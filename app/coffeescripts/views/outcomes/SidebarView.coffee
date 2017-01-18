@@ -68,7 +68,8 @@ define [
       else
         parent = _.last @directories
         directoryClass = outcomeGroup.get('directoryClass') || OutcomesDirectoryView
-        dir = new directoryClass {outcomeGroup, parent, @readOnly, selectFirstItem: @selectFirstItem, inFindDialog: @inFindDialog}
+        i = _.indexOf @directories, @selectedDir()
+        dir = new directoryClass {outcomeGroup, parent, @readOnly, selectFirstItem: @selectFirstItem, inFindDialog: @inFindDialog, directoryDepth: i + 1}
         @firstDir = false
       @addDir dir
 
@@ -106,9 +107,6 @@ define [
 
     # Select the directory view and optionally select an Outcome or Group.
     selectDir: (dir, selectedModel) =>
-      # don't re-select the same model
-      return if selectedModel and dir is @selectedDir() and selectedModel is @selectedDir()?.prevSelectedModel
-
       # If root selection is an outcome, don't have a dir. Get root most dir to clear selection.
       useDir = if dir then dir else @directories[0]
       useDir.clearSelection() if useDir and !selectedModel
@@ -161,6 +159,9 @@ define [
       else
         i = _.indexOf @directories, @selectedDir()
         @selectDir @directories[i - 1]
+
+      @selectedDir().makeFocusable()
+
       @goingBack = false
 #      if @selectedModel() instanceof OutcomeGroup
 #        parentDir = @selectedDir().parent

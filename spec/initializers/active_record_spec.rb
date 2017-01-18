@@ -55,9 +55,50 @@ module ActiveRecord
           User.connection.cache { User.find_each(batch_size: 1) { |u| found << u } }
           expect(found).to eq users
         end
+
+        it "cleans up the cursor" do
+          # two cursors with the same name; if it didn't get cleaned up, it would error
+          User.all.find_each {}
+          User.all.find_each {}
+        end
+
+        it "cleans up the temp table for non-DB error" do
+          User.create!
+          # two temp tables with the same name; if it didn't get cleaned up, it would error
+          expect do
+            User.all.find_each do
+              raise ArgumentError
+            end
+          end.to raise_error(ArgumentError)
+
+          User.all.find_each {}
+        end
+
+        it "doesnt obfuscate the error when it dies in a transaction" do
+          account = Account.create!
+          course = account.courses.create!
+          User.create!
+          expect do
+            ActiveRecord::Base.transaction do
+              User.all.find_each do |batch|
+                # to force a foreign key error
+                Account.where(id: account).delete_all
+              end
+            end
+          end.to raise_error(ActiveRecord::InvalidForeignKey)
+        end
       end
 
       describe "with temp table" do
+        around do |example|
+          begin
+            ActiveRecord::Base.in_migration = true
+            example.run
+          ensure
+            ActiveRecord::Base.in_migration = false
+          end
+        end
+
         it "should use a temp table when you select without an id" do
           User.create!
           User.select(:name).find_in_batches do |batch|
@@ -68,7 +109,7 @@ module ActiveRecord
         it "should not use a temp table for a plain query" do
           User.create!
           User.find_in_batches do |batch|
-            expect { User.connection.select_value("SELECT COUNT(*) FROM users_find_in_batches_temp_table_#{User.scoped.to_sql.hash.abs.to_s(36)}") }.to raise_error
+            expect { User.connection.select_value("SELECT COUNT(*) FROM users_find_in_batches_temp_table_#{User.all.to_sql.hash.abs.to_s(36)}") }.to raise_error
           end
         end
 
@@ -89,6 +130,38 @@ module ActiveRecord
           end
         end
 
+        it "cleans up the temp table" do
+          # two temp tables with the same name; if it didn't get cleaned up, it would error
+          User.all.find_in_batches_with_temp_table {}
+          User.all.find_in_batches_with_temp_table {}
+        end
+
+        it "cleans up the temp table for non-DB error" do
+          User.create!
+          # two temp tables with the same name; if it didn't get cleaned up, it would error
+          expect do
+            User.all.find_in_batches_with_temp_table do
+              raise ArgumentError
+            end
+          end.to raise_error(ArgumentError)
+
+          User.all.find_in_batches_with_temp_table {}
+        end
+
+        it "doesnt obfuscate the error when it dies in a transaction" do
+          account = Account.create!
+          course = account.courses.create!
+          User.create!
+          expect do
+            ActiveRecord::Base.transaction do
+              User.all.find_in_batches_with_temp_table do |batch|
+                # to force a foreign key error
+                Account.where(id: account).delete_all
+              end
+            end
+          end.to raise_error(ActiveRecord::InvalidForeignKey)
+        end
+
       end
     end
 
@@ -98,7 +171,7 @@ module ActiveRecord
           User.create(name: 'dr who')
           User.create(name: 'dr who')
 
-          expect { User.joins("INNER JOIN users u ON users.sortable_name = u.sortable_name").
+          expect { User.joins("INNER JOIN #{User.quoted_table_name} u ON users.sortable_name = u.sortable_name").
             where("u.sortable_name <> users.sortable_name").delete_all }.to_not raise_error
         end
       end
@@ -167,17 +240,18 @@ module ActiveRecord
     describe "union" do
       shared_examples_for "query creation" do
         it "should include conditions after the union inside of the subquery" do
-          query = base.active.where(id:99).union(User.where(id:1)).to_sql
-          sql_before_union, sql_after_union = query.split("UNION ALL")
+          wheres = base.active.where(id:99).union(User.where(id:1)).where_values
+          expect(wheres.count).to eq 1
+          sql_before_union, sql_after_union = wheres.first.split("UNION ALL")
           expect(sql_before_union.include?("99")).to be_falsey
           expect(sql_after_union.include?("99")).to be_truthy
         end
 
         it "should include conditions prior to the union outside of the subquery" do
-          query = base.active.union(User.where(id:1)).where(id:99).to_sql
-          sql_before_union, sql_after_union = query.split("UNION ALL")
-          expect(sql_before_union.include?("99")).to be_truthy
-          expect(sql_after_union.include?("99")).to be_falsey
+          wheres = base.active.union(User.where(id:1)).where(id:99).where_values
+          expect(wheres.count).to eq 2
+          union_where = wheres.detect{|w| w.is_a?(String) && w.include?("UNION ALL")}
+          expect(union_where.include?("99")).to be_falsey
         end
       end
 
@@ -188,8 +262,7 @@ module ActiveRecord
 
       context "through a relation" do
         include_examples "query creation"
-        a = Account.create!
-        let(:base) { Account.find(a.id).users }
+        let(:base) { Account.create.users }
       end
     end
   end

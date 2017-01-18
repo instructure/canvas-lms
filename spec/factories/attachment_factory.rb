@@ -27,14 +27,19 @@ Attachment.class_eval do
   # Marshal.dump, you can't have any singleton methods (which our
   # Rails 3 attachment_fu hacks do while saving)
   def marshal_dump
-    attributes = clone_attributes(:read_attribute_before_type_cast)
-    self.class.initialize_attributes(attributes, :serialized => false)
+    if CANVAS_RAILS4_0
+      attributes = clone_attributes(:read_attribute_before_type_cast)
+      self.class.initialize_attributes(attributes, :serialized => false)
+    else
+      attributes = self.attributes
+    end
     [attributes, instance_variable_get(:@new_record)]
   end
 
   def marshal_load(data)
     initialize
-    instance_variable_set :@attributes, data[0]
+    instance_variable_set :@attributes, (CANVAS_RAILS4_0 ? data[0] : self.class.attributes_builder.build_from_database(data[0]))
+    instance_variable_set :@attributes_cache, {}
     instance_variable_set :@new_record, data[1]
   end
 end
@@ -95,3 +100,23 @@ def crocodocable_attachment_model(opts={})
 end
 
 alias :canvadocable_attachment_model :crocodocable_attachment_model
+
+def attachment_obj_with_context(obj, opts={})
+  @attachment = factory_with_protected_attributes(Attachment, valid_attachment_attributes.merge(opts))
+  @attachment.context = obj
+  @attachment
+end
+
+def attachment_with_context(obj, opts={})
+  attachment_obj_with_context(obj, opts)
+  @attachment.save!
+  @attachment
+end
+
+def create_attachment_for_file_upload_submission!(submission, opts={})
+  submission.attachments.create! opts.merge({
+    :filename => "doc.doc",
+    :display_name => "doc.doc", :user => @user,
+    :uploaded_data => dummy_io
+  })
+end

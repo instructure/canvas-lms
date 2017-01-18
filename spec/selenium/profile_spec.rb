@@ -1,20 +1,20 @@
-# encoding: UTF-8
+# encoding: utf-8
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "profile" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def click_edit
     f('.edit_settings_link').click
     edit_form = f('#update_profile_form')
-    keep_trying_until { expect(edit_form).to be_displayed }
+    expect(edit_form).to be_displayed
     edit_form
   end
 
   def add_skype_service
     f('#unregistered_service_skype > a').click
     skype_dialog = f('#unregistered_service_skype_dialog')
-    skype_dialog.find_element(:id, 'user_service_user_name').send_keys("jakesorce")
+    skype_dialog.find_element(:id, 'skype_user_service_user_name').send_keys("jakesorce")
     submit_dialog(skype_dialog, '.btn')
     wait_for_ajaximations
     expect(f('#registered_services')).to include_text("Skype")
@@ -24,7 +24,7 @@ describe "profile" do
     f('.add_access_token_link').click
     access_token_form = f('#access_token_form')
     access_token_form.find_element(:id, 'access_token_purpose').send_keys(purpose)
-    submit_form(access_token_form)
+    submit_dialog_form(access_token_form)
     wait_for_ajax_requests
     details_dialog = f('#token_details_dialog')
     expect(details_dialog).to be_displayed
@@ -33,31 +33,13 @@ describe "profile" do
     end
   end
 
-  it "should give error - wrong old password" do
-    user_with_pseudonym({:active_user => true})
+  def log_in_to_settings
+    user_with_pseudonym({active_user: true})
     create_session(@pseudonym)
     get '/profile/settings'
-    wrong_old_password = 'wrongoldpassword'
-    new_password = 'newpassword'
-    edit_form = click_edit
-    edit_form.find_element(:id, 'change_password_checkbox').click
-    edit_form.find_element(:id, 'old_password').send_keys(wrong_old_password)
-    edit_form.find_element(:id, 'pseudonym_password').send_keys(new_password)
-    edit_form.find_element(:id, 'pseudonym_password_confirmation').send_keys(new_password)
-    submit_form(edit_form)
-    wait_for_ajaximations
-    # check to see if error box popped up
-    errorboxes = ff('.error_text')
-    expect(errorboxes.length).to be > 1
-    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Invalid old password for the login/ }).to be_truthy
   end
 
-  it "should change the password" do
-    user_with_pseudonym({:active_user => true})
-    create_session(@pseudonym)
-    get '/profile/settings'
-    old_password = 'asdfasdf'
-    new_password = 'newpassword'
+  def change_password(old_password, new_password)
     edit_form = click_edit
     edit_form.find_element(:id, 'change_password_checkbox').click
     edit_form.find_element(:id, 'old_password').send_keys(old_password)
@@ -65,13 +47,41 @@ describe "profile" do
     edit_form.find_element(:id, 'pseudonym_password_confirmation').send_keys(new_password)
     submit_form(edit_form)
     wait_for_ajaximations
-    #login with new password
-    expect(@pseudonym.reload).to be_valid_password(new_password)
+  end
+
+  it "should give error - wrong old password" do
+    log_in_to_settings
+    change_password('wrongoldpassword', 'newpassword')
+    # check to see if error box popped up
+    errorboxes = ff('.error_text')
+    expect(errorboxes.length).to be > 1
+    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Invalid old password for the login/ }).to be_truthy
+  end
+
+  it "should change the password" do
+    log_in_to_settings
+    change_password('asdfasdf', 'newpassword')
+    # login with new password
+    expect(@pseudonym.reload).to be_valid_password('newpassword')
+  end
+
+  it "rejects passwords longer than 255 characters", priority: "2", test_id: 840136 do
+    log_in_to_settings
+    change_password('asdfasdf', SecureRandom.hex(128))
+    errorboxes = ff('.error_text')
+    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Can't exceed 255 characters/ }).to be_truthy
+  end
+
+  it "rejects passwords shorter than 6 characters", priority: "2", test_id: 1055503 do
+    log_in_to_settings
+    change_password('asdfasdf', SecureRandom.hex(2))
+    errorboxes = ff('.error_text')
+    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Must be at least 6 characters/ }).to be_truthy
   end
 
   context "non password tests" do
 
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
     end
 
@@ -80,6 +90,7 @@ describe "profile" do
     end
 
     it "should add a new email address on profile settings page" do
+      @user.account.enable_feature!(:international_sms)
       notification_model(:category => 'Grading')
       notification_policy_model(:notification_id => @notification.id)
 
@@ -87,17 +98,18 @@ describe "profile" do
       add_email_link
 
       f('#communication_channels a[href="#register_sms_number"]').click
+
+      click_option('#communication_channel_sms_country', 'United States (+1)')
       replace_content(f('#register_sms_number #communication_channel_sms_email'), 'test@example.com')
       expect(f('#register_sms_number button[type="submit"]')).to be_displayed
       f('#communication_channels a[href="#register_email_address"]').click
       form = f("#register_email_address")
       test_email = 'nobody+1234@example.com'
-      form.find_element(:id, 'communication_channel_address').send_keys(test_email)
+      form.find_element(:id, 'communication_channel_email').send_keys(test_email)
       submit_form(form)
 
       confirmation_dialog = f("#confirm_email_channel")
-      keep_trying_until { expect(confirmation_dialog).to be_displayed }
-      expect(driver.execute_script("return INST.errorCount;")).to eq 0
+      expect(confirmation_dialog).to be_displayed
       submit_dialog(confirmation_dialog, '.cancel_button')
       expect(confirmation_dialog).not_to be_displayed
       expect(f('.email_channels')).to include_text(test_email)
@@ -110,7 +122,7 @@ describe "profile" do
 
       get '/profile/settings'
       row = f("#channel_#{channel.id}")
-      link = f("#channel_#{channel.id} td:first-child a")
+      link = f("#channel_#{channel.id} td:first-of-type a")
       link.click
       wait_for_ajaximations
       expect(row).to have_class("default")
@@ -120,21 +132,20 @@ describe "profile" do
       new_user_name = 'new user name'
       get "/profile/settings"
       edit_form = click_edit
-      edit_form.find_element(:id, 'user_name').send_keys(new_user_name)
+      replace_content(edit_form.find_element(:id, 'user_name'), new_user_name)
       submit_form(edit_form)
       wait_for_ajaximations
-      keep_trying_until { expect(f('.full_name').text).to eq new_user_name }
+      expect(f('.full_name')).to include_text new_user_name
     end
 
     it "should edit display name and validate" do
       new_display_name = 'test name'
       get "/profile/settings"
       edit_form = click_edit
-      edit_form.find_element(:id, 'user_short_name').send_keys(new_display_name)
+      replace_content(edit_form.find_element(:id, 'user_short_name'), new_display_name)
       submit_form(edit_form)
-      wait_for_ajaximations
       refresh_page
-      keep_trying_until { expect(f('#topbar li.user_name').text).to eq new_display_name }
+      expect(displayed_username).to eq(new_display_name)
     end
 
     it "should change the language" do
@@ -159,16 +170,19 @@ describe "profile" do
     end
 
     it "should add another contact method - sms" do
+      @user.account.enable_feature!(:international_sms)
       test_cell_number = '8017121011'
       get "/profile/settings"
       f('.add_contact_link').click
+      click_option('#communication_channel_sms_country', 'United States (+1)')
       register_form = f('#register_sms_number')
       register_form.find_element(:css, '.sms_number').send_keys(test_cell_number)
       click_option('select.user_selected.carrier', 'AT&T')
+      driver.action.send_keys(:tab).perform
       submit_form(register_form)
       wait_for_ajaximations
       close_visible_dialog
-      keep_trying_until { expect(f('.other_channels .path')).to include_text(test_cell_number) }
+      expect(f('.other_channels .path')).to include_text(test_cell_number)
     end
 
     it "should register a service" do
@@ -191,15 +205,17 @@ describe "profile" do
     it "should toggle service visibility" do
       get "/profile/settings"
       add_skype_service
-      initial_state = @user.show_user_services
-
-      f('#show_user_services').click
+      selector = "#show_user_services"
+      expect(f(selector).selected?).to be_truthy
+      f(selector).click
       wait_for_ajaximations
-      expect(@user.reload.show_user_services).not_to eq initial_state
+      refresh_page
+      expect(f(selector).selected?).to be_falsey
 
-      f('#show_user_services').click
+      f(selector).click
       wait_for_ajaximations
-      expect(@user.reload.show_user_services).to eq initial_state
+      refresh_page
+      expect(f(selector).selected?).to be_truthy
     end
 
     it "should generate a new access token" do
@@ -232,6 +248,18 @@ describe "profile" do
       driver.switch_to.alert.accept
       wait_for_ajaximations
       expect(f('#access_tokens')).not_to be_displayed
+      check_element_has_focus f(".add_access_token_link")
+    end
+
+    it "should set focus to the previous access token when deleting and multiple exist" do
+      @token1 = @user.access_tokens.create! purpose: 'token_one'
+      @token2 = @user.access_tokens.create! purpose: 'token_two'
+      get "/profile/settings"
+      fj(".delete_key_link[rel$=#{@token2.id}]").click
+      expect(driver.switch_to.alert).not_to be_nil
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      check_element_has_focus fj(".delete_key_link[rel$=#{@token1.id}]")
     end
   end
 
@@ -242,11 +270,9 @@ describe "profile" do
 
     it "should link back to profile/settings in oauth callbacks" do
       get "/profile/settings"
-      links = ffj('#unregistered_services .service .content a')
+      links = ff('#unregistered_services .service .content a')
       links.each do |l|
-        url = l.attribute('href')
-        query = URI.parse(url).query
-        expect(CGI.unescape(query)).to match /profile\/settings/
+        expect(l).to have_attribute('href', 'profile%2Fsettings')
       end
     end
   end
@@ -256,47 +282,17 @@ describe "profile" do
       local_storage!
     end
 
-    it "should successfully upload profile pictures" do
-      skip("intermittently fails")
-      course_with_teacher_logged_in
-      a = Account.default
-      a.enable_service('avatars')
-      a.save!
-      image_src = ''
-
-      get "/profile/settings"
-      keep_trying_until { f(".profile_pic_link") }.click
-      dialog = f("#profile_pic_dialog")
-      expect(dialog).to be_displayed
-      dialog.find_element(:css, ".add_pic_link").click
-      filename, fullpath, data = get_file("graded.png")
-      dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
-      # Make ajax request slow down to verify transitional state
-      FilesController.before_filter { sleep 5; true }
-
-      submit_form('#add_pic_form')
-
-      new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
-      expect(new_image.attribute('src')).not_to match %r{/images/thumbnails/}
-
-      FilesController._process_action_callbacks.pop
-
-      keep_trying_until do
-        spans = ffj("#profile_pic_dialog .profile_pic_list span.img")
-        spans.last.attribute('class') =~ /selected/
-        uploaded_image = ffj("#profile_pic_dialog .profile_pic_list span.img img").last
-        image_src = uploaded_image.attribute('src')
-        expect(image_src).to match %r{/images/thumbnails/}
-        expect(new_image.attribute('alt')).to match /graded/
-      end
-      dialog.find_element(:css, '.select_button').click
+    it "should save admin profile pics setting", priority: "1", test_id: 68933 do
+      site_admin_logged_in
+      get "/accounts/#{Account.default.id}/settings"
+      f('#account_services_avatars').click
+      f('.btn.btn-primary[type="submit"]').click
       wait_for_ajaximations
-      keep_trying_until do
-        profile_pic = fj('.profile_pic_link img')
-        expect(profile_pic).to have_attribue('src', image_src)
-      end
-      expect(Attachment.last.folder).to eq @user.profile_pics_folder
+      expect(is_checked('#account_services_avatars')).to be_truthy
     end
+
+    # TODO reimplement per CNVS-29610, but make sure we're testing at the right level
+    it "should successfully upload profile pictures"
 
     it "should allow users to choose an avatar from their profile page" do
       course_with_teacher_logged_in
@@ -317,51 +313,8 @@ describe "profile" do
   end
 
   describe "profile pictures s3 tests" do
-    before do
-      s3_storage!(:stubs => false)
-    end
-
-    it "should successfully upload profile pictures" do
-      skip("intermittently fails")
-      course_with_teacher_logged_in
-      a = Account.default
-      a.enable_service('avatars')
-      a.save!
-      image_src = ''
-
-      get "/profile/settings"
-      keep_trying_until { f(".profile_pic_link") }.click
-      dialog = f("#profile_pic_dialog")
-      expect(dialog).to be_displayed
-      dialog.find_element(:css, ".add_pic_link").click
-      filename, fullpath, data = get_file("graded.png")
-      dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
-      # Make ajax request slow down to verify transitional state
-      FilesController.before_filter { sleep 5; true }
-
-      submit_form('#add_pic_form')
-
-      new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
-      expect(new_image.attribute('src')).not_to match %r{/images/thumbnails/}
-
-      FilesController._process_action_callbacks.pop
-
-      keep_trying_until do
-        spans = ffj("#profile_pic_dialog .profile_pic_list span.img")
-        spans.last.attribute('class') =~ /selected/
-        uploaded_image = ffj("#profile_pic_dialog .profile_pic_list span.img img").last
-        image_src = uploaded_image.attribute('src')
-        expect(image_src).to match %r{/images/thumbnails/}
-        expect(new_image.attribute('alt')).to match /graded/
-      end
-      dialog.find_element(:css, '.select_button').click
-      wait_for_ajaximations
-      keep_trying_until do
-        profile_pic = fj('.profile_pic_link img')
-        expect(profile_pic).to have_attribue('src', image_src)
-      end
-      expect(Attachment.last.folder).to eq @user.profile_pics_folder
-    end
+    # TODO reimplement per CNVS-29611, but make sure we're testing at the right level
+    it "should successfully upload profile pictures"
   end
 
   describe "avatar reporting" do
@@ -399,4 +352,3 @@ describe "profile" do
     end
   end
 end
-

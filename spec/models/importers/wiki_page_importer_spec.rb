@@ -25,9 +25,10 @@ describe "Importing wikis" do
       it "should import for #{system}" do
         data = get_import_data(system, 'wiki')
         context = get_import_context(system)
+        migration = context.content_migrations.create!
 
-        Importers::WikiPageImporter.import_from_migration(data, context)
-        Importers::WikiPageImporter.import_from_migration(data, context)
+        Importers::WikiPageImporter.import_from_migration(data, context, migration)
+        Importers::WikiPageImporter.import_from_migration(data, context, migration)
         expect(context.wiki.wiki_pages.count).to eq 1
 
         wiki = WikiPage.where(migration_id: data[:migration_id]).first
@@ -39,12 +40,14 @@ describe "Importing wikis" do
   it "should update BB9 wiki page links to the correct url" do
     data = get_import_data('bb9', 'wikis')
     context = get_import_context('bb9')
+    migration = context.content_migrations.create!
     2.times do
       data.each do |wiki|
-        Importers::WikiPageImporter.import_from_migration(wiki, context)
+        Importers::WikiPageImporter.import_from_migration(wiki, context, migration)
       end
     end
-    
+    migration.resolve_content_links!
+
     # The wiki references should resolve to course urls
     expect(context.wiki.wiki_pages.count).to eq 18
     wiki = WikiPage.where(migration_id: 'res00146').first

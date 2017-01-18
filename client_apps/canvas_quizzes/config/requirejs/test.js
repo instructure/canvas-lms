@@ -10,7 +10,8 @@ requirejs.config({
     },
 
     '*': {
-      'old_unsupported_dont_use_react': 'canvas/old_unsupported_dont_use_react'
+      'old_unsupported_dont_use_react': 'canvas/old_unsupported_dont_use_react',
+      'str': 'canvas/str'
     }
   },
 
@@ -22,7 +23,8 @@ requirejs.config({
 
     'test': '../test',
     'fixtures': '../test/fixtures',
-    'canvas_quizzes': '../../common/js'
+    'canvas_quizzes': '../../common/js',
+    'canvas_app': '../../vendor/canvas_app'
   },
 
   deps: [

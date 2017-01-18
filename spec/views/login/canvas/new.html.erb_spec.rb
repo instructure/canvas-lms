@@ -32,7 +32,7 @@ describe "login/canvas/new.html.erb" do
   end
 
   it "uses ldap route for the ldap 'controller'" do
-    Account.default.account_authorization_configs.create!(:auth_type => 'ldap')
+    Account.default.authentication_providers.create!(:auth_type => 'ldap')
 
     controller.request.path_parameters[:controller] = 'login/ldap'
     render
@@ -49,7 +49,7 @@ describe "login/canvas/new.html.erb" do
 
   context "with external mechanism specified" do
     let(:account){ Account.default }
-    let(:config){ account.account_authorization_configs.build }
+    let(:config){ account.authentication_providers.build }
 
     before do
       config.auth_type = 'ldap'

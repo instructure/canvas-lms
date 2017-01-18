@@ -31,22 +31,14 @@ class Folder < ActiveRecord::Base
   MY_FILES_FOLDER_NAME = "my files"
   CONVERSATION_ATTACHMENTS_FOLDER_NAME = "conversation attachments"
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['User', 'Group', 'Account', 'Course']
+  belongs_to :context, polymorphic: [:user, :group, :account, :course]
   belongs_to :cloned_item
   belongs_to :parent_folder, :class_name => "Folder"
   has_many :file_attachments, :class_name => "Attachment"
-  has_many :active_file_attachments, :class_name => 'Attachment', :conditions => ['attachments.file_state != ?', 'deleted']
-  has_many :visible_file_attachments, :class_name => 'Attachment', :conditions => ['attachments.file_state in (?, ?)', 'available', 'public']
+  has_many :active_file_attachments, -> { where("attachments.file_state<>'deleted'") }, class_name: 'Attachment'
+  has_many :visible_file_attachments, -> { where(file_state: ['available', 'public']) }, class_name: 'Attachment'
   has_many :sub_folders, :class_name => "Folder", :foreign_key => "parent_folder_id", :dependent => :destroy
-  has_many :active_sub_folders, :class_name => "Folder", :conditions => ['folders.workflow_state != ?', 'deleted'], :foreign_key => "parent_folder_id", :dependent => :destroy
-
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :name, :full_name, :context_id, :context_type, :parent_folder_id, :workflow_state, :created_at, :updated_at, :deleted_at, :locked,
-    :lock_at, :unlock_at, :last_lock_at, :last_unlock_at, :cloned_item_id, :position
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:context, :cloned_item, :parent_folder, :file_attachments, :sub_folders]
+  has_many :active_sub_folders, -> { where("folders.workflow_state<>'deleted'") }, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy
 
   acts_as_list :scope => :parent_folder
 
@@ -60,6 +52,7 @@ class Folder < ActiveRecord::Base
   validates_length_of :name, :maximum => maximum_string_length
   validate :protect_root_folder_name, :if => :name_changed?
   validate :reject_recursive_folder_structures, on: :update
+  validate :restrict_submission_folder_context
 
   def file_attachments_visible_to(user)
     if self.context.grants_right?(user, :manage_files)
@@ -97,19 +90,21 @@ class Folder < ActiveRecord::Base
     return true
   end
 
+  def restrict_submission_folder_context
+    if self.for_submissions? && !self.context.is_a?(User) && !self.context.is_a?(Group)
+      errors.add(:submission_context_code, t("submissions folders must be created in User or Group context"))
+      return false
+    end
+    true
+  end
+
   workflow do
-    # Anyone who has read access to the course can view
     state :visible
-    # Anyone who is an enrolled member of the course can view
-    state :protected
-    # Only course admins can view
-    state :private
-    # Not sure what this was for...
     state :hidden
     state :deleted
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.active_file_attachments.each{|a| a.destroy }
@@ -154,7 +149,7 @@ class Folder < ActiveRecord::Base
     # TODO i18n
     t :default_folder_name, 'New Folder'
     self.name = 'New Folder' if self.name.blank?
-    self.name = self.name.gsub(/\//, "_")
+    self.name = self.name.strip.gsub(/\//, "_")
     folder = self
     @update_sub_folders = false
     self.parent_folder_id = nil if !self.parent_folder || self.parent_folder.context != self.context || self.parent_folder_id == self.id
@@ -219,7 +214,6 @@ class Folder < ActiveRecord::Base
   end
 
   def visible?
-    # everything but private folders should be visible... for now...
     return @visible if defined?(@visible)
     @visible = (self.workflow_state == "visible") && (!self.parent_folder || self.parent_folder.visible?)
   end
@@ -239,11 +233,6 @@ class Folder < ActiveRecord::Base
 
   def just_hide
     self.workflow_state == 'hidden'
-  end
-
-  def protected?
-    return @protected if defined?(@protected)
-    @protected = (self.workflow_state == 'protected') || (self.parent_folder && self.parent_folder.protected?)
   end
 
   def public?
@@ -326,6 +315,13 @@ class Folder < ActiveRecord::Base
     end
 
     root_folders
+  end
+
+  def self.is_locked?(folder_id)
+    RequestCache.cache('folder_is_locked', folder_id) do
+      folder = Folder.where(:id => folder_id).first
+      folder && folder.locked?
+    end
   end
 
   def attachments
@@ -445,25 +441,34 @@ class Folder < ActiveRecord::Base
       (self.parent_folder && self.parent_folder.locked?)
   end
 
+  def for_submissions?
+    !self.submission_context_code.nil?
+  end
+
   def currently_locked
     self.locked || (self.lock_at && Time.now > self.lock_at) || (self.unlock_at && Time.now < self.unlock_at) || self.workflow_state == 'hidden'
   end
 
   set_policy do
-    given { |user, session| self.visible? && self.context.grants_right?(user, session, :read) }#students.include?(user) }
+    given { |user, session| self.visible? && self.context.grants_right?(user, session, :read) }
     can :read
 
     given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
-    can :read_contents
+    can :read_as_admin, :read_contents, :read_contents_for_export
 
-    given { |user, session| self.visible? && !self.locked? && self.context.grants_right?(user, session, :read) && !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES)) }#students.include?(user) }
-    can :read_contents
+    given { |user, session| self.visible? && !self.locked? && self.context.grants_right?(user, session, :read) && !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES)) }
+    can :read_contents, :read_contents_for_export
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_files) }#admins.include?(user) }
-    can :update and can :delete and can :create and can :read and can :read_contents
+    given do |user, session|
+      self.visible? && !self.locked? && self.context.grants_right?(user, session, :read)
+    end
+    can :read_contents_for_export
 
-    given {|user, session| self.protected? && !self.locked? && self.context.grants_right?(user, session, :read) && self.context.users.include?(user) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_files) }
     can :read and can :read_contents
+
+    given { |user, session| !self.for_submissions? && self.context.grants_right?(user, session, :manage_files) }
+    can :update and can :delete and can :create and can :manage_contents
   end
 
   # find all unlocked/visible folders that can be reached by following unlocked/visible folders from the root
@@ -479,7 +484,9 @@ class Folder < ActiveRecord::Base
     visible_ids
   end
 
-  private
+  def self.from_context_or_id(context, id)
+    root_folders(context).first || where(id: id).first || (raise ActiveRecord::RecordNotFound)
+  end
 
   def self.find_visible_folders(visible_ids, folder_tree, dir_contents)
     visible_ids.concat dir_contents
@@ -489,4 +496,5 @@ class Folder < ActiveRecord::Base
     end
     nil
   end
+  private_class_method :find_visible_folders
 end

@@ -1,16 +1,16 @@
-/** @jsx React.DOM */
-
 define([
   'underscore',
   'react',
   'jsx/due_dates/DueDateTokenWrapper',
   'jsx/due_dates/DueDateCalendarPicker',
+  'jsx/shared/helpers/accessibleDateFormat',
+  'timezone',
   'i18n!assignments',
+  'classnames',
   'jquery',
   'jquery.instructure_forms'
-], (_ , React, DueDateTokenWrapper ,DueDateCalendarPicker ,I18n, $) => {
+], (_, React, DueDateTokenWrapper, DueDateCalendarPicker, accessibleDateFormat, tz, I18n, cx, $) => {
 
-  var cx = React.addons.classSet;
   var DueDateCalendarPicker = React.createClass({
 
     propTypes: {
@@ -29,16 +29,11 @@ define([
 
       $(dateInput).datetime_field().change( (e) => {
         var trimmedInput = $.trim(e.target.value)
-        var localizedDate = $(dateInput).data('date')
 
-        var newDate = (trimmedInput === "") ?
-          null :
-          localizedDate
+        var newDate = $(dateInput).data('unfudged-date')
+        newDate     = (trimmedInput === "") ? null : newDate
+        newDate     = this.changeToFancyMidnightIfNeeded(newDate)
 
-        if(this.fancyMidnightNeeded(trimmedInput, newDate)){
-          var newDate = this.changeToFancyMidnight(newDate)
-        }
-        var newDate = $.unfudgeDateForProfileTimezone(newDate)
         this.props.handleUpdate(newDate)
       })
     },
@@ -49,30 +44,20 @@ define([
       $(dateInput).val(this.formattedDate())
     },
 
-    // --------------------
-    //    Fancy Midnight
-    // --------------------
-
-    fancyMidnightNeeded(userInput, localizedDate){
-      return localizedDate && !(this.props.dateType == "unlock_at") && this.isMidnight(localizedDate)
+    changeToFancyMidnightIfNeeded(date) {
+      if( !(this.props.dateType == "unlock_at") &&
+          tz.isMidnight(date, { timezone: ENV.CONTEXT_TIMEZONE }) ) {
+        return tz.changeToTheSecondBeforeMidnight(date);
+      } else {
+        return date;
+      }
     },
-
-    isMidnight(date){
-      return date.getHours() === 0 && date.getMinutes() === 0
-    },
-
-    changeToFancyMidnight(date){
-      date.setHours(23)
-      date.setMinutes(59)
-      return date
-    },
-
     // ---------------
     //    Rendering
     // ---------------
 
     formattedDate(){
-      return $.datetimeString(this.props.dateValue,{localized: false})
+      return $.datetimeString(this.props.dateValue)
     },
 
     wrapperClassName(){
@@ -95,6 +80,8 @@ define([
         <div ref="datePickerWrapper" className={this.wrapperClassName()}>
           <input type            = "text"
                  ref             = "dateInput"
+                 title           = {accessibleDateFormat()}
+                 data-tooltip    = ""
                  className       = {this.inputClasses()}
                  aria-labelledby = {this.props.labelledBy}
                  data-row-key    = {this.props.rowKey}

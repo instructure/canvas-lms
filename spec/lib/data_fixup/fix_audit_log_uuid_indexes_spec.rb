@@ -189,19 +189,6 @@ describe DataFixup::FixAuditLogUuidIndexes do
     check_event_stream(check[:event_id], 'courses', check[:count])
   end
 
-  it "fixes index rows as they are queried for the same key" do
-    event_id = CanvasSlug.generate
-    course_with_teacher
-    SecureRandom.stubs(:uuid).returns(event_id)
-    Auditors::Course.record_created(@course, @teacher, { name: @course.name }, source: :manual)
-    Timecop.freeze(Time.now + 1.hour) do
-      Auditors::Course.record_updated(@course, @teacher, { name: @course.name }, source: :manual)
-    end
-    SecureRandom.unstub(:uuid)
-
-    expect(Auditors::Course.for_course(@course).paginate(per_page: 5).size).to eq 2
-  end
-
   it "fixes index rows as they are queried for events that have multiple indexes" do
     users = []
     pseudonyms = []

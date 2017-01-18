@@ -19,8 +19,7 @@
 class ExternalFeed < ActiveRecord::Base
   attr_accessible :url, :verbosity, :header_match
   belongs_to :user
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
+  belongs_to :context, polymorphic: [:course, :group]
 
   has_many :external_feed_entries, :dependent => :destroy
   has_many :discussion_topics, dependent: :nullify
@@ -46,27 +45,27 @@ class ExternalFeed < ActiveRecord::Base
     true
   end
   protected :infer_defaults
-  
+
   def display_name(short=true)
     short_url = (self.url || "").split("/")[0,3].join("/")
     res = self.title || (short ? t(:short_feed_title, "%{short_url} feed", :short_url => short_url) : self.url )
-    
+
   end
 
   def header_match=(str)
     write_attribute(:header_match, str.to_s.strip.presence)
   end
-  
+
   scope :to_be_polled, ->(start) {
     where("external_feeds.consecutive_failures<5 AND external_feeds.refresh_at<?", start).order(:refresh_at)
   }
-  
+
   def add_rss_entries(rss)
     items = rss.items.map{|item| add_entry(item, rss, :rss) }.compact
     self.context.add_aggregate_entries(items, self) if self.context && self.context.respond_to?(:add_aggregate_entries)
     items
   end
-  
+
   def add_atom_entries(atom)
     items = []
     atom.each_entry{|item| items << add_entry(item, atom, :atom) }
@@ -74,7 +73,7 @@ class ExternalFeed < ActiveRecord::Base
     self.context.add_aggregate_entries(items, self) if self.context && self.context.respond_to?(:add_aggregate_entries)
     items
   end
-  
+
   def format_description(desc)
     desc = (desc || "").to_s
     if self.verbosity == 'link_only'
@@ -86,10 +85,15 @@ class ExternalFeed < ActiveRecord::Base
       desc
     end
   end
-  
+
   def add_entry(item, feed, feed_type)
     if feed_type == :rss
-      uuid = (item.respond_to?(:guid) && item.guid && item.guid.content.to_s) || Digest::MD5.hexdigest("#{item.title}#{item.date.strftime('%Y-%m-%d')}")
+      uuid = item.respond_to?(:guid) && item.guid && item.guid.content.to_s
+      if uuid && uuid.length > 255
+        uuid = Digest::MD5.hexdigest(uuid)
+      end
+      uuid ||= Digest::MD5.hexdigest("#{item.title}#{item.date.strftime('%Y-%m-%d')}")
+
       entry = self.external_feed_entries.where(uuid: uuid).first
       entry ||= self.external_feed_entries.where(url: item.link).first
       description = entry && entry.message
@@ -99,7 +103,7 @@ class ExternalFeed < ActiveRecord::Base
       end
       if entry
         entry.update_feed_attributes(
-          :title => item.title,
+          :title => item.title.to_s,
           :message => description,
           :url => item.link
         )
@@ -111,7 +115,7 @@ class ExternalFeed < ActiveRecord::Base
       description = "<a href='#{ERB::Util.h(item.link)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
       description += format_description(item.description || item.title)
       entry = self.external_feed_entries.new(
-        :title => item.title,
+        :title => item.title.to_s,
         :message => description,
         :source_name => feed.channel.title,
         :source_url => feed.channel.link,
@@ -132,7 +136,7 @@ class ExternalFeed < ActiveRecord::Base
       end
       if entry
         entry.update_feed_attributes(
-          :title => item.title,
+          :title => item.title.to_s,
           :message => description,
           :url => item.links.alternate.to_s,
           :author_name => author.name,
@@ -149,7 +153,7 @@ class ExternalFeed < ActiveRecord::Base
       entry = self.external_feed_entries.new(
         :title => item.title,
         :message => description,
-        :source_name => feed.title,
+        :source_name => feed.title.to_s,
         :source_url => feed.links.alternate.to_s,
         :posted_at => item.published,
         :url => item.links.alternate.to_s,

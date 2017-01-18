@@ -20,6 +20,36 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe GradingStandardsApiController, type: :request do
   context "account admin" do
+    describe 'get grading standards' do
+      it "should get a list of account grading standards" do
+        account_admin_user
+        account = Account.default
+        account_resource_path = "/api/v1/accounts/#{account.id}/grading_standards"
+        account_resource_params = { :controller => 'grading_standards_api',
+                                     :action => 'context_index',
+                                     :format => 'json',
+                                     :account_id => account.id.to_s }
+        grading_standard_for account
+        res = api_call(:get, account_resource_path, account_resource_params)
+        expect(res.first["context_type"]).to eq 'Account'
+        expect(res.first["context_id"]).to eq account.id
+      end
+
+      it "should get a list of course grading standards" do
+        account_admin_user
+        course = Course.create!
+        course_resource_path = "/api/v1/courses/#{course.id}/grading_standards"
+        course_resource_params = { :controller => 'grading_standards_api',
+                                    :action => 'context_index',
+                                    :format => 'json',
+                                    :course_id => course.id.to_s }
+        grading_standard_for course
+        res = api_call(:get, course_resource_path, course_resource_params)
+        expect(res.first["context_type"]).to eq 'Course'
+        expect(res.first["context_id"]).to eq course.id
+      end
+    end
+
     describe 'grading standards creation' do
       before :once do
         @account = Account.default

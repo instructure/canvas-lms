@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+if CANVAS_RAILS4_0
 class Date
   def in_time_zone(zone=::Time.zone)
     # would do zone = Time.get_zone(zone), but that's a private method,
@@ -23,4 +24,5 @@ class Date
       ::Time.zone.local(self.year, self.month, self.day)
     end
   end
+end
 end

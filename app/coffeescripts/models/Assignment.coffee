@@ -8,7 +8,9 @@ define [
   'compiled/collections/AssignmentOverrideCollection'
   'compiled/collections/DateGroupCollection'
   'i18n!assignments'
-], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection, I18n) ->
+  'compiled/util/GradingPeriods'
+  'timezone'
+], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection, I18n, GradingPeriods, tz) ->
 
   class Assignment extends Model
     @mixin DefaultUrlMixin
@@ -31,10 +33,11 @@ define [
         @set 'all_dates', new DateGroupCollection(all_dates)
       if (@postToSISEnabled())
         if !@get('id') && @get('post_to_sis') != false
-          @set 'post_to_sis', true
+          @set 'post_to_sis', !!ENV?.POST_TO_SIS_DEFAULT
 
     isQuiz: => @_hasOnlyType 'online_quiz'
     isDiscussionTopic: => @_hasOnlyType 'discussion_topic'
+    isPage: => @_hasOnlyType 'wiki_page'
     isExternalTool: => @_hasOnlyType 'external_tool'
     isNotGraded: => @_hasOnlyType 'not_graded'
     isAssignment: =>
@@ -141,6 +144,10 @@ define [
       return @get 'post_to_sis' unless arguments.length > 0
       @set 'post_to_sis', postToSisBoolean
 
+    moderatedGrading: (moderatedGradingBoolean) =>
+      return @get 'moderated_grading' unless arguments.length > 0
+      @set 'moderated_grading', moderatedGradingBoolean
+
     peerReviews: (peerReviewBoolean) =>
       return @get 'peer_reviews' unless arguments.length > 0
       @set 'peer_reviews', peerReviewBoolean
@@ -193,9 +200,6 @@ define [
 
     canGroup: -> !@get('has_submitted_submissions')
 
-    differentiatedAssignmentsEnabled: ->
-      ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED || false
-
     gradingStandardId: (id) =>
       return @get('grading_standard_id') unless arguments.length > 0
       @set 'grading_standard_id', id
@@ -238,11 +242,13 @@ define [
     iconType: =>
       return 'quiz' if @isQuiz()
       return 'discussion' if @isDiscussionTopic()
+      return 'document' if @isPage()
       return 'assignment'
 
     objectType: =>
       return 'Quiz' if @isQuiz()
       return 'Discussion' if @isDiscussionTopic()
+      return 'WikiPage' if @isPage()
       return 'Assignment'
 
     htmlUrl: =>
@@ -266,6 +272,12 @@ define [
     multipleDueDates: =>
       dateGroups = @get("all_dates")
       dateGroups && dateGroups.length > 1
+
+    hasDueDate: =>
+      !@isPage()
+
+    hasPointsPossible: =>
+      !@isQuiz() && !@isPage()
 
     nonBaseDates: =>
       dateGroups = @get("all_dates")
@@ -303,10 +315,9 @@ define [
         'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
         'gradingStandardId', 'isLetterGraded', 'isGpaScaled', 'assignmentGroupId', 'iconType',
         'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position', 'postToSIS',
-        'multipleDueDates', 'nonBaseDates', 'allDates', 'isQuiz', 'singleSectionDueDate'
+        'multipleDueDates', 'nonBaseDates', 'allDates', 'hasDueDate', 'hasPointsPossible'
+        'singleSectionDueDate', 'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides'
       ]
-      if ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED
-        fields.push 'isOnlyVisibleToOverrides'
 
       hash = id: @get 'id'
       for field in fields
@@ -318,8 +329,18 @@ define [
       data = @_filterFrozenAttributes(data)
       if @alreadyScoped then data else { assignment: data }
 
-    search: (regex) ->
-      if @get('name').match(regex)
+    inGradingPeriod: (gradingPeriod) ->
+      dateGroups = @get("all_dates")
+      if dateGroups
+        _.any dateGroups.models, (dateGroup) =>
+          GradingPeriods.dateIsInGradingPeriod(dateGroup.dueAt(), gradingPeriod)
+      else
+        GradingPeriods.dateIsInGradingPeriod(tz.parse(@dueAt()), gradingPeriod)
+
+    search: (regex, gradingPeriod) ->
+      match = regex == "" || @get('name').match(regex)
+      match = @inGradingPeriod(gradingPeriod) if match && gradingPeriod
+      if match
         @set 'hidden', false
         return true
       else
@@ -357,6 +378,7 @@ define [
     # @api private
     _getAssignmentType: =>
       if @isDiscussionTopic() then 'discussion_topic'
+      else if @isPage() then 'wiki_page'
       else if @isQuiz() then 'online_quiz'
       else if @isExternalTool() then 'external_tool'
       else if @isNotGraded() then 'not_graded'
@@ -388,7 +410,7 @@ define [
     unpublish: -> @save("published", false)
 
     disabledMessage: ->
-      I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
+      I18n.t("Can't unpublish %{name} if there are student submissions", name: @get('name'))
 
     isOnlyVisibleToOverrides: (override_flag) ->
       return @get('only_visible_to_overrides') || false unless arguments.length > 0

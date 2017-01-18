@@ -2,12 +2,15 @@
 <% add_crumb t('#crumbs.rubrics', "Rubrics") %>
 <% content_for :right_side do %>
   <div class="rs-margin-all">
-    <a href="<%= context_url(@context, :context_rubrics_url) %>" class="btn button-sidebar-wide add_rubric_link"><i class="icon-add"></i> <%= t('buttons.add_rubric', 'Add Rubric') %></a>
+    <a href="<%= context_url(@context, :context_rubrics_url) %>" class="Button icon-plus add_rubric_link">
+      <span aria-hidden="true"><%= t('buttons.add_rubric', 'Rubric') %></span>
+      <span class="screenreader-only"><%= t('Add Rubric') %></span>
+    </a>
   </div>
 <% end %>
 
 <% js_bundle :edit_rubric %>
-<% jammit_css :learning_outcomes %>
+<% css_bundle :learning_outcomes %>
 <% content_for :stylesheets do %>
   <style>
     #rubrics .find_rubric_link {
@@ -43,7 +46,7 @@
       </span>
       <span class="details">
         <%= rubric.criteria.length %> <%= rubric.criteria.length == 1 ? 'criterion' : 'criteria' %><br/>
-        <%= t('points_possible', {:one => "1 point possible", :other => "%{count} points possible"}, :count => rubric.points_possible) %>
+        <%= t('points_possible', {:one => "1 point possible", :other => "%{count} points possible"}, :count => round_if_whole(rubric.points_possible)) %>
       </span>
     </li>
   <% end %>

@@ -1,5 +1,5 @@
 <% @routes.each do |route| %>
-  <% route_path = route.path.spec.to_s.sub("(.json)(.:format)", "")
+  <% route_path = route.path.spec.to_s.sub("(.:format)", "")
      if route.verb.source =~ /\^?(\w*)\$/
        verb = $1.upcase
      else

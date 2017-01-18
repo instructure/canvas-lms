@@ -68,10 +68,10 @@ describe SIS::CSV::EnrollmentImporter do
       "NONEXISTENT,U001,student,1B,active",
       "C001,U001,student,NONEXISTENT,active",
       "C002,U001,student,1B,active")
-    warnings = importer.warnings.map { |r| r.last }
+    warnings = importer.warnings.map(&:last)
     expect(warnings).to eq ["An enrollment referenced a non-existent course NONEXISTENT",
-                        "An enrollment referenced a non-existent section NONEXISTENT",
-                        "An enrollment listed a section and a course that are unrelated"]
+                            "An enrollment referenced a non-existent section NONEXISTENT",
+                            "An enrollment listed a section (1B) and a course (C002) that are unrelated for user (U001)"]
     expect(importer.errors).to eq []
   end
 
@@ -103,15 +103,21 @@ describe SIS::CSV::EnrollmentImporter do
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
     )
-    process_csv_data_cleanly(
+    batch = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active",
       "user_2,user2,User,Dos,user2@example.com,active",
       "user_3,user4,User,Tres,user3@example.com,active",
       "user_5,user5,User,Quatro,user5@example.com,active",
       "user_6,user6,User,Cinco,user6@example.com,active",
-      "user_7,user7,User,Siete,user7@example.com,active"
+      "user_7,user7,User,Siete,user7@example.com,active",
+      ",,,,,"
     )
+    expect(batch.errors).to eq []
+    expect(batch.warnings).to eq []
+    # should skip empty lines without error or warning
+    expect(batch.counts[:users]).to eq 6
+
     process_csv_data_cleanly(
       "section_id,course_id,name,status,start_date,end_date",
       "S001,test_1,Sec1,active,,"
@@ -132,12 +138,31 @@ describe SIS::CSV::EnrollmentImporter do
     expect(course.tas.first.name).to eq "User Tres"
     expect(course.observers.first.name).to eq "User Quatro"
     expect(course.observer_enrollments.first.associated_user_id).to eq course.students.first.id
-    expect(course.observer_enrollments.first.sis_source_id).to eq "test_1:user_5:#{observer_role.id}:Sec1"
-    expect(course.designers.first.name).to eq "User Cinco"
+    expect(course.users.where(enrollments: { type: 'DesignerEnrollment' }).first.name).to eq "User Cinco"
     siete = course.teacher_enrollments.detect { |e| e.user.name == "User Siete" }
     expect(siete).not_to be_nil
     expect(siete.start_at).to eq DateTime.new(1985, 8, 24)
     expect(siete.end_at).to eq DateTime.new(2011, 8, 29)
+  end
+
+  it "should enroll users by integration id" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "course_sis_id,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,integration_id,login_id,first_name,last_name,email,status",
+      "user_1,user_1_int,user1,User,Uno,user@example.com,active",
+    )
+    process_csv_data_cleanly(
+      "course_id,user_integration_id,role,section_id,status,associated_user_id,start_date,end_date",
+      "course_sis_id,user_1_int,teacher,,active,,,",
+    )
+    pseudonym = @account.pseudonyms.where(integration_id: "user_1_int").first
+    course = pseudonym.user.enrollments.first.course
+
+    expect(pseudonym.sis_user_id).to eq 'user_1'
+    expect(course.sis_source_id).to eq 'course_sis_id'
   end
 
   it "should support sis stickiness" do
@@ -477,7 +502,9 @@ describe SIS::CSV::EnrollmentImporter do
 
     @observer.reload
     expect(@observer.enrollments.count).to eq 1
-    expect(@observer.enrollments.first.workflow_state).to eq 'completed'
+    e = @observer.enrollments.first
+    expect(e.workflow_state).to eq 'completed'
+    expect(e.completed_at).to be_present
   end
 
   it "should only queue up one DueDateCacher job per course" do
@@ -785,5 +812,26 @@ describe SIS::CSV::EnrollmentImporter do
     student = Pseudonym.where(:sis_user_id => "student_user").first.user
     expect(student.enrollments.count).to eq 1
     expect(student.enrollments.first).to be_deleted
+  end
+
+  it "should not enroll users into deleted sections" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active",
+    )
+    process_csv_data_cleanly(
+      "section_id,course_id,name,status,start_date,end_date",
+      "S001,test_1,Sec1,deleted,,"
+    )
+    importer = process_csv_data(
+      "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+      "test_1,user_1,teacher,S001,active,,,",
+    )
+    warnings = importer.warnings.map { |r| r.last }
+    expect(warnings.first).to include("not a valid section")
   end
 end

@@ -106,7 +106,7 @@ describe ContextModule do
       end
     end
   end
-  
+
   describe "progressing before job is run" do
     def progression_testing(progress_by_item_link)
       enable_cache do
@@ -158,7 +158,7 @@ describe ContextModule do
         @quiz_submission.save!
 
         # navigate to the second item (forcing update to progression)
-        next_link = progress_by_item_link ? 
+        next_link = progress_by_item_link ?
           "/courses/#{@course.id}/modules/items/#{@tag2.id}" :
           "/courses/#{@course.id}/modules/#{@mod2.id}/items/first"
         get next_link
@@ -178,7 +178,7 @@ describe ContextModule do
         end
       end
     end
-    
+
     it "should progress to assignment" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
@@ -189,7 +189,7 @@ describe ContextModule do
         end
       end
     end
-    
+
     it "should progress to discussion topic" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
@@ -197,11 +197,10 @@ describe ContextModule do
           @test_url = "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
           @tag2 = @mod2.add_item(:type => 'discussion_topic', :id => discussion.id)
           expect(@tag2).to be_published
-          @test_content_length = 1
         end
       end
     end
-    
+
     it "should progress to a quiz" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
@@ -213,7 +212,7 @@ describe ContextModule do
         end
       end
     end
-    
+
     it "should progress to a wiki page" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
@@ -225,7 +224,7 @@ describe ContextModule do
         end
       end
     end
-    
+
     it "should progress to an attachment" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
@@ -288,7 +287,6 @@ describe ContextModule do
     it "should load visibilities for each model" do
       course_module
       assignment_model(course: @course, submission_types: "online_url", workflow_state: "published", only_visible_to_overrides: false)
-      @course.enable_feature!(:differentiated_assignments)
 
       @module = ContextModule.find(@module.id) #clear cache of visibilities
 
@@ -299,7 +297,6 @@ describe ContextModule do
     it "should load visibilities for each model with cache" do
       course_module
       assignment_model(course: @course, submission_types: "online_url", workflow_state: "published", only_visible_to_overrides: false)
-      @course.enable_feature!(:differentiated_assignments)
 
       @module = ContextModule.find(@module.id) #clear old cache of visibilities
       @module.cache_visibilities_for_students([@user.id]) #make updated cache

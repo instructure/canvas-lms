@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "courses" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "as a teacher" do
 
@@ -20,7 +20,6 @@ describe "courses" do
     end
 
     context 'draft state' do
-
       before(:each) do
         course_with_teacher_logged_in
       end
@@ -37,29 +36,33 @@ describe "courses" do
         @course.save!
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
-        expect(f('.publish_course_in_wizard_link')).to be_displayed
         expect(course_status_buttons.first).to have_class('disabled')
         expect(course_status_buttons.first.text).to eq 'Unpublished'
         expect(course_status_buttons.last).not_to have_class('disabled')
         expect(course_status_buttons.last.text).to eq 'Publish'
         expect_new_page_load { course_status_buttons.last.click }
-        expect(f('.publish_course_in_wizard_link')).to be_nil
         validate_action_button(:last, 'Published')
 
         @course.reload
         expect(@course.lock_all_announcements).to be_truthy
       end
 
+      it "should display a creative commons license when set", priority: "1", test_id: 272274 do
+        @course.license =  'cc_by_sa'
+        @course.save!
+        get "/courses/#{@course.id}"
+        wait_for_ajaximations
+        expect(f('.public-license-text').text).to include('This course content is offered under a')
+      end
+
       it "should allow unpublishing of a course through the course status actions" do
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
-        expect(f('.publish_course_in_wizard_link')).to be_nil
         expect(course_status_buttons.first).not_to have_class('disabled')
         expect(course_status_buttons.first.text).to eq 'Unpublish'
         expect(course_status_buttons.last).to have_class('disabled')
         expect(course_status_buttons.last.text).to eq 'Published'
         expect_new_page_load { course_status_buttons.first.click }
-        expect(f('.publish_course_in_wizard_link')).to be_displayed
         validate_action_button(:first, 'Unpublished')
       end
 
@@ -67,7 +70,6 @@ describe "courses" do
         course_with_student_submissions({submission_points: true, unpublished: true})
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
-        expect(f('.publish_course_in_wizard_link')).to be_displayed
         expect(course_status_buttons.first).to have_class('disabled')
         expect(course_status_buttons.first.text).to eq 'Unpublished'
         expect(course_status_buttons.last).not_to have_class('disabled')
@@ -80,7 +82,7 @@ describe "courses" do
       it "should not show course status if published and graded submissions exist" do
         course_with_student_submissions({submission_points: true})
         get "/courses/#{@course.id}"
-        expect(f('#course_status')).to be_nil
+        expect(f("#content")).not_to contain_css('#course_status')
       end
 
       it "should allow unpublishing of the course if submissions have no score or grade" do
@@ -92,80 +94,139 @@ describe "courses" do
         validate_action_button(:first, 'Unpublished')
       end
 
-    end
+      it "should allow publishing/unpublishing with only change_course_state permission" do
+        @course.account.role_overrides.create!(:permission => :manage_course_content, :role => teacher_role, :enabled => false)
+        @course.account.role_overrides.create!(:permission => :manage_courses, :role => teacher_role, :enabled => false)
 
-    it "should properly hide the wizard and remember its hidden state" do
-      # For now we are not allowing the wizard to popup automatically
-      # so this spec doesn't apply, it may in the future though.
-      pending
-      course_with_teacher_logged_in
-
-      create_new_course
-
-      wizard_box = f(".ic-wizard-box")
-      keep_trying_until { expect(wizard_box).to be_displayed }
-      f(".ic-wizard-box__close a").click
-
-      refresh_page
-      wait_for_ajaximations # we need to give the wizard a chance to pop up
-      wizard_box = f(".ic-wizard-box")
-      expect(wizard_box).to eq nil
-
-      # un-remember the setting
-      driver.execute_script "localStorage.clear()"
-    end
-
-    it "should open and close wizard after initial close" do
-      # For now we are not allowing the wizard to popup automatically
-      # so this spec doesn't apply, it may in the future though.
-      pending
-      def find_wizard_box
-        wizard_box = keep_trying_until do
-          wizard_box = f(".ic-wizard-box")
-          expect(wizard_box).to be_displayed
-          wizard_box
-        end
-        wizard_box
+        get "/courses/#{@course.id}"
+        expect_new_page_load { ff('#course_status_actions button').first.click }
+        validate_action_button(:first, 'Unpublished')
+        expect_new_page_load { ff('#course_status_actions button').last.click }
+        validate_action_button(:last, 'Published')
       end
 
-      course_with_teacher_logged_in
-      create_new_course
+      it "should not allow publishing/unpublishing without change_course_state permission" do
+        @course.account.role_overrides.create!(:permission => :change_course_state, :role => teacher_role, :enabled => false)
 
-      wait_for_ajaximations
-      wizard_box = find_wizard_box
-      f(".ic-wizard-box__close a").click
-      wait_for_ajaximations
-      wizard_box = f(".ic-wizard-box")
-      expect(wizard_box).to eq nil
-      checklist_button = f('.wizard_popup_link')
-      expect(checklist_button).to be_displayed
-      checklist_button.click
-      wait_for_ajaximations
-      wizard_box = find_wizard_box
-      f(".ic-wizard-box__close a").click
-      wait_for_ajaximations
-      wizard_box = f(".ic-wizard-box")
-      expect(wizard_box).to eq nil
-      expect(checklist_button).to be_displayed
+        get "/courses/#{@course.id}"
+        expect(f("#content")).not_to contain_css('#course_status_actions')
+      end
     end
 
-    it "should open up the choose home page dialog from the wizard" do
-      course_with_teacher_logged_in
-      create_new_course
+    describe 'course wizard' do
+      def go_to_checklist
+        get "/courses/#{@course.id}"
+        f(".wizard_popup_link").click()
+        expect(f(".ic-wizard-box")).to be_displayed
+        wait_for_ajaximations(500)
+      end
 
-      # Because of the specs about automatically opening are currently
-      # pending, we need to cause the wizard to open by way of click. When
-      # those specs are no longer pendings, the click line should be removed.
-      f(".wizard_popup_link").click()
-      wizard_box = f(".ic-wizard-box")
-      keep_trying_until { expect(wizard_box).to be_displayed }
+      def check_if_item_complete(item)
+        elem = "#wizard_#{item}.ic-wizard-box__content-trigger--checked"
+        expect(f(elem)).to be_displayed
+      end
 
+      def check_if_item_not_complete(item)
+        expect(f("#wizard_#{item}.ic-wizard-box__content-trigger")).to be_displayed
+        expect(f("#content")).not_to contain_css("#wizard_#{item}.ic-wizard-box__content-trigger--checked")
+      end
 
-      f("#wizard_home_page").click
-      f(".ic-wizard-box__message-button a").click
-      wait_for_ajaximations
-      modal = f("#edit_course_home_content_form")
-      expect(modal).to be_displayed
+      it "should open up the choose home page dialog from the wizard" do
+        skip_if_chrome('research')
+        course_with_teacher_logged_in
+        create_new_course
+
+        go_to_checklist
+
+        f("#wizard_home_page").click
+        f(".ic-wizard-box__message-button a").click
+        wait_for_ajaximations
+        modal = f("#edit_course_home_content_form")
+        expect(modal).to be_displayed
+      end
+
+      it "should have the correct initial state" do
+        course_with_teacher_logged_in
+        go_to_checklist
+
+        check_if_item_not_complete('content_import')
+        check_if_item_not_complete('add_assignments')
+        check_if_item_not_complete('add_students')
+        check_if_item_not_complete('add_files')
+        check_if_item_not_complete('content_import')
+        check_if_item_not_complete('select_navigation')
+        check_if_item_complete('home_page')
+        check_if_item_not_complete('course_calendar')
+        check_if_item_not_complete('add_tas')
+      end
+
+      it "should complete 'Add Course Assignments' checklist item" do
+        course_with_teacher_logged_in
+        @course.assignments.create({name: "Test Assignment"})
+        go_to_checklist
+        check_if_item_complete('add_assignments')
+      end
+
+      it "should complete 'Add Students to the Course' checklist item" do
+        course_with_teacher_logged_in
+        student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
+        student_in_course(:user => student, :active_all => 1)
+        go_to_checklist
+        check_if_item_complete('add_students')
+      end
+
+      it "should complete 'Select Navigation Links' checklist item" do
+        skip_if_chrome('research')
+        course_with_teacher_logged_in
+
+        # Navigate to Navigation tab
+        go_to_checklist
+        f('#wizard_select_navigation').click
+        f('.ic-wizard-box__message-button a').click
+
+        # Modify Naviagtion
+        f('#navigation_tab').click
+        f('.navitem.enabled.modules .al-trigger.al-trigger-gray').click
+        f('.navitem.enabled.modules .admin-links .disable_nav_item_link').click
+        f('#tab-navigation .btn').click
+
+        go_to_checklist
+        check_if_item_complete('select_navigation')
+      end
+
+      it "should complete 'Add Course Calendar Events' checklist item" do
+        skip_if_chrome('research')
+
+        course_with_teacher_logged_in
+
+        # Navigate to Calendar tab
+        go_to_checklist
+        f('#wizard_course_calendar').click
+        f('.ic-wizard-box__message-button a').click
+
+        # Add Event
+        f("#create_new_event_link").click
+        wait_for_ajaximations
+        replace_content(f('#edit_calendar_event_form #calendar_event_title'), "Event")
+        f("#edit_calendar_event_form button.event_button").click
+        wait_for_ajaximations
+
+        go_to_checklist
+        check_if_item_complete('course_calendar')
+      end
+
+      it "should complete 'Publish the Course' checklist item" do
+        skip_if_chrome('research')
+        course_with_teacher_logged_in
+
+        # Publish from Checklist
+        go_to_checklist
+        f('#wizard_publish_course').click
+        f('.ic-wizard-box__message-button button').click
+
+        go_to_checklist
+        check_if_item_complete('publish_course')
+      end
     end
 
     it "should correctly update the course quota" do
@@ -179,7 +240,6 @@ describe "courses" do
       quota_input = form.find_element(:css, "input#course_storage_quota_mb")
       replace_content(quota_input, "10")
       submit_form(form)
-      keep_trying_until { f(".loading_image_holder").nil? rescue true }
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"
 
@@ -189,7 +249,6 @@ describe "courses" do
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"
       submit_form(form)
-      keep_trying_until { f(".loading_image_holder").nil? rescue true }
       form = f("#course_form")
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"
@@ -212,7 +271,7 @@ describe "courses" do
       course2 = course_with_teacher(:user => teacher, :active_all => 1, :course_name => 'course2').course
       student_in_course(:user => student, :active_all => 1)
 
-      create_session(student.pseudonyms.first, false)
+      create_session(student.pseudonyms.first)
 
       get "/courses/#{course1.id}/grades/#{student.id}"
 
@@ -221,7 +280,7 @@ describe "courses" do
       expect(options.length).to eq 2
       wait_for_ajaximations
       expect_new_page_load{ click_option('#course_url', course2.name) }
-      expect(f('#section-tabs-header').text).to match course2.name
+      expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#breadcrumbs .home + li a' : '#section-tabs-header')).to include_text(course2.name)
     end
 
     it "should load the users page using ajax" do
@@ -237,7 +296,7 @@ describe "courses" do
       # Test that the page loads properly the first time.
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
-      expect(flash_message_present?(:error)).to be_falsey
+      expect_no_flash_message :error
       expect(ff('.roster .rosterUser').length).to eq 50
     end
 
@@ -280,36 +339,6 @@ describe "courses" do
       expect(sections.map(&:text).sort).to eq ["One", "One", "Two", "Unnamed Course", "Unnamed Course"]
     end
 
-    it "should display users section name properly when separated by custom roles" do
-      course_with_teacher_logged_in(:active_all => true)
-      user1 = user
-      section1 = @course.course_sections.create!(:name => 'One')
-      section2 = @course.course_sections.create!(:name => 'Two')
-
-      role1 = @course.account.roles.build :name => "CustomStudent1"
-      role1.base_role_type = "StudentEnrollment"
-      role1.save!
-      role2 = @course.account.roles.build :name => "CustomStudent2"
-      role2.base_role_type = "StudentEnrollment"
-      role2.save!
-
-      @course.enroll_user(user1, "StudentEnrollment", :section => section1, :role => role1).accept!
-      @course.enroll_user(user1, "StudentEnrollment", :section => section2, :role => role2, :allow_multiple_enrollments => true).accept!
-      roles_to_sections = {'CustomStudent1' => 'One', 'CustomStudent2' => 'Two'}
-
-      get "/courses/#{@course.id}/users"
-
-      wait_for_ajaximations
-
-      role_wrappers = ff('.student_roster .users-wrapper')
-      role_wrappers.each do |rw|
-        role_name = ff('.h3', rw).first.text
-        sections = ff('.section', rw)
-        expect(sections.count).to eq 1
-        expect(roles_to_sections[role_name]).to eq sections.first.text
-      end
-    end
-
     context "course_home_sub_navigation lti apps" do
       def create_course_home_sub_navigation_tool(options = {})
         @course.root_account.enable_feature!(:lor_for_account)
@@ -343,14 +372,14 @@ describe "courses" do
         course_with_teacher_logged_in(active_all: true)
         create_course_home_sub_navigation_tool
         get "/courses/#{@course.id}"
-        expect(f('.course-home-sub-navigation-lti').attribute("href")).to match(/launch_type=course_home_sub_navigation/)
+        expect(f('.course-home-sub-navigation-lti')).to have_attribute("href", /launch_type=course_home_sub_navigation/)
       end
 
       it "should include launch type parameter (draft state on)" do
         course_with_teacher_logged_in(active_all: true)
         create_course_home_sub_navigation_tool
         get "/courses/#{@course.id}"
-        expect(f('.course-home-sub-navigation-lti').attribute("href")).to match(/launch_type=course_home_sub_navigation/)
+        expect(f('.course-home-sub-navigation-lti')).to have_attribute("href", /launch_type=course_home_sub_navigation/)
       end
 
       it "should only display active tools" do
@@ -359,7 +388,7 @@ describe "courses" do
         tool.workflow_state = 'deleted'
         tool.save!
         get "/courses/#{@course.id}"
-        expect(ff(".course-home-sub-navigation-lti").size).to eq 0
+        expect(f("#content")).not_to contain_css(".course-home-sub-navigation-lti")
       end
 
       it "should not display admin tools to students" do
@@ -372,7 +401,7 @@ describe "courses" do
 
         course_with_student_logged_in(course: @course, active_all: true)
         get "/courses/#{@course.id}"
-        expect(ff(".course-home-sub-navigation-lti").size).to eq 0
+        expect(f("#content")).not_to contain_css(".course-home-sub-navigation-lti")
       end
     end
 
@@ -395,12 +424,23 @@ describe "courses" do
       Account.default.save!
     end
 
+    it "should auto-accept the course invitation if previews are not allowed" do
+      Account.default.settings[:allow_invitation_previews] = false
+      Account.default.save!
+      enroll_student(@student, false)
+
+      create_session(@student.pseudonym)
+      get "/courses/#{@course.id}"
+      assert_flash_notice_message /Invitation accepted!/
+      expect(f("#content")).not_to contain_css(".ic-notification button[name='accept'] ")
+    end
+
     it "should accept the course invitation" do
       enroll_student(@student, false)
 
       create_session(@student.pseudonym)
       get "/courses/#{@course.id}"
-      f(".global-message .btn[name='accept'] ").click
+      f(".ic-notification button[name='accept'] ").click
       assert_flash_notice_message /Invitation accepted!/
     end
 
@@ -409,7 +449,7 @@ describe "courses" do
 
       create_session(@student.pseudonym)
       get "/courses/#{@course.id}"
-      f(".global-message .btn[name=reject]").click
+      f(".ic-notification button[name=reject]").click
       assert_flash_notice_message /Invitation canceled./
     end
 

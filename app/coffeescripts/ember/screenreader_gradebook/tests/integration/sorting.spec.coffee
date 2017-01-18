@@ -6,8 +6,6 @@ define [
 
   App = null
 
-  fixtures.create()
-
   setSelection = (selection) ->
     find('#arrange_assignments').val(selection)
   checkSelection = (selection) ->
@@ -15,6 +13,7 @@ define [
 
   module 'screenreader_gradebook assignment sorting: no saved setting',
     setup: ->
+      fixtures.create()
       App = startApp()
       visit('/')
     teardown: ->
@@ -26,6 +25,7 @@ define [
 
   module 'screenreader_gradebook assignment sorting: toggle settings',
     setup: ->
+      fixtures.create()
       App = startApp()
       visit('/')
     teardown: ->
@@ -39,5 +39,3 @@ define [
     setSelection('due_date')
     visit('/')
     checkSelection('due_date')
-
-

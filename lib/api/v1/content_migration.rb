@@ -45,7 +45,7 @@ module Api::V1::ContentMigration
     if attachment_preflight
       json[:pre_attachment] = attachment_preflight
     elsif migration.attachment && !migration.for_course_copy?
-      json[:attachment] = attachment_json(migration.attachment, current_user, {}, {:can_manage_files => true})
+      json[:attachment] = attachment_json(migration.attachment, current_user, {}, {:can_view_hidden_files => true})
     end
 
     if migration.for_course_copy?

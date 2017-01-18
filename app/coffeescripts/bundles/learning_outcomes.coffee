@@ -32,6 +32,7 @@ require [
   $el = $ '#outcomes'
   $el.html browserTemplate
     canManageOutcomes: ENV.PERMISSIONS.manage_outcomes
+    canManageRubrics: ENV.PERMISSIONS.manage_rubrics
     contextUrlRoot: ENV.CONTEXT_URL_ROOT
 
   toolbar = new ToolbarView

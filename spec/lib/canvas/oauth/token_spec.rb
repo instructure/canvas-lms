@@ -36,11 +36,6 @@ module Canvas::Oauth
         expect(token.is_for_valid_code?).to be_falsey
       end
 
-      it 'is false when the client id does not match the key id' do
-        stub_out_cache (key.id + 1)
-        expect(token.is_for_valid_code?).to be_falsey
-      end
-
       it 'is true otherwise' do
         expect(token.is_for_valid_code?).to be_truthy
       end
@@ -144,13 +139,41 @@ module Canvas::Oauth
         expect(json['access_token']).not_to be_empty
       end
 
+      it 'includes the refresh token' do
+        expect(json['refresh_token']).to be_a String
+        expect(json['refresh_token']).not_to be_empty
+      end
+
+      it 'ignores refresh token if its not there' do
+        # need to re-fetch the access token so refresh token wont be set
+        access_token = AccessToken.authenticate(json['access_token'])
+        # setup new token with existing access token
+        new_token = Token.new(token.key, token.code, access_token)
+        expect(new_token.as_json.keys).to_not include 'refresh_token'
+      end
+
       it 'grabs the user json as well' do
         expect(json['user']).to eq user.as_json(:only => [:id, :name], :include_root => false)
       end
 
-      it 'does not put anything else into the json' do
-        expect(json.keys.sort).to eq ['access_token', 'user']
+      it 'returns the expires_in parameter' do
+        Time.stubs(:now).returns(DateTime.parse('2015-07-10T09:29:00+00:00').utc.to_time)
+        access_token = token.access_token
+        access_token.expires_at = DateTime.parse('2015-07-10T10:29:00+00:00')
+        access_token.save!
+        expect(json['expires_in']).to eq 3600
       end
+
+      it 'does not put anything else into the json' do
+        expect(json.keys.sort).to match_array(['access_token', 'refresh_token', 'user', 'expires_in', 'token_type'])
+      end
+      it 'does not put expires_in in the json when auto_expire_tokens is false' do
+        key = token.key
+        key.auto_expire_tokens = false
+        key.save!
+        expect(json.keys.sort).to match_array(['access_token', 'refresh_token', 'user', 'token_type'])
+      end
+
     end
 
     describe '.generate_code_for' do
@@ -179,6 +202,29 @@ module Canvas::Oauth
         redis.expects(:setex).with('oauth2:brand_new_code', 10, code_data.to_json)
         Canvas.stubs(:redis => redis)
         Token.generate_code_for(1, 1)
+      end
+    end
+
+    context "token expiration" do
+      it "starts expiring tokens in 1 hour" do
+        DateTime.stubs(:now).returns(DateTime.parse('2016-06-29T23:01:00+00:00'))
+        expect(token.access_token.expires_at.utc.iso8601).to eq('2016-06-30T00:01:00+00:00')
+      end
+
+      it 'doesn\'t set an expiration if the dev key has auto_expire_tokens set to false' do
+        key = token.key
+        key.auto_expire_tokens = false
+        key.save!
+        expect(token.access_token.expires_at).to be_nil
+      end
+
+      it 'Tokens wont expire if the dev key has auto_expire_tokens set to false' do
+        DateTime.stubs(:now).returns(Time.zone.parse('2015-06-29T23:01:00+00:00'))
+        key = token.key
+        key.auto_expire_tokens = false
+        key.save!
+        expect(token.access_token.expires_at).to be_nil
+        expect(token.access_token.expired?).to be false
       end
     end
   end

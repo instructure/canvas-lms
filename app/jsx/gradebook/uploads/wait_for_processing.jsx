@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define(["jquery", "i18n!gradebook_uploads", "vendor/jquery.spin"],
        ($, I18n) => {
   function waitForProcessing(progress) {

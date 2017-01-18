@@ -71,14 +71,15 @@
   }
   .ui-datepicker-time {
     @extend .ui-dialog-buttonpane;
-    padding: 5px 0;
-    text-align: center;
+    padding: 5px 6px;
+    text-align: right;
 
     input, select { padding: 2px; margin-bottom: 0; }
+    .ui-datepicker-ok { margin-left: 6px; }
   }
   .ui-datepicker-header {
     @extend .ui-dialog-titlebar;
-    font-size: 12px;
+    @include fontSize(12px);
   }
 }
 .ui-datepicker-today .ui-state-highlight:not(.ui-state-active){

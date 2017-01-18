@@ -1,4 +1,6 @@
 class SetSamlEntityId < ActiveRecord::Migration
+  tag :predeploy
+
 
   # Sets all existing SAML configs to be what is currently in the config so they won't break
   # If there is no config use the host of the account
@@ -10,7 +12,7 @@ class SetSamlEntityId < ActiveRecord::Migration
     end
     
     AccountAuthorizationConfig.where(auth_type: "saml").each do |aac|
-      if aac.entity_id.blank?
+      if aac['entity_id'].blank?
         aac.entity_id = old_default_domain || aac.saml_default_entity_id
         aac.save!
       end

@@ -20,9 +20,10 @@ define [
   'jquery'
   'compiled/views/profiles/AvatarUploadBaseView'
   'jst/profiles/gravatarView'
-  'jquery.ajaxJSON'
   'vendor/md5'
-], ($, AvatarUploadBaseView, template) ->
+  'jquery.ajaxJSON'
+
+], ($, AvatarUploadBaseView, template, CryptoJS) ->
 
   class GravatarView extends AvatarUploadBaseView
 

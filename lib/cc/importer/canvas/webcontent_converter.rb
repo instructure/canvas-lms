@@ -36,7 +36,7 @@ module CC::Importer::Canvas
 
       file_map
     end
-    
+
     def convert_file_metadata(file_map)
       path = File.join(@unzipped_file_path, COURSE_SETTINGS_DIR, FILES_META)
       return unless File.exist? path
@@ -57,6 +57,14 @@ module CC::Importer::Canvas
           if file_map[id]
             file_map[id][:hidden] = true if get_bool_val(file, 'hidden', false)
             file_map[id][:locked] = true if get_bool_val(file, 'locked', false)
+
+            if unlock_at = get_time_val(file, 'unlock_at')
+              file_map[id][:unlock_at] = unlock_at
+            end
+            if lock_at = get_time_val(file, 'lock_at')
+              file_map[id][:lock_at] = lock_at
+            end
+
             if display_name = file.at_css("display_name")
               file_map[id][:display_name] = display_name.text
             end
@@ -80,12 +88,12 @@ module CC::Importer::Canvas
       make_export_dir
       path = get_full_path(WEB_RESOURCES_FOLDER)
       Zip::File.open(zip_file, 'w') do |zipfile|
-        Dir["#{path}/**/**"].each do |file|
+        Dir.glob("#{path}/**/**", File::FNM_DOTMATCH).each do |file|
+          next if File.directory?(file)
           file_path = file.sub(path+'/', '')
           zipfile.add(file_path, file)
         end
       end
-
       File.expand_path(zip_file)
     end
 

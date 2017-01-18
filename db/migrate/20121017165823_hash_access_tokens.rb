@@ -5,7 +5,7 @@ class HashAccessTokens < ActiveRecord::Migration
   def self.up
     loop do
       batch = AccessToken.connection.select_all(<<-SQL)
-        SELECT id, token FROM access_tokens WHERE crypted_token IS NULL LIMIT 1000
+        SELECT id, token FROM #{AccessToken.quoted_table_name} WHERE crypted_token IS NULL LIMIT 1000
       SQL
 
       break if batch.empty?

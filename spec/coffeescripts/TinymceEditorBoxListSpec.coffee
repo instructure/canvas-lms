@@ -8,6 +8,8 @@ define ['tinymce.editor_box_list'], (EditorBoxList)->
     teardown: ->
       $("#42").remove()
       $("#fixtures").empty()
+      $(".ui-dialog").remove()
+      $(".mce-tinymce").remove()
 
   test 'constructor: property setting', ->
     ok(list._textareas?)

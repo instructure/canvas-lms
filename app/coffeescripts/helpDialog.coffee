@@ -22,7 +22,10 @@ define [
 
     showEmail: -> not ENV.current_user_id
 
+    animateDuration: 100
+
     initDialog: ->
+      @defaultTitle = ENV.help_link_name || @defaultTitle
       @$dialog = $('<div style="padding:0; overflow: visible;" />').dialog
         resizable: false
         width: 400
@@ -47,7 +50,6 @@ define [
           contextAssetString: ENV.context_asset_string
           userRoles: ENV.current_user_roles
 
-
         @$dialog.html(helpDialogTemplate locals)
         @initTicketForm()
         $(this).trigger('ready')
@@ -55,18 +57,19 @@ define [
       @dialogInited = true
 
     initTicketForm: ->
+      requiredFields = ['error[subject]', 'error[comments]', 'error[user_perceived_severity]']
+      requiredFields.push 'error[email]' if @showEmail()
+
       $form = @$dialog.find('#create_ticket').formSubmit
         disableWhileLoading: true
-        required: =>
-          requiredFields = ['error[subject]', 'error[comments]', 'error[user_perceived_severity]']
-          requiredFields.push 'error[email]' if @showEmail()
-          requiredFields
+        required: requiredFields
         success: =>
           @$dialog.dialog('close')
           $form.find(':input').val('')
 
     switchTo: (panelId) ->
       toggleablePanels = "#teacher_feedback, #create_ticket"
+      homePanel = "#help-dialog-options"
       @$dialog.find(toggleablePanels).hide()
       newPanel = @$dialog.find(panelId)
       newHeight = newPanel.show().outerHeight()
@@ -78,9 +81,13 @@ define [
           #reposition vertically to reflect current height
           @initDialog() unless @dialogInited and @$dialog?.hasClass("ui-dialog-content")
           @$dialog?.dialog('option', 'position', 'center')
-        duration: 100
+        duration: @animateDuration
         complete: ->
-          newPanel.find(':input').not(':disabled').first().focus()
+          toFocus = newPanel.find(':input').not(':disabled')
+          if toFocus.length is 0
+            toFocus = newPanel.find(':focusable')
+          toFocus.first().focus()
+          $(homePanel).hide() unless panelId is homePanel
       })
 
       if newTitle = @$dialog.find("a[href='#{panelId}'] .text").text()

@@ -1,5 +1,5 @@
 class Profile < ActiveRecord::Base
-  belongs_to :context, :polymorphic => true
+  belongs_to :context, polymorphic: [:course], exhaustive: false
   belongs_to :root_account, :class_name => 'Account'
 
   attr_accessible :context, :root_account, :title, :path, :description, :visibility, :position
@@ -36,7 +36,7 @@ class Profile < ActiveRecord::Base
   end
 
   def data
-    read_attribute(:data) || write_attribute(:data, {})
+    read_or_initialize_attribute(:data, {})
   end
 
   def data_before_type_cast # for validations and such
@@ -73,7 +73,7 @@ class Profile < ActiveRecord::Base
     context_type = klass.name.sub(/Profile\z/, '')
     klass.class_eval { alias_method context_type.downcase.underscore, :context }
     klass.instance_eval { def table_name; "profiles"; end }
-    klass.default_scope :conditions => ["context_type = ?", context_type]
+    klass.default_scope -> { where(:context_type => context_type) }
   end
 
   def self.columns_hash
@@ -87,26 +87,25 @@ class Profile < ActiveRecord::Base
     @columns_hash
   end
 
-  def self.instantiate(record)
+  def self.instantiate(*args)
+    record = args.first
     record["type"] = "#{record["context_type"]}Profile"
     super
   end
 
   module Association
-    def self.included(klass)
-      klass.has_one :profile, :as => :context
-      klass.class_eval <<-CODE, __FILE__, __LINE__ + 1
-        def profile_with_correct_class
-          profile_without_correct_class || begin
-            profile = #{klass}Profile.new(:context => self)
-            profile.root_account = root_account
-            profile.title = name
-            profile.visibility = "private"
-            profile
-          end
-        end
-        alias_method_chain :profile, :correct_class
-      CODE
+    def self.prepended(klass)
+      klass.has_one :profile, as: :context
+    end
+
+    def profile
+      super || begin
+        profile = Object.const_get("#{self.class.name}Profile", false).new(context: self)
+        profile.root_account = root_account
+        profile.title = name
+        profile.visibility = "private"
+        profile
+      end
     end
   end
 end

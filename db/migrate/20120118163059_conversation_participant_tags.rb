@@ -1,4 +1,6 @@
 class ConversationParticipantTags < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :conversations, :tags, :text
     add_column :conversation_participants, :tags, :text

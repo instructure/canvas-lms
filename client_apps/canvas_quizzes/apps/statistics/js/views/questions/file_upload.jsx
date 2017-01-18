@@ -6,9 +6,9 @@ define(function(require) {
 
   var FileUpload = React.createClass({
     render: Essay.type.prototype.render,
-    renderAsideContent: function() {
+    renderLinkButton: function() {
       return (
-        <a href={this.props.quizSubmissionsZipUrl} target="_blank">
+        <a className="btn" href={this.props.quizSubmissionsZipUrl} target="_blank" style={{marginBottom: "20px", maxWidth: "50%"}}>
           {I18n.t('download_submissions', 'Download All Files')}
         </a>
       );

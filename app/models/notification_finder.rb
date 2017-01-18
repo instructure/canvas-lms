@@ -19,7 +19,7 @@
 class NotificationFinder
   attr_reader :notifications
 
-  def initialize(notifications = Notification.all)
+  def initialize(notifications = Notification.all_cached)
     refresh_cache(notifications)
   end
 
@@ -34,7 +34,7 @@ class NotificationFinder
     true
   end
 
-  def refresh_cache(notifications = Notification.all)
+  def refresh_cache(notifications = Notification.all_cached)
     @notifications = notifications.index_by(&:name)
     @notifications.values.each(&:freeze)
     true

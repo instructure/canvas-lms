@@ -3,13 +3,6 @@ class AccountNotification < ActiveRecord::Base
     :account, :account_notification_roles, :user, :start_at, :end_at,
     :required_account_service, :months_in_display_cycle
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :user_id, :account_id, :subject, :icon, :message, :start_at,
-    :end_at, :required_account_service, :months_in_display_cycle, :created_at, :updated_at
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:account, :user, :account_notification_roles]
-
   validates_presence_of :start_at, :end_at, :subject, :message, :account_id
   validate :validate_dates
   belongs_to :account, :touch => true
@@ -30,9 +23,13 @@ class AccountNotification < ActiveRecord::Base
   end
 
   def self.for_user_and_account(user, account)
-    current = self.for_account(account)
+    if account.site_admin?
+      current = self.for_account(account)
+    else
+      sub_account_ids = UserAccountAssociation.where(user: user).pluck(:account_id)
+      current = self.for_account(account, sub_account_ids)
+    end
 
-    ActiveRecord::Associations::Preloader.new(current, [:account, {account_notification_roles: :role}]).run
     user_role_ids = {}
 
     current.select! do |announcement|
@@ -53,8 +50,8 @@ class AccountNotification < ActiveRecord::Base
         end
 
         # preload role objects for those enrollments and account users
-        ActiveRecord::Associations::Preloader.new(enrollments, [:role]).run
-        ActiveRecord::Associations::Preloader.new(account_users, [:role]).run
+        ActiveRecord::Associations::Preloader.new.preload(enrollments, [:role])
+        ActiveRecord::Associations::Preloader.new.preload(account_users, [:role])
 
         # map to role ids. user role.id instead of role_id to trigger Role#id
         # magic for built in roles. announcements intended for users not
@@ -97,18 +94,25 @@ class AccountNotification < ActiveRecord::Base
     current
   end
 
-  def self.for_account(account)
+  def self.for_account(account, sub_account_ids=nil)
     # Refreshes every 10 minutes at the longest
-    Rails.cache.fetch(['account_notifications2', account].cache_key, :expires_in => 10.minutes) do
+    sub_account_ids_hash = Digest::MD5.hexdigest sub_account_ids.try(:sort).to_s
+    Rails.cache.fetch(['account_notifications3', account, sub_account_ids_hash].cache_key, expires_in: 10.minutes) do
       now = Time.now.utc
       # we always check the given account for the flag, even if the announcement is from the site_admin account
       # this allows us to make a global announcement that is filtered to only accounts with this flag
       enabled_flags = ACCOUNT_SERVICE_NOTIFICATION_FLAGS & account.allowed_services_hash.keys.map(&:to_s)
+      account_ids = account.account_chain(include_site_admin: true).map(&:id)
+      if sub_account_ids
+        account_ids += sub_account_ids
+        account_ids.uniq!
+      end
 
-      Shard.partition_by_shard([Account.site_admin, account]) do |accounts|
-        AccountNotification.where("account_id IN (?) AND start_at <? AND end_at>?", accounts, now, now).
+      Shard.partition_by_shard(account_ids) do |a|
+        AccountNotification.where("account_id IN (?) AND start_at <? AND end_at>?", a, now, now).
           where("required_account_service IS NULL OR required_account_service IN (?)", enabled_flags).
-          order('start_at DESC').all
+          order('start_at DESC').
+          preload(:account, account_notification_roles: :role)
       end
     end
   end

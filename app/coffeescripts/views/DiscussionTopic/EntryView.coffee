@@ -14,10 +14,10 @@ define [
   'compiled/discussions/EntryEditor'
   'str/htmlEscape'
   'vendor/jquery.ba-tinypubsub'
-  'compiled/str/convertApiUserContent'
+  'compiled/str/apiUserContent'
   'jst/_avatar'
   'jst/discussions/_reply_form'
-], ($, _, I18n, MarkAsReadWatcher, walk, Backbone, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, entryStatsTemplate, Reply, EntryEditor, htmlEscape, {publish}, convertApiUserContent) ->
+], ($, _, I18n, MarkAsReadWatcher, walk, Backbone, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, entryStatsTemplate, Reply, EntryEditor, htmlEscape, {publish}, apiUserContent) ->
 
   class EntryView extends Backbone.View
 
@@ -108,7 +108,7 @@ define [
       json.edited_at = $.datetimeString(json.updated_at)
       if json.editor
         json.editor_name = json.editor.display_name
-        json.editor_href = "href=\"#{json.editor.html_url}\""
+        json.editor_href = json.editor.html_url
       else
         json.editor_name = I18n.t 'unknown', 'Unknown'
         json.editor_href = ""
@@ -122,11 +122,10 @@ define [
     toggleCollapsed: (event, $el)->
       @addCountsToHeader() unless @addedCountsToHeader
       @$el.toggleClass 'collapsed'
-
       if @$el.hasClass('collapsed')
-        $el.attr('title', I18n.t('Expand Subdiscussion'))
+        $el.find('.screenreader-only').text(I18n.t('Expand Subdiscussion'))
       else
-        $el.attr('title', I18n.t('Collapse Subdiscussion'))
+        $el.find('.screenreader-only').text(I18n.t('Collapse Subdiscussion'))
 
     expand: ->
       @$el.removeClass 'collapsed'
@@ -268,7 +267,7 @@ define [
 
     format: (attr, value) ->
       if attr is 'message'
-        value = convertApiUserContent(value)
+        value = apiUserContent.convert(value)
         @$el.find('.message').removeClass('enhanced')
         publish('userContent/change')
         value

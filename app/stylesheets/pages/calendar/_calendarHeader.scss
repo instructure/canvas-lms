@@ -66,8 +66,8 @@
   line-height: 32px;
   padding-left: 5px;
   white-space: nowrap;
-  @if $use_new_styles { font-size: 16px; }
-  @else { font-size: 18px; }
+  @if $use_new_styles { @include fontSize($ic-font-size--medium); }
+  @else { @include fontSize(18px); }
 }
 
 #refresh_calendar_link {
@@ -91,7 +91,7 @@
 }
 
 .whats-new {
-  font-size: 11px;
+  @include fontSize(11px);
   line-height: 32px;
   margin-right: 0px;
 }

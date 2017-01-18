@@ -25,7 +25,8 @@ describe Profile do
 
       class Foo < ActiveRecord::Base
         self.table_name = :users
-        include Profile::Association
+        prepend Profile::Association
+        strong_params
         def root_account; Account.default; end
       end
     end

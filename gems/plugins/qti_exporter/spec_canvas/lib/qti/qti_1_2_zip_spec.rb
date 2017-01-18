@@ -3,12 +3,12 @@ if Qti.migration_executable
   describe "QTI 1.2 zip" do
     before(:all) do
       @archive_file_path = File.join(BASE_FIXTURE_DIR, 'qti', 'plain_qti.zip')
-      unzipped_file_path = File.join(File.dirname(@archive_file_path), "qti_#{File.basename(@archive_file_path, '.zip')}", 'oi')
-      @dir = File.join(File.dirname(@archive_file_path), "qti_plain_qti")
-      
+      unzipped_file_path = create_temp_dir!
+      @dir = create_temp_dir!
+
       @course = Course.create!(:name => 'tester')
       @migration = ContentMigration.create(:context => @course)
-      
+
       @converter = Qti::Converter.new(:export_archive_path=>@archive_file_path, :base_download_dir=>unzipped_file_path, :content_migration => @migration)
       @converter.export
       @course_data = @converter.course.with_indifferent_access
@@ -18,15 +18,11 @@ if Qti.migration_executable
       @migration.set_default_settings
       @migration.migration_settings[:migration_ids_to_import] = {:copy=>{}}
       @migration.migration_settings[:files_import_root_path] = @course_data[:files_import_root_path]
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)      
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
 
     after(:all) do
       truncate_all_tables
-      @converter.delete_unzipped_archive
-      if File.exist?(@dir)
-        FileUtils::rm_rf(@dir)
-      end
     end
 
     it "should convert the assessments" do
@@ -50,9 +46,8 @@ if Qti.migration_executable
     end
 
     it "should have file paths" do
-      expect(@course_data[:overview_file_path].index("oi/overview.json")).not_to be_nil
-      expect(@course_data[:export_folder_path].index('spec_canvas/fixtures/qti/qti_plain_qti/oi')).not_to be_nil
-      expect(@course_data[:full_export_file_path].index('spec_canvas/fixtures/qti/qti_plain_qti/oi/course_export.json')).not_to be_nil
+      expect(@course_data[:overview_file_path].index("/overview.json")).not_to be_nil
+      expect(@course_data[:full_export_file_path].index('course_export.json')).not_to be_nil
     end
 
     it "should import the included files" do
@@ -70,28 +65,28 @@ if Qti.migration_executable
       c_att = @course.attachments.where(migration_id: "4d348a246af616c7d9a7d403367c1a30").first
       att = aq.attachments.where(migration_id: CC::CCHelper.create_key(c_att)).first
       expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
-      
+
       aq = @course.assessment_questions.where(migration_id: "QUE_1007").first
       c_att = @course.attachments.where(migration_id: "f3e5ead7f6e1b25a46a4145100566821").first
       att = aq.attachments.where(migration_id: CC::CCHelper.create_key(c_att)).first
       expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
-      
+
       aq = @course.assessment_questions.where(migration_id: "QUE_1014").first
       c_att = @course.attachments.where(migration_id: "d2b5ca33bd970f64a6301fa75ae2eb22").first
       att = aq.attachments.where(migration_id: CC::CCHelper.create_key(c_att)).first
       expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
-      
+
       aq = @course.assessment_questions.where(migration_id: "QUE_1053").first
       c_att = @course.attachments.where(migration_id: "c16566de1661613ef9e5517ec69c25a1").first
       att = aq.attachments.where(migration_id: CC::CCHelper.create_key(c_att)).first
       expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
     end
-    
+
     it "should hide the quiz directory" do
       folder = @course.folders.where(name: Canvas::Migration::MigratorHelper::QUIZ_FILE_DIRECTORY).first
       expect(folder.hidden?).to be_truthy
     end
-    
+
     it "should use new attachments for imports with same file names" do
       # run a second migration and check that there are different attachments on the questions
       migration = ContentMigration.create(:context => @course)
@@ -104,13 +99,13 @@ if Qti.migration_executable
       migration.migration_settings[:files_import_root_path] = course_data[:files_import_root_path]
       migration.migration_settings[:id_prepender] = 'test2'
       Importers::CourseContentImporter.import_content(@course, course_data, nil, migration)
-      
+
       # Check the first import
       aq = @course.assessment_questions.where(migration_id: "QUE_1003").first
       c_att = @course.attachments.where(migration_id: "4d348a246af616c7d9a7d403367c1a30").first
       att = aq.attachments.where(migration_id: CC::CCHelper.create_key(c_att)).first
       expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
-      
+
       # check the second import
       aq = @course.assessment_questions.where(migration_id: "test2_QUE_1003").first
       c_att = @course.attachments.where(migration_id: "test2_4d348a246af616c7d9a7d403367c1a30").first

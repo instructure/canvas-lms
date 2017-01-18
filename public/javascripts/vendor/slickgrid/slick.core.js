@@ -456,6 +456,6 @@ define(['jquery','vendor/slickgrid/lib/jquery.event.drag-2.2'],function($) {
       return (activeEditController ? activeEditController.cancelCurrentEdit() : true);
     };
   }
-})(jQuery);
+})($);
 
 });

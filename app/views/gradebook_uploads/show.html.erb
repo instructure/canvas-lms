@@ -1,8 +1,6 @@
-<% content_for :page_title do %><%= join_title t(:page_title, "Gradebook"), @context.name %><% end %>
-
 <%
-  jammit_css :slickgrid
-  jammit_css :gradebook_uploads
+  content_for :page_title, join_title(t(:page_title, "Gradebook"), @context.name)
+  css_bundle :slickgrid, :gradebook_uploads
   js_bundle :gradebook_uploads
 %>
 
@@ -24,7 +22,7 @@
           <th class='name'><%= t(:student_example, "Some Guy") %></th>
           <td>
             <select name="student_-iterator-">
-              <option value=""><%= t(:choose_option, "-- Choose --") %></option>
+              <option value=""><%= t("-- Choose student --") %></option>
               <option value="ignore" class="ignore"><%= t(:ignore_student_option, "Not in my class, Ignore this row.") %></option>
             </select>
           </td>
@@ -46,13 +44,13 @@
           <th class='title'><%= t(:assignment_example, "Equity Indices Quiz") %></th>
           <td>
             <select name="assignment_-iterator-">
-              <option value=""><%= t(:choose_option, "-- Choose --") %></option>
+              <option value=""><%= t("-- Choose assignment --") %></option>
               <option value="new" class="new"><%= t(:new_assignment_option, "A new assignment") %></option>
               <option value="ignore" class="ignore"><%= t(:ignore_assignment_option, "Bogus, ignore it") %></option>
             </select>
             <span class="points_possible_section">
-              <label><%= t('labels.points_possible', "Points Possible") %></label>
-              <input type="text" class="points_possible" />
+              <label for="points_possible"><%= t("Points Possible") %></label>
+              <input id="points_possible" type="text" class="points_possible" />
             </span>
           </td>
         </tr>
@@ -87,6 +85,11 @@
     <span id="assignments_without_changes_alert" style="display:none; margin-left: 50px;"><%= t('notices.unchanged', "Note: You uploaded some assignments that had no grade changes detected. They have been hidden.") %></span>
   </div>
 <% end -%>
+
+<div id="assignments_outside_current_periods" class="hidden">
+  <h4><%= t('headers.past_grading_periods_prevent_editing', "The following assignments cannot be edited because they are not in a current grading period:") %></h4>
+</div>
+
 <style>
   /*keep this here because jquery.rule needs it to stick in dynamic styles for the slick.grid to keep all of the columns the same width*/
 </style>

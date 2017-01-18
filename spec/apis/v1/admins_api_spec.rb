@@ -90,14 +90,26 @@ describe "Admins API", type: :request do
       })
     end
 
-    it "should not send a notification email if passed a valid 'send_confirmation' value" do
+    it "should not send a notification email if passed a 0 'send_confirmation' value" do
+      AccountUser.any_instance.expects(:account_user_notification!).never
+      AccountUser.any_instance.expects(:account_user_registration!).never
+
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
+               {:controller => 'admins', :action => 'create', :format => 'json',
+                :account_id => @admin.account.to_param },
+               {:user_id => @new_user.to_param, :send_confirmation => '0'})
+
+      # Both of the expectations above should pass.
+    end
+
+    it "should not send a notification email if passed a false 'send_confirmation' value" do
       AccountUser.any_instance.expects(:account_user_notification!).never
       AccountUser.any_instance.expects(:account_user_registration!).never
 
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                       {:controller => 'admins', :action => 'create', :format => 'json',
                        :account_id => @admin.account.to_param },
-                      {:user_id => @new_user.to_param, :send_confirmation => '0'})
+                      {:user_id => @new_user.to_param, :send_confirmation => 'false'})
 
       # Both of the expectations above should pass.
     end
@@ -121,7 +133,7 @@ describe "Admins API", type: :request do
       expect(response.code).to eq '404'
     end
   end
-  
+
   describe "destroy" do
     before :once do
       @account = Account.default
@@ -166,7 +178,7 @@ describe "Admins API", type: :request do
       it "should 404 if the user doesn't exist" do
         temp_user = User.create!
         bad_id = temp_user.to_param
-        temp_user.destroy!
+        temp_user.destroy_permanently!
         api_call(:delete, @base_path + bad_id, @path_opts.merge(:user_id => bad_id),
                  {}, {}, :expected_status => 404)
       end
@@ -228,7 +240,7 @@ describe "Admins API", type: :request do
       end
     end
   end
-  
+
   describe "index" do
     before :once do
       @account = Account.default

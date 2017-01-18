@@ -20,22 +20,42 @@ require 'aws-sdk'
 
 class DeveloperKey < ActiveRecord::Base
   include CustomValidations
+  include Workflow
 
   belongs_to :user
   belongs_to :account
+
   has_many :page_views
   has_many :access_tokens
-  has_many :context_external_tools, :primary_key => 'tool_id', :foreign_key => 'tool_id'
 
-  attr_accessible :api_key, :name, :user, :account, :icon_url, :redirect_uri, :tool_id, :email
+  attr_accessible :api_key, :name, :user, :account, :icon_url, :redirect_uri, :email, :event, :auto_expire_tokens
 
   before_create :generate_api_key
-  before_save :nullify_empty_tool_id
+  before_create :set_auto_expire_tokens
+  before_save :nullify_empty_icon_url
+  after_save :clear_cache
 
   validates_as_url :redirect_uri
 
-  def nullify_empty_tool_id
-    self.tool_id = nil if tool_id.blank?
+  scope :nondeleted, -> { where("workflow_state<>'deleted'") }
+
+  workflow do
+    state :active do
+      event :deactivate, transitions_to: :inactive
+    end
+    state :inactive do
+      event :activate, transitions_to: :active
+    end
+    state :deleted
+  end
+
+  alias_method :destroy_permanently!, :destroy
+  def destroy
+    self.workflow_state = 'deleted'
+    self.save
+  end
+
+  def nullify_empty_icon_url
     self.icon_url = nil if icon_url.blank?
   end
 
@@ -43,12 +63,36 @@ class DeveloperKey < ActiveRecord::Base
     self.api_key = CanvasSlug.generate(nil, 64) if overwrite || !self.api_key
   end
 
+  def set_auto_expire_tokens
+    self.auto_expire_tokens = true if self.respond_to?(:auto_expire_tokens=)
+  end
+
   def self.default
     get_special_key("User-Generated")
   end
 
+  def authorized_for_account?(target_account)
+    return true unless account_id
+    target_account.id == account_id
+  end
+
   def account_name
     account.try(:name)
+  end
+
+  class << self
+    def find_cached(id)
+      global_id = Shard.global_id_for(id)
+      MultiCache.fetch("developer_key/#{global_id}") do
+        Shackles.activate(:slave) do
+          DeveloperKey.find(global_id)
+        end
+      end
+    end
+  end
+
+  def clear_cache
+    MultiCache.delete("developer_key/#{global_id}")
   end
 
   def self.get_special_key(default_key_name)
@@ -78,7 +122,7 @@ class DeveloperKey < ActiveRecord::Base
     self_domain = URI.parse(self.redirect_uri).host
     other_domain = URI.parse(redirect_uri).host
     return self_domain.present? && other_domain.present? && (self_domain == other_domain || other_domain.end_with?(".#{self_domain}"))
-  rescue URI::InvalidURIError
+  rescue URI::Error
     return false
   end
 

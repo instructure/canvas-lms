@@ -1,5 +1,5 @@
 <tr class="<%= 'kept' if kept %>">
-  <th scope="row">
+  <th scope="row" class="ic-Table--header-row">
     <% if kept %>
       <%= t 'kept', 'KEPT' %>
     <% elsif version.version_number == @submission.version_number %>

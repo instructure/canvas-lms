@@ -81,9 +81,9 @@ module Quizzes
   #       }
   #     }
   class QuizSubmissionUsersController < ::ApplicationController
-    include Filters::Quizzes
+    include ::Filters::Quizzes
     before_filter :require_context, :require_quiz
-    
+
     def index
       return unless user_has_teacher_level_access?
       @users = index_users
@@ -115,7 +115,7 @@ module Quizzes
     # @API Send a message to unsubmitted or submitted users for the quiz
     # @beta
     #
-    # @param conversations [QuizUserConversation] - Body and recipients to send the message to.
+    # @argument conversations [QuizUserConversation] - Body and recipients to send the message to.
     #
     # @model QuizUserConversation
     #

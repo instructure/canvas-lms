@@ -1,7 +1,6 @@
 define [
   'jquery'
   'i18n!pages'
-  'wikiSidebar'
   'compiled/models/WikiPage'
   'compiled/views/PaginatedCollectionView'
   'compiled/views/wiki/WikiPageEditView'
@@ -10,7 +9,7 @@ define [
   'compiled/views/StickyHeaderMixin'
   'compiled/str/splitAssetString'
   'jquery.disableWhileLoading'
-], ($, I18n, wikiSidebar, WikiPage, PaginatedCollectionView, WikiPageEditView, itemView, template, StickyHeaderMixin, splitAssetString) ->
+], ($, I18n, WikiPage, PaginatedCollectionView, WikiPageEditView, itemView, template, StickyHeaderMixin, splitAssetString) ->
 
   class WikiPageIndexView extends PaginatedCollectionView
     @mixin StickyHeaderMixin
@@ -41,6 +40,7 @@ define [
       @itemViewOptions.indexView = @
       @itemViewOptions.collection = @collection
       @itemViewOptions.WIKI_RIGHTS = @WIKI_RIGHTS
+      @focusAfterRenderSelector = null
 
       @contextAssetString = options?.contextAssetString
       [@contextName, @contextId] = splitAssetString(@contextAssetString) if @contextAssetString
@@ -61,6 +61,11 @@ define [
       super
       @$noPages.redirectClickTo(@$noPagesLink)
       @renderSortHeaders()
+      if @focusAfterRenderSelector
+        # We do a setTimeout here just to force it to the next tick.
+        setTimeout =>
+          $(@focusAfterRenderSelector).focus()
+        , 1
 
     sort: (event = {}) ->
       event.preventDefault()
@@ -117,9 +122,7 @@ define [
 
       # override the cancel behavior
       @editView.on 'cancel', =>
-        @editView.$el.remove()
-        wikiSidebar.hide()
-
+        @editView.destroyEditor()
         $('body').removeClass('edit with-right-side')
         $('body').addClass('index')
         @$el.show()

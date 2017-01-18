@@ -7,46 +7,77 @@ module CanvasPartman::Concerns
   #  for *every* record you try to create or modify.
   module Partitioned
     def self.included(base)
-      base.extend ClassMethods
-      base.class_eval do
-        # @attr [String] partitioning_field
-        #  Name of the database column which contains the data we'll use to
-        #  locate the correct partition for the records.
-        #
-        #  This should point to a Time field of some sorts.
-        #
-        #  Default value is "created_at".
-        cattr_accessor :partitioning_field
-
-        # @attr [Symbol] partitioning_interval
-        #  A time interval to partition the table over.
-        #  Allowed values are one of: [ :months, :years ]
-        #
-        #  Default value is :months.
-        #
-        #  Note that only :months has been officially tested, YMMV for other
-        #  intervals.
-        cattr_accessor :partitioning_interval
-
-        self.partitioning_field = 'created_at'
-        self.partitioning_interval = :months
-      end
+      base.singleton_class.include(ClassMethods)
+      base.partitioning_strategy = :by_date
     end
 
     module ClassMethods
-      # Convenience method for configuring a Partitioned model.
+      # @attr [Symbol] parititioning_strategy
+      #  How to partition the table. Allowed values are one of:
+      #  [ :by_date, :by_id ]
       #
-      # @param [Hash] options
-      #   Partitioned options.
+      # Default value is :by_date
+      attr_reader :partitioning_strategy
+
+      def partitioning_strategy=(value)
+        raise ArgumentError unless [:by_date, :by_id].include?(value)
+
+        if value == :by_date
+          self.partitioning_field = "created_at"
+          self.partitioning_interval = :months
+        elsif value == :by_id
+          self.partitioning_field = nil
+          self.partition_size = 1_000_000
+        end
+        @partitioning_strategy = value
+      end
+
+      # @attr [String] partitioning_field
+      #  Name of the database column which contains the data we'll use to
+      #  locate the correct partition for the records. Only applies to
+      #  :by_date partitioning_strategy
       #
-      # @param [String] options[:on]
+      #  This should point to a Time field of some sorts.
+      #
+      #  Default value is "created_at" for :by_date partitioning,
+      #  or unset for :by_id partitioning.
+      attr_accessor :partitioning_field
+
+      # @attr [Symbol] partitioning_interval
+      #  A time interval to partition the table over. Only applies to
+      #  :by_date partitioning_strategy
+      #  Allowed values are one of: [ :months, :years ]
+      #
+      #  Default value is :months.
+      #
+      #  Note that only :months has been officially tested, YMMV for other
+      #  intervals.
+      attr_reader :partitioning_interval
+
+      def partitioning_interval=(value)
+        raise ArgumentError unless [:months, :years].include?(value)
+
+        @partitioning_interval = value
+      end
+
+      # @attr [Fixnum]  partition_size
+      #  How large each partition is. Only applies to
+      #  :by_id partitioning_strategy
+      #
+      # Default value is 1_000_000
+      attr_accessor :partition_size
+
+      # Convenience method for configuring a :by_date Partitioned model.
+      #
+      # @param [String] on
       #   Partitioning field.
       #
-      # @param [Symbol] options[:over]
+      # @param [Symbol] over
       #   Partitioning interval.
-      def partitioned(options={})
-        self.partitioning_field = options[:on].to_s if options[:on]
-        self.partitioning_interval = options[:over].to_sym if options[:over]
+      def partitioned(on: nil, over: nil)
+        self.partitioning_strategy = :by_date
+        self.partitioning_field = on.to_s if on
+        self.partitioning_interval = over.to_sym if over
       end
 
       # :nodoc:
@@ -84,9 +115,9 @@ module CanvasPartman::Concerns
       # @return [String]
       #  The table name for the partition.
       def infer_partition_table_name(attributes)
-        date_attr = attributes.detect { |(k,v)| k.name == partitioning_field }
+        attr = attributes.detect { |(k, _v)| k.name == partitioning_field }
 
-        if date_attr.nil? || date_attr[1].nil?
+        if attr.nil? || attr[1].nil?
           raise ArgumentError.new <<-ERROR
             Partition resolution failure!!!
             Expected "#{partitioning_field}" attribute to be present in set and
@@ -96,19 +127,19 @@ module CanvasPartman::Concerns
           ERROR
         end
 
-        date = date_attr[1]
-        date = date.utc if ActiveRecord::Base.default_timezone == :utc
+        if partitioning_strategy == :by_date
+          date = attr[1]
+          date = date.utc if ActiveRecord::Base.default_timezone == :utc
 
-        case partitioning_interval
-        when :months
-          [ self.table_name, date.year, date.month ].join('_')
-        when :years
-          [ self.table_name, date.year ].join('_')
+          case partitioning_interval
+          when :months
+            [ table_name, date.year, date.month ].join('_')
+          when :years
+            [ table_name, date.year ].join('_')
+          end
         else
-          raise NotImplementedError.new <<-ERROR
-            Only [:months,:years] are currently supported as a partitioning
-            interval.
-          ERROR
+          id = attr[1]
+          [ table_name, id / partition_size ].join('_')
         end
       end
     end

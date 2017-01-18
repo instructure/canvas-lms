@@ -1,0 +1,32 @@
+<h4>Request Parameters:</h4>
+<table class="request-params">
+  <thead>
+    <tr>
+      <th class="param-name">Parameter</th>
+      <th class="param-req"></th>
+      <th class="param-type">Type</th>
+      <th class="param-desc">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @request_parameters.each do |param| %>
+    <tr class="request-param">
+      <td><%= h param.name(json: false) %></td>
+      <td>
+        <% if param.required? %>
+        Required
+        <% end %>
+      </td>
+      <td><%= h param.swagger_type %></td>
+      <td class="param-desc">
+        <%= htmlify param.desc %>
+        <% if param.enums.present? %>
+        <p class="param-values">
+          <span class="allowed">Allowed values:</span> <%= param.enums.map { |v| "<code class=enum>#{v}</code>" }.join(", ") %>
+        </p>
+        <% end %>
+      </td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>

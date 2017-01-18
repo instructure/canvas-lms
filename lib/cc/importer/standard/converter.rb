@@ -29,7 +29,7 @@ module CC::Importer::Standard
 
     MANIFEST_FILE = "imsmanifest.xml"
     SUPPORTED_TYPES = /assessment\z|\Aassignment|\Aimswl|\Aimsbasiclti|\Aimsdt|webcontent|learning-application-resource\z/
-    
+
     attr_accessor :resources
 
     # settings will use these keys: :course_name, :base_download_dir
@@ -44,6 +44,8 @@ module CC::Importer::Standard
 
     # exports the package into the intermediary json
     def convert(to_export = nil)
+      @course[:assignments] ||= []
+
       @archive.prepare_cartridge_file(MANIFEST_FILE)
       @manifest = open_file_xml(File.join(@unzipped_file_path, MANIFEST_FILE))
       @manifest.remove_namespaces!
@@ -55,7 +57,7 @@ module CC::Importer::Standard
       @course[:discussion_topics] = convert_discussions
       lti_converter = CC::Importer::BLTIConverter.new
       @course[:external_tools] = convert_blti_links_with_flat(lti_converter)
-      @course[:assignments] = lti_converter.create_assignments_from_lti_links(@course[:external_tools])
+      @course[:assignments] += lti_converter.create_assignments_from_lti_links(@course[:external_tools])
       convert_cc_assignments(@course[:assignments])
       @course[:assessment_questions], @course[:assessments] = convert_quizzes if Qti.qti_enabled?
       @course[:modules] = convert_organizations(@manifest)
@@ -92,7 +94,7 @@ module CC::Importer::Standard
       @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')] ||
         @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '').sub(WEB_RESOURCES_FOLDER + '/', '')]
     end
-    
+
     def get_canvas_att_replacement_url(path, resource_dir=nil)
       if path.start_with?('../')
         if url = get_canvas_att_replacement_url(path.sub('../', ''), resource_dir)
@@ -132,7 +134,7 @@ module CC::Importer::Standard
       @file_path_migration_id[file[:path_name]] = file[:migration_id]
       add_file(file)
     end
-    
+
     FILEBASE_REGEX = /\$IMS[-_]CC[-_]FILEBASE\$/
     def replace_urls(html, resource_dir=nil)
       return "" if html.blank?
@@ -156,7 +158,7 @@ module CC::Importer::Standard
                   end
                 end
               end
-            rescue URI::InvalidURIError
+            rescue URI::Error
               Rails.logger.warn "attempting to translate invalid url: #{val}"
             end
           end
@@ -182,6 +184,6 @@ module CC::Importer::Standard
 
       tools
     end
-    
+
   end
 end

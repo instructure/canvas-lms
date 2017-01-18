@@ -1,4 +1,6 @@
 class IncreaseFolderNameSize < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     change_column :folders, :full_name, :text
   end

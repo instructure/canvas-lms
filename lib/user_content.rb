@@ -36,12 +36,30 @@ module UserContent
       child.add_next_sibling(form)
     end
 
-    html.css('img.equation_image').each do |node|
-      mathml = Nokogiri::HTML::DocumentFragment.parse('<span class="hidden-readable">' + Ritex::Parser.new.parse(node.delete('alt').value) + '</span>') rescue next
-      node.add_next_sibling(mathml)
+    find_equation_images(html) do |node|
+      mathml = latex_to_mathml(node['alt'])
+      next if mathml.blank?
+
+      mathml_span = Nokogiri::HTML::DocumentFragment.parse(
+        "<span class=\"hidden-readable\">#{mathml}</span>"
+      )
+      node.add_next_sibling(mathml_span)
     end
 
     html.to_s.html_safe
+  end
+
+  def self.latex_to_mathml(latex)
+    CanvasStatsd::Statsd.time("ritex.parse_attempt") do
+      CanvasStatsd::Statsd.increment("ritex.parse_attempt.count")
+      begin
+        Ritex::Parser.new.parse(latex)
+      rescue Racc::ParseError, Ritex::LexError, Ritex::Error
+        # invalid LaTeX; leave alt alone, skip mathml
+        CanvasStatsd::Statsd.increment("ritex.parse_failure.count")
+        return ""
+      end
+    end
   end
 
   class Node < Struct.new(:width, :height, :node_string, :node_hmac)
@@ -76,22 +94,29 @@ module UserContent
     end
   end
 
+  def self.find_equation_images(html)
+    html.css('img.equation_image').each do |node|
+      yield node
+    end
+  end
+
   # TODO: try and discover the motivation behind the "huhs"
   def self.css_size(val)
-    if !val || val.to_f == 0
+    to_f = TextHelper.round_if_whole(val.to_f)
+    if !val || to_f == 0
       # no value, non-numeric value, or 0 value (whether "0", "0px", "0%",
       # etc.); ignore
       nil
-    elsif val == "#{val.to_f}%" || val == "#{val.to_f}px"
+    elsif val == "#{to_f}%" || val == "#{to_f}px"
       # numeric percentage or specific px value; use as is
       val
-    elsif val.to_f.to_s == val
+    elsif to_f.to_s == val
       # unadorned numeric value; make px (after adding 10... huh?)
-      (val.to_f + 10).to_s + "px"
+      (to_f + 10).to_s + "px"
     else
       # numeric value embedded, but has additional text we didn't recognize;
       # just extract the numeric part (without a px... huh?)
-      val.to_f.to_s
+      to_f.to_s
     end
   end
 
@@ -192,8 +217,8 @@ module UserContent
       return true unless user
       # if user given, check that the user is allowed to manage all
       # context content, or read that specific item (and it's not locked)
-      @manage_content ||= context.grants_right?(user, :manage_content)
-      return true if @manage_content
+      @read_as_admin = context.grants_right?(user, :read_as_admin) if @read_as_admin.nil?
+      return true if @read_as_admin
       content ||= get_content.call
       allow = true if content.respond_to?(:grants_right?) && content.grants_right?(user, :read)
       allow = false if allow && content.respond_to?(:locked_for?) && content.locked_for?(user)

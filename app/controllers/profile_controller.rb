@@ -140,10 +140,10 @@
 #
 class ProfileController < ApplicationController
   before_filter :require_registered_user, :except => [:show, :settings, :communication, :communication_update]
-  before_filter :require_user, :only => [:settings, :communication, :communication_update, :observees, :toggle_inbox_disable]
+  before_filter :require_user, :only => [:settings, :communication, :communication_update]
   before_filter :require_user_for_private_profile, :only => :show
   before_filter :reject_student_view_student
-  before_filter :require_password_session, :only => [:settings, :communication, :communication_update, :update]
+  before_filter :require_password_session, :only => [:communication, :communication_update, :update]
 
   include Api::V1::Avatar
   include Api::V1::CommunicationChannel
@@ -172,7 +172,7 @@ class ProfileController < ApplicationController
 
     known_user = @user_data[:common_contexts].present?
     if @user_data[:known_user] # if you can message them, you can see the profile
-      add_crumb(t('crumbs.settings_frd', "%{user}'s settings", :user => @user.short_name), user_profile_path(@user))
+      add_crumb(t('crumbs.settings_frd', "%{user}'s Profile", :user => @user.short_name), user_profile_path(@user))
       render
     else
       render :unauthorized
@@ -191,6 +191,7 @@ class ProfileController < ApplicationController
       @user = api_find(User, params[:user_id])
       return unless authorized_action(@user, @current_user, :read_profile)
     else
+      return unless require_password_session
       @user = @current_user
       @user.dismiss_bouncing_channel_message!
     end
@@ -230,7 +231,7 @@ class ProfileController < ApplicationController
         json[:category]             = category.category.underscore.gsub(/\s/, '_')
         json[:display_name]         = category.category_display_name
         json[:category_description] = category.category_description
-        json[:option]               = category.related_user_setting(@user)
+        json[:option]               = category.related_user_setting(@user, @domain_root_account)
       end
     end
 
@@ -439,6 +440,9 @@ class ProfileController < ApplicationController
   private :require_user_for_private_profile
 
   def observees
+    if @domain_root_account.parent_registration?
+      js_env(AUTH_TYPE: @domain_root_account.parent_auth_type)
+    end
     @user ||= @current_user
     @active_tab = 'observees'
     @context = @user.profile if @user == @current_user

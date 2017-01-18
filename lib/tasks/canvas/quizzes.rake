@@ -11,7 +11,7 @@ namespace :canvas do
       model.transaction do
         snapshots = Quizzes::QuizSubmissionSnapshot.
           where(quiz_submission_id: quiz_submission_ids).
-          includes(:quiz_submission).
+          preload(:quiz_submission).
           reject { |snapshot| snapshot.quiz_submission.nil? }
 
         puts "Generating #{snapshots.length} events..."

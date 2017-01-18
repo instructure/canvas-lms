@@ -179,7 +179,6 @@ describe GroupCategory do
       group2 = category.groups.create(:context => course)
       course.reload
       expect(course.groups.active.count).to eq 2
-
       category.destroy
       course.reload
       expect(course.groups.active.count).to eq 0
@@ -344,6 +343,20 @@ describe GroupCategory do
       @category = @course.group_categories.create(:name => "Group Category")
     end
 
+    it "should not assign inactive users to groups" do
+      group1 = @category.groups.create(:name => "Group 1", :context => @course)
+      student1 = @course.enroll_student(user_model).user
+      inactive_en = @course.enroll_student(user_model)
+      inactive_en.deactivate
+
+      # group1 now has fewer students, and would be favored if it weren't
+      # destroyed. make sure the unassigned student (student2) is assigned to
+      # group2 instead of group1
+      memberships = @category.assign_unassigned_members
+      expect(memberships.size).to eq 1
+      expect(memberships.first.user).to eq student1
+    end
+
     it "should not assign users to inactive groups" do
       group1 = @category.groups.create(:name => "Group 1", :context => @course)
       group2 = @category.groups.create(:name => "Group 2", :context => @course)
@@ -439,10 +452,26 @@ describe GroupCategory do
       expect(category.progresses.count).to eq 2
     end
   end
+
+  context "#clone_groups_and_memberships" do
+    it "should not duplicate wiki ids" do
+      category = @course.group_categories.create!(:name => "Group Category")
+      group = category.groups.create!(name: "Group 1", context: @course)
+      group.wiki # this creates a wiki for the group
+      expect(group.wiki_id).not_to be_nil
+
+      new_category = @course.group_categories.create!(:name => "New Group Category")
+      category.clone_groups_and_memberships(new_category)
+      new_category.reload
+      new_group = new_category.groups.first
+
+      expect(new_group.wiki_id).to be_nil
+    end
+  end
 end
 
 def assert_random_group_assignment(category, course, initial_spread, result_spread, opts={})
-  if group_limit = opts[:group_limit]
+  if (group_limit = opts[:group_limit])
     category.group_limit = group_limit
     category.save!
   end

@@ -64,15 +64,6 @@ module TextHelper
     presenter.as_string(shorten_midnight: shorten_midnight)
   end
 
-  def unlocalized_datetime_string(start_datetime, datetime_type=:event)
-    start_datetime = start_datetime.in_time_zone rescue start_datetime
-    return nil unless start_datetime
-
-    date_format = (datetime_type == :verbose || start_datetime.year != Time.zone.today.year) ? "%b %-d, %Y" : "%b %-d"
-    time_format = start_datetime.min == 0 ?  "%l%P" : "%l:%M%P"
-    return start_datetime.strftime("#{date_format} at #{time_format}")
-  end
-
   def time_ago_in_words_with_ago(time)
     I18n.t('#time.with_ago', '%{time} ago', :time => (time_ago_in_words time rescue ''))
   end
@@ -237,5 +228,17 @@ module TextHelper
     # Strip wrapping <p></p> if inlinify == :auto && they completely wrap the result && there are not multiple <p>'s
     result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>.*<\/p>\z/m && !(result =~ /.*<p>.*<p>.*/m)
     result.strip.html_safe
+  end
+
+  def round_if_whole(value)
+    TextHelper.round_if_whole(value)
+  end
+
+  def self.round_if_whole(value)
+    if value.is_a?(Float) && (i = value.to_i) == value
+      i
+    else
+      value
+    end
   end
 end

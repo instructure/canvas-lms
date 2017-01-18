@@ -4,7 +4,7 @@ define ['Backbone'], ({Model}) ->
     setup: -> @model = new Model
 
   test '@mixin', ->
-    initSpy = sinon.spy()
+    initSpy = @spy()
     mixable =
       defaults:
         cash: 'money'

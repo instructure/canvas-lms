@@ -30,8 +30,8 @@ var SHARED_CONFIG = {
   version: '2.0.0',
 
   styles: [
-    "vendor/canvas/public/stylesheets_compiled/new_styles_normal_contrast/pages/g_vendor.css",
-    "vendor/canvas/public/stylesheets_compiled/new_styles_normal_contrast/base/c-common.css",
+    "vendor/canvas_public/stylesheets_compiled/new_styles_normal_contrast/pages/g_vendor.css",
+    "vendor/canvas_public/stylesheets_compiled/new_styles_normal_contrast/base/c-common.css",
     "dist/<%= grunt.config.get('pkg.name') %>.css"
   ]
 };

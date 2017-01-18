@@ -50,11 +50,13 @@ class FilePreviewsController < ApplicationController
   # canvadocs, crocodoc, inline image, etc.
   def show
     @file = @context.attachments.not_deleted.find_by_id(params[:file_id])
-    jammit_css :react_files
+    css_bundle :react_files
     unless @file
       @headers = false
       @show_left_side = false
-      return render template: 'shared/errors/404_message', status: :not_found
+      return render template: 'shared/errors/404_message',
+        status: :not_found,
+        formats: [:html]
     end
     if authorized_action(@file, @current_user, :read)
       unless @file.grants_right?(@current_user, :download)

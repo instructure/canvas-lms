@@ -1,39 +1,8 @@
-def set_up_google_docs(setupDrive = true)
-  UserService.register(
-      :service => "google_docs",
-      :token => "token",
-      :secret => "secret",
-      :user => @user,
-      :service_domain => "google.com",
-      :service_user_id => "service_user_id",
-      :service_user_name => "service_user_name"
-  )
-
-  GoogleDocs::Connection.any_instance.
-      stubs(:verify_access_token).
-      returns(true)
-
-  # GoogleDocs::Connection.any_instance.
-  #     stubs(:list).
-  #     returns(nil)
+module GoogleDriveCommon
+  def setup_google_drive(add_user_service=true, authorized=true)
 
 
-  GoogleDocsCollaboration.any_instance.
-      stubs(:initialize_document).
-      returns(nil)
-
-  GoogleDocsCollaboration.any_instance.
-      stubs(:delete_document).
-      returns(nil)
-
-  if (setupDrive == true)
-    set_up_drive_connection
-  end
-
-end
-
-def set_up_drive_connection
-  UserService.register(
+    UserService.register(
       :service => "google_drive",
       :token => "token",
       :secret => "secret",
@@ -41,10 +10,22 @@ def set_up_drive_connection
       :service_domain => "drive.google.com",
       :service_user_id => "service_user_id",
       :service_user_name => "service_user_name"
-  )
+    ) if add_user_service
 
-  GoogleDocs::DriveConnection.any_instance.
-      stubs(:verify_access_token).
-      returns(true)
+    GoogleDrive::Connection.any_instance.
+      stubs(:authorized?).
+      returns(authorized)
+
+    data = stub('data', id: 1, to_json: { id: 1 }, alternateLink: 'http://localhost/googleDoc')
+    doc = stub('doc', data: data)
+    adapter = stub('google_adapter', create_doc: doc, acl_add: nil, acl_remove: nil)
+    GoogleDocsCollaboration.any_instance.
+        stubs(:google_adapter_for_user).
+        returns(adapter)
+
+    GoogleDocsCollaboration.any_instance.
+        stubs(:delete_document).
+        returns(nil)
+
+  end
 end
-

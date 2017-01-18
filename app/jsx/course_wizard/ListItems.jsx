@@ -3,11 +3,13 @@ define([
   ], function (I18n) {
     /**
      * Returns an array containing all the possible items for the checklist
+     * For many ListItems, the ! is added for the complete property
+     *  because the ENV is checking if the step is nil? or empty?
      */
     return [
       {
         key:'content_import',
-        complete: ENV.COURSE_WIZARD.checklist_states.import_step,
+        complete: !ENV.COURSE_WIZARD.checklist_states.import_step,
         title: I18n.t("Import Content"),
         text: I18n.t("If you've been using another course management system, you probably have stuff in there that you're going to want moved over to Canvas. We can walk you through the process of easily migrating your content into Canvas."),
         url: ENV.COURSE_WIZARD.urls.content_import,
@@ -15,7 +17,7 @@ define([
       },
       {
         key:'add_assignments',
-        complete: ENV.COURSE_WIZARD.checklist_states.assignment_step,
+        complete: !ENV.COURSE_WIZARD.checklist_states.assignment_step,
         title: I18n.t("Add Course Assignments"),
         text: I18n.t("Add your assignments.  You can just make a long list, or break them up into groups - and even specify weights for each assignment group."),
         url: ENV.COURSE_WIZARD.urls.add_assignments,
@@ -23,7 +25,7 @@ define([
       },
       {
         key:'add_students',
-        complete: ENV.COURSE_WIZARD.checklist_states.add_student_step,
+        complete: !ENV.COURSE_WIZARD.checklist_states.add_student_step,
         title: I18n.t("Add Students to the Course"),
         text: I18n.t("You'll definitely want some of these.  What's the fun of teaching a course if nobody's even listening?"),
         url: ENV.COURSE_WIZARD.urls.add_students,
@@ -31,7 +33,7 @@ define([
       },
       {
         key:'add_files',
-        complete: ENV.COURSE_WIZARD.checklist_states.import_step, /* Super odd in the existing wizard this is set to display: none */
+        complete: !ENV.COURSE_WIZARD.checklist_states.import_step, /* Super odd in the existing wizard this is set to display: none */
         title: I18n.t("Add Files to the Course"),
         text: I18n.t("The Files tab is the place to share lecture slides, example documents, study helps -- anything your students will want to download.  Uploading and organizing your files is easy with Canvas.  We'll show you how."),
         url: ENV.COURSE_WIZARD.urls.add_files,
@@ -39,7 +41,7 @@ define([
       },
       {
         key:'select_navigation',
-        complete: ENV.COURSE_WIZARD.checklist_states.navigation_step,
+        complete: !ENV.COURSE_WIZARD.checklist_states.navigation_step,
         title: I18n.t("Select Navigation Links"),
         text: I18n.t("By default all links are enabled for a course.  Students won't see links to sections that don't have content.  For example, if you haven't created any quizzes, they won't see the quizzes link.  You can sort and explicitly disable these links if there are areas of the course you don't want your students accessing."),
         url: ENV.COURSE_WIZARD.urls.select_navigation,
@@ -54,7 +56,7 @@ define([
       },
       {
         key:'course_calendar',
-        complete: ENV.COURSE_WIZARD.checklist_states.calendar_event_step,
+        complete: !ENV.COURSE_WIZARD.checklist_states.calendar_event_step,
         title: I18n.t("Add Course Calendar Events"),
         text: I18n.t("Here's a great chance to get to know the calendar and add any non-assignment events you might have to the course. Don't worry, we'll help you through it."),
         url: ENV.COURSE_WIZARD.urls.course_calendar,
@@ -62,7 +64,7 @@ define([
       },
       {
         key:'add_tas',
-        complete: ENV.COURSE_WIZARD.checklist_states.add_ta_step,
+        complete: !ENV.COURSE_WIZARD.checklist_states.add_ta_step,
         title: I18n.t("Add TAs to the Course"),
         text: I18n.t("You may want to assign some TAs to help you with the course.  TAs can grade student submissions, help moderate the discussions and even update due dates and assignment details for you."),
         url: ENV.COURSE_WIZARD.urls.add_tas,

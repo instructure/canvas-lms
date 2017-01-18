@@ -1,9 +1,6 @@
-/** @jsx React.DOM */
-
 define([
-  'react',
-  'react-router'
-], function(React, { RouteHandler }) {
+  'react'
+], function(React) {
 
   return React.createClass({
     displayName: 'Root',
@@ -11,7 +8,7 @@ define([
     render() {
       return (
         <div className="ExternalAppsRoot">
-          <RouteHandler/>
+          {React.cloneElement(this.props.children, {})}
         </div>
       );
     }

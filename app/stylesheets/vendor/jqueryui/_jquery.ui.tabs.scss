@@ -54,17 +54,3 @@
   }
   .ui-tabs-hide { display: none !important; }
 }
-
-// this is a custom minimal tab style added by instructure, apply this class in addition to the .ui-tabs
-// that jqueryui puts on.
-.ui-tabs-minimal {
-  .ui-tabs-nav {
-    border-bottom-color: $borderColorContent;
-  }
-  .ui-tabs-panel {
-    border-width: 0;
-    padding-left: 0;
-    padding-right: 0;
-    padding-bottom: 0;
-  }
-}

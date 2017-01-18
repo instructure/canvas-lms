@@ -30,6 +30,7 @@ module Importers
       let(:attachment) do
         stub(:context= => true,
              :migration_id= => true,
+             :migration_id => migration_id,
              :save_without_broadcasting! => true,
              :set_publish_state_for_usage_rights => nil)
       end

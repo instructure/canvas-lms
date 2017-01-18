@@ -1,7 +1,7 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/UploadButton'
+  'jsx/files/UploadButton'
   'compiled/react_files/modules/FileOptionsCollection'
 ], (React, $, UploadButton, FileOptionsCollection) ->
 
@@ -14,7 +14,7 @@ define [
           files:
             models: []
 
-      @button = React.render(UploadButton(props), $('<div>').appendTo("#fixtures")[0])
+      @button = React.render(React.createElement(UploadButton, props), $('<div>').appendTo("#fixtures")[0])
 
     teardown: ->
       React.unmountComponentAtNode(@button.getDOMNode().parentNode)
@@ -25,7 +25,7 @@ define [
     ok $(form).attr('class').match(/hidden/), 'is hidden from user'
 
   test 'only enques uploads when state.newUploads is true', ->
-    sinon.spy(@button, 'queueUploads')
+    @spy(@button, 'queueUploads')
 
     @button.state.nameCollisions.length = 0
     @button.state.resolvedNames.length = 1
@@ -37,5 +37,3 @@ define [
     FileOptionsCollection.state.newOptions = true
     @button.componentDidUpdate()
     equal @button.queueUploads.callCount, 1
-
-    @button.queueUploads.restore()

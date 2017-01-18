@@ -21,7 +21,7 @@ module Lti
 
     def index
       if authorized_action(@context, @current_user, :update)
-        app_collator = AppCollator.new(@context)
+        app_collator = AppCollator.new(@context, method(:reregistration_url_builder))
         collection = app_collator.bookmarked_collection
 
         respond_to do |format|
@@ -35,11 +35,19 @@ module Lti
       if authorized_action(@context, @current_user, :update)
         placements = params['placements'] || []
         collection = AppLaunchCollator.bookmarked_collection(@context, placements)
+        pagination_args = {max_per_page: 100}
         respond_to do |format|
-          launch_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_launch_definitions_url, include_host: true))
+          launch_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_launch_definitions_url, include_host: true), pagination_args)
           format.json { render :json => AppLaunchCollator.launch_definitions(launch_defs, placements) }
         end
       end
+    end
+
+
+    private
+
+    def reregistration_url_builder(context, tool_proxy_id)
+        polymorphic_url([context, :tool_proxy_reregistration], tool_proxy_id: tool_proxy_id)
     end
 
   end

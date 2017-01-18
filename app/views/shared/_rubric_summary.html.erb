@@ -1,3 +1,4 @@
+<% rubric_summary ||= nil %>
 <% rubric = rubric_summary %>
 <% rubric_association ||= nil; editable ||= false; association_object = nil
    edit ||= false; rubic ||= nil; assessing ||= false; assessment ||= nil; brief ||= false %>
@@ -19,7 +20,7 @@
     <th><%= t 'headers.assessment', "Assessment" %></th>
   </tr>
 </thead>
-<tbody> 
+<tbody>
   <% if rubric && rubric.criteria %>
     <% rubric.criteria_object.each do |criterion| %>
       <% rating = assessment.ratings.find{|r| r.criterion_id == criterion.id} rescue nil %>

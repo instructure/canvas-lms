@@ -1,7 +1,7 @@
 module DataFixup::DetectAttachmentEncoding
   def self.run
     begin
-      attachments = Attachment.where("encoding IS NULL AND content_type LIKE '%text%'").limit(5000).all
+      attachments = Attachment.where("encoding IS NULL AND content_type LIKE '%text%'").limit(5000).to_a
       attachments.each do |a|
         begin
           a.infer_encoding

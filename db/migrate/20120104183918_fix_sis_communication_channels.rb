@@ -1,4 +1,6 @@
 class FixSisCommunicationChannels < ActiveRecord::Migration
+  tag :predeploy
+
   disable_ddl_transaction!
 
   def self.up

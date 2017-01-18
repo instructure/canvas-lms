@@ -8,7 +8,11 @@
 </div>
 
 <div class="pad-box bottom-only">
-  <table class="table">
+  {{#if ENV.use_new_styles}}
+    <table class="ic-Table">
+  {{else}}
+    <table class="table">
+  {{/if}}
     <thead>
       <tr>
         <th>{{#t 'points_possible'}}Points possible{{/t}}</th>

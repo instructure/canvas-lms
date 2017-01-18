@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "course settings" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
@@ -94,9 +94,18 @@ describe "course settings" do
 
       code = @course.reload.self_enrollment_code
       expect(code).not_to be_nil
+      # this element _can_ still be on the page if the post hasn't finished yet,
+      # so make sure it's been populated before continuing
+      wait = Selenium::WebDriver::Wait.new(timeout: 5)
+      wait.until do
+        el = f('.self_enrollment_message')
+        el.present? &&
+        el.text != nil &&
+        el.text != ""
+      end
       message = f('.self_enrollment_message')
-      expect(message.text).to include(code)
-      expect(message.text).not_to include('self_enrollment_code')
+      expect(message).to include_text(code)
+      expect(message).not_to include_text('self_enrollment_code')
     end
   end
 
@@ -130,15 +139,25 @@ describe "course settings" do
       expect(@course.time_zone.name).to eq time_zone_value
     end
 
+    it "should disable from Course Navigation tab", priority: "1", test_id: 112172 do
+      get "/courses/#{@course.id}/settings#tab-navigation"
+      ff(".al-trigger")[0].click
+      ff(".icon-x")[0].click
+      wait_for_ajaximations
+      f('#nav_form > p:nth-of-type(2) > button.btn.btn-primary').click
+      wait_for_ajaximations
+      f('.student_view_button').click
+      wait_for_ajaximations
+      expect(f("#content")).not_to contain_link("Home")
+    end
+
     it "should add a section" do
       section_name = 'new section'
       get "/courses/#{@course.id}/settings#tab-sections"
 
       section_input = nil
-      keep_trying_until do
-        section_input = f('#course_section_name')
-        expect(section_input).to be_displayed
-      end
+      section_input = f('#course_section_name')
+      expect(section_input).to be_displayed
       replace_content(section_input, section_name)
       submit_form('#add_section_form')
       wait_for_ajaximations
@@ -150,17 +169,12 @@ describe "course settings" do
       add_section('Delete Section')
       get "/courses/#{@course.id}/settings#tab-sections"
 
-      keep_trying_until do
-        body = f('body')
-        expect(body).to include_text('Delete Section')
-      end
+      body = f('body')
+      expect(body).to include_text('Delete Section')
 
       f('.delete_section_link').click
-      keep_trying_until do
-        expect(driver.switch_to.alert).not_to be_nil
-        driver.switch_to.alert.accept
-        true
-      end
+      expect(driver.switch_to.alert).not_to be_nil
+      driver.switch_to.alert.accept
       wait_for_ajaximations
       expect(ff('#sections > .section').count).to eq 1
     end
@@ -170,36 +184,20 @@ describe "course settings" do
       add_section('Edit Section')
       get "/courses/#{@course.id}/settings#tab-sections"
 
-      keep_trying_until do
-        body = f('body')
-        expect(body).to include_text('Edit Section')
-      end
+      body = f('body')
+      expect(body).to include_text('Edit Section')
 
       f('.edit_section_link').click
       section_input = f('#course_section_name_edit')
-      keep_trying_until { expect(section_input).to be_displayed }
+      expect(section_input).to be_displayed
       replace_content(section_input, edit_text)
       section_input.send_keys(:return)
       wait_for_ajaximations
       expect(ff('#sections > .section')[0]).to include_text(edit_text)
     end
 
-    it "should move a nav item to disabled" do
-      skip('fragile')
-      get "/courses/#{@course.id}/settings#tab-navigation"
-
-      keep_trying_until do
-        body = f('body')
-        expect(body).to include_text('Drag and drop items to reorder them in the course navigation.')
-      end
-      disabled_div = f('#nav_disabled_list')
-      announcements_nav = f('#nav_edit_tab_id_14')
-      driver.action.click_and_hold(announcements_nav).
-          move_to(disabled_div).
-          release(disabled_div).
-          perform
-      keep_trying_until { expect(f('#nav_disabled_list')).to include_text(announcements_nav.text) }
-    end
+    # TODO reimplement per CNVS-29605, but make sure we're testing at the right level
+    it "should move a nav item to disabled"
   end
 
   context "right sidebar" do
@@ -207,8 +205,7 @@ describe "course settings" do
       @fake_student = @course.student_view_student
       get "/courses/#{@course.id}/settings"
       f(".student_view_button").click
-      wait_for_ajaximations
-      expect(f("#identity .user_name")).to include_text @fake_student.name
+      expect(displayed_username).to include(@fake_student.name)
     end
 
     it "should allow leaving student view" do
@@ -216,8 +213,7 @@ describe "course settings" do
       stop_link = f("#masquerade_bar .leave_student_view")
       expect(stop_link).to include_text "Leave Student View"
       stop_link.click
-      wait_for_ajaximations
-      expect(f("#identity .user_name")).to include_text @teacher.name
+      expect(displayed_username).to eq(@teacher.name)
     end
 
     it "should allow resetting student view" do
@@ -258,9 +254,141 @@ describe "course settings" do
 
     get "/courses/#{@course.id}/settings"
 
-    expect(f('#course_restrict_student_past_view').attribute('disabled')).to be_nil
-    expect(f('#course_restrict_student_future_view').attribute('disabled')).to_not be_nil
+    expect(f('#course_restrict_student_past_view')).not_to be_disabled
+    expect(f('#course_restrict_student_future_view')).to be_disabled
 
     expect(is_checked('#course_restrict_student_future_view')).to be_truthy
+  end
+
+  it "should disable editing settings if :manage rights are not granted" do
+    user(:active_all => true)
+    user_session(@user)
+    role = custom_account_role('role', :account => @account)
+    @account.role_overrides.create!(:permission => 'read_course_content', :role => role, :enabled => true)
+    @account.role_overrides.create!(:permission => 'manage_content', :role => role, :enabled => false)
+    @course.account.account_users.create!(:user => @user, :role => role)
+
+    get "/courses/#{@course.id}/settings"
+
+    ffj("#tab-details input:visible").each do |input|
+      expect(input).to be_disabled
+    end
+    expect(f("#content")).not_to contain_css(".course_form button[type='submit']")
+  end
+
+  context "link validator" do
+    it "should validate all the links" do
+      CourseLinkValidator.any_instance.stubs(:reachable_url?).returns(false).once # don't actually ping the links for the specs
+
+      course_with_teacher_logged_in
+      attachment_model
+
+      bad_url = "http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com"
+      bad_url2 = "/courses/#{@course.id}/file_contents/baaaad"
+      html = %{
+      <a href="#{bad_url}">Bad absolute link</a>
+      <img src="#{bad_url2}">Bad file link</a>
+      <img src="/courses/#{@course.id}/file_contents/#{CGI.escape(@attachment.full_display_path)}">Ok file link</a>
+      <a href="/courses/#{@course.id}/quizzes">Ok other link</a>
+    }
+
+      @course.syllabus_body = html
+      @course.save!
+
+      bank = @course.assessment_question_banks.create!(:title => 'bank')
+      aq = bank.assessment_questions.create!(:question_data => {'question_name' => 'test question',
+        'question_text' => html, 'answers' => [{'id' => 1}, {'id' => 2}]})
+
+      assmnt = @course.assignments.create!(:title => 'assignment', :description => html)
+      event = @course.calendar_events.create!(:title => "event", :description => html)
+      topic = @course.discussion_topics.create!(:title => "discussion title", :message => html)
+      mod = @course.context_modules.create!(:name => "some module")
+      tag = mod.add_item(:type => 'external_url', :url => bad_url, :title => 'pls view')
+      page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => html)
+      quiz = @course.quizzes.create!(:title => 'quiz1', :description => html)
+
+      qq = quiz.quiz_questions.create!(:question_data => aq.question_data.merge('question_name' => 'other test question'))
+
+      get "/courses/#{@course.id}/settings"
+
+      expect_new_page_load{ f(".validator_link").click }
+
+      f('#link_validator_wrapper button').click
+      wait_for_ajaximations
+      run_jobs
+
+      wait_for_ajaximations
+      expect(f("#all-results")).to be_displayed
+
+      expect(f("#all-results .alert")).to include_text("Found 17 unresponsive links")
+
+      result_links = ff("#all-results .result a")
+      expect(result_links.map{|link| link.text.strip}).to match_array([
+        'Course Syllabus',
+        aq.question_data[:question_name],
+        qq.question_data[:question_name],
+        assmnt.title,
+        event.title,
+        topic.title,
+        tag.title,
+        quiz.title,
+        page.title
+      ])
+    end
+
+    it "should be able to filter links to unpublished content" do
+      course_with_teacher_logged_in
+
+      active = @course.assignments.create!(:title => "blah")
+      unpublished = @course.assignments.create!(:title => "blah")
+      unpublished.unpublish!
+      deleted = @course.assignments.create!(:title => "blah")
+      deleted.destroy
+
+      active_link = "/courses/#{@course.id}/assignments/#{active.id}"
+      unpublished_link = "/courses/#{@course.id}/assignments/#{unpublished.id}"
+      deleted_link = "/courses/#{@course.id}/assignments/#{deleted.id}"
+
+      @course.syllabus_body = %{
+        <a href='#{active_link}'>link</a>
+        <a href='#{unpublished_link}'>link</a>
+        <a href='#{deleted_link}'>link</a>
+      }
+      @course.save!
+      page = @course.wiki.wiki_pages.create!(:title => "wikiii", :body => %{<a href='#{unpublished_link}'>link</a>})
+
+      get "/courses/#{@course.id}/link_validator"
+      wait_for_ajaximations
+      move_to_click('#link_validator_wrapper button')
+      wait_for_ajaximations
+      run_jobs
+
+      wait_for_ajaximations
+      expect(f("#all-results")).to be_displayed
+
+      expect(f("#all-results .alert")).to include_text("Found 3 unresponsive links")
+      syllabus_result = ff('#all-results .result').detect{|r| r.text.include?("Course Syllabus")}
+      expect(syllabus_result).to include_text(unpublished_link)
+      expect(syllabus_result).to include_text(deleted_link)
+      page_result = ff('#all-results .result').detect{|r| r.text.include?(page.title)}
+      expect(page_result).to include_text(unpublished_link)
+
+      # hide the unpublished results
+      move_to_click('label[for=show_unpublished]')
+      wait_for_ajaximations
+
+      expect(f("#all-results .alert")).to include_text("Found 1 unresponsive link")
+      expect(ff("#all-results .result a").count).to eq 1
+      result = f("#all-results .result")
+      expect(result).to include_text("Course Syllabus")
+      expect(result).to include_text(deleted_link)
+
+      # show them again
+      move_to_click('label[for=show_unpublished]')
+
+      expect(f("#all-results .alert")).to include_text("Found 3 unresponsive links")
+      page_result = ff('#all-results .result').detect{|r| r.text.include?(page.title)}
+      expect(page_result).to include_text(unpublished_link)
+    end
   end
 end

@@ -27,88 +27,358 @@
 ```html
 <p>
   <div class="ic-flash-info">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-info"></i>
+    </div>
     Info: Sample flash notice style.
+    <button type="button" class="Button Button--icon-action close_link">
+      <i class="icon-x" aria-hidden="true"></i>
+      <span class="screenreader-only">Close</span>
+    </button>
   </div>
 </p>
 <p>
   <div class="ic-flash-success">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-check"></i>
+    </div>
     Success: Sample flash notice style.
+    <button type="button" class="Button Button--icon-action close_link">
+      <i class="icon-x" aria-hidden="true"></i>
+      <span class="screenreader-only">Close</span>
+    </button>
   </div>
 </p>
 <p>
   <div class="ic-flash-warning">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-warning"></i>
+    </div>
     Warning: Sample flash notice style.
+    <button type="button" class="Button Button--icon-action close_link">
+      <i class="icon-x" aria-hidden="true"></i>
+      <span class="screenreader-only">Close</span>
+    </button>
   </div>
 </p>
 <p>
   <div class="ic-flash-error">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-warning"></i>
+    </div>
     Error: Sample flash notice style.
+    <button type="button" class="Button Button--icon-action close_link">
+      <i class="icon-x" aria-hidden="true"></i>
+      <span class="screenreader-only">Close</span>
+    </button>
   </div>
 </p>
 ```
 
 */
 
+// Alerts
+////////////////////////
+
+
+// Base styles
+
+.alert {
+  padding: $ic-sp $ic-sp*3 $ic-sp $ic-sp;
+  background-color: $ic-bg-light-alert;
+  color: $ic-color-alert;
+  border-radius: $ic-border-radius;
+}
+.alert h4 {
+  margin: 0;
+}
+
+// Adjust close link position
+
+.alert .close {
+  position: relative;
+  top: -2px;
+  right: -21px;
+  line-height: $baseLineHeight;
+}
+
+// Alternate State Colors
+
+.alert-success {
+  background-color: $ic-bg-light-success;
+  color: $successText;
+}
+.alert-danger,
+.alert-error {
+  background-color: $ic-bg-light-danger;
+  color: $ic-color-danger;
+}
+.alert-info {
+  background-color: $ic-bg-light-primary;
+  color: $ic-brand-primary;
+}
+
+//// end Alerts
+
+//// Flash Notifications
+////////////////////////
+
 .ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error {
   position: relative;
-
-  color: #ffffff;
-  font-weight: bold;
-
-  padding: 4px 40px 4px 8px;
+  box-sizing: border-box;
+  padding: $ic-sp/2 40px $ic-sp/2 $ic-sp*4;
   margin: 0 auto;
   width: 475px;
   min-height: 20px;
+  line-height: 1.3;
   z-index: 2;
-  zoom: 1;
   vertical-align: middle;
-  text-align: center;
+  box-shadow: 0 1px 8px rgba(black, 0.25);
+  border: 2px solid;
+  border-radius: $baseBorderRadius*2;
+  background-color: $ic-color-light;
 
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
-  border-bottom-color: rgba(0, 0, 0, 0.5);
-
-  a {
-    text-decoration: underline;
-    color: inherit;
-  }
-  a.close_link {
+  .close_link {
     position: absolute;
-    right: 10px;
+    right: $ic-sp/3;
     top: 50%;
-    width: 20px;
-    height: 20px;
-    overflow: hidden;
-    margin-top: -11px;
-    color: white;
+    margin-top: -12px;
     text-decoration: none;
   }
-  &.no_close a.close_link {
+
+  &.no_close .close_link {
     display: none;
   }
 
-  i {
-    height: 20px;
-    margin-right: 2px;
+  .ic-flash__icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: $ic-sp*3;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $ic-color-light;
+
+    i[class*=icon-],
+    i[class^=icon-] {
+      &:before {
+        left: -1px; // account for left border, so icon looks centered
+      }
+    }
+
   }
 
   &.ic-flash-static {
     width: auto;
+    border-radius: 0; // corners look bad when msg is full-width
   }
 }
 
 .ic-flash-info {
-  background-color: #3a87ad;
+  border-color: $ic-brand-primary;
+  .ic-flash__icon { background-color: $ic-brand-primary; }
 }
 
 .ic-flash-success {
-  background-color: $successText;
+  border-color: $ic-color-success;
+  .ic-flash__icon { background-color: $ic-color-success; }
 }
 
 .ic-flash-warning {
-  color: #472a0e;
-  background-color: #ffb700;
+  border-color: $ic-color-alert;
+  .ic-flash__icon { background-color: $ic-color-alert; }
 }
 
 .ic-flash-error {
-  background-color: #b94a48;
+  border-color: $ic-color-danger;
+  .ic-flash__icon { background-color: $ic-color-danger; }
+}
+
+.ic-flash--Theme-Editor {
+  border-color: $ic-color-dark;
+  text-align: center; // need this or text is obscured by theme editor sidebar
+  .ic-flash__icon { background-color: $ic-color-dark; }
+}
+
+.ic-flash__headline {
+  margin: 0;
+  @if $use_new_styles { font-weight: 500; }
+  @else { font-weight: bold; }
+}
+
+.ic-flash__text {
+  margin: $ic-sp/2 0;
+  &:first-of-type { margin-top: 0; }
+  &:last-child { margin-bottom: 0; }
+}
+
+// Buttons in Flash actions
+a.Button--flash {
+  text-decoration: none;
+  @if $use_high_contrast {
+    text-decoration: underline;
+  }
+}
+
+// .ic-alert-masquerade-student-view is used when a user is
+// masquerading or using student view. In the new UI, it gives
+// Canvas the appearance of being inside a 3px frame.
+.ic-alert-masquerade-student-view {
+  padding: $ic-sp/2 $ic-sp;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  @if $use_new_styles {
+    background: $ic-color-action;
+    color: $ic-color-light;
+    // This adds a fixed top border for the fixed bottom alert,
+    // so the top border doesn't disappear on scroll
+    &:after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 3px;
+      background: $ic-color-action;
+    }
+  }
+  @else {
+    border-top: 1px solid $ic-border-light;
+    background: $ic-color-light;
+    box-shadow: 0 -1px 2px rgba(black, 0.1);
+  }
+
+  .avatar {
+    width: $ic-sp*3; height: $ic-sp*3;
+  }
+}
+
+// When the fixed bottom alert is showing, add a
+// left and right border, making Canvas appear as if
+// it is inside a frame.
+@if $use_new_styles {
+  body.is-masquerading-or-student-view {
+    border-right: 3px solid $ic-color-action;
+    .ic-app-header { border-left: 3px solid $ic-color-action; }
+  }
+}
+
+.ic-alert-masquerade-student-view-module {
+  flex: 1;
+  padding: 0 $ic-sp/2;
+  &:first-of-type { padding-left: 0; }
+  &:last-of-type {
+    padding-right: 0;
+    &.ic-alert-masquerade-student-view-module--buttons {
+      text-align: right;
+    }
+  }
+  &.ic-alert-masquerade-student-view-module--header {
+    font-weight: 500;
+  }
+  &.ic-alert-masquerade-student-view-module--description {
+    font-style: italic;
+    @include fontSize($ic-font-size--xsmall);
+    line-height: 1.3;
+  }
+}
+
+
+$ic-notification-icon-size: 22px;
+$ic-notification-border-thickness: 2px;
+
+@mixin ic-notification-color-scheme($color) {
+  border-color: $color;
+  .ic-notification__icon { background: $color; }
+}
+
+// .ic-notification
+.ic-notification {
+  display: flex;
+  border: $ic-notification-border-thickness solid $ic-brand-primary;
+  margin-bottom: $ic-sp;
+  box-shadow: 0 1px 6px rgba(black, 0.2);
+  border-radius: $baseBorderRadius;
+  box-sizing: border-box;
+  form { margin: 0; }
+  &.ic-notification--success { @include ic-notification-color-scheme($ic-color-success); }
+  &.ic-notification--alert { @include ic-notification-color-scheme($ic-color-alert); }
+  &.ic-notification--danger { @include ic-notification-color-scheme($ic-color-danger); }
+  // variant for global notifications created by admin via Settings
+  &.ic-notification--admin-created {
+    .ic-notification__content {
+      display: flex;
+      @include breakpoint(desktop) { align-items: flex-start; }
+    }
+    .ic-notification__message { flex: 1; }
+    .ic-notification__actions {
+      margin-left: $ic-sp*2;
+      @include breakpoint(desktop) { margin-left: $ic-sp*3; }
+    }
+    .ic-notification__title {
+      display: block;
+      @include fontSize($ic-font-size--medium)
+      margin: 0 0 $ic-sp/2;
+    }
+  }
+}
+
+.ic-notification__icon {
+  background: $ic-brand-primary;
+  flex: 0 0 $ic-sp*4;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top-left-radius: ($baseBorderRadius - $ic-notification-border-thickness);
+  border-bottom-left-radius: ($baseBorderRadius - $ic-notification-border-thickness);
+  box-sizing: border-box;
+  @include overwrite-default-icon-size($ic-notification-icon-size);
+  i[class*=icon-], i[class^=icon-] {
+    color: $ic-color-light;
+    text-shadow: none;
+  }
+}
+
+.ic-notification__title {
+  margin-right: $ic-sp/3;
+  @include fontSize($ic-font-size--small);
+  display: inline;
+  font-weight: 500;
+}
+
+.ic-notification__content {
+  flex: 1;
+  padding: $ic-sp;
+  box-sizing: border-box;
+  background: $ic-color-light;
+}
+
+.ic-notification__message {
+  box-sizing: border-box;
+  p:last-of-type { margin-bottom: 0; }
+}
+
+.ic-notification__actions {
+  box-sizing: border-box;
+}
+
+.ic-notification__admin-actions {
+  float: right;
+  margin-left: $ic-sp;
+  margin-bottom: $ic-sp/2;
+}
+
+.notification_account_content {
+  width: 100%;
+  background-color: $ic-color-neutral;
+}
+
+.notification_account_content_text {
+  font-size: 0.8em;
+  font-weight: 300;
+  padding-left: 12px;
+  line-height: 22px;
 }

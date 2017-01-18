@@ -37,7 +37,7 @@ module AssignmentOverrideApplicator
     # students get the last overridden date that applies to them, but teachers
     # should see the assignment's due_date if that is more lenient
     context = result_assignment_or_quiz.context
-    if context && result_assignment_or_quiz.grants_right?(user, :delete)
+    if context && context.grants_right?(user, :manage_assignments) # faster than calling :delete rights on each assignment/quiz
 
       overridden_section_ids = result_assignment_or_quiz
         .applied_overrides.select { |o| o.set_type == "CourseSection" }
@@ -68,11 +68,6 @@ module AssignmentOverrideApplicator
     assignment_overridden_for(quiz, user)
   end
 
-  def self.assignment_overriden_for_section(assignment_or_quiz, section)
-    section_overrides = assignment_or_quiz.assignment_overrides.where(:set_type => 'CourseSection', :set_id => section)
-    override_for_due_at(assignment_or_quiz, section_overrides)
-  end
-
   # determine list of overrides (of appropriate version) that apply to the
   # assignment or quiz(of specific version) for a particular user. the overrides are
   # returned in priority order; the first override to contain an overridden
@@ -83,19 +78,29 @@ module AssignmentOverrideApplicator
     Rails.cache.fetch(cache_key) do
       next [] if self.has_invalid_args?(assignment_or_quiz, user)
       context = assignment_or_quiz.context
-      overrides = []
+      visible_user_ids = UserSearch.scope_for(context, user, { force_users_visible_to: true }).map(&:id)
 
-      if context.account_membership_allows(user, :manage_courses) || context.user_has_been_admin?(user)
+      if context.grants_right?(user, :read_as_admin)
         overrides = assignment_or_quiz.assignment_overrides
         if assignment_or_quiz.current_version?
-          overrides = overrides.loaded? ?
-            overrides.select{|o| o.workflow_state == 'active'} :
-            overrides.active.to_a
+          overrides = if overrides.loaded?
+                        ovs = overrides.select do |ov|
+                          ov.workflow_state == 'active' &&
+                          ov.set_type != 'ADHOC'
+                        end
+                        ovs + overrides.select{ |ov| ov.visible_student_overrides(visible_user_ids) }
+                      else
+                        ovs = overrides.active.where.not(set_type: 'ADHOC').to_a
+                        ovs + overrides.active.visible_students_only(visible_user_ids).to_a
+                      end
         else
           overrides = current_override_version(assignment_or_quiz, overrides)
         end
+
         return overrides
       end
+
+      overrides = []
 
       # priority: adhoc, group, section (do not exclude deleted)
       adhoc = adhoc_override(assignment_or_quiz, user)
@@ -124,21 +129,33 @@ module AssignmentOverrideApplicator
   end
 
   def self.adhoc_override(assignment_or_quiz, user)
-    key = assignment_or_quiz.is_a?(Quizzes::Quiz) ? :quiz_id : :assignment_id
-    AssignmentOverrideStudent.where(key => assignment_or_quiz, :user_id => user).first
+    return nil unless user
+
+    if assignment_or_quiz.preloaded_override_students && (overrides = assignment_or_quiz.preloaded_override_students[user.id])
+      overrides.first
+    else
+      key = assignment_or_quiz.is_a?(Quizzes::Quiz) ? :quiz_id : :assignment_id
+      AssignmentOverrideStudent.where(key => assignment_or_quiz, :user_id => user).first
+    end
   end
 
   def self.group_override(assignment_or_quiz, user)
-    return nil unless assignment_or_quiz.is_a?(Assignment) && assignment_or_quiz.group_category
+    return nil unless assignment_or_quiz.is_a?(Assignment)
+    group_category_id = assignment_or_quiz.group_category_id || assignment_or_quiz.discussion_topic.try(:group_category_id)
+    return nil unless group_category_id
 
     if assignment_or_quiz.context.user_has_been_student?(user)
-      group = user.current_groups.where(:group_category_id => assignment_or_quiz.group_category_id).first
+      group = user.current_groups.where(:group_category_id => group_category_id).first
     else
-      group = assignment_or_quiz.context.groups.where(:group_category_id => assignment_or_quiz.group_category_id).first
+      group = assignment_or_quiz.context.groups.where(:group_category_id => group_category_id).first
     end
 
     if group
-      assignment_or_quiz.assignment_overrides.where(:set_type => 'Group', :set_id => group.id).first
+      if assignment_or_quiz.assignment_overrides.loaded?
+        assignment_or_quiz.assignment_overrides.detect{|o| o.set_type == 'Group' && o.set_id == group.id}
+      else
+        assignment_or_quiz.assignment_overrides.where(:set_type => 'Group', :set_id => group.id).first
+      end
     else
       nil
     end
@@ -155,12 +172,26 @@ module AssignmentOverrideApplicator
 
   def self.section_overrides(assignment_or_quiz, user)
     context = assignment_or_quiz.context
-    section_ids = context.sections_visible_to(user).map(&:id)
-    section_ids += context.section_visibilities_for(user).select { |v|
+    section_ids = RequestCache.cache(:visible_section_ids, context, user) do
+      context.sections_visible_to(
+        user,
+        context.active_course_sections,
+        excluded_workflows: ['deleted', 'completed']
+      ).map(&:id) +
+
+      context.section_visibilities_for(
+        user,
+        excluded_workflows: ['deleted', 'completed']
+      ).select { |v|
         ['StudentEnrollment', 'ObserverEnrollment', 'StudentViewEnrollment'].include? v[:type]
-      }.map { |v| v[:course_section_id] }
-    section_overrides = assignment_or_quiz.assignment_overrides.where(:set_type => 'CourseSection', :set_id => section_ids.uniq)
-    section_overrides
+      }.map { |v| v[:course_section_id] }.uniq
+    end
+
+    if assignment_or_quiz.assignment_overrides.loaded?
+      assignment_or_quiz.assignment_overrides.select{|o| o.set_type == 'CourseSection' && section_ids.include?(o.set_id)}
+    else
+      assignment_or_quiz.assignment_overrides.where(:set_type => 'CourseSection', :set_id => section_ids)
+    end
   end
 
   def self.current_override_version(assignment_or_quiz, all_overrides)
@@ -222,6 +253,7 @@ module AssignmentOverrideApplicator
 
   def self.copy_preloaded_associations_to_clone(orig, clone)
     orig.class.reflections.keys.each do |association|
+      association = association.to_sym
       clone.send(:association_instance_set, association, orig.send(:association_instance_get, association))
     end
   end
@@ -257,7 +289,7 @@ module AssignmentOverrideApplicator
 
   # turn the list of overrides into a unique but consistent cache key component
   def self.overrides_hash(overrides)
-    canonical = overrides.map{ |override| { :id => override.id, :version => override.version_number } }.inspect
+    canonical = overrides.map{ |override| override.cache_key }.inspect
     Digest::MD5.hexdigest(canonical)
   end
 
@@ -287,9 +319,13 @@ module AssignmentOverrideApplicator
 
   def self.overridden_unlock_at(assignment_or_quiz, overrides)
     applicable_overrides = overrides.select(&:unlock_at_overridden)
+
+    # CNVS-24849 if the override has been locked it's unlock_at no longer applies
+    applicable_overrides.reject!(&:availability_expired?)
+
     if applicable_overrides.empty?
       assignment_or_quiz.unlock_at
-    elsif override = applicable_overrides.detect{ |o| o.unlock_at.nil? }
+    elsif applicable_overrides.any? { |o| o.unlock_at.nil? }
       nil
     else
       applicable_overrides.sort_by(&:unlock_at).first.unlock_at
@@ -300,10 +336,52 @@ module AssignmentOverrideApplicator
     applicable_overrides = overrides.select(&:lock_at_overridden)
     if applicable_overrides.empty?
       assignment_or_quiz.lock_at
-    elsif override = applicable_overrides.detect{ |o| o.lock_at.nil? }
+    elsif applicable_overrides.detect{ |o| o.lock_at.nil? }
       nil
     else
       applicable_overrides.sort_by(&:lock_at).last.lock_at
+    end
+  end
+
+  def self.should_preload_override_students?(assignments, user, endpoint_key)
+    assignment_key = Digest::MD5.hexdigest(assignments.map(&:id).sort.map(&:to_s).join(','))
+    key = ['should_preload_assignment_override_students', user, endpoint_key, assignment_key].cache_key
+    # if the user has been touch we should preload all of the overrides because it's almost certain we'll need them all
+    if Rails.cache.read(key)
+      false
+    else
+      Rails.cache.write(key, true)
+      true
+    end
+  end
+
+  def self.preload_assignment_override_students(items, user)
+    return unless user
+    ActiveRecord::Associations::Preloader.new.preload(items, :context)
+    # preloads the override students for a particular user for many objects at once, instead of doing separate queries for each
+    quizzes, assignments = items.partition{|i| i.is_a?(Quizzes::Quiz)}
+
+    ActiveRecord::Associations::Preloader.new.preload(assignments, [:quiz, :assignment_overrides])
+
+    if assignments.any?
+      override_students = AssignmentOverrideStudent.where(:assignment_id => assignments, :user_id => user).index_by(&:assignment_id)
+      assignments.each do |a|
+        a.preloaded_override_students ||= {}
+        a.preloaded_override_students[user.id] = Array(override_students[a.id])
+
+        quizzes << a.quiz if a.quiz
+      end
+    end
+    quizzes.uniq!
+
+    ActiveRecord::Associations::Preloader.new.preload(quizzes, :assignment_overrides)
+
+    if quizzes.any?
+      override_students = AssignmentOverrideStudent.where(:quiz_id => quizzes, :user_id => user).index_by(&:quiz_id)
+      quizzes.each do |q|
+        q.preloaded_override_students ||= {}
+        q.preloaded_override_students[user.id] = Array(override_students[q.id])
+      end
     end
   end
 end

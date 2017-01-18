@@ -10,28 +10,23 @@
     <% if @presenter.ldap_config? %>
       <a href="#"
          class="test_ldap_link btn button-sidebar-wide"
-         <%= image_tag "pending_review.png" %>
+         <%= image_tag "pending_review.png", :alt => '' %>
          <%= t(:test_ldap_link, "Test LDAP Authentication")%>
       </a>
     <% end %>
 
     <% if @presenter.auth? %>
-      <%= link_to(image_tag("delete.png") + t(:delete_auth_link, "Remove All Authentication"),
-                  context_url(@account, :context_remove_all_authorization_configs_url),
-                  confirm: t(:delete_auth_confirmation, "Are you sure? Users may not be able to log in if this is removed."),
-                  method: :delete,
-                  class: "delete_auth_link btn button-sidebar-wide")%>
+      <%= link_to(account_remove_all_authentication_providers_url(@account),
+          confirm: t(:delete_auth_confirmation, "Are you sure? Users may not be able to log in if this is removed."),
+          method: :delete,
+          class: "delete_auth_link btn icon-trash button-sidebar-wide") do %>
+          <%= t(:delete_auth_link, "Remove All Authentication") %>
+      <% end %>
     <% end %>
 
-    <div class="add_auth_div">
-      <span class="add">
-        <%= t(:add_auth_desc, "Add an identity provider to this account:")%>
-      </span>
-      <br/>
-      <%= select( "", "", @presenter.sso_options,
-                { include_blank: t(:choose_auth_type_option,
-                                   "Choose an authentication service") },
-                id: "add_auth_select") %>
+    <div id="add-authentication-provider"
+         class="add_auth_div"
+         data-options="<%= @presenter.sso_options.to_json %>">
     </div>
   </div>
 <% end %>
@@ -61,18 +56,10 @@
   </p>
 <% end %>
 
-<% if @presenter.canvas_auth_only? %>
-  <p>
-    <%= mt(:canvas_login_tip, "If you configure settings that cause you to "\
-           "not be able to log in you can add *%{url1}* to the end of your login"\
-           " url. This will let you login using the normal Canvas login "\
-           "procedure. For this account the url would be %{url2}",
-           url1: "?canvas_login=1",
-           url2: "http://#{@account.domain}/login?canvas_login=1") %>
-  </p>
-<% end %>
+<%= render partial: 'sso_settings_form',
+           locals: { presenter: @presenter, account: @account }%>
 
-<h2><%= t(:current_settings_title, "Current Integration") %></h2>
+<h2><%= t("Current Provider") %></h2>
 
 
 <% if @presenter.configs.empty? %>
@@ -87,12 +74,12 @@
   <% end %>
 <% end %>
 
-<% @presenter.auth_types.each do |auth_type| %>
+<% @presenter.new_auth_types.each do |auth_type| %>
   <%= render partial: "aac_settings",
              locals: {
                account: @account,
                presenter: @presenter,
-               aac: @presenter.new_config(auth_type: auth_type)
+               aac: @presenter.new_config(auth_type: auth_type.sti_name)
              } %>
 <% end %>
 
@@ -105,11 +92,5 @@
   <%= render partial: 'saml_settings_test',
              locals: { account: @account, presenter: @presenter } %>
 <% end %>
-
-<% if @presenter.configs.size >= 1 %>
-  <%= render partial: 'sso_settings_form',
-             locals: { presenter: @presenter, account: @account }%>
-<% end %>
-
 
 <% js_bundle :account_authorization_configs %>

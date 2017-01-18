@@ -20,8 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/eportfolios/_section_list" do
-  it "should render" do
+  before(:once) do
     eportfolio_with_user
+  end
+
+  it "should render" do
     view_portfolio
     assigns[:category] = @portfolio.eportfolio_categories.create!(:name => "some category")
     assigns[:categories] = [assigns[:category]]
@@ -29,5 +32,13 @@ describe "/eportfolios/_section_list" do
     render :partial => "eportfolios/section_list"
     expect(response).to have_tag("ul#section_list")
   end
-end
 
+  it "should render even with a blank category slug" do
+    view_portfolio
+    assigns[:category] = @portfolio.eportfolio_categories.create!(:name => "+++")
+    assigns[:categories] = [assigns[:category]]
+    assigns[:page] = @portfolio.eportfolio_entries.create!(:name => "some entry", :eportfolio_category => assigns[:category])
+    render :partial => "eportfolios/section_list"
+    expect(response).to have_tag("ul#section_list")
+  end
+end

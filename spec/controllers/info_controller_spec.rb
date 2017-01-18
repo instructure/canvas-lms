@@ -32,7 +32,10 @@ describe InfoController do
       Canvas.stubs(:revision).returns("Test Proc")
       get "health_check"
       expect(response).to be_success
-      expect(JSON.parse(response.body)).to eq({ "status" => "canvas ok", "revision" => "Test Proc" })
+      json = JSON.parse(response.body)
+      expect(json).to have_key('installation_uuid')
+      json.delete('installation_uuid')
+      expect(json).to eq({ "status" => "canvas ok", "revision" => "Test Proc" })
     end
   end
 

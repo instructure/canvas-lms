@@ -8,7 +8,7 @@ require [
   'compiled/calendar/sidebar'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/UndatedEventsList'
-  'compiled/bundles/jquery_ui_menu'
+  'compiled/jquery.kylemenu'
 ], ($, Calendar, MiniCalendar, CalendarHeader, drawSidebar, EventDataSource, UndatedEventsList) ->
   @eventDataSource = new EventDataSource(ENV.CALENDAR.CONTEXTS)
   @header = new CalendarHeader(

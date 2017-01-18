@@ -20,7 +20,6 @@ module GoogleDrive
       client
     end
 
-
     def self.auth_uri(client, state, login=nil)
       auth_client = client.authorization
       auth_client.update!
@@ -32,8 +31,6 @@ module GoogleDrive
       }
 
       request_data[:login_hint] = login if login
-
-
       auth_client.authorization_uri(request_data).to_s
     end
   end

@@ -60,6 +60,30 @@ describe CrocodocSessionsController do
       get :show, blob: @blob, hmac: @hmac
       assert_status(503)
     end
+
+    it "updates attachment.viewed_at if the owner views" do
+      last_viewed_at = @attachment.viewed_at
+
+      get :show, blob: @blob, hmac: @hmac
+
+      @attachment.reload
+      expect(@attachment.viewed_at).not_to eq(last_viewed_at)
+    end
+
+    it "doesn't update attachment.viewed_at for non-owner views" do
+      last_viewed_at = @attachment.viewed_at
+
+      teacher_blob = {attachment_id: @attachment.global_id,
+                      user_id: @teacher.global_id,
+                      type: "crocodoc"}.to_json
+      teacher_hmac = Canvas::Security.hmac_sha1(teacher_blob)
+      user_session(@teacher)
+
+      get :show, blob: teacher_blob, hmac: teacher_hmac
+
+      @attachment.reload
+      expect(@attachment.viewed_at).to eq(last_viewed_at)
+    end
   end
 
   it "should 404 if a crocodoc document is unavailable" do

@@ -1,13 +1,12 @@
-/** @jsx React.DOM */
-
 define([
   'react',
   'jsx/grading/dataRow',
   'jquery',
   'i18n!external_tools',
-  'underscore'
+  'underscore',
+  'compiled/str/splitAssetString'
 ],
-function(React, DataRow, $, I18n, _) {
+function(React, DataRow, $, I18n, _, splitAssetString) {
   var update = React.addons.update;
   var GradingStandard = React.createClass({
 
@@ -28,18 +27,17 @@ function(React, DataRow, $, I18n, _) {
     },
 
     componentDidMount: function() {
-      if(this.props.justAdded) this.refs.title.getDOMNode().focus();
+      if(this.props.justAdded) React.findDOMNode(this.refs.title).focus();
     },
 
     componentDidUpdate: function(prevProps, prevState) {
       if(this.props.editing !== prevProps.editing){
-       this.refs.title.getDOMNode().focus();
-       this.setState({editingStandard: $.extend(true, {}, this.props.standard)})
+        React.findDOMNode(this.refs.title).focus();
+        this.setState({editingStandard: $.extend(true, {}, this.props.standard)})
       }
     },
 
     triggerEditGradingStandard: function(event) {
-      event.preventDefault();
       this.props.onSetEditingStatus(this.props.uniqueId, true);
     },
 
@@ -58,7 +56,7 @@ function(React, DataRow, $, I18n, _) {
         });
       }else{
         this.setState({showAlert: true}, function() {
-          this.refs.invalidStandardAlert.getDOMNode().focus();
+          React.findDOMNode(this.refs.invalidStandardAlert).focus();
         });
       }
     },
@@ -104,7 +102,7 @@ function(React, DataRow, $, I18n, _) {
 
     hideAlert: function() {
       this.setState({showAlert: false}, function(){
-        this.refs.title.getDOMNode().focus();
+        React.findDOMNode(this.refs.title).focus();
       });
     },
 
@@ -158,7 +156,7 @@ function(React, DataRow, $, I18n, _) {
       if(this.props.editing){
         return (
           <div className="pull-left" tabIndex="0">
-            <input type="text" onChange={this.changeTitle} className="grading_standard_title"
+            <input type="text" onChange={this.changeTitle}
                    name="grading_standard[title]" className="scheme_name" title={I18n.t("Grading standard title")}
                    value={this.state.editingStandard.title} ref="title"/>
           </div>
@@ -219,17 +217,17 @@ function(React, DataRow, $, I18n, _) {
       if(!this.props.editing){
         return(
           <div>
-            <a href="#" onClick={this.triggerEditGradingStandard} title={I18n.t("Edit Grading Scheme")}
-               ref="editLink" tabIndex="1"
-               className={"edit_grading_standard_link no-hover " + (this.assessedAssignment() ? "read_only" : "")}>
-               <span className="screenreader-only">{I18n.t("Edit Grading Scheme")}</span>
-              <i className="icon-edit standalone-icon"/>
-            </a>
-            <a href="#" title={I18n.t("Delete Grading Scheme")} onClick={this.triggerDeleteGradingStandard}
-               ref="deleteLink" className="delete_grading_standard_link no-hover" tabIndex="1">
+            <button ref="editButton"
+                    className={"Button Button--icon-action edit_grading_standard_button " + (this.assessedAssignment() ? "read_only" : "")}
+                    onClick={this.triggerEditGradingStandard} type="button">
+              <span className="screenreader-only">{I18n.t("Edit Grading Scheme")}</span>
+              <i className="icon-edit"/>
+            </button>
+            <button ref="deleteButton" className="Button Button--icon-action delete_grading_standard_button"
+                    onClick={this.triggerDeleteGradingStandard} type="button">
                <span className="screenreader-only">{I18n.t("Delete Grading Scheme")}</span>
-              <i className="icon-trash standalone-icon"/>
-            </a>
+              <i className="icon-trash"/>
+            </button>
           </div>
         );
       }
@@ -237,7 +235,8 @@ function(React, DataRow, $, I18n, _) {
     },
 
     renderIconsAndTitle: function() {
-      if(this.props.permissions.manage && !this.props.othersEditing){
+      if(this.props.permissions.manage && !this.props.othersEditing &&
+        (!this.props.standard.context_code || this.props.standard.context_code == ENV.context_asset_string)){
         return (
           <div>
             {this.renderTitle()}
@@ -250,15 +249,33 @@ function(React, DataRow, $, I18n, _) {
       return (
         <div>
           {this.renderTitle()}
-          <div className="disabled-links" ref="disabledLinks">
-            <i className="icon-edit standalone-icon"/>
-            <i className="icon-trash standalone-icon"/>
-          </div>
+          {this.renderDisabledIcons()}
           <div className="pull-left cannot-manage-notification">
             {this.renderCannotManageMessage()}
           </div>
         </div>
       );
+    },
+
+    renderDisabledIcons: function() {
+      if (this.props.permissions.manage &&
+         this.props.standard.context_code && (this.props.standard.context_code != ENV.context_asset_string)) {
+        var url = "/" + splitAssetString(this.props.standard.context_code).join('/') + "/grading_standards";
+        var titleText = I18n.t('Manage grading schemes in %{context_name}',
+          {context_name: this.props.standard.context_name || this.props.standard.context_type.toLowerCase()});
+        return (<a className='links cannot-manage-notification'
+                   href={url}
+                   title={titleText}
+                   data-tooltip='left'>
+                  <span className="screenreader-only">{titleText}</span>
+                  <i className="icon-more standalone-icon"/>
+                </a>);
+      } else {
+        return (<div className="disabled-buttons" ref="disabledButtons">
+                  <i className="icon-edit"/>
+                  <i className="icon-trash"/>
+                </div>);
+      }
     },
 
     renderInvalidStandardMessage: function() {
@@ -301,7 +318,7 @@ function(React, DataRow, $, I18n, _) {
             <div>
               <table>
                 <caption className="screenreader-only">
-                  {I18n.t("A table containing the name of the grading scheme and icons for editing or deleting the scheme.")}
+                  {I18n.t("A table containing the name of the grading scheme and buttons for editing or deleting the scheme.")}
                 </caption>
                 <thead>
                   <tr>
@@ -312,9 +329,9 @@ function(React, DataRow, $, I18n, _) {
                   </tr>
                   <tr>
                     <th scope="col" className="insert_row_container"/>
-                    <th scope="col" className="name_header">{I18n.t("Name:")}</th>
+                    <th scope="col" className="name_header">{I18n.t("Name")}</th>
                     <th scope="col" className="range_container" colSpan="2">
-                      <div className="range_label">{I18n.t("Range:")}</div>
+                      <div className="range_label">{I18n.t("Range")}</div>
                       <div className="clear"></div>
                     </th>
                   </tr>
@@ -322,7 +339,7 @@ function(React, DataRow, $, I18n, _) {
               </table>
               <table className="grading_standard_data">
                 <caption className="screenreader-only">
-                  {I18n.t("A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains an icon to add a new row below, and an icon to delete the current row.")}
+                  {I18n.t("A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.")}
                 </caption>
                 <thead ariaHidden="true"><tr><td></td><td></td><td></td><td></td><td></td></tr></thead>
                 <tbody>

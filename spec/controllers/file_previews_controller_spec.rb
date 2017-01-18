@@ -45,7 +45,7 @@ describe FilePreviewsController do
   it "should 404 (w/o canvas chrome) if the file doesn't exist" do
     attachment_model
     file_id = @attachment.id
-    @attachment.destroy!
+    @attachment.destroy_permanently!
     get :show, course_id: @course.id, file_id: file_id
     expect(response.status).to eq 404
     expect(assigns['headers']).to eq false

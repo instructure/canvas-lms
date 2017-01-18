@@ -89,7 +89,13 @@ describe Canvas::ICU do
     include_examples "Collator"
 
     before do
-      skip if Canvas::ICU.collator == Canvas::ICU::NaiveCollator
+      if (ICU::Lib.version rescue false)
+        if Canvas::ICU.collator == Canvas::ICU::NaiveCollator
+          raise "ICU appears to be installed, but we didn't load it correctly"
+        end
+      else
+        skip if Canvas::ICU.collator == Canvas::ICU::NaiveCollator
+      end
     end
   end
 end

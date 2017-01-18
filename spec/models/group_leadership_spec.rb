@@ -47,7 +47,7 @@ describe GroupLeadership do
       context "leader membership" do
         it "should revoke when deleted" do
           expect(@group.leader).not_to be_nil
-          @leader_membership.destroy!
+          @leader_membership.destroy_permanently!
           expect(@group.reload.leader).to be_nil
         end
 
@@ -68,7 +68,7 @@ describe GroupLeadership do
       context "non-leader membership" do
         it "should not revoke when deleted" do
           expect(@group.leader).not_to be_nil
-          @membership.destroy!
+          @membership.destroy_permanently!
           expect(@group.reload.leader).not_to be_nil
        end
 

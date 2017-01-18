@@ -7,14 +7,14 @@ define [
 
   {run} = Ember
 
-  fixtures.create()
-
   buildComponent = (props) ->
     props = _.extend props,
       'assignmentUrl': '/courses/1/assignments/1'
     DownloadDialog.create(props)
 
-  module 'status'
+  module 'ic_submission_download_dialog',
+    setup: ->
+      fixtures.create()
 
   test 'is "finished" if file ready', ->
     component = buildComponent
@@ -63,4 +63,3 @@ define [
     component = buildComponent
       'percentComplete': 100
     equal component.get('keepChecking'), undefined
-

@@ -1,8 +1,5 @@
+require_relative '../../spec_helper'
 require_relative '../../support/boolean_translator'
-require_relative '../../../app/models/group_categories/params'
-require_relative '../../../app/models/group_categories/params_policy'
-
-class Course; end
 
 module GroupCategories
 

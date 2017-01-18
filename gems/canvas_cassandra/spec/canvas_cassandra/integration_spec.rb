@@ -28,7 +28,8 @@ describe "execute and update" do
   let(:cassandra_configured?) do
     File.exist?(config_path) &&
         YAML.load(ERB.new(File.read(config_path)).result) &&
-        YAML.load(ERB.new(File.read(config_path)).result)['test']
+        YAML.load(ERB.new(File.read(config_path)).result)['test'] &&
+        YAML.load(ERB.new(File.read(config_path)).result)['test']['page_views']
   end
   let(:db) do
     # TODO: ConfigFile.load really deserves to be its own Config component that we could use here

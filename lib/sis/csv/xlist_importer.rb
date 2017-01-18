@@ -19,15 +19,15 @@
 module SIS
   module CSV
     class XlistImporter < CSVBaseImporter
-    
-      def self.is_xlist_csv?(row)
+
+      def self.xlist_csv?(row)
         row.include?('xlist_course_id') && row.include?('section_id')
       end
 
       def self.identifying_fields
         %w[section_id].freeze
       end
-    
+
       # possible columns:
       # xlist_course_id, section_id, status
       def process(csv)

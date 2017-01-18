@@ -20,7 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe UserList do
-  
+
   before(:each) do
     @account = Account.default
     @account.settings = { :open_registration => true }
@@ -73,7 +73,7 @@ describe UserList do
     expect(ul.errors).to eq []
     expect(ul.duplicate_addresses).to eq []
   end
-  
+
   it "should process a list of only emails, without brackets" do
     ul = UserList.new without_brackets
     expect(ul.addresses.map{|x| [x[:name], x[:address]]}).to eql([
@@ -82,7 +82,7 @@ describe UserList do
     expect(ul.errors).to eq []
     expect(ul.duplicate_addresses).to eq []
   end
-  
+
   it "should work with a mixed entry list" do
     ul = UserList.new regular + "," + %{otherryankshaw@gmail.com, otherlastfirst@gmail.com}
     expect(ul.addresses.map{|x| [x[:name], x[:address]]}).to eql([
@@ -93,7 +93,7 @@ describe UserList do
     expect(ul.errors).to eq []
     expect(ul.duplicate_addresses).to eq []
   end
-  
+
   it "should work well with a single address" do
     ul = UserList.new('ryankshaw@gmail.com')
     expect(ul.addresses.map{|x| [x[:name], x[:address]]}).to eql([
@@ -101,7 +101,7 @@ describe UserList do
     expect(ul.errors).to eq []
     expect(ul.duplicate_addresses).to eq []
   end
-  
+
   it "should remove duplicates" do
     user = User.create!(:name => 'A 123451')
     user.pseudonyms.create!(:unique_id => "A123451", :account => @account)
@@ -156,7 +156,7 @@ describe UserList do
     expect(ul.addresses.length).to eq 1
     expect(ul.duplicate_addresses.length).to eq 1
   end
-  
+
   it "should process login ids, SIS ids, and email addresses" do
     user = User.create!(:name => 'A 112351243')
     user.pseudonyms.create!(:unique_id => "A112351243", :account => @account)
@@ -180,7 +180,7 @@ describe UserList do
     expect(ul.errors).to eq []
     expect(ul.duplicate_addresses).to eq []
   end
-  
+
   it "should not process login ids if they don't exist" do
     user = User.create!(:name => 'A 112351243')
     user.pseudonyms.create!(:unique_id => "A112351243", :account => @account)
@@ -310,6 +310,24 @@ describe UserList do
       ul = UserList.new 'jt@instructure.com'
       expect(ul.addresses).to eq []
       expect(ul.errors).to eq [{:address => 'jt@instructure.com', :type => :email, :details => :not_found}]
+    end
+
+    it "doesn't find site admins if you're not a site admin" do
+      user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => Account.site_admin)
+      Account.default.stubs(:trusted_account_ids).returns([Account.site_admin.id])
+      jt = @user
+      user_with_pseudonym
+      other = @user
+
+      ul = UserList.new 'jt@instructure.com', current_user: other
+      expect(ul.addresses).to eq []
+      expect(ul.errors).to eq [{:address => 'jt@instructure.com', :type => :email, :details => :not_found}]
+
+      # when it's the user _from_ site admin doing it, it can be found
+      Account.default.stubs(:trusted_account_ids).returns([Account.site_admin.id])
+      ul = UserList.new 'jt@instructure.com', current_user: jt
+      expect(ul.addresses).to eq [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => jt.id, :name => 'JT', :shard => Shard.default}]
+      expect(ul.errors).to eq []
     end
 
     it "should find users from trusted accounts" do

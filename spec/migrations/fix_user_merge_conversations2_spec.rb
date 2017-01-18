@@ -31,7 +31,7 @@ describe 'FixUserMergeConversations2' do
       # conversation deleted, cp's and cmps orphaned,
       # and cm on the target conversation
       borked = Conversation.initiate([u1, u2], true)
-      borked_cps = borked.conversation_participants.all
+      borked_cps = borked.conversation_participants.to_a
       borked_cmps = borked_cps.map(&:conversation_message_participants).flatten
       m1 = borked.add_message(u1, "test")
       Conversation.where(:id => borked).delete_all # bypass callbacks

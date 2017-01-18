@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require_dependency 'importers'
 
 module Importers
   class QuizImporter < Importer
@@ -160,7 +161,7 @@ module Importers
 
     # Import a quiz from a hash.
     # It assumes that all the referenced questions are already in the database
-    def self.import_from_migration(hash, context, migration=nil, question_data=nil, item=nil, allow_update = false)
+    def self.import_from_migration(hash, context, migration, question_data=nil, item=nil, allow_update = false)
       hash = hash.with_indifferent_access
       # there might not be an import id if it's just a text-only type...
       item ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first if hash[:id]
@@ -169,10 +170,12 @@ module Importers
         if item.deleted?
           item.workflow_state = (hash[:available] || !item.can_unpublish?) ? 'available' : 'unpublished'
           item.saved_by = :migration
+          item.quiz_questions.destroy_all
           item.save
         end
       end
-      item ||= context.quizzes.new
+      item ||= context.quizzes.temp_record
+      new_record = item.new_record? || item.deleted?
 
       hash[:due_at] ||= hash[:due_date]
       hash[:due_at] ||= hash[:grading][:due_date] if hash[:grading]
@@ -184,10 +187,7 @@ module Importers
       item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
 
       missing_links = []
-      item.description = ImportedHtmlConverter.convert(hash[:description], context, migration) do |warn, link|
-        missing_links << link if warn == :missing_link
-      end
-
+      item.description = migration.convert_html(hash[:description], :quiz, hash[:migration_id], :description)
 
       %w[
         migration_id
@@ -219,14 +219,6 @@ module Importers
 
       item.saved_by = :migration
       item.save!
-
-      if migration
-        migration.add_missing_content_links(
-          :class => item.class.to_s,
-          :id => item.id, :missing_links => missing_links,
-          :url => "/#{context.class.to_s.demodulize.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}"
-        )
-      end
 
       if question_data
         question_data[:qq_ids] ||= {}
@@ -262,11 +254,11 @@ module Importers
           item.assignment ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:assignment][:migration_id]).first
         end
         item.assignment = nil if item.assignment && item.assignment.quiz && item.assignment.quiz.id != item.id
-        item.assignment ||= context.assignments.new
+        item.assignment ||= context.assignments.temp_record
 
         item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
 
-        if !hash[:available] && item.can_unpublish?
+        if new_record && !hash[:available] && item.can_unpublish?
           item.workflow_state = 'unpublished'
           item.assignment.workflow_state = 'unpublished'
         end
@@ -288,14 +280,14 @@ module Importers
         end
       end
 
-      if item.for_assignment? && !item.assignment && item.can_unpublish?
+      if new_record && item.for_assignment? && !item.assignment && item.can_unpublish?
         item.workflow_state = 'unpublished'
       end
 
       item.save
       item.assignment.save if item.assignment && item.assignment.changed?
 
-      migration.add_imported_item(item) if migration
+      migration.add_imported_item(item)
       item.saved_by = nil
       item
     end

@@ -25,12 +25,12 @@ describe GroupsController do
     course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
     group_category = @course.group_categories.build(:name => "worldCup")
     @group = Group.create!(:name => "group1", :group_category => group_category, :context => @course)
-    
+
     get "/courses/#{@course.id}/groups/#{@group.id}"
     expect(response).to be_success
-    
+
     html = Nokogiri::HTML(response.body)
-    expect(html.css('#right-side a.add').attribute("href").text).to eq "/groups/#{@group.id}/announcements#new"
+    expect(html.css('#right-side a#add-announcement').attribute("href").text).to eq "/groups/#{@group.id}/announcements#new"
   end
 
   it "should not rendering 'pending' page when joining a self-signup group" do

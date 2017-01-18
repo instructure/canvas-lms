@@ -21,20 +21,19 @@ class Login::CanvasController < ApplicationController
 
   before_filter :forbid_on_files_domain
   before_filter :run_login_hooks, only: [:new, :create]
+  before_filter :fix_ms_office_redirects, only: :new
 
-  protect_from_forgery except: :create
+  protect_from_forgery except: :create, with: :exception
 
   def new
     @pseudonym_session = PseudonymSession.new
     @headers = false
+    flash.now[:error] = params[:message] if params[:message]
 
     maybe_render_mobile_login
   end
 
   def create
-    # reset the session id cookie to prevent session fixation.
-    reset_session_for_login
-
     # Check referer and authenticity token.  If the token is invalid but the referer is trusted
     # and one is not provided then continue.  If the referer is trusted and they provide a token
     # we still want to check it.
@@ -45,6 +44,9 @@ class Login::CanvasController < ApplicationController
         return unsuccessful_login(t("Invalid Authenticity Token"))
       end
     end
+
+    # reset the session id cookie to prevent session fixation.
+    reset_session_for_login
 
     if params[:pseudonym_session].blank? || params[:pseudonym_session][:password].blank?
       return unsuccessful_login(t("No password was given"))
@@ -61,13 +63,23 @@ class Login::CanvasController < ApplicationController
     @pseudonym_session.remote_ip = request.remote_ip
     found = @pseudonym_session.save
 
-    # look for LDAP pseudonyms where we get the unique_id back from LDAP
+    # look for LDAP pseudonyms where we get the unique_id back from LDAP, or if we're doing JIT provisioning
     if !found && !@pseudonym_session.attempted_record
-      found = @domain_root_account.account_authorization_configs.where(auth_type: 'ldap').any? do |aac|
-        next unless aac.identifier_format.present?
+      found = @domain_root_account.authentication_providers.active.where(auth_type: 'ldap').any? do |aac|
+        next unless aac.identifier_format.present? || aac.jit_provisioning?
+
         res = aac.ldap_bind_result(params[:pseudonym_session][:unique_id], params[:pseudonym_session][:password])
-        unique_id = res.first[aac.identifier_format].first if res
-        next unless unique_id && (pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first)
+        next unless res
+        unique_id = if aac.identifier_format.present?
+                      res.first[aac.identifier_format].first
+                    else
+                      params[:pseudonym_session][:unique_id]
+                    end
+        next unless unique_id
+
+        pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first
+        pseudonym ||= aac.provision_user(unique_id) if aac.jit_provisioning?
+        next unless pseudonym
 
         pseudonym.instance_variable_set(:@ldap_result, res.first)
         @pseudonym_session = PseudonymSession.new(pseudonym, params[:pseudonym_session][:remember_me] == "1")
@@ -103,13 +115,16 @@ class Login::CanvasController < ApplicationController
       user = pseudonym.login_assertions_for_user
       successful_login(user, pseudonym)
     else
-      unsuccessful_login t("Incorrect username and/or password")
+      unsuccessful_login t("Invalid username or password")
     end
   end
 
   protected
 
   def unsuccessful_login(message)
+    if request.format.json?
+      return render :json => {:errors => [message]}, :status => :bad_request
+    end
     flash[:error] = message
     @errored = true
     @headers = false
@@ -125,6 +140,7 @@ class Login::CanvasController < ApplicationController
       )
       render :mobile_login, layout: 'mobile_auth', status: status
     else
+      @aacs_with_buttons = @domain_root_account.authentication_providers.active.select { |aac| aac.class.login_button? }
       render :new, status: status
     end
   end

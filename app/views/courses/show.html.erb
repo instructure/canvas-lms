@@ -1,5 +1,5 @@
 <% content_for :page_title, @context.name %>
-<% jammit_css :course_show %>
+<% css_bundle :course_show %>
 <% @active_tab ||= "home" %>
 <h1 class='screenreader-only'><%= @context.name %></h1>
 <% content_for :auto_discovery do %>
@@ -12,12 +12,13 @@
 
 <% content_for :right_side do %>
   <div id="course_show_secondary">
-    <% @can_manage_content = can_do(@context, @current_user, :manage_content) %>
-    <% if @can_manage_content && can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) %>
+    <% @can_manage = can_do(@context, @current_user, :manage) %>
+    <% @can_create_announcements = @context.announcements.temp_record.grants_right?(@current_user, session, :create) %>
+    <% if can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) %>
       <div id="course_status" <% unless use_new_styles? %>class="text-center"<% end %>>
-        <h4>
+        <h3>
           <%= t('headers.course_status', %{Course Status}) %>
-        </h4>
+        </h3>
         <div id='course_status_actions' class="ui-buttonset">
           <%= form_for @context do |f| %>
             <% if @context.created? || @context.claimed? %>
@@ -46,16 +47,10 @@
       </div>
     <% end %>
 
-    <% if @can_manage_content || @course_home_view != 'feed' || @course_home_sub_navigation_tools.present? %>
+    <% if @can_manage || @can_create_announcements || @course_home_view != 'feed' || @course_home_sub_navigation_tools.present? %>
       <div class="course-options">
-        <% @course_home_sub_navigation_tools.each do |tool| %>
-          <a class="btn button-sidebar-wide course-home-sub-navigation-lti"
-             href="<%= course_external_tool_path(@context, tool, launch_type: 'course_home_sub_navigation') %>">
-            <img class="icon" src="<%= tool.course_home_sub_navigation(:icon_url) %>" />
-            <%= tool.label_for(:course_home_sub_navigation) %>
-          </a>
-        <% end %>
-        <% if @can_manage_content %>
+        <%= external_tools_menu_items(@course_home_sub_navigation_tools, {link_class: "btn button-sidebar-wide course-home-sub-navigation-lti", settings_key: :course_home_sub_navigation}) %>
+        <% if @can_manage %>
           <a class="btn button-sidebar-wide element_toggler choose_home_page_link" aria-controls="edit_course_home_content_form" href="<%= context_url(@context, :context_details_url) %>">
             <i class="icon-target"></i>
             <%= t('links.choose_home_page', %{Choose Home Page}) %>
@@ -69,35 +64,24 @@
           </a>
         <% end %>
 
-          <% if @can_manage_content %>
-            <% js_bundle :course_wizard %>
-            <% jammit_css :course_wizard %>
-            <a href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
-              <i class="icon-question"></i> <%= t('links.course_setup', %{Course Setup Checklist}) %>
-            </a>
+        <% if @can_manage %>
+          <% set_js_course_wizard_data %>
+          <% js_bundle :course_wizard %>
+          <% css_bundle :course_wizard %>
+          <a href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
+            <i class="icon-question"></i> <%= t('links.course_setup', %{Course Setup Checklist}) %>
+          </a>
+        <% end %>
 
+        <% if @can_create_announcements %>
           <a class="btn button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><i class="icon-announcement"></i> <%= t('links.new_announcement', %{New Announcement}) %>
           </a>
         <% end %>
+
+        <% course_custom_links.each do |link| %>
+          <a class="btn button-sidebar-wide" href="<%= link[:url] %>"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
+        <% end %>
       </div>
-    <% else %>
-      <% if @can_manage_content || @course_home_sub_navigation_tools.present? %>
-        <div class="secondary-button-group rs-margin-lr rs-margin-top rs-margin-bottom">
-        <% @course_home_sub_navigation_tools.each do |tool| %>
-          <a class="btn button-sidebar-wide course-home-sub-navigation-lti"
-             href="<%= course_external_tool_path(@context, tool, launch_type: 'course_home_sub_navigation') %>">
-            <img class="icon" src="<%= tool.course_home_sub_navigation(:icon_url) %>" />
-            <%= tool.label_for(:course_home_sub_navigation) %>
-          </a>
-        <% end %>
-        <% if @can_manage_content %>
-            <% js_bundle :course_wizard %>
-            <% jammit_css :course_wizard %>
-            <a href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>"><i class="icon-question"></i> <%= t('links.course_setup', %{Course Setup Checklist}) %></a>
-            <a class="btn button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><i class="icon-announcement"></i> <%= t('links.new_announcement', %{New Announcement}) %></a>
-        <% end %>
-        </div>
-      <% end %>
     <% end %>
 
     <% if @context.available? && @context.self_enrollment_enabled? && @context.open_enrollment && (!@context_enrollment || !@context_enrollment.active?) %>
@@ -117,8 +101,8 @@
         </div>
       </div>
     <% end %>
-    <%= render :partial => 'assignments_needing_grading', :locals => {:contexts => [@context]} %>
-    <%= render :partial => "group_list", :object => @user_groups %>
+    <%= render :partial => 'to_do_list', :locals => {:contexts => [@context]} %>
+    <%= render :partial => "group_list", :locals => {:group_list => @user_groups} %>
     <%= nbsp unless @current_user %>
   </div>
   <% if @course_home_view == 'assignments' %>
@@ -137,23 +121,24 @@ hi there
     <% end %>
   <% end %>
   <% if @show_recent_feedback %>
-    <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('titles.recent_feedback', "Recent Feedback"), :contexts_to_link_to => @context, :is_recent_feedback => true, :period => :two_weeks} %>
+    <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('titles.recent_feedback', "Recent Feedback"), :contexts_to_link_to => @context, :is_recent_feedback => true} %>
   <% end %>
 <% end %>
 
 <%
-  jammit_css :dashboard
+  css_bundle :dashboard
   case @course_home_view
   when 'wiki'
-    jammit_css :tinymce
+    css_bundle :tinymce
   when 'modules'
     js_bundle :context_modules
-    jammit_css :context_modules2
+    css_bundle :context_modules2
   when 'assignments'
-    js_bundle :assignments
+    js_bundle :assignment_index
+    css_bundle :new_assignments
   when 'syllabus'
     js_bundle :syllabus
-    jammit_css :tinymce
+    css_bundle :tinymce
   else
     js_bundle :dashboard
   end
@@ -161,29 +146,22 @@ hi there
 
 <% js_bundle 'legacy/courses_show' %>
 <% if @context.created? || @context.claimed? %>
+  <% css_bundle("reminder_course_setup") %>
   <div class="reminder Reminder__course-setup">
     <h2 class="Reminder__course-setup-title">
       <%= t('headings.unpublished', %{This Course is Unpublished}) %>
 
       <span class="Reminder__course-setup-subttitle">
-        <%= t 'teachers_only', "Only teachers can see this course until it is *published*", :wrapper => (can_do(@context, @current_user, :update) ? '<a href="#" class="publish_course_in_wizard_link"><b>\1</b></a>' : '\1') %>
+        <%= t "Only teachers can see this course until it is published" %>
       </span>
     </h2>
     <div class="body Reminder__course-setup-body">
-      <p>Need help setting up your course?</p>
+      <p><%= t('Need help setting up your course?') %></p>
       <br/>
       <a href="#" class="btn btn-primary wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
         <%= t("Setup Checklist") %>
       </a>
       <!-- <button class="btn btn-primary">Setup Checklist</button> -->
-    </div>
-  </div>
-<% end %>
-<% if @context.has_open_course_imports? %>
-  <div class="reminder" style="text-align: center;">
-    <h2><%= t('headings.importing', 'This course is being imported') %></h2>
-    <div class="body">
-      <p><%= t 'importing', 'Course copy/migration in progress. This means some content may be temporarily unavailable.' %></p>
     </div>
   </div>
 <% end %>
@@ -234,7 +212,7 @@ hi there
       @body_classes << 'hide-content-while-scripts-not-loaded'
       @body_classes << 'with_item_groups'
       js_bundle :assignment_index
-      jammit_css :new_assignments
+      css_bundle :new_assignments
     %>
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_content', :locals => {:course_home => true} %>

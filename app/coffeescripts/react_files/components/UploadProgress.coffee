@@ -1,15 +1,12 @@
 define [
   'i18n!react_files'
   'react'
-  'compiled/react/shared/utils/withReactElement'
-  '../modules/FileUploader'
-  './ProgressBar'
-  'compiled/util/mimeClass'
-], (I18n, React, withReactElement, FileUploader, ProgressBarComponent, mimeClass) ->
+  'jquery'
+  'compiled/jquery.rails_flash_notifications'
+], (I18n, React, $) ->
 
-  ProgressBar = React.createFactory ProgressBarComponent
 
-  UploadProgress = React.createClass
+  UploadProgress =
     displayName: 'UploadProgress'
 
     propTypes:
@@ -20,37 +17,35 @@ define [
         file: React.PropTypes.instanceOf(File).isRequired
       })
 
-    render: withReactElement ->
-      div className: "ef-item-row #{'text-error' if @props.uploader.error}",
-        div className: 'col-xs-6',
-          div className: 'media ellipsis',
-            span className: 'pull-left',
-              i className: "media-object mimeClass-#{mimeClass(@props.uploader.file.type)}"
-            span className: 'media-body', ref: 'fileName',
-              @props.uploader.getFileName()
+    getInitialState: ->
+      progress: 0
+      messages: {}
 
-        div className: 'col-xs-5',
-          if @props.uploader.error
-            span {},
-              (
-                if @props.uploader.error.message
-                  I18n.t('Error: %{message}', {message: @props.uploader.error.message})
-                else
-                  I18n.t('Error uploading file.')
-              ),
-              button {
-                className: 'btn-link'
-                type: 'button'
-                onClick: => @props.uploader.upload()
-              },
-                I18n.t('retry', 'Retry')
-          else
-            ProgressBar progress: @props.uploader.roundProgress()
+    componentWillMount: ->
+      @sendProgressUpdate @state.progress
 
-        button {
-          type: 'button'
-          onClick: @props.uploader.cancel
-          'aria-label': I18n.t('cancel', 'Cancel')
-          className: 'btn-link upload-progress-view__button'
-        },
-          'x'
+    componentWillReceiveProps: (nextProps) ->
+      newProgress = nextProps.uploader.roundProgress()
+
+      if @state.progress isnt newProgress
+        @sendProgressUpdate(newProgress)
+
+    componentWillUnmount: ->
+      @sendProgressUpdate @state.progress
+
+    sendProgressUpdate: (progress) ->
+      # Track which status updates have been sent to prevent duplicate messages
+      messages = @state.messages
+
+      unless progress of messages
+        fileName = @props.uploader.getFileName()
+
+        message = if progress < 100
+                    I18n.t("%{fileName} - %{progress} percent uploaded", { fileName, progress })
+                  else
+                    I18n.t("%{fileName} uploaded successfully!", { fileName })
+
+        $.screenReaderFlashMessage message
+        messages[progress] = true
+
+        @setState { messages, progress }

@@ -18,18 +18,7 @@
 
 class Announcement < DiscussionTopic
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
-
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :context_id, :context_type, :title, :message, :type, :user_id,
-    :workflow_state, :last_reply_at, :created_at, :updated_at, :delayed_post_at, :posted_at,
-    :assignment_id, :attachment_id, :deleted_at, :root_topic_id, :could_be_locked, :cloned_item_id,
-    :context_code, :position, :subtopics_refreshed_at, :old_assignment_id, :last_assignment_id, :external_feed_id,
-    :editor_id, :podcast_enabled, :podcast_has_student_posts, :require_initial_post, :discussion_type, :lock_at, :pinned, :locked
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:context]
+  belongs_to :context, polymorphic: [:course, :group]
 
   has_a_broadcast_policy
   include HasContentTags
@@ -61,20 +50,26 @@ class Announcement < DiscussionTopic
   end
   protected :respect_context_lock_rules
 
+  def self.lock_from_course(course)
+    Announcement.where(
+      :context_type => 'Course',
+      :context_id => course,
+      :workflow_state => 'active'
+    ).update_all(:locked => true)
+  end
+
   set_broadcast_policy! do
     dispatch :new_announcement
-    to { active_participants(true) - [user] }
+    to { users_with_permissions(active_participants(true) - [user]) }
     whenever { |record|
-      record.context.available? and
-        !record.context.concluded? and
+      record.send_notification_for_context? and
         ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
     }
 
     dispatch :announcement_created_by_you
     to { user }
     whenever { |record|
-      record.context.available? and
-        !record.context.concluded? and
+      record.send_notification_for_context? and
         ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
     }
   end
@@ -96,7 +91,7 @@ class Announcement < DiscussionTopic
     end
     can :read_replies
 
-    given { |user, session| self.context.grants_right?(user, session, :read) }
+    given { |user, session| self.context.grants_right?(user, session, :read_announcements) }
     can :read
 
     given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && !self.locked?}
@@ -105,8 +100,14 @@ class Announcement < DiscussionTopic
     given { |user, session| self.context.is_a?(Group) && self.context.grants_right?(user, session, :post_to_forum) }
     can :create
 
-    given { |user, session| self.context.grants_right?(user, session, :moderate_forum) } #admins.include?(user) }
+    given { |user, session| self.context.grants_all_rights?(user, session, :read_announcements, :moderate_forum) } #admins.include?(user) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
+
+    given do |user, session|
+      self.allow_rating && (!self.only_graders_can_rate ||
+                            self.context.grants_right?(user, session, :manage_grades))
+    end
+    can :rate
   end
 
   def is_announcement; true end
@@ -126,5 +127,9 @@ class Announcement < DiscussionTopic
 
   def published?
     true
+  end
+
+  def assignment
+    nil
   end
 end

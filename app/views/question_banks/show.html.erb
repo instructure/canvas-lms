@@ -1,6 +1,6 @@
 <%
   js_bundle :quizzes_bundle, :question_bank
-  jammit_css :quizzes, :learning_outcomes, :tinymce
+  css_bundle :quizzes, :learning_outcomes, :tinymce, :question_bank
   content_for :page_title, @bank.title
 %>
 <% content_for :right_side do %>
@@ -12,11 +12,12 @@
       <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide delete_bank_link"><i class="icon-end"></i> <%= t 'buttons.delete', "Delete Bank" %></a>
     <% end %>
     <% if @bank && !@bank.bookmarked_for?(@current_user) %>
-      <a href="<%= context_url(@context, :context_question_bank_bookmark_url, @bank ? @bank.id : "{{ id }}") %>" class="btn button-sidebar-wide bookmark_bank_link"><%= image_tag "bookmark_gray.png" %> <span class="message"><%= t 'buttons.bookmark', "Bookmark this Bank" %></span></a>
+      <a href="<%= context_url(@context, :context_question_bank_bookmark_url, @bank ? @bank.id : "{{ id }}") %>" class="btn button-sidebar-wide bookmark_bank_link"><%= image_tag("bookmark_gray.png", alt: "") %> <span class="message"><%= t 'buttons.bookmark', "Bookmark this Bank" %></span></a>
     <% else %>
-      <button class="btn button-sidebar-wide disabled" disabled="true"><%= image_tag "bookmark.png" %> <%= t 'buttons.already_bookmarked', "Already Bookmarked" %></button>
+      <button class="btn button-sidebar-wide disabled" disabled="true"><%= image_tag("bookmark.png", alt: "") %> <%= t 'buttons.already_bookmarked', "Already Bookmarked" %></button>
     <% end %>
   </div>
+  <% css_bundle("aligned_outcomes") %>
   <h2 id="aligned_outcomes"><%= t 'headings.aligned_outcomes', "Aligned Outcomes" %></h2>
   <div class="rs-margin-lr rs-margin-bottom">
     <ul class="unstyled_list" id="aligned_outcomes_list">
@@ -41,7 +42,7 @@
 <% end %>
 
 <div class="quiz-header">
-  <%= form_for @bank, :url => context_url(@context, :context_question_bank_url), :html => {:id => "edit_bank_form", :method => :put} do |f| %>
+  <%= form_for @bank, :url => context_url(@context, :context_question_bank_url, @bank), :html => {:id => "edit_bank_form", :method => :put} do |f| %>
     <div class="displaying">
       <h1><%= @bank.title %></h1>
     </div>
@@ -128,75 +129,12 @@
       <input type="checkbox" name="copy" id="copy_question" value="1" checked />
       <label for="copy_question"><%= t 'labels.keep_copy', 'Keep a copy in this question bank as well' %></label>
     </div>
-    <div class="button-container">
-      <button type="button" class="btn submit_button"><%= t 'button.move_copy_question', 'Move/Copy Question' %></button>
-      <button type="button" class="btn cancel_button btn button-secondary"><%= t 'button.cancel', 'Cancel' %></button>
+    <div class="move_question_dialog_actions">
+      <button type="button" class="Button cancel_button"><%= t 'button.cancel', 'Cancel' %></button>
+      <button type="button" class="Button Button--primary submit_button"><%= t 'button.move_copy_question', 'Move/Copy Question' %></button>
     </div>
   </div>
 </div>
 <div id="assessment_question_bank_id" style="display: none;"><%= @bank.id %></div>
 
-<% content_for :stylesheets do %>
-<style>
-#move_question_dialog .question_name {
-}
-#move_question_dialog .question_text {
-  font-size: 0.8em;
-  margin-left: 20px;
-}
-#move_question_dialog ul.questions {
-  margin: 5px 20px;
-  overflow: auto;
-  min-height: 50px;
-  max-height: 200px;
-}
-#move_question_dialog ul.questions .list_question .list_question_text {
-  padding-left: 30px;
-  color: #666;
-  font-size: 0.8em;
-  max-height: 1.7em;
-  overflow: hidden;
-}
-
-#move_question_dialog ul.banks {
-  margin: 5px 20px;
-  overflow: auto;
-  min-height: 30px;
-  max-height: 150px;
-}
-#move_question_dialog li.bank {
-  margin-bottom: 5px;
-}
-#move_question_dialog li.bank .bank_label {
-  float: left;
-}
-#move_question_dialog li.bank .bank_radio {
-  float: left;
-}
-#move_question_dialog li.bank .bank_label .bank_name {
-  font-weight: bold;
-  display: block;
-}
-#move_question_dialog li.bank .bank_label .context_name {
-  font-size: 0.8em;
-  display: block;
-  padding-left: 10px;
-  color: #888;
-}
-#questions.uneditable .question_holder .display_question .move {
-  display: none;
-}
-#questions.uneditable .question_holder .display_question .links {
-  display: none;
-}
-.bottom_links {
-  text-align: right;
-  margin-right: 10px;
-  clear: left;
-}
-#questions.uneditable .question_holder .display_question .bottom_links {
-  display: none;
-}
-</style>
-<% end %>
 <%= render :partial => 'quizzes/quizzes/equations_help' %>

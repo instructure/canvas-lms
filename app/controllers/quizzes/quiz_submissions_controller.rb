@@ -18,10 +18,10 @@
 
 class Quizzes::QuizSubmissionsController < ApplicationController
   include Api::V1::QuizSubmission
-  include Filters::Quizzes
-  include Filters::QuizSubmissions
+  include ::Filters::Quizzes
+  include ::Filters::QuizSubmissions
 
-  protect_from_forgery :except => [:create, :backup, :record_answer]
+  protect_from_forgery :except => [:create, :backup, :record_answer], with: :exception
   before_filter :require_context
   before_filter :require_quiz, :only => [ :index, :create, :extensions, :show, :update, :log ]
   before_filter :require_quiz_submission, :only => [ :show, :log ]
@@ -42,6 +42,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     if @quiz.access_code.present?
       session.delete(@quiz.access_code_key_for_user(@current_user))
     end
+    delete_session_access_key!
     if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
       flash[:error] = t('errors.protected_quiz', "This quiz is protected and is only available from certain locations.  The computer you are currently using does not appear to be at a valid location for taking this quiz.")
     elsif @quiz.grants_right?(@current_user, :submit)
@@ -82,6 +83,9 @@ class Quizzes::QuizSubmissionsController < ApplicationController
 
   def backup
     @quiz = require_quiz
+    if value_to_boolean(params[:leaving])
+      delete_session_access_key!
+    end
     if authorized_action(@quiz, @current_user, :submit)
       if @current_user.nil? || is_previewing?
         @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(false)).first
@@ -100,7 +104,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
       elsif is_previewing? || (@submission && @submission.temporary_user_code == temporary_user_code(false)) ||
                               (@submission && @submission.grants_right?(@current_user, session, :update))
-        if !@submission.completed? && !@submission.overdue?
+        if !@submission.completed? && (!@submission.overdue? || is_previewing?)
           if params[:action] == 'record_answer'
             if last_question = params[:last_question_id]
               params[:"_question_#{last_question}_read"] = true
@@ -181,6 +185,11 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   end
 
   protected
+
+  def delete_session_access_key!
+    return unless session[:quiz_access_code] && @quiz.access_code.present?
+    session[:quiz_access_code].delete(@quiz.id)
+  end
 
   def is_previewing?
     @previewing ||= params[:preview] && @quiz.grants_right?(@current_user, session, :update)

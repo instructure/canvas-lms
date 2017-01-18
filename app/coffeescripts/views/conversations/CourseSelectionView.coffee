@@ -36,9 +36,10 @@ define [
       now = $.fudgeDateForProfileTimezone(new Date)
       @options.courses.all.each((course) =>
         if @options.courses.favorites.get(course.id) then return
-        is_complete = course.get('workflow_state') == 'completed' ||
-          (course.get('end_at') && new Date(course.get('end_at')) < now) ||
-          (course.get('term').end_at && new Date(course.get('term').end_at) < now)
+        if course.get('access_restricted_by_date') then return
+
+        is_complete = @is_complete(course, now)
+
         collection = if is_complete then concluded else more
         collection.push(course.toJSON())
       )
@@ -55,6 +56,12 @@ define [
       @getAriaLabel()
       @createSearchViews()
       if !@renderValue() then @loadAll()
+
+    is_complete: (course, asOf) ->
+      if course.get('workflow_state') == 'completed' then return true
+      if course.get('end_at') && course.get('restrict_enrollments_to_course_dates') then return (new Date(course.get('end_at')) < asOf)
+      if course.get('term') && course.get('term').end_at then return (new Date(course.get('term').end_at) < asOf)
+      false
 
     createSearchViews: ->
       searchViews = []
@@ -91,7 +98,7 @@ define [
         view.clearSearch()
 
     getAriaLabel: ->
-      return if _.include(ENV.current_user_roles, 'admin')
+      return if ENV.CONVERSATIONS.CAN_MESSAGE_ACCOUNT_CONTEXT
       label = @getCurrentContext().name || I18n.t("Select course: a selection is required before recipients field will become available")
       @$picker.find('button').attr("aria-label", label)
 

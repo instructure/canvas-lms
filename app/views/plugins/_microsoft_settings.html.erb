@@ -1,0 +1,24 @@
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 600px;" class="formtable">
+    <tr>
+      <td colspan="2"><%= mt(:description, <<-TEXT, ms_app_url: "https://apps.dev.microsoft.com/", callback_url: oauth2_login_callback_url)
+You will need to register a [new app with Microsoft](%{ms_app_url}).
+You should configure %{callback_url} as the Redirect URI.
+After you save your app, make a note of the Application ID and Secret, and enter them here.
+TEXT
+      %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :application_id, en: "Application ID" %></td>
+      <td>
+        <%= f.text_field :application_id %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :application_secret, en: "Application Secret" %></td>
+      <td>
+        <%= f.password_field :application_secret, autocomplete: false %>
+      </td>
+    </tr>
+  </table>
+<% end %>

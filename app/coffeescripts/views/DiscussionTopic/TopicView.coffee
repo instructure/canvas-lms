@@ -10,10 +10,11 @@ define [
   'jst/discussions/_reply_form'
   'compiled/discussions/Reply'
   'compiled/widget/assignmentRubricDialog'
-  'compiled/util/wikiSidebarWithMultipleEditors'
-  'jquery.instructure_misc_helpers' #scrollSidebar
+  'jsx/shared/rce/RceCommandShim'
   'str/htmlEscape'
-], (I18n, $, Backbone, _, DiscussionTopic, EntriesView, EntryView, PublishButtonView, replyTemplate, Reply, assignmentRubricDialog, htmlEscape) ->
+  'jquery.instructure_misc_helpers' #scrollSidebar
+], (I18n, $, Backbone, _, DiscussionTopic, EntriesView, EntryView, PublishButtonView,
+    replyTemplate, Reply, assignmentRubricDialog, RceCommandShim, htmlEscape) ->
 
   class TopicView extends Backbone.View
 
@@ -93,7 +94,7 @@ define [
     toggleEditorMode: (event) ->
       event.preventDefault()
       event.stopPropagation()
-      @$textarea.editorBox('toggle')
+      RceCommandShim.send(@$textarea, 'toggle')
       # hide the clicked link, and show the other toggle link.
       # todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()

@@ -1,52 +1,48 @@
-<form action="<%= self_enrollment_url %>" method="post" id="enroll_form" class="form-horizontal bootstrap-form">
+<form action="<%= self_enrollment_url %>" method="post" id="enroll_form" class="ic-Self-enrollment-form">
   <%= registration_summary || content_tag(:p, mt(:getting_started, "You are enrolling in **%{course}**.", :course => @course.name)) %>
   <p><%= t("Please enter your %{label_name}:", :label_name => @login_label_name) %></p>
   <input type="hidden" name="user[initial_enrollment_type]" value="student">
-  <div class="control-group" id="email_info">
-      <label class="control-label" for="student_email"><%= @login_label_name %></label>
-    <div class="controls">
-      <input type="text" id="student_email" name="pseudonym[unique_id]" placeholder="<%= @login_label_name %>">
+  <div class="ic-Form-group ic-Form-group--horizontal">
+    <div class="ic-Form-control" id="email_info">
+      <label class="ic-Label" for="student_email"><%= @login_label_name %></label>
+      <input type="text" class="ic-Input" id="student_email" name="pseudonym[unique_id]" placeholder="<%= @login_label_name %>">
     </div>
-  </div>
-  <div class="control-group" id="initial_action">
-    <div class="controls">
-      <label class="radio">
-        <input type="radio" name="initial_action" value="create">
-        <%= t "new_user", "I am a new user" %>
-      </label>
-      <label class="radio">
-        <input type="radio" name="initial_action" value="log_in">
-        <%= t "existing_user", "I already have a %{institution_name} login", :institution_name => @domain_root_account.short_name %>
-      </label>
-    </div>
-  </div>
-  <div class="user_info" id="log_in_user_info" style="<%= hidden %>">
-    <div class="control-group">
-      <label class="control-label" for="student_password"><%= t "labels.password", "Password" %></label>
-      <div class="controls">
-        <input type="password" id="student_password" name="pseudonym[password]">
+    <div class="ic-Form-control ic-Form-control--radio" id="initial_action">
+      <div class="ic-Radio">
+        <input id="selfEnrollmentAuthRegCreate" type="radio" name="initial_action" value="create">
+        <label for="selfEnrollmentAuthRegCreate" class="ic-Label"><%= t "new_user", "I am a new user" %></label>
       </div>
-    </div>
-  </div>
-  <div class="user_info" id="create_user_info" style="<%= hidden %>">
-    <div class="control-group">
-      <label class="control-label" for="student_name"><%= t "labels.name", "Full Name" %></label>
-      <div class="controls">
-        <input type="text" id="student_name" name="user[name]">
-      </div>
-    </div>
-    <div class="control-group">
-      <div class="controls">
-        <label class="checkbox">
-          <input type="checkbox" name="user[terms_of_use]" value="1">
-          <%= agree_to_terms %>
+      <div class="ic-Radio">
+        <input id="selfEnrollmentAuthRegLogin" type="radio" name="initial_action" value="log_in">
+        <label for="selfEnrollmentAuthRegLogin" class="ic-Label">
+          <%= t "existing_user", "I already have a %{institution_name} login", :institution_name => @domain_root_account.short_name %>
         </label>
       </div>
     </div>
+    <div class="user_info" id="log_in_user_info" style="<%= hidden %>">
+      <div class="ic-Form-control">
+        <label class="ic-Label" for="student_password"><%= t "labels.password", "Password" %></label>
+        <input class="ic-Input" type="password" id="student_password" name="pseudonym[password]">
+      </div>
+    </div>
+    <div class="user_info" id="create_user_info" style="<%= hidden %>">
+      <div class="ic-Form-control">
+        <label class="ic-Label" for="student_name"><%= t "labels.name", "Full Name" %></label>
+        <input class="ic-Input" type="text" id="student_name" name="user[name]">
+      </div>
+      <div class="ic-Checkbox-group">
+        <div class="ic-Form-control ic-Form-control--checkbox">
+          <input type="checkbox" id="selfEnrollmentAuthRegLoginAgreeTerms" name="user[terms_of_use]" value="1">
+          <label class="ic-Label" for="selfEnrollmentAuthRegLoginAgreeTerms"><%= agree_to_terms %></label>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="control-group embedded-footer">
-    <a href="<%= privacy_policy_url %>" target="_blank" class="footer-info"><%= t '#site.view_privacy_policy', 'View Privacy Policy' %></a>
-    <div class="controls">
+  <div class="ic-Self-enrollment-footer">
+    <div class="ic-Self-enrollment-footer__Secondary">
+      <a href="<%= privacy_policy_url %>" target="_blank" class="footer-info"><%= t '#site.view_privacy_policy', 'View Privacy Policy' %></a>
+    </div>
+    <div class="ic-Self-enrollment-footer__Primary">
       <button class="btn btn-primary" style="visibility: hidden" id="submit_button" type="submit"><%= @confirm_enrollment_url ? t("buttons.next", "Next") : t("buttons.enroll_in_course", "Enroll in Course") %></button>
     </div>
   </div>

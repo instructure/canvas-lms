@@ -9,12 +9,15 @@ define [
 ], (I18n, $, mute_dialog_template) ->
 
   class AssignmentMuter
-    constructor: (@$link, @assignment, @url, @setter) ->
-      @$link = $(@$link)
-      @updateLink()
-      @$link.click (event) =>
-        event.preventDefault()
+    constructor: (@$link, @assignment, @url, @setter, @options) ->
+      if @options?.openDialogInstantly
         if @assignment.muted then @confirmUnmute() else @showDialog()
+      else
+        @$link = $(@$link)
+        @updateLink()
+        @$link.click (event) =>
+          event.preventDefault()
+          if @assignment.muted then @confirmUnmute() else @showDialog()
 
     updateLink: =>
       @$link.text(if @assignment.muted then I18n.t('unmute_assignment', 'Unmute Assignment') else I18n.t('mute_assignment', 'Mute Assignment'))
@@ -37,7 +40,7 @@ define [
         @setter @assignment, 'muted', serverResponse.assignment.muted
       else
         @assignment.muted = serverResponse.assignment.muted
-      @updateLink()
+      @updateLink() unless @options?.openDialogInstantly
       @$dialog.dialog('close')
       $.publish('assignment_muting_toggled', [@assignment])
 

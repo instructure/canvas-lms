@@ -1,4 +1,6 @@
 class AddNewTabToContentTags < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :content_tags, :new_tab, :boolean
   end

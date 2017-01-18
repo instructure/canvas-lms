@@ -22,19 +22,17 @@ class Message < ActiveRecord::Base
   # Included modules
   include Rails.application.routes.url_helpers
 
-  include PolymorphicTypeOverride
-  override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
-                                            'QuizRegradeRun' => 'Quizzes::QuizRegradeRun'},
-                             asset_context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
-                                                  'QuizRegradeRun' => 'Quizzes::QuizRegradeRun'}
-
   include ERB::Util
   include SendToStream
   include TextHelper
   include HtmlTextHelper
   include Workflow
+  include Messages::PeerReviewsHelper
 
   extend TextHelper
+
+  MAX_TWITTER_MESSAGE_LENGTH = 140
+
 
   # Associations
   belongs_to :asset_context, :polymorphic => true
@@ -60,10 +58,15 @@ class Message < ActiveRecord::Base
   before_save :set_asset_context_code
 
   # Validations
-  validates_length_of :body,                :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :transmission_errors, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :to, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :from, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates :body, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :html_body, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :transmission_errors, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :to, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :from, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :url, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :subject, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :from_name, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :reply_to_name, length: {maximum: maximum_string_length}, allow_nil: true, allow_blank: true
 
   # Stream policy
   on_create_send_to_streams do
@@ -83,12 +86,14 @@ class Message < ActiveRecord::Base
           MessageDispatcher.dispatch(self)
         end
       end
+      event :set_transmission_error, :transitions_to => :transmission_error
       event :cancel, :transitions_to => :cancelled
       event :close, :transitions_to => :closed # needed for dashboard messages
     end
 
     state :staged do
       event :dispatch, :transitions_to => :sending
+      event :set_transmission_error, :transitions_to => :transmission_error
       event :cancel, :transitions_to => :cancelled
       event :close, :transitions_to => :closed # needed for dashboard messages
     end
@@ -97,6 +102,7 @@ class Message < ActiveRecord::Base
       event :complete_dispatch, :transitions_to => :sent do
         self.sent_at ||= Time.now
       end
+      event :set_transmission_error, :transitions_to => :transmission_error
       event :cancel, :transitions_to => :cancelled
       event :close, :transitions_to => :closed
       event :errored_dispatch, :transitions_to => :staged do
@@ -106,6 +112,7 @@ class Message < ActiveRecord::Base
     end
 
     state :sent do
+      event :set_transmission_error, :transitions_to => :transmission_error
       event :close, :transitions_to => :closed
       event :bounce, :transitions_to => :bounced do
         # Permenant reminder that this bounced.
@@ -121,12 +128,19 @@ class Message < ActiveRecord::Base
     end
 
     state :dashboard do
+      event :set_transmission_error, :transitions_to => :transmission_error
       event :close, :transitions_to => :closed
       event :cancel, :transitions_to => :closed
     end
+
     state :cancelled
 
+    state :transmission_error do
+      event :close, :transitions_to => :closed
+    end
+
     state :closed do
+      event :set_transmission_error, :transitions_to => :transmission_error
       event :send_message, :transitions_to => :closed do
         self.sent_at ||= Time.now
       end
@@ -252,6 +266,8 @@ class Message < ActiveRecord::Base
   def link_root_account
     @root_account ||= begin
       context = self.context
+      context = self.asset_context if context.is_a?(CommunicationChannel) && self.asset_context
+
       context = context.assignment if context.respond_to?(:assignment) && context.assignment
       context = context.rubric_association.context if context.respond_to?(:rubric_association) && context.rubric_association
       context = context.appointment_group.contexts.first if context.respond_to?(:appointment_group) && context.appointment_group
@@ -259,7 +275,7 @@ class Message < ActiveRecord::Base
       context = context.account if context.respond_to?(:account)
       context = context.root_account if context.respond_to?(:root_account)
       if context
-        p = user.sis_pseudonym_for(context)
+        p = SisPseudonym.for(user, context)
         p ||= user.find_pseudonym_for_account(context, true)
         context = p.account if p
       else
@@ -269,6 +285,11 @@ class Message < ActiveRecord::Base
       end
       context
     end
+  end
+
+  # infer a root account time zone
+  def root_account_time_zone
+    link_root_account.time_zone if link_root_account.respond_to?(:time_zone)
   end
 
   # Internal: Store any transmission errors in the database to help with later
@@ -326,6 +347,7 @@ class Message < ActiveRecord::Base
   class UnescapedBuffer < String # acts like safe buffer except for the actually being safe part
     alias :append= :<<
     alias :safe_concat :concat
+    alias :safe_append= :concat
   end
 
   # Public: Store content in a message_content_... instance variable.
@@ -439,10 +461,9 @@ class Message < ActiveRecord::Base
   # Returns message body
   def populate_body(message_body_template, path_type, _binding, filename)
     # Build the body content based on the path type
-
-      self.body = Erubis::Eruby.new(message_body_template,
-        bufvar: '@output_buffer', filename: filename).result(_binding)
-      self.html_body = apply_html_template(_binding) if path_type == 'email'
+    self.body = Erubis::Eruby.new(message_body_template,
+      bufvar: '@output_buffer', filename: filename).result(_binding)
+    self.html_body = apply_html_template(_binding) if path_type == 'email'
 
     # Append a footer to the body if the path type is email
     if path_type == 'email'
@@ -476,8 +497,11 @@ class Message < ActiveRecord::Base
 
     # Get the users timezone but maintain the original timezone in order to set it back at the end
     original_time_zone = Time.zone.name || "UTC"
-    user_time_zone     = self.user.try(:time_zone) || original_time_zone
+    user_time_zone     = self.user.try(:time_zone) || root_account_time_zone || original_time_zone
     Time.zone          = user_time_zone
+
+    # (temporarily) override course name with user's nickname for the course
+    hacked_course = apply_course_nickname_to_asset(self.context, self.user)
 
     # Ensure we have a path_type
     path_type = 'dashboard' if to == 'summary'
@@ -514,6 +538,8 @@ class Message < ActiveRecord::Base
     # Set the timezone back to what it originally was
     Time.zone = original_time_zone if original_time_zone.present?
 
+    hacked_course.apply_nickname_for!(nil) if hacked_course
+
     @i18n_scope = nil
   end
 
@@ -536,7 +562,94 @@ class Message < ActiveRecord::Base
       return nil
     end
 
-    send(delivery_method)
+    if user && user.account.feature_enabled?(:notification_service) && path_type != "yo"
+      enqueue_to_sqs
+    else
+      send(delivery_method)
+    end
+  end
+
+  # Public: Enqueues a message to the notification_service's sqs queue
+  #
+  # Returns nothing
+  def enqueue_to_sqs
+    notification_targets.each do |target|
+      Services::NotificationService.process(
+        global_id,
+        notification_message,
+        path_type,
+        target
+      )
+      complete_dispatch
+    end
+  rescue AWS::SQS::Errors::Base => e
+    Canvas::Errors.capture(
+      e,
+      message: 'Message delivery failed',
+      to: to,
+      object: inspect.to_s
+    )
+    error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+    self.transmission_errors = error_string
+    self.errored_dispatch
+    raise
+  end
+
+  class RemoteConfigurationError < StandardError; end
+  # Public: Determine the remote configuration for notification_service
+  #
+  # Returns string remote configuration (eventually a hash).
+  def remote_configuration
+    case path_type
+    when "email"
+      return "email.amazonaws.com"
+    when "push"
+      return "push.com"
+    when "twitter"
+      return 'twitter'
+    when "sms"
+      return if to =~ /^\+[0-9]+$/ ? "Twilio.com" : "email.amazonaws.com"
+    else
+      raise RemoteConfigurationError, "No matching path types for notification service"
+    end
+  end
+
+  # Public: Determines the message body for a notification endpoint
+  #
+  # Returns target notification message body
+  def notification_message
+    case path_type
+    when "email"
+      Mailer.create_message(self).to_s
+    when "push"
+      sns_json
+    when "twitter"
+      url = self.main_link || self.url
+      message_length = MAX_TWITTER_MESSAGE_LENGTH - url.length - 1
+      truncated_body = HtmlTextHelper.strip_and_truncate(body, max_length: message_length)
+      "#{truncated_body} #{url}"
+    else
+      body
+    end
+  end
+
+  # Public: Returns all notification_service targets to send to
+  #
+  # Returns the targets in which to send the notification to
+  def notification_targets
+    case path_type
+    when "push"
+      self.user.notification_endpoints.map(&:arn)
+    when "twitter"
+      twitter_service = user.user_services.where(service: 'twitter').first
+      [
+        "access_token"=> twitter_service.token,
+        "access_token_secret"=> twitter_service.secret,
+        "user_id"=> twitter_service.service_user_id
+      ]
+    else
+      [to]
+    end
   end
 
   # Public: Fetch the dashboard messages for the given messages.
@@ -587,7 +700,6 @@ class Message < ActiveRecord::Base
   def infer_defaults
     if notification
       self.notification_name     ||= notification.name
-      self.notification_category ||= notification_category
     end
 
     self.path_type ||= communication_channel.try(:path_type)
@@ -612,13 +724,15 @@ class Message < ActiveRecord::Base
   # options - An options hash passed to translate (default: {}).
   #
   # Returns a translated string.
-  def translate(key, default, options={})
+  def translate(*args)
+    key, options = I18nliner::CallHelpers.infer_arguments(args)
+
     # Add scope if it's present in the model and missing from the key.
-    if @i18n_scope && key !~ /\A#/
+    if !options[:i18nliner_inferred_key] && @i18n_scope && key !~ /\A#/
       key = "##{@i18n_scope}.#{key}"
     end
 
-    super(key, default, options)
+    super(key, options)
   end
   alias :t :translate
 
@@ -676,7 +790,6 @@ class Message < ActiveRecord::Base
   def deliver_via_email
     res = nil
     logger.info "Delivering mail: #{self.inspect}"
-
     begin
       res = Mailer.create_message(self).deliver
     rescue Net::SMTPServerBusy => e
@@ -687,7 +800,6 @@ class Message < ActiveRecord::Base
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
     end
-
     if res
       complete_dispatch
     elsif @exception
@@ -741,12 +853,41 @@ class Message < ActiveRecord::Base
     end
   end
 
-  # Internal: Send the message through SMS. Right now this just calls
-  # deliver_via_email because we're using email SMS gateways.
+  # Internal: Send the message through SMS. This currently sends it via Twilio if the recipient is a E.164 phone
+  # number, or via email otherwise.
   #
   # Returns nothing.
   def deliver_via_sms
-    deliver_via_email
+    if to =~ /^\+[0-9]+$/
+      begin
+        unless user.account.feature_enabled?(:international_sms)
+          raise "International SMS is currently disabled for this user's account"
+        end
+        if Canvas::Twilio.enabled?
+          Canvas::Twilio.deliver(
+            to,
+            body,
+            from_recipient_country: true
+          )
+        end
+      rescue StandardError => e
+        logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+        Canvas::Errors.capture(
+          e,
+          message: 'SMS delivery failed',
+          to: to,
+          object: inspect.to_s,
+          tags: {
+            type: :sms_message
+          }
+        )
+        cancel
+      else
+        complete_dispatch
+      end
+    else
+      deliver_via_email
+    end
   end
 
   # Internal: Deliver the message using AWS SNS.
@@ -754,7 +895,7 @@ class Message < ActiveRecord::Base
   # Returns nothing.
   def deliver_via_push
     begin
-      self.user.notification_endpoints.all.each do |notification_endpoint|
+      self.user.notification_endpoints.each do |notification_endpoint|
         notification_endpoint.destroy unless notification_endpoint.push_json(sns_json)
       end
       complete_dispatch
@@ -788,6 +929,18 @@ class Message < ActiveRecord::Base
 
   def message_context
     @_message_context ||= Messages::AssetContext.new(context, notification_name)
+  end
+
+  def apply_course_nickname_to_asset(asset, user)
+    hacked_course = if asset.is_a?(Course)
+      asset
+    elsif asset.respond_to?(:context) && asset.context.is_a?(Course)
+      asset.context
+    elsif asset.respond_to?(:course) && asset.course.is_a?(Course)
+      asset.course
+    end
+    hacked_course.apply_nickname_for!(user) if hacked_course
+    hacked_course
   end
 
 end

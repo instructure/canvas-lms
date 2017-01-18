@@ -34,7 +34,7 @@ describe "MessageableUser::Calculator" do
         expect(@calculator.uncached_visible_section_ids).to eq({})
       end
 
-      it "should include sections from section visibile courses" do
+      it "should include sections from section visible courses" do
         Enrollment.limit_privileges_to_course_section!(@course, @viewing_user, true)
         expect(@calculator.uncached_visible_section_ids.keys).to include(@course.id)
       end
@@ -82,7 +82,7 @@ describe "MessageableUser::Calculator" do
         expect(@calculator.uncached_observed_student_ids).to eq({})
       end
 
-      it "should not include observed students from section visibile courses" do
+      it "should not include observed students from section visible courses" do
         Enrollment.limit_privileges_to_course_section!(@course, @viewing_user, true)
         expect(@calculator.uncached_observed_student_ids).to eq({})
       end
@@ -142,7 +142,7 @@ describe "MessageableUser::Calculator" do
         # contrived, but have read_roster permission, but no association
         account = Account.create!
         account_admin_user(:user => @viewing_user, :account => account)
-        @viewing_user.user_account_associations.scoped.delete_all
+        @viewing_user.user_account_associations.scope.delete_all
         expect(@calculator.uncached_visible_account_ids).not_to include(account.id)
       end
 
@@ -180,12 +180,14 @@ describe "MessageableUser::Calculator" do
           end
 
           it "should include the group if the course was recently concluded" do
+            @course.start_at = 2.days.ago
             @course.conclude_at = 1.day.ago
             @course.save!
             expect(@calculator.uncached_fully_visible_group_ids).to include(@group.id)
           end
 
           it "should not include the group if the course concluding was not recent" do
+            @course.start_at = 46.days.ago
             @course.conclude_at = 45.days.ago
             @course.save!
             expect(@calculator.uncached_fully_visible_group_ids).not_to include(@group.id)
@@ -786,6 +788,14 @@ describe "MessageableUser::Calculator" do
         group_with_user(:user => @student, :group_context => @course)
         Enrollment.limit_privileges_to_course_section!(@course, @viewing_user, true)
         expect(@calculator.load_messageable_users([@student]).first.common_groups).to be_empty
+      end
+
+      it "includes user who are admins of the account with no enrollments" do
+        new_admin = user
+        tie_user_to_account(@viewing_user, role: admin_role)
+        tie_user_to_account(new_admin, role: admin_role)
+        messageable_users = @calculator.load_messageable_users([new_admin.id])
+        expect(messageable_users.map(&:id)).to include(new_admin.id)
       end
 
       context "creation pending users" do

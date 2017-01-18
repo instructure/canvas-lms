@@ -1,6 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../cc_spec_helper')
 
 require 'nokogiri'
+require 'tmpdir'
 
 describe "Canvas Cartridge importing" do
   before(:each) do
@@ -96,7 +97,7 @@ describe "Canvas Cartridge importing" do
     hash = {:migration_id=>CC::CCHelper.create_key(a),
             :title=>a.title,
             :assignment_group_migration_id=>CC::CCHelper.create_key(ag2)}
-    Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
+    Importers::AssignmentImporter.import_from_migration(hash, @copy_to, @migration)
 
     ag2_2.reload
     expect(ag2_2.assignments.count).to eq 1
@@ -567,13 +568,49 @@ describe "Canvas Cartridge importing" do
     hash = @converter.convert_wiki(doc, 'some-page')
     hash = hash.with_indifferent_access
     #import into new course
-    @copy_to.attachment_path_id_lookup = { 'unfiled/ohai there.txt' => attachment_import.migration_id }
-    Importers::WikiPageImporter.import_from_migration(hash, @copy_to)
+    @migration.attachment_path_id_lookup = { 'unfiled/ohai there.txt' => attachment_import.migration_id }
+    Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
+    @migration.resolve_content_links!
 
     page_2 = @copy_to.wiki.wiki_pages.where(migration_id: migration_id).first
     expect(page_2.title).to eq page.title
     expect(page_2.url).to eq page.url
     expect(page_2.body).to eq body_with_link % ([ @copy_to.id, attachment_import.id ] * 4)
+  end
+
+  it "should translate media file links on import" do
+    media_id = 'm_mystiry'
+    att = Attachment.create!(:filename => 'video.mp4',
+      :uploaded_data => StringIO.new('stuff'),
+      :folder => Folder.root_folders(@copy_to).first, :context => @copy_to)
+    att.migration_id = 'stuff'
+    att.content_type = "video/mp4"
+    att.save!
+
+    media_id = "m_mystiry"
+    Attachment.any_instance.stubs(:media_object).returns(stub(:media_id => media_id))
+
+    path = CGI.escape(att.full_path)
+    body_with_links = %{<p>Watup? <strong>eh?</strong>
+      <a href="%24IMS-CC-FILEBASE%24/#{path}" class="instructure_inline_media_comment">wroks</a>
+      <a href="%24IMS-CC-FILEBASE%24/#{path}">no wroks</a>
+      </p>}
+
+    hash = {
+      :migration_id => 'mig',
+      :title => 'title',
+      :text => body_with_links
+    }.with_indifferent_access
+    #import into new course
+    @migration.attachment_path_id_lookup = { att.full_path => att.migration_id }
+    Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
+    @migration.resolve_content_links!
+
+    page_2 = @copy_to.wiki.wiki_pages.where(migration_id: hash[:migration_id]).first
+    links = Nokogiri::HTML::DocumentFragment.parse(page_2.body).css("a")
+    expect(links.count).to eq 2
+    expect(links.first['href']).to eq "/media_objects/#{media_id}"
+    expect(links.last['href']).to eq "/courses/#{@copy_to.id}/files/#{att.id}/preview"
   end
 
   it "should import wiki pages" do
@@ -595,7 +632,7 @@ describe "Canvas Cartridge importing" do
     to_att.migration_id = CC::CCHelper.create_key(from_att)
     to_att.save
     path = to_att.full_display_path.gsub('course files/', '')
-    @copy_to.attachment_path_id_lookup = {path => to_att.migration_id}
+    @migration.attachment_path_id_lookup = {path => to_att.migration_id}
 
     body_with_link = %{<p>Watup? <strong>eh?</strong>
       <a href=\"/courses/%s/assignments\">Assignments</a>
@@ -625,6 +662,7 @@ describe "Canvas Cartridge importing" do
     hash = hash.with_indifferent_access
     #import into new course
     Importers::WikiPageImporter.process_migration({'wikis' => [hash, nil]}, @migration)
+    @migration.resolve_content_links!
 
     expect(ErrorReport.last.message).to match /nil wiki/
 
@@ -650,7 +688,7 @@ describe "Canvas Cartridge importing" do
     hash = @converter.convert_wiki(doc, 'blti-link')
     hash = hash.with_indifferent_access
     #import into new course
-    Importers::WikiPageImporter.import_from_migration(hash, @copy_to)
+    Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
 
     page_2 = @copy_to.wiki.wiki_pages.where(migration_id: migration_id).first
     expect(page_2.title).to eq page.title
@@ -703,7 +741,7 @@ describe "Canvas Cartridge importing" do
     hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
-    Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
+    Importers::AssignmentImporter.import_from_migration(hash, @copy_to, @migration)
 
     asmnt_2 = @copy_to.assignments.where(migration_id: migration_id).first
     expect(asmnt_2.title).to eq asmnt.title
@@ -742,7 +780,7 @@ describe "Canvas Cartridge importing" do
     hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
-    Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
+    Importers::AssignmentImporter.import_from_migration(hash, @copy_to, @migration)
 
     asmnt_2 = @copy_to.assignments.where(migration_id: migration_id).first
     expect(asmnt_2.submission_types).to eq "external_tool"
@@ -803,7 +841,7 @@ XML
     hash = @converter.convert_topic(cc_doc, meta_doc)
     hash = hash.with_indifferent_access
     #import
-    Importers::DiscussionTopicImporter.import_from_migration(hash, @copy_to)
+    Importers::DiscussionTopicImporter.import_from_migration(hash, @copy_to, @migration)
 
     dt_2 = @copy_to.discussion_topics.where(migration_id: migration_id).first
     expect(dt_2.title).to eq dt.title
@@ -851,7 +889,7 @@ XML
     ag1.migration_id = CC::CCHelper.create_key(assignment.assignment_group)
     ag1.save!
     #import
-    Importers::DiscussionTopicImporter.import_from_migration(hash, @copy_to)
+    Importers::DiscussionTopicImporter.import_from_migration(hash, @copy_to, @migration)
 
     dt_2 = @copy_to.discussion_topics.where(migration_id: migration_id).first
     expect(dt_2.title).to eq dt.title
@@ -961,7 +999,7 @@ XML
     ag.migration_id = "i713e960ab2685259505efeb08cd48a1d"
     ag.save!
 
-    Importers::QuizImporter.import_from_migration(quiz_hash, @copy_to, nil, {})
+    Importers::QuizImporter.import_from_migration(quiz_hash, @copy_to, @migration, {})
     q = @copy_to.quizzes.where(migration_id: "ie3d8f8adfad423eb225229c539cdc450").first
     a = q.assignment
     expect(a.assignment_group.id).to eq ag.id
@@ -1282,6 +1320,57 @@ XML
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/quizzes/#{quiz.id}"
     end
 
+    it "should add warnings for quiz questions" do
+      data = {
+        "assessments" => {
+          "assessments" => [{
+            "questions" => [{
+              "answers" => [],
+              "correct_comments" => "",
+              "incorrect_comments" => "",
+              "question_text" => "<a href='/badlink/toabadplace'>mwhahaha</a>",
+              "question_name" => "Question",
+              "migration_id" => "i340ed54b48e0de110bda151e00a3bbfd",
+              "question_type" => "essay_question"
+            }],
+            "quiz_type" => "assignment",
+            "question_count" => 1,
+            "title" => "Week 1 - Activity 4 Quiz",
+            "quiz_name" => "Week 1 - Activity 4 Quiz",
+            "migration_id" => "i18b97d4d9de02036d8b8861645c5f8ec",
+            "allowed_attempts" => -1,
+            "description" => "description",
+            "scoring_policy" => "keep_highest",
+            "assignment_group_migration_id" => "ia517adfdd9051a85ec5cfb1c57b9b853",
+            "points_possible" => 1,
+            "lock_at" => 1360825140000,
+            "unlock_at" => 1359615600000,
+            "due_at" => 1360220340000,
+            "anonymous_submissions" => false,
+            "show_correct_answers" => false,
+            "require_lockdown_browser" => false,
+            "require_lockdown_browser_for_results" => false,
+            "shuffle_answers" => false,
+            "available" => true,
+            "cant_go_back" => false,
+            "one_question_at_a_time" => false
+          }]
+        }
+      }.with_indifferent_access
+
+      migration = ContentMigration.create(:context => @copy_to)
+      migration.migration_settings[:migration_ids_to_import] = {:copy => {"all_quizzes" => 1}}
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+
+      quiz = @copy_to.quizzes.first
+
+      expect(migration.migration_issues.count).to eq 1
+      warning = migration.migration_issues.first
+      expect(warning.issue_type).to eq "warning"
+      expect(warning.description.start_with?("Missing links found in imported content")).to eq true
+      expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/quizzes/#{quiz.id}/edit"
+    end
+
     it "should add warnings for wiki pages" do
       data = {
         "wikis" => [{
@@ -1313,8 +1402,7 @@ end
 describe "cc assignment extensions" do
   before(:all) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_assignment_extension.zip")
-    unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
-    @export_folder = File.join(File.dirname(archive_file_path), "cc_cc_assignment_extension")
+    unzipped_file_path = create_temp_dir!
     @converter = CC::Importer::Canvas::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
     @converter.export
     @course_data = @converter.course.with_indifferent_access
@@ -1329,10 +1417,6 @@ describe "cc assignment extensions" do
   end
 
   after(:all) do
-    @converter.delete_unzipped_archive
-    if File.exist?(@export_folder)
-      FileUtils::rm_rf(@export_folder)
-    end
     truncate_all_tables
   end
 
@@ -1367,8 +1451,7 @@ describe "matching question reordering" do
   before(:all) do
     skip unless Qti.qti_enabled?
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/canvas_matching_reorder.zip")
-    unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
-    @export_folder = File.join(File.dirname(archive_file_path), "cc_canvas_matching_reorder")
+    unzipped_file_path = create_temp_dir!
     @converter = CC::Importer::Canvas::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
     @converter.export
     @course_data = @converter.course.with_indifferent_access
@@ -1383,10 +1466,6 @@ describe "matching question reordering" do
   end
 
   after(:all) do
-    @converter.delete_unzipped_archive
-    if File.exist?(@export_folder)
-      FileUtils::rm_rf(@export_folder)
-    end
     truncate_all_tables
   end
 

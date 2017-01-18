@@ -9,7 +9,7 @@
       {{#t}}Due Date:{{/t}}
       {{datepickerScreenreaderPrompt}}
     </label>
-    <input value="{{datetimeFormatted due_at false}}" name="due_at" type="text"
+    <input value="{{datetimeFormatted due_at}}" name="due_at" type="text"
     class="input-small date_field" aria-labelledby="overrides_due_date_accessible_label_{{uniqid}}"
     data-tooltip title="{{accessibleDateFormat}}">
   </div>
@@ -19,7 +19,7 @@
       {{#t}}Available From Date:{{/t}}
       {{datepickerScreenreaderPrompt}}
     </label>
-    <input name="unlock_at" value="{{datetimeFormatted unlock_at false}}" type="text"
+    <input name="unlock_at" value="{{datetimeFormatted unlock_at}}" type="text"
     class="date_field" aria-labelledby="overrides_unlock_at_accessible_label_{{uniqid}}"
     data-tooltip title="{{accessibleDateFormat}}">
   </div>
@@ -29,7 +29,7 @@
       {{#t}}Available Until Date:{{/t}}
       {{datepickerScreenreaderPrompt}}
     </span>
-    <input name="lock_at" value="{{datetimeFormatted lock_at false}}" type="text"
+    <input name="lock_at" value="{{datetimeFormatted lock_at}}" type="text"
     class="date_field" aria-labelledby="overrides_lock_at_accessible_label_{{uniqid}}"
     data-tooltip title="{{accessibleDateFormat}}">
   </div>

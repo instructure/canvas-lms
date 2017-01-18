@@ -17,14 +17,22 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-
 module Lti
   describe VariableExpander do
     let(:root_account) { Account.new }
     let(:account) { Account.new(root_account: root_account) }
     let(:course) { Course.new(account: account) }
+    let(:group_category) { course.group_categories.new(name: 'Category') }
+    let(:group) { course.groups.new(name: 'Group', group_category: group_category) }
     let(:user) { User.new }
     let(:assignment) { Assignment.new }
+    let(:collaboration) do
+      ExternalToolCollaboration.new(
+        title: "my collab",
+        user: user,
+        url: 'http://www.example.com'
+      )
+    end
     let(:substitution_helper) { stub_everything }
     let(:right_now) { DateTime.now }
     let(:tool) do
@@ -39,12 +47,19 @@ module Lti
     end
     let(:controller) do
       request_mock = mock('request')
+      request_mock.stubs(:url).returns('https://localhost')
       request_mock.stubs(:host).returns('/my/url')
       request_mock.stubs(:scheme).returns('https')
       m = mock('controller')
+      m.stubs(:css_url_for).with(:common).returns('/path/to/common.scss')
       m.stubs(:request).returns(request_mock)
       m.stubs(:logged_in_user).returns(user)
       m.stubs(:named_context_url).returns('url')
+      m.stubs(:polymorphic_url).returns('url')
+      view_context_mock = mock('view_context')
+      view_context_mock.stubs(:stylesheet_path)
+                       .returns(URI.parse(request_mock.url).merge(m.css_url_for(:common)).to_s)
+      m.stubs(:view_context).returns(view_context_mock)
       m
     end
 
@@ -58,11 +73,11 @@ module Lti
 
     it 'registers expansions' do
       before_count = described_class.expansions.count
-      described_class.register_expansion('test_expan', ['a'], -> { @context })
+      described_class.register_expansion('abc123', ['a'], -> { @context })
       expansions = described_class.expansions
       expect(expansions.count - before_count).to eq 1
-      test_expan = expansions[:"$test_expan"]
-      expect(test_expan.name).to eq 'test_expan'
+      test_expan = expansions[:"$abc123"]
+      expect(test_expan.name).to eq 'abc123'
       expect(test_expan.permission_groups).to eq ['a']
     end
 
@@ -73,13 +88,49 @@ module Lti
       expect(expanded[:some_name]).to eq account
     end
 
-    it 'handles lti1 expansion' do
-      described_class.register_expansion('test_expan', ['a'], -> { @context })
-      expanded = subject.expand_variables!({'some_name' => '$test_expan'})
+    it 'expands substring variables' do
+      account.stubs(:id).returns(42)
+      described_class.register_expansion('test_expan', ['a'], -> { @context.id })
+      expanded = subject.expand_variables!({some_name: 'my variable is buried in here ${test_expan} can you find it?'})
       expect(expanded.count).to eq 1
-      expect(expanded['some_name']).to eq account
+      expect(expanded[:some_name]).to eq "my variable is buried in here 42 can you find it?"
     end
 
+    it 'handles multiple substring variables' do
+      account.stubs(:id).returns(42)
+      described_class.register_expansion('test_expan', ['a'], -> { @context.id })
+      described_class.register_expansion('variable1', ['a'], -> { 1 })
+      described_class.register_expansion('other_variable', ['a'], -> { 2 })
+      expanded = subject.expand_variables!(
+        {some_name: 'my variables ${variable1} is buried ${other_variable} in here ${test_expan} can you find them?'}
+      )
+      expect(expanded[:some_name]).to eq "my variables 1 is buried 2 in here 42 can you find them?"
+    end
+
+    it 'does not expand a substring variable if it is not valid' do
+      account.stubs(:id).returns(42)
+      described_class.register_expansion('test_expan', ['a'], -> { @context.id })
+      expanded = subject.expand_variables!({some_name: 'my variable is buried in here ${tests_expan} can you find it?'})
+      expect(expanded.count).to eq 1
+      expect(expanded[:some_name]).to eq "my variable is buried in here ${tests_expan} can you find it?"
+    end
+
+    context 'lti1' do
+      it 'handles expansion' do
+        described_class.register_expansion('test_expan', ['a'], -> { @context })
+        expanded = subject.expand_variables!({'some_name' => '$test_expan'})
+        expect(expanded.count).to eq 1
+        expect(expanded['some_name']).to eq account
+      end
+
+      it 'expands substring variables' do
+        account.stubs(:id).returns(42)
+        described_class.register_expansion('test_expan', ['a'], -> { @context.id })
+        expanded = subject.expand_variables!({'some_name' => 'my variable is buried in here ${test_expan} can you find it?'})
+        expect(expanded.count).to eq 1
+        expect(expanded['some_name']).to eq "my variable is buried in here 42 can you find it?"
+      end
+    end
     describe "#variable expansions" do
 
       it 'has substitution for $Canvas.api.domain' do
@@ -87,6 +138,12 @@ module Lti
         HostUrl.stubs(:context_host).returns('localhost')
         subject.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq 'localhost'
+      end
+
+      it 'has substitution for $Canvas.css.common' do
+        exp_hash = {test: '$Canvas.css.common'}
+        subject.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq 'https://localhost/path/to/common.scss'
       end
 
       it 'has substitution for $Canvas.api.baseUrl' do
@@ -145,8 +202,41 @@ module Lti
         expect(exp_hash[:test]).to eq 'cd45'
       end
 
+      it 'has substitution for $Canvas.root_account.global_id' do
+        root_account.stubs(:global_id).returns(10054321)
+        exp_hash = {test: '$Canvas.root_account.global_id'}
+        subject.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq 10054321
+      end
+
+      it 'has substitution for $Canvas.shard.id' do
+        exp_hash = {test: '$Canvas.shard.id'}
+        subject.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq Shard.current.id
+      end
+
+      context 'context is a group' do
+        subject { described_class.new(root_account, group, controller, current_user: user) }
+
+        it 'has substitution for $ToolProxyBinding.memberships.url when context is a group' do
+          exp_hash = { test: '$ToolProxyBinding.memberships.url' }
+          group.stubs(:id).returns('1')
+          controller.stubs(:polymorphic_url).returns("/api/lti/groups/#{group.id}/membership_service")
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "/api/lti/groups/1/membership_service"
+        end
+      end
+
       context 'context is a course' do
         subject { described_class.new(root_account, course, controller, current_user: user) }
+
+        it 'has substitution for $ToolProxyBinding.memberships.url when context is a course' do
+          exp_hash = { test: '$ToolProxyBinding.memberships.url' }
+          course.stubs(:id).returns('1')
+          controller.stubs(:polymorphic_url).returns("/api/lti/courses/#{course.id}/membership_service")
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "/api/lti/courses/1/membership_service"
+        end
 
         it 'has substitution for $Canvas.course.id' do
           course.stubs(:id).returns(123)
@@ -211,7 +301,7 @@ module Lti
       end
 
       context 'context is a course and there is a user' do
-        subject { described_class.new(root_account, course, controller, current_user: user, tool:tool) }
+        subject { described_class.new(root_account, course, controller, current_user: user, tool: tool) }
 
         it 'has substitution for $Canvas.xapi.url' do
           Lti::XapiService.stubs(:create_token).returns('abcd')
@@ -269,10 +359,47 @@ module Lti
         it 'has substitution for $Canvas.externalTool.url' do
           course.save!
           tool = course.context_external_tools.create!(:domain => 'example.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
-          expander = described_class.new(root_account, course, controller, current_user: user, tool:tool)
+          expander = described_class.new(root_account, course, controller, current_user: user, tool: tool)
           exp_hash = {test: '$Canvas.externalTool.url'}
           expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq "url"
+        end
+
+        it 'returns the opaque identifiers for the active groups the user is a part of' do
+          course.save!
+          user.save!
+
+          g1 = course.groups.new
+          g2 = course.groups.new
+
+          user.groups << g1
+          user.groups << g2
+
+          g1.save!
+          g2.save!
+
+          exp_hash = { test: '$Canvas.group.contextIds' }
+          subject.expand_variables!(exp_hash)
+
+          g1.reload
+          g2.reload
+
+          ids = exp_hash[:test].split(',')
+          expect(ids.size).to eq 2
+          expect(ids.include?(g1.lti_context_id)).to be true
+          expect(ids.include?(g2.lti_context_id)).to be true
+        end
+      end
+
+      context 'context is a course with an assignment' do
+        subject { described_class.new(root_account, course, controller, collaboration: collaboration) }
+
+        it 'has substitution for $Canvas.api.collaborationMembers.url' do
+          collaboration.stubs(:id).returns(1)
+          controller.stubs(:api_v1_collaboration_members_url).returns('https://www.example.com/api/v1/collaborations/1/members')
+          exp_hash = {test: '$Canvas.api.collaborationMembers.url'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'https://www.example.com/api/v1/collaborations/1/members'
         end
       end
 
@@ -293,11 +420,27 @@ module Lti
           expect(exp_hash[:test]).to eq 'Buy as many ducks as you can'
         end
 
-        it 'has substitution for $Canvas.assignment.pointsPossible' do
-          assignment.stubs(:points_possible).returns(10)
-          exp_hash = {test: '$Canvas.assignment.pointsPossible'}
-          subject.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq 10
+        describe "$Canvas.assignment.pointsPossible" do
+          it 'has substitution for $Canvas.assignment.pointsPossible' do
+            assignment.stubs(:points_possible).returns(10.0)
+            exp_hash = {test: '$Canvas.assignment.pointsPossible'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq 10
+          end
+
+          it 'does not round if not whole' do
+            assignment.stubs(:points_possible).returns(9.5)
+            exp_hash = {test: '$Canvas.assignment.pointsPossible'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test].to_s).to eq "9.5"
+          end
+
+          it 'rounds if whole' do
+            assignment.stubs(:points_possible).returns(9.0)
+            exp_hash = {test: '$Canvas.assignment.pointsPossible'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test].to_s).to eq "9"
+          end
         end
 
         it 'has substitution for $Canvas.assignment.unlockAt' do
@@ -320,6 +463,59 @@ module Lti
           subject.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq right_now.to_s
         end
+
+        it 'has substitution for $Canvas.assignment.published' do
+          assignment.stubs(:workflow_state).returns('published')
+          exp_hash = {test: '$Canvas.assignment.published'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq true
+        end
+
+        context 'iso8601' do
+          it 'has substitution for $Canvas.assignment.unlockAt.iso8601' do
+            assignment.stubs(:unlock_at).returns(right_now)
+            exp_hash = {test: '$Canvas.assignment.unlockAt.iso8601'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq right_now.utc.iso8601.to_s
+          end
+
+          it 'has substitution for $Canvas.assignment.lockAt.iso8601' do
+            assignment.stubs(:lock_at).returns(right_now)
+            exp_hash = {test: '$Canvas.assignment.lockAt.iso8601'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq right_now.utc.iso8601.to_s
+          end
+
+          it 'has substitution for $Canvas.assignment.dueAt.iso8601' do
+            assignment.stubs(:due_at).returns(right_now)
+            exp_hash = {test: '$Canvas.assignment.dueAt.iso8601'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq right_now.utc.iso8601.to_s
+          end
+
+          it 'handles a nil unlock_at' do
+            assignment.stubs(:unlock_at).returns(nil)
+            exp_hash = {test: '$Canvas.assignment.unlockAt.iso8601'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq "$Canvas.assignment.unlockAt.iso8601"
+          end
+
+          it 'handles a nil lock_at' do
+            assignment.stubs(:lock_at).returns(nil)
+            exp_hash = {test: '$Canvas.assignment.lockAt.iso8601'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq "$Canvas.assignment.lockAt.iso8601"
+          end
+
+          it 'handles a nil due_at' do
+            assignment.stubs(:lock_at).returns(nil)
+            exp_hash = {test: '$Canvas.assignment.dueAt.iso8601'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq "$Canvas.assignment.dueAt.iso8601"
+          end
+
+        end
+
 
       end
 
@@ -347,6 +543,7 @@ module Lti
         end
 
         it 'has substitution for $Person.email.primary' do
+          user.save
           user.email = 'someone@somewhere'
           exp_hash = {test: '$Person.email.primary'}
           subject.expand_variables!(exp_hash)
@@ -381,6 +578,13 @@ module Lti
           expect(exp_hash[:test]).to eq 'Admin,User'
         end
 
+        it 'has substitution for $Canvas.user.globalId' do
+          user.stubs(:global_id).returns(456)
+          exp_hash = {test: '$Canvas.user.globalId'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 456
+        end
+
         it 'has substitution for $Membership.role' do
           substitution_helper.stubs(:all_roles).with('lis2').returns('Admin,User')
           Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
@@ -411,7 +615,6 @@ module Lti
             expect(exp_hash[:test]).to eq 'false'
           end
         end
-
 
         context 'pseudonym' do
           let(:pseudonym) { Pseudonym.new }
@@ -576,8 +779,9 @@ module Lti
         end
 
         it 'has substitution for ToolConsumerProfile.url' do
+          expander = described_class.new(root_account, account, controller, current_user: user, tool: ToolProxy.new)
           exp_hash = {test: '$ToolConsumerProfile.url'}
-          subject.expand_variables!(exp_hash)
+          expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'url'
         end
       end

@@ -81,7 +81,6 @@ define [
       ret
 
     loginErrors: (errors) ->
-      errors = errors.base
       error = errors[errors.length - 1]
       {'pseudonym[password]': error}
 

@@ -5,11 +5,6 @@ require 'canvas_partman/concerns/partitioned'
 
 module CanvasPartman
   class << self
-    # @property [String, "db/migrate"] migrations_paths
-    #   Path (relative to Rails root) to where the partition migrations should be
-    #   looked up.
-    attr_accessor :migrations_path
-
     # @property [String, "partitions"] migrations_scope
     #   The filename "scope" that identifies partition migrations. This is a key
     #   that is separated from the name of the migration file and the "rb"
@@ -19,6 +14,5 @@ module CanvasPartman
     attr_accessor :migrations_scope
   end
 
-  self.migrations_path = 'db/migrate'
   self.migrations_scope = 'partitions'
 end

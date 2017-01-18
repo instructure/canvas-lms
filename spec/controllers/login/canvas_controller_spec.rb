@@ -17,6 +17,7 @@
 #
 
 require_relative '../../sharding_spec_helper'
+require 'rotp'
 
 describe Login::CanvasController do
   before :once do
@@ -58,6 +59,20 @@ describe Login::CanvasController do
 
   end
 
+  it "should show sso buttons on load" do
+    aac = Account.default.authentication_providers.create!(auth_type: 'facebook')
+    Canvas::Plugin.find(:facebook).stubs(:settings).returns({})
+    get 'new'
+    expect(assigns[:aacs_with_buttons]).to eq [aac]
+  end
+
+  it "should still show sso buttons on login error" do
+    aac = Account.default.authentication_providers.create!(auth_type: 'facebook')
+    Canvas::Plugin.find(:facebook).stubs(:settings).returns({})
+    post 'create'
+    expect(assigns[:aacs_with_buttons]).to eq [aac]
+  end
+
   it "should re-render if no user" do
     post 'create'
     assert_status(400)
@@ -78,6 +93,17 @@ describe Login::CanvasController do
   end
 
   it "password auth should work" do
+    session[:sentinel] = true
+    post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwerty'}
+    expect(response).to be_redirect
+    expect(response).to redirect_to(dashboard_url(:login_success => 1))
+    expect(assigns[:pseudonym_session].record).to eq @pseudonym
+    # session reset
+    expect(session[:sentinel]).to be_nil
+  end
+
+  it "password auth should work for an explicit Canvas pseudonym" do
+    @pseudonym.update_attribute(:authentication_provider, Account.default.canvas_authentication_provider)
     post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwerty'}
     expect(response).to be_redirect
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
@@ -93,9 +119,11 @@ describe Login::CanvasController do
 
   it "should re-render if authenticity token is invalid and referer is not trusted" do
     controller.expects(:verify_authenticity_token).raises(ActionController::InvalidAuthenticityToken)
+    session[:sentinel] = true
     post 'create', :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwerty' },
          :authenticity_token => '42'
     assert_status(400)
+    expect(session[:sentinel]).to eq true
     expect(response).to render_template(:new)
     expect(flash[:error]).to match(/invalid authenticity token/i)
   end
@@ -121,11 +149,11 @@ describe Login::CanvasController do
     it "should log in a user with a identifier_format" do
       user_with_pseudonym(:username => '12345', :active_all => 1)
       @pseudonym.update_attribute(:sis_user_id, '12345')
-      aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      aac = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).once.
           with('username', 'password').
           returns([{ 'uid' => ['12345'] }])
-      Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).never
       post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
       expect(response).to be_redirect
@@ -133,13 +161,48 @@ describe Login::CanvasController do
       expect(assigns[:pseudonym_session].record).to eq @pseudonym
     end
 
+    it "works for a pseudonym explicitly linked to LDAP" do
+      user_with_pseudonym(:username => '12345', :active_all => 1)
+      aac = Account.default.authentication_providers.create!(auth_type: 'ldap')
+      @pseudonym.any_instantiation.expects(:valid_arbitrary_credentials?).returns(true)
+      @pseudonym.update_attribute(:authentication_provider, aac)
+      post 'create', :pseudonym_session => { :unique_id => '12345', :password => 'password'}
+      expect(response).to be_redirect
+      expect(response).to redirect_to(dashboard_url(:login_success => 1))
+      expect(assigns[:pseudonym_session].record).to eq @pseudonym
+    end
+
     it "should only query the LDAP server once, even with a differing identifier_format but a matching pseudonym" do
       user_with_pseudonym(:username => 'username', :active_all => 1)
-      aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      aac = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).once.with('username', 'password').returns(nil)
       post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
       assert_status(400)
       expect(response).to render_template(:new)
+    end
+
+    it "doesn't query the server at all if the enabled features don't require it, and there is no matching login" do
+      ap = Account.default.authentication_providers.create!(auth_type: 'ldap')
+      ap.any_instantiation.expects(:ldap_bind_result).never
+      post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      assert_status(400)
+      expect(response).to render_template(:new)
+    end
+
+    it "provisions automatically when enabled" do
+      ap = Account.default.authentication_providers.create!(auth_type: 'ldap', jit_provisioning: true)
+      ap.any_instantiation.expects(:ldap_bind_result).once.
+          with('username', 'password').
+          returns([{ 'uid' => ['12345'] }])
+      unique_id = 'username'
+      expect(Account.default.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
+
+      post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      expect(response).to be_redirect
+      expect(response).to redirect_to(dashboard_url(:login_success => 1))
+
+      p = Account.default.pseudonyms.active.by_unique_id(unique_id).first!
+      expect(p.authentication_provider).to eq ap
     end
   end
 

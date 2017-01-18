@@ -25,7 +25,6 @@ define [
   # http://emberjs.com/api/classes/Ember.ArrayController.html
   # http://emberjs.com/api/classes/Ember.ObjectController.html
 
-
   studentsUniqByEnrollments = (args...)->
     hiddenNameCounter = 1
     options =
@@ -74,16 +73,6 @@ define [
         $('#gradebook-export').prop('disabled', true)
         $('#last-exported-gradebook').hide()
         @pollGradebookCsvProgress(attachmentProgress)
-    ).on('init')
-
-    errors: (->
-      # this is a sad, sad hack
-      # until we can get flash notifications working app-wide for screenreaders
-      if Ember.$('#flash_message_holder li').size() > 0
-        close = Ember.$('#flash_message_holder li a').text().trim()
-        message = Ember.$('#flash_message_holder li').text().replace(close,'').trim()
-        node = Ember.$("<span role='alert'>#{htmlEscape(message)}</span>")
-        Ember.$(node).appendTo(Ember.$('#flash_screenreader_holder'))
     ).on('init')
 
     contextUrl: contextUrl
@@ -156,9 +145,12 @@ define [
     ).property()
 
     showDownloadSubmissionsButton: (->
-      @get('selectedAssignment.has_submitted_submissions') and
-      _.intersection(@get('selectedAssignment.submission_types'), ['online_upload','online_text_entry','online_url', 'online_quiz']) != [] and
-      !@get('selectedAssignment.hide_download_submissions_button')
+      hasSubmittedSubmissions     = @get('selectedAssignment.has_submitted_submissions')
+      whitelist                   = ['online_upload','online_text_entry', 'online_url']
+      submissionTypes             = @get('selectedAssignment.submission_types')
+      submissionTypesOnWhitelist  = _.intersection(submissionTypes, whitelist)
+
+      hasSubmittedSubmissions and submissionTypesOnWhitelist != []
     ).property('selectedAssignment')
 
     hideStudentNames: false
@@ -301,7 +293,7 @@ define [
             set(submissionData.submission, 'drop', submissionData.drop)
         result = result[finalOrCurrent]
 
-        percent = round (result.score / result.possible * 100), 1
+        percent = round (result.score / result.possible * 100), 2
         percent = 0 if isNaN(percent)
         setProperties student,
           total_grade: result
@@ -351,8 +343,12 @@ define [
           student
 
         return unless notYetLoaded.length
-        student_ids = notYetLoaded.mapBy('id')
-        fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, records: @get('submissions'), data: student_ids: student_ids)
+        studentIds = notYetLoaded.mapBy('id')
+
+        while (studentIds.length)
+          chunk = studentIds.splice(0, ENV.GRADEBOOK_OPTIONS.chunk_size || 20)
+          fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, records: @get('submissions'), data: student_ids: chunk)
+
     ).observes('students.@each', 'selectedGradingPeriod').on('init')
 
     showNotesColumn: (->
@@ -369,10 +365,10 @@ define [
 
     notesURL: (->
       if @get('shouldCreateNotes')
-        ENV.GRADEBOOK_OPTIONS.custom_columns_url
+        window.ENV.GRADEBOOK_OPTIONS.custom_columns_url
       else
         notesID = @get('teacherNotes')?.id
-        ENV.GRADEBOOK_OPTIONS.custom_column_url.replace(/:id/, notesID)
+        window.ENV.GRADEBOOK_OPTIONS.custom_column_url.replace(/:id/, notesID)
     ).property('shouldCreateNotes', 'custom_columns.@each')
 
     notesParams: (->
@@ -686,6 +682,7 @@ define [
           user_id: student.id
           assignment_id: assignment.id
           hidden: !@differentiatedAssignmentVisibleToStudent(assignment, student.id)
+          grade_matches_current_submission: true
         }
     ).property('selectedStudent', 'selectedAssignment')
 
@@ -801,10 +798,11 @@ define [
     ).property('hideStudentNames')
 
     fetchCorrectEnrollments: (->
+      return if (@get('enrollments.isLoading'))
       if @get('showConcludedEnrollments')
-        url = ENV.GRADEBOOK_OPTIONS.students_url_with_concluded_enrollments
+        url = ENV.GRADEBOOK_OPTIONS.enrollments_with_concluded_url
       else
-        url = ENV.GRADEBOOK_OPTIONS.students_url
+        url = ENV.GRADEBOOK_OPTIONS.enrollments_url
 
       enrollments = @get('enrollments')
       enrollments.clear()

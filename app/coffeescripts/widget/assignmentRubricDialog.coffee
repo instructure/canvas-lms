@@ -35,9 +35,6 @@ define [
         close: => @$focusReturnsTo.focus()
 
       $.get @url, (html) ->
-        # weird hackery because the server returns a <div id="rubrics" style="display:none">
-        # as it's root node, so we need to show it before we inject it
-        assignmentRubricDialog.$dialog.html $(html).show()
 
         # if there is not already a rubric, we want to click the "add rubric" button for them,
         # since that is the point of why they clicked the link.
@@ -45,7 +42,10 @@ define [
           $.subscribe 'edit_rubric/initted', ->
             assignmentRubricDialog.$dialog.find('.btn.add_rubric_link').click()
 
+        # weird hackery because the server returns a <div id="rubrics" style="display:none">
+        # as it's root node, so we need to show it before we inject it
+        assignmentRubricDialog.$dialog.html $(html).show()
+
     openDialog: ->
       @initDialog() unless @dialogInited
       @$dialog.dialog 'open'
-

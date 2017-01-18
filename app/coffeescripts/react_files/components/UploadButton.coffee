@@ -1,19 +1,14 @@
 define [
   'i18n!upload_button'
   'react'
-  'compiled/react/shared/utils/withReactElement'
   'underscore'
-  './FileRenameForm'
   '../modules/customPropTypes'
-  './ZipFileOptionsForm'
   '../modules/FileOptionsCollection'
-], (I18n, React, withReactElement, _, FileRenameFormComponent, customPropTypes, ZipFileOptionsFormComponent, FileOptionsCollection) ->
+], (I18n, React, _, customPropTypes, FileOptionsCollection) ->
 
   resolvedUserAction = false
-  FileRenameForm = React.createFactory FileRenameFormComponent
-  ZipFileOptionsForm = React.createFactory ZipFileOptionsFormComponent
 
-  UploadButton = React.createClass
+  UploadButton =
     displayName: 'UploadButton'
 
     propTypes:
@@ -72,36 +67,3 @@ define [
 
     setStateFromOptions: ->
       @setState(FileOptionsCollection.getState())
-
-    buildPotentialModal: ->
-      if @state.zipOptions.length
-        ZipFileOptionsForm
-          fileOptions: @state.zipOptions[0]
-          onZipOptionsResolved: @onZipOptionsResolved
-          onClose: @onClose
-      else if @state.nameCollisions.length
-        FileRenameForm
-          fileOptions: @state.nameCollisions[0]
-          onNameConflictResolved: @onNameConflictResolved
-          onClose: @onClose
-
-
-    render: withReactElement ->
-      span {},
-        form
-          ref: 'form'
-          className: 'hidden',
-          input
-            type:'file'
-            ref:'addFileInput'
-            onChange: @handleFilesInputChange
-            multiple: true
-        button
-          type: 'button'
-          className:'btn btn-primary btn-upload'
-          'aria-label': I18n.t('upload', 'Upload')
-          onClick: @handleAddFilesClick,
-            i className: 'icon-upload'
-            span className: ('hidden-phone' if @props.showingButtons),
-              I18n.t('upload', 'Upload')
-        @buildPotentialModal()

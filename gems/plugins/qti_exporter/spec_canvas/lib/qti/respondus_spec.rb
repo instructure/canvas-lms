@@ -7,7 +7,7 @@ describe "Converting respondus QTI" do
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq RespondusExpected::MULTIPLE_CHOICE
   end
-  
+
   it "should find correct answer for multiple choice with zero point weights" do
     hash = get_question_hash(RESPONDUS_FIXTURE_DIR, 'zero_point_mc', false, :flavor => Qti::Flavors::RESPONDUS)
     expect(hash[:import_error]).to eq nil
@@ -169,7 +169,7 @@ module RespondusExpected
                                    :text=>"Streamline",
                                    :weight=>0}],
                   :incorrect_comments=>"",
-                  :points_possible=>1,
+                  :points_possible=>100,
                   :neutral_comments=>
                           "\"Alabaster\" and \"architecture\" both start with an \"A\".",
                   :question_type=>"multiple_answers_question",
@@ -197,7 +197,7 @@ module RespondusExpected
                                    :text=>"sugar",
                                    :weight=>0}],
                   :incorrect_comments=>"",
-                  :points_possible=>1,
+                  :points_possible=>100,
                   :neutral_comments=>
                           "the words \"fox\" and \"clocks\" rhyme with \"box\". I know, that was a tricky one because \"clocks\" doesn't end in \"ox\" like \"box\" and \"fox\" do.",
                   :question_type=>"multiple_answers_question",

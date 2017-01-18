@@ -7,6 +7,6 @@ class PopulateConversationRootAccountIds < ActiveRecord::Migration
   end
 
   def self.down
-    execute "UPDATE conversations SET root_account_ids = NULL"
+    Conversation.update_all(root_account_ids: nil)
   end
 end

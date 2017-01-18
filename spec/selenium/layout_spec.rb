@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "layout" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before (:each) do
     course_with_student_logged_in
@@ -10,6 +10,7 @@ describe "layout" do
   end
 
   it "should auto-scroll the sidebar when $.scrollSidebar is called" do
+    skip if Account.default.feature_enabled?(:use_new_styles)
     exec_cs  <<-CS
       $("#content").height(10000)
       $("#right-side").height(5000)

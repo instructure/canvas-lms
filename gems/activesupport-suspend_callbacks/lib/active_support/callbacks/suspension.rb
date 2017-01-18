@@ -72,9 +72,10 @@ module ActiveSupport::Callbacks
     #   end
     #
     def suspended_callback?(callback, kind, type=nil)
-      suspended_callbacks.include?(callback, kind, type) ||
+      instance_variable_defined?(:@suspended_callbacks) &&
+        suspended_callbacks.include?(callback, kind, type) ||
       suspended_callback_ancestor &&
-      suspended_callback_ancestor.suspended_callback?(callback, kind, type)
+        suspended_callback_ancestor.suspended_callback?(callback, kind, type)
     end
 
     def suspended_callback_ancestor
@@ -93,34 +94,45 @@ module ActiveSupport::Callbacks
       protected
       # as ActiveSupport::Callbacks#run_callbacks, but with the step filtering on
       # suspended_callback? added
-      if ActiveSupport::VERSION::STRING < '3'
-        # [ActiveSupport 2.3]
-        def run_callbacks(kind, options={}, &block)
-          cbs = self.class.send("#{kind}_callback_chain").dup
-          cbs.delete_if{ |cb| suspended_callback?(cb.method, kind) }
-          cbs.run(self, options, &block)
-        end
-      elsif ActiveSupport::VERSION::STRING < '4'
+      if ActiveSupport::VERSION::STRING < '4'
         # [ActiveSupport 3]
         def run_callbacks(kind, key=nil)
-          cbs = send("_#{kind}_callbacks").dup
-          cbs.delete_if{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
-          runner = cbs.compile(key, self)
-          # provided block (if any) is executed by yields statements in the
-          # compiled runner
-          instance_eval(runner)
+          cbs = send("_#{kind}_callbacks")
+          if cbs.empty?
+            yield if block_given?
+          else
+            if cbs.detect{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
+              cbs = cbs.dup
+              cbs.delete_if{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
+              runner = cbs.compile(key, self)
+              # provided block (if any) is executed by yields statements in the
+              # compiled runner
+              instance_eval(runner, __FILE__)
+            else
+              super
+            end
+          end
         end
       elsif ActiveSupport::VERSION::STRING < '4.1'
         # [ActiveSupport 4.0]
         def run_callbacks(kind)
-          cbs = send("_#{kind}_callbacks").dup
-          cbs.delete_if{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
-          runner = cbs.compile
-          # provided block (if any) is executed by yields statements in the
-          # compiled runner
-          instance_eval(runner)
+          cbs = send("_#{kind}_callbacks")
+          if cbs.empty?
+            yield if block_given?
+          else
+            if cbs.detect{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
+              cbs = cbs.dup
+              cbs.delete_if{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
+              runner = cbs.compile
+              # provided block (if any) is executed by yields statements in the
+              # compiled runner
+              instance_eval(runner, __FILE__)
+            else
+              super
+            end
+          end
         end
-      else
+      elsif ActiveSupport::VERSION::STRING < '4.2'
         # [ActiveSupport 4.1]
         def run_callbacks(kind, &block)
           cbs = send("_#{kind}_callbacks").dup
@@ -129,6 +141,22 @@ module ActiveSupport::Callbacks
           filtered = cbs.dup
           filtered.clear
           cbs.each{ |cb| filtered.insert(-1, cb) unless suspended_callback?(cb.filter, kind, cb.kind) }
+
+          if filtered.empty?
+            yield if block_given?
+          else
+            runner = filtered.compile
+            e = Filters::Environment.new(self, false, nil, block)
+            runner.call(e).value
+          end
+        end
+      else
+        # [ActiveSupport 4.2]
+        def __run_callbacks__(cbs, &block)
+          # emulate cbs.delete_if{ ... } since CallbackChain doesn't proxy it
+          filtered = cbs.dup
+          filtered.clear
+          cbs.each{ |cb| filtered.insert(-1, cb) unless suspended_callback?(cb.filter, cbs.name, cb.kind) }
 
           if filtered.empty?
             yield if block_given?

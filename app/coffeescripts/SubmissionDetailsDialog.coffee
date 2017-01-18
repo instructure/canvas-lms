@@ -2,6 +2,7 @@ define [
   'i18n!submission_details_dialog'
   'jquery'
   'jst/SubmissionDetailsDialog'
+  'compiled/gradebook2/GradebookHelpers'
   'compiled/gradebook2/Turnitin'
   'jst/_submission_detail' # a partial needed by the SubmissionDetailsDialog template
   'jst/_turnitinScore' # a partial needed by the submission_detail partial
@@ -12,7 +13,7 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.scrollTo'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $, submissionDetailsDialog, {extractDataFor}) ->
+], (I18n, $, submissionDetailsDialog, GradebookHelpers, {extractDataFor}) ->
 
   class SubmissionDetailsDialog
     constructor: (@assignment, @student, @options) ->
@@ -20,6 +21,10 @@ define [
         "#{@options.context_url}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22student_id%22%3A#{@student.id}%7D"
       else
         null
+
+      isInPastGradingPeriodAndNotAdmin = ((assignment) ->
+        GradebookHelpers.gradeIsLocked(assignment, ENV)
+      )(@assignment)
 
       @url = @options.change_grade_url.replace(":assignment", @assignment.id).replace(":submission", @student.id)
       @submission = $.extend {}, @student["assignment_#{@assignment.id}"],
@@ -29,8 +34,10 @@ define [
         speedGraderUrl: speedGraderUrl
         loading: true
         showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
+        shouldShowExcusedOption: true
+        isInPastGradingPeriodAndNotAdmin: isInPastGradingPeriodAndNotAdmin
       @submission["assignment_grading_type_is_#{@assignment.grading_type}"] = true
-
+      @submission.grade = "EX" if @submission.excused
       @$el = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
       @$el.html(submissionDetailsDialog(@submission))
 
@@ -44,7 +51,10 @@ define [
           $(this).showIf(index == event.currentTarget.selectedIndex)
       .delegate '.submission_details_grade_form', 'submit', (event) =>
         event.preventDefault()
-        $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', $(event.currentTarget).getFormData(), (data) =>
+        formData = $(event.currentTarget).getFormData()
+        if formData["submission[posted_grade]"].toUpperCase() == "EX"
+          formData = {"submission[excuse]": true}
+        $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', formData, (data) =>
           @update(data)
           $.publish 'submissions_updated', [@submission.all_submissions]
           setTimeout =>
@@ -81,12 +91,10 @@ define [
         submission.turnitin = extractDataFor(submission, "submission_#{submission.id}", @options.context_url)
         for attachment in submission.attachments || []
           attachment.turnitin = extractDataFor(submission, "attachment_#{attachment.id}", @options.context_url)
+      @submission.grade = "EX" if @submission.excused
       @dialog.html(submissionDetailsDialog(@submission))
       @dialog.find('select').trigger('change')
       @scrollCommentsToBottom()
 
-    @cachedDialogs: {}
-
     @open: (assignment, student, options) ->
-      (SubmissionDetailsDialog.cachedDialogs["#{assignment.id}-#{student.id}"] ||= new SubmissionDetailsDialog(assignment, student, options)).open()
-
+      new SubmissionDetailsDialog(assignment, student, options, ENV).open()

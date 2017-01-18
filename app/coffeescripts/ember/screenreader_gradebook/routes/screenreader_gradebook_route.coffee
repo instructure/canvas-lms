@@ -10,7 +10,7 @@ define [
 
     model: ->
       model =
-        enrollments: fetchAllPages(ENV.GRADEBOOK_OPTIONS.students_url)
+        enrollments: fetchAllPages(ENV.GRADEBOOK_OPTIONS.enrollments_url)
         assignment_groups: ArrayProxy.create(content: [])
         submissions: ArrayProxy.create(content: [])
         custom_columns: fetchAllPages(ENV.GRADEBOOK_OPTIONS.custom_columns_url)

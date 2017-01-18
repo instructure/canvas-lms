@@ -17,11 +17,10 @@
 #
 
 class FeatureFlag < ActiveRecord::Base
-  attr_accessible :feature, :state, :locking_account
-  belongs_to :context, polymorphic: true
-  belongs_to :locking_account, class_name: 'Account'
+  attr_accessible :feature, :state
+  belongs_to :context, polymorphic: [:account, :course, :user]
 
-  validate :valid_state, :feature_applies, :locking_account_in_chain
+  validate :valid_state, :feature_applies
   before_save :check_cache
   before_destroy :clear_cache
 
@@ -36,7 +35,8 @@ class FeatureFlag < ActiveRecord::Base
   def unhides_feature?
     return false unless Feature.definitions[feature].hidden?
     return true if context.is_a?(Account) && context.site_admin?
-    Account.find(context.feature_flag_account_ids.last).lookup_feature_flag(feature, true).hidden?
+    parent_setting = Account.find(context.feature_flag_account_ids.last).lookup_feature_flag(feature, true)
+    parent_setting.nil? || parent_setting.hidden?
   end
 
   def enabled?
@@ -47,13 +47,12 @@ class FeatureFlag < ActiveRecord::Base
     state == 'allowed'
   end
 
-  def locked?(query_context, current_user = nil)
-    locking_account.present? && (current_user.blank? || !locking_account.grants_right?(current_user, :manage_feature_flags)) ||
-        !allowed? && (context_id != query_context.id || context_type != query_context.class.name)
+  def locked?(query_context)
+    !allowed? && (context_id != query_context.id || context_type != query_context.class.name)
   end
 
   def clear_cache
-    connection.after_transaction_commit { MultiCache.delete(self.context.feature_flag_cache_key(feature)) } if self.context
+    self.class.connection.after_transaction_commit { MultiCache.delete(self.context.feature_flag_cache_key(feature)) } if self.context
   end
 
 private
@@ -63,18 +62,6 @@ private
 
   def feature_applies
     errors.add(:feature, "is not valid in context") unless Feature.feature_applies_to_object(feature, context)
-  end
-
-  def locking_account_in_chain
-    if locking_account_id.present?
-      account = if context.respond_to?(:parent_account)
-                  context.parent_account || Account.site_admin
-                else
-                  context.account
-                end
-      account_chain_ids = account.account_chain(include_site_admin: true).map(&:id)
-      errors.add(:locking_account_id, "not in account chain") unless account_chain_ids.include?(locking_account_id)
-    end
   end
 
   def check_cache

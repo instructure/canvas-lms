@@ -66,6 +66,15 @@ define [
     filter: (model, term) =>
       _.all(@activeFilters(), (filter) -> filter.fn.call(model, model, term))
 
+    screenreaderSearchResultCount: _.debounce ->
+      text = ''
+      if @activeFilters().length > 0
+        text = I18n.t({one: 'One result', other: '%{count} results'}, {count: @resultCount})
+      else
+        text = I18n.t('Showing all discussions')
+      @$('#searchResultCount').text(text)
+    , 1000
+
     filterResults: (e) =>
       if e.target.type is 'checkbox'
         @filters[e.target.id].active = $(e.target).prop('checked')
@@ -73,14 +82,20 @@ define [
       else
         @filters[e.target.id].active = $(e.target).val().length > 0
         term = $(e.target).val()
-        @resultsUpdatedAccessibleAlert()
 
+      resultCount = 0
       _.each @collections(), (collection) =>
         collection.each (model) =>
           if @activeFilters().length > 0
-            model.set('hidden', !@filter(model, term))
+            hidden = !@filter(model, term)
+            if !hidden
+              resultCount += 1
+            model.set('hidden', hidden)
           else
+            resultCount += 1
             model.set('hidden', false)
+      @resultCount = resultCount
+      @screenreaderSearchResultCount()
 
     toggleSettingsView: ->
       @settingsView().toggle()
@@ -139,8 +154,3 @@ define [
         length: 1,
         atLeastOnePageFetched: true
         new_topic_url: ENV.newTopicURL
-
-    resultsUpdatedAccessibleAlert: _.debounce(->
-      $.screenReaderFlashMessage I18n.t 'The list of results has been updated.'
-    , 1000)
-

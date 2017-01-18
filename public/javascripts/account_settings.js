@@ -1,6 +1,8 @@
 define([
   'i18n!account_settings',
   'jquery', // $
+  'tinymce.config',
+  'global_announcements',
   'jquery.ajaxJSON', // ajaxJSON
   'jquery.instructure_date_and_time', // date_field, time_field, datetime_field, /\$\.datetime/
   'jquery.instructure_forms', // formSubmit, getFormData, validateForm
@@ -8,24 +10,58 @@ define([
   'jquery.instructure_misc_helpers', // replaceTags
   'jquery.instructure_misc_plugins', // confirmDelete, showIf, /\.log/
   'jquery.loadingImg', // loadingImg, loadingImage
-  'compiled/tinymce',
-  'tinymce.editor_box', // editorBox
   'vendor/date', // Date.parse
   'vendor/jquery.scrollTo', // /\.scrollTo/
   'jqueryui/tabs' // /\.tabs/
-], function(I18n, $) {
+], function(I18n, $, EditorConfig, globalAnnouncements) {
+
+  EditorConfig.prototype.balanceButtonsOverride = function(instructure_buttons) {
+    var instBtnGroup = "table,instructure_links,unlink" + instructure_buttons;
+    var top_row_buttons = "";
+    var bottom_row_buttons = "";
+
+    top_row_buttons = this.formatBtnGroup + "," + this.positionBtnGroup;
+    bottom_row_buttons = instBtnGroup + "," + this.fontBtnGroup;
+
+    return [top_row_buttons, bottom_row_buttons];
+  };
+
+  EditorConfig.prototype.toolbar = function() {
+    var instructure_buttons = this.buildInstructureButtons();
+    return this.balanceButtonsOverride(instructure_buttons);
+  }
 
   $(document).ready(function() {
+    checkFutureListingSetting = function() {
+
+      if ($('#account_settings_restrict_student_future_view_value').is(':checked')) {
+        $('.future_listing').show();
+      } else {
+        $('.future_listing').hide();
+      }
+    };
+    checkFutureListingSetting();
+    $('#account_settings_restrict_student_future_view_value').change(checkFutureListingSetting);
+
     $("#account_settings").submit(function() {
       var $this = $(this);
+      var remove_ip_filters = true;
       $(".ip_filter .value").each(function() {
         $(this).removeAttr('name');
       }).filter(":not(.blank)").each(function() {
         var name = $.trim($(this).parents(".ip_filter").find(".name").val().replace(/\[|\]/g, '_'));
         if(name) {
+          remove_ip_filters = false;
           $(this).attr('name', 'account[ip_filters][' + name + ']');
         }
       });
+
+      if (remove_ip_filters) {
+        $this.append("<input class='remove_ip_filters' type='hidden' name='account[remove_ip_filters]' value='1'/>");
+      } else {
+        $this.find('.remove_ip_filters').remove(); // just in case it's left over after a failed validation
+      }
+
       var validations = {
         object_name: 'account',
         required: ['name'],
@@ -40,54 +76,12 @@ define([
         return false;
       }
     });
+    $("#account_notification_start_at,#account_notification_end_at").datetime_field({addHiddenInput: true});
     $(".datetime_field").datetime_field();
-    $("#add_notification_form textarea").editorBox().width('100%');
-    $("#add_notification_form .datetime_field").bind('blur change', function() {
-      var date = Date.parse($(this).val());
-      if(date) {
-        date = date.toString($.datetime.defaultFormat);
-      }
-      $(this).val(date);
-    });
-    $("#add_notification_form").submit(function(event) {
-      var $this = $(this);
-      var $confirmation = $this.find('#confirm_global_announcement:visible:not(:checked)');
-      if ($confirmation.length > 0) {
-        $confirmation.errorBox(I18n.t('confirms.global_announcement', "You must confirm the global announcement"));
-        return false;
-      }
-      var validations = {
-        object_name: 'account_notification',
-        required: ['start_at', 'end_at', 'subject', 'message'],
-        date_fields: ['start_at', 'end_at'],
-        numbers: []
-      };
-      if ($('#account_notification_months_in_display_cycle').length > 0) {
-        validations.numbers.push('months_in_display_cycle');
-      }
-      var result = $this.validateForm(validations);
-      if(!result) {
-        return false;
-      }
-    });
-    $("#account_notification_required_account_service").click(function(event) {
-      $this = $(this);
-      $("#confirm_global_announcement_field").showIf(!$this.is(":checked"));
-      $("#account_notification_months_in_display_cycle").prop("disabled", !$this.is(":checked"));
-    });
-    $(".delete_notification_link").click(function(event) {
-      event.preventDefault();
-      var $link = $(this);
-      $link.parents("li").confirmDelete({
-        url: $link.attr('rel'),
-        message: I18n.t('confirms.delete_announcement', "Are you sure you want to delete this announcement?"),
-        success: function() {
-          $(this).slideUp(function() {
-            $(this).remove();
-          });
-        }
-      });
-    });
+
+    globalAnnouncements.augmentView()
+    globalAnnouncements.bindDomEvents()
+
     $("#account_settings_tabs").tabs().show();
     $(".add_ip_filter_link").click(function(event) {
       event.preventDefault();
@@ -294,11 +288,9 @@ define([
       $('#self_registration_type_radios').toggle(this.checked);
     }).trigger('change');
 
-
-    $('.branding_section_toggler').on('change', function(){
-      $(this).prevAll('.branding_section').last().toggle(!this.checked)
-    })
-
+    $('#account_settings_global_includes').change(function() {
+      $('#global_includes_warning_message_wrapper').toggleClass('alert', this.checked);
+    }).trigger('change');
   });
 
 });

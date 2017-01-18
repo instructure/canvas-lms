@@ -2,6 +2,7 @@ define [
   'jquery',
   'underscore'
   'i18n!calendar'
+  'compiled/util/fcUtil'
   'jst/calendar/appointmentGroupList'
   'jst/calendar/schedulerRightSideAdminSection'
   'compiled/calendar/EditAppointmentGroupDialog'
@@ -13,7 +14,8 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'vendor/jquery.spin'
-], ($, _, I18n, appointmentGroupListTemplate, schedulerRightSideAdminSectionTemplate, EditAppointmentGroupDialog, MessageParticipantsDialog, deleteItemTemplate, semanticDateRange) ->
+  'compiled/behaviors/activate'
+], ($, _, I18n, fcUtil, appointmentGroupListTemplate, schedulerRightSideAdminSectionTemplate, EditAppointmentGroupDialog, MessageParticipantsDialog, deleteItemTemplate, semanticDateRange) ->
 
   class Scheduler
     constructor: (selector, @calendar) ->
@@ -22,11 +24,13 @@ define [
 
       @listDiv = @div.find(".appointment-list")
 
-      @div.delegate('.view_calendar_link', 'click', @viewCalendarLinkClick)
+      @div.delegate('.view_calendar_link', 'click keyclick', @viewCalendarLinkClick)
+      @div.activate_keyclick('.view_calendar_link')
       @listDiv.delegate('.edit_link', 'click', @editLinkClick)
       @listDiv.delegate('.message_link', 'click', @messageLinkClick)
       @listDiv.delegate('.delete_link', 'click', @deleteLinkClick)
-      @listDiv.delegate('.show_event_link', 'click', @showEventLinkClick)
+      @listDiv.delegate('.show_event_link', 'click keyclick', @showEventLinkClick)
+      @listDiv.activate_keyclick('.show_event_link')
 
       if @canManageAGroup()
         @div.addClass('can-manage')
@@ -106,7 +110,7 @@ define [
       false
 
     loadData: =>
-      if not @loadingDeferred || (@loadingDeferred && not @loadingDeferred.isResolved())
+      if not @loadingDeferred || (@loadingDeferred && @loadingDeferred.isResolved())
         @loadingDeferred = new $.Deferred()
 
       @groups = {}
@@ -142,18 +146,26 @@ define [
         if @viewingGroup
           @viewingGroup = @groups[@viewingGroup.id]
           if @viewingGroup
-            @listDiv.find(".appointment-group-item[data-appointment-group-id='#{@viewingGroup.id}']").addClass('active')
+            appointmentGroup = @listDiv.find(".appointment-group-item[data-appointment-group-id='#{@viewingGroup.id}']")
+            appointmentGroup.addClass('active')
+            appointmentGroup.find('h3 .view_calendar_link').focus()
             @calendar.displayAppointmentEvents = @viewingGroup
           else
             @toggleListMode(true)
 
       $.publish "Calendar/refetchEvents"
+      if (@viewingGroup)
+        @calendar.showSchedulerSingle(@viewingGroup)
 
     viewCalendarLinkClick: (jsEvent) =>
       jsEvent.preventDefault()
+      if not @viewingGroup
+        $.screenReaderFlashMessageExclusive(I18n.t('Scheduler shown'))
       @viewCalendarForElement $(jsEvent.target)
 
     showEventLinkClick: (jsEvent) =>
+      if not @viewingGroup
+        $.screenReaderFlashMessageExclusive(I18n.t('Scheduler shown'))
       jsEvent.preventDefault()
       group = @viewCalendarForElement $(jsEvent.target)
 
@@ -169,7 +181,7 @@ define [
       groupId = thisItem.data('appointment-group-id')
       thisItem.addClass('active')
       group = @groups?[groupId]
-      @viewCalendarForGroup(@groups?[groupId])
+      @viewCalendarForGroup(group)
       group
 
     viewCalendarForGroupId: (id) =>
@@ -185,11 +197,10 @@ define [
       @loadingDeferred.done =>
         @div.addClass('showing-single')
 
-        @calendar.showSchedulerSingle();
         if @viewingGroup.start_at
-          @calendar.gotoDate($.fudgeDateForProfileTimezone(@viewingGroup.start_at))
+          @calendar.gotoDate(fcUtil.wrap(@viewingGroup.start_at))
         else
-          @calendar.gotoDate(new Date())
+          @calendar.gotoDate(fcUtil.now())
 
         @calendar.displayAppointmentEvents = @viewingGroup
         $.publish "Calendar/refetchEvents"
@@ -201,10 +212,12 @@ define [
 
     showList: =>
       @div.removeClass('showing-single')
+      target = @listDiv.find('.appointment-group-item.active h3 .view_calendar_link')
       @listDiv.find('.appointment-group-item').removeClass('active')
 
-      @calendar.calendar.hide()
+      @calendar.hideAgendaView()
       @calendar.displayAppointmentEvents = null
+      target.focus()
 
     editLinkClick: (jsEvent) =>
       jsEvent.preventDefault()

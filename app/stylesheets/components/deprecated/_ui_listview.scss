@@ -66,7 +66,7 @@
 
     &.ui-listview-header, &.ui-listview-header:hover  {
       padding: .5em 15px;
-      font-size: 14px;
+      @include fontSize($ic-font-size--small);
       border: 1px solid #b3cbbc;
       background: #5e87b0;
       color: #747575;

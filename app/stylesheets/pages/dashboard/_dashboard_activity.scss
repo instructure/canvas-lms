@@ -10,24 +10,27 @@
     border-bottom: 1px solid $ic-border-light;
     line-height: 1.2;
     padding-bottom: $ic-sp;
+    font-size: 1.5em;
   }
   @else {
     padding: 10px;
     border-bottom: 1px solid #b3b3b3;
-  } 
+  }
 }
+
+.ic-notification + .recent-activity-header { margin-top: $ic-sp*2; }
 
 .recent_activity > li {
   position: relative;
   border-bottom: 1px solid #ddd;
-  .title { 
+  .title {
     font-weight: normal;
     @if $use_new_styles and $use_high_contrast == false {
       font-weight: 300;
     }
   }
   .links {
-    font-size: 11px;
+    @include fontSize(11px);
   }
   .unread-count {
     display: block;
@@ -61,7 +64,7 @@
     padding: $ic-sp;
     .image-block {
       flex: 1;
-      align-items: center; 
+      align-items: center;
     }
   }
   @else {
@@ -70,7 +73,7 @@
   }
   .toggle-details {
     text-transform: uppercase;
-    @if $use_new_styles { font-size: 11px; }
+    @if $use_new_styles { @include fontSize(11px); }
     @else { font-size: 0.75em; }
   }
   &:hover {
@@ -130,7 +133,7 @@ $ignore-col-width: 50px;
     }
   }
   .date {
-    font-size: 11px;
+    @include fontSize(11px);
     width: 100px;
     white-space: nowrap;
     text-align: center;
@@ -148,6 +151,8 @@ $ignore-col-width: 50px;
 }
 
 .content_summary {
+  word-break: break-all;
+  word-wrap: break-word;
   display: block;
   color: inherit;
   @if $use_high_contrast {
@@ -163,7 +168,7 @@ $ignore-col-width: 50px;
   }
   @if $use_new_styles {
     font-weight: 500;
-    font-size: 12px;
+    @include fontSize($ic-font-size--xsmall);
   }
 }
 

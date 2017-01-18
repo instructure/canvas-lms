@@ -397,4 +397,100 @@ describe ContentMigration do
 
     expect(cm.migration_issues).to be_empty
   end
+
+  it "should correclty handle media comment resolution in quizzes" do
+    course_with_teacher
+    cm = ContentMigration.new(:context => @course, :user => @user)
+    cm.migration_type = 'canvas_cartridge_importer'
+    cm.migration_settings['import_immediately'] = true
+    cm.save!
+
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/canvas_quiz_media_comment.zip")
+    attachment = Attachment.new
+    attachment.context = cm
+    attachment.uploaded_data = File.open(package_path, 'rb')
+    attachment.filename = 'file.zip'
+    attachment.save!
+
+    cm.attachment = attachment
+    cm.save!
+
+    cm.queue_migration
+    run_jobs
+
+    expect(cm.migration_issues).to be_empty
+    quiz = @course.quizzes.available.first
+    expect(quiz.quiz_data).to be_present
+    expect(quiz.quiz_data.to_yaml).to include("/media_objects/m-5U5Jww6HL7zG35CgyaYGyA5bhzsremxY")
+
+    qq = quiz.quiz_questions.first
+    expect(qq.question_data).to be_present
+    expect(qq.question_data.to_yaml).to include("/media_objects/m-5U5Jww6HL7zG35CgyaYGyA5bhzsremxY")
+
+  end
+
+  it "expires migration jobs after 48 hours" do
+    course_with_teacher
+    cm = ContentMigration.new(:context => @course, :user => @teacher)
+    cm.migration_type = 'common_cartridge_importer'
+    cm.workflow_state = 'created'
+    cm.save!
+    cm.queue_migration
+
+    Canvas::Migration::Worker::CCWorker.any_instance.expects(:perform).never
+    Timecop.travel(50.hours.from_now) do
+      run_jobs
+    end
+
+    cm.reload
+    expect(cm).to be_failed
+    expect(cm.migration_issues).not_to be_empty
+    expect(cm.migration_issues.last.error_report.message).to include 'job expired'
+  end
+
+  it "expires import jobs after 48 hours" do
+    course_with_teacher
+    cm = ContentMigration.new(:context => @course, :user => @teacher)
+    cm.migration_type = 'common_cartridge_importer'
+    cm.workflow_state = 'exported'
+    cm.save!
+    Canvas::Migration::Worker::CCWorker.expects(:new).never
+    cm.queue_migration
+
+    ContentMigration.any_instance.expects(:import_content).never
+    Timecop.travel(50.hours.from_now) do
+      run_jobs
+    end
+
+    cm.reload
+    expect(cm).to be_failed
+    expect(cm.migration_issues).not_to be_empty
+    expect(cm.migration_issues.last.error_report.message).to include 'job expired'
+  end
+
+  it "delays queueing imports if one in course is already running" do
+    course_with_teacher
+
+    cms = []
+    Timecop.freeze(Time.now) do
+      2.times do
+        cm = ContentMigration.new(:context => @course, :user => @teacher)
+        cm.migration_type = 'common_cartridge_importer'
+        cm.workflow_state = 'exported'
+        cm.save!
+        cm.queue_migration
+        cms << cm
+      end
+
+      dj = Delayed::Job.last
+      expect(dj.tag).to eq "ContentMigration#queue_migration"
+      expect(dj.run_at > 30.minutes.from_now).to be_truthy # should run in the future if something goes wrong
+    end
+
+    cms[1].any_instantiation.expects(:queue_migration).with do |plugin, opts|
+      opts[:retry_count] == 1 && opts[:expires_at].present?
+    end
+
+    run_jobs # even though the requeue is set to happen in the future, it should get run right away after the first one completes
+  end
 end

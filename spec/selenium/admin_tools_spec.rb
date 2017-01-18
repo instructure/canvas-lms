@@ -3,7 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 require File.expand_path(File.dirname(__FILE__) + '/../cassandra_spec_helper')
 
 describe "admin_tools" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include Calendar2Common
 
   def load_admin_tools_page
     get "/accounts/#{@account.id}/admin_tools"
@@ -126,7 +127,7 @@ describe "admin_tools" do
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
           expect(f('#commMessagesSearchResults .alert').text).to include('No messages found')
-          expect(f('#commMessagesSearchResults .message-body')).to be_nil
+          expect(f("#content")).not_to contain_css('#commMessagesSearchResults .message-body')
         end
 
         it "should display valid search params used" do
@@ -144,14 +145,14 @@ describe "admin_tools" do
           set_value f('#commMessagesSearchForm .dateEndSearchField'), 'Mar 9, 2001'
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12:00am to Mar 9, 2001 at 12:00am.")
+          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12am to Mar 9, 2001 at 12am.")
           # Search with begin date/time and end date/time - should use and show given time
           perform_user_search("#commMessagesSearchForm", @student.id)
           set_value f('#commMessagesSearchForm .dateStartSearchField'), 'Mar 3, 2001 1:05p'
           set_value f('#commMessagesSearchForm .dateEndSearchField'), 'Mar 9, 2001 3p'
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3:00pm.")
+          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3pm.")
         end
 
         it "should display search params used when given invalid input data" do
@@ -172,8 +173,7 @@ describe "admin_tools" do
 
           load_admin_tools_page
           wait_for_ajaximations
-          tab = fj('#adminToolsTabs .notifications > a')
-          expect(tab).to be_nil
+          expect(f('#adminToolsTabs')).not_to contain_css('.notifications')
         end
       end
 
@@ -182,8 +182,7 @@ describe "admin_tools" do
           setup_account_admin({:view_notifications => false})
           load_admin_tools_page
           wait_for_ajaximations
-          tab = fj('#adminToolsTabs .notifications > a')
-          expect(tab).to be_nil
+          expect(f('#adminToolsTabs')).not_to contain_css('.notifications')
         end
       end
     end
@@ -208,7 +207,7 @@ describe "admin_tools" do
     end
 
     context "permissions" do
-      it "should includ options activity with permissions" do
+      it "should include options activity with permissions" do
         setup_account_admin
         load_admin_tools_page
         wait_for_ajaximations
@@ -223,8 +222,7 @@ describe "admin_tools" do
         expect(select).not_to be_nil
         expect(select).to be_displayed
 
-        options = ffj("#loggingType > option")
-        options.map!{ |o| o.text }
+        options = ffj("#loggingType > option").map(&:text).map(&:strip)
         expect(options).to include("Select a Log type")
         expect(options).to include("Login / Logout Activity")
         expect(options).to include("Grade Change Activity")
@@ -241,8 +239,7 @@ describe "admin_tools" do
           )
           load_admin_tools_page
           wait_for_ajaximations
-          tab = fj('#adminToolsTabs .logging > a')
-          expect(tab).to be_nil
+          expect(f('#adminToolsTabs')).not_to contain_css('.logging')
         end
 
         it "should not include login activity option for revoked permission" do
@@ -332,7 +329,7 @@ describe "admin_tools" do
         @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
       end
 
-      @submission = @assignment.grade_student(@student, grade: 9, grader: @teacher).first
+      @submission = @assignment.grade_student(@student, grade: 9, grader: @teacher, graded_anonymously: true).first
 
       load_admin_tools_page
       click_view_tab "logging"
@@ -346,7 +343,7 @@ describe "admin_tools" do
       expect(ff('#gradeChangeLoggingSearchResults table tbody tr').length).to eq 3
 
       cols = ffj('#gradeChangeLoggingSearchResults table tbody tr:last td')
-      expect(cols.size).to eq 8
+      expect(cols.size).to eq 9
 
       expect(cols[2].text).to eq "-"
       expect(cols[3].text).to eq "7"
@@ -354,6 +351,16 @@ describe "admin_tools" do
       expect(cols[5].text).to eq @student.name
       expect(cols[6].text).to eq @course.name
       expect(cols[7].text).to eq @assignment.title
+      expect(cols[8].text).to eq "n"
+    end
+
+    it "displays 'y' if graded anonymously" do
+      perform_autocomplete_search("#grader_id-autocompleteField", @teacher.name)
+      f('#loggingGradeChange button[name=gradeChange_submit]').click
+      wait_for_ajaximations
+
+      cols = ffj('#gradeChangeLoggingSearchResults table tbody tr:first td')
+      expect(cols[8].text).to eq "y"
     end
 
     it "should search by student name" do

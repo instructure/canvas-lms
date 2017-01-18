@@ -164,7 +164,7 @@ module Workflow
       @halted_because
     end
 
-    # INSTRUCTURE: 
+    # INSTRUCTURE:
     def process_event(name, *args)
       success = true
       begin
@@ -176,7 +176,7 @@ module Workflow
       end
       success
     end
-    
+
     def process_event!(name, *args)
       event = current_state.events[name.to_sym]
       raise NoTransitionAllowed.new(
@@ -198,7 +198,7 @@ module Workflow
         return_value
       end
     end
- 
+
     private
  
     def spec

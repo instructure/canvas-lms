@@ -25,15 +25,11 @@ define [
     onChange: ->
       #noop, set by components who care about it
 
-    onUploadProgress: (percent, file) =>
-      @onChange()
-
     createUploader: (fileOptions, folder, contextId, contextType) ->
       uploader = if fileOptions.expandZip
         new ZipUploader(fileOptions, folder, contextId, contextType)
       else
         new FileUploader(fileOptions, folder)
-      uploader.onProgress = @onUploadProgress
       uploader.cancel = =>
         uploader._xhr?.abort()
         @_queue = _.without(@_queue, uploader)
@@ -52,6 +48,9 @@ define [
       @_queue = _.without(@_queue, firstNonErroredUpload)
       firstNonErroredUpload
 
+    pageChangeWarning: ->
+      "You currently have uploads in progress. If you leave this page, the uploads will stop."
+
     attemptNextUpload: ->
       @onChange()
       return if @_uploading || @_queue.length == 0
@@ -59,6 +58,7 @@ define [
       if uploader
         @onChange()
         @_uploading = true
+        $(window).on 'beforeunload', @pageChangeWarning
 
         promise = uploader.upload()
         promise.fail (failReason) =>
@@ -69,6 +69,7 @@ define [
         promise.always =>
           @_uploading = false
           @currentUploader = null
+          $(window).off 'beforeunload', @pageChangeWarning
           @onChange()
           @attemptNextUpload()
 

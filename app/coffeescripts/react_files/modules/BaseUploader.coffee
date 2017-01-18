@@ -1,9 +1,9 @@
 define [
   'jquery'
   'jquery.ajaxJSON'
-], ($, BBFile, FilesCollection) ->
+], ($) ->
 
-  # Base uploader with common api between File and Zip uploades
+  # Base uploader with common api between File and Zip uploads
   # (where zip is expanded)
   class BaseUploader
 

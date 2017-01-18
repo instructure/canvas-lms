@@ -18,3 +18,19 @@ define [
     elem  = $("<span>")
     elem.text(equation)
     equal(EquationEditorView.getEquationText(elem), "52\\ast\\sqrt{64}")
+
+  module "EquationEditorView#render",
+    setup: ->
+    teardown: ->
+      $('.ui-dialog').remove()
+
+  test "it renders into a div (because spans break KO nav)", ->
+    editor = {
+      selection: {
+        getBookmark: (()-> return null),
+        getNode: (()-> return "Node Text"),
+        getContent: (()-> return "Editor Content")
+      }
+    }
+    view = new EquationEditorView(editor)
+    equal(view.el.nodeName, "DIV")

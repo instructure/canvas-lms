@@ -3,9 +3,7 @@ define [
   'compiled/behaviors/elementToggler'
 ], ($, elementToggler)->
 
-
   module 'elementToggler',
-
     teardown: ->
       el?.remove() for el in [@$trigger, @$otherTrigger, @$target, @$target1, @$target2]
       $("#fixtures").empty()
@@ -87,13 +85,12 @@ define [
 
     # click to show it
     msg = "target pops up as a dialog"
-    spy = sinon.spy $.fn, 'fixDialogButtons'
+    spy = @spy $.fn, 'fixDialogButtons'
 
     @$trigger.click()
     ok @$target.is(':ui-dialog:visible'), msg
 
     ok spy.thisValues[0].is(@$target), 'calls fixDialogButton on @$trigger'
-    spy.restore()
 
     msg = "handles `data-turn-into-dialog` options correctly"
     equal @$target.dialog('option', 'width'), 450, msg

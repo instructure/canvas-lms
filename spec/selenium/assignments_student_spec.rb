@@ -3,11 +3,13 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/google_drive_common')
 
 describe "assignments" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include GoogleDriveCommon
+  include AssignmentsCommon
 
   context "as a student" do
 
-    before (:each) do
+    before(:each) do
       course_with_student_logged_in
     end
 
@@ -54,7 +56,7 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
       details = f(".details")
-      expect(details).to include_text('comment before muting')
+      expect(details).not_to include_text('comment before muting')
       expect(details).not_to include_text('comment after muting')
     end
 
@@ -81,7 +83,7 @@ describe "assignments" do
       get "/courses/#{new_course.id}/assignments/#{assignment.id}"
 
       expect(f('.ui-state-error')).to be_displayed
-      expect(f('#assignment_show')).to be_nil
+      expect(f("#content")).not_to contain_css('#assignment_show')
     end
 
     it "should verify lock until date is enforced" do
@@ -90,7 +92,7 @@ describe "assignments" do
       locked_assignment = @course.assignments.create!(:name => assignment_name, :unlock_at => unlock_time)
 
       get "/courses/#{@course.id}/assignments/#{locked_assignment.id}"
-      expect(f('#content')).to include_text(unlock_time.strftime("%b %-d"))
+      expect(f('#content')).to include_text(format_date_for_view(unlock_time))
       locked_assignment.update_attributes(:unlock_at => Time.now)
       refresh_page # to show the updated assignment
       expect(f('#content')).not_to include_text('This assignment is locked until')
@@ -98,12 +100,31 @@ describe "assignments" do
 
     it "should verify due date is enforced" do
       due_date_assignment = @course.assignments.create!(:name => 'due date assignment', :due_at => 5.days.ago)
-      driver.current_url
       get "/courses/#{@course.id}/assignments"
       expect(f("#assignment_group_past #assignment_#{due_date_assignment.id}")).to be_displayed
       due_date_assignment.update_attributes(:due_at => 2.days.from_now)
       refresh_page # to show the updated assignment
       expect(f("#assignment_group_upcoming #assignment_#{due_date_assignment.id}")).to be_displayed
+    end
+
+    it "should show assignment data if locked by due date or lock date" do
+      assignment = @course.assignments.create!(:name => 'locked assignment',
+                                               :due_at => 5.days.ago,
+                                               :lock_at => 3.days.ago)
+      get "/courses/#{@course.id}/assignments/#{assignment.id}"
+      wait_for_ajaximations
+      expect(f("#content")).not_to contain_css('.submit_assignment_link')
+      expect(f(".student-assignment-overview")).to be_displayed
+    end
+
+
+    it "should still not show assignment data if locked by unlock date" do
+      assignment = @course.assignments.create!(:name => 'not unlocked assignment',
+                                               :due_at => 5.days.from_now,
+                                               :unlock_at => 3.days.from_now)
+      get "/courses/#{@course.id}/assignments/#{assignment.id}"
+      wait_for_ajaximations
+      expect(f("#content")).not_to contain_css(".student-assignment-overview")
     end
 
     context "overridden lock_at" do
@@ -170,25 +191,22 @@ describe "assignments" do
         submission_input = f('.submission_attachment input')
         ext_error = f('.bad_ext_msg')
 
-        keep_trying_until do
-          submission_input.send_keys(fullpath_txt)
-          expect(ext_error).not_to be_displayed
-          expect(submit_file_button['disabled']).to be_nil
-          submission_input.send_keys(fullpath_zip)
-          expect(ext_error).to be_displayed
-          expect(submit_file_button).to have_attribute(:disabled, "true")
-        end
+        submission_input.send_keys(fullpath_txt)
+        expect(ext_error).not_to be_displayed
+        expect(submit_file_button['disabled']).to be_nil
+        submission_input.send_keys(fullpath_zip)
+        expect(ext_error).to be_displayed
+        expect(submit_file_button).to be_disabled
       end
     end
 
     context "google drive" do
-      before(:each) do
-        PluginSetting.create!(:name => 'google_docs', :settings => {})
+      before do
         PluginSetting.create!(:name => 'google_drive', :settings => {})
-        set_up_google_docs()
+        setup_google_drive()
       end
 
-      it "should have a google doc tab if google docs is enabled", :priority => "1", :test_id => 161884 do
+      it "should have a google doc tab if google docs is enabled", priority: "1", test_id: 161884 do
         @assignment.update_attributes(:submission_types => 'online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
@@ -200,16 +218,16 @@ describe "assignments" do
       context "select file or folder" do
         before(:each) do
           # mock out function calls
-          google_service_connection = mock()
-          google_service_connection.stubs(:service_type).returns('google_drive')
-          google_service_connection.stubs(:retrieve_access_token).returns('access_token')
-          google_service_connection.stubs(:verify_access_token).returns(true)
+          google_drive_connection = mock()
+          google_drive_connection.stubs(:service_type).returns('google_drive')
+          google_drive_connection.stubs(:retrieve_access_token).returns('access_token')
+          google_drive_connection.stubs(:authorized?).returns(true)
 
           # mock files to show up from "google drive"
           file_list = create_file_list
-          google_service_connection.stubs(:list_with_extension_filter).returns(file_list)
+          google_drive_connection.stubs(:list_with_extension_filter).returns(file_list)
 
-          ApplicationController.any_instance.stubs(:google_service_connection).returns(google_service_connection)
+          ApplicationController.any_instance.stubs(:google_drive_connection).returns(google_drive_connection)
 
           # create assignment
           @assignment.update_attributes(:submission_types => 'online_upload')
@@ -219,13 +237,13 @@ describe "assignments" do
           wait_for_animations
         end
 
-        it "should select a file from google drive", :priority => "1", :test_id => 161886 do
+        it "should select a file from google drive", priority: "1", test_id: 161886 do
           # find file in list
           # the file we are looking for is created as the second file in the list
           expect(ff(".filename")[1]).to include_text("test.mydoc")
         end
 
-        it "should select a file in a folder from google drive", :priority => "1", :test_id => 161885 do
+        it "should select a file in a folder from google drive", priority: "1", test_id: 161885 do
           # open folder
           f(".folder").click
           wait_for_animations
@@ -235,13 +253,13 @@ describe "assignments" do
         end
       end
 
-      it "forces users to authenticate", :priority => "1", :test_id => 161892 do
+      it "forces users to authenticate", priority: "1", test_id: 161892 do
         # stub out google drive
-        google_service_connection = mock()
-        google_service_connection.stubs(:service_type).returns('google_drive')
-        google_service_connection.stubs(:retrieve_access_token).returns(nil)
-        google_service_connection.stubs(:verify_access_token).returns(nil)
-        ApplicationController.any_instance.stubs(:google_service_connection).returns(google_service_connection)
+        google_drive_connection = mock()
+        google_drive_connection.stubs(:service_type).returns('google_drive')
+        google_drive_connection.stubs(:retrieve_access_token).returns(nil)
+        google_drive_connection.stubs(:authorized?).returns(nil)
+        ApplicationController.any_instance.stubs(:google_drive_connection).returns(google_drive_connection)
 
         @assignment.update_attributes(:submission_types => 'online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -260,7 +278,7 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
 
-      f("#show_by_type").click
+      move_to_click("label[for=show_by_type]")
       ag_el = f("#assignment_group_#{ag.id}")
       expect(ag_el).to be_present
       expect(ag_el.text).to match @assignment.name
@@ -272,11 +290,11 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
 
-      expect(f('.new_assignment')).to be_nil
-      expect(f('#addGroup')).to be_nil
-      expect(f('.add_assignment')).to be_nil
-      f("#show_by_type").click
-      expect(f("ag_#{ag.id}_manage_link")).to be_nil
+      expect(f("#content")).not_to contain_css('.new_assignment')
+      expect(f("#content")).not_to contain_css('#addGroup')
+      expect(f("#content")).not_to contain_css('.add_assignment')
+      move_to_click("label[for=show_by_type]")
+      expect(f("#content")).not_to contain_css("ag_#{ag.id}_manage_link")
     end
 
     it "should default to grouping by date" do
@@ -298,7 +316,7 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
 
-      f("#show_by_type").click
+      move_to_click("label[for=show_by_type]")
       expect(is_checked('#show_by_type')).to be_truthy
       expect(f("#assignment_group_#{ag.id}")).not_to be_nil
 
@@ -314,11 +332,11 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
 
-      expect(f('#assignment_group_overdue')).to be_nil
-      expect(f('#assignment_group_past')).to be_nil
+      expect(f("#content")).not_to contain_css('#assignment_group_overdue')
+      expect(f("#content")).not_to contain_css('#assignment_group_past')
 
-      f("#show_by_type").click
-      expect(f("#assignment_group_#{empty_ag.id}")).to be_nil
+      move_to_click("label[for=show_by_type]")
+      expect(f("#content")).not_to contain_css("#assignment_group_#{empty_ag.id}")
     end
 
     it "should show empty assignment groups if they have a weight" do
@@ -334,7 +352,7 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
 
-      f("#show_by_type").click
+      move_to_click("label[for=show_by_type]")
       expect(f("#assignment_group_#{empty_ag.id}")).not_to be_nil
     end
 

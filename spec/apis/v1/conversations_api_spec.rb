@@ -113,6 +113,19 @@ describe ConversationsController, type: :request do
       ]
     end
 
+    it "should properly respond to include[]=participant_avatars" do
+      conversation(@bob, :workflow_state => 'read')
+
+      json = api_call(:get, "/api/v1/conversations.json",
+              { :controller => 'conversations', :action => 'index',
+                :format => 'json', :include => ["participant_avatars"] })
+      json.each do |conversation|
+        conversation["participants"].each do |user|
+          expect(user).to have_key "avatar_url"
+        end
+      end
+    end
+
     it "should stringify audience ids if requested" do
       @c1 = conversation(@bob, :workflow_state => 'read')
       @c2 = conversation(@bob, @billy, :workflow_state => 'unread', :subscribed => false)
@@ -627,7 +640,7 @@ describe ConversationsController, type: :request do
               p.delete("avatar_url")
             }
           }
-          json.each {|c| c["messages"].each {|m| m["participating_user_ids"].sort!}} 
+          json.each {|c| c["messages"].each {|m| m["participating_user_ids"].sort!}}
           json.each { |c| c.delete("last_authored_message_at") } # This is sometimes not updated. It's a known bug.
           expect(json).to eql [
             {
@@ -730,8 +743,9 @@ describe ConversationsController, type: :request do
 
       it "should create a conversation with forwarded messages" do
         forwarded_message = conversation(@me, :sender => @bob).messages.first
-        attachment = @me.conversation_attachments_folder.attachments.create!(:context => @me, :uploaded_data => stub_png_data)
-        forwarded_message.attachments << attachment
+        attachment = @bob.conversation_attachments_folder.attachments.create!(:context => @bob, :uploaded_data => stub_png_data)
+        forwarded_message.attachment_ids = [attachment.id]
+        forwarded_message.save!
 
         json = api_call(:post, "/api/v1/conversations",
                 { :controller => 'conversations', :action => 'create', :format => 'json' },
@@ -763,7 +777,7 @@ describe ConversationsController, type: :request do
             "subscribed" => true,
             "private" => true,
             "starred" => false,
-            "properties" => ["last_author"],
+            "properties" => ["last_author", "attachments"],
             "visible" => false,
             "context_code" => conversation.conversation.context_code,
             "audience" => [@billy.id],
@@ -796,7 +810,8 @@ describe ConversationsController, type: :request do
                                              'locked_for_user' => false,
                                              'hidden_for_user' => false,
                                              'created_at' => attachment.created_at.as_json,
-                                             'updated_at' => attachment.updated_at.as_json, 
+                                             'updated_at' => attachment.updated_at.as_json,
+                                             'modified_at' => attachment.updated_at.as_json,
                                              'thumbnail_url' => attachment.thumbnail_url }], "participating_user_ids" => [@me.id, @bob.id].sort
                   }
                 ]
@@ -804,7 +819,7 @@ describe ConversationsController, type: :request do
             ]
           }
         ]
-        expect(json).to eql expected
+        expect(json).to eq expected
       end
 
       it "should set subject" do
@@ -978,7 +993,8 @@ describe ConversationsController, type: :request do
                 'hidden_for_user' => false,
                 'created_at' => attachment.created_at.as_json,
                 'updated_at' => attachment.updated_at.as_json,
-                'thumbnail_url' => attachment.thumbnail_url
+                'thumbnail_url' => attachment.thumbnail_url,
+                'modified_at' => attachment.updated_at.as_json
               }
             ],
             "participating_user_ids" => [@me.id, @bob.id].sort
@@ -1403,7 +1419,6 @@ describe ConversationsController, type: :request do
       expect(MediaObject.count).to eql 1
     end
 
-
     it "should add recipients to the conversation" do
       conversation = conversation(@bob, @billy)
 
@@ -1449,6 +1464,21 @@ describe ConversationsController, type: :request do
           {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "jane, joe, and tommy were added to the conversation by nobody@example.com", "author_id" => @me.id, "generated" => true, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @billy.id, @bob.id, @jane.id, @joe.id, @tommy.id].sort}
         ]
       })
+    end
+
+    it "should not cache an old audience when adding recipients" do
+      enable_cache do
+        Timecop.freeze(5.seconds.ago) do
+          @conversation = conversation(@bob, @billy)
+          # prime the paticipants cache
+          @conversation.participants
+        end
+
+        json = api_call(:post, "/api/v1/conversations/#{@conversation.conversation_id}/add_recipients",
+          { :controller => 'conversations', :action => 'add_recipients', :id => @conversation.conversation_id.to_s, :format => 'json' },
+          { :recipients => [@jane.id.to_s, "course_#{@course.id}"] })
+        expect(json["audience"]).to match_array [@billy.id, @bob.id, @jane.id, @joe.id, @tommy.id]
+      end
     end
 
     it "should update the conversation" do
@@ -1845,12 +1875,12 @@ describe ConversationsController, type: :request do
   end
 
   describe "delete_for_all" do
-    it "should require site_admin with become_user permissions" do
+    it "should require site_admin with manage_students permissions" do
       cp = conversation(@me, @bob, @billy, @jane, @joe, @tommy, :sender => @me)
       conv = cp.conversation
       expect(@joe.conversations.size).to eql 1
 
-      account_admin_user_with_role_changes(:account => Account.site_admin, :role_changes => { :become_user => false })
+      account_admin_user_with_role_changes(:account => Account.site_admin, :role_changes => { :manage_students => false })
       json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
         {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
         {:domain_root_account => Account.site_admin})
@@ -1905,7 +1935,7 @@ describe ConversationsController, type: :request do
       expect(ConversationMessageParticipant.count).to eql 0
       # should leave the conversation and its message in the database
       expect(Conversation.count).to eql 1
-      expect(ConversationMessage.count).to eql 1 
+      expect(ConversationMessage.count).to eql 1
     end
 
     context "sharding" do
@@ -1952,5 +1982,5 @@ describe ConversationsController, type: :request do
       expect(json).to eql({'unread_count' => '1'})
     end
   end
-  
+
 end

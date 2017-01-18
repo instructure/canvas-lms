@@ -5,7 +5,7 @@ define(function(require) {
 
   var Calculated = React.createClass({
     render: Essay.type.prototype.render,
-    renderAsideContent: function() {
+    renderLinkButton: function() {
       return false;
     }
   });

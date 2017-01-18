@@ -30,7 +30,51 @@ describe ContentMigration do
       expect(topic.attributes.slice(*attrs)).to eq new_topic.attributes.slice(*attrs)
 
       expect(new_topic.last_reply_at).to be_nil
+      expect(new_topic.allow_rating).to eq false
       expect(topic.posted_at.to_i).to eq new_topic.posted_at.to_i
+    end
+
+    it "copies rating settings" do
+      topic1 = @copy_from.discussion_topics.create!(:title => "blah", :message => "srsly",
+                                                    :allow_rating => true, :only_graders_can_rate => true,
+                                                    :sort_by_rating => false)
+      topic2 = @copy_from.discussion_topics.create!(:title => "bleh", :message => "srsly",
+                                                    :allow_rating => true, :only_graders_can_rate => false,
+                                                    :sort_by_rating => true)
+      run_course_copy
+
+      new_topic1 = @copy_to.discussion_topics.where(migration_id: mig_id(topic1)).first
+      expect(new_topic1.allow_rating).to eq true
+      expect(new_topic1.only_graders_can_rate).to eq true
+      expect(new_topic1.sort_by_rating).to eq false
+
+      new_topic2 = @copy_to.discussion_topics.where(migration_id: mig_id(topic2)).first
+      expect(new_topic2.allow_rating).to eq true
+      expect(new_topic2.only_graders_can_rate).to eq false
+      expect(new_topic2.sort_by_rating).to eq true
+    end
+
+    it "should copy group setting" do
+      group_category = @copy_from.group_categories.create!(name: 'blah')
+      topic = @copy_from.discussion_topics.create! group_category: group_category
+
+      run_course_copy
+
+      new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
+      expect(new_topic).to be_has_group_category
+      expect(new_topic.group_category.name).to eq "Project Groups"
+    end
+
+    it "assigns group discussions to a group with a matching name in the destination course" do
+      group_category = @copy_from.group_categories.create!(name: 'blah')
+      topic = @copy_from.discussion_topics.create! group_category: group_category
+      target_group = @copy_to.group_categories.create!(name: 'blah')
+
+      run_course_copy
+
+      new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
+      expect(new_topic).to be_has_group_category
+      expect(new_topic.group_category.name).to eq "blah"
     end
 
     it "should copy a discussion topic when assignment is selected" do
@@ -66,6 +110,56 @@ describe ContentMigration do
       expect(to_ann.workflow_state).to eq "post_delayed"
       expect(to_ann.delayed_post_at.to_i).to eq from_time.to_i
       expect(to_ann.lock_at.to_i).to eq until_time.to_i
+
+      Timecop.freeze(2.hours.from_now) do
+        run_jobs
+        to_ann.reload
+        expect(to_ann.workflow_state).to eq 'active'
+      end
+
+      Timecop.freeze(26.hours.from_now) do
+        run_jobs
+        to_ann.reload
+        expect(to_ann.locked).to be_truthy
+      end
+    end
+
+    it "should properly copy selected delayed announcements even if they've already posted and locked" do
+      from_ann = @copy_from.announcements.create!(:message => "goodbye", :title => "goodbye announcement", delayed_post_at: 5.days.ago, lock_at: 2.days.ago )
+      from_ann.save!
+      run_jobs
+      from_ann.reload
+
+      expect(from_ann.workflow_state).to eq "active"
+      expect(from_ann.locked).to be_truthy
+
+      @cm.copy_options = {
+        :everything => true,
+        :shift_dates => true,
+        :old_start_date => 7.days.ago.to_s,
+        :old_end_date => Time.now.to_s,
+        :new_start_date => Time.now.to_s,
+        :new_end_date => 7.days.from_now.to_s
+      }
+      @cm.save!
+
+      run_course_copy
+
+      to_ann = @copy_to.announcements.where(migration_id: mig_id(from_ann)).first
+      expect(to_ann.workflow_state).to eq "post_delayed"
+      expect(to_ann.locked).to be_falsey
+
+      Timecop.freeze(3.days.from_now) do
+        run_jobs
+        to_ann.reload
+        expect(to_ann.workflow_state).to eq 'active'
+      end
+
+      Timecop.freeze(6.days.from_now) do
+        run_jobs
+        to_ann.reload
+        expect(to_ann.locked).to be_truthy
+      end
     end
 
     it "should not copy announcements if not selected" do
@@ -147,5 +241,27 @@ describe ContentMigration do
       expect(decoy_ag.reload.name).not_to eql group.name
     end
 
+    it "should copy references to locked discussions even if manage_content is not true" do
+      @role = Account.default.roles.build :name => 'SuperTeacher'
+      @role.base_role_type = 'TeacherEnrollment'
+      @role.save!
+      @copy_to.enroll_user(@user, 'TeacherEnrollment', :role => @role)
+
+      Account.default.role_overrides.create!(:permission => "manage_content", :role => teacher_role, :enabled => false)
+
+      topic = @copy_from.discussion_topics.build(:title => "topic")
+      topic.locked = true
+      topic.save!
+
+      @copy_from.syllabus_body = "<p><a href=\"/courses/#{@copy_from.id}/discussion_topics/#{topic.id}\">link</a></p>"
+      @copy_from.save!
+
+      run_course_copy
+
+      topic2 = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
+
+      @copy_to.reload
+      expect(@copy_to.syllabus_body).to be_include("/courses/#{@copy_to.id}/discussion_topics/#{topic2.id}")
+    end
   end
 end

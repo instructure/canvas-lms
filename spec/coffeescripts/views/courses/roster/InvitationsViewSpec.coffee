@@ -8,6 +8,8 @@ define [
   module 'InvitationsView',
     setup: ->
     teardown: ->
+      $(".ui-tooltip").remove()
+      $(".ui-dialog").remove()
 
   buildView = (enrollment)->
     model = new RosterUser( enrollments: [enrollment] )

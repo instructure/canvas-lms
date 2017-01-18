@@ -20,12 +20,12 @@ module AccountsHelper
   def show_last_batch
     @last_batch && !(@current_batch && @current_batch.importing?)
   end
-    
+
   def print_messages(batch)
     return '' unless batch
     render :partial => 'accounts/sis_batch_messages', :object => batch
   end
-  
+
   def print_counts(batch)
     return '' unless batch.data && batch.data[:counts]
     render :partial => 'accounts/sis_batch_counts', :object => batch
@@ -35,5 +35,14 @@ module AccountsHelper
     show_term = course.enrollment_term && !course.enrollment_term.default_term?
     show_code = course.course_code != course.name
     "#{course.course_code if show_code}#{', ' if show_term && show_code}#{course.enrollment_term.name if show_term}"
+  end
+
+  def turnitin_originality_options
+    [
+      [I18n.t('#turnitin_settings.originality_report_visible_immediately', "Immediately"), 'immediate'],
+      [I18n.t('#turnitin_settings.originality_report_visible_after_grading', "After the assignment is graded"), 'after_grading'],
+      [I18n.t('#turnitin_settings.originality_report_visible_after_due_date', "After the Due Date"), 'after_due_date'],
+      [I18n.t('#turnitin_settings.originality_report_never', "Never"), 'never']
+    ]
   end
 end

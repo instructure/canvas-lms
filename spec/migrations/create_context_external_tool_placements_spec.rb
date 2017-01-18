@@ -28,15 +28,15 @@ describe 'CreateContextExternalToolPlacements' do
 
       # make sure the triggers work while they need to
       # on update to false
-      ContextExternalTool.connection.execute("UPDATE context_external_tools SET has_course_navigation = 'f' WHERE id = #{tool1.id}")
+      ContextExternalTool.connection.execute("UPDATE #{ContextExternalTool.quoted_table_name} SET has_course_navigation = 'f' WHERE id = #{tool1.id}")
 
       # on update to true
-      ContextExternalTool.connection.execute("UPDATE context_external_tools SET has_account_navigation = 't' WHERE id = #{tool1.id}")
+      ContextExternalTool.connection.execute("UPDATE #{ContextExternalTool.quoted_table_name} SET has_account_navigation = 't' WHERE id = #{tool1.id}")
       # and on re-update to true
-      ContextExternalTool.connection.execute("UPDATE context_external_tools SET has_account_navigation = 't' WHERE id = #{tool1.id}")
+      ContextExternalTool.connection.execute("UPDATE #{ContextExternalTool.quoted_table_name} SET has_account_navigation = 't' WHERE id = #{tool1.id}")
 
       # on insert
-      ContextExternalTool.connection.execute("INSERT INTO context_external_tools(
+      ContextExternalTool.connection.execute("INSERT INTO #{ContextExternalTool.quoted_table_name}(
         context_id, context_type, workflow_state, name, shared_secret, consumer_key, created_at, updated_at, has_user_navigation)
         VALUES(#{@course.id}, 'Course', 'active', '', '', '', '2014-07-07', '2014-07-07', 't')")
 

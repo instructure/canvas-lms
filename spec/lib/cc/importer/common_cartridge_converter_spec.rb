@@ -2,12 +2,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../cc_spec_helper')
 
 require 'nokogiri'
+require 'tmpdir'
 
 describe "Standard Common Cartridge importing" do
   before(:all) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_full_test.zip")
-    unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
-    @export_folder = File.join(File.dirname(archive_file_path), "cc_cc_full_test")
+    unzipped_file_path = create_temp_dir!
     @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
     @converter.export
     @course_data = @converter.course.with_indifferent_access
@@ -21,12 +21,8 @@ describe "Standard Common Cartridge importing" do
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
   end
-  
+
   after(:all) do
-    @converter.delete_unzipped_archive
-    if File.exist?(@export_folder)
-      FileUtils::rm_rf(@export_folder)
-    end
     truncate_all_tables
   end
 
@@ -37,18 +33,25 @@ describe "Standard Common Cartridge importing" do
       expect(@course.attachments.where(migration_id: mig_id)).to be_exists
     end
   end
-  
+
+  it "should import files as assignments with intended_use set" do
+    assignment = @course.assignments.where(:migration_id => "f5").first
+    att = @course.attachments.where(:migration_id => "8612e3db71e452d5d2952ff64647c0d8").first
+    expect(assignment.description).to match_ignoring_whitespace(%{<img src="/courses/#{@course.id}/files/#{att.id}/preview">})
+    expect(assignment.title).to eq "Assignment 2"
+  end
+
   it "should import discussion topics" do
     expect(@course.discussion_topics.count).to eq 2
     file1_id = @course.attachments.where(migration_id: "I_media_R").first.id
     file2_id = @course.attachments.where(migration_id: "I_00006_Media").first.id
-    
+
     dt =  @course.discussion_topics.where(migration_id: "I_00006_R").first
     expect(dt.message).to match_ignoring_whitespace(%{<p>Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview"></p>})
     dt.attachment_id = file2_id
-    
+
     dt =  @course.discussion_topics.where(migration_id: "I_00009_R").first
-    expect(dt.message).to eq %{<p>Monkeys: Go!</p>\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>} 
+    expect(dt.message).to eq %{<p>Monkeys: Go!</p>\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>}
   end
 
   # This also tests the WebLinks, they are just content tags and don't have their own class
@@ -65,6 +68,7 @@ describe "Standard Common Cartridge importing" do
     tag = mod1.content_tags[1]
     expect(tag.content_type).to eq 'ContextModuleSubHeader'
     expect(tag.title).to eq "Study Guide"
+    expect(tag.migration_id).to eq "I_00002"
     expect(tag.indent).to eq 0
     index = 2
     if Qti.qti_enabled?
@@ -80,7 +84,7 @@ describe "Standard Common Cartridge importing" do
     expect(tag.title).to eq "Wikipedia - Your Mom"
     expect(tag.url).to eq "http://en.wikipedia.org/wiki/Maternal_insult"
     expect(tag.indent).to eq 0
-    
+
     mod1 = @course.context_modules.where(migration_id: "m2").first
     expect(mod1.name).to eq "Attachment module"
     expect(mod1.content_tags.count).to eq 5
@@ -101,10 +105,10 @@ describe "Standard Common Cartridge importing" do
       expect(tag.title).to eq "Sub-Folder 2"
       expect(tag.indent).to eq 1
         tag = mod1.content_tags[4]
-        expect(tag.content_type).to eq 'Attachment'
-        expect(tag.content_id).to eq @course.attachments.where(migration_id: "f5").first.id
+        expect(tag.content_type).to eq 'Assignment'
+        expect(tag.content_id).to eq @course.assignments.where(migration_id: "f5").first.id
         expect(tag.indent).to eq 2
-    
+
     mod1 = @course.context_modules.where(migration_id: "m3").first
     expect(mod1.name).to eq "Misc Module"
     expect(mod1.content_tags.count).to eq 4
@@ -206,19 +210,19 @@ describe "Standard Common Cartridge importing" do
       skip("Can't import assessment data with python QTI tool.")
     end
   end
-  
+
   context "re-importing the cartridge" do
-    
+
     append_before do
       @migration2 = ContentMigration.create(:context => @course)
       @migration2.migration_settings[:migration_ids_to_import] = {:copy=>{}}
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration2)
     end
-    
+
     it "should import webcontent" do
       expect(@course.attachments.count).to eq 20
       expect(@course.attachments.active.count).to eq 10
-      mig_ids = %w{I_00001_R I_00006_Media I_media_R f3 f4 f5 8612e3db71e452d5d2952ff64647c0d8 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
+      mig_ids = %w{I_00001_R I_00006_Media I_media_R f3 f4 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
       mig_ids.each do |mig_id|
         atts = @course.attachments.where(migration_id: mig_id).to_a
         expect(atts.length).to eq 2
@@ -226,7 +230,7 @@ describe "Standard Common Cartridge importing" do
         expect(atts.any?{|a|a.file_state = 'available'}).to eq true
       end
     end
-    
+
     it "should point to new attachment from module" do
       expect(@course.context_modules.count).to eq 3
 
@@ -284,6 +288,8 @@ describe "Standard Common Cartridge importing" do
       expect(@course.discussion_topics.count).to eq 1
       expect(@course.discussion_topics.first.migration_id).to eq 'I_00006_R'
     end
+
+
 
     it "should not import all attachments if :files does not exist" do
       @course = course
@@ -406,6 +412,38 @@ describe "Standard Common Cartridge importing" do
     end
   end
 
+  context "sub-modules" do
+    it "list submodules in the overview" do
+      overview = JSON.parse(File.read(@course_data['overview_file_path']))
+      root_mod = overview['modules'][1]
+      sub_mod = root_mod['submodules'].first
+      expect(sub_mod['title']).to eq "Sub-Folder"
+      expect(sub_mod['migration_id']).to eq "sf1"
+
+      sub_mod2 = sub_mod['submodules'].first
+      expect(sub_mod2['title']).to eq "Sub-Folder 2"
+      expect(sub_mod2['migration_id']).to eq "sf2"
+    end
+
+    it "should import submodules individually if selected" do
+      course
+      @migration = ContentMigration.create(:context => @course)
+      @migration.migration_settings[:migration_ids_to_import] = {
+        :copy => {"context_modules" => {"sf2" => "1"}}
+      }
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+
+      expect(@course.context_modules.count).to eq 1
+      mod = @course.context_modules.first
+
+      expect(mod.name).to eq "Sub-Folder 2" # imports as a top-level module
+
+      expect(mod.content_tags.count).to eq 1
+      tag = mod.content_tags.first
+      expect(tag.title).to eq "Assignment 2"
+      expect(tag.content).to be_present
+    end
+  end
 end
 
 describe "More Standard Common Cartridge importing" do
@@ -558,8 +596,7 @@ end
 describe "LTI tool combination" do
   before(:all) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_lti_combine_test.zip")
-    unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
-    @export_folder = File.join(File.dirname(archive_file_path), "cc_cc_lti_combine_test")
+    unzipped_file_path = create_temp_dir!
     @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
     @converter.export
     @course_data = @converter.course.with_indifferent_access
@@ -576,10 +613,6 @@ describe "LTI tool combination" do
   end
 
   after(:all) do
-    @converter.delete_unzipped_archive
-    if File.exist?(@export_folder)
-      FileUtils::rm_rf(@export_folder)
-    end
     truncate_all_tables
   end
 
@@ -607,8 +640,7 @@ end
 describe "cc assignment extensions" do
   before(:all) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_assignment_extension.zip")
-    unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
-    @export_folder = File.join(File.dirname(archive_file_path), "cc_cc_assignment_extension")
+    unzipped_file_path = create_temp_dir!
     @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
     @converter.export
     @course_data = @converter.course.with_indifferent_access
@@ -623,10 +655,6 @@ describe "cc assignment extensions" do
   end
 
   after(:all) do
-    @converter.delete_unzipped_archive
-    if File.exist?(@export_folder)
-      FileUtils::rm_rf(@export_folder)
-    end
     truncate_all_tables
   end
 

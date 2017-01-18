@@ -15,14 +15,17 @@ require([
 $(document).ready(function() {
   $("#communication_channels").tabs();
   $("#communication_channels").bind('tabsshow', function(event) {
+    var channelInputField;
     if($(this).css('display') != 'none') {
+      // TODO: This is always undefined - where did this come from?
       var idx = $(this).data('selected.tabs');
       if(idx == 0) {
-        $("#register_email_address").find(":text:first").focus().select();
+        channelInputField = $("#register_email_address").find(":text:first");
       } else {
-        $("#register_sms_number").find(":text:first").focus().select();
+        channelInputField = $("#register_sms_number").find("input[type=tel]:first");
       }
     }
+    formatTabs(channelInputField);
   });
   $(".channel_list tr").hover(function() {
     if($(this).hasClass('unconfirmed')) {
@@ -44,10 +47,7 @@ $(document).ready(function() {
       title:  I18n.t('titles.register_communication', "Register Communication") ,
       width: 600,
       resizable: false,
-      modal: true,
-      open: function() {
-        $("#communication_channels").triggerHandler('tabsshow');
-      }
+      modal: true
     });
     if($(this).hasClass('add_contact_link')) {
       $("#communication_channels").tabs('select', '#register_sms_number');
@@ -56,33 +56,103 @@ $(document).ready(function() {
       $("#communication_channels").tabs('select', '#register_email_address');
     }
   });
-  $("#register_sms_number .user_selected").bind('change blur keyup focus', function() {
-    var $form = $(this).parents("#register_sms_number");
+
+  var formatTabs = function (tabs) {
+    var $form = $(tabs).parents("#register_sms_number");
     var sms_number = $form.find(".sms_number").val().replace(/[^\d]/g, "");
-    $form.find(".should_be_10_digits").showIf(sms_number && sms_number.length != 10);
-    var email = $form.find(".carrier").val();
-    $form.find(".sms_email").attr('disabled', email != 'other');
-    if(email == "other") { return; }
-    email = email.replace("#", sms_number);
-    $form.find(".sms_email").val(email);
+
+    var useEmail = !ENV.INTERNATIONAL_SMS_ENABLED || $form.find(".country option:selected").data('useEmail');
+
+    // Don't show the 10-digit warning if we're not expecting a U.S. number
+    $form.find(".should_be_10_digits").showIf(useEmail && sms_number && sms_number.length != 10);
+
+    // Show the "international text messaging rates may apply" warning if international SMS is enabled, the user has
+    // selected a country, and that country is not the U.S.
+    $form.find('.intl_rates_may_apply').showIf(
+      ENV.INTERNATIONAL_SMS_ENABLED &&
+      !useEmail &&
+      $form.find(".country option:selected").val() !== 'undecided'
+    );
+
+    if (useEmail) {
+      $form.find('.sms_email_group').show();
+      var email = $form.find(".carrier").val();
+      $form.find(".sms_email").attr('disabled', email != 'other');
+      if(email == "other") { return; }
+      email = email.replace("#", sms_number);
+      $form.find(".sms_email").val(email);
+    } else {
+      $form.find('.sms_email_group').hide();
+    }
+  }
+
+  $("#register_sms_number .user_selected").bind('change blur keyup focus', function() {
+    formatTabs(this);
   });
 
   $("#register_sms_number,#register_email_address").formSubmit({
     object_name: 'communication_channel',
-    required: ['address'],
-    property_validations: {
-      address: function (value) {
-        var match = value.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/);
-        return !match && !(match && match.length !== value.length) && !(value.length === 0) && I18n.t("Email is invalid!");
+    processData: function(data) {
+      var address;
+      var type;
+      if (data['communication_channel[type]'] === 'email') {
+        // Email channel
+        type = 'email';
+        address = data.communication_channel_email;
+      } else if (ENV.INTERNATIONAL_SMS_ENABLED && $('#communication_channel_sms_country').val() === 'undecided') {
+        // Haven't selected a country yet
+        $(this).formErrors({communication_channel_sms_country: I18n.t("Country is required")});
+        return false;
+      } else if (!ENV.INTERNATIONAL_SMS_ENABLED || $('#communication_channel_sms_country option:selected').data('useEmail')) {
+        // SMS channel using an email address
+        type = 'sms_email';
+        address = data.communication_channel_sms_email;
+      } else {
+        // SMS channel using a phone number
+        type = 'sms_number';
+        address = '+' + data.communication_channel_sms_country + data.communication_channel_sms_number;
       }
+
+      delete data.communication_channel_sms_country;
+
+      if (type == 'email' || type == 'sms_email') {
+        // Make sure it's a valid email address
+        var match = address.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/);
+        if (!match) {
+          // Not a valid email address. Show a message on the relevant field, then bail.
+          var errorMessage = address === "" ? I18n.t("Email is required") : I18n.t("Email is invalid!");
+          if (type == 'email') {
+            $(this).formErrors({communication_channel_email: errorMessage});
+          } else {
+            $(this).formErrors({communication_channel_sms_email: errorMessage});
+          }
+          return false;
+        }
+      } else {
+        // Make sure it's a valid phone number. Validate the phone number they typed instead of the address because
+        // the address will already have the country code prepended, and this will result in our regex failing always
+        // because it's not expecting the leading plus sign (and it can't just be added to the regex because then
+        // we can't detect when they entered a blank phone number). libphonenumber plz
+        var match = data.communication_channel_sms_number.match(/^[0-9]+$/);
+        if (!match) {
+          var errorMessage = address === "" ? I18n.t("Cell Number is required") : I18n.t("Cell Number is invalid!");
+          $(this).formErrors({communication_channel_sms_number: errorMessage});
+          return false;
+        }
+      }
+
+      // Don't need these anymore
+      delete data.communication_channel_sms_number;
+      delete data.communication_channel_sms_email;
+
+      data['communication_channel[address]'] = address;
     },
     beforeSubmit: function(data) {
       var $list = $(".email_channels");
-      var data = $(this).getFormData({object_name: 'communication_channel'});
       if($(this).attr('id') == "register_sms_number") {
         $list = $(".other_channels");
       }
-      var path = $(this).getFormData({object_name: 'communication_channel'}).address;
+      var path = data['communication_channel[address]'];
       $(this).data('email', path);
       $list.find(".channel .path").each(function() {
         if($(this).text() == path) { path = ""; }
@@ -99,10 +169,12 @@ $(document).ready(function() {
       }
       if(!path) { return false; }
       $("#communication_channels").dialog('close');
+      $("#communication_channels").hide();
       $channel.loadingImage({image_size: 'small'});
       return $channel;
     }, success: function(channel, $channel) {
       $("#communication_channels").dialog('close');
+      $("#communication_channels").hide();
       $channel.loadingImage('remove');
 
       channel.channel_id = channel.id;
@@ -138,16 +210,41 @@ $(document).ready(function() {
     event.preventDefault();
 
   });
+
+  var manageAfterDeletingAnEmailFocus = function(currentElement) {
+    // There may be a better way to do this but I'm not aware of another way. I'm trying to
+    // find the closest prev() or next() sibling
+    var $elementToFocusOn = $(currentElement).next('.channel:not(.blank)').last();
+    if (!$elementToFocusOn.length) {
+      $elementToFocusOn = $(currentElement).prev('.channel:not(.blank)').last();
+    }
+
+    if ($elementToFocusOn.length) {
+      $elementToFocusOn.find('.email_channel').first().focus();
+    } else {
+      $(this).parents(".channel_list .email_channel").first().focus();
+    }
+  }
+
   $(".channel_list .channel .delete_channel_link").click(function(event) {
     event.preventDefault();
     $(this).parents(".channel").confirmDelete({
       url: $(this).attr('href'),
       success: function(data) {
         var $list = $(this).parents(".channel_list");
+        manageAfterDeletingAnEmailFocus(this);
         $(this).remove();
         $list.toggleClass('single', $list.find(".channel:visible").length <= 1);
       }
     });
+  });
+  $(".channel_list .channel .reset_bounce_count_link").click(function(event) {
+    event.preventDefault();
+    $.ajaxJSON($(this).attr('href'), 'POST', {}, function(data) {
+      $(this).parents('.channel').find('.bouncing-channel').remove();
+      $(this).remove();
+      $.flashMessage(I18n.t('Bounce count reset!'))
+    }.bind(this));
   });
   $("#confirm_communication_channel .cancel_button").click(function(event) {
     $("#confirm_communication_channel").dialog('close');
@@ -213,7 +310,8 @@ $(document).ready(function() {
       $.flashMessage( I18n.t('notices.contact_confirmed', "Contact successfully confirmed!") );
     },
     error: function(data) {
-      $(this).find(".status_message").text( I18n.t('errors.confirmation_failed', "Confirmation failed.  Please try again.") );
+      $(this).find(".status_message").css('visibility', 'hidden');
+      $.flashError( I18n.t("Confirmation failed.  Please try again.") );
     }
   });
   $(".channel_list .channel .default_link").click(function(event) {
@@ -224,8 +322,8 @@ $(document).ready(function() {
     }
     $.ajaxJSON($(this).attr('href'), 'PUT', formData, function(data) {
       var channel_id = data.user.communication_channel.id;
-      $(".channel.default").removeClass('default');
-      $(".channel#channel_" + channel_id).addClass('default');
+      $(".channel.default").removeClass('default').find('a.default_link span.screenreader-only.default_label').remove();
+      $(".channel#channel_" + channel_id).addClass('default').find('a.default_link').append( $('<span class="screenreader-only" />').text(I18n.t("This is the default email address")) );
       $(".default_email.display_data").text(data.user.pseudonym.unique_id);
     });
   });

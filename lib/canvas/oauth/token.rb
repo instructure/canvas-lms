@@ -9,13 +9,18 @@ module Canvas::Oauth
     PURPOSE_KEY = 'purpose'
     REMEMBER_ACCESS = 'remember_access'
 
-    def initialize(key, code)
+    def initialize(key, code, access_token=nil)
       @key = key
-      @code = code
+      @code = code if code
+      if access_token
+        @access_token = access_token
+        @user = @access_token.user
+      end
+
     end
 
     def is_for_valid_code?
-      code_data.present? &&  client_id == key.id
+      code_data.present?
     end
 
     def client_id
@@ -54,9 +59,15 @@ module Canvas::Oauth
         user.access_tokens.where(developer_key_id: key).destroy_all if replace_tokens || key.replace_tokens
 
         # Then create a new one
-        @access_token = user.access_tokens.create!({:developer_key => key, :remember_access => remember_access?, :scopes => scopes, :purpose => purpose})
+        @access_token = user.access_tokens.create!({
+                                                     :developer_key => key,
+                                                     :remember_access => remember_access?,
+                                                     :scopes => scopes,
+                                                     :purpose => purpose
+                                                   })
 
         @access_token.clear_full_token! if @access_token.scoped_to?(['userinfo'])
+        @access_token.clear_plaintext_refresh_token! if @access_token.scoped_to?(['userinfo'])
       end
     end
 
@@ -73,11 +84,19 @@ module Canvas::Oauth
       end
     end
 
-    def as_json(options={})
-      {
-        'access_token' => access_token.full_token,
-        'user' => user.as_json(:only => [:id, :name], :include_root => false),
+    def as_json(_options={})
+      json = {
+          'access_token' => access_token.full_token,
+          'token_type' => 'Bearer',
+          'user' => user.as_json(:only => [:id, :name], :include_root => false)
       }
+
+      json['refresh_token'] = access_token.plaintext_refresh_token if access_token.plaintext_refresh_token
+
+      if access_token.expires_at && key.auto_expire_tokens
+        json['expires_in'] = access_token.expires_at.utc.to_i - Time.now.utc.to_i
+      end
+      json
     end
 
     def self.find_userinfo_access_token(user, developer_key, purpose)
