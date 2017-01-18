@@ -59,7 +59,7 @@ set :linked_dirs, %w{log tmp/pids public/system}
 # Default value for keep_releases is 5
 # Set it to 2 to free up space (1.6GB per release on an 8GB server)
 # and realistically, we won't go back more than one release.
-set :keep_releases, 2
+set :keep_releases, 3
 
 # set the locations that we will look for changed assets to determine whether to precompile
 set :assets_dependencies, %w(app/stylesheets app/coffeescripts public/javascripts public/stylesheets app/views/jst spec/javascripts spec/coffeescripts Gemfile.lock config/routes.rb)
@@ -192,10 +192,10 @@ namespace :deploy do
             # with their permissions set loosely enough on the group so that compile_assets will work since "deploy" is in the 
             # "canvasadmin" group.
             info("Compiling assets because a file in #{fetch(:assets_dependencies)} changed.")
-            execute :npm, 'cache clear' # Was getting "npm ERR! cb() never called!".
-            execute :npm, 'install', '--silent'
-            #execute :npm, '-d install' # print debug log of npm install
-            execute :rake, 'canvas:compile_assets'
+            execute :npm, 'cache clean' # Was getting "npm ERR! cb() never called!".
+            #execute :npm, 'install', '--silent'
+            execute :npm, '-dd install' # print debug log of npm install
+            execute :rake, 'canvas:compile_assets', '--trace'
           end
         end
       end
