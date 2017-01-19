@@ -217,7 +217,9 @@ class BzController < ApplicationController
     @current_user.last_url_title = params[:last_url_title]
     @current_user.save
 
-    # I also want to store
+    # I also want to store the per-module, per-course
+    # last item, so we can pick up where we left off on
+    # the dynamic syllabus there too.
     url = URI.parse(params[:last_url])
     urlparams = CGI.parse(url.query)
     if urlparams['module_item_id']
@@ -328,11 +330,6 @@ class BzController < ApplicationController
     @progressions = @current_user.context_module_progressions
 
     @editable = authorized_action(@course, @current_user, :update)
-
-    #@course.context_modules.active.each do |mod|
-      #mod.part_id = 2
-      #mod.save
-    #end
   end
 
   def dynamic_syllabus_edit
