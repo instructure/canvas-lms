@@ -244,6 +244,7 @@ define([
                         <div className="StudentContextTray-Header__Actions">
                           <Button
                             ref={ (b) => this.messageStudentsButton = b }
+                            variant="link" size="small"
                             onClick={this.handleMessageButtonClick}
                           >
                             <ScreenReaderContent>
