@@ -41,7 +41,15 @@
       <% elsif progress.workflow_state == 'locked' %>
         <!-- locked, no button needed -->
       <% else %>
-        <a class="bz-button-pick-up" href="/courses/<%= @course.id %>/modules/items/<%= progress.current_position_tag_without_progress.id %>">Pick up where you left off</a>
+        <%
+          ump = UserModulePosition.where(:user_id => @current_user.id, :module_id => mod.id, :course_id => @course.id)
+          if ump.empty?
+        %>
+          <a class="bz-button-pick-up" href="/courses/<%= @course.id %>/modules/items/<%= progress.current_position_tag_without_progress.id %>">Pick up where you left off</a>
+        <% else %>
+          <a class="bz-button-pick-up" href="/courses/<%= @course.id %>/modules/items/<%= ump.first.module_item_id %>">Pick up where you left off</a>
+
+        <% end %>
       <% end %>
     </div>
     <% end %>
