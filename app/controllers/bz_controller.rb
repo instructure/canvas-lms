@@ -217,6 +217,34 @@ class BzController < ApplicationController
     @current_user.last_url_title = params[:last_url_title]
     @current_user.save
 
+    # I also want to store
+    url = URI.parse(params[:last_url])
+    urlparams = CGI.parse(url.query)
+    if urlparams['module_item_id']
+      mi = urlparams['module_item_id'].first
+      tag = ContentTag.find(mi)
+      context_module = tag.context_module
+
+      p = UserModulePosition.where(
+        :user_id => @current_user.id,
+        :course_id => tag.context_id,
+        :module_id => context_module.id
+      )
+      if p.empty?
+        UserModulePosition.create(
+          :user_id => @current_user.id,
+          :course_id => tag.context_id,
+          :module_id => context_module.id,
+          :module_item_id => mi
+        )
+      else
+        p = p.first
+        p.module_item_id = mi
+        p.save
+      end
+    end
+
+
     render :nothing => true
   end
 
