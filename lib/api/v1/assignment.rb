@@ -119,6 +119,7 @@ module Api::V1::Assignment
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
     hash['due_date_required'] = assignment.due_date_required?
+    hash['max_name_length'] = assignment.max_name_length
 
     unless opts[:exclude_response_fields].include?('in_closed_grading_period')
       hash['in_closed_grading_period'] = assignment.in_closed_grading_period?

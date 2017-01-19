@@ -312,6 +312,11 @@
 #           "type": "array",
 #           "items": {"type": "string"}
 #         },
+#         "max_name_length": {
+#           "description": "An integer indicating the maximum length an assignment's name may be",
+#           "example": 15,
+#           "type": "integer"
+#         },
 #         "turnitin_enabled": {
 #           "description": "Boolean flag indicating whether or not Turnitin has been enabled for the assignment. NOTE: This flag will not appear unless your account has the Turnitin plugin available",
 #           "example": true,
