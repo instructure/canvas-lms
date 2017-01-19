@@ -781,6 +781,16 @@ class Submission < ActiveRecord::Base
   VERICITE_JOB_OPTS = { :n_strand => 'vericite', :priority => Delayed::LOW_PRIORITY, :max_attempts => 2 }
 
   def submit_to_vericite_later
+    # make sure any missing statuses get set to "pending"
+    vericite_assets.each do |a|
+      asset_data = self.vericite_data_hash[a.asset_string] || {}
+      #we only want to change the status if it is not present or a hard reset
+      if(!asset_data[:status].present?)
+        asset_data[:status] = 'pending'
+        self.vericite_data_hash[a.asset_string] = asset_data
+        self.vericite_data_changed!
+      end
+    end
     submit_to_plagiarism_later('vericite')
   end
 
@@ -825,8 +835,8 @@ class Submission < ActiveRecord::Base
       end
     end
     # only save if there were newly submitted attachments
+    send_later_enqueue_args(:check_vericite_status, { :run_at => 5.minutes.from_now }.merge(VERICITE_JOB_OPTS))
     if update
-      send_later_enqueue_args(:check_vericite_status, { :run_at => 5.minutes.from_now }.merge(VERICITE_JOB_OPTS))
       if !self.vericite_data_hash.empty?
         # only set vericite provider flag if the hash isn't empty
         self.vericite_data_hash[:provider] = :vericite
@@ -912,7 +922,7 @@ class Submission < ActiveRecord::Base
 
   def prep_for_submitting_to_plagiarism(type)
     if(type == "vericite")
-      plagData = self.vericite_data_hash
+      plagData = self.vericite_data(false)
       @submit_to_vericite = false
       canSubmit = self.vericiteable?
     else

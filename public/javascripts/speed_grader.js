@@ -1499,17 +1499,17 @@ define([
         });
 
         var defaultInfoMessage = I18n.t('vericite.info_message',
-                                        'This file is still being processed by VeriCite. Please check back later to see the score'),
+                                        'This file is still being processed by VeriCite. Please check back later to see the score or resubmit if it has been more than a day.'),
             defaultErrorMessage = I18n.t('vericite.error_message',
                                          'There was an error submitting to VeriCite. Please try resubmitting the file before contacting support');
         var $vericiteInfo = $(vericiteInfoTemplate({
           assetString: assetString,
           message: (vericiteAsset.status == 'error' ? (vericiteAsset.public_error_message || defaultErrorMessage) : defaultInfoMessage),
-          showResubmit: vericiteAsset.status == 'error' && isMostRecent
+          showResubmit: isMostRecent
         }));
         $vericiteInfoContainer.append($vericiteInfo);
 
-        if (vericiteAsset.status == 'error' && isMostRecent) {
+        if (isMostRecent) {
           var resubmitUrl = $.replaceTags($assignment_submission_resubmit_to_vericite_url.attr('href'), { user_id: submission.user_id });
           $vericiteInfo.find('.vericite_resubmit_button').click(function(event) {
             event.preventDefault();
