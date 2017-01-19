@@ -69,7 +69,6 @@ class Assignment < ActiveRecord::Base
   has_many :ignores, :as => :asset
   has_many :moderated_grading_selections, class_name: 'ModeratedGrading::Selection'
   belongs_to :context, polymorphic: [:course]
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
   belongs_to :grading_standard
   belongs_to :group_category
 
@@ -145,12 +144,11 @@ class Assignment < ActiveRecord::Base
     AssignmentUtil.due_date_required?(self)
   end
 
-  def assignment_name_length_ok?
-    name_length = self.try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value) ||
-                  Assignment.maximum_string_length
-    if sis_require_assignment_name_length? && self.post_to_sis.present? && self.title.length > name_length
-      errors.add(:title, I18n.t('The title cannot be longer than %{length} characters', length: name_length))
+  def max_name_length
+    if AssignmentUtil.assignment_name_length_required?(self)
+      return self.try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value).to_i
     end
+    Assignment.maximum_string_length
   end
 
   def secure_params
@@ -248,7 +246,6 @@ class Assignment < ActiveRecord::Base
   validates_presence_of :context_id, :context_type, :workflow_state
 
   validates_presence_of :title, if: :title_changed?
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :allowed_extensions, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
@@ -2339,9 +2336,16 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def sis_require_assignment_name_length?
-    self.try(:context).try(:account).try(:sis_assignment_name_length).try(:[], :value) &&
-    self.try(:context).try(:feature_enabled?, 'new_sis_integrations').present?
+  def assignment_name_length_ok?
+    name_length = max_name_length
+
+    # Due to the removal of the multiple `validates_length_of :title` validations we need this nil check
+    # here to act as those validations so we can reduce the number of validations for this attribute
+    # to just one single check
+    return if self.nil? || self.title.nil?
+
+    if self.title.to_s.length > name_length
+      errors.add(:title, I18n.t('The title cannot be longer than %{length} characters', length: name_length))
+    end
   end
 end
-

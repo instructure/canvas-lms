@@ -3384,6 +3384,11 @@ describe Assignment do
       @assignment = assignment_model(course: @course)
     end
 
+    let(:errors) do
+      @assignment.valid?
+      @assignment.errors
+    end
+
     it "should hard truncate at 30 characters" do
       @assignment.title = "a" * 31
       expect(@assignment.title.length).to eq 31
@@ -3410,7 +3415,7 @@ describe Assignment do
                            qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                            qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
 
-      expect(lambda { @assignment.save! }).to raise_error("Validation failed: Title is too long (maximum is 255 characters), Title is too long (maximum is 255 characters)")
+      expect(errors[:title]).not_to be_empty
     end
   end
 
@@ -3813,60 +3818,24 @@ describe Assignment do
       errors = assignment.errors
       expect(errors[:title]).not_to be_empty
     end
+  end
 
-    describe "when sis_assignment_name_length is true" do
-      it "is required when post_to_sis is true and feature_enabled(post_grades) is true" do
-        assignment.post_to_sis = true
-        assignment.title = "Too much tuna fish"
-        assignment.context.account.stubs(:sis_assignment_name_length).returns({value: true})
-        assignment.context.account.stubs(:sis_assignment_name_length_input).returns({value: 15})
-        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
-        expect(assignment.valid?).to eq(false)
-      end
-
-      it "is valid when post_to_sis is true, feature_enabled(post_grades) is true and there is no name length value" do
-        assignment.post_to_sis = true
-        assignment.title = "Too much tuna fish"
-        assignment.context.account.stubs(:sis_assignment_name_length).returns({value: true})
-        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
-        expect(assignment.valid?).to eq(true)
-      end
+  describe "max_name_length" do
+    let(:assignment) do
+      @course.assignments.new(assignment_valid_attributes)
     end
 
-    describe "when sis_assignment_name_length is false" do
-      before do
-        assignment.context.account.stubs(:sis_assignment_name_length).returns({value: false})
-      end
+    it "returns custom name length if sis_assignment_name_length_input is present" do
+      assignment.post_to_sis = true
+      assignment.context.account.stubs(:sis_syncing).returns({value: true})
+      assignment.context.account.stubs(:sis_assignment_name_length).returns({value: true})
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+      assignment.context.account.stubs(:sis_assignment_name_length_input).returns({value: 15})
+      expect(assignment.max_name_length).to eq(15)
+    end
 
-      it "is not required when post_to_sis is true and feature_enabled(post_grades) is true" do
-        assignment.post_to_sis = true
-        assignment.title = "Too much tuna fish"
-        assignment.context.account.stubs(:sis_assignment_name_length).returns({value: false})
-        assignment.context.account.stubs(:sis_assignment_name_length_input).returns({value: 15})
-        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
-        expect(assignment.valid?).to eq(true)
-      end
-
-      it "is not required when post_to_sis is true and feature_enabled(post_grades) is false" do
-        assignment.post_to_sis = true
-        assignment.title = "some new assignment"
-        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(false)
-        expect(assignment.valid?).to eq(true)
-      end
-
-      it "is not required when post_to_sis is false and feature_enabled(post_grades) is true" do
-        assignment.post_to_sis = false
-        assignment.title = "oh hello"
-        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
-        expect(assignment.valid?).to eq(true)
-      end
-
-      it "is not required when post_to_sis is false and feature_enabled(post_grades) is false" do
-        assignment.post_to_sis = false
-        assignment.title = "tuna"
-        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(false)
-        expect(assignment.valid?).to eq(true)
-      end
+    it "returns default of 255 if sis_assignment_name_length_input is not present " do
+      expect(assignment.max_name_length).to eq(255)
     end
   end
 

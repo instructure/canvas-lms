@@ -10,6 +10,8 @@ describe AssignmentUtil do
     @course.assignments.create!(assignment_valid_attributes)
   end
 
+  let(:assignment_name_length_value){ 15 }
+
   describe "due_date_required?" do
     it "returns true when all 3 are set to true" do
       assignment.post_to_sis = true
@@ -65,5 +67,46 @@ describe AssignmentUtil do
       expect(described_class.due_date_ok?(assignment)).to eq(true)
     end
   end
-end
 
+  describe "assignment_name_length_required?" do
+    it "returns true when all 4 are set to true" do
+      assignment.post_to_sis = true
+      assignment.context.account.stubs(:sis_syncing).returns({value: true})
+      assignment.context.account.stubs(:sis_assignment_name_length).returns({value: true})
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+      expect(described_class.assignment_name_length_required?(assignment)).to eq(true)
+    end
+
+    it "returns false when sis_sycning is set to false" do
+      assignment.post_to_sis = true
+      assignment.context.account.stubs(:sis_syncing).returns({value: false})
+      assignment.context.account.stubs(:sis_assignment_name_length).returns({value: true})
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+      expect(described_class.assignment_name_length_required?(assignment)).to eq(false)
+    end
+
+    it "returns false when post_to_sis is false" do
+      assignment.post_to_sis = false
+      assignment.context.account.stubs(:sis_syncing).returns({value: true})
+      assignment.context.account.stubs(:sis_assignment_name_length).returns({value: true})
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+      expect(described_class.assignment_name_length_required?(assignment)).to eq(false)
+    end
+
+    it "returns false when sis_assignment_name_length is false" do
+      assignment.post_to_sis = true
+      assignment.context.account.stubs(:sis_syncing).returns({value: false})
+      assignment.context.account.stubs(:sis_assignment_name_length).returns({value: false})
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+      expect(described_class.assignment_name_length_required?(assignment)).to eq(false)
+    end
+
+    it "returns false when new_sis_integrations is false" do
+      assignment.post_to_sis = true
+      assignment.context.account.stubs(:sis_syncing).returns({value: false})
+      assignment.context.account.stubs(:sis_assignment_name_length).returns({value: true})
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(false)
+      expect(described_class.assignment_name_length_required?(assignment)).to eq(false)
+    end
+  end
+end
