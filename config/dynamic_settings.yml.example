@@ -14,5 +14,5 @@ development:
   rich-content-service:
     app-host: "rce.docker"
   canvas:
-    encryption-secret: "12345"
-    signing-secret: "54321"
+    encryption-secret: "astringthatisactually32byteslong"
+    signing-secret: "astringthatisactually32byteslong"
