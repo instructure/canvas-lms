@@ -108,3 +108,10 @@ define [
     ok Calendar.prototype.isSameWeek(date2, datetime3), 'sun-sat 1'
     ok Calendar.prototype.isSameWeek(datetime2, date3), 'sun-sat 2'
     ok Calendar.prototype.isSameWeek(date2, date3), 'sun-sat 3'
+
+  test 'gets appointment groups when show scheduler activated', ->
+    mockHeader = makeMockHeader()
+    mockDataSource = makeMockDataSource()
+    cal = new Calendar('#fixtures', [], null, mockDataSource, {header: mockHeader, showScheduler: true})
+    ok mockDataSource.getAppointmentGroups.called
+    ok mockDataSource.getEvents.called
