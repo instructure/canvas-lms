@@ -285,17 +285,13 @@ describe ConditionalRelease::Service do
       @submission.save!
     end
 
-    RSpec::Matchers.define :cr_service_body_params do |expected|
-      match do |actual|
-        parsed = Rack::Utils.parse_query(actual[:form_data])
-        expected.all?{|k,v| parsed[k] == v}
-      end
-    end
-
     def expect_select_mastery_path_request(expected_params = {})
-      expect(CanvasHttp).to receive(:post)
-        .with(Service.select_assignment_set_url, anything, cr_service_body_params(expected_params))
-        .and_return(double(code: '200', body: { key: 'value' }.to_json))
+      expect(CanvasHttp).to receive(:post) do |url, _headers, body|
+        expect(url).to eq Service.select_assignment_set_url
+        parsed = Rack::Utils.parse_query(body[:form_data])
+        expect(expected_params.all?{|k,v| parsed[k] == v}).to be_truthy
+        double(code: '200', body: { key: 'value' }.to_json)
+      end
     end
 
     it 'make http request to service' do
