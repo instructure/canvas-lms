@@ -95,6 +95,32 @@ describe "Default Account Reports" do
     @term1.save!
   end
 
+  def create_some_group_categories()
+    create_some_courses
+    @group_category1 = GroupCategory.create(
+      :name => 'Test Group Category'
+    )
+    @group_category2 = GroupCategory.create(
+      :name => 'Test Group Category2'
+    )
+    @group_category1.save!
+    @group_category2.auto_leader = 'first'
+    @group_category2.group_limit = 2
+    @group_category2.save!
+    @group_category3 = GroupCategory.create(
+      :name => 'Test Group Category Deleted'
+    )
+    @group_category4 = GroupCategory.create(
+      :name => 'Test Group Category Course'
+    )
+    @account.group_categories << @group_category1
+    @account.group_categories << @group_category2
+    @account.group_categories << @group_category3
+    @course3.group_categories << @group_category4
+    @group_category3.destroy
+    @account.save!
+  end
+
   def create_some_terms()
     create_a_term
     @term2 = EnrollmentTerm.create(:name => 'Winter',:start_at => 3.weeks.ago,
@@ -224,13 +250,15 @@ describe "Default Account Reports" do
   end
 
   def create_some_groups()
-    create_an_account()
+    create_some_group_categories
     @group1 = @account.groups.create(:name => 'group1name')
+    @group1.group_category = @group_category1
     @group1.sis_source_id = 'group1sis'
     @group1.sis_batch_id = @sis.id
     @group1.save!
     @group2 = @sub_account.groups.create(:name => 'group2name')
     @group2.sis_source_id = 'group2sis'
+    @group2.group_category = @group_category2
     @group2.sis_batch_id = @sis.id
     @group2.save!
     @group3 = @sub_account.groups.create(:name => 'group3name')
@@ -240,6 +268,10 @@ describe "Default Account Reports" do
     @group4.sis_batch_id = @sis.id
     @group4.save!
     @group4.destroy
+    @group5 = @course1.groups.create(:name => 'group5name')
+    @group5.sis_source_id = 'group5sis'
+    @group5.sis_batch_id = @sis.id
+    @group5.save!
   end
 
   def create_some_group_memberships_n_stuff()
@@ -838,9 +870,10 @@ describe "Default Account Reports" do
         parameters["enrollment_term_id"] = @default_term.id
         parameters["groups"] = true
         parsed = read_report("sis_export_csv",{params: parameters, order: 2})
-        expect(parsed.length).to eq 2
+        expect(parsed.length).to eq 3
         expect(parsed[0]).to eq ["group1sis",nil,"group1name","available"]
         expect(parsed[1]).to eq ["group2sis","sub1","group2name","available"]
+        expect(parsed[2]).to eq ["group5sis","sub1","group5name","available"]
       end
 
       it "should run the SIS report with deleted groups" do
@@ -848,23 +881,26 @@ describe "Default Account Reports" do
         parameters["include_deleted"] = true
         parameters["groups"] = true
         parsed = read_report("sis_export_csv",{params: parameters, order: 2})
-        expect(parsed.length).to eq 3
+        expect(parsed.length).to eq 4
         expect(parsed[0]).to eq ["group1sis",nil,"group1name","available"]
         expect(parsed[1]).to eq ["group2sis","sub1","group2name","available"]
         expect(parsed[2]).to eq ["group4sis",nil,"group4name","deleted"]
+        expect(parsed[3]).to eq ["group5sis","sub1","group5name","available"]
       end
 
       it "should run the provisioning report" do
         parameters = {}
         parameters["groups"] = true
         parsed = read_report("provisioning_csv", {params: parameters, order: 4})
-        expect(parsed.length).to eq 3
+        expect(parsed.length).to eq 4
         expect(parsed[0]).to eq [@group1.id.to_s, "group1sis", @account.id.to_s,
-                                 nil, "group1name", "available", "true"]
+                                 nil, "group1name", "available", "true", @account.id.to_s, 'Account', @group1.group_category.id.to_s]
         expect(parsed[1]).to eq [@group2.id.to_s, "group2sis", @sub_account.id.to_s,
-                                 "sub1", "group2name", "available", "true"]
+                                 "sub1", "group2name", "available", "true", @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s]
         expect(parsed[2]).to eq [@group3.id.to_s, nil, @sub_account.id.to_s,
-                                 "sub1", "group3name", "available", "false"]
+                                 "sub1", "group3name", "available", "false", @sub_account.id.to_s,'Account', nil]
+        expect(parsed[3]).to eq [@group5.id.to_s, "group5sis", @sub_account.id.to_s,
+                                 "sub1", "group5name", "available", "true", @course1.id.to_s,'Course', @group5.group_category.id.to_s]
       end
 
       it "should run the provisioning report on a sub account" do
@@ -873,9 +909,48 @@ describe "Default Account Reports" do
         parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: 4})
         expect(parsed.length).to eq 2
         expect(parsed[0]).to eq [@group2.id.to_s, "group2sis", @sub_account.id.to_s,
-                                 "sub1", "group2name", "available", "true"]
+                                 "sub1", "group2name", "available", "true", @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s]
         expect(parsed[1]).to eq [@group3.id.to_s, nil, @sub_account.id.to_s,
-                                 "sub1", "group3name", "available", "false"]
+                                 "sub1", "group3name", "available", "false", @sub_account.id.to_s, 'Account', nil]
+      end
+    end
+
+    describe "Group Categories" do
+      before(:once) do
+        create_some_groups
+        @student_category = GroupCategory.where(name: "Student Groups").first
+      end
+
+      it 'should run the provisioning report' do
+        parameters = {}
+        parameters["group_categories"] = true
+        parsed = read_report("provisioning_csv", {params: parameters, order: 4})
+        expect(parsed.length).to eq 4
+        expect(parsed[0]).to eq [@group_category1.id.to_s, @account.id.to_s, "Account", "Test Group Category", nil, nil, nil, nil]
+        expect(parsed[1]).to eq [@group_category2.id.to_s, @account.id.to_s, "Account", "Test Group Category2", nil, nil, "2", "first"]
+        expect(parsed[2]).to eq [@group_category4.id.to_s, @course3.id.to_s, "Course", "Test Group Category Course", nil, nil, nil, nil]
+        expect(parsed[3]).to eq [@student_category.id.to_s, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil]
+      end
+
+      it 'should run the provisioning report for a sub account' do
+        parameters = {}
+        parameters["group_categories"] = true
+        parsed = read_report("provisioning_csv", {params: parameters, order: 4, account: @sub_account})
+        expect(parsed.length).to eq 1
+        expect(parsed[0]).to eq [@student_category.id.to_s, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil]
+      end
+
+      it 'should run the report for deleted categories' do
+        parameters = {}
+        parameters["group_categories"] = true
+        parameters["include_deleted"] = true
+        parsed = read_report("provisioning_csv", {params: parameters, order: 4})
+        expect(parsed.length).to eq 5
+        expect(parsed[0]).to eq [@group_category1.id.to_s, @account.id.to_s, "Account", "Test Group Category", nil, nil, nil, nil]
+        expect(parsed[1]).to eq [@group_category2.id.to_s, @account.id.to_s, "Account", "Test Group Category2", nil, nil, "2", "first"]
+        expect(parsed[2]).to eq [@group_category3.id.to_s, @account.id.to_s, "Account", "Test Group Category Deleted", nil, nil, nil, nil]
+        expect(parsed[3]).to eq [@group_category4.id.to_s, @course3.id.to_s, "Course", "Test Group Category Course", nil, nil, nil, nil]
+        expect(parsed[4]).to eq [@student_category.id.to_s, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil]
       end
     end
 
