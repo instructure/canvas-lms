@@ -110,7 +110,7 @@ module AccountReports
         },
         'provisioning_csv' => {
           :title => proc { I18n.t(:provisioning_title, 'Provisioning') },
-          :parameters_partial => 'sis_export_csv_parameters',
+          :parameters_partial => 'provisioning_csv_parameters',
           :description_partial => true,
           :parameters => {
             :enrollment_term_id => {
@@ -137,6 +137,9 @@ module AccountReports
             },
             :groups => {
               :description => 'Get the Provisioning file for groups'
+            },
+            :group_categories => {
+              :description => 'Get the Provisioning file for group_categories'
             },
             :group_membership => {
               :description => 'Get the Provisioning file for group_membership'
