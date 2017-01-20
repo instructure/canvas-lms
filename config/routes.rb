@@ -387,6 +387,7 @@ CanvasRails::Application.routes.draw do
     get 'offline_web_exports' => 'courses#offline_web_exports'
     post 'start_offline_web_export' => 'courses#start_offline_web_export'
     get 'modules/items/assignment_info' => 'context_modules#content_tag_assignment_data', as: :context_modules_assignment_info
+    get 'modules/items/master_course_info' => 'context_modules#content_tag_master_course_data', as: :context_modules_master_course_info
     get 'modules/items/:id' => 'context_modules#item_redirect', as: :context_modules_item_redirect
     get 'modules/items/:id/edit_mastery_paths' => 'context_modules#item_redirect_mastery_paths'
     get 'modules/items/:id/choose' => 'context_modules#choose_mastery_path'

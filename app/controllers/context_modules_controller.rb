@@ -74,6 +74,17 @@ class ContextModulesController < ApplicationController
            usage_rights_required: @context.feature_enabled?(:usage_rights_required),
            manage_files: @context.grants_right?(@current_user, session, :manage_files)
         }
+
+      if master_courses?
+        is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)
+        if is_child_course # todo: someday expose master side data via here too
+          js_env(:MASTER_COURSE_SETTINGS => {
+            :HAS_MASTER_COURSE_SUBSCRIPTION => is_child_course,
+            :MASTER_COURSE_DATA_URL => context_url(@context, :context_context_modules_master_course_info_url)
+          })
+        end
+      end
+
       conditional_release_js_env(includes: :active_rules)
     end
   end
@@ -283,6 +294,26 @@ class ContextModulesController < ApplicationController
         else
           {:points_possible => nil, :due_date => nil}
         end
+      end
+      render :json => info
+    end
+  end
+
+  def content_tag_master_course_data
+    return not_found unless master_courses?
+    if authorized_action(@context, @current_user, :read_as_admin)
+      info = {}
+      if MasterCourses::ChildSubscription.is_child_course?(@context)
+        tag_scope = @context.module_items_visible_to(@current_user)
+        tag_scope = tag_scope.where(:id => params[:tag_id]) if params[:tag_id]
+        tag_ids = tag_scope.pluck(:id)
+        restriction_info = {}
+        if tag_ids.any?
+          MasterCourses::MasterContentTag.fetch_module_item_restrictions(tag_ids).each do |tag_id, restrictions|
+            restriction_info[tag_id] = restrictions.any?{|k, v| v} ? 'locked' : 'unlocked' # might need to elaborate in the future
+          end
+        end
+        info[:tag_restrictions] = restriction_info
       end
       render :json => info
     end
