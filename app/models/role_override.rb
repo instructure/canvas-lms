@@ -440,7 +440,8 @@ class RoleOverride < ActiveRecord::Base
           'DesignerEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :applies_to_concluded => true
       },
       :manage_files => {
         :label => lambda { t('permissions.manage_files', "Manage (add / edit / delete) course files") },

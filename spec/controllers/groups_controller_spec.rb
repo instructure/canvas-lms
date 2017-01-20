@@ -232,6 +232,18 @@ describe GroupsController do
       g1.reload
       expect(g1.users.map(&:id)).not_to include @student.id
     end
+
+    it "should allow teachers to view after conclusion" do
+      @teacher.enrollments.first.conclude
+      user_session(@teacher)
+      category = @course.group_categories.create(:name => "category")
+      group = @course.groups.create(:name => "some group", :group_category => category)
+
+      get 'show', :id => group.id
+
+      expect(response).to be_success
+      expect(assigns[:group]).to eql(group)
+    end
   end
 
   describe "GET new" do
