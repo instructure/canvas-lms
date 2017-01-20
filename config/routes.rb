@@ -1045,11 +1045,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/assignments/:assignment_id/gradeable_students", action: :gradeable_students, as: "course_assignment_gradeable_students"
     end
 
-    scope(controller: :originality_reports_api) do
-      post "assignments/:assignment_id/submissions/:submission_id/originality_report", action: :create
-      put "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :update
-      get "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :show
-    end
+
 
     scope(controller: :provisional_grades) do
       get "courses/:course_id/assignments/:assignment_id/provisional_grades/status", action: :status, as: "course_assignment_provisional_status"
@@ -1956,6 +1952,13 @@ CanvasRails::Application.routes.draw do
     # Membership Service
     get "courses/:course_id/membership_service", controller: "lti/membership_service", action: :course_index, as: :course_membership_service
     get "groups/:group_id/membership_service", controller: "lti/membership_service", action: :group_index, as: :group_membership_service
+
+    # Originality Report Service
+    scope(controller: 'lti/originality_reports_api') do
+      post "assignments/:assignment_id/submissions/:submission_id/originality_report", action: :create
+      put "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :update
+      get "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :show
+    end
   end
 
   ApiRouteSet.draw(self, '/api/sis') do

@@ -8,7 +8,7 @@ module Lti
 
       let(:account) { Account.new }
 
-      let (:developer_key) { DeveloperKey.create(redirect_uri: 'http://example.com/redirect') }
+      let (:developer_key) { DeveloperKey.create!(redirect_uri: 'http://example.com/redirect') }
 
       let(:product_family) do
         ProductFamily.create(

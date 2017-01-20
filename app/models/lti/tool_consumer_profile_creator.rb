@@ -5,6 +5,8 @@ module Lti
 
     TCP_UUID = "339b6700-e4cb-47c5-a54f-3ee0064921a9".freeze # Hard coded until we start persisting the tcp
 
+    ORIGINALITY_REPORT_SERVICE = 'vnd.Canvas.OriginalityReport'.freeze
+
     CAPABILITIES = %w(
           basic-lti-launch-request
           User.id
@@ -32,8 +34,8 @@ module Lti
           Context.id
         ).freeze
 
-    RESTRICTED_CAPABILITIES = %w(
-      vnd.Canvas.OriginalityReport.url
+    RESTRICTED_CAPABILITIES = %W(
+      #{ORIGINALITY_REPORT_SERVICE}.url
     ).freeze
 
     SERVICES = [
@@ -77,7 +79,7 @@ module Lti
 
     RESTRICTED_SERVICES = [
       {
-        id: 'vnd.Canvas.OriginalityReport',
+        id: ORIGINALITY_REPORT_SERVICE,
         endpoint: 'api/v1/assignments/{assignment_id}/submissions/{submission_id}/originality_report',
         format: ['application/json'],
         action: ['POST', 'PUT', 'GET']

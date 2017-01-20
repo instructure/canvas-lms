@@ -43,7 +43,7 @@ module Lti
       tp = IMS::LTI::Models::ToolProxy.new.from_json(json)
       tp.tool_proxy_guid = guid
 
-      validate_proxy!(tp, context)
+      validate_proxy!(tp, context, developer_key)
       tool_proxy = nil
       ToolProxy.transaction do
         product_family = create_product_family(tp, context.root_account, developer_key)
@@ -196,9 +196,9 @@ module Lti
       obj.kind_of?(Array) ? obj.map(&:as_json) : obj.as_json
     end
 
-    def validate_proxy!(tp, context)
+    def validate_proxy!(tp, context, developer_key = nil)
 
-      profile = Lti::ToolConsumerProfileCreator.new(context, tp.tool_consumer_profile).create
+      profile = Lti::ToolConsumerProfileCreator.new(context, tp.tool_consumer_profile).create(developer_key.present?)
       tp_validator = IMS::LTI::Services::ToolProxyValidator.new(tp)
       tp_validator.tool_consumer_profile = profile
 
