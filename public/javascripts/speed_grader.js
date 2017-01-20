@@ -1432,13 +1432,13 @@ define([
         $turnitinScoreContainer.html(turnitinScoreTemplate({
           state: (turnitinAsset.state || 'no') + '_score',
           reportUrl: $.replaceTags(urlContainer.attr('href'), { user_id: submission.user_id, asset_string: assetString }),
-          tooltip: I18n.t('turnitin.tooltip.score', 'Turnitin Similarity Score - See detailed report'),
+          tooltip: I18n.t('turnitin.tooltip.score', 'Similarity Score - See detailed report'),
           score: turnitinAsset.similarity_score + '%'
         }));
       } else if (turnitinAsset.status) {
         // status == 'error' or status == 'pending'
-        var pendingTooltip = I18n.t('turnitin.tooltip.pending', 'Turnitin Similarity Score - Submission pending'),
-            errorTooltip = I18n.t('turnitin.tooltip.error', 'Turnitin Similarity Score - See submission error details');
+        var pendingTooltip = I18n.t('turnitin.tooltip.pending', 'Similarity Score - Submission pending'),
+            errorTooltip = I18n.t('turnitin.tooltip.error', 'Similarity Score - See submission error details');
         $turnitinSimilarityScore = $(turnitinScoreTemplate({
           state: 'submission_' + turnitinAsset.status,
           reportUrl: '#',
