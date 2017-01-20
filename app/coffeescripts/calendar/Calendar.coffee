@@ -90,6 +90,7 @@ define [
       @colorizeContexts()
 
       @reservable_appointment_groups = {}
+      @hasAppointmentGroups = $.Deferred()
       if @options.showScheduler
         # Pre-load the appointment group list, for the badge
         @dataSource.getAppointmentGroups false, (data) =>
@@ -101,6 +102,9 @@ define [
               @reservable_appointment_groups[context_code].push "appointment_group_#{group.id}"
           @header.setSchedulerBadgeCount(required)
           @options.onLoadAppointmentGroups(@reservable_appointment_groups) if @options.onLoadAppointmentGroups
+          @hasAppointmentGroups.resolve()
+      else
+        @hasAppointmentGroups.resolve()
 
       @connectHeaderEvents()
       @connectSchedulerNavigatorEvents()
@@ -688,7 +692,8 @@ define [
 
     agendaViewFetch: (start) ->
       @setDateTitle(@formatDate(start, 'date.formats.medium'))
-      @agenda.fetch(@visibleContextList.concat(@findAppointmentModeGroups()), start)
+      $.when(@hasAppointmentGroups)
+        .then(=> @agenda.fetch(@visibleContextList.concat(@findAppointmentModeGroups()), start))
 
     renderDateRange: (start, end) =>
       @agendaStart = fcUtil.unwrap(start)
