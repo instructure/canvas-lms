@@ -15,10 +15,30 @@
 
   <div class="bz-course-part-task-box" id="bz-task-part-box"> </div>
 
-  <% CoursePart.where(:course_id => @course.id).order(:position, :id).each do |part| %>
-  <% part_count = 0 %>
-  <div class="bz-course-part">
+  <% CoursePart.where(:course_id => @course.id).order(:position, :id).each do |part|
+     part_count = 0
+     part_modules = @course.context_modules.active.where(:part_id => part.id)
+     progressions = {}
+     all_complete = true
+     part_modules.each do |mod|
+       progress = @progressions.where(:context_module_id => mod.id).first
+       progressions[mod.id] = progress
+       all_complete = false if progress.workflow_state != 'completed'
+     end
+  %>
+  <div class="bz-course-part <%= all_complete ? 'bz-part-complete bz-part-collapsed' : '' %>">
     <h2><%= part.title %></h2>
+
+    <% if all_complete %>
+      <button class="bz-expand-collapse-button" type="button" onclick="
+        $(this.parentNode).toggleClass('bz-part-collapsed');
+        if($(this.parentNode).hasClass('bz-part-collapsed'))
+          this.innerHTML = 'Expand';
+        else
+          this.innerHTML = 'Collapse';
+      ">Expand</button>
+    <% end %>
+
     <p><%= part.intro ? part.intro.html_safe : '' %></p>
 
     <% if false %>
@@ -29,9 +49,9 @@
     </div>
     <% end %>
 
-    <% @course.context_modules.active.where(:part_id => part.id).each do |mod| %>
+    <% part_modules.each do |mod| %>
     <% part_count += 1 %>
-    <% progress = @progressions.where(:context_module_id => mod.id).first %>
+    <% progress = progressions[mod.id] %>
     <div class="bz-course-part-module-box <%= progress.workflow_state %> ">
       <div class="bz-module-image"><img src="<%= mod.image_url %>" alt="" /></div>
       <h3><%= part_count %> <%= mod.name %></h3>
