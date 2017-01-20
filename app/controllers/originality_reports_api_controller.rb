@@ -25,7 +25,7 @@
 # detection services to give an originality score to an assignment
 # submission's file. An originality report has an associated
 # file ID (the file submitted by the student) and an originality score
-# between 0 and 1.
+# between 0 and 100.
 #
 # @model OriginalityReport
 #     {
@@ -43,7 +43,7 @@
 #           "type": "integer"
 #         },
 #         "originality_score": {
-#           "description": "A number between 0 and 1 representing the originality score",
+#           "description": "A number between 0 and 100 representing the originality score",
 #           "example": "0.16",
 #           "type": "number"
 #         },
@@ -76,7 +76,7 @@ class OriginalityReportsApiController < ApplicationController
   #   The id of the file being given an originality score.
   #
   # @argument originality_report[originality_score] [Required, Float]
-  #   A number between 0 and 1 representing the measure of the
+  #   A number between 0 and 100 representing the measure of the
   #   specified file's originality.
   #
   # @argument originality_report[originality_report_url] [String]
@@ -118,7 +118,7 @@ class OriginalityReportsApiController < ApplicationController
   # Modify an existing originality report
   #
   # @argument originality_report[originality_score] [Float]
-  #   A number between 0 and 1 representing the measure of the
+  #   A number between 0 and 100 representing the measure of the
   #   specified file's originality.
   #
   # @argument originality_report[originality_report_url] [String]
@@ -173,7 +173,8 @@ class OriginalityReportsApiController < ApplicationController
     [:originality_report_file_id,
      :originality_report_url,
      :originality_report_lti_url,
-     :originality_score].freeze
+     :originality_score,
+     :workflow_state].freeze
   end
 
   def attachment_in_context

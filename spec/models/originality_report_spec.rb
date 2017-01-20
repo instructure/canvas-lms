@@ -27,10 +27,11 @@ describe OriginalityReport do
   it 'requies a valid workflow_state' do
     subject.workflow_state = 'invalid_state'
     subject.valid?
-    expect(subject.errors).to include :workflow_state
+    expect(subject.errors).not_to include :workflow_state
   end
 
   it 'allows the "pending" workflow state' do
+    subject.update_attributes(originality_score: nil)
     expect(subject.workflow_state).to eq 'pending'
   end
 
@@ -63,4 +64,36 @@ describe OriginalityReport do
     expect(subject.state).to eq 'acceptable'
   end
 
+  describe 'workflow_state transitions' do
+    let(:report_no_score){ OriginalityReport.new(attachment: attachment, submission: submission) }
+    let(:report_with_score){ OriginalityReport.new(attachment: attachment, submission: submission, originality_score: 23.2) }
+
+    it "updates state to 'scored' if originality_score is set on existing record" do
+      report_no_score.update_attributes(originality_score: 23.0)
+      expect(report_no_score.workflow_state).to eq 'scored'
+    end
+
+    it "updates state to 'scored' if originality_score is set on a new record" do
+      report_with_score.save
+      expect(report_with_score.workflow_state).to eq 'scored'
+    end
+
+    it "updates state to 'pending' if originality_score is set to nil on existing record" do
+      report_with_score.save
+      report_with_score.update_attributes(originality_score: nil)
+      expect(report_with_score.workflow_state).to eq 'pending'
+    end
+
+    it "updates state to 'pending' if originality_score is not set on new record" do
+      report_no_score.save
+      expect(report_no_score.workflow_state).to eq 'pending'
+    end
+
+    it "does not change workflow_state if it is set to 'error'" do
+      report_with_score.save
+      report_with_score.update_attributes(workflow_state: 'error')
+      report_with_score.update_attributes(originality_score: 23.2)
+      expect(report_with_score.workflow_state).to eq 'error'
+    end
+  end
 end
