@@ -21,10 +21,6 @@ module MochaRspecAdapter
     mocha_teardown
     ::RSpec::Mocks.teardown
   end
-
-  def rspec_anything
-    ::RSpec::Mocks::ArgumentMatchers::AnyArgMatcher::INSTANCE
-  end
 end
 
 RSpec.configure do |config|
