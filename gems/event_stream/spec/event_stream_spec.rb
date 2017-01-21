@@ -24,6 +24,11 @@ describe EventStream do
     EventStream.get_index_ids_lookup = nil
   end
 
+  after do
+    EventStream.current_shard_lookup = nil
+    EventStream.get_index_ids_lookup = nil
+  end
+
   describe '.current_shard' do
     it 'returns the current shard' do
       shard = double('shard')
