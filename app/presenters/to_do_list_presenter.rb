@@ -155,6 +155,17 @@ class ToDoListPresenter
       end
     end
 
+    def ignore_sr_message
+      case @type
+      when :grading
+        I18n.t('Ignore %{item} until new submission', :item => title)
+      when :moderation
+        I18n.t('Ignore %{item} until new mark', :item => title)
+      when :submitting
+        I18n.t('Ignore %{item}', :item => title)
+      end
+    end
+
     def ignore_flash_message
       case @type
       when :grading
@@ -207,6 +218,10 @@ class ToDoListPresenter
 
     def ignore_title
       I18n.t('Ignore this assignment')
+    end
+
+    def ignore_sr_message
+      I18n.t('Ignore %{assignment}', :assignment => @assignment.title)
     end
 
     def ignore_flash_message

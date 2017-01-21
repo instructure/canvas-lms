@@ -1,7 +1,8 @@
 define([
   'redux-actions',
-  './api_client'
-], ({ createActions }, api) => {
+  './api_client',
+  './resolveValidationIssues'
+], ({ createActions }, api, resolveValidationIssues) => {
   const actionDefs = [
     'SET_INPUT_PARAMS',
 
@@ -60,26 +61,15 @@ define([
     const state = getState();
     const courseId = state.courseParams.courseId;
 
-    // the list of users to be enrolled
-    let usersToBeEnrolled = state.userValidationResult.validUsers.slice();
-    // and the list of users to be created
-    const usersToBeCreated = [];
+    const newUsers = resolveValidationIssues(
+      state.userValidationResult.duplicates,
+      state.userValidationResult.missing
+    )
 
-    Object.keys(state.userValidationResult.duplicates).forEach((addr) => {
-      const dupeSet = state.userValidationResult.duplicates[addr];
-      if (dupeSet.createNew && dupeSet.newUserInfo.name && dupeSet.newUserInfo.email) {
-        usersToBeCreated.push(dupeSet.newUserInfo);
-      } else if (dupeSet.selectedUserId >= 0) {
-        const selectedUser = dupeSet.userList.find(u => u.user_id === dupeSet.selectedUserId);
-        usersToBeEnrolled.push(selectedUser);
-      }
-    });
-    Object.keys(state.userValidationResult.missing).forEach((addr) => {
-      const missing = state.userValidationResult.missing[addr];
-      if (missing.createNew && missing.newUserInfo.name && missing.newUserInfo.email) {
-        usersToBeCreated.push(missing.newUserInfo);
-      }
-    });
+    // the list of users to be enrolled
+    let usersToBeEnrolled = state.userValidationResult.validUsers.concat(newUsers.usersToBeEnrolled);
+    // and the list of users to be created
+    const usersToBeCreated = newUsers.usersToBeCreated;
 
     api.createUsers({ courseId, users: usersToBeCreated })
       .then((res) => {

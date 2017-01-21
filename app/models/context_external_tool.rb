@@ -7,6 +7,10 @@ class ContextExternalTool < ActiveRecord::Base
 
   belongs_to :context, polymorphic: [:course, :account]
 
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:name, :description]
+  restrict_columns :settings, [:consumer_key, :shared_secret, :url, :domain, :settings]
+
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_presence_of :name, :consumer_key, :shared_secret
   validates_length_of :name, :maximum => maximum_string_length

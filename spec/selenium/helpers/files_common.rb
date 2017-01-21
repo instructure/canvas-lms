@@ -43,8 +43,7 @@ module FilesCommon
       ff('.ef-item-row')[row_selected].click
       f('.btn-move').click
     end
-    wait_for_ajaximations
-    expect(f(".ReactModal__Header-Title h4").text).to eq "Where would you like to move #{file_name}?"
+    expect(f(".ReactModal__Header-Title h4")).to include_text "Where would you like to move #{file_name}?"
     if destination.present?
       folders = destination.split('/')
       folders.each do |folder|

@@ -114,3 +114,9 @@ Specs/DeterministicDescribedClasses:
   Include:
     - "**/spec/**/*.rb"
     - "**/spec_canvas/**/*.rb"
+
+Specs/ScopeIncludes:
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"

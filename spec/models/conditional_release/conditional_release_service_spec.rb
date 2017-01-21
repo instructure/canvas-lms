@@ -23,7 +23,7 @@ describe ConditionalRelease::Service do
   Service = ConditionalRelease::Service
 
   def stub_config(*configs)
-    ConfigFile.stubs(:load).returns(*configs)
+    allow(ConfigFile).to receive(:load).and_return(*configs)
   end
 
   def clear_config
@@ -31,9 +31,9 @@ describe ConditionalRelease::Service do
   end
 
   def enable_service
-    Canvas::Security::ServicesJwt.stubs(:encryption_secret).returns('secret' * 10)
-    Canvas::Security::ServicesJwt.stubs(:signing_secret).returns('donttell' * 10)
-    Service.stubs(:enabled_in_context?).returns(true)
+    allow(Canvas::Security::ServicesJwt).to receive(:encryption_secret).and_return('secret' * 10)
+    allow(Canvas::Security::ServicesJwt).to receive(:signing_secret).and_return('donttell' * 10)
+    allow(Service).to receive(:enabled_in_context?).and_return(true)
   end
 
   before(:each) do
@@ -64,7 +64,7 @@ describe ConditionalRelease::Service do
     end
 
     it 'defaults protocol to canvas protocol' do
-      HostUrl.stubs(:protocol).returns('foo')
+      allow(HostUrl).to receive(:protocol).and_return('foo')
       stub_config(nil)
       expect(Service.protocol).to eq('foo')
     end
@@ -87,27 +87,27 @@ describe ConditionalRelease::Service do
     end
 
     it 'requires feature flag to be enabled' do
-      context = stub({feature_enabled?: true})
+      context = double({feature_enabled?: true})
       stub_config({enabled: true, host: 'foo'})
       expect(Service.enabled_in_context?(context)).to eq true
     end
 
     it 'reports enabled as true when enabled' do
-      context = stub({feature_enabled?: true})
+      context = double({feature_enabled?: true})
       stub_config({enabled: true, host: 'foo'})
       env = Service.env_for(context)
       expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq true
     end
 
     it 'reports enabled as false if feature flag is off' do
-      context = stub({feature_enabled?: false})
+      context = double({feature_enabled?: false})
       stub_config({enabled: true, host: 'foo'})
       env = Service.env_for(context)
       expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
     end
 
     it 'reports enabled as false if service is disabled' do
-      context = stub({feature_enabled?: true})
+      context = double({feature_enabled?: true})
       stub_config({enabled: false})
       env = Service.env_for(context)
       expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
@@ -120,12 +120,12 @@ describe ConditionalRelease::Service do
       stub_config({
         protocol: 'foo', host: 'bar', rules_path: 'rules'
       })
-      Service.stubs(:active_rules).returns([])
+      allow(Service).to receive(:active_rules).and_return([])
       course_with_student(active_all: true)
     end
 
     it 'returns no jwt or env if not enabled' do
-      Service.stubs(:enabled_in_context?).returns(false)
+      allow(Service).to receive(:enabled_in_context?).and_return(false)
       env = Service.env_for(@course, @student, domain: 'foo.bar')
       expect(env).not_to have_key :CONDITIONAL_RELEASE_ENV
     end
@@ -136,13 +136,13 @@ describe ConditionalRelease::Service do
     end
 
     it 'returns an env with jwt if everything enabled' do
-      Service.stubs(:jwt_for).returns(:jwt)
+      allow(Service).to receive(:jwt_for).and_return(:jwt)
       env = Service.env_for(@course, @student, domain: 'foo.bar')
       expect(env[:CONDITIONAL_RELEASE_ENV][:jwt]).to eq :jwt
     end
 
     it 'returns an env with current locale' do
-      I18n.stubs(:locale).returns('en-PI')
+      allow(I18n).to receive(:locale).and_return('en-PI')
       env = Service.env_for(@course, @student, domain: 'foo.bar')
       expect(env[:CONDITIONAL_RELEASE_ENV][:locale]).to eq 'en-PI'
     end
@@ -174,7 +174,7 @@ describe ConditionalRelease::Service do
 
     it 'includes a relevant rule if includes :rule' do
       assignment_model course: @course
-      Service.stubs(:rule_triggered_by).returns(nil)
+      allow(Service).to receive(:rule_triggered_by).and_return(nil)
       env = Service.env_for(@course, @student, domain: 'foo.bar', assignment: @assignment, includes: [:rule])
       cr_env = env[:CONDITIONAL_RELEASE_ENV]
       expect(cr_env).to have_key :rule
@@ -182,7 +182,7 @@ describe ConditionalRelease::Service do
 
     it 'includes a active rules if includes :active_rules' do
       assignment_model course: @course
-      Service.stubs(:rule_triggered_by).returns(nil)
+      allow(Service).to receive(:rule_triggered_by).and_return(nil)
       env = Service.env_for(@course, @student, domain: 'foo.bar', assignment: @assignment, includes: [:active_rules])
       cr_env = env[:CONDITIONAL_RELEASE_ENV]
       expect(cr_env).to have_key :active_rules
@@ -285,12 +285,17 @@ describe ConditionalRelease::Service do
       @submission.save!
     end
 
+    RSpec::Matchers.define :cr_service_body_params do |expected|
+      match do |actual|
+        parsed = Rack::Utils.parse_query(actual[:form_data])
+        expected.all?{|k,v| parsed[k] == v}
+      end
+    end
+
     def expect_select_mastery_path_request(expected_params = {})
-      CanvasHttp.expects(:post)
-                .with(Service.select_assignment_set_url, anything, anything) do |_url, _headers, body|
-                  expect(Rack::Utils.parse_query(body[:form_data])).to include(expected_params)
-                end
-                .returns(stub(code: '200', body: { key: 'value' }.to_json))
+      expect(CanvasHttp).to receive(:post)
+        .with(Service.select_assignment_set_url, rspec_anything, cr_service_body_params(expected_params))
+        .and_return(double(code: '200', body: { key: 'value' }.to_json))
     end
 
     it 'make http request to service' do
@@ -315,13 +320,13 @@ describe ConditionalRelease::Service do
 
     it 'clears rules cache' do
       expect_select_mastery_path_request
-      Service.expects(:clear_rules_cache_for).with(@course, @student)
+      expect(Service).to receive(:clear_rules_cache_for).with(@course, @student)
       Service.select_mastery_path(@course, @student, @student, @assignment, 200, nil)
     end
 
     it 'fails for muted assignments' do
       @assignment.mute!
-      CanvasHttp.expects(:post).never
+      expect(CanvasHttp).to receive(:post).never
       response = Service.select_mastery_path(@course, @student, @student, @assignment, 200, nil)
       expect(response[:code]).to eq '400'
     end
@@ -329,14 +334,14 @@ describe ConditionalRelease::Service do
     it 'fails for partially graded assignments' do
       @submission.workflow_state = :pending_review
       @submission.save!
-      CanvasHttp.expects(:post).never
+      expect(CanvasHttp).to receive(:post).never
       response = Service.select_mastery_path(@course, @student, @student, @assignment, 200, nil)
       expect(response[:code]).to eq '400'
     end
 
     it 'fails if student has no submission' do
       student_in_course
-      CanvasHttp.expects(:post).never
+      expect(CanvasHttp).to receive(:post).never
       response = Service.select_mastery_path(@course, @student, @student, @assignment, 200, nil)
       expect(response[:code]).to eq '400'
     end
@@ -350,8 +355,8 @@ describe ConditionalRelease::Service do
     it 'caches a successful http response' do
       enable_cache do
         course_with_teacher
-        CanvasHttp.expects(:get).once.returns(stub({ code: '200', body: [].to_json }))
-        Canvas::Errors.expects(:capture).never
+        expect(CanvasHttp).to receive(:get).once.and_return(double({ code: '200', body: [].to_json }))
+        expect(Canvas::Errors).to receive(:capture).never
         Service.active_rules @course, @user, nil
         rules = Service.active_rules @course, @user, nil
         expect(rules).to eq []
@@ -361,8 +366,9 @@ describe ConditionalRelease::Service do
     it 'does not cache an error http response' do
       course_with_teacher
       enable_cache do
-        CanvasHttp.expects(:get).twice.returns(stub({ code: '500' }))
-        Canvas::Errors.expects(:capture).twice.with(instance_of(ConditionalRelease::ServiceError), anything)
+        expect(CanvasHttp).to receive(:get).twice.and_return(double({ code: '500' }))
+        expect(Canvas::Errors).to receive(:capture).twice.
+          with(instance_of(ConditionalRelease::ServiceError), rspec_anything)
         Service.active_rules @course, @user, nil
         Service.active_rules @course, @user, nil
       end
@@ -371,8 +377,8 @@ describe ConditionalRelease::Service do
 
   context 'with active_rules' do
     before(:each) do
-      Service.stubs(:enabled_in_context?).returns(true)
-      Service.stubs(:jwt_for).returns(:jwt)
+      allow(Service).to receive(:enabled_in_context?).and_return(true)
+      allow(Service).to receive(:jwt_for).and_return(:jwt)
     end
 
     before(:once) do
@@ -398,8 +404,9 @@ describe ConditionalRelease::Service do
 
     context 'assignment data' do
       before(:each) do
-        Service.stubs(:enabled_in_context?).returns(true)
-        CanvasHttp.expects(:get).once.returns stub({ code: '200', body: default_rules.to_json })
+        allow(Service).to receive(:enabled_in_context?).and_return(true)
+        expect(CanvasHttp).to receive(:get).once.
+          and_return(double({ code: '200', body: default_rules.to_json }))
       end
 
       let(:rules) do
@@ -432,7 +439,8 @@ describe ConditionalRelease::Service do
 
       it 'caches the result of a successful http call' do
         enable_cache do
-          CanvasHttp.expects(:get).once.returns stub({ code: '200', body: default_rules.to_json })
+          expect(CanvasHttp).to receive(:get).once.
+           and_return(double({ code: '200', body: default_rules.to_json }))
           Service.rule_triggered_by(@a1, @teacher, nil)
         end
       end
@@ -455,26 +463,26 @@ describe ConditionalRelease::Service do
       end
 
       it 'returns nil without making request if no assignment is provided' do
-        CanvasHttp.expects(:get).never
+        expect(CanvasHttp).to receive(:get).never
         Service.rule_triggered_by(nil, @teacher, nil)
       end
 
       it 'returns nil without making request if service is not enabled' do
-        Service.stubs(:enabled_in_context?).returns(false)
-        CanvasHttp.expects(:get).never
+        allow(Service).to receive(:enabled_in_context?).and_return(false)
+        expect(CanvasHttp).to receive(:get).never
         Service.rule_triggered_by(@a1, @teacher, nil)
       end
     end
 
     describe 'rules_assigning' do
       before(:each) do
-        Service.stubs(:active_rules).returns(default_rules)
+        allow(Service).to receive(:active_rules).and_return(default_rules)
       end
 
       it 'caches the calculation of the reverse index' do
         enable_cache do
           Service.rules_assigning(@a1, @teacher, nil)
-          Service.stubs(:active_rules).raises 'should not refetch rules'
+          allow(Service).to receive(:active_rules).and_raise 'should not refetch rules'
           Service.rules_assigning(@a2, @teacher, nil)
         end
       end
@@ -503,22 +511,21 @@ describe ConditionalRelease::Service do
 
     def expect_cyoe_request(code, assignments = nil)
       a3 = @a3
-      response = stub() do
-        expects(:code).returns(code)
-        unless assignments.nil?
-          assignments = Array.wrap(assignments)
-          assignments_json = assignments.map do |a|
-            { id: a.id, assignment_id: a.id }
-          end
-          expects(:body).returns([
-            { id: 1, trigger_assignment: 2, assignment_sets: [
-              { id: 11, assignments: assignments_json },
-              { id: 12, assignments: [{ id: a3.id, assignment_id: a3.id }]}
-            ]}
-          ].to_json)
+      response = double()
+      expect(response).to receive(:code).and_return(code)
+      unless assignments.nil?
+        assignments = Array.wrap(assignments)
+        assignments_json = assignments.map do |a|
+          { id: a.id, assignment_id: a.id }
         end
+        expect(response).to receive(:body).and_return([
+          { id: 1, trigger_assignment: 2, assignment_sets: [
+            { id: 11, assignments: assignments_json },
+            { id: 12, assignments: [{ id: a3.id, assignment_id: a3.id }]}
+          ]}
+        ].to_json)
       end
-      CanvasHttp.expects(:post).once.returns(response)
+      expect(CanvasHttp).to receive(:post).once.and_return(response)
     end
 
     let(:rules) { Service.rules_for(@course, @student, [], nil) }
@@ -556,13 +563,15 @@ describe ConditionalRelease::Service do
 
     it 'handles an http error with logging and defaults' do
       expect_cyoe_request '404'
-      Canvas::Errors.expects(:capture).with(instance_of(ConditionalRelease::ServiceError), anything)
+      expect(Canvas::Errors).to receive(:capture).
+        with(instance_of(ConditionalRelease::ServiceError), rspec_anything)
       expect(rules).to eq []
     end
 
     it 'handles a network exception with logging and defaults' do
-      CanvasHttp.expects(:post).throws('something terrible')
-      Canvas::Errors.expects(:capture).with(instance_of(ConditionalRelease::ServiceError), anything)
+      expect(CanvasHttp).to receive(:post).and_raise('something terrible') #throws?
+      expect(Canvas::Errors).to receive(:capture).
+        with(instance_of(ConditionalRelease::ServiceError), rspec_anything)
       expect(rules).to eq []
     end
 
@@ -635,9 +644,9 @@ describe ConditionalRelease::Service do
       end
 
       def expect_request_rules(submissions)
-        Service.expects(:request_rules)
-          .with(anything(), submissions_hash_for(submissions))
-          .returns([])
+        expect(Service).to receive(:request_rules)
+          .with(rspec_anything, submissions_hash_for(submissions))
+          .and_return([])
       end
 
       before do

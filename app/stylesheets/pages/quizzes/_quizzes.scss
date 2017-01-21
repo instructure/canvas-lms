@@ -24,7 +24,7 @@ $answersSprite: url(/images/answers_sprite.png);
 // quiz index
 li.quiz {
   cursor: pointer;
-  .ellipses, i[class^=icon-]:not(.icon-publish):not(.icon-quiz):not(.icon-post-to-sis) {
+  .ellipses, i[class^=icon-]:not(.icon-publish):not(.icon-quiz):not(.icon-post-to-sis):not(.icon-lock) {
     color: darken($ic-color-neutral, 40);
   }
   .ig-title {
@@ -2256,3 +2256,11 @@ li.quiz.quiz-loading-overrides {
     margin-left: 2px;
   }
 }
+
+.master-course-cell i {
+  margin-right: 12px;
+}
+.options-spacer {
+  width: 52px;
+}
+

@@ -69,6 +69,9 @@
 #           "example": "sis1-login",
 #           "type": "string"
 #         },
+#         "lti_user_id": {
+#           "type": "string"
+#         },
 #         "avatar_url": {
 #           "description": "The avatar_url can change over time, so we recommend not caching it for more than a few hours",
 #           "example": "..url..",
@@ -182,7 +185,7 @@ class ProfileController < ApplicationController
   # Returns user profile data, including user id, name, and profile pic.
   #
   # When requesting the profile for the user accessing the API, the user's
-  # calendar feed URL will be returned as well.
+  # calendar feed URL and LTI user id will be returned as well.
   #
   # @returns Profile
   def settings

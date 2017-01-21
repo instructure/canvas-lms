@@ -126,7 +126,9 @@ define [
       $('li.external-tools-dialog > a[data-url], button.external-tools-dialog').on 'click keyclick', (event) ->
         postGradesDialog = new PostGradesFrameDialog({
           returnFocusTo: $('#post_grades'),
-          baseUrl: $(event.target).attr('data-url')
+          baseUrl: $(event.target).attr('data-url'),
+          launchHeight: $(event.target).attr('data-height'),
+          launchWidth: $(event.target).attr('data-width'),
         })
         postGradesDialog.open()
 
@@ -176,6 +178,26 @@ define [
       @checkForUploadComplete()
 
       @gotSections(@options.sections)
+
+    loadOverridesForSIS: ->
+      return unless $('.post-grades-placeholder').length > 0
+
+      assignmentGroupsURL = @options.assignment_groups_url.replace('&include%5B%5D=assignment_visibility', '')
+      overrideDataLoader = DataLoader.loadGradebookData(
+        assignmentGroupsURL: assignmentGroupsURL
+        assignmentGroupsParams:
+          exclude_response_fields: @fieldsToExcludeFromAssignments
+          include: ['overrides']
+        onlyLoadAssignmentGroups: true
+      )
+      $.when(overrideDataLoader.gotAssignmentGroups).then(@addOverridesToPostGradesStore)
+
+    addOverridesToPostGradesStore: (assignmentGroups) =>
+      for group in assignmentGroups
+        group.assignments = _.select group.assignments, (a) -> a.published
+        for assignment in group.assignments
+          @assignments[assignment.id].overrides = assignment.overrides if @assignments[assignment.id]
+      @postGradesStore.setGradeBookAssignments @assignments
 
     # dependencies - gridReady
     setAssignmentVisibility: (studentIds) ->
@@ -249,6 +271,7 @@ define [
       @initGrid()
       @initHeader()
       @gridReady.resolve()
+      @loadOverridesForSIS()
 
     gotAllAssignmentGroupsAndEffectiveDueDates: (assignmentGroups, dueDatesResponse) =>
       @effectiveDueDates = dueDatesResponse[0]
@@ -269,7 +292,6 @@ define [
           assignment.effectiveDueDates = @effectiveDueDates[assignment.id] || {}
           assignment.inClosedGradingPeriod = _.any(assignment.effectiveDueDates, (date) => date.in_closed_grading_period)
           @assignments[assignment.id] = assignment
-      @postGradesStore.setGradeBookAssignments @assignments
 
     gotSections: (sections) =>
       @sections = {}

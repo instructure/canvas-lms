@@ -98,9 +98,9 @@ describe GradingStandardsController do
         expect(subject).to be_ok
       end
 
-      it "renders the 'index' template" do
+      it "renders the 'course_index' template" do
         user_session(@teacher)
-        expect(subject).to render_template(:index)
+        expect(subject).to render_template(:course_index)
       end
     end
   end

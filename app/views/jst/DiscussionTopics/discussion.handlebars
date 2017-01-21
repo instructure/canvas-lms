@@ -50,9 +50,10 @@
         </div>
         {{/if}}
         {{#if cyoe.isReleased}}
-        <span class="pill mastery-path-icon" data-tooltip title="{{#t}}Released by Mastery Path{{/t}}">
+        <span class="pill mastery-path-icon" aria-hidden="true" data-tooltip title="{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}">
           <i class="icon-mastery-path"></i>{{cyoe.releasedLabel}}
         </span>
+        <span class="screenreader-only">{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}</span>
         {{/if}}
       {{/if}}
     {{/if}}

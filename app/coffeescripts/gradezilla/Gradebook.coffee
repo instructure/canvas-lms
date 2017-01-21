@@ -30,6 +30,7 @@ define [
   'compiled/util/NumberCompare'
   'str/htmlEscape'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
+  'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader'
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
@@ -62,9 +63,9 @@ define [
   GradingPeriodsAPI, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS, CourseGradeCalculator,
   GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
   GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, htmlEscape,
-  AssignmentColumnHeader, StudentColumnHeader, TotalGradeColumnHeader, PostGradesStore, PostGradesApp,
-  SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView,
-  GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper
+  AssignmentColumnHeader, AssignmentGroupColumnHeader, StudentColumnHeader, TotalGradeColumnHeader,
+  PostGradesStore, PostGradesApp, SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate,
+  SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper
 ) ->
 
   class Gradebook
@@ -177,6 +178,26 @@ define [
 
       @gotSections(@options.sections)
 
+    loadOverridesForSIS: ->
+      return unless $('.post-grades-placeholder').length > 0
+
+      assignmentGroupsURL = @options.assignment_groups_url.replace('&include%5B%5D=assignment_visibility', '')
+      overrideDataLoader = DataLoader.loadGradebookData(
+        assignmentGroupsURL: assignmentGroupsURL
+        assignmentGroupsParams:
+          exclude_response_fields: @fieldsToExcludeFromAssignments
+          include: ['overrides']
+        onlyLoadAssignmentGroups: true
+      )
+      $.when(overrideDataLoader.gotAssignmentGroups).then(@addOverridesToPostGradesStore)
+
+    addOverridesToPostGradesStore: (assignmentGroups) =>
+      for group in assignmentGroups
+        group.assignments = _.select group.assignments, (a) -> a.published
+        for assignment in group.assignments
+          @assignments[assignment.id].overrides = assignment.overrides if @assignments[assignment.id]
+      @postGradesStore.setGradeBookAssignments @assignments
+
     # dependencies - gridReady
     setAssignmentVisibility: (studentIds) ->
       studentsWithHiddenAssignments = []
@@ -249,6 +270,7 @@ define [
       @initGrid()
       @initHeader()
       @gridReady.resolve()
+      @loadOverridesForSIS()
 
     gotAllAssignmentGroupsAndEffectiveDueDates: (assignmentGroups, dueDatesResponse) =>
       @effectiveDueDates = dueDatesResponse[0]
@@ -269,7 +291,6 @@ define [
           assignment.effectiveDueDates = @effectiveDueDates[assignment.id] || {}
           assignment.inClosedGradingPeriod = _.any(assignment.effectiveDueDates, (date) => date.in_closed_grading_period)
           @assignments[assignment.id] = assignment
-      @postGradesStore.setGradeBookAssignments @assignments
 
     gotSections: (sections) =>
       @sections = {}
@@ -504,7 +525,7 @@ define [
     handleAssignmentMutingChange: (assignment) =>
       idx = @grid.getColumnIndex("assignment_#{assignment.id}")
       colDef = @grid.getColumns()[idx]
-      colDef.name = assignment.name
+      @initAssignmentColumnHeader(colDef)
       @grid.setColumns(@grid.getColumns())
       @fixColumnReordering()
       @buildRows()
@@ -513,7 +534,7 @@ define [
       columns = @grid.getColumns()
       for assignment_group in assignment_group_options.assignmentGroups
         column = _.findWhere columns, id: "assignment_group_#{assignment_group.id}"
-        column.name = @assignmentGroupHtml(column.object.name, column.object.group_weight)
+        @initAssignmentGroupColumnHeader(column)
       @setAssignmentWarnings()
       @grid.setColumns(columns)
       # TODO: don't buildRows?
@@ -523,17 +544,6 @@ define [
       @totalColumnInFront = not @totalColumnInFront
       UserSettings.contextSet 'total_column_in_front', @totalColumnInFront
       window.location.reload()
-
-    assignmentGroupHtml: (group_name, group_weight) =>
-      if @weightedGroups()
-        percentage = I18n.toPercentage(group_weight, precision: 2)
-        """
-          #{htmlEscape(group_name)}<div class='assignment-points-possible'>
-            #{htmlEscape I18n.t 'percent_of_grade', "%{percentage} of grade", percentage: percentage}
-          </div>
-        """
-      else
-        htmlEscape(group_name)
 
     # filter, sort, and build the dataset for slickgrid to read from, then
     # force a full redraw
@@ -1086,6 +1096,20 @@ define [
       component = React.createElement(AssignmentColumnHeader, { assignment }, null)
       ReactDOM.render(component, $(obj.node).find('.slick-column-name')[0])
 
+    initAssignmentGroupColumnHeader: (columnDefinition) =>
+      original_assignment_group = columnDefinition.column.object
+
+      assignment_group =
+        name: original_assignment_group.name
+        weight: original_assignment_group.group_weight
+
+      header_props =
+        assignmentGroup: assignment_group
+        weightedGroups: @weightedGroups()
+
+      component = React.createElement(AssignmentGroupColumnHeader, header_props, null)
+      ReactDOM.render(component, $(columnDefinition.node).find('.slick-column-name')[0])
+
     initGradebookExporter: () =>
       self = this
 
@@ -1343,14 +1367,15 @@ define [
             id: fieldName
             field: fieldName
             formatter: @groupTotalFormatter
-            name: @assignmentGroupHtml(group.name, group.group_weight)
+            name: group.name
             toolTip: group.name
             object: group
-            minWidth: columnWidths.assignmentGroup.min,
-            maxWidth: columnWidths.assignmentGroup.max,
+            minWidth: columnWidths.assignmentGroup.min
+            maxWidth: columnWidths.assignmentGroup.max
             width: aggregateWidth
-            cssClass: "meta-cell assignment-group-cell",
+            cssClass: "meta-cell assignment-group-cell"
             type: 'assignment_group'
+            neverSort: true
           }
 
         label = I18n.t "Total"
@@ -1434,6 +1459,8 @@ define [
         @initTotalGradeColumnHeader(obj)
       else if obj.column.id.match(/^assignment_\d+$/)
         @initAssignmentColumnHeader(obj)
+      else if obj.column.id.match(/^assignment_group_\d+$/)
+        @initAssignmentGroupColumnHeader(obj)
 
     onColumnsResized: (event, obj) =>
       grid = obj.grid

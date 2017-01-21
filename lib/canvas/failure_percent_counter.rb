@@ -25,6 +25,11 @@ module Canvas
       @min_samples = min_samples
     end
 
+    def self.lua
+      @lua ||= ::Redis::Scripting::Module.new(nil,
+        File.join(File.dirname(__FILE__), "failure_percent_counter"))
+    end
+
     def increment_count
       increment(@count_key)
     end
@@ -35,32 +40,16 @@ module Canvas
 
     def failure_rate
       now = Time.now.utc.to_i
-      # ideally we'd want to do all the redis calls in a redis.multi
-      # so they are atomic, but canvas uses an abstraction layer that
-      # doesn't expose that
-      count = cleanup_and_get(@count_key, now)
-      failure = cleanup_and_get(@fail_key, now)
-
-      # If our sample size is too small, let's claim total success
-      return 0.0 if count < @min_samples
-      failure.fdiv(count)
+      result = FailurePercentCounter.lua.run(:failure_rate, [@count_key],
+        [@fail_key, now, @period, @min_samples], @redis)
+      result.to_f
     end
 
     private
     def increment(key)
       now = Time.now.utc.to_i
-      # ideally we'd want to do all the redis calls in a redis.multi
-      # so they are atomic, but canvas uses an abstraction layer that
-      # doesn't expose that
-      @redis.zadd(key, now, SecureRandom.uuid)
-      @redis.expire(key, @period.ceil)
-      cleanup_and_get(key, now)
-    end
-
-    def cleanup_and_get(key, now)
-      cleanup_time = now - @period
-      @redis.zremrangebyscore(key, 0, cleanup_time)
-      @redis.zcount(key, cleanup_time, now)
+      FailurePercentCounter.lua.run(:increment_counter, [@count_key],
+        [key, now, SecureRandom.uuid, @period.ceil], @redis)
     end
   end
 end

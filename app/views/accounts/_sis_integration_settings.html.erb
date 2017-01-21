@@ -52,7 +52,7 @@
                     require_due_date_disabled = sis_syncing_locked_subs ||
                         (require_due_date[:locked] && require_due_date[:inherited])
                   %>
-                  <div>
+                  <div class="require_assignment_due_date_nested_cleanup">
                     <%= ff_due_date.check_box :value, :checked => require_due_date[:value],
                                               :disabled => require_due_date_disabled %>
                     <%= ff_due_date.label :value, t("Require assignment due date") %>
@@ -71,7 +71,7 @@
                                                "aria-controls" => "account_settings_sis_assignment_name_length_value_settings" %>
                   <%= ff_name_length.label :value, t("Limit assignment names lengths (max 255)") %>
                 </div>
-                <fieldset id="account_settings_sis_assignment_name_length_value_settings" class="nested" style="display: none;">
+                <fieldset id="account_settings_sis_assignment_name_length_value_settings" class="nested sis_name_length_nested_cleanup">
                   <div class="name-length-wrapper">
                     <%= settings.fields_for :sis_assignment_name_length_input do |ff_name_input|%>
                       <%= ff_name_input.label :value, :en => "Characters"%>

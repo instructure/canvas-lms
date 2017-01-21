@@ -23,6 +23,7 @@ describe "courses/_to_do_list.html.erb" do
         expect(response).to include "15 points"
         expect(response).to include "My Awesome Course"
         expect(response).to include due_at(@assignment, @user)
+        expect(response).to include "Ignore SubmitMe"
       end
     end
     describe "submissions to review" do
@@ -47,6 +48,7 @@ describe "courses/_to_do_list.html.erb" do
         view_context
         render partial: "courses/to_do_list", locals: {contexts: nil}
         expect(response).to include "Peer Review for ReviewMe"
+        expect(response).to include "Ignore ReviewMe"
       end
     end
   end
@@ -79,6 +81,7 @@ describe "courses/_to_do_list.html.erb" do
         expect(response).to include due_at(@assignment, @user)
         expect(response).to include "2"
         expect(response).to include "2 submissions need grading"
+        expect(response).to include "Ignore GradeMe until new submission"
       end
 
       it "shows 999+ when there are more than 999 to grade" do
@@ -125,6 +128,7 @@ describe "courses/_to_do_list.html.erb" do
         view_context
         render partial: "courses/to_do_list", locals: {contexts: nil}
         expect(response).to include "Moderate ModerateMe"
+        expect(response).to include "Ignore ModerateMe until new mark"
       end
     end
   end

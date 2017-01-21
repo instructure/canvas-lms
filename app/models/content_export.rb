@@ -280,6 +280,7 @@ class ContentExport < ActiveRecord::Base
   #
   # Returns: bool
   def export_symbol?(symbol)
+    return false if symbol == :all_course_settings && for_master_migration?
     selected_content.empty? || is_set?(selected_content[symbol]) || is_set?(selected_content[:everything])
   end
 

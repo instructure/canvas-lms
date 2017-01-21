@@ -1,12 +1,12 @@
 require_relative 'common'
 require_relative 'helpers/shared_examples_common'
-include SharedExamplesCommon
 
 # ======================================================================================================================
 # Shared Examples
 # ======================================================================================================================
 
 shared_examples 'show courses for ePub generation' do |context|
+  include SharedExamplesCommon
   
   it "should show the courses the user is enrolled in and feature enabled in ePub exports page",
                             priority: "1", test_id: pick_test_id(context, teacher: "417579", student: "498316") do
@@ -39,6 +39,8 @@ shared_examples 'show courses for ePub generation' do |context|
 end
 
 shared_examples 'generate and download ePub' do |context|
+  include SharedExamplesCommon
+
   it "should show progress", priority: "1", test_id: pick_test_id(context, teacher: "417580", student: "498317") do
     get '/epub_exports'
     f('.ig-admin .Button').click

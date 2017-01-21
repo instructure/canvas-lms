@@ -406,6 +406,10 @@ class AssignmentGroupsController < ApplicationController
       assignments.each { |a| a.has_no_overrides = true if a.assignment_overrides.size == 0 }
     end
 
+    if master_courses? && context.grants_right?(@current_user, session, :manage_assignments)
+      MasterCourses::Restrictor.preload_restrictions(assignments)
+    end
+
     assignments
   end
 

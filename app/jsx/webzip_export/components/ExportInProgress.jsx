@@ -19,7 +19,7 @@ define([
 
     onComplete () {
       this.setState({completed: true})
-      this.props.loadExports()
+      this.props.loadExports(this.props.webzip.progressId)
     }
 
     render () {

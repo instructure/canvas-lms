@@ -37,7 +37,7 @@ module Lti
 
     end
 
-    def process_tool_proxy_json(json, context, guid, tool_proxy_to_update = nil, tc_half_shared_secret = nil)
+    def process_tool_proxy_json(json:, context:, guid:, tool_proxy_to_update: nil, tc_half_shared_secret: nil, developer_key: nil)
       @tc_half_secret = tc_half_shared_secret
 
       tp = IMS::LTI::Models::ToolProxy.new.from_json(json)
@@ -46,7 +46,7 @@ module Lti
       validate_proxy!(tp, context)
       tool_proxy = nil
       ToolProxy.transaction do
-        product_family = create_product_family(tp, context.root_account)
+        product_family = create_product_family(tp, context.root_account, developer_key)
         tool_proxy = create_tool_proxy(tp, context, product_family, tool_proxy_to_update)
         process_resources(tp, tool_proxy)
         create_proxy_binding(tool_proxy, context)
@@ -88,13 +88,14 @@ module Lti
       tool_proxy
     end
 
-    def create_product_family(tp, account)
+    def create_product_family(tp, account, developer_key)
       vendor_code = tp.tool_profile.product_instance.product_info.product_family.vendor.code
       product_code = tp.tool_profile.product_instance.product_info.product_family.code
-      unless product_family = ProductFamily.where(vendor_code: vendor_code, product_code: product_code).first
+      unless product_family = ProductFamily.where(vendor_code: vendor_code, product_code: product_code, developer_key: developer_key).first
         product_family = ProductFamily.new
         product_family.vendor_code = vendor_code
         product_family.product_code = product_code
+        product_family.developer_key = developer_key
 
         vendor = tp.tool_profile.product_instance.product_info.product_family.vendor
         product_family.vendor_name = vendor.default_name

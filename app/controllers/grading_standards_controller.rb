@@ -44,7 +44,7 @@ class GradingStandardsController < ApplicationController
         view_path = 'account_index'
       else
         client_env[:GRADING_PERIODS_URL] = api_v1_course_grading_periods_url(@context)
-        view_path = 'index'
+        view_path = 'course_index'
       end
 
       js_env(client_env)

@@ -15,7 +15,7 @@ describe "speed grader - grade display" do
     @assignment = @course.assignments.create(name: 'assignment', points_possible: POINTS)
     @assignment.submit_homework(@students[0])
     @assignment.grade_student(@students[0], grade: GRADE, grader: @teacher)
-    Speedgrader.visit(@course, @assignment)
+    Speedgrader.visit(@course.id, @assignment.id)
   end
 
   it "displays the score on the sidebar", priority: "1", test_id: 283993 do

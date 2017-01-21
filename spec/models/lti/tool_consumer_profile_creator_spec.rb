@@ -68,6 +68,20 @@ module Lti
         expect(reg_srv.action).to include('POST')
       end
 
+      it 'includes restricted services when developer_credentials is set to true' do
+        restricted_service_id = 'vnd.Canvas.OriginalityReport'
+        profile = subject.create(true)
+        reg_srv = profile.service_offered.find { |srv| srv.id.include? restricted_service_id }
+        expect(reg_srv.id).to eq "#{tcp_url}##{restricted_service_id}"
+      end
+
+      it 'does not include restricted services when developer_credentials is set to false' do
+        restricted_service_id = 'vnd.Canvas.OriginalityReport'
+        profile = subject.create
+        reg_srv = profile.service_offered.find { |srv| srv.id.include? restricted_service_id }
+        expect(reg_srv).to be_nil
+      end
+
       describe '#capabilities' do
         it 'add the basic_launch capability' do
           expect(subject.create.capability_offered).to include('basic-lti-launch-request')
@@ -112,6 +126,14 @@ module Lti
 
         it 'adds the Context.id capability' do
           expect(subject.create.capability_offered).to include 'Context.id'
+        end
+
+        it 'adds the OriginalityReport capability if developer_key is true' do
+          expect(subject.create(true).capability_offered).to include 'vnd.Canvas.OriginalityReport.url'
+        end
+
+        it 'does not add the OriginalityReport capability if developer_key is false' do
+          expect(subject.create.capability_offered).not_to include 'vnd.Canvas.OriginalityReport.url'
         end
 
         it 'adds the ToolProxyReregistrationRequest capability if the feature flag is on' do

@@ -39,9 +39,21 @@ module Lti
 
       def create
         secret = RegistrationRequestService.retrieve_registration_password(context, oauth_consumer_key)
+
+        if secret.blank?
+          dev_key = DeveloperKey.find_cached(oauth_consumer_key)
+          secret = dev_key.present? && dev_key.api_key
+        end
+
         if oauth_authenticated_request?(secret)
           tp_service = ToolProxyService.new
-          tool_proxy = tp_service.process_tool_proxy_json(request.body.read, context, oauth_consumer_key)
+          tool_proxy = tp_service.process_tool_proxy_json(
+            json: request.body.read,
+            context: context,
+            guid: oauth_consumer_key,
+            developer_key: dev_key
+          )
+
           json = {
             "@context" => "http://purl.imsglobal.org/ctx/lti/v2/ToolProxyId",
             "@type" => "ToolProxy",
@@ -93,6 +105,7 @@ module Lti
       end
 
       private
+
       def payload
         @payload ||= (
           request.body.rewind

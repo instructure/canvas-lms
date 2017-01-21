@@ -1945,7 +1945,7 @@ class UsersController < ApplicationController
   # @returns [User]
   def split
     user = api_find(User, params[:id])
-    unless UserMergeData.active.where(user_id: user).shard(user).where('created_at > ?', 90.days.ago).exists?
+    unless UserMergeData.active.splitable.where(user_id: user).shard(user).exists?
       return render json: {message: t('Nothing to split off of this user')}, status: :bad_request
     end
 

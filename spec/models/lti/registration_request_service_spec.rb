@@ -19,9 +19,10 @@ module Lti
       it 'writes the reg password to the cache' do
         account = Account.create!
         enable_cache do
-          IMS::LTI::Models::Messages::RegistrationRequest.any_instance.expects(:generate_key_and_password).
-            returns(['key', 'password'])
-          Rails.cache.expects(:write).with("lti_registration_request/Account/#{account.global_id}/key", 'password', anything)
+          expect_any_instance_of(IMS::LTI::Models::Messages::RegistrationRequest).to receive(:generate_key_and_password).
+            and_return(['key', 'password'])
+          expect(Rails.cache).to receive(:write).
+            with("lti_registration_request/Account/#{account.global_id}/key", 'password', rspec_anything)
 
           described_class.create_request(account, 'profile_url', ->(_) {'return_url'})
         end

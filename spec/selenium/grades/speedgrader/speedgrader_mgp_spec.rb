@@ -38,7 +38,7 @@ describe "speedgrader - multiple grading periods" do
 
     it 'assignment in ended gp should be gradable', test_id: 2947134, priority: "1" do
       assignment = @course.assignments.create!(due_at: 13.days.ago, title: "assign in ended")
-      Speedgrader.visit(@course, assignment)
+      Speedgrader.visit(@course.id, assignment.id)
       Speedgrader.enter_grade(8)
 
       expect(Speedgrader.current_grade).to eq "8"
@@ -47,7 +47,7 @@ describe "speedgrader - multiple grading periods" do
 
     it 'assignment in closed gp should not be gradable', test_id: 2947133, priority: "1" do
       assignment = @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")
-      Speedgrader.visit(@course, assignment)
+      Speedgrader.visit(@course.id, assignment.id)
       Speedgrader.enter_grade(8)
 
       expect(Speedgrader.current_grade).to eq ""

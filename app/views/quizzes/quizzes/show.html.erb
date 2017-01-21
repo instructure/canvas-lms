@@ -112,7 +112,7 @@
 
       <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
       <div class="header-group-right">
-        <% if can_do(@quiz, @current_user, :update) %>
+        <% if can_do(@quiz, @current_user, :update) && !editing_restricted?(@quiz) %>
         <a href="<%= edit_course_quiz_path(@context, @quiz) %>" class='btn edit_assignment_link quiz-edit-button' role='button'>
           <i class="icon-edit"></i> <%= admin_edit_title %>
         </a>
@@ -144,7 +144,7 @@
               </li>
             <% end %>
 
-            <% if can_do(@quiz, @current_user, :update) %>
+            <% if can_do(@quiz, @current_user, :update) && !editing_restricted?(@quiz) %>
               <% if @quiz.locked? %>
                 <%= form_for @quiz, as: :quiz, method: :put, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_unlock_form' } do |f| %>
                   <%= hidden_field_tag 'quiz[locked]', false %>
@@ -215,7 +215,7 @@
             <% end %>
 
             <li role="presentation">
-            <% if @quiz.grants_right?(@current_user, :delete) %>
+            <% if @quiz.grants_right?(@current_user, :delete) && !editing_restricted?(@quiz) %>
               <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link" tabindex="-1" role="menuitem">
                 <i class="icon-trash"><span class="screenreader-only"><%= admin_delete_title %></span></i> <%= admin_delete_title %>
               </a>

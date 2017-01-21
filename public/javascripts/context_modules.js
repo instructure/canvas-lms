@@ -520,9 +520,13 @@ define([
         var cyoe = CyoeHelper.getItemData(data.assignment_id, data.is_cyoe_able)
 
         if (cyoe.isReleased) {
-          var $pathIcon = $('<span class="pill mastery-path-icon" data-tooltip><i class="icon-mastery-path" /></span>')
-            .attr('title', I18n.t('Released by Mastery Path'))
+          var fullText = I18n.t('Released by Mastery Path: %{path}', { path: cyoe.releasedLabel })
+          var $pathIcon = $('<span class="pill mastery-path-icon" aria-hidden="true" data-tooltip><i class="icon-mastery-path" /></span>')
+            .attr('title', fullText)
             .append(htmlEscape(cyoe.releasedLabel))
+          var $srPath = $('<span class="screenreader-only">')
+            .append(htmlEscape(fullText))
+          $admin.prepend($srPath)
           $admin.prepend($pathIcon)
         }
 

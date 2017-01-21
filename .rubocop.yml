@@ -170,6 +170,8 @@ RSpec/ExampleWording:
   Enabled: false
 RSpec/ExampleLength:
   Max: 16
+RSpec/NestedGroups:
+  Max: 5
 RSpec/DescribedClass:
   Enabled: false
 RSpec/DescribeClass:

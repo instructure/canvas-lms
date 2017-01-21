@@ -20,11 +20,12 @@ require_relative '../common'
 require_relative '../announcements/announcement_helpers'
 require_relative '../discussions/discussion_helpers'
 require_relative '../helpers/shared_examples_common'
-include DiscussionHelpers
-include AnnouncementHelpers
-include SharedExamplesCommon
 
 describe 'announcement permissions' do
+  include DiscussionHelpers
+  include AnnouncementHelpers
+  include SharedExamplesCommon
+
   include_context "in-process server selenium tests"
   include_context "announcements_page_shared_context"
   include_context "discussions_page_shared_context"

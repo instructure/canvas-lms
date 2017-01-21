@@ -134,6 +134,8 @@ define([
       e.preventDefault()
       this.setState({
         messageFormOpen: false
+      }, () => {
+        this.messageStudentsButton.focus()
       })
     }
 
@@ -243,6 +245,7 @@ define([
                       {this.state.permissions.send_messages ? (
                         <div className="StudentContextTray-Header__Actions">
                           <Button
+                            ref={ (b) => this.messageStudentsButton = b }
                             variant="icon" size="small"
                             onClick={this.handleMessageButtonClick}
                           >

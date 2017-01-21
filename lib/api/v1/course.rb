@@ -97,6 +97,8 @@ module Api::V1::Course
       add_helper_dependant_entries(hash, course, builder)
       apply_nickname(hash, course, user) if user
 
+      hash['image_download_url'] = course.image if includes.include?('course_image') && course.feature_enabled?('course_card_images')
+
       # return hash from the block for additional processing in Api::V1::CourseJson
       hash
     end

@@ -117,7 +117,9 @@ module Factories
 
   def teacher_in_section(section, opts={})
     teacher = opts.fetch(:user) { user_factory }
-    enrollment = section.course.enroll_user(teacher, 'TeacherEnrollment', :section => section, :force_update => true)
+    limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
+    enrollment = section.course.enroll_user(teacher, 'TeacherEnrollment', :section => section,
+      :force_update => true, :limit_privileges_to_course_section => limit_privileges_to_course_section)
     teacher.save!
     enrollment.workflow_state = 'active'
     enrollment.save!

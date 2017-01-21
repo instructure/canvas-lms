@@ -10,14 +10,16 @@ define([
 ], (React, axios, {default: Spinner}, I18n, splitAssetString, ExportList, ExportInProgress, Errors) => {
   class WebZipExportApp extends React.Component {
 
-    static webZipFormat (webZipExports) {
+    static webZipFormat (webZipExports, newExportId = null) {
       return webZipExports.map((webZipExport) => {
         const url = webZipExport.zip_attachment ? webZipExport.zip_attachment.url : null
+        const isNewExport = (newExportId === webZipExport.progress_id)
         return {
           date: webZipExport.created_at,
           link: url,
           workflowState: webZipExport.workflow_state,
-          progressId: webZipExport.progress_id
+          progressId: webZipExport.progress_id,
+          newExport: isNewExport
         }
       }).reverse()
     }
@@ -33,9 +35,16 @@ define([
       this.getExports()
     }
 
-    getExports () {
+    componentDidUpdate () {
+      const newExport = this.findNewExport()
+      if (newExport && newExport.link) {
+        this.downloadLink(newExport.link)
+      }
+    }
+
+    getExports (newExportId = null) {
       const courseId = splitAssetString(ENV.context_asset_string)[1]
-      this.loadExistingExports(courseId)
+      this.loadExistingExports(courseId, newExportId)
     }
 
     getExportsInProgress () {
@@ -44,19 +53,25 @@ define([
       )
     }
 
-    getFinishedExports () {
+    getViewableExports () {
       return this.state.exports.filter(ex =>
-        this.finishedStates.includes(ex.workflowState)
+        ex.workflowState === 'generated' || ex.newExport
       )
     }
 
-    loadExistingExports (courseId) {
+    findNewExport () {
+      return this.state.exports.find(ex =>
+        ex.newExport
+      )
+    }
+
+    loadExistingExports (courseId, newExportId = null) {
       axios.get(`/api/v1/courses/${courseId}/web_zip_exports`)
         .then((response) => {
           this.setState({
             loaded: true,
-            exports: WebZipExportApp.webZipFormat(response.data),
-            errors: [],
+            exports: WebZipExportApp.webZipFormat(response.data, newExportId),
+            errors: []
           })
         })
         .catch((response) => {
@@ -68,16 +83,20 @@ define([
         })
     }
 
+    downloadLink (link) {
+      window.location = link
+    }
+
     render () {
-      const webzipInProgress = this.getExportsInProgress()
       let app = null
+      const webzipInProgress = this.getExportsInProgress()
+      const viewableExports = this.getViewableExports()
       if (!this.state.loaded) {
         app = <Spinner size="small" title={I18n.t('Loading')} />
       } else if (this.state.errors.length > 0) {
         app = <Errors errors={this.state.errors} />
-      } else if (webzipInProgress === undefined) {
-        const finishedExports = this.getFinishedExports()
-        app = <ExportList exports={finishedExports} />
+      } else if (viewableExports.length > 0 || !webzipInProgress) {
+        app = <ExportList exports={viewableExports} />
       }
       return (
         <div>

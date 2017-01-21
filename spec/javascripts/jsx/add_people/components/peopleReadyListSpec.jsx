@@ -67,4 +67,13 @@ define([
     const sisid = rows[1].querySelectorAll('td')[3].innerHTML;
     equal(sisid, props.nameList[1].sis_user_id, 'middle user has sis id displayed');
   });
+  test('shows no users message when no users', () => {
+    renderComponent({nameList: []});
+    const peopleReadyList = domNode.querySelector('.addpeople__peoplereadylist');
+
+    const tbls = peopleReadyList.querySelectorAll('table');
+    equal(tbls.length, 0, 'no tables');
+
+    equal(peopleReadyList.innerText, 'No users were selected to add to the course');
+  })
 })

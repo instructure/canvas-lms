@@ -1,9 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/conversations_common')
 require_relative '../helpers/shared_examples_common'
-include SharedExamplesCommon
 
 describe "conversations new" do
   include_context "in-process server selenium tests"
+  include SharedExamplesCommon
   include ConversationsCommon
 
   before do

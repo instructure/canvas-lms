@@ -7,14 +7,22 @@ define([
     static propTypes = {
       exports: React.PropTypes.arrayOf(React.PropTypes.shape({
         date: React.PropTypes.string.isRequired,
-        link: React.PropTypes.string.isRequired
+        link: React.PropTypes.string.isRequired,
+        workflowState: React.PropTypes.string.isRequired,
+        newExport: React.PropTypes.bool.isRequired
       })).isRequired
     }
 
     renderExportListItems () {
-      return this.props.exports.map((webzip, key) =>
-        <ExportListItem key={key} link={webzip.link} date={webzip.date} />
-      )
+      return this.props.exports.map((webzip, key) => (
+        <ExportListItem
+          key={key}
+          link={webzip.link}
+          date={webzip.date}
+          workflowState={webzip.workflowState}
+          newExport={webzip.newExport}
+        />
+      ))
     }
 
     render () {

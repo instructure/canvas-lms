@@ -264,6 +264,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def edit
     if authorized_action(@quiz, @current_user, :update)
+      return render_unauthorized_action if editing_restricted?(@quiz)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
       @assignment = @quiz.assignment
 
@@ -479,6 +480,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def destroy
     if authorized_action(@quiz, @current_user, :delete)
+      return render_unauthorized_action if editing_restricted?(@quiz)
       respond_to do |format|
         if @quiz.destroy
           format.html { redirect_to course_quizzes_url(@context) }

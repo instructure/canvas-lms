@@ -65,6 +65,23 @@ describe "Gradezilla - post grades to SIS" do
     expect(f('.post-grades-dialog')).to be_displayed
   end
 
+  it 'does not show assignment errors when clicking the post grades button if all ' \
+    'assignments have due dates for each section', priority: '1', test_id: 3036003 do
+    @course.root_account.enable_feature!(:post_grades)
+    @course.update!(sis_source_id: 'xyz')
+    @course.course_sections.each do |section|
+      @attendance_assignment.assignment_overrides.create! do |override|
+        override.set = section
+        override.title = 'section override'
+        override.due_at = Time.zone.now
+        override.due_at_overridden = true
+      end
+    end
+    gradezilla_page.visit(@course)
+    f('.post-grades-placeholder > button').click
+    expect(f('.post-grades-dialog')).not_to contain_css('#assignment-errors')
+  end
+
   context 'post grades button' do
     def create_post_grades_tool(opts={})
       course = opts[:course] || @course

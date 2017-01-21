@@ -74,8 +74,13 @@ module MasterCourses::Restrictor
 
     changed_columns ||= self.changes.keys & self.class.base_class.restricted_column_settings.values.flatten
     if changed_columns.any?
+      if self.is_a?(Assignment) && submittable = self.submittable_object
+        tag_content = submittable # mark on the owner's tag
+      else
+        tag_content = self
+      end
       MasterCourses::ChildContentTag.transaction do
-        child_tag = MasterCourses::ChildContentTag.all.polymorphic_where(:content => self).lock.first
+        child_tag = MasterCourses::ChildContentTag.all.polymorphic_where(:content => tag_content).lock.first
         if child_tag
           new_changes = changed_columns - child_tag.downstream_changes
           if new_changes.any?
@@ -100,7 +105,7 @@ module MasterCourses::Restrictor
     return unless @importing_migration && is_child_content?
 
     child_tag = @importing_migration.master_course_subscription.content_tag_for(self) # find or create it
-    return unless child_tag.downstream_changes.present?
+    return unless child_tag && child_tag.downstream_changes.present?
 
     restrictions = nil
     columns_to_restore = []
