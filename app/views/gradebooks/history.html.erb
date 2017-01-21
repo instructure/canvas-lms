@@ -47,20 +47,45 @@
                   <tr data-assignment-id="<%= submission.assignment_id %>" data-user-id="<%= submission.user_id %>">
                     <th scope="row" class="ic-Table--header-row"><%= submission.student_name %></th>
                     <td>
-                      <a href="#" class="ui-corner-all revert-grade-link" >
+                      <a
+                        href="#"
+                        class="ui-corner-all revert-grade-link"
+                        data-grade="<%= display_grade(submission.previous_grade) %>"
+                      >
                         <span class="ui-icon ui-icon-arrowrefresh-1-w"></span>
-                        <span title="<%= t('titles.submission_graded', "%{graded_date} by %{grader}", :graded_date => date_string(submission.previous_graded_at), :grader => submission.previous_grader) %>" class='ui-corner-all grade'><%= display_grade(submission.previous_grade) %></span>
+                        <span
+                          title="<%= graded_by_title(submission.previous_graded_at, submission.previous_grader) %>"
+                          class='ui-corner-all grade'
+                        >
+                          <%= display_grade(format_grade(submission.previous_grade)) %>
+                        </span>
                         <span class="revert"><%= t(:revert, "Revert to this grade") %></span>
                       </a>
                     </td>
                     <td>
-                      <a href="#" class="ui-corner-all revert-grade-link" >
+                      <a
+                        href="#"
+                        class="ui-corner-all revert-grade-link"
+                        data-grade="<%= display_grade(submission.new_grade) %>"
+                      >
                         <span class="ui-icon ui-icon-arrowrefresh-1-w"></span>
-                        <span title="<%= t('titles.submission_graded', "%{graded_date} by %{grader}", :graded_date => date_string(submission.new_graded_at), :grader => submission.new_grader) %>" class='ui-corner-all grade'><%= display_grade(submission.new_grade) %></span>
+                        <span
+                          title="<%= graded_by_title(submission.new_graded_at, submission.new_grader) %>"
+                          class='ui-corner-all grade'
+                        >
+                          <%= display_grade(format_grade(submission.new_grade)) %>
+                        </span>
                         <span class="revert"><%= t(:revert, "Revert to this grade") %></span>
                       </a>
                     </td>
-                    <td><span title="<%= t('titles.submission_graded', "%{graded_date} by %{grader}", :graded_date => date_string(submission.current_graded_at), :grader => submission.current_grader) %>" class="current_grade assignment_<%= submission.assignment_id %>_user_<%= submission.user_id  %>_current_grade"><%= display_grade(submission.current_grade) %></span></td>
+                    <td>
+                      <span
+                        title="<%= graded_by_title(submission.current_graded_at, submission.current_grader) %>"
+                        class="current_grade <%= history_submission_class(submission) %>"
+                      >
+                        <%= display_grade(format_grade(submission.current_grade)) %>
+                      </span>
+                    </td>
                   </tr>
                   <% end %>
                 </tbody>

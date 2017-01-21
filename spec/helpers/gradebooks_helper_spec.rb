@@ -240,4 +240,106 @@ describe GradebooksHelper do
       end
     end
   end
+
+  describe '#format_grade?' do
+    it 'returns true if given grade is a string containing an integer' do
+      expect(helper.format_grade?('42')).to eq true
+    end
+
+    it 'returns true if given grade is an integer' do
+      expect(helper.format_grade?(42)).to eq true
+    end
+
+    it 'returns true if given grade is a string containing a decimal' do
+      expect(helper.format_grade?('42.32')).to eq true
+    end
+
+    it 'returns true if given grade is a decimal' do
+      expect(helper.format_grade?(42.32)).to eq true
+    end
+
+    it 'returns true if given grade is a percentage' do
+      expect(helper.format_grade?('42.32%')).to eq true
+    end
+
+    it 'returns false if given grade is a letter grade' do
+      expect(helper.format_grade?('A')).to eq false
+      expect(helper.format_grade?('B-')).to eq false
+      expect(helper.format_grade?('D+')).to eq false
+    end
+
+    it 'returns false if given grade is a mix of letters and numbers' do
+      expect(helper.format_grade?('A2')).to eq false
+      expect(helper.format_grade?('3.0D')).to eq false
+      expect(helper.format_grade?('asdf321')).to eq false
+    end
+  end
+
+  describe '#percentage?' do
+    it 'returns true if given grade is a percentage' do
+      expect(helper.percentage?('42%'))
+      expect(helper.percentage?('42.32%'))
+    end
+
+    it 'returns false if given grade is not a percentage' do
+      expect(helper.percentage?('42'))
+      expect(helper.percentage?('42.32'))
+      expect(helper.percentage?('A'))
+    end
+  end
+
+  describe '#format_grade' do
+    it 'formats integer point grades with I18n#n' do
+      expect(I18n).to receive(:n).with('1000', percentage: false).and_return('42')
+      expect(helper.format_grade('1000')).to eq '42'
+    end
+
+    it 'formats decimal point grades with I18n#n' do
+      expect(I18n).to receive(:n).with('1000.32', percentage: false).and_return('42')
+      expect(helper.format_grade('1000.32')).to eq '42'
+    end
+
+    it 'formats integer percentage grades with I18n#n' do
+      expect(I18n).to receive(:n).with('34', percentage: true).and_return('42')
+      expect(helper.format_grade('34%')).to eq '42'
+    end
+
+    it 'formats decimal percentage grades with I18n#n' do
+      expect(I18n).to receive(:n).with('34.45', percentage: true).and_return('42')
+      expect(helper.format_grade('34.45%')).to eq '42'
+    end
+
+    it 'returns letter grades as is' do
+      expect(helper.format_grade('A')).to eq 'A'
+      expect(helper.format_grade('B-')).to eq 'B-'
+      expect(helper.format_grade('D+')).to eq 'D+'
+    end
+
+    it 'returns a mix of letters and numbers as is' do
+      expect(helper.format_grade('A2')).to eq 'A2'
+      expect(helper.format_grade('B-4')).to eq 'B-4'
+      expect(helper.format_grade('30.0D+')).to eq '30.0D+'
+    end
+  end
+
+  describe '#graded_by_title' do
+    it 'returns an I18n translated string' do
+      expect(I18n).to receive(:t).with(
+        '%{graded_date} by %{grader}',
+        graded_date: 'the_date',
+        grader: 'the_grader'
+      ).and_return('the return value')
+      expect(TextHelper).to receive(:date_string).with('the_date').and_return('the_date')
+      helper.graded_by_title('the_date', 'the_grader')
+    end
+  end
+
+  describe '#history_submission_class' do
+    it 'returns a class based on given submission' do
+      submission = OpenStruct.new(assignment_id: 'assignment_id', user_id: 'user_id')
+      expect(
+        helper.history_submission_class(submission)
+      ).to eq 'assignment_assignment_id_user_user_id_current_grade'
+    end
+  end
 end
