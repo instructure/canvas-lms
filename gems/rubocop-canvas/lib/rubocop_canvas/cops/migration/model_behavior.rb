@@ -32,7 +32,7 @@ module RuboCop
           parts = receiver + methods
           return true if whitelist.any? do |whitelist_parts|
             if whitelist_parts[0] == :*
-              methods.last == whitelist_parts.last
+              methods.any? { |m| m == whitelist_parts.last }
             else
               parts[0, whitelist_parts.length] == whitelist_parts
             end
