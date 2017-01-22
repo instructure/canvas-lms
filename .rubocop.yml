@@ -184,5 +184,3 @@ Style/HashSyntax:
   Enabled: false
 RSpec/MultipleExpectations:
   Enabled: false
-RSpec/NestedGroups:
-  MaxNesting: 3
