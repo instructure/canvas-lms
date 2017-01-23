@@ -306,6 +306,19 @@ describe TermsController, type: :request do
         expect(student_override.start_at.iso8601).to eq "2017-01-20T20:00:00Z"
         expect(student_override.end_at.iso8601).to eq "2017-03-20T20:00:00Z"
       end
+
+      it "rejects override for invalid enrollment type", priority: "1", test_id: 3046399 do
+        result = @term1.enrollment_dates_overrides.where(enrollment_type: 'ObserverEnrollment').to_a
+        api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
+          { controller: 'terms', action: 'update', format: 'json',
+              account_id: @account.to_param, id: @term1.to_param },
+          { enrollment_term: {overrides: { 'ObserverEnrollment': {
+              'start_at': '2017-01-17T20:00:00Z', 'end_at': '2017-01-17T20:00:00Z'
+              } } } },
+          {},
+          { expected_status: 400 })
+        expect(result).to eq(@term1.enrollment_dates_overrides.where(enrollment_type: 'ObserverEnrollment').to_a)
+      end
     end
 
     describe "authorization" do
