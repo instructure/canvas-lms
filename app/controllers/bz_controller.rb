@@ -217,6 +217,36 @@ class BzController < ApplicationController
     @current_user.last_url_title = params[:last_url_title]
     @current_user.save
 
+    # I also want to store the per-module, per-course
+    # last item, so we can pick up where we left off on
+    # the dynamic syllabus there too.
+    url = URI.parse(params[:last_url])
+    urlparams = CGI.parse(url.query)
+    if urlparams['module_item_id']
+      mi = urlparams['module_item_id'].first
+      tag = ContentTag.find(mi)
+      context_module = tag.context_module
+
+      p = UserModulePosition.where(
+        :user_id => @current_user.id,
+        :course_id => tag.context_id,
+        :module_id => context_module.id
+      )
+      if p.empty?
+        UserModulePosition.create(
+          :user_id => @current_user.id,
+          :course_id => tag.context_id,
+          :module_id => context_module.id,
+          :module_item_id => mi
+        )
+      else
+        p = p.first
+        p.module_item_id = mi
+        p.save
+      end
+    end
+
+
     render :nothing => true
   end
 
@@ -300,11 +330,6 @@ class BzController < ApplicationController
     @progressions = @current_user.context_module_progressions
 
     @editable = authorized_action(@course, @current_user, :update)
-
-    #@course.context_modules.active.each do |mod|
-      #mod.part_id = 2
-      #mod.save
-    #end
   end
 
   def dynamic_syllabus_edit
@@ -352,23 +377,13 @@ class BzController < ApplicationController
 
     params[:module_id].each_with_index do |module_id, idx|
       mod = ContextModule.find(module_id)
-      mod.intro_text = params[:intro_text][idx]
 
-      # mod.image_url = params[:image_url][idx]
-
-      if params[:upload] && params[:upload]["image_file_#{mod.id}"]
-        file = params[:upload]["image_file_#{mod.id}"].read
-        dirname = Rails.root.to_s + '/public/bz_dynamic_syllabus_images/'
-        filename = dirname + module_id.to_s + '.png'
-        File.open(filename, 'wb') do |f|
-          f.write(file)
-        end
-
-        mod.image_url = "/bz_dynamic_syllabus_images/#{module_id.to_s}.png"
-      end
-
-      mod.part_id = (params[:part_id][idx] == '') ? nil : params[:part_id][idx]
-      mod.save
+      # Doing this instead of .save because running the callbacks
+      # takes forever and we only ever touch these few auxiliary fields
+      # here.
+      mod.update_column(:intro_text, params[:intro_text][idx])
+      mod.update_column(:image_url, params[:image_url][idx])
+      mod.update_column(:part_id, (params[:part_id][idx] == '') ? nil : params[:part_id][idx])
     end
 
     redirect_to "/courses/#{@course.id}/dynamic_syllabus"

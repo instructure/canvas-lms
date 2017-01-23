@@ -7,7 +7,94 @@ js_bundle :dynamic_syllabus
 
   <hr />
 
-  <%= form_tag "/courses/#{@course.id}/dynamic_syllabus/modules_edit", {:method => :post, :multipart => true} do %>
+<!--
+  To upload: request info via ajax
+  upload file via ajax
+  confirm set on canvas
+  set url here
+-->
+
+<script>
+function dynamicSyllabusUpload(module_id) {
+
+  function finalize(url) {
+    var txt = document.getElementById("module_"+module_id+"_image_url");
+    txt.value = url;
+
+    var img = document.getElementById("module_"+module_id+"_image");
+    img.src = url;
+  }
+
+  var chooser = document.createElement("input");
+  chooser.setAttribute("type", "file");
+  chooser.onchange = function() {
+    var file = this.files[0];
+
+    var req1 = new XMLHttpRequest();
+    var data = new FormData();
+    data.append("name", "module_" + module_id);
+    data.append("size", file.size);
+    data.append("content_type", file.type);
+    data.append("parent_folder_path", "dynamic_syllabus");
+    data.append("utf8", "\u2713");
+    data.append("authenticity_token", "<%= form_authenticity_token %>");
+    req1.open("POST", "/api/v1/courses/<%= @course.id %>/files", true);
+    req1.onload = function(e) {
+      if(req1.status == 200) {
+        var obj = JSON.parse(req1.responseText);
+
+        var req2 = new XMLHttpRequest();
+        var data = new FormData();
+        console.log(req1.responseText);
+        for(i in obj.upload_params) {
+          data.append(i, obj.upload_params[i]);
+          console.log(i, " = ", obj.upload_params[i]);
+        }
+        data.append("file", file, file.name);
+        req2.open("POST", obj.upload_url, true);
+        req2.onload = function(e) {
+          if(req2.status == 301) {
+            var confirmUrl = req2.getResponseHeader("Location");
+
+            var req3 = new XMLHttpRequest();
+            var data = new FormData();
+            data.append("authenticity_token", "<%= form_authenticity_token %>");
+            req3.open("POST", confirmUrl, true);
+            req3.onload = function(e) {
+              if(req.status == 200) {
+                var obj = JSON.parse(req3.responseText);
+                finalize(obj.url);
+              } else {
+                alert("Error 3: " + req3.status);
+              }
+            };
+            req3.send("");
+          } else if(req2.status == 200) {
+            var obj;
+            // jsonp, starting with while(1)
+            if(req2.responseText[0] == "w")
+              obj = JSON.parse(req2.responseText.substr(9));
+            else // normal json
+              obj = JSON.parse(req2.responseText);
+            finalize(obj.url);
+          } else {
+            alert("Error 2: " + req2.status + " " + req2.responseText);
+          }
+        };
+        req2.send(data);
+      } else {
+        alert("Error: " + req2.status);
+      }
+    };
+    req1.send(data);
+  };
+
+  chooser.click();
+}
+</script>
+
+
+  <%= form_tag "/courses/#{@course.id}/dynamic_syllabus/modules_edit", {:method => :post} do %>
 
     <% @course.context_modules.active.each do |mod| %>
     <div class="dynamic-syllabus-parts-editor">
@@ -18,11 +105,9 @@ js_bundle :dynamic_syllabus
           <%= mod.intro_text %>
         </textarea>
       <label><span>Image:</span>
-        <!-- <input type="text" name="image_url[]" value="<%= mod.image_url %>" /></label> -->
-        <%= file_field 'upload', "image_file_#{mod.id}" %>
-        <% if mod.image_url && !mod.image_url.empty? %>
-          <img style="max-width: 200px; max-height: 200px;" src="<%=mod.image_url%>" />
-        <% end %>
+        <input type="hidden" id="module_<%= mod.id %>_image_url" name="image_url[]" value="<%= mod.image_url %>" /></label>
+        <button type="button" onclick="dynamicSyllabusUpload(<%= mod.id %>);">Upload Image</button>
+        <img id="module_<%=mod.id%>_image" style="max-width: 200px; max-height: 200px;" src="<%=mod.image_url%>" />
       <label><span>Course Part:</span>
         <select name="part_id[]">
             <option value="">-none-</option>
