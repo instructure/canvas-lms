@@ -22,7 +22,7 @@ describe Canvas::LiveEvents do
   # The only methods tested in here are ones that have any sort of logic happening.
 
   def expect_event(event_name, event_body, event_context = nil)
-    expect(LiveEvents).to receive(:post_event).with(event_name, event_body, rspec_anything, event_context)
+    expect(LiveEvents).to receive(:post_event).with(event_name, event_body, anything, event_context)
   end
 
   describe ".wiki_page_updated" do
@@ -167,7 +167,7 @@ describe Canvas::LiveEvents do
       course_with_student_submissions
       submission = @course.assignments.first.submissions.first
 
-      expect_event('grade_change', rspec_anything, course_context)
+      expect_event('grade_change', anything, course_context)
       Canvas::LiveEvents.grade_changed(submission)
     end
 
@@ -176,7 +176,7 @@ describe Canvas::LiveEvents do
       course_with_student_submissions
       submission = @course.assignments.first.submissions.first
 
-      expect_event('grade_change', rspec_anything, hash_including({ foo: 'bar' }))
+      expect_event('grade_change', anything, hash_including({ foo: 'bar' }))
       Canvas::LiveEvents.grade_changed(submission)
     end
 

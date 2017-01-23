@@ -20,7 +20,7 @@ describe 'Canvas::Twilio' do
 
     lookup_stub = double('Canvas::Twilio.lookups_client.phone_numbers')
     # Expectations are matched last to first, so add our catch-all expectation before the number specific ones
-    allow(lookup_stub).to receive(:get).with(rspec_anything).and_return(
+    allow(lookup_stub).to receive(:get).with(anything).and_return(
       make_phone_number_stub('anything', Canvas::Twilio::DEFAULT_COUNTRY)
     )
     # Now add one expectation for each number+country mapping

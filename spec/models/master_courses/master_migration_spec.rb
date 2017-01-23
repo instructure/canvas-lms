@@ -305,6 +305,12 @@ describe MasterCourses::MasterMigration do
       copied_event = @copy_to.calendar_events.where(:migration_id => mig_id(event)).first
       copied_tool = @copy_to.context_external_tools.where(:migration_id => mig_id(tool)).first
 
+      copied_things = [copied_assmt, copied_topic, copied_ann, copied_page, copied_quiz,
+        copied_bank, copied_file, copied_event, copied_tool]
+      copied_things.each do |copy|
+        expect(MasterCourses::ChildContentTag.all.polymorphic_where(:content => copy).first.migration_id).to eq copy.migration_id
+      end
+
       new_text = "<p>some text here</p>"
       assmt.update_attribute(:description, new_text)
       topic.update_attribute(:message, new_text)

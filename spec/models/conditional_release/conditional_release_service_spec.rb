@@ -285,17 +285,13 @@ describe ConditionalRelease::Service do
       @submission.save!
     end
 
-    RSpec::Matchers.define :cr_service_body_params do |expected|
-      match do |actual|
-        parsed = Rack::Utils.parse_query(actual[:form_data])
-        expected.all?{|k,v| parsed[k] == v}
-      end
-    end
-
     def expect_select_mastery_path_request(expected_params = {})
-      expect(CanvasHttp).to receive(:post)
-        .with(Service.select_assignment_set_url, rspec_anything, cr_service_body_params(expected_params))
-        .and_return(double(code: '200', body: { key: 'value' }.to_json))
+      expect(CanvasHttp).to receive(:post) do |url, _headers, body|
+        expect(url).to eq Service.select_assignment_set_url
+        parsed = Rack::Utils.parse_query(body[:form_data])
+        expect(expected_params.all?{|k,v| parsed[k] == v}).to be_truthy
+        double(code: '200', body: { key: 'value' }.to_json)
+      end
     end
 
     it 'make http request to service' do
@@ -368,7 +364,7 @@ describe ConditionalRelease::Service do
       enable_cache do
         expect(CanvasHttp).to receive(:get).twice.and_return(double({ code: '500' }))
         expect(Canvas::Errors).to receive(:capture).twice.
-          with(instance_of(ConditionalRelease::ServiceError), rspec_anything)
+          with(instance_of(ConditionalRelease::ServiceError), anything)
         Service.active_rules @course, @user, nil
         Service.active_rules @course, @user, nil
       end
@@ -564,14 +560,14 @@ describe ConditionalRelease::Service do
     it 'handles an http error with logging and defaults' do
       expect_cyoe_request '404'
       expect(Canvas::Errors).to receive(:capture).
-        with(instance_of(ConditionalRelease::ServiceError), rspec_anything)
+        with(instance_of(ConditionalRelease::ServiceError), anything)
       expect(rules).to eq []
     end
 
     it 'handles a network exception with logging and defaults' do
       expect(CanvasHttp).to receive(:post).and_raise('something terrible') #throws?
       expect(Canvas::Errors).to receive(:capture).
-        with(instance_of(ConditionalRelease::ServiceError), rspec_anything)
+        with(instance_of(ConditionalRelease::ServiceError), anything)
       expect(rules).to eq []
     end
 
@@ -645,7 +641,7 @@ describe ConditionalRelease::Service do
 
       def expect_request_rules(submissions)
         expect(Service).to receive(:request_rules)
-          .with(rspec_anything, submissions_hash_for(submissions))
+          .with(anything, submissions_hash_for(submissions))
           .and_return([])
       end
 

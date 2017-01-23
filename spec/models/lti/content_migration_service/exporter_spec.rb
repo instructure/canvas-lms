@@ -158,7 +158,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
 
       it 'must not include the exported assets key' do
         assert_not_requested(:post, 'https://lti.example.com/begin_export', {
-          body: hash_including('custom_exported_assets' => rspec_anything)
+          body: hash_including('custom_exported_assets' => anything)
         })
       end
 

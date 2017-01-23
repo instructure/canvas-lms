@@ -4,6 +4,9 @@ module MochaRspecAdapter
   include Mocha::API
   include ::RSpec::Mocks::ExampleMethods
 
+  # rspec-mocks shadows mocha's implementations of kind_of, instance_of, and
+  # anything. if you need those, please use rspec-mocks syntax
+
   def setup_mocks_for_rspec
     mocha_setup
     ::RSpec::Mocks.setup
@@ -17,17 +20,6 @@ module MochaRspecAdapter
   def teardown_mocks_for_rspec
     mocha_teardown
     ::RSpec::Mocks.teardown
-  end
-
-  # mocha and rspec both define:
-  # - anything
-
-  def anything
-    ::Mocha::ParameterMatchers::Anything.new
-  end
-
-  def rspec_anything
-    ::RSpec::Mocks::ArgumentMatchers::AnyArgMatcher::INSTANCE
   end
 end
 

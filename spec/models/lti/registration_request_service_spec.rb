@@ -22,7 +22,7 @@ module Lti
           expect_any_instance_of(IMS::LTI::Models::Messages::RegistrationRequest).to receive(:generate_key_and_password).
             and_return(['key', 'password'])
           expect(Rails.cache).to receive(:write).
-            with("lti_registration_request/Account/#{account.global_id}/key", 'password', rspec_anything)
+            with("lti_registration_request/Account/#{account.global_id}/key", 'password', anything)
 
           described_class.create_request(account, 'profile_url', ->(_) {'return_url'})
         end

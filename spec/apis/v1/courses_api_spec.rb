@@ -1250,7 +1250,7 @@ describe CoursesController, type: :request do
     context "an authorized user" do
       it "should be able to reset a course" do
         expect(Auditors::Course).to receive(:record_reset).once.
-          with(@course, rspec_anything, @user, rspec_anything)
+          with(@course, anything, @user, anything)
 
         json = api_call(:post, @path, @params)
         @course.reload
@@ -3044,7 +3044,7 @@ describe CoursesController, type: :request do
 
     it "should update settings" do
       expect(Auditors::Course).to receive(:record_updated).
-        with(rspec_anything, rspec_anything, rspec_anything, source: :api)
+        with(anything, anything, anything, source: :api)
 
       json = api_call(:put, "/api/v1/courses/#{@course.id}/settings", {
         :controller => 'courses',

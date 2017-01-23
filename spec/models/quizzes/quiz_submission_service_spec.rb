@@ -24,7 +24,7 @@ shared_examples_for 'Takeable Quiz Services' do
   it 'should deny access to locked quizzes' do
     allow(quiz).to receive(:locked_for?).and_return(true)
     allow(quiz).to receive(:grants_right?).
-      with(rspec_anything, rspec_anything, :manage).and_return(false)
+      with(anything, anything, :manage).and_return(false)
 
     expect { service_action.call }.to raise_error(RequestError, /is locked/i)
   end
@@ -129,7 +129,7 @@ describe Quizzes::QuizSubmissionService do
           quiz.context.enroll_user(participant.user)
 
           allow(quiz).to receive(:grants_right?).and_return(true)
-          allow(quiz).to receive(:grants_right?).with(rspec_anything, rspec_anything, :manage).and_return(false)
+          allow(quiz).to receive(:grants_right?).with(anything, anything, :manage).and_return(false)
 
           allow(participant.user).to receive(:sections_for_course).and_return([inactive_course_section, active_course_section])
           allow(participant.user).to receive(:new_record?).and_return(false)

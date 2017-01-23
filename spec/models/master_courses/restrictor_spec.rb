@@ -120,4 +120,15 @@ describe MasterCourses::Restrictor do
       expect(new_file.display_name).not_to eq 'blargh'
     end
   end
+
+  it "should prevent updating a title on a module item for restricted content" do
+    mod = @copy_to.context_modules.create!
+    item = mod.add_item(:id => @page_copy.id, :type => 'wiki_page')
+    item.update_attribute(:title, "new title") # should work
+    @tag.update_attribute(:restrictions, {:content => true})
+    item.reload
+    item.title = "another new title"
+    expect(item.save).to be_falsey
+    expect(item.errors[:title].first.to_s).to include("locked by Master Course")
+  end
 end

@@ -52,7 +52,7 @@ describe "users" do
     it "should validate page view with a participation" do
       page_view(:user => @student, :course => @course, :participated => true)
       get "/users/#{@student.id}"
-      expect(f("#page_view_results img")).to have_attribute(:src, '/images/checked.png')
+      expect(f("#page_view_results .icon-check")).to be_displayed
     end
 
     it "should validate a page view url" do

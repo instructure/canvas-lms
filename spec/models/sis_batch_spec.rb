@@ -403,7 +403,7 @@ s2,test_1,section2,active},
       expect(@course.reload).to be_claimed
       expect(b.data[:counts][:batch_sections_deleted]).to eq 1
 
-      expect(Auditors::Course).to receive(:record_deleted).once.with(@course, rspec_anything, rspec_anything)
+      expect(Auditors::Course).to receive(:record_deleted).once.with(@course, anything, anything)
       # only supply courses
       b = process_csv_data(
         [%{course_id,short_name,long_name,term_id}],

@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.r
 describe AddressBook::Service do
   before :each do
     allow(Canvas::DynamicSettings).to receive(:from_cache).
-      with("address-book", rspec_anything).
+      with("address-book", anything).
       and_return({'app-host' => 'http://test.host'})
 
     @sender = user_model
