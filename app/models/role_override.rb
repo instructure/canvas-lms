@@ -585,6 +585,18 @@ class RoleOverride < ActiveRecord::Base
           'AccountAdmin'
         ]
       },
+      :manage_master_courses => {
+        :label => lambda { t('Blueprint Courses (create / edit / associate / delete)') },
+        :available_to => [
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :account_only => true,
+        :true_for => [
+          'AccountAdmin'
+        ],
+        :account_allows => lambda {|a| a.feature_allowed?(:master_courses)}
+      },
       :manage_user_logins => {
         :label => lambda { t('permissions.manage_user_logins', "Modify login details for users") },
         :available_to => [
