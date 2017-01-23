@@ -43,13 +43,13 @@
         <%= before_label :user, "user" %> <%= link_to report.user.try(:name), user_url(report.user_id) %><br />
       <% end %>
       <% if report.url.present? %>
-        <%= before_label :url, "url" %> <%= link_to report.url, report.url %><br/>
+        <%= before_label :url, "url" %> <%= link_to report.url, report.url %><br />
       <% end %>
       <% if report.request_context_id %>
-        <%= before_label :request_context_id, "request context id" %> <%= report.request_context_id %>
+        <%= before_label :request_context_id, "request context id" %> <%= report.request_context_id %><br />
       <% end %>
       <% if report.comments %>
-        <%= before_label :comments, "comments" %> <%= report.comments %><br/>
+        <%= before_label :comments, "comments" %> <%= report.comments %><br />
       <% end %>
       <% (report.data || {}).to_a.sort.each do |k,v| %>
         <% next if k.to_s == "exception_message" %>
