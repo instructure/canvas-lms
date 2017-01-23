@@ -19,11 +19,13 @@
 require_relative '../api_spec_helper'
 require_relative '../locked_spec'
 require_relative '../../sharding_spec_helper'
+require_relative '../../lti_spec_helper'
 
-describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
+describe AssignmentsApiController, type: :request do
   include Api
   include Api::V1::Assignment
   include Api::V1::Submission
+  include LtiSpecHelper
 
   context 'locked api item' do
     include_examples 'a locked api item'

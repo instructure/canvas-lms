@@ -18,11 +18,27 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 
-RSpec.configure do |config|
-  config.include ApplicationHelper
-end
-
 shared_examples_for "file uploads api" do
+  include ApplicationHelper
+
+  # send a multipart post request in an integration spec post_params is
+  # an array of [k,v] params so that the order of the params can be
+  # defined
+  def send_multipart(url, post_params = {}, http_headers = {}, method = :post)
+    mp = Multipart::Post.new
+    query, headers = mp.prepare_query(post_params)
+
+    # A bug in the testing adapter in Rails 3-2-stable doesn't corretly handle
+    # translating this header to the Rack/CGI compatible version:
+    # (https://github.com/rails/rails/blob/3-2-stable/actionpack/lib/action_dispatch/testing/integration.rb#L289)
+    #
+    # This issue is fixed in Rails 4-0 stable, by using a newer version of
+    # ActionDispatch Http::Headers which correctly handles the merge
+    headers = headers.dup.tap { |h| h['CONTENT_TYPE'] ||= h.delete('Content-type') }
+
+    send(method, url, query, headers.merge(http_headers))
+  end
+
   def attachment_json(attachment, options = {})
     json = {
       'id' => attachment.id,

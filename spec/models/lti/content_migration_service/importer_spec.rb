@@ -15,6 +15,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'spec_helper'
+require_relative '../../../lti_spec_helper'
 
 RSpec.describe Lti::ContentMigrationService::Importer do
   include WebMock::API

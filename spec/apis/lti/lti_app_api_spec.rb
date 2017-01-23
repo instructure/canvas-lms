@@ -16,11 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../api_spec_helper'
+require_relative '../../lti_spec_helper'
 require_dependency "lti/lti_apps_controller"
 
 module Lti
-  describe LtiAppsController, :include_lti_spec_helpers, type: :request do
+  describe LtiAppsController, type: :request do
+    include LtiSpecHelper
 
     let(:account) { Account.create }
     describe '#launch_definitions' do

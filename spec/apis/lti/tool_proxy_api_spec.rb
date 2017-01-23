@@ -16,11 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../api_spec_helper'
+require_relative '../../lti_spec_helper'
 require_dependency "lti/tool_proxy_controller"
 
 module Lti
-  describe ToolProxyController, :include_lti_spec_helpers, type: :request do
+  describe ToolProxyController, type: :request do
+    include LtiSpecHelper
 
     let(:account) { Account.create }
 

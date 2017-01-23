@@ -23,26 +23,6 @@ end
 
 require 'securerandom'
 require 'tmpdir'
-require_relative './lti_spec_helper'
-
-RSpec.configure do |c|
-  c.raise_errors_for_deprecations!
-  c.color = true
-  c.include LtiSpecHelper, :include_lti_spec_helpers
-  c.around(:each) do |example|
-    record_spec_info(example) do
-      Timeout::timeout(60) do
-        Rails.logger.info "STARTING SPEC #{example.full_description}"
-        example.run
-      end
-    end
-  end
-
-  # TODO: spec failure pages for everything, not just selenium
-  def record_spec_info(*)
-    yield
-  end
-end
 
 ENV["RAILS_ENV"] = 'test'
 
@@ -340,20 +320,31 @@ module Helpers
 end
 
 RSpec.configure do |config|
-  # If you're not using ActiveRecord you should remove these
-  # lines, delete config/database.yml and disable :active_record
-  # in your config/boot.rb
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false
   config.fixture_path = Rails.root+'spec/fixtures/'
   config.infer_spec_type_from_file_location!
-
+  config.raise_errors_for_deprecations!
+  config.color = true
   config.order = :random
 
   config.include Helpers
   config.include Factories
-
   config.include Onceler::BasicHelpers
+
+  config.around(:each) do |example|
+    record_spec_info(example) do
+      Timeout::timeout(60) do
+        Rails.logger.info "STARTING SPEC #{example.full_description}"
+        example.run
+      end
+    end
+  end
+
+  # TODO: spec failure pages for everything, not just selenium
+  def record_spec_info(*)
+    yield
+  end
 
   def reset_all_the_things!
     I18n.locale = :en
@@ -485,13 +476,6 @@ RSpec.configure do |config|
   # correspond with the model that should be built by the factory.
   # Please see spec/factories for examples!
   #****************************************************************
-
-  def enter_student_view(opts={})
-    course = opts[:course] || @course || course(opts)
-    @fake_student = course.student_view_student
-    post "/users/#{@fake_student.id}/masquerade"
-    expect(session[:become_user_id]).to eq @fake_student.id.to_s
-  end
 
   def login_as(username = "nobody@example.com", password = "asdfasdf")
     post_via_redirect "/login",
@@ -763,43 +747,8 @@ RSpec.configure do |config|
     expect(created_jobs.count { |j| j.tag == tag }).to eq count
   end
 
-  # send a multipart post request in an integration spec post_params is
-  # an array of [k,v] params so that the order of the params can be
-  # defined
-  def send_multipart(url, post_params = {}, http_headers = {}, method = :post)
-    mp = Multipart::Post.new
-    query, headers = mp.prepare_query(post_params)
-
-    # A bug in the testing adapter in Rails 3-2-stable doesn't corretly handle
-    # translating this header to the Rack/CGI compatible version:
-    # (https://github.com/rails/rails/blob/3-2-stable/actionpack/lib/action_dispatch/testing/integration.rb#L289)
-    #
-    # This issue is fixed in Rails 4-0 stable, by using a newer version of
-    # ActionDispatch Http::Headers which correctly handles the merge
-    headers = headers.dup.tap { |h| h['CONTENT_TYPE'] ||= h.delete('Content-type') }
-
-    send(method, url, query, headers.merge(http_headers))
-  end
-
   def content_type_key
     'Content-Type'
-  end
-
-  def force_string_encoding(str, encoding = "UTF-8")
-    if str.respond_to?(:force_encoding)
-      str.force_encoding(encoding)
-    end
-    str
-  end
-
-  # from minitest, MIT licensed
-  def capture_io
-    orig_stdout, orig_stderr = $stdout, $stderr
-    $stdout, $stderr = StringIO.new, StringIO.new
-    yield
-    return $stdout.string, $stderr.string
-  ensure
-    $stdout, $stderr = orig_stdout, orig_stderr
   end
 
   def compare_json(actual, expected)
