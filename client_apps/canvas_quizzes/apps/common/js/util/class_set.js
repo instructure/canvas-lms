@@ -1,5 +1,5 @@
-define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
+define((require) => {
+  const React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   /**
    * @member Util
    *
@@ -12,9 +12,9 @@ define(function(require) {
    * @return {String}
    *         The produced class string ready for use as a className prop.
    */
-  var classSet = function(set) {
-    return Object.keys(set).reduce(function(classes, key) {
-      if (!!set[key]) {
+  const classSet = function (set) {
+    return Object.keys(set).reduce((classes, key) => {
+      if (set[key]) {
         classes.push(key);
       }
 

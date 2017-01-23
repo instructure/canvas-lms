@@ -1,14 +1,14 @@
-define(function(require) {
-  var $ = require('canvas_packages/jquery');
-  var Void = require('canvas_packages/jquery/instructure_date_and_time');
+define((require) => {
+  const $ = require('canvas_packages/jquery');
+  const Void = require('canvas_packages/jquery/instructure_date_and_time');
 
-  var exports = {};
+  const exports = {};
 
-  exports.friendlyDatetime = function(dateTime, perspective) {
-    var muddledDateTime = dateTime;
+  exports.friendlyDatetime = function (dateTime, perspective) {
+    const muddledDateTime = dateTime;
 
     if (muddledDateTime) {
-      muddledDateTime.clone = function() {
+      muddledDateTime.clone = function () {
         return new Date(muddledDateTime.getTime());
       };
     }

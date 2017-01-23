@@ -1,23 +1,22 @@
-var config = require('./config/environments/production');
-var callbacks = [];
-var loaded;
+let config = require('./config/environments/production');
+const callbacks = [];
+let loaded;
 
 if (!config) {
   config = {};
 }
 
-config.onLoad = function(callback) {
+config.onLoad = function (callback) {
   if (loaded) {
     callback();
-  }
-  else {
+  } else {
     callbacks.push(callback);
   }
 };
 
 if (process.env.NODE_ENV !== 'production') {
-  var extend = require('lodash').extend;
-  var onLoad = function() {
+  const extend = require('lodash').extend;
+  const onLoad = function () {
     console.log('\tLoaded', process.env.NODE_ENV, 'config.');
     loaded = true;
 
@@ -28,14 +27,14 @@ if (process.env.NODE_ENV !== 'production') {
 
   console.log('Environment:', process.env.NODE_ENV);
 
-  var onEnvSpecificConfigLoaded = function (envSpecificConfig) {
+  const onEnvSpecificConfigLoaded = function (envSpecificConfig) {
     extend(config, envSpecificConfig);
     onLoad();
   }
   if (process.env.NODE_ENV === 'test') {
-    require([ './config/environments/test' ], onEnvSpecificConfigLoaded);
+    require(['./config/environments/test'], onEnvSpecificConfigLoaded);
   } else {
-    require([ './config/environments/development' ], onEnvSpecificConfigLoaded);
+    require(['./config/environments/development'], onEnvSpecificConfigLoaded);
   }
 }
 

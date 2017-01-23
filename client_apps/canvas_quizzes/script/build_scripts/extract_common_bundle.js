@@ -1,6 +1,6 @@
-var glob = require('glob');
-var readJSON = require('../helpers/read_json');
-var K = require('./constants');
+const glob = require('glob');
+const readJSON = require('../helpers/read_json');
+const K = require('./constants');
 
 /**
  * Prepare a set of module IDs for use inside the "bundles" r.js config hash.
@@ -17,10 +17,9 @@ var K = require('./constants');
  *
  * @return {String[]}
  */
-module.exports = function(commonModules) {
-  return commonModules.map(function(moduleId) {
+module.exports = function (commonModules) {
+  return commonModules.map(moduleId =>
     // Since we're excluding the JSX plugin from the build, we need to discard
     // the loader plugin prefix from the module identifiers:
-    return moduleId.replace('jsx!', '');
-  });
+     moduleId.replace('jsx!', ''));
 };

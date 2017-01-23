@@ -4,10 +4,10 @@
 // template in an AMD module, giving it dependencies on handlebars, it's scoped
 // i18n object if it needs one, and any brandableCss variant stuff it needs.
 const Handlebars = require('handlebars')
-const {pick} = require('lodash')
-const {EmberHandlebars} = require('ember-template-compiler')
+const { pick } = require('lodash')
+const { EmberHandlebars } = require('ember-template-compiler')
 const ScopedHbsExtractor = require('./../gems/canvas_i18nliner/js/scoped_hbs_extractor')
-const {allFingerprintsFor} = require('brandable_css/lib/main')
+const { allFingerprintsFor } = require('brandable_css/lib/main')
 const PreProcessor = require('./../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor')
 require('./../gems/canvas_i18nliner/js/scoped_hbs_pre_processor')
 
@@ -17,21 +17,20 @@ const compileHandlebars = (data) => {
   try {
     let translationCount = 0
     const ast = Handlebars.parse(source)
-    const extractor = new ScopedHbsExtractor(ast, {path})
+    const extractor = new ScopedHbsExtractor(ast, { path })
     const scope = extractor.scope
     PreProcessor.scope = scope
     PreProcessor.process(ast)
-    extractor.forEach(() => translationCount++ )
+    extractor.forEach(() => translationCount++)
 
     const precompiler = data.ember ? EmberHandlebars : Handlebars
     const result = precompiler.precompile(ast).toString()
-    const payload = {template: result, scope: scope, translationCount: translationCount}
+    const payload = { template: result, scope, translationCount }
     return payload
-  }
-  catch (e) {
+  } catch (e) {
     e = e.message || e
     console.log(e)
-    throw {error: e}
+    throw { error: e }
   }
 }
 
@@ -41,7 +40,7 @@ const emitTemplate = (path, name, result, dependencies, cssRegistration, partial
     define('${moduleName}', ${JSON.stringify(dependencies)}, function(Handlebars){
       var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
       var name = '${name}';
-      templates[name] = template(${result['template']});
+      templates[name] = template(${result.template});
       ${partialRegistration}
       ${cssRegistration}
       return templates[name];
@@ -49,24 +48,20 @@ const emitTemplate = (path, name, result, dependencies, cssRegistration, partial
   `
 }
 
-const resourceName = (path) => {
-  return path
+const resourceName = path => path
     .replace(/^.+\/app\/views\/jst\/(?:plugins\/[^\/]*\/)?/, '')
     .replace(/\.handlebars$/, '')
     .replace(/_/g, '-')
-}
 
 // given an object, returns a new object with just the 'combinedChecksum' property of each item
-const getCombinedChecksums = (obj) => {
-  return Object.keys(obj).reduce((accumulator, key) => {
-    accumulator[key] = pick(obj[key], 'combinedChecksum')
-    return accumulator
-  }, {})
-}
+const getCombinedChecksums = obj => Object.keys(obj).reduce((accumulator, key) => {
+  accumulator[key] = pick(obj[key], 'combinedChecksum')
+  return accumulator
+}, {})
 
 const buildCssReference = (name) => {
-  const bundle = 'jst/' + name
-  const cached = allFingerprintsFor(bundle + '.scss')
+  const bundle = `jst/${name}`
+  const cached = allFingerprintsFor(`${bundle}.scss`)
   const firstVariant = Object.keys(cached)[0]
   if (!firstVariant) {
     // no matching css file, just return a blank string
@@ -80,7 +75,7 @@ const buildCssReference = (name) => {
   :
     // Spit out all the combinedChecksums into the compiled js file and use brandableCss.getCssVariant()
     // at runtime to determine which css variant to load, based on the user & account's settings
-    JSON.stringify(getCombinedChecksums(cached)) + '[brandableCss.getCssVariant()]'
+    `${JSON.stringify(getCombinedChecksums(cached))}[brandableCss.getCssVariant()]`
 
   return `
     var brandableCss = arguments[1];
@@ -90,9 +85,9 @@ const buildCssReference = (name) => {
 
 const partialRegexp = /\{\{>\s?\[?(.+?)\]?( .*?)?}}/g
 const findReferencedPartials = (source) => {
-  let partials = []
+  const partials = []
   let match
-  while(match = partialRegexp.exec(source)){
+  while (match = partialRegexp.exec(source)) {
     partials.push(match[1].trim())
   }
 
@@ -114,11 +109,11 @@ const emitPartialRegistration = (path, resourceName) => {
 }
 
 const buildPartialRequirements = (partialPaths) => {
-  const requirements = partialPaths.map(partial => {
+  const requirements = partialPaths.map((partial) => {
     const partialParts = partial.split('/')
-    partialParts[partialParts.length - 1] = '_' + partialParts[partialParts.length - 1]
+    partialParts[partialParts.length - 1] = `_${partialParts[partialParts.length - 1]}`
     const requirePath = partialParts.join('/')
-    return 'jst/' + requirePath
+    return `jst/${requirePath}`
   })
   return requirements
 }
@@ -131,7 +126,7 @@ module.exports = function i18nLinerHandlebarsLoader (source) {
   const partialRegistration = emitPartialRegistration(this.resourcePath, name)
 
   const cssRegistration = buildCssReference(name)
-  if (cssRegistration){
+  if (cssRegistration) {
     // arguments[1] will be brandableCss
     dependencies.push('compiled/util/brandableCss')
   }
@@ -140,14 +135,14 @@ module.exports = function i18nLinerHandlebarsLoader (source) {
   const partialRequirements = buildPartialRequirements(partials)
   partialRequirements.forEach(requirement => dependencies.push(requirement))
 
-  const result = compileHandlebars({path: this.resourcePath, source})
-  if (result.error){
+  const result = compileHandlebars({ path: this.resourcePath, source })
+  if (result.error) {
     console.log('THERE WAS AN ERROR IN PRECOMPILATION', result)
     throw result
   }
 
   if (result.translationCount > 0) {
-    dependencies.push('i18n!' + result.scope)
+    dependencies.push(`i18n!${result.scope}`)
   }
   const compiledTemplate = emitTemplate(this.resourcePath, name, result, dependencies, cssRegistration, partialRegistration)
   return compiledTemplate

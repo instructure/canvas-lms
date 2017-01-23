@@ -1,3 +1,1 @@
-define([ 'canvas/vendor/lodash.underscore' ], function(_) {
-  return _;
-});
+define(['canvas/vendor/lodash.underscore'], _ => _);

@@ -1,7 +1,7 @@
 /* jshint node:true */
 
-var K = require('./constants');
-var config;
+const K = require('./constants');
+let config;
 
 /**
  * Extract the r.js config we use in development, which includes paths and maps
@@ -15,15 +15,15 @@ var config;
  * @return {Object}
  *         Object passed to requirejs.config() in that file.
  */
-module.exports = function() {
-  var noConflict = global.requirejs;
+module.exports = function () {
+  const noConflict = global.requirejs;
 
   if (config) { // cache
     return config;
   }
 
   global.requirejs = {
-    config: function(inConfig) {
+    config (inConfig) {
       config = inConfig;
     }
   };

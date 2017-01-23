@@ -1,10 +1,10 @@
-define(function(require) {
-  var config = require('../../config');
-  var CoreAdapter = require('canvas_quizzes/core/adapter');
-  var Adapter = new CoreAdapter(config);
-  var Backbone = require('canvas_packages/backbone');
+define((require) => {
+  const config = require('../../config');
+  const CoreAdapter = require('canvas_quizzes/core/adapter');
+  const Adapter = new CoreAdapter(config);
+  const Backbone = require('canvas_packages/backbone');
 
-  Backbone.ajax = function(options){
+  Backbone.ajax = function (options) {
     return Adapter.request(options);
   };
 });

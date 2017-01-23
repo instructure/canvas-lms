@@ -1,12 +1,12 @@
-define([ 'canvas_packages/jquery', 'lodash' ], function($, _) {
-  var extend = _.extend;
+define(['canvas_packages/jquery', 'lodash'], ($, _) => {
+  const extend = _.extend;
 
   /**
    * @class Common.Core.Environment
    *
    * API for manipulating the search query.
    */
-  var Environment = {
+  const Environment = {
     /**
      * @property {Object} query
      * The extracted GET query parameters. See #parseQueryString
@@ -24,22 +24,21 @@ define([ 'canvas_packages/jquery', 'lodash' ], function($, _) {
      * @return {Object}
      *         Contains the key-value pairs found in the query string.
      */
-    parseQueryString: function(query) {
-      var items = query.replace(/^\?/, '').split('&');
+    parseQueryString (query) {
+      const items = query.replace(/^\?/, '').split('&');
 
-      return items.reduce(function(params, item) {
-        var pair  = item.split('=');
-        var key   = decodeURIComponent(pair[0]);
-        var value = decodeURIComponent(pair[1]);
+      return items.reduce((params, item) => {
+        const pair = item.split('=');
+        let key = decodeURIComponent(pair[0]);
+        const value = decodeURIComponent(pair[1]);
 
         if (key && key.length) {
           if (key.substr(-2, 2) === '[]') {
-            key = key.substr(0, key.length-2);
+            key = key.substr(0, key.length - 2);
 
             params[key] = params[key] || [];
             params[key].push(value);
-          }
-          else {
+          } else {
             params[key] = value;
           }
         }
@@ -59,7 +58,7 @@ define([ 'canvas_packages/jquery', 'lodash' ], function($, _) {
      *   // => ?foo=bar&from=03/28/2014
      *
      */
-    updateQueryString: function(params) {
+    updateQueryString (params) {
       this.query = extend({}, this.query, params);
 
       history.pushState('', '', [
@@ -68,18 +67,18 @@ define([ 'canvas_packages/jquery', 'lodash' ], function($, _) {
       ].join('?'));
     },
 
-    getQueryParameter: function(key) {
+    getQueryParameter (key) {
       return this.query[key];
     },
 
-    removeQueryParameter: function(key) {
-      this.removeQueryParameters([ key ]);
+    removeQueryParameter (key) {
+      this.removeQueryParameters([key]);
     },
 
-    removeQueryParameters: function(keys) {
-      var query = this.query;
+    removeQueryParameters (keys) {
+      const query = this.query;
 
-      keys.forEach(function(key) {
+      keys.forEach((key) => {
         delete query[key];
       });
 
@@ -90,16 +89,14 @@ define([ 'canvas_packages/jquery', 'lodash' ], function($, _) {
   // Extract the actual query string either from location.search if it's there,
   // or from the hash if we're using hash-based history, or from the href
   // as the last resort.
-  var extractQueryString = function() {
+  const extractQueryString = function () {
     if (window.location.search.length) {
       return window.location.search;
-    }
-    else if (window.location.hash.length) {
+    } else if (window.location.hash.length) {
       return window.location.hash.split('?')[1] || '';
     }
-    else {
-      return window.location.href.split('?')[1] || '';
-    }
+
+    return window.location.href.split('?')[1] || '';
   };
 
   Environment.query = Environment.parseQueryString(extractQueryString());

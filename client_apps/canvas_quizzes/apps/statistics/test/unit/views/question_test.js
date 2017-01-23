@@ -1,12 +1,12 @@
-define(function(require) {
-  var Subject = require('jsx!views/question');
+define((require) => {
+  const Subject = require('jsx!views/question');
 
-  describe('Views.Question', function() {
+  describe('Views.Question', function () {
     this.reactSuite({
       type: Subject
     });
 
-    it('should render', function() {
+    it('should render', () => {
       expect(subject.isMounted()).toEqual(true);
     });
   });

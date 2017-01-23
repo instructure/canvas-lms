@@ -1,8 +1,8 @@
-define(function(require) {
-  var convertCase = require('../../util/convert_case');
-  var _ = require('lodash');
-  var pick = _.pick;
-  var camelize = convertCase.camelize;
+define((require) => {
+  const convertCase = require('../../util/convert_case');
+  const _ = require('lodash');
+  const pick = _.pick;
+  const camelize = convertCase.camelize;
 
   /**
    * @method pickAndNormalize
@@ -14,7 +14,7 @@ define(function(require) {
    * @param  {String[]} keys
    * @return {Object}
    */
-  return function pickAndNormalize(set, keys) {
+  return function pickAndNormalize (set, keys) {
     return camelize(pick(set || {}, keys));
   };
 });

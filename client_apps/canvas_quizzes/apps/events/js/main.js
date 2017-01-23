@@ -1,7 +1,7 @@
-define(function(require) {
-  var config = require('./config');
-  var delegate = require('./core/delegate');
-  var exports = {};
+define((require) => {
+  const config = require('./config');
+  const delegate = require('./core/delegate');
+  const exports = {};
 
   exports.configure = delegate.configure;
   exports.mount = delegate.mount;

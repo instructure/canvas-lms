@@ -1,12 +1,12 @@
-var _ = require('lodash');
-var fs = require('fs');
-var grunt = require('grunt');
-var merge = _.merge;
+const _ = require('lodash');
+const fs = require('fs');
+const grunt = require('grunt');
+const merge = _.merge;
 
-var PKG_NAME = grunt.config.get('pkg.name');
+const PKG_NAME = grunt.config.get('pkg.name');
 
 // Test config shared between all the app suites:
-var SHARED_CONFIG = {
+const SHARED_CONFIG = {
   timeout: 2500,
 
   host: "http://127.0.0.1:<%= grunt.config.get('connect.tests.options.port') %>/",
@@ -30,21 +30,21 @@ var SHARED_CONFIG = {
   version: '2.0.0',
 
   styles: [
-    "vendor/canvas_public/stylesheets_compiled/new_styles_normal_contrast/pages/g_vendor.css",
-    "vendor/canvas_public/stylesheets_compiled/new_styles_normal_contrast/base/c-common.css",
+    'vendor/canvas_public/stylesheets_compiled/new_styles_normal_contrast/pages/g_vendor.css',
+    'vendor/canvas_public/stylesheets_compiled/new_styles_normal_contrast/base/c-common.css',
     "dist/<%= grunt.config.get('pkg.name') %>.css"
   ]
 };
 
-var appNames = [ 'common', 'events', 'statistics' ];
-var config = appNames.reduce(function(config, appName) {
-  var pathTo = function(path) {
-    return [ 'apps', appName, path ].join('/');
+const appNames = ['common', 'events', 'statistics'];
+const config = appNames.reduce((config, appName) => {
+  const pathTo = function (path) {
+    return ['apps', appName, path].join('/');
   };
 
-  var configFile = pathTo('test/config.js');
-  var cssFile = pathTo('test/overrides.css');
-  var appConfig = merge({}, SHARED_CONFIG);
+  const configFile = pathTo('test/config.js');
+  const cssFile = pathTo('test/overrides.css');
+  const appConfig = merge({}, SHARED_CONFIG);
 
   appConfig.helpers = [
     'apps/common/test/helpers/*.js',
@@ -56,7 +56,7 @@ var config = appNames.reduce(function(config, appName) {
   ];
 
   if (fs.existsSync(cssFile)) {
-    appConfig.styles = SHARED_CONFIG.styles.concat([ cssFile ]);
+    appConfig.styles = SHARED_CONFIG.styles.concat([cssFile]);
   }
 
   if (fs.existsSync(configFile)) {

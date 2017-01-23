@@ -4,7 +4,7 @@
 //   - adding JSON response Content-Type headers
 //   - remembering whether headers or body go first!
 //
-this.xhrResponse = function(statusCode, body, headers) {
+this.xhrResponse = function (statusCode, body, headers) {
   if (!headers) {
     headers = {};
   }
@@ -13,5 +13,5 @@ this.xhrResponse = function(statusCode, body, headers) {
     headers['Content-Type'] = 'application/json';
   }
 
-  return [ statusCode, headers, JSON.stringify(body) ];
+  return [statusCode, headers, JSON.stringify(body)];
 };

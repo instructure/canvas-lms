@@ -1,10 +1,10 @@
-module.exports = function(input){
+module.exports = function (input) {
   this.cacheable();
-  var dependenciesRegexp = /define\(?\s*\[(.|\n)*?]/;
-  var newInput = input.replace(dependenciesRegexp, function(match){
-    if(/('|")jst\//.test(match)){
-      var extraDep = ", 'coffeescripts/handlebars_helpers']";
-      var defineWithHandlebarsDependency = match.replace(/]$/m, extraDep);
+  const dependenciesRegexp = /define\(?\s*\[(.|\n)*?]/;
+  const newInput = input.replace(dependenciesRegexp, (match) => {
+    if (/('|")jst\//.test(match)) {
+      const extraDep = ", 'coffeescripts/handlebars_helpers']";
+      const defineWithHandlebarsDependency = match.replace(/]$/m, extraDep);
       return defineWithHandlebarsDependency;
     }
     return match;

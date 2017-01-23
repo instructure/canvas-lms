@@ -1,9 +1,9 @@
-define(function(require) {
-  var Subject = require('collections/quiz_reports');
-  describe('Collections.QuizReports', function() {
-    it('should parse properly', function() {
-      var fixture = require('json!fixtures/quiz_reports.json');
-      var subject = new Subject();
+define((require) => {
+  const Subject = require('collections/quiz_reports');
+  describe('Collections.QuizReports', () => {
+    it('should parse properly', () => {
+      const fixture = require('json!fixtures/quiz_reports.json');
+      const subject = new Subject();
       subject.add(fixture, { parse: true });
 
       expect(subject.length).toBe(2);

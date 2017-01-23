@@ -1,20 +1,21 @@
-var fs = require('fs-extra');
-var glob = require('glob');
-var path = require('path');
-var transform = require('react-tools').transform;
-var convertTextBlocks = require('canvas_react_i18n');
+const fs = require('fs-extra');
+const glob = require('glob');
+const path = require('path');
+const transform = require('react-tools').transform;
+const convertTextBlocks = require('canvas_react_i18n');
 
-var processJSX = function(rawJSX) {
+const processJSX = function (rawJSX) {
   return transform(convertTextBlocks(rawJSX));
 };
 
-module.exports = function(srcDir, destDir) {
+module.exports = function (srcDir, destDir) {
   if (!destDir) {
     destDir = srcDir;
   }
 
-  glob.sync('**/*.jsx', { cwd: srcDir }).forEach(function(file) {
-    var compiled, outfile;
+  glob.sync('**/*.jsx', { cwd: srcDir }).forEach((file) => {
+    let compiled,
+      outfile;
 
     console.log('Compiling JSX:', file);
 

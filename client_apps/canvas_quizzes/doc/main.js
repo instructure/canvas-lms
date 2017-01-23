@@ -1,19 +1,19 @@
 requirejs.config({
   baseUrl: '/',
   paths: {
-    'canvas_quizzes': 'apps/common/js'
+    canvas_quizzes: 'apps/common/js'
   }
 });
 
-require([ 'config/requirejs/development' ], function() {
+require(['config/requirejs/development'], () => {
   require([
     'canvas_packages/jquery',
     'old_version_of_react_used_by_canvas_quizzes_client_apps',
     'canvas_quizzes/util/inflections',
-  ], function($, React, Inflection) {
-    var parseFileName = function() {
-      var appName;
-      var fileName = $('h1.class .class-source-link')[0].innerHTML
+  ], ($, React, Inflection) => {
+    const parseFileName = function () {
+      let appName;
+      let fileName = $('h1.class .class-source-link')[0].innerHTML
         .match(/([\w|\.]+)/)[1]
         .trim();
 
@@ -23,19 +23,19 @@ require([ 'config/requirejs/development' ], function() {
       appName = fileName.shift();
       fileName = fileName.join('/');
 
-      return 'jsx!apps/' + appName + '/js/' + fileName;
+      return `jsx!apps/${appName}/js/${fileName}`;
     };
 
-    $(function() {
-      $(window).on('click', '.seed-name', function() {
-        var $this = $(this);
-        var $data = $this.next().find('.seed-data');
-        var $container = $this.next().find('.seed-runner');
-        var data = JSON.parse($data.text());
-        var mountUp = function(props) {
-          var fileName = parseFileName();
+    $(() => {
+      $(window).on('click', '.seed-name', function () {
+        const $this = $(this);
+        const $data = $this.next().find('.seed-data');
+        const $container = $this.next().find('.seed-runner');
+        const data = JSON.parse($data.text());
+        const mountUp = function (props) {
+          const fileName = parseFileName();
 
-          require([ fileName ], function(Component) {
+          require([fileName], (Component) => {
             React.unmountComponentAtNode($container[0]);
             React.renderComponent(Component(props), $container[0]);
           });
@@ -44,11 +44,10 @@ require([ 'config/requirejs/development' ], function() {
         $container.text('Loading...');
 
         if (typeof data === 'string') {
-          require([ 'text!' + data ], function(fixture) {
+          require([`text!${data}`], (fixture) => {
             mountUp(JSON.parse(fixture));
           });
-        }
-        else {
+        } else {
           mountUp(data);
         }
       });

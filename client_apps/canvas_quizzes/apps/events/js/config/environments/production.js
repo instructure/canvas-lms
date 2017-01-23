@@ -1,39 +1,39 @@
-define([], function() {
+define([], () =>
   /**
    * @class Events.Config
    */
-  return {
+   ({
     /**
      * @cfg {Function} ajax
      * An XHR request processor that has an API compatible with jQuery.ajax.
      */
-    ajax: undefined,
+     ajax: undefined,
 
     /**
      * @cfg {String} quizUrl
      * Canvas API endpoint for querying the current quiz.
      */
-    quizUrl: undefined,
+     quizUrl: undefined,
 
     /**
      * @cfg {String} submissionUrl
      * Canvas API endpoint for querying the current quiz submission.
      */
-    submissionUrl: undefined,
+     submissionUrl: undefined,
 
     /**
      * @cfg {String} eventsUrl
      * Canvas API endpoint for querying the current quiz submission's events.
      */
-    eventsUrl: undefined,
+     eventsUrl: undefined,
 
     /**
      * @cfg {String} questionsUrl
      * Canvas API endpoint for querying questions in the current quiz.
      */
-    questionsUrl: undefined,
+     questionsUrl: undefined,
 
-    attempt: undefined,
+     attempt: undefined,
 
     /**
      * @cfg {Boolean} [loadOnStartup=true]
@@ -44,7 +44,7 @@ define([], function() {
      * You may disable this behavior if you want to manually inject the app
      * with data.
      */
-    loadOnStartup: true,
+     loadOnStartup: true,
 
     /**
      * @cfg {Boolean} [allowMatrixView=true]
@@ -52,7 +52,7 @@ define([], function() {
      * Turn this off if you don't want the user to be able to view the answer
      * matrix.
      */
-    allowMatrixView: true,
+     allowMatrixView: true,
 
     /**
      * Error emitter. Default behavior is to log the error message to the
@@ -63,8 +63,7 @@ define([], function() {
      * @param  {String} message
      *         An explanation of the error.
      */
-    onError: function(message) {
-      console.error(message);
-    }
-  };
-});
+     onError (message) {
+       console.error(message);
+     }
+   }));

@@ -1,5 +1,5 @@
-define(function(require) {
-  var $ = require('canvas_packages/jquery');
+define((require) => {
+  const $ = require('canvas_packages/jquery');
 
   return {
     xhr: {
@@ -17,7 +17,7 @@ define(function(require) {
     quizReportsUrl: '/api/v1/courses/1/quizzes/1/reports',
     courseSectionsUrl: '/api/v1/courses/1/sections',
 
-    onError: function(message) {
+    onError (message) {
       throw new Error(message);
     }
   };

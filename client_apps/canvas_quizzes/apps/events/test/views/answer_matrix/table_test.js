@@ -1,12 +1,12 @@
-define(function(require) {
-  var Subject = require('jsx!views/answer_matrix/table');
+define((require) => {
+  const Subject = require('jsx!views/answer_matrix/table');
 
-  describe('Views::AnswerMatrix::Table', function() {
+  describe('Views::AnswerMatrix::Table', function () {
     this.reactSuite({
       type: Subject
     });
 
-    it('should render', function() {
+    it('should render', () => {
       expect(subject.isMounted()).toEqual(true);
     });
   });

@@ -1,4 +1,4 @@
-define(function() {
+define(() =>
   /**
    * Populate a collection with some data.
    *
@@ -16,18 +16,18 @@ define(function() {
    *        new data.
    *
    */
-  return function populateCollection(collection, payload, replace) {
-    var setter, setterOptions;
+   function populateCollection (collection, payload, replace) {
+     let setter,
+       setterOptions;
 
-    if (arguments.length === 2) {
-      replace = true;
-    }
+     if (arguments.length === 2) {
+       replace = true;
+     }
 
-    setter = replace ? 'reset' : 'add';
-    setterOptions = replace ?
+     setter = replace ? 'reset' : 'add';
+     setterOptions = replace ?
       { parse: true } :
       { parse: true, merge: true };
 
-    collection[setter].call(collection, payload, setterOptions);
-  };
-});
+     collection[setter].call(collection, payload, setterOptions);
+   });

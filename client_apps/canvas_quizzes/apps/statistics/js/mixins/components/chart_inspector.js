@@ -1,24 +1,24 @@
-define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var d3 = require('d3');
-  var $ = require('canvas_packages/jquery');
-  var jQuery_qTip = require('qtip');
+define((require) => {
+  const React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
+  const d3 = require('d3');
+  const $ = require('canvas_packages/jquery');
+  const jQuery_qTip = require('qtip');
 
-  var makeInspectable = function(selector, view) {
+  const makeInspectable = function (selector, view) {
     selector
       .on('mouseover', view.inspect)
       .on('mouseout', view.stopInspecting);
   };
 
-  var DEFAULT_TOOLTIP_OPTIONS = {
+  const DEFAULT_TOOLTIP_OPTIONS = {
     position: {
       my: 'center bottom',
       at: 'center top'
     }
   };
 
-  var ChartMixin = {
-    makeInspectable: makeInspectable,
+  const ChartMixin = {
+    makeInspectable,
 
     defaults: {
     },
@@ -36,14 +36,14 @@ define(function(require) {
         onInspect: React.PropTypes.func
       },
 
-      getDefaultProps: function() {
+      getDefaultProps () {
         return {
           onInspect: null
         };
       },
 
-      buildInspector: function() {
-        var node = this.refs.inspector.getDOMNode();
+      buildInspector () {
+        const node = this.refs.inspector.getDOMNode();
 
         this.inspectorNode = node;
         this.inspector = $(node).qtip({
@@ -76,11 +76,12 @@ define(function(require) {
         return this.inspector;
       },
 
-      inspect: function(datapoint) {
-        var inspector, contentNode;
-        var itemId = datapoint.id;
-        var tooltipOptions = this.tooltipOptions || DEFAULT_TOOLTIP_OPTIONS;
-        var targetNode = d3.event.target;
+      inspect (datapoint) {
+        let inspector,
+          contentNode;
+        const itemId = datapoint.id;
+        const tooltipOptions = this.tooltipOptions || DEFAULT_TOOLTIP_OPTIONS;
+        const targetNode = d3.event.target;
 
         if (this.props.onInspect) {
           contentNode = this.props.onInspect(itemId, datapoint);
@@ -96,7 +97,7 @@ define(function(require) {
         inspector.show();
       },
 
-      stopInspecting: function() {
+      stopInspecting () {
         this.inspector.hide();
       }
     }

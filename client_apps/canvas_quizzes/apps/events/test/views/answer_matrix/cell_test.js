@@ -1,25 +1,25 @@
-define(function(require) {
-  var Subject = require('jsx!views/answer_matrix/cell');
-  var K = require('constants');
+define((require) => {
+  const Subject = require('jsx!views/answer_matrix/cell');
+  const K = require('constants');
 
-  describe('Views::AnswerMatrix::Cell', function() {
+  describe('Views::AnswerMatrix::Cell', function () {
     this.reactSuite({
       type: Subject
     });
 
-    it('should render', function() {
+    it('should render', () => {
       expect(subject.isMounted()).toEqual(true);
     });
 
-    describe('when not expanded', function() {
-      beforeEach(function() {
+    describe('when not expanded', () => {
+      beforeEach(() => {
         setProps({
           expanded: false,
           question: { id: '1', questionType: 'multiple_choice_question' }
         });
       });
 
-      it('should show an emblem for an empty answer', function() {
+      it('should show an emblem for an empty answer', () => {
         setProps({
           event: { data: [{ quizQuestionId: '1', answer: null }] }
         });
@@ -27,7 +27,7 @@ define(function(require) {
         expect('.is-empty').toExist();
       });
 
-      it('should show an emblem for an answer', function() {
+      it('should show an emblem for an answer', () => {
         setProps({
           event: {
             data: [
@@ -39,7 +39,7 @@ define(function(require) {
         expect('.is-answered').toExist();
       });
 
-      it('should show an emblem for the last answer', function() {
+      it('should show an emblem for the last answer', () => {
         setProps({
           event: {
             data: [
@@ -51,17 +51,17 @@ define(function(require) {
         expect('.is-answered.is-last').toExist();
       });
 
-      it('should show nothing for no answer', function() {
+      it('should show nothing for no answer', () => {
         expect('.ic-AnswerMatrix__Emblem').not.toExist();
       });
     });
 
-    describe('when expanded', function() {
-      beforeEach(function() {
+    describe('when expanded', () => {
+      beforeEach(() => {
         setProps({ expanded: true });
       });
 
-      it('should encode the answer as JSON', function() {
+      it('should encode the answer as JSON', () => {
         setProps({
           question: {
             id: '1',
@@ -73,11 +73,11 @@ define(function(require) {
           }
         });
 
-        expect(subject.getDOMNode().innerText.trim()).toEqual(JSON.stringify("123", null, 2));
+        expect(subject.getDOMNode().innerText.trim()).toEqual(JSON.stringify('123', null, 2));
       });
 
-      describe('with an essay/textual question', function() {
-        beforeEach(function() {
+      describe('with an essay/textual question', () => {
+        beforeEach(() => {
           setProps({
             question: {
               id: '1',
@@ -86,45 +86,45 @@ define(function(require) {
           });
         });
 
-        it('should not encode the answer as JSON', function() {
+        it('should not encode the answer as JSON', () => {
           setProps({
             event: {
-              data: [{ quizQuestionId: '1', answer: "<p>foo</p>\n\n<p>bar</p>" }]
+              data: [{ quizQuestionId: '1', answer: '<p>foo</p>\n\n<p>bar</p>' }]
             }
           });
 
-          expect(subject.getDOMNode().innerText.trim()).
-            toEqual("<p>foo</p>\n\n<p>bar</p>");
+          expect(subject.getDOMNode().innerText.trim())
+            .toEqual('<p>foo</p>\n\n<p>bar</p>');
         });
 
-        it('should truncate a long answer', function() {
+        it('should truncate a long answer', () => {
           setProps({
             shouldTruncate: true,
             event: {
               data: [{
                 quizQuestionId: '1',
-                answer: "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+                answer: 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
               }]
             }
           });
 
-          expect(subject.getDOMNode().innerText.trim()).
-            toEqual("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwx...");
+          expect(subject.getDOMNode().innerText.trim())
+            .toEqual('abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwx...');
         });
 
-        it('should not truncate a short answer', function() {
+        it('should not truncate a short answer', () => {
           setProps({
             shouldTruncate: true,
             event: {
               data: [{
                 quizQuestionId: '1',
-                answer: "abcdefghijklmnopqrstuvwxyz"
+                answer: 'abcdefghijklmnopqrstuvwxyz'
               }]
             }
           });
 
-          expect(subject.getDOMNode().innerText.trim()).
-            toEqual("abcdefghijklmnopqrstuvwxyz");
+          expect(subject.getDOMNode().innerText.trim())
+            .toEqual('abcdefghijklmnopqrstuvwxyz');
         });
       });
     });

@@ -1,14 +1,14 @@
-define(function(require) {
-  var Subject = require('jsx!views/app');
-  var Statistics = require('stores/statistics');
-  var _ = require('lodash');
+define((require) => {
+  const Subject = require('jsx!views/app');
+  const Statistics = require('stores/statistics');
+  const _ = require('lodash');
 
-  describe('Views.App', function() {
+  describe('Views.App', function () {
     this.reactSuite({
       type: Subject
     });
 
-    it('should render', function() {
+    it('should render', () => {
       expect(subject.isMounted()).toEqual(true);
     });
   });

@@ -1,16 +1,16 @@
-define(function(require) {
-  var Subject = require('jsx!views/summary/report/status');
-  var $ = require('canvas_packages/jquery');
+define((require) => {
+  const Subject = require('jsx!views/summary/report/status');
+  const $ = require('canvas_packages/jquery');
 
-  describe('Views.Summary.Report.Status', function() {
+  describe('Views.Summary.Report.Status', function () {
     this.reactSuite({
       type: Subject
     });
 
-    it('should render', function() {});
+    it('should render', () => {});
 
-    describe('when not yet generated', function() {
-      it('should read a message', function() {
+    describe('when not yet generated', () => {
+      it('should read a message', () => {
         setProps({
           generatable: true,
           file: {},
@@ -21,8 +21,8 @@ define(function(require) {
       });
     });
 
-    describe('when generating', function() {
-      it('should show a progress bar', function() {
+    describe('when generating', () => {
+      it('should show a progress bar', () => {
         setProps({
           generatable: true,
           isGenerating: true,
@@ -34,7 +34,7 @@ define(function(require) {
         expect('.progress').toExist();
       });
 
-      it('should fill up the progress bar', function() {
+      it('should fill up the progress bar', () => {
         setProps({
           generatable: true,
           isGenerating: true,
@@ -55,8 +55,8 @@ define(function(require) {
       });
     });
 
-    describe('when generated', function() {
-      it('should read the time of generation', function() {
+    describe('when generated', () => {
+      it('should read the time of generation', () => {
         setProps({
           generatable: true,
           isGenerated: true,

@@ -1,12 +1,12 @@
-define(function(require) {
-  var _ = require('lodash');
-  var find = _.find;
-  var RE_EXTRACT_LINK = /<([^>]+)>; rel="([^"]+)",?\s*/g;
-  var RE_EXTRACT_PP = /per_page=(\d+)/;
+define((require) => {
+  const _ = require('lodash');
+  const find = _.find;
+  const RE_EXTRACT_LINK = /<([^>]+)>; rel="([^"]+)",?\s*/g;
+  const RE_EXTRACT_PP = /per_page=(\d+)/;
 
   // Extract pagination meta from a JSON-API payload inside the
   // "meta.pagination" set.
-  var parseJsonApiPagination = function(respMeta, meta) {
+  const parseJsonApiPagination = function (respMeta, meta) {
     if (!meta) meta = {};
 
     meta.perPage = respMeta.per_page;
@@ -21,9 +21,11 @@ define(function(require) {
   //
   // Here's a good reference:
   //   https://developer.github.com/guides/traversing-with-pagination/
-  var parseLinkPagination = function(linkHeader, meta) {
-    var match, nextLink, lastLink;
-    var links = [];
+  const parseLinkPagination = function (linkHeader, meta) {
+    let match,
+      nextLink,
+      lastLink;
+    const links = [];
 
     if (!meta) meta = {};
 
@@ -89,7 +91,7 @@ define(function(require) {
    *       collection.length; // 50
    *     });
    */
-  var Mixin = {
+  const Mixin = {
     /**
      * Fetch the next page, if available.
      *
@@ -104,13 +106,12 @@ define(function(require) {
      *         Resolves when the page has been loaded and the pagination meta
      *         parsed.
      */
-    fetchNext: function(options) {
-      var meta = this._paginationMeta;
+    fetchNext (options) {
+      const meta = this._paginationMeta;
 
       if (!options) {
         options = {};
-      }
-      else if (options.hasOwnProperty('xhr')) {
+      } else if (options.hasOwnProperty('xhr')) {
         delete options.xhr;
       }
 
@@ -120,13 +121,12 @@ define(function(require) {
 
       options.data.page = options.page || meta.nextPage;
 
-      options.success = function(payload, statusText, xhr) {
-        var header = xhr.getResponseHeader('Link');
+      options.success = function (payload, statusText, xhr) {
+        const header = xhr.getResponseHeader('Link');
 
         if (payload.meta && payload.meta.pagination) {
           parseJsonApiPagination(payload.meta.pagination, meta);
-        }
-        else if (header) {
+        } else if (header) {
           parseLinkPagination(header, meta);
         }
 
@@ -141,7 +141,7 @@ define(function(require) {
      *         Whether there's more data (that we know of) to pull in from the
      *         server.
      */
-    canLoadMore: function() {
+    canLoadMore () {
       return !!this._paginationMeta.hasMore;
     },
 
@@ -155,13 +155,12 @@ define(function(require) {
      * @return {Promise}
      *         Resolves when *all* pages have been loaded.
      */
-    fetchAll: function(options) {
-      var meta = this._paginationMeta;
+    fetchAll (options) {
+      const meta = this._paginationMeta;
 
       if (!options) {
         options = {};
-      }
-      else if (options.hasOwnProperty('page')) {
+      } else if (options.hasOwnProperty('page')) {
         console.warn(
           'You may not specify a page when fetching all pages. ' +
           'Resetting cursor to 1.'
@@ -176,25 +175,24 @@ define(function(require) {
 
       meta.nextPage = 1;
 
-      return (function fetch(collection) {
-        return collection.fetchNext(options).then(function() {
+      return (function fetch (collection) {
+        return collection.fetchNext(options).then(() => {
           if (meta.hasMore) {
             return fetch(collection);
-          } else {
-            return collection;
           }
+          return collection;
         });
-      })(this);
+      }(this));
     },
 
     /** @private */
-    _resetPaginationMeta: function() {
+    _resetPaginationMeta () {
       this._paginationMeta = {};
     },
 
   };
 
-  return function applyMixin(collection) {
+  return function applyMixin (collection) {
     collection.fetchNext = Mixin.fetchNext;
     collection.fetchAll = Mixin.fetchAll;
     collection._resetPaginationMeta = Mixin._resetPaginationMeta;

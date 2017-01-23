@@ -1,16 +1,16 @@
-define(function(require) {
-  var _ = require('lodash');
-  var K = require('../constants');
-  var findWhere = _.findWhere;
-  var keys = Object.keys;
-  var QuestionAnsweredEventDecorator = {};
+define((require) => {
+  const _ = require('lodash');
+  const K = require('../constants');
+  const findWhere = _.findWhere;
+  const keys = Object.keys;
+  const QuestionAnsweredEventDecorator = {};
 
-  QuestionAnsweredEventDecorator.decorateAnswerRecord = function(question, record) {
-    var answered = false;
-    var answer = record.answer;
-    var blank;
+  QuestionAnsweredEventDecorator.decorateAnswerRecord = function (question, record) {
+    let answered = false;
+    const answer = record.answer;
+    let blank;
 
-    switch(question.questionType) {
+    switch (question.questionType) {
       case K.Q_NUMERICAL:
       case K.Q_CALCULATED:
       case K.Q_MULTIPLE_CHOICE:
@@ -36,9 +36,7 @@ define(function(require) {
         if (answer instanceof Array && answer.length > 0) {
           // watch out that at this point, the attributes are not normalized
           // and not camelCased:
-          answered = answer.some(function(pair) {
-            return pair.match_id !== null;
-          });
+          answered = answer.some(pair => pair.match_id !== null);
         }
 
         break;
@@ -88,14 +86,12 @@ define(function(require) {
    *         Nothing is returned as the decoration is done in-place on the model
    *         attributes.
    */
-  QuestionAnsweredEventDecorator.run = function(events, questions) {
-    var finalAnswerEvents = {};
+  QuestionAnsweredEventDecorator.run = function (events, questions) {
+    let finalAnswerEvents = {};
 
-    events.forEach(function(event) {
-      event.attributes.data.forEach(function(record) {
-        var question = questions.filter(function(question) {
-          return question.id === record.quizQuestionId;
-        })[0];
+    events.forEach((event) => {
+      event.attributes.data.forEach((record) => {
+        const question = questions.filter(question => question.id === record.quizQuestionId)[0];
 
         finalAnswerEvents[question.id] = event;
 
@@ -103,11 +99,11 @@ define(function(require) {
       });
     });
 
-    keys(finalAnswerEvents).forEach(function(quizQuestionId) {
-      var event = finalAnswerEvents[quizQuestionId];
+    keys(finalAnswerEvents).forEach((quizQuestionId) => {
+      const event = finalAnswerEvents[quizQuestionId];
 
       findWhere(event.attributes.data, {
-        quizQuestionId: quizQuestionId
+        quizQuestionId
       }).last = true;
     });
 

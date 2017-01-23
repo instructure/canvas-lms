@@ -1,21 +1,21 @@
-define(function(require) {
-  var Subject = require('core/controller');
-  var config = require('config');
+define((require) => {
+  const Subject = require('core/controller');
+  const config = require('config');
 
-  describe('Controller', function() {
-    describe('#start', function() {
+  describe('Controller', () => {
+    describe('#start', function () {
       this.promiseSuite = true;
 
-      it('should work', function() {
-        expect(function() {
+      it('should work', () => {
+        expect(() => {
           Subject.start(jasmine.createSpy());
         }).not.toThrow();
       });
     });
 
-    describe('#load', function() {
-      it('should work', function() {
-        expect(function() {
+    describe('#load', () => {
+      it('should work', () => {
+        expect(() => {
           Subject.load();
         }).not.toThrow();
       });

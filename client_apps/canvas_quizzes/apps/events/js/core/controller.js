@@ -1,9 +1,9 @@
-define(function(require) {
-  var EventStore = require('../stores/events');
-  var config = require('../config');
-  var update;
+define((require) => {
+  const EventStore = require('../stores/events');
+  const config = require('../config');
+  let update;
 
-  var onChange = function() {
+  const onChange = function () {
     update({
       submission: EventStore.getSubmission(),
       questions: EventStore.getQuestions(),
@@ -40,7 +40,7 @@ define(function(require) {
      *        Quiz reports.
      *        See Stores.Statistics#getQuizReports().
      */
-    start: function(onUpdate) {
+    start (onUpdate) {
       update = onUpdate;
       EventStore.addChangeListener(onChange);
 
@@ -52,14 +52,14 @@ define(function(require) {
     /**
      * Load initial application data; quiz statistics and reports.
      */
-    load: function() {
+    load () {
       EventStore.loadInitialData().then(EventStore.load.bind(EventStore));
     },
 
     /**
      * Stop listening to data changes.
      */
-    stop: function() {
+    stop () {
       update = undefined;
     }
   };

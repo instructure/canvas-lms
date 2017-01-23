@@ -1,6 +1,6 @@
-define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var ActorMixin = require('../mixins/components/actor');
+define((require) => {
+  const React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
+  const ActorMixin = require('../mixins/components/actor');
 
   if (!React.addons) {
     React.addons = {};

@@ -1,16 +1,16 @@
-define(function(require) {
-  var Backbone = require('canvas_packages/backbone');
-  var pickAndNormalize = require('canvas_quizzes/models/common/pick_and_normalize');
-  var K = require('../constants');
-  var fromJSONAPI = require('canvas_quizzes/models/common/from_jsonapi');
-  var isGenerating = function(report) {
-    var workflowState = report.progress.workflowState;
-    return [ 'queued', 'running' ].indexOf(workflowState) > -1;
+define((require) => {
+  const Backbone = require('canvas_packages/backbone');
+  const pickAndNormalize = require('canvas_quizzes/models/common/pick_and_normalize');
+  const K = require('../constants');
+  const fromJSONAPI = require('canvas_quizzes/models/common/from_jsonapi');
+  const isGenerating = function (report) {
+    const workflowState = report.progress.workflowState;
+    return ['queued', 'running'].indexOf(workflowState) > -1;
   };
 
   return Backbone.Model.extend({
-    parse: function(payload) {
-      var attrs;
+    parse (payload) {
+      let attrs;
 
       payload = fromJSONAPI(payload, 'quiz_reports', true);
       attrs = pickAndNormalize(payload, K.QUIZ_REPORT_ATTRS);

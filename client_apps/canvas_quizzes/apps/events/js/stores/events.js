@@ -1,23 +1,23 @@
-define(function(require) {
-  var Store = require('canvas_quizzes/core/store');
-  var Dispatcher = require('../core/dispatcher');
-  var Environment = require('canvas_quizzes/core/environment');
-  var Config = require('../config');
-  var EventCollection = require('../collections/events');
-  var QuestionCollection = require('../collections/questions');
-  var Submission = require('../models/submission');
-  var QuestionAnsweredEventDecorator = require('../models/question_answered_event_decorator');
-  var K = require('../constants');
-  var _ = require('lodash');
-  var range = _.range;
+define((require) => {
+  const Store = require('canvas_quizzes/core/store');
+  const Dispatcher = require('../core/dispatcher');
+  const Environment = require('canvas_quizzes/core/environment');
+  const Config = require('../config');
+  const EventCollection = require('../collections/events');
+  const QuestionCollection = require('../collections/questions');
+  const Submission = require('../models/submission');
+  const QuestionAnsweredEventDecorator = require('../models/question_answered_event_decorator');
+  const K = require('../constants');
+  const _ = require('lodash');
+  const range = _.range;
 
   /**
    * @class Events.Stores.Events
    */
   return new Store('events', {
-    getInitialState: function() {
-      var attempt = Config.attempt;
-      var requestedAttempt = Environment.getQueryParameter('attempt');
+    getInitialState () {
+      let attempt = Config.attempt;
+      const requestedAttempt = Environment.getQueryParameter('attempt');
 
       if (requestedAttempt) {
         attempt = parseInt(requestedAttempt, 10);
@@ -30,7 +30,7 @@ define(function(require) {
 
         loading: false,
 
-        attempt: attempt,
+        attempt,
 
         /**
          * @property {Integer} latestAttempt
@@ -54,10 +54,10 @@ define(function(require) {
      * This needs to be called at most once per submission during the lifetime
      * of the app.
      */
-    loadInitialData: function() {
-      return this.state.submission.fetch().then(function(submission) {
-        var newState = {};
-        var latestAttempt = this.state.submission.get('attempt');
+    loadInitialData () {
+      return this.state.submission.fetch().then((submission) => {
+        const newState = {};
+        const latestAttempt = this.state.submission.get('attempt');
 
         if (!this.state.attempt || this.state.attempt > latestAttempt) {
           newState.attempt = latestAttempt;
@@ -66,30 +66,30 @@ define(function(require) {
         newState.latestAttempt = latestAttempt;
 
         this.setState(newState);
-      }.bind(this));
+      });
     },
 
-    load: function() {
+    load () {
       this.setState({ loading: true });
       this.loadSubmission()
         .then(this.loadQuestions.bind(this))
         .then(this.loadEvents.bind(this))
-        .finally(function() {
+        .finally(() => {
           this.setState({ loading: false });
-        }.bind(this));
+        });
     },
 
-    loadSubmission: function() {
-      var data;
+    loadSubmission () {
+      let data;
 
       if (this.state.attempt) {
         data = { attempt: this.state.attempt };
       }
 
-      return this.state.submission.fetch({ data: data });
+      return this.state.submission.fetch({ data });
     },
 
-    loadQuestions: function() {
+    loadQuestions () {
       return this.state.questions.fetchAll({
         reset: true,
         data: {
@@ -99,9 +99,9 @@ define(function(require) {
       });
     },
 
-    loadEvents: function() {
-      var events = this.state.events;
-      var questions = this.getQuestions();
+    loadEvents () {
+      const events = this.state.events;
+      const questions = this.getQuestions();
 
       return events.fetchAll({
         reset: true,
@@ -109,48 +109,45 @@ define(function(require) {
           attempt: this.state.attempt,
           per_page: 50
         }
-      }).then(function decorateAnswerEvents(/*payload*/) {
-        var answerEvents = events.filter(function(model) {
-          return model.get('type') === K.EVT_QUESTION_ANSWERED;
-        });
+      }).then((/* payload*/) => {
+        const answerEvents = events.filter(model => model.get('type') === K.EVT_QUESTION_ANSWERED);
 
         QuestionAnsweredEventDecorator.run(answerEvents, questions);
 
         return events;
-      }.bind(this));
+      });
     },
 
-    isLoading: function() {
+    isLoading () {
       return this.state.loading;
     },
 
-    getAll: function() {
+    getAll () {
       return this.state.events.toJSON();
     },
 
-    getQuestions: function() {
+    getQuestions () {
       return this.state.questions.toJSON();
     },
 
-    getSubmission: function() {
+    getSubmission () {
       return this.state.submission.toJSON();
     },
 
-    getAttempt: function() {
+    getAttempt () {
       return this.state.attempt;
     },
 
-    getAvailableAttempts: function() {
+    getAvailableAttempts () {
       return range(1, Math.max(1, (this.state.latestAttempt || 0) + 1));
     },
 
-    setActiveAttempt: function(_attempt) {
-      var attempt = parseInt(_attempt, 10);
+    setActiveAttempt (_attempt) {
+      const attempt = parseInt(_attempt, 10);
 
       if (this.getAvailableAttempts().indexOf(attempt) === -1) {
-        throw new Error("Invalid attempt '" + attempt + "'");
-      }
-      else if (this.state.attempt !== attempt) {
+        throw new Error(`Invalid attempt '${attempt}'`);
+      } else if (this.state.attempt !== attempt) {
         this.state.attempt = attempt;
         this.load();
       }

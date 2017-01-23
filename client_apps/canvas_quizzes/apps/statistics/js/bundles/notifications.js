@@ -1,5 +1,5 @@
 define([
   '../notifications/report_generation_failed'
-], function() {
+], function () {
   return [].slice.call(arguments);
 });

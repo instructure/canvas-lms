@@ -1,17 +1,17 @@
-define(function(require) {
-  var Store = require('canvas_quizzes/core/store');
-  var Dispatcher = require('../core/dispatcher');
-  var config = require('../config');
-  var QuizStats = require('../collections/quiz_statistics');
-  var populateCollection = require('./common/populate_collection');
-  var quizStats = new QuizStats([]);
+define((require) => {
+  const Store = require('canvas_quizzes/core/store');
+  const Dispatcher = require('../core/dispatcher');
+  const config = require('../config');
+  const QuizStats = require('../collections/quiz_statistics');
+  const populateCollection = require('./common/populate_collection');
+  const quizStats = new QuizStats([]);
 
   /**
    * @class Statistics.Stores.Statistics
    * Load stats.
    */
-  var store = new Store('statistics', {
-    getInitialState: function() {
+  const store = new Store('statistics', {
+    getInitialState () {
       return {
         loading: false,
         stats_can_load: true,
@@ -28,7 +28,7 @@ define(function(require) {
      * @return {RSVP.Promise}
      *         Fulfills when the stats have been loaded and injected.
      */
-    load: function() {
+    load () {
       if (!config.quizStatisticsUrl) {
         return config.onError('Missing configuration parameter "quizStatisticsUrl".');
       }
@@ -37,15 +37,15 @@ define(function(require) {
 
       return quizStats.fetch({
         success: this.checkForStatsNoLoad.bind(this),
-      }).then(function onLoad(payload) {
+      }).then((payload) => {
         this.populate(payload);
         this.setState({ loading: false });
-      }.bind(this));
+      });
     },
 
-    checkForStatsNoLoad: function(collection, response) {
+    checkForStatsNoLoad (collection, response) {
       if (response == null) {
-        this.setState({stats_can_load: false});
+        this.setState({ stats_can_load: false });
       }
     },
 
@@ -55,13 +55,13 @@ define(function(require) {
      *
      * @fires change
      */
-    populate: function(payload) {
+    populate (payload) {
       populateCollection(quizStats, payload);
       this.emitChange();
     },
 
-    get: function() {
-      var props;
+    get () {
+      let props;
 
       if (quizStats.length) {
         props = quizStats.first().toJSON();
@@ -71,34 +71,34 @@ define(function(require) {
       return props;
     },
 
-    isLoading: function() {
+    isLoading () {
       return this.state.loading;
     },
 
-    canBeLoaded: function() {
+    canBeLoaded () {
       return this.state.stats_can_load;
     },
 
-    getSubmissionStatistics: function() {
-      var stats = this.get();
+    getSubmissionStatistics () {
+      const stats = this.get();
       if (stats) {
         return stats.submissionStatistics;
       }
     },
 
-    getQuestionStatistics: function() {
-      var stats = this.get();
+    getQuestionStatistics () {
+      const stats = this.get();
 
       if (stats) {
         return stats.questionStatistics;
       }
     },
 
-    filterForSection: function(sectionId) {
-      if(sectionId == 'all') {
+    filterForSection (sectionId) {
+      if (sectionId == 'all') {
         quizStats.url = config.quizStatisticsUrl;
       } else {
-        quizStats.url = config.quizStatisticsUrl + '?section_ids=' + sectionId;
+        quizStats.url = `${config.quizStatisticsUrl}?section_ids=${sectionId}`;
       }
 
       config.section_ids = sectionId;
@@ -106,13 +106,13 @@ define(function(require) {
 
       return quizStats.fetch({
         success: this.checkForStatsNoLoad.bind(this),
-      }).then(function onLoad(payload) {
+      }).then((payload) => {
         this.populate(payload);
         this.setState({ loading: false });
-      }.bind(this));
+      });
     },
 
-    __reset__: function() {
+    __reset__ () {
       quizStats.reset();
       return Store.prototype.__reset__.call(this);
     }

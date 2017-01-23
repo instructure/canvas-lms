@@ -1,33 +1,33 @@
 /* jshint node:true */
 
-var glob = require('glob');
-var grunt = require('grunt');
+const glob = require('glob');
+const grunt = require('grunt');
 
 process.env.NODE_PATH = __dirname;
 require('module').Module._initPaths();
 
-var readPackage = function() {
+const readPackage = function () {
   return grunt.file.readJSON('package.json');
 };
 
-var loadOptions = function(path) {
-  glob.sync('*', { cwd: path }).forEach(function(option) {
-    var key = option.replace(/\.js$/,'').replace(/^grunt\-/, '');
+const loadOptions = function (path) {
+  glob.sync('*', { cwd: path }).forEach((option) => {
+    const key = option.replace(/\.js$/, '').replace(/^grunt\-/, '');
     grunt.config.set(key, require(path + option));
   });
 };
 
-var loadTasks = function(path) {
-  glob.sync('*.js', { cwd: path }).forEach(function(taskFile) {
-    var taskRunner;
-    var task = require(path + '/' + taskFile);
-    var taskName = taskFile.replace(/\.js$/, '');
+const loadTasks = function (path) {
+  glob.sync('*.js', { cwd: path }).forEach((taskFile) => {
+    let taskRunner;
+    const task = require(`${path}/${taskFile}`);
+    const taskName = taskFile.replace(/\.js$/, '');
 
     taskRunner = task.runner;
 
     if (taskRunner instanceof Function) {
-      taskRunner = function() {
-        var params = [].slice.call(arguments);
+      taskRunner = function () {
+        const params = [].slice.call(arguments);
         params.unshift(grunt);
         return task.runner.apply(this, params);
       };
@@ -37,7 +37,7 @@ var loadTasks = function(path) {
   });
 };
 
-module.exports = function() {
+module.exports = function () {
   grunt.initConfig({
     pkg: readPackage()
   });

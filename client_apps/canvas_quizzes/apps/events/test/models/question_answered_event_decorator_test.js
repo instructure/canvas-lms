@@ -1,23 +1,23 @@
-define(function(require) {
-  var Subject = require('models/question_answered_event_decorator');
-  var Backbone = require('canvas_packages/backbone');
-  var _ = require('lodash');
-  var findWhere = _.findWhere;
+define((require) => {
+  const Subject = require('models/question_answered_event_decorator');
+  const Backbone = require('canvas_packages/backbone');
+  const _ = require('lodash');
+  const findWhere = _.findWhere;
 
-  describe('Models.QuestionAnsweredEventDecorator', function() {
-    describe('#decorateAnswerRecord', function() {
-      describe('inferring whether a question is answered', function() {
-        var record = {};
-        var questionType;
-        var subject = function(answer) {
+  describe('Models.QuestionAnsweredEventDecorator', () => {
+    describe('#decorateAnswerRecord', () => {
+      describe('inferring whether a question is answered', () => {
+        const record = {};
+        let questionType;
+        const subject = function (answer) {
           record.answer = answer;
 
           return Subject.decorateAnswerRecord({
-            questionType: questionType
+            questionType
           }, record);
         };
 
-        it('multiple_choice_question and many friends (scalar answers)', function() {
+        it('multiple_choice_question and many friends (scalar answers)', () => {
           questionType = 'multiple_choice_question';
 
           subject(null);
@@ -27,7 +27,7 @@ define(function(require) {
           expect(record.answered).toEqual(true);
         });
 
-        it('fill_in_multiple_blanks_question, multiple_dropdowns', function() {
+        it('fill_in_multiple_blanks_question, multiple_dropdowns', () => {
           questionType = 'fill_in_multiple_blanks_question';
 
           subject({ color1: null, color2: null });
@@ -37,7 +37,7 @@ define(function(require) {
           expect(record.answered).toEqual(true, 'should be true if any blank is filled with anything');
         });
 
-        it('matching_question', function() {
+        it('matching_question', () => {
           questionType = 'matching_question';
 
           subject([]);
@@ -53,7 +53,7 @@ define(function(require) {
           expect(record.answered).toEqual(true);
         });
 
-        it('multiple_answers, file_upload', function() {
+        it('multiple_answers, file_upload', () => {
           questionType = 'matching_question';
 
           subject([]);
@@ -64,14 +64,13 @@ define(function(require) {
 
           subject(null);
           expect(record.answered).toEqual(false);
-
         });
       });
     });
 
-    describe('#run', function() {
-      it('should mark latest answers to all questions', function() {
-        var events = [
+    describe('#run', () => {
+      it('should mark latest answers to all questions', () => {
+        const events = [
           {
             data: [
               { quizQuestionId: '1', answer: 'something' },
@@ -85,16 +84,14 @@ define(function(require) {
           }
         ];
 
-        var eventCollection = events.map(function(attrs) {
-          return new Backbone.Model(attrs);
-        });
+        const eventCollection = events.map(attrs => new Backbone.Model(attrs));
 
-        var questions = [
+        const questions = [
           { id: '1' },
           { id: '2' }
         ];
 
-        var findQuestionRecord = function(eventIndex, id) {
+        const findQuestionRecord = function (eventIndex, id) {
           return findWhere(eventCollection[eventIndex].get('data'), {
             quizQuestionId: id
           });

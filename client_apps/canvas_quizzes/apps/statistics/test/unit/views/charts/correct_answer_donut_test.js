@@ -1,14 +1,13 @@
-define(function(require) {
-  var Subject = require('jsx!views/charts/correct_answer_donut');
+define((require) => {
+  const Subject = require('jsx!views/charts/correct_answer_donut');
 
-  describe('Views.Charts.CorrectAnswerDonut', function() {
+  describe('Views.Charts.CorrectAnswerDonut', function () {
     this.reactSuite({
       type: Subject
     });
 
-    it('should render', function() {
+    it('should render', () => {
       expect(subject.isMounted()).toEqual(true);
     });
-
   });
 });

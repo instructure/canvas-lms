@@ -1,6 +1,6 @@
 const i18nRegex = /["']vendor\/i18n['"]/
 
-module.exports = function nonAmdLoader(input){
+module.exports = function nonAmdLoader (input) {
   this.cacheable()
 
   return input.replace(i18nRegex, match =>

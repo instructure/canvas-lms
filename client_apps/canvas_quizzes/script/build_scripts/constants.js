@@ -1,24 +1,20 @@
-var path = require('path');
-var glob = require('glob');
-var readJSON = require('../helpers/read_json');
+const path = require('path');
+const glob = require('glob');
+const readJSON = require('../helpers/read_json');
 
-var K = {};
-var pkg = readJSON('package.json');
-var root = path.join(__dirname, '..', '..');
+const K = {};
+const pkg = readJSON('package.json');
+const root = path.join(__dirname, '..', '..');
 
 K.root = root;
 K.pkgName = pkg.name;
 
-K.appNames = glob.sync('*/js/main.js', { cwd: path.join(root, 'apps') }).map(function(file) {
-  return file.split('/')[0];
-}).filter(function(appName) {
-  return appName !== 'common';
-});
+K.appNames = glob.sync('*/js/main.js', { cwd: path.join(root, 'apps') }).map(file => file.split('/')[0]).filter(appName => appName !== 'common');
 
 K.bundledDependencies = pkg.requirejs.bundledDependencies;
 K.commonRoot = 'apps/common';
 
-K.require = function(relativePath) {
+K.require = function (relativePath) {
   return require(path.join(root, relativePath));
 };
 

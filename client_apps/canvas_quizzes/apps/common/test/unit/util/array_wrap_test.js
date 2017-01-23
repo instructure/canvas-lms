@@ -1,9 +1,9 @@
-define(function(require) {
-  var arrayWrap = require('util/array_wrap');
+define((require) => {
+  const arrayWrap = require('util/array_wrap');
 
-  describe('Util::arrayWrap', function() {
-    it('should work', function() {
-      expect(arrayWrap('foo')).toEqual([ 'foo' ]);
+  describe('Util::arrayWrap', () => {
+    it('should work', () => {
+      expect(arrayWrap('foo')).toEqual(['foo']);
     });
   });
 });

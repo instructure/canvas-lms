@@ -1,5 +1,5 @@
-define([ 'rsvp' ], function(RSVP) {
-  RSVP.on('error', function(e) {
+define(['rsvp'], (RSVP) => {
+  RSVP.on('error', (e) => {
     console.error('RSVP error:', JSON.stringify(e));
 
     if (e && e.message) {

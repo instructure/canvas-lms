@@ -1,8 +1,8 @@
-var glob = require('glob');
-var path = require('path');
-var K = require('./constants');
-var PKG_PATH = path.join(K.root, 'vendor/packages');
-var PKG_PATH_RJS = '../../../vendor/packages';
+const glob = require('glob');
+const path = require('path');
+const K = require('./constants');
+const PKG_PATH = path.join(K.root, 'vendor/packages');
+const PKG_PATH_RJS = '../../../vendor/packages';
 
 // Look for all the packages in vendor/packages/**/*.js and create an "empty:"
 // map containing all the package paths.
@@ -31,12 +31,12 @@ var PKG_PATH_RJS = '../../../vendor/packages';
 //       "react": "empty:"
 //     }
 //
-module.exports = function() {
-  var devConfig = require('./extract_development_config')();
-  var pkgMap = glob.sync('**/*.js', { cwd: PKG_PATH }).reduce(function(set, pkg) {
-    var pkgName = pkg.replace(/\.js$/, '');
+module.exports = function () {
+  const devConfig = require('./extract_development_config')();
+  const pkgMap = glob.sync('**/*.js', { cwd: PKG_PATH }).reduce((set, pkg) => {
+    const pkgName = pkg.replace(/\.js$/, '');
 
-    set[PKG_PATH_RJS + '/' + pkgName] = 'empty:';
+    set[`${PKG_PATH_RJS}/${pkgName}`] = 'empty:';
 
     // We'll also have to stub aliases to commonly used canvas packages, like
     // "react" for example.

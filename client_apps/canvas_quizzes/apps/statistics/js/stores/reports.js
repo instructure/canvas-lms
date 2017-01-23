@@ -1,21 +1,21 @@
-define(function(require) {
-  var Store = require('canvas_quizzes/core/store');
-  var Dispatcher = require('../core/dispatcher');
-  var config = require('../config');
-  var K = require('../constants');
-  var QuizReports = require('../collections/quiz_reports');
-  var pollProgress = require('../services/poll_progress');
-  var populateCollection = require('./common/populate_collection');
-  var quizReports = new QuizReports();
+define((require) => {
+  const Store = require('canvas_quizzes/core/store');
+  const Dispatcher = require('../core/dispatcher');
+  const config = require('../config');
+  const K = require('../constants');
+  const QuizReports = require('../collections/quiz_reports');
+  const pollProgress = require('../services/poll_progress');
+  const populateCollection = require('./common/populate_collection');
+  const quizReports = new QuizReports();
 
-  var triggerDownload = function(url) {
-    var iframe = document.createElement('iframe');
+  const triggerDownload = function (url) {
+    const iframe = document.createElement('iframe');
     iframe.style.display = 'none';
     iframe.src = url;
     document.body.appendChild(iframe);
   };
 
-  var generationRequests = [];
+  let generationRequests = [];
 
   /**
    * @class Statistics.Stores.QuizReports
@@ -33,9 +33,9 @@ define(function(require) {
      * @return {RSVP.Promise}
      *         Fulfills when the reports have been loaded.
      */
-    load: function() {
-      var onLoad = this.populate.bind(this);
-      var url = config.quizReportsUrl;
+    load () {
+      const onLoad = this.populate.bind(this);
+      const url = config.quizReportsUrl;
 
       if (!url) {
         return config.onError('Missing configuration parameter "quizReportsUrl".');
@@ -43,10 +43,10 @@ define(function(require) {
 
       return quizReports.fetch({
         data: {
-          include: [ 'progress', 'file' ],
+          include: ['progress', 'file'],
           includes_all_versions: config.includesAllVersions
         }
-      }).then(function(payload) {
+      }).then((payload) => {
         onLoad(payload, { replace: true, track: true });
       });
     },
@@ -69,7 +69,7 @@ define(function(require) {
      *
      * @fires change
      */
-    populate: function(payload, options) {
+    populate (payload, options) {
       options = options || {};
 
       populateCollection(quizReports, payload, options.replace);
@@ -83,74 +83,70 @@ define(function(require) {
       this.emitChange();
     },
 
-    getAll: function() {
+    getAll () {
       return quizReports.toJSON();
     },
 
     actions: {
-      generate: function(reportType, onChange, onError) {
-        var quizReport = quizReports.findWhere({ reportType: reportType });
+      generate (reportType, onChange, onError) {
+        const quizReport = quizReports.findWhere({ reportType });
 
         if (quizReport) {
           if (quizReport.get('isGenerating')) {
             return onError('report is already being generated');
-          }
-          else if (quizReport.get('isGenerated')) {
+          } else if (quizReport.get('isGenerated')) {
             return onError('report is already generated');
           }
         }
 
-        quizReports.generate(reportType).then(function(quizReport) {
+        quizReports.generate(reportType).then((quizReport) => {
           this.trackReportGeneration(quizReport, true);
           onChange();
-        }.bind(this), onError);
+        }, onError);
       },
 
-      regenerate: function(reportId, onChange, onError) {
-        var quizReport = quizReports.get(reportId);
-        var progress = quizReport.get('progress');
+      regenerate (reportId, onChange, onError) {
+        const quizReport = quizReports.get(reportId);
+        const progress = quizReport.get('progress');
 
         if (!quizReport) {
           return onError('no such report');
-        }
-        else if (!progress) {
+        } else if (!progress) {
           return onError('report is not being generated');
-        }
-        else if (progress.workflowState !== K.PROGRESS_FAILED) {
+        } else if (progress.workflowState !== K.PROGRESS_FAILED) {
           return onError('report generation is not stuck');
         }
 
         quizReports.generate(quizReport.get('reportType'))
-          .then(function retrackGeneration(quizReport) {
+          .then((quizReport) => {
             this.stopTracking(quizReport.get('id'));
             this.trackReportGeneration(quizReport, true);
 
             onChange();
-          }.bind(this), onError);
+          }, onError);
       },
 
-      abort: function(reportId, onChange, onError) {
-        var quizReport = quizReports.get(reportId);
+      abort (reportId, onChange, onError) {
+        const quizReport = quizReports.get(reportId);
 
         if (!quizReport) {
           return onError('no such quiz report');
-        }
-        else if (!quizReport.get('progress')) {
+        } else if (!quizReport.get('progress')) {
           return onError('quiz report is not being generated');
         }
 
-        quizReport.destroy({ wait: true }).then(function() {
+        quizReport.destroy({ wait: true }).then(() => {
           this.stopTracking(quizReport.get('id'));
 
           // destroy() would remove the report from the collection but we
           // don't want that... just reload the report from the server:
           quizReports.add(quizReport);
           quizReport.fetch().then(onChange, onError);
-        }.bind(this), onError);
+        }, onError);
       }
     },
 
-    __reset__: function() {
+    __reset__ () {
       quizReports.reset();
       generationRequests = [];
 
@@ -158,12 +154,13 @@ define(function(require) {
     },
 
     /** @private */
-    trackReportGeneration: function(quizReport, autoDownload) {
-      var emitChange, progressUrl, poll, reload;
-      var quizReportId = quizReport.get('id');
-      var generationRequest = generationRequests.filter(function(request) {
-        return request.quizReportId === quizReportId;
-      })[0];
+    trackReportGeneration (quizReport, autoDownload) {
+      let emitChange,
+        progressUrl,
+        poll,
+        reload;
+      const quizReportId = quizReport.get('id');
+      let generationRequest = generationRequests.filter(request => request.quizReportId === quizReportId)[0];
 
       // we're already tracking
       if (generationRequest) {
@@ -171,8 +168,8 @@ define(function(require) {
       }
 
       generationRequest = {
-        quizReportId: quizReportId,
-        autoDownload: autoDownload
+        quizReportId,
+        autoDownload
       };
 
       generationRequests.push(generationRequest);
@@ -180,25 +177,25 @@ define(function(require) {
       emitChange = this.emitChange.bind(this);
       progressUrl = quizReport.get('progress').url;
 
-      poll = function() {
+      poll = function () {
         return pollProgress(progressUrl, {
           interval: 1000,
-          onTick: function(completion, progress) {
+          onTick (completion, progress) {
             quizReport.set('progress', progress);
             emitChange();
           }
         });
       };
 
-      reload = function() {
+      reload = function () {
         return quizReport.fetch({
           data: {
-            include: [ 'progress', 'file' ]
+            include: ['progress', 'file']
           }
         });
       };
 
-      poll().then(reload, reload).finally(function() {
+      poll().then(reload, reload).finally(() => {
         this.stopTracking(quizReportId);
 
         if (generationRequest.autoDownload && quizReport.get('isGenerated')) {
@@ -206,19 +203,16 @@ define(function(require) {
         }
 
         emitChange();
-      }.bind(this));
+      });
     },
 
     /** @private */
-    stopTracking: function(quizReportId) {
-      var request = generationRequests.filter(function(request) {
-        return request.quizReportId === quizReportId;
-      })[0];
+    stopTracking (quizReportId) {
+      const request = generationRequests.filter(request => request.quizReportId === quizReportId)[0];
 
       if (request) {
         generationRequests.splice(generationRequests.indexOf(request), 1);
       }
     }
   }, Dispatcher);
-
 });

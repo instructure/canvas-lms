@@ -4,66 +4,65 @@
 // template in an AMD module, giving it dependencies on handlebars, it's scoped
 // i18n object if it needs one, and any brandableCss variant stuff it needs.
 
-var Handlebars = require('handlebars');
-var EmberHandlebars = require('ember-template-compiler').EmberHandlebars;
-var ScopedHbsExtractor = require(__dirname + '/../gems/canvas_i18nliner/js/scoped_hbs_extractor');
-var PreProcessor = require(__dirname + '/../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor');
-var fs = require('fs');
-var child_process = require('child_process');
+const Handlebars = require('handlebars');
+const EmberHandlebars = require('ember-template-compiler').EmberHandlebars;
+const ScopedHbsExtractor = require(`${__dirname}/../gems/canvas_i18nliner/js/scoped_hbs_extractor`);
+const PreProcessor = require(`${__dirname}/../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor`);
+const fs = require('fs');
+const child_process = require('child_process');
 
-var compileHandlebars = function(data){
-  var path = data.path;
-  var source = data.source;
+const compileHandlebars = function (data) {
+  const path = data.path;
+  const source = data.source;
   try {
-    var translationCount = 0;
-    var ast = Handlebars.parse(source);
-    var extractor = new ScopedHbsExtractor(ast, {path: path});
-    var scope = extractor.scope;
+    let translationCount = 0;
+    const ast = Handlebars.parse(source);
+    const extractor = new ScopedHbsExtractor(ast, { path });
+    const scope = extractor.scope;
     PreProcessor.scope = scope;
     PreProcessor.process(ast);
-    extractor.forEach(function() { translationCount++; });
+    extractor.forEach(() => { translationCount++; });
 
-    var precompiler = data.ember ? EmberHandlebars : Handlebars;
-    var result = precompiler.precompile(ast).toString();
-    var payload = {template: result, scope: scope, translationCount: translationCount};
+    const precompiler = data.ember ? EmberHandlebars : Handlebars;
+    const result = precompiler.precompile(ast).toString();
+    const payload = { template: result, scope, translationCount };
     return payload;
-  }
-  catch (e) {
+  } catch (e) {
     e = e.message || e;
     console.log(e);
-    throw {error: e};
+    throw { error: e };
   }
 };
 
-var resourceName = function(path){
+const resourceName = function (path) {
   return path
     .replace(/^.+?\/templates\//, '')
     .replace(/\.hbs$/, '');
 };
 
-var emitTemplate = function(path, name, result, dependencies){
-  return "" +
-    "define(" + JSON.stringify(dependencies) + ", function(Ember){\n" +
-      "Ember.TEMPLATES['" + name + "'] = " + 
-        "Ember.Handlebars.template(" + result['template']+ ");\n" + 
-    "});";
+const emitTemplate = function (path, name, result, dependencies) {
+  return `${'' +
+    'define('}${JSON.stringify(dependencies)}, function(Ember){\n` +
+      `Ember.TEMPLATES['${name}'] = ` +
+        `Ember.Handlebars.template(${result.template});\n` +
+    '});';
 };
 
 module.exports = function (source) {
   this.cacheable();
-  var name = resourceName(this.resourcePath)
-  var dependencies = ['ember', 'coffeescripts/ember/shared/helpers/common'];
+  const name = resourceName(this.resourcePath)
+  const dependencies = ['ember', 'coffeescripts/ember/shared/helpers/common'];
 
-  var result = compileHandlebars({path: this.resourcePath, source: source, ember: true});
+  const result = compileHandlebars({ path: this.resourcePath, source, ember: true });
 
-  if(result['error']){
-    console.log("THERE WAS AN ERROR IN PRECOMPILATION", result);
+  if (result.error) {
+    console.log('THERE WAS AN ERROR IN PRECOMPILATION', result);
     throw result;
   }
 
-  if(result["translationCount"] > 0){
-    dependencies.push("i18n!" + result["scope"] +"");
+  if (result.translationCount > 0) {
+    dependencies.push(`i18n!${result.scope}`);
   }
-  var compiledTemplate = emitTemplate(this.resourcePath, name, result, dependencies);
+  const compiledTemplate = emitTemplate(this.resourcePath, name, result, dependencies);
   return compiledTemplate;
 };

@@ -37,6 +37,7 @@ Gemfile.lock5
 mkmf.log
 /node_modules
 npm-debug.log
+.eslintcache
 /public/assets/
 /public/dist/
 /public/webpack-dist/

@@ -1,20 +1,20 @@
-define(function(require) {
-  var Subject = require('jsx!views/summary/report');
-  var $ = require('canvas_packages/jquery');
+define((require) => {
+  const Subject = require('jsx!views/summary/report');
+  const $ = require('canvas_packages/jquery');
 
-  describe('Views.Summary.Report', function() {
+  describe('Views.Summary.Report', function () {
     this.reactSuite({
       type: Subject
     });
 
-    it('should render', function() {});
-    it('should be a button if it can be generated', function() {
+    it('should render', () => {});
+    it('should be a button if it can be generated', () => {
       setProps({ isGenerated: false });
 
       expect('button.generate-report').toExist();
     });
 
-    it('should be an anchor if it can be downloaded', function() {
+    it('should be an anchor if it can be downloaded', () => {
       setProps({
         isGenerated: true,
         file: {
@@ -27,13 +27,13 @@ define(function(require) {
       expect(find('a.download-report').href).toBe('http://foobar.com/');
     });
 
-    it('should emit quizReports:generate', function() {
+    it('should emit quizReports:generate', () => {
       setProps({
         generatable: true,
         reportType: 'student_analysis'
       });
 
-      expect(function() {
+      expect(() => {
         click('button.generate-report');
       }).toSendAction({
         action: 'quizReports:generate',
@@ -41,8 +41,9 @@ define(function(require) {
       });
     });
 
-    it('should mount a Status inside a tooltip', function() {
-      var $node, $target;
+    it('should mount a Status inside a tooltip', () => {
+      let $node,
+        $target;
 
       setProps({
         generatable: true,
