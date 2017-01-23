@@ -10,14 +10,7 @@ define([
   './SectionInfo',
   './SubmissionProgressBars',
   'jsx/shared/MessageStudents',
-  'instructure-ui/Heading',
-  'instructure-ui/Button',
-  'instructure-ui/Link',
-  'instructure-ui/Overlay',
-  'instructure-ui/Typography',
-  'instructure-ui/ScreenReaderContent',
-  'instructure-ui/Spinner',
-  'instructure-ui/Tray'
+  'instructure-ui/instructure-ui',
 ], function(React, I18n, FriendlyDatetime,
    StudentCardStore,
    Avatar,
@@ -27,14 +20,7 @@ define([
    SectionInfo,
    SubmissionProgressBars,
    MessageStudents,
-   { default: Heading },
-   { default: Button },
-   { default: Link },
-   { default: Overlay },
-   { default: Typography },
-   { default: ScreenReaderContent },
-   { default: Spinner },
-   { default: Tray }) {
+   {Heading, Button, Link, Typography, ScreenReaderContent, Spinner, Tray, ApplyTheme}) {
 
   class StudentContextTray extends React.Component {
 
@@ -187,6 +173,7 @@ define([
           ) : null}
 
           <Tray
+            label={I18n.t('Student Details')}
             isDismissable={!this.state.isLoading}
             closeButtonLabel={I18n.t('Close')}
             isOpen={this.state.isOpen}
@@ -290,5 +277,12 @@ define([
     }
   }
 
-  return StudentContextTray
+  const DeleteMe = (props) => (
+    <ApplyTheme theme={ApplyTheme.generateTheme('a11y')}>
+      <StudentContextTray {...props}/>
+    </ApplyTheme>
+  )
+
+  /* TODO: after instui gets updated, just return StudentContextTray */
+  return ENV.use_high_contrast ? DeleteMe : StudentContextTray
 })
