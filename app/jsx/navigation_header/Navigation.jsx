@@ -123,7 +123,7 @@ define([
 
     updateUnreadCount (count) {
       count = parseInt(count, 10);
-      this.unreadCountElement().text(count);
+      this.unreadCountElement().text(I18n.n(count));
       this.unreadCountElement().toggle(count > 0);
     },
 
