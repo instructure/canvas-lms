@@ -98,6 +98,9 @@ describe ContextController do
       end
 
       it "is enabled for teachers when feature_flag is on" do
+        %w[manage_students manage_admin_users].each do |perm|
+          RoleOverride.manage_role_override(Account.default, teacher_role, perm, override: false)
+        end
         user_session(@teacher)
         get :roster, course_id: @course.id
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be true
