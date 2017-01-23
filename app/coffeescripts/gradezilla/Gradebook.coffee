@@ -33,6 +33,7 @@ define [
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader'
+  'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
   'jsx/gradezilla/SISGradePassback/PostGradesApp'
   'jsx/gradezilla/SubmissionStateMap'
@@ -64,7 +65,7 @@ define [
   GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
   GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, htmlEscape,
   AssignmentColumnHeader, AssignmentGroupColumnHeader, StudentColumnHeader, TotalGradeColumnHeader,
-  PostGradesStore, PostGradesApp, SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate,
+  ViewOptionsMenu, PostGradesStore, PostGradesApp, SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate,
   SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper
 ) ->
 
@@ -1009,6 +1010,7 @@ define [
       $('.post-grades-placeholder').toggle(showButton)
 
     initHeader: =>
+      @initViewOptionsMenu()
       @drawSectionSelectButton() if @sections_enabled
       @drawGradingPeriodSelectButton() if @gradingPeriodsEnabled
 
@@ -1079,6 +1081,11 @@ define [
     initTotalGradeColumnHeader: (obj) =>
       component = React.createElement(TotalGradeColumnHeader, {}, null)
       ReactDOM.render(component, $(obj.node).find('.slick-column-name')[0])
+
+    initViewOptionsMenu: () =>
+      component = React.createElement(ViewOptionsMenu, {}, null)
+      mountPoint = document.querySelectorAll("[data-component='#{component.type.name}']")[0]
+      ReactDOM.render(component, mountPoint)
 
     initAssignmentColumnHeader: (obj) =>
       original_assignment = obj.column.object

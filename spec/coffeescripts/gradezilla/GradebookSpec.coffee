@@ -40,11 +40,11 @@ define [
     , 'assignment1') < 0
     , "other fields are sorted by score"
 
-  gradebookStubs = ->
-    indexedOverrides: Gradebook.prototype.indexedOverrides
-    indexedGradingPeriods: _.indexBy(@gradingPeriods, 'id')
-
   module "Gradebook#hideAggregateColumns",
+    gradebookStubs: ->
+      indexedOverrides: Gradebook.prototype.indexedOverrides
+      indexedGradingPeriods: _.indexBy(@gradingPeriods, 'id')
+
     setupThis: (options) ->
       customOptions = options || {}
       defaults =
@@ -53,7 +53,7 @@ define [
         options:
           all_grading_periods_totals: false
 
-      _.defaults customOptions, defaults, gradebookStubs()
+      _.defaults customOptions, defaults, @gradebookStubs()
 
     setup: ->
       @hideAggregateColumns = Gradebook.prototype.hideAggregateColumns
@@ -298,3 +298,11 @@ define [
 
     ok @fakeSubmissionDetailsDialog.called
     deepEqual expectedArguments, @submissionDialogArgs
+
+  test 'ViewOptionsMenu is rendered on init', ->
+    fixtures = document.getElementById("fixtures")
+    fixtures.innerHTML = '<span data-component="ViewOptionsMenu"></span>'
+    Gradebook.prototype.initViewOptionsMenu.call()
+    buttonText = document.querySelector('[data-component="ViewOptionsMenu"] Button').innerText.trim()
+    equal(buttonText, 'View')
+    document.getElementById("fixtures").innerHTML = ""
