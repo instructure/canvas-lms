@@ -1,13 +1,13 @@
-define(function(require) {
-  var Subject = require('core/delegate');
-  var App = require('main');
+define((require) => {
+  const Subject = require('core/delegate');
+  const App = require('main');
 
-  describe('Delegate', function() {
-    describe('#mount', function() {
+  describe('Delegate', () => {
+    describe('#mount', function () {
       this.promiseSuite = true;
 
-      it('should work', function() {
-        var onReady = jasmine.createSpy('onAppMount');
+      it('should work', function () {
+        const onReady = jasmine.createSpy('onAppMount');
         spyOn(console, 'warn');
         Subject.mount(jasmine.fixture).then(onReady);
 
@@ -16,7 +16,7 @@ define(function(require) {
       });
 
       it('should mount the app view');
-      it('should accept options', function() {
+      it('should accept options', () => {
         Subject.mount(jasmine.fixture, {
           loadOnStartup: false
         });
@@ -24,9 +24,9 @@ define(function(require) {
         expect(App.config.loadOnStartup).toBe(false);
       });
 
-      describe('config.loadOnStartup', function() {
-        it('should log a warning when config.quizStatisticsUrl is missing', function() {
-          var warnSpy = spyOn(console, 'warn');
+      describe('config.loadOnStartup', () => {
+        it('should log a warning when config.quizStatisticsUrl is missing', function () {
+          const warnSpy = spyOn(console, 'warn');
 
           App.configure({ quizStatisticsUrl: null });
           Subject.mount(jasmine.fixture);

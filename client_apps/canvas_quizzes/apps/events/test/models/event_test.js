@@ -1,10 +1,10 @@
-define(function(require) {
-  var Subject = require('models/event');
+define((require) => {
+  const Subject = require('models/event');
 
-  describe('Models.Event', function() {
-    describe('constructor', function() {
-      it('should work', function() {
-        expect(function() {
+  describe('Models.Event', () => {
+    describe('constructor', () => {
+      it('should work', () => {
+        expect(() => {
           new Subject();
         }).not.toThrow();
       });

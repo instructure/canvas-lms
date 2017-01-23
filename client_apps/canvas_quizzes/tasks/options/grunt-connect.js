@@ -1,11 +1,11 @@
-var rewriteRulesSnippet = require('grunt-connect-rewrite/lib/utils').rewriteRequest;
-var proxy = require('grunt-connect-proxy/lib/utils').proxyRequest;
-var middleware = function (connect, options) {
-  var middlewares = [];
-  var directory;
+const rewriteRulesSnippet = require('grunt-connect-rewrite/lib/utils').rewriteRequest;
+const proxy = require('grunt-connect-proxy/lib/utils').proxyRequest;
+const middleware = function (connect, options) {
+  const middlewares = [];
+  let directory;
 
   // ReverseProxy support
-  middlewares.push( proxy );
+  middlewares.push(proxy);
 
   // RewriteRules support
   middlewares.push(rewriteRulesSnippet);
@@ -15,7 +15,7 @@ var middleware = function (connect, options) {
   }
 
   // Serve static files.
-  options.base.forEach(function (base) {
+  options.base.forEach((base) => {
     middlewares.push(connect.static(base));
   });
 
@@ -24,7 +24,7 @@ var middleware = function (connect, options) {
   middlewares.push(connect.directory(directory));
 
   return middlewares;
-};;
+};
 
 module.exports = {
   rules: [
@@ -63,7 +63,7 @@ module.exports = {
       keepalive: false,
       port: 9442,
       base: 'www',
-      middleware: middleware
+      middleware
     }
   },
 

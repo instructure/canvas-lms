@@ -1,10 +1,10 @@
-define(function(require) {
-  var Subject = require('models/quiz_statistics');
-  var fixture = require('json!fixtures/quiz_statistics_all_types.json');
+define((require) => {
+  const Subject = require('models/quiz_statistics');
+  const fixture = require('json!fixtures/quiz_statistics_all_types.json');
 
-  describe('Models.QuizStatistics', function() {
-    it('should parse properly', function() {
-      var subject = new Subject(fixture.quiz_statistics[0], { parse: true });
+  describe('Models.QuizStatistics', () => {
+    it('should parse properly', () => {
+      const subject = new Subject(fixture.quiz_statistics[0], { parse: true });
 
       expect(subject.get('id')).toBe('267');
       expect(subject.get('pointsPossible')).toBe(16);
@@ -14,16 +14,16 @@ define(function(require) {
       expect(subject.get('questionStatistics').length).toBe(13);
     });
 
-    it('should parse the discrimination index', function() {
-      var subject = new Subject(fixture.quiz_statistics[0], { parse: true });
+    it('should parse the discrimination index', () => {
+      const subject = new Subject(fixture.quiz_statistics[0], { parse: true });
 
       expect(subject.get('id')).toBe('267');
       expect(subject.get('questionStatistics')[0].discriminationIndex).toBe(0.7157094891780442);
     });
 
-    describe('calculating participant count', function() {
-      it('should use the number of students who actually took the question', function() {
-        var subject = new Subject({
+    describe('calculating participant count', () => {
+      it('should use the number of students who actually took the question', () => {
+        const subject = new Subject({
           question_statistics: [
             {
               question_type: 'multiple_choice_question',
@@ -38,8 +38,8 @@ define(function(require) {
         expect(subject.get('questionStatistics')[0].participantCount).toEqual(5);
       });
 
-      it('should work with questions that have answer sets', function() {
-        var subject = new Subject({
+      it('should work with questions that have answer sets', () => {
+        const subject = new Subject({
           question_statistics: [
             {
               question_type: 'fill_in_multiple_blanks_question',
@@ -66,24 +66,24 @@ define(function(require) {
         expect(subject.get('questionStatistics')[0].participantCount).toEqual(5);
       });
 
-      it("should work with multiple_answers_questions", function() {
-        var subject = new Subject({
+      it('should work with multiple_answers_questions', () => {
+        const subject = new Subject({
           question_statistics: [
             {
-              question_type:"multiple_answers_question",
-              responses:2,
-              correct:1,
-              answers:[
-                {id:"6122",text:"a",correct:true,responses:2},
-                {id:"6863",text:"b",correct:true,responses:2},
-                {id:"3938",text:"c",correct:true,responses:2},
-                {id:"938",text:"d",correct:false,responses:1}
+              question_type: 'multiple_answers_question',
+              responses: 2,
+              correct: 1,
+              answers: [
+                { id: '6122', text: 'a', correct: true, responses: 2 },
+                { id: '6863', text: 'b', correct: true, responses: 2 },
+                { id: '3938', text: 'c', correct: true, responses: 2 },
+                { id: '938', text: 'd', correct: false, responses: 1 }
               ]
             }
           ]
-        }, {parse: true});
+        }, { parse: true });
 
-        expect(subject.get("questionStatistics")[0].participantCount).toEqual(2);
+        expect(subject.get('questionStatistics')[0].participantCount).toEqual(2);
       });
     });
   });

@@ -1,33 +1,30 @@
-define(function(require) {
-  var RSVP = require('rsvp');
-  var $ = require('canvas_packages/jquery');
-  var CoreAdapter = require('canvas_quizzes/core/adapter');
-  var K = require('../constants');
-  var config = require('../config');
-  var Adapter = new CoreAdapter(config);
-  var pickAndNormalize = require('canvas_quizzes/models/common/pick_and_normalize');;
+define((require) => {
+  const RSVP = require('rsvp');
+  const $ = require('canvas_packages/jquery');
+  const CoreAdapter = require('canvas_quizzes/core/adapter');
+  const K = require('../constants');
+  const config = require('../config');
+  const Adapter = new CoreAdapter(config);
+  const pickAndNormalize = require('canvas_quizzes/models/common/pick_and_normalize');
 
-  var fetchProgress = function(url) {
+  const fetchProgress = function (url) {
     return Adapter.request({
       type: 'GET',
-      url: url,
-    }).then(function(payload) {
-      return pickAndNormalize(payload, K.PROGRESS_ATTRS);
-    });
+      url,
+    }).then(payload => pickAndNormalize(payload, K.PROGRESS_ATTRS));
   };
 
-  return function pollProgress(url, options) {
-    var poll, poller;
-    var service = RSVP.defer();
+  return function pollProgress (url, options) {
+    let poll,
+      poller;
+    const service = RSVP.defer();
 
     options = options || {};
 
-    $(window).on('beforeunload.progress', function() {
-      return clearTimeout(poller);
-    });
+    $(window).on('beforeunload.progress', () => clearTimeout(poller));
 
-    poll = function() {
-      fetchProgress(url).then(function(data) {
+    poll = function () {
+      fetchProgress(url).then((data) => {
         if (options.onTick) {
           options.onTick(data.completion, data);
         }
@@ -39,7 +36,7 @@ define(function(require) {
         } else {
           poller = setTimeout(poll, options.interval || config.pollingFrequency);
         }
-      }, function() {
+      }, () => {
         service.reject();
       });
     };

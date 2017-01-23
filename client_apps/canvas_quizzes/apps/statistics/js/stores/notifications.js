@@ -1,8 +1,8 @@
-define(function(require) {
-  var Store = require('canvas_quizzes/core/store');
-  var Dispatcher = require('../core/dispatcher');
-  var _ = require('lodash');
-  var throttle = _.throttle;
+define((require) => {
+  const Store = require('canvas_quizzes/core/store');
+  const Dispatcher = require('../core/dispatcher');
+  const _ = require('lodash');
+  const throttle = _.throttle;
 
 
   /**
@@ -10,7 +10,7 @@ define(function(require) {
    *
    * Display "stateful" and "one-time" alerts and notices.
    */
-  var store = new Store('notifications', {
+  const store = new Store('notifications', {
     _state: {
       notifiers: [],
       notifications: [],
@@ -18,21 +18,19 @@ define(function(require) {
       watchedTargets: []
     },
 
-    initialize: function() {
+    initialize () {
       this.run = throttle(this.run.bind(this), 100, {
         leading: false,
         trailing: true
       });
     },
 
-    registerWatcher: function(notifier) {
-      var watchTargets = notifier.watchTargets || [];
-      var watchedTargets = this._state.watchedTargets;
-      var run = this.run.bind(this);
+    registerWatcher (notifier) {
+      const watchTargets = notifier.watchTargets || [];
+      const watchedTargets = this._state.watchedTargets;
+      const run = this.run.bind(this);
 
-      watchTargets.filter(function(target) {
-        return watchedTargets.indexOf(target) === -1;
-      }).forEach(function(target) {
+      watchTargets.filter(target => watchedTargets.indexOf(target) === -1).forEach((target) => {
         target.addChangeListener(run);
       });
 
@@ -44,21 +42,15 @@ define(function(require) {
      *         All available notifications. Notifications that were dismissed
      *         by the user will not be returned.
      */
-    getAll: function() {
-      var dismissed = this._state.dismissed;
+    getAll () {
+      const dismissed = this._state.dismissed;
 
-      return this._state.notifications.filter(function(notification) {
-        return dismissed.indexOf(notification.id) === -1;
-      }).map(function(notification) {
-        return notification.toJSON();
-      });
+      return this._state.notifications.filter(notification => dismissed.indexOf(notification.id) === -1).map(notification => notification.toJSON());
     },
 
-    run: function() {
+    run () {
       this._state.notifications =
-        this._state.notifiers.reduce(function(notifications, notifier) {
-          return notifications.concat(notifier());
-        }, []);
+        this._state.notifiers.reduce((notifications, notifier) => notifications.concat(notifier()), []);
 
       this.emitChange();
     },
@@ -71,8 +63,8 @@ define(function(require) {
        * @param  {String} id
        *         The unique notification id.
        */
-      dismiss: function(id, onChange/*, onError*/) {
-        var dismissed = this._state.dismissed;
+      dismiss (id, onChange/* , onError*/) {
+        const dismissed = this._state.dismissed;
 
         if (dismissed.indexOf(id) === -1) {
           dismissed.push(id);

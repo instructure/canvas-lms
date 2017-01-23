@@ -1,5 +1,5 @@
-define(function(require) {
-  var Dispatcher = require('../../core/dispatcher');
+define((require) => {
+  const Dispatcher = require('../../core/dispatcher');
 
   /**
    * @class Statistics.Mixins.Components.ActorMixin
@@ -7,28 +7,28 @@ define(function(require) {
    * Extend a component with the ability to dispatch (and track) events to
    * stores directly using a `#sendAction()` helper.
    */
-  var ActorMixin = {
-    getInitialState: function() {
+  const ActorMixin = {
+    getInitialState () {
       return {
         actionIndex: null
       };
     },
 
-    getDefaultProps: function() {
+    getDefaultProps () {
       return {
         storeError: null
       };
     },
 
-    componentWillReceiveProps: function(nextProps) {
-      var storeError = nextProps.storeError;
+    componentWillReceiveProps (nextProps) {
+      const storeError = nextProps.storeError;
 
       if (storeError && storeError.actionIndex === this.state.actionIndex) {
-        this.setState({ storeError: storeError });
+        this.setState({ storeError });
       }
     },
 
-    componentDidUpdate: function() {
+    componentDidUpdate () {
       if (this.state.storeError) {
         if (this.onStoreError) {
           this.onStoreError(this.state.storeError);
@@ -39,7 +39,7 @@ define(function(require) {
       }
     },
 
-    componentWillUnmount: function() {
+    componentWillUnmount () {
       this.lastAction = undefined;
     },
 
@@ -49,7 +49,7 @@ define(function(require) {
      * @param {Event} e
      *        Something that responds to #preventDefault().
      */
-    consume: function(e) {
+    consume (e) {
       if (e) {
         e.preventDefault();
       }
@@ -81,9 +81,9 @@ define(function(require) {
      *         or fail if the action doesn't. Failure will be presented by
      *         an error that adheres to the UIError interface.
      */
-    sendAction: function(action, params, options) {
-      var service;
-      var setState;
+    sendAction (action, params, options) {
+      let service;
+      let setState;
 
       service = Dispatcher.dispatch(action, params);
 
@@ -98,11 +98,11 @@ define(function(require) {
         actionIndex: service.index
       });
 
-      service.promise.then(null, function(error) {
+      service.promise.then(null, (error) => {
         setState({
           storeError: {
             actionIndex: service.index,
-            error: error
+            error
           }
         });
       });

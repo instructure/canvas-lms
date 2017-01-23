@@ -1,13 +1,13 @@
-define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var _ = require('lodash');
-  var config = require('../config');
-  var initialize = require('../config/initializer');
-  var controller = require('./controller');
-  var Layout = require('jsx!../views/app');
-  var extend = _.extend;
-  var container;
-  var layout;
+define((require) => {
+  const React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
+  const _ = require('lodash');
+  const config = require('../config');
+  const initialize = require('../config/initializer');
+  const controller = require('./controller');
+  const Layout = require('jsx!../views/app');
+  const extend = _.extend;
+  let container;
+  let layout;
 
   /**
    * @class Statistics.Core.Delegate
@@ -15,7 +15,7 @@ define(function(require) {
    * The client app delegate. This is the main interface that embedding
    * applications use to interact with the client app.
    */
-  var exports = {};
+  const exports = {};
 
   /**
    * Configure the application. See Config for the supported options.
@@ -23,7 +23,7 @@ define(function(require) {
    * @param  {Object} options
    *         A set of options to override.
    */
-  var configure = function(options) {
+  const configure = function (options) {
     extend(config, options);
   };
 
@@ -39,29 +39,29 @@ define(function(require) {
    * @return {RSVP.Promise}
    *         Fulfilled when the app has been started and rendered.
    */
-  var mount = function(node, options) {
+  const mount = function (node, options) {
     configure(options);
     container = node;
 
-    return initialize().then(function() {
+    return initialize().then(() => {
       layout = React.renderComponent(Layout(), container);
       controller.start(update);
     });
   };
 
-  var isMounted = function() {
+  const isMounted = function () {
     return !!layout;
   };
 
-  var update = function(props) {
+  var update = function (props) {
     layout.setProps(props);
   };
 
-  var reload = function() {
+  const reload = function () {
     controller.load();
   };
 
-  var unmount = function() {
+  const unmount = function () {
     if (isMounted()) {
       controller.stop();
       React.unmountComponentAtNode(container);
@@ -76,15 +76,15 @@ define(function(require) {
   exports.reload = reload;
   exports.unmount = unmount;
 
-  //>>excludeStart("production", pragmas.production);
+  // >>excludeStart("production", pragmas.production);
   // You can use this in development to read the props of the app layout
   // directly in console.
   //
   //     require([ 'core/delegate' ], function(Delegate) {
   //       Delegate.__getLayout__().props; // {}
   //     });
-  exports.__getLayout__ = function() { return layout; }
-  //>>excludeEnd("production");
+  exports.__getLayout__ = function () { return layout; }
+  // >>excludeEnd("production");
 
   return exports;
 });

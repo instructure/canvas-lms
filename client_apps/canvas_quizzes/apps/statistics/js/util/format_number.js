@@ -1,4 +1,4 @@
-define([ '../config' ], function(config) {
+define(['../config'], config =>
   /**
    * @member Util
    * @method formatNumber
@@ -20,15 +20,14 @@ define([ '../config' ], function(config) {
    * @return {String}
    *         The formatted number, ready for rendering.
    */
-  return function formatNumber(n, precision) {
-    if (precision === undefined) {
-      precision = config.precision;
-    }
+   function formatNumber (n, precision) {
+     if (precision === undefined) {
+       precision = config.precision;
+     }
 
-    if (typeof n !== 'number' || !(n instanceof Number)) {
-      n = parseFloat(n);
-    }
+     if (typeof n !== 'number' || !(n instanceof Number)) {
+       n = parseFloat(n);
+     }
 
-    return n.toFixed(parseInt(precision, 10));
-  };
-});
+     return n.toFixed(parseInt(precision, 10));
+   });

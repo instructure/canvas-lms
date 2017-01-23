@@ -1,8 +1,8 @@
-define(function(require) {
-  var RSVP = require('./initializers/rsvp');
-  var Backbone = require('./initializers/backbone');
+define((require) => {
+  const RSVP = require('./initializers/rsvp');
+  const Backbone = require('./initializers/backbone');
 
-  return function initializeApp() {
+  return function initializeApp () {
     return RSVP.resolve();
   };
 });

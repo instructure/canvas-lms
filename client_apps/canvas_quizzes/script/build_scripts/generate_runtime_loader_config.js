@@ -1,11 +1,11 @@
 /* jshint node:true */
 
-var glob = require('glob');
-var fs = require('fs');
-var readJSON = require('../helpers/read_json');
-var CANVAS_PACKAGE_MAP = readJSON('config/requirejs/build/map.json');
-var K = require('./constants');
-var PKG_NAME = K.pkgName;
+const glob = require('glob');
+const fs = require('fs');
+const readJSON = require('../helpers/read_json');
+const CANVAS_PACKAGE_MAP = readJSON('config/requirejs/build/map.json');
+const K = require('./constants');
+const PKG_NAME = K.pkgName;
 
 /**
  * Generate r.js config to pass to requirejs.config() at RUN-TIME so that the
@@ -21,8 +21,8 @@ var PKG_NAME = K.pkgName;
  * @return {Object}
  *         Configuration to pass to requirejs.config() in the output file.
  */
-module.exports = function generateRuntimeLoaderConfig(commonBundle, appName) {
-  var config = {};
+module.exports = function generateRuntimeLoaderConfig (commonBundle, appName) {
+  const config = {};
 
   config.map = {};
 
@@ -41,8 +41,8 @@ module.exports = function generateRuntimeLoaderConfig(commonBundle, appName) {
   //   module named "[PKG_NAME]/config", rewrite that module by prefixing the
   //   current app's module id.
   // """
-  config.map[PKG_NAME + '/config'] = {
-    'app': [ K.pkgName, 'apps', appName ].join('/')
+  config.map[`${PKG_NAME}/config`] = {
+    app: [K.pkgName, 'apps', appName].join('/')
   };
 
   // Tell r.js of all the modules that are contained inside the the common

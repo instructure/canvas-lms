@@ -1,21 +1,21 @@
-define(function(require) {
-  var subject = require('stores/reports');
-  var config = require('config');
-  var quizReportsFixture = require('json!fixtures/quiz_reports.json');
-  var K = require('constants');
+define((require) => {
+  const subject = require('stores/reports');
+  const config = require('config');
+  const quizReportsFixture = require('json!fixtures/quiz_reports.json');
+  const K = require('constants');
 
-  describe('Stores.Reports', function() {
+  describe('Stores.Reports', function () {
     this.storeSuite(subject);
 
-    beforeEach(function() {
+    beforeEach(() => {
       config.quizReportsUrl = '/reports';
     });
 
-    describe('#load', function() {
+    describe('#load', function () {
       this.xhrSuite = true;
 
-      it('should load and deserialize reports', function() {
-        var quizReports;
+      it('should load and deserialize reports', function () {
+        let quizReports;
 
         this.respondWith('GET', /^\/reports/, xhrResponse(200, quizReportsFixture));
 
@@ -26,15 +26,13 @@ define(function(require) {
         quizReports = subject.getAll();
 
         expect(quizReports.length).toBe(2);
-        expect(quizReports.map(function(quizReport) {
-          return quizReport.id;
-        }).sort()).toEqual([ '200', '201' ]);
+        expect(quizReports.map(quizReport => quizReport.id).sort()).toEqual(['200', '201']);
 
         expect(onChange).toHaveBeenCalled();
       });
 
-      it('should request both "file" and "progress" to be included with quiz reports', function() {
-        var quizReportsUrl;
+      it('should request both "file" and "progress" to be included with quiz reports', function () {
+        let quizReportsUrl;
 
         subject.load();
 
@@ -45,12 +43,12 @@ define(function(require) {
       });
     });
 
-    describe('#populate', function() {
+    describe('#populate', function () {
       this.xhrSuite = {
         trackRequests: true
       };
 
-      it('should track any active reports being generated', function() {
+      it('should track any active reports being generated', function () {
         subject.populate({
           quiz_reports: [{
             id: '1',
@@ -66,7 +64,7 @@ define(function(require) {
         expect(this.requests[0].url).toBe('/progress/1');
       });
 
-      it('but it should not auto-download them when generated', function() {
+      it('but it should not auto-download them when generated', function () {
         subject.populate({
           quiz_reports: [{
             id: '1',
@@ -103,7 +101,7 @@ define(function(require) {
           .toBeFalsy('it should not create an <iframe /> for auto-downloading');
       });
 
-      it('should never track the same report multiple times simultaneously', function() {
+      it('should never track the same report multiple times simultaneously', function () {
         subject.populate({
           quiz_reports: [{
             id: '1',
@@ -142,12 +140,12 @@ define(function(require) {
       });
     });
 
-    describe('quizReports:generate', function() {
+    describe('quizReports:generate', function () {
       this.xhrSuite = {
         trackRequests: true
       };
 
-      it('should work', function() {
+      it('should work', function () {
         this.sendAction('quizReports:generate', 'student_analysis');
 
         expect(this.requests.length).toBe(1);
@@ -158,7 +156,7 @@ define(function(require) {
             report_type: 'student_analysis',
             includes_all_versions: true
           }],
-          include: [ 'progress', 'file' ]
+          include: ['progress', 'file']
         }));
 
         this.respondTo(this.lastRequest, 200, {}, {
@@ -174,7 +172,7 @@ define(function(require) {
         expect(onChange).toHaveBeenCalled();
       });
 
-      it('should track the generation progress', function() {
+      it('should track the generation progress', function () {
         this.sendAction('quizReports:generate', 'student_analysis');
 
         expect(this.requests.length).toBe(1);
@@ -195,7 +193,7 @@ define(function(require) {
         expect(onChange).toHaveBeenCalled();
       });
 
-      it('should auto download the file when generated', function() {
+      it('should auto download the file when generated', function () {
         this.sendAction('quizReports:generate', 'student_analysis');
 
         expect(this.requests.length).toBe(1);
@@ -231,7 +229,7 @@ define(function(require) {
           }]
         });
 
-        var iframe = document.body.querySelector('iframe');
+        const iframe = document.body.querySelector('iframe');
 
         expect(iframe).toBeTruthy();
         expect(iframe.src).toContain('/files/1/download');
@@ -240,7 +238,7 @@ define(function(require) {
         expect(onChange).toHaveBeenCalled();
       });
 
-      it('should reject if the report is being generated', function() {
+      it('should reject if the report is being generated', function () {
         subject.populate({
           quiz_reports: [{
             id: '1',
@@ -258,7 +256,7 @@ define(function(require) {
         expect(onError).toHaveBeenCalled();
       });
 
-      it('should reject if the report is already generated', function() {
+      it('should reject if the report is already generated', function () {
         subject.populate({
           quiz_reports: [{
             id: '1',

@@ -1,11 +1,11 @@
-define(function(require) {
-  var Backbone = require('canvas_packages/backbone');
-  var QuizReport = require('../models/quiz_report');
-  var fromJSONAPI = require('canvas_quizzes/models/common/from_jsonapi');
-  var config = require('../config');
-  var CoreAdapter = require('canvas_quizzes/core/adapter');
-  var Adapter = new CoreAdapter(config);
-  var SORT_ORDER = [
+define((require) => {
+  const Backbone = require('canvas_packages/backbone');
+  const QuizReport = require('../models/quiz_report');
+  const fromJSONAPI = require('canvas_quizzes/models/common/from_jsonapi');
+  const config = require('../config');
+  const CoreAdapter = require('canvas_quizzes/core/adapter');
+  const Adapter = new CoreAdapter(config);
+  const SORT_ORDER = [
     'student_analysis',
     'item_analysis'
   ];
@@ -13,15 +13,15 @@ define(function(require) {
   return Backbone.Collection.extend({
     model: QuizReport,
 
-    url: function() {
+    url () {
       return config.quizReportsUrl;
     },
 
-    parse: function(payload) {
+    parse (payload) {
       return fromJSONAPI(payload, 'quiz_reports');
     },
 
-    generate: function(reportType) {
+    generate (reportType) {
       return Adapter.request({
         type: 'POST',
         url: this.url(),
@@ -32,13 +32,13 @@ define(function(require) {
           }],
           include: ['progress', 'file']
         }
-      }).then(function(payload) {
-        var quizReports = this.add(payload, { parse: true, merge: true });
+      }).then((payload) => {
+        const quizReports = this.add(payload, { parse: true, merge: true });
         return quizReports[0];
-      }.bind(this));
+      });
     },
 
-    comparator: function(model) {
+    comparator (model) {
       return SORT_ORDER.indexOf(model.get('reportType'));
     }
   });

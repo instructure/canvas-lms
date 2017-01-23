@@ -1,17 +1,17 @@
-define(function(require) {
-  var Backbone = require('canvas_packages/backbone');
-  var QuizStatistics = require('../models/quiz_statistics');
-  var fromJSONAPI = require('canvas_quizzes/models/common/from_jsonapi');
-  var config = require('../config');
+define((require) => {
+  const Backbone = require('canvas_packages/backbone');
+  const QuizStatistics = require('../models/quiz_statistics');
+  const fromJSONAPI = require('canvas_quizzes/models/common/from_jsonapi');
+  const config = require('../config');
 
   return Backbone.Collection.extend({
     model: QuizStatistics,
 
-    url: function() {
+    url () {
       return config.quizStatisticsUrl;
     },
 
-    parse: function(payload) {
+    parse (payload) {
       return fromJSONAPI(payload, 'quiz_statistics');
     }
   });

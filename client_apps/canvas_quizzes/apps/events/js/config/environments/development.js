@@ -1,5 +1,5 @@
-define(function(require) {
-  var $ = require('canvas_packages/jquery');
+define((require) => {
+  const $ = require('canvas_packages/jquery');
 
   return {
     xhr: {
@@ -10,7 +10,7 @@ define(function(require) {
 
     ajax: $.ajax,
 
-    onError: function(message) {
+    onError (message) {
       throw new Error(message);
     }
   };

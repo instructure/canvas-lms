@@ -1,16 +1,16 @@
-define(function(require) {
-  var Subject = require('jsx!views/questions/essay');
+define((require) => {
+  const Subject = require('jsx!views/questions/essay');
 
-  describe('Views.Questions.Essay', function() {
+  describe('Views.Questions.Essay', function () {
     this.reactSuite({
       type: Subject
     });
 
-    it('should render', function() {
+    it('should render', () => {
       expect(subject.isMounted()).toEqual(true);
     });
 
-    it('should provide a link to speedgrader', function() {
+    it('should provide a link to speedgrader', () => {
       setProps({
         speedGraderUrl: 'http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=10'
       });

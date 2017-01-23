@@ -1,5 +1,5 @@
-define(function() {
-  var MULTIPLE_ANSWERS = 'multiple_answers_question';
+define(() => {
+  const MULTIPLE_ANSWERS = 'multiple_answers_question';
 
   /**
    * @member Statistics.Models
@@ -28,8 +28,9 @@ define(function() {
    *
    * @return {Number} A scalar, the ratio.
    */
-  return function calculateResponseRatio(answerPool, participantCount, suppl) {
-    var questionType, correctResponseCount;
+  return function calculateResponseRatio (answerPool, participantCount, suppl) {
+    let questionType,
+      correctResponseCount;
 
     participantCount = parseInt(participantCount || 0, 10);
 
@@ -46,11 +47,8 @@ define(function() {
     // answer, so we don't have to calculate anything for it.
     if (MULTIPLE_ANSWERS === questionType) {
       correctResponseCount = suppl.correctResponseCount || 0;
-    }
-    else {
-      correctResponseCount = answerPool.reduce(function(sum, answer) {
-        return (answer.correct) ? sum + answer.responses : sum;
-      }, 0);
+    } else {
+      correctResponseCount = answerPool.reduce((sum, answer) => (answer.correct) ? sum + answer.responses : sum, 0);
     }
 
     return parseFloat(correctResponseCount) / participantCount;

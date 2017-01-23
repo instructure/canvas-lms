@@ -1,14 +1,14 @@
-define(function(require) {
-  var Subject = require('jsx!views/session');
+define((require) => {
+  const Subject = require('jsx!views/session');
 
-  describe('Views::Session', function() {
-    var suite = reactRouterSuite(this, Subject, {});
+  describe('Views::Session', function () {
+    const suite = reactRouterSuite(this, Subject, {});
 
     suite.stubRoutes([
-      { name: "answer_matrix", path: "/doesnt_matter" }
+      { name: 'answer_matrix', path: '/doesnt_matter' }
     ]);
 
-    it('should render', function() {
+    it('should render', () => {
       expect(subject.isMounted()).toEqual(true);
     });
   });

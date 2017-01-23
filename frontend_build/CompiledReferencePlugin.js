@@ -9,56 +9,53 @@
 // directory with the same name, and load them directly rather than needing
 // a compile step ahead of time.
 
-var CompiledReferencePlugin = function(){};
-var pluginTranspiledRegexp = /^([^/]+)\/compiled\//;
+const CompiledReferencePlugin = function () {};
+const pluginTranspiledRegexp = /^([^/]+)\/compiled\//;
 
-var rewritePluginPath = function(requestString){
-  var pluginName = pluginTranspiledRegexp.exec(requestString)[1];
-  var jsxRegexp = /compiled\/jsx/;
-  var relativePath = requestString.replace(pluginName + "/compiled/", "");
-  if(jsxRegexp.test(requestString)){
+const rewritePluginPath = function (requestString) {
+  const pluginName = pluginTranspiledRegexp.exec(requestString)[1];
+  const jsxRegexp = /compiled\/jsx/;
+  const relativePath = requestString.replace(`${pluginName}/compiled/`, '');
+  if (jsxRegexp.test(requestString)) {
     // this references a JSX file which already has "jsx" in it's file path
-    return pluginName + "/app/" + relativePath;
-  }else{
+    return `${pluginName}/app/${relativePath}`;
+  }
     // this references a coffeescript file which needs "coffeescripts" to
     // replace the "compiled" part of the path
-    return pluginName + "/app/coffeescripts/" + relativePath;
-  }
+  return `${pluginName}/app/coffeescripts/${relativePath}`;
 };
 
-CompiledReferencePlugin.prototype.apply = function(compiler){
+CompiledReferencePlugin.prototype.apply = function (compiler) {
+  compiler.plugin('normal-module-factory', (nmf) => {
+    nmf.plugin('before-resolve', (result, callback) => {
+      const requestString = result.request;
 
-  compiler.plugin("normal-module-factory", function(nmf) {
-    nmf.plugin("before-resolve", function(result, callback) {
-      var requestString = result.request;
-
-      if(/^jsx\//.test(requestString)){
+      if (/^jsx\//.test(requestString)) {
         // this is a jsx file in canvas. We have to require it with it's full
         // extension while we still have a require-js build or we risk loading
         // it's compiled js instead
-        result.request = requestString + ".jsx"
-      } else if(/^jst\//.test(requestString)){
+        result.request = `${requestString}.jsx`
+      } else if (/^jst\//.test(requestString)) {
         // this is a handlebars file in canvas. We have to require it with it's full
         // extension while we still have a require-js build or we risk loading
         // it's compiled js instead
-        result.request = requestString + ".handlebars"
-      } else if(/^compiled\//.test(requestString)){
+        result.request = `${requestString}.handlebars`
+      } else if (/^compiled\//.test(requestString)) {
         // this references a coffesscript file in canvas
-        result.request = requestString.replace("compiled/", "coffeescripts/");
-      }else if(/^spec\/javascripts\/compiled/.test(requestString)){
+        result.request = requestString.replace('compiled/', 'coffeescripts/');
+      } else if (/^spec\/javascripts\/compiled/.test(requestString)) {
         // this references a coffesscript spec file in canvas
-        result.request = requestString.replace("spec/javascripts/compiled/", "");
+        result.request = requestString.replace('spec/javascripts/compiled/', '');
       }
 
       // this references a file in a canvas plugin
-      var pluginTranspiledRegexp = /^([^/]+)\/compiled\//;
-      if(pluginTranspiledRegexp.test(requestString)){
+      const pluginTranspiledRegexp = /^([^/]+)\/compiled\//;
+      if (pluginTranspiledRegexp.test(requestString)) {
         result.request = rewritePluginPath(requestString);
       }
       return callback(null, result);
     });
   });
-
 };
 
 

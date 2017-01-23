@@ -1,9 +1,9 @@
-define(function(require) {
-  var I18n = require('i18n!quiz_statistics');
-  var floor = Math.floor;
+define((require) => {
+  const I18n = require('i18n!quiz_statistics');
+  const floor = Math.floor;
 
-  var pad = function(duration) {
-    return ('00' + duration).slice(-2);
+  const pad = function (duration) {
+    return (`00${duration}`).slice(-2);
   };
 
   /**
@@ -22,18 +22,19 @@ define(function(require) {
    *
    * @return {String}
    */
-  var secondsToTime = function(seconds) {
-    var hh, mm, ss;
+  const secondsToTime = function (seconds) {
+    let hh,
+      mm,
+      ss;
 
     if (seconds > 3600) {
       hh = floor(seconds / 3600);
-      mm = floor((seconds - hh*3600) / 60);
+      mm = floor((seconds - hh * 3600) / 60);
       ss = seconds % 60;
-      return [ hh, mm, ss ].map(pad).join(':');
+      return [hh, mm, ss].map(pad).join(':');
     }
-    else {
-      return [ seconds / 60, seconds % 60 ].map(floor).map(pad).join(':');
-    }
+
+    return [seconds / 60, seconds % 60].map(floor).map(pad).join(':');
   };
 
   /**
@@ -58,16 +59,19 @@ define(function(require) {
    * @return {String}
    *         A human-readable string representation of the duration.
    */
-  secondsToTime.toReadableString = function(seconds) {
-    var hours, minutes, strHours, strMinutes, strSeconds;
+  secondsToTime.toReadableString = function (seconds) {
+    let hours,
+      minutes,
+      strHours,
+      strMinutes,
+      strSeconds;
 
     if (seconds < 60) {
       return I18n.t('duration_in_seconds', {
         one: '1 second',
         other: '%{count} seconds'
       }, { count: floor(seconds) });
-    }
-    else if (seconds < 3600) {
+    } else if (seconds < 3600) {
       minutes = floor(seconds / 60);
       seconds = floor(seconds % 60);
 
@@ -88,29 +92,28 @@ define(function(require) {
         seconds: strSeconds
       });
     }
-    else {
-      hours = floor(seconds / 3600);
-      minutes = floor((seconds - hours*3600) / 60);
 
-      strMinutes = I18n.t('duration_in_minutes', {
-        one: '1 minute',
-        other: '%{count} minutes'
-      }, {
-        count: minutes
-      });
+    hours = floor(seconds / 3600);
+    minutes = floor((seconds - hours * 3600) / 60);
 
-      strHours = I18n.t('duration_in_hours', {
-        one: '1 hour',
-        other: '%{count} hours'
-      }, {
-        count: hours
-      });
+    strMinutes = I18n.t('duration_in_minutes', {
+      one: '1 minute',
+      other: '%{count} minutes'
+    }, {
+      count: minutes
+    });
 
-      return I18n.t('duration_in_hours_and_minutes', '%{hours} and %{minutes}', {
-        minutes: strMinutes,
-        hours: strHours
-      });
-    }
+    strHours = I18n.t('duration_in_hours', {
+      one: '1 hour',
+      other: '%{count} hours'
+    }, {
+      count: hours
+    });
+
+    return I18n.t('duration_in_hours_and_minutes', '%{hours} and %{minutes}', {
+      minutes: strMinutes,
+      hours: strHours
+    });
   };
 
   return secondsToTime;

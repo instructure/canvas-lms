@@ -1,8 +1,8 @@
-define(function(require) {
-  var $ = require('canvas_packages/jquery');
+define((require) => {
+  const $ = require('canvas_packages/jquery');
 
   // We're already logging errors in config/initializers/rsvp.js
-  if(typeof(jasmine) !== "undefined" && typeof(jasmine !== undefined)){
+  if (typeof (jasmine) !== 'undefined' && typeof (jasmine !== undefined)) {
     jasmine.RSVP.logRSVPErrors = false;
   }
 
@@ -13,7 +13,7 @@ define(function(require) {
       timeout: 25
     },
 
-    onError: function(message) {
+    onError (message) {
       throw new Error(message);
     }
   };

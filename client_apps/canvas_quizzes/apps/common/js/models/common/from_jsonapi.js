@@ -1,4 +1,4 @@
-define(function() {
+define(() =>
   /**
    * @method fromJSONAPI
    * @member Models
@@ -20,23 +20,20 @@ define(function() {
    *
    * @return {Object|Array}
    */
-  return function fromJSONAPI(payload, collKey, wantsObject) {
-    var data = {};
+   function fromJSONAPI (payload, collKey, wantsObject) {
+     let data = {};
 
-    if (payload) {
-      if (payload[collKey]) {
-        data = payload[collKey];
-      }
-      else {
-        data = payload;
-      }
-    }
+     if (payload) {
+       if (payload[collKey]) {
+         data = payload[collKey];
+       } else {
+         data = payload;
+       }
+     }
 
-    if (wantsObject && Array.isArray(data)) {
-      return data[0];
-    }
-    else {
-      return data;
-    }
-  };
-});
+     if (wantsObject && Array.isArray(data)) {
+       return data[0];
+     }
+
+     return data;
+   });

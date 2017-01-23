@@ -1,8 +1,8 @@
 requirejs.config({
   map: {
     '*': {
-      'jquery': 'canvas/vendor/jquery-1.7.2',
-      'jqueryui': 'canvas/vendor/jqueryui',
+      jquery: 'canvas/vendor/jquery-1.7.2',
+      jqueryui: 'canvas/vendor/jqueryui',
     },
 
     'canvas/vendor/jqueryui/dialog': {
@@ -10,7 +10,7 @@ requirejs.config({
     },
 
     'canvas/str/htmlEscape': {
-      'INST': 'canvas/INST',
+      INST: 'canvas/INST',
     },
 
     'canvas/vendor/jqueryui/draggable': {
@@ -19,6 +19,6 @@ requirejs.config({
   }
 });
 
-define([ 'canvas/vendor/jqueryui/dialog' ], function() {
+define(['canvas/vendor/jqueryui/dialog'], () => {
   // dialog package has no return value
 });

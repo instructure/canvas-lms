@@ -1,11 +1,11 @@
-define(function(require) {
-  var quizStatistics = require('../stores/statistics');
-  var quizReports = require('../stores/reports');
-  var notifications = require('../stores/notifications');
-  var config = require('../config');
-  var update;
+define((require) => {
+  const quizStatistics = require('../stores/statistics');
+  const quizReports = require('../stores/reports');
+  const notifications = require('../stores/notifications');
+  const config = require('../config');
+  let update;
 
-  var onChange = function() {
+  const onChange = function () {
     update({
       quizStatistics: quizStatistics.get(),
       isLoadingStatistics: quizStatistics.isLoading(),
@@ -41,7 +41,7 @@ define(function(require) {
      *        Quiz reports.
      *        See Stores.Statistics#getQuizReports().
      */
-    start: function(onUpdate) {
+    start (onUpdate) {
       update = onUpdate;
       quizStatistics.addChangeListener(onChange);
       quizReports.addChangeListener(onChange);
@@ -55,12 +55,11 @@ define(function(require) {
     /**
      * Load initial application data; quiz statistics and reports.
      */
-    load: function() {
+    load () {
       if (config.quizStatisticsUrl) {
         quizStatistics.load();
         quizReports.load();
-      }
-      else {
+      } else {
         console.warn(
           'You have requested to load on start-up, but have not',
           'provided a url to load from in CQS.config.quizStatisticsUrl.'
@@ -71,7 +70,7 @@ define(function(require) {
     /**
      * Stop listening to data changes.
      */
-    stop: function() {
+    stop () {
       quizStatistics.removeChangeListener(onChange);
       quizReports.removeChangeListener(onChange);
       notifications.removeChangeListener(onChange);

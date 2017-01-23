@@ -1,14 +1,14 @@
-define(function(require) {
-  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var Subject = require('jsx!components/text');
+define((require) => {
+  const React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
+  const Subject = require('jsx!components/text');
 
-  describe('Components.Text', function() {
+  describe('Components.Text', function () {
     this.reactSuite({
       type: Subject
     });
 
-    it('should render', function() {});
-    it('should register markup', function() {
+    it('should render', () => {});
+    it('should register markup', () => {
       setProps({
         phrase: 'quiz_statistics.test',
         children: React.DOM.p({ children: 'Hello world!' })

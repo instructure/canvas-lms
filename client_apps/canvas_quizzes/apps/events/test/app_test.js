@@ -1,8 +1,8 @@
-define(function(require) {
-  var App = require('core/delegate');
+define((require) => {
+  const App = require('core/delegate');
 
-  describe('app', function() {
-    it('write me', function() {
+  describe('app', () => {
+    it('write me', () => {
       expect(App).toBeTruthy();
     });
   });

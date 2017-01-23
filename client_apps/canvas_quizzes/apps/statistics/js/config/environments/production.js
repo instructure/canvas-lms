@@ -66,7 +66,7 @@ define({
    * @param  {String} message
    *         An explanation of the error.
    */
-  onError: function(message) {
+  onError (message) {
     console.error(message);
   }
 });

@@ -1,13 +1,13 @@
-define(function(require) {
-  var Subject = require('jsx!views/questions/fill_in_multiple_blanks');
-  var answerSetFixture = [
+define((require) => {
+  const Subject = require('jsx!views/questions/fill_in_multiple_blanks');
+  const answerSetFixture = [
     {
       id: '1',
       text: 'color',
       answers: [
-        { id: 'a1', text: 'red', responses: 4, correct: true, ratio: 100, user_names: ['One', 'Two', 'Three', 'Four']},
-        { id: 'a2', text: 'green', responses: 0, ratio: 0, user_names: []},
-        { id: 'a3', text: 'blue', responess: 0, ratio: 0, user_names: []},
+        { id: 'a1', text: 'red', responses: 4, correct: true, ratio: 100, user_names: ['One', 'Two', 'Three', 'Four'] },
+        { id: 'a2', text: 'green', responses: 0, ratio: 0, user_names: [] },
+        { id: 'a3', text: 'blue', responess: 0, ratio: 0, user_names: [] },
       ]
     },
     {
@@ -21,15 +21,15 @@ define(function(require) {
     }
   ];
 
-  describe('Views.Questions.FillInMultipleBlanks', function() {
+  describe('Views.Questions.FillInMultipleBlanks', function () {
     this.reactSuite({
       type: Subject
     });
 
-    it('should render', function() {
+    it('should render', () => {
       expect(subject.isMounted()).toEqual(true);
     });
-    it('renders a tab for each answer set', function() {
+    it('renders a tab for each answer set', () => {
       setProps({
         answerSets: [
           { id: '1', text: 'color' },
@@ -41,7 +41,7 @@ define(function(require) {
       expect('.answer-set-tabs button:contains("size")').toExist();
     });
 
-    it('activates an answer set by clicking the tab', function() {
+    it('activates an answer set by clicking the tab', () => {
       setProps({
         answerSets: [
           { id: '1', text: 'color' },
@@ -54,13 +54,13 @@ define(function(require) {
       expect(find('.answer-set-tabs .active').innerText).toMatch('size');
     });
 
-    it('shows answer text per answer set', function() {
+    it('shows answer text per answer set', () => {
       setProps({
         answerSets: answerSetFixture,
       });
 
       expect(find('.answer-set-tabs .active').innerText).toMatch('color');
-      var answerTextMatches = findAll("th.answer-textfield .answerText");
+      let answerTextMatches = findAll('th.answer-textfield .answerText');
       expect(answerTextMatches[0].innerText).toEqual('red');
       expect(answerTextMatches[1].innerText).toEqual('green');
       expect(answerTextMatches[2].innerText).toEqual('blue');
@@ -68,7 +68,7 @@ define(function(require) {
       click('.answer-set-tabs button:contains("size")');
 
       expect(find('.answer-set-tabs .active').innerText).toMatch('size');
-      answerTextMatches = findAll("th.answer-textfield .answerText");
+      answerTextMatches = findAll('th.answer-textfield .answerText');
       expect(answerTextMatches[0].innerText).toEqual('S');
       expect(answerTextMatches[1].innerText).toEqual('M');
       expect(answerTextMatches[2].innerText).toEqual('L');

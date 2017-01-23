@@ -1,6 +1,6 @@
-define(function(require) {
-  var K = require('../constants');
-  var ATTRIBUTES = [
+define((require) => {
+  const K = require('../constants');
+  const ATTRIBUTES = [
     { name: 'id', required: true },
     { name: 'code', required: true },
     { name: 'context', required: false }
@@ -9,27 +9,27 @@ define(function(require) {
   /**
    * @class Models.Notification
    */
-  var Notification = function(attrs) {
-    ATTRIBUTES.forEach(function(attr) {
+  const Notification = function (attrs) {
+    ATTRIBUTES.forEach((attr) => {
       if (attr.required && !attrs.hasOwnProperty(attr.name)) {
-        throw new Error("Notification is missing a required attribute '" + attr.name + "'");
+        throw new Error(`Notification is missing a required attribute '${attr.name}'`);
       }
 
       this[attr.name] = attrs[attr.name];
-    }.bind(this));
+    });
 
     if (this.code === undefined) {
-      throw new Error("You must register the notification code as a constant.");
+      throw new Error('You must register the notification code as a constant.');
     }
 
     return this;
   };
 
-  Notification.prototype.toJSON = function() {
-    return ATTRIBUTES.reduce(function(attributes, attr) {
+  Notification.prototype.toJSON = function () {
+    return ATTRIBUTES.reduce((attributes, attr) => {
       attributes[attr.name] = this[attr.name];
       return attributes;
-    }.bind(this), {});
+    }, {});
   };
 
   return Notification;

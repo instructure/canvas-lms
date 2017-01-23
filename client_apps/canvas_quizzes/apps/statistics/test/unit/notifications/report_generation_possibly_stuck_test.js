@@ -1,11 +1,11 @@
-define(function(require) {
-  var Subject = require('notifications/report_generation_failed');
-  var K = require('constants');
-  var QuizReports = require('stores/reports');
+define((require) => {
+  const Subject = require('notifications/report_generation_failed');
+  const K = require('constants');
+  const QuizReports = require('stores/reports');
 
-  describe('Notifications::ReportGenerationFailed', function() {
-    it('should work', function() {
-      var notifications = Subject();
+  describe('Notifications::ReportGenerationFailed', () => {
+    it('should work', () => {
+      let notifications = Subject();
 
       expect(notifications.length).toBe(0);
 

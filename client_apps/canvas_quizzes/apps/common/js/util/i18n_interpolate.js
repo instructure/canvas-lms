@@ -1,5 +1,5 @@
-define(function() {
-  var INTERPOLATER = /\%\{([^\}]+)\}/g;
+define(() => {
+  const INTERPOLATER = /\%\{([^\}]+)\}/g;
 
   /**
    * @member Util
@@ -18,12 +18,12 @@ define(function() {
    * @return {String}
    *         The interpolated text.
    */
-  return function i18nInterpolate(contents, options) {
-    var variables = contents.match(INTERPOLATER);
+  return function i18nInterpolate (contents, options) {
+    const variables = contents.match(INTERPOLATER);
 
     if (variables) {
-      variables.forEach(function(variable) {
-        var optionKey = variable.substr(2, variable.length - 3);
+      variables.forEach((variable) => {
+        const optionKey = variable.substr(2, variable.length - 3);
         contents = contents.replace(new RegExp(variable, 'g'), options[optionKey]);
       });
     }

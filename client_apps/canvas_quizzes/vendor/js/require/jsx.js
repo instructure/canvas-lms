@@ -21,35 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['JSXTransformer', 'text'], function (JSXTransformer, text) {
-  'use strict';
-
-  var buildMap = {};
-  var jsx = {
+define(['JSXTransformer', 'text'], (JSXTransformer, text) => {
+  const buildMap = {};
+  const jsx = {
     version: '0.2.1',
 
-    load: function (name, req, onLoadNative, config) {
-      var fileExtension = config.jsx && config.jsx.fileExtension || '.js';
-      var fileName = name;
-      var moduleId;
+    load (name, req, onLoadNative, config) {
+      let fileExtension = config.jsx && config.jsx.fileExtension || '.js';
+      let fileName = name;
+      let moduleId;
 
-      var onLoad = function(content) {
+      const onLoad = function (content) {
         if (config.isBuild) {
           buildMap[name] = content;
           onLoadNative.fromText(name, content);
-        }
-        else {
+        } else {
           try {
-            if (-1 === content.indexOf('@jsx React.DOM')) {
-              content = "/** @jsx React.DOM */\n" + content;
+            if (content.indexOf('@jsx React.DOM') === -1) {
+              content = `/** @jsx React.DOM */\n${content}`;
             }
             content = JSXTransformer.transform(content).code;
           } catch (err) {
             onLoadNative.error(err);
           }
 
-          content += "\n//# sourceURL=" + location.protocol + "//" + location.hostname +
-            config.baseUrl + name + fileExtension;
+          content += `\n//# sourceURL=${location.protocol}//${location.hostname
+            }${config.baseUrl}${name}${fileExtension}`;
 
           onLoadNative.fromText(content);
         }
@@ -64,10 +61,10 @@ define(['JSXTransformer', 'text'], function (JSXTransformer, text) {
         }
 
         if (moduleId.length) {
-          fileName = (moduleId + '/') +
+          fileName = `${moduleId}/${
             fileName
               .replace(moduleId, '')
-              .replace(/^\//, '');
+              .replace(/^\//, '')}`;
         }
       }
 
@@ -78,9 +75,9 @@ define(['JSXTransformer', 'text'], function (JSXTransformer, text) {
       text.load(fileName, req, onLoad, config);
     },
 
-    write: function (pluginName, moduleName, write) {
+    write (pluginName, moduleName, write) {
       if (buildMap.hasOwnProperty(moduleName)) {
-        var content = buildMap[moduleName];
+        const content = buildMap[moduleName];
         write.asModule(moduleName, content);
       }
     }

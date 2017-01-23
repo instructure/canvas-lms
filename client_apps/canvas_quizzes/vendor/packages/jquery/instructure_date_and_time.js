@@ -5,24 +5,24 @@ requirejs.config({
   map: {
     '*': {
       // needed by a loader plugin, can't scope the mapping
-      'timezone_core': 'canvas/timezone_core',
-      'moment': 'canvas/moment',
-      'moment_formats': 'canvas/moment_formats',
-      'bower': 'canvas/bower',
-      'compiled': 'canvas/compiled',
-      'jquery': 'canvas/vendor/jquery-1.7.2',
-      'jqueryui': 'canvas/vendor/jqueryui',
-      'vendor': 'canvas/vendor',
-      'timezone': 'canvas/timezone',
+      timezone_core: 'canvas/timezone_core',
+      moment: 'canvas/moment',
+      moment_formats: 'canvas/moment_formats',
+      bower: 'canvas/bower',
+      compiled: 'canvas/compiled',
+      jquery: 'canvas/vendor/jquery-1.7.2',
+      jqueryui: 'canvas/vendor/jqueryui',
+      vendor: 'canvas/vendor',
+      timezone: 'canvas/timezone',
       'jquery.instructure_date_and_time': 'canvas/jquery.instructure_date_and_time',
-      'i18nObj': 'i18n',
-      'moment': 'canvas/symlink_to_node_modules/moment/moment'
+      i18nObj: 'i18n',
+      moment: 'canvas/symlink_to_node_modules/moment/moment'
     },
 
     'canvas/jquery.instructure_date_and_time': {
       'compiled/behaviors/authenticity_token': 'canvas/compiled/behaviors/authenticity_token',
-      'jqueryui': 'canvas/vendor/jqueryui',
-      'timezone': 'canvas/timezone',
+      jqueryui: 'canvas/vendor/jqueryui',
+      timezone: 'canvas/timezone',
       'str/htmlEscape': 'canvas/str/htmlEscape',
       'jquery.keycodes': 'canvas/jquery.keycodes',
       'vendor/date': 'canvas/vendor/date',
@@ -30,11 +30,11 @@ requirejs.config({
     },
 
     'canvas/jsx/shared/render-datepicker-time': {
-      'i18n': 'i18n',
+      i18n: 'i18n',
     },
 
     'canvas/str/htmlEscape': {
-      'INST': 'canvas/INST',
+      INST: 'canvas/INST',
     },
 
     'canvas/jquery': {
@@ -42,7 +42,7 @@ requirejs.config({
     },
 
     'canvas/jquery.instructure_jquery_patches': {
-      'vendor': 'canvas/vendor',
+      vendor: 'canvas/vendor',
     },
 
     'canvas/jquery.keycodes': {
@@ -50,7 +50,7 @@ requirejs.config({
     },
 
     'canvas/timezone': {
-      'timezone_plugin': 'canvas/timezone_plugin'
+      timezone_plugin: 'canvas/timezone_plugin'
     },
 
     'canvas/vendor/date': {
@@ -71,5 +71,5 @@ requirejs.config({
   }
 });
 
-define([ 'canvas/jquery.instructure_date_and_time' ], function() {
+define(['canvas/jquery.instructure_date_and_time'], () => {
 });

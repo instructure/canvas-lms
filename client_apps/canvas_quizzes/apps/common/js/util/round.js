@@ -1,4 +1,4 @@
-define([], function() {
+define([], () =>
   /**
    * @member Util
    * @method round
@@ -16,20 +16,19 @@ define([], function() {
    * @return {Number}
    *         The rounded number, ready for human-consumption.
    */
-  return function round(n, digits) {
-    var scale;
+   function round (n, digits) {
+     let scale;
 
-    if (digits === undefined) {
-      digits = 0;
-    }
+     if (digits === undefined) {
+       digits = 0;
+     }
 
-    if (typeof n !== 'number' || !(n instanceof Number)) {
-      n = parseFloat(n);
-    }
+     if (typeof n !== 'number' || !(n instanceof Number)) {
+       n = parseFloat(n);
+     }
 
-    scale = Math.pow(10, parseInt(digits, 10));
-    n = Math.round(n * scale) / scale;
+     scale = Math.pow(10, parseInt(digits, 10));
+     n = Math.round(n * scale) / scale;
 
-    return n;
-  };
-});
+     return n;
+   });

@@ -1,14 +1,14 @@
-define(function(require) {
-  var Backbone = require('canvas_packages/backbone');
-  var pickAndNormalize = require('./common/pick_and_normalize');
-  var K = require('../constants');
+define((require) => {
+  const Backbone = require('canvas_packages/backbone');
+  const pickAndNormalize = require('./common/pick_and_normalize');
+  const K = require('../constants');
 
   return Backbone.Model.extend({
-    url: function() {
+    url () {
       return this.get('url');
     },
 
-    parse: function(payload) {
+    parse (payload) {
       return pickAndNormalize(payload, K.PROGRESS_ATTRS);
     },
   });

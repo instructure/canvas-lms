@@ -1,5 +1,5 @@
-require([ 'core/dispatcher' ], function(Dispatcher) {
-  var global = this;
+require(['core/dispatcher'], function (Dispatcher) {
+  const global = this;
 
   /**
    * Store-testing facilities for jasmine suites.
@@ -47,14 +47,14 @@ require([ 'core/dispatcher' ], function(Dispatcher) {
    *         auto afterEach() block that resets the Store's state by calling
    *         store.__reset__().
    */
-  jasmine.Suite.prototype.storeSuite = function(store) {
+  jasmine.Suite.prototype.storeSuite = function (store) {
     this.promiseSuite = true;
-    this.beforeEach(function() {
-      var onChange = global.onChange = jasmine.createSpy('onChange');
-      var onError = global.onError = jasmine.createSpy('onError');
+    this.beforeEach(function () {
+      const onChange = global.onChange = jasmine.createSpy('onChange');
+      const onError = global.onError = jasmine.createSpy('onError');
 
-      this.sendAction = function(action, payload, _onChange, _onError) {
-        var svc = Dispatcher.dispatch(action, payload);
+      this.sendAction = function (action, payload, _onChange, _onError) {
+        const svc = Dispatcher.dispatch(action, payload);
 
         _onChange = _onChange || onChange;
         _onError = _onError || onError;
@@ -66,7 +66,7 @@ require([ 'core/dispatcher' ], function(Dispatcher) {
       };
     });
 
-    this.afterEach(function() {
+    this.afterEach(() => {
       if (store) {
         store.__reset__();
       }

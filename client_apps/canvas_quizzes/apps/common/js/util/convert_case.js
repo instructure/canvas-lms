@@ -1,13 +1,13 @@
-define(function(require) {
-  var Inflections = require('./inflections');
-  var camelizeStr = Inflections.camelize;
-  var underscoreStr = Inflections.underscore;
+define((require) => {
+  const Inflections = require('./inflections');
+  const camelizeStr = Inflections.camelize;
+  const underscoreStr = Inflections.underscore;
 
   return {
     // Convert all property keys in an object to camelCase
-    camelize: function(props) {
-      var prop;
-      var attrs = {};
+    camelize (props) {
+      let prop;
+      const attrs = {};
 
       for (prop in props) {
         if (props.hasOwnProperty(prop)) {
@@ -18,9 +18,9 @@ define(function(require) {
       return attrs;
     },
 
-    underscore: function(props) {
-      var prop;
-      var attrs = {};
+    underscore (props) {
+      let prop;
+      const attrs = {};
 
       for (prop in props) {
         if (props.hasOwnProperty(prop)) {
