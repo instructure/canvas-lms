@@ -16,8 +16,12 @@ class AssociateInteraction < AssessmentItemConverter
     if @doc.at_css('associateInteraction')
       match_map = {}
       get_all_matches_with_interaction(match_map)
-      get_all_answers_with_interaction(match_map)
-      check_for_meta_matches
+      if pair_node = @doc.at_css('responseDeclaration[baseType=pair][cardinality=multiple]')
+        get_answers_from_matching_pairs(pair_node, match_map)
+      else
+        get_all_answers_with_interaction(match_map)
+        check_for_meta_matches
+      end
     elsif node = @doc.at_css('matchInteraction')
       get_all_match_interaction(node)
     elsif @custom_type == 'respondus_matching'
@@ -236,7 +240,7 @@ class AssociateInteraction < AssessmentItemConverter
         match = {}
         extract_answer!(match, m)
 
-        if other_match = @question[:matches].detect{|om| match[:text].to_s.strip == om[:text].to_s.strip}
+        if other_match = @question[:matches].detect{|om| match[:text].to_s.strip == om[:text].to_s.strip && match[:html].to_s.strip == om[:html].to_s.strip}
           match_map[m['identifier']] = other_match[:match_id]
         else
           @question[:matches] << match
@@ -271,6 +275,19 @@ class AssociateInteraction < AssessmentItemConverter
             end
           end
         end
+      end
+    end
+  end
+
+  def get_answers_from_matching_pairs(node, match_map)
+    node.css('correctResponse > value').each do |pair|
+      match_id, answer_id = pair.text.split
+      match = @question[:matches].detect{|m| m[:match_id] == match_map[match_id.strip]}
+      answer = @question[:matches].detect{|m| m[:match_id] == match_map[answer_id.strip]}
+      if answer && match
+        @question[:matches].delete(answer)
+        answer[:match_id] = match[:match_id]
+        @question[:answers] << answer
       end
     end
   end

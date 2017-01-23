@@ -96,7 +96,7 @@ class AssessmentItemConverter
       text_nodes = @doc.css(selectors.join(','))
       text_nodes = text_nodes.reject{|node| node.inner_html.strip.empty? ||
         EXCLUDED_QUESTION_TEXT_CLASSES.any?{|c| c.casecmp(node['class'].to_s) == 0} ||
-        node.at_css('choiceInteraction')}
+        node.at_css('choiceInteraction') || node.at_css('associateInteraction')}
 
       if text_nodes.length > 0
         @question[:question_text] = ''
@@ -108,6 +108,8 @@ class AssessmentItemConverter
             @question[:question_text] += sanitize_html!(node)
           end
         end
+      elsif @doc.at_css('itemBody associateInteraction prompt')
+        @question[:question_text] = "" # apparently they deliberately had a blank question?
       elsif text = @doc.at_css('itemBody div:first-child') || @doc.at_css('itemBody p:first-child') || @doc.at_css('itemBody div') || @doc.at_css('itemBody p')
         @question[:question_text] = sanitize_html!(text)
       elsif @doc.at_css('itemBody')

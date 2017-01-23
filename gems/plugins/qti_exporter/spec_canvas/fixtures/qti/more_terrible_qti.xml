@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assessmentItem xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:xi="http://www.w3.org/2001/XInclude" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/qti/qtiv2p1/imsqti_v2p1.xsd" identifier="i14815939453473786" title="TL Canvas 07" adaptive="false" timeDependent="false">
+  <responseDeclaration baseType="pair" cardinality="multiple" identifier="RESPONSE">
+    <correctResponse>
+      <value><![CDATA[choice_3 choice_1]]></value>
+      <value><![CDATA[choice_4 choice_2]]></value>
+    </correctResponse>
+  </responseDeclaration>
+  <outcomeDeclaration cardinality="single" baseType="float" identifier="SCORE"/>
+  <itemBody>
+    <div class="grid-row">
+      <div class="col-12">
+        <associateInteraction shuffle="false" maxAssociations="0" minAssociations="0" responseIdentifier="RESPONSE">
+          <prompt/>
+          <simpleAssociableChoice fixed="false" showHide="show" matchMax="0" matchMin="0" identifier="choice_1">Canine</simpleAssociableChoice>
+          <simpleAssociableChoice fixed="false" showHide="show" matchMax="0" matchMin="0" identifier="choice_2">Feline</simpleAssociableChoice>
+          <simpleAssociableChoice fixed="false" showHide="show" matchMax="0" matchMin="0" identifier="choice_3">Dog</simpleAssociableChoice>
+          <simpleAssociableChoice fixed="false" showHide="show" matchMax="0" matchMin="0" identifier="choice_4">Cat</simpleAssociableChoice>
+        </associateInteraction>
+      </div>
+    </div>
+  </itemBody>
+  <responseProcessing template="http://www.imsglobal.org/question/qti_v2p1/rptemplates/match_correct"/>
+</assessmentItem>

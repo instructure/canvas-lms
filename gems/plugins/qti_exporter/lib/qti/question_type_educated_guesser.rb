@@ -27,6 +27,9 @@ class QuestionTypeEducatedGuesser < AssessmentItemConverter
       if @doc.at_css('matchInteraction')
         return ['matchInteraction', 'matching']
       end
+      if @doc.at_css('itemBody inlineChoiceInteraction')
+        return ['multiple_dropdowns_question', 'inline_choice']
+      end
     rescue => e
       message = "There was an error educatedly guessing the type for an assessment question"
       @question[:qti_error] = "#{message} - #{e}"
