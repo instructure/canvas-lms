@@ -86,6 +86,8 @@ class Speedgrader
     # action
     def visit(course_id, assignment_id)
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
+      visibility_check = grade_input
+      keep_trying_until { visibility_check.displayed? }
     end
 
     def enter_grade(grade)
