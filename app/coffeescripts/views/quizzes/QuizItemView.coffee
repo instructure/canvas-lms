@@ -51,6 +51,7 @@ define [
 
     afterRender: ->
       this.$el.toggleClass('quiz-loading-overrides', !!@model.get('loadingOverrides'))
+      bzRetainedInfoSetup()
 
     # make clicks follow through to url for entire row
     clickRow: (e) =>
