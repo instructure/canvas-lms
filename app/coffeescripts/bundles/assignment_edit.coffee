@@ -55,6 +55,7 @@ require [
       'js-assignment-overrides': new OverrideView
         model: dueDateList
         views: {}
+        assignment: assignment
 
   editHeaderView = new EditHeaderView
     el: headerEl

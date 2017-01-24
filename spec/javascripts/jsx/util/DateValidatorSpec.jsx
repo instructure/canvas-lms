@@ -48,7 +48,13 @@ define([
     return [periodOne, periodTwo];
   }
 
-  function createValidator({ data, gradingPeriods, userIsAdmin }) {
+  function createValidator ({
+    data,
+    gradingPeriods,
+    userIsAdmin,
+    multipleGradingPeriodsEnabled = true,
+    assignment = { dueDateRequired: function () { return false; } }
+  }) {
     const params = {
       date_range: {
         start_at: {
@@ -60,10 +66,11 @@ define([
           date_context: "term"
         }
       },
-      multipleGradingPeriodsEnabled: true,
+      multipleGradingPeriodsEnabled,
       userIsAdmin,
       data,
-      gradingPeriods
+      gradingPeriods,
+      assignment
     };
 
     return new DateValidator(params);
@@ -151,5 +158,49 @@ define([
     const gradingPeriods = generateGradingPeriods();
     const validator = createValidator({ data, gradingPeriods, userIsAdmin: false });
     ok(isValid(validator));
+  });
+
+  test('it is valid to have no due date when dueDateRequired is false', function () {
+    const data = generateData({ due_at: null });
+    const validator = createValidator({
+      data,
+      gradingPeriods: null,
+      userIsAdmin: false,
+      multipleGradingPeriodsEnabled: false,
+      assignment: { dueDateRequired: function () { return false; } }});
+    ok(isValid(validator));
+  });
+
+  test('it is valid to have a due date when dueDateRequired is false', function () {
+    const data = generateData({ due_at: DATE_IN_OPEN_PERIOD });
+    const validator = createValidator({
+      data,
+      gradingPeriods: null,
+      userIsAdmin: false,
+      multipleGradingPeriodsEnabled: false,
+      assignment: { dueDateRequired: function () { return false; } }});
+    ok(isValid(validator));
+  });
+
+  test('it is valid to have a due date when dueDateRequired is true', function () {
+    const data = generateData({ due_at: DATE_IN_OPEN_PERIOD });
+    const validator = createValidator({
+      data,
+      gradingPeriods: null,
+      userIsAdmin: false,
+      multipleGradingPeriodsEnabled: false,
+      assignment: { dueDateRequired: function () { return true; } }});
+    ok(isValid(validator));
+  });
+
+  test('it is not valid to have a missing due date when dueDateRequired is true', function () {
+    const data = generateData({ due_at: null });
+    const validator = createValidator({
+      data,
+      gradingPeriods: null,
+      userIsAdmin: false,
+      multipleGradingPeriodsEnabled: false,
+      assignment: { dueDateRequired: function () { return true; } }});
+    notOk(isValid(validator));
   });
 });

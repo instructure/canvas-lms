@@ -34,6 +34,8 @@ define [
       @gradingPeriods = params.gradingPeriods
       @userIsAdmin = params.userIsAdmin
 
+      @assignment = params.assignment || { dueDateRequired: -> false }
+
     validateDatetimes: ->
       lockAt = @data.lock_at
       unlockAt = @data.unlock_at
@@ -70,6 +72,12 @@ define [
           validationDates: {"unlock_at": unlockAt},
           range: "end_range",
           type: "due"
+        }
+
+      if @assignment.dueDateRequired()
+        datetimesToValidate.push {
+          date: dueAt,
+          dueDateRequired: true,
         }
 
       if @multipleGradingPeriodsEnabled && !@userIsAdmin && @data.persisted == false
@@ -112,6 +120,8 @@ define [
 
     _validateDatetimeSequences: (datetimesToValidate, errs) =>
       for datetimeSet in datetimesToValidate
+        if datetimeSet.dueDateRequired && !datetimeSet.date
+          errs["due_at"] = I18n.t("Due dates are required")
         if datetimeSet.range == "grading_period_range"
           @_validateMultipleGradingPeriods(datetimeSet.date, errs)
         else if datetimeSet.date
