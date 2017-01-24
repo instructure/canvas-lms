@@ -2085,18 +2085,7 @@ class User < ActiveRecord::Base
     # (hopefully) don't need to include cross-shard because calendar events/assignments/etc are only seached for on current shard anyway
     @cached_context_codes ||=
       Rails.cache.fetch([self, 'cached_context_codes', Shard.current].cache_key, :expires_in => 15.minutes) do
-        group_admin_course_ids =
-          Rails.cache.fetch([self, 'group_admin_course_ids', Shard.current].cache_key, :expires_in => 1.hour) do
-            # permissions are cached for an hour anyways
-            admin_enrolls = self.enrollments.shard(Shard.current).of_admin_type.active_by_date
-            Course.where(:id => admin_enrolls.select(:course_id)).to_a.select{|c| c.grants_right?(self, :manage_groups)}.map(&:id)
-          end
-
-        group_ids = group_admin_course_ids.any? ?
-          Group.active.where(:context_type => "Course", :context_id => group_admin_course_ids).pluck(:id) : []
-        group_ids += self.groups.active.pluck(:id)
-        group_ids.uniq!
-
+        group_ids = self.groups.active.pluck(:id)
         cached_current_course_ids = Rails.cache.fetch([self, 'cached_current_course_ids', Shard.current].cache_key) do
           # don't need an expires at because user will be touched if enrollment state changes from 'active'
           self.enrollments.shard(Shard.current).active_by_date.distinct.pluck(:course_id)
