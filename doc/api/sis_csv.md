@@ -33,8 +33,10 @@ must be specified when uploading the SIS import. Use this option with caution, a
 large data sets without any prompting on the individual records. Currently, this affects courses,
 sections and enrollments.
 
-This option will only affect data created via previous SIS imports. Manually created courses, for
-example, won't be deleted even if they don't appear in the new SIS import.
+This option will only affect data that has been involved in a previous SIS job
+-- either created by a previous import, or referenced by a SIS job after a SIS
+ID was manually added. Manually created courses with no SIS ID, for example,
+won't be deleted even if they don't appear in the new SIS import.
 
 Diffing Mode
 ------------
