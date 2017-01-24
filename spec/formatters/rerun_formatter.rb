@@ -25,8 +25,9 @@ module RSpec
 
       msg = "[SPOTBOT] adding spec to rerun #{path}"
 
-      if defined?(SeleniumErrorRecovery) &&
-          SeleniumErrorRecovery::RecoverableException == example_data[:exception]
+      exempt_exception_classes = [ SpecTimeLimit::Error ] # sometimes things are just a bit slow. we won't hold it against you the first time
+      exempt_exception_classes << SeleniumErrorRecovery::RecoverableException if defined?(SeleniumErrorRecovery)
+      if exempt_exception_classes.any? { |klass| klass === example_data[:exception] }
         msg += " [#{example_data[:exception].class} exceptions are exempt from rerun thresholds]"
       end
 

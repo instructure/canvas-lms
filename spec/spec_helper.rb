@@ -331,8 +331,8 @@ RSpec.configure do |config|
 
   config.around(:each) do |example|
     record_spec_info(example) do
-      Timeout::timeout(60) do
-        Rails.logger.info "STARTING SPEC #{example.full_description}"
+      Rails.logger.info "STARTING SPEC #{example.full_description}"
+      SpecTimeLimit.enforce(example) do
         example.run
       end
     end
