@@ -2,5 +2,5 @@
   <%= polymorphic_url([asset.context, :files]) %>
 <% end -%>
 <%= t('body', 'Canvas Alert - %{count} new files for %{name}', 
-        :count => data.count,
+        :count => n(data.count),
         :name => asset.context.name) %>

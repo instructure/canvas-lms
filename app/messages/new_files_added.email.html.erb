@@ -4,7 +4,7 @@
 
 <% define_content :subject do %>
   <%= t('subject', '%{count} new files added for the course, %{name}:', 
-          :count => data.count,
+          :count => n(data.count),
           :name => asset.context.name) %>
 <% end %>
 
@@ -15,5 +15,5 @@
 <% end %>
 
 <p><%= t('body', '%{count} new files have been added for the course, %{name}:', 
-        :count => data.count,
+        :count => n(data.count),
         :name => asset.context.name) %></p>
