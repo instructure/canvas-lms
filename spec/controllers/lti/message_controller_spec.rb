@@ -73,7 +73,7 @@ module Lti
           expect(launch_params['reg_key']).not_to be_empty
           expect(launch_params['reg_password']).not_to be_empty
           expect(launch_params['launch_presentation_return_url'])
-            .to include "courses/#{course.id}/lti/registration_return/#{launch_params['reg_key']}"
+            .to include "courses/#{course.id}/lti/registration_return"
           expect(launch_params['ext_tool_consumer_instance_guid']).to eq @course.root_account.lti_guid
           expect(launch_params['ext_api_domain']).to eq HostUrl.context_host(course, request.host)
           account_tp_url_stub = course_tool_consumer_profile_url(course, 'abc123').gsub('abc123', '')
@@ -177,7 +177,7 @@ module Lti
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
 
-          expected_launch = "courses/#{course.id}/lti/registration_return/#{launch_params['reg_key']}"
+          expected_launch = "courses/#{course.id}/lti/registration_return"
           expect(launch_params['launch_presentation_return_url']).to include expected_launch
         end
 
@@ -339,27 +339,29 @@ module Lti
       describe "resource link" do
 
         it 'creates resource_links without a resource_link_fragment' do
-          Account.any_instance.stubs(:global_id).returns(3)
-          MessageHandler.any_instance.stubs(:global_id).returns(4)
-          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,
-              params: {tool_launch_context: 'my_custom_context'}
-          expect(response.code).to eq "200"
+          Timecop.freeze do
+            get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,
+                params: {tool_launch_context: 'my_custom_context'}
+            expect(response.code).to eq "200"
 
-          lti_launch = assigns[:lti_launch]
-          params = lti_launch.params.with_indifferent_access
-          expect(params[:resource_link_id]).to eq "bc460437e3f6cf7a7eecb017487c145f4957334d"
+            lti_launch = assigns[:lti_launch]
+            params = lti_launch.params.with_indifferent_access
+            expected_id = Canvas::Security.hmac_sha1("Account_#{account.global_id},MessageHandler_#{message_handler.global_id}")
+            expect(params[:resource_link_id]).to eq expected_id
+          end
         end
 
-        it 'creates resource_links with a resource_link_fragment' do
-          Account.any_instance.stubs(:global_id).returns(3)
-          MessageHandler.any_instance.stubs(:global_id).returns(4)
-          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,
-              resource_link_fragment: 'my_custom_postfix'
-          expect(response.code).to eq "200"
+        it 'creates with a resource_link_fragment' do
+          Timecop.freeze do
+            get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,
+                resource_link_fragment: 'my_custom_postfix'
+            expect(response.code).to eq "200"
 
-          lti_launch = assigns[:lti_launch]
-          params = lti_launch.params.with_indifferent_access
-          expect(params[:resource_link_id]).to eq "c5c1cef6a293b2c173cc8f4ec4412916019324f8"
+            lti_launch = assigns[:lti_launch]
+            params = lti_launch.params.with_indifferent_access
+            expected_id = Canvas::Security.hmac_sha1("Account_#{account.global_id},MessageHandler_#{message_handler.global_id},my_custom_postfix")
+            expect(params[:resource_link_id]).to eq expected_id
+          end
         end
 
 

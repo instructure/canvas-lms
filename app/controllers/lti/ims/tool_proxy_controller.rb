@@ -38,11 +38,13 @@ module Lti
       end
 
       def create
+        tool_proxy_guid = oauth_consumer_key
         secret = RegistrationRequestService.retrieve_registration_password(context, oauth_consumer_key)
 
         if secret.blank?
           dev_key = DeveloperKey.find_cached(oauth_consumer_key)
           secret = dev_key.present? && dev_key.api_key
+          tool_proxy_guid = SecureRandom.uuid
         end
 
         if oauth_authenticated_request?(secret)
@@ -50,7 +52,7 @@ module Lti
           tool_proxy = tp_service.process_tool_proxy_json(
             json: request.body.read,
             context: context,
-            guid: oauth_consumer_key,
+            guid: tool_proxy_guid,
             developer_key: dev_key
           )
 

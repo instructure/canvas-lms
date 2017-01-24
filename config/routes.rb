@@ -291,7 +291,7 @@ CanvasRails::Application.routes.draw do
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
     get 'lti/tool_proxy_reregistration/:tool_proxy_id', controller: 'lti/message', action: 'reregistration',
         as: :tool_proxy_reregistration
-    get 'lti/registration_return/:tool_proxy_uuid', controller: 'lti/message', action: 'registration_return',
+    get 'lti/registration_return', controller: 'lti/message', action: 'registration_return',
         as: :registration_return
 
     resources :submissions
@@ -601,7 +601,7 @@ CanvasRails::Application.routes.draw do
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
     get 'lti/tool_proxy_reregistration/:tool_proxy_id', controller: 'lti/message', action: 'reregistration',
         as: :tool_proxy_reregistration
-    get 'lti/registration_return/:tool_proxy_uuid', controller: 'lti/message', action: 'registration_return',
+    get 'lti/registration_return', controller: 'lti/message', action: 'registration_return',
         as: :registration_return
 
     get 'outcomes/users/:user_id' => 'outcomes#user_outcome_results', as: :user_outcomes_results
