@@ -46,16 +46,13 @@ module WebMock::API
   end
 end
 
+Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+
 # nuke the db (say, if `rake db:migrate RAILS_ENV=test` created records),
 # and then ensure people aren't creating records outside the rspec
 # lifecycle, e.g. inside a describe/context block rather than a
 # let/before/example
-require_relative 'support/blank_slate_protection'
 BlankSlateProtection.install!
-
-require_relative 'support/discourage_slow_specs'
-
-Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 
