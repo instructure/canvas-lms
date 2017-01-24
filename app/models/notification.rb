@@ -497,7 +497,6 @@ Invitation for:
 * Web conference
 * Group
 * Collaboration
-* Course
 * Peer Review & reminder
 EOS
     when 'Other'
