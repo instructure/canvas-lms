@@ -27,8 +27,8 @@ module BlankSlateProtection
     end
   end
 
-  module ExampleGroup
-    def run_examples(*)
+  module Example
+    def run(*)
       BlankSlateProtection.disable { super }
     end
   end
@@ -49,7 +49,7 @@ module BlankSlateProtection
 
     def install!
       truncate_all_tables!
-      ::RSpec::Core::ExampleGroup.singleton_class.prepend ExampleGroup
+      ::RSpec::Core::Example.prepend Example
       ::ActiveRecord::Base.include ActiveRecord
       @enabled = true
     end

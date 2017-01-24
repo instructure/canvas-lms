@@ -38,6 +38,7 @@ group :test do
     gem 'websocket', '1.2.3', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test_after_commit', '1.1.0' if CANVAS_RAILS4_2
+  gem 'test-queue', github: 'jenseng/test-queue', ref: '59d087f9fb29d4d380e56c61618407e83a469fc7', require: false
   gem 'testrailtagging', '0.3.7', require: false
 
   gem 'webmock', '1.22.3', require: false
