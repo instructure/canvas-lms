@@ -23,7 +23,7 @@
      part_modules.each do |mod|
        progress = @progressions.where(:context_module_id => mod.id).first
        progressions[mod.id] = progress
-       all_complete = false if progress.workflow_state != 'completed'
+       all_complete = false if progress.nil? || progress.workflow_state != 'completed'
      end
   %>
   <div class="bz-course-part <%= all_complete ? 'bz-part-complete bz-part-collapsed' : '' %>">
@@ -52,20 +52,20 @@
     <% part_modules.each do |mod| %>
     <% part_count += 1 %>
     <% progress = progressions[mod.id] %>
-    <div class="bz-course-part-module-box <%= progress.workflow_state %> ">
+    <div class="bz-course-part-module-box <%= progress.nil? ? '' : progress.workflow_state %> ">
       <div class="bz-module-image"><img src="<%= mod.image_url %>" alt="" /></div>
       <h3><%= part_count %> <%= mod.name %></h3>
       <div><%= mod.intro_text ? mod.intro_text.html_safe : '' %></div>
-      <% if progress.workflow_state == 'completed' %>
+      <% if progress && progress.workflow_state == 'completed' %>
         <a href="/courses/<%= @course.id %>/modules/items/<%= mod.content_tags.first.id %>" class="bz-button-pick-up">Completed</a>
-      <% elsif progress.workflow_state == 'locked' %>
+      <% elsif progress && progress.workflow_state == 'locked' %>
         <!-- locked, no button needed -->
       <% else %>
         <%
           ump = UserModulePosition.where(:user_id => @current_user.id, :module_id => mod.id, :course_id => @course.id)
           if ump.empty?
         %>
-          <a class="bz-button-pick-up" href="/courses/<%= @course.id %>/modules/items/<%= progress.current_position_tag_without_progress.id %>">Pick up where you left off</a>
+          <a class="bz-button-pick-up" href="/courses/<%= @course.id %>/modules/items/<%= mod.content_tags.active.first.id %>">Pick up where you left off</a>
         <% else %>
           <a class="bz-button-pick-up" href="/courses/<%= @course.id %>/modules/items/<%= ump.first.module_item_id %>">Pick up where you left off</a>
 
