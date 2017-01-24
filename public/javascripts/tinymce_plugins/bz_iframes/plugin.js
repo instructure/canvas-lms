@@ -18,6 +18,19 @@ tinymce.create('tinymce.plugins.BZIframes', {
       label.appendChild(type);
       div.appendChild(label);
 
+      $.get("/api/v1/courses/" + location.pathname.split("/")[2] + "/rubrics", function(data) {
+        var optgroup = document.createElement("optgroup");
+        optgroup.setAttribute("label", "Rubrics");
+        type.appendChild(optgroup);
+        for(var i = 0; i < data.length; i++) {
+              var item = data[i];
+              var option = document.createElement("option");
+              option.value = "/courses/" + location.pathname.split("/")[2] + "/rubrics/" + item.id;
+              option.textContent = item.title;
+              optgroup.appendChild(option);
+        }
+      });
+
       $.get("/api/v1/courses/" + location.pathname.split("/")[2] + "/modules?include[]=items", function(data) {
         for(var i = 0; i < data.length; i++) {
           if(data[i].published) {
