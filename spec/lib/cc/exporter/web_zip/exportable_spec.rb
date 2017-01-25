@@ -75,7 +75,7 @@ describe "Exportable" do
           file = zip_file.glob('**/viewer/course-data.js').first
           expect(file).not_to be_nil
           contents = file.get_input_stream.read
-          expect(contents).not_to be_nil
+          expect(contents.start_with?('window.COURSE_DATA =')).to be true
         end
       end
 
@@ -83,7 +83,7 @@ describe "Exportable" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/viewer/course-data.js').first
           expect(file).not_to be_nil
-          contents = JSON.parse(file.get_input_stream.read)
+          contents = JSON.parse(file.get_input_stream.read.sub('window.COURSE_DATA =',''))
           expect(contents['files']).not_to be_nil
         end
       end
@@ -92,7 +92,7 @@ describe "Exportable" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/viewer/course-data.js').first
           expect(file).not_to be_nil
-          contents = JSON.parse(file.get_input_stream.read)
+          contents = JSON.parse(file.get_input_stream.read.sub('window.COURSE_DATA =',''))
           expect(contents['files'].length).to eq(3)
           expect(contents['files'][0]['type']).to eq('file')
           expect(contents['files'][0]['name']).not_to be_nil

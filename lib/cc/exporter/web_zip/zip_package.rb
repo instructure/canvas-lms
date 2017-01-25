@@ -46,7 +46,7 @@ module CC::Exporter::WebZip
         files: create_tree_data
       }
 
-      f.write(data.to_json)
+      f.write("window.COURSE_DATA = #{data.to_json}")
 
       zip_file.add("#{@viewer_path_prefix}/#{@course_data_filename}", f)
       f.close
