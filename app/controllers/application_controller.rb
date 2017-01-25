@@ -266,7 +266,7 @@ class ApplicationController < ActionController::Base
   #
   # @param [String] cause
   #   The reason the request is rejected for.
-  # @param [Optional, Fixnum|Symbol, Default :bad_request] status
+  # @param [Optional, Integer|Symbol, Default :bad_request] status
   #   HTTP status code or symbol.
   def reject!(cause, status=:bad_request)
     raise RequestError.new(cause, status)

@@ -113,7 +113,7 @@ module SimplyVersioned
 
       version = if version.kind_of?( Version )
         version
-      elsif version.kind_of?( Fixnum )
+      elsif version.kind_of?( Integer )
         self.versions.where(number: version).first
       end
 

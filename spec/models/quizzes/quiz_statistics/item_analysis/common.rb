@@ -16,8 +16,7 @@ class BeApproximately
     case target
     when Array; array_approximates(target, expected)
     when Hash;  hash_approximates(target, expected)
-    when Fixnum,
-         Bignum,
+    when Integer,
          Float; real_approximates(target, expected)
     else        false
     end

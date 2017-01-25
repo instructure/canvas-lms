@@ -60,7 +60,7 @@ module CanvasPartman::Concerns
         @partitioning_interval = value
       end
 
-      # @attr [Fixnum]  partition_size
+      # @attr [Integer]  partition_size
       #  How large each partition is. Only applies to
       #  :by_id partitioning_strategy
       #

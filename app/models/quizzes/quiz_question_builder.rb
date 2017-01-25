@@ -202,7 +202,7 @@ class Quizzes::QuizQuestionBuilder
     ::ActiveRecord::Base.t(*args)
   end
 
-  # @property [Fixnum] submission_question_index
+  # @property [Integer] submission_question_index
   # @private
   #
   # A counter used in generating question names for students based on the

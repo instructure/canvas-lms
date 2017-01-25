@@ -65,8 +65,8 @@ describe EventStream::AttrConfig do
       obj.field.== string
     end
 
-    it "casts values with type Fixnum" do
-      @class.attr_config :field, :type => Fixnum, :default => nil
+    it "casts values with type Integer" do
+      @class.attr_config :field, :type => Integer, :default => nil
       integer = double('value')
       value = double(:to_i => integer)
       obj = @class.new
@@ -96,7 +96,7 @@ describe EventStream::AttrConfig do
     end
 
     it "errors when Proc does not return the expected type" do
-      @class.attr_config :field, :type => Fixnum, :default => nil
+      @class.attr_config :field, :type => Integer, :default => nil
       obj = @class.new
       value = -> { [] }
       obj.field(value)

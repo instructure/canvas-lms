@@ -1755,7 +1755,7 @@ class Submission < ActiveRecord::Base
   #  * workflow_state (String)
   #  * cached_due_date (Time)
   #  * submitted_at (Time)
-  #  * score (Fixnum)
+  #  * score (Integer)
   #  * excused (Boolean)
   #
   module Tardiness

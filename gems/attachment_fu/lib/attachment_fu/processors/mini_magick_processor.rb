@@ -52,8 +52,8 @@ module AttachmentFu # :nodoc:
             img.format("png")
           end
 
-          if size.is_a?(Fixnum) || (size.is_a?(Array) && size.first.is_a?(Fixnum))
-            if size.is_a?(Fixnum)
+          if size.is_a?(Integer) || (size.is_a?(Array) && size.first.is_a?(Integer))
+            if size.is_a?(Integer)
               size = [size, size]
               commands.resize(size.join('x'))
             else

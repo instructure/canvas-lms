@@ -45,7 +45,7 @@ shared_examples_for "All answer parsers" do
 
   it "provides IDs for the answers" do
     ids = @answer_data.answers.map { |a| a[:id] }
-    ids.each { |id| expect(id).to be_kind_of(Fixnum) }
+    ids.each { |id| expect(id).to be_kind_of(Integer) }
   end
 end
 

@@ -772,7 +772,7 @@ RSpec.configure do |config|
         compare_json(a, e)
       end
     else
-      if actual.is_a?(Fixnum) || actual.is_a?(Float)
+      if actual.is_a?(Integer) || actual.is_a?(Float)
         expect(actual).to eq expected
       else
         expect(actual.to_json).to eq expected.to_json

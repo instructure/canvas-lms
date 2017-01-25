@@ -237,7 +237,7 @@ class SearchController < ApplicationController
     end
 
     def validate(bookmark)
-      bookmark.is_a?(Fixnum)
+      bookmark.is_a?(Integer)
     end
 
     def self.wrap(collection)

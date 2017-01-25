@@ -43,7 +43,7 @@ module BookmarkedCollection
 
     TYPE_MAP = {
       string: String,
-      integer: Fixnum
+      integer: Integer
     }
 
     def validate(bookmark)
