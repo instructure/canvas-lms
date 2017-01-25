@@ -368,7 +368,7 @@ body.primary-nav-expanded {
     opacity: 1;
     text-align: center;
     display: block;
-    line-height: 1;
+    line-height: 1.4;
     border-radius: 0;
     margin: $ic-sp/4 0 0;
     padding: 0;
@@ -486,6 +486,9 @@ body.primary-nav-expanded {
     .ic-NavMenu__headline {
       flex: 1;
       min-width: 1px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
 
   }

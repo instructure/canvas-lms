@@ -220,6 +220,7 @@ define([
         case 'help':
           return (
             <HelpTray
+              trayTitle={window.ENV.help_link_name}
               links={this.state.help}
               hasLoaded={this.state.helpAreLoaded}
               closeTray={this.closeTray}
