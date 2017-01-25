@@ -240,7 +240,7 @@ tinymce.create('tinymce.plugins.BZButtons', {
     });
 
     function insertUserName() {
-      ed.selection.setContent("<span class=\"bz-user-name\">READER'S NAME</span>);
+      ed.selection.setContent("<span class=\"bz-user-name\">READER'S NAME</span>");
     }
 
     ed.addCommand('bzName', insertUserName);
