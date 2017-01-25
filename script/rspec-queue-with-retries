@@ -2,6 +2,8 @@
 
 set -e
 
+export TEST_QUEUE_REPLACE_STATS=1
+
 max_failures=${RERUNS:=200}
 runs_remaining=$((1+${RERUNS_RETRY:=3}))
 spec_list=${SPEC_FILES:=spec}
@@ -86,6 +88,7 @@ while true; do
   if [[ ! $reruns_started ]]; then
     reruns_started=1
     echo "[rspec-queue:reruns] STARTING"
+    unset TEST_QUEUE_REPLACE_STATS # ensure the rerun stats merge into the main ones
   fi
 done
 

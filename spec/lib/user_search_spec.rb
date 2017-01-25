@@ -6,7 +6,7 @@ describe UserSearch do
 
   describe '.for_user_in_context' do
     let(:search_names) { ['Rose Tyler', 'Martha Jones', 'Rosemary Giver', 'Martha Stewart', 'Tyler Pickett', 'Jon Stewart', 'Stewart Little', 'Ĭńşŧřůćƭǜȑȩ Person'] }
-    let(:course) { Course.create! }
+    let(:course) { Course.create!(workflow_state: "available") }
     let(:users) { UserSearch.for_user_in_context('Stewart', course, user).to_a }
     let(:names) { users.map(&:name) }
     let(:user) { User.last }
