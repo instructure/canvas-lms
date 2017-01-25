@@ -43,6 +43,23 @@ define([
       );
     }
   }
+  FolderChild.renderMasterCourseIcon = function (canManage) {
+    if (canManage && this.props.model.get('is_master_course_content')) {
+      if (this.props.model.get('restricted_by_master_course')) {
+        return (
+          <span className="master-course-cell">
+            <i className="icon-lock"></i>
+          </span>
+        );
+      } else {
+        return (
+          <span className="master-course-cell">
+            <i className="icon-unlock icon-Line"></i>
+          </span>
+        );
+      }
+    }
+  }
 
   FolderChild.renderEditingState = function () {
     if(this.state.editing) {
@@ -188,6 +205,7 @@ define([
         { this.renderUsageRightsIndicator() }
 
         <div className= 'ef-links-col' role= 'gridcell'>
+          { this.renderMasterCourseIcon(canManage) }
           { this.renderPublishCloud(canManage && this.props.userCanRestrictFilesForContext) }
           { this.renderItemCog(canManage) }
         </div>

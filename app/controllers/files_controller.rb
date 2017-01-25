@@ -1081,6 +1081,7 @@ class FilesController < ApplicationController
   def destroy
     @attachment = Attachment.find(params[:id])
     if can_do(@attachment, @current_user, :delete)
+      return render_unauthorized_action if master_courses? && editing_restricted?(@attachment)
       @attachment.destroy
       respond_to do |format|
         format.html {

@@ -554,6 +554,29 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.reload.is_public).to_not be_truthy
     end
 
+    it "should trigger folder locking data cache invalidation" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      enable_cache do
+        expect(MasterCourses::FolderLockingHelper.locked_folder_ids_for_course(@copy_to)).to be_empty
+
+        master_parent_folder = Folder.root_folders(@copy_from).first.sub_folders.create!(:name => "parent", :context => @copy_from)
+        master_sub_folder = master_parent_folder.sub_folders.create!(:name => "child", :context => @copy_from)
+        att = Attachment.create!(:filename => 'file.txt', :uploaded_data => StringIO.new('1'), :folder => master_sub_folder, :context => @copy_from)
+        att_tag = @template.create_content_tag_for!(att, :restrictions => {:content => true, :settings => true})
+
+        run_master_migration
+
+        copied_att = @copy_to.attachments.where(:migration_id => att_tag.migration_id).first
+        child_sub_folder = copied_att.folder
+        child_parent_folder = child_sub_folder.parent_folder
+        expected_ids = [child_sub_folder, child_parent_folder, Folder.root_folders(@copy_to).first].map(&:id)
+        Folder.connection.expects(:select_values).never # should have already been cached in migration
+        expect(MasterCourses::FolderLockingHelper.locked_folder_ids_for_course(@copy_to)).to match_array(expected_ids)
+      end
+    end
+
     context "master courses + external migrations" do
       class TestExternalContentService
         cattr_reader :course, :imported_content

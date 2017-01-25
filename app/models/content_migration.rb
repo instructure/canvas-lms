@@ -495,6 +495,7 @@ class ContentMigration < ActiveRecord::Base
         # copy the attachments
         source_export = ContentExport.find(self.migration_settings[:master_course_export_id])
         self.context.copy_attachments_from_course(source_export.context, :content_export => source_export, :content_migration => self)
+        MasterCourses::FolderLockingHelper.recalculate_locked_folders(self.context)
 
         data = JSON.parse(self.exported_attachment.open, :max_nesting => 50)
         data = prepare_data(data)

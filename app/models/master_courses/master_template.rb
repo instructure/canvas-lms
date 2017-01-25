@@ -111,8 +111,6 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def ensure_attachment_tags_on_export
-    return unless self.default_restrictions.present?
-
     # because attachments don't get "added" to the export
     self.course.attachments.where("file_state <> 'deleted'").each do |att|
       ensure_tag_on_export(att)
