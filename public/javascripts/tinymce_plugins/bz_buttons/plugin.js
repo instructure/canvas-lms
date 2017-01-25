@@ -239,6 +239,18 @@ tinymce.create('tinymce.plugins.BZButtons', {
       cmd: 'bzChecklist'
     });
 
+    function insertUserName() {
+      ed.selection.setContent("<span class=\"bz-user-name\">READER'S NAME</span>);
+    }
+
+    ed.addCommand('bzName', insertUserName);
+    ed.addButton('bz_name', {
+      title: 'Insert user name',
+      image: url + '/btn-name.png',
+      cmd: 'bzName'
+    });
+
+
 
     /* *********************** */
   },

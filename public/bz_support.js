@@ -32,6 +32,13 @@ function bzRetainedInfoSetup() {
       ta.textContent = value;
   }
 
+  var names = document.querySelectorAll(".bz-user-name");
+  for(var i = 0; i < names.length; i++) {
+    var element = names[i];
+    element.className = "bz-user-name-showing";
+    element.textContent = ENV.current_user.display_name;
+  }
+
   var textareas = document.querySelectorAll("[data-bz-retained]");
   for(var i = 0; i < textareas.length; i++) {
     (function(ta) {
