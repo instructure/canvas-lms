@@ -8,7 +8,7 @@ module RSpec
       output.puts
     end
 
-    def dump_summary(duration, example_count, failure_count, pending_count)
+    def dump_summary(*)
       dump_failures
     end
   end

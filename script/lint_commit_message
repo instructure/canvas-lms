@@ -46,8 +46,8 @@ end
 # not perfect (won't get irregular verbs, only checks first word), but
 # close enough... does the right thing on most existing commits
 maybe_wrong_tense_regex = /\A(spec: )?[a-z]+([^e]ed|[^aijoqsu]s|ing) /i
-actually_ok_rejex = /\A
-  (spec: )?
+actually_ok_regex = /\A
+  (spec:\s+)?
   (
     # *ing words
     (brand|br|[^ ]*learn|masquerad|upcom|shard|word|grad)ing |
@@ -61,7 +61,7 @@ actually_ok_rejex = /\A
 /xi
 
 maybe_start_with_wrong_tense = subject =~ maybe_wrong_tense_regex &&
-                               subject !~ actually_ok_rejex
+                               subject !~ actually_ok_regex
 if maybe_start_with_wrong_tense
   comment "warn", 1, "make sure your commit message has an imperative verb (e.g. \"add\" instead of \"adds\", \"added\", or \"adding\")", true
 end
