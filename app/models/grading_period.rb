@@ -31,6 +31,7 @@ class GradingPeriod < ActiveRecord::Base
   before_validation :ensure_close_date
 
   after_save :recompute_scores, if: :dates_changed?
+  after_destroy :destroy_grading_period_set, if: :last_remaining_legacy_period?
 
   scope :current, -> do
     period_table = GradingPeriod.arel_table
@@ -156,6 +157,14 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   private
+
+  def destroy_grading_period_set
+    grading_period_group.destroy
+  end
+
+  def last_remaining_legacy_period?
+    course_group? && grading_period_group.active? && siblings.active.empty?
+  end
 
   def skip_not_overlapping_validator?
     @_skip_not_overlapping_validator
