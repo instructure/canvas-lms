@@ -2,7 +2,7 @@ define([
   'react',
   'react-dom',
   'react-addons-test-utils',
-  'instructure-ui/instructure-ui',
+  'instructure-ui',
   'jsx/context_cards/StudentContextTray',
   'jsx/context_cards/StudentCardStore'
 ], (React, ReactDOM, TestUtils, { Avatar, Tray }, StudentContextTray, StudentCardStore) => {

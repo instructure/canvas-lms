@@ -3,7 +3,7 @@ define([
   'react-dom',
   'react-addons-test-utils',
   'jsx/context_cards/Avatar',
-  'instructure-ui/instructure-ui'
+  'instructure-ui'
 ], (React, ReactDOM, TestUtils, Avatar, { Avatar: InstUIAvatar }) => {
 
   module('StudentContextTray/Avatar', (hooks) => {

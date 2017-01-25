@@ -2,7 +2,7 @@ define([
   'react',
   'i18n!student_context_tray',
   'classnames',
-  'instructure-ui/instructure-ui'
+  'instructure-ui'
 ], (React, I18n, classnames,
     { Heading, Rating: InstUIRating, Typography }
    ) => {

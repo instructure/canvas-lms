@@ -1,6 +1,6 @@
 define([
   'react',
-  'instructure-ui/instructure-ui',
+  'instructure-ui',
 ], (React, { Avatar: InstUIAvatar, Typography }) => {
 
   class Avatar extends React.Component {

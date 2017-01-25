@@ -10,7 +10,7 @@ define([
   './SectionInfo',
   './SubmissionProgressBars',
   'jsx/shared/MessageStudents',
-  'instructure-ui/instructure-ui',
+  'instructure-ui',
 ], function(React, I18n, FriendlyDatetime,
    StudentCardStore,
    Avatar,

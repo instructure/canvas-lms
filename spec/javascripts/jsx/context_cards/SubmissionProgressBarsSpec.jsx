@@ -3,7 +3,7 @@ define([
   'react-dom',
   'react-addons-test-utils',
   'jsx/context_cards/SubmissionProgressBars',
-  'instructure-ui/instructure-ui'
+  'instructure-ui'
 ], (React, ReactDOM, TestUtils, SubmissionProgressBars, { Progress: InstUIProgress }) => {
 
   module('StudentContextTray/Progress', (hooks) => {

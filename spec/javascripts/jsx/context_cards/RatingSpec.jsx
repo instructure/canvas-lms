@@ -2,7 +2,7 @@ define([
   'react',
   'react-addons-test-utils',
   'jsx/context_cards/Rating',
-  'instructure-ui/instructure-ui'
+  'instructure-ui'
 ], (React, TestUtils, Rating, { Rating: InstUIRating }) => {
 
   module('StudentContextTray/Rating', () => {
