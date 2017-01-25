@@ -2,8 +2,10 @@ define([
   'react',
   'i18n!student_context_tray',
   'classnames',
-  'instructure-ui/instructure-ui'
-], (React, I18n, classnames, { Heading, Progress, Typography }) => {
+  'instructure-ui/Heading',
+  'instructure-ui/Progress',
+  'instructure-ui/Typography'
+], (React, I18n, classnames, { default: Heading }, { default: Progress }, { default: Typography }) => {
 
   class SubmissionProgressBars extends React.Component {
     static propTypes = {

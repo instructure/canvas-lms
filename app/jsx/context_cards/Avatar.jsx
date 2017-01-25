@@ -1,7 +1,8 @@
 define([
   'react',
-  'instructure-ui/instructure-ui',
-], (React, { Avatar: InstUIAvatar, Typography }) => {
+  'instructure-ui/Avatar',
+  'instructure-ui/Typography',
+], (React, { default: InstUIAvatar }, { default: Typography }) => {
 
   class Avatar extends React.Component {
     static propTypes = {

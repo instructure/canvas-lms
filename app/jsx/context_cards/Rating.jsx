@@ -2,9 +2,13 @@ define([
   'react',
   'i18n!student_context_tray',
   'classnames',
-  'instructure-ui/instructure-ui'
+  'instructure-ui/Heading',
+  'instructure-ui/Rating',
+  'instructure-ui/Typography'
 ], (React, I18n, classnames,
-    { Heading, Rating: InstUIRating, Typography }
+    { default: Heading},
+    { default: InstUIRating },
+    { default: Typography }
    ) => {
   class Rating extends React.Component {
     static propTypes = {
