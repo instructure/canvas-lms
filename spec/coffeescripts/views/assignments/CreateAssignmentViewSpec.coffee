@@ -325,17 +325,81 @@ define [
 
     notOk errors["due_at"]
 
-  test "requires a name < 255 chars to save assignment", ->
+  test "requires name to save assignment", ->
     view = createView(@assignment3)
+    data =
+      name: ""
+    errors = view.validateBeforeSave(data, [])
+
+    ok errors["name"]
+    equal errors["name"].length, 1
+    equal errors["name"][0]["message"], "Name is required!"
+
+  test "has an error when a name > 255 chars", ->
+    view = createView(@assignment3)
+
     l1 = 'aaaaaaaaaa'
     l2 = l1 + l1 + l1 + l1 + l1 + l1
     l3 = l2 + l2 + l2 + l2 + l2 + l2
-    ok l3.length > 255
 
     errors = view.validateBeforeSave(name: l3, [])
     ok errors["name"]
     equal errors["name"].length, 1
-    equal errors["name"][0]["message"], "Name is too long"
+    equal errors["name"][0]["message"], "Name is too long, must be under 256 characters"
+
+  test "allows assignment to save when a name < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is true", ->
+    view = createView(@assignment3)
+    ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = false
+
+    l1 = 'aaaaaaaaaa'
+    l2 = l1 + l1 + l1 + l1 + l1 + l1
+    l3 = l2 + l2 + l2 + l2 + l2 + l2
+
+    errors = view.validateBeforeSave({name: l3, post_to_sis: '1'}, [])
+    equal errors.length, 0
+
+  test "allows assignment to save when a name < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is false", ->
+    view = createView(@assignment3)
+    ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = false
+
+    l1 = 'aaaaaaaaaa'
+    l2 = l1 + l1 + l1 + l1 + l1 + l1
+    l3 = l2 + l2 + l2 + l2 + l2 + l2
+
+    errors = view.validateBeforeSave({name: l3, post_to_sis: '0'}, [])
+    equal errors.length, 0
+
+  test "has an error when a name > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
+    view = createView(@assignment3)
+    ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = true
+    ENV.MAX_NAME_LENGTH = 5
+
+    l1 = 'aaaaaaaaaaa'
+
+    errors = view.validateBeforeSave({name: l1, post_to_sis: '1'}, [])
+    ok errors["name"]
+    equal errors["name"].length, 1
+    equal errors["name"][0]["message"], "Name is too long, must be under #{ENV.MAX_NAME_LENGTH + 1} characters"
+
+  test "allows assignment to save when name > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is false", ->
+    view = createView(@assignment3)
+    ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = true
+    ENV.MAX_NAME_LENGTH = 5
+
+    l1 = 'aaaaaaaaaaa'
+
+    errors = view.validateBeforeSave({name: l1, post_to_sis: '0'}, [])
+    equal errors.length, 0
+
+  test "allows assignment to save when name < MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
+    view = createView(@assignment3)
+    ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = true
+    ENV.MAX_NAME_LENGTH = 30
+
+    l1 = 'aaaaaaaaaaa'
+
+    errors = view.validateBeforeSave({name: l1, post_to_sis: '1'}, [])
+    equal errors.length, 0
 
   test "don't validate name if it is frozen", ->
     view = createView(@assignment3)

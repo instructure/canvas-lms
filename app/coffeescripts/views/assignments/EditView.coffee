@@ -453,13 +453,17 @@ define [
     _validateTitle: (data, errors) =>
       return errors if _.contains(@model.frozenAttributes(), "title")
 
+      max_name_length = 256
+      if data.post_to_sis == '1' && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT == true
+        max_name_length = ENV.MAX_NAME_LENGTH + 1
+
       if !data.name or $.trim(data.name.toString()).length == 0
         errors["name"] = [
           message: I18n.t 'name_is_required', 'Name is required!'
         ]
-      else if $.trim(data.name.toString()).length > 255
+      else if $.trim(data.name.toString()).length > max_name_length
         errors["name"] = [
-          message: I18n.t 'name_too_long', 'Name is too long'
+          message: I18n.t "Name is too long, must be under %{length} characters", length: max_name_length
         ]
       errors
 

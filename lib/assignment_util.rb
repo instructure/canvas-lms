@@ -8,7 +8,10 @@ module AssignmentUtil
   end
 
   def self.assignment_name_length_required?(assignment)
-    assignment.post_to_sis.present? &&
+    assignment.post_to_sis.present? && name_length_required_for_account?(assignment)
+  end
+
+  def self.name_length_required_for_account?(assignment)
     assignment.try(:context).try(:account).try(:sis_syncing).try(:[], :value) &&
     assignment.try(:context).try(:account).try(:sis_assignment_name_length).try(:[], :value) &&
     assignment.try(:context).try(:account).try(:feature_enabled?, 'new_sis_integrations').present?
