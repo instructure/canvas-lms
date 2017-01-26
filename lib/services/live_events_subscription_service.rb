@@ -17,7 +17,9 @@ module Services
 
       private
       def request(method, endpoint, options = {})
-        HTTParty.send(method, "#{settings['app-host']}#{endpoint}", options)
+        Canvas.timeout_protection("live-events-subscription-service-session", raise_on_timeout: true) do
+          HTTParty.send(method, "#{settings['app-host']}#{endpoint}", options.merge(timeout: 10))
+        end
       end
 
       def headers(jwt_body, headers = {})
@@ -27,8 +29,7 @@ module Services
       end
 
       def settings
-        settings = Canvas::DynamicSettings.from_cache("live-events-subscription-service", expires_in: 5.minutes)
-        settings if settings.present?
+        Canvas::DynamicSettings.from_cache("live-events-subscription-service", expires_in: 5.minutes)
       rescue Faraday::ConnectionFailed,
              Faraday::ClientError,
              Canvas::DynamicSettings::ConsulError,

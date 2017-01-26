@@ -37,6 +37,19 @@ module Services
         Canvas::DynamicSettings.unstub(:find)
       end
 
+      let(:product_family) do
+        product_family = mock()
+        product_family.stubs(:developer_key).returns('10000000001')
+        product_family
+      end
+
+      let(:tool_proxy) do
+        tool_proxy = mock()
+        tool_proxy.stubs(:guid).returns('151b52cd-d670-49fb-bf65-6a327e3aaca0')
+        tool_proxy.stubs(:product_family).returns(product_family)
+        tool_proxy
+      end
+
       describe '.available?' do
         it 'returns true if the service is configured' do
           expect(LiveEventsSubscriptionService.available?).to eq true
@@ -45,15 +58,6 @@ module Services
 
       describe '.tool_proxy_subscriptions' do
         it 'makes the expected request' do
-          product_family = mock()
-          product_family.stubs(:developer_key).returns('10000000001')
-          Lti::ProductFamily.stubs(:new).returns(product_family)
-
-          proxy = mock()
-          proxy.stubs(:guid).returns('151b52cd-d670-49fb-bf65-6a327e3aaca0')
-          proxy.stubs(:product_family).returns(product_family)
-          Lti::ToolProxy.stubs(:new).returns(proxy)
-
           HTTParty.expects(:send).with do |method, endpoint, options|
             expect(method).to eq(:get)
             expect(endpoint).to eq('http://example.com/api/subscriptions')
@@ -61,7 +65,14 @@ module Services
             expect(jwt["developerKey"]).to eq('10000000001')
             expect(jwt["sub"]).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
           end
-          LiveEventsSubscriptionService.tool_proxy_subscriptions(proxy)
+          LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy)
+        end
+      end
+
+      context 'timeout protection' do
+        it 'throws an exception for .tool_proxy_subscriptions' do
+          Timeout.expects(:timeout).raises(Timeout::Error)
+          expect { LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy) }.to raise_error(Timeout::Error)
         end
       end
     end
