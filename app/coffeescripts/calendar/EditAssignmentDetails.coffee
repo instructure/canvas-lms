@@ -2,6 +2,7 @@ define [
   'jquery'
   'timezone'
   'compiled/util/fcUtil'
+  'compiled/util/natcompare'
   'compiled/calendar/commonEventFactory'
   'jst/calendar/editAssignment'
   'jst/calendar/editAssignmentOverride'
@@ -9,7 +10,7 @@ define [
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
   'jquery.instructure_misc_helpers'
-], ($, tz, fcUtil, commonEventFactory, editAssignmentTemplate, editAssignmentOverrideTemplate, genericSelectOptionsTemplate) ->
+], ($, tz, fcUtil, natcompare, commonEventFactory, editAssignmentTemplate, editAssignmentOverrideTemplate, genericSelectOptionsTemplate) ->
 
   class EditAssignmentDetails
     constructor: (selector, @event, @contextChangeCB, @closeCB) ->
@@ -75,7 +76,7 @@ define [
 
       # TODO: support adding a new assignment group from this select box
       assignmentGroupsSelectOptionsInfo =
-        collection: @currentContextInfo.assignment_groups
+        collection: @currentContextInfo.assignment_groups.sort(natcompare.byKey('name'))
       @$form.find(".assignment_group").html(genericSelectOptionsTemplate(assignmentGroupsSelectOptionsInfo))
 
       # Update the edit and more options links with the new context

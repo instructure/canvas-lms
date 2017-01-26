@@ -97,9 +97,9 @@ define [
     calculateAppointmentGroupEventStatus: ->
       status = I18n.t 'Available'
       if @calendarEvent.available_slots > 0
-        status = I18n.t('%{availableSlots} Available', {availableSlots: @calendarEvent.available_slots})
+        status = I18n.t('%{availableSlots} Available', {availableSlots: I18n.n(@calendarEvent.available_slots)})
       if @calendarEvent.available_slots > 0 && @calendarEvent.child_events?.length
-        status = I18n.t('%{availableSlots} more available', {availableSlots: @calendarEvent.available_slots})
+        status = I18n.t('%{availableSlots} more available', {availableSlots: I18n.n(@calendarEvent.available_slots)})
       if @calendarEvent.available_slots == 0
         status = I18n.t('Filled')
       if @consideredReserved()
