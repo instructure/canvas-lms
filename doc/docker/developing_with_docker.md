@@ -8,21 +8,28 @@ If you have a `docker-compose.override.yml`, you'll need to update it to version
 
 ## Recommendations
 
-If using dinghy or dory, you can use the auto-generated host names.
+If using dinghy (macOS) or [dory](https://github.com/FreedomBen/dory) (Linux || Mac), you can use the
+auto-generated host names.
 
 - web.canvaslms.docker
 
 By default `docker-compose` will look at 2 files
 - docker-compose.yml
 - docker-compose.override.yml
+
 If you need more than what the default override provides you should use a `.env` file to set your `COMPOSE_FILE` environment variable.
 
-Create a `docker-compose.local.<username>.yml` and append it the `COMPOSE_FILE` environment variable.
-Then add only the extras you need to that file.
+### Create your own local docker-compose overrides file(s)
+
+In order to tweak your local environment (which you may want to do for any of several reasons),
+you can create your own [docker-compose overrides file](https://docs.docker.com/compose/compose-file/).
+To get docker-compose to pick up your file and use its settings, you'll want to set an
+environment variable `COMPOSE_FILE`.  The place to do this is in a `.env` file.
+Create a `docker-compose.local.<username>.yml` and add a `COMPOSE_FILE` environment variable.
+This variable can then have a list of files, separated by `:`.  You need to keep the main docker-compose and docker-compose.override otherwise everything will be ruined.
 
 ```bash
-touch docker-compose.local.`whoami`.yml
-echo COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose.local.`whoami`.yml >> .env
+echo "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose.local.`whoami`.yml" >> .env
 ```
 
 ## Getting Started
