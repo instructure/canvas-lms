@@ -405,7 +405,7 @@ sv:
       add_course_link: "Ny kurs"
       add_user_button: "Lägg till användare"
       add_user_link: "Ny användare"
-      display_name_help: "Det här nämnet kommer att visas i diskussioner, meddelanden och kommentarer."
+      display_name_help: "Det här namnet kommer att visas i diskussioner, meddelanden och kommentarer."
       full_name_description: "Det här namnet kommer användas av lärare för betygssättning."
       labels: 
         account_id: Underkonto
@@ -1829,7 +1829,7 @@ sv:
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: "Du kan inte radera en grupp med en låst uppgift"
-  assignment_groups_weight_2f1a5a7c: "Avvägning anvisningsgrupp"
+  assignment_groups_weight_2f1a5a7c: "Viktning för Uppgiftsgrupper"
   assignment_menu_91fe3716: Uppgiftsmeny
   assignment_muted_4cb590a4: "Uppgiften har tystats"
   assignment_muter: 
@@ -2246,7 +2246,7 @@ sv:
       due_at: Färdig
       for: Till
       links: 
-        add_rubric: Rubrik
+        add_rubric: Matris
         assign_rubric: "Tilldela matris"
         edit: Redigera
       manage: Hantera
@@ -4530,7 +4530,7 @@ sv:
       course_export: "Fel vid kurs export"
       course_settings: "Misslyckades att exportera kursinställningar"
       events: "Misslyckades att exportera kalenderhändelser"
-      external_feeds: "Misslyckades att exportera externt flöde"
+      external_feeds: "Misslyckades att exportera extern feed"
       file: "Filen \"%{file_name}\" kunde inte exporteras"
       file_meta: "Misslyckades att exportera meta-fil data"
       files: "Misslyckades att exporter vissa filer"
@@ -5825,7 +5825,7 @@ sv:
       user_unsubscribed: "Du prenumererar inte på det här ämnet. Klicka för att prenumerera."
     discussion_feed_title: "%{title} Diskussionsflöde"
     discussion_list: 
-      no_pinned_discussions: "Du har förtillfället inga fastnålade diskussioner"
+      no_pinned_discussions: "Du har för tillfället inga fastnålade diskussioner"
       pinned_instructions: "För att nåla fast en diskussion högst upp på sidan, drar du hit diskussionen eller så väljer du Nåla i inställningar för diskussioner."
       there_are_no_discussions_show: "Det finns inga diskussioner att visa i den här sektionen."
     discussions_settings_view: 
@@ -6768,8 +6768,8 @@ sv:
   external_feed: 
     original_article: "Ursprunglig artikel"
     short_feed_title: "%{short_url} flöde"
-  external_feed_was_added_d6d16a0: "Externt flöde lades till"
-  external_feed_was_deleted_403465fd: "Externt flöde raderades"
+  external_feed_was_added_d6d16a0: "Extern feed lades till"
+  external_feed_was_deleted_403465fd: "Extern feed raderades"
   external_feeds: 
     index_view: 
       add_a_new_feed: "Lägg till ett nytt flöde"
@@ -6783,7 +6783,7 @@ sv:
       labels: 
         match_phrase_checkbox: "Lägg endast till inlägg med en specifik fras i titeln"
       links: 
-        add_external_feed: "En extern flöde"
+        add_external_feed: "Lägg till extern feed"
       options: 
         content_to_post: "Innehåll att posta"
         full_article: "Fullständig artikel"
@@ -7126,7 +7126,7 @@ sv:
     only_one_folder: "Kan inte ställa in sökväg och mapp-id"
   for: till
   for_974cbb84: Till
-  for_all_devices_1f603968: "För alla apparater"
+  for_all_devices_1f603968: "För Alla Enheter"
   for_an_instant_answer_see_if_your_issue_is_address_48280e89: "För ett svar direkt, se om ditt problem nämns i *Canvas Guiderna*."
   for_best_results_crop_image_to_262px_wide_by_146px_af81a540: "För bästa resultat beskär bild till 262px bred med 146px hög. JPG, PNG eller GIF filtyper accepteras"
   forgot_password_url_3f9c04b: "Glömt lösenord URL"
@@ -8593,7 +8593,7 @@ sv:
   incorrect_answer_7c17e63b: "Fel svar"
   incorrect_username_and_or_password_2de73abb: "Ogiltigt användarnamn och/eller lösenord"
   increase_indent_6af90f7c: "Öka indrag"
-  increase_indent_6d550a4a: "Minska indrag"
+  increase_indent_6d550a4a: "Öka indrag"
   incremental_update_successfully_generated_against__db3f3f06: "En ökad uppdatering genererades mot en tidigare SIS import."
   india_8d982994: Indien
   india_91_6c290107: "Indien (+91)"
@@ -11038,7 +11038,7 @@ sv:
     discussion_topic_type: Diskussionsämne
     ecollege: 
       course_not_found: "ECollege kursen hittades inte."
-    external_feed_type: "Externt flöde"
+    external_feed_type: "Extern feed"
     external_tool_type: "Externt verktyg"
     file_type: Fil
     grading_standard_type: Betygsstandard
@@ -11047,7 +11047,7 @@ sv:
     module_type: Modul
     quiz_question_type: Quizfråga
     quiz_type: Quiz
-    rubric_type: Rubrik
+    rubric_type: Matris
     webct: 
       course_not_found: "Svarta tavlan kursen hittades inte"
     wiki_page_type: Wikisida
@@ -11968,7 +11968,7 @@ sv:
       criterion_dialog: "Lärandemål kan inkluderas i en matris för att enkelt spåra måluppfyllelsen för specifika uppgifter. När du definierar ett lärandemål bör du även definiera kriterierna som ska användas när du bygger matriser. Definiera så många kolumner du behöver, och specificera en poänggräns som kommer användas för att definiera bedömningens måluppfyllelse."
       criterion_info_link: "Klicka här för att lära dig mer om värderingskriterium"
       description: "Beskriv lärandemålet"
-      display_name: "Vänlig namn (valfritt)"
+      display_name: "Alternativt namn (valfritt)"
       mastery: "Måluppfyllelse vid"
       points: "%{points_possible} Poäng"
       title: "Namnge lärandemålet"
@@ -12109,7 +12109,7 @@ sv:
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Granskningar kan inte aktiveras för modererade uppgifter"
   people_b4ebb13c: Personer
   people_options_cfb419a6: Personalternativ
-  people_will_see_this_name_in_discussions_messages__fca9ebb2: "Det här nämnet kommer att visas i diskussioner, meddelanden och kommentarer."
+  people_will_see_this_name_in_discussions_messages__fca9ebb2: "Det här namnet kommer att visas i diskussioner, meddelanden och kommentarer."
   percent_448ea947: procent
   percent_complete_3a7edc20: "%{percent} färdig"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Procent av respondenter som valt detta svaret"
@@ -12779,7 +12779,7 @@ sv:
         expires_at: "lämna blank för ingen utgång"
         language: "Det här kommer skriva över alla webbläsare och kontoinställningar."
         name: "Det här namnet kommer användas för betyg."
-        short_name: "Det här nämnet kommer att visas i diskussioner, meddelanden och kommentarer."
+        short_name: "Det här namnet kommer att visas i diskussioner, meddelanden och kommentarer."
         sortable_name: "Det här namnet kommer att synas i ordnade listor."
       labels: 
         change_password: "Ändra lösenord"
@@ -14573,7 +14573,7 @@ sv:
   remove_text_8e485c41: "Ta bort %{text}"
   remove_these_dates_48453a81: "Radera dessa datumen"
   remove_this_item_from_the_module_4b2ceab7: "Ta bort det här föremålet från modulen"
-  remove_this_rubric_from_my_list_c7d80704: "Ta bort den här Rubriken från min lista"
+  remove_this_rubric_from_my_list_c7d80704: "Ta bort den här matrisen från min lista"
   remove_this_section_9a88ca43: "Ta bort den här sektionen"
   removed_user_as_group_leader_bb69330f: "Tog bort %{user} som gruppledare"
   rename_45608f54: "Döp om"
@@ -14809,7 +14809,7 @@ sv:
       account_rubrics: "Matriser på kontot"
       are_you_sure_prompt: "Är du säker på att du vill radera den här matrisen? Kurser som är associerade med den här matrisen kommer fortfarande ha tillgång till den, fast inga nya kurser kommer kunna se den."
       buttons: 
-        add_rubric: "Lägg till rubrik"
+        add_rubric: "Lägg till matris"
       course_rubrics: "Matriser i kursen"
       delete_rubric: "Ta bort matris"
       edit_rubric: "Redigera matris"
@@ -14842,7 +14842,7 @@ sv:
       prompts: 
         are_you_sure_delete: "Är du säker på att du vill radera den här rmatrisen? Kurser som är associerade med den här matrisen kommer har tillgång till den, fast inga nya kurser kommer kunna se den."
         are_you_sure_remove: "Är du säker på att du vill radera den här matrisen från din lista?"
-      remove_rubric: "Ta bort den här Rubriken från min lista"
+      remove_rubric: "Ta bort den här matrisen från min lista"
   salesforce_account_id_eb5c78ad: "Salesforce Konto-Id"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce har olika inloggningsvärdar för sanboxkonton och produktionskonton, så om du använder ett Salesforce sanboxkonto och inte markerar den här rutan kommer den inte kunna verifiera (det gäller åt andra hållet också, och du har ett produktionskonto och MARKERAR rutan kan den inte verifiera)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
@@ -15110,7 +15110,7 @@ sv:
         crosslist_this_section: "Flytta den här sektionen"
         current_enrollments: "Nuvarande registreringar"
         decrosslist_section: "Flytta tillbaka den här sektionen"
-  see_rubric_results_62a6447d: "Se rubrikresultat"
+  see_rubric_results_62a6447d: "Se matris-resultat"
   see_scoring_details_f7fd1f3b: "Se poängsättningsdetaljer"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Se vissa LTI verktyg* som fungerar utmärkt med Canvas."
   see_turnitin_results_cd9d4a6c: "Se Turnitinresultat"
@@ -15686,7 +15686,7 @@ sv:
           other: "Kom ihåg att %{count} studenter redan har utvärderats med den här matrisen. Ändrar du den kommer det påverka deras utvärderingar"
         rubric_in_use2: "Du har redan betygsatt studenter med den här matrisen. Större ändringar kan påverka deras uppgifts resultat."
       out_of: "%{points} *utav %{total}*"
-      rubric: Rubrik
+      rubric: Matris
       rubric_title: Titel
       title: "Titel:"
       titles: 
@@ -15750,7 +15750,7 @@ sv:
       labels: 
         total_points: "Totala poäng"
       points_out_of: "*%{points}* utav **%{total}**"
-      rubric: Rubrik
+      rubric: Matris
     rubric_summary_criterion: 
       defaults: 
         description: "Beskrivning av kriterium"
@@ -16007,7 +16007,7 @@ sv:
     instructure_csv: "Instructure formaterad CSV eller zipfil med CSVs"
     upload_filename: "sis_upload_%{id}.zip"
   sis_export_title: "SIS export"
-  sis_friendly_name_52b5683d: "SIS vänligt namn"
+  sis_friendly_name_52b5683d: "SIS alternativt namn"
   sis_grade_export_settings_45a9f709: "SIS betygexportinställningar"
   sis_id_4495a887: "SIS ID"
   sis_id_8c2029e1: "sis id"
