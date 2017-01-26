@@ -32,11 +32,13 @@ function bzRetainedInfoSetup() {
       ta.textContent = value;
   }
 
-  var names = document.querySelectorAll(".bz-user-name");
-  for(var i = 0; i < names.length; i++) {
-    var element = names[i];
-    element.className = "bz-user-name-showing";
-    element.textContent = ENV.current_user.display_name;
+  if(window.ENV && ENV.current_user) {
+    var names = document.querySelectorAll(".bz-user-name");
+    for(var i = 0; i < names.length; i++) {
+      var element = names[i];
+      element.className = "bz-user-name-showing";
+      element.textContent = ENV.current_user.display_name;
+    }
   }
 
   var textareas = document.querySelectorAll("[data-bz-retained]");
@@ -113,7 +115,7 @@ function getInnerHtmlWithMagicFieldsReplaced(ele) {
         replace("&", "&amp;").
         replace("\"", "&quot;").
         replace("<", "&lt;").
-        replace("\n", "<br />").
+        replace("\n", "<br />");
       n.innerHTML = h;
     } else if(o.tagName == "INPUT" && o.getAttribute("type") == "checkbox") {
       n = document.createElement("span");
@@ -138,7 +140,8 @@ function copyAssignmentDescriptionIntoAssignmentSubmission() {
   var html = getInnerHtmlWithMagicFieldsReplaced(desc);
 
   var bodHtml = tinyMCE.get("submission_body");
-  bodHtml.setContent(html);
+  if(bodHtml)
+    bodHtml.setContent(html);
 
   var bod = document.getElementById("submission_body");
   bod.value = html;
@@ -165,7 +168,7 @@ function prepareAssignmentSubmitWithMagicFields() {
   }, true);
 }
 
-document.body.addEventListener("load", function() {
+window.addEventListener("load", function() {
   var submitAssignmentLink = document.querySelector(".btn-primary.submit_assignment_link");
   if(submitAssignmentLink)
   submitAssignmentLink.addEventListener("click", function() {
