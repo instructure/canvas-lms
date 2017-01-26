@@ -54,7 +54,7 @@
     <% progress = progressions[mod.id] %>
     <div class="bz-course-part-module-box <%= progress.nil? ? '' : progress.workflow_state %> ">
       <div class="bz-module-image"><img src="<%= mod.image_url %>" alt="" /></div>
-      <h3><%= part_count %> <%= mod.name %></h3>
+      <h3><!--<%= part_count %> --><%= mod.name %></h3>
       <div><%= mod.intro_text ? mod.intro_text.html_safe : '' %></div>
       <% if progress && progress.workflow_state == 'completed' %>
         <a href="/courses/<%= @course.id %>/modules/items/<%= mod.content_tags.first.id %>" class="bz-button-pick-up">Completed</a>

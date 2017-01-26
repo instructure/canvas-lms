@@ -110,10 +110,10 @@
     <table class="formtable" style="width: 100%;">
       <tr>
         <td>
-        <%= t 'instructions.online_text_entry', "Copy and paste or type your submission right here." %>
+        <!--<%= t 'instructions.online_text_entry', "Copy and paste or type your submission right here." %>-->
             <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
         </td>
-      </tr><tr>
+      </tr><tr id="submit_assignment_online_text_form_holder">
         <td>
           <div style="text-align: right; font-size: 0.8em;">
             <a class="switch_text_entry_submission_views" href="#"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
