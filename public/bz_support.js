@@ -131,7 +131,7 @@ function getInnerHtmlWithMagicFieldsReplaced(ele) {
     o.parentNode.replaceChild(n, o);
   }
 
-  return html.innerHTML;
+  return "<div class=\"bz-magic-field-submission\">" + html.innerHTML + "</div>";
 }
 
 function copyAssignmentDescriptionIntoAssignmentSubmission() {
@@ -151,6 +151,9 @@ function prepareAssignmentSubmitWithMagicFields() {
   // only do this if we put magic field editors in the assignment
   if(!document.querySelector("#assignment_show .description input[data-bz-retained], #assignment_show .description textarea[data-bz-retained]"))
     return;
+
+  var as = document.querySelector("#assignment_show .description");
+  as.className += " bz-magic-field-assignment";
 
   // going to hide the UI
   var tab = document.querySelector("#submit_assignment_tabs li > a.submit_online_text_entry_option");
@@ -173,12 +176,17 @@ window.addEventListener("load", function() {
   if(submitAssignmentLink) {
     submitAssignmentLink.addEventListener("click", function() {
       prepareAssignmentSubmitWithMagicFields();
+      window.scrollTo(0, 0); // we want them to be up top to read and fill in from the top.
     }, true);
 
     if(location.hash == "#submit") {
       // if we go to this directly, there is no need to click the button up
       // top, so just automatically go.
       prepareAssignmentSubmitWithMagicFields();
+    } else if(submitAssignmentLink) {
+
+      if(document.querySelector("#assignment_show .description input[data-bz-retained], #assignment_show .description textarea[data-bz-retained]"))
+      submitAssignmentLink.click();
     }
   }
 }, true);
