@@ -7,7 +7,7 @@
   <% if can_do(@actual_rubric, @current_user, :update) %>
     <a href="#" class="edit_rubric_link btn button-sidebar-wide"><i class="icon-edit"></i> <%= t('titles.edit_rubric', 'Edit Rubric') %></a>
   <% else %>
-      <%= t('rubric_can_not_modify', 'Rubrics cannot be modified once they have been used in more than one place.') %>
+      <%= t('rubric_can_not_modify', 'Rubrics cannot be modified if you are a student or if they have been used in more than one place.') %>
   <% end %>
   <% if can_do(@actual_rubric, @current_user, :delete) %>
     <a href="#" class="delete_rubric_link btn button-sidebar-wide"><i class="icon-end"></i> <%= t('buttons.delete', 'Delete Rubric') %></a>

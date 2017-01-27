@@ -32,11 +32,13 @@ function bzRetainedInfoSetup() {
       ta.textContent = value;
   }
 
-  var names = document.querySelectorAll(".bz-user-name");
-  for(var i = 0; i < names.length; i++) {
-    var element = names[i];
-    element.className = "bz-user-name-showing";
-    element.textContent = ENV.current_user.display_name;
+  if(window.ENV && ENV.current_user) {
+    var names = document.querySelectorAll(".bz-user-name");
+    for(var i = 0; i < names.length; i++) {
+      var element = names[i];
+      element.className = "bz-user-name-showing";
+      element.textContent = ENV.current_user.display_name;
+    }
   }
 
   var textareas = document.querySelectorAll("[data-bz-retained]");
@@ -113,7 +115,7 @@ function getInnerHtmlWithMagicFieldsReplaced(ele) {
         replace("&", "&amp;").
         replace("\"", "&quot;").
         replace("<", "&lt;").
-        replace("\n", "<br />").
+        replace("\n", "<br />");
       n.innerHTML = h;
     } else if(o.tagName == "INPUT" && o.getAttribute("type") == "checkbox") {
       n = document.createElement("span");
@@ -129,7 +131,7 @@ function getInnerHtmlWithMagicFieldsReplaced(ele) {
     o.parentNode.replaceChild(n, o);
   }
 
-  return html.innerHTML;
+  return "<div class=\"bz-magic-field-submission\">" + html.innerHTML + "</div>";
 }
 
 function copyAssignmentDescriptionIntoAssignmentSubmission() {
@@ -138,7 +140,8 @@ function copyAssignmentDescriptionIntoAssignmentSubmission() {
   var html = getInnerHtmlWithMagicFieldsReplaced(desc);
 
   var bodHtml = tinyMCE.get("submission_body");
-  bodHtml.setContent(html);
+  if(bodHtml)
+    bodHtml.setContent(html);
 
   var bod = document.getElementById("submission_body");
   bod.value = html;
@@ -149,9 +152,12 @@ function prepareAssignmentSubmitWithMagicFields() {
   if(!document.querySelector("#assignment_show .description input[data-bz-retained], #assignment_show .description textarea[data-bz-retained]"))
     return;
 
+  var as = document.querySelector("#assignment_show .description");
+  as.className += " bz-magic-field-assignment";
+
   // going to hide the UI
-  var tab = document.querySelector("#submit_assignment_tabs li[aria-controls=\"submit_online_text_entry_form\"]");
-  tab.style.display = "none";
+  var tab = document.querySelector("#submit_assignment_tabs li > a.submit_online_text_entry_option");
+  tab.parentNode.style.display = "none";
 
   var tabcontent = document.querySelector("#submit_assignment_online_text_form_holder");
   tabcontent.style.display = "none";
@@ -165,10 +171,22 @@ function prepareAssignmentSubmitWithMagicFields() {
   }, true);
 }
 
-document.body.addEventListener("load", function() {
+window.addEventListener("load", function() {
   var submitAssignmentLink = document.querySelector(".btn-primary.submit_assignment_link");
-  if(submitAssignmentLink)
-  submitAssignmentLink.addEventListener("click", function() {
-    prepareAssignmentSubmitWithMagicFields();
-  }, true);
+  if(submitAssignmentLink) {
+    submitAssignmentLink.addEventListener("click", function() {
+      prepareAssignmentSubmitWithMagicFields();
+      window.scrollTo(0, 0); // we want them to be up top to read and fill in from the top.
+    }, true);
+
+    if(location.hash == "#submit") {
+      // if we go to this directly, there is no need to click the button up
+      // top, so just automatically go.
+      prepareAssignmentSubmitWithMagicFields();
+    } else if(submitAssignmentLink) {
+
+      if(document.querySelector("#assignment_show .description input[data-bz-retained], #assignment_show .description textarea[data-bz-retained]"))
+      submitAssignmentLink.click();
+    }
+  }
 }, true);
