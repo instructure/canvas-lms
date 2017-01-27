@@ -19,7 +19,7 @@
   <% @users.each do |user| %>
     <tr class="date">
       <td class="details"><a href="<%= user_user_notes_path(user)%>"><%= user.last_name_first %></a></td>
-      <td style="text-align:left;"><%= datetime_string(user.try_rescue(:last_user_note)) || "Never" %></td>
+      <td style="text-align:left;"><%= datetime_string(user.try_rescue(:last_user_note)) || t("Never") %></td>
       <td class="courses" style="text-align:left;">
         <% user.courses.each_with_index do |course, i| %><%= ", " if i > 0 %><a href="<%= course_user_notes_path(course) %>"><%= course.short_name %></a><% end %>
       </td>
