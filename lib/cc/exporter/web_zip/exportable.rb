@@ -5,7 +5,7 @@ module CC::Exporter::WebZip
     end
 
     def create_zip(exporter)
-      CC::Exporter::WebZip::ZipPackage.new(exporter)
+      CC::Exporter::WebZip::ZipPackage.new(exporter, course, user)
     end
 
     def convert_to_offline_web_zip

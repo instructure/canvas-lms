@@ -1,5 +1,5 @@
 # coding: utf-8
-require File.expand_path(File.dirname(__FILE__) + '/../../cc_spec_helper')
+require 'spec_helper'
 
 describe "Exportable" do
   # this class is only necessary until we get our package into a public repo
@@ -34,6 +34,11 @@ describe "Exportable" do
   class ExportableTest
     include CC::Exporter::WebZip::Exportable
 
+    def initialize(course, user)
+      @course = course
+      @user = user
+    end
+
     def attachment
       @_attachment ||= Attachment.create({
         context: Course.create,
@@ -47,14 +52,16 @@ describe "Exportable" do
     end
 
     def create_zip(exporter)
-      ZipPackageTest.new(exporter)
+      ZipPackageTest.new(exporter, @course, @student)
     end
   end
 
   context "#convert_to_web_zip" do
 
     before do
-      @web_zip_export = ExportableTest.new.convert_to_offline_web_zip
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true, user_name: 'a student')
+      @web_zip_export = ExportableTest.new(@course, @student).convert_to_offline_web_zip
     end
 
     let(:zip_path) do
