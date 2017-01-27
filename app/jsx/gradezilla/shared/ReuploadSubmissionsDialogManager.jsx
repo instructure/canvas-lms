@@ -1,10 +1,9 @@
-define([
-  'compiled/behaviors/authenticity_token',
-  'jst/re_upload_submissions_form',
-  'i18n!gradezilla',
-  'jquery',
-  'jquery.instructure_misc_helpers'
-], (authenticity_token, re_upload_submissions_form, I18n, $) => {
+import authenticity_token from 'compiled/behaviors/authenticity_token'
+import re_upload_submissions_form from 'jst/re_upload_submissions_form'
+import I18n from 'i18n!gradezilla'
+import $ from 'jquery'
+import 'jquery.instructure_misc_helpers'
+
   class ReuploadSubmissionsDialogManager {
     constructor (assignment, reuploadUrlTemplate) {
       this.assignment = assignment;
@@ -53,5 +52,4 @@ define([
     }
   }
 
-  return ReuploadSubmissionsDialogManager;
-});
+export default ReuploadSubmissionsDialogManager

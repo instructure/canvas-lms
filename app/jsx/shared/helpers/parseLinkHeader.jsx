@@ -4,7 +4,7 @@
  *
  */
 
-define([], function () {
+
 
   var regex = /<(http.*?)>; rel="([a-z]*)"/g;
 
@@ -22,6 +22,4 @@ define([], function () {
     return links;
   };
 
-  return parseLinkHeader;
-
-});
+export default parseLinkHeader

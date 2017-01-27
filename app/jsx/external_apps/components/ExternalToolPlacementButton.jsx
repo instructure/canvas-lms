@@ -1,12 +1,10 @@
-define([
-  'jquery',
-  'underscore',
-  'i18n!external_tools',
-  'react',
-  'react-modal',
-  'jsx/external_apps/lib/ExternalAppsStore',
-  'compiled/jquery.rails_flash_notifications'
-], function ($, _, I18n, React, ReactModal, store) {
+import $ from 'jquery'
+import _ from 'underscore'
+import I18n from 'i18n!external_tools'
+import React from 'react'
+import ReactModal from 'react-modal'
+import store from 'jsx/external_apps/lib/ExternalAppsStore'
+import 'compiled/jquery.rails_flash_notifications'
 
   const modalOverrides = {
     overlay : {
@@ -24,7 +22,7 @@ define([
     }
   };
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ExternalToolPlacementButton',
 
     componentDidUpdate: function() {
@@ -185,4 +183,3 @@ define([
       return false;
     }
   });
-});

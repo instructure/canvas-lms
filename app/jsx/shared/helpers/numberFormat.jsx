@@ -1,6 +1,5 @@
-define([
-  'i18nObj'
-], (I18n) => {
+import I18n from 'i18nObj'
+
   const numberFormat = {
     _format (n, options) {
       if (typeof n !== 'number' || isNaN(n)) {
@@ -14,5 +13,4 @@ define([
     }
   }
 
-  return numberFormat
-})
+export default numberFormat

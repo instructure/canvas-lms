@@ -1,4 +1,4 @@
-define([], () => {
+
   class LoginFormSwitcher {
     constructor($loginForm, $forgotPasswordForm) {
       this.$loginForm = $loginForm;
@@ -18,5 +18,4 @@ define([], () => {
     }
   }
 
-  return LoginFormSwitcher;
-});
+export default LoginFormSwitcher

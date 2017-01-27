@@ -1,23 +1,18 @@
-define([
-  'underscore',
-  'react',
-  'react-dom',
-  'jsx/due_dates/DueDateRow',
-  'jsx/due_dates/DueDateAddRowButton',
-  'jsx/due_dates/OverrideStudentStore',
-  'jsx/due_dates/StudentGroupStore',
-  'jsx/due_dates/TokenActions',
-  'compiled/models/AssignmentOverride',
-  'jsx/gradebook/AssignmentOverrideHelper',
-  'i18n!assignments',
-  'jquery',
-  'jsx/grading/helpers/GradingPeriodsHelper',
-  'timezone',
-  'compiled/jquery.rails_flash_notifications'
-], (
-  _ ,React, ReactDOM, DueDateRow, DueDateAddRowButton, OverrideStudentStore, StudentGroupStore, TokenActions,
-  Override, AssignmentOverrideHelper, I18n, $, GradingPeriodsHelper, tz
-) => {
+import _ from 'underscore'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import DueDateRow from 'jsx/due_dates/DueDateRow'
+import DueDateAddRowButton from 'jsx/due_dates/DueDateAddRowButton'
+import OverrideStudentStore from 'jsx/due_dates/OverrideStudentStore'
+import StudentGroupStore from 'jsx/due_dates/StudentGroupStore'
+import TokenActions from 'jsx/due_dates/TokenActions'
+import Override from 'compiled/models/AssignmentOverride'
+import AssignmentOverrideHelper from 'jsx/gradebook/AssignmentOverrideHelper'
+import I18n from 'i18n!assignments'
+import $ from 'jquery'
+import GradingPeriodsHelper from 'jsx/grading/helpers/GradingPeriodsHelper'
+import tz from 'timezone'
+import 'compiled/jquery.rails_flash_notifications'
 
   var DueDates = React.createClass({
 
@@ -493,5 +488,4 @@ define([
     }
   })
 
-  return DueDates
-});
+export default DueDates

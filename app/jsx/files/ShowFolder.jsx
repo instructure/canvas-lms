@@ -1,17 +1,15 @@
-define([
-  'react',
-  'underscore',
-  'i18n!react_files',
-  'compiled/react_files/components/ShowFolder',
-  'jsx/files/FilePreview',
-  'jsx/files/FolderChild',
-  'jsx/files/UploadDropZone',
-  'jsx/files/ColumnHeaders',
-  'jsx/files/CurrentUploads',
-  'jsx/files/LoadingIndicator',
-  'page',
-  'compiled/react_files/modules/FocusStore'
-], function (React, _, I18n, ShowFolder, FilePreview, FolderChild, UploadDropZone, ColumnHeaders, CurrentUploads, LoadingIndicator, page, FocusStore) {
+import React from 'react'
+import _ from 'underscore'
+import I18n from 'i18n!react_files'
+import ShowFolder from 'compiled/react_files/components/ShowFolder'
+import FilePreview from 'jsx/files/FilePreview'
+import FolderChild from 'jsx/files/FolderChild'
+import UploadDropZone from 'jsx/files/UploadDropZone'
+import ColumnHeaders from 'jsx/files/ColumnHeaders'
+import CurrentUploads from 'jsx/files/CurrentUploads'
+import LoadingIndicator from 'jsx/files/LoadingIndicator'
+import page from 'page'
+import FocusStore from 'compiled/react_files/modules/FocusStore'
 
   ShowFolder.closeFilePreview = function (url) {
     page(url)
@@ -126,5 +124,4 @@ define([
     );
   }
 
-  return React.createClass(ShowFolder);
-});
+export default React.createClass(ShowFolder)

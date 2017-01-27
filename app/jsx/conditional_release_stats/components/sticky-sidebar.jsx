@@ -1,10 +1,8 @@
-define([
-  'react',
-  'classnames',
-], (React, classnames) => {
+import React from 'react'
+import classnames from 'classnames'
   const { bool, object, func } = React.PropTypes
 
-  return class StickySidebar extends React.Component {
+export default class StickySidebar extends React.Component {
     static propTypes = {
       children: object,
       isHidden: bool,
@@ -33,4 +31,3 @@ define([
       )
     }
   }
-})

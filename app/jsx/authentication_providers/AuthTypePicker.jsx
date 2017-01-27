@@ -1,8 +1,7 @@
-define([
-  'react',
-  'i18n!account_authorization_configs',
-  'instructure-ui/Select',
-], (React, I18n, { default: Select }) => {
+import React from 'react'
+import I18n from 'i18n!account_authorization_configs'
+import Select from 'instructure-ui/Select'
+
   class AuthTypePicker extends React.Component {
 
     static propTypes = {
@@ -65,5 +64,4 @@ define([
 
   }
 
-  return AuthTypePicker;
-});
+export default AuthTypePicker

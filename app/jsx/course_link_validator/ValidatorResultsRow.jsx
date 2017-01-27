@@ -1,7 +1,5 @@
-define([
-  'react',
-  'i18n!link_validator'
-], function(React, I18n) {
+import React from 'react'
+import I18n from 'i18n!link_validator'
   var ValidatorResultsRow = React.createClass({
     render () {
       var invalid_links = this.props.result.invalid_links;
@@ -42,5 +40,4 @@ define([
     }
   });
 
-  return ValidatorResultsRow;
-});
+export default ValidatorResultsRow

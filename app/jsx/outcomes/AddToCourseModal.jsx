@@ -1,13 +1,11 @@
-define([
-  'react',
-  'i18n!outcomes',
-  'instructure-ui/Button',
-  'instructure-ui/Modal',
-  'instructure-ui/Heading',
-  'instructure-ui/Typography',
-], (React, I18n, { default: Button }, { default: Modal, ModalHeader, ModalBody, ModalFooter }, { default: Heading }, { default: Typography }) => {
+import React from 'react'
+import I18n from 'i18n!outcomes'
+import Button from 'instructure-ui/Button'
+import Modal, { ModalHeader, ModalBody, ModalFooter } from 'instructure-ui/Modal'
+import Heading from 'instructure-ui/Heading'
+import Typography from 'instructure-ui/Typography'
 
-  return React.createClass({
+export default React.createClass({
     proptypes: {
       onClose: React.PropTypes.func,
       onReady: React.PropTypes.func
@@ -62,4 +60,3 @@ define([
       }.bind(this), 0);
     }
   });
-});

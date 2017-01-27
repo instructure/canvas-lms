@@ -1,18 +1,16 @@
-define([
-  'underscore',
-  'i18n!external_tools',
-  'react',
-  'jsx/external_apps/components/EditExternalToolButton',
-  'jsx/external_apps/components/ManageUpdateExternalToolButton',
-  'jsx/external_apps/components/ExternalToolPlacementButton',
-  'jsx/external_apps/components/DeleteExternalToolButton',
-  'jsx/external_apps/components/ConfigureExternalToolButton',
-  'jsx/external_apps/components/ReregisterExternalToolButton',
-  'jsx/external_apps/lib/classMunger',
-  'jquery.instructure_misc_helpers'
-], function(_, I18n, React, EditExternalToolButton, ManageUpdateExternalToolButton, ExternalToolPlacementButton, DeleteExternalToolButton, ConfigureExternalToolButton, ReregisterExternalToolButton, classMunger) {
+import _ from 'underscore'
+import I18n from 'i18n!external_tools'
+import React from 'react'
+import EditExternalToolButton from 'jsx/external_apps/components/EditExternalToolButton'
+import ManageUpdateExternalToolButton from 'jsx/external_apps/components/ManageUpdateExternalToolButton'
+import ExternalToolPlacementButton from 'jsx/external_apps/components/ExternalToolPlacementButton'
+import DeleteExternalToolButton from 'jsx/external_apps/components/DeleteExternalToolButton'
+import ConfigureExternalToolButton from 'jsx/external_apps/components/ConfigureExternalToolButton'
+import ReregisterExternalToolButton from 'jsx/external_apps/components/ReregisterExternalToolButton'
+import classMunger from 'jsx/external_apps/lib/classMunger'
+import 'jquery.instructure_misc_helpers'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ExternalToolsTableRow',
 
     propTypes: {
@@ -114,4 +112,3 @@ define([
       );
     }
   });
-});

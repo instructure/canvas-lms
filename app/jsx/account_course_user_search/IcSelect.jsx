@@ -1,7 +1,5 @@
-define([
-  "react",
-  "./IcInput"
-], function(React, IcInput) {
+import React from 'react'
+import IcInput from './IcInput'
 
   var { string } = React.PropTypes;
 
@@ -27,6 +25,4 @@ define([
       );
     }
   });
-  return IcSelect;
-});
-
+export default IcSelect

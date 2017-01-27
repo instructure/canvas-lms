@@ -1,6 +1,4 @@
-define([
-  'jquery'
-], function ($) {
+import $ from 'jquery'
   /* This file contains code specific to weird edge cases that can be removed later. For instance, if you
    * are writing some weird code around something that is broken in Jaws, it can live here 
    */ 
@@ -14,5 +12,4 @@ define([
     }
   }
 
-  return codeToRemoveLater;
-});
+export default codeToRemoveLater

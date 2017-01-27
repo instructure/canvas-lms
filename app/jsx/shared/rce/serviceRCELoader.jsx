@@ -1,11 +1,9 @@
-define([
-  'jquery',
-  'underscore',
-  'jsx/shared/rce/editorOptions',
-  'jsx/shared/rce/loadEventListeners',
-  'jsx/shared/rce/polyfill',
-  'compiled/str/splitAssetString'
-], function($, _, editorOptions, loadEventListeners, polyfill, splitAssetString) {
+import $ from 'jquery'
+import _ from 'underscore'
+import editorOptions from 'jsx/shared/rce/editorOptions'
+import loadEventListeners from 'jsx/shared/rce/loadEventListeners'
+import polyfill from 'jsx/shared/rce/polyfill'
+import splitAssetString from 'compiled/str/splitAssetString'
 
   let refreshToken = function(callback){
     return $.post("/api/v1/jwts").done((response)=>{
@@ -205,5 +203,4 @@ define([
     }
   }
 
-  return RCELoader;
-});
+export default RCELoader

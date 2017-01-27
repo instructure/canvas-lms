@@ -1,7 +1,5 @@
-define([
-  'redux',
-  '../actions/collaborationsActions'
-], (redux, ACTION_NAMES) => {
+import redux from 'redux'
+import ACTION_NAMES from '../actions/collaborationsActions'
   let initialState = {
     updateCollaborationPending: false,
     updateCollaborationSuccessful: false,
@@ -41,5 +39,4 @@ define([
     }
   };
 
-  return updateReducer;
-});
+export default updateReducer

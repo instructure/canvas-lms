@@ -1,7 +1,6 @@
-define([
-  'axios',
-  'jsx/shared/helpers/parseLinkHeader',
-], (axios, parseLinkHeader) => {
+import axios from 'axios'
+import parseLinkHeader from 'jsx/shared/helpers/parseLinkHeader'
+
   const ApiClient = {
     _depaginate (url, allResults = []) {
       return axios.get(url)
@@ -56,5 +55,4 @@ define([
     }
   }
 
-  return ApiClient
-})
+export default ApiClient

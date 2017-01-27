@@ -1,9 +1,7 @@
-define([
-  'react',
-  'i18n!external_tools',
-  'jsx/shared/helpers/numberHelper',
-],
-(React, I18n, numberHelper) => {
+import React from 'react'
+import I18n from 'i18n!external_tools'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
+
   const { bool, func, number } = React.PropTypes;
 
   var DataRow = React.createClass({
@@ -185,5 +183,4 @@ define([
     }
   });
 
-  return DataRow;
-});
+export default DataRow

@@ -1,12 +1,10 @@
-define([
-  'react',
-  'i18n!react_files',
-  'classnames',
-  'compiled/react_files/components/Breadcrumbs',
-  'compiled/react_files/modules/filesEnv',
-  'jsx/files/BreadcrumbCollapsedContainer',
-  'compiled/str/splitAssetString'
-], function(React, I18n, classnames, Breadcrumbs, filesEnv, BreadcrumbCollapsedContainer, splitAssetString) {
+import React from 'react'
+import I18n from 'i18n!react_files'
+import classnames from 'classnames'
+import Breadcrumbs from 'compiled/react_files/components/Breadcrumbs'
+import filesEnv from 'compiled/react_files/modules/filesEnv'
+import BreadcrumbCollapsedContainer from 'jsx/files/BreadcrumbCollapsedContainer'
+import splitAssetString from 'compiled/str/splitAssetString'
 
   var MAX_CRUMB_WIDTH = 500
   var MIN_CRUMB_WIDTH = 80;
@@ -100,5 +98,4 @@ define([
     );
   };
 
-  return React.createClass(Breadcrumbs);
-});
+export default React.createClass(Breadcrumbs)

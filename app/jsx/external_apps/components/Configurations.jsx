@@ -1,12 +1,10 @@
-define([
-  'i18n!external_tools',
-  'react',
-  'jsx/external_apps/components/Header',
-  'jsx/external_apps/components/ExternalToolsTable',
-  'jsx/external_apps/components/AddExternalToolButton',
-  'page'
-], function(I18n, React, Header, ExternalToolsTable, AddExternalToolButton, page) {
-  return React.createClass({
+import I18n from 'i18n!external_tools'
+import React from 'react'
+import Header from 'jsx/external_apps/components/Header'
+import ExternalToolsTable from 'jsx/external_apps/components/ExternalToolsTable'
+import AddExternalToolButton from 'jsx/external_apps/components/AddExternalToolButton'
+import page from 'page'
+export default React.createClass({
     displayName: 'Configurations',
 
     propTypes: {
@@ -37,4 +35,3 @@ define([
       );
     }
   });
-});

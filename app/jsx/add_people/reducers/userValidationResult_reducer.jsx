@@ -1,10 +1,9 @@
-define([
-  'underscore',
-  'redux',
-  'redux-actions',
-  '../actions',
-  '../store'
-], (_, redux, { handleActions }, {actions, actionTypes}, {defaultState}) => {
+import _ from 'underscore'
+import redux from 'redux'
+import { handleActions } from 'redux-actions'
+import {actions, actionTypes} from '../actions'
+import {defaultState} from '../store'
+
   // helpers -------------------------------
   // the api returns duplicates as nested arrays
   // inner array is of users sharing the searched address
@@ -53,7 +52,7 @@ define([
   }
 
   // the module -----------------------------------
-  return handleActions({
+export default handleActions({
     // no action.payload
     [actionTypes.VALIDATE_USERS_START]: (state, /* action */) => {
       // reset state
@@ -127,4 +126,3 @@ define([
     }
 
   }, defaultState.userValidationResult);
-});

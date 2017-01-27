@@ -1,21 +1,12 @@
-define([
-  'react',
-  'i18n!custom_help_link',
-  './CustomHelpLinkIconInput',
-  'jsx/shared/icons/IconCog',
-  'jsx/shared/icons/IconFolder',
-  'jsx/shared/icons/IconInformation',
-  'jsx/shared/icons/IconLifePreserver',
-  'jsx/shared/icons/IconQuestionMark'
-], function(
-    React,
-    I18n,
-    CustomHelpLinkIconInput,
-    IconCog,
-    IconFolder,
-    IconInformation,
-    IconLifePreserver,
-    IconQuestionMark) {
+import React from 'react'
+import I18n from 'i18n!custom_help_link'
+import CustomHelpLinkIconInput from './CustomHelpLinkIconInput'
+import IconCog from 'jsx/shared/icons/IconCog'
+import IconFolder from 'jsx/shared/icons/IconFolder'
+import IconInformation from 'jsx/shared/icons/IconInformation'
+import IconLifePreserver from 'jsx/shared/icons/IconLifePreserver'
+import IconQuestionMark from 'jsx/shared/icons/IconQuestionMark'
+
   const CustomHelpLinkIcons = React.createClass({
     propTypes: {
       defaultValue: React.PropTypes.string
@@ -70,5 +61,4 @@ define([
     }
   });
 
-  return CustomHelpLinkIcons;
-});
+export default CustomHelpLinkIcons

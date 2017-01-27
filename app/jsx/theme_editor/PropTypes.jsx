@@ -1,7 +1,5 @@
-define([
-  'react',
-  'underscore'
-], (React, _) => {
+import React from 'react'
+import _ from 'underscore'
 
   const MD5_REGEX = /[0-9a-fA-F]{32}$/
   const types = {}
@@ -69,5 +67,4 @@ define([
 
   types.brandableVariableDefaults = React.PropTypes.objectOf(types.variableDescription)
 
-  return types
-});
+export default types

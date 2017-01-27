@@ -1,12 +1,10 @@
-define([
-  'underscore',
-  'react',
-  'jsx/due_dates/DueDateTokenWrapper',
-  'jsx/due_dates/DueDateCalendars',
-  'jsx/due_dates/DueDateRemoveRowLink',
-  'i18n!assignments',
-  'jquery'
-], (_ , React, DueDateTokenWrapper, DueDateCalendars, DueDateRemoveRowLink, I18n, $) => {
+import _ from 'underscore'
+import React from 'react'
+import DueDateTokenWrapper from 'jsx/due_dates/DueDateTokenWrapper'
+import DueDateCalendars from 'jsx/due_dates/DueDateCalendars'
+import DueDateRemoveRowLink from 'jsx/due_dates/DueDateRemoveRowLink'
+import I18n from 'i18n!assignments'
+import $ from 'jquery'
 
 
   var DueDateRow = React.createClass({
@@ -192,5 +190,4 @@ define([
 
   })
 
-  return DueDateRow
-});
+export default DueDateRow

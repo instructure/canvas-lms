@@ -1,9 +1,8 @@
-define([
-  'react',
-  'i18n!appointment_groups',
-  'instructure-ui/Button',
-  'instructure-ui/Grid',
-], (React, I18n, { default: Button }, { default: Grid, GridCol, GridRow }) => {
+import React from 'react'
+import I18n from 'i18n!appointment_groups'
+import Button from 'instructure-ui/Button'
+import Grid, { GridCol, GridRow } from 'instructure-ui/Grid'
+
   class ContextSelector extends React.Component {
     static propTypes = {
       appointmentGroup: React.PropTypes.object,
@@ -275,5 +274,4 @@ define([
     }
   }
 
-  return ContextSelector
-})
+export default ContextSelector

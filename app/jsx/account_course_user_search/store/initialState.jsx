@@ -1,6 +1,4 @@
-define([
-  './tabList'
-], function (tabList) {
+import tabList from './tabList'
 
   const initialState = {
     userList: {
@@ -20,7 +18,4 @@ define([
     }
   };
 
-
-  return initialState;
-});
-
+export default initialState

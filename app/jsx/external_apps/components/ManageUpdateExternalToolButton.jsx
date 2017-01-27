@@ -1,12 +1,10 @@
-define([
-  'jquery',
-  'i18n!external_tools',
-  'react',
-  'jsx/external_apps/components/Lti2ReregistrationUpdateModal',
-  'jsx/external_apps/lib/ExternalAppsStore'
-], function ($, I18n, React, Lti2ReregistrationUpdateModal, store) {
+import $ from 'jquery'
+import I18n from 'i18n!external_tools'
+import React from 'react'
+import Lti2ReregistrationUpdateModal from 'jsx/external_apps/components/Lti2ReregistrationUpdateModal'
+import store from 'jsx/external_apps/lib/ExternalAppsStore'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ManageUpdateExternalToolButton',
 
     propTypes: {
@@ -31,4 +29,3 @@ define([
       )
     }
   });
-});

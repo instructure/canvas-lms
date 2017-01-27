@@ -1,9 +1,7 @@
-define([
-  'react',
-  'compiled/models/Folder',
-  'compiled/util/mimeClass',
-  'compiled/react_files/components/FilesystemObjectThumbnail'
-], function (React, Folder, mimeClass, FilesystemObjectThumbnail) {
+import React from 'react'
+import Folder from 'compiled/models/Folder'
+import mimeClass from 'compiled/util/mimeClass'
+import FilesystemObjectThumbnail from 'compiled/react_files/components/FilesystemObjectThumbnail'
 
   FilesystemObjectThumbnail.render = function () {
     var additionalClassName = this.props.className ? this.props.className : '';
@@ -27,6 +25,4 @@ define([
     }
   };
 
-  return React.createClass(FilesystemObjectThumbnail);
-
-});
+export default React.createClass(FilesystemObjectThumbnail)

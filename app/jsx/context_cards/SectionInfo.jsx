@@ -1,8 +1,6 @@
-define([
-  'react',
-  'underscore',
-  'i18n!student_context_tray'
-], (React, _, I18n) => {
+import React from 'react'
+import _ from 'underscore'
+import I18n from 'i18n!student_context_tray'
 
   class SectionInfo extends React.Component {
     static propTypes = {
@@ -46,5 +44,4 @@ define([
     }
   }
 
-  return SectionInfo
-})
+export default SectionInfo

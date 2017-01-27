@@ -1,15 +1,13 @@
-define([
-  'react',
-  'react-dom',
-  'i18n!outcomes',
-  'instructure-ui/PopoverMenu',
-  'instructure-ui/Button',
-  'instructure-ui/Menu',
-  'instructure-ui/ScreenReaderContent',
-  'jsx/outcomes/AddToCourseModal'
-], (React, ReactDOM, I18n, { default: PopoverMenu }, { default: Button }, { default: Menu, MenuItem, MenuItemSeparator }, { default: ScreenReaderContent }, AddToCourseModal) => {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import I18n from 'i18n!outcomes'
+import PopoverMenu from 'instructure-ui/PopoverMenu'
+import Button from 'instructure-ui/Button'
+import Menu, { MenuItem, MenuItemSeparator } from 'instructure-ui/Menu'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import AddToCourseModal from 'jsx/outcomes/AddToCourseModal'
 
-  return React.createClass({
+export default React.createClass({
     propTypes: {
       contextUrlRoot: React.PropTypes.string,
       permissions: React.PropTypes.object
@@ -75,4 +73,3 @@ define([
       this.refs.popovermenu.focus();
     }
   });
-});

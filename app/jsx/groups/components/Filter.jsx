@@ -1,7 +1,5 @@
-define([
-  'i18n!student_groups',
-  'react'
-], (I18n, React) => {
+import I18n from 'i18n!student_groups'
+import React from 'react'
   var Filter = React.createClass({
     render() {
       return (
@@ -12,5 +10,4 @@ define([
     }
   });
 
-  return Filter;
-});
+export default Filter

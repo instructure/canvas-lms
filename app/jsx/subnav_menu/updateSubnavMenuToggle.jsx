@@ -1,6 +1,4 @@
-define([
-  'i18n!subnav_menu_toggle'
-], (I18n) => {
+import I18n from 'i18n!subnav_menu_toggle'
   const updateSubnavMenuToggle = function (pathname = window.location.pathname) {
     // update subnav menu toggle for accessibility
     const subnavMenuTranslations = {
@@ -39,6 +37,4 @@ define([
     subnavMenuToggle.setAttribute('title', subnavMenuToggleText)
   }
 
-  return updateSubnavMenuToggle
-})
-
+export default updateSubnavMenuToggle

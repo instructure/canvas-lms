@@ -1,4 +1,5 @@
-define(['underscore', 'Backbone'], function(_, Backbone) {
+import _ from 'underscore'
+import Backbone from 'Backbone'
 
   /**
    * Creates a data store with some initial state.
@@ -67,6 +68,4 @@ define(['underscore', 'Backbone'], function(_, Backbone) {
     };
   };
 
-  return createStore;
-});
-
+export default createStore

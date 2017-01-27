@@ -1,10 +1,9 @@
-define([
-  'react',
-  './student-range-item',
-], (React, StudentRangeItem) => {
+import React from 'react'
+import StudentRangeItem from './student-range-item'
+
   const { object, func } = React.PropTypes
 
-  return class StudentRange extends React.Component {
+export default class StudentRange extends React.Component {
     static propTypes = {
       range: object.isRequired,
       onStudentSelect: func.isRequired,
@@ -28,4 +27,3 @@ define([
       )
     }
   }
-})

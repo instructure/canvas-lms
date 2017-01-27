@@ -1,12 +1,10 @@
-define([
-  'i18n!course_wizard'
-  ], function (I18n) {
+import I18n from 'i18n!course_wizard'
     /**
      * Returns an array containing all the possible items for the checklist
      * For many ListItems, the ! is added for the complete property
      *  because the ENV is checking if the step is nil? or empty?
      */
-    return [
+export default [
       {
         key:'content_import',
         complete: !ENV.COURSE_WIZARD.checklist_states.import_step,
@@ -79,6 +77,3 @@ define([
         iconClass: 'icon-publish'
       }
     ]
-})
-
-

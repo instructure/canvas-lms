@@ -1,11 +1,10 @@
-define([
-  'i18n!roster',
-  'react',
-  './shapes',
-  './duplicate_section',
-  './missing_people_section',
-  'instructure-ui/Alert'
-], (I18n, React, shapes, DuplicateSection, MissingPeopleSection, {default: Alert}) => {
+import I18n from 'i18n!roster'
+import React from 'react'
+import shapes from './shapes'
+import DuplicateSection from './duplicate_section'
+import MissingPeopleSection from './missing_people_section'
+import Alert from 'instructure-ui/Alert'
+
   class PeopleValidationIssues extends React.Component {
     static propTypes = {
       searchType: React.PropTypes.string.isRequired,
@@ -126,5 +125,4 @@ define([
     }
   }
 
-  return PeopleValidationIssues;
-});
+export default PeopleValidationIssues

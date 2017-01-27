@@ -1,12 +1,10 @@
-define([
-  'i18n!react_files',
-  'react',
-  'react-dom',
-  'compiled/react_files/modules/customPropTypes',
-  'compiled/models/Folder',
-  'compiled/react_files/modules/filesEnv',
-  'jsx/files/UsageRightsDialog'
-], function (I18n, React, ReactDOM, customPropTypes, Folder, filesEnv, UsageRightsDialog) {
+import I18n from 'i18n!react_files'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import customPropTypes from 'compiled/react_files/modules/customPropTypes'
+import Folder from 'compiled/models/Folder'
+import filesEnv from 'compiled/react_files/modules/filesEnv'
+import UsageRightsDialog from 'jsx/files/UsageRightsDialog'
 
   var UsageRightsIndicator = React.createClass({
     displayName: 'UsageRightsIndicator',
@@ -99,5 +97,4 @@ define([
     }
   });
 
-  return UsageRightsIndicator;
-});
+export default UsageRightsIndicator

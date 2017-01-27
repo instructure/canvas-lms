@@ -1,11 +1,9 @@
-define([
-  'i18n!theme_collection_view',
-  'react',
-  'underscore',
-  './PropTypes',
-  './submitHtmlForm',
-  './ThemeCard'
-], (I18n, React, _, customTypes, submitHtmlForm, ThemeCard) => {
+import I18n from 'i18n!theme_collection_view'
+import React from 'react'
+import _ from 'underscore'
+import customTypes from './PropTypes'
+import submitHtmlForm from './submitHtmlForm'
+import ThemeCard from './ThemeCard'
 
   const blankConfig = {
     name: I18n.t('Default Template'),
@@ -17,7 +15,7 @@ define([
 
   const isSystemTheme = (sharedBrandConfig) => !sharedBrandConfig.account_id
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'CollectionView',
 
     propTypes: {
@@ -228,4 +226,3 @@ define([
       )
     }
   })
-})

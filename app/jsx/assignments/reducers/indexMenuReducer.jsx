@@ -1,12 +1,12 @@
-define([
-  'underscore',
-  '../actions/IndexMenuActions',
-], function (_, IndexMenuActions) {
-  // CONSTANTS //
-  const SET_MODAL_OPEN = IndexMenuActions.SET_MODAL_OPEN;
-  const LAUNCH_TOOL = IndexMenuActions.LAUNCH_TOOL;
-  const SET_TOOLS = IndexMenuActions.SET_TOOLS;
-  const SET_WEIGHTED = IndexMenuActions.SET_WEIGHTED;
+import _ from 'underscore'
+import IndexMenuActions from '../actions/IndexMenuActions'
+
+  const {
+    SET_MODAL_OPEN,
+    LAUNCH_TOOL,
+    SET_TOOLS,
+    SET_WEIGHTED
+  } = IndexMenuActions;
 
   const initialState = {
     externalTools: [],
@@ -46,7 +46,7 @@ define([
     },
   };
 
-  return function reducer (state, action) {
+  function reducer (state, action) {
     const prevState = state || initialState;
     const handler = handlers[action.type];
 
@@ -54,4 +54,5 @@ define([
 
     return prevState;
   };
-});
+
+export default reducer

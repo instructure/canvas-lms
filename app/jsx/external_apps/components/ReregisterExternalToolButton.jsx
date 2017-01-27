@@ -1,16 +1,14 @@
-define([
-  'jquery',
-  'underscore',
-  'i18n!external_tools',
-  'react',
-  'react-modal',
-  'jsx/external_apps/components/Lti2Iframe',
-  'jsx/external_apps/components/Lti2ReregistrationUpdateModal',
-  'jsx/external_apps/lib/ExternalAppsStore',
-  'compiled/jquery.rails_flash_notifications'
-], function ($, _, I18n, React, ReactModal, Lti2Iframe, Lti2ReregistrationUpdateModal, store) {
+import $ from 'jquery'
+import _ from 'underscore'
+import I18n from 'i18n!external_tools'
+import React from 'react'
+import ReactModal from 'react-modal'
+import Lti2Iframe from 'jsx/external_apps/components/Lti2Iframe'
+import Lti2ReregistrationUpdateModal from 'jsx/external_apps/components/Lti2ReregistrationUpdateModal'
+import store from 'jsx/external_apps/lib/ExternalAppsStore'
+import 'compiled/jquery.rails_flash_notifications'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ReregisterExternalToolButton',
 
     componentDidUpdate: function () {
@@ -115,4 +113,3 @@ define([
     }
 
   });
-});

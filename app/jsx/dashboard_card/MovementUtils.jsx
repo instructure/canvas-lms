@@ -1,4 +1,4 @@
-define(['axios'], (axios) => {
+import axios from 'axios'
   // Updates the positions of a given group of contexts asynchronously
   const updatePositions = (newPositions, userId, ajaxLib = axios) => {
     const request = {};
@@ -9,7 +9,6 @@ define(['axios'], (axios) => {
     return ajaxLib.put(`/api/v1/users/${userId}/dashboard_positions`, request);
   };
 
-  return {
+export default {
     updatePositions
   };
-});

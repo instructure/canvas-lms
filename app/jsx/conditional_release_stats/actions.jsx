@@ -1,7 +1,6 @@
-define([
-  './cyoe-api',
-  './helpers/actions',
-], (cyoeClient, { createActions }) => {
+import cyoeClient from './cyoe-api'
+import { createActions } from './helpers/actions'
+
   const actionDefs = [
     'SET_INITIAL_DATA',
     'SET_SCORING_RANGES',
@@ -21,7 +20,7 @@ define([
     'LOAD_STUDENT_DETAILS_END',
   ]
 
-  const { actions, actionTypes } = createActions(actionDefs)
+  export const { actions, actionTypes } = createActions(actionDefs)
 
   actions.loadInitialData = (assignment) => {
     return (dispatch, getState) => {
@@ -72,6 +71,3 @@ define([
       }
     }
   }
-
-  return { actions, actionTypes }
-})

@@ -1,18 +1,16 @@
-define([
-  'i18n!react_files',
-  'react',
-  'compiled/react_files/components/FolderChild',
-  'compiled/react_files/modules/filesEnv',
-  'classnames',
-  'jsx/files/ItemCog',
-  'jsx/shared/PublishCloud',
-  'jsx/files/FilesystemObjectThumbnail',
-  'jsx/files/UsageRightsIndicator',
-  'compiled/models/Folder',
-  'compiled/fn/preventDefault',
-  'jsx/shared/FriendlyDatetime',
-  'compiled/util/friendlyBytes'
-], function(I18n, React, FolderChild, filesEnv, classnames, ItemCog, PublishCloud, FilesystemObjectThumbnail, UsageRightsIndicator, Folder, preventDefault, FriendlyDatetime, friendlyBytes) {
+import I18n from 'i18n!react_files'
+import React from 'react'
+import FolderChild from 'compiled/react_files/components/FolderChild'
+import filesEnv from 'compiled/react_files/modules/filesEnv'
+import classnames from 'classnames'
+import ItemCog from 'jsx/files/ItemCog'
+import PublishCloud from 'jsx/shared/PublishCloud'
+import FilesystemObjectThumbnail from 'jsx/files/FilesystemObjectThumbnail'
+import UsageRightsIndicator from 'jsx/files/UsageRightsIndicator'
+import Folder from 'compiled/models/Folder'
+import preventDefault from 'compiled/fn/preventDefault'
+import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
+import friendlyBytes from 'compiled/util/friendlyBytes'
 
   FolderChild.renderItemCog = function (canManage) {
     if (!this.props.model.isNew() || this.props.model.get('locked_for_user')) {
@@ -213,5 +211,4 @@ define([
     );
   }
 
-  return React.createClass(FolderChild);
-});
+export default React.createClass(FolderChild)

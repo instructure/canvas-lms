@@ -1,14 +1,11 @@
-define([
-  'react',
-  'react-dom',
-  'react-addons-update',
-  'jsx/grading/dataRow',
-  'jquery',
-  'i18n!external_tools',
-  'underscore',
-  'compiled/str/splitAssetString'
-],
-function(React, ReactDOM , update, DataRow, $, I18n, _, splitAssetString) {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import update from 'react-addons-update'
+import DataRow from 'jsx/grading/dataRow'
+import $ from 'jquery'
+import I18n from 'i18n!external_tools'
+import _ from 'underscore'
+import splitAssetString from 'compiled/str/splitAssetString'
   var GradingStandard = React.createClass({
 
     getInitialState: function() {
@@ -355,6 +352,4 @@ function(React, ReactDOM , update, DataRow, $, I18n, _, splitAssetString) {
     }
   });
 
-  return GradingStandard;
-
-});
+export default GradingStandard

@@ -1,8 +1,7 @@
-define([
-  'i18n!gradebook',
-  'jsx/shared/helpers/numberHelper',
-  'compiled/util/round'
-], (I18n, numberHelper, round) => {
+import I18n from 'i18n!gradebook'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
+import round from 'compiled/util/round'
+
   const POINTS = 'points';
   const PERCENT = 'percent';
 
@@ -84,5 +83,4 @@ define([
     }
   }
 
-  return new GradeFormatHelper();
-});
+export default new GradeFormatHelper()

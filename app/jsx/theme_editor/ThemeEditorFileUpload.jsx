@@ -1,10 +1,8 @@
-define([
-  'react',
-  './PropTypes',
-  'i18n!theme_editor'
-], (React, customTypes, I18n) => {
+import React from 'react'
+import customTypes from './PropTypes'
+import I18n from 'i18n!theme_editor'
 
-  return React.createClass({
+export default React.createClass({
 
     displayName: 'ThemeEditorFileUpload',
 
@@ -142,4 +140,3 @@ define([
       )
     }
   })
-});

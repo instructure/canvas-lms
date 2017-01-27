@@ -1,18 +1,11 @@
-define([
-  'react',
-  'jquery',
-  'i18n!eportfolio',
-  'instructure-ui/Modal',
-  'instructure-ui/Button',
-  'instructure-ui/Heading',
-  'instructure-ui/Typography',
-  'instructure-ui/Select'
-], function(React, $, I18n,
-  { default: Modal, ModalHeader, ModalBody, ModalFooter },
-  { default: Button },
-  { default: Heading },
-  { default: Typography },
-  { default: Select }) {
+import React from 'react'
+import $ from 'jquery'
+import I18n from 'i18n!eportfolio'
+import Modal, {ModalHeader, ModalBody, ModalFooter } from 'instructure-ui/Modal'
+import Button from 'instructure-ui/Button'
+import Heading from 'instructure-ui/Heading'
+import Typography from 'instructure-ui/Typography'
+import Select from 'instructure-ui/Select'
 
   var MoveToDialog = React.createClass({
     propTypes: {
@@ -107,5 +100,4 @@ define([
       )
     }
   });
-  return MoveToDialog;
-});
+export default MoveToDialog

@@ -1,12 +1,10 @@
-define([
-  'react',
-  'react-dom',
-  'jsx/shared/DatetimeDisplay',
-  './DeleteConfirmation',
-  'i18n!react_collaborations',
-  'compiled/str/splitAssetString',
-  'jsx/collaborations/store/store'
-], (React, ReactDOM, DatetimeDisplay, DeleteConfirmation, i18n, splitAssetString, store) => {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import DatetimeDisplay from 'jsx/shared/DatetimeDisplay'
+import DeleteConfirmation from './DeleteConfirmation'
+import i18n from 'i18n!react_collaborations'
+import splitAssetString from 'compiled/str/splitAssetString'
+import store from 'jsx/collaborations/store/store'
   class Collaboration extends React.Component {
     constructor (props) {
       super(props);
@@ -79,5 +77,4 @@ define([
     deleteCollaboration: React.PropTypes.func
   };
 
-  return Collaboration
-});
+export default Collaboration

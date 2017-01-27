@@ -1,4 +1,5 @@
-define(['underscore', 'Backbone'], function(_, Backbone) {
+import _ from 'underscore'
+import Backbone from 'Backbone'
 
   class NewFilesStore {
 
@@ -84,6 +85,4 @@ define(['underscore', 'Backbone'], function(_, Backbone) {
     }
   }
 
-  return NewFilesStore;
-
-});
+export default NewFilesStore

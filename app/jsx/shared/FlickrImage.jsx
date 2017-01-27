@@ -1,6 +1,4 @@
-define([
-  'react'
-], (React) => {
+import React from 'react'
 
   class FlickrImage extends React.Component {
     constructor (props) {
@@ -36,6 +34,4 @@ define([
     }
   }
 
-  return FlickrImage;
-
-});
+export default FlickrImage

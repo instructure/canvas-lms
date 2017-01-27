@@ -1,10 +1,8 @@
-define([
-  'react-dnd',
-  'react-dnd-html5-backend',
-  'jsx/shared/helpers/compose',
-  './Types',
-  './DashboardCardBox'
-], ({ DragDropContext, DropTarget }, ReactDnDHTML5Backend, compose, ItemTypes, DashboardCardBox) => {
+import { DragDropContext, DropTarget } from 'react-dnd'
+import ReactDnDHTML5Backend from 'react-dnd-html5-backend'
+import compose from 'jsx/shared/helpers/compose'
+import ItemTypes from './Types'
+import DashboardCardBox from './DashboardCardBox'
   const cardTarget = {
     drop () {}
   };
@@ -20,5 +18,4 @@ define([
     /* eslint-enable new-cap */
   );
 
-  return getDroppableDashboardCardBox;
-});
+export default getDroppableDashboardCardBox

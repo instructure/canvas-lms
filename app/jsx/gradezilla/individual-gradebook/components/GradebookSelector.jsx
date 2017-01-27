@@ -16,16 +16,14 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-define([
-  'underscore',
-  'react',
-  'instructure-icons/react/Solid/IconMiniArrowDownSolid',
-  'instructure-ui/Select',
-  'instructure-ui/Typography',
-  'instructure-ui/ScreenReaderContent',
-  'i18n!gradebook'
-], ({ head, tail }, React, { default: IconMiniArrowDownSolid }, { default: Select }, { default: Typography },
-  { default: ScreenReaderContent }, I18n) => {
+import { head, tail } from 'underscore'
+import React from 'react'
+import IconMiniArrowDownSolid from 'instructure-icons/react/Solid/IconMiniArrowDownSolid'
+import Select from 'instructure-ui/Select'
+import Typography from 'instructure-ui/Typography'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import I18n from 'i18n!gradebook'
+
   const INDIVIDUAL_GRADEBOOK = 'IndividualGradebook';
   const LEARNING_MASTERY = 'LearningMastery';
 
@@ -139,5 +137,4 @@ define([
     }
   }
 
-  return GradebookSelector;
-});
+export default GradebookSelector;

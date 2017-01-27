@@ -1,10 +1,8 @@
-define([
-  'i18n!external_tools',
-  'react',
-  'str/htmlEscape'
-], function (I18n, React, htmlEscape) {
+import I18n from 'i18n!external_tools'
+import React from 'react'
+import htmlEscape from 'str/htmlEscape'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'Lti2Permissions',
 
     propTypes: {
@@ -36,5 +34,3 @@ define([
       )
     }
   });
-
-});

@@ -1,8 +1,6 @@
-define([
-  'react',
-  'i18n!student_context_tray',
-  'instructure-ui'
-], (React, I18n, { MetricsList: InstUIMetricsList, MetricsListItem }) => {
+import React from 'react'
+import I18n from 'i18n!student_context_tray'
+import { MetricsList as InstUIMetricsList, MetricsListItem } from 'instructure-ui'
   class MetricsList extends React.Component {
     static propTypes = {
       analytics: React.PropTypes.object,
@@ -65,5 +63,4 @@ define([
     }
   }
 
-  return MetricsList
-})
+export default MetricsList

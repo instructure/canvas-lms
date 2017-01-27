@@ -1,11 +1,9 @@
-define([
-  'i18n!external_tools',
-  'jquery',
-  'react',
-  'page'
-], function (I18n, $, React, page) {
+import I18n from 'i18n!external_tools'
+import $ from 'jquery'
+import React from 'react'
+import page from 'page'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'AppTile',
 
     getInitialState() {
@@ -67,5 +65,3 @@ define([
       );
     }
   });
-
-});

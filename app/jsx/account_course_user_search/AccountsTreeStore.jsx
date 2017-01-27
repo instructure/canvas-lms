@@ -1,8 +1,6 @@
-define([
-  "react",
-  "./createStore",
-  "underscore"
-], function(React, createStore, _) {
+import React from 'react'
+import createStore from './createStore'
+import _ from 'underscore'
 
   var { string, shape, arrayOf } = React.PropTypes;
 
@@ -51,5 +49,4 @@ define([
     ).isRequired
   });
 
-  return AccountsTreeStore;
-});
+export default AccountsTreeStore

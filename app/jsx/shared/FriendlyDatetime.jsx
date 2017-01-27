@@ -1,11 +1,9 @@
-define ([
-  'i18nObj',
-  'react',
-  'timezone',
-  'underscore',
-  'jquery',
-  'jquery.instructure_date_and_time'
-], function (I18n, React, tz, _, $) {
+import I18n from 'i18nObj'
+import React from 'react'
+import tz from 'timezone'
+import _ from 'underscore'
+import $ from 'jquery'
+import 'jquery.instructure_date_and_time'
 
 
   var slowRender = function () {
@@ -60,6 +58,4 @@ define ([
 
   });
 
-  return FriendlyDatetime;
-
-});
+export default FriendlyDatetime

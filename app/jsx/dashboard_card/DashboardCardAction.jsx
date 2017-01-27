@@ -1,9 +1,7 @@
-define([
-  'jquery',
-  'react',
-  'i18n!dashcards',
-  'classnames'
-], function($, React, I18n, classnames) {
+import $ from 'jquery'
+import React from 'react'
+import I18n from 'i18n!dashcards'
+import classnames from 'classnames'
   var DashboardCardAction = React.createClass({
     displayName: 'DashboardCardAction',
 
@@ -58,5 +56,4 @@ define([
     }
   });
 
-  return DashboardCardAction;
-});
+export default DashboardCardAction

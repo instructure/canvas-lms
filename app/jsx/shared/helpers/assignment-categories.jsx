@@ -1,7 +1,5 @@
-define([
-  'underscore',
-  'i18n!assignment_categories',
-], (_, I18n) => {
+import _ from 'underscore'
+import I18n from 'i18n!assignment_categories'
   const OTHER = {
     label: I18n.t('Other'),
     id: 'other',
@@ -63,5 +61,4 @@ define([
     return category || Categories.OTHER
   }
 
-  return Categories
-})
+export default Categories

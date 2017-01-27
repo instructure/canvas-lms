@@ -1,7 +1,5 @@
- define([
-  'react',
-  './BaseIcon'
-], function(React, BaseIcon) {
+import React from 'react'
+import BaseIcon from './BaseIcon'
   var IconFolder = React.createClass({
     render () {
       const content = `
@@ -17,5 +15,4 @@
     }
   });
 
-  return IconFolder;
-});
+export default IconFolder

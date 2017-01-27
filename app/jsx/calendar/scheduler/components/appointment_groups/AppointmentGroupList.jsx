@@ -1,14 +1,13 @@
-define([
-  'react',
-  'classnames',
-  'i18n!appointment_groups',
-  'jsx/shared/FriendlyDatetime',
-  'compiled/util/natcompare',
-  'instructure-icons/react/Line/IconCalendarAddLine',
-  'instructure-icons/react/Line/IconCalendarReservedLine',
-  'jquery',
-  'jquery.instructure_date_and_time'
-], (React, classnames, I18n, FriendlyDatetime, natcompare, { default: IconCalendarAddLine }, { default: IconCalendarReservedLine }, $) => {
+import React from 'react'
+import classnames from 'classnames'
+import I18n from 'i18n!appointment_groups'
+import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
+import natcompare from 'compiled/util/natcompare'
+import IconCalendarAddLine from 'instructure-icons/react/Line/IconCalendarAddLine'
+import IconCalendarReservedLine from 'instructure-icons/react/Line/IconCalendarReservedLine'
+import $ from 'jquery'
+import 'jquery.instructure_date_and_time'
+
   const renderAppointment = (appointment, participantList = '') => {
     const timeLabel = I18n.t('%{start_date}, %{start_time} to %{end_time}', {
       start_date: $.dateString(appointment.start_at),
@@ -56,7 +55,7 @@ define([
     )
   }
 
-  return class AppointmentGroupList extends React.Component {
+export default class AppointmentGroupList extends React.Component {
     static propTypes = {
       appointmentGroup: React.PropTypes.object,
     }
@@ -95,4 +94,3 @@ define([
       )
     }
   }
-})

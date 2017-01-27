@@ -1,14 +1,12 @@
-define([
-  'i18n!external_tools',
-  'underscore',
-  'jquery',
-  'react',
-  'react-modal',
-  'jsx/external_apps/components/ConfigOptionField',
-  'compiled/models/ExternalTool',
-  'jquery.disableWhileLoading',
-  'compiled/jquery.rails_flash_notifications'
-], function(I18n, _, $, React, Modal, ConfigOptionField, ExternalTool) {
+import I18n from 'i18n!external_tools'
+import _ from 'underscore'
+import $ from 'jquery'
+import React from 'react'
+import Modal from 'react-modal'
+import ConfigOptionField from 'jsx/external_apps/components/ConfigOptionField'
+import ExternalTool from 'compiled/models/ExternalTool'
+import 'jquery.disableWhileLoading'
+import 'compiled/jquery.rails_flash_notifications'
 
   const modalOverrides = {
     overlay : {
@@ -26,7 +24,7 @@ define([
     }
   };
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'AddApp',
 
     propTypes: {
@@ -255,4 +253,3 @@ define([
       )
     }
   });
-});

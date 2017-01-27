@@ -1,6 +1,5 @@
-define([
-  'compiled/AssignmentMuter'
-], (AssignmentMuter) => {
+import AssignmentMuter from 'compiled/AssignmentMuter'
+
   class AssignmentMuterDialogManager {
     constructor (assignment, url, submissionsLoaded) {
       this.assignment = assignment;
@@ -22,5 +21,4 @@ define([
     }
   }
 
-  return AssignmentMuterDialogManager;
-});
+export default AssignmentMuterDialogManager

@@ -1,24 +1,14 @@
-define([
-  'react',
-  'i18n!message_students',
-  'axios',
-  'instructure-ui/Button',
-  'instructure-ui/Select',
-  'instructure-ui/TextInput',
-  'instructure-ui/TextArea',
-  'instructure-ui/Modal',
-  'instructure-ui/Heading',
-  'instructure-ui/FormField',
-  'instructure-ui/Alert'
-], function(React, I18n, axios,
-  { default: Button },
-  { default: Select },
-  { default: TextInput },
-  { default: TextArea },
-  { default: Modal, ModalHeader, ModalBody, ModalFooter },
-  { default: Heading },
-  { default: FormField },
-  { default: Alert }) {
+import React from 'react'
+import I18n from 'i18n!message_students'
+import axios from 'axios'
+import Button from 'instructure-ui/Button'
+import Select from 'instructure-ui/Select'
+import TextInput from 'instructure-ui/TextInput'
+import TextArea from 'instructure-ui/TextArea'
+import Modal, { ModalHeader, ModalBody, ModalFooter } from 'instructure-ui/Modal'
+import Heading from 'instructure-ui/Heading'
+import FormField from 'instructure-ui/FormField'
+import Alert from 'instructure-ui/Alert'
 
   class MessageStudents extends React.Component {
     static propTypes = {
@@ -302,5 +292,4 @@ define([
     }
   }
 
-  return MessageStudents
-})
+export default MessageStudents

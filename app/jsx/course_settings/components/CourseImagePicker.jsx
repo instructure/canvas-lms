@@ -1,11 +1,9 @@
-define([
-  'react',
-  'i18n!course_images',
-  'underscore',
-  './UploadArea',
-  '../../shared/FlickrSearch',
-  'instructure-ui/Spinner'
-], (React, I18n, _, UploadArea, FlickrSearch, { default: Spinner }) => {
+import React from 'react'
+import I18n from 'i18n!course_images'
+import _ from 'underscore'
+import UploadArea from './UploadArea'
+import FlickrSearch from '../../shared/FlickrSearch'
+import Spinner from 'instructure-ui/Spinner'
 
   class CourseImagePicker extends React.Component {
     constructor (props) {
@@ -100,6 +98,4 @@ define([
     }
   }
 
-  return CourseImagePicker;
-
-});
+export default CourseImagePicker

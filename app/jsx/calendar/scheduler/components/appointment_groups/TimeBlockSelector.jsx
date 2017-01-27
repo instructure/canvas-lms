@@ -1,16 +1,15 @@
-define([
-  'jquery',
-  'react',
-  'react-dom',
-  'i18n!appointment_groups',
-  'instructure-ui/Typography',
-  'instructure-ui/Button',
-  'instructure-ui/TextInput',
-  './TimeBlockSelectRow',
-  'compiled/util/coupleTimeFields',
-  'compiled/calendar/TimeBlockListManager',
-  'jquery.instructure_date_and_time'
-], ($, React, ReactDOM, I18n, { default: Typography }, { default: Button }, { default: TextInput }, TimeBlockSelectRow, coupleTimeFields, TimeBlockListManager) => {
+import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import I18n from 'i18n!appointment_groups'
+import Typography from 'instructure-ui/Typography'
+import Button from 'instructure-ui/Button'
+import TextInput from 'instructure-ui/TextInput'
+import TimeBlockSelectRow from './TimeBlockSelectRow'
+import coupleTimeFields from 'compiled/util/coupleTimeFields'
+import TimeBlockListManager from 'compiled/calendar/TimeBlockListManager'
+import 'jquery.instructure_date_and_time'
+
   class TimeBlockSelector extends React.Component {
 
     static propTypes = {
@@ -144,5 +143,4 @@ define([
     }
   }
 
-  return TimeBlockSelector;
-});
+export default TimeBlockSelector

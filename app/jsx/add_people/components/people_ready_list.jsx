@@ -1,12 +1,10 @@
-define([
-  'i18n!roster',
-  'react',
-  './shapes',
-  'instructure-ui/Alert',
-  'instructure-ui/Table',
-  'instructure-ui/ScreenReaderContent'
-], (I18n, React, {personReadyToEnrollShape},
-    {default: Alert}, {default: Table}, {default: ScreenReaderContent}) => {
+import I18n from 'i18n!roster'
+import React from 'react'
+import {personReadyToEnrollShape} from './shapes'
+import Alert from 'instructure-ui/Alert'
+import Table from 'instructure-ui/Table'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+
   class PeopleReadyList extends React.Component {
     static propTypes = {
       nameList: React.PropTypes.arrayOf(React.PropTypes.shape(personReadyToEnrollShape)),
@@ -69,5 +67,4 @@ define([
     }
   }
 
-  return PeopleReadyList;
-});
+export default PeopleReadyList

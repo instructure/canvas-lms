@@ -1,14 +1,12 @@
-define([
-  "react",
-  "i18n!account_course_user_search",
-  "underscore",
-  "./UsersStore",
-  "./UsersList",
-  "./UsersToolbar",
-  "./renderSearchMessage",
-  "./store/configureStore",
-  "./actions/UserActions"
-], function(React, I18n, _, UsersStore, UsersList, UsersToolbar, renderSearchMessage, configureStore, UserActions) {
+import React from 'react'
+import I18n from 'i18n!account_course_user_search'
+import _ from 'underscore'
+import UsersStore from './UsersStore'
+import UsersList from './UsersList'
+import UsersToolbar from './UsersToolbar'
+import renderSearchMessage from './renderSearchMessage'
+import configureStore from './store/configureStore'
+import UserActions from './actions/UserActions'
 
   const MIN_SEARCH_LENGTH = 3;
 
@@ -98,5 +96,4 @@ define([
     }
   });
 
-  return UsersPane;
-});
+export default UsersPane

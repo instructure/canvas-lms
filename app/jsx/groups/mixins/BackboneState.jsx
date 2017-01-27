@@ -1,7 +1,5 @@
-define([
-  'underscore',
-  'Backbone'
-], (_, Backbone) => {
+import _ from 'underscore'
+import Backbone from 'Backbone'
   var BackboneState = {
     _forceUpdate() {this.forceUpdate()}, // strips off args that backbone sends and react incorrectly believes is a callback
 
@@ -48,5 +46,4 @@ define([
       this._listen(this._off, this.state);
     }
   };
-  return BackboneState;
-});
+export default BackboneState

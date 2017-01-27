@@ -1,7 +1,5 @@
-define([
-  'i18n!format_range',
-  './score',
-], (I18n, scoreHelper) => {
+import I18n from 'i18n!format_range'
+import scoreHelper from './score'
   const isEnabled = () => ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED || false
   const parseEnvData = () => {
     const activeRules = ENV.CONDITIONAL_RELEASE_ENV && ENV.CONDITIONAL_RELEASE_ENV.active_rules || []
@@ -48,7 +46,7 @@ define([
     }
   }
 
-  return {
+export default {
     isEnabled,
     reloadEnv () {
       data = parseEnvData()
@@ -65,4 +63,3 @@ define([
       : {}
     },
   }
-})

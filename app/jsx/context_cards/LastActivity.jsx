@@ -1,8 +1,6 @@
-define([
-  'react',
-  'i18n!student_context_tray',
-  'jsx/shared/FriendlyDatetime'
-], (React, I18n, FriendlyDatetime) => {
+import React from 'react'
+import I18n from 'i18n!student_context_tray'
+import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
 
   class LastActivity extends React.Component {
     static propTypes = {
@@ -34,5 +32,4 @@ define([
     }
   }
 
-  return LastActivity
-})
+export default LastActivity

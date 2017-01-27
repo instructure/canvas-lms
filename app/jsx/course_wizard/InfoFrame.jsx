@@ -1,10 +1,8 @@
-define([
-  'jquery',
-  'underscore',
-  'react',
-  'i18n!course_wizard',
-  './ListItems'
-], function($, _, React, I18n, ListItems) {
+import $ from 'jquery'
+import _ from 'underscore'
+import React from 'react'
+import I18n from 'i18n!course_wizard'
+import ListItems from './ListItems'
 
   var courseNotSetUpItem = {
     text: I18n.t("Great, so you've got a course. Now what? Well, before you go publishing it to the world, you may want to check and make sure you've got the basics laid out.  Work through the list on the left to ensure that your course is ready to use."),
@@ -152,6 +150,4 @@ define([
       }
   });
 
-  return InfoFrame;
-
-});
+export default InfoFrame

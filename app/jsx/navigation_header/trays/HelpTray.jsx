@@ -1,8 +1,6 @@
-define([
-  'i18n!new_nav',
-  'react',
-  'jsx/help_dialog/HelpDialog'
-], (I18n, React, HelpDialog) => {
+import I18n from 'i18n!new_nav'
+import React from 'react'
+import HelpDialog from 'jsx/help_dialog/HelpDialog'
 
   var HelpTray = React.createClass({
     propTypes: {
@@ -47,5 +45,4 @@ define([
     }
   });
 
-  return HelpTray;
-});
+export default HelpTray

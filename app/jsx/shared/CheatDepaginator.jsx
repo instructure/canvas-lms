@@ -1,4 +1,6 @@
-define(["jquery", "underscore", "jquery.ajaxJSON"], ($, _) => {
+import $ from 'jquery'
+import _ from 'underscore'
+import 'jquery.ajaxJSON'
   /**
    * Fires callback for paginated APIs in order
    *
@@ -85,5 +87,4 @@ define(["jquery", "underscore", "jquery.ajaxJSON"], ($, _) => {
     return gotAllPagesDfd;
   };
 
-  return cheaterDepaginate;
-});
+export default cheaterDepaginate

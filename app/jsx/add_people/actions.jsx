@@ -1,9 +1,8 @@
-define([
-  'redux-actions',
-  './api_client',
-  './resolveValidationIssues',
-  './helpers'
-], ({ createActions }, api, resolveValidationIssues, {parseNameList, findEmailInEntry}) => {
+import { createActions } from 'redux-actions'
+import api from './api_client'
+import resolveValidationIssues from './resolveValidationIssues'
+import {parseNameList, findEmailInEntry} from './helpers'
+
   const actionDefs = [
     'SET_INPUT_PARAMS',
 
@@ -29,13 +28,12 @@ define([
     'RESET'   // reset([array of state subsections to reset]) undefined or empty = reset everything
   ];
 
-
-  const actionTypes = actionDefs.reduce((types, action) => {
+  export const actionTypes = actionDefs.reduce((types, action) => {
     types[action] = action;   // eslint-disable-line no-param-reassign
     return types;
   }, {});
 
-  const actions = createActions(...actionDefs);
+  export const actions = createActions(...actionDefs);
 
   actions.validateUsers = () => (dispatch, getState) => {
     dispatch(actions.validateUsersStart());
@@ -125,5 +123,3 @@ define([
       .then(res => dispatch(actions.enrollUsersSuccess(res.data)))
       .catch(err => dispatch(actions.enrollUsersError(err)));
   };
-  return { actions, actionTypes };
-});

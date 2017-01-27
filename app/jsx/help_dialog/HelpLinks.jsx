@@ -1,8 +1,7 @@
-define([
-  'react',
-  'i18n!help_dialog',
-  'instructure-ui/Spinner'
-], (React, I18n, { default: Spinner }) => {
+import React from 'react'
+import I18n from 'i18n!help_dialog'
+import Spinner from 'instructure-ui/Spinner'
+
   const HelpLinks = React.createClass({
     propTypes: {
       links: React.PropTypes.array,
@@ -76,5 +75,4 @@ define([
     }
   });
 
-  return HelpLinks;
-});
+export default HelpLinks

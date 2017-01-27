@@ -1,11 +1,10 @@
-define([
-  'react',
-  'i18n!new_user_tutorial',
-  'instructure-ui/Button',
-  'instructure-icons/react/Line/IconMoveLeftLine',
-  'instructure-icons/react/Line/IconMoveRightLine',
-  'jsx/shared/proptypes/plainStoreShape'
-], (React, I18n, { default: Button }, { default: IconMoveLeftLine }, { default: IconMoveRightLine }, plainStoreShape) => {
+import React from 'react'
+import I18n from 'i18n!new_user_tutorial'
+import Button from 'instructure-ui/Button'
+import IconMoveLeftLine from 'instructure-icons/react/Line/IconMoveLeftLine'
+import IconMoveRightLine from 'instructure-icons/react/Line/IconMoveRightLine'
+import plainStoreShape from 'jsx/shared/proptypes/plainStoreShape'
+
   class NewUserTutorialToggleButton extends React.Component {
 
     static propTypes = {
@@ -59,5 +58,5 @@ define([
     }
   }
 
-  return NewUserTutorialToggleButton;
-});
+export default NewUserTutorialToggleButton;
+

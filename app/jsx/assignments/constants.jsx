@@ -1,5 +1,5 @@
-define([], function () {
-  return {
+
+export default {
     sortDirections: {
       ASCENDING: 'ASCENDING',
       DESCENDING: 'DESCENDING'
@@ -10,5 +10,3 @@ define([], function () {
       MARK_THREE: 'MARK3'
     }
   }
-});
-

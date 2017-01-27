@@ -1,12 +1,11 @@
-define([
-  'react',
-  'react-modal',
-  'jsx/collaborations/GettingStartedCollaborations',
-  'jsx/collaborations/CollaborationsNavigation',
-  './CollaborationsList',
-  './LoadingSpinner',
-  './store/store'
-], (React, Modal, GettingStartedCollaborations, CollaborationsNavigation, CollaborationsList, LoadingSpinner, {dispatch}) => {
+import React from 'react'
+import Modal from 'react-modal'
+import GettingStartedCollaborations from 'jsx/collaborations/GettingStartedCollaborations'
+import CollaborationsNavigation from 'jsx/collaborations/CollaborationsNavigation'
+import CollaborationsList from './CollaborationsList'
+import LoadingSpinner from './LoadingSpinner'
+import { dispatch } from './store/store'
+
   class CollaborationsApp extends React.Component {
     constructor (props) {
       super(props);
@@ -45,5 +44,4 @@ define([
     }
   };
 
-  return CollaborationsApp;
-});
+export default CollaborationsApp

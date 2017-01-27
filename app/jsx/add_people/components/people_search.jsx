@@ -1,23 +1,18 @@
-define([
-  'i18n!roster',
-  'react',
-  'instructure-ui/Button',
-  'instructure-ui/Typography',
-  'instructure-ui/RadioInputGroup',
-  'instructure-ui/RadioInput',
-  'instructure-ui/Select',
-  'instructure-ui/TextArea',
-  'instructure-ui/ScreenReaderContent',
-  'instructure-ui/Checkbox',
-  'instructure-ui/Alert',
-  'instructure-icons/react/Solid/IconUserSolid',
-  './shapes',
-  '../helpers'
-], (I18n, React, {default: Button}, {default: Typography}, {default: RadioInputGroup},
-    {default: RadioInput}, {default: Select}, {default: TextArea}, {default: ScreenReaderContent},
-    {default: Checkbox}, {default: Alert}, {default: IconUserSolid},
-    {courseParamsShape, inputParamsShape},
-    {parseNameList, findEmailInEntry, emailValidator}) => {
+import I18n from 'i18n!roster'
+import React from 'react'
+import Button from 'instructure-ui/Button'
+import Typography from 'instructure-ui/Typography'
+import RadioInputGroup from 'instructure-ui/RadioInputGroup'
+import RadioInput from 'instructure-ui/RadioInput'
+import Select from 'instructure-ui/Select'
+import TextArea from 'instructure-ui/TextArea'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import Checkbox from 'instructure-ui/Checkbox'
+import Alert from 'instructure-ui/Alert'
+import IconUserSolid from 'instructure-icons/react/Solid/IconUserSolid'
+import {courseParamsShape, inputParamsShape} from './shapes'
+import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
+
   class PeopleSearch extends React.Component {
     static propTypes = Object.assign({}, inputParamsShape, courseParamsShape);
 
@@ -193,5 +188,4 @@ define([
     }
   }
 
-  return PeopleSearch;
-});
+export default PeopleSearch

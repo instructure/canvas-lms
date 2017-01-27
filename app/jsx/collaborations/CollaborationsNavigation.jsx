@@ -1,9 +1,7 @@
-define([
-  'react',
-  'i18n!react_collaborations',
-  'jsx/collaborations/NewCollaborationsDropDown',
-  'compiled/str/splitAssetString'
-], (React, I18n, NewCollaborationsDropDown, splitAssetString) => {
+import React from 'react'
+import I18n from 'i18n!react_collaborations'
+import NewCollaborationsDropDown from 'jsx/collaborations/NewCollaborationsDropDown'
+import splitAssetString from 'compiled/str/splitAssetString'
   class CollaborationsNavigation extends React.Component {
 
     renderNewCollaborationsDropDown () {
@@ -31,5 +29,4 @@ define([
     actions: React.PropTypes.object
   };
 
-  return CollaborationsNavigation;
-});
+export default CollaborationsNavigation

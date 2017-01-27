@@ -1,7 +1,5 @@
-define([
-  'underscore',
-  'i18n!gradebook',
-], function (_, I18n) {
+import _ from 'underscore'
+import I18n from 'i18n!gradebook'
   var MessageStudentsWhoHelper = {
     settings: function(assignment, students) {
       return {
@@ -92,5 +90,4 @@ define([
       }
     }
   };
-  return MessageStudentsWhoHelper;
-});
+export default MessageStudentsWhoHelper

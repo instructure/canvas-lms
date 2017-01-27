@@ -1,21 +1,19 @@
-define([
-  'i18n!blueprint_config',
-  'jquery',
-  'react',
-  'instructure-ui/Heading',
-  'instructure-ui/Alert',
-  'instructure-ui/Button',
-  'instructure-ui/Typography',
-  'instructure-ui/Spinner',
-  '../propTypes',
-  './CoursePicker',
-  './AssociationsTable',
-  'compiled/jquery.rails_flash_notifications',
-], (I18n, $, React, {default: Heading}, {default: Alert}, {default: Button}, {default: Typography}, {default: Spinner},
-  propTypes, CoursePicker, AssociationsTable) => {
+import I18n from 'i18n!blueprint_config'
+import $ from 'jquery'
+import React from 'react'
+import Heading from 'instructure-ui/Heading'
+import Alert from 'instructure-ui/Alert'
+import Button from 'instructure-ui/Button'
+import Typography from 'instructure-ui/Typography'
+import Spinner from 'instructure-ui/Spinner'
+import propTypes from '../propTypes'
+import CoursePicker from './CoursePicker'
+import AssociationsTable from './AssociationsTable'
+import 'compiled/jquery.rails_flash_notifications'
+
   const { string, arrayOf, func, bool } = React.PropTypes
 
-  return class BlueprintSettings extends React.Component {
+  class BlueprintSettings extends React.Component {
     static propTypes = {
       loadCourses: func.isRequired,
       addAssociations: func.isRequired,
@@ -137,4 +135,5 @@ define([
       )
     }
   }
-})
+
+export default BlueprintSettings

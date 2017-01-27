@@ -1,16 +1,15 @@
-define([
-  'i18n!add_bank',
-  'jquery' /* $ */,
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_forms' /* formSubmit, getFormData, formErrors */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags */,
-  'jquery.instructure_misc_plugins' /* confirmDelete, showIf, .dim */,
-  'jquery.keycodes' /* keycodes */,
-  'jquery.loadingImg' /* loadingImage */,
-  'jquery.templateData' /* fillTemplateData, getTemplateData */
-], function(I18n, $) {
-  var addBank = function(bank) {
+import I18n from 'i18n!add_bank'
+import $ from 'jquery'
+import 'jquery.ajaxJSON' /* ajaxJSON */
+import 'jquery.instructure_forms' /* formSubmit, getFormData, formErrors */
+import 'jqueryui/dialog'
+import 'jquery.instructure_misc_helpers' /* replaceTags */
+import 'jquery.instructure_misc_plugins' /* confirmDelete, showIf, .dim */
+import 'jquery.keycodes' /* keycodes */
+import 'jquery.loadingImg' /* loadingImage */
+import 'jquery.templateData' /* fillTemplateData, getTemplateData */
+
+export default function addBank (bank) {
     var current_question_bank_id = $("#bank_urls .current_question_bank_id").text();
     if(bank.id == current_question_bank_id) { return; }
     var $dialog = $("#move_question_dialog");
@@ -21,8 +20,4 @@ define([
       .find(".bank_name").text(bank.title || I18n.t('default_name', "No Name")).end()
       .find(".context_name").text(bank.cached_context_short_name);
     $bank.show().insertBefore($dialog.find("ul.banks .bank.blank:last"));
-  };
-
-  return addBank;
-});
-
+}

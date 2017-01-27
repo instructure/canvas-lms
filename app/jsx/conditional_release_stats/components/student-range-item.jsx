@@ -1,11 +1,10 @@
-define([
-  'react',
-  'classnames',
-  'i18n!cyoe_assignment_sidebar',
-], (React, classNames, I18n) => {
+import React from 'react'
+import classNames from 'classnames'
+import I18n from 'i18n!cyoe_assignment_sidebar'
+
   const { object, func, number } = React.PropTypes
 
-  return class StudentRangeItem extends React.Component {
+export default class StudentRangeItem extends React.Component {
     static propTypes = {
       student: object.isRequired,
       studentIndex: number.isRequired,
@@ -50,4 +49,3 @@ define([
       )
     }
   }
-})

@@ -1,12 +1,11 @@
-define([
-  'react',
-  'react-dom',
-  'redux',
-  'react-redux',
-  './store',
-  './actions',
-  './components/BlueprintSettings',
-], (React, ReactDOM, { bindActionCreators }, { connect, Provider }, createStore, actions, BlueprintSettings) => {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { bindActionCreators } from 'redux'
+import { connect, Provider } from 'react-redux'
+import createStore from './store'
+import actions from './actions'
+import BlueprintSettings from './components/BlueprintSettings'
+
   class BlueprintSettingsApp {
     constructor (ENV, root) {
       this.root = root
@@ -54,5 +53,4 @@ define([
     }
   }
 
-  return BlueprintSettingsApp
-})
+export default BlueprintSettingsApp

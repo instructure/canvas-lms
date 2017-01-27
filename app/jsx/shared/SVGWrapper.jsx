@@ -1,7 +1,6 @@
-define([
-  'react',
-  'jquery'
-], (React, $) => {
+import React from 'react'
+import $ from 'jquery'
+
   const DOCUMENT_NODE = 9;
   const ELEMENT_NODE = 1;
 
@@ -49,5 +48,4 @@ define([
     }
   }
 
-  return SVGWrapper;
-});
+export default SVGWrapper

@@ -1,7 +1,5 @@
-define([
-  'react',
-  'jquery'
-  ], function (React, $) {
+import React from 'react'
+import $ from 'jquery'
 
   var RangeInput = React.createClass({
     propTypes: {
@@ -76,5 +74,4 @@ define([
       );
     }
   });
-  return RangeInput;
-});
+export default RangeInput

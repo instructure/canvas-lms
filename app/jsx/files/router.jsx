@@ -1,13 +1,11 @@
-define([
-  'react',
-  'react-dom',
-  'page',
-  'qs',
-  'compiled/react_files/modules/filesEnv',
-  'jsx/files/FilesApp',
-  'jsx/files/ShowFolder',
-  'jsx/files/SearchResults'
-], function (React, ReactDOM, page, qs, filesEnv, FilesApp, ShowFolder, SearchResults) {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import page from 'page'
+import qs from 'qs'
+import filesEnv from 'compiled/react_files/modules/filesEnv'
+import FilesApp from 'jsx/files/FilesApp'
+import ShowFolder from 'jsx/files/ShowFolder'
+import SearchResults from 'jsx/files/SearchResults'
 
   /**
    * Route Handlers
@@ -77,11 +75,9 @@ define([
   page('/folder', '/');
   page('/folder/*', getFolderSplat, renderShowFolder);
 
-  return {
+export default {
     start () {
       page.start();
     },
     getFolderSplat // Export getSplat for testing
   };
-
-});

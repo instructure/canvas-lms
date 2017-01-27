@@ -3,12 +3,10 @@
  * data-tooltip=""
  */
 
-define(['i18n!dateformat'], function (I18n) {
+import I18n from 'i18n!dateformat'
 
   var accessibleDateFormat = () => {
     return I18n.t("YYYY-MM-DD hh:mm");
   };
 
-  return accessibleDateFormat;
-
-});
+export default accessibleDateFormat

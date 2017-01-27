@@ -1,6 +1,4 @@
-define([
-  'compiled/gradebook/GradebookTranslations'
-  ], function(GRADEBOOK_TRANSLATIONS) {
+import GRADEBOOK_TRANSLATIONS from 'compiled/gradebook/GradebookTranslations'
 
   const MULTIPLIER = 1.5;
 
@@ -36,5 +34,4 @@ define([
     }
   };
 
-  return OutlierScoreHelper;
-});
+export default OutlierScoreHelper

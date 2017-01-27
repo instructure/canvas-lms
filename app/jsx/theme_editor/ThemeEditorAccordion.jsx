@@ -1,17 +1,15 @@
-define([
-  'react',
-  'i18n!theme_editor',
-  './ThemeEditorColorRow',
-  './ThemeEditorImageRow',
-  './RangeInput',
-  './PropTypes',
-  'jquery',
-  'jqueryui/accordion'
-], (React, I18n, ThemeEditorColorRow, ThemeEditorImageRow, RangeInput, customTypes, $) => {
+import React from 'react'
+import I18n from 'i18n!theme_editor'
+import ThemeEditorColorRow from './ThemeEditorColorRow'
+import ThemeEditorImageRow from './ThemeEditorImageRow'
+import RangeInput from './RangeInput'
+import customTypes from './PropTypes'
+import $ from 'jquery'
+import 'jqueryui/accordion'
 
   const activeIndexKey = 'Theme__editor-accordion-index'
 
-  return React.createClass({
+export default React.createClass({
 
     displayName: 'ThemeEditorAccordion',
 
@@ -122,4 +120,3 @@ define([
       )
     }
   })
-});

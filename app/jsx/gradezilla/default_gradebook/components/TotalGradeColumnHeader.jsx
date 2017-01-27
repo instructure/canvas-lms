@@ -1,15 +1,10 @@
-define([
-  'react',
-  'instructure-icons/react/Solid/IconMoreSolid',
-  'instructure-ui/Menu',
-  'instructure-ui/PopoverMenu',
-  'instructure-ui/ScreenReaderContent',
-  'instructure-ui/Typography',
-  'i18n!gradebook'
-], (
-  React, { default: IconMoreSolid }, { MenuItem }, { default: PopoverMenu }, { default: ScreenReaderContent },
-  { default: Typography }, I18n
-) => {
+import React from 'react'
+import IconMoreSolid from 'instructure-icons/react/Solid/IconMoreSolid'
+import { MenuItem } from 'instructure-ui/Menu'
+import PopoverMenu from 'instructure-ui/PopoverMenu'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import Typography from 'instructure-ui/Typography'
+import I18n from 'i18n!gradebook'
   /* eslint-disable react/style-prop-object */
 
   // TODO: remove this rule when this component begins using internal state
@@ -45,5 +40,4 @@ define([
     }
   }
 
-  return TotalGradeColumnHeader;
-});
+export default TotalGradeColumnHeader

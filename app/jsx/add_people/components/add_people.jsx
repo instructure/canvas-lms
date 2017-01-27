@@ -1,24 +1,18 @@
-define([
-  'i18n!roster',
-  'react',
-  'react-dom',
-  'instructure-ui/Modal',
-  'instructure-ui/Heading',
-  'instructure-ui/Button',
-  'instructure-ui/Spinner',
-  'instructure-ui/Alert',
-  'instructure-ui/ScreenReaderContent',
-  './shapes',
-  './people_search',
-  './people_ready_list',
-  './people_validation_issues',
-  './api_error'
-], (I18n, React, ReactDOM,
-      {default: Modal, ModalHeader, ModalBody, ModalFooter},
-      {default: Heading}, {default: Button}, {default: Spinner}, {default: Alert},
-      {default: ScreenReaderContent},
-        {courseParamsShape, apiStateShape, inputParamsShape, validateResultShape, personReadyToEnrollShape},
-        PeopleSearch, PeopleReadyList, PeopleValidationIssues, APIError) => {
+import I18n from 'i18n!roster'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import Modal, {ModalHeader, ModalBody, ModalFooter} from 'instructure-ui/Modal'
+import Heading from 'instructure-ui/Heading'
+import Button from 'instructure-ui/Button'
+import Spinner from 'instructure-ui/Spinner'
+import Alert from 'instructure-ui/Alert'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import {courseParamsShape, apiStateShape, inputParamsShape, validateResultShape, personReadyToEnrollShape} from './shapes'
+import PeopleSearch from './people_search'
+import PeopleReadyList from './people_ready_list'
+import PeopleValidationIssues from './people_validation_issues'
+import APIError from './api_error'
+
   const PEOPLESEARCH = 'peoplesearch';
   const PEOPLEREADYLIST = 'peoplereadylist';
   const PEOPLEVALIDATIONISSUES = 'peoplevalidationissues';
@@ -312,5 +306,5 @@ define([
       );
     }
   }
-  return AddPeople;
-});
+
+export default AddPeople

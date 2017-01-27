@@ -1,5 +1,6 @@
-define(["jquery", "i18n!gradezilla_uploads", "spin.js/jquery.spin"],
-       ($, I18n) => {
+import $ from 'jquery'
+import I18n from 'i18n!gradezilla_uploads'
+import 'spin.js/jquery.spin'
   function waitForProcessing(progress) {
     var dfd = $.Deferred();
     var spinner = $("#spinner").spin();
@@ -24,5 +25,4 @@ define(["jquery", "i18n!gradezilla_uploads", "spin.js/jquery.spin"],
     return dfd;
   }
 
-  return waitForProcessing;
-});
+export default waitForProcessing

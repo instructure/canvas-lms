@@ -1,6 +1,4 @@
-define([
-  'react'
-], function(React) {
+import React from 'react'
 
   function topPosition(domElt) {
     if (!domElt) {
@@ -9,7 +7,7 @@ define([
     return domElt.offsetTop + topPosition(domElt.offsetParent);
   }
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'InfiniteScroll',
 
     getDefaultProps() {
@@ -70,4 +68,3 @@ define([
     }
 
   });
-});

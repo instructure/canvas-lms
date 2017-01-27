@@ -1,12 +1,10 @@
-define([
-  'i18n!external_tools',
-  'jquery',
-  'underscore',
-  'react',
-  'jsx/external_apps/mixins/InputMixin'
-], function (I18n, $, _, React, InputMixin) {
+import I18n from 'i18n!external_tools'
+import $ from 'jquery'
+import _ from 'underscore'
+import React from 'react'
+import InputMixin from 'jsx/external_apps/mixins/InputMixin'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'SelectInput',
 
     mixins: [InputMixin],
@@ -55,4 +53,3 @@ define([
       )
     }
   });
-});

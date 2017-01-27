@@ -1,8 +1,6 @@
-define([
-  "react",
-  "./IcInput",
-  "classnames"
-], function(React, IcInput, classnames) {
+import React from 'react'
+import IcInput from './IcInput'
+import classnames from 'classnames'
 
   var { string } = React.PropTypes;
 
@@ -33,5 +31,4 @@ define([
       );
     }
   });
-  return IcCheckbox;
-});
+export default IcCheckbox

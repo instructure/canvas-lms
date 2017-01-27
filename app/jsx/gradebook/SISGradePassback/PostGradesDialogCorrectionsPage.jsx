@@ -1,10 +1,8 @@
-define([
-  'underscore',
-  'i18n!modules',
-  'react',
-  'jsx/gradebook/SISGradePassback/assignmentUtils',
-  'jsx/gradebook/SISGradePassback/AssignmentCorrectionRow'
-], (_, I18n, React, assignmentUtils, AssignmentCorrectionRow) => {
+import _ from 'underscore'
+import I18n from 'i18n!modules'
+import React from 'react'
+import assignmentUtils from 'jsx/gradebook/SISGradePassback/assignmentUtils'
+import AssignmentCorrectionRow from 'jsx/gradebook/SISGradePassback/AssignmentCorrectionRow'
 
   var PostGradesDialogCorrectionsPage = React.createClass({
     componentDidMount () {
@@ -108,5 +106,4 @@ define([
     }
   });
 
-  return PostGradesDialogCorrectionsPage;
-});
+export default PostGradesDialogCorrectionsPage

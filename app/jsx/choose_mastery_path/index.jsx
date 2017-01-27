@@ -1,13 +1,12 @@
-define([
-  'react',
-  'react-dom',
-  'redux',
-  'react-redux',
-  './store',
-  './actions',
-  './components/choose-mastery-path',
-], (React, ReactDOM, { bindActionCreators }, { connect, Provider }, createStore, actions, ChooseMasteryPath) => {
-  return {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { bindActionCreators } from 'redux'
+import { connect, Provider } from 'react-redux'
+import createStore from './store'
+import actions from './actions'
+import ChooseMasteryPath from './components/choose-mastery-path'
+
+export default {
     init: (data, root) => {
       const options = data.options
       delete data.options
@@ -32,4 +31,3 @@ define([
       )
     },
   }
-})

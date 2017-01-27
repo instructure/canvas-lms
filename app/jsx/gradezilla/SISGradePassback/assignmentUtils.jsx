@@ -1,9 +1,7 @@
-define([
-  'jquery',
-  'underscore',
-  'react',
-  'jsx/shared/helpers/createStore'
-], ($, _, createStore) => {
+import $ from 'jquery'
+import _ from 'underscore'
+import createStore from 'react'
+import 'jsx/shared/helpers/createStore'
 
   let assignmentUtils = {
     copyFromGradebook (assignment) {
@@ -65,10 +63,10 @@ define([
       // for the invalid override on the assignment.
       _.each(assignments, (a) => {
           if(a.overrideForThisSection != undefined && a.recentlyUpdated != undefined && a.recentlyUpdated == true && a.overrideForThisSection.due_at != null){a.original_error = false}
-          else if(a.overrideForThisSection != undefined && a.recentlyUpdated != undefined && a.recentlyUpdated == false && a.overrideForThisSection.due_at == null){a.original_error = true} 
-          //for handling original error detection of a valid override for one section and an invalid override for another section 
+          else if(a.overrideForThisSection != undefined && a.recentlyUpdated != undefined && a.recentlyUpdated == false && a.overrideForThisSection.due_at == null){a.original_error = true}
+          //for handling original error detection of a valid override for one section and an invalid override for another section
           else if(a.overrideForThisSection != undefined && a.overrideForThisSection.due_at != null && !assignmentUtils.noDueDateForEveryoneElseOverride(a) && a.recentlyUpdated == false && a.hadOriginalErrors == false){a.original_error = false}
-          //for handling original error detection of a valid override for one section and the EveryoneElse "override" scenario  
+          //for handling original error detection of a valid override for one section and the EveryoneElse "override" scenario
           else if(a.overrideForThisSection != undefined && a.overrideForThisSection.due_at != null && assignmentUtils.noDueDateForEveryoneElseOverride(a) && a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id && a.recentlyUpdated == false && a.hadOriginalErrors == false){a.original_error = false}
           //for handling original error detection of an override for one section and the EveryoneElse "override" scenario but the second section is currentlySelected and IS NOT valid
           else if(a.overrideForThisSection == undefined && assignmentUtils.noDueDateForEveryoneElseOverride(a) && a.due_at == null && a.currentlySelected.id.toString() == a.selectedSectionForEveryone){a.original_error = true}
@@ -76,8 +74,8 @@ define([
           else if(a.overrideForThisSection == undefined && a.due_at != null && a.currentlySelected.id.toString() == a.selectedSectionForEveryone && a.hadOriginalErrors == false){a.original_error = false}
           //for handling original error detection of an "override" in the 'EveryoneElse "override" scenario but the course is currentlySelected and IS NOT valid
           else if(a.overrideForThisSection == undefined && assignmentUtils.noDueDateForEveryoneElseOverride(a) && a.due_at == null && a.currentlySelected.type == 'course' && a.currentlySelected.id.toString() != a.selectedSectionForEveryone){a.original_error = true}
-          //for handling original error detection of an "override" in the 'EveryoneElse "override" scenario but the course is currentlySelected and IS valid    
-          else if(a.overrideForThisSection == undefined && a.due_at != null && a.currentlySelected.type == 'course' && a.currentlySelected.id.toString() != a.selectedSectionForEveryone && a.hadOriginalErrors == false){a.original_error = false} 
+          //for handling original error detection of an "override" in the 'EveryoneElse "override" scenario but the course is currentlySelected and IS valid
+          else if(a.overrideForThisSection == undefined && a.due_at != null && a.currentlySelected.type == 'course' && a.currentlySelected.id.toString() != a.selectedSectionForEveryone && a.hadOriginalErrors == false){a.original_error = false}
       });
       return _.filter(assignments, (a) => a.original_error && !a.please_ignore)
     },
@@ -117,7 +115,7 @@ define([
 
       ////Override missing due_at
       var has_this_override = a.overrideForThisSection != undefined
-      if(has_this_override && a.overrideForThisSection.due_at == null && a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id) return true  
+      if(has_this_override && a.overrideForThisSection.due_at == null && a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id) return true
 
       ////Override missing due_at while currentlySelecteed is at the course level
       if(has_this_override && a.overrideForThisSection.due_at == null && a.currentlySelected.id.toString() != a.overrideForThisSection.course_section_id) return true
@@ -125,12 +123,12 @@ define([
       ////Has one override and another override for 'Everyone Else'
       ////
       ////The override for 'Everyone Else' isn't really an override and references
-      ////the assignments actual due_at. So we must check for this behavior 
+      ////the assignments actual due_at. So we must check for this behavior
       if(assignmentUtils.noDueDateForEveryoneElseOverride(a) && a.currentlySelected != undefined && a.overrideForThisSection != undefined && a.currentlySelected.id.toString() != a.overrideForThisSection.course_section_id) return true
 
       ////Has only one override but the section that is currently selected does not have an override thus causing the assignment to have due_at that is null making it invalid
       if(assignmentUtils.noDueDateForEveryoneElseOverride(a) && a.overrideForThisSection == undefined && a.currentlySelected != undefined && a.currentlySelected.id.toString() == a.selectedSectionForEveryone) return true
-      
+
       ////'Everyone Else' scenario and the course is currentlySelected but due_at is null making it invalid
       if(assignmentUtils.noDueDateForEveryoneElseOverride(a) && a.overrideForThisSection == undefined && a.currentlySelected != undefined && a.currentlySelected.type == 'course' && a.currentlySelected.id.toString() != a.selectedSectionForEveryone) return true
 
@@ -231,5 +229,4 @@ define([
 
   };
 
-  return assignmentUtils;
-});
+export default assignmentUtils

@@ -1,8 +1,6 @@
-define([
-  'react',
-  'jsx/shared/KeyboardShortcutModal',
-  'i18n!react_files'
-], function(React, KeyboardShortcutModal, I18n) {
+import React from 'react'
+import KeyboardShortcutModal from 'jsx/shared/KeyboardShortcutModal'
+import I18n from 'i18n!react_files'
 
   var SHORTCUTS = [
     { keycode: 'j', description: I18n.t('Next Message') },
@@ -19,5 +17,4 @@ define([
     }
   });
 
-  return DiscussionTopicKeyboardShortcutModal;
-});
+export default DiscussionTopicKeyboardShortcutModal

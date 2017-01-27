@@ -1,8 +1,7 @@
-define([
-  'react',
-  'i18n!outcomes',
-  'jquery'
-], (React, I18n, $) => {
+import React from 'react'
+import I18n from 'i18n!outcomes'
+import $ from 'jquery'
+
   class OutcomeAlignmentDeleteLink extends React.Component {
     static propTypes = {
       url: React.PropTypes.string.isRequired,
@@ -50,5 +49,4 @@ define([
     }
   }
 
-  return OutcomeAlignmentDeleteLink;
-});
+export default OutcomeAlignmentDeleteLink

@@ -1,11 +1,9 @@
-define([
-  'jquery',
-  'jsx/shared/rce/serviceRCELoader',
-  'jsx/shared/rce/featureFlag',
+import $ from 'jquery'
+import serviceRCELoader from 'jsx/shared/rce/serviceRCELoader'
+import featureFlag from 'jsx/shared/rce/featureFlag'
 
-  // for legacy pathways
-  'wikiSidebar'
-], function($, serviceRCELoader, featureFlag, wikiSidebar) {
+// for legacy pathways
+import wikiSidebar from 'wikiSidebar'
 
   function loadServiceSidebar(callback) {
     serviceRCELoader.loadSidebarOnTarget($("#editor_tabs").get(0), callback)
@@ -94,5 +92,4 @@ define([
     }
   }
 
-  return Sidebar
-})
+export default Sidebar

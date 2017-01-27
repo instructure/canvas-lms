@@ -1,10 +1,8 @@
-define([
-  'underscore',
-  'i18n!external_tools',
-  'react'
-], function (_, I18n, React) {
+import _ from 'underscore'
+import I18n from 'i18n!external_tools'
+import React from 'react'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'Header',
 
     render() {
@@ -33,4 +31,3 @@ define([
       )
     }
   });
-});

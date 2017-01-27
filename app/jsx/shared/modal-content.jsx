@@ -1,6 +1,4 @@
-define([
-  'react',
-], function(React){
+import React from 'react'
 
   var ModalContent = React.createClass({
     displayName: 'ModalContent',
@@ -19,5 +17,4 @@ define([
     }
   });
 
-  return ModalContent;
-});
+export default ModalContent

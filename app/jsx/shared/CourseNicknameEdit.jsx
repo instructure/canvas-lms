@@ -1,8 +1,6 @@
-define([
-  'jquery',
-  'react',
-  'i18n!course_nickname_edit',
-], function ($, React, I18n) {
+import $ from 'jquery'
+import React from 'react'
+import I18n from 'i18n!course_nickname_edit'
 
   var CourseNicknameEdit = React.createClass({
 
@@ -90,5 +88,4 @@ define([
     }
 
   });
-  return CourseNicknameEdit;
-});
+export default CourseNicknameEdit

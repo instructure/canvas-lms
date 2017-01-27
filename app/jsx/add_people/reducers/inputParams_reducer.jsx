@@ -1,9 +1,9 @@
-define([
-  'redux',
-  'redux-actions',
-  '../actions',
-  '../store'
-], (redux, { handleActions }, {actions, actionTypes}, {defaultState}) => handleActions({
+import redux from 'redux'
+import { handleActions } from 'redux-actions'
+import {actions, actionTypes} from '../actions'
+import {defaultState} from '../store'
+
+export default handleActions({
   [actionTypes.SET_INPUT_PARAMS]: function setReducer (state, action) {
       // replace state with new values
     return action.payload;
@@ -13,4 +13,4 @@ define([
     const resetState = Object.assign({}, defaultState.inputParams, {canReadSIS: state.canReadSIS});
     return (!action.payload || action.payload.includes('inputParams')) ? resetState : state;
   }
-}, defaultState.inputParams));
+}, defaultState.inputParams)

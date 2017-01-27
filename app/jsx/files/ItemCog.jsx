@@ -1,19 +1,17 @@
-define([
-  'i18n!react_files',
-  'react',
-  'react-dom',
-  'compiled/fn/preventDefault',
-  'compiled/react_files/modules/customPropTypes',
-  'compiled/react_files/modules/filesEnv',
-  'compiled/models/File',
-  'compiled/models/Folder',
-  'jsx/files/UsageRightsDialog',
-  'jsx/files/RestrictedDialogForm',
-  'jsx/files/utils/openMoveDialog',
-  'compiled/react_files/utils/downloadStuffAsAZip',
-  'compiled/react_files/utils/deleteStuff',
-  'jquery'
-], function (I18n, React, ReactDOM, preventDefault, customPropTypes, filesEnv, File, Folder, UsageRightsDialog, RestrictedDialogForm, openMoveDialog, downloadStuffAsAZip, deleteStuff, $) {
+import I18n from 'i18n!react_files'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import preventDefault from 'compiled/fn/preventDefault'
+import customPropTypes from 'compiled/react_files/modules/customPropTypes'
+import filesEnv from 'compiled/react_files/modules/filesEnv'
+import File from 'compiled/models/File'
+import Folder from 'compiled/models/Folder'
+import UsageRightsDialog from 'jsx/files/UsageRightsDialog'
+import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
+import openMoveDialog from 'jsx/files/utils/openMoveDialog'
+import downloadStuffAsAZip from 'compiled/react_files/utils/downloadStuffAsAZip'
+import deleteStuff from 'compiled/react_files/utils/deleteStuff'
+import $ from 'jquery'
 
   var ItemCog = React.createClass({
     displayName: 'ItemCog',
@@ -153,5 +151,4 @@ define([
 
   });
 
-  return ItemCog;
-});
+export default ItemCog

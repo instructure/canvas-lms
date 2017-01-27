@@ -1,7 +1,5 @@
-define([
-  'parse-decimal-number',
-  'i18nObj'
-], (parseNumber, I18n) => {
+import parseNumber from 'parse-decimal-number'
+import I18n from 'i18nObj'
 
   const helper = {
     _parseNumber: parseNumber,
@@ -37,5 +35,4 @@ define([
     }
   }
 
-  return helper
-})
+export default helper

@@ -1,13 +1,12 @@
-define([
-  'redux',
-  'redux-thunk',
-], (redux, {default: ReduxThunk}) => {
-  // returns createStore(reducer, initialState)
-  const createStore = redux.applyMiddleware(
-    ReduxThunk
-  )(redux.createStore);
+import { applyMiddleware, createStore as reduxCreateStore } from 'redux'
+import ReduxThunk from 'redux-thunk'
 
-  const defaultState = {
+  // returns createStore(reducer, initialState)
+  export const createStore = applyMiddleware(
+    ReduxThunk
+  )(reduxCreateStore);
+
+  export const defaultState = {
     courseParams: {
       courseId: '',             // the course ID
       roles: [],                // the roles available to assign people to
@@ -34,6 +33,3 @@ define([
     usersToBeEnrolled: [],  // [{user_id, name, email, ...}]
     usersEnrolled: false    // true when students have been enrolled and we're finished
   };
-
-  return {createStore, defaultState};
-});

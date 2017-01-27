@@ -1,9 +1,7 @@
-define([
-  'axios',
-  'jsx/shared/helpers/parseLinkHeader',
-  'i18n!moderated_grading',
-  'underscore'
-], function (axios, parseLinkHeader, I18n, _) {
+import axios from 'axios'
+import parseLinkHeader from 'jsx/shared/helpers/parseLinkHeader'
+import I18n from 'i18n!moderated_grading'
+import _ from 'underscore'
 
   var ModerationActions = {
 
@@ -252,5 +250,4 @@ define([
     }
   };
 
-  return ModerationActions;
-});
+export default ModerationActions

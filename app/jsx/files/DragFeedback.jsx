@@ -1,8 +1,6 @@
-define([
-  'react',
-  'jsx/files/FilesystemObjectThumbnail',
-  'compiled/react_files/modules/customPropTypes'
-], function (React, FilesystemObjectThumbnail, customPropTypes) {
+import React from 'react'
+import FilesystemObjectThumbnail from 'jsx/files/FilesystemObjectThumbnail'
+import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 
   var MAX_THUMBNAILS_TO_SHOW = 10;
 
@@ -42,5 +40,4 @@ define([
     }
   });
 
-  return DragFeedback;
-});
+export default DragFeedback

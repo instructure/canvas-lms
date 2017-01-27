@@ -1,9 +1,7 @@
-define([
-  'react',
-  'i18n!link_validator',
-  'underscore',
-  './ValidatorResultsRow'
-], function(React, I18n, _, ValidatorResultsRow) {
+import React from 'react'
+import I18n from 'i18n!link_validator'
+import _ from 'underscore'
+import ValidatorResultsRow from './ValidatorResultsRow'
 
   var ValidatorResults = React.createClass({
     getInitialState () {
@@ -75,5 +73,4 @@ define([
       );
     }
   });
-  return ValidatorResults;
-});
+export default ValidatorResults

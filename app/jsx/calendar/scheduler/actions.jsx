@@ -1,8 +1,4 @@
-define([
-  'redux-actions',
-], (ReduxActions) => {
-
-  const { createAction } = ReduxActions;
+import { createAction } from 'redux-actions'
 
   const keys = {
     SET_FIND_APPOINTMENT_MODE: 'SET_FIND_APPOINTMENT_MODE',
@@ -14,9 +10,7 @@ define([
     setCourse: createAction(keys.SET_COURSE)
   };
 
-  return {
+export default {
     actions,
     keys
   };
-
-});

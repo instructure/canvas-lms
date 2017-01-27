@@ -1,9 +1,7 @@
-define([
-  'react',
-  'underscore',
-  'jsx/shared/helpers/createStore',
-  'jquery'
-], (React, _, createStore, $) => {
+import React from 'react'
+import _ from 'underscore'
+import createStore from 'jsx/shared/helpers/createStore'
+import $ from 'jquery'
   var CourseEpubExportStore = createStore({}),
     _courses = {};
 
@@ -32,5 +30,4 @@ define([
     }, 'json');
   }
 
-  return CourseEpubExportStore;
-})
+export default CourseEpubExportStore

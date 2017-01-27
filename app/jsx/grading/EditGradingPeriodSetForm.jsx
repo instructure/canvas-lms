@@ -1,14 +1,13 @@
-define([
-  'react',
-  'react-dom',
-  'underscore',
-  'jquery',
-  'instructure-ui/Button',
-  'instructure-ui/Checkbox',
-  'i18n!grading_periods',
-  'jsx/grading/EnrollmentTermInput',
-  'compiled/jquery.rails_flash_notifications'
-], function(React, ReactDOM, _, $, { default: Button }, { default: Checkbox }, I18n, EnrollmentTermInput) {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import _ from 'underscore'
+import $ from 'jquery'
+import Button from 'instructure-ui/Button'
+import Checkbox from 'instructure-ui/Checkbox'
+import I18n from 'i18n!grading_periods'
+import EnrollmentTermInput from 'jsx/grading/EnrollmentTermInput'
+import 'compiled/jquery.rails_flash_notifications'
+
   const { array, bool, func, shape, string } = React.PropTypes;
 
   const buildSet = function(attr = {}) {
@@ -178,5 +177,4 @@ define([
     }
   });
 
-  return GradingPeriodSetForm;
-});
+export default GradingPeriodSetForm

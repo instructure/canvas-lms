@@ -1,13 +1,12 @@
-define([
-  'jquery',
-  'react',
-  'react-dom',
-  'react-modal',
-  'classnames',
-  'i18n!conditional_release',
-  'jsx/shared/helpers/numberHelper',
-  'jquery.instructure_forms'
-], ($, React, ReactDOM, Modal, classNames, I18n, numberHelper) => {
+import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import Modal from 'react-modal'
+import classNames from 'classnames'
+import I18n from 'i18n!conditional_release'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
+import 'jquery.instructure_forms'
+
   const SAVE_TIMEOUT = 15000
 
   const Editor = React.createClass({
@@ -133,5 +132,4 @@ define([
     attach: attach
   };
 
-  return ConditionalRelease;
-});
+export default ConditionalRelease

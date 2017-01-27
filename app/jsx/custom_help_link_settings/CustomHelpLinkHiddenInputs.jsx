@@ -1,8 +1,6 @@
- define([
-  'react',
-  'i18n!custom_help_link',
-  './CustomHelpLinkPropTypes'
-], function(React, I18n, CustomHelpLinkPropTypes) {
+import React from 'react'
+import I18n from 'i18n!custom_help_link'
+import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
   const CustomHelpLinkHiddenInputs = React.createClass({
     propTypes: {
       link: CustomHelpLinkPropTypes.link.isRequired
@@ -35,5 +33,4 @@
     }
   });
 
-  return CustomHelpLinkHiddenInputs;
-});
+export default CustomHelpLinkHiddenInputs

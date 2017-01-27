@@ -1,6 +1,4 @@
-define([
-  'underscore'
-  ], function(_) {
+import _ from 'underscore'
 
   function validateDate(date, nullAllowed = false) {
     let valid = _.isDate(date);
@@ -79,5 +77,4 @@ define([
     }
   }
 
-  return GradingPeriodsHelper;
-});
+export default GradingPeriodsHelper

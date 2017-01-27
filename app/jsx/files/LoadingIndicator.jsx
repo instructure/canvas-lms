@@ -1,7 +1,5 @@
-define([
-  'i18n!react_files',
-  'react'
-], function (I18n, React) {
+import I18n from 'i18n!react_files'
+import React from 'react'
 
   var LoadingIndicator = React.createClass({
     displayName: 'LoadingIndicator',
@@ -19,6 +17,4 @@ define([
     }
   });
 
-  return LoadingIndicator;
-
-});
+export default LoadingIndicator

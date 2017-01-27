@@ -1,9 +1,7 @@
-define([
-  'i18n!new_nav',
-  'react',
-  'jsx/shared/SVGWrapper',
-  'instructure-ui/Spinner'
-], (I18n, React, SVGWrapper, { default: Spinner }) => {
+import I18n from 'i18n!new_nav'
+import React from 'react'
+import SVGWrapper from 'jsx/shared/SVGWrapper'
+import Spinner from 'instructure-ui/Spinner'
 
   var GroupsTray = React.createClass({
     propTypes: {
@@ -61,6 +59,4 @@ define([
     }
   });
 
-  return GroupsTray;
-
-});
+export default GroupsTray

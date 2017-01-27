@@ -1,10 +1,8 @@
-define([
-  'react',
-  'i18n!help_dialog',
-  './CreateTicketForm',
-  './TeacherFeedbackForm',
-  './HelpLinks'
-], (React, I18n, CreateTicketForm, TeacherFeedbackForm, HelpLinks) => {
+import React from 'react'
+import I18n from 'i18n!help_dialog'
+import CreateTicketForm from './CreateTicketForm'
+import TeacherFeedbackForm from './TeacherFeedbackForm'
+import HelpLinks from './HelpLinks'
 
   const HelpDialog = React.createClass({
     propTypes: {
@@ -57,5 +55,4 @@ define([
     }
   });
 
-  return HelpDialog;
-});
+export default HelpDialog

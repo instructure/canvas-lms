@@ -1,16 +1,10 @@
-define([
-  'redux',
-  'redux-thunk',
-  '../reducers/FlickrReducer',
-  './FlickrInitialState'
-], function (Redux, {default:ReduxThunk}, FlickrReducer, FlickrInitialState) {
-
-  const { createStore, applyMiddleware } = Redux;
+import { createStore, applyMiddleware } from 'redux'
+import ReduxThunk from 'redux-thunk'
+import FlickrReducer from '../reducers/FlickrReducer'
+import FlickrInitialState from './FlickrInitialState'
 
   const createStoreWithMiddleware = applyMiddleware(
     ReduxThunk
   )(createStore);
 
-  return createStoreWithMiddleware(FlickrReducer, FlickrInitialState);
-
-});
+export default createStoreWithMiddleware(FlickrReducer, FlickrInitialState)

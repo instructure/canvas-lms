@@ -1,8 +1,7 @@
-define([
-  'i18n!roster',
-  'react',
-  'instructure-ui/Alert'
-], (I18n, React, {default: Alert}) => {
+import I18n from 'i18n!roster'
+import React from 'react'
+import Alert from 'instructure-ui/Alert'
+
   class ApiError extends React.Component {
     static propTypes = {
       error: React.PropTypes.oneOfType([
@@ -34,5 +33,4 @@ define([
     }
   }
 
-  return ApiError;
-});
+export default ApiError

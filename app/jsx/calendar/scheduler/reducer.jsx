@@ -1,10 +1,6 @@
-define([
-  'redux-actions',
-  './actions',
-  './store/initialState'
-], (ReduxActions, SchedulerActions, initialState) => {
-
-  const { handleActions } = ReduxActions;
+import { handleActions } from 'redux-actions'
+import SchedulerActions from './actions'
+import initialState from './store/initialState'
 
   const reducer = handleActions({
     [SchedulerActions.keys.SET_FIND_APPOINTMENT_MODE]: (state = initialState, action) => {
@@ -21,6 +17,4 @@ define([
     }
   });
 
-  return reducer;
-
-});
+export default reducer

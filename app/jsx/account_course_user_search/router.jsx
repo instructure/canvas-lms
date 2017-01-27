@@ -1,7 +1,5 @@
-define([
-  'page',
-  './actions/TabActions'
-], function(page, TabActions) {
+import page from 'page'
+import TabActions from './actions/TabActions'
 
 
   const router = {
@@ -24,5 +22,4 @@ define([
   };
 
 
-  return router;
-});
+export default router

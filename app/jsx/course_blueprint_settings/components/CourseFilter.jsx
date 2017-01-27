@@ -1,18 +1,16 @@
-define([
-  'i18n!blueprint_config',
-  'react',
-  'instructure-ui/TextInput',
-  'instructure-ui/Select',
-  'instructure-ui/ScreenReaderContent',
-  'instructure-ui/Grid',
-  'instructure-ui/ApplyTheme',
-  '../propTypes',
-], (I18n, React, {default: TextInput}, {default: Select}, {default: ScreenReaderContent}, {default: Grid, GridCol, GridRow},
-  {default: ApplyTheme}, propTypes) => {
+import I18n from 'i18n!blueprint_config'
+import React from 'react'
+import TextInput from 'instructure-ui/TextInput'
+import Select from 'instructure-ui/Select'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import Grid, {GridCol, GridRow} from 'instructure-ui/Grid'
+import ApplyTheme from 'instructure-ui/ApplyTheme'
+import propTypes from '../propTypes'
+
   const { func } = React.PropTypes
   const MIN_SEACH = 3 // min search term length for API
 
-  return class CourseFilter extends React.Component {
+  class CourseFilter extends React.Component {
     static propTypes = {
       onChange: func,
       onActivate: func,
@@ -140,4 +138,4 @@ define([
       )
     }
   }
-})
+export default CourseFilter

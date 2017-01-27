@@ -1,7 +1,5 @@
-define([
-  'redux',
-  '../actions/collaborationsActions'
-], (redux, ACTION_NAMES) => {
+import redux from 'redux'
+import ACTION_NAMES from '../actions/collaborationsActions'
   let initialState = {
     listCollaborationsPending: false,
     listCollaborationsSuccessful: false,
@@ -53,11 +51,10 @@ define([
     }
   };
 
-  return (state = initialState, action) => {
+export default (state = initialState, action) => {
     if (collaborationsHandlers[action.type]) {
       return collaborationsHandlers[action.type](state, action)
     } else {
       return state
     }
   }
-})

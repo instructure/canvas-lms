@@ -1,22 +1,17 @@
-define([
-  'jquery',
-  'react',
-  'instructure-icons/react/Solid/IconMiniArrowDownSolid',
-  'instructure-ui/Button',
-  'instructure-ui/Link',
-  'instructure-ui/Menu',
-  'instructure-ui/PopoverMenu',
-  'instructure-ui/Typography',
-  'jsx/gradezilla/shared/GradebookExportManager',
-  'timezone',
-  'jsx/shared/helpers/dateHelper',
-  'i18n!gradebook',
-  'compiled/jquery.rails_flash_notifications'
-], (
-  $, React, { default: IconMiniArrowDownSolid }, { default: Button }, { default: Link },
-  { MenuItem, MenuItemSeparator }, { default: PopoverMenu }, { default: Typography },
-  GradebookExportManager, tz, DateHelper, I18n
-) => {
+import $ from 'jquery'
+import React from 'react'
+import IconMiniArrowDownSolid from 'instructure-icons/react/Solid/IconMiniArrowDownSolid'
+import Button from 'instructure-ui/Button'
+import Link from 'instructure-ui/Link'
+import { MenuItem, MenuItemSeparator } from 'instructure-ui/Menu'
+import PopoverMenu from 'instructure-ui/PopoverMenu'
+import Typography from 'instructure-ui/Typography'
+import GradebookExportManager from 'jsx/gradezilla/shared/GradebookExportManager'
+import tz from 'timezone'
+import DateHelper from 'jsx/shared/helpers/dateHelper'
+import I18n from 'i18n!gradebook'
+import 'compiled/jquery.rails_flash_notifications'
+
   const { bool, shape, string } = React.PropTypes;
 
   class ActionMenu extends React.Component {
@@ -209,5 +204,4 @@ define([
     }
   }
 
-  return ActionMenu;
-});
+export default ActionMenu

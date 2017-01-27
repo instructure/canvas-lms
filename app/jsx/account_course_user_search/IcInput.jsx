@@ -1,8 +1,6 @@
-define([
-  "react",
-  "underscore",
-  "classnames"
-], function(React, _, classnames) {
+import React from 'react'
+import _ from 'underscore'
+import classnames from 'classnames'
 
   var { string, any, bool } = React.PropTypes;
 
@@ -69,5 +67,4 @@ define([
       );
     }
   });
-  return IcInput;
-});
+export default IcInput

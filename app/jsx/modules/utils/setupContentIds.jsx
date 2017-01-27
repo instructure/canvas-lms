@@ -1,4 +1,4 @@
-define([], () => {
+
 
   /**
   * This utilty function will take a jQuery node and a module id then
@@ -11,5 +11,4 @@ define([], () => {
     $module.find('[aria-controls="context_module_content_"]').attr('aria-controls', newVal);
   };
 
-  return setupContentIds;
-});
+export default setupContentIds

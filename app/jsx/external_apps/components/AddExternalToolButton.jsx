@@ -1,15 +1,13 @@
-define([
-  'jquery',
-  'i18n!external_tools',
-  'react',
-  'react-modal',
-  'compiled/models/ExternalTool',
-  'jsx/external_apps/lib/ExternalAppsStore',
-  'jsx/external_apps/components/ConfigurationForm',
-  'jsx/external_apps/components/Lti2Iframe',
-  'jsx/external_apps/components/Lti2Permissions',
-  'compiled/jquery.rails_flash_notifications'
-], function ($, I18n, React, Modal, ExternalTool, store, ConfigurationForm, Lti2Iframe, Lti2Permissions) {
+import $ from 'jquery'
+import I18n from 'i18n!external_tools'
+import React from 'react'
+import Modal from 'react-modal'
+import ExternalTool from 'compiled/models/ExternalTool'
+import store from 'jsx/external_apps/lib/ExternalAppsStore'
+import ConfigurationForm from 'jsx/external_apps/components/ConfigurationForm'
+import Lti2Iframe from 'jsx/external_apps/components/Lti2Iframe'
+import Lti2Permissions from 'jsx/external_apps/components/Lti2Permissions'
+import 'compiled/jquery.rails_flash_notifications'
 
   const modalOverrides = {
     overlay : {
@@ -27,7 +25,7 @@ define([
     }
   };
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'AddExternalToolButton',
     throttleCreation: false,
 
@@ -184,4 +182,3 @@ define([
       );
     }
   });
-});

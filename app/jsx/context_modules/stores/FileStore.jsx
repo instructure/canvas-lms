@@ -1,6 +1,4 @@
-define([
-  './ObjectStore'
-], function (ObjectStore) {
+import ObjectStore from './ObjectStore'
 
   class FileStore extends ObjectStore {
     /**
@@ -15,5 +13,4 @@ define([
     }
   }
 
-  return FileStore;
-});
+export default FileStore

@@ -1,11 +1,9 @@
-define([
-  'i18n!external_tools',
-  'jquery',
-  'underscore',
-  'jsx/shared/helpers/createStore',
-  'compiled/fn/parseLinkHeader',
-  'compiled/jquery.rails_flash_notifications'
-], function(I18n, $, _, createStore, parseLinkHeader) {
+import I18n from 'i18n!external_tools'
+import $ from 'jquery'
+import _ from 'underscore'
+import createStore from 'jsx/shared/helpers/createStore'
+import parseLinkHeader from 'compiled/fn/parseLinkHeader'
+import 'compiled/jquery.rails_flash_notifications'
 
   var PER_PAGE = 50;
 
@@ -279,5 +277,4 @@ define([
     this.fetch({ force: true });
   };
 
-  return store;
-});
+export default store

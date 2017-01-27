@@ -1,11 +1,9 @@
-define([
-  'react',
-  'i18n!react_files',
-  'classnames',
-  'compiled/react_files/components/UploadProgress',
-  'jsx/shared/ProgressBar',
-  'compiled/util/mimeClass'
-  ], function(React, I18n, classnames, UploadProgress, ProgressBar, mimeClass) {
+import React from 'react'
+import I18n from 'i18n!react_files'
+import classnames from 'classnames'
+import UploadProgress from 'compiled/react_files/components/UploadProgress'
+import ProgressBar from 'jsx/shared/ProgressBar'
+import mimeClass from 'compiled/util/mimeClass'
 
     UploadProgress.renderProgressBar = function () {
       if (this.props.uploader.error) {
@@ -60,6 +58,4 @@ define([
       );
     };
 
-    return React.createClass(UploadProgress);
-
-});
+export default React.createClass(UploadProgress)

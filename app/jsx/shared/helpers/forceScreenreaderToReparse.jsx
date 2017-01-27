@@ -1,4 +1,4 @@
-define([], () => {
+
   /**
    * Preface: This is a horrible terrible function and should only be used
    *          in the most dire circumstances.  In fact, it probably shouldn't
@@ -32,5 +32,4 @@ define([], () => {
     window.scroll(XscrollPosition, YscrollPosition);
   };
 
-  return forceScreenreaderToReparse;
-});
+export default forceScreenreaderToReparse

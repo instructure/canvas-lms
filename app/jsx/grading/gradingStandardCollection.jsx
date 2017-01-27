@@ -1,13 +1,10 @@
-define([
-  'react',
-  'react-addons-update',
-  'jsx/grading/gradingStandard',
-  'jquery',
-  'i18n!external_tools',
-  'underscore',
-  'jquery.instructure_misc_plugins'
-],
-function(React, update, GradingStandard, $, I18n, _) {
+import React from 'react'
+import update from 'react-addons-update'
+import GradingStandard from 'jsx/grading/gradingStandard'
+import $ from 'jquery'
+import I18n from 'i18n!external_tools'
+import _ from 'underscore'
+import 'jquery.instructure_misc_plugins'
   var GradingStandardCollection = React.createClass({
 
     getInitialState: function() {
@@ -205,6 +202,4 @@ function(React, update, GradingStandard, $, I18n, _) {
     }
   });
 
-  return GradingStandardCollection;
-
-});
+export default GradingStandardCollection

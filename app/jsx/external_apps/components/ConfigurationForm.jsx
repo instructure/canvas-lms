@@ -1,15 +1,13 @@
-define([
-  'i18n!external_tools',
-  'jquery',
-  'react',
-  'jsx/external_apps/components/ConfigurationFormManual',
-  'jsx/external_apps/components/ConfigurationFormUrl',
-  'jsx/external_apps/components/ConfigurationFormXml',
-  'jsx/external_apps/components/ConfigurationFormLti2',
-  'jsx/external_apps/components/ConfigurationTypeSelector'
-], function(I18n, $, React, ConfigurationFormManual, ConfigurationFormUrl, ConfigurationFormXml, ConfigurationFormLti2, ConfigurationTypeSelector) {
+import I18n from 'i18n!external_tools'
+import $ from 'jquery'
+import React from 'react'
+import ConfigurationFormManual from 'jsx/external_apps/components/ConfigurationFormManual'
+import ConfigurationFormUrl from 'jsx/external_apps/components/ConfigurationFormUrl'
+import ConfigurationFormXml from 'jsx/external_apps/components/ConfigurationFormXml'
+import ConfigurationFormLti2 from 'jsx/external_apps/components/ConfigurationFormLti2'
+import ConfigurationTypeSelector from 'jsx/external_apps/components/ConfigurationTypeSelector'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ConfigurationForm',
 
     propTypes: {
@@ -192,4 +190,3 @@ define([
       )
     }
   });
-});

@@ -1,7 +1,5 @@
-define([
-  'react',
-  'react-crop'
-], (React, {default: Cropper}) => {
+import React from 'react'
+import Cropper from 'react-crop'
   //
   // The react-crop component requires a wrapper component for interacting
   // with the outside world.
@@ -73,5 +71,4 @@ define([
       )
     }
   }
-  return CanvasCropper;
-});
+export default CanvasCropper

@@ -1,9 +1,7 @@
-define([
-  'jquery',
-  'react',
-  'i18n!moderated_grading',
-  'compiled/jquery.rails_flash_notifications'
-], function ($, React, I18n) {
+import $ from 'jquery'
+import React from 'react'
+import I18n from 'i18n!moderated_grading'
+import 'compiled/jquery.rails_flash_notifications'
 
   var FlashMessageHolder = React.createClass({
     displayName: 'FlashMessageHolder',
@@ -37,5 +35,4 @@ define([
     }
   });
 
-  return FlashMessageHolder;
-});
+export default FlashMessageHolder

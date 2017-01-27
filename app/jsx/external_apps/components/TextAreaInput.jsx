@@ -1,11 +1,9 @@
-define([
-  'i18n!external_tools',
-  'jquery',
-  'react',
-  'jsx/external_apps/mixins/InputMixin'
-], function (I18n, $, React, InputMixin) {
+import I18n from 'i18n!external_tools'
+import $ from 'jquery'
+import React from 'react'
+import InputMixin from 'jsx/external_apps/mixins/InputMixin'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'TextAreaInput',
 
     mixins: [InputMixin],
@@ -37,5 +35,3 @@ define([
       )
     }
   });
-
-});

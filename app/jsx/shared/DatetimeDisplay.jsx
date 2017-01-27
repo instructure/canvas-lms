@@ -1,7 +1,5 @@
-define([
-  'react',
-  'timezone'
-], (React, tz) => {
+import React from 'react'
+import tz from 'timezone'
   class DatetimeDisplay extends React.Component {
     render () {
       let datetime = this.props.datetime instanceof Date ? this.props.datetime.toString() : this.props.datetime
@@ -25,5 +23,4 @@ define([
     format: '%c'
   };
 
-  return DatetimeDisplay;
-});
+export default DatetimeDisplay

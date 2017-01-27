@@ -1,9 +1,7 @@
-define([
-  'react', //for React.createElement outputted by jsx
-  "i18n!account_course_user_search",
-], function(React, I18n) {
+import React from 'react'
+import I18n from 'i18n!account_course_user_search'
 
-  return function(collection, loadMore, noneFoundMessage) {
+  function renderSearchMessage (collection, loadMore, noneFoundMessage) {
     if (!collection || collection.loading) {
       return (
         <div className="text-center pad-box">
@@ -41,5 +39,4 @@ define([
       );
     }
   }
-});
-
+export default renderSearchMessage

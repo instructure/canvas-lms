@@ -1,6 +1,4 @@
-define([
 
-], () => {
 
   function permissionFilter(items, perms) {
     return items.filter(item => {
@@ -16,5 +14,4 @@ define([
     });
   };
 
-  return permissionFilter;
-});
+export default permissionFilter

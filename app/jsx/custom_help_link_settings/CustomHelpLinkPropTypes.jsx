@@ -1,7 +1,6 @@
-define([
-  'react'
-], function (React) {
-  return {
+import React from 'react'
+
+export default {
     link: React.PropTypes.shape({
       text: React.PropTypes.string.isRequired,
       url: React.PropTypes.string.isRequired,
@@ -16,4 +15,3 @@ define([
       is_disabled: React.PropTypes.bool
     })
   }
-});

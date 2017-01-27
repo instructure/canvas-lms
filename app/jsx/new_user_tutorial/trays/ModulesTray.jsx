@@ -1,9 +1,8 @@
-define([
-  'react',
-  'i18n!new_user_tutorial',
-  'instructure-ui',
-  'jsx/shared/SVGWrapper'
-], (React, I18n, { Heading, Typography }, SVGWrapper) => {
+import React from 'react'
+import I18n from 'i18n!new_user_tutorial'
+import { Heading, Typography } from 'instructure-ui'
+import SVGWrapper from 'jsx/shared/SVGWrapper'
+
   const ModulesTray = () => (
     <div>
       <Heading as="h2" level="h1" >{I18n.t('Modules')}</Heading>
@@ -23,5 +22,4 @@ define([
     </div>
   );
 
-  return ModulesTray;
-});
+export default ModulesTray

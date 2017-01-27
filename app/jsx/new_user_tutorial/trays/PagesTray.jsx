@@ -1,8 +1,7 @@
-define([
-  'react',
-  'i18n!new_user_tutorial',
-  'instructure-ui',
-], (React, I18n, { Heading, Typography }) => {
+import React from 'react'
+import I18n from 'i18n!new_user_tutorial'
+import { Heading, Typography } from 'instructure-ui'
+
   const PagesTray = () => (
     <div>
       <div>
@@ -21,5 +20,4 @@ define([
     </div>
   );
 
-  return PagesTray;
-});
+export default PagesTray

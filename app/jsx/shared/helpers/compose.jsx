@@ -1,4 +1,4 @@
-define([], () => {
+
   // Adapted from https://github.com/reactjs/redux/blob/master/src/compose.js
 
   // This is a simple utility to help with composing functions together
@@ -28,5 +28,4 @@ define([], () => {
     return (...args) => rest.reduceRight((composed, f) => f(composed), last(...args))
   }
 
-  return compose;
-});
+export default compose

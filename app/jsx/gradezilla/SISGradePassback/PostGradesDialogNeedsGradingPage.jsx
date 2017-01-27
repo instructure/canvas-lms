@@ -1,8 +1,6 @@
-define([
-  'underscore',
-  'i18n!modules',
-  'react'
-], (_, I18n, React) => {
+import _ from 'underscore'
+import I18n from 'i18n!modules'
+import React from 'react'
 
   var PostGradesDialogNeedsGradingPage = React.createClass({
     onClickRow(assignment_id) {
@@ -58,5 +56,4 @@ define([
     }
   })
 
-  return PostGradesDialogNeedsGradingPage
-})
+export default PostGradesDialogNeedsGradingPage

@@ -1,14 +1,12 @@
-define([
-  'jsx/shared/rce/serviceRCELoader',
-  'jsx/shared/rce/RceCommandShim',
-  'jsx/shared/rce/Sidebar',
-  'jsx/shared/rce/featureFlag',
-  'jquery',
+import serviceRCELoader from 'jsx/shared/rce/serviceRCELoader'
+import { send, destroy, focus } from 'jsx/shared/rce/RceCommandShim'
+import Sidebar from 'jsx/shared/rce/Sidebar'
+import featureFlag from 'jsx/shared/rce/featureFlag'
+import $ from 'jquery'
 
-  // for legacy pathways
-  'tinymce.editor_box',
-  'compiled/tinymce'
-], function(serviceRCELoader, RceCommandShim, Sidebar, featureFlag, $) {
+// for legacy pathways
+import 'tinymce.editor_box'
+import 'compiled/tinymce'
 
   function loadServiceRCE(target, tinyMCEInitOptions, callback) {
     serviceRCELoader.loadOnTarget(target, tinyMCEInitOptions, (textarea, remoteEditor) => {
@@ -181,7 +179,7 @@ define([
       if (featureFlag()) {
         $target = this.freshNode($target)
       }
-      return RceCommandShim.send($target, methodName, ...args)
+      return send($target, methodName, ...args)
     },
 
     /**
@@ -193,7 +191,7 @@ define([
       if (featureFlag()) {
         $target = this.freshNode($target)
       }
-      RceCommandShim.destroy($target)
+      destroy($target)
       Sidebar.hide()
     },
 
@@ -207,7 +205,7 @@ define([
       if (featureFlag()) {
         $target = this.freshNode($target)
       }
-      RceCommandShim.focus($target)
+      focus($target)
       Sidebar.show()
     },
 
@@ -216,5 +214,4 @@ define([
     ensureID: ensureID
   }
 
-  return RichContentEditor
-})
+export default RichContentEditor

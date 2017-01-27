@@ -1,7 +1,6 @@
-define([
-  'underscore',
-  'i18n!gradebook',
-], (_, I18n) => {
+import _ from 'underscore'
+import I18n from 'i18n!gradebook'
+
   function getSubmittedAt (student) {
     return (student.submittedAt || student.submitted_at);
   }
@@ -108,5 +107,4 @@ define([
       }
     }
   };
-  return MessageStudentsWhoHelper;
-});
+export default MessageStudentsWhoHelper

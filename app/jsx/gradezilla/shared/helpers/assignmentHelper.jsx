@@ -1,6 +1,4 @@
-define([
-  'underscore'
-], function (_) {
+import _ from 'underscore'
   function uniqueEffectiveDueDates(assignment) {
     const dueDates = _.map(assignment.effectiveDueDates, function(dueDateInfo) {
       const dueAt = dueDateInfo.due_at;
@@ -68,5 +66,4 @@ define([
     }
   };
 
-  return assignmentHelper;
-});
+export default assignmentHelper

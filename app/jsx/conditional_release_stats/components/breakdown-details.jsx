@@ -1,12 +1,11 @@
-define([
-  'react',
-  './student-ranges-view',
-  './student-details-view',
-  '../shapes/index',
-], (React, StudentRangeView, StudentDetailsView, { assignmentShape, selectedPathShape }) => {
+import React from 'react'
+import StudentRangeView from './student-ranges-view'
+import StudentDetailsView from './student-details-view'
+import { assignmentShape, selectedPathShape } from '../shapes/index'
+
   const { array, object, func, bool } = React.PropTypes
 
-  return class BreakdownDetails extends React.Component {
+export default class BreakdownDetails extends React.Component {
     static propTypes = {
       ranges: array.isRequired,
       students: object.isRequired,
@@ -85,4 +84,3 @@ define([
       )
     }
   }
-})

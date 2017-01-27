@@ -1,14 +1,12 @@
-define([
-  'underscore',
-  'react',
-  'i18n!restrict_student_access',
-  'jquery',
-  'classnames',
-  'jsx/files/UsageRightsSelectBox',
-  'jsx/files/RestrictedRadioButtons',
-  'jsx/files/DialogPreview',
-  'compiled/react_files/components/RestrictedDialogForm'
-], function (_, React, I18n, $, classNames, UsageRightsSelectBox, RestrictedRadioButtons, DialogPreview, RestrictedDialogForm) {
+import _ from 'underscore'
+import React from 'react'
+import I18n from 'i18n!restrict_student_access'
+import $ from 'jquery'
+import classNames from 'classnames'
+import UsageRightsSelectBox from 'jsx/files/UsageRightsSelectBox'
+import RestrictedRadioButtons from 'jsx/files/RestrictedRadioButtons'
+import DialogPreview from 'jsx/files/DialogPreview'
+import RestrictedDialogForm from 'compiled/react_files/components/RestrictedDialogForm'
 
   RestrictedDialogForm.renderUsageRightsWarning = function () {
     return (
@@ -104,6 +102,4 @@ define([
     );
   };
 
-  return React.createClass(RestrictedDialogForm);
-
-});
+export default React.createClass(RestrictedDialogForm)

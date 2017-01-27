@@ -1,9 +1,7 @@
-define([
-  'i18n!new_nav',
-  'react',
-  'jsx/shared/SVGWrapper',
-  'compiled/fn/preventDefault'
-], (I18n, React, SVGWrapper, PreventDefault) => {
+import I18n from 'i18n!new_nav'
+import React from 'react'
+import SVGWrapper from 'jsx/shared/SVGWrapper'
+import PreventDefault from 'compiled/fn/preventDefault'
 
   var ProfileTray = React.createClass({
 
@@ -83,6 +81,4 @@ define([
     }
   });
 
-  return ProfileTray;
-
-});
+export default ProfileTray

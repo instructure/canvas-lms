@@ -1,43 +1,37 @@
-define([
-  'underscore',
-], (_) => {
-  const actionsHelper = {
-    typeNameToFuncName: (typeName) => {
-      const parts = typeName.split('_')
-      return parts.map((part, i) => {
-        if (i !== 0 && part.length) {
-          return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
-        } else {
-          return part.toLowerCase()
-        }
-      }).join('')
-    },
+import _ from 'underscore'
 
-    createAction: (actionType) => {
-      const actionCreator = (payload) => ({
-        type: actionType,
-        payload,
-      })
+export function typeNameToFuncName (typeName) {
+  const parts = typeName.split('_')
+  return parts.map((part, i) => {
+    if (i !== 0 && part.length) {
+      return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+    } else {
+      return part.toLowerCase()
+    }
+  }).join('')
+}
 
-      actionCreator.type = actionType
-      actionCreator.toString = () => actionType
-      return actionCreator
-    },
+export function createAction (actionType) {
+  const actionCreator = (payload) => ({
+    type: actionType,
+    payload,
+  })
 
-    createActions: (actionDefs) => {
-      const actionTypes = {}
-      const actions = {}
+  actionCreator.type = actionType
+  actionCreator.toString = () => actionType
+  return actionCreator
+}
 
-      actionDefs.forEach(actionDef => {
-        const action = actionsHelper.createAction(actionDef)
-        const funcName = actionsHelper.typeNameToFuncName(action.type)
-        actions[funcName] = action
-        actionTypes[action.type] = action.type
-      })
+export function createActions (actionDefs) {
+  const actionTypes = {}
+  const actions = {}
 
-      return { actionTypes, actions }
-    },
-  }
+  actionDefs.forEach(actionDef => {
+    const action = createAction(actionDef)
+    const funcName = typeNameToFuncName(action.type)
+    actions[funcName] = action
+    actionTypes[action.type] = action.type
+  })
 
-  return actionsHelper
-})
+  return { actionTypes, actions }
+}

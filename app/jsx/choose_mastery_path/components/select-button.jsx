@@ -1,11 +1,9 @@
-define([
-  'react',
-  'classnames',
-  'i18n!choose_mastery_path',
-], (React, classNames, I18n) => {
+import React from 'react'
+import classNames from 'classnames'
+import I18n from 'i18n!choose_mastery_path'
   const { func, bool } = React.PropTypes
 
-  return class SelectButton extends React.Component {
+export default class SelectButton extends React.Component {
     static propTypes = {
       isSelected: bool,
       isDisabled: bool,
@@ -54,4 +52,3 @@ define([
       )
     }
   }
-})

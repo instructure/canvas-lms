@@ -1,7 +1,5 @@
-  define([
-  '../stores/FlickrInitialState',
-  'underscore'
-], (FlickrInitialState, _) => {
+  import FlickrInitialState from '../stores/FlickrInitialState'
+import _ from 'underscore'
 
   const flickrHandlers = {
     START_FLICKR_SEARCH (state, action) {
@@ -39,6 +37,4 @@
     }
   };
 
-  return flickr;
-
-});
+export default flickr

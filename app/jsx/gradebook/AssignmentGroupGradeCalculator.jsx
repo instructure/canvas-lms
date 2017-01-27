@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'underscore'
-], (_) => {
+import _ from 'underscore'
+
   function sum (collection) {
     return _.reduce(collection, (total, value) => total + value, 0);
   }
@@ -306,7 +305,7 @@ define([
   //   final: <AssignmentGroup Grade *see above>
   //   scoreUnit: 'points'
   // }
-  function calculate (allSubmissions, assignmentGroup) {
+  export function calculate (allSubmissions, assignmentGroup) {
     const submissions = _.uniq(allSubmissions, 'assignment_id');
     return {
       assignmentGroupId: assignmentGroup.id,
@@ -316,8 +315,3 @@ define([
       scoreUnit: 'points'
     };
   }
-
-  return {
-    calculate
-  };
-});

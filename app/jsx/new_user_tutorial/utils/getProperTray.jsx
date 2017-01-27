@@ -1,23 +1,20 @@
-define([
-  'i18n!new_user_tutorials',
-  '../trays/HomeTray',
-  '../trays/ModulesTray',
-  '../trays/PagesTray',
-  '../trays/AssignmentsTray',
-  '../trays/QuizzesTray',
-  '../trays/SettingsTray',
-  '../trays/FilesTray',
-  '../trays/PeopleTray',
-  '../trays/AnnouncementsTray',
-  '../trays/GradesTray',
-  '../trays/DiscussionsTray',
-  '../trays/SyllabusTray',
-  '../trays/CollaborationsTray',
-  '../trays/ImportTray',
-  '../trays/ConferencesTray'
-], (I18n, HomeTray, ModulesTray, PagesTray, AssignmentsTray, QuizzesTray, SettingsTray,
-  FilesTray, PeopleTray, AnnouncementsTray, GradesTray, DiscussionsTray, SyllabusTray,
-  CollaborationsTray, ImportTray, ConferencesTray) => {
+import I18n from 'i18n!new_user_tutorials'
+import HomeTray from '../trays/HomeTray'
+import ModulesTray from '../trays/ModulesTray'
+import PagesTray from '../trays/PagesTray'
+import AssignmentsTray from '../trays/AssignmentsTray'
+import QuizzesTray from '../trays/QuizzesTray'
+import SettingsTray from '../trays/SettingsTray'
+import FilesTray from '../trays/FilesTray'
+import PeopleTray from '../trays/PeopleTray'
+import AnnouncementsTray from '../trays/AnnouncementsTray'
+import GradesTray from '../trays/GradesTray'
+import DiscussionsTray from '../trays/DiscussionsTray'
+import SyllabusTray from '../trays/SyllabusTray'
+import CollaborationsTray from '../trays/CollaborationsTray'
+import ImportTray from '../trays/ImportTray'
+import ConferencesTray from '../trays/ConferencesTray'
+
   const generateObject = (component, label, pageName) => ({
     component,
     label,
@@ -57,5 +54,4 @@ define([
     return generateObject(HomeTray, I18n.t('Home Tutorial Tray'), 'home');
   }
 
-  return getProperTray;
-});
+export default getProperTray

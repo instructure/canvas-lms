@@ -1,10 +1,8 @@
-define([
-  'jquery',
-  'react',
-  'react-dom',
-  'i18n!file_not_found',
-  'compiled/fn/preventDefault'
-], function ($, React, ReactDOM, I18n, preventDefault) {
+import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import I18n from 'i18n!file_not_found'
+import preventDefault from 'compiled/fn/preventDefault'
 
   const LABEL_TEXT = I18n.t('Please let them know which page you were viewing and the link you clicked on.');
 
@@ -70,6 +68,4 @@ define([
     contextCode: React.PropTypes.string.isRequired
   };
 
-  return FileNotFound;
-
-});
+export default FileNotFound

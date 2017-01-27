@@ -1,11 +1,9 @@
-define([
-  'react',
-  './assignment-shape',
-], ({ PropTypes }, assignmentShape) => {
-  const { shape, number, arrayOf } = PropTypes
+import { PropTypes } from 'react'
+import assignmentShape from './assignment-shape'
 
-  return shape({
-    setId: number.isRequired,
-    assignments: arrayOf(assignmentShape).isRequired,
-  })
+const { shape, number, arrayOf } = PropTypes
+
+export default shape({
+  setId: number.isRequired,
+  assignments: arrayOf(assignmentShape).isRequired,
 })

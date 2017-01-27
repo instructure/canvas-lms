@@ -1,13 +1,12 @@
-define([
-  'react',
-  'jquery',
-  'instructure-ui/Button',
-  'axios',
-  'i18n!grading_periods',
-  'timezone',
-  'jsx/shared/helpers/dateHelper',
-  'jquery.instructure_misc_helpers'
-], function(React, $, { default: Button }, axios, I18n, tz, DateHelper) {
+import React from 'react'
+import $ from 'jquery'
+import Button from 'instructure-ui/Button'
+import axios from 'axios'
+import I18n from 'i18n!grading_periods'
+import tz from 'timezone'
+import DateHelper from 'jsx/shared/helpers/dateHelper'
+import 'jquery.instructure_misc_helpers'
+
   const Types = React.PropTypes;
 
   let AccountGradingPeriod = React.createClass({
@@ -130,5 +129,4 @@ define([
     },
   });
 
-  return AccountGradingPeriod;
-});
+export default AccountGradingPeriod

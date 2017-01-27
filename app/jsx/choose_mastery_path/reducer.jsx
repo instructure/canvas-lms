@@ -1,10 +1,9 @@
-define([
-  'redux',
-  'redux-actions',
-  './actions',
-  '../shared/helpers/assignment-categories',
-], ({ combineReducers }, { handleActions }, actions, Categories) => {
-  return combineReducers({
+import { combineReducers } from 'redux'
+import { handleActions } from 'redux-actions'
+import actions from './actions'
+import Categories from '../shared/helpers/assignment-categories'
+
+export default combineReducers({
     error: handleActions({
       [actions.SET_ERROR]: (state, action) => action.payload,
     }, ''),
@@ -28,4 +27,3 @@ define([
     moduleId: (state = '', action) => state,
     itemId: (state = '', action) => state,
   })
-})

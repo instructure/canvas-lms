@@ -1,14 +1,12 @@
-define([
-  'react',
-  'underscore',
-  'jsx/epub_exports/GenerateLink',
-  'jsx/epub_exports/DownloadLink',
-  'jsx/shared/ApiProgressBar',
-  'jsx/epub_exports/CourseStore',
-  'i18n!epub_exports',
-  'jsx/shared/FriendlyDatetime',
-  'classnames'
-], function(React, _, GenerateLink, DownloadLink, ApiProgressBar, CourseEpubExportStore, I18n, FriendlyDatetime, classnames) {
+import React from 'react'
+import _ from 'underscore'
+import GenerateLink from 'jsx/epub_exports/GenerateLink'
+import DownloadLink from 'jsx/epub_exports/DownloadLink'
+import ApiProgressBar from 'jsx/shared/ApiProgressBar'
+import CourseEpubExportStore from 'jsx/epub_exports/CourseStore'
+import I18n from 'i18n!epub_exports'
+import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
+import classnames from 'classnames'
   var CourseListItem = React.createClass({
     displayName: 'CourseListItem',
     propTypes: {
@@ -94,6 +92,4 @@ define([
     },
   });
 
-  return CourseListItem;
-});
-
+export default CourseListItem

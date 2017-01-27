@@ -1,9 +1,7 @@
-define([
-  'underscore',
-  'timezone',
-  'i18n!gradebook',
-  'jsx/grading/helpers/GradingPeriodsHelper'
-], function(_, tz, I18n, GradingPeriodsHelper) {
+import _ from 'underscore'
+import tz from 'timezone'
+import I18n from 'i18n!gradebook'
+import GradingPeriodsHelper from 'jsx/grading/helpers/GradingPeriodsHelper'
 
   const TOOLTIP_KEYS = {
     NOT_IN_ANY_GP: "not_in_any_grading_period",
@@ -91,5 +89,4 @@ define([
     }
   };
 
-  return SubmissionState;
-})
+export default SubmissionState

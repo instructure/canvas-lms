@@ -1,11 +1,9 @@
-define([
-  'jquery',
-  'react',
-  './DashboardCard',
-  './DraggableDashboardCard',
-  './DashboardCardBackgroundStore',
-  './MovementUtils'
-], ($, React, DashboardCard, DraggableDashboardCard, DashboardCardBackgroundStore, MovementUtils) => {
+import $ from 'jquery'
+import React from 'react'
+import DashboardCard from './DashboardCard'
+import DraggableDashboardCard from './DraggableDashboardCard'
+import DashboardCardBackgroundStore from './DashboardCardBackgroundStore'
+import MovementUtils from './MovementUtils'
   const DashboardCardBox = React.createClass({
 
     displayName: 'DashboardCardBox',
@@ -122,5 +120,4 @@ define([
     }
   });
 
-  return DashboardCardBox;
-});
+export default DashboardCardBox

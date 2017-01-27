@@ -1,4 +1,5 @@
-define(['jsx/shared/helpers/createStore'], (createStore) => {
+import createStore from 'jsx/shared/helpers/createStore';
+
   const defaultState = Object.freeze({
     isCollapsed: false
   });
@@ -8,5 +9,4 @@ define(['jsx/shared/helpers/createStore'], (createStore) => {
     return store;
   }
 
-  return createTutorialStore;
-});
+export default createTutorialStore;

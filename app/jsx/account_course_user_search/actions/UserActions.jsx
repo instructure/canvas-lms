@@ -1,9 +1,7 @@
-define ([
-  "jquery",
-  "jsx/account_course_user_search/UsersStore",
-  "underscore",
-  "i18n!user_actions"
-], ($, UsersStore, _, I18n) => {
+import $ from 'jquery'
+import UsersStore from 'jsx/account_course_user_search/UsersStore'
+import _ from 'underscore'
+import I18n from 'i18n!user_actions'
 
   const UserActions = {
     apiCreateUser (accountId, attributes) {
@@ -134,5 +132,4 @@ define ([
     }
   };
 
-  return UserActions;
-});
+export default UserActions

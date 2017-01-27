@@ -1,13 +1,11 @@
-define([
-  'react',
-  'axios',
-  'instructure-ui/Spinner',
-  'i18n!webzip_exports',
-  'compiled/str/splitAssetString',
-  'jsx/webzip_export/components/ExportList',
-  'jsx/webzip_export/components/ExportInProgress',
-  'jsx/webzip_export/components/Errors',
-], (React, axios, {default: Spinner}, I18n, splitAssetString, ExportList, ExportInProgress, Errors) => {
+import React from 'react'
+import axios from 'axios'
+import Spinner from 'instructure-ui/Spinner'
+import I18n from 'i18n!webzip_exports'
+import splitAssetString from 'compiled/str/splitAssetString'
+import ExportList from 'jsx/webzip_export/components/ExportList'
+import ExportInProgress from 'jsx/webzip_export/components/ExportInProgress'
+import Errors from 'jsx/webzip_export/components/Errors'
   class WebZipExportApp extends React.Component {
 
     static webZipFormat (webZipExports, newExportId = null) {
@@ -113,5 +111,4 @@ define([
     }
   }
 
-  return WebZipExportApp
-})
+export default WebZipExportApp

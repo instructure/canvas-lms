@@ -1,14 +1,9 @@
-define([
-  'underscore',
-  'react',
-  'jsx/gradezilla/SISGradePassback/assignmentUtils',
-  'jsx/gradezilla/SISGradePassback/PostGradesDialogCorrectionsPage',
-  'jsx/gradezilla/SISGradePassback/PostGradesDialogNeedsGradingPage',
-  'jsx/gradezilla/SISGradePassback/PostGradesDialogSummaryPage'
-], (_, React, assignmentUtils,
-    PostGradesDialogCorrectionsPage,
-    PostGradesDialogNeedsGradingPage,
-    PostGradesDialogSummaryPage) => {
+import _ from 'underscore'
+import React from 'react'
+import assignmentUtils from 'jsx/gradezilla/SISGradePassback/assignmentUtils'
+import PostGradesDialogCorrectionsPage from 'jsx/gradezilla/SISGradePassback/PostGradesDialogCorrectionsPage'
+import PostGradesDialogNeedsGradingPage from 'jsx/gradezilla/SISGradePassback/PostGradesDialogNeedsGradingPage'
+import PostGradesDialogSummaryPage from 'jsx/gradezilla/SISGradePassback/PostGradesDialogSummaryPage'
 
   var PostGradesDialog = React.createClass({
     componentDidMount () {
@@ -153,5 +148,4 @@ define([
     }
   });
 
-  return PostGradesDialog;
-});
+export default PostGradesDialog

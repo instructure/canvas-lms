@@ -1,20 +1,16 @@
-define([
-  'react',
-  'react-dom',
-  'jquery',
-  'i18n!student_groups',
-  'compiled/util/natcompare',
-  'compiled/models/Group',
-  'compiled/collections/UserCollection',
-  'compiled/collections/ContextGroupCollection',
-  'jsx/groups/mixins/BackboneState',
-  'jsx/groups/components/PaginatedGroupList',
-  'jsx/groups/components/Filter',
-  'jsx/groups/components/NewGroupDialog',
-  'jsx/groups/components/ManageGroupDialog',
-], (React, ReactDOM, $, I18n, natcompare, Group, UserCollection,
-  ContextGroupCollection, BackboneState, PaginatedGroupList, Filter,
-  NewGroupDialog, ManageGroupDialog) => {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import $ from 'jquery'
+import I18n from 'i18n!student_groups'
+import natcompare from 'compiled/util/natcompare'
+import Group from 'compiled/models/Group'
+import UserCollection from 'compiled/collections/UserCollection'
+import ContextGroupCollection from 'compiled/collections/ContextGroupCollection'
+import BackboneState from 'jsx/groups/mixins/BackboneState'
+import PaginatedGroupList from 'jsx/groups/components/PaginatedGroupList'
+import Filter from 'jsx/groups/components/Filter'
+import NewGroupDialog from 'jsx/groups/components/NewGroupDialog'
+import ManageGroupDialog from 'jsx/groups/components/ManageGroupDialog'
   const StudentView = React.createClass({
     mixins: [BackboneState],
 
@@ -232,5 +228,4 @@ define([
         </div>)
     },
   })
-  return <StudentView />
-})
+export default <StudentView />

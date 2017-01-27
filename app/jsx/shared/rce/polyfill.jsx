@@ -1,4 +1,4 @@
-define(['underscore'], function(_) {
+import _ from 'underscore'
 
   const editorExtensions = {
     call(methodName, ...args) {
@@ -38,5 +38,4 @@ define(['underscore'], function(_) {
     }
   }
 
-  return polyfill
-})
+export default polyfill

@@ -1,8 +1,7 @@
-define([
-  'i18n!student_context_tray',
-  'react',
-  'instructure-ui',
-], (I18n, React, { Avatar: InstUIAvatar, Typography, Link }) => {
+import I18n from 'i18n!student_context_tray'
+import React from 'react'
+import { Avatar as InstUIAvatar, Typography, Link } from 'instructure-ui'
+
   class Avatar extends React.Component {
     static propTypes = {
       user: React.PropTypes.shape({
@@ -53,5 +52,4 @@ define([
     }
   }
 
-  return Avatar
-})
+export default Avatar

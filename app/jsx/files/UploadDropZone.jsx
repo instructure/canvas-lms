@@ -1,13 +1,11 @@
-define([
-  'underscore',
-  'react',
-  'react-dom',
-  'jquery',
-  'i18n!upload_drop_zone',
-  'compiled/react_files/modules/FileOptionsCollection',
-  'compiled/models/Folder',
-  'compiled/jquery.rails_flash_notifications'
-], function(_, React, ReactDOM, $, I18n, FileOptionsCollection, Folder) {
+import _ from 'underscore'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import $ from 'jquery'
+import I18n from 'i18n!upload_drop_zone'
+import FileOptionsCollection from 'compiled/react_files/modules/FileOptionsCollection'
+import Folder from 'compiled/models/Folder'
+import 'compiled/jquery.rails_flash_notifications'
 
     var UploadDropZone = React.createClass({
       displayName: 'UploadDropZone',
@@ -127,5 +125,4 @@ define([
 
     });
 
-    return UploadDropZone;
-});
+export default UploadDropZone

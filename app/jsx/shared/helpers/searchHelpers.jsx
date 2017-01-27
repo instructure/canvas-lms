@@ -1,7 +1,5 @@
-define([
-  'underscore',
-  'compiled/regexp/rEscape'
-], function (_, rEscape) {
+import _ from 'underscore'
+import rEscape from 'compiled/regexp/rEscape'
   let SearchHelpers = {
     exactMatchRegex(string) {
       return new RegExp('^' + rEscape(string) + '$', 'i')
@@ -16,5 +14,4 @@ define([
     },
   };
 
-  return SearchHelpers;
-});
+export default SearchHelpers

@@ -16,22 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable react/style-prop-object */
-define([
-  'react',
-  'instructure-icons/react/Solid/IconMoreSolid',
-  'instructure-icons/react/Solid/IconMutedSolid',
-  'instructure-icons/react/Solid/IconWarningSolid',
-  'instructure-ui/Link',
-  'instructure-ui/Menu',
-  'instructure-ui/PopoverMenu',
-  'instructure-ui/Typography',
-  'message_students',
-  'jsx/gradezilla/shared/helpers/messageStudentsWhoHelper',
-  'i18n!gradebook',
-], (React, { default: IconMoreSolid }, { default: IconMutedSolid }, { default: IconWarningSolid },
-  { default: Link }, { MenuItem }, { default: PopoverMenu }, { default: Typography },
-  messageStudents, MessageStudentsWhoHelper, I18n) => {
+import React from 'react'
+import IconMoreSolid from 'instructure-icons/react/Solid/IconMoreSolid'
+import IconMutedSolid from 'instructure-icons/react/Solid/IconMutedSolid'
+import IconWarningSolid from 'instructure-icons/react/Solid/IconWarningSolid'
+import Link from 'instructure-ui/Link'
+import { MenuItem } from 'instructure-ui/Menu'
+import PopoverMenu from 'instructure-ui/PopoverMenu'
+import Typography from 'instructure-ui/Typography'
+import messageStudents from 'message_students'
+import MessageStudentsWhoHelper from 'jsx/gradezilla/shared/helpers/messageStudentsWhoHelper'
+import I18n from 'i18n!gradebook'
+
   const { arrayOf, bool, func, instanceOf, number, shape, string } = React.PropTypes;
 
   class AssignmentColumnHeader extends React.Component {
@@ -230,5 +226,4 @@ define([
     }
   }
 
-  return AssignmentColumnHeader;
-});
+export default AssignmentColumnHeader

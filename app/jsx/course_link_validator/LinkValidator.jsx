@@ -1,9 +1,7 @@
-define([
-  'jquery',
-  'react',
-  'i18n!link_validator',
-  './ValidatorResults'
-], function($, React, I18n, ValidatorResults) {
+import $ from 'jquery'
+import React from 'react'
+import I18n from 'i18n!link_validator'
+import ValidatorResults from './ValidatorResults'
 
   var LinkValidator = React.createClass({
     getInitialState () {
@@ -113,5 +111,4 @@ define([
     }
   });
 
-  return LinkValidator;
-});
+export default LinkValidator

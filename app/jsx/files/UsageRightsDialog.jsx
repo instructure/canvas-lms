@@ -1,13 +1,11 @@
-define([
-  'react',
-  'compiled/react_files/components/UsageRightsDialog',
-  'i18n!usage_rights_modal',
-  'jsx/files/UsageRightsSelectBox',
-  'jsx/files/RestrictedRadioButtons',
-  'jsx/files/DialogPreview',
-  'compiled/models/Folder',
-  'str/htmlEscape'
-], function (React, UsageRightsDialog, I18n, UsageRightsSelectBox, RestrictedRadioButtons, DialogPreview, Folder, htmlEscape) {
+import React from 'react'
+import UsageRightsDialog from 'compiled/react_files/components/UsageRightsDialog'
+import I18n from 'i18n!usage_rights_modal'
+import UsageRightsSelectBox from 'jsx/files/UsageRightsSelectBox'
+import RestrictedRadioButtons from 'jsx/files/RestrictedRadioButtons'
+import DialogPreview from 'jsx/files/DialogPreview'
+import Folder from 'compiled/models/Folder'
+import htmlEscape from 'str/htmlEscape'
 
   var MAX_THUMBNAILS_TO_SHOW = 5;
   var MAX_FOLDERS_TO_SHOW = 2;
@@ -190,6 +188,4 @@ define([
     );
   };
 
-  return React.createClass(UsageRightsDialog);
-
-});
+export default React.createClass(UsageRightsDialog)

@@ -1,8 +1,6 @@
-define([
-  'react',
-  'i18n!course_wizard',
-  'classnames'
-], function(React, I18n, classnames) {
+import React from 'react'
+import I18n from 'i18n!course_wizard'
+import classnames from 'classnames'
 
   var ChecklistItem = React.createClass({
       displayName: 'ChecklistItem',
@@ -62,6 +60,4 @@ define([
 
   });
 
-  return ChecklistItem;
-
-});
+export default ChecklistItem

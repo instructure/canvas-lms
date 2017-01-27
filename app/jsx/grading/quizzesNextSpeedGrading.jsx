@@ -12,7 +12,7 @@
 // refreshGradesCb executes the normal speedGrader refresh grades
 // actions, plus whatever callback is passed in as an argument
 
-define([], function() {
+
   function quizzesNextSpeedGrading (EG, $iframe_holder, registerCb, refreshGradesCb, speedGraderWindow = window) {
     function quizzesNextChange (submission) {
       EG.refreshSubmissionsToView();
@@ -67,5 +67,4 @@ define([], function() {
     };
   }
 
-  return quizzesNextSpeedGrading;
-});
+export default quizzesNextSpeedGrading

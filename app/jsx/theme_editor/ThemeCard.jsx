@@ -1,11 +1,9 @@
-define([
-  'i18n!theme_editor',
-  'react',
-  'jsx/shared/SVGWrapper',
-  'react-addons-css-transition-group',
-], (I18n, React, SVGWrapper, ReactCSSTransitionGroup) => {
+import I18n from 'i18n!theme_editor'
+import React from 'react'
+import SVGWrapper from 'jsx/shared/SVGWrapper'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ThemeCard',
 
     propTypes: {
@@ -177,4 +175,3 @@ define([
       )
     }
   })
-})

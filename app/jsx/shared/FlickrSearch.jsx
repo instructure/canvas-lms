@@ -1,12 +1,10 @@
-define([
-  'react',
-  'i18n!flickr_search',
-  './actions/FlickrActions',
-  './stores/FlickrStore',
-  './FlickrImage',
-  './SVGWrapper',
-  'instructure-ui/Spinner'
-], (React, I18n, FlickrActions, FlickrStore, FlickrImage, SVGWrapper, { default: Spinner }) => {
+import React from 'react'
+import I18n from 'i18n!flickr_search'
+import FlickrActions from './actions/FlickrActions'
+import FlickrStore from './stores/FlickrStore'
+import FlickrImage from './FlickrImage'
+import SVGWrapper from './SVGWrapper'
+import Spinner from 'instructure-ui/Spinner'
 
   class FlickrSearch extends React.Component {
 
@@ -120,6 +118,4 @@ define([
     }
   }
 
-  return FlickrSearch;
-
-});
+export default FlickrSearch

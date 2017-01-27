@@ -1,10 +1,8 @@
-define([
-  'react',
-  'i18n!epub_exports',
-  'classnames',
-  'underscore',
-  'jsx/epub_exports/CourseStore'
-], function(React, I18n, classnames, _, CourseEpubExportStore){
+import React from 'react'
+import I18n from 'i18n!epub_exports'
+import classnames from 'classnames'
+import _ from 'underscore'
+import CourseEpubExportStore from 'jsx/epub_exports/CourseStore'
 
   var GenerateLink = React.createClass({
     displayName: 'GenerateLink',
@@ -85,5 +83,4 @@ define([
     }
   });
 
-  return GenerateLink;
-});
+export default GenerateLink

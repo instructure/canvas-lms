@@ -1,7 +1,5 @@
-define([
-  'react',
-  'underscore'
-], (React, _) => {
+import React from 'react'
+import _ from 'underscore'
 
   const styles = {
     list: {
@@ -37,5 +35,4 @@ define([
     }
   }
 
-  return DisabledTokenInput;
-});
+export default DisabledTokenInput

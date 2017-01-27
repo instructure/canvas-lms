@@ -1,8 +1,6 @@
-define([
-  'i18n!account_course_user_search',
-  '../CoursesPane',
-  '../UsersPane',
-], function(I18n, CoursesPane, UsersPane) {
+import I18n from 'i18n!account_course_user_search'
+import CoursesPane from '../CoursesPane'
+import UsersPane from '../UsersPane'
 
   const tabs = [
     {
@@ -20,5 +18,4 @@ define([
   ];
 
 
-  return tabs;
-});
+export default tabs

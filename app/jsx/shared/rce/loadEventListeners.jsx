@@ -1,12 +1,10 @@
-define([
-  'compiled/views/tinymce/InsertUpdateImageView',
-  'tinymce_plugins/instructure_equella/initializeEquella',
-  'tinymce_plugins/instructure_external_tools/initializeExternalTools',
-  'tinymce_plugins/instructure_record/mediaEditorLoader',
-  'INST'
-], function(InsertUpdateImageView, initializeEquella, initializeExternalTools, mediaEditorLoader, INST){
+import InsertUpdateImageView from 'compiled/views/tinymce/InsertUpdateImageView'
+import initializeEquella from 'tinymce_plugins/instructure_equella/initializeEquella'
+import initializeExternalTools from 'tinymce_plugins/instructure_external_tools/initializeExternalTools'
+import mediaEditorLoader from 'tinymce_plugins/instructure_record/mediaEditorLoader'
+import INST from 'INST'
 
-  return function (callbacks={}) {
+  function loadEventListeners (callbacks={}) {
     const validCallbacks = [
       "imagePickerCB",
       "equellaCB",
@@ -40,4 +38,5 @@ define([
       callbacks.recordCB()
     });
   }
-});
+
+export default loadEventListeners

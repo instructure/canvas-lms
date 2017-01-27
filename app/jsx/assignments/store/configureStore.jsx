@@ -1,16 +1,13 @@
-define([
-  'redux',
-  'redux-thunk',
-  '../reducers/rootReducer'
-], function (Redux, {default:ReduxThunk}, rootReducer) {
+import { createStore, applyMiddleware } from 'redux'
+import ReduxThunk from 'redux-thunk'
+import rootReducer from '../reducers/rootReducer'
 
-  var { createStore, applyMiddleware } = Redux;
+var createStoreWithMiddleware = applyMiddleware(
+  ReduxThunk
+)(createStore);
 
-  var createStoreWithMiddleware = applyMiddleware(
-    ReduxThunk
-  )(createStore);
+function configureStore (initialState) {
+  return createStoreWithMiddleware(rootReducer, initialState);
+};
 
-  return function configureStore (initialState) {
-    return createStoreWithMiddleware(rootReducer, initialState);
-  };
-});
+export default configureStore

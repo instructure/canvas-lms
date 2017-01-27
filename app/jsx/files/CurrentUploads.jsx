@@ -1,9 +1,7 @@
-define([
-  'react',
-  'classnames',
-  'compiled/react_files/components/CurrentUploads',
-  'jsx/files/UploadProgress'
-  ], function(React, classnames, CurrentUploads, UploadProgress) {
+import React from 'react'
+import classnames from 'classnames'
+import CurrentUploads from 'compiled/react_files/components/CurrentUploads'
+import UploadProgress from 'jsx/files/UploadProgress'
 
     CurrentUploads.renderUploadProgress = function () {
       if (this.state.currentUploads.length) {
@@ -32,6 +30,4 @@ define([
       );
     };
 
-    return React.createClass(CurrentUploads);
-
-});
+export default React.createClass(CurrentUploads)

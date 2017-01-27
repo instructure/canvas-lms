@@ -1,9 +1,7 @@
-define([
-  'react',
-  'i18n!webzip_exports',
-  'jquery',
-  'jquery.instructure_date_and_time'
-], (React, I18n, $) => {
+import React from 'react'
+import I18n from 'i18n!webzip_exports'
+import $ from 'jquery'
+import 'jquery.instructure_date_and_time'
   class ExportListItem extends React.Component {
     static propTypes = {
       date: React.PropTypes.string.isRequired,
@@ -30,6 +28,4 @@ define([
     }
   }
 
-  return ExportListItem
-})
-
+export default ExportListItem

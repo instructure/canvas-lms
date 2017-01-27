@@ -1,8 +1,6 @@
-define([
-  'react',
-  'underscore',
-  'jsx/epub_exports/CourseListItem'
-], function(React, _, CourseListItem){
+import React from 'react'
+import _ from 'underscore'
+import CourseListItem from 'jsx/epub_exports/CourseListItem'
 
   var CourseList = React.createClass({
     displayName: 'CourseList',
@@ -25,5 +23,4 @@ define([
     }
   });
 
-  return CourseList;
-});
+export default CourseList

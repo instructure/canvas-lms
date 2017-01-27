@@ -1,13 +1,11 @@
-define([
-  'jquery',
-  'react',
-  'i18n!course_wizard',
-  'react-modal',
-  './InfoFrame',
-  './Checklist',
-  'compiled/userSettings',
-  'compiled/jquery.rails_flash_notifications'
-], function ($, React, I18n, ReactModal, InfoFrame, Checklist, userSettings) {
+import $ from 'jquery'
+import React from 'react'
+import I18n from 'i18n!course_wizard'
+import ReactModal from 'react-modal'
+import InfoFrame from './InfoFrame'
+import Checklist from './Checklist'
+import userSettings from 'compiled/userSettings'
+import 'compiled/jquery.rails_flash_notifications'
 
   const modalOverrides = {
     overlay : {
@@ -118,6 +116,4 @@ define([
       }
   });
 
-  return CourseWizard;
-
-});
+export default CourseWizard

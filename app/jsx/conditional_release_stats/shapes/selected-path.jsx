@@ -1,10 +1,7 @@
-define([
-  'react',
-], ({ PropTypes }) => {
-  const { shape, number } = PropTypes
+import { PropTypes } from 'react'
+const { shape, number } = PropTypes
 
-  return shape({
-    range: number,
-    student: number,
-  })
+export default shape({
+  range: number,
+  student: number,
 })

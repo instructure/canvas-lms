@@ -1,4 +1,4 @@
-define([], () => {
+
 
   const initialState = {
     courseImage: 'abc',
@@ -9,5 +9,4 @@ define([], () => {
     removingImage: false
   };
 
-  return initialState;
-});
+export default initialState

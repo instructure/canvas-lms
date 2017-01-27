@@ -1,13 +1,11 @@
-define([
-  'i18n!react_files',
-  'react',
-  'compiled/react_files/components/MoveDialog',
-  'jsx/shared/modal',
-  'jsx/shared/modal-content',
-  'jsx/shared/modal-buttons',
-  'jsx/files/BBTreeBrowser',
-  'classnames'
-], function (I18n, React, MoveDialog, Modal, ModalContent, ModalButtons, BBTreeBrowser, classnames) {
+import I18n from 'i18n!react_files'
+import React from 'react'
+import MoveDialog from 'compiled/react_files/components/MoveDialog'
+import Modal from 'jsx/shared/modal'
+import ModalContent from 'jsx/shared/modal-content'
+import ModalButtons from 'jsx/shared/modal-buttons'
+import BBTreeBrowser from 'jsx/files/BBTreeBrowser'
+import classnames from 'classnames'
 
   const modalOverrides = {
     overlay : {
@@ -88,6 +86,4 @@ define([
     );
   };
 
-  return React.createClass(MoveDialog);
-
-});
+export default React.createClass(MoveDialog)

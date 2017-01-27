@@ -1,8 +1,7 @@
-define([], () => {
   // parse the list of names entered by our user into an array
   // separates entries on , or \n
   // deals with entries like '"Last, First" email' where there's a common w/in quotes
-  function parseNameList (nameList) {
+  export function parseNameList (nameList) {
     const names = [];
     let iStart = 0;
     let inQuote = false;
@@ -21,13 +20,10 @@ define([], () => {
     return names;
   }
 
-  function findEmailInEntry (entry) {
+  export function findEmailInEntry (entry) {
     const tokens = entry.split(/\s+/);
     const emailIndex = tokens.findIndex(t => t.indexOf('@') >= 0);
     return tokens[emailIndex];
   }
 
-  const emailValidator = /.+@.+\..+/;
-
-  return {parseNameList, findEmailInEntry, emailValidator};
-});
+  export const emailValidator = /.+@.+\..+/;

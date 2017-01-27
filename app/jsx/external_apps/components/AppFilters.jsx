@@ -1,10 +1,8 @@
-define([
-  'i18n!external_tools',
-  'react',
-  'jsx/external_apps/lib/AppCenterStore'
-], function (I18n, React, store) {
+import I18n from 'i18n!external_tools'
+import React from 'react'
+import store from 'jsx/external_apps/lib/AppCenterStore'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'AppFilters',
 
     getInitialState() {
@@ -68,4 +66,3 @@ define([
       )
     }
   });
-});

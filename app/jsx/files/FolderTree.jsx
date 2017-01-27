@@ -1,8 +1,5 @@
-define([
-  'react',
-  'compiled/react_files/components/FolderTree'
-
-  ], function(React, FolderTree) {
+import React from 'react'
+import FolderTree from 'compiled/react_files/components/FolderTree'
 
   FolderTree.render =  function () {
     return (
@@ -14,6 +11,4 @@ define([
     );
   };
 
-  return React.createClass(FolderTree);
-
-});
+export default React.createClass(FolderTree)

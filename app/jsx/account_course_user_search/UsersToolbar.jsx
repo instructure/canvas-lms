@@ -1,10 +1,9 @@
-define([
-  'react',
-  'i18n!account_course_user_search',
-  'underscore',
-  './NewUserModal',
-  './IcInput',
-], (React, I18n, _, NewUserModal, IcInput) => {
+import React from 'react'
+import I18n from 'i18n!account_course_user_search'
+import _ from 'underscore'
+import NewUserModal from './NewUserModal'
+import IcInput from './IcInput'
+
   const { string, bool, func, object } = React.PropTypes
 
   var UsersToolbar = React.createClass({
@@ -106,5 +105,4 @@ define([
     }
   });
 
-  return UsersToolbar;
-});
+export default UsersToolbar

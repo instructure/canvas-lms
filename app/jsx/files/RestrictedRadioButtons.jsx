@@ -1,13 +1,11 @@
-define([
-  'underscore',
-  'react',
-  'react-dom',
-  'i18n!restrict_student_access',
-  'jquery',
-  'compiled/react_files/modules/customPropTypes',
-  'compiled/models/Folder',
-  'jquery.instructure_date_and_time'
-], function (_, React, ReactDOM, I18n, $, customPropTypes, Folder) {
+import _ from 'underscore'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import I18n from 'i18n!restrict_student_access'
+import $ from 'jquery'
+import customPropTypes from 'compiled/react_files/modules/customPropTypes'
+import Folder from 'compiled/models/Folder'
+import 'jquery.instructure_date_and_time'
 
   var RestrictedRadioButtons = React.createClass({
 
@@ -225,6 +223,4 @@ define([
     }
   });
 
-  return RestrictedRadioButtons;
-
-});
+export default RestrictedRadioButtons

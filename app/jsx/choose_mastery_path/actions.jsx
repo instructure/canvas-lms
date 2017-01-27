@@ -1,7 +1,6 @@
-define([
-  'redux-actions',
-  './api-client',
-], ({ createAction }, api) => {
+import { createAction } from 'redux-actions'
+import api from './api-client'
+
   const actions = {}
 
   actions.SET_ERROR = 'SET_ERROR'
@@ -24,5 +23,4 @@ define([
     }
   }
 
-  return actions
-})
+export default actions

@@ -1,8 +1,7 @@
-define([
-  'react',
-  'i18n!new_user_tutorial',
-  'instructure-ui',
-], (React, I18n, { Typography, Heading }) => {
+import React from 'react'
+import I18n from 'i18n!new_user_tutorial'
+import { Typography, Heading } from 'instructure-ui'
+
   const PeopleTray = () => (
     <div>
       <Heading as="h2" level="h1" >{I18n.t('People')}</Heading>
@@ -17,5 +16,4 @@ define([
     </div>
   );
 
-  return PeopleTray;
-});
+export default PeopleTray

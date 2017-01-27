@@ -1,9 +1,8 @@
-define([
-  'underscore',
-  'redux',
-  '../actions/ModerationActions',
-  './../constants'
-], function (_, Redux, ModerationActions, Constants) {
+import _ from 'underscore'
+import { combineReducers } from 'redux'
+import ModerationActions from '../actions/ModerationActions'
+import Constants from './../constants'
+
   // CONSTANTS //
   var ASCENDING = Constants.sortDirections.ASCENDING;
   var DESCENDING = Constants.sortDirections.DESCENDING;
@@ -48,7 +47,6 @@ define([
     return studentList;
   }
 
-  var { combineReducers } = Redux;
   /**
    * Student Handlers
    */
@@ -321,12 +319,10 @@ define([
     return state;
   }
 
-  return combineReducers({
+export default combineReducers({
     studentList,
     urls,
     flashMessage,
     assignment,
     inflightAction
   });
-
-});

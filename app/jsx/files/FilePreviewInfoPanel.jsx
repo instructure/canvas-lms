@@ -1,12 +1,10 @@
-define([
-  'react',
-  'i18n!file_preview',
-  'jsx/shared/FriendlyDatetime',
-  'compiled/util/friendlyBytes',
-  'compiled/react_files/modules/customPropTypes',
-  'compiled/react_files/utils/getFileStatus',
-  'compiled/util/mimeClass'
- ], function (React, I18n, FriendlyDatetime, friendlyBytes, customPropTypes, getFileStatus, mimeClass) {
+import React from 'react'
+import I18n from 'i18n!file_preview'
+import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
+import friendlyBytes from 'compiled/util/friendlyBytes'
+import customPropTypes from 'compiled/react_files/modules/customPropTypes'
+import getFileStatus from 'compiled/react_files/utils/getFileStatus'
+import mimeClass from 'compiled/util/mimeClass'
 
   var FilePreviewInfoPanel = React.createClass({
     displayName: 'FilePreviewInfoPanel',
@@ -74,6 +72,4 @@ define([
 
   });
 
-  return FilePreviewInfoPanel;
-
-});
+export default FilePreviewInfoPanel

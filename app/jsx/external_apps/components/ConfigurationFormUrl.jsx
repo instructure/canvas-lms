@@ -1,13 +1,11 @@
-define([
-  'jquery',
-  'i18n!external_tools',
-  'underscore',
-  'react',
-  'jsx/external_apps/components/TextInput',
-  'compiled/jquery.rails_flash_notifications'
-], function ($, I18n, _, React, TextInput) {
+import $ from 'jquery'
+import I18n from 'i18n!external_tools'
+import _ from 'underscore'
+import React from 'react'
+import TextInput from 'jsx/external_apps/components/TextInput'
+import 'compiled/jquery.rails_flash_notifications'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ConfigurationFormUrl',
 
     propTypes: {
@@ -95,4 +93,3 @@ define([
       );
     }
   });
-});

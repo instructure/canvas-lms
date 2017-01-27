@@ -1,10 +1,8 @@
-define([
-  'i18n!upload_button',
-  'react',
-  'jsx/files/FileRenameForm',
-  './ZipFileOptionsForm',
-  'compiled/react_files/components/UploadButton'
-], function (I18n, React, FileRenameForm, ZipFileOptionsForm, UploadButton) {
+import I18n from 'i18n!upload_button'
+import React from 'react'
+import FileRenameForm from 'jsx/files/FileRenameForm'
+import ZipFileOptionsForm from './ZipFileOptionsForm'
+import UploadButton from 'compiled/react_files/components/UploadButton'
   UploadButton.buildPotentialModal = function () {
     if (this.state.zipOptions.length) {
       return (
@@ -60,5 +58,4 @@ define([
     );
   }
 
-  return React.createClass(UploadButton);
-});
+export default React.createClass(UploadButton)

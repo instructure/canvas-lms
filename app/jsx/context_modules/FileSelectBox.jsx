@@ -1,12 +1,10 @@
-define([
-  'underscore',
-  'react',
-  'i18n!context_modules',
-  './stores/FileStore',
-  './stores/FolderStore',
-  'compiled/util/natcompare',
-  'compiled/str/splitAssetString'
-], function(_, React, I18n, FileStore, FolderStore, natcompare, splitAssetString) {
+import _ from 'underscore'
+import React from 'react'
+import I18n from 'i18n!context_modules'
+import FileStore from './stores/FileStore'
+import FolderStore from './stores/FolderStore'
+import natcompare from 'compiled/util/natcompare'
+import splitAssetString from 'compiled/str/splitAssetString'
 
   var FileSelectBox = React.createClass({
     displayName: 'FileSelectBox',
@@ -108,6 +106,4 @@ define([
     }
   });
 
-  return FileSelectBox;
-
-});
+export default FileSelectBox

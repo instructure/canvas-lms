@@ -1,11 +1,9 @@
-define([
-  'jquery',
-  'react',
-  'i18n!dashboard',
-  'jsx/shared/SVGWrapper',
-  'classnames',
-  'jquery.ajaxJSON'
-], function($, React, I18n, SVGWrapper, classNames) {
+import $ from 'jquery'
+import React from 'react'
+import I18n from 'i18n!dashboard'
+import SVGWrapper from 'jsx/shared/SVGWrapper'
+import classNames from 'classnames'
+import 'jquery.ajaxJSON'
   var RecentActivityToggle = React.createClass({
     displayName: 'RecentActivityToggle',
     url: '/users/toggle_recent_activity_dashboard',
@@ -76,5 +74,4 @@ define([
       )
     }
   });
-  return RecentActivityToggle;
-});
+export default RecentActivityToggle

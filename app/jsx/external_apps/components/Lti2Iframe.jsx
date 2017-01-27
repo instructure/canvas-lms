@@ -1,10 +1,8 @@
-define([
-  'i18n!external_tools',
-  'jquery',
-  'react'
-], function (I18n, $, React) {
+import I18n from 'i18n!external_tools'
+import $ from 'jquery'
+import React from 'react'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'Lti2Iframe',
 
     propTypes: {
@@ -45,5 +43,3 @@ define([
       )
     }
   });
-
-});

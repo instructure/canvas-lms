@@ -1,7 +1,5 @@
-define([
-  'i18n!react_files',
-  'react'
-], function (I18n, React) {
+import I18n from 'i18n!react_files'
+import React from 'react'
 
   var NoResults = React.createClass({
     displayName: 'NoResults',
@@ -28,5 +26,4 @@ define([
 
   });
 
-  return NoResults;
-});
+export default NoResults

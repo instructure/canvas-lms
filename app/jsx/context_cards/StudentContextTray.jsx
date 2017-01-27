@@ -1,28 +1,17 @@
-define([
-  'react',
-  'i18n!student_context_tray',
-  'jsx/shared/FriendlyDatetime',
-  './StudentCardStore',
-  './Avatar',
-  './LastActivity',
-  './MetricsList',
-  './Rating',
-  './SectionInfo',
-  './SubmissionProgressBars',
-  'jsx/shared/MessageStudents',
-  'instructure-ui',
-], function(React, I18n, FriendlyDatetime,
-   StudentCardStore,
-   Avatar,
-   LastActivity,
-   MetricsList,
-   Rating,
-   SectionInfo,
-   SubmissionProgressBars,
-   MessageStudents,
-   {Heading, Button, Link, Typography, ScreenReaderContent, Spinner, Tray}) {
+import React from 'react'
+import I18n from 'i18n!student_context_tray'
+import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
+import StudentCardStore from './StudentCardStore'
+import Avatar from './Avatar'
+import LastActivity from './LastActivity'
+import MetricsList from './MetricsList'
+import Rating from './Rating'
+import SectionInfo from './SectionInfo'
+import SubmissionProgressBars from './SubmissionProgressBars'
+import MessageStudents from 'jsx/shared/MessageStudents'
+import {Heading, Button, Link, Typography, ScreenReaderContent, Spinner, Tray} from 'instructure-ui'
 
-  class StudentContextTray extends React.Component {
+export default class StudentContextTray extends React.Component {
 
     static propTypes = {
       courseId: React.PropTypes.string.isRequired,
@@ -296,5 +285,3 @@ define([
       )
     }
   }
-  return StudentContextTray;
-})

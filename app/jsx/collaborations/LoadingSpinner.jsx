@@ -1,7 +1,5 @@
-define([
-  'react',
-  'i18n!react_collaborations'
-], (React, i18n) => {
+import React from 'react'
+import i18n from 'i18n!react_collaborations'
   class Spinner extends React.Component {
     render () {
       return (
@@ -22,5 +20,4 @@ define([
     }
   }
 
-  return Spinner
-})
+export default Spinner

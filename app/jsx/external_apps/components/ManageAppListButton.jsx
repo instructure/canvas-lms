@@ -1,9 +1,7 @@
-define([
-  'i18n!external_tools',
-  'react',
-  'react-modal',
-  'jsx/external_apps/components/ConfigOptionField'
-], function(I18n, React, Modal, ConfigOptionField) {
+import I18n from 'i18n!external_tools'
+import React from 'react'
+import Modal from 'react-modal'
+import ConfigOptionField from 'jsx/external_apps/components/ConfigOptionField'
 
   const modalOverrides = {
     overlay : {
@@ -21,7 +19,7 @@ define([
     }
   };
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ManageAppListButton',
 
     propTypes: {
@@ -132,4 +130,3 @@ define([
       );
     }
   });
-});

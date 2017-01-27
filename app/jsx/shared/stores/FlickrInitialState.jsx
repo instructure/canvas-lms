@@ -1,4 +1,4 @@
-define([], () => {
+
 
   const FlickrInitialState = {
 	searching: false,
@@ -7,5 +7,4 @@ define([], () => {
 	page: 1
   };
 
-  return FlickrInitialState;
-});
+export default FlickrInitialState

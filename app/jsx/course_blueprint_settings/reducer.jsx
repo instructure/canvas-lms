@@ -1,13 +1,12 @@
-define([
-  'redux',
-  'redux-actions',
-  './actions',
-], ({ combineReducers }, { handleActions }, { actionTypes }) => {
+import { combineReducers } from 'redux'
+import { handleActions } from 'redux-actions'
+import{ actionTypes } from './actions'
+
   const identity = (defaultState = null) => {
     return state => state === undefined ? defaultState : state
   }
 
-  return combineReducers({
+  export default combineReducers({
     accountId: identity(),
     course: identity(),
     terms: identity([]),
@@ -53,4 +52,3 @@ define([
         : state
     },
   })
-})

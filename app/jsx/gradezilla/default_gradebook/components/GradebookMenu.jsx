@@ -16,16 +16,14 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-define([
-  'react',
-  'instructure-icons/react/Solid/IconMiniArrowDownSolid',
-  'instructure-ui/Button',
-  'instructure-ui/Menu',
-  'instructure-ui/PopoverMenu',
-  'instructure-ui/Typography',
-  'i18n!gradebook'
-], (React, { default: IconMiniArrowDownSolid }, { default: Button }, { MenuItem, MenuItemSeparator },
-  { default: PopoverMenu }, { default: Typography }, I18n) => {
+import React from 'react'
+import IconMiniArrowDownSolid from 'instructure-icons/react/Solid/IconMiniArrowDownSolid'
+import Button from 'instructure-ui/Button'
+import { MenuItem, MenuItemSeparator } from 'instructure-ui/Menu'
+import PopoverMenu from 'instructure-ui/PopoverMenu'
+import Typography from 'instructure-ui/Typography'
+import I18n from 'i18n!gradebook'
+
   const { oneOf, bool, string, func } = React.PropTypes;
 
   class GradebookMenu extends React.Component {
@@ -145,5 +143,4 @@ define([
     }
   }
 
-  return GradebookMenu;
-});
+export default GradebookMenu;

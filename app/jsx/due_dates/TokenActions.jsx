@@ -1,8 +1,6 @@
-define([
-  'underscore',
-  'compiled/models/AssignmentOverride',
-  'compiled/models/Section'
-], (_, AssignmentOverride, Section) => {
+import _ from 'underscore'
+import AssignmentOverride from 'compiled/models/AssignmentOverride'
+import Section from 'compiled/models/Section'
 
   var TokenActions = {
 
@@ -179,5 +177,4 @@ define([
     },
   }
 
-  return TokenActions
-});
+export default TokenActions

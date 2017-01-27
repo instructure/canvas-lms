@@ -16,12 +16,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'underscore',
-  'jquery',
-  'i18n!gradebook_upload',
-  'jquery.ajaxJSON'
-], (_, $, I18n) => {
+import _ from 'underscore'
+import $ from 'jquery'
+import I18n from 'i18n!gradebook_upload'
+import 'jquery.ajaxJSON'
+
   const successMessage = I18n.t(
     'You will be redirected to Gradebook while your file is being uploaded. ' +
       'If you have a large CSV file, your changes may take a few minutes to update. ' +
@@ -134,5 +133,4 @@ define([
     }
   };
 
-  return ProcessGradebookUpload;
-});
+export default ProcessGradebookUpload

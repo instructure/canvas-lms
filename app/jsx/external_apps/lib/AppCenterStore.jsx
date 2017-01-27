@@ -1,12 +1,10 @@
-define([
-  'i18n!external_tools',
-  'jquery',
-  'underscore',
-  'jsx/shared/helpers/createStore',
-  'jsx/external_apps/lib/ExternalAppsStore',
-  'compiled/fn/parseLinkHeader',
-  'compiled/jquery.rails_flash_notifications'
-], function(I18n, $, _, createStore, ExternalAppsStore, parseLinkHeader) {
+import I18n from 'i18n!external_tools'
+import $ from 'jquery'
+import _ from 'underscore'
+import createStore from 'jsx/shared/helpers/createStore'
+import ExternalAppsStore from 'jsx/external_apps/lib/ExternalAppsStore'
+import parseLinkHeader from 'compiled/fn/parseLinkHeader'
+import 'compiled/jquery.rails_flash_notifications'
 
   var PER_PAGE = 250;
 
@@ -123,5 +121,4 @@ define([
     });
   };
 
-  return store;
-});
+export default store

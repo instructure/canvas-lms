@@ -1,5 +1,3 @@
-define ([], () => {
-
   const Helpers = {
     isValidImageType (mimeType) {
       switch (mimeType) {
@@ -36,7 +34,4 @@ define ([], () => {
       return {file, type};
     }
   };
-
-  return Helpers;
-
-});
+export default Helpers

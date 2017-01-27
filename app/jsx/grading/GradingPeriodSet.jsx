@@ -1,16 +1,14 @@
-define([
-  'react',
-  'jquery',
-  'underscore',
-  'instructure-ui/Button',
-  'axios',
-  'convert_case',
-  'i18n!grading_periods',
-  'jsx/grading/AccountGradingPeriod',
-  'jsx/grading/GradingPeriodForm',
-  'compiled/api/gradingPeriodsApi',
-  'jquery.instructure_misc_helpers'
-], function(React, $, _, { default: Button }, axios, ConvertCase, I18n, GradingPeriod, GradingPeriodForm, gradingPeriodsApi) {
+import React from 'react'
+import $ from 'jquery'
+import _ from 'underscore'
+import Button from 'instructure-ui/Button'
+import axios from 'axios'
+import ConvertCase from 'convert_case'
+import I18n from 'i18n!grading_periods'
+import GradingPeriod from 'jsx/grading/AccountGradingPeriod'
+import GradingPeriodForm from 'jsx/grading/GradingPeriodForm'
+import gradingPeriodsApi from 'compiled/api/gradingPeriodsApi'
+import 'jquery.instructure_misc_helpers'
 
   const sortPeriods = function(periods) {
     return _.sortBy(periods, "startDate");
@@ -436,5 +434,4 @@ define([
     }
   });
 
-  return GradingPeriodSet;
-});
+export default GradingPeriodSet

@@ -1,11 +1,9 @@
-define([
-  'react',
-  'react-dom',
-  'compiled/react_files/modules/customPropTypes',
-  'i18n!react_files',
-  'compiled/react_files/modules/BBTreeBrowserView',
-  'compiled/views/RootFoldersFinder'
-], function (React, ReactDOM, customPropTypes, I18n, BBTreeBrowserView, RootFoldersFinder) {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import customPropTypes from 'compiled/react_files/modules/customPropTypes'
+import I18n from 'i18n!react_files'
+import BBTreeBrowserView from 'compiled/react_files/modules/BBTreeBrowserView'
+import RootFoldersFinder from 'compiled/views/RootFoldersFinder'
   var BBTreeBrowser = React.createClass({
     displayName: "BBTreeBrowser",
     propTypes: {
@@ -44,5 +42,4 @@ define([
       );
     }
   });
-  return BBTreeBrowser;
-});
+export default BBTreeBrowser

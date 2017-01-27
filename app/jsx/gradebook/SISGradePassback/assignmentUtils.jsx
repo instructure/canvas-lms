@@ -1,9 +1,7 @@
-define([
-  'jquery',
-  'underscore',
-  'react',
-  'jsx/shared/helpers/createStore'
-], ($, _, createStore) => {
+import $ from 'jquery'
+import _ from 'underscore'
+import createStore from 'react'
+import 'jsx/shared/helpers/createStore'
 
   let assignmentUtils = {
     copyFromGradebook (assignment) {
@@ -231,5 +229,4 @@ define([
 
   };
 
-  return assignmentUtils;
-});
+export default assignmentUtils

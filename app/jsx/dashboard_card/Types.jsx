@@ -1,4 +1,4 @@
-define([], () => {
+
   /**
    * Used for drag and drop stuff
    */
@@ -6,5 +6,4 @@ define([], () => {
     CARD: 'card'
   };
 
-  return TYPES;
-});
+export default TYPES

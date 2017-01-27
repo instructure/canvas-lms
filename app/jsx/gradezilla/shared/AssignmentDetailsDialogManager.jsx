@@ -1,6 +1,6 @@
-define([
-  'compiled/AssignmentDetailsDialog'
-], (AssignmentDetailsDialog) => {
+import AssignmentDetailsDialog from 'compiled/AssignmentDetailsDialog'
+
+
   function prepareStudents (students, assignmentId) {
     return students.map((student) => {
       const processedStudent = {};
@@ -41,5 +41,4 @@ define([
     }
   }
 
-  return AssignmentDetailsDialogManager;
-});
+export default AssignmentDetailsDialogManager

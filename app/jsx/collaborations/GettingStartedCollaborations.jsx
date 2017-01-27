@@ -1,8 +1,6 @@
-define([
-  'react',
-  'i18n!react_collaborations',
-  'compiled/str/splitAssetString'
-], (React, I18n, splitAssetString) => {
+import React from 'react'
+import I18n from 'i18n!react_collaborations'
+import splitAssetString from 'compiled/str/splitAssetString'
   class GettingStartedCollaborations extends React.Component {
     renderContent() {
       let header, content, link;
@@ -50,5 +48,4 @@ define([
     }
   };
 
-  return GettingStartedCollaborations;
-});
+export default GettingStartedCollaborations

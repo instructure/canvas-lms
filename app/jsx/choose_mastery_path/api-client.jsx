@@ -1,6 +1,4 @@
-define([
-  'axios',
-], (axios) => {
+import axios from 'axios'
   const ApiClient = {
     selectOption ({ courseId, moduleId, itemId }, option) {
       return axios({
@@ -13,5 +11,4 @@ define([
     },
   }
 
-  return ApiClient
-})
+export default ApiClient

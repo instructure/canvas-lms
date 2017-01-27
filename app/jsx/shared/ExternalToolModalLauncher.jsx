@@ -1,11 +1,10 @@
-define([
-  'underscore',
-  'jquery',
-  'react',
-  'jsx/shared/modal',
-  'jsx/shared/modal-content',
-], function (_, $, React, Modal, ModalContent) {
-  return React.createClass({
+import _ from 'underscore'
+import $ from 'jquery'
+import React from 'react'
+import Modal from 'jsx/shared/modal'
+import ModalContent from 'jsx/shared/modal-content'
+
+export default React.createClass({
     displayName: 'ExternalToolModalLauncher',
 
     propTypes: {
@@ -113,4 +112,3 @@ define([
       );
     }
   });
-});

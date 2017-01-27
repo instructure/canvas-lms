@@ -1,11 +1,9 @@
-define([
-  'jquery',
-  'i18n!course_wizard',
-  'axios',
-  'compiled/str/splitAssetString',
-  'jsx/shared/parseLinkHeader',
-  'page'
-], ($, I18n, axios, splitAssetString, parseLinkHeader, page) => {
+import $ from 'jquery'
+import I18n from 'i18n!course_wizard'
+import axios from 'axios'
+import splitAssetString from 'compiled/str/splitAssetString'
+import parseLinkHeader from 'jsx/shared/parseLinkHeader'
+import page from 'page'
   const actions = {}
 
   actions.LIST_COLLABORATIONS_START = 'LIST_COLLABORATIONS_START';
@@ -143,5 +141,4 @@ define([
     }
   }
 
-  return actions
-})
+export default actions

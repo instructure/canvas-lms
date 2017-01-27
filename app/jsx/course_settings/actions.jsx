@@ -1,10 +1,8 @@
-define ([
-  'axios',
-  'jquery',
-  'i18n!actions',
-  './helpers',
-  'compiled/jquery.rails_flash_notifications'
-], (axios, $, I18n, Helpers) => {
+import axios from 'axios'
+import $ from 'jquery'
+import I18n from 'i18n!actions'
+import Helpers from './helpers'
+import 'compiled/jquery.rails_flash_notifications'
 
   const Actions = {
 
@@ -99,14 +97,14 @@ define ([
     },
 
     putImageData(courseId, imageUrl, imageId = null, ajaxLib = axios) {
-      const data = imageId ? {"course[image_id]": imageId} : 
-                             {"course[image_url]": imageUrl}; 
+      const data = imageId ? {"course[image_id]": imageId} :
+                             {"course[image_url]": imageUrl};
 
       return (dispatch, getState) => {
-        this.ajaxPutFormData(`/api/v1/courses/${courseId}`, data, ajaxLib) 
+        this.ajaxPutFormData(`/api/v1/courses/${courseId}`, data, ajaxLib)
           .then((response)=> {
-              dispatch(imageId ? this.setCourseImageId(imageUrl, imageId) : 
-                                 this.setCourseImageUrl(imageUrl)); 
+              dispatch(imageId ? this.setCourseImageId(imageUrl, imageId) :
+                                 this.setCourseImageUrl(imageUrl));
           })
           .catch((response) => {
             dispatch(this.errorUploadingImage());
@@ -117,9 +115,9 @@ define ([
     putRemoveImage(courseId, ajaxLib = axios) {
       return (dispatch, getState) => {
         dispatch(this.removingImage());
-        this.ajaxPutFormData(`/api/v1/courses/${courseId}`, { "course[remove_image]": true}) 
+        this.ajaxPutFormData(`/api/v1/courses/${courseId}`, { "course[remove_image]": true})
           .then((response)=> {
-            dispatch(this.removedImage());   
+            dispatch(this.removedImage());
           })
           .catch((response) => {
             dispatch(this.errorRemovingImage());
@@ -161,7 +159,7 @@ define ([
 
         if (Helpers.isValidImageType(type)) {
           dispatch(this.uploadingImage());
-          
+
           const data = {
             name: file.name,
             size: file.size,
@@ -192,10 +190,10 @@ define ([
 
     ajaxPutFormData(path, data, ajaxLib = axios) {
       return (
-        ajaxLib.put(path, data, 
+        ajaxLib.put(path, data,
           {
             // TODO: this is a naive implementation,
-            // upgrading to axios@0.12.0 will make it unnecessary 
+            // upgrading to axios@0.12.0 will make it unnecessary
             // by using URLSearchParams.
             transformRequest: function (data, headers) {
               return Object.keys(data).reduce((prev, key) => {
@@ -208,5 +206,4 @@ define ([
 
   };
 
-  return Actions;
-});
+export default Actions

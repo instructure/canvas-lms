@@ -1,10 +1,8 @@
-define([
-  "react",
-  "i18n!account_course_user_search",
-  'jquery',
-  'jsx/shared/EditUserDetailsDialog',
-  'jquery.instructure_date_and_time'
-], function(React, I18n, $, EditUserDetailsDialog) {
+import React from 'react'
+import I18n from 'i18n!account_course_user_search'
+import $ from 'jquery'
+import EditUserDetailsDialog from 'jsx/shared/EditUserDetailsDialog'
+import 'jquery.instructure_date_and_time'
 
   const { object, number, string, func, shape, arrayOf, bool } = React.PropTypes;
 
@@ -125,5 +123,4 @@ define([
     }
   });
 
-  return UsersListRow;
-});
+export default UsersListRow

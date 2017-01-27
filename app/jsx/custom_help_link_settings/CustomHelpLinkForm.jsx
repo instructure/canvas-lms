@@ -1,16 +1,8 @@
- define([
-  'react',
-  'react-dom',
-  'i18n!custom_help_link',
-  './CustomHelpLinkPropTypes',
-  './CustomHelpLinkConstants'
-], function(
-    React,
-    ReactDOM,
-    I18n,
-    CustomHelpLinkPropTypes,
-    CustomHelpLinkConstants
-  ) {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import I18n from 'i18n!custom_help_link'
+import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
+import CustomHelpLinkConstants from './CustomHelpLinkConstants'
   const CustomHelpLinkForm = React.createClass({
     propTypes: {
       link: CustomHelpLinkPropTypes.link.isRequired,
@@ -190,5 +182,4 @@
     }
   });
 
-  return CustomHelpLinkForm;
-});
+export default CustomHelpLinkForm

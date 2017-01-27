@@ -1,12 +1,11 @@
-define([
-  'jquery',
-  'react',
-  'i18n!appointment_groups',
-  'instructure-ui/Button',
-  'instructure-ui/ScreenReaderContent',
-  'compiled/util/coupleTimeFields',
-  'jquery.instructure_date_and_time'
-], ($, React, I18n, { default: Button }, { default: ScreenReaderContent }, coupleTimeFields) => {
+import $ from 'jquery'
+import React from 'react'
+import I18n from 'i18n!appointment_groups'
+import Button from 'instructure-ui/Button'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import coupleTimeFields from 'compiled/util/coupleTimeFields'
+import 'jquery.instructure_date_and_time'
+
   const dateToString = (dateObj, format) => {
     if (!dateObj) {
       return '';
@@ -137,5 +136,4 @@ define([
     }
   }
 
-  return TimeBlockSelectorRow;
-});
+export default TimeBlockSelectorRow

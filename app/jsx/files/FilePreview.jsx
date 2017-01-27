@@ -1,16 +1,14 @@
-define([
-  'react',
-  'page',
-  'jquery',
-  'i18n!react_files',
-  'classnames',
-  'react-modal',
-  'compiled/react_files/components/FilePreview',
-  'jsx/files/FilePreviewInfoPanel',
-  'compiled/react_files/utils/collectionHandler',
-  'compiled/fn/preventDefault',
-  'compiled/models/Folder'
-], function (React, page, $, I18n, classnames, ReactModal, FilePreview, FilePreviewInfoPanel, CollectionHandler, preventDefault, Folder) {
+import React from 'react'
+import page from 'page'
+import $ from 'jquery'
+import I18n from 'i18n!react_files'
+import classnames from 'classnames'
+import ReactModal from 'react-modal'
+import FilePreview from 'compiled/react_files/components/FilePreview'
+import FilePreviewInfoPanel from 'jsx/files/FilePreviewInfoPanel'
+import CollectionHandler from 'compiled/react_files/utils/collectionHandler'
+import preventDefault from 'compiled/fn/preventDefault'
+import Folder from 'compiled/models/Folder'
 
   const modalOverrides = {
     overlay : {
@@ -177,6 +175,4 @@ define([
       </ReactModal>
     );
   };
-  return React.createClass(FilePreview);
-
-});
+export default React.createClass(FilePreview)

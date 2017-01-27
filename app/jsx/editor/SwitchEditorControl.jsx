@@ -1,8 +1,6 @@
-define([
-  'react',
-  'i18n!editor',
-  'jsx/shared/rce/RichContentEditor'
-], function(React, I18n, RichContentEditor){
+import React from 'react'
+import I18n from 'i18n!editor'
+import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 
   var SwitchEditorControl = React.createClass({
     displayName: 'SwitchEditor',
@@ -55,5 +53,4 @@ define([
     }
   });
 
-  return SwitchEditorControl;
-});
+export default SwitchEditorControl

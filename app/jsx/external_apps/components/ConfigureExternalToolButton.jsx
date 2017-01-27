@@ -1,9 +1,7 @@
-define([
-  'jquery',
-  'i18n!external_tools',
-  'react',
-  'react-modal'
-], function ($, I18n, React, Modal) {
+import $ from 'jquery'
+import I18n from 'i18n!external_tools'
+import React from 'react'
+import Modal from 'react-modal'
 
   const modalOverrides = {
     overlay : {
@@ -21,7 +19,7 @@ define([
     }
   };
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ConfigureExternalToolButton',
 
     propTypes: {
@@ -100,4 +98,3 @@ define([
       )
     }
   });
-});

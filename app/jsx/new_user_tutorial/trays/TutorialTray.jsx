@@ -1,18 +1,10 @@
-define([
-  'react',
-  'i18n!new_user_tutorial',
-  'instructure-ui',
-  '../NewUserTutorialToggleButton',
-  '../ConfirmEndTutorialDialog',
-  'jsx/shared/proptypes/plainStoreShape'
-], (
-  React,
-  I18n,
-  { Tray, Button },
-  NewUserTutorialToggleButton,
-  ConfirmEndTutorialDialog,
-  plainStoreShape
-) => {
+import React from 'react'
+import I18n from 'i18n!new_user_tutorial'
+import { Tray, Button } from 'instructure-ui'
+import NewUserTutorialToggleButton from '../NewUserTutorialToggleButton'
+import ConfirmEndTutorialDialog from '../ConfirmEndTutorialDialog'
+import plainStoreShape from 'jsx/shared/proptypes/plainStoreShape'
+
   class TutorialTray extends React.Component {
 
     static propTypes = {
@@ -113,5 +105,4 @@ define([
     }
   }
 
-  return TutorialTray;
-});
+export default TutorialTray

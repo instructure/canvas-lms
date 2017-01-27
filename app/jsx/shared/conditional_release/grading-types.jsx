@@ -1,6 +1,4 @@
-define([
-  'i18n!cyoe_assignment_sidebar'
-  ], (I18n)=> {
+import I18n from 'i18n!cyoe_assignment_sidebar'
 
   const GradingTypes = {
     points: {
@@ -25,5 +23,4 @@ define([
     },
   }
 
-  return GradingTypes
-})
+export default GradingTypes

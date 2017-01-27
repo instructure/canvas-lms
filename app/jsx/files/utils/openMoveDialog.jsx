@@ -1,11 +1,9 @@
-define([
-  'underscore',
-  'react',
-  'react-dom',
-  'jsx/files/MoveDialog',
-  'compiled/react_files/modules/filesEnv',
-  'jquery'
-], function (_, React, ReactDOM, MoveDialog, filesEnv, $) {
+import _ from 'underscore'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import MoveDialog from 'jsx/files/MoveDialog'
+import filesEnv from 'compiled/react_files/modules/filesEnv'
+import $ from 'jquery'
 
   function openMoveDialog (thingsToMove, {contextType, contextId, returnFocusTo, clearSelectedItems, onMove}) {
 
@@ -36,6 +34,4 @@ define([
     );
   }
 
-  return openMoveDialog;
-
-});
+export default openMoveDialog

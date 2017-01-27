@@ -1,15 +1,13 @@
-define([
-  'underscore',
-  'react',
-  'i18n!dashcards',
-  './DashboardCardAction',
-  './DashboardColorPicker',
-  './CourseActivitySummaryStore',
-  'react-dnd',
-  './Types',
-  'jsx/shared/helpers/compose',
-  './DashboardCardMovementMenu'
-], function(_, React, I18n, DashboardCardAction, DashboardColorPicker, CourseActivitySummaryStore, ReactDnD, ItemTypes, compose, DashboardCardMovementMenu) {
+import _ from 'underscore'
+import React from 'react'
+import I18n from 'i18n!dashcards'
+import DashboardCardAction from './DashboardCardAction'
+import DashboardColorPicker from './DashboardColorPicker'
+import CourseActivitySummaryStore from './CourseActivitySummaryStore'
+import ReactDnD from 'react-dnd'
+import ItemTypes from './Types'
+import compose from 'jsx/shared/helpers/compose'
+import DashboardCardMovementMenu from './DashboardCardMovementMenu'
 
   var DashboardCard = React.createClass({
 
@@ -307,5 +305,4 @@ define([
     }
   });
 
-  return DashboardCard;
-});
+export default DashboardCard

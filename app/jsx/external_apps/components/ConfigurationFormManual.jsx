@@ -1,13 +1,11 @@
-define([
-  'i18n!external_tools',
-  'underscore',
-  'jquery',
-  'react',
-  'jsx/external_apps/components/TextInput',
-  'jsx/external_apps/components/TextAreaInput',
-  'jsx/external_apps/components/SelectInput',
-  'compiled/jquery.rails_flash_notifications'
-], function(I18n, _, $, React, TextInput, TextAreaInput, SelectInput) {
+import I18n from 'i18n!external_tools'
+import _ from 'underscore'
+import $ from 'jquery'
+import React from 'react'
+import TextInput from 'jsx/external_apps/components/TextInput'
+import TextAreaInput from 'jsx/external_apps/components/TextAreaInput'
+import SelectInput from 'jsx/external_apps/components/SelectInput'
+import 'compiled/jquery.rails_flash_notifications'
 
   var PRIVACY_OPTIONS = {
     anonymous  : I18n.t('Anonymous'),
@@ -16,7 +14,7 @@ define([
     public     : I18n.t('Public')
   };
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ConfigurationFormManual',
 
     propTypes: {
@@ -165,4 +163,3 @@ define([
       );
     }
   });
-});

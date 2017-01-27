@@ -1,12 +1,10 @@
-define([
-  'react',
-  'jquery',
-  'underscore',
-  'compiled/fn/preventDefault',
-  'react-modal',
-  './modal-content',
-  './modal-buttons',
-], function (React, $, _, preventDefault,  ReactModal, ModalContent, ModalButtons) {
+import React from 'react'
+import $ from 'jquery'
+import _ from 'underscore'
+import preventDefault from 'compiled/fn/preventDefault'
+import ReactModal from 'react-modal'
+import ModalContent from './modal-content'
+import ModalButtons from './modal-buttons'
 
   const modalOverrides = {
     overlay : {
@@ -140,5 +138,4 @@ define([
 
   });
 
-  return Modal;
-});
+export default Modal

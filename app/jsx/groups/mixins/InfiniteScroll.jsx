@@ -1,7 +1,5 @@
-define([
-  'underscore',
-  'react-dom',
-], (_, ReactDOM) => {
+import _ from 'underscore'
+import ReactDOM from 'react-dom'
   var InfiniteScroll = {
     topPosition(el) {
       if (!el) {
@@ -52,5 +50,4 @@ define([
     },
 
   };
-  return InfiniteScroll;
-});
+export default InfiniteScroll

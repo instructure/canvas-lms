@@ -1,7 +1,5 @@
-define([
-  "react",
-  "./createStore",
-], function(React, createStore) {
+import React from 'react'
+import createStore from './createStore'
 
   var { string, shape } = React.PropTypes;
 
@@ -18,6 +16,4 @@ define([
     name: string.isRequired
   });
 
-  return TermsStore;
-});
-
+export default TermsStore

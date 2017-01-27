@@ -1,7 +1,5 @@
-define([
-  'react',
-  'i18n!assignments'
-], (React, I18n) => {
+import React from 'react'
+import I18n from 'i18n!assignments'
 
   var DueDateRemoveRowLink = React.createClass({
 
@@ -26,5 +24,4 @@ define([
     }
   })
 
-  return DueDateRemoveRowLink;
-});
+export default DueDateRemoveRowLink

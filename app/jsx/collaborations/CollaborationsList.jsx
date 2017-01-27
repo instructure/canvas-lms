@@ -1,10 +1,9 @@
-define([
-  'react',
-  'react-dom',
-  './Collaboration',
-  '../shared/load-more',
-  './store/store'
-], (React, ReactDOM, Collaboration, LoadMore, {dispatch}) => {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import Collaboration from './Collaboration'
+import LoadMore from '../shared/load-more'
+import { dispatch } from './store/store'
+
   class CollaborationsList extends React.Component {
 
     constructor (props) {
@@ -39,5 +38,4 @@ define([
     getCollaborations: React.PropTypes.func.isRequired,
   };
 
-  return CollaborationsList;
-})
+export default CollaborationsList

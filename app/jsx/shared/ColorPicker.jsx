@@ -1,12 +1,10 @@
-define([
-  'jquery',
-  'react',
-  'react-modal',
-  'i18n!calendar_color_picker',
-  'jsx/shared/CourseNicknameEdit',
-  'classnames',
-  'compiled/jquery.rails_flash_notifications'
-], function($, React, ReactModal, I18n, CourseNicknameEdit, classnames) {
+import $ from 'jquery'
+import React from 'react'
+import ReactModal from 'react-modal'
+import I18n from 'i18n!calendar_color_picker'
+import CourseNicknameEdit from 'jsx/shared/CourseNicknameEdit'
+import classnames from 'classnames'
+import 'compiled/jquery.rails_flash_notifications'
 
   var PREDEFINED_COLORS = [
     {hexcode: '#EF4437', name: I18n.t('Red')},
@@ -384,5 +382,4 @@ define([
         this.modalWrapping(body);
     }
   });
-  return ColorPicker;
-});
+export default ColorPicker

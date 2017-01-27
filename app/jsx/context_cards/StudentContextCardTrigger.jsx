@@ -1,10 +1,9 @@
-define([
-  'jquery',
-  'react',
-  'react-dom',
-  'jsx/context_cards/StudentContextTray',
-  'jsx/context_cards/StudentCardStore'
-], ($, React, ReactDOM, StudentContextTray, StudentCardStore) => {
+import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import StudentContextTray from 'jsx/context_cards/StudentContextTray'
+import StudentCardStore from 'jsx/context_cards/StudentCardStore'
+
   const handleClickEvent = (event) => {
     const studentId = $(event.target).attr('data-student_id');
     const courseId = $(event.target).attr('data-course_id');
@@ -43,5 +42,5 @@ define([
 
   $(document).on('click', '.student_context_card_trigger', handleClickEvent);
 
-  return handleClickEvent;
-});
+export default handleClickEvent;
+

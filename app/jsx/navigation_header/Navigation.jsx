@@ -1,17 +1,15 @@
-define([
-  'underscore',
-  'jquery',
-  'i18n!new_nav',
-  'react',
-  'react-tray',
-  'jsx/navigation_header/trays/CoursesTray',
-  'jsx/navigation_header/trays/GroupsTray',
-  'jsx/navigation_header/trays/AccountsTray',
-  'jsx/navigation_header/trays/ProfileTray',
-  'jsx/navigation_header/trays/HelpTray',
-  'jsx/shared/SVGWrapper',
-  'compiled/fn/preventDefault'
-], (_, $, I18n, React, Tray, CoursesTray, GroupsTray, AccountsTray, ProfileTray, HelpTray, SVGWrapper, preventDefault) => {
+import _ from 'underscore'
+import $ from 'jquery'
+import I18n from 'i18n!new_nav'
+import React from 'react'
+import Tray from 'react-tray'
+import CoursesTray from 'jsx/navigation_header/trays/CoursesTray'
+import GroupsTray from 'jsx/navigation_header/trays/GroupsTray'
+import AccountsTray from 'jsx/navigation_header/trays/AccountsTray'
+import ProfileTray from 'jsx/navigation_header/trays/ProfileTray'
+import HelpTray from 'jsx/navigation_header/trays/HelpTray'
+import SVGWrapper from 'jsx/shared/SVGWrapper'
+import preventDefault from 'compiled/fn/preventDefault'
 
   var EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/;
   var ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversations|profile)/;
@@ -246,5 +244,4 @@ define([
     }
   });
 
-  return Navigation;
-});
+export default Navigation

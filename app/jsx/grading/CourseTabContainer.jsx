@@ -1,11 +1,9 @@
-define([
-  'react',
-  'jsx/grading/gradingStandardCollection',
-  'jsx/grading/gradingPeriodCollection',
-  'jquery',
-  'i18n!external_tools',
-  'jquery.instructure_misc_plugins'
-], (React, GradingStandardCollection, GradingPeriodCollection, $, I18n) => {
+import React from 'react'
+import GradingStandardCollection from 'jsx/grading/gradingStandardCollection'
+import GradingPeriodCollection from 'jsx/grading/gradingPeriodCollection'
+import $ from 'jquery'
+import I18n from 'i18n!external_tools'
+import 'jquery.instructure_misc_plugins'
   class CourseTabContainer extends React.Component {
     static propTypes = {
       hasGradingPeriods: React.PropTypes.bool.isRequired
@@ -59,5 +57,4 @@ define([
     }
   }
 
-  return CourseTabContainer;
-});
+export default CourseTabContainer

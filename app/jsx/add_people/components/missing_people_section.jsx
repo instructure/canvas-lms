@@ -1,14 +1,12 @@
-define([
-  'i18n!roster',
-  'react',
-  './shapes',
-  'instructure-ui/Table',
-  'instructure-ui/ScreenReaderContent',
-  'instructure-ui/TextInput',
-  'instructure-ui/Checkbox',
-  'instructure-ui/Link'
-], (I18n, React, shapes, {default: Table}, {default: ScreenReaderContent},
-    {default: TextInput}, {default: Checkbox}, {default: Link}) => {
+import I18n from 'i18n!roster'
+import React from 'react'
+import shapes from './shapes'
+import Table from 'instructure-ui/Table'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import TextInput from 'instructure-ui/TextInput'
+import Checkbox from 'instructure-ui/Checkbox'
+import Link from 'instructure-ui/Link'
+
   const namePrompt = I18n.t('Click to add a name');
   const nameLabel = I18n.t("New user's name");
   const emailLabel = I18n.t('Required Email Address');
@@ -305,5 +303,4 @@ define([
     }
   }
 
-  return MissingPeopleSection;
-});
+export default MissingPeopleSection

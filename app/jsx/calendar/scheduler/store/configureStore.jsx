@@ -1,21 +1,18 @@
-define([
-  'redux',
-  'redux-thunk',
-  'redux-logger',
-  '../reducer',
-  './initialState'
-], function (Redux, {default:ReduxThunk}, ReduxLogger, reducer, initialState) {
+import { createStore, applyMiddleware } from 'redux'
+import ReduxThunk from 'redux-thunk'
+import ReduxLogger from 'redux-logger'
+import reducer from '../reducer'
+import initialState from './initialState'
 
-  const { createStore, applyMiddleware } = Redux;
+const logger = ReduxLogger();
 
-  const logger = ReduxLogger();
+const createStoreWithMiddleware = applyMiddleware(
+  logger,
+  ReduxThunk
+)(createStore);
 
-  const createStoreWithMiddleware = applyMiddleware(
-    logger,
-    ReduxThunk
-  )(createStore);
+function configureStore (state = initialState) {
+  return createStoreWithMiddleware(reducer, state);
+};
 
-  return function configureStore (state = initialState) {
-    return createStoreWithMiddleware(reducer, state);
-  };
-});
+export default configureStore

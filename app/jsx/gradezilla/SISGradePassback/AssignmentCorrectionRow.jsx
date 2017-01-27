@@ -1,10 +1,8 @@
-define([
-  'underscore',
-  'i18n!modules',
-  'react',
-  'jsx/gradezilla/SISGradePassback/assignmentUtils',
-  'classnames'
-], (_, I18n, React, assignmentUtils, classnames) => {
+import _ from 'underscore'
+import I18n from 'i18n!modules'
+import React from 'react'
+import assignmentUtils from 'jsx/gradezilla/SISGradePassback/assignmentUtils'
+import classnames from 'classnames'
 
   var AssignmentCorrectionRow = React.createClass({
     componentDidMount() {
@@ -171,5 +169,4 @@ define([
     }
   })
 
-  return AssignmentCorrectionRow;
-});
+export default AssignmentCorrectionRow

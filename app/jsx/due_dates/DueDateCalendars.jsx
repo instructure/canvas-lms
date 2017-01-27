@@ -1,10 +1,8 @@
-define([
-  'jquery',
-  'react',
-  'jsx/due_dates/DueDateCalendarPicker',
-  'i18n!assignments',
-  'classnames'
-], ($, React, DueDateCalendarPicker, I18n, cx) => {
+import $ from 'jquery'
+import React from 'react'
+import DueDateCalendarPicker from 'jsx/due_dates/DueDateCalendarPicker'
+import I18n from 'i18n!assignments'
+import cx from 'classnames'
 
   var DueDateCalendars = React.createClass({
 
@@ -73,5 +71,4 @@ define([
     }
   });
 
-  return DueDateCalendars;
-});
+export default DueDateCalendars

@@ -1,9 +1,7 @@
-define([
-  'react',
-  'i18n!help_dialog',
-  'jquery.instructure_forms', /* formSubmit, getFormData, formErrors */
-  'compiled/jquery.rails_flash_notifications'
-], (React, I18n) => {
+import React from 'react'
+import I18n from 'i18n!help_dialog'
+import 'jquery.instructure_forms'
+import 'compiled/jquery.rails_flash_notifications'
   const CreateTicketForm = React.createClass({
     propTypes: {
       onCancel: React.PropTypes.func,
@@ -127,5 +125,4 @@ define([
       );
     }
   });
-  return CreateTicketForm;
-});
+export default CreateTicketForm

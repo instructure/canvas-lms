@@ -1,13 +1,12 @@
-define([
-  'react',
-  'react-dom',
-  'axios',
-  './NewUserTutorialToggleButton',
-  './trays/TutorialTray',
-  './utils/getProperTray',
-  './utils/createTutorialStore',
-  'compiled/str/splitAssetString',
-], (React, ReactDOM, axios, NewUserTutorialToggleButton, TutorialTray, getProperTray, createTutorialStore, splitAssetString) => {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import axios from 'axios'
+import NewUserTutorialToggleButton from './NewUserTutorialToggleButton'
+import TutorialTray from './trays/TutorialTray'
+import getProperTray from './utils/getProperTray'
+import createTutorialStore from './utils/createTutorialStore'
+import splitAssetString from 'compiled/str/splitAssetString'
+
   const initializeNewUserTutorials = () => {
     if (window.ENV.NEW_USER_TUTORIALS &&
         window.ENV.NEW_USER_TUTORIALS.is_enabled &&
@@ -55,5 +54,4 @@ define([
     }
   };
 
-  return initializeNewUserTutorials;
-});
+export default initializeNewUserTutorials

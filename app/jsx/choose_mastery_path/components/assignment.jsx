@@ -1,13 +1,12 @@
-define([
-  'react',
-  'classnames',
-  'i18n!choose_mastery_path',
-  'compiled/str/apiUserContent',
-  '../shapes/assignment-shape',
-], (React, classNames, I18n, apiUserContent, assignmentShape) => {
-  const { bool } = React.PropTypes
+import React from 'react'
+import classNames from 'classnames'
+import I18n from 'i18n!choose_mastery_path'
+import apiUserContent from 'compiled/str/apiUserContent'
+import assignmentShape from '../shapes/assignment-shape'
 
-  return class Assignment extends React.Component {
+const { bool } = React.PropTypes
+
+export default class Assignment extends React.Component {
     static propTypes = {
       assignment: assignmentShape.isRequired,
       isSelected: bool,
@@ -74,4 +73,3 @@ define([
       )
     }
   }
-})

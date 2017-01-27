@@ -1,9 +1,7 @@
-define([
-  'react',
-  'underscore',
-  'jsx/shared/stores/ProgressStore',
-  'jsx/shared/ProgressBar'
-], function(React, _, ProgressStore, ProgressBar){
+import React from 'react'
+import _ from 'underscore'
+import ProgressStore from 'jsx/shared/stores/ProgressStore'
+import ProgressBar from 'jsx/shared/ProgressBar'
   var ApiProgressBar = React.createClass({
     displayName: 'ProgressBar',
     propTypes: {
@@ -106,5 +104,4 @@ define([
     }
   });
 
-  return ApiProgressBar;
-});
+export default ApiProgressBar

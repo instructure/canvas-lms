@@ -1,14 +1,12 @@
-define([
-  'i18n!theme_editor',
-  'react',
-  'jquery',
-  './PropTypes',
-  'jsx/shared/modal',
-  'jsx/shared/modal-content',
-  'jsx/shared/modal-buttons'
-], (I18n, React, $, customTypes, Modal, ModalContent, ModalButtons) => {
+import I18n from 'i18n!theme_editor'
+import React from 'react'
+import $ from 'jquery'
+import customTypes from './PropTypes'
+import Modal from 'jsx/shared/modal'
+import ModalContent from 'jsx/shared/modal-content'
+import ModalButtons from 'jsx/shared/modal-buttons'
 
-  return React.createClass({
+export default React.createClass({
 
     displayName: 'SaveThemeButton',
 
@@ -123,4 +121,3 @@ define([
       )
     }
   })
-});

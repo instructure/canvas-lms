@@ -1,16 +1,14 @@
-define([
-  'i18n!external_tools',
-  'react',
-  'jsx/external_apps/lib/AppCenterStore',
-  'jsx/external_apps/lib/ExternalAppsStore',
-  'jsx/external_apps/components/AppTile',
-  'jsx/external_apps/components/Header',
-  'jsx/external_apps/components/AppFilters',
-  'jsx/external_apps/components/ManageAppListButton',
-  'compiled/str/splitAssetString'
-], function(I18n, React, store, extStore, AppTile, Header, AppFilters, ManageAppListButton, splitAssetString) {
+import I18n from 'i18n!external_tools'
+import React from 'react'
+import store from 'jsx/external_apps/lib/AppCenterStore'
+import extStore from 'jsx/external_apps/lib/ExternalAppsStore'
+import AppTile from 'jsx/external_apps/components/AppTile'
+import Header from 'jsx/external_apps/components/Header'
+import AppFilters from 'jsx/external_apps/components/AppFilters'
+import ManageAppListButton from 'jsx/external_apps/components/ManageAppListButton'
+import splitAssetString from 'compiled/str/splitAssetString'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'AppList',
 
     getInitialState() {
@@ -73,5 +71,3 @@ define([
       );
     }
   });
-
-});

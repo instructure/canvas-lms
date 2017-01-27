@@ -1,9 +1,7 @@
- define([
-  'react',
-  'i18n!custom_help_link',
-  './CustomHelpLinkPropTypes',
-  './CustomHelpLinkConstants'
-], function(React, I18n, CustomHelpLinkPropTypes, CustomHelpLinkConstants) {
+import React from 'react'
+import I18n from 'i18n!custom_help_link'
+import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
+import CustomHelpLinkConstants from './CustomHelpLinkConstants'
   const CustomHelpLinkMenu = React.createClass({
     propTypes: {
       links: React.PropTypes.arrayOf(CustomHelpLinkPropTypes.link).isRequired,
@@ -86,5 +84,4 @@
     }
   });
 
-  return CustomHelpLinkMenu;
-});
+export default CustomHelpLinkMenu

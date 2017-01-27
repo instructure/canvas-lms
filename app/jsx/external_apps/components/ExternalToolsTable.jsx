@@ -1,13 +1,11 @@
-define([
-  'underscore',
-  'i18n!external_tools',
-  'react',
-  'jsx/external_apps/lib/ExternalAppsStore',
-  'jsx/external_apps/components/ExternalToolsTableRow',
-  'jsx/external_apps/components/InfiniteScroll'
-], function(_, I18n, React, store, ExternalToolsTableRow, InfiniteScroll) {
+import _ from 'underscore'
+import I18n from 'i18n!external_tools'
+import React from 'react'
+import store from 'jsx/external_apps/lib/ExternalAppsStore'
+import ExternalToolsTableRow from 'jsx/external_apps/components/ExternalToolsTableRow'
+import InfiniteScroll from 'jsx/external_apps/components/InfiniteScroll'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ExternalToolsTable',
 
     propTypes: {
@@ -72,4 +70,3 @@ define([
       );
     }
   });
-});

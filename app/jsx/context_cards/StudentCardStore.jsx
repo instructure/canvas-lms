@@ -1,4 +1,4 @@
-define(['axios'], (axios) => {
+import axios from 'axios'
   class StudentCardStore {
     constructor(studentId, courseId) {
       this.studentId = studentId
@@ -86,5 +86,4 @@ define(['axios'], (axios) => {
     }
   }
 
-  return StudentCardStore;
-});
+export default StudentCardStore

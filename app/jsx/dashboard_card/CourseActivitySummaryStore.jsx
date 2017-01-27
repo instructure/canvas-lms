@@ -1,11 +1,9 @@
-define([
-  'react',
-  'underscore',
-  'jsx/shared/helpers/createStore',
-  'jquery',
-  'compiled/backbone-ext/DefaultUrlMixin',
-  'compiled/fn/parseLinkHeader',
-], (React, _, createStore, $, DefaultUrlMixin) => {
+import React from 'react'
+import _ from 'underscore'
+import createStore from 'jsx/shared/helpers/createStore'
+import $ from 'jquery'
+import DefaultUrlMixin from 'compiled/backbone-ext/DefaultUrlMixin'
+import 'compiled/fn/parseLinkHeader'
 
   var CourseActivitySummaryStore = createStore({streams: {}})
 
@@ -33,5 +31,4 @@ define([
     })
   }
 
-  return CourseActivitySummaryStore
-});
+export default CourseActivitySummaryStore

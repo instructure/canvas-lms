@@ -1,11 +1,9 @@
-define([
-  'react',
-  'underscore',
-  'jsx/shared/helpers/createStore',
-  'jquery',
-  'compiled/backbone-ext/DefaultUrlMixin',
-  'compiled/fn/parseLinkHeader',
-], (React, _, createStore, $, DefaultUrlMixin, parseLinkHeader) => {
+import React from 'react'
+import _ from 'underscore'
+import createStore from 'jsx/shared/helpers/createStore'
+import $ from 'jquery'
+import DefaultUrlMixin from 'compiled/backbone-ext/DefaultUrlMixin'
+import parseLinkHeader from 'compiled/fn/parseLinkHeader'
 
   // -------------------
   //     Initialize
@@ -185,5 +183,4 @@ define([
     })
   }
 
-  return OverrideStudentStore
-});
+export default OverrideStudentStore

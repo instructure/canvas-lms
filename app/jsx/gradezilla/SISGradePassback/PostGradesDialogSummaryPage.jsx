@@ -1,8 +1,6 @@
-define([
-  'underscore',
-  'i18n!modules',
-  'react'
-], (_, I18n, React) => {
+import _ from 'underscore'
+import I18n from 'i18n!modules'
+import React from 'react'
 
   var PostGradesDialogSummaryPage = React.createClass({
     render () {
@@ -52,5 +50,4 @@ define([
     }
   })
 
-  return PostGradesDialogSummaryPage
-})
+export default PostGradesDialogSummaryPage

@@ -1,13 +1,11 @@
-define([
-  'react',
-  'classnames',
-  'jsx/shared/helpers/assignment-categories',
-  'jsx/shared/conditional_release/score',
-  '../shapes/assignment',
-], (React, classNames, categoryHelper, scoreHelpers, assignmentShape) => {
+import React from 'react'
+import classNames from 'classnames'
+import categoryHelper from 'jsx/shared/helpers/assignment-categories'
+import scoreHelpers from 'jsx/shared/conditional_release/score'
+import assignmentShape from '../shapes/assignment'
   const { object, number } = React.PropTypes
 
-  return class StudentAssignmentItem extends React.Component {
+export default class StudentAssignmentItem extends React.Component {
     static propTypes = {
       assignment: assignmentShape.isRequired,
       trend: number,
@@ -39,4 +37,3 @@ define([
       )
     }
   }
-})

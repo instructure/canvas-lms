@@ -1,10 +1,8 @@
-define([
-  'react',
-  'react-dom',
-  'i18n!modules',
-  'jsx/gradezilla/SISGradePassback/PostGradesDialog',
-  'classnames'
-], (React, ReactDOM, I18n, PostGradesDialog, classnames) => {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import I18n from 'i18n!modules'
+import PostGradesDialog from 'jsx/gradezilla/SISGradePassback/PostGradesDialog'
+import classnames from 'classnames'
 
   // The PostGradesApp mounts a single "Post Grades" button, which pops up
   // the PostGradesDialog when clicked.
@@ -69,5 +67,4 @@ define([
     },
   });
 
-  return PostGradesApp;
-});
+export default PostGradesApp

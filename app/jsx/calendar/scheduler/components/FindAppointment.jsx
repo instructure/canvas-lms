@@ -1,9 +1,8 @@
-define([
-  'react',
-  'react-modal',
-  'i18n!react_scheduler',
-  'jsx/calendar/scheduler/actions',
-], (React, Modal, I18n, Actions) => {
+import React from 'react'
+import Modal from 'react-modal'
+import I18n from 'i18n!react_scheduler'
+import Actions from 'jsx/calendar/scheduler/actions'
+
   class FindAppointment extends React.Component {
 
     static propTypes = {
@@ -107,5 +106,4 @@ define([
     }
   }
 
-  return FindAppointment
-})
+export default FindAppointment

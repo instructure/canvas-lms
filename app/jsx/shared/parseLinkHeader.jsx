@@ -1,6 +1,5 @@
-define([
-], () =>  {
-  return function (linkHeader) {
+
+export default function (linkHeader) {
     if (!linkHeader) {
       return []
     }
@@ -16,4 +15,3 @@ define([
     })
     return retVal
   }
-});

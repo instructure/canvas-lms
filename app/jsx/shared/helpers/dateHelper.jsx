@@ -1,9 +1,7 @@
-define([
-  'underscore',
-  'jquery',
-  'timezone',
-  'jquery.instructure_date_and_time'
-], function (_, $, tz) {
+import _ from 'underscore'
+import $ from 'jquery'
+import tz from 'timezone'
+import 'jquery.instructure_date_and_time'
   var DateHelper = {
     parseDates: function(object, datesToParse) {
       _.each(datesToParse, (dateString) => {
@@ -25,5 +23,4 @@ define([
       return tz.isMidnight(date);
     }
   };
-  return DateHelper;
-});
+export default DateHelper

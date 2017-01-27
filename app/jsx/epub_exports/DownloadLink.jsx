@@ -1,8 +1,6 @@
-define([
-  'react',
-  'i18n!epub_exports',
-  'underscore'
-], function(React, I18n, _){
+import React from 'react'
+import I18n from 'i18n!epub_exports'
+import _ from 'underscore'
 
   var DownloadLink = React.createClass({
     displayName: 'DownloadLink',
@@ -48,5 +46,4 @@ define([
     }
   });
 
-  return DownloadLink;
-});
+export default DownloadLink

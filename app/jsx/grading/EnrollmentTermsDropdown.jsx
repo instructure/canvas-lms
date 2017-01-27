@@ -1,8 +1,6 @@
-define([
-  'react',
-  'underscore',
-  'i18n!grading_periods',
-], function(React, _, I18n) {
+import React from 'react'
+import _ from 'underscore'
+import I18n from 'i18n!grading_periods'
 
   let EnrollmentTermsDropdown = React.createClass({
     propTypes: {
@@ -44,5 +42,4 @@ define([
     }
   });
 
-  return EnrollmentTermsDropdown;
-});
+export default EnrollmentTermsDropdown

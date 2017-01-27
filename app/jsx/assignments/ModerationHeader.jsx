@@ -1,7 +1,5 @@
-define([
-  'react',
-  'i18n!moderated_grading'
-], function (React, I18n) {
+import React from 'react'
+import I18n from 'i18n!moderated_grading'
 
   var Header = React.createClass({
     displayName: 'Header',
@@ -94,6 +92,4 @@ define([
 
   });
 
-  return Header;
-
-});
+export default Header

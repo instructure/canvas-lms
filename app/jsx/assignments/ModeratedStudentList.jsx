@@ -1,10 +1,9 @@
-define([
-  'underscore',
-  'react',
-  './actions/ModerationActions',
-  './constants',
-  'i18n!moderated_grading'
-], (_, React, ModerationActions, Constants, I18n) => {
+import _ from 'underscore'
+import React from 'react'
+import ModerationActions from './actions/ModerationActions'
+import Constants from './constants'
+import I18n from 'i18n!moderated_grading'
+
   // CONSTANTS
   var PG_ONE_INDEX = 0;
   var PG_TWO_INDEX = 1;
@@ -24,7 +23,7 @@ define([
     }
   });
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ModeratedStudentList',
 
     propTypes: {
@@ -217,5 +216,3 @@ define([
       );
     }
   });
-
-});

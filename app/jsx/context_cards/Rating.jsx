@@ -1,11 +1,8 @@
-define([
-  'react',
-  'i18n!student_context_tray',
-  'classnames',
-  'instructure-ui'
-], (React, I18n, classnames,
-    { Heading, Rating: InstUIRating, Typography }
-   ) => {
+import React from 'react'
+import I18n from 'i18n!student_context_tray'
+import classnames from 'classnames'
+import { Heading, Rating as InstUIRating, Typography } from 'instructure-ui'
+
   class Rating extends React.Component {
     static propTypes = {
       analytics: React.PropTypes.object,
@@ -57,5 +54,4 @@ define([
     }
   }
 
-  return Rating
-})
+export default Rating

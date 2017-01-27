@@ -1,18 +1,17 @@
-define([
-  'i18n!blueprint_config',
-  'jquery',
-  'react',
-  'instructure-ui/ToggleDetails',
-  'instructure-ui/Typography',
-  'instructure-ui/Spinner',
-  '../propTypes',
-  './CourseFilter',
-  './CoursePickerTable',
-  'compiled/jquery.rails_flash_notifications',
-], (I18n, $, React, {default: ToggleDetails}, {default: Typography}, {default: Spinner}, propTypes, CourseFilter, CoursePickerTable) => {
+import I18n from 'i18n!blueprint_config'
+import $ from 'jquery'
+import React from 'react'
+import ToggleDetails from 'instructure-ui/ToggleDetails'
+import Typography from 'instructure-ui/Typography'
+import Spinner from 'instructure-ui/Spinner'
+import propTypes from '../propTypes'
+import CourseFilter from './CourseFilter'
+import CoursePickerTable from './CoursePickerTable'
+import 'compiled/jquery.rails_flash_notifications'
+
   const { func, bool, arrayOf, string } = React.PropTypes
 
-  return class CoursePicker extends React.Component {
+  class CoursePicker extends React.Component {
     static propTypes = {
       courses: propTypes.courseList.isRequired,
       excludeCourses: arrayOf(string),
@@ -118,4 +117,5 @@ define([
       )
     }
   }
-})
+
+export default CoursePicker

@@ -1,10 +1,7 @@
-define([
-  'underscore',
-  'redux',
-  '../helpers/reducer',
-  '../actions',
-], (_, { combineReducers }, helper, { actionTypes }) => {
-  const { handleActions, identity, getPayload } = helper
+import _ from 'underscore'
+import { combineReducers } from 'redux'
+import { handleActions, identity, getPayload } from '../helpers/reducer'
+import { actionTypes } from '../actions'
 
   const studentCache = handleActions({
     [actionTypes.ADD_STUDENT_TO_CACHE]: (state, action) => {
@@ -73,7 +70,7 @@ define([
     },
   }, { range: 0, student: null })
 
-  return combineReducers({
+export default combineReducers({
     apiUrl: identity(),
     jwt: identity(),
     studentCache,
@@ -87,4 +84,3 @@ define([
     showDetails,
     selectedPath,
   })
-})

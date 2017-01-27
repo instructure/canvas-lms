@@ -1,7 +1,5 @@
-define([
-  "react",
-  "i18n!account_course_user_search"
-], function(React, I18n) {
+import React from 'react'
+import I18n from 'i18n!account_course_user_search'
 
   var UserLink = React.createClass({
     propTypes: {
@@ -26,5 +24,4 @@ define([
     }
   });
 
-  return UserLink;
-});
+export default UserLink

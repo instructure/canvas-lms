@@ -1,18 +1,16 @@
-define([
-  "jquery",
-  "react",
-  "underscore",
-  "i18n!account_course_user_search",
-  "jsx/shared/modal",
-  "jsx/shared/modal-content",
-  "jsx/shared/modal-buttons",
-  "./CoursesStore",
-  "./TermsStore",
-  "./AccountsTreeStore",
-  "./IcInput",
-  "./IcSelect",
-  "compiled/jquery.rails_flash_notifications"
-], function($, React, _, I18n, Modal, ModalContent, ModalButtons, CoursesStore, TermsStore, AccountsTreeStore, IcInput, IcSelect) {
+import $ from 'jquery'
+import React from 'react'
+import _ from 'underscore'
+import I18n from 'i18n!account_course_user_search'
+import Modal from 'jsx/shared/modal'
+import ModalContent from 'jsx/shared/modal-content'
+import ModalButtons from 'jsx/shared/modal-buttons'
+import CoursesStore from './CoursesStore'
+import TermsStore from './TermsStore'
+import AccountsTreeStore from './AccountsTreeStore'
+import IcInput from './IcInput'
+import IcSelect from './IcSelect'
+import 'compiled/jquery.rails_flash_notifications'
 
   var { arrayOf } = React.PropTypes;
 
@@ -179,5 +177,4 @@ define([
     }
   });
 
-  return NewCourseModal;
-});
+export default NewCourseModal

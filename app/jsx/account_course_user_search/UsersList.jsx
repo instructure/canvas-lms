@@ -1,9 +1,7 @@
-define([
-  "react",
-  "i18n!account_course_user_search",
-  "underscore",
-  "./UsersListRow",
-], function(React, I18n, _, UsersListRow) {
+import React from 'react'
+import I18n from 'i18n!account_course_user_search'
+import _ from 'underscore'
+import UsersListRow from './UsersListRow'
 
   var { string, array, object } = React.PropTypes;
 
@@ -67,5 +65,4 @@ define([
     }
   });
 
-  return UsersList;
-});
+export default UsersList

@@ -1,11 +1,9 @@
-define([
-  'jquery',
-  'react',
-  'str/htmlEscape',
-  'i18n!help_dialog',
-  'jquery.instructure_forms', /* formSubmit, getFormData, formErrors */
-  'compiled/jquery.rails_flash_notifications'
-], ($, React, htmlEscape, I18n) => {
+import $ from 'jquery'
+import React from 'react'
+import htmlEscape from 'str/htmlEscape'
+import I18n from 'i18n!help_dialog'
+import 'jquery.instructure_forms'
+import 'compiled/jquery.rails_flash_notifications'
   const TeacherFeedbackForm = React.createClass({
     propTypes: {
       onCancel: React.PropTypes.func,
@@ -135,5 +133,4 @@ define([
       );
     }
   });
-  return TeacherFeedbackForm;
-});
+export default TeacherFeedbackForm

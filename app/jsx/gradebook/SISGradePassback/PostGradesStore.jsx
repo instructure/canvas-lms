@@ -1,10 +1,8 @@
-define([
-  'jquery',
-  'underscore',
-  'i18n!modules',
-  'jsx/shared/helpers/createStore',
-  'jsx/gradebook/SISGradePassback/assignmentUtils',
-], ($, _, I18n, createStore, assignmentUtils) => {
+import $ from 'jquery'
+import _ from 'underscore'
+import I18n from 'i18n!modules'
+import createStore from 'jsx/shared/helpers/createStore'
+import assignmentUtils from 'jsx/gradebook/SISGradePassback/assignmentUtils'
 
   var PostGradesStore = (state) => {
     var store = $.extend(createStore(state), {
@@ -220,5 +218,4 @@ define([
     return store
   };
 
-  return PostGradesStore;
-});
+export default PostGradesStore

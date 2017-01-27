@@ -1,10 +1,8 @@
-define([
-  "jquery",
-  "jsx/shared/helpers/createStore",
-  "compiled/fn/parseLinkHeader",
-  "underscore",
-  "jquery.ajaxJSON"
-], function($, createStore, parseLinkHeader, _) {
+import $ from 'jquery'
+import createStore from 'jsx/shared/helpers/createStore'
+import parseLinkHeader from 'compiled/fn/parseLinkHeader'
+import _ from 'underscore'
+import 'jquery.ajaxJSON'
 
   /**
    * Build a store that support basic ajax fetching (first, next, all),
@@ -169,5 +167,4 @@ define([
     }, spec);
   }
 
-  return factory;
-});
+export default factory

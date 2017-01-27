@@ -1,18 +1,17 @@
-define([
-  'i18n!question_bank',
-  'jquery' /* $ */,
-  'jst/quiz/move_question',
-  'str/htmlEscape',
-  'jsx/quizzes/question_bank/loadBanks',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_forms' /* formSubmit, getFormData, formErrors */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags */,
-  'jquery.instructure_misc_plugins' /* confirmDelete, showIf, .dim */,
-  'jquery.keycodes' /* keycodes */,
-  'jquery.loadingImg' /* loadingImage */,
-  'jquery.templateData' /* fillTemplateData, getTemplateData */
-], function(I18n, $, moveQuestionTemplate, htmlEscape, loadBanks) {
+import I18n from 'i18n!question_bank'
+import $ from 'jquery'
+import moveQuestionTemplate from 'jst/quiz/move_question'
+import htmlEscape from 'str/htmlEscape'
+import loadBanks from 'jsx/quizzes/question_bank/loadBanks'
+import 'jquery.ajaxJSON'
+import 'jquery.instructure_forms' /* formSubmit, getFormData, formErrors */
+import 'jqueryui/dialog'
+import 'jquery.instructure_misc_helpers' /* replaceTags */
+import 'jquery.instructure_misc_plugins' /* confirmDelete, showIf, .dim */
+import 'jquery.keycodes' /* keycodes */
+import 'jquery.loadingImg' /* loadingImage */
+import 'jquery.templateData' /* fillTemplateData, getTemplateData */
+
   var moveQuestions = {
     elements: {
       $dialog: () => {return $('#move_question_dialog')},
@@ -80,5 +79,4 @@ define([
     }
   }
 
-  return moveQuestions
-})
+export default moveQuestions

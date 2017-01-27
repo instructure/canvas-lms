@@ -1,15 +1,13 @@
-define([
-  'i18n!roster',
-  'react',
-  './shapes',
-  'instructure-ui/Table',
-  'instructure-ui/ScreenReaderContent',
-  'instructure-ui/TextInput',
-  'instructure-ui/RadioInput',
-  'instructure-ui/Typography',
-  'instructure-ui/Link'
-], (I18n, React, shapes, {default: Table}, {default: ScreenReaderContent},
-    {default: TextInput}, {default: RadioInput}, {default: Typography}, {default: Link}) => {
+import I18n from 'i18n!roster'
+import React  from 'react'
+import shapes from './shapes'
+import Table from 'instructure-ui/Table'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import TextInput from 'instructure-ui/TextInput'
+import RadioInput from 'instructure-ui/RadioInput'
+import Typography from 'instructure-ui/Typography'
+import Link from 'instructure-ui/Link'
+
   const CREATE_NEW = '__CREATE_NEW__';
   const SKIP = '__SKIP';
   const nameLabel = I18n.t("New user's name");
@@ -223,5 +221,5 @@ define([
       );
     }
   }
-  return DuplicateSection;
-});
+
+export default DuplicateSection

@@ -1,14 +1,12 @@
-define([
-  'react',
-  'classnames',
-  'i18n!choose_mastery_path',
-  './assignment',
-  './select-button',
-  '../shapes/assignment-shape',
-], (React, classNames, I18n, Assignment, SelectButton, assignmentShape) => {
+import React from 'react'
+import classNames from 'classnames'
+import I18n from 'i18n!choose_mastery_path'
+import Assignment from './assignment'
+import SelectButton from './select-button'
+import assignmentShape from '../shapes/assignment-shape'
   const { func, number, arrayOf } = React.PropTypes
 
-  return class PathOption extends React.Component {
+export default class PathOption extends React.Component {
     static propTypes = {
       assignments: arrayOf(assignmentShape).isRequired,
       optionIndex: number.isRequired,
@@ -61,4 +59,3 @@ define([
       )
     }
   }
-})

@@ -1,7 +1,6 @@
-define([
-  'redux-actions',
-  './apiClient',
-], ({ createActions }, api) => {
+import { createActions } from 'redux-actions'
+import api from './apiClient'
+
   const actionTypes = [
     'LOAD_COURSES_START', 'LOAD_COURSES_SUCCESS', 'LOAD_COURSES_FAIL',
     'LOAD_ASSOCIATIONS_START', 'LOAD_ASSOCIATIONS_SUCCESS', 'LOAD_ASSOCIATIONS_FAIL',
@@ -102,5 +101,4 @@ define([
   actions.actionTypes = actionTypes.reduce((types, actionType) =>
     Object.assign(types, { [actionType]: actionType }), {})
 
-  return actions
-})
+export default actions

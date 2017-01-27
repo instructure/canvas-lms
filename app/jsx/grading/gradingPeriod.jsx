@@ -1,12 +1,10 @@
-define([
-  'timezone',
-  'react',
-  'jquery',
-  'i18n!external_tools',
-  'underscore',
-  'jsx/grading/gradingPeriodTemplate',
-  'jsx/shared/helpers/dateHelper'
-], function(tz, React, $, I18n, _, GradingPeriodTemplate, DateHelper) {
+import tz from 'timezone'
+import React from 'react'
+import $ from 'jquery'
+import I18n from 'i18n!external_tools'
+import _ from 'underscore'
+import GradingPeriodTemplate from 'jsx/grading/gradingPeriodTemplate'
+import DateHelper from 'jsx/shared/helpers/dateHelper'
   var Types = React.PropTypes;
 
   var GradingPeriod = React.createClass({
@@ -94,5 +92,4 @@ define([
     }
   });
 
-  return GradingPeriod;
-});
+export default GradingPeriod

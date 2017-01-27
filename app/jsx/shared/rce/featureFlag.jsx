@@ -1,5 +1,3 @@
-define([], function() {
-  return function() {
-    return window.ENV.RICH_CONTENT_SERVICE_ENABLED
-  }
-})
+export default function() {
+  return window.ENV.RICH_CONTENT_SERVICE_ENABLED
+}

@@ -1,14 +1,14 @@
-define([
-  'react',
-  'jquery',
-  'i18n!account_course_user_search',
-  'compiled/util/natcompare',
-  'axios',
-  './CoursesListRow',
-], (React, $, I18n, natcompare, axios, CoursesListRow) => {
-  const { string, shape, arrayOf } = React.PropTypes
+import React from 'react'
+import $ from 'jquery'
+import I18n from 'i18n!account_course_user_search'
+import natcompare from 'compiled/util/natcompare'
+import _ from 'underscore'
+import axios from 'axios'
+import CoursesListRow from './CoursesListRow'
 
-  return class CoursesList extends React.Component {
+const { string, shape, arrayOf } = React.PropTypes
+
+  class CoursesList extends React.Component {
     static propTypes = {
       courses: arrayOf(shape(CoursesListRow.propTypes)).isRequired,
       addUserUrls: shape({
@@ -98,4 +98,5 @@ define([
       )
     }
   }
-})
+
+export default CoursesList

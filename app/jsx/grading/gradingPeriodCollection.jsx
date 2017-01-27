@@ -1,14 +1,11 @@
-define([
-  'react',
-  'react-addons-update',
-  'jsx/grading/gradingPeriod',
-  'jquery',
-  'i18n!external_tools',
-  'underscore',
-  'convert_case',
-  'jquery.instructure_misc_plugins'
-],
-function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
+import React from 'react'
+import update from 'react-addons-update'
+import GradingPeriod from 'jsx/grading/gradingPeriod'
+import $ from 'jquery'
+import I18n from 'i18n!external_tools'
+import _ from 'underscore'
+import ConvertCase from 'convert_case'
+import 'jquery.instructure_misc_plugins'
 
   const periodsAreLoaded = (state) => {
     return state.periods !== null;
@@ -250,5 +247,4 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
     }
   });
 
-  return GradingPeriodCollection;
-});
+export default GradingPeriodCollection

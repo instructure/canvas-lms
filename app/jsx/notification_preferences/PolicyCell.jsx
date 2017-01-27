@@ -1,22 +1,13 @@
-define([
-  'jquery',
-  'react',
-  'react-dom',
-  'instructure-ui/RadioInput',
-  'instructure-ui/RadioInputGroup',
-  'instructure-ui/ScreenReaderContent',
-], (
-  $,
-  React,
-  ReactDOM,
-  { default: RadioInput },
-  { default: RadioInputGroup },
-  { default: ScreenReaderContent }
-) => {
+import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import RadioInput from 'instructure-ui/RadioInput'
+import RadioInputGroup from 'instructure-ui/RadioInputGroup'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
 
 const PropTypes = React.PropTypes
 
-return class PolicyCell extends React.Component {
+export default class PolicyCell extends React.Component {
   static renderAt (elt, props) {
     ReactDOM.render(<PolicyCell {...props} />, elt)
   }
@@ -76,5 +67,3 @@ return class PolicyCell extends React.Component {
     </RadioInputGroup>
   }
 }
-
-})

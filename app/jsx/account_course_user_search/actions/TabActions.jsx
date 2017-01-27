@@ -1,6 +1,4 @@
-define([
-  "i18n!user_actions"
-], function(I18n) {
+import I18n from 'i18n!user_actions'
 
   const TabActions = {
     selectTab(tabIndex) {
@@ -13,5 +11,4 @@ define([
     }
   };
 
-  return TabActions;
-});
+export default TabActions

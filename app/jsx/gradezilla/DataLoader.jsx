@@ -1,4 +1,6 @@
-define(['jquery', 'jsx/shared/CheatDepaginator', 'underscore'], ($, cheaterDepaginate, _) => {
+import $ from 'jquery'
+import cheaterDepaginate from 'jsx/shared/CheatDepaginator'
+import _ from 'underscore'
   // loaders
   const getAssignmentGroups = (url, params) => {
     return cheaterDepaginate(url, params);
@@ -127,5 +129,4 @@ define(['jquery', 'jsx/shared/CheatDepaginator', 'underscore'], ($, cheaterDepag
     };
   };
 
-  return { loadGradebookData: loadGradebookData, getDataForColumn: getDataForColumn };
-});
+export default { loadGradebookData: loadGradebookData, getDataForColumn: getDataForColumn }

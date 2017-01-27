@@ -5,10 +5,10 @@
 // and sometimes to map a response field to a new field name based
 // on the api input.
 //
-define([
-  'i18n!roster',
-  'axios',
-], (I18n, axios) => ({
+import axios from 'axios'
+import I18n from 'i18n!roster'
+
+export default {
   /* eslint-disable no-param-reassign */
 
   // @param courseId: id of current course
@@ -85,4 +85,4 @@ define([
     });
   }
   /* eslint-disable no-param-reassign */
-}))
+}

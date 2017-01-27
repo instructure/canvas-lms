@@ -1,11 +1,9 @@
-define([
-  'react',
-  'react-modal',
-  'i18n!course_images',
-  '../actions',
-  './CourseImagePicker',
-  'instructure-ui/Spinner'
-], (React, Modal, I18n, Actions, CourseImagePicker, { default: Spinner }) => {
+import React from 'react'
+import Modal from 'react-modal'
+import I18n from 'i18n!course_images'
+import Actions from '../actions'
+import CourseImagePicker from './CourseImagePicker'
+import Spinner from 'instructure-ui/Spinner'
 
   const modalOverrides = {
     content : {
@@ -156,6 +154,4 @@ define([
     }
   };
 
-  return CourseImageSelector;
-
-});
+export default CourseImageSelector

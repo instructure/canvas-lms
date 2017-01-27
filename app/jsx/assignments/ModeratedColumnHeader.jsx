@@ -1,8 +1,7 @@
-define([
-  'react',
-  './constants',
-  'i18n!moderated_grading'
-], function (React, Constants, I18n) {
+import React from 'react'
+import Constants from './constants'
+import I18n from 'i18n!moderated_grading'
+
   var ModeratedColumnHeader = React.createClass({
     displayName: 'ModeratedColumnHeader',
 
@@ -105,5 +104,4 @@ define([
     }
   });
 
-  return ModeratedColumnHeader;
-});
+export default ModeratedColumnHeader

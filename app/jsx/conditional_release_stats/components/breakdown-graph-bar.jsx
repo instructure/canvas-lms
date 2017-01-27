@@ -1,7 +1,5 @@
-define([
-  'react',
-  'i18n!cyoe_assignment_sidebar',
-], (React, I18n) => {
+import React from 'react'
+import I18n from 'i18n!cyoe_assignment_sidebar'
   const { string, number, func } = React.PropTypes
 
   class BreakdownGraph extends React.Component {
@@ -65,5 +63,4 @@ define([
     }
   }
 
-  return BreakdownGraph
-})
+export default BreakdownGraph

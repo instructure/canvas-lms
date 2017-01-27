@@ -1,11 +1,8 @@
-define([
-  'react',
-], ({ PropTypes }) => {
-  const { shape, string, number } = PropTypes
+import { PropTypes } from 'react'
+const { shape, string, number } = PropTypes
 
-  return shape({
-    id: number.isRequired,
-    name: string.isRequired,
-    avatar_url: string,
-  })
+export default shape({
+  id: number.isRequired,
+  name: string.isRequired,
+  avatar_url: string,
 })

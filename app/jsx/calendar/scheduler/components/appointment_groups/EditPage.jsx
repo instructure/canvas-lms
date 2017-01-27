@@ -1,21 +1,20 @@
-define([
-  'jquery',
-  'react',
-  'i18n!appointment_groups',
-  'instructure-ui/Breadcrumb',
-  'instructure-ui/Button',
-  'instructure-ui/Grid',
-  'instructure-ui/ScreenReaderContent',
-  'axios',
-  './AppointmentGroupList',
-  'compiled/calendar/EventDataSource',
-  'compiled/calendar/MessageParticipantsDialog',
-  './ContextSelector',
-  './TimeBlockSelector',
-  'compiled/jquery.rails_flash_notifications',
-  'jquery.instructure_forms',
-  'jquery.instructure_date_and_time'
-], ($, React, I18n, { default: Breadcrumb, BreadcrumbLink }, { default: Button }, { default: Grid, GridCol, GridRow }, { default: ScreenReaderContent }, axios, AppointmentGroupList, EventDataSource, MessageParticipantsDialog, ContextSelector, TimeBlockSelector) => {
+import $ from 'jquery'
+import React from 'react'
+import I18n from 'i18n!appointment_groups'
+import Breadcrumb, { BreadcrumbLink } from 'instructure-ui/Breadcrumb'
+import Button from 'instructure-ui/Button'
+import Grid, { GridCol, GridRow } from 'instructure-ui/Grid'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import axios from 'axios'
+import AppointmentGroupList from './AppointmentGroupList'
+import EventDataSource from 'compiled/calendar/EventDataSource'
+import MessageParticipantsDialog from 'compiled/calendar/MessageParticipantsDialog'
+import ContextSelector from './ContextSelector'
+import TimeBlockSelector from './TimeBlockSelector'
+import 'compiled/jquery.rails_flash_notifications'
+import 'jquery.instructure_forms'
+import 'jquery.instructure_date_and_time'
+
   const parseFormValues = data => ({
     description: data.description,
     location: data.location_name,
@@ -358,5 +357,4 @@ define([
     }
   }
 
-  return EditPage
-})
+export default EditPage

@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'underscore',
-  'compiled/util/round',
-  'jsx/gradebook/AssignmentGroupGradeCalculator'
-], (_, round, AssignmentGroupGradeCalculator) => {
+import _ from 'underscore'
+import round from 'compiled/util/round'
+import { calculate as AssignmentGroupGradeCalculatorCalculate } from 'jsx/gradebook/AssignmentGroupGradeCalculator'
+
   function sum (collection) {
     return _.reduce(collection, (total, value) => (total + value), 0);
   }
@@ -155,7 +154,7 @@ define([
       const groupGrades = {};
 
       (assignmentGroupsByGradingPeriodId[gradingPeriod.id] || []).forEach((assignmentGroup) => {
-        groupGrades[assignmentGroup.id] = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup);
+        groupGrades[assignmentGroup.id] = AssignmentGroupGradeCalculatorCalculate(submissions, assignmentGroup);
         periodBasedAssignmentGroupGrades.push(groupGrades[assignmentGroup.id]);
       });
 
@@ -182,7 +181,7 @@ define([
     }
 
     const allAssignmentGroupGrades = _.map(assignmentGroups, assignmentGroup => (
-      AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
+      AssignmentGroupGradeCalculatorCalculate(submissions, assignmentGroup)
     ));
 
     return {
@@ -196,7 +195,7 @@ define([
 
   function calculateWithoutGradingPeriods (submissions, assignmentGroups, options) {
     const assignmentGroupGrades = _.map(assignmentGroups, assignmentGroup => (
-      AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
+      AssignmentGroupGradeCalculatorCalculate(submissions, assignmentGroup)
     ));
 
     return {
@@ -305,7 +304,7 @@ define([
   //   final: <AssignmentGroup Grade *see above>
   //   scoreUnit: 'points'|'percent'
   // }
-  function calculate (submissions, assignmentGroups, weightingScheme, gradingPeriodSet, effectiveDueDates) {
+  export function calculate (submissions, assignmentGroups, weightingScheme, gradingPeriodSet, effectiveDueDates) {
     const options = {
       weightGradingPeriods: gradingPeriodSet && !!gradingPeriodSet.weighted,
       weightAssignmentGroups: weightingScheme === 'percent'
@@ -319,8 +318,3 @@ define([
 
     return calculateWithoutGradingPeriods(submissions, assignmentGroups, options);
   }
-
-  return {
-    calculate
-  };
-});

@@ -1,15 +1,14 @@
-define([
-  'react',
-  'classnames',
-  'instructure-ui/Spinner',
-  'i18n!cyoe_assignment_sidebar',
-  './student-assignment-item',
-  '../shapes/index',
-  'jsx/shared/conditional_release/score'
-], (React, classNames, { default: Spinner }, I18n, StudentAssignmentItem, { assignmentShape, studentShape }, { i18nGrade }) => {
+import React from 'react'
+import classNames from 'classnames'
+import Spinner from 'instructure-ui/Spinner'
+import I18n from 'i18n!cyoe_assignment_sidebar'
+import StudentAssignmentItem from './student-assignment-item'
+import { assignmentShape, studentShape } from '../shapes/index'
+import { i18nGrade } from 'jsx/shared/conditional_release/score'
+
   const { shape, string, number, arrayOf, func, bool } = React.PropTypes
 
-  return class StudentDetailsView extends React.Component {
+export default class StudentDetailsView extends React.Component {
     static propTypes = {
       isLoading: bool,
       student: studentShape,
@@ -147,4 +146,3 @@ define([
       )
     }
   }
-})

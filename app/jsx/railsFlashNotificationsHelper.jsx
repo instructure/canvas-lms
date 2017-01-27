@@ -1,13 +1,12 @@
-define([
-  'i18n!shared.flash_notices',
-  'jquery',
-  'underscore',
-  'compiled/fn/preventDefault',
-  'str/htmlEscape',
-  'jqueryui/effects/drop',
-  'vendor/jquery.cookie'
-], function (I18n, $, _, preventDefault, htmlEscape) {
-  var RailsFlashNotificationsHelper = class {
+import I18n from 'i18n!shared.flash_notices'
+import $ from 'jquery'
+import _ from 'underscore'
+import preventDefault from 'compiled/fn/preventDefault'
+import htmlEscape from 'str/htmlEscape'
+import 'jqueryui/effects/drop'
+import 'vendor/jquery.cookie'
+
+  class RailsFlashNotificationsHelper {
     constructor() {
       this.holder = null;
       this.screenreader_holder = null;
@@ -174,5 +173,4 @@ xsslint safeString.method escapeContent
     }
   }
 
-  return RailsFlashNotificationsHelper;
-});
+export default RailsFlashNotificationsHelper

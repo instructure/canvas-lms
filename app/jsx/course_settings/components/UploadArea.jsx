@@ -1,9 +1,7 @@
-define([
-  'react',
-  'i18n!course_images',
-  'classnames',
-  'str/htmlEscape'
-], (React, I18n, classnames, htmlEscape) => {
+import React from 'react'
+import I18n from 'i18n!course_images'
+import classnames from 'classnames'
+import htmlEscape from 'str/htmlEscape'
 
   class UploadArea extends React.Component {
     constructor (props) {
@@ -58,6 +56,4 @@ define([
     }
   }
 
-  return UploadArea;
-
-});
+export default UploadArea

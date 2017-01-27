@@ -1,12 +1,10 @@
-define([
-    'jquery',
-    'i18n!external_tools',
-    'react',
-    'react-modal',
-    'jsx/external_apps/lib/ExternalAppsStore'
-], function ($, I18n, React, Modal, store) {
+import $ from 'jquery'
+import I18n from 'i18n!external_tools'
+import React from 'react'
+import Modal from 'react-modal'
+import store from 'jsx/external_apps/lib/ExternalAppsStore'
 
-    return React.createClass({
+export default React.createClass({
         displayName: 'Lti2ReregistrationUpdateModal',
 
         propTypes: {
@@ -85,4 +83,3 @@ define([
         }
 
     });
-});

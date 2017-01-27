@@ -1,17 +1,15 @@
-define([
-  'i18n!react_files',
-  'underscore',
-  'react',
-  'compiled/react_files/components/SearchResults',
-  'jsx/files/NoResults',
-  'jsx/files/ColumnHeaders',
-  'compiled/models/Folder',
-  'jsx/files/FolderChild',
-  'jsx/files/LoadingIndicator',
-  'jsx/files/FilePreview',
-  'page',
-  'compiled/react_files/modules/FocusStore'
-], function(I18n, _, React, SearchResults, NoResults, ColumnHeaders, Folder, FolderChild, LoadingIndicator, FilePreview, page, FocusStore) {
+import I18n from 'i18n!react_files'
+import _ from 'underscore'
+import React from 'react'
+import SearchResults from 'compiled/react_files/components/SearchResults'
+import NoResults from 'jsx/files/NoResults'
+import ColumnHeaders from 'jsx/files/ColumnHeaders'
+import Folder from 'compiled/models/Folder'
+import FolderChild from 'jsx/files/FolderChild'
+import LoadingIndicator from 'jsx/files/LoadingIndicator'
+import FilePreview from 'jsx/files/FilePreview'
+import page from 'page'
+import FocusStore from 'compiled/react_files/modules/FocusStore'
 
   SearchResults.displayErrors =  function (errors) {
     var error_message= null
@@ -114,6 +112,4 @@ define([
     }
   };
 
-  return React.createClass(SearchResults);
-
-});
+export default React.createClass(SearchResults)

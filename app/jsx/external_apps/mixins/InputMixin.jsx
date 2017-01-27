@@ -1,10 +1,8 @@
-define([
-  'underscore',
-  'react',
-  'jsx/external_apps/lib/classMunger'
-], function(_, React, classMunger) {
+import _ from 'underscore'
+import React from 'react'
+import classMunger from 'jsx/external_apps/lib/classMunger'
 
-  return {
+export default {
     getInitialState() {
       return {
         value: this.props.defaultValue
@@ -32,4 +30,3 @@ define([
       return this.props.errors[this.props.id];
     }
   }
-});

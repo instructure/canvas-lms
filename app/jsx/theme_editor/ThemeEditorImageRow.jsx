@@ -1,15 +1,13 @@
-define([
-  'react',
-  './PropTypes',
-  'i18n!theme_editor'
-], (React, customTypes, I18n) => {
+import React from 'react'
+import customTypes from './PropTypes'
+import I18n from 'i18n!theme_editor'
 
   // consider anything other than null or undefined (including '') as "set"
   function isSet(val) {
     return val === null || val === undefined
   }
 
-  return React.createClass({
+export default React.createClass({
 
     displayName: 'ThemeEditorImageRow',
 
@@ -108,4 +106,3 @@ define([
       )
     }
   })
-});

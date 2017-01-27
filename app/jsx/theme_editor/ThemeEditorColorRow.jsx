@@ -1,12 +1,10 @@
-define([
-  'react',
-  './PropTypes',
-  'i18n!theme_editor',
-  'compiled/util/rgb2hex',
-  'classnames'
-], (React, customTypes, I18n, rgb2hex, classnames) => {
+import React from 'react'
+import customTypes from './PropTypes'
+import I18n from 'i18n!theme_editor'
+import rgb2hex from 'compiled/util/rgb2hex'
+import classnames from 'classnames'
 
-  return React.createClass({
+export default React.createClass({
 
     displayName: 'ThemeEditorColorRow',
 
@@ -148,4 +146,3 @@ define([
       )
     }
   })
-});

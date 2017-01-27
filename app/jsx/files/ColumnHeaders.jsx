@@ -1,11 +1,9 @@
-define([
-  'jquery',
-  'underscore',
-  'i18n!react_files',
-  'react',
-  'classnames',
-  'compiled/react_files/components/ColumnHeaders',
-  ], function($, _, I18n, React, classnames, ColumnHeaders) {
+import $ from 'jquery'
+import _ from 'underscore'
+import I18n from 'i18n!react_files'
+import React from 'react'
+import classnames from 'classnames'
+import ColumnHeaders from 'compiled/react_files/components/ColumnHeaders'
 
     ColumnHeaders.renderColumns = function (sort, order) {
       return this.columns.map((column) => {
@@ -115,7 +113,4 @@ define([
     );
   }
 
-  return React.createClass(ColumnHeaders);
-
-
-});
+export default React.createClass(ColumnHeaders)

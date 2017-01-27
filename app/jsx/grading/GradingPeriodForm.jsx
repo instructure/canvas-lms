@@ -1,16 +1,13 @@
-define([
-  'react',
-  'react-dom',
-  'react-addons-update',
-  'underscore',
-  'instructure-ui/Button',
-  'i18n!external_tools',
-  'jsx/due_dates/DueDateCalendarPicker',
-  'jsx/shared/helpers/accessibleDateFormat',
-  'jsx/shared/helpers/numberHelper',
-  'compiled/util/round'
-], function(React, ReactDOM, update, _, { default: Button }, I18n,
-  DueDateCalendarPicker, accessibleDateFormat, numberHelper, round) {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import update from 'react-addons-update'
+import _ from 'underscore'
+import Button from 'instructure-ui/Button'
+import I18n from 'i18n!external_tools'
+import DueDateCalendarPicker from 'jsx/due_dates/DueDateCalendarPicker'
+import accessibleDateFormat from 'jsx/shared/helpers/accessibleDateFormat'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
+import round from 'compiled/util/round'
 
   const Types = React.PropTypes;
 
@@ -267,5 +264,4 @@ define([
     }
   });
 
-  return GradingPeriodForm;
-});
+export default GradingPeriodForm

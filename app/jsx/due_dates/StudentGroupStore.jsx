@@ -1,11 +1,9 @@
-define([
-  'react',
-  'underscore',
-  'jsx/shared/helpers/createStore',
-  'jquery',
-  'compiled/str/splitAssetString',
-  'compiled/fn/parseLinkHeader'
-], (React, _, createStore, $, splitAssetString, parseLinkHeader) => {
+import React from 'react'
+import _ from 'underscore'
+import createStore from 'jsx/shared/helpers/createStore'
+import $ from 'jquery'
+import splitAssetString from 'compiled/str/splitAssetString'
+import parseLinkHeader from 'compiled/fn/parseLinkHeader'
 
   // -------------------
   //       About
@@ -114,5 +112,4 @@ define([
 
   // -------------------
 
-  return StudentGroupStore
-});
+export default StudentGroupStore

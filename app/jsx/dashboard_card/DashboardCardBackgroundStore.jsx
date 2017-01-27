@@ -1,9 +1,7 @@
-define([
-  'react',
-  'underscore',
-  'jsx/shared/helpers/createStore',
-  'compiled/contextColorer',
-], (React, _, createStore, ContextColorer) => {
+import React from 'react'
+import _ from 'underscore'
+import createStore from 'jsx/shared/helpers/createStore'
+import ContextColorer from 'compiled/contextColorer'
 
   var DEFAULT_COLOR_OPTIONS = [
     '#008400',
@@ -106,5 +104,4 @@ define([
     ContextColorer.persistContextColors(tmp, ENV.current_user_id);
   }
 
-  return DashboardCardBackgroundStore;
-});
+export default DashboardCardBackgroundStore

@@ -1,9 +1,7 @@
-define([
-  'react',
-  './ChecklistItem',
-  './ListItems',
-  'i18n!course_wizard'
-], function (React, ChecklistItem, ListItems, I18n) {
+import React from 'react'
+import ChecklistItem from './ChecklistItem'
+import ListItems from './ListItems'
+import I18n from 'i18n!course_wizard'
 
   var Checklist = React.createClass({
       displayName: 'Checklist',
@@ -55,6 +53,4 @@ define([
 
   });
 
-  return Checklist;
-
-});
+export default Checklist

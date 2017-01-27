@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery',
-  'compiled/shared/CurveGradesDialog',
-  'i18n!gradebook',
-  'compiled/jquery.rails_flash_notifications'
-], ($, CurveGradesDialog, I18n) => {
+import $ from 'jquery'
+import CurveGradesDialog from 'compiled/shared/CurveGradesDialog'
+import I18n from 'i18n!gradebook'
+import 'compiled/jquery.rails_flash_notifications'
+
   const CurveGradesDialogManager = {
     createCurveGradesAction (assignment, students, {isAdmin, contextUrl, submissionsLoaded} = {}) {
       const { grading_type: gradingType, points_possible: pointsPossible } = assignment;
@@ -39,5 +38,4 @@ define([
       };
     }
   }
-  return CurveGradesDialogManager
-});
+export default CurveGradesDialogManager

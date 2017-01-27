@@ -1,15 +1,13 @@
-define([
-  'react',
-  'react-dom',
-  'page',
-  'qs',
-  'redux',
-  'jsx/collaborations/CollaborationsApp',
-  'jsx/collaborations/CollaborationsToolLaunch',
-  'jsx/collaborations/actions/collaborationsActions',
-  'jsx/collaborations/store/store',
-  'compiled/str/splitAssetString'
-], function (React, ReactDOM, page, qs, redux, CollaborationsApp, CollaborationsToolLaunch, actions, store, splitAssetString) {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import page from 'page'
+import qs from 'qs'
+import redux from 'redux'
+import CollaborationsApp from 'jsx/collaborations/CollaborationsApp'
+import CollaborationsToolLaunch from 'jsx/collaborations/CollaborationsToolLaunch'
+import actions from 'jsx/collaborations/actions/collaborationsActions'
+import store from 'jsx/collaborations/store/store'
+import splitAssetString from 'compiled/str/splitAssetString'
 
   $(window).on('externalContentReady', (e, data) => store.dispatch(actions.externalContentReady(e, data)));
 
@@ -58,10 +56,8 @@ define([
 
   page('/:context(courses|groups)/:contextId/lti_collaborations/external_tools*', renderLaunchTool);
 
-  return {
+export default {
     start () {
       page.start();
     }
   };
-
-});

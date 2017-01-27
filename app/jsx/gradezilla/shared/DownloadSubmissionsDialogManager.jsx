@@ -1,8 +1,7 @@
-define([
-  'INST',
-  'jquery',
-  'jquery.instructure_misc_helpers'
-], (INST, $) => {
+import INST from 'INST'
+import $ from 'jquery'
+import 'jquery.instructure_misc_helpers'
+
   class DownloadSubmissionsDialogManager {
     constructor (assignment, downloadUrlTemplate, submissionsDownloading) {
       this.assignment = assignment;
@@ -24,5 +23,4 @@ define([
     }
   }
 
-  return DownloadSubmissionsDialogManager;
-});
+export default DownloadSubmissionsDialogManager

@@ -1,7 +1,5 @@
-define([
-  'redux',
-  'underscore'
-], (redux, _) => {
+import redux from 'redux'
+import _ from 'underscore'
   let initialState = {
     listLTICollaboratorsPending: false,
     listLTICollaboratorsSuccessful: false,
@@ -37,6 +35,4 @@ define([
       return state;
     }
   };
-  return ltiCollaborators;
-
-})
+export default ltiCollaborators

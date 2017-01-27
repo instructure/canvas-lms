@@ -1,11 +1,10 @@
-define([
-  'react',
-  'react-dom',
-  'react-redux',
-  './components/breakdown-graphs',
-  './components/sticky-sidebar',
-  './components/breakdown-details',
-], (React, ReactDOM, { connect, Provider }, BreakdownGraphs, StickySidebar, BreakdownDetails) => {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { connect, Provider } from 'react-redux'
+import BreakdownGraphs from './components/breakdown-graphs'
+import StickySidebar from './components/sticky-sidebar'
+import BreakdownDetails from './components/breakdown-details'
+
   const Graphs = connect((state) => ({
     assignment: state.assignment,
     ranges: state.ranges,
@@ -25,7 +24,7 @@ define([
     students: state.studentCache,
   }))(BreakdownDetails)
 
-  return class CRSApp {
+export default class CRSApp {
     constructor (store, actions) {
       this.store = store
       this.actions = actions
@@ -62,4 +61,3 @@ define([
       )
     }
   }
-})

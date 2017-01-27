@@ -1,6 +1,4 @@
-define([
-  'react'
-], (React) => {
+import React from 'react'
   let main = document.querySelector('#main')
 
   class CollaborationsToolLaunch extends React.Component {
@@ -38,5 +36,4 @@ define([
     }
   }
 
-  return CollaborationsToolLaunch
-})
+export default CollaborationsToolLaunch

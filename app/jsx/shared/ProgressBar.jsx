@@ -1,8 +1,6 @@
-define([
-  'react',
-  'i18n!react_files',
-  'classnames'
-  ], function (React, I18n, classnames) {
+import React from 'react'
+import I18n from 'i18n!react_files'
+import classnames from 'classnames'
 
     var ProgressBar = React.createClass({
 
@@ -36,5 +34,4 @@ define([
       }
   });
 
-    return ProgressBar;
-});
+export default ProgressBar

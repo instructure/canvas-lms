@@ -1,6 +1,4 @@
-define([
-  '../actions/collaborationsActions'
-], (ACTION_NAMES) => {
+import ACTION_NAMES from '../actions/collaborationsActions'
   const initialState = {
     createCollaborationPending: false,
     createCollaborationSuccessful: false,
@@ -32,11 +30,10 @@ define([
     }
   }
 
-  return (state = initialState, action) => {
+export default (state = initialState, action) => {
     if (createHandlers[action.type]) {
       return createHandlers[action.type](state, action)
     } else {
       return state
     }
   }
-})

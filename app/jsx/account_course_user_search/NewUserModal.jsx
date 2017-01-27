@@ -1,17 +1,15 @@
-define([
-  "jquery",
-  "react",
-  "underscore",
-  "i18n!account_course_user_search",
-  "user_utils",
-  "jsx/shared/modal",
-  "jsx/shared/modal-content",
-  "jsx/shared/modal-buttons",
-  "./UsersStore",
-  "./IcInput",
-  "./IcCheckbox",
-  "compiled/jquery.rails_flash_notifications"
-], function($, React, _, I18n, userUtils, Modal, ModalContent, ModalButtons, UsersStore, IcInput, IcCheckbox) {
+import $ from 'jquery'
+import React from 'react'
+import _ from 'underscore'
+import I18n from 'i18n!account_course_user_search'
+import userUtils from 'user_utils'
+import Modal from 'jsx/shared/modal'
+import ModalContent from 'jsx/shared/modal-content'
+import ModalButtons from 'jsx/shared/modal-buttons'
+import UsersStore from './UsersStore'
+import IcInput from './IcInput'
+import IcCheckbox from './IcCheckbox'
+import 'compiled/jquery.rails_flash_notifications'
 
   var { object } = React.PropTypes;
 
@@ -183,5 +181,4 @@ define([
     }
   });
 
-  return NewUserModal;
-});
+export default NewUserModal

@@ -1,7 +1,5 @@
- define([
-  'react',
-  './BaseIcon'
-], function(React, BaseIcon) {
+import React from 'react'
+import BaseIcon from './BaseIcon'
   var IconLifePreserver = React.createClass({
     render () {
       const content = `
@@ -22,5 +20,4 @@
     }
   });
 
-  return IconLifePreserver;
-});
+export default IconLifePreserver

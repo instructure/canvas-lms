@@ -1,21 +1,19 @@
-define([
-  'react',
-  'underscore',
-  'jquery',
-  'instructure-ui/Button',
-  'i18n!grading_periods',
-  'convert_case',
-  'jsx/grading/GradingPeriodSet',
-  'jsx/grading/SearchGradingPeriodsField',
-  'jsx/shared/helpers/searchHelpers',
-  'jsx/shared/helpers/dateHelper',
-  'jsx/grading/EnrollmentTermsDropdown',
-  'jsx/grading/NewGradingPeriodSetForm',
-  'jsx/grading/EditGradingPeriodSetForm',
-  'compiled/api/gradingPeriodSetsApi',
-  'compiled/api/enrollmentTermsApi',
-  'jquery.instructure_misc_plugins'
-], function(React, _, $, { default: Button }, I18n, ConvertCase, GradingPeriodSet, SearchGradingPeriodsField, SearchHelpers, DateHelper, EnrollmentTermsDropdown, NewGradingPeriodSetForm, EditGradingPeriodSetForm, SetsApi, TermsApi) {
+import React from 'react'
+import _ from 'underscore'
+import $ from 'jquery'
+import Button from 'instructure-ui/Button'
+import I18n from 'i18n!grading_periods'
+import ConvertCase from 'convert_case'
+import GradingPeriodSet from 'jsx/grading/GradingPeriodSet'
+import SearchGradingPeriodsField from 'jsx/grading/SearchGradingPeriodsField'
+import SearchHelpers from 'jsx/shared/helpers/searchHelpers'
+import DateHelper from 'jsx/shared/helpers/dateHelper'
+import EnrollmentTermsDropdown from 'jsx/grading/EnrollmentTermsDropdown'
+import NewGradingPeriodSetForm from 'jsx/grading/NewGradingPeriodSetForm'
+import EditGradingPeriodSetForm from 'jsx/grading/EditGradingPeriodSetForm'
+import SetsApi from 'compiled/api/gradingPeriodSetsApi'
+import TermsApi from 'compiled/api/enrollmentTermsApi'
+import 'jquery.instructure_misc_plugins'
 
   const presentEnrollmentTerms = function(enrollmentTerms) {
     return _.map(enrollmentTerms, term => {
@@ -422,5 +420,4 @@ define([
     }
   });
 
-  return GradingPeriodSetCollection;
-});
+export default GradingPeriodSetCollection

@@ -1,12 +1,9 @@
-define([
-  'react',
-  'compiled/react_files/components/FileRenameForm',
-  'jsx/shared/modal',
-  'jsx/shared/modal-content',
-  'jsx/shared/modal-buttons',
-  'i18n!file_rename_form'
-
-  ], function(React, FileRenameForm, Modal, ModalContent, ModalButtons, I18n) {
+import React from 'react'
+import FileRenameForm from 'compiled/react_files/components/FileRenameForm'
+import Modal from 'jsx/shared/modal'
+import ModalContent from 'jsx/shared/modal-content'
+import ModalButtons from 'jsx/shared/modal-buttons'
+import I18n from 'i18n!file_rename_form'
 
   FileRenameForm.buildContent = function () {
     var nameToUse = this.state.fileOptions.name || this.state.fileOptions.file.name;
@@ -152,6 +149,4 @@ define([
     );
   };
 
-  return React.createClass(FileRenameForm);
-
-});
+export default React.createClass(FileRenameForm)

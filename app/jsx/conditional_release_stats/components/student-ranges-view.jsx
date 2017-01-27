@@ -1,11 +1,10 @@
-define([
-  'react',
-  'instructure-ui/TabList',
-  'instructure-ui/ApplyTheme',
-  'i18n!cyoe_assignment_sidebar',
-  'jsx/shared/conditional_release/score',
-  './student-range',
-], (React, { default: TabList, TabPanel, Tab }, { default: ApplyTheme }, I18n, scoreHelpers, StudentRange) => {
+import React from 'react'
+import TabList, { TabPanel, Tab } from 'instructure-ui/TabList'
+import ApplyTheme from 'instructure-ui/ApplyTheme'
+import I18n from 'i18n!cyoe_assignment_sidebar'
+import scoreHelpers from 'jsx/shared/conditional_release/score'
+import StudentRange from './student-range'
+
   const { array, func, object } = React.PropTypes
 
   const tabsTheme = {
@@ -25,7 +24,7 @@ define([
     },
   }
 
-  return class StudentRangesView extends React.Component {
+export default class StudentRangesView extends React.Component {
     static propTypes = {
       assignment: object.isRequired,
       ranges: array.isRequired,
@@ -67,4 +66,3 @@ define([
       )
     }
   }
-})

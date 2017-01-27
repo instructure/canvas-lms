@@ -1,6 +1,4 @@
-define([
-  'axios',
-], (axios) => {
+import axios from 'axios'
   const CyoeClient = {
     call ({ apiUrl, jwt }, path) {
       return axios({
@@ -24,5 +22,4 @@ define([
     },
   }
 
-  return CyoeClient
-})
+export default CyoeClient

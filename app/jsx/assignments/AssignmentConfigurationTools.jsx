@@ -1,10 +1,8 @@
-define([
-  'jquery',
-  'react',
-  'react-dom',
-  'i18n!moderated_grading',
-  'compiled/jquery.rails_flash_notifications'
-], ($, React, ReactDOM, I18n) => {
+import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import I18n from 'i18n!moderated_grading'
+import 'compiled/jquery.rails_flash_notifications'
 
   const AssignmentConfigurationTools = React.createClass({
     displayName: 'AssignmentConfigurationTools',
@@ -180,5 +178,4 @@ define([
     attach: attach
   };
 
-  return ConfigurationTools;
-});
+export default ConfigurationTools

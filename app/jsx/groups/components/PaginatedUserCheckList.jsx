@@ -1,6 +1,4 @@
-define([
-  'react',
-], (React) => {
+import React from 'react'
   const PaginatedUserCheckList = React.createClass({
     getDefaultProps () {
       return {
@@ -46,5 +44,4 @@ define([
     },
   })
 
-  return PaginatedUserCheckList
-})
+export default PaginatedUserCheckList

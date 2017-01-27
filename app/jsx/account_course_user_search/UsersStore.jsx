@@ -1,6 +1,5 @@
-define([
-  './createStore',
-], (createStore) => {
+import createStore from './createStore'
+
   const UsersStore = createStore({
     getUrl () {
       return `/api/v1/accounts/${this.context.accountId}/users`;
@@ -18,5 +17,4 @@ define([
     }
   })
 
-  return UsersStore
-})
+export default UsersStore

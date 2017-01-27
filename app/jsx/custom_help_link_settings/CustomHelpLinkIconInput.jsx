@@ -1,7 +1,4 @@
-define([
-  'react',
-  'i18n!custom_help_link'
-], function(React, I18n) {
+import React from 'react'
 
   const CustomHelpLinkIconInput = React.createClass({
     propTypes: {
@@ -35,5 +32,4 @@ define([
     }
   });
 
-  return CustomHelpLinkIconInput;
-});
+export default CustomHelpLinkIconInput

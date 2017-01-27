@@ -1,9 +1,7 @@
-define([
-  'react',
-  'jsx/shared/modal',
-  'jsx/shared/modal-content',
-  'i18n!react_files'
-], function(React, Modal, ModalContent, I18n) {
+import React from 'react'
+import Modal from 'jsx/shared/modal'
+import ModalContent from 'jsx/shared/modal-content'
+import I18n from 'i18n!react_files'
   var KeyboardShortcutModal = React.createClass({
     getInitialState() {
       return {
@@ -67,5 +65,4 @@ define([
     }
   });
 
-  return KeyboardShortcutModal;
-});
+export default KeyboardShortcutModal

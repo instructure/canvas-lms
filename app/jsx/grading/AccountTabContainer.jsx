@@ -1,10 +1,8 @@
-define([
-  'react',
-  'jsx/grading/gradingStandardCollection',
-  'jsx/grading/GradingPeriodSetCollection',
-  'jquery',
-  'i18n!grading_periods'
-], (React, GradingStandardCollection, GradingPeriodSetCollection, $, I18n) => {
+import React from 'react'
+import GradingStandardCollection from 'jsx/grading/gradingStandardCollection'
+import GradingPeriodSetCollection from 'jsx/grading/GradingPeriodSetCollection'
+import $ from 'jquery'
+import I18n from 'i18n!grading_periods'
   const { bool, string, shape } = React.PropTypes;
 
   class AccountTabContainer extends React.Component {
@@ -52,5 +50,4 @@ define([
     }
   }
 
-  return AccountTabContainer;
-});
+export default AccountTabContainer

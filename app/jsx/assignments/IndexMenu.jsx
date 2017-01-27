@@ -1,12 +1,11 @@
-define([
-  'underscore',
-  'react',
-  'react-dom',
-  'i18n!assignment_index_menu',
-  'jsx/shared/ExternalToolModalLauncher',
-  './actions/IndexMenuActions',
-], function (_, React, ReactDOM, I18n, ExternalToolModalLauncher, Actions) {
-  return React.createClass({
+import _ from 'underscore'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import I18n from 'i18n!assignment_index_menu'
+import ExternalToolModalLauncher from 'jsx/shared/ExternalToolModalLauncher'
+import Actions from './actions/IndexMenuActions'
+
+export default React.createClass({
     displayName: 'IndexMenu',
 
     propTypes: {
@@ -125,4 +124,3 @@ define([
       );
     }
   });
-});

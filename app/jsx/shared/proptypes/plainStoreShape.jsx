@@ -1,4 +1,5 @@
-define(['react'], (React) => {
+import React from 'react'
+
   const plainStoreShape = {
     getState: React.PropTypes.func,
     addChangeListener: React.PropTypes.func,
@@ -6,5 +7,4 @@ define(['react'], (React) => {
     setState: React.PropTypes.func
   };
 
-  return plainStoreShape;
-});
+export default plainStoreShape

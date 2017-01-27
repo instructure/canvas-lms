@@ -1,18 +1,16 @@
-define([
-  'i18n!theme_editor',
-  'react',
-  'jquery',
-  'underscore',
-  'str/htmlEscape',
-  'compiled/fn/preventDefault',
-  'compiled/models/Progress',
-  './PropTypes',
-  './submitHtmlForm',
-  './SaveThemeButton',
-  './ThemeEditorAccordion',
-  './ThemeEditorFileUpload',
-  './ThemeEditorModal'
-], (I18n, React, $, _, htmlEscape, preventDefault, Progress, customTypes, submitHtmlForm, SaveThemeButton, ThemeEditorAccordion, ThemeEditorFileUpload, ThemeEditorModal) => {
+import I18n from 'i18n!theme_editor'
+import React from 'react'
+import $ from 'jquery'
+import _ from 'underscore'
+import htmlEscape from 'str/htmlEscape'
+import preventDefault from 'compiled/fn/preventDefault'
+import Progress from 'compiled/models/Progress'
+import customTypes from './PropTypes'
+import submitHtmlForm from './submitHtmlForm'
+import SaveThemeButton from './SaveThemeButton'
+import ThemeEditorAccordion from './ThemeEditorAccordion'
+import ThemeEditorFileUpload from './ThemeEditorFileUpload'
+import ThemeEditorModal from './ThemeEditorModal'
 
 /*eslint no-alert:0*/
   const TABS = [
@@ -52,7 +50,7 @@ define([
 
   const notComplete = (progress) => progress.completion !== 100
 
-  return React.createClass({
+export default React.createClass({
 
     displayName: 'ThemeEditor',
 
@@ -515,4 +513,3 @@ define([
       )
     }
   })
-});

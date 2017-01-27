@@ -1,10 +1,7 @@
-define([
-  'i18n!student_groups',
-  'react',
-  'jsx/groups/mixins/InfiniteScroll',
-  'jsx/groups/components/Group'
-
-], (I18n, React, InfiniteScroll, Group) => {
+import I18n from 'i18n!student_groups'
+import React from 'react'
+import InfiniteScroll from 'jsx/groups/mixins/InfiniteScroll'
+import Group from 'jsx/groups/components/Group'
   var PaginatedGroupList = React.createClass({
     mixins: [InfiniteScroll],
 
@@ -25,5 +22,4 @@ define([
     }
   });
 
-  return PaginatedGroupList;
-});
+export default PaginatedGroupList

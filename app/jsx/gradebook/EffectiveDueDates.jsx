@@ -1,7 +1,6 @@
-define([
-  'underscore'
-], (_) => {
-  function scopeToUser (dueDateData, userId) {
+import _ from 'underscore'
+
+  export function scopeToUser (dueDateData, userId) {
     const scopedData = {};
     _.forEach(dueDateData, (dueDateDataByUserId, assignmentId) => {
       if (dueDateDataByUserId[userId]) {
@@ -10,8 +9,3 @@ define([
     });
     return scopedData;
   }
-
-  return {
-    scopeToUser
-  };
-});

@@ -1,13 +1,9 @@
-define([
-  'react',
-  'underscore',
-  'axios',
-  'convert_case',
-  'i18n!grading_periods',
-  'react-tokeninput',
-], function(React, _, axios, ConvertCase, I18n, TokenInput) {
-  let ComboboxOption = TokenInput.Option;
-  TokenInput = TokenInput.default;
+import React from 'react'
+import _ from 'underscore'
+import axios from 'axios'
+import ConvertCase from 'convert_case'
+import I18n from 'i18n!grading_periods'
+import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
 
   const groupByTagType = function(options) {
     const now = new Date;
@@ -159,5 +155,4 @@ define([
       );
     }
   });
-  return EnrollmentTermInput;
-});
+export default EnrollmentTermInput

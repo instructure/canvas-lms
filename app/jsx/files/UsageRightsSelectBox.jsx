@@ -1,8 +1,6 @@
-define([
-  'react',
-  'i18n!react_files',
-  'compiled/react_files/components/UsageRightsSelectBox'
-], function (React, I18n, UsageRightsSelectBox) {
+import React from 'react'
+import I18n from 'i18n!react_files'
+import UsageRightsSelectBox from 'compiled/react_files/components/UsageRightsSelectBox'
 
   var CONTENT_OPTIONS = [{
       display: I18n.t('Choose usage rights...'),
@@ -131,6 +129,4 @@ define([
     );
   };
 
-  return React.createClass(UsageRightsSelectBox);
-
-});
+export default React.createClass(UsageRightsSelectBox)

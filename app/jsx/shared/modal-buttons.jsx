@@ -1,6 +1,4 @@
-define([
-  'react',
-], function(React){
+import React from 'react'
 
   var ModalButtons = React.createClass({
     displayName: 'ModalButtons',
@@ -21,5 +19,4 @@ define([
     }
   });
 
-  return ModalButtons;
-});
+export default ModalButtons

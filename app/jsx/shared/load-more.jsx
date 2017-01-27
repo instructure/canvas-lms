@@ -1,7 +1,5 @@
-define([
-  'react',
-  'i18n!react_collaborations'
-], (React, i18n) => {
+import React from 'react'
+import i18n from 'i18n!react_collaborations'
   class LoadMore extends React.Component {
 
     static propTypes = {
@@ -57,5 +55,4 @@ define([
     children: React.PropTypes.any
   };
 
-  return LoadMore;
-});
+export default LoadMore

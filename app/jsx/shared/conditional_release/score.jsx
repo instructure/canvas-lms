@@ -1,8 +1,7 @@
-define([
-  './grading-types',
-  'i18n!cyoe_assignment_sidebar',
-  'jsx/shared/helpers/numberHelper'
-], (GradingTypes, I18n, numberHelper) => {
+import GradingTypes from './grading-types'
+import I18n from 'i18n!cyoe_assignment_sidebar'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
+
   // stack overflow suggests this implementation
   const isNumeric = (n) => {
     const parsed = numberHelper.parse(n)
@@ -101,5 +100,4 @@ define([
     i18nGrade,
   }
 
-  return scoreHelpers
-})
+export default scoreHelpers

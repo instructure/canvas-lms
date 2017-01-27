@@ -1,10 +1,8 @@
-define([
-  'redux',
-  'redux-actions',
-  'i18n!roster',
-  '../actions',
-  '../store'
-], (redux, { handleActions }, I18n, {actions, actionTypes}, {defaultState}) => {
+import redux from 'redux'
+import { handleActions } from 'redux-actions'
+import I18n from 'i18n!roster'
+import { actions, actionTypes } from '../actions'
+import { defaultState } from '../store'
   // helpers -----------------------
   //
   // There are 2 paths to *_ERROR actions.
@@ -43,7 +41,7 @@ define([
   }
 
   // the returned module ---------------------
-  return handleActions({
+export default handleActions({
     // when api calls start
     [actionTypes.VALIDATE_USERS_START]: startApi,
     [actionTypes.CREATE_USERS_START]: startApi,
@@ -73,4 +71,3 @@ define([
     }
 
   }, defaultState.apiState);
-});

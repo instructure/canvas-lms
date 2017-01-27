@@ -1,8 +1,6 @@
-define([
-  'react',
-  'jsx/shared/ApiProgressBar',
-  'i18n!webzip_exports',
-], (React, ApiProgressBar, I18n) => {
+import React from 'react'
+import ApiProgressBar from 'jsx/shared/ApiProgressBar'
+import I18n from 'i18n!webzip_exports'
   class ExportInProgress extends React.Component {
     static propTypes = {
       webzip: React.PropTypes.shape({
@@ -46,6 +44,4 @@ define([
     }
   }
 
-  return ExportInProgress
-})
-
+export default ExportInProgress

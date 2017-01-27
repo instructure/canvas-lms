@@ -1,9 +1,7 @@
-define([
-  'react',
-  'underscore',
-  'jsx/shared/helpers/createStore',
-  'jquery'
-], (React, _, createStore, $) => {
+import React from 'react'
+import _ from 'underscore'
+import createStore from 'jsx/shared/helpers/createStore'
+import $ from 'jquery'
   var ProgressStore = createStore({}),
     _progresses = {};
 
@@ -16,5 +14,4 @@ define([
     });
   };
 
-  return ProgressStore;
-})
+export default ProgressStore

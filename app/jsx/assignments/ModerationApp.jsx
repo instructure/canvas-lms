@@ -1,15 +1,13 @@
-define([
-  'underscore',
-  'react',
-  'i18n!moderated_grading',
-  './ModeratedStudentList',
-  './ModerationHeader',
-  './FlashMessageHolder',
-  './actions/ModerationActions',
-  './ModeratedColumnHeader'
-], function (_, React, I18n, ModeratedStudentList, Header, FlashMessageHolder, Actions, ModeratedColumnHeader) {
+import _ from 'underscore'
+import React from 'react'
+import I18n from 'i18n!moderated_grading'
+import ModeratedStudentList from './ModeratedStudentList'
+import Header from './ModerationHeader'
+import FlashMessageHolder from './FlashMessageHolder'
+import Actions from './actions/ModerationActions'
+import ModeratedColumnHeader from './ModeratedColumnHeader'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ModerationApp',
 
     propTypes: {
@@ -103,5 +101,3 @@ define([
       );
     }
   });
-
-});

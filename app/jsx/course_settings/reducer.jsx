@@ -1,8 +1,6 @@
-define([
-  './actions',
-  './store/initialState',
-  'underscore'
-], (Actions, initialState, _) => {
+import Actions from './actions'
+import initialState from './store/initialState'
+import _ from 'underscore'
 
   const courseImageHandlers = {
     MODAL_VISIBILITY (state, action) {
@@ -62,6 +60,4 @@ define([
     }
   };
 
-  return courseImage;
-
-});
+export default courseImage

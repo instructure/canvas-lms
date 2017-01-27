@@ -1,18 +1,16 @@
-define([
-  'jquery',
-  'i18n!react_files',
-  'react',
-  'react-dom',
-  'page',
-  'compiled/react_files/components/Toolbar',
-  'compiled/react_files/modules/FocusStore',
-  'jsx/files/utils/openMoveDialog',
-  'compiled/react_files/utils/deleteStuff',
-  'jsx/files/UploadButton',
-  'classnames',
-  'compiled/fn/preventDefault',
-  'compiled/models/Folder'
-], function ($, I18n, React, ReactDOM, page, Toolbar, FocusStore, openMoveDialog, deleteStuff, UploadButton, classnames, preventDefault, Folder) {
+import $ from 'jquery'
+import I18n from 'i18n!react_files'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import page from 'page'
+import Toolbar from 'compiled/react_files/components/Toolbar'
+import FocusStore from 'compiled/react_files/modules/FocusStore'
+import openMoveDialog from 'jsx/files/utils/openMoveDialog'
+import deleteStuff from 'compiled/react_files/utils/deleteStuff'
+import UploadButton from 'jsx/files/UploadButton'
+import classnames from 'classnames'
+import preventDefault from 'compiled/fn/preventDefault'
+import Folder from 'compiled/models/Folder'
 
   Toolbar.openPreview = function () {
     FocusStore.setItemToFocus(ReactDOM.findDOMNode(this.refs.previewLink));
@@ -274,5 +272,5 @@ define([
       </header>
     );
   }
-  return React.createClass(Toolbar);
-});
+
+export default React.createClass(Toolbar)

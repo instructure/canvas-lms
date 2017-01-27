@@ -1,12 +1,11 @@
-define([
-  'underscore',
-  'react',
-  'jquery',
-  'i18n!dashcards',
-  'jsx/shared/ColorPicker',
-  'jsx/shared/proptypes/DOMElement',
-  'classnames'
-], (_, React, $, I18n, ColorPicker, DOMElement, cx) => {
+import _ from 'underscore'
+import React from 'react'
+import $ from 'jquery'
+import I18n from 'i18n!dashcards'
+import ColorPicker from 'jsx/shared/ColorPicker'
+import DOMElement from 'jsx/shared/proptypes/DOMElement'
+import cx from 'classnames'
+
   // ================
   //   COLOR PICKER
   // ================
@@ -151,5 +150,4 @@ define([
     }
   })
 
-  return ColorPickerTooltip;
-});
+export default ColorPickerTooltip

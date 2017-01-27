@@ -1,8 +1,6 @@
-define([
-  'react',
-  'jsx/epub_exports/CourseStore',
-  'jsx/epub_exports/CourseList'
-], function(React, CourseStore, CourseList){
+import React from 'react'
+import CourseStore from 'jsx/epub_exports/CourseStore'
+import CourseList from 'jsx/epub_exports/CourseList'
 
   var EpubExportApp = React.createClass({
     displayName: 'EpubExportApp',
@@ -41,5 +39,4 @@ define([
     }
   });
 
-  return EpubExportApp;
-});
+export default EpubExportApp

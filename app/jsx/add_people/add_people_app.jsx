@@ -1,15 +1,13 @@
-define([
-  'react',
-  'react-dom',
-  'redux',
-  'react-redux',
-  'compiled/util/natcompare',
-  './store',
-  './actions',
-  './reducer',
-  './components/add_people',
-], (React, ReactDOM, { bindActionCreators }, { connect, Provider }, natcompare,
-    { createStore, defaultState }, { actions, actionTypes }, reducer, AddPeople) => {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { bindActionCreators } from 'redux'
+import { connect, Provider } from 'react-redux'
+import natcompare from 'compiled/util/natcompare'
+import { createStore, defaultState } from './store'
+import { actions, actionTypes } from './actions'
+import reducer from './reducer'
+import AddPeople from './components/add_people'
+
   class AddPeopleApp {
     constructor (root, props) {
       this.root = root;                     // DOM node we render into
@@ -83,5 +81,4 @@ define([
       )
     }
   }
-  return AddPeopleApp;
-});
+export default AddPeopleApp

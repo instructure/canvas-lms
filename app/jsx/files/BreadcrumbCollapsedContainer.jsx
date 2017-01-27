@@ -1,10 +1,8 @@
-define([
-  'i18n!react_files',
-  'react',
-  'classnames',
-  'compiled/react_files/modules/filesEnv',
-  'compiled/react_files/modules/customPropTypes',
-  ], function(I18n, React, classnames, filesEnv, customPropTypes) {
+import I18n from 'i18n!react_files'
+import React from 'react'
+import classnames from 'classnames'
+import filesEnv from 'compiled/react_files/modules/filesEnv'
+import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 
   const BreadcrumbCollapsedContainer = React.createClass({
 
@@ -79,6 +77,4 @@ define([
     }
   });
 
-  return BreadcrumbCollapsedContainer;
-
-});
+export default BreadcrumbCollapsedContainer

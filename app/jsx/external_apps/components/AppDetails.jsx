@@ -1,13 +1,11 @@
-define([
-  'i18n!external_tools',
-  'react',
-  'page',
-  'jsx/external_apps/components/Header',
-  'jsx/external_apps/components/AddApp',
-  'compiled/jquery.rails_flash_notifications'
-], function(I18n, React, page, Header, AddApp) {
+import I18n from 'i18n!external_tools'
+import React from 'react'
+import page from 'page'
+import Header from 'jsx/external_apps/components/Header'
+import AddApp from 'jsx/external_apps/components/AddApp'
+import 'compiled/jquery.rails_flash_notifications'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'AppDetails',
 
     propTypes: {
@@ -83,5 +81,3 @@ define([
       )
     }
   });
-
-});

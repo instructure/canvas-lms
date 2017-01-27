@@ -1,7 +1,5 @@
-define([
-  'react',
-  'react-modal'
-], function (React, Modal) {
+import React from 'react'
+import Modal from 'react-modal'
 
   const modalOverrides = {
     overlay : {
@@ -80,5 +78,4 @@ define([
       );
     }
   });
-  return ReactModalExample;
-});
+export default ReactModalExample

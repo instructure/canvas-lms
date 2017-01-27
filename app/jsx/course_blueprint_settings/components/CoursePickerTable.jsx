@@ -1,22 +1,18 @@
-define([
-  'i18n!blueprint_config',
-  'jquery',
-  'react',
-  'instructure-ui/Typography',
-  'instructure-ui/ScreenReaderContent',
-  'instructure-ui/PresentationContent',
-  'instructure-ui/Table',
-  'instructure-ui/Checkbox',
-  '../propTypes',
-  'compiled/jquery.rails_flash_notifications',
-], (I18n, $, React, {default: Typography}, {default: ScreenReaderContent}, {default: PresentationContent},
-  {default: Table}, {default: Checkbox}, propTypes) => {
-  const { func } = React.PropTypes
+import I18n from 'i18n!blueprint_config'
+import $ from 'jquery'
+import React from 'react'
+import Typography from 'instructure-ui/Typography'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import PresentationContent from 'instructure-ui/PresentationContent'
+import Table from 'instructure-ui/Table'
+import Checkbox from 'instructure-ui/Checkbox'
+import propTypes from '../propTypes'
+import 'compiled/jquery.rails_flash_notifications'
 
-  return class CoursePickerTable extends React.Component {
+export default class CoursePickerTable extends React.Component {
     static propTypes = {
       courses: propTypes.courseList.isRequired,
-      onSelectedChanged: func,
+      onSelectedChanged: React.PropTypes.func,
     }
 
     static defaultProps = {
@@ -192,4 +188,3 @@ define([
       )
     }
   }
-})

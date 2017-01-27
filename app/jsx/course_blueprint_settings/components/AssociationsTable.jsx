@@ -1,18 +1,17 @@
-define([
-  'i18n!blueprint_config',
-  'jquery',
-  'react',
-  'instructure-ui/Typography',
-  'instructure-ui/ScreenReaderContent',
-  'instructure-ui/PresentationContent',
-  'instructure-ui/Table',
-  'instructure-ui/Button',
-  'instructure-ui/Spinner',
-  'instructure-icons/react/Solid/IconXSolid',
-  '../propTypes',
-  'compiled/jquery.rails_flash_notifications',
-], (I18n, $, React, {default: Typography}, {default: ScreenReaderContent}, {default: PresentationContent},
-  {default: Table}, {default: Button}, {default: Spinner}, {default: RemoveIcon}, propTypes) => {
+import I18n from 'i18n!blueprint_config'
+import $ from 'jquery'
+import React from 'react'
+import Typography from 'instructure-ui/Typography'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import PresentationContent from 'instructure-ui/PresentationContent'
+import Table from 'instructure-ui/Table'
+import Button from 'instructure-ui/Button'
+import Spinner from 'instructure-ui/Spinner'
+import RemoveIcon from 'instructure-icons/react/Solid/IconXSolid'
+import propTypes from '../propTypes'
+import 'compiled/jquery.rails_flash_notifications'
+
+
   const { func, arrayOf, string, bool } = React.PropTypes
 
   function shortId () {
@@ -21,7 +20,7 @@ define([
     return prefix + id
   }
 
-  return class CoursePickerTable extends React.Component {
+  class CoursePickerTable extends React.Component {
     static propTypes = {
       existingAssociations: propTypes.courseList.isRequired,
       addedAssociations: propTypes.courseList.isRequired,
@@ -211,4 +210,6 @@ define([
       )
     }
   }
-})
+
+export default CoursePickerTable
+

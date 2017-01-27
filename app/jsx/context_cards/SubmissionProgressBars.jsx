@@ -1,9 +1,8 @@
-define([
-  'react',
-  'i18n!student_context_tray',
-  'classnames',
-  'instructure-ui'
-], (React, I18n, classnames, { Heading, Progress, Tooltip, Typography, Link }) => {
+import React from 'react'
+import I18n from 'i18n!student_context_tray'
+import classnames from 'classnames'
+import { Heading, Progress, Tooltip, Typography, Link } from 'instructure-ui'
+
   class SubmissionProgressBars extends React.Component {
     static propTypes = {
       submissions: React.PropTypes.array.isRequired
@@ -105,5 +104,4 @@ define([
     }
   }
 
-  return SubmissionProgressBars
-})
+export default SubmissionProgressBars

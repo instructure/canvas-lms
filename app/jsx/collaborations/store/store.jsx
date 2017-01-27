@@ -1,25 +1,21 @@
-define([
-  'redux',
-  'redux-thunk',
-  '../reducers/ltiCollaboratorsReducer',
-  '../reducers/listCollaborationsReducer',
-  '../reducers/deleteCollaborationReducer',
-  '../reducers/createCollaborationReducer',
-  '../reducers/updateCollaborationReducer'
-], (Redux, {default:ReduxThunk}, ltiCollaboratorsReducer, listCollaborationsReducer, deleteCollaborationReducer, createCollaborationReducer, updateCollaborationReducer) => {
-  const { createStore, applyMiddleware } = Redux;
+import { createStore, applyMiddleware, combineReducers } from 'redux'
+import ReduxThunk from 'redux-thunk'
+import ltiCollaboratorsReducer from '../reducers/ltiCollaboratorsReducer'
+import listCollaborationsReducer from '../reducers/listCollaborationsReducer'
+import deleteCollaborationReducer from '../reducers/deleteCollaborationReducer'
+import createCollaborationReducer from '../reducers/createCollaborationReducer'
+import updateCollaborationReducer from '../reducers/updateCollaborationReducer'
 
-  const createStoreWithMiddleware = applyMiddleware(
-    ReduxThunk
-  )(createStore);
+const createStoreWithMiddleware = applyMiddleware(
+  ReduxThunk
+)(createStore);
 
-  const collaboratorationsReducer = Redux.combineReducers({
-    ltiCollaborators: ltiCollaboratorsReducer,
-    listCollaborations: listCollaborationsReducer,
-    deleteCollaboration: deleteCollaborationReducer,
-    createCollaboration: createCollaborationReducer,
-    updateCollaboration: updateCollaborationReducer
-  });
-
-  return createStoreWithMiddleware(collaboratorationsReducer);
+const collaboratorationsReducer = combineReducers({
+  ltiCollaborators: ltiCollaboratorsReducer,
+  listCollaborations: listCollaborationsReducer,
+  deleteCollaboration: deleteCollaborationReducer,
+  createCollaboration: createCollaborationReducer,
+  updateCollaboration: updateCollaborationReducer
 });
+
+export default createStoreWithMiddleware(collaboratorationsReducer)

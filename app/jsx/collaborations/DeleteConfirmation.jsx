@@ -1,8 +1,6 @@
-define([
-  'react',
-  'react-dom',
-  'i18n!react_collaborations'
-], (React, ReactDOM, i18n) => {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import i18n from 'i18n!react_collaborations'
   class DeleteConfirmation extends React.Component {
     componentDidMount () {
       ReactDOM.findDOMNode(this).focus()
@@ -35,5 +33,4 @@ define([
     onDelete: React.PropTypes.func
   }
 
-  return DeleteConfirmation
-});
+export default DeleteConfirmation

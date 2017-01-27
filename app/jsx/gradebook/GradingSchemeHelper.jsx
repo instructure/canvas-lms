@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'underscore'
-], (_) => {
-  function scoreToGrade (score, gradingScheme) {
+import _ from 'underscore'
+
+  export function scoreToGrade (score, gradingScheme) {
     const scoreWithLowerBound = Math.max(score, 0);
     const letter = _.find(gradingScheme, (row, i) => {
       const schemeScore = (row[1] * 100).toPrecision(4);
@@ -31,7 +30,3 @@ define([
     return letter[0];
   }
 
-  return {
-    scoreToGrade
-  };
-});

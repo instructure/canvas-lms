@@ -1,8 +1,6 @@
-define([
-  'react'
-], function (React) {
+import React from 'react'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ConfigOptionField',
 
     propTypes: {
@@ -56,5 +54,3 @@ define([
       )
     }
   });
-
-});

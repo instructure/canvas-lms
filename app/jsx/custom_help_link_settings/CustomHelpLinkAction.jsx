@@ -1,8 +1,7 @@
- define([
-  'react',
-  'react-dom',
-  './CustomHelpLinkPropTypes'
-], function(React, ReactDOM, CustomHelpLinkPropTypes) {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
+
   const CustomHelpLinkAction = React.createClass({
     propTypes: {
       link: CustomHelpLinkPropTypes.link.isRequired,
@@ -41,5 +40,4 @@
     }
   });
 
-  return CustomHelpLinkAction;
-});
+export default CustomHelpLinkAction

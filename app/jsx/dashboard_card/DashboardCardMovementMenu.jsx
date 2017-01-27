@@ -1,11 +1,10 @@
-define([
-  'react',
-  'i18n!dashcards',
-  'instructure-ui/PopoverMenu',
-  'instructure-ui/Menu',
-  'instructure-ui/ScreenReaderContent',
-  'instructure-ui/Button'
-], (React, I18n, { default: PopoverMenu }, { MenuItem, MenuItemSeparator }, { default: ScreenReaderContent }, { default: Button }) => {
+import React from 'react'
+import I18n from 'i18n!dashcards'
+import PopoverMenu from 'instructure-ui/PopoverMenu'
+import { MenuItem, MenuItemSeparator } from 'instructure-ui/Menu'
+import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import Button from 'instructure-ui/Button'
+
   class DashboardCardMovementMenu extends React.Component {
 
     static propTypes = {
@@ -92,5 +91,4 @@ define([
     }
   }
 
-  return DashboardCardMovementMenu;
-});
+export default DashboardCardMovementMenu

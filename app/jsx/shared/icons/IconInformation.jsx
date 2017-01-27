@@ -1,7 +1,5 @@
- define([
-  'react',
-  './BaseIcon'
-], function(React, BaseIcon) {
+import React from 'react'
+import BaseIcon from './BaseIcon'
   var IconInformation = React.createClass({
     render () {
       const content = `
@@ -19,5 +17,4 @@
     }
   });
 
-  return IconInformation;
-});
+export default IconInformation

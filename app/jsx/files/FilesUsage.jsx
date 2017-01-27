@@ -1,9 +1,7 @@
-define([
-  'react',
-  'i18n!react_files',
-  'compiled/react_files/components/FilesUsage',
-  'compiled/util/friendlyBytes',
-], (React, I18n, FilesUsage, friendlyBytes) => {
+import React from 'react'
+import I18n from 'i18n!react_files'
+import FilesUsage from 'compiled/react_files/components/FilesUsage'
+import friendlyBytes from 'compiled/util/friendlyBytes'
 
   FilesUsage.render = function () {
     if (this.state) {
@@ -40,5 +38,4 @@ define([
     }
   };
 
-  return React.createClass(FilesUsage);
-});
+export default React.createClass(FilesUsage)

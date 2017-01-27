@@ -1,30 +1,24 @@
-define([
-  'underscore',
-], (_) => {
-  const reducersHelper = {
-    handleActions: (actionHandler, def) => {
-      return (state, action) => {
-        state = state === undefined ? def : state
+import _ from 'underscore'
 
-        if (actionHandler[action.type]) {
-          let stateCopy = state
-          if (_.isObject(state)) {
-            stateCopy = _.extend({}, state)
-          } else if (Array.isArray(state)) {
-            stateCopy = state.slice()
-          }
+export const handleActions = (actionHandler, def) => {
+  return (state, action) => {
+    state = state === undefined ? def : state
 
-          return actionHandler[action.type](stateCopy, action)
-        } else {
-          return state
-        }
+    if (actionHandler[action.type]) {
+      let stateCopy = state
+      if (_.isObject(state)) {
+        stateCopy = _.extend({}, state)
+      } else if (Array.isArray(state)) {
+        stateCopy = state.slice()
       }
-    },
 
-    getPayload: (state, action) => action.payload,
-
-    identity: (def = '') => (s, a) => s === undefined ? def : s,
+      return actionHandler[action.type](stateCopy, action)
+    } else {
+      return state
+    }
   }
+}
 
-  return reducersHelper
-})
+export const getPayload = (state, action) => action.payload
+
+export const identity = (def = '') => (s, a) => s === undefined ? def : s

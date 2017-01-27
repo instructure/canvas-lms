@@ -1,10 +1,8 @@
-define([
-  'react',
-  'instructure-ui/Spinner',
-  'i18n!cyoe_assignment_sidebar',
-  'jsx/shared/conditional_release/score',
-  './breakdown-graph-bar',
-], (React, { default: Spinner }, I18n, scoreHelpers, BarGraph) => {
+import React from 'react'
+import Spinner from 'instructure-ui/Spinner'
+import I18n from 'i18n!cyoe_assignment_sidebar'
+import scoreHelpers from 'jsx/shared/conditional_release/score'
+import BarGraph from './breakdown-graph-bar'
   const { object, array, func, number, bool } = React.PropTypes
 
   class BreakdownGraphs extends React.Component {
@@ -55,5 +53,4 @@ define([
     }
   }
 
-  return BreakdownGraphs
-})
+export default BreakdownGraphs

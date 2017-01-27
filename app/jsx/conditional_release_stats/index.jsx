@@ -1,9 +1,8 @@
-define([
-  'redux',
-  './app',
-  './create-store',
-  './actions',
-], ({ bindActionCreators }, App, createStore, { actions }) => {
+import { bindActionCreators } from 'redux'
+import App from './app'
+import createStore from './create-store'
+import { actions } from './actions'
+
   const CyoeStats = {
     init: (graphsRoot, detailsParent) => {
       const ENV = window.ENV
@@ -39,5 +38,4 @@ define([
     },
   }
 
-  return CyoeStats
-})
+export default CyoeStats

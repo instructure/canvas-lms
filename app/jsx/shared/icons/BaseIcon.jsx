@@ -1,8 +1,6 @@
- define([
-  'react',
-  'react-dom',
-  'underscore'
-], function(React, ReactDOM, _) {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import _ from 'underscore'
   var BaseIcon = React.createClass({
     propTypes: {
       name: React.PropTypes.string.isRequired,
@@ -94,5 +92,4 @@
     }
   });
 
-  return BaseIcon;
-});
+export default BaseIcon

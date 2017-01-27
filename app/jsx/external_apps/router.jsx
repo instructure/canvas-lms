@@ -1,15 +1,12 @@
-define([
-  'react',
-  'react-dom',
-  'page',
-  'jsx/external_apps/components/Root',
-  'jsx/external_apps/components/AppList',
-  'jsx/external_apps/components/AppDetails',
-  'jsx/external_apps/components/Configurations',
-  'jsx/external_apps/lib/AppCenterStore',
-  'jsx/external_apps/lib/regularizePathname'
-], function(React, ReactDOM, page, Root, AppList, AppDetails, Configurations,
-  AppCenterStore, regularizePathname) {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import page from 'page'
+import Root from 'jsx/external_apps/components/Root'
+import AppList from 'jsx/external_apps/components/AppList'
+import AppDetails from 'jsx/external_apps/components/AppDetails'
+import Configurations from 'jsx/external_apps/components/Configurations'
+import AppCenterStore from 'jsx/external_apps/lib/AppCenterStore'
+import regularizePathname from 'jsx/external_apps/lib/regularizePathname'
 
   const currentPath = window.location.pathname;
   const re = /(.*\/settings|.*\/details)/;
@@ -66,7 +63,7 @@ define([
   page('/app/:shortName', renderAppDetails);
   page('/configurations', renderConfigurations);
 
-  return {
+export default {
     start (targetNode) {
       targetNodeToRenderIn = targetNode;
       page.start();
@@ -76,5 +73,3 @@ define([
     },
     regularizePathname
   };
-
-});

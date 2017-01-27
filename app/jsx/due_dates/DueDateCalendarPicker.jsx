@@ -1,10 +1,8 @@
-define([
-  'jquery',
-  'react',
-  'jsx/shared/helpers/accessibleDateFormat',
-  'timezone',
-  'jquery.instructure_forms'
-], ($, React, accessibleDateFormat, tz) => {
+import $ from 'jquery'
+import React from 'react'
+import accessibleDateFormat from 'jsx/shared/helpers/accessibleDateFormat'
+import tz from 'timezone'
+import 'jquery.instructure_forms'
 
   const { string, func, bool, instanceOf } = React.PropTypes;
 
@@ -116,5 +114,4 @@ define([
     }
   });
 
-  return DueDateCalendarPicker
-});
+export default DueDateCalendarPicker

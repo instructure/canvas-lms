@@ -1,25 +1,13 @@
-define([
-  'react',
-  'i18n!custom_help_link',
-  'jquery',
-  './CustomHelpLinkIcons',
-  './CustomHelpLink',
-  './CustomHelpLinkForm',
-  './CustomHelpLinkMenu',
-  './CustomHelpLinkPropTypes',
-  './CustomHelpLinkConstants',
-  'compiled/jquery.rails_flash_notifications'
-], function(
-    React,
-    I18n,
-    jquery,
-    CustomHelpLinkIcons,
-    CustomHelpLink,
-    CustomHelpLinkForm,
-    CustomHelpLinkMenu,
-    CustomHelpLinkPropTypes,
-    CustomHelpLinkConstants
-  ) {
+import React from 'react'
+import I18n from 'i18n!custom_help_link'
+import jquery from 'jquery'
+import CustomHelpLinkIcons from './CustomHelpLinkIcons'
+import CustomHelpLink from './CustomHelpLink'
+import CustomHelpLinkForm from './CustomHelpLinkForm'
+import CustomHelpLinkMenu from './CustomHelpLinkMenu'
+import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
+import CustomHelpLinkConstants from './CustomHelpLinkConstants'
+import 'compiled/jquery.rails_flash_notifications'
 
   let counter = 0; // counter to ensure unique ids for links
 
@@ -292,5 +280,4 @@ define([
     }
   });
 
-  return CustomHelpLinkSettings;
-});
+export default CustomHelpLinkSettings

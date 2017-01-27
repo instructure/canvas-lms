@@ -1,4 +1,4 @@
-define([], () => {
+
 
   const initialState = {
     inFindAppointmentMode: false,
@@ -6,5 +6,4 @@ define([], () => {
   };
 
 
-  return initialState;
-});
+export default initialState

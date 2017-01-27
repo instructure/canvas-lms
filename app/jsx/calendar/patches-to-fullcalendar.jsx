@@ -1,7 +1,5 @@
-define([
-	'fullcalendar',
-	'str/htmlEscape'
-], function(fullCalendar, htmlEscape) {
+import fullCalendar from 'fullcalendar'
+import htmlEscape from 'str/htmlEscape'
 
 	// set up a custom view for the agendaWeek day/date header row
 	const _originalHeadCellHtml = fullCalendar.Grid.prototype.headCellHtml;
@@ -21,4 +19,3 @@ define([
 			return _originalHeadCellHtml.apply(this, arguments);
 		}
 	};
-})

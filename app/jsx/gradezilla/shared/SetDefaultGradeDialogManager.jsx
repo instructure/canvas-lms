@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery',
-  'i18n!gradebook',
-  'compiled/gradezilla/SetDefaultGradeDialog',
-  'compiled/jquery.rails_flash_notifications'
-], ($, I18n, SetDefaultGradeDialog) => {
+import $ from 'jquery'
+import I18n from 'i18n!gradebook'
+import SetDefaultGradeDialog from 'compiled/gradezilla/SetDefaultGradeDialog'
+import 'compiled/jquery.rails_flash_notifications'
+
   class SetDefaultGradeDialogManager {
     constructor (assignment, students, contextId, selectedSection, isAdmin = false, submissionsLoaded = false) {
       this.assignment = assignment;
@@ -59,5 +58,4 @@ define([
     }
   }
 
-  return SetDefaultGradeDialogManager;
-});
+export default SetDefaultGradeDialogManager

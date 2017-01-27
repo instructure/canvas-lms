@@ -1,7 +1,5 @@
-define([
-  'underscore',
-  'timezone'
-], function(_, tz) {
+import _ from 'underscore'
+import tz from 'timezone'
 
   function addStudentID(student, collection = []) {
     return collection.concat([student.id]);
@@ -71,5 +69,4 @@ define([
     return dates;
   }
 
-  return { effectiveDueDatesForAssignment };
-})
+export default { effectiveDueDatesForAssignment }

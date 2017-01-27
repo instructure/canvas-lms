@@ -1,13 +1,11 @@
-define([
-  "react",
-  "react-tabs",
-  "underscore",
-  "jsx/shared/helpers/permissionFilter",
-  "./CoursesStore",
-  "./TermsStore",
-  "./AccountsTreeStore",
-  "./UsersStore"
-], function(React, ReactTabs, _, permissionFilter, CoursesStore, TermsStore, AccountsTreeStore, UsersStore) {
+import React from 'react'
+import ReactTabs from 'react-tabs'
+import _ from 'underscore'
+import permissionFilter from 'jsx/shared/helpers/permissionFilter'
+import CoursesStore from './CoursesStore'
+import TermsStore from './TermsStore'
+import AccountsTreeStore from './AccountsTreeStore'
+import UsersStore from './UsersStore'
 
   const { Tab, Tabs, TabList, TabPanel } = ReactTabs;
   const { string, bool, shape } = React.PropTypes;
@@ -63,5 +61,4 @@ define([
     }
   });
 
-  return AccountCourseUserSearch;
-});
+export default AccountCourseUserSearch

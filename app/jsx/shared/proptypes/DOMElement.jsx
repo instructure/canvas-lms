@@ -1,4 +1,4 @@
-define([], () => {
+
   const DOMElement = (props, propName, componentName) => {
     if (props[propName] && props[propName] instanceof Element === false) {
       return new Error(
@@ -9,5 +9,4 @@ define([], () => {
     return null;
   }
 
-  return DOMElement;
-})
+export default DOMElement

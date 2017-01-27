@@ -1,8 +1,6 @@
-define([
-  'react',
-  'i18n!webzip_exports',
-  'jsx/webzip_export/components/ExportListItem'
-], (React, I18n, ExportListItem) => {
+import React from 'react'
+import I18n from 'i18n!webzip_exports'
+import ExportListItem from 'jsx/webzip_export/components/ExportListItem'
   class ExportList extends React.Component {
     static propTypes = {
       exports: React.PropTypes.arrayOf(React.PropTypes.shape({
@@ -41,5 +39,4 @@ define([
     }
   }
 
-  return ExportList
-})
+export default ExportList

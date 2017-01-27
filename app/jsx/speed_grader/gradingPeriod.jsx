@@ -1,4 +1,4 @@
-define(["underscore"], (_) => {
+import _ from 'underscore'
   const assignmentClosedForStudent = (student, {due_at, only_visible_to_overrides, gradingPeriods, assignmentOverrides}) => {
     const potentialDueDates = only_visible_to_overrides ?
       assignmentOverrides :
@@ -35,5 +35,4 @@ define(["underscore"], (_) => {
     return _.last(applicableDueDates.sort());
   };
 
-  return {assignmentClosedForStudent, gradingPeriodForDate, dueDateForStudent};
-});
+export default {assignmentClosedForStudent, gradingPeriodForDate, dueDateForStudent}

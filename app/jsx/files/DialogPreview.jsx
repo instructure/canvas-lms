@@ -1,12 +1,9 @@
-define([
-  'i18n!react_files',
-  'react',
-  'compiled/react_files/modules/customPropTypes',
-  'compiled/models/Folder',
-  'compiled/react_files/modules/filesEnv',
-  'jsx/files/FilesystemObjectThumbnail'
-
-  ], function(I18n, React, customPropTypes, Folder, filesEnv, FilesystemObjectThumbnail) {
+import I18n from 'i18n!react_files'
+import React from 'react'
+import customPropTypes from 'compiled/react_files/modules/customPropTypes'
+import Folder from 'compiled/models/Folder'
+import filesEnv from 'compiled/react_files/modules/filesEnv'
+import FilesystemObjectThumbnail from 'jsx/files/FilesystemObjectThumbnail'
 
   var MAX_THUMBNAILS_TO_SHOW = 5;
 
@@ -51,6 +48,4 @@ define([
     }
   });
 
-  return DialogPreview;
-
-});
+export default DialogPreview

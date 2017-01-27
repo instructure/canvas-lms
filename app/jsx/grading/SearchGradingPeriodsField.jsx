@@ -1,9 +1,7 @@
-define([
-  'react',
-  'underscore',
-  'i18n!grading_periods',
-  'jsx/shared/helpers/searchHelpers'
-], function(React, _, I18n, SearchHelpers) {
+import React from 'react'
+import _ from 'underscore'
+import I18n from 'i18n!grading_periods'
+import SearchHelpers from 'jsx/shared/helpers/searchHelpers'
 
   let SearchGradingPeriodsField = React.createClass({
     propTypes: {
@@ -32,5 +30,4 @@ define([
     }
   });
 
-  return SearchGradingPeriodsField;
-});
+export default SearchGradingPeriodsField

@@ -1,17 +1,15 @@
-define([
-  'jquery',
-  "react",
-  "Backbone",
-  "i18n!account_course_user_search",
-  "underscore",
-  "./UserLink",
-  "compiled/views/courses/roster/CreateUsersView",
-  "compiled/collections/RosterUserCollection",
-  "compiled/collections/SectionCollection",
-  "compiled/collections/RolesCollection",
-  "compiled/models/Role",
-  "compiled/models/CreateUserList",
-], function($, React, {Model}, I18n, _, UserLink, CreateUsersView, RosterUserCollection, SectionCollection, RolesCollection, Role, CreateUserList) {
+import $ from 'jquery'
+import React from 'react'
+import {Model} from 'Backbone'
+import I18n from 'i18n!account_course_user_search'
+import _ from 'underscore'
+import UserLink from './UserLink'
+import CreateUsersView from 'compiled/views/courses/roster/CreateUsersView'
+import RosterUserCollection from 'compiled/collections/RosterUserCollection'
+import SectionCollection from 'compiled/collections/SectionCollection'
+import RolesCollection from 'compiled/collections/RolesCollection'
+import Role from 'compiled/models/Role'
+import CreateUserList from 'compiled/models/CreateUserList'
 
   var { number, string, func, shape, arrayOf } = React.PropTypes;
 
@@ -140,5 +138,4 @@ define([
     }
   });
 
-  return CoursesListRow;
-});
+export default CoursesListRow

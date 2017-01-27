@@ -1,9 +1,7 @@
-define([
-  'i18n!student_groups',
-  'underscore',
-  'react',
-  'compiled/util/natcompare'
-], (I18n, _, React, natcompare) => {
+import I18n from 'i18n!student_groups'
+import _ from 'underscore'
+import React from 'react'
+import natcompare from 'compiled/util/natcompare'
   var Group = React.createClass({
     getInitialState() {
       return {open: false};
@@ -149,5 +147,4 @@ define([
         </div>);
     }
   });
-  return Group;
-});
+export default Group

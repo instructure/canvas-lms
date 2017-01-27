@@ -1,7 +1,5 @@
-define([
-  'axios',
-  'i18n!assignment_index_menu',
-], function (axios, I18n) {
+import axios from 'axios'
+import I18n from 'i18n!assignment_index_menu'
   const IndexMenuActions = {
 
     // Define 'constants' for types
@@ -47,5 +45,4 @@ define([
     }
   };
 
-  return IndexMenuActions;
-});
+export default IndexMenuActions

@@ -1,12 +1,8 @@
-define([
-  'redux',
-  'underscore',
-  '../actions/UserActions',
-  'compiled/fn/parseLinkHeader',
-  'jsx/account_course_user_search/store/initialState'
-], (Redux, _, UserActions, parseLinkHeader, initialState) => {
-
-  const {combineReducers} = Redux;
+import { combineReducers } from 'redux'
+import _ from 'underscore'
+import UserActions from '../actions/UserActions'
+import parseLinkHeader from 'compiled/fn/parseLinkHeader'
+import initialState from 'jsx/account_course_user_search/store/initialState'
 
   /**
    * Handles setting the editUserDialogOpen state
@@ -120,9 +116,7 @@ define([
   };
 
 
-  return combineReducers({
+export default combineReducers({
     userList,
     tabList
   });
-
-});

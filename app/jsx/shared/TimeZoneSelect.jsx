@@ -1,8 +1,7 @@
-define([
-  'react',
-  'underscore',
-  'i18n!edit_timezone'
-], function (React, _, I18n) {
+import React from 'react'
+import _ from 'underscore'
+import I18n from 'i18n!edit_timezone'
+
   const { array } = React.PropTypes;
 
   class TimeZoneSelect extends React.Component {
@@ -44,5 +43,4 @@ define([
     priority_timezones: array.isRequired
   };
 
-  return TimeZoneSelect;
-});
+export default TimeZoneSelect

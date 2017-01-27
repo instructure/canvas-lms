@@ -1,9 +1,7 @@
-define([
-  'i18n!theme_editor',
-  'react',
-  'react-modal',
-  'jsx/shared/ProgressBar'
-], (I18n, React, Modal, ProgressBar) => {
+import I18n from 'i18n!theme_editor'
+import React from 'react'
+import Modal from 'react-modal'
+import ProgressBar from 'jsx/shared/ProgressBar'
 
   Modal.setAppElement(document.body)
 
@@ -23,7 +21,7 @@ define([
     }
   };
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ThemeEditorModal',
 
     propTypes: {
@@ -125,5 +123,3 @@ define([
       )
     }
   })
-
-})

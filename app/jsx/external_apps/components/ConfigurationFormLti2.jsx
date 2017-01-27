@@ -1,11 +1,9 @@
-define([
-  'i18n!external_tools',
-  'underscore',
-  'react',
-  'jsx/external_apps/components/TextInput'
-], function (I18n, _, React, TextInput) {
+import I18n from 'i18n!external_tools'
+import _ from 'underscore'
+import React from 'react'
+import TextInput from 'jsx/external_apps/components/TextInput'
 
-  return React.createClass({
+export default React.createClass({
     displayName: 'ConfigurationFormLti2',
 
     propTypes: {
@@ -48,4 +46,3 @@ define([
       );
     }
   });
-});

@@ -1,6 +1,5 @@
-define([
-  'react',
-], (React) => {
+import React from 'react'
+
   const { shape, string, arrayOf } = React.PropTypes
   const propTypes = {}
 
@@ -29,5 +28,4 @@ define([
   propTypes.accountList = arrayOf(propTypes.account)
   propTypes.courseList = arrayOf(propTypes.course)
 
-  return propTypes
-})
+export default propTypes

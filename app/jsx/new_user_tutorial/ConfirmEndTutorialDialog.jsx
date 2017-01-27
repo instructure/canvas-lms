@@ -1,14 +1,8 @@
-define([
-  'react',
-  'i18n!new_user_tutorial',
-  'instructure-ui',
-  'axios'
-], (
-  React,
-  I18n,
-  { Button, Heading, Modal, ModalHeader, ModalBody, ModalFooter },
-  axios
-) => {
+import React from 'react'
+import I18n from 'i18n!new_user_tutorial'
+import { Button, Heading, Modal, ModalHeader, ModalBody, ModalFooter } from 'instructure-ui'
+import axios from 'axios'
+
   class ConfirmEndTutorialDialog extends React.Component {
 
     static propTypes = {
@@ -83,5 +77,4 @@ define([
     }
   }
 
-  return ConfirmEndTutorialDialog;
-});
+export default ConfirmEndTutorialDialog

@@ -1,15 +1,14 @@
-define([
-  'react',
-  'i18n!announcements',
-  'jsx/shared/FriendlyDatetime',
-  'instructure-ui/ToggleDetails',
-  'instructure-ui/Table',
-  'instructure-ui/Link',
-  'compiled/str/TextHelper',
-  'jquery',
-  'jquery.instructure_date_and_time'
-], (React, I18n, FriendlyDatetime, { default: ToggleDetails }, { default: Table }, { default: Link }, TextHelper, $) => {
-  class AnnouncementList extends React.Component {
+import React from 'react'
+import I18n from 'i18n!announcements'
+import FriendlyDatetime from '../shared/FriendlyDatetime'
+import ToggleDetails from 'instructure-ui/ToggleDetails'
+import Table from 'instructure-ui/Table'
+import Link from 'instructure-ui/Link'
+import TextHelper from 'compiled/str/TextHelper'
+import $ from 'jquery'
+import 'jquery.instructure_date_and_time'
+
+export default class AnnouncementList extends React.Component {
 
     static propTypes = {
       announcements: React.PropTypes.arrayOf(
@@ -64,6 +63,3 @@ define([
       )
     }
   }
-
-  return AnnouncementList
-})

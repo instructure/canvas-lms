@@ -1,16 +1,14 @@
-define([
-  'jquery',
-  'react',
-  'react-modal',
-  'page',
-  'compiled/react_files/components/FilesApp',
-  'compiled/react_files/modules/filesEnv',
-  'i18n!react_files',
-  'jsx/files/Breadcrumbs',
-  'jsx/files/FolderTree',
-  'jsx/files/FilesUsage',
-  'jsx/files/Toolbar'
-], function ($, React, ReactModal, page, FilesApp, filesEnv, I18n, Breadcrumbs, FolderTree, FilesUsage, Toolbar) {
+import $ from 'jquery'
+import React from 'react'
+import ReactModal from 'react-modal'
+import page from 'page'
+import FilesApp from 'compiled/react_files/components/FilesApp'
+import filesEnv from 'compiled/react_files/modules/filesEnv'
+import I18n from 'i18n!react_files'
+import Breadcrumbs from 'jsx/files/Breadcrumbs'
+import FolderTree from 'jsx/files/FolderTree'
+import FilesUsage from 'jsx/files/FilesUsage'
+import Toolbar from 'jsx/files/Toolbar'
 
   const modalOverrides = {
     overlay : {
@@ -209,5 +207,4 @@ define([
     );
   };
 
-  return React.createClass(FilesApp);
-});
+export default React.createClass(FilesApp)

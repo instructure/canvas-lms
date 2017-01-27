@@ -1,14 +1,12 @@
-define([
-  'react',
-  'underscore',
-  'jquery',
-  'instructure-ui/Button',
-  'instructure-ui/Checkbox',
-  'i18n!grading_periods',
-  'compiled/api/gradingPeriodSetsApi',
-  'jsx/grading/EnrollmentTermInput',
-  'compiled/jquery.rails_flash_notifications'
-], function(React, _, $, { default: Button }, { default: Checkbox }, I18n, setsApi, EnrollmentTermInput) {
+import React from 'react'
+import _ from 'underscore'
+import $ from 'jquery'
+import Button from 'instructure-ui/Button'
+import Checkbox from 'instructure-ui/Checkbox'
+import I18n from 'i18n!grading_periods'
+import setsApi from 'compiled/api/gradingPeriodSetsApi'
+import EnrollmentTermInput from 'jsx/grading/EnrollmentTermInput'
+import 'compiled/jquery.rails_flash_notifications'
 
   let NewGradingPeriodSetForm = React.createClass({
     propTypes: {
@@ -159,5 +157,4 @@ define([
     }
   });
 
-  return NewGradingPeriodSetForm;
-});
+export default NewGradingPeriodSetForm

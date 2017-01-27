@@ -1,9 +1,7 @@
-define([
-  'react-dnd',
-  'jsx/shared/helpers/compose',
-  './Types',
-  './DashboardCard'
-], ({ DropTarget, DragSource }, compose, ItemTypes, DashboardCard) => {
+import { DropTarget, DragSource } from 'react-dnd'
+import compose from 'jsx/shared/helpers/compose'
+import ItemTypes from './Types'
+import DashboardCard from './DashboardCard'
   const cardSource = {
     beginDrag(props) {
       return {
@@ -38,7 +36,7 @@ define([
   };
 
   /* eslint-disable new-cap */
-  return compose(
+export default compose(
     DropTarget(ItemTypes.CARD, cardTarget, connect => ({
       connectDropTarget: connect.dropTarget()
     })),
@@ -48,4 +46,3 @@ define([
     }))
   )(DashboardCard);
   /* eslint-enable new-cap */
-});

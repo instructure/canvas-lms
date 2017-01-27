@@ -1,18 +1,17 @@
-define([
-  'react',
-  'i18n!account_course_user_search',
-  './CoursesStore',
-  './TermsStore',
-  './AccountsTreeStore',
-  './CoursesList',
-  './CoursesToolbar',
-  './renderSearchMessage',
-], (React, I18n, CoursesStore, TermsStore, AccountsTreeStore, CoursesList, CoursesToolbar, renderSearchMessage) => {
+import React from 'react'
+import I18n from 'i18n!account_course_user_search'
+import CoursesStore from './CoursesStore'
+import TermsStore from './TermsStore'
+import AccountsTreeStore from './AccountsTreeStore'
+import CoursesList from './CoursesList'
+import CoursesToolbar from './CoursesToolbar'
+import renderSearchMessage from './renderSearchMessage'
+
   const MIN_SEARCH_LENGTH = 3
   const stores = [CoursesStore, TermsStore, AccountsTreeStore]
   const { shape, arrayOf, string } = React.PropTypes
 
-  return class CoursesPane extends React.Component {
+  class CoursesPane extends React.Component {
     static propTypes = {
       roles: arrayOf(shape({ id: string.isRequired })).isRequired,
       addUserUrls: shape({
@@ -113,4 +112,5 @@ define([
       )
     }
   }
-})
+
+export default CoursesPane

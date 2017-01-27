@@ -1,11 +1,9 @@
-define([
-  'react',
-  'react-dom',
-  'jquery',
-  'i18n!publish_cloud',
-  'compiled/react_files/components/PublishCloud',
-  'jsx/files/RestrictedDialogForm'
-], function (React, ReactDOM, $, I18n, PublishCloud, RestrictedDialogForm) {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import $ from 'jquery'
+import I18n from 'i18n!publish_cloud'
+import PublishCloud from 'compiled/react_files/components/PublishCloud'
+import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
 
   // Function Summary
   // Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
@@ -116,6 +114,4 @@ define([
 
   };
 
-  return React.createClass(PublishCloud);
-
-});
+export default React.createClass(PublishCloud)

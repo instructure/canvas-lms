@@ -1,4 +1,4 @@
-define([], () => {
+
   function resolveValidationIssues (duplicates, missings) {
     const usersToBeEnrolled = [];
     const usersToBeCreated = [];
@@ -22,5 +22,4 @@ define([], () => {
     return {usersToBeEnrolled, usersToBeCreated};
   }
 
-  return resolveValidationIssues;
-});
+export default resolveValidationIssues

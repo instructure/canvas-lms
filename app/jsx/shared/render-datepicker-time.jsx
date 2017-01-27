@@ -1,4 +1,7 @@
-define(['i18n!instructure', 'timezone', 'react'], function(I18n, tz, React) {
+import I18n from 'i18n!instructure'
+import tz from 'timezone'
+import React from 'react'
+
   var STRINGS = {
     timeLabel: I18n.beforeLabel(I18n.t('Time')),
     hourTitle: I18n.t('datepicker.titles.hour', 'hr'),
@@ -9,7 +12,7 @@ define(['i18n!instructure', 'timezone', 'react'], function(I18n, tz, React) {
     doneButton: I18n.t('#buttons.done', 'Done')
   };
 
-  return function($input) {
+  function renderDatepickerTime($input) {
     var data = {
       hour:   ($input.data('time-hour')   || "").replace(/'/g, ""),
       minute: ($input.data('time-minute') || "").replace(/'/g, ""),
@@ -57,4 +60,5 @@ define(['i18n!instructure', 'timezone', 'react'], function(I18n, tz, React) {
       </div>
     );
   };
-});
+
+export default renderDatepickerTime
