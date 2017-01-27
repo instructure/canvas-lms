@@ -20,10 +20,11 @@ define [
   'jsx/shared/conditional_release/ConditionalRelease'
   'compiled/util/deparam'
   'compiled/jquery.rails_flash_notifications' #flashMessage
+  'jsx/shared/helpers/numberHelper'
 ], (I18n, ValidatedFormView, AssignmentGroupSelector, GradingTypeSelector,
 GroupCategorySelector, PeerReviewsSelector, PostToSisSelector, _, template, RichContentEditor,
 htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, MissingDateDialog, KeyboardShortcuts,
-ConditionalRelease, deparam) ->
+ConditionalRelease, deparam, flashMessage, numberHelper) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -122,8 +123,9 @@ ConditionalRelease, deparam) ->
 
     handlePointsChange:(ev) =>
       ev.preventDefault()
+      @assignment.pointsPossible(@$assignmentPointsPossible.val())
       if @assignment.hasSubmittedSubmissions()
-        @$discussionPointPossibleWarning.toggleAccessibly(@$assignmentPointsPossible.val() != "#{@initialPointsPossible}")
+        @$discussionPointPossibleWarning.toggleAccessibly(@assignment.pointsPossible() != @initialPointsPossible)
 
 
     # also separated for easy stubbing
@@ -237,6 +239,12 @@ ConditionalRelease, deparam) ->
 
       assign_data = data.assignment
       delete data.assignment
+
+      if assign_data?.points_possible
+        # this happens before validation, so we better validate it here
+        if numberHelper.validate(assign_data.points_possible)
+          assign_data.points_possible = numberHelper.parse(assign_data.points_possible)
+
 
       if assign_data?.set_assignment is '1'
         data.set_assignment = '1'
@@ -352,7 +360,7 @@ ConditionalRelease, deparam) ->
       assign = data.assignment
       frozenPoints = _.contains(assign.frozenAttributes(), "points_possible")
 
-      if !frozenPoints and assign.pointsPossible() and isNaN(parseFloat(assign.pointsPossible()))
+      if !frozenPoints and assign.pointsPossible() and !numberHelper.validate(assign.pointsPossible())
         errors["assignment[points_possible]"] = [
           message: I18n.t 'points_possible_number', 'Points possible must be a number'
         ]
