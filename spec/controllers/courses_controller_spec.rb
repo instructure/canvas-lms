@@ -1318,6 +1318,14 @@ describe CoursesController do
       expect(assigns[:course]).to eql(@course)
     end
 
+    it "should update some settings and stuff" do
+      user_session(@teacher)
+      put 'update', :id => @course.id, :course => {:show_announcements_on_home_page => true, :home_page_announcement_limit => 2}
+      @course.reload
+      expect(@course.show_announcements_on_home_page).to be_truthy
+      expect(@course.home_page_announcement_limit).to eq 2
+    end
+
     it "should allow sending events" do
       user_session(@teacher)
       put 'update', :id => @course.id, :course => {:event => "complete"}
