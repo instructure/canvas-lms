@@ -153,8 +153,8 @@ function prepareAssignmentSubmitWithMagicFields() {
     return;
 
   // going to hide the UI
-  var tab = document.querySelector("#submit_assignment_tabs li[aria-controls=\"submit_online_text_entry_form\"]");
-  tab.style.display = "none";
+  var tab = document.querySelector("#submit_assignment_tabs li > a.submit_online_text_entry_option");
+  tab.parentNode.style.display = "none";
 
   var tabcontent = document.querySelector("#submit_assignment_online_text_form_holder");
   tabcontent.style.display = "none";
@@ -170,8 +170,15 @@ function prepareAssignmentSubmitWithMagicFields() {
 
 window.addEventListener("load", function() {
   var submitAssignmentLink = document.querySelector(".btn-primary.submit_assignment_link");
-  if(submitAssignmentLink)
-  submitAssignmentLink.addEventListener("click", function() {
-    prepareAssignmentSubmitWithMagicFields();
-  }, true);
+  if(submitAssignmentLink) {
+    submitAssignmentLink.addEventListener("click", function() {
+      prepareAssignmentSubmitWithMagicFields();
+    }, true);
+
+    if(location.hash == "#submit") {
+      // if we go to this directly, there is no need to click the button up
+      // top, so just automatically go.
+      prepareAssignmentSubmitWithMagicFields();
+    }
+  }
 }, true);
