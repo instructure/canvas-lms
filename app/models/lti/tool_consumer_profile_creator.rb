@@ -32,7 +32,7 @@ module Lti
           ToolConsumerProfile.url
           Security.splitSecret
           Context.id
-        ).freeze
+        ).concat(CapabilitiesHelper.new(@context).parameter_capabilities).freeze
 
     RESTRICTED_CAPABILITIES = %W(
       #{ORIGINALITY_REPORT_SERVICE}.url

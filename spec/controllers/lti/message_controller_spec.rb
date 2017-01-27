@@ -36,6 +36,11 @@ module Lti
         resource_handler: resource_handler
       )
     end
+    let(:enabled_capability) {
+      %w(tool_consumer_instance_guid
+         launch_presentation_document_target
+         launch_presentation_locale)
+    }
     let(:tool_proxy) do
       ToolProxy.create(
         shared_secret: 'shared_secret',
@@ -45,7 +50,7 @@ module Lti
         product_family: product_family,
         context: account,
         workflow_state: 'active',
-        raw_data: 'some raw data'
+        raw_data: {enabled_capability: enabled_capability}
       )
     end
     let(:default_resource_handler) do
@@ -334,10 +339,23 @@ module Lti
           expect(params['ext_lti_assignment_id']).to eq lti_assignment_id
         end
 
+        it 'does only adds non-required params if they are present in enabled_capability' do
+          allow_any_instance_of(IMS::LTI::Models::ToolProxy).to receive(:enabled_capability) { {} }
+
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,
+              params: {tool_launch_context: 'my_custom_context'}
+          expect(response.code).to eq "200"
+
+          lti_launch = assigns[:lti_launch]
+          params = lti_launch.params.with_indifferent_access
+
+          expect(params[:launch_presentation_locale]).to be_nil
+          expect(params[:tool_consumer_instance_guid]).to be_nil
+          expect(params[:launch_presentation_document_target]).to be_nil
+        end
       end
 
       describe "resource link" do
-
         it 'creates resource_links without a resource_link_fragment' do
           Timecop.freeze do
             get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,

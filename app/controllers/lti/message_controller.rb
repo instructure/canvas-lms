@@ -89,11 +89,9 @@ module Lti
             lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
             resource_link_id: build_resource_link_id(message_handler),
             context_id: Lti::Asset.opaque_identifier_for(@context),
-            tool_consumer_instance_guid: @context.root_account.lti_guid,
-            launch_presentation_locale: I18n.locale || I18n.default_locale.to_s,
             roles: Lti::SubstitutionsHelper.new(@context, @domain_root_account, @current_user).all_roles('lis2'),
-            launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
           }
+          launch_params.merge! enabled_parameters(tool_proxy)
           if params[:secure_params].present?
             secure_params = Canvas::Security.decode_jwt(params[:secure_params])
             launch_params.merge!({ext_lti_assignment_id: secure_params[:lti_assignment_id]}) if secure_params[:lti_assignment_id].present?
@@ -134,6 +132,12 @@ module Lti
     end
 
     private
+
+    def enabled_parameters(tp)
+      param_capabilities_hash = CapabilitiesHelper.new(@context).parameter_capabilities_hash
+      enabled_capabilities = IMS::LTI::Models::ToolProxy.from_json(tp.raw_data).enabled_capabilities
+      param_capabilities_hash.each_with_object({}) { |(k, v), hash| hash[k] = v if enabled_capabilities.include? k }
+    end
 
     def module_sequence(tag)
       env_hash = {}
