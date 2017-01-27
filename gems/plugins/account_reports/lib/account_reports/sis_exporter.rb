@@ -509,7 +509,9 @@ module AccountReports
       end
 
       if account != root_account
-        groups.where!(:groups => {:context_id => account, :context_type => 'Account'})
+        groups.where!(groups: { context_type: 'Account' })
+        groups.where!("accounts.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
+                      OR accounts.id = :account_id", { account_id: account.id })
       end
 
       generate_and_run_report headers do |csv|

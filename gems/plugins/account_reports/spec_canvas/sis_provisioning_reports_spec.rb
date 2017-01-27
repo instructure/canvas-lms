@@ -913,6 +913,21 @@ describe "Default Account Reports" do
         expect(parsed[1]).to eq [@group3.id.to_s, nil, @sub_account.id.to_s,
                                  "sub1", "group3name", "available", "false", @sub_account.id.to_s, 'Account', nil]
       end
+
+      it "includes sub-sub-account groups when run on a sub account" do
+        sub_sub_account = Account.create(:parent_account => @sub_account,:name => 'sESL')
+        group6 = sub_sub_account.groups.create!(:name => 'group6name')
+        parameters = {}
+        parameters["groups"] = true
+        parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: 4})
+        expect(parsed.length).to eq 3
+        expect(parsed[0]).to eq [@group2.id.to_s, "group2sis", @sub_account.id.to_s,
+                                 "sub1", "group2name", "available", "true", @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s]
+        expect(parsed[1]).to eq [@group3.id.to_s, nil, @sub_account.id.to_s,
+                                 "sub1", "group3name", "available", "false", @sub_account.id.to_s, 'Account', nil]
+        expect(parsed[2]).to eq [group6.id.to_s, nil, sub_sub_account.id.to_s,
+                                 nil, "group6name", "available", "false", sub_sub_account.id.to_s, 'Account', nil]
+      end
     end
 
     describe "Group Categories" do
