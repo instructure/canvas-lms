@@ -705,5 +705,16 @@ describe Pseudonym do
     p2.authentication_provider = aac
     expect(p2).to be_valid
   end
+
+  describe ".find_all_by_arbtrary_credentials" do
+    it "doesn't choke on if global lookups is down" do
+      u = User.create!
+      p = u.pseudonyms.create!(unique_id: 'a', account: Account.default, password: 'abcdefgh', password_confirmation: 'abcdefgh')
+      expect(GlobalLookups).to receive(:enabled?).and_return(true)
+      expect(Pseudonym).to receive(:associated_shards).and_raise("an error")
+      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: 'a', password: 'abcdefgh' },
+        [Account.default.id], '127.0.0.1')).to eq [p]
+    end
+  end
 end
 
