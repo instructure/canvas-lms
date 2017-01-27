@@ -66,8 +66,9 @@
   "devDependencies": {
     "axe-core": "2.1.7",
     "babel-cli": "^6.10.1",
-    "babel-core": "^6.10.4",
+    "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.2",
+    "babel-jest": "^21.2.0",
     "babel-loader": "^7.1.1",
     "babel-plugin-add-module-exports": "0.2.1",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.9",
@@ -83,10 +84,11 @@
     "css-loader": "^0.28.4",
     "ember-template-compiler": "^1.8.0",
     "enzyme": "^2.9.1",
-    "eslint": "^4.11.0",
+    "eslint": "^4.13.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-config-prettier": "^2.3.0",
     "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jest": "^21.4.2",
     "eslint-plugin-jsx-a11y": "^6.0.2",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-qunit": "^3.2.0",
@@ -110,6 +112,7 @@
     "happypack": "^3.1.0",
     "imports-loader": "^0.7.0",
     "istanbul-instrumenter-loader": "^3.0.0",
+    "jest": "^21.2.1",
     "json-loader": "^0.5.3",
     "jsx-loader": "0.11.2",
     "karma": "^1.7.0",
@@ -141,7 +144,7 @@
   },
   "repository": "instructure/canvas-lms",
   "scripts": {
-    "test": "karma start --single-run",
+    "test": "jest && karma start --single-run",
     "test-headless": "karma start --single-run --browsers ChromeHeadlessNoSandbox",
     "test-watch": "karma start",
     "test-watch-headless": "karma start --browsers ChromeHeadlessNoSandbox",
@@ -159,6 +162,23 @@
     "jspec": "./spec/jspec.sh",
     "jspec-watch": "./spec/jspec.sh --watch",
     "a11y-report": "./spec/jspec.sh --a11y"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^i18n!(.*$)": "<rootDir>/jest/i18nTransformer.js",
+      "^compiled/(.*)$": "<rootDir>/app/coffeescripts/$1"
+    },
+    "roots": [
+      "app/jsx"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "public/javascripts"
+    ],
+    "transform": {
+      "^i18n": "<rootDir>/jest/i18nTransformer.js",
+      "^.+\\.jsx?$": "babel-jest"
+    }
   },
   "resolutions": {
     "jquery": "https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d"

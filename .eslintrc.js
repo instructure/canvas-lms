@@ -2,12 +2,14 @@ module.exports = {
   env: {
     es6: true,
     amd: true,
-    browser: true
+    browser: true,
+    "jest/globals": true
   },
   extends: [
     "airbnb",
     "prettier",
     "prettier/react",
+    "plugin:jest/recommended",
   ],
   parserOptions: {
     ecmaVersion: 7,
@@ -25,7 +27,8 @@ module.exports = {
   },
   plugins: [
     "promise",
-    "import"
+    "import",
+    "jest"
   ],
   // 0 - off, 1 - warning, 2 - error
   rules: {
@@ -49,6 +52,8 @@ module.exports = {
     "import/no-unresolved": [0],
     "import/no-webpack-loader-syntax": [0],
     "import/no-commonjs": [2],
+    "jest/prefer-to-be-null": "error",
+    "jest/prefer-to-be-undefined": "error",
     "react/jsx-filename-extension": [2, { "extensions": [".js"] }],
     "import/extensions": [1, { "js": "never", "jsx": "never", "json": "always" }],
     "promise/avoid-new": [0],
