@@ -248,7 +248,9 @@ class Pseudonym < ActiveRecord::Base
     return true unless self.sis_user_id
     existing_pseudo = Pseudonym.where(account_id: self.account_id, sis_user_id: self.sis_user_id.to_s).first
     return true if !existing_pseudo || existing_pseudo.id == self.id
-    self.errors.add(:sis_user_id, t('#errors.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_user_id))
+    self.errors.add(:sis_user_id, :taken,
+      message: t('#errors.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_user_id)
+    )
     false
   end
 
