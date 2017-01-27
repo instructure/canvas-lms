@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe AccountsController do
   def account_with_admin_logged_in(opts = {})
@@ -538,6 +538,19 @@ describe AccountsController do
       expect(response).to be_success
 
       expect(assigns[:last_reports].first.last).to eq report
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "loads even from the wrong shard" do
+        account_with_admin_logged_in
+
+        @shard1.activate do
+          get 'settings', account_id: @account
+          expect(response).to be_success
+        end
+      end
     end
 
     context "external_integration_keys" do
