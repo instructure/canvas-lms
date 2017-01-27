@@ -27,6 +27,7 @@ describe 'Grading quizzes' do
       context 'after changing a quiz question\'s correct answer' do
         before(:each) do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+          dismiss_flash_messages
           click_questions_tab
 
           edit_first_question

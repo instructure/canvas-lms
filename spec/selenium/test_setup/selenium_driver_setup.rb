@@ -17,8 +17,8 @@ Selenium::WebDriver::Firefox::Launcher::SOCKET_LOCK_TIMEOUT = 90
 
 module SeleniumDriverSetup
   CONFIG = ConfigFile.load("selenium") || {}.freeze
-  SECONDS_UNTIL_GIVING_UP = 20
-  MAX_SERVER_START_TIME = 15
+  SECONDS_UNTIL_GIVING_UP = 10
+  MAX_SERVER_START_TIME = 5
 
   # Number of recent specs to show in failure pages
   RECENT_SPEC_RUNS_LIMIT = 500
@@ -26,7 +26,8 @@ module SeleniumDriverSetup
   RECENT_SPEC_FAILURE_LIMIT = 10
   # Number of failures to record
   MAX_FAILURES_TO_RECORD = 20
-  IMPLICIT_WAIT_TIMEOUT = 15
+  IMPLICIT_WAIT_TIMEOUT = 5
+  SCRIPT_TIMEOUT = 5
 
   def driver
     SeleniumDriverSetup.driver
@@ -120,7 +121,7 @@ module SeleniumDriverSetup
 
       @driver.manage.timeouts.implicit_wait = 0 # nothing should wait by default
       SeleniumExtensions::FinderWaiting.timeout = IMPLICIT_WAIT_TIMEOUT # except finding elements
-      @driver.manage.timeouts.script_timeout = 60
+      @driver.manage.timeouts.script_timeout = SCRIPT_TIMEOUT
 
       puts "Browser: #{browser_name} - #{browser_version}"
 
@@ -557,13 +558,17 @@ module SeleniumDriverSetup
 
     def rack_app
       app = spec_safe_rack_app
+      asset_path = %r{\A/(dist|fonts|images|javascripts|optimized|webpack-dist|webpack-dist-optimized)/.*\.[a-z0-9]+\z}
 
       lambda do |env|
-        log_request = env["REQUEST_URI"] !~ %r{/(javascripts|dist)}
+        # make legit asset 404s return more quickly
+        asset_request = env["REQUEST_URI"] =~ asset_path
+        return [404, {}, [""]] if asset_request && !File.exist?("public/#{env["REQUEST_URI"]}")
+
         req = "#{env['REQUEST_METHOD']} #{env['REQUEST_URI']}"
-        Rails.logger.info "STARTING REQUEST #{req}" if log_request
+        Rails.logger.info "STARTING REQUEST #{req}" unless asset_request
         result = app.call(env)
-        Rails.logger.info "FINISHED REQUEST #{req}: #{result[0]}" if log_request
+        Rails.logger.info "FINISHED REQUEST #{req}: #{result[0]}" unless asset_request
         result
       end
     end
