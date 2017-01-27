@@ -12,6 +12,7 @@ testWebpackConfig.entry = (process.env.WEBPACK_TEST_BUNDLE === 'ember')
 testWebpackConfig.output.path = path.resolve(__dirname, 'spec/javascripts/webpack')
 testWebpackConfig.output.publicPath = '/base/spec/javascripts/webpack/'
 testWebpackConfig.output.filename = '[name].bundle.test.js';
+testWebpackConfig.output.chunkFilename = '[name].chunk.test.js';
 
 testWebpackConfig.plugins = testWebpackConfig.plugins.concat([
   // expose a 'qunit' global variable to any file that uses it
