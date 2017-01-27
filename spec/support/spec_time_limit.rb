@@ -1,15 +1,14 @@
 module SpecTimeLimit
   class Error < StandardError
-    def self.for(type, timeout)
-      message = case type
-                when :target
-                  "Exceeded the #{timeout} sec target threshold for new/modified specs"
-                when :absolute
-                  "Exceeded the #{timeout} sec absolute threshold for existing specs"
-                else
-                  "Exceeded the #{timeout} sec historical threshold for this particular spec"
-                end
-      new message
+    def self.message_for(type, timeout)
+      case type
+      when :target
+        "Exceeded the #{timeout} sec target threshold for new/modified specs"
+      when :absolute
+        "Exceeded the #{timeout} sec absolute threshold for existing specs"
+      else
+        "Exceeded the #{timeout} sec historical threshold for this particular spec"
+      end
     end
   end
 
@@ -20,7 +19,7 @@ module SpecTimeLimit
         example.run
       end
     rescue Timeout::Error
-      raise Error.for(type, timeout)
+      raise Error, Error.message_for(type, timeout), $ERROR_INFO.backtrace
     end
 
     # find an appropriate timeout for this spec
