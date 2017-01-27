@@ -87,7 +87,7 @@ class NotificationPreferencesController < ApplicationController
   # Change the preference for a single notification for a single communication channel
   # @argument notification_preferences[frequency] [Required] The desired frequency for this notification
   def update
-    return render_unauthorized_action unless @user == @current_user
+    return render_unauthorized_action unless can_modify
     preference = notification_preferences_param
     render json: { notification_preferences: [notification_policy_json(NotificationPolicy.find_or_update_for(@cc, params[:notification], preference[:frequency]), @current_user, session)] }
   end
@@ -97,7 +97,7 @@ class NotificationPreferencesController < ApplicationController
   # @argument category [String] The name of the category. Must be parameterized (e.g. The category "Course Content" should be "course_content")
   # @argument notification_preferences[frequency] [Required] The desired frequency for each notification in the category
   def update_preferences_by_category
-    return render_unauthorized_action unless @user == @current_user
+    return render_unauthorized_action unless can_modify
     preference = notification_preferences_param
     policies = NotificationPolicy.find_or_update_for_category(@cc, params[:category].titleize, preference[:frequency])
     render json: { notification_preferences: policies.map{ |p| notification_policy_json(p, @current_user, session) } }
@@ -107,7 +107,7 @@ class NotificationPreferencesController < ApplicationController
   # Change the preferences for multiple notifications for a single communication channel at once
   # @argument notification_preferences[<X>][frequency] [Required] The desired frequency for <X> notification
   def update_all
-    return render_unauthorized_action unless @user == @current_user
+    return render_unauthorized_action unless can_modify
     policies = []
     preferences = convert_hash_to_jsonapi_array(params[:notification_preferences], :notification)
     preferences.each do |preference|
@@ -117,6 +117,10 @@ class NotificationPreferencesController < ApplicationController
   end
 
   private
+  def can_modify
+    @user == @current_user or authorized_action(@user.account, @current_user, :manage_account_settings)
+  end
+
   def convert_hash_to_jsonapi_array(hash, key = :id)
     return hash if hash.is_a?(Array)
     hash.map { |k, v| { key => k }.reverse_merge!(v).with_indifferent_access }
