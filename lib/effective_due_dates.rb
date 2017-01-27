@@ -221,7 +221,7 @@ class EffectiveDueDates
         WHERE
           o.set_type = 'CourseSection' AND
           s.workflow_state <> 'deleted' AND
-          e.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND
+          e.workflow_state NOT IN ('rejected', 'deleted') AND
           e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
       ),
 
@@ -241,7 +241,7 @@ class EffectiveDueDates
         INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = c.id
         INNER JOIN #{User.quoted_table_name} student ON e.user_id = student.id
         WHERE
-          e.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND
+          e.workflow_state NOT IN ('rejected', 'deleted') AND
           e.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND
           a.only_visible_to_overrides IS NOT TRUE
       ),
