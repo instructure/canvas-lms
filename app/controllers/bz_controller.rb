@@ -221,28 +221,30 @@ class BzController < ApplicationController
     # last item, so we can pick up where we left off on
     # the dynamic syllabus there too.
     url = URI.parse(params[:last_url])
-    urlparams = CGI.parse(url.query)
-    if urlparams['module_item_id']
-      mi = urlparams['module_item_id'].first
-      tag = ContentTag.find(mi)
-      context_module = tag.context_module
+    if url.query
+      urlparams = CGI.parse(url.query)
+      if urlparams['module_item_id']
+        mi = urlparams['module_item_id'].first
+        tag = ContentTag.find(mi)
+        context_module = tag.context_module
 
-      p = UserModulePosition.where(
-        :user_id => @current_user.id,
-        :course_id => tag.context_id,
-        :module_id => context_module.id
-      )
-      if p.empty?
-        UserModulePosition.create(
+        p = UserModulePosition.where(
           :user_id => @current_user.id,
           :course_id => tag.context_id,
-          :module_id => context_module.id,
-          :module_item_id => mi
+          :module_id => context_module.id
         )
-      else
-        p = p.first
-        p.module_item_id = mi
-        p.save
+        if p.empty?
+          UserModulePosition.create(
+            :user_id => @current_user.id,
+            :course_id => tag.context_id,
+            :module_id => context_module.id,
+            :module_item_id => mi
+          )
+        else
+          p = p.first
+          p.module_item_id = mi
+          p.save
+        end
       end
     end
 

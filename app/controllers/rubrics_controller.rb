@@ -33,7 +33,7 @@ class RubricsController < ApplicationController
   end
 
   def show
-    permission = @context.is_a?(User) ? :manage : :manage_rubrics
+    permission = @context.is_a?(User) ? :manage : :read
     return unless authorized_action(@context, @current_user, permission)
     if (id = params[:id]) =~ Api::ID_REGEX
       js_env :ROOT_OUTCOME_GROUP => get_root_outcome

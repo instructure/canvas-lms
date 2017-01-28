@@ -32,6 +32,15 @@ function bzRetainedInfoSetup() {
       ta.textContent = value;
   }
 
+  if(window.ENV && ENV.current_user) {
+    var names = document.querySelectorAll(".bz-user-name");
+    for(var i = 0; i < names.length; i++) {
+      var element = names[i];
+      element.className = "bz-user-name-showing";
+      element.textContent = ENV.current_user.display_name;
+    }
+  }
+
   var textareas = document.querySelectorAll("[data-bz-retained]");
   for(var i = 0; i < textareas.length; i++) {
     (function(ta) {
@@ -92,3 +101,92 @@ if(window != window.top) {
   // we are in an iframe... strip off magic
   document.getElementsByTagName("html")[0].className += " bz-in-iframe";
 }
+
+
+function getInnerHtmlWithMagicFieldsReplaced(ele) {
+  var html = ele.cloneNode(true);
+  var magicFields = html.querySelectorAll("[data-bz-retained]");
+  for(var i = 0; i < magicFields.length; i++) {
+    var o = magicFields[i];
+    var n;
+    if(o.tagName == "TEXTAREA") {
+      n = document.createElement("div");
+      var h = o.value.
+        replace("&", "&amp;").
+        replace("\"", "&quot;").
+        replace("<", "&lt;").
+        replace("\n", "<br />");
+      n.innerHTML = h;
+    } else if(o.tagName == "INPUT" && o.getAttribute("type") == "checkbox") {
+      n = document.createElement("span");
+      n.textContent = o.checked ? "[X]" : "[ ]";
+    } else if(o.tagName == "INPUT" && o.getAttribute("type") == "radio") {
+      n = document.createElement("span");
+      n.textContent = o.checked ? "[O]" : "[ ]";
+    } else {
+      n = document.createElement("span");
+      n.textContent = o.value;
+    }
+    n.className = "bz-retained-field-replaced";
+    o.parentNode.replaceChild(n, o);
+  }
+
+  return "<div class=\"bz-magic-field-submission\">" + html.innerHTML + "</div>";
+}
+
+function copyAssignmentDescriptionIntoAssignmentSubmission() {
+  var desc = document.querySelector("#assignment_show .description");
+
+  var html = getInnerHtmlWithMagicFieldsReplaced(desc);
+
+  var bodHtml = tinyMCE.get("submission_body");
+  if(bodHtml)
+    bodHtml.setContent(html);
+
+  var bod = document.getElementById("submission_body");
+  bod.value = html;
+}
+
+function prepareAssignmentSubmitWithMagicFields() {
+  // only do this if we put magic field editors in the assignment
+  if(!document.querySelector("#assignment_show .description input[data-bz-retained], #assignment_show .description textarea[data-bz-retained]"))
+    return;
+
+  var as = document.querySelector("#assignment_show .description");
+  as.className += " bz-magic-field-assignment";
+
+  // going to hide the UI
+  var tab = document.querySelector("#submit_assignment_tabs li > a.submit_online_text_entry_option");
+  tab.parentNode.style.display = "none";
+
+  var tabcontent = document.querySelector("#submit_assignment_online_text_form_holder");
+  tabcontent.style.display = "none";
+
+  copyAssignmentDescriptionIntoAssignmentSubmission(); // copy it initially
+
+  // and copy it again on submit in case it changed in the mean time...
+  var form = document.getElementById("submit_online_text_entry_form");
+  form.addEventListener("submit", function() {
+    copyAssignmentDescriptionIntoAssignmentSubmission();
+  }, true);
+}
+
+window.addEventListener("load", function() {
+  var submitAssignmentLink = document.querySelector(".btn-primary.submit_assignment_link");
+  if(submitAssignmentLink) {
+    submitAssignmentLink.addEventListener("click", function() {
+      prepareAssignmentSubmitWithMagicFields();
+      window.scrollTo(0, 0); // we want them to be up top to read and fill in from the top.
+    }, true);
+
+    if(location.hash == "#submit") {
+      // if we go to this directly, there is no need to click the button up
+      // top, so just automatically go.
+      prepareAssignmentSubmitWithMagicFields();
+    } else if(submitAssignmentLink) {
+
+      if(document.querySelector("#assignment_show .description input[data-bz-retained], #assignment_show .description textarea[data-bz-retained]"))
+      submitAssignmentLink.click();
+    }
+  }
+}, true);
