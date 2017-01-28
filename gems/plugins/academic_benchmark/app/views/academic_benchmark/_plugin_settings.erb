@@ -6,6 +6,28 @@
       </td>
     </tr>
     <tr>
+      <td colspan="2">
+        <%= t "These credentials are for Academic Benchmark API v3. Leaving the Partner Key empty will default the importer to use Academic Benchmark API v1." %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :partner_id, :en => "Partner ID" %></td>
+      <td>
+        <%= f.text_field :partner_id,:size => "90" %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :partner_key, :en => "Partner Key" %></td>
+      <td>
+        <%= f.text_field :partner_key %>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <%= t "These credentials are for Academic Benchmark API v1, which will be deprecated in a future release." %>
+      </td>
+    </tr>
+    <tr>
       <td><%= f.blabel :api_url, :en => "Api Url" %></td>
       <td>
         <%= f.text_field :api_url,:size => "90" %> <%= t :api_url_description, "(e.g. %{url})", :url => AcademicBenchmark::Api::API_BASE_URL %>
@@ -20,7 +42,7 @@
     <tr>
       <td><%= f.blabel :common_core_guid, :en => "Common Core GUID (optional)" %></td>
       <td>
-        <%= f.text_field :common_core_guid %> <%= t :common_core_guid, "(e.g. %{guid})", :guid => AcademicBenchmark::Converter::COMMON_CORE_GUID %>
+        <%= f.text_field :common_core_guid %> <%= t :common_core_guid, "(e.g. %{guid})", :guid => AcademicBenchmark::ConverterV1::COMMON_CORE_GUID %>
       </td>
     </tr>
   </table>

@@ -467,14 +467,14 @@ describe "Folders API", type: :request do
 
     context "course" do
       before :once do
-        course active_all: true
+        course_factory active_all: true
         @root_folder = Folder.root_folders(@course).first
         @request_path = "/api/v1/courses/#{@course.id}/folders/by_path"
         @params_hash.merge!(course_id: @course.to_param)
       end
 
       it "should check permissions" do
-        user
+        user_factory
         api_call(:get, @request_path, @params_hash, {}, {}, { expected_status: 401 })
       end
 
@@ -533,7 +533,7 @@ describe "Folders API", type: :request do
 
     context "user" do
       before :once do
-        user active_all: true
+        user_factory active_all: true
         @root_folder = Folder.root_folders(@user).first
         @params_hash.merge!(user_id: @user.id)
       end
@@ -553,12 +553,12 @@ describe "Folders API", type: :request do
 
   describe "copy_folder" do
     before :once do
-      @source_context = course active_all: true
+      @source_context = course_factory active_all: true
       @source_folder = @source_context.folders.create! name: 'teh folder'
       @file = attachment_model context: @source_context, folder: @source_folder, display_name: 'foo'
       @params_hash = { controller: 'folders', action: 'copy_folder', format: 'json' }
 
-      @dest_context = course active_all: true
+      @dest_context = course_factory active_all: true
       @dest_folder = @dest_context.folders.create! name: 'put stuff here', parent_folder: Folder.root_folders(@dest_context).first
 
       user_model
@@ -654,7 +654,7 @@ describe "Folders API", type: :request do
   describe "copy_file" do
     before :once do
       @params_hash = { controller: 'folders', action: 'copy_file', format: 'json' }
-      @dest_context = course active_all: true
+      @dest_context = course_factory active_all: true
       @dest_folder = @dest_context.folders.create! name: 'put stuff here', parent_folder: Folder.root_folders(@dest_context).first
 
       user_model
@@ -799,7 +799,7 @@ describe "Folders API", type: :request do
       end
 
       it "should return a 401 for unauthorized users" do
-        @user = user(active_all: true)
+        @user = user_factory(active_all: true)
         json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
                         {:controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param},
                         {}, {}, {:expected_status => 401})
@@ -841,7 +841,7 @@ describe "Folders API", type: :request do
 
     context "user" do
       it "should list all folders owned by a user including subfolders" do
-        user(active_all: true)
+        user_factory(active_all: true)
         make_folders_in_context @user
         json = api_call(:get, "/api/v1/users/#{@user.id}/folders",
                         {:controller => "folders", :action => "list_all_folders", :format => "json", :user_id => @user.id.to_param})

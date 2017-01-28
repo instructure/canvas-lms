@@ -73,7 +73,7 @@ describe GradingStandardsApiController, type: :request do
       end
 
       it "should create course level grading standards" do
-        course = course(name: 'grading standard course')
+        course = course_factory(name: 'grading standard course')
         @resource_path = "/api/v1/courses/#{course.id}/grading_standards"
         @resource_params = { :controller => 'grading_standards_api', :action => 'create', :format => 'json', :course_id => course.id.to_s }
         post_params = {"title"=>"course grading standard", "grading_scheme_entry"=>[{"name"=>"A", "value"=>"90"}, {"name"=>"B", "value"=>"80"}, {"name"=>"C", "value"=>"70"}]}
@@ -114,8 +114,8 @@ describe GradingStandardsApiController, type: :request do
       @account = Account.default
       @resource_path = "/api/v1/accounts/#{@account.id}/grading_standards"
       @resource_params = { :controller => 'grading_standards_api', :action => 'create', :format => 'json', :account_id => @account.id.to_s }
-      @course = course(name: 'grading standard course')
-      user
+      @course = course_factory(name: 'grading standard course')
+      user_factory
       enrollment = @course.enroll_teacher(@user)
       enrollment.accept!
     end
@@ -126,7 +126,7 @@ describe GradingStandardsApiController, type: :request do
     end
 
     it "should not be able to create course level grading standards" do
-      course = course(name: 'grading standard course')
+      course = course_factory(name: 'grading standard course')
       @resource_path = "/api/v1/courses/#{course.id}/grading_standards"
       @resource_params = { :controller => 'grading_standards_api', :action => 'create', :format => 'json', :course_id => course.id.to_s }
       post_params = {"title"=>"course grading standard", "grading_scheme_entry"=>[{"name"=>"A", "value"=>"90"}, {"name"=>"B", "value"=>"80"}, {"name"=>"C", "value"=>"70"}]}

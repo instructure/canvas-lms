@@ -456,6 +456,71 @@ describe GradeCalculator do
     end
   end
 
+  describe '#compute_and_save_scores' do
+    before(:once) do
+      @first_period, @second_period = grading_periods(count: 2)
+      first_assignment = @course.assignments.create!(
+        due_at: 1.day.from_now(@first_period.start_date),
+        points_possible: 100
+      )
+      second_assignment = @course.assignments.create!(
+        due_at: 1.day.from_now(@second_period.start_date),
+        points_possible: 100
+      )
+      first_assignment.grade_student(@student, grade: 25, grader: @teacher)
+      second_assignment.grade_student(@student, grade: 75, grader: @teacher)
+      # update_column to avoid callbacks on submission that would trigger score updates
+      Submission.where(user: @student, assignment: first_assignment).first.update_column(:score, 100.0)
+      Submission.where(user: @student, assignment: second_assignment).first.update_column(:score, 95.0)
+    end
+
+    let(:scores) { @student.enrollments.first.scores }
+    let(:overall_course_score) { scores.where(grading_period_id: nil).first }
+
+    it 'updates the overall course score' do
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+      expect(overall_course_score.current_score).to eq(97.5)
+    end
+
+    it 'updates all grading period scores' do
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+      grading_period_scores = scores.where.not(grading_period_id: nil).order(:current_score).pluck(:current_score)
+      expect(grading_period_scores).to match_array([100.0, 95.0])
+    end
+
+    it 'does not update grading period scores if update_all_grading_period_scores is false' do
+      GradeCalculator.new(@student.id, @course, update_all_grading_period_scores: false).compute_and_save_scores
+      grading_period_scores = scores.where.not(grading_period_id: nil).order(:current_score).pluck(:current_score)
+      expect(grading_period_scores).to match_array([25.0, 75.0])
+    end
+
+    context 'grading period is provided' do
+      it 'updates the grading period score' do
+        GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
+        score = scores.where(grading_period_id: @first_period).first
+        expect(score.current_score).to eq(100.0)
+      end
+
+      it 'updates the overall course score' do
+        GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
+        expect(overall_course_score.current_score).to eq(97.5)
+      end
+
+      it 'does not update scores for other grading periods' do
+        GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
+        score = scores.where(grading_period_id: @second_period).first
+        expect(score.current_score).to eq(75.0)
+      end
+
+      it 'does not update the overall course score if update_course_score is false' do
+        GradeCalculator.new(
+          @student.id, @course, grading_period: @first_period, update_course_score: false
+        ).compute_and_save_scores
+        expect(overall_course_score.current_score).to eq(50.0)
+      end
+    end
+  end
+
   it "should return grades in the order they are requested" do
     @student1 = @student
     student_in_course

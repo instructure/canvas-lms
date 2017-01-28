@@ -49,7 +49,7 @@ describe "User Profile API", type: :request do
 
   it "should return user info for users with no pseudonym" do
     @me = @user
-    new_user = user(:name => 'new guy')
+    new_user = user_factory(:name => 'new guy')
     @user = @me
     @course.enroll_user(new_user, 'ObserverEnrollment')
     Account.site_admin.account_users.create!(user: @user)

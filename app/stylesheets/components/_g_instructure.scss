@@ -1,4 +1,5 @@
 @import "pages/turnitin.scss";
+@import "base/environment";
 
 // DO NOT ADD ANYTHING TO THIS FILE
 // there is certainly a better place to put whatever it is that you were thinking
@@ -354,8 +355,13 @@ table.formtable td {
     font-size: 1.1em;
     font-weight: bold;
   }
-  .unpublished .name a {
-    color: $ic-font-color--subdued;
+  .unpublished {
+    .name a {
+      color: $ic-font-color--subdued;
+    }
+    i {
+      color: $ic-font-color--subdued;
+    }
   }
   .details {
     font-size: 0.8em;
@@ -1615,34 +1621,33 @@ body.padless-content .ic-Layout-contentMain,
 
 #module_prerequisites_list {
   list-style-type: none;
-  padding-left: 10px;
+  color: $ic-color-medium;
   li.module {
     padding: 5px 0;
+    vertical-align: middle;
     ul {
       list-style-type: none;
-      padding: 5px 0 5px 20px;
+      padding: 5px 0;
     }
     li.requirement {
+      vertical-align: middle;
       .description {
         font-size: 0.8em;
       }
       &.locked_requirement {
         .description {
-          padding-left: 20px;
-          background: transparent url(/images/lock.png) no-repeat left center;
+          padding-left: $ic-sp*2;
         }
-        color: #888;
         a {
-          color: #888;
+          color: $ic-color-medium;
         }
       }
     }
     &.locked {
-      padding-left: 20px;
       cursor: pointer;
-      background: transparent url(/images/lock_small.png) no-repeat left 5px;
       h3 {
-        color: #888;
+        display: inline-block;
+        padding-left: $ic-sp;
       }
       ul {
         display: none;

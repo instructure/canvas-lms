@@ -10,7 +10,6 @@
 <% end %>
 
 <% if @context.is_a?(Course) %>
-<%= render :partial => "groups/add_group_category" %>
 <div id="edit_letter_grades_form" style="display: none;">
   <%= render partial: "shared/grading_standard", object: @topic.assignment.try(:grading_standard), locals: {read_only: false} %>
   <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>

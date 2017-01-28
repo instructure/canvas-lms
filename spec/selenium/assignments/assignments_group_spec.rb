@@ -7,7 +7,7 @@ describe "assignment group that can't manage a course" do
 
   it "does not display the manage cog menu" do
     @domain_root_account = Account.default
-    course
+    course_factory
     account_admin_user_with_role_changes(:role_changes => {:manage_courses => false})
     user_session(@user)
     @course.require_assignment_group

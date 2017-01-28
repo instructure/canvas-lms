@@ -22,22 +22,22 @@
     </tr>
     <tr>
       <th scope="row"><%= before_label(:courses, "Courses") %></th>
-      <td><%= number_with_delimiter(@counts_report['courses']) %></td>
+      <td><%= n(@counts_report['courses']) %></td>
       <td style="font-size: 0.8em; padding-left: 20px;"><a href="#" class="over_time_link" data-key="courses" data-name="<%= t('labels.courses', "Courses") %>"><%= t(:over_time_link, "over time") %></a></td>
     </tr>
     <tr>
       <th scope="row"><%= before_label(:teachers, "Teachers") %></th>
-      <td><%= number_with_delimiter(@counts_report['teachers']) %></td>
+      <td><%= n(@counts_report['teachers']) %></td>
       <td style="font-size: 0.8em; padding-left: 20px;"><a href="#" class="over_time_link" data-key="teachers" data-name="<%= t('labels.teachers', "Teachers") %>"><%= t(:over_time_link, "over time") %></a></td>
     </tr>
     <tr>
       <th scope="row"><%= before_label(:students, "Students") %></th>
-      <td><%= number_with_delimiter(@counts_report['students']) %></td>
+      <td><%= n(@counts_report['students']) %></td>
       <td style="font-size: 0.8em; padding-left: 20px;"><a href="#" class="over_time_link" data-key="students" data-name="<%= t('labels.students', "Students") %>"><%= t(:over_time_link, "over time") %></a></td>
     </tr>
     <tr>
       <th scope="row"><%= before_label(:users, "Users") %></th>
-      <td><%= number_with_delimiter(@counts_report['users']) %></td>
+      <td><%= n(@counts_report['users']) %></td>
       <td style="font-size: 0.8em; padding-left: 20px;"><a href="#" class="over_time_link" data-key="users" data-name="<%= t('labels.users', "Users") %>"><%= t(:over_time_link, "over time") %></a></td>
     </tr>
     <tr>

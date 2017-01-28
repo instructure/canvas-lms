@@ -151,9 +151,12 @@ class Account < ActiveRecord::Base
   # the account settings page
   add_setting :sis_app_token, :root_only => true
   add_setting :sis_app_url, :root_only => true
+  add_setting :sis_name, :root_only => true
   add_setting :sis_syncing, :boolean => true, :default => false, :inheritable => true
   add_setting :sis_default_grade_export, :boolean => true, :default => false, :inheritable => true
   add_setting :sis_require_assignment_due_date, :boolean => true, :default => false, :inheritable => true
+  add_setting :sis_assignment_name_length, :boolean => true, :default => false, :inheritable => true
+  add_setting :sis_assignment_name_length_input, :inheritable => true
 
   add_setting :global_includes, :root_only => true, :boolean => true, :default => false
   add_setting :sub_account_includes, :boolean => true, :default => false
@@ -189,6 +192,7 @@ class Account < ActiveRecord::Base
   add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
+  add_setting :enable_turnitin, :boolean => true, :default => false
   add_setting :mfa_settings, :root_only => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
   add_setting :admins_can_view_notifications, :boolean => true, :root_only => true, :default => false
@@ -468,6 +472,7 @@ class Account < ActiveRecord::Base
     columns = "courses.id, courses.name, courses.workflow_state, courses.course_code, courses.sis_source_id, courses.enrollment_term_id"
     associated_courses = self.associated_courses.active.order(opts[:order])
     associated_courses = associated_courses.with_enrollments if opts[:hide_enrollmentless_courses]
+    associated_courses = associated_courses.master_courses if opts[:only_master_courses]
     associated_courses = associated_courses.for_term(opts[:term]) if opts[:term].present?
     associated_courses = yield associated_courses if block_given?
     associated_courses.limit(opts[:limit]).active_first.select(columns).to_a
@@ -971,7 +976,7 @@ class Account < ActiveRecord::Base
   set_policy do
     enrollment_types = RoleOverride.enrollment_type_labels.map { |role| role[:name] }
     RoleOverride.permissions.each do |permission, details|
-      given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(self, permission) && (!details[:if] || send(details[:if])) } }
+      given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(self, permission) } }
       can permission
       can :create_courses if permission == :manage_courses
     end
@@ -1276,7 +1281,10 @@ class Account < ActiveRecord::Base
   def turnitin_settings
     return @turnitin_settings if defined?(@turnitin_settings)
     if self.turnitin_account_id.present? && self.turnitin_shared_secret.present?
-      @turnitin_settings = [self.turnitin_account_id, self.turnitin_shared_secret, self.turnitin_host]
+      if settings[:enable_turnitin]
+        @turnitin_settings = [self.turnitin_account_id, self.turnitin_shared_secret,
+                              self.turnitin_host]
+      end
     else
       @turnitin_settings = self.parent_account.try(:turnitin_settings)
     end

@@ -1,12 +1,14 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2 - turnitin" do
+describe "gradebook - turnitin" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
-  let!(:setup) { gradebook_data_setup }
+  before(:once) { gradebook_data_setup }
+  before(:each) { user_session(@teacher) }
 
   it "should show turnitin data" do
+    @first_assignment.update_attribute(:turnitin_enabled, true)
     s1 = @first_assignment.submit_homework(@student_1, :submission_type => 'online_text_entry', :body => 'asdf')
     s1.update_attribute :turnitin_data, {
       "submission_#{s1.id}" => {
@@ -29,13 +31,12 @@ describe "gradebook2 - turnitin" do
       }
     }
 
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-    icons = ffj('.gradebook-cell-turnitin')
-    expect(icons.size).to eq 2
+    get "/courses/#{@course.id}/gradebook"
+    icons = ff('.gradebook-cell-turnitin')
+    expect(icons).to have_size 2
 
-    none        = ffj('.none-score')[0]       # icons[0]
-    acceptable  = ffj('.acceptable-score')[0] # icons[1]
+    none        = f('.none-score')       # icons[0]
+    acceptable  = f('.acceptable-score') # icons[1]
     # make sure it appears in each submission dialog
 
     cell = none.find_element(:xpath, '..')
@@ -43,7 +44,6 @@ describe "gradebook2 - turnitin" do
     driver.action.move_to(f('#gradebook_settings')).move_to(cell).perform
     expect(cell.find_element(:css, "a")).to be_displayed
     cell.find_element(:css, "a").click
-    wait_for_ajaximations
 
     fj('.ui-icon-closethick:visible').click
 
@@ -55,9 +55,7 @@ describe "gradebook2 - turnitin" do
     driver.action.move_to(f('#gradebook_settings')).move_to(cell).perform
     expect(cell.find_element(:css, "a")).to be_displayed
     cell.find_element(:css, "a").click
-    wait_for_ajaximations
 
     fj('.ui-icon-closethick:visible').click
-
   end
 end

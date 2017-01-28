@@ -44,7 +44,7 @@ class Enrollment < ActiveRecord::Base
   has_many :role_overrides, :as => :context
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
-  has_many :grading_period_grades, dependent: :destroy
+  has_many :scores, -> { active }, dependent: :destroy
 
   validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state, :role_id
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
@@ -811,7 +811,7 @@ class Enrollment < ActiveRecord::Base
     if result
       self.user.try(:update_account_associations)
       self.user.touch
-      grading_period_grades.destroy_all
+      scores.destroy_all
     end
     result
   end
@@ -820,6 +820,8 @@ class Enrollment < ActiveRecord::Base
     self.workflow_state = 'active'
     self.completed_at = nil
     self.save
+    Score.where(enrollment_id: self, workflow_state: :deleted).find_each(&:undestroy)
+    true
   end
 
   def re_send_confirmation!
@@ -982,24 +984,71 @@ class Enrollment < ActiveRecord::Base
   # please add appropriate calls to this so that the cached values don't get
   # stale! And once you've added the call, add the condition to the comment
   # here for future enlightenment.
-  def self.recompute_final_score(user_ids, course_id)
-    GradeCalculator.recompute_final_score(user_ids, course_id)
+
+  def self.recompute_final_score(*args)
+    GradeCalculator.recompute_final_score(*args)
   end
 
-  def self.recompute_final_score_if_stale(course, user=nil)
-    Rails.cache.fetch(['recompute_final_scores', course.id, user].cache_key, :expires_in => Setting.get('recompute_grades_window', 600).to_i.seconds) do
-      recompute_final_score user ? user.id : course.student_enrollments.except(:preload).distinct.pluck(:user_id), course.id
+  def self.recompute_final_score_if_stale(course, user=nil, compute_score_opts = {})
+    Rails.cache.fetch(
+      ['recompute_final_scores', course.id, user, compute_score_opts[:grading_period_id]].cache_key,
+      expires_in: Setting.get('recompute_grades_window', 600).to_i.seconds
+    ) do
+      user_id = user ? user.id : course.student_enrollments.except(:preload).distinct.pluck(:user_id)
+      recompute_final_score(user_id, course.id, compute_score_opts)
       yield if block_given?
       true
     end
   end
 
-  def computed_current_grade
-    self.course.score_to_grade(self.computed_current_score)
+  def computed_current_grade(grading_period_id: nil)
+    cached_score_or_grade(:current, :grade, grading_period_id: grading_period_id)
   end
 
-  def computed_final_grade
-    self.course.score_to_grade(self.computed_final_score)
+  def computed_final_grade(grading_period_id: nil)
+    cached_score_or_grade(:final, :grade, grading_period_id: grading_period_id)
+  end
+
+  def computed_current_score(grading_period_id: nil)
+    cached_score_or_grade(:current, :score, grading_period_id: grading_period_id)
+  end
+
+  def computed_final_score(grading_period_id: nil)
+    cached_score_or_grade(:final, :score, grading_period_id: grading_period_id)
+  end
+
+  def cached_score_or_grade(current_or_final, score_or_grade, grading_period_id: nil)
+    score = find_score(grading_period_id: grading_period_id)
+    if score.present?
+      score.send("#{current_or_final}_#{score_or_grade}")
+    else
+      return nil if grading_period_id.present?
+      # TODO: drop the computed_current_score / computed_final_score columns
+      # after the data fixup to populate the scores table completes
+      score = read_attribute("computed_#{current_or_final}_score")
+      score_or_grade == :score ? score : course.score_to_grade(score)
+    end
+  end
+  private :cached_score_or_grade
+
+  def find_score(grading_period_id: nil)
+    if scores.loaded?
+      scores.find { |score| score.grading_period_id == grading_period_id }
+    else
+      scores.where(grading_period_id: grading_period_id).first
+    end
+  end
+  private :find_score
+
+  def graded_at
+    score = find_score
+    if score.present?
+      score.updated_at
+    else
+      # TODO: drop the graded_at column after the data fixup to populate
+      # the scores table completes
+      read_attribute(:graded_at)
+    end
   end
 
   def self.typed_enrollment(type)

@@ -38,7 +38,7 @@ describe Lti::LtiContextCreator do
   describe "#convert" do
 
     describe "consumer instance" do
-      let(:canvas_user) { user(name: 'Shorty McLongishname') }
+      let(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
       let(:lti_context_creator) { Lti::LtiContextCreator.new(canvas_user, canvas_tool) }
 
       it "generates a consumer instance from the tool" do
@@ -64,7 +64,7 @@ describe Lti::LtiContextCreator do
     end
 
     describe "for canvas user" do
-      let(:canvas_user) { user(name: 'Shorty McLongishname') }
+      let(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
       let(:lti_context_creator) { Lti::LtiContextCreator.new(canvas_user, canvas_tool) }
 
       it "converts a user to an lti_user" do
@@ -81,7 +81,7 @@ describe Lti::LtiContextCreator do
 
     describe "for a canvas course" do
       let(:canvas_course) do
-        course(active_course: true, course_name: 'my course').tap do |course|
+        course_factory(active_course: true, course_name: 'my course').tap do |course|
           course.course_code = 'abc'
           course.sis_source_id = 'sis_id'
           course.root_account = root_account

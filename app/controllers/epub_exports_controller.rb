@@ -96,13 +96,27 @@ class EpubExportsController < ApplicationController
 
   before_filter :require_user
   before_filter :require_context, :only => [:create]
+  before_filter :check_feature_enabled
 
-  # API List courses with their latest ePub export
+  def check_feature_enabled
+    if !@domain_root_account.feature_allowed?(:epub_export) ||
+      @domain_root_account.enable_offline_web_export?
+      respond_to do |format|
+        format.html do
+          render status: 404, template: 'shared/errors/404_message'
+        end
+        format.json { render status: 404 }
+      end
+      return false
+    end
+  end
+
+  # @API List courses with their latest ePub export
   #
   # Lists all courses a user is actively participating in,
   # and the latest ePub export associated with the user & course.
   #
-  # @return [CourseEpubExport]
+  # @returns [CourseEpubExport]
   def index
     @presenter = EpubExports::CourseEpubExportsPresenter.new(@current_user)
     @courses = @presenter.courses
@@ -117,7 +131,7 @@ class EpubExportsController < ApplicationController
     end
   end
 
-  # API Create ePub Export
+  # @API Create ePub Export
   #
   # Begin an ePub export for a course.
   #
@@ -132,11 +146,11 @@ class EpubExportsController < ApplicationController
   def create
     if authorized_action(EpubExport.new(course: @context), @current_user, :create)
       @course = Course.find(params[:course_id])
-      @service = EpubExports::CreateService.new(@course, @current_user)
+      @service = EpubExports::CreateService.new(@course, @current_user, :epub_export)
       status = @service.save ? 201 : 422
       respond_to do |format|
         format.json do
-          @course.latest_epub_export = @service.epub_export
+          @course.latest_epub_export = @service.offline_export
           render({
             status: status, json: course_epub_export_json(@course)
           })

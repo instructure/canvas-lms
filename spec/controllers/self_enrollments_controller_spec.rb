@@ -22,7 +22,7 @@ describe SelfEnrollmentsController do
   describe "GET 'new'" do
     before do
       Account.default.allow_self_enrollment!
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.update_attribute(:self_enrollment, true)
     end
 

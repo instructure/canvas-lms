@@ -9,7 +9,7 @@ describe Bookmarks::BookmarksController do
   end
 
   context "when user is logged in" do
-    let(:u) { user }
+    let(:u) { user_factory }
     let!(:bookmark) { Bookmarks::Bookmark.create(user_id: u.id, name: 'bio 101', url: '/courses/1') }
 
     before(:each) do
@@ -37,7 +37,7 @@ describe Bookmarks::BookmarksController do
       end
 
       it "restricts to own bookmarks" do
-        u2 = user
+        u2 = user_factory
         bookmark2 = Bookmarks::Bookmark.create(user_id: u2.id, name: 'bio 101', url: '/courses/1')
         get 'show', id: bookmark2.id, format: 'json'
         expect(response).to_not be_success

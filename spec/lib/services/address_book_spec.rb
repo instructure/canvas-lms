@@ -1,4 +1,5 @@
 require_relative "../../spec_helper"
+require_dependency "services/address_book"
 
 module Services
   describe AddressBook do

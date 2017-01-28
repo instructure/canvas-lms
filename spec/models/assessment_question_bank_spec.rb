@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssessmentQuestionBank do
   before :once do
-    course
+    course_factory
     assessment_question_bank_model
     @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
   end
@@ -46,7 +46,6 @@ describe AssessmentQuestionBank do
     end
 
     it "should exclude specified questions" do
-      [@q1.id, @q2.id, @q3.id, @q4.id, @q5.id, @q6.id, @q7.id, @q8.id, @q9.id, @q10.id]
       selected_ids = @bank.select_for_submission(@quiz.id, nil, 10, [@q1.id, @q10.id]).map(&:assessment_question_id)
 
       expect(selected_ids.include?(@q1.id)).to be_falsey
@@ -78,11 +77,18 @@ describe AssessmentQuestionBank do
       # yes, technically there's a 0.000000000000000001% chance this will fail spontaneously - sue me
       expect(aq_ids.uniq.count > 1).to be_truthy
     end
+
+    it "processes questions in :id sorted order" do
+      AssessmentQuestion.expects(:find_or_create_quiz_questions).with do |aqs, _, _, _|
+        aqs == aqs.sort_by(&:id)
+      end.returns([])
+      @bank.select_for_submission(@quiz.id, nil, 10)
+    end
   end
 
   it "should allow user read access through question bank users" do
-    user
-    @bank.assessment_question_bank_users.create!(:user => user)
+    user_factory
+    @bank.assessment_question_bank_users.create!(:user => user_factory)
     expect(@course.grants_right?(@user, :manage_assignments)).to be_falsey
     expect(@bank.grants_right?(@user, :read)).to be_truthy
   end

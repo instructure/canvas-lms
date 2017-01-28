@@ -22,6 +22,7 @@ module RuboCop
           /:input/,     # https://api.jquery.com/input-selector/
           /:last/,      # https://api.jquery.com/last-selector/
           /:lt\(/,      # https://api.jquery.com/lt-selector/
+          /:nth\(/,     # equivalent to :eq()
           /:odd/,       # https://api.jquery.com/odd-selector/
           /:parent/,    # https://api.jquery.com/parent-selector/
           /:password/,  # https://api.jquery.com/password-selector/

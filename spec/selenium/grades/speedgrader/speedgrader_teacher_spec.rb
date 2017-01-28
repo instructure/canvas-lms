@@ -1,13 +1,13 @@
 require_relative "../../common"
 require_relative "../../helpers/speed_grader_common"
-require_relative "../../helpers/gradebook2_common"
+require_relative "../../helpers/gradebook_common"
 require_relative "../../helpers/quizzes_common"
 require_relative "../../helpers/groups_common"
 
 describe "speed grader" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
-  include Gradebook2Common
+  include GradebookCommon
   include SpeedGraderCommon
   include GroupsCommon
 
@@ -40,7 +40,7 @@ describe "speed grader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       expect(f("#x_of_x_students_frd")).to include_text("1/1")
-      expect(ff("#students_selectmenu-menu li").count).to eq 1
+      expect(ff("#students_selectmenu-menu li")).to have_size 1
     end
   end
 
@@ -81,10 +81,9 @@ describe "speed grader" do
     student_submission
     student_submission(:username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"))
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
 
-    expect(ff('#students_selectmenu option').size).to eq 1 # just the one student
-    expect(ff('#section-menu ul li').size).to eq 1 # "Show all sections"
+    expect(ff('#students_selectmenu option')).to have_size 1 # just the one student
+    expect(ff('#section-menu ul li')).to have_size 1 # "Show all sections"
     expect(f("#students_selectmenu")).not_to contain_css('#section-menu') # doesn't get inserted into the menu
   end
 
@@ -97,10 +96,9 @@ describe "speed grader" do
     en.deactivate
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
 
-    expect(ff('#students_selectmenu option').size).to eq 1 # just the one student
-    expect(f('#enrollment_inactive_notice').text).to eq 'Notice: Inactive Student'
+    expect(ff('#students_selectmenu option')).to have_size 1 # just the one student
+    expect(f('#enrollment_inactive_notice')).to include_text 'Notice: Inactive Student'
   end
 
   it "can grade and comment inactive students" do
@@ -115,17 +113,13 @@ describe "speed grader" do
     en.deactivate
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
 
     replace_content f('#grading-box-extended'), "5", tab_out: true
-    wait_for_ajaximations
-    @submission.reload
-    expect(@submission.score).to eq 5
+    expect { @submission.reload.score }.to become 5
 
     f('#speedgrader_comment_textarea').send_keys('srsly')
     f('#add_a_comment button[type="submit"]').click
-    wait_for_ajaximations
-    expect(@submission.submission_comments.first.comment).to eq 'srsly'
+    expect { @submission.submission_comments.where(comment: 'srsly').any? }.to become(true)
     # doesn't get inserted into the menu
     expect(f('#students_selectmenu')).not_to contain_css('#section-menu')
   end
@@ -139,10 +133,9 @@ describe "speed grader" do
     en.conclude
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
 
-    expect(ff('#students_selectmenu option').size).to eq 1 # just the one student
-    expect(f('#enrollment_concluded_notice').text).to eq 'Notice: Concluded Student'
+    expect(ff('#students_selectmenu option')).to have_size 1 # just the one student
+    expect(f('#enrollment_concluded_notice')).to include_text 'Notice: Concluded Student'
   end
 
   context "multiple enrollments" do
@@ -157,22 +150,20 @@ describe "speed grader" do
 
     it "does not duplicate students", priority: "1", test_id: 283985 do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      wait_for_ajaximations
 
-      expect(ff("#students_selectmenu option").length).to eq 1
+      expect(ff("#students_selectmenu option")).to have_size 1
     end
 
     it "filters by section properly", priority: "1", test_id: 283986 do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      wait_for_ajaximations
 
       sections = @course.course_sections
       section_options_text = f("#section-menu ul")[:textContent] # hidden
       expect(section_options_text).to include(@course_section.name)
       goto_section(sections[0].id)
-      expect(ff("#students_selectmenu option").length).to eq 1
+      expect(ff("#students_selectmenu option")).to have_size 1
       goto_section(sections[1].id)
-      expect(ff("#students_selectmenu option").length).to eq 1
+      expect(ff("#students_selectmenu option")).to have_size 1
     end
   end
 
@@ -198,7 +189,6 @@ describe "speed grader" do
     student_submission(name: 'student@example.com')
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
 
     # sort by submission date
     f("#settings_link").click
@@ -241,14 +231,12 @@ describe "speed grader" do
     it "show all sections menu item is present", priority: "2", test_id: "164207" do
       f("#students_selectmenu-button").click
       hover(f("#section-menu-link"))
-      wait_for_ajaximations
       expect(f("#section-menu .ui-menu")).to include_text("Show All Sections")
     end
 
     it "should list all course sections", priority: "2", test_id: "588914" do
       f("#students_selectmenu-button").click
       hover(f("#section-menu-link"))
-      wait_for_ajaximations
       expect(f("#section-menu .ui-menu")).to include_text(@section0.name)
       expect(f("#section-menu .ui-menu")).to include_text(@section1.name)
     end
@@ -257,23 +245,20 @@ describe "speed grader" do
   it "includes the student view student for grading", priority: "1", test_id: 283990 do
     @course.student_view_student
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
 
-    expect(ff("#students_selectmenu option").length).to eq 1
+    expect(ff("#students_selectmenu option")).to have_size 1
   end
 
   it "marks the checkbox of students for graded assignments", priority: "1", test_id: 283992 do
     student_submission
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
 
     expect(f("#students_selectmenu-button")).to have_class("not_graded")
 
     f('#grade_container input[type=text]').click
     set_value(f('#grade_container input[type=text]'), 1)
     f(".ui-selectmenu-icon").click
-    wait_for_ajaximations
     expect(f("#students_selectmenu-button")).to have_class("graded")
   end
 
@@ -294,6 +279,7 @@ describe "speed grader" do
 
   it 'should let you enter in a float for a quiz question point value', priority: "1", test_id: 369250 do
     init_course_with_students
+    user_session(@teacher)
     quiz = seed_quiz_with_submission
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
     # In the left panel modify the grade to 0.5
@@ -316,7 +302,7 @@ describe "speed grader" do
   context 'Crocodocable Submissions' do
     # set up course and users
     let(:test_course) { @course }
-    let(:student)     { user(active_all: true) }
+    let(:student)     { user_factory(active_all: true) }
     let!(:crocodoc_plugin) { PluginSetting.create! name: "crocodoc", settings: {api_key: "abc123"} }
     let!(:enroll_student) do
       test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')

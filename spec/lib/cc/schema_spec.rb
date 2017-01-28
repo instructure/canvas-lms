@@ -1,4 +1,5 @@
 require File.expand_path('../../../spec_helper', __FILE__)
+require_dependency "cc/schema"
 
 module CC
   describe Schema do

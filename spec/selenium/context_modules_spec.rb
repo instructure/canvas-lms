@@ -7,7 +7,7 @@ describe "context modules" do
 
   context 'adds existing items to modules' do
     before(:once) do
-      course(:active_course => true)
+      course_factory(active_course: true)
       @course.context_modules.create! name: 'Module 1'
       @mod = @course.context_modules.first
     end
@@ -175,7 +175,7 @@ describe "context modules" do
 
   context 'edit inline items on module page' do
     before(:once) do
-      course(:active_course => true)
+      course_factory(active_course: true)
       @course.context_modules.create! name: 'Module 2'
       @mod = @course.context_modules.first
     end
@@ -236,7 +236,7 @@ describe "context modules" do
     FILE_NAME = 'some test file'
 
     before(:once) do
-      course(:active_course => true)
+      course_factory(active_course: true)
       Account.default.enable_feature!(:usage_rights_required)
       #adding file to course
       @file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
@@ -291,7 +291,7 @@ describe "context modules" do
 
   context "logged out", priority: "2" do
     before(:once) do
-      @course = course(:active_all => true)
+      @course = course_factory(active_all: true)
       course_module
       @course.is_public = true
       @course.save!

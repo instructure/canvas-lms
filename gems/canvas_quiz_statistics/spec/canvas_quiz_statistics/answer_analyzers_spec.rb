@@ -5,11 +5,11 @@ describe CanvasQuizStatistics::Analyzers do
 
   describe '[]' do
     it 'should locate an analyzer' do
-      subject['essay_question'].should == Analyzers::Essay
+      expect(subject['essay_question']).to eq(Analyzers::Essay)
     end
 
     it 'should return the generic analyzer for questions of unsupported types' do
-      subject['text_only_question'].should == Analyzers::Base
+      expect(subject['text_only_question']).to eq(Analyzers::Base)
     end
   end
 end

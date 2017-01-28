@@ -72,11 +72,11 @@ body {
 
 #footer {
   .footer-logo {
-    @include bg-image("footer-logo", "png", no-repeat, left, top, transparent, 140px, 10px);
+    @include bg-image("footer-logo", "png", no-repeat, left, top, transparent, 114px, 10px);
     display: inline-block;
     height: 10px;
     margin: 0 20px 0 0;
-    width: 140px;
+    width: 114px;
   }
 }
 

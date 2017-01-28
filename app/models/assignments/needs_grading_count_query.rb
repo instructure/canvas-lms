@@ -120,10 +120,7 @@ module Assignments
           AND e.course_id = ?
           AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
           AND e.workflow_state = 'active'
-          AND submissions.submission_type IS NOT NULL
-          AND (submissions.workflow_state = 'pending_review'
-            OR (submissions.workflow_state = 'submitted'
-              AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)))
+          AND #{Submission.needs_grading_conditions}
         SQL
 
       string += <<-SQL

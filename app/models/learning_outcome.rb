@@ -47,10 +47,10 @@ class LearningOutcome < ActiveRecord::Base
   validates :short_description, length: { maximum: maximum_string_length }
   validates :display_name, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }
   validates :calculation_method, inclusion: { in: CALCULATION_METHODS.keys,
-    message: t(
+    message: -> { t(
       "calculation_method must be one of the following: %{calc_methods}",
       :calc_methods => CALCULATION_METHODS.keys.to_s
-    )
+    ) }
   }
   validates :short_description, :workflow_state, presence: true
   sanitize_field :description, CanvasSanitize::SANITIZE

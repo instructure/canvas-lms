@@ -19,7 +19,7 @@
 
 require "spec_helper"
 
-require 'syck'
+require "yaml"
 
 describe Utf8Cleaner do
   it "should strip out invalid utf-8" do
@@ -34,33 +34,7 @@ describe Utf8Cleaner do
 
     test_strings.each do |input, output|
       input = input.dup.force_encoding("UTF-8")
-      Utf8Cleaner.strip_invalid_utf8(input).should == output
-    end
-  end
-
-  describe "YAML invalid UTF8 stripping" do
-    it "should recursively strip out invalid utf-8" do
-      data = YAML.load(<<-YAML)
----
-answers:
-- !map:Hash
-  id: 2
-  text: t\xEAwo
-  valid_ascii: !binary |
-    oHRleHSg
-YAML
-      answer = data['answers'][0]['text']
-      answer.valid_encoding?.should be_false
-      Utf8Cleaner.recursively_strip_invalid_utf8!(data, true)
-      answer.should == "two"
-      answer.encoding.should == Encoding::UTF_8
-      answer.valid_encoding?.should be_true
-
-      # in some edge cases, Syck will return a string as ASCII-8BIT if it's not valid UTF-8
-      # so we added a force_encoding step to recursively_strip_invalid_utf8!
-      ascii = data['answers'][0]['valid_ascii']
-      ascii.should == 'text'
-      ascii.encoding.should == Encoding::UTF_8
+      expect(Utf8Cleaner.strip_invalid_utf8(input)).to eq(output)
     end
   end
 end

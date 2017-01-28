@@ -175,12 +175,12 @@ describe "Groups API", type: :request do
     course_with_teacher(:active_all => true)
     @group = @course.groups.create!(:name => 'New group')
 
-    inactive_user = user
+    inactive_user = user_factory
     enrollment = @course.enroll_student(inactive_user)
     enrollment.deactivate
     @group.add_user(inactive_user, 'accepted')
 
-    @course.enroll_student(user).accept!
+    @course.enroll_student(user_factory).accept!
     @group.add_user(@user, 'accepted')
 
     json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json?include[]=users",
@@ -202,7 +202,7 @@ describe "Groups API", type: :request do
     course_with_teacher(:active_all => true)
     @group = @course.groups.create!(:name => 'New group')
 
-    inactive_user = user
+    inactive_user = user_factory
     enrollment = @course.enroll_student(inactive_user)
     enrollment.deactivate
     @group.add_user(inactive_user, 'accepted')
@@ -845,7 +845,7 @@ describe "Groups API", type: :request do
     end
 
     it "should return 401 for users outside the group" do
-      user
+      user_factory
       raw_api_call(:get, "/api/v1/groups/#{@community.id}/users",
                          { :controller => 'groups', :action => 'users', :group_id => @community.to_param, :format => 'json' })
       expect(response.code).to eq '401'
@@ -954,7 +954,7 @@ describe "Groups API", type: :request do
     end
 
     it "should require permission to preview" do
-      @user = user
+      @user = user_factory
       api_call(:post, "/api/v1/groups/#{@group.id}/preview_html",
                       { :controller => 'groups', :action => 'preview_html', :group_id => @group.to_param, :format => 'json' },
                       { :html => ""}, {}, {:expected_status => 401})

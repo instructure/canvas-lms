@@ -30,7 +30,7 @@ describe UsersController, type: :request do
   before :once do
     @teacher = course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_all => true))
     @teacher_course = @course
-    @student_course = course(:active_all => true)
+    @student_course = course_factory(active_all: true)
     @student_course.enroll_student(@user).accept!
     # an assignment i need to submit (needs_submitting)
     @a1 = Assignment.create!(:context => @student_course, :due_at => 6.days.from_now, :title => 'required work', :submission_types => 'online_text_entry', :points_possible => 10)
@@ -38,7 +38,7 @@ describe UsersController, type: :request do
     # an assignment i created, and a student who submits the assignment (needs_grading)
     @a2 = Assignment.create!(:context => @teacher_course, :due_at => 1.day.from_now, :title => 'text', :submission_types => 'online_text_entry', :points_possible => 15)
     @me = @user
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     @user = @me
     @teacher_course.enroll_student(student).accept!
     @sub = @a2.reload.submit_homework(student, :submission_type => 'online_text_entry', :body => 'done')
@@ -71,7 +71,7 @@ describe UsersController, type: :request do
 
   def another_submission
     @me = @user
-    student2 = user(:active_all => true)
+    student2 = user_factory(active_all: true)
     @user = @me
     @teacher_course.enroll_student(student2).accept!
     @sub2 = @a2.reload.submit_homework(student2,
@@ -178,22 +178,28 @@ describe UsersController, type: :request do
     expect(json).to eq []
   end
 
-  it "should include assignments that don't expect an online submission (courses endpoint)" do
-    ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
+  it "should include future assignments that don't expect an online submission (courses endpoint)" do
+    past_ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
+    ungraded = @student_course.assignments.create! due_at: 2.days.from_now, workflow_state: 'published', submission_types: 'not_graded'
     json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo", :controller => "courses", :action => "todo_items",
         :format => "json", :course_id => @student_course.to_param
     expect(json.map {|e| e['assignment']['id']}).to include ungraded.id
+    expect(json.map {|e| e['assignment']['id']}).not_to include past_ungraded.id
   end
 
-  it "should include assignments that don't expect an online submission (users endpoint)" do
-    ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
+  it "should include future assignments that don't expect an online submission (users endpoint)" do
+    past_ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
+    ungraded = @student_course.assignments.create! due_at: 2.days.from_now, workflow_state: 'published', submission_types: 'not_graded'
     json = api_call :get, "/api/v1/users/self/todo", :controller => "users", :action => "todo_items", :format => "json"
     expect(json.map {|e| e['assignment']['id']}).to include ungraded.id
+    expect(json.map {|e| e['assignment']['id']}).not_to include past_ungraded.id
   end
 
   it "includes ungraded quizzes by request" do
     survey = @student_course.quizzes.create!(quiz_type: 'survey', due_at: 1.day.from_now)
     survey.publish!
+    past_survey = @student_course.quizzes.create!(quiz_type: 'survey', due_at: 1.day.ago)
+    past_survey.publish!
 
     # course endpoint
     json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo", :controller => "courses",

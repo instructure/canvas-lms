@@ -1,100 +1,13 @@
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
+require_dependency "turnitin/outcome_response_processor"
+require File.expand_path(File.dirname(__FILE__) + '/turnitin_spec_helper')
+require 'turnitin_api'
 module Turnitin
   describe OutcomeResponseProcessor do
-
-    let(:lti_student) { user_model }
-    let(:lti_course) { course_with_student({user: lti_student}).course }
-    let(:tool) do
-      tool = lti_course.context_external_tools.new(
-          name: "bob",
-          consumer_key: "bob",
-          shared_secret: "bob",
-          tool_id: 'some_tool',
-          privacy_level: 'public'
-      )
-      tool.url = "http://www.example.com/basic_lti"
-      tool.resource_selection = {
-          :url => "http://#{HostUrl.default_host}/selection_test",
-          :selection_width => 400,
-          :selection_height => 400}
-      tool.save!
-      tool
-    end
-
-    let(:lti_assignment) do
-      assignment = assignment_model(course: lti_course)
-      tag = assignment.build_external_tool_tag(url: tool.url)
-      tag.content_type = 'ContextExternalTool'
-      tag.content_id = tool.id
-      tag.save!
-      assignment
-    end
-
-    let(:attachment) do
-      Attachment.create! uploaded_data: StringIO.new('blah'),
-                         context: lti_course,
-                         filename: 'blah.txt'
-    end
-
-    let(:outcome_response_json) do
-      {
-          "paperid" => 200505101,
-          "outcomes_tool_placement_url" => "https://sandbox.turnitin.com/api/lti/1p0/outcome_tool_data/200505101?lang=en_us",
-          "lis_result_sourcedid" => Lti::LtiOutboundAdapter.new(tool, lti_student, lti_course).encode_source_id(lti_assignment)
-      }
-    end
-
+    include_context "shared_tii_lti"
     subject { described_class.new(tool, lti_assignment, lti_student, outcome_response_json) }
 
     describe '#process' do
       let(:filename) {'my_sample_file'}
-      let(:tii_response) {
-        {"outcome_grademark" => {
-            "text" => "--",
-            "label" => "Open GradeMark",
-            "roles" => ["Instructor"],
-            "launch_url" => "https://sandbox.turnitin.com/api/lti/1p0/dv/grademark/200587213?lang=en_us",
-            "numeric" => {"score" => nil, "max" => 10}
-          },
-          "outcome_pdffile" => {
-            "text" => nil,
-            "launch_url" => "https://sandbox.turnitin.com/api/lti/1p0/download/pdf/200587213?lang=en_us",
-            "roles" => ["Learner", "Instructor"],
-            "label" => "Download File in PDF Format"
-          },
-          "meta" => {
-            "date_uploaded" => "2016-10-24T19:48:40Z"
-          },
-          "outcome_originalityreport" => {
-            "label" => "Open Originality Report",
-            "numeric" => {
-              "max" => 100,
-              "score" => nil
-            },
-            "roles" => ["Instructor"],
-            "launch_url" => "https://sandbox.turnitin.com/api/lti/1p0/dv/report/200587213?lang=en_us",
-            "breakdown" => {
-              "submitted_works_score" => nil,
-              "internet_score" => nil,
-              "publications_score" => nil
-            },
-            "text" => "Pending"
-          },
-          "outcome_originalfile" => {
-            "text" => nil,
-            "launch_url" => "https://sandbox.turnitin.com/api/lti/1p0/download/orig/200587213?lang=en_us",
-            "roles" => ["Learner", "Instructor"],
-            "label" => "Download File in Original Format"
-          },
-          "outcome_resubmit" => {
-            "label" => "Resubmit File",
-            "launch_url" => "https://sandbox.turnitin.com/api/lti/1p0/upload/resubmit/200587213?lang=en_us",
-            "roles" => ["Learner"],
-            "text" => nil
-          }
-        }
-      }
 
       before(:each) do
         original_submission_response = mock('original_submission_mock')
@@ -182,16 +95,18 @@ module Turnitin
         subject.class.any_instance.stubs(:attempt_number).returns(subject.class.max_attempts-1)
         mock_turnitin_client = mock('turnitin_client')
         mock_turnitin_client.stubs(:scored?).returns(false)
-        subject.stubs(:build_turnitin_client).returns(mock_turnitin_client)
+        subject.stubs(:turnitin_client).returns(mock_turnitin_client)
         submission = lti_assignment.submit_homework(lti_student, attachments:[attachment], submission_type: 'online_upload')
-        expect { subject.update_originality_data(submission, attachment.asset_string) }.to raise_error Turnitin::SubmissionNotScoredError
+        expect do
+          subject.update_originality_data(submission, attachment.asset_string)
+        end.to raise_error Turnitin::Errors::SubmissionNotScoredError
       end
 
       it 'sets an error message if max attempts are exceeded' do
         subject.class.any_instance.stubs(:attempt_number).returns(subject.class.max_attempts)
         mock_turnitin_client = mock('turnitin_client')
         mock_turnitin_client.stubs(:scored?).returns(false)
-        subject.stubs(:build_turnitin_client).returns(mock_turnitin_client)
+        subject.stubs(:turnitin_client).returns(mock_turnitin_client)
         submission = lti_assignment.submit_homework(lti_student, attachments:[attachment], submission_type: 'online_upload')
         subject.update_originality_data(submission, attachment.asset_string)
         expect(submission.turnitin_data[attachment.asset_string][:status]).to eq 'error'

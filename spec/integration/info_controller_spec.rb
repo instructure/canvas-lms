@@ -23,7 +23,7 @@ describe InfoController do
     it "should clear the cache on avatar update" do
       Account.default.tap { |a| a.enable_service(:avatars) }.save
       enable_cache do
-        user
+        user_factory
         get "/images/users/#{@user.id}"
         expect(response).to be_redirect
         expect(response['Location']).to match(%r{gravatar})

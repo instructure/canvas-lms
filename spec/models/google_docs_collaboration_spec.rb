@@ -43,7 +43,7 @@ describe GoogleDocsCollaboration do
       PluginSetting.create!(:name => "google_drive", :settings => {})
       @other_user = user_with_pseudonym(:active_all => true)
       @student = user_with_pseudonym(:active_all => true)
-      course(:active_all => true)
+      course_factory(:active_all => true)
       @course.enroll_student(@student)
 
       @teacher.user_services.create! service: 'google_drive', service_domain: 'drive.google.com',

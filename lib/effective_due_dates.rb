@@ -78,7 +78,19 @@ class EffectiveDueDates
     end
   end
 
+  def grading_period_id_for(student_id:, assignment_id:)
+    find_effective_due_date(student_id, assignment_id).fetch(:grading_period_id, nil)
+  end
+
   private
+
+  def find_effective_due_date(student_id, assignment_id)
+    find_effective_due_dates_for_assignment(assignment_id).fetch(student_id, {})
+  end
+
+  def find_effective_due_dates_for_assignment(assignment_id)
+    to_hash.fetch(assignment_id, {})
+  end
 
   def usable_student_id?(student_id)
     return false unless student_id.present?
@@ -342,7 +354,7 @@ class EffectiveDueDates
       FROM calculated_overrides overrides
       -- match the effective due date with its grading period
       LEFT OUTER JOIN applied_grading_periods periods ON
-          overrides.due_at >= periods.start_date AND overrides.due_at < periods.end_date
+          periods.start_date < overrides.due_at AND overrides.due_at <= periods.end_date
     ")
   end
 end

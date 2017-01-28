@@ -300,7 +300,7 @@ describe 'quizzes question banks' do
     end
 
     it "should let account admins view question banks without :manage_assignments (but not edit)", priority: "2", test_id: 456162 do
-      user(:active_all => true)
+      user_factory(active_all: true)
       user_session(@user)
       @role = custom_account_role 'weakling', :account => @course.account
       @course.account.role_overrides.create!(:permission => 'read_course_content', :enabled => true, :role => @role)

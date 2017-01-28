@@ -12,7 +12,7 @@ describe 'dashcards' do
   context 'as a student' do
 
     before do
-      @course = course(active_all: true)
+      @course = course_factory(active_all: true)
       course_with_student_logged_in(active_all: true)
     end
 
@@ -285,7 +285,7 @@ describe 'dashcards' do
 
   context "as a teacher and student" do
     before :each do
-      @course = course(active_all: true)
+      @course = course_factory(active_all: true)
       course_with_teacher_logged_in(active_all: true)
       @student = user_with_pseudonym(username: 'student@example.com', active_all: 1)
       enrollment = student_in_course(course: @course, user: @student)

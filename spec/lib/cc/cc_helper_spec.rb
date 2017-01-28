@@ -70,7 +70,7 @@ describe CC::CCHelper do
     end
 
     it "should find media objects outside the context (because course copy)" do
-      other_course = course
+      other_course = course_factory
       @exporter = CC::CCHelper::HtmlContentExporter.new(other_course, @user)
       @exporter.html_content(<<-HTML)
       <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>

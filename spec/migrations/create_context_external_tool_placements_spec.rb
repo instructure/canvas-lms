@@ -6,7 +6,7 @@ describe 'CreateContextExternalToolPlacements' do
   describe "up" do
     it "should populate the context external tool placements table" do
       skip("PostgreSQL specific") unless ContentExport.connection.adapter_name == 'PostgreSQL'
-      course
+      course_factory
 
       migration1 = CreateContextExternalToolPlacements.new
       migration2 = DropHasColumnsFromContextExternalTools.new

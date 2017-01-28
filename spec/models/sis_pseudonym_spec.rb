@@ -1,8 +1,8 @@
 require_relative "../sharding_spec_helper"
 
 describe SisPseudonym do
-  let_once(:course1) { course active_all: true, account: Account.default }
-  let_once(:course2) { course active_all: true, account: account2 }
+  let_once(:course1) { course_factory active_all: true, account: Account.default }
+  let_once(:course2) { course_factory active_all: true, account: account2 }
   let_once(:account1) { account_model }
   let_once(:account2) { account_model }
   let_once(:u) { User.create! }

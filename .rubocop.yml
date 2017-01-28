@@ -5,7 +5,7 @@ require:
   - ./gems/rubocop-canvas/lib/rubocop_canvas
 
 AllCops:
-  RunRailsCops: true
+  TargetRubyVersion: 2.3
 
 # our style changes: disabling style rules we aren't interested in
 Style/StringLiterals:
@@ -54,7 +54,7 @@ Style/RedundantSelf:
   Enabled: false
 Style/SpaceAroundEqualsInParameterDefault:
   Enabled: false
-Style/SingleSpaceBeforeFirstArg:
+Style/SpaceBeforeFirstArg:
   Enabled: false
 Style/EmptyLinesAroundAccessModifier:
   Enabled: false
@@ -68,7 +68,9 @@ Style/IndentHash:
   Enabled: false
 Style/DoubleNegation:
   Enabled: false
-Style/TrailingComma:
+Style/TrailingCommaInArguments:
+  Enabled: false
+Style/TrailingCommaInLiteral:
   Enabled: false
 Style/MethodCallParentheses:
   Enabled: false
@@ -80,8 +82,6 @@ Style/IndentationWidth:
   Enabled: false
 Style/AlignParameters:
   Enabled: false
-Style/RescueModifier:
-  Severity: warning
 Style/DotPosition:
   Enabled: false
 Style/TrailingWhitespace:
@@ -98,8 +98,27 @@ Style/WhileUntilModifier:
   Enabled: false
 Style/ParallelAssignment:
   Enabled: false
+Style/ZeroLengthPredicate:
+  Enabled: false
+Style/SpaceInLambdaLiteral:
+  Enabled: false
+Style/NumericPredicate:
+  Enabled: false
+Style/VariableNumber:
+  Enabled: false
+Style/SpaceInLambdaLiteral:
+  Enabled: false
+# We may want to enable this when we start working toward Ruby 3
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# this isn't good for us because of how we pin dependencies
+Bundler/OrderedGems:
+  Enabled: false
 
 # Rails style changes
+Rails:
+  Enabled: true
 Rails/TimeZone:
   Enabled: false
 # accessors are often defined in terms of read_attribute
@@ -123,9 +142,14 @@ Performance/Detect:
 # these need better configuration than the default:
 Style/AndOr:
   EnforcedStyle: conditionals
+Style/RescueModifier:
+  Severity: warning
+Style/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+Style/IndentArray:
+  EnforcedStyle: consistent
 
 # these don't make sense pre-Rails 4
-
 Rails/FindBy:
   Enabled: false
 Rails/ActionFilter:
@@ -144,9 +168,13 @@ RSpec/InstanceVariable:
   Enabled: false
 RSpec/ExampleWording:
   Enabled: false
+RSpec/ExampleLength:
+  Max: 16
 RSpec/DescribedClass:
   Enabled: false
 RSpec/DescribeClass:
   Enabled: false
 Style/HashSyntax:
+  Enabled: false
+RSpec/MultipleExpectations:
   Enabled: false

@@ -19,16 +19,36 @@
 <% end %>
 
 <div class="header-bar">
-  <% if @can_edit %>
-    <div class="header-bar-right">
+  <div class="header-bar-right">
+    <% if @can_edit %>
       <a class="btn module_progressions_link" href="<%= progressions_course_context_modules_path(@context) %>"><%= t('links.student_progress', 'View Progress') %></a>
+    <% end %>
+    <% if @context.allow_web_export_download? %>
+      <span class="offline_web_export_view">
+        <%= form_tag(context_url(@context, :context_start_offline_web_export_url)) do %>
+          <button type="submit" class="btn offline_web_export">
+            <i class="icon-download" role="presentation"></i>
+            <%= t("Download Course Content") %>
+          </button>
+        <% end %>
+        <% if @last_web_export %>
+          <small class="muted">
+            <%= t("Last Download: ") %>
+            <a href="<%= context_url(@context, :context_offline_web_exports_url) %>">
+              <%= datetime_string(force_zone(@last_web_export.created_at)) %>
+            </a>
+          </small>
+        <% end %>
+      </span>
+    <% end %>
+    <% if @can_edit %>
       <button class="btn btn-primary add_module_link">
         <i class="icon-plus" role="presentation"></i>
         <span class="screenreader-only">Add</span>
         <%= t('#context_modules.buttons.add_module', 'Module') %>
       </button>
-    </div>
-  <% end %>
+    <% end %>
+  </div>
 </div>
 
 <% if @can_edit %>

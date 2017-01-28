@@ -186,7 +186,7 @@ describe SectionsController, type: :request do
       end
 
       it "should scope course sections to the course" do
-        @other_course = course
+        @other_course = course_factory
         @other_section = @other_course.default_section
         site_admin_user
         api_call(:get, "#{@path_prefix}/#{@other_section.id}", @path_params.merge({ :id => @other_section.to_param }), {}, {}, :expected_status => 404)
@@ -280,7 +280,7 @@ describe SectionsController, type: :request do
 
   describe "#create" do
     before :once do
-      course
+      course_factory
       @path_prefix = "/api/v1/courses/#{@course.id}/sections"
       @path_params = { :controller => 'sections', :action => 'create', :course_id => @course.to_param, :format => 'json' }
     end
@@ -397,7 +397,7 @@ describe SectionsController, type: :request do
 
   describe "#update" do
     before :once do
-      course
+      course_factory
       @section = @course.course_sections.create! :name => "Test Section"
       @section.update_attribute(:sis_source_id, "SISsy")
       @path_prefix = "/api/v1/sections"
@@ -488,7 +488,7 @@ describe SectionsController, type: :request do
 
   describe "#delete" do
     before :once do
-      course
+      course_factory
       @section = @course.course_sections.create! :name => "Test Section"
       @section.update_attribute(:sis_source_id, "SISsy")
       @path_prefix = "/api/v1/sections"
@@ -542,8 +542,8 @@ describe SectionsController, type: :request do
 
   describe "#crosslist" do
     before :once do
-      @dest_course = course
-      course
+      @dest_course = course_factory
+      course_factory
       @section = @course.course_sections.create!
       @params = { :controller => 'sections', :action => 'crosslist', :format => 'json' }
     end
@@ -640,8 +640,8 @@ describe SectionsController, type: :request do
 
   describe "#uncrosslist" do
     before :once do
-      @dest_course = course
-      course
+      @dest_course = course_factory
+      course_factory
       @section = @course.course_sections.create!
       @section.crosslist_to_course(@dest_course)
       @params = { :controller => 'sections', :action => 'uncrosslist', :format => 'json' }

@@ -22,7 +22,7 @@ describe Collaboration do
   context "collaboration_class" do
 
     describe ".any_collaborations_configured?" do
-      let(:context) {course}
+      let(:context) {course_factory}
       it "should by default not have any collaborations" do
         expect(Collaboration.any_collaborations_configured?(context)).to be_falsey
         expect(Collaboration.collaboration_types).to eq []

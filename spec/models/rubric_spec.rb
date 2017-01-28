@@ -87,7 +87,7 @@ describe Rubric do
       expect(@rubric).not_to be_new_record
       expect(@rubric.learning_outcome_alignments(true)).not_to be_empty
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
-      @user = user(:active_all => true)
+      @user = user_factory(active_all: true)
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
@@ -160,7 +160,7 @@ describe Rubric do
 
   context "fractional_points" do
     it "should allow fractional points" do
-      course
+      course_factory
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {

@@ -18,6 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require_dependency "lti/substitutions_helper"
 
 module Lti
   describe SubstitutionsHelper do

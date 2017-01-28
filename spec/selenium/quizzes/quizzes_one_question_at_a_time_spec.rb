@@ -38,8 +38,12 @@ describe 'taking a quiz one question at a time' do
         back_and_forth_flow
       end
 
+      it 'has sidebar navigation', priority: "1", test_id: 140610 do
+        it_should_have_sidebar_navigation
+      end
+
       it 'warns upon submitting unanswered questions', priority: "1", test_id: 209371 do
-        submit_unfinished_quiz('You have 3 unanswered questions')
+        submit_unfinished_quiz('You have 2 unanswered questions')
       end
     end
 
@@ -57,7 +61,6 @@ describe 'taking a quiz one question at a time' do
       end
 
       it 'allows saving answers to each question', priority: "1", test_id: 209364 do
-        it_should_show_cant_go_back_warning
         accept_cant_go_back_warning
         answers_flow
       end
@@ -67,10 +70,6 @@ describe 'taking a quiz one question at a time' do
 
         click_next_button_and_accept_warning
 
-        navigate_away_and_resume_quiz
-        accept_cant_go_back_warning
-        it_should_be_on_second_question
-
         navigate_directly_to_first_question
         it_should_be_on_second_question
       end
@@ -78,7 +77,7 @@ describe 'taking a quiz one question at a time' do
       it 'warns upon submitting a quiz when not on the last question', priority: "1", test_id: 209366 do
         accept_cant_go_back_warning
         answer_the_question_correctly
-        submit_unfinished_quiz('There are still 2 questions you haven\'t seen')
+        submit_unfinished_quiz('There is still 1 question you haven\'t seen')
       end
 
       it 'warns upon moving on without answering a question', priority: "1", test_id: 209367 do
@@ -87,19 +86,8 @@ describe 'taking a quiz one question at a time' do
       end
 
       it 'warns upon resuming', priority: "1", test_id: 209368 do
-        it_should_show_cant_go_back_warning
         accept_cant_go_back_warning
-
-        expect_new_page_load(true) do
-          click_quiz_link("Quizzes")
-        end
-
-        expect_new_page_load do
-          click_quiz_link("OQAAT quiz")
-        end
-
-        fj('#not_right_side .take_quiz_button a:contains(\'Resume Quiz\')').click
-
+        navigate_away_and_resume_quiz
         it_should_show_cant_go_back_warning
       end
     end
@@ -124,6 +112,10 @@ describe 'taking a quiz one question at a time' do
 
       it 'displays one question at a time', priority: "1", test_id: 209373 do
         back_and_forth_flow
+      end
+
+      it 'has sidebar navigation', priority: "1", test_id: 209373 do
+        it_should_have_sidebar_navigation
       end
     end
 

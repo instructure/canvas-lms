@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe TermsController do
   it "should only touch courses once when setting overrides" do
     a = Account.default
-    u = user(:active_all => true)
+    u = user_factory(active_all: true)
     a.account_users.create!(user: u)
     user_session(@user)
 
@@ -54,7 +54,7 @@ describe TermsController do
     user_session(@user)
 
     @term = @account.enrollment_terms.create!
-    course account: @account
+    course_factory account: @account
     @course.enrollment_term = @term
     @course.save!
 

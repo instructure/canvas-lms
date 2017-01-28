@@ -2852,6 +2852,7 @@ ko:
           enrollment_sis_defined: "이 등록은 대학에서 정의한 것이고 삭제할 수 없음"
         user_account_details: "사용자 계정 세부 정보"
         user_only_view_section: "이 사용자가 동료 섹션 사용자만 보도록 제한"
+        user_outcomes: "%{user}의 성과"
         user_view_all_sections: "이 사용자가 모든 과목 사용자를 보도록 허용"
       no_messages: "메시지 없음"
       no_services: "%{user}는 아직 계정에 외부 서비스를 연결하지 않았습니다."

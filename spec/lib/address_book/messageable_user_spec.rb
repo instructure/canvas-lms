@@ -15,7 +15,7 @@ describe AddressBook::MessageableUser do
     it "includes only known users" do
       teacher = teacher_in_course(active_all: true).user
       student1 = student_in_course(active_all: true).user
-      student2 = student_in_course(course: course(), active_all: true).user
+      student2 = student_in_course(course: course_factory(), active_all: true).user
       address_book = AddressBook::MessageableUser.new(teacher)
       known_users = address_book.known_users([student1, student2])
       expect(known_users.map(&:id)).to include(student1.id)
@@ -32,7 +32,7 @@ describe AddressBook::MessageableUser do
 
     it "caches the failure for unknown users" do
       teacher = teacher_in_course(active_all: true).user
-      student = student_in_course(course: course(), active_all: true).user
+      student = student_in_course(course: course_factory(), active_all: true).user
       address_book = AddressBook::MessageableUser.new(teacher)
       expect(address_book.known_users([student])).to be_empty
       expect(address_book.cached?(student)).to be_truthy
@@ -89,7 +89,7 @@ describe AddressBook::MessageableUser do
       end
 
       it "no effect if no role in the course exists" do
-        course = course(active_all: true)
+        course = course_factory(active_all: true)
         @address_book.known_users([@student], include_context: course)
         expect(@address_book.common_courses(@student)).not_to include(course.id)
       end
@@ -103,8 +103,8 @@ describe AddressBook::MessageableUser do
 
     describe "with optional :conversation_id" do
       it "treats unknown users in that conversation as known" do
-        course1 = course(active_all: true)
-        course2 = course(active_all: true)
+        course1 = course_factory(active_all: true)
+        course2 = course_factory(active_all: true)
         teacher = teacher_in_course(course: course1, active_all: true).user
         student = student_in_course(course: course2, active_all: true).user
         conversation = Conversation.initiate([teacher, student], true)
@@ -114,8 +114,8 @@ describe AddressBook::MessageableUser do
       end
 
       it "ignores if sender is not a participant in the conversation" do
-        course1 = course(active_all: true)
-        course2 = course(active_all: true)
+        course1 = course_factory(active_all: true)
+        course2 = course_factory(active_all: true)
         teacher = teacher_in_course(course: course1, active_all: true).user
         student1 = student_in_course(course: course2, active_all: true).user
         student2 = student_in_course(course: course2, active_all: true).user
@@ -133,7 +133,7 @@ describe AddressBook::MessageableUser do
         enrollment = @shard1.activate{ teacher_in_course(active_all: true) }
         teacher = enrollment.user
         course = enrollment.course
-        student = @shard2.activate{ user(active_all: true) }
+        student = @shard2.activate{ user_factory(active_all: true) }
         student_in_course(course: course, user: student, active_all: true)
         address_book = AddressBook::MessageableUser.new(teacher)
         known_users = address_book.known_users([student])
@@ -153,7 +153,7 @@ describe AddressBook::MessageableUser do
 
     it "returns nil if not known" do
       teacher = teacher_in_course(active_all: true).user
-      other = user(active_all: true)
+      other = user_factory(active_all: true)
       address_book = AddressBook::MessageableUser.new(teacher)
       known_user = address_book.known_user(other)
       expect(known_user).to be_nil
@@ -174,8 +174,8 @@ describe AddressBook::MessageableUser do
 
   describe "common_groups" do
     it "pulls the corresponding MessageableUser's common_groups" do
-      sender = user(active_all: true)
-      recipient = user(active_all: true)
+      sender = user_factory(active_all: true)
+      recipient = user_factory(active_all: true)
       group = group()
       group.add_user(sender, 'accepted')
       group.add_user(recipient, 'accepted')
@@ -187,8 +187,8 @@ describe AddressBook::MessageableUser do
 
   describe "known_in_context" do
     it "limits to users in context" do
-      course1 = course(active_all: true)
-      course2 = course(active_all: true)
+      course1 = course_factory(active_all: true)
+      course2 = course_factory(active_all: true)
       teacher = teacher_in_course(course: course1, active_all: true).user
       teacher_in_course(user: teacher, course: course2, active_all: true)
       student1 = student_in_course(course: course1, active_all: true).user
@@ -233,7 +233,7 @@ describe AddressBook::MessageableUser do
       enrollment = teacher_in_course(active_all: true)
       teacher = enrollment.user
       course1 = enrollment.course
-      student = student_in_course(course: course(), active_all: true).user
+      student = student_in_course(course: course_factory(), active_all: true).user
       address_book = AddressBook::MessageableUser.new(teacher)
       address_book.known_in_context(course1.asset_string)
       expect(address_book.cached?(student)).to be_falsey
@@ -246,7 +246,7 @@ describe AddressBook::MessageableUser do
         enrollment = @shard1.activate{ teacher_in_course(active_all: true) }
         @teacher = enrollment.user
         @course = enrollment.course
-        @student = @shard2.activate{ user(active_all: true) }
+        @student = @shard2.activate{ user_factory(active_all: true) }
         student_in_course(course: @course, user: @student, active_all: true)
       end
 
@@ -309,8 +309,8 @@ describe AddressBook::MessageableUser do
     end
 
     it "restricts to matching known users in optional :context" do
-      course1 = course(active_all: true)
-      course2 = course(active_all: true)
+      course1 = course_factory(active_all: true)
+      course2 = course_factory(active_all: true)
       teacher = teacher_in_course(course: course1, active_all: true).user
       teacher_in_course(user: teacher, course: course2, active_all: true)
       student1 = student_in_course(course: course1, active_all: true, name: 'Bob').user

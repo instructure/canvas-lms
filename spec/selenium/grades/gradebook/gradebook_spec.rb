@@ -1,29 +1,28 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative '../../helpers/groups_common'
 
-describe "gradebook2" do
+describe "gradebook" do
   include_context "in-process server selenium tests"
   include_context "gradebook_components"
-  include Gradebook2Common
+  include GradebookCommon
   include GroupsCommon
 
-  let!(:setup) { gradebook_data_setup }
+  before(:once) { gradebook_data_setup }
+  before(:each) { user_session(@teacher) }
 
   it "hides unpublished/shows published assignments", priority: "1", test_id: 210016 do
     assignment = @course.assignments.create! title: 'unpublished'
     assignment.unpublish
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
+    get "/courses/#{@course.id}/gradebook"
     expect(f('#gradebook_grid .container_1 .slick-header')).not_to include_text(assignment.title)
 
     @first_assignment.publish
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
+    get "/courses/#{@course.id}/gradebook"
     expect(f('#gradebook_grid .container_1 .slick-header')).to include_text(@first_assignment.title)
   end
 
   it "should not show 'not-graded' assignments", priority: "1", test_id: 210017 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     expect(f('.slick-header-columns')).not_to include_text(@ungraded_assignment.title)
   end
@@ -38,53 +37,51 @@ describe "gradebook2" do
   end
 
   it 'should filter students', priority: "1", test_id: 210018 do
-    get "/courses/#{@course.id}/gradebook2"
-    expect(visible_students.length).to eq @all_students.size
+    get "/courses/#{@course.id}/gradebook"
+    expect(visible_students).to have_size @all_students.size
     filter_student 'student 1'
     visible_after_filtering = visible_students
-    expect(visible_after_filtering.length).to eq 1
-    expect(visible_after_filtering[0].text).to eq 'student 1'
+    expect(visible_after_filtering).to have_size 1
+    expect(visible_after_filtering[0]).to include_text 'student 1'
   end
 
   it "should validate correct number of students showing up in gradebook", priority: "1", test_id: 210019 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
-    expect(ff('.student-name').count).to eq @course.students.count
+    expect(ff('.student-name')).to have_size @course.students.count
   end
 
   it "should show students sorted by their sortable_name", priority: "1", test_id: 210022 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     dom_names = ff('.student-name').map(&:text)
     expect(dom_names).to eq @all_students.map(&:name)
   end
 
   it "should not show student avatars until they are enabled", priority: "1", test_id: 210023 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
-    expect(ff('.student-name').length).to eq @all_students.size
+    expect(ff('.student-name')).to have_size @all_students.size
     expect(f("body")).not_to contain_css('.avatar img')
 
     @account = Account.default
     @account.enable_service(:avatars)
     @account.save!
     expect(@account.service_enabled?(:avatars)).to be_truthy
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
+    get "/courses/#{@course.id}/gradebook"
 
-    expect(ff('.student-name').length).to eq @all_students.size
-    expect(ff('.avatar').length).to eq @all_students.size
+    expect(ff('.student-name')).to have_size @all_students.size
+    expect(ff('.avatar')).to have_size @all_students.size
   end
 
   it "should handle muting/unmuting correctly", priority: "1", test_id: 164227 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     toggle_muting(@second_assignment)
     expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
     expect(fj('.total-cell .icon-muted')).to be_displayed
     expect(@second_assignment.reload).to be_muted
 
     # reload the page and make sure it remembered the setting
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
+    get "/courses/#{@course.id}/gradebook"
     expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
 
     # make sure you can un-mute
@@ -96,27 +93,26 @@ describe "gradebook2" do
   context "unpublished course" do
     before do
       @course.claim!
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
     end
 
     it "should allow editing grades", priority: "1", test_id: 210026 do
       cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
-      expect(f('.gradebook-cell', cell).text).to eq '10'
+      expect(f('.gradebook-cell', cell)).to include_text '10'
       cell.click
       expect(ff('.grade', cell)).to_not be_blank
     end
   end
 
   it "should validate that gradebook settings is displayed when button is clicked", priority: "1", test_id: 164217 do
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
+    get "/courses/#{@course.id}/gradebook"
 
     f('#gradebook_settings').click
     expect(f('.gradebook_dropdown')).to be_displayed
   end
 
   it "View Grading History menu item redirects to grading history page", priority: "2", test_id: 164218 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     f('#gradebook_settings').click
     fj('.ui-menu-item a:contains("View Grading History")').click
@@ -126,15 +122,14 @@ describe "gradebook2" do
   it "should validate assignment details", priority: "1", test_id: 210048 do
     submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(1)
     f('[data-action="showAssignmentDetails"]').click
-    wait_for_ajaximations
     details_dialog = f('#assignment-details-dialog')
     expect(details_dialog).to be_displayed
     table_rows = ff('#assignment-details-dialog-stats-table tr')
-    expect(table_rows[3].find_element(:css, 'td').text).to eq submissions_count
+    expect(table_rows[3].find_element(:css, 'td')).to include_text submissions_count
   end
 
   it "should include student view student for grading" do
@@ -144,7 +139,7 @@ describe "gradebook2" do
     @fake_student1.update_attribute :workflow_state, "registered"
     @fake_submission = @first_assignment.submit_homework(@fake_student1, :body => 'fake student submission')
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     fakes = [@fake_student1.name, @fake_student2.name]
     expect(ff('.student-name').last(2).map(&:text)).to eq fakes
@@ -181,8 +176,7 @@ describe "gradebook2" do
     group_assignment.submissions.create(:user => @student)
     group_assignment.grade_student @student_1, grade: 2, grader: @teacher # 0 points possible
 
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
+    get "/courses/#{@course.id}/gradebook"
     group_grade = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .assignment-group-cell .percentage')
     total_grade = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .percentage')
     expect(group_grade).to include_text('100%') # otherwise 108%
@@ -198,8 +192,7 @@ describe "gradebook2" do
                                            })
 
     assignment.mute!
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
+    get "/courses/#{@course.id}/gradebook"
 
     expect(f("body")).not_to contain_css(".total-cell .icon-muted")
   end
@@ -213,30 +206,27 @@ describe "gradebook2" do
       student_toggle.click
     end
 
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
+    get "/courses/#{@course.id}/gradebook"
 
     toggle_hiding_students
     expect(f("#content")).not_to contain_jqcss('.student-name:visible')
-    expect(ffj('.student-placeholder:visible').length).to be > 0
+    expect(fj('.student-placeholder:visible')).to be
 
     toggle_hiding_students
-    expect(ffj('.student-name:visible').length).to be > 0
+    expect(fj('.student-name:visible')).to be
     expect(f("#content")).not_to contain_jqcss('.student-placeholder:visible')
   end
 
   it "should hide and show notes", priority: "2", test_id: 164224 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     # show notes column
     gradebook_settings_cog.click
-    wait_for_ajaximations
     show_notes.click
     expect(f("#content")).to contain_jqcss('.custom_column:visible')
 
     # hide notes column
     gradebook_settings_cog.click
-    wait_for_ajaximations
     hide_notes.click
     expect(f("#content")).not_to contain_jqcss('.custom_column:visible')
   end
@@ -248,7 +238,7 @@ describe "gradebook2" do
       @first_assignment.submit_homework(@student_2, :submission_type => 'online_upload', :attachments => [a])
 
       # When I go to the gradebook
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
 
       # And I click the dropdown menu on the assignment
       f('.gradebook-header-drop').click
@@ -272,8 +262,6 @@ describe "gradebook2" do
       # And I upload it
       expect_new_page_load do
         fj('button:contains("Upload Files")').click
-        # And I wait for the upload
-        wait_for_ajax_requests
       end
 
       # Then I should see a message indicating the file was processed
@@ -282,12 +270,12 @@ describe "gradebook2" do
   end
 
   it "should show late submissions" do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     expect(f("body")).not_to contain_css(".late")
 
     @student_3_submission.write_attribute(:cached_due_date, 1.week.ago)
     @student_3_submission.save!
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     expect(ff('.late')).to have_size(1)
   end
@@ -295,17 +283,17 @@ describe "gradebook2" do
   it "should not display a speedgrader link for large courses", priority: "2", test_id: 210099 do
     Course.any_instance.stubs(:large_roster?).returns(true)
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     f('.gradebook-header-drop').click
-    expect(f('.gradebook-header-menu').text).not_to match(/SpeedGrader/)
+    expect(f('.gradebook-header-menu')).not_to include_text("SpeedGrader")
   end
 
   context 'grading quiz submissions' do
     # set up course and users
-    let(:test_course) { course() }
-    let(:teacher)     { user(active_all: true) }
-    let(:student)     { user(active_all: true) }
+    let(:test_course) { course_factory() }
+    let(:teacher)     { user_factory(active_all: true) }
+    let(:student)     { user_factory(active_all: true) }
     let!(:enroll_teacher_and_students) do
       test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
       test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
@@ -379,7 +367,6 @@ describe "gradebook2" do
 
       replace_value('#gradebook_grid input.grade', '10')
       f('#gradebook_grid input.grade').send_keys(:enter)
-      wait_for_ajaximations
       expect(f('#gradebook_grid')).not_to contain_css('.icon-quiz')
     end
   end

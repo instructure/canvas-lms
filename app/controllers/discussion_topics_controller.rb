@@ -468,7 +468,10 @@ class DiscussionTopicsController < ApplicationController
         gp_context = @context.is_a?(Group) ? @context.context : @context
         js_hash[:active_grading_periods] = GradingPeriod.json_for(gp_context, @current_user)
       end
-
+      if context.is_a?(Course)
+        js_hash[:allow_self_signup] = true  # for group creation
+        js_hash[:group_user_type] = 'student'
+      end
       js_env(js_hash)
 
       conditional_release_js_env(@topic.assignment)

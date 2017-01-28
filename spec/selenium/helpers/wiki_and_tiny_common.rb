@@ -119,6 +119,7 @@ module WikiAndTinyCommon
 
   def add_canvas_image(el, folder, filename)
     dialog = activate_editor_embed_image(el)
+    scroll_into_view('a[href="#tabUploaded"]')
     f('a[href="#tabUploaded"]', dialog).click
     expect(f('.treeLabel', dialog)).to be_displayed
     folder_el = ff('.treeLabel', dialog).detect { |e| e.text == folder }
@@ -148,6 +149,7 @@ module WikiAndTinyCommon
     clear_wiki_rce
     f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
     f('.upload_new_image_link').click
+    wait_for_animations
     wiki_page_tools_upload_file('#sidebar_upload_image_form', :image)
     in_frame wiki_page_body_ifr_id do
       expect(f('#tinymce img')).to be_displayed

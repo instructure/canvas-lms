@@ -45,7 +45,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "does not 404 if there is no submission" do
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
@@ -80,7 +80,7 @@ describe 'Submissions API', type: :request do
 
   describe "using section ids" do
     before :once do
-      @student1 = user(:active_all => true)
+      @student1 = user_factory(active_all: true)
       course_with_teacher(:active_all => true)
       @default_section = @course.default_section
       @section = factory_with_protected_attributes(@course.course_sections, :sis_source_id => 'my-section-sis-id', :name => 'section2')
@@ -326,7 +326,7 @@ describe 'Submissions API', type: :request do
     it "does not find sections in other root accounts" do
       acct = account_model(:name => 'other root')
       @first_course = @course
-      course(:active_all => true, :account => acct)
+      course_factory(active_all: true, :account => acct)
       @course.default_section.update_attribute('sis_source_id', 'my-section-sis-id')
       json = api_call(:get,
             "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions",
@@ -380,7 +380,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "returns student discussion entries for discussion_topic assignments" do
-    @student = user(:active_all => true)
+    @student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(@student).accept!
     @context = @course
@@ -449,7 +449,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "returns student discussion entries from child topics for group discussion_topic assignments" do
-    @student = user(:active_all => true)
+    @student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(@student).accept!
     group_category = @course.group_categories.create(:name => "Category")
@@ -506,7 +506,7 @@ describe 'Submissions API', type: :request do
   end
 
   def submission_with_comment
-    @student = user(:active_all => true)
+    @student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(@student).accept!
     @quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
@@ -599,7 +599,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "returns a valid preview url for quiz submissions" do
-    @student = student1 = user(:active_all => true)
+    @student = student1 = user_factory(active_all: true)
     course_with_teacher_logged_in(:active_all => true) # need to be logged in to view the preview url below
     @course.enroll_student(student1).accept!
     quiz_with_submission
@@ -624,7 +624,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "returns a correct submission_history for quiz submissions" do
-    student1 = user(:active_all => true)
+    student1 = user_factory(active_all: true)
     course_with_teacher_logged_in(:active_all => true) # need to be logged in to view the preview url below
     @course.enroll_student(student1).accept!
     quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
@@ -668,8 +668,8 @@ describe 'Submissions API', type: :request do
   end
 
   it "allows students to retrieve their own submission" do
-    student1 = user(:active_all => true)
-    student2 = user(:active_all => true)
+    student1 = user_factory(active_all: true)
+    student2 = user_factory(active_all: true)
 
     course_with_teacher(:active_all => true)
 
@@ -741,7 +741,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "returns grading information for observers" do
-    @student = user(:active_all => true)
+    @student = user_factory(active_all: true)
     e = course_with_observer(:active_all => true)
     e.associated_user_id = @student.id
     e.save!
@@ -757,7 +757,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "should api translate online_text_entry submissions" do
-    student1 = user(:active_all => true)
+    student1 = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student1).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
@@ -772,7 +772,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "allows retrieving attachments without a session" do
-    student1 = user(:active_all => true)
+    student1 = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student1).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
@@ -790,7 +790,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "allows retrieving media comments without a session" do
-    student1 = user(:active_all => true)
+    student1 = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student1).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
@@ -815,8 +815,8 @@ describe 'Submissions API', type: :request do
   end
 
   it "returns all submissions for an assignment" do
-    student1 = user(:active_all => true)
-    student2 = user(:active_all => true)
+    student1 = user_factory(active_all: true)
+    student2 = user_factory(active_all: true)
 
     course_with_teacher(:active_all => true)
 
@@ -1100,7 +1100,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "paginates submissions" do
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!({
@@ -1117,7 +1117,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "returns nothing if no assignments in the course" do
-    student1 = user(:active_all => true)
+    student1 = user_factory(active_all: true)
     student2 = user_with_pseudonym(:active_all => true)
     student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
 
@@ -1196,11 +1196,45 @@ describe 'Submissions API', type: :request do
     expect(json.first['integration_id']).to eq 'xyz'
   end
 
-  it "returns turnitin data if present" do
-    student = user(:active_all => true)
+  it "returns vericite data if present and vericite is enabled for the assignment" do
+    student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, vericite_enabled: true)
+    a1.turnitin_settings = {:originality_report_visibility => 'after_grading'}
+    a1.save!
+    submission = submit_homework(a1, student)
+    sample_vericite_data = {
+      :last_processed_attempt=>1,
+      "attachment_504177"=> {
+        :web_overlap=>73,
+        :publication_overlap=>0,
+        :error=>true,
+        :student_overlap=>100,
+        :state=>"failure",
+        :similarity_score=>100,
+        :object_id=>"123345"
+      },
+      provider: 'vericite'
+    }
+    submission.turnitin_data = sample_vericite_data
+    submission.save!
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s })
+    expect(json).to have_key 'vericite_data'
+    sample_vericite_data.delete :last_processed_attempt
+    expect(json['vericite_data']).to eq sample_vericite_data.with_indifferent_access
+  end
+
+  it "returns turnitin data if present and turnitin is enabled for the assignment" do
+    student = user_factory(active_all: true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, turnitin_enabled: true)
     a1.turnitin_settings = {:originality_report_visibility => 'after_grading'}
     a1.save!
     submission = submit_homework(a1, student)
@@ -1253,7 +1287,7 @@ describe 'Submissions API', type: :request do
 
   describe "#for_students" do
     before(:once) do
-      @student1 = user(:active_all => true)
+      @student1 = user_factory(active_all: true)
       @student2 = user_with_pseudonym(:active_all => true)
       @student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
 
@@ -1346,6 +1380,56 @@ describe 'Submissions API', type: :request do
             { student_ids: [@student1.to_param],
               order: "graded_at", order_direction: "descending" })
       expect(json.map { |a| a["assignment_id"] }).to eq [@a2.id, @a1.id, @a3.id]
+    end
+
+    context 'OriginalityReport' do
+      it 'includes has_originality_report if the submission has an originality_report' do
+        attachment_model
+        course_factory active_all: true
+        student_in_course active_all: true
+        teacher_in_course active_all: true
+        @assignment = @course.assignments.create!(title: "some assignment",
+                                                assignment_group: @group,
+                                                points_possible: 12,
+                                                tool_settings_tool: @tool)
+        @attachment.context = @student
+        @attachment.save!
+        submission = @assignment.submit_homework(@student, attachments: [@attachment])
+        OriginalityReport.create!(attachment: @attachment,
+                                  submission: submission,
+                                  workflow_state: 'pending',
+                                  originality_score: 0.1)
+
+        user_session(@teacher)
+        json = api_call(:get,
+                "/api/v1/courses/#{@course.id}/students/submissions.json",
+                { :controller => 'submissions_api', :action => 'for_students',
+                  :format => 'json', :course_id => @course.to_param },
+                { :student_ids => [@student.to_param] })
+        expect(json.first).to have_key 'has_originality_report'
+      end
+
+      it 'does not include has_originality_report if the submission has no originality_report' do
+        attachment_model
+        course_factory active_all: true
+        student_in_course active_all: true
+        teacher_in_course active_all: true
+        @assignment = @course.assignments.create!(title: "some assignment",
+                                                assignment_group: @group,
+                                                points_possible: 12,
+                                                tool_settings_tool: @tool)
+        @attachment.context = @student
+        @attachment.save!
+        @assignment.submit_homework(@student, attachments: [@attachment])
+
+        user_session(@teacher)
+        json = api_call(:get,
+                "/api/v1/courses/#{@course.id}/students/submissions.json",
+                { :controller => 'submissions_api', :action => 'for_students',
+                  :format => 'json', :course_id => @course.to_param },
+                { :student_ids => [@student.to_param] })
+        expect(json.first).not_to have_key 'has_originality_report'
+      end
     end
   end
 
@@ -1445,7 +1529,7 @@ describe 'Submissions API', type: :request do
     before do
       # set up course with DA and submit homework for an assignment
       # that is only visible to overrides for @section1
-      @student = user(:active_all => true)
+      @student = user_factory(active_all: true)
       course_with_teacher(:active_all => true)
       @section1 = @course.course_sections.create!(name: "test section")
       @section2 = @course.course_sections.create!(name: "test section")
@@ -1483,6 +1567,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "does not return the submissons if the student is not in the overriden section and has a submission with no grade" do
+          Score.where(enrollment_id: @student.enrollments).delete_all
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
           @assignment.grade_student(@student, grade: nil, grader: @teacher)
@@ -1493,6 +1578,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "returns the submissons if the student is not in the overriden section but has a graded submission" do
+          Score.where(enrollment_id: @student.enrollments).delete_all
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
           @assignment.grade_student(@student, grade: 5, grader: @teacher)
@@ -1520,6 +1606,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "does not return the submissons if the observed student is not in the overriden section and has a submission with no grade" do
+          Score.where(enrollment_id: @student.enrollments).delete_all
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
           @assignment.grade_student(@student, grade: nil, grader: @teacher)
@@ -1530,6 +1617,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "returns the submissons if the observed student is not in the overriden section but has a graded submission" do
+          Score.where(enrollment_id: @student.enrollments).delete_all
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
           @assignment.grade_student(@student, grade: 5, grader: @teacher)
@@ -1552,6 +1640,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "returns the submissons even if the student is not in the overriden section" do
+          Score.where(enrollment_id: @student.enrollments).delete_all
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
 
@@ -1569,7 +1658,7 @@ describe 'Submissions API', type: :request do
       # set up course with DA and submit homework for an assignment
       # that is only visible to overrides for @section1
       # move student to a section that cannot see assignment by default
-      @student = user(:active_all => true)
+      @student = user_factory(active_all: true)
       course_with_teacher(:active_all => true)
       @section1 = @course.course_sections.create!(name: "test section")
       @section2 = @course.course_sections.create!(name: "test section")
@@ -1577,6 +1666,7 @@ describe 'Submissions API', type: :request do
       @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, :only_visible_to_overrides => true)
       create_section_override_for_assignment(@assignment, course_section: @section1)
       submit_homework(@assignment, @student)
+      Score.where(enrollment_id: @student.enrollments).delete_all
       @student.enrollments.each(&:destroy_permanently!)
       student_in_section(@section2, user: @student)
 
@@ -1636,7 +1726,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "returns student submissions grouped by student" do
-    student1 = user(:active_all => true)
+    student1 = user_factory(active_all: true)
     student2 = user_with_pseudonym(:active_all => true)
 
     course_with_teacher(:active_all => true)
@@ -1682,7 +1772,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "returns students with no submissions when grouped" do
-    student1 = user(:active_all => true)
+    student1 = user_factory(active_all: true)
     student2 = user_with_pseudonym(:active_all => true)
     student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
 
@@ -1710,7 +1800,7 @@ describe 'Submissions API', type: :request do
 
   context "Multiple Grading Periods" do
     before :once do
-      @student1 = user(:active_all => true)
+      @student1 = user_factory(active_all: true)
       @student2 = user_with_pseudonym(:active_all => true)
 
       course_with_teacher(:active_all => true)
@@ -1893,7 +1983,7 @@ describe 'Submissions API', type: :request do
 
     context "observers" do
       before :once do
-        @observer = user :active_all => true
+        @observer = user_factory :active_all => true
         @course.enroll_user(@observer, 'ObserverEnrollment', :associated_user_id => @student1.id)
         @course.enroll_user(@observer, 'ObserverEnrollment', :allow_multiple_enrollments => true, :associated_user_id => @student2.id)
       end
@@ -2265,7 +2355,7 @@ describe 'Submissions API', type: :request do
 
   it "allows commenting by a student without trying to grade" do
     course_with_teacher(:active_all => true)
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     @course.enroll_student(student).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
 
@@ -2288,7 +2378,7 @@ describe 'Submissions API', type: :request do
 
   it "does not allow grading by a student" do
     course_with_teacher(:active_all => true)
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     @course.enroll_student(student).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
 
@@ -2306,7 +2396,7 @@ describe 'Submissions API', type: :request do
 
   it "does not allow rubricking by a student" do
     course_with_teacher(:active_all => true)
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     @course.enroll_student(student).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
 
@@ -2323,7 +2413,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "does not return submissions for no-longer-enrolled students" do
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     enrollment = @course.enroll_student(student)
     enrollment.accept!
@@ -2348,7 +2438,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "allows updating the grade for an existing submission" do
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
@@ -2375,7 +2465,7 @@ describe 'Submissions API', type: :request do
 
   it "adds hidden comments if the assignment is muted" do
     course_with_teacher(:active_all => true)
-    student    = user(:active_all => true)
+    student    = user_factory(active_all: true)
     assignment = @course.assignments.create!(:title => 'assignment')
     assignment.update_attribute(:muted, true)
     @user = @teacher
@@ -2391,7 +2481,7 @@ describe 'Submissions API', type: :request do
 
   it "does not hide student comments on muted assignments" do
     course_with_teacher(:active_all => true)
-    student    = user(:active_all => true)
+    student    = user_factory(active_all: true)
     assignment = @course.assignments.create!(:title => 'assignment')
     assignment.update_attribute(:muted, true)
     @user = student
@@ -2474,7 +2564,7 @@ describe 'Submissions API', type: :request do
   end
 
   def submit_with_grade(assignment_opts, param, score, grade)
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     a1 = @course.assignments.create!({:title => 'assignment1'}.merge(assignment_opts))
@@ -2494,7 +2584,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "allows posting a rubric assessment" do
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
@@ -2536,7 +2626,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "allows posting a comment on a submission" do
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
@@ -2557,8 +2647,8 @@ describe 'Submissions API', type: :request do
   end
 
   it "allows posting a group comment on a submission" do
-    student1 = user(:active_all => true)
-    student2 = user(:active_all => true)
+    student1 = user_factory(active_all: true)
+    student2 = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student1).accept!
     @course.enroll_student(student2).accept!
@@ -2586,7 +2676,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "allows posting a media comment on a submission, given a kaltura id" do
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
@@ -2610,7 +2700,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "allows commenting on an uncreated submission" do
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
@@ -2631,7 +2721,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "allows clearing out the current grade with a blank grade" do
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
@@ -2655,7 +2745,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "allows repeated changes to a submission to accumulate" do
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
@@ -2851,8 +2941,8 @@ describe 'Submissions API', type: :request do
       user_with_pseudonym :username => "sisuser2@example.com", :account => account2
       user3 = user_with_pseudonym :username => "sisuser3@example.com", :account => account1
       user_with_pseudonym :username => "sisuser3@example.com", :account => account2
-      user5 = user :account => account1
-      user6 = user :account => account2
+      user5 = user_factory :account => account1
+      user6 = user_factory :account => account2
       expect(@controller.map_user_ids(["sis_login_id:sisuser1@example.com", "sis_login_id:sisuser2@example.com", "sis_login_id:sisuser3@example.com", user5.id, user6.id]).sort).to eq [user1.id, user3.id, user5.id, user6.id].sort
     end
   end
@@ -3051,7 +3141,7 @@ describe 'Submissions API', type: :request do
     end
 
     it "does not allow group comments (students)" do
-      student2 = user(:active_all => true)
+      student2 = user_factory(active_all: true)
       @course.enroll_student(student2).accept!
       group_category = @course.group_categories.create(:name => "Category")
       @group = @course.groups.create(:name => "Group", :group_category => group_category, :context => @course)
@@ -3179,8 +3269,8 @@ describe 'Submissions API', type: :request do
 
   context 'bulk update' do
     before :each do
-      @student1 = user(:active_all => true)
-      @student2 = user(:active_all => true)
+      @student1 = user_factory(active_all: true)
+      @student2 = user_factory(active_all: true)
       course_with_teacher(:active_all => true)
       @default_section = @course.default_section
       @section = @course.course_sections.create!(:name => "section2")
@@ -3527,10 +3617,10 @@ describe 'Submissions API', type: :request do
   end
   describe '#index' do
     context 'grouped_submissions' do
-      let(:test_course) { course() }
-      let(:teacher)   { user(active_all: true) }
-      let(:student1)  { user(active_all: true) }
-      let(:student2)  { user(active_all: true) }
+      let(:test_course) { course_factory() }
+      let(:teacher)   { user_factory(active_all: true) }
+      let(:student1)  { user_factory(active_all: true) }
+      let(:student2)  { user_factory(active_all: true) }
       let(:group) do
         group_category = test_course.group_categories.create(name: 'Engineering')
         test_course.groups.create(name: 'Group1', group_category: group_category)

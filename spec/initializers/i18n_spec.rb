@@ -43,4 +43,48 @@ describe I18n do
       expect(Group.new.i18nliner_scope.scope).to eq "group."
     end
   end
+
+  describe ".n" do
+    before do
+      format = {
+        delimiter: '_',
+        separator: ',',
+        precision: 3,
+        format: '%n %'
+      }
+      I18n.stubs(:translate).with(:'number.format', anything).returns(format)
+      I18n.stubs(:translate).with(:'number.percentage.format', anything).returns(format)
+      I18n.stubs(:translate).with(:'number.precision.format', anything).returns(format)
+    end
+
+    context "without precision" do
+      it "uses delimiter" do
+        expect(I18n.n(1000)).to eq "1_000"
+      end
+
+      it "uses separator" do
+        expect(I18n.n(100.56)).to eq "100,56"
+      end
+    end
+
+    context "with precision" do
+      it "uses delimiter" do
+        expect(I18n.n(1000, precision: 2)).to eq "1_000,00"
+      end
+
+      it "truncates overly precise input" do
+        expect(I18n.n(1000.2345, precision: 2)).to eq "1_000,23"
+      end
+    end
+
+    context "percentage" do
+      it "formats without precision" do
+        expect(I18n.n(76.6, percentage: true)).to eq "76,6 %"
+      end
+
+      it "formats with precision" do
+        expect(I18n.n(76.6, precision: 2, percentage: true)).to eq "76,60 %"
+      end
+    end
+  end
 end

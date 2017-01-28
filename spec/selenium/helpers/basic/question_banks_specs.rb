@@ -29,11 +29,11 @@ shared_examples_for "question bank basic tests" do
 
   it "should un-bookmark a question bank" do
     question_bank = add_question_bank
-    expect(fj(".bookmark_bank_link img:visible")['src']).to include('bookmark')
-    expect(fj(".bookmark_bank_link img:visible")['src']).to_not include('bookmark_gray')
+    expect(fj(".bookmark_bank_link i:visible")).to have_class("icon-remove-bookmark")
+    expect(fj(".bookmark_bank_link i:visible")).not_to have_class("icon-bookmark")
     fj(".bookmark_bank_link:visible").click
     wait_for_ajaximations
-    expect(fj(".bookmark_bank_link img:visible")['src']).to include('bookmark_gray')
+    expect(fj(".bookmark_bank_link i:visible")).to have_class("icon-bookmark")
     question_bank.reload
     expect(question_bank.bookmarked_for?(User.last)).to be_falsey
   end

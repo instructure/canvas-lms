@@ -1,24 +1,25 @@
 require 'guard'
-require 'guard/guard'
+require 'guard/plugin'
 require 'lib/ember_bundle'
 
 module Guard
-  class EmberBundles < Guard
+  class EmberBundles < Plugin
 
     DEFAULT_OPTIONS = {
       :hide_success => false,
       :all_on_start => false
     }
 
-    def initialize(watchers=[], options={})
-      super([::Guard::Watcher.new(/(app\/coffeescripts\/ember\/)/)], {})
+    def initialize(options={})
+      options[:watchers] = [::Guard::Watcher.new(/(app\/coffeescripts\/ember\/)/)]
+      super(options)
     end
 
     def start
       run_all if options[:all_on_start]
     end
 
-    def run_on_change(paths)
+    def run_on_changes(paths)
       build_bundles(paths)
     end
 
@@ -39,10 +40,6 @@ module Guard
       Dir.entries('app/coffeescripts/ember').reject {|d| d.match(/^\./) || d == 'shared'}.each do |app|
         EmberBundle.new(app).build
       end
-    end
-
-    def run_on_deletion(paths)
-      build_bundles(paths)
     end
   end
 end

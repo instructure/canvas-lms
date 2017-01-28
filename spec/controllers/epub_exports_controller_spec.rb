@@ -160,4 +160,25 @@ describe EpubExportsController do
       end
     end
   end
+
+  context "with feature disabled" do
+    before(:each) do
+      user_session(@student)
+    end
+    it "should return 404 with the feature disabled" do
+      account = Account.default
+      account.disable_feature!(:epub_export)
+      get :index
+      expect(response.code).to eq '404'
+    end
+
+    it "should return 404 with the feature enabled and offline web enabled" do
+      account = Account.default
+      account.enable_feature!(:epub_export)
+      account.settings[:enable_offline_web_export] = true
+      account.save!
+      get :index
+      expect(response.code).to eq '404'
+    end
+  end
 end

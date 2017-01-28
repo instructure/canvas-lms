@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_dependency "lti/lti_apps_controller"
 
 module Lti
   describe LtiAppsController, :include_lti_spec_helpers, type: :request do

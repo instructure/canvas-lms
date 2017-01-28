@@ -21,6 +21,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe LearningOutcomeResult do
 
   let_once :learning_outcome_result do
+    create_and_associate_lor(quiz_model)
+  end
+
+  def create_and_associate_lor(association_object)
     assignment_model
     outcome = @course.created_learning_outcomes.create!(title: 'outcome')
 
@@ -30,9 +34,9 @@ describe LearningOutcomeResult do
         context: @course,
         learning_outcome: outcome})
       ).tap do |lor|
-        lor.association_object = quiz_model
+        lor.association_object = association_object
         lor.context = @course
-        lor.associated_asset = quiz_model
+        lor.associated_asset = association_object
         lor.save!
       end
   end
@@ -161,6 +165,59 @@ describe LearningOutcomeResult do
 
       expect(learning_outcome_result.percent).to eq 0.5143
     end
+  end
 
+  describe '#assignment' do
+    it 'returns the Assignment if association object is Assignment' do
+      assignment = assignment_model
+      lor = create_and_associate_lor(assignment)
+
+      expect(lor.assignment).to eq(assignment)
+    end
+
+    it 'returns the Assignment from the artifact if one doesnt explicitly exist' do
+      lor = create_and_associate_lor(nil)
+      lor.artifact = rubric_assessment_model(user: @user, context: @course)
+
+      expect(lor.assignment).to eq(lor.artifact.assignment)
+    end
+
+    it 'returns nil if no explicit assignment or artifact exists' do
+      lor = create_and_associate_lor(nil)
+
+      expect(lor.assignment).to eq(nil)
+    end
+  end
+
+  describe '#save_to_version' do
+    it 'updates the attempt version with the current model state' do
+      learning_outcome_result.attempt = 1
+      learning_outcome_result.save!
+      attempt1_version = learning_outcome_result.versions.current
+
+      attributes = {
+        score: 20,
+        mastery: true,
+        possible: 20,
+        attempt: 2,
+        title: "Foobar"
+      }
+
+      attributes.each do |method_name, value|
+        learning_outcome_result.send("#{method_name}=".to_sym, value)
+      end
+      learning_outcome_result.save!
+
+      updated_version = learning_outcome_result.versions.where(id: attempt1_version.id).first
+      version_model = updated_version.model
+
+      expect(version_model).not_to have_attributes(attributes)
+
+      learning_outcome_result.save_to_version(1)
+      updated_version = learning_outcome_result.versions.where(id: attempt1_version.id).first
+      version_model = updated_version.model
+
+      expect(version_model).to have_attributes(attributes)
+    end
   end
 end

@@ -245,7 +245,7 @@ class SisImportsApiController < ApplicationController
         scope = scope.where("created_at > ?", created_since)
       end
       @batches = Api.paginate(scope, self, api_v1_account_sis_imports_url)
-      render :json => ({ sis_imports: @batches})
+      render :json => ({sis_imports: @batches})
     end
   end
 
@@ -346,8 +346,8 @@ class SisImportsApiController < ApplicationController
       raise "invalid import type parameter" unless SisBatch.valid_import_types.has_key?(params[:import_type])
 
       if !api_request? && @account.current_sis_batch.try(:importing?)
-        return render :json => {:error=>true, :error_message=> t(:sis_import_in_process_notice, "An SIS import is already in process."), :batch_in_progress=>true},
-               :as_text => true
+        return render :json => {:error => true, :error_message => t(:sis_import_in_process_notice, "An SIS import is already in process."), :batch_in_progress => true},
+                      :as_text => true
       end
 
       file_obj = nil
@@ -355,15 +355,23 @@ class SisImportsApiController < ApplicationController
         file_obj = params[:attachment]
       else
         file_obj = request.body
+
         def file_obj.set_file_attributes(filename, content_type)
           @original_filename = filename
           @content_type = content_type
         end
-        def file_obj.content_type; @content_type; end
-        def file_obj.original_filename; @original_filename; end
+
+        def file_obj.content_type
+          @content_type
+        end
+
+        def file_obj.original_filename
+          @original_filename
+        end
+
         if params[:extension]
           file_obj.set_file_attributes("sis_import.#{params[:extension]}",
-                                Attachment.mimetype("sis_import.#{params[:extension]}"))
+                                       Attachment.mimetype("sis_import.#{params[:extension]}"))
         else
           env = request.env.dup
           env['CONTENT_TYPE'] = env["ORIGINAL_CONTENT_TYPE"]
@@ -371,14 +379,14 @@ class SisImportsApiController < ApplicationController
           request2 = Rack::Request.new(env)
           charset = request2.media_type_params['charset']
           if charset.present? && charset.downcase != 'utf-8'
-            return render :json => { :error => t('errors.invalid_content_type', "Invalid content type, UTF-8 required") }, :status => 400
+            return render :json => {:error => t('errors.invalid_content_type', "Invalid content type, UTF-8 required")}, :status => 400
           end
           params[:extension] ||= {"application/zip" => "zip",
                                   "text/xml" => "xml",
                                   "text/plain" => "csv",
                                   "text/csv" => "csv"}[request2.media_type] || "zip"
           file_obj.set_file_attributes("sis_import.#{params[:extension]}",
-                                request2.media_type)
+                                       request2.media_type)
         end
       end
 
@@ -386,10 +394,10 @@ class SisImportsApiController < ApplicationController
       if value_to_boolean(params[:batch_mode])
         if params[:batch_mode_term_id].present?
           batch_mode_term = api_find(@account.enrollment_terms.active,
-                                           params[:batch_mode_term_id])
+                                     params[:batch_mode_term_id])
         end
         unless batch_mode_term
-          return render :json => { :message => "Batch mode specified, but the given batch_mode_term_id cannot be found." }, :status => :bad_request
+          return render :json => {:message => "Batch mode specified, but the given batch_mode_term_id cannot be found."}, :status => :bad_request
         end
       end
 
@@ -435,10 +443,8 @@ class SisImportsApiController < ApplicationController
   # @returns SisImport
   def show
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
-      @batch = SisBatch.find(params[:id])
-      raise "Sis Import not found" unless @batch
-      raise "Batch does not match account" unless @batch.account.id == @account.id
-      render :json => @batch
+      @batch = @account.sis_batches.find(params[:id])
+      render json: @batch
     end
   end
 

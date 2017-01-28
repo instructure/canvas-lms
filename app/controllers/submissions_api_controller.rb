@@ -201,7 +201,7 @@ class SubmissionsApiController < ApplicationController
                                                            @current_user, section_ids)
                         .pluck(:user_id)
                     end
-      submissions = @assignment.submissions.where(user_id: student_ids)
+      submissions = @assignment.submissions.where(user_id: student_ids).preload(:originality_reports)
 
       if includes.include?("visibility")
         json = bulk_process_submissions_for_visibility(submissions, includes)
@@ -354,11 +354,11 @@ class SubmissionsApiController < ApplicationController
           eager_load(:user => :pseudonyms).
           where("users.id" => student_ids)
 
-      submissions = if requested_assignment_ids.present?
+      submissions_scope = if requested_assignment_ids.present?
                       Submission.where(
                         :user_id => student_ids,
                         :assignment_id => assignments
-                      ).to_a
+                      )
                     else
                       Submission.joins(:assignment).where(
                         :user_id => student_ids,
@@ -366,8 +366,9 @@ class SubmissionsApiController < ApplicationController
                         "assignments.context_id" => @context.id
                       ).where(
                         "assignments.workflow_state != 'deleted'"
-                      ).to_a
+                      )
                     end
+      submissions = submissions_scope.preload(:originality_reports).to_a
       bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
 
@@ -418,7 +419,7 @@ class SubmissionsApiController < ApplicationController
       order = "#{order_by} #{order_direction}"
       submissions = @context.submissions.except(:order).where(:user_id => student_ids).order(order)
       submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
-      submissions = submissions.preload(:user)
+      submissions = submissions.preload(:user, :originality_reports)
 
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
       Submission.bulk_load_versioned_attachments(submissions)

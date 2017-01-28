@@ -89,14 +89,15 @@ describe AssignmentsHelper do
       student_in_course(active_all: true)
       assignment_model(course: @course)
       @assignment.turnitin_enabled = true
-      @context = @assignment.context
       @assignment.update_attributes!({
         submission_types: ["online_url"]
       })
-      @context.account.update_attributes!({
-        turnitin_account_id: 12345,
-        turnitin_shared_secret: "the same combination on my luggage"
-      })
+      @context = @assignment.context
+      account = @context.account
+      account.turnitin_account_id = 12345
+      account.turnitin_shared_secret = "the same combination on my luggage"
+      account.settings[:enable_turnitin] = true
+      account.save!
     end
 
     it "returns true if turnitin is active on the assignment and account" do

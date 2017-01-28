@@ -71,8 +71,6 @@ npm-debug.log
 # generated client app stuff
 /public/javascripts/client_apps/
 
-# remove this once we move jquery into bower
-/public/javascripts/bower/jquery/
 
 # canvas-gems
 /gems/*/coverage

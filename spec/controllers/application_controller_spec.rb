@@ -693,11 +693,11 @@ describe ApplicationController do
 
   describe "#get_all_pertinent_contexts" do
     it "doesn't show unpublished courses to students" do
-      student = user(:active_all => true)
-      c1 = course
+      student = user_factory(active_all: true)
+      c1 = course_factory
       e = c1.enroll_student(student)
       e.update_attribute(:workflow_state, 'active')
-      c2 = course(:active_all => true)
+      c2 = course_factory(active_all: true)
       c2.enroll_student(student).accept!
 
       controller.instance_variable_set(:@context, student)
@@ -707,7 +707,7 @@ describe ApplicationController do
 
 
     it "doesn't touch the database if there are no valid courses" do
-      user
+      user_factory
       controller.instance_variable_set(:@context, @user)
 
       Course.expects(:where).never
@@ -715,7 +715,7 @@ describe ApplicationController do
     end
 
     it "doesn't touch the database if there are no valid groups" do
-      user
+      user_factory
       controller.instance_variable_set(:@context, @user)
 
       @user.expects(:current_groups).never
@@ -726,7 +726,7 @@ describe ApplicationController do
       specs_require_sharding
 
       it "should not asplode with cross-shard groups" do
-        user(:active_all => true)
+        user_factory(active_all: true)
         controller.instance_variable_set(:@context, @user)
 
         @shard1.activate do

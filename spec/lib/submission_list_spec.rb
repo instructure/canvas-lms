@@ -30,7 +30,7 @@ describe SubmissionList do
 
   it "should provide a dictionary in 'list'" do
     course_model
-    expect(SubmissionList.new(@course).list).to be_is_a(Dictionary)
+    expect(SubmissionList.new(@course).list).to be_is_a(Hashery::Dictionary)
   end
 
   it "should create keys in the data when versions of submissions existed" do

@@ -7,9 +7,9 @@ describe "assignments" do
 
   context "as observer" do
     before(:each) do
-      @course   = course(:active_all => true)
-      @student  = user(:active_all => true, :active_state => 'active')
-      @observer = user(:active_all => true, :active_state => 'active')
+      @course   = course_factory(active_all: true)
+      @student  = user_factory(active_all: true, :active_state => 'active')
+      @observer = user_factory(active_all: true, :active_state => 'active')
       user_session(@observer)
 
       @due_date = Time.now.utc + 12.days

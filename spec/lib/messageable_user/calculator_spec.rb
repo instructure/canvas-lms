@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe "MessageableUser::Calculator" do
   before do
-    @viewing_user = user
+    @viewing_user = user_factory
     @calculator = MessageableUser::Calculator.new(@viewing_user)
   end
 
@@ -270,8 +270,8 @@ describe "MessageableUser::Calculator" do
 
     describe "#uncached_group_ids_in_courses" do
       it "should include active groups in the courses" do
-        course1 = course
-        course2 = course
+        course1 = course_factory
+        course2 = course_factory
         group1 = group(:group_context => course1)
         group2 = group(:group_context => course2)
         ids = @calculator.uncached_group_ids_in_courses([course1, course2])
@@ -280,14 +280,14 @@ describe "MessageableUser::Calculator" do
       end
 
       it "should not include deleted groups in the courses" do
-        course
+        course_factory
         group(:group_context => @course).destroy
         expect(@calculator.uncached_group_ids_in_courses([@course])).not_to include(@group.id)
       end
 
       it "should not include groups in other courses" do
-        course1 = course
-        course2 = course
+        course1 = course_factory
+        course2 = course_factory
         group(:group_context => course1)
         expect(@calculator.uncached_group_ids_in_courses([course2])).not_to include(@group.id)
       end
@@ -395,7 +395,7 @@ describe "MessageableUser::Calculator" do
       end
 
       it "should distinguish users" do
-        calc2 = MessageableUser::Calculator.new(user)
+        calc2 = MessageableUser::Calculator.new(user_factory)
 
         enable_cache do
           @calculator.shard_cached('cache_key') { @expected1 }
@@ -471,8 +471,8 @@ describe "MessageableUser::Calculator" do
     before do
       @account1 = @shard1.activate{ Account.create! }
       @account2 = @shard2.activate{ Account.create! }
-      @course1 = course(:account => @account1, :active_all => 1)
-      @course2 = course(:account => @account2, :active_all => 1)
+      @course1 = course_factory(:account => @account1, :active_all => 1)
+      @course2 = course_factory(:account => @account2, :active_all => 1)
       course_with_student(:course => @course1, :user => @viewing_user, :active_all => 1)
       course_with_student(:course => @course2, :user => @viewing_user, :active_all => 1)
     end
@@ -541,7 +541,7 @@ describe "MessageableUser::Calculator" do
       end
 
       it "should handle shard-local observer observing cross-shard student" do
-        @shard2.activate{ @student = user }
+        @shard2.activate{ @student = user_factory }
         student_in_course(:course => @course1, :user => @student, :active_all => true)
         @observer_enrollment1.associated_user = @student
         @observer_enrollment1.save!
@@ -558,7 +558,7 @@ describe "MessageableUser::Calculator" do
       end
 
       it "should handle cross-shard observer observing cross-shard student" do
-        @shard1.activate{ @student = user }
+        @shard1.activate{ @student = user_factory }
         student_in_course(:course => @course2, :user => @student, :active_all => true)
         @observer_enrollment2.associated_user = @student
         @observer_enrollment2.save!
@@ -600,8 +600,8 @@ describe "MessageableUser::Calculator" do
 
     describe "#linked_observer_ids_by_shard" do
       before do
-        @observer1 = @shard1.activate{ user }
-        @observer2 = @shard2.activate{ user }
+        @observer1 = @shard1.activate{ user_factory }
+        @observer2 = @shard2.activate{ user_factory }
 
         @observer_enrollment1 = course_with_observer(:course => @course2, :user => @observer1, :active_all => true)
         @observer_enrollment1.associated_user = @viewing_user
@@ -791,7 +791,7 @@ describe "MessageableUser::Calculator" do
       end
 
       it "includes user who are admins of the account with no enrollments" do
-        new_admin = user
+        new_admin = user_factory
         tie_user_to_account(@viewing_user, role: admin_role)
         tie_user_to_account(new_admin, role: admin_role)
         messageable_users = @calculator.load_messageable_users([new_admin.id])
@@ -863,7 +863,7 @@ describe "MessageableUser::Calculator" do
 
       context "with conversation_id" do
         before do
-          @bob = user(:active_all => true)
+          @bob = user_factory(active_all: true)
         end
 
         it "should not affect anything if the user was already messageable" do
@@ -890,13 +890,13 @@ describe "MessageableUser::Calculator" do
         end
 
         it "should have no effect if conversation doesn't involve viewing user" do
-          charlie = user(:active_all => true)
+          charlie = user_factory(active_all: true)
           conversation(@bob, charlie)
           expect(@calculator.load_messageable_users([@bob], :conversation_id => @conversation.conversation_id)).to be_empty
         end
 
         it "should have no effect if conversation doesn't involve target user" do
-          charlie = user(:active_all => true)
+          charlie = user_factory(active_all: true)
           conversation(@viewing_user, charlie)
           expect(@calculator.load_messageable_users([@bob], :conversation_id => @conversation.conversation_id)).to be_empty
         end
@@ -1152,7 +1152,7 @@ describe "MessageableUser::Calculator" do
         end
 
         it "should include users messageable via adminned accounts" do
-          user
+          user_factory
           tie_user_to_account(@viewing_user, :role => admin_role)
           custom_role = custom_account_role('CustomStudent', :account => Account.default)
           tie_user_to_account(@user, :role => custom_role)
@@ -1163,7 +1163,7 @@ describe "MessageableUser::Calculator" do
           student_in_course(:user => @viewing_user, :active_all => true)
           group_with_user(:user => @viewing_user)
 
-          alice = user(:name => 'Alice')
+          alice = user_factory(:name => 'Alice')
           @group.add_user(alice, 'accepted')
 
           @teacher.name = 'Bob'
@@ -1224,7 +1224,7 @@ describe "MessageableUser::Calculator" do
 
         it "should properly interpret and translate exclude_ids" do
           @shard1.activate do
-            course(:account => Account.create!, :active_all => true)
+            course_factory(:account => Account.create!, :active_all => true)
             student_in_course(:user => @viewing_user, :active_all => true)
           end
 

@@ -21,6 +21,9 @@
         type="text"
         maxlength="254"
         class="input-block-level"
+        {{#if inClosedGradingPeriod}}
+          readonly
+        {{/if}}
         {{disabledIfIncludes frozenAttributes "title"}}/>
     </div>
   </div>

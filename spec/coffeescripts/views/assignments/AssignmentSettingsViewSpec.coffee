@@ -25,8 +25,6 @@ define [
       assignmentGroups: opts.assignmentGroups or assignmentGroups()
       weightsView: AssignmentGroupWeightsView
       userIsAdmin: opts.userIsAdmin
-    if opts.trigger
-      view.setTrigger(opts.trigger)
     view.open()
     view
 
@@ -66,22 +64,26 @@ define [
     equal(attributes.apply_assignment_group_weights, "0")
     view.remove()
 
-  test 'changes the checkbox icon on the menu item when apply_assignment_group_weights flag changes', ->
-    $('body').append('<a id="assignmentSettingsCog"><i class="icon-check"></i></a> ')
-    $trigger = $('#assignmentSettingsCog')
-    view = createView(trigger: $trigger[0])
+  test 'onSaveSuccess triggers weightedToggle event with expected argument', ->
+    sandbox = sinon.sandbox.create()
 
-    view.$('#apply_assignment_group_weights').click()
-    iconClass = view.$trigger.find('i').attr('class')
-
-    view.$('#apply_assignment_group_weights').click()
-    notEqual iconClass, view.$trigger.find('i').attr('class')
-
-    view.$('#apply_assignment_group_weights').click()
-    equal iconClass, view.$trigger.find('i').attr('class')
-
+    stub1 = sandbox.stub()
+    view = createView(weighted: true)
+    view.on('weightedToggle', stub1)
+    view.onSaveSuccess()
+    equal stub1.callCount, 1
+    deepEqual stub1.getCall(0).args, [true]
     view.remove()
-    $trigger.remove()
+
+    stub2 = sandbox.stub()
+    view = createView(weighted: false)
+    view.on('weightedToggle', stub2)
+    view.onSaveSuccess()
+    equal stub2.callCount, 1
+    deepEqual stub2.getCall(0).args, [false]
+    view.remove()
+
+    sandbox.restore()
 
   test 'saves group weights', ->
     view = createView(weighted: true)

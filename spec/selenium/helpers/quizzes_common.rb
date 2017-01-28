@@ -305,8 +305,8 @@ module QuizzesCommon
   end
 
   def start_quiz_question
-    get "/courses/#{@course.id}/quizzes"
-    expect_new_page_load { f('.new-quiz-link').click }
+    quiz_model(course: @course)
+    open_quiz_edit_form
     click_questions_tab
     click_new_question_button
     wait_for_ajaximations

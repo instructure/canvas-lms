@@ -14,6 +14,11 @@
         <input name="hide_enrollmentless_courses" type="hidden" value="0" />
         <input id="enroll_filter_checkbox" name="hide_enrollmentless_courses" type="checkbox" value="1" <% if params[:hide_enrollmentless_courses] == "1" %>checked="checked"<% end %>/>
         <label for="enroll_filter_checkbox"><%= t(:hide_enrollmentless_courses, "Hide enrollmentless courses") %></label>
+        <% if master_courses? %>
+        <br>
+        <input id="mc_filter_checkbox" name="only_master_courses" type="checkbox" value="1" <% if params[:only_master_courses] == "1" %>checked="checked"<% end %>/>
+        <label for="mc_filter_checkbox"><%= t("Show only blueprint courses") %></label>
+        <% end %>
         <br />
         <span aria-hidden="true" class="screenreader-only" id="course-sort-description">
           <%= t("Sort courses") %>

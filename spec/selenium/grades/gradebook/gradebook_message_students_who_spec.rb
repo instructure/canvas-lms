@@ -1,17 +1,18 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative '../../helpers/groups_common'
 
-describe "gradebook2 - message students who" do
+describe "gradebook - message students who" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
   include GroupsCommon
 
-  let!(:setup) { gradebook_data_setup }
+  before(:once) { gradebook_data_setup }
+  before(:each) { user_session(@teacher) }
 
   it "should send messages" do
     message_text = "This is a message"
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(2)
     f('[data-action="messageStudentsWho"]').click
@@ -35,7 +36,7 @@ describe "gradebook2 - message students who" do
     # student 3 has neither submitted nor been graded
 
     message_text = "This is a message"
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     open_assignment_options(2)
     f('[data-action="messageStudentsWho"]').click
     expect {
@@ -50,7 +51,7 @@ describe "gradebook2 - message students who" do
 
   it "should send messages when Scored more than X points" do
     message_text = "This is a message"
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(1)
     f('[data-action="messageStudentsWho"]').click
@@ -71,7 +72,7 @@ describe "gradebook2 - message students who" do
     submission = @third_assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 3')
     submission.save!
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     # set grade for first student, 3rd assignment
     # l4 because the the first two columns are part of the same grid
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l4', 0)
@@ -79,21 +80,20 @@ describe "gradebook2 - message students who" do
 
     # expect dialog to show 1 more student with the "Haven't been graded" option
     f('[data-action="messageStudentsWho"]').click
-    wait_for_ajaximations
     visible_students = ffj('.student_list li:visible')
-    expect(visible_students.size).to eq 2
-    expect(visible_students[0].text.strip).to include @student_name_1
+    expect(visible_students).to have_size 2
+    expect(visible_students[0]).to include_text @student_name_1
     click_option('#message_assignment_recipients .message_types', "Haven't been graded")
     visible_students = ffj('.student_list li:visible')
-    expect(visible_students.size).to eq 2
-    expect(visible_students[0].text.strip).to include @student_name_2
-    expect(visible_students[1].text.strip).to include @student_name_3
+    expect(visible_students).to have_size 2
+    expect(visible_students[0]).to include_text @student_name_2
+    expect(visible_students[1]).to include_text @student_name_3
   end
 
   it "should create separate conversations" do
     message_text = "This is a message"
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(2)
     f('[data-action="messageStudentsWho"]').click
@@ -107,7 +107,7 @@ describe "gradebook2 - message students who" do
   end
 
   it "allows the teacher to remove students from the message" do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(1)
     f('[data-action="messageStudentsWho"]').click
@@ -115,10 +115,9 @@ describe "gradebook2 - message students who" do
     message_form = f('#message_assignment_recipients')
     click_option('#message_assignment_recipients .message_types', 'Scored more than')
     message_form.find_element(:css, '.cutoff_score').send_keys('3')
-    wait_for_animations
 
     remove_buttons = ff('#message_students_dialog .student_list li:not(.blank) .remove-button')
-    expect(remove_buttons.size).to eq 3
+    expect(remove_buttons).to have_size 3
 
     remove_buttons[0].click
     wait_for_animations
@@ -133,13 +132,12 @@ describe "gradebook2 - message students who" do
     expect(message_form.find_element(:css, '.send_button')).not_to have_class('disabled')
 
     submit_form(message_form)
-    wait_for_ajax_requests
 
-    expect(ConversationBatch.last.recipient_ids).to eq([@student_2.id])
+    expect{ ConversationBatch.last.recipient_ids }.to become([@student_2.id])
   end
 
   it "disables the submit button if all students are filtered out" do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(1)
     f('[data-action="messageStudentsWho"]').click
@@ -149,16 +147,14 @@ describe "gradebook2 - message students who" do
 
     click_option('#message_assignment_recipients .message_types', 'Scored more than')
     replace_content(message_form.find_element(:css, '.cutoff_score'), '1000')
-    wait_for_animations
     expect(message_form.find_element(:css, '.send_button')).to have_class('disabled')
 
     replace_content(message_form.find_element(:css, '.cutoff_score'), '1')
-    wait_for_animations
     expect(message_form.find_element(:css, '.send_button')).not_to have_class('disabled')
   end
 
   it "disables the submit button if all students are manually removed" do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(1)
     f('[data-action="messageStudentsWho"]').click
@@ -168,10 +164,9 @@ describe "gradebook2 - message students who" do
 
     click_option('#message_assignment_recipients .message_types', 'Scored more than')
     message_form.find_element(:css, '.cutoff_score').send_keys('3')
-    wait_for_animations
 
     remove_buttons = ff('#message_students_dialog .student_list li:not(.blank) .remove-button')
-    expect(remove_buttons.size).to eq 3
+    expect(remove_buttons).to have_size 3
 
     expect(message_form.find_element(:css, '.send_button')).not_to have_class('disabled')
 
@@ -188,7 +183,7 @@ describe "gradebook2 - message students who" do
     en.deactivate
 
     message_text = "This is a message"
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(1)
     f('[data-action="messageStudentsWho"]').click

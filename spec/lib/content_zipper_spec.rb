@@ -196,7 +196,7 @@ describe ContentZipper do
 
   describe "assignment_zip_filename" do
     it "should use use course and title slugs to keep filename length down" do
-      course(active_all: true)
+      course_factory(active_all: true)
       @course.short_name = "a" * 31
       @course.save!
       assignment_model(course: @course, title: "b" * 31)

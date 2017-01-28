@@ -5,9 +5,9 @@ describe SplitUsers do
     let!(:user1) { user_model }
     let!(:user2) { user_model }
     let(:user3) { user_model }
-    let(:course1) { course(active_all: true) }
-    let(:course2) { course(active_all: true) }
-    let(:course3) { course(active_all: true) }
+    let(:course1) { course_factory(active_all: true) }
+    let(:course2) { course_factory(active_all: true) }
+    let(:course3) { course_factory(active_all: true) }
     let(:account1) { Account.default }
     let(:sub_account) { account1.sub_accounts.create! }
 

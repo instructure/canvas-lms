@@ -36,7 +36,8 @@ module EpubExports
     def epub_exports
       @_epub_exports ||= EpubExport.where({
         course_id: courses_with_feature_enabled,
-        user_id: current_user
+        user_id: current_user,
+        type: nil
       }).select("DISTINCT ON (epub_exports.course_id) epub_exports.*").
       order("course_id, created_at DESC").
       preload(:epub_attachment, :job_progress, :zip_attachment)

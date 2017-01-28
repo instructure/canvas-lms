@@ -99,7 +99,6 @@ i[class*=icon-],
 i[class^=icon-],
 a[class*=icon-],
 a[class^=icon-] {
-  font-size: 16px;
   &:before {
     font-family: "InstructureIcons-#{$icon_default}";
     display: inline-block;
@@ -111,7 +110,7 @@ a[class^=icon-] {
 
     // the specific reason for this being in the :before and not part of the <i> was to get
     // .input-appends to work with .btns that had an <i> icon in them.
-    font-size: 1rem;
+    @include fontSize(16px);
 
     // override any properties in the cascade that might make the font display incorrectly
     text-transform: none !important;

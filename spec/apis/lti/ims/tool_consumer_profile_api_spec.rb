@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
+require_dependency "lti/ims/tool_consumer_profile_controller"
 
 module Lti
   module Ims

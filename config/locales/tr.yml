@@ -5864,6 +5864,8 @@ tr:
   edit_group_c8679dba: "Grubu Düzenle"
   edit_module_item_83258f6d: "Modülü/Öğeyi Düzenle"
   edit_name_cbdef0c2: "Düzenle %{name}"
+  edit_outcome_867a0381: "Öğrenme Çıktısını Düzenle"
+  edit_outcome_group_f82e0210: "Öğrenme Çıktısı Grubunu Düzenle"
   edit_permissions_for_count_items_d65e3855: 
     one: "Şunun için izinleri düzenle: %{itemName}"
     other: "%{count} öğe için izinleri düzenle"
@@ -6676,6 +6678,7 @@ tr:
   final_grade_score_fe69a301: "Final notu: %{score}"
   find_8d605019: Ara
   find_an_existing_grading_scheme_d836ea: "Varolan Notlandırma Şeması Bul"
+  find_an_outcome_919328e6: "Bir Öğrenme Çıktısı Ara"
   find_flickr_image_view: 
     find_cc_on_flickr: "Flickr'da Creative Commons Lisanslı görseller bul"
     search: Ara
@@ -6823,6 +6826,7 @@ tr:
     student: Öğrenci
     student_index: "%{index} Öğrenci"
     student_mute_notification: "Öğretim elemanı notlar üzerinde çalışıyor"
+    submit: Gönder
     titles: 
       click_to_record: "Konuşmayı metne"
       hypothetical_score: "Bu bir ... olsaydı Ne Olurdu? puanı"
@@ -10532,6 +10536,7 @@ tr:
   new_group_set_7241a581: "Yeni Grup Seti"
   new_module_4e9287e4: "Yeni Modül"
   new_outcome_7fba8c7d: "Yeni Öğrenme Çıktısı"
+  new_outcome_group_af59f145: "Yeni Öğrenme Çıktısı Grubu"
   new_question_9107c469: "Yeni Soru"
   new_question_group_d9306280: "Yeni Soru Grubu"
   new_quiz_statistics_desc: "Ders için yeni kısa sınav istatistik sayfasını etkinleştir."
@@ -10976,6 +10981,7 @@ tr:
       links: 
         back: Geri
         find: Ara
+        new_outcome: "Öğrenme Çıktıları"
     common_core: "Ortak Temel Standartlar"
     common_core_description: "Sol tarafta Common Core State Standards	Common Core State Standards'ın her gruplaması için bilindik öğrenme çıktıları klasör yapısını göreceksiniz. Bu sayede dersinizde notlandırma için kolay bir şekilde Common Core Standards'tan herhangi birini kullanabilirsiniz."
     confirm: 
@@ -15179,6 +15185,7 @@ tr:
       Teşekkürler,
       Canvas Destek
   the_module_item_is_locked_27fe420b: "Bu modül henüz kilitlidir."
+  the_most_recent_scores_for_user_current_user_name__ea82f0b6: " %{current_user_name} için en son puan ve %{outcome_name} öğrenme çıktısı."
   the_profile_picture_has_been_reported_d609d6dd: "Profil resmi rapor edildi"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Sağlanan Academic Benchmark dosyasında hata var"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Belirtilen kullanıcı (%{id}) bu derste öğrenci değildir"
@@ -15218,6 +15225,7 @@ tr:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Muhtemelen ders içeriklerini ilgili dosyalar olmadan içe aktardığınız için bu durum oluştu."
   this_name_appears_in_sorted_lists_dccbd84b: "Bu ad sıralama kriteri listelerinde görünür."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Bu isim puanlandırmada öğretmenler tarafından kullanılacaktır."
+  this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Bu öğrenme çıktısı bir öğrenciyi değerlendirmek için kullanılmış durumda ve artık güncellenemez"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Bu öğrenme çıktısı bir öğrencinin değerlendirilmesinde kullanıldı ve düzenlenip silinemez"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Bu kısa sınav yayınlanmadı* Sadece öğretmenler bu kısa sınav yayınlanana kadar görebilirler."
   this_student_wrote_f1a3f22d: "Bu öğrenci şunu yazmış:"

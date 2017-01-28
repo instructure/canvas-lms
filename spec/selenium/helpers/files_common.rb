@@ -6,11 +6,12 @@ module FilesCommon
   # - fixture: location of the file to be uploaded
   # - context: course in which file would be uploaded
   # - name: file name
-  def add_file(fixture, context, name)
+  # - folder: course folder it should go under (defaults to root folder)
+  def add_file(fixture, context, name, folder = Folder.root_folders(context).first)
     context.attachments.create! do |attachment|
       attachment.uploaded_data = fixture
       attachment.filename = name
-      attachment.folder = Folder.root_folders(context).first
+      attachment.folder = folder
     end
   end
 
@@ -157,6 +158,7 @@ module FilesCommon
   end
 
   def all_files_folders
+    # TODO: switch to ff once specs stop using this to find non-existence of stuff
     driver.find_elements(:class, 'ef-item-row')
   end
 
@@ -176,7 +178,7 @@ module FilesCommon
       ff(".name.text")[3].click
       ff(".btn-primary")[3].click
     elsif insert_into == :discussion
-      ff(".btn-primary")[2].click
+      f("#edit_discussion_form_buttons .btn-primary").click
     else
       f(".btn-primary").click
     end

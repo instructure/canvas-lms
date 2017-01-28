@@ -79,7 +79,7 @@ describe "Outcome Groups API", type: :request do
   def assess_with(outcome, context, user = nil)
     assignment = assignment_model(context: context)
     rubric = add_or_get_rubric(outcome)
-    user ||= user(:active_all => true)
+    user ||= user_factory(active_all: true)
     context.enroll_student(user) unless context.student_enrollments.exists?(user_id: user.id)
     a = rubric.associate_with(assignment, context, :purpose => 'grading')
     assignment.reload

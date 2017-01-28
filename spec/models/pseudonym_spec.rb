@@ -154,7 +154,7 @@ describe Pseudonym do
   end
 
   it "should change a blank sis_user_id to nil" do
-    user
+    user_factory
     pseudonym = Pseudonym.new(:user => @user, :unique_id => 'test@example.com', :password => 'passwd123')
     pseudonym.password_confirmation = 'passwd123'
     pseudonym.sis_user_id = ''
@@ -434,7 +434,7 @@ describe Pseudonym do
 
     let(:bob) { student_in_course(
       user: student_in_course(account: account2).user,
-      course: course(account: account1)).user }
+      course: course_factory(account: account1)).user }
 
     let(:charlie) { student_in_course(account: account2).user }
 

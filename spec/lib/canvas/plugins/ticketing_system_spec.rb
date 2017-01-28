@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_dependency "canvas/plugins/ticketing_system"
 
 module Canvas::Plugins
   describe TicketingSystem do

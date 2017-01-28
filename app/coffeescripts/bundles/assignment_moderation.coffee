@@ -4,6 +4,7 @@ require [
   'react-dom'
   'jsx/assignments/ModerationApp'
   'jsx/assignments/store/configureStore'
+  'jsx/context_cards/StudentContextCardTrigger'
 ], ($, React, ReactDOM, ModerationApp, configureStore) ->
 
   ModerationAppFactory = React.createFactory ModerationApp
@@ -23,7 +24,8 @@ require [
     },
     assignment: {
       published: window.ENV.GRADES_PUBLISHED,
-      title: window.ENV.ASSIGNMENT_TITLE
+      title: window.ENV.ASSIGNMENT_TITLE,
+      course_id: window.ENV.COURSE_ID,
     },
     flashMessage: {
       error: false,

@@ -31,7 +31,7 @@ describe 'Submissions::ShowHelper' do
 
     describe '#render_user_not_found' do
       before do
-        course
+        course_factory
         assignment_model
         routes.draw { get 'anonymous' => 'anonymous#show' }
       end

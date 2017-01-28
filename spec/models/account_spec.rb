@@ -522,6 +522,7 @@ describe Account do
       account.role_overrides.create!(:permission => 'read_reports', :role => (k == :site_admin ? @sa_role : @root_role), :enabled => true)
       account.role_overrides.create!(:permission => 'reset_any_mfa', :role => @sa_role, :enabled => true)
       # clear caches
+      account.tap{|a| a.settings[:mfa_settings] = :optional; a.save!}
       v[:account] = Account.find(account)
     end
     RoleOverride.clear_cached_contexts
@@ -578,7 +579,7 @@ describe Account do
     a.settings = { :no_enrollments_can_create_courses => true }
     a.save!
 
-    user
+    user_factory
     expect(a.grants_right?(@user, :create_courses)).to be_truthy
   end
 
@@ -586,7 +587,7 @@ describe Account do
     a = Account.site_admin
     a.settings = { :no_enrollments_can_create_courses => true }
     manual = a.manually_created_courses_account
-    user
+    user_factory
 
     expect(a.grants_right?(@user, :create_courses)).to eq false
     expect(manual.grants_right?(@user, :create_courses)).to eq false
@@ -892,13 +893,13 @@ describe Account do
     it "should be preferred for anyone if open registration is turned on" do
       account.settings = { :open_registration => true }
       expect(account.user_list_search_mode_for(nil)).to eq :preferred
-      expect(account.user_list_search_mode_for(user)).to eq :preferred
+      expect(account.user_list_search_mode_for(user_factory)).to eq :preferred
     end
 
     it "should be preferred for account admins" do
       expect(account.user_list_search_mode_for(nil)).to eq :closed
-      expect(account.user_list_search_mode_for(user)).to eq :closed
-      user
+      expect(account.user_list_search_mode_for(user_factory)).to eq :closed
+      user_factory
       account.account_users.create!(user: @user)
       expect(account.user_list_search_mode_for(@user)).to eq :preferred
     end
@@ -909,7 +910,7 @@ describe Account do
 
     it "should properly return site admin permissions regardless of active shard" do
       enable_cache do
-        user
+        user_factory
         site_admin = Account.site_admin
         site_admin.account_users.create!(user: @user)
 
@@ -918,7 +919,7 @@ describe Account do
         end
         expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_truthy
 
-        user
+        user_factory
         @shard1.activate do
           expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_falsey
         end
@@ -953,7 +954,7 @@ describe Account do
     end
 
     it "should grant :read_outcomes to enrollees in account courses" do
-      course(:account => Account.default)
+      course_factory(:account => Account.default)
       teacher_in_course
       student_in_course
       expect(Account.default.grants_right?(@teacher, :read_outcomes)).to be_truthy
@@ -961,7 +962,7 @@ describe Account do
     end
 
     it "should grant :read_outcomes to enrollees in subaccount courses" do
-      course(:account => Account.default.sub_accounts.create!)
+      course_factory(:account => Account.default.sub_accounts.create!)
       teacher_in_course
       student_in_course
       expect(Account.default.grants_right?(@teacher, :read_outcomes)).to be_truthy
@@ -1080,7 +1081,7 @@ describe Account do
   describe "account_users_for" do
     it "should be cache coherent for site admin" do
       enable_cache do
-        user
+        user_factory
         sa = Account.site_admin
         expect(sa.account_users_for(@user)).to eq []
 
@@ -1102,7 +1103,7 @@ describe Account do
 
       it "should be cache coherent for site admin" do
         enable_cache do
-          user
+          user_factory
           sa = Account.site_admin
           @shard1.activate do
             expect(sa.account_users_for(@user)).to eq []
@@ -1562,7 +1563,7 @@ describe Account do
         ActiveRecord::Base.connection.stubs(:use_qualified_names?).returns(true)
         @shard1.activate do
           @account = Account.create!
-          @user = user(:name => "silly name")
+          @user = user_factory(:name => "silly name")
           @user.account_users.create(:account => @account)
         end
         expect(@account.users_name_like("silly").first).to eq @user

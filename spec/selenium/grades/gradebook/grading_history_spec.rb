@@ -1,7 +1,7 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2 - Grading History" do
-  include Gradebook2Common
+describe "gradebook - Grading History" do
+  include GradebookCommon
   include_context 'in-process server selenium tests'
   include_context 'reusable_course'
 

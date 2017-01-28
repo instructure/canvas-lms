@@ -89,7 +89,7 @@ describe ConferencesController, type: :request do
 
     it "should work with cross-shard invitees" do
       @shard1.activate do
-        @student = user(:active_all => true)
+        @student = user_factory(active_all: true)
       end
       course_with_teacher(:active_all => true)
       @course.enroll_student(@student).accept!

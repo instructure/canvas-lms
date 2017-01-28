@@ -1,11 +1,11 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative '../page_objects/srgb_page'
 require_relative '../setup/gradebook_setup'
 
 describe 'Screenreader Gradebook grading' do
   include_context 'in-process server selenium tests'
   include_context 'reusable_course'
-  include Gradebook2Common
+  include GradebookCommon
   include GradebookSetup
 
   let(:srgb_page) { SRGB }

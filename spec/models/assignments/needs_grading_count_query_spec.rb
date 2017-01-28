@@ -17,6 +17,7 @@
 #
 #
 require_relative "../../spec_helper.rb"
+require_dependency "assignments/needs_grading_count_query"
 
 module Assignments
   describe NeedsGradingCountQuery do
@@ -121,8 +122,8 @@ module Assignments
             @students << student
           end
 
-          @ta1 = ta_in_course(:course => course, :active_all => true).user
-          @ta2 = ta_in_course(:course => course, :active_all => true).user
+          @ta1 = ta_in_course(:course => course_factory, :active_all => true).user
+          @ta2 = ta_in_course(:course => course_factory, :active_all => true).user
         end
 
         it "should only include students with no marks when unmoderated" do

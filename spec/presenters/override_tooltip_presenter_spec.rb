@@ -14,7 +14,7 @@ describe OverrideTooltipPresenter do
 
     it 'returns a unique selector for the assignment' do
       quiz = Quizzes::Quiz.new(title: 'some quiz')
-      quiz.context = course
+      quiz.context = course_factory
       quiz.save
 
       presenter = OverrideTooltipPresenter.new(quiz)

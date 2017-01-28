@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_dependency "messages/asset_context"
 
 module Messages
 

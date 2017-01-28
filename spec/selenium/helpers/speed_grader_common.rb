@@ -1,6 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative "../grades/page_objects/speedgrader_page"
 
 module SpeedGraderCommon
+
   def student_submission(options = {})
     submission_model({:assignment => @assignment, :body => "first student submission text"}.merge(options))
   end
@@ -73,16 +75,17 @@ module SpeedGraderCommon
   end
 
   def cycle_students_correctly(direction_string)
-    current_index = @students.index(@students.find { |l| l.name == f(selectedStudent).text })
+    current_index = @students.index(@students.find { |l| l.name == Speedgrader.selected_student.text })
 
-    f(direction_string).click
+    Speedgrader.click_next_or_prev_student(direction_string)
 
-    direction = direction_string.include?(next_) ? 1 : -1
+    # move onto next student
+    direction = direction_string.equal?(:next) ? 1 : -1
     new_index = (current_index + direction) % @students.length
-    student_X_of_X_string = "Student #{new_index + 1} of #{@students.length}"
+    student_x_of_x_string = "Student #{new_index + 1} of #{@students.length}"
 
-    f(selectedStudent).text.include?(@students[new_index].name) &&
-        f(studentXofXlabel).text.include?(student_X_of_X_string)
+    Speedgrader.selected_student.text.include?(@students[new_index].name) &&
+        Speedgrader.student_x_of_x_label.text.include?(student_x_of_x_string)
   end
 
   def expand_right_pane

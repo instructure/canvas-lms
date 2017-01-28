@@ -40,9 +40,9 @@ describe ContextController do
     end
 
     it "should only show active group members to students" do
-      active_student = user
+      active_student = user_factory
       @course.enroll_student(active_student).accept!
-      inactive_student = user
+      inactive_student = user_factory
       @course.enroll_student(inactive_student).deactivate
 
       @group = @course.groups.create!
@@ -56,9 +56,9 @@ describe ContextController do
     end
 
     it "should only show active course instructors to students" do
-      active_teacher = user
+      active_teacher = user_factory
       @course.enroll_teacher(active_teacher).accept!
-      inactive_teacher = user
+      inactive_teacher = user_factory
       @course.enroll_teacher(inactive_teacher).deactivate
 
       @group = @course.groups.create!
@@ -71,9 +71,9 @@ describe ContextController do
     end
 
     it "should show all group members to admins" do
-      active_student = user
+      active_student = user_factory
       @course.enroll_student(active_student).accept!
-      inactive_student = user
+      inactive_student = user_factory
       @course.enroll_student(inactive_student).deactivate
 
       @group = @course.groups.create!
@@ -98,6 +98,9 @@ describe ContextController do
       end
 
       it "is enabled for teachers when feature_flag is on" do
+        %w[manage_students manage_admin_users].each do |perm|
+          RoleOverride.manage_role_override(Account.default, teacher_role, perm, override: false)
+        end
         user_session(@teacher)
         get :roster, course_id: @course.id
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be true
@@ -119,7 +122,7 @@ describe ContextController do
 
     it "should assign variables" do
       user_session(@teacher)
-      @enrollment = @course.enroll_student(user(:active_all => true))
+      @enrollment = @course.enroll_student(user_factory(:active_all => true))
       @enrollment.accept!
       @student = @enrollment.user
       get 'roster_user', :course_id => @course.id, :id => @student.id
@@ -136,12 +139,12 @@ describe ContextController do
 
       it 'allows merged users from other shards to be referenced' do
         user1 = user_model
-        course1 = course(:active_all => 1)
+        course1 = course_factory(active_all: true)
         course1.enroll_user(user1)
 
         @shard2.activate do
           @user2 = user_model
-          @course2 = course(:active_all => 1)
+          @course2 = course_factory(active_all: true)
           @course2.enroll_user(@user2)
         end
 

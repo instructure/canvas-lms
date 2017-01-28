@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
+require_dependency "lti/membership_service/group_lis_person_collator"
 
 module Lti::MembershipService
   describe GroupLisPersonCollator do

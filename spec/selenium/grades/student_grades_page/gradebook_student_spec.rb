@@ -1,9 +1,13 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative './gradebook_student_common'
+require_relative '../setup/gradebook_setup'
+require_relative '../page_objects/student_grades_page'
+
 
 describe 'Student Gradebook' do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
+  include GradebookSetup
 
   let(:assignments) do
     assignments = []
@@ -16,6 +20,8 @@ describe 'Student Gradebook' do
     end
     assignments
   end
+
+  let(:student_grades_page) { StudentGradesPage.new }
 
   grades = [
     5, 10, 15,
@@ -55,7 +61,7 @@ describe 'Student Gradebook' do
 
       scores = []
       if role == 'observer'
-        observer = user(name: 'Observer', active_all: true, active_state: 'active')
+        observer = user_factory(name: 'Observer', active_all: true, active_state: 'active')
         [course1, course2, course3].each do |course|
 
           enrollment = ObserverEnrollment.new(user: observer,
@@ -83,6 +89,7 @@ describe 'Student Gradebook' do
 
   it 'shows assignment details', priority: '1', test_id: 164023 do
     init_course_with_students 3
+    user_session(@teacher)
 
     means = []
     [0, 3, 6].each do |i|
@@ -107,9 +114,9 @@ describe 'Student Gradebook' do
 
     expectations.each_with_index do |expectation, index|
       i = index * 4 # each detail row has 4 items, we only want the first 3
-      expect(details[i].text).to eq "Mean: #{expectation[:mean]}"
-      expect(details[i + 1].text).to eq "High: #{expectation[:high]}"
-      expect(details[i + 2].text).to eq "Low: #{expectation[:low]}"
+      expect(details[i]).to include_text "Mean: #{expectation[:mean]}"
+      expect(details[i + 1]).to include_text "High: #{expectation[:high]}"
+      expect(details[i + 2]).to include_text "Low: #{expectation[:low]}"
     end
 
     f('#show_all_details_button').click
@@ -127,33 +134,55 @@ describe 'Student Gradebook' do
 
   it 'calculates grades based on graded assignments', priority: '1', test_id: 164025 do
     init_course_with_students
+    user_session(@teacher)
 
     assignments[0].grade_student @students[0], grade: 20, grader: @teacher
     assignments[1].grade_student @students[0], grade: 20, grader: @teacher
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
-    expect(f('.final_grade .grade').text).to eq '100%'
+    expect(f('.final_grade .grade')).to include_text '100%'
 
     f('#only_consider_graded_assignments_wrapper').click
-    expect(f('.final_grade .grade').text).to eq '66.67%'
+    expect(f('.final_grade .grade')).to include_text '66.67%'
+  end
+
+  it 'follows grade dropping rules', test_id: 164009, priority: '1' do
+    add_teacher_and_student
+    @group = @course.assignment_groups.create!(name: 'Group1', rules: 'drop_lowest:1')
+
+    a1 = @course.assignments.create!(points_possible: 20, title: "Assignment 1", assignment_group: @group)
+    a2 = @course.assignments.create!(points_possible: 20, title: "Assignment 2", assignment_group: @group)
+    a3 = @course.assignments.create!(points_possible: 40, title: "Assignment 3", assignment_group: @group)
+
+    a1.grade_student(@student, grade: 15, grader: @teacher)
+    a2.grade_student(@student, grade: 10, grader: @teacher)
+    a3.grade_student(@student, grade: 19, grader: @teacher)
+
+    user_session(@teacher)
+    student_grades_page.visit_as_teacher(@course, @student)
+    expect(student_grades_page.assignment_row(a3)).to have_class 'dropped'
+
+    user_session(@student)
+    student_grades_page.visit_as_student(@course)
+    expect(student_grades_page.assignment_row(a3)).to have_class 'dropped'
   end
 
   context 'Comments' do
     # create a course, publish and enroll teacher and student
-    let(:test_course) { course() }
-    let(:teacher) { user(active_all: true) }
-    let(:student) { user(active_all: true) }
-    let!(:published_course) do
+    let_once(:test_course) { course_factory() }
+    let_once(:teacher) { user_factory(active_all: true) }
+    let_once(:student) { user_factory(active_all: true) }
+    let_once(:published_course) do
       test_course.workflow_state = 'available'
       test_course.save!
       test_course
     end
-    let!(:enroll_teacher_and_students) do
+    let_once(:enroll_teacher_and_students) do
       published_course.enroll_teacher(teacher).accept!
       published_course.enroll_student(student, enrollment_state: 'active')
     end
     # create an assignment and submit as a student
-    let(:assignment) do
+    let_once(:assignment) do
       published_course.assignments.create!(
         title: 'Assignment Yay',
         grading_type: 'points',
@@ -161,8 +190,8 @@ describe 'Student Gradebook' do
         submission_types: 'online_upload'
       )
     end
-    let(:file_attachment) { attachment_model(:content_type => 'application/pdf', :context => student) }
-    let!(:student_submission) do
+    let_once(:file_attachment) { attachment_model(:content_type => 'application/pdf', :context => student) }
+    let_once(:student_submission) do
       assignment.submit_homework(
         student,
         submission_type: 'online_upload',
@@ -170,7 +199,7 @@ describe 'Student Gradebook' do
       )
     end
     # leave a comment as a teacher
-    let!(:teacher_comment) { student_submission.submission_comments.create!(comment: 'good job')}
+    let_once(:teacher_comment) { student_submission.submission_comments.create!(comment: 'good job')}
 
     it 'should display comments from a teacher on student grades page', priority: "1", test_id: 537621 do
       user_session(student)

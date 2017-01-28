@@ -187,6 +187,21 @@ module CanvasRails
       val.constantize
     end
 
+    module PatchThorWarning
+      # active_model_serializers should be passing `type: :boolean` here:
+      # https://github.com/rails-api/active_model_serializers/blob/v0.9.0.alpha1/lib/active_model/serializer/generators/serializer/scaffold_controller_generator.rb#L10
+      # but we don't really care about the warning, it only affects using the rails
+      # generator for a resource
+      #
+      # Easiest way to avoid the warning for now is to patch thor
+      def validate_default_type!
+        return if switch_name == "--serializer" 
+        super
+      end
+    end
+
+    Autoextend.hook(:"Thor::Option", PatchThorWarning, method: :prepend)
+
     # Extend any base classes, even gem classes
     Dir.glob("#{Rails.root}/lib/ext/**/*.rb").each { |file| require file }
 

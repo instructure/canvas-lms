@@ -117,7 +117,7 @@ describe EventStream::Stream do
     it "returns false when not available" do
       # can't access spec ivars inside instance_exec
       database, table = self.database, @table
-      database.stub(:available?).and_return(false)
+      allow(database).to receive(:available?).and_return(false)
       id_column = double(:to_s => double('id_column'))
       record_type = double('record_type')
 
@@ -434,7 +434,7 @@ describe EventStream::Stream do
       before do
         @database = double('database')
         def @database.available?; true end
-        @stream.stub(:database).and_return(@database)
+        allow(@stream).to receive(:database).and_return(@database)
         @record = double(
           :id => 'id',
           :created_at => Time.now,
@@ -463,13 +463,13 @@ describe EventStream::Stream do
           @stream.raise_on_error = true
           @stream.on_error{ spy.trigger }
           expect(spy).to receive(:trigger).once
-          expect{ @stream.insert(@record) }.to raise_exception
+          expect{ @stream.insert(@record) }.to raise_exception(Exception)
         end
       end
 
       context "failing database" do
         before do
-          @database.stub(:batch).and_raise(@exception)
+          allow(@database).to receive(:batch).and_raise(@exception)
         end
 
         include_examples "error callbacks"
@@ -477,10 +477,10 @@ describe EventStream::Stream do
 
       context "failing callbacks" do
         before do
-          @database.stub(:batch).and_yield
-          @database.stub(:insert_record)
-          @database.stub(:update_record)
-          @database.stub(:keyspace)
+          allow(@database).to receive(:batch).and_yield
+          allow(@database).to receive(:insert_record)
+          allow(@database).to receive(:update_record)
+          allow(@database).to receive(:keyspace)
 
           exception = @exception
           @stream.on_insert{ raise exception }

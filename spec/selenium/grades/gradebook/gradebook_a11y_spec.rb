@@ -1,15 +1,20 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2" do
+describe "gradebook" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
+  let(:extra_setup) { }
   let(:active_element) { driver.switch_to.active_element }
-  let(:setup) { gradebook_data_setup }
+
+  before(:once) do
+    gradebook_data_setup
+  end
 
   before(:each) do
-    setup
-    get "/courses/#{@course.id}/gradebook2"
+    extra_setup
+    user_session(@teacher)
+    get "/courses/#{@course.id}/gradebook"
   end
 
   context "export menu" do
@@ -21,10 +26,7 @@ describe "gradebook2" do
     end
 
     context "when a csv already exists" do
-      # This "let(:setup)" is overriding "let(:setup) { gradebook_data_setup }"
-      let(:setup) do
-        gradebook_data_setup
-
+      let(:extra_setup) do
         attachment = @course.attachments.create!(uploaded_data: default_uploaded_data)
         progress = @course.progresses.new(tag: 'gradebook_export')
         progress.workflow_state = 'completed'
@@ -35,7 +37,7 @@ describe "gradebook2" do
       end
 
       it "maintains focus on export button during past csv export", priority: "2", test_id: 720460 do
-        wait_for_ajaximations
+        wait_for_ajax_requests
         f('#csv_export_options .ui-menu-item:not(.generate_new_csv)').click
         expect(active_element).to have_attribute('id', 'download_csv')
       end

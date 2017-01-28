@@ -22,7 +22,7 @@ class GradingPeriod < ActiveRecord::Base
   attr_accessible :weight, :start_date, :end_date, :close_date, :title
 
   belongs_to :grading_period_group, inverse_of: :grading_periods
-  has_many :grading_period_grades, dependent: :destroy
+  has_many :scores, -> { active }, dependent: :destroy
 
   validates :title, :start_date, :end_date, :close_date, :grading_period_group_id, presence: true
   validate :start_date_is_before_end_date
@@ -32,11 +32,13 @@ class GradingPeriod < ActiveRecord::Base
   before_validation :adjust_close_date_for_course_period
   before_validation :ensure_close_date
 
+  after_save :recompute_scores, if: :dates_changed?
+
   scope :current, -> do
     period_table = GradingPeriod.arel_table
     now = Time.zone.now
-    where(period_table[:start_date].lteq(now)).
-      where(period_table[:end_date].gt(now))
+    where(period_table[:start_date].lt(now)).
+      where(period_table[:end_date].gteq(now))
   end
 
   scope :grading_periods_by, ->(context_with_ids) do
@@ -109,7 +111,7 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def in_date_range?(date)
-    start_date <= date && date < end_date
+    start_date < date && date <= end_date
   end
 
   def last?
@@ -163,7 +165,7 @@ class GradingPeriod < ActiveRecord::Base
 
   scope :overlaps, ->(from, to) do
     # sourced: http://c2.com/cgi/wiki?TestIfDateRangesOverlap
-    where('((start_date < ?) and (end_date > ?))', to, from)
+    where('((end_date > ?) and (start_date < ?))', from, to)
   end
 
   def not_overlapping
@@ -207,5 +209,20 @@ class GradingPeriod < ActiveRecord::Base
     if close_date.present? && end_date.present? && close_date < end_date
       errors.add(:close_date, t('must be on or after end date'))
     end
+  end
+
+  def recompute_scores
+    if course_group?
+      courses = [grading_period_group.course]
+    else
+      term_ids = grading_period_group.enrollment_terms.pluck(:id)
+      courses = Course.where(enrollment_term_id: term_ids)
+    end
+    # Course#recompute_student_scores is asynchronous
+    courses.each { |course| course.recompute_student_scores(grading_period_id: self.id) }
+  end
+
+  def dates_changed?
+    start_date_changed? || end_date_changed?
   end
 end

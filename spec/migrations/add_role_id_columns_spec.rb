@@ -66,10 +66,10 @@ describe 'AddRoleIdColumns', shared_db: false do
       # shares same name as @account_role2, but belongs to @sub_account2
       account_role2_lookalike = create_role(@sub_account2, "accountrole2", 'AccountMembership')
 
-      plain_au = @sub_sub_account.account_users.create!(:user => user)
-      role1_au = @sub_account1.account_users.create!(:user => user, :role => @account_role1)
-      role2_au = @sub_sub_account.account_users.create!(:user => user, :role => @account_role2)
-      lookalike_au = @sub_account2.account_users.create!(:user => user, :role => account_role2_lookalike)
+      plain_au = @sub_sub_account.account_users.create!(:user => user_factory)
+      role1_au = @sub_account1.account_users.create!(:user => user_factory, :role => @account_role1)
+      role2_au = @sub_sub_account.account_users.create!(:user => user_factory, :role => @account_role2)
+      lookalike_au = @sub_account2.account_users.create!(:user => user_factory, :role => account_role2_lookalike)
 
       @post_migration.down
       @pre_migration.down
@@ -89,25 +89,25 @@ describe 'AddRoleIdColumns', shared_db: false do
       # with a built-in role
       id1 = AccountUser.connection.insert("INSERT INTO #{AccountUser.quoted_table_name}(
         account_id, user_id, membership_type, created_at, updated_at)
-        VALUES(#{@sub_account1.id}, #{user.id}, 'AccountAdmin', '2014-07-07', '2014-07-07')")
+        VALUES(#{@sub_account1.id}, #{user_factory.id}, 'AccountAdmin', '2014-07-07', '2014-07-07')")
       expect(AccountUser.find(id1).role_id).to eq admin_role.id
 
       # with role 1 for @sub_account1
       id2 = AccountUser.connection.insert("INSERT INTO #{AccountUser.quoted_table_name}(
         account_id, user_id, membership_type, created_at, updated_at)
-        VALUES(#{@sub_account1.id}, #{user.id}, 'accountrole1', '2014-07-07', '2014-07-07')")
+        VALUES(#{@sub_account1.id}, #{user_factory.id}, 'accountrole1', '2014-07-07', '2014-07-07')")
       expect(AccountUser.find(id2).role_id).to eq @account_role1.id
 
       # with role 2 for @sub_account1
       id3 = AccountUser.connection.insert("INSERT INTO #{AccountUser.quoted_table_name}(
         account_id, user_id, membership_type, created_at, updated_at)
-        VALUES(#{@sub_account1.id}, #{user.id}, 'accountrole2', '2014-07-07', '2014-07-07')")
+        VALUES(#{@sub_account1.id}, #{user_factory.id}, 'accountrole2', '2014-07-07', '2014-07-07')")
       expect(AccountUser.find(id3).role_id).to eq @account_role2.id
 
       # with the role name meant for the lookalike
       id4 = AccountUser.connection.insert("INSERT INTO #{AccountUser.quoted_table_name}(
         account_id, user_id, membership_type, created_at, updated_at)
-        VALUES(#{@sub_account2.id}, #{user.id}, 'accountrole2', '2014-07-07', '2014-07-07')")
+        VALUES(#{@sub_account2.id}, #{user_factory.id}, 'accountrole2', '2014-07-07', '2014-07-07')")
       expect(AccountUser.find(id4).role_id).to eq account_role2_lookalike.id
 
       # also make sure the data fixes worked
@@ -118,10 +118,10 @@ describe 'AddRoleIdColumns', shared_db: false do
     end
 
     it "should convert enrollment role_name column to role_id" do
-      @user = user
+      @user = user_factory
       @course_role2.update_attribute(:workflow_state, "inactive")
-      ssa1_course = course(:account => @sub_sub_account)
-      sa2_course = course(:account => @sub_account2)
+      ssa1_course = course_factory(:account => @sub_sub_account)
+      sa2_course = course_factory(:account => @sub_account2)
 
       # shares same name as @course_role2, but belongs to @sub_account2
       course_role2_lookalike = create_role(@sub_account2, "courserole2", 'StudentEnrollment')
@@ -141,7 +141,7 @@ describe 'AddRoleIdColumns', shared_db: false do
       expect(Enrollment.connection.select_value("SELECT role_name FROM #{Enrollment.quoted_table_name} WHERE id=#{role2_enrollment.id}")).to eq "courserole2"
       expect(Enrollment.connection.select_value("SELECT role_name FROM #{Enrollment.quoted_table_name} WHERE id=#{lookalike_enrollment.id}")).to eq "courserole2"
 
-      @user2 = user
+      @user2 = user_factory
       null_en_id = Enrollment.connection.insert("INSERT INTO #{Enrollment.quoted_table_name}(
         course_id, course_section_id, root_account_id, user_id, type, workflow_state, created_at, updated_at, role_name)
         VALUES(#{ssa1_course.id}, #{ssa1_course.default_section.id}, #{@root_account.id}, #{@user2.id},

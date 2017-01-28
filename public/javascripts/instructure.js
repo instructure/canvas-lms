@@ -207,7 +207,7 @@ define([
         menuItemHoverTimeoutId;
 
     // Makes sure that the courses/groups menu is openable by clicking
-    $coursesItem = $menu.find('#courses_menu_item .menu-item-title');
+    var $coursesItem = $menu.find('#courses_menu_item .menu-item-title');
     $coursesItem.click(function (e) {
       if (e.metaKey || e.ctrlKey) return;
       e.preventDefault();
@@ -838,10 +838,12 @@ define([
       var sf = $('#sequence_footer')
       if (sf.length) {
         var el = $(sf[0]);
-        el.moduleSequenceFooter({
-          courseID: el.attr("data-course-id"),
-          assetType: el.attr("data-asset-type"),
-          assetID: el.attr("data-asset-id")
+        require(['compiled/jquery/ModuleSequenceFooter'], function (){
+          el.moduleSequenceFooter({
+            courseID: el.attr("data-course-id"),
+            assetType: el.attr("data-asset-type"),
+            assetID: el.attr("data-asset-id")
+          });
         });
       }
     }

@@ -1,0 +1,282 @@
+[
+  {
+    "code": "NRC",
+    "guid": "095383F6-BBCB-11E1-9321-88419DFF4B22",
+    "description": "Achieve"
+  },
+  {
+    "code": "AL",
+    "guid": "A8325A6C-901A-11DF-A622-0C319DFF4B22",
+    "description": "Alabama"
+  },
+  {
+    "code": "AK",
+    "guid": "A83250D0-901A-11DF-A622-0C319DFF4B22",
+    "description": "Alaska"
+  },
+  {
+    "code": "AZ",
+    "guid": "A83274AC-901A-11DF-A622-0C319DFF4B22",
+    "description": "Arizona"
+  },
+  {
+    "code": "AR",
+    "guid": "A8326336-901A-11DF-A622-0C319DFF4B22",
+    "description": "Arkansas"
+  },
+  {
+    "code": "AU",
+    "guid": "A8326BEC-901A-11DF-A622-0C319DFF4B22",
+    "description": "Australia"
+  },
+  {
+    "code": "CA",
+    "guid": "A832862C-901A-11DF-A622-0C319DFF4B22",
+    "description": "California"
+  },
+  {
+    "code": "CO",
+    "guid": "A832A9A4-901A-11DF-A622-0C319DFF4B22",
+    "description": "Colorado"
+  },
+  {
+    "code": "CT",
+    "guid": "A832BBEC-901A-11DF-A622-0C319DFF4B22",
+    "description": "Connecticut"
+  },
+  {
+    "code": "DE",
+    "guid": "A832CDE4-901A-11DF-A622-0C319DFF4B22",
+    "description": "Delaware"
+  },
+  {
+    "code": "DC",
+    "guid": "A832C4DE-901A-11DF-A622-0C319DFF4B22",
+    "description": "District of Columbia"
+  },
+  {
+    "code": "FL",
+    "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22",
+    "description": "Florida"
+  },
+  {
+    "code": "GA",
+    "guid": "A832E9D2-901A-11DF-A622-0C319DFF4B22",
+    "description": "Georgia"
+  },
+  {
+    "code": "HI",
+    "guid": "A832F2EC-901A-11DF-A622-0C319DFF4B22",
+    "description": "Hawaii"
+  },
+  {
+    "code": "ID",
+    "guid": "A833087C-901A-11DF-A622-0C319DFF4B22",
+    "description": "Idaho"
+  },
+  {
+    "code": "IL",
+    "guid": "A8333252-901A-11DF-A622-0C319DFF4B22",
+    "description": "Illinois"
+  },
+  {
+    "code": "IN",
+    "guid": "A8334A58-901A-11DF-A622-0C319DFF4B22",
+    "description": "Indiana"
+  },
+  {
+    "code": "IA",
+    "guid": "A832FC24-901A-11DF-A622-0C319DFF4B22",
+    "description": "Iowa"
+  },
+  {
+    "code": "KS",
+    "guid": "A833636C-901A-11DF-A622-0C319DFF4B22",
+    "description": "Kansas"
+  },
+  {
+    "code": "KY",
+    "guid": "A8337BFE-901A-11DF-A622-0C319DFF4B22",
+    "description": "Kentucky"
+  },
+  {
+    "code": "LA",
+    "guid": "A8339404-901A-11DF-A622-0C319DFF4B22",
+    "description": "Louisiana"
+  },
+  {
+    "code": "ME",
+    "guid": "A833DCB6-901A-11DF-A622-0C319DFF4B22",
+    "description": "Maine"
+  },
+  {
+    "code": "MD",
+    "guid": "A833C528-901A-11DF-A622-0C319DFF4B22",
+    "description": "Maryland"
+  },
+  {
+    "code": "MA",
+    "guid": "A833AC96-901A-11DF-A622-0C319DFF4B22",
+    "description": "Massachusetts"
+  },
+  {
+    "code": "MI",
+    "guid": "A833F5CA-901A-11DF-A622-0C319DFF4B22",
+    "description": "Michigan"
+  },
+  {
+    "code": "MN",
+    "guid": "A8340E5C-901A-11DF-A622-0C319DFF4B22",
+    "description": "Minnesota"
+  },
+  {
+    "code": "MS",
+    "guid": "A8343EFE-901A-11DF-A622-0C319DFF4B22",
+    "description": "Mississippi"
+  },
+  {
+    "code": "MO",
+    "guid": "A83425EA-901A-11DF-A622-0C319DFF4B22",
+    "description": "Missouri"
+  },
+  {
+    "code": "MT",
+    "guid": "A83457FE-901A-11DF-A622-0C319DFF4B22",
+    "description": "Montana"
+  },
+  {
+    "code": "NT",
+    "guid": "A834CC02-901A-11DF-A622-0C319DFF4B22",
+    "description": "National Standards"
+  },
+  {
+    "code": "NE",
+    "guid": "A834A0B0-901A-11DF-A622-0C319DFF4B22",
+    "description": "Nebraska"
+  },
+  {
+    "code": "NV",
+    "guid": "A834D620-901A-11DF-A622-0C319DFF4B22",
+    "description": "Nevada"
+  },
+  {
+    "code": "NH",
+    "guid": "A834AE7A-901A-11DF-A622-0C319DFF4B22",
+    "description": "New Hampshire"
+  },
+  {
+    "code": "NJ",
+    "guid": "A834B848-901A-11DF-A622-0C319DFF4B22",
+    "description": "New Jersey"
+  },
+  {
+    "code": "NM",
+    "guid": "A834C22A-901A-11DF-A622-0C319DFF4B22",
+    "description": "New Mexico"
+  },
+  {
+    "code": "NY",
+    "guid": "A834E00C-901A-11DF-A622-0C319DFF4B22",
+    "description": "New York"
+  },
+  {
+    "code": "CC",
+    "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+    "description": "NGA Center/CCSSO"
+  },
+  {
+    "code": "NC",
+    "guid": "A8346F1E-901A-11DF-A622-0C319DFF4B22",
+    "description": "North Carolina"
+  },
+  {
+    "code": "ND",
+    "guid": "A834881E-901A-11DF-A622-0C319DFF4B22",
+    "description": "North Dakota"
+  },
+  {
+    "code": "OH",
+    "guid": "A834F40C-901A-11DF-A622-0C319DFF4B22",
+    "description": "Ohio"
+  },
+  {
+    "code": "OK",
+    "guid": "A834FE5C-901A-11DF-A622-0C319DFF4B22",
+    "description": "Oklahoma"
+  },
+  {
+    "code": "OR",
+    "guid": "A8350866-901A-11DF-A622-0C319DFF4B22",
+    "description": "Oregon"
+  },
+  {
+    "code": "PA",
+    "guid": "A8351270-901A-11DF-A622-0C319DFF4B22",
+    "description": "Pennsylvania"
+  },
+  {
+    "code": "RI",
+    "guid": "A8351CA2-901A-11DF-A622-0C319DFF4B22",
+    "description": "Rhode Island"
+  },
+  {
+    "code": "SC",
+    "guid": "A835312E-901A-11DF-A622-0C319DFF4B22",
+    "description": "South Carolina"
+  },
+  {
+    "code": "SD",
+    "guid": "A8353B56-901A-11DF-A622-0C319DFF4B22",
+    "description": "South Dakota"
+  },
+  {
+    "code": "TN",
+    "guid": "A836285E-901A-11DF-A622-0C319DFF4B22",
+    "description": "Tennessee"
+  },
+  {
+    "code": "TX",
+    "guid": "A8363358-901A-11DF-A622-0C319DFF4B22",
+    "description": "Texas"
+  },
+  {
+    "code": "UK",
+    "guid": "A8363E2A-901A-11DF-A622-0C319DFF4B22",
+    "description": "United Kingdom"
+  },
+  {
+    "code": "UT",
+    "guid": "A83653D8-901A-11DF-A622-0C319DFF4B22",
+    "description": "Utah"
+  },
+  {
+    "code": "VT",
+    "guid": "A83669D6-901A-11DF-A622-0C319DFF4B22",
+    "description": "Vermont"
+  },
+  {
+    "code": "VA",
+    "guid": "A8365EE6-901A-11DF-A622-0C319DFF4B22",
+    "description": "Virginia"
+  },
+  {
+    "code": "WA",
+    "guid": "A83674DA-901A-11DF-A622-0C319DFF4B22",
+    "description": "Washington"
+  },
+  {
+    "code": "WV",
+    "guid": "A8368AEC-901A-11DF-A622-0C319DFF4B22",
+    "description": "West Virginia"
+  },
+  {
+    "code": "WI",
+    "guid": "A8367FDE-901A-11DF-A622-0C319DFF4B22",
+    "description": "Wisconsin"
+  },
+  {
+    "code": "WY",
+    "guid": "A83695FA-901A-11DF-A622-0C319DFF4B22",
+    "description": "Wyoming"
+  }
+]

@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
+require_dependency "lti/membership_service/membership_collator_factory"
 
 module Lti::MembershipService
   describe MembershipCollatorFactory do

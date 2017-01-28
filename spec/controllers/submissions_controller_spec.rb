@@ -612,24 +612,71 @@ describe SubmissionsController do
     end
   end
 
-  describe 'GET turnitin_report' do
+  describe 'GET originality_report' do
+    let_once(:test_course) do
+      test_course = course_factory(active_course: true)
+      test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
+      test_course.enroll_student(test_student, enrollment_state: 'active')
+      test_course
+    end
 
+    let_once(:test_teacher) { User.create }
+    let_once(:test_student) { User.create }
+    let_once(:assignment) { Assignment.create!(title: 'test assignment', context: test_course) }
+    let_once(:attachment) { attachment_model(filename: "submission.doc", context: test_student) }
+    let_once(:submission) { assignment.submit_homework(test_student, attachments: [attachment]) }
+    let!(:originality_report) {
+      OriginalityReport.create!(attachment: attachment,
+                                submission: submission,
+                                originality_score: 0.5,
+                                originality_report_url: 'http://www.instructure.com')
+    }
+
+
+    before :each do
+      user_session(test_teacher)
+    end
+
+    it 'redirects to the originality report URL if it exists' do
+
+      get 'originality_report', course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id, asset_string: attachment.asset_string
+      expect(response).to redirect_to originality_report.originality_report_url
+    end
+
+
+    it 'returns 400 if submission_id is not integer' do
+      get 'originality_report', :course_id => assignment.context_id, :assignment_id => assignment.id, :submission_id => '{{ user_id }}', :asset_string => attachment.asset_string
+      expect(response.response_code).to eq 400
+    end
+
+    it "returns unauthorized for users who can't read submission" do
+      unauthorized_user = User.create
+      user_session(unauthorized_user)
+      get 'originality_report', course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id, asset_string: attachment.asset_string
+      expect(response.status).to eq 401
+    end
+
+    it 'gives error if no url is present for the OriginalityReport' do
+      originality_report.update_attribute(:originality_report_url, nil)
+      get 'originality_report', course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id, asset_string: attachment.asset_string
+      expect(flash[:notice]).to be_present
+    end
+  end
+
+  describe 'GET turnitin_report' do
     it 'returns 400 if submission_id is not integer' do
       assignment = assignment_model
       get 'turnitin_report', :course_id => assignment.context_id, :assignment_id => assignment.id, :submission_id => '{{ user_id }}', :asset_string => '123'
       expect(response.response_code).to eq 400
     end
-
   end
 
   describe 'POST resubmit_to_turnitin' do
-
     it 'returns 400 if submission_id is not integer' do
       assignment = assignment_model
       post 'resubmit_to_turnitin', :course_id => assignment.context_id, :assignment_id => assignment.id, :submission_id => '{{ user_id }}'
       expect(response.response_code).to eq 400
     end
-
   end
 
   describe "copy_attachments_to_submissions_folder" do

@@ -221,7 +221,7 @@ describe GradebookExporter do
 
   context "a course with a student whose name starts with an equals sign" do
     let(:student) do
-      user = user(name: "=sum(A)", active_user: true)
+      user = user_factory(name: "=sum(A)", active_user: true)
       course_with_student(course: course, user: user)
       user
     end

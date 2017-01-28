@@ -79,6 +79,20 @@ describe SupportHelpers::TurnitinController do
       end
     end
 
+    context 'refresh_lti_attachment' do
+      it "should create a new RefreshLtiAttachmentFixter" do
+        submission_model
+        attachment_model
+        fixer = SupportHelpers::Tii::LtiAttachmentFixer.new(@user.email, nil, @submission.id, @attachment.id)
+        SupportHelpers::Tii::LtiAttachmentFixer.expects(:new)
+          .with(@user.email, nil, @submission.id, @attachment.id).returns(fixer)
+        fixer.expects(:monitor_and_fix)
+        get :lti_attachment, submission_id: @submission.id, attachment_id: @attachment.id
+        expect(response.body).to eq("Enqueued TurnItIn LtiAttachmentFixer ##{fixer.job_id}...")
+      end
+    end
+
+
     context 'pending' do
       it "should create a new StuckInPendingFixer" do
         fixer(SupportHelpers::Tii::StuckInPendingFixer)

@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssessmentQuestion do
   before :once do
-    course
+    course_factory
     @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
   end
 

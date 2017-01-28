@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContextModuleProgression do
   before do
-    @course = course(:active_all => true)
+    @course = course_factory(active_all: true)
     @module = @course.context_modules.create!(:name => "some module")
 
     @user = User.create!(:name => "some name")

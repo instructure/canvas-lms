@@ -25,7 +25,7 @@ describe Canvas::PasswordPolicy do
       account.settings[:password_policy] = policy
       account.save
       @pseudonym = Pseudonym.new
-      @pseudonym.user = user
+      @pseudonym.user = user_factory
       @pseudonym.account = Account.default
       @pseudonym.unique_id = "foo"
     end

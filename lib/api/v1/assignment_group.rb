@@ -26,13 +26,15 @@ module Api::V1::AssignmentGroup
     position
     group_weight
     rules
+    sis_source_id
+    integration_data
   ).freeze
 
   def assignment_group_json(group, user, session, includes = [], opts = {})
     includes ||= []
     opts.reverse_merge!(override_assignment_dates: true, exclude_response_fields: [])
 
-    hash = api_json(group, user, session,:only => %w(id name position group_weight))
+    hash = api_json(group, user, session,:only => %w(id name position group_weight sis_source_id integration_data))
     hash['rules'] = group.rules_hash(stringify_json_ids: opts[:stringify_json_ids])
 
     if includes.include?('assignments')
@@ -96,12 +98,21 @@ module Api::V1::AssignmentGroup
   def update_assignment_group(assignment_group, params)
     return nil unless params.is_a?(ActionController::Parameters)
 
-    update_params = params.permit(*API_ALLOWED_ASSIGNMENT_GROUP_INPUT_FIELDS)
-
-    if rules = params.delete('rules')
+    integration_data_keys = params["integration_data"].nil? ? {} : params["integration_data"].keys
+    update_params = params.permit(*API_ALLOWED_ASSIGNMENT_GROUP_INPUT_FIELDS,
+                                   "integration_data": integration_data_keys)
+    rules = params.delete('rules')
+    if rules
       assignment_group.rules_hash = rules
     end
 
-    assignment_group.attributes = update_params
+    assignment_group.integration_data = assignment_group.integration_data.to_h.merge(
+      update_params[:integration_data].to_h
+    )
+
+    updated_attributes = update_params.except(:integration_data)
+    assignment_group.attributes = updated_attributes
+
+    assignment_group
   end
 end

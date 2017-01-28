@@ -103,62 +103,62 @@ describe "MessageableUser" do
     end
 
     it "should order by sortable_name before id" do
-      user1 = user(:active_all => 1, :name => 'Yellow Bob')
-      user2 = user(:active_all => 1, :name => 'Zebra Alice')
+      user1 = user_factory(active_all: true, :name => 'Yellow Bob')
+      user2 = user_factory(active_all: true, :name => 'Zebra Alice')
       expect(MessageableUser.prepped().where(id: [user1, user2]).first.id).to eq user2.id
     end
 
     it "should ignore case when ordering by sortable_name" do
-      user1 = user(:active_all => 1, :name => 'bob')
-      user2 = user(:active_all => 1, :name => 'ALICE')
+      user1 = user_factory(active_all: true, :name => 'bob')
+      user2 = user_factory(active_all: true, :name => 'ALICE')
       expect(MessageableUser.prepped().where(id: [user1, user2]).first.id).to eq user2.id
     end
 
     it "should order by id as tiebreaker" do
-      user1 = user(:active_all => 1, :name => 'Alice')
-      user2 = user(:active_all => 1, :name => 'Alice')
+      user1 = user_factory(active_all: true, :name => 'Alice')
+      user2 = user_factory(active_all: true, :name => 'Alice')
       expect(MessageableUser.prepped().where(id: [user1, user2]).first.id).to eq user1.id
     end
 
     it "should exclude creation_pending students with strict_checks true" do
-      user(:user_state => 'creation_pending')
+      user_factory(:user_state => 'creation_pending')
       expect(MessageableUser.prepped(:strict_checks => true).where(id: @user).length).to eq 0
     end
 
     it "should include creation_pending students with strict_checks false" do
-      user(:user_state => 'creation_pending')
+      user_factory(:user_state => 'creation_pending')
       expect(MessageableUser.prepped(:strict_checks => false).where(id: @user).length).to eq 1
     end
 
     it "should exclude deleted students with include_deleted true but strict_checks true" do
-      user(:user_state => 'deleted')
+      user_factory(:user_state => 'deleted')
       expect(MessageableUser.prepped(:strict_checks => true, :include_deleted => true).where(id: @user).length).to eq 0
     end
 
     it "should exclude deleted students with with strict_checks false but include_deleted false" do
-      user(:user_state => 'deleted')
+      user_factory(:user_state => 'deleted')
       expect(MessageableUser.prepped(:strict_checks => false, :include_deleted => false).where(id: @user).length).to eq 0
     end
 
     it "should include deleted students with strict_checks false and include_deleted true" do
-      user(:user_state => 'deleted')
+      user_factory(:user_state => 'deleted')
       expect(MessageableUser.prepped(:strict_checks => false, :include_deleted => true).where(id: @user).length).to eq 1
     end
 
     it "should default strict_checks to true" do
-      user(:user_state => 'creation_pending')
+      user_factory(:user_state => 'creation_pending')
       expect(MessageableUser.prepped().where(id: @user).length).to eq 0
     end
 
     it "should default include_delete to false" do
-      user(:user_state => 'deleted')
+      user_factory(:user_state => 'deleted')
       expect(MessageableUser.prepped(:strict_checks => false).where(id: @user).length).to eq 0
     end
   end
 
   describe "#common_courses" do
     before do
-      user(:active_all => 1)
+      user_factory(active_all: true)
     end
 
     it "should be empty with no common_courses selected" do
@@ -196,7 +196,7 @@ describe "MessageableUser" do
 
   describe "#common_groups" do
     before do
-      user(:active_all => 1)
+      user_factory(active_all: true)
     end
 
     it "should be empty with no common_groups selected" do
@@ -225,7 +225,7 @@ describe "MessageableUser" do
 
   describe "#include_common_contexts_from" do
     before do
-      user(:active_all => 1)
+      user_factory(active_all: true)
     end
 
     it "should merge disparate ids" do

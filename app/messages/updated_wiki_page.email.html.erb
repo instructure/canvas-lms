@@ -16,4 +16,4 @@
 
 <p><strong><%= html_to_text(asset.title).titleize %></strong></p>
 
-<p><%= CanvasTextHelper.truncate_text(html_to_text(asset.body, :base_url => dashboard_url), :max_length => 200) %></p>
+<p><%= html_to_text(asset.body, :base_url => dashboard_url) %></p>

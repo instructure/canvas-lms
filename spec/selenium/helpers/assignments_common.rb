@@ -79,7 +79,7 @@ module AssignmentsCommon
   end
 
   def submit_assignment_form
-    expect_new_page_load { f('.btn-primary[type=submit]').click }
+    expect_new_page_load { f('#edit_assignment_form .btn-primary[type=submit]').click }
     wait_for_ajaximations
   end
 
@@ -135,7 +135,10 @@ module AssignmentsCommon
     # 2 course sections, student in second section.
     @section1 = @course.course_sections.create!(:name => 'Section A')
     @section2 = @course.course_sections.create!(:name => 'Section B')
-    @course.student_enrollments.each(&:destroy_permanently!) # get rid of existing student enrollments, mess up section enrollment
+    @course.student_enrollments.each do |enrollment|
+      Score.where(enrollment_id: enrollment).delete_all
+      enrollment.destroy_permanently! # get rid of existing student enrollments, mess up section enrollment
+    end
     # Overridden lock dates for 2nd section - different dates, but still in future
     @override = assignment_override_model(
       :assignment => @assignment,

@@ -21,17 +21,17 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe BounceNotificationProcessor do
   before(:once) do
     bounce_queue_log = File.read(File.dirname(__FILE__) + '/../fixtures/bounces.json')
-    @all_bounce_messages_json = JSON.parse(bounce_queue_log)
-    @soft_bounce_messages_json = @all_bounce_messages_json.select {|m| m['Message'].include?('Transient')}
-    @hard_bounce_messages_json = @all_bounce_messages_json.select {|m| m['Message'].include?('Permanent')}
+    @all_bounce_messages_json = JSON.parse(bounce_queue_log).map { |m| m['Message'] }
+    @soft_bounce_messages_json = @all_bounce_messages_json.select {|m| m.include?('Transient')}
+    @hard_bounce_messages_json = @all_bounce_messages_json.select {|m| m.include?('Permanent')}
     @bounce_count = @all_bounce_messages_json.count do |notification|
-      JSON.parse(notification['Message'])['notificationType'] == 'Bounce'
+      JSON.parse(notification)['notificationType'] == 'Bounce'
     end
   end
 
   def mock_message(json)
     message = mock
-    message.stubs(:body).returns(json.to_json)
+    message.stubs(:body).returns(json)
     message
   end
 

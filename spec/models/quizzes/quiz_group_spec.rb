@@ -22,7 +22,7 @@ describe Quizzes::QuizGroup do
 
   describe "saving a group" do
     it "should mark its quiz as having unpublished changes when updated" do
-      course
+      course_factory
       quiz = @course.quizzes.create!(:title => "some quiz")
       group = quiz.quiz_groups.create!(:name => "question group", :pick_count => 1, :question_points => 5.0)
       group.quiz_questions.create!(:quiz=>quiz, :question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
@@ -40,7 +40,7 @@ describe Quizzes::QuizGroup do
   describe "#actual_pick_count" do
     context "with a question bank" do
       it "should return the correct pick count if there aren't enough questions" do
-        course
+        course_factory
         quiz = @course.quizzes.create!(:title => "some quiz")
         group = quiz.quiz_groups.create!(:name => "question group", :pick_count => 3, :question_points => 5.0)
         group.quiz_questions.create!(:quiz=>quiz, :question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
@@ -54,7 +54,7 @@ describe Quizzes::QuizGroup do
 
     context "with a question bank" do
       before(:once) do
-        course
+        course_factory
         @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
         @bank.assessment_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
         @bank.assessment_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
@@ -85,7 +85,7 @@ describe Quizzes::QuizGroup do
 
   describe "#data" do
     it "should generate valid data" do
-      course
+      course_factory
       quiz = @course.quizzes.create!(:title => "some quiz")
       g = quiz.quiz_groups.create(:name => "question group", :pick_count => 2, :question_points => 5.0)
       g.quiz_questions << quiz.quiz_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
@@ -113,7 +113,7 @@ describe Quizzes::QuizGroup do
     end
 
     before :once do
-      course
+      course_factory
       @quiz = @course.quizzes.create!(:title => "some quiz")
       @group1 = @quiz.quiz_groups.create(:name => "question group 1")
       @group2 = @quiz.quiz_groups.create(:name => "question group 2")

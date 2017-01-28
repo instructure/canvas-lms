@@ -1,4 +1,5 @@
 require_relative '../../../spec_helper'
+require_dependency "canvas/security/services_jwt"
 
 module Canvas::Security
   describe ServicesJwt do

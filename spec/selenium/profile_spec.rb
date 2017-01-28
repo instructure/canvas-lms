@@ -354,7 +354,7 @@ describe "profile" do
       Account.default.save!
 
       course_with_student_logged_in(:active_all => true)
-      @other_student = user
+      @other_student = user_factory
       @other_student.avatar_state = "submitted"
       @other_student.save!
       student_in_course(:course => @course, :user => @other_student, :active_all => true)

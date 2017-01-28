@@ -137,8 +137,8 @@ This text has a http://www.google.com link in it...
     @assignment.workflow_state = 'published'
     @assignment.save
     @course.offer
-    @course.enroll_teacher(user)
-    @se = @course.enroll_student(user)
+    @course.enroll_teacher(user_factory)
+    @se = @course.enroll_student(user_factory)
     @assignment.reload
     @submission = @assignment.submit_homework(@se.user, :body => 'some message')
     @submission.created_at = Time.now - 60
@@ -166,7 +166,7 @@ This text has a http://www.google.com link in it...
 
   it "should ensure the media object exists" do
     assignment_model
-    se = @course.enroll_student(user)
+    se = @course.enroll_student(user_factory)
     @submission = @assignment.submit_homework(se.user, :body => 'some message')
     MediaObject.expects(:ensure_media_object).with("fake", { :context => se.user, :user => se.user })
     @comment = @submission.add_comment(:author => se.user, :media_comment_type => 'audio', :media_comment_id => 'fake')

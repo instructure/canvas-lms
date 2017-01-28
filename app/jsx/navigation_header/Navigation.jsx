@@ -212,6 +212,8 @@ define([
             <ProfileTray
               userDisplayName={window.ENV.current_user.display_name}
               userAvatarURL={window.ENV.current_user.avatar_image_url}
+              profileEnabled={window.ENV.SETTINGS.enable_profiles}
+              eportfoliosEnabled={window.ENV.SETTINGS.eportfolios_enabled}
               closeTray={this.closeTray}
             />
           );

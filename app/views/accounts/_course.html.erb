@@ -1,12 +1,15 @@
 <% course ||= nil %>
 <% if !course || !course.deleted? %>
-<% teacher_names = course && (course.teacher_names || course.teachers.uniq.map(&:name)) %>
-<% student_count = course && (course.student_count || course.students.where("enrollments.type <> ?", "StudentViewEnrollment").count) %>
+
+<% master_template = course && @master_template_index && @master_template_index[course.id] %>
+<% teacher_names = course && !master_template && (course.teacher_names || course.teachers.uniq.map(&:name)) %>
+<% student_count = course && !master_template && (course.student_count || course.students.where("enrollments.type <> ?", "StudentViewEnrollment").count) %>
+
 <li class="course" id="course_<%= course ? course.id : "blank" %>" style="<%= hidden unless course %>">
   <div class="course <%= 'unpublished' if course && course.read_attribute(:workflow_state) && (course.created? || course.claimed?) %>">
     <div class="name">
       <a href="<%= course_path(course ? course.id : "{{ id }}") %>" class="name"><%= (course && course.name) || nbsp %></a>
-      <%= image_tag "hammer.png", :title => t(:course_unpublished_title, "This course hasn't been published yet"), :alt => t(:course_unpublished_tooltip, "Unpublished"), :class => "unpublished_icon", :style => (course && course.read_attribute(:workflow_state) && (course.created? || course.claimed?) ? "" : "display: none;") %>
+      <i class="icon-unpublish" title="<%= t(:course_unpublished_title, "This course hasn't been published yet") %>" style="<%= (course && course.read_attribute(:workflow_state) && (course.created? || course.claimed?) ? "" : "display: none;") %>"></i>
     </div>
     <% if course %>
     <div class="details ellipsis">
@@ -19,10 +22,16 @@
           <%= before_label(t(:sis_id_label, "SIS ID")) %> <%= course.sis_source_id %>
         <% end %>
       </div>
-      <% teacher_names_new = teacher_names[0, 2] %>
-      <% teacher_names_new << t(:more_count, { :one => "1 more", :other => "%{count} more" }, :count => teacher_names.length - 2) if teacher_names.length > 2 %>
-      <span style="display: inline-block; min-width: 80px;"><%= t(:student_count, { :one => "1 Student", :other => "%{count} Students" }, :count => student_count || 0) %></span>
-      <%= before_label(t(:teachers_label, "Teachers")) %> <%= teacher_names.blank? ? t(:none, 'none') : teacher_names_new.to_sentence %>
+      <% if master_template %>
+        <strong><%= t('Blueprint Course') %></strong>
+        <% if master_template.last_export_completed_at %><br><%= t('Last Pushed Update: %{last_export_at}', :last_export_at => datetime_string(master_template.last_export_completed_at)) %><% end %>
+        <br><%= t(:associated_count, {:one => "1 Associated Course", :other => "%{count} Associated Courses"}, :count => master_template.child_course_count) %>
+      <% else %>
+        <% teacher_names_new = teacher_names[0, 2] %>
+        <% teacher_names_new << t(:more_count, { :one => "1 more", :other => "%{count} more" }, :count => teacher_names.length - 2) if teacher_names.length > 2 %>
+        <span style="display: inline-block; min-width: 80px;"><%= t(:student_count, { :one => "1 Student", :other => "%{count} Students" }, :count => student_count || 0) %></span>
+        <%= before_label(t(:teachers_label, "Teachers")) %> <%= teacher_names.blank? ? t(:none, 'none') : teacher_names_new.to_sentence %>
+      <% end %>
     </div>
     <% end %>
     <div class="info">

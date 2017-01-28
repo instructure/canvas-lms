@@ -23,14 +23,14 @@ describe GradingPeriod do
 
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
   let(:account) { Account.create! }
-  let(:course) { Course.create! }
+  let(:course) { account.courses.create! }
   let(:grading_period_group) do
     group = account.grading_period_groups.create!(title: "A Group")
-    group.enrollment_terms << course.enrollment_term
+    term = course.enrollment_term
+    group.enrollment_terms << term
     group
   end
   let(:now) { Time.zone.now.change(usec: 0) }
-
   let(:params) do
     {
       title: 'A Grading Period',
@@ -159,14 +159,40 @@ describe GradingPeriod do
       context "where end_date equals Time.now" do
         it "does not include period" do
           Timecop.freeze(Time.zone.now.change(usec: 0)) do
-            period.update(end_date: now)
+            period.update!(end_date: now)
+            is_expected.to be_present
+          end
+        end
+      end
+
+      context "where end_date equals Time.now + 1" do
+        it "does not include period" do
+          Timecop.freeze(Time.zone.now.change(usec: 0) + 1) do
+            period.update!(end_date: now)
             is_expected.to be_empty
+          end
+        end
+      end
+
+      context "where start_date equals Time.now" do
+        it "does not include period" do
+          Timecop.freeze(Time.zone.now.change(usec: 0)) do
+            period.update!(start_date: now)
+            is_expected.to be_empty
+          end
+        end
+      end
+
+      context "where start_date equals Time.now + 1" do
+        it "does not include period" do
+          Timecop.freeze(Time.zone.now.change(usec: 0) + 1) do
+            period.update!(start_date: now)
+            is_expected.to be_present
           end
         end
       end
     end
   end
-
 
   describe "#as_json_with_user_permissions" do
     it "includes the close_date in the returned object" do
@@ -177,7 +203,7 @@ describe GradingPeriod do
 
   describe "close_date" do
     context "grading period group belonging to an account" do
-      it "allows setting a close_date that is different from the end_date" do
+      it "allows setting a close_date that is after the end_date" do
         grading_period = grading_period_group.grading_periods.create!(params)
         expect(grading_period.close_date).not_to eq(grading_period.end_date)
       end
@@ -187,14 +213,14 @@ describe GradingPeriod do
         expect(grading_period.close_date).to eq(grading_period.end_date)
       end
 
-      it "considers the grading period invalid if the close date is before the end date" do
+      it "is invalid if the close date is before the end date" do
         period_params = params.merge(close_date: 1.day.ago(params[:end_date]))
         grading_period = grading_period_group.grading_periods.build(period_params)
         expect(grading_period).to be_invalid
       end
 
       it "considers the grading period valid if the close date is equal to the end date" do
-        period_params = params.merge(close_date: params[:end_date])
+        period_params = params.merge(close_date: params.fetch(:end_date))
         grading_period = grading_period_group.grading_periods.build(period_params)
         expect(grading_period).to be_valid
       end
@@ -258,14 +284,17 @@ describe GradingPeriod do
   end
 
   describe "#destroy" do
-    before { subject.destroy }
-
-    it "marks workflow as deleted" do
-      expect(subject.workflow_state).to eq "deleted"
+    it_behaves_like "soft deletion" do
+      let(:creation_arguments) { params }
+      subject { grading_period_group.grading_periods }
     end
 
-    it "does not destroy" do
-      expect(subject).not_to be_destroyed
+    it "calls destroy on associated scores" do
+      course = Course.create!
+      enrollment = student_in_course(course: course)
+      score = enrollment.scores.create!(grading_period: grading_period)
+      grading_period.destroy
+      expect(score.reload).to be_deleted
     end
   end
 
@@ -547,10 +576,19 @@ describe GradingPeriod do
         it { is_expected.to be_overlapping }
       end
 
-      context 'given a new grading period with a start_date that begins at the end_date existing grading_period' do
+      context 'given a new grading period with a start_date that is the' \
+        'end_date of existing grading_period' do
         subject { grading_period_group.grading_periods.build(start_date: start_date, end_date: end_date)}
         let(:start_date) { existing_grading_period.end_date }
         let(:end_date)   { existing_grading_period.end_date + 1.month }
+        it { is_expected.not_to be_overlapping }
+      end
+
+      context 'given a new grading period with an end_date that is the ' \
+        'start_date of existing grading_period' do
+        subject { grading_period_group.grading_periods.build(start_date: start_date, end_date: end_date)}
+        let(:start_date) { existing_grading_period.start_date - 1.month }
+        let(:end_date)   { existing_grading_period.start_date }
         it { is_expected.not_to be_overlapping }
       end
     end
@@ -560,7 +598,7 @@ describe GradingPeriod do
     end
   end
 
-  context "Soft deletion" do
+  describe "Soft deletion" do
     subject { grading_period_group.grading_periods }
     let(:creation_arguments) { [period_one, period_two] }
     let(:period_one) { { title: 'an title', start_date: 1.week.ago(now), end_date: 2.weeks.from_now(now) } }
@@ -570,26 +608,27 @@ describe GradingPeriod do
 
   describe ".in_date_range?" do
     subject(:period) do
-      grading_period_group.grading_periods.create(
+      grading_period_group.grading_periods.build(
+        title:      'a period',
         start_date: 1.week.ago(now),
         end_date:   2.weeks.from_now(now)
       )
     end
 
-    it "is in date range for a date in the period" do
-      is_expected.to be_in_date_range(period.end_date - 1.second)
+    it "is in date range for a date that equals end_date" do
+      is_expected.to be_in_date_range(period.end_date)
     end
 
     it "is not in date range for a date before the period" do
-      is_expected.not_to be_in_date_range(8.days.ago(now))
+      is_expected.not_to be_in_date_range(2.weeks.ago(now))
     end
 
     it "is not in date range for or a date after the period" do
-      is_expected.not_to be_in_date_range(15.days.from_now(now))
+      is_expected.not_to be_in_date_range(3.weeks.from_now(now))
     end
 
     it "is not in date range for a date that equals end_date" do
-      is_expected.not_to be_in_date_range(period.end_date)
+      is_expected.not_to be_in_date_range(period.start_date)
     end
   end
 
@@ -649,6 +688,41 @@ describe GradingPeriod do
     it "can persist double precision values" do
       subject.update!(weight: 1.5)
       expect(subject.reload.weight).to eql 1.5
+    end
+  end
+
+  describe 'grading period scores' do
+    before do
+      student_in_course(course: course, active_all: true)
+      teacher_in_course(course: course, active_all: true)
+      @assignment = course.assignments.create!(due_at: 10.days.from_now(now), points_possible: 10)
+      @assignment.grade_student(@student, grade: 8, grader: @teacher)
+    end
+
+    it 'creates scores for the grading period upon its creation' do
+      expect{ grading_period.save! }.to change{ Score.count }.from(1).to(2)
+    end
+
+    it 'updates grading period scores when the grading period end date is changed' do
+      grading_period.save!
+      expect do
+        day_after_assignment_is_due = 1.day.from_now(@assignment.due_at)
+        grading_period.update!(
+          end_date: day_after_assignment_is_due,
+          close_date: day_after_assignment_is_due
+        )
+      end.to change{
+        Score.where(grading_period_id: grading_period).first.current_score
+      }.from(nil).to(80.0)
+    end
+
+    it 'updates grading period scores when the grading period start date is changed' do
+      day_before_grading_period_starts = 1.day.ago(grading_period.start_date)
+      @assignment.update!(due_at: day_before_grading_period_starts)
+      grading_period.save!
+      expect{ grading_period.update!(start_date: 1.day.ago(@assignment.due_at)) }.to change{
+        Score.where(grading_period_id: grading_period).first.current_score
+      }.from(nil).to(80.0)
     end
   end
 end

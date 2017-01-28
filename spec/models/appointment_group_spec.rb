@@ -53,7 +53,7 @@ describe AppointmentGroup do
   end
 
   context "add context" do
-    let_once(:course1) { course(:active_all => true) }
+    let_once(:course1) { course_factory(active_all: true) }
 
     it "should only add contexts" do
       course_with_student(:active_all => true)
@@ -83,13 +83,13 @@ describe AppointmentGroup do
                                     :sub_context_codes => [gc.asset_string])
       expect(ag.contexts).to eql [course1]
 
-      ag.contexts = [course]
+      ag.contexts = [course_factory]
       ag.save!
       expect(ag.contexts).to eql [course1]
     end
 
     it "should update appointments effective_context_code" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       course2 = @course
 
       group = AppointmentGroup.create!(
@@ -109,11 +109,11 @@ describe AppointmentGroup do
 
   context "add sub_contexts" do
     before :once do
-      @course1 = course
+      @course1 = course_factory
       @c1section1 = @course1.default_section
       @c1section2 = @course1.course_sections.create!
 
-      @course2 = course
+      @course2 = course_factory
     end
 
     it "should only add sub_contexts when first adding a course" do
@@ -385,7 +385,7 @@ describe AppointmentGroup do
     end
 
     it "should not notify participants in an unpublished course" do
-      @unpublished_course = course
+      @unpublished_course = course_factory
       @unpublished_course.enroll_user(@student, 'StudentEnrollment')
       @unpublished_course.enroll_user(@teacher, 'TeacherEnrollment')
       @unpublished_course.enroll_user(@observer, 'ObserverEnrollment')

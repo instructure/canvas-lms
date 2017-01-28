@@ -15,36 +15,36 @@ define([
     { default: Modal, ModalHeader, ModalBody, ModalFooter },
    ) => {
 
-  module('MessageStudents', (hooks) => {
-    let subject
+  let $domNode, subject
 
+  const renderComponent = (props) => {
+    $domNode = $domNode || document.createElement('div')
+    return ReactDOM.render(<MessageStudents { ...props } />, $domNode)
+  }
+
+  module('MessageStudents', (hooks)  => {
     hooks.afterEach(() => {
-      if (subject) {
-        const componentNode = ReactDOM.findDOMNode(subject)
-        if (componentNode) {
-          ReactDOM.unmountComponentAtNode(componentNode.parentNode)
-        }
-      }
-      subject = null
+      ReactDOM.unmountComponentAtNode($domNode)
+      $domNode = null
+      subject= null
     })
 
     test('it renders', () => {
-      const subject = TestUtils.renderIntoDocument(
-        <MessageStudents contextCode="course_1" title="Send a message" />
-      )
+      subject = renderComponent({
+        contextCode: "course_1", title: "Send a message"
+      })
       ok(subject)
     })
 
     module('composeRequestData()', () => {
       test('simplifies recipients to an array of ids', () => {
-        const subject = TestUtils.renderIntoDocument(
-          <MessageStudents title="Send a message"
-            contextCode='course_1'
-            recipients={[{
-              id: 1, email: 'some@one.com'
-            }]}
-          />
-        )
+        subject = renderComponent({
+          title: "Send a message",
+          contextCode: 'course_1',
+          recipients: [{
+            id: 1, email: 'some@one.com'
+          }]
+        })
 
         const requestData = subject.composeRequestData()
         const recipient = requestData.recipients[0]
@@ -55,9 +55,9 @@ define([
 
     module('errorMessagesFor()', () => {
       test('fetches error for a given field from state', () => {
-        const subject = TestUtils.renderIntoDocument(
-          <MessageStudents contextCode='course_1' title="Send a message" />
-        )
+        subject = renderComponent({
+          contextCode: "course_1", title: "Send a message"
+        })
         const errorMessage = 'Please provide a subject.'
         subject.setState({
           errors: {
@@ -81,16 +81,15 @@ define([
       const errorPromise = new Promise((_, reject) => reject(errorResponse))
 
       hooks.beforeEach(() => {
-        subject = TestUtils.renderIntoDocument(
-          <MessageStudents title="Send a message"
-            contextCode='course_1'
-            subject='Here is a subject'
-            body='Here is a body'
-            recipients={[{
-              id: 1, email: 'some@one.com'
-            }]}
-          />
-        )
+        subject = renderComponent({
+          title: "Send a message",
+          contextCode: 'course_1',
+          subject: 'Here is a subject',
+          body: 'Here is a body',
+          recipients: [{
+            id: 1, email: 'some@one.com'
+          }]
+        })
         data = subject.composeRequestData()
         sinon.spy(subject, 'handleResponseSuccess')
         sinon.spy(subject, 'handleResponseError')
@@ -151,34 +150,35 @@ define([
       })
     })
 
-    module('validationErrors()', () => {
+    module('validationErrors()', (hooks) => {
       const fields = ['subject', 'body']
+
+      hooks.beforeEach(() => {
+        subject = renderComponent({
+          contextCode: "course_1", title: "Send a message"
+        })
+      })
+
       fields.forEach((field) => {
         test(`validates length of ${field} and sets error`, () => {
-          const component = TestUtils.renderIntoDocument(
-            <MessageStudents contextCode='course_1' title="Send a message" />
-          )
           let data = {
             body: '',
             subject: ''
           }
-          let errors = component.validationErrors(data)
+          let errors = subject.validationErrors(data)
           ok(errors.hasOwnProperty(field))
           data[field] = 'a value'
-          errors = component.validationErrors(data)
+          errors = subject.validationErrors(data)
           ok(!errors.hasOwnProperty(field))
         })
       })
 
       test('validates max length for subject', () => {
-        const component = TestUtils.renderIntoDocument(
-          <MessageStudents contextCode="course_1" title="Send a message" />
-        )
         const data = {
           body: '',
           subject: "x".repeat(256)
         }
-        let errors = component.validationErrors(data)
+        let errors = subject.validationErrors(data)
         ok(errors.hasOwnProperty('subject'))
       })
     })
@@ -187,9 +187,9 @@ define([
       let closeButton
 
       hooks.beforeEach(() => {
-        subject = TestUtils.renderIntoDocument(
-          <MessageStudents contextCode='course_1' title="Send a message" />
-        )
+        subject = renderComponent({
+          contextCode: "course_1", title: "Send a message"
+        })
         subject.setState({errors: {
           subject: 'provide a subject'
         }})
@@ -198,19 +198,16 @@ define([
 
       test('sets state.hideAlert to true', () => {
         notOk(subject.state.hideAlert, 'precondition')
-        Promise.resolve().then(() => {
-          TestUtils.Simulate.click(closeButton)
-        }).then(() => {
-          ok(subject.state.hideAlert)
-        })
+        TestUtils.Simulate.click(closeButton)
+        ok(subject.state.hideAlert)
       })
     })
 
     module('handleChange()', (hooks) => {
       hooks.beforeEach(() => {
-        subject = TestUtils.renderIntoDocument(
-          <MessageStudents contextCode='course_1' title="Send a message" />
-        )
+        subject = renderComponent({
+          contextCode: "course_1", title: "Send a message"
+        })
       })
 
       test('sets provided field / value pair in state.data', () => {
@@ -238,9 +235,9 @@ define([
       let closeButton
 
       hooks.beforeEach(() => {
-        subject = TestUtils.renderIntoDocument(
-          <MessageStudents contextCode='course_1' title="Send a message" />
-        )
+        subject = renderComponent({
+          contextCode: "course_1", title: "Send a message"
+        })
         const buttons = document.querySelectorAll('button')
         closeButton = buttons[buttons.length - 2]
       })
@@ -256,14 +253,13 @@ define([
       let submitButton
 
       hooks.beforeEach(() => {
-        subject = TestUtils.renderIntoDocument(
-          <MessageStudents title="Send a message"
-            contextCode='course_1'
-            recipients={[{
-              id: 1, email: 'some@one.com'
-            }]}
-          />
-        )
+        subject = renderComponent({
+          title: "Send a message",
+          contextCode: 'course_1',
+          recipients: [{
+            id: 1, email: 'some@one.com'
+          }]
+        })
         sinon.spy(subject, 'sendMessage')
 
         const buttons = document.querySelectorAll('button')
@@ -317,16 +313,15 @@ define([
 
       hooks.beforeEach(() => {
         clocks = sinon.useFakeTimers()
-        subject = TestUtils.renderIntoDocument(
-          <MessageStudents title="Send a message"
-            contextCode='course_1'
-            subject='Here is a subject'
-            body='Here is a body'
-            recipients={[{
-              id: 1, email: 'some@one.com'
-            }]}
-          />
-        )
+        subject = renderComponent({
+          title: "Send a message",
+          contextCode: 'course_1',
+          subject: 'Here is a subject',
+          body: 'Here is a body',
+          recipients: [{
+            id: 1, email: 'some@one.com'
+          }]
+        })
         subject.setState({
           hideAlert: true,
           sending: true
@@ -372,14 +367,13 @@ define([
           }
         }
 
-        subject = TestUtils.renderIntoDocument(
-          <MessageStudents title="Send a message"
-            contextCode='course_1'
-            recipients={[{
-              id: 1, email: 'some@one.com'
-            }]}
-          />
-        )
+        subject = renderComponent({
+          title: "Send a message",
+          contextCode: 'course_1',
+          recipients: [{
+            id: 1, email: 'some@one.com'
+          }]
+        })
         subject.setState({
           sending: true
         })
@@ -396,24 +390,20 @@ define([
       test('marks sending as false', () => {
         ok(subject.state.sending, 'precondition, is sending')
 
-        Promise.resolve().then(() => {
-          subject.handleResponseError(errorResponse)
-        }).then(() => {
-          ok(!subject.state.sending)
-        })
+        subject.handleResponseError(errorResponse)
+        ok(!subject.state.sending)
       })
     })
 
     module('renderAlert()', (hooks) => {
       hooks.beforeEach(() => {
-        subject = TestUtils.renderIntoDocument(
-          <MessageStudents title="Send a message"
-            contextCode='course_1'
-            recipients={[{
-              id: 1, email: 'some@one.com'
-            }]}
-          />
-        )
+        subject = renderComponent({
+          title: "Send a message",
+          contextCode: 'course_1',
+          recipients: [{
+            id: 1, email: 'some@one.com'
+          }]
+        })
       })
 
       test('is null if provided callback is not truthy', () => {

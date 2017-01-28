@@ -13,7 +13,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
     end
 
     it "should require authorization" do
-      user(active_all: true) # not enrolled
+      user_factory(active_all: true) # not enrolled
 
       raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/assignment_overrides",
                   {:controller=>"quizzes/quiz_assignment_overrides", :action => "index", :format => "json", :course_id => "#{@course.id}"},

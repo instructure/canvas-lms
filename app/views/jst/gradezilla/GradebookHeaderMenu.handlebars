@@ -1,0 +1,12 @@
+<ul class="gradebook-header-menu">
+  <li><a data-action="showAssignmentDetails" href="{{assignmentUrl}}">{{#t "assignment_details"}}Assignment Details{{/t}}</a></li>
+  {{#if speedGraderUrl }}
+    <li><a href="{{speedGraderUrl}}">{{#t "speedgrader"}}SpeedGrader{{/t}}</a></li>
+  {{/if}}
+  <li><a data-action="messageStudentsWho" href="#">{{#t "message_students_who"}}Message Students Who...{{/t}}</a></li>
+  <li><a data-action="setDefaultGrade" href="#">{{#t "set_default_grade"}}Set Default Grade{{/t}}</a></li>
+  <li><a data-action="curveGrades" href="#">{{#t "curve_grades"}}Curve Grades{{/t}}</a></li>
+  <li><a data-action="downloadSubmissions" href="#">{{#t "download_submissions"}}Download Submissions{{/t}}</a></li>
+  <li><a data-action="reuploadSubmissions" href="#">{{#t "re_upload_submissions"}}Re-Upload Submissions{{/t}}</a></li>
+  <li><a data-action="toggleMuting" href="#"></a></li>
+</ul>

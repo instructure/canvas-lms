@@ -35,7 +35,7 @@ describe "/users/user_dashboard" do
   end
 
   it "should show announcements to users with no enrollments" do
-    user
+    user_factory
     view_context
     assigns[:courses] = []
     assigns[:enrollments] = []

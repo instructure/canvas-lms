@@ -1,4 +1,4 @@
-Datafixup/EagerLoad: &Datafixup
+Datafixup/EagerLoad:
   Enabled: true
   Include:
     - "**/db/migrate/*.rb"
@@ -15,7 +15,7 @@ Lint/NoSleep:
   Exclude:
     - "**/spec/selenium/test_setup/**/*.rb"
 
-Migration/ConcurrentIndex: &Migration
+Migration/ConcurrentIndex:
   Enabled: true
   Include:
     - "**/db/migrate/*.rb"
@@ -42,36 +42,75 @@ Migration/ModelBehavior:
     - "ActiveRecord::Migration"
 
 Migration/PrimaryKey:
-  <<: *Migration
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
 
 Migration/RemoveColumn:
-  <<: *Migration
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
 
 Migration/SendLater:
-  <<: *Migration
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
 
 Rails/SmartTimeZone:
   Enabled: true
 
-Specs/EnsureSpecExtension: &Specs
+Specs/EnsureSpecExtension:
   Enabled: true
   Include:
     - "**/spec/**/*.rb"
     - "**/spec_canvas/**/*.rb"
 
 Specs/NoBeforeAll:
-  <<: *Specs
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"
 
 Specs/NoBeforeOnceStubs:
-  <<: *Specs
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"
 
 Specs/NoExecuteScript:
-  <<: *Specs
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"
   Exclude:
     - "**/spec/selenium/test_setup/**/*.rb"
 
+Specs/NoNoSuchElementError:
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"
+
+Specs/NoStrftime:
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"
+
 Specs/PreferFOverFj:
-  <<: *Specs
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"
 
 Specs/ScopeHelperModules:
-  <<: *Specs
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"
+
+Specs/DeterministicDescribedClasses:
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"

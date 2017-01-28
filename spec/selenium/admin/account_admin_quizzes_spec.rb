@@ -5,7 +5,7 @@ describe "quizzes" do
 
   context "as an admin" do
     it "should show unpublished quizzes to admins without management rights" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       quiz = @course.quizzes.create!(:title => "quizz")
       quiz.unpublish!
 

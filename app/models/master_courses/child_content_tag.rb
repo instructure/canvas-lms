@@ -8,5 +8,5 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
 
   strong_params
 
-  serialize :downstream_changes, Hash
+  serialize :downstream_changes, Array # an array of changed columns
 end

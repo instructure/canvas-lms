@@ -300,9 +300,9 @@ class CoursesController < ApplicationController
   include CustomSidebarLinksHelper
   include SyllabusHelper
 
-  before_filter :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates]
+  before_filter :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
   before_filter :require_user_or_observer, :only=>[:user_index]
-  before_filter :require_context, :only => [:roster, :locks, :create_file, :ping, :effective_due_dates, :offline_web_exports]
+  before_filter :require_context, :only => [:roster, :locks, :create_file, :ping, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
   skip_after_filter :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
 
   include Api::V1::Course
@@ -2463,6 +2463,27 @@ class CoursesController < ApplicationController
     ])
   end
 
+  # @API Permissions
+  # Returns permission information for provided course & current_user
+  #
+  # @argument permissions[] [String]
+  #   List of permissions to check against authenticated user
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/<course_id>/permissions \
+  #       -H 'Authorization: Bearer <token>' \
+  #       -d 'permissions[]=manage_grades'
+  #       -d 'permissions[]=send_messages'
+  #
+  # @example_response
+  #   {'manage_grades': 'false', 'send_messages': 'true'}
+  def permissions
+    get_context
+    return unless authorized_action(@context, @current_user, :read)
+    permissions = Array(params[:permissions]).map(&:to_sym)
+    render json: @context.rights_status(@current_user, session, *permissions)
+  end
+
   def student_view
     get_context
     if authorized_action(@context, @current_user, :use_student_view)
@@ -2734,9 +2755,25 @@ class CoursesController < ApplicationController
 
   def offline_web_exports
     return render status: 404, template: 'shared/errors/404_message' unless @context.allow_web_export_download?
-    @page_title = t('Course Content Downloads')
-    render :text => 'Downloads'.html_safe, :layout => true
+    if authorized_action(WebZipExport.new(course: @context), @current_user, :create)
+      title = t('Course Content Downloads')
+      @page_title = title
+      add_crumb(title)
+      js_bundle :webzip_export
+      css_bundle :webzip_export
+      render :text => '<div id="course-webzip-export-app"></div>'.html_safe, :layout => true
+    end
   end
+
+  def start_offline_web_export
+    return render status: 404, template: 'shared/errors/404_message' unless @context.allow_web_export_download?
+    if authorized_action(WebZipExport.new(course: @context), @current_user, :create)
+      @service = EpubExports::CreateService.new(@context, @current_user, :web_zip_export)
+      @service.save
+      redirect_to context_url(@context, :context_offline_web_exports_url)
+    end
+  end
+
   private
 
   def effective_due_dates_params

@@ -14,13 +14,13 @@ define [
 
     SIS_ATTRIBUTES = {
       enabled: {
-        src: '/images/svg-icons/svg_icon_post_to_sis_active.svg',
+        src: '/images/svg-icons/svg_icon_sis_synced.svg',
         description: I18n.t('Post grade to SIS enabled. Click to toggle.'),
         label: I18n.t('The grade for this assignment will sync to the student information system.'),
 
       },
       disabled: {
-        src: '/images/svg-icons/svg_icon_post_to_sis.svg',
+        src: '/images/svg-icons/svg_icon_sis_not_synced.svg',
         description: I18n.t('Post grade to SIS disabled. Click to toggle.'),
         label: I18n.t('The grade for this assignment will not sync to the student information system.')
       }

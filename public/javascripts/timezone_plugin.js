@@ -1,16 +1,17 @@
 define({
-  load: function(name, req, load, config) {
-    req(["timezone_core"], function(tz) {
-      if (typeof ENV == 'undefined') {
-        load(tz);
+  load: function (name, req, load /* , config */) {
+    req(['timezone_core'], function (tz) {
+      if (typeof ENV === 'undefined') {
+        load(tz)
+      } else {
+        Promise.all([
+          ENV.TIMEZONE && tz.changeZone(ENV.TIMEZONE),
+          ENV.CONTEXT_TIMEZONE && tz.preload(ENV.CONTEXT_TIMEZONE),
+          ENV.BIGEASY_LOCALE && tz.changeLocale(ENV.BIGEASY_LOCALE, ENV.MOMENT_LOCALE)
+        ]).then(function () {
+          load(tz)
+        })
       }
-      else {
-        var promises = [];
-        if (ENV && ENV.TIMEZONE) { promises.push(tz.changeZone(ENV.TIMEZONE)); }
-        if (ENV && ENV.CONTEXT_TIMEZONE) { promises.push(tz.preload(ENV.CONTEXT_TIMEZONE)); }
-        if (ENV && ENV.BIGEASY_LOCALE) { promises.push(tz.changeLocale(ENV.BIGEASY_LOCALE, ENV.MOMENT_LOCALE)); }
-        $.when.apply($, promises).then(function() { load(tz); });
-      }
-    });
+    })
   }
-});
+})

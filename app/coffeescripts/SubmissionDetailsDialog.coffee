@@ -2,8 +2,8 @@ define [
   'jquery'
   'jst/SubmissionDetailsDialog'
   'i18n!submission_details_dialog'
-  'compiled/gradebook2/GradebookHelpers'
-  'compiled/gradebook2/Turnitin'
+  'compiled/gradebook/GradebookHelpers'
+  'compiled/gradebook/Turnitin'
   'jsx/grading/helpers/OutlierScoreHelper'
   'jst/_submission_detail' # a partial needed by the SubmissionDetailsDialog template
   'jst/_turnitinScore' # a partial needed by the submission_detail partial

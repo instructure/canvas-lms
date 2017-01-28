@@ -129,7 +129,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   def export_object?(obj)
     return false unless obj
-    last_export_at = self.master_template.last_export_at
+    last_export_at = self.master_template.last_export_started_at
     last_export_at.nil? || obj.updated_at >= last_export_at
   end
 
@@ -152,6 +152,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       cm.migration_settings[:hide_from_index] = true # we may decide we want to show this after all, but hide them for now
       cm.migration_settings[:master_course_export_id] = export.id
       cm.migration_settings[:master_migration_id] = self.id
+      cm.migration_settings[:child_subscription_id] = sub.id
       cm.workflow_state = 'exported'
       cm.exported_attachment = export.attachment
       cm.save!
@@ -180,6 +181,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
         # all imports are done
         if self.import_results.values.all?{|r| r[:state] == 'completed'}
           self.workflow_state = 'completed'
+          self.imports_completed_at = Time.now
         else
           self.workflow_state = 'imports_failed'
         end

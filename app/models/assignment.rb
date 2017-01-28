@@ -45,6 +45,14 @@ class Assignment < ActiveRecord::Base
 
   attr_reader :assignment_changed
 
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:title, :description]
+  restrict_columns :settings, [:points_possible, :assignment_group_id,
+    :grading_type, :omit_from_final_grade, :submission_types,
+    :group_category, :group_category_id,
+    :grade_group_students_individually, :peer_reviews,
+    :moderated_grading]
+
   has_many :submissions, :dependent => :destroy
   has_many :provisional_grades, :through => :submissions
   has_many :attachments, :as => :context, :dependent => :destroy
@@ -2264,9 +2272,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.sis_grade_export_enabled?(context)
-    context.feature_enabled?(:post_grades) ||
-      context.root_account.feature_enabled?(:bulk_sis_grade_export) ||
-      Lti::AppLaunchCollator.any?(context, [:post_grades])
+    context.feature_enabled?(:post_grades) || Lti::AppLaunchCollator.any?(context, [:post_grades])
   end
 
   def run_if_overrides_changed!(student_ids=nil)

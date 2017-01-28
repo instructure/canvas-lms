@@ -40,7 +40,7 @@ function(React, ReactDOM, GradingStandardCollection, GradingPeriodCollection, $,
       } else{
         return (
           <div ref="gradingStandards">
-            <h1 tabIndex="0">{I18n.t("Grading Schemes")}</h1>
+            <h1>{I18n.t("Grading Schemes")}</h1>
             <GradingStandardCollection/>
           </div>
         );

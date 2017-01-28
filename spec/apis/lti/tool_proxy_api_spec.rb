@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_dependency "lti/tool_proxy_controller"
 
 module Lti
   describe ToolProxyController, :include_lti_spec_helpers, type: :request do

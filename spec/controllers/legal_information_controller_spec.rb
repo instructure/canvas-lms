@@ -27,14 +27,14 @@ describe LegalInformationController do
     end
 
     it "should work with authorization" do
-      user
+      user_factory
       user_session @user
       get 'terms_of_use'
       expect(response).to redirect_to controller.terms_of_use_url
     end
 
     it "should not require acceptance of terms" do
-      user
+      user_factory
       user_session @user
       session[:require_terms] = true
       get 'terms_of_use'
@@ -49,14 +49,14 @@ describe LegalInformationController do
     end
 
     it "should work with authorization" do
-      user
+      user_factory
       user_session @user
       get 'privacy_policy'
       expect(response).to redirect_to controller.privacy_policy_url
     end
 
     it "should not require acceptance of terms" do
-      user
+      user_factory
       user_session @user
       session[:require_terms] = true
       get 'privacy_policy'

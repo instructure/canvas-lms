@@ -5,10 +5,13 @@ require [
   'compiled/userSettings'
   'compiled/collections/OutcomeSummaryCollection'
   'compiled/views/grade_summary/OutcomeSummaryView'
+  'grade_summary'
   'jqueryui/tabs'
   'jquery.disableWhileLoading'
-  'grade_summary'
-], ($, _, Backbone, userSettings, OutcomeSummaryCollection, OutcomeSummaryView) ->
+], ($, _, Backbone, userSettings, OutcomeSummaryCollection, OutcomeSummaryView, grade_summary) ->
+  # Ensure the gradebook summary code has had a chance to setup all its handlers
+  grade_summary.setup()
+
   class GradebookSummaryRouter extends Backbone.Router
     routes:
       '': 'tab'

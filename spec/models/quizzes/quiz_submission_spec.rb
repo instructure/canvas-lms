@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe Quizzes::QuizSubmission do
   context 'with course and quiz' do
     before(:once) do
-      course
+      course_factory
       @quiz = @course.quizzes.create!
     end
 
@@ -38,7 +38,7 @@ describe Quizzes::QuizSubmission do
         qs = Quizzes::QuizSubmission.new
         qs.extra_time = 10081
         expect(qs.valid?).to eq false
-        expect(Array(qs.errors[:extra_time])).to eq ["must be less than or equal to 10080"]
+        expect(Array(qs.errors[:extra_time])).to eq ["must be less than or equal to 10,080"]
       end
 
       it "should validate numericality of extra attempts" do
@@ -52,14 +52,14 @@ describe Quizzes::QuizSubmission do
         qs = Quizzes::QuizSubmission.new
         qs.extra_attempts = 1001
         expect(qs.valid?).to eq false
-        expect(Array(qs.errors[:extra_attempts])).to eq ["must be less than or equal to 1000"]
+        expect(Array(qs.errors[:extra_attempts])).to eq ["must be less than or equal to 1,000"]
       end
 
       it "should validate quiz points possible is not too long" do
         qs = Quizzes::QuizSubmission.new
         qs.quiz = Quizzes::Quiz.new(:points_possible => 2000000001)
         expect(qs.valid?).to eq false
-        expect(Array(qs.errors[:quiz_points_possible])).to eq ["must be less than or equal to 2000000000"]
+        expect(Array(qs.errors[:quiz_points_possible])).to eq ["must be less than or equal to 2,000,000,000"]
       end
     end
 
@@ -137,7 +137,7 @@ describe Quizzes::QuizSubmission do
     describe "#update_scores" do
       before(:once) do
         student_in_course
-        assignment_quiz([])
+        assignment_quiz([], course: @course)
         qd = multiple_choice_question_data
         @quiz.quiz_data = [qd]
         @quiz.points_possible = qd[:points_possible]
@@ -278,7 +278,7 @@ describe Quizzes::QuizSubmission do
 
         @quiz.publish!
 
-        quiz_submission = @quiz.generate_submission(user)
+        quiz_submission = @quiz.generate_submission(user_factory)
         quiz_submission.backup_submission_data({
           "question_#{qq1.id}" => "1",
           "question_#{qq2.id}" => "",
@@ -298,7 +298,7 @@ describe Quizzes::QuizSubmission do
 
           true_answer = question.question_data['answers'].find { |answer| answer['text'] == 'True' }
           false_answer = question.question_data['answers'].find { |answer| answer['text'] == 'False' }
-          quiz_submission = @quiz.generate_submission(user)
+          quiz_submission = @quiz.generate_submission(user_factory)
           quiz_submission.backup_submission_data({
             "question_#{question.id}" => true_answer['id'],
             :"_question_#{question.id}_read" => true
@@ -751,7 +751,7 @@ describe Quizzes::QuizSubmission do
     describe "#score_to_keep" do
       before(:once) do
         student_in_course
-        assignment_quiz([])
+        assignment_quiz([], course: @course)
         qd = multiple_choice_question_data
         @quiz.quiz_data = [qd]
         @quiz.points_possible = qd[:points_possible]
@@ -842,7 +842,7 @@ describe Quizzes::QuizSubmission do
     context "permissions" do
       it "should allow read to observers" do
         course_with_student(:active_all => true)
-        @observer = user
+        @observer = user_factory
         oe = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active')
         oe.update_attribute(:associated_user, @user)
         @quiz = @course.quizzes.create!
@@ -1245,7 +1245,7 @@ describe Quizzes::QuizSubmission do
     describe "#needs_grading?" do
       before :once do
         student_in_course
-        assignment_quiz([])
+        assignment_quiz([], course: @course)
         qd = multiple_choice_question_data
         @quiz.quiz_data = [qd]
         @quiz.points_possible = qd[:points_possible]
@@ -1311,7 +1311,7 @@ describe Quizzes::QuizSubmission do
     describe "#needs_grading" do
       before :once do
         student_in_course
-        assignment_quiz([])
+        assignment_quiz([], course: @course)
         qd = multiple_choice_question_data
         @quiz.quiz_data = [qd]
         @quiz.points_possible = qd[:points_possible]

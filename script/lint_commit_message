@@ -108,10 +108,13 @@ if File.exists?(user_config_file)
 end
 
 gh_issue = (commit_message =~ /(?:refs|fixes|closes|resolves|references) gh-\d+/i)
+SAFE_PARTS_REGEX = /UTF\-8/
+TICKET_REGEX = /([A-Z]+\-[0-9]+)/
 
 issue_ids = JiraRefParser.scan_message_for_issue_ids(commit_message)
 if issue_ids.empty? && !gh_issue
-  parts = commit_message.split(/([A-Z]+-[0-9]+)/)
+  parts = commit_message.gsub(SAFE_PARTS_REGEX, "")
+            .split(TICKET_REGEX)
   if parts.size > 1
     jira_hook_words = JiraRefParser::RefKeywords + JiraRefParser::FixKeywords
     comment "warn", parts.first.count("\n") + 1, "the jira hooks won't link this commit to #{parts[1]} unless you use one of the following keywords: #{jira_hook_words.join(", ")}"

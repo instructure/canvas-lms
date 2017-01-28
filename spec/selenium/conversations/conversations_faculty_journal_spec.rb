@@ -13,9 +13,9 @@ describe "conversations new" do
 
   before do
     conversation_setup
-    @s1 = user(name: "first student")
-    @s2 = user(name: "second student")
-    @s3 = user(name: 'third student')
+    @s1 = user_factory(name: "first student")
+    @s2 = user_factory(name: "second student")
+    @s3 = user_factory(name: 'third student')
     [@s1, @s2, @s3].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
     cat = @course.group_categories.create(:name => "the groups")
     @group = cat.groups.create(:name => "the group", :context => @course)
@@ -76,6 +76,7 @@ describe "conversations new" do
       replace_content(f('textarea'),'FJ Body text 2')
       wait_for_ajaximations
       f('.send_button').click
+      wait_for_ajaximations
       time = format_time_for_view(UserNote.last.updated_at)
       get student_user_notes_url
       expect(f('.subject').text).to eq 'FJ Title 2'

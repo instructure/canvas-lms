@@ -125,7 +125,7 @@ describe ContentMigration do
     end
 
     it "should keep date-locked files locked" do
-      student = user
+      student = user_factory
       @copy_from.enroll_student(student)
       att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt", :uploaded_data => StringIO.new('file'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from, :lock_at => 1.month.ago, :unlock_at => 1.month.from_now)
       expect(att.grants_right?(student, :download)).to be_falsey
@@ -641,6 +641,27 @@ describe ContentMigration do
 
       new_tag2 = @copy_to.context_module_tags.where(:migration_id => mig_id(tag2)).first
       expect(new_tag2).to be_unpublished
+    end
+
+    it "should restore deleted module items on re-import" do
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
+
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      tag1 = mod.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })
+      tag2 = mod.add_item({:id => page.id, :type => 'wiki_page', :indent => 1})
+
+      run_course_copy
+
+      new_mod = @copy_to.context_modules.where(:migration_id => mig_id(mod)).first
+      new_mod.destroy!
+
+      run_course_copy
+
+      new_mod.reload
+      expect(new_mod).to_not be_deleted
+      new_mod.content_tags.each do |new_tag|
+        expect(new_tag).to_not be_deleted
+      end
     end
 
     it "should copy over published tableless module items" do

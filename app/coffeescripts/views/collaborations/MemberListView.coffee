@@ -160,5 +160,5 @@ define [
     #
     # Returns nothing.
     removeCurrentUser: ->
-      @collection.remove(@options.currentUser, silent: true)
+      @collection.remove(@collection.where(id: @options.currentUser, type: 'user'), silent: true)
 

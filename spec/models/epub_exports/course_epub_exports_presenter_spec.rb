@@ -59,6 +59,13 @@ describe EpubExports::CourseEpubExportsPresenter do
         end.latest_epub_export).to be_nil
       end
 
+      it 'does not include web zip exports' do
+        @course_with_epub.web_zip_exports.create!(user: @student)
+        expect(courses.find do |course|
+          course.id == @course_with_epub.id
+        end.latest_epub_export).to eq @epub_export
+      end
+
       it 'does not include course for which user is an observer' do
         expect(courses).not_to include(@course_as_observer)
       end

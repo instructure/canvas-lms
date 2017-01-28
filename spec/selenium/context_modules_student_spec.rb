@@ -63,7 +63,7 @@ describe "context modules" do
     end
 
     it "should not lock modules for observers" do
-      @course.enroll_user(user, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+      @course.enroll_user(user_factory, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
       user_session(@user)
 
       go_to_modules
@@ -94,22 +94,13 @@ describe "context modules" do
 
     it "moves a student through context modules in sequential order", priority: "2", test_id: 126742 do
       go_to_modules
+      validate_context_module_status_icon(@module_1.id, @no_icon)
+      validate_context_module_status_icon(@module_2.id, @locked_icon)
 
       #sequential normal validation
       navigate_to_module_item(0, @assignment_1.title)
       validate_context_module_status_icon(@module_1.id, @completed_icon)
       validate_context_module_status_icon(@module_2.id, @no_icon)
-      validate_context_module_status_icon(@module_3.id, @locked_icon)
-
-      navigate_to_module_item(1, @assignment_2.title)
-      validate_context_module_status_icon(@module_1.id, @completed_icon)
-      validate_context_module_status_icon(@module_2.id, @completed_icon)
-      validate_context_module_status_icon(@module_3.id, @no_icon)
-
-      navigate_to_module_item(2, @quiz_1.title)
-      validate_context_module_status_icon(@module_1.id, @completed_icon)
-      validate_context_module_status_icon(@module_2.id, @completed_icon)
-      validate_context_module_status_icon(@module_3.id, @completed_icon)
     end
 
     it "should not cache a changed module requirement" do
@@ -260,24 +251,13 @@ describe "context modules" do
       expect(f('#module_prerequisites_list')).to be_displayed
 
       go_to_modules
+      validate_context_module_status_icon(@module_1.id, @no_icon)
+      validate_context_module_status_icon(@module_2.id, @locked_icon)
 
       #sequential normal validation
       navigate_to_module_item(0, @assignment_1.title)
       validate_context_module_status_icon(@module_1.id, @completed_icon)
       validate_context_module_status_icon(@module_2.id, @no_icon)
-      validate_context_module_status_icon(@module_3.id, @locked_icon)
-
-      navigate_to_module_item(1, @assignment_2.title)
-      validate_context_module_status_icon(@module_1.id, @completed_icon)
-      validate_context_module_status_icon(@module_2.id, @completed_icon)
-      validate_context_module_status_icon(@module_3.id, @no_icon)
-
-      scroll_page_to_bottom
-
-      navigate_to_module_item(2, @quiz_1.title)
-      validate_context_module_status_icon(@module_1.id, @completed_icon)
-      validate_context_module_status_icon(@module_2.id, @completed_icon)
-      validate_context_module_status_icon(@module_3.id, @completed_icon)
     end
 
     context "next and previous buttons", priority: "2" do
@@ -573,6 +553,13 @@ describe "context modules" do
         validate_context_module_item_icon(@tag_1.id, @completed_icon)
       end
 
+      it "shows a tooltip when hovering over a completed icon", priority: "1", test_id: 255915 do
+        go_to_modules
+        navigate_to_module_item(0, @assignment_1.title)
+        driver.mouse.move_to(f('.ig-header-admin .completion_status .icon-check'), 0, 0)
+        expect(fj('.ui-tooltip:visible')).to include_text('Completed')
+      end
+
       it "should show an incomplete circle icon when module item is requirement but not complete", priority: "1", test_id: 250544 do
         go_to_modules
         validate_context_module_item_icon(@tag_1.id, @open_item_icon)
@@ -607,6 +594,14 @@ describe "context modules" do
         go_to_modules
 
         validate_context_module_item_icon(@tag_4.id, @in_progress_icon)
+      end
+
+      it "shows tool tip text when hovering over the warning icon for a min score requirement", priority: "1", test_id: 255916 do
+        add_min_score_assignment
+        grade_assignment(50)
+        go_to_modules
+        driver.mouse.move_to(f('.ig-header-admin .completion_status .icon-minimize'), 0, 0)
+        expect(fj('.ui-tooltip:visible')).to include_text('Started')
       end
 
       it "should show an info icon when module item is a min score requirement that has not yet been graded" do

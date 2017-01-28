@@ -33,6 +33,9 @@ module Importers
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= context.assignments.temp_record #new(:context => context)
+      
+      item.mark_as_importing!(migration)
+
       item.title = hash[:title]
       item.title = I18n.t('untitled assignment') if item.title.blank?
       item.migration_id = hash[:migration_id]
@@ -125,6 +128,7 @@ module Importers
           assoc.summary_data[:saved_comments] ||= {}
           assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
         end
+        assoc.skip_updating_points_possible = true
         assoc.save
 
         item.points_possible ||= rubric.points_possible if item.infer_grading_type == "points"

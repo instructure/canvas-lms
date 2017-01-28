@@ -29,12 +29,18 @@ RSpec.configure do |c|
   c.raise_errors_for_deprecations!
   c.color = true
   c.include LtiSpecHelper, :include_lti_spec_helpers
-
   c.around(:each) do |example|
-    Timeout::timeout(180) do
-      Rails.logger.info "STARTING SPEC #{example.full_description}"
-      example.run
+    record_spec_info(example) do
+      Timeout::timeout(60) do
+        Rails.logger.info "STARTING SPEC #{example.full_description}"
+        example.run
+      end
     end
+  end
+
+  # TODO: spec failure pages for everything, not just selenium
+  def record_spec_info(*)
+    yield
   end
 end
 
@@ -898,7 +904,7 @@ RSpec.configure do |config|
   end
 end
 
-class I18nema::Backend
+class I18n::Backend::Simple
   def stub(translations)
     @stubs = translations.with_indifferent_access
     singleton_class.instance_eval do
@@ -916,8 +922,8 @@ class I18nema::Backend
 
   def lookup_with_stubs(locale, key, scope = [], options = {})
     init_translations unless initialized?
-    keys = normalize_keys(locale, key, scope, options[:separator])
-    keys.inject(@stubs){ |h,k| h[k] if h.respond_to?(:key) } || direct_lookup(*keys)
+    keys = I18n.normalize_keys(locale, key, scope, options[:separator])
+    keys.inject(@stubs){ |h,k| h[k] if h.respond_to?(:key) } || lookup_without_stubs(locale, key, scope, options)
   end
   alias_method :lookup_without_stubs, :lookup
 
@@ -929,4 +935,19 @@ end
 
 Dir[Rails.root+'{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb'].each do |f|
   require f
+end
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    # Choose a test framework:
+    with.test_framework :rspec
+
+    # Choose one or more libraries:
+    with.library :active_record
+    with.library :active_model
+    # Disable the action_controller matchers until shoulda-matchers supports new compound matchers
+    # with.library :action_controller
+    # Or, choose the following (which implies all of the above):
+    # with.library :rails
+  end
 end

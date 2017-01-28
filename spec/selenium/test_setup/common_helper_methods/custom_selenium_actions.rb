@@ -62,7 +62,7 @@ module CustomSeleniumActions
   #   expect(f('#content')).not_to contain_jqcss('.gone:visible')
   def fj(selector, scope = nil)
     stale_element_protection do
-      wait_for(method: :fj, timeout: driver.manage.timeouts.implicit_wait) do
+      wait_for(method: :fj) do
         find_with_jquery selector, scope
       end or raise Selenium::WebDriver::Error::NoSuchElementError
     end
@@ -73,11 +73,14 @@ module CustomSeleniumActions
   # like other selenium methods, this will wait until it finds elements on
   # the page, and will eventually raise if none are found
   def ff(selector, scope = nil)
-    result = reloadable_collection do
-      (scope || driver).find_elements :css, selector
+    reloadable_collection do
+      result = nil
+      wait_for(method: :ff) do
+        result = disable_implicit_wait { (scope || driver).find_elements(:css, selector) }
+        result.present?
+      end or raise Selenium::WebDriver::Error::NoSuchElementError
+      result
     end
-    raise Selenium::WebDriver::Error::NoSuchElementError unless result.present?
-    result
   end
 
   # same as `fj`, but returns all matching elements
@@ -87,7 +90,7 @@ module CustomSeleniumActions
   def ffj(selector, scope = nil)
     reloadable_collection do
       result = nil
-      wait_for(method: :ffj, timeout: driver.manage.timeouts.implicit_wait) do
+      wait_for(method: :ffj) do
         result = find_all_with_jquery(selector, scope)
         result.present?
       end or raise Selenium::WebDriver::Error::NoSuchElementError

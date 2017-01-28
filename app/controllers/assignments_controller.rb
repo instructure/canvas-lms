@@ -164,6 +164,8 @@ class AssignmentsController < ApplicationController
       js_env({
         :ASSIGNMENT_TITLE => @assignment.title,
         :GRADES_PUBLISHED => @assignment.grades_published?,
+        :COURSE_ID => @context.id,
+        :STUDENT_CONTEXT_CARDS_ENABLED => @domain_root_account.feature_enabled?(:student_context_cards),
         :URLS => {
           :student_submissions_url => polymorphic_url([:api_v1, @context, @assignment, :submissions]) + "?include[]=user_summary&include[]=provisional_grades",
           :publish_grades_url => api_v1_publish_provisional_grades_url({course_id: @context.id, assignment_id: @assignment.id}),
@@ -461,6 +463,10 @@ class AssignmentsController < ApplicationController
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
       end
       append_sis_data(hash)
+      if context.is_a?(Course)
+        hash[:allow_self_signup] = true  # for group creation
+        hash[:group_user_type] = 'student'
+      end
       js_env(hash)
       conditional_release_js_env(@assignment)
       render :edit

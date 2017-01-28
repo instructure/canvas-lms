@@ -23,5 +23,12 @@ module Canvas::SoftDeletable
       run_callbacks :destroy
       true
     end
+
+    # `restore` was taken by too many other methods...
+    def undestroy
+      self.workflow_state = 'active'
+      save!
+      true
+    end
   end
 end

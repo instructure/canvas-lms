@@ -119,7 +119,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
 
     before :once do
       Account.default.enable_feature!(:quiz_log_auditing)
-      @quiz = course(active_all: true).quizzes.create!
+      @quiz = course_factory(active_all: true).quizzes.create!
     end
 
     context 'as the student who took the quiz' do
@@ -195,7 +195,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
     context 'as someone else' do
       before(:once) do
         student_in_course(course: @course)
-        user(active_all: true)
+        user_factory(active_all: true)
 
         @quiz_submission = @quiz.generate_submission(@student)
       end

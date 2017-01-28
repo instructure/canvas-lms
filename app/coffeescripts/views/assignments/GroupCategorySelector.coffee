@@ -5,8 +5,10 @@ define [
   'jquery'
   'jst/assignments/GroupCategorySelector'
   'compiled/jquery/toggleAccessibly',
-  'jsx/due_dates/StudentGroupStore'
-], (I18n, Backbone, _, $, template, toggleAccessibly, StudentGroupStore) ->
+  'jsx/due_dates/StudentGroupStore',
+  'compiled/views/groups/manage/GroupCategoryCreateView',
+  'compiled/models/GroupCategory',
+], (I18n, Backbone, _, $, template, toggleAccessibly, StudentGroupStore, GroupCategoryCreateView, GroupCategory) ->
 
   class GroupCategorySelector extends Backbone.View
 
@@ -56,10 +58,9 @@ define [
       StudentGroupStore.setSelectedGroupSet(newSelectedId)
 
     showGroupCategoryCreateDialog: =>
-      # TODO: Yikes, we need to pull the javascript out of manage_groups.js
-      # and get rid of this global thing
-      window.addGroupCategory (data) =>
-        group = data[0].group_category
+      groupCategory = new GroupCategory()
+      view = new GroupCategoryCreateView({model: groupCategory})
+      view.on 'success', (group) =>
         $newCategory = $('<option>')
         $newCategory.val(group.id)
         $newCategory.text(group.name)
@@ -67,6 +68,7 @@ define [
         @$groupCategoryID.val(group.id)
         @groupCategories.push(group)
         @$groupCategoryID.toggleAccessibly true
+      view.open()
 
     toggleGroupCategoryOptions: =>
       isGrouped = @$hasGroupCategory.prop('checked')

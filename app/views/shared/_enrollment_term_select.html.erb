@@ -1,3 +1,5 @@
+<% default_term ||= @root_account.default_enrollment_term %>
+<% terms = terms.not_default %>
 <% selected_id ||= nil %>
 <% exclude_all_option ||= false %>
 <% name ||= 'enrollment_term_id' %>
@@ -5,6 +7,9 @@
 <select id="<%= id %>" name="<%= name %>">
   <% unless exclude_all_option %>
     <option value="" <%= 'selected' unless selected_id %>><%= t("All Terms") %></option>
+  <% end %>
+  <% if default_term %>
+    <option value="<%= default_term.id %>" <%= 'selected' if default_term.id == selected_id %>><%= default_term.name %></option>
   <% end %>
   <% if terms.started.not_ended.any? %>
     <optgroup label="<%= t("Active Terms") %>">

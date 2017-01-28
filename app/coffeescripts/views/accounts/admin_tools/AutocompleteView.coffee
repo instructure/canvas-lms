@@ -3,6 +3,7 @@ define [
   'Backbone'
   'jquery'
   'jst/accounts/admin_tools/autocomplete'
+  'jqueryui/autocomplete'
 ], (_, Backbone, $, template) ->
   class AutocompleteView extends Backbone.View
     template: template

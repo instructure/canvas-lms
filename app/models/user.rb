@@ -1490,13 +1490,13 @@ class User < ActiveRecord::Base
         need_submitting_info(id, options[:limit]).
         not_locked
       assignments = assignments.expecting_submission unless opts[:include_ungraded]
-      select_available_assignments(assignments)
+      select_available_assignments(assignments).reject { |a| a.due_at && a.due_at < Time.now && !a.expects_submission? }
     end
   end
 
   def ungraded_quizzes_needing_submitting(opts={})
     assignments_needing('submitting', :student, 15.minutes, opts.merge(:ungraded_quizzes => true)) do |quiz_scope, options|
-      due_after = options[:due_after] || 4.weeks.ago
+      due_after = options[:due_after] || Time.now
       due_before = options[:due_before] || 1.week.from_now
 
       quizzes = quiz_scope.
@@ -2786,7 +2786,7 @@ class User < ActiveRecord::Base
   end
 
   def preferred_gradebook_version
-    preferences[:gradebook_version] || '2'
+    preferences.fetch(:gradebook_version, '2')
   end
 
   def stamp_logout_time!

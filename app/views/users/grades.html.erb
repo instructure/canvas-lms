@@ -63,7 +63,7 @@
     <td class="course" style="vertical-align: middle;"><a href="<%= course_grades_path(enrollment.course_id) %>"><%= enrollment.course.name %></a></td>
     <td class="percent">
       <% if @presenter.course_grade_summaries[enrollment.course_id][:score] %>
-        <%= number_to_percentage(@presenter.course_grade_summaries[enrollment.course_id][:score], :precision => 2) %>
+        <%= n(@presenter.course_grade_summaries[enrollment.course_id][:score], percentage: true, precision: 2) %>
         <div style="font-size: 0.6em; font-weight: normal;"><%= t('average_grades', {:one => "average for 1 student", :other => "average for %{count} students"}, :count => @presenter.course_grade_summaries[enrollment.course_id][:students]) %></div>
       <% else %>
         <span style="font-weight: normal; font-size: 0.9em;"><%= t('no_grades', 'no grades') %></span>

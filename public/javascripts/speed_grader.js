@@ -17,7 +17,7 @@
  */
 
 define([
-  'jsx/speed_grader/mgp',
+  'jsx/speed_grader/gradingPeriod',
   'jsx/grading/helpers/OutlierScoreHelper',
   'jsx/grading/quizzesNextSpeedGrading',
   'jst/speed_grader/student_viewed_at',
@@ -130,6 +130,7 @@ define([
       $submission_file_hidden = $("#submission_file_hidden").removeAttr('id').detach(),
       $assignment_submission_url = $("#assignment_submission_url"),
       $assignment_submission_turnitin_report_url = $("#assignment_submission_turnitin_report_url"),
+      $assignment_submission_originality_report_url = $("#assignment_submission_originality_report_url"),
       $assignment_submission_resubmit_to_turnitin_url = $("#assignment_submission_resubmit_to_turnitin_url"),
       $assignment_submission_vericite_report_url = $("#assignment_submission_vericite_report_url"),
       $assignment_submission_resubmit_to_vericite_url = $("#assignment_submission_resubmit_to_vericite_url"),
@@ -1419,9 +1420,13 @@ define([
 
       // build up new values based on this asset
       if (turnitinAsset.status == 'scored' || (turnitinAsset.status == null && turnitinAsset.similarity_score != null)) {
+        var urlContainer = SpeedgraderHelpers.urlContainer(submission,
+                                                           $assignment_submission_turnitin_report_url,
+                                                           $assignment_submission_originality_report_url)
+
         $turnitinScoreContainer.html(turnitinScoreTemplate({
           state: (turnitinAsset.state || 'no') + '_score',
-          reportUrl: $.replaceTags($assignment_submission_turnitin_report_url.attr('href'), { user_id: submission.user_id, asset_string: assetString }),
+          reportUrl: $.replaceTags(urlContainer.attr('href'), { user_id: submission.user_id, asset_string: assetString }),
           tooltip: I18n.t('turnitin.tooltip.score', 'Turnitin Similarity Score - See detailed report'),
           score: turnitinAsset.similarity_score + '%'
         }));
@@ -1830,6 +1835,19 @@ define([
         allowfullscreen: true
       });
       $iframe_holder.html($.raw(iframe)).show();
+      this.fitImgToIframe();
+    },
+
+    // if the iframe is only an img, set its max-width and height to 100%
+    fitImgToIframe: function () {
+      $iframe_holder.find('iframe').load(this.resizeImg);
+    },
+
+    resizeImg: function () {
+      var iframeContent = $(this).contents().find('body').children();
+      if (iframeContent.length === 1 && iframeContent.first().is('img')) {
+        iframeContent.attr('style', 'max-width: 100vw; max-height: 100vh;');
+      }
     },
 
     renderLtiLaunch: function($div, urlBase, externalToolUrl) {
@@ -1887,7 +1905,7 @@ define([
         }));
       } else if (attachment.canvadoc_url) {
         $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
-          canvadoc_session_url: attachment.canvadoc_url
+          canvadoc_session_url: attachment.canvadoc_url + '&wants_annotation=true'
         }));
       } else if ($.isPreviewable(attachment.content_type, 'google')) {
         if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
@@ -1909,6 +1927,7 @@ define([
         $iframe_holder.html(
           $.raw(iframe)
         ).show();
+        this.fitImgToIframe();
       }
     },
 
@@ -1949,136 +1968,204 @@ define([
       }
     },
 
-    showDiscussion: function(){
-      var hideStudentNames = utils.shouldHideStudentNames();
+    renderCommentAttachment: function (comment, attachmentData, incomingOpts) {
+      var defaultOpts = {
+        commentAttachmentBlank: $comment_attachment_blank
+      };
+      var opts = _.extend({}, defaultOpts, incomingOpts);
+      var attachment = attachmentData.attachment ? attachmentData.attachment : attachmentData;
+      var attachmentElement = opts.commentAttachmentBlank.clone(true);
+
+      attachment.comment_id = comment.id;
+      attachment.submitter_id = EG.currentStudent.id;
+
+      attachmentElement = attachmentElement.fillTemplateData({
+        data: attachment,
+        hrefValues: ['comment_id', 'id', 'submitter_id']
+      });
+      attachmentElement.find('a').addClass(attachment.mime_class);
+
+      return attachmentElement;
+    },
+
+    addCommentDeletionHandler: function (commentElement, comment) {
       var that = this;
-      $comments.html("");
 
-      function renderComment(comment, commentBlank) {
-        // Serialization seems to have changed... not sure if it's changed everywhere, though...
-        if (comment.submission_comment) { comment = comment.submission_comment; }
+      // this is really poorly decoupled but over in
+      // speed_grader.html.erb these rubricAssessment. variables are
+      // set.  what this is saying is: if I am able to grade this
+      // assignment (I am administrator in the course) or if I wrote
+      // this comment... and if the student isn't concluded
+      var isConcluded = EG.isStudentConcluded(EG.currentStudent.id);
+      var commentIsDeleteableByMe = (ENV.RUBRIC_ASSESSMENT.assessment_type === 'grading' ||
+        ENV.RUBRIC_ASSESSMENT.assessor_id === comment.author_id) && !isConcluded;
 
-        // don't render private comments when viewing a group assignment
-        if (!comment.group_comment_id && jsonData.GROUP_GRADING_MODE) return;
+      commentElement.find('.delete_comment_link').click(function (_event) {
+        $(this).parents('.comment').confirmDelete({
+          url: '/submission_comments/' + comment.id,
+          message: I18n.t('Are you sure you want to delete this comment?'),
+          success: function (_data) {
+            var updatedComments = [];
 
-        comment.posted_at = $.datetimeString(comment.created_at);
-
-        var hideStudentName = hideStudentNames && jsonData.studentMap[comment.author_id];
-        if (hideStudentName) { comment.author_name = I18n.t('Student'); }
-        var $comment = commentBlank.clone(true).fillTemplateData({ data: comment });
-
-        if (comment.draft === true) {
-          $comment.addClass('draft');
-        } else {
-          $comment.find('.draft-marker').remove();
-          $comment.find('.submit_comment_button').remove();
-        }
-
-        $comment.find('span.comment').html($.raw(htmlEscape(comment.comment).replace(/\n/g, "<br />")));
-        if (comment.avatar_path && !hideStudentName) {
-          $comment.find(".avatar").attr('src', comment.avatar_path).show();
-        }
-
-        if (comment.media_comment_type && comment.media_comment_id) {
-          $comment.find(".play_comment_link").data(comment).show();
-        }
-
-        $.each((comment.cached_attachments || comment.attachments || []), function(){
-          var attachment = this.attachment || this;
-          attachment.comment_id = comment.id;
-          attachment.submitter_id = EG.currentStudent.id;
-          $comment.find(".comment_attachments").append($comment_attachment_blank.clone(true).fillTemplateData({
-            data: attachment,
-            hrefValues: ['comment_id', 'id', 'submitter_id']
-          }).show().find("a").addClass(attachment.mime_class));
-        });
-
-        /* Submit a comment and Delete a comment listeners */
-
-        // this is really poorly decoupled but over in
-        // speed_grader.html.erb these rubricAssessment. variables are
-        // set.  what this is saying is: if I am able to grade this
-        // assignment (I am administrator in the course) or if I wrote
-        // this comment... and if the student isn't concluded
-        var isConcluded = EG.isStudentConcluded(EG.currentStudent.id);
-        var commentIsDeleteableByMe = (ENV.RUBRIC_ASSESSMENT.assessment_type === "grading" ||
-            ENV.RUBRIC_ASSESSMENT.assessor_id === comment.author_id) && !isConcluded;
-        var commentIsPublishableByMe = (comment.draft === true &&
-            parseInt(comment.author_id) === parseInt(ENV.current_user_id)) && !isConcluded;
-
-        $comment.find(".delete_comment_link").click(function(event) {
-          $(this).parents(".comment").confirmDelete({
-            url: "/submission_comments/" + comment.id,
-            message: I18n.t("Are you sure you want to delete this comment?"),
-            success: function(data) {
-              // Let's remove this comment from the client-side cache
-              if (that.currentStudent.submission && that.currentStudent.submission.submission_comments) {
-                var updatedComments = _.reject(
-                  that.currentStudent.submission.submission_comments,
-                  function(item) {
-                    var submissionComment = item.submission_comment || item;
-                    return submissionComment.id === comment.id;
-                  }
-                );
-
-                that.currentStudent.submission.submission_comments = updatedComments;
-              }
-
-              // and also remove it from the DOM
-              $(this).slideUp(function() {
-                $(this).remove();
-              });
-            }
-          });
-        }).showIf(commentIsDeleteableByMe);
-
-        $comment.find(".submit_comment_button").click(function(event) {
-          if (confirm(I18n.t('Are you sure you want to submit this comment?'))) {
-            function commentUpdateSucceeded(data) {
-              var $replacementComment = renderComment(data.submission_comment, $comment_blank);
-              $replacementComment.show();
-              $comment.replaceWith($replacementComment);
-
-              var updatedComments = _.map(that.currentStudent.submission.submission_comments,
-                function(item) {
+            // Let's remove this comment from the client-side cache
+            if (that.currentStudent.submission && that.currentStudent.submission.submission_comments) {
+              updatedComments = _.reject(
+                that.currentStudent.submission.submission_comments,
+                function (item) {
                   var submissionComment = item.submission_comment || item;
-                  if (submissionComment.id === comment.id) {
-                    return data.submission_comment;
-                  } else {
-                    return submissionComment;
-                  }
+                  return submissionComment.id === comment.id;
                 }
               );
 
               that.currentStudent.submission.submission_comments = updatedComments;
             }
 
-            function commentUpdateFailed(jqXHR, textStatus) {
-              $.flashError(I18n.t("Failed to submit draft comment"));
-            }
-
-            var url = '/submission_comments/' + comment.id;
-            var data = { submission_comment: { draft: 'false' } };
-            var ajaxOptions = { url: url, data: data, dataType: 'json', type: 'PATCH' };
-
-            $.ajax(ajaxOptions).done(commentUpdateSucceeded).fail(commentUpdateFailed);
+            // and also remove it from the DOM
+            $(this).slideUp(function () {
+              $(this).remove();
+            });
           }
-        }).showIf(commentIsPublishableByMe);
+        });
+      }).showIf(commentIsDeleteableByMe);
+    },
 
-        return $comment;
+    addCommentSubmissionHandler: function (commentElement, comment) {
+      var that = this;
+
+      // this is really poorly decoupled but over in
+      // speed_grader.html.erb these rubricAssessment. variables are
+      // set.  what this is saying is: if I am able to grade this
+      // assignment (I am administrator in the course) or if I wrote
+      // this comment... and if the student isn't concluded
+      var isConcluded = EG.isStudentConcluded(EG.currentStudent.id);
+      var commentIsPublishableByMe = comment.draft &&
+        (comment.author_id.toString() === ENV.current_user_id) && !isConcluded;
+
+      commentElement.find('.submit_comment_button').click(function (_event) {
+        var updateUrl = '';
+        var updateData = {};
+        var updateAjaxOptions = {};
+        var commentUpdateSucceeded = function (data) {
+          var updatedComments = [];
+          var $replacementComment = that.renderComment(data.submission_comment);
+          $replacementComment.show();
+          commentElement.replaceWith($replacementComment);
+
+          updatedComments = _.map(that.currentStudent.submission.submission_comments,
+            function (item) {
+              var submissionComment = item.submission_comment || item;
+
+              if (submissionComment.id === comment.id) {
+                return data.submission_comment;
+              }
+
+              return submissionComment;
+            }
+          );
+
+          that.currentStudent.submission.submission_comments = updatedComments;
+        };
+        var commentUpdateFailed = function (_jqXHR, _textStatus) {
+          $.flashError(I18n.t('Failed to submit draft comment'));
+        };
+        var confirmed = confirm(I18n.t('Are you sure you want to submit this comment?'));
+
+        if (confirmed) {
+          updateUrl = '/submission_comments/' + comment.id;
+          updateData = { submission_comment: { draft: 'false' } };
+          updateAjaxOptions = { url: updateUrl, data: updateData, dataType: 'json', type: 'PATCH' };
+
+          $.ajax(updateAjaxOptions).done(commentUpdateSucceeded).fail(commentUpdateFailed);
+        }
+      }).showIf(commentIsPublishableByMe);
+    },
+
+    renderComment: function (commentData, incomingOpts) {
+      var comment = commentData;
+      var spokenComment = '';
+      var submitCommentButtonText = '';
+      var deleteCommentLinkText = '';
+      var hideStudentName = false;
+      var defaultOpts = {
+        commentBlank: $comment_blank,
+        commentAttachmentBlank: $comment_attachment_blank
+      };
+      var opts = _.extend({}, defaultOpts, incomingOpts);
+      var commentElement = opts.commentBlank.clone(true);
+
+      // Serialization seems to have changed... not sure if it's changed everywhere, though...
+      if (comment.submission_comment) { comment = commentData.submission_comment; }
+
+      // don't render private comments when viewing a group assignment
+      if (!comment.group_comment_id && window.jsonData.GROUP_GRADING_MODE) return undefined;
+
+      // For screenreaders
+      spokenComment = comment.comment.replace(/\s+/, ' ');
+
+      comment.posted_at = $.datetimeString(comment.created_at);
+
+      hideStudentName = opts.hideStudentNames && window.jsonData.studentMap[comment.author_id];
+      if (hideStudentName) { comment.author_name = I18n.t('Student'); }
+      commentElement = commentElement.fillTemplateData({ data: comment });
+
+      if (comment.draft) {
+        commentElement.addClass('draft');
+        submitCommentButtonText = I18n.t('Submit comment: %{commentText}', { commentText: spokenComment });
+        commentElement.find('.submit_comment_button').attr('aria-label', submitCommentButtonText);
+      } else {
+        commentElement.find('.draft-marker').remove();
+        commentElement.find('.submit_comment_button').remove();
       }
+
+      commentElement.find('span.comment').html($.raw(htmlEscape(comment.comment).replace(/\n/g, '<br />')));
+
+      deleteCommentLinkText = I18n.t('Delete comment: %{commentText}', { commentText: spokenComment });
+      commentElement.find('.delete_comment_link .screenreader-only').text(deleteCommentLinkText);
+
+      if (comment.avatar_path && !hideStudentName) {
+        commentElement.find('.avatar').attr('src', comment.avatar_path).show();
+      }
+
+      if (comment.media_comment_type && comment.media_comment_id) {
+        commentElement.find('.play_comment_link').data(comment).show();
+      }
+
+      // TODO: Move attachment handling into a separate function
+      $.each((comment.cached_attachments || comment.attachments || []), function (attachment) {
+        var attachmentElement = this.renderCommentAttachment(comment, attachment, commentElement, opts);
+
+        commentElement.find('.comment_attachments').append($(attachmentElement).show());
+      });
+
+      /* Submit a comment and Delete a comment listeners */
+
+      this.addCommentDeletionHandler(commentElement, comment);
+      this.addCommentSubmissionHandler(commentElement, comment);
+
+      return commentElement;
+    },
+
+    showDiscussion: function () {
+      var that = this;
+      var commentRenderingOptions = {
+        hideStudentNames: utils.shouldHideStudentNames(),
+        commentBlank: $comment_blank,
+        commentAttachmentBlank: $comment_attachment_blank
+      };
+
+      $comments.html('');
 
       if (this.currentStudent.submission && this.currentStudent.submission.submission_comments) {
-        $.each(this.currentStudent.submission.submission_comments, function(i, comment){
-          var $comment = renderComment(comment, $comment_blank);
+        $.each(this.currentStudent.submission.submission_comments, function (i, comment) {
+          var commentElement = that.renderComment(comment, commentRenderingOptions);
 
-          if (!$comment) return true; // continue to next comment
-
-          $comments.append($comment.show());
-          $comments.find(".play_comment_link").mediaCommentThumbnail('normal');
+          if (commentElement) {
+            $comments.append($(commentElement).show());
+            $comments.find('.play_comment_link').mediaCommentThumbnail('normal');
+          }
         });
       }
-      $comments.scrollTop(9999999);  //the scrollTop part forces it to scroll down to the bottom so it shows the most recent comment.
+      $comments.scrollTop(9999999);  // the scrollTop part forces it to scroll down to the bottom so it shows the most recent comment.
     },
 
     revertFromFormSubmit: function(draftComment) {
