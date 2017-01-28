@@ -60,17 +60,17 @@ module SeleniumExtensions
       ]
     ).each do |method|
       define_method(method) do |*args|
-        raise 'need to do a `get` before you can interact with the page' unless ready_for_interaction
+        raise RuntimeError, 'need to do a `get` before you can interact with the page', CallStackUtils.useful_backtrace(method) unless ready_for_interaction
         super(*args)
       end
     end
   end
 
   module FinderWaiting
-    def find_element(*)
+    def find_element(*args)
       FinderWaiting.wait_for method: :find_element do
         super
-      end or raise Selenium::WebDriver::Error::NoSuchElementError
+      end or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{args.map(&:inspect).join(", ")}", CallStackUtils.useful_backtrace
     end
     alias_method :first, :find_element
 
@@ -119,7 +119,7 @@ module SeleniumExtensions
       def prevent_nested_waiting!(method)
         return unless @outer_wait_method
         return if timeout == 0
-        raise NestedWaitError, "`#{method}` will wait for you; don't nest it in `#{@outer_wait_method}`"
+        raise NestedWaitError, "`#{method}` will wait for you; don't nest it in `#{@outer_wait_method}`", CallStackUtils.useful_backtrace(method)
       end
     end
   end

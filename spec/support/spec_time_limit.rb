@@ -19,7 +19,9 @@ module SpecTimeLimit
         example.run
       end
     rescue Timeout::Error
-      raise Error, Error.message_for(type, timeout), $ERROR_INFO.backtrace
+      bt = $ERROR_INFO.backtrace
+      bt.shift while bt.first =~ /\/(gems|test_setup)\//
+      raise Error, Error.message_for(type, timeout), bt
     end
 
     # find an appropriate timeout for this spec
