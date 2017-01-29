@@ -36,9 +36,11 @@ describe IncomingMailProcessor::SqsMailbox do
   let(:queue) { double }
   let(:sqs_message_body) {
     {
-      mail: {
-        messageId: 's3_key'
-      }
+      Message: {
+        mail: {
+          messageId: 's3_key'
+        }
+      }.to_json
     }.to_json
   }
   let(:sqs_message) { double(body: sqs_message_body) }
