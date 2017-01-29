@@ -63,7 +63,8 @@ class BounceNotificationProcessor
   end
 
   def parse_message(message)
-    sns_body = JSON.parse(message.body)
+    sqs_body = JSON.parse(message.body)
+    sns_body = JSON.parse(sqs_body['Message'])
     sns_body['bounce']
   end
 
