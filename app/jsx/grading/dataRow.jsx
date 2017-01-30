@@ -1,47 +1,72 @@
 define([
   'react',
-  'i18n!external_tools'
+  'i18n!external_tools',
+  'jsx/shared/helpers/numberHelper',
 ],
-function(React, I18n) {
+(React, I18n, numberHelper) => {
+  const { bool, func, number } = React.PropTypes;
 
   var DataRow = React.createClass({
+    propTypes: {
+      onRowMinScoreChange: func.isRequired,
+      uniqueId: number.isRequired,
+      round: func.isRequired,
+      editing: bool.isRequired,
+    },
 
-    getInitialState: function() {
+    getInitialState () {
       return { showBottomBorder: false };
     },
 
-    getRowData: function(){
+    componentWillReceiveProps () {
+      this.setState({ showBottomBorder: false });
+    },
+
+    getRowData () {
       var rowData = {name: this.props.row[0], minScore: this.props.row[1], maxScore: null};
       rowData.maxScore = this.props.uniqueId === 0 ? 100 : this.props.siblingRow[1];
       return rowData;
     },
 
-    componentWillReceiveProps: function(nextProps) {
-      this.setState({ showBottomBorder: false });
+    hideBottomBorder () {
+      this.setState({showBottomBorder: false});
     },
 
-    triggerRowNameChange: function(event){
+    showBottomBorder () {
+      this.setState({showBottomBorder: true});
+    },
+
+    triggerRowNameChange (event) {
       this.props.onRowNameChange(this.props.uniqueId, event.target.value);
     },
 
-    triggerRowMinScoreChange: function(event){
-      var inputVal = event.target.value;
-      if(inputVal >= 0 && inputVal <= 100){
-        this.props.onRowMinScoreChange(this.props.uniqueId, inputVal);
+    triggerRowMinScoreBlur () {
+      if (this.state.minScoreInput == null) return;
+
+      const inputVal = numberHelper.parse(this.state.minScoreInput);
+
+      if (!isNaN(inputVal) && inputVal >= 0 && inputVal <= 100) {
+        this.props.onRowMinScoreChange(this.props.uniqueId, String(inputVal));
       }
+
+      this.setState({ minScoreInput: null });
     },
 
-    triggerDeleteRow: function(event){
+    triggerRowMinScoreChange (event) {
+      this.setState({ minScoreInput: event.target.value });
+    },
+
+    triggerDeleteRow (event) {
       event.preventDefault();
       return this.props.onDeleteRow(this.props.uniqueId);
     },
 
-    triggerInsertRow: function(event){
+    triggerInsertRow (event) {
       event.preventDefault();
       return this.props.onInsertRow(this.props.uniqueId);
     },
 
-    renderInsertRowButton: function(){
+    renderInsertRowButton () {
       return (
         <button className="Button Button--icon-action insert_row_button"
                 onMouseEnter={this.showBottomBorder} onFocus={this.showBottomBorder}
@@ -52,26 +77,24 @@ function(React, I18n) {
         </button>);
     },
 
-    showBottomBorder: function(){
-      this.setState({showBottomBorder: true});
+    renderMaxScore () {
+      const maxScore = this.props.round(this.getRowData().maxScore);
+      return (maxScore === 100 ? '' : '< ') + I18n.n(maxScore);
     },
 
-    hideBottomBorder: function(){
-      this.setState({showBottomBorder: false});
+    renderMinScore () {
+      let minScore = this.getRowData().minScore;
+
+      if (!this.props.editing) {
+        minScore = this.props.round(minScore);
+      } else if (this.state.minScoreInput != null) {
+        return this.state.minScoreInput;
+      }
+
+      return I18n.n(minScore);
     },
 
-    renderMaxScore: function(){
-      var maxScore = this.props.round(this.getRowData().maxScore);
-      return maxScore === 100 ? String(maxScore) : "< " + maxScore;
-    },
-
-    renderMinScore: function(){
-      var score = String(this.getRowData().minScore);
-      if(!this.props.editing) return String(this.props.round(score));
-      return score;
-    },
-
-    renderDeleteRowButton: function(){
+    renderDeleteRowButton () {
       if(this.props.onlyDataRowRemaining) return null;
       return(
         <button ref="deleteButton" className="Button Button--icon-action delete_row_button"
@@ -82,7 +105,7 @@ function(React, I18n) {
       );
     },
 
-    renderViewMode: function() {
+    renderViewMode () {
       return (
         <tr className="grading_standard_row react_grading_standard_row" ref="viewContainer">
           <td className="insert_row_icon_container"/>
@@ -110,7 +133,7 @@ function(React, I18n) {
       );
     },
 
-    renderEditMode: function() {
+    renderEditMode () {
       return (
         <tr className={this.state.showBottomBorder ?
                        "grading_standard_row react_grading_standard_row border_below" :
@@ -136,11 +159,17 @@ function(React, I18n) {
           <td className="row_cell">
             <div>
               <span className="range_to" ariaHidden="true">{I18n.t("to ")}</span>
-              <input type="text" ref="minScoreInput" onChange={this.triggerRowMinScoreChange}
-                     className="standard_value" title={I18n.t('Lower limit of range')}
-                     ariaLabel={I18n.t('Lower limit of range')}
-                     name={"grading_standard[standard_data][scheme_" + this.props.uniqueId + "][value]"}
-                     value={this.renderMinScore()}/>
+              <input
+                type="text"
+                className="standard_value"
+                ref={(input) => { this.minScoreInput = input; }}
+                onChange={this.triggerRowMinScoreChange}
+                onBlur={this.triggerRowMinScoreBlur}
+                title={I18n.t('Lower limit of range')}
+                ariaLabel={I18n.t('Lower limit of range')}
+                name={`grading_standard[standard_data][scheme_${this.props.uniqueId}][value]`}
+                value={this.renderMinScore()}
+              />
               <span ariaHidden="true"> % </span>
             </div>
           </td>
@@ -151,11 +180,10 @@ function(React, I18n) {
       );
     },
 
-    render: function () {
+    render () {
       return this.props.editing ? this.renderEditMode() : this.renderViewMode();
     }
   });
 
   return DataRow;
-
 });
