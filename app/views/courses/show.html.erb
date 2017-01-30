@@ -224,9 +224,12 @@ hi there
       window.onload = function() {
         var rs = document.getElementById("right-side");
         var tpb = document.getElementById("bz-task-part-box");
-        if(rs)
+        if(rs) {
+          var taskListHtml = tpb.innerHTML;
           tpb.innerHTML = rs.innerHTML;
-        else
+          var list = tpb.querySelector(".to-do-list");
+          list.innerHTML = taskListHtml;
+        } else
           tpb.parentNode.removeChild(tpb);
         // moving the buttons to the bottom of the html too so I can float it right
         var co = tpb.querySelector(".course-options");
