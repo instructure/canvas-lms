@@ -2272,7 +2272,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.sis_grade_export_enabled?(context)
-    context.feature_enabled?(:post_grades) || Lti::AppLaunchCollator.any?(context, [:post_grades])
+    context.feature_enabled?(:post_grades) ||
+      context.root_account.feature_enabled?(:bulk_sis_grade_export) ||
+      Lti::AppLaunchCollator.any?(context, [:post_grades])
   end
 
   def run_if_overrides_changed!(student_ids=nil)
