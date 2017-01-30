@@ -48,6 +48,7 @@
             magic[:text] = "#{text} #{tag.title}"
             magic[:link] = link
             magic[:due_at] = due_at(obj, @current_user)
+            magic[:due_at_date] = obj.due_at
             magic[:icon] = icon
 
             objs << magic
@@ -55,7 +56,7 @@
         end
       end
 
-      objs = objs.sort { |x, y| x[:due_at] <=> y[:due_at] }
+      objs = objs.sort { |x, y| x[:due_at_date] <=> y[:due_at_date] }
 
       if objs.any?
       objs.each do |obj|
