@@ -234,6 +234,15 @@ module Lti
                        -> { @context.id },
                        COURSE_GUARD
 
+    # returns the current course name.
+    # @example
+    #   ```
+    #   Course Name
+    #   ```
+    register_expansion 'Canvas.course.name', [],
+                       -> { @context.name },
+                       COURSE_GUARD
+
     # returns the current course sis source id.
     # @example
     #   ```

@@ -279,6 +279,13 @@ module Lti
           expect(exp_hash[:test]).to eq 123
         end
 
+        it 'has substitution for $Canvas.course.name' do
+          course.stubs(:name).returns('Course 101')
+          exp_hash = {test: '$Canvas.course.name'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'Course 101'
+        end
+
         it 'has substitution for $Canvas.course.workflowState' do
           course.workflow_state = 'available'
           exp_hash = {test: '$Canvas.course.workflowState'}
