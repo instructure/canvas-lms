@@ -760,8 +760,10 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def initialize_last_reply_at
-    self.posted_at ||= Time.now.utc
-    self.last_reply_at ||= Time.now.utc unless [:migration, :after_migration].include?(self.saved_by)
+    unless [:migration, :after_migration].include?(self.saved_by)
+      self.posted_at ||= Time.now.utc
+      self.last_reply_at ||= Time.now.utc
+    end
   end
 
   set_policy do

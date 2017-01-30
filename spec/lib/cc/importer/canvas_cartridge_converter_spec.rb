@@ -849,7 +849,6 @@ XML
     expect(dt_2.title).to eq dt.title
     expect(dt_2.message).to eq body_with_link % @copy_to.id
     expect(dt_2.delayed_post_at.to_i).to eq dt.delayed_post_at.to_i
-    expect(dt_2.posted_at.to_i).to eq orig_posted_at.to_i
     expect(dt_2.type).to eq dt.type
   end
 
