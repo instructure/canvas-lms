@@ -16,15 +16,24 @@
   <div class="bz-course-part-task-box" id="bz-task-part-box">
     <%
       objs = []
+      quizzes_shown = {}
+      assignments_shown = {}
       @course.context_modules.active.each do |mod|
         mod.content_tags.active.each do |tag|
           text = ''
+          icon = ''
           obj = nil
           if tag.content_type =='Assignment'
             text = 'Submit'
+            icon = 'assignment'
+            next if assignments_shown[tag.content_id]
+            assignments_shown[tag.content_id] = true
             obj = Assignment.find(tag.content_id)
           elsif tag.content_type == 'Quizzes::Quiz'
             text = 'Take'
+            icon = 'quiz'
+            next if quizzes_shown[tag.content_id]
+            quizzes_shown[tag.content_id] = true
             obj = Quizzes::Quiz.find(tag.content_id)
           end
 
@@ -36,7 +45,8 @@
             magic[:obj] = obj
             magic[:text] = "#{text} #{tag.title}"
             magic[:link] = link
-            magic[:due_at] = obj.due_at
+            magic[:due_at] = due_at(obj, @current_user)
+            magic[:icon] = icon
 
             objs << magic
           end
@@ -45,10 +55,24 @@
 
       objs = objs.sort { |x, y| x[:due_at] <=> y[:due_at] }
 
+      if objs.any?
       objs.each do |obj|
         %>
-          <li><a href="<%= obj[:link] %>"><%= obj[:text] %></a></li>
+          <li class="todo">
+            <a class="item" href="<%= obj[:link] %>">
+              <i class="icon-<%= obj[:icon] %>"></i>
+                <div class="todo-details">
+                <p><%= obj[:text] %></p>
+                <p><%= obj[:due_at] %></p>
+              </div>
+            </a>
+          </li>
         <%
+      end
+      else
+      %>
+        <li>Nothing for now</li>
+      <%
       end
     %>
   </div>
