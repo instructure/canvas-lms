@@ -39,16 +39,20 @@
 
           link = "/courses/#{@course.id}/modules/items/#{tag.id}"
 
-          unless text.empty? || obj.due_at.nil?
+          next if obj.nil?
+
+          overridden = obj.overridden_for(@current_user)
+
+          unless text.empty? || overridden.due_at.nil?
             # skip anything that is significantly past due
             # because it ought to be already done
-            next if obj.due_at < (DateTime.now - 2.days)
+            next if overridden.due_at < (DateTime.now - 2.days)
             magic = {}
             magic[:obj] = obj
             magic[:text] = "#{text} #{tag.title}"
             magic[:link] = link
             magic[:due_at] = due_at(obj, @current_user)
-            magic[:due_at_date] = obj.due_at
+            magic[:due_at_date] = overridden.due_at
             magic[:icon] = icon
 
             objs << magic
