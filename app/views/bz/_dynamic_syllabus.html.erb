@@ -40,7 +40,9 @@
           link = "/courses/#{@course.id}/modules/items/#{tag.id}"
 
           unless text.empty? || obj.due_at.nil?
-            next if obj.due_at < DateTime.now
+            # skip anything that is significantly past due
+            # because it ought to be already done
+            next if obj.due_at < (DateTime.now - 2.days)
             magic = {}
             magic[:obj] = obj
             magic[:text] = "#{text} #{tag.title}"
