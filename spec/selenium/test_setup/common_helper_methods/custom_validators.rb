@@ -49,7 +49,7 @@ module CustomValidators
 
   def expect_flash_message(type = :warning, message = nil)
     message = Regexp.new(Regexp.escape(message)) if message.is_a?(String)
-    wait_for method: :expect_flash_message, ignore: [Selenium::WebDriver::Error::StaleElementReferenceError] do
+    wait_for method: :expect_flash_message, ignore: [Selenium::WebDriver::Error::StaleElementReferenceError, Selenium::WebDriver::Error::NoSuchElementError] do
       messages = disable_implicit_wait { driver.find_elements :css, "#flash_message_holder .ic-flash-#{type}" }
       text = messages.map(&:text).join('\n')
       message ? !!text.match(message) : messages.present?
@@ -63,6 +63,7 @@ module CustomValidators
       text = messages.map(&:text).join('\n')
       message ? !text.match(message) : messages.empty?
     end or raise(RSpec::Expectations::ExpectationNotMetError, "expected no flash #{type} message#{message ? " " + message.inspect : ""}, one was found", CallStackUtils.useful_backtrace)
+  rescue Selenium::WebDriver::Error::NoSuchElementError
   end
 
   def assert_flash_notice_message(okay_message_regex)

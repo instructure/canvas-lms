@@ -168,7 +168,7 @@ describe "profile" do
 
       get "/profile/settings"
       edit_form = click_edit
-      expect(edit_form.find_elements(:id, 'user_short_name').first).to be_nil
+      expect(edit_form).not_to contain_css('#user_short_name')
       click_option('#user_locale', 'Español')
       expect_new_page_load { submit_form(edit_form) }
       expect(get_value('#user_locale')).to eq 'es'

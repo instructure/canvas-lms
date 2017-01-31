@@ -12,14 +12,6 @@ module CustomSeleniumActions
     skip("skipping test, fails in Chrome: #{additional_error_text}") if driver.browser == :chrome
   end
 
-  def find(css)
-    driver.find(css)
-  end
-
-  def find_all(css)
-    driver.find_all(css)
-  end
-
   def find_radio_button_by_value(value, scope = nil)
     fj("input[type=radio][value=#{value}]", scope)
   end
@@ -39,6 +31,7 @@ module CustomSeleniumActions
       (scope || driver).find_element :css, selector
     end
   end
+  alias find f
 
   # short for find with link
   def fln(link_text, scope = nil)
@@ -74,11 +67,10 @@ module CustomSeleniumActions
   # the page, and will eventually raise if none are found
   def ff(selector, scope = nil)
     reloadable_collection do
-      result = (scope || driver).find_elements(:css, selector)
-      result.present? or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{selector.inspect}", CallStackUtils.useful_backtrace
-      result
+      (scope || driver).find_elements(:css, selector)
     end
   end
+  alias find_all ff
 
   # same as `fj`, but returns all matching elements
   #

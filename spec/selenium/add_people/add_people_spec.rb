@@ -91,8 +91,7 @@ describe "add_people" do
         expect(people_ready_panel).to be_displayed
 
         # no table
-        tables = find_all('.addpeople__peoplereadylist table')
-        expect(tables).to have_size(0)
+        expect(f('body')).not_to contain_css('.addpeople__peoplereadylist table')
 
         # the message_user_path
         msg = fj(".addpeople__peoplereadylist:contains('No users were selected to add to the course')")

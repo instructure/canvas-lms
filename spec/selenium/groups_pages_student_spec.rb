@@ -268,7 +268,7 @@ describe "groups" do
         get files_page
         add_folder
         delete(0, :cog_icon)
-        expect(all_files_folders.count).to eq 0
+        expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
       it "should allow group members to move a folder", priority: "1", test_id: 273632 do
@@ -290,7 +290,7 @@ describe "groups" do
         expect(all_files_folders.count).to eq 1
         # Now try to delete the other one using toolbar menu
         delete(0, :toolbar_menu)
-        expect(all_files_folders.count).to eq 0
+        expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
       it "should allow group members to move a file", priority: "1", test_id: 273633 do

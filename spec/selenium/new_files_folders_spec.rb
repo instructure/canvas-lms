@@ -78,7 +78,7 @@ describe "better_file_browsing, folders" do
 
     it "should delete folder from toolbar", priority: "1", test_id: 133105 do
       delete(0, :toolbar_menu)
-      expect(all_files_folders.count).to eq 0
+      expect(f("body")).not_to contain_css('.ef-item-row')
     end
 
     it "should be able to create and view a new folder with uri characters", priority: "2", test_id: 193153 do

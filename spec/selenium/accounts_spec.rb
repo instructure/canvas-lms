@@ -20,7 +20,7 @@ describe "account" do
       get "/accounts/#{Account.default.id}/users"
       f(".add_user_link").click
       dialog = f("#add_user_dialog")
-      expect(dialog.find_elements(:id, "pseudonym_path").length).to eq 0
+      expect(dialog).not_to contain_css("#pseudonym_path")
       expect(dialog.find_element(:id, "pseudonym_unique_id")).to be_displayed
 
       Account.default.authentication_providers.create(:auth_type => 'cas')

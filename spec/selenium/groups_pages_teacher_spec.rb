@@ -190,7 +190,7 @@ describe "groups" do
         get files_page
         add_folder
         delete(0, :toolbar_menu)
-        expect(all_files_folders.count).to eq 0
+        expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
       it "should allow a teacher to delete a file", priority: "2", test_id: 304183 do
@@ -198,7 +198,7 @@ describe "groups" do
         get files_page
         delete(0, :toolbar_menu)
         wait_for_ajaximations
-        expect(all_files_folders.count).to eq 0
+        expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
       it "should allow teachers to move a file", priority: "2", test_id: 304185 do

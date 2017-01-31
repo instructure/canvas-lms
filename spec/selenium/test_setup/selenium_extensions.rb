@@ -72,17 +72,18 @@ module SeleniumExtensions
         super
       end or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{args.map(&:inspect).join(", ")}", CallStackUtils.useful_backtrace
     end
-    alias_method :first, :find_element
+    alias first find_element
 
-    def find_elements(*)
+    def find_elements(*args)
       result = []
       FinderWaiting.wait_for method: :find_elements do
         result = super
         result.present?
       end
+      result.present? or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{args.map(&:inspect).join(", ")}", CallStackUtils.useful_backtrace
       result
     end
-    alias_method :all, :find_elements
+    alias all find_elements
 
     class << self
       attr_accessor :timeout

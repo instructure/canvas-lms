@@ -34,7 +34,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     it "should lazy load images" do
       wiki_page_tools_file_tree_setup
       expect(@image_list).not_to have_class('initialized')
-      expect(@image_list.find_elements(:css, '.img').length).to eq 0
+      expect(@image_list).not_to contain_css('.img')
 
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
@@ -51,7 +51,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
         image.save!
       end
       expect(@image_list).not_to have_class('initialized')
-      expect(@image_list.find_elements(:css, '.img').length).to eq 0
+      expect(@image_list).not_to contain_css('.img')
 
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
