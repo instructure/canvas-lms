@@ -187,6 +187,7 @@ window.addEventListener("load", function() {
 
       if(document.querySelector("#assignment_show .description input[data-bz-retained], #assignment_show .description textarea[data-bz-retained]"))
       submitAssignmentLink.click();
+      window.onbeforeunload = null; // turn off the "are you sure you want to leave the page?" thing since we auto save anyway.
     }
   }
 }, true);
