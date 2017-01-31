@@ -1084,7 +1084,7 @@ define [
 
     initViewOptionsMenu: () =>
       component = React.createElement(ViewOptionsMenu, {}, null)
-      mountPoint = document.querySelectorAll("[data-component='#{component.type.name}']")[0]
+      mountPoint = document.querySelectorAll("[data-component='ViewOptionsMenu']")[0]
       ReactDOM.render(component, mountPoint)
 
     initAssignmentColumnHeader: (obj) =>
