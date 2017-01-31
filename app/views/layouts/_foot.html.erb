@@ -76,14 +76,53 @@
 
 <script>
   if(ENV["TIMEZONE_OFFSET"] && localStorage.skipTzWarning != "yes") {
+    function showBzTzWarning() {
+      var t = document.getElementById("bz-tz-warning");
+      if(t)
+        t.style.display = "";
+    }
+
     // JS gives minutes, Rails gives seconds, and they come from other directions
     // so the negative and divide make them match up
     var rails_tz = -ENV["TIMEZONE_OFFSET"] / 60;
     var offset = new Date().getTimezoneOffset();
     if(rails_tz != offset) {
-      var t = document.getElementById("bz-tz-warning");
-      if(t)
-        t.style.display = "";
+      if(localStorage.previouslyLoggedIn != "yes") {
+        var ajax = new XMLHttpRequest();
+        ajax.onload = function() {
+          location.reload();
+        };
+        ajax.open("PUT", "/api/v1/users/" + ENV["current_user_id"] + ".json");
+        ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        var data = "authenticity_token=" + encodeURIComponent("<%= form_authenticity_token %>");
+        data += "&" + encodeURIComponent("user[time_zone]");
+        var skip = false;
+        data += "=";
+        // Javascript doesn't give us enough information to select
+        // this specifically and correctly given the complexities of
+        // daylight saving and all the other time zones. So we'll just
+        // handle the two US coasts automatically, and ask the user to
+        // set it themselves if it is anything else.
+        switch(offset) {
+          case 300: // eastern standard time
+            data += "America/New_York";
+          break;
+          case 480: // pacific standard
+            data += "America/Los_Angeles";
+          break;
+          default:
+            skip = true;
+        }
+        if(!skip)
+          ajax.send(data);
+        else
+          showBzTzWarning();
+
+        localStorage.previouslyLoggedIn = "yes";
+      } else {
+        showBzTzWarning();
+      }
     }
   }
 </script>
