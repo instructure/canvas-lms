@@ -113,11 +113,11 @@ describe 'account authentication' do
 
       it 'should allow creation of config', priority: "1", test_id: 250266 do
         add_saml_config
-        keep_trying_until { expect(saml_aac.active.count).to eq 1 }
+        expect { saml_aac.active.count }.to become 1
         config = saml_aac.active.last.reload
-        expect(config.idp_entity_id).to eq 'entity.example.dev'
-        expect(config.log_in_url).to eq 'login.example.dev'
-        expect(config.log_out_url).to eq 'logout.example.dev'
+        expect(config.idp_entity_id).to eq 'entity.example'
+        expect(config.log_in_url).to eq 'login.example'
+        expect(config.log_out_url).to eq 'logout.example'
         expect(config.certificate_fingerprint).to eq 'abc123'
         expect(config.login_attribute).to eq 'nameid'
         expect(config.identifier_format).to eq 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
@@ -127,6 +127,7 @@ describe 'account authentication' do
 
       it 'should allow update of config', priority: "1", test_id: 250267 do
         add_saml_config
+        expect { saml_aac.active.count }.to become 1
         saml_form = f("#edit_saml#{saml_aac.active.last.id}")
         f("#authentication_provider_idp_entity_id").clear
         f("#authentication_provider_log_in_url").clear
@@ -149,6 +150,7 @@ describe 'account authentication' do
 
       it 'should allow deletion of config', priority: "1", test_id: 250268 do
         add_saml_config
+        expect { saml_aac.active.count }.to become 1
         f("#delete-aac-#{saml_aac.active.last.id}").click
         accept_alert
         wait_for_ajax_requests

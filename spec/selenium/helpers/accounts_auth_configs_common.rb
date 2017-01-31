@@ -3,6 +3,10 @@ require_relative "../common"
 module AccountsAuthConfigsCommon
   def add_auth_type(auth_type)
     click_option("#add-authentication-provider select", auth_type)
+    # public/javascripts/authentication_providers.js waits 100ms to focus
+    # the first input; this can cause selenium to get focus-jacked and
+    # put something in the wrong one :'(
+    sleep 0.1
   end
 
   def add_sso_config
@@ -47,12 +51,11 @@ module AccountsAuthConfigsCommon
     get "/accounts/#{Account.default.id}/authentication_providers"
     add_auth_type('SAML')
     saml_form = f("#new_saml")
-    set_value(f("#authentication_provider_idp_entity_id"), 'entity.example.dev')
-    set_value(f("#authentication_provider_log_in_url"), 'login.example.dev')
-    set_value(f("#authentication_provider_log_out_url"), 'logout.example.dev')
+    set_value(f("#authentication_provider_idp_entity_id"), 'entity.example')
+    set_value(f("#authentication_provider_log_in_url"), 'login.example')
+    set_value(f("#authentication_provider_log_out_url"), 'logout.example')
     set_value(f("#authentication_provider_certificate_fingerprint"), 'abc123')
     f("#new_saml button[type='submit']").click
-    wait_for_ajaximations
   end
 
   def start_saml_debug
