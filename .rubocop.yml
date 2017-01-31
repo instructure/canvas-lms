@@ -72,7 +72,9 @@ Style/TrailingCommaInArguments:
   Enabled: false
 Style/TrailingCommaInLiteral:
   Enabled: false
-Style/MethodCallParentheses:
+Style/MethodCallWithoutArgsParentheses:
+  Enabled: false
+Style/MethodCallWithArgsParentheses:
   Enabled: false
 Style/TrailingBlankLines:
   Enabled: false
@@ -110,6 +112,10 @@ Style/SpaceInLambdaLiteral:
   Enabled: false
 # We may want to enable this when we start working toward Ruby 3
 Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# RSpec cops we don't care aboue
+RSpec/RMessageSpies:
   Enabled: false
 
 # this isn't good for us because of how we pin dependencies
@@ -159,6 +165,10 @@ Rails/ActionFilter:
 Rails/HttpPositionalArguments:
   Enabled: false
 
+# these are invalid pre-Ruby 2.4
+Performance/RegexpMatch:
+  Enabled: false
+
 # Things we may want to tighten down later
 Metrics/AbcSize:
   Enabled: false
@@ -175,7 +185,7 @@ RSpec/ExampleWording:
 RSpec/ExampleLength:
   Max: 16
 RSpec/NestedGroups:
-  MaxNesting: 5
+  Max: 5
 RSpec/DescribedClass:
   Enabled: false
 RSpec/DescribeClass:
@@ -183,4 +193,6 @@ RSpec/DescribeClass:
 Style/HashSyntax:
   Enabled: false
 RSpec/MultipleExpectations:
+  Enabled: false
+RSpec/ScatteredSetup:
   Enabled: false
