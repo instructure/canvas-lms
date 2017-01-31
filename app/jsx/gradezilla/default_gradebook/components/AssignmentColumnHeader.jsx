@@ -77,7 +77,7 @@ define([
 
       return (
         <div className="assignment-points-possible">
-          { I18n.t('Out of %{pointsPossible}', { pointsPossible: assignment.pointsPossible }) }
+          { I18n.t('Out of %{pointsPossible}', { pointsPossible: I18n.n(assignment.pointsPossible) }) }
         </div>
       )
     }

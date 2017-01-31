@@ -40,7 +40,7 @@ define [
     equal @cell.$input[0].defaultValue, escapedDangerousHTML
 
   test "#class.formatter rounds numbers if they are numbers", ->
-    @stub(SubmissionCell.prototype, 'cellWrapper').withArgs(0.67).returns('ok')
+    @stub(SubmissionCell.prototype, 'cellWrapper').withArgs('0.67').returns('ok')
     formattedResponse = SubmissionCell.formatter(0, 0, { grade: 0.666 }, {}, {})
     equal formattedResponse, 'ok'
 

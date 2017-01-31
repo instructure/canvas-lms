@@ -46,6 +46,31 @@ define([
     strictEqual(I18n.n.notCalled, true);
   });
 
+  test('providing gradingType in the options hash should override detected grade type', () => {
+    GradeFormatHelper.formatGrade(10, { gradingType: 'percent' });
+    ok(I18n.n.calledWith(42, { percentage: true }));
+
+    GradeFormatHelper.formatGrade('10%', { gradingType: 'points' });
+    ok(I18n.n.calledWith(42, { percentage: false }));
+
+    GradeFormatHelper.formatGrade('10%');
+    ok(I18n.n.calledWith(42, { percentage: true }));
+  });
+
+  test('providing precision overrides default rounding to two decimal places', () => {
+    numberHelper.parse.restore();
+    I18n.n.restore();
+
+    let formatted = GradeFormatHelper.formatGrade(10.321);
+    strictEqual(formatted, '10.32');
+
+    formatted = GradeFormatHelper.formatGrade(10.325);
+    strictEqual(formatted, '10.33');
+
+    formatted = GradeFormatHelper.formatGrade(10.321, { precision: 3 });
+    strictEqual(formatted, '10.321');
+  });
+
   QUnit.module('GradeFormatHelper#delocalizeGrade');
 
   test('should return input value when input is not a string', () => {
