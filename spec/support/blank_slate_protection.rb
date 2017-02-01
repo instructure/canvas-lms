@@ -48,7 +48,6 @@ module BlankSlateProtection
     end
 
     def install!
-      truncate_all_tables!
       ::RSpec::Core::Example.prepend Example
       ::ActiveRecord::Base.include ActiveRecord
       @enabled = true

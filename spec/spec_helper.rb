@@ -52,6 +52,7 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 # and then ensure people aren't creating records outside the rspec
 # lifecycle, e.g. inside a describe/context block rather than a
 # let/before/example
+BlankSlateProtection.truncate_all_tables! unless defined?(TestQueue::Runner::RSpec) # we do this in each runner
 BlankSlateProtection.install!
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
