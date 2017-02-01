@@ -1483,7 +1483,7 @@ class UsersController < ApplicationController
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
     managed_attributes << :email if update_email
 
-    if @user.grants_right?(@current_user, :manage_user_details)
+    if @user.grants_right?(@current_user, :manage_user_details) || @current_user.id == @user.id
       managed_attributes.concat([:time_zone, :locale])
     end
 
