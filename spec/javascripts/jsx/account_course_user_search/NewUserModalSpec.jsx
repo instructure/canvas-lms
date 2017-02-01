@@ -7,6 +7,7 @@ define([
   module('Account Course User Search NewUserModal View');
 
   const props = {
+    contentLabel: 'label',
     userList: {
       errors: {}
     }

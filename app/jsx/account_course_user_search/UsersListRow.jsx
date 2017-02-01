@@ -116,6 +116,7 @@ define([
               user={this.props.user}
               timezones={this.props.timezones}
               isOpen={editUserDialogOpen}
+              contentLabel={I18n.t('Edit User')}
               onRequestClose={handleCloseEditUserDialog.bind(null, this.props.user)}
             />
           </div>

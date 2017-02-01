@@ -113,6 +113,7 @@ define([
           isOpen={isOpen}
           style={modalOverrides}
           title={I18n.t("Add a New User")}
+          contentLabel={this.props.contentLabel}
           onRequestClose={this.closeModal}
           onSubmit={this.onSubmit}
         >
