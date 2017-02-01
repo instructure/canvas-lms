@@ -108,7 +108,11 @@ namespace :deploy do
   desc "Setup permissions on Canvas files in preparation for compile_assets, bundle install, and db:migrate"
   task :setup_permissions do
     on roles(:app) do
-      execute :sudo, 'chmod -R g+w', release_path.join('log') # Needed for rake canvas:compile_assets and db:migrate to work.  It tries to write to production.log
+      # Needed for rake canvas:compile_assets and db:migrate to work.  It tries to write to production.log
+      # and this process runs as the deploy user who is in the canvasadmin group whereas the apache
+      # application runs as canvasuser so when logs get rotated they are put in the canvasuser group
+      execute :sudo, 'chown -R canvasuser:canvasadmin', release_path.join('log/') 
+      execute :sudo, 'chmod -R g+w', release_path.join('log')
     end
   end
 
