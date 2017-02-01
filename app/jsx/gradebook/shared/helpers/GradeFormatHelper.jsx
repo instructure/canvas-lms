@@ -15,7 +15,7 @@ define([
       return shouldFormatGradingType(gradingType);
     }
 
-    return /^\d+\.?\d*%?$/.test(grade);
+    return numberHelper.validate(grade.replace('%', ''));
   }
 
   function isPercent (grade, gradeType) {
@@ -52,7 +52,7 @@ define([
 
       formattedGrade = grade.toString();
 
-      if (shouldFormatGrade(grade, opts.gradingType)) {
+      if (shouldFormatGrade(formattedGrade, opts.gradingType)) {
         formattedGrade = formattedGrade.replace(/%/g, '');
         formattedGrade = round(numberHelper.parse(formattedGrade), opts.precision || 2);
         formattedGrade = I18n.n(formattedGrade, { percentage: isPercent(grade, opts.gradingType) });
