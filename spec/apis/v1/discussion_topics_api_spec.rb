@@ -2395,6 +2395,30 @@ describe DiscussionTopicsController, type: :request do
                                         ]
 
     end
+
+    it "should resolve the placeholder domain in new entries" do
+      course_with_teacher(:active_all => true)
+      student_in_course(:course => @course, :active_all => true)
+      @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
+      @root1 = @topic.reply_from(:user => @student, :html => "root1")
+
+      link = "/courses/#{@course.id}/discussion_topics"
+      # materialized view jobs are now delayed
+      Timecop.travel(Time.now + 20.seconds) do
+        run_jobs
+
+        # make everything slightly in the past to test updating
+        DiscussionEntry.update_all(:updated_at => 5.minutes.ago)
+        @reply1 = @root1.reply_from(:user => @teacher, :html => "<a href='#{link}'>locallink</a>")
+      end
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
+        {:controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}, {:include_new_entries => '1'})
+
+      message = json['new_entries'].first['message']
+      expect(message).to_not include("placeholder.invalid")
+      expect(message).to include("www.example.com#{link}")
+    end
   end
 
   it "returns due dates as they apply to the user" do
