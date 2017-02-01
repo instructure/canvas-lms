@@ -507,6 +507,14 @@ define [
       if parentEvent
         parentEvent.calendarEvent.reserved = false
         parentEvent.calendarEvent.available_slots += 1
+        # remove the unreserved event from the parent's children.
+        parentEvent.calendarEvent.child_events = parentEvent.calendarEvent.child_events.filter((obj) ->
+          obj.id != event.calendarEvent.id
+        )
+        # need to update the appointmentGroupEventStatus to make sure it
+        # correctly displays the new status in the calendar.
+        parentEvent.appointmentGroupEventStatus = parentEvent.calculateAppointmentGroupEventStatus()
+
         @refetchEvents()
 
     eventSaving: (event) =>
