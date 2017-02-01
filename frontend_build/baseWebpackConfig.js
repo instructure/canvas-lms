@@ -101,7 +101,6 @@ module.exports = {
       /tinymce\/tinymce/, // has 'require' and 'define' but they are from it's own internal closure
     ],
     rules: [
-
       // to get tinymce to work. see: https://github.com/tinymce/tinymce/issues/2836
       {
         test: require.resolve('tinymce/tinymce'),
