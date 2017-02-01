@@ -2142,6 +2142,12 @@ class CoursesController < ApplicationController
         end
       end
 
+      root_account_id = params[:course].delete :root_account_id
+      if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
+        @course.root_account = Account.root_accounts.find(root_account_id)
+        @course.account = @course.root_account if @course.account.root_account != @course.root_account
+      end
+
       if params[:course].key?(:apply_assignment_group_weights)
         @course.apply_assignment_group_weights =
           value_to_boolean params[:course].delete(:apply_assignment_group_weights)
