@@ -2721,6 +2721,7 @@ class CoursesController < ApplicationController
 
     hash = []
 
+    enrollments.sort_by!(&:course_id)
     Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values
     enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
