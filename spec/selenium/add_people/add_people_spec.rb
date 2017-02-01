@@ -97,5 +97,14 @@ describe "add_people" do
         msg = fj(".addpeople__peoplereadylist:contains('No users were selected to add to the course')")
         expect(msg).to be_displayed
     end
+
+    it "should include only manageable roles" do
+      @course.account.role_overrides.create! :role => Role.get_built_in_role('TeacherEnrollment'),
+                                             :permission => :manage_students,
+                                             :enabled => false
+      get "/courses/#{@course.id}/users"
+      f('#addUsers').click
+      expect(ff('#peoplesearch_select_role option').map(&:text)).not_to include 'Student'
+    end
   end
 end
