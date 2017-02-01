@@ -3,8 +3,7 @@ define [
   'timezone'
   '../start_app'
   '../shared_ajax_fixtures'
-  'helpers/fakeENV'
-], (Ember, tz, startApp, fixtures, fakeENV) ->
+], (Ember, tz, startApp, fixtures) ->
 
   {run} = Ember
 
@@ -12,7 +11,7 @@ define [
 
   QUnit.module 'grading_cell',
     setup: ->
-      fakeENV.setup()
+      window.ENV = {}
       fixtures.create()
       App = startApp()
       @component = App.GradingCellComponent.create()
@@ -44,7 +43,7 @@ define [
       run =>
         @component.destroy()
         App.destroy()
-        fakeENV.teardown()
+        window.ENV = {}
 
   test "setting value on init", ->
     component = App.GradingCellComponent.create()

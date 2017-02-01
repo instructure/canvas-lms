@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'test'
+
 const path = require('path')
 const webpack = require('webpack')
 const testWebpackConfig = require('./frontend_build/baseWebpackConfig')
@@ -18,12 +20,12 @@ testWebpackConfig.plugins.push(new webpack.DefinePlugin(jspecEnv))
 
 // These externals are necessary for Enzyme
 // See http://airbnb.io/enzyme/docs/guides/webpack.html
-testWebpackConfig.externals = testWebpackConfig.externals || {};
-testWebpackConfig.externals['react-dom/server'] = 'window';
-testWebpackConfig.externals['react/lib/ReactContext'] = 'true';
-testWebpackConfig.externals['react/lib/ExecutionEnvironment'] = 'true';
+Object.assign(testWebpackConfig.externals || (testWebpackConfig.externals = {}), {
+  'react-dom/server': 'window',
+  'react/lib/ReactContext': 'true',
+  'react/lib/ExecutionEnvironment': 'true'
+})
 
-testWebpackConfig.resolve.modules.push(path.resolve(__dirname, 'spec/coffeescripts'))
 testWebpackConfig.resolve.alias['spec/jsx'] = path.resolve(__dirname, 'spec/javascripts/jsx')
 
 testWebpackConfig.module.rules.unshift({

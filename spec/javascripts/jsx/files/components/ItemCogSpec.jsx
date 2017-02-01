@@ -1,5 +1,5 @@
 define([
-  'spec/javascripts/compiled/react_files/mockFilesENV',
+  (window.USE_WEBPACK ? '../../../../coffeescripts/react_files/mockFilesENV.coffee' : 'spec/javascripts/compiled/react_files/mockFilesENV'),
   'react',
   'react-dom',
   'react-addons-test-utils',

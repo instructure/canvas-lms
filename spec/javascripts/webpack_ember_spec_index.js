@@ -9,5 +9,5 @@ function requireAll(requireContext) {
   return requireContext.keys().map(requireContext);
 }
 
-var testsContext = require.context(__dirname + "/../../app/coffeescripts", true, /\.spec$/);
+const testsContext = require.context(__dirname + "/../../app/coffeescripts", true, /\.spec.coffee$/);
 requireAll(testsContext);

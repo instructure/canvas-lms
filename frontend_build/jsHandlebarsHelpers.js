@@ -1,5 +1,5 @@
 const dependenciesRegexp = /define\(?\s*\[(.|\n)*?]/
-const extraDep = ", 'coffeescripts/handlebars_helpers']"
+const extraDep = ", 'coffeescripts/handlebars_helpers.coffee']"
 
 module.exports = function (input) {
   this.cacheable()
