@@ -1,12 +1,11 @@
 define([
-  "react",
-  "i18n!account_course_user_search",
-  "underscore",
-  "./NewUserModal",
-  "./IcInput",
-], function(React, I18n, _, NewUserModal, IcInput) {
-
-  var { string, bool, func, object, arrayOf, shape } = React.PropTypes;
+  'react',
+  'i18n!account_course_user_search',
+  'underscore',
+  './NewUserModal',
+  './IcInput',
+], (React, I18n, _, NewUserModal, IcInput) => {
+  const { string, bool, func, object } = React.PropTypes
 
   var UsersToolbar = React.createClass({
     propTypes: {
@@ -28,8 +27,8 @@ define([
       this.refs.addUser.openModal();
     },
 
-    render() {
-      var { onUpdateFilters, isLoading, search_term, errors } = this.props;
+    render () {
+      const { onUpdateFilters, isLoading, errors } = this.props
 
       var addUserButton;
       if (window.ENV.PERMISSIONS.can_create_users) {
@@ -53,7 +52,7 @@ define([
               <div className="col-xs-12 col-md-9">
                 <div className="users-list-toolbar-form">
                   <IcInput
-                    value={search_term}
+                    value={this.props.search_term}
                     placeholder={I18n.t("Search users...")}
                     onChange={(e) => onUpdateFilters({search_term: e.target.value})}
                     error={errors.search_term}

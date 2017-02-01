@@ -1,74 +1,74 @@
 define([
-  "react",
-  "i18n!account_course_user_search",
-  "underscore",
-  "./TermsStore",
-  "./AccountsTreeStore",
-  "./NewCourseModal",
-  "./IcInput",
-  "./IcSelect",
-  "./IcCheckbox"
-], function(React, I18n, _, TermsStore, AccountsTreeStore, NewCourseModal, IcInput, IcSelect, IcCheckbox) {
+  'react',
+  'i18n!account_course_user_search',
+  './TermsStore',
+  './AccountsTreeStore',
+  './NewCourseModal',
+  './IcInput',
+  './IcSelect',
+  './IcCheckbox',
+], (React, I18n, TermsStore, AccountsTreeStore, NewCourseModal, IcInput, IcSelect, IcCheckbox) => {
+  const { string, bool, func, arrayOf, shape } = React.PropTypes
 
-  var { string, bool, func, object, arrayOf, shape } = React.PropTypes;
-
-  var CoursesToolbar = React.createClass({
-    propTypes: {
+  return class CoursesToolbar extends React.Component {
+    static propTypes = {
       onUpdateFilters: func.isRequired,
       onApplyFilters: func.isRequired,
       isLoading: bool,
-
       with_students: bool.isRequired,
       search_term: string,
       enrollment_term_id: string,
-      errors: object,
-
+      errors: shape({ search_term: string }).isRequired,
       terms: arrayOf(TermsStore.PropType),
-      accounts: arrayOf(AccountsTreeStore.PropType)
-    },
+      accounts: arrayOf(AccountsTreeStore.PropType),
+    }
 
-    applyFilters(e) {
-      e.preventDefault();
-      this.props.onApplyFilters();
-    },
+    static defaultProps = {
+      terms: null,
+      accounts: [],
+      search_term: '',
+      enrollment_term_id: null,
+      isLoading: false,
+    }
 
-    renderTerms() {
-      var { terms } = this.props;
+    applyFilters = (e) => {
+      e.preventDefault()
+      this.props.onApplyFilters()
+    }
+
+    addCourse = () => {
+      this.addCourse.openModal()
+    }
+
+    renderTerms () {
+      const { terms } = this.props
 
       if (terms) {
         return [
           <option key="all" value="">
-            {I18n.t("All Terms")}
+            {I18n.t('All Terms')}
           </option>
-        ].concat(terms.map((term) => {
-          return (
-            <option key={term.id} value={term.id}>
-              {term.name}
-            </option>
-          );
-        }));
-      } else {
-        return <option value="">{I18n.t("Loading...")}</option>;
+        ].concat(terms.map(term => (
+          <option key={term.id} value={term.id}>
+            {term.name}
+          </option>
+        )))
       }
-    },
 
-    addCourse() {
-      this.refs.addCourse.openModal();
-    },
+      return <option value="">{I18n.t('Loading...')}</option>
+    }
 
-    render() {
-      var { terms, accounts, onUpdateFilters, isLoading, with_students, search_term, enrollment_term_id, errors } = this.props;
+    render () {
+      const { terms, accounts, onUpdateFilters, isLoading, errors, ...props } = this.props
 
-      var addCourseButton;
-      if (window.ENV.PERMISSIONS.can_create_courses) {
-        addCourseButton = <div>
+      const addCourseButton = window.ENV.PERMISSIONS.can_create_courses ?
+        (<div>
           <button className="btn" type="button" onClick={this.addCourse}>
-            <i className="icon-plus"/>
-            {" "}
-            {I18n.t("Course")}
+            <i className="icon-plus" />
+            {' '}
+            {I18n.t('Course')}
           </button>
-        </div>;
-      }
+        </div>) : null
 
       return (
         <div>
@@ -81,20 +81,20 @@ define([
             <div className="ic-Form-action-box courses-list-search-bar-layout">
               <div className="ic-Form-action-box__Form">
                 <IcSelect
-                  value={enrollment_term_id}
-                  onChange={(e) => onUpdateFilters({enrollment_term_id: e.target.value})}
+                  value={props.enrollment_term_id}
+                  onChange={e => onUpdateFilters({enrollment_term_id: e.target.value})}
                 >
                   {this.renderTerms()}
                 </IcSelect>
                 <IcInput
-                  value={search_term}
-                  placeholder={I18n.t("Search courses...")}
-                  onChange={(e) => onUpdateFilters({search_term: e.target.value})}
+                  value={props.search_term}
+                  placeholder={I18n.t('Search courses...')}
+                  onChange={e => onUpdateFilters({search_term: e.target.value})}
                   error={errors.search_term}
                 />
                 <div className="ic-Form-control">
                   <button className="btn">
-                    {I18n.t("Go")}
+                    {I18n.t('Go')}
                   </button>
                 </div>
               </div>
@@ -103,20 +103,18 @@ define([
               </div>
             </div>
             <IcCheckbox
-              checked={with_students}
-              onChange={(e) => onUpdateFilters({with_students: e.target.checked})}
-              label={I18n.t("Hide courses without enrollments")}
+              checked={props.with_students}
+              onChange={e => onUpdateFilters({with_students: e.target.checked})}
+              label={I18n.t('Hide courses without enrollments')}
             />
           </form>
           <NewCourseModal
-            ref="addCourse"
+            ref={(c) => { this.addCourseModal = c }}
             terms={terms}
             accounts={accounts}
           />
         </div>
-      );
+      )
     }
-  });
-
-  return CoursesToolbar;
-});
+  }
+})
