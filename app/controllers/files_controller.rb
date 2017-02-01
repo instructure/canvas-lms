@@ -192,46 +192,19 @@ class FilesController < ApplicationController
   protected :check_file_access_flags
 
   def index
+    # This is only used by the old wiki sidebar, see
+    # public/javascripts/wikiSidebar.js#loadFolders
     if request.format == :json
       if authorized_action(@context.attachments.build, @current_user, :read)
-        @current_folder = Folder.find_folder(@context, params[:folder_id])
-        if !@current_folder || authorized_action(@current_folder, @current_user, :read)
-          if params[:folder_id]
-            if @context.grants_right?(@current_user, session, :manage_files)
-              @current_attachments = @current_folder.active_file_attachments.by_position_then_display_name
-            else
-              @current_attachments = @current_folder.visible_file_attachments.by_position_then_display_name
-            end
-            @current_attachments = @current_attachments.preload(:thumbnail, :media_object)
-            render :json => @current_attachments.map do |a|
-              a.as_json({
-                methods: [ :readable_size, :currently_locked, :thumbnail_url ],
-                permissions: {
-                  user: @current_user, session: session
-                }
-              })
-            end
-          else
-            file_structure = {
-              :contexts => [@context.as_json(permissions: {user: @current_user})],
-              :collaborations => [],
-              :folders => @context.active_folders.preload(:active_sub_folders).
-                order("COALESCE(parent_folder_id, 0), COALESCE(position, 0), COALESCE(name, ''), created_at").map{ |f|
-                f.as_json(permissions: {user: @current_user}, methods: [:mime_class, :currently_locked])
-              },
-              :folders_with_subcontent => [],
-              :files => []
-            }
+        root_folder = Folder.root_folders(@context).first
+        if authorized_action(root_folder, @current_user, :read)
+          file_structure = {
+            :folders => @context.active_folders.
+              reorder("COALESCE(parent_folder_id, 0), COALESCE(position, 0), COALESCE(name, ''), created_at").
+              select(:id, :parent_folder_id, :name)
+          }
 
-            if @current_user
-              file_structure[:collaborations] = @current_user.collaborations.for_context(@context).active.
-                preload(:user, :users).order("created_at DESC").map{ |c|
-                c.as_json(permissions: {user: @current_user}, methods: [:collaborator_ids])
-              }
-            end
-
-            render :json => file_structure
-          end
+          render :json => file_structure
         end
       end
     else
