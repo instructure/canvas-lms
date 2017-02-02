@@ -32,7 +32,7 @@ gem 'authlogic', '3.5.0'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.9.2'
+gem 'switchman', '1.9.3'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.11', require: 'folio/rails'
   # for folio, see the folio README
@@ -109,7 +109,7 @@ gem 'canvas_statsd', '1.0.8'
   gem 'aroi', '0.0.4', require: false
 gem 'diplomat', '1.0.0', require: false
 gem 'gepub'
-gem 'academic_benchmarks', '0.0.8', require: false
+gem 'academic_benchmarks', '0.0.9', require: false
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
 gem 'acts_as_list', path: 'gems/acts_as_list'
