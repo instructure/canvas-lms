@@ -558,8 +558,8 @@ define [
       else
        options.inverse @
 
-    n:(number, {hash: {precision, percentage}}) ->
-      I18n.n(number, {precision, percentage})
+    n:(number, {hash: {precision, percentage, strip_insignificant_zeros}}) ->
+      I18n.n(number, {precision, percentage, strip_insignificant_zeros})
   }
 
   return Handlebars

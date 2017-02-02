@@ -2,7 +2,7 @@
   <div class="rating-wrap">
     <div class="show" aria-expanded="true">
       <h5>{{description}}</h5>
-      <span class="points">{{points}}</span> {{#t "points"}}Points{{/t}}
+      <span class="points">{{n points precision=2 strip_insignificant_zeros=true}}</span> {{#t "points"}}Points{{/t}}
       <a
         href="#"
         class="edit_rating active"
@@ -24,7 +24,7 @@
           <input type="text" name="ratings[{{_index}}][description]" class="outcome_rating_description" value="{{description}}" aria-label="{{#t "rating_description"}}Criterion rating description{{/t}}">
         </div>
         <div class="span4 offset1">
-          <input type="text" name="ratings[{{_index}}][points]" style="width: 20px;" class="outcome_rating_points" value="{{points}}" aria-label="{{#t "criterion_rating_points"}}Criterion rating points{{/t}}"> <span class="outcomes-points-label">{{#t "pts"}}pts{{/t}}</span>
+          <input type="text" name="ratings[{{_index}}][points]" style="width: 20px;" class="outcome_rating_points" value="{{n points precision=2 strip_insignificant_zeros=true}}" aria-label="{{#t "criterion_rating_points"}}Criterion rating points{{/t}}"> <span class="outcomes-points-label">{{#t "pts"}}pts{{/t}}</span>
         </div>
       </div>
 
