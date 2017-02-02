@@ -59,7 +59,7 @@ gem 'httparty', '0.14.0'
 gem 'i18n', '0.7.0'
 gem 'i18nliner', '0.0.12'
 gem 'icalendar', '1.5.4', require: false
-gem 'ims-lti', '2.1.0.beta.3', require: 'ims'
+gem 'ims-lti', '2.1.0.beta.4', require: 'ims'
 if RUBY_VERSION >= '2.4'
   gem 'json', '2.0.3'
 else

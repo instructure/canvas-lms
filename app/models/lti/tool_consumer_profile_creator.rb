@@ -30,7 +30,7 @@ module Lti
           Person.sourcedId
           Membership.role
           ToolConsumerProfile.url
-          OAuth.splitSecret
+          Security.splitSecret
           Context.id
         ).freeze
 

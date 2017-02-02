@@ -125,13 +125,12 @@ module Lti
           expect(subject.create.capability_offered).to include 'Canvas.placements.similarityDetection'
         end
 
-
         it 'adds the ToolConsumerProfile.url capability' do
           expect(subject.create.capability_offered).to include 'ToolConsumerProfile.url'
         end
 
-        it 'adds the OAuth.splitSecret capability' do
-          expect(subject.create.capability_offered).to include 'OAuth.splitSecret'
+        it 'adds the Security.splitSecret capability' do
+          expect(subject.create.capability_offered).to include 'Security.splitSecret'
         end
 
         it 'adds the Context.id capability' do
