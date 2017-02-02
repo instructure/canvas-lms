@@ -50,7 +50,11 @@ module AvatarHelper
     link_opts[:style] += ";width: #{opts[:size]}px;height: #{opts[:size]}px" if opts[:size]
     link_opts[:href] = url if url
     link_opts[:title] = opts[:title] if opts[:title]
-    content = content_tag(:span, display_name, class: 'screenreader-only')
+    content = content_tag(
+      :span,
+      I18n.t('Click to change profile picture for %{display_name}', :display_name => display_name),
+      class: 'screenreader-only'
+    )
     content += (opts[:edit] ? content_tag(:i, nil, class: 'icon-edit') : '')
     content += (opts[:show_flag] ? content_tag(:i, nil, class: 'icon-flag') : '')
     content_tag(:a, content, link_opts)
