@@ -41,12 +41,7 @@ class CompiledReferencePlugin {
         const result = input
         const requestString = result.request
 
-        if (/^jsx\//.test(requestString)) {
-          // this is a jsx file in canvas. We have to require it with its full
-          // extension while we still have a require-js build or we risk loading
-          // its compiled js instead
-          result.request = `${requestString}.jsx`
-        } else if (
+        if (
           requestString.startsWith('.') &&
           path.join(input.context, input.request).includes('app/coffeescripts') &&
           !/\.coffee$/.test(requestString)

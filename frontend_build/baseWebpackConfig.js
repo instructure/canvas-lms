@@ -116,7 +116,7 @@ module.exports = {
       'node_modules'
     ],
 
-    extensions: ['.js', '.jsx']
+    extensions: ['.js']
   },
 
   module: {
@@ -156,7 +156,7 @@ module.exports = {
         ])
       },
       {
-        test: /\.jsx?$/,
+        test: /\.js$/,
         include: [
           path.resolve(__dirname, '../app/jsx'),
           path.resolve(__dirname, '../spec/javascripts/jsx'),
@@ -167,7 +167,7 @@ module.exports = {
         ])
       },
       {
-        test: /\.jsx?$/,
+        test: /\.js$/,
         include: [/client_apps\/canvas_quizzes\/apps\//],
         loaders: ['jsx-loader']
       },
