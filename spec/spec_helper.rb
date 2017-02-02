@@ -38,6 +38,7 @@ require 'rspec/rails'
 require 'webmock'
 require 'webmock/rspec/matchers'
 WebMock.allow_net_connect!
+WebMock.enable!
 # unlike webmock/rspec, only reset in groups that actually do stubbing
 module WebMock::API
   include WebMock::Matchers
