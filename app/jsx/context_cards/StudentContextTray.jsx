@@ -207,13 +207,13 @@ define([
                         {this.state.user.short_name ? (
                           <div className="StudentContextTray-Header__Name">
                             <Heading level="h3" tag="h2">
-                              <Link
-                                href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
-                              >
-                                <span className="StudentContextTray-Header__NameLink">
+                              <span className="StudentContextTray-Header__NameLink">
+                                <Link
+                                  href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
+                                >
                                   {this.state.user.short_name}
-                                </span>
-                              </Link>
+                                </Link>
+                              </span>
                             </Heading>
                           </div>
                         ) : null}
