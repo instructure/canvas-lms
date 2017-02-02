@@ -228,8 +228,9 @@ module AccountReports
                 c.sis_source_id AS course_sis_id, s.name AS section_name,
                 e.course_section_id, s.sis_source_id AS section_sis_id,
                 t.name AS term_name, t.id AS term_id,
-                t.sis_source_id AS term_sis_id, e.computed_current_score,
-                e.computed_final_score,
+                t.sis_source_id AS term_sis_id,
+                CASE WHEN sc.id IS NOT NULL THEN sc.current_score ELSE e.computed_current_score END AS computed_current_score,
+                CASE WHEN sc.id IS NOT NULL THEN sc.final_score ELSE e.computed_final_score END AS computed_final_score,
            CASE WHEN e.workflow_state = 'active' THEN 'active'
                 WHEN e.workflow_state = 'completed' THEN 'concluded'
                 WHEN e.workflow_state = 'deleted' THEN 'deleted' END AS enroll_state").
@@ -239,7 +240,8 @@ module AccountReports
                  AND e.type = 'StudentEnrollment'
                INNER JOIN #{Course.quoted_table_name} c ON c.id = e.course_id
                INNER JOIN #{EnrollmentTerm.quoted_table_name} t ON c.enrollment_term_id = t.id
-               INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id")
+               INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id
+               LEFT JOIN #{Score.quoted_table_name} sc ON sc.enrollment_id = e.id AND sc.grading_period_id IS NULL")
 
       if @include_deleted
         students = students.where("e.workflow_state IN ('active', 'completed', 'deleted')")
@@ -255,7 +257,8 @@ module AccountReports
         students = students.where(
           "pseudonyms.workflow_state<>'deleted'
            AND c.workflow_state='available'
-           AND e.workflow_state IN ('active', 'completed')")
+           AND e.workflow_state IN ('active', 'completed')
+           AND sc.workflow_state <> 'deleted'")
       end
 
       students = add_course_sub_account_scope(students, 'c')
