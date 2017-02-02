@@ -8,7 +8,7 @@ module Messages
 
     def from_name
       return nil unless has_named_source?
-      anonymized_user
+      CanvasTextHelper.truncate_text(anonymized_user_name, :max_length => 50)
     end
 
     def reply_to_name
@@ -18,7 +18,7 @@ module Messages
 
     private
 
-    def anonymized_user
+    def anonymized_user_name
       if is_anonymized_asset?
         asset.can_read_author?(asset.recipient, nil) ? source_user.short_name : I18n.t(:anonymous_user, 'Anonymous User')
       else
