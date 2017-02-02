@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'turnitin/response'
+require_dependency 'turnitin/response'
 
 module Turnitin
   def self.state_from_similarity_score(similarity_score)
