@@ -35,7 +35,7 @@ module Factories
   end
 
   def quiz_with_submission(complete_quiz = true)
-    test_data = [{:correct_comments=>"", :assessment_question_id=>nil, :incorrect_comments=>"", :question_name=>"Question 1", :points_possible=>1, :question_text=>"Which book(s) are required for this course?", :name=>"Question 1", :id=>128, :answers=>[{:weight=>0, :text=>"A", :comments=>"", :id=>1490}, {:weight=>0, :text=>"B", :comments=>"", :id=>1020}, {:weight=>0, :text=>"C", :comments=>"", :id=>7051}], :question_type=>"multiple_choice_question"}]
+    test_data = [{:correct_comments=>"", :assessment_question_id=>nil, :incorrect_comments=>"", :question_name=>"Question 1", :points_possible=>1, :question_text=>"Which book(s) are required for this course?", :name=>"Question 1", :id=>128, :answers=>[{:weight=>100, :text=>"A", :comments=>"", :id=>1490}, {:weight=>0, :text=>"B", :comments=>"", :id=>1020}, {:weight=>0, :text=>"C", :comments=>"", :id=>7051}], :question_type=>"multiple_choice_question"}]
     @course ||= course_model(:reusable => true)
     @student ||= user_model
     @course.enroll_student(@student).accept
@@ -46,9 +46,17 @@ module Factories
 
     @qsub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
     @qsub.quiz_data = test_data
-    @qsub.submission_data = complete_quiz ? [{:points=>0, :text=>"7051", :question_id=>128, :correct=>false, :answer_id=>7051}] : test_data.first
-    # {"context_id"=>"3", "text_after_answers"=>"", "context_type"=>"Course", "attempt"=>1, "user_id"=>"3", "controller"=>"quiz_submissions", "cnt"=>1, "course_id"=>"3", "quiz_id"=>"6", "question_text"=>"<p>true?</p>"}
-    @qsub.workflow_state = 'complete' if complete_quiz
+    @qsub.started_at = 1.minute.ago
+    @qsub.attempt = 1
+    if complete_quiz
+      @qsub.submission_data = [{:points=>0, :text=>"7051", :question_id=>128, :correct=>false, :answer_id=>7051}]
+      @qsub.score = 0
+      @qsub.finished_at = Time.now.utc
+      @qsub.workflow_state = 'complete'
+      @qsub.submission = @quiz.assignment.find_or_create_submission(@student.id)
+    else
+      @qsub.submission_data = {}
+    end
     @qsub.with_versioning(true) do
       @qsub.save!
     end

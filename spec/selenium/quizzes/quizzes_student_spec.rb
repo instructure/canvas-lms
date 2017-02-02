@@ -5,16 +5,12 @@ describe 'quizzes' do
   include_context "in-process server selenium tests"
   include QuizzesCommon
 
-  def prepare_quiz
-    @quiz = quiz_model({ course: @course, time_limit: 5 })
-    @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
-    @quiz.generate_quiz_data
-    @quiz.save
-    @quiz
+  before(:once) do
+    course_with_student(active_all: true)
   end
 
   before(:each) do
-    course_with_student_logged_in
+    user_session(@student)
   end
 
   context 'with a student' do
@@ -39,7 +35,7 @@ describe 'quizzes' do
 
     context 'with a quiz started' do
 
-      before(:each) do
+      before(:once) do
         @qsub = quiz_with_submission(false)
       end
 
@@ -156,22 +152,20 @@ describe 'quizzes' do
   end
 
   context 'when the \'show correct answers\' setting is on' do
-    before(:each) do
-      prepare_quiz
+    before(:once) do
+      quiz_with_submission
       @quiz.update_attributes(show_correct_answers: true)
       @quiz.save!
     end
 
     it 'highlights correct answers', priority: "1", test_id: 209417 do
-      take_and_answer_quiz
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
       expect(ff('.correct_answer').length).to be > 0
     end
 
     it 'always highlights incorrect answers', priority: "1", test_id: 209418 do
-      take_and_answer_quiz do |answers|
-        answers[1][:id] # don't answer
-      end
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
       expect(ff('.incorrect.answer_arrow').length).to be > 0
     end
@@ -179,77 +173,49 @@ describe 'quizzes' do
 
   context "when 'show correct answers after last attempt setting' is on" do
     before(:each) do
-      prepare_quiz
+      quiz_with_submission
       @quiz.update_attributes(:show_correct_answers => true,
         :show_correct_answers_last_attempt => true, :allowed_attempts => 2)
       @quiz.save!
     end
 
     it "should not show correct answers on first attempt", priority: "1", test_id: 474288 do
-      @student = @user
-      @observer = user_factory
-      @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
-
-      take_and_answer_quiz
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
       expect(f("#content")).not_to contain_css('.correct_answer')
+    end
 
-      # shouldn't show to an observer either
-      user_session(@observer)
-      sub = @quiz.quiz_submissions.where(:user_id => @student).first
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{sub.id}"
-
-      expect(f("#content")).not_to contain_css('.correct_answer')
-
-      # attempt two
-      user_session(@student)
-      take_and_answer_quiz
+    it "should show correct answers on last attempt", priority: "1", test_id: 474288 do
+      @qsub.update_attribute :attempt, 2
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
       expect(ff('.correct_answer').length).to be > 0
     end
   end
 
   context 'when the \'show correct answers\' setting is off' do
 
-    before(:each) do
-      prepare_quiz
+    before(:once) do
+      quiz_with_submission
       @quiz.update_attributes(show_correct_answers: false)
       @quiz.save!
     end
 
     it 'doesn\'t highlight correct answers', priority: "1", test_id: 209416 do
-      take_and_answer_quiz
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
       expect(f("#content")).not_to contain_css('.correct_answer')
     end
 
     it 'always highlights incorrect answers', priority: "1", test_id: 209480 do
-      take_and_answer_quiz do |answers|
-        answers[1][:id] # don't answer
-      end
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
       expect(ff('.incorrect.answer_arrow').length).to be > 0
     end
   end
 
   it "should show badge counts after completion", priority: "1", test_id: 474289 do
-    prepare_quiz
-    take_and_answer_quiz
+    quiz_with_submission
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+
     expect(f("#section-tabs .grades .nav-badge").text).to eq "1"
-  end
-
-  it "should show quiz descriptions to observers" do
-    @context = @course
-    quiz = quiz_model
-    description = "some description"
-    quiz.description = description
-    quiz.save!
-
-    @student = @user
-    @observer = user_factory
-    @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
-    user_session(@observer)
-
-    open_quiz_show_page
-    
-    expect(f(".description")).to include_text(description)
   end
 end
