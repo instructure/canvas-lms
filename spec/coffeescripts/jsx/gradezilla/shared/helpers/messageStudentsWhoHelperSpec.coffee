@@ -24,8 +24,18 @@ define [
     hasSubmission = MessageStudentsWhoHelper.hasSubmission(assignment)
     deepEqual hasSubmission, false
 
+  test "returns false if there are no submission types and submissionTypes is camelCase", ->
+    assignment = { id: '1', name: 'Shootbags', submissionTypes: [] }
+    hasSubmission = MessageStudentsWhoHelper.hasSubmission(assignment)
+    deepEqual hasSubmission, false
+
   test "returns false if the only submission type is 'none'", ->
     assignment = { id: '1', name: 'Shootbags', submission_types: ['none'] }
+    hasSubmission = MessageStudentsWhoHelper.hasSubmission(assignment)
+    deepEqual hasSubmission, false
+
+  test "returns false if the only submission type is 'none' and submissionTypes is camelCase", ->
+    assignment = { id: '1', name: 'Shootbags', submissionTypes: ['none'] }
     hasSubmission = MessageStudentsWhoHelper.hasSubmission(assignment)
     deepEqual hasSubmission, false
 
@@ -34,13 +44,28 @@ define [
     hasSubmission = MessageStudentsWhoHelper.hasSubmission(assignment)
     deepEqual hasSubmission, false
 
+  test "returns false if the only submission type is 'on_paper' and submissionTypes is camelCase", ->
+    assignment = { id: '1', name: 'Shootbags', submissionTypes: ['on_paper'] }
+    hasSubmission = MessageStudentsWhoHelper.hasSubmission(assignment)
+    deepEqual hasSubmission, false
+
   test "returns false if the only submission types are 'none' and 'on_paper'", ->
     assignment = { id: '1', name: 'Shootbags', submission_types: ['none', 'on_paper'] }
     hasSubmission = MessageStudentsWhoHelper.hasSubmission(assignment)
     deepEqual hasSubmission, false
 
+  test "returns false if the only submission types are 'none' and 'on_paper' and submissionTypes is camelCase", ->
+    assignment = { id: '1', name: 'Shootbags', submissionTypes: ['none', 'on_paper'] }
+    hasSubmission = MessageStudentsWhoHelper.hasSubmission(assignment)
+    deepEqual hasSubmission, false
+
   test "returns true if there is at least one submission that is not of type 'non' or 'on_paper'", ->
     assignment = { id: '1', name: 'Shootbags', submission_types: ['online_quiz'] }
+    hasSubmission = MessageStudentsWhoHelper.hasSubmission(assignment)
+    deepEqual hasSubmission, true
+
+  test "returns true if there is at least one submission that is not of type 'non' or 'on_paper' and submissionTypes is camelCase", ->
+    assignment = { id: '1', name: 'Shootbags', submissionTypes: ['online_quiz'] }
     hasSubmission = MessageStudentsWhoHelper.hasSubmission(assignment)
     deepEqual hasSubmission, true
 
@@ -119,3 +144,42 @@ define [
       "students", "context_code", "callback", "subjectCallback"]
 
     deepEqual settingsKeys, expectedKeys
+
+  test "returns an object with the expected settings and courseId is camelCase", ->
+    assignment =
+      id: '1'
+      name: 'Shootbags'
+      points_possible: 5
+      courseId: '5'
+    students = [{ id: '1', name: 'Dora' }]
+    self =
+      options: -> 'stuff'
+      callbackFn: -> 'call me back!'
+      generateSubjectCallbackFn: -> -> 'function inception'
+    settingsFn = MessageStudentsWhoHelper.settings.bind(self)
+    settings = settingsFn(assignment, students)
+
+    settingsKeys = _.keys settings
+    expectedKeys = ["options", "title", "points_possible",
+      "students", "context_code", "callback", "subjectCallback"]
+
+    deepEqual settingsKeys, expectedKeys
+
+  QUnit.module 'messageStudentsWhoHelper#options'
+
+  test "returns a `Haven't submitted yet option` with a criteriaFn that checks submission date", ->
+    assignment = { id: '1', name: 'Shootbags', submission_types: 'arbitrary' }
+    studentWithSubmission = { submitted_at: new Date() }
+    studentWithoutSubmission = {}
+    options = MessageStudentsWhoHelper.options(assignment)
+
+    notOk(options[0].criteriaFn(studentWithSubmission))
+    ok(options[0].criteriaFn(studentWithoutSubmission))
+
+  test "returns a `Haven't submitted yet option` with a criteriaFn that checks submission date and submittedAt is camelCase", ->
+    assignment = { id: '1', name: 'Shootbags', submission_types: 'arbitrary' }
+    studentWithSubmission = { submittedAt: new Date() }
+    options = MessageStudentsWhoHelper.options(assignment)
+
+    notOk(options[0].criteriaFn(studentWithSubmission))
+
