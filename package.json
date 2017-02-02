@@ -70,7 +70,7 @@
     "stylelint": "7.7.0",
     "uglify-js": "~2.7.0",
     "vinyl-fs": "0.3.7",
-    "webpack": "2.2.0-rc.3",
+    "webpack": "2.2.1",
     "webpack-manifest-plugin": "^1.0.1",
     "xsslint": "^0.1.3",
 
