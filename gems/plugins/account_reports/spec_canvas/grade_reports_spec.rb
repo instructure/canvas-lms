@@ -61,6 +61,15 @@ describe "Default Account Reports" do
     @enrollment5 = @course2.enroll_user(@user4, 'StudentEnrollment', :enrollment_state => :active)
     @enrollment6 = @course1.enroll_user(@user5, 'TeacherEnrollment', :enrollment_state => :active)
     @enrollment7 = @course2.enroll_user(@user5, 'TaEnrollment', :enrollment_state => :active)
+
+    # create some default course scores for these enrollments
+    @enrollment1.scores.create!
+    @enrollment2.scores.create!
+    @enrollment3.scores.create!
+    @enrollment4.scores.create!
+    @enrollment5.scores.create!
+    @enrollment6.scores.create!
+    @enrollment7.scores.create!
   end
 
   # The report should get all the grades for the term provided
@@ -69,11 +78,19 @@ describe "Default Account Reports" do
   # have sis id's and not sis ids
   describe "Grade Export report" do
     before(:once) do
-      @enrollment1.update_attribute :computed_final_score, 88
-      @enrollment2.update_attribute :computed_final_score, 90
-      @enrollment3.update_attribute :computed_final_score, 93
-      @enrollment4.update_attribute :computed_final_score, 97
-      @enrollment5.update_attribute :computed_final_score, 99
+      # We don't expect these values.  The report should only be
+      # looking at course_score
+      @enrollment1.update_attribute :computed_final_score, 1
+      @enrollment2.update_attribute :computed_final_score, 2
+      @enrollment3.update_attribute :computed_final_score, 3
+      @enrollment4.update_attribute :computed_final_score, 3
+      @enrollment5.update_attribute :computed_final_score, 2
+
+      @enrollment1.find_score.update_attribute(:final_score, 88)
+      @enrollment2.find_score.update_attribute(:final_score, 90)
+      @enrollment3.find_score.update_attribute(:final_score, 93)
+      @enrollment4.find_score.update_attribute(:final_score, 97)
+      @enrollment5.find_score.update_attribute(:final_score, 99)
     end
 
     it "should run grade export for a term" do

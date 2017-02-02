@@ -257,6 +257,20 @@ describe Enrollment do
       )
     end
 
+    describe '#find_score' do
+      it 'returns the course score when no arg is passed' do
+        score = @enrollment.scores.create!(final_score: 80.3)
+        @enrollment.scores.create!(final_score: 80.3, grading_period_id: period.id)
+        expect(@enrollment.find_score).to eq score
+      end
+
+      it 'returns the grading period score when grading_period_id is passed' do
+        @enrollment.scores.create!(final_score: 80.3)
+        score = @enrollment.scores.create!(final_score: 80.3, grading_period_id: period.id)
+        expect(@enrollment.find_score(grading_period_id: period.id)).to eq score
+      end
+    end
+
     describe '#computed_final_score' do
       it 'uses the value from the associated score object, if one exists' do
         @enrollment.scores.create!(final_score: 80.3)

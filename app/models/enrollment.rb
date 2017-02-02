@@ -1031,6 +1031,7 @@ class Enrollment < ActiveRecord::Base
   end
   private :cached_score_or_grade
 
+  # when grading period is nil, we are fetching the overall course score
   def find_score(grading_period_id: nil)
     if scores.loaded?
       scores.find { |score| score.grading_period_id == grading_period_id }
@@ -1038,7 +1039,6 @@ class Enrollment < ActiveRecord::Base
       scores.where(grading_period_id: grading_period_id).first
     end
   end
-  private :find_score
 
   def graded_at
     score = find_score
