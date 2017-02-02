@@ -24,7 +24,8 @@ if (usingWebpack) {
     'spec/javascripts/support/redux/fakeStore.js',
     {pattern: 'spec/javascripts/webpack/*.bundle.test.js', included: true, served: true},
     {pattern: 'spec/javascripts/webpack/*.chunk*.js', included: false, served: true},
-    {pattern: 'spec/javascripts/fixtures/*', included: false, served: true}
+    {pattern: 'spec/javascripts/fixtures/*', included: false, served: true},
+    {pattern: 'public/dist/brandable_css/**/*.css', included: false, served: true},
   ];
 } else {
   karmaFiles = [
