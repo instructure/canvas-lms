@@ -171,7 +171,7 @@ define([
     });
 
     window.onbeforeunload = function() {
-      if($("#submit_assignment:visible").length > 0 && !submitting) {
+      if($("#submit_assignment:visible:not(.bz-magic-field-submit").length > 0 && !submitting) {
         return I18n.t('messages.not_submitted_yet', "You haven't finished submitting your assignment.  You still need to click \"Submit\" to finish turning it in.  Do you want to leave this page anyway?");
       }
     };
@@ -200,7 +200,10 @@ define([
       }
       $("#submit_assignment").show();
       $(".submit_assignment_link").hide();
-      $("html,body").scrollTo($("#submit_assignment"));
+      // if the bz magic field stuff is present, we want to keep the scroll at the top of the page
+      // since the student needs to answer top to bottom instead of doing a text area at the end.
+      if(!document.querySelector("#assignment_show .description input[data-bz-retained], #assignment_show .description textarea[data-bz-retained]"))
+        $("html,body").scrollTo($("#submit_assignment"));
       createSubmitAssignmentTabs();
       homeworkSubmissionLtiContainer.loadExternalTools();
       $("#submit_assignment_tabs li").first().focus();
