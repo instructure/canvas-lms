@@ -199,9 +199,9 @@ namespace :deploy do
             # "canvasadmin" group.
             info("Compiling assets because a file in #{fetch(:assets_dependencies)} changed.")
             execute :npm, 'cache clean' # Was getting "npm ERR! cb() never called!".
-            execute :npm, 'install', '--silent'
-            #execute :npm, '-d install' # print debug log of npm install
-            execute :rake, 'canvas:compile_assets'
+            #execute :npm, 'install', '--silent'
+            execute :npm, '-dd install' # print debug log of npm install
+            execute :rake, 'canvas:compile_assets --trace'
           end
         end
       end
