@@ -564,7 +564,7 @@ class DiscussionTopic < ActiveRecord::Base
   def comments_disabled?
     !!(self.is_a?(Announcement) &&
       self.context.is_a?(Course) &&
-      self.context.settings[:lock_all_announcements])
+      self.context.lock_all_announcements)
   end
 
   def lock(opts = {})

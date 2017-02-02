@@ -1720,6 +1720,13 @@ describe DiscussionTopic do
       expect(announcement.reload.comments_disabled?).to be_truthy
     end
 
+    it "should reflect account setting for when lock_all_announcements is enabled" do
+      announcement = @course.announcements.create!(message: "Lock this")
+      expect(announcement.comments_disabled?).to be_falsey
+      @course.account.tap{|a| a.settings[:lock_all_announcements] = {:value => true, :locked => true}; a.save!}
+      expect(announcement.reload.comments_disabled?).to be_truthy
+    end
+
     it "should not allow replies from students to topics locked based on date" do
       course_with_teacher(:active_all => true)
       discussion_topic_model(:context => @course)
