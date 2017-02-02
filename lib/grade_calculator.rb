@@ -261,7 +261,7 @@ class GradeCalculator
     visible_assignments = visible_assignments.select{|a| assignment_ids_visible_to_user(user_id).include?(a.id)}
 
     if @grading_period
-      user = @course.users.find(user_id)
+      user = User.find(user_id)
       visible_assignments = @grading_period.assignments_for_student(visible_assignments, user)
     end
     assignments_by_group_id = visible_assignments.group_by(&:assignment_group_id)
