@@ -31,7 +31,7 @@ describe ConditionalRelease::Service do
   end
 
   def enable_service
-    allow(Canvas::Security::ServicesJwt).to receive(:encryption_secret).and_return('secret' * 10)
+    allow(Canvas::Security::ServicesJwt).to receive(:encryption_secret).and_return('setecastronomy92' * 2)
     allow(Canvas::Security::ServicesJwt).to receive(:signing_secret).and_return('donttell' * 10)
     allow(Service).to receive(:enabled_in_context?).and_return(true)
   end
