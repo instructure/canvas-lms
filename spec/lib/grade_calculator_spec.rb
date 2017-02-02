@@ -33,6 +33,21 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_final_score).to eql(25.0)
     end
 
+    it "can compute scores for users with deleted enrollments when grading periods are used" do
+      @course.root_account.enable_feature!(:multiple_grading_periods)
+      grading_period_set = @course.root_account.grading_period_groups.create!
+      grading_period_set.enrollment_terms << @course.enrollment_term
+      period = grading_period_set.grading_periods.create!(
+        title: "A Grading Period",
+        start_date: 10.days.ago,
+        end_date: 10.days.from_now
+      )
+      @user.enrollments.first.destroy
+      expect {
+        GradeCalculator.recompute_final_score(@user.id, @course.id, grading_period_id: period.id)
+      }.not_to raise_error
+    end
+
     it "should recompute when an assignment's points_possible changes'" do
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 100)
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
