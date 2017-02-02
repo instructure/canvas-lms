@@ -133,6 +133,14 @@ module Lti
           expect(subject.create.capability_offered).to include 'Security.splitSecret'
         end
 
+        it 'adds the Person.sourcedId capability' do
+          expect(subject.create.capability_offered).to include 'Person.sourcedId'
+        end
+
+        it 'adds the CourseSection.sourcedId capability' do
+          expect(subject.create.capability_offered).to include 'CourseSection.sourcedId'
+        end
+
         it 'adds the Context.id capability' do
           expect(subject.create.capability_offered).to include 'Context.id'
         end
