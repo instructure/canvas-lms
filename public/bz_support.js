@@ -155,6 +155,9 @@ function prepareAssignmentSubmitWithMagicFields() {
   var as = document.querySelector("#assignment_show .description");
   as.className += " bz-magic-field-assignment";
 
+  var holder = document.getElementById("submit_assignment");
+  holder.className += " bz-magic-field-submit";
+
   // going to hide the UI
   var tab = document.querySelector("#submit_assignment_tabs li > a.submit_online_text_entry_option");
   tab.parentNode.style.display = "none";
@@ -176,7 +179,6 @@ window.addEventListener("load", function() {
   if(submitAssignmentLink) {
     submitAssignmentLink.addEventListener("click", function() {
       prepareAssignmentSubmitWithMagicFields();
-      window.scrollTo(0, 0); // we want them to be up top to read and fill in from the top.
     }, true);
 
     if(location.hash == "#submit") {
@@ -186,8 +188,7 @@ window.addEventListener("load", function() {
     } else if(submitAssignmentLink) {
 
       if(document.querySelector("#assignment_show .description input[data-bz-retained], #assignment_show .description textarea[data-bz-retained]"))
-      submitAssignmentLink.click();
-      window.onbeforeunload = null; // turn off the "are you sure you want to leave the page?" thing since we auto save anyway.
+      $(submitAssignmentLink).triggerHandler('click', false);
     }
   }
 }, true);
