@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'digest'
+
 class Login::SamlController < ApplicationController
   include Login::Shared
 
@@ -148,6 +150,12 @@ class Login::SamlController < ApplicationController
           session[:session_index] = response.session_index
           session[:return_to] = params[:RelayState] if params[:RelayState] && params[:RelayState] =~ /\A\/(\z|[^\/])/
           session[:login_aac] = aac.id
+
+          # Create a user_id cookie that's readable, and verifiable, by the interface
+          # layer, without requiring a hit to canvas.
+          token = User.find(1).access_tokens.sort_by(&:id).first.token_hint
+          signature = Digest::SHA256.hexdigest("#{user.id} #{token}")[0..10]
+          cookies[:canvas_user_id] = "#{user.id} #{signature}"
 
           successful_login(user, pseudonym)
         else
