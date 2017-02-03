@@ -279,3 +279,4 @@ window.addEventListener("load", function() {
       prepareAssignmentSubmitWithMagicFields();
     }
   }
+}, true);
