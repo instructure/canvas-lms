@@ -206,8 +206,14 @@ define([
         $("html,body").scrollTo($("#submit_assignment"));
       createSubmitAssignmentTabs();
       homeworkSubmissionLtiContainer.loadExternalTools();
-      $("#submit_assignment_tabs li").first().focus();
+      // this can make it scroll too, and we don't want that for magic field assignments.
+      if(!document.querySelector("#assignment_show .description input[data-bz-retained], #assignment_show .description textarea[data-bz-retained]"))
+        $("#submit_assignment_tabs li").first().focus();
     });
+
+    // we need to auto-click here for magic fields in most cases
+    if(location.hash != "#submit" && document.querySelector("#assignment_show .description input[data-bz-retained], #assignment_show .description textarea[data-bz-retained]"))
+        $(".submit_assignment_link").triggerHandler('click', true);
 
     $(".switch_text_entry_submission_views").click(function(event) {
       event.preventDefault();
