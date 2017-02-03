@@ -1049,6 +1049,7 @@ CanvasRails::Application.routes.draw do
     end
 
     post '/courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/files', action: :create_file, controller: :submission_comments_api
+    delete '/sections/:section_id/assignments/:assignment_id/submissions/:user_id/comments/:id', action: :destroy, controller: :submission_comments_api
 
     scope(controller: :gradebook_history_api) do
       get "courses/:course_id/gradebook_history/days", action: :days, as: 'gradebook_history'

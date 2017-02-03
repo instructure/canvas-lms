@@ -24,6 +24,7 @@ class SubmissionCommentsApiController < ApplicationController
   before_filter :require_context
 
   include Api::V1::Attachment
+  include Api::V1::SubmissionComment
 
   # @API Upload a file
   #
@@ -42,6 +43,16 @@ class SubmissionCommentsApiController < ApplicationController
     if authorized_action?(@assignment, @current_user,
                           :attach_submission_comment_files)
       api_attachment_preflight(@assignment, request, check_quota: true)
+    end
+  end
+
+  def destroy
+    submission_comment = SubmissionComment.find(params[:id])
+    if authorized_action(submission_comment, @current_user, :delete)
+      submission_comment.hidden = true;
+      submission_comment.save
+
+      render :json => submission_comment_json(submission_comment, @current_user)
     end
   end
 end
