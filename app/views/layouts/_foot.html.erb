@@ -87,7 +87,10 @@
     var rails_tz = -ENV["TIMEZONE_OFFSET"] / 60;
     var offset = new Date().getTimezoneOffset();
     if(rails_tz != offset) {
-      if(localStorage.previouslyLoggedIn != "yes") {
+      var logInInfo = {};
+      if(localStorage.previouslyLoggedIn)
+        logInInfo = JSON.parse(localStorage.previouslyLoggedIn);
+      if(!logInInfo[ENV["current_user_id"]]) {
         var ajax = new XMLHttpRequest();
         ajax.onload = function() {
           location.reload();
@@ -119,7 +122,8 @@
         else
           showBzTzWarning();
 
-        localStorage.previouslyLoggedIn = "yes";
+        logInInfo[ENV["current_user_id"]] = true;
+        localStorage.previouslyLoggedIn = JSON.stringify(logInInfo);
       } else {
         showBzTzWarning();
       }

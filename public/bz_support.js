@@ -155,6 +155,9 @@ function prepareAssignmentSubmitWithMagicFields() {
   var as = document.querySelector("#assignment_show .description");
   as.className += " bz-magic-field-assignment";
 
+  var holder = document.getElementById("submit_assignment");
+  holder.className += " bz-magic-field-submit";
+
   // going to hide the UI
   var tab = document.querySelector("#submit_assignment_tabs li > a.submit_online_text_entry_option");
   tab.parentNode.style.display = "none";
@@ -171,23 +174,93 @@ function prepareAssignmentSubmitWithMagicFields() {
   }, true);
 }
 
-window.addEventListener("load", function() {
-  var submitAssignmentLink = document.querySelector(".btn-primary.submit_assignment_link");
-  if(submitAssignmentLink) {
-    submitAssignmentLink.addEventListener("click", function() {
-      prepareAssignmentSubmitWithMagicFields();
-      window.scrollTo(0, 0); // we want them to be up top to read and fill in from the top.
-    }, true);
+/* We need instant survey here to ensure it is loaded before the
+   canvas JS to avoid undefined function problems */
+function bzActivateInstantSurvey(magic_field_name) {
+        var i = document.getElementById("instant-survey");
+	if(!i) return;
 
-    if(location.hash == "#submit") {
-      // if we go to this directly, there is no need to click the button up
-      // top, so just automatically go.
-      prepareAssignmentSubmitWithMagicFields();
-    } else if(submitAssignmentLink) {
+	// adjust styles of the container to make room  (see CSS)
+	var msf = document.querySelector(".module-sequence-footer");
+	var originalMsfButtonClass = msf.className;
+	msf.className += ' has-instant-survey';
 
-      if(document.querySelector("#assignment_show .description input[data-bz-retained], #assignment_show .description textarea[data-bz-retained]"))
-      submitAssignmentLink.click();
-      window.onbeforeunload = null; // turn off the "are you sure you want to leave the page?" thing since we auto save anyway.
-    }
-  }
-}, true);
+	// discourage clicking of next without answering first...
+	var nb = document.querySelector(".bz-next-button");
+	var originalNextButtonClass = nb.className;
+	nb.className += ' discouraged';
+
+	// move the survey from the hidden body to the visible footer
+        var h = document.getElementById("instant-survey-holder");
+        h.innerHTML = "";
+        h.appendChild(i.parentNode.removeChild(i));
+
+	var count = h.querySelectorAll("input").length;
+	if(count < 3)
+		msf.className += ' has-short-instant-survey';
+	else if(count == 3)
+		msf.className += ' has-3-instant-survey';
+	else if(count == 4)
+		msf.className += ' has-4-instant-survey';
+
+	// react to survey click - save and encourage hitting the next button.
+
+	var save = function(value) {
+		var http = new XMLHttpRequest();
+		http.open("POST", "/bz/user_retained_data", true);
+		var data = "name=" + encodeURIComponent(magic_field_name) + "&value=" + encodeURIComponent(value) + "&from=" + encodeURIComponent(location.href);
+		http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+		// encourage next clicking again once they are saved
+		http.onload = function() {
+			nb.className = originalNextButtonClass;
+          		var h = document.getElementById("instant-survey-holder");
+			$(h).hide("slow");
+			// shrinks the container...
+			msf.className = originalMsfButtonClass;
+		};
+
+		http.send(data);
+	};
+
+	var inputs = i.querySelectorAll("input");
+	for(var a = 0; a < inputs.length; a++) {
+		inputs[a].onchange = function() {
+			save(this.value);
+		};
+	}
+}
+
+function bzInitializeInstantSurvey() {
+	// only valid on wiki pages
+	if(ENV == null || ENV["WIKI_PAGE"] == null || ENV["WIKI_PAGE"].page_id == null)
+		return;
+
+	// if there's no survey in the document, don't need to query.
+        var i = document.getElementById("instant-survey");
+        if(!i)
+	  return;
+
+	// show the button for editors (if present) if a survey exists
+	var ssrbtn = document.getElementById("see-survey-results-button");
+	if(ssrbtn)
+	  ssrbtn.style.display = '';
+
+
+	// our key in the user magic field data where responses are stored
+	var name = "instant-survey-" + ENV["WIKI_PAGE"].page_id;
+
+	// load the value first. If it is already set, no need to show -
+	// instant survey is supposed to only be done once.
+
+	var http = new XMLHttpRequest();
+	// cut off json p stuff
+	http.onload = function() {
+		var value = http.responseText.substring(9);
+		if(value == null || value == "")
+			bzActivateInstantSurvey(name);
+	};
+	http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name), true);
+	http.send();
+
+}
