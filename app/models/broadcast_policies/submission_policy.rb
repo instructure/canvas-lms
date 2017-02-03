@@ -44,11 +44,13 @@ module BroadcastPolicies
     def should_dispatch_submission_graded?
       broadcasting_grades? &&
       user_has_visibility? &&
+      submission.submission_type != 'discussion_topic' &&
       (submission.changed_state_to(:graded) || (grade_updated? && graded_recently?))
     end
 
     def should_dispatch_submission_grade_changed?
       broadcasting_grades? &&
+      submission.submission_type != 'discussion_topic' &&
       submission.graded_at &&
       !graded_recently? &&
       grade_updated? &&
