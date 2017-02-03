@@ -209,6 +209,8 @@ define([
       // this can make it scroll too, and we don't want that for magic field assignments.
       if(!document.querySelector("#assignment_show .description input[data-bz-retained], #assignment_show .description textarea[data-bz-retained]"))
         $("#submit_assignment_tabs li").first().focus();
+      else
+        prepareAssignmentSubmitWithMagicFields();
     });
 
     // we need to auto-click here for magic fields in most cases
