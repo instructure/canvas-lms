@@ -264,19 +264,3 @@ function bzInitializeInstantSurvey() {
 	http.send();
 
 }
-
-// set magic field assignment event handlers
-window.addEventListener("load", function() {
-  var submitAssignmentLink = document.querySelector(".btn-primary.submit_assignment_link");
-  if(submitAssignmentLink) {
-    submitAssignmentLink.addEventListener("click", function() {
-      prepareAssignmentSubmitWithMagicFields();
-    }, true);
-
-    if(location.hash == "#submit") {
-      // if we go to this directly, there is no need to click the button up
-      // top, so just automatically go.
-      prepareAssignmentSubmitWithMagicFields();
-    }
-  }
-}, true);
