@@ -32,6 +32,12 @@ This variable can then have a list of files, separated by `:`.  You need to keep
 echo "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose.local.`whoami`.yml" >> .env
 ```
 
+Setup your user-specific docker-compose override file as an empty file using the following command:
+
+```bash
+echo version: '2' > docker-compose.local.`whoami`.yml
+```
+
 ## Getting Started
 After you have [installed the dependencies](getting_docker.md). You'll need to copy
 over the required configuration files.
@@ -51,7 +57,8 @@ Now you're ready to build all of the containers. This will take a while as a lot
 - Assets are compiled
 
 ```bash
-docker-compose run --rm web bash -c "bundle exec rake db:create db:initial_setup canvas:compile_assets"
+docker-compose run --rm web bundle install
+docker-compose run --rm web bundle exec rake db:create db:initial_setup canvas:compile_assets_dev
 ```
 
 Now you should be able to start up and access canvas like you would any other container.
@@ -69,6 +76,7 @@ After pulling new code, you'll probably want to run migrations and
 update assets:
 
 ```
+$ docker-compose run --rm web bundle update
 $ docker-compose run --rm web bundle exec rake db:migrate
 $ docker-compose run --rm web bundle exec rake canvas:compile_assets
 ```
@@ -174,6 +182,19 @@ Email is often sent through background jobs if you spin up the `jobs` container.
 If you would like to test or preview any notifications, simply trigger the email
 through it's normal actions, and it should immediately show up in the emulated
 webmail inbox available here: http://mailcatcher.canvaslms.docker/
+
+## Tips
+
+It will likely be helpful to alias the various docker-compose commands like `docker-compose run --rm web` because that can get tiring to type over and overe. Here's some recommended aliases you can add to your `~/.bash_profile` and reload your Terminal.
+
+```
+alias dc='docker-compose'
+alias dcu='docker-compose up'
+alias dcr='docker-compose run --rm web'
+alias dcrx='docker-compose run --rm web bundle exec'
+```
+
+Now you can just run commands like `dcrx rake db:migrate` or `dcr bundle install`
 
 ## Troubleshooting
 
