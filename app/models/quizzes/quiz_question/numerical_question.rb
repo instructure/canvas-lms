@@ -41,7 +41,11 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
 
     # we use BigDecimal here to avoid rounding errors at the edge of the tolerance
     # e.g. in floating point, -11.7 with margin of 0.02 isn't inclusive of the answer -11.72
-    answer_number = BigDecimal.new(answer_text.to_s)
+    begin
+      answer_number = BigDecimal.new(answer_text.to_s)
+    rescue ArgumentError
+      answer_number = BigDecimal.new('0.0')
+    end
 
     match = answers.find do |answer|
       if answer[:numerical_answer_type] == "exact_answer"
