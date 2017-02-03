@@ -1,62 +1,115 @@
+<!DOCTYPE html>
 <html>
-<body style="background-color: #FFFFFF;">
+<head>
+  <meta name="viewport" content="width=device-width">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <style type="text/css">
+/*
+Changes to font size (14->16) for smaller screens
+table[class=body] is the only selector that works for all vendors
+*/
+@media only screen and (max-width: 620px) {
+  table[class=body] p,
+  table[class=body] ul,
+  table[class=body] ol,
+  table[class=body] td,
+  table[class=body] span,
+  table[class=body] a {
+    font-size: 16px !important;
+  }
+  /* remove padding for mobile so no gray shows */
+  table[class=body] .bodycell {
+    padding: 0 !important;
+    width: 100% !important;
+  }
+  /* reduce padding from 20->10 for mobile */
+  table[class=body] .maincell {
+    padding: 10px !important;
+  }
+}
+/*
+ExternalClass fixes Outlook.com / Hotmail emails
+*/
+@media all {
+  .ExternalClass {
+    width: 100%;
+  }
+  .ExternalClass,
+  .ExternalClass p,
+  .ExternalClass span,
+  .ExternalClass font,
+  .ExternalClass td,
+  .ExternalClass div {
+    line-height: 100%;
+  }
+}
+  </style>
+</head>
+<!--
+background: white (could be gray)
+default sans serif fonts, 14px, 1.3, #444444
+vendor prefixes for Outlook (-ms) and iOS (-webkit)
+Margin is capitalized to fix Outlook.com
+-->
+<body class="" style="background-color:#ffffff; font-family:'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif'; font-size:14px; color: #444444; line-height:1.3; Margin:0; padding:0; -ms-text-size-adjust:100%; -webkit-font-smoothing:antialiased; -webkit-text-size-adjust:100%;">
 
-<center>
-  <table cellpadding="8" cellspacing="0" style="margin: 0; padding: 0; width:728px;" border="0">
+  <!-- body: background table (if body has a color, this should match) -->
+  <table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse:separate; background-color:#ffffff; width:100%; box-sizing:border-box; mso-table-lspace:0pt; mso-table-rspace:0pt;">
     <tr>
-      <td valign="top">
-        <table cellpadding="0" cellspacing="0" align="center" style="background-color: #ffffff;">
+      <!-- width and max-width so it can scale for mobile -->
+      <td class="bodycell" style="max-width:600px; width:100%; font-family:'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif'; font-size:14px; vertical-align:top; display:block; box-sizing:border-box; padding:10px; Margin:0 auto !important;">
+
+<!-- for older versions of Outlook that don't support max-width -->
+<!--[if (gte mso 9)|(IE)]>
+<table width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td>
+<![endif]-->
+
+        <!-- main: white box for content -->
+        <table class="main" style="background:#fff; width:100%; border-collapse:separate; mso-table-lspace:0pt; mso-table-rspace:0pt; ">
           <tr>
-            <td>
-              <table cellpadding="0" cellspacing="0" style="" border="0" align="center">
-                <tr>
-                  <td colspan="3" height="36"></td>
-                </tr>
-                <tr>
-                  <td width="36"></td>
-                  <td width="454" style="font-size: 14px; color: #444444; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif'; border-collapse: collapse;" align="left" valign="top">
+            <td class="maincell" style="font-family:sans-serif; font-size:14px; vertical-align:top; box-sizing:border-box; padding:20px;">
 
                     <%= inner_html %>
 
-                  </td>
-                  <td width="36"></td>
-                </tr>
-                <tr>
-                  <td colspan="3" height="36"></td>
-                </tr>
-              </table>
             </td>
           </tr>
         </table>
-        <table cellpadding="0" cellspacing="0" align="center" border="0" style="background-color: #ffffff;">
+        <!-- /.main -->
+
+        <!-- logo: branding -->
+        <table class="logo" style="width:100%; box-sizing:border-box; border-collapse:separate; mso-table-lspace:0pt; mso-table-rspace:0pt; ">
           <tr>
-            <td height="60"></td>
-          </tr>
-          <tr>
-            <td align="center"> <img src="<%= custom_logo || "https://lh3.googleusercontent.com/D1pgZeJZrBFc_n_EnEWpj9BQpVUaQ6xj2FYl1ZaxhDN4c-x8X69DqfJ258Eb0u7sXyuvYI533FkaCouBv6131tpxMbd1CpjZDEMr2kN4t8_Epitm77c" %>" alt=""></td>
-          </tr>
-          <tr>
-            <td height="15"></td>
-          </tr>
-          <tr>
-            <td style="padding: 0; border-collapse: collapse;">
-              <table cellpadding="0" cellspacing="0" align="center" border="0">
-                <tr style="font-size: 11px; color: #a8b9c6; background-color: #ffffff; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top">
-                  <% if !content(:footer_link).blank? %>
-                    <td width="375" align="center">
-                    <%= content(:footer_link).html_safe %></td>
-                    <td width="50" align="center"> | </td>
-                  <% end %>
-                  <td width="375" align="center"><a href="<%= communication_profile_url %>">
-                    <%= t 'click_to_preferences', "Update your notification settings" %></a></td>
-                </tr>
-              </table>
+            <td class="logocell" style="text-align:center; vertical-align:top; box-sizing:border-box; padding:10px;">
+              <img src="<%= custom_logo || "https://lh3.googleusercontent.com/D1pgZeJZrBFc_n_EnEWpj9BQpVUaQ6xj2FYl1ZaxhDN4c-x8X69DqfJ258Eb0u7sXyuvYI533FkaCouBv6131tpxMbd1CpjZDEMr2kN4t8_Epitm77c" %>" alt="">
             </td>
           </tr>
         </table>
+        <!-- /.logo -->
+
+        <!-- footer: gray text below main -->
+        <table class="footer" style="width:100%; box-sizing:border-box; border-collapse:separate; mso-table-lspace:0pt; mso-table-rspace:0pt; ">
+          <tr>
+            <td class="footercell" style="font-family:sans-serif; font-size:14px; vertical-align:top; color:#a8b9c6; font-size:12px; text-align:center; padding:10px; box-sizing:border-box; ">
+
+              <% if !content(:footer_link).blank? %>
+                <%= content(:footer_link).html_safe %> &nbsp;|&nbsp;
+              <% end %>
+
+              <a href="<%= communication_profile_url %>" style="white-space: nowrap;"><%= t 'click_to_preferences', "Update your notification settings" %></a>
+
+            </td>
+          </tr>
+        </table>
+        <!-- /.footer -->
+
+<!--[if (gte mso 9)|(IE)]>
+</td></tr></table>
+<![endif]-->
+
       </td>
     </tr>
   </table>
-</center>
+  <!-- /.body -->
+
 </body>
 </html>
