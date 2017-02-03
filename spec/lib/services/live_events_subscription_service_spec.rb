@@ -39,7 +39,7 @@ module Services
 
       let(:product_family) do
         product_family = mock()
-        product_family.stubs(:developer_key).returns('10000000001')
+        product_family.stubs(:developer_key).returns(10000000000003)
         product_family
       end
 
@@ -62,10 +62,28 @@ module Services
             expect(method).to eq(:get)
             expect(endpoint).to eq('http://example.com/api/subscriptions')
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
-            expect(jwt["developerKey"]).to eq('10000000001')
+            expect(jwt["developerKey"]).to eq('10000000000003')
             expect(jwt["sub"]).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
           end
           LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy)
+        end
+      end
+
+      describe '.create_tool_proxy_subscription' do
+        it 'makes the expected request' do
+          subscription = { 'my' => 'subscription' }
+
+          HTTParty.expects(:send).with do |method, endpoint, options|
+            expect(method).to eq(:post)
+            expect(endpoint).to eq('http://example.com/api/subscriptions')
+            expect(options[:headers]['Content-Type']).to eq('application/json')
+            jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
+            expect(jwt['developerKey']).to eq('10000000000003')
+            expect(jwt['sub']).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
+            expect(JSON.parse(options[:body])).to eq(subscription)
+          end
+
+          LiveEventsSubscriptionService.create_tool_proxy_subscription(tool_proxy, subscription)
         end
       end
 

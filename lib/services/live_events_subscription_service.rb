@@ -9,10 +9,24 @@ module Services
         options = {
           headers: headers({
             sub: "ltiToolProxy:#{tool_proxy.guid}",
-            developerKey: tool_proxy.product_family.developer_key
+            developerKey: tool_proxy.product_family.developer_key.to_s
           })
         }
         request(:get, '/api/subscriptions', options)
+      end
+
+      def create_tool_proxy_subscription(tool_proxy, subscription)
+        options = {
+          headers: headers({
+            sub: "ltiToolProxy:#{tool_proxy.guid}",
+            developerKey: tool_proxy.product_family.developer_key.to_s
+          },
+          {
+            'Content-Type' => 'application/json'
+          }),
+          body: subscription.to_json
+        }
+        request(:post, '/api/subscriptions', options)
       end
 
       private
