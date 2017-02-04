@@ -10,6 +10,7 @@ define [
 
   scope = I18n.scoped('foo')
   t = (args...) -> scope.t(args...)
+  interpolate = (args...) -> I18n.interpolate(args...)
 
   QUnit.module "I18n",
     setup: ->
@@ -76,6 +77,17 @@ define [
     # manually concatenate it into your wrapper
     equal t('bar', 'you need to *log in*', {wrapper: '<a href="%{url}">$1</a>', url: 'http://foo.bar'}),
       'you need to <a href="http://foo.bar">log in</a>'
+
+  test "interpolate: should format numbers", ->
+    equal interpolate("user count: %{foo}", {foo: 1500}), "user count: 1,500"
+
+  test "interpolate: should not format numbery strings", ->
+    equal interpolate("user count: %{foo}", {foo: "1500"}), "user count: 1500"
+
+  test "interpolate: should not mutate the options", ->
+    options = {foo: 1500}
+    interpolate("user count: %{foo}", options)
+    equal options.foo, 1500
 
   test "pluralize: should format the number", ->
     equal t({one: "1 thing", other: "%{count} things"}, {count: 1500}), '1,500 things'
