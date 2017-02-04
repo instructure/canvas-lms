@@ -20,7 +20,7 @@ define [
     app.$el.appendTo $('#fixtures')
     app.render()
 
-  module 'ConferenceView',
+  QUnit.module 'ConferenceView',
     setup: ->
       fakeENV.setup()
     teardown: ->

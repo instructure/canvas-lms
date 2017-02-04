@@ -12,7 +12,7 @@ define [
   renderComponent = ->
     ReactDOM.render(React.createFactory(FileSelectBox)({contextString: 'test_3'}), wrapper)
 
-  module 'FileSelectBox',
+  QUnit.module 'FileSelectBox',
     setup: ->
       @server = sinon.fakeServer.create()
 

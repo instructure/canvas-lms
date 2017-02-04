@@ -4,7 +4,7 @@ define [
   'vendor/timezone/America/Denver'
 ], (fcUtil, tz, denver) ->
 
-  module "Calendar",
+  QUnit.module "Calendar",
     setup: ->
       @snapshot = tz.snapshot()
       tz.changeZone(denver, 'America/Denver')

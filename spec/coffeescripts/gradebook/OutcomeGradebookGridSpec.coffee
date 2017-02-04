@@ -5,7 +5,7 @@ define [
   'i18n!gradebook'
 ], (_, Grid,fakeENV) ->
 
-  module 'OutcomeGradebookGrid',
+  QUnit.module 'OutcomeGradebookGrid',
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
 

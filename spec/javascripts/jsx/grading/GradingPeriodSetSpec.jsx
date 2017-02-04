@@ -83,7 +83,7 @@ define([
     terms: []
   };
 
-  module("GradingPeriodSet", {
+  QUnit.module("GradingPeriodSet", {
     renderComponent(opts = {}) {
       let attrs = _.extend({}, props, opts);
       attrs.onDelete = this.stub();
@@ -170,7 +170,7 @@ define([
     });
   });
 
-  module("GradingPeriodSet 'Edit Grading Period'", {
+  QUnit.module("GradingPeriodSet 'Edit Grading Period'", {
     renderComponent(opts = {}) {
       let attrs = _.extend({}, props, opts);
       const element = React.createElement(GradingPeriodSet, attrs);
@@ -239,7 +239,7 @@ define([
     ok(spy.calledOnce);
   });
 
-  module("GradingPeriodSet 'Edit Grading Period - onSave'", {
+  QUnit.module("GradingPeriodSet 'Edit Grading Period - onSave'", {
     renderComponent(opts = {}) {
       let attrs = _.extend({}, props, opts);
       const element = React.createElement(GradingPeriodSet, attrs);
@@ -355,7 +355,7 @@ define([
     });
   });
 
-  module("GradingPeriodSet 'Edit Grading Period - validations'", {
+  QUnit.module("GradingPeriodSet 'Edit Grading Period - validations'", {
     stubUpdate() {
       let failure = new Promise(_, reject => { throw("FAIL") });
       this.stub(gradingPeriodsApi, "batchUpdate").returns(failure);
@@ -505,7 +505,7 @@ define([
     ok(set.refs.editPeriodForm, "form is still visible");
   });
 
-  module("GradingPeriodSet 'Add Grading Period'", {
+  QUnit.module("GradingPeriodSet 'Add Grading Period'", {
     renderComponent(permissions = allPermissions, readOnly = false) {
       let updatedProps = _.extend({}, props, {
         permissions: _.extend({}, allPermissions, permissions),
@@ -574,7 +574,7 @@ define([
     notOk(set.refs["show-grading-period-3"].props.actionsDisabled);
   });
 
-  module("GradingPeriodSet 'Remove Grading Period'", {
+  QUnit.module("GradingPeriodSet 'Remove Grading Period'", {
     renderComponent() {
       const element = React.createElement(GradingPeriodSet, props);
       return ReactDOM.render(element, wrapper);
@@ -592,7 +592,7 @@ define([
     propEqual(periodIDs, ["3", "2"]);
   });
 
-  module("GradingPeriodSet 'New Grading Period - onSave'", {
+  QUnit.module("GradingPeriodSet 'New Grading Period - onSave'", {
     renderComponent(opts = {}) {
       const element = React.createElement(GradingPeriodSet, _.defaults(opts, props));
       let component = ReactDOM.render(element, wrapper);
@@ -685,7 +685,7 @@ define([
     });
   });
 
-  module("GradingPeriodSet 'New Grading Period - validations'", {
+  QUnit.module("GradingPeriodSet 'New Grading Period - validations'", {
     stubUpdate() {
       let failure = new Promise(_, reject => { throw("FAIL") });
       this.stub(gradingPeriodsApi, "batchUpdate").returns(failure);

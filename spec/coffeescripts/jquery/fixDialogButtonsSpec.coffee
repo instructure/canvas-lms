@@ -5,7 +5,7 @@ define [
   'helpers/jquery.simulate'
 ], ($) ->
 
-  module 'fixDialogButtons',
+  QUnit.module 'fixDialogButtons',
 
     setup: ->
       @clock = sinon.useFakeTimers()

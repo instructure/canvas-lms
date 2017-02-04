@@ -8,7 +8,7 @@ define [
   'jquery'
 ], (Calendar, fcUtil, moment, tz, denver, fixtures, $) ->
 
-  module "Calendar",
+  QUnit.module "Calendar",
     setup: ->
       @snapshot = tz.snapshot()
       tz.changeZone(denver, 'America/Denver')

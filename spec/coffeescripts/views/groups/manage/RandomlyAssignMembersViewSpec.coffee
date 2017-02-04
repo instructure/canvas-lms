@@ -143,7 +143,7 @@ define [
       "course_id": 1
     }
 
-  module 'RandomlyAssignMembersView',
+  QUnit.module 'RandomlyAssignMembersView',
     setup: ->
       server = sinon.fakeServer.create()
       @_ENV = globalObj.ENV

@@ -2,7 +2,7 @@ define(['compiled/gradezilla/Gradebook',
   "underscore",
   "helpers/fakeENV",
 ], (Gradebook, _, fakeENV) => {
-  module("addRow", {
+  QUnit.module("addRow", {
     setup: function() {
       fakeENV.setup({
         GRADEBOOK_OPTIONS: { context_id: 1 },

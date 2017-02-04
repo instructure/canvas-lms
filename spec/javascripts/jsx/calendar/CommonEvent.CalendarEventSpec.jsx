@@ -12,7 +12,7 @@ define([
     ];
   }
 
-  module('CommonEvent.CalendarEvent', {
+  QUnit.module('CommonEvent.CalendarEvent', {
     setup () {
       const data = {
         child_events: []

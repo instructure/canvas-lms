@@ -5,7 +5,7 @@ define [
 ], ($, _)->
   # fragile spec
 
-  module 'mediaCommentThumbnail',
+  QUnit.module 'mediaCommentThumbnail',
     setup: ->
       # flop out the _.defer function to just call directly down to the passed
       # function reference. this helps the tests run in a synchronous order

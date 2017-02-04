@@ -7,7 +7,7 @@ define([
   let file = null;
   let component = null;
 
-  module('CanvasCropper', {
+  QUnit.module('CanvasCropper', {
     setup () {
       const blob = dataURItoBlob(filedata)  // eslint-disable-line no-use-before-define
       file = new File([blob], 'test.jpg', {type: 'image/jpeg', lastModified: Date.now()});

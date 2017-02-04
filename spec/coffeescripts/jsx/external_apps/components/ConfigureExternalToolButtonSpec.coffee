@@ -24,7 +24,7 @@ define [
     btnTriggerModal = component.refs.btnTriggerModal?.getDOMNode()
     [component, btnTriggerModal]
 
-  module 'ExternalApps.ConfigureExternalToolButton',
+  QUnit.module 'ExternalApps.ConfigureExternalToolButton',
     setup: ->
       @tools = [
         {

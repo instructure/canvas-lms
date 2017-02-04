@@ -11,7 +11,7 @@ define [
   scope = I18n.scoped('foo')
   t = (args...) -> scope.t(args...)
 
-  module "I18n",
+  QUnit.module "I18n",
     setup: ->
       I18nStubber.pushFrame()
 
@@ -80,7 +80,7 @@ define [
   test "pluralize: should format the number", ->
     equal t({one: "1 thing", other: "%{count} things"}, {count: 1500}), '1,500 things'
 
-  module 'I18n localize number',
+  QUnit.module 'I18n localize number',
     setup: ->
       @delimiter = ' '
       @separator = ','

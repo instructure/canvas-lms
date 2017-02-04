@@ -74,7 +74,7 @@ define([
     return Object.keys(errors).length === 0;
   }
 
-  module('#DateValidator -- Multiple Grading Periods');
+  QUnit.module('#DateValidator -- Multiple Grading Periods');
 
   test("it is invalid to add a new override with a date in a closed grading period", function() {
     const data = generateData({ due_at: DATE_IN_CLOSED_PERIOD, persisted: false });

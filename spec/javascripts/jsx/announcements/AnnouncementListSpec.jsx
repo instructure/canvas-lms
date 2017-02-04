@@ -1,7 +1,7 @@
 define([
   'react', 'react-addons-test-utils', 'jsx/announcements/AnnouncementList',
 ], (React, TestUtils, AnnouncementList) => {
-  module('AnnouncementList')
+  QUnit.module('AnnouncementList')
 
   test('renders the AnnouncementList component', () => {
     const announcements = [

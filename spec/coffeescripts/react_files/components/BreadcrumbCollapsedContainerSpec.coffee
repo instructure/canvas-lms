@@ -12,7 +12,7 @@ define [
   simulate = TestUtils.Simulate
   simulateNative = TestUtils.SimulateNative
 
-  module 'BreadcrumbsCollapsedContainer',
+  QUnit.module 'BreadcrumbsCollapsedContainer',
     setup: ->
       folder = new Folder(name: 'Test Folder', urlPath: 'test_url', url: 'stupid')
       folder.url = -> "stupid"

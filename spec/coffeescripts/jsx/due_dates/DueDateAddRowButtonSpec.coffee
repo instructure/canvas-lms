@@ -6,7 +6,7 @@ define [
   'jsx/due_dates/DueDateAddRowButton'
 ], (React, ReactDOM, {Simulate, SimulateNative}, _, DueDateAddRowButton) ->
 
-  module 'DueDateAddRowButton with true display prop',
+  QUnit.module 'DueDateAddRowButton with true display prop',
     setup: ->
       props =
         display: true
@@ -22,7 +22,7 @@ define [
     ok @DueDateAddRowButton.refs.addButton
 
 
-  module 'DueDateAddRowButton with false display prop',
+  QUnit.module 'DueDateAddRowButton with false display prop',
     setup: ->
       props =
         display: false

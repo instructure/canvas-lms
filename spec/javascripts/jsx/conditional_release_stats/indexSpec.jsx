@@ -65,7 +65,7 @@ define([
 
   let testNode = null
 
-  module('CyoeStats - init', {
+  QUnit.module('CyoeStats - init', {
     setup() {
       fakeENV.setup();
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true

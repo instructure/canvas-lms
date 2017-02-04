@@ -51,7 +51,7 @@ define [
         [{asset_string: 'course_1', id: 1, can_create_calendar_events: can_edit}]
     ]
 
-  module "CalendarEventFilter",
+  QUnit.module "CalendarEventFilter",
     setup: ->
     teardown: ->
 

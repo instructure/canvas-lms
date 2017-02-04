@@ -9,7 +9,7 @@ define [
   'helpers/fakeENV'
 ], (FeatureFlagView, FeatureFlag, $, tz, juneau, french, I18nStubber, fakeENV) ->
 
-  module "FeatureFlagView",
+  QUnit.module "FeatureFlagView",
     setup: ->
       @container = $('<div />', id: 'feature-flags').appendTo('#fixtures')
       @snapshot = tz.snapshot()

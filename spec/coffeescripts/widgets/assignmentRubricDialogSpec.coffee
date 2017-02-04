@@ -3,7 +3,7 @@ define [
   'compiled/widget/assignmentRubricDialog'
 ], ($, assignmentRubricDialog)->
 
-  module 'assignmentRubricDialog'
+  QUnit.module 'assignmentRubricDialog'
 
   test 'make sure it picks up the right data attrs', ->
     $trigger = $('<div />').addClass('rubric_dialog_trigger')

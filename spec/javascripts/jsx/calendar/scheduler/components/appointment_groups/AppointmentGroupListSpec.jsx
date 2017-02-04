@@ -4,7 +4,7 @@ define([
   'react-addons-test-utils',
   'jsx/calendar/scheduler/components/appointment_groups/AppointmentGroupList',
 ], (React, ReactDOM, TestUtils, AppointmentGroupList) => {
-  module('AppointmentGroupList')
+  QUnit.module('AppointmentGroupList')
 
   test('renders the AppointmentGroupList component', () => {
     const appointmentGroup = { appointments: [{ child_events: [{ user: { sortable_name: 'test' } }], start_at: '2016-10-18T19:00:00Z', end_at: '2016-10-18T110:00:00Z' }], appointments_count: 1 }

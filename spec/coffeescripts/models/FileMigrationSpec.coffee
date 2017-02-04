@@ -1,6 +1,6 @@
 define [
   'Backbone'
 ], (Backbone) ->
-  module 'FileMigrationSpec',
+  QUnit.module 'FileMigrationSpec',
     setup: ->
     teardown: ->

@@ -2,7 +2,7 @@ define [
   "jsx/assignments/actions/ModerationActions"
 ], (ModerationActions) ->
 
-  module "ModerationActions - Action Creators"
+  QUnit.module "ModerationActions - Action Creators"
 
   test 'creates the SORT_MARK1_COLUMN action', ->
     action = ModerationActions.sortMark1Column()
@@ -130,7 +130,7 @@ define [
     deepEqual action, expected, "creates the action successfully"
 
 
-  module "ModerationActions#apiGetStudents",
+  QUnit.module "ModerationActions#apiGetStudents",
     setup: ->
       @client =
         get: ->
@@ -182,7 +182,7 @@ define [
         start()
     , getState)
 
-  module "ModerationActions#publishGrades",
+  QUnit.module "ModerationActions#publishGrades",
     setup: ->
       @client = {
         post: ->
@@ -270,7 +270,7 @@ define [
       start()
     , getState)
 
-  module "ModerationActions#addStudentToModerationSet",
+  QUnit.module "ModerationActions#addStudentToModerationSet",
     setup: ->
       @client =
         post: ->
@@ -333,7 +333,7 @@ define [
       start()
     , getState)
 
-  module "ModerationActions#selectProvisionalGrade",
+  QUnit.module "ModerationActions#selectProvisionalGrade",
     setup: ->
       @client =
         put: ->

@@ -26,7 +26,7 @@ define([
 
   let alt, createLinkOpts, editor, node
 
-  module('editor box: create_link', {
+  QUnit.module('editor box: create_link', {
     setup () {
       alt = 'preview alt text'
       createLinkOpts = {

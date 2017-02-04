@@ -1,7 +1,7 @@
 define([
   'jsx/shared/helpers/urlHelper',
 ], ({ encodeSpecialChars, decodeSpecialChars }) => {
-  module('Url Helper')
+  QUnit.module('Url Helper')
 
   test('encodes % properly', () => {
     equal(encodeSpecialChars('/some/path%thing'), '/some/path&#37;thing')

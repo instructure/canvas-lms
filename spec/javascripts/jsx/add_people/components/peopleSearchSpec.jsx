@@ -4,7 +4,7 @@ define([
   'react-addons-test-utils',
   'jsx/add_people/components/people_search',
 ], (React, ReactDOM, TestUtils, PeopleSearch) => {
-  module('PeopleSearch')
+  QUnit.module('PeopleSearch')
 
   const searchProps = {
     roles: [{id: '1', name: 'Student'}, {id: '2', name: 'TA'}],

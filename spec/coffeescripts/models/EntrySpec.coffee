@@ -3,7 +3,7 @@ define [
   'helpers/fakeENV'
 ], (Entry, fakeENV) ->
 
-  module 'Entry',
+  QUnit.module 'Entry',
     setup: ->
       fakeENV.setup()
       @user_id = 1

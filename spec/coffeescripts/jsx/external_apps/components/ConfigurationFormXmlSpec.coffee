@@ -19,7 +19,7 @@ define [
   renderComponent = (data) ->
     ReactDOM.render(createElement(data), wrapper)
 
-  module 'ExternalApps.ConfigurationFormXml',
+  QUnit.module 'ExternalApps.ConfigurationFormXml',
     teardown: ->
       ReactDOM.unmountComponentAtNode wrapper
 

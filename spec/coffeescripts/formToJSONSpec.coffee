@@ -10,7 +10,7 @@ define [
       <input type='text' name='date' class='datetime_field_enabled'/>
     """
 
-  module 'jquery.toJSON',
+  QUnit.module 'jquery.toJSON',
     setup: ->
       @form = $ '<form/>'
       @form.html """

@@ -7,7 +7,7 @@ define [
   'i18n!epub_exports',
 ], (_, React, ReactDOM, TestUtils, DownloadLink, I18n) ->
 
-  module 'DownloadLink',
+  QUnit.module 'DownloadLink',
     setup: ->
       @props = {
         course: {

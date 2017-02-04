@@ -38,7 +38,7 @@ define([
     ];
   }
 
-  module('grade_summary#calculateTotals', {
+  QUnit.module('grade_summary#calculateTotals', {
     setup () {
       fakeENV.setup();
 
@@ -175,7 +175,7 @@ define([
     sandbox.restore();
   });
 
-  module('grade_summary.canBeConvertedToGrade');
+  QUnit.module('grade_summary.canBeConvertedToGrade');
 
   test('returns false when possible is nonpositive', function () {
     notOk(grade_summary.canBeConvertedToGrade(1, 0));
@@ -189,14 +189,14 @@ define([
     ok(grade_summary.canBeConvertedToGrade(1, 1));
   });
 
-  module('grade_summary.calculatePercentGrade');
+  QUnit.module('grade_summary.calculatePercentGrade');
 
   test('returns properly computed and rounded value', function () {
     const percentGrade = grade_summary.calculatePercentGrade(1, 3);
     ok(percentGrade === 33.33);
   });
 
-  module('grade_summary.formatPercentGrade');
+  QUnit.module('grade_summary.formatPercentGrade');
 
   test('returns i18ned number value', function () {
     const sandbox = sinon.sandbox.create();
@@ -208,7 +208,7 @@ define([
     sandbox.restore();
   });
 
-  module('grade_summary.calculateGrade');
+  QUnit.module('grade_summary.calculateGrade');
 
   test('returns N/A when canBeConvertedToGrade returns false', function () {
     const sandbox = sinon.sandbox.create();
@@ -231,7 +231,7 @@ define([
     sandbox.restore();
   });
 
-  module('grade_summary.listAssignmentGroupsForGradeCalculation', {
+  QUnit.module('grade_summary.listAssignmentGroupsForGradeCalculation', {
     setup () {
       fakeENV.setup();
       ENV.assignment_groups = createAssignmentGroups();
@@ -272,7 +272,7 @@ define([
     equal(assignmentGroups[1].assignments.length, 1);
   });
 
-  module('grade_summary.calculateGrades', {
+  QUnit.module('grade_summary.calculateGrades', {
     setup () {
       fakeENV.setup();
       ENV.submissions = createSubmissions();

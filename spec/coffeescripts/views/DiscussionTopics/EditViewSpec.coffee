@@ -42,7 +42,7 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     (app.assignmentGroupCollection = new AssignmentGroupCollection).contextAssetString = ENV.context_asset_string
     app.render()
 
-  module 'EditView',
+  QUnit.module 'EditView',
     setup: ->
       fakeENV.setup()
     teardown: ->
@@ -110,7 +110,7 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     view = @editView()
     equal view.locationAfterCancel({ return_to: 'http://bar' }), 'http://bar'
 
-  module 'EditView - ConditionalRelease',
+  QUnit.module 'EditView - ConditionalRelease',
     setup: ->
       fakeENV.setup()
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true

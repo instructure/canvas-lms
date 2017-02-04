@@ -6,7 +6,7 @@ define([
   'helpers/I18nStubber',
   'helpers/fakeENV'
 ], (EditConferenceView, Conference, tz, french, I18nStubber, fakeENV) => {
-  module('EditConferenceView', {
+  QUnit.module('EditConferenceView', {
     setup () {
       this.view = new EditConferenceView();
       this.snapshot = tz.snapshot();

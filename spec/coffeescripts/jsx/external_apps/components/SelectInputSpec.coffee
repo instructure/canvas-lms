@@ -29,7 +29,7 @@ define [
     hintNode = component.refs.hintText?.getDOMNode()
     [ component, inputNode, hintNode ]
 
-  module 'ExternalApps.SelectInput',
+  QUnit.module 'ExternalApps.SelectInput',
     teardown: ->
       ReactDOM.unmountComponentAtNode wrapper
 

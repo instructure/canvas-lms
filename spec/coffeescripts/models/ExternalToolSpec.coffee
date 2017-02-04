@@ -2,7 +2,7 @@ define [
   'compiled/models/ExternalTool'
 ], (ExternalTool) ->
 
-  module "ExternalTool",
+  QUnit.module "ExternalTool",
     setup: ->
       @prevAssetString = ENV.context_asset_string
       ENV.context_asset_string = "course_3"

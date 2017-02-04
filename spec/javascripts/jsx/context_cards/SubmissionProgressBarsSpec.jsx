@@ -6,7 +6,7 @@ define([
   'instructure-ui'
 ], (React, ReactDOM, TestUtils, SubmissionProgressBars, { Progress: InstUIProgress }) => {
 
-  module('StudentContextTray/Progress', (hooks) => {
+  QUnit.module('StudentContextTray/Progress', (hooks) => {
     let grade, score, spy, subject, submission, tag
 
     hooks.afterEach(() => {
@@ -24,14 +24,14 @@ define([
       tag = null
     })
 
-    module('displayGrade', () => {
+    QUnit.module('displayGrade', () => {
       hooks.beforeEach(() => {
         subject = TestUtils.renderIntoDocument(
           <SubmissionProgressBars submissions={[]} />
         )
       })
 
-      module('when submission is excused', () => {
+      QUnit.module('when submission is excused', () => {
         test('it returns `EX`', () => {
           submission = { id: 1, excused: true, assignment: {points_possible: 25} }
           grade = SubmissionProgressBars.displayGrade(submission)
@@ -39,7 +39,7 @@ define([
         })
       })
 
-      module('when grade is a percentage', () => {
+      QUnit.module('when grade is a percentage', () => {
         test('it returns the grade', () => {
           const percentage = '80%'
           submission = {
@@ -53,7 +53,7 @@ define([
         })
       })
 
-      module('when grade is complete or incomplete', () => {
+      QUnit.module('when grade is complete or incomplete', () => {
         test('it calls `renderIcon`', () => {
           submission = {
             id: 1,
@@ -72,7 +72,7 @@ define([
         })
       })
 
-      module('when grade is a random string', () => {
+      QUnit.module('when grade is a random string', () => {
         test('it renders `score/points_possible`', () => {
           const pointsPossible = 25
           score = '15'
@@ -88,7 +88,7 @@ define([
         })
       })
 
-      module('by default', () => {
+      QUnit.module('by default', () => {
         test('it renders `score/points_possible`', () => {
           const pointsPossible = 25
           grade = '15'
@@ -105,14 +105,14 @@ define([
       })
     })
 
-    module('displayScreenreaderGrade', () => {
+    QUnit.module('displayScreenreaderGrade', () => {
       hooks.beforeEach(() => {
         subject = TestUtils.renderIntoDocument(
           <SubmissionProgressBars submissions={[]} />
         )
       })
 
-      module('when submission is excused', () => {
+      QUnit.module('when submission is excused', () => {
         test('it returns `excused`', () => {
           submission = { id: 1, excused: true, assignment: {points_possible: 25} }
           grade = SubmissionProgressBars.displayScreenreaderGrade(submission)
@@ -120,7 +120,7 @@ define([
         })
       })
 
-      module('when grade is a percentage', () => {
+      QUnit.module('when grade is a percentage', () => {
         test('it returns the grade', () => {
           const percentage = '80%'
           submission = {
@@ -134,7 +134,7 @@ define([
         })
       })
 
-      module('when grade is complete or incomplete', () => {
+      QUnit.module('when grade is complete or incomplete', () => {
         test('renders `complete` or `incomplete`', () => {
           submission = {
             id: 1,
@@ -150,7 +150,7 @@ define([
         })
       })
 
-      module('when grade is a random string', () => {
+      QUnit.module('when grade is a random string', () => {
         test('it renders `score/points_possible`', () => {
           const pointsPossible = 25
           score = '15'
@@ -166,7 +166,7 @@ define([
         })
       })
 
-      module('by default', () => {
+      QUnit.module('by default', () => {
         test('it renders `score/points_possible`', () => {
           const pointsPossible = 25
           grade = '15'
@@ -183,8 +183,8 @@ define([
       })
     })
 
-    module('renderIcon', () => {
-      module('when grade is `complete`', () => {
+    QUnit.module('renderIcon', () => {
+      QUnit.module('when grade is `complete`', () => {
         test('renders icon with `icon-check` class', () => {
           subject = TestUtils.renderIntoDocument(
             <SubmissionProgressBars
@@ -201,7 +201,7 @@ define([
         })
       })
 
-      module('when grade is `complete`', () => {
+      QUnit.module('when grade is `complete`', () => {
         test('renders icon with `icon-check` class', () => {
           subject = TestUtils.renderIntoDocument(
             <SubmissionProgressBars submissions={[{
@@ -217,7 +217,7 @@ define([
       })
     })
 
-    module('render', () => {
+    QUnit.module('render', () => {
       test('renders one InstUIProgress component per submission', () => {
         const submissions = [{
           id: 1,

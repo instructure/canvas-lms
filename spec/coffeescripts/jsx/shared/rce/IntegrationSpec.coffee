@@ -6,7 +6,7 @@ define [
   'helpers/editorUtils'
 ], (RichContentEditor, RCELoader, $, fakeENV, editorUtils) ->
 
-  module 'Rce Abstraction - integration',
+  QUnit.module 'Rce Abstraction - integration',
     setup: ->
       fakeENV.setup()
       ENV.RICH_CONTENT_CDN_HOST = "fakeCDN.com"

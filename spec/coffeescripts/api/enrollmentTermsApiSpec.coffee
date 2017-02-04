@@ -56,7 +56,7 @@ define [
     ]
   }
 
-  module "list",
+  QUnit.module "list",
     setup: ->
       @server = sinon.fakeServer.create()
       @fakeHeaders = '<http://some_url?page=1&per_page=10>; rel="last"'

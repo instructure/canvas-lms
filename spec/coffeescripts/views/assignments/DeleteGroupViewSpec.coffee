@@ -28,7 +28,7 @@ define [
     new DeleteGroupView
       model: ag_group
 
-  module 'DeleteGroupView',
+  QUnit.module 'DeleteGroupView',
     setup: ->
     teardown: ->
       $("#fixtures").empty()

@@ -4,7 +4,7 @@ define [
   'underscore'
 ], (MessageStudentsDialog,$,_) ->
 
-  module "MessageStudentsDialog",
+  QUnit.module "MessageStudentsDialog",
     setup: ->
       @testData =
         context: 'The Quiz'

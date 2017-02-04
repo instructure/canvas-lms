@@ -4,7 +4,7 @@ define([
   'jsx/shared/FlickrImage'
 ], (React, TestUtils, FlickrImage) => {
 
-  module('FlickrImage View');
+  QUnit.module('FlickrImage View');
 
   test('it renders', () => {
     const flickrImage = TestUtils.renderIntoDocument(

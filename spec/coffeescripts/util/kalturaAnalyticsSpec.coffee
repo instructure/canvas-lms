@@ -4,7 +4,7 @@ define [
   'vendor/mediaelement-and-player'
   'vendor/jquery.cookie'
 ], ($, kalturaAnalytics, mejs) ->
-  module 'kaltura analytics helper',
+  QUnit.module 'kaltura analytics helper',
     setup: ->
       @player = new mejs.PluginMediaElement
       @pluginSettings = {partner_id: 'ster', kcw_ui_conf: 'cobb', domain:'example.com', do_analytics:true, parallel_api_calls: 1}

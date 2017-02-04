@@ -25,7 +25,7 @@ define [
 
     app.render()
 
-  module 'EditHeaderView',
+  QUnit.module 'EditHeaderView',
     setup: ->
       fakeENV.setup({
         current_user_roles: ['teacher']
@@ -77,7 +77,7 @@ define [
     ok window.confirm.notCalled
     ok view.delete.notCalled
 
-  module 'EditHeaderView - ConditionalRelease',
+  QUnit.module 'EditHeaderView - ConditionalRelease',
     setup: ->
       fakeENV.setup()
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true

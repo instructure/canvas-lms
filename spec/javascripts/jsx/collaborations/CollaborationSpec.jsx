@@ -6,7 +6,7 @@ define([
   'timezone'
 ], (React, TestUtils, ReactDOM, Collaboration, tz) => {
 
-  module('Collaboration');
+  QUnit.module('Collaboration');
 
   let props = {
     collaboration: {

@@ -4,7 +4,7 @@ define([
   'jsx/account_course_user_search/CoursesList',
   'jsx/account_course_user_search/CoursesListRow'
 ], (React, {shallow}, CoursesList, CoursesListRow) => {
-  module('Account Course User Search CoursesList View');
+  QUnit.module('Account Course User Search CoursesList View');
 
   const props = {
     courses: [{

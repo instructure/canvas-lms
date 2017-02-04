@@ -4,7 +4,7 @@ define([
   'compiled/models/DiscussionTopic'
 ], ($, ToggleableSubscriptionIconView, DiscussionTopic) => {
 
-  module('ToggleableSubscriptionIconView', {
+  QUnit.module('ToggleableSubscriptionIconView', {
     setup () {
       this.model = new DiscussionTopic();
       this.view = new ToggleableSubscriptionIconView({model: this.model});

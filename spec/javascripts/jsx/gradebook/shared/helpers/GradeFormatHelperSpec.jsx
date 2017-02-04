@@ -3,7 +3,7 @@ define([
   'i18n!gradebook',
   'jsx/shared/helpers/numberHelper'
 ], function (GradeFormatHelper, I18n, numberHelper) {
-  module('GradeFormatHelper#formatGrade', {
+  QUnit.module('GradeFormatHelper#formatGrade', {
     setup () {
       this.stub(numberHelper, 'parse').returns(42);
       this.stub(I18n, 'n').returns('42');
@@ -46,7 +46,7 @@ define([
     strictEqual(I18n.n.notCalled, true);
   });
 
-  module('GradeFormatHelper#delocalizeGrade');
+  QUnit.module('GradeFormatHelper#delocalizeGrade');
 
   test('should return input value when input is not a string', () => {
     strictEqual(GradeFormatHelper.delocalizeGrade(1), 1);

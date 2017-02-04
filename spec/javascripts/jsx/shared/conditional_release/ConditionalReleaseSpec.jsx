@@ -41,7 +41,7 @@ define([
   const noAssignmentEnv = { edit_rule_url: 'about:blank', jwt: 'foo' }
   const assignmentNoIdEnv = { assignment: { foo: 'bar' }, edit_rule_url: 'about:blank', jwt: 'foo' }
 
-  module('Conditional Release component', {
+  QUnit.module('Conditional Release component', {
     setup: () => {
       ajax = sinon.stub($, 'ajax')
       createComponent()

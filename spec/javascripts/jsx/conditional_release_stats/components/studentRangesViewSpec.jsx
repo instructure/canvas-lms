@@ -5,7 +5,7 @@ define([
 ], (React, ReactDOM, RangesView) => {
   const container = document.getElementById('fixtures')
 
-  module('Student Ranges View', {
+  QUnit.module('Student Ranges View', {
     teardown() {
       ReactDOM.unmountComponentAtNode(container)
     }

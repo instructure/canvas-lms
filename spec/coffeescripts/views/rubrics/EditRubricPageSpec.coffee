@@ -2,7 +2,7 @@ define [
   'jquery'
   'compiled/views/rubrics/EditRubricPage'
 ], ($, EditRubricPage) ->
-  module 'EditRubricPage'
+  QUnit.module 'EditRubricPage'
 
   test 'does not immediately create the dialog', ->
     clickSpy = @spy EditRubricPage.prototype, 'attachInitialEvent'

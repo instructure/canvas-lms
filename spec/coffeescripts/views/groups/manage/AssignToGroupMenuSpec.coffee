@@ -10,7 +10,7 @@ define [
   view = null
   user = null
 
-  module 'AssignToGroupMenu',
+  QUnit.module 'AssignToGroupMenu',
     setup: ->
       groupCategory = new GroupCategory
       user = new GroupUser(id: 1, name: "bob", group: null, category: groupCategory)

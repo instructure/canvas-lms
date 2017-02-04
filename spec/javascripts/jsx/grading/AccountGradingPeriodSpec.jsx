@@ -29,7 +29,7 @@ define([
     deleteGradingPeriodURL: "api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D"
   };
 
-  module("AccountGradingPeriod", {
+  QUnit.module("AccountGradingPeriod", {
     renderComponent(props = {}) {
       let attrs = _.defaults(props, defaultProps);
       attrs.onDelete = this.stub();

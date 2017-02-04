@@ -21,7 +21,7 @@ define([
   const renderComponentInDOM = (props = { appointment_group_id: '1' }) => ReactDOM.render(<EditPage {...props} />, container)
 
   let sandbox = null
-  module('AppointmentGroup EditPage', {
+  QUnit.module('AppointmentGroup EditPage', {
     setup () {
       moxios.install()
     },
@@ -37,7 +37,7 @@ define([
   })
 
 
-  module('Message Users', {
+  QUnit.module('Message Users', {
     setup () {
       moxios.install()
     },
@@ -110,7 +110,7 @@ define([
   })
 
 
-  module('Delete Group', {
+  QUnit.module('Delete Group', {
     setup: () => {
       sandbox = sinon.sandbox.create()
       moxios.install()
@@ -142,7 +142,7 @@ define([
     ok($.flashError.withArgs('An error ocurred while deleting the appointment group'))
   })
 
-  module('Change Handlers', {
+  QUnit.module('Change Handlers', {
     setup () {
       moxios.install()
     },
@@ -175,7 +175,7 @@ define([
     equal(component.state.formValues.han, true)
   })
 
-  module('Save Group', {
+  QUnit.module('Save Group', {
     setup () {
       sandbox = sinon.sandbox.create()
       moxios.install()

@@ -11,7 +11,7 @@ define([
     contextUrlRoot: "test"
   };
 
-  module("OutcomesActionsPopoverMenu", {
+  QUnit.module("OutcomesActionsPopoverMenu", {
     renderComponent(props = {}) {
       let attrs = Object.assign({}, defaultProps, props);
       const element = React.createElement(OutcomesActionsPopoverMenu, attrs);

@@ -6,7 +6,7 @@ define [
 
   oldTrackEvent = null
 
-  module 'inlineMediaComment',
+  QUnit.module 'inlineMediaComment',
     setup: ->
       oldTrackEvent = $.trackEvent
       @fixtures = document.getElementById('fixtures')

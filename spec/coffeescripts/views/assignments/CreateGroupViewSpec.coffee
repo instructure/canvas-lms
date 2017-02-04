@@ -31,7 +31,7 @@ define [
 
     new CreateGroupView(args)
 
-  module 'CreateGroupView',
+  QUnit.module 'CreateGroupView',
     setup: ->
       fakeENV.setup()
     teardown: ->

@@ -10,7 +10,7 @@ define [
   'compiled/jquery.rails_flash_notifications'
 ], (React, ReactDOM, TestUtils, $, _, GradingPeriodCollection, fakeENV) ->
 
-  module 'GradingPeriodCollection',
+  QUnit.module 'GradingPeriodCollection',
     setup: ->
       @stub($, 'flashMessage', ->)
       @stub($, 'flashError', ->)
@@ -260,7 +260,7 @@ define [
   test 'renderSaveButton renders a button if the user is not at the course grading periods page', ->
     ok @gradingPeriodCollection.renderSaveButton()
 
-  module 'GradingPeriodCollection with one grading period',
+  QUnit.module 'GradingPeriodCollection with one grading period',
     setup: ->
       @server = sinon.fakeServer.create()
       fakeENV.setup()
@@ -305,7 +305,7 @@ define [
     @gradingPeriodCollection.setState(canChangeGradingPeriodsSetting: false)
     notOk @gradingPeriodCollection.refs.linkToSettings
 
-  module 'GradingPeriodCollection with read-only grading periods',
+  QUnit.module 'GradingPeriodCollection with read-only grading periods',
     setup: ->
       @server = sinon.fakeServer.create()
       fakeENV.setup()

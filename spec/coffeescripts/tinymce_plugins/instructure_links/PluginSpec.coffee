@@ -7,7 +7,7 @@ define [
   selection = null
   alt = 'preview alt text'
 
-  module "InstructureLinks Tinymce Plugin",
+  QUnit.module "InstructureLinks Tinymce Plugin",
     setup: ->
       selection = {
         getContent: (()-> return "Selection Content" )
@@ -40,7 +40,7 @@ define [
     wrapper = EditorLinks.prepEditorForDialog(editor)
     equal(wrapper.selectedContent, "Selection Content")
 
-  module "InstructureLinks Tinymce Plugin: bindLinkSubmit",
+  QUnit.module "InstructureLinks Tinymce Plugin: bindLinkSubmit",
     setup: ->
       @box = $("
         <div data-editor='editorId'>
@@ -95,7 +95,7 @@ define [
     EditorLinks.bindLinkSubmit(@box, @editor, @fetchClasses, (()->))
     @form.trigger('submit')
 
-  module "InstructureLinks Tinymce Plugin: buildLinkClasses"
+  QUnit.module "InstructureLinks Tinymce Plugin: buildLinkClasses"
 
   test "it removes any existing link-specific classes", ->
     box = $("<div></div>")

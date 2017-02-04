@@ -6,7 +6,7 @@ define [
   'jsx/grading/dataRow'
 ], (React, ReactDOM, {Simulate, SimulateNative}, $, DataRow) ->
 
-  module 'DataRow not being edited, without a sibling',
+  QUnit.module 'DataRow not being edited, without a sibling',
     setup: ->
       props =
         key: 0
@@ -37,7 +37,7 @@ define [
   test "renderMaxScore() returns a max score of 100 without a '<' sign", ->
     deepEqual @dataRow.renderMaxScore(), '100'
 
-  module 'DataRow being edited',
+  QUnit.module 'DataRow being edited',
     setup: ->
       @props =
         key: 0
@@ -116,7 +116,7 @@ define [
     Simulate.click(@dataRow.refs.deleteButton.getDOMNode())
     ok deleteRow.calledOnce
 
-  module 'DataRow with a sibling',
+  QUnit.module 'DataRow with a sibling',
     setup: ->
       props =
         key: 1

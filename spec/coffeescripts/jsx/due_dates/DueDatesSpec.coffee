@@ -13,7 +13,7 @@ define [
   findAllByTag = TestUtils.scryRenderedDOMComponentsWithTag
   findAllByClass = TestUtils.scryRenderedDOMComponentsWithClass
 
-  module 'DueDates',
+  QUnit.module 'DueDates',
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"
@@ -135,7 +135,7 @@ define [
     attributes = _.keys(@dueDates.getAllOverrides()[0].attributes)
     ok _.contains(attributes, "persisted")
 
-  module 'DueDates with Multiple Grading Periods enabled',
+  QUnit.module 'DueDates with Multiple Grading Periods enabled',
     setup: ->
       fakeENV.setup()
       @server = sinon.fakeServer.create()
@@ -290,7 +290,7 @@ define [
   test 'dropdown options include students that do not belong to sections assigned in closed periods', ->
     ok _.contains(@dropdownOptions, "Publius Publicoa")
 
-  module 'DueDates render callbacks',
+  QUnit.module 'DueDates render callbacks',
     setup: ->
       fakeENV.setup()
       @server = sinon.fakeServer.create()

@@ -6,7 +6,7 @@ define [
   'jsx/dashboard_card/DashboardCardAction'
 ], (React, ReactDOM, TestUtils, _, DashboardCardAction) ->
 
-  module 'DashboardCardAction',
+  QUnit.module 'DashboardCardAction',
     setup: ->
       @props = {
         iconClass: 'icon-assignment',

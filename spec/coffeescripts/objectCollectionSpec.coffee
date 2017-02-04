@@ -1,6 +1,6 @@
 define ['compiled/util/objectCollection'], (objectCollection) ->
 
-  module 'objectCollection',
+  QUnit.module 'objectCollection',
     setup: ->
       arrayOfObjects = [
         {id: 1, name: 'foo'}

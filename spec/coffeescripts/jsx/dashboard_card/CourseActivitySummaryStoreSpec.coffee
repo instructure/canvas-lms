@@ -4,7 +4,7 @@ define [
   'jsx/dashboard_card/CourseActivitySummaryStore'
 ], (TestUtils, _, CourseActivitySummaryStore) ->
 
-  module 'CourseActivitySummaryStore',
+  QUnit.module 'CourseActivitySummaryStore',
     setup: ->
       CourseActivitySummaryStore.setState(streams: {})
       @server = sinon.fakeServer.create()

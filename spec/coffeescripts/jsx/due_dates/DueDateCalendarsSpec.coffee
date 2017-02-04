@@ -7,7 +7,7 @@ define [
   'helpers/fakeENV'
 ], (React, ReactDOM, {Simulate, SimulateNative}, _, DueDateCalendars, fakeENV) ->
 
-  module 'DueDateCalendars',
+  QUnit.module 'DueDateCalendars',
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"

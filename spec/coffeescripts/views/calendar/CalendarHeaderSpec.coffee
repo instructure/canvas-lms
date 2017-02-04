@@ -3,7 +3,7 @@ define [
   'compiled/views/calendar/CalendarHeader'
 ], ($, CalendarHeader) ->
 
-  module 'CalendarHeader',
+  QUnit.module 'CalendarHeader',
     setup: ->
       @header = new CalendarHeader()
       @header.$el.appendTo $('#fixtures')

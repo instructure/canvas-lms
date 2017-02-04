@@ -109,7 +109,7 @@ define [
     view.$el.appendTo $('#fixtures')
     view.render()
 
-  module 'CreateAssignmentView',
+  QUnit.module 'CreateAssignmentView',
     setup: ->
       @assignment1 = new Assignment(buildAssignment1())
       @assignment2 = new Assignment(buildAssignment2())

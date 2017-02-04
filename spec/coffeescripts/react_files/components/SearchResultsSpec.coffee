@@ -7,7 +7,7 @@ define [
   'compiled/collections/FilesCollection'
 ], (mockFilesENV, $, React, ReactDOM, SearchResults, FilesCollection) ->
 
-  module 'SearchResults#render',
+  QUnit.module 'SearchResults#render',
     setup: ->
     teardown: ->
       $("#fixtures").empty()

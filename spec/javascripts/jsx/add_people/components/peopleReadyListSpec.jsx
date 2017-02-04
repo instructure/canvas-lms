@@ -41,7 +41,7 @@ define([
     defaultInstitutionName: 'School of Hard Knocks'
   }
 
-  module('PeopleReadyList')
+  QUnit.module('PeopleReadyList')
 
   test('renders the component', () => {
     renderComponent(props);

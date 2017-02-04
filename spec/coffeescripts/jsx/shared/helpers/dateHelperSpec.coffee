@@ -14,7 +14,7 @@ define [
       updated_at: "2015-07-07T18:35:22Z"
     }
 
-  module 'DateHelper#parseDates'
+  QUnit.module 'DateHelper#parseDates'
 
   test 'returns a new object with specified dates parsed', ->
     assignment = defaultAssignment()
@@ -42,7 +42,7 @@ define [
     ok _.isDate(assignment.created_at)
     ok _.isUndefined(assignment.undefined_due_at)
 
-  module 'DateHelper#formatDatetimeForDisplay',
+  QUnit.module 'DateHelper#formatDatetimeForDisplay',
     setup: ->
       @snapshot = tz.snapshot()
     teardown: ->
@@ -58,7 +58,7 @@ define [
     formattedDate = DateHelper.formatDatetimeForDisplay(assignment.due_at)
     equal formattedDate, "Jul 14, 2015 at 10:35am"
 
-  module 'DateHelper#formatDateForDisplay',
+  QUnit.module 'DateHelper#formatDateForDisplay',
     setup: ->
       @snapshot = tz.snapshot()
     teardown: ->
@@ -74,7 +74,7 @@ define [
     formattedDate = DateHelper.formatDateForDisplay(assignment.due_at)
     equal formattedDate, "Jul 14, 2015"
 
-  module 'DateHelper#isMidnight',
+  QUnit.module 'DateHelper#isMidnight',
     setup: ->
       @snapshot = tz.snapshot()
     teardown: ->

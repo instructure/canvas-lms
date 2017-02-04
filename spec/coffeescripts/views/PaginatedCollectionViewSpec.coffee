@@ -32,7 +32,7 @@ define [
   class TestCollection extends PaginatedCollection
     url: '/test'
 
-  module 'PaginatedCollectionView',
+  QUnit.module 'PaginatedCollectionView',
     setup: ->
       fakeENV.setup()
       fixtures.css height: 500, overflow: 'auto'

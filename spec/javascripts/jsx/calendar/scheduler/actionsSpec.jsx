@@ -2,7 +2,7 @@ define([
   'jsx/calendar/scheduler/actions',
 ], (Actions) => {
 
-  module('Scheduler Actions');
+  QUnit.module('Scheduler Actions');
 
   test('setFindAppointmentMode returns the proper action', () => {
     const actual = Actions.actions.setFindAppointmentMode(true);

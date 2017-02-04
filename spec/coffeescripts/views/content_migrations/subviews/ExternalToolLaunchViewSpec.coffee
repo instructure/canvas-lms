@@ -4,7 +4,7 @@ define [
   'compiled/views/content_migrations/subviews/ExternalToolLaunchView'
 ], ($, Backbone, ExternalToolLaunchView) ->
 
-  module 'ExternalToolLaunchView',
+  QUnit.module 'ExternalToolLaunchView',
     setup: ->
       @mockMigration = new Backbone.Model
       @mockReturnView = new Backbone.View

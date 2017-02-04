@@ -4,7 +4,7 @@ define([
   'jsx/conditional_release_stats/components/student-range',
 ], (React, TestUtils, StudentRange) => {
 
-  module('Student Range')
+  QUnit.module('Student Range')
 
   const defaultProps = () => ({
     range: {

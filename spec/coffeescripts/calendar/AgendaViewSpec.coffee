@@ -24,7 +24,7 @@ define [
     server.requests[requestIndex+1].respond 200,
       { 'Content-Type': 'application/json' }, assignments
 
-  module "AgendaView",
+  QUnit.module "AgendaView",
     setup: ->
       @container = $('<div />', id: 'agenda-wrapper').appendTo('#fixtures')
       @contexts = [{"asset_string":"user_1"}, {"asset_string":"course_2"}, {"asset_string":"group_3"}]

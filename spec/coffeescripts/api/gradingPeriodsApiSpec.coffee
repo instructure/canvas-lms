@@ -64,7 +64,7 @@ define [
     ]
   }
 
-  module "batchUpdate",
+  QUnit.module "batchUpdate",
     setup: ->
       fakeENV.setup()
       ENV.GRADING_PERIODS_UPDATE_URL = 'api/{{ set_id }}/batch_update'
@@ -110,7 +110,7 @@ define [
       equal error, "FAIL"
       start()
 
-  module "deserializePeriods"
+  QUnit.module "deserializePeriods"
 
   test "returns an empty array if passed undefined", ->
     propEqual api.deserializePeriods(undefined), []

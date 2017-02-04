@@ -1,7 +1,7 @@
 define [
   'compiled/collections/ContentMigrationIssueCollection'
 ], (ContentMigrationIssueCollection) ->
-  module 'ContentMigrationIssueCollection'
+  QUnit.module 'ContentMigrationIssueCollection'
 
   test "generates the correct fetch url", ->
     course_id = 5

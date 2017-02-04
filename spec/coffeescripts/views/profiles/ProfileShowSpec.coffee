@@ -3,7 +3,7 @@ define [
   'compiled/views/profiles/ProfileShow'
 ], ($, ProfileShow) ->
 
-  module 'ProfileShow',
+  QUnit.module 'ProfileShow',
     setup: ->
       @fixtures = document.getElementById('fixtures')
       @fixtures.innerHTML = "<div class='.profile-link'></div>"

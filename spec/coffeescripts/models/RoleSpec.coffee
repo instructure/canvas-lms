@@ -6,7 +6,7 @@ define [
   'compiled/util/BaseRoleTypes'
   'helpers/fakeENV'
 ], (Backbone,_, Role, Account, BASE_ROLE_TYPES, fakeENV) ->
-  module 'RoleModel',
+  QUnit.module 'RoleModel',
     setup: -> 
       @account = new Account id: 4
       @role = new Role account: @account

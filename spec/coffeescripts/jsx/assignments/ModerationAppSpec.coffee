@@ -6,7 +6,7 @@ define [
   'jsx/assignments/actions/ModerationActions'
 ], (React, ReactDOM, TestUtils, ModerationApp, Actions) ->
 
-  module 'ModerationApp',
+  QUnit.module 'ModerationApp',
     setup: ->
       @store =
         subscribe: sinon.spy()

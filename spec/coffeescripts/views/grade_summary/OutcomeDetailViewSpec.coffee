@@ -9,7 +9,7 @@ define [
   'helpers/fakeENV'
 ], (_, Backbone, CollectionView, OutcomeResultCollection, Outcome, Group, OutcomeDetailView, fakeENV) ->
 
-  module 'OutcomeDetailViewSpec',
+  QUnit.module 'OutcomeDetailViewSpec',
     setup: ->
       @course_id = 1
       @user_id = 6

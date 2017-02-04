@@ -5,7 +5,7 @@ define([
   'jsx/assignments/IndexMenu',
   'jsx/assignments/actions/IndexMenuActions',
 ], (React, TestUtils, Modal, IndexMenu, Actions) => {
-  module('AssignmentsIndexMenu')
+  QUnit.module('AssignmentsIndexMenu')
 
   const generateProps = (overrides, initialState = {}) => {
     const state = {

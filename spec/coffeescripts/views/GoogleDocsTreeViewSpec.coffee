@@ -4,7 +4,7 @@ define ['jquery', 'compiled/views/GoogleDocsTreeView'], ($, GoogleDocsTreeView) 
   fileData = { files: [file1] }
   folderData = { folders: [ { name: 'Folder 1', files: [file1] } ] }
 
-  module 'GoogleDocsTreeView'
+  QUnit.module 'GoogleDocsTreeView'
 
   test 'renders a top level file', ()->
     tree = new GoogleDocsTreeView({model: fileData})

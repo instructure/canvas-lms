@@ -11,7 +11,7 @@ define([
 
   let elem, props
 
-  module('ThemeEditorAccordion Component', {
+  QUnit.module('ThemeEditorAccordion Component', {
     setup () {
       elem = document.createElement('div')
       props = {

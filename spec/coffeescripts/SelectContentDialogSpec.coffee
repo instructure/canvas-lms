@@ -7,7 +7,7 @@ define [
   fixtures = null
   clickEvent = {}
 
-  module "SelectContentDialog",
+  QUnit.module "SelectContentDialog",
     setup: ->
       fixtures = document.getElementById('fixtures')
       fixtures.innerHTML = '<div id="context_external_tools_select">

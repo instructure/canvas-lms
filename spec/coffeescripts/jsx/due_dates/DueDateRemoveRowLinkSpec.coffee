@@ -6,7 +6,7 @@ define [
   'jsx/due_dates/DueDateRemoveRowLink'
 ], (React, ReactDOM, {Simulate}, _, DueDateRemoveRowLink) ->
 
-  module 'DueDateRemoveRowLink',
+  QUnit.module 'DueDateRemoveRowLink',
     setup: ->
       props =
         handleClick: ->

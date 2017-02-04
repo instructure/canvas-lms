@@ -7,7 +7,7 @@ define([
   'jsx/grading/AccountTabContainer',
   'jqueryui/tabs',
 ], (React, { mount }, $, axios, _, AccountTabContainer) => {
-  module('AccountTabContainer', {
+  QUnit.module('AccountTabContainer', {
     renderComponent (props = {}) {
       const defaults = {
         readOnly: false,

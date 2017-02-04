@@ -36,7 +36,7 @@ define [
     view.$el.appendTo $('#fixtures')
     view.render()
 
-  module 'QuizItemView',
+  QUnit.module 'QuizItemView',
     setup: ->
       fakeENV.setup({
         CONDITIONAL_RELEASE_ENV: {

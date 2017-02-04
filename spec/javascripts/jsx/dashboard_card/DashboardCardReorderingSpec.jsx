@@ -14,7 +14,7 @@ define([
   let cards;
   let fakeServer;
 
-  module('DashboardCard Reordering', {
+  QUnit.module('DashboardCard Reordering', {
     setup () {
       fakeENV.setup({
         DASHBOARD_REORDERING_ENABLED: true

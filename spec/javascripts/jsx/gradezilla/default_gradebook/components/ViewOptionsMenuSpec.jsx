@@ -3,7 +3,7 @@ define([
   'enzyme',
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
 ], (React, { mount }, ViewOptionsMenu) => {
-  module('ViewOptionsMenu', {
+  QUnit.module('ViewOptionsMenu', {
     setup () {
       this.wrapper = mount(<ViewOptionsMenu />);
     },

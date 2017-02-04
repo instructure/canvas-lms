@@ -8,7 +8,7 @@ define [
   'helpers/assertions'
 ], (React, ReactDOM, TestUtils, _, DashboardCard, CourseActivitySummaryStore, assertions) ->
 
-  module 'DashboardCard',
+  QUnit.module 'DashboardCard',
     setup: ->
       @stream = [{
         "type": "DiscussionTopic",

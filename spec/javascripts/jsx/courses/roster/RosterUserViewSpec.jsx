@@ -9,7 +9,7 @@ define([
   let existingENV;
   let server;
 
-  module('RosterUserViewSpec', {
+  QUnit.module('RosterUserViewSpec', {
     setup () {
       window.ENV = window.ENV || {};
       existingENV = window.ENV;

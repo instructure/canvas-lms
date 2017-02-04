@@ -5,7 +5,7 @@ define [
   'compiled/views/wiki/WikiPageRevisionView'
 ], ($, WikiPageRevision, WikiPageRevisionsCollection, WikiPageRevisionView) ->
 
-  module 'WikiPageRevisionView'
+  QUnit.module 'WikiPageRevisionView'
 
   test 'binds to model change triggers', ->
     revision = new WikiPageRevision

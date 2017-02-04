@@ -10,7 +10,7 @@ define [
   groupCategory = null
   group = null
 
-  module 'GroupCreateView',
+  QUnit.module 'GroupCreateView',
     setup: ->
       fakeENV.setup()
       group = new Group
@@ -37,7 +37,7 @@ define [
     $group_join_level_select = $('#group_join_level')
     equal $group_join_level_select.length, 0
 
-  module 'GroupCreateView with blank fields',
+  QUnit.module 'GroupCreateView with blank fields',
     setup: ->
       fakeENV.setup()
       group = new Group

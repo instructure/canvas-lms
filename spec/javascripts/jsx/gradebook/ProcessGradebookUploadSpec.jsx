@@ -71,7 +71,7 @@ define([
     equal(assignment1.published, assignment2.published);
   }
 
-  module('ProcessGradebookUpload.getNewAssignmentsFromGradebook');
+  QUnit.module('ProcessGradebookUpload.getNewAssignmentsFromGradebook');
 
   test('returns an empty array if the gradebook given has a single assignment with no id', () => {
     const gradebook = {assignments: [{key: 'value'}]};
@@ -119,7 +119,7 @@ define([
     ok(assignments[1].id < 1);
   });
 
-  module('ProcessGradebookUpload.createIndividualAssignment', {
+  QUnit.module('ProcessGradebookUpload.createIndividualAssignment', {
     setup () {
       xhr = sinon.useFakeXMLHttpRequest();
       requests = [];
@@ -149,7 +149,7 @@ define([
     equalAssignment(createAssignmentRequest.assignment, oldAssignment1);
   });
 
-  module('ProcessGradebookUpload.createAssignments', {
+  QUnit.module('ProcessGradebookUpload.createAssignments', {
     setup () {
       xhr = sinon.useFakeXMLHttpRequest();
       requests = [];
@@ -201,7 +201,7 @@ define([
     equalAssignment(createAssignmentRequest2.assignment, newAssignment2);
   });
 
-  module('ProcessGradebookUpload.mapLocalAssignmentsToDatabaseAssignments');
+  QUnit.module('ProcessGradebookUpload.mapLocalAssignmentsToDatabaseAssignments');
 
   test('properly pairs if length is 1 and responses is not an array of arrays', () => {
     const gradebook = {assignments: [newAssignment1]};
@@ -229,7 +229,7 @@ define([
     equal(assignmentMap[newAssignment2.id], responses[1][0].id);
   });
 
-  module('ProcessGradebookUpload.populateGradeDataPerSubmission');
+  QUnit.module('ProcessGradebookUpload.populateGradeDataPerSubmission');
 
   test('rejects an unrecognized or ignored assignment', () => {
     const gradeData = {};
@@ -275,7 +275,7 @@ define([
     equal(gradeData[submissionOld1Excused.assignment_id][0].excuse, true);
   });
 
-  module('ProcessGradebookUpload.populateGradeDataPerStudent');
+  QUnit.module('ProcessGradebookUpload.populateGradeDataPerStudent');
 
   test('does not modify grade data if student submissions is an empty array', () => {
     const student = {previous_id: 1, submissions: []};
@@ -305,7 +305,7 @@ define([
     equal(gradeData[assignmentMap[submissionNew2Change.assignment_id]][student.previous_id].posted_grade, submissionNew2Change.grade);
   });
 
-  module('ProcessGradebookUpload.populateGradeData');
+  QUnit.module('ProcessGradebookUpload.populateGradeData');
 
   test('properly populates grade data', () => {
     const student1 = {
@@ -338,7 +338,7 @@ define([
     equal(gradeData[createAssignmentResponse2.id][student3.previous_id].posted_grade, submissionNew2Change.grade);
   });
 
-  module('ProcessGradebookUpload.submitGradeData', {
+  QUnit.module('ProcessGradebookUpload.submitGradeData', {
     setup () {
       xhr = sinon.useFakeXMLHttpRequest();
       requests = [];
@@ -387,7 +387,7 @@ define([
     equal(bulkUpdateRequest.grade_data[3][2].excuse, true);
   });
 
-  module('ProcessGradebookUpload.upload', {
+  QUnit.module('ProcessGradebookUpload.upload', {
     setup () {
       this.stub(window, 'alert');
       xhr = sinon.useFakeXMLHttpRequest();

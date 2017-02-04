@@ -8,7 +8,7 @@ define([
   'helpers/fakeENV'
 ], ($, React, ReactDOM, TestUtils, Breadcrumbs, Folder, fakeENV) => {
 
-  module('Files Breadcrumbs Component', {
+  QUnit.module('Files Breadcrumbs Component', {
     setup () {
       fakeENV.setup({context_asset_string: 'course_1'});
     },

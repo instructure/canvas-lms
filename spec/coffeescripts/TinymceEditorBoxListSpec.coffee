@@ -1,6 +1,6 @@
 define ['tinymce.editor_box_list'], (EditorBoxList)->
   list = null
-  module "EditorBoxList",
+  QUnit.module "EditorBoxList",
     setup: ->
       $("#fixtures").append("<textarea id=42></textarea>")
       list = new EditorBoxList()

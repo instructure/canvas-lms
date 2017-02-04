@@ -6,7 +6,7 @@ define ['compiled/util/invoker'], (invoker) ->
     noMethod: ->
       'noMethod'
 
-  module 'Invoker'
+  QUnit.module 'Invoker'
 
   test 'should call a method with invoke', =>
     result = obj.invoke 'one'

@@ -6,7 +6,7 @@ define [
   'jsx/assignments/constants'
 ], (React, ReactDOM, TestUtils, ModeratedColumnHeader, Constants) ->
 
-  module 'ModeratedColumnHeader',
+  QUnit.module 'ModeratedColumnHeader',
     setup: ->
       @props =
         markColumn: Constants.markColumnNames.MARK_ONE

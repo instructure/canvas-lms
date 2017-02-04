@@ -4,7 +4,7 @@ define([
   'compiled/models/Message'
 ], ($, MessageView, Message) => {
 
-  module('MessageView', {
+  QUnit.module('MessageView', {
     setup () {
       this.model = new Message({
         subject: 'Hey There!',

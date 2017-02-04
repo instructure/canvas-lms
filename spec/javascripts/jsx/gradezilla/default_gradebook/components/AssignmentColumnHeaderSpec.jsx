@@ -4,7 +4,7 @@ define([
   'enzyme',
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
 ], (React, TestUtils, { mount }, AssignmentColumnHeader) => {
-  module('AssignmentColumnHeader - base behavior', {
+  QUnit.module('AssignmentColumnHeader - base behavior', {
     setup () {
       this.assignment = {
         id: '1',
@@ -64,7 +64,7 @@ define([
     equal(actualElements.props().title, 'Assignment #1 Options');
   });
 
-  module('AssignmentColumnHeader - non-standard assignment', {
+  QUnit.module('AssignmentColumnHeader - non-standard assignment', {
     setup () {
       this.assignment = {
         id: '1',

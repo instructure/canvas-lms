@@ -6,7 +6,7 @@ define([
   'enzyme'
 ], ($, OutcomeAlignmentDeleteLink, React, ReactDOM, Enzyme) => {
   const { mount } = Enzyme;
-  module('OutcomeAlignmentDeleteLink');
+  QUnit.module('OutcomeAlignmentDeleteLink');
 
   test('should render span if hasRubricAssociation', () => {
     const wrapper = mount(<OutcomeAlignmentDeleteLink url="http://hellow" has_rubric_association="" />);

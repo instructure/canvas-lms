@@ -4,7 +4,7 @@ define ['compiled/util/deparam'], (deparam) ->
   params_obj = { a:['4','5','6'], b:{x:['7'], y:'8', z:['9','0','true','false','undefined','']}, c:'1' }
   params_obj_coerce = { a:[4,5,6], b:{x:[7], y:8, z:[9,0,true,false,undefined,'']}, c:1 }
 
-  module "deparam"
+  QUnit.module "deparam"
 
   test "deparam", ->
     deepEqual deparam(), {}, "deparam()"

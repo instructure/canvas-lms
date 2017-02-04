@@ -2,7 +2,7 @@ define ['compiled/gradebook/Turnitin'], (Turnitin) ->
 
   submissionWithReport = null
 
-  module "Turnitin",
+  QUnit.module "Turnitin",
     setup: ->
       submissionWithReport =
         'id': '7'

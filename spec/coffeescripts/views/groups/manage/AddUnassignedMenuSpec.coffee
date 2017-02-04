@@ -25,7 +25,7 @@ define [
       'Content-Type': 'application/json'
     }, JSON.stringify(json)]
 
-  module 'AddUnassignedMenu',
+  QUnit.module 'AddUnassignedMenu',
     setup: ->
       fakeENV.setup()
       clock = sinon.useFakeTimers()

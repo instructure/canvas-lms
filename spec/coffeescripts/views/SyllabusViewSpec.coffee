@@ -75,7 +75,7 @@ define [
     server.respondWith /\/api\/v1\/appointment_groups($|\?)/, appointment_groups_endpoint
     server
 
-  module 'Syllabus',
+  QUnit.module 'Syllabus',
     setup: ->
       fakeENV.setup(TIMEZONE: 'America/Denver', CONTEXT_TIMEZONE: 'America/New_York')
       # Setup stubs/mocks

@@ -8,7 +8,7 @@ define [
   view = null
   groupCategory = null
 
-  module 'GroupCategoryEditView',
+  QUnit.module 'GroupCategoryEditView',
     setup: ->
       fakeENV.setup({allow_self_signup: true})
       groupCategory = new GroupCategory()

@@ -37,7 +37,7 @@ define([
     return true;
   };
 
-  module('Toolbar', {
+  QUnit.module('Toolbar', {
     setup() {
       file = new File({id: 1});
       courseFolder = new Folder({context_type: 'Course', context_id: 1});

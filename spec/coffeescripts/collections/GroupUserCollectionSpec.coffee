@@ -12,7 +12,7 @@ define [
   users = null
   group = null
 
-  module 'GroupUserCollection',
+  QUnit.module 'GroupUserCollection',
     setup: ->
       group = new Group(id: 1)
       category = new GroupCategory()

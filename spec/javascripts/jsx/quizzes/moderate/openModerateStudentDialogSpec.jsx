@@ -2,7 +2,7 @@ define([
   'jsx/quizzes/moderate/openModerateStudentDialog'
 ], (openModerateStudentDialog) => {
   let $fixture = null
-  module('openModerateStudentDialog', {
+  QUnit.module('openModerateStudentDialog', {
     setup() {
       $fixture = $('#fixtures').html(`
         <div id='parent'>

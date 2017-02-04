@@ -8,7 +8,7 @@ define [
   'compiled/react_files/utils/getFileStatus'
 ], (React, ReactDOM, TestUtils, $, FilePreviewInfoPanel, File, getFileStatus) ->
 
-  module 'File Preview Info Panel Specs',
+  QUnit.module 'File Preview Info Panel Specs',
     setup: ->
       @file = new File
               'content-type': 'text/plain'

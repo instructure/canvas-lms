@@ -8,7 +8,7 @@ define [
   'helpers/I18nStubber'
 ], ($, EditAppointmentGroupDetails, fcUtil, tz, detroit, french, I18nStubber) ->
 
-  module "EditAppointmentGroupDetails",
+  QUnit.module "EditAppointmentGroupDetails",
     setup: ->
       @snapshot = tz.snapshot()
       @$holder = $('<table />').appendTo(document.getElementById("fixtures"))

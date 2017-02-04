@@ -5,7 +5,7 @@ define([
 ], (React, ReactDOM, BreakdownDetails) => {
   const container = document.getElementById('fixtures')
 
-  module('Breakdown Details', {
+  QUnit.module('Breakdown Details', {
     teardown() {
       ReactDOM.unmountComponentAtNode(container);
     }

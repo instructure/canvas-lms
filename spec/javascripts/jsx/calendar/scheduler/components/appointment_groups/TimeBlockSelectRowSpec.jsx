@@ -11,7 +11,7 @@ define([
   let props;
   let tzSnapshot;
 
-  module('TimeBlockSelectRow', {
+  QUnit.module('TimeBlockSelectRow', {
     setup() {
       tzSnapshot = tz.snapshot()
       // set local timezone to UTC

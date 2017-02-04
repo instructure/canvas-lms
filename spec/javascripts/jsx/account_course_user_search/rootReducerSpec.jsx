@@ -1,6 +1,6 @@
 define(['jsx/account_course_user_search/reducers/rootReducer'], (reducer) => {
 
-  module('Account Course User Search Reducer');
+  QUnit.module('Account Course User Search Reducer');
 
   test('ADD_ERROR action reducer', () => {
     const initialState = {

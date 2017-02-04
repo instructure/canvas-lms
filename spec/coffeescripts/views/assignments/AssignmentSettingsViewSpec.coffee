@@ -28,7 +28,7 @@ define [
     view.open()
     view
 
-  module 'AssignmentSettingsView',
+  QUnit.module 'AssignmentSettingsView',
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
 
@@ -95,7 +95,7 @@ define [
     equal view.assignmentGroups.last().get('group_weight'), 80
     view.remove()
 
-  module 'AssignmentSettingsView with an assignment in a closed grading period',
+  QUnit.module 'AssignmentSettingsView with an assignment in a closed grading period',
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
 

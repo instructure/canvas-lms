@@ -5,7 +5,7 @@ define([
   'jsx/shared/ExternalToolModalLauncher',
   'jsx/shared/modal',
 ], (React, TestUtils, $, ExternalToolModalLauncher, Modal) => {
-  module('ExternalToolModalLauncher');
+  QUnit.module('ExternalToolModalLauncher');
 
   function generateProps (overrides = {}) {
     return {

@@ -24,7 +24,7 @@ define [
   mockAttemptNext = ->
     #noop
 
-  module 'UploadQueue',
+  QUnit.module 'UploadQueue',
     setup: ->
       @queue = UploadQueue
 

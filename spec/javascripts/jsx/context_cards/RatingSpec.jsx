@@ -5,11 +5,11 @@ define([
   'instructure-ui'
 ], (React, TestUtils, Rating, { Rating: InstUIRating }) => {
 
-  module('StudentContextTray/Rating', () => {
+  QUnit.module('StudentContextTray/Rating', () => {
     let subject
     const participationsLevel = 2
 
-    module('valueNow', () => {
+    QUnit.module('valueNow', () => {
       test('returns value associated with metricName', () => {
         subject = TestUtils.renderIntoDocument(
           <Rating
@@ -25,7 +25,7 @@ define([
       })
     })
 
-    module('formatValueText', () => {
+    QUnit.module('formatValueText', () => {
       subject = TestUtils.renderIntoDocument(
         <Rating />
       )
@@ -39,7 +39,7 @@ define([
       })
     })
 
-    module('render', () => {
+    QUnit.module('render', () => {
       test('delegates to InstUIRating', () => {
         subject = TestUtils.renderIntoDocument(
           <Rating

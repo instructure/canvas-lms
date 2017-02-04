@@ -42,7 +42,7 @@ define [
     ]
   }
 
-  module 'ModeratedStudentList'
+  QUnit.module 'ModeratedStudentList'
 
   test 'only shows the next speedgrader link when in moderation set', ->
     newFakeStudentList = _.extend({}, fakeStudentList)
@@ -171,7 +171,7 @@ define [
     equal radioInputs.length, 2, 'renders two radio buttons'
     ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
-  module 'Persist provisional grades'
+  QUnit.module 'Persist provisional grades'
 
   test 'selecting provisional grade triggers handleSelectProvisionalGrade handler', ->
     newFakeStudentList = _.extend({}, fakeStudentList)

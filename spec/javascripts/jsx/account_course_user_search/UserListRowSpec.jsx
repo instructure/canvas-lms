@@ -4,7 +4,7 @@ define([
   'jsx/account_course_user_search/UsersListRow'
 ], (React, TestUtils, UsersListRow) => {
 
-  module('Account Course User Search UsersListRow View');
+  QUnit.module('Account Course User Search UsersListRow View');
 
   const user = {
     avatar_url: 'http://someurl'

@@ -3,7 +3,7 @@ define [
   'jsx/files/ColumnHeaders'
 ], (React, ColumnHeaders) ->
 
-  module 'ColumnHeaders'
+  QUnit.module 'ColumnHeaders'
 
   test '`queryParamsFor` returns correct values', ->
     SORT_UPDATED_AT_DESC = {sort: 'updated_at', order: 'desc'}

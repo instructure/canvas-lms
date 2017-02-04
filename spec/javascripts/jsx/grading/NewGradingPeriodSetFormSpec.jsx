@@ -29,7 +29,7 @@ define([
     }
   };
 
-  module('NewGradingPeriodSetForm', {
+  QUnit.module('NewGradingPeriodSetForm', {
     renderComponent(props={}) {
       const defaultProps = {
         enrollmentTerms: [],

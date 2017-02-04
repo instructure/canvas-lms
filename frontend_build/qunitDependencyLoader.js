@@ -11,7 +11,7 @@ const lineThatStartsWithTheWordModule = /^\s+(return )?module\(/gm
 module.exports = function(source) {
   this.cacheable()
   // replace "module(..." calls with "qunit.module"
-  return source.replace(lineThatStartsWithTheWordModule, match => 
-    match.replace('module', 'qunit.module')
+  return source.replace(lineThatStartsWithTheWordModule, match =>
+    match.replace('module', 'QUnit.module')
   )
 }

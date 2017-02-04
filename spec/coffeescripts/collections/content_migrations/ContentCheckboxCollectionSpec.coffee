@@ -2,7 +2,7 @@ define [
   'compiled/collections/content_migrations/ContentCheckboxCollection'
   'compiled/models/content_migrations/ContentCheckbox'
 ], (CheckboxCollection, CheckboxModel) -> 
-  module 'ContentCheckboxCollectionSpec'
+  QUnit.module 'ContentCheckboxCollectionSpec'
 
   createCheckboxCollection = (properties) -> 
     properties ||= {}

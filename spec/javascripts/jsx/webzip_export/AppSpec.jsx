@@ -4,7 +4,7 @@ define([
   'moxios',
   'jsx/webzip_export/App',
 ], (React, enzyme, moxios, WebZipExportApp) => {
-  module('WebZip Export App', {
+  QUnit.module('WebZip Export App', {
     setup () {
       moxios.install()
     },
@@ -195,7 +195,7 @@ define([
     })
   })
 
-  module('webZipFormat')
+  QUnit.module('webZipFormat')
 
   test('returns a JS object with necessary info', () => {
     const data = [{

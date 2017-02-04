@@ -20,7 +20,7 @@ define([
   'underscore',
   'jsx/gradebook/GradingSchemeHelper'
 ], function (_, GradingSchemeHelper) {
-  module('GradingSchemeHelper.scoreToGrade');
+  QUnit.module('GradingSchemeHelper.scoreToGrade');
 
   test('returns the lowest grade to below-scale scores', function () {
     const gradingScheme = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['E', 0.50]];

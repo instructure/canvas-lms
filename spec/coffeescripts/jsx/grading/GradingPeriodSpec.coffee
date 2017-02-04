@@ -12,7 +12,7 @@ define [
 
   wrapper = document.getElementById('fixtures')
 
-  module 'GradingPeriod',
+  QUnit.module 'GradingPeriod',
     setup: ->
       @stub($, 'flashMessage', -> )
       @stub($, 'flashError', -> )

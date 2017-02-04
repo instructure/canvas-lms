@@ -7,7 +7,7 @@ define [
   'jsx/files/UsageRightsSelectBox'
   ], ($, _, React, ReactDOM, TestUtils, UsageRightsSelectBox ) ->
 
-    module "UsageRightsSelectBox",
+    QUnit.module "UsageRightsSelectBox",
       setup: ->
       teardown: ->
         $("div.error_box").remove()

@@ -15,7 +15,7 @@ define [
   groups = null
   users = null
 
-  module 'UnassignedUsersView',
+  QUnit.module 'UnassignedUsersView',
     setup: ->
       fakeENV.setup()
       $('#fixtures').html('<div id="content"></div>')

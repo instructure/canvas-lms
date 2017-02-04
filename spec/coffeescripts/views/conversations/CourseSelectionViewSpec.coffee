@@ -15,7 +15,7 @@ define [
     app = new CourseSelectionView
       courses: courses
 
-  module 'CourseSelectionView',
+  QUnit.module 'CourseSelectionView',
     setup: ->
       @now = $.fudgeDateForProfileTimezone(new Date)
       fakeENV.setup(CONVERSATIONS: {CAN_MESSAGE_ACCOUNT_CONTEXT: false})

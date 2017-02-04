@@ -19,7 +19,7 @@ define([
     closeDate: new Date("2016-01-07T12:00:00Z")
   };
 
-  module('GradingPeriodForm', {
+  QUnit.module('GradingPeriodForm', {
     renderComponent: function(opts={}) {
       const defaults = {
         period: examplePeriod,

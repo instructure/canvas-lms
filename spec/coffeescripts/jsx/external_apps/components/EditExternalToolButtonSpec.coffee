@@ -13,7 +13,7 @@ define [
   renderComponent = (data = {}) ->
     ReactDOM.render(createElement(data), wrapper)
 
-  module 'ExternalApps.EditExternalToolButton',
+  QUnit.module 'ExternalApps.EditExternalToolButton',
     setup: ->
       ENV.APP_CENTER = {'enabled': true}
 

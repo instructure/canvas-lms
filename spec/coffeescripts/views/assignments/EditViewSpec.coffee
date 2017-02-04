@@ -58,7 +58,7 @@ define [
 
     app.render()
 
-  module 'EditView',
+  QUnit.module 'EditView',
     setup: ->
       fakeENV.setup({
         current_user_roles: ['teacher'],
@@ -316,7 +316,7 @@ define [
     notOk view.$el.find('#has_group_category').attr('readonly')
     notOk view.$el.find('#has_group_category').attr('aria-readonly')
 
-  module 'EditView: handleGroupCategoryChange',
+  QUnit.module 'EditView: handleGroupCategoryChange',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -337,7 +337,7 @@ define [
 
     ok spy.calledOnce
 
-  module 'EditView: group category inClosedGradingPeriod',
+  QUnit.module 'EditView: group category inClosedGradingPeriod',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -364,7 +364,7 @@ define [
     notOk view.$("#assignment_group_category_id").prop("disabled")
     notOk view.$("[type=checkbox][name=grade_group_students_individually]").prop("disabled")
 
-  module 'EditView: enableCheckbox',
+  QUnit.module 'EditView: enableCheckbox',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -396,7 +396,7 @@ define [
 
     ok view.$('#assignment_peer_reviews').prop('disabled')
 
-  module 'EditView: setDefaultsIfNew',
+  QUnit.module 'EditView: setDefaultsIfNew',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -437,7 +437,7 @@ define [
 
     equal view.assignment.get('submission_types'), "foo"
 
-  module 'EditView: setDefaultsIfNew: no localStorage',
+  QUnit.module 'EditView: setDefaultsIfNew: no localStorage',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -458,7 +458,7 @@ define [
 
     equal view.assignment.get('submission_type'), "online"
 
-  module 'EditView: cacheAssignmentSettings',
+  QUnit.module 'EditView: cacheAssignmentSettings',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -488,7 +488,7 @@ define [
 
     equal null, userSettings.contextGet("new_assignment_settings")["invalid_attribute_example"]
 
-  module 'EditView: Conditional Release',
+  QUnit.module 'EditView: Conditional Release',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -559,7 +559,7 @@ define [
     view.showErrors({ conditional_release: 'foo' })
     ok focusOnError.called
 
-  module 'Editview: Intra-Group Peer Review toggle',
+  QUnit.module 'Editview: Intra-Group Peer Review toggle',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -595,7 +595,7 @@ define [
     view.$el.appendTo $('#fixtures')
     notOk view.$('#intra_group_peer_reviews').is(":visible")
 
-  module 'EditView: Assignment Configuration Tools',
+  QUnit.module 'EditView: Assignment Configuration Tools',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1

@@ -9,7 +9,7 @@ define([
   const container = document.getElementById('fixtures')
   let server
 
-  module('<TeacherFeedbackForm/>', {
+  QUnit.module('<TeacherFeedbackForm/>', {
     setup () {
       server = sinon.fakeServer.create()
 

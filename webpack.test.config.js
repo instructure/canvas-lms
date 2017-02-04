@@ -28,6 +28,7 @@ testWebpackConfig.externals['react/lib/ReactContext'] = 'true';
 testWebpackConfig.externals['react/lib/ExecutionEnvironment'] = 'true';
 
 testWebpackConfig.resolve.alias.qunit = 'qunitjs';
+testWebpackConfig.resolve.alias.QUnit = 'qunitjs';
 testWebpackConfig.resolve.modules.push(path.resolve(__dirname, 'spec/coffeescripts'))
 testWebpackConfig.resolve.modules.push(path.resolve(__dirname, 'spec/javascripts/support'))
 testWebpackConfig.resolve.alias['spec/jsx'] = path.resolve(__dirname, 'spec/javascripts/jsx')
@@ -49,6 +50,9 @@ testWebpackConfig.module.rules.unshift({
     'imports-loader?test=>qunit.test',
     'imports-loader?asyncTest=>qunit.asyncTest',
     'imports-loader?start=>qunit.start',
+    'imports-loader?test=>QUnit.test',
+    'imports-loader?asyncTest=>QUnit.asyncTest',
+    'imports-loader?start=>QUnit.start',
     'qunitDependencyLoader'
   ]
 })

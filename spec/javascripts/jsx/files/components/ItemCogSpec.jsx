@@ -59,7 +59,7 @@ define([
     };
   };
 
-  module('ItemCog', {
+  QUnit.module('ItemCog', {
     setup () {
       itemCog = ReactDOM.render(<ItemCog {...sampleProps(true)} />, $('<div>').appendTo('#fixtures')[0]);
     },

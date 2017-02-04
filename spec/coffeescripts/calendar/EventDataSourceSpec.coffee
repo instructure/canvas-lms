@@ -5,7 +5,7 @@ define [
   'vendor/timezone/America/Denver'
 ], (EventDataSource, fcUtil, tz, denver) ->
 
-  module "EventDataSource: getEvents",
+  QUnit.module "EventDataSource: getEvents",
     setup: ->
       @snapshot = tz.snapshot()
       tz.changeZone(denver, 'America/Denver')

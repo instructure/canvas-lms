@@ -14,7 +14,7 @@ define [
     React.render(createElement(data), wrapper)
 
 
-  module 'AssignmentConfigurationsTools',
+  QUnit.module 'AssignmentConfigurationsTools',
     setup: ->
       secureParams = "asdf234.lhadf234.adfasd23324"
       wrapper = document.getElementById('fixtures')

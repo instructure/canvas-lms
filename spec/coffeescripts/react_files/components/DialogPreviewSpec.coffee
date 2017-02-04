@@ -8,7 +8,7 @@ define [
   'jsx/files/FilesystemObjectThumbnail'
 ], ($, React, ReactDOM, TestUtils, File, DialogPreview, FilesystemObjectThumbnail) ->
 
-  module 'DialogPreview',
+  QUnit.module 'DialogPreview',
     setup: ->
     teardown: ->
 

@@ -32,7 +32,7 @@ define [
       }, JSON.stringify anns]
 
 
-  module 'AnnouncementsIndexView',
+  QUnit.module 'AnnouncementsIndexView',
     setup: ->
       fakeENV.setup(PERMISSIONS: { manage: false })
       $('<div id="content"></div>').appendTo fixtures

@@ -24,7 +24,7 @@ define [
 
   wrapper = document.getElementById('fixtures')
 
-  module 'GradingPeriod with read-only permissions',
+  QUnit.module 'GradingPeriod with read-only permissions',
     renderComponent: (opts = {}) ->
       readOnlyProps =
         permissions: {
@@ -71,7 +71,7 @@ define [
     gradingPeriod = @renderComponent(closeDate: null)
     equal gradingPeriod.refs.closeDate.textContent, "May 31, 2015 at 12am"
 
-  module "GradingPeriod with 'readOnly' set to true",
+  QUnit.module "GradingPeriod with 'readOnly' set to true",
     renderComponent: (opts = {}) ->
       readOnlyProps =
         readOnly: true
@@ -115,7 +115,7 @@ define [
     gradingPeriod = @renderComponent(closeDate: null)
     equal gradingPeriod.refs.closeDate.textContent, "May 31, 2015 at 12am"
 
-  module 'editable GradingPeriod',
+  QUnit.module 'editable GradingPeriod',
     renderComponent: (opts = {}) ->
       props = _.defaults(opts, defaultProps)
       GradingPeriodElement = React.createElement(GradingPeriod, props)
@@ -156,7 +156,7 @@ define [
     Simulate.click(gradingPeriod.refs.deleteButton)
     notOk deleteSpy.called
 
-  module 'custom prop validation for editable periods',
+  QUnit.module 'custom prop validation for editable periods',
     renderComponent: (opts = {}) ->
       props = _.defaults(opts, defaultProps)
       GradingPeriodElement = React.createElement(GradingPeriod, props)

@@ -8,7 +8,7 @@ define [
   'helpers/I18nStubber'
 ], ($, EditAssignmentDetails, fcUtil, tz, detroit, french, I18nStubber) ->
 
-  module "EditAssignmentDetails",
+  QUnit.module "EditAssignmentDetails",
     setup: ->
       @snapshot = tz.snapshot()
       @$holder = $('<table />').appendTo(document.getElementById("fixtures"))

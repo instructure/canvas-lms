@@ -2,7 +2,7 @@ define [
   'jquery'
   'compiled/jquery/ModuleSequenceFooter'
 ], ($) ->
-  module 'ModuleSequenceFooter: init',
+  QUnit.module 'ModuleSequenceFooter: init',
     setup: ->
       @$testEl = $('<div>')
       $('#fixtures').append @$testEl
@@ -58,7 +58,7 @@ define [
     equal @$testEl.find('.module-sequence-footer:not(.no-animation)').length, 1, 'no-animation removed from module-sequence-footer'
     equal @$testEl.find('.module-sequence-padding:not(.no-animation)').length, 1, 'no-animation removed from module-sequence-padding'
 
-  module 'ModuleSequenceFooter: rendering',
+  QUnit.module 'ModuleSequenceFooter: rendering',
     setup: ->
       @server = sinon.fakeServer.create()
       @$testEl = $('<div>')

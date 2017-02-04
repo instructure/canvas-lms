@@ -4,7 +4,7 @@ define([
   'jsx/collaborations/DeleteConfirmation'
 ], (React, TestUtils, DeleteConfirmation) => {
 
-  module('DeleteConfirmation');
+  QUnit.module('DeleteConfirmation');
 
   let props = {
     collaboration: {

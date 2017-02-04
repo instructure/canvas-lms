@@ -4,7 +4,7 @@ define([
   'jsx/conditional_release_stats/components/breakdown-graphs',
 ], (React, TestUtils, BreakdownGraph) => {
 
-  module('Breakdown Graph')
+  QUnit.module('Breakdown Graph')
 
   const defaultProps = () => ({
     ranges: [

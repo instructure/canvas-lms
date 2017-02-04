@@ -5,7 +5,7 @@ define([
   'jsx/collaborations/NewCollaborationsDropDown'
 ], (React, ReactDOM, TestUtils, NewCollaborationsDropDown) => {
 
-  module('NewCollaborationsDropDown');
+  QUnit.module('NewCollaborationsDropDown');
 
   let defaultProps = {
     ltiCollaborators: [{name: "A name", id: '1'}]

@@ -3,7 +3,7 @@ define [
   'compiled/widget/ComboBox'
   'helpers/simulateClick'
 ], ($, ComboBox, simulateClick)->
-  module 'ComboBox',
+  QUnit.module 'ComboBox',
     setup: ->
 
     teardown: ->

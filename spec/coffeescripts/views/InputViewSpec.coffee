@@ -6,7 +6,7 @@ define [
 
   view = null
 
-  module 'InputView',
+  QUnit.module 'InputView',
     setup: ->
       view = new InputView
       view.render()

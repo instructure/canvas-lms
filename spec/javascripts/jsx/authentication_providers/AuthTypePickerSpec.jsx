@@ -10,7 +10,7 @@ define([
   ];
   const { mount } = enzyme;
 
-  module('AuthTypePicker');
+  QUnit.module('AuthTypePicker');
 
   test('rendered structure', () => {
     const wrapper = mount(<AuthTypePicker authTypes={authTypes} />)

@@ -6,7 +6,7 @@ define [
   'compiled/SubmissionDetailsDialog'
 ], (Gradebook, DataLoader, _, tz, SubmissionDetailsDialog) ->
 
-  module "Gradebook#gradeSort"
+  QUnit.module "Gradebook#gradeSort"
 
   test "gradeSort - total_grade", ->
     gradeSort = (showTotalGradeAsPoints, a, b, field, asc) ->
@@ -40,7 +40,7 @@ define [
     , 'assignment1') < 0
     , "other fields are sorted by score"
 
-  module "Gradebook#hideAggregateColumns",
+  QUnit.module "Gradebook#hideAggregateColumns",
     gradebookStubs: ->
       indexedOverrides: Gradebook.prototype.indexedOverrides
       indexedGradingPeriods: _.indexBy(@gradingPeriods, 'id')
@@ -92,7 +92,7 @@ define [
 
     notOk @hideAggregateColumns.call(self)
 
-  module 'Gradebook#getVisibleGradeGridColumns',
+  QUnit.module 'Gradebook#getVisibleGradeGridColumns',
     setup: ->
       @getVisibleGradeGridColumns = Gradebook.prototype.getVisibleGradeGridColumns
       @makeColumnSortFn = Gradebook.prototype.makeColumnSortFn
@@ -131,7 +131,7 @@ define [
     @getVisibleGradeGridColumns()
     notOk @makeColumnSortFn.called
 
-  module 'Gradebook#fieldsToExcludeFromAssignments',
+  QUnit.module 'Gradebook#fieldsToExcludeFromAssignments',
     setup: ->
       @excludedFields = Gradebook.prototype.fieldsToExcludeFromAssignments
 
@@ -141,7 +141,7 @@ define [
   test "includes 'needs_grading_count' in the response", ->
     ok _.contains(@excludedFields, 'needs_grading_count')
 
-  module "Gradebook#submissionsForStudent",
+  QUnit.module "Gradebook#submissionsForStudent",
     setupThis: (options = {}) ->
       effectiveDueDates = {
         1: { 1: { grading_period_id: "1" } },
@@ -185,7 +185,7 @@ define [
     submissions = @submissionsForStudent.call(self, @student)
     propEqual _.pluck(submissions, "assignment_id"), ["2"]
 
-  module 'Gradebook#studentsUrl',
+  QUnit.module 'Gradebook#studentsUrl',
     setupThis:(options) ->
       options = options || {}
       defaults = {
@@ -212,7 +212,7 @@ define [
     self = @setupThis(showConcludedEnrollments: true, showInactiveEnrollments: true)
     equal @studentsUrl.call(self), 'students_with_concluded_and_inactive_enrollments_url'
 
-  module 'Gradebook#showNotesColumn',
+  QUnit.module 'Gradebook#showNotesColumn',
     setup: ->
       @loadNotes = @stub(DataLoader, "getDataForColumn")
 
@@ -233,7 +233,7 @@ define [
     @showNotesColumn()
     ok @loadNotes.notCalled
 
-  module 'Gradebook#cellCommentClickHandler',
+  QUnit.module 'Gradebook#cellCommentClickHandler',
     setup: ->
       @cellCommentClickHandler = Gradebook.prototype.cellCommentClickHandler
       @assignments = {

@@ -6,7 +6,7 @@ define([
 ], (React, ReactDOM, {Simulate}, SearchGradingPeriodsField) => {
   const wrapper = document.getElementById('fixtures');
 
-  module("SearchGradingPeriodsField", {
+  QUnit.module("SearchGradingPeriodsField", {
     renderComponent() {
       const props = { changeSearchText: this.spy() };
       const element = React.createElement(SearchGradingPeriodsField, props);

@@ -6,7 +6,7 @@ define [
 ], (React, ReactDOM, FlashMessageHolder, configureStore) ->
 
 
-  module 'FlashMessageHolder',
+  QUnit.module 'FlashMessageHolder',
     setup: ->
       @props =
         time: 123

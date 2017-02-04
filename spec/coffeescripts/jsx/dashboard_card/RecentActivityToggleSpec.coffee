@@ -7,7 +7,7 @@ define [
   'helpers/assertions'
 ], (React, ReactDOM, TestUtils, _, RecentActivityToggle, assertions) ->
 
-  module 'RecentActivityToggle',
+  QUnit.module 'RecentActivityToggle',
     setup: ->
       @props = {
         recent_activity_dashboard: false

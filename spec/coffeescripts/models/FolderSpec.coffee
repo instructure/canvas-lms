@@ -3,7 +3,7 @@ define [
   'compiled/models/File'
 ], (Folder, FileModel) ->
 
-  module 'Folder',
+  QUnit.module 'Folder',
     setup: ->
       @file1 = new FileModel({display_name: 'File 1'}, {preflightUrl: '/test'});
       @file2 = new FileModel({display_name: 'file 10'}, {preflightUrl: '/test'});

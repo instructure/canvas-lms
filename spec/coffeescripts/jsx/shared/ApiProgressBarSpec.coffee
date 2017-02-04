@@ -7,7 +7,7 @@ define [
   'jsx/shared/stores/ProgressStore'
 ], (_, React, ReactDOM, TestUtils, ApiProgressBar, ProgressStore) ->
 
-  module 'ApiProgressBarSpec',
+  QUnit.module 'ApiProgressBarSpec',
     setup: ->
       @progress_id = '1'
       @progress = {

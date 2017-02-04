@@ -4,7 +4,7 @@ define([
   'jsx/external_apps/components/ConfigurationFormManual'
 ], (React, TestUtils, ConfigurationFormManual) => {
 
-  module('External Apps Manual Configuration Form');
+  QUnit.module('External Apps Manual Configuration Form');
 
   const fakeStore = {
     findAppByShortName () {

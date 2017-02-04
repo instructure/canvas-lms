@@ -2,7 +2,7 @@ define([
   'jquery',
   'account_settings'
 ], ($, {addUsersLink, openReportDescriptionLink}) => {
-  module('AccountSettings.openReportDescriptionLink', {
+  QUnit.module('AccountSettings.openReportDescriptionLink', {
     setup () {
       const $html = $('<div>').addClass('title').addClass('reports')
         .append($('<span>').addClass('title').text('Title'))
@@ -22,7 +22,7 @@ define([
     ok($('#fixtures .report_description').length);
   });
 
-  module('AccountSettings.addUsersLink', {
+  QUnit.module('AccountSettings.addUsersLink', {
     setup () {
       const $select = $('<select>').attr('id', 'admin_role_id')
         .append($('<option>').attr('val', '1'));

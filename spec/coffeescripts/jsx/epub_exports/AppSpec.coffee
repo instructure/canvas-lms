@@ -7,7 +7,7 @@ define [
   'jsx/epub_exports/CourseStore'
 ], (_, React, ReactDOM, TestUtils, App, CourseEpubExportStore) ->
 
-  module 'AppSpec',
+  QUnit.module 'AppSpec',
     setup: ->
       @props = {
         1: {

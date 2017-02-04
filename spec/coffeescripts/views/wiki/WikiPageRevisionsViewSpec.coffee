@@ -4,7 +4,7 @@ define [
   'compiled/views/wiki/WikiPageRevisionsView'
 ], ($, WikiPageRevisionsCollection, WikiPageRevisionsView) ->
 
-  module 'WikiPageRevisionsView',
+  QUnit.module 'WikiPageRevisionsView',
     setup: ->
     teardown: ->
       document.getElementById("fixtures").innerHTML = ""

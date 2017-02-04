@@ -5,7 +5,7 @@ define [
   'helpers/fakeENV'
 ], (Assignment, Submission, DateGroup, fakeENV) ->
 
-  module "Assignment#initialize with ENV.POST_TO_SIS set to false",
+  QUnit.module "Assignment#initialize with ENV.POST_TO_SIS set to false",
     setup: ->
       fakeENV.setup
         POST_TO_SIS: false
@@ -15,7 +15,7 @@ define [
     assignment = new Assignment
     strictEqual assignment.get('post_to_sis'), undefined
 
-  module "Assignment#initalize with ENV.POST_TO_SIS set to true",
+  QUnit.module "Assignment#initalize with ENV.POST_TO_SIS set to true",
     setup: ->
       fakeENV.setup
         POST_TO_SIS: true
@@ -37,7 +37,7 @@ define [
     }
     strictEqual assignment.get('post_to_sis'), null
 
-  module "Assignment#isQuiz"
+  QUnit.module "Assignment#isQuiz"
 
   test "returns true if record is a quiz", ->
     assignment = new Assignment name: 'foo'
@@ -49,7 +49,7 @@ define [
     assignment.set 'submission_types', ['on_paper']
     equal assignment.isQuiz(), false
 
-  module "Assignment#isDiscussionTopic"
+  QUnit.module "Assignment#isDiscussionTopic"
 
   test "returns true if record is discussion topic", ->
     assignment = new Assignment name: 'foo'
@@ -61,7 +61,7 @@ define [
     assignment.submissionTypes( ['on_paper'] )
     equal assignment.isDiscussionTopic(), false
 
-  module "Assignment#isExternalTool"
+  QUnit.module "Assignment#isExternalTool"
 
   test "returns true if record is external tool", ->
     assignment = new Assignment name: 'foo'
@@ -73,7 +73,7 @@ define [
     assignment.submissionTypes( [ 'on_paper' ] )
     equal assignment.isExternalTool(), false
 
-  module "Assignment#isNotGraded"
+  QUnit.module "Assignment#isNotGraded"
 
   test "returns true if record is not graded", ->
     assignment = new Assignment name: 'foo'
@@ -86,7 +86,7 @@ define [
     assignment.submissionTypes [ 'online_url' ]
     equal assignment.isNotGraded(), false
 
-  module "Assignment#isAssignment"
+  QUnit.module "Assignment#isAssignment"
 
   test "returns true if record is not quiz,ungraded,external tool, or discussion", ->
     assignment = new Assignment name: 'foo'
@@ -102,7 +102,7 @@ define [
     assignment.set 'submission_types', ['online_quiz']
     equal assignment.isAssignment(), false
 
-  module "Assignment#asignmentType as a setter"
+  QUnit.module "Assignment#asignmentType as a setter"
 
   test "sets the record's submission_types to the value", ->
     assignment = new Assignment name: 'foo'
@@ -118,7 +118,7 @@ define [
     equal assignment.assignmentType(), 'assignment'
     deepEqual assignment.get( 'submission_types' ), [ 'none' ]
 
-  module "Assignment#assignmentType as a getter"
+  QUnit.module "Assignment#assignmentType as a getter"
 
   test "returns 'assignment' if not quiz, discussion topic, external tool, or ungraded", ->
     assignment = new Assignment name: 'foo'
@@ -130,7 +130,7 @@ define [
     assignment.set 'submission_types', ['online_quiz']
     equal assignment.assignmentType(), 'online_quiz'
 
-  module "Assignment#dueAt as a getter"
+  QUnit.module "Assignment#dueAt as a getter"
 
   test "returns record's due_at", ->
     date = Date.now()
@@ -138,7 +138,7 @@ define [
     assignment.set 'due_at', date
     equal assignment.dueAt(), date
 
-  module "Assignment#dueAt as a setter"
+  QUnit.module "Assignment#dueAt as a setter"
 
   test "sets the record's due_at", ->
     date = Date.now()
@@ -147,7 +147,7 @@ define [
     assignment.dueAt( date )
     equal assignment.dueAt(), date
 
-  module "Assignment#unlockAt as a getter"
+  QUnit.module "Assignment#unlockAt as a getter"
 
   test "gets the records unlock_at", ->
     date = Date.now()
@@ -155,7 +155,7 @@ define [
     assignment.set 'unlock_at', date
     equal assignment.unlockAt(), date
 
-  module "Assignment#unlockAt as a setter"
+  QUnit.module "Assignment#unlockAt as a setter"
 
   test "sets the record's unlock_at", ->
     date = Date.now()
@@ -164,7 +164,7 @@ define [
     assignment.unlockAt( date )
     equal assignment.unlockAt(), date
 
-  module "Assignment#lockAt as a getter"
+  QUnit.module "Assignment#lockAt as a getter"
 
   test "gets the records lock_at", ->
     date = Date.now()
@@ -172,7 +172,7 @@ define [
     assignment.set 'lock_at', date
     equal assignment.lockAt(), date
 
-  module "Assignment#lockAt as a setter"
+  QUnit.module "Assignment#lockAt as a setter"
 
   test "sets the record's lock_at", ->
     date = Date.now()
@@ -181,14 +181,14 @@ define [
     assignment.lockAt( date )
     equal assignment.lockAt(), date
 
-  module "Assignment#description as a getter"
+  QUnit.module "Assignment#description as a getter"
 
   test "returns the record's description", ->
     assignment = new Assignment name: 'foo'
     assignment.set 'description', 'desc'
     equal assignment.description(), 'desc'
 
-  module "Assignment#description as a setter"
+  QUnit.module "Assignment#description as a setter"
 
   test "sets the record's description", ->
     assignment = new Assignment name: 'foo'
@@ -197,14 +197,14 @@ define [
     equal assignment.description(), 'desc'
     equal assignment.get('description'), 'desc'
 
-  module "Assignment#dueDateRequired as a getter"
+  QUnit.module "Assignment#dueDateRequired as a getter"
 
   test "returns the record's dueDateRequired", ->
     assignment = new Assignment name: 'foo'
     assignment.set 'dueDateRequired', true
     equal assignment.dueDateRequired(), true
 
-  module "Assignment#dueDateRequired as a setter"
+  QUnit.module "Assignment#dueDateRequired as a setter"
 
   test "sets the record's dueDateRequired", ->
     assignment = new Assignment name: 'foo'
@@ -213,14 +213,14 @@ define [
     equal assignment.dueDateRequired(), true
     equal assignment.get('dueDateRequired'), true
 
-  module "Assignment#name as a getter"
+  QUnit.module "Assignment#name as a getter"
 
   test "returns the record's name", ->
     assignment = new Assignment name: 'foo'
     assignment.set 'name', 'Todd'
     equal assignment.name(), 'Todd'
 
-  module "Assignment#name as a setter"
+  QUnit.module "Assignment#name as a setter"
 
   test "sets the record's name", ->
     assignment = new Assignment name: 'foo'
@@ -228,7 +228,7 @@ define [
     assignment.name( 'Todd' )
     equal assignment.get('name'), 'Todd'
 
-  module "Assignment#pointsPossible as a setter"
+  QUnit.module "Assignment#pointsPossible as a setter"
 
   test "sets the record's points_possible", ->
     assignment = new Assignment name: 'foo'
@@ -237,7 +237,7 @@ define [
     equal assignment.pointsPossible(), 12
     equal assignment.get('points_possible'), 12
 
-  module "Assignment#secureParams as a getter"
+  QUnit.module "Assignment#secureParams as a getter"
 
   test "returns secure params if set", ->
     secure_params = 'eyJ0eXAiOiJKV1QiLCJhb.asdf232.asdf2334'
@@ -245,7 +245,7 @@ define [
     assignment.set 'secure_params', secure_params
     equal assignment.secureParams(), secure_params
 
-  module "Assignment#assignmentGroupId as a setter"
+  QUnit.module "Assignment#assignmentGroupId as a setter"
 
   test "sets the record's assignment group id", ->
     assignment = new Assignment name: 'foo'
@@ -254,7 +254,7 @@ define [
     equal assignment.assignmentGroupId(), 12
     equal assignment.get('assignment_group_id'), 12
 
-  module "Assignment#canDelete",
+  QUnit.module "Assignment#canDelete",
     setup: -> fakeENV.setup({
       current_user_roles: ['teacher']
     })
@@ -276,7 +276,7 @@ define [
     assignment.set 'in_closed_grading_period', false
     equal assignment.canDelete(), true
 
-  module "Assignment#canMove as teacher",
+  QUnit.module "Assignment#canMove as teacher",
     setup: -> fakeENV.setup({
       current_user_roles: ['teacher']
     })
@@ -298,7 +298,7 @@ define [
     assignment.set 'in_closed_grading_period', false
     equal assignment.canMove(), true
 
-  module "Assignment#canMove as admin",
+  QUnit.module "Assignment#canMove as admin",
     setup: -> fakeENV.setup({
       current_user_roles: ['admin']
     })
@@ -320,7 +320,7 @@ define [
     assignment.set 'in_closed_grading_period', false
     equal assignment.canMove(), true
 
-  module "Assignment#inClosedGradingPeriod as a non admin",
+  QUnit.module "Assignment#inClosedGradingPeriod as a non admin",
     setup: -> fakeENV.setup({
       current_user_roles: ['teacher']
     })
@@ -333,7 +333,7 @@ define [
     assignment.set 'in_closed_grading_period', false
     equal assignment.inClosedGradingPeriod(), false
 
-  module "Assignment#inClosedGradingPeriod as an admin",
+  QUnit.module "Assignment#inClosedGradingPeriod as an admin",
     setup: -> fakeENV.setup({
       current_user_roles: ['admin']
     })
@@ -347,7 +347,7 @@ define [
     equal assignment.inClosedGradingPeriod(), false
 
 
-  module "Assignment#gradingType as a setter"
+  QUnit.module "Assignment#gradingType as a setter"
 
   test "sets the record's grading type", ->
     assignment = new Assignment name: 'foo'
@@ -356,7 +356,7 @@ define [
     equal assignment.gradingType(), 'percent'
     equal assignment.get('grading_type'), 'percent'
 
-  module "Assignment#submissionType"
+  QUnit.module "Assignment#submissionType"
 
   test "returns 'none' if record's submission_types is ['none']", ->
     assignment = new Assignment name: 'foo', id: '12'
@@ -373,7 +373,7 @@ define [
     assignment.set 'submission_types', [ 'online_upload' ]
     equal assignment.submissionType(), 'online'
 
-  module "Assignment#expectsSubmission"
+  QUnit.module "Assignment#expectsSubmission"
 
   test "returns false if assignment submission type is not online", ->
     assignment = new Assignment name: 'foo'
@@ -385,7 +385,7 @@ define [
     assignment.set 'submission_types': [ 'online' ]
     equal assignment.expectsSubmission(), true
 
-  module "Assignment#allowedToSubmit"
+  QUnit.module "Assignment#allowedToSubmit"
 
   test "returns false if assignment is locked", ->
     assignment = new Assignment name: 'foo'
@@ -404,7 +404,7 @@ define [
     assignment.set 'submission_types': [ 'external_tool', 'on_paper', 'attendance' ]
     equal assignment.allowedToSubmit(), false
 
-  module "Assignment#withoutGradedSubmission"
+  QUnit.module "Assignment#withoutGradedSubmission"
 
   test "returns false if there is a submission", ->
     assignment = new Assignment name: 'foo'
@@ -426,7 +426,7 @@ define [
     assignment.set 'submission': new Submission {'grade': 305}
     equal assignment.withoutGradedSubmission(), false
 
-  module "Assignment#acceptsOnlineUpload"
+  QUnit.module "Assignment#acceptsOnlineUpload"
 
   test "returns true if record submission types includes online_upload", ->
     assignment = new Assignment name: 'foo'
@@ -438,7 +438,7 @@ define [
     assignment.set 'submission_types', []
     equal assignment.acceptsOnlineUpload(), false
 
-  module "Assignment#acceptsOnlineURL"
+  QUnit.module "Assignment#acceptsOnlineURL"
 
   test "returns true if assignment allows online url", ->
     assignment = new Assignment name: 'foo'
@@ -450,21 +450,21 @@ define [
     assignment.set 'submission_types', []
     equal assignment.acceptsOnlineURL(), false
 
-  module "Assignment#acceptsMediaRecording"
+  QUnit.module "Assignment#acceptsMediaRecording"
 
   test "returns true if submission types includes media recordings", ->
     assignment = new Assignment name: 'foo'
     assignment.set 'submission_types', [ 'media_recording' ]
     equal assignment.acceptsMediaRecording(), true
 
-  module "Assignment#acceptsOnlineTextEntries"
+  QUnit.module "Assignment#acceptsOnlineTextEntries"
 
   test "returns true if submission types includes online text entry", ->
     assignment = new Assignment name: 'foo'
     assignment.set 'submission_types', [ 'online_text_entry' ]
     equal assignment.acceptsOnlineTextEntries(), true
 
-  module "Assignment#peerReviews"
+  QUnit.module "Assignment#peerReviews"
 
   test "returns the peer_reviews on the record if no args passed", ->
     assignment = new Assignment name: 'foo'
@@ -477,7 +477,7 @@ define [
     assignment.peerReviews( true )
     equal assignment.peerReviews(), true
 
-  module "Assignment#automaticPeerReviews"
+  QUnit.module "Assignment#automaticPeerReviews"
 
   test "returns the automatic_peer_reviews on the model if no args passed", ->
     assignment = new Assignment name: 'foo'
@@ -490,7 +490,7 @@ define [
     assignment.automaticPeerReviews( true )
     equal assignment.automaticPeerReviews(), true
 
-  module "Assignment#notifyOfUpdate"
+  QUnit.module "Assignment#notifyOfUpdate"
 
   test "returns record's notifyOfUpdate if no args passed", ->
     assignment = new Assignment name: 'foo'
@@ -502,7 +502,7 @@ define [
     assignment.notifyOfUpdate( false )
     equal assignment.notifyOfUpdate(), false
 
-  module "Assignment#multipleDueDates"
+  QUnit.module "Assignment#multipleDueDates"
 
   test "checks for multiple due dates from assignment overrides", ->
     assignment = new Assignment all_dates: [{title: "Winter"}, {title: "Summer"}]
@@ -512,7 +512,7 @@ define [
     assignment = new Assignment
     ok !assignment.multipleDueDates()
 
-  module "Assignment#allDates"
+  QUnit.module "Assignment#allDates"
 
   test "gets the due dates from the assignment overrides", ->
     dueAt = new Date("2013-08-20T11:13:00")
@@ -530,7 +530,7 @@ define [
     assignment = new Assignment
     deepEqual assignment.allDates(), []
 
-  module "Assignment#inGradingPeriod",
+  QUnit.module "Assignment#inGradingPeriod",
     setup: ->
       @gradingPeriod =
         id: "1"
@@ -564,7 +564,7 @@ define [
     assignment = new Assignment all_dates: dates
     equal assignment.inGradingPeriod(@gradingPeriod), false
 
-  module "Assignment#singleSectionDueDate",
+  QUnit.module "Assignment#singleSectionDueDate",
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
 
@@ -588,7 +588,7 @@ define [
     equal assignment.singleSectionDueDate(), assignment.dueAt()
     ENV.PERMISSIONS = {}
 
-  module "Assignment#omitFromFinalGrade"
+  QUnit.module "Assignment#omitFromFinalGrade"
 
   test "gets the record's omit_from_final_grade boolean", ->
     assignment = new Assignment name: 'foo'
@@ -600,7 +600,7 @@ define [
     assignment.omitFromFinalGrade( true )
     ok assignment.omitFromFinalGrade()
 
-  module "Assignment#toView",
+  QUnit.module "Assignment#toView",
     setup: -> fakeENV.setup({
       current_user_roles: ['teacher']
     })

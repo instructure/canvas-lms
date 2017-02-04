@@ -6,7 +6,7 @@ define([
 
   const container = document.getElementById('fixtures')
 
-  module('<CreateTicketForm/>', {
+  QUnit.module('<CreateTicketForm/>', {
     render(overrides={}) {
       const props = {
         ...overrides

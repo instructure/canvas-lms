@@ -3,7 +3,7 @@ define [
   'compiled/views/calendar/CalendarNavigator'
 ], ($, CalendarNavigator) ->
 
-  module 'CalendarNavigator',
+  QUnit.module 'CalendarNavigator',
     setup: ->
       @navigator = new CalendarNavigator()
       @navigator.$el.appendTo $('#fixtures')

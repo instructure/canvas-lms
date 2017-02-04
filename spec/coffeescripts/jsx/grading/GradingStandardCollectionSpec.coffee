@@ -10,7 +10,7 @@ define [
 
   Simulate = TestUtils.Simulate
 
-  module 'GradingStandardCollection',
+  QUnit.module 'GradingStandardCollection',
     setup: ->
       @stub($, 'flashMessage', ->)
       @stub($, 'flashError', ->)

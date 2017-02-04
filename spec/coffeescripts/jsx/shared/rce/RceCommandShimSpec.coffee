@@ -5,7 +5,7 @@ define [
 ], (RceCommandShim, wikiSidebar, fixtures) ->
 
   remoteEditor = null
-  module 'RceCommandShim - send',
+  QUnit.module 'RceCommandShim - send',
     setup: ->
       fixtures.setup()
       @$target = fixtures.create('<textarea />')
@@ -52,7 +52,7 @@ define [
     @$target.data('remoteEditor', remoteEditor)
     equal RceCommandShim.send(@$target, "get_code"), 'methodResult'
 
-  module 'RceCommandShim - focus',
+  QUnit.module 'RceCommandShim - focus',
     setup: ->
       fixtures.setup()
       @$target = fixtures.create('<textarea />')
@@ -74,7 +74,7 @@ define [
     ok wikiSidebar.attachToEditor.calledWith(@$target)
     wikiSidebar.attachToEditor.restore()
 
-  module 'RceCommandShim - destroy',
+  QUnit.module 'RceCommandShim - destroy',
     setup: ->
       fixtures.setup()
       @$target = fixtures.create('<textarea />')

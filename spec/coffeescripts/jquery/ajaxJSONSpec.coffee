@@ -6,7 +6,7 @@ define [
 
   storedInstEnv = null
 
-  module '$.fn.defaultAjaxError',
+  QUnit.module '$.fn.defaultAjaxError',
     setup: ->
       storedInstEnv = INST.environment
       $.ajaxJSON.unhandledXHRs = []
@@ -45,7 +45,7 @@ define [
     ok spy.called
 
 
-  module '$.ajaxJSON.isUnauthenticated'
+  QUnit.module '$.ajaxJSON.isUnauthenticated'
 
   test 'returns false if status is not 401', ->
     equal $.ajaxJSON.isUnauthenticated({status: 200}), false

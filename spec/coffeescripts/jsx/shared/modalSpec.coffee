@@ -8,7 +8,7 @@ define [
   'jsx/shared/modal-buttons'
 ], ($, Modal, React, ReactDOM, TestUtils, ModalContent, ModalButtons) ->
 
-  module 'Modal',
+  QUnit.module 'Modal',
     setup: ->
       $('body').append("<div id=application />")
     teardown: ->

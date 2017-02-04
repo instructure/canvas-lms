@@ -1,6 +1,6 @@
 define ['compiled/backbone-ext/Model'], (Model) ->
 
-  module 'dateAttributes'
+  QUnit.module 'dateAttributes'
 
   test 'converts date strings to date objects', ->
 
