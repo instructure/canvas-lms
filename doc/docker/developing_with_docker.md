@@ -35,7 +35,7 @@ echo "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose
 Setup your user-specific docker-compose override file as an empty file using the following command:
 
 ```bash
-echo version: '2' > docker-compose.local.`whoami`.yml
+echo "version: '2'" > docker-compose.local.`whoami`.yml
 ```
 
 ## Getting Started
