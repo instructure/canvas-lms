@@ -1,9 +1,9 @@
 define [
   'jquery'
   'timezone'
-  'vendor/timezone/America/Detroit'
-  'vendor/timezone/America/Juneau'
-  'vendor/timezone/pt_PT'
+  'timezone/America/Detroit'
+  'timezone/America/Juneau'
+  'timezone/pt_PT'
   'helpers/I18nStubber'
   'jquery.instructure_date_and_time'
 ], ($, tz, detroit, juneau, portuguese, I18nStubber) ->

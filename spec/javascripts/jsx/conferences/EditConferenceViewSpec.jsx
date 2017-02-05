@@ -2,7 +2,7 @@ define([
   'compiled/views/conferences/EditConferenceView',
   'compiled/models/Conference',
   'timezone',
-  'vendor/timezone/fr_FR',
+  'timezone/fr_FR',
   'helpers/I18nStubber',
   'helpers/fakeENV'
 ], (EditConferenceView, Conference, tz, french, I18nStubber, fakeENV) => {

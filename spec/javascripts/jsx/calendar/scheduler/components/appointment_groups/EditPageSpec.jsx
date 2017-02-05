@@ -6,7 +6,7 @@ define([
   'axios',
   'moment',
   'jsx/calendar/scheduler/components/appointment_groups/EditPage',
-  'vendor/timezone/Europe/London',
+  'timezone/Europe/London',
   'timezone',
   'helpers/fakeENV',
   'instructure-ui/Button',

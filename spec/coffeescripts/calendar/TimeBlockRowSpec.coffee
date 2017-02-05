@@ -4,7 +4,7 @@ define [
   'compiled/calendar/TimeBlockList'
   'compiled/calendar/TimeBlockRow'
   'timezone'
-  'vendor/timezone/America/Detroit'
+  'timezone/America/Detroit'
 ], ($, fcUtil, TimeBlockList, TimeBlockRow, tz, detroit) ->
 
   nextYear = new Date().getFullYear() + 1

@@ -1,5 +1,5 @@
 define [
-  'vendor/timezone/Europe/London'
+  'timezone/Europe/London'
   'timezone'
   'compiled/util/coupleTimeFields'
   'compiled/widget/DatetimeField'

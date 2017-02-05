@@ -2,8 +2,8 @@ define [
   'jsx/shared/helpers/dateHelper'
   'underscore'
   'timezone'
-  'vendor/timezone/America/Detroit'
-  'vendor/timezone/America/Juneau'
+  'timezone/America/Detroit'
+  'timezone/America/Juneau'
 ], (DateHelper, _, tz, detroit, juneau) ->
 
   defaultAssignment = ->

@@ -71,6 +71,7 @@
     "sinon": "2.0.0-pre.5",
     "style-loader": "^0.13.1",
     "stylelint": "7.7.0",
+    "timezone": "1.0.5",
     "uglify-js": "~2.7.0",
     "vinyl-fs": "0.3.7",
     "webpack": "2.2.1",

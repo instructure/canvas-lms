@@ -1,7 +1,7 @@
 define [
   'compiled/util/fcUtil',
   'timezone'
-  'vendor/timezone/America/Denver'
+  'timezone/America/Denver'
 ], (fcUtil, tz, denver) ->
 
   QUnit.module "Calendar",

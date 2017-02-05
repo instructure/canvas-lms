@@ -14,15 +14,13 @@ require('babel-polyfill')
 
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
-const timezones = glob.sync('vendor/timezone/**/*.js', {cwd: 'public/javascripts'})
-const momentLocales = glob.sync('moment/locale/**/*.js', {cwd: 'node_modules'})
-const timezoneAndLocaleBundles = timezones.concat(momentLocales).reduce((memo, filename) =>
+const momentLocaleBundles = glob.sync('moment/locale/**/*.js', {cwd: 'node_modules'}).reduce((memo, filename) =>
   Object.assign(memo, {[filename.replace(/.js$/, '')]: filename})
 , {})
 
 // Put any custom moment locales here:
-timezoneAndLocaleBundles['moment/locale/mi-nz'] = 'custom_moment_locales/mi_nz.js'
-timezoneAndLocaleBundles['moment/locale/ht-ht'] = 'custom_moment_locales/ht_ht.js'
+momentLocaleBundles['moment/locale/mi-nz'] = 'custom_moment_locales/mi_nz.js'
+momentLocaleBundles['moment/locale/ht-ht'] = 'custom_moment_locales/ht_ht.js'
 
 module.exports = {
   // In prod build, don't attempt to continue if there are any errors.
@@ -34,7 +32,7 @@ module.exports = {
   entry: Object.assign({
     vendor: require('./modulesToIncludeInVendorBundle'),
     appBootstrap: 'jsx/appBootstrap'
-  }, bundleEntries, timezoneAndLocaleBundles),
+  }, bundleEntries, momentLocaleBundles),
 
   output: {
     path: path.join(__dirname, '../public', webpackPublicPath),
@@ -66,7 +64,7 @@ module.exports = {
 
       qtip: 'jquery.qtip',
       backbone: 'Backbone',
-      timezone: 'timezone_core',
+      timezone$: 'timezone_core',
     },
 
     modules: [
@@ -117,11 +115,6 @@ module.exports = {
       {
         test: /vendor\/i18n/,
         loaders: ['exports-loader?I18n']
-      },
-
-      {
-        test: /vendor\/timezone\//,
-        loaders: ['timezoneLoader']
       },
 
 
@@ -234,14 +227,7 @@ module.exports = {
 
     new WebpackHooks(),
 
-  ].concat(process.env.NODE_ENV === 'test' ? [
-
-    // in test mode, we do include all possible timezones in vendor/timezone/* into
-    // the main bundle (see timezone_core.js). There are a few files in that dir
-    // that are not js files, tell webpack to ignore them.
-    new webpack.IgnorePlugin(/(CHANGELOG|LICENSE|README|\.md|package.json)$/, /vendor\/timezone/)
-
-  ] : [
+  ].concat(process.env.NODE_ENV === 'test' ? [] : [
 
     // don't include any of the moment locales in the common bundle (otherwise it is huge!)
     // we load them explicitly onto the page in include_js_bundles from rails.
@@ -259,7 +245,7 @@ module.exports = {
       // ensures that no other module goes into the vendor chunk
       minChunks: Infinity
     }),
-    // gets moment and timezone setup before any app code runs
+    // gets moment locale setup before any app code runs
     new webpack.optimize.CommonsChunkPlugin({
       name: 'appBootstrap',
       children: true

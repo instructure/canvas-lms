@@ -4,7 +4,7 @@ define([
   'react-addons-test-utils',
   'underscore',
   'jsx/grading/GradingPeriodForm',
-  'vendor/timezone/America/Chicago',
+  'timezone/America/Chicago',
   'timezone',
   'helpers/fakeENV'
 ], (React, ReactDOM, {Simulate}, _, GradingPeriodForm, chicago, tz,

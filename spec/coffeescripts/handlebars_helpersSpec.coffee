@@ -5,9 +5,9 @@ define [
   'helpers/assertions'
   'helpers/fakeENV'
   'timezone'
-  'vendor/timezone/America/Detroit'
-  'vendor/timezone/America/Chicago'
-  'vendor/timezone/America/New_York'
+  'timezone/America/Detroit'
+  'timezone/America/Chicago'
+  'timezone/America/New_York'
 ], ({helpers}, $, _, {contains}, fakeENV, tz, detroit, chicago, newYork) ->
 
   QUnit.module 'handlebars_helpers'

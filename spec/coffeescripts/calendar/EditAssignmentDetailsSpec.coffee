@@ -3,8 +3,8 @@ define [
   'compiled/calendar/EditAssignmentDetails'
   'compiled/util/fcUtil'
   'timezone'
-  'vendor/timezone/America/Detroit'
-  'vendor/timezone/fr_FR'
+  'timezone/America/Detroit'
+  'timezone/fr_FR'
   'helpers/I18nStubber'
 ], ($, EditAssignmentDetails, fcUtil, tz, detroit, french, I18nStubber) ->
 

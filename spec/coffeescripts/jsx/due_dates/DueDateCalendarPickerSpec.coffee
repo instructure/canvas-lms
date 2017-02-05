@@ -6,7 +6,7 @@ define [
   'jquery'
   'jsx/due_dates/DueDateCalendarPicker'
   'timezone'
-  'vendor/timezone/fr_FR'
+  'timezone/fr_FR'
   'helpers/I18nStubber'
   'helpers/fakeENV'
 ], ( React, ReactDOM, { findRenderedDOMComponentWithTag }, _, $,

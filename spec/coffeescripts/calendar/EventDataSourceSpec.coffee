@@ -2,7 +2,7 @@ define [
   'compiled/calendar/EventDataSource'
   'compiled/util/fcUtil',
   'timezone'
-  'vendor/timezone/America/Denver'
+  'timezone/America/Denver'
 ], (EventDataSource, fcUtil, tz, denver) ->
 
   QUnit.module "EventDataSource: getEvents",

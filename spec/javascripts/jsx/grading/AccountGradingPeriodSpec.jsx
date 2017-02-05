@@ -7,7 +7,7 @@ define([
   'jsx/grading/AccountGradingPeriod',
   'helpers/fakeENV',
   'timezone',
-  'vendor/timezone/America/Chicago'
+  'timezone/America/Chicago'
 ], (React, ReactDOM, { Simulate }, axios, _, GradingPeriod, fakeENV, tz, chicago) => {
   const wrapper = document.getElementById('fixtures');
 

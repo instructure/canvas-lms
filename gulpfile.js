@@ -13,6 +13,9 @@ const STUFF_TO_REV = [
   'public/javascripts/vendor/ie11-polyfill.js',
   'public/javascripts/vendor/lato-fontfaceobserver.js',
 
+  // when using webpack, we put a script tag for these directly on the page out-of-band from webpack
+  'public/javascripts/vendor/timezone/**/*',
+
   // But for all other javascript, we only load stuff using js_bundle.
   // Meaning that we only include stuff in the "bundles" dir from rails.
   // In prod, the 'optimized' versions of these bundles will include all their deps
@@ -35,12 +38,7 @@ const STUFF_TO_REV = [
 
 
 gulp.task('rev', function(){
-  var stuffToRev = STUFF_TO_REV;
-  if(process.env.SKIP_JS_REV){
-    // just get fonts and images
-    stuffToRev = STUFF_TO_REV.slice(0,2)
-  }
-  gulp.src(stuffToRev, {
+  gulp.src(STUFF_TO_REV, {
     base: 'public', // tell it to use the 'public' folder as the base of all paths
     follow: true // follow symlinks, so it picks up on images inside plugins and stuff
   })
