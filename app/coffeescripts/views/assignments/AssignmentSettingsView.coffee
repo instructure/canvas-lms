@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'compiled/util/round'
   'underscore'
   'compiled/views/DialogFormView'
   'jst/EmptyDialogFormWrapper'
   'jst/assignments/AssignmentSettings'
-], (round, _, DialogFormView, wrapper, assignmentSettingsTemplate) ->
+], ($, round, _, DialogFormView, wrapper, assignmentSettingsTemplate) ->
 
   class AssignmentSettingsView extends DialogFormView
     template: assignmentSettingsTemplate
