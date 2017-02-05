@@ -48,5 +48,5 @@ require [
       @views[viewName].onShow()
       userSettings.contextSet 'gradebook_tab', viewName
 
-  @router = new GradebookRouter
+  router = new GradebookRouter
   Backbone.history.start()

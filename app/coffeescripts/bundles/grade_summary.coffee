@@ -44,5 +44,5 @@ require [
       router.navigate("#tab-#{tab}", {trigger: true})
       userSettings.contextSet('grade_summary_tab', tab)
 
-  @router = new GradebookSummaryRouter
+  router = new GradebookSummaryRouter
   Backbone.history.start()
