@@ -136,16 +136,25 @@ module Lti
         expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
         expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor'
         expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator'
-        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Learner'
-        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Instructor'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
         expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper'
-        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Observer'
-        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#TeachingAssistant'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership/instructor#TeachingAssistant'
       end
 
       it "returns none if no user for lis 2" do
         helper = SubstitutionsHelper.new(course, root_account, nil)
         expect(helper.all_roles('lis2')).to eq ['http://purl.imsglobal.org/vocab/lis/v2/person#None']
+      end
+
+      it "includes main and subrole for TeachingAssistant" do
+        subject.stubs(:course_enrollments).returns([TaEnrollment.new])
+        roles = subject.all_roles('lis2')
+        expected_roles = ["http://purl.imsglobal.org/vocab/lis/v2/membership/instructor#TeachingAssistant",
+                          "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
+                          "http://purl.imsglobal.org/vocab/lis/v2/system/person#User"]
+        expect(roles.split(',')).to match_array expected_roles
       end
     end
 
