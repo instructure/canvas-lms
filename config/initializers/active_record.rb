@@ -9,7 +9,7 @@ class ActiveRecord::Base
     delegate :distinct_on, :find_ids_in_batches, to: :all
 
     def find_ids_in_ranges(opts={}, &block)
-      opts.reverse_merge(:loose => true)
+      opts.reverse_merge!(:loose => true)
       all.find_ids_in_ranges(opts, &block)
     end
 
