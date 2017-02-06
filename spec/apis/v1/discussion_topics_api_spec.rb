@@ -639,6 +639,20 @@ describe DiscussionTopicsController, type: :request do
         expect(@topic).not_to be_locked
       end
 
+      it "should not update certain attributes for group discussions" do
+        group_category = @course.group_categories.create(:name => 'watup')
+        group = group_category.groups.create!(:name => "group1", :context => @course)
+        gtopic = create_topic(group, :title => "topic")
+
+        api_call(:put, "/api/v1/groups/#{group.id}/discussion_topics/#{gtopic.id}",
+          {:controller => "discussion_topics", :action => "update", :format => "json", :group_id => group.to_param, :topic_id => gtopic.to_param},
+          {:allow_rating => '1', :require_initial_post => '1'})
+
+        gtopic.reload
+        expect(gtopic.allow_rating).to be_truthy
+        expect(gtopic.require_initial_post).to_not be_truthy
+      end
+
       context "publishing" do
         it "should publish a draft state topic" do
           @topic.workflow_state = 'unpublished'

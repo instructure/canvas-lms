@@ -900,13 +900,16 @@ class DiscussionTopicsController < ApplicationController
   end
 
   API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at lock_at podcast_enabled
-                                podcast_has_student_posts require_initial_post is_announcement pinned
+                                podcast_has_student_posts require_initial_post pinned
                                 group_category_id allow_rating only_graders_can_rate sort_by_rating).freeze
+
+  API_ALLOWED_TOPIC_FIELDS_FOR_GROUP = %w(title message discussion_type podcast_enabled pinned
+                                allow_rating only_graders_can_rate sort_by_rating).freeze
+
 
   def process_discussion_topic(is_new = false)
     @errors = {}
-    discussion_topic_hash = params.permit(*API_ALLOWED_TOPIC_FIELDS)
-    model_type = value_to_boolean(discussion_topic_hash.delete(:is_announcement)) && @context.announcements.temp_record.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
+    model_type = value_to_boolean(params[:is_announcement]) && @context.announcements.temp_record.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
     if is_new
       @topic = @context.send(model_type).build
     else
@@ -914,6 +917,9 @@ class DiscussionTopicsController < ApplicationController
     end
 
     return unless authorized_action(@topic, @current_user, (is_new ? :create : :update))
+
+    allowed_fields = @context.is_a?(Group) ? API_ALLOWED_TOPIC_FIELDS_FOR_GROUP : API_ALLOWED_TOPIC_FIELDS
+    discussion_topic_hash = params.permit(*allowed_fields)
 
     prior_version = @topic.generate_prior_version
     process_podcast_parameters(discussion_topic_hash)
