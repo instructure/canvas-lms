@@ -53,8 +53,11 @@ define([
     gradingPeriods,
     userIsAdmin,
     multipleGradingPeriodsEnabled = true,
-    assignment = { dueDateRequired: function () { return false; } }
+    assignment = null,
+    dueDateRequiredForAccount = false
   }) {
+    ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = dueDateRequiredForAccount;
+
     const params = {
       date_range: {
         start_at: {
@@ -160,47 +163,39 @@ define([
     ok(isValid(validator));
   });
 
-  test('it is valid to have no due date when dueDateRequired is false', function () {
+  test('it is valid to have no due date when postToSISEnabled is false when dueDateRequiredForAccount is true', function () {
     const data = generateData({ due_at: null });
     const validator = createValidator({
       data,
       gradingPeriods: null,
       userIsAdmin: false,
       multipleGradingPeriodsEnabled: false,
-      assignment: { dueDateRequired: function () { return false; } }});
+      assignment: { postToSISEnabled: function () { return false; } },
+      dueDateRequiredForAccount: true });
     ok(isValid(validator));
   });
 
-  test('it is valid to have a due date when dueDateRequired is false', function () {
-    const data = generateData({ due_at: DATE_IN_OPEN_PERIOD });
-    const validator = createValidator({
-      data,
-      gradingPeriods: null,
-      userIsAdmin: false,
-      multipleGradingPeriodsEnabled: false,
-      assignment: { dueDateRequired: function () { return false; } }});
-    ok(isValid(validator));
-  });
-
-  test('it is valid to have a due date when dueDateRequired is true', function () {
-    const data = generateData({ due_at: DATE_IN_OPEN_PERIOD });
-    const validator = createValidator({
-      data,
-      gradingPeriods: null,
-      userIsAdmin: false,
-      multipleGradingPeriodsEnabled: false,
-      assignment: { dueDateRequired: function () { return true; } }});
-    ok(isValid(validator));
-  });
-
-  test('it is not valid to have a missing due date when dueDateRequired is true', function () {
+  test('it is not valid to have a missing due date when postToSISEnabled is true when dueDateRequiredForAccount is true', function () {
     const data = generateData({ due_at: null });
     const validator = createValidator({
       data,
       gradingPeriods: null,
       userIsAdmin: false,
       multipleGradingPeriodsEnabled: false,
-      assignment: { dueDateRequired: function () { return true; } }});
+      assignment: { postToSISEnabled: function () { return true; } },
+      dueDateRequiredForAccount: true });
     notOk(isValid(validator));
+  });
+
+  test('it is valid to have a missing due date when postToSISEnabled is true and dueDateRequiredForAccount is false', function () {
+    const data = generateData({ due_at: null });
+    const validator = createValidator({
+      data,
+      gradingPeriods: null,
+      userIsAdmin: false,
+      multipleGradingPeriodsEnabled: false,
+      assignment: { postToSISEnabled: function () { return true; } },
+      dueDateRequiredForAccount: false });
+    ok(isValid(validator));
   });
 });

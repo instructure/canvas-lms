@@ -177,7 +177,7 @@ describe 'creating a quiz' do
         f('.new-quiz-link').click
         wait_for_ajaximations
       end
-      expect(is_checked('#assignment_post_to_sis')).to be_truthy
+      expect(is_checked('#quiz_post_to_sis')).to be_truthy
     end
 
     it "should not default to post grades if account setting is not enabled" do
@@ -186,7 +186,7 @@ describe 'creating a quiz' do
         f('.new-quiz-link').click
         wait_for_ajaximations
       end
-      expect(is_checked('#assignment_post_to_sis')).to be_falsey
+      expect(is_checked('#quiz_post_to_sis')).to be_falsey
     end
   end
 end

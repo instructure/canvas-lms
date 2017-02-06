@@ -34,7 +34,8 @@ define [
       @gradingPeriods = params.gradingPeriods
       @userIsAdmin = params.userIsAdmin
 
-      @assignment = params.assignment || { dueDateRequired: -> false }
+      assignment = params.assignment || { postToSISEnabled: -> false }
+      @dueDateRequired = assignment.postToSISEnabled() && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
 
     validateDatetimes: ->
       lockAt = @data.lock_at
@@ -74,10 +75,10 @@ define [
           type: "due"
         }
 
-      if @assignment.dueDateRequired()
+      if @dueDateRequired
         datetimesToValidate.push {
           date: dueAt,
-          dueDateRequired: true,
+          dueDateRequired: @dueDateRequired,
         }
 
       if @multipleGradingPeriodsEnabled && !@userIsAdmin && @data.persisted == false

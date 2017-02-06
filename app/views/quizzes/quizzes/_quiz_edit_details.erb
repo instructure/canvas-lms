@@ -56,7 +56,7 @@
 
             <% if Assignment.sis_grade_export_enabled?(@context) %>
               <label class="checkbox" id=post_to_sis_option>
-                <%= check_box :assignment, :post_to_sis, :checked => @quiz.assignment ? @quiz.assignment.post_to_sis : @context.account.sis_default_grade_export[:value] %>
+                <%= check_box :quiz, :post_to_sis, :checked => @quiz.assignment ? @quiz.assignment.post_to_sis : @context.account.sis_default_grade_export[:value] %>
                 <%= t("Post Grades to SIS") %>
               </label>
             <% end %>
