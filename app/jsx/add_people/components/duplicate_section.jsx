@@ -19,8 +19,12 @@ define([
       duplicates: React.PropTypes.shape(shapes.duplicateSetShape).isRequired,
       onSelectDuplicate: React.PropTypes.func.isRequired,
       onNewForDuplicate: React.PropTypes.func.isRequired,
-      onSkipDuplicate: React.PropTypes.func.isRequired
+      onSkipDuplicate: React.PropTypes.func.isRequired,
+      inviteUsersURL: React.PropTypes.string
     };
+    static defaultProps = {
+      inviteUsersURL: undefined
+    }
 
     // event handlers ----------------------------------------
     // user has selected a user from the list of duplicates
@@ -102,71 +106,72 @@ define([
           </tr>
         )
       });
-      // next, add a row for creating a new user for this login id
-      if (duplicateSet.createNew) {
-        // render the row as an editor
-        rows.push(
-          <tr key={duplicateSet.address + CREATE_NEW}>
-            <td>
-              <RadioInput
-                value={CREATE_NEW}
-                name={duplicateSet.address}
-                onChange={eatEvent}
-                checked
-                label={<ScreenReaderContent>{I18n.t('Click to create a new user for %{address}',
-                                                {address: duplicateSet.address})}</ScreenReaderContent>}
-              />
-            </td>
-            <td>
-              <TextInput
-                required
-                name="name"
-                type="text"
-                placeholder={nameLabel}
-                label={<ScreenReaderContent>{nameLabel}</ScreenReaderContent>}
-                value={duplicateSet.newUserInfo.name}
-                onChange={this.onNewForDuplicateChange}
-              />
-            </td>
-            <td>
-              <TextInput
-                required
-                name="email"
-                type="email"
-                placeholder={emailLabel}
-                label={<ScreenReaderContent>{emailLabel}</ScreenReaderContent>}
-                value={duplicateSet.newUserInfo.email}
-                onChange={this.onNewForDuplicateChange}
-              />
-            </td>
-            <td colSpan="3" />
-          </tr>
-        );
-      } else {
-        // render the row as a hint to the user
-
-        rows.push(
-          <tr key={duplicateSet.address + CREATE_NEW} >
-            <td>
-              <RadioInput
-                value={CREATE_NEW} name={duplicateSet.address} onChange={this.onSelectNewForDuplicate} checked={false}
-                label={<ScreenReaderContent>{I18n.t('Click to create a new user for %{login}',
-                                                  {login: duplicateSet.address})}</ScreenReaderContent>}
-              />
-            </td>
-            <td colSpan="5" >
-              <Link
-                onClick={this.onSelectNewForDuplicate}
-              >
-                {I18n.t('Create a new user for "%{address}"', {address: duplicateSet.address})}
-              </Link>
-            </td>
-          </tr>
-        );
+      if (this.props.inviteUsersURL) {
+        // next, add a row for creating a new user for this login id
+        if (duplicateSet.createNew) {
+          // render the row as an editor
+          rows.push(
+            <tr key={duplicateSet.address + CREATE_NEW} className="create-new">
+              <td>
+                <RadioInput
+                  value={CREATE_NEW}
+                  name={duplicateSet.address}
+                  onChange={eatEvent}
+                  checked
+                  label={<ScreenReaderContent>{I18n.t('Click to create a new user for %{address}',
+                                                  {address: duplicateSet.address})}</ScreenReaderContent>}
+                />
+              </td>
+              <td>
+                <TextInput
+                  required
+                  name="name"
+                  type="text"
+                  placeholder={nameLabel}
+                  label={<ScreenReaderContent>{nameLabel}</ScreenReaderContent>}
+                  value={duplicateSet.newUserInfo.name}
+                  onChange={this.onNewForDuplicateChange}
+                />
+              </td>
+              <td>
+                <TextInput
+                  required
+                  name="email"
+                  type="email"
+                  placeholder={emailLabel}
+                  label={<ScreenReaderContent>{emailLabel}</ScreenReaderContent>}
+                  value={duplicateSet.newUserInfo.email}
+                  onChange={this.onNewForDuplicateChange}
+                />
+              </td>
+              <td colSpan="3" />
+            </tr>
+          );
+        } else {
+          // render the row as a hint to the user
+          rows.push(
+            <tr key={duplicateSet.address + CREATE_NEW} className="create-new" >
+              <td>
+                <RadioInput
+                  value={CREATE_NEW} name={duplicateSet.address} onChange={this.onSelectNewForDuplicate} checked={false}
+                  label={<ScreenReaderContent>{I18n.t('Click to create a new user for %{login}',
+                                                    {login: duplicateSet.address})}</ScreenReaderContent>}
+                />
+              </td>
+              <td colSpan="5" >
+                <Link
+                  onClick={this.onSelectNewForDuplicate}
+                >
+                  {I18n.t('Create a new user for "%{address}"', {address: duplicateSet.address})}
+                </Link>
+              </td>
+            </tr>
+          );
+        }
       }
       // finally, the skip this user row
       rows.push(
-        <tr key={duplicateSet.address + SKIP}>
+        <tr key={duplicateSet.address + SKIP} className="skip-addr">
           <td>
             <RadioInput
               value={SKIP} name={duplicateSet.address} onChange={this.onSkipDuplicate} checked={duplicateSet.skip}

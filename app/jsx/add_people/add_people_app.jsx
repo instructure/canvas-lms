@@ -29,7 +29,8 @@ define([
           courseId: props.courseId || 0,
           defaultInstitutionName: props.defaultInstitutionName || '',
           roles: props.roles || [],
-          sections
+          sections,
+          inviteUsersURL: props.inviteUsersURL
         },
         inputParams: {
           searchType: defaultState.inputParams.searchType,

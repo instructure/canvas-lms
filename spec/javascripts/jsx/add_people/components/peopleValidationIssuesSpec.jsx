@@ -64,12 +64,17 @@ define([
     addr4: {address: 'addr4', type: 'unique_id', createNew: true, newUserInfo: {name: 'the name2', email: 'email2'}}
   }
   const noop = function () {};
+  const inviteUsersURL = '/courses/#/invite_users';
 
   test('renders the component', () => {
     const component = TestUtils.renderIntoDocument(
       <PeopleValidationIssues
-        duplicates={duplicates} missing={missing} searchType="unique_id"
-        onChangeDuplicate={noop} onChangeMissing={noop}
+        duplicates={duplicates}
+        missing={missing}
+        searchType="unique_id"
+        inviteUsersURL={inviteUsersURL}
+        onChangeDuplicate={noop}
+        onChangeMissing={noop}
       />
     );
     const peopleValidationIssues = TestUtils.findRenderedDOMComponentWithClass(component, 'addpeople__peoplevalidationissues');

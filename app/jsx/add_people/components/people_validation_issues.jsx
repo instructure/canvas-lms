@@ -9,10 +9,14 @@ define([
   class PeopleValidationIssues extends React.Component {
     static propTypes = {
       searchType: React.PropTypes.string.isRequired,
+      inviteUsersURL: React.PropTypes.string,
       duplicates: React.PropTypes.shape(shapes.duplicatesShape),
       missing: React.PropTypes.shape(shapes.missingsShape),
       onChangeDuplicate: React.PropTypes.func.isRequired,
       onChangeMissing: React.PropTypes.func.isRequired
+    };
+    static defaultProps = {
+      inviteUsersURL: undefined
     };
 
     static defaultProps = {
@@ -79,6 +83,7 @@ define([
             return (
               <DuplicateSection
                 key={`dupe_${address}`}
+                inviteUsersURL={this.props.inviteUsersURL}
                 duplicates={dupeSet}
                 onSelectDuplicate={this.onSelectDuplicate}
                 onNewForDuplicate={this.onNewForDuplicate}
@@ -95,13 +100,15 @@ define([
       if (!missingAddresses || missingAddresses.length === 0) {
         return null;
       }
-      const alertText = this.props.searchType === 'unique_id'
-          ? I18n.t('We were unable to find matches for the logins below. Select which you would like to be created as new users.')
-          : I18n.t('Unable to find matches for these email addresses in your institution. Select those you would like to create as new users. Unselected will be skipped.'); // eslint-disable-line max-len
+      const alertText = this.props.inviteUsersURL
+        ? I18n.t('We were unable to find matches below. Select any you would like to create as new users. Unselected will be skipped at this time.')
+        : I18n.t('We were unable to find matches below.');
+
       return (
         <div className="peoplevalidationissues__missing">
           <Alert variant="warning" isDismissable={false}>{alertText}</Alert>
           <MissingPeopleSection
+            inviteUsersURL={this.props.inviteUsersURL}
             missing={this.props.missing}
             searchType={this.props.searchType}
             onChange={this.onNewForMissing}

@@ -71,8 +71,8 @@ define([
     renderComponent({nameList: []});
     const peopleReadyList = domNode.querySelector('.addpeople__peoplereadylist');
 
-    const tbls = peopleReadyList.querySelectorAll('table');
-    equal(tbls.length, 0, 'no tables');
+    const tbls = peopleReadyList.querySelector('table');
+    equal(tbls, null, 'no tables');
 
     equal(peopleReadyList.innerText, 'No users were selected to add to the course');
   })

@@ -43,7 +43,7 @@ define [
         roles: ((ENV.ALL_ROLES || []).filter (role) -> role.manageable_by_user),
         sections: ENV.SECTIONS || [],
         onClose: @fetchOnCreateUsersClose,
-        theme: if ENV.use_high_contrast then 'a11y' else 'canvas'
+        inviteUsersURL: ENV.INVITE_USERS_URL
       })
 
     attach: ->

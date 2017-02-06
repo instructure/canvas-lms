@@ -3,7 +3,8 @@ define([], () => {
     courseParams: {
       courseId: 1,
       roles: [{id: 1}, {id: 2}, {id: 3}],
-      sections: [{id: 1}, {id: 2}, {id: 3}]
+      sections: [{id: 1}, {id: 2}, {id: 3}],
+      inviteUsersURL: '/courses/#/invite_users'
     },
     inputParams: {
       searchType: 'unique_id',
