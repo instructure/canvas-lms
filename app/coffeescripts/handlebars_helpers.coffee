@@ -116,7 +116,7 @@ define [
     # timezone preference. expects: anything tz() can handle
     dateString : (datetime) ->
       return '' unless datetime
-      tz.format(datetime, '%m/%d/%Y')
+      I18n.l "date.formats.medium", datetime
 
     # Convert the total amount of minutes into a Hours:Minutes format.
     minutesToHM : (minutes) ->
