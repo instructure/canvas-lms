@@ -519,7 +519,9 @@ END
       display_name: -> { I18n.t('Modules Home Page') },
       description: -> { I18n.t('Default to modules for the course home page') },
       applies_to: "RootAccount",
+      state: "hidden",
       beta: true,
+      development: true,
     },
   )
 
