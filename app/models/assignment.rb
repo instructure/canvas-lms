@@ -1636,7 +1636,8 @@ class Assignment < ActiveRecord::Base
     enrollment_priority = { 'active' => 1, 'inactive' => 2 }
     enrollment_priority.default = 100
 
-    reps_and_others = groups_and_ungrouped(user, includes: includes).map do |group_name, group_students|
+    reps_and_others = groups_and_ungrouped(user, includes: includes).map do |group_name, group_info|
+      group_students = group_info[:users]
       visible_group_students =
         group_students & visible_students_for_speed_grader(user, includes: includes)
 
@@ -1652,7 +1653,7 @@ class Assignment < ActiveRecord::Base
 
       representative.readonly!
       representative.name = group_name
-      representative.sortable_name = group_name
+      representative.sortable_name = group_info[:sortable_name]
       representative.short_name = group_name
 
       [representative, others]
@@ -1663,16 +1664,19 @@ class Assignment < ActiveRecord::Base
     if block_given?
       sorted_reps_with_others.each { |r,o| yield r, o }
     end
-    sorted_reps_with_others.map &:first
+    sorted_reps_with_others.map(&:first)
   end
 
   def groups_and_ungrouped(user, includes: [])
     groups_and_users = group_category.
       groups.active.preload(group_memberships: :user).
-      map { |g| [g.name, g.users] }
-    users_in_group = groups_and_users.flat_map { |_,users| users }
+      map { |g| [g.name, { sortable_name: g.name, users: g.users}] }
+    users_in_group = groups_and_users.flat_map { |_, group_info| group_info[:users] }
     groupless_users = visible_students_for_speed_grader(user, includes: includes) - users_in_group
-    phony_groups = groupless_users.map { |u| [u.name, [u]] }
+    phony_groups = groupless_users.map do |u|
+      sortable_name = users_in_group.empty? ? u.sortable_name : u.name
+      [u.name, { sortable_name: sortable_name, users: [u] }]
+    end
     groups_and_users + phony_groups
   end
   private :groups_and_ungrouped

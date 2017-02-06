@@ -17,11 +17,12 @@
 #
 
 require_relative '../sharding_spec_helper'
+require_relative '../selenium/helpers/groups_common'
 
 describe Assignment do
   before :once do
     course_with_teacher(active_all: true)
-    student_in_course(active_all: true, user_name: 'a student')
+    @initial_student = student_in_course(active_all: true, user_name: 'a student').user
   end
 
   it "should create a new instance given valid attributes" do
@@ -134,6 +135,182 @@ describe Assignment do
     @assignment.tool_settings_tool = message_handler
     @assignment.save
     expect(@assignment.tool_settings_tool).to eq(message_handler)
+  end
+
+  describe "#representatives" do
+    context "individual students" do
+      it "sorts by sortable_name" do
+        student_one = student_in_course(
+          active_all: true, name: 'Frodo Bravo', sortable_name: 'Bravo, Frodo'
+        ).user
+        student_two = student_in_course(
+          active_all: true, name: 'Alfred Charlie', sortable_name: 'Charlie, Alfred'
+        ).user
+        student_three = student_in_course(
+          active_all: true, name: 'Beauregard Alpha', sortable_name: 'Alpha, Beauregard'
+        ).user
+
+        expect(User).to receive(:best_unicode_collation_key).with('sortable_name').and_call_original
+
+        assignment = @course.assignments.create!(assignment_valid_attributes)
+        representatives = assignment.representatives(@teacher)
+
+        expect(representatives[0].name).to eql(student_three.name)
+        expect(representatives[1].name).to eql(student_one.name)
+        expect(representatives[2].name).to eql(student_two.name)
+      end
+    end
+
+    context "group assignments with all students assigned to a group" do
+      include GroupsCommon
+      it "sorts by group name" do
+        student_one = student_in_course(
+          active_all: true, name: 'Frodo Bravo', sortable_name: 'Bravo, Frodo'
+        ).user
+        student_two = student_in_course(
+          active_all: true, name: 'Alfred Charlie', sortable_name: 'Charlie, Alfred'
+        ).user
+        student_three = student_in_course(
+          active_all: true, name: 'Beauregard Alpha', sortable_name: 'Alpha, Beauregard'
+        ).user
+
+        group_category = @course.group_categories.create!(name: "Test Group Set")
+        group_one = @course.groups.create!(name: "Group B", group_category: group_category)
+        group_two = @course.groups.create!(name: "Group A", group_category: group_category)
+        group_three = @course.groups.create!(name: "Group C", group_category: group_category)
+
+        add_user_to_group(student_one, group_one, true)
+        add_user_to_group(student_two, group_two, true)
+        add_user_to_group(student_three, group_three, true)
+        add_user_to_group(@initial_student, group_three, true)
+
+        assignment = @course.assignments.create!(
+          assignment_valid_attributes.merge(
+            group_category: group_category,
+            grade_group_students_individually: false
+          )
+        )
+
+        expect(Canvas::ICU).to receive(:collate_by).and_call_original
+
+        representatives = assignment.representatives(@teacher)
+
+        expect(representatives[0].name).to eql(group_two.name)
+        expect(representatives[1].name).to eql(group_one.name)
+        expect(representatives[2].name).to eql(group_three.name)
+      end
+    end
+
+    context "group assignments with no students assigned to a group" do
+      it "sorts by sortable_name" do
+        student_one = student_in_course(
+          active_all: true, name: 'Frodo Bravo', sortable_name: 'Bravo, Frodo'
+        ).user
+        student_two = student_in_course(
+          active_all: true, name: 'Alfred Charlie', sortable_name: 'Charlie, Alfred'
+        ).user
+        student_three = student_in_course(
+          active_all: true, name: 'Beauregard Alpha', sortable_name: 'Alpha, Beauregard'
+        ).user
+
+        group_category = @course.group_categories.create!(name: "Test Group Set")
+
+        assignment = @course.assignments.create!(
+          assignment_valid_attributes.merge(
+            group_category: group_category,
+            grade_group_students_individually: false
+          )
+        )
+
+        expect(Canvas::ICU).to receive(:collate_by).and_call_original
+
+        representatives = assignment.representatives(@teacher)
+
+        expect(representatives[0].name).to eql(student_three.name)
+        expect(representatives[1].name).to eql(student_one.name)
+        expect(representatives[2].name).to eql(student_two.name)
+        expect(representatives[3].name).to eql(@initial_student.name)
+      end
+    end
+
+    context "group assignments with some students assigned to a group and some not" do
+      include GroupsCommon
+      it "sorts by student name and group name" do
+        student_one = student_in_course(
+          active_all: true, name: 'Frodo Bravo', sortable_name: 'Bravo, Frodo'
+        ).user
+        student_two = student_in_course(
+          active_all: true, name: 'Alfred Charlie', sortable_name: 'Charlie, Alfred'
+        ).user
+        student_three = student_in_course(
+          active_all: true, name: 'Beauregard Alpha', sortable_name: 'Alpha, Beauregard'
+        ).user
+
+        group_category = @course.group_categories.create!(name: "Test Group Set")
+        group_one = @course.groups.create!(name: "Group B", group_category: group_category)
+        group_two = @course.groups.create!(name: "Group A", group_category: group_category)
+
+        add_user_to_group(student_one, group_one, true)
+        add_user_to_group(student_two, group_two, true)
+
+        assignment = @course.assignments.create!(
+          assignment_valid_attributes.merge(
+            group_category: group_category,
+            grade_group_students_individually: false
+          )
+        )
+
+        expect(Canvas::ICU).to receive(:collate_by).and_call_original
+
+        representatives = assignment.representatives(@teacher)
+
+        expect(representatives[0].name).to eql(student_three.name)
+        expect(representatives[1].name).to eql(group_two.name)
+        expect(representatives[2].name).to eql(group_one.name)
+        expect(representatives[3].name).to eql(@initial_student.name)
+      end
+    end
+  end
+
+  context "group assignments with all students assigned to a group and grade_group_students_individually set to true" do
+    include GroupsCommon
+    it "sorts by sortable_name" do
+      student_one = student_in_course(
+        active_all: true, name: 'Frodo Bravo', sortable_name: 'Bravo, Frodo'
+      ).user
+      student_two = student_in_course(
+        active_all: true, name: 'Alfred Charlie', sortable_name: 'Charlie, Alfred'
+      ).user
+      student_three = student_in_course(
+        active_all: true, name: 'Beauregard Alpha', sortable_name: 'Alpha, Beauregard'
+      ).user
+
+      group_category = @course.group_categories.create!(name: "Test Group Set")
+      group_one = @course.groups.create!(name: "Group B", group_category: group_category)
+      group_two = @course.groups.create!(name: "Group A", group_category: group_category)
+      group_three = @course.groups.create!(name: "Group C", group_category: group_category)
+
+      add_user_to_group(student_one, group_one, true)
+      add_user_to_group(student_two, group_two, true)
+      add_user_to_group(student_three, group_three, true)
+      add_user_to_group(@initial_student, group_three, true)
+
+      assignment = @course.assignments.create!(
+        assignment_valid_attributes.merge(
+          group_category: group_category,
+          grade_group_students_individually: true
+        )
+      )
+
+      expect(User).to receive(:best_unicode_collation_key).with('sortable_name').and_call_original
+
+      representatives = assignment.representatives(@teacher)
+
+      expect(representatives[0].name).to eql(student_three.name)
+      expect(representatives[1].name).to eql(student_one.name)
+      expect(representatives[2].name).to eql(student_two.name)
+      expect(representatives[3].name).to eql(@initial_student.name)
+    end
   end
 
   describe "#has_student_submissions?" do
