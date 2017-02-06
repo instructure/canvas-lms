@@ -117,7 +117,7 @@ class PeerReviewsApiController < ApplicationController
     end
   end
 
-  # @API Create Peer Review
+  # @API Delete Peer Review
   # Delete a peer review for the assignment
   #
   # @argument user_id [Required, Integer]
