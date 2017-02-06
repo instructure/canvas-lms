@@ -101,18 +101,13 @@ module QuizzesCommon
 
   def add_quiz_question(points)
     click_questions_tab
-    @points_total += points.to_i
-    @question_count += 1
     click_new_question_button
     wait_for_ajaximations
     question = fj('.question_form:visible')
     replace_content(question.find_element(:css, "input[name='question_points']"), points)
     submit_form(question)
     wait_for_ajaximations
-    questions = ffj(".question_holder:visible")
-    expect(questions.length).to eq @question_count
     click_settings_tab
-    expect(f(".points_possible").text).to eq @points_total.to_s
   end
 
   def quiz_with_multiple_type_questions(goto_edit=true)
