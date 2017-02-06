@@ -375,6 +375,13 @@ describe CoursesController, type: :request do
     expect(courses.length).to eq 2
   end
 
+  it "returns course list in id sort order", priority: "2", test_id: 3058053 do
+    json = api_call(:get, "/api/v1/courses.json",
+    {controller: 'courses', action: 'index', format: 'json'})
+    course_ids = json.map{ |c| c["id"]}
+    expect(course_ids).to eq course_ids.sort
+  end
+
   describe "user index" do
     specs_require_sharding
     before :once do
