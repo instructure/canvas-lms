@@ -263,7 +263,7 @@ class SubmissionsController < ApplicationController
         log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
         format.html do
           flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
-          redirect_to course_assignment_url(@context, @assignment)
+          redirect_to course_assignment_url(@context, @assignment, :module_item_id => params[:module_item_id])
         end
         format.json do
           if api_request?

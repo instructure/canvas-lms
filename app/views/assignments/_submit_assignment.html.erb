@@ -44,6 +44,9 @@
     </ul>
     <% if @assignment.submission_types && @assignment.submission_types.match(/online_upload/) %>
     <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_upload_form", :class => "submit_assignment_form", :multipart => true }) do %>
+    <% if params[:module_item_id] %>
+      <input type="hidden" name="module_item_id" value="<%= params[:module_item_id] %>" />
+    <% end %>
     <%= hidden_field :submission, :submission_type, :value => "online_upload" %>
     <%= hidden_field :submission, :attachment_ids, :value => "", :id => "submission_attachment_ids" %>
     <table class="formtable" style="width: 100%;">
@@ -106,6 +109,9 @@
 
     <% if @assignment.submission_types && @assignment.submission_types.match(/online_text_entry/) %>
     <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_text_entry_form", :class => "submit_assignment_form"}) do %>
+    <% if params[:module_item_id] %>
+      <input type="hidden" name="module_item_id" value="<%= params[:module_item_id] %>" />
+    <% end %>
     <%= hidden_field :submission, :submission_type, :value => "online_text_entry" %>
     <table class="formtable" style="width: 100%;">
       <tr>
@@ -142,6 +148,9 @@
 
     <% if @assignment.submission_types && @assignment.submission_types.match(/online_url/) %>
     <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_url_form", :class => "submit_assignment_form"}) do %>
+    <% if params[:module_item_id] %>
+      <input type="hidden" name="module_item_id" value="<%= params[:module_item_id] %>" />
+    <% end %>
     <%= hidden_field :submission, :submission_type, :value => "online_url" %>
     <table class="formtable" style="width: 100%;">
       <tr>
@@ -226,6 +235,9 @@
             </div>
          <% else %>
           <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_google_doc_form", :class => "submit_assignment_form"}) do %>
+            <% if params[:module_item_id] %>
+              <input type="hidden" name="module_item_id" value="<%= params[:module_item_id] %>" />
+            <% end %>
             <%= hidden_field :submission, :submission_type, :value => "google_doc" %>
             <%= hidden_field :google_doc, :document_id, :value => "", :class => "google_doc_id" %>
             <table class="formtable" style="width: 100%;">
@@ -286,6 +298,9 @@
         </div>
       <% else %>
         <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_media_recording_form", :class => "submit_assignment_form", :multipart => true }) do %>
+        <% if params[:module_item_id] %>
+          <input type="hidden" name="module_item_id" value="<%= params[:module_item_id] %>" />
+        <% end %>
         <%= hidden_field :submission, :submission_type, :value => "media_recording" %>
         <%= hidden_field :submission, :media_comment_id, :value => "", :class => "media_comment_id" %>
         <%= hidden_field :submission, :media_comment_type, :value => "video" %>
@@ -340,6 +355,9 @@
 
     <% if @external_tools.length > 3 %>
       <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_from_external_tool_form", :class => "submit_assignment_form" }) do %>
+        <% if params[:module_item_id] %>
+          <input type="hidden" name="module_item_id" value="<%= params[:module_item_id] %>" />
+        <% end %>
         <%= hidden_field :submission, :submission_type, :value => "online_url", :id => 'external_tool_submission_type' %>
         <%= hidden_field :submission, :filename, :id => 'external_tool_filename' %>
         <%= hidden_field :submission, :attachment_ids, :id => 'external_tool_file_id' %>
