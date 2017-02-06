@@ -498,7 +498,7 @@ shared_examples_for "file uploads api with quotas" do
 
     json = api_call(:get, status_url, {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
     expect(json['upload_status']).to eq 'errored'
-    expect(json['message']).to eq "file size exceeds quota limits: #{2.megabytes} bytes"
+    expect(json['message']).to eq "file size exceeds quota limits: #{ActiveSupport::NumberHelper.number_to_delimited(2.megabytes)} bytes"
     expect(attachment.file_state).to eq 'deleted'
   end
 end
