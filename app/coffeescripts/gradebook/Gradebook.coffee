@@ -884,7 +884,7 @@ define [
     # conjunction with a click listener on <body />. When we 'blur' the grid
     # by clicking outside of it, save the current field.
     onGridBlur: (e) =>
-      if e.target.className.match(/cell|slick/) or !@grid.getActiveCell
+      if e.target.className.match?(/cell|slick/) or !@grid.getActiveCell
         return
 
       if e.target.className is 'grade' and @grid.getCellEditor() instanceof SubmissionCell.out_of

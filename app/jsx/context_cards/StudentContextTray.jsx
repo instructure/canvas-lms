@@ -33,14 +33,9 @@ define([
         React.PropTypes.string,
         React.PropTypes.number
       ]),
-      isOpen: React.PropTypes.bool,
       store: React.PropTypes.instanceOf(StudentCardStore),
       onClose: React.PropTypes.func,
-      isLoading: React.PropTypes.bool
-    }
-
-    static defaultProps = {
-      isOpen: false
+      returnFocusTo: React.PropTypes.func.isRequired
     }
 
     static renderQuickLink (label, url, showIf) {
@@ -61,8 +56,8 @@ define([
       this.state = {
         analytics: {},
         course: {},
-        isLoading: this.props.isLoading,
-        isOpen: this.props.isOpen,
+        isLoading: this.props.store.isLoading,
+        isOpen: true,
         messageFormOpen: false,
         permissions: {},
         submissions: [],
@@ -78,11 +73,17 @@ define([
       this.props.store.onChange = this.onChange
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps (nextProps) {
       if (nextProps.store !== this.props.store) {
         this.props.store.onChange = null
         nextProps.store.onChange = this.onChange
-        this.setState({isLoading: true})
+        const newState = {
+          isLoading: true
+        };
+        if (!this.state.isOpen) {
+          newState.isOpen = true
+        }
+        this.setState(newState)
       }
     }
 
@@ -90,7 +91,7 @@ define([
      * Handlers
      */
 
-    onChange = (e) => {
+    onChange = () => {
       const {store} = this.props;
       this.setState({
         analytics: store.state.analytics,
@@ -99,7 +100,17 @@ define([
         permissions: store.state.permissions,
         submissions: store.state.submissions,
         user: store.state.user
+      }, () => {
+        if (!store.state.loading && this.state.isOpen) {
+          if (this.closeButtonRef) {
+            this.closeButtonRef.focus()
+          }
+        }
       })
+    }
+
+    getCloseButtonRef = (ref) => {
+      this.closeButtonRef = ref
     }
 
     handleRequestClose = (e) => {
@@ -107,6 +118,14 @@ define([
       this.setState({
         isOpen: false
       })
+      if (this.props.returnFocusTo) {
+        const focusableItems = this.props.returnFocusTo();
+        // Because of the way native focus calls return undefined, all focus
+        // objects should be wrapped in something that will return truthy like
+        // jQuery wrappers do... and it should be able to check visibility like a
+        // jQuery wrapper... so just use jQuery.
+        focusableItems.some($itemToFocus => $itemToFocus.is(':visible') && $itemToFocus.focus())
+      }
     }
 
     handleMessageButtonClick = (e) => {
@@ -176,6 +195,7 @@ define([
             label={I18n.t('Student Details')}
             isDismissable={!this.state.isLoading}
             closeButtonLabel={I18n.t('Close')}
+            closeButtonRef={this.getCloseButtonRef}
             isOpen={this.state.isOpen}
             onRequestClose={this.handleRequestClose}
             placement='right'
