@@ -4,11 +4,12 @@ define [
   'underscore'
   'helpers/assertions'
   'helpers/fakeENV'
+  'jsx/shared/helpers/numberFormat'
   'timezone'
   'timezone/America/Detroit'
   'timezone/America/Chicago'
   'timezone/America/New_York'
-], ({helpers}, $, _, {contains}, fakeENV, tz, detroit, chicago, newYork) ->
+], ({helpers}, $, _, {contains}, fakeENV, numberFormat, tz, detroit, chicago, newYork) ->
 
   QUnit.module 'handlebars_helpers'
 
@@ -266,3 +267,13 @@ define [
     equal helpers.n(num, hash: {precision, percentage}), @ret
     ok I18n.n.calledWithMatch(num, {precision, percentage})
 
+  QUnit.module 'i18n number format helper',
+    setup: ->
+      @ret = '2,34'
+      @stub(numberFormat, 'outcomeScore').returns(@ret)
+
+  test 'proxies to numberFormat', ->
+    num = 2.34
+    format = 'outcomeScore'
+    equal helpers.nf(num, hash: {format}), @ret
+    ok numberFormat.outcomeScore.calledWithMatch(num)
