@@ -52,9 +52,6 @@
 
   <% js_bundle :take_quiz %>
 
-<% if params[:module_item_id] %>
-  <input type="hidden" name="module_item_id" value="<%= params[:module_item_id] %>" />
-<% end %>
 <div id="questions" class="assessing">
   <input type="hidden" name="attempt" value="<%= @submission.attempt %>"/>
   <% if @submission.validation_token.present? %>
@@ -73,6 +70,9 @@
     <span class="time_left"><%= @submission.time_left %></span>
   </div>
   <%= form_tag @quiz_presenter.form_action(session, @current_user), :id => "submit_quiz_form", :class => @quiz_presenter.form_class, :method => "post" do %>
+    <% if params[:module_item_id] %>
+      <input type="hidden" name="module_item_id" value="<%= params[:module_item_id] %>" />
+    <% end %>
 
   <div id="questions" class="assessing">
     <input type="hidden" name="attempt" value="<%= @submission.attempt %>"/>
