@@ -73,6 +73,7 @@ module CanvasSanitize #:nodoc:
     value
   end
 
+  DEFAULT_PROTOCOLS = ['http', 'https', :relative].freeze
   SANITIZE = {
       :elements => [
           'a', 'b', 'blockquote', 'br', 'caption', 'cite', 'code', 'col',
@@ -258,15 +259,58 @@ module CanvasSanitize #:nodoc:
       }.freeze,
 
       :protocols => {
-          'a' => {'href' => ['ftp', 'http', 'https', 'mailto',
-                             :relative].freeze}.freeze,
-          'blockquote' => {'cite' => ['http', 'https', :relative].freeze}.freeze,
-          'img' => {'src' => ['http', 'https', :relative].freeze}.freeze,
-          'q' => {'cite' => ['http', 'https', :relative].freeze}.freeze,
-          'object' => {'data' => ['http', 'https', :relative].freeze}.freeze,
-          'embed' => {'src' => ['http', 'https', :relative].freeze}.freeze,
-          'iframe' => {'src' => ['http', 'https', :relative].freeze}.freeze,
-          'style' => {'any' => ['http', 'https', :relative].freeze}.freeze
+          'a' => {'href' => ['ftp', 'http', 'https', 'mailto', :relative].freeze}.freeze,
+          'blockquote' => {'cite' => DEFAULT_PROTOCOLS }.freeze,
+          'img' => {'src' => DEFAULT_PROTOCOLS }.freeze,
+          'q' => {'cite' => DEFAULT_PROTOCOLS }.freeze,
+          'object' => {'data' => DEFAULT_PROTOCOLS }.freeze,
+          'embed' => {'src' => DEFAULT_PROTOCOLS }.freeze,
+          'iframe' => {'src' => DEFAULT_PROTOCOLS }.freeze,
+          'style' => {'any' => DEFAULT_PROTOCOLS }.freeze,
+          'annotation' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'annotation-xml' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'maction' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'maligngroup' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'malignmark' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'math' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'menclose' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'merror' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mfenced' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mfrac' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mglyph' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mi' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mlabeledtr' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mlongdiv' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mmultiscripts' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mn' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mo' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mover' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mpadded' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mphantom' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mprescripts' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mroot' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mrow' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'ms' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mscarries' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mscarry' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'msgroup' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'msline' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mspace' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'msqrt' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'msrow' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mstack' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mstyle' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'msub' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'msubsup' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'msup' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mtable' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mtd' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mtext' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'mtr' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'munder' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'munderover' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'none' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
+          'semantics' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
       }.freeze,
       :style_methods => ['url'].freeze,
       :style_properties => [
@@ -368,3 +412,4 @@ module CanvasSanitize #:nodoc:
 
   end # InstanceMethods
 end
+
