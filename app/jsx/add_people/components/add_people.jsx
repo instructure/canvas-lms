@@ -235,6 +235,7 @@ define([
             <PeopleValidationIssues
               {...this.props.userValidationResult}
               searchType={this.props.inputParams.searchType}
+              inviteUsersURL={this.props.courseParams.inviteUsersURL}
               onChangeDuplicate={this.onChangeDuplicate}
               onChangeMissing={this.onChangeMissing}
             />

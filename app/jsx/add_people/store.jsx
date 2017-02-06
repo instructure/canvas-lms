@@ -11,7 +11,8 @@ define([
     courseParams: {
       courseId: '',             // the course ID
       roles: [],                // the roles available to assign people to
-      sections: []              // the sections in this course
+      sections: [],             // the sections in this course
+      inviteUser: false     // can the current user invite new users into a course?
     },
     inputParams: {
       searchType: 'cc_path',    // cc_path=email, unique_id=login_id, sis_user_id=sis_user_id

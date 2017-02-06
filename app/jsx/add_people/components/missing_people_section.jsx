@@ -18,8 +18,12 @@ define([
     static propTypes = {
       missing: React.PropTypes.shape(shapes.missingsShape).isRequired,
       searchType: React.PropTypes.string.isRequired,
-      onChange: React.PropTypes.func
+      inviteUsersURL: React.PropTypes.string,
+      onChange: React.PropTypes.func.isRequired
     };
+    static defaultProps = {
+      inviteUsersURL: undefined
+    }
 
     // event handlers ------------------------------------
     // user has chosen to create a new user for this group of duplicates
@@ -83,9 +87,14 @@ define([
         let row;
 
         // a row for each login_id
-        // instructure-ui/Checkbox is throwing errors when rendering.
-        // replace with generic checkbox for now just to the the ui built
-        if (missing.createNew) {
+        if (!this.props.inviteUsersURL) {
+          // cannot create new users. Just show the missing ones
+          row = (
+            <tr key={`missing_${missing.address}`}>
+              <td>{missing.address}</td>
+            </tr>
+          );
+        } else if (missing.createNew) {
           row = (
             <tr key={`missing_${missing.address}`} >
               <td>
@@ -149,7 +158,14 @@ define([
       return Object.keys(missingList).map((missingKey) => {
         const missing = missingList[missingKey];
         let row;
-        if (missing.createNew) {
+        if (!this.props.inviteUsersURL) {
+          // cannot create new users. Just show the missing ones
+          row = (
+            <tr key={`missing_${missing.address}`}>
+              <td>{missing.address}</td>
+            </tr>
+          );
+        } else if (missing.createNew) {
           row = (
             <tr key={`missing_${missing.address}`} >
               <td>
@@ -196,8 +212,7 @@ define([
       });
     }
 
-    // render the list of login_ids where we did not find users
-    render () {
+    renderTableHead () {
       let idColHeader = null;
       if (this.props.searchType === 'unique_id') {
         idColHeader = <th scope="col">{I18n.t('Login ID')}</th>;
@@ -205,19 +220,33 @@ define([
         idColHeader = <th scope="col">{I18n.t('SIS ID')}</th>
       }
 
+      if (this.props.inviteUsersURL) {
+        return (
+          <thead>
+            <tr>
+              <th scope="col">
+                <ScreenReaderContent>{I18n.t('User Selection')}</ScreenReaderContent>
+              </th>
+              <th scope="col">{I18n.t('Name')}</th>
+              <th scope="col">{I18n.t('Email Address')}</th>
+              {idColHeader}
+            </tr>
+          </thead>
+        );
+      }
+      idColHeader = idColHeader || <th scope="col">{I18n.t('Email Address')}</th>;
+      return (
+        <thead>
+          <tr>{idColHeader}</tr>
+        </thead>
+      );
+    }
+    // render the list of login_ids where we did not find users
+    render () {
       return (
         <div className="addpeople__missing namelist">
           <Table caption={<ScreenReaderContent>{I18n.t('Unmatched login list')}</ScreenReaderContent>}>
-            <thead>
-              <tr>
-                <th scope="col">
-                  <ScreenReaderContent>{I18n.t('User Selection')}</ScreenReaderContent>
-                </th>
-                <th scope="col">{I18n.t('Name')}</th>
-                <th scope="col">{I18n.t('Email Address')}</th>
-                {idColHeader}
-              </tr>
-            </thead>
+            {this.renderTableHead()}
             <tbody>
               {this.props.searchType === 'cc_path' ? this.renderMissingEmail() : this.renderMissingIds()}
             </tbody>

@@ -11,6 +11,7 @@ define([
     courseParams: {
       courseId: '1',
       defaultInstitutionName: "Ed's House",
+      inviteUsersURL: '/courses/#/invite_users',
       roles: [
         {
           base_role_name: 'StudentEnrollment',
