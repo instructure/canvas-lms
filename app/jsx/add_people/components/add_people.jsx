@@ -287,7 +287,7 @@ define([
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button onClick={this.close}>{cancelLabel}</Button>
+            <Button id="addpeople_cancel" onClick={this.close}>{cancelLabel}</Button>
             &nbsp;{onBack ? <Button id="addpeople_back" onClick={onBack}>{backLabel}</Button> : null}
             &nbsp;{onNext
               ? <Button id="addpeople_next" onClick={onNext} variant="primary" disabled={!readyForNext}>{nextLabel}</Button>
