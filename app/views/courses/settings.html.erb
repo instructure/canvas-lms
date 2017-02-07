@@ -557,7 +557,11 @@
               <a class="al-trigger al-trigger-gray" role="button" href="#">
                 <i class="icon-settings"></i>
                 <i class="icon-mini-arrow-down"></i>
-                <span class="screenreader-only">Settings</span>
+                <span class="screenreader-only">
+                  <span class="screenreader-only">
+                    <%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %>
+                  </span>
+                </span>
               </a>
 
               <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
@@ -594,7 +598,7 @@
                 <a class="al-trigger al-trigger-gray" role="button" href="#">
                   <i class="icon-settings"></i>
                   <i class="icon-mini-arrow-down"></i>
-                  <span class="screenreader-only">Settings</span>
+                  <span class="screenreader-only"><%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %></span>
                 </a>
 
                 <ul id="content-2" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-3">
