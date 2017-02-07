@@ -33,6 +33,21 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_final_score).to eql(25.0)
     end
 
+    it "can compute scores for users with deleted enrollments when grading periods are used" do
+      @course.root_account.enable_feature!(:multiple_grading_periods)
+      grading_period_set = @course.root_account.grading_period_groups.create!
+      grading_period_set.enrollment_terms << @course.enrollment_term
+      period = grading_period_set.grading_periods.create!(
+        title: "A Grading Period",
+        start_date: 10.days.ago,
+        end_date: 10.days.from_now
+      )
+      @user.enrollments.first.destroy
+      expect {
+        GradeCalculator.recompute_final_score(@user.id, @course.id, grading_period_id: period.id)
+      }.not_to raise_error
+    end
+
     it "should recompute when an assignment's points_possible changes'" do
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 100)
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
@@ -456,6 +471,26 @@ describe GradeCalculator do
     end
   end
 
+  describe '#number_or_null' do
+    it "should return a valid score" do
+      calc = GradeCalculator.new [@user.id], @course.id
+      score = 23.4
+      expect(calc.send(:number_or_null, score)).to eql(score)
+    end
+
+    it "should convert NaN to NULL" do
+      calc = GradeCalculator.new [@user.id], @course.id
+      score = 0/0.0
+      expect(calc.send(:number_or_null, score)).to eql('NULL')
+    end
+
+    it "should convert nil to NULL" do
+      calc = GradeCalculator.new [@user.id], @course.id
+      score = nil
+      expect(calc.send(:number_or_null, score)).to eql('NULL')
+    end
+  end
+
   describe '#compute_and_save_scores' do
     before(:once) do
       @first_period, @second_period = grading_periods(count: 2)
@@ -494,6 +529,12 @@ describe GradeCalculator do
       expect(grading_period_scores).to match_array([25.0, 75.0])
     end
 
+    it 'restores and updates previously deleted scores' do
+      overall_course_score.destroy
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+      expect(overall_course_score.reload).to be_active
+    end
+
     context 'grading period is provided' do
       it 'updates the grading period score' do
         GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
@@ -517,6 +558,13 @@ describe GradeCalculator do
           @student.id, @course, grading_period: @first_period, update_course_score: false
         ).compute_and_save_scores
         expect(overall_course_score.current_score).to eq(50.0)
+      end
+      
+      it 'does not restore previously deleted score if grading period is deleted too' do
+        score = scores.where(grading_period_id: @first_period).first
+        @first_period.destroy
+        GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
+        expect(score.reload).to be_deleted
       end
     end
   end

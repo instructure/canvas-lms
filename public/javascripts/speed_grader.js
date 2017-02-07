@@ -2081,6 +2081,7 @@ define([
     },
 
     renderComment: function (commentData, incomingOpts) {
+      var self = this;
       var comment = commentData;
       var spokenComment = '';
       var submitCommentButtonText = '';
@@ -2131,8 +2132,8 @@ define([
       }
 
       // TODO: Move attachment handling into a separate function
-      $.each((comment.cached_attachments || comment.attachments || []), function (attachment) {
-        var attachmentElement = this.renderCommentAttachment(comment, attachment, commentElement, opts);
+      $.each((comment.cached_attachments || comment.attachments || []), function (_index, attachment) {
+        var attachmentElement = self.renderCommentAttachment(comment, attachment, opts);
 
         commentElement.find('.comment_attachments').append($(attachmentElement).show());
       });

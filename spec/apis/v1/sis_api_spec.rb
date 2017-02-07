@@ -1,6 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe SisApiController, type: :request do
+  def enable_bulk_grade_export
+    context.root_account.enable_feature!(:bulk_sis_grade_export)
+  end
 
   def install_post_grades_tool
     context.context_external_tools.create!(
@@ -47,6 +50,12 @@ describe SisApiController, type: :request do
 
       before do
         user_session(@user)
+      end
+
+      it 'requires :bulk_sis_grade_export feature to be enabled or post_grades tool to be installed' do
+        get "/api/sis/accounts/#{context.id}/assignments", account_id: context.id
+        expect(response.status).to eq 400
+        expect(json_parse).to include('code' => 'not_enabled')
       end
 
       shared_examples 'account sis assignments api' do
@@ -144,6 +153,14 @@ describe SisApiController, type: :request do
         end
       end
 
+      context 'with :bulk_sis_grade_export feature enabled' do
+        before do
+          enable_bulk_grade_export
+        end
+
+        include_examples 'account sis assignments api'
+      end
+
       context 'with a post_grades tool installed' do
         before do
           install_post_grades_tool
@@ -171,6 +188,14 @@ describe SisApiController, type: :request do
           expect(response.status).to eq 400
           expect(json_parse).to include('code' => 'unpublished_course')
         end
+      end
+
+      context 'with :bulk_sis_grade_export feature enabled' do
+        before do
+          enable_bulk_grade_export
+        end
+
+        include_examples 'unpublished course sis assignments api'
       end
 
       context 'with a post_grades tool installed' do
@@ -228,6 +253,12 @@ describe SisApiController, type: :request do
 
       before do
         user_session(@user)
+      end
+
+      it 'requires :bulk_sis_grade_export feature to be enabled or post_grades tool to be installed' do
+        get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id
+        expect(response.status).to eq 400
+        expect(json_parse).to include('code' => 'not_enabled')
       end
 
       shared_examples 'course sis assignments api' do
@@ -300,6 +331,14 @@ describe SisApiController, type: :request do
           expect(assignment_ids).to include assignment7.id
           expect(assignment_ids).to include assignment8.id
         end
+      end
+
+      context 'with :bulk_sis_grade_export feature enabled' do
+        before do
+          enable_bulk_grade_export
+        end
+
+        include_examples 'course sis assignments api'
       end
 
       context 'with a post_grades tool installed' do

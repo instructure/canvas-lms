@@ -11,7 +11,7 @@ define([
   module('SpeedGrader#showDiscussion', {
     setup () {
       fakeENV.setup();
-      this.spy($, 'ajaxJSON');
+      this.stub($, 'ajaxJSON');
       this.spy($.fn, 'append');
       this.originalWindowJSONData = window.jsonData;
       window.jsonData = {
@@ -128,6 +128,62 @@ define([
             submission_id: 1,
             teacher_only_comment: false,
             updated_at: '2016-07-12T23:47:34Z'
+          }, {
+            group_comment_id: null,
+            anonymous: false,
+            assessment_request_id: null,
+            attachment_ids: '',
+            cached_attachments: [{
+              attachment: {
+                cloned_item_id: null,
+                content_type: 'video/mp4',
+                context_id: 1,
+                context_type: 'Assignment',
+                could_be_locked: null,
+                created_at: '2017-01-23T22:23:11Z',
+                deleted_at: null,
+                display_name: 'SampleVideo_1280x720_1mb (1).mp4',
+                encoding: null,
+                file_state: 'available',
+                filename: 'SampleVideo_1280x720_1mb.mp4',
+                folder_id: null,
+                id: 21,
+                last_lock_at: null,
+                last_unlock_at: null,
+                lock_at: null,
+                locked: false,
+                md5: 'd55bddf8d62910879ed9f605522149a8',
+                media_entry_id: 'maybe',
+                migration_id: null,
+                modified_at: '2017-01-23T22:23:11Z',
+                namespace: '_localstorage_/account_1',
+                need_notify: null,
+                position: null,
+                replacement_attachment_id: null,
+                root_attachment_id: 19,
+                size: 1055736,
+                unlock_at: null,
+                updated_at: '2017-01-23T22:23:11Z',
+                upload_error_message: null,
+                usage_rights_id: null,
+                user_id: 1,
+                uuid: 'zR4YRxttAe8Aw53vmcOmUWCGq8g443Mqb8dr7IsJ',
+                viewed_at: null,
+                workflow_state: 'processed'
+              }
+            }],
+            author_id: 1000,
+            author_name: 'neil@instructure.com',
+            comment: 'test',
+            context_id: 1,
+            context_type: 'Course',
+            created_at: '2016-07-13T23:47:34Z',
+            hidden: false,
+            id: 12,
+            posted_at: 'Jul 12 at 5:47pm',
+            submission_id: 1,
+            teacher_only_comment: false,
+            updated_at: '2016-07-13T23:47:34Z'
           }]
         }
       };
@@ -159,6 +215,12 @@ define([
         </div>
       `;
 
+      const commentAttachmentBlank = `
+        <div class="comment_attachment" id="comment_attachment_blank" style="display: none;">
+          <a href="example.com/{{ submitter_id }}/{{ id }}/{{ comment_id }}"><span class="display_name">&nbsp;</span></a>
+        </div>
+      `;
+
       const gradeContainerHtml = `
         <div id="grade_container">
           <a class="update_submission_grade_url" href="my_url.com" title="POST"></a>
@@ -171,7 +233,7 @@ define([
 
       $('#fixtures').html(gradeContainerHtml);
 
-      commentRenderingOptions = { commentBlank: $(commentBlankHtml) };
+      commentRenderingOptions = { commentBlank: $(commentBlankHtml), commentAttachmentBlank: $(commentAttachmentBlank) };
     },
 
     teardown () {
@@ -187,6 +249,14 @@ define([
     const commentText = renderedComment.find('span.comment').text();
 
     equal(commentText, 'test');
+  });
+
+  test('renderComment renders a comment with an attachment', () => {
+    const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[1];
+    const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
+    const commentText = renderedComment.find('.comment_attachment a').text();
+
+    equal(commentText, 'SampleVideo_1280x720_1mb (1).mp4');
   });
 
   test('renderComment should add the comment text to the delete link for screenreaders', () => {
@@ -209,7 +279,7 @@ define([
   module('SpeedGrader#handleGradeSubmit', {
     setup () {
       fakeENV.setup();
-      this.spy($, 'ajaxJSON');
+      this.stub($, 'ajaxJSON');
       this.spy($.fn, 'append');
       this.originalWindowJSONData = window.jsonData;
       window.jsonData = {
@@ -313,7 +383,7 @@ define([
   module('loading a submission Preview', {
     setup() {
       fakeENV.setup();
-      this.spy($, 'ajaxJSON');
+      this.stub($, 'ajaxJSON');
       $div = $("<div id='iframe_holder'>not empty</div>")
       $("#fixtures").html($div)
     },
@@ -358,7 +428,7 @@ define([
   module('emptyIframeHolder', {
     setup() {
       fakeENV.setup();
-      this.spy($, 'ajaxJSON');
+      this.stub($, 'ajaxJSON');
       $div = $("<div id='iframe_holder'>not empty</div>")
       $("#fixtures").html($div)
     },
@@ -381,7 +451,7 @@ define([
   module('renderLtiLaunch', {
     setup() {
       fakeENV.setup();
-      this.spy($, 'ajaxJSON');
+      this.stub($, 'ajaxJSON');
       $div = $("<div id='iframe_holder'>not empty</div>")
       $("#fixtures").html($div)
     },

@@ -147,11 +147,19 @@ class GradeCalculator
     end
   end
 
+  def number_or_null(score)
+    # GradeCalculator sometimes divides by 0 somewhere,
+    # resulting in NaN. Treat that as null here
+    score = nil if score.try(:nan?)
+    score || 'NULL'
+  end
+
   def save_scores
     raise "Can't save scores when ignore_muted is false" unless @ignore_muted
 
     return if @current_updates.empty? && @final_updates.empty?
     return if joined_enrollment_ids.blank?
+    return if @grading_period && @grading_period.deleted?
 
     @course.touch
     updated_at = Score.sanitize(Time.now.utc)
@@ -164,7 +172,7 @@ class GradeCalculator
               current_score = CASE enrollment_id
                 #{@current_updates.map do |user_id, score|
                   enrollments_by_user[user_id].map do |enrollment|
-                    "WHEN #{enrollment.id} THEN #{score || 'NULL'}"
+                    "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
                   end.join(' ')
                 end.join(' ')}
                 ELSE current_score
@@ -172,15 +180,16 @@ class GradeCalculator
               final_score = CASE enrollment_id
                 #{@final_updates.map do |user_id, score|
                   enrollments_by_user[user_id].map do |enrollment|
-                    "WHEN #{enrollment.id} THEN #{score || 'NULL'}"
+                    "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
                   end.join(' ')
                 end.join(' ')}
                 ELSE final_score
               END,
-              updated_at = #{updated_at}
+              updated_at = #{updated_at},
+              -- if workflow_state was previously deleted for some reason, update it to active
+              workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), 'active')
             WHERE
               enrollment_id IN (#{joined_enrollment_ids}) AND
-              workflow_state <> 'deleted' AND
               grading_period_id #{@grading_period ? "= #{@grading_period.id}" : 'IS NULL'};
         INSERT INTO #{Score.quoted_table_name}
             (enrollment_id, grading_period_id, current_score, final_score, created_at, updated_at)
@@ -190,7 +199,7 @@ class GradeCalculator
               CASE enrollments.id
                 #{@current_updates.map do |user_id, score|
                   enrollments_by_user[user_id].map do |enrollment|
-                    "WHEN #{enrollment.id} THEN #{score || 'NULL'}"
+                    "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
                   end.join(' ')
                 end.join(' ')}
                 ELSE NULL
@@ -198,7 +207,7 @@ class GradeCalculator
               CASE enrollments.id
                 #{@final_updates.map do |user_id, score|
                   enrollments_by_user[user_id].map do |enrollment|
-                    "WHEN #{enrollment.id} THEN #{score || 'NULL'}"
+                    "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
                   end.join(' ')
                 end.join(' ')}
                 ELSE NULL
@@ -208,7 +217,6 @@ class GradeCalculator
             FROM #{Enrollment.quoted_table_name} enrollments
             LEFT OUTER JOIN #{Score.quoted_table_name} scores on
               scores.enrollment_id = enrollments.id AND
-              scores.workflow_state <> 'deleted' AND
               scores.grading_period_id #{@grading_period ? "= #{@grading_period.id}" : 'IS NULL'}
             WHERE
               enrollments.id IN (#{joined_enrollment_ids}) AND
@@ -253,7 +261,7 @@ class GradeCalculator
     visible_assignments = visible_assignments.select{|a| assignment_ids_visible_to_user(user_id).include?(a.id)}
 
     if @grading_period
-      user = @course.users.find(user_id)
+      user = User.find(user_id)
       visible_assignments = @grading_period.assignments_for_student(visible_assignments, user)
     end
     assignments_by_group_id = visible_assignments.group_by(&:assignment_group_id)
