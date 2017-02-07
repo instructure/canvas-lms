@@ -28,7 +28,7 @@ class EportfolioEntriesController < ApplicationController
       @category = @portfolio.eportfolio_categories.find(params[:eportfolio_entry].delete(:eportfolio_category_id))
 
       page_names = @category.eportfolio_entries.map{|c| c.name}
-      @page = @portfolio.eportfolio_entries.build(params[:eportfolio_entry])
+      @page = @portfolio.eportfolio_entries.build(eportfolio_entry_params)
       @page.eportfolio_category = @category
       @page.parse_content(params)
       respond_to do |format|
@@ -75,12 +75,13 @@ class EportfolioEntriesController < ApplicationController
       @entry = @portfolio.eportfolio_entries.find(params[:id])
       @entry.parse_content(params) if params[:section_count]
       category_id = params[:eportfolio_entry].delete(:eportfolio_category_id)
+      entry_params = eportfolio_entry_params
       if category_id && category_id.to_i != @entry.eportfolio_category_id
         category = @portfolio.eportfolio_categories.find(category_id)
-        params[:eportfolio_entry][:eportfolio_category] = category
+        entry_params[:eportfolio_category] = category
       end
       respond_to do |format|
-        if @entry.update_attributes!(params[:eportfolio_entry])
+        if @entry.update_attributes!(entry_params)
           format.html { redirect_to eportfolio_entry_url(@portfolio, @entry) }
           format.json { render :json => @entry }
         else
@@ -140,5 +141,9 @@ class EportfolioEntriesController < ApplicationController
   protected
   def rich_content_service_config
     rce_js_env(:basic)
+  end
+
+  def eportfolio_entry_params
+    params.require(:eportfolio_entry).permit(:name, :allow_comments, :show_comments)
   end
 end

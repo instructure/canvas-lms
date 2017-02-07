@@ -813,6 +813,18 @@ describe GradebooksController do
       get 'speed_grader', course_id: @course, assignment_id: @assignment.id
       expect(assigns[:js_env][:lti_retrieve_url]).not_to be_nil
     end
+
+    it 'includes the grading_type in the js_env' do
+      user_session(@teacher)
+      @assignment = @course.assignments.create!(
+        title: "A Title",
+        submission_types: 'online_url,online_file',
+        grading_type: 'percent'
+      )
+
+      get 'speed_grader', course_id: @course, assignment_id: @assignment.id
+      expect(assigns[:js_env][:grading_type]).to eq('percent')
+    end
   end
 
   describe "POST 'speed_grader_settings'" do
@@ -903,6 +915,31 @@ describe GradebooksController do
         ],
       },
     ]
+    end
+  end
+
+  describe '#external_tool_detail' do
+    let(:tool) do
+      {
+        name: 'test lti',
+        placements: {
+          post_grades: {
+            canvas_launch_url: 'http://example.com/lti/post_grades',
+            launch_width: 100,
+            launch_height: 100
+          }
+        }
+      }
+    end
+
+    it 'maps a tool to launch details' do
+      expect(@controller.external_tool_detail(tool)).to eql(
+        data_url: 'http://example.com/lti/post_grades',
+        name: 'test lti',
+        type: :lti,
+        data_width: 100,
+        data_height: 100
+      )
     end
   end
 end

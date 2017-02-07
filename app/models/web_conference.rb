@@ -19,7 +19,6 @@
 class WebConference < ActiveRecord::Base
   include SendToStream
   include TextHelper
-  attr_accessible :title, :duration, :description, :conference_type, :user, :user_settings, :context
   attr_readonly :context_id, :context_type
   belongs_to :context, polymorphic: [:course, :group, :account]
   has_many :web_conference_participants

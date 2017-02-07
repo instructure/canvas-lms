@@ -200,7 +200,11 @@ these cases, `grader_id` should be null in the body.
 | `old_points_possible` | The maximum points possible for the previous grade. |
 | `grader_id` | The Canvas id of the user making the grade change. Null if this was the result of automatic grading. |
 | `user_id` | The Canvas id of the user associated with the submission with the change. |
-
+| `muted` | The boolean muted state of the submissions's assignment.  Muted grade changes
+should not be published to students. |
+| `grading_complete` | The boolean state that the submission is completely graded.  False
+if the assignment is only partially graded, for example a quiz with automatically and manually
+graded sections. Incomplete grade changes should not be published to students. |
 
 #### `wiki_page_created`
 

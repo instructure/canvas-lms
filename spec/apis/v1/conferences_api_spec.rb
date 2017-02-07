@@ -18,11 +18,11 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-include Api::V1::Conferences
-include Api::V1::Json
-include Api
-
 describe "Conferences API", type: :request do
+  include Api::V1::Conferences
+  include Api::V1::Json
+  include Api
+
   before :once do
     # these specs need an enabled web conference plugin
     @plugin = PluginSetting.create!(name: 'wimba')

@@ -215,6 +215,27 @@ define([
         });
       },
 
+      loadMasterCourseData: function(tag_id) {
+        if (ENV.MASTER_COURSE_SETTINGS) {
+          // Grab the stuff for master courses if needed
+          $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', {tag_id: tag_id}, function(data) {
+            if (data.tag_restrictions) {
+              $.each(data.tag_restrictions, function (id, restriction) {
+                var $item = $("#context_module_item_" + id).not('.master_course_content');
+                $item.addClass('master_course_content');
+                var $admin_links = $item.find('.ig-admin');
+                if (restriction == 'locked') {
+                  $item.addClass('locked_by_master_course');
+                  $admin_links.prepend("<span class='master-course-cell'><i class='icon-lock'/></span>");
+                } else {
+                  $admin_links.prepend("<span class='master-course-cell'><i class='icon-unlock icon-Line'/></span>");
+                }
+              });
+            }
+          });
+        }
+      },
+
       itemClass: function(content_tag) {
         return (content_tag.content_type || "").replace(/^[A-Za-z]+::/, '') + "_" + content_tag.content_id;
       },
@@ -520,9 +541,13 @@ define([
         var cyoe = CyoeHelper.getItemData(data.assignment_id, data.is_cyoe_able)
 
         if (cyoe.isReleased) {
-          var $pathIcon = $('<span class="pill mastery-path-icon" data-tooltip><i class="icon-mastery-path" /></span>')
-            .attr('title', I18n.t('Released by Mastery Path'))
+          var fullText = I18n.t('Released by Mastery Path: %{path}', { path: cyoe.releasedLabel })
+          var $pathIcon = $('<span class="pill mastery-path-icon" aria-hidden="true" data-tooltip><i class="icon-mastery-path" /></span>')
+            .attr('title', fullText)
             .append(htmlEscape(cyoe.releasedLabel))
+          var $srPath = $('<span class="screenreader-only">')
+            .append(htmlEscape(fullText))
+          $admin.prepend($srPath)
           $admin.prepend($pathIcon)
         }
 
@@ -1138,6 +1163,10 @@ define([
       $("#edit_item_form").find(".external").showIf($item.hasClass('external_url') || $item.hasClass('context_external_tool'));
       $("#edit_item_form").attr('action', $(this).attr('href'));
       $("#edit_item_form").fillFormData(data, {object_name: 'content_tag'});
+
+      var $title_input = $("#edit_item_form #content_tag_title")
+      $title_input.attr('disabled', $item.hasClass('locked_by_master_course'))
+
       $("#edit_item_form").dialog({
         title: I18n.t('titles.edit_item', "Edit Item Details"),
         open: function(){
@@ -1329,6 +1358,7 @@ define([
               $module.find(".context_module_items.ui-sortable").sortable('enable').sortable('refresh');
               initNewItemPublishButton($item, data.content_tag);
               modules.updateAssignmentData();
+              modules.loadMasterCourseData(data.content_tag.id);
             }), { onComplete: function() {
               $module.find('.add_module_item_link').focus();
             }}
@@ -1815,6 +1845,7 @@ define([
     }
     if($("#context_modules").hasClass('editable')) {
       setTimeout(modules.initModuleManagement, 1000);
+      modules.loadMasterCourseData();
     }
 
     // need the assignment data to check past due state

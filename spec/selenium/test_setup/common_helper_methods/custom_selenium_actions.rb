@@ -64,7 +64,7 @@ module CustomSeleniumActions
     stale_element_protection do
       wait_for(method: :fj) do
         find_with_jquery selector, scope
-      end or raise Selenium::WebDriver::Error::NoSuchElementError
+      end or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{selector.inspect}", CallStackUtils.useful_backtrace
     end
   end
 
@@ -74,11 +74,8 @@ module CustomSeleniumActions
   # the page, and will eventually raise if none are found
   def ff(selector, scope = nil)
     reloadable_collection do
-      result = nil
-      wait_for(method: :ff) do
-        result = disable_implicit_wait { (scope || driver).find_elements(:css, selector) }
-        result.present?
-      end or raise Selenium::WebDriver::Error::NoSuchElementError
+      result = (scope || driver).find_elements(:css, selector)
+      result.present? or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{selector.inspect}", CallStackUtils.useful_backtrace
       result
     end
   end
@@ -93,7 +90,7 @@ module CustomSeleniumActions
       wait_for(method: :ffj) do
         result = find_all_with_jquery(selector, scope)
         result.present?
-      end or raise Selenium::WebDriver::Error::NoSuchElementError
+      end or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{selector.inspect}", CallStackUtils.useful_backtrace
       result
     end
   end

@@ -9,7 +9,7 @@ class FormattedType
   end
 
   def integer?
-    return true if @example.is_a?(Fixnum)
+    return true if @example.is_a?(Integer)
     return false if @example.is_a?(Float)
     begin # try to convert string to integer
       Integer(@example)

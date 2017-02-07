@@ -23,7 +23,6 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   include Workflow
 
-  attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade, :has_seen_results
   attr_readonly :quiz_id, :user_id
   attr_accessor :grader_id
 
@@ -51,7 +50,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   after_save :context_module_action
   before_create :assign_validation_token
 
-  has_many :attachments, :as => :context, :dependent => :destroy
+  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :events, class_name: 'Quizzes::QuizSubmissionEvent'
 
   # update the QuizSubmission's Submission to 'graded' when the QuizSubmission is marked as 'complete.' this
@@ -284,6 +283,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def sanitize_params(params)
+    params = params.to_hash.with_indifferent_access if params.is_a?(ActionController::Parameters) # clear the strong params
+
     # if the submission has already been graded
     if graded?
       return params.merge({:_already_graded => true})

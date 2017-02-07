@@ -14,7 +14,8 @@
 <tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if learning_outcome_criterion %>" style="<%= hidden unless criterion %>">
   <td class="criterion_description hover-container">
     <div class="container">
-      <%= image_tag "flagged_question.png", :class => "learning_outcome_flag", :alt => t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %>
+      <i class="learning_outcome_flag icon-outcomes" aria-hidden="true"></i>
+      <span class="screenreader-only"><%= t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %></span>
       <span class="description criterion_description_value"><%= description %></span>
       <span class="learning_outcome_id" style="display: none;"><%= criterion.try(:learning_outcome_id) %></span>
       <span class="criterion_id" style="display: none;"><%= criterion.try(:id) %></span>
@@ -24,7 +25,7 @@
       </div>
       <div class="threshold">
         <%= before_label :threshold, "threshold" %>
-        <%= t :points, "%{points} pts", :points => %{<span class="mastery_points">#{criterion.mastery_points rescue 5}</span>}.html_safe %>
+        <%= t :points, "%{points} pts", :points => %{<span class="mastery_points">#{n((criterion.mastery_points rescue 5))}</span>}.html_safe %>
       </div>
       <% if !learning_outcome_criterion %>
         <div class="links editing">
@@ -68,7 +69,9 @@
           <td id="rating_<%= rating.id %>" class="rating <%= "edge_rating" if rating.edge %>">
           <div class="container">
             <div class="description rating_description_value"><%= rating.description %></div>
-            <span class="nobr"><%= t :points, "%{points} pts", :points => %{<span class="points">#{rating.points}</span>}.html_safe %></span>
+            <span class="nobr">
+              <%= t "%{points} pts", :points => %{<span class="points">#{n(rating.points)}</span>}.html_safe %>
+            </span>
             <span class="rating_id" style="display: none;"><%= rating && rating.id %></span>
             <% if !learning_outcome_criterion %>
               <div class="links">
@@ -91,9 +94,24 @@
   <td class="nobr points_form">
     <div class="editing" style="white-space: normal">
       <span style="white-space: nowrap; font-size: 0.8em">
-        <% rating_points = %{<input type="text" aria-label="#{h(t(:points_label, "Points"))}" value="#{ assessing ? (assessment_rating.points rescue "") : (criterion.points rescue 5) }" class="criterion_points span1 no-margin-bottom" />}.html_safe %>
+        <%
+          if assessing
+            points_value = (n(assessment_rating.points) rescue "")
+          else
+            points_value = n((criterion.points rescue 5))
+          end
+
+          rating_points = %{
+            <input
+              type="text"
+              aria-label="#{h(t("Points"))}"
+              value="#{points_value}"
+              class="criterion_points span1 no-margin-bottom"
+            />
+          }.html_safe
+        %>
         <% if assessing && criterion && criterion.points %>
-          <%= t :points_out_of2, "%{points} / %{total} pts", :points => rating_points, :total => criterion.points %>
+          <%= t "%{points} / %{total} pts", points: rating_points, total: n(criterion.points) %>
         <% else %>
           <%= t :points, "%{points} pts", :points => rating_points %>
         <% end %>
@@ -102,9 +120,9 @@
     <div class="displaying">
       <span style="white-space: nowrap;">
         <span class="criterion_rating_points_holder" style="<%= hidden unless assessment_rating %>">
-          <span class="criterion_rating_points"><%= assessment_rating ? round_if_whole(assessment_rating[:points]) : nbsp %></span> /
+          <span class="criterion_rating_points"><%= assessment_rating ? n(round_if_whole(assessment_rating[:points])) : nbsp %></span> /
         </span>
-        <%= t :points, "%{points} pts", :points => %{<span class="display_criterion_points">#{ criterion.points rescue 5 }</span>}.html_safe %><br />
+        <%= t :points, "%{points} pts", :points => %{<span class="display_criterion_points">#{ n((criterion.points rescue 5)) }</span>}.html_safe %><br />
       </span>
     </div>
     <div class="ignoring">

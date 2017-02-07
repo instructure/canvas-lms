@@ -839,7 +839,7 @@ describe ConversationsController, type: :request do
         it "should not asplode" do
           @shard1.activate do
             course_with_teacher(:active_course => true, :active_enrollment => true, :user => @me)
-            @bob = student_in_course(:course => @course, :name => "bob")
+            @bob = student_in_course(:name => "bob")
 
             @message = conversation(@me, :sender => @bob).messages.first
           end

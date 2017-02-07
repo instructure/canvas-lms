@@ -121,6 +121,6 @@ class SharedBrandConfigsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def shared_brand_config_params
-      strong_params.require(:shared_brand_config).permit(:brand_config_md5, :name)
+      params.require(:shared_brand_config).permit(:brand_config_md5, :name)
     end
 end

@@ -14,8 +14,6 @@ group :test do
   gem 'simplecov', '0.9.2', require: false
     gem 'docile', '1.1.5', require: false
   gem 'simplecov-rcov', '0.2.3', require: false
-  gem 'bullet_instructure', '4.14.8', require: 'bullet'
-    gem 'redcarpet', '3.3.4', require: false
   gem 'mocha', github: 'maneframe/mocha', ref: 'bb8813fbb4cc589d7c58073d93983722d61b6919', require: false
     gem 'metaclass', '0.0.4', require: false
   gem 'thin', '1.7.0'
@@ -32,7 +30,7 @@ group :test do
       gem 'rainbow', '2.2.1', require: false
   gem 'rubocop-rspec', '1.8.0', require: false
 
-  gem 'once-ler', '0.0.16'
+  gem 'once-ler', '0.1.0'
 
   # Keep this gem synced with docker-compose/seleniumff/Dockerfile
   gem 'selenium-webdriver', '2.53.4'
@@ -40,6 +38,7 @@ group :test do
     gem 'websocket', '1.2.3', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test_after_commit', '1.1.0' if CANVAS_RAILS4_2
+  gem 'test-queue', github: 'jenseng/test-queue', ref: '57d31b70d9d83de3b3534f4119c614155c68e290', require: false
   gem 'testrailtagging', '0.3.7', require: false
 
   gem 'webmock', '1.22.3', require: false

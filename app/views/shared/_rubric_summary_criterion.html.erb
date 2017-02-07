@@ -2,7 +2,8 @@
 <% @empty_rating ||= [OpenObject.new(:id => "blank", :description => t(:full_marks, "Full Marks"), :points => 5), OpenObject.new(:id => "blank_2", :description => t(:no_marks, "No Marks"), :points => 0)] %>
 <tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> criterion_<%= criterion ? criterion.id : "blank" %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if criterion && criterion.learning_outcome_id %>">
   <td class="criterion_description">
-    <%= image_tag "flagged_question.png", :class => "learning_outcome_flag", :alt => t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %>
+    <i class="learning_outcome_flag icon-outcomes" aria-hidden="true"></i>
+    <span class="screenreader-only"><%= t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %></span>
     <span class="description_title"><%= criterion ? CanvasTextHelper.truncate_text(criterion.description, :max_length => 50) : t('defaults.description', "Description of criterion") %></span>
     <span class="learning_outcome_id" style="display: none;"><%= criterion.learning_outcome_id rescue nbsp %></span>
     <span class="criterion_id" style="display: none;"><%= criterion && criterion.id %></span>
@@ -31,7 +32,7 @@
         <span class="nobr x_out_of_x">
           <% ot(:out_of_points, "%{points}/%{total} pts", :points => capture { %>
             <span class="criterion_points" style="<%= hidden if brief %>"><%= assessing ? (assessment_rating ? assessment_rating.points : "") : (criterion ? criterion.points : 5) %></span><% }, :total => capture { %>
-            <span class="criterion_points_possible"><%= criterion ? criterion.points : 5 %></span><% }) %>
+            <span class="criterion_points_possible"><%= criterion ? I18n.n(criterion.points) : I18n.n(5) %></span><% }) %>
         </span>
       </div>
       <div class="ignoring">

@@ -19,9 +19,11 @@ define [
       @$dialog.dialog
         autoOpen: false
         resizable: false
-        width: 800
-        height: 600
+        width: Number(options.launchWidth) || 800
+        height: Number(options.launchHeight) || 600
         dialogClass: 'post-grades-frame-dialog'
+        
+      # listen for external tool events
 
       # other init
       if @baseUrl
@@ -34,8 +36,12 @@ define [
       @$dialog.dialog('close')
 
     onDialogOpen: (event) =>
+      $(window).on('externalContentReady', @close)
+      $(window).on('externalContentCancel', @close)
 
     onDialogClose: (event) =>
+      $(window).off('externalContentReady', @close);
+      $(window).off('externalContentCancel', @close);
       @$dialog.dialog('destroy').remove()
       if @returnFocusTo
         @returnFocusTo.focus()

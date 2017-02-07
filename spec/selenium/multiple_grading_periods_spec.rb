@@ -92,9 +92,20 @@ describe "interaction with multiple grading periods" do
     let!(:enable_mgp_flag) { account.enable_feature!(:multiple_grading_periods) }
     let(:test_course) { account.courses.create!(name: 'New Course') }
 
-    it 'should still be functional with mgp flag turned on and disable adding during edit mode', priority: "1", test_id: 545585 do
+    it 'is still editable with grading periods flag turned on and disable ' \
+      'adding during edit mode', priority: "1", test_id: 545585 do
       user_session(admin)
       get "/courses/#{test_course.id}/grading_standards"
+      f('#react_grading_tabs a[href="#grading-standards-tab"]').click
+      f('button.add_standard_button').click
+      expect(f('input.scheme_name')).not_to be_nil
+      expect(f('button.add_standard_button')).to have_class('disabled')
+    end
+
+    it 'is still editable with grading periods flag turned on and disable ' \
+      'adding during edit mode', priority: "1" do
+      user_session(admin)
+      get "/accounts/#{account.id}/grading_standards"
       f('#react_grading_tabs a[href="#grading-standards-tab"]').click
       f('button.add_standard_button').click
       expect(f('input.scheme_name')).not_to be_nil

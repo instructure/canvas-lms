@@ -2,8 +2,6 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
   belongs_to :user
 
-  strong_params
-
   serialize :export_results, Hash
   serialize :import_results, Hash
 

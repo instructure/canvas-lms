@@ -23,11 +23,13 @@ class RubricAssociationsController < ApplicationController
   end
 
   def update
-    params[:rubric_association] ||= {}
+    association_params = params[:rubric_association] ?
+      params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :bookmarked, :rubric_id) : {}
+
     @association = @context.rubric_associations.find(params[:id]) rescue nil
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])
     @association_object = nil unless @association_object && @association_object.try(:context) == @context
-    rubric_id = params[:rubric_association].delete(:rubric_id)
+    rubric_id = association_params.delete(:rubric_id)
     @rubric = @association ? @association.rubric : Rubric.find(rubric_id)
     # raise "User doesn't have access to this rubric" unless @rubric.grants_right?(@current_user, session, :read)
     if !@association && !authorized_action(@context, @current_user, :manage_rubrics)
@@ -36,10 +38,10 @@ class RubricAssociationsController < ApplicationController
       if params[:rubric] && @rubric.grants_right?(@current_user, session, :update)
         @rubric.update_criteria(params[:rubric])
       end
-      params[:rubric_association][:association_object] = @association.association_object if @association
-      params[:rubric_association][:association_object] ||= @association_object
-      params[:rubric_association][:id] = @association.id if @association
-      @association = RubricAssociation.generate(@current_user, @rubric, @context, params[:rubric_association])
+      association_params[:association_object] = @association.association_object if @association
+      association_params[:association_object] ||= @association_object
+      association_params[:id] = @association.id if @association
+      @association = RubricAssociation.generate(@current_user, @rubric, @context, association_params)
       json_res = {
         :rubric => @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => {:user => @current_user, :session => session}),
         :rubric_association => @association.as_json(:include_root => false, :include => [:rubric_assessments, :assessment_requests], :methods => :assessor_name, :permissions => {:user => @current_user, :session => session})

@@ -2,6 +2,7 @@ require_dependency 'importers'
 
 module Importers
   class LearningOutcomeImporter < Importer
+    extend OutcomeImporter
 
     self.item_class = LearningOutcome
 
@@ -52,15 +53,16 @@ module Importers
             # import from vendor with global outcomes
             context = nil
             hash[:learning_outcome_group] ||= LearningOutcomeGroup.global_root_outcome_group
-            item ||= LearningOutcome.global.where(migration_id: hash[:migration_id]).first if hash[:migration_id] && !migration.cross_institution?
-            item ||= LearningOutcome.global.where(vendor_guid: hash[:vendor_guid]).first if hash[:vendor_guid]
+            item ||= LearningOutcome.global.where(migration_clause(hash[:migration_id])).first if hash[:migration_id] && !migration.cross_institution?
+            item ||= LearningOutcome.global.where(vendor_clause(hash[:vendor_guid])).first if hash[:vendor_guid]
             item ||= LearningOutcome.new
           else
             migration.add_warning(t(:no_global_permission, %{You're not allowed to manage global outcomes, can't add "%{title}"}, :title => hash[:title]))
             return
           end
         else
-          item ||= LearningOutcome.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
+          item ||= LearningOutcome.where(context_id: context, context_type: context.class.to_s).
+            where(migration_clause(hash[:migration_id])).first if hash[:migration_id]
           item ||= context.created_learning_outcomes.temp_record
           item.context = context
         end
@@ -94,6 +96,9 @@ module Importers
         item = outcome
       end
 
+      log = hash[:learning_outcome_group] || context.root_outcome_group
+      log.add_outcome(item)
+
       if hash[:alignments]
         alignments = hash[:alignments].sort_by{|a| a[:position].to_i}
         alignments.each do |alignment|
@@ -113,9 +118,6 @@ module Importers
           end
         end
       end
-
-      log = hash[:learning_outcome_group] || context.root_outcome_group
-      log.add_outcome(item)
 
       migration.outcome_to_id_map[hash[:migration_id]] = item.id
 

@@ -1,7 +1,7 @@
 require_relative '../shared_examples_common'
-include SharedExamplesCommon
 
 shared_examples_for "settings basic tests" do |account_type|
+  include SharedExamplesCommon
   include_context "in-process server selenium tests"
 
   before(:each) do

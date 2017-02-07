@@ -19,8 +19,6 @@
 class GradingStandard < ActiveRecord::Base
   include Workflow
 
-  attr_accessible :title, :standard_data, :data
-
   belongs_to :context, polymorphic: [:account, :course]
   belongs_to :user
   has_many :assignments

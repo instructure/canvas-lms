@@ -62,38 +62,55 @@ define([
     );
   }
 
+  function canBeConvertedToGrade (score, possible) {
+    return possible > 0 && !isNaN(score);
+  }
+
+  function calculatePercentGrade (score, possible) {
+    return round((score / possible) * 100, round.DEFAULT);
+  }
+
+  function formatPercentGrade (percentGrade) {
+    return I18n.n(percentGrade, {percentage: true});
+  }
+
+  function calculateGrade (score, possible) {
+    if (canBeConvertedToGrade(score, possible)) {
+      return formatPercentGrade(calculatePercentGrade(score, possible));
+    }
+
+    return I18n.t('N/A');
+  }
+
   function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme) {
     var showTotalGradeAsPoints = ENV.show_total_grade_as_points;
-
-    var calculateGrade = function (score, possible) {
-      if (possible === 0 || isNaN(score)) {
-        return 'N/A';
-      }
-      return round((score / possible) * 100, round.DEFAULT);
-    };
 
     for (var i = 0; i < calculatedGrades.group_sums.length; i++) {
       var groupSum = calculatedGrades.group_sums[i];
       var $groupRow = $('#submission_group-' + groupSum.group.id);
       var groupGradeInfo = groupSum[currentOrFinal];
       $groupRow.find('.grade').text(
-        calculateGrade(groupGradeInfo.score, groupGradeInfo.possible) + '%'
+        calculateGrade(groupGradeInfo.score, groupGradeInfo.possible)
       );
       $groupRow.find('.score_teaser').text(
-        round(groupGradeInfo.score, round.DEFAULT) + ' / ' + round(groupGradeInfo.possible, round.DEFAULT)
+        I18n.n(groupGradeInfo.score, {precision: round.DEFAULT}) + ' / ' + I18n.n(groupGradeInfo.possible, {precision: round.DEFAULT})
       );
     }
 
     var finalScore = calculatedGrades[currentOrFinal].score;
     var finalPossible = calculatedGrades[currentOrFinal].possible;
-    var scoreAsPoints = round(finalScore, round.DEFAULT) + ' / ' + round(finalPossible, round.DEFAULT);
+    var scoreAsPoints = I18n.n(finalScore, {precision: round.DEFAULT}) + ' / ' + I18n.n(finalPossible, {precision: round.DEFAULT});
     var scoreAsPercent = calculateGrade(finalScore, finalPossible);
 
-    var finalGrade = scoreAsPercent + '%';
-    var teaserText = scoreAsPoints;
+    var finalGrade;
+    var teaserText;
+
     if (showTotalGradeAsPoints && groupWeightingScheme !== 'percent') {
       finalGrade = scoreAsPoints;
-      teaserText = scoreAsPercent + '%';
+      teaserText = scoreAsPercent;
+    } else {
+      finalGrade = scoreAsPercent;
+      teaserText = scoreAsPoints;
     }
 
     var $finalGradeRow = $('.student_assignment.final_grade');
@@ -110,7 +127,11 @@ define([
     }
 
     if (ENV.grading_scheme) {
-      $('.final_letter_grade .grade').text(GradingSchemeHelper.scoreToGrade(scoreAsPercent, ENV.grading_scheme));
+      $('.final_letter_grade .grade').text(
+        GradingSchemeHelper.scoreToGrade(
+          calculatePercentGrade(finalScore, finalPossible), ENV.grading_scheme
+        )
+      );
     }
 
     $('.revert_all_scores').showIf($('#grades_summary .revert_score_link').length > 0);

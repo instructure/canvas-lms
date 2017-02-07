@@ -33,7 +33,7 @@ define [
     toFilesOptionArray: (fList) ->
       [].slice.call(fList, 0).map((file) -> {file})
 
-    fileNameExists: (name) ->
+    findMatchingFile: (name) ->
       _.find @folder.files.models, (f) -> f.get('display_name') is name
 
     isZipFile: (file) ->
@@ -43,14 +43,18 @@ define [
     segregateOptionBuckets: (selectedFiles) ->
       [collisions, resolved, zips] = [[], [], []]
       for file in selectedFiles
-        nameToTest = file.name || file.file.name
         if (@isZipFile(file.file) and typeof file.expandZip is 'undefined')
           zips.push file
         # only mark as collision if it is a collision that hasn't been resolved, or is is a zip that will be expanded
-        else if @fileNameExists(nameToTest) && (file.dup != 'overwrite' && (!file.expandZip? || file.expandZip is false))
-          collisions.push file
         else
-          resolved.push file
+          nameToTest = file.name || file.file.name
+          matchingFile = @findMatchingFile(nameToTest)
+          if matchingFile && (file.dup != 'overwrite' && (!file.expandZip? || file.expandZip is false))
+            if matchingFile.get('restricted_by_master_course')
+              file.cannotOverwrite = true
+            collisions.push file
+          else
+            resolved.push file
 
       {collisions, resolved, zips}
 

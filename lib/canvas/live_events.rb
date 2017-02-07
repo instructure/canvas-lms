@@ -329,7 +329,9 @@ module Canvas::LiveEvents
       old_points_possible: old_assignment.points_possible,
       grader_id: grader_id,
       student_id: submission.global_user_id,
-      user_id: submission.global_user_id
+      user_id: submission.global_user_id,
+      grading_complete: submission.graded?,
+      muted: submission.muted_assignment?
     }, amended_context(submission.assignment.context))
   end
 

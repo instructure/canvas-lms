@@ -27,15 +27,20 @@ module BlankSlateProtection
     end
   end
 
-  module ExampleGroup
-    def run_examples(*)
+  module Example
+    def run(*)
       BlankSlateProtection.disable { super }
     end
   end
 
   # switchman and once-ler have special snowflake context hooks where data
   # setup is allowed
-  EXEMPT_PATTERNS = %w[specs_require_sharding r_spec_helper add_onceler_hooks]
+  EXEMPT_PATTERNS = %w[
+    specs_require_sharding
+    r_spec_helper
+    add_onceler_hooks
+    recreate_persistent_test_shards
+  ].freeze
 
   class << self
     def enabled?
@@ -44,7 +49,7 @@ module BlankSlateProtection
 
     def install!
       truncate_all_tables!
-      ::RSpec::Core::ExampleGroup.singleton_class.prepend ExampleGroup
+      ::RSpec::Core::Example.prepend Example
       ::ActiveRecord::Base.include ActiveRecord
       @enabled = true
     end
@@ -62,7 +67,7 @@ module BlankSlateProtection
 
     def get_table_names(connection)
       # use custom SQL to exclude tables from extensions
-      schema = connection.shard.name if connection.instance_variable_get(:@config)[:use_qualified_names]
+      schema = connection.shard.name if connection.use_qualified_names?
       table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
          SELECT relname
          FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
@@ -73,11 +78,16 @@ module BlankSlateProtection
            )
       SQL
       table_names.delete('schema_migrations')
+      table_names.delete('switchman_shards')
       table_names
     end
 
-    def truncate_all_tables!(quick: true)
-      return if quick && Account.all.empty? # this is the most likely table to have stuff
+    def truncate_all_tables!
+      require "switchman/test_helper"
+      # this won't create/migrate them, but it will let us with_each_shard any
+      # persistent ones that already exist
+      ::Switchman::TestHelper.recreate_persistent_test_shards(dont_create: true)
+
       puts "truncating all tables..."
       Shard.with_each_shard do
         model_connections = ::ActiveRecord::Base.descendants.map(&:connection).uniq
@@ -85,6 +95,35 @@ module BlankSlateProtection
           table_names = get_table_names(connection)
           next if table_names.empty?
           connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
+        end
+      end
+      randomize_sequences!
+    end
+
+    def get_sequences(connection)
+      schema = connection.shard.name if connection.use_qualified_names?
+      sequences = connection.query(<<-SQL, 'SCHEMA').map(&:first)
+         SELECT relname
+         FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
+         WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'} AND relkind='S'
+      SQL
+      sequences.delete('switchman_shards_id_seq')
+      sequences
+    end
+
+    def randomize_sequences!
+      puts "randomizing db sequences..."
+      seed = ::RSpec.configuration.seed
+      i = 0
+      Shard.with_each_shard do
+        i += 1
+        model_connections = ::ActiveRecord::Base.descendants.map(&:connection).uniq
+        model_connections.each do |connection|
+          get_sequences(connection).each do |sequence|
+            # stable random-ish number <= 2**20 so that we don't overflow pre-migrated Version partitions
+            new_val = Digest::MD5.hexdigest("#{seed}#{i}#{sequence}")[0...5].to_i(16) + 1
+            connection.execute("ALTER SEQUENCE #{connection.quote_table_name(sequence)} RESTART WITH #{new_val}")
+          end
         end
       end
     end

@@ -34,26 +34,30 @@
           <span class="screenreader-only"><%= t('Keyboard Shortcuts') %></span>
           <i class="icon-keyboard-shortcuts"></i>
         </button>
-        <% if @post_grades_tools.count > 1 %>
-          <button id="post_grades" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><%= t('Post Grades') %></button>
-          <ul style="display: none;" class="post-grades-menu ui-kyle-menu">
-            <% @post_grades_tools.each do |tool| %>
-              <% case tool[:type] %>
-              <% when :lti %>
-                <li class="external-tools-dialog"><a aria-controls="post_grades_frame_dialog" role="button" data-url="<%= tool[:data_url]%>"><%= tool[:name]%></a></li>
-              <% when :post_grades %>
-                <li class="post-grades-placeholder in-menu"></li>
-              <% when :ellip %>
-                <li class="external-tools-dialog ellip"><a>&hellip;</a></li>
+        <% if !@context.account.feature_enabled?(:new_sis_integrations) %>
+          <% if @post_grades_tools.count > 1 %>
+            <button id="post_grades" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><%= t('Post Grades') %></button>
+            <ul style="display: none;" class="post-grades-menu ui-kyle-menu">
+              <% @post_grades_tools.each do |tool| %>
+                <% case tool[:type] %>
+                <% when :lti %>
+                  <li class="external-tools-dialog">
+                    <a aria-controls="post_grades_frame_dialog" role="button" data-url="<%= tool[:data_url]%>" data-width="<%= tool[:data_width]%>" data-height="<%= tool[:data_height]%>">
+                      <%= tool[:name]%>
+                    </a>
+                  </li>
+                <% when :post_grades %>
+                  <li class="post-grades-placeholder in-menu"></li>
+                <% end %>
               <% end %>
+            </ul>
+          <% elsif @post_grades_tools.count == 1 %>
+            <% case @post_grades_tools[0][:type] %>
+            <% when :lti %>
+            <button class="external-tools-dialog ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" data-url="<%= @post_grades_tools[0][:data_url]%>" data-width="<%= @post_grades_tools[0][:data_width]%>" data-height="<%= @post_grades_tools[0][:data_height]%>"><%= @post_grades_tools[0][:name]%></button>
+            <% when :post_grades %>
+            <span class="post-grades-placeholder"></span>
             <% end %>
-          </ul>
-        <% elsif @post_grades_tools.count == 1 %>
-          <% case @post_grades_tools[0][:type] %>
-          <% when :lti %>
-          <button class="external-tools-dialog ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" data-url="<%= @post_grades_tools[0][:data_url]%>"><%= @post_grades_tools[0][:name]%></button>
-          <% when :post_grades %>
-          <span class="post-grades-placeholder"></span>
           <% end %>
         <% end %>
       </div>
@@ -99,15 +103,27 @@
             <%= t('Export') %>
           </button>
           <ul style="display: none;" id="csv_export_options" class="export_dropdown ui-kyle-menu">
-            <li class="generate_new_csv"><a href="#"><%=t('Current') %></a></li>
+            <li class="generate_new_csv"><a href="#"><%=t('CSV File') %></a></li>
             <% if @last_exported_gradebook_csv.present? %>
               <li><a href="<%= @last_exported_gradebook_csv.attachment.download_url %>" class="open_in_a_new_tab">
-                <%= t('Previous (%{time})', time: datetime_string(@last_exported_gradebook_csv.attachment.updated_at)) %>
+                <%= t('Previous CSV File (%{time})', time: datetime_string(@last_exported_gradebook_csv.attachment.updated_at)) %>
               </a></li>
             <% else %>
               <li style="display:none;">
                 <a class="open_in_a_new_tab"></a>
               </li>
+            <% end %>
+            <% if @context.account.feature_enabled?(:new_sis_integrations) %>
+              <% @post_grades_tools.each do |tool| %>
+                <% case tool[:type] %>
+                <% when :lti %>
+                <li class="external-tools-dialog">
+                  <a aria-controls="post_grades_frame_dialog" role="button" data-url="<%= tool[:data_url]%>" data-width="<%= tool[:data_width]%>" data-height="<%= tool[:data_height]%>"><%= tool[:name]%></a>
+                </li>
+                <% when :post_grades %>
+                <li class="post-grades-placeholder in-menu"></li>
+                <% end %>
+              <% end %>
             <% end %>
           </ul>
         </span>

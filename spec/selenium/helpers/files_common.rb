@@ -43,8 +43,7 @@ module FilesCommon
       ff('.ef-item-row')[row_selected].click
       f('.btn-move').click
     end
-    wait_for_ajaximations
-    expect(f(".ReactModal__Header-Title h4").text).to eq "Where would you like to move #{file_name}?"
+    expect(f(".ReactModal__Header-Title h4")).to include_text "Where would you like to move #{file_name}?"
     if destination.present?
       folders = destination.split('/')
       folders.each do |folder|
@@ -139,14 +138,14 @@ module FilesCommon
 
   def add_folder(name = 'new folder')
     click_new_folder_button
-    new_folder = f("input.ef-edit-name-form__input")
+    new_folder = f("input[aria-label='Folder Name']")
     new_folder.send_keys(name)
     new_folder.send_keys(:return)
     wait_for_ajaximations
   end
 
   def click_new_folder_button
-    f(".btn-add-folder").click
+    f("button[aria-label='Add Folder']").click
     wait_for_ajaximations
   end
 

@@ -11,7 +11,7 @@ define([
   FileRenameForm.buildContent = function () {
     var nameToUse = this.state.fileOptions.name || this.state.fileOptions.file.name;
     var buildContentToRender;
-    if (!this.state.isEditing) {
+    if (!this.state.isEditing && !this.state.fileOptions.cannotOverwrite) {
       buildContentToRender = (
         <div ref='bodyContent'>
           <p id='renameFileMessage'>
@@ -20,10 +20,17 @@ define([
         </div>
       );
     } else {
+      var renameMessage;
+      if (this.state.fileOptions.cannotOverwrite) {
+        renameMessage = I18n.t('A locked item named "%{name}" already exists in this location. Please enter a new name.', {name: nameToUse});
+      } else {
+        renameMessage = I18n.t('Change "%{name}" to', {name: nameToUse});
+      }
+
       buildContentToRender = (
         <div ref='bodyContent'>
           <p>
-            {I18n.t('Change "%{name}" to', {name: nameToUse})}
+            {renameMessage}
           </p>
           <form onSubmit={this.handleFormSubmit}>
             <label className='file-rename-form__form-label'>
@@ -46,7 +53,20 @@ define([
 
   FileRenameForm.buildButtons = function () {
     var buildButtonsToRender;
-    if (!this.state.isEditing) {
+    if (this.state.fileOptions.cannotOverwrite) {
+      buildButtonsToRender = (
+        [
+          <button
+            key='commitChangeBtn'
+            ref='commitChangeBtn'
+            className='btn btn-primary'
+            onClick={this.handleChangeClick}
+          >
+            {I18n.t('Change')}
+          </button>
+        ]
+      );
+    } else if (!this.state.isEditing) {
       buildButtonsToRender = (
         [
           <button
@@ -108,7 +128,7 @@ define([
           style={{
             overlay : {
               backgroundColor: 'rgba(0,0,0,0.5)'
-            },  
+            },
             content : {
               position: 'static',
               top: '0',

@@ -33,7 +33,6 @@ class CustomData < ActiveRecord::Base
   belongs_to :user
 
   serialize :data, Hash
-  attr_protected :data
 
   validates_presence_of :user, :namespace
 

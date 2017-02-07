@@ -55,7 +55,7 @@ class AlertsController < ApplicationController
 
   protected
   def convert_recipients
-    strong_params[:alert][:recipients] = strong_params[:alert][:recipients].to_a.map do |r|
+    params[:alert][:recipients] = params[:alert][:recipients].to_a.map do |r|
       if r.is_a?(String) && r[0] == ':'
         r[1..-1].to_sym
       elsif role = (@context.is_a?(Account) ? @context.get_role_by_id(r) : @context.account.get_role_by_id(r))
@@ -65,7 +65,7 @@ class AlertsController < ApplicationController
   end
 
   def alert_params
-    strong_params.require(:alert).
+    params.require(:alert).
       permit(:context, :repetition, :criteria => [:criterion_type, :threshold], :recipients => strong_anything)
   end
 end

@@ -50,7 +50,7 @@ module Api::V1::WikiPage
       wiki_page.increment_view_count(current_user, wiki_page.context)
     end
     if opts[:include_master_course_restrictions]
-      hash['restricted_by_master_course'] = wiki_page.editing_restricted?
+      hash.merge!(wiki_page.master_course_api_restriction_data)
     end
     hash
   end

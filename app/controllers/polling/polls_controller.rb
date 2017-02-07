@@ -116,8 +116,7 @@ module Polling
     #   }
     #
     def create
-      poll_params = params[:polls][0]
-      @poll = @current_user.polls.new(poll_params)
+      @poll = @current_user.polls.new(get_poll_params)
       if authorized_action(@poll, @current_user, :create)
         if @poll.save
           render json: serialize_jsonapi(@poll)
@@ -145,7 +144,7 @@ module Polling
     #
     def update
       @poll = Polling::Poll.find(params[:id])
-      poll_params = params[:polls][0]
+      poll_params = get_poll_params
 
       if authorized_action(@poll, @current_user, :update)
         poll_params.delete(:is_correct) if poll_params && poll_params[:is_correct].blank?
@@ -197,5 +196,8 @@ module Polling
       }).as_json
     end
 
+    def get_poll_params
+      params.require(:polls)[0].permit(:question, :description)
+    end
   end
 end

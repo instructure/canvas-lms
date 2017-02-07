@@ -47,7 +47,7 @@ context "accessing public content" do
   end
 
   it "should show quizzes" do
-    quiz = @course.quizzes.create!(:name => "blah")
+    quiz = @course.quizzes.create!
     quiz.publish!
 
     test_public_access do

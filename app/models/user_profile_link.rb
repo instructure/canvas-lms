@@ -16,8 +16,6 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class UserProfileLink < ActiveRecord::Base
-  attr_accessible :url, :title
-
   belongs_to :user_profile
 
   validates :title, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }

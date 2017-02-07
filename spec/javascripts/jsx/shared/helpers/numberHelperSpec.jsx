@@ -65,6 +65,27 @@ define([
     equal(ret, output)
   })
 
+  test('returns NaN for null and undefined values', () => {
+    ok(isNaN(numberHelper.parse(null)))
+    ok(isNaN(numberHelper.parse(undefined)))
+  })
+
+  test('returns input if already a number', () => {
+    const input = 4.7
+    equal(numberHelper.parse(input), input)
+  })
+
+  test('parses toString value of objects', () => {
+    numberHelper._parseNumber.restore()
+    const obj = {toString: () => `2${separator}3`}
+    equal(numberHelper.parse(obj), 2.3)
+  })
+
+  test('parses positive numbers beginning with "+"', () => {
+    numberHelper._parseNumber.restore()
+    equal(numberHelper.parse('+4'), 4)
+  })
+
   test('validate returns false if parse returns NaN', () => {
     numberHelper._parseNumber.returns(NaN)
     equal(numberHelper.validate('1'), false)

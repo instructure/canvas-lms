@@ -1,6 +1,5 @@
 <% if !@account.site_admin? &&
     @account.root_account? &&
-    @account.feature_allowed?(:post_grades) &&
     @account.grants_right?(@current_user, :manage_site_settings) %>
     <fieldset id="add_sis_app_token">
         <legend><%= t("SIS Agent Token Authentication") %></legend>

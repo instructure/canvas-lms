@@ -20,8 +20,6 @@ require 'spec_helper'
 
 describe LinkedIn::Connection do
 
-  let(:connection) { LinkedIn::Connection.new }
-
   describe ".config" do
     it "accepts any object with a call interface" do
       conf_class= Class.new do
@@ -65,63 +63,56 @@ describe LinkedIn::Connection do
                          .with('/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)')
                          .and_return(double(body: token_response_body))
 
-        service_user_id, service_user_name, service_user_url = connection.get_service_user_info(mock_access_token)
-        expect(service_user_id).to eq("#1")
-        expect(service_user_name).to eq("john doe")
-        expect(service_user_url).to eq("http://example.com/linkedin")
+        linkedin = LinkedIn::Connection.new(mock_access_token)
+        expect(linkedin.service_user_id).to eq("#1")
+        expect(linkedin.service_user_name).to eq("john doe")
+        expect(linkedin.service_user_url).to eq("http://example.com/linkedin")
       end
     end
 
-    describe "#get_access_token" do
+    describe ".from_request_token" do
       it "builds access token based on the supplied parameters" do
         token = double
         secret = double
         oauth_verifier = double
         consumer = double
         request_token = double
+        access_token = double
         expect(OAuth::Consumer).to receive(:new).and_return(consumer)
         expect(OAuth::RequestToken).to receive(:new).with(consumer, token, secret).and_return(request_token)
-        expect(request_token).to receive(:get_access_token).with(:oauth_verifier => oauth_verifier)
+        expect(request_token).to receive(:get_access_token).with(:oauth_verifier => oauth_verifier).and_return(access_token)
 
-        connection.get_access_token(token, secret, oauth_verifier)
+        linkedin = LinkedIn::Connection.from_request_token(token, secret, oauth_verifier)
+        expect(linkedin.access_token).to eq(access_token)
       end
     end
 
-    describe "#request_token" do
+    describe ".request_token" do
       it "builds access token based on the supplied parameters" do
         consumer = double
         oauth_callback = double
         expect(OAuth::Consumer).to receive(:new).and_return(consumer)
         expect(consumer).to receive(:get_request_token).with(:oauth_callback => oauth_callback)
 
-        connection.request_token(oauth_callback)
+        LinkedIn::Connection.request_token(oauth_callback)
       end
     end
 
-    describe ".consumer" do
-      it "uses the config values" do
-
-        expect(OAuth::Consumer).to receive(:new).with('key', 'secret', {
-          :site => "https://api.linkedin.com",
-          :request_token_path => "/uas/oauth/requestToken",
-          :access_token_path => "/uas/oauth/accessToken",
-          :authorize_path => "/uas/oauth/authorize",
-          :signature_method => "HMAC-SHA1"
-        })
-
-        LinkedIn::Connection.consumer
-      end
-
+    describe ".config_check" do
       it "user the supplied parameters" do
+        consumer = double(get_request_token: "present")
         expect(OAuth::Consumer).to receive(:new).with('my_key', 'my_secret', {
           :site => "https://api.linkedin.com",
           :request_token_path => "/uas/oauth/requestToken",
           :access_token_path => "/uas/oauth/accessToken",
           :authorize_path => "/uas/oauth/authorize",
           :signature_method => "HMAC-SHA1"
-        })
+        }).and_return(consumer)
 
-        LinkedIn::Connection.consumer('my_key', 'my_secret')
+        LinkedIn::Connection.config_check({
+          api_key: 'my_key',
+          secret_key: 'my_secret'
+        })
       end
     end
   end

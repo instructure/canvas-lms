@@ -59,8 +59,8 @@ define [
     #
     # Returns nothing.
     attachEvents: ->
-      @groupList.on('collection:remove',  @memberList.collection.add.bind(@memberList.collection))
-      @userList.on('collection:remove',   @memberList.collection.add.bind(@memberList.collection))
+      @groupList.on('collection:remove',  @selectCollaborator)
+      @userList.on('collection:remove',   @selectCollaborator)
       @memberList.on('collection:remove', @deselectCollaborator)
       @memberList.on('collection:reset',  @updateListFilters)
 
@@ -86,6 +86,7 @@ define [
     #
     # Returns nothing.
     fetchCollaborators: ->
+      @userList.collection.url = ENV.POTENTIAL_COLLABORATORS_URL
       @userList.collection.fetch(@fetchOptions)
       @groupList.collection.fetch(@fetchOptions) if @includeGroups
       if @options.edit
@@ -114,15 +115,26 @@ define [
     blurRadioGroup: (e) ->
       $(e.currentTarget).parent().removeClass("radio-group-outline")
 
+    # Internal: Add a collaborator to the member list.
+    selectCollaborator: (collaborator) =>
+      item = collaborator.clone()
+      # since the collaborators collection includes users and groups, prefix ids with type
+      item.set('collaborator_id', collaborator.id)
+      item.set('id', "#{collaborator.modelType}_#{collaborator.id}")
+      @memberList.collection.add(item)
+
     # Internal: Remove a collaborator and return them to their original list.
     #
     # collaborator - The model being removed from the collaborators list.
     #
     # Returns nothing.
     deselectCollaborator: (collaborator) =>
+      item = collaborator.clone()
+      # remove the type prefix from the id
+      item.set('id', collaborator.get('collaborator_id'))
       list = if collaborator.modelType is 'user' then @userList else @groupList
-      list.removeFromFilter(collaborator)
-      list.collection.add(collaborator)
+      list.removeFromFilter(item)
+      list.collection.add(item)
 
     # Internal: Pass filter updates to the right collection.
     #
@@ -133,4 +145,3 @@ define [
     updateListFilters: (type, models) =>
       list = if type is 'user' then @userList else @groupList
       list.updateFilter(models)
-

@@ -22,16 +22,16 @@ class ContentExport < ActiveRecord::Base
   belongs_to :user
   belongs_to :attachment
   belongs_to :content_migration
-  has_many :attachments, :as => :context, :dependent => :destroy
+  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_one :epub_export
   has_a_broadcast_policy
   serialize :settings
-  attr_accessible :context, :export_type, :user, :selected_content, :progress
 
   attr_writer :master_migration
+
   validates_presence_of :context_id, :workflow_state
 
-  has_one :job_progress, :class_name => 'Progress', :as => :context
+  has_one :job_progress, :class_name => 'Progress', :as => :context, :inverse_of => :context
 
   #export types
   COMMON_CARTRIDGE = 'common_cartridge'
@@ -280,6 +280,7 @@ class ContentExport < ActiveRecord::Base
   #
   # Returns: bool
   def export_symbol?(symbol)
+    return false if symbol == :all_course_settings && for_master_migration?
     selected_content.empty? || is_set?(selected_content[symbol]) || is_set?(selected_content[:everything])
   end
 

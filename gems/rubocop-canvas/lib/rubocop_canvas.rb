@@ -33,6 +33,7 @@ require 'rubocop_canvas/cops/specs/no_strftime'
 require 'rubocop_canvas/cops/specs/prefer_f_over_fj'
 require 'rubocop_canvas/cops/specs/scope_helper_modules'
 require 'rubocop_canvas/cops/specs/deterministic_described_classes'
+require 'rubocop_canvas/cops/specs/scope_includes'
 
 module RuboCop
   module Canvas

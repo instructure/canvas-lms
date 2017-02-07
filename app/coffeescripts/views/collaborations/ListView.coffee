@@ -57,6 +57,7 @@ define [
     attachEvents: ->
       @collection.on('add remove reset', @render)
                  .on('remove', (model) => @trigger('collection:remove', model))
+                 .on('reset', () => @trigger('collection:reset'))
 
     render: =>
       @updateFilter([])
@@ -70,13 +71,11 @@ define [
     #
     # Returns an HTML string.
     renderCollaborator: (collaborator) =>
-      if collaborator.get('id') == @options.currentUser
-        ''
-      else
-        binding = extend collaborator.toJSON(),
-          name: collaborator.get('sortable_name') or collaborator.get('name')
-          type: collaborator.modelType
-        collaboratorTemplate(binding)
+      binding = extend collaborator.toJSON(),
+        name: collaborator.get('sortable_name') or collaborator.get('name')
+        type: collaborator.modelType
+        collaborator_id: collaborator.id
+      collaboratorTemplate(binding)
 
     # Internal: Set focus after render.
     #
@@ -92,7 +91,7 @@ define [
     # Returns nothing.
     selectCollaborator: (e) ->
       e.preventDefault()
-      id = $(e.currentTarget).data('id')
+      id = $(e.currentTarget).attr('data-id') # .data('id') truncates cross-shard ids :P
       @currentIndex = $(e.currentTarget).parent().index()
       @hasFocus     = true
       @collection.remove(id)
@@ -108,6 +107,7 @@ define [
       setTimeout =>
         @filteredMembers = flatten([@filteredMembers, models])
         each(@filteredMembers, (m) => @collection.remove(m, silent: true))
+        @render() if models.length > 0 # re-render if users were filtered out
       , 0
 
     # Public: Remove the given model from the filter.

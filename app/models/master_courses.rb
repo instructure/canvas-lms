@@ -9,7 +9,7 @@ module MasterCourses
     DiscussionTopic ContextExternalTool ContextModule LearningOutcome Quizzes::Quiz Rubric WikiPage
   }.freeze
 
-  MIGRATION_ID_PREFIX = "mc_".freeze
+  MIGRATION_ID_PREFIX = "mastercourse_".freeze
 
   LOCK_TYPES = [:content, :settings].freeze
 end

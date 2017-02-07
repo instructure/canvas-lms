@@ -72,6 +72,19 @@ define([
             $div.remove();
           }
         });
+
+      var tabHelperHeight = 35;
+      $div.append(
+      $('<div/>',
+        {id: 'tab-helper', style: 'height:0px;padding:5px', tabindex: '0'}
+      ).focus(function () {
+        $(this).height(tabHelperHeight + 'px')
+        var joke = document.createTextNode(I18n.t('Q: What goes black, white, black, white?  A: A panda rolling down a hill.'))
+        this.appendChild(joke)
+      }).blur(function () {
+        $(this).html('').height('0px');
+      }))
+
       return $div;
     },
     beforeUnloadHandler: function(e) {

@@ -20,8 +20,6 @@ class AssignmentGroup < ActiveRecord::Base
 
   include Workflow
 
-  strong_params
-
   attr_readonly :context_id, :context_type
   belongs_to :context, polymorphic: [:course]
   acts_as_list scope: { context: self, workflow_state: 'available' }

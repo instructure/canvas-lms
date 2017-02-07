@@ -20,7 +20,7 @@ describe Twitter::Messenger do
 
     context "with a twitter service" do
       before(:each) do
-        expect(Twitter::Connection).to receive(:new).with("twitter_token", "twitter_secret").and_return(connection_mock)
+        expect(Twitter::Connection).to receive(:from_service_token).with("twitter_token", "twitter_secret").and_return(connection_mock)
       end
 
       it 'delegates to the twitter module if a service is available' do

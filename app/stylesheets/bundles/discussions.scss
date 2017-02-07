@@ -10,6 +10,14 @@ $discussion-dark-text: $ic-color-dark;
   display: none !important;
 }
 
+.entry.deleted.no-replies {
+  display: none !important;
+}
+
+.show-deleted .entry.deleted.no-replies {
+  display: block !important;
+}
+
 .right-align {
   text-align: right;
 }

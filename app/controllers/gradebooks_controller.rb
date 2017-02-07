@@ -217,15 +217,17 @@ class GradebooksController < ApplicationController
 
     tools = external_tools[0...tool_limit]
     tools.push(type: :post_grades) if @context.feature_enabled?(:post_grades)
-    tools.push(type: :ellip) if external_tools.length > tool_limit
     tools
   end
 
   def external_tool_detail(tool)
+    post_grades_placement = tool[:placements][:post_grades]
     {
-      data_url: tool[:placements][:post_grades][:canvas_launch_url],
+      data_url: post_grades_placement[:canvas_launch_url],
       name: tool[:name],
-      type: :lti
+      type: :lti,
+      data_width: post_grades_placement[:launch_width],
+      data_height: post_grades_placement[:launch_height]
     }
   end
 
@@ -409,7 +411,7 @@ class GradebooksController < ApplicationController
       end
 
       submissions = if params[:submissions]
-                      params[:submissions].values
+                      params[:submissions].map{|k, v| v} # apparently .values doesn't pass on the params
                     else
                       [params[:submission]]
                     end
@@ -426,13 +428,17 @@ class GradebooksController < ApplicationController
       submissions.compact.each do |submission|
         @assignment = assignments[submission[:assignment_id].to_i]
         @user = users[submission[:user_id].to_i]
+
+        submission = submission.permit(:grade, :score, :excuse, :excused,
+          :graded_anonymously, :provisional, :final,
+          :comment, :media_comment_id)
+
         submission[:grader] = @current_user
-        submission.delete :comment_attachments
         submission.delete(:provisional) unless @assignment.moderated_grading?
         if params[:attachments]
           attachments = []
           params[:attachments].keys.each do |idx|
-            attachment = strong_params[:attachments][idx].permit(Attachment.permitted_attributes)
+            attachment = params[:attachments][idx].permit(Attachment.permitted_attributes)
             attachment[:user] = @current_user
             attachments << @assignment.attachments.create(attachment)
           end
@@ -460,6 +466,7 @@ class GradebooksController < ApplicationController
           if [:comment, :media_comment_id, :comment_attachments].any? { |k| submission.key? k }
             submission[:commenter] = @current_user
             submission[:hidden] = @assignment.muted?
+
             subs = @assignment.update_submission(@user, submission)
             if submission[:provisional]
               subs.each do |sub|
@@ -567,7 +574,10 @@ class GradebooksController < ApplicationController
           :settings_url => speed_grader_settings_course_gradebook_path,
           :force_anonymous_grading => force_anonymous_grading?(@assignment),
           :grading_role => grading_role,
-          :lti_retrieve_url => retrieve_course_external_tools_url(@context.id, assignment_id: @assignment.id, display: 'borderless'),
+          :grading_type => @assignment.grading_type,
+          :lti_retrieve_url => retrieve_course_external_tools_url(
+            @context.id, assignment_id: @assignment.id, display: 'borderless'
+          ),
           :course_id => @context.id,
           :assignment_id => @assignment.id,
         }
@@ -629,7 +639,7 @@ class GradebooksController < ApplicationController
         @current_user.preferences[:gradebook_column_order] = {}
       end
 
-      @current_user.preferences[:gradebook_column_order][@context.id] = params[:column_order]
+      @current_user.preferences[:gradebook_column_order][@context.id] = params[:column_order].to_hash.with_indifferent_access
       @current_user.save!
       render json: nil
     end

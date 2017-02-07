@@ -152,6 +152,8 @@
 
 #sidebar_content {
   .details {
+    border: none;
+    padding: 0;
     h3 {
       margin: 0;
     }
@@ -171,7 +173,7 @@
         padding-top: 10px;
       }
       .late {
-        color: #880000;
+        color: $ic-color-danger;
         font-weight: bold;
       }
       .unstyled_list {

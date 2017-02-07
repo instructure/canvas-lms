@@ -216,6 +216,14 @@ define [
       url = ENV.DISCUSSION.RATE_URL.replace /:id/, @get 'id'
       $.ajaxJSON url, 'POST', rating: rating
 
+    _hasActiveReplies: (replies) ->
+      return true if _.some(replies, (reply) -> !reply.deleted)
+      return true if _.some(replies, (reply) => @_hasActiveReplies(reply.replies))
+      false
+
+    hasActiveReplies: ->
+      @_hasActiveReplies(@get('replies'))
+
     hasChildren: ->
       @get('replies').length > 0
 

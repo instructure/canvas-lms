@@ -27,9 +27,9 @@ describe UserListV2 do
     @account.save!
   end
 
-  it "should complain about invalid addresses" do
-    ul = UserListV2.new '@instructure', search_type: 'unique_id'
-    expect(ul.errors).to eq [{:address => '@instructure', :details => :unparseable}]
+  it "should complain about invalid input" do
+    ul = UserListV2.new '%instructure', search_type: 'unique_id'
+    expect(ul.errors).to eq [{:address => '%instructure', :details => :unparseable}]
   end
 
   it "should not fail with unicode names" do

@@ -27,9 +27,9 @@ describe UserList do
     @account.save!
   end
 
-  it "should complain about invalid addresses" do
-    ul = UserList.new '@instructure'
-    expect(ul.errors).to eq [{:address => '@instructure', :details => :unparseable}]
+  it "should complain about invalid input" do
+    ul = UserList.new '%instructure'
+    expect(ul.errors).to eq [{:address => '%instructure', :details => :unparseable}]
   end
 
   it "should not fail with unicode names" do

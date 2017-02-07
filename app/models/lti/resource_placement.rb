@@ -25,12 +25,12 @@ module Lti
     LINK_SELECTION = 'link_selection'
     POST_GRADES = 'post_grades'
     RESOURCE_SELECTION = 'resource_selection'
-    ASSIGNMENT_CONFIGURATION = 'assignment_configuration'
+    SIMILARITY_DETECTION = 'similarity_detection'
 
     DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
 
     PLACEMENTS = [:account_navigation,
-                  :assignment_configuration,
+                  :similarity_detection,
                   :assignment_menu,
                   :assignment_selection,
                   :collaboration,
@@ -59,10 +59,8 @@ module Lti
       'Canvas.placements.courseNavigation' => COURSE_NAVIGATION,
       'Canvas.placements.linkSelection' => LINK_SELECTION,
       'Canvas.placements.postGrades' => POST_GRADES,
-      'Canvas.placements.assignmentConfiguration' => ASSIGNMENT_CONFIGURATION,
+      'Canvas.placements.similarityDetection' => SIMILARITY_DETECTION,
     }.freeze
-
-    attr_accessible :placement, :message_handler, :resource_handler
 
     belongs_to :message_handler, class_name: 'Lti::MessageHandler'
     belongs_to :resource_handler, class_name: 'Lti::ResourceHandler'

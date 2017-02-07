@@ -31,7 +31,7 @@ module CanvasColor
     # Default value for #darken, #lighten etc.
     BRIGHTNESS_DEFAULT = 0.2
 
-    # Constructor.  Inits to white (#FFFFFF) by default, or accepts any params 
+    # Constructor.  Inits to white (#FFFFFF) by default, or accepts any params
     # supported by #parse.
     def initialize(*args)
       @r = 255
@@ -91,7 +91,7 @@ module CanvasColor
         return val if val.is_a?(Color)
 
         # Single value, assume grayscale
-        return Color.new(val, val, val) if val.is_a?(Fixnum)
+        return Color.new(val, val, val) if val.is_a?(Integer)
 
         # Assume string
         str = val.to_s.upcase

@@ -51,6 +51,7 @@ class ActiveRecord::Base
                         before_quiz_submission_types
                         grading_scheme_id
                         location
+                        needs_grading_count
                       ).freeze,
     'attachments' => %w(enrollment_id
                         cached_s3_url

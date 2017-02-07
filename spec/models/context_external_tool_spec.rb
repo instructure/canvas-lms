@@ -180,6 +180,12 @@ describe ContextExternalTool do
       expect(@found_tool).to eql(@tool)
     end
 
+    it "should be case insensitive when matching on the same domain" do
+      @tool = @course.context_external_tools.create!(:name => "a", :domain => "Google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @found_tool = ContextExternalTool.find_external_tool("http://google.com/is/cool", Course.find(@course.id), @tool.id)
+      expect(@found_tool).to eql(@tool)
+    end
+
     it "should match on a subdomain" do
       @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/is/cool", Course.find(@course.id))

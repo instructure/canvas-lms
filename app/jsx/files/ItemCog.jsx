@@ -115,7 +115,7 @@ define([
         menuItems.push(<li key='download' role='presentation'><a onClick={wrap(this.downloadFile)} href={this.props.model.get('url')} ref='download' role='menuitem' tabIndex='-1'>{I18n.t('Download')}</a></li>);
       }
 
-      if (this.props.userCanManageFilesForContext) {
+      if (this.props.userCanManageFilesForContext && !this.props.model.get('restricted_by_master_course')) {
         // Rename Link
         menuItems.push(<li key='rename' role='presentation'><a href='#' onClick={preventDefault(this.props.startEditingName)} ref='editName' role='menuitem' tabIndex='-1'>{I18n.t('Rename')}</a></li>);
         // Move Link

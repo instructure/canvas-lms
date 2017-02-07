@@ -30,9 +30,7 @@ define([
             trigger={
               <span className="Gradebook__ColumnHeaderAction">
                 <Typography weight="bold" style="normal" size="large" color="brand">
-                  <IconMoreSolid
-                    label={<ScreenReaderContent>{ I18n.t('More') }</ScreenReaderContent>}
-                  />
+                  <IconMoreSolid title={I18n.t('Student Name Options')} />
                 </Typography>
               </span>
             }

@@ -110,10 +110,8 @@ describe SIS::CSV::AbstractCourseImporter do
       expect(c.sis_source_id).to eq "C001"
       expect(c.short_name).to eq "Hum101"
       expect(c.name).to eq "Humanities"
-      expect(c.enrollment_term).to eq EnrollmentTerm.last
-      expect(c.enrollment_term.name).to eq "Winter13"
-      expect(c.account).to eq Account.last
-      expect(c.account.name).to eq "TestAccount"
+      expect(c.enrollment_term).to eq EnrollmentTerm.find_by(name: "Winter13")
+      expect(c.account).to eq Account.find_by(name: "TestAccount")
       expect(c.root_account).to eq @account
       expect(c.workflow_state).to eq 'active'
     }
@@ -138,14 +136,11 @@ describe SIS::CSV::AbstractCourseImporter do
     )
     Course.last.tap{|c|
       expect(c.sis_source_id).to eq "C001"
-      expect(c.abstract_course).to eq AbstractCourse.last
-      expect(c.abstract_course.sis_source_id).to eq "AC001"
+      expect(c.abstract_course).to eq AbstractCourse.find_by(sis_source_id: "AC001")
       expect(c.short_name).to eq "Hum101"
       expect(c.name).to eq "Humanities"
-      expect(c.enrollment_term).to eq EnrollmentTerm.last
-      expect(c.enrollment_term.name).to eq "Winter13"
-      expect(c.account).to eq Account.last
-      expect(c.account.name).to eq "TestAccount"
+      expect(c.enrollment_term).to eq EnrollmentTerm.find_by(name: "Winter13")
+      expect(c.account).to eq Account.find_by(name: "TestAccount")
       expect(c.root_account).to eq @account
     }
   end
@@ -186,14 +181,11 @@ describe SIS::CSV::AbstractCourseImporter do
     )
     Course.last.tap{|c|
       expect(c.sis_source_id).to eq "C001"
-      expect(c.abstract_course).to eq AbstractCourse.last
-      expect(c.abstract_course.sis_source_id).to eq "AC001"
+      expect(c.abstract_course).to eq AbstractCourse.find_by(sis_source_id: "AC001")
       expect(c.short_name).to eq "shortname"
       expect(c.name).to eq "longname"
-      expect(c.enrollment_term).to eq EnrollmentTerm.last
-      expect(c.enrollment_term.name).to eq "Winter13"
-      expect(c.account).to eq Account.last
-      expect(c.account.name).to eq "TestAccount"
+      expect(c.enrollment_term).to eq EnrollmentTerm.find_by(name: "Winter13")
+      expect(c.account).to eq Account.find_by(name: "TestAccount")
       expect(c.root_account).to eq @account
     }
   end
@@ -210,8 +202,7 @@ describe SIS::CSV::AbstractCourseImporter do
     )
     expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap{|c|
-      expect(c.account).to eq Account.last
-      expect(c.account.name).to eq "TestAccount"
+      expect(c.account).to eq Account.find_by(name: "TestAccount")
       expect(c.root_account).to eq @account
     }
   end

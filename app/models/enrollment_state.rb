@@ -1,6 +1,4 @@
 class EnrollmentState < ActiveRecord::Base
-  strong_params
-
   belongs_to :enrollment
 
   attr_accessor :skip_touch_user, :user_needs_touch, :is_direct_recalculation

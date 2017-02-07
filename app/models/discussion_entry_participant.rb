@@ -19,9 +19,6 @@
 class DiscussionEntryParticipant < ActiveRecord::Base
   include Workflow
 
-  # Be more restrictive if this is ever updatable from user params
-  attr_accessible :discussion_entry, :user, :workflow_state, :forced_read_state
-
   belongs_to :discussion_entry
   belongs_to :user
 

@@ -35,7 +35,7 @@
               <% end %>
             </ul>
             <% if can_do(@wiki_sidebar_data[:wiki], @current_user, :create_page) %>
-              <%= link_to t('links.new_page', "Link to a New Page"), "#", :id => 'new_page_link', :class => "add" %>
+              <%= link_to t('links.new_page', "Link to a New Page"), "#", :id => 'new_page_link', :class => "icon-add" %>
               <form id="new_page_drop_down" style="display:none; margin: 5px;">
                 <div class="row-fluid">
                   <label for="new_page_name"><%= t('new_page_name', %{What would you like to call the new page?}) %></label><br />
@@ -197,7 +197,7 @@
       </div>
     </div>
     <% if can_do(@context, @current_user, :manage_files) %>
-      <div><a href="#" class="upload_new_file_link add" style="padding-top:2px;"><%= t('links.upload_file', %{Upload a new file}) %></a></div>
+      <div><a href="#" class="upload_new_file_link icon-add" style="padding-top:2px;"><%= t('links.upload_file', %{Upload a new file}) %></a></div>
       <%= form_for :attachment, :url => context_url(@context, :context_files_url), :html => {:id => "sidebar_upload_file_form", :style => "display: none;", :multipart => true, :class => "sidebar_upload_file_form"} do |f| %>
         <input type="hidden" name="return_to" value="<%= request.url %>"/>
         <%= f.file_field :uploaded_data, :class => "file_name", :size => 20 %>
@@ -228,7 +228,7 @@
   <div aria-atomic="true" id="editor_tabs_4">
     <%= t('images_tab', %{Click any image to embed the image in the page.}) %>
     <% if can_do(@context, @current_user, :manage_files) %>
-      <a href="#" aria-label="<%= t('aria_label.image_form_collapsed', 'Click to toggle the upload a new image form (collapsed)') %>" class="upload_new_image_link add" style="padding-top:2px;"><%= t('links.upload_image', %{Upload a new image}) %></a>
+      <a href="#" aria-label="<%= t('aria_label.image_form_collapsed', 'Click to toggle the upload a new image form (collapsed)') %>" class="upload_new_image_link icon-add" style="padding-top:2px;"><%= t('links.upload_image', %{Upload a new image}) %></a>
     <% end %>
     <% if can_do(@context, @current_user, :manage_files) %>
       <%= form_for :attachment, :url => context_url(@context, :context_files_url), :html => {:id => "sidebar_upload_image_form", :style => "display: none;", :multipart => true} do |f| %>

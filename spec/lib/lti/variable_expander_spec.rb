@@ -279,6 +279,13 @@ module Lti
           expect(exp_hash[:test]).to eq 123
         end
 
+        it 'has substitution for $Canvas.course.workflowState' do
+          course.workflow_state = 'available'
+          exp_hash = {test: '$Canvas.course.workflowState'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'available'
+        end
+
         it 'has substitution for $CourseSection.sourcedId' do
           course.sis_source_id = 'course1'
           exp_hash = {test: '$CourseSection.sourcedId'}
@@ -564,6 +571,15 @@ module Lti
 
       end
 
+      context 'user is not logged in' do
+        let(:user) {}
+        it 'has substitution for $vnd.Canvas.Person.email.sis when user is not logged in' do
+          exp_hash = {test: '$vnd.Canvas.Person.email.sis'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq '$vnd.Canvas.Person.email.sis'
+        end
+      end
+
       context 'user is logged in' do
 
         it 'has substitution for $Person.name.full' do
@@ -593,6 +609,30 @@ module Lti
           exp_hash = {test: '$Person.email.primary'}
           subject.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'someone@somewhere'
+        end
+
+        it 'has substitution for $vnd.Canvas.Person.email.sis when user is added via sis' do
+          user.save
+          user.email = 'someone@somewhere'
+          cc1 = user.communication_channels.first
+          pseudonym1 = cc1.user.pseudonyms.build(:unique_id => cc1.path, :account => Account.default)
+          pseudonym1.sis_communication_channel_id=cc1.id
+          pseudonym1.communication_channel_id=cc1.id
+          pseudonym1.sis_user_id="some_sis_id"
+          pseudonym1.save
+
+          exp_hash = {test: '$vnd.Canvas.Person.email.sis'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'someone@somewhere'
+        end
+
+        it 'has substitution for $vnd.Canvas.Person.email.sis when user is NOT added via sis' do
+          user.save
+          user.email = 'someone@somewhere'
+
+          exp_hash = {test: '$vnd.Canvas.Person.email.sis'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq '$vnd.Canvas.Person.email.sis'
         end
 
         it 'has substitution for $Person.address.timezone' do

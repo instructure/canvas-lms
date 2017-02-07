@@ -17,8 +17,6 @@
 #
 
 class SisPostGradesStatus < ActiveRecord::Base
-  strong_params
-
   ALLOWED_STATUSES = %w{success warning failed}
   belongs_to :course
   belongs_to :course_section

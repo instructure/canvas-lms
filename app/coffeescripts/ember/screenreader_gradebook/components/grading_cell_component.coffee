@@ -2,12 +2,14 @@ define [
   'i18n!grading_cell'
   'compiled/gradebook/GradebookTranslations'
   'compiled/gradebook/GradebookHelpers'
+  'jsx/gradebook/shared/helpers/GradeFormatHelper'
   'jsx/grading/helpers/OutlierScoreHelper'
+  'jsx/shared/helpers/numberHelper'
   'underscore'
   'ember'
   'jquery'
   'jquery.ajaxJSON'
-], (I18n, GRADEBOOK_TRANSLATIONS, GradebookHelpers, OutlierScoreHelper, _, Ember, $) ->
+], (I18n, GRADEBOOK_TRANSLATIONS, GradebookHelpers, GradeFormatHelper, OutlierScoreHelper, numberHelper, _, Ember, $) ->
 
   GradingCellComponent = Ember.Component.extend
 
@@ -50,13 +52,15 @@ define [
       else if @get('isGpaScale')
         ""
       else if @get('isLetterGrade') or @get('isPassFail')
-        I18n.t "out_of_with_score", "(%{score} out of %{points})",
-          points: @assignment.points_possible
+        I18n.t(
+          "(%{score} out of %{points})",
+          points: I18n.n @assignment.points_possible
           score: @get('score')
+        )
       else if @get('nilPointsPossible')
-        I18n.t "out_of_nil", "No points possible"
+        I18n.t("No points possible")
       else
-        I18n.t "out_of", "(out of %{points})", points: @assignment.points_possible
+        I18n.t("(out of %{points})", points: I18n.n(@assignment.points_possible))
     ).property('submission.score', 'assignment')
 
     changeGradeURL: ->
@@ -70,7 +74,7 @@ define [
     ).property('submission.assignment_id', 'submission.user_id')
 
     score: (->
-      if @submission.score? then @submission.score else ' -'
+      if @submission.score? then I18n.n(@submission.score) else ' -'
     ).property('submission.score')
 
     ajax: (url, options) ->
@@ -102,7 +106,7 @@ define [
                  @submission?.grade || '-'
 
       @setExcusedWithoutTriggeringSave(@submission?.excused)
-      @set 'value', newVal
+      @set 'value', GradeFormatHelper.formatGrade(newVal)
     ).observes('submission').on('init')
 
     onUpdateSuccess: (submission) ->
@@ -110,7 +114,6 @@ define [
       unless submission.excused
         outlierScoreHelper = new OutlierScoreHelper(submission.score, @assignment.points_possible)
         $.flashWarning(outlierScoreHelper.warningMessage()) if outlierScoreHelper.hasWarning()
-
 
     onUpdateError: ->
       $.flashError(GRADEBOOK_TRANSLATIONS.submission_update_error)
@@ -123,11 +126,17 @@ define [
 
       url = @get('saveURL')
       value = @$('input, select').val()
-      @setExcusedWithoutTriggeringSave(value?.toUpperCase() == 'EX')
+
+      excused = typeof value == 'string' && value.toUpperCase() == 'EX'
+      @setExcusedWithoutTriggeringSave(excused)
+
       if @get('isPassFail') and value == '-'
         value = ''
+
+      value = GradeFormatHelper.delocalizeGrade(value)
+
       return if value == submission.grade
-      data = if value?.toUpperCase() == 'EX'
+      data = if typeof value == 'string' && value.toUpperCase() == 'EX'
                { "submission[excuse]": true }
              else
                { "submission[posted_grade]": value }

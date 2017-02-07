@@ -153,7 +153,7 @@ docker-compose run --rm web bundle exec rspec spec/selenium/dashboard_spec.rb
 ### Cassandra
 
 If you're using the analytics package, you'll also need Cassandra. The
-Cassandra configuration isn't ennabled by default. Add `docker-compose/cassandra.override.yml` to your `COMPOSE_FILE` var in `.env`
+Cassandra configuration isn't enabled by default. Add `docker-compose/cassandra.override.yml` to your `COMPOSE_FILE` var in `.env`
 
 Then:
 - Uncomment configuration in config/cassandra.yml
@@ -182,7 +182,8 @@ Or the permissions change (which will make docker work, but causes the git worki
 chmod a+rwx -R canvas-lms
 ```
 
-If your distro is equipped with selinux, make sure it is not interfering.
+If your distro is equipped with [SELinux](https://en.wikipedia.org/wiki/Security-Enhanced_Linux),
+make sure it is not interfering.
 
 ```
 $ sestatus

@@ -23,7 +23,7 @@ describe PageView do
   before do
     # sets both @user and @course (@user is a teacher in @course)
     course_model
-    @page_view = PageView.new { |p| p.assign_attributes({ :created_at => Time.now, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }, :without_protection => true) }
+    @page_view = PageView.new { |p| p.assign_attributes({ :created_at => Time.now, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }) }
   end
 
   describe "sharding" do
@@ -59,7 +59,7 @@ describe PageView do
     end
 
     it "should not start a db transaction on save" do
-      PageView.new { |p| p.assign_attributes({ :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }, :without_protection => true) }.store
+      PageView.new { |p| p.assign_attributes({ :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }) }.store
       PageView.connection.expects(:transaction).never
       expect(PageView.find("abcdef")).to be_present
     end
@@ -237,8 +237,8 @@ describe PageView do
         store_time_2 = Time.zone.parse('2012-01-13T15:47:52Z')
         @user1 = @user
         @user2 = user_model
-        pv2 = PageView.new { |p| p.assign_attributes({ :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "req1", :interaction_seconds => 5 }, :without_protection => true) }
-        pv3 = PageView.new { |p| p.assign_attributes({ :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "req2", :interaction_seconds => 5 }, :without_protection => true) }
+        pv2 = PageView.new { |p| p.assign_attributes({ :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "req1", :interaction_seconds => 5 }) }
+        pv3 = PageView.new { |p| p.assign_attributes({ :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "req2", :interaction_seconds => 5 }) }
         pv2.created_at = store_time
         pv3.created_at = store_time_2
         expect(pv2.store).to be_truthy
@@ -254,7 +254,7 @@ describe PageView do
     before :once do
       Setting.set('enable_page_views', 'db')
       course_model
-      @page_view = PageView.new { |p| p.assign_attributes({ :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }, :without_protection => true) }
+      @page_view = PageView.new { |p| p.assign_attributes({ :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }) }
       @page_view.save!
     end
 

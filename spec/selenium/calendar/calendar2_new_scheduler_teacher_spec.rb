@@ -1,8 +1,8 @@
 require_relative '../common'
 require_relative '../helpers/calendar2_common'
-include Calendar2Common
 
 describe "scheduler" do
+  include Calendar2Common
   include_context "in-process server selenium tests"
   include Calendar2Common
 
@@ -66,11 +66,12 @@ describe "scheduler" do
           set_value(fj('.time_field.end_time:visible'),end_time_text)
           set_value(fj('.date_field:visible'), date)
           find('.scheduler-event-details-footer .btn-primary').click
+          wait_for_ajax_requests
         end
 
         # make sure that the DB record for the Appointment Group is correct
         last_group = AppointmentGroup.last
-        expect(last_group.title).to eq title # spec breaks here
+        expect(last_group.title).to eq title
         expect(last_group.location_name).to eq location
         expect(last_group.start_at.strftime("%I")).to eq start_time_text
         expect(last_group.end_at.strftime("%I")).to eq end_time_text

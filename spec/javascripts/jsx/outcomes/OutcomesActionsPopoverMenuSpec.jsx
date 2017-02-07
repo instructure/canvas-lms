@@ -1,9 +1,9 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jsx/outcomes/OutcomesActionsPopoverMenu'
-], (React, ReactDOM, OutcomesActionsPopoverMenu) => {
-  const TestUtils = React.addons.TestUtils;
+], (React, ReactDOM, TestUtils, OutcomesActionsPopoverMenu) => {
   const Simulate = TestUtils.Simulate;
 
   const fixtures = document.getElementById('fixtures');

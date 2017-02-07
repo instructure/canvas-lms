@@ -39,7 +39,6 @@ require 'authlogic/crypto_providers/bcrypt'
 class SessionPersistenceToken < ActiveRecord::Base
   belongs_to :pseudonym
 
-  attr_accessible :pseudonym, :crypted_token, :token_salt, :uncrypted_token
   attr_accessor :uncrypted_token
   validates_presence_of :pseudonym_id, :crypted_token, :token_salt
 

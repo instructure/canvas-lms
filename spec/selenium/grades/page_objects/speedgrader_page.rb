@@ -63,9 +63,31 @@ class Speedgrader
       f('#students_selectmenu-button')
     end
 
+    def comment_text_area
+      f('#speedgrader_comment_textarea')
+    end
+
+    def comment_submit_button
+      f('#comment_submit_button')
+    end
+
+    def delete_comment
+      f('.delete_comment_link')
+    end
+
+    def submission_file_name
+      f('#submission_files_list .submission-file .display_name')
+    end
+
+    def submission_to_view_dropdown
+      f('#submission_to_view')
+    end
+
     # action
-    def visit(course, assignment)
-      get "/courses/#{course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
+    def visit(course_id, assignment_id)
+      get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
+      visibility_check = grade_input
+      keep_trying_until { visibility_check.displayed? }
     end
 
     def enter_grade(grade)
@@ -100,6 +122,18 @@ class Speedgrader
       next_student_btn.click
     end
 
+    def add_comment_and_submit(comment)
+      replace_content(comment_text_area, comment)
+      comment_submit_button.click
+    end
+
+    def click_submissions_to_view
+      submission_to_view_dropdown.click
+    end
+
+    def select_option_submission_to_view(option_index)
+      click_option(submission_to_view_dropdown, option_index, :value)
+    end
+
   end
 end
-

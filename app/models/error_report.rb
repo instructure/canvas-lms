@@ -30,8 +30,6 @@ class ErrorReport < ActiveRecord::Base
   # Define a custom callback for external notification of an error report.
   define_callbacks :on_send_to_external
 
-  attr_accessible
-
   def send_to_external
     run_callbacks(:on_send_to_external)
   end

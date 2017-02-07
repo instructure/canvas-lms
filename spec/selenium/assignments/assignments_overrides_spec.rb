@@ -151,7 +151,7 @@ describe "assignment groups" do
     end
 
     it "properly validates identical calendar dates when saving and editing", priority: "2", test_id: 216351 do
-      shared_date = "October 12 2014"
+      shared_date = "October 12 2014 at 23:59:00"
       other_section = @course.course_sections.create!(:name => "Section 31", :restrict_enrollments_to_section_dates => true, :end_at => shared_date)
       visit_new_assignment_page
       wait_for_ajaximations

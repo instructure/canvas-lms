@@ -2,36 +2,55 @@ define([
   'react',
   'i18n!student_context_tray',
   'classnames',
-  'instructure-ui/Heading',
-  'instructure-ui/Progress',
-  'instructure-ui/Typography'
-], (React, I18n, classnames, { default: Heading }, { default: Progress }, { default: Typography }) => {
+  'instructure-ui'
+], (React, I18n, classnames, { Heading, Progress, Typography }) => {
 
   class SubmissionProgressBars extends React.Component {
     static propTypes = {
       submissions: React.PropTypes.array.isRequired
     }
 
-    displayGrade (submission) {
+    static displayGrade (submission) {
       const {score, grade, excused} = submission
       const pointsPossible = submission.assignment.points_possible
+      let display
 
       if (excused) {
-        return 'EX'
-      } else if (grade.match(/\%/)) {
+        display = 'EX'
+      } else if (grade.match(/%/)) {
         // Grade is a percentage, just show it
-        return grade
+        display = grade
       } else if (grade.match(/complete/)) {
         // Grade is complete/incomplete, show icon
-        return this.renderIcon(grade)
+        display = SubmissionProgressBars.renderIcon(grade)
       } else {
         // Default to show score out of points possible
-        return `${score}/${pointsPossible}`
+        display = `${score}/${pointsPossible}`
       }
+
+      return display
     }
 
-    renderIcon (grade) {
-      const iconClass= classnames({
+    static displayScreenreaderGrade (submission) {
+      const {score, grade, excused} = submission
+      const pointsPossible = submission.assignment.points_possible
+      let display
+
+      if (excused) {
+        display = I18n.t('excused')
+      } else if (grade.match(/%/) || grade.match(/complete/)) {
+        // Grade is a percentage or in/complete, just show it
+        display = grade
+      } else {
+        // Default to show score out of points possible
+        display = `${score}/${pointsPossible}`
+      }
+
+      return display
+    }
+
+    static renderIcon (grade) {
+      const iconClass = classnames({
         'icon-check': grade === 'complete',
         'icon-x': grade === 'incomplete'
       })
@@ -64,14 +83,12 @@ define([
                     label={I18n.t('Grade')}
                     valueMax={submission.assignment.points_possible}
                     valueNow={submission.score || 0}
-                    formatValueText={() => {return this.displayGrade(submission)} }
-                    formatDisplayedValue={() => {
-                      return (
-                        <Typography size="x-small" color="secondary">
-                          {this.displayGrade(submission)}
-                        </Typography>
-                      )
-                    }}
+                    formatValueText={() => SubmissionProgressBars.displayScreenreaderGrade(submission)}
+                    formatDisplayedValue={() => (
+                      <Typography size="x-small" color="secondary">
+                        {SubmissionProgressBars.displayGrade(submission)}
+                      </Typography>
+                    )}
                   />
                 </div>
               )

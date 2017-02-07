@@ -1,9 +1,8 @@
 require_relative 'common'
 require_relative 'helpers/notifications_common'
-include NotificationsCommon
-
 
 describe "dashboard" do
+  include NotificationsCommon
   include_context "in-process server selenium tests"
 
   context "as a teacher" do
@@ -76,7 +75,7 @@ describe "dashboard" do
 
     context 'stream items' do
       before :once do
-        NotificationsCommon.setup_notification(@teacher, name: 'Assignment Created')
+        setup_notification(@teacher, name: 'Assignment Created')
       end
 
       it 'shows an assignment stream item under Recent Activity in dashboard', priority: "1", test_id: 108723 do

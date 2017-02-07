@@ -31,7 +31,7 @@ class EportfolioCategoriesController < ApplicationController
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
       category_names = @portfolio.eportfolio_categories.map{|c| c.name}
-      @category = @portfolio.eportfolio_categories.build(params[:eportfolio_category])
+      @category = @portfolio.eportfolio_categories.build(eportfolio_category_params)
       respond_to do |format|
         if @category.save
           @portfolio.eportfolio_entries.create(:eportfolio_category => @category, :name => t(:default_name, "New Page"), :allow_comments => true, :show_comments => :true)
@@ -49,7 +49,7 @@ class EportfolioCategoriesController < ApplicationController
     if authorized_action(@portfolio, @current_user, :update)
       @category = @portfolio.eportfolio_categories.find(params[:id])
       respond_to do |format|
-        if @category.update_attributes(params[:eportfolio_category])
+        if @category.update_attributes(eportfolio_category_params)
           format.html { redirect_to eportfolio_category_url(@portfolio, @category) }
           format.json { render :json => @category }
         else
@@ -102,5 +102,9 @@ class EportfolioCategoriesController < ApplicationController
   protected
   def rich_content_service_config
     rce_js_env(:basic)
+  end
+
+  def eportfolio_category_params
+    params.require(:eportfolio_category).permit(:name)
   end
 end

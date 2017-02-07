@@ -108,7 +108,7 @@ describe "Files API", type: :request do
     it "should set the attachment to available (s3 storage)" do
       s3_storage!
 
-      AWS::S3::S3Object.any_instance.expects(:head).returns({
+      Aws::S3::Object.any_instance.expects(:data).returns({
                                           :content_type => 'text/plain',
                                           :content_length => 1234,
                                       })
@@ -165,7 +165,7 @@ describe "Files API", type: :request do
       FilesController.any_instance.stubs(:in_app?).returns(true)
       FilesController.any_instance.stubs(:verified_request?).returns(true)
 
-      AWS::S3::S3Object.any_instance.expects(:head).returns({
+      Aws::S3::Object.any_instance.expects(:data).returns({
                                           :content_type => 'text/plain',
                                           :content_length => 1234,
                                       })
@@ -199,7 +199,7 @@ describe "Files API", type: :request do
 
       it "should call back for s3" do
         s3_storage!
-         AWS::S3::S3Object.any_instance.expects(:head).returns({
+         Aws::S3::Object.any_instance.expects(:data).returns({
                                           :content_type => 'text/plain',
                                           :content_length => 1234,
                                       })

@@ -116,8 +116,8 @@ describe UsersController, type: :request do
       @course.enroll_teacher(@teacher).accept!
       @sub = @assignment.grade_student(@student, grade: nil, grader: @teacher).first
       @sub.workflow_state = 'submitted'
-      @sub.submission_comments.create!(:comment => 'c1', :author => @teacher, :recipient_id => @student.id)
-      @sub.submission_comments.create!(:comment => 'c2', :author => @student, :recipient_id => @teacher.id)
+      @sub.submission_comments.create!(:comment => 'c1', :author => @teacher)
+      @sub.submission_comments.create!(:comment => 'c2', :author => @student)
       @sub.save!
 
       json = api_call(:get, "/api/v1/users/self/activity_stream?asset_type=Submission",
@@ -346,8 +346,8 @@ describe UsersController, type: :request do
     @course.enroll_teacher(@teacher)
     @sub = @assignment.grade_student(@user, { :grade => '12', :grader => @teacher}).first
     @sub.workflow_state = 'submitted'
-    @sub.submission_comments.create!(:comment => 'c1', :author => @teacher, :recipient_id => @user.id)
-    @sub.submission_comments.create!(:comment => 'c2', :author => @user, :recipient_id => @teacher.id)
+    @sub.submission_comments.create!(:comment => 'c1', :author => @teacher)
+    @sub.submission_comments.create!(:comment => 'c2', :author => @user)
     @sub.save!
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
@@ -458,8 +458,8 @@ describe UsersController, type: :request do
     @course.enroll_teacher(@teacher)
     @sub = @assignment.grade_student(@user, grade: nil, grader: @teacher).first
     @sub.workflow_state = 'submitted'
-    @sub.submission_comments.create!(:comment => 'c1', :author => @teacher, :recipient_id => @user.id)
-    @sub.submission_comments.create!(:comment => 'c2', :author => @user, :recipient_id => @teacher.id)
+    @sub.submission_comments.create!(:comment => 'c1', :author => @teacher)
+    @sub.submission_comments.create!(:comment => 'c2', :author => @user)
     @sub.save!
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })

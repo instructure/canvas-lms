@@ -215,7 +215,6 @@ module AssignmentsCommon
         }
       }
     )
-    post_grades_tool.context_external_tool_placements.create!(placement_type: 'post_grades')
     post_grades_tool
   end
 

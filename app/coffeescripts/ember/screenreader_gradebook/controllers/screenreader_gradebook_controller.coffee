@@ -181,6 +181,10 @@ define [
         userSettings.contextSet 'show_concluded_enrollments', isChecked
     ).observes('showConcludedEnrollments')
 
+    selectedAssignmentPointsPossible: ( ->
+      I18n.n @get('selectedAssignment.points_possible')
+    ).property('selectedAssignment')
+
     selectedStudent: null
 
     selectedSection: null
@@ -317,7 +321,7 @@ define [
         percent = 0 if isNaN(percent)
         setProperties student,
           total_grade: result
-          total_percent: percent
+          total_percent: I18n.n(percent, percentage: true)
 
     calculateAllGrades: (->
       @get('students').forEach (student) => @calculateStudentGrade student

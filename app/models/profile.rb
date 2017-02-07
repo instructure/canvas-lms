@@ -2,8 +2,6 @@ class Profile < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course], exhaustive: false
   belongs_to :root_account, :class_name => 'Account'
 
-  attr_accessible :context, :root_account, :title, :path, :description, :visibility, :position
-
   serialize :data
 
   validates_presence_of :root_account
@@ -95,7 +93,7 @@ class Profile < ActiveRecord::Base
 
   module Association
     def self.prepended(klass)
-      klass.has_one :profile, as: :context
+      klass.has_one :profile, as: :context, inverse_of: :context
     end
 
     def profile

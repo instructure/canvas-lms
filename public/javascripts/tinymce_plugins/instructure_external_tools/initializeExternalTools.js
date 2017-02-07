@@ -116,6 +116,22 @@ define([
                 .appendTo("body");
             });
           })
+
+          var tabHelperHeight = 35;
+          $dialog.append(
+          $('<div/>',
+            {id: 'tab-helper', style: 'height: ' + tabHelperHeight + 'px;padding:5px', tabindex: '0'}
+          ).focus(function () {
+            $(this).height(tabHelperHeight + 'px')
+            var joke = document.createTextNode(I18n.t('Q: What goes black, white, black, white?  A: A panda rolling down a hill.'))
+            this.appendChild(joke)
+            var currentHeight = $dialog.dialog('option', 'height');
+            $dialog.dialog('option', 'height', currentHeight + tabHelperHeight)
+          }).blur(function () {
+            $(this).html('').height('0px');
+            var currentHeight = $dialog.dialog('option', 'height');
+            $dialog.dialog('option', 'height', currentHeight - tabHelperHeight)
+          }))
       }
 
       $(window).unbind("externalContentReady");

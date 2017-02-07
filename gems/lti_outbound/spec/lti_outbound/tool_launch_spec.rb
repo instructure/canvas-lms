@@ -135,6 +135,7 @@ describe LtiOutbound::ToolLaunch do
       expect(hash['custom_canvas_user_login_id']).to eq '$Canvas.user.loginId'
       expect(hash['custom_canvas_course_id']).to eq '$Canvas.course.id'
       expect(hash['custom_canvas_api_domain']).to eq '$Canvas.api.domain'
+      expect(hash['custom_canvas_workflow_state']).to eq '$Canvas.course.workflowState'
       expect(hash['lis_course_offering_sourcedid']).to eq '$CourseSection.sourcedId'
       expect(hash['lis_person_contact_email_primary']).to eq 'nobody@example.com'
       expect(hash['lis_person_name_full']).to eq 'user_name'

@@ -21,5 +21,4 @@ class UserMergeDataRecord < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account_user, :enrollment, :pseudonym,:user_observer,
                                      :attachment, :communication_channel, :user_service]
 
-  strong_params
 end

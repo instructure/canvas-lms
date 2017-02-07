@@ -21,7 +21,6 @@ class EnrollmentTerm < ActiveRecord::Base
 
   include Workflow
 
-  attr_accessible :name, :start_at, :end_at
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :grading_period_group, inverse_of: :enrollment_terms
   has_many :grading_periods, through: :grading_period_group

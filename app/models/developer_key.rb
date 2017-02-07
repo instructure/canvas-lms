@@ -28,8 +28,6 @@ class DeveloperKey < ActiveRecord::Base
   has_many :page_views
   has_many :access_tokens
 
-  attr_accessible :api_key, :name, :user, :account, :icon_url, :redirect_uri, :redirect_uris, :email, :event, :auto_expire_tokens
-
   before_create :generate_api_key
   before_create :set_auto_expire_tokens
   before_save :nullify_empty_icon_url

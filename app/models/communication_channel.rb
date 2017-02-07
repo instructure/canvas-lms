@@ -21,8 +21,6 @@ class CommunicationChannel < ActiveRecord::Base
   # as independent of pseudonyms
   include Workflow
 
-  attr_accessible :user, :path, :path_type, :build_pseudonym_on_confirm, :pseudonym
-
   serialize :last_bounce_details
   serialize :last_transient_bounce_details
 

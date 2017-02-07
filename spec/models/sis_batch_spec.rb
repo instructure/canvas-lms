@@ -55,7 +55,7 @@ describe SisBatch do
 
   def process_csv_data(data, opts = {})
     create_csv_data(data) do |batch|
-      batch.update_attributes(opts, without_protection: true) if opts.present?
+      batch.update_attributes(opts) if opts.present?
       batch.process_without_send_later
       batch
     end
@@ -250,12 +250,18 @@ s2,test_1,section2,active},
       @previous_batch = @account.sis_batches.create!
       @old_batch = @account.sis_batches.create!
 
-      @c1 = factory_with_protected_attributes(@subacct.courses, :name => "delete me", :enrollment_term => @term1, :sis_batch_id => @previous_batch.id)
+      @c1 = factory_with_protected_attributes(@subacct.courses, name: "delete me", enrollment_term: @term1,
+                                              sis_source_id: 'my_first_course', sis_batch_id: @previous_batch.id)
       @c1.offer!
-      @c2 = factory_with_protected_attributes(@account.courses, :name => "don't delete me", :enrollment_term => @term1, :sis_source_id => 'my_course', :root_account => @account)
+      @c2 = factory_with_protected_attributes(@account.courses, name: "don't delete me", enrollment_term: @term1,
+                                              sis_source_id: 'my_course', root_account: @account)
       @c2.offer!
-      @c3 = factory_with_protected_attributes(@account.courses, :name => "delete me if terms", :enrollment_term => @term2, :sis_batch_id => @previous_batch.id)
+      @c3 = factory_with_protected_attributes(@account.courses, name: "delete me if terms", enrollment_term: @term2,
+                                              sis_source_id: 'my_third_course', sis_batch_id: @previous_batch.id)
       @c3.offer!
+      @c5 = factory_with_protected_attributes(@account.courses, name: "don't delete me cause sis was removed",
+                                              enrollment_term: @term1, sis_batch_id: @previous_batch.id, sis_source_id: nil)
+      @c5.offer!
 
       # initial import of one course, to test courses that haven't changed at all between imports
       process_csv_data([
@@ -265,10 +271,17 @@ another_course,not-delete,not deleted not changed,,term1,active}
       @c4 = @account.courses.where(course_code: 'not-delete').first
 
       # sections are keyed off what term their course is in
-      @s1 = factory_with_protected_attributes(@c1.course_sections, :name => "delete me", :sis_batch_id => @old_batch.id)
-      @s2 = factory_with_protected_attributes(@c2.course_sections, :name => "don't delete me", :sis_source_id => 'my_section')
-      @s3 = factory_with_protected_attributes(@c3.course_sections, :name => "delete me if terms", :sis_batch_id => @old_batch.id)
-      @s4 = factory_with_protected_attributes(@c2.course_sections, :name => "delete me", :sis_batch_id => @old_batch.id) # c2 won't be deleted, but this section should still be
+      @s1 = factory_with_protected_attributes(@c1.course_sections, name: "delete me",
+                                              sis_source_id: 's1', sis_batch_id: @old_batch.id)
+      @s2 = factory_with_protected_attributes(@c2.course_sections, name: "don't delete me",
+                                              sis_source_id: 'my_section')
+      @s3 = factory_with_protected_attributes(@c3.course_sections, name: "delete me if terms",
+                                              sis_source_id: 's3', sis_batch_id: @old_batch.id)
+      # c2 won't be deleted, but this section should still be
+      @s4 = factory_with_protected_attributes(@c2.course_sections, name: "delete me",
+                                              sis_source_id: 's4', sis_batch_id: @old_batch.id)
+      @sn = factory_with_protected_attributes(@c2.course_sections, name: "don't delete me, I've lost my sis",
+                                              sis_source_id: nil, sis_batch_id: @old_batch.id)
 
       # enrollments are keyed off what term their course is in
       @e1 = factory_with_protected_attributes(@c1.enrollments, :workflow_state => 'active', :user => user_factory, :sis_batch_id => @old_batch.id, :type => 'StudentEnrollment')
@@ -301,6 +314,7 @@ s2,test_1,section2,active},
       expect(@c2.reload).to be_available
       expect(@c3.reload).to be_available
       expect(@c4.reload).to be_claimed
+      expect(@c5.reload).to be_available
       @cnew = @account.reload.courses.where(course_code: 'TC 101').first
       expect(@cnew).not_to be_nil
       expect(@cnew.sis_batch_id).to eq @batch.id
@@ -310,6 +324,7 @@ s2,test_1,section2,active},
       expect(@s2.reload).to be_active
       expect(@s3.reload).to be_active
       expect(@s4.reload).to be_deleted
+      expect(@sn.reload).to be_active
       @s5 = @cnew.course_sections.where(sis_source_id: 's2').first
       expect(@s5).not_to be_nil
 
@@ -403,7 +418,7 @@ s2,test_1,section2,active},
       expect(@course.reload).to be_claimed
       expect(b.data[:counts][:batch_sections_deleted]).to eq 1
 
-      Auditors::Course.expects(:record_deleted).once.with(@course, anything, anything)
+      expect(Auditors::Course).to receive(:record_deleted).once.with(@course, anything, anything)
       # only supply courses
       b = process_csv_data(
         [%{course_id,short_name,long_name,term_id}],

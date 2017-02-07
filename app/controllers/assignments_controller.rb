@@ -46,7 +46,8 @@ class AssignmentsController < ApplicationController
       @context.require_assignment_group
       set_js_assignment_data # in application_controller.rb, because the assignments page can be shared with the course home
 
-      js_env(WEIGHT_FINAL_GRADES: @context.apply_group_weights?)
+      js_env(WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
+             POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value])
 
       respond_to do |format|
         format.html do
@@ -334,12 +335,13 @@ class AssignmentsController < ApplicationController
   end
 
   def create
+    defaults = {}
     if params[:assignment] && params[:assignment][:post_to_sis].nil?
-      params[:assignment][:post_to_sis] = @context.account.sis_default_grade_export[:value]
+      defaults[:post_to_sis] = @context.account.sis_default_grade_export[:value]
     end
-    params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
+    defaults[:time_zone_edited] = Time.zone.name if params[:assignment]
     group = get_assignment_group(params[:assignment])
-    @assignment ||= @context.assignments.build(strong_assignment_params)
+    @assignment ||= @context.assignments.build(strong_assignment_params.merge(defaults))
 
     if params[:assignment][:secure_params]
       secure_params = Canvas::Security.decode_jwt params[:assignment][:secure_params]
@@ -386,6 +388,7 @@ class AssignmentsController < ApplicationController
     rce_js_env(:highrisk)
     @assignment ||= @context.assignments.active.find(params[:id])
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
+      return render_unauthorized_action if !@assignment.new_record? && editing_restricted?(@assignment)
       @assignment.title = params[:title] if params[:title]
       @assignment.due_at = params[:due_at] if params[:due_at]
       @assignment.points_possible = params[:points_possible] if params[:points_possible]
@@ -531,6 +534,7 @@ class AssignmentsController < ApplicationController
   def destroy
     @assignment = @context.assignments.active.api_id(params[:id])
     if authorized_action(@assignment, @current_user, :delete)
+      return render_unauthorized_action if editing_restricted?(@assignment)
       @assignment.destroy
 
       respond_to do |format|
@@ -543,7 +547,7 @@ class AssignmentsController < ApplicationController
   protected
 
   def strong_assignment_params
-    strong_params.require(:assignment).
+    params.require(:assignment).
       permit(:title, :name, :description, :due_at, :points_possible,
         :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
         :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,

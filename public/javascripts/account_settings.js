@@ -15,20 +15,23 @@ define([
   'jqueryui/tabs' // /\.tabs/
 ], function(I18n, $, EditorConfig, globalAnnouncements) {
 
-  EditorConfig.prototype.balanceButtonsOverride = function(instructure_buttons) {
-    var instBtnGroup = "table,instructure_links,unlink" + instructure_buttons;
-    var top_row_buttons = "";
-    var bottom_row_buttons = "";
+  function openReportDescriptionLink (event) {
+    event.preventDefault();
+    var title = $(this).parents('.title').find('span.title').text();
+    var $desc = $(this).parent('.reports').find('.report_description');
+    $desc.clone().dialog({
+      title: title,
+      width: 800
+    });
+  }
 
-    top_row_buttons = this.formatBtnGroup + "," + this.positionBtnGroup;
-    bottom_row_buttons = instBtnGroup + "," + this.fontBtnGroup;
-
-    return [top_row_buttons, bottom_row_buttons];
-  };
-
-  EditorConfig.prototype.toolbar = function() {
-    var instructure_buttons = this.buildInstructureButtons();
-    return this.balanceButtonsOverride(instructure_buttons);
+  function addUsersLink (event) {
+    event.preventDefault();
+    var $enroll_users_form = $('#enroll_users_form');
+    $(this).hide();
+    $enroll_users_form.show();
+    $('html,body').scrollTo($enroll_users_form);
+    $enroll_users_form.find('#admin_role_id').focus().select();
   }
 
   $(document).ready(function() {
@@ -212,23 +215,9 @@ define([
     });
 
     // Admins tab
-    $(".add_users_link").click(function(event) {
-        var $enroll_users_form = $("#enroll_users_form");
-        $(this).hide();
-        event.preventDefault();
-        $enroll_users_form.show();
-        $("html,body").scrollTo($enroll_users_form);
-        $enroll_users_form.find("textarea").focus().select();
-      });
+    $(".add_users_link").click(addUsersLink);
 
-    $(".open_report_description_link").click(function(event) {
-      event.preventDefault();
-      var title = $(this).parents(".title").find("span.title").text();
-      $(this).parent(".reports").find(".report_description").dialog({
-        title: title,
-        width: 800
-      });
-    });
+    $(".open_report_description_link").click(openReportDescriptionLink);
 
     $(".run_report_link").click(function(event) {
       event.preventDefault();
@@ -319,5 +308,10 @@ define([
       $('#global_includes_warning_message_wrapper').toggleClass('alert', this.checked);
     }).trigger('change');
   });
+
+  return {
+    addUsersLink: addUsersLink,
+    openReportDescriptionLink: openReportDescriptionLink
+  }
 
 });

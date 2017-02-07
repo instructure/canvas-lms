@@ -25,7 +25,6 @@ class Attachment < ActiveRecord::Base
     col = table ? "#{table}.display_name" : 'display_name'
     best_unicode_collation_key(col)
   end
-  strong_params
 
   PERMITTED_ATTRIBUTES = [:filename, :display_name, :locked, :position, :lock_at,
     :unlock_at, :uploaded_data, :hidden, :viewed_at].freeze
@@ -39,6 +38,9 @@ class Attachment < ActiveRecord::Base
   include HasContentTags
   include ContextModuleItem
   include SearchTermHelper
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:display_name, :uploaded_data]
+  restrict_columns :settings, [:folder_id, :locked, :lock_at, :unlock_at, :usage_rights_id]
 
   attr_accessor :podcast_associated_asset
 
@@ -121,7 +123,7 @@ class Attachment < ActiveRecord::Base
   has_attachment(
       :storage => self.store_type.key,
       :path_prefix => file_store_config['path_prefix'],
-      :s3_access => :private,
+      :s3_access => 'private',
       :thumbnails => { :thumb => '128x128' },
       :thumbnail_class => 'Thumbnail'
   )
@@ -263,7 +265,7 @@ class Attachment < ActiveRecord::Base
 
     excluded_atts = EXCLUDED_COPY_ATTRIBUTES
     excluded_atts += ["locked", "hidden"] if dup == existing
-    dup.assign_attributes(self.attributes.except(*excluded_atts), :without_protection => true)
+    dup.assign_attributes(self.attributes.except(*excluded_atts))
 
     dup.write_attribute(:filename, self.filename)
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
@@ -272,6 +274,7 @@ class Attachment < ActiveRecord::Base
     end
     dup.context = context
     dup.migration_id = options[:migration_id] || CC::CCHelper.create_key(self)
+    dup.mark_as_importing!(options[:migration]) if options[:migration]
     if context.respond_to?(:log_merge_result)
       context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
     end
@@ -643,11 +646,18 @@ class Attachment < ActiveRecord::Base
 
   def handle_duplicates(method, opts = {})
     return [] unless method.present? && self.folder
+
     if self.folder.for_submissions?
       method = :rename
     else
       method = method.to_sym
     end
+
+    if method == :overwrite
+      atts = self.shard.activate { self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id) }
+      method = :rename if atts.any? { |att| att.editing_restricted?(:any) }
+    end
+
     deleted_attachments = []
     if method == :rename
       self.save! unless self.id
@@ -669,9 +679,8 @@ class Attachment < ActiveRecord::Base
         end
       end
     elsif method == :overwrite
-      atts = self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id)
       atts.update_all(:replacement_attachment_id => self) # so we can find the new file in content links
-      copy_access_attributes!(atts.first) unless atts.empty?
+      copy_access_attributes!(atts) unless atts.empty?
       atts.each do |a|
         # update content tags to refer to the new file
         ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(:content_id => self)
@@ -685,7 +694,9 @@ class Attachment < ActiveRecord::Base
     return deleted_attachments
   end
 
-  def copy_access_attributes!(source)
+  def copy_access_attributes!(source_attachments)
+    self.could_be_locked = true if source_attachments.any?(&:could_be_locked?)
+    source = source_attachments.first
     self.file_state = 'hidden' if source.file_state == 'hidden'
     self.locked = source.locked
     self.unlock_at = source.unlock_at
@@ -889,11 +900,11 @@ class Attachment < ActiveRecord::Base
   end
 
   def download_url(ttl = url_ttl)
-    authenticated_s3_url(expires: ttl, response_content_disposition: "attachment; " + disposition_filename)
+    authenticated_s3_url(expires_in: ttl, response_content_disposition: "attachment; " + disposition_filename)
   end
 
   def inline_url(ttl = url_ttl)
-    authenticated_s3_url(expires: ttl, response_content_disposition: "inline; " + disposition_filename)
+    authenticated_s3_url(expires_in: ttl, response_content_disposition: "inline; " + disposition_filename)
   end
 
   def url_ttl
@@ -1625,7 +1636,7 @@ class Attachment < ActiveRecord::Base
           end
         else
           new_attachment = Attachment.new
-          new_attachment.assign_attributes(attachment.attributes.except(*EXCLUDED_COPY_ATTRIBUTES), :without_protection => true)
+          new_attachment.assign_attributes(attachment.attributes.except(*EXCLUDED_COPY_ATTRIBUTES))
 
           new_attachment.user_id = to_context.id if to_context.is_a? User
           new_attachment.context = to_context

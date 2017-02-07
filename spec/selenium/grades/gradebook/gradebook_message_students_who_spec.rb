@@ -132,6 +132,7 @@ describe "gradebook - message students who" do
     expect(message_form.find_element(:css, '.send_button')).not_to have_class('disabled')
 
     submit_form(message_form)
+    wait_for_ajax_requests
 
     expect{ ConversationBatch.last.recipient_ids }.to become([@student_2.id])
   end

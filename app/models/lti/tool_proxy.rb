@@ -19,8 +19,6 @@
 module Lti
   class ToolProxy < ActiveRecord::Base
 
-    attr_accessible :shared_secret, :guid, :product_version, :lti_version, :product_family, :workflow_state, :raw_data, :context, :name, :description
-
     has_many :bindings, class_name: 'Lti::ToolProxyBinding', dependent: :destroy
     has_many :resources, class_name: 'Lti::ResourceHandler', dependent: :destroy
     has_many :tool_settings, class_name: 'Lti::ToolSetting', dependent: :destroy

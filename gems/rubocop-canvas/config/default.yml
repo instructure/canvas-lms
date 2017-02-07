@@ -26,8 +26,12 @@ Migration/ModelBehavior:
     - "**/db/migrate/*.rb"
     - "lib/data_fixup/*.rb"
   Whitelist:
+    - "ActiveRecord::Base"
+    - "ActiveRecord::Migration"
     - Canvas
+    - DatabaseServer
     - DataFixup
+    - Shackles
     - Switchman
     - Shard
     - Account.default
@@ -39,7 +43,6 @@ Migration/ModelBehavior:
     - "*.find_ids_in_ranges"
     - "*.update_all"
     - "*.delete_all"
-    - "ActiveRecord::Migration"
 
 Migration/PrimaryKey:
   Enabled: true
@@ -110,6 +113,12 @@ Specs/ScopeHelperModules:
     - "**/spec_canvas/**/*.rb"
 
 Specs/DeterministicDescribedClasses:
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"
+
+Specs/ScopeIncludes:
   Enabled: true
   Include:
     - "**/spec/**/*.rb"

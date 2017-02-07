@@ -44,4 +44,29 @@ describe MasterCourses::MasterContentTag do
       expect(@topic.reload.updated_at.to_i).to eq @time.to_i
     end
   end
+
+  describe "fetch_module_item_restrictions" do
+    it "should fetch restrictions for module items in a most fancy fashion" do
+      @copy_from = course_factory
+      @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
+      topic = @copy_from.discussion_topics.create!
+      topic_master_tag = @template.create_content_tag_for!(topic)
+      assmt = @copy_from.assignments.create!
+      restrictions = {:content => true, :settings => true}
+      assmt_master_tag = @template.create_content_tag_for!(assmt, {:restrictions => restrictions})
+
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      copied_topic = @copy_to.discussion_topics.create!(:migration_id => topic_master_tag.migration_id)
+      copied_assmt = @copy_to.assignments.create!(:migration_id => assmt_master_tag.migration_id)
+      [copied_topic, copied_assmt].each{|obj| sub.create_content_tag_for!(obj)}
+
+      mod = @copy_to.context_modules.create!(:name => "something")
+      tag1 = mod.add_item(:id => copied_topic.id, :type => "discussion_topic")
+      tag2 = mod.add_item(:id => copied_assmt.id, :type => "assignment")
+
+      item_restriction_map = MasterCourses::MasterContentTag.fetch_module_item_restrictions([tag1.id, tag2.id])
+      expect(item_restriction_map).to eq({tag1.id => {}, tag2.id => restrictions})
+    end
+  end
 end

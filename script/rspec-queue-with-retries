@@ -1,0 +1,97 @@
+#!/bin/bash
+
+set -e
+
+export TEST_QUEUE_REPLACE_STATS=1
+
+max_failures=${RERUNS:=200}
+runs_remaining=$((1+${RERUNS_RETRY:=3}))
+spec_list=${SPEC_FILES:=spec}
+
+rerun_line="adding spec to rerun (\./.*:[0-9]+)"
+exempt_from_rerun_threshold_line="exceptions are exempt from rerun thresholds"
+failed_relevant_spec_line="\[(.*) is not eligible for rerunning"
+
+pipe=/tmp/rspec-queue-pipe
+rm -f $pipe
+mkfifo $pipe
+
+# sometimes the log_and_run_command fifo gets clogged and the echo fails,
+# so sleep and try again
+function try_echo {
+  for i in {1..5}; do
+    if echo "$@" 2>&-; then
+      [[ $i -gt 1 ]] && echo "try_echo succeeded on try $i" # TODO: remove me once we're sure it's working well
+      return 0
+    fi
+    sleep 1
+  done
+  return 1
+}
+
+echo "[rspec-queue:initial] STARTING"
+while true; do
+  last_status=0
+  new_spec_list=()
+  exempt_spec_list=()
+  failed_relevant_spec_list=()
+
+  command="bundle exec script/rspec-queue $@ --failure-exit-code 99 $spec_list"
+  echo "Running [$command]"
+  $command >$pipe 2>&1 &
+  command_pid=$!
+
+  while IFS= read line; do
+    try_echo "$line" || exit 2
+    if [[ $line =~ $rerun_line ]]; then
+      new_spec="${BASH_REMATCH[1]}"
+      new_spec_list+=("$new_spec")
+      if [[ $line =~ $exempt_from_rerun_threshold_line ]]; then
+        exempt_spec_list+=("$new_spec")
+      fi
+    elif [[ $line =~ $failed_relevant_spec_line ]]; then
+      failed_relevant_spec_list+=("${BASH_REMATCH[1]}")
+    fi
+  done <$pipe
+  wait $command_pid || last_status=$?
+  [[ ! $reruns_started ]] && echo "[rspec-queue:initial] FINISHED"
+
+  # between test-queue and the formatter we get double output; uniq them
+  new_spec_list=($(echo "${new_spec_list[@]}"|tr ' ' '\n'|sort -u|tr '\n' ' '))
+  failed_relevant_spec_list=($(echo "${failed_relevant_spec_list[@]}"|tr ' ' '\n'|sort -u|tr '\n' ' '))
+  failures_exempt_from_rerun_threshold=$(echo "${exempt_spec_list[@]}"|tr ' ' '\n'|grep .|sort -u|wc -l)
+
+  runs_remaining=$((runs_remaining-1))
+  num_failures=${#new_spec_list[@]}
+
+  [[ $last_status == 0 ]] && break
+  [[ $runs_remaining == 0 ]] && { echo "reruns failed $num_failures failure(s)"; break; }
+
+  failures_towards_rerun_threshold=$((num_failures-failures_exempt_from_rerun_threshold))
+  if [[ failures_towards_rerun_threshold -gt $max_failures ]]; then
+    echo "too many failures (got: $num_failures, exempt from threshold: $failures_exempt_from_rerun_threshold, max: $max_failures), build not eligible for reruns" || :
+    break
+  fi
+
+  failed_relevant_spec_list_length=${#failed_relevant_spec_list[@]}
+  if [[ "$DONT_RERUN_RELEVANT_SPECS" == "1" && failed_relevant_spec_list_length -gt 0 ]]; then
+    echo "specs relevant to this commit failed: ${failed_relevant_spec_list[@]}, build not eligible for reruns" || :
+    break
+  fi
+
+  [[ $num_failures == 0 ]] && { echo "nothing to re-run! perhaps the code is horribly broken? :("; break; }
+  [[ $last_status != 99 ]] && { echo "unexpected exit code $last_status! perhaps the code is horribly broken? :("; break; }
+
+  spec_list="${new_spec_list[@]}"
+
+  echo -e "failed, re-trying $num_failures failure(s) ($failures_towards_rerun_threshold against threshold), $runs_remaining attempt(s) left\n\n\n"
+  if [[ ! $reruns_started ]]; then
+    reruns_started=1
+    echo "[rspec-queue:reruns] STARTING"
+    unset TEST_QUEUE_REPLACE_STATS # ensure the rerun stats merge into the main ones
+  fi
+done
+
+[[ $reruns_started ]] && echo "[rspec-queue:reruns] FINISHED"
+echo "rspec-queue-with-retries exiting with $last_status"
+exit $last_status

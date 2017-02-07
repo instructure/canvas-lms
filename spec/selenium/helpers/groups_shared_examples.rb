@@ -1,13 +1,14 @@
 require_relative '../common'
 require_relative 'groups_common'
 require_relative 'shared_examples_common'
-include GroupsCommon
-include SharedExamplesCommon
 
 # ======================================================================================================================
 # Shared Examples
 # ======================================================================================================================
 shared_examples 'home_page' do |context|
+  include GroupsCommon
+  include SharedExamplesCommon
+
   it "should display a coming up section with relevant events", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273602, teacher: 319909) do
     # Create an event to have something in the Coming up Section
     event = @testgroup[0].calendar_events.create!(title: "ohai",
@@ -54,6 +55,9 @@ end
 
 #-----------------------------------------------------------------------------------------------------------------------
 shared_examples 'announcements_page' do |context|
+  include GroupsCommon
+  include SharedExamplesCommon
+
   it "should center the add announcement button if no announcements are present", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273606, teacher: 324936) do
     get announcements_page
     expect(f('#content div')).to have_attribute(:style, 'text-align: center;')
@@ -105,6 +109,9 @@ end
 
 #-----------------------------------------------------------------------------------------------------------------------
 shared_examples 'pages_page' do |context|
+  include GroupsCommon
+  include SharedExamplesCommon
+
   it "should load pages index and display all pages", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273610, teacher: 324927) do
     @testgroup.first.wiki.wiki_pages.create!(title: "Page 1", user: @teacher)
     @testgroup.first.wiki.wiki_pages.create!(title: "Page 2", user: @teacher)
@@ -115,9 +122,9 @@ shared_examples 'pages_page' do |context|
   it "should only list in-group pages in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273620, teacher: 324928) do
     # create group and course announcements
     group_page = @testgroup.first.wiki.wiki_pages.create!(user: @teacher,
-                                                          title: 'Group Page', message: 'Group')
+                                                          title: 'Group Page')
     course_page = @course.wiki.wiki_pages.create!(user: @teacher,
-                                                  title: 'Course Page', message: 'Course')
+                                                  title: 'Course Page')
 
     get pages_page
     f('.btn-primary').click
@@ -139,6 +146,9 @@ end
 
 #-----------------------------------------------------------------------------------------------------------------------
 shared_examples 'people_page' do |context|
+  include GroupsCommon
+  include SharedExamplesCommon
+
   it "should allow group users to see group registered services page", priority: pick_priority(context, student: "1", teacher: "2"),test_id: pick_test_id(context, student: 323329, teacher: 324926) do
     get people_page
     expect_new_page_load do
@@ -152,6 +162,9 @@ end
 
 #-----------------------------------------------------------------------------------------------------------------------
 shared_examples 'discussions_page' do |context|
+  include GroupsCommon
+  include SharedExamplesCommon
+
   it "should only list in-group discussions in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273622, teacher: 324930) do
     # create group and course announcements
     group_dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
@@ -191,6 +204,9 @@ end
 
 #-----------------------------------------------------------------------------------------------------------------------
 shared_examples 'files_page' do |context|
+  include GroupsCommon
+  include SharedExamplesCommon
+
   it "should allow group users to rename a file", priority: "2", test_id: pick_test_id(context, student: 312869, teacher: 315577) do
     add_test_files
     get files_page
@@ -213,6 +229,9 @@ end
 
 #-----------------------------------------------------------------------------------------------------------------------
 shared_examples 'conferences_page' do |context|
+  include GroupsCommon
+  include SharedExamplesCommon
+
   it "should allow group users to create a conference", priority: pick_priority(context, student: "1", teacher: "2"),test_id: pick_test_id(context, student: 307624, teacher: 308534) do
     skip_if_chrome('issue with invite_all_but_one_user method')
     title = 'test conference'

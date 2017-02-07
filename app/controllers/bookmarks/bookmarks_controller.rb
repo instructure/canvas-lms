@@ -148,7 +148,7 @@ class Bookmarks::BookmarksController < ApplicationController
   end
 
   def valid_params
-    strong_params.permit(:name, :url).merge(user_id: user_id).merge(params.slice(:data))
+    params.permit(:name, :url).merge(user_id: user_id).merge(params.slice(:data))
   end
 
   def set_position

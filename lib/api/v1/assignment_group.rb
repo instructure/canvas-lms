@@ -73,7 +73,8 @@ module Api::V1::AssignmentGroup
           overrides: overrides,
           include_overrides: opts[:include_overrides],
           needs_grading_course_proxy: needs_grading_course_proxy,
-          submission: includes.include?('submission') ? opts[:submissions][a.id] : nil
+          submission: includes.include?('submission') ? opts[:submissions][a.id] : nil,
+          include_master_course_restrictions: master_courses? && group.context.grants_right?(user, session, :manage_assignments)
         )
 
         unless opts[:exclude_response_fields].include?('in_closed_grading_period')

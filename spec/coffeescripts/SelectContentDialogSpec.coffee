@@ -39,6 +39,23 @@ define [
     $dialog.dialog('close')
     ok window.confirm.called
 
+  test "it includes the tab-helper element", () ->
+    $dialog = $("#resource_selection_dialog")
+    ok $($dialog).find('#tab-helper').length
+
+  test 'tab-helper element is not visible after it has been blurred', ->
+    $dialog = $("#resource_selection_dialog")
+    $tabHelper = $($dialog).find('#tab-helper')
+    $($tabHelper).focus()
+    $($tabHelper).blur()
+    equal $($tabHelper).height(), 0
+
+  test 'tab-helper element is visible when focused', ->
+    $dialog = $("#resource_selection_dialog")
+    $tabHelper = $($dialog).find('#tab-helper')
+    $($tabHelper).focus()
+    equal $($tabHelper).height(), 35
+
   test "it removes the confim alert if a selection is passed back", ()->
     l = document.getElementById('test-tool')
     @mock(window).expects("confirm").never()

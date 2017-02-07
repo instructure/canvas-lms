@@ -425,29 +425,31 @@ class GroupsController < ApplicationController
   #
   # @returns Group
   def create
+    attrs = api_request? ? params : params.require(:group)
+    attrs = attrs.permit(:name, :description, :join_level, :is_public, :storage_quota_mb, :max_membership)
+
     if api_request?
       if params[:group_category_id]
         group_category = GroupCategory.active.find(params[:group_category_id])
         return render :json => {}, :status => bad_request unless group_category
         @context = group_category.context
-        params[:group_category] = group_category
+        attrs[:group_category] = group_category
         return unless authorized_action(group_category.context, @current_user, :manage_groups)
       else
         @context = @domain_root_account
-        params[:group_category] = GroupCategory.communities_for(@context)
+        attrs[:group_category] = GroupCategory.communities_for(@context)
       end
     elsif params[:group]
       group_category_id = params[:group].delete :group_category_id
       if group_category_id && @context.grants_right?(@current_user, session, :manage_groups)
         group_category = @context.group_categories.where(id: group_category_id).first
         return render :json => {}, :status => :bad_request unless group_category
-        params[:group][:group_category] = group_category
+        attrs[:group_category] = group_category
       else
-        params[:group][:group_category] = nil
+        attrs[:group_category] = nil
       end
     end
 
-    attrs = api_request? ? params : params[:group]
     attrs.delete :storage_quota_mb unless @context.grants_right? @current_user, session, :manage_storage_quotas
     @group = @context.groups.temp_record(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
 
@@ -510,11 +512,12 @@ class GroupsController < ApplicationController
   # @returns Group
   def update
     find_group
-    attrs = api_request? ? params : params[:group]
+    attrs = api_request? ? params : params.require(:group)
+    attrs = attrs.permit(:name, :description, :join_level, :is_public, :avatar_id, :storage_quota_mb, :max_membership,
+      :leader => strong_anything, :members => strong_anything)
 
-    attrs.delete :group_category
-    if !api_request? && attrs[:group_category_id]
-      group_category_id = attrs.delete :group_category_id
+    if !api_request? && params[:group][:group_category_id]
+      group_category_id = params[:group].delete :group_category_id
       group_category = @context.group_categories.where(id: group_category_id).first
       return render :json => {}, :status => :bad_request unless group_category
       attrs[:group_category] = group_category

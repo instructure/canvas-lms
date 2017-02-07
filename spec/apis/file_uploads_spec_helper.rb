@@ -18,11 +18,27 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 
-RSpec.configure do |config|
-  config.include ApplicationHelper
-end
-
 shared_examples_for "file uploads api" do
+  include ApplicationHelper
+
+  # send a multipart post request in an integration spec post_params is
+  # an array of [k,v] params so that the order of the params can be
+  # defined
+  def send_multipart(url, post_params = {}, http_headers = {}, method = :post)
+    mp = Multipart::Post.new
+    query, headers = mp.prepare_query(post_params)
+
+    # A bug in the testing adapter in Rails 3-2-stable doesn't corretly handle
+    # translating this header to the Rack/CGI compatible version:
+    # (https://github.com/rails/rails/blob/3-2-stable/actionpack/lib/action_dispatch/testing/integration.rb#L289)
+    #
+    # This issue is fixed in Rails 4-0 stable, by using a newer version of
+    # ActionDispatch Http::Headers which correctly handles the merge
+    headers = headers.dup.tap { |h| h['CONTENT_TYPE'] ||= h.delete('Content-type') }
+
+    send(method, url, query, headers.merge(http_headers))
+  end
+
   def attachment_json(attachment, options = {})
     json = {
       'id' => attachment.id,
@@ -123,7 +139,7 @@ shared_examples_for "file uploads api" do
     s3_storage!
     # step 1, preflight
     json = preflight({ :name => filename })
-    expect(json['upload_url']).to eq "http://no-bucket.s3.amazonaws.com/"
+    expect(json['upload_url']).to eq "https://no-bucket.s3.amazonaws.com"
     attachment = Attachment.order(:id).last
     redir = json['upload_params']['success_action_redirect']
     exemption_string = has_query_exemption? ? ("quota_exemption=" + attachment.quota_exemption_key + "&") : ""
@@ -132,7 +148,7 @@ shared_examples_for "file uploads api" do
 
     # step 2, upload
     # we skip the actual call and stub this out, since we can't hit s3 during specs
-    AWS::S3::S3Object.any_instance.expects(:head).returns({
+    Aws::S3::Object.any_instance.expects(:data).returns({
       :content_type => 'application/msword',
       :content_length => 1234,
     })
@@ -393,7 +409,7 @@ shared_examples_for "file uploads api with folders" do
 
     redir = json['upload_params']['success_action_redirect']
     attachment = Attachment.order(:id).last
-    AWS::S3::S3Object.any_instance.expects(:head).returns({
+    Aws::S3::Object.any_instance.expects(:data).returns({
                                       :content_type => 'application/msword',
                                       :content_length => 1234,
                                     })

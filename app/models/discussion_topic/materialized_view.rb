@@ -24,8 +24,6 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   include Rails.application.routes.url_helpers
   def use_placeholder_host?; true; end
 
-  attr_accessible :discussion_topic
-
   serialize :participants_array, Array
   serialize :entry_ids_array, Array
 

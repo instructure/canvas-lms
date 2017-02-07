@@ -21,23 +21,41 @@ require 'oauth'
 
 module LinkedIn
   class Connection
-    def get_service_user_info(access_token)
-      body = access_token.get('/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)').body
-      data = Nokogiri::XML(body)
-      service_user_id = data.css("id")[0].content
-      service_user_name = data.css("first-name")[0].content + " " + data.css("last-name")[0].content
-      service_user_url = data.css("public-profile-url")[0].content
-      return service_user_id, service_user_name, service_user_url
+    def self.from_request_token(request_token, request_secret, oauth_verifier)
+      access_token = OAuth::RequestToken.new(
+        consumer,
+        request_token,
+        request_secret
+      ).get_access_token(:oauth_verifier => oauth_verifier)
+      new(access_token)
     end
 
-    def get_access_token(token, secret, oauth_verifier)
-      consumer = self.class.consumer
-      request_token = OAuth::RequestToken.new(consumer, token, secret)
-      request_token.get_access_token(:oauth_verifier => oauth_verifier)
+    attr_reader :access_token
+
+    def initialize(access_token)
+      @access_token = access_token
     end
 
-    def request_token(oauth_callback)
-      consumer = self.class.consumer
+    def service_user_id
+      service_user.css("id")[0].content
+    end
+
+    def service_user_name
+      fn = service_user.css("first-name")[0].content
+      ln = service_user.css("last-name")[0].content
+      "#{fn} #{ln}"
+    end
+
+    def service_user_url
+      service_user.css("public-profile-url")[0].content
+    end
+
+    def service_user
+      url = '/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)'
+      @data ||= Nokogiri::XML(access_token.get(url).body)
+    end
+
+    def self.request_token(oauth_callback)
       consumer.get_request_token(:oauth_callback => oauth_callback)
     end
 
@@ -53,10 +71,11 @@ module LinkedIn
         :signature_method => "HMAC-SHA1"
       })
     end
+    private_class_method :consumer
 
     def self.config_check(settings)
-      consumer = self.consumer(settings[:api_key], settings[:secret_key])
-      token = consumer.get_request_token rescue nil
+      c = consumer(settings[:api_key], settings[:secret_key])
+      token = c.get_request_token rescue nil
       token ? nil : "Configuration check failed, please check your settings"
     end
 

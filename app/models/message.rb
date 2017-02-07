@@ -41,11 +41,7 @@ class Message < ActiveRecord::Base
   include NotificationPreloader
   belongs_to :user
   belongs_to :root_account, :class_name => 'Account'
-  has_many   :attachments, :as => :context
-
-  attr_accessible :to, :from, :subject, :body, :delay_for, :context, :path_type,
-    :from_name, :reply_to_name, :sent_at, :notification, :user, :communication_channel,
-    :notification_name, :asset_context, :data, :root_account_id
+  has_many   :attachments, :as => :context, :inverse_of => :context
 
   attr_writer :delayed_messages
   attr_accessor :output_buffer

@@ -248,7 +248,7 @@ define [
       ad = @srgb.get('assignmentDetails')
       selectedAssignment = @srgb.get('selectedAssignment')
       strictEqual ad.assignment, selectedAssignment
-      strictEqual ad.cnt, 1
+      strictEqual ad.cnt, '1'
 
   test 'outcomeDetails is computed properly', ->
     @completeSetup().then =>
@@ -426,7 +426,7 @@ define [
 
   test 'calculates final grade', ->
     workAroundRaceCondition().then =>
-      equal @srgb.get('students.firstObject.total_percent'), 79.55
+      equal @srgb.get('students.firstObject.total_percent'), '79.55%'
 
   module 'grade calc with 0s',
     setup: ->
@@ -434,7 +434,7 @@ define [
 
   test 'calculates final grade', ->
     workAroundRaceCondition().then =>
-      equal @srgb.get('students.firstObject.total_percent'), 0
+      equal @srgb.get('students.firstObject.total_percent'), '0%'
 
 
   module 'screenreader_gradebook_controller: notes computed props',

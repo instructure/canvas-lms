@@ -70,6 +70,10 @@ define [
       return @get 'lock_at' unless arguments.length > 0
       @set 'lock_at', date
 
+    dueDateRequired: (newDueDateRequired) =>
+      return @get 'dueDateRequired' unless arguments.length > 0
+      @set 'dueDateRequired', newDueDateRequired
+
     description: (newDescription) =>
       return @get 'description' unless arguments.length > 0
       @set 'description', newDescription
@@ -365,10 +369,13 @@ define [
         'allDates', 'hasDueDate', 'hasPointsPossible', 'singleSectionDueDate',
         'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides',
         'omitFromFinalGrade', 'is_quiz_assignment', 'secureParams',
-        'inClosedGradingPeriod'
+        'inClosedGradingPeriod', 'dueDateRequired'
       ]
 
-      hash = id: @get 'id'
+      hash =
+        id: @get('id'),
+        is_master_course_content: @get('is_master_course_content'),
+        restricted_by_master_course: @get('restricted_by_master_course')
       for field in fields
         hash[field] = @[field]()
       hash

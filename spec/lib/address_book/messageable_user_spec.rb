@@ -45,9 +45,9 @@ describe AddressBook::MessageableUser do
       student3 = student_in_course(active_all: true).user
       address_book = AddressBook::MessageableUser.new(teacher)
       address_book.known_users([student1, student2])
-      teacher.expects(:load_messageable_users).
+      expect(teacher).to receive(:load_messageable_users).
         with([student3], anything).
-        returns(MessageableUser.where(id: student3).to_a)
+        and_return(MessageableUser.where(id: student3).to_a)
       known_users = address_book.known_users([student2, student3])
       expect(known_users.map(&:id)).to include(student2.id)
       expect(known_users.map(&:id)).to include(student3.id)

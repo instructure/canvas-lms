@@ -135,6 +135,12 @@ class FoldersController < ApplicationController
     folder = Folder.find(params[:id])
     if authorized_action(folder, @current_user, :read_contents)
       can_view_hidden_files = can_view_hidden_files?(folder.context, @current_user, session)
+      opts = {:can_view_hidden_files => can_view_hidden_files}
+
+      if can_view_hidden_files && folder.context.is_a?(Course) &&
+          master_courses? && MasterCourses::ChildSubscription.is_child_course?(folder.context)
+        opts[:master_course_restricted_folder_ids] = MasterCourses::FolderLockingHelper.locked_folder_ids_for_course(folder.context)
+      end
 
       scope = folder.active_sub_folders
       unless can_view_hidden_files
@@ -146,7 +152,7 @@ class FoldersController < ApplicationController
         scope = scope.by_name
       end
       @folders = Api.paginate(scope, self, api_v1_list_folders_url(folder))
-      render :json => folders_json(@folders, @current_user, session, :can_view_hidden_files => can_view_hidden_files)
+      render :json => folders_json(@folders, @current_user, session, opts)
     end
   end
 
@@ -504,7 +510,7 @@ class FoldersController < ApplicationController
 
   def process_folder_params(parameters, api_request)
     folder_params = (api_request ? parameters : parameters[:folder]) || {}
-    folder_params.slice(:name, :parent_folder_id, :parent_folder_path, :folder_id,
+    folder_params.permit(:name, :parent_folder_id, :parent_folder_path, :folder_id,
                         :source_folder_id, :lock_at, :unlock_at, :locked,
                         :hidden, :context, :position, :just_hide)
   end
@@ -538,6 +544,10 @@ class FoldersController < ApplicationController
     if authorized_action(@folder, @current_user, :delete)
       if @folder.root_folder?
         render :json => {:message => t('no_deleting_root', "Can't delete the root folder")}, :status => 400
+      elsif @folder.context.is_a?(Course) && master_courses? &&
+          MasterCourses::ChildSubscription.is_child_course?(@folder.context) &&
+          MasterCourses::FolderLockingHelper.locked_folder_ids_for_course(@folder.context).include?(@folder.id)
+        render :json => {:message => "Can't delete folder containing files locked by Blueprint Course"}, :status => 400
       elsif @folder.has_contents? && params[:force] != 'true'
         render :json => {:message => t('no_deleting_folders_with_content', "Can't delete a folder with content")}, :status => 400
       else

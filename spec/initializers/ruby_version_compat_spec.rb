@@ -3,6 +3,16 @@
 require File.expand_path('../spec_helper', File.dirname( __FILE__ ))
 
 describe 'ruby_version_compat' do
+  # from minitest, MIT licensed
+  def capture_io
+    orig_stdout, orig_stderr = $stdout, $stderr
+    $stdout, $stderr = StringIO.new, StringIO.new
+    yield
+    return $stdout.string, $stderr.string
+  ensure
+    $stdout, $stderr = orig_stdout, orig_stderr
+  end
+
   describe 'backport of ruby #7278' do
     it "should not output to stdout/stderr" do
       output = capture_io do

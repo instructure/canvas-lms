@@ -225,8 +225,6 @@ describe CourseProgress do
       specs_require_sharding
 
       it "can return correct progress" do
-        pend_with_bullet
-
         @shard1.activate { @shard_user = User.create!(name: 'outofshard') }
         @course.enroll_student(@shard_user).accept!
 

@@ -1,2 +1,4 @@
 public/javascripts/vendor/**/*
 public/javascripts/enzyme_requireJS.js
+
+doc/

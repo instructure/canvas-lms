@@ -88,7 +88,7 @@ describe "submissions" do
       expect_new_page_load { f('#submit_file_button').click }
 
       expect(f('.details .header')).to include_text "Turned In!"
-      expect(f('.details .file-big')).to include_text "testfile1"
+      expect(f('.details')).to include_text "testfile1"
     end
   end
 end

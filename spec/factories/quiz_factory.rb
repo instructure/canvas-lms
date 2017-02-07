@@ -247,7 +247,7 @@ module Factories
     @assignment.submission_types = "online_quiz"
     @assignment.save
     @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
-    @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
+    @questions = questions.map { |q| @quiz.quiz_questions.create!(q.slice(:quiz_group, :assessment_question, :question_data, :assessment_question_version)) }
     @quiz.generate_quiz_data
     @quiz.due_at = opts.fetch(:due_at, Time.zone.now.advance(days: 7))
     @quiz.published_at = Time.zone.now

@@ -22,7 +22,6 @@ require 'atom'
 require_dependency 'assignment_student_visibility'
 
 class WikiPage < ActiveRecord::Base
-  attr_accessible :title, :body, :url, :user_id, :user, :editing_roles, :notify_of_update
   attr_readonly :wiki_id
   attr_accessor :saved_by
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -38,6 +37,7 @@ class WikiPage < ActiveRecord::Base
   include MasterCourses::Restrictor
   restrict_columns :content, [:body, :title]
   restrict_columns :settings, [:editing_roles]
+  restrict_columns :settings, Assignment::RESTRICTED_SETTINGS
 
   after_update :post_to_pandapub_when_revised
 

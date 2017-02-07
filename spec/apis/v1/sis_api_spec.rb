@@ -12,9 +12,7 @@ describe SisApiController, type: :request do
       consumer_key: 'key',
       shared_secret: 'secret',
       settings: { post_grades: { url: 'http://example.com/lti/post_grades' } }
-    ).tap do |tool|
-      tool.context_external_tool_placements.create!(placement_type: 'post_grades')
-    end
+    )
   end
 
   describe '#sis_assignments' do

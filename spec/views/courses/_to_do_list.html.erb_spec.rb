@@ -23,6 +23,7 @@ describe "courses/_to_do_list.html.erb" do
         expect(response).to include "15 points"
         expect(response).to include "My Awesome Course"
         expect(response).to include due_at(@assignment, @user)
+        expect(response).to include "Ignore SubmitMe"
       end
     end
     describe "submissions to review" do
@@ -47,6 +48,7 @@ describe "courses/_to_do_list.html.erb" do
         view_context
         render partial: "courses/to_do_list", locals: {contexts: nil}
         expect(response).to include "Peer Review for ReviewMe"
+        expect(response).to include "Ignore ReviewMe"
       end
     end
   end
@@ -79,6 +81,7 @@ describe "courses/_to_do_list.html.erb" do
         expect(response).to include due_at(@assignment, @user)
         expect(response).to include "2"
         expect(response).to include "2 submissions need grading"
+        expect(response).to include "Ignore GradeMe until new submission"
       end
 
       it "shows 999+ when there are more than 999 to grade" do
@@ -88,9 +91,9 @@ describe "courses/_to_do_list.html.erb" do
                          due_at: due_date,
                          submission_types: "online_text_entry",
                          points_possible: 15,
-                         title: "GradeMe",
-                         needs_grading_count: 1000)
-        Assignments::NeedsGradingCountQuery.any_instance.stubs(:count).returns(1000)
+                         title: "GradeMe")
+        Assignment.stubs(:need_grading_info).returns(Assignment.where(id: @assignment.id))
+        Assignments::NeedsGradingCountQuery.any_instance.stubs(:manual_count).returns(1000)
         @user = @teacher
         @user.course_nicknames[@course.id] = "My Awesome Course"
         @user.save!
@@ -115,8 +118,8 @@ describe "courses/_to_do_list.html.erb" do
                          submission_types: "online_text_entry",
                          points_possible: 15,
                          title: "ModerateMe",
-                         moderated_grading: true,
-                         needs_grading_count: 1)
+                         moderated_grading: true)
+        Assignments::NeedsGradingCountQuery.any_instance.stubs(:manual_count).returns(1)
         @submission = submission_model(assignment: @assignment, body: "my submission")
         @submission.find_or_create_provisional_grade!(@teacher, grade: 5)
         @user = @teacher
@@ -125,6 +128,7 @@ describe "courses/_to_do_list.html.erb" do
         view_context
         render partial: "courses/to_do_list", locals: {contexts: nil}
         expect(response).to include "Moderate ModerateMe"
+        expect(response).to include "Ignore ModerateMe until new mark"
       end
     end
   end

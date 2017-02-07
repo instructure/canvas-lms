@@ -929,7 +929,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would create a tool on this course with two custom fields and a course navigation tab
-  #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools' \
+  #   curl -X POST 'https://<canvas>/api/v1/courses/<course_id>/external_tools' \
   #        -H "Authorization: Bearer <token>" \
   #        -F 'name=LTI Example' \
   #        -F 'consumer_key=asdfg' \
@@ -945,7 +945,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would create a tool on the account with navigation for the user profile page
-  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/external_tools' \
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/external_tools' \
   #        -H "Authorization: Bearer <token>" \
   #        -F 'name=LTI Example' \
   #        -F 'consumer_key=asdfg' \
@@ -959,7 +959,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would create a tool on the account with configuration pulled from an external URL
-  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/external_tools' \
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/external_tools' \
   #        -H "Authorization: Bearer <token>" \
   #        -F 'name=LTI Example' \
   #        -F 'consumer_key=asdfg' \
@@ -968,7 +968,7 @@ class ExternalToolsController < ApplicationController
   #        -F 'config_url=https://example.com/ims/lti/tool_config.xml'
   def create
     if authorized_action(@context, @current_user, :create_tool_manually)
-      external_tool_params = params[:external_tool] || params
+      external_tool_params = (params[:external_tool] || params).to_hash.with_indifferent_access
       @tool = @context.context_external_tools.new
       if request.content_type == 'application/x-www-form-urlencoded'
         custom_fields = Lti::AppUtil.custom_params(request.raw_post)
@@ -1018,7 +1018,7 @@ class ExternalToolsController < ApplicationController
         :config_settings
       ]
 
-      external_tool_params = params.select{|k, _| required_params.include?(k.to_sym)}
+      external_tool_params = params.to_hash.with_indifferent_access.select{|k, _| required_params.include?(k.to_sym)}
 
       external_tool_params[:config_url] = app_api.get_app_config_url(params[:app_center_id], params[:config_settings])
       external_tool_params[:config_type] = 'by_url'
@@ -1049,7 +1049,7 @@ class ExternalToolsController < ApplicationController
   def update
     @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])
     if authorized_action(@tool, @current_user, :update_manually)
-      external_tool_params = params[:external_tool] || params
+      external_tool_params = (params[:external_tool] || params).to_hash.with_indifferent_access
       if request.content_type == 'application/x-www-form-urlencoded'
         custom_fields = Lti::AppUtil.custom_params(request.raw_post)
         external_tool_params[:custom_fields] = custom_fields if custom_fields.present?

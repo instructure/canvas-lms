@@ -27,7 +27,6 @@ class DelayedNotification < ActiveRecord::Base
   include NotificationPreloader
   belongs_to :asset_context, polymorphic: [:account, :group, :course]
 
-  attr_accessible :asset, :notification, :recipient_keys, :asset_context, :data
   attr_accessor :data
   validates_presence_of :notification_id, :asset_id, :asset_type, :workflow_state
 

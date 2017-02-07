@@ -20,8 +20,6 @@ module Polling
   class PollChoice < ActiveRecord::Base
     self.table_name = 'polling_poll_choices'
 
-    attr_accessible :text, :poll, :is_correct, :position
-
     belongs_to :poll, class_name: 'Polling::Poll'
     has_many :poll_submissions, class_name: 'Polling::PollSubmission', dependent: :destroy
 

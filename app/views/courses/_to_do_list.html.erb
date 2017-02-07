@@ -30,9 +30,11 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
             </div>
           </div>
           <div class="todo-details">
-            <b><%= t('Grade %{assignment}', assignment: assignment.title) %></b>
+            <b class="todo-details__title"><%= t('Grade %{assignment}', assignment: assignment.title) %></b>
             <% if presenter.show_context? %>
-              <p><%= assignment.short_context_name %></p>
+              <p class="todo-details__context">
+                <%= assignment.short_context_name %>
+              </p>
             <% end %>
             <p>
               <% if assignment.points_possible %>
@@ -57,9 +59,11 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
         >
           <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
           <div class="todo-details">
-            <b><%= t('Moderate %{assignment}', assignment: assignment.title) %></b>
+            <b class="todo-details__title"><%= t('Moderate %{assignment}', assignment: assignment.title) %></b>
             <% if presenter.show_context? %>
-              <p><%= assignment.short_context_name %></p>
+              <p class="todo-details__context">
+                <%= assignment.short_context_name %>
+              </p>
             <% end %>
             <p>
               <% if assignment.points_possible %>
@@ -84,9 +88,11 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
         >
           <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
           <div class="todo-details">
-            <b><%= assignment.submission_action_string %></b>
+            <b  class="todo-details__title"><%= assignment.submission_action_string %></b>
             <% if presenter.show_context? %>
-              <p><%= assignment.short_context_name %></p>
+              <p class="todo-details__context">
+                <%= assignment.short_context_name %>
+              </p>
             <% end %>
             <p>
               <% if assignment.points_possible %>
@@ -113,9 +119,11 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
           <%# Don't need aria-label here because we say that this is a peer review in the text immediately following %>
           <i class="icon-peer-review"></i>
           <div class="todo-details">
-            <b><%= t('Peer Review for %{assignment}', assignment: assignment.title) %></b>
+            <b class="todo-details__title"><%= t('Peer Review for %{assignment}', assignment: assignment.title) %></b>
             <% if presenter.show_context? %>
-              <p><%= assessment_request.short_context_name %></p>
+              <p class="todo-details__context">
+                <%= assessment_request.short_context_name %>
+              </p>
             <% end %>
             <p>
               <% if assignment.try(:points_possible) %>

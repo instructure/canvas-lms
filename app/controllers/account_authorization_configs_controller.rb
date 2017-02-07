@@ -603,7 +603,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # @returns AuthenticationProvider
   def create
-    aac_data = strong_params.fetch(:authentication_provider, strong_params)
+    aac_data = params.fetch(:authentication_provider, params)
     position = aac_data.delete(:position)
     data = filter_data(aac_data)
     deselect_parent_registration(data)
@@ -659,7 +659,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # @returns AuthenticationProvider
   def update
-    aac_data = strong_params.fetch(:authentication_provider, strong_params)
+    aac_data = params.fetch(:authentication_provider, params)
     aac = @account.authentication_providers.active.find params[:id]
     update_deprecated_account_settings_data(aac_data, aac)
     position = aac_data.delete(:position)
@@ -779,7 +779,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # @returns SSOSettings
   def update_sso_settings
-    sets = strong_params.require(:sso_settings).permit(:login_handle_name,
+    sets = params.require(:sso_settings).permit(:login_handle_name,
                                                        :change_password_url,
                                                        :auth_discovery_url,
                                                        :unknown_user_url)

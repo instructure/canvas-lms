@@ -69,13 +69,26 @@
         <a href="{{htmlEditUrl}}?return_to={{return_to}}#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{name}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
         {{/if}}
         {{#if cyoe.isReleased}}
-        <span class="pill mastery-path-icon" data-tooltip title="{{#t}}Released by Mastery Path{{/t}}">
+        <span class="pill mastery-path-icon" aria-hidden="true" data-tooltip title="{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}">
           <i class="icon-mastery-path"></i>{{cyoe.releasedLabel}}
         </span>
+        <span class="screenreader-only">{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}</span>
         {{/if}}
         <span class="sis-button" data-view="sis-button"></span>
+        <span class="master-course-cell">
+          {{#if is_master_course_content}}
+            {{#if restricted_by_master_course}}
+              <i class="icon-lock"></i>
+            {{else}}
+              <i class="icon-unlock icon-Line"></i>
+            {{/if}}
+          {{/if}}
+        </span>
         <span class="publish-icon" data-view="publish-icon"></span>
         <div class="inline-block">
+          {{#if restricted_by_master_course}}
+            <div class="options-spacer"></div>
+          {{else}}
           <a
             class="al-trigger al-trigger-gray"
             id="assign_{{id}}_manage_link"
@@ -151,6 +164,7 @@
             {{/if}}
             {{>ExternalTools/external_tools_menu menu_tools}}
           </ul>
+          {{/if}}
         </div>
       </div>
     </div>

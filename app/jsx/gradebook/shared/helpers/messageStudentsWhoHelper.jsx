@@ -37,13 +37,19 @@ define([
         {
           text: I18n.t("students_who.scored_less_than", "Scored less than"),
           cutoff: true,
-          subjectFn: (assignment, cutoff) => I18n.t('students_who.scored_less_than_on', 'Scored less than %{cutoff} on %{assignment}', { assignment: assignment.name, cutoff: cutoff }),
+          subjectFn: (assignment, cutoff) => I18n.t(
+            'Scored less than %{cutoff} on %{assignment}',
+            { assignment: assignment.name, cutoff: I18n.n(cutoff) }
+          ),
           criteriaFn: (student, cutoff) => this.scoreWithCutoff(student, cutoff) && student.score < cutoff
         },
         {
           text: I18n.t("students_who.scored_more_than", "Scored more than"),
           cutoff: true,
-          subjectFn: (assignment, cutoff) => I18n.t('students_who.scored_more_than_on', 'Scored more than %{cutoff} on %{assignment}', { assignment: assignment.name, cutoff: cutoff }),
+          subjectFn: (assignment, cutoff) => I18n.t(
+            'Scored more than %{cutoff} on %{assignment}',
+            { assignment: assignment.name, cutoff: I18n.n(cutoff) }
+          ),
           criteriaFn: (student, cutoff) => this.scoreWithCutoff(student, cutoff) && student.score > cutoff
         }
       ];

@@ -115,7 +115,7 @@ module Polling
     #   }
     #
     def create
-      poll_choice_params = params[:poll_choices][0]
+      poll_choice_params = get_poll_choice_params
       @poll_choice = @poll.poll_choices.new(poll_choice_params)
       @poll_choice.is_correct = false if poll_choice_params && poll_choice_params[:is_correct].blank?
 
@@ -148,7 +148,7 @@ module Polling
     #   }
     #
     def update
-      poll_choice_params = params[:poll_choices][0]
+      poll_choice_params = get_poll_choice_params
       @poll_choice = @poll.poll_choices.find(params[:id])
 
       if poll_choice_params && poll_choice_params[:is_correct].blank?
@@ -202,6 +202,10 @@ module Polling
         scope: @current_user,
         include_root: false
       }).as_json
+    end
+
+    def get_poll_choice_params
+      params.require(:poll_choices)[0].permit(:text, :is_correct, :position)
     end
 
   end

@@ -52,9 +52,9 @@ describe I18n do
         precision: 3,
         format: '%n %'
       }
-      I18n.stubs(:translate).with(:'number.format', anything).returns(format)
-      I18n.stubs(:translate).with(:'number.percentage.format', anything).returns(format)
-      I18n.stubs(:translate).with(:'number.precision.format', anything).returns(format)
+      allow(I18n).to receive(:translate).with(:'number.format', anything).and_return(format)
+      allow(I18n).to receive(:translate).with(:'number.percentage.format', anything).and_return(format)
+      allow(I18n).to receive(:translate).with(:'number.precision.format', anything).and_return(format)
     end
 
     context "without precision" do

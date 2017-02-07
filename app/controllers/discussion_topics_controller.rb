@@ -372,11 +372,16 @@ class DiscussionTopicsController < ApplicationController
         end
       end
       format.json do
+        check_for_restrictions = master_courses? && @context.grants_right?(@current_user, session, :moderate_forum)
+        MasterCourses::Restrictor.preload_restrictions(@topics) if check_for_restrictions
+
         render json: discussion_topics_api_json(@topics, @context, @current_user, session,
           user_can_moderate: user_can_moderate,
           plain_messages: value_to_boolean(params[:plain_messages]),
           exclude_assignment_description: value_to_boolean(params[:exclude_assignment_descriptions]),
-          include_all_dates: include_params.include?('all_dates'))
+          include_all_dates: include_params.include?('all_dates'),
+          include_master_course_restrictions: check_for_restrictions
+        )
       end
     end
   end
@@ -398,6 +403,7 @@ class DiscussionTopicsController < ApplicationController
   def edit
     @topic ||= @context.all_discussion_topics.find(params[:id])
     if authorized_action(@topic, @current_user, (@topic.new_record? ? :create : :update))
+      return render_unauthorized_action if !@topic.new_record? && editing_restricted?(@topic)
       hash =  {
         URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
         PERMISSIONS: {
@@ -805,6 +811,7 @@ class DiscussionTopicsController < ApplicationController
   def destroy
     @topic = @context.all_discussion_topics.find(params[:id] || params[:topic_id])
     if authorized_action(@topic, @current_user, :delete)
+      return render_unauthorized_action if editing_restricted?(@topic)
       @topic.destroy
       respond_to do |format|
         format.html {
@@ -898,7 +905,7 @@ class DiscussionTopicsController < ApplicationController
 
   def process_discussion_topic(is_new = false)
     @errors = {}
-    discussion_topic_hash = params.slice(*API_ALLOWED_TOPIC_FIELDS)
+    discussion_topic_hash = params.permit(*API_ALLOWED_TOPIC_FIELDS)
     model_type = value_to_boolean(discussion_topic_hash.delete(:is_announcement)) && @context.announcements.temp_record.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
     if is_new
       @topic = @context.send(model_type).build
@@ -951,7 +958,7 @@ class DiscussionTopicsController < ApplicationController
         apply_positioning_parameters
         apply_attachment_parameters
         unless @topic.root_topic_id?
-          apply_assignment_parameters(strong_params[:assignment], @topic)
+          apply_assignment_parameters(params[:assignment], @topic)
         end
 
         if publish_later

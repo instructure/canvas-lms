@@ -56,20 +56,22 @@ class RubricsController < ApplicationController
   # parameter, then it will point the rubric_association to the new rubric
   # instead of the old one.
   def update
-    params[:rubric_association] ||= {}
+    association_params = params[:rubric_association] ?
+      params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :bookmarked) : {}
+
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])
     params[:rubric][:user] = @current_user if params[:rubric]
     if (!@association_object || authorized_action(@association_object, @current_user, :read)) && authorized_action(@context, @current_user, :manage_rubrics)
       @association = @context.rubric_associations.where(id: params[:rubric_association_id]).first if params[:rubric_association_id].present?
       @association_object ||= @association.association_object if @association
-      params[:rubric_association][:association_object] = @association_object
-      params[:rubric_association][:update_if_existing] = params[:action] == 'update'
+      association_params[:association_object] = @association_object
+      association_params[:update_if_existing] = params[:action] == 'update'
       skip_points_update = !!(params[:skip_updating_points_possible] =~ /true/i)
-      params[:rubric_association][:skip_updating_points_possible] = skip_points_update
+      association_params[:skip_updating_points_possible] = skip_points_update
       @rubric = @association.rubric if params[:id] && @association && (@association.rubric_id == params[:id].to_i || (@association.rubric && @association.rubric.migration_id == "cloned_from_#{params[:id]}"))
       @rubric ||= @context.rubrics.where(id: params[:id]).first if params[:id].present?
       @association = nil unless @association && @rubric && @association.rubric_id == @rubric.id
-      params[:rubric_association][:id] = @association.id if @association
+      association_params[:id] = @association.id if @association
       # Update the rubric if you can
       # Better specify params[:rubric_association_id] if you want it to update an existing association
 
@@ -82,7 +84,7 @@ class RubricsController < ApplicationController
         @rubric.user = @current_user
       end
       if params[:rubric] && (@rubric.grants_right?(@current_user, session, :update) || (@association && @association.grants_right?(@current_user, session, :update))) #authorized_action(@rubric, @current_user, :update)
-        @association = @rubric.update_with_association(@current_user, params[:rubric], @context, params[:rubric_association])
+        @association = @rubric.update_with_association(@current_user, params[:rubric], @context, association_params)
         @rubric = @association.rubric if @association
       end
       json_res = {}

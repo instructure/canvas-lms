@@ -41,7 +41,7 @@ class Enrollment < ActiveRecord::Base
 
   has_one :enrollment_state, :dependent => :destroy
 
-  has_many :role_overrides, :as => :context
+  has_many :role_overrides, :as => :context, :inverse_of => :context
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
   has_many :scores, -> { active }, dependent: :destroy
@@ -78,8 +78,6 @@ class Enrollment < ActiveRecord::Base
   after_destroy :update_assignment_overrides_if_needed
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
-  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
-
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
   scope :current_and_invited, -> { joins(:course).where(QueryBuilder.new(:current_and_invited).conditions).readonly(false) }
   scope :current_and_future, -> { joins(:course).where(QueryBuilder.new(:current_and_future).conditions).readonly(false) }
@@ -153,9 +151,7 @@ class Enrollment < ActiveRecord::Base
     active_student? != active_student?(:was)
   end
 
-  def adjust_needs_grading_count(mode = :increment)
-    amount = mode == :increment ? 1 : -1
-
+  def touch_assignments
     Assignment.
       where(context_id: course_id, context_type: 'Course').
       where("EXISTS (?) AND NOT EXISTS (?)",
@@ -165,14 +161,14 @@ class Enrollment < ActiveRecord::Base
         Enrollment.where(Enrollment.active_student_conditions).
           where(user_id: user_id, course_id: course_id).
           where("id<>?", self)).
-      update_all(["needs_grading_count=needs_grading_count+?, updated_at=?", amount, Time.now.utc])
+      update_all(["updated_at=?", Time.now.utc])
   end
 
-  after_create :update_needs_grading_count, if: :active_student?
-  after_update :update_needs_grading_count, if: :active_student_changed?
-  def update_needs_grading_count
+  after_create :needs_grading_count_updated, if: :active_student?
+  after_update :needs_grading_count_updated, if: :active_student_changed?
+  def needs_grading_count_updated
     self.class.connection.after_transaction_commit do
-      adjust_needs_grading_count(active_student? ? :increment : :decrement)
+      touch_assignments
     end
   end
 
@@ -605,7 +601,7 @@ class Enrollment < ActiveRecord::Base
     TYPE_RANK_HASHES[order][self.class.to_s]
   end
 
-  STATE_RANK = ['active', ['invited', 'creation_pending'], 'inactive', 'completed', 'rejected', 'deleted']
+  STATE_RANK = ['active', ['invited', 'creation_pending'], 'completed', 'inactive', 'rejected', 'deleted']
   STATE_RANK_HASH = rank_hash(STATE_RANK)
   def self.state_rank_sql
     # don't call rank_sql during class load
@@ -616,7 +612,7 @@ class Enrollment < ActiveRecord::Base
     STATE_RANK_HASH[state.to_s]
   end
 
-  STATE_BY_DATE_RANK = ['active', ['invited', 'creation_pending', 'pending_active', 'pending_invited'], 'inactive', 'completed', 'rejected', 'deleted']
+  STATE_BY_DATE_RANK = ['active', ['invited', 'creation_pending', 'pending_active', 'pending_invited'], 'completed', 'inactive', 'rejected', 'deleted']
   STATE_BY_DATE_RANK_HASH = rank_hash(STATE_BY_DATE_RANK)
   def self.state_by_date_rank_sql
     @state_by_date_rank_sql ||= rank_sql(STATE_BY_DATE_RANK, 'enrollment_states.state').

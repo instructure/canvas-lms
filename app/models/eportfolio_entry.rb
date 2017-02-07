@@ -20,7 +20,6 @@ require 'atom'
 require 'sanitize'
 
 class EportfolioEntry < ActiveRecord::Base
-  attr_accessible :eportfolio, :eportfolio_category, :name, :allow_comments, :show_comments
   attr_readonly :eportfolio_id, :eportfolio_category_id
   belongs_to :eportfolio, touch: true
   belongs_to :eportfolio_category

@@ -180,6 +180,30 @@ describe ContentMigration do
       expect(to_root.child_outcome_links.where(content_id: lo2.id).first).not_to be_nil
     end
 
+    it "should copy external learning outcomes linked to banks correctly" do
+      account = @copy_from.account
+      a_group = account.root_outcome_group
+      lo = create_outcome(account, a_group)
+
+      root = @copy_from.root_outcome_group
+      log = @copy_from.learning_outcome_groups.create!(:title => "some group")
+      root.adopt_outcome_group(log)
+      log.add_outcome(lo)
+
+      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      bank.assessment_questions.create!(:question_data => {'name' => 'test question', 'question_type' => 'essay_question'})
+
+      lo.align(bank, @copy_from, {:mastery_type => 'points', :mastery_score => 50.0})
+
+      run_course_copy
+
+      to_log = @copy_to.learning_outcome_groups.where(:migration_id => mig_id(log)).first
+      expect(to_log.child_outcome_links.where(content_id: lo.id).first).not_to be_nil
+
+      to_root = @copy_to.root_outcome_group
+      expect(to_root.child_outcome_links.count).to eq 0
+    end
+
     it "should create outcomes in new course if external context not found" do
       hash = {"is_global_outcome"=>true,
                "points_possible"=>nil,

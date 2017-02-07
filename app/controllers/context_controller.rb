@@ -297,7 +297,7 @@ class ContextController < ApplicationController
         end
         format.json do
           @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
-          render :json => @accesses.map{ |a| a.as_json(methods: [:readable_name, :asset_class_name]) }
+          render :json => @accesses.map{ |a| a.as_json(methods: [:readable_name, :asset_class_name, :icon]) }
         end
       end
     end

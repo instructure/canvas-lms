@@ -3,18 +3,14 @@ class EpubExport < ActiveRecord::Base
   include LocaleSelection
   include Workflow
 
-  strong_params
-
   belongs_to :content_export
   belongs_to :course
   belongs_to :user
-  has_many :attachments, -> { order('created_at DESC') }, dependent: :destroy, as: :context, class_name: 'Attachment'
-  has_one :epub_attachment, -> { where(content_type: 'application/epub+zip').order('created_at DESC') }, as: :context, class_name: 'Attachment'
-  has_one :zip_attachment, -> { where(content_type: 'application/zip').order('created_at DESC') }, as: :context, class_name: 'Attachment'
-  has_one :job_progress, as: :context, class_name: 'Progress'
+  has_many :attachments, -> { order('created_at DESC') }, dependent: :destroy, as: :context, inverse_of: :context, class_name: 'Attachment'
+  has_one :epub_attachment, -> { where(content_type: 'application/epub+zip').order('created_at DESC') }, as: :context, inverse_of: :context, class_name: 'Attachment'
+  has_one :zip_attachment, -> { where(content_type: 'application/zip').order('created_at DESC') }, as: :context, inverse_of: :context, class_name: 'Attachment'
+  has_one :job_progress, as: :context, inverse_of: :context, class_name: 'Progress'
   validates :course_id, :workflow_state, presence: true
-
-  attr_accessible :course, :user, :content_export
 
   PERCENTAGE_COMPLETE = {
     created: 0,

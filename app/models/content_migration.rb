@@ -28,7 +28,7 @@ class ContentMigration < ActiveRecord::Base
   belongs_to :source_course, :class_name => 'Course'
   has_one :content_export
   has_many :migration_issues
-  has_one :job_progress, :class_name => 'Progress', :as => :context
+  has_one :job_progress, :class_name => 'Progress', :as => :context, :inverse_of => :context
   serialize :migration_settings
   cattr_accessor :export_file_path
   before_save :set_started_at_and_finished_at
@@ -37,7 +37,6 @@ class ContentMigration < ActiveRecord::Base
 
   DATE_FORMAT = "%m/%d/%Y"
 
-  attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type, :initiated_source
   attr_accessor :imported_migration_items, :outcome_to_id_map, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :last_module_position
 
   workflow do
@@ -496,6 +495,7 @@ class ContentMigration < ActiveRecord::Base
         # copy the attachments
         source_export = ContentExport.find(self.migration_settings[:master_course_export_id])
         self.context.copy_attachments_from_course(source_export.context, :content_export => source_export, :content_migration => self)
+        MasterCourses::FolderLockingHelper.recalculate_locked_folders(self.context)
 
         data = JSON.parse(self.exported_attachment.open, :max_nesting => 50)
         data = prepare_data(data)

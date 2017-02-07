@@ -21,7 +21,7 @@ class PageCommentsController < ApplicationController
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     @page = @portfolio.eportfolio_entries.find(params[:entry_id])
     if authorized_action(@page, @current_user, :comment)
-      @comment = @page.page_comments.build(params[:page_comment])
+      @comment = @page.page_comments.build(params.require(:page_comment).permit(:message))
       @comment.user = @current_user
       url = if @page.eportfolio_category.slug.blank?
               eportfolio_url(@portfolio)
@@ -42,7 +42,7 @@ class PageCommentsController < ApplicationController
       end
     end
   end
-  
+
   def destroy
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     @page = @portfolio.eportfolio_entries.find(params[:entry_id])

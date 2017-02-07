@@ -1,9 +1,8 @@
 require_relative 'common'
 require_relative 'helpers/notifications_common'
-include NotificationsCommon
-
 
 describe "dashboard" do
+  include NotificationsCommon
   include_context "in-process server selenium tests"
 
   shared_examples_for 'load events list' do
@@ -156,7 +155,7 @@ describe "dashboard" do
     end
 
     it "shows an assignment stream item under Recent Activity in dashboard", priority: "1", test_id: 108725 do
-      NotificationsCommon.setup_notification(@student, name: 'Assignment Created')
+      setup_notification(@student, name: 'Assignment Created')
       assignment_model({:submission_types => ['online_text_entry'], :course => @course})
       get "/"
       f('#dashboardToggleButton').click

@@ -22,7 +22,6 @@ class UsageRights < ActiveRecord::Base
   USE_JUSTIFICATIONS = %w(own_copyright public_domain used_by_permission fair_use creative_commons).freeze
 
   belongs_to :context, polymorphic: [:course, :group, :user]
-  attr_accessible :legal_copyright, :license, :use_justification
 
   before_validation :infer_license
   validates_inclusion_of :use_justification, in: USE_JUSTIFICATIONS

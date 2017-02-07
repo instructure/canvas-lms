@@ -23,5 +23,26 @@ describe "Converting QTI items" do
     expect(hash[:answers].map{|a| a[:text]}).to match_array(['True', 'False', 'Not Sure'])
     expect(hash[:question_text]).to_not include("Not Sure")
   end
+
+  it "should get answers correctly even when people write more gross xml" do
+    file_path = File.join(BASE_FIXTURE_DIR, 'qti')
+    manifest_node=get_manifest_node('more_terrible_qti')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>file_path)
+
+    expect(hash[:question_text]).to be_blank
+    expect(hash[:answers].map{|a| [a[:left], a[:right]]}).to match_array([["Canine", "Dog"], ["Feline", "Cat"]])
+  end
+
+  it "should get answers correctly for weird multiple dropdown questions" do
+    file_path = File.join(BASE_FIXTURE_DIR, 'qti')
+    manifest_node=get_manifest_node('inline_choice_interaction')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>file_path)
+
+    expect(hash[:answers].select{|a| a[:blank_id] == "RESPONSE"}.map{|a| a[:text]}).to match_array(["pen", "pan", "ten"])
+    expect(hash[:answers].select{|a| a[:blank_id] == "RESPONSE_1"}.map{|a| a[:text]}).to match_array(["apple", "ant", "ape"])
+    expect(hash[:answers].select{|a| a[:weight] == 100}.map{|a| a[:text]}).to match_array(["pen", "apple"])
+    expect(hash[:question_text]).to include("I have a [RESPONSE]")
+    expect(hash[:question_text]).to include("I have an [RESPONSE_1]")
+  end
 end
 end

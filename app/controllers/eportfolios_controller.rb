@@ -41,7 +41,7 @@ class EportfoliosController < ApplicationController
 
   def create
     if authorized_action(Eportfolio.new, @current_user, :create)
-      @portfolio = @current_user.eportfolios.build(params[:eportfolio])
+      @portfolio = @current_user.eportfolios.build(eportfolio_params)
       respond_to do |format|
         if @portfolio.save
           @portfolio.ensure_defaults
@@ -103,7 +103,7 @@ class EportfoliosController < ApplicationController
     @portfolio = Eportfolio.find(params[:id])
     if authorized_action(@portfolio, @current_user, :update)
       respond_to do |format|
-        if @portfolio.update_attributes(params[:eportfolio])
+        if @portfolio.update_attributes(eportfolio_params)
           @portfolio.ensure_defaults
           flash[:notice] = t('notices.updated', "ePortfolio successfully updated")
           format.html { redirect_to eportfolio_url(@portfolio) }
@@ -215,5 +215,9 @@ class EportfoliosController < ApplicationController
   protected
   def rich_content_service_config
     rce_js_env(:basic)
+  end
+
+  def eportfolio_params
+    params.require(:eportfolio).permit(:name, :public)
   end
 end

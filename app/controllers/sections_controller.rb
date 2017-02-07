@@ -147,7 +147,7 @@ class SectionsController < ApplicationController
         @section = @context.course_sections.where(:sis_source_id => sis_section_id, :workflow_state => 'deleted').first
         @section.workflow_state = 'active' if @section
       end
-      @section ||= @context.course_sections.build(params[:course_section])
+      @section ||= @context.course_sections.build(course_section_params)
       @section.sis_source_id = sis_section_id if can_manage_sis
 
       respond_to do |format|
@@ -261,7 +261,7 @@ class SectionsController < ApplicationController
         end
       end
       respond_to do |format|
-        if @section.update_attributes(params[:course_section])
+        if @section.update_attributes(course_section_params)
           @context.touch
           flash[:notice] = t('section_updated', "Section successfully updated!")
           format.html { redirect_to course_section_url(@context, @section) }
@@ -333,5 +333,10 @@ class SectionsController < ApplicationController
         end
       end
     end
+  end
+
+  protected
+  def course_section_params
+    params[:course_section] ? params[:course_section].permit(:name, :start_at, :end_at, :restrict_enrollments_to_section_dates) : {}
   end
 end

@@ -513,6 +513,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   # @returns Quiz
   def destroy
     if authorized_action(@quiz, @current_user, :delete)
+      return render_unauthorized_action if editing_restricted?(@quiz)
       @quiz.destroy
       if accepts_jsonapi?
         head :no_content

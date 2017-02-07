@@ -19,8 +19,6 @@
 class CustomGradebookColumnDatum < ActiveRecord::Base
   belongs_to :custom_gradebook_column
 
-  attr_accessible :content
-
   validates_length_of :content, :maximum => maximum_string_length,
     :allow_nil => true
   validates_uniqueness_of :user_id, :scope => :custom_gradebook_column_id

@@ -93,8 +93,36 @@ module GradebooksHelper
     }
   end
 
+  def format_grade?(grade)
+    return false if grade.blank?
+    (grade.to_s =~ /^\d+\.?\d*%?$/).present?
+  end
+
+  def percentage?(grade)
+    (grade.to_s =~ /^\d+\.?\d*%$/).present?
+  end
+
+  def format_grade(grade)
+    return grade unless format_grade?(grade)
+
+    formatted_grade = grade.delete('%')
+    I18n.n(formatted_grade, percentage: percentage?(grade))
+  end
+
   def display_grade(grade)
     grade.blank? ? '-' : grade
+  end
+
+  def graded_by_title(graded_at, grader_name)
+    I18n.t(
+      "%{graded_date} by %{grader}",
+      graded_date: date_string(graded_at),
+      grader: grader_name
+    )
+  end
+
+  def history_submission_class(submission)
+    "assignment_#{submission.assignment_id}_user_#{submission.user_id}_current_grade"
   end
 
   def student_score_display_for(submission, show_student_view = false)
@@ -121,9 +149,13 @@ module GradebooksHelper
     when 'pass_fail'
       pass_fail_icon(score, grade)
     when 'percent'
-      grade
+      if grade.nil?
+        '-'
+      else
+        I18n.n grade.to_f, percentage: true
+      end
     when 'points'
-      round_if_whole(score.to_f.round(2))
+      I18n.n round_if_whole(score.to_f.round(2))
     when 'gpa_scale', 'letter_grade'
       nil
     end

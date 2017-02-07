@@ -19,10 +19,10 @@
 define([
   'i18n!gradebook',
   'jquery' /* $ */,
+  'jsx/gradebook/shared/helpers/GradeFormatHelper',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* datetimeString */
-], function(I18n, $) {
-
+], function (I18n, $, GradeFormatHelper) {
   var GradebookHistory = {
     init: function(){
       $('.assignment_header').click(function(event) {
@@ -42,20 +42,19 @@ define([
     },
 
     handleGradeSubmit: function(event){
-      event.preventDefault();
       // 'this' should be the <a href> that they clicked on
+      var assignmentId = $(this).parents('tr').data('assignment-id');
+      var userId = $(this).parents('tr').data('user-id');
+      var grade = $(this).data('grade').toString().replace('--', '');
+      var url = $('.update_submission_grade_url').attr('href');
+      var method = $('.update_submission_grade_url').attr('title');
 
-      var assignment_id = $(this).parents('tr').data('assignment-id'),
-          user_id = $(this).parents('tr').data('user-id'),
-          grade = $(this).find('.grade').text().replace("--", ""),
-          url = $(".update_submission_grade_url").attr('href'),
-          method = $(".update_submission_grade_url").attr('title');
-
-      $(".assignment_" + assignment_id + "_user_" + user_id + "_current_grade").addClass('loading');
+      event.preventDefault();
+      $('.assignment_' + assignmentId + '_user_' + userId + '_current_grade').addClass('loading');
 
       var formData = {
-        'submission[assignment_id]': assignment_id,
-        'submission[user_id]':       user_id
+        'submission[assignment_id]': assignmentId,
+        'submission[user_id]': userId
       };
 
       if(grade == "EX") {
@@ -67,13 +66,13 @@ define([
       $.ajaxJSON(url, method, formData, function(submissions) {
         $.each(submissions, function(){
           var submission = this.submission;
-          var el = $(".assignment_" + submission.assignment_id + "_user_" + submission.user_id + "_current_grade")
+          var el = $('.assignment_' + submission.assignment_id + '_user_' + submission.user_id + '_current_grade')
             el.removeClass('loading');
             el.attr('title', I18n.t('graded_by_me', "%{graded_time} by me", { 'graded_time': $.datetimeString(submission.graded_at) }));
             if(submission.excused) {
               el.text("EX");
             } else {
-              el.text(submission.grade || "--");
+              el.text(GradeFormatHelper.formatGrade(submission.grade) || '--');
             }
         });
       });

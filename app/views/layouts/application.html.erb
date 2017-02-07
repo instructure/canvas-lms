@@ -9,6 +9,12 @@
   wizard = (yield :wizard_box).presence
   top_nav = (yield :top_nav).presence
 
+  subnav_menu_text = t('Hide Navigation Menu')
+  subnav_menu_text = t('Hide Account Navigation Menu') if active_path?('/profile')
+  subnav_menu_text = t('Hide Admin Navigation Menu') if active_path?('/accounts')
+  subnav_menu_text = t('Hide Courses Navigation Menu') if active_path?('/courses')
+  subnav_menu_text = t('Hide Groups Navigation Menu') if active_path?('/groups')
+
   content_for :pre_html do
     @collapse_global_nav = @current_user.try(:collapse_global_nav?)
     @body_class_no_headers = @headers == false
@@ -68,7 +74,7 @@
     <% if crumbs.length > 1 %>
       <div class="ic-app-nav-toggle-and-crumbs no-print">
         <% if @show_left_side %>
-          <button type="button" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" aria-live="polite" aria-label="<%= t('Hide courses menu') %>" title="<%= t('Hide courses menu') %>">
+          <button type="button" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" aria-live="polite" aria-label="<%= subnav_menu_text %>" title="<%= subnav_menu_text %>">
             <i class="icon-hamburger" aria-hidden="true"></i>
           </button>
           <div class="ic-app-crumbs">

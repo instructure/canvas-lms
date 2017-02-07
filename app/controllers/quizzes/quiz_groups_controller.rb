@@ -116,7 +116,7 @@ class Quizzes::QuizGroupsController < ApplicationController
     if authorized_action(@quiz, @current_user, :update)
       @quiz.did_edit if @quiz.created?
 
-      quiz_group_params = params[:quiz_groups][0]
+      quiz_group_params = params[:quiz_groups][0].permit(:name, :pick_count, :question_points, :assessment_question_bank_id)
       bank_id = quiz_group_params.delete(:assessment_question_bank_id)
       bank = find_bank(bank_id) if bank_id.present?
       quiz_group_params[:assessment_question_bank_id] = bank_id if bank
@@ -154,10 +154,7 @@ class Quizzes::QuizGroupsController < ApplicationController
       @group = @quiz.quiz_groups.find(params[:id])
       @quiz.did_edit if @quiz.created?
 
-      quiz_group_params = params[:quiz_groups][0]
-      quiz_group_params.delete(:assessment_question_bank_id)
-      quiz_group_params.delete(:position) # position is taken care of in reorder
-
+      quiz_group_params = params[:quiz_groups][0].permit(:name, :pick_count, :question_points)
       if update_api_quiz_group(@group, quiz_group_params)
         render :json => quiz_groups_compound_json([@group], @context, @current_user, session)
       else

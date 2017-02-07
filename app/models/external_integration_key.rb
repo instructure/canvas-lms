@@ -17,8 +17,6 @@
 #
 
 class ExternalIntegrationKey < ActiveRecord::Base
-  attr_accessible
-
   belongs_to :context, polymorphic: [:account]
 
   validates_presence_of :context_id

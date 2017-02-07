@@ -266,7 +266,7 @@ class OutcomeGroupsApiController < ApplicationController
       render :json => 'error'.to_json, :status => :bad_request
       return
     end
-    @outcome_group.update_attributes(params.slice(:title, :description, :vendor_guid))
+    @outcome_group.update_attributes(params.permit(:title, :description, :vendor_guid))
     if params[:parent_outcome_group_id] && params[:parent_outcome_group_id] != @outcome_group.learning_outcome_group_id
       new_parent = context_outcome_groups.find(params[:parent_outcome_group_id])
       unless new_parent.adopt_outcome_group(@outcome_group)
@@ -492,7 +492,9 @@ class OutcomeGroupsApiController < ApplicationController
         return
       end
     else
-      @outcome = context_create_outcome(params.slice(:title, :description, :ratings, :mastery_points, :vendor_guid, :display_name, :calculation_method, :calculation_int))
+      outcome_params = params.permit(:title, :description, :mastery_points, :vendor_guid,
+        :display_name, :calculation_method, :calculation_int, :ratings => strong_anything)
+      @outcome = context_create_outcome(outcome_params)
       unless @outcome.valid?
         render :json => @outcome.errors, :status => :bad_request
         return
@@ -599,7 +601,7 @@ class OutcomeGroupsApiController < ApplicationController
     return unless can_manage_outcomes
 
     @outcome_group = context_outcome_groups.find(params[:id])
-    @child_outcome_group = @outcome_group.child_outcome_groups.build(params.slice(:title, :description, :vendor_guid))
+    @child_outcome_group = @outcome_group.child_outcome_groups.build(params.permit(:title, :description, :vendor_guid))
     if @child_outcome_group.save
       render :json => outcome_group_json(@child_outcome_group, @current_user, session)
     else

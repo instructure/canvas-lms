@@ -34,8 +34,6 @@ class PageView < ActiveRecord::Base
   attr_accessor :generated_by_hand
   attr_accessor :is_update
 
-  attr_accessible :url, :user, :controller, :action, :session_id, :developer_key, :user_agent, :real_user, :context
-
   # note that currently we never query page views from the perspective of the course;
   # we simply don't record them for non-logged-in users in a public course
   # if we ever do either of the above, we'll need to remove this, and figure out
@@ -216,7 +214,7 @@ class PageView < ActiveRecord::Base
     shard = PageView.global_storage_namespace? ? Shard.birth : Shard.current
     page_view = shard.activate do
       if new_record
-        new{ |pv| pv.assign_attributes(attrs, :without_protection => true) }
+        new{ |pv| pv.assign_attributes(attrs) }
       else
         instantiate(@blank_template.merge(attrs))
       end

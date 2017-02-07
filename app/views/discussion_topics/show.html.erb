@@ -77,7 +77,8 @@
             </button>
           <% end %>
 
-          <% if @topic.grants_right?(@current_user, :update) %>
+          <% restricted_by_master_course = editing_restricted?(@topic) %>
+          <% if !restricted_by_master_course && @topic.grants_right?(@current_user, :update) %>
             <a href="<%= context_url(@topic.context,
                                      :edit_context_discussion_topic_url,
                                      @topic) %>"
@@ -105,7 +106,7 @@
                   <li><a href="#" class="mark_all_as_unread"><%#= <i class="icon-mark-as-unread" aria-hidden="hidden"></i> %> <%= t :mark_all_as_unread, 'Mark All as Unread' %></a></li>
                 <% end %>
 
-                <% if can_do(@topic, @current_user, :delete)%>
+                <% if !restricted_by_master_course && can_do(@topic, @current_user, :delete)%>
                   <li><a href="<%= context_url(@context, :context_discussion_topic_url, @topic.id) %>" class="delete_discussion" data-method="delete" rel="nofollow" data-confirm="<%= t :confirm_delete_discussion, 'Are you sure you want to delete this discussion?' %>"><i class="icon-trash"></i> <%= t :delete, 'Delete' %></a></li>
                 <% end %>
 
@@ -144,7 +145,7 @@
                   </li>
                 <% end %>
 
-                <% unless @presenter.comments_disabled? %>
+                <% unless restricted_by_master_course || @presenter.comments_disabled? %>
                   <% if @topic.locked? %>
                     <% if can_do(@context, @current_user, :moderate_forum) %>
                       <li><a href="#" data-mark-locked="false" class="discussion_locked_toggler"><i class="icon-unlock"></i> <%= t(:unlock_topic, %{Open for Comments}) %></a></li>
@@ -284,6 +285,12 @@
                 id      = "onlyUnread"
                 aria-labelledby="onlyUnreadAccessibleLabel"/>
               <label for="onlyUnread" aria-hidden="true"><%= t('unread', 'Unread') %></label>
+
+              <% if can_do(@context, @current_user, :moderate_forum) %>
+                <span class="screenreader-only" id="showDeletedAccessibleLabel"><%= t("Show deleted replies") %></span>
+                <input type="checkbox" id="showDeleted" aria-labelledby="showDeletedAccessibleLabel"/>
+                <label for="showDeleted" aria-hidden="true" title="Show deleted replies"><i class="icon-eye"></i></label>
+              <% end %>
 
               &nbsp; &nbsp;
               <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">

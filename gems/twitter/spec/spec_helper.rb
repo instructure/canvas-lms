@@ -1,4 +1,5 @@
 require 'twitter'
+require 'byebug'
 
 I18n.load_path += Dir[File.join('spec','locales','*.yml')]
 

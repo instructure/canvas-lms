@@ -17,7 +17,7 @@
 #
 
 class ContentParticipationCount < ActiveRecord::Base
-  attr_accessible :context, :user, :content_type, :unread_count
+  ACCESSIBLE_ATTRIBUTES = [:context, :user, :content_type, :unread_count].freeze
 
   belongs_to :context, polymorphic: [:course]
   belongs_to :user
@@ -40,7 +40,7 @@ class ContentParticipationCount < ActiveRecord::Base
             :unread_count => unread_count_for(type, context, user),
           })
         end
-        participant.attributes = opts.slice(*ContentParticipationCount.accessible_attributes.to_a)
+        participant.attributes = opts.slice(*ACCESSIBLE_ATTRIBUTES)
 
         # if the participant was just created, the count will already be correct
         if opts[:offset].present? && !participant.new_record?

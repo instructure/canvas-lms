@@ -1,14 +1,19 @@
 module GroupsCommon
+  def self.included(mod)
+    mod.singleton_class.include(ClassMethods)
+  end
 
-  def setup_group_page_urls
-    let(:url) {"/groups/#{@testgroup.first.id}"}
-    let(:announcements_page) {url + '/announcements'}
-    let(:people_page) {url + '/users'}
-    let(:discussions_page) {url + '/discussion_topics'}
-    let(:pages_page) {url + '/pages'}
-    let(:files_page) {url + '/files'}
-    let(:conferences_page) {url + '/conferences'}
-    let(:collaborations_page) {url + '/collaborations'}
+  module ClassMethods
+    def setup_group_page_urls
+      let(:url) {"/groups/#{@testgroup.first.id}"}
+      let(:announcements_page) {url + '/announcements'}
+      let(:people_page) {url + '/users'}
+      let(:discussions_page) {url + '/discussion_topics'}
+      let(:pages_page) {url + '/pages'}
+      let(:files_page) {url + '/files'}
+      let(:conferences_page) {url + '/conferences'}
+      let(:collaborations_page) {url + '/collaborations'}
+    end
   end
 
   def seed_students(count, base_name = 'Test Student')

@@ -113,6 +113,23 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to be_empty
       end
 
+      it "should prioritize completed enrollments over inactive ones" do
+        course_with_student(:active_all => true)
+        old_enroll = @student.enrollments.first
+
+        section2 = @course.course_sections.create!
+        inactive_enroll = @course.enroll_student(@student, :section => section2, :allow_multiple_enrollments => true)
+        inactive_enroll.deactivate
+
+        @course.update_attributes(:start_at => 2.days.ago, :conclude_at => 1.day.ago, :restrict_enrollments_to_course_dates => true)
+
+        user_session(@student)
+
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:past_enrollments]).to eq [old_enroll]
+      end
+
       it "should include 'active' enrollments whose term is past" do
         @student = user_factory
 
@@ -1269,7 +1286,8 @@ describe CoursesController do
       changes.delete("settings")
       changes["lock_all_announcements"] = [ nil, true ]
 
-      Auditors::Course.expects(:record_created).with(anything, anything, changes, anything)
+      expect(Auditors::Course).to receive(:record_created).
+        with(anything, anything, changes, anything)
 
       post 'create', { :account_id => @account.id, :course =>
           { :name => course.name, :lock_all_announcements => true } }
@@ -1298,6 +1316,14 @@ describe CoursesController do
       put 'update', :id => @course.id, :course => {:name => "new course name"}
       expect(assigns[:course]).not_to be_nil
       expect(assigns[:course]).to eql(@course)
+    end
+
+    it "should update some settings and stuff" do
+      user_session(@teacher)
+      put 'update', :id => @course.id, :course => {:show_announcements_on_home_page => true, :home_page_announcement_limit => 2}
+      @course.reload
+      expect(@course.show_announcements_on_home_page).to be_truthy
+      expect(@course.home_page_announcement_limit).to eq 2
     end
 
     it "should allow sending events" do
@@ -1380,7 +1406,8 @@ describe CoursesController do
         "lock_all_announcements" => [ true, false ]
       }
 
-      Auditors::Course.expects(:record_updated).with(anything, anything, changes, source: :manual)
+      expect(Auditors::Course).to receive(:record_updated).
+        with(anything, anything, changes, source: :manual)
 
       put 'update', :id => @course.id, :course => {
         :name => changes["name"].last,
@@ -1578,7 +1605,8 @@ describe CoursesController do
       expect(response).to be_redirect
       expect(@course.reload).to be_completed
       expect(@course.conclude_at).to be <= Time.now
-      Auditors::Course.expects(:record_unconcluded).with(anything, anything, source: :manual)
+      expect(Auditors::Course).to receive(:record_unconcluded).
+        with(anything, anything, source: :manual)
 
       post 'unconclude', :course_id => @course.id
       expect(response).to be_redirect
@@ -1827,7 +1855,8 @@ describe CoursesController do
 
     it "should log reset audit event" do
       user_session(@teacher)
-      Auditors::Course.expects(:record_reset).once.with(@course, anything, @user, anything)
+      expect(Auditors::Course).to receive(:record_reset).once.
+        with(@course, anything, @user, anything)
       post 'reset_content', :course_id => @course.id
     end
   end

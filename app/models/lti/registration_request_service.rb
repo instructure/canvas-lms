@@ -14,7 +14,7 @@ module Lti
         tc_profile_url: tc_profile_url,
       )
       reg_key, reg_password = registration_request.generate_key_and_password
-      registration_request.launch_presentation_return_url = return_url.call(reg_key)
+      registration_request.launch_presentation_return_url = return_url.call()
       cache_registration(context, reg_key, reg_password)
 
       registration_request

@@ -1,8 +1,8 @@
 define([
   'react',
   'i18n!student_context_tray',
-  'instructure-ui/MetricsList'
-], (React, I18n, { default: InstUIMetricsList, MetricsListItem }) => {
+  'instructure-ui'
+], (React, I18n, { MetricsList: InstUIMetricsList, MetricsListItem }) => {
   class MetricsList extends React.Component {
     static propTypes = {
       analytics: React.PropTypes.object,

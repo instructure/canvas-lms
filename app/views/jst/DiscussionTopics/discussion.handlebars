@@ -50,12 +50,23 @@
         </div>
         {{/if}}
         {{#if cyoe.isReleased}}
-        <span class="pill mastery-path-icon" data-tooltip title="{{#t}}Released by Mastery Path{{/t}}">
+        <span class="pill mastery-path-icon" aria-hidden="true" data-tooltip title="{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}">
           <i class="icon-mastery-path"></i>{{cyoe.releasedLabel}}
         </span>
+        <span class="screenreader-only">{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}</span>
         {{/if}}
       {{/if}}
     {{/if}}
+
+    <div class="master-course-cell">
+      {{#if is_master_course_content}}
+        {{#if restricted_by_master_course}}
+          <i class="icon-lock"></i>
+        {{else}}
+          <i class="icon-unlock icon-Line"></i>
+        {{/if}}
+      {{/if}}
+    </div>
 
     <div class="discussion-status">
       <span id="publish-icon" class="publish-icon" data-view="publishIcon"></span>
@@ -91,6 +102,7 @@
     </div>
 
     <div class="discussion-actions">
+      {{#unless restricted_by_master_course}}
       {{#if permissions.delete}}
         <a href="#" class="al-trigger al-trigger-gray" role="button" id="manage_link">
           <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
@@ -144,6 +156,7 @@
           {{/if}}
         </ul>
       {{/if}}
+      {{/unless}}
     </div>
   </div>
 </div>

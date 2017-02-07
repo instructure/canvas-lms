@@ -136,7 +136,7 @@ module Polling
     #   }
     #
     def create
-      poll_session_params = params[:poll_sessions][0]
+      poll_session_params = get_poll_session_params
 
       if course_id = poll_session_params.delete(:course_id)
         @course = Course.find(course_id)
@@ -183,9 +183,8 @@ module Polling
     #
     def update
       @poll_session = @poll.poll_sessions.find(params[:id])
-      poll_session_params = params[:poll_sessions][0]
       if authorized_action(@poll, @current_user, :update)
-        if @poll_session.update_attributes(poll_session_params)
+        if @poll_session.update_attributes(get_poll_session_params)
           render json: serialize_jsonapi(@poll_session)
         else
           render json: @poll_session.errors, status: :bad_request
@@ -300,5 +299,8 @@ module Polling
       }).as_json
     end
 
+    def get_poll_session_params
+      params.require(:poll_sessions)[0].permit(:course_id, :course_section_id, :has_public_results)
+    end
   end
 end

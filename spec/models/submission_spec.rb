@@ -228,6 +228,30 @@ describe Submission do
     @assignment.save!
   end
 
+  it "should log graded submission change when assignment muted" do
+    submission_spec_model
+    @submission.grade_it!
+
+    Auditors::GradeChange.expects(:record)
+    @assignment.mute!
+  end
+
+  it "should log graded submission change when assignment unmuted" do
+    @assignment.mute!
+    submission_spec_model
+    @submission.grade_it!
+
+    Auditors::GradeChange.expects(:record)
+    @assignment.unmute!
+  end
+
+  it "should not log ungraded submission change when assignment muted" do
+    submission_spec_model
+    Auditors::GradeChange.expects(:record).never
+    @assignment.mute!
+    @assignment.unmute!
+  end
+
   context "#graded_anonymously" do
     it "saves when grade changed and set explicitly" do
       submission_spec_model

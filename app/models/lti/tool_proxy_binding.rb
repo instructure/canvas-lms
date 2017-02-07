@@ -18,8 +18,6 @@
 module Lti
   class ToolProxyBinding < ActiveRecord::Base
 
-    attr_accessible :context, :tool_proxy, :enabled
-
     belongs_to :tool_proxy, class_name: 'Lti::ToolProxy'
 
     belongs_to :context, polymorphic: [:course, :account]

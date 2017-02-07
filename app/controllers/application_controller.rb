@@ -266,7 +266,7 @@ class ApplicationController < ActionController::Base
   #
   # @param [String] cause
   #   The reason the request is rejected for.
-  # @param [Optional, Fixnum|Symbol, Default :bad_request] status
+  # @param [Optional, Integer|Symbol, Default :bad_request] status
   #   HTTP status code or symbol.
   def reject!(cause, status=:bad_request)
     raise RequestError.new(cause, status)
@@ -2069,15 +2069,6 @@ class ApplicationController < ActionController::Base
 
   def user_has_google_drive
     @user_has_google_drive ||= google_drive_connection.authorized?
-  end
-
-  def twitter_connection
-    if @current_user
-      service = @current_user.user_services.where(service: "twitter").first
-      return Twitter::Connection.new(service.token, service.secret)
-    else
-      return Twitter::Connection.new(session[:oauth_twitter_access_token_token], session[:oauth_twitter_access_token_secret])
-    end
   end
 
   def self.region

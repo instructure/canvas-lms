@@ -22,7 +22,7 @@
 # The other purpose of this class is just to make rubrics reusable.
 class RubricAssociation < ActiveRecord::Base
   attr_accessor :skip_updating_points_possible
-  attr_accessible :rubric, :association_object, :context, :use_for_grading, :title, :summary_data, :purpose, :url, :hide_score_total, :bookmarked
+
   belongs_to :rubric
   belongs_to :association_object, polymorphic: [:account, :course, :assignment],
              foreign_type: :association_type, foreign_key: :association_id,

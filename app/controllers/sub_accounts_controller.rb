@@ -171,6 +171,6 @@ class SubAccountsController < ApplicationController
   end
 
   def account_params
-    strong_params.require(:account).permit(:name, :default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb)
+    params.require(:account).permit(:name, :default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb)
   end
 end

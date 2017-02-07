@@ -749,11 +749,17 @@ describe Attachment do
       tag2 = mod.add_item(:id => @a2.id, :type => 'attachment')
       mod.save!
 
+      @a1.reload
+      expect(@a1.could_be_locked).to be_truthy
+
       @a.display_name = 'a1'
       @a.handle_duplicates(:overwrite)
       tag1.reload
       expect(tag1).to be_active
       expect(tag1.content_id).to eq @a.id
+
+      @a.reload
+      expect(@a.could_be_locked).to be_truthy
 
       @a2.destroy
       tag2.reload
@@ -843,9 +849,9 @@ describe Attachment do
     it 'should allow custom ttl for download_url' do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
-      attachment.expects(:authenticated_s3_url).with(has_entry(:expires => 86400))
+      attachment.expects(:authenticated_s3_url).with(has_entry(:expires_in => 86400))
       attachment.download_url
-      attachment.expects(:authenticated_s3_url).with(has_entry(:expires => 172800))
+      attachment.expects(:authenticated_s3_url).with(has_entry(:expires_in => 172800))
       attachment.download_url(2.days.to_i)
     end
 
@@ -1009,8 +1015,8 @@ describe Attachment do
       @old_object = mock('old object')
       @new_object = mock('new object')
       new_full_filename = @root.full_filename.sub(@root.namespace, @new_account.file_namespace)
-      @objects = { @root.full_filename => @old_object, new_full_filename => @new_object }
-      @root.bucket.stubs(:objects).returns(@objects)
+      @root.bucket.stubs(:object).with(@root.full_filename).returns(@old_object)
+      @root.bucket.stubs(:object).with(new_full_filename).returns(@new_object)
     end
 
     it "should fail for non-root attachments" do
@@ -1029,8 +1035,8 @@ describe Attachment do
     end
 
     it "should rename root attachments and update children" do
-      @new_object.expects(:exists?).returns(false)
-      @old_object.expects(:copy_to).with(@root.full_filename.sub(@old_account.id.to_s, @new_account.id.to_s), anything)
+      expect(@new_object).to receive(:exists?).and_return(false)
+      expect(@old_object).to receive(:copy_to).with(@root.full_filename.sub(@old_account.id.to_s, @new_account.id.to_s), anything)
       @root.change_namespace(@new_account.file_namespace)
       expect(@root.namespace).to eq @new_account.file_namespace
       expect(@child.reload.namespace).to eq @root.namespace
@@ -1103,7 +1109,9 @@ describe Attachment do
       thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
       expect(thumb).to eq nil
 
-      @attachment.expects(:create_or_update_thumbnail).with(anything, sz, sz).returns { @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data) }
+      expect(@attachment).to receive(:create_or_update_thumbnail).with(anything, sz, sz) { 
+        @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data)
+      }
       url = @attachment.thumbnail_url(:size => "640x>")
       expect(url).to be_present
       thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
@@ -1112,9 +1120,11 @@ describe Attachment do
     end
 
     it "should use the existing thumbnail if present" do
-      @attachment.expects(:create_or_update_thumbnail).with(anything, sz, sz).returns { @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data) }
+      expect(@attachment).to receive(:create_or_update_thumbnail).with(anything, sz, sz) {
+        @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data)
+      }
       url = @attachment.thumbnail_url(:size => "640x>")
-      @attachment.expects(:create_dynamic_thumbnail).never
+      expect(@attachment).to receive(:create_dynamic_thumbnail).never
       url = @attachment.thumbnail_url(:size => "640x>")
       thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
       expect(url).to be_present
@@ -1372,19 +1382,19 @@ describe Attachment do
       before do
         s3_storage!
         attachment_model
-        @attachment.s3object.class.any_instance.expects(:read).yields("test")
       end
 
       it "should stream data to the block given" do
         callback = false
+        @attachment.s3object.class.any_instance.expects(:get).yields("test")
         @attachment.open { |data| expect(data).to eq "test"; callback = true }
         expect(callback).to eq true
       end
 
       it "should stream to a tempfile without a block given" do
+        @attachment.s3object.class.any_instance.expects(:get).with(has_key(:response_target))
         file = @attachment.open
         expect(file).to be_a(Tempfile)
-        expect(file.read).to eq "test"
       end
     end
   end

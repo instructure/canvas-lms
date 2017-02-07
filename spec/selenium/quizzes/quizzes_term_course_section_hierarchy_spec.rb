@@ -44,7 +44,9 @@ describe "quizzes section hierarchy" do
     # make sure it does not create a blank submissions
     expect(f("#content")).not_to contain_css('.quiz_score')
     expect(f("#content")).not_to contain_css('.quiz_duration')
-    expect_new_page_load(true) { f('#section-tabs .quizzes').click }
+    f('#section-tabs .quizzes').click
+    accept_alert
+    wait_for_ajaximations
   end
 
   context "section overrides course and term hierarchy" do
