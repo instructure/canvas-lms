@@ -8,16 +8,8 @@ module ConferencesCommon
     f('.new-conference-btn')
   end
 
-  def start_conference_button
-    f('.start-button', new_conference_list)
-  end
-
   def end_conference_button
     f('.close_conference_link', new_conference_list)
-  end
-
-  def start_first_conference_in_list
-    expect_new_page_load { start_conference_button.click }
   end
 
   def end_first_conference_in_list

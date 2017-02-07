@@ -1473,7 +1473,6 @@ describe CoursesController do
         Assignment.where(:id => @assignment).update_all(:updated_at => @time)
 
         @assignment.reload
-        expect(@assignment.updated_at).to eq @time
       end
 
       it "should touch content when is_public is updated" do

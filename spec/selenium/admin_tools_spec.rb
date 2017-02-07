@@ -46,8 +46,6 @@ describe "admin_tools" do
   def click_view_tab(tab_name)
     wait_for_ajaximations
     tab = fj("#adminToolsTabs .#{tab_name} > a")
-    expect(tab).not_to be_nil
-    expect(tab).to be_displayed
     tab.click
     wait_for_ajaximations
   end

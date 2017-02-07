@@ -401,7 +401,7 @@ describe ConditionalRelease::Service do
     context 'assignment data' do
       before(:each) do
         allow(Service).to receive(:enabled_in_context?).and_return(true)
-        expect(CanvasHttp).to receive(:get).once.
+        allow(CanvasHttp).to receive(:get).once.
           and_return(double({ code: '200', body: default_rules.to_json }))
       end
 
@@ -530,7 +530,7 @@ describe ConditionalRelease::Service do
 
     it 'returns a list of rules' do
       expect_cyoe_request '200', @a1
-      expect(rules.length > 0)
+      expect(rules.length).to be > 0
       expect(models0).to eq [@a1]
     end
 

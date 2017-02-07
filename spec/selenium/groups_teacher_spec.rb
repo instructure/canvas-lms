@@ -1000,7 +1000,7 @@ describe "new groups" do
 
           select_change_groups_option
 
-          expect(f('.progressbar').displayed?)
+          expect(f('.progressbar')).to be_displayed
         end
 
         context "dragging and dropping a student" do

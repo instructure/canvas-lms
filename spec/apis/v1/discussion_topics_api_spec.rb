@@ -1763,9 +1763,10 @@ describe DiscussionTopicsController, type: :request do
       RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
                            :role => observer_role, :enabled => false)
 
-      expect { api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
-                        {:controller => 'discussion_topics', :action => 'index', :format => 'json',
-                         :course_id => @course.id.to_s}) }.to raise_error
+      api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+               {:controller => 'discussion_topics', :action => 'index', :format => 'json',
+               :course_id => @course.id.to_s})
+      expect(response).to be_client_error
     end
   end
 
@@ -2492,7 +2493,6 @@ describe DiscussionTopicsController, type: :request do
 
     before :each do
       course_with_teacher(active_all: true, is_public: true) # sets @teacher and @course
-      expect(@course.is_public).to be_truthy
       account_admin_user(account: @course.account) # sets @admin
       @student1 = student_in_course(active_all: true).user
       @student2 = student_in_course(active_all: true).user

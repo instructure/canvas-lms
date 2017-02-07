@@ -19,7 +19,7 @@ module CustomPageLoaders
       close_modal_if_present
       wait_for_ajaximations
     else
-      expect_new_page_load(true) do
+      wait_for_new_page_load(true) do
         driver.get(app_url + link)
       end
     end

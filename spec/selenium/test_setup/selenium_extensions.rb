@@ -32,7 +32,7 @@ module SeleniumExtensions
       yield
     rescue Selenium::WebDriver::Error::StaleElementReferenceError
       raise unless finder_proc
-      location = CallStackUtils.best_line_for($ERROR_INFO.backtrace, /test_setup/)
+      location = CallStackUtils.best_line_for($ERROR_INFO.backtrace)
       $stderr.puts "WARNING: StaleElementReferenceError at #{location}, attempting to recover..."
       @id = finder_proc.call.ref
       retry

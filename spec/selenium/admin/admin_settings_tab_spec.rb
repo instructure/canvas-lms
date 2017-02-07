@@ -241,8 +241,8 @@ describe "admin settings tab" do
 
       before(:each) do
         f("#enable_equella").click
-        expect(is_checked("#enable_equella")).to be_truthy
       end
+
       it "should add an equella feature" do
         add_equella_feature
       end

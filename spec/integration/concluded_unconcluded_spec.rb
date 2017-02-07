@@ -41,14 +41,12 @@ describe "concluded/unconcluded courses" do
     @group = @course.assignment_groups.create!(:name => "default")
     @assignment = @course.assignments.create!(:submission_types => 'online_quiz', :title => 'quiz assignment', :assignment_group => @group)
     @quiz = @assignment.reload.quiz
-    expect(@quiz).not_to be_nil
     @qsub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
     @qsub.quiz_data = [{:correct_comments=>"", :assessment_question_id=>nil, :incorrect_comments=>"", :question_name=>"Question 1", :points_possible=>1, :question_text=>"Which book(s) are required for this course?", :name=>"Question 1", :id=>128, :answers=>[{:weight=>0, :text=>"A", :comments=>"", :id=>1490}, {:weight=>0, :text=>"B", :comments=>"", :id=>1020}, {:weight=>0, :text=>"C", :comments=>"", :id=>7051}], :question_type=>"multiple_choice_question"}]
     @qsub.submission_data = [{:points=>0, :text=>"7051", :question_id=>128, :correct=>false, :answer_id=>7051}]
     @qsub.workflow_state = 'complete'
     @qsub.save!
     @sub = @qsub.submission
-    expect(@sub).not_to be_nil
   end
   
   it "should let the teacher change grades in the speed grader by default" do

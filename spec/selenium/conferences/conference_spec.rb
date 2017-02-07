@@ -40,8 +40,10 @@ describe 'Web conferences' do
 
   context 'when concluding a conference' do
     let(:conference_title) { 'Newer Conference' }
-    before(:once) { create_wimba_conference(conference_title) }
-    before(:each) { start_first_conference_in_list }
+    before(:once) do
+      conference = create_wimba_conference(conference_title)
+      conference.add_attendee(@user)
+    end
 
     context 'as a teacher' do
       it 'concludes the conference', priority: "1", test_id: 323320 do

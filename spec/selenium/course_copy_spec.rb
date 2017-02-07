@@ -169,12 +169,12 @@ describe "course copy" do
     before(:each) do
       course_with_admin_logged_in
       @date_to_use = 2.weeks.from_now.monday.strftime("%Y-%m-%d")
-      get "/calendar"
-      quick_jump_to_date(@date_to_use)
-      create_calendar_event('Monday Event', true, false, false, @date_to_use, true)
     end
 
     it "shifts the dates a week later", priority: "2", test_id: 2953906 do
+      get "/calendar"
+      quick_jump_to_date(@date_to_use)
+      create_calendar_event('Monday Event', true, false, false, @date_to_use, true)
       get "/courses/#{@course.id}/copy"
       new_course_name = "copied course"
       replace_content(f("input[type=text][id=course_name]"), new_course_name)
@@ -184,8 +184,7 @@ describe "course copy" do
       replace_content(f("input[type=text][id=newStartDate]"), date)
       submit_form('#copy_course_form')
       run_jobs
-      status = f('div.progressStatus span').text
-      keep_trying_until { expect(status == 'Completed') }
+      expect(f('div.progressStatus span')).to include_text 'Completed'
       get "/calendar#view_name=week"
       quick_jump_to_date(@date_to_use)
       f('.fc-event').click

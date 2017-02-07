@@ -6,7 +6,7 @@ module BlankSlateProtection
       return super unless BlankSlateProtection.enabled?
       return super if caller.grep(BlankSlateProtection.exempt_patterns).present?
 
-      location = CallStackUtils.best_line_for(caller).sub(/:in .*/, '')
+      location = CallStackUtils.best_line_for(caller)
       if caller.grep(/_context_hooks/).present?
         $stderr.puts "\e[31mError: Don't create records inside `:all` hooks!"
         $stderr.puts "See: " + location + "\e[0m"

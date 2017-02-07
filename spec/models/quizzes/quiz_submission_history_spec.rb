@@ -31,21 +31,17 @@ describe Quizzes::QuizSubmissionHistory do
       @submission.score = 5.0
       @submission.attempt = 1
       @submission.with_versioning(true, &:save!)
-      expect(@submission.version_number).to eql(1)
-      expect(@submission.score).to eql(5.0)
 
       # regrade 1
       @submission.score_before_regrade = 5.0
       @submission.score = 4.0
       @submission.attempt = 1
       @submission.with_versioning(true, &:save!)
-      expect(@submission.version_number).to eql(2)
 
       # new attempt
       @submission.score = 3.0
       @submission.attempt = 2
       @submission.with_versioning(true, &:save!)
-      expect(@submission.version_number).to eql(3)
     end
 
     describe "#initialize" do

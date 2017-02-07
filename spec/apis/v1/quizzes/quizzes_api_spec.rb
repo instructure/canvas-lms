@@ -241,14 +241,11 @@ describe Quizzes::QuizzesApiController, type: :request do
     end
 
     context "non-existent quiz" do
-      before do
-        @json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/10101",
-                        {:controller=>"quizzes/quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "10101"},
-                        {}, {}, {:expected_status => 404})
-      end
-
       it "should return a not found error message" do
-        expect(@json.inspect).to include "does not exist"
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/10101",
+                       {:controller=>"quizzes/quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "10101"},
+                       {}, {}, {:expected_status => 404})
+        expect(json.inspect).to include "does not exist"
       end
     end
   end

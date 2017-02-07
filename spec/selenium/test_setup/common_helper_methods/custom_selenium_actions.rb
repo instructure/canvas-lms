@@ -214,7 +214,6 @@ module CustomSeleniumActions
       assert_can_switch_views!
       switch_editor_views(tiny_controlling_element)
       tiny_controlling_element.clear
-      expect(tiny_controlling_element[:value]).to be_empty
       switch_editor_views(tiny_controlling_element)
     end
   end

@@ -183,10 +183,6 @@ describe 'Provisional Grades API', type: :request do
           @submission = @assignment.submit_homework(@student, :body => "hello")
           @submission.add_comment(author: @ta, provisional: true, comment: 'A provisional comment')
           @provisional_grade = @submission.provisional_grades.first
-
-          expect(@submission.workflow_state).to eq('submitted')
-          expect(@submission.grade).to be_nil
-          expect(@provisional_grade.graded_at).to be_nil
         end
 
         it 'publishes an empty provisional grade for an active student' do

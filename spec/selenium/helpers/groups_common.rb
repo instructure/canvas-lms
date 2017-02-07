@@ -304,7 +304,7 @@ module GroupsCommon
   def verify_member_sees_group_page(index = 0)
     get pages_page
     expect_new_page_load { ff('.wiki-page-link')[index].click }
-    expect expect(f('.page-title')).to include_text("#{@page.title}")
+    expect(f('.page-title')).to include_text(@page.title)
   end
 
   # context test. if true, allows you to test files both in and out of group context,

@@ -90,9 +90,7 @@ module ContextModulesCommon
     fj('.add_item_button.ui-button').click
     wait_for_ajaximations
     tag = ContentTag.last
-    module_item = f("#context_module_item_#{tag.id}")
-    expect(module_item).to include_text(item_name)
-    module_item
+    fj("#context_module_item_#{tag.id}:contains(#{item_name.inspect})")
   end
 
   def select_module_item(select_element_css, item_text)
@@ -100,11 +98,8 @@ module ContextModulesCommon
   end
 
   def new_module_form
-    add_form = f('#add_context_module_form')
     f(".add_module_link").click
-    expect(add_form).to be_displayed
-
-    add_form
+    fj('#add_context_module_form:visible')
   end
 
   def add_module(module_name = 'Test Module')

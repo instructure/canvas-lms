@@ -66,8 +66,7 @@ describe 'Moderated Grades API', type: :request do
         @parsed_json = api_call :post,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/moderated_students",
           {controller: 'moderation_set', action: 'create',
-            format: 'json', course_id: @course.id, assignment_id: @assignment.id}, {}, {},
-          { expected_status: 400 }
+            format: 'json', course_id: @course.id, assignment_id: @assignment.id}, {}, {}
       end
 
       it 'responds with a bad request' do

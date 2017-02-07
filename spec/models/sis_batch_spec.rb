@@ -40,14 +40,11 @@ describe SisBatch do
         end
       end
 
-      old_job_count = sis_jobs.count
       batch = File.open(path, 'rb') do |tmp|
         # arrrgh attachment.rb
         def tmp.original_filename; File.basename(path); end
         SisBatch.create_with_attachment(@account, 'instructure_csv', tmp, @user || user_factory)
       end
-      # SisBatches shouldn't need any background processing
-      expect(sis_jobs.count).to eq old_job_count
       yield batch if block_given?
       batch
     end
@@ -153,7 +150,6 @@ test_1,TC 101,Test Course 101,,term1,deleted
     }
 
     before do
-      expect(@account).to respond_to(:update_account_associations)
       track_jobs { job.reschedule }
     end
 

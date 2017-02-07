@@ -179,7 +179,7 @@ describe Assignment do
     end
 
     it 'returns a jwt' do
-      expect(Canvas::Security.decode_jwt @assignment.secure_params)
+      expect(Canvas::Security.decode_jwt(@assignment.secure_params)).to be
     end
   end
 
@@ -4036,87 +4036,80 @@ describe Assignment do
       end
     end
   end
-end
 
-def setup_assignment_with_group
-  assignment_model(:group_category => "Study Groups", :course => @course)
-  @group = @a.context.groups.create!(:name => "Study Group 1", :group_category => @a.group_category)
-  @u1 = @a.context.enroll_user(User.create(:name => "user 1")).user
-  @u2 = @a.context.enroll_user(User.create(:name => "user 2")).user
-  @u3 = @a.context.enroll_user(User.create(:name => "user 3")).user
-  @group.add_user(@u1)
-  @group.add_user(@u2)
-  @assignment.reload
-end
-
-def setup_assignment_without_submission
-  assignment_model(:course => @course)
-  @assignment.reload
-end
-
-def setup_assignment_with_homework
-  setup_assignment_without_submission
-  res = @assignment.submit_homework(@user, {:submission_type => 'online_text_entry', :body => 'blah'})
-  expect(res).not_to be_nil
-  expect(res).to be_is_a(Submission)
-  @assignment.reload
-end
-
-def setup_assignment_with_students
-  @graded_notify = Notification.create!(:name => "Submission Graded")
-  @grade_change_notify = Notification.create!(:name => "Submission Grade Changed")
-  @stu1 = @student
-  @course.enroll_student(@stu2 = user_factory)
-  @assignment = @course.assignments.create(:title => "asdf", :points_possible => 10)
-  @sub1 = @assignment.grade_student(@stu1, grade: 9, grader: @teacher).first
-  expect(@sub1.score).to eq 9
-  # Took this out until it is asked for
-  # @sub1.published_score.should_not == @sub1.score
-  expect(@sub1.published_score).to eq @sub1.score
-  @assignment.reload
-  expect(@assignment.submissions).to be_include(@sub1)
-end
-
-def submit_homework(student)
-  file_context = @assignment.group_category.group_for(student) if @assignment.has_group_category?
-  file_context ||= student
-  a = Attachment.create! context: file_context,
-                         filename: "homework.pdf",
-                         uploaded_data: StringIO.new("blah blah blah")
-  @assignment.submit_homework(student, attachments: [a],
-                                       submission_type: "online_upload")
-  a
-end
-
-def zip_submissions
-  zip = Attachment.new filename: 'submissions.zip'
-  zip.user = @teacher
-  zip.workflow_state = 'to_be_zipped'
-  zip.context = @assignment
-  zip.save!
-  ContentZipper.process_attachment(zip, @teacher)
-  raise "zip failed" if zip.workflow_state != "zipped"
-  zip
-end
-
-def setup_differentiated_assignments(opts={})
-  if !opts[:course]
-    course_with_teacher(active_all: true)
+  def setup_assignment_with_group
+    assignment_model(:group_category => "Study Groups", :course => @course)
+    @group = @a.context.groups.create!(:name => "Study Group 1", :group_category => @a.group_category)
+    @u1 = @a.context.enroll_user(User.create(:name => "user 1")).user
+    @u2 = @a.context.enroll_user(User.create(:name => "user 2")).user
+    @u3 = @a.context.enroll_user(User.create(:name => "user 3")).user
+    @group.add_user(@u1)
+    @group.add_user(@u2)
+    @assignment.reload
   end
 
-  @section1 = @course.course_sections.create!(name: 'Section One')
-  @section2 = @course.course_sections.create!(name: 'Section Two')
-
-  if opts[:ta]
-    @ta = course_with_ta(course: @course, active_all: true).user
+  def setup_assignment_without_submission
+    assignment_model(:course => @course)
+    @assignment.reload
   end
 
-  @student1, @student2, @student3 = create_users(3, return_type: :record)
-  student_in_section(@section1, user: @student1)
-  student_in_section(@section2, user: @student2)
+  def setup_assignment_with_homework
+    setup_assignment_without_submission
+    res = @assignment.submit_homework(@user, {:submission_type => 'online_text_entry', :body => 'blah'})
+    @assignment.reload
+  end
 
-  @assignment = assignment_model(course: @course, submission_types: "online_url", workflow_state: "published")
-  @override_s1 = differentiated_assignment(assignment: @assignment, course_section: @section1)
-  @override_s1.due_at = 1.day.from_now
-  @override_s1.save!
+  def setup_assignment_with_students
+    @graded_notify = Notification.create!(:name => "Submission Graded")
+    @grade_change_notify = Notification.create!(:name => "Submission Grade Changed")
+    @stu1 = @student
+    @course.enroll_student(@stu2 = user_factory)
+    @assignment = @course.assignments.create(:title => "asdf", :points_possible => 10)
+    @sub1 = @assignment.grade_student(@stu1, grade: 9, grader: @teacher).first
+    @assignment.reload
+  end
+
+  def submit_homework(student)
+    file_context = @assignment.group_category.group_for(student) if @assignment.has_group_category?
+    file_context ||= student
+    a = Attachment.create! context: file_context,
+                           filename: "homework.pdf",
+                           uploaded_data: StringIO.new("blah blah blah")
+    @assignment.submit_homework(student, attachments: [a],
+                                         submission_type: "online_upload")
+    a
+  end
+
+  def zip_submissions
+    zip = Attachment.new filename: 'submissions.zip'
+    zip.user = @teacher
+    zip.workflow_state = 'to_be_zipped'
+    zip.context = @assignment
+    zip.save!
+    ContentZipper.process_attachment(zip, @teacher)
+    raise "zip failed" if zip.workflow_state != "zipped"
+    zip
+  end
+
+  def setup_differentiated_assignments(opts={})
+    if !opts[:course]
+      course_with_teacher(active_all: true)
+    end
+
+    @section1 = @course.course_sections.create!(name: 'Section One')
+    @section2 = @course.course_sections.create!(name: 'Section Two')
+
+    if opts[:ta]
+      @ta = course_with_ta(course: @course, active_all: true).user
+    end
+
+    @student1, @student2, @student3 = create_users(3, return_type: :record)
+    student_in_section(@section1, user: @student1)
+    student_in_section(@section2, user: @student2)
+
+    @assignment = assignment_model(course: @course, submission_types: "online_url", workflow_state: "published")
+    @override_s1 = differentiated_assignment(assignment: @assignment, course_section: @section1)
+    @override_s1.due_at = 1.day.from_now
+    @override_s1.save!
+  end
 end

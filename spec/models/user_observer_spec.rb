@@ -132,7 +132,6 @@ describe UserObserver do
       @observer = user_with_pseudonym
       student.observers << @observer
       @observer_enrollment = @observer.enrollments.where(type: 'ObserverEnrollment', course_id: @course, associated_user_id: student).first
-      expect(@observer_enrollment).not_to be_nil
     end
 
     it "should not attempt to add a duplicate observer enrollment" do

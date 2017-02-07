@@ -33,8 +33,6 @@ describe AssignmentsController do
       :assignment_group => @group,
       :due_at => Time.zone.now + 1.week
     )
-    expect(@assignment.assignment_group).to eql(@group)
-    expect(@group.assignments).to be_include(@assignment)
     @assignment
   end
 

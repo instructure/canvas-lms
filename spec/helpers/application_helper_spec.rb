@@ -452,10 +452,6 @@ describe ApplicationHelper do
   end
 
   describe "hidden dialogs" do
-    before do
-      expect(hidden_dialogs).to be_empty
-    end
-
     it "should generate empty string when there are no dialogs" do
       str = render_hidden_dialogs
       expect(str).to eq ''

@@ -349,11 +349,11 @@ module QuizzesCommon
     end
 
     if access_code.nil?
-      expect_new_page_load { f('#take_quiz_link').click }
+      wait_for_new_page_load { f('#take_quiz_link').click }
     else
       f('#quiz_access_code').send_keys(access_code)
-      expect_new_page_load { fj('.btn', '#main').click }
-    end
+      wait_for_new_page_load { fj('.btn', '#main').click }
+    end or raise "unable to start quiz"
 
     wait_for_quiz_to_begin
   end

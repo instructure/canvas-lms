@@ -80,18 +80,26 @@ module CustomValidators
     expect(box[0]).to be_displayed
   end
 
-  def expect_new_page_load(accept_alert = false)
+  def wait_for_new_page_load(accept_alert = false)
     driver.execute_script("window.INST = window.INST || {}; INST.still_on_old_page = true;")
     yield
-    wait_for method: :expect_new_page_load do
+    wait_for(method: :wait_for_new_page_load) do
       begin
         driver.execute_script("return window.INST && INST.still_on_old_page !== true;")
       rescue Selenium::WebDriver::Error::UnhandledAlertError, Selenium::WebDriver::Error::UnknownError
         raise unless accept_alert
         driver.switch_to.alert.accept
       end
-    end or raise(RSpec::Expectations::ExpectationNotMetError, "expected new page load, none happened")
+    end or return false
     wait_for_dom_ready
     wait_for_ajaximations
+    true
+  end
+
+  def expect_new_page_load(accept_alert = false)
+    success = wait_for_new_page_load(accept_alert) do
+      yield
+    end
+    expect(success).to be, "expected new page load, none happened"
   end
 end

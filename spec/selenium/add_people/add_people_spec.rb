@@ -117,7 +117,7 @@ describe "add_people" do
 
       # check the checkbox
       f('label[for="limit_privileges_to_course_section"]').click
-      expect(f('#limit_privileges_to_course_section').selected?)
+      expect(f('#limit_privileges_to_course_section')).to be_selected
 
       # cancel the dialog
       f('#addpeople_cancel').click
@@ -129,7 +129,7 @@ describe "add_people" do
 
       # check the checkbox again
       f('label[for="limit_privileges_to_course_section"]').click
-      expect(f('#limit_privileges_to_course_section').selected?)
+      expect(f('#limit_privileges_to_course_section')).to be_selected
 
     end
   end

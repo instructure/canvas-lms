@@ -1477,7 +1477,7 @@ describe AssignmentsApiController, type: :request do
         api_call_to_update_adhoc_override(student_ids: [@student.id])
 
         ao = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
-        expect(AssignmentOverrideStudent.count ==1)
+        expect(AssignmentOverrideStudent.count).to eq 1
       end
 
       it 'allows the update of an adhoc override with different student' do
@@ -3246,7 +3246,6 @@ describe AssignmentsApiController, type: :request do
           @tool_tag.save!
           @assignment.submission_types = 'external_tool'
           @assignment.save!
-          expect(@assignment.external_tool_tag).not_to be_nil
         end
 
         before :each do

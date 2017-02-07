@@ -55,6 +55,7 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 # let/before/example
 BlankSlateProtection.truncate_all_tables! unless defined?(TestQueue::Runner::RSpec) # we do this in each runner
 BlankSlateProtection.install!
+GreatExpectations.install!
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 
@@ -572,8 +573,8 @@ RSpec.configure do |config|
 
   def process_csv_data_cleanly(*lines_or_opts)
     importer = process_csv_data(*lines_or_opts)
-    expect(importer.errors).to eq []
-    expect(importer.warnings).to eq []
+    raise "csv errors" if importer.errors.present?
+    raise "csv warning" if importer.warnings.present?
   end
 
   def enable_cache(new_cache=:memory_store)
@@ -726,8 +727,6 @@ RSpec.configure do |config|
         skip "Please put valid S3 credentials in config/amazon_s3.yml"
       end
     end
-    expect(Attachment.s3_storage?).to be true
-    expect(Attachment.local_storage?).to be false
   end
 
   def local_storage!
@@ -738,9 +737,6 @@ RSpec.configure do |config|
       model.stubs(:s3_storage?).returns(false)
       model.stubs(:local_storage?).returns(true)
     end
-
-    expect(Attachment.local_storage?).to be true
-    expect(Attachment.s3_storage?).to be false
   end
 
   def run_job(job)
