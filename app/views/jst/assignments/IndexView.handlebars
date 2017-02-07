@@ -53,38 +53,8 @@
         aria-label='{{#t "title_add_assignment"}}Add Assignment{{/t}}'
       >{{#t "add_assignment"}}Assignment{{/t}}</a>
 
-      <div class="inline-block">
-        <a
-          class="al-trigger btn"
-          id="course_assignment_settings_link"
-          role="button"
-          tabindex="0"
-          title='{{#t "assignments_settings"}}Assignments Settings{{/t}}'
-          aria-label="{{#t "assignments_settings_screenreader"}}Assignments Settings{{/t}}"
-        >
-          <span class="screenreader-only">{{#t}}Assignments Settings{{/t}}</span>
-          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-        </a>
-        <ul
-          class="al-options"
-          role="menu"
-        >
-          <li role="menuitem">
-            <a href="#" id="assignmentSettingsCog" role="button"
-            title='{{#t "grading_weight_settings"}}Assignment Groups Weight{{/t}}'
-            data-focus-returns-to="course_assignment_settings_link"
-            aria-label="{{#t "grading_weight_settings_screenreader"}}Assignment Groups Weight{{/t}}">
-              {{#if weight_final_grades }}
-                <i class="icon-check"></i>
-              {{else}}
-                <i class="icon-blank"></i>
-              {{/if}}
-              {{#t}}Assignment Groups Weight{{/t}}
-            </a>
-          </li>
-        </ul>
+      <span id="settingsMountPoint"></span>
       </div>
-
     {{else}}
       <div data-view="showBy"></div>
     {{/if}}

@@ -22,7 +22,7 @@ require 'nokogiri'
 
 describe ContentExportsApiController, type: :request do
   let_once(:t_teacher) do
-    user(active_all: true)
+    user_factory(active_all: true)
   end
 
   let_once(:t_course) do
@@ -66,7 +66,7 @@ describe ContentExportsApiController, type: :request do
 
   describe "index" do
     it "should check permissions" do
-      random_user = user active_all: true
+      random_user = user_factory active_all: true
       api_call_as_user(random_user, :get, "/api/v1/courses/#{t_course.id}/content_exports",
         { controller: 'content_exports_api', action: 'index', format: 'json', course_id: t_course.to_param },
         {}, {}, { expected_status: 401 })
@@ -275,7 +275,7 @@ describe ContentExportsApiController, type: :request do
         expect(export.job_progress).to be_completed
         expect(export.attachment).not_to be_nil
 
-        course
+        course_factory
         cm = @course.content_migrations.new
         cm.attachment = export.attachment
         cm.migration_type = "canvas_cartridge_importer"
@@ -315,7 +315,7 @@ describe ContentExportsApiController, type: :request do
         expect(export.job_progress).to be_completed
         expect(export.attachment).not_to be_nil
 
-        course
+        course_factory
         cm = @course.content_migrations.new
         cm.attachment = export.attachment
         cm.migration_type = "canvas_cartridge_importer"
@@ -366,7 +366,7 @@ describe ContentExportsApiController, type: :request do
         run_jobs
 
         export.reload
-        course
+        course_factory
         cm = @course.content_migrations.new
         cm.attachment = export.attachment
         cm.migration_type = "canvas_cartridge_importer"
@@ -425,7 +425,7 @@ describe ContentExportsApiController, type: :request do
         run_jobs
 
         export.reload
-        course
+        course_factory
         cm = @course.content_migrations.new
         cm.attachment = export.attachment
         cm.migration_type = "canvas_cartridge_importer"
@@ -455,7 +455,7 @@ describe ContentExportsApiController, type: :request do
         run_jobs
 
         export.reload
-        course
+        course_factory
         cm = @course.content_migrations.new
         cm.attachment = export.attachment
         cm.migration_type = "canvas_cartridge_importer"

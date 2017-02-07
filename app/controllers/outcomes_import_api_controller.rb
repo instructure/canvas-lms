@@ -22,11 +22,8 @@ class OutcomesImportApiController < ApplicationController
 
   before_filter :require_user, :can_manage_global_outcomes, :has_api_config
 
-  NATIONAL_STANDARDS_TITLE = "National Standards"
-  UNITED_KINGDOM_TITLE = "United Kingdom"
-
   def available
-    render json: list_of_available_guids
+    render json: AcademicBenchmark.list_of_available_guids
   end
 
   def create
@@ -39,7 +36,7 @@ class OutcomesImportApiController < ApplicationController
       err_msg = "Import failed to queue"
 
       # AcademicBenchmark.queue_migration_for_guid can raise Canvas::Migration::Error
-      migration = AcademicBenchmark.import(Array(params[:guid]), options).first
+      migration = AcademicBenchmark.import(params[:guid], options)
 
       if migration
         render json: { migration_id: migration.id, guid: params[:guid] }
@@ -72,18 +69,13 @@ class OutcomesImportApiController < ApplicationController
   end
 
   def has_api_config
-    err = "The AcademicBenchmark API is not configured"
-    if !AcademicBenchmark.config
-      render json: { error: "#{err} (needs api_key and api_url)" }
-      return false
-    elsif !AcademicBenchmark.config["api_key"] || AcademicBenchmark.config["api_key"].empty?
-      render json: { error: "#{err} (needs api_key)" }
-      return false
-    elsif !AcademicBenchmark.config["api_url"] || AcademicBenchmark.config["api_url"].empty?
-      render json: { error: "#{err} (needs api_url)" }
-      return false
+    err = AcademicBenchmark.check_config
+    if err.nil?
+      true
+    else
+      render json: { error: "The AcademicBenchmark API is not configured #{err}" }
+      false
     end
-    true
   end
 
   ##
@@ -142,61 +134,5 @@ class OutcomesImportApiController < ApplicationController
       raise "invalid description value: #{rating[:description]}"
     end
     { :description => rating[:description], :points => parse_int(rating[:points]) }
-  end
-
-  ##
-  # Extract the national standards from the list of authorities
-  # National Standards are also known as Common Core and NGSS
-  ##
-  def nat_stds_guid(authorities)
-    authorities.find{|a| a["title"] == NATIONAL_STANDARDS_TITLE}["guid"]
-  end
-
-  def api_connection
-    # The api credentials for accessing the Academic Benchmarks API
-    # are stored in the database.  This retrieves them
-    config = AcademicBenchmark.config
-
-    # create a new api connection.  Note that this does not actually
-    # make a request to the API
-    AcademicBenchmark::Api.new(config["api_key"], base_url: config["api_url"])
-  end
-
-  ##
-  # get a list of all of the available authorities,
-  # and sort them alphabetically by title.
-  #
-  # Academic Benchmarks authorities are generally State Standards,
-  # although "National Statndards" is an authority which must be
-  # browsed in order to retrieve specifics like NGSS and Common Core
-  ##
-  def retrieve_authorities(api)
-    authorities = api.list_available_authorities.select { |a| a.key?("title") }
-    authorities.sort{ |a, b| a["title"] <=> b["title"] }
-  end
-
-  def extract_nat_stds(api, nat_stds_guid)
-    api.browse_guid(nat_stds_guid).first["itm"].first["itm"]
-  end
-
-  ##
-  # Get a list of all of the available guids that users can import.
-  # These can be passed to the `create` action
-  ##
-  def list_of_available_guids
-    api = api_connection
-    auth_list = retrieve_authorities(api)
-
-    # prepend the common core, next gen science standards,
-    # and the ISTE (NETS) standards to the list
-    auth_list.unshift(extract_nat_stds(api, nat_stds_guid(auth_list)))
-
-    # append the UK standards to the end of the list and flatten it down
-    auth_list.push(uk_guid(api)).flatten
-  end
-
-  # The UK standards are now available to us as well,
-  def uk_guid(api)
-    api.browse.find{ |a| a["title"] == UNITED_KINGDOM_TITLE }
   end
 end

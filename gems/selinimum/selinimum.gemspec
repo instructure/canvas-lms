@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.test_files = spec.files.grep(%r{^spec/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "aws-sdk-v1", "~> 1.63"
+  spec.add_dependency "aws-sdk", "~> 2.6.7"
   spec.add_dependency "activesupport", ">= 3.2", "< 5.1"
   spec.add_dependency "activerecord", ">= 3.2", "< 5.1"
   spec.add_dependency "globby", ">= 0.1.2"

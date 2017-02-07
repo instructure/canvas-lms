@@ -49,11 +49,14 @@ module Api::V1::WikiPage
       hash['body'] = api_user_content(wiki_page.body)
       wiki_page.increment_view_count(current_user, wiki_page.context)
     end
+    if opts[:include_master_course_restrictions]
+      hash['restricted_by_master_course'] = wiki_page.editing_restricted?
+    end
     hash
   end
 
-  def wiki_pages_json(wiki_pages, current_user, session)
-    wiki_pages.map { |page| wiki_page_json(page, current_user, session, false) }
+  def wiki_pages_json(wiki_pages, current_user, session, opts={})
+    wiki_pages.map { |page| wiki_page_json(page, current_user, session, false, opts) }
   end
 
   def wiki_page_revision_json(version, current_user, current_session, include_content = true, latest_version = nil)

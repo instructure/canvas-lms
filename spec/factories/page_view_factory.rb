@@ -25,7 +25,7 @@ module Factories
     {
       :url => "http://www.example.com/courses/1",
       :request_id => SecureRandom.uuid,
-      :user => @user || user
+      :user => @user || user_factory
     }
   end
 

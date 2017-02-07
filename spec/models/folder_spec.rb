@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Folder do
   before(:once) do
-    course
+    course_factory
   end
 
   it "should create a new instance given valid attributes" do
@@ -360,7 +360,7 @@ describe Folder do
     end
 
     it "ensures only one root submissions folder per user exists" do
-      user
+      user_factory
       @user.submissions_folder
       dup = @user.folders.build(name: 'dup', parent_folder: Folder.root_folders(@user).first)
       dup.submission_context_code = 'root'

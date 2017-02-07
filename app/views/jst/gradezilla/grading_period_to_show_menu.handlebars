@@ -1,0 +1,14 @@
+<button type="button" class="grading-period-select-button">
+  <span class="selected-grading-period">{{currentGradingPeriod}}</span>
+</button>
+
+<ul class="grading-period-select-menu gradebook_dropdown ui-kyle-menu" id="grading-period-to-show-menu">
+  {{#each periods}}
+    <li>
+      <a href="#">
+        <label for="period_option_{{id}}">{{{title}}}</label>
+        <input id="period_option_{{id}}" type="radio" value="{{id}}" name="period_to_show_radio" {{#if checked}} checked {{/if}} />
+      </a>
+    </li>
+  {{/each}}
+</ul>

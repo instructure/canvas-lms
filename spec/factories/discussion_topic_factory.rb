@@ -68,7 +68,7 @@ module Factories
   end
 
   def group_discussion_assignment
-    course = @course || course(:active_all => true)
+    course = @course || course_factory(active_all: true)
     group_category = course.group_categories.create!(:name => "category")
     @group1 = course.groups.create!(:name => "group 1", :group_category => group_category)
     @group2 = course.groups.create!(:name => "group 2", :group_category => group_category)

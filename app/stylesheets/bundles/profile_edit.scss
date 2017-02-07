@@ -273,3 +273,7 @@ li[id$=service_google_docs] {
 #disable_inbox {
   vertical-align: top;
 }
+
+a.delete_key_link {
+  color: $ic-color-medium-darker;
+}

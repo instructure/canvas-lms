@@ -70,6 +70,7 @@ module Api::V1::Assignment
     allowed_extensions
     due_at
     only_visible_to_overrides
+    post_to_sis
   ].freeze
 
   def assignments_json(assignments, user, session, opts = {})

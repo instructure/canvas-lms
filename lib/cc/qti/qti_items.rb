@@ -77,10 +77,25 @@ module CC
         add_question(node, question)
       end
 
+      def qq_mig_id(question)
+        qq_id = question['id']
+        if @manifest && @manifest.exporter.for_master_migration
+          create_key("quizzes/quiz_question_#{Shard.global_id_for(qq_id)}") # curse you namespacing
+        else
+          create_key("quiz_question_#{qq_id}")
+        end
+      end
+
+      def aq_mig_id(question)
+        aq_id = question['assessment_question_id']
+        if @manifest && @manifest.exporter.for_master_migration
+          aq_id = Shard.global_id_for(aq_id)
+        end
+        create_key("assessment_question_#{aq_id}")
+      end
+
       def add_question(node, question, for_cc=false)
-        aq_mig_id = create_key("assessment_question_#{question['assessment_question_id']}")
-        qq_mig_id = create_key("quiz_question_#{question['id']}")
-        question['migration_id'] = question[:is_quiz_question] ? qq_mig_id : aq_mig_id
+        question['migration_id'] = question[:is_quiz_question] ? qq_mig_id(question) : aq_mig_id(question)
         question['answers'] ||= []
 
         if question['question_type'] == 'missing_word_question'
@@ -101,7 +116,7 @@ module CC
                 meta_field(qm_node, 'question_type', question['question_type'])
                 meta_field(qm_node, 'points_possible', question['points_possible'])
                 if question[:is_quiz_question]
-                  meta_field(qm_node, 'assessment_question_identifierref', aq_mig_id)
+                  meta_field(qm_node, 'assessment_question_identifierref', aq_mig_id(question))
                 end
               end
             end

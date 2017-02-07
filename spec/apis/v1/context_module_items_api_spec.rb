@@ -19,7 +19,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Module Items API", type: :request do
   before :once do
-    course.offer!
+    course_factory.offer!
 
     @module1 = @course.context_modules.create!(:name => "module1")
     @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 20)
@@ -1516,7 +1516,7 @@ describe "Module Items API", type: :request do
 
   context "unauthorized user" do
     before :once do
-      user
+      user_factory
     end
 
     it "should check permissions" do

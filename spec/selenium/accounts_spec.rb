@@ -216,7 +216,7 @@ describe "account" do
     end
 
     it "should be able to view user details from parent account" do
-      user_non_root = user
+      user_non_root = user_factory
       create_sub_account.account_users.create!(user: user_non_root)
       get "/accounts/#{Account.default.id}/users/#{user_non_root.id}"
       # verify user details displayed properly

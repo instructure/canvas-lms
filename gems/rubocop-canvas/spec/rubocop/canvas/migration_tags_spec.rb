@@ -1,3 +1,5 @@
+require 'parser/current'
+
 describe RuboCop::Canvas::MigrationTags do
   subject { Class.new.tap { |c| c.include(described_class) }.new }
 

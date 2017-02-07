@@ -1,16 +1,19 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative '../../helpers/assignment_overrides'
 
-describe "gradebook2 - arrange by due date" do
+describe "gradebook - arrange by due date" do
   include_context "in-process server selenium tests"
   include AssignmentOverridesSeleniumHelper
-  include Gradebook2Common
+  include GradebookCommon
 
-  before(:each) do
+  before(:once) do
     gradebook_data_setup
     @assignment = @course.assignments.first
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
+  end
+
+  before(:each) do
+    user_session(@teacher)
+    get "/courses/#{@course.id}/gradebook"
   end
 
   it "should validate arrange columns by due date option", priority: "1", test_id: 220027 do
@@ -19,21 +22,20 @@ describe "gradebook2 - arrange by due date" do
     arrange_settings = ff('input[name="arrange-columns-by"]')
     arrange_settings.first.find_element(:xpath, '..').click
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    expect(first_row_cells[0].text).to eq expected_text
+    expect(first_row_cells[0]).to include_text expected_text
     f('#gradebook_settings').click
     expect(arrange_settings.first.find_element(:xpath, '..')).not_to be_displayed
     expect(arrange_settings.last.find_element(:xpath, '..')).to be_displayed
 
     # Setting should stick after reload
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
+    get "/courses/#{@course.id}/gradebook"
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    expect(first_row_cells[0].text).to eq expected_text
+    expect(first_row_cells[0]).to include_text expected_text
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    expect(first_row_cells[0].text).to eq expected_text
-    expect(first_row_cells[1].text).to eq @assignment_1_points
-    expect(first_row_cells[2].text).to eq @assignment_2_points
+    expect(first_row_cells[0]).to include_text expected_text
+    expect(first_row_cells[1]).to include_text @assignment_1_points
+    expect(first_row_cells[2]).to include_text @assignment_2_points
 
     f('#gradebook_settings').click
     arrange_settings = ff('input[name="arrange-columns-by"]')
@@ -53,7 +55,7 @@ describe "gradebook2 - arrange by due date" do
     f('#gradebook_settings').click
     f("a[data-arrange-columns-by='due_date']").click
     # since due date changes in assignments don't reflect in column sorting without a refresh
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(1)')).to include_text(assignment3.title)
     expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(2)')).to include_text(assignment2.title)
     expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(3)')).to include_text(@assignment.title)

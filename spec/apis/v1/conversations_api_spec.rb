@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe ConversationsController, type: :request do
   before :once do
-    @other = user(active_all: true)
+    @other = user_factory(active_all: true)
 
     course_with_teacher(:active_course => true, :active_enrollment => true, :user => user_with_pseudonym(:active_user => true))
     @course.update_attribute(:name, "the course")
@@ -1050,6 +1050,19 @@ describe ConversationsController, type: :request do
         { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s, :format => 'json' })
 
       expect(json["cannot_reply"]).to eq true
+    end
+
+    it "should not explode on account group conversations" do
+      @user = @billy
+      group
+      @group.add_user(@bob)
+      @group.add_user(@billy)
+      conversation = conversation(@bob, :sender => @billy, :context_type => "Group", :context_id => @group.id)
+
+      json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
+        { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s, :format => 'json' })
+
+      expect(json["cannot_reply"]).to_not be_truthy
     end
 
     it "should still include attachment verifiers when using session auth" do

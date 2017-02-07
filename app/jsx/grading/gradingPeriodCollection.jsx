@@ -20,7 +20,7 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
       // no props
     },
 
-    getInitialState: function() {
+    getInitialState: function () {
       return {
         periods: null,
         readOnly: false,
@@ -30,11 +30,11 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
       };
     },
 
-    componentWillMount: function() {
+    componentWillMount: function () {
       this.getPeriods();
     },
 
-    getPeriods: function() {
+    getPeriods: function () {
       let self = this;
       $.getJSON(ENV.GRADING_PERIODS_URL)
         .success(function(periods) {
@@ -46,7 +46,7 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
             saveDisabled: _.isEmpty(periods.grading_periods)
           });
         })
-        .error(function(){
+        .error(function (){
           $.flashError(I18n.t('There was a problem fetching periods'));
         });
     },
@@ -77,14 +77,14 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
               self.removeDeletedGradingPeriod(id);
             }
           },
-          error: function() {
+          error: function () {
             $.flashError(I18n.t('There was a problem deleting the grading period'));
           }
         });
       }
     },
 
-    lastRemainingPeriod: function() {
+    lastRemainingPeriod: function () {
       return this.state.periods.length === 1;
     },
 
@@ -97,12 +97,12 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
       return _.find(this.state.periods, period => period.id === id);
     },
 
-    areGradingPeriodsValid: function() {
+    areGradingPeriodsValid: function () {
       return _.every(this.state.periods, (period) => {
         return this.isTitleCompleted(period) &&
-        this.areDatesValid(period) &&
-        this.isStartDateBeforeEndDate(period) &&
-        this.areNoDatesOverlapping(period)
+          this.areDatesValid(period) &&
+          this.isStartDateBeforeEndDate(period) &&
+          this.areNoDatesOverlapping(period)
       });
     },
 
@@ -163,7 +163,7 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
       this.setState({ periods: updatedPeriods });
     },
 
-    serializeDataForSubmission: function() {
+    serializeDataForSubmission: function () {
       let periods = _.map(this.state.periods, function(period) {
         return {
           id: period.id,
@@ -175,7 +175,7 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
       return { 'grading_periods': periods };
     },
 
-    batchUpdatePeriods: function() {
+    batchUpdatePeriods: function () {
       this.setState({disabled: true}, () => {
         if (this.areGradingPeriodsValid()) {
           $.ajax({
@@ -200,25 +200,30 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
       });
     },
 
-    renderLinkToSettingsPage: function() {
+    renderLinkToSettingsPage: function () {
       if (this.state.canChangeGradingPeriodsSetting && this.state.periods && this.state.periods.length <= 1) {
         return (
           <span id='disable-feature-message' ref='linkToSettings'>
             {I18n.t('You can disable this feature ')}
-            <a href={ENV.CONTEXT_SETTINGS_URL + '#tab-features'} aria-label={I18n.t('Feature Options')}> {I18n.t('here.')} </a>
+            <a
+              href={ENV.CONTEXT_SETTINGS_URL + '#tab-features'}
+              aria-label={I18n.t('Feature Options')}
+            > {I18n.t('here.')} </a>
           </span>);
       }
     },
 
-    renderSaveButton: function() {
+    renderSaveButton: function () {
       if (periodsAreLoaded(this.state) && !this.state.readOnly && _.all(this.state.periods, period => period.permissions.update)) {
         let buttonText = this.state.disabled ? I18n.t('Updating') : I18n.t('Save');
         return (
           <div className='form-actions'>
-            <button className='Button btn-primary btn save_button'
-                    id='update-button'
-                    disabled={this.state.disabled || this.state.saveDisabled}
-                    onClick={this.batchUpdatePeriods}>
+            <button
+              className='Button btn-primary btn save_button'
+              id='update-button'
+              disabled={this.state.disabled || this.state.saveDisabled}
+              onClick={this.batchUpdatePeriods}
+            >
               {buttonText}
             </button>
           </div>
@@ -226,23 +231,25 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
       }
     },
 
-    renderGradingPeriods: function() {
+    renderGradingPeriods: function () {
       if (!this.state.periods) return null;
       return _.map(this.state.periods, period => {
         return (
-          <GradingPeriod key={period.id}
-                         ref={"grading_period_" + period.id}
-                         id={period.id}
-                         title={period.title}
-                         startDate={period.startDate}
-                         endDate={period.endDate}
-                         closeDate={period.closeDate}
-                         permissions={period.permissions}
-                         readOnly={this.state.readOnly}
-                         disabled={this.state.disabled}
-                         weight={period.weight}
-                         updateGradingPeriodCollection={this.updateGradingPeriodCollection}
-                         onDeleteGradingPeriod={this.deleteGradingPeriod}/>
+          <GradingPeriod
+            key={period.id}
+            ref={"grading_period_" + period.id}
+            id={period.id}
+            title={period.title}
+            startDate={period.startDate}
+            endDate={period.endDate}
+            closeDate={period.closeDate}
+            permissions={period.permissions}
+            readOnly={this.state.readOnly}
+            disabled={this.state.disabled}
+            weight={period.weight}
+            updateGradingPeriodCollection={this.updateGradingPeriodCollection}
+            onDeleteGradingPeriod={this.deleteGradingPeriod}
+          />
         );
       });
     },

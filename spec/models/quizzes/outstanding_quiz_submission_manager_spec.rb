@@ -22,7 +22,7 @@ describe Quizzes::OutstandingQuizSubmissionManager do
 
   describe "outstanding submissions by quiz" do
     before do
-      course
+      course_factory
       @user = student_in_course.user
       @quiz = @course.quizzes.create!(:title => "Outstanding")
       @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)

@@ -1,4 +1,4 @@
-class AddHomePageAnnouncementLimitToCourses < ActiveRecord::Migration
+class AddHomePageAnnouncementLimitToCourses < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

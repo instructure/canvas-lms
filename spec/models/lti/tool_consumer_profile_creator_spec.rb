@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_dependency "lti/tool_consumer_profile_creator"
 
 module Lti
   describe ToolConsumerProfileCreator do

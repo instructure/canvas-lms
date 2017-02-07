@@ -180,9 +180,6 @@ describe "quizzes questions" do
       expect_new_page_load do
         f('.save_quiz_button').click
       end
-      expect_new_page_load do
-        f('.quiz-publish-button').click
-      end
 
       user_session(@student)
       get "/courses/#{@course.id}/quizzes/#{Quizzes::Quiz.last.id}"

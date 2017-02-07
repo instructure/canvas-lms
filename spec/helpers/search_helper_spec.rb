@@ -24,7 +24,7 @@ describe SearchHelper do
 
   context "load_all_contexts" do
     it "should return requested permissions" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       @current_user = @teacher
       
       load_all_contexts
@@ -68,7 +68,7 @@ describe SearchHelper do
 
     it "doesn't load the section for observers" do
       course_with_student(:active_all => true)
-      observer = user
+      observer = user_factory
       @course.enroll_user(observer, "ObserverEnrollment", :associated_user_id => @student)
       @current_user = observer
       load_all_contexts(context: @course.default_section)
@@ -84,7 +84,7 @@ describe SearchHelper do
       specs_require_sharding
 
       before do
-        @current_user = @shard1.activate{ user(:active_all => true) }
+        @current_user = @shard1.activate{ user_factory(active_all: true) }
         @shard2.activate{ course_with_teacher(:account => Account.create!, :user => @current_user, :active_all => true) }
       end
 

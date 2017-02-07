@@ -26,8 +26,8 @@ describe Lti::LtiUserCreator do
       end
     end
 
-    let(:canvas_user) { user(name: 'Shorty McLongishname') }
-    let(:canvas_user2) { user(name: 'Observer Dude') }
+    let(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
+    let(:canvas_user2) { user_factory(name: 'Observer Dude') }
     let(:root_account) { Account.create! }
 
     it 'converts a canvas user to an lti user' do
@@ -79,7 +79,7 @@ describe Lti::LtiUserCreator do
     end
 
     context "enrollments" do
-      let(:canvas_course) { course(active_course: true) }
+      let(:canvas_course) { course_factory(active_course: true) }
       let(:canvas_account) { root_account }
       let(:course_user_creator) { Lti::LtiUserCreator.new(canvas_user, canvas_account, tool, canvas_course) }
       let(:course_observer_creator) { Lti::LtiUserCreator.new(canvas_user2, canvas_account, tool, canvas_course) }
@@ -172,7 +172,7 @@ describe Lti::LtiUserCreator do
         it "does not include enrollments from other courses" do
           student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
 
-          other_course = course(active_course: true)
+          other_course = course_factory(active_course: true)
           teacher_in_course(user: canvas_user, course: other_course, active_enrollment: true)
 
           enrollments = course_user_creator.convert.current_roles

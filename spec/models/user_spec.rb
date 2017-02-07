@@ -413,7 +413,7 @@ describe User do
       specs_require_sharding
 
       it "should create associations for a user in multiple shards" do
-        user
+        user_factory
         Account.site_admin.account_users.create!(user: @user)
         expect(@user.user_account_associations.map(&:account)).to eq [Account.site_admin]
 
@@ -512,24 +512,24 @@ describe User do
   describe '#courses_with_primary_enrollment' do
 
     it "should return appropriate courses with primary enrollment" do
-      user
-      @course1 = course(:course_name => "course", :active_course => true)
+      user_factory
+      @course1 = course_factory(:course_name => "course_factory", :active_course => true)
       @course1.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
 
-      @course2 = course(:course_name => "other course", :active_course => true)
+      @course2 = course_factory(:course_name => "other course_factory", :active_course => true)
       @course2.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
 
-      @course3 = course(:course_name => "yet another course", :active_course => true)
+      @course3 = course_factory(:course_name => "yet another course", :active_course => true)
       @course3.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
       @course3.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
 
-      @course4 = course(:course_name => "not yet active")
+      @course4 = course_factory(:course_name => "not yet active")
       @course4.enroll_user(@user, 'StudentEnrollment')
 
-      @course5 = course(:course_name => "invited")
+      @course5 = course_factory(:course_name => "invited")
       @course5.enroll_user(@user, 'TeacherEnrollment')
 
-      @course6 = course(:course_name => "active but date restricted", :active_course => true)
+      @course6 = course_factory(:course_name => "active but date restricted", :active_course => true)
       @course6.restrict_student_future_view = true
       @course6.save!
       e = @course6.enroll_user(@user, 'StudentEnrollment')
@@ -538,7 +538,7 @@ describe User do
       e.end_at = 2.days.from_now
       e.save!
 
-      @course7 = course(:course_name => "soft concluded", :active_course => true)
+      @course7 = course_factory(:course_name => "soft concluded", :active_course => true)
       e = @course7.enroll_user(@user, 'StudentEnrollment')
       e.accept!
       e.start_at = 2.days.ago
@@ -555,12 +555,12 @@ describe User do
     end
 
     it "includes invitations to temporary users" do
-      user1 = user
-      user2 = user
-      c1 = course(name: 'a', active_course: true)
+      user1 = user_factory
+      user2 = user_factory
+      c1 = course_factory(name: 'a', active_course: true)
       e = c1.enroll_teacher(user1)
       user2.stubs(:temporary_invitations).returns([e])
-      c2 = course(name: 'b', active_course: true)
+      c2 = course_factory(name: 'b', active_course: true)
       c2.enroll_user(user2)
 
       expect(user2.courses_with_primary_enrollment.map(&:id)).to eq [c1.id, c2.id]
@@ -721,7 +721,7 @@ describe User do
       @site_admin = user_with_pseudonym(:username => 'nobody3@example.com', :account => Account.site_admin)
       Account.default.account_users.create!(user: @admin)
       Account.site_admin.account_users.create!(user: @site_admin)
-      course
+      course_factory
       @course.enroll_teacher(@admin)
       Account.default.update_attribute(:settings, {:teachers_can_create_courses => true})
       expect(@admin.can_masquerade?(@site_admin, Account.default)).to be_truthy
@@ -1098,13 +1098,13 @@ describe User do
 
     context "weak_checks" do
       it "should optionally show invited enrollments" do
-        course(:active_all => true)
+        course_factory(active_all: true)
         student_in_course(:user_state => 'creation_pending')
         expect(search_messageable_users(@teacher, weak_checks: true).map(&:id)).to include @student.id
       end
 
       it "should optionally show pending enrollments in unpublished courses" do
-        course()
+        course_factory()
         teacher_in_course(:active_user => true)
         student_in_course()
         expect(search_messageable_users(@teacher, weak_checks: true, context: @course.asset_string, is_admin: true).map(&:id)).to include @student.id
@@ -1352,11 +1352,11 @@ describe User do
     it "should include temporary invitations" do
       user_with_pseudonym(:active_all => 1)
       @user1 = @user
-      user
+      user_factory
       @user2 = @user
       @user2.update_attribute(:workflow_state, 'creation_pending')
       @user2.communication_channels.create!(:path => @cc.path)
-      course(:active_all => 1)
+      course_factory(active_all: true)
       @course.enroll_user(@user2)
 
       expect(@user1.menu_courses).to eq [@course]
@@ -1428,11 +1428,11 @@ describe User do
     it "should include temporary invitations" do
       user_with_pseudonym(:active_all => 1)
       @user1 = @user
-      user
+      user_factory
       @user2 = @user
       @user2.update_attribute(:workflow_state, 'creation_pending')
       @user2.communication_channels.create!(:path => @cc.path)
-      course(:active_all => 1)
+      course_factory(active_all: true)
       @enrollment = @course.enroll_user(@user2)
 
       expect(@user1.cached_current_enrollments).to eq [@enrollment]
@@ -1487,7 +1487,7 @@ describe User do
     describe 'with cross-sharding' do
       specs_require_sharding
       it "should only search trusted shards" do
-        @user = user(:active_all => 1, :account => @account1)
+        @user = user_factory(active_all: true, :account => @account1)
         @shard1.activate do
           @account2 = Account.create!
           @pseudonym1 = pseudonym(@user, :account => @account2)
@@ -1553,7 +1553,7 @@ describe User do
 
     it "should not create a new one when there are no viable candidates" do
       # no pseudonyms
-      user
+      user_factory
       expect(@user.find_or_initialize_pseudonym_for_account(@account1)).to be_nil
 
       # auto-generated password
@@ -1601,7 +1601,7 @@ describe User do
 
   describe "can_be_enrolled_in_course?" do
     before :once do
-      course active_all: true
+      course_factory active_all: true
     end
 
     it "should allow a user with a pseudonym in the course's root account" do
@@ -1616,13 +1616,13 @@ describe User do
     end
 
     it "should not allow a registered user with an existing enrollment but no pseudonym" do
-      user active_all: true
+      user_factory active_all: true
       @course.enroll_student(@user)
       expect(@user.can_be_enrolled_in_course?(@course)).to be_falsey
     end
 
     it "should not allow a user with neither an enrollment nor a pseudonym" do
-      user active_all: true
+      user_factory active_all: true
       expect(@user.can_be_enrolled_in_course?(@course)).to be_falsey
     end
   end
@@ -1641,7 +1641,7 @@ describe User do
     it "should find the right root account for a course" do
       account = account_model
       user = User.create!
-      account_course = course(active_all: true, account: account)
+      account_course = course_factory(active_all: true, account: account)
       pseudonym = account.pseudonyms.create!(user: user, unique_id: 'user') do |p|
         p.sis_user_id = 'abc'
       end
@@ -1744,7 +1744,7 @@ describe User do
       context "after db section context_code filtering" do
         before do
           course_with_teacher(:active_all => true)
-          @student = user(:active_user => true)
+          @student = user_factory(active_user: true)
           @sections = []
           @events = []
           3.times { @sections << @course.course_sections.create! }
@@ -2022,7 +2022,7 @@ describe User do
       specs_require_sharding
 
       it "includes assignments from other shards" do
-        student = @shard1.activate { user }
+        student = @shard1.activate { user_factory }
         assignment = create_course_with_assignment_needing_submitting(student: student, override: true)
         expect(student.assignments_needing_submitting).to eq [assignment]
       end
@@ -2032,14 +2032,17 @@ describe User do
       before :once do
         course_with_student :active_all => true
         @assignment = @course.assignments.create! title: 'blah!', due_at: 1.day.from_now, submission_types: 'not_graded'
+        @past_assignment = @course.assignments.create! title: 'blah!', due_at: 1.day.ago, submission_types: 'not_graded'
       end
 
       it "excludes ungraded assignments by default" do
         expect(@student.assignments_needing_submitting).not_to include @assignment
+        expect(@student.assignments_needing_submitting).not_to include @past_assignment
       end
 
-      it "includes ungraded assignments if requested" do
+      it "includes future ungraded assignments if requested" do
         expect(@student.assignments_needing_submitting(include_ungraded: true)).to include @assignment
+        expect(@student.assignments_needing_submitting(include_ungraded: true)).not_to include @past_assignment
       end
     end
   end
@@ -2047,7 +2050,7 @@ describe User do
   describe "ungraded_quizzes_needing_submitting" do
     before(:once) do
       course_with_student :active_all => true
-      @quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.ago)
+      @quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.from_now)
       @quiz.publish!
     end
 
@@ -2056,13 +2059,13 @@ describe User do
     end
 
     it "excludes graded quizzes" do
-      other_quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "assignment", :due_at => 1.day.ago)
+      other_quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "assignment", :due_at => 1.day.from_now)
       other_quiz.publish!
       expect(@student.ungraded_quizzes_needing_submitting).not_to include other_quiz
     end
 
     it "excludes unpublished quizzes" do
-      other_quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.ago)
+      other_quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.from_now)
       expect(@student.ungraded_quizzes_needing_submitting).not_to include other_quiz
     end
 
@@ -2073,7 +2076,7 @@ describe User do
     end
 
     it "filters by due date" do
-      expect(@student.ungraded_quizzes_needing_submitting(:due_after => 1.day.from_now)).not_to include @quiz
+      expect(@student.ungraded_quizzes_needing_submitting(:due_after => 2.days.from_now)).not_to include @quiz
     end
 
     it "excludes submitted quizzes" do
@@ -2091,7 +2094,7 @@ describe User do
     context "sharding" do
       specs_require_sharding
       it "includes quizzes from other shards" do
-        other_user = @shard1.activate { user }
+        other_user = @shard1.activate { user_factory }
         student_in_course :course => @course, :user => other_user, :active_all => true
         expect(other_user.ungraded_quizzes_needing_submitting).to include @quiz
       end
@@ -2189,7 +2192,7 @@ describe User do
   end
 
   describe "quota" do
-    before(:once) { user }
+    before(:once) { user_factory }
     it "should default to User.default_storage_quota" do
       expect(@user.quota).to eql User.default_storage_quota
     end
@@ -2582,7 +2585,7 @@ describe User do
     specs_require_sharding
 
     it "should include accounts from multiple shards" do
-      user
+      user_factory
       Account.site_admin.account_users.create!(user: @user)
       @shard1.activate do
         @account2 = Account.create!
@@ -2593,7 +2596,7 @@ describe User do
     end
 
     it "should exclude deleted accounts" do
-      user
+      user_factory
       Account.site_admin.account_users.create!(user: @user)
       @shard1.activate do
         @account2 = Account.create!
@@ -2637,22 +2640,20 @@ describe User do
 
   describe "preferred_gradebook_version" do
     let(:user) { User.new }
-    let(:course) { double('course') }
     subject { user.preferred_gradebook_version }
 
-    context "prefers gb2" do
-      before { user.stubs(:preferences => { :gradebook_version => '2' }) }
-      it { is_expected.to eq '2' }
+    it "prefers gb2" do
+      user.preferences[:gradebook_version] = '2'
+      is_expected.to eq '2'
     end
 
-    context "prefers srgb" do
-      before { user.stubs(:preferences => { :gradebook_version => 'srgb' }) }
-      it { is_expected.to eq 'srgb' }
+    it "prefers srgb " do
+      user.preferences[:gradebook_version] = 'srgb'
+      is_expected.to eq 'srgb'
     end
 
-    context "nil preference" do
-      before { user.stubs(:preferences => { :gradebook_version => nil }) }
-      it { is_expected.to eq '2' }
+    it "returns '2' when not set" do
+      is_expected.to eq '2'
     end
   end
 
@@ -2679,7 +2680,7 @@ describe User do
     it "excludes collkey" do
       # Ruby 1.9 does not like html that includes the collkey, so
       # don't ship it to the page (even as json).
-      user = User.create!
+      User.create!
       users = User.order_by_sortable_name
       expect(users.first.as_json['user'].keys).not_to include('collkey')
     end
@@ -2707,7 +2708,7 @@ describe User do
 
       let(:bob) { student_in_course(
         user: student_in_course(account: account2).user,
-        course: course(account: account1)).user }
+        course: course_factory(account: account1)).user }
 
       let(:charlie) { student_in_course(account: account1).user }
 
@@ -2788,7 +2789,7 @@ describe User do
 
       let(:bob) { student_in_course(
         user: student_in_course(account: account2).user,
-        course: course(account: account1)).user }
+        course: course_factory(account: account1)).user }
 
       let(:charlie) { student_in_course(account: account2).user }
 
@@ -2836,7 +2837,7 @@ describe User do
 
       it "should check for associated accounts on shards the user shares with the seeker" do
         # create target user on defualt shard
-        target = user()
+        target = user_factory()
         # create account on another shard
         account = @shard1.activate{ Account.create! }
         # associate target user with that account
@@ -2848,7 +2849,7 @@ describe User do
       end
 
       it 'checks all shards, even if not actually associated' do
-        target = user()
+        target = user_factory()
         # create account on another shard
         account = @shard1.activate{ Account.create! }
         # associate target user with that account
@@ -2864,7 +2865,7 @@ describe User do
 
   describe "#conversation_context_codes" do
     before :once do
-      @user = user(:active_all => true)
+      @user = user_factory(active_all: true)
       course_with_student(:user => @user, :active_all => true)
       group_with_user(:user => @user, :active_all => true)
     end
@@ -2951,7 +2952,7 @@ describe User do
 
   describe "delete_enrollments" do
     before do
-      course
+      course_factory
       2.times { @course.course_sections.create! }
       2.times { @course.assignments.create! }
     end
@@ -3040,7 +3041,7 @@ describe User do
 
     it "should include account groups" do
       account = account_model(:parent_account => Account.default)
-      student = user active_all: true
+      student = user_factory active_all: true
       @group = Group.create! context: account, name: "GroupOne"
       @group.users << student
       @group.save!
@@ -3050,8 +3051,8 @@ describe User do
 
   describe 'roles' do
     before(:once) do
-      user(active_all: true)
-      course(active_course: true)
+      user_factory(active_all: true)
+      course_factory(active_course: true)
       @account = Account.default
     end
 
@@ -3111,7 +3112,7 @@ describe User do
   end
 
   it "should change avatar state on reporting" do
-    user
+    user_factory
     @user.report_avatar_image!
     @user.reload
     expect(@user.avatar_state).to eq :reported
@@ -3149,5 +3150,12 @@ describe User do
       f.save!
       expect(@user.submissions_folder(@course)).to eq f
     end
+  end
+
+  it { is_expected.to have_many(:submission_comment_participants) }
+  it do
+    is_expected.to have_many(:submission_comments).
+      conditions(-> { published }).
+        through(:submission_comment_participants)
   end
 end

@@ -1,9 +1,8 @@
 require [
+  # true modules that we use in this file
   'jquery'
   'underscore'
   'i18n!common'
-
-  # true modules that we manage in this file
   'Backbone'
   'compiled/helpDialog'
 
@@ -28,26 +27,20 @@ require [
   'compiled/behaviors/instructure_inline_media_comment'
   'compiled/behaviors/ping'
   'LtiThumbnailLauncher'
+  'compiled/badge_counts'
 
-  # other stuff several bundles use
+  # Other stuff several bundles use.
+  # If any of these really arn't used on most pages,
+  # we should remove them from this list, since this
+  # loads them on every page
   'media_comments'
   'jqueryui/effects/drop'
   'jqueryui/progressbar'
   'jqueryui/tabs'
   'compiled/registration/incompleteRegistrationWarning'
   'moment'
-
-  # random modules required by the js_blocks, put them all in here
-  # so RequireJS doesn't try to load them before common is loaded
-  # in an optimized environment
-  'jquery.fancyplaceholder'
-  'jqueryui/autocomplete'
-  'link_enrollment'
-  'media_comments'
-  'vendor/jquery.pageless'
-  'vendor/jquery.scrollTo'
-  'compiled/badge_counts'
 ], ($, _, I18n, Backbone, helpDialog) ->
+
   helpDialog.initTriggers()
 
   $('#skip_navigation_link').on 'click', ->

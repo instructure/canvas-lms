@@ -9,5 +9,9 @@
         "ok": true,
         "sinon": true,
         "deepEqual": true
+    },
+    "rules": {
+      "func-names": ["off"],
+      "prefer-arrow-callback": ["off"]
     }
 }

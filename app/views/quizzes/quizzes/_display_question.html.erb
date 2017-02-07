@@ -48,7 +48,7 @@
               name="question_score_<%= hash_get(question, :id) %>" placeholder="--"
               value="<%= point_value_for_input(user_answer, question).is_a?(Float) &&
                 !point_value_for_input(user_answer, question).nan? &&
-                number_with_precision(point_value_for_input(user_answer, question), precision: 2, strip_insignificant_zeros: true) || ''
+                n(point_value_for_input(user_answer, question).round(2)) || ''
               %>"
               autocomplete='off'/>
           <% else %>

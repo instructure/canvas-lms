@@ -16,14 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk-v1'
+require 'aws-sdk'
 
 class ConfigurationMissingError < StandardError; end
 
 class NotificationFailureProcessor
   attr_reader :config
 
-  POLL_PARAMS = %i(initial_timeout idle_timeout wait_time_seconds visibility_timeout).freeze
+  POLL_PARAMS = %i(idle_timeout wait_time_seconds visibility_timeout).freeze
   DEFAULT_CONFIG = {
     notification_failure_queue_name: 'notification-service-failures',
     idle_timeout: 10
@@ -31,7 +31,7 @@ class NotificationFailureProcessor
 
   def self.config
     return @config if instance_variable_defined?(:@config)
-    @config = ConfigFile.load('notification_failures').try(:symbolize_keys)
+    @config = ConfigFile.load('notification_failures').try(:symbolize_keys).try(:freeze)
   end
 
   class << self
@@ -85,7 +85,12 @@ class NotificationFailureProcessor
 
   def notification_failure_queue
     return @notification_failure_queue if defined?(@notification_failure_queue)
-    sqs = AWS::SQS.new(config)
-    @notification_failure_queue = sqs.queues.named(config[:notification_failure_queue_name])
+    conf = Canvas::AWS.validate_v2_config(config, 'notification_failures.yml').dup
+    conf.except!(*POLL_PARAMS)
+    conf.delete(:initial_timeout) # old, no longer supported poll param
+    queue_name = conf.delete(:notification_failure_queue_name)
+    sqs = Aws::SQS::Client.new(conf)
+    queue_url = sqs.get_queue_url(queue_name: queue_name).queue_url
+    @notification_failure_queue = Aws::SQS::QueuePoller.new(queue_url, client: sqs)
   end
 end

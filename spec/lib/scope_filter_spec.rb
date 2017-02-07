@@ -18,8 +18,8 @@
 require File.expand_path('../spec_helper', File.dirname(__FILE__))
 
 describe ScopeFilter do
-  let_once(:current_course) { course }
-  let_once(:current_user) { course.all_real_users.first }
+  let_once(:current_course) { course_factory }
+  let_once(:current_user) { course_factory.all_real_users.first }
   let_once(:scope_filter) { ScopeFilter.new(current_course, current_user) }
   describe '#initialize' do
     it 'should set instance vars' do

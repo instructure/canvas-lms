@@ -26,6 +26,7 @@ class AssignmentGroup < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course]
   acts_as_list scope: { context: self, workflow_state: 'available' }
   has_a_broadcast_policy
+  serialize :integration_data, Hash
 
   has_many :assignments, -> { order('position, due_at, title') }, dependent: :destroy
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'").order('assignments.position, assignments.due_at, assignments.title') }, class_name: 'Assignment'

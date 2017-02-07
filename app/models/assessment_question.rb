@@ -41,6 +41,10 @@ class AssessmentQuestion < ActiveRecord::Base
 
   serialize :question_data
 
+  include MasterCourses::CollectionRestrictor
+  self.collection_owner_association = :assessment_question_bank
+  restrict_columns :content, [:name, :question_data]
+
   set_policy do
     given{|user, session| self.context.grants_right?(user, session, :manage_assignments) }
     can :read and can :create and can :update and can :delete
@@ -138,11 +142,13 @@ class AssessmentQuestion < ActiveRecord::Base
     end
 
     hash = deep_translate.call(self.question_data)
-    self.question_data = hash
+    if hash != self.question_data
+      self.question_data = hash
 
-    @skip_translate_links = true
-    self.save!
-    @skip_translate_links = false
+      @skip_translate_links = true
+      self.save!
+      @skip_translate_links = false
+    end
   end
 
   def data

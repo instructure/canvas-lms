@@ -47,14 +47,15 @@ define([
     }
 
     render () {
-      if (this.props.submissions.length > 0) {
+      const {submissions} = this.props
+      if (submissions.length > 0) {
         return (
           <section
             className="StudentContextTray__Section StudentContextTray-Progress">
             <Heading level="h4" tag="h3" border="bottom">
-              {I18n.t("Last %{length} Graded Items", {length: this.props.submissions.length})}
+              {I18n.t("Last %{length} Graded Items", {length: submissions.length})}
             </Heading>
-            {this.props.submissions.map((submission) => {
+            {submissions.map((submission) => {
               return (
                 <div key={submission.id} className="StudentContextTray-Progress__Bar">
                   <Progress

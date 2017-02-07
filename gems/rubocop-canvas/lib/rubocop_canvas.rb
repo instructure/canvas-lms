@@ -28,8 +28,11 @@ require 'rubocop_canvas/cops/specs/no_before_all'
 require 'rubocop_canvas/cops/specs/no_before_once_stubs'
 require 'rubocop_canvas/cops/specs/ensure_spec_extension'
 require 'rubocop_canvas/cops/specs/no_execute_script'
+require 'rubocop_canvas/cops/specs/no_no_such_element_error'
+require 'rubocop_canvas/cops/specs/no_strftime'
 require 'rubocop_canvas/cops/specs/prefer_f_over_fj'
 require 'rubocop_canvas/cops/specs/scope_helper_modules'
+require 'rubocop_canvas/cops/specs/deterministic_described_classes'
 
 module RuboCop
   module Canvas
@@ -37,8 +40,10 @@ module RuboCop
       DEFAULT_FILE = File.expand_path("../../config/default.yml", __FILE__)
 
       def self.defaults!
-        hash = YAML.load_file(DEFAULT_FILE)
-        config = ConfigLoader.merge_with_default(hash, DEFAULT_FILE)
+        path = File.absolute_path(DEFAULT_FILE)
+        hash = ConfigLoader.send(:load_yaml_configuration, path)
+        config = Config.new(hash, path)
+        config = ConfigLoader.merge_with_default(config, path)
 
         ConfigLoader.instance_variable_set(:@default_configuration, config)
       end

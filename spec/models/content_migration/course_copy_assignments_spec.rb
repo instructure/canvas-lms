@@ -43,6 +43,9 @@ describe ContentMigration do
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
       expect(to_assign.points_possible).to eq 1
       expect(to_assign.rubric.rubric_associations.for_grading.first.use_for_grading).to be_truthy
+
+      run_course_copy
+      expect(to_assign.reload.points_possible).to eq 1
     end
 
     it "should copy rubric outcomes in selective copy" do

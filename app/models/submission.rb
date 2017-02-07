@@ -74,6 +74,7 @@ class Submission < ActiveRecord::Base
   has_many :rubric_assessments, :as => :artifact
   has_many :attachment_associations, :as => :context
   has_many :provisional_grades, class_name: 'ModeratedGrading::ProvisionalGrade'
+  has_many :originality_reports
   has_one :rubric_assessment, -> { where(assessment_type: 'grading') }, as: :artifact
 
   # we no longer link submission comments and conversations, but we haven't fixed up existing
@@ -129,6 +130,8 @@ class Submission < ActiveRecord::Base
 
 
   # see #needs_grading?
+  # When changing these conditions, consider updating index_submissions_on_assignment_id
+  # to maintain performance.
   def self.needs_grading_conditions
     conditions = <<-SQL
       submissions.submission_type IS NOT NULL
@@ -158,8 +161,19 @@ class Submission < ActiveRecord::Base
     needs_grading? != needs_grading?(:was)
   end
 
-  scope :needs_grading, -> { where(needs_grading_conditions) }
+  scope :needs_grading, -> {
+    s_name = quoted_table_name
+    e_name = Enrollment.quoted_table_name
+    joins("INNER JOIN #{e_name} ON #{s_name}.user_id=#{e_name}.user_id")
+    .where(needs_grading_conditions)
+    .where(Enrollment.active_student_conditions)
+    .distinct
+  }
 
+  scope :needs_grading_count, -> {
+    select("COUNT(#{quoted_table_name}.id)")
+    .needs_grading
+  }
 
   sanitize_field :body, CanvasSanitize::SANITIZE
 
@@ -326,13 +340,15 @@ class Submission < ActiveRecord::Base
       plagData = self.vericite_data_hash
       @submit_to_vericite = false
       settings = assignment.vericite_settings
+      type_can_peer_review = true
     else
       plagData = self.turnitin_data
       @submit_to_turnitin = false
       settings = assignment.turnitin_settings
+      type_can_peer_review = false
     end
     return plagData &&
-    user_can_read_grade?(user, session) &&
+    (user_can_read_grade?(user, session) || (type_can_peer_review && user_can_peer_review_plagiarism?(user))) &&
     (assignment.context.grants_right?(user, session, :manage_grades) ||
       case settings[:originality_report_visibility]
        when 'immediate' then true
@@ -342,6 +358,18 @@ class Submission < ActiveRecord::Base
        when 'never' then false
       end
     )
+  end
+
+  def user_can_peer_review_plagiarism?(user)
+    assignment.peer_reviews &&
+    assignment.current_submissions_and_assessors[:submissions].select{ |submission|
+      # first filter by submissions for the requested reviewer
+      user.id == submission.user_id &&
+      submission.assigned_assessments
+    }.any? {|submission|
+      # next filter the assigned assessments by the submission user_id being reviewed
+      submission.assigned_assessments.any? {|review| user_id == review.user_id}
+    }
   end
 
   def user_can_read_grade?(user, session=nil)
@@ -370,7 +398,19 @@ class Submission < ActiveRecord::Base
       else
         Rails.logger.info "GRADES: submission #{global_id} score changed. recomputing grade for course #{context.global_id} user #{user_id}."
         self.class.connection.after_transaction_commit do
-          Enrollment.send_later_if_production_enqueue_args(:recompute_final_score, { run_at: 3.seconds.from_now }, self.user_id, self.context.id)
+          effective_due_dates = EffectiveDueDates.new(self.context, self.assignment_id)
+          grading_period_id = effective_due_dates.grading_period_id_for(
+            student_id: self.user_id,
+            assignment_id: self.assignment_id
+          )
+          Enrollment.send_later_if_production_enqueue_args(
+            :recompute_final_score,
+            { run_at: 3.seconds.from_now },
+            self.user_id,
+            self.context.id,
+            grading_period_id: grading_period_id,
+            update_all_grading_period_scores: false
+          )
         end
       end
       self.assignment.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score) if self.assignment
@@ -511,6 +551,22 @@ class Submission < ActiveRecord::Base
     true
   end
 
+  # This method pulls data from the OriginalityReport table
+  # Preload OriginalityReport before using this method in a collection of submissions
+  def originality_data
+    data = self.originality_reports.each_with_object({}) do |originality_report, hash|
+      hash[Attachment.asset_string(originality_report.attachment_id)] = {
+        similarity_score: originality_report.originality_score.round(2),
+        state: originality_report.state,
+        report_url: originality_report.originality_report_url,
+        status: originality_report.workflow_state
+      }
+    end
+    ret_val = turnitin_data.merge(data)
+    ret_val.delete(:provider)
+    ret_val
+  end
+
   def turnitin_assets
     if self.submission_type == 'online_upload'
       self.attachments.select{ |a| a.turnitinable? }
@@ -519,6 +575,17 @@ class Submission < ActiveRecord::Base
     else
       []
     end
+  end
+
+  # Preload OriginalityReport before using this method
+  def originality_report_url(asset_string, user)
+    url = nil
+    if self.grants_right?(user, :view_turnitin_report)
+      attachment = self.attachments.find_by_asset_string(asset_string)
+      report = self.originality_reports.find_by(attachment: attachment)
+      url = report.originality_report_url if report
+    end
+    url
   end
 
   def delete_turnitin_errors
@@ -1073,6 +1140,9 @@ class Submission < ActiveRecord::Base
         # since vericite_data is a function, make sure you are cloning the most recent vericite_data_hash
         if self.vericiteable?
           model.turnitin_data = self.vericite_data(true)
+        # only use originality data if it's loaded, we want to avoid making N+1 queries
+        elsif self.association(:originality_reports).loaded?
+          model.turnitin_data = self.originality_data
         end
         if model.submitted_at && last_submitted_at.to_i != model.submitted_at.to_i
           res << model

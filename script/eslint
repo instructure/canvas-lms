@@ -1,0 +1,58 @@
+#!/usr/bin/env ruby
+$:.push File.expand_path("../../gems/dr_diff/lib", __FILE__)
+require 'dr_diff'
+require 'json'
+
+def pretty_comment(comment)
+  message = ""
+  message += "[#{comment[:severity]}]".colorize(:yellow)
+  message += " #{comment[:path].colorize(:light_blue)}:#{comment[:position]}"
+  message += " => #{comment[:message].colorize(:green)}"
+  puts message
+end
+
+def gerrit_patchset?
+  !!ENV['GERRIT_PATCHSET_REVISION']
+end
+
+env_sha = ENV['SHA'] || ENV['GERRIT_PATCHSET_REVISION']
+
+dr_diff = DrDiff::Manager.new(sha: env_sha)
+ESLINT_FILE_REGEX = /\.jsx?$/
+js_files = dr_diff.files(ESLINT_FILE_REGEX)
+
+if js_files.size == 0
+  puts "No js or jsx file changes found!"
+  exit 0
+end
+
+comments = dr_diff.comments(format: "eslint",
+                            command: "node_modules/.bin/eslint #{js_files.join(' ')}",
+                            include_git_dir_in_output: !gerrit_patchset?)
+
+# This section should be removed when we start -2ing patchsets
+comments = comments.map do |comment|
+  comment[:severity] = 'warn'
+  comment
+end
+
+unless comments.size >  0
+  puts "-- -- -- -- -- -- -- -- -- -- --"
+  puts "No relevant js or jsx errors found!"
+  puts "-- -- -- -- -- -- -- -- -- -- --"
+  exit(0)
+end
+
+if gerrit_patchset?
+  require "gergich"
+  draft = Gergich::Draft.new
+  comments.each do |comment|
+    draft.add_comment comment[:path],
+                      comment[:position],
+                      comment[:message],
+                      comment[:severity]
+  end
+else
+  require 'colorize'
+  comments.each { |comment| pretty_comment(comment) }
+end

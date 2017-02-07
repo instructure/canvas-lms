@@ -46,24 +46,17 @@ describe "admin settings tab" do
     it "should test SIS Agent Token Authentication", priority: "2", test_id: 132577 do
       course_with_admin_logged_in(:account => Account.site_admin)
       sis_token = "canvas"
-      go_to_feature_options(Account.site_admin)
-      move_to_click("label[for=ff_allowed_post_grades]")
-      go_to_feature_options(account)
-      move_to_click("label[for=ff_allowed_post_grades]")
-      f("#tab-settings-link").click
-      # SIS Agent Token Authentication will not appear without refresh
-      refresh_page
+      account.enable_feature!(:post_grades)
+
+      get_settings_page(account)
       expect(f("#add_sis_app_token")).to be_displayed
       expect(f("#account_settings_sis_app_token")).to be_displayed
       f("#account_settings_sis_app_token").send_keys(sis_token)
       f(".Button--primary").click
       token = f("#account_settings_sis_app_token")
-      keep_trying_until do
-        expect(token.attribute("value")).to eq sis_token
-      end
-      go_to_feature_options(account)
-      move_to_click("label[for=ff_off_post_grades]")
-      f('#tab-settings-link').click
+      expect(token).to have_value(sis_token)
+
+      account.disable_feature!(:post_grades)
       refresh_page
       expect(f("#account_settings")).not_to contain_css("#account_settings_sis_app_token")
     end
@@ -75,6 +68,9 @@ describe "admin settings tab" do
     let(:sis_syncing_locked) { "#account_settings_sis_syncing_locked" }
     let(:default_grade_export) { "#account_settings_sis_default_grade_export_value" }
     let(:require_assignment_due_date) { "#account_settings_sis_require_assignment_due_date_value" }
+    let(:sis_name) { "#account_settings_sis_name" }
+    let(:assignment_name_length) { "#account_settings_sis_assignment_name_length_value" }
+    let(:assignment_name_length_input) { "#account_settings_sis_assignment_name_length_input_value" }
 
     def test_checkbox_on_off(id)
       set_checkbox_via_label(id,true)
@@ -100,9 +96,8 @@ describe "admin settings tab" do
         expect(f("body")).not_to contain_css(sis_syncing)
       end
 
-      context "SIS grade export disabled" do
+      context "SIS post grades disabled" do
         before do
-          account.set_feature_flag! :bulk_sis_grade_export, 'off'
           account.set_feature_flag! 'post_grades', 'off'
           get_settings_page(account)
         end
@@ -112,9 +107,8 @@ describe "admin settings tab" do
         end
       end
 
-      context "SIS grade export enabled" do
+      context "SIS post grades enabled" do
         before do
-          account.set_feature_flag! :bulk_sis_grade_export, 'on'
           account.set_feature_flag! 'post_grades', 'on'
           get_settings_page(account)
         end
@@ -125,10 +119,35 @@ describe "admin settings tab" do
       end
     end
 
-    context ":new_sis_integrations => true" do
+    context ":new_sis_integrations => true (sub account)" do
+      before do
+        account.set_feature_flag! :new_sis_integrations, 'on'
+        get_settings_page(sub_account)
+      end
+
+      it "should have SIS name setting disabled for sub accounts" do
+        name_setting = f(sis_name)
+        expect(name_setting.displayed?).to be_truthy
+        expect(name_setting.enabled?).to be_falsey
+      end
+    end
+
+    context ":new_sis_integrations => true (root account)" do
       before do
         account.set_feature_flag! :new_sis_integrations, 'on'
         get_settings_page(account)
+      end
+
+      it "should persist custom SIS name" do
+        custom_sis_name = "PowerSchool"
+        f(sis_name).send_keys(custom_sis_name)
+        f(".Button--primary").click
+        name = f(sis_name)
+        keep_trying_until do
+          expect(name.attribute("value")).to eq custom_sis_name
+        end
+        click_submit
+        expect(name.attribute("value")).to eq(custom_sis_name)
       end
 
       it "persists SIS import settings on refresh" do
@@ -140,7 +159,6 @@ describe "admin settings tab" do
 
         context "SIS syncing => true" do
           before do
-            account.set_feature_flag! :bulk_sis_grade_export, 'on'
             account.set_feature_flag! 'post_grades', 'on'
             account.settings = { sis_syncing: { value: true } }
             account.save
@@ -148,15 +166,38 @@ describe "admin settings tab" do
           end
 
           it { test_checkbox_on_off(sis_syncing_locked) }
-          it { set_checkbox_via_label(default_grade_export,true)
-               click_submit
-               test_checkbox_on_off(require_assignment_due_date) }
+          it "toggles require assignment due date" do
+             set_checkbox_via_label(default_grade_export,true)
+             click_submit
+             test_checkbox_on_off(require_assignment_due_date)
+          end
+
+          it "toggles assignment name length" do
+            set_checkbox_via_label(default_grade_export,true)
+            click_submit
+            test_checkbox_on_off(assignment_name_length)
+          end
+
+          it "should test sis assignment name length" do
+            set_checkbox_via_label(default_grade_export,true)
+            click_submit
+            set_checkbox_via_label(assignment_name_length,true)
+            click_submit
+            name_length = 123
+            f("#account_settings_sis_assignment_name_length_input_value").send_keys(name_length)
+            f(".Button--primary").click
+            length = f("#account_settings_sis_assignment_name_length_input_value")
+            keep_trying_until do
+              expect(length.attribute("value")).to eq name_length.to_s
+            end
+            refresh_page
+            expect(length.attribute("value")).to eq(name_length.to_s)
+          end
         end
       end
 
-      context "SIS grade export disabled" do
+      context "SIS post grades disabled" do
         before do
-          account.set_feature_flag! :bulk_sis_grade_export, 'off'
           account.set_feature_flag! 'post_grades', 'off'
           get_settings_page(account)
         end
@@ -166,9 +207,8 @@ describe "admin settings tab" do
         end
       end
 
-      context "SIS grade export enabled" do
+      context "SIS post grades enabled" do
         before do
-          account.set_feature_flag! :bulk_sis_grade_export, 'on'
           account.set_feature_flag! 'post_grades', 'on'
         end
 
@@ -199,7 +239,6 @@ describe "admin settings tab" do
 
       context "root and sub-accounts" do
         before do
-          account.set_feature_flag! :bulk_sis_grade_export, 'on'
           account.set_feature_flag! 'post_grades', 'on'
         end
 
@@ -214,6 +253,7 @@ describe "admin settings tab" do
             expect(f(sis_syncing)).not_to be_disabled
             expect(f(sis_syncing_locked)).not_to be_disabled
             expect(f(require_assignment_due_date)).not_to be_disabled
+            expect(f(assignment_name_length)).not_to be_disabled
             expect(f(default_grade_export)).not_to be_disabled
           end
         end
@@ -229,6 +269,7 @@ describe "admin settings tab" do
             expect(f(sis_syncing)).to be_disabled
             expect(f(sis_syncing_locked)).to be_disabled
             expect(f(require_assignment_due_date)).to be_disabled
+            expect(f(assignment_name_length)).to be_disabled
             expect(f(default_grade_export)).to be_disabled
           end
         end

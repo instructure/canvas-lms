@@ -33,8 +33,9 @@ define([
     },
     getDefaultProps(){
       return {
-        className: "ReactModal__Content--canvas" // Override with "ReactModal__Content--canvas ReactModal__Content--mini-modal" for a mini modal
-      }
+        className: "ReactModal__Content--canvas", // Override with "ReactModal__Content--canvas ReactModal__Content--mini-modal" for a mini modal
+        style: {},
+      };
     },
     componentWillReceiveProps(props){
       let callback
@@ -112,8 +113,10 @@ define([
             style={modalOverrides}
             overlayClassName={this.props.overlayClassName}
             appElement={this.getAppElement()}>
-            <div ref="modal" className="ReactModal__Layout">
-
+            <div ref="modal"
+              className="ReactModal__Layout"
+              style={this.props.style}
+            >
               <div className="ReactModal__Header">
                 <div className="ReactModal__Header-Title">
                   <h4>{this.props.title}</h4>

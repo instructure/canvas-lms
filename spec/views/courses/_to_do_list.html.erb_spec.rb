@@ -27,7 +27,7 @@ describe "courses/_to_do_list.html.erb" do
     end
     describe "submissions to review" do
       it "shows peer reviews" do
-        course(active_all: true)
+        course_factory(active_all: true)
         due_date = 2.days.from_now
         assignment_model(course: @course,
                          due_at: due_date,
@@ -54,7 +54,7 @@ describe "courses/_to_do_list.html.erb" do
   context "as a teacher" do
     describe "assignments to grade" do
       it "shows assignment data" do
-        course(active_all: true)
+        course_factory(active_all: true)
         due_date = 2.days.from_now
         assignment_model(course: @course,
                          due_at: due_date,
@@ -63,7 +63,7 @@ describe "courses/_to_do_list.html.erb" do
                          title: "GradeMe")
 
         2.times do
-          @course.enroll_student(user).accept!
+          @course.enroll_student(user_factory).accept!
           @assignment.submit_homework(@user, {:submission_type => 'online_text_entry', :body => 'blah'})
         end
 

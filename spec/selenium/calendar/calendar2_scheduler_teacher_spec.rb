@@ -133,7 +133,7 @@ describe "scheduler" do
       student4 = student_in_course(:course => @course, :active_all => true).user
 
       other_section = @course.course_sections.create!
-      @course.enroll_user(student5 = user(:active_all => true), 'StudentEnrollment', :section => other_section).accept!
+      @course.enroll_user(student5 = user_factory(active_all: true), 'StudentEnrollment', :section => other_section).accept!
 
       # create some appointment groups and sign up a participant in each one
       appointment_participant_model(:course => @course, :participant => student1)
@@ -174,7 +174,7 @@ describe "scheduler" do
 
       first_course = @course
 
-      other_course = course
+      other_course = course_factory
       other_course.enroll_teacher(@teacher).accept!
       other_course.offer
       other_course.enroll_student(student1).accept!

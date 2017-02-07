@@ -6,8 +6,8 @@ describe "conversations new" do
 
   before do
     conversation_setup
-    @s1 = user(name: "first student")
-    @s2 = user(name: "second student")
+    @s1 = user_factory(name: "first student")
+    @s2 = user_factory(name: "second student")
     [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
     cat = @course.group_categories.create(:name => "the groups")
     @group = cat.groups.create(:name => "the group", :context => @course)
@@ -252,8 +252,8 @@ describe "conversations new" do
         before(:each) do
           @t1_name = 'teacher1'
           @t2_name = 'teacher2'
-          @t1 = user(name: @t1_name, active_user: true)
-          @t2 = user(name: @t2_name, active_user: true)
+          @t1 = user_factory(name: @t1_name, active_user: true)
+          @t2 = user_factory(name: @t2_name, active_user: true)
           [@t1, @t2].each { |s| @course.enroll_teacher(s) }
 
           conversations

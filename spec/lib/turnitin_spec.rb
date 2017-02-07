@@ -343,7 +343,7 @@ describe Turnitin::Client do
 
   describe '#email' do
     it "uses turnitin_id for courses" do
-      course
+      course_factory
       t = Turnitin::Client.new('blah', 'blah')
       expect(@course.turnitin_id).to be_nil
       expect(t.email(@course)).to eq "course_#{@course.global_id}@null.instructure.example.com"

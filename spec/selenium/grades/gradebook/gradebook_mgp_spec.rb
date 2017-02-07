@@ -25,41 +25,64 @@ describe "gradebook - multiple grading periods" do
   include GradebookSetup
 
   context 'with close and end dates' do
-    let(:gb_mgp_page) { Gradebook::MultipleGradingPeriods.new }
+    let(:page) { Gradebook::MultipleGradingPeriods.new }
+    now = Time.zone.now
 
     before(:once) do
       term_name = "First Term"
-      create_multiple_grading_periods(term_name)
+      create_multiple_grading_periods(term_name, now)
       add_teacher_and_student
       associate_course_to_term(term_name)
     end
 
-    before(:each) do
-      user_session(@teacher)
+    context 'as a teacher' do
+      before(:each) do
+        user_session(@teacher)
+      end
+
+      it 'assignment in ended grading period should be gradable', test_id: 2947119, priority: "1" do
+        @course.assignments.create!(due_at: 13.days.ago(now), title: "assign in ended")
+        page.visit_gradebook(@course)
+
+        page.select_grading_period(0)
+        page.enter_grade("10", 0, 0)
+        expect(page.cell_graded?("10", 0, 0)).to be true
+
+        page.select_grading_period(@gp_ended.id)
+        page.enter_grade("8", 0, 0)
+        expect(page.cell_graded?("8", 0, 0)).to be true
+      end
     end
 
-    it 'assignment in ended gp should be gradable', test_id: 2947119, priority: "1" do
-      @course.assignments.create!(due_at: 13.days.ago, title: "assign in ended")
-      gb_mgp_page.visit_gradebook(@course)
+    context 'as an admin' do
+      before(:each) do
+        account_admin_user(account: Account.site_admin)
+        user_session(@admin)
+      end
 
-      gb_mgp_page.select_grading_period(0)
-      gb_mgp_page.enter_grade("10", 0, 0)
-      expect(gb_mgp_page.cell_graded?("10", 0, 0)).to be true
+      it 'assignment in closed grading period should be gradable', test_id: 2947126, priority: "1" do
 
-      gb_mgp_page.select_grading_period(@gp_ended.id)
-      gb_mgp_page.enter_grade("8", 0, 0)
-      expect(gb_mgp_page.cell_graded?("8", 0, 0)).to be true
+        assignment = @course.assignments.create!(due_at: 18.days.ago(now), title: "assign in closed")
+        page.visit_gradebook(@course)
+
+        page.select_grading_period(@gp_closed.id)
+        page.enter_grade("10", 0, 0)
+        expect(page.cell_graded?("10", 0, 0)).to be true
+        expect(Submission.where(assignment_id: assignment.id, user_id: @student.id).first.grade).to eq "10"
+      end
     end
 
     it 'assignment in closed gp should not be gradable', test_id: 2947118, priority: "1" do
+      user_session(@teacher)
+
       @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")
-      gb_mgp_page.visit_gradebook(@course)
+      page.visit_gradebook(@course)
 
-      gb_mgp_page.select_grading_period(0)
-      expect(gb_mgp_page.grading_cell(0, 0)).to contain_css(gb_mgp_page.ungradable_selector)
+      page.select_grading_period(0)
+      expect(page.grading_cell(0, 0)).to contain_css(page.ungradable_selector)
 
-      gb_mgp_page.select_grading_period(@gp_closed.id)
-      expect(gb_mgp_page.grading_cell(0, 0)).to contain_css(gb_mgp_page.ungradable_selector)
+      page.select_grading_period(@gp_closed.id)
+      expect(page.grading_cell(0, 0)).to contain_css(page.ungradable_selector)
     end
   end
 end

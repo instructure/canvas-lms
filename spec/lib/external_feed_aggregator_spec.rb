@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe ExternalFeedAggregator do
   context "#process_feed" do
     before(:once) do
-      course(active_all: true)
+      course_factory(active_all: true)
       @feed = external_feed_model
     end
 

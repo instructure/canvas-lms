@@ -59,6 +59,10 @@ module Api::V1::Account
           hash['privacy_policy_url'] = privacy_policy_url
         end
       end
+      if includes.include?('services') && account.grants_right?(user, session, :manage_account_settings)
+        hash['services'] = Hash[Account.services_exposed_to_ui_hash(nil, user, account).keys.map{|k| [k, account.service_enabled?(k)]}]
+      end
+
       @@extensions.each do |extension|
         hash = extension.extend_account_json(hash, account, user, session, includes)
       end

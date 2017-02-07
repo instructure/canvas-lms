@@ -41,7 +41,7 @@ describe Quizzes::QuizzesController do
         end
 
         it "should show an overridden due date for student" do
-          @course.enroll_user(user, 'StudentEnrollment')
+          @course.enroll_user(user_factory, 'StudentEnrollment')
           user_session(@user)
 
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"

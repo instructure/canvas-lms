@@ -106,16 +106,16 @@ define([
         <div className="GradingPeriodList__period">
           <div className="GradingPeriodList__period__attributes grid-row">
             <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
-              <span tabIndex="0" ref="title">{this.props.period.title}</span>
+              <span ref="title">{this.props.period.title}</span>
             </div>
             <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
-              <span tabIndex="0" ref="startDate">{I18n.t("Start Date:")} {this.dateWithTimezone(this.props.period.startDate)}</span>
+              <span ref="startDate">{I18n.t("Start Date:")} {this.dateWithTimezone(this.props.period.startDate)}</span>
             </div>
             <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
-              <span tabIndex="0" ref="endDate">{I18n.t("End Date:")} {this.dateWithTimezone(this.props.period.endDate)}</span>
+              <span ref="endDate">{I18n.t("End Date:")} {this.dateWithTimezone(this.props.period.endDate)}</span>
             </div>
             <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
-              <span tabIndex="0" ref="closeDate">{I18n.t("Close Date:")} {this.dateWithTimezone(this.props.period.closeDate)}</span>
+              <span ref="closeDate">{I18n.t("Close Date:")} {this.dateWithTimezone(this.props.period.closeDate)}</span>
             </div>
           </div>
           <div className="GradingPeriodList__period__actions">

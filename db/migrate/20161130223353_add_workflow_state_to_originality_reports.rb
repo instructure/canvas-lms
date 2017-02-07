@@ -1,4 +1,4 @@
-class AddWorkflowStateToOriginalityReports < ActiveRecord::Migration
+class AddWorkflowStateToOriginalityReports < ActiveRecord::Migration[4.2]
   tag :predeploy
   def change
     add_column :originality_reports, :workflow_state, :string, null: false, default: 'pending'

@@ -151,4 +151,8 @@ module OtherHelperMethods
       }
     JS
   end
+
+  def clear_local_storage
+    driver.execute_script 'localStorage.clear();'
+  end
 end

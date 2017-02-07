@@ -17,9 +17,10 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '../../../spec_helper.rb')
+require_dependency "alerts/ungraded_count"
 
 module Alerts
-  describe Alerts::UngradedCount do
+  describe UngradedCount do
 
     describe "#should_not_receive_message?" do
       before :once do

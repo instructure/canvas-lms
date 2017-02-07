@@ -34,7 +34,7 @@ describe BigBlueButtonConference do
       @conference = BigBlueButtonConference.create!(
         :title => "my conference",
         :user => @user,
-        :context => course
+        :context => course_factory
       )
     end
 
@@ -54,7 +54,7 @@ describe BigBlueButtonConference do
       @conference.settings[:user_key] = 'user'
       @conference.save
 
-      params = {:fullName => user.name, :meetingID => @conference.conference_key, :userID => user.id}
+      params = {:fullName => user_factory.name, :meetingID => @conference.conference_key, :userID => user_factory.id}
       admin_params = params.merge(:password => 'admin').to_query
       user_params = params.merge(:password => 'user').to_query
       expect(@conference.admin_join_url(@user)).to eql("http://bbb.instructure.com/bigbluebutton/api/join?#{admin_params}&checksum=" + Digest::SHA1.hexdigest("join#{admin_params}secret"))
@@ -108,8 +108,8 @@ describe BigBlueButtonConference do
     it "should send record flag if record user_setting is set" do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => true }
-      bbb.user = user
-      bbb.context = course
+      bbb.user = user_factory
+      bbb.context = course_factory
       bbb.save!
       bbb.expects(:send_request).with do |verb, options|
         expect(verb).to eql :create
@@ -121,8 +121,8 @@ describe BigBlueButtonConference do
     it "should not send record flag if record user setting is unset" do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => false }
-      bbb.user = user
-      bbb.context = course
+      bbb.user = user_factory
+      bbb.context = course_factory
       bbb.save!
       bbb.expects(:send_request).with do |verb, options|
         expect(verb).to eql :create
@@ -135,8 +135,8 @@ describe BigBlueButtonConference do
       bbb = BigBlueButtonConference.new
       bbb.stubs(:conference_key).returns('12345')
       bbb.user_settings = { record: true }
-      bbb.user = user
-      bbb.context = course
+      bbb.user = user_factory
+      bbb.context = course_factory
       bbb.save!
       response = {returncode: 'SUCCESS', recordings: "\n  ",
                   messageKey: 'noRecordings', message: 'There are not
@@ -148,8 +148,8 @@ describe BigBlueButtonConference do
     it "should look for recordings only if record user setting is set" do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => false }
-      bbb.user = user
-      bbb.context = course
+      bbb.user = user_factory
+      bbb.context = course_factory
 
       # set some vars so it thinks it's been created and doesn't do an api call
       bbb.conference_key = 'test'
@@ -186,8 +186,8 @@ describe BigBlueButtonConference do
     it "should not send record flag even if record user_setting is set" do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => true }
-      bbb.user = user
-      bbb.context = course
+      bbb.user = user_factory
+      bbb.context = course_factory
       bbb.save!
       bbb.expects(:send_request).with do |verb, options|
         expect(verb).to eql :create

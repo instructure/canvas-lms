@@ -1,7 +1,7 @@
 require_relative '../../spec_helper'
 
 describe SupportHelpers::Crocodoc::CrocodocFixer do
-  let(:student) { user(active_all: true) }
+  let(:student) { user_factory(active_all: true) }
   let(:test_course) { Account.default.courses.create!(name: 'croco') }
   let(:assignment) do
     test_course.assignments.create!(title: 'doc',

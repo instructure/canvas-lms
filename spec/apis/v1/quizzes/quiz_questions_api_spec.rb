@@ -22,7 +22,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
   context 'as a teacher' do
     before :once do
-      @course = course
+      @course = course_factory
       teacher_in_course active_all: true
       @quiz = @course.quizzes.create!(:title => "A Sample Quiz")
     end

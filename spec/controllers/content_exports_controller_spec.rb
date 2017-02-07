@@ -61,7 +61,7 @@ describe ContentExportsController do
   describe 'export visibility' do
     context 'course' do
       before(:once) do
-        course active_all: true
+        course_factory active_all: true
         course_with_ta(course: @course, active_all: true)
         student_in_course(course: @course, active_all: true)
         @acx = factory_with_protected_attributes(@course.content_exports, user: @ta, export_type: 'common_cartridge')
@@ -102,7 +102,7 @@ describe ContentExportsController do
 
     context "user" do
       before(:once) do
-        course active_all: true
+        course_factory active_all: true
         student_in_course(course: @course, active_all: true)
         @tzx = factory_with_protected_attributes(@student.content_exports, user: @teacher, export_type: 'zip')
         @sdx = factory_with_protected_attributes(@student.content_exports, user: @student, export_type: 'user_data')

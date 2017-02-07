@@ -166,16 +166,24 @@ define([
       });
     });
 
-    $("#turnitin, " +
-      "#enable_equella, " +
-      "#account_settings_sis_syncing_value, " +
-      "#account_settings_sis_default_grade_export_value").change(function() {
-      var $myFieldset = $('#'+ $(this).attr('id') + '_settings'),
-          iAmChecked = $(this).attr('checked');
+    $('#enable_equella, ' +
+      '#account_settings_sis_syncing_value, ' +
+      '#account_settings_sis_default_grade_export_value').change(function () {
+        var $myFieldset = $('#'+ $(this).attr('id') + '_settings');
+        var iAmChecked = $(this).attr('checked');
       $myFieldset.showIf(iAmChecked);
       if (!iAmChecked) {
         $myFieldset.find("input,textarea").val("");
       }
+    }).change();
+
+    $('#account_settings_sis_syncing_value,' +
+      '#account_settings_sis_default_grade_export_value,' +
+      '#account_settings_sis_assignment_name_length_value').change(function() {
+        var attr_id = $(this).attr('id');
+        var $myFieldset = $('#'+ attr_id + '_settings');
+        var iAmChecked = $(this).attr('checked');
+        $myFieldset.showIf(iAmChecked);
     }).change();
 
     $(".turnitin_account_settings").change(function() {

@@ -85,12 +85,6 @@ a.discussion-icon-small {
   background-image: url(/images/discussion_icon_small.png);
 }
 
-a.discussion-topic {
-  @include icon_link;
-  background-image: url(/images/discussion_topic.png);
-  padding-left: 30px;
-}
-
 a.download {
   @include icon_link;
   background-image: url(/images/download.png);

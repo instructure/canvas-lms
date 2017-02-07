@@ -2,9 +2,9 @@ define([
   'jquery',
 
   // for legacy pathways
-  'wikiSidebar'
-], function($, wikiSidebar) {
-
+  'wikiSidebar',
+  'exports'
+], ($, wikiSidebar, exports) => {
   // for each command, there are three possibilities:
   //
   //   .data('remoteEditor') is set:
@@ -19,11 +19,12 @@ define([
   //     will do the best it can (see send for example), but often will be a
   //     no-op
   //
-  const RceCommandShim = {
-    send($target, methodName, ...args) {
-      let remoteEditor = $target.data('remoteEditor')
+  Object.assign(exports, {
+
+    send ($target, methodName, ...args) {
+      const remoteEditor = $target.data('remoteEditor')
       if (remoteEditor) {
-        if(methodName == 'get_code' && remoteEditor.isHidden()){
+        if (methodName === 'get_code' && remoteEditor.isHidden()) {
           return $target.val()
         }
         return remoteEditor.call(methodName, ...args)
@@ -32,18 +33,18 @@ define([
       } else {
         // we're not set up, so tell the caller that `exists?` is false,
         // `get_code` is the textarea value, and ignore anything else.
-        if (methodName == 'exists?') {
+        if (methodName === 'exists?') {
           return false
-        } else if (methodName == 'get_code') {
+        } else if (methodName === 'get_code') {
           return $target.val()
         } else {
-          console.warn("called send('" + methodName + "') on an RCE instance that hasn't fully loaded, ignored")
+          console.warn(`called send('${methodName}') on an RCE instance that hasn't fully loaded, ignored`)
         }
       }
     },
 
-    focus($target) {
-      let remoteEditor = $target.data('remoteEditor')
+    focus ($target) {
+      const remoteEditor = $target.data('remoteEditor')
       if (remoteEditor) {
         remoteEditor.focus()
       } else if ($target.data('rich_text')) {
@@ -53,8 +54,8 @@ define([
       }
     },
 
-    destroy($target) {
-      let remoteEditor = $target.data('remoteEditor')
+    destroy ($target) {
+      const remoteEditor = $target.data('remoteEditor')
       if (remoteEditor) {
         // detach the remote editor reference after destroying it
         remoteEditor.destroy()
@@ -65,7 +66,5 @@ define([
         console.warn("called destroy() on an RCE instance that hasn't fully loaded, ignored")
       }
     }
-  }
-
-  return RceCommandShim
+  })
 })

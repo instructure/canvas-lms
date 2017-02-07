@@ -31,7 +31,7 @@ describe OutcomeResultsController do
   end
 
   let_once(:outcome_course) do
-    course(active_all: true)
+    course_factory(active_all: true)
     @course
   end
 

@@ -1,9 +1,9 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
 describe "group weights" do
   include_context "in-process server selenium tests"
   include_context "gradebook_components"
-  include Gradebook2Common
+  include GradebookCommon
 
   def student_totals()
     totals = ff('.total-cell')
@@ -55,7 +55,7 @@ describe "group weights" do
     @course.update_attributes(:group_weighting_scheme => 'points')
 
     # Displays total column as points
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     expect(student_totals).to eq(["25"])
   end
 
@@ -67,7 +67,7 @@ describe "group weights" do
     @course.update_attributes(:group_weighting_scheme => 'percent')
 
     # Displays total column as points
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     expect(student_totals).to eq(["45%"])
   end
 
@@ -110,7 +110,7 @@ describe "group weights" do
     end
 
     it 'should not display triangle warnings if an assignment is muted in both header and total column' do
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       toggle_muting(@assignment2)
       expect(f("#content")).not_to contain_jqcss('.total-cell .icon-warning')
       expect(f("#content")).not_to contain_jqcss(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning")
@@ -119,7 +119,7 @@ describe "group weights" do
     it 'should display triangle warnings if an assignment is unmuted in both header and total column' do
       @assignment2.muted = true
       @assignment2.save!
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       toggle_muting(@assignment2)
       expect(f('.total-cell .icon-warning')).to be_displayed
       expect(fj(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning")).to be_displayed

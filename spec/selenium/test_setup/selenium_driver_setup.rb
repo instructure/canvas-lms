@@ -118,7 +118,8 @@ module SeleniumDriverSetup
 
       focus_viewport if run_headless?
 
-      @driver.manage.timeouts.implicit_wait = IMPLICIT_WAIT_TIMEOUT
+      @driver.manage.timeouts.implicit_wait = 0 # nothing should wait by default
+      SeleniumExtensions::FinderWaiting.timeout = IMPLICIT_WAIT_TIMEOUT # except finding elements
       @driver.manage.timeouts.script_timeout = 60
 
       puts "Browser: #{browser_name} - #{browser_version}"
@@ -606,5 +607,13 @@ Selenium::WebDriver::Firefox::Binary.class_eval do
     $DEBUG = true
     @process.start
     $DEBUG = nil
+  end
+end
+
+
+# make Wait play nicely with Timecop
+module Selenium::WebDriver::Wait::Time
+  def self.now
+    ::Time.now_without_mock_time
   end
 end

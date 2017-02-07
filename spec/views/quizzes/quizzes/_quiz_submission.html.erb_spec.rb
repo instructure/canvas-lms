@@ -61,8 +61,8 @@ describe "/quizzes/quizzes/_quiz_submission" do
 
   context 'as a teacher' do
     it "should render Respondus lockdown submission for soft concluded course" do
-      course_with_student
-      course_with_teacher
+      course_with_student course: @course, active_all: true
+      course_with_teacher course: @course, active_all: true
       view_context
 
       Quizzes::Quiz.stubs(:lockdown_browser_plugin_enabled?).returns(true)

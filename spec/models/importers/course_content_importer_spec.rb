@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 describe Course do
   describe "import_content" do
     before(:once) do
-      @course = course()
+      @course = course_factory()
     end
 
     it "should import a whole json file" do
@@ -271,7 +271,7 @@ describe Course do
 
   describe "shift_date" do
     it "should round sanely" do
-      course
+      course_factory
       @course.root_account.default_time_zone = Time.zone
       options = Importers::CourseContentImporter.shift_date_options(@course, {
           old_start_date: '2014-3-2',  old_end_date: '2014-4-26',
@@ -341,7 +341,7 @@ describe Course do
 
   describe "audit logging" do
     it "should log content migration in audit logs" do
-      course
+      course_factory
 
       json = File.open(File.join(IMPORT_JSON_DIR, 'assessments.json')).read
       data = JSON.parse(json).with_indifferent_access

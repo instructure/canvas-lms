@@ -8,8 +8,8 @@ describe Api::V1::SisAssignment do
   subject { SisAssignmentHarness.new }
 
   context "#sis_assignments_json" do
-    let(:course_1) { course }
-    let(:assignment_1) { assignment_model(course: course) }
+    let(:course_1) { course_factory }
+    let(:assignment_1) { assignment_model(course: course_factory) }
     let(:assignment_with_context) { Assignment.new }
 
     let(:assignment_override_1) do
@@ -80,14 +80,32 @@ describe Api::V1::SisAssignment do
       course_sections.stubs(:association).returns(OpenStruct.new(:loaded? => true))
     end
 
-    it "assignment groups have name and sis_source_id" do
+    it "creates assignment groups that have name and integration_data with proper data" do
       ag_name = 'chumba choo choo'
       sis_source_id = "my super unique goo-id"
-      assignment_group = AssignmentGroup.new(name: ag_name, sis_source_id: sis_source_id, group_weight: 8.7)
+      integration_data = {'something'=> 'else', 'foo'=> {'bar'=> 'baz'}}
+      assignment_group = AssignmentGroup.new(name: ag_name,
+                                             sis_source_id: sis_source_id,
+                                             integration_data: integration_data, group_weight: 8.7)
       assignment_1.stubs(:assignment_group).returns(assignment_group)
       result = subject.sis_assignments_json([assignment_1])
       expect(result[0]["assignment_group"]["name"]).to eq(ag_name)
       expect(result[0]["assignment_group"]["sis_source_id"]).to eq(sis_source_id)
+      expect(result[0]["assignment_group"]["integration_data"]).to eq(integration_data)
+      expect(result[0]["assignment_group"]["group_weight"]).to eq(8.7)
+    end
+
+    it "creates assignment groups where integration_data is nil" do
+      ag_name = 'too much tuna'
+      sis_source_id = "some super cool id"
+      assignment_group = AssignmentGroup.new(name: ag_name,
+                                             sis_source_id: sis_source_id,
+                                             integration_data: nil, group_weight: 8.7)
+      assignment_1.stubs(:assignment_group).returns(assignment_group)
+      result = subject.sis_assignments_json([assignment_1])
+      expect(result[0]["assignment_group"]["name"]).to eq(ag_name)
+      expect(result[0]["assignment_group"]["sis_source_id"]).to eq(sis_source_id)
+      expect(result[0]["assignment_group"]["integration_data"]).to eq({})
       expect(result[0]["assignment_group"]["group_weight"]).to eq(8.7)
     end
 

@@ -63,6 +63,7 @@ module Importers
           end
         end
 
+        item.skip_updating_points_possible = true
         migration.add_imported_item(item)
         item.save!
       end

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe MasterCourses::MasterContentTag do
   before :once do
-    course
+    course_factory
     @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
   end
 
@@ -20,7 +20,7 @@ describe MasterCourses::MasterContentTag do
 
   describe "#touch_content_if_restrictions_tightened" do
     before :once do
-      course
+      course_factory
       @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
       @topic = @course.discussion_topics.create!
       @time = 42.seconds.ago

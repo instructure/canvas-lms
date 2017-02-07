@@ -179,15 +179,15 @@ describe ContentTag do
   end
 
   it "should return content for a assignment" do
-    course
-    assignment = course.assignments.create!
+    course_factory
+    assignment = course_factory.assignments.create!
     tag = ContentTag.new(:content => assignment, :context => @course)
     expect(tag.assignment).to eq assignment
   end
 
   it "should return associated assignment for a quiz" do
-    course
-    quiz = course.quizzes.create!
+    course_factory
+    quiz = course_factory.quizzes.create!
     tag = ContentTag.new(:content => quiz, :context => @course)
     expect(tag.assignment).to eq quiz.assignment
   end
@@ -198,7 +198,7 @@ describe ContentTag do
   end
 
   it "should include tags from a course in the for_context named scope" do
-    course
+    course_factory
     quiz = @course.quizzes.create!
     tag = ContentTag.create!(:content => quiz, :context => @course)
     tags = ContentTag.for_context(@course)
@@ -216,7 +216,7 @@ describe ContentTag do
   end
 
   it "should include tags from courses under an account in the for_context named scope" do
-    course
+    course_factory
     quiz = @course.quizzes.create!
     tag = ContentTag.create!(:content => quiz, :context => @course)
     tags = ContentTag.for_context(@course.account)
@@ -225,7 +225,7 @@ describe ContentTag do
   end
   
   it "should not rename the linked external tool if the tag is renamed" do
-    course
+    course_factory
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({
@@ -242,7 +242,7 @@ describe ContentTag do
   end
     
   it "should not rename the tag if the linked external tool is renamed" do
-    course
+    course_factory
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({
@@ -259,7 +259,7 @@ describe ContentTag do
   end
 
   it "should rename the linked assignment if the tag is renamed" do
-    course
+    course_factory
     @assignment = @course.assignments.create!(:title => "some assignment")
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({
@@ -275,7 +275,7 @@ describe ContentTag do
   end
   
   it "should rename the tag if the linked assignment is renamed" do
-    course
+    course_factory
     @assignment = @course.assignments.create!(:title => "some assignment")
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({
@@ -299,8 +299,8 @@ describe ContentTag do
   describe ".update_for" do
     context "when updating a quiz" do
       before do
-        course
-        @quiz = course.quizzes.create!
+        course_factory
+        @quiz = course_factory.quizzes.create!
         @module = @course.context_modules.create!(:name => "module")
         @tag = @module.add_item({
           :type => 'quiz',
@@ -331,8 +331,7 @@ describe ContentTag do
   end
 
   it "should not attempt to update asset name attribute if it's over the db limit" do
-    skip "CNVS-33340 - only passes if your db was created prior to rails 4.2"
-    course
+    course_factory
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({:type => 'WikiPage', :title => 'oh noes!' * 35, :id => @page.id})
@@ -344,8 +343,7 @@ describe ContentTag do
   end
 
   it "should properly trim asset name for assignments" do
-    skip "CNVS-33340 - only passes if your db was created prior to rails 4.2"
-    course
+    course_factory
     @assign = @course.assignments.create!(:title => "some assignment")
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({:type => 'Assignment', :title => 'oh noes!' * 35, :id => @assign.id})
@@ -357,7 +355,7 @@ describe ContentTag do
   end
 
   it "should publish/unpublish the tag if the linked wiki page is published/unpublished" do
-    course
+    course_factory
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
     @page.workflow_state = 'unpublished'
     @page.save!
@@ -379,7 +377,7 @@ describe ContentTag do
   end
 
   it "should publish/unpublish the linked wiki page (and its tags) if the tag is published/unpublished" do
-    course
+    course_factory
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
     @page.workflow_state = 'unpublished'
     @page.save!
@@ -439,7 +437,7 @@ describe ContentTag do
   end
   
   it "should not rename tag if linked attachment is renamed" do
-    course
+    course_factory
     att = Attachment.create!(:filename => 'important title.txt', :display_name => "important title.txt", :uploaded_data => StringIO.new("It's what's on the inside of the file that doesn't matter.'"), :folder => Folder.unfiled_folder(@course), :context => @course)
 
     a_module = @course.context_modules.create!(:name => "module")
@@ -453,7 +451,7 @@ describe ContentTag do
   end
   
   it "should not rename attachment if linked tag is renamed" do
-    course
+    course_factory
     att = Attachment.create!(:filename => 'important title.txt', :display_name => "important title.txt", :uploaded_data => StringIO.new("It's what's on the inside of the file that doesn't matter.'"), :folder => Folder.unfiled_folder(@course), :context => @course)
 
     a_module = @course.context_modules.create!(:name => "module")
@@ -466,12 +464,12 @@ describe ContentTag do
 
   include_examples "url validation tests"
   it "should check url validity" do
-    quiz = course.quizzes.create!
+    quiz = course_factory.quizzes.create!
     test_url_validation(ContentTag.create!(:content => quiz, :context => @course))
   end
 
   it "should touch the module after committing the save" do
-    course
+    course_factory
     mod = @course.context_modules.create!
     yesterday = 1.day.ago
     ContextModule.where(:id => mod).update_all(:updated_at => yesterday)
@@ -483,7 +481,7 @@ describe ContentTag do
   end
 
   it "should allow skipping touches on save" do
-    course
+    course_factory
     @assignment = @course.assignments.create!(:title => "some assignment")
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({
@@ -626,7 +624,7 @@ describe ContentTag do
   end
 
   it "should sync tag published state with attachment locked state" do
-    course
+    course_factory
     att = Attachment.create!(:filename => 'blah.txt', :uploaded_data => StringIO.new("blah"),
                              :folder => Folder.unfiled_folder(@course), :context => @course)
     att.locked = true

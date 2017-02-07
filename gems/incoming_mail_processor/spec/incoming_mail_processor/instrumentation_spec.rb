@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe IncomingMailProcessor::Instrumentation do
   let(:mailbox) do
-    obj = mock()
-    obj.stubs(:unprocessed_message_count).returns(4,nil,0,50)
+    obj = double()
+    allow(obj).to receive(:unprocessed_message_count).and_return(4,nil,0,50)
     obj
   end
 
@@ -28,13 +28,13 @@ describe IncomingMailProcessor::Instrumentation do
 
   describe ".process" do
     before do
-      IncomingMailProcessor::IncomingMessageProcessor.stubs(:create_mailbox).returns(mailbox)
+      allow(IncomingMailProcessor::IncomingMessageProcessor).to receive(:create_mailbox).and_return(mailbox)
     end
 
     it 'should push to statsd for one mailbox' do
       IncomingMailProcessor::IncomingMessageProcessor.configure(single_config)
 
-      CanvasStatsd::Statsd.expects(:gauge).with("incoming_mail_processor.mailbox_queue_size.fake@fake_fake",4)
+      expect(CanvasStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.fake@fake_fake",4)
 
       IncomingMailProcessor::Instrumentation.process
     end
@@ -42,9 +42,9 @@ describe IncomingMailProcessor::Instrumentation do
     it 'should push to statsd for multiple mailboxes' do
       IncomingMailProcessor::IncomingMessageProcessor.configure(multi_config)
 
-      CanvasStatsd::Statsd.expects(:gauge).with("incoming_mail_processor.mailbox_queue_size.user1@fake_fake", 4)
-      CanvasStatsd::Statsd.expects(:gauge).with("incoming_mail_processor.mailbox_queue_size.user3@fake_fake", 0)
-      CanvasStatsd::Statsd.expects(:gauge).with("incoming_mail_processor.mailbox_queue_size.user4@fake_fake", 50)
+      expect(CanvasStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.user1@fake_fake", 4)
+      expect(CanvasStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.user3@fake_fake", 0)
+      expect(CanvasStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.user4@fake_fake", 50)
 
       IncomingMailProcessor::Instrumentation.process
     end

@@ -60,10 +60,10 @@ describe LinkedIn::Connection do
                               "<last-name>doe</last-name>"\
                               "<public-profile-url>http://example.com/linkedin</public-profile-url>"\
                               "</html>"
-        mock_access_token = stub()
-        mock_access_token.expects(:get)
+        mock_access_token = double()
+        expect(mock_access_token).to receive(:get)
                          .with('/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)')
-                         .returns(stub(body: token_response_body))
+                         .and_return(double(body: token_response_body))
 
         service_user_id, service_user_name, service_user_url = connection.get_service_user_info(mock_access_token)
         expect(service_user_id).to eq("#1")
@@ -74,14 +74,14 @@ describe LinkedIn::Connection do
 
     describe "#get_access_token" do
       it "builds access token based on the supplied parameters" do
-        token = mock
-        secret = mock
-        oauth_verifier = mock
-        consumer = mock
-        request_token = mock
-        OAuth::Consumer.expects(:new).returns(consumer)
-        OAuth::RequestToken.expects(:new).with(consumer, token, secret).returns(request_token)
-        request_token.expects(:get_access_token).with(:oauth_verifier => oauth_verifier)
+        token = double
+        secret = double
+        oauth_verifier = double
+        consumer = double
+        request_token = double
+        expect(OAuth::Consumer).to receive(:new).and_return(consumer)
+        expect(OAuth::RequestToken).to receive(:new).with(consumer, token, secret).and_return(request_token)
+        expect(request_token).to receive(:get_access_token).with(:oauth_verifier => oauth_verifier)
 
         connection.get_access_token(token, secret, oauth_verifier)
       end
@@ -89,10 +89,10 @@ describe LinkedIn::Connection do
 
     describe "#request_token" do
       it "builds access token based on the supplied parameters" do
-        consumer = mock
-        oauth_callback = mock
-        OAuth::Consumer.expects(:new).returns(consumer)
-        consumer.expects(:get_request_token).with(:oauth_callback => oauth_callback)
+        consumer = double
+        oauth_callback = double
+        expect(OAuth::Consumer).to receive(:new).and_return(consumer)
+        expect(consumer).to receive(:get_request_token).with(:oauth_callback => oauth_callback)
 
         connection.request_token(oauth_callback)
       end
@@ -101,7 +101,7 @@ describe LinkedIn::Connection do
     describe ".consumer" do
       it "uses the config values" do
 
-        OAuth::Consumer.expects(:new).with('key', 'secret', {
+        expect(OAuth::Consumer).to receive(:new).with('key', 'secret', {
           :site => "https://api.linkedin.com",
           :request_token_path => "/uas/oauth/requestToken",
           :access_token_path => "/uas/oauth/accessToken",
@@ -113,7 +113,7 @@ describe LinkedIn::Connection do
       end
 
       it "user the supplied parameters" do
-        OAuth::Consumer.expects(:new).with('my_key', 'my_secret', {
+        expect(OAuth::Consumer).to receive(:new).with('my_key', 'my_secret', {
           :site => "https://api.linkedin.com",
           :request_token_path => "/uas/oauth/requestToken",
           :access_token_path => "/uas/oauth/accessToken",

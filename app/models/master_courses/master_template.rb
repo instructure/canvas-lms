@@ -14,6 +14,9 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   strong_params
 
+  attr_accessor :child_course_count
+  attr_writer :last_export_completed_at
+
   include Canvas::SoftDeletable
 
   include MasterCourses::TagHelper
@@ -56,6 +59,17 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     course.master_course_templates.active.for_full_course.first
   end
 
+  def self.preload_index_data(templates)
+    child_counts = MasterCourses::ChildSubscription.active.where(:master_template_id => templates).group(:master_template_id).count
+    last_export_times = Hash[MasterCourses::MasterMigration.where(:master_template_id => templates, :workflow_state => "completed").
+      order("master_template_id, id DESC").pluck("DISTINCT ON (master_template_id) master_template_id, imports_completed_at")]
+
+    templates.each do |template|
+      template.child_course_count = child_counts[template.id] || 0
+      template.last_export_completed_at = last_export_times[template.id]
+    end
+  end
+
   def migration_id_for(obj, prepend="")
     key = obj.is_a?(ActiveRecord::Base) ? obj.global_asset_string : obj.to_s
     "#{MasterCourses::MIGRATION_ID_PREFIX}#{self.shard.id}_#{self.id}_#{Digest::MD5.hexdigest(prepend + key)}"
@@ -74,16 +88,22 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     self.active_migration && self.active_migration.still_running?
   end
 
-  def last_export_at
-    unless defined?(@last_export_at)
-      @last_export_at = self.master_migrations.where(:workflow_state => "completed").order("id DESC").limit(1).pluck(:exports_started_at).first
+  def last_export_started_at
+    unless defined?(@last_export_started_at)
+      @last_export_started_at = self.master_migrations.where(:workflow_state => "completed").order("id DESC").limit(1).pluck(:exports_started_at).first
     end
-    @last_export_at
+    @last_export_started_at
+  end
+
+  def last_export_completed_at
+    unless defined?(@last_export_completed_at)
+      @last_export_completed_at = self.master_migrations.where(:workflow_state => "completed").order("id DESC").limit(1).pluck(:imports_completed_at).first
+    end
+    @last_export_completed_at
   end
 
   def ensure_tag_on_export(obj)
-    return unless self.default_restrictions.present? # if there are no restrictions then why bother creating tags
-
+    # even if there are no default restrictions we should still create the tags initially so know to touch the content if we lock it later
     load_tags! # does nothing if already loaded
     content_tag_for(obj, {:restrictions => self.default_restrictions}) # set the restrictions on create if a new tag
     # TODO: make a thing if we change the defaults at some point and want to force them on all the existing tags
@@ -96,5 +116,19 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     self.course.attachments.where("file_state <> 'deleted'").each do |att|
       ensure_tag_on_export(att)
     end
+  end
+
+  def preload_restrictions!
+    @preloaded_restrictions ||= begin
+      index = {}
+      self.master_content_tags.pluck(:migration_id, :restrictions).each do |mig_id, restrictions|
+        index[mig_id] = restrictions
+      end
+      index
+    end
+  end
+
+  def find_preloaded_restriction(migration_id)
+    @preloaded_restrictions[migration_id]
   end
 end

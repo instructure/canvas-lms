@@ -10,7 +10,7 @@ describe "users" do
       user_session(admin)
 
       @user = User.create!
-      course.enroll_student(@user)
+      course_factory.enroll_student(@user)
 
       get "/users/#{@user.id}"
       pseudonym_form = f('#edit_pseudonym_form')
@@ -239,7 +239,7 @@ describe "users" do
 
     it "should register a student with a join code" do
       Account.default.allow_self_enrollment!
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.update_attribute(:self_enrollment, true)
 
       get '/register'

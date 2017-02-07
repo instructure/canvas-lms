@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_dependency "canvas/error_stats"
 
 module Canvas
   describe ErrorStats do

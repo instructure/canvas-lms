@@ -38,4 +38,9 @@ describe CanvasSanitize do
     cleaned = Sanitize.clean("<track src=\"http://google.com\"></track>", CanvasSanitize::SANITIZE)
     expect(cleaned).to eq("<track src=\"http://google.com\"></track>")
   end
+
+  it "sanitizes javascript protocol in mathml" do
+    cleaned = Sanitize.clean("<math href=\"javascript:alert(1)\">CLICKME</math>", CanvasSanitize::SANITIZE)
+    expect(cleaned).to eq("<math>CLICKME</math>")
+  end
 end

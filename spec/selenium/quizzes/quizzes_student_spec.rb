@@ -187,7 +187,7 @@ describe 'quizzes' do
 
     it "should not show correct answers on first attempt", priority: "1", test_id: 474288 do
       @student = @user
-      @observer = user
+      @observer = user_factory
       @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
 
       take_and_answer_quiz
@@ -244,7 +244,7 @@ describe 'quizzes' do
     quiz.save!
 
     @student = @user
-    @observer = user
+    @observer = user_factory
     @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
     user_session(@observer)
 

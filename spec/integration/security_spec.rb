@@ -407,12 +407,12 @@ describe "security" do
     u.pseudonyms.create!(:unique_id => "A1234567", :account => Account.default)
     @course = Account.default.courses.create!
     @course.offer!
-    @teacher = user :active_all => true
+    @teacher = user_factory :active_all => true
     @course.enroll_teacher(@teacher).tap do |e|
       e.workflow_state = 'active'
       e.save!
     end
-    @student = user :active_all => true
+    @student = user_factory :active_all => true
     @course.enroll_student(@student).tap do |e|
       e.workflow_state = 'active'
       e.save!
@@ -651,7 +651,7 @@ describe "security" do
       it "read_course_list" do
         add_permission :view_statistics
 
-        course
+        course_factory
         get "/accounts/#{Account.default.id}"
         expect(response).to be_redirect
 
@@ -758,7 +758,7 @@ describe "security" do
 
     describe 'course' do
       before (:each) do
-        course(:active_all => 1)
+        course_factory(active_all: true)
         Account.default.update_attribute(:settings, { :no_enrollments_can_create_courses => false })
       end
 
@@ -1092,7 +1092,7 @@ describe "security" do
       it 'view_statistics' do
         course_with_teacher_logged_in(:active_all => 1)
 
-        @student = user :active_all => true
+        @student = user_factory :active_all => true
         @course.enroll_student(@student).tap do |e|
           e.workflow_state = 'active'
           e.save!

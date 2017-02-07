@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'forgot_password.email' do
   it "should render" do
-    user
+    user_factory
     @pseudonym = @user.pseudonyms.create!(:unique_id => 'unique@example.com', :password => 'password', :password_confirmation => 'password')
     @object = @user.communication_channels.create!(:path_type => 'email', :path => 'bob@example.com', :user => @user)
     @object.reload

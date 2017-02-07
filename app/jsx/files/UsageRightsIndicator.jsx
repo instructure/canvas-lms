@@ -16,6 +16,7 @@ define([
     propTypes: {
       model: customPropTypes.filesystemObject.isRequired,
       userCanManageFilesForContext: React.PropTypes.bool.isRequired,
+      userCanRestrictFilesForContext: React.PropTypes.bool.isRequired,
       usageRightsRequiredForContext: React.PropTypes.bool.isRequired,
       modalOptions: React.PropTypes.object.isRequired
     },
@@ -26,6 +27,7 @@ define([
         <UsageRightsDialog
           closeModal={this.props.modalOptions.closeModal}
           itemsToManage={[this.props.model]}
+          userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
         />
       );
       this.props.modalOptions.openModal(contents, () => {

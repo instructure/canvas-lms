@@ -17,7 +17,6 @@
 #
 
 require 'spec_helper'
-require 'mocha/api'
 
 describe ActiveSupport::Callbacks::Suspension do
   before do
@@ -69,24 +68,24 @@ describe ActiveSupport::Callbacks::Suspension do
 
   describe "suspend_callbacks" do
     it "should suspend all callbacks by default" do
-      @instance.expects(:validate).never
-      @instance.expects(:publish).never
+      expect(@instance).to receive(:validate).never
+      expect(@instance).to receive(:publish).never
       @instance.suspend_callbacks{ @instance.save }
     end
 
     it "should treat suspended callbacks as successful" do
-      @instance.expects(:persist).once
+      expect(@instance).to receive(:persist).once
       @instance.suspend_callbacks{ @instance.save }
     end
 
     it "should only suspend given callbacks" do
-      @instance.expects(:validate).never
-      @instance.expects(:publish).once
+      expect(@instance).to receive(:validate).never
+      expect(@instance).to receive(:publish).once
       @instance.suspend_callbacks(:validate) { @instance.save }
     end
 
     it "should only suspend callbacks of the given kind" do
-      @instance.expects(:validate).once
+      expect(@instance).to receive(:validate).once
       if @rails2
         @instance.suspend_callbacks(kind: :before_save) { @instance.update }
       else
@@ -96,8 +95,8 @@ describe ActiveSupport::Callbacks::Suspension do
 
     unless @rails2
       it "should only suspend callbacks of the given type" do
-        @instance.expects(:validate).never
-        @instance.expects(:publish).once
+        expect(@instance).to receive(:validate).never
+        expect(@instance).to receive(:publish).once
         @instance.suspend_callbacks(type: :before) { @instance.save }
       end
     end
@@ -105,8 +104,8 @@ describe ActiveSupport::Callbacks::Suspension do
 
   describe "nesting" do
     it "should combine suspensions from various levels" do
-      @instance.expects(:validate).never
-      @instance.expects(:publish).never
+      expect(@instance).to receive(:validate).never
+      expect(@instance).to receive(:publish).never
       @instance.suspend_callbacks(:validate) do
         @instance.suspend_callbacks(:publish) do
           @instance.save
@@ -115,8 +114,8 @@ describe ActiveSupport::Callbacks::Suspension do
     end
 
     it "should restore correct subset of suspensions after leaving block" do
-      @instance.expects(:validate).never
-      @instance.expects(:publish).once
+      expect(@instance).to receive(:validate).never
+      expect(@instance).to receive(:publish).once
       @instance.suspend_callbacks(:validate) do
         @instance.suspend_callbacks(:publish) do
           @instance.save
@@ -128,24 +127,24 @@ describe ActiveSupport::Callbacks::Suspension do
 
   describe "inheritance" do
     it "should apply suspensions from the class to instances" do
-      @instance.expects(:validate).never
-      @instance.expects(:publish).never
+      expect(@instance).to receive(:validate).never
+      expect(@instance).to receive(:publish).never
       @class.suspend_callbacks{ @instance.save }
     end
 
     it "should apply suspensions from a superclass to instances of a subclass" do
       subclass = Class.new(@class)
       instance = subclass.new
-      instance.expects(:validate).never
-      instance.expects(:publish).never
+      expect(instance).to receive(:validate).never
+      expect(instance).to receive(:publish).never
       @class.suspend_callbacks{ instance.save }
     end
 
     it "should combine suspensions from various levels" do
       subclass = Class.new(@class)
       instance = subclass.new
-      instance.expects(:validate).never
-      instance.expects(:publish).never
+      expect(instance).to receive(:validate).never
+      expect(instance).to receive(:publish).never
       # only suspends :validate from save
       instance.suspend_callbacks(:validate, kind: (@rails2 ? :before_save : :save)) do
         # only suspends :publish
@@ -161,14 +160,14 @@ describe ActiveSupport::Callbacks::Suspension do
     end
 
     it "should keep class suspensions independent per thread" do
-      @instance.expects(:validate).never
-      @instance.expects(:publish).once
+      expect(@instance).to receive(:validate).never
+      expect(@instance).to receive(:publish).once
 
       @class.suspend_callbacks(:validate) do
         Thread.new do
           @instance2 = @class.new
-          @instance2.expects(:validate).once
-          @instance2.expects(:publish).once
+          expect(@instance2).to receive(:validate).once
+          expect(@instance2).to receive(:publish).once
           @instance2.save
         end.join
 

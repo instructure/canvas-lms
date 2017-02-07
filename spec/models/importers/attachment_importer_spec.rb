@@ -17,9 +17,10 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '../../../spec_helper.rb')
+require_dependency "importers/attachment_importer"
 
 module Importers
-  describe Importers::AttachmentImporter do
+  describe AttachmentImporter do
 
     describe '#process_migration', no_retry: true do
       let(:course) { ::Course.new }

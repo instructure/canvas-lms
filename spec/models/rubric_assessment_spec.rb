@@ -22,11 +22,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe RubricAssessment do
   before :once do
     assignment_model
-    @teacher = user(:active_all => true)
+    @teacher = user_factory(active_all: true)
     @course.enroll_teacher(@teacher).accept
-    @student = user(:active_all => true)
+    @student = user_factory(active_all: true)
     @course.enroll_student(@student).accept
-    @observer = user(:active_all => true)
+    @observer = user_factory(active_all: true)
     @course.enroll_user(@observer, 'ObserverEnrollment', {:associated_user_id => @student.id})
     rubric_model
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
@@ -169,7 +169,7 @@ describe RubricAssessment do
     end
 
     it "should not update scores if not a valid grader" do
-      @student2 = user(:active_all => true)
+      @student2 = user_factory(active_all: true)
       @course.enroll_student(@student2).accept
       @assessment = @association.assess({
         :user => @student,
@@ -286,14 +286,14 @@ describe RubricAssessment do
     end
 
     it "does not grant :read to an account user without :manage_courses or :view_all_grades" do
-      user
+      user_factory
       role = custom_account_role('custom', :account => @account)
       @account.account_users.create!(user: @user, role: role)
       expect(@assessment.grants_right?(@user, :read)).to eq false
     end
 
     it "grants :read to an account user with :view_all_grades but not :manage_courses" do
-      user
+      user_factory
       role = custom_account_role('custom', :account => @account)
       RoleOverride.create!(:context => @account, :permission => 'view_all_grades', :role => role, :enabled => true)
       RoleOverride.create!(:context => @account, :permission => 'manage_courses', :role => role, :enabled => false)

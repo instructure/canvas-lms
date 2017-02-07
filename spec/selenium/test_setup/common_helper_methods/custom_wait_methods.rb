@@ -142,7 +142,7 @@ module CustomWaitMethods
     tiny_frame = nil
     keep_trying_until {
       begin
-        tiny_frame = parent.find_element(:css, 'iframe')
+        tiny_frame = disable_implicit_wait { parent.find_element(:css, 'iframe') }
       rescue => e
         puts "#{e.inspect}"
         false
@@ -152,10 +152,9 @@ module CustomWaitMethods
   end
 
   def disable_implicit_wait
-    driver.manage.timeouts.implicit_wait = 0
-    yield
-  ensure
-    driver.manage.timeouts.implicit_wait = SeleniumDriverSetup::IMPLICIT_WAIT_TIMEOUT
+    ::SeleniumExtensions::FinderWaiting.disable do
+      yield
+    end
   end
 
   # little wrapper around Selenium::WebDriver::Wait, notably it:
@@ -163,21 +162,17 @@ module CustomWaitMethods
   # * returns false (rather than raising) if the block never returns true
   # * doesn't rescue :allthethings: like keep_trying_until
   # * prevents nested waiting, cuz that's terrible
-  def wait_for(timeout: SeleniumDriverSetup::IMPLICIT_WAIT_TIMEOUT, method: nil, ignore: nil)
-    return yield if timeout == 0
-    driver.prevent_nested_waiting(method) do
-      Selenium::WebDriver::Wait.new(timeout: timeout, ignore: ignore).until do
-        yield
-      end
-    end
-  rescue Selenium::WebDriver::Error::TimeOutError
-    false
+  def wait_for(*args, &block)
+    ::SeleniumExtensions::FinderWaiting.wait_for(*args, &block)
   end
 
   def wait_for_no_such_element(method: nil)
     wait_for(method: method, ignore: []) do
-      yield
-      false
+      # so find_element calls return ASAP
+      disable_implicit_wait do
+        yield
+        false
+      end
     end
   rescue Selenium::WebDriver::Error::NoSuchElementError
     true

@@ -67,7 +67,7 @@ define([
 
       return (
         <div>
-          <Select ref='select' label={selectLabel}>
+          <Select id='MoveToDialog__select' ref='select' label={selectLabel}>
           {
             this.props.destinations.map((dest) => (
               <option key={dest.id} value={dest.id}>{ dest.label }</option>

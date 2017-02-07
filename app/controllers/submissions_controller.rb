@@ -477,6 +477,31 @@ class SubmissionsController < ApplicationController
     resubmit_to_plagiarism('vericite')
   end
 
+  def originality_report
+    plagiarism_report('originality_report')
+  end
+
+  def legacy_plagiarism_report(submission, asset_string, type)
+    plag_data = submission.turnitin_data
+    url = nil
+    if type == 'vericite'
+      plag_data = submission.vericite_data
+    end
+    if (report_url = plag_data[asset_string] && plag_data[asset_string][:report_url])
+      url = polymorphic_url([:retrieve, @context, :external_tools], url:report_url, display:'borderless')
+    else
+      if type == 'vericite'
+        # VeriCite URL
+        url = submission.vericite_report_url(asset_string, @current_user, session) rescue nil
+      else
+        # Turnitin URL
+        url = submission.turnitin_report_url(asset_string, @current_user) rescue nil
+      end
+    end
+    url
+  end
+  private :legacy_plagiarism_report
+
   def plagiarism_report(type)
     return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
 
@@ -484,21 +509,12 @@ class SubmissionsController < ApplicationController
     @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
     @asset_string = params[:asset_string]
     if authorized_action(@submission, @current_user, :read)
-      plag_data = @submission.turnitin_data
-      if type == 'vericite'
-        plag_data = @submission.vericite_data
-      end
-      if (report_url = plag_data[@asset_string] && plag_data[@asset_string][:report_url])
-        url = polymorphic_url([:retrieve, @context, :external_tools], url:report_url, display:'borderless')
+      if type == 'originality_report'
+        url = @submission.originality_report_url(@asset_string, @current_user)
       else
-        if type == 'vericite'
-          # VeriCite URL
-          url = @submission.vericite_report_url(@asset_string, @current_user, session) rescue nil
-        else
-          # Turnitin URL
-          url = @submission.turnitin_report_url(@asset_string, @current_user) rescue nil
-        end
+        url = legacy_plagiarism_report(@submission, @asset_string, type)
       end
+
       if url
         redirect_to url
       else

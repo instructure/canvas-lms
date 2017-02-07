@@ -40,7 +40,7 @@ describe EventStream do
   describe '.get_index_ids' do
     let(:index) do
       index = double('index')
-      index.stub(:id_column).and_return(:id)
+      allow(index).to receive(:id_column).and_return(:id)
       index
     end
     let(:index_ids) { (1..10).to_a }

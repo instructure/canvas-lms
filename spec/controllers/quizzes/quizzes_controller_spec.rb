@@ -860,7 +860,7 @@ describe Quizzes::QuizzesController do
 
     it "should find the observed submissions" do
       @submission = @quiz.generate_submission(@student)
-      @observer = user
+      @observer = user_factory
       @enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active')
       @enrollment.update_attribute(:associated_user, @student)
       user_session(@observer)

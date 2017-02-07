@@ -56,6 +56,7 @@ module Importers
       self.context = context
       self.migration = migration
       self.item    = find_or_create_topic(item)
+      self.item.mark_as_importing!(migration)
     end
 
     def find_or_create_topic(topic = nil)

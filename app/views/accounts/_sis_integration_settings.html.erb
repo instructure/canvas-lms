@@ -1,5 +1,12 @@
 <fieldset id="sis_integration_settings">
   <legend><%= t("SIS Integration Settings") %></legend>
+  <%= f.label :sis_name, t("If you wish, you can rename \"SIS\" to something more familiar to your staff") %>
+  <div class="sis-name">
+    <%= f.fields_for :settings do |settings| %>
+      <%= settings.label :sis_name, t("SIS friendly name") %>
+      <%= settings.text_field :sis_name, :value => @account.settings[:sis_name], :maxlength => 255, :disabled => !@account.root_account? %>
+    <% end %>
+  </div>
   <div>
     <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
     <%= f.label :allow_sis_import, t("SIS imports") %>
@@ -36,7 +43,7 @@
                                        "aria-controls" => "account_settings_sis_default_grade_export_value_settings" %>
               <%= ff_default.label :value, t("Default SIS Sync for assignments, quizzes, grade discussion") %>
             </div>
-            <fieldset id="account_settings_sis_default_grade_export_value_settings" class="nested" style="display: none;">
+            <fieldset id="account_settings_sis_default_grade_export_value_settings" class="nested nested_setting_cleanup" style="display: none;">
               <legend class="screenreader-only"><%= t("Additional SIS Sync Assignment, Quiz, and Discussion settings") %></legend>
                 <%= settings.fields_for :sis_require_assignment_due_date do |ff_due_date| %>
                   <%
@@ -49,6 +56,34 @@
                                               :disabled => require_due_date_disabled %>
                     <%= ff_due_date.label :value, t("Require assignment due date") %>
                   </div>
+                <% end %>
+                <%= settings.fields_for :sis_assignment_name_length do |ff_name_length| %>
+                  <%
+                    name_length = @account.sis_assignment_name_length
+                    name_length_disabled = sis_syncing_locked_subs ||
+                        (name_length[:locked] && name_length[:inherited])
+                  %>
+                  <div>
+                    <%= ff_name_length.check_box :value, :checked => name_length[:value],
+                                              :disabled => name_length_disabled,
+                                              "aria-controls" => "account_settings_sis_assignment_name_length_value_settings" %>
+                    <%= ff_name_length.label :value, t("Limit assignment names lengths (max 255)") %>
+                  </div>
+                  <fieldset id="account_settings_sis_assignment_name_length_value_settings" class="nested" style="display: none;">
+                    <div class="name-length-wrapper">
+                      <%= settings.fields_for :sis_assignment_name_length_input do |ff_name_input|%>
+                        <%= ff_name_input.label :value, :en => "Characters"%>
+                        <%= ff_name_input.text_field :value,
+                                                     :type => "number",
+                                                     :value => @account.sis_assignment_name_length_input[:value],
+                                                     :class => "small-input",
+                                                     :max => 255,
+                                                     :min => 0,
+                                                     :disabled => name_length_disabled,
+                                                     :placeholder => "255"%>
+                      <% end %>
+                    </div>
+                  </fieldset>
                 <% end %>
             </fieldset>
           <% end %>

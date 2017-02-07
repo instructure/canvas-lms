@@ -12,7 +12,6 @@ require [
   'compiled/views/assignments/GroupCategorySelector'
   'compiled/views/assignments/PeerReviewsSelector'
   'grading_standards'
-  'manage_groups'
 ], (Section, Assignment, EditHeaderView, EditView, SectionCollection,
 
   DueDateList, OverrideView, AssignmentGroupSelector,

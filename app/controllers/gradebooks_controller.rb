@@ -122,8 +122,7 @@ class GradebooksController < ApplicationController
 
   def light_weight_ags_json(assignment_groups, opts={})
     assignment_groups.map do |ag|
-      visible_assignments = ag.visible_assignments(opts[:student] || @current_user)
-                              .reject(&:muted?)
+      visible_assignments = ag.visible_assignments(opts[:student] || @current_user).to_a
 
       if multiple_grading_periods? && @current_grading_period_id && !view_all_grading_periods?
         current_period = GradingPeriod.for(@context).find_by(id: @current_grading_period_id)
@@ -136,7 +135,8 @@ class GradebooksController < ApplicationController
           submission_types: a.submission_types_array,
           points_possible: a.points_possible,
           due_at: a.due_at,
-          omit_from_final_grade: a.omit_from_final_grade?
+          omit_from_final_grade: a.omit_from_final_grade?,
+          muted: a.muted?
         }
       end
 
@@ -198,19 +198,17 @@ class GradebooksController < ApplicationController
       @course_is_concluded = @context.completed?
       @post_grades_tools = post_grades_tools
 
-      case @current_user.preferred_gradebook_version
-      when "2"
-        render :gradebook2
-        return
-      when "srgb"
-        render :screenreader
-        return
+      version = @current_user.preferred_gradebook_version
+      if version == '2'
+        render :gradebook and return
+      elsif version == "gradezilla" && @context.root_account.feature_enabled?(:gradezilla)
+        render :gradezilla and return
+      elsif version == "srgb"
+        render :screenreader and return
+      else
+        render :gradebook and return
       end
     end
-  end
-
-  def gradebook2
-    redirect_to action: :show
   end
 
   def post_grades_tools
@@ -647,11 +645,7 @@ class GradebooksController < ApplicationController
     groups ||= @context.assignment_groups.active
 
     percentage = lambda do |weight|
-      # find the smallest precision necessary to capture up to two digits of
-      # significant decimals, but to avoid unnecessary zeros on the end. (so we
-      # can have 100%, but still have 33.33%, for example)
-      precision = sprintf('%.2f', weight % 1).sub(/^(?:0|1)\.(\d?[1-9])?0*$/, '\1').length
-      number_to_percentage(weight, :precision => precision)
+      I18n.n(weight, percentage: true)
     end
 
     points_possible =
@@ -722,15 +716,6 @@ class GradebooksController < ApplicationController
     js_env :total_grade_warning => warning if warning
   end
   private :set_gradebook_warnings
-
-
-  def assignment_groups_json(opts={})
-    @context.assignment_groups.active.preload(:published_assignments).map { |g|
-      assignment_group_json(g, @current_user, session, ['assignments'], {
-        stringify_json_ids: opts[:stringify_json_ids] || stringify_json_ids?
-      })
-    }
-  end
 
   private
 

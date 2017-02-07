@@ -595,7 +595,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
       context "as a student" do
         before :once do
-          course(:active_all => true)
+          course_factory(active_all: true)
           setup_DA
         end
 
@@ -617,7 +617,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
       context "as an observer" do
         before :once do
-          course(:active_all => true)
+          course_factory(active_all: true)
           setup_DA
           @observer = User.create
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @course.course_sections.first, :enrollment_state => 'active', :allow_multiple_enrollments => true)
@@ -721,7 +721,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
     it "returns due dates as they apply to the user" do
       course_with_student(active_all: true)
       @user = @student
-      @student.enrollments.map(&:destroy_permanently!)
+      @student.enrollments.each(&:destroy_permanently!)
       @assignment = @course.assignments.create!(title: "Test Assignment", description: "public stuff")
       @section = @course.course_sections.create!(name: "afternoon delight")
       @course.enroll_user(@student, "StudentEnrollment", section: @section, enrollment_state: :active)
@@ -735,7 +735,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
     it "returns original assignment due dates" do
       course_with_student(:active_all => true)
       @user = @teacher
-      @student.enrollments.map(&:destroy_permanently!)
+      @student.enrollments.each(&:destroy_permanently!)
       @assignment = @course.assignments.create!(
         :title => "Test Assignment",
         :description => "public stuff",
@@ -783,7 +783,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       end
 
       it "shows unpublished assignments to teachers" do
-        user
+        user_factory
         @enrollment = @course.enroll_user(@user, 'TeacherEnrollment')
         @enrollment.course = @course # set the reverse association
 
@@ -2175,6 +2175,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         acct = @course.account
         acct.turnitin_account_id = 0
         acct.turnitin_shared_secret = "blah"
+        acct.settings[:enable_turnitin] = true
         acct.save!
       end
 
@@ -2525,6 +2526,18 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           @assignment = create_assignment(due_at: 3.days.from_now, only_visible_to_overrides: false)
           call_update({ only_visible_to_overrides: true }, 201)
           expect(@assignment.reload.only_visible_to_overrides).to eql true
+        end
+
+        it "allows disabling post_to_sis when due in a closed grading period" do
+          @assignment = create_assignment(due_at: 3.days.ago, post_to_sis: true)
+          call_update({ post_to_sis: false }, 201)
+          expect(@assignment.reload.post_to_sis).to eq(false)
+        end
+
+        it "allows enabling post_to_sis when due in a closed grading period" do
+          @assignment = create_assignment(due_at: 3.days.ago, post_to_sis: false)
+          call_update({ post_to_sis: true }, 201)
+          expect(@assignment.reload.post_to_sis).to eq(true)
         end
 
         it "does not allow disabling only_visible_to_overrides when due in a closed grading period" do
@@ -2921,7 +2934,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           'topic_children' => [],
           'locked' => false,
           'can_lock' => true,
-          'can_unlock' => true,
+          'comments_disabled' => false,
           'locked_for_user' => false,
           'root_topic_id' => @topic.root_topic_id,
           'podcast_url' => nil,
@@ -2975,7 +2988,8 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       end
 
       it "returns the dates for assignment as they apply to the user" do
-        @student.enrollments.map(&:destroy_permanently!)
+        Score.where(enrollment_id: @student.enrollments).delete_all
+        @student.enrollments.each(&:destroy_permanently!)
         @assignment = @course.assignments.create!(
           :title => "Test Assignment",
           :description => "public stuff"
@@ -2992,7 +3006,8 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       end
 
       it "returns original assignment due dates" do
-        @student.enrollments.map(&:destroy_permanently!)
+        Score.where(enrollment_id: @student.enrollments).delete_all
+        @student.enrollments.each(&:destroy_permanently!)
         @assignment = @course.assignments.create!(
           :title => "Test Assignment",
           :description => "public stuff",
@@ -3383,12 +3398,15 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
     end
 
     context "when turnitin_enabled is true on the context" do
-      before {
-        @course.account.update_attributes! turnitin_account_id: 1234,
-                                                turnitin_shared_secret: 'foo',
-                                                turnitin_host: 'example.com'
+      before(:once) do
+        account = @course.account
+        account.turnitin_account_id = 1234
+        account.turnitin_shared_secret = 'foo'
+        account.turnitin_host = 'example.com'
+        account.settings[:enable_turnitin] = true
+        account.save!
         @assignment.reload
-      }
+      end
 
       it "contains a turnitin_enabled key" do
         expect(result.has_key?('turnitin_enabled')).to eq true

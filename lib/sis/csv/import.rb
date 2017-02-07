@@ -233,13 +233,17 @@ module SIS
 
         if update_progress?
           if @parallelism > 1
-            SisBatch.transaction do
-              @batch.reload(select: 'data, progress', lock: :no_key_update)
-              @current_row += @batch.data[:current_row]
-              @batch.data[:current_row] = @current_row
-              @batch.progress = [calculate_progress, 99].min
-              @batch.save
-              @current_row = 0
+            begin
+              SisBatch.transaction do
+                @batch.reload(select: 'data, progress', lock: :no_key_update)
+                @current_row += @batch.data[:current_row]
+                @batch.data[:current_row] = @current_row
+                @batch.progress = [calculate_progress, 99].min
+                @batch.save
+                @current_row = 0
+              end
+            rescue ActiveRecord::RecordNotFound
+              return
             end
           else
             @batch.fast_update_progress( (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100)

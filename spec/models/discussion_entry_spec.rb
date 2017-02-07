@@ -60,7 +60,7 @@ describe DiscussionEntry do
   end
 
   it "should preserve parent_id if valid" do
-    course
+    course_factory
     entry = topic.discussion_entries.create!
     sub_entry = topic.discussion_entries.build
     sub_entry.parent_id = entry.id
@@ -269,7 +269,7 @@ describe DiscussionEntry do
     before :once do
       course_with_student(:active_all => true)
       @author = @user
-      @reader = user()
+      @reader = user_factory()
       @course.enroll_student(@author)
       @course.enroll_student(@reader)
 

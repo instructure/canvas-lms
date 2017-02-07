@@ -215,10 +215,13 @@ module BasicLTI
           submission_hash[:submission_type] = 'online_url'
         elsif (result_data = result_data_download_url)
           url = result_data[:url]
-          attachment = assignment.attachments.create!(
-            display_name: result_data[:name],
+          attachment = Attachment.create!(
+            shard: user.shard,
+            context: user,
             file_state: 'deleted',
             workflow_state: 'unattached',
+            filename: result_data[:name],
+            display_name: result_data[:name],
             user: user
           )
 

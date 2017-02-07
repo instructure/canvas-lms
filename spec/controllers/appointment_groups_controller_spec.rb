@@ -20,8 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe AppointmentGroupsController do
   before :once do
-    @course2 = course(active_all: true)
-    course(active_all: true)
+    @course2 = course_factory(active_all: true)
+    course_factory(active_all: true)
     student_in_course(active_all: true)
     @next_year = Time.now.year + 1
     @ag = AppointmentGroup.create!(:title => "blah", :contexts => [@course, @course2],

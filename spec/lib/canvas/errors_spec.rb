@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_dependency "canvas/errors"
 module Canvas
   describe Errors do
     before(:each) do

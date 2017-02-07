@@ -7,11 +7,13 @@ require [
 ], ($, I18n) ->
 
   dataReady = (data, service_id) ->
+
+    e = jQuery.Event( "externalContentReady" )
+    e.contentItems = data
+    e.service_id = service_id
+    parentWindow.$(parentWindow).trigger "externalContentReady", e
+
     if parentWindow[callback] and parentWindow[callback].ready
-      e = jQuery.Event( "externalContentReady" )
-      e.contentItems = data
-      e.service_id = service_id
-      parentWindow.$(parentWindow).trigger "externalContentReady", e
       parentWindow[callback].ready data
       setTimeout (->
         if callback == 'external_tool_dialog'

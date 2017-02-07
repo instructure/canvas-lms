@@ -72,7 +72,7 @@ describe ExternalToolsController do
 
     it "does not return a JWT token for another context" do
       teacher_course = @course
-      other_course = course()
+      other_course = course_factory()
 
       @tool.context_id = other_course.id
       @tool.save!
@@ -572,7 +572,18 @@ describe ExternalToolsController do
         @tool.save!
 
         get :show, course_id: @course.id, id: @tool.id, launch_type: 'migration_selection'
-        expect(assigns[:lti_launch].resource_url).to eq 'http://www.instructure.com/test?first=rory&last=williams'
+        expect(assigns[:lti_launch].params['first']).to be_nil
+      end
+
+      it "does not copy query params to POST if oauth_compliant tool setting is enabled" do
+        user_session(@teacher)
+        @course.root_account.disable_feature!(:disable_lti_post_only)
+        @tool.url = 'http://www.instructure.com/test?first=rory&last=williams'
+        @tool.settings[:oauth_compliant] = true
+        @tool.save!
+
+        get :show, course_id: @course.id, id: @tool.id, launch_type: 'migration_selection'
+        expect(assigns[:lti_launch].params['first']).to be_nil
       end
     end
   end
@@ -651,7 +662,7 @@ describe ExternalToolsController do
     end
 
     it "should remove query params when post_only is set" do
-      u = user(:active_all => true)
+      u = user_factory(active_all: true)
       account.account_users.create!(user: u)
       user_session(@user)
 
@@ -662,7 +673,7 @@ describe ExternalToolsController do
     end
 
     it "should not remove query params when post_only is not set" do
-      u = user(:active_all => true)
+      u = user_factory(active_all: true)
       account.account_users.create!(user: u)
       user_session(@user)
 
@@ -672,7 +683,7 @@ describe ExternalToolsController do
     end
 
     it "adds params from secure_params" do
-      u = user(:active_all => true)
+      u = user_factory(active_all: true)
       account.account_users.create!(user: u)
       user_session(@user)
       tool.save!
@@ -695,7 +706,7 @@ describe ExternalToolsController do
       end
 
       it "lets you specify the selection_type" do
-        u = user(active_all: true)
+        u = user_factory(active_all: true)
         account.account_users.create!( user: u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
@@ -705,7 +716,7 @@ describe ExternalToolsController do
       end
 
       it "creates a content-item return url with an id" do
-        u = user(active_all: true)
+        u = user_factory(active_all: true)
         account.account_users.create!(user:u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
@@ -716,7 +727,7 @@ describe ExternalToolsController do
       end
 
       it "sets the auto_create param to true" do
-        u = user(active_all: true)
+        u = user_factory(active_all: true)
         account.account_users.create!(user:u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
@@ -726,7 +737,7 @@ describe ExternalToolsController do
       end
 
       it "sets the accept_unsigned param to false" do
-        u = user(active_all: true)
+        u = user_factory(active_all: true)
         account.account_users.create!(user:u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
@@ -736,7 +747,7 @@ describe ExternalToolsController do
       end
 
       it "adds a data element with a jwt that contains the id if a content_item_id param is present " do
-        u = user(active_all: true)
+        u = user_factory(active_all: true)
         account.account_users.create!(user:u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
@@ -748,7 +759,7 @@ describe ExternalToolsController do
       end
 
       it "adds a data element with a jwt that contains the consumer_key if a content_item_id param is present " do
-        u = user(active_all: true)
+        u = user_factory(active_all: true)
         account.account_users.create!(user:u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
@@ -760,7 +771,7 @@ describe ExternalToolsController do
       end
 
       it 'adds to the data element the default launch url' do
-        u = user(active_all: true)
+        u = user_factory(active_all: true)
         account.account_users.create!(user:u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
@@ -1166,6 +1177,9 @@ describe ExternalToolsController do
         <lticm:property name="selection_width">500</lticm:property>
         <lticm:property name="selection_height">300</lticm:property>
       </lticm:options>
+      <lticm:property name="oauth_compliant">
+       true
+      </lticm:property>
     </blti:extensions>
     <cartridge_bundle identifierref="BLTI001_Bundle"/>
     <cartridge_icon identifierref="BLTI001_Icon"/>
@@ -1182,6 +1196,7 @@ describe ExternalToolsController do
       expect(assigns[:tool].shared_secret).to eq "secret"
       expect(assigns[:tool].not_selectable).to be_truthy
       expect(assigns[:tool].has_placement?(:editor_button)).to be_truthy
+      expect(assigns[:tool].settings[:oauth_compliant]).to be_truthy
     end
 
     it "should handle advanced xml configurations with no url or domain set" do

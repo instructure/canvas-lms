@@ -89,7 +89,7 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
 
       quiz = course.quizzes.create
 
-      @quiz_submission = quiz.generate_submission(user)
+      @quiz_submission = quiz.generate_submission(user_factory)
       @quiz_submission.quiz_data = quiz_data
       @quiz_submission.save!
     end

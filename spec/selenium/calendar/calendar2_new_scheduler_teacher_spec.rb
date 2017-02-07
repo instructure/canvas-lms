@@ -1,5 +1,6 @@
 require_relative '../common'
 require_relative '../helpers/calendar2_common'
+include Calendar2Common
 
 describe "scheduler" do
   include_context "in-process server selenium tests"
@@ -73,6 +74,21 @@ describe "scheduler" do
         expect(last_group.location_name).to eq location
         expect(last_group.start_at.strftime("%I")).to eq start_time_text
         expect(last_group.end_at.strftime("%I")).to eq end_time_text
+      end
+
+      it 'shows page for editing Appointment Groups', priority: "1", test_id: 2953905 do
+        Account.default.enable_feature!(:better_scheduler)
+        create_appointment_group(contexts: [@course])
+        get "/calendar2"
+        f('.fc-title').click
+        f('.pull-right .group_details').click
+        expect(f('.EditPage')).to include_text("Edit new appointment group")
+      end
+
+      it 'does not show the Find Appointment button for the teacher', priority: "1", test_id: 2936794 do
+        create_appointment_group title: "appointment1"
+        get "/calendar"
+        expect(f('#select-course-component')).not_to contain_css("#FindAppointmentButton")
       end
     end
 

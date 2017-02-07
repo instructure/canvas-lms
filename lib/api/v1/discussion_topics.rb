@@ -111,7 +111,7 @@ module Api::V1::DiscussionTopics
       subscribed: topic.subscribed?(user), topic_children: topic.child_topics.pluck(:id),
       attachments: attachments, published: topic.published?,
       can_unpublish: opts[:user_can_moderate] ? topic.can_unpublish?(opts) : false,
-      locked: topic.locked?, can_lock: topic.can_lock?, can_unlock: topic.can_unlock?,
+      locked: topic.locked?, can_lock: topic.can_lock?, comments_disabled: topic.comments_disabled?,
       author: user_display_json(topic.user, topic.context),
       html_url: html_url, url: html_url, pinned: !!topic.pinned,
       group_category_id: topic.group_category_id, can_group: topic.can_group?(opts) }

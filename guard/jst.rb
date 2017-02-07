@@ -1,11 +1,11 @@
 require 'guard'
-require 'guard/guard'
+require 'guard/plugin'
 require 'fileutils'
 require 'handlebars_tasks'
 require 'parallel'
 
 module Guard
-  class JST < Guard
+  class JST < Plugin
 
 
     DEFAULT_OPTIONS = {
@@ -15,23 +15,22 @@ module Guard
 
     # Initialize Guard::JST.
     #
-    # @param [Array<Guard::Watcher>] watchers the watchers in the Guard block
     # @param [Hash] options the options for the Guard
     # @option options [String] :input the input directory
     # @option options [String] :output the output directory
     # @option options [Boolean] :hide_success hide success message notification
     # @option options [Boolean] :all_on_start generate all JavaScripts files on start
     #
-    def initialize(watchers = [], options = {})
-      watchers = [] if !watchers
+    def initialize(options = {})
+      options[:watchers] ||= []
       defaults = DEFAULT_OPTIONS.clone
 
       if options[:input]
         defaults.merge!({ :output => options[:input] })
-        watchers << ::Guard::Watcher.new(%r{\A(?:vendor/plugins/.*?/)?#{ Regexp.escape(options[:input]) }/(.+\.handlebars)\z})
+        options[:watchers] << ::Guard::Watcher.new(%r{\A(?:vendor/plugins/.*?/)?#{ Regexp.escape(options[:input]) }/(.+\.handlebars)\z})
       end
 
-      super(watchers, defaults.merge(options))
+      super(defaults.merge(options))
     end
 
     # Gets called once when Guard starts.
@@ -49,7 +48,7 @@ module Guard
     # @raise [:task_has_failed] when stop has failed
     #
     # Compiles templates from app/views/jst to public/javascripts/jst
-    def run_on_change(paths)
+    def run_on_modifications(paths)
       paths = paths.map{ |path|
         prefix = path =~ %r{\Avendor/plugins/.*?/} ? $& : ''
         [prefix, path]
@@ -77,11 +76,7 @@ module Guard
 
 
     # Called on file(s) deletions that the Guard watches.
-    #
-    # @param [Array<String>] paths the deleted files or paths
-    # @raise [:task_has_failed] when run_on_change has failed
-    #
-    def run_on_deletion(paths)
+    def run_on_removals(paths)
       paths.each do |file|
         javascript = file.sub(%r{\A#{Regexp.escape(@options[:input])}/(.*?)\.handlebars}, "#{@options[:output]}/\\1.js")
         UI.info "Removing: #{javascript}"

@@ -52,18 +52,24 @@ module SchedulerCommon
     @student1 = User.create!(name: 'Student 1')
     @student2 = User.create!(name: 'Student 2')
     @student3 = User.create!(name: 'Student 3')
+    @teacher1 = User.create!(name: 'teacher')
     @course1.enroll_student(@student1).accept!
-    @course3.enroll_student(@student1).accept!
+    @course1.enroll_teacher(@teacher1).accept!
+    @course1.enroll_student(@student2).accept!
     @course2.enroll_student(@student2).accept!
     @course3.enroll_student(@student3).accept!
+    @course3.enroll_student(@student1).accept!
   end
 
   def create_appointment_groups_for_courses
-    @app1 = AppointmentGroup.create!(appointment_params(title: "Appointment 1", contexts: [@course1]))
+    @app1 = AppointmentGroup.create!(title: "Appointment 1", contexts: [@course1],
+                                     new_appointments: [[Time.zone.now, Time.zone.now + 30.minutes],
+                                                        [Time.zone.now + 30.minutes, Time.zone.now + 1.hour]],
+                                     participants_per_appointment: 1)
     @app1.publish!
     @app2 = AppointmentGroup.create!(appointment_params(title: "Appointment 2", contexts: [@course2]))
     @app2.publish!
-    @app3 = AppointmentGroup.create!(appointment_params(title: "Appointment 3", contexts: [@course1, @course2]))
+    @app3 = AppointmentGroup.create!(appointment_params(title: "Appointment 3", contexts: [@course1, @course3]))
     @app3.publish!
   end
 
@@ -72,7 +78,7 @@ module SchedulerCommon
         title: opts[:title],
         contexts: opts[:contexts],
         new_appointments: [
-          [opts[:start_at] || Time.zone.now + 1.hour, 
+          [opts[:start_at] || Time.zone.now + 1.hour,
            opts[:end_at] || Time.zone.now + 3.hours],
         ],
         participants_per_appointment: opts[:participants] || 4
@@ -100,6 +106,17 @@ module SchedulerCommon
       submit_appointment_group_form(opts[:publish])
       expect(f('.view_calendar_link').text).to eq opts[:new_appointment_text]
     }.to change(AppointmentGroup, :count).by(1)
+  end
+
+  def open_select_courses_modal(course_name)
+    f('#FindAppointmentButton').click
+    click_option('.ic-Input', course_name)
+    f('.ReactModal__Footer-Actions .btn').click
+  end
+
+  # This method closes the modal only when it is already opened. If not, it will open the modal
+  def close_select_courses_modal
+    f('#FindAppointmentButton').click
   end
 
   def click_scheduler_link

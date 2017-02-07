@@ -45,9 +45,9 @@ describe MessageScrubber do
   describe '#scrub' do
 
     before(:each) do
-      @context      = course
+      @context      = course_factory
       @notification = Notification.create!(name: 'Test Notification', category: 'Test')
-      @recipient    = user
+      @recipient    = user_factory
 
       @recipient.communication_channels.create!(path_type: 'email', path: 'user@example.com')
     end
@@ -85,15 +85,15 @@ describe MessageScrubber do
       @notification = Notification.create!(name: 'Test Notification', category: 'Test')
 
       @shard1.activate do
-        @context      = course
-        @recipient    = user(name: 'User One')
+        @context      = course_factory
+        @recipient    = user_factory(name: 'User One')
         @recipient.communication_channels.create!(path_type: 'email', path: 'user1@example.com')
         @messages.concat(old_messages(1))
       end
 
       @shard2.activate do
-        @context      = course
-        @recipient    = user(name: 'User Two')
+        @context      = course_factory
+        @recipient    = user_factory(name: 'User Two')
         @recipient.communication_channels.create!(path_type: 'email', path: 'user2@example.com')
         @messages.concat(old_messages(1))
       end

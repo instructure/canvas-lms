@@ -23,7 +23,7 @@ describe CommMessagesApiController, type: :request do
     context "a site admin" do
       context "with permission" do
         before :once do
-          @test_user = user(:active_all => true)
+          @test_user = user_factory(active_all: true)
           site_admin_user
         end
 
@@ -91,7 +91,7 @@ describe CommMessagesApiController, type: :request do
 
       context "without permission" do
         before do
-          @test_user = user(:active_all => true)
+          @test_user = user_factory(active_all: true)
           account_admin_user_with_role_changes(:account => Account.site_admin,
                                                :role_changes => {:read_messages => false})
         end
@@ -108,7 +108,7 @@ describe CommMessagesApiController, type: :request do
     context "an account admin" do
       context "with permission" do
         before :once do
-          @test_user = user(:active_all => true)
+          @test_user = user_factory(active_all: true)
           account_admin_user_with_role_changes(:account => Account.default,
                                                :role_changes => {:view_notifications => true})
         end
@@ -137,7 +137,7 @@ describe CommMessagesApiController, type: :request do
 
       context "without permission" do
         before do
-          @test_user = user(:active_all => true)
+          @test_user = user_factory(active_all: true)
           account_admin_user_with_role_changes(:account => Account.default,
                                                :role_changes => {:view_notifications => false})
         end
@@ -153,8 +153,8 @@ describe CommMessagesApiController, type: :request do
 
     context "an unauthorized user" do
       before do
-        @test_user = user(:active_all => true)
-        @user = user(:active_all => true)
+        @test_user = user_factory(active_all: true)
+        @user = user_factory(active_all: true)
       end
 
       it "should receive unauthorized" do

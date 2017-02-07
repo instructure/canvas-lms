@@ -87,9 +87,9 @@ $left-offset:  16px;
   text-decoration: underline;
 }
 
-$switch-background: lighten($ic-color-dark, 15%);
+$switch-background: $ic-color-medium-darker;
 $switch-background-disabled: lighten($switch-background, 40%);
-$switch-text: rgba($ic-color-light, 0.6);
+$switch-text: rgba($ic-color-light, 0.8);
 
 .ff-background {
   display: inline-block;

@@ -25,7 +25,7 @@ describe CanvasCassandra do
     CanvasCassandra::Database.allocate.tap do |db|
       db.send(:instance_variable_set, :@db, conn)
       db.send(:instance_variable_set, :@logger, double().as_null_object)
-      db.stub(:sanitize).and_return("")
+      allow(db).to receive(:sanitize).and_return("")
     end
   end
 
@@ -38,7 +38,7 @@ describe CanvasCassandra do
 
     describe "cql3" do
       before do
-        conn.stub(:use_cql3?).and_return(true)
+        allow(conn).to receive(:use_cql3?).and_return(true)
       end
 
       it "passes the consistency level as a param" do
@@ -54,7 +54,7 @@ describe CanvasCassandra do
 
     describe "cql2" do
       before do
-        conn.stub(:use_cql3?).and_return(false)
+        allow(conn).to receive(:use_cql3?).and_return(false)
       end
 
       it "passes the consistency level in the query string" do
@@ -235,10 +235,10 @@ describe CanvasCassandra do
   describe "#available?" do
     it 'asks #db.active?' do
       expect(db.db).to receive(:active?) { true }
-      expect(db.available?).to be_true
+      expect(db.available?).to be_truthy
 
       expect(db.db).to receive(:active?) { false }
-      expect(db.available?).to be_false
+      expect(db.available?).to be_falsey
     end
   end
 

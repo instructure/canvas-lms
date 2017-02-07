@@ -24,10 +24,10 @@ describe "/assignments/_syllabus_content" do
     def setup_and_render_context(type, opts={})
       case type
       when :anonymous
-        course :active_all => true
+        course_factory :active_all => true
       when :non_enrolled_user
-        course :active_all => true
-        user
+        course_factory :active_all => true
+        user_factory
       when :enrolled_user
         course_with_student :active_all => true
       end
@@ -44,7 +44,7 @@ describe "/assignments/_syllabus_content" do
     end
 
     before(:each) do
-      course :active_all => true
+      course_factory :active_all => true
       @course.is_public = true
       @course.save!
     end

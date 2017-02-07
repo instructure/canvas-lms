@@ -284,3 +284,15 @@ input.move-module-label-spacer {
 .require-sequential {
   margin-left: 20px;
 }
+
+.offline_web_export_view {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  small {
+    padding-top: 6px;
+  }
+  form {
+    margin: 0;
+  }
+}

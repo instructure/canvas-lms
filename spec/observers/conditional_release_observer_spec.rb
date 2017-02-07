@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ConditionalReleaseObserver do
   before :once do
-    course.offer!
+    course_factory.offer!
 
     @module = @course.context_modules.create!(:name => "cyoe module")
     @assignment = @course.assignments.create!(:name => "cyoe asgn", :submission_types => ["online_text_entry"], :points_possible => 100)

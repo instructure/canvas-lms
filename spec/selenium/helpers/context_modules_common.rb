@@ -160,6 +160,14 @@ module ContextModulesCommon
     @module = @course.context_modules.create!(:name => "some module")
   end
 
+  def add_modules_and_set_prerequisites
+    @module1 = @course.context_modules.create!(:name => "First module")
+    @module2 = @course.context_modules.create!(:name => "Second module")
+    @module3 = @course.context_modules.create!(:name => "Third module")
+    @module3.prerequisites = "module_#{@module1.id},module_#{@module2.id}"
+    @module3.save!
+  end
+
   def edit_module_item(module_item)
     module_item.find_element(:css, '.al-trigger').click
     wait_for_ajaximations

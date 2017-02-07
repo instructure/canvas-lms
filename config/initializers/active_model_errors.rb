@@ -105,6 +105,12 @@ module ActiveModel
       end
     end
 
+    class ErrorMessageSet
+      def grep(*args)
+        Array(find(args).first)
+      end
+    end
+
     module AutosaveAssociation
       def _ensure_no_duplicate_errors
         errors.error_collection.keys.each do |attribute|

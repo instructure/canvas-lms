@@ -172,16 +172,6 @@ shared_context "in-process server selenium tests" do
     Delayed::Backend::ActiveRecord::Job::Failed.stubs(:connection).returns(@dj_connection)
   end
 
-  around do |example|
-    Rails.logger.capture_messages do
-      example.run
-    end
-  end
-
-  before do
-    SeleniumDriverSetup.start_capturing_video
-  end
-
   after(:each) do |example|
     begin
       clear_timers!
@@ -192,10 +182,20 @@ shared_context "in-process server selenium tests" do
     rescue Selenium::WebDriver::Error::WebDriverError
       # we want to ignore selenium errors when attempting to wait here
     ensure
-      exception = $ERROR_INFO || example.exception
-      SeleniumDriverSetup.note_recent_spec_run(example, exception)
-      SeleniumDriverSetup.record_errors(example, exception, Rails.logger.captured_messages)
       SeleniumDriverSetup.disallow_requests!
+    end
+  end
+
+  def record_spec_info(example)
+    Rails.logger.capture_messages do
+      begin
+        SeleniumDriverSetup.start_capturing_video
+        yield
+      ensure
+        exception = $ERROR_INFO || example.exception
+        SeleniumDriverSetup.note_recent_spec_run(example, exception)
+        SeleniumDriverSetup.record_errors(example, exception, Rails.logger.captured_messages)
+      end
     end
   end
 end

@@ -65,8 +65,10 @@ define [
         VALID_DATE_RANGE: {},
         COURSE_ID: 1,
       })
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       $(".ui-dialog").remove()
       $("ul[id^=ui-id-]").remove()
@@ -241,6 +243,7 @@ define [
     view = @editView(in_closed_grading_period: true)
     view.$el.appendTo $('#fixtures')
 
+    ok view.$el.find('#assignment_name').attr('readonly')
     ok view.$el.find('#assignment_points_possible').attr('readonly')
     ok view.$el.find('#assignment_group_id').attr('readonly')
     equal view.$el.find('#assignment_group_id').attr('aria-readonly'), 'true'
@@ -249,17 +252,22 @@ define [
     ok view.$el.find('#has_group_category').attr('readonly')
     equal view.$el.find('#has_group_category').attr('aria-readonly'), 'true'
 
-  test 'ignoreClickHandler is called for a disabled checkbox', ->
+  test 'does not disable post to sis when inClosedGradingPeriod', ->
+    ENV.POST_TO_SIS = true
+    view = @editView(in_closed_grading_period: true)
+    view.$el.appendTo $('#fixtures')
+    notOk view.$el.find('#assignment_post_to_sis').attr('disabled')
+
+  test 'disableCheckbox is called for a disabled checkbox', ->
     view = @editView(in_closed_grading_period: true)
     view.$el.appendTo $('#fixtures')
     $('<input type="checkbox" id="checkbox_fixture"/>').appendTo $(view.$el)
 
     # because we're stubbing so late we must call disableFields() again
-    ignoreClickHandlerStub =  @stub view, 'ignoreClickHandler'
+    disableCheckboxStub =  @stub view, 'disableCheckbox'
     view.disableFields()
 
-    view.$el.find('#checkbox_fixture').click()
-    equal ignoreClickHandlerStub.calledOnce, true
+    equal disableCheckboxStub.called, true
 
   test 'ignoreClickHandler is called for a disabled radio', ->
     view = @editView(in_closed_grading_period: true)
@@ -299,6 +307,7 @@ define [
     view = @editView()
     view.$el.appendTo $('#fixtures')
 
+    notOk view.$el.find('#assignment_name').attr('readonly')
     notOk view.$el.find('#assignment_points_possible').attr('readonly')
     notOk view.$el.find('#assignment_group_id').attr('readonly')
     notOk view.$el.find('#assignment_group_id').attr('aria-readonly')
@@ -307,16 +316,36 @@ define [
     notOk view.$el.find('#has_group_category').attr('readonly')
     notOk view.$el.find('#has_group_category').attr('aria-readonly')
 
+  module 'EditView: handleGroupCategoryChange',
+    setup: ->
+      fakeENV.setup()
+      ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
+
+    teardown: ->
+      @server.restore()
+      fakeENV.teardown()
+      document.getElementById('fixtures').innerHTML = ''
+
+    editView: ->
+      editView.apply(this, arguments)
+
+  test 'calls handleModeratedGradingChange', ->
+    view = @editView()
+    spy = @spy(view, 'handleModeratedGradingChange')
+    view.handleGroupCategoryChange()
+
+    ok spy.calledOnce
+
   module 'EditView: group category inClosedGradingPeriod',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
-      @oldAddGroupCategory = window.addGroupCategory
-      window.addGroupCategory = @stub()
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
-      window.addGroupCategory = @oldAddGroupCategory
       document.getElementById("fixtures").innerHTML = ""
 
     editView: ->
@@ -339,14 +368,12 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
-      $.fn.extend
-        timeoutTooltip: ->
-          return this
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       document.getElementById('fixtures').innerHTML = ''
-      delete $.fn.timeoutTooltip
 
     editView: ->
       editView.apply(this, arguments)
@@ -374,8 +401,10 @@ define [
       fakeENV.setup()
       ENV.COURSE_ID = 1
       @stub(userSettings, 'contextGet').returns {submission_types: "foo", peer_reviews: "1", assignment_group_id: 99}
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       document.getElementById("fixtures").innerHTML = ""
 
@@ -413,8 +442,10 @@ define [
       fakeENV.setup()
       ENV.COURSE_ID = 1
       @stub(userSettings, 'contextGet').returns null
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       document.getElementById("fixtures").innerHTML = ""
 
@@ -431,8 +462,10 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       document.getElementById("fixtures").innerHTML = ""
 
@@ -462,8 +495,10 @@ define [
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
       ENV.CONDITIONAL_RELEASE_ENV = { assignment: { id: 1 }, jwt: 'foo' }
       $(document).on 'submit', -> false
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       $(document).off 'submit'
       document.getElementById("fixtures").innerHTML = ""
@@ -528,8 +563,10 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       document.getElementById("fixtures").innerHTML = ""
 
@@ -563,8 +600,10 @@ define [
       fakeENV.setup()
       ENV.COURSE_ID = 1
       ENV.PLAGIARISM_DETECTION_PLATFORM = true
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       document.getElementById("fixtures").innerHTML = ""
 

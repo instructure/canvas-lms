@@ -110,7 +110,7 @@ require 'securerandom'
 class FilesController < ApplicationController
   before_filter :require_user, only: :create_pending
   before_filter :require_context, except: [
-    :assessment_question_show, :image_thumbnail, :show_thumbnail, :preflight,
+    :assessment_question_show, :image_thumbnail, :show_thumbnail,
     :create_pending, :s3_success, :show, :api_create, :api_create_success, :api_create_success_cors,
     :api_show, :api_index, :destroy, :api_update, :api_file_status, :public_url
   ]
@@ -531,7 +531,7 @@ class FilesController < ApplicationController
   def render_attachment(attachment)
     respond_to do |format|
       if params[:preview] && attachment.mime_class == 'image'
-        format.html { redirect_to '/images/lock.png' }
+        format.html { redirect_to '/images/svg-icons/icon_lock.svg' }
       else
         if @files_domain
           @headers = false
@@ -692,19 +692,6 @@ class FilesController < ApplicationController
       #set cache to expoire in 1 day, max-age take seconds, and Expires takes a date
       response.headers["Cache-Control"] = "private, max-age=86400"
       response.headers["Expires"] = 1.day.from_now.httpdate
-    end
-  end
-
-  def preflight
-    @context = Context.find_by_asset_string(params[:context_code])
-    if authorized_action(@context, @current_user, :manage_files)
-      @current_folder = Folder.find_folder(@context, params[:folder_id])
-      if @current_folder
-        params[:filenames] = [] if params[:filenames].blank?
-        return render :json => {
-          :duplicates => @current_folder.active_file_attachments.map(&:display_name) & params[:filenames]
-        }
-      end
     end
   end
 
@@ -1057,6 +1044,7 @@ class FilesController < ApplicationController
       end
 
       @attachment.attributes = process_attachment_params(params)
+      @attachment.set_publish_state_for_usage_rights if @attachment.context.is_a?(Group)
       if !@attachment.locked? && @attachment.locked_changed? && @attachment.usage_rights_id.nil? && @context.respond_to?(:feature_enabled?)  && @context.feature_enabled?(:usage_rights_required)
         return render :json => { :message => I18n.t('This file must have usage_rights set before it can be published.') }, :status => :bad_request
       end

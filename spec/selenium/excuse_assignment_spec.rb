@@ -1,9 +1,9 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/groups_common')
 
 describe 'Excuse an Assignment' do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
   include GroupsCommon
 
   before do |example|

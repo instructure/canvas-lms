@@ -1,0 +1,99 @@
+<table>
+    <%=  render :partial => 'terms_parameters', :locals => { :all_terms_option => true } %>
+    <tr>
+        <td>
+            <label class="checkbox">
+                <%= check_box_tag "parameters[users]"   %>
+                <%= t('account_reports.default.users.check_box','Users CSV') %>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="checkbox">
+                <%= check_box_tag "parameters[accounts]"   %>
+                <%= t('account_reports.default.accounts.check_box','Accounts CSV') %>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="checkbox">
+                <%= check_box_tag "parameters[terms]"   %>
+                <%= t('account_reports.default.terms.check_box','Terms CSV') %>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="checkbox">
+                <%= check_box_tag "parameters[courses]"   %>
+                <%= t('account_reports.default.courses.check_box','Courses CSV') %>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="checkbox">
+                <%= check_box_tag "parameters[sections]"   %>
+                <%= t('account_reports.default.sections.check_box','Sections CSV') %>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="checkbox">
+                <%= check_box_tag "parameters[enrollments]"   %>
+                <%= t('account_reports.default.enrollments.check_box','Enrollments CSV') %>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="checkbox">
+                <%= check_box_tag "parameters[groups]"   %>
+                <%= t('account_reports.default.groups.check_box','Groups CSV') %>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="checkbox">
+                <%= check_box_tag "parameters[group_membership]"   %>
+                <%= t('account_reports.default.group_membership.login.check_box','Group Membership CSV') %>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="checkbox">
+                <%= check_box_tag "parameters[group_categories]"   %>
+                <%= t('account_reports.default.group_categories.login.check_box','Group Categories CSV') %>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="checkbox">
+                <%= check_box_tag "parameters[xlist]"   %>
+                <%= t('account_reports.default.xlist.check_box','X list CSV') %>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="checkbox">
+                <%= check_box_tag "parameters[created_by_sis]"   %>
+                <%= t('Created by SIS') %>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>
+                <%= t('account_reports.sis_default.parameters.note', %{*Term settings only impact Courses, Sections, Enrollments, and X list CSV files.}) %>
+            </label>
+        </td>
+    </tr>
+    <%=  render :partial => 'include_deleted_parameter' %>
+</table>

@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/users/admin_merge" do
   it "should only list accounts that the user can merge users in" do
-    user
+    user_factory
     @account = Account.create!(:name => "My Root Account")
     @account2 = @account.sub_accounts.create!(:name => "Sub-Account")
     @account.account_users.create!(user: @user)
@@ -33,7 +33,7 @@ describe "/users/admin_merge" do
     expect(@user.associated_accounts.map(&:id).sort).to eq [@account.id, @account2.id, Account.default.id].sort
 
     assigns[:current_user] = @user
-    user
+    user_factory
     assigns[:user] = @user
 
     render "users/admin_merge"

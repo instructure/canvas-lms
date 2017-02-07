@@ -63,7 +63,7 @@ describe CollaborationsController, type: :request do
     end
 
     it 'should require authorization' do
-      user
+      user_factory
       raw_api_call(:get, url, url_options)
       expect(response.code).to eq '401'
     end
@@ -171,7 +171,7 @@ describe CollaborationsController, type: :request do
 
     describe 'a non-group member' do
       before(:each) do
-        user
+        user_factory
       end
 
       it 'should receive a 401' do

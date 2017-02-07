@@ -28,9 +28,9 @@ define([
     hostname = (hostname || "").split(":")[0];
     var parts = hostname.split("."),
         length = parts.length;
-    return ( length > 1  ? 
-      [ parts[length - 2] , parts[length - 1] ] : 
-      parts 
+    return ( length > 1  ?
+      [ parts[length - 2] , parts[length - 1] ] :
+      parts
     ).join("");
   }
   var locationTld = getTld(window.location.hostname);
@@ -39,7 +39,7 @@ define([
     //if a browser doesnt support <a>.hostname then just dont mark anything as external, better to not get false positives.
     return !!(href && href.length && !href.match(/^(mailto\:|javascript\:)/) && element.hostname && getTld(element.hostname) != locationTld);
   };
-    
+
   window.equella = {
     ready: function(data) {
       $(document).triggerHandler('equella_ready', data);
@@ -53,7 +53,7 @@ define([
   }).bind('equella_cancel', function() {
     $("#equella_dialog").dialog('close');
   });
-  
+
   window.external_tool_dialog = {
     ready: function(data) {
       var e = jQuery.Event( 'selection' )
@@ -66,11 +66,10 @@ define([
       $("#resource_selection_dialog").dialog('close');
       $("#homework_selection_dialog:visible").dialog('close');
     }
-  }
-  
+  };
+
   window.jsonFlickrApi = function(data) {
     $("#instructure_image_search").triggerHandler('search_results', data);
   };
 
 });
-

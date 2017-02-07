@@ -1,5 +1,6 @@
 defaults: &defaults
   # host: 'the hostname to use for static asset cdn, eg: https://mydistribution.cloudfront.net'
+  # region: us-east-1
   # bucket: "name of the s3 bucket to push things to"
   # aws_access_key_id: "secret aws_access_key_id that has write access to that bucket"
   # aws_secret_access_key: "secret_access_key for that access_key_id"

@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe CanvasBreachMitigation::MaskingSecrets do
   before do
-    Rails = mock("Rails") unless defined? Rails
+    Rails = double("Rails") unless defined? Rails
   end
 
   let(:masking_secrets) { CanvasBreachMitigation::MaskingSecrets }

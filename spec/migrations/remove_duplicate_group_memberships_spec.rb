@@ -7,7 +7,7 @@ describe DataFixup::RemoveDuplicateGroupMemberships do
     mig.down
 
     group_model
-    user
+    user_factory
     member1 = @group.group_memberships.create!(:user => @user)
     member1.workflow_state = 'rejected'
     member1.save!

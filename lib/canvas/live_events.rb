@@ -17,8 +17,8 @@ module Canvas::LiveEvents
 
   def self.get_course_data(course)
     {
-      course_id: course.id,
-      account_id: course.account_id,
+      course_id: course.global_id,
+      account_id: course.global_account_id,
       name: course.name,
       created_at: course.created_at,
       updated_at: course.updated_at,
@@ -69,7 +69,7 @@ module Canvas::LiveEvents
 
   def self.account_notification_created(notification)
     post_event_stringified('account_notification_created', {
-      account_notification_id: notification.id,
+      account_notification_id: notification.global_id,
       subject: LiveEvents.truncate(notification.subject),
       message: LiveEvents.truncate(notification.message),
       icon: notification.icon,
@@ -172,7 +172,7 @@ module Canvas::LiveEvents
 
   def self.get_user_data(user)
     {
-      user_id: user.id,
+      user_id: user.global_id,
       name: user.name,
       short_name: user.short_name,
       workflow_state: user.workflow_state,
@@ -192,15 +192,15 @@ module Canvas::LiveEvents
   def self.get_enrollment_data(enrollment)
     {
 
-      enrollment_id: enrollment.id,
-      course_id: enrollment.course_id,
-      user_id: enrollment.user_id,
+      enrollment_id: enrollment.global_id,
+      course_id: enrollment.global_course_id,
+      user_id: enrollment.global_user_id,
       user_name: enrollment.user_name,
       type: enrollment.type,
       created_at: enrollment.created_at,
       updated_at: enrollment.updated_at,
       limit_privileges_to_course_section: enrollment.limit_privileges_to_course_section,
-      course_section_id: enrollment.course_section_id,
+      course_section_id: enrollment.global_course_section_id,
       workflow_state: enrollment.workflow_state
     }
   end
@@ -216,7 +216,7 @@ module Canvas::LiveEvents
   def self.get_enrollment_state_data(enrollment_state)
     {
 
-      enrollment_id: enrollment_state.enrollment_id,
+      enrollment_id: enrollment_state.global_enrollment_id,
       state: enrollment_state.state,
       state_started_at: enrollment_state.state_started_at,
       state_is_current: enrollment_state.state_is_current,
@@ -236,8 +236,8 @@ module Canvas::LiveEvents
 
   def self.user_account_association_created(assoc)
     post_event_stringified('user_account_association_created', {
-      user_id: assoc.user_id,
-      account_id: assoc.account_id,
+      user_id: assoc.global_user_id,
+      account_id: assoc.global_account_id,
       created_at: assoc.created_at,
       updated_at: assoc.updated_at,
       is_admin: !(assoc.account.root_account.all_account_users_for(assoc.user).empty?),

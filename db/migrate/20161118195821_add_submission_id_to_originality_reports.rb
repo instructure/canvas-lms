@@ -1,4 +1,4 @@
-class AddSubmissionIdToOriginalityReports < ActiveRecord::Migration
+class AddSubmissionIdToOriginalityReports < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

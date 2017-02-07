@@ -131,13 +131,19 @@ module Api::V1::Submission
       hash['media_comment'] = media_comment_json(:media_id => attempt.media_comment_id, :media_type => attempt.media_comment_type)
     end
 
-    if attempt.turnitin_data.present? && attempt.grants_right?(@current_user, :view_turnitin_report)
-      turnitin_hash = attempt.turnitin_data.dup
+    if attempt.originality_reports.present?
+       hash['has_originality_report'] = true
+    end
+
+    if attempt.originality_data.present? && attempt.grants_right?(@current_user, :view_turnitin_report)
+      turnitin_hash = attempt.originality_data.dup
       turnitin_hash.delete(:last_processed_attempt)
       hash['turnitin_data'] = turnitin_hash
     end
 
-    if attempt.vericite_data(false).present? && attempt.can_view_plagiarism_report('vericite', @current_user, session)
+    if attempt.vericite_data(false).present? &&
+      attempt.can_view_plagiarism_report('vericite', @current_user, session) &&
+      attempt.assignment.vericite_enabled?
       vericite_hash = attempt.vericite_data(false).dup
       vericite_hash.delete(:last_processed_attempt)
       hash['vericite_data'] = vericite_hash

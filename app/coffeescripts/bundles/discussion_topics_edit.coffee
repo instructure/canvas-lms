@@ -9,7 +9,6 @@ require [
   'compiled/collections/SectionCollection'
   'compiled/str/splitAssetString'
   'grading_standards'
-  'manage_groups'
 ], ($, DiscussionTopic, Announcement, DueDateList, EditView,
 OverrideView, AssignmentGroupCollection, SectionCollection,
 splitAssetString) ->

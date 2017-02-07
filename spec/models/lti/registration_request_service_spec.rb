@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_dependency "lti/registration_request_service"
 
 module Lti
   describe RegistrationRequestService do

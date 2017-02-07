@@ -15,8 +15,10 @@
         <span class="screenreader-only">{{#t 'menu.settings'}}Settings{{/t}}</span>
       </a>
       <ul class="al-options">
-        <li><a href="#" class="icon-edit edit-menu-item" title="{{#t 'menu.edit'}}Edit{{/t}}">{{#t 'menu.edit'}}Edit{{/t}}</a></li>
-        <li><a href="#" class="icon-trash delete-menu-item{{#unless deletable}} disabled{{/unless}}" title="{{#t 'menu.delete'}}Delete{{/t}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>{{#t 'menu.delete'}}Delete{{/t}}</a></li>
+        {{#unless restricted_by_master_course}}
+          <li><a href="#" class="icon-edit edit-menu-item" title="{{#t 'menu.edit'}}Edit{{/t}}">{{#t 'menu.edit'}}Edit{{/t}}</a></li>
+          <li><a href="#" class="icon-trash delete-menu-item{{#unless deletable}} disabled{{/unless}}" title="{{#t 'menu.delete'}}Delete{{/t}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>{{#t 'menu.delete'}}Delete{{/t}}</a></li>
+        {{/unless}}
         {{#unless front_page}}
           <li><a href="#" class="icon-document use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}" title="{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}</a></li>
         {{/unless}}

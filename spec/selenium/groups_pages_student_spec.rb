@@ -300,10 +300,18 @@ describe "groups" do
         move_file_to_folder('example.pdf','destination_folder')
       end
 
-      it "should hide the publish cloud" do
+      it "should hide the publish cloud", priority: "1", test_id: 273628 do
         add_test_files
         get files_page
-        expect(f('#content')).to_not contain_css('.btn-link.published-status')
+        expect(f('#content')).not_to contain_css('.btn-link.published-status')
+      end
+
+      it "does not allow group members to restrict access to a file", priority: "1", test_id: 304672 do
+        add_test_files
+        get files_page
+        f('.ef-item-row .ef-date-created-col').click
+        expect(f('.ef-header')).to contain_css('.ef-header__secondary')
+        expect(f('.ef-header__secondary')).not_to contain_css('.btn-restrict')
       end
     end
 

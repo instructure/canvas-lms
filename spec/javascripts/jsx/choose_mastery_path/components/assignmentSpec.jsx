@@ -14,6 +14,7 @@ define([
       points_possible: 10,
       due_at: new Date(),
       itemId: 1,
+      description: 'a quiz',
       category: {
         id: 'other',
         label: 'Other',
@@ -67,5 +68,13 @@ define([
 
     const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'cmp-assignment__title-link')
     equal(renderedList.length, 1, 'renders link title')
+  })
+
+  test('renders description', () => {
+    const props = defaultProps()
+    const component = renderComponent(props)
+
+    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'ig-description')
+    equal(renderedList.length, 1, 'renders link description')
   })
 })

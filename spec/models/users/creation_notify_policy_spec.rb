@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_dependency "users/creation_notify_policy"
 
 module Users
   describe CreationNotifyPolicy do

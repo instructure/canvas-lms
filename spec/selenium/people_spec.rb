@@ -232,7 +232,7 @@ describe "people" do
       dialog = open_student_group_dialog
       replace_content(f('#new_category_name'), 'new group')
       dialog.find_element(:css, '#enable_self_signup').click
-      fj('input[name="create_group_count"]:visible').send_keys(group_count)
+      replace_content(fj('input[name="create_group_count"]:visible'), group_count)
       submit_form('.group-category-create')
       wait_for_ajaximations
       expect(@course.groups.count).to eq 4
@@ -250,7 +250,7 @@ describe "people" do
       dialog = open_student_group_dialog
       replace_content(f('#new_category_name'), 'new group')
       dialog.find_element(:css, '#split_groups').click
-      fj('input[name="create_group_count"]:visible').send_keys(group_count)
+      replace_content(fj('input[name="create_group_count"]:visible'), group_count)
       expect(@course.groups.count).to eq 0
       submit_form('.group-category-create')
       wait_for_ajaximations
@@ -391,7 +391,7 @@ describe "people" do
     end
 
     it "should remove a student from a section", priority: "1", test_id: 296461 do
-     @student = user
+     @student = user_factory
      @course.enroll_student(@student, allow_multiple_enrollments: true)
      @course.enroll_student(@student, section: @section2, allow_multiple_enrollments: true)
      get "/courses/#{@course.id}/users"
@@ -435,7 +435,7 @@ describe "people" do
     course_with_admin_logged_in
     sec1 = @course.course_sections.create!(name: "section1")
     sec2 = @course.course_sections.create!(name: "section2")
-    @student = user
+    @student = user_factory
     e1 = @course.enroll_student(@student, section: sec1, allow_multiple_enrollments: true)
     @course.enroll_student(@student, section: sec2, allow_multiple_enrollments: true)
     Enrollment.where(:id => e1).update_all(:total_activity_time => 900)
@@ -465,7 +465,7 @@ describe "people" do
 
   context "editing role" do
     before :once do
-      course
+      course_factory
       @section = @course.course_sections.create!(name: "section1")
 
       @teacher = user_with_pseudonym(:active_all => true)
@@ -486,7 +486,7 @@ describe "people" do
     end
 
     it "should not let observers with associated users have their roles changed" do
-      student = user
+      student = user_factory
       @course.enroll_student(student)
       @course.enroll_user(@teacher, "ObserverEnrollment", :allow_multiple_enrollments => true, :associated_user_id => student.id)
 

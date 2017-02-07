@@ -51,7 +51,7 @@ describe UsersController do
     end
 
     it "removes query string when post_only = true" do
-      u = user(:active_all => true)
+      u = user_factory(active_all: true)
       account.account_users.create!(user: u)
       user_session(@user)
       tool.user_navigation = { text: "example" }
@@ -63,7 +63,7 @@ describe UsersController do
     end
 
     it "does not remove query string from url" do
-      u = user(:active_all => true)
+      u = user_factory(active_all: true)
       account.account_users.create!(user: u)
       user_session(@user)
       tool.user_navigation = { text: "example" }
@@ -74,7 +74,7 @@ describe UsersController do
     end
 
     it "uses localized labels" do
-      u = user(:active_all => true)
+      u = user_factory(active_all: true)
       account.account_users.create!(user: u)
       user_session(@user)
 
@@ -86,7 +86,7 @@ describe UsersController do
   describe "index" do
     before :each do
       @a = Account.default
-      @u = user(:active_all => true)
+      @u = user_factory(active_all: true)
       @a.account_users.create!(user: @u)
       user_session(@user)
       @t1 = @a.default_enrollment_term
@@ -131,7 +131,7 @@ describe UsersController do
       settings_mock.stubs(:settings).returns({})
       settings_mock.stubs(:enabled?).returns(true)
 
-      user(:active_all => true)
+      user_factory(active_all: true)
       user_session(@user)
 
       Canvas::Plugin.stubs(:find).returns(settings_mock)
@@ -261,7 +261,7 @@ describe UsersController do
         end
 
         it "should not allow students to self register" do
-          course(:active_all => true)
+          course_factory(active_all: true)
           @course.update_attribute(:self_enrollment, true)
 
           post 'create', :pseudonym => { :unique_id => 'jane@example.com', :password => 'lolwut12', :password_confirmation => 'lolwut12' }, :user => { :name => 'Jane Student', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1', :format => 'json'
@@ -431,7 +431,7 @@ describe UsersController do
       context "self enrollment" do
         before(:once) do
           Account.default.allow_self_enrollment!
-          course(:active_all => true)
+          course_factory(active_all: true)
           @course.update_attribute(:self_enrollment, true)
         end
 
@@ -606,11 +606,11 @@ describe UsersController do
 
   describe "GET 'grades_for_student'" do
     let(:test_course) do
-      test_course = course(active_all: true)
+      test_course = course_factory(active_all: true)
       test_course.root_account.enable_feature!(:multiple_grading_periods)
       test_course
     end
-    let(:student) { user(active_all: true) }
+    let(:student) { user_factory(active_all: true) }
     let!(:student_enrollment) do
       course_with_user('StudentEnrollment', course: test_course, user: student, active_all: true)
     end
@@ -666,7 +666,7 @@ describe UsersController do
 
       it "returns unauthorized if a student is trying to get grades for " \
       "another student (and is not observing that student)" do
-        snooping_student = user(active_all: true)
+        snooping_student = user_factory(active_all: true)
         course_with_user('StudentEnrollment', course: test_course, user: snooping_student, active_all: true)
         user_session(snooping_student)
         get('grades_for_student', grading_period_id: grading_period.id,
@@ -725,9 +725,9 @@ describe UsersController do
 
   describe "GET 'grades'" do
     context "grading periods" do
-      let(:test_course) { course(active_all: true) }
-      let(:student1) { user(active_all: true) }
-      let(:student2) { user(active_all: true) }
+      let(:test_course) { course_factory(active_all: true) }
+      let(:student1) { user_factory(active_all: true) }
+      let(:student2) { user_factory(active_all: true) }
       let(:grading_period_group) { group_helper.legacy_create_for_course(test_course) }
       let!(:grading_period) do
         grading_period_group.grading_periods.create!(
@@ -767,7 +767,7 @@ describe UsersController do
         end
 
         context "with Multiple Grading Periods enabled" do
-          before(:once) { course.root_account.enable_feature!(:multiple_grading_periods) }
+          before(:once) { course_factory.root_account.enable_feature!(:multiple_grading_periods) }
 
           it "returns the grading periods" do
             user_session(observer)
@@ -810,9 +810,9 @@ describe UsersController do
       end
 
       context "as a student" do
-        let(:another_test_course) { course(active_all: true) }
+        let(:another_test_course) { course_factory(active_all: true) }
         let(:test_student) do
-          student = user(active_all: true)
+          student = user_factory(active_all: true)
           course_with_user('StudentEnrollment', course: test_course, user: student, active_all: true)
           course_with_user('StudentEnrollment', course: another_test_course, user: student, active_all: true)
           student
@@ -839,7 +839,7 @@ describe UsersController do
         end
 
         context "with Multiple Grading Periods enabled" do
-          before(:once) { course.root_account.enable_feature!(:multiple_grading_periods) }
+          before(:once) { course_factory.root_account.enable_feature!(:multiple_grading_periods) }
 
           it "returns the grading periods" do
             user_session(test_student)
@@ -886,7 +886,7 @@ describe UsersController do
                 @shard1.activate do
                   account = Account.create!
                   account.enable_feature!(:multiple_grading_periods)
-                  @course2 = course(active_all: true, account: account)
+                  @course2 = course_factory(active_all: true, account: account)
                   course_with_user('StudentEnrollment', course: @course2, user: student1, active_all: true)
                   grading_period_group2 = group_helper.legacy_create_for_course(@course2)
                   @grading_period2 = grading_period_group2.grading_periods.create!(
@@ -911,10 +911,10 @@ describe UsersController do
     it "does not include designers in the teacher enrollments" do
       # teacher needs to be in two courses to get to the point where teacher
       # enrollments are queried
-      @course1 = course(:active_all => true)
-      @course2 = course(:active_all => true)
-      @teacher = user(:active_all => true)
-      @designer = user(:active_all => true)
+      @course1 = course_factory(active_all: true)
+      @course2 = course_factory(active_all: true)
+      @teacher = user_factory(active_all: true)
+      @designer = user_factory(active_all: true)
       @course1.enroll_teacher(@teacher).accept!
       @course2.enroll_teacher(@teacher).accept!
       @course2.enroll_designer(@designer).accept!
@@ -931,9 +931,9 @@ describe UsersController do
     end
 
     it "does not redirect to an observer enrollment with no observee" do
-      @course1 = course(:active_all => true)
-      @course2 = course(:active_all => true)
-      @user = user(:active_all => true)
+      @course1 = course_factory(active_all: true)
+      @course2 = course_factory(active_all: true)
+      @user = user_factory(active_all: true)
       @course1.enroll_user(@user, 'ObserverEnrollment')
       @course2.enroll_student(@user).accept!
 
@@ -1310,8 +1310,8 @@ describe UsersController do
 
   describe '#toggle_recent_activity_dashboard' do
     it 'updates user preference based on value provided' do
-      course
-      user(active_all: true)
+      course_factory
+      user_factory(active_all: true)
       user_session(@user)
 
       expect(@user.preferences[:recent_activity_dashboard]).to be_falsy
@@ -1343,7 +1343,7 @@ describe UsersController do
     end
 
     it 'works with an admin with manage_login_rights' do
-      course
+      course_factory
       account_admin_user(:active_all => true)
       user_session(@user)
 

@@ -24,7 +24,7 @@ describe CanvasPandaPub::Client do
 
   def stub_config(opts = {})
     base = 'http://pandapub.example.com/'
-    CanvasPandaPub::Client.stub(:config) {
+    allow(CanvasPandaPub::Client).to receive(:config) {
       {
         'base_url' => base,
         'application_id' => 'qwerty',
@@ -56,7 +56,7 @@ describe CanvasPandaPub::Client do
 
       CanvasPandaPub.worker.stop!
 
-      stub.should have_been_requested
+      expect(stub).to have_been_requested
     end
   end
 
@@ -65,11 +65,11 @@ describe CanvasPandaPub::Client do
       expires = Time.now + 60
       token = @client.generate_token "/foo", true, true, expires
       payload, _ = JWT.decode(token, "secret")
-      payload['keyId'].should eq("key")
-      payload['channel'].should eq("/qwerty/foo")
-      payload['pub'].should be true
-      payload['sub'].should be true
-      payload['exp'].should eq(expires.to_i)
+      expect(payload['keyId']).to eq("key")
+      expect(payload['channel']).to eq("/qwerty/foo")
+      expect(payload['pub']).to be true
+      expect(payload['sub']).to be true
+      expect(payload['exp']).to eq(expires.to_i)
     end
   end
 end

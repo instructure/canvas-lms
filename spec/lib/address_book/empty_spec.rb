@@ -35,14 +35,14 @@ describe AddressBook::Empty do
 
   describe "known_in_context" do
     it "returns an empty array" do
-      course = course(active_all: true)
+      course = course_factory(active_all: true)
       expect(@address_book.known_in_context(course.asset_string)).to eql([])
     end
   end
 
   describe "count_in_context" do
     it "returns zero" do
-      course = course(active_all: true)
+      course = course_factory(active_all: true)
       expect(@address_book.count_in_context(course.asset_string)).to eql(0)
     end
   end

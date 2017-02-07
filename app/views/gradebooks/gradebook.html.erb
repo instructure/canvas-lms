@@ -1,0 +1,147 @@
+<%
+  content_for :page_title, "Gradebook - #{@context.name}"
+  @body_classes << "gradebook full-width"
+  @show_left_side = true
+  @collapse_course_menu = true
+  @show_embedded_chat = false
+  css_bundle :slickgrid, :gradebook
+  js_bundle :gradebook
+%>
+<div id="keyboard_navigation"></div>
+<div id="gradebook_wrapper">
+<h1 class="screenreader-only"><%= t('Gradebook') %></h1>
+  <div class="gradebook-header">
+    <div class="accessibility_warning">
+      <%= link_to t('Warning: For improved accessibility, please click here to use the Individual View Gradebook.'), context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb"), :id => "accessibility_warning", :class => "screenreader-only" %>
+    </div>
+    <% if @context.feature_enabled?(:outcome_gradebook) || @context.feature_enabled?(:post_grades) %>
+      <nav class="gradebook-navigation">
+        <ul class="nav nav-pills gradebook-navigation-pills">
+          <li class="active">
+            <a href="#" data-id="assignment"><%= t("Grades") %></a>
+          </li>
+          <% if @context.feature_enabled?(:outcome_gradebook) %>
+          <li>
+            <a href="#" data-id="outcome"><%= t("Learning Mastery") %></a>
+          </li>
+          <% end %>
+        </ul>
+      </nav>
+    <% end %>
+    <div class="header-buttons">
+      <div class="post-grades-button-placeholder">
+        <button id="keyboard-shortcuts" class="Button--icon-action Button--active" type="button">
+          <span class="screenreader-only"><%= t('Keyboard Shortcuts') %></span>
+          <i class="icon-keyboard-shortcuts"></i>
+        </button>
+        <% if @post_grades_tools.count > 1 %>
+          <button id="post_grades" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><%= t('Post Grades') %></button>
+          <ul style="display: none;" class="post-grades-menu ui-kyle-menu">
+            <% @post_grades_tools.each do |tool| %>
+              <% case tool[:type] %>
+              <% when :lti %>
+                <li class="external-tools-dialog"><a aria-controls="post_grades_frame_dialog" role="button" data-url="<%= tool[:data_url]%>"><%= tool[:name]%></a></li>
+              <% when :post_grades %>
+                <li class="post-grades-placeholder in-menu"></li>
+              <% when :ellip %>
+                <li class="external-tools-dialog ellip"><a>&hellip;</a></li>
+              <% end %>
+            <% end %>
+          </ul>
+        <% elsif @post_grades_tools.count == 1 %>
+          <% case @post_grades_tools[0][:type] %>
+          <% when :lti %>
+          <button class="external-tools-dialog ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" data-url="<%= @post_grades_tools[0][:data_url]%>"><%= @post_grades_tools[0][:name]%></button>
+          <% when :post_grades %>
+          <span class="post-grades-placeholder"></span>
+          <% end %>
+        <% end %>
+      </div>
+      <a
+        href="<%= context_url(@context, :change_gradebook_version_context_gradebook_url, version: "srgb") %>"
+        class="Button individual-view-button"
+        id="change_gradebook_version_link_holder"
+        type="button"
+      ><%= t("Individual View") %></a>
+      <% if @context.root_account.feature_enabled?(:gradezilla) %>
+        <a
+          href="<%= context_url(@context, :change_gradebook_version_context_gradebook_url, version: "gradezilla") %>"
+          class="Button individual-view-button"
+          id="change_gradebook_version_gradezilla"
+          type="button"
+        ><%= t("Gradezilla") %></a>
+      <% end %>
+      <div class="section-button-placeholder"></div>
+    </div>
+  </div>
+
+  <div class="assignment-gradebook-container hidden">
+    <div id="gradebook-toolbar" class="toolbar">
+      <div class="gradebook_dropdowns">
+        <% if multiple_grading_periods? %>
+          <span class="multiple-grading-periods-selector-placeholder"></span>
+        <% end %>
+      </div>
+      <div class="gradebook_filter" style="display:none">
+        <% placeholder = t('Filter by student name or secondary ID') %>
+        <input type="text" class="search-query" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
+      </div>
+      <div class="gradebook_menu">
+        <span class="ui-buttonset">
+          <% if @gradebook_is_editable && @context.allows_gradebook_uploads? %>
+            <%= link_to(new_course_gradebook_upload_path(@context), class: "ui-button") do %>
+              <i class="icon-import"></i>
+              <%= t 'Import' %>
+            <% end %>
+          <% end %>
+          <button class="ui-button" id="download_csv">
+            <i class="icon-export"></i>
+            <%= t('Export') %>
+          </button>
+          <ul style="display: none;" id="csv_export_options" class="export_dropdown ui-kyle-menu">
+            <li class="generate_new_csv"><a href="#"><%=t('Current') %></a></li>
+            <% if @last_exported_gradebook_csv.present? %>
+              <li><a href="<%= @last_exported_gradebook_csv.attachment.download_url %>" class="open_in_a_new_tab">
+                <%= t('Previous (%{time})', time: datetime_string(@last_exported_gradebook_csv.attachment.updated_at)) %>
+              </a></li>
+            <% else %>
+              <li style="display:none;">
+                <a class="open_in_a_new_tab"></a>
+              </li>
+            <% end %>
+          </ul>
+        </span>
+        <iframe id="csv_download" style="display:none"></iframe>
+
+        <button id="gradebook_settings"><i class="icon-settings"></i></button>
+        <ul style="display: none;" class="gradebook_dropdown ui-kyle-menu">
+          <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= t('View Grading History') %></a></li>
+          <% if @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades) %>
+          <li><a id="publish_to_sis" href="<%= context_url(@context, :context_details_url,
+                                                           :anchor => 'tab-grade-publishing') %>">
+            <%= t('Publish grades to SIS') %>
+          </a></li>
+          <% end %>
+          <li><a class="student_names_toggle" href="#" role="button"><%= t('Hide Student Names') %></a></li>
+          <li><a data-arrange-columns-by="due_date" href="#"><label><%= t('Arrange columns by due date') %><input type="radio" name="arrange-columns-by" /></label></a></li>
+          <li><a data-arrange-columns-by="assignment_group" href="#"><label><%= t('Arrange columns by assignment group') %><input type="radio" name="arrange-columns-by" /></label></a></li>
+          <li><a href="#"><label><%= t('Show Attendance Columns') %> <input type="checkbox" id="show_attendance" /></label></a></li>
+          <li id="include-ungraded-list-item"><a href="#"><label><%= t("Treat Ungraded as 0") %><input type="checkbox" id="include_ungraded_assignments" /></label></a></li>
+          <li class="<% if @course_is_concluded %>ui-state-disabled<% end %>"><a href="#"><label><%= t("Show Concluded Enrollments") %><input type="checkbox" id="show_concluded_enrollments" /></label></a></li>
+          <li><a href="#"><label><%= t("Show Inactive Enrollments") %><input type="checkbox" id="show_inactive_enrollments" /></label></a></li>
+        </ul>
+      </div>
+    </div>
+    <div id="gradebook-grid-wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
+      <div id="gradebook_grid"></div>
+    </div>
+    <div style="display:none;">
+      <%= render :partial => "shared/message_students" %>
+      <%= render :partial => 'submissions/submission_download' %>
+    </div>
+  </div>
+
+  <% if @context.feature_enabled?(:outcome_gradebook) %>
+    <div class="outcome-gradebook-container hidden"></div>
+  <% end %>
+</div>

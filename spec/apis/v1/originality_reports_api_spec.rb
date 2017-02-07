@@ -22,7 +22,7 @@ describe 'Originality Reports API', type: :request do
   before :each do
     attachment_model
 
-    course(active_all: true)
+    course_factory(active_all: true)
     student_in_course active_all: true
     teacher_in_course active_all: true
 
@@ -173,7 +173,7 @@ describe 'Originality Reports API', type: :request do
 
     it "does not update originality score if out of range" do
       user_session(@teacher)
-      put @endpoints[:update], originality_report: {originality_score: 1.5}
+      put @endpoints[:update], originality_report: {originality_score: 150}
 
       expect(response.status).to eq 400
       expect(JSON.parse(response.body)['errors'].key? 'originality_score').to be_truthy

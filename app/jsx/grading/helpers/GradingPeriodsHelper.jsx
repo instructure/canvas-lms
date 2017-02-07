@@ -69,7 +69,7 @@ define([
       if (date === null) {
         return gradingPeriod.isLast;
       } else {
-        return date >= gradingPeriod.startDate && date < gradingPeriod.endDate
+        return gradingPeriod.startDate < date && date <= gradingPeriod.endDate;
       }
     }
 

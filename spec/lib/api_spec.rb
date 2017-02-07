@@ -37,7 +37,7 @@ end
 describe Api do
   context 'api_find' do
     before do
-      @user = user
+      @user = user_factory
       @api = TestApiInstance.new Account.default, nil
     end
 
@@ -170,7 +170,7 @@ describe Api do
     end
 
     it "should find course by lti_context_id" do
-      lti_course = course
+      lti_course = course_factory
       lti_course.lti_context_id = Canvas::Security.hmac_sha1(lti_course.asset_string.to_s, 'key')
       lti_course.save!
       expect(@api.api_find(Course, "lti_context_id:#{lti_course.lti_context_id}")).to eq lti_course
@@ -186,7 +186,7 @@ describe Api do
 
   context 'api_find_all' do
     before do
-      @user = user
+      @user = user_factory
       @api = TestApiInstance.new Account.default, nil
     end
 
@@ -208,7 +208,7 @@ describe Api do
     end
 
     it 'should find existing records with different lookup strategies' do
-      @user1 = user
+      @user1 = user_factory
       @user2 = user_with_pseudonym :username => "sis_user_1@example.com"
       @user3 = user_with_pseudonym
       @pseudonym.sis_user_id = "sis_user_2"
@@ -218,20 +218,20 @@ describe Api do
     end
 
     it 'should filter out duplicates' do
-      @other_user = user
+      @other_user = user_factory
       @user = user_with_pseudonym :username => "sis_user_1@example.com"
       expect(@api.api_find_all(User, [@user.id, "sis_login_id:sis_user_1@example.com", @other_user.id, @user.id]).sort_by(&:id)).to eq [@user, @other_user].sort_by(&:id)
     end
 
     it "should find user id 'self' when a current user is provided" do
-      @current_user = user
-      @other_user = user
+      @current_user = user_factory
+      @other_user = user_factory
       expect(TestApiInstance.new(Account.default, @current_user).api_find_all(User, [@other_user.id, 'self']).sort_by(&:id)).to eq [@current_user, @other_user].sort_by(&:id)
     end
 
     it 'should not find user id "self" when a current user is not provided' do
-      @current_user = user
-      @other_user = user
+      @current_user = user_factory
+      @other_user = user_factory
       expect(TestApiInstance.new(Account.default, nil).api_find_all(User, ["self", @other_user.id])).to eq [@other_user]
     end
 
@@ -244,8 +244,8 @@ describe Api do
       user2 = user_with_pseudonym :username => "sis_user_2@example.com", :account => account2
       user3 = user_with_pseudonym :username => "sis_user_3@example.com", :account => account1
       user4 = user_with_pseudonym :username => "sis_user_3@example.com", :account => account2
-      user5 = user :account => account1
-      user6 = user :account => account2
+      user5 = user_factory :account => account1
+      user6 = user_factory :account => account2
       expect(api1.api_find_all(User, ["sis_login_id:sis_user_1@example.com", "sis_login_id:sis_user_2@example.com", "sis_login_id:sis_user_3@example.com", user5.id, user6.id]).sort_by(&:id)).to eq [user1, user3, user5, user6].sort_by(&:id)
       expect(api2.api_find_all(User, ["sis_login_id:sis_user_1@example.com", "sis_login_id:sis_user_2@example.com", "sis_login_id:sis_user_3@example.com", user5.id, user6.id]).sort_by(&:id)).to eq [user2, user4, user5, user6].sort_by(&:id)
     end
@@ -323,8 +323,8 @@ describe Api do
       user2 = user_with_pseudonym :username => "sisuser2@example.com", :account => account2
       user3 = user_with_pseudonym :username => "sisuser3@example.com", :account => account1
       user4 = user_with_pseudonym :username => "sisuser3@example.com", :account => account2
-      user5 = user :account => account1
-      user6 = user :account => account2
+      user5 = user_factory :account => account1
+      user6 = user_factory :account => account2
       expect(Api.map_ids(["sis_login_id:sisuser1@example.com", "sis_login_id:sisuser2@example.com", "sis_login_id:sisuser3@example.com", user5.id, user6.id], User, account1).sort).to eq [user1.id, user3.id, user5.id, user6.id].sort
     end
 
@@ -492,7 +492,7 @@ describe Api do
   context 'relation_for_sis_mapping_and_columns' do
     it 'should fail when not given a root account' do
       expect(Api.relation_for_sis_mapping_and_columns(User, {}, {}, Account.default)).to eq User.none
-      expect(lambda {Api.relation_for_sis_mapping_and_columns(User, {}, {}, user)}).to raise_error("sis_root_account required for lookups")
+      expect(lambda {Api.relation_for_sis_mapping_and_columns(User, {}, {}, user_factory)}).to raise_error("sis_root_account required for lookups")
     end
 
     it 'should properly generate an escaped arg string' do
@@ -703,7 +703,7 @@ describe Api do
     end
 
     it "should add context to files and remove verifier parameters" do
-      course
+      course_factory
       attachment_model(:context => @course)
 
       html = %{<div>

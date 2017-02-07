@@ -209,7 +209,7 @@ describe Canvas::LiveEvents do
 
   describe ".asset_access" do
     it "should trigger a live event without an asset subtype" do
-      course
+      course_factory
 
       expect_event('asset_accessed', {
         asset_type: 'course',
@@ -224,7 +224,7 @@ describe Canvas::LiveEvents do
     end
 
     it "should trigger a live event with an asset subtype" do
-      course
+      course_factory
 
       expect_event('asset_accessed', {
         asset_type: 'course',

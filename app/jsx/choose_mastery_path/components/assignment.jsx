@@ -2,9 +2,10 @@ define([
   'react',
   'classnames',
   'i18n!choose_mastery_path',
+  'compiled/str/apiUserContent',
   '../shapes/assignment-shape',
-], (React, classNames, I18n, assignmentShape) => {
-  const { shape, date, string, object, bool } = React.PropTypes
+], (React, classNames, I18n, apiUserContent, assignmentShape) => {
+  const { bool } = React.PropTypes
 
   return class Assignment extends React.Component {
     static propTypes = {
@@ -41,28 +42,33 @@ define([
 
       return (
         <li className={assgClasses}>
-          <div className='ig-row'>
-            <span className='type_icon' title={this.props.assignment.category.label}>
-              <span className='ig-type-icon'>
-                <i className={`icon-${this.props.assignment.category.id}`}></i>
+          <div className="ig-row">
+            <div className="ig-header">
+              <span className="type_icon" title={this.props.assignment.category.label}>
+                <span className="ig-type-icon">
+                  <i className={`icon-${this.props.assignment.category.id}`} />
+                </span>
               </span>
-            </span>
-            <div className='ig-info'>
-              <div className='module-item-title'>
-                {this.renderTitle()}
-              </div>
-              <div className='ig-details'>
-                {!!dueAt && (
-                  <div className='due_date_display ig-details__item'>
-                    <strong>{I18n.t('Due')}</strong>
-                    <span>{date}</span>
-                  </div>
-                )}
-                { points != null && (
-                  <div key='points' className='points_possible_display ig-details__item'>{I18n.t('%{points} pts', { points: points })}</div>
-                )}
+              <div className="ig-info">
+                <div className="module-item-title">
+                  {this.renderTitle()}
+                </div>
+                <div className="ig-details">
+                  {!!dueAt && (
+                    <div className="due_date_display ig-details__item">
+                      <strong>{I18n.t('Due')}</strong>
+                      <span>{date}</span>
+                    </div>
+                  )}
+                  { points != null && (
+                    <div key="points" className="points_possible_display ig-details__item">
+                      {I18n.t('%{points} pts', { points })}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
+            <div className="ig-description" dangerouslySetInnerHTML={{__html: apiUserContent.convert(this.props.assignment.description)}} />
           </div>
         </li>
       )

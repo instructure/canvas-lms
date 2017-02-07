@@ -1,4 +1,4 @@
-class CreateChildContentTags < ActiveRecord::Migration
+class CreateChildContentTags < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

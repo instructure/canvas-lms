@@ -1,10 +1,10 @@
 define [
   'compiled/userSettings'
-  'i18n!gradebook2'
+  'i18n!gradebook'
   'jquery'
   'underscore'
   'Backbone'
-  'jst/gradebook2/grading_period_to_show_menu'
+  'jst/gradebook/grading_period_to_show_menu'
    'compiled/jquery.kylemenu'
   'vendor/jquery.ba-tinypubsub'
 ], (userSettings, I18n, $, _, {View}, template) ->

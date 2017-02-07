@@ -1,0 +1,12 @@
+{{>avatar}}
+<div class='student-name'>
+  <a class='student-grades-link student_context_card_trigger'
+     data-student_id="{{student_id}}" data-course_id="{{course_id}}"
+     href="{{url}}">{{{display_name}}}</a> {{#if enrollment_status}}<span title={{#t}}"This user is currently not able to access the course"{{/t}} class="label">{{enrollment_status}}</span>{{/if}}
+</div>
+<div class="student-placeholder">
+  {{#t "student_placeholder"}}Student{{/t}}
+</div>
+{{#if sectionNames}}
+  <div class='student-section'>{{{sectionNames}}}</div>
+{{/if}}

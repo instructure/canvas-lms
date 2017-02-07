@@ -66,12 +66,12 @@ describe "BookmarkedCollection" do
     end
 
     it "should return a WrapProxy" do
-      BookmarkedCollection.wrap(IDBookmarker, @scope).should be_a(PaginatedCollection::Proxy)
+      expect(BookmarkedCollection.wrap(IDBookmarker, @scope)).to be_a(PaginatedCollection::Proxy)
     end
 
     it "should use the provided scope when executing pagination" do
       collection = BookmarkedCollection.wrap(IDBookmarker, @scope)
-      collection.paginate(:per_page => 1).should == [@scope.first]
+      expect(collection.paginate(:per_page => 1)).to eq([@scope.first])
     end
 
     it "should use the bookmarker's bookmark generator to produce bookmarks" do
@@ -79,7 +79,7 @@ describe "BookmarkedCollection" do
       allow(IDBookmarker).to receive(:bookmark_for) { bookmark }
 
       collection = BookmarkedCollection.wrap(IDBookmarker, @scope)
-      collection.paginate(:per_page => 1).next_bookmark.should == bookmark
+      expect(collection.paginate(:per_page => 1).next_bookmark).to eq(bookmark)
     end
 
     it "should use the bookmarker's bookmark applicator to restrict by bookmark" do
@@ -88,7 +88,7 @@ describe "BookmarkedCollection" do
       allow(IDBookmarker).to receive(:restrict_scope) { bookmarked_scope }
 
       collection = BookmarkedCollection.wrap(IDBookmarker, @scope)
-      collection.paginate(:per_page => 1).should == [bookmarked_scope.first]
+      expect(collection.paginate(:per_page => 1)).to eq([bookmarked_scope.first])
     end
 
     it "should apply any restriction block given to the scope" do
@@ -99,7 +99,7 @@ describe "BookmarkedCollection" do
         scope.where(:name => course.name)
       end
 
-      collection.paginate(:per_page => 1).should == [course]
+      expect(collection.paginate(:per_page => 1)).to eq([course])
     end
   end
 
@@ -126,27 +126,27 @@ describe "BookmarkedCollection" do
     end
 
     it "should return a merge proxy" do
-      @collection.should be_a(BookmarkedCollection::MergeProxy)
+      expect(@collection).to be_a(BookmarkedCollection::MergeProxy)
     end
 
     it "should merge the given collections" do
-      @collection.paginate(:per_page => 2).should == [@created_course1, @deleted_course1]
+      expect(@collection.paginate(:per_page => 2)).to eq([@created_course1, @deleted_course1])
     end
 
     it "should have a next page when there's a non-exhausted collection" do
-      @collection.paginate(:per_page => 3).next_page.should_not be_nil
+      expect(@collection.paginate(:per_page => 3).next_page).not_to be_nil
     end
 
     it "should not have a next page when all collections are exhausted" do
-      @collection.paginate(:per_page => 4).next_page.should be_nil
+      expect(@collection.paginate(:per_page => 4).next_page).to be_nil
     end
 
     it "should pick up in the middle of a collection" do
       page = @collection.paginate(:per_page => 1)
-      page.should == [@created_course1]
-      page.next_bookmark.should_not be_nil
+      expect(page).to eq([@created_course1])
+      expect(page.next_bookmark).not_to be_nil
 
-      @collection.paginate(:page => page.next_page, :per_page => 2).should == [@deleted_course1, @created_course2]
+      expect(@collection.paginate(:page => page.next_page, :per_page => 2)).to eq([@deleted_course1, @created_course2])
     end
 
     context "with a merge proc" do
@@ -168,7 +168,7 @@ describe "BookmarkedCollection" do
       end
 
       it "should collapse duplicates" do
-        @collection.paginate(:per_page => 2).should == [@created_course]
+        expect(@collection.paginate(:per_page => 2)).to eq([@created_course])
       end
     end
 
@@ -191,17 +191,17 @@ describe "BookmarkedCollection" do
       end
 
       it "should sort the ties by collection" do
-        @collection.paginate(:per_page => 2).should == [@created_course, @deleted_course]
+        expect(@collection.paginate(:per_page => 2)).to eq([@created_course, @deleted_course])
       end
 
       it "should pick up at the right place when a page break splits the tie" do
         page = @collection.paginate(:per_page => 1)
-        page.should == [@created_course]
-        page.next_bookmark.should_not be_nil
+        expect(page).to eq([@created_course])
+        expect(page.next_bookmark).not_to be_nil
 
         page = @collection.paginate(:page => page.next_page, :per_page => 1)
-        page.should == [@deleted_course]
-        page.next_bookmark.should be_nil
+        expect(page).to eq([@deleted_course])
+        expect(page.next_bookmark).to be_nil
       end
     end
   end
@@ -229,39 +229,39 @@ describe "BookmarkedCollection" do
     end
 
     it "should return a concat proxy" do
-      @collection.should be_a(BookmarkedCollection::ConcatProxy)
+      expect(@collection).to be_a(BookmarkedCollection::ConcatProxy)
     end
 
     it "should concatenate the given collections" do
-      @collection.paginate(:per_page => 3).should == [@created_course1, @created_course2, @deleted_course1]
+      expect(@collection.paginate(:per_page => 3)).to eq([@created_course1, @created_course2, @deleted_course1])
     end
 
     it "should have a next page when there's a non-exhausted collection" do
-      @collection.paginate(:per_page => 3).next_page.should_not be_nil
+      expect(@collection.paginate(:per_page => 3).next_page).not_to be_nil
     end
 
     it "should have a next page on the border between an exhausted collection and a non-exhausted collection" do
-      @collection.paginate(:per_page => 2).next_page.should_not be_nil
+      expect(@collection.paginate(:per_page => 2).next_page).not_to be_nil
     end
 
     it "should not have a next page when all collections are exhausted" do
-      @collection.paginate(:per_page => 4).next_page.should be_nil
+      expect(@collection.paginate(:per_page => 4).next_page).to be_nil
     end
 
     it "should pick up in the middle of a collection" do
       page = @collection.paginate(:per_page => 1)
-      page.should == [@created_course1]
-      page.next_bookmark.should_not be_nil
+      expect(page).to eq([@created_course1])
+      expect(page.next_bookmark).not_to be_nil
 
-      @collection.paginate(:page => page.next_page, :per_page => 2).should == [@created_course2, @deleted_course1]
+      expect(@collection.paginate(:page => page.next_page, :per_page => 2)).to eq([@created_course2, @deleted_course1])
     end
 
     it "should pick up from a break between collections" do
       page = @collection.paginate(:per_page => 2)
-      page.should == [@created_course1, @created_course2]
-      page.next_bookmark.should_not be_nil
+      expect(page).to eq([@created_course1, @created_course2])
+      expect(page.next_bookmark).not_to be_nil
 
-      @collection.paginate(:page => page.next_page, :per_page => 2).should == [@deleted_course1, @deleted_course2]
+      expect(@collection.paginate(:page => page.next_page, :per_page => 2)).to eq([@deleted_course1, @deleted_course2])
     end
 
     it "doesn't get confused by subcollections that don't respect per_page" do
@@ -279,8 +279,8 @@ describe "BookmarkedCollection" do
           ['created', created_collection],
           ['deleted', @deleted_collection]
       )
-      created_collection.paginate(per_page: 3).should == [@created_course1]
-      @collection.paginate(per_page: 3).should == [@created_course1, @created_course2, @deleted_course1]
+      expect(created_collection.paginate(per_page: 3)).to eq([@created_course1])
+      expect(@collection.paginate(per_page: 3)).to eq([@created_course1, @created_course2, @deleted_course1])
     end
 
     it "efficiently has a next page that coincides with a partial read" do
@@ -300,7 +300,7 @@ describe "BookmarkedCollection" do
       )
 
       expect(@deleted_collection).to receive(:execute_pager).never
-      @collection.paginate(per_page: 1).next_page.should_not be_nil
+      expect(@collection.paginate(per_page: 1).next_page).not_to be_nil
     end
 
 
@@ -346,12 +346,12 @@ describe "BookmarkedCollection" do
       )
 
       page = @collection.paginate(:per_page => 4)
-      page.should == [@user1, @user2, @created_course1, @deleted_course1]
-      page.next_page.should_not be_nil
+      expect(page).to eq([@user1, @user2, @created_course1, @deleted_course1])
+      expect(page.next_page).not_to be_nil
 
       page = @collection.paginate(:page => page.next_page, :per_page => 2)
-      page.should == [@created_course2, @deleted_course2]
-      page.next_page.should be_nil
+      expect(page).to eq([@created_course2, @deleted_course2])
+      expect(page.next_page).to be_nil
     end
 
     it "should handle merge(A, merge(B, C))" do
@@ -371,12 +371,12 @@ describe "BookmarkedCollection" do
       )
 
       page = @collection.paginate(:per_page => 3)
-      page.should == [@created_course1, @created_course2, @user1]
-      page.next_page.should_not be_nil
+      expect(page).to eq([@created_course1, @created_course2, @user1])
+      expect(page.next_page).not_to be_nil
 
       page = @collection.paginate(:page => page.next_page, :per_page => 3)
-      page.should == [@user2, @deleted_course1, @deleted_course2]
-      page.next_page.should be_nil
+      expect(page).to eq([@user2, @deleted_course1, @deleted_course2])
+      expect(page.next_page).to be_nil
     end
 
     it "should handle concat(A, concat(B, C))" do
@@ -393,12 +393,12 @@ describe "BookmarkedCollection" do
         ['courses', @course_collection])
 
       page = @collection.paginate(:per_page => 3)
-      page.should == [@user1, @user2, @created_course1]
-      page.next_page.should_not be_nil
+      expect(page).to eq([@user1, @user2, @created_course1])
+      expect(page.next_page).not_to be_nil
 
       page = @collection.paginate(:page => page.next_page, :per_page => 3)
-      page.should == [@created_course2, @deleted_course1, @deleted_course2]
-      page.next_page.should be_nil
+      expect(page).to eq([@created_course2, @deleted_course1, @deleted_course2])
+      expect(page.next_page).to be_nil
     end
 
     it "should not allow merge(A, concat(B, C))" do

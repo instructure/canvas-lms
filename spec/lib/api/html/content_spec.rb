@@ -17,6 +17,7 @@
 #
 
 require_relative '../../../spec_helper.rb'
+require_dependency "api/html/content"
 
 module Api
   module Html

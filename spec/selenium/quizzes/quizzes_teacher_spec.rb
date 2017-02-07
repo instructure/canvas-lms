@@ -19,12 +19,16 @@ describe "quizzes" do
 
   context "as a teacher" do
 
-    before(:each) do
-      course_with_teacher_logged_in
+    before(:once) do
+      course_with_teacher(active_all: true)
       course_with_student(course: @course, active_enrollment: true)
       @course.update_attributes(:name => 'teacher course')
       @course.save!
       @course.reload
+    end
+
+    before(:each) do
+      user_session(@teacher)
     end
 
     it "should show a summary of due dates if there are multiple", priority: "1", test_id: 210054 do
@@ -180,7 +184,7 @@ describe "quizzes" do
 
     describe "moderation" do
 
-      before do
+      before :once do
         @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
         @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
         @context = @course
@@ -356,38 +360,23 @@ describe "quizzes" do
       Setting.set('context_default_quota', '1') # shouldn't check quota
 
       user_session(@student)
-      get "/courses/#{@course.id}/quizzes/#{q.id}/take"
-      expect_new_page_load do
-        f("#take_quiz_link").click
-        # In this case the UI updates on a timer, not an ajax callback
-        sleep 1
-      end
+      begin_quiz
 
       # so we can .send_keys to the input, can't if it's invisible to the browser
       driver.execute_script "$('.file-upload').removeClass('hidden')"
       upload_attachment_answer
       expect(file_upload_submission_data).to eq [file_upload_attachment.id.to_s]
-      # delete the attachment id
-      f('.delete-attachment').click
-      expect(f("#content")).not_to contain_css('.answered')
 
-      f('.upload-label').click
-      wait_for_ajaximations
-      keep_trying_until { expect(file_upload_submission_data).to eq [""] }
-      # the following attachment will not be backed up w/o this sleep
-      # wait_for_ajaximations doesn't work here
-      sleep 0.5
-      upload_attachment_answer
       expect_new_page_load do
         driver.get driver.current_url
         driver.switch_to.alert.accept
       end
+
       wait_for_ajaximations
       attachment = file_upload_attachment
       expect(f('.file-upload-box')).to include_text attachment.display_name
       f('#submit_quiz_button').click
       expect(f('.selected_answer')).to include_text attachment.display_name
-      user_session(@user)
     end
 
     it "should notify a student of extra time given by a moderator", priority: "2", test_id: 210070

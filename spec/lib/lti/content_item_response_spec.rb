@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Lti::ContentItemResponse do
 
-  let_once(:context) { course(active_all: true) }
+  let_once(:context) { course_factory(active_all: true) }
   let_once(:teacher) { course_with_teacher(course: context, active_all: true).user }
   let_once(:assign1) { context.assignments.create!(name: "A1") }
   let_once(:assign2) { context.assignments.create!(name: "A2") }

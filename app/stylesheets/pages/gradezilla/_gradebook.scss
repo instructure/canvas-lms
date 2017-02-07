@@ -1,0 +1,784 @@
+$gradebook_letter-grade-font: lighten($ic-color-dark, 8%);
+
+a#accessibility_warning {
+  @include accessibility-prompt;
+  @include fontSize(14px);
+}
+
+#footer {
+  display: none;
+}
+
+$cell_height: 33px;
+
+// ******* overrides of the default slick.grid.css styles ********
+.slick-sort-indicator {
+  position: absolute;
+  bottom: 4px;
+  left: 0px;
+}
+
+.container_0,
+.container_1 {
+  .slick-cell {
+    border-bottom: 1px dotted #ccc;
+    border-right: 1px dotted #ccc;
+    padding: 0;
+    overflow: visible;
+    &.editable {
+      background: transparent;
+      border: none;
+    }
+  }
+}
+
+#gradebook_grid .slick-cell.meta-cell {
+  padding: 0;
+}
+
+// ******* END overrides of the default slick.grid.css styles ********
+
+.gradebook .ic-Layout-contentMain {
+  position: relative;
+  padding: 0 $ic-sp*2;
+}
+
+#gradebook-grid-wrapper {
+  position: relative;
+}
+
+.student-name {
+  color: #1b7eda;
+  text-shadow: #fbf8f8 0 0 1px;
+}
+
+.student-grades-link {
+  @if $use_high_contrast { color: darken($ic-link-color, 5%); }
+}
+
+.meta-cell .avatar {
+  width: 25px;
+  height: 25px;
+  margin-top: 3px;
+  margin-right: 4px;
+  float: left;
+  position: relative;
+  z-index: 1;
+}
+
+.student-placeholder {
+  display: none;
+}
+
+.student-section {
+  margin-top: -5px;
+  @include fontSize(12px);
+}
+
+.secondary_identifier_cell, .custom_column {
+  color: #333333;
+  @include fontSize(12px);
+  text-align: center;
+  line-height: 35px;
+}
+
+// show and hide student names using a parent css class.
+.hide-students {
+  .student-name, .avatar {
+    display: none;
+  }
+  .student-placeholder {
+    display: block;
+  }
+  .secondary_identifier_cell {
+    text-indent: -9999em;
+  }
+}
+
+// override the default jquery ui top border
+.slick-header.ui-state-default {
+  border-top: 0;
+}
+
+.slick-header-column {
+  background-color: #f3f4f8;
+  background-image: none;
+  padding: 10px;
+  @include fontSize(12px);
+  text-align: center;
+  font-weight: normal;
+  // override jqueryUI style
+  &.ui-state-default {
+    height: 30px;
+  }
+  &.hovered-column,
+  &.slick-header-column-active,
+  &.ui-state-hover {
+    @if $use_high_contrast { @include vertical-gradient(#eef5fc, #d5e2ed); }
+    @else { @include vertical-gradient(#e0ecf9, #bdd2e3); }
+  }
+  .slick-column-name {
+    font-weight: bold;
+    color: #2f2a34;
+    text-shadow: white 0 0 1px;
+  }
+  a.assignment-name {
+    font-weight: normal;
+
+    text-shadow: white 0 0 1px;
+    //this is for the ellipses
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    @if $use_high_contrast {
+      &:hover, &:focus { text-decoration: underline; }
+    }
+    @else { color: $ic-link-color; }
+  }
+  .muted i {
+    color: $ic-color-medium-darker;
+  }
+  .assignment-points-possible {
+    font-weight: normal;
+    @include fontSize(12px);
+    margin: {
+      left: 10px;
+      right: 14px;
+    };
+    // If high contrast, default to regular dark text
+    @if $use_high_contrast == false { color: lighten($ic-font-color-dark, 15%); }
+  }
+  .gradebook-header-drop {
+    //put it above the "out of"
+    z-index: 1;
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    text-indent: 999px;
+    opacity: 0;
+    //override jqueryui blue border
+    border: 0 none;
+
+    @if $use_high_contrast {
+      background: url("/images/jqueryui/gradebook-header-drop2-high-contrast.png") no-repeat top left;
+      @media (min--moz-device-pixel-ratio: 1.5),
+      (-o-min-device-pixel-ratio: 3/2),
+      (-webkit-min-device-pixel-ratio: 1.5),
+      (min-device-pixel-ratio: 1.5),
+      (min-resolution: 1.5dppx) {
+        background-image: url("/images/jqueryui/gradebook-header-drop2-high-contrast@2x.png");
+        background-size: 14px 28px;
+      }
+    }
+
+    @else {
+      background: url("/images/jqueryui/gradebook-header-drop2.png") no-repeat top left;
+      @media (min--moz-device-pixel-ratio: 1.5),
+      (-o-min-device-pixel-ratio: 3/2),
+      (-webkit-min-device-pixel-ratio: 1.5),
+      (min-device-pixel-ratio: 1.5),
+      (min-resolution: 1.5dppx) {
+        background-image: url("/images/jqueryui/gradebook-header-drop2@2x.png");
+        background-size: 14px 28px;
+      }
+    }
+
+    &:hover, &.ui-menu-trigger-menu-is-open {
+      background-position: bottom left;
+      opacity: 1;
+    }
+  }
+  &:hover .gradebook-header-drop {
+    opacity: 1;
+  }
+}
+
+.Gradebook__ColumnHeaderContent {
+  bottom: 0;
+  display: flex;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.Gradebook__ColumnHeaderDetail {
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.Gradebook__ColumnHeaderAction {
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.Gradebook__ColumnHeaderDetail,
+.Gradebook__ColumnHeaderAction {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.odd .slick-cell {
+  background-color: #f5f6f7;
+}
+
+.even .slick-cell {
+  background-color: #fcfcfc;
+}
+
+.odd .meta-cell {
+  background-color: #eff3f4;
+}
+
+.even .meta-cell {
+  background-color: #e6eaec;
+}
+
+.odd .total-cell {
+  background-color: #e0e6e8;
+}
+
+.even .total-cell {
+  background-color: #d7dee1;
+}
+
+// overrides of jqueryUI theme
+.slick-row.ui-state-active {
+  color: inherit;
+  background-image: none;
+  font-weight: normal;
+  border: none;
+}
+
+// my styles
+.slick-row.ui-state-active  .slick-cell {
+  background-color: #dfe9f2;
+}
+
+.slick-row.ui-state-active .slick-cell.selected {
+  @include vertical-gradient(#d7eaf9, #bedff6);
+  background-color: #ccddff;
+}
+
+.slick-cell div.cell-content {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.slick-cell {
+  // we're adding this further in
+  // border-right: none
+}
+
+.slick-cell.editable {
+  border-color: #2fa1ff;
+}
+
+.slick-cell.ungraded {
+  background-image: url("/images/4_percent_opacity.png");
+  background-repeat: repeat;
+}
+
+@mixin first-row-tooltip() {
+  top: 35px;
+  &:after {
+    border-top-color: transparent;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    border-bottom: 5px solid #444444;
+    bottom: 30px;
+  }
+}
+
+// We need both visibility and opacity because visibility is binary but opacity will allow fading in/out
+@keyframes fade-in-and-out {
+  0%   { opacity: 0; visibility: hidden; }
+  1%   { opacity: 0; visibility: visible; }
+  75%  { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@-o-keyframes fade-in-and-out {
+  0%   { opacity: 0; visibility: hidden; }
+  1%   { opacity: 0; visibility: visible; }
+  75%  { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@-moz-keyframes fade-in-and-out {
+  0%   { opacity: 0; visibility: hidden; }
+  1%   { opacity: 0; visibility: visible; }
+  75%  { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@-webkit-keyframes fade-in-and-out {
+  0%   { opacity: 0; visibility: hidden; }
+  1%   { opacity: 0; visibility: visible; }
+  75%  { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+.gradebook-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  background-color: #444444;
+  color: white;
+  border-radius: 3px;
+  padding: 5px 10px;
+  z-index: 7;
+  position: absolute;
+  font-size: 0.8em;
+  left: 0;
+  top: -30px;
+  &:after {
+    border-color: #444444 transparent;
+    border-style: solid;
+    border-width: 5px 5px 0;
+    position: absolute;
+    bottom: -5px;
+    width: 0;
+    left: 15px;
+    content: "";
+  }
+  .slick-cell.hover &, .slick-cell.focus &, .slick-cell.selected & {
+    visibility: visible;
+    opacity: 1;
+  }
+  .slick-cell.active &, .slick-cell.editable & {
+    visibility: visible;
+    opacity: 1;
+    -webkit-animation: fade-in-and-out 2s 1 forwards;
+    -moz-animation: fade-in-and-out 2s 1 forwards;
+    -o-animation: fade-in-and-out 2s 1 forwards;
+    animation: fade-in-and-out 2s 1 forwards;
+  }
+  &.first-row {
+    @include first-row-tooltip();
+  }
+}
+
+.slick-row:first-child {
+  .gradebook-tooltip {
+    @include first-row-tooltip();
+  }
+}
+
+.total-column-tooltip {
+  width: 250px;
+  height: 60px;
+  white-space: pre-line;
+  padding-top: 5px;
+  padding-bottom: 55px;
+  margin-top: -25px;
+  margin-bottom: -50px;
+}
+
+.slick-cell.completely-hidden {
+  display: none;
+}
+
+.gradebook-tooltip-last {
+  left: auto;
+  right: 0;
+  &:after {
+    left: auto;
+    right: 15px;
+  }
+}
+
+$gradebook_cell_padding_top: 8px;
+
+.gradebook-cell {
+  padding-top: $gradebook_cell_padding_top;
+  height: $cell_height - $gradebook_cell_padding_top;
+  position: relative;
+  text-align: center;
+  background-repeat: repeat;
+  border: none;
+  &.late {
+    background-image: url("/images/gradebook-late-indicator.png");
+  }
+  &.resubmitted {
+    background-image: url("/images/gradebook-resubmitted-indicator.png");
+  }
+  &.grayed-out {
+    background-color: $grayLighter;
+  }
+}
+
+.slick-cell.dropped {
+  background-image: url("/images/gradebook-dropped-indicator.png");
+  background-repeat: repeat;
+}
+
+.gradebook-cell-turnitin {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  z-index: 1;
+  width: 20px;
+  height: 16px;
+  &.no-score {
+    background-image: url(/images/turnitin_no_score.png);
+  }
+  &.none-score {
+    background-image: url(/images/turnitin_none_score.png);
+  }
+  &.acceptable-score {
+    background-image: url(/images/turnitin_acceptable_score.png);
+  }
+  &.warning-score {
+    background-image: url(/images/turnitin_warning_score.png);
+  }
+  &.problem-score {
+    background-image: url(/images/turnitin_problem_score.png);
+  }
+  &.failure-score {
+    background-image: url(/images/turnitin_failure_score.png);
+  }
+}
+
+.gradebook-cell-comment {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  height: 12px;
+  width: 12px;
+  visibility: hidden;
+  //needs to be above "normal but below tooltips"
+  z-index: 2;
+  overflow: hidden;
+
+  @if $use_high_contrast {
+    background: url("/images/gradebook-comments-sprite3-high-contrast.png") no-repeat 100% 0;
+    @media (min--moz-device-pixel-ratio: 1.5),
+    (-o-min-device-pixel-ratio: 3/2),
+    (-webkit-min-device-pixel-ratio: 1.5),
+    (min-device-pixel-ratio: 1.5),
+    (min-resolution: 1.5dppx) {
+      background-image: url("/images/gradebook-comments-sprite3-high-contrast@2x.png");
+      background-size: 17px 105px;
+    }
+  }
+
+  @else {
+    background: url("/images/gradebook-comments-sprite3.png") no-repeat 100% 0;
+    @media (min--moz-device-pixel-ratio: 1.5),
+    (-o-min-device-pixel-ratio: 3/2),
+    (-webkit-min-device-pixel-ratio: 1.5),
+    (min-device-pixel-ratio: 1.5),
+    (min-resolution: 1.5dppx) {
+      background-image: url("/images/gradebook-comments-sprite3@2x.png");
+      background-size: 17px 105px;
+    }
+  }
+
+
+  #gradebook_grid.editable &:hover,
+  #gradebook_grid.editable &:focus {
+    visibility: visible;
+    background-position: 100% -88px !important;
+    width: 17px;
+    height: 17px;
+  }
+  .slick-cell.with-comments & {
+    visibility: visible;
+  }
+  #gradebook_grid.editable .slick-cell.focus &,
+  #gradebook_grid.editable .slick-cell.hover &,
+  #gradebook_grid.editable .slick-cell.active & {
+    visibility: visible;
+    background-position: 100% -41px;
+    width: 25px;
+    height: 25px;
+  }
+
+  .slick-cell.cannot_edit & {
+    display: none;
+  }
+}
+
+.gradebook-cell-comment-label {
+  @include hide-text;
+  display: inline-block;
+}
+
+.gradebook-cell-editable {
+  height: $cell_height - 1px -8px;
+  padding-top: 8px;
+  margin: 0;
+  border: 1px solid #35a5e5;
+  background-color: white;
+  box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+}
+
+#gradebook_grid .slick-cell {
+  z-index: auto;
+  &.active {
+    background-color: inherit;
+    z-index: 5;
+    border: 1px solid #35a5e5;
+    &.editable {
+      top: 0;
+      border: 0;
+    }
+  }
+}
+
+.gradebook-cell {
+  .grade {
+    border: none;
+    text-align: center;
+    outline: none;
+    @include fontSize(12px);
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background: none;
+    box-shadow: none !important;
+  }
+  .grade::-webkit-outer-spin-button {
+    display: none;
+  }
+  .grade::-ms-clear {
+    display: none;
+  }
+}
+
+.gradebook-cell-out-of-formatter {
+  padding-top: 0;
+  height: $cell_height - 1px;
+  .overflow-wrapper {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: $cell_height - 1px;
+  }
+  .grade-and-outof-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 400px;
+    margin-left: -200px;
+    //changeme
+    margin-top: -10px;
+    .divider {
+      padding: 0 1px 0 2px;
+    }
+    .outof, .grade {
+      width: 200px;
+      display: inline-block;
+      background: transparent;
+    }
+    .outof {
+      @include user-select(none);
+      text-align: left;
+      // if high contrast, no color value (default to regular dark text color)
+      @if $use_high_contrast == false { color: #888888; }
+    }
+    .grade {
+      border: none;
+      text-align: right;
+      outline: none;
+      @include fontSize(12px);
+    }
+    .grade::-webkit-outer-spin-button {
+      display: none;
+    }
+  }
+}
+
+$gradebook_checkbox_size: 16px;
+
+.gradebook-checkbox {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-top: -($gradebook_checkbox_size / 2) - ( $gradebook_cell_padding_top / 2 );
+  margin-left: -$gradebook_checkbox_size / 2;
+}
+
+#hide_warning {
+  vertical-align: top;
+}
+
+.minimized {
+  background-image: url("/images/4_percent_opacity.png");
+  .gradebook-cell {
+    font-size: 0px;
+    * {
+      display: none;
+    }
+  }
+}
+
+.minimized .slick-column-name {
+  display: none;
+}
+
+// STUFF FOR HEADER
+#gradebook-toolbar {
+  position: relative;
+  padding: $ic-sp;
+  border-top: none;
+  @include breakpoint(desktop) {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.gradebook_dropdowns {
+  display: inline-block;
+}
+
+.gradebook_filter {
+  display: inline-block;
+  input {
+    width: 248px;
+  }
+  @include breakpoint(desktop) {
+    margin-left: $ic-sp/3;
+  }
+}
+
+.gradebook_menu {
+  margin-top: $ic-sp/3;
+  @include breakpoint(desktop) {
+    white-space: nowrap;
+    margin-top: 0;
+    flex: 1;
+    text-align: right;
+  }
+}
+
+@mixin gradebook_menu_label($fontsize) {
+  font-size: $fontsize;
+  font-weight: bold;
+  margin-bottom: 0;
+  vertical-align: 0px !important;
+  position: relative;
+  line-height: 1.5;
+}
+
+#section-to-show-menu {
+  width: 350px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 275px;
+  label {
+    @include gradebook_menu_label(12px);
+  }
+  .ui-state-focus:last-child {
+    margin: 0 !important;
+  }
+}
+
+.post-grades-placeholder {
+  display: inline-block;
+}
+
+.submission_type_icon {
+  display: block;
+  width: 100%;
+  height: 22px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  .online_text_entry & {
+    background-image: url("/images/text_entry.png");
+  }
+  .discussion_topic & {
+    background-image: url("/images/word_bubble.png");
+  }
+  .online_upload & {
+    background-image: url("/images/file.png");
+  }
+  .pending_review & {
+    background-image: url("/images/pending_review.png");
+  }
+  .media_comment &, .media_recording & {
+    background-image: url("/images/media_comment.gif");
+  }
+  .quiz & {
+    background-image: url("/images/quiz.png");
+  }
+}
+
+.letter-grade-points,
+.gpa-scale-points {
+  position: absolute;
+  @include fontSize(12px);
+  padding-left: 8px;
+  line-height: 19px;
+  color: $gradebook_letter-grade-font;
+  .muted & {
+    @if $use_high_contrast { color: darken($ic-hint-text, 20%); }
+    @else { color: $ic-hint-text; }
+  }
+}
+
+.final-warning {
+  margin-left: -16px;
+}
+
+.gradebook_dropdown, .export_dropdown {
+  li, label {
+    @include gradebook_menu_label(13px);
+    cursor:pointer;
+  }
+}
+
+.ui-menu .ui-menu-item.ui-state-disabled {
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+}
+
+.ui-menu-item.ui-state-disabled label {
+  margin-bottom: 0;
+  vertical-align: 0;
+}
+
+.post-grades-menu {
+  li.external-tools-dialog,
+  li.post-grades-placeholder {
+    cursor: pointer;
+  }
+  li.external-tools-dialog.ellip {
+    cursor: default;
+  }
+}
+
+.ui-dialog.post-grades-frame-dialog {
+  .ui-dialog-content {
+    padding: 0;
+    overflow: hidden;
+  }
+}
+
+#export_progress {
+  background-color: gray;
+  width: 100px;
+  height: 8px;
+  margin: auto;
+
+  div {
+    position: relative;
+    left: 0;
+    width: 20px;
+    height: 8px;
+    background: blue;
+  }
+}
+
+// Very specific declaration to get Choose a Section text to have better text:background contrast in Section dropdown
+#section-to-show-menu {
+  li:first-of-type.ui-state-disabled {
+    opacity: 0.8;
+  }
+}

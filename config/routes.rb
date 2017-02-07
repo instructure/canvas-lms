@@ -150,6 +150,8 @@ CanvasRails::Application.routes.draw do
     end
   end
 
+  get '/courses/:course_id/gradebook2', to: redirect('/courses/%{course_id}/gradebook')
+
   # There are a lot of resources that are all scoped to the course level
   # (assignments, files, wiki pages, user lists, forums, etc.).  Many of
   # these resources also apply to groups and individual users.  We call
@@ -207,7 +209,6 @@ CanvasRails::Application.routes.draw do
     end
 
     resource :gradebook_csv, only: [:show]
-    get 'gradebook2' => "gradebooks#gradebook2"
 
     get 'attendance' => 'gradebooks#attendance'
     get 'attendance/:user_id' => 'gradebooks#attendance', as: :attendance_user
@@ -238,6 +239,7 @@ CanvasRails::Application.routes.draw do
           request.query_parameters.key?(:download)
         end
       resources :submissions do
+        get 'originality_report/:asset_string' => 'submissions#originality_report', as: :originality_report
         post 'turnitin/resubmit' => 'submissions#resubmit_to_turnitin', as: :resubmit_to_turnitin
         get 'turnitin/:asset_string' => 'submissions#turnitin_report', as: :turnitin_report
         post 'vericite/resubmit' => 'submissions#resubmit_to_vericite', as: :resubmit_to_vericite
@@ -383,6 +385,7 @@ CanvasRails::Application.routes.draw do
 
     resources :content_exports, only: [:create, :index, :destroy, :show]
     get 'offline_web_exports' => 'courses#offline_web_exports'
+    post 'start_offline_web_export' => 'courses#start_offline_web_export'
     get 'modules/items/assignment_info' => 'context_modules#content_tag_assignment_data', as: :context_modules_assignment_info
     get 'modules/items/:id' => 'context_modules#item_redirect', as: :context_modules_item_redirect
     get 'modules/items/:id/edit_mastery_paths' => 'context_modules#item_redirect_mastery_paths'
@@ -814,7 +817,6 @@ CanvasRails::Application.routes.draw do
   get "files/search", controller: 'files', action: 'react_files', format: false
   get 'files/s3_success/:id' => 'files#s3_success', as: :s3_success
   get 'files/:id/public_url' => 'files#public_url', as: :public_url
-  get 'files/preflight' => 'files#preflight', as: :file_preflight
   post 'files/pending' => 'files#create_pending', as: :file_create_pending
   resources :assignments, only: :index do
     resources :files, only: [] do
@@ -914,6 +916,7 @@ CanvasRails::Application.routes.draw do
       post 'courses/:course_id/reset_content', :action => :reset_content
       get  'users/:user_id/courses', action: :user_index, as: 'user_courses'
       get 'courses/:course_id/effective_due_dates', action: :effective_due_dates, as: 'course_effective_due_dates'
+      get 'courses/:course_id/permissions', action: :permissions
     end
 
     scope(controller: :account_notifications) do
@@ -1664,6 +1667,7 @@ CanvasRails::Application.routes.draw do
       get "support_helpers/turnitin/assignment", action: :assignment
       get "support_helpers/turnitin/pending", action: :pending
       get "support_helpers/turnitin/expired", action: :expired
+      get "support_helpers/turnitin/refresh_lti_attachment", action: :lti_attachment
     end
 
     scope(controller: 'support_helpers/crocodoc') do
@@ -1797,6 +1801,11 @@ CanvasRails::Application.routes.draw do
       post 'courses/:course_id/epub_exports', {
         action: :create
       }
+    end
+
+    scope(controller: :web_zip_exports) do
+      get 'courses/:course_id/web_zip_exports', action: :index, as: "web_zip_exports"
+      get 'courses/:course_id/web_zip_exports/:id', action: :show
     end
 
     scope(controller: :grading_standards_api) do

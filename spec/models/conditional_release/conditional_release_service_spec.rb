@@ -219,7 +219,7 @@ describe ConditionalRelease::Service do
     end
 
     it 'returns an admin jwt for an admin viewing a course' do
-      course
+      course_factory
       account_admin_user
       jwt = Service.jwt_for(@course, @admin, 'foo.bar')
       claims = get_claims jwt
@@ -229,7 +229,7 @@ describe ConditionalRelease::Service do
 
     it 'returns a no-role jwt for a non-associated user viewing a course' do
       teacher_in_course
-      course # redefines @course
+      course_factory # redefines @course
       jwt = Service.jwt_for(@course, @user, 'foo.bar')
       claims = get_claims jwt
       expect(claims[:sub]).to eq @user.id.to_s

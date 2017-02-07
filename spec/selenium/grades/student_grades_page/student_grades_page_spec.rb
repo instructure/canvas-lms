@@ -1,9 +1,9 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative '../page_objects/student_grades_page'
 
-describe "gradebook2 - logged in as a student" do
+describe "gradebook - logged in as a student" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
   # Helpers
   def backend_group_helper

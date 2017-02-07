@@ -277,16 +277,6 @@ describe "assignments" do
       end
     end
 
-    it "should verify that self sign-up link works in more options", priority: "2", test_id: 622853 do
-      get "/courses/#{@course.id}/assignments"
-      manually_create_assignment
-      f('#has_group_category').click
-      wait_for_ajaximations
-      fj('.ui-dialog:visible .self_signup_help_link img').click
-      wait_for_ajaximations
-      expect(f('#self_signup_help_dialog')).to be_displayed
-    end
-
     it "should validate that a group category is selected", priority: "1", test_id: 626905 do
       assignment_name = 'first test assignment'
       @assignment = @course.assignments.create({
@@ -662,7 +652,7 @@ describe "assignments" do
   context "post to sis default setting" do
     before do
       account_model
-      @account.enable_feature!(:bulk_sis_grade_export)
+      @account.set_feature_flag! 'post_grades', 'on'
       course_with_teacher_logged_in(:active_all => true, :account => @account)
     end
 

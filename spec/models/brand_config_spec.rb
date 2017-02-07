@@ -121,7 +121,7 @@ describe BrandConfig do
     describe "with cdn disabled" do
       before :each do
         Canvas::Cdn.expects(:enabled?).returns(false)
-        @subaccount_bc.s3_uploader.expects(:upload_file).never
+        @subaccount_bc.expects(:s3_uploader).never
         File.expects(:delete).never
       end
 
@@ -139,6 +139,8 @@ describe BrandConfig do
     describe "with cdn enabled" do
       before :each do
         Canvas::Cdn.expects(:enabled?).returns(true)
+        s3 = stub(bucket: nil)
+        Aws::S3::Resource.stubs(:new).returns(s3)
         @upload_expectation = @subaccount_bc.s3_uploader.expects(:upload_file).once
         @delete_expectation = File.expects(:delete).once
       end

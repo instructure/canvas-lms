@@ -5,13 +5,17 @@ define [
   'jquery'
   'underscore'
   'Backbone'
+  'react'
+  'react-dom'
   'jst/assignments/IndexView'
   'jst/assignments/NoAssignmentsSearch'
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
   'compiled/userSettings'
   'compiled/api/gradingPeriodsApi'
+  'jsx/assignments/IndexMenu'
+  'jsx/assignments/store/indexMenuStore'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, KeyboardNavDialog, keyboardNavTemplate, $, _, Backbone, template, NoAssignments, AssignmentKeyBindingsMixin, userSettings, GradingPeriodsAPI) ->
+], (I18n, KeyboardNavDialog, keyboardNavTemplate, $, _, Backbone, React, ReactDOM, template, NoAssignments, AssignmentKeyBindingsMixin, userSettings, GradingPeriodsAPI, IndexMenu, configureIndexMenuStore) ->
 
   class IndexView extends Backbone.View
     @mixin AssignmentKeyBindingsMixin
@@ -52,7 +56,28 @@ define [
 
       if @assignmentSettingsView
         @assignmentSettingsView.hide()
-        @assignmentSettingsView.setTrigger @$assignmentSettingsButton
+
+        @indexMenuStore = configureIndexMenuStore({
+          weighted: ENV.WEIGHT_FINAL_GRADES,
+          externalTools: [],
+          modalIsOpen: false,
+          selectedTool: null
+        });
+
+        contextInfo = ENV.context_asset_string.split('_')
+        contextType = contextInfo[0]
+        contextId = parseInt(contextInfo[1], 10)
+
+        ReactDOM.render(
+          React.createElement(IndexMenu, {
+            store: @indexMenuStore,
+            contextType: contextType,
+            contextId: contextId,
+            setTrigger: @assignmentSettingsView.setTrigger.bind(@assignmentSettingsView)
+            registerWeightToggle: @assignmentSettingsView.on.bind(@assignmentSettingsView)
+          }),
+          $('#settingsMountPoint')[0]
+        )
 
       @filterKeyBindings() if !@canManage()
 

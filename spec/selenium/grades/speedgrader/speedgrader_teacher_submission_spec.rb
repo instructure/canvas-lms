@@ -208,7 +208,26 @@ describe "speed grader submissions" do
     it "should highlight submitted assignments and not non-submitted assignments for students", priority: "1",
        test_id: 283502
 
-    it "should display image submission in browser", priority: "1", test_id: 283503
+    it "should display image submission in browser", priority: "1", test_id: 283503 do
+      filename, fullpath, _data = get_file("graded.png")
+      create_and_enroll_students(1)
+      @assignment.submission_types ='online_upload'
+      @assignment.save!
+
+      add_attachment_student_assignment(filename, @students[0], fullpath)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      expect(f('#speedgrader_iframe')).to be_displayed
+
+      in_frame("speedgrader_iframe") do
+        # validates the image\attachment is inside the iframe as expected
+        image_element = f('img')
+
+        expect(image_element.attribute('src')).to include('download')
+        expect(image_element.attribute('style')).to include('max-height: 100')
+        expect(image_element.attribute('style')).to include('max-width: 100')
+      end
+    end
 
     context "turnitin" do
       before(:each) do

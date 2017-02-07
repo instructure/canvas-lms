@@ -33,9 +33,10 @@ describe 'submissions' do
       original_number_of_group = Group.count
       create_assignment_preparation
       f('#has_group_category').click
-      replace_content(f('input[name="category[name]"]'), "canv")
-      f('input[name="category[split_groups]"]').click
-      f('.ui-dialog-buttonpane .btn-primary').click
+      replace_content(f('#new_category_name'), "canv")
+      f('#split_groups').click
+      replace_content(f('input[name=create_group_count]'), '1')
+      f('#newGroupSubmitButton').click
       wait_for_ajaximations
       submit_assignment_form
       validate_edit_and_publish_links_exist

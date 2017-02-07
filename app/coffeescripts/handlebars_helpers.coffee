@@ -556,8 +556,10 @@ define [
       if x > y
         options.fn @
       else
-        options.inverse @
+       options.inverse @
 
+    n:(number, {hash: {precision, percentage}}) ->
+      I18n.n(number, {precision, percentage})
   }
 
   return Handlebars

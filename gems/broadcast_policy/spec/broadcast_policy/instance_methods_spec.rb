@@ -53,7 +53,7 @@ describe BroadcastPolicy::InstanceMethods do
     end
 
     it "raises an error if prior_version has not been created" do
-      expect{ harness.changed_in_state('active', fields: :score) }.to raise_error
+      expect{ harness.changed_in_state('active', fields: :score) }.to raise_error(NoMethodError)
     end
   end
 
@@ -70,7 +70,7 @@ describe BroadcastPolicy::InstanceMethods do
     end
 
     it "raises an error if prior_version has not been created" do
-      expect { harness.changed_state('active', 'deleted') }.to raise_error
+      expect { harness.changed_state('active', 'deleted') }.to raise_error(NoMethodError)
     end
   end
 end

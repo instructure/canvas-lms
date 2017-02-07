@@ -23,7 +23,8 @@
     <div class="control-group options">
       <label class="control-label"><strong>{{#t "options_label"}}Options{{/t}}</strong></label>
       <div class="controls">
-        <select name="editing_roles">
+        <label id="editing_roles_label"  for="editing_roles">{{t "Can edit this page role selection"}}</label>
+        <select id="editing_roles" aria-label="{{t "Can edit this page role selection"}}" name="editing_roles">
           {{#if SHOW.COURSE_ROLES}}
             <option value="teachers"{{#if IS.TEACHER_ROLE}} selected{{/if}}>{{#t "course_editing_roles.only_teachers"}}Only teachers{{/t}}</option>
             <option value="teachers,students"{{#if IS.STUDENT_ROLE}} selected{{/if}}>{{#t "course_editing_roles.teachers_and_students"}}Teachers and students{{/t}}</option>
@@ -33,7 +34,6 @@
             <option value="members,public"{{#if IS.ANYONE_ROLE}} selected{{/if}}>{{#t "editing_roles.anyone"}}Anyone{{/t}}</option>
           {{/if}}
         </select>
-        {{#t "editing_roles.can_edit_page"}}can edit this page{{/t}}
       </div>
       {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED}}
         <div class="controls">

@@ -27,9 +27,9 @@ describe SisApiController, type: :request do
       end
 
       # courses
-      let_once(:course1) { course(account: @account) } # unpublished
-      let_once(:course2) { course(account: @account, active_all: true) }
-      let_once(:course3) { course(account: @account, active_all: true) }
+      let_once(:course1) { course_factory(account: @account) } # unpublished
+      let_once(:course2) { course_factory(account: @account, active_all: true) }
+      let_once(:course3) { course_factory(account: @account, active_all: true) }
 
       # non-postable assignments
       let_once(:assignment1)  { course1.assignments.create!(post_to_sis: true) } # unpublished course
@@ -172,7 +172,7 @@ describe SisApiController, type: :request do
 
     context 'for an unpublished course' do
       before :once do
-        course
+        course_factory
         account_admin_user(account: @course.root_account, active_all: true)
       end
 
@@ -209,7 +209,7 @@ describe SisApiController, type: :request do
 
     context 'for a published course' do
       before :once do
-        course(active_all: true)
+        course_factory(active_all: true)
         account_admin_user(account: @course.root_account, active_all: true)
       end
 

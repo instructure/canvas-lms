@@ -1,8 +1,8 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2 - permissions" do
+describe "gradebook - permissions" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
   context "as an admin" do
 
@@ -20,7 +20,7 @@ describe "gradebook2 - permissions" do
                           :account => Account.default,
                           :role => role)
 
-      get "/courses/#{course.id}/gradebook2"
+      get "/courses/#{course.id}/gradebook"
       expect_no_flash_message :error
     end
 
@@ -35,7 +35,7 @@ describe "gradebook2 - permissions" do
                           :account => Account.default,
                           :role => role)
 
-      get "/courses/#{course.id}/gradebook2"
+      get "/courses/#{course.id}/gradebook"
       expect_no_flash_message :error
     end
   end

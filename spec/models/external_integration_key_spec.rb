@@ -95,24 +95,24 @@ describe ExternalIntegrationKey do
   context "grants_right_for?" do
     it "calls keytype method for specified right" do
       external_integration_key.key_type = :external_key0
-      expect(external_integration_key.grants_right?(user, :read)).to be_truthy
-      expect(external_integration_key.grants_right?(user, :write)).to be_truthy
+      expect(external_integration_key.grants_right?(user_factory, :read)).to be_truthy
+      expect(external_integration_key.grants_right?(user_factory, :write)).to be_truthy
     end
 
     it "returns access determined by type" do
       external_integration_key.key_type = :external_key1
-      expect(external_integration_key.grants_right?(user, :read)).to be_falsey
-      expect(external_integration_key.grants_right?(user, :write)).to be_falsey
+      expect(external_integration_key.grants_right?(user_factory, :read)).to be_falsey
+      expect(external_integration_key.grants_right?(user_factory, :write)).to be_falsey
 
       external_integration_key.key_type = :external_key2
-      expect(external_integration_key.grants_right?(user, :read)).to be_truthy
-      expect(external_integration_key.grants_right?(user, :write)).to be_falsey
+      expect(external_integration_key.grants_right?(user_factory, :read)).to be_truthy
+      expect(external_integration_key.grants_right?(user_factory, :write)).to be_falsey
     end
 
     it "defaults to false when rights method does not exist" do
       external_integration_key.key_type = :external_key3
-      expect(external_integration_key.grants_right?(user, :read)).to be_falsey
-      expect(external_integration_key.grants_right?(user, :write)).to be_falsey
+      expect(external_integration_key.grants_right?(user_factory, :read)).to be_falsey
+      expect(external_integration_key.grants_right?(user_factory, :write)).to be_falsey
     end
   end
 end

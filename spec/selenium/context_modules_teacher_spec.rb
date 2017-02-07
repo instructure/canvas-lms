@@ -7,7 +7,7 @@ describe "context modules" do
 
   context "as a teacher", priority: "1" do
     before(:once) do
-      course(:active_course => true)
+      course_with_teacher(active_all: true)
       # have to add quiz and assignment to be able to add them to a new module
       @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
       @assignment = @course.assignments.create!(:title => 'assignment 1', :submission_types => 'online_text_entry')
@@ -24,7 +24,7 @@ describe "context modules" do
     end
 
     before(:each) do
-      course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
+      user_session(@teacher)
     end
 
     def module_with_two_items
@@ -135,19 +135,19 @@ describe "context modules" do
 
       f('.ig-header-admin  .al-trigger').click
       hover_and_click('#context_modules .edit_module_link')
-      wait_for_ajax_requests
+      wait_for_animations
       expect(f('#add_context_module_form')).to be_displayed
       f('.add_completion_criterion_link').click
-      assignment_picker = fj('.assignment_picker:visible')
+      wait_for_animations
+      fj(".assignment_picker:visible option[value='#{content_tag_1.id}']").click
+      wait_for_js # the action above might be changing the element underneath between finding and clicking
+      fj('.assignment_requirement_picker:visible option[value="min_score"]').click
+      expect(f("body")).to contain_jqcss(".points_possible_parent:visible")
 
-      assignment_picker.find_element(:css, "option[value='#{content_tag_1.id}']").click
-      requirement_picker = fj('.assignment_requirement_picker:visible')
-      requirement_picker.find_element(:css, 'option[value="min_score"]').click
-      expect(driver.execute_script('return $(".points_possible_parent:visible").length')).to be > 0
-
-      assignment_picker.find_element(:css, "option[value='#{content_tag_2.id}']").click
-      requirement_picker.find_element(:css, 'option[value="min_score"]').click
-      expect(driver.execute_script('return $(".points_possible_parent:visible").length')).to eq 0
+      fj(".assignment_picker:visible option[value='#{content_tag_2.id}']").click
+      wait_for_js # the action above might be changing the element underneath between finding and clicking
+      fj('.assignment_requirement_picker:visible option[value="min_score"]').click
+      expect(f("body")).not_to contain_jqcss(".points_possible_parent:visible")
     end
 
     it "should add and remove completion criteria" do
@@ -429,49 +429,25 @@ describe "context modules" do
       expect(fj('.alert.alert-error:visible').text).to eq "An external tool can't be saved without a URL."
     end
 
-    it "should add 2 modules with the first one as a prerequisite" do
+    it "shows the added pre requisites in the header of a module", priority: "1", test_id: 250297 do
+      add_modules_and_set_prerequisites
       get "/courses/#{@course.id}/modules"
-      first_module_name = 'First Module'
-      second_module_name = 'Second Module'
-      third_module_name = 'Third Module'
-      add_module(first_module_name)
-      add_module(second_module_name)
+      expect(f('.item-group-condensed:nth-of-type(3) .ig-header .prerequisites_message').text).
+        to eq "Prerequisites: #{@module1.name}, #{@module2.name}"
+    end
 
-      #adding second module - can't use add_module method because a prerequisite needs to be added to this module
-      add_form = new_module_form
-      replace_content(add_form.find_element(:id, 'context_module_name'), third_module_name)
-      # add first prerequisite
-      f('.ui-dialog .add_prerequisite_link').click
-      wait_for_ajaximations
-      click_option('.criterion select', "#{first_module_name}")
-      # add second prerequisite
-      f('.ui-dialog .add_prerequisite_link').click
-      wait_for_ajaximations
-      click_option('.criterion select:last', "#{second_module_name}")
-      submit_form(add_form)
-
-      wait_for_ajaximations
-      expect(fj('.prerequisites_message:first').text).to eq "Prerequisites: First Module, Second Module"
-
-      mod1 = @course.context_modules.where(:name => first_module_name).first
-      mod3 = @course.context_modules.where(:name => third_module_name).first
-
-      move_to_click("#context_module_#{mod3.id}")
-      f("#context_module_#{mod3.id} .ig-header-admin .al-trigger").click
-      f("#context_module_#{mod3.id} .edit_module_link").click
+    it "shows the added prerequisites when editing a module" do
+      add_modules_and_set_prerequisites
+      get "/courses/#{@course.id}/modules"
+      move_to_click("#context_module_#{@module3.id}")
+      f("#context_module_#{@module3.id} .ig-header-admin .al-trigger").click
+      f("#context_module_#{@module3.id} .edit_module_link").click
+      add_form = f('#add_context_module_form')
       expect(add_form).to be_displayed
       wait_for_ajaximations
-      prereq_select = fj('.criterion select')
+      prereq_select = f('.criterion select')
       option = first_selected_option(prereq_select)
-      expect(option.text).to eq first_module_name
-
-      ff('.cancel_button', dialog_for(add_form)).last.click
-      wait_for_ajaximations
-      mod3.publish!
-
-      # should bring up relock dialog on publish
-      f("#context_module_#{mod1.id} .publish-icon").click
-      test_relock
+      expect(option.text).to eq "#{@module1.name}"
     end
 
     it "does not have a prerequisites section when creating the first module" do
@@ -643,6 +619,39 @@ describe "context modules" do
       expect(tag.indent).to eq 1
     end
 
+    context "edit dialog" do
+      before :each do
+        @mod = create_modules(2, true)
+        @mod[0].add_item({id: @assignment.id, type: 'assignment'})
+        @mod[0].add_item({id: @assignment2.id, type: 'assignment'})
+        get "/courses/#{@course.id}/modules"
+      end
+
+      it "shows all items are completed radio button", priority: "1", test_id: 248023 do
+        f("#context_module_#{@mod[0].id} .ig-header-admin .al-trigger").click
+        hover_and_click("#context_module_#{@mod[0].id} .edit_module_link")
+        f('.add-item .add_completion_criterion_link').click
+        expect(f('.ic-Radio')).to contain_css("input[type=radio][id = context_module_requirement_count_]")
+        expect(f('.ic-Radio .ic-Label').text).to eq('Students must complete all of these requirements')
+      end
+
+      it "shows complete one of these items radio button", priority: "1", test_id: 250294 do
+        f("#context_module_#{@mod[0].id} .ig-header-admin .al-trigger").click
+        hover_and_click("#context_module_#{@mod[0].id} .edit_module_link")
+        f('.add-item .add_completion_criterion_link').click
+        expect(ff('.ic-Radio')[1]).to contain_css("input[type=radio][id = context_module_requirement_count_1]")
+        expect(ff('.ic-Radio .ic-Label')[1].text).to eq('Student must complete one of these requirements')
+      end
+
+      it "does not show the radio buttons for module with no items", priority: "1", test_id: 3028275 do
+        f("#context_module_#{@mod[1].id} .ig-header-admin .al-trigger").click
+        hover_and_click("#context_module_#{@mod[1].id} .edit_module_link")
+        expect(f('.ic-Radio .ic-Label').text).not_to include('Students must complete all of these requirements')
+        expect(f('.ic-Radio .ic-Label').text).not_to include('Student must complete one of these requirements')
+        expect(f('.completion_entry .no_items_message').text).to eq('No items in module')
+      end
+    end
+
     context "module item cog focus management", priority: "1" do
 
       before :each do
@@ -736,94 +745,100 @@ describe "context modules" do
     end
 
     context "Keyboard Accessibility", priority: "1" do
-      it "should set focus to the first drag handle after the + Module button" do
-        # Add two modules, so the drag handles show up.
-        course_module
-        course_module
-        get "/courses/#{@course.id}/modules"
-
-        driver.execute_script("$('.add_module_link').focus()")
-        add_module_link = f('.add_module_link')
-        add_module_link.send_keys("\t")
-        first_handle = f('.icon-drag-handle')
-        check_element_has_focus(first_handle)
-
-      end
-
-      it "should use the keyboard shortcuts to navigate through modules and module items" do
-        skip_if_chrome('research - focus on HTML')
-        # Test these shortcuts (access menu by pressing comma key):
-        # Up : Previous Module/Item
-        # Down : Next Module/Item
-        # Space : Move Module/Item
-        # k : Previous Module/Item
-        # j : Next Module/Item
-        # e : Edit Module/Item
-        # d : Delete Current Module/Item
-        # i : Increase Indent
-        # o : Decrease Indent
-        # n : New Module
-
+      before :once do
         modules = create_modules(2, true)
         modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
         modules[0].add_item({:id => @assignment2.id, :type => 'assignment'})
         modules[1].add_item({:id => @assignment3.id, :type => 'assignment'})
+      end
+
+      before :each do
+        skip_if_chrome('skipped - research find html')
         get "/courses/#{@course.id}/modules"
 
-        context_modules = ff('.context_module .icon-drag-handle')
-        context_module_items = ff('.context_module_item a.title')
+        # focus the first item
+        f('html').send_keys("j")
+      end
+
+      def send_keys(*keys)
+        driver.switch_to.active_element.send_keys(*keys)
+      end
+
+      let(:context_modules) { ff('.context_module .icon-drag-handle') }
+      let(:context_module_items) { ff('.context_module_item a.title') }
+
+      it "should set focus to the first drag handle after the + Module button" do
+        add_module_link = f('.add_module_link')
+        add_module_link.send_keys("\t")
+        first_handle = f('.icon-drag-handle')
+        check_element_has_focus(first_handle)
+      end
+
+      # Test these shortcuts (access menu by pressing comma key):
+      # Up : Previous Module/Item
+      # Down : Next Module/Item
+      # Space : Move Module/Item
+      # k : Previous Module/Item
+      # j : Next Module/Item
+      # e : Edit Module/Item
+      # d : Delete Current Module/Item
+      # i : Increase Indent
+      # o : Decrease Indent
+      # n : New Module
+      it "should navigate through modules and module items" do
 
         # Navigate through modules and module items
-        f('html').send_keys("j")
         check_element_has_focus(context_modules[0])
 
-        context_modules[0].send_keys(:arrow_down)
+        send_keys(:arrow_down)
         check_element_has_focus(context_module_items[0])
 
-        context_module_items[0].send_keys("j")
+        send_keys("j")
         check_element_has_focus(context_module_items[1])
 
-        context_module_items[1].send_keys("k")
+        send_keys("k")
         check_element_has_focus(context_module_items[0])
 
-        context_module_items[0].send_keys(:arrow_up)
+        send_keys(:arrow_up)
         check_element_has_focus(context_modules[0])
+      end
 
-        # Test Edit key
-        wait_for_ajaximations(1000) # Has to wait one second before sending keys for it to work
-        context_modules[0].send_keys("e")
+      it "should edit modules" do
+
+        send_keys("e")
         expect(f('#add_context_module_form')).to be_displayed
-        ff('.cancel_button', dialog_for(f('#add_context_module_form'))).last.click
+      end
 
-        # Test New Module key
-        wait_for_ajaximations(1000)
-        context_modules[0].send_keys("n")
+      it "should create a module" do
+
+        send_keys("n")
         expect(f('#add_context_module_form')).to be_displayed
-        ff('.cancel_button', dialog_for(f('#add_context_module_form'))).last.click
+      end
 
-        context_modules[0].send_keys(:arrow_down)
+
+      it "should indent / outdent" do
+
+        send_keys(:arrow_down)
         check_element_has_focus(context_module_items[0])
 
         # Test Indent / Outdent
-        expect(ff('.context_module_item')[0]).to have_class('indent_0')
+        expect(f('.context_module_item')).to have_class('indent_0')
 
-        wait_for_ajaximations(1000)
-        context_module_items[0].send_keys("i")
-        item = f('.context_module_item')
-        expect(item).to have_class('indent_1')
+        send_keys("i")
+        wait_for_ajax_requests
+        expect(f('.context_module_item')).to have_class('indent_1')
 
-        wait_for_ajaximations(1000)
-        ff('.context_module_item a.title')[0].send_keys("o")
-        item = f('.context_module_item')
-        expect(item).to have_class('indent_0')
+        send_keys("o")
+        wait_for_ajax_requests
+        expect(f('.context_module_item')).to have_class('indent_0')
+      end
+
+      it "should delete" do
 
         # Test Delete key
-        wait_for_ajaximations(1000)
-        new_first_module_item = ff('.context_module_item')[1]
-        ff('.context_module_item')[0].send_keys("d")
+        send_keys("d")
         driver.switch_to.alert.accept
-        expect(ff('.context_module_item')).to have_size(3) # wait for draggy clone to disappear
-        expect(f('.context_module_item')).to eq(new_first_module_item)
+        expect(context_module_items).to have_size(2)
       end
     end
 
@@ -996,7 +1011,7 @@ describe "context modules" do
 
   context "as a teacher through course home page (set to modules)", priority: "1" do
     before(:once) do
-      course(:active_course => true)
+      course_factory(active_course: true)
       @course.default_view = 'modules'
       @course.save!
     end
@@ -1122,7 +1137,7 @@ describe "context modules" do
 
   context "as a teacher" do
     before(:once) do
-      course(:active_course => true)
+      course_factory(active_course: true)
     end
 
     before(:each) do

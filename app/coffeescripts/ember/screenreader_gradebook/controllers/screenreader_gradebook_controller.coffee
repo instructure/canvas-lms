@@ -10,8 +10,8 @@ define [
   'timezone'
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
-  'compiled/grade_calculator'
-  'compiled/gradebook2/OutcomeGradebookGrid'
+  'jsx/gradebook/CourseGradeCalculator'
+  'compiled/gradebook/OutcomeGradebookGrid'
   '../../shared/components/ic_submission_download_dialog_component'
   'str/htmlEscape'
   'compiled/models/grade_summary/CalculationMethodContent'
@@ -20,7 +20,7 @@ define [
   'jquery.instructure_date_and_time'
 ], (
   ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz,
-  AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, outcomeGrid,
+  AssignmentDetailsDialog, AssignmentMuter, CourseGradeCalculator, outcomeGrid,
   ic_submission_download_dialog, htmlEscape, CalculationMethodContent, SubmissionStateMap,
   GradingPeriodsAPI
 ) ->
@@ -291,7 +291,7 @@ define [
       set(assignment, 'assignment_visibility', filteredVisibilities)
 
     calculate: (submissionsArray) ->
-      GradeCalculator.calculate submissionsArray, @assignmentGroupsHash(), @get('weightingScheme')
+      CourseGradeCalculator.calculate submissionsArray, @assignmentGroupsHash(), @get('weightingScheme')
 
     submissionsForStudent: (student) ->
       allSubmissions = (value for key, value of student when key.match /^assignment_(?!group)/)

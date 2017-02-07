@@ -1,4 +1,5 @@
 require File.expand_path('../../spec_helper', File.dirname(__FILE__))
+require_dependency "broadcast_policies/assignment_policy"
 
 module BroadcastPolicies
   describe AssignmentPolicy do

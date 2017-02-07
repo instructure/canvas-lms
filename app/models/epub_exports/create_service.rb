@@ -17,30 +17,31 @@
 #
 module EpubExports
   class CreateService
-    def initialize(course, user)
+    def initialize(course, user, export_type)
       @course = course
       @user = user
+      @export_type = export_type
     end
-    attr_reader :course, :user
+    attr_reader :course, :user, :export_type
 
-    def epub_export
-      unless @_epub_export
-        @_epub_export = course.epub_exports.visible_to(user).running.first
-        @_epub_export ||= course.epub_exports.build({
+    def offline_export
+      unless @_offline_export
+        @_offline_export = course.send(export_type.to_s.pluralize).visible_to(user).running.first
+        @_offline_export ||= course.send(export_type.to_s.pluralize).build({
           user: user
         })
       end
-      @_epub_export
+      @_offline_export
     end
 
     def already_running?
-      !epub_export.new_record?
+      !offline_export.new_record?
     end
 
     def save
-      if !already_running? && epub_export.save
+      if !already_running? && offline_export.save
         # Queuing jobs always returns nil, yay
-        epub_export.export
+        offline_export.export
         true
       else
         false

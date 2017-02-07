@@ -123,7 +123,7 @@ describe "grading standards" do
     end
 
     it "should extend ranges to fractional values at the boundary with the next range", priority: "1", test_id: 217597 do
-      student = user(:active_all => true)
+      student = user_factory(active_all: true)
       course_with_teacher_logged_in(:active_all => true)
       @course.enroll_student(student).accept!
       @course.update_attribute :grading_standard_id, 0

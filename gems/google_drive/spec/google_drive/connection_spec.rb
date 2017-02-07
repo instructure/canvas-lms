@@ -41,7 +41,7 @@ describe GoogleDrive::Connection do
         'content-disposition' => 'attachment;filename="Testing.docx"'
       }
 
-      entry = stub('Entry', extension: "not")
+      entry = double('Entry', extension: "not")
       file_extension = google_docs.send(:file_extension_from_header, headers, entry)
 
       expect(file_extension).to eq("docx")
@@ -54,7 +54,7 @@ describe GoogleDrive::Connection do
         'content-disposition' => 'attachment"'
       }
 
-      entry = stub('Entry', extension: "not")
+      entry = double('Entry', extension: "not")
       file_extension = google_docs.send(:file_extension_from_header, headers, entry)
       expect(file_extension).to eq("not")
     end
@@ -66,7 +66,7 @@ describe GoogleDrive::Connection do
         'content-disposition' => 'attachment"'
       }
 
-      entry = stub('Entry', extension: "")
+      entry = double('Entry', extension: "")
       file_extension = google_docs.send(:file_extension_from_header, headers, entry)
       expect(file_extension).to eq("unknown")
     end
@@ -75,7 +75,7 @@ describe GoogleDrive::Connection do
       google_docs = GoogleDrive::Connection.new(token, secret)
 
       headers = {}
-      entry = stub('Entry', extension: nil)
+      entry = double('Entry', extension: nil)
 
       file_extension = google_docs.send(:file_extension_from_header, headers, entry)
       expect(file_extension).to eq("unknown")
@@ -171,7 +171,7 @@ describe GoogleDrive::Connection do
 
       it "wraps a timeout in a drive connection exception" do
 
-        Timeout.stubs(:timeout).raises(Timeout::Error)
+        allow(Timeout).to receive(:timeout).and_raise(Timeout::Error)
         expect{ connection.download("42", nil) }.to(
           raise_error(GoogleDrive::ConnectionException) do |e|
             expect(e.message).to eq("Google Drive connection timed out")
@@ -183,7 +183,7 @@ describe GoogleDrive::Connection do
     describe "#create_doc" do
       it "wraps a timeout in a drive connection exception" do
 
-        Timeout.stubs(:timeout).raises(Timeout::Error)
+        allow(Timeout).to receive(:timeout).and_raise(Timeout::Error)
         expect{ connection.create_doc("Docname") }.to(
           raise_error(GoogleDrive::ConnectionException) do |e|
             expect(e.message).to eq("Google Drive connection timed out")

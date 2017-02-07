@@ -24,6 +24,10 @@ describe AssignmentGroupsController do
     @group = @course.assignment_groups.create(:name => 'some group')
   end
 
+  def course_group_with_integration_data
+    @course.assignment_groups.create(:name => 'some group', :integration_data => {'something'=> 'else'})
+  end
+
   describe 'GET index' do
     let(:assignments_ids) do
       json_response = json_parse(response.body)
@@ -75,6 +79,51 @@ describe AssignmentGroupsController do
       end
       let(:root_account) { Account.default }
       let(:sub_account) { root_account.sub_accounts.create! }
+
+      context 'given an assignment group with and without integration data' do
+        before(:once) do
+          root_account.allow_feature!(:multiple_grading_periods)
+          root_account.enable_feature!(:multiple_grading_periods)
+          account_admin_user(account: root_account)
+        end
+
+        let(:index_params) do
+          {
+              course_id: @course.id,
+              exclude_response_fields: ['description'],
+              format: :json,
+              include: ['assignments', 'assignment_visibility', 'overrides']
+          }
+        end
+
+        it 'should return an empty hash when created without integration data' do
+          user_session(@admin)
+          course_group
+          @assignment = @course.assignments.create!(
+            title: 'assignment',
+            assignment_group: @group,
+            only_visible_to_overrides: true,
+            workflow_state: 'published'
+          )
+          get :index, index_params
+          assignment_group_response = json_parse(response.body).first
+          expect(assignment_group_response['integration_data']).to eq({})
+        end
+
+        it 'should return the assignment group with integration data when it was created with it' do
+          user_session(@admin)
+          group_with_integration_data = course_group_with_integration_data
+          @assignment = @course.assignments.create!(
+            title: 'assignment',
+            assignment_group: group_with_integration_data,
+            only_visible_to_overrides: true,
+            workflow_state: 'published'
+          )
+          get 'index', index_params
+          assignment_group_response = json_parse(response.body).last
+          expect(assignment_group_response['integration_data']).to eq({'something'=> 'else'})
+        end
+      end
 
       context 'given a root account with a grading period and a sub account with a grading period' do
         before(:once) do
@@ -431,25 +480,66 @@ describe AssignmentGroupsController do
       student_in_course(active_all: true)
     end
 
+    let(:name){ 'some test group' }
+
     it 'requires authorization' do
-      post 'create', :course_id => @course.id, :assignment_group => {:name => 'some test group'}
+      post 'create', :course_id => @course.id, :assignment_group => {:name => name}
       assert_unauthorized
     end
 
     it 'does not allow students to create' do
       user_session(@student)
-      post 'create', :course_id => @course.id, :assignment_group => {:name => 'some test group'}
+      post 'create', :course_id => @course.id, :assignment_group => {:name => name}
       assert_unauthorized
     end
 
-    it 'creates a new group' do
+    it 'creates a new group with valid integration_data' do
       user_session(@teacher)
-      post 'create', :course_id => @course.id, :assignment_group => {:name => 'some test group'}
+      group_integration_data = {'something'=> 'else'}
+      post 'create', :course_id => @course.id, :assignment_group => {:name => name,
+                                                                     :integration_data => group_integration_data}
       expect(response).to be_redirect
-      expect(assigns[:assignment_group].name).to eql('some test group')
+      expect(assigns[:assignment_group].name).to eql(name)
       expect(assigns[:assignment_group].position).to eql(1)
+      expect(assigns[:assignment_group].integration_data).to eql(group_integration_data)
     end
 
+    it 'creates a new group with no integration_data' do
+      user_session(@teacher)
+      post 'create', :course_id => @course.id, :assignment_group => {:name => name,
+                                                                     :integration_data => {}}
+      expect(response).to be_redirect
+      expect(assigns[:assignment_group].name).to eql(name)
+      expect(assigns[:assignment_group].position).to eql(1)
+      expect(assigns[:assignment_group].integration_data).to eql({})
+    end
+
+    it 'creates a new group where integration_data is not present' do
+      user_session(@teacher)
+      post 'create', :course_id => @course.id, :assignment_group => {:name => name,
+                                                                     :integration_data => nil}
+      expect(response).to be_redirect
+      expect(assigns[:assignment_group].name).to eql(name)
+      expect(assigns[:assignment_group].position).to eql(1)
+      expect(assigns[:assignment_group].integration_data).to eql({})
+    end
+
+    it 'returns a 400 when trying to create a new group with invalid integration_data' do
+      user_session(@teacher)
+      integration_data = 'something'
+      post 'create', :course_id => @course.id, :assignment_group => {:name => name,
+                                                                     :integration_data => integration_data}
+      expect(response.status).to eq(400)
+    end
+
+    it 'creates a new group when integration_data is not present' do
+      user_session(@teacher)
+      post 'create', :course_id => @course.id, :assignment_group => {:name => name}
+      expect(response).to be_redirect
+      expect(assigns[:assignment_group].name).to eql(name)
+      expect(assigns[:assignment_group].position).to eql(1)
+      expect(assigns[:assignment_group].integration_data).to eql({})
+    end
   end
 
   describe "PUT 'update'" do
@@ -459,22 +549,98 @@ describe AssignmentGroupsController do
       course_group
     end
 
+    let(:name){ 'new group name' }
+
     it 'requires authorization' do
-      put 'update', :course_id => @course.id, :id => @group.id
+      put 'update', :course_id => @course.id, :id => @group.id, :assignment_group => {:name => name}
       assert_unauthorized
     end
 
     it 'does not allow students to update' do
       user_session(@student)
-      put 'update', :course_id => @course.id, :id => @group.id
+      put 'update', :course_id => @course.id, :id => @group.id, :assignment_group => {:name => name}
       assert_unauthorized
     end
 
     it 'updates group' do
       user_session(@teacher)
-      put 'update', :course_id => @course.id, :id => @group.id, :assignment_group => {:name => 'new group name'}
+      group_integration_data = {'something' => 'else', 'foo' => 'bar'}
+      put 'update', :course_id => @course.id,
+                    :id => @group.id,
+                    :assignment_group => {:name => name,
+                                          :sis_source_id => '5678',
+                                          :integration_data => group_integration_data}
       expect(assigns[:assignment_group]).to eql(@group)
       expect(assigns[:assignment_group].name).to eql('new group name')
+      expect(assigns[:assignment_group].sis_source_id).to eql('5678')
+      expect(assigns[:assignment_group].integration_data).to eql(group_integration_data)
+    end
+
+    it 'updates group with existing integration_data' do
+      existing_integration_data = {'existing' => 'data'}
+      @group.integration_data = existing_integration_data
+      @group.save
+
+      user_session(@teacher)
+      new_integration_data = {'oh'=> 'hello', 'hi'=> 'there'}
+      put 'update', :course_id => @course.id,
+          :id => @group.id,
+          :assignment_group => {:name => name,
+                                :sis_source_id => '5678',
+                                :integration_data => new_integration_data}
+
+      expect(AssignmentGroup.find(@group.id).integration_data).to eq(
+        existing_integration_data.merge(new_integration_data)
+      )
+    end
+
+    it 'updates a group with no integration_data' do
+      user_session(@teacher)
+      put 'update', :course_id => @course.id,
+          :id => @group.id,
+          :assignment_group => {:name => name,
+                                :sis_source_id => '5678',
+                                :integration_data => {}}
+      expect(assigns[:assignment_group]).to eql(@group)
+      expect(assigns[:assignment_group].name).to eql('new group name')
+      expect(assigns[:assignment_group].sis_source_id).to eql('5678')
+      expect(assigns[:assignment_group].integration_data).to eql({})
+    end
+
+    it 'updates a group where integration_data is not present' do
+      user_session(@teacher)
+      put 'update', :course_id => @course.id,
+          :id => @group.id,
+          :assignment_group => {:name => 'updated name',
+                                :sis_source_id => '5678',
+                                :integration_data => nil}
+      expect(assigns[:assignment_group]).to eql(@group)
+      expect(assigns[:assignment_group].name).to eql('updated name')
+      expect(assigns[:assignment_group].sis_source_id).to eql('5678')
+      expect(assigns[:assignment_group].integration_data).to eql({})
+    end
+
+    it 'returns a 400 when trying to update a group with invalid integration_data' do
+      user_session(@teacher)
+      integration_data = 'test'
+      put 'update', :course_id => @course.id,
+          :id => @group.id,
+          :assignment_group => {:name => name,
+                                :integration_data => integration_data}
+      expect(response.status).to eq(400)
+    end
+
+    it 'retains integration_data when updating a group' do
+      user_session(@teacher)
+      group = course_group_with_integration_data
+      expect(group.name).to eq('some group')
+      expect(group.integration_data).to eq({'something'=> 'else'})
+      put 'update', :course_id => @course.id,
+          :id => group.id,
+          :assignment_group => {:name => 'new new new group name'}
+      expect(assigns[:assignment_group]).to eql(group)
+      expect(assigns[:assignment_group].name).to eql('new new new group name')
+      expect(assigns[:assignment_group].integration_data).to eql({'something'=> 'else'})
     end
   end
 

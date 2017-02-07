@@ -250,7 +250,10 @@ class WikiPagesApiController < ApplicationController
       scope = scope.order(order_clause)
 
       wiki_pages = Api.paginate(scope, self, pages_route)
-      render :json => wiki_pages_json(wiki_pages, @current_user, session)
+
+      check_for_restrictions = master_courses? && @context.wiki.grants_right?(@current_user, :manage)
+      MasterCourses::Restrictor.preload_restrictions(wiki_pages) if check_for_restrictions
+      render :json => wiki_pages_json(wiki_pages, @current_user, session, :include_master_course_restrictions => check_for_restrictions)
     end
   end
 
@@ -391,6 +394,7 @@ class WikiPagesApiController < ApplicationController
   # @returns Page
   def destroy
     if authorized_action(@page, @current_user, :delete)
+      return render_unauthorized_action if editing_restricted?(@page)
       if !@was_front_page
         @page.destroy
         process_front_page

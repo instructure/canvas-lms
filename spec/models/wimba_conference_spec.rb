@@ -83,7 +83,7 @@ describe WimbaConference do
   end
 
   it "should be active if an admin has joined" do
-    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course)
+    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course_factory)
     # this makes it active
     conference.initiate_conference
     expect(conference.admin_join_url(@user)).not_to be_nil
@@ -93,20 +93,20 @@ describe WimbaConference do
   end
 
   it "should be closed if it has not been initiated" do
-    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course)
+    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course_factory)
     expect(conference.conference_status).to eql(:closed)
     expect(conference.participant_join_url(@user)).to be_nil
   end
 
   it "should be closed if no admins have joined" do
-    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course)
+    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course_factory)
     conference.initiate_conference
     expect(conference.conference_status).to eql(:closed)
     expect(conference.participant_join_url(@user)).to be_nil
   end
 
   it "should correctly generate join urls" do
-    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course)
+    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course_factory)
     conference.initiate_conference
     # join urls for admins and participants look the same (though token will vary by user), since
     # someone's admin/participant-ness is negotiated beforehand through api calls and isn't
@@ -117,7 +117,7 @@ describe WimbaConference do
   end
 
   it "should correctly return archive urls" do
-    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course)
+    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course_factory)
     conference.initiate_conference
     conference.admin_join_url(@user)
     conference.started_at = 1.hour.ago
@@ -128,7 +128,7 @@ describe WimbaConference do
   end
 
   it "should not return archive urls if the conference hasn't started" do
-    conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 120, :context => course)
+    conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 120, :context => course_factory)
     expect(conference.external_url_for("archive", @user)).to be_empty
   end
 end

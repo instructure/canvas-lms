@@ -127,10 +127,10 @@ describe Api::V1::User do
       student = User.create!(:name => 'User')
       student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
 
-      teacher = user
-      course1 = course(:active_all => true)
+      teacher = user_factory
+      course1 = course_factory(active_all: true)
       course1.enroll_user(teacher, "TeacherEnrollment").accept!
-      course2 = course(:active_all => true)
+      course2 = course_factory(active_all: true)
       course2.enroll_user(teacher, "StudentEnrollment").accept!
 
       expect(@test_api.user_json(student, teacher, {}, [], course1)).to eq({
@@ -157,10 +157,10 @@ describe Api::V1::User do
       student = User.create!(:name => 'User')
       student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
 
-      teacher = user
-      course1 = course(:active_all => true)
+      teacher = user_factory
+      course1 = course_factory(active_all: true)
       course1.enroll_user(teacher, "TeacherEnrollment").accept!
-      course2 = course(:active_all => true)
+      course2 = course_factory(active_all: true)
       course2.enroll_user(teacher, "StudentEnrollment").accept!
       group1 = course1.groups.create!(:name => 'Group 1')
       group2 = course2.groups.create!(:name => 'Group 2')
@@ -838,7 +838,7 @@ describe "Users API", type: :request do
 
     context "as a non-administrator" do
       before :once do
-        user(active_all: true)
+        user_factory(active_all: true)
       end
 
       it "should not let you create a user if self_registration is off" do
@@ -954,7 +954,7 @@ describe "Users API", type: :request do
 
     context "as an anonymous user" do
       before :each do
-        user(active_all: true)
+        user_factory(active_all: true)
         @user = nil
       end
 
@@ -1226,7 +1226,7 @@ describe "Users API", type: :request do
 
     context "an unauthorized user" do
       it "should receive a 401" do
-        user
+        user_factory
         raw_api_call(:put, @path, @path_options, {
           :user => { :name => 'Gob Bluth' }
         })
@@ -1281,7 +1281,7 @@ describe "Users API", type: :request do
       end
 
       it "should receive 401 if updating another user's settings" do
-        @course.enroll_student(user).accept!
+        @course.enroll_student(user_factory).accept!
         raw_api_call(:put, path, path_options, manual_mark_as_read: true)
         expect(response.code).to eq '401'
       end
@@ -1418,7 +1418,7 @@ describe "Users API", type: :request do
 
     context 'an unauthorized user' do
       it "should receive a 401" do
-        user
+        user_factory
         raw_api_call(:delete, @path, @path_options)
         expect(response.code).to eql '401'
       end
@@ -1543,7 +1543,7 @@ describe "Users API", type: :request do
   describe 'Custom Colors' do
     before :each do
       @a = Account.default
-      @u = user(:active_all => true)
+      @u = user_factory(active_all: true)
       @a.account_users.create!(user: @u)
     end
 
@@ -1676,7 +1676,7 @@ describe "Users API", type: :request do
   describe "dashboard positions" do
     before :each do
       @a = Account.default
-      @u = user(:active_all => true)
+      @u = user_factory(active_all: true)
       @a.account_users.create!(user: @u)
     end
 
@@ -1720,8 +1720,8 @@ describe "Users API", type: :request do
 
     describe "PUT dashboard positions" do
       it "should allow setting dashboard positions" do
-        course1 = course(:active_all => true)
-        course2 = course(:active_all => true)
+        course1 = course_factory(active_all: true)
+        course2 = course_factory(active_all: true)
         json = api_call(
           :put,
           "/api/v1/users/#{@user.id}/dashboard_positions",
@@ -1745,7 +1745,7 @@ describe "Users API", type: :request do
       end
 
       it "should not allow creating entries for entities that do not exist" do
-        course1 = course(:active_all => true)
+        course1 = course_factory(active_all: true)
         course1.enroll_user(@user, "TeacherEnrollment").accept!
         api_call(
           :put,
@@ -1767,7 +1767,7 @@ describe "Users API", type: :request do
       it "should not allow creating entries for entities that the user doesn't have read access to" do
         course_with_student(:active_all => true)
         course1 = @course
-        course2 = course
+        course2 = course_factory
 
         api_call(
           :put,
@@ -1787,8 +1787,8 @@ describe "Users API", type: :request do
       end
 
       it "should not allow setting positions to strings" do
-        course1 = course(:active_all => true)
-        course2 = course(:active_all => true)
+        course1 = course_factory(active_all: true)
+        course2 = course_factory(active_all: true)
 
         api_call(
           :put,
@@ -1813,7 +1813,7 @@ describe "Users API", type: :request do
   describe 'missing submissions' do
     before :once do
       course_with_student(active_all: true)
-      @observer = user(active_all: true, active_state: 'active')
+      @observer = user_factory(active_all: true, active_state: 'active')
       @observer.user_observees.create do |uo|
         uo.user_id = @student.id
       end
@@ -1837,7 +1837,7 @@ describe "Users API", type: :request do
     end
 
     it "should not return assignments that don't expect a submission" do
-      ungraded = @course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
+      ungraded = @course.assignments.create! due_at: 2.days.from_now, workflow_state: 'published', submission_types: 'not_graded'
       json = api_call(:get, @path, @params)
       expect(json.map { |a| a['id'] }).not_to include ungraded.id
     end

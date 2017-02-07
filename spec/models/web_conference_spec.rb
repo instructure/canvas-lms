@@ -53,14 +53,14 @@ describe WebConference do
     it "should ignore invalid user settings" do
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :user_settings => {:foo => :bar}, :context => course)
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :user_settings => {:foo => :bar}, :context => course_factory)
       expect(conference.user_settings).to be_empty
     end
 
     it "should not expose internal settings to users" do
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = BigBlueButtonConference.new(:title => "my conference", :user => @user, :context => course)
+      conference = BigBlueButtonConference.new(:title => "my conference", :user => @user, :context => course_factory)
       conference.settings = {:record => true, :not => :for_user}
       conference.save
       conference.reload
@@ -75,7 +75,7 @@ describe WebConference do
     end
 
     let_once(:conference) do
-      WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
+      WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course_factory)
     end
 
     before :each do
@@ -253,7 +253,7 @@ describe WebConference do
   context "scheduled conferences" do
     before :once do
       course_with_student(:active_all => 1)
-      @conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
+      @conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => @course)
     end
 
     it "has a start date" do

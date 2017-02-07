@@ -21,6 +21,7 @@ define([
           model= {this.props.model}
           startEditingName= {this.startEditingName}
           userCanManageFilesForContext= {canManage}
+          userCanRestrictFilesForContext= {this.props.userCanRestrictFilesForContext}
           usageRightsRequiredForContext= {this.props.usageRightsRequiredForContext}
           externalToolsForContext= {this.props.externalToolsForContext}
           modalOptions= {this.props.modalOptions}
@@ -121,6 +122,7 @@ define([
           <UsageRightsIndicator
             model= {this.props.model}
             userCanManageFilesForContext= {this.props.userCanManageFilesForContext}
+            userCanRestrictFilesForContext= {this.props.userCanRestrictFilesForContext}
             usageRightsRequiredForContext= {this.props.usageRightsRequiredForContext}
             modalOptions= {this.props.modalOptions}
           />

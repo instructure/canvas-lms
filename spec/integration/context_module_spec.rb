@@ -241,7 +241,7 @@ describe ContextModule do
   describe "caching" do
     it "should cache the view separately for each time zone" do
       enable_cache do
-        course active_all: true
+        course_factory active_all: true
 
         mod = @course.context_modules.create!
         mod.unlock_at = Time.utc(2014, 12, 25, 12, 0)

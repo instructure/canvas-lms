@@ -22,10 +22,12 @@ define [
   'jqueryui/dialog'
   'jquery.toJSON'
   'compiled/jquery.rails_flash_notifications'
+  'compiled/behaviors/tooltip'
 ], (INST, I18n, ValidatedFormView, _, $, RichContentEditor, EditViewTemplate,
-userSettings, TurnitinSettings, VeriCiteSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
-AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts,
-ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
+  userSettings, TurnitinSettings, VeriCiteSettings, TurnitinSettingsDialog,
+  preventDefault, MissingDateDialog, AssignmentGroupSelector,
+  GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts,
+  ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -113,7 +115,6 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
       events["click #{EXTERNAL_TOOLS_URL}_find"] = 'showExternalToolsDialog'
       events["change #assignment_points_possible"] = 'handlePointsChange'
       events["change #{PEER_REVIEWS_BOX}"] = 'handleModeratedGradingChange'
-      events["change #{GROUP_CATEGORY_BOX}"] = 'handleModeratedGradingChange'
       events["change #{MODERATED_GRADING_BOX}"] = 'handleModeratedGradingChange'
       events["change #{GROUP_CATEGORY_BOX}"] = 'handleGroupCategoryChange'
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
@@ -166,16 +167,17 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
       @checkboxAccessibleAdvisory(box).text(message)
 
     enableCheckbox: (box) ->
-      if box.prop("disabled")
+      if box.prop('disabled')
         return if @assignment.inClosedGradingPeriod()
 
-        box.removeProp("disabled").parent().timeoutTooltip().timeoutTooltip('disable').removeAttr('data-tooltip').removeAttr('title')
+        box.prop('disabled', false).parent().timeoutTooltip().timeoutTooltip('disable').removeAttr('data-tooltip').removeAttr('title')
         @setImplicitCheckboxValue(box, '0')
         @checkboxAccessibleAdvisory(box).text('')
 
     handleGroupCategoryChange: ->
       isGrouped = @$groupCategoryBox.prop('checked')
       @$intraGroupPeerReviews.toggleAccessibly(isGrouped)
+      @handleModeratedGradingChange()
 
     handleModeratedGradingChange: =>
       if !ENV?.HAS_GRADED_SUBMISSIONS
@@ -466,6 +468,15 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
         errors["online_submission_types[online_text_entry]"] = [
           message: I18n.t 'at_least_one_submission_type', 'Please choose at least one submission type'
         ]
+      else if data.submission_type == 'online' and data.vericite_enabled == "1"
+        allow_vericite = true
+        _.select _.keys(data.submission_types), (k) ->
+          allow_vericite = allow_vericite && (data.submission_types[k] == "online_upload" || data.submission_types[k] == "online_text_entry")
+        if !allow_vericite
+          errors["online_submission_types[online_text_entry]"] = [
+            message: I18n.t 'vericite_submission_types_validation', 'VeriCite only supports file submissions and text entry'
+          ]
+
       errors
 
     _validateAllowedExtensions: (data, errors) =>
@@ -535,11 +546,14 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
         "#assignment_peer_reviews_fields *"
         "#assignment_description"
         "#assignment_notify_of_update"
+        "#assignment_post_to_sis"
       ]
       ignoreFilter = ignoreFields.map((field) -> "not(#{field})").join(":")
 
+      self = this
+      @$el.find(":checkbox:#{ignoreFilter}").each ->
+        self.disableCheckbox($(this), I18n.t("Cannot be edited for assignments in closed grading periods"))
       @$el.find(":radio:#{ignoreFilter}").click(@ignoreClickHandler)
-      @$el.find(":checkbox:#{ignoreFilter}").click(@ignoreClickHandler)
       @$el.find("select:#{ignoreFilter}").each(@lockSelectValueHandler)
 
     ignoreClickHandler: (event) ->

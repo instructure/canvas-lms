@@ -305,6 +305,68 @@ describe "Accounts API", type: :request do
       expect(@a1.restrict_student_past_view).to eq({:value => true, :locked => false})
     end
 
+    it "should update services" do
+      expect(@a1.service_enabled?(:avatars)).to be_falsey
+      json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+        { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+        { :account => {:services => {:avatars => "1"}}})
+
+      expect(json['services']['avatars']).to be_truthy
+      expect(Account.find(@a1.id).service_enabled?(:avatars)).to be_truthy
+    end
+
+    it "should update account with sis_assignment_name_length_input with string value" do
+      api_call(:put, "/api/v1/accounts/#{@a1.id}",
+                      { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+                      { :account => {
+                          :settings => {
+                            :sis_assignment_name_length_input => {
+                              :value => '120'
+                            }
+                      }}})
+
+      expect(Account.find(@a1.id).settings[:sis_assignment_name_length_input][:value]).to eq '120'
+    end
+
+    it "should update account with sis_assignment_name_length_input with integer value" do
+      api_call(:put, "/api/v1/accounts/#{@a1.id}",
+               { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+               { :account => {
+                 :settings => {
+                   :sis_assignment_name_length_input => {
+                     :value => 200
+                   }
+                 }}})
+
+      expect(Account.find(@a1.id).settings[:sis_assignment_name_length_input][:value]).to eq '200'
+    end
+
+    it "should set sis_assignment_name_length_input to default 255 if value is integer and over 255" do
+      api_call(:put, "/api/v1/accounts/#{@a1.id}",
+               { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+               { :account => {
+                 :settings => {
+                   :sis_assignment_name_length_input => {
+                     :value => 400
+                   }
+                 }}})
+
+      expect(Account.find(@a1.id).settings[:sis_assignment_name_length_input][:value]).to eq '255'
+    end
+
+    it "should set sis_assignment_name_length_input to default 255 if value is string and over 255" do
+      api_call(:put, "/api/v1/accounts/#{@a1.id}",
+               { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+               { :account => {
+                 :settings => {
+                   :sis_assignment_name_length_input => {
+                     :value => '300'
+                   }
+                 }}})
+
+      expect(Account.find(@a1.id).settings[:sis_assignment_name_length_input][:value]).to eq '255'
+    end
+
     it "should not update with a blank name" do
       @a1.name = "blah"
       @a1.save!

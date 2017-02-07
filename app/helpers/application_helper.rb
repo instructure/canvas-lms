@@ -253,7 +253,7 @@ module ApplicationHelper
   #   * or when ?debug_assets=true is present in the url
   def js_base_url
     if use_webpack?
-      use_optimized_js? ? "/webpack-dist-optimized" : "/webpack-dist"
+      use_optimized_js? ? '/dist/webpack-production' : '/dist/webpack-dev'
     else
       use_optimized_js? ? '/optimized' : '/javascripts'
     end.freeze
@@ -261,11 +261,27 @@ module ApplicationHelper
 
   # Returns a <script> tag for each registered js_bundle
   def include_js_bundles
-    paths = []
-    paths = ["#{js_base_url}/vendor.bundle.js", "#{js_base_url}/instructure-common.bundle.js"] if use_webpack?
+    if use_webpack?
+
+      # This contains the webpack runtime, it needs to be loaded first
+      paths = ["#{js_base_url}/vendor"]
+
+      # We preemptive load these timezone/locale data files so they are ready
+      # by the time our app-code runs and so webpack doesn't need to know how to load them
+      paths << "#{js_base_url}/vendor/timezone/#{js_env[:TIMEZONE]}" if js_env[:TIMEZONE]
+      paths << "#{js_base_url}/vendor/timezone/#{js_env[:CONTEXT_TIMEZONE]}" if js_env[:CONTEXT_TIMEZONE]
+      paths << "#{js_base_url}/vendor/timezone/#{js_env[:BIGEASY_LOCALE]}" if js_env[:BIGEASY_LOCALE]
+      paths << "#{js_base_url}/moment/locale/#{js_env[:MOMENT_LOCALE]}" if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != 'en'
+
+      paths << "#{js_base_url}/appBootstrap"
+      paths << "#{js_base_url}/common"
+    else
+      paths = []
+    end
+
     js_bundles.each do |(bundle, plugin)|
       if use_webpack?
-        paths << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}.bundle.js"
+        paths << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}"
       else
         paths << "#{js_base_url}#{plugin ? "/plugins/#{plugin}" : ''}/compiled/bundles/#{bundle}.js"
       end

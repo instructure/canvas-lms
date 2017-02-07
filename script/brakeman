@@ -39,8 +39,14 @@ unless comments.size > 0
 end
 
 if gerrit_patchset?
-  require 'shellwords'
-  `gergich comment #{Shellwords.escape(comments.to_json)}`
+  require "gergich"
+  draft = Gergich::Draft.new
+  comments.each do |comment|
+    draft.add_comment comment[:path],
+                      comment[:position],
+                      comment[:message],
+                      comment[:severity]
+  end
 else
   require 'colorize'
   comments.each { |comment| pretty_comment(comment) }

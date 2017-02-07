@@ -1,13 +1,13 @@
-module.exports = function(input){
-  this.cacheable();
-  var dependenciesRegexp = /define\(?\s*\[(.|\n)*?]/;
-  var newInput = input.replace(dependenciesRegexp, function(match){
-    if(/('|")jst\//.test(match)){
-      var extraDep = ", 'coffeescripts/handlebars_helpers']";
-      var defineWithHandlebarsDependency = match.replace(/]$/m, extraDep);
-      return defineWithHandlebarsDependency;
+const dependenciesRegexp = /define\(?\s*\[(.|\n)*?]/
+const extraDep = ", 'coffeescripts/handlebars_helpers']"
+
+module.exports = function (input) {
+  this.cacheable()
+  return input.replace(dependenciesRegexp, match => {
+    if (/('|")jst\//.test(match)) {
+      const defineWithHandlebarsDependency = match.replace(/]$/m, extraDep)
+      return defineWithHandlebarsDependency
     }
-    return match;
-  });
-  return newInput;
+    return match
+  })
 }

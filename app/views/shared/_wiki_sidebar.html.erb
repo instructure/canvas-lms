@@ -80,7 +80,7 @@
          <div id="announcements_panel" role="tabpanel">
             <ul class="wiki_pages page_list">
               <li title="<%= t('insert.announcements', %{Click to insert a link to this announcement}) %>"><%= link_to t('links.announcements', "Announcements List"), context_url(@context, :context_announcements_url) %></li>
-              <% for announcement in @wiki_sidebar_data[:active_discussion_topics].select{|d| d.is_a?(Announcement) } %>
+              <% for announcement in @wiki_sidebar_data[:active_discussion_topics].select{ |d| d.is_a?(Announcement) } %>
                 <li title="<%= t('insert.announcements', %{Click to insert a link to this announcement}) %>"><%= link_to announcement.title, context_url(@context, :context_announcement_url, announcement) %></li>
               <% end %>
             </ul>
@@ -94,7 +94,7 @@
          <div id="discussions_panel" role="tabpanel">
             <ul class="wiki_pages page_list">
               <li title="<%= t('insert.discussions', %{Click to insert a link to this topic}) %>"><%= link_to t('links.discussions', "Discussion Index"), context_url(@context, :context_discussion_topics_url) %></li>
-              <% for discussion_topic in @wiki_sidebar_data[:active_discussion_topics] %>
+              <% for discussion_topic in @wiki_sidebar_data[:active_discussion_topics].reject{ |d| d.is_a?(Announcement) } %>
                 <li title="<%= t('insert.discussions', %{Click to insert a link to this topic}) %>"><%= link_to discussion_topic.title, context_url(@context, :context_discussion_topic_url, discussion_topic) %></li>
               <% end %>
             </ul>

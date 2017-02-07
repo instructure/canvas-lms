@@ -8,9 +8,9 @@ namespace :i18n do
     Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
     def I18nliner.manual_translations
-      I18n.backend.direct_lookup('en')
+      I18n.available_locales
+      I18n.backend.send(:translations)[:en]
     end
-
 
     puts "\nJS/HBS..."
     system "./gems/canvas_i18nliner/bin/i18nliner export"
@@ -79,11 +79,7 @@ namespace :i18n do
     I18n.load_path += Dir[Rails.root.join('gems', 'plugins', '*', 'config', 'locales', '*.{rb,yml}')]
     I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
 
-    require 'i18nema'
-
-    I18n.backend = I18nema::Backend.new
-    I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
-    I18n.backend.init_translations
+    I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
   end
 
   desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
@@ -96,11 +92,11 @@ namespace :i18n do
     #
     # LOCALES=hi,ja,pt,zh-hans rake i18n:generate_js
     locales += ENV['LOCALES'].split(',').map(&:to_sym) if ENV['LOCALES']
-    all_translations = I18n.backend.direct_lookup
+    all_translations = I18n.backend.send(:translations)
 
     # copy "real" translations from deprecated locales
     I18n.available_locales.each do |locale|
-      if (deprecated_for = I18n.backend.direct_lookup(locale.to_s, 'deprecated_for'))
+      if (deprecated_for = I18n.backend.send(:lookup, locale.to_s, 'deprecated_for'))
         all_translations[locale] = all_translations[deprecated_for.to_sym]
       end
     end

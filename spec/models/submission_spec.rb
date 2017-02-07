@@ -63,9 +63,9 @@ describe Submission do
 
     describe "permissions" do
       before(:once) do
-        @admin = user(active_all: true)
+        @admin = user_factory(active_all: true)
         @root_account.account_users.create!(user: @admin)
-        @teacher = user(active_all: true)
+        @teacher = user_factory(active_all: true)
         @context.enroll_teacher(@teacher)
       end
 
@@ -86,7 +86,7 @@ describe Submission do
           end
 
           it "has not have grade permissions if the user is non-root account admin without manage_grades permissions" do
-            @student = user(active_all: true)
+            @student = user_factory(active_all: true)
             @context.enroll_student(@student)
             expect(@submission.grants_right?(@student, :grade)).to eq(false)
           end
@@ -108,7 +108,7 @@ describe Submission do
           end
 
           it "has not have grade permissions if the user is non-root account admin without manage_grades permissions" do
-            @student = user(active_all: true)
+            @student = user_factory(active_all: true)
             @context.enroll_student(@student)
             expect(@submission.grants_right?(@student, :grade)).to eq(false)
           end
@@ -186,7 +186,7 @@ describe Submission do
 
   it "should ensure the media object exists" do
     assignment_model
-    se = @course.enroll_student(user)
+    se = @course.enroll_student(user_factory)
     MediaObject.expects(:ensure_media_object).with("fake", { :context => se.user, :user => se.user })
     @submission = @assignment.submit_homework(se.user, :media_comment_id => "fake", :media_comment_type => "audio")
   end
@@ -619,6 +619,74 @@ describe Submission do
     end
   end
 
+  describe 'computation of scores' do
+    before(:once) do
+      @assignment.update!(points_possible: 10)
+      @submission = Submission.create!(@valid_attributes)
+    end
+
+    let(:scores) do
+      enrollment = Enrollment.where(user_id: @submission.user_id, course_id: @submission.context).first
+      enrollment.scores.order(:grading_period_id)
+    end
+
+    let(:grading_period_scores) do
+      scores.where.not(grading_period_id: nil)
+    end
+
+    it 'recomputes course scores when the submission score changes' do
+      expect { @submission.update!(score: 5) }.to change {
+        scores.pluck(:current_score)
+      }.from([nil]).to([50.0])
+    end
+
+    context 'Multiple Grading Periods' do
+      before(:once) do
+        @now = Time.zone.now
+        course = @submission.context
+        assignment_outside_of_period = course.assignments.create!(
+          due_at: 10.days.from_now(@now),
+          points_possible: 10
+        )
+        assignment_outside_of_period.grade_student(@user, grade: 8, grader: @teacher)
+        @assignment.update!(due_at: @now)
+        @root_account = course.root_account
+        @root_account.enable_feature!(:multiple_grading_periods)
+        group = @root_account.grading_period_groups.create!
+        group.enrollment_terms << course.enrollment_term
+        @grading_period = group.grading_periods.create!(
+          title: 'Current Grading Period',
+          start_date: 5.days.ago(@now),
+          end_date: 5.days.from_now(@now)
+        )
+      end
+
+      it 'updates the course score and grading period score if a submission ' \
+      'in a grading period is graded' do
+        expect { @submission.update!(score: 5) }.to change {
+          scores.pluck(:current_score)
+        }.from([nil, 80.0]).to([50.0, 65.0])
+      end
+
+      it 'keeps grading period scores updated even if the feature flag is disabled' do
+        @submission.update!(score: 10)
+        @root_account.disable_feature!(:multiple_grading_periods)
+        expect { @submission.update!(score: 5) }.to change {
+          grading_period_scores.pluck(:current_score)
+        }.from([100.0]).to([50.0])
+      end
+
+      it 'only updates the course score (not the grading period score) if a submission ' \
+      'not in a grading period is graded' do
+        day_after_grading_period_ends = 1.day.from_now(@grading_period.end_date)
+        @assignment.update!(due_at: day_after_grading_period_ends)
+        expect { @submission.update!(score: 5) }.to change {
+          scores.pluck(:current_score)
+        }.from([nil, 80.0]).to([nil, 65.0])
+      end
+    end
+  end
+
   describe '#can_grade?' do
     before(:each) do
       @account = Account.new
@@ -788,6 +856,126 @@ describe Submission do
 
       it 'sets an appropriate error message' do
         expect(@submission.grading_error_message).to include('closed grading period')
+      end
+    end
+  end
+
+  context "OriginalityReport" do
+    let(:attachment) { attachment_model }
+    let(:course) { course_model }
+    let(:submission) { submission_model }
+
+    let(:originality_report) do
+      OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
+    end
+
+    describe "#originality_data" do
+      it "generates the originality data" do
+        originality_report.originality_report_url = 'http://example.com'
+        originality_report.save!
+        expect(submission.originality_data).to eq({
+                                                    attachment.asset_string => {
+                                                      similarity_score: originality_report.originality_score,
+                                                      state: originality_report.state,
+                                                      report_url: originality_report.originality_report_url,
+                                                      status: originality_report.workflow_state
+                                                    }
+                                                  })
+      end
+
+      it "includes tii data" do
+        tii_data = {
+          similarity_score: 10,
+          state: 'acceptable',
+          report_url: 'http://example.com',
+          status: 'scored'
+        }
+        submission.turnitin_data[attachment.asset_string] = tii_data
+        expect(submission.originality_data).to eq({
+                                                    attachment.asset_string => tii_data
+                                                  })
+      end
+
+      it "overrites the tii data with the originality data" do
+        originality_report.originality_report_url = 'http://example.com'
+        originality_report.save!
+        tii_data = {
+          similarity_score: 10,
+          state: 'acceptable',
+          report_url: 'http://example.com/tii',
+          status: 'pending'
+        }
+        submission.turnitin_data[attachment.asset_string] = tii_data
+        expect(submission.originality_data).to eq({
+                                                    attachment.asset_string => {
+                                                      similarity_score: originality_report.originality_score,
+                                                      state: originality_report.state,
+                                                      report_url: originality_report.originality_report_url,
+                                                      status: originality_report.workflow_state
+                                                    }
+                                                  })
+      end
+
+      it "rounds the score to 2 decimal places" do
+        originality_report.originality_score = 2.94997
+        originality_report.save!
+        expect(submission.originality_data[attachment.asset_string][:similarity_score]).to eq(2.95)
+      end
+
+      it "filters out :provider key and value" do
+         originality_report.originality_report_url = 'http://example.com'
+        originality_report.save!
+        tii_data = {
+          provider: 'vericite',
+          similarity_score: 10,
+          state: 'acceptable',
+          report_url: 'http://example.com/tii',
+          status: 'pending'
+        }
+        submission.turnitin_data[attachment.asset_string] = tii_data
+        expect(submission.originality_data).not_to include :vericite
+      end
+
+    end
+
+    describe '#originality_report_url' do
+      let_once(:test_course) do
+        test_course = course_model
+        test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
+        test_course.enroll_student(test_student, enrollment_state: 'active')
+        test_course
+      end
+
+      let_once(:test_teacher) { User.create }
+      let_once(:test_student) { User.create }
+      let_once(:assignment) { Assignment.create!(title: 'test assignment', context: test_course) }
+      let_once(:attachment) { attachment_model(filename: "submission.doc", context: test_student) }
+      let_once(:submission) { assignment.submit_homework(test_student, attachments: [attachment]) }
+      let_once(:report_url) { 'http://www.test-score.com' }
+      let!(:originality_report) {
+        OriginalityReport.create!(attachment: attachment,
+                                  submission: submission,
+                                  originality_score: 0.5,
+                                  originality_report_url: report_url)
+      }
+
+      it 'returns nil if no originality report exists for the submission' do
+        originality_report.destroy
+        expect(submission.originality_report_url(attachment.asset_string, test_teacher)).to be_nil
+      end
+
+      it 'returns nil if no report url is present in the report' do
+        originality_report.update_attribute(:originality_report_url, nil)
+        expect(submission.originality_report_url(attachment.asset_string, test_teacher)).to be_nil
+      end
+
+      it 'returns the originality_report_url if present' do
+        expect(submission.originality_report_url(attachment.asset_string, test_teacher)).to eq(report_url)
+      end
+
+      it 'requires the :grade permission' do
+        unauthorized_user = User.new
+        expect(submission.originality_report_url(attachment.asset_string, unauthorized_user)).to be_nil
       end
     end
   end
@@ -1115,7 +1303,7 @@ describe Submission do
     # see redmine #6048
 
     # set up the data to have a submission with a quiz submission with multiple versions
-    course
+    course_factory
     quiz = @course.quizzes.create!
     quiz_submission = quiz.generate_submission @user, false
     quiz_submission.save
@@ -1639,7 +1827,7 @@ describe Submission do
 
     before(:each) do
       student_in_course(active_all: true)
-      @student2 = user
+      @student2 = user_factory
       @course.enroll_student(@student2).accept!
       @assignment = peer_review_assignment
       @assignment.submit_homework(@student,  body: 'Lorem ipsum dolor')
@@ -1769,10 +1957,10 @@ describe Submission do
     specs_require_sharding
     it "should work" do
       @shard1.activate do
-        @student = user(:active_user => true)
+        @student = user_factory(active_user: true)
         @attachment = Attachment.create! uploaded_data: StringIO.new('blah'), context: @student, filename: 'blah.txt'
       end
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.enroll_user(@student, "StudentEnrollment").accept!
       @assignment = @course.assignments.create!
 
@@ -2189,6 +2377,57 @@ describe Submission do
       @submission.expects(:grants_right?).with(@grader, :grade).returns(false)
 
       expect(@submission.grader_can_grade?).to be_falsey
+    end
+  end
+
+  describe "#submission_history" do
+    let!(:student) {student_in_course(active_all: true).user}
+    let(:attachment) {attachment_model(filename: "submission-a.doc", :context => student)}
+    let(:submission) { @assignment.submit_homework(student, submission_type: 'online_upload',attachments: [attachment]) }
+
+    it "includes originality data" do
+      OriginalityReport.create!(submission: submission, attachment: attachment, originality_score: 1.0, workflow_state:'pending')
+      submission.originality_reports.load_target
+      expect(submission.submission_history.first.turnitin_data[attachment.asset_string][:similarity_score]).to eq 1.0
+    end
+
+    it "doesn't include the originality_data if originality_report isn't pre loaded" do
+      OriginalityReport.create!(submission: submission, attachment: attachment, originality_score: 1.0, workflow_state:'pending')
+      expect(submission.submission_history.first.turnitin_data[attachment.asset_string]).to be_nil
+    end
+  end
+
+  describe ".needs_grading" do
+    before :once do
+      @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'asdf')
+    end
+
+    it "includes submission that has not been graded" do
+      expect(Submission.needs_grading.count).to eq(1)
+    end
+
+    it "includes submission by enrolled student" do
+      @student.enrollments.take!.complete
+      expect(Submission.needs_grading.count).to eq(0)
+      @course.enroll_student(@student).accept
+      expect(Submission.needs_grading.count).to eq(1)
+    end
+
+    it "includes submission by user with multiple enrollments in the course only once" do
+      another_section = @course.course_sections.create(name: 'two')
+      @course.enroll_student(@student, section: another_section, allow_multiple_enrollments: true).accept
+      expect(Submission.needs_grading.count).to eq(1)
+    end
+
+    it "does not include submission that has been graded" do
+      @assignment.grade_student(@student, grade: '100', grader: @teacher)
+      expect(Submission.needs_grading.count).to eq(0)
+    end
+
+    it "does not include submission by non-student user" do
+      @student.enrollments.take!.complete
+      @course.enroll_user(@student, 'TaEnrollment').accept
+      expect(Submission.needs_grading.count).to eq(0)
     end
   end
 end

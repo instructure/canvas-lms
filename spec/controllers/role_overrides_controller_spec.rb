@@ -101,8 +101,8 @@ describe RoleOverridesController do
         @existing_override.reload
         expect(@existing_override.locked).to be_falsey
       end
-      
-      it "only updates enabled" do 
+
+      it "only updates enabled" do
         @existing_override.enabled = true
         @existing_override.save
 
@@ -144,7 +144,7 @@ describe RoleOverridesController do
         expect(override.locked).to be_truthy
       end
 
-      it "sets override as false when override is unchecked" do 
+      it "sets override as false when override is unchecked" do
         post_with_settings(:override => 'unchecked')
         override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
         expect(override).not_to be_nil
@@ -183,7 +183,7 @@ describe RoleOverridesController do
 
         context "for a non-admin" do
           it "is false" do
-            user_session(user(account: @account))
+            user_session(user_factory(account: @account))
             get 'check_account_permission', :account_id => @account.id, :permission => 'manage_catalog'
             expect(json['granted']).to eq(false)
           end

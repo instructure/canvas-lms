@@ -1,6 +1,6 @@
-gem "aws-sdk-v1", "=1.63.0" unless defined? Bundler
+gem "aws-sdk", "=2.6.7" unless defined? Bundler
 require "json"
-require "aws-sdk-v1"
+require "aws-sdk"
 require "fileutils"
 require "tmpdir"
 require 'yaml'
@@ -46,7 +46,7 @@ module Selinimum
       end
 
       def download_stats(sha, dest)
-        data = s3.objects[S3_PREFIX + "/builds/" + sha].read
+        data = s3.object(S3_PREFIX + "/builds/" + sha).get.body.read
 
         # legacy, fetch individual json files
         # TODO: remove me in ~200 commits once the old data falls out
@@ -62,16 +62,12 @@ module Selinimum
       # download all the json files stored under canvas-lms/data/<SHA>/
       def download_raw_data(sha, dest)
         prefix = S3_PREFIX + "/data/" + sha + "/"
-        objects = s3.objects
-          .as_tree(prefix: prefix)
-          .children
-          .select(&:leaf?)
-          .map(&:object)
+        objects = s3.objects(prefix: prefix, delimiter: '/')
 
         objects.each do |object|
           file_name = object.key.sub(prefix, "")
           File.open("#{dest}/#{file_name}", "wb") do |file|
-            object.read do |chunk|
+            object.get.body.read do |chunk|
               file.write(chunk)
             end
           end
@@ -106,7 +102,7 @@ module Selinimum
 
       def save_file(filename, data)
         save_file_locally(filename, data)
-        s3.objects["#{S3_PREFIX}/#{filename}"].write data
+        s3.object("#{S3_PREFIX}/#{filename}").put(body: data)
       end
 
       def save_file_locally(filename, data)
@@ -118,11 +114,8 @@ module Selinimum
       # get all the SHAs w/ finalized stats
       def all_shas
         prefix = S3_PREFIX + "/builds/"
-        s3.objects
-          .as_tree(prefix: prefix)
-          .children
-          .select(&:leaf?)
-          .map { |obj| obj.key.sub(prefix, "") }
+        s3.objects(prefix: prefix, delimiter: '/').
+          map { |obj| obj.key.sub(prefix, "") }
       end
 
       def s3_enabled?
@@ -134,14 +127,19 @@ module Selinimum
           config = {
             access_key_id: ENV["SELINIMUM_AWS_ID"],
             secret_access_key: ENV["SELINIMUM_AWS_SECRET"],
-            bucket_name: ENV.fetch("SELINIMUM_AWS_BUCKET")
+            bucket_name: ENV.fetch("SELINIMUM_AWS_BUCKET"),
+            region: ENV["SELINIMUM_AWS_REGION"] || 'us-east-1'
           }
-          # fall back to the canvas s3 creds, if provided
+          config[:endpoint] = ENV["SELINUMUM_AWS_ENDPOINT"] if ENV["SELINUMUM_AWS_ENDPOINT"]
+            # fall back to the canvas s3 creds, if provided
           yml_file = "config/amazon_s3.yml"
+
           if File.exist?(yml_file)
             yml_config = YAML.load_file(yml_file)[ENV["RAILS_ENV"]] || {}
             config[:access_key_id] ||= yml_config["access_key_id"]
             config[:secret_access_key] ||= yml_config["secret_access_key"]
+            config[:region] ||= yml_config["region"]
+            config[:endpoint] ||= yml_config["endpoint"] if yml_config["endpoint"]
           end
           config
         end
@@ -149,7 +147,9 @@ module Selinimum
 
       def s3
         @s3 ||= begin
-          AWS::S3.new(s3_config).buckets[s3_config[:bucket_name]]
+          config = s3_config.dup
+          bucket_name = config.delete(:bucket_name)
+          Aws::S3::Resource.new(config).bucket(bucket_name)
         end
       end
     end

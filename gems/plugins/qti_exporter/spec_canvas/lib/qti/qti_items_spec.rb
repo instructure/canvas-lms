@@ -14,5 +14,14 @@ describe "Converting QTI items" do
     expect(question[:question_bank_name]).to eql 'Sad & Broken'
     expect(question[:question_text]).not_to match /divp/
   end
+
+  it "should get answers correctly even when people write gross xml" do
+    file_path = File.join(BASE_FIXTURE_DIR, 'qti')
+    manifest_node=get_manifest_node('terrible_qti')
+    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>file_path)
+
+    expect(hash[:answers].map{|a| a[:text]}).to match_array(['True', 'False', 'Not Sure'])
+    expect(hash[:question_text]).to_not include("Not Sure")
+  end
 end
 end

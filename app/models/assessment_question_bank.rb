@@ -29,6 +29,9 @@ class AssessmentQuestionBank < ActiveRecord::Base
   after_save :update_alignments
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
 
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:title]
+
   workflow do
     state :active
     state :deleted
@@ -121,13 +124,14 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
 
   def select_for_submission(quiz_id, quiz_group_id, count, exclude_ids=[], duplicate_index = 0)
+    # 1. select a random set of questions from the DB
     questions = assessment_questions.active
     questions = questions.where.not(id: exclude_ids) unless exclude_ids.empty?
     questions = questions.reorder("RANDOM()").limit(count)
-    aqs = questions.to_a
+    # 2. process the questions in :id order to minimize the risk of deadlock
+    aqs = questions.to_a.sort_by(&:id)
     quiz_questions = AssessmentQuestion.find_or_create_quiz_questions(aqs, quiz_id, quiz_group_id, duplicate_index)
-    # it's important that this shuffle come after the db updates, otherwise
-    # this can cause deadlocks when run in a transaction
+    # 3. re-randomize the resulting questions
     quiz_questions.shuffle
   end
 

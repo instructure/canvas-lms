@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../lib/canvas/draft_state
 describe Quizzes::Quiz do
 
   before :once do
-    course
+    course_factory
   end
 
   describe ".mark_quiz_edited" do
@@ -809,7 +809,8 @@ describe Quizzes::Quiz do
     expect(q.quiz_submissions.size).to eq 0
 
     # create a graded submission
-    Quizzes::SubmissionGrader.new(q.generate_submission(User.create!(:name => "some_user"))).grade_submission
+    student_in_course(course: @course, active_all: true)
+    Quizzes::SubmissionGrader.new(q.generate_submission(@student)).grade_submission
     q.reload
 
     expect(q.quiz_submissions.size).to eq 1
@@ -1120,7 +1121,7 @@ describe Quizzes::Quiz do
       it "should not allow quiz points higher than allowable by postgres" do
         q = Quizzes::Quiz.new(:points_possible => 2000000001)
         expect(q.valid?).to eq false
-        expect(Array(q.errors[:points_possible])).to eq ["must be less than or equal to 2000000000"]
+        expect(Array(q.errors[:points_possible])).to eq ["must be less than or equal to 2,000,000,000"]
       end
     end
 
@@ -1642,7 +1643,7 @@ describe Quizzes::Quiz do
     end
 
     context "show_correct_answers_last_attempt is true" do
-      let(:user) { User.create! }
+      let(:student) { student_in_course(course: @course, active_all: true) }
 
       it "shows the correct answers on last attempt completed" do
         quiz = @course.quizzes.create!({
@@ -1654,15 +1655,15 @@ describe Quizzes::Quiz do
 
         quiz.publish!
 
-        submission = quiz.generate_submission(user)
-        expect(quiz.show_correct_answers?(user, submission)).to be_falsey
+        submission = quiz.generate_submission(student)
+        expect(quiz.show_correct_answers?(student, submission)).to be_falsey
         submission.complete!
 
-        submission = quiz.generate_submission(user)
-        expect(quiz.show_correct_answers?(user, submission)).to be_falsey
+        submission = quiz.generate_submission(student)
+        expect(quiz.show_correct_answers?(student, submission)).to be_falsey
         submission.complete!
 
-        expect(quiz.show_correct_answers?(user, submission)).to be_truthy
+        expect(quiz.show_correct_answers?(student, submission)).to be_truthy
       end
 
       it "hides the correct answers on last attempt" do
@@ -1675,9 +1676,9 @@ describe Quizzes::Quiz do
 
         quiz.publish!
 
-        submission = quiz.generate_submission(user)
+        submission = quiz.generate_submission(student)
 
-        expect(quiz.show_correct_answers?(user, submission)).to be_falsey
+        expect(quiz.show_correct_answers?(student, submission)).to be_falsey
       end
     end
   end
@@ -1918,7 +1919,7 @@ describe Quizzes::Quiz do
 
   describe "restore" do
     before do
-      course
+      course_factory
     end
 
     it "should restore to published state if there are student submissions" do

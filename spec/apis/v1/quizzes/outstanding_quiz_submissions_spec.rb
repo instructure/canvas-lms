@@ -37,7 +37,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
     end
 
     before :once do
-      course
+      course_factory
       @user = student_in_course.user
       @quiz = @course.quizzes.create!(:title => "Outstanding")
       @quiz.save
@@ -81,7 +81,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
     end
 
     before :once do
-      course
+      course_factory
       @quiz = @course.quizzes.create!(:title => "Outstanding")
       @quiz.save
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, false)

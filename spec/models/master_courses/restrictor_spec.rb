@@ -2,12 +2,12 @@ require 'spec_helper'
 
 describe MasterCourses::Restrictor do
   before :once do
-    @copy_from = course
+    @copy_from = course_factory
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
     @original_page = @copy_from.wiki.wiki_pages.create!(:title => "blah", :body => "bloo")
     @tag = @template.create_content_tag_for!(@original_page)
 
-    @copy_to = course
+    @copy_to = course_factory
     @page_copy = @copy_to.wiki.wiki_pages.new(:title => "blah", :body => "bloo") # just create a copy directly instead of doing a real migraiton
     @page_copy.migration_id = @tag.migration_id
     @page_copy.save!
@@ -28,13 +28,6 @@ describe MasterCourses::Restrictor do
 
     it "should not prevent changes to content columns on settings-locked objects" do
       @tag.update_attribute(:restrictions, {:settings => true})
-      @page_copy.body = "another something else"
-      @page_copy.save!
-    end
-
-    it "should not prevent changes if validations are skipped" do
-      @tag.update_attribute(:restrictions, {:content => true})
-      @page_copy.skip_master_course_validation!
       @page_copy.body = "another something else"
       @page_copy.save!
     end

@@ -1,5 +1,5 @@
 require 'guard'
-require 'guard/guard'
+require 'guard/plugin'
 require 'fileutils'
 
 # The only thing this guard does is make sure to touch the
@@ -7,19 +7,19 @@ require 'fileutils'
 # doing so will trigger the handlebars guard to regenerate the
 # .handlebars file with the new css injected into
 module Guard
-  class JSTCSS < Guard
+  class JSTCSS < Plugin
 
-    def initialize(watchers = [], options = {})
-      watchers = [] if !watchers
+    def initialize(options = {})
+      options[:watchers] ||= []
 
       if options[:input]
-        watchers << ::Guard::Watcher.new(%r{\A(?:vendor/plugins/.*?/)?#{ Regexp.escape(options[:input]) }/(.+\.s[ca]ss)\z})
+        options[:watchers] << ::Guard::Watcher.new(%r{\A(?:vendor/plugins/.*?/)?#{ Regexp.escape(options[:input]) }/(.+\.s[ca]ss)\z})
       end
 
-      super(watchers, options)
+      super(options)
     end
 
-    def run_on_change(paths)
+    def run_on_modifications(paths)
       paths.each { |p| touch_handlebars_file(p) }
     end
 

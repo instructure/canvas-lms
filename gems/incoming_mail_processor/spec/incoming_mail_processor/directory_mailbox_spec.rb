@@ -32,83 +32,81 @@ describe IncomingMailProcessor::DirectoryMailbox do
   end
 
   it "should connect if folder exists" do
-    @mailbox.expects(:folder_exists?).with(default_config[:folder]).returns(true)
-    expect { @mailbox.connect}.to_not raise_error
+    expect(@mailbox).to receive(:folder_exists?).with(default_config[:folder]).and_return(true)
+    expect { @mailbox.connect }.to_not raise_error
   end
 
   it "should raise on connect if folder does not exist" do
-    @mailbox.expects(:folder_exists?).with(default_config[:folder]).returns(false)
-    expect { @mailbox.connect }.to raise_error
+    expect(@mailbox).to receive(:folder_exists?).with(default_config[:folder]).and_return(false)
+    expect { @mailbox.connect }.to raise_error(/Folder .* does not exist/)
   end
 
   describe ".each_message" do
     it "should iterate through and yield files in a directory" do
       folder = default_config[:folder]
       folder_entries = %w(. .. foo bar baz)
-      @mailbox.expects(:files_in_folder).with(folder).returns(folder_entries)
+      expect(@mailbox).to receive(:files_in_folder).with(folder).and_return(folder_entries)
       folder_entries.each do |entry|
-        @mailbox.expects(:file?).with(folder, entry).returns(!entry.include?('.'))
+        expect(@mailbox).to receive(:file?).with(folder, entry).and_return(!entry.include?('.'))
       end
 
-      @mailbox.expects(:read_file).with(folder, "foo").returns("foo body")
-      @mailbox.expects(:read_file).with(folder, "bar").returns("bar body")
-      @mailbox.expects(:read_file).with(folder, "baz").returns("baz body")
+      expect(@mailbox).to receive(:read_file).with(folder, "foo").and_return("foo body")
+      expect(@mailbox).to receive(:read_file).with(folder, "bar").and_return("bar body")
+      expect(@mailbox).to receive(:read_file).with(folder, "baz").and_return("baz body")
 
       yielded_values = []
       @mailbox.each_message do |*values|
         yielded_values << values
       end
-      yielded_values.should eql [["foo", "foo body"], ["bar", "bar body"], ["baz", "baz body"], ]
+      expect(yielded_values).to eql [["foo", "foo body"], ["bar", "bar body"], ["baz", "baz body"], ]
     end
 
     it "iterates with stride and offset" do
       folder = default_config[:folder]
       folder_entries = %w(. .. foo bar baz)
-      @mailbox.expects(:files_in_folder).with(folder).twice.returns(folder_entries)
+      expect(@mailbox).to receive(:files_in_folder).with(folder).twice.and_return(folder_entries)
       folder_entries.each do |entry|
-        @mailbox.expects(:file?).with(folder, entry).returns(!entry.include?('.'))
+        expect(@mailbox).to receive(:file?).with(folder, entry).and_return(!entry.include?('.'))
       end
 
       # the crc32 of the filename is used to determine whether a given worker picks up the file
       # with these file and two workers, foo goes to worker 1 and foo goes to worker 0
-      @mailbox.expects(:read_file).with(folder, "foo").returns("foo body")
-      @mailbox.expects(:read_file).with(folder, "bar").returns("bar body")
-      @mailbox.expects(:read_file).with(folder, "baz").returns("baz body")
+      expect(@mailbox).to receive(:read_file).with(folder, "foo").and_return("foo body")
+      expect(@mailbox).to receive(:read_file).with(folder, "bar").and_return("bar body")
+      expect(@mailbox).to receive(:read_file).with(folder, "baz").and_return("baz body")
 
       yielded_values = []
       @mailbox.each_message(stride: 2, offset: 0) do |*values|
         yielded_values << values
       end
-      yielded_values.should eql [["bar", "bar body"], ["baz", "baz body"], ]
+      expect(yielded_values).to eql [["bar", "bar body"], ["baz", "baz body"], ]
 
       yielded_values = []
       @mailbox.each_message(stride: 2, offset: 1) do |*values|
         yielded_values << values
       end
-      yielded_values.should eql [["foo", "foo body"]]
+      expect(yielded_values).to eql [["foo", "foo body"]]
     end
   end
 
   describe '#unprocessed_message_count' do
     it "should return nil" do
-      @mailbox.unprocessed_message_count.should be_nil
+      expect(@mailbox.unprocessed_message_count).to be_nil
     end
   end
 
   context "with simple foo file" do
 
     before do
-      @mailbox.expects({
-        :file? => true,
-        :read_file => "foo body",
-        :files_in_folder => ["foo"],
-      })
-      @mailbox.expects(:folder_exists?).with(default_config[:folder]).returns(true)
+      expect(@mailbox).to receive(:file?).and_return(true)
+      expect(@mailbox).to receive(:read_file).and_return("foo body")
+      expect(@mailbox).to receive(:files_in_folder).and_return(["foo"])
+      expect(@mailbox).to receive(:folder_exists?).with(default_config[:folder]).and_return(true)
       @mailbox.connect
     end
 
     it "should delete files" do
-      @mailbox.expects(:delete_file).with(default_config[:folder], "foo")
+      expect(@mailbox).to receive(:delete_file).with(default_config[:folder], "foo")
       @mailbox.each_message do |id, body|
         @mailbox.delete_message(id)
       end
@@ -116,9 +114,9 @@ describe IncomingMailProcessor::DirectoryMailbox do
 
     it "should move files" do
       folder = default_config[:folder]
-      @mailbox.expects(:move_file).with(folder, "foo", "aside")
-      @mailbox.expects(:folder_exists?).with(folder, "aside").returns(true)
-      @mailbox.expects(:create_folder).never
+      expect(@mailbox).to receive(:move_file).with(folder, "foo", "aside")
+      expect(@mailbox).to receive(:folder_exists?).with(folder, "aside").and_return(true)
+      expect(@mailbox).to receive(:create_folder).never
       @mailbox.each_message do |id, body|
         @mailbox.move_message(id, "aside")
       end
@@ -126,9 +124,9 @@ describe IncomingMailProcessor::DirectoryMailbox do
 
     it "should create target folder when moving file if target folder doesn't exist" do
       folder = default_config[:folder]
-      @mailbox.expects(:move_file).with(folder, "foo", "aside")
-      @mailbox.expects(:folder_exists?).with(folder, "aside").returns(false)
-      @mailbox.expects(:create_folder).with(default_config[:folder], "aside")
+      expect(@mailbox).to receive(:move_file).with(folder, "foo", "aside")
+      expect(@mailbox).to receive(:folder_exists?).with(folder, "aside").and_return(false)
+      expect(@mailbox).to receive(:create_folder).with(default_config[:folder], "aside")
       @mailbox.each_message do |id, body|
         @mailbox.move_message(id, "aside")
       end

@@ -9,6 +9,7 @@
  
 define(['vendor/date-js/globalization/en-US'], function() {
 (function () {
+    var _originalDateDotPrototypeDotToString = Date.prototype.toString;
     var $D = Date, 
         $P = $D.prototype, 
         $C = $D.CultureInfo,
@@ -866,7 +867,7 @@ define(['vendor/date-js/globalization/en-US'], function() {
                 return m;
             }
         }
-        ) : this._toString();
+        ) : _originalDateDotPrototypeDotToString.apply(this, arguments);
     };
 }());    
 });

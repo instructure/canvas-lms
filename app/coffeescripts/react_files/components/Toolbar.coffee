@@ -82,6 +82,7 @@ define [
       contents = React.createElement(UsageRightsDialog, {
           closeModal: @props.modalOptions.closeModal
           itemsToManage: @props.selectedItems
+          userCanRestrictFilesForContext: @props.userCanRestrictFilesForContext
       })
 
       @props.modalOptions.openModal(contents, => ReactDOM.findDOMNode(@refs.usageRightsBtn).focus())

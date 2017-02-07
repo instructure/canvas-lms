@@ -190,7 +190,7 @@ describe "assignment groups" do
     let(:unlock_at) { Time.zone.now - 2.days }
     let(:lock_at) { Time.zone.now + 4.days }
 
-    before(:once) do
+    before(:each) do
       make_full_screen
       course_with_student_logged_in(:active_all => true)
     end

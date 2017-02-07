@@ -14,7 +14,7 @@ describe "Standard Common Cartridge importing" do
     @course_data['all_files_export'] ||= {}
     @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
 
-    @course = course
+    @course = course_factory
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
     enable_cache do
@@ -241,7 +241,7 @@ describe "Standard Common Cartridge importing" do
 
   context "selective import" do
     it "should selectively import files" do
-      @course = course
+      @course = course_factory
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {
               :copy => {"discussion_topics" => {"I_00006_R" => true},
@@ -288,7 +288,7 @@ describe "Standard Common Cartridge importing" do
 
 
     it "should not import all attachments if :files does not exist" do
-      @course = course
+      @course = course_factory
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {
           :copy => {"everything" => "0"}}.with_indifferent_access
@@ -341,7 +341,7 @@ describe "Standard Common Cartridge importing" do
     end
 
     it "should fix position conflicts for modules" do
-      @course = course
+      @course = course_factory
 
       mod1 = @course.context_modules.create :name => "ponies"
       mod1.position = 1
@@ -368,7 +368,7 @@ describe "Standard Common Cartridge importing" do
     end
 
     it "should fix position conflicts for assignment groups" do
-      @course = course
+      @course = course_factory
 
       ag1 = @course.assignment_groups.create :name => "ponies"
       ag1.position = 1
@@ -409,7 +409,7 @@ describe "Standard Common Cartridge importing" do
     end
 
     it "should import submodules individually if selected" do
-      course
+      course_factory
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {
         :copy => {"context_modules" => {"sf2" => "1"}}
@@ -586,7 +586,7 @@ describe "LTI tool combination" do
     @course_data['all_files_export'] ||= {}
     @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
 
-    @course = course
+    @course = course_factory
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_type = "common_cartridge_importer"
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
@@ -621,7 +621,7 @@ describe "other cc files" do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/#{filename}")
     unzipped_file_path = create_temp_dir!
 
-    @course = course
+    @course = course_factory
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_type = "common_cartridge_importer"
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}

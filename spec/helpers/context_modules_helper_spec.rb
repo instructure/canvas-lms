@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe ContextModulesHelper do
   include ContextModulesHelper
 
-  let_once(:t_course) { course(active_all: true) }
+  let_once(:t_course) { course_factory(active_all: true) }
   let_once(:t_module) { t_course.context_modules.create! name: "test module" }
 
   describe "module_item_unpublishable?" do

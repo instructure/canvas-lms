@@ -10,15 +10,27 @@ docker-compose.local.*.yml
 docker-compose.override.yml
 docker-compose.yml
 
+client_apps/canvas_quizzes/dist/
 client_apps/canvas_quizzes/node_modules/
+client_apps/canvas_quizzes/tmp/
 gems/canvas_i18nliner/node_modules/
 log/
 node_modules/
 public/dist/
+public/doc/
+public/javascripts/client_apps/
+public/javascripts/compiled/
+public/javascripts/jst/
+public/javascripts/jsx/
+public/javascripts/translations/
+!public/javascripts/translations/_core_en.js
 public/optimized/
 public/webpack-dist/
 public/webpack-dist-optimized/
+spec/javascripts/compiled/
+spec/javascripts/webpack/
 tmp/
 vendor/bundle/
 Dockerfile
 Gemfile.lock
+mkmf.log

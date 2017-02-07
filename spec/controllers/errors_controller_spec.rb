@@ -79,7 +79,7 @@ describe ErrorsController do
 
     it "records the real user if they are in student view" do
       authenticate_user!
-      svs = course.student_view_student
+      svs = course_factory.student_view_student
       session[:become_user_id] = svs.id
       post 'create', error: {message: 'test message'}
       expect(ErrorReport.order(:id).last.user_id).to eq @user.id

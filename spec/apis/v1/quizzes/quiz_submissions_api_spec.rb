@@ -733,13 +733,19 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   end
 
   describe "GET /courses/:course_id/quizzes/:quiz_id/submssions/:id/time" do
+    around(:all) do |group|
+      Timecop.freeze { group.run_examples }
+    end
+
+    let_once(:now) { Time.zone.now }
+
     before :once do
       enroll_student
       @user = @student
 
       @quiz_submission = @quiz.generate_submission(@student)
-      @quiz_submission.update_attribute(:end_at, Time.now + 1.hour)
-      Quizzes::QuizSubmission.where(:id => @quiz_submission).update_all(:updated_at => 1.hour.ago)
+      @quiz_submission.update_attribute(:end_at, now + 1.hour)
+      Quizzes::QuizSubmission.where(:id => @quiz_submission).update_all(:updated_at => now - 1.hour)
     end
     it "should give times for the quiz" do
       json = qs_api_time(false)

@@ -4,7 +4,7 @@ describe GroupLeadership do
 
   describe "member_changed_event" do
     before(:once) do
-      course
+      course_factory
       @category = @course.group_categories.build(:name => "category 1")
       @category.save!
       @group = @category.groups.create!(:context => @course)

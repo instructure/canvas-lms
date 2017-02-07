@@ -1,11 +1,11 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative '../page_objects/srgb_page'
 
 describe "Screenreader Gradebook" do
   include_context 'in-process server selenium tests'
   include_context 'gradebook_components'
   include_context 'reusable_course'
-  include Gradebook2Common
+  include GradebookCommon
 
   let(:srgb_page) { SRGB }
 
@@ -41,7 +41,7 @@ describe "Screenreader Gradebook" do
   it 'shows conluded enrollments', priority: "2", test_id: 615674 do
     srgb_page.concluded_enrollments.click
     wait_for_ajaximations
-    expect(srgb_page.student_dropdown).to include_text('Stewie Griffin')
+    expect(srgb_page.student_dropdown).to include_text('Concluded Student')
   end
 
   it 'shows notes in student info', priority: "2", test_id: 615675 do

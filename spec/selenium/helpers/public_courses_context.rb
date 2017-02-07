@@ -10,7 +10,7 @@ shared_context "public course as a logged out user" do
   end
 
   let!(:public_course) do
-    course(active_course: true)
+    course_factory(active_course: true)
     @course.is_public = true
     @course.save!
     @course

@@ -300,11 +300,13 @@ class SectionsController < ApplicationController
           @student_enrollments_count = @section.enrollments.not_fake.where(:type => 'StudentEnrollment').count
           can_manage_students = @context.grants_right?(@current_user, session, :manage_students) || @context.grants_right?(@current_user, session, :manage_admin_users)
           js_env(
-            :STUDENT_CONTEXT_CARDS_ENABLED => can_manage_students && @domain_root_account.feature_enabled?(:student_context_cards),
             :PERMISSIONS => {
               :manage_students => can_manage_students,
               :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings)
             })
+          if @context.grants_right?(@current_user, session, :manage)
+            js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
+          end
         end
         format.json { render :json => section_json(@section, @current_user, session, Array(params[:include])) }
       end

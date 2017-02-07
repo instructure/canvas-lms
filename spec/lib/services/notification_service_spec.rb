@@ -18,6 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../../messages/messages_helper')
+require_dependency "services/notification_service"
 
 module Services
   describe NotificationService do

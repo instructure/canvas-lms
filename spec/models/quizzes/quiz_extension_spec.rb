@@ -62,7 +62,7 @@ describe Quizzes::QuizExtension do
 
   describe ".build_extensions" do
     before :once do
-      course
+      course_factory
       @quiz = @course.quizzes.create!
 
       @user1 = user_with_pseudonym(active_all: true, name: 'Student1', username: 'student1@instructure.com')
@@ -92,7 +92,7 @@ describe Quizzes::QuizExtension do
 
   describe "#extend_submission" do
     before :once do
-      course
+      course_factory
       @quiz = @course.quizzes.create!
 
       @user = user_with_pseudonym(active_all: true, name: 'Student1', username: 'student1@instructure.com')

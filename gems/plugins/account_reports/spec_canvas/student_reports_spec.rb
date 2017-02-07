@@ -25,12 +25,12 @@ describe 'Student reports' do
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
-    @course1 = course(:course_name => 'English 101', :account => @account,
+    @course1 = course_factory(:course_name => 'English 101', :account => @account,
                       :active_course => true)
     @course1.sis_source_id = 'SIS_COURSE_ID_1'
     @course1.save!
     @course1.offer
-    @course2 = course(:course_name => 'Math 101', :account => @account,
+    @course2 = course_factory(:course_name => 'Math 101', :account => @account,
                       :active_course => true)
     @course2.offer
     @course3 = Course.create(:name => 'Science 101', :course_code => 'SCI101',
@@ -580,7 +580,7 @@ describe 'Student reports' do
     it 'should show data for users in other accounts with enrollments on this account' do
       @different_account = Account.create(name: 'New Account', default_time_zone: 'UTC')
 
-      @course3 = course(:course_name => 'English 101', :account => @account, :active_course => true)
+      @course3 = course_factory(:course_name => 'English 101', :account => @account, :active_course => true)
       @course3.save!
       @course3.offer
 

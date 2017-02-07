@@ -1,7 +1,7 @@
 OAuth2
 ======
 <a name="top"></a>
-<div class="warning-message"> We have started rolling out short lived access tokens. You will need to start using <a href="file.oauth.html#using-refresh-tokens">refresh tokens</a> to generate new access tokens.</div>
+<div class="warning-message"> Developer keys issued after Oct 2015 generate tokens with a 1 hour expiration. Applications must use <a href="file.oauth.html#using-refresh-tokens">refresh tokens</a> to generate new access tokens.</div>
 
 [OAuth2](http://oauth.net/2/) is a protocol designed to let third-party applications
 authenticate to perform actions as a user, without getting the user's
@@ -99,12 +99,17 @@ Performing the OAuth2 token request flow requires an application client
 ID and client secret. To obtain these application credentials, you will
 need to register your application.  The client secret should never be shared.
 
-For Canvas Cloud (hosted by Instructure), you can request a client ID and secret from
-http://instructure.github.io/ in the Dev Key Signup section.
+For Canvas Cloud (hosted by Instructure), developer keys are
+[issued by the admin of the institution](https://community.canvaslms.com/docs/DOC-5141).
 
-For open source Canvas users, you can generate a client ID and secret in
-the Site Admin account of your Canvas install. There will be a
-"Developer Keys" tab on the left navigation sidebar.
+<b>NOTE for LTI providers:</b> Since developer keys are scoped to the institution they are issued
+from, tool providers that serve multiple institutions should store and look up the correct
+developer key based on the launch parameters (eg. custom_canvas_api_domain) sent during the LTI
+launch.
+
+For [open source Canvas users](https://github.com/instructure/canvas-lms/wiki),
+you can [generate a client ID](https://community.canvaslms.com/docs/DOC-5141) 
+and secret in the Site Admin account of your Canvas install.
 
 <a name="oauth2-flow-1"></a>
 ### [Step 1: Redirect users to request Canvas access](#oauth2-flow-1)
@@ -174,7 +179,9 @@ client_id and client_secret to obtain the final access_key.
 ### [Step 3: Exchange the code for the final access token](#oauth2-flow-3)
 <small><a href="#top">Back to Top</a></small>
 
-To get a code, send a [POST request to login/oauth2/token](file.oauth_endpoints.html#post-login-oauth2-token)
+To get a new access token and refresh token, send a
+[POST request to login/oauth2/token](file.oauth_endpoints.html#post-login-oauth2-token)
+with the following parameters:
 
 <h4>Parameters</h4>
 <table>
@@ -237,7 +244,14 @@ curl "https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>"
 ## [Using a Refresh Token to get a new Access Token](#using-refresh-tokens)
 <small><a href="#top">Back to Top</a></small>
 
-To get a code, send a [POST request to login/oauth2/token](file.oauth_endpoints.html#post-login-oauth2-token)
+Access tokens have a 1 hour lifespan. When the refresh flow is taken, Canvas
+will update the access token to a new value, reset the expiration timer, and
+return the new access token as part of the response. When refreshing tokens the
+user will not be asked to authorize the application again.
+
+To refresh the access token, send a
+[POST request to login/oauth2/token](file.oauth_endpoints.html#post-login-oauth2-token)
+with the following parameters:
 
 <h4>Parameters</h4>
 <table>
@@ -266,6 +280,11 @@ To get a code, send a [POST request to login/oauth2/token](file.oauth_endpoints.
     </tr>
   </tbody>
 </table>
+
+The response to this request will not contain a new refresh token; the same
+refresh token is to be reused.
+
+
 
 ## [Logging Out](file.oauth_endpoints.html#delete-login-oauth2-token)
 <small><a href="#top">Back to Top</a></small>

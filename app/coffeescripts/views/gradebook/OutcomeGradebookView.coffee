@@ -1,13 +1,13 @@
 define [
-  'i18n!gradebook2'
+  'i18n!gradebook'
   'jquery'
   'underscore'
   'Backbone'
   'vendor/slickgrid'
-  'compiled/gradebook2/OutcomeGradebookGrid'
+  'compiled/gradebook/OutcomeGradebookGrid'
   'compiled/views/gradebook/CheckboxView'
   'compiled/views/gradebook/SectionMenuView'
-  'jst/gradebook2/outcome_gradebook'
+  'jst/gradebook/outcome_gradebook'
   'vendor/jquery.ba-tinypubsub'
   'jquery.instructure_misc_plugins'
 ], (I18n, $, _, {View}, Slick, Grid, CheckboxView, SectionMenuView, template, cellTemplate) ->

@@ -1,9 +1,10 @@
 require_relative '../../spec_helper'
+require_dependency "api/v1/course_json"
 
 module Api
   module V1
 
-    describe Api::V1::CourseJson do
+    describe CourseJson do
       let(:includes) { [] }
       let(:course) { stub(:course) }
       let(:user) { stub(:user) }

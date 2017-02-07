@@ -88,6 +88,10 @@ class ContextModulesController < ApplicationController
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end
+
+      if @context.allow_web_export_download?
+        @last_web_export = @context.web_zip_exports.visible_to(@current_user).order('epub_exports.created_at').last
+      end
     end
   end
 

@@ -21,14 +21,12 @@ const compileHandlebars = (data) => {
     const scope = extractor.scope
     PreProcessor.scope = scope
     PreProcessor.process(ast)
-    extractor.forEach(() => translationCount++ )
+    extractor.forEach(() => translationCount++)
 
     const precompiler = data.ember ? EmberHandlebars : Handlebars
-    const result = precompiler.precompile(ast).toString()
-    const payload = {template: result, scope: scope, translationCount: translationCount}
-    return payload
-  }
-  catch (e) {
+    const template = precompiler.precompile(ast).toString()
+    return {template, scope, translationCount}
+  } catch (e) {
     e = e.message || e
     console.log(e)
     throw {error: e}
@@ -42,8 +40,8 @@ const emitTemplate = (path, name, result, dependencies, cssRegistration, partial
       var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
       var name = '${name}';
       templates[name] = template(${result['template']});
-      ${partialRegistration}
-      ${cssRegistration}
+      ${partialRegistration};
+      ${cssRegistration};
       return templates[name];
     });
   `
@@ -92,7 +90,7 @@ const partialRegexp = /\{\{>\s?\[?(.+?)\]?( .*?)?}}/g
 const findReferencedPartials = (source) => {
   let partials = []
   let match
-  while(match = partialRegexp.exec(source)){
+  while (match = partialRegexp.exec(source)){
     partials.push(match[1].trim())
   }
 
@@ -131,7 +129,7 @@ module.exports = function i18nLinerHandlebarsLoader (source) {
   const partialRegistration = emitPartialRegistration(this.resourcePath, name)
 
   const cssRegistration = buildCssReference(name)
-  if (cssRegistration){
+  if (cssRegistration) {
     // arguments[1] will be brandableCss
     dependencies.push('compiled/util/brandableCss')
   }
@@ -141,7 +139,7 @@ module.exports = function i18nLinerHandlebarsLoader (source) {
   partialRequirements.forEach(requirement => dependencies.push(requirement))
 
   const result = compileHandlebars({path: this.resourcePath, source})
-  if (result.error){
+  if (result.error) {
     console.log('THERE WAS AN ERROR IN PRECOMPILATION', result)
     throw result
   }

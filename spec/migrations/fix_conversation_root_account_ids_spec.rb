@@ -6,9 +6,9 @@ describe DataFixup::FixConversationRootAccountIds do
   it 'should fix conversations with unglobalishized root account ids' do
     @shard1.activate do
       @account = account_model
-      new_course = course(:account => @account)
-      u1 = user
-      u2 = user
+      new_course = course_factory(:account => @account)
+      u1 = user_factory
+      u2 = user_factory
       conversation = Conversation.initiate([u1, u2], false, context_type: 'Course', context_id: new_course.id)
       conversation.root_account_ids = [@account.id] # unglobalize it
       conversation.save!

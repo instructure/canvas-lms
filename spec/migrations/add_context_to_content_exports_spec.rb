@@ -23,8 +23,8 @@ describe 'AddContextToContentExports' do
   describe "up" do
     it "should populate all content exports with course context type and context id" do
       skip("PostgreSQL specific") unless ContentExport.connection.adapter_name == 'PostgreSQL'
-      course1 = course
-      course2 = course
+      course1 = course_factory
+      course2 = course_factory
 
       RemoveCourseIdFromContentExports.down
       AddContextToContentExports.down

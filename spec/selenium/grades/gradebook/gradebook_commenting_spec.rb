@@ -1,24 +1,24 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2" do
+describe "gradebook" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
-  let!(:setup) { gradebook_data_setup }
+  before(:once) { gradebook_data_setup }
+  before(:each) { user_session(@teacher) }
 
   it "should validate posting a comment to a graded assignment", priority: "1", test_id: 210046 do
     comment_text = "This is a new comment!"
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     dialog = open_comment_dialog
     set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
     f("form.submission_details_add_comment_form.clearfix > button.btn").click
-    wait_for_ajaximations
+    wait_for_ajax_requests
 
     # make sure it is still there if you reload the page
     refresh_page
-    wait_for_ajaximations
 
     comment = open_comment_dialog.find_element(:css, '.comment')
     expect(comment).to include_text(comment_text)
@@ -40,7 +40,7 @@ describe "gradebook2" do
 
     comment_text = "This is a new group comment!"
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     dialog = open_comment_dialog(3)
     set_value(dialog.find_element(:id, "add_a_comment"), comment_text)

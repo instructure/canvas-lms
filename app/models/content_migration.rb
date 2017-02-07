@@ -389,8 +389,10 @@ class ContentMigration < ActiveRecord::Base
         job = self.send_later_enqueue_args(:queue_migration, {:no_delay => true, :run_at => run_at},
           plugin, retry_count: retry_count + 1, expires_at: expires_at)
 
-        self.job_progress.delayed_job_id = job.id
-        self.job_progress.save!
+        if self.job_progress
+          self.job_progress.delayed_job_id = job.id
+          self.job_progress.save!
+        end
       end
 
       return true
@@ -488,6 +490,9 @@ class ContentMigration < ActiveRecord::Base
     begin
       data = nil
       if self.for_master_course_import?
+        self.master_course_subscription.load_tags! # load child content tags
+        self.master_course_subscription.master_template.preload_restrictions!
+
         # copy the attachments
         source_export = ContentExport.find(self.migration_settings[:master_course_export_id])
         self.context.copy_attachments_from_course(source_export.context, :content_export => source_export, :content_migration => self)
@@ -541,6 +546,11 @@ class ContentMigration < ActiveRecord::Base
     master_migration.update_import_state!(self, state)
   end
 
+  def master_course_subscription
+    return unless self.for_master_course_import?
+    @master_course_subscription ||= MasterCourses::ChildSubscription.find(self.migration_settings[:child_subscription_id])
+  end
+
   def prepare_data(data)
     data = data.with_indifferent_access if data.is_a? Hash
     Utf8Cleaner.recursively_strip_invalid_utf8!(data, true)
@@ -558,7 +568,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def for_course_copy?
-    self.migration_type && self.migration_type == 'course_copy_importer'
+    self.migration_type == 'course_copy_importer' || for_master_course_import?
   end
 
   def for_master_course_import?
@@ -842,7 +852,7 @@ class ContentMigration < ActiveRecord::Base
   def check_for_blocked_migration
     if self.workflow_state_changed? && %w(pre_process_error exported imported failed).include?(workflow_state)
       if self.context && (next_cm = self.context.content_migrations.where(:workflow_state => 'queued').order(:id).first)
-        job_id = next_cm.job_progress.delayed_job_id
+        job_id = next_cm.job_progress.try(:delayed_job_id)
         if job_id && (job = Delayed::Job.where(:id => job_id, :locked_at => nil).first)
           job.run_at = Time.now # it's okay to try it again now
           job.save

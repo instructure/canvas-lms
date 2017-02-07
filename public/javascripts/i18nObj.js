@@ -1,10 +1,11 @@
 define([
   'vendor/i18n_js_extension',
   'jquery',
+  'underscore',
   'str/htmlEscape',
   'compiled/str/i18nLolcalize',
   'vendor/date' /* Date.parse, Date.UTC */
-], function(I18n, $, htmlEscape, i18nLolcalize) {
+], function(I18n, $, _, htmlEscape, i18nLolcalize) {
 
 I18n.locale = document.documentElement.getAttribute('lang');
 
@@ -70,6 +71,22 @@ I18n.localize = function(scope, value) {
     result = result.replace(/\s{2,}/, ' ');
   return result;
 }
+
+I18n.localizeNumber = function (value, options) {
+  if (options == null) {
+    options = {}
+  }
+  var format = _.extend({}, I18n.lookup('number.format'), {
+    // use a high precision and strip zeros if no precision is provided
+    // 9 is as high as we want to go without causing precision issues
+    // when used with toFixed()
+    strip_insignificant_zeros: options.precision == null,
+    precision: options.precision != null ? options.precision : 9
+  })
+  var method = options.percentage ? 'toPercentage' : 'toNumber'
+  return I18n[method](value, format)
+}
+I18n.n = I18n.localizeNumber
 
 I18n.strftime = function(date, format) {
   var options = this.lookup("date");
@@ -207,7 +224,7 @@ I18n.pluralize = function(count, scope, options) {
 
   var message;
   options = this.prepareOptions(options, {precision: 0});
-  options.count = this.toNumber(count, options);
+  options.count = this.localizeNumber(count, options);
 
   switch(Math.abs(count)) {
     case 0:
@@ -285,12 +302,13 @@ I18n.scope.prototype = {
   toNumber:     I18n.toNumber.bind(I18n),
   toCurrency:   I18n.toCurrency.bind(I18n),
   toHumanSize:  I18n.toHumanSize.bind(I18n),
-  toPercentage: I18n.toPercentage.bind(I18n)
+  toPercentage: I18n.toPercentage.bind(I18n),
+  localizeNumber: I18n.n.bind(I18n)
 };
 I18n.scope.prototype.t = I18n.scope.prototype.translate;
 I18n.scope.prototype.l = I18n.scope.prototype.localize;
+I18n.scope.prototype.n = I18n.scope.prototype.localizeNumber;
 I18n.scope.prototype.p = I18n.scope.prototype.pluralize;
-
 
 if (I18n.translations) {
   $.extend(true, I18n.translations, {en: {}});

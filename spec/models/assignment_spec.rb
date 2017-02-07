@@ -2341,7 +2341,7 @@ describe Assignment do
       end
 
       it "should not create a message in an unpublished course" do
-        course
+        course_factory
         assignment_model(:course => @course)
         @assignment.broadcast_unmute_event
         expect(@assignment.messages_sent).not_to be_include('Assignment Unmuted')
@@ -2659,14 +2659,14 @@ describe Assignment do
   context "modules" do
     it "should be locked when part of a locked module" do
       ag = @course.assignment_groups.create!
-      a1 = ag.assignments.create!(:context => course)
+      a1 = ag.assignments.create!(:context => course_factory)
       expect(a1.locked_for?(@user)).to be_falsey
 
       m = @course.context_modules.create!
       ct = ContentTag.new
       ct.content_id = a1.id
       ct.content_type = 'Assignment'
-      ct.context_id = course.id
+      ct.context_id = course_factory.id
       ct.context_type = 'Course'
       ct.title = "Assignment"
       ct.tag_type = "context_module"
@@ -3149,7 +3149,7 @@ describe Assignment do
     end
 
     it "destroys the associated page if enabled" do
-      course
+      course_factory
       @course.enable_feature!(:conditional_release)
       wiki_page_assignment_model course: @course
       @assignment.destroy
@@ -4036,7 +4036,7 @@ def setup_assignment_with_students
   @graded_notify = Notification.create!(:name => "Submission Graded")
   @grade_change_notify = Notification.create!(:name => "Submission Grade Changed")
   @stu1 = @student
-  @course.enroll_student(@stu2 = user)
+  @course.enroll_student(@stu2 = user_factory)
   @assignment = @course.assignments.create(:title => "asdf", :points_possible => 10)
   @sub1 = @assignment.grade_student(@stu1, grade: 9, grader: @teacher).first
   expect(@sub1.score).to eq 9

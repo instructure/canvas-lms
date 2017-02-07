@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'confirm_email_communication_channel.email' do
   it "should render" do
-    user
+    user_factory
     @pseudonym = @user.pseudonyms.create!(:unique_id => 'unique@example.com', :password => 'password', :password_confirmation => 'password')
     @object = @user.communication_channels.create!(:path_type => 'email', :path => 'bob@example.com', :user => @user)
     generate_message(:confirm_email_communication_channel, :email, @object)

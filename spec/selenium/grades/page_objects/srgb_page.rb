@@ -4,6 +4,16 @@ class SRGB
   class << self
     include SeleniumDependencies
 
+    ASSIGNMENT_SORT_ORDER_OPTIONS = {
+      assignment_group: 'By Assignment Group and Position',
+      alpha: 'Alphabetically',
+      due_date: 'By Due Date'
+    }.freeze
+
+    def assignment_arrangement_dropdown
+      f(assignment_sort_order_selector)
+    end
+
     def main_grade_input
       f('#student_and_assignment_grade')
     end
@@ -21,7 +31,7 @@ class SRGB
     end
 
     def notes_field
-      f('#student_information textarea')
+      fj('#student_information textarea:visible:not([disabled])')
     end
 
     def final_grade
@@ -50,6 +60,10 @@ class SRGB
 
     def default_grade
       f("#set_default_grade")
+    end
+
+    def curve_grade_button
+      f('#curve_grades')
     end
 
     # global checkboxes
@@ -95,8 +109,24 @@ class SRGB
       f('#assignment-speedgrader-link a')
     end
 
+    def assignment_scores
+      f('#assignment_information .ic-Table tbody tr')
+    end
+
     def visit(course_id)
       get "/courses/#{course_id}/gradebook/change_gradebook_version?version=srgb"
+    end
+
+    def sort_assignments_by(sort_order)
+      opt_name = ASSIGNMENT_SORT_ORDER_OPTIONS[sort_order.to_sym]
+      opt_name ||= ASSIGNMENT_SORT_ORDER_OPTIONS[ASSIGNMENT_SORT_ORDER_OPTIONS.invert[sort_order]]
+      return unless opt_name
+
+      click_option(assignment_arrangement_dropdown, opt_name.to_s)
+    end
+
+    def assignment_sort_order
+      get_value(assignment_sort_order_selector)
     end
 
     def select_assignment(assignment)
@@ -139,6 +169,13 @@ class SRGB
       ag.rules_hash = {"drop_lowest"=>num_assignment}
       ag.save!
     end
+
+    private
+
+    def assignment_sort_order_selector
+      'select#arrange_assignments'
+    end
+
   end
 end
 

@@ -1,4 +1,4 @@
-class MoveSamlEntityIdToAccount < ActiveRecord::Migration
+class MoveSamlEntityIdToAccount < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

@@ -1,13 +1,6 @@
 <tr>
   <!--Select the term to run the report on-->
   <td><%= t('account_reports.default.parameters.header', %{Term}) %>
-    <select name="parameters[enrollment_term_id]">
-      <% if all_terms_option %>
-        <option value="" <%= 'selected' unless @term %>><%= t(:all_terms, "All Terms") %></option>
-      <%end%>
-      <% @root_account.active_enrollment_terms.each do |term| %>
-        <option value="<%= term.id %>" <%= 'selected' if term == @term %>><%= term.name %></option>
-      <% end %>
-    </select>
+    <%= render :partial => 'shared/enrollment_term_select', :locals => { :name => 'parameters[enrollment_term_id]', :terms => @root_account.enrollment_terms.active, :selected_id => @term && @term.id, :exclude_all_option => !all_terms_option } %>
   </td>
 </tr>

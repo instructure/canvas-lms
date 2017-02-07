@@ -11,6 +11,20 @@ define([
   var PG_TWO_INDEX = 1;
   var PG_THREE_INDEX = 2;
 
+  const StudentName = React.createClass({
+    render() {
+      if (ENV.STUDENT_CONTEXT_CARDS_ENABLED) {
+        return <a href="#"
+                  className="student_context_card_trigger"
+                  data-course_id={this.props.course_id}
+                  data-student_id={this.props.student_id}
+                  >{this.props.children}</a>
+      } else {
+        return <span>{this.props.children}</span>
+      }
+    }
+  });
+
   return React.createClass({
     displayName: 'ModeratedStudentList',
 
@@ -20,7 +34,7 @@ define([
       handleCheckbox: React.PropTypes.func.isRequired,
       includeModerationSetColumns: React.PropTypes.bool,
       urls: React.PropTypes.object.isRequired,
-      onSelectProvisionalGrade: React.PropTypes.func.isRequired
+      onSelectProvisionalGrade: React.PropTypes.func.isRequired,
     },
 
     generateSpeedgraderUrl (baseSpeedgraderUrl, student) {
@@ -150,7 +164,10 @@ define([
                               onChange={this.props.handleCheckbox.bind(null, student)}
                             />
                             <img className='img-circle AssignmentList_StudentPhoto' alt='' src={student.avatar_image_url} />
-                            <span>{student.display_name}</span>
+                            <StudentName
+                              course_id={this.props.assignment.course_id}
+                              student_id={student.id}
+                              >{student.display_name}</StudentName>
                           </label>
                         </div>
                       </div>
@@ -175,7 +192,10 @@ define([
                               onChange={this.props.handleCheckbox.bind(null, student)}
                             />
                             <img className='img-circle AssignmentList_StudentPhoto' alt='' src={student.avatar_image_url} />
-                            <span>{student.display_name}</span>
+                            <StudentName
+                              course_id={this.props.assignment.course_id}
+                              student_id={student.id}
+                              >{student.display_name}</StudentName>
                           </label>
                         </div>
                       </div>

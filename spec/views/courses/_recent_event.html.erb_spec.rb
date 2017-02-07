@@ -30,7 +30,7 @@ describe "/courses/_recent_event" do
   end
 
   it "should render without a user" do
-    course
+    course_factory
     assignment = @course.assignments.create!(:title => 'my assignment')
     view_context
     render :partial => "courses/recent_event", :object => assignment, :locals => { :is_hidden => false }

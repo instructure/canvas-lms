@@ -101,7 +101,7 @@ class TabsController < ApplicationController
   #         "label": "Grades",
   #         "position": 3,
   #         "hidden": true
-  #         "visibility": amdin
+  #         "visibility": admin
   #         "type": "internal"
   #       }
   #     ]

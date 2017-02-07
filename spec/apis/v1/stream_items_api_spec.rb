@@ -75,10 +75,10 @@ describe UsersController, type: :request do
   context "cross-shard activity stream summary" do
     specs_require_sharding
     it "should return the activity stream summary with cross-shard items" do
-      @student = user(:active_all => true)
+      @student = user_factory(active_all: true)
       @shard1.activate do
         @account = Account.create!
-        course(:active_all => true, :account => @account)
+        course_factory(active_all: true, :account => @account)
         @course.enroll_student(@student).accept!
         @context = @course
         discussion_topic_model
@@ -106,12 +106,12 @@ describe UsersController, type: :request do
     end
 
     it "should find cross-shard submission comments" do
-      @student = user(:active_all => true)
-      course(:active_all => true)
+      @student = user_factory(active_all: true)
+      course_factory(active_all: true)
       @course.enroll_student(@student).accept!
       @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
       @shard1.activate do
-        @teacher = user(:active_all => true)
+        @teacher = user_factory(active_all: true)
       end
       @course.enroll_teacher(@teacher).accept!
       @sub = @assignment.grade_student(@student, grade: nil, grader: @teacher).first

@@ -107,6 +107,25 @@ module SupportHelpers
       end
     end
 
+    class LtiAttachmentFixer < TiiFixer
+      def initialize(email, after_time, submission_id, attachment_id)
+        @submission = Submission.find(submission_id)
+        @attachment = Attachment.find(attachment_id)
+        super(email, after_time)
+      end
+
+      def fix
+        Turnitin::AttachmentManager.update_attachment(@submission, @attachment)
+      end
+
+      private
+
+      def load_broken_objects
+        [@submission]
+      end
+
+    end
+
     class AssignmentFixer < TiiFixer
       def initialize(email, after_time, assignment_id)
         @assignment = Assignment.find(assignment_id)

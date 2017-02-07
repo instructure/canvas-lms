@@ -1,5 +1,5 @@
 require_relative '../../common'
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
 describe GradeSummaryPresenter do
   include_context 'in-process server selenium tests'
@@ -27,7 +27,7 @@ describe GradeSummaryPresenter do
     end
 
     let(:observed_courses) do
-      2.times.map { course(active_course: true, active_all: true) }
+      2.times.map { course_factory(active_course: true, active_all: true) }
     end
     let(:active_element) { driver.execute_script('return document.activeElement') }
 

@@ -55,7 +55,7 @@ describe "BookmarkedCollection::MergeProxy" do
     end
 
     it "should ignore total_entries parameter" do
-      @proxy.paginate(:per_page => 5, :total_entries => 10).total_entries.should be_nil
+      expect(@proxy.paginate(:per_page => 5, :total_entries => 10).total_entries).to be_nil
     end
 
     it "should require a bookmark-style page parameter" do
@@ -65,27 +65,27 @@ describe "BookmarkedCollection::MergeProxy" do
       bookmark2 = "bookmark:W1td" # base64 of '[[]' which should fail to parse
       bookmark3 = "bookmark:#{::JSONToken.encode(value1)}"
       bookmark4 = "bookmark:#{::JSONToken.encode(value2)}"
-      @proxy.paginate(:page => bookmark1, :per_page => 5).current_bookmark.should be_nil
-      @proxy.paginate(:page => bookmark2, :per_page => 5).current_bookmark.should be_nil
-      @proxy.paginate(:page => bookmark3, :per_page => 5).current_bookmark.should be_nil
-      @proxy.paginate(:page => bookmark4, :per_page => 5).current_bookmark.should == value2
+      expect(@proxy.paginate(:page => bookmark1, :per_page => 5).current_bookmark).to be_nil
+      expect(@proxy.paginate(:page => bookmark2, :per_page => 5).current_bookmark).to be_nil
+      expect(@proxy.paginate(:page => bookmark3, :per_page => 5).current_bookmark).to be_nil
+      expect(@proxy.paginate(:page => bookmark4, :per_page => 5).current_bookmark).to eq(value2)
     end
 
     it "should produce an appropriate collection type" do
-      @proxy.paginate(:per_page => 1).should be_a(BookmarkedCollection::CompositeCollection)
+      expect(@proxy.paginate(:per_page => 1)).to be_a(BookmarkedCollection::CompositeCollection)
     end
 
     it "should include the results" do
-      @proxy.paginate(:per_page => 1).should == [@scope.first]
-      @proxy.paginate(:per_page => @scope.count).should == @scope.to_a
+      expect(@proxy.paginate(:per_page => 1)).to eq([@scope.first])
+      expect(@proxy.paginate(:per_page => @scope.count)).to eq(@scope.to_a)
     end
 
     it "should set next_bookmark if the page wasn't the last" do
-      @proxy.paginate(:per_page => 1).next_bookmark.should == ['label', MyBookmarker.bookmark_for(@scope.first)]
+      expect(@proxy.paginate(:per_page => 1).next_bookmark).to eq(['label', MyBookmarker.bookmark_for(@scope.first)])
     end
 
     it "should not set next_bookmark if the page was the last" do
-      @proxy.paginate(:per_page => @scope.count).next_bookmark.should be_nil
+      expect(@proxy.paginate(:per_page => @scope.count).next_bookmark).to be_nil
     end
 
     describe "with multiple collections" do
@@ -114,23 +114,23 @@ describe "BookmarkedCollection::MergeProxy" do
       end
 
       it "should interleave" do
-        @proxy.paginate(:per_page => 5).should == @courses[0, 5]
+        expect(@proxy.paginate(:per_page => 5)).to eq(@courses[0, 5])
       end
 
       it "should start each collection after the bookmark" do
         page = @proxy.paginate(:per_page => 3)
-        @proxy.paginate(:page => page.next_page, :per_page => 3).should == @courses[3, 3]
+        expect(@proxy.paginate(:page => page.next_page, :per_page => 3)).to eq(@courses[3, 3])
       end
 
       it "should handle inclusive bookmarks" do
         page = @proxy.paginate(:per_page => 3)
-        @proxy.paginate(:page => page.next_page, :per_page => 3).should == @courses[3, 3]
+        expect(@proxy.paginate(:page => page.next_page, :per_page => 3)).to eq(@courses[3, 3])
 
         # indicates we've seen through @courses[2].id up through the 0th
         # collection, but haven't seen it from the 1th collection (the one that
         # has @courses[2]) yet
         page.next_bookmark = ['created', @courses[2].id]
-        @proxy.paginate(:page => page.next_page, :per_page => 3).should == @courses[2, 3]
+        expect(@proxy.paginate(:page => page.next_page, :per_page => 3)).to eq(@courses[2, 3])
       end
 
       context "when multiple collections still have results" do
@@ -139,11 +139,11 @@ describe "BookmarkedCollection::MergeProxy" do
         end
 
         it "should have next_page with more than a page left" do
-          @proxy.paginate(:page => @next_page, :per_page => 4).next_page.should_not be_nil
+          expect(@proxy.paginate(:page => @next_page, :per_page => 4).next_page).not_to be_nil
         end
 
         it "should not have next_page with exactly a page left" do
-          @proxy.paginate(:page => @next_page, :per_page => 5).next_page.should be_nil
+          expect(@proxy.paginate(:page => @next_page, :per_page => 5).next_page).to be_nil
         end
       end
 
@@ -153,11 +153,11 @@ describe "BookmarkedCollection::MergeProxy" do
         end
 
         it "should have next_page with more than a page left" do
-          @proxy.paginate(:page => @next_page, :per_page => 2).next_page.should_not be_nil
+          expect(@proxy.paginate(:page => @next_page, :per_page => 2).next_page).not_to be_nil
         end
 
         it "should not have next_page with exactly a page left" do
-          @proxy.paginate(:page => @next_page, :per_page => 3).next_page.should be_nil
+          expect(@proxy.paginate(:page => @next_page, :per_page => 3).next_page).to be_nil
         end
       end
     end
@@ -198,13 +198,13 @@ describe "BookmarkedCollection::MergeProxy" do
 
       it "should indicate the first collection to provide the last value in the bookmark" do
         results = @proxy.paginate(:per_page => 3)
-        results.next_bookmark.should == ['1', @courses[2].id]
+        expect(results.next_bookmark).to eq(['1', @courses[2].id])
       end
 
       it "should not repeat elements from prior pages regardless of duplicates" do
         @next_page = @proxy.paginate(:per_page => 3).next_page
         results = @proxy.paginate(:page => @next_page, :per_page => 3)
-        results.first.should == @courses[3]
+        expect(results.first).to eq(@courses[3])
       end
     end
   end

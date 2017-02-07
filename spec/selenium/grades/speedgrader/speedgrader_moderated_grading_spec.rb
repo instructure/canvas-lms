@@ -1,15 +1,15 @@
 require_relative '../../helpers/speed_grader_common'
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
 describe "speed grader" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
   include SpeedGraderCommon
 
   before(:once) do
     stub_kaltura
 
-    course(:active_all => true)
+    course_factory(active_all: true)
     outcome_with_rubric
     @assignment = @course.assignments.new(:name => 'assignment with rubric', :points_possible => 10)
     @assignment.moderated_grading = true
