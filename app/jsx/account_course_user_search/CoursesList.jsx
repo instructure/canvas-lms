@@ -2,9 +2,10 @@ define([
   'react',
   'jquery',
   'i18n!account_course_user_search',
+  'compiled/util/natcompare',
   'axios',
   './CoursesListRow',
-], (React, $, I18n, axios, CoursesListRow) => {
+], (React, $, I18n, natcompare, axios, CoursesListRow) => {
   const { string, shape, arrayOf } = React.PropTypes
 
   return class CoursesList extends React.Component {
@@ -73,7 +74,7 @@ define([
           </div>
 
           <div className="courses-list" role="rowgroup">
-            {courses.map((course) => {
+            {courses.sort(natcompare.byKey('name')).map((course) => {
               const urlsForCourse = {
                 USER_LISTS_URL: $.replaceTags(this.props.addUserUrls.USER_LISTS_URL, 'id', course.id),
                 ENROLL_USERS_URL: $.replaceTags(this.props.addUserUrls.ENROLL_USERS_URL, 'id', course.id)
