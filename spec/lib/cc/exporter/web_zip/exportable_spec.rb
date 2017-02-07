@@ -52,15 +52,17 @@ describe "Exportable" do
     end
 
     def create_zip(exporter)
-      ZipPackageTest.new(exporter, @course, @student)
+      ZipPackageTest.new(exporter, @course, @user)
     end
   end
 
   context "#convert_to_web_zip" do
 
     before do
+      @create_date = 1.minute.ago
       course_with_teacher(active_all: true)
       student_in_course(active_all: true, user_name: 'a student')
+      @course.web_zip_exports.create!(created_at: @create_date, user: @student)
       @web_zip_export = ExportableTest.new(@course, @student).convert_to_offline_web_zip
     end
 
@@ -108,6 +110,16 @@ describe "Exportable" do
         end
       end
 
+      it "should add course data to the course-data.js file" do
+        Zip::File.open(zip_path) do |zip_file|
+          file = zip_file.glob('**/viewer/course-data.js').first
+          expect(file).not_to be_nil
+          contents = JSON.parse(file.get_input_stream.read.sub('window.COURSE_DATA =',''))
+          expect(contents['language']).to eq 'en'
+          expect(contents['lastDownload']).to eq @create_date.in_time_zone(@student.time_zone).iso8601
+          expect(contents['title']).to eq @course.name
+        end
+      end
     end
 
     context "canvas_offline_course_viewer files" do

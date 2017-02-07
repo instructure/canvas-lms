@@ -16,6 +16,10 @@ module CC::Exporter::WebZip
 
     ASSIGNMENT_TYPES = ['Assignment', 'Quizzes::Quiz', 'DiscussionTopic'].freeze
 
+    def force_timezone(time)
+      time&.in_time_zone(user.time_zone)&.iso8601
+    end
+
     def add_files
       files.each do |file_data|
         next unless file_data[:exists]
@@ -46,11 +50,12 @@ module CC::Exporter::WebZip
 
     def add_course_data
       f = File.new(@course_data_filename, 'w+')
+      last_web_export_time = course.web_zip_exports.where(user: user).last&.created_at
 
       data = {
-        language: nil,
-        lastDownload: nil,
-        title: nil,
+        language: course.locale || 'en',
+        lastDownload: force_timezone(last_web_export_time),
+        title: course.name,
         files: create_tree_data,
         modules: parse_module_data
       }
@@ -93,7 +98,7 @@ module CC::Exporter::WebZip
           id: mod.id,
           name: mod.name,
           locked: !mod.available_for?(user, deep_check_if_needed: true),
-          unlockDate: mod.unlock_at&.iso8601,
+          unlockDate: force_timezone(mod.unlock_at),
           prereqs: mod.prerequisites.map{|pre| pre[:id]},
           requirement: requirement_type(mod),
           sequential: mod.require_sequential_progress || false,
@@ -143,9 +148,9 @@ module CC::Exporter::WebZip
         assignment = item.content&.assignment
       end
       item_hash[:pointsPossible] = assignment&.points_possible
-      item_hash[:dueAt] = assignment&.due_at&.iso8601
-      item_hash[:lockAt] = assignment&.lock_at&.iso8601
-      item_hash[:unlockAt] = assignment&.unlock_at&.iso8601
+      item_hash[:dueAt] = force_timezone(assignment&.due_at)
+      item_hash[:lockAt] = force_timezone(assignment&.lock_at)
+      item_hash[:unlockAt] = force_timezone(assignment&.unlock_at)
       item_hash
     end
 
