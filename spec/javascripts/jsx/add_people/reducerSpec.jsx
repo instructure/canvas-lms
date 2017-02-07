@@ -181,7 +181,8 @@ define([
       nameList: [],
       role: '',
       section: '',
-      limitPrivilege: false
+      limitPrivilege: false,
+      canReadSIS: true
     },
     apiState: {
       pendingCount: 0,         // >0 while api calls are in-flight
@@ -451,7 +452,7 @@ define([
     const newState = reduce(actions.enrollUsersError('whoops'), state);
     deepEqual(newState.apiState, {pendingCount: 0, error: 'whoops'}, 'api is no longer in-flight and has error');
   });
-  test('RESET', () => {
+  test(' ', () => {
     const newState = reduce(actions.reset(), runningState);
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams');
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams');

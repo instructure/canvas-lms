@@ -11,7 +11,8 @@ define([], () => {
       nameList: ['foo', 'bar', 'baz'],
       role: '1',
       section: '1',
-      limitPrivilege: false
+      limitPrivilege: false,
+      canReadSIS: true
     },
     apiState: {
       pendingCount: 0,
