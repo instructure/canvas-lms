@@ -93,13 +93,15 @@ define([
               value="unique_id"
               label={I18n.t('Login ID')}
             />
-            <RadioInput
-              id="peoplesearch_radio_sis_user_id"
-              isBlock={false}
-              key="sis_user_id"
-              value="sis_user_id"
-              label={I18n.t('SIS ID')}
-            />
+            {this.props.canReadSIS
+              ? <RadioInput
+                id="peoplesearch_radio_sis_user_id"
+                isBlock={false}
+                key="sis_user_id"
+                value="sis_user_id"
+                label={I18n.t('SIS ID')}
+              />
+              : null}
           </RadioInputGroup>
           <fieldset>
             <div style={{marginBottom: '.5em'}}>{I18n.t('Example:')} {exampleText}</div>

@@ -36,7 +36,8 @@ define([
           searchType: defaultState.inputParams.searchType,
           nameList: defaultState.inputParams.nameList,
           role: props.roles.length ? props.roles[0].id : '',
-          section: sections.length ? sections[0].id : ''
+          section: sections.length ? sections[0].id : '',
+          canReadSIS: props.canReadSIS
         },
         apiState: defaultState.apiState,
         userValidationResult: defaultState.userValidationResult,

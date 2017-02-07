@@ -13,7 +13,8 @@ define([
     role: '2',
     limitPrivilege: true,
     searchType: 'unique_id',
-    nameList: ['foo', 'bar', 'baz']
+    nameList: ['foo', 'bar', 'baz'],
+    canReadSIS: true
   };
 
   test('renders the component', () => {
@@ -35,5 +36,13 @@ define([
     deepEqual(sections, ['section 2', 'section 10'], 'sections are sorted by name');
     const limitPrivilegeCheckbox = peopleSearch.querySelector('#limit_privileges_to_course_section');
     equal(limitPrivilegeCheckbox.checked, true, 'limit privileges checkbox is checked');
+  });
+  test('removes search by SIS ID', () => {
+    const newProps = Object.assign({}, searchProps);
+    newProps.canReadSIS = false;
+    const component = TestUtils.renderIntoDocument(<PeopleSearch {...newProps} />);
+    const peopleSearch = TestUtils.findRenderedDOMComponentWithClass(component, 'addpeople__peoplesearch');
+    const sisRadio = peopleSearch.querySelector('input[type="radio"][value="sis_user_id"]');
+    equal(sisRadio, null, 'sis id radio button is not displayed');
   });
 });

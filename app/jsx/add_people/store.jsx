@@ -19,7 +19,8 @@ define([
       nameList: [],             // user entered list of names to add to this course
       role: '',                 // the role to assign each of the added users
       section: '',              // the section to assign each of the added users
-      limitPrivilege: false     // user can interact with users in their section only
+      limitPrivilege: false,    // user can interact with users in their section only
+      canReadSIS: true
     },
     apiState: {
       pendingCount: 0,         // >0 while api calls are in-flight
