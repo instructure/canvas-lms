@@ -9,7 +9,11 @@ class WebZipExport < EpubExport
   # `EpubExport::DelayedMethods`, which is prepended to the parent class here
   # but ends up being later in the lookup chain for this class.
   def export(synchronous: false)
-    MustViewModuleProgressor.new(user, course).make_progress
+    module_progressor = MustViewModuleProgressor.new(user, course)
+    Rails.cache.fetch(cache_key, expires_in: 4.hours) do
+      module_progressor.current_progress
+    end
+    module_progressor.make_progress
     super
   end
 
@@ -28,7 +32,7 @@ class WebZipExport < EpubExport
   def convert_to_offline_web_zip
     begin
       set_locale
-      file_path = super
+      file_path = super(cache_key)
       I18n.locale = :en
 
       create_attachment_from_path!(file_path)
@@ -41,4 +45,8 @@ class WebZipExport < EpubExport
     cleanup_file_path!(file_path)
   end
   handle_asynchronously :convert_to_offline_web_zip, priority: Delayed::LOW_PRIORITY, max_attempts: 1
+
+  def cache_key
+    "web_zip_export_user_progress_#{global_id}"
+  end
 end

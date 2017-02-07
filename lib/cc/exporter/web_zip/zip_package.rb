@@ -1,6 +1,6 @@
 module CC::Exporter::WebZip
   class ZipPackage < CC::Exporter::Epub::FilesDirectory
-    def initialize(exporter, course, user)
+    def initialize(exporter, course, user, progress_key)
       @files = exporter.unsupported_files + exporter.cartridge_json[:files]
       @filename_prefix = exporter.filename_prefix
       @viewer_path_prefix = @filename_prefix + '/viewer'
@@ -10,8 +10,9 @@ module CC::Exporter::WebZip
       @tempfile_filename = 'empty.txt'
       @course = course
       @user = user
+      @current_progress = Rails.cache.fetch(progress_key)
     end
-    attr_reader :files, :course, :user
+    attr_reader :files, :course, :user, :current_progress
     attr_accessor :file_data
 
     ASSIGNMENT_TYPES = ['Assignment', 'Quizzes::Quiz', 'DiscussionTopic'].freeze
@@ -108,8 +109,18 @@ module CC::Exporter::WebZip
     end
 
     def user_module_status(modul)
+      progress = current_progress&.dig(modul.id, :status)
+      return progress unless progress.nil?
       progression = modul.context_module_progressions.find_or_create_by(user: user).evaluate
       progression.workflow_state
+    end
+
+    def item_completed?(item)
+      modul = item.context_module
+      progress = current_progress&.dig(modul.id, :items, item.id)
+      return progress unless progress.nil?
+      progression = modul.context_module_progressions.find_or_create_by(user: user).evaluate
+      progression.finished_item?(item)
     end
 
     def requirement_type(modul)
@@ -180,12 +191,6 @@ module CC::Exporter::WebZip
         path = file_path(item)
         "#{@files_path_prefix}#{path}#{item.content&.filename}"
       end
-    end
-
-    def item_completed?(item)
-      modul = item.context_module
-      progression = modul.context_module_progressions.find_or_create_by(user: user).evaluate
-      progression.finished_item?(item)
     end
 
     def file_path(item)

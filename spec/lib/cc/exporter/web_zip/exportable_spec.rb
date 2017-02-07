@@ -51,8 +51,8 @@ describe "Exportable" do
       File.join(File.dirname(__FILE__), "/../../../../fixtures/migration/unicode-filename-test-export.imscc")
     end
 
-    def create_zip(exporter)
-      ZipPackageTest.new(exporter, @course, @user)
+    def create_zip(exporter, progress_key)
+      ZipPackageTest.new(exporter, @course, @user, progress_key)
     end
   end
 
@@ -63,7 +63,7 @@ describe "Exportable" do
       course_with_teacher(active_all: true)
       student_in_course(active_all: true, user_name: 'a student')
       @course.web_zip_exports.create!(created_at: @create_date, user: @student)
-      @web_zip_export = ExportableTest.new(@course, @student).convert_to_offline_web_zip
+      @web_zip_export = ExportableTest.new(@course, @student).convert_to_offline_web_zip('cache_key')
     end
 
     let(:zip_path) do
