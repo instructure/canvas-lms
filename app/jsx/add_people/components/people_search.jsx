@@ -1,19 +1,11 @@
 define([
   'i18n!roster',
   'react',
-  'instructure-ui/Button',
-  'instructure-ui/Typography',
-  'instructure-ui/RadioInputGroup',
-  'instructure-ui/RadioInput',
-  'instructure-ui/Select',
-  'instructure-ui/TextArea',
-  'instructure-ui/ScreenReaderContent',
-  'instructure-ui/Checkbox',
-  'instructure-ui/Alert',
+  'instructure-ui',
   './shapes'
-], (I18n, React, {default: Button}, {default: Typography}, {default: RadioInputGroup},
-    {default: RadioInput}, {default: Select}, {default: TextArea}, {default: ScreenReaderContent},
-    {default: Checkbox}, {default: Alert}, {courseParamsShape, inputParamsShape}) => {
+], (I18n, React, {Button, Typography, RadioInputGroup,
+    RadioInput, Select, TextArea, ScreenReaderContent,
+    Checkbox, Alert}, {courseParamsShape, inputParamsShape}) => {
   class PeopleSearch extends React.Component {
     static propTypes = Object.assign({}, inputParamsShape, courseParamsShape);
 
@@ -157,7 +149,7 @@ define([
             </div>
           </fieldset>
           <div className="peoplesearch__instructions">
-            <i className="peoplesearch__icon-user" />
+            <i className="icon-user" />
             <Typography size="medium">
               {I18n.t('Add user by Email Address, Login ID, or SIS ID.')}<br />
               {I18n.t('Use "," between for adding multiple users.')}

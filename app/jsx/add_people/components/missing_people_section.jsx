@@ -2,13 +2,9 @@ define([
   'i18n!roster',
   'react',
   './shapes',
-  'instructure-ui/Table',
-  'instructure-ui/ScreenReaderContent',
-  'instructure-ui/TextInput',
-  'instructure-ui/Checkbox',
-  'instructure-ui/Link'
-], (I18n, React, shapes, {default: Table}, {default: ScreenReaderContent},
-      {default: TextInput}, {default: Checkbox}, {default: Link}) => {
+  'instructure-ui'
+], (I18n, React, shapes, {Table, ScreenReaderContent,
+      TextInput, Checkbox, Link}) => {
   const namePrompt = I18n.t('Click to add a name');
   const nameLabel = I18n.t("New user's name");
   const emailLabel = I18n.t('Required Email Address');

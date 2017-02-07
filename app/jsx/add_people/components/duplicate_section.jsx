@@ -2,16 +2,9 @@ define([
   'i18n!roster',
   'react',
   './shapes',
-  'instructure-ui/Table',
-  'instructure-ui/ScreenReaderContent',
-  'instructure-ui/TextInput',
-  'instructure-ui/RadioInput',
-  'instructure-ui/Checkbox',
-  'instructure-ui/Typography',
-  'instructure-ui/Link'
-], (I18n, React, shapes, {default: Table}, {default: ScreenReaderContent},
-      {default: TextInput}, {default: RadioInput}, {default: Checkbox},
-      {default: Typography}, {default: Link}) => {
+  'instructure-ui'
+], (I18n, React, shapes, {Table, ScreenReaderContent,
+    TextInput, RadioInput, Typography, Link}) => {
   const CREATE_NEW = '__CREATE_NEW__';
   const SKIP = '__SKIP';
   const nameLabel = I18n.t("New user's name");

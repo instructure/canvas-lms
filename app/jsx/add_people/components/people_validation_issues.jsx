@@ -4,8 +4,8 @@ define([
   './shapes',
   './duplicate_section',
   './missing_people_section',
-  'instructure-ui/Alert'
-], (I18n, React, shapes, DuplicateSection, MissingPeopleSection, {default: Alert}) => {
+  'instructure-ui'
+], (I18n, React, shapes, DuplicateSection, MissingPeopleSection, {Alert}) => {
   class PeopleValidationIssues extends React.Component {
     static propTypes = {
       searchType: React.PropTypes.string.isRequired,

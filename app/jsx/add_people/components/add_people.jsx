@@ -2,21 +2,16 @@ define([
   'i18n!roster',
   'react',
   'react-dom',
-  'instructure-ui/Modal',
-  'instructure-ui/Heading',
-  'instructure-ui/Button',
-  'instructure-ui/Spinner',
-  'instructure-ui/Alert',
-  'instructure-ui/ScreenReaderContent',
+  'instructure-ui',
   './shapes',
   './people_search',
   './people_ready_list',
   './people_validation_issues',
   './api_error'
 ], (I18n, React, ReactDOM,
-        {default: Modal, ModalHeader, ModalBody, ModalFooter},
-        {default: Heading}, {default: Button}, {default: Spinner}, {default: Alert},
-        {default: ScreenReaderContent},
+      {Modal, ModalHeader, ModalBody, ModalFooter,
+        Heading, Button, Spinner, Alert,
+        ScreenReaderContent, ApplyTheme},
         {courseParamsShape, apiStateShape, inputParamsShape, validateResultShape, personReadyToEnrollShape},
         PeopleSearch, PeopleReadyList, PeopleValidationIssues, APIError) => {
   const PEOPLESEARCH = 'peoplesearch';
@@ -50,6 +45,8 @@ define([
   }
 
   class AddPeople extends React.Component {
+    // TODO: deal with defaut props after the warmfix to keep this change small
+    /* eslint-disable react/require-default-props */
     static propTypes = {
       isOpen: React.PropTypes.bool,
       validateUsers: React.PropTypes.func.isRequired,
@@ -70,6 +67,7 @@ define([
       resolveValidationIssues: React.PropTypes.func,
       reset: React.PropTypes.func
     };
+    /* eslint-enable */
 
     constructor (props) {
       super(props);
@@ -299,5 +297,12 @@ define([
     }
   }
 
-  return AddPeople;
+  const DeleteMe = props => (
+    <ApplyTheme theme={ApplyTheme.generateTheme('a11y')}>
+      <AddPeople {...props} />
+    </ApplyTheme>
+  )
+
+  /* TODO: after instui gets updated, just return AddPeople */
+  return ENV.use_high_contrast ? DeleteMe : AddPeople;
 });
