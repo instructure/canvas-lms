@@ -41,14 +41,14 @@ define [
       c = @model.postToSIS()
       @model.postToSIS(!c)
       if sisUrl
-        @model.save({}, {
+        @model.save({ override_dates: false }, {
           type: 'POST',
           url: sisUrl,
           success: =>
             @setAttributes()
         })
       else
-        @model.save({}, {
+        @model.save({ override_dates: false }, {
           success: =>
             @setAttributes()
         })

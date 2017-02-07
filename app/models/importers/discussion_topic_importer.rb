@@ -74,8 +74,6 @@ module Importers
 
     def run
       return unless options.importable?
-      # not seeing where this is used, so I'm commenting it out for now
-      # options[:skip_replies] = true unless options.importable_entries?
       [:migration_id, :title, :discussion_type, :position, :pinned,
        :require_initial_post, :allow_rating, :only_graders_can_rate, :sort_by_rating].each do |attr|
         next if options[attr].nil? && item.class.columns_hash[attr.to_s].type == :boolean

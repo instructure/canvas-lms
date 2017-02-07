@@ -905,7 +905,7 @@ describe "Pages API", type: :request do
                                           :assignment => { :only_visible_to_overrides => true } }})
         page = @course.wiki.wiki_pages.where(url: json['url']).first!
         expect(page.assignment.title).to eq 'Content Page Assignment'
-        expect(page.assignment.only_visible_to_overrides).to eq nil
+        expect(page.assignment.only_visible_to_overrides).to eq false
       end
 
       it 'should not destroy linked assignment' do

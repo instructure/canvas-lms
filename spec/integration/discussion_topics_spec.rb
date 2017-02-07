@@ -83,5 +83,4 @@ describe "discussion_topics" do
     doc = Nokogiri::XML(response.body)
     expect(doc.at_css('.admin-links .icon-peer-review')).not_to be_nil
   end
-
 end

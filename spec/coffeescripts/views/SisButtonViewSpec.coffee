@@ -41,6 +41,13 @@ define [
     @view.$el.click()
     ok !@assignment.postToSIS()
 
+  test 'does not override dates', ->
+    saveStub = @stub(@assignment, 'save').callsFake(() ->)
+    @view = new SisButtonView(model: @assignment)
+    @view.render()
+    @view.$el.click()
+    ok saveStub.calledWith(override_dates: false)
+
   test 'properly saves model with a custom url if present', ->
     @stub @quiz, 'save', (attributes, options) ->
       ok options['url'], '/some_other_url'

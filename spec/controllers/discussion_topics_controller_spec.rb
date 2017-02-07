@@ -28,7 +28,7 @@ describe DiscussionTopicsController do
   end
 
   def course_topic(opts={})
-    @topic = @course.discussion_topics.build(:title => "some topic", :pinned => opts[:pinned])
+    @topic = @course.discussion_topics.build(:title => "some topic", :pinned => opts.fetch(:pinned, false))
     user = opts[:user] || @user
     if user && !opts[:skip_set_user]
       @topic.user = user

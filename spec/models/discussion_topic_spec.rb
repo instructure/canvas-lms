@@ -1740,38 +1740,6 @@ describe DiscussionTopic do
     end
   end
 
-  describe "locked flag" do
-    before :once do
-      discussion_topic_model
-    end
-
-    it "should ignore workflow_state if the flag is set" do
-      @topic.locked = true
-      @topic.workflow_state = 'active'
-      expect(@topic.locked?).to be_truthy
-      @topic.locked = false
-      @topic.workflow_state = 'locked'
-      expect(@topic.locked?).to be_falsey
-    end
-
-    it "should fall back to the workflow_state if the flag is nil" do
-      @topic.locked = nil
-      @topic.workflow_state = 'active'
-      expect(@topic.locked?).to be_falsey
-      @topic.workflow_state = 'locked'
-      expect(@topic.locked?).to be_truthy
-    end
-
-    it "should fix up a 'locked' workflow_state" do
-      @topic.workflow_state = 'locked'
-      @topic.locked = nil
-      @topic.save!
-      @topic.unlock!
-      expect(@topic.workflow_state).to eql 'active'
-      expect(@topic.locked?).to be_falsey
-    end
-  end
-
   describe "update_order" do
     it "should handle existing null positions" do
       topics = (1..4).map{discussion_topic_model(pinned: true)}

@@ -71,6 +71,7 @@ module Api::V1::Assignment
     due_at
     only_visible_to_overrides
     post_to_sis
+    time_zone_edited
   ].freeze
 
   def assignments_json(assignments, user, session, opts = {})

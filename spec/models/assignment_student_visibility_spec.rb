@@ -36,10 +36,6 @@ describe "differentiated_assignments" do
     make_assignment({date: Time.now, ovto: false})
   end
 
-  def assignment_with_null_only_visible_to_overrides
-    make_assignment({date: Time.now, ovto: nil})
-  end
-
   def group_assignment_with_true_only_visible_to_overrides(opts={})
     group_category = opts[:group_category] || @course.group_categories.first
     make_assignment({date: nil, ovto: true, group_category: group_category})
@@ -369,37 +365,6 @@ describe "differentiated_assignments" do
           it "should not show deleted assignments" do
             @assignment.destroy
             ensure_user_does_not_see_assignment
-          end
-        end
-        context "user in section with override" do
-          before{enroller_user_in_section(@section_foo)}
-          it "should show the assignment to the user" do
-            ensure_user_sees_assignment
-          end
-        end
-        context "user in section with no override" do
-          before{enroller_user_in_section(@section_bar)}
-          it "should show the assignment to the user" do
-            ensure_user_sees_assignment
-          end
-        end
-        context "user in section with override and one without override" do
-          before do
-            enroller_user_in_both_sections
-          end
-          it "should show the assignment to the user" do
-            ensure_user_sees_assignment
-          end
-        end
-      end
-      context "assignment with null only_visible_to_overrides" do
-        before do
-          assignment_with_null_only_visible_to_overrides
-          give_section_due_date(@assignment, @section_foo)
-        end
-        context "user in default section" do
-          it "should show the assignment to the user" do
-            ensure_user_sees_assignment
           end
         end
         context "user in section with override" do
