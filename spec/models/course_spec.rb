@@ -1099,6 +1099,39 @@ describe Course, "enroll" do
   end
 end
 
+describe Course, '#assignment_groups' do
+  it 'orders groups by position' do
+    course_model
+    @course.assignment_groups.create!(:name => 'B Group', position: 3)
+    @course.assignment_groups.create!(:name => 'A Group', position: 2)
+    @course.assignment_groups.create!(:name => 'C Group', position: 1)
+
+    groups = @course.assignment_groups
+
+    expect(groups[0].name).to eq('C Group')
+    expect(groups[1].name).to eq('A Group')
+    expect(groups[2].name).to eq('B Group')
+  end
+
+  it 'orders groups by name when positions are equal' do
+    course_model
+
+    @course.assignment_groups.create!(:name => 'B Group', position: 1)
+    @course.assignment_groups.create!(:name => 'A Group', position: 2)
+    @course.assignment_groups.create!(:name => 'D Group', position: 3)
+    @course.assignment_groups.create!(:name => 'C Group', position: 3)
+
+    @course.reload
+    expect(AssignmentGroup).to receive(:best_unicode_collation_key).with('assignment_groups.name').and_call_original
+    groups = @course.assignment_groups
+
+    expect(groups[0].name).to eq('B Group')
+    expect(groups[1].name).to eq('A Group')
+    expect(groups[2].name).to eq('C Group')
+    expect(groups[3].name).to eq('D Group')
+  end
+end
+
 describe Course, "score_to_grade" do
   it "should correctly map scores to grades" do
     default = GradingStandard.default_grading_standard

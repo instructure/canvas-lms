@@ -124,7 +124,7 @@ class Course < ActiveRecord::Base
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context, :inverse_of => :context
   has_many :groups, :as => :context, :inverse_of => :context
   has_many :active_groups, -> { where("groups.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'Group'
-  has_many :assignment_groups, -> { order('assignment_groups.position, assignment_groups.name') }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :assignment_groups, -> { order('assignment_groups.position', AssignmentGroup.best_unicode_collation_key('assignment_groups.name')) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :assignments, -> { order('assignments.created_at') }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :submissions, -> { order('submissions.updated_at DESC') }, through: :assignments, dependent: :destroy
