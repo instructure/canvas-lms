@@ -1088,7 +1088,7 @@ class ConversationsController < ApplicationController
         known_users(users, conversation_id: params[:from_conversation_id])
     end
     contexts.each{ |context| known.concat(@current_user.address_book.known_in_context(context)) }
-    @recipients = known.uniq(&:id)
+    @recipients = known.uniq(&:id).reject{|u| u.id == @current_user.id}
   end
 
   def infer_tags
