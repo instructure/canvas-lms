@@ -1,14 +1,8 @@
 if CANVAS_RAILS4_2
-  # if you want to run Ruby 2.4, you have to use an unreleased version of Rails 4.2. but that's a
-  # pain for deployment, since Rails is so big, so only do it locally
-  if RUBY_VERSION >= '2.4'
-    gem 'rails', '4.2.7.1', github: 'rails/rails', ref: '047cd2ae5d4beddc27c0ebd223fa0c6aed634766'
-      # for some reason bundler doesn't realize to lock these sub-gems to 4.2.7.1 automatically, and tries to use 5.0.1
-      gem 'activesupport', '4.2.7.1', github: 'rails/rails', ref: '047cd2ae5d4beddc27c0ebd223fa0c6aed634766'
-      gem 'actionpack', '4.2.7.1', github: 'rails/rails', ref: '047cd2ae5d4beddc27c0ebd223fa0c6aed634766'
-  else
-    gem 'rails', '4.2.7.1'
-  end
+  gem 'rails', '4.2.7.1', github: 'rails/rails', ref: 'bff1f05813d02a5ddb6caa74d64722b22648c397'
+    # for some reason bundler doesn't realize to lock these sub-gems to 4.2.7.1 automatically, and tries to use 5.0.1
+    gem 'activesupport', '4.2.7.1', github: 'rails/rails', ref: 'bff1f05813d02a5ddb6caa74d64722b22648c397'
+    gem 'actionpack', '4.2.7.1', github: 'rails/rails', ref: 'bff1f05813d02a5ddb6caa74d64722b22648c397'
   gem 'rack', '1.6.5'
   gem 'rails-observers', '0.1.2'
   gem 'activesupport-json_encoder', '1.1.0'
@@ -60,11 +54,7 @@ gem 'i18n', '0.7.0'
 gem 'i18nliner', '0.0.12'
 gem 'icalendar', '1.5.4', require: false
 gem 'ims-lti', '2.1.0.beta.4', require: 'ims'
-if RUBY_VERSION >= '2.4'
-  gem 'json', '2.0.3'
-else
-  gem 'json', '1.8.3'
-end
+gem 'json', '2.0.3'
 gem 'oj', '2.17.1'
 gem 'jwt', '1.2.1', require: false
 gem 'json-jwt', '1.6.5', require: false
