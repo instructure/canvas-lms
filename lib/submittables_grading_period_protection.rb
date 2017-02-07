@@ -18,13 +18,13 @@ module SubmittablesGradingPeriodProtection
     submittable.only_visible_to_overrides =
       submittable_params[:only_visible_to_overrides] if submittable_params.key?(:only_visible_to_overrides)
     submittable.due_at = submittable_params[:due_at] if submittable_params.key?(:due_at)
-    return true unless submittable.only_visible_to_overrides_changed? || submittable.due_at_changed?
+    return true unless submittable.only_visible_to_overrides_changed? || due_at_changed?(submittable)
     return true unless context_grading_periods_enabled? && !current_user_is_context_admin?
 
     in_closed_grading_period = date_in_closed_grading_period?(submittable.due_at_was)
 
     if in_closed_grading_period && !submittable.only_visible_to_overrides_was
-      if submittable.due_at_changed?
+      if due_at_changed?(submittable)
         apply_error(submittable, :due_at, ERROR_MESSAGES[:change_due_at_in_closed], flash_message)
       else
         message = ERROR_MESSAGES[:change_only_visible_to_overrides]
@@ -57,6 +57,10 @@ module SubmittablesGradingPeriodProtection
   end
 
   private
+
+  def due_at_changed?(submittable)
+    submittable.due_at_was.to_i != submittable.due_at.to_i
+  end
 
   def apply_grading_params(submittable, submittable_params)
     case submittable

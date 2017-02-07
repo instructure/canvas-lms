@@ -299,7 +299,7 @@ describe DiscussionTopicsController, type: :request do
        "position" => @topic.position,
        "url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
        "html_url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-       "podcast_has_student_posts" => nil,
+       "podcast_has_student_posts" => false,
        "attachments" => [{"content-type" => "unknown/unknown",
                           "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
                           "filename" => "content.txt",
@@ -330,9 +330,9 @@ describe DiscussionTopicsController, type: :request do
        "permissions" => {"delete" => true, "attach" => true, "update" => true, "reply" => true},
        "group_category_id" => nil,
        "can_group" => true,
-       "allow_rating" => nil,
-       "only_graders_can_rate" => nil,
-       "sort_by_rating" => nil,
+       "allow_rating" => false,
+       "only_graders_can_rate" => false,
+       "sort_by_rating" => false,
       }
     end
 
@@ -1105,7 +1105,7 @@ describe DiscussionTopicsController, type: :request do
       "user_can_see_posts" => true,
       "subscribed" => true,
       "podcast_url" => nil,
-      "podcast_has_student_posts" => nil,
+      "podcast_has_student_posts" => false,
       "require_initial_post" => nil,
       "title" => "Group Topic 1",
       "discussion_subentry_count" => 0,
@@ -1155,9 +1155,9 @@ describe DiscussionTopicsController, type: :request do
       "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!,
       "group_category_id" => nil,
       "can_group" => true,
-      "allow_rating" => nil,
-      "only_graders_can_rate" => nil,
-      "sort_by_rating" => nil,
+      "allow_rating" => false,
+      "only_graders_can_rate" => false,
+      "sort_by_rating" => false,
     }
     expect(json.sort.to_h).to eq expected.sort.to_h
   end

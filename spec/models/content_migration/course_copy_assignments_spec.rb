@@ -404,8 +404,8 @@ describe ContentMigration do
         run_course_copy(warnings)
 
         asmnt_2 = @copy_to.assignments.where(migration_id: mig_id(@asmnt)).first
-        expect(asmnt_2.freeze_on_copy).to be_nil
-        expect(asmnt_2.copied).to be_nil
+        expect(asmnt_2.freeze_on_copy).to be false
+        expect(asmnt_2.copied).to be false
       end
     end
 

@@ -106,10 +106,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def set_defaults
-    self.one_question_at_a_time = false if self.one_question_at_a_time == nil
-    self.cant_go_back = false if self.cant_go_back == nil || self.one_question_at_a_time == false
-    self.shuffle_answers = false if self.shuffle_answers == nil
-    self.show_correct_answers = true if self.show_correct_answers == nil
+    self.cant_go_back = false unless self.one_question_at_a_time
     if !self.show_correct_answers
       self.show_correct_answers_last_attempt = false
       self.show_correct_answers_at = nil

@@ -585,12 +585,6 @@ class DiscussionTopic < ActiveRecord::Base
   end
   alias_method :unlock!, :unlock
 
-  # deprecated with draft state: use publish+available_[from|until] machinery instead
-  # you probably want available?
-  def locked?
-    locked.nil? ? workflow_state == 'locked' : locked
-  end
-
   def published?
     return false if workflow_state == 'unpublished'
     return false if workflow_state == 'post_delayed' && is_announcement
