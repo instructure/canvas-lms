@@ -1,40 +1,29 @@
 module Lti
   class CapabilitiesHelper
-    attr_accessor :context
-    def initialize(context)
-      @context = context
+    SUPPORTED_CAPABILITIES = %w(ToolConsumerInstance.guid
+                                CourseSection.sourcedId
+                                Membership.role
+                                Person.email.primary
+                                Person.name.given
+                                Person.name.family
+                                Person.name.full
+                                Person.sourcedId
+                                User.id
+                                User.image
+                                Message.documentTarget
+                                Message.locale
+                                Membership.role).freeze
+
+    def self.supported_capabilities
+      SUPPORTED_CAPABILITIES
     end
 
-    def parameter_capabilities_hash
-      @_param_capabilities_hash ||= begin
-        recommended_params.merge optional_params
-      end
+    def self.filter_capabilities(enabled_capability)
+      enabled_capability & SUPPORTED_CAPABILITIES
     end
 
-    def parameter_capabilities
-      parameter_capabilities_hash.keys
+    def self.capability_params_hash(enabled_capability, variable_expander)
+      variable_expander.enabled_capability_params(filter_capabilities(enabled_capability))
     end
-
-    def recommended_params
-      {
-        'launch_presentation_document_target' => IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME,
-        'tool_consumer_instance_guid' => tc_instance_guid
-      }
-    end
-
-    def optional_params
-      {
-        'launch_presentation_locale' => I18n.locale || I18n.default_locale.to_s
-      }
-    end
-
-    private
-
-    def tc_instance_guid
-      if context.respond_to?(:root_account) && context.root_account.present?
-        context.root_account.lti_guid
-      end
-    end
-
   end
 end

@@ -93,6 +93,44 @@ module Lti
       end
     end
 
+    def enabled_capability_params(enabled_capabilities)
+      enabled_capabilities.each_with_object({}) do |capability, hash|
+        if (expansion = capability.respond_to?(:to_sym) && self.class.expansions["$#{capability}".to_sym])
+          hash[expansion.default_name] = expansion.expand(self) if expansion.default_name.present?
+        end
+      end
+    end
+
+    # communicates the kind of browser window/frame where the Canvas has launched a tool
+    # associated launch param name: launch_presentation_document_target
+    # @example
+    #   ```
+    #   ifame
+    #   ```
+    register_expansion 'Message.documentTarget', [],
+                       -> { IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME },
+                       default_name: 'launch_presentation_document_target'
+
+    # returns the current locale
+    # associated launch param name: launch_presentation_locale
+    # @example
+    #   ```
+    #   de
+    #   ```
+    register_expansion 'Message.locale', [],
+                       -> { I18n.locale || I18n.default_locale },
+                       default_name: 'launch_presentation_locale'
+
+    # returns a unique identifier for the Tool Consumer (Canvas)
+    # associated launch param name: 'tool_consumer_instance_guid'
+    # @example
+    #   ```
+    #   0dWtgJjjFWRNT41WdQMvrleejGgv7AynCVm3lmZ2:canvas-lms
+    #   ```
+    register_expansion 'ToolConsumerInstance.guid', [],
+                       -> { @root_account.lti_guid },
+                       default_name: 'tool_consumer_instance_guid'
+
     # returns the canvas domain for the current context.
     # @example
     #   ```
@@ -282,13 +320,15 @@ module Lti
 
     # returns the current course sis source id
     # to return the section source id use Canvas.course.sectionIds
+    # associated launch param name: 'lis_course_section_sourcedid'
     # @example
     #   ```
     #   1234
     #   ```
     register_expansion 'CourseSection.sourcedId', [],
                        -> { @context.sis_source_id },
-                       COURSE_GUARD
+                       COURSE_GUARD,
+                       default_name: 'lis_course_section_sourcedid'
 
     # returns the current course enrollment state
     # @example
@@ -338,40 +378,48 @@ module Lti
                        COURSE_GUARD
 
     # Returns the full name of the launching user. Only available when launched by a logged in user.
+    # associated launch param name: lis_person_name_full
     # @example
     #   ```
     #   John Doe
     #   ```
     register_expansion 'Person.name.full', [],
                        -> { @current_user.name },
-                       USER_GUARD
+                       USER_GUARD,
+                       default_name: 'lis_person_name_full'
 
     # Returns the last name of the launching user. Only available when launched by a logged in user.
+    # associated launch param name: 'lis_person_name_family'
     # @example
     #   ```
     #   Doe
     #   ```
     register_expansion 'Person.name.family', [],
                        -> { @current_user.last_name },
-                       USER_GUARD
+                       USER_GUARD,
+                       default_name: 'lis_person_name_family'
 
     # Returns the first name of the launching user. Only available when launched by a logged in user.
+    # associated launch param name: 'lis_person_name_given'
     # @example
     #   ```
     #   John
     #   ```
     register_expansion 'Person.name.given', [],
                        -> { @current_user.first_name },
-                       USER_GUARD
+                       USER_GUARD,
+                       default_name: 'lis_person_name_given'
 
     # Returns the primary email of the launching user. Only available when launched by a logged in user.
+    # associated launch param name: 'lis_person_contact_email_primary'
     # @example
     #   ```
     #   john.doe@example.com
     #   ```
     register_expansion 'Person.email.primary', [],
                        -> { @current_user.email },
-                       USER_GUARD
+                       USER_GUARD,
+                       default_name: 'lis_person_contact_email_primary'
 
 
     # Returns the institution assigned email of the launching user. Only available when launched by a logged in user that was added via SIS.
@@ -395,22 +443,26 @@ module Lti
                        USER_GUARD
 
     # Returns the profile picture URL of the launching user. Only available when launched by a logged in user.
+    # associated launch param name: 'user_image'
     # @example
     #   ```
     #   https://example.com/picture.jpg
     #   ```
     register_expansion 'User.image', [],
                        -> { @current_user.avatar_url },
-                       USER_GUARD
+                       USER_GUARD,
+                       default_name: 'user_image'
 
     # Returns the Canvas user_id of the launching user. Only available when launched by a logged in user.
+    # associated launch param name: 'user_id'
     # @example
     #   ```
     #   420000000000042
     #   ```
     register_expansion 'User.id', [],
                        -> { @current_user.id },
-                       USER_GUARD
+                       USER_GUARD,
+                       default_name: 'user_id'
 
     # Returns the Canvas user_id of the launching user. Only available when launched by a logged in user.
     # @example
@@ -443,13 +495,15 @@ module Lti
 
     # Returns the <a href="https://www.imsglobal.org/specs/ltimemv1p0/specification-3">IMS LTI membership service</a> roles for filtering via query parameters.
     # Only available when launched by a logged in user.
+    # associated launch param name: 'roles'
     # @example
     #   ```
     #   http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator
     #   ```
     register_expansion 'Membership.role', [],
                        -> { lti_helper.all_roles('lis2') },
-                       USER_GUARD
+                       USER_GUARD,
+                       default_name: 'roles'
 
     # Returns list of <a href="https://www.imsglobal.org/specs/ltiv1p0/implementation-guide#toc-16" target ="_blank">LIS role full URNs</a>.
     # Should always be available.
@@ -521,7 +575,8 @@ module Lti
     #   ```
     register_expansion 'Person.sourcedId', [],
                        -> { sis_pseudonym.sis_user_id },
-                       PSEUDONYM_GUARD
+                       PSEUDONYM_GUARD,
+                       default_name: 'lis_person_sourcedid'
 
     # Returns the logout service url for the user.
     # This is the pseudonym the user is actually logged in as.

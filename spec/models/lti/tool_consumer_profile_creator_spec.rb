@@ -149,16 +149,20 @@ module Lti
           expect(subject.create(true).capability_offered).to include 'vnd.Canvas.OriginalityReport.url'
         end
 
-        it 'adds the launch_presentation_document_target paramter capability' do
-          expect(subject.create(true).capability_offered).to include 'launch_presentation_document_target'
+        it 'adds the Message.documentTarget capability' do
+          expect(subject.create(true).capability_offered).to include 'Message.documentTarget'
         end
 
-        it 'adds the tool_consumer_instance_guid paramter capability' do
-          expect(subject.create(true).capability_offered).to include 'tool_consumer_instance_guid'
+        it 'adds the ToolConsumerInstance.guid capability' do
+          expect(subject.create(true).capability_offered).to include 'ToolConsumerInstance.guid'
         end
 
-        it 'adds the launch_presentation_locale paramter capability' do
-          expect(subject.create(true).capability_offered).to include 'launch_presentation_locale'
+        it 'adds the Message.locale capability' do
+          expect(subject.create(true).capability_offered).to include 'Message.locale'
+        end
+
+        it 'adds the Membership.role capability' do
+          expect(subject.create(true).capability_offered).to include 'Membership.role'
         end
 
         it 'does not add the OriginalityReport capability if developer_key is false' do

@@ -37,9 +37,10 @@ module Lti
       )
     end
     let(:enabled_capability) {
-      %w(tool_consumer_instance_guid
-         launch_presentation_document_target
-         launch_presentation_locale)
+      %w(ToolConsumerInstance.guid
+         Message.documentTarget
+         Message.locale
+         Membership.role)
     }
     let(:tool_proxy) do
       ToolProxy.create(
@@ -267,10 +268,12 @@ module Lti
         end
 
         it 'returns the roles' do
+          course_with_student(account: account, active_all: true)
+          user_session(@student)
           get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,
               params: {tool_launch_context: 'my_custom_context'}
           params = assigns[:lti_launch].params.with_indifferent_access
-          expect(params['roles']).to eq ["http://purl.imsglobal.org/vocab/lis/v2/person#None"]
+          expect(params['roles']).to eq "http://purl.imsglobal.org/vocab/lis/v2/system/person#User"
         end
 
         it 'adds module item substitutions' do

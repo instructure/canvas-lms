@@ -22,14 +22,15 @@
 module Lti
   class VariableExpansion
 
-    attr_reader :name, :permission_groups
+    attr_reader :name, :permission_groups, :default_name
 
-    def initialize(name, permission_groups, expansion_proc, *guards)
+    def initialize(name, permission_groups, expansion_proc, *guards, default_name: nil)
       @name = name
       @permission_groups = permission_groups
       @expansion_proc = expansion_proc
       @guards = guards
       @guards << -> { true } if @guards.empty?
+      @default_name = default_name
     end
 
     def expand(expander)
