@@ -23,7 +23,8 @@ define([
       return nextProps.searchType !== this.props.searchType
           || nextProps.nameList.join(',') !== this.props.nameList.join(',')
           || nextProps.role !== this.props.role
-          || nextProps.section !== this.props.section;
+          || nextProps.section !== this.props.section
+          || nextProps.limitPrivilege !== this.props.limitPrivilege;
     }
 
 
@@ -142,6 +143,7 @@ define([
             </div>
             <div style={{marginTop: '1em'}}>
               <Checkbox
+                key="limit_privileges_to_course_section"
                 id="limit_privileges_to_course_section"
                 label={I18n.t('Can interact with users in their section only')}
                 isBlock value={0}
