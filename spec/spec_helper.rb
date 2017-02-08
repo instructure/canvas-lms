@@ -398,7 +398,7 @@ RSpec.configure do |config|
   # this in a specific example group if you need to do something fancy/
   # crazy/slow. but you probably don't. seriously. just use once-ler
   def using_transactions_properly?
-    use_transactional_fixtures
+    CANVAS_RAILS4_2 ? use_transactional_fixtures : use_transactional_tests
   end
 
   config.before :suite do
