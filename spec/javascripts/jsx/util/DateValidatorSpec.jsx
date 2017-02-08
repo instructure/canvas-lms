@@ -53,7 +53,7 @@ define([
     gradingPeriods,
     userIsAdmin,
     multipleGradingPeriodsEnabled = true,
-    assignment = null,
+    postToSIS = null,
     dueDateRequiredForAccount = false
   }) {
     ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = dueDateRequiredForAccount;
@@ -73,7 +73,7 @@ define([
       userIsAdmin,
       data,
       gradingPeriods,
-      assignment
+      postToSIS
     };
 
     return new DateValidator(params);
@@ -170,7 +170,7 @@ define([
       gradingPeriods: null,
       userIsAdmin: false,
       multipleGradingPeriodsEnabled: false,
-      assignment: { postToSISEnabled: function () { return false; } },
+      postToSIS: false,
       dueDateRequiredForAccount: true });
     ok(isValid(validator));
   });
@@ -182,7 +182,7 @@ define([
       gradingPeriods: null,
       userIsAdmin: false,
       multipleGradingPeriodsEnabled: false,
-      assignment: { postToSISEnabled: function () { return true; } },
+      postToSIS: true,
       dueDateRequiredForAccount: true });
     notOk(isValid(validator));
   });
@@ -194,7 +194,7 @@ define([
       gradingPeriods: null,
       userIsAdmin: false,
       multipleGradingPeriodsEnabled: false,
-      assignment: { postToSISEnabled: function () { return true; } },
+      postToSIS: true,
       dueDateRequiredForAccount: false });
     ok(isValid(validator));
   });

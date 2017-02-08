@@ -60,7 +60,7 @@ define [
           multipleGradingPeriodsEnabled: @multipleGradingPeriodsEnabled
           gradingPeriods: @gradingPeriods
           userIsAdmin: _.contains(ENV.current_user_roles, "admin"),
-          assignment: @options.assignment
+          postToSIS: @options.postToSIS
         })
         rowErrors = dateValidator.validateDatetimes()
         errors = _.extend(errors, rowErrors)

@@ -33,9 +33,7 @@ define [
       @multipleGradingPeriodsEnabled = params.multipleGradingPeriodsEnabled
       @gradingPeriods = params.gradingPeriods
       @userIsAdmin = params.userIsAdmin
-
-      assignment = params.assignment || { postToSISEnabled: -> false }
-      @dueDateRequired = assignment.postToSISEnabled() && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
+      @dueDateRequired = params.postToSIS && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
 
     validateDatetimes: ->
       lockAt = @data.lock_at
@@ -122,7 +120,7 @@ define [
     _validateDatetimeSequences: (datetimesToValidate, errs) =>
       for datetimeSet in datetimesToValidate
         if datetimeSet.dueDateRequired && !datetimeSet.date
-          errs["due_at"] = I18n.t("Due dates are required")
+          errs["due_at"] = I18n.t("Please add a due date")
         if datetimeSet.range == "grading_period_range"
           @_validateMultipleGradingPeriods(datetimeSet.date, errs)
         else if datetimeSet.date

@@ -63,7 +63,7 @@ require [
       'js-assignment-overrides': new DueDateOverride
         model: dueDateList
         views: {}
-        assignment: assignment
+        postToSIS: assignment.postToSIS()
 
   editHeaderView = new EditHeaderView
     el: headerEl
