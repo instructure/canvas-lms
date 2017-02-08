@@ -11,7 +11,8 @@ define [
   'compiled/util/deparam'
   'compiled/views/editor/KeyboardShortcuts'
   'compiled/util/coupleTimeFields'
-], ($, _, I18n, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, RichContentEditor, unflatten, deparam, KeyboardShortcuts, coupleTimeFields) ->
+  'jsx/shared/helpers/datePickerFormat'
+], ($, _, I18n, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, RichContentEditor, unflatten, deparam, KeyboardShortcuts, coupleTimeFields, datePickerFormat) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -38,7 +39,7 @@ define [
           'title', 'description', 'location_name', 'location_address',
           'duplicate')
         if picked_params.start_date
-          picked_params.start_date = $.dateString($.fudgeDateForProfileTimezone(picked_params.start_date), {format: 'medium'})
+          picked_params.start_date = tz.format($.fudgeDateForProfileTimezone(picked_params.start_date), 'date.formats.medium_with_weekday')
 
         attrs = @model.parse(picked_params)
         # if start and end are at the beginning of a day, assume it is an all day date
@@ -72,7 +73,7 @@ define [
     render: =>
       super
 
-      @$(".date_field").date_field()
+      @$(".date_field").date_field({ datepicker: { dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday')) } })
       @$(".time_field").time_field()
       @$(".date_start_end_row").each (_, row) =>
         date = $('.start_date', row).first()
