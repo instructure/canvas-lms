@@ -188,6 +188,7 @@ class Course < ActiveRecord::Base
   has_many :gradebook_csvs, inverse_of: :course
 
   has_many :master_course_templates, :class_name => "MasterCourses::MasterTemplate"
+  has_many :master_course_subscriptions, :class_name => "MasterCourses::ChildSubscription", :foreign_key => 'child_course_id'
 
   prepend Profile::Association
 
@@ -655,6 +656,10 @@ class Course < ActiveRecord::Base
   scope :deleted, -> { where(:workflow_state => 'deleted') }
 
   scope :master_courses, -> { joins(:master_course_templates).where.not(MasterCourses::MasterTemplate.table_name => {:workflow_state => 'deleted'}) }
+  scope :not_master_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::MasterTemplate.quoted_table_name} AS mct ON mct.course_id=courses.id AND mct.workflow_state<>'deleted'").where("mct IS NULL") }
+
+  scope :associated_courses, -> { joins(:master_course_subscriptions).where.not(MasterCourses::ChildSubscription.table_name => {:workflow_state => 'deleted'}) }
+  scope :not_associated_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'").where("mcs IS NULL") }
 
   def potential_collaborators
     current_users
