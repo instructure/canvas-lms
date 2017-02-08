@@ -120,14 +120,20 @@ class CalendarEvent < ActiveRecord::Base
         'displayName' => 'Braven Portal'
       },
       'start' => {
-        'dateTime' => start_at.utc_datetime,
         'timeZone' => 'Etc/GMT',
       },
       'end' => {
-        'dateTime' => end_at.utc_datetime,
         'timeZone' => 'Etc/GMT',
       }
     }
+
+    if self.all_day?
+      event['start']['date'] = start_at.utc_datetime.to_date
+      event['end']['date'] = start_at.utc_datetime.to_date
+    else
+      event['start']['dateTime'] = start_at.utc_datetime
+      event['end']['dateTime'] = end_at.utc_datetime
+    end
 
     # Need to fetch existing attendee status (if available)
     # to the RSVP is unmodified across updates
