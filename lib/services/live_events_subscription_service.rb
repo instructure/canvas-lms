@@ -5,25 +5,19 @@ module Services
         settings.present?
       end
 
+      def tool_proxy_subscription(tool_proxy, subscription_id)
+        options = { headers: headers(tool_proxy_jwt_body(tool_proxy)) }
+        request(:get, "/api/subscriptions/#{subscription_id}", options)
+      end
+
       def tool_proxy_subscriptions(tool_proxy)
-        options = {
-          headers: headers({
-            sub: "ltiToolProxy:#{tool_proxy.guid}",
-            developerKey: tool_proxy.product_family.developer_key.to_s
-          })
-        }
+        options = { headers: headers(tool_proxy_jwt_body(tool_proxy)) }
         request(:get, '/api/subscriptions', options)
       end
 
       def create_tool_proxy_subscription(tool_proxy, subscription)
         options = {
-          headers: headers({
-            sub: "ltiToolProxy:#{tool_proxy.guid}",
-            developerKey: tool_proxy.product_family.developer_key.to_s
-          },
-          {
-            'Content-Type' => 'application/json'
-          }),
+          headers: headers(tool_proxy_jwt_body(tool_proxy), { 'Content-Type' => 'application/json' }),
           body: subscription.to_json
         }
         request(:post, '/api/subscriptions', options)
@@ -50,6 +44,13 @@ module Services
              Diplomat::KeyNotFound => e
         Canvas::Errors.capture_exception(:live_events_subscription, e)
         nil
+      end
+
+      def tool_proxy_jwt_body(tool_proxy, options = {})
+        options.merge({
+          sub: "ltiToolProxy:#{tool_proxy.guid}",
+          developerKey: tool_proxy.product_family.developer_key.to_s
+        })
       end
     end
   end

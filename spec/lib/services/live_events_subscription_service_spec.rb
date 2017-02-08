@@ -56,6 +56,19 @@ module Services
         end
       end
 
+      describe '.tool_proxy_subscription' do
+        it 'makes the expected request' do
+          HTTParty.expects(:send).with do |method, endpoint, options|
+            expect(method).to eq(:get)
+            expect(endpoint).to eq('http://example.com/api/subscriptions/subscription_id')
+            jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
+            expect(jwt["developerKey"]).to eq('10000000000003')
+            expect(jwt["sub"]).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
+          end
+          LiveEventsSubscriptionService.tool_proxy_subscription(tool_proxy, 'subscription_id')
+        end
+      end
+
       describe '.tool_proxy_subscriptions' do
         it 'makes the expected request' do
           HTTParty.expects(:send).with do |method, endpoint, options|
