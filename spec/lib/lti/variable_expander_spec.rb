@@ -130,7 +130,8 @@ module Lti
            User.id
            User.image
            Message.documentTarget
-           Message.locale)
+           Message.locale
+           Context.id)
       }
 
       it 'does not use expansions that do not have default names' do
@@ -209,6 +210,11 @@ module Lti
       it 'includes Message.locale' do
         expanded = subject.enabled_capability_params(enabled_capability)
         expect(expanded.keys).to include 'launch_presentation_locale'
+      end
+
+      it 'includes Context.id' do
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.keys).to include 'context_id'
       end
     end
 

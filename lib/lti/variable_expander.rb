@@ -101,6 +101,15 @@ module Lti
       end
     end
 
+    # an opaque identifier that uniquely identifies the context that contains the link being launched
+    # @example
+    #   ```
+    #   cdca1fe2c392a208bd8a657f8865ddb9ca359534
+    #   ```
+    register_expansion 'Context.id', [],
+                       -> { Lti::Asset.opaque_identifier_for(@context) },
+                       default_name: 'context_id'
+
     # communicates the kind of browser window/frame where the Canvas has launched a tool
     # associated launch param name: launch_presentation_document_target
     # @example

@@ -165,6 +165,10 @@ module Lti
           expect(subject.create(true).capability_offered).to include 'Membership.role'
         end
 
+        it 'adds the Context.id capability' do
+          expect(subject.create(true).capability_offered).to include 'Context.id'
+        end
+
         it 'does not add the OriginalityReport capability if developer_key is false' do
           expect(subject.create.capability_offered).not_to include 'vnd.Canvas.OriginalityReport.url'
         end

@@ -23,7 +23,6 @@ module Lti
           vnd.Canvas.Person.email.sis
           ToolConsumerProfile.url
           Security.splitSecret
-          Context.id
         ).concat(CapabilitiesHelper.supported_capabilities).freeze
 
     RESTRICTED_CAPABILITIES = %W(

@@ -68,7 +68,7 @@ module Lti
          User.image
          Message.documentTarget
          Message.locale
-         Membership.role)
+         Context.id)
     }
     describe '#supported_capabilities' do
       it 'returns all supported capabilities asociated with launch params' do

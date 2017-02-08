@@ -12,7 +12,7 @@ module Lti
                                 User.image
                                 Message.documentTarget
                                 Message.locale
-                                Membership.role).freeze
+                                Context.id).freeze
 
     def self.supported_capabilities
       SUPPORTED_CAPABILITIES

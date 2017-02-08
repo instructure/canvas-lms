@@ -88,7 +88,6 @@ module Lti
             oauth_consumer_key: tool_proxy.guid,
             lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
             resource_link_id: build_resource_link_id(message_handler),
-            context_id: Lti::Asset.opaque_identifier_for(@context)
           }
 
           if params[:secure_params].present?

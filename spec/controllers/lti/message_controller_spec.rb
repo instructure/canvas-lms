@@ -40,7 +40,8 @@ module Lti
       %w(ToolConsumerInstance.guid
          Message.documentTarget
          Message.locale
-         Membership.role)
+         Membership.role
+         Context.id)
     }
     let(:tool_proxy) do
       ToolProxy.create(

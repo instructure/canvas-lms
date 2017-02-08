@@ -99,6 +99,15 @@ particular placement:
 ```
 
 # Supported Substitutions
+## Context.id
+an opaque identifier that uniquely identifies the context of the tool launch
+
+Launch Parameter: *context_id*
+
+```
+cdca1fe2c392a208bd8a657f8865ddb9ca359534
+```
+
 ## ToolConsumerInstance.guid
 returns a unique identifier for the Tool Consumer (Canvas)
 
