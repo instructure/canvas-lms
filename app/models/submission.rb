@@ -786,6 +786,10 @@ class Submission < ActiveRecord::Base
 
   VERICITE_RETRY = 5
   def submit_to_vericite(attempt=0)
+    Rails.logger.info("VERICITE #submit_to_vericite submission ID: #{self.id}, vericiteable? #{vericiteable?}")
+    if vericiteable?
+      Rails.logger.info("VERICITE #submit_to_vericite submission ID: #{self.id}, plugin: #{Canvas::Plugin.find(:vericite)}, vericite plugin enabled? #{Canvas::Plugin.find(:vericite).try(:enabled?)}")
+    end
     return unless vericiteable? && Canvas::Plugin.find(:vericite).try(:enabled?)
     vericite = VeriCite::Client.new()
     reset_vericite_assets
@@ -921,6 +925,8 @@ class Submission < ActiveRecord::Base
       canSubmit = self.turnitinable?
     end
     last_attempt = plagData && plagData[:last_processed_attempt]
+    Rails.logger.info("VERICITE #prep_for_submitting_to_plagiarism submission ID: #{self.id}, type: #{type}, canSubmit? #{canSubmit}")
+    Rails.logger.info("VERICITE #prep_for_submitting_to_plagiarism submission ID: #{self.id}, last_attempt: #{last_attempt}, self.attempt: #{self.attempt}, @group_broadcast_submission: #{@group_broadcast_submission}, self.group: #{self.group}")
     if canSubmit && (!last_attempt || last_attempt < self.attempt) && (@group_broadcast_submission || !self.group)
       if plagData[:last_processed_attempt] != self.attempt
         plagData[:last_processed_attempt] = self.attempt
@@ -947,6 +953,7 @@ class Submission < ActiveRecord::Base
       delayFunction = :submit_to_turnitin
       delayOpts = TURNITIN_JOB_OPTS
     end
+    Rails.logger.info("VERICITE #submit_to_plagiarism_later submission ID: #{self.id}, type: #{type}, canSubmit? #{canSubmit}, submitPlag? #{submitPlag}")
     if canSubmit && submitPlag
       delay = Setting.get(delayName, 60.to_s).to_i
       send_later_enqueue_args(delayFunction, { :run_at => delay.seconds.from_now }.merge(delayOpts))
