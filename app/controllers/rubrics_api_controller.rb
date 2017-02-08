@@ -147,7 +147,7 @@ class RubricsApiController < ApplicationController
 
   def index
     return unless authorized_action(@context, @current_user, :manage_rubrics)
-    rubrics = Api.paginate(@context.rubrics.active, self, api_v1_course_assignments_url(@context))
+    rubrics = Api.paginate(@context.rubrics.active, self, rubric_pagination_url)
     render json: rubrics_json(rubrics, @current_user, session) unless performed?
   end
 
