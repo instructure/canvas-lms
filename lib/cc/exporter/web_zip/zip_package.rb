@@ -97,7 +97,7 @@ module CC::Exporter::WebZip
         {
           id: mod.id,
           name: mod.name,
-          locked: !mod.available_for?(user, deep_check_if_needed: true),
+          status: user_module_status(mod),
           unlockDate: force_timezone(mod.unlock_at),
           prereqs: mod.prerequisites.map{|pre| pre[:id]},
           requirement: requirement_type(mod),
@@ -105,6 +105,11 @@ module CC::Exporter::WebZip
           items: parse_module_item_data(mod)
         }
       end
+    end
+
+    def user_module_status(modul)
+      progression = modul.context_module_progressions.find_or_create_by(user: user).evaluate
+      progression.workflow_state
     end
 
     def requirement_type(modul)

@@ -17,37 +17,67 @@ describe "ZipPackage" do
   context "parse_module_data" do
     it "should map context module data from Canvas" do
       module_data = @zip_package.parse_module_data
-      expect(module_data).to eq [{id: @module.id, name: 'first_module', locked: false,
+      expect(module_data).to eq [{id: @module.id, name: 'first_module', status: 'completed',
         unlockDate: nil, prereqs: [], requirement: nil, sequential: false, items: []}]
     end
 
-    it "should show modules locked by prerequisites as locked" do
+    it "should show modules locked by prerequisites with status of locked" do
+      assign = @course.assignments.create!(title: 'Assignment 1')
+      assign_item = @module.content_tags.create!(content: assign, context: @course)
+      @module.completion_requirements = [{id: assign_item.id, type: 'must_submit'}]
+      @module.save!
       module2 = @course.context_modules.create!(name: 'second_module')
+      quiz = @course.quizzes.create!(title: 'Quiz 1')
+      quiz_item = module2.content_tags.create!(content: quiz, context: @course, indent: 1)
       module2.prerequisites = [{id: @module.id, type: "context_module", name: 'first_module'}]
+      module2.completion_requirements = [{id: quiz_item.id, type: 'must_submit'}]
       module2.save!
 
       module2_data = @zip_package.parse_module_data.last
-      expect(module2_data[:locked]).to be true
+      expect(module2_data[:status]).to eq 'locked'
       expect(module2_data[:prereqs]).to eq [@module.id]
     end
 
-    it "should show modules locked by date as locked" do
+    it "should show modules locked by date with status of locked" do
       lock_date = 1.day.from_now.iso8601
       @module.unlock_at = lock_date
       @module.save!
 
       module_data = @zip_package.parse_module_data.first
-      expect(module_data[:locked]).to be true
+      expect(module_data[:status]).to eq 'locked'
       expect(module_data[:unlockDate]).to eq lock_date
     end
 
-    it "should not show module as locked if it only has require sequential progress set to true" do
+    it "should not show module status as locked if it only has require sequential progress set to true" do
+      assign = @course.assignments.create!(title: 'Assignment 1')
+      assign_item = @module.content_tags.create!(content: assign, context: @course)
+      @module.completion_requirements = [{id: assign_item.id, type: 'must_submit'}]
+      @module.save!
       @module.require_sequential_progress = true
       @module.save!
 
       module_data = @zip_package.parse_module_data.first
-      expect(module_data[:locked]).to be false
+      expect(module_data[:status]).to eq 'unlocked'
       expect(module_data[:sequential]).to be true
+    end
+
+    it "should show module status as completed if there are no further module items to complete" do
+      module_data = @zip_package.parse_module_data.first
+      expect(module_data[:status]).to eq 'completed'
+    end
+
+    it "should show module status of started if only some items are completed" do
+      assign = @course.assignments.create!(title: 'Assignment 1')
+      assign_item = @module.content_tags.create!(content: assign, context: @course)
+      quiz = @course.quizzes.create!(title: 'Quiz 1')
+      quiz_item = @module.content_tags.create!(content: quiz, context: @course, indent: 1)
+      @module.completion_requirements = [{id: assign_item.id, type: 'must_submit'},
+                                         {id: quiz_item.id, type: 'must_submit'}]
+      @module.save!
+      bare_submission_model(assign, @student)
+
+      module_data = @zip_package.parse_module_data.first
+      expect(module_data[:status]).to eq 'started'
     end
 
     it "should not export unpublished context modules" do
