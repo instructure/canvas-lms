@@ -1,4 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
+require "spec_helper"
+require_dependency "lti/oauth2/access_token"
 require 'json/jwt'
 
 module Lti
