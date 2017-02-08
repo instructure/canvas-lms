@@ -62,6 +62,7 @@ define [
       @$fileUploadBox.parent().append uploadedOrRemovedTemplate(
         _.extend({}, @model.present(), {fileUploaded: true})
       )
+      @trigger('attachmentManipulationComplete')
 
     # For now we'll just remove it from the form, but not actually delete it
     # using the API in case teacher's need to see any uploaded files a
@@ -75,4 +76,5 @@ define [
       @removeFileStatusMessage()
       @render()
       @$fileUploadBox.parent().append uploadedOrRemovedTemplate(oldModel)
+      @trigger('attachmentManipulationComplete')
 
