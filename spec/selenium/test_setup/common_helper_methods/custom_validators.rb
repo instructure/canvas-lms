@@ -53,7 +53,7 @@ module CustomValidators
       messages = disable_implicit_wait { driver.find_elements :css, "#flash_message_holder .ic-flash-#{type}" }
       text = messages.map(&:text).join('\n')
       message ? !!text.match(message) : messages.present?
-    end or raise(RSpec::Expectations::ExpectationNotMetError, "expected flash #{type} message#{message ? " " + message.inspect : ""}, none found", CallStackUtils.useful_backtrace)
+    end or raise(RSpec::Expectations::ExpectationNotMetError, "expected flash #{type} message#{message ? " " + message.inspect : ""}, none found")
   end
 
   def expect_no_flash_message(type = :warning, message = nil)
@@ -62,7 +62,7 @@ module CustomValidators
       messages = disable_implicit_wait { driver.find_elements :css, "#flash_message_holder .ic-flash-#{type}" }
       text = messages.map(&:text).join('\n')
       message ? !text.match(message) : messages.empty?
-    end or raise(RSpec::Expectations::ExpectationNotMetError, "expected no flash #{type} message#{message ? " " + message.inspect : ""}, one was found", CallStackUtils.useful_backtrace)
+    end or raise(RSpec::Expectations::ExpectationNotMetError, "expected no flash #{type} message#{message ? " " + message.inspect : ""}, one was found")
   rescue Selenium::WebDriver::Error::NoSuchElementError
   end
 

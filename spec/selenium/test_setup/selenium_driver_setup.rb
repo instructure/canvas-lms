@@ -439,6 +439,7 @@ module SeleniumDriverSetup
       headless.video.stop_and_discard if capture_video? && !exception
 
       {
+        example: example,
         meta: example.metadata,
         summary_name: summary_name,
         exception: exception,
@@ -475,6 +476,7 @@ module SeleniumDriverSetup
 
     def create_spec_error_page(data)
       log_message_formatter = EscapeCode::HtmlFormatter.new(data[:log_messages].join("\n"))
+      exception_formatter = EscapeCode::HtmlFormatter.new(RSpec::Core::Formatters::ExceptionPresenter.new(data[:exception], data[:example]).fully_formatted(nil))
 
       # make a nice little html file for jenkins
       File.open(errors_path.join(data[:summary_name] + ".html"), "w") do |file|

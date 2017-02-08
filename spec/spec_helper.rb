@@ -330,6 +330,7 @@ RSpec.configure do |config|
   config.include Helpers
   config.include Factories
   config.include Onceler::BasicHelpers
+  config.project_source_dirs << "gems" # so that failures here are reported properly
 
   config.around(:each) do |example|
     record_spec_info(example) do

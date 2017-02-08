@@ -10,10 +10,7 @@
     <code><b>bin/rspec <%= data[:meta][:location] %></b></code>
 
     <h2>Ruby Error</h2>
-    <pre style="overflow:auto; max-height: 300px;">
-  <b><%= data[:exception].class.name %> <%= data[:exception].message %></b>
-  <%= data[:exception].backtrace.join("\n") %>
-    </pre>
+    <pre style="overflow:auto; max-height: 300px;"><%= exception_formatter.generate.html_safe %></pre>
 
     <% if data[:js_errors].present? %>
       <h2>JS Errors</h2>

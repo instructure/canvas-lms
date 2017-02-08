@@ -123,7 +123,6 @@ module CustomWaitMethods
 
   def keep_trying_until(seconds = SeleniumDriverSetup::SECONDS_UNTIL_GIVING_UP)
     frd_error = Selenium::WebDriver::Error::TimeOutError.new
-    frd_error.set_backtrace CallStackUtils.useful_backtrace
     wait_for(timeout: seconds, method: :keep_trying_until) do
       begin
         yield
