@@ -1,8 +1,8 @@
 class TokensController < ApplicationController
-  before_filter :require_registered_user
-  before_filter { |c| c.active_tab = "profile" }
-  before_filter :require_password_session
-  before_filter :require_non_masquerading, :except => :show
+  before_action :require_registered_user
+  before_action { |c| c.active_tab = "profile" }
+  before_action :require_password_session
+  before_action :require_non_masquerading, :except => :show
 
   def require_non_masquerading
     render_unauthorized_action if @real_current_user

@@ -133,17 +133,17 @@
 class ConferencesController < ApplicationController
   include Api::V1::Conferences
 
-  before_filter :require_context
-  skip_before_filter :load_user, :only => [:recording_ready]
+  before_action :require_context
+  skip_before_action :load_user, :only => [:recording_ready]
 
   add_crumb(proc{ t '#crumbs.conferences', "Conferences"}) do |c|
     c.send(:named_context_url, c.instance_variable_get("@context"), :context_conferences_url)
   end
 
-  before_filter { |c| c.active_tab = "conferences" }
-  before_filter :require_config
-  before_filter :reject_student_view_student
-  before_filter :get_conference, :except => [:index, :create]
+  before_action { |c| c.active_tab = "conferences" }
+  before_action :require_config
+  before_action :reject_student_view_student
+  before_action :get_conference, :except => [:index, :create]
 
   # @API List conferences
   # Retrieve the list of conferences for this context

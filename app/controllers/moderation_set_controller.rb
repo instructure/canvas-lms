@@ -27,7 +27,7 @@
 class ModerationSetController < ApplicationController
   include Api::V1::User
 
-  before_filter :load_assignment
+  before_action :load_assignment
 
   # @API List students selected for moderation
   #

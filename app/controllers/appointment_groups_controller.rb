@@ -206,8 +206,8 @@
 class AppointmentGroupsController < ApplicationController
   include Api::V1::CalendarEvent
 
-  before_filter :require_user
-  before_filter :get_appointment_group, :only => [:show, :update, :destroy, :users, :groups, :edit]
+  before_action :require_user
+  before_action :get_appointment_group, :only => [:show, :update, :destroy, :users, :groups, :edit]
 
   def calendar_fragment(opts)
     opts.to_json.unpack('H*')

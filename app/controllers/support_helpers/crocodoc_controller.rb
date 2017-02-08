@@ -2,7 +2,7 @@ module SupportHelpers
   class CrocodocController < ApplicationController
     include SupportHelpers::ControllerHelpers
 
-    before_filter :require_site_admin
+    before_action :require_site_admin
 
     protect_from_forgery with: :exception
 

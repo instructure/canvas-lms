@@ -16,8 +16,8 @@
 #
 module Lti
   class LtiAppsController < ApplicationController
-    before_filter :require_context
-    before_filter :require_user
+    before_action :require_context
+    before_action :require_user
 
     def index
       if authorized_action(@context, @current_user, :update)

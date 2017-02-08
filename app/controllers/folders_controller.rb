@@ -112,7 +112,7 @@ class FoldersController < ApplicationController
   include Api::V1::Attachment
   include AttachmentHelper
 
-  before_filter :require_context, :except => [:api_index, :show, :api_destroy, :update, :create, :create_file, :copy_folder, :copy_file]
+  before_action :require_context, :except => [:api_index, :show, :api_destroy, :update, :create, :create_file, :copy_folder, :copy_file]
 
   def index
     if authorized_action(@context, @current_user, :read)

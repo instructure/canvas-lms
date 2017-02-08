@@ -27,10 +27,10 @@ class AssignmentsController < ApplicationController
 
   include KalturaHelper
   include SyllabusHelper
-  before_filter :require_context
+  before_action :require_context
   add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
-  before_filter { |c| c.active_tab = "assignments" }
-  before_filter :normalize_title_param, :only => [:new, :edit]
+  before_action { |c| c.active_tab = "assignments" }
+  before_action :normalize_title_param, :only => [:new, :edit]
 
   def index
     return redirect_to(dashboard_url) if @context == @current_user

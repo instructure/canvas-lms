@@ -20,7 +20,7 @@ require 'ims/lti'
 module Lti
   class MessageController < ApplicationController
 
-    before_filter :require_context
+    before_action :require_context
 
     def registration
       if authorized_action(@context, @current_user, :update)

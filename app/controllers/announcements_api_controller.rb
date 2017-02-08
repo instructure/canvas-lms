@@ -24,8 +24,8 @@
 class AnnouncementsApiController < ApplicationController
   include Api::V1::DiscussionTopics
 
-  before_filter :parse_context_codes, :only => [:index]
-  before_filter :get_dates, :only => [:index]
+  before_action :parse_context_codes, :only => [:index]
+  before_action :get_dates, :only => [:index]
 
   # @API List announcements
   #

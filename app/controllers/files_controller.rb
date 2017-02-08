@@ -108,21 +108,21 @@ require 'securerandom'
 #     }
 #
 class FilesController < ApplicationController
-  before_filter :require_user, only: :create_pending
-  before_filter :require_context, except: [
+  before_action :require_user, only: :create_pending
+  before_action :require_context, except: [
     :assessment_question_show, :image_thumbnail, :show_thumbnail,
     :create_pending, :s3_success, :show, :api_create, :api_create_success, :api_create_success_cors,
     :api_show, :api_index, :destroy, :api_update, :api_file_status, :public_url
   ]
 
-  before_filter :check_file_access_flags, only: [:show_relative, :show]
-  before_filter :open_cors, only: [
+  before_action :check_file_access_flags, only: [:show_relative, :show]
+  before_action :open_cors, only: [
     :api_create, :api_create_success, :api_create_success_cors, :show_thumbnail
   ]
 
-  prepend_around_filter :load_pseudonym_from_policy, only: :create
-  skip_before_filter :verify_authenticity_token, only: :api_create
-  before_filter :verify_api_id, only: [
+  prepend_around_action :load_pseudonym_from_policy, only: :create
+  skip_before_action :verify_authenticity_token, only: :api_create
+  before_action :verify_api_id, only: [
     :api_show, :api_create_success, :api_file_status, :api_update, :destroy
   ]
 
@@ -130,7 +130,7 @@ class FilesController < ApplicationController
   include Api::V1::Avatar
   include AttachmentHelper
 
-  before_filter { |c| c.active_tab = "files" }
+  before_action { |c| c.active_tab = "files" }
 
   def verify_api_id
     raise ActiveRecord::RecordNotFound unless params[:id] =~ Api::ID_REGEX

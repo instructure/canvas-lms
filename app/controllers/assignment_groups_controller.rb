@@ -92,7 +92,7 @@
 #     }
 #
 class AssignmentGroupsController < ApplicationController
-  before_filter :require_context
+  before_action :require_context
 
   include Api::V1::AssignmentGroup
 

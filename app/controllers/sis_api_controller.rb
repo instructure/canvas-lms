@@ -5,9 +5,9 @@
 class SisApiController < ApplicationController
   include Api::V1::SisAssignment
 
-  before_filter :require_view_all_grades, only: [:sis_assignments]
-  before_filter :require_grade_export, only: [:sis_assignments]
-  before_filter :require_published_course, only: [:sis_assignments]
+  before_action :require_view_all_grades, only: [:sis_assignments]
+  before_action :require_grade_export, only: [:sis_assignments]
+  before_action :require_published_course, only: [:sis_assignments]
 
   GRADE_EXPORT_NOT_ENABLED_ERROR = {
     code: 'not_enabled',

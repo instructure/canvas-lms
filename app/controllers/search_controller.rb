@@ -22,8 +22,8 @@ class SearchController < ApplicationController
   include SearchHelper
   include Api::V1::Conversation
 
-  before_filter :require_user, :except => [:all_courses]
-  before_filter :get_context, except: :recipients
+  before_action :require_user, :except => [:all_courses]
+  before_action :get_context, except: :recipients
 
   def rubrics
     contexts = @current_user.management_contexts rescue []

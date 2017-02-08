@@ -94,9 +94,9 @@
 class EpubExportsController < ApplicationController
   include Api::V1::EpubExport
 
-  before_filter :require_user
-  before_filter :require_context, :only => [:create]
-  before_filter :check_feature_enabled
+  before_action :require_user
+  before_action :require_context, :only => [:create]
+  before_action :check_feature_enabled
 
   def check_feature_enabled
     if !@domain_root_account.feature_allowed?(:epub_export) ||

@@ -305,10 +305,10 @@ class CoursesController < ApplicationController
   include CustomSidebarLinksHelper
   include SyllabusHelper
 
-  before_filter :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
-  before_filter :require_user_or_observer, :only=>[:user_index]
-  before_filter :require_context, :only => [:roster, :locks, :create_file, :ping, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
-  skip_after_filter :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
+  before_action :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
+  before_action :require_user_or_observer, :only=>[:user_index]
+  before_action :require_context, :only => [:roster, :locks, :create_file, :ping, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
+  skip_after_action :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
 
   include Api::V1::Course
   include Api::V1::Progress

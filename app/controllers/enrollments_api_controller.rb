@@ -241,8 +241,8 @@
 #       }
 #
 class EnrollmentsApiController < ApplicationController
-  before_filter :get_course_from_section, :require_context
-  before_filter :require_user
+  before_action :get_course_from_section, :require_context
+  before_action :require_user
 
   @@errors = {
     :missing_parameters                => 'No parameters given',

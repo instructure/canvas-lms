@@ -74,8 +74,8 @@
 class PeerReviewsApiController < ApplicationController
   include Api::V1::AssessmentRequest
 
-  before_filter :get_course_from_section, :require_context, :require_assignment
-  before_filter :peer_review_assets, only: [:create, :destroy]
+  before_action :get_course_from_section, :require_context, :require_assignment
+  before_action :peer_review_assets, only: [:create, :destroy]
 
   # @API Get all Peer Reviews
   # Get a list of all Peer Reviews for this assignment

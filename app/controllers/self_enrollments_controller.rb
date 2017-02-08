@@ -17,7 +17,7 @@
 #
 
 class SelfEnrollmentsController < ApplicationController
-  before_filter :infer_signup_info, :only => [:new]
+  before_action :infer_signup_info, :only => [:new]
 
   include Api::V1::Course
 

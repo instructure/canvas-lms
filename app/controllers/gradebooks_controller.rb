@@ -25,13 +25,13 @@ class GradebooksController < ApplicationController
   include Api::V1::CustomGradebookColumn
   include Api::V1::Section
 
-  before_filter :require_context
-  before_filter :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary]
+  before_action :require_context
+  before_action :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary]
 
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
 
   add_crumb(proc { t '#crumbs.grades', "Grades" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
-  before_filter { |c| c.active_tab = "grades" }
+  before_action { |c| c.active_tab = "grades" }
 
   MAX_POST_GRADES_TOOLS = 10
 

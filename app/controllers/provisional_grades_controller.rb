@@ -69,8 +69,8 @@
 #       }
 #     }
 class ProvisionalGradesController < ApplicationController
-  before_filter :require_user
-  before_filter :load_assignment
+  before_action :require_user
+  before_action :load_assignment
 
   include Api::V1::Submission
 

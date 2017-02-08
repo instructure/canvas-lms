@@ -98,7 +98,7 @@
 class Quizzes::QuizReportsController < ApplicationController
   include ::Filters::Quizzes
 
-  before_filter :require_context, :require_quiz
+  before_action :require_context, :require_quiz
 
   # @API Retrieve all quiz reports
   #

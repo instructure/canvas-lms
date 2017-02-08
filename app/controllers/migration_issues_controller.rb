@@ -93,8 +93,8 @@
 class MigrationIssuesController < ApplicationController
   include Api::V1::ContentMigration
 
-  before_filter :require_context
-  before_filter :require_content_migration
+  before_action :require_context
+  before_action :require_content_migration
 
   # @API List migration issues
   #
@@ -102,7 +102,7 @@ class MigrationIssuesController < ApplicationController
   #
   # @example_request
   #
-  #     curl https://<canvas>/api/v1/courses/<course_id>/content_migrations/<content_migration_id>/migration_issues \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/content_migrations/<content_migration_id>/migration_issues \
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns [MigrationIssue]
@@ -117,7 +117,7 @@ class MigrationIssuesController < ApplicationController
   #
   # @example_request
   #
-  #     curl https://<canvas>/api/v1/courses/<course_id>/content_migrations/<content_migration_id>/migration_issues/<id> \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/content_migrations/<content_migration_id>/migration_issues/<id> \
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns MigrationIssue
@@ -134,8 +134,8 @@ class MigrationIssuesController < ApplicationController
   #
   # @example_request
   #
-  #   curl -X PUT https://<canvas>/api/v1/courses/<course_id>/content_migrations/<content_migration_id>/migration_issues/<id> \ 
-  #        -H 'Authorization: Bearer <token>' \ 
+  #   curl -X PUT https://<canvas>/api/v1/courses/<course_id>/content_migrations/<content_migration_id>/migration_issues/<id> \
+  #        -H 'Authorization: Bearer <token>' \
   #        -F 'workflow_state=resolved'
   #
   # @returns MigrationIssue

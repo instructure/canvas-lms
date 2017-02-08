@@ -96,10 +96,10 @@ require 'csv'
 #     }
 #
 class AccountsController < ApplicationController
-  before_filter :require_user, :only => [:index]
-  before_filter :reject_student_view_student
-  before_filter :get_context
-  before_filter :rich_content_service_config, only: [:settings]
+  before_action :require_user, :only => [:index]
+  before_action :reject_student_view_student
+  before_action :get_context
+  before_action :rich_content_service_config, only: [:settings]
 
   include Api::V1::Account
   include CustomSidebarLinksHelper

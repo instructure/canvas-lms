@@ -20,9 +20,9 @@ module Lti
     class ToolProxyController < ApplicationController
       include Lti::ApiServiceHelper
 
-      before_filter :require_context, :except => [:show]
-      skip_before_filter :require_user, only: [:create, :show, :re_reg]
-      skip_before_filter :load_user, only: [:create, :show, :re_reg]
+      before_action :require_context, :except => [:show]
+      skip_before_action :require_user, only: [:create, :show, :re_reg]
+      skip_before_action :load_user, only: [:create, :show, :re_reg]
 
       rescue_from 'Lti::ToolProxyService::InvalidToolProxyError', only: [:create, :re_reg] do |exception|
         render json: {error: exception.message}, status: 400

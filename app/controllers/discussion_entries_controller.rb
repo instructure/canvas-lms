@@ -20,7 +20,7 @@ require 'atom'
 
 # @API Discussion Topics
 class DiscussionEntriesController < ApplicationController
-  before_filter :require_context_and_read_access, :except => :public_feed
+  before_action :require_context_and_read_access, :except => :public_feed
 
   def show
     @entry = @context.discussion_entries.find(params[:id]).tap{|e| e.current_user = @current_user}

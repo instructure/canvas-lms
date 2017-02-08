@@ -548,8 +548,8 @@
 #       }
 #     }
 class AssignmentsApiController < ApplicationController
-  before_filter :require_context
-  before_filter :require_user_visibility, :only=>[:user_index]
+  before_action :require_context
+  before_action :require_user_visibility, :only=>[:user_index]
   include Api::V1::Assignment
   include Api::V1::Submission
   include Api::V1::AssignmentOverride

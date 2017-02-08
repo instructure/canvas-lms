@@ -236,8 +236,8 @@ require 'atom'
 #     }
 #
 class DiscussionTopicsController < ApplicationController
-  before_filter :require_context_and_read_access, :except => :public_feed
-  before_filter :rich_content_service_config
+  before_action :require_context_and_read_access, :except => :public_feed
+  before_action :rich_content_service_config
 
   include Api::V1::DiscussionTopics
   include Api::V1::Assignment

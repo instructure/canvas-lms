@@ -28,12 +28,12 @@ class Quizzes::QuizzesController < ApplicationController
   # locked down.
   attr_reader :lock_results_if_needed
 
-  before_filter :require_context
-  before_filter :rich_content_service_config, only: [:show, :new, :edit]
+  before_action :require_context
+  before_action :rich_content_service_config, only: [:show, :new, :edit]
 
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
-  before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :require_quiz, :only => [
+  before_action { |c| c.active_tab = "quizzes" }
+  before_action :require_quiz, :only => [
     :statistics,
     :edit,
     :show,
@@ -47,8 +47,8 @@ class Quizzes::QuizzesController < ApplicationController
     :submission_html,
     :toggle_post_to_sis
   ]
-  before_filter :set_download_submission_dialog_title , only: [:show,:statistics]
-  after_filter :lock_results, only: [ :show, :submission_html ]
+  before_action :set_download_submission_dialog_title , only: [:show,:statistics]
+  after_action :lock_results, only: [ :show, :submission_html ]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
   QUIZ_QUESTIONS_DETAIL_LIMIT = 25

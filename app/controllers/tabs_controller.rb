@@ -59,7 +59,7 @@
 class TabsController < ApplicationController
   include Api::V1::Tab
 
-  before_filter :require_context
+  before_action :require_context
 
   # @API List available tabs for a course or group
   #

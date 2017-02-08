@@ -21,11 +21,11 @@ require 'securerandom'
 class LoginController < ApplicationController
   include Login::Shared
 
-  before_filter :forbid_on_files_domain, except: :clear_file_session
-  before_filter :run_login_hooks, only: :new
-  before_filter :check_sa_delegated_cookie, only: :new
-  before_filter :fix_ms_office_redirects, only: :new
-  skip_before_filter :require_reacceptance_of_terms
+  before_action :forbid_on_files_domain, except: :clear_file_session
+  before_action :run_login_hooks, only: :new
+  before_action :check_sa_delegated_cookie, only: :new
+  before_action :fix_ms_office_redirects, only: :new
+  skip_before_action :require_reacceptance_of_terms
 
   def new
     if @current_user &&

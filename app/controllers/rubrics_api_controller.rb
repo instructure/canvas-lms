@@ -137,10 +137,10 @@ class RubricsApiController < ApplicationController
   include Api::V1::Rubric
   include Api::V1::RubricAssessment
 
-  before_filter :require_user
-  before_filter :require_context
-  before_filter :validate_args
-  before_filter :find_rubric, only: [:show]
+  before_action :require_user
+  before_action :require_context
+  before_action :validate_args
+  before_action :find_rubric, only: [:show]
 
   # @API List rubrics
   # Returns the paginated list of active rubrics for the current context.

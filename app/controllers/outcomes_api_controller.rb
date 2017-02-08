@@ -118,8 +118,8 @@
 class OutcomesApiController < ApplicationController
   include Api::V1::Outcome
 
-  before_filter :require_user
-  before_filter :get_outcome
+  before_action :require_user
+  before_action :get_outcome
 
   # @API Show an outcome
   #

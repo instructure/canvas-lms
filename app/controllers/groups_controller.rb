@@ -134,8 +134,8 @@ require 'atom'
 #     }
 #
 class GroupsController < ApplicationController
-  before_filter :get_context
-  before_filter :require_user, :only => %w[index accept_invitation activity_stream activity_stream_summary]
+  before_action :get_context
+  before_action :require_user, :only => %w[index accept_invitation activity_stream activity_stream_summary]
 
   include Api::V1::Attachment
   include Api::V1::Group
