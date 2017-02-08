@@ -97,7 +97,7 @@ module CustomValidators
         raise unless accept_alert
         driver.switch_to.alert.accept
       end
-    end
+    end or raise(RSpec::Expectations::ExpectationNotMetError, "expected new page load, none happened")
     wait_for_dom_ready
     wait_for_ajaximations
   end

@@ -90,7 +90,10 @@ describe "assignment groups" do
       last_due_at_element.
         send_keys(format_date_for_view(other_section_due, :medium))
 
-      update_assignment!
+      # `return_to` is not set, so no redirect happens
+      submit_form('#edit_assignment_form')
+      wait_for_ajax_requests
+
       overrides = assign.reload.assignment_overrides
       expect(overrides.count).to eq 3
       default_override = overrides.detect{ |o| o.set_id == default_section.id }
