@@ -44,12 +44,7 @@
   li {
     @include name_bubbles;
     clear: left;
-  }
-}
-
-#edit_sections {
-  a.browser {
-    background: transparent url(/images/messages/context-search-sprite.png) 0 0 no-repeat;
+    margin-top: $ic-sp/2;
   }
 }
 
