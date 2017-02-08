@@ -108,6 +108,7 @@ module CanvasRails
       app.config.middleware.insert_after(config.session_store, 'RequestContextSession')
       app.config.middleware.insert_before(request_throttle_position, 'RequestThrottle')
       app.config.middleware.insert_before('Rack::MethodOverride', 'PreventNonMultipartParse')
+      app.config.middleware.insert_before('PreventNonMultipartParse', 'StripContentTypeFromGet')
     end
 
     config.to_prepare do
