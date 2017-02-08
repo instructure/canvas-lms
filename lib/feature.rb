@@ -502,7 +502,7 @@ END
       display_name: -> { I18n.t('Student Context Card') },
       description: -> { I18n.t('Enable student context card links') },
       applies_to: "RootAccount",
-      state: "hidden_in_prod",
+      state: "allowed",
       beta: true
     },
     'gradezilla' =>
