@@ -18,7 +18,7 @@ module RespondusSoapEndpoint
     end
 
     initializer "respondus_soap_endpoint.middleware" do |app|
-      app.middleware.use 'RespondusSoapEndpoint::Middleware'
+      app.middleware.use RespondusSoapEndpoint::Middleware
     end
   end
 end
