@@ -716,6 +716,14 @@ describe ConversationsController, type: :request do
           [@billy, @joe].each {|u| expect(u.conversations.first.conversation.context).to eql(@course)}
         end
 
+        it "constraints the length of the subject of a conversation batch" do
+          json = api_call(:post, "/api/v1/conversations",
+              { :controller => 'conversations', :action => 'create', :format => 'json' },
+              { :recipients => [@bob.id, @joe.id, @billy.id], :subject => 'Z' * 300, :body => "test",
+                :context_code => "course_#{@course.id}" }, {}, { :expected_status => 400 })
+          expect(json['errors']['subject']).to be_present
+        end
+
         it "should create/update bulk private conversations asynchronously" do
           json = api_call(:post, "/api/v1/conversations",
                   { :controller => 'conversations', :action => 'create', :format => 'json' },
