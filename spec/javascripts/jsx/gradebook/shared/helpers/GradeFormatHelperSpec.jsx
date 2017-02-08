@@ -46,6 +46,12 @@ define([
     strictEqual(I18n.n.notCalled, true);
   });
 
+  test('should return input when input is undefined, null, or empty string', () => {
+    strictEqual(GradeFormatHelper.formatGrade(undefined), undefined);
+    strictEqual(GradeFormatHelper.formatGrade(null), null);
+    strictEqual(GradeFormatHelper.formatGrade(''), '');
+  });
+
   test('providing gradingType in the options hash should override detected grade type', () => {
     GradeFormatHelper.formatGrade(10, { gradingType: 'percent' });
     ok(I18n.n.calledWith(42, { percentage: true }));

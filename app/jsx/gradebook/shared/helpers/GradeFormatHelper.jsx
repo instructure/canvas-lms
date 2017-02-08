@@ -30,7 +30,7 @@ define([
     /**
      * Returns given grade rounded to two decimal places and formatted with I18n
      * if it is a point or percent grade.
-     * If grade is undefined or null the grade is returned as is.
+     * If grade is undefined, null, or empty string, the grade is returned as is.
      * Other grades are returned as given after calling grade.toString().
      *
      * @param {string|number|undefined|null} grade - Grade to be formatted.
@@ -46,7 +46,7 @@ define([
     formatGrade (grade, opts = {}) {
       let formattedGrade;
 
-      if (grade === undefined || grade === null) {
+      if (grade === undefined || grade === null || grade === '') {
         return grade;
       }
 
