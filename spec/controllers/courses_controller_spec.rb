@@ -2081,6 +2081,9 @@ describe CoursesController do
       test_student = @course.student_view_student
       assignment = @course.assignments.create!(:workflow_state => 'published', :moderated_grading => true)
       assignment.grade_student test_student, { :grade => 1, :grader => @teacher, :provisional => true }
+      file = assignment.attachments.create! uploaded_data: default_uploaded_data
+      assignment.submissions.first.add_comment(commenter: @teacher, message: 'blah', provisional: true, attachments: [file])
+
       expect(test_student.submissions.size).not_to be_zero
       delete 'reset_test_student', course_id: @course.id
       test_student.reload
