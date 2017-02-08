@@ -31,7 +31,6 @@ module Lti
       let(:raw_jwt) do
         raw_jwt = JSON::JWT.new(
           {
-            iss: tool_proxy.guid,
             sub: tool_proxy.guid,
             aud: auth_url,
             exp: 1.minute.from_now,
@@ -39,7 +38,6 @@ module Lti
             jti: "6b7f5b02-b4e1-4fa3-d6b0-329dee85abff"
           }
         )
-        raw_jwt.kid = tool_proxy.guid
         raw_jwt
       end
 
@@ -83,12 +81,6 @@ module Lti
           expect { validator.jwt }.to raise_error(JSON::JWS::UnexpectedAlgorithm)
         end
 
-        it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'sub' doesn't equal the ToolProxy guid" do
-          raw_jwt['sub'] = 'invalid'
-          expect { authValidator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                                                "the 'sub' must be a valid ToolProxy guid"
-        end
-
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'exp' is to far in the future" do
           raw_jwt['exp'] = 5.minutes.from_now.to_i
           Setting.set('lti.oauth2.authorize.max.expiration', 1.minute.to_i)
@@ -126,11 +118,6 @@ module Lti
           end
         end
 
-        it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'iss' is not the Tool Proxy guid" do
-          raw_jwt['iss'] = 'invalid'
-          expect { authValidator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                                                "the 'iss' must be a valid ToolProxy guid"
-        end
 
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'aud' is not the authorization endpoint" do
           raw_jwt['aud'] = 'http://google.com/invalid'
@@ -142,18 +129,13 @@ module Lti
 
       describe "#tool_proxy" do
 
-        it 'returns the tool_proxy from the uuid specified in the kid' do
+        it 'returns the tool_proxy from the uuid specified in the sub' do
           expect(authValidator.tool_proxy).to eq tool_proxy
         end
 
         it "raises Lti::Oauth2::AuthorizationValidator::ToolProxyNotFound if it can't find a ToolProxy" do
-          raw_jwt.kid = 'invalid'
+          raw_jwt[:sub] = 'invalid'
           expect { authValidator.tool_proxy }.to raise_error Lti::Oauth2::AuthorizationValidator::ToolProxyNotFound
-        end
-
-        it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'kid' is missing" do
-          raw_jwt.kid = nil
-          expect { authValidator.tool_proxy }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt, "the 'kid' header is required"
         end
 
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the Tool Proxy is not using a split secret" do

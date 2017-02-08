@@ -19,11 +19,6 @@ module Lti
         @_jwt ||= begin
           validated_jwt = JSON::JWT.decode @raw_jwt, tool_proxy.shared_secret
           check_required_assertions(validated_jwt.keys)
-          %w(iss sub).each do |assertion|
-            if validated_jwt[assertion] != tool_proxy.guid
-              raise InvalidAuthJwt, "the '#{assertion}' must be a valid ToolProxy guid"
-            end
-          end
           if validated_jwt['aud'] != @authorization_url
             raise InvalidAuthJwt, "the 'aud' must be the LTI Authorization endpoint"
           end
@@ -38,11 +33,12 @@ module Lti
           validated_jwt
         end
       end
+
       alias_method :validate!, :jwt
 
       def tool_proxy
         @_tool_proxy ||= begin
-          tp = ToolProxy.where(guid: unverified_jwt.kid, workflow_state: 'active').first
+          tp = ToolProxy.where(guid: unverified_jwt[:sub], workflow_state: 'active').first
           raise ToolProxyNotFound if tp.blank?
           developer_key = tp.product_family.developer_key
           raise InvalidAuthJwt, "the Tool Proxy must be associated to a developer key" if developer_key.blank?
@@ -59,7 +55,7 @@ module Lti
       private
 
       def check_required_assertions(assertion_keys)
-        missing_assertions = (%w(iss sub aud exp iat jti) - assertion_keys)
+        missing_assertions = (%w(sub aud exp iat jti) - assertion_keys)
         if missing_assertions.present?
           raise InvalidAuthJwt, "the following assertions are missing: #{missing_assertions.join(',')}"
         end
@@ -68,7 +64,6 @@ module Lti
       def unverified_jwt
         @_unverified_jwt ||= begin
           decoded_jwt = JSON::JWT.decode(@raw_jwt, :skip_verification)
-          raise InvalidAuthJwt, "the 'kid' header is required" if decoded_jwt.kid.blank?
           decoded_jwt
         end
       end

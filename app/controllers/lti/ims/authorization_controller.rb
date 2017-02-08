@@ -10,13 +10,8 @@ module Lti
     # @model AuthorizationJWT
     #     {
     #       "id": "AuthorizationJWT",
-    #       "description": "This is a JWT (https://tools.ietf.org/html/rfc7519), we highly recommend using a library to create these tokens. The token should be signed with the shared secret found in the Tool Proxy, which must be using the 'splitSecret' capability. You will also need to set the 'kid' (keyId) in the header of the JWT to equal the Tool Proxy GUID",
+    #       "description": "This is a JWT (https://tools.ietf.org/html/rfc7519), we highly recommend using a library to create these tokens. The token should be signed with the shared secret found in the Tool Proxy, which must be using the 'splitSecret' capability."
     #       "properties": {
-    #         "iss":{
-    #           "description": "The Tool Proxy Guid",
-    #           "example": "81c4fc5f-4931-4199-ae3b-2077de8f9325",
-    #           "type": "string"
-    #         },
     #         "sub":{
     #           "description": "The Tool Proxy Guid",
     #           "example": "81c4fc5f-4931-4199-ae3b-2077de8f9325",
