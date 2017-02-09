@@ -115,6 +115,8 @@ Style/FrozenStringLiteralComment:
   Enabled: false
 
 # RSpec cops we don't care about
+RSpec/MessageSpies:
+  Enabled: false
 RSpec/HookArgument:
   Enabled: false
 
