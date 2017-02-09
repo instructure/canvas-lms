@@ -34,4 +34,9 @@ end
 ActiveSupport::TimeZone::MAPPING['Asuncion'] = 'America/Asuncion'
 ActiveSupport::TimeZone.instance_variable_set(:@zones, nil)
 ActiveSupport::TimeZone.instance_variable_set(:@zones_map, nil)
-ActiveSupport::TimeZone.instance_variable_set(:@lazy_zones_map, ThreadSafe::Cache.new)
+if CANVAS_RAILS4_2
+  ActiveSupport::TimeZone.instance_variable_set(:@lazy_zones_map, ThreadSafe::Cache.new)
+else
+  ActiveSupport::TimeZone.instance_variable_set(:@lazy_zones_map, Concurrent::Map.new)
+  ActiveSupport::TimeZone.instance_variable_set(:@country_zones, Concurrent::Map.new)
+end
