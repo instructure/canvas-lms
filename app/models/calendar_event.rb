@@ -440,7 +440,7 @@ class CalendarEvent < ActiveRecord::Base
     end
 
     if self.all_day && (!self.all_day_date || self.start_at_changed? || self.all_day_date_changed?)
-      self.start_at = self.end_at = zoned_start_at.beginning_of_day rescue nil
+      self.start_at = self.end_at = zoned_start_at.beginning_of_day + 12.hours rescue nil
       self.all_day_date = (zoned_start_at.to_date rescue nil)
     end
   end
