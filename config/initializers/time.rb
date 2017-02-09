@@ -1,18 +1,12 @@
-Time.class_eval do
-  def as_json_with_utc(options={})
-    self.utc.as_json_without_utc(options)
+module JsonTimeInUTC
+  def as_json(options = {})
+    return super if utc?
+    utc.as_json(options)
   end
-
-  alias_method_chain :as_json, :utc
 end
-
-DateTime.class_eval do
-  def as_json_with_utc(options={})
-    self.utc.as_json_without_utc(options)
-  end
-
-  alias_method_chain :as_json, :utc
-end
+Time.prepend(JsonTimeInUTC)
+DateTime.prepend(JsonTimeInUTC)
+ActiveSupport::TimeWithZone.prepend(JsonTimeInUTC)
 
 # Object#blank? calls respond_to?, which has to instantiate the time object
 # by doing an expensive time zone calculation.  So just skip that.
@@ -23,10 +17,6 @@ class ActiveSupport::TimeWithZone
 
   def utc_datetime
     self.comparable_time.utc_datetime
-  end
-
-  def as_json(options={})
-    self.utc.as_json_without_utc(options)
   end
 end
 

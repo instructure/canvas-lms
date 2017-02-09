@@ -125,10 +125,10 @@ class Group < ActiveRecord::Base
     self.group_memberships
   end
 
-  def wiki_with_create
+  def wiki
+    return super if wiki_id
     Wiki.wiki_for_context(self)
   end
-  alias_method_chain :wiki, :create
 
   def auto_accept?
     self.group_category &&

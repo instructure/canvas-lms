@@ -139,12 +139,11 @@ class Wiki < ActiveRecord::Base
   end
 
   def self.wiki_for_context(context)
-    return context.wiki_without_create if context.wiki_id
     context.transaction do
       # otherwise we lose dirty changes
       context.save! if context.changed?
       context.lock!
-      return context.wiki_without_create if context.wiki_id
+      return context.wiki if context.wiki_id
       # TODO i18n
       t :default_course_wiki_name, "%{course_name} Wiki", :course_name => nil
       t :default_group_wiki_name, "%{group_name} Wiki", :group_name => nil

@@ -420,11 +420,10 @@ class Account < ActiveRecord::Base
     !self.root_account_id
   end
 
-  def root_account_with_self
-    return self if self.root_account?
-    root_account_without_self
+  def root_account
+    return self if root_account?
+    super
   end
-  alias_method_chain :root_account, :self
 
   def sub_accounts_as_options(indent = 0, preloaded_accounts = nil)
     unless preloaded_accounts
