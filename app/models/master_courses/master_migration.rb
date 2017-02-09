@@ -72,6 +72,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     self.save!
 
     subs = self.master_template.child_subscriptions.active.preload(:child_course).to_a
+    subs.reject!{|s| s.child_course.deleted?}
     if subs.empty?
       self.workflow_state = 'completed'
       self.export_results[:message] = "No child courses to export to"
