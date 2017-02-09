@@ -7,7 +7,6 @@ module CC::Exporter::WebZip
       @files_path_prefix = @viewer_path_prefix + '/files/'
       @path_to_files = nil
       @course_data_filename = 'course-data.js'
-      @tempfile_filename = 'empty.txt'
       @course = course
       @user = user
       @current_progress = Rails.cache.fetch(progress_key)
@@ -36,8 +35,6 @@ module CC::Exporter::WebZip
     end
 
     def create
-      return nil unless files.any?
-
       begin
         add_files
         add_course_data
@@ -225,20 +222,7 @@ module CC::Exporter::WebZip
       end
     end
 
-    def empty_zip_file
-      zip_file = Zip::File.new(
-        File.join(export_directory, filename),
-        Zip::File::CREATE
-      )
-      f = File.new(@tempfile_filename, "w+")
-      zip_file.add(@tempfile_filename, f)
-      f.close
-      zip_file.close
-      zip_file.name
-    end
-
     def cleanup_files
-      File.delete(@tempfile_filename) if File.exist?(@tempfile_filename)
       File.delete(@course_data_filename) if File.exist?(@course_data_filename)
     end
   end

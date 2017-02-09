@@ -6,16 +6,20 @@ describe "Exportable" do
   # (canvas_offline_course_viewer npm package)
   class ZipPackageTest < CC::Exporter::WebZip::ZipPackage
 
-    def dist_package_path
+    def initialize(exporter, course, user, progress_key)
+      super(exporter, course, user, progress_key)
+      @index_file = 'dist/index.html'
+      @bundle_file = 'dist/viewer/bundle.js'
       @dist_dir = 'dist'
       @viewer_dir = 'dist/viewer'
+    end
+
+    def dist_package_path
       Dir.mkdir(@dist_dir) unless Dir.exist?(@dist_dir)
       Dir.mkdir(@viewer_dir) unless Dir.exist?(@viewer_dir)
-      @index_file = 'dist/index.html'
       index_file = File.new(@index_file, "w+")
       index_file.write("<html></html>")
       index_file.close
-      @bundle_file = 'dist/viewer/bundle.js'
       bundle_file = File.new(@bundle_file, "w+")
       bundle_file.write("{}")
       bundle_file.close
@@ -34,16 +38,17 @@ describe "Exportable" do
   class ExportableTest
     include CC::Exporter::WebZip::Exportable
 
-    def initialize(course, user)
+    def initialize(course, user, cartridge_path)
       @course = course
       @user = user
+      @cartridge_path = cartridge_path
     end
 
     def attachment
       @_attachment ||= Attachment.create({
         context: Course.create,
         filename: 'exportable-test-file',
-        uploaded_data: File.open(cartridge_path)
+        uploaded_data: File.open(@cartridge_path)
       })
     end
 
@@ -63,7 +68,8 @@ describe "Exportable" do
       course_with_teacher(active_all: true)
       student_in_course(active_all: true, user_name: 'a student')
       @course.web_zip_exports.create!(created_at: @create_date, user: @student)
-      @web_zip_export = ExportableTest.new(@course, @student).convert_to_offline_web_zip('cache_key')
+      cartridge_path = "spec/fixtures/migration/unicode-filename-test-export.imscc"
+      @web_zip_export = ExportableTest.new(@course, @student, cartridge_path).convert_to_offline_web_zip('cache_key')
     end
 
     let(:zip_path) do
@@ -76,6 +82,12 @@ describe "Exportable" do
 
     it "should create a zip file" do
       expect(zip).not_to be_nil
+    end
+
+    it "exports zip file if there are no files in the course" do
+      cartridge_path = "spec/fixtures/migration/canvas_announcement.zip"
+      zip_path = ExportableTest.new(@course, @student, cartridge_path).convert_to_offline_web_zip('cache_key')
+      expect(zip_path).not_to be_nil
     end
 
     context "course-data.js file" do

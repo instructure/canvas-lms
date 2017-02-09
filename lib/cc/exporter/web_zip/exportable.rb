@@ -11,7 +11,7 @@ module CC::Exporter::WebZip
     def convert_to_offline_web_zip(progress_key)
       exporter = CC::Exporter::WebZip::Exporter.new(content_cartridge.open, false, :web_zip)
       zip = create_zip(exporter, progress_key)
-      file_path = zip.create || zip.empty_zip_file
+      file_path = zip.create
 
       exporter.cleanup_files
       zip.cleanup_files

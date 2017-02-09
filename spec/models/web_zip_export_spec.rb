@@ -28,6 +28,8 @@ describe WebZipExport do
       web_zip_export.export_without_send_later
       web_zip_export.content_export.export_without_send_later
       expect(web_zip_export.zip_attachment).to be_nil, 'precondition'
+      dist_folder = 'node_modules/canvas_offline_course_viewer/dist'
+      expect_any_instance_of(CC::Exporter::WebZip::ZipPackage).to receive(:add_dir_to_zip).with(dist_folder, dist_folder)
       expect{web_zip_export.convert_to_offline_web_zip_without_send_later}.to change{Attachment.count}.by(1)
       web_zip_export.reload
       expect(web_zip_export.zip_attachment).not_to be_nil
