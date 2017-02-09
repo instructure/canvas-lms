@@ -28,7 +28,8 @@ define([
       return {
         toolLaunchUrl: 'none',
         toolType: '',
-        tools: []
+        tools: [],
+        selectedToolValue: `${this.props.selectedToolType}_${this.props.selectedTool}`
       };
     },
 
@@ -87,37 +88,42 @@ define([
       return endpoint + query;
     },
 
-    setToolLaunchUrl() {
-      const selector = this.refs.similarityDetectionTool;
-      const selectedOption = selector.options[selector.selectedIndex];
-      const selectedType = selectedOption.getAttribute('data-type');
-
+    setToolLaunchUrl () {
+      const selectBox = this.similarityDetectionTool;
       this.setState({
-        toolLaunchUrl: selectedOption.getAttribute('data-launch'),
-        toolType: selectedType
-      });
+        toolLaunchUrl: selectBox[selectBox.selectedIndex].getAttribute('data-launch'),
+        toolType: selectBox[selectBox.selectedIndex].getAttribute('data-type')
+      })
     },
 
-    renderOptions() {
+    handleSelectionChange (event) {
+      event.preventDefault();
+      this.setState({
+        selectedToolValue: event.target.value,
+      }, () => this.setToolLaunchUrl());
+    },
+
+    renderOptions () {
       return (
-        <select id="similarity_detection_tool"
-                name="similarityDetectionTool"
-                onChange={this.setToolLaunchUrl}
-                ref="similarityDetectionTool">
+        <select
+          id="similarity_detection_tool"
+          name="similarityDetectionTool"
+          onChange={this.handleSelectionChange}
+          ref={(c) => { this.similarityDetectionTool = c; }}
+          value={this.state.selectedToolValue}
+        >
           <option data-launch="none">None</option>
           {
-            this.state.tools.map((tool) => {
-              return (
-                <option
-                  value={tool.definition_id}
-                  data-launch={this.getLaunch(tool)}
-                  data-type={tool.definition_type}
-                  selected={tool.definition_id == this.props.selectedTool}
-                  >
-                  {tool.name}
-                </option>
-              );
-            })
+            this.state.tools.map(tool => (
+              <option
+                key={`${tool.definition_type}_${tool.definition_id}`}
+                value={`${tool.definition_type}_${tool.definition_id}`}
+                data-launch={this.getLaunch(tool)}
+                data-type={tool.definition_type}
+              >
+                {tool.name}
+              </option>
+            ))
           }
         </select>
       );

@@ -765,7 +765,7 @@ module Api::V1::Assignment
   end
 
   def assignment_configuration_tool(assignment_params)
-    tool_id = assignment_params['similarityDetectionTool'].to_i
+    tool_id = assignment_params['similarityDetectionTool'].split('_').last.to_i
     tool = nil
     if assignment_params['configuration_tool_type'] == 'ContextExternalTool'
       tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)
