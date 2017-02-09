@@ -32,7 +32,7 @@ define [
     click find('a', dialog)
     checkDialogClosed()
 
-  module 'screenreader_gradebook assignment_muter_component: muted',
+  QUnit.module 'screenreader_gradebook assignment_muter_component: muted',
     setup: ->
       fixtures.create()
       App = startApp()
@@ -81,7 +81,7 @@ define [
         equal @con.get('selectedAssignment.muted'), false
         server.restore()
 
-  module 'screenreader_gradebook assignment_muter_component: unmuted',
+  QUnit.module 'screenreader_gradebook assignment_muter_component: unmuted',
     setup: ->
       fixtures.create()
       App = startApp()

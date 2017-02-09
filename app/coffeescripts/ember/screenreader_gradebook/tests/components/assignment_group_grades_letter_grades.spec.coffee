@@ -17,7 +17,7 @@ define [
       submissions: []
       weight: 100
 
-  module 'assignment_group_grades_component_letter_grade',
+  QUnit.module 'assignment_group_grades_component_letter_grade',
     setup: ->
       fixtures.create()
       App = startApp()

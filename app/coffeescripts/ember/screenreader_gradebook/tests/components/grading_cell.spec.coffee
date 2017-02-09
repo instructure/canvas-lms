@@ -10,7 +10,7 @@ define [
 
   setType = null
 
-  module 'grading_cell',
+  QUnit.module 'grading_cell',
     setup: ->
       fakeENV.setup()
       fixtures.create()

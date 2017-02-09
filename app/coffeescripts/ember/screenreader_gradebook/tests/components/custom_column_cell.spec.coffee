@@ -10,7 +10,7 @@ define [
 
   setType = null
 
-  module 'custom_column_cell',
+  QUnit.module 'custom_column_cell',
     setup: ->
       fixtures.create()
       App = startApp()

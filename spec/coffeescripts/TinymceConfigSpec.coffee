@@ -93,8 +93,9 @@ define [
       plugins: "",
       external_plugins: {},
       init_instance_callback: (editor)->
-        start()
         content = editor.setContent("<span></span>")
         ok(content.match("<span></span>"))
+        start()
+
     })
     tinymce.init(configHash)

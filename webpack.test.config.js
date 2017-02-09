@@ -14,12 +14,7 @@ testWebpackConfig.output.publicPath = '/base/spec/javascripts/webpack/'
 testWebpackConfig.output.filename = '[name].bundle.test.js';
 testWebpackConfig.output.chunkFilename = '[name].chunk.test.js';
 
-testWebpackConfig.plugins = testWebpackConfig.plugins.concat([
-  // expose a 'qunit' global variable to any file that uses it
-  new webpack.ProvidePlugin({qunit: 'qunitjs'}),
-
-  new webpack.DefinePlugin(jspecEnv)
-]);
+testWebpackConfig.plugins.push(new webpack.DefinePlugin(jspecEnv))
 
 // These externals are necessary for Enzyme
 // See http://airbnb.io/enzyme/docs/guides/webpack.html
@@ -28,10 +23,7 @@ testWebpackConfig.externals['react-dom/server'] = 'window';
 testWebpackConfig.externals['react/lib/ReactContext'] = 'true';
 testWebpackConfig.externals['react/lib/ExecutionEnvironment'] = 'true';
 
-testWebpackConfig.resolve.alias.qunit = 'qunitjs';
-testWebpackConfig.resolve.alias.QUnit = 'qunitjs';
 testWebpackConfig.resolve.modules.push(path.resolve(__dirname, 'spec/coffeescripts'))
-testWebpackConfig.resolve.modules.push(path.resolve(__dirname, 'spec/javascripts/support'))
 testWebpackConfig.resolve.alias['spec/jsx'] = path.resolve(__dirname, 'spec/javascripts/jsx')
 
 testWebpackConfig.module.rules.unshift({
@@ -48,13 +40,9 @@ testWebpackConfig.module.rules.unshift({
   // inside of a closure, without truly making them globals.
   // We should get rid of this and just change our actual source to s/test/qunit.test/ and s/module/qunit.module/
   loaders: [
-    'imports-loader?test=>qunit.test',
-    'imports-loader?asyncTest=>qunit.asyncTest',
-    'imports-loader?start=>qunit.start',
     'imports-loader?test=>QUnit.test',
     'imports-loader?asyncTest=>QUnit.asyncTest',
     'imports-loader?start=>QUnit.start',
-    'qunitDependencyLoader'
   ]
 })
 
@@ -66,10 +54,5 @@ if (process.env.COVERAGE) {
     loader: 'istanbul-instrumenter-loader'
   })
 }
-
-testWebpackConfig.module.noParse = testWebpackConfig.module.noParse.concat([
-  /\/sinon-1.17.2.js/,
-  /\/axe.js/
-])
 
 module.exports = testWebpackConfig

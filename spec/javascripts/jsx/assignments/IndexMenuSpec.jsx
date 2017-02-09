@@ -4,7 +4,8 @@ define([
   'react-modal',
   'jsx/assignments/IndexMenu',
   'jsx/assignments/actions/IndexMenuActions',
-], (React, TestUtils, Modal, IndexMenu, Actions) => {
+  './createFakeStore',
+], (React, TestUtils, Modal, IndexMenu, Actions, createFakeStore) => {
   QUnit.module('AssignmentsIndexMenu')
 
   const generateProps = (overrides, initialState = {}) => {

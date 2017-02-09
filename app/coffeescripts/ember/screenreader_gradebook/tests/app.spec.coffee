@@ -6,7 +6,7 @@ define [
 
   App = null
 
-  module 'screenreader_gradebook',
+  QUnit.module 'screenreader_gradebook',
     setup: ->
       fixtures.create()
       App = startApp()

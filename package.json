@@ -16,6 +16,7 @@
   "devDependencies": "the first group is all the things our build tooling needs",
   "devDependencies": "the second group is the client-side stuff we send to browsers",
   "devDependencies": {
+    "axe-core": "1.1.1",
     "babel-cli": "^6.10.1",
     "babel-core": "^6.10.4",
     "babel-eslint": "^7.1.0",
@@ -67,6 +68,7 @@
     "qunitjs": "^1.14.0",
     "requirejs": "~2.2.0",
     "script-loader": "^0.7.0",
+    "sinon": "2.0.0-pre.5",
     "style-loader": "^0.13.1",
     "stylelint": "7.7.0",
     "uglify-js": "~2.7.0",

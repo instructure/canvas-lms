@@ -29,7 +29,7 @@ define([
     }
   );
 
-  module('ActionMenu - Basic Rendering', {
+  QUnit.module('ActionMenu - Basic Rendering', {
     setup () {
       const propsWithPreviousExport = {
         ...workingMenuProps(),
@@ -69,7 +69,7 @@ define([
     equal(specificMenuItem.textContent, 'Previous Export (Jan 20, 2009 at 5pm)');
   });
 
-  module('ActionMenu - getExistingExport', {
+  QUnit.module('ActionMenu - getExistingExport', {
     setup () {
       this.wrapper = mount(<ActionMenu {...workingMenuProps()} />);
     },
@@ -135,7 +135,7 @@ define([
     equal(this.wrapper.instance().getExistingExport(), undefined);
   });
 
-  module('ActionMenu - handleExport', {
+  QUnit.module('ActionMenu - handleExport', {
     getPromise (type) {
       if (type === 'resolved') {
         return Promise.resolve({
@@ -297,7 +297,7 @@ define([
     });
   });
 
-  module('ActionMenu - handleImport', {
+  QUnit.module('ActionMenu - handleImport', {
     setup () {
       this.spies = {};
       this.spies.gotoUrl = this.stub(ActionMenu, 'gotoUrl');
@@ -328,7 +328,7 @@ define([
     equal(this.spies.gotoUrl.callCount, 1);
   });
 
-  module('ActionMenu - disableImports', {
+  QUnit.module('ActionMenu - disableImports', {
     setup () {
       this.wrapper = mount(<ActionMenu {...workingMenuProps()} />);
     },
@@ -372,7 +372,7 @@ define([
     });
   });
 
-  module('ActionMenu - lastExportFromProps', {
+  QUnit.module('ActionMenu - lastExportFromProps', {
     setup () {
       this.wrapper = mount(<ActionMenu {...workingMenuProps()} />);
     },
@@ -409,7 +409,7 @@ define([
     equal(this.wrapper.instance().lastExportFromProps(), undefined);
   });
 
-  module('ActionMenu - lastExportFromState', {
+  QUnit.module('ActionMenu - lastExportFromState', {
     setup () {
       this.wrapper = mount(<ActionMenu {...workingMenuProps()} />);
     },
@@ -442,7 +442,7 @@ define([
     equal(this.wrapper.instance().lastExportFromState(), undefined);
   });
 
-  module('ActionMenu - previousExport', {
+  QUnit.module('ActionMenu - previousExport', {
     setup () {
       const neededProps = {
         ...workingMenuProps(),
@@ -491,7 +491,7 @@ define([
     equal(lastExportFromProps.callCount, 1);
   });
 
-  module('ActionMenu - exportInProgress', {
+  QUnit.module('ActionMenu - exportInProgress', {
     setup () {
       this.wrapper = mount(<ActionMenu {...workingMenuProps()} />);
     },

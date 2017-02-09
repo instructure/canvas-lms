@@ -11,7 +11,7 @@ define([
     attachmentId: 'attachmentId'
   };
 
-  module('GradebookExportManager - constructor', {
+  QUnit.module('GradebookExportManager - constructor', {
     setup () {
       moxios.install();
     },
@@ -57,7 +57,7 @@ define([
     });
   });
 
-  module('GradebookExportManager - monitoringUrl', {
+  QUnit.module('GradebookExportManager - monitoringUrl', {
     setup () {
       moxios.install();
 
@@ -87,7 +87,7 @@ define([
     equal(this.subject.monitoringUrl(), undefined);
   });
 
-  module('GradebookExportManager - attachmentUrl', {
+  QUnit.module('GradebookExportManager - attachmentUrl', {
     setup () {
       moxios.install();
 
@@ -117,7 +117,7 @@ define([
     equal(this.subject.attachmentUrl(), undefined);
   });
 
-  module('GradebookExportManager - startExport', {
+  QUnit.module('GradebookExportManager - startExport', {
     setup () {
       moxios.install();
 
