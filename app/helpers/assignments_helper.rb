@@ -86,4 +86,17 @@ module AssignmentsHelper
     @assignment.vericite_enabled? && @context.vericite_enabled? &&
     !@assignment.submission_types.include?("none")
   end
+
+  def i18n_grade(grade, grading_type = nil)
+    number = Float(grade.sub(/%$/, '')) rescue nil
+    if number.present?
+      if grading_type.nil?
+        grading_type = (/%$/ =~ grade) ? 'percent' : 'points'
+      end
+      if grading_type == 'points' || grading_type == 'percent'
+        return I18n.n(round_if_whole(number), percentage: (grading_type == 'percent'))
+      end
+    end
+    grade
+  end
 end

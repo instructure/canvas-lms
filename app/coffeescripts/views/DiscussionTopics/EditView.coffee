@@ -263,7 +263,9 @@ define [
         # this happens before validation, so we better validate it here
         if numberHelper.validate(assign_data.points_possible)
           assign_data.points_possible = numberHelper.parse(assign_data.points_possible)
-
+      if assign_data?.peer_review_count
+        if numberHelper.validate(assign_data.peer_review_count)
+          assign_data.peer_review_count = numberHelper.parse(assign_data.peer_review_count)
 
       if assign_data?.set_assignment is '1'
         data.set_assignment = '1'

@@ -2,11 +2,12 @@ define [
   'jquery'
   'i18n!assignments'
   'compiled/util/round'
+  'jsx/shared/helpers/numberHelper'
   'underscore'
   'compiled/views/DialogFormView'
   'jst/EmptyDialogFormWrapper'
   'jst/assignments/AssignmentSettings'
-], ($, I18n, round, _, DialogFormView, wrapper, assignmentSettingsTemplate) ->
+], ($, I18n, round, numberHelper, _, DialogFormView, wrapper, assignmentSettingsTemplate) ->
 
   class AssignmentSettingsView extends DialogFormView
     template: assignmentSettingsTemplate
@@ -37,7 +38,7 @@ define [
       _.each weights, (weight) =>
         weight_value = $(weight).val()
         field_selector = weight.getAttribute("name")
-        if (weight_value && isNaN(parseFloat(weight_value)))
+        if (weight_value && isNaN(numberHelper.parse(weight_value)))
           errors[field_selector] = [{type: 'number', message: I18n.t("Must be a valid number")}]
       errors
 
@@ -109,7 +110,7 @@ define [
         total_weight += model.get('group_weight') || 0
       total_weight = round(total_weight,2)
 
-      @$el.find('#percent_total').text(total_weight + "%")
+      @$el.find('#percent_total').text(I18n.n(total_weight, { percentage: true }))
 
     clearWeights: ->
       @weights = []
@@ -120,7 +121,7 @@ define [
       for v in @weights
         total_weight += v.findWeight() || 0
       total_weight = round(total_weight,2)
-      @$el.find('#percent_total').text(total_weight + "%")
+      @$el.find('#percent_total').text(I18n.n(total_weight, { percentage: true }))
 
     toJSON: ->
       data = super

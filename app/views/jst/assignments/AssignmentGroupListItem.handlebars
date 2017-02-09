@@ -50,7 +50,7 @@
       {{#ifAny showWeight showRules}}
         <ul class="pill">
           {{#if showWeight}}
-            <li>{{#t}}{{groupWeight}}% of Total{{/t}}</li>
+            <li>{{#t}}{{n groupWeight percentage=true}} of Total{{/t}}</li>
           {{/if}}
           {{#if showRules}}
             <li>

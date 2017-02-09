@@ -20,6 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CoursesHelper do
   include ApplicationHelper
+  include AssignmentsHelper
   include CoursesHelper
   include QuizzesHelper
 

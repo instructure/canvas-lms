@@ -1,13 +1,15 @@
 define [
   'compiled/util/round'
+  'i18n!assignments'
   'jquery'
   'jst/AssignmentGroupWeightsDialog'
+  'jsx/shared/helpers/numberHelper'
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
   'jqueryui/dialog'
   'jquery.instructure_misc_helpers'
   'vendor/jquery.ba-tinypubsub'
-], (round, $, assignmentGroupWeightsDialogTemplate) -> class AssignmentGroupWeightsDialog
+], (round, I18n, $, assignmentGroupWeightsDialogTemplate, numberHelper) -> class AssignmentGroupWeightsDialog
 
   constructor: (options) ->
     @$dialog = $ assignmentGroupWeightsDialogTemplate()
@@ -40,7 +42,7 @@ define [
         .clone()
         .data('assignment_group', group)
         .find('label').attr('for', uniqueId ).text(group.name).end()
-        .find('input').attr('id', uniqueId).val(group.group_weight).end()
+        .find('input').attr('id', uniqueId).val(I18n.n(group.group_weight)).end()
         .appendTo(@$groups_holder)
     @$dialog.find('#group_weighting_scheme').prop('checked', @options.context.group_weighting_scheme == 'percent').change()
     @calcTotal()
@@ -53,16 +55,16 @@ define [
   addGroupWeightListener: =>
     $(".group_weight").on 'change', (e) ->
       value = $(e.target).val()
-      rounded_value = round(parseFloat(value), 2)
+      rounded_value = round(numberHelper.parse(value), 2)
       unless isNaN(rounded_value)
         $(e.target).val(rounded_value)
 
   calcTotal: =>
     total = 0
     @$dialog.find('.assignment_group_row input').each ->
-      total += Number($(this).val())
+      total += numberHelper.parse($(this).val())
     total = round(total,2)
-    @$dialog.find('.total_weight').text(total)
+    @$dialog.find('.total_weight').text(I18n.n(total))
 
   save: =>
     courseUrl = "/courses/#{@options.context.context_id}"
@@ -77,7 +79,7 @@ define [
 
     @$dialog.find('.assignment_group_row').each (i, row) =>
       group = $(row).data('assignment_group')
-      newWeight = Number($(row).find('input').val())
+      newWeight = numberHelper.parse($(row).find('input').val())
       if newWeight != group.group_weight
         requests.push $.ajaxJSON "/api/v1#{courseUrl}/assignment_groups/#{group.id}", 'PUT', {'group_weight' : newWeight}, (data) =>
           @mergeFunction(group, data)

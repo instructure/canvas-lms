@@ -92,8 +92,8 @@ describe QuizzesHelper do
       expect(render_score(1)).to eq '1'
       expect(render_score(100)).to eq '100'
       expect(render_score(1.123)).to eq '1.12'
-      expect(render_score(1000.45166)).to eq '1000.45'
-      expect(render_score(1000.45966)).to eq '1000.46'
+      expect(render_score(1000.45166)).to eq '1,000.45'
+      expect(render_score(1000.45966)).to eq '1,000.46'
       expect(render_score('100')).to eq '100'
       expect(render_score('1.43')).to eq '1.43'
     end

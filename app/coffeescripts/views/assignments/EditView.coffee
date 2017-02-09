@@ -4,6 +4,8 @@ define [
   'compiled/views/ValidatedFormView'
   'underscore'
   'jquery'
+  'jsx/shared/helpers/numberHelper'
+  'compiled/util/round'
   'jsx/shared/rce/RichContentEditor'
   'jst/assignments/EditView'
   'compiled/userSettings'
@@ -23,7 +25,7 @@ define [
   'jquery.toJSON'
   'compiled/jquery.rails_flash_notifications'
   'compiled/behaviors/tooltip'
-], (INST, I18n, ValidatedFormView, _, $, RichContentEditor, EditViewTemplate,
+], (INST, I18n, ValidatedFormView, _, $, numberHelper, round, RichContentEditor, EditViewTemplate,
   userSettings, TurnitinSettings, VeriCiteSettings, TurnitinSettingsDialog,
   preventDefault, MissingDateDialog, AssignmentGroupSelector,
   GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts,
@@ -149,6 +151,10 @@ define [
 
     handlePointsChange:(ev) =>
       ev.preventDefault()
+      if (numberHelper.validate(@$assignmentPointsPossible.val()))
+        newPoints = round(numberHelper.parse(@$assignmentPointsPossible.val()), 2)
+        @$assignmentPointsPossible.val(I18n.n(newPoints))
+
       if @assignment.hasSubmittedSubmissions()
         @$pointsChangeWarning.toggleAccessibly(@$assignmentPointsPossible.val() != "#{@assignment.pointsPossible()}")
 
@@ -343,6 +349,8 @@ define [
       data.only_visible_to_overrides = !@dueDateOverrideView.overridesContainDefault()
       data.assignment_overrides = @dueDateOverrideView.getOverrides()
       data.published = true if @shouldPublish
+      data.points_possible = round(numberHelper.parse(data.points_possible), 2)
+      data.peer_review_count = numberHelper.parse(data.peer_review_count) if data.peer_review_count
       return data
 
     saveFormData: =>
@@ -499,7 +507,7 @@ define [
     _validatePointsPossible: (data, errors) =>
       return errors if _.contains(@model.frozenAttributes(), "points_possible")
 
-      if data.points_possible and isNaN(parseFloat(data.points_possible))
+      if typeof data.points_possible != 'number' or isNaN(data.points_possible)
         errors["points_possible"] = [
           message: I18n.t 'points_possible_number', 'Points possible must be a number'
         ]
@@ -510,7 +518,7 @@ define [
     _validatePointsRequired: (data, errors) =>
       return errors unless _.include ['percent','letter_grade','gpa_scale'], data.grading_type
 
-      if parseInt(data.points_possible,10) < 0 or isNaN(parseFloat(data.points_possible))
+      if typeof data.points_possible != 'number' or data.points_possible < 0 or isNaN(data.points_possible)
         errors["points_possible"] = [
           message: I18n.t("Points possible must be 0 or more for selected grading type")
         ]

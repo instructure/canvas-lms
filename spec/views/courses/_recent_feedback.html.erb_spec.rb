@@ -41,7 +41,7 @@ describe "/courses/_recent_feedback" do
 
     render :partial => "courses/recent_feedback", object: @submission, locals: {is_hidden: false}
 
-    expect(response.body).to include("5782394 out of #{@assignment.points_possible}")
+    expect(response.body).to include("5,782,394 out of #{@assignment.points_possible}")
   end
 
   it 'shows the grade and the comment' do
@@ -51,7 +51,7 @@ describe "/courses/_recent_feedback" do
 
     render :partial => "courses/recent_feedback", object: @submission, locals: {is_hidden: false}
 
-    expect(response.body).to include("25734 out of #{@assignment.points_possible}")
+    expect(response.body).to include("25,734 out of #{@assignment.points_possible}")
     expect(response.body).to include('something different')
   end
 end

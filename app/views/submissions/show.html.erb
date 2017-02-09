@@ -49,7 +49,7 @@
               <% if @submission.excused? %>
                 <%= t "Excused" %>
               <% else %>
-                <%= @submission.published_grade %>
+                <%= i18n_grade(@submission.published_grade) %>
               <% end %>
             </span>
           <% end %>
