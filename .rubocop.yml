@@ -114,8 +114,8 @@ Style/SpaceInLambdaLiteral:
 Style/FrozenStringLiteralComment:
   Enabled: false
 
-# RSpec cops we don't care aboue
-RSpec/RMessageSpies:
+# RSpec cops we don't care about
+RSpec/HookArgument:
   Enabled: false
 
 # this isn't good for us because of how we pin dependencies
@@ -176,6 +176,11 @@ Metrics/LineLength:
   Max: 120
 Metrics/MethodLength:
   Max: 16
+Metrics/BlockLength:
+  Exclude:
+  - 'gems/*/spec/**/*.rb'
+  - 'gems/plugins/*/spec_canvas/**/*.rb'
+  - 'spec/**/*.rb'
 Metrics/CyclomaticComplexity:
   Max: 10
 RSpec/InstanceVariable:
