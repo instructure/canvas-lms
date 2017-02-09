@@ -23,9 +23,9 @@ describe "/assignments/syllabus" do
   it "should render" do
     course_with_student
     view_context(@course, @user)
-    
-    assigns[:events] = [@course.assignments.create!(:title => "some assignment", :due_at => Time.now), @course.calendar_events.create!(:title => "some event", :start_at => Time.now, :end_at => Time.now)]
-    assigns[:dates] = assigns[:events].map{|e| e.start_at}
+
+    assigns[:events] = events = [@course.assignments.create!(:title => "some assignment", :due_at => Time.now), @course.calendar_events.create!(:title => "some event", :start_at => Time.now, :end_at => Time.now)]
+    assigns[:dates] = events.map{|e| e.start_at}
     assigns[:undated_events] = [@course.assignments.create!(:title => "assignment 2"), @course.calendar_events.create!(:title => "event 2")]
     render 'assignments/syllabus'
     expect(response).not_to be_nil

@@ -121,17 +121,27 @@ end
 # TODO: actually fix the deprecation messages once we're on Rails 4 permanently and remove this
 ActiveSupport::Deprecation.silenced = true
 
+# we use ivars too extensively for factories; prevent them from
+# being propagated to views in view specs
+# yes, I'm overwriting the method in-place, rather than prepend,
+# because the ancestor chain for RSpec::Rails::ViewExampleGroup
+# has already been built, and I can't put myself between the two
+module ActionView::TestCase::Behavior
+  def view_assigns
+    if self.is_a?(RSpec::Rails::HelperExampleGroup)
+      # the original implementation. we can't call super because
+      # we replaced the whole original method
+      return Hash[_user_defined_ivars.map do |ivar|
+        [ivar[1..-1].to_sym, instance_variable_get(ivar)]
+      end]
+    end
+    {}
+  end
+end
+
 module RSpec::Rails
   module ViewExampleGroup
     module ExampleMethods
-      # normally in rspec 2, assigns returns a newly constructed hash
-      # which means that 'assigns[:key] = value' in view specs does nothing
-      def assigns
-        @assigns ||= super
-      end
-
-      alias :view_assigns :assigns
-
       delegate :content_for, :to => :view
 
       def render_with_helpers(*args)

@@ -23,11 +23,11 @@ describe '/quizzes/quizzes/take_quiz' do
   it 'should render' do
     course_with_student
     view_context
-    assigns[:quiz] = @course.quizzes.create!(description: 'Hello')
-    assigns[:submission] = assigns[:quiz].generate_submission(@user)
+    assigns[:quiz] = quiz = @course.quizzes.create!(description: 'Hello')
+    assigns[:submission] = sub = quiz.generate_submission(@user)
     assigns[:quiz_presenter] = Quizzes::TakeQuizPresenter.new(
-      assigns[:quiz],
-      assigns[:submission],
+      quiz,
+      sub,
       params
     )
     render 'quizzes/quizzes/take_quiz'
@@ -39,12 +39,12 @@ describe '/quizzes/quizzes/take_quiz' do
   it 'should render preview alert for unpublished quiz' do
     course_with_student
     view_context
-    assigns[:quiz] = @course.quizzes.create!
-    assigns[:submission] = assigns[:quiz].generate_submission(@user)
-    assigns[:submission].update_attribute(:workflow_state, 'preview')
+    assigns[:quiz] = quiz = @course.quizzes.create!
+    assigns[:submission] = sub = quiz.generate_submission(@user)
+    sub.update_attribute(:workflow_state, 'preview')
     assigns[:quiz_presenter] = Quizzes::TakeQuizPresenter.new(
-      assigns[:quiz],
-      assigns[:submission],
+      quiz,
+      sub,
       params
     )
     render 'quizzes/quizzes/take_quiz'
@@ -58,11 +58,11 @@ describe '/quizzes/quizzes/take_quiz' do
     quiz = @course.quizzes.create!
     quiz.publish!
     assigns[:quiz] = quiz
-    assigns[:submission] = quiz.generate_submission(@user)
-    assigns[:submission].update_attribute(:workflow_state, 'preview')
+    assigns[:submission] = sub = quiz.generate_submission(@user)
+    sub.update_attribute(:workflow_state, 'preview')
     assigns[:quiz_presenter] = Quizzes::TakeQuizPresenter.new(
-      assigns[:quiz],
-      assigns[:submission],
+      quiz,
+      sub,
       params
     )
     render 'quizzes/quizzes/take_quiz'
