@@ -5,11 +5,13 @@ define [
   'compiled/util/DateValidator'
   'jst/assignments/CreateAssignment'
   'jst/EmptyDialogFormWrapper'
+  'jsx/shared/helpers/numberHelper'
   'i18n!assignments'
+  'compiled/util/round'
   'jquery'
   'compiled/api/gradingPeriodsApi'
   'jquery.instructure_date_and_time'
-], (_, Assignment, DialogFormView, DateValidator, template, wrapper, I18n, $, GradingPeriodsAPI) ->
+], (_, Assignment, DialogFormView, DateValidator, template, wrapper, numberHelper, I18n, round, $, GradingPeriodsAPI) ->
 
   class CreateAssignmentView extends DialogFormView
     defaults:
@@ -20,6 +22,7 @@ define [
       'click .dialog_closer': 'close'
       'click .save_and_publish': 'saveAndPublish'
       'click .more_options': 'moreOptions'
+      'blur .points_possible': 'roundPointsPossible'
 
     template: template
     wrapperTemplate: wrapper
@@ -42,6 +45,7 @@ define [
       unfudged = $.unfudgeDateForProfileTimezone(data.due_at)
       data.due_at = unfudged.toISOString() if unfudged?
       data.published = true if @shouldPublish
+      data.points_possible = numberHelper.parse(data.points_possible)
       return data
 
     saveAndPublish: (event) ->
@@ -138,7 +142,7 @@ define [
     _validatePointsPossible: (data, errors) =>
       return errors if _.contains(@model.frozenAttributes(), "points_possible")
 
-      if data.points_possible and isNaN(parseFloat(data.points_possible))
+      if data.points_possible and isNaN(data.points_possible)
         errors["points_possible"] = [
           message: I18n.t 'points_possible_number', 'Points possible must be a number'
         ]
@@ -176,3 +180,11 @@ define [
 
       errors["due_at"] = [message: errs["due_at"]]
       errors
+
+    roundPointsPossible: (e) ->
+      value = $(e.target).val()
+      rounded_value = round(numberHelper.parse(value), 2)
+      if isNaN(rounded_value)
+        return
+      else
+        $(e.target).val(I18n.n(rounded_value))

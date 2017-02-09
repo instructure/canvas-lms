@@ -98,7 +98,7 @@
       </li>
       <li>
         <span class='title'><%= t :points, 'Points' %></span>
-        <span class='value'><%= round_if_whole(@assignment.points_possible) || t(:no_points, 'None') %></span>
+        <span class='value'><%= n(round_if_whole(@assignment.points_possible)) || t(:no_points, 'None') %></span>
       </li>
       <% if @assignment.expects_submission? || @assignment.expects_external_submission? %>
         <% turnitin_text = turnitin_active? ? ' ' + t(:turnitin_enabled_short, '(Turnitin enabled)') : '' %>
@@ -138,7 +138,7 @@
         <div class="control-group">
           <div class="control-label"><%= t(:points, 'Points') %></div>
           <div class="controls">
-            <span class="value points_possible"><%= round_if_whole(@assignment.points_possible) || t(:no_points, 'None') %></span>
+            <span class="value points_possible"><%= n(round_if_whole(@assignment.points_possible)) || t(:no_points, 'None') %></span>
           </div>
         </div>
         <div class="control-group">

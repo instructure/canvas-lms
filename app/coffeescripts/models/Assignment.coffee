@@ -10,7 +10,7 @@ define [
   'compiled/collections/DateGroupCollection'
   'i18n!assignments'
   'jsx/grading/helpers/GradingPeriodsHelper'
-  'timezone',
+  'timezone'
   'jsx/shared/helpers/numberHelper'
 ], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, VeriCiteSettings, DateGroup, AssignmentOverrideCollection,
     DateGroupCollection, I18n, GradingPeriodsHelper, tz, numberHelper) ->

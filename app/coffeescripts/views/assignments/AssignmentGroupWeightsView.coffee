@@ -2,8 +2,10 @@ define [
   'jquery'
   'compiled/util/round'
   'Backbone'
+  'i18n!assignments'
   'jst/assignments/AssignmentGroupWeights'
-], ($, round, Backbone, AssignmentGroupWeightsTemplate) ->
+  'jsx/shared/helpers/numberHelper'
+], ($, round, Backbone, I18n, AssignmentGroupWeightsTemplate, numberHelper) ->
 
   class AssignmentGroupWeightsView extends Backbone.View
     template: AssignmentGroupWeightsTemplate
@@ -17,14 +19,14 @@ define [
 
     roundWeight: (e) ->
       value = $(e.target).val()
-      rounded_value = round(parseFloat(value), 2)
+      rounded_value = round(numberHelper.parse(value), 2)
       if isNaN(rounded_value)
         return
       else
-        $(e.target).val(rounded_value)
+        $(e.target).val(I18n.n(rounded_value))
 
     findWeight: ->
-      round(parseFloat(@$el.find('.group_weight_value').val()), 2)
+      round(numberHelper.parse(@$el.find('.group_weight_value').val()), 2)
 
     toJSON: ->
       data = super

@@ -350,6 +350,12 @@ define [
     notOk view.$el.find('#has_group_category').attr('readonly')
     notOk view.$el.find('#has_group_category').attr('aria-readonly')
 
+  test 'rounds points_possible', ->
+    view = @editView()
+    view.$assignmentPointsPossible.val('1.234')
+    data = view.getFormData()
+    equal data.points_possible, 1.23
+
   QUnit.module 'EditView: handleGroupCategoryChange',
     setup: ->
       fakeENV.setup()

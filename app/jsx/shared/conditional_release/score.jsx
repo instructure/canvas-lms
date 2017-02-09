@@ -1,10 +1,12 @@
 define([
   './grading-types',
   'i18n!cyoe_assignment_sidebar',
-], (GradingTypes, I18n) => {
+  'jsx/shared/helpers/numberHelper'
+], (GradingTypes, I18n, numberHelper) => {
   // stack overflow suggests this implementation
   const isNumeric = (n) => {
-    return !isNaN(parseFloat(n)) && isFinite(n)
+    const parsed = numberHelper.parse(n)
+    return !isNaN(parsed) && isFinite(parsed)
   }
 
   const haveGradingScheme = (assignment) => {
@@ -45,55 +47,58 @@ define([
   const formatScore = (score, assignment) => {
     const gradingType = getGradingType(assignment)
     if (gradingType === GradingTypes.points.key) {
-      return I18n.t('%{score} pts', { score })
+      return I18n.t('%{score} pts', {
+        score: I18n.n(score, { precision: 2, strip_insignificant_zeros: true })
+      })
     } else if (gradingType === GradingTypes.letter_grade.key || gradingType === GradingTypes.gpa_scale.key) {
       return score
     } else {
-      return I18n.t('%{score}%', { score })
-    }
-  }
-
-  const formatReaderOnlyScore = (score, assignment) => {
-    const gradingType = getGradingType(assignment)
-    if (gradingType === GradingTypes.points.key) {
-      return I18n.t('%{score} points', { score })
-    } else if (gradingType === GradingTypes.letter_grade.key || gradingType === GradingTypes.gpa_scale.key) {
-      return I18n.t('%{score} letter grade', { score })
-    } else {
-      return I18n.t('%{score} percent', { score })
+      return I18n.n(score, { precision: 2, percentage: true, strip_insignificant_zeros: true })
     }
   }
 
   const percentToPoints = (score, assignment) => {
     if (!isNumeric(score)) { return score }
     if (score === 0) { return '0' }
-    const percent = parseFloat(score)
+    const percent = numberHelper.parse(score)
     const pointsPossible = Number(assignment.points_possible) || 100
-    return Math.ceil(percent * pointsPossible).toString()
+    return Math.ceil(percent * pointsPossible)
   }
 
   const percentToLetterGrade = (score, assignment) => {
     if (score === '') { return '' }
+    const parsed = numberHelper.parse(score)
     const letterGrade = { letter: null, score: -Infinity }
     for (const k in assignment.grading_scheme) {
-      const v = parseFloat(assignment.grading_scheme[k])
-      if ((v <= score && v > letterGrade.score) || (v === 0 && v > score)) {
+      const v = numberHelper.parse(assignment.grading_scheme[k])
+      if ((v <= parsed && v > letterGrade.score) || (v === 0 && v > parsed)) {
         letterGrade.score = v
         letterGrade.letter = k
       }
     }
-    return letterGrade.letter ? letterGrade.letter : score
+    return letterGrade.letter ? letterGrade.letter : parsed
   }
 
   const percentToExternalPercent = (score) => {
     if (!isNumeric(score)) { return score }
-    return Math.floor(score * 100).toString()
+    return Math.floor(score * 100)
+  }
+
+  const i18nGrade = (grade, assignment) => {
+    if (typeof grade === 'string' &&
+        assignment.grading_type !== GradingTypes.letter_grade.key &&
+        assignment.grading_type !== GradingTypes.gpa_scale.key) {
+      const number = numberHelper.parse(grade.replace(/%$/, ''))
+      if (!isNaN(number)) {
+        return formatScore(number, assignment)
+      }
+    }
+    return grade
   }
 
   const scoreHelpers = {
-    percentToScore,
     transformScore,
-    formatReaderOnlyScore,
+    i18nGrade,
   }
 
   return scoreHelpers

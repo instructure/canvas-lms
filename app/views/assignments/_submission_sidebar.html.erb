@@ -67,8 +67,8 @@
           <span><%= t "This assignment has been excused." %></span>
         <% else %>
           <div><%= t 'labels.grade', "Grade: %{grade} *(%{points_possible} pts possible)*", {
-            :grade => @current_user_submission.grade,
-            :points_possible => round_if_whole(@assignment.points_possible),
+            :grade => i18n_grade(@current_user_submission.grade, @assignment.grading_type),
+            :points_possible => n(round_if_whole(@assignment.points_possible)),
             :wrapper => '<span style="font-size: 0.8em;">\1</span>'
           } %></div>
           <div><%= t 'labels.graded_anonymously', "Graded Anonymously: %{value}", {

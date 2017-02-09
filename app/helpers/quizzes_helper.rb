@@ -66,7 +66,7 @@ module QuizzesHelper
     if score.nil?
       '_'
     else
-      round_if_whole(score.to_f.round(precision)).to_s
+      I18n.n(round_if_whole(score.to_f.round(precision)))
     end
   end
 
