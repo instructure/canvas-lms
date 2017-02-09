@@ -1923,7 +1923,7 @@ define([
         }));
       } else if (attachment.canvadoc_url) {
         $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
-          canvadoc_session_url: attachment.canvadoc_url + '&wants_annotation=true'
+          canvadoc_session_url: attachment.canvadoc_url
         }));
       } else if ($.isPreviewable(attachment.content_type, 'google')) {
         if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
