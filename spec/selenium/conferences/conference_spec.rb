@@ -99,7 +99,7 @@ describe 'Web conferences' do
   end
 
   context 'when one conference exists' do
-    before(:once) { @conference = create_wimba_conference }
+    before(:once) { @conference = create_wimba_conference('A Conference', 1234) }
 
     context 'when the conference is open' do
       it 'should delete active conferences', priority: "1", test_id: 126912 do
@@ -116,6 +116,17 @@ describe 'Web conferences' do
         cog_menu_item = f('.al-trigger')
         delete_conference(cog_menu_item: cog_menu_item, cancel: true)
         check_element_has_focus(cog_menu_item)
+      end
+
+      it 'should open editor if edit selected from cog menu', priority: "2" do
+        cog_menu_item = f('.al-trigger')
+        edit_conference(cog_menu_item: cog_menu_item, cancel: false)
+
+        duration_edit_field = f('#web_conference_duration');
+
+        expect(duration_edit_field).to be_displayed # input field w/in editor
+        # value is localized
+        expect(duration_edit_field.attribute('value')).to eq('1,234')
       end
     end
 

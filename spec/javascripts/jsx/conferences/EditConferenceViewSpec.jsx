@@ -67,4 +67,24 @@ define([
     const title = this.view.$el.dialog('option', 'title');
     equal(title, expectedTitle);
   });
+
+  test('#show sets localized durataion when editing conference', function () {
+    const expectedDuration = '1,234.5';
+    const attributes = {
+      title: 'InstructureCon',
+      recordings: [],
+      user_settings: {
+        scheduled_date: new Date()
+      },
+      permissions: {
+        update: true
+      },
+      duration: 1234.5
+    };
+
+    const conference = new Conference(attributes);
+    this.view.show(conference, {isEditing: true});
+    const duration = this.view.$('#web_conference_duration')[0].value;
+    equal(duration, expectedDuration);
+  });
 });
