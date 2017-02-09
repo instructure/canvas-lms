@@ -5,12 +5,11 @@ class SisAssignmentHarness
 end
 
 describe Api::V1::SisAssignment do
-  subject { SisAssignmentHarness.new }
+  subject(:generator) { SisAssignmentHarness.new }
 
   context "#sis_assignments_json" do
     let(:course_1) { course_factory }
     let(:assignment_1) { assignment_model(course: course_factory) }
-    let(:assignment_with_context) { Assignment.new }
 
     let(:assignment_override_1) do
       assignment_override_model(assignment: assignment_1)
@@ -48,19 +47,6 @@ describe Api::V1::SisAssignment do
 
     before do
       assignment_1.stubs(:locked_for?).returns(false)
-
-      assignment_with_context.stubs(:locked_for?).returns(false)
-      assignment_with_context.stubs(:context).returns(course_sections)
-      assignment_with_context.stubs(:association).with(:context).returns(course_sections)
-      assignment_with_context.stubs(:association).with(:assignment_group).returns(
-        OpenStruct.new(:loaded? => false))
-      assignment_with_context.stubs(:association).with(:active_assignment_overrides).returns(
-        OpenStruct.new(:loaded? => true))
-      assignment_with_context.stubs(:active_assignment_overrides).returns(assignment_overrides)
-      assignment_with_context.stubs(:only_visible_to_overrides).returns(true)
-
-      assignment_with_context.stubs(:unlock_at).returns(10.days.ago)
-      assignment_with_context.stubs(:lock_at).returns(10.days.from_now)
 
       assignment_overrides.stubs(:loaded?).returns(true)
       assignment_overrides.stubs(:unlock_at).returns(15.days.ago)
@@ -145,26 +131,73 @@ describe Api::V1::SisAssignment do
       it { expect(results.first["id"]).to eq(assignment_1.id) }
     end
 
-    it "sis assignments handle only visible to overrides" do
-      assignments = [assignment_with_context]
-      result = subject.sis_assignments_json(assignments)
+    it "displays all section overrides" do
+      course = assignment_1.course
+      new_section = course.course_sections.create!(:name => 'new section')
+      create_section_override_for_assignment(assignment_1, course_section: course.default_section)
+      create_section_override_for_assignment(assignment_1, course_section: new_section)
+
+      result = generator.sis_assignments_json([assignment_1])
+
       expect(result[0]['sections'].size).to eq(2)
-      expect(result[0]['sections'][0]["id"]).to eq(1)
-      expect(result[0]['sections'][1]["id"]).to eq(2)
+      expect(result[0]['sections'][0]["id"]).to eq(new_section.id)
+      expect(result[0]['sections'][1]["id"]).to eq(course.default_section.id)
     end
 
     it "includes unlock_at and lock_at attributes" do
-      assignments = [assignment_with_context]
-      result = subject.sis_assignments_json(assignments)
+      result = generator.sis_assignments_json([assignment_1])
+
       expect(result[0].key?('unlock_at')).to eq(true)
       expect(result[0].key?('lock_at')).to eq(true)
     end
 
     it "includes unlock_at and lock_at attributes in section overrides" do
-      assignments = [assignment_with_context]
-      result = subject.sis_assignments_json(assignments)
+      create_section_override_for_assignment(assignment_1, unlock_at: 1.day.ago, lock_at: 1.day.from_now)
+      assignment_1.active_assignment_overrides.reload
+
+      result = generator.sis_assignments_json([assignment_1])
+
       expect(result[0]['sections'][0]['override'].key?('unlock_at')).to eq(true)
       expect(result[0]['sections'][0]['override'].key?('lock_at')).to eq(true)
     end
+
+    context "add_assignment_user_overrides_json" do
+      before do
+        @student1 = student_in_course({:course => assignment_1.course, :workflow_state => 'active'}).user
+        @student2 = student_in_course({:course => assignment_1.course, :workflow_state => 'active'}).user
+        due_at = Time.zone.parse('2017-02-08 22:11:10')
+        @override = create_adhoc_override_for_assignment(assignment_1, [@student1, @student2], due_at: due_at)
+      end
+
+      it "adds student assignment override information" do
+        assignment_1.active_assignment_overrides.reload
+        assignment_1.active_assignment_overrides.each { |ao| ao.assignment_override_students.reload }
+
+        result = generator.sis_assignments_json([assignment_1])
+
+        user_overrides = result[0]["user_overrides"]
+        expect(user_overrides.size).to eq 1
+        expect(user_overrides.first).to include({"id" => @override.id, "due_at": @override.due_at})
+
+        students = user_overrides.first["students"]
+        expect(students).to include({"user_id" => @student1.id})
+        expect(students).to include({"user_id" => @student1.id})
+        expect(students.size).to eq 2
+      end
+
+      it "does not list active_assignment_overrides which were not preloaded" do
+        assignment_1.reload
+
+        expect(generator.sis_assignments_json([assignment_1])[0]).not_to have_key('user_overrides')
+      end
+
+      it "does not list assignment_override_students which were not preloaded" do
+        assignment_1.reload
+        assignment_1.active_assignment_overrides.reload
+
+        expect(generator.sis_assignments_json([assignment_1])[0]).not_to have_key('user_overrides')
+      end
+    end
+
   end
 end
