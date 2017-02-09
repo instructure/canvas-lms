@@ -425,9 +425,11 @@ class CalendarEvent < ActiveRecord::Base
   protected :populate_missing_dates
 
   def populate_all_day_flag
-    # If the all day flag has been changed to all day, set the times to 00:00
+    # If the all day flag has been changed to all day, set the times to noon instead of 00:00
+    # because it is more resilient to being set in different time zones - if someone in EST
+    # sets an event for all day in a PST course, the day can be wrong!
     if self.all_day_changed? && self.all_day?
-      self.start_at = self.end_at = zoned_start_at.beginning_of_day rescue nil
+      self.start_at = self.end_at = zoned_start_at.beginning_of_day + 12.hours rescue nil
 
     elsif self.start_at_changed? || self.end_at_changed?
       if self.start_at && self.start_at == self.end_at # && zoned_start_at.strftime("%H:%M") == '00:00'

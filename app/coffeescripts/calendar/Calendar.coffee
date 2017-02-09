@@ -212,8 +212,11 @@ define [
       startDate = event.startDate()
       endDate = event.endDate()
       timeString = if !endDate || +startDate == +endDate
-          startDate.locale(calendarDefaults.lang)
-          startDate.format("LT")
+	  if !endDate
+            startDate.locale(calendarDefaults.lang)
+            startDate.format("LT")
+	  else
+	    "All Day"
         else
           startDate.locale(calendarDefaults.lang)
           endDate.locale(calendarDefaults.lang)

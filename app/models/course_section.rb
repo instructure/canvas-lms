@@ -38,7 +38,7 @@ class CourseSection < ActiveRecord::Base
 
   has_many :users, :through => :enrollments
   has_many :course_account_associations
-  has_many :calendar_events, :as => :context, :dependent => :destroy
+  has_many :calendar_events, :as => :context
   has_many :assignment_overrides, :as => :set, :dependent => :destroy
 
   before_validation :infer_defaults, :verify_unique_sis_source_id
@@ -265,6 +265,7 @@ class CourseSection < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.enrollments.not_fake.each(&:destroy)
     self.assignment_overrides.each(&:destroy)
+    self.calendar_events.each(&:destroy)
     save!
   end
 
