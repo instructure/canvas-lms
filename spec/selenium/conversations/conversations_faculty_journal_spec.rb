@@ -188,7 +188,7 @@ describe "conversations new" do
       conversations
       # First verify teacher can send a message with faculty journal entry checked to one student
       compose course: @course, to: [@s1], body: 'hallo!', journal: true, send: true
-      expect_flash_message :success, /Message sent!/
+      expect_flash_message :success, "Message sent!"
       # Now verify adding another user while the faculty journal entry checkbox is checked doesn't uncheck it and
       #   still lets teacher know it was sent successfully.
       fj('.ic-flash-success:last').click
@@ -196,7 +196,7 @@ describe "conversations new" do
       add_message_recipient(@s2)
       expect(is_checked('.user_note')).to be_truthy
       click_send
-      expect_flash_message :success, /Message sent!/
+      expect_flash_message :success, "Message sent!"
     end
   end
 end

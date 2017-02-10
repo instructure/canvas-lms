@@ -414,7 +414,7 @@ describe "courses" do
 
       create_session(@student.pseudonym)
       get "/courses/#{@course.id}"
-      assert_flash_notice_message /Invitation accepted!/
+      assert_flash_notice_message "Invitation accepted!"
       expect(f("#content")).not_to contain_css(".ic-notification button[name='accept'] ")
     end
 
@@ -424,7 +424,7 @@ describe "courses" do
       create_session(@student.pseudonym)
       get "/courses/#{@course.id}"
       f(".ic-notification button[name='accept'] ").click
-      assert_flash_notice_message /Invitation accepted!/
+      assert_flash_notice_message "Invitation accepted!"
     end
 
     it "should reject a course invitation" do
@@ -433,7 +433,7 @@ describe "courses" do
       create_session(@student.pseudonym)
       get "/courses/#{@course.id}"
       f(".ic-notification button[name=reject]").click
-      assert_flash_notice_message /Invitation canceled./
+      assert_flash_notice_message "Invitation canceled."
     end
 
     it "should display user groups on courses page" do

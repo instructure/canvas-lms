@@ -48,34 +48,27 @@ module CustomValidators
   end
 
   def expect_flash_message(type = :warning, message = nil)
-    message = Regexp.new(Regexp.escape(message)) if message.is_a?(String)
-    wait_for method: :expect_flash_message, ignore: [Selenium::WebDriver::Error::StaleElementReferenceError, Selenium::WebDriver::Error::NoSuchElementError] do
-      messages = disable_implicit_wait { driver.find_elements :css, "#flash_message_holder .ic-flash-#{type}" }
-      text = messages.map(&:text).join('\n')
-      message ? !!text.match(message) : messages.present?
-    end or raise(RSpec::Expectations::ExpectationNotMetError, "expected flash #{type} message#{message ? " " + message.inspect : ""}, none found")
+    selector = ".ic-flash-#{type}"
+    selector << ":contains(#{message.inspect})" if message
+    expect(f("#flash_message_holder")).to contain_jqcss(selector)
   end
 
   def expect_no_flash_message(type = :warning, message = nil)
-    message = Regexp.new(Regexp.escape(message)) if message.is_a?(String)
-    wait_for method: :expect_no_flash_message, ignore: [Selenium::WebDriver::Error::StaleElementReferenceError] do
-      messages = disable_implicit_wait { driver.find_elements :css, "#flash_message_holder .ic-flash-#{type}" }
-      text = messages.map(&:text).join('\n')
-      message ? !text.match(message) : messages.empty?
-    end or raise(RSpec::Expectations::ExpectationNotMetError, "expected no flash #{type} message#{message ? " " + message.inspect : ""}, one was found")
-  rescue Selenium::WebDriver::Error::NoSuchElementError
+    selector = ".ic-flash-#{type}"
+    selector << ":contains(#{message.inspect})" if message
+    expect(f("#flash_message_holder")).not_to contain_jqcss(selector)
   end
 
-  def assert_flash_notice_message(okay_message_regex)
-    expect_flash_message :success, okay_message_regex
+  def assert_flash_notice_message(okay_message)
+    expect_flash_message :success, okay_message
   end
 
-  def assert_flash_warning_message(warn_message_regex)
-    expect_flash_message :warning, warn_message_regex
+  def assert_flash_warning_message(warn_message)
+    expect_flash_message :warning, warn_message
   end
 
-  def assert_flash_error_message(fail_message_regex)
-    expect_flash_message :error, fail_message_regex
+  def assert_flash_error_message(fail_message)
+    expect_flash_message :error, fail_message
   end
 
   def assert_error_box(selector)

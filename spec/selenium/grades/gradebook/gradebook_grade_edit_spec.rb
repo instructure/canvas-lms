@@ -225,7 +225,7 @@ describe "editing grades" do
     SubmissionsApiController.any_instance.expects(:update).returns('bad response')
     get "/courses/#{@course.id}/gradebook"
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
-    expect_flash_message :error, /refresh/
+    expect_flash_message :error, "refresh"
   end
 
   context 'with multiple grading periods enabled' do
@@ -275,7 +275,7 @@ describe "editing grades" do
         it 'gives an error when clicked' do
           @curve_grades_menu_item.click
 
-          expect_flash_message :error, /Unable to curve grades/
+          expect_flash_message :error, "Unable to curve grades"
         end
       end
 
@@ -291,7 +291,7 @@ describe "editing grades" do
         it 'gives an error when clicked' do
           @set_default_grade_menu_item.click
 
-          expect_flash_message :error, /Unable to set default grade/
+          expect_flash_message :error, "Unable to set default grade"
         end
       end
     end

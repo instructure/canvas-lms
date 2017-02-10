@@ -41,7 +41,7 @@ describe "account" do
 
       wait_for_ajaximations
       expect(f('#add_course_dialog')).not_to be_displayed
-      assert_flash_notice_message(/Test Course successfully added/)
+      assert_flash_notice_message("Test Course successfully added")
     end
 
     it "should be able to create a new course when no other courses exist" do

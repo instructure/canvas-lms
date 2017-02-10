@@ -245,7 +245,7 @@ describe "conversations new" do
         f('.message-body textarea').send_keys("I'll pay you Tuesday for a hamburger today")
         click_send
 
-        expect_flash_message :success, /Message sent!/
+        expect_flash_message :success, "Message sent!"
       end
 
       context "Message Address Book" do
