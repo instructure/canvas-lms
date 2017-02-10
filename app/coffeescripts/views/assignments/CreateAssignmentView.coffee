@@ -156,7 +156,8 @@ define [
         data: data
         multipleGradingPeriodsEnabled: !!ENV.MULTIPLE_GRADING_PERIODS_ENABLED
         gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods)
-        userIsAdmin: @currentUserIsAdmin()
+        userIsAdmin: @currentUserIsAdmin(),
+        data
       )
       errs = dateValidator.validateDatetimes()
 
