@@ -173,7 +173,7 @@ module Lti
           tool_proxy_fixture = JSON.parse(File.read(fixture_file))
 
           tcp_url = polymorphic_url([@course.account, :tool_consumer_profile],
-                                    tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID)
+                                    tool_consumer_profile_id: Lti::ToolConsumerProfile::DEFAULT_TCP_UUID)
           tool_proxy_fixture["tool_consumer_profile"] = tcp_url
 
           headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(auth_header)

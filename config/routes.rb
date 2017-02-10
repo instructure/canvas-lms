@@ -1945,7 +1945,7 @@ CanvasRails::Application.routes.draw do
     post "authorize", controller: 'lti/ims/authorization', action: :authorize, as: 'lti_oauth2_authorize'
     %w(course account).each do |context|
       prefix = "#{context}s/:#{context}_id"
-      get  "#{prefix}/tool_consumer_profile/:tool_consumer_profile_id", controller: 'lti/ims/tool_consumer_profile',
+      get  "#{prefix}/tool_consumer_profile(/:tool_consumer_profile_id)", controller: 'lti/ims/tool_consumer_profile',
            action: 'show', as: "#{context}_tool_consumer_profile"
       post "#{prefix}/tool_proxy", controller: 'lti/ims/tool_proxy', action: :re_reg,
            as: "re_reg_#{context}_lti_tool_proxy", constraints: Lti::ReRegConstraint.new

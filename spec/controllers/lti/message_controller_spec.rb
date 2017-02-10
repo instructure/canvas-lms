@@ -83,7 +83,7 @@ module Lti
             .to include "courses/#{course.id}/lti/registration_return"
           expect(launch_params['ext_tool_consumer_instance_guid']).to eq @course.root_account.lti_guid
           expect(launch_params['ext_api_domain']).to eq HostUrl.context_host(course, request.host)
-          account_tp_url_stub = course_tool_consumer_profile_url(course, 'abc123').gsub('abc123', '')
+          account_tp_url_stub = course_tool_consumer_profile_url(course)
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end
 
@@ -108,7 +108,7 @@ module Lti
           expect(launch_params['launch_presentation_document_target']).to eq 'iframe'
           expect(launch_params['reg_key']).not_to be_empty
           expect(launch_params['reg_password']).not_to be_empty
-          account_tp_url_stub = account_tool_consumer_profile_url(Account.default, 'abc123').gsub('abc123', '')
+          account_tp_url_stub = account_tool_consumer_profile_url(Account.default)
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end
 
@@ -173,7 +173,7 @@ module Lti
           get 'reregistration', course_id: course.id, tool_proxy_id: tool_proxy.id
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
-          account_tp_url_stub = course_tool_consumer_profile_url(course, 'abc123').gsub('abc123', '')
+          account_tp_url_stub = course_tool_consumer_profile_url(course)
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end
 

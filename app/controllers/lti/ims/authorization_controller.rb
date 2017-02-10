@@ -42,6 +42,15 @@ module Lti
     #
     class AuthorizationController < ApplicationController
 
+      SERVICE_DEFINITIONS = [
+        {
+          id: 'vnd.Canvas.authorization',
+          endpoint: "api/lti/authorize",
+          format: ['application/json'].freeze,
+          action: ['POST'].freeze
+        }.freeze
+      ].freeze
+
       class InvalidGrant < RuntimeError; end
       JWT_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:jwt-bearer'.freeze
 

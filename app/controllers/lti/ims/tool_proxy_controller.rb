@@ -21,6 +21,21 @@ module Lti
       include Lti::ApiServiceHelper
       include Lti::Ims::AccessTokenHelper
 
+      SERVICE_DEFINITIONS = [
+        {
+          id: 'ToolProxy.collection',
+          endpoint: ->(context) { "api/lti/#{context.class.name.downcase}s/#{context.id}/tool_proxy" },
+          format: ['application/vnd.ims.lti.v2.toolproxy+json'].freeze,
+          action: ['POST'].freeze
+        }.freeze,
+        {
+          id: 'ToolProxy.item',
+          endpoint: 'api/lti/tool_proxy/{tool_proxy_guid}',
+          format: ['application/vnd.ims.lti.v2.toolproxy+json'].freeze,
+          action: ['GET'].freeze
+        }.freeze
+      ].freeze
+
       before_action :require_context, :except => [:show]
       skip_before_action :require_user, only: [:create, :show, :re_reg]
       skip_before_action :load_user, only: [:create, :show, :re_reg]
@@ -116,15 +131,15 @@ module Lti
       end
 
       def tp_validator
-        @tp_validator ||= (
+        @tp_validator ||= begin
           tcp_url = polymorphic_url([@context, :tool_consumer_profile],
-                                    tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID)
+                                    tool_consumer_profile_id: Lti::ToolConsumerProfile::DEFAULT_TCP_UUID)
           profile = Lti::ToolConsumerProfileCreator.new(@context, tcp_url).create
 
           tp_validator = IMS::LTI::Services::ToolProxyValidator.new(IMS::LTI::Models::ToolProxy.from_json(payload))
           tp_validator.tool_consumer_profile = profile
           tp_validator
-        )
+        end
       end
     end
   end
