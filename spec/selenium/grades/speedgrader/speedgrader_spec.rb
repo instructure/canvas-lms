@@ -556,6 +556,44 @@ describe 'Speedgrader' do
     end
   end
 
+  context "mute/unmute dialogs" do
+    before(:once) do
+      init_course_with_students
+
+      @assignment = @course.assignments.create!(
+        grading_type: 'points',
+        points_possible: 10
+      )
+    end
+
+    before(:each) do
+      user_session(@teacher)
+    end
+
+    it "shows dialog when attempting to mute and mutes" do
+      @assignment.update_attributes(muted: false)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+      f('#mute_link').click
+      expect(f('#mute_dialog').attribute('style')).not_to include('display: none')
+      f('button.btn-mute').click
+      @assignment.reload
+      expect(@assignment.muted?).to be true
+    end
+
+    it "shows dialog when attempting to unmute and unmutes" do
+      @assignment.update_attributes(muted: true)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+      f('#mute_link').click
+      expect(f('#unmute_dialog').attribute('style')).not_to include('display: none')
+      f('button.btn-unmute').click
+      @assignment.reload
+      expect(@assignment.muted?).to be false
+    end
+
+  end
+
   private
 
   def grader_speedgrader_assignment(grade1, grade2, clear_grade=true)
