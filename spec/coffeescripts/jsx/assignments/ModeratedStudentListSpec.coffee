@@ -63,8 +63,8 @@ define [
     )
     moderatedColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
     columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList__Mark')
-    equal moderatedColumns[0].getDOMNode().querySelectorAll('span')[1].textContent, '4,000.1'
-    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    equal ReactDOM.findDOMNode(moderatedColumns[0]).querySelectorAll('span')[1].textContent, '4,000.1'
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(studentList).parentNode)
 
   test 'renders final scores i18ned', ->
     newFakeStudentList = _.extend({}, fakeStudentList())
@@ -84,8 +84,8 @@ define [
     )
 
     gradeColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList_Grade')
-    equal gradeColumns[0].getDOMNode().querySelectorAll('span')[1].textContent, '4,000.1'
-    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    equal ReactDOM.findDOMNode(gradeColumns[0]).querySelectorAll('span')[1].textContent, '4,000.1'
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(studentList).parentNode)
 
   test 'only shows the next speedgrader link when in moderation set', ->
     newFakeStudentList = _.extend({}, fakeStudentList())
@@ -101,10 +101,10 @@ define [
     )
     moderatedColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
     columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList__Mark')
-    equal moderatedColumns[0].getDOMNode().querySelectorAll('span')[1].textContent, '4', 'displays the grade in the first column'
-    equal moderatedColumns[1].getDOMNode().querySelectorAll('span')[1].textContent, 'SpeedGrader™', 'displays speedgrader link in the second'
-    equal columns[0].getDOMNode().querySelectorAll('span')[1].textContent, '-', 'third column is a dash'
-    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    equal ReactDOM.findDOMNode(moderatedColumns[0]).querySelectorAll('span')[1].textContent, '4', 'displays the grade in the first column'
+    equal ReactDOM.findDOMNode(moderatedColumns[1]).querySelectorAll('span')[1].textContent, 'SpeedGrader™', 'displays speedgrader link in the second'
+    equal ReactDOM.findDOMNode(columns[0]).querySelectorAll('span')[1].textContent, '-', 'third column is a dash'
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(studentList).parentNode)
 
   test 'show a dash in in the first column when not in the moderation set', ->
     newFakeStudentList = _.extend({}, fakeStudentList())
@@ -118,8 +118,8 @@ define [
       )
     )
     columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList__Mark')
-    equal columns[0].getDOMNode().querySelectorAll('span')[1].textContent, '-', 'shows a dash for non moderation set students'
-    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    equal ReactDOM.findDOMNode(columns[0]).querySelectorAll('span')[1].textContent, '-', 'shows a dash for non moderation set students'
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(studentList).parentNode)
 
   test 'only shows one column when includeModerationSetHeaders is false', ->
     studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList,
@@ -135,7 +135,7 @@ define [
     moderatedColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
     equal columns.length, 1, 'only show one column'
     equal moderatedColumns.length, 0, 'no moderated columns shown'
-    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(studentList).parentNode)
 
   test 'shows the grade column when there is a selected_provisional_grade_id', ->
     newFakeStudentList = _.extend({}, fakeStudentList())
@@ -151,8 +151,8 @@ define [
     )
 
     gradeColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList_Grade')
-    equal gradeColumns[0].props.children[1].props.children, 4
-    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    equal gradeColumns[0].children[1].textContent, '4'
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(studentList).parentNode)
 
   test 'properly renders final grade if there are no provisional grades', ->
     newFakeStudentList = _.extend({}, fakeUngradedStudentList())
@@ -167,8 +167,8 @@ define [
     )
 
     gradeColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList_Grade')
-    equal gradeColumns[0].getDOMNode().querySelectorAll('span')[1].textContent, '-', 'grade column is a dash'
-    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    equal ReactDOM.findDOMNode(gradeColumns[0]).querySelectorAll('span')[1].textContent, '-', 'grade column is a dash'
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(studentList).parentNode)
 
   test 'does not show radio button if there is only one provisional grade', ->
     newFakeStudentList = _.extend({}, fakeStudentList())
@@ -183,7 +183,7 @@ define [
     )
 
     inputs = TestUtils.scryRenderedDOMComponentsWithTag(studentList, 'input')
-    radioInputs = inputs.filter((input) -> input.getDOMNode().type == 'radio')
+    radioInputs = inputs.filter((input) -> ReactDOM.findDOMNode(input).type == 'radio')
     equal radioInputs.length, 0, 'does not render any radio buttons'
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(studentList).parentNode)
 
@@ -210,9 +210,9 @@ define [
     )
 
     inputs = TestUtils.scryRenderedDOMComponentsWithTag(studentList, 'input')
-    radioInputs = inputs.filter((input) -> input.getDOMNode().type == 'radio')
+    radioInputs = inputs.filter((input) -> ReactDOM.findDOMNode(input).type == 'radio')
     equal radioInputs.length, 2, 'renders two radio buttons'
-    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(studentList).parentNode)
 
   QUnit.module 'Persist provisional grades'
 
@@ -241,4 +241,4 @@ define [
     radio = TestUtils.scryRenderedDOMComponentsWithTag(studentList, 'input').filter((domComponent) -> domComponent.type == 'radio')
     TestUtils.Simulate.change(radio[0])
     ok callback.called, 'called selectProvisionalGrade'
-    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(studentList).parentNode)

@@ -36,7 +36,7 @@ define [
 
     teardown: ->
       @store = null
-      ReactDOM.unmountComponentAtNode(@moderationApp.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@moderationApp).parentNode)
 
   test 'it subscribes to the store when mounted', ->
     # TODO: Once the rest of the components get dumbed down, this could be
