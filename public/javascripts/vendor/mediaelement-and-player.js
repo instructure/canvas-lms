@@ -4878,7 +4878,8 @@ if (typeof jQuery != 'undefined') {
 			if (track != null && track.isLoaded) {
 				for (i=0; i<track.entries.times.length; i++) {
 					if (t.media.currentTime >= track.entries.times[i].start && t.media.currentTime <= track.entries.times[i].stop){
-						t.captionsText.html(track.entries.text[i]);
+						// NOTE: do not change this to .html() without sanitizing the text
+						t.captionsText.text(track.entries.text[i]);
 						t.captions.show().height(0);
 						return; // exit out if one is visible;
 					}
