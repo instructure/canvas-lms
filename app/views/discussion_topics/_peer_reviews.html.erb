@@ -1,6 +1,16 @@
 <% @presenter.peer_reviews_for(@current_user).each do |peer_review| %>
-  <div class="discussion-section discussion-assignment-section peer-review-alert alert">
+  <div class="discussion-section discussion-assignment-section peer-review-alert <%= peer_review.assigned? ? "alert" : "alert-info" %>">
     <div class="row-fluid">
+      <% if peer_review.completed? %>
+        <div class="span9">
+          <p class="peer-review-title">
+            <i class="icon-peer-review"></i>
+            <strong>
+              <%= t('You have completed a peer review for %{person}. Thank you', {:person => peer_review.user.name}) %>
+            </strong>
+          </p>
+        </div>
+      <% else %>
       <div class="span9">
         <p class="peer-review-title">
           <i class="icon-peer-review"></i>
@@ -8,9 +18,8 @@
             <%= t('peer_review_alert',
             'You have been assigned a peer review for %{person}',
             {:person => peer_review.user.name}) %>
-            <%= link_to "Review Now", course_assignment_submission_path(@assignment.context_id, @assignment.id, peer_review.user_id) %>
+            <%= link_to t("Review Now"), course_assignment_submission_path(@assignment.context_id, @assignment.id, peer_review.user_id) %>
           </strong>
-         
         </p>
       </div>
 
@@ -21,8 +30,8 @@
           </b>
         </div>
       </div>
+      <% end %>
     </div>
-
   </div>
 
 <% end %>
