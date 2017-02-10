@@ -73,12 +73,12 @@ define([
         $(document).triggerHandler('page_view_update');
       }, 1000 * intervalInSeconds);
 
-      window.onbeforeunload = function() {
+      window.addEventListener('beforeunload', function(e) {
         if(interactionSeconds > 30) {
           var value = JSON.stringify({url: update_url, seconds: interactionSeconds});
           document.cookie = "last_page_view=" + escape(value) + "; Path=/;";
         }
-      };
+      });
 
       var eventInTime = false;
       $(document).bind('mousemove keypress mousedown focus', function() {

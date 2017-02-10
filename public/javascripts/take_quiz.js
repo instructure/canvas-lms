@@ -387,16 +387,17 @@ define([
 
       var unloadWarned = false;
 
-      window.onbeforeunload = function(e) {
+      window.addEventListener('beforeunload', function(e) {
         if (!quizSubmission.navigatingToRelogin) {
           if(!quizSubmission.submitting && !quizSubmission.alreadyAcceptedNavigatingAway && !unloadWarned) {
             quizSubmission.clearAccessCode = true
             setTimeout(function() { unloadWarned = false; }, 0);
             unloadWarned = true;
-            return I18n.t('confirms.unfinished_quiz', "You're about to leave the quiz unfinished.  Continue anyway?");
+            e.returnValue = I18n.t('confirms.unfinished_quiz', "You're about to leave the quiz unfinished.  Continue anyway?");
+            return e.returnValue;
           }
         }
-      };
+      });
       window.addEventListener('unload', function(e) {
         var data = $("#submit_quiz_form").getFormData();
         var url = $(".backup_quiz_submission_url").attr('href');
