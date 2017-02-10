@@ -9,6 +9,17 @@ define([
     static DEFAULT_MONITORING_BASE_URL = '/api/v1/progress';
     static DEFAULT_ATTACHMENT_BASE_URL = '/api/v1/users';
 
+    static exportCompleted (workflowState) {
+      return workflowState === 'completed';
+    }
+
+    // Returns false if the workflowState is 'failed' or an unknown state
+    static exportFailed (workflowState) {
+      if (workflowState === 'failed') return true;
+
+      return !['completed', 'queued', 'running'].includes(workflowState);
+    }
+
     constructor (exportingUrl, currentUserId, existingExport, pollingInterval = GradebookExportManager.DEFAULT_POLLING_INTERVAL) {
       this.pollingInterval = pollingInterval;
 
@@ -38,6 +49,13 @@ define([
       return `${this.attachmentBaseUrl}/${this.export.attachmentId}`;
     }
 
+    clearMonitor () {
+      if (this.exportStatusPoll) {
+        window.clearInterval(this.exportStatusPoll);
+        this.exportStatusPoll = null;
+      }
+    }
+
     monitorExport (resolve, reject) {
       if (!this.monitoringUrl()) {
         this.export = undefined;
@@ -45,12 +63,12 @@ define([
         reject(I18n.t('No way to monitor gradebook exports provided!'));
       }
 
-      const exportStatusPoll = window.setInterval(() => {
+      this.exportStatusPoll = window.setInterval(() => {
         axios.get(this.monitoringUrl()).then((response) => {
           const workflowState = response.data.workflow_state;
 
-          if (workflowState === 'completed') {
-            window.clearInterval(exportStatusPoll);
+          if (GradebookExportManager.exportCompleted(workflowState)) {
+            this.clearMonitor();
 
             // Export is complete => let's get the attachment url
             axios.get(this.attachmentUrl()).then((attachmentResponse) => {
@@ -65,8 +83,8 @@ define([
             }).catch((error) => {
               reject(error);
             });
-          } else if (workflowState === 'failed') {
-            window.clearInterval(exportStatusPoll);
+          } else if (GradebookExportManager.exportFailed(workflowState)) {
+            this.clearMonitor();
 
             reject(I18n.t('Error exporting gradebook: %{msg}', { msg: response.data.message }));
           }
