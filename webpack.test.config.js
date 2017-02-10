@@ -58,9 +58,8 @@ testWebpackConfig.module.rules.unshift({
   ]
 })
 
-// For easier local debugging in karma, only add istambul cruft if running on jenkins
-// or you've explicity set the "JS_CODE_COVERAGE" environment variable
-if (process.env.JENKINS_HOME || process.env.JS_CODE_COVERAGE) {
+// For faster local debugging in karma, only add istambul cruft you've explicity set the "COVERAGE" environment variable
+if (process.env.COVERAGE) {
   testWebpackConfig.module.rules.unshift({
     test: /(jsx.*(\.js$|\.jsx$)|\.coffee$|public\/javascripts\/.*\.js$)/,
     exclude: /(node_modules|spec|public\/javascripts\/(bower|client_apps|compiled|jst|jsx|translations|vendor))/,
