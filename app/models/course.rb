@@ -705,6 +705,15 @@ class Course < ActiveRecord::Base
     participating_instructors.restrict_to_sections(section_ids)
   end
 
+  def user_is_admin?(user)
+    return unless user
+    RequestCache.cache('user_is_admin', self, user) do
+      Rails.cache.fetch([self, user, "course_user_is_admin"].cache_key) do
+        self.enrollments.for_user(user).active_by_date.of_admin_type.exists?
+      end
+    end
+  end
+
   def user_is_instructor?(user)
     return unless user
     RequestCache.cache('user_is_instructor', self, user) do

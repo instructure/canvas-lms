@@ -421,6 +421,7 @@ describe DiscussionTopic do
     it "should allow students to create topics by default" do
       expect(@topic.check_policy(@teacher)).to include :create
       expect(@topic.check_policy(@student)).to include :create
+      expect(@topic.check_policy(@course.student_view_student)).to include :create
     end
 
     it "should disallow students from creating topics" do
@@ -429,6 +430,7 @@ describe DiscussionTopic do
       @topic.reload
       expect(@topic.check_policy(@teacher)).to include :create
       expect(@topic.check_policy(@student)).not_to include :create
+      expect(@topic.check_policy(@course.student_view_student)).not_to include :create
     end
 
   end
