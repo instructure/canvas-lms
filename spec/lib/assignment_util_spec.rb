@@ -42,6 +42,26 @@ describe AssignmentUtil do
     end
   end
 
+  describe "due_date_required_for_account?" do
+    it "returns true both are set to true" do
+      assignment.context.account.stubs(:sis_require_assignment_due_date).returns({value: true})
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+      expect(described_class.due_date_required_for_account?(assignment)).to eq(true)
+    end
+
+    it "returns false when sis_require_assignment_due_date is false" do
+      assignment.context.account.stubs(:sis_require_assignment_due_date).returns({value: false})
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+      expect(described_class.due_date_required_for_account?(assignment)).to eq(false)
+    end
+
+    it "returns false when new_sis_integrations is false" do
+      assignment.context.account.stubs(:sis_require_assignment_due_date).returns({value: true})
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(false)
+      expect(described_class.due_date_required_for_account?(assignment)).to eq(false)
+    end
+  end
+
   describe "due_date_ok?" do
     it "returns false when due_at is blank and due_date_required? is true" do
       assignment.due_at = nil
@@ -110,3 +130,4 @@ describe AssignmentUtil do
     end
   end
 end
+
