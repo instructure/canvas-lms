@@ -820,7 +820,7 @@ define([
     }
   });
 
-  function beforeLeavingSpeedgrader() {
+  function beforeLeavingSpeedgrader(e) {
     // Submit any draft comments that need submitting
     EG.addSubmissionComment(true);
 
@@ -831,20 +831,24 @@ define([
         return (snapshot == student) && student.name;
       })[0];
     })
-      hasPendingQuizSubmissions = (function(){
-        var ret = false;
-        if (userNamesWithPendingQuizSubmission.length){
-          for (var i = 0, max = userNamesWithPendingQuizSubmission.length; i < max; i++){
-            if (userNamesWithPendingQuizSubmission[i] !== false) { ret = true; }
-          }
+
+    var hasPendingQuizSubmissions = (function(){
+      var ret = false;
+      if (userNamesWithPendingQuizSubmission.length){
+        for (var i = 0, max = userNamesWithPendingQuizSubmission.length; i < max; i++){
+          if (userNamesWithPendingQuizSubmission[i] !== false) { ret = true; }
         }
-        return ret;
-      })();
+      }
+      return ret;
+    })();
+
     var hasUnsubmittedComments = $.trim($add_a_comment_textarea.val()) !== "";
     if (hasPendingQuizSubmissions) {
-      return I18n.t('confirms.unsaved_changes', "The following students have unsaved changes to their quiz submissions: \n\n %{users}\nContinue anyway?", {'users': userNamesWithPendingQuizSubmission.join('\n ')});
+      e.returnValue = I18n.t('confirms.unsaved_changes', "The following students have unsaved changes to their quiz submissions: \n\n %{users}\nContinue anyway?", {'users': userNamesWithPendingQuizSubmission.join('\n ')});
+      return e.returnValue;
     } else if (hasUnsubmittedComments) {
-      return I18n.t("If you would like to keep your unsubmitted comments, please save them before navigating away from this page.");
+      e.returnValue = I18n.t("If you would like to keep your unsubmitted comments, please save them before navigating away from this page.");
+      return e.returnValue;
     }
   }
 
@@ -972,7 +976,7 @@ define([
         e.preventDefault();
       });
 
-      window.onbeforeunload = beforeLeavingSpeedgrader;
+      window.addEventListener('beforeunload', beforeLeavingSpeedgrader);
     },
 
     jsonReady: function(){
