@@ -824,7 +824,7 @@ module ApplicationHelper
         javascript_include_tag(*includes)
       else
         str = <<-ENDSCRIPT
-          require(['jquery'], function () {
+          require(['jquery'], function fnCanvasUsesToLoadAccountJSAfterJQueryIsReady () {
             #{includes.to_json}.forEach(function (src) {
               var s = document.createElement('script');
               s.src = src;
