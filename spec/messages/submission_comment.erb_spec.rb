@@ -20,6 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'submission_comment' do
+  include MessagesCommon
+
   before :once do
     submission_model
     @comment = @submission.add_comment(:comment => "new comment")

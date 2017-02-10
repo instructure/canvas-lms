@@ -20,6 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'announcement_reply' do
+  include MessagesCommon
+
   before :once do
     course_with_teacher(active_all: true)
     @announcement = announcement_model(user: @teacher, discussion_type: 'threaded')

@@ -20,6 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'peer_review_invitation' do
+  include MessagesCommon
+
   before :once do
     assessment_request_model
   end

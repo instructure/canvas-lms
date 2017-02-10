@@ -20,6 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'appointment_group_published' do
+  include MessagesCommon
+
   before :once do
     course_with_student(:active_all => true)
     @cat = @course.group_categories.create(:name => 'teh category')
