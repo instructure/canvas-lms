@@ -5,7 +5,7 @@ module Lti
     class AuthorizationValidator
       class InvalidSignature < StandardError
       end
-      class ToolProxyNotFound < StandardError
+      class SecretNotFound < StandardError
       end
       class InvalidAuthJwt < StandardError
       end
@@ -17,7 +17,7 @@ module Lti
 
       def jwt
         @_jwt ||= begin
-          validated_jwt = JSON::JWT.decode @raw_jwt, tool_proxy.shared_secret
+          validated_jwt = JSON::JWT.decode @raw_jwt, jwt_secret
           check_required_assertions(validated_jwt.keys)
           if validated_jwt['aud'] != @authorization_url
             raise InvalidAuthJwt, "the 'aud' must be the LTI Authorization endpoint"
@@ -39,7 +39,7 @@ module Lti
       def tool_proxy
         @_tool_proxy ||= begin
           tp = ToolProxy.where(guid: unverified_jwt[:sub], workflow_state: 'active').first
-          raise ToolProxyNotFound if tp.blank?
+          return nil unless tp.present?
           developer_key = tp.product_family.developer_key
           raise InvalidAuthJwt, "the Tool Proxy must be associated to a developer key" if developer_key.blank?
           raise InvalidAuthJwt, "the Developer Key is not active" unless developer_key.active?
@@ -51,8 +51,23 @@ module Lti
         end
       end
 
+      def developer_key
+        @_developer_key ||= DeveloperKey.find_cached(unverified_jwt[:sub])
+      rescue ActiveRecord::RecordNotFound
+        return nil
+      end
+
+      def sub
+        tool_proxy&.guid || developer_key&.global_id
+      end
 
       private
+
+      def jwt_secret
+        secret = tool_proxy&.shared_secret || developer_key&.api_key
+        return secret if secret.present?
+        raise SecretNotFound, "either the tool proxy or developer key were not found"
+      end
 
       def check_required_assertions(assertion_keys)
         missing_assertions = (%w(sub aud exp iat jti) - assertion_keys)
