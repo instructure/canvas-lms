@@ -28,6 +28,7 @@ define [
   'compiled/gradebook/SubmissionCell'
   'compiled/gradebook/GradebookHeaderMenu'
   'compiled/util/NumberCompare'
+  'compiled/util/natcompare'
   'str/htmlEscape'
   'jsx/gradebook/SISGradePassback/PostGradesStore'
   'jsx/gradebook/SISGradePassback/PostGradesApp'
@@ -60,8 +61,8 @@ define [
   $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   TotalColumnHeaderView, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS, CourseGradeCalculator,
   GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
-  GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, htmlEscape,
-  PostGradesStore, PostGradesApp, SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate,
+  GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, natcompare,
+  htmlEscape, PostGradesStore, PostGradesApp, SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate,
   RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper,
   GradingPeriodsAPI
 ) ->
@@ -1506,9 +1507,7 @@ define [
       @grid.invalidate()
 
     localeSort: (a, b) ->
-      (a || "").localeCompare b || "",
-        i18nObj.locale,
-        sensitivity: 'accent', numeric: true
+      natcompare.strings(a || '', b || '')
 
     gradeSort: (a, b, field, asc) =>
       scoreForSorting = (obj) =>

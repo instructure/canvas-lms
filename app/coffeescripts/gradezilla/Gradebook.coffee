@@ -28,6 +28,7 @@ define [
   'compiled/gradezilla/SubmissionCell'
   'compiled/gradezilla/GradebookHeaderMenu'
   'compiled/util/NumberCompare'
+  'compiled/util/natcompare'
   'str/htmlEscape'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
@@ -64,8 +65,8 @@ define [
   $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   GradingPeriodsAPI, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS, CourseGradeCalculator,
   GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
-  GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, htmlEscape,
-  AssignmentColumnHeader, AssignmentGroupColumnHeader, StudentColumnHeader, TotalGradeColumnHeader,
+  GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, natcompare,
+  htmlEscape, AssignmentColumnHeader, AssignmentGroupColumnHeader, StudentColumnHeader, TotalGradeColumnHeader,
   ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp, SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate,
   SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper
 ) ->
@@ -1527,9 +1528,7 @@ define [
       @grid.invalidate()
 
     localeSort: (a, b) ->
-      (a || "").localeCompare b || "",
-        i18nObj.locale,
-        sensitivity: 'accent', numeric: true
+      natcompare.strings(a || '', b || '')
 
     gradeSort: (a, b, field, asc) =>
       scoreForSorting = (obj) =>

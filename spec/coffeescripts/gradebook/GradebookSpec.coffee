@@ -4,7 +4,19 @@ define [
   'underscore'
   'timezone'
   'compiled/SubmissionDetailsDialog'
-], (Gradebook, DataLoader, _, tz, SubmissionDetailsDialog) ->
+  'compiled/util/natcompare'
+], (Gradebook, DataLoader, _, tz, SubmissionDetailsDialog, natcompare) ->
+  QUnit.module "Gradebook#localeSort"
+
+  test "delegates to natcompare.strings", ->
+    natCompareSpy = @spy(natcompare, 'strings')
+    Gradebook.prototype.localeSort('a', 'b')
+    ok natCompareSpy.calledWith('a', 'b')
+
+  test "substitutes falsy args with empty string", ->
+    natCompareSpy = @spy(natcompare, 'strings')
+    Gradebook.prototype.localeSort(0, false)
+    ok natCompareSpy.calledWith('', '')
 
   QUnit.module "Gradebook#gradeSort"
 
