@@ -167,7 +167,7 @@ define([
 
   test('displays grades localized', function () {
     const sandbox = sinon.sandbox.create();
-    sandbox.stub(i18n, 'n', function () { return 'I18n number'; });
+    sandbox.stub(i18n, 'n').returns('I18n number');
     grade_summary.calculateTotals(this.calculatedGrades, this.currentOrFinal, this.groupWeightingScheme);
 
     notOk($('.score_teaser').text().indexOf('I18n number') === -1);
@@ -200,7 +200,7 @@ define([
 
   test('returns i18ned number value', function () {
     const sandbox = sinon.sandbox.create();
-    sandbox.stub(i18n, 'n', function () { return 'formatted number'; });
+    sandbox.stub(i18n, 'n').returns('formatted number');
     const formattedPercentGrade = grade_summary.formatPercentGrade(33.33);
 
     ok(formattedPercentGrade === 'formatted number');
@@ -212,7 +212,7 @@ define([
 
   test('returns N/A when canBeConvertedToGrade returns false', function () {
     const sandbox = sinon.sandbox.create();
-    sandbox.stub(grade_summary, 'canBeConvertedToGrade', function () { return false; });
+    sandbox.stub(grade_summary, 'canBeConvertedToGrade').returns(false);
     const calculatedGrade = grade_summary.calculateGrade(1, 1);
 
     ok(calculatedGrade === 'N/A');
@@ -222,8 +222,8 @@ define([
 
   test('composes formatPercentGrade and calculatePercentGrade', function () {
     const sandbox = sinon.sandbox.create();
-    sandbox.stub(grade_summary, 'calculatePercentGrade', function () { return 'percentGrade'; });
-    sandbox.stub(grade_summary, 'formatPercentGrade', function (val) { return `formatted:${val}`; });
+    sandbox.stub(grade_summary, 'calculatePercentGrade').returns('percentGrade');
+    sandbox.stub(grade_summary, 'formatPercentGrade').callsFake(val => `formatted:${val}`);
     const calculatedGrade = grade_summary.calculateGrade(1, 1);
 
     ok(calculatedGrade === 'formatted:percentGrade');

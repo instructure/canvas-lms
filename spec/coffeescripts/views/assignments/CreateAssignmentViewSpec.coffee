@@ -159,7 +159,7 @@ define [
     equal view.$('input[name=points_possible]').length, 0
 
   test "onSaveSuccess adds model to assignment group for creation", ->
-    @stub(DialogFormView.prototype, "close", ->)
+    @stub(DialogFormView.prototype, "close")
 
     equal @group.get("assignments").length, 2
 
@@ -169,7 +169,7 @@ define [
     equal @group.get("assignments").length, 3
 
   test "the form is cleared after adding an assignment", ->
-    @stub(DialogFormView.prototype, "close", ->)
+    @stub(DialogFormView.prototype, "close")
 
     view = createView(@group)
     view.onSaveSuccess()
@@ -178,8 +178,8 @@ define [
     equal view.$("#ag_#{@group.id}_assignment_points").val(), "0"
 
   test "moreOptions redirects to new page for creation", ->
-    @stub(CreateAssignmentView.prototype, "newAssignmentUrl", ->)
-    @stub(CreateAssignmentView.prototype, "redirectTo", ->)
+    @stub(CreateAssignmentView.prototype, "newAssignmentUrl")
+    @stub(CreateAssignmentView.prototype, "redirectTo")
 
     view = createView(@group)
     view.moreOptions()
@@ -187,7 +187,7 @@ define [
     ok view.redirectTo.called
 
   test "moreOptions redirects to edit page for editing", ->
-    @stub(CreateAssignmentView.prototype, "redirectTo", ->)
+    @stub(CreateAssignmentView.prototype, "redirectTo")
 
     view = createView(@assignment1)
     view.moreOptions()
@@ -231,22 +231,22 @@ define [
 
   test "disableDueAt returns true if due_at is a frozen attribute", ->
     view = createView(@assignment1)
-    @stub(view.model, 'frozenAttributes', -> ["due_at"])
+    @stub(view.model, 'frozenAttributes').returns(["due_at"])
     equal view.disableDueAt(), true
 
   test "disableDueAt returns false if the user is an admin", ->
     view = createView(@assignment1)
-    @stub(view, 'currentUserIsAdmin', -> true)
+    @stub(view, 'currentUserIsAdmin').returns(true)
     equal view.disableDueAt(), false
 
   test "disableDueAt returns true if the user is not an admin and the assignment has a due date in a closed grading period", ->
     view = createView(@assignment1)
-    @stub(view, 'currentUserIsAdmin', -> false)
-    @stub(view.model, 'inClosedGradingPeriod', -> true)
+    @stub(view, 'currentUserIsAdmin').returns(false)
+    @stub(view.model, 'inClosedGradingPeriod').returns(true)
     equal view.disableDueAt(), true
 
   test "openAgain doesn't add datetime for multiple dates", ->
-    @stub(DialogFormView.prototype, "openAgain", ->)
+    @stub(DialogFormView.prototype, "openAgain")
     @spy $.fn, "datetime_field"
 
     view = createView(@assignment1)
@@ -255,7 +255,7 @@ define [
     ok $.fn.datetime_field.notCalled
 
   test "openAgain adds datetime picker", ->
-    @stub(DialogFormView.prototype, "openAgain", ->)
+    @stub(DialogFormView.prototype, "openAgain")
     @spy $.fn, "datetime_field"
 
     view = createView(@assignment2)
@@ -264,11 +264,11 @@ define [
     ok $.fn.datetime_field.called
 
   test "openAgain doesn't add datetime picker if disableDueAt is true", ->
-    @stub(DialogFormView.prototype, "openAgain", ->)
+    @stub(DialogFormView.prototype, "openAgain")
     @spy $.fn, "datetime_field"
 
     view = createView(@assignment2)
-    @stub(view, 'disableDueAt', -> true)
+    @stub(view, 'disableDueAt').returns(true)
 
     view.openAgain()
 
@@ -297,7 +297,7 @@ define [
     }]
 
     view = createView(@assignment1)
-    @stub(view, 'currentUserIsAdmin', -> false)
+    @stub(view, 'currentUserIsAdmin').returns(false)
     data =
       name: "Foo"
       due_at: "2103-08-15T06:00:00Z"
@@ -317,7 +317,7 @@ define [
     }]
 
     view = createView(@assignment1)
-    @stub(view, 'currentUserIsAdmin', -> true)
+    @stub(view, 'currentUserIsAdmin').returns(true)
     data =
       name: "Foo"
       due_at: "2103-08-15T06:00:00Z"

@@ -196,8 +196,8 @@ define [
   test 'asks for confirmation before deleting an assignment', ->
     view = createView(@model)
 
-    @stub(view, 'visibleAssignments', -> [])
-    @stub(window, "confirm", -> true )
+    @stub(view, 'visibleAssignments').returns([])
+    @stub(window, "confirm").returns(true)
     @spy view, "delete"
 
     view.$("#assignment_#{@model.id} .delete_assignment").click()
@@ -209,7 +209,7 @@ define [
     @model.set('in_closed_grading_period', true)
     view = createView(@model)
 
-    @stub(window, "confirm", -> true )
+    @stub(window, "confirm").returns(true)
     @spy view, "delete"
 
     view.$("#assignment_#{@model.id} .delete_assignment").click()

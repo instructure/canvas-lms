@@ -12,9 +12,9 @@ define [
 
   QUnit.module 'GradingPeriodCollection',
     setup: ->
-      @stub($, 'flashMessage', ->)
-      @stub($, 'flashError', ->)
-      @stub(window, 'confirm', -> true)
+      @stub($, 'flashMessage')
+      @stub($, 'flashError')
+      @stub(window, 'confirm').returns(true)
       @server = sinon.fakeServer.create()
       fakeENV.setup()
       ENV.current_user_roles = ["admin"]
@@ -165,13 +165,13 @@ define [
     deepEqual @gradingPeriodCollection.serializeDataForSubmission(), expectedOutput
 
   test 'batchUpdatePeriods makes an AJAX call if validations pass', ->
-    @sandbox.stub(@gradingPeriodCollection, 'areGradingPeriodsValid', -> true)
+    @sandbox.stub(@gradingPeriodCollection, 'areGradingPeriodsValid').returns(true)
     ajax = @sandbox.spy($, 'ajax')
     @gradingPeriodCollection.batchUpdatePeriods()
     ok ajax.calledOnce
 
   test 'batchUpdatePeriods does not make an AJAX call if validations fail', ->
-    @sandbox.stub(@gradingPeriodCollection, 'areGradingPeriodsValid', -> false)
+    @sandbox.stub(@gradingPeriodCollection, 'areGradingPeriodsValid').returns(false)
     ajax = @sandbox.spy($, 'ajax')
     @gradingPeriodCollection.batchUpdatePeriods()
     ok ajax.notCalled

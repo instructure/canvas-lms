@@ -9,7 +9,7 @@ define [
 
   QUnit.module 'DashboardCardBox',
     setup: ->
-      @stub(CourseActivitySummaryStore, 'getStateForCourse', -> {})
+      @stub(CourseActivitySummaryStore, 'getStateForCourse').returns({})
       @courseCards = [{
         id: 1,
         shortName: 'Bio 101'

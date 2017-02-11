@@ -22,10 +22,10 @@ define [
            $(renderingTarget).append("<div id='fake-editor'>" + propsForRCE.toString() + "</div>")
            renderCallback()
       }
-      sinon.stub($, "getScript", ((url, callback)=>
+      sinon.stub($, "getScript").callsFake((url, callback) =>
         window.RceModule = @fakeRceModule
         callback()
-      ));
+      )
 
     teardown: ->
       fakeENV.teardown()

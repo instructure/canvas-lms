@@ -134,7 +134,7 @@ define([
 
   test('flashes error on error delete response', () => {
     const component = renderComponent()
-    sandbox.stub(axios, 'delete', () => Promise.reject({ respose: { data: new Error('Something bad happened') } }))
+    sandbox.stub(axios, 'delete').callsFake(() => Promise.reject({ respose: { data: new Error('Something bad happened') } }))
     sandbox.spy($, 'flashError')
 
     component.deleteGroup()
@@ -330,7 +330,7 @@ define([
 
   test('flashes error on error delete response', () => {
     const component = renderComponent()
-    sandbox.stub(axios, 'put', () => Promise.reject({ respose: { data: new Error('Something bad happened') } }))
+    sandbox.stub(axios, 'put').callsFake(() => Promise.reject({ respose: { data: new Error('Something bad happened') } }))
     sandbox.stub($, 'flashError')
 
     component.handleSave()

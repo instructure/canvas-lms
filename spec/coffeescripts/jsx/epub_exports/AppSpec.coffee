@@ -19,7 +19,7 @@ define [
           id: 2
         }
       }
-      sinon.stub(CourseEpubExportStore, 'getAll', -> true)
+      sinon.stub(CourseEpubExportStore, 'getAll').returns(true)
 
     teardown: ->
       CourseEpubExportStore.getAll.restore()

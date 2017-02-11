@@ -69,7 +69,7 @@ define [
   test 'does not attempt to delete an assignment due in a closed grading period', ->
     view = editHeaderView(in_closed_grading_period: true)
 
-    @stub(window, "confirm", -> true )
+    @stub(window, "confirm").returns(true)
     @spy view, "delete"
 
     view.$(".delete_assignment_link").click()

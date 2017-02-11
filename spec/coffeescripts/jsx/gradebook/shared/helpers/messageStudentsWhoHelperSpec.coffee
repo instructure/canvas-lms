@@ -8,12 +8,12 @@ define [
       @assignment = { id: '1', name: 'Shootbags'}
 
   test "Includes the 'Haven't been graded' option if there are submissions", ->
-    @stub(MessageStudentsWhoHelper, 'hasSubmission', -> true)
+    @stub(MessageStudentsWhoHelper, 'hasSubmission').returns(true)
     options = MessageStudentsWhoHelper.options(@assignment)
     deepEqual options[1].text, "Haven't been graded"
 
   test "Does not include the 'Haven't been graded' option if there are no submissions", ->
-    @stub(MessageStudentsWhoHelper, 'hasSubmission', -> false)
+    @stub(MessageStudentsWhoHelper, 'hasSubmission').returns(false)
     options = MessageStudentsWhoHelper.options(@assignment)
     deepEqual options[1].text, "Scored less than"
 
@@ -79,7 +79,7 @@ define [
 
   test "returns the student ids filtered by the correct criteria", ->
     option = { criteriaFn: (student, cutoff) -> student.score > cutoff }
-    @stub(MessageStudentsWhoHelper, 'findOptionByText', -> option)
+    @stub(MessageStudentsWhoHelper, 'findOptionByText').returns(option)
     students = [{ user_data: { id: '1', score: 8 } }, { user_data: { id: '2', score: 4 } }]
     cutoff = 5
     selected = "Scored more than"
@@ -92,7 +92,7 @@ define [
 
   test "generates a function that returns the subject string", ->
     option = { subjectFn: (assignment, cutoff) -> 'name: ' + assignment.name + ', cutoff: ' + cutoff }
-    @stub(MessageStudentsWhoHelper, 'findOptionByText', -> option)
+    @stub(MessageStudentsWhoHelper, 'findOptionByText').returns(option)
     assignment = { id: '1', name: 'Shootbags' }
     cutoff = 5
     subjectCallbackFn = MessageStudentsWhoHelper.generateSubjectCallbackFn(assignment)

@@ -21,7 +21,7 @@ define [
       }
       @store_state = {}
       @store_state[@progress_id] = @progress
-      @storeSpy = sinon.stub(ProgressStore, 'get', (=>
+      @storeSpy = sinon.stub(ProgressStore, 'get').callsFake((=>
         ProgressStore.setState(@store_state)
       ))
       @clock = sinon.useFakeTimers()

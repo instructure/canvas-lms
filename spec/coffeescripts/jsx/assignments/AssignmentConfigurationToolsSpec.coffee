@@ -75,7 +75,7 @@ define [
             'title': 'Redirect Tool'
         }
       ]
-      @stub($, 'ajax', -> {status: 200, data: toolDefinitions})
+      @stub($, 'ajax').returns({status: 200, data: toolDefinitions})
 
     teardown: ->
       wrapper.innerHTML = ''

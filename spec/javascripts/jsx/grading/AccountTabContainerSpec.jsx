@@ -30,7 +30,7 @@ define([
       const response = {};
       const successPromise = new Promise(resolve => resolve(response));
       this.stub(axios, 'get').returns(successPromise);
-      this.stub($, 'ajax', () => ({ done: () => {} }));
+      this.stub($, 'ajax').returns({ done () {} });
     },
 
     teardown () {

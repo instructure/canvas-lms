@@ -28,7 +28,7 @@ define [
         image: null,
         imagesEnabled: false
       }
-      @stub(CourseActivitySummaryStore, 'getStateForCourse', -> {})
+      @stub(CourseActivitySummaryStore, 'getStateForCourse').returns({})
 
     teardown: ->
       localStorage.clear()

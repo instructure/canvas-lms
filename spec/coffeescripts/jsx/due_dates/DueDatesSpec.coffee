@@ -236,9 +236,9 @@ define [
           sections: ["8"]
           group_ids: []
 
-      @stub(OverrideStudentStore, 'getStudents', -> students)
-      @stub(OverrideStudentStore, 'currentlySearching', -> false)
-      @stub(OverrideStudentStore, 'allStudentsFetched', -> true)
+      @stub(OverrideStudentStore, 'getStudents').returns(students)
+      @stub(OverrideStudentStore, 'currentlySearching').returns(false)
+      @stub(OverrideStudentStore, 'allStudentsFetched').returns(true)
 
       props =
         overrides: overrides
