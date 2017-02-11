@@ -163,25 +163,28 @@ describe Api::V1::SisAssignment do
 
     context "add_assignment_user_overrides_json" do
       before do
-        @student1 = student_in_course({:course => assignment_1.course, :workflow_state => 'active'}).user
-        @student2 = student_in_course({:course => assignment_1.course, :workflow_state => 'active'}).user
+        course = assignment_1.course
+        @student1 = student_in_course(course: course, workflow_state: 'active').user
+        @student2 = student_in_course(course: course, workflow_state: 'active').user
+        managed_pseudonym(@student2, sis_user_id: 'SIS_ID_2')
+
         due_at = Time.zone.parse('2017-02-08 22:11:10')
         @override = create_adhoc_override_for_assignment(assignment_1, [@student1, @student2], due_at: due_at)
       end
 
       it "adds student assignment override information" do
-        assignment_1.active_assignment_overrides.reload
-        assignment_1.active_assignment_overrides.each { |ao| ao.assignment_override_students.reload }
+        assignments = Assignment.where(id: assignment_1.id).
+          preload(active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]])
 
-        result = generator.sis_assignments_json([assignment_1])
+        result = generator.sis_assignments_json(assignments)
 
         user_overrides = result[0]["user_overrides"]
         expect(user_overrides.size).to eq 1
         expect(user_overrides.first).to include({"id" => @override.id, "due_at": @override.due_at})
 
         students = user_overrides.first["students"]
-        expect(students).to include({"user_id" => @student1.id})
-        expect(students).to include({"user_id" => @student1.id})
+        expect(students).to include({"user_id" => @student1.id, 'sis_user_id' => nil})
+        expect(students).to include({"user_id" => @student2.id, 'sis_user_id' => 'SIS_ID_2'})
         expect(students.size).to eq 2
       end
 
@@ -196,6 +199,22 @@ describe Api::V1::SisAssignment do
         assignment_1.active_assignment_overrides.reload
 
         expect(generator.sis_assignments_json([assignment_1])[0]).not_to have_key('user_overrides')
+      end
+
+      it "does not list student sis_ids when users are not preloaded" do
+        assignments = Assignment.where(id: assignment_1.id).
+          preload(active_assignment_overrides: [:assignment_override_students])
+
+        user_overrides = generator.sis_assignments_json(assignments)[0]['user_overrides']
+        expect(user_overrides.first['students'].first).not_to have_key('sis_user_id')
+      end
+
+      it "does not list student sis_ids when pseudonyms are not preloaded" do
+        assignments = Assignment.where(id: assignment_1.id).
+          preload(active_assignment_overrides: [assignment_override_students: [:user]])
+
+        user_overrides = generator.sis_assignments_json(assignments)[0]['user_overrides']
+        expect(user_overrides.first['students'].first).not_to have_key('sis_user_id')
       end
     end
 

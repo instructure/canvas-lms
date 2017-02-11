@@ -49,6 +49,7 @@ describe SisApiController do
         before do
           @student1 = student_in_course({:course => course, :workflow_state => 'active'}).user
           @student2 = student_in_course({:course => course, :workflow_state => 'active'}).user
+          managed_pseudonym(@student2, sis_user_id: 'SIS_ID_2')
           due_at = Time.zone.parse('2017-02-08 22:11:10')
           @override = create_adhoc_override_for_assignment(assignment, [@student1, @student2], due_at: due_at)
         end
@@ -60,12 +61,17 @@ describe SisApiController do
           expect(parsed_json.first).not_to have_key('user_overrides')
         end
 
-        it 'does includes student overrides by including student_overrides' do
+        it 'does includes student override data by including student_overrides' do
           get 'sis_assignments', course_id: course.id, include: ['student_overrides']
 
           parsed_json = json_parse(response.body)
           expect(parsed_json.first['user_overrides'].size).to eq 1
           expect(parsed_json.first['user_overrides'].first['id']).to eq @override.id
+
+          students = parsed_json.first['user_overrides'].first['students']
+          expect(students.size).to eq 2
+          expect(students).to include({'user_id' => @student1.id, 'sis_user_id' => nil})
+          expect(students).to include({'user_id' => @student2.id, 'sis_user_id' => 'SIS_ID_2'})
         end
       end
     end

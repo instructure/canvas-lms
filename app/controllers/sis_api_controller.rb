@@ -98,9 +98,11 @@ class SisApiController < ApplicationController
   #           "students": [
   #             {
   #               "user_id": 643194
+  #               "sis_user_id": SIS_123
   #             },
   #             {
   #               "user_id": 643195
+  #               "sis_user_id": SIS_456
   #             }
   #           ]
   #         }
@@ -159,7 +161,9 @@ class SisApiController < ApplicationController
       preload(context: { active_course_sections: [:nonxlist_course] })
 
     if params[:include].to_a.include? 'student_overrides'
-      assignments = assignments.preload(active_assignment_overrides: [:assignment_override_students])
+      assignments = assignments.preload(
+        active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]]
+      )
     else
       assignments = assignments.preload(:active_assignment_overrides)
     end
