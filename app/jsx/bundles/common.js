@@ -56,6 +56,8 @@ import 'jqueryui/tabs'
 import 'compiled/registration/incompleteRegistrationWarning'
 import 'moment'
 
+$('html').removeClass('scripts-not-loaded')
+
 $('.help_dialog_trigger').click((event) => {
   event.preventDefault()
   require.ensure([], (require) => {
