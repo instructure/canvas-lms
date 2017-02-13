@@ -310,7 +310,10 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     view = @editView({ withAssignment: true })
     _.defer =>
       view.$discussionEditView.tabs('option', 'active', 0)
-      view.showErrors({ foo: 'bar', conditional_release: 'bat' })
+      view.showErrors({
+        foo: {type: 'bar'},
+        conditional_release: {type: 'bat'}
+      })
       equal 1, view.$discussionEditView.tabs('option', 'active')
       resolved()
 
@@ -319,6 +322,9 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     view = @editView({ withAssignment: true })
     _.defer =>
       view.$discussionEditView.tabs('option', 'active', 1)
-      view.showErrors({ foo: 'bar', baz: 'bat' })
+      view.showErrors({
+        foo: {type: 'bar'},
+        baz: {type: 'bat'}
+      })
       equal 0, view.$discussionEditView.tabs('option', 'active')
       resolved()

@@ -596,7 +596,7 @@ define [
   test 'focuses in conditional release editor if conditional save validation fails', ->
     view = @editView()
     focusOnError = @stub(view.conditionalReleaseEditor, 'focusOnError')
-    view.showErrors({ conditional_release: 'foo' })
+    view.showErrors({ conditional_release: {type:'foo'} })
     ok focusOnError.called
 
   QUnit.module 'Editview: Intra-Group Peer Review toggle',
