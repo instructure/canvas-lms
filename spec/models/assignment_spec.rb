@@ -3435,6 +3435,55 @@ describe Assignment do
     end
   end
 
+  describe "validate_assignment_overrides_due_date" do
+    let(:section_1) { @course.course_sections.create!(name: "section 1") }
+    let(:section_2) { @course.course_sections.create!(name: "section 2") }
+
+    let(:assignment) do
+      @course.assignments.create!(assignment_valid_attributes)
+    end
+
+    describe "when an override has no due date" do
+      before do
+        # Create an override with a due date
+        create_section_override_for_assignment(assignment, course_section: section_1)
+
+        # Create an override without a due date
+        override = create_section_override_for_assignment(assignment, course_section: section_2)
+        override.due_at = nil
+        override.save
+      end
+
+      it "is not valid when AssignmentUtil.due_date_required? is true" do
+        AssignmentUtil.stubs(:due_date_required?).returns(true)
+        expect(assignment.valid?).to eq(false)
+      end
+
+      it "is valid when AssignmentUtil.due_date_required? is false" do
+        AssignmentUtil.stubs(:due_date_required?).returns(false)
+        expect(assignment.valid?).to eq(true)
+      end
+    end
+
+    describe "when all overrides have a due date" do
+      before do
+        # Create 2 overrides with due dates
+        create_section_override_for_assignment(assignment, course_section: section_1)
+        create_section_override_for_assignment(assignment, course_section: section_2)
+      end
+
+      it "is valid when AssignmentUtil.due_date_required? is true and " do
+        AssignmentUtil.stubs(:due_date_required?).returns(true)
+        expect(assignment.valid?).to eq(true)
+      end
+
+      it "is valid when AssignmentUtil.due_date_required? is false" do
+        AssignmentUtil.stubs(:due_date_required?).returns(false)
+        expect(assignment.valid?).to eq(true)
+      end
+    end
+  end
+
   describe "due_date_required?" do
     let(:assignment) do
       @course.assignments.create!(assignment_valid_attributes)
