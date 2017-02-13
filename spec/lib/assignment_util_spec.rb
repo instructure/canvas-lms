@@ -72,6 +72,13 @@ describe AssignmentUtil do
     end
   end
 
+  describe "assignment_max_name_length" do
+    it "returns 15 when the account setting sis_assignment_name_length_input is 15" do
+      assignment.context.account.stubs(:sis_assignment_name_length_input).returns({value: 15})
+      expect(described_class.assignment_max_name_length(assignment)).to eq(15)
+    end
+  end
+
   describe "due_date_ok?" do
     it "returns false when due_at is blank and due_date_required? is true" do
       assignment.due_at = nil
