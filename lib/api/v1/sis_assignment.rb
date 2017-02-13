@@ -19,6 +19,9 @@
 module Api::V1::SisAssignment
   include Api::V1::Json
 
+  class UnloadedAssociationError < StandardError
+  end
+
   API_SIS_ASSIGNMENT_JSON_OPTS = {
     only: %i(id created_at due_at unlock_at lock_at points_possible integration_id integration_data include_in_final_grade).freeze,
     methods: %i(name submission_types_array).freeze
@@ -44,20 +47,21 @@ module Api::V1::SisAssignment
       only: %i(user_id).freeze
   }.freeze
 
-  def sis_assignments_json(assignments)
-    assignments.map { |a| sis_assignment_json(a) }
+  def sis_assignments_json(assignments, includes = {})
+    assignments.map { |a| sis_assignment_json(a, includes) }
   end
 
   private
 
-  def sis_assignment_json(assignment)
+  def sis_assignment_json(assignment, includes)
     json = api_json(assignment, nil, nil, API_SIS_ASSIGNMENT_JSON_OPTS)
     json[:course_id] = assignment.context_id if assignment.context_type == 'Course'
     json[:submission_types] = json.delete(:submission_types_array)
     json[:include_in_final_grade] = include_in_final_grade(assignment)
     add_sis_assignment_group_json(assignment, json)
     add_sis_course_sections_json(assignment, json)
-    add_assignment_user_overrides_json(assignment, json)
+
+    json[:user_overrides] = assignment_user_overrides_json(assignment) if includes[:student_overrides]
     json
   end
 
@@ -77,17 +81,14 @@ module Api::V1::SisAssignment
     json.merge!(sections: sis_assignment_course_sections_json(course_sections, assignment))
   end
 
-  def add_assignment_user_overrides_json(assignment, json)
-    overrides = active_assignment_overrides_for(assignment) || []
-    return if overrides.empty?
-
-    user_overrides_json = overrides.map {|o| assignment_user_override_json(o)}.compact
-
-    json.merge!(user_overrides: user_overrides_json) unless user_overrides_json.empty?
+  def assignment_user_overrides_json(assignment)
+    overrides = active_assignment_overrides_for(assignment)
+    raise UnloadedAssociationError if overrides.nil?
+    overrides.map {|o| assignment_user_override_json(o)}.compact
   end
 
   def assignment_user_override_json(override)
-    return nil unless override.association(:assignment_override_students).loaded?
+    raise UnloadedAssociationError unless override.association(:assignment_override_students).loaded?
     return nil if override.assignment_override_students.empty?
 
     assignment_override_students_json = override.assignment_override_students.map do |student_override|

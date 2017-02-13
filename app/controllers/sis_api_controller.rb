@@ -114,7 +114,9 @@ class SisApiController < ApplicationController
   #   ]
   #
   def sis_assignments
-    render json: sis_assignments_json(paginated_assignments)
+    includes = {}
+    includes[:student_overrides] = include_student_overrides?
+    render json: sis_assignments_json(paginated_assignments, includes)
   end
 
   private
@@ -153,6 +155,10 @@ class SisApiController < ApplicationController
     end
   end
 
+  def include_student_overrides?
+    params[:include].to_a.include?('student_overrides')
+  end
+
   def published_assignments
     assignments = Assignment.published.
       where(post_to_sis: true).
@@ -160,7 +166,7 @@ class SisApiController < ApplicationController
       preload(:assignment_group).
       preload(context: { active_course_sections: [:nonxlist_course] })
 
-    if params[:include].to_a.include? 'student_overrides'
+    if include_student_overrides?
       assignments = assignments.preload(
         active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]]
       )
