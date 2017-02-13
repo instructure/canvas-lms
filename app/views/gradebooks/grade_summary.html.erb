@@ -135,6 +135,7 @@
 <% end %>
 
 <div id="assignments">
+  <span id="aria-announcer" class="hide-text affix" aria-live="polite" aria-relevant="additions"></span>
 <table style="width: 100%;" id="grades_summary" class="<%= 'editable' if @presenter.editable? %>">
   <% if @presenter.editable? %>
     <caption class="screenreader-only"><%= whatif_instructions %></caption>
