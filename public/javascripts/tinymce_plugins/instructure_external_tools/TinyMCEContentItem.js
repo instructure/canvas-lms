@@ -60,7 +60,7 @@ define(['jquery'], function ($){
     },
 
     link: function (tinyMCEContentItem) {
-      var editorSelection = window.tinyMCE.activeEditor.contentDocument.getSelection();
+      var editorSelection = window.tinyMCE && window.tinyMCE.activeEditor && window.tinyMCE.activeEditor.contentDocument.getSelection();
       var selectedText = editorSelection && editorSelection.anchorNode && editorSelection.anchorNode.data;
 
       var $linkContainer = $("<div/>"),
