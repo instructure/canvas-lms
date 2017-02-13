@@ -216,8 +216,8 @@ define [
         if !endDate
           startDate.locale(calendarDefaults.lang)
           timeString = startDate.format("LT")
-	else
-	  timeString = "All Day"
+        else
+          timeString = "All Day"
       else
         startDate.locale(calendarDefaults.lang)
         endDate.locale(calendarDefaults.lang)
