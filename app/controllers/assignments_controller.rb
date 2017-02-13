@@ -395,7 +395,13 @@ class AssignmentsController < ApplicationController
       @assignment.submission_types = params[:submission_types] if params[:submission_types]
       @assignment.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
       @assignment.ensure_assignment_group(false)
-      @assignment.post_to_sis = params[:post_to_sis] if params[:post_to_sis]
+
+      if params.key?(:post_to_sis)
+        @assignment.post_to_sis = value_to_boolean(params[:post_to_sis])
+      elsif @assignment.new_record?
+        @assignment.post_to_sis = @context.account.sis_default_grade_export[:value]
+      end
+
       if @assignment.submission_types == 'online_quiz' && @assignment.quiz
         return redirect_to edit_course_quiz_url(@context, @assignment.quiz, index_edit_params)
       elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic
