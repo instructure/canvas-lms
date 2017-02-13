@@ -1,4 +1,4 @@
-define ['jquery', 'underscore'], ($, _) ->
+define ['jquery', 'underscore', 'axe-core'], ($, _, axe) ->
 
   isVisible: ($el, message = '') ->
     ok $el.length, "elements found"

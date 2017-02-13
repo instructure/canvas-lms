@@ -18,7 +18,6 @@ console.log('using webpack?', usingWebpack)
 let karmaFiles
 if (usingWebpack) {
   karmaFiles = [
-    'node_modules/axe-core/axe.js',
     {pattern: 'spec/javascripts/webpack/*.bundle.test.js', included: true, served: true},
     {pattern: 'spec/javascripts/webpack/*.chunk*.js', included: false, served: true},
     {pattern: 'spec/javascripts/fixtures/*', included: false, served: true},
@@ -31,7 +30,6 @@ if (usingWebpack) {
     'public/javascripts/vendor/require.js',
     'node_modules/karma-requirejs/lib/adapter.js',
     'spec/javascripts/support/sinon/sinon-qunit-1.0.0.js',
-    'node_modules/axe-core/axe.js',
     {pattern: 'public/javascripts/*.js', included: false, served: true},
     {pattern: 'spec/javascripts/fixtures/*.html', included: false, served: true},
     {pattern: 'spec/javascripts/compiled/*.js', included: false, served: true},

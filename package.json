@@ -16,7 +16,7 @@
   "devDependencies": "the first group is all the things our build tooling needs",
   "devDependencies": "the second group is the client-side stuff we send to browsers",
   "devDependencies": {
-    "axe-core": "1.1.1",
+    "axe-core": "2.1.7",
     "babel-cli": "^6.10.1",
     "babel-core": "^6.10.4",
     "babel-eslint": "^7.1.0",
