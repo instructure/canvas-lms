@@ -25,29 +25,11 @@ describe 'CreateContextExternalToolPlacements' do
       expect(tool1_old.has_course_navigation).to eq true
 
       migration1.up
-
-      # make sure the triggers work while they need to
-      # on update to false
-      ContextExternalTool.connection.execute("UPDATE #{ContextExternalTool.quoted_table_name} SET has_course_navigation = 'f' WHERE id = #{tool1.id}")
-
-      # on update to true
-      ContextExternalTool.connection.execute("UPDATE #{ContextExternalTool.quoted_table_name} SET has_account_navigation = 't' WHERE id = #{tool1.id}")
-      # and on re-update to true
-      ContextExternalTool.connection.execute("UPDATE #{ContextExternalTool.quoted_table_name} SET has_account_navigation = 't' WHERE id = #{tool1.id}")
-
-      # on insert
-      ContextExternalTool.connection.execute("INSERT INTO #{ContextExternalTool.quoted_table_name}(
-        context_id, context_type, workflow_state, name, shared_secret, consumer_key, created_at, updated_at, has_user_navigation)
-        VALUES(#{@course.id}, 'Course', 'active', '', '', '', '2014-07-07', '2014-07-07', 't')")
-
       migration2.up
       ContextExternalTool.reset_column_information
       tool1.reload
-      expect(tool1.has_placement?(:course_navigation)).to eq false
-      expect(tool1.has_placement?(:account_navigation)).to eq true
-
-      tool2 = @course.context_external_tools.detect{|t| t.id != tool1.id}
-      expect(tool2.has_placement?(:user_navigation)).to eq true
+      expect(tool1.has_placement?(:course_navigation)).to eq true
+      expect(tool1.has_placement?(:account_navigation)).to eq false
     end
   end
 end

@@ -24,7 +24,6 @@ describe 'AddContextToContentExports' do
     it "should populate all content exports with course context type and context id" do
       skip("PostgreSQL specific") unless ContentExport.connection.adapter_name == 'PostgreSQL'
       course1 = course_factory
-      course2 = course_factory
 
       RemoveCourseIdFromContentExports.down
       AddContextToContentExports.down
@@ -32,15 +31,11 @@ describe 'AddContextToContentExports' do
       ContentExport.connection.execute "INSERT INTO #{ContentExport.quoted_table_name}(course_id, workflow_state, created_at, updated_at) VALUES(#{course1.id}, '', '2014-07-07', '2014-07-07')"
 
       AddContextToContentExports.up
-      ContentExport.connection.execute "INSERT INTO #{ContentExport.quoted_table_name}(course_id, workflow_state, created_at, updated_at) VALUES(#{course2.id}, '', '2014-07-07', '2014-07-07')"
       RemoveCourseIdFromContentExports.up
 
       ce1 = course1.content_exports.first
-      ce2 = course2.content_exports.first
       expect(ce1.context_type).to eq 'Course'
       ce1.context_id = course1.id
-      expect(ce2.context_type).to eq 'Course'
-      expect(ce2.context_id).to eq course2.id
     end
   end
 end
