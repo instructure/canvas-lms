@@ -26,7 +26,7 @@ define([
 ], ($) => {
   const $questionContent = {bind () {}}
 
-  module('isChangeMultiFuncBound', {
+  QUnit.module('isChangeMultiFuncBound', {
     setup () {
       this.sandb = this.sandbox.create();
       this.sandb.stub($, '_data');
@@ -74,7 +74,7 @@ define([
   });
 
   let sandbx;
-  module('rebindMultiChange', {
+  QUnit.module('rebindMultiChange', {
     setup () {
       sandbx = this.sandbox.create();
       this.sandb = this.sandbox.create();
