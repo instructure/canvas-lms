@@ -72,7 +72,7 @@ describe 'Gradezilla omit from final grade assignments' do
     end
 
     it 'displays triangle warning' do
-      expect(f(".slick-header-column[title='Also not for final grade'] i")).to have_class('icon-warning')
+      expect(ff('.Gradebook__ColumnHeaderDetail svg[aria-labelledby^="IconWarningSolid"]').size).to eq(1)
     end
 
     it 'does not include omitted assignment in final' do

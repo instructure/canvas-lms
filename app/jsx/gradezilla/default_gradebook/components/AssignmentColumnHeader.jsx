@@ -104,7 +104,7 @@ define([
         assignmentTitle = I18n.t('This assignment does not count toward the final grade');
         assignmentIcon = AssignmentColumnHeader.renderWarningIcon(assignmentTitle);
       } else if (assignment.invalid) {
-        assignmentTitle = I18n.t('Assignments in this group have no points possible and cannot be included in grade calculation');
+        assignmentTitle = I18n.t('This assignment has no points possible and cannot be included in grade calculation');
         assignmentIcon = AssignmentColumnHeader.renderWarningIcon(assignmentTitle);
       }
 

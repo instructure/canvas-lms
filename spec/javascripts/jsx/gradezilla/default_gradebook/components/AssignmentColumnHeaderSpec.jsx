@@ -210,7 +210,7 @@ define([
 
     const actualLinkElements = this.renderOutput.find('.assignment-name Link');
     const actualIconElements = actualLinkElements.find('IconWarningSolid');
-    const expectedLinkTitle = 'Assignments in this group have no points possible and cannot be included in grade calculation';
+    const expectedLinkTitle = 'This assignment has no points possible and cannot be included in grade calculation';
 
     equal(actualLinkElements.length, 1);
     deepEqual(actualLinkElements.props().title, expectedLinkTitle);

@@ -59,9 +59,9 @@ describe "Gradezilla - arrange by due date" do
     f("a[data-arrange-columns-by='due_date']").click
     # since due date changes in assignments don't reflect in column sorting without a refresh
     gradezilla_page.visit(@course)
-    expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(1)')).to include_text(assignment3.title)
-    expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(2)')).to include_text(assignment2.title)
-    expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(3)')).to include_text(@assignment.title)
+    expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(1)')).to include_text(assignment3.title)
+    expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(2)')).to include_text(assignment2.title)
+    expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(3)')).to include_text(@assignment.title)
   end
 
   it "should arrange columns by due date when multiple due dates are present", priority: "2", test_id: 378823 do
@@ -78,7 +78,8 @@ describe "Gradezilla - arrange by due date" do
 
     f('#gradebook_settings').click
     f("a[data-arrange-columns-by='due_date']").click
-    expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(1)')).to include_text(assignment3.title)
-    expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(2)')).to include_text(@assignment.title)
+
+    expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(1)')).to include_text(assignment3.title)
+    expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(2)')).to include_text(@assignment.title)
   end
 end

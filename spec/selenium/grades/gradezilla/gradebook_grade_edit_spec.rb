@@ -121,6 +121,7 @@ describe "Gradezilla editing grades" do
   end
 
   it "should not update default grades for users not in this section", priority: "1", test_id: 220314 do
+    pending('TODO: Refactor this and add it back as part of CNVS-35020')
     # create new user and section
 
     gradezilla_page.visit(@course)
@@ -173,6 +174,7 @@ describe "Gradezilla editing grades" do
   end
 
   it "should validate curving grades option", priority: "1", test_id: 220320 do
+    pending('TODO: Refactor this and add it back as part of CNVS-35021')
     skip_if_chrome('issue with set_value')
     curved_grade_text = "8"
 
@@ -188,6 +190,7 @@ describe "Gradezilla editing grades" do
   end
 
   it "should optionally assign zeroes to unsubmitted assignments during curving", priority: "1", test_id: 220321 do
+    pending('TODO: Refactor this and add it back as part of CNVS-35021')
     gradezilla_page.visit(@course)
 
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', '')
@@ -214,6 +217,7 @@ describe "Gradezilla editing grades" do
   end
 
   it "should validate setting default grade for an assignment", priority: "1", test_id: 220383 do
+    pending('TODO: Refactor this and add it back as part of CNVS-35020')
     expected_grade = "45"
     gradezilla_page.visit(@course)
     set_default_grade(2, expected_grade)
