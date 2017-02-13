@@ -372,15 +372,16 @@ class DiscussionTopicsController < ApplicationController
         end
       end
       format.json do
-        check_for_restrictions = master_courses? && @context.grants_right?(@current_user, session, :moderate_forum)
-        MasterCourses::Restrictor.preload_restrictions(@topics) if check_for_restrictions
+        if @context.grants_right?(@current_user, session, :moderate_forum)
+          mc_status = setup_master_course_restrictions(@topics, @context)
+        end
 
         render json: discussion_topics_api_json(@topics, @context, @current_user, session,
           user_can_moderate: user_can_moderate,
           plain_messages: value_to_boolean(params[:plain_messages]),
           exclude_assignment_description: value_to_boolean(params[:exclude_assignment_descriptions]),
           include_all_dates: include_params.include?('all_dates'),
-          include_master_course_restrictions: check_for_restrictions
+          master_course_status: mc_status
         )
       end
     end

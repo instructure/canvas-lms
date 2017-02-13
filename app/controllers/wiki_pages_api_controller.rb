@@ -251,9 +251,10 @@ class WikiPagesApiController < ApplicationController
 
       wiki_pages = Api.paginate(scope, self, pages_route)
 
-      check_for_restrictions = master_courses? && @context.wiki.grants_right?(@current_user, :manage)
-      MasterCourses::Restrictor.preload_restrictions(wiki_pages) if check_for_restrictions
-      render :json => wiki_pages_json(wiki_pages, @current_user, session, :include_master_course_restrictions => check_for_restrictions)
+      if @context.wiki.grants_right?(@current_user, :manage)
+        mc_status = setup_master_course_restrictions(wiki_pages, @context)
+      end
+      render :json => wiki_pages_json(wiki_pages, @current_user, session, :master_course_status => mc_status)
     end
   end
 

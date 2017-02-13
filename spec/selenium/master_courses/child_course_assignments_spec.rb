@@ -13,6 +13,7 @@ describe "master courses - child courses - assignment locking" do
 
     course_with_teacher(:active_all => true)
     @copy_to = @course
+    @template.add_child_course!(@copy_to)
     @assmt_copy = @copy_to.assignments.new(:title => "blah", :description => "bloo") # just create a copy directly instead of doing a real migration
     @assmt_copy.migration_id = @tag.migration_id
     @assmt_copy.save!

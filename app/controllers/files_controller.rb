@@ -291,6 +291,7 @@ class FilesController < ApplicationController
       @files = Api.paginate(scope, self, url)
       render json: attachments_json(@files, @current_user, {}, {
         can_view_hidden_files: can_view_hidden_files?(@context || @folder, @current_user, session),
+        context: @context || @folder.context,
         include: params[:include],
         only: params[:only],
         omit_verifier_in_app: !value_to_boolean(params[:use_verifiers])

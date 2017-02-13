@@ -49,8 +49,8 @@ module Api::V1::WikiPage
       hash['body'] = api_user_content(wiki_page.body)
       wiki_page.increment_view_count(current_user, wiki_page.context)
     end
-    if opts[:include_master_course_restrictions]
-      hash.merge!(wiki_page.master_course_api_restriction_data)
+    if opts[:master_course_status]
+      hash.merge!(wiki_page.master_course_api_restriction_data(opts[:master_course_status]))
     end
     hash
   end

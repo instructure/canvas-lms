@@ -53,10 +53,8 @@ module Api::V1::Quiz
 
   def quizzes_json(quizzes, context, user, session, options={})
     options[:description_formatter] = description_formatter(context, user)
-    check_for_restrictions = master_courses? && context.grants_right?(user, session, :manage_assignments)
-    if check_for_restrictions
-      MasterCourses::Restrictor.preload_restrictions(quizzes)
-      options[:include_master_course_restrictions] = true
+    if context.grants_right?(user, session, :manage_assignments)
+      options[:master_course_status] = setup_master_course_restrictions(quizzes, context)
     end
 
     quizzes.map do |quiz|
