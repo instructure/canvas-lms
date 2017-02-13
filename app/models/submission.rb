@@ -561,7 +561,6 @@ class Submission < ActiveRecord::Base
       }
     end
     ret_val = turnitin_data.merge(data)
-    ret_val.delete(:provider)
     ret_val
   end
 
