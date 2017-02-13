@@ -136,6 +136,20 @@ define [
     ok errors
     equal _.keys(errors).length, 1
 
+  test 'it should not allow NaN values for group weight', ->
+    view = createView()
+    assignments = view.assignmentGroup.get('assignments')
+
+    data =
+      name: "Assignments"
+      drop_highest: "0"
+      drop_lowest: "0"
+      group_weight: "the weighting is the hardest part"
+
+    errors = view.validateFormData(data)
+    ok errors
+    equal _.keys(errors).length, 1
+
   test 'it should trigger a render event on save success when editing', ->
     triggerSpy = @spy(AssignmentGroupCollection::, 'trigger')
     view = createView()
