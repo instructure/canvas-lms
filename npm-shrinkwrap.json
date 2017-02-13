@@ -86,7 +86,7 @@
         },
         "js-yaml": {
           "version": "3.5.5",
-          "from": "js-yaml>=3.5.5 <4.0.0",
+          "from": "js-yaml>=3.5.5 <3.7.1",
           "resolved": "https://registry.npmjs.org/js-yaml/-/js-yaml-3.5.5.tgz"
         },
         "lodash": {
