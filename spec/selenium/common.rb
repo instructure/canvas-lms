@@ -189,17 +189,4 @@ shared_context "in-process server selenium tests" do
       SeleniumDriverSetup.disallow_requests!
     end
   end
-
-  def record_spec_info(example)
-    Rails.logger.capture_messages do
-      begin
-        SeleniumDriverSetup.start_capturing_video
-        yield
-      ensure
-        exception = $ERROR_INFO || example.exception
-        SeleniumDriverSetup.note_recent_spec_run(example, exception)
-        SeleniumDriverSetup.record_errors(example, exception, Rails.logger.captured_messages)
-      end
-    end
-  end
 end

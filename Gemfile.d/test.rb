@@ -47,6 +47,6 @@ group :test do
   gem 'timecop', '0.8.1'
   gem 'jira_ref_parser', '1.0.1'
   gem 'headless', '2.3.1', require: false
-  gem 'escape_code', '0.2'
+  gem 'escape_code', '0.2', require: false
   gem 'hashdiff', '0.3.2'
 end

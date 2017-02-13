@@ -344,17 +344,10 @@ RSpec.configure do |config|
   config.project_source_dirs << "gems" # so that failures here are reported properly
 
   config.around(:each) do |example|
-    record_spec_info(example) do
-      Rails.logger.info "STARTING SPEC #{example.full_description}"
-      SpecTimeLimit.enforce(example) do
-        example.run
-      end
+    Rails.logger.info "STARTING SPEC #{example.full_description}"
+    SpecTimeLimit.enforce(example) do
+      example.run
     end
-  end
-
-  # TODO: spec failure pages for everything, not just selenium
-  def record_spec_info(*)
-    yield
   end
 
   def reset_all_the_things!

@@ -3,8 +3,10 @@
 set -e
 
 export TEST_QUEUE_REPLACE_STATS=1
+export ERROR_CONTEXT_BASE_PATH="`pwd`/log/spec_failures/Initial"
 
 max_failures=${RERUNS:=200}
+rerun_number=0
 runs_remaining=$((1+${RERUNS_RETRY:=3}))
 spec_list=${SPEC_FILES:=spec}
 
@@ -61,11 +63,13 @@ while true; do
   failed_relevant_spec_list=($(echo "${failed_relevant_spec_list[@]}"|tr ' ' '\n'|sort -u|tr '\n' ' '))
   failures_exempt_from_rerun_threshold=$(echo "${exempt_spec_list[@]}"|tr ' ' '\n'|grep .|sort -u|wc -l)
 
+  rerun_number=$((rerun_number+1))
   runs_remaining=$((runs_remaining-1))
   num_failures=${#new_spec_list[@]}
 
   [[ $last_status == 0 ]] && break
   [[ $runs_remaining == 0 ]] && { echo "reruns failed $num_failures failure(s)"; break; }
+  export ERROR_CONTEXT_BASE_PATH="`pwd`/log/spec_failures/Rerun $rerun_number"
 
   failures_towards_rerun_threshold=$((num_failures-failures_exempt_from_rerun_threshold))
   if [[ failures_towards_rerun_threshold -gt $max_failures ]]; then
