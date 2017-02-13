@@ -36,10 +36,6 @@
           </div>
         </div>
       <% end %>
-      <div class="edit_term edit_term_buttons">
-        <button class="btn button-secondary cancel_button" type="button"><%= t '#buttons.cancel', "Cancel" %></button>
-        <button class="btn btn-primary submit_button" type="submit"><%= term ? t('buttons.update', "Update Term") : t('buttons.add', "Add Term") %></button>
-      </div>
     <% end %>
   </td>
   <% types = [StudentEnrollment, TeacherEnrollment, TaEnrollment, DesignerEnrollment] %>
@@ -91,6 +87,15 @@
                                                         :date_class_prefix => "#{type_string}_", :whenever => [start_whenever, false] } %>
       </tr>
     <% end %>
+    <tr class="edit-buttons">
+      <td></td>
+      <td></td>
+      <td></td>
+      <td class="edit_term edit_term_buttons">
+        <button class="btn button-secondary cancel_button" type="button"><%= t '#buttons.cancel', "Cancel" %></button>
+        <button class="btn btn-primary submit_button" type="button"><%= term ? t('buttons.update', "Update Term") : t('buttons.add', "Add Term") %></button>
+      </td>
+    </tr>
     </table>
   </td>
   <td class="links">
