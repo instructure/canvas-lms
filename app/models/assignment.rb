@@ -80,6 +80,7 @@ class Assignment < ActiveRecord::Base
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
   validate :due_date_ok?
+  validate :assignment_overrides_due_date_ok?
   validate :discussion_group_ok?
   validate :positive_points_possible?
   validate :moderation_setting_ok?
@@ -291,6 +292,7 @@ class Assignment < ActiveRecord::Base
               :update_submissions_if_details_changed,
               :maintain_group_category_attribute,
               :validate_assignment_overrides
+
 
   after_save  :update_grades_if_details_changed,
               :touch_assignment_group,
@@ -2333,6 +2335,14 @@ class Assignment < ActiveRecord::Base
   def due_date_ok?
     unless AssignmentUtil.due_date_ok?(self)
       errors.add(:due_at, I18n.t("due_at", "cannot be blank when Post to Sis is checked"))
+    end
+  end
+
+  def assignment_overrides_due_date_ok?
+    if AssignmentUtil.due_date_required?(self)
+      if active_assignment_overrides.where(due_at: nil).count > 0
+        errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
+      end
     end
   end
 
