@@ -10,12 +10,22 @@ module Lti
     end
 
     def resource_url
-      @post_only ? @resource_url.split('?').first : @resource_url
+      begin
+        url = URI(@resource_url)
+
+        if ['http', 'https'].include?(url.scheme)
+          @post_only ? @resource_url.split('?').first : @resource_url
+        else
+          'about:blank'
+        end
+      rescue
+        'about:blank'
+      end
     end
 
     def resource_path
       url = URI.parse(resource_url)
-      url.path.empty? ? '/' : url.path
+      url.path.blank? ? '/' : url.path
     end
 
     def analytics_id
