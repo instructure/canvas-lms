@@ -11,6 +11,10 @@ define([
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function (round, I18n, numberHelper, $) {
+  function roundedNumber (val) {
+    return I18n.n(round(val, round.DEFAULT));
+  }
+
   $(document).ready(function() {
     $(".add_standard_link").click(function(event) {
       event.preventDefault();
@@ -157,8 +161,8 @@ define([
               for(var jdx = 0; jdx < standard.data.length; jdx++) {
                 var row = {
                   name: standard.data[jdx][0],
-                  value: jdx != 0 ? '< ' + round((standard.data[jdx - 1][1] * 100), 2) : 100,
-                  next_value: round((standard.data[jdx][1] * 100), 2)
+                  value: jdx === 0 ? roundedNumber(100) : '< ' + roundedNumber(standard.data[jdx - 1][1] * 100),
+                  next_value: roundedNumber(standard.data[jdx][1] * 100)
                 };
                 var $row = $standard.find(".details_row.blank:first").clone(true);
                 $row.removeClass('blank');
