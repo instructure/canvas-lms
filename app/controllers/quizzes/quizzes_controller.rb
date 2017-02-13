@@ -258,6 +258,12 @@ class Quizzes::QuizzesController < ApplicationController
       if authorized_action(@quiz, @current_user, :update)
         @assignment = @quiz.assignment
       end
+
+      hash = {
+        :DUE_DATE_REQUIRED_FOR_ACCOUNT => AssignmentUtil.due_date_required_for_account?(@assignment),
+      }
+
+      js_env(hash)
       redirect_to(named_context_url(@context, :edit_context_quiz_url, @quiz))
     end
   end
@@ -289,6 +295,7 @@ class Quizzes::QuizzesController < ApplicationController
         :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_for(@current_user,
                                                            ensure_set_not_empty: true),
                                                            @current_user),
+        :DUE_DATE_REQUIRED_FOR_ACCOUNT => AssignmentUtil.due_date_required_for_account?(@assignment),
         :QUIZ => quiz_json(@quiz, @context, @current_user, session),
         :SECTION_LIST => sections.map { |section|
           {
