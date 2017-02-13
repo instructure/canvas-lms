@@ -523,6 +523,15 @@ END
       beta: true,
       development: true,
     },
+    'new_user_tutorial' =>
+    {
+      display_name: -> { I18n.t('New User Tutorial')},
+      description: -> { I18n.t('Provide tutorial information for new users in a flyout tray.')},
+      applies_to: "RootAccount",
+      state: "hidden",
+      beta: true,
+      development: true
+    }
   )
 
   def self.definitions
