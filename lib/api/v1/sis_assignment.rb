@@ -19,6 +19,9 @@
 module Api::V1::SisAssignment
   include Api::V1::Json
 
+  class UnloadedAssociationError < StandardError
+  end
+
   API_SIS_ASSIGNMENT_JSON_OPTS = {
     only: %i(id created_at due_at unlock_at lock_at points_possible integration_id integration_data include_in_final_grade).freeze,
     methods: %i(name submission_types_array).freeze
@@ -37,20 +40,28 @@ module Api::V1::SisAssignment
   }.freeze
 
   API_SIS_ASSIGNMENT_OVERRIDES_JSON_OPTS = {
-    only: %i(title due_at unlock_at lock_at).freeze
+    only: %i(id title due_at unlock_at lock_at).freeze
   }.freeze
 
-  def sis_assignments_json(assignments)
-    assignments.map { |a| sis_assignment_json(a) }
+  API_SIS_ASSIGNMENT_STUDENT_OVERRIDES_JSON_OPTS = {
+      only: %i(user_id).freeze
+  }.freeze
+
+  def sis_assignments_json(assignments, includes = {})
+    assignments.map { |a| sis_assignment_json(a, includes) }
   end
 
-  def sis_assignment_json(assignment)
+  private
+
+  def sis_assignment_json(assignment, includes)
     json = api_json(assignment, nil, nil, API_SIS_ASSIGNMENT_JSON_OPTS)
     json[:course_id] = assignment.context_id if assignment.context_type == 'Course'
     json[:submission_types] = json.delete(:submission_types_array)
     json[:include_in_final_grade] = include_in_final_grade(assignment)
     add_sis_assignment_group_json(assignment, json)
     add_sis_course_sections_json(assignment, json)
+
+    json[:user_overrides] = assignment_user_overrides_json(assignment) if includes[:student_overrides]
     json
   end
 
@@ -68,6 +79,30 @@ module Api::V1::SisAssignment
     course_sections = active_course_sections_for(assignment.context)
     return unless course_sections
     json.merge!(sections: sis_assignment_course_sections_json(course_sections, assignment))
+  end
+
+  def assignment_user_overrides_json(assignment)
+    overrides = active_assignment_overrides_for(assignment)
+    raise UnloadedAssociationError if overrides.nil?
+    overrides.map {|o| assignment_user_override_json(o)}.compact
+  end
+
+  def assignment_user_override_json(override)
+    raise UnloadedAssociationError unless override.association(:assignment_override_students).loaded?
+    return nil if override.assignment_override_students.empty?
+
+    assignment_override_students_json = override.assignment_override_students.map do |student_override|
+      json = api_json(student_override, nil, nil, API_SIS_ASSIGNMENT_STUDENT_OVERRIDES_JSON_OPTS)
+      if student_override.association(:user).loaded? && student_override.user.association(:pseudonym).loaded?
+        pseudonym = student_override.user.pseudonym
+        json[:sis_user_id] = (pseudonym ? pseudonym.sis_user_id : nil)
+      end
+
+      json
+    end
+
+    api_json(override, nil, nil, API_SIS_ASSIGNMENT_OVERRIDES_JSON_OPTS).
+      merge({students: assignment_override_students_json})
   end
 
   def sis_assignment_course_sections_json(course_sections, assignment)
@@ -108,11 +143,11 @@ module Api::V1::SisAssignment
     json[:override] = override_json
   end
 
-  private def include_in_final_grade(assignment)
+  def include_in_final_grade(assignment)
     !(assignment.omit_from_final_grade? || assignment.grading_type == 'not_graded')
   end
 
-  private def active_course_sections_for(context)
+  def active_course_sections_for(context)
     if context.respond_to?(:active_course_sections) && context.association(:active_course_sections).loaded?
       context.active_course_sections
     elsif context.respond_to?(:course_sections) && context.association(:course_sections).loaded?
@@ -120,7 +155,7 @@ module Api::V1::SisAssignment
     end
   end
 
-  private def active_assignment_overrides_for(assignment)
+  def active_assignment_overrides_for(assignment)
     if assignment.association(:active_assignment_overrides).loaded?
       assignment.active_assignment_overrides
     elsif assignment.association(:assignment_overrides).loaded?
