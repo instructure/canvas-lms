@@ -33,10 +33,12 @@ pl:
       removed: "Grupa została pomyślnie usunięta."
     student_count: 
       few: "%{count} uczestników"
+      many: "%{count} uczestników"
       one: "% uczestnik"
       other: "%{count} uczestników"
     user_count: 
       few: "%{count} użytkowników"
+      many: "%{count} użytkowników"
       one: "1 użytkownik"
       other: "%{count} użytkowników"
   GroupUserCollection: 
@@ -53,6 +55,7 @@ pl:
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Folder o nazwie %{itemName} już istnieje."
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Pełnowymiarowe logo, które pojawia się w prawym, bocznym panelu Canvas. Idealny rozmiar to 360 x 140 pikseli. Akceptowane formaty: svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Poręczny kluczowy/wartościowy zrzut wielku ciekawych informacji środowiskowych dla zgłaszającego użytkownika"
+  a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "Zablokowany element o nazwie \"%{name}\" już istnieje w tej lokalizacji. Wpisz nową nazwę."
   a_message_is_required_129e1814: "Wymagana jest wiadomość"
   a_name_for_this_set_is_required_222bad23: "Wymagana jest nazwa dla tego zbioru"
   a_new_assignment_has_been_created_for_your_course__12b72639: "Utworzono nowe zadanie dla twojego kursu, %{course_name}"
@@ -88,6 +91,7 @@ pl:
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "akceptowane formaty: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Akcpetowane formaty: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Zaakceptowano: %{user}, %{role_type}, kurs, %{course}"
+  access_report_80d28095: "Raport dostępu"
   access_token_3be22221: "Token dostępu "
   access_token_is_valid_until_d2f048cf: "Token dostępu jest ważny do"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Tokeny dostępu mogą służyć do zezwalania innym aplikacjom na wykonywanie wywołań API w imieniu użytkownika. Można również generować tokeny i *korzystać z Otwartego API Canvas* do integracji systemu z innymi usługami."
@@ -639,6 +643,7 @@ pl:
     course: 
       associated_count: 
         few: "%{count} Powiązane kursy"
+        many: "%{count} Powiązane kursy"
         one: "1 powiązany kurs"
         other: "%{count} Powiązane kursy"
       course_unpublished_title: "Kurs nie został jeszcze opublikowany"
@@ -646,6 +651,7 @@ pl:
       homepage_link: "Strona główna"
       more_count: 
         few: "%{count} więcej"
+        many: "%{count} więcej"
         one: "1 więcej"
         other: "%{count} więcej"
       none: brak
@@ -654,6 +660,7 @@ pl:
       statistics_link: Statystyki
       student_count: 
         few: "%{count} Uczestników"
+        many: "%{count} uczestników"
         one: "1 Uczestnik"
         other: "%{count} uczestników"
       teachers_label: Instruktorzy
@@ -796,6 +803,34 @@ pl:
         sis_export: 
           description: 
             text: "Ten raport wyeksportuje wszystkie niezbędne informacje, które odnoszą się do zastrzegania systemu Canvas w odpowiednich kategoriach."
+    provisioning_csv_parameters: 
+      account_reports: 
+        default: 
+          accounts: 
+            check_box: "Konta CSV"
+          courses: 
+            check_box: "Kursy CSV"
+          enrollments: 
+            check_box: "Zapisy CSV"
+          group_categories: 
+            login: 
+              check_box: "Kategorie grup CSV"
+          group_membership: 
+            login: 
+              check_box: "Członkostwo w grupie CSV"
+          groups: 
+            check_box: "Grupy CSV"
+          sections: 
+            check_box: "Sekcje CSV"
+          terms: 
+            check_box: "Terminy CSV"
+          users: 
+            check_box: "Użytkownicy CSV"
+          xlist: 
+            check_box: "Lista X CSV"
+        sis_default: 
+          parameters: 
+            note: "*Ustawienia semestru odnoszą się jedynie do kursów, sekcji, zapisów oraz plików CSV listy X."
     public_courses_csv_description: 
       account_reports: 
         default: 
@@ -1153,6 +1188,7 @@ pl:
       page_title: "Importowanie danych SIS"
       pending_batches_count: 
         few: "%{count} zadania czekają na przetworzenie."
+        many: "%{count} zadań czeka na przetworzenie."
         one: "%{count} zadanie czeka na przetworzenie."
         other: "%{count} zadań czeka na przetworzenie."
       pending_batches_title: "Oczekujące elementy wsadowe"
@@ -1189,6 +1225,7 @@ pl:
       loading_text: "trwa ładowanie..."
       media_data: 
         few: "%{file_size} *z %{count} plików*"
+        many: "%{file_size} *z %{count} plików*"
         one: " %{file_size} *z jednego pliku*"
         other: "%{file_size} *z %{count} plików*"
       media_file_storage_header: "Magazyn plików multimedialnych"
@@ -1204,6 +1241,7 @@ pl:
       title_data_point_over_time: "%{data_point} Z okresu"
       uploaded_data: 
         few: "%{file_size} *z %{count} plików*"
+        many: "%{file_size} *z %{count} plików*"
         one: " %{file_size} *z jednego pliku*"
         other: "%{file_size} *z %{count} plików*"
       uploaded_file_storage_header: "Magazyn przekazanych plików"
@@ -1310,6 +1348,7 @@ pl:
             text: "W tym raporcie uwzględniono wszystkich uczestników zapisanych do jakiegokolwiek kursu w danym semestrze. Wynikowy plik csv będzie zawierał jeden rząd na zapis użytkownika, który nie odwiedził kursu od określonej daty."
   achieve_mastery_count_times_8c9bbcec: 
     few: "Osiągnij biegłość %{count} razy"
+    many: "Osiągnij biegłość %{count} razy"
     one: "Osiągnij biegłość raz"
     other: "Osiągnij biegłość %{count} razy"
   actions_efcde10d: Akcje
@@ -1395,7 +1434,10 @@ pl:
   add_theme_32fa3d50: "Dodaj motyw"
   add_to_course_481a51c4: "Dodaj do kursu..."
   add_trigger_bc1a0fae: "Dodaj przyczynę"
+  add_user_by_email_address_login_id_or_sis_id_7dd370dd: "Dodaj użytkownika wg adresu e-mail, nazwy użytkownika lub ID SIS."
   add_user_e73e8e50: "Dodaj użytkownika"
+  add_user_s_by_b2549f89: "Dodaj użytkownika wg"
+  add_users_b10c7fb1: "Dodaj użytkownika"
   add_users_to_name_b8109bbb: "Dodaj użytkowników do %{name}"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Dodaj swoje zadania. Możesz po prostu utworzyć długą listę albo podzielić je na grupy, a nawet określić wagi dla każdej grupy zadań."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Dodaj swój identyfikator pola dla Zendesk Instance dla każdego poniższego pola (pola, które nie zawierają identyfikatora nie będą logowane):"
@@ -1404,6 +1446,7 @@ pl:
   additional_settings_for_sis_syncing_f926973e: "Dodatkowe ustawienia dla synchronizacji SIS"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Dodatkowe ustawienia synchronizacji SIS dla dyskusji, quizów i zadań"
   addressbook_microservice_a4940422: "AddressBook mikrousługa"
+  adjust_final_grade_fa45e7e0: "Dostosuj ocenę końcową"
   admin_4d3ba42f: Administrator
   admins_3e1dce15: Administratorzy
   after_date_981cd41b: "Po %{date}"
@@ -1513,6 +1556,7 @@ pl:
   an_error_occured_while_fetching_grading_period_set_b4f12aa5: "Wystąpił błąd podczas pobierania zbiorów okresów oceniania."
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Wystąpił bład podczas aktualizaji zbioru okresu oceniania."
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Wystąpił błąd*, wyślij swoją odpowiedź później"
+  an_error_occurred_please_try_again_later_84223241: "Wystąpił błąd. Spróbuj ponownie później."
   an_error_occurred_publishing_grades_cfdf7631: "Wystąpił błąd podczas publikacji ocen."
   an_error_occurred_selecting_provisional_grades_9d7bcda: "Wystąpił błąd podczas wyboru ocen wstępnych"
   an_error_occurred_trying_to_apply_this_theme_pleas_253d0996: "Wystąpił błąd podczas zastosowania tego motywu, spróbuj ponownie."
@@ -1522,6 +1566,7 @@ pl:
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Wystąpił błąd podczas próby kontaktu Turnitin."
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Wystąpił błąd podczas usuwania grupy przydziałów"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "Wystąpił błąd podczas zapisywania grupy przydziałów"
+  an_internal_error_occurred_83b8a685: "Wystąpił błąd wewnętrzny"
   an_item_named_name_already_exists_in_this_location_147b7312: "Pozycja o nazwie  \"%{name}\" już istnieje w danej lokalizacji. Czy chcesz zamienić istniejący plik?"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Wystąpił nieznany błąd serwera. Spróbuj ponownie."
   an_update_is_available_for_toolname_bba3fa2: "Istnieje możliwość aktualizacji dla %{toolName}"
@@ -1707,6 +1752,7 @@ pl:
   are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: "Czy na pewno chcesz inaktywować tego użytkownika? Nie będzie on mógł uczestniczyć w kursie gdy jest nieaktywny."
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     few: "Czy na pewno chcesz usunąć te %{count} elementy?"
+    many: "Czy na pewno chcesz usunąć te %{count} elementów?"
     one: "Czy na pewno chcesz usunąć %{name}?"
     other: "Czy na pewno chcesz usunąć te %{count} elementów?"
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Czy na pewno chcesz usunąć to ogłoszenie?"
@@ -1754,6 +1800,7 @@ pl:
       select_url: Wybierz
     comment_from_files: 
       few: "Zobacz załączone pliki"
+      many: "Zobacz załączone pliki"
       one: "Zobacz załączony plik"
       other: "Zobacz załączone pliki"
     errors: 
@@ -1849,6 +1896,7 @@ pl:
   assignment_override: 
     student_count: 
       few: "%{count} uczestników"
+      many: "%{count} uczestników"
       one: "%{count} uczestników"
       other: "%{count} uczestników"
   assignment_path_selected_e80191d1: "Wybrano ścieżkę zadania"
@@ -1993,11 +2041,13 @@ pl:
       would_you_like: "Czy chcesz:"
     drop_highest_rule: 
       few: "Liczba najwyższych wyników punktowych do pominięcia: %{count}"
+      many: "Liczba najwyższych wyników punktowych do pominięcia: %{count}"
       one: "Pomiń najwyższy wynik punktowy"
       other: "Liczba najwyższych wyników punktowych do pominięcia: %{count}"
     drop_highest_scores: "Liczba najwyższych wyników punktowych do pominięcia: %{number}"
     drop_lowest_rule: 
       few: "Liczba najniższych wyników punktowych do pominięcia: %{count}"
+      many: "Liczba najniższych wyników punktowych do pominięcia: %{count}"
       one: "Pomiń najniższy wynik punktowy"
       other: "Liczba najniższych wyników punktowych do pominięcia: %{count}"
     drop_lowest_scores: "Liczba najniższych wyników punktowych do pominięcia: %{number}"
@@ -2057,6 +2107,7 @@ pl:
         reupload_submissions: "Ponownie przekaż zadania"
       resubmission_count: 
         few: "%{count} ponownie wysłane zadania bez oceny"
+        many: "%{count} ponownie wysłanych zadań bez oceny"
         one: "1 ponownie wysłane zadanie bez oceny "
         other: "%{count} ponownie wysłanych zadań bez oceny"
       reupload_instructions: |-
@@ -2237,6 +2288,7 @@ pl:
     remove_unsaved_never_drop_rule: "Usuń niezapisaną zasadę Nigdy nie pomijaj"
     rules_text: 
       few: "Liczba reguł: %{count}"
+      many: "Liczba reguł: %{count}"
       one: "1 reguła"
       other: "Liczba reguł: %{count}"
     select_assignment: "[Wybierz zadanie]"
@@ -2497,6 +2549,7 @@ pl:
   authentication_with_provider_was_successful_but_no_6a194137: "Uwierzytelnienie u %{provider} powiodło się ale nie dostarczono unikalnego identyfikatora do logowania w programie Canvas."
   author_s_name_b35e905a: "Imię i nazwisko twórcy"
   authorize_e3f25bb4: Zezwól
+  auto_leader_7791c30a: auto_leader
   available_8606e40c: Dostępne
   available_after_unlock_at_b5682224: "Dostępne po %{unlock_at}"
   available_after_unlock_at_until_lock_at_499e8092: "Dostępne po %{unlock_at} aż do %{lock_at}"
@@ -2562,6 +2615,7 @@ pl:
   blue_daf8fea9: Niebieski
   blueprint_course_e16ed131: "Kurs wzorcowy"
   blueprint_courses_9dd321b8: "Kursy wzorcowe"
+  blueprint_courses_create_edit_associate_delete_bf41988e: "Kursy wzorcowe (utwórz / edytuj / powiąż / usuń)"
   body_9f663faf: Treść
   body_shadow_d36e8c2e: "Cień ciała"
   bolivia_567898d8: Boliwia
@@ -2855,6 +2909,7 @@ pl:
       event_saved: "Wydarzenie zapisane z powodzeniem"
       missingDueDate: 
         few: "Do %{sections} sekcji nie przypisano terminu dostarczenia."
+        many: "Do %{sections} sekcji nie przypisano terminu dostarczenia."
         one: "Do %{sections} sekcji nie przypisano terminu dostarczenia."
         other: "Do %{sections} sekcji nie przypisano terminu dostarczenia."
       titles: 
@@ -3151,6 +3206,7 @@ pl:
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "System Canvas nie rozpoznał dostawcy tożsamości"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "W systemie Canvas nie ma konta użytkownika: %{user}"
   canvas_error_report_ff678539: "Zgłoś błąd Canvas"
+  canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_introduction_video_2d81f3ad: "Wideo wprowadzenia Canvas"
   canvas_parent_description: "To ustawienie określa czy rodzice mogą łączyć się z uczniami w instytucji za pomocą mobilnej aplikacji Canvas Parent,"
   canvas_parent_improved_description: "Za pomocą tej opcji można określić, czy rodzice, którzy tworzą konta Canvas Parent mogą łączyć się z uczestnikami kursów we własnej organizacji, korzystając z aplikacji mobilnej Canvas Parent. Uwaga: Rodzice zarejestrowani jako obserwujący Canvas mogą korzystać z mobilnej aplikacji Canvas Parent nawet wtedy, gdy flaga tej funkcji jest wyłączona."
@@ -3195,6 +3251,9 @@ pl:
   changes_you_made_may_not_be_saved_4e8db973: "Zmiany mogą nie zostać zapisane."
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "Wykres ocen ucznia za każde zadanie"
   chat_2153c6b7: "Rozmowa sieciowa"
+  check_to_add_a_user_for_loginid_6cd25597: "Zaznacz, aby dodać użytkownika do %{loginid}"
+  check_to_skip_adding_a_user_for_loginid_5fa643da: "Zaznacz, aby pominąć dodawanie użytkownika do %{loginid}"
+  checked_883b93fd: zaznaczono
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Kurs dla dzieci musi należeć do tego samego konta głównego co kurs główny"
   child_s_username_dde3aa9: "Nazwa użytkownika dziecka"
   chile_56_88238b47: "Chile (+56)"
@@ -3220,12 +3279,17 @@ pl:
   click_here_on_the_calendar_link_c9965631: "Kliknij łącze *Kalendarz*"
   click_here_to_see_the_file_79e2b366: "Kliknij tutaj, aby zobaczyć plik."
   click_here_to_view_ec8cb2fd: "Kliknij tutaj, aby wyświetlić"
+  click_to_add_a_name_6cf551b0: "Kliknij, aby dodać imię"
+  click_to_create_a_new_user_for_address_325f6683: "Kliknij, aby utworzyć nowego użytkownika dla %{address}"
+  click_to_create_a_new_user_for_login_56d2daf5: "Kliknij, aby utworzyć nowego użytkownika dla %{login}"
   click_to_edit_drag_to_reorder_ab725681: "Kliknij, aby edytować; przeciągnij aby zmienić kolejność"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Kliknij aby dodać komentarze, jezeli uczeń wybierzę tę odpowiedź"
   click_to_load_a020891b: "(klinknij aby załadować)"
   click_to_modify_89fa26aa: "Kliknij aby zmienić"
   click_to_report_profile_picture_370f9625: "Kliknij aby zgłosić zdjęcie profilowe"
+  click_to_select_user_name_41746803: "Kliknij, aby wybrać użytkownika %{name}"
   click_to_set_this_answer_as_correct_1326e3fd: "Kliknij aby ustawić tę odpowiedź jako poprawną"
+  click_to_skip_address_8f874b32: "Kliknij, aby pominąć %{address}"
   click_to_test_a_different_score_2e0bb6f0: "Kliknij, aby sprawdzić inny wynik punktowy"
   click_to_test_dropdown_b950974d: "Kliknij aby przetestować rozwijane menu"
   click_to_view_event_details_b25dc1f3: "Kliknij, aby wyświetlić szczegóły wydarzenia"
@@ -3936,6 +4000,7 @@ pl:
   context_contextname_24d82846: "(%{context}: %{contextName})"
   context_external_tool: 
     url_or_domain_required: "Musisz ustawić url albo domenę"
+  context_id_83fdfe0d: context_id
   context_level_56d88f5b: "(poziom %{context})"
   context_module: 
     requirements: 
@@ -4157,8 +4222,10 @@ pl:
     invalid_position: "Nieprawidłowa pozycja"
   context_nav_link_8d15d95: "Link nawigacyjny zawartości"
   context_nav_link_active_78adb0fa: "Link nawigacyjny zawartości aktywny"
+  context_type_eb76a7b9: context_type
   contextname_and_count_others_9dda769b: 
     few: "%{contextName} i %{count} innych"
+    many: "%{contextName} i %{count} innych"
     one: "%{contextName} i %{count} inny"
     other: "%{contextName} i %{count} innych"
   contextscount_more_66b2f99b: "+ %{contextsCount} więcej"
@@ -4176,11 +4243,13 @@ pl:
     subject_specified: "Prywatna wiadomość: %{subject}"
     users_added: 
       few: "%{list_of_users} zostali dodani do konwersacji przez %{current_user}"
+      many: "%{list_of_users} zostali dodani do konwersacji przez %{current_user}"
       one: "%{user} został dodany do konwersacji przez %{current_user}"
       other: "%{list_of_users} zostali dodani do konwersacji przez %{current_user}"
   conversation_participant: 
     batch_update_message: 
       few: "%{count} przetworzonych konwersacji"
+      many: "%{count} przetworzonych konwersacji"
       one: "1 przetworzona konwersacja"
       other: "%{count} przetworzonych konwersacji"
     not_participating: "Użytkownik nie uczestniczy w tej rozmowie"
@@ -4330,10 +4399,12 @@ pl:
     no_results_found: "Nie znaleziono wyników"
     other: 
       few: "i %{count} inne"
+      many: "i %{count} innych"
       one: "i 1 inna"
       other: "i %{count} innych"
     other_recipients: 
       few: "i %{count} inne"
+      many: "i %{count} innych"
       one: "i 1 inna"
       other: "i %{count} innych"
     result_status: "W autouzupełnianiu zawarto %{results} wpisów. Użyj strzałek do góry i w dół w celu nawigacji po liście, następnie naciśnij Enter, aby dodać osobę do pola Do."
@@ -4376,18 +4447,22 @@ pl:
     zero: "Brak zadań z błędami; kliknij przycisk Kontynuuj"
   count_comments_cb137ab8: 
     few: "%{count} komentarze"
+    many: "%{count} komentarze"
     one: "1 komentarz"
     other: "%{count} komentarze"
   count_files_updated_4570a8a: 
     few: "Zaktualizowano %{count} pliki"
+    many: "Zaktualizowano %{count} plików"
     one: "Zaktualizowano 1 plik"
     other: "Zaktualizowano %{count} plików"
   count_items_deleted_successfully_a287aa53: 
     few: "Pomyślnie usunięto %{count} elementy."
+    many: "Pomyślnie usunięto %{count} elementów."
     one: "Pomyślnie usunięto %{name}."
     other: "Pomyślnie usunięto %{count} elementów."
   count_items_selected_91814713: 
     few: "Wybrano %{count} elementy"
+    many: "Wybrano %{count} elementów"
     one: "Wybrano %{count} element"
     other: "Wybrano %{count} elementów"
   count_max_students_2db76773: "%{count} / %{max} uczniów"
@@ -4398,6 +4473,7 @@ pl:
     zero: "mniej niż 1 minutę"
   count_options_190d6373: 
     few: "%{count} Opcje"
+    many: "%{count} Opcje"
     one: "1 opcja"
     other: "%{count} Opcje"
   count_page_views_b40102b3: 
@@ -4410,6 +4486,7 @@ pl:
     other: "%{count} uczestnicw"
   count_points_4735a2e8: 
     few: "%{count}  punktów"
+    many: "%{count} Punktów"
     one: "1 punkt"
     other: "%{count} Punktów"
   count_quizzes_found_e5e29bb4: 
@@ -4418,10 +4495,12 @@ pl:
     zero: "Brak pasujących testów."
   count_results_9926447c: 
     few: "%{count} wyników"
+    many: "%{count} wyników"
     one: "Jeden wynik"
     other: "%{count} wyników"
   count_results_displayed_ed39a0f0: 
     few: "Wyświetlono %{count} wyników"
+    many: "Wyświetlono %{count} wyników"
     one: "Wyświetlony jeden wynik"
     other: "Wyświetlono %{count} wyników"
   count_sets_of_grading_periods_found_c8857ae9: 
@@ -4430,10 +4509,12 @@ pl:
     zero: "Nie znaleziono żadnych pasujących zbiorów okresów oceniania."
   count_students_30e46120: 
     few: "%{count} uczestników"
+    many: "%{count} uczestników"
     one: "1 uczestnik"
     other: "%{count} uczestników"
   count_students_in_percentile_percentile_d0adecfe: 
     few: "%{count} uczestników w percentylu %{percentile}. "
+    many: "%{count} uczestników w percentylu %{percentile}. "
     one: "1 uczestnik w percentylu %{percentile}. "
     other: "%{count} uczestników w percentylu %{percentile}. "
   count_students_will_get_num_points_c970fc01: 
@@ -4442,10 +4523,12 @@ pl:
     other: "%{count} uczestników otrzyma %{num} punktów"
   count_sub_modules_3373a1c4: 
     few: "%{count} submodułół"
+    many: "%{count} submodułów"
     one: "%{count} submoduł"
     other: "%{count} submodułów"
   count_submissions_need_grading_d34bae25: 
     few: "%{count} przesłanych zadań wymaga oceny"
+    many: "%{count} przesłanych zadań wymaga oceny"
     one: "1 przesłane zadanie wymaga oceny"
     other: "%{count} przesłanych zadań wymaga oceny"
   country_is_required_b0afbf52: "Wymagany jest kraj"
@@ -4453,6 +4536,7 @@ pl:
     access_denied: "Dostęp uniemozliwiony"
     batch_update_message: 
       few: "%{count} przetworzone kursy"
+      many: "%{count} przetworzonych kursów"
       one: "1 przetworzony kurs"
       other: "%{count} przetworzonych kursów"
     course: Kurs
@@ -5009,6 +5093,7 @@ pl:
       drag_to_hide: "Przeciągnij tu elementy, których nie chcesz pokazywać uczestnikom."
       enrollment_count: 
         few: "%{count} Użytkowników"
+        many: "%{count} Użytkowników"
         one: "1 Użytkownik"
         other: "%{count} Użytkowników"
       headings: 
@@ -5204,6 +5289,7 @@ pl:
       discussions: Dyskusje
       file_count: 
         few: "%{count} pliki"
+        many: "%{count} plików"
         one: "1 plik"
         other: "%{count} plików"
       file_upload: "Przekazywanie pliku"
@@ -5255,6 +5341,7 @@ pl:
   courses_43204aae: Kursy
   create_132b3be1: Utwórz
   create_a_new_account_4cf7c0f9: "Utwórz nowe konto"
+  create_a_new_user_for_address_7487e9c9: "Utwórz nowego użytkownika dla \"%{address}\""
   create_account_263ec6: "Utwórz konto"
   create_assignment_68532ceb: "Utwórz zadanie"
   create_failed_15d07ad4: "Utworzenie nie powiodło się"
@@ -5385,6 +5472,7 @@ pl:
       student: 
         count: "Nieprawidłowa liczba studentów"
         ratio: "Nieprawidłowy stosunek studentów"
+  csv_file_8061540e: "Plik CSV"
   current_367624e9: Bieżące
   current_courses_d5287d50: "Bieżące kursy"
   current_grading_scheme_for_this_assignment_d525463e: "Obecny standard klasyfikacji dla tego zadania"
@@ -5424,18 +5512,22 @@ pl:
   dashboard: 
     announcements_collapse: 
       few: "Zwiń %{count} ogłoszenia"
+      many: "Zwiń %{count} ogłoszeń"
       one: "Zwiń %{count} ogłoszenie"
       other: "Zwiń %{count} ogłoszeń"
     announcements_expand: 
       few: "Rozwiń %{count} ogłoszenia"
+      many: "Rozwiń %{count} ogłoszeń"
       one: "Rozwiń %{count} ogłoszenie"
       other: "Rozwiń %{count} ogłoszeń"
     assignments_collapse: 
       few: "Zwiń %{count} powiadomienia o zadaniu"
+      many: "Zwiń %{count} powiadomień o zadaniu"
       one: "Zwiń %{count} powiadomienie o zadaniu"
       other: "Zwiń %{count} powiadomień o zadaniu"
     assignments_expand: 
       few: "Rozwiń %{count} powiadomienia o zadaniu"
+      many: "Rozwiń %{count} powiadomień o zadaniu"
       one: "Rozwiń %{count} powiadomienie o zadaniu"
       other: "Rozwiń %{count} powiadomień o zadaniu"
     confirm: 
@@ -5445,18 +5537,22 @@ pl:
           Ponowne otworzenie konferencji nie będzie możliwe.
     conversations_collapse: 
       few: "Zwiń %{count} wiadomości w rozmowie"
+      many: "Zwiń %{count} wiadomości w rozmowie"
       one: "Zwiń %{count} wiadomość w rozmowie"
       other: "Zwiń %{count} wiadomości w rozmowie"
     conversations_expand: 
       few: "Rozwiń %{count} wiadomości w rozmowie"
+      many: "Rozwiń %{count} wiadomości w rozmowie"
       one: "Rozwiń %{count} wiadomość w rozmowie"
       other: "Rozwiń %{count} wiadomości w rozmowie"
     discussions_collapse: 
       few: "Zwiń %{count} dyskusje"
+      many: "Zwiń %{count} dyskusji"
       one: "Zwiń %{count} dyskusję"
       other: "Zwiń %{count} dyskusji"
     discussions_expand: 
       few: "Rozwiń %{count} dyskusje"
+      many: "Rozwiń %{count} dyskusji"
       one: "Rozwiń %{count} dyskusję"
       other: "Rozwiń %{count} dyskusji"
     show_more_link: 
@@ -5556,47 +5652,58 @@ pl:
     distance_in_words: 
       about_x_hours: 
         few: "około %{count} godziny"
+        many: "około %{count} godzin"
         one: "około 1 godziny"
         other: "około %{count} godzin"
       about_x_months: 
         few: "około %{count} miesięcy"
+        many: "około %{count} miesięcy"
         one: "około 1 miesiąca"
         other: "około %{count} miesięcy"
       about_x_years: 
         few: "około %{count} lata"
+        many: "około %{count} lat"
         one: "około 1 roku"
         other: "około %{count} lat"
       almost_x_years: 
         few: "prawie %{count} lata"
+        many: "prawie %{count} lat"
         one: "prawie 1 rok"
         other: "prawie %{count} lat"
       half_a_minute: "pół minuty"
       less_than_x_minutes: 
         few: "mniej niż %{count} minuty"
+        many: "mniej niż %{count} minut"
         one: "mniej niż minuta"
         other: "mniej niż %{count} minut"
       less_than_x_seconds: 
         few: "mniej niż %{count} sekundy"
+        many: "mniej niż %{count} sekund"
         one: "mniej niż 1 sekunda"
         other: "mniej niż %{count} sekund"
       over_x_years: 
         few: "ponad %{count}  lata"
+        many: "ponad %{count}  lat"
         one: "ponad 1 rok"
         other: "ponad %{count}  lat"
       x_days: 
         few: "%{count} dni"
+        many: "%{count} dni"
         one: "1 dzień"
         other: "%{count} dni"
       x_minutes: 
         few: "%{count} minuty"
+        many: "%{count} minut"
         one: "1 minuta"
         other: "%{count} minut"
       x_months: 
         few: "%{count} miesiące"
+        many: "%{count} miesięcy"
         one: "1 miesiąc"
         other: "%{count} miesięcy"
       x_seconds: 
         few: " %{count} sekundy"
+        many: " %{count} sekund"
         one: "1 sekunda"
         other: " %{count} sekund"
     prompts: 
@@ -5622,9 +5729,11 @@ pl:
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "Domyślna synchronizacja SIS dla zadań, quizów i dyskusji nt. ocen"
   default_template_f2a759ed: "Wzór domyślny"
   default_templates_are_used_as_starting_points_for__f06f9e33: "Wzory domyślne są używane jako punkty startowe dla nowych motywów i nie mogą być usunięte."
+  default_to_modules_for_the_course_home_page_d6a951a7: "Domyślne dla modułów strony głównej kursu"
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Określ tekst wyświetlany przed listą rozwijaną i po niej jak również utwórz zestaw możliwych odpowiedzi ."
   delay_posting_this_topic_until_aa483eec: "Opóźnij publikację tego tematu do"
   delete_a6efa79d: Usuń
+  delete_alignment_f33c97d5: "Usuń wyrównanie"
   delete_assignment_group_7c3b01c4: "Usuń grupę zadań"
   delete_assignment_name_deec56e3: "Usuń zadanie %{name}"
   delete_comment_a71040c3: "Usuń komentarz"
@@ -5826,6 +5935,7 @@ pl:
       for: Dla
       graded_discussion_and_points: 
         few: "Ten temat jest tematem ocenianym: *%{count} możliwe punkty do zdobycia*"
+        many: "Ten temat jest tematem ocenianym: *%{count} możliwych punktów do zdobycia*"
         one: "Ten temat jest tematem ocenianym: *1 możliwy punkt do zdobycia*"
         other: "Ten temat jest tematem ocenianym: *%{count} możliwych punktów do zdobycia*"
       show_due_dates: "Pokaż terminy dostarczenia"
@@ -5833,10 +5943,12 @@ pl:
     cannot_unpublish_with_replies: "Nie można cofnąć publikacji, jeśli są odpowiedzi uczestników"
     confirm_delete_announcement: 
       few: "Czy na pewno chcesz usunąć te %{count} ogłoszenia?"
+      many: "Czy na pewno chcesz usunąć te %{count} ogłoszenia?"
       one: "Czy na pewno chcesz usunąć to ogłoszenie?"
       other: "Czy na pewno chcesz usunąć te %{count} ogłoszenia?"
     confirm_delete_discussion_topic: 
       few: "Czy jesteś pewien, że chcesz usunąć te %{count} tematy dyskusji?"
+      many: "Czy jesteś pewien, że chcesz usunąć te %{count} tematy dyskusji?"
       one: "Czy jesteś pewien, że chcesz usunąć ten temat dyskusji?"
       other: "Czy jesteś pewien, że chcesz usunąć te %{count} tematy dyskusji?"
     create_new_crumb: "Utwórz nowy"
@@ -5907,6 +6019,7 @@ pl:
       reply_to_message: "Dodaj komentarz z boku"
       show_more_entries: 
         few: "Pokaż %{count} wpisy więcej"
+        many: "Pokaż %{count} wpisów więcej"
         one: "Pokaż 1 wpis więcej"
         other: "Pokaż %{count} wpisów więcej"
     error_draft_state_unauthorized: "Nie masz pozwolenia, aby ustawić temat jako wersję roboczą."
@@ -6076,6 +6189,7 @@ pl:
     initial_post_required_to_subscribe: "Należy wysłać odpowiedź przed dokonaniem subskrypcji"
     like_count: 
       few: "(%{count} polubienia)"
+      many: "(%{count} polubienia)"
       one: "(%{count} polubienie)"
       other: "(%{count} polubienia)"
     mark_as_read: "Oznacz jako przeczytane"
@@ -6103,10 +6217,12 @@ pl:
       write_a_reply: Odpowiedź
     results_entry: 
       authors_name: "Nazwa autora"
+      edited_comment: "Edytowane przez *%{editor.display_name}* w dniu %{edited_at}"
       unknown_author: "Nieznany autor"
       view_in_discussion: "Pokaż w dyskusji"
     show_all_n_replies: 
       few: "Pokaż wszystkie %{count} odpowiedzi"
+      many: "Pokaż wszystkie %{count} odpowiedzi"
       one: "Pokaż jedną odpowiedź"
       other: "Pokaż wszystkie %{count} odpowiedzi"
     show_due_dates: "Pokaż terminy dostarczenia"
@@ -6124,6 +6240,7 @@ pl:
   discussions_a5f96392: Dyskusje
   dismiss_dacdb625: Odrzuć
   display_all_text_links_in_canvas_as_underlined_tex_e698e714: "Wyświetl wszystkie łącza w programie Canvas jako *podkreślony tekst*."
+  display_as_points_63084235: "Wyświetl jako punkty"
   display_course_catalog: "Pokaż listę kursów na tym koncie źródłowym z włączoną opcją „Dołącz do publicznego katalogu kursów”."
   display_name_b80c243e: "Wyświetlana nazwa"
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "Wyświetl wszystkie oceny gdy opcja \"Wszystkie okresy klasyfikacji\" jest wybrana w liście rozwijanej (opcja Wszystkie okresy klasyfikacji musi być włączona)."
@@ -6136,6 +6253,7 @@ pl:
   do_nothing_9672b478: "Nic nie rób"
   domain_3b54c511: Domena
   domain_is_required_1d4c8b25: "Wymagana jest domena"
+  don_t_add_this_user_for_now_32912974: "Nie dodawaj tego użytkownika teraz."
   don_t_move_lti_query_params_to_post_body_21744487: "Nie przenoś parametrów zapytania LTI do części POST"
   don_t_move_lti_query_params_to_post_body_5c80e037: "Nie przenoś parametrów zapytania LTI do części POST"
   don_t_show_again_15d8253e: "nie pokazuj ponownie"
@@ -6166,6 +6284,7 @@ pl:
   due_a73610f6: "Termin dostarczenia"
   due_assignment_due_date_time_5acdf3cf: "Termin dostarczenia: %{assignment_due_date_time}"
   due_assignment_due_date_time_607f2e1d: "termin dostarczenia: %{assignment_due_date_time}"
+  due_at: "nie może być puste, jeśli zaznaczona jest opcja Publikuj w SIS."
   due_at_5d7d2fa: "Termin dostarczenia:"
   due_at_5e18eeac: "Godz:"
   due_at_time_fa41cf6c: "Termin dostarczenia: %{time}"
@@ -6242,6 +6361,7 @@ pl:
   edit_pagetitle_cd8abab9: "Edytuj %{pageTitle}"
   edit_permissions_for_count_items_d65e3855: 
     few: "Edytuj uprawnienia dla %{count} elementów"
+    many: "Edytuj uprawnienia dla %{count} elementów"
     one: "Edytuj uprawnienia dla: %{itemName}"
     other: "Edytuj uprawnienia dla %{count} elementów"
   edit_quiz_ededddd8: "Edytuj test"
@@ -6253,6 +6373,7 @@ pl:
     change: Zmień
     discussion_points_possible: 
       few: "%{count} możliwe punkty"
+      many: "%{count} możliwych punktów"
       one: "%{count} możliwy punkt"
       other: "%{count} możliwych punktów"
     errors: 
@@ -6347,6 +6468,7 @@ pl:
   email_22a7d52d: Email
   email_actions_a9bfe457: "Akcje email"
   email_address_6e0443a5: "Adres e-mail"
+  email_address_a1b97a39: "Adres e-mail"
   email_addresses_893faeb2: "Adresy e-mail"
   email_already_in_use_330248e: "E-mail jest już w użyciu"
   email_e366fa29: e-mail
@@ -6424,6 +6546,9 @@ pl:
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Wprowadź \"{{CANVAS_USER_ID}}\", aby zamienić unikatowy identyfikator Canvas użytkownika"
   enter_or_find_an_external_tool_url_6aebbd0d: "Wprowadź lub znajdź adres URL narzędzia zewnętrznego"
   enter_the_access_token_for_your_organization_from__cc77493d: "Wprowadź token dostępu danej organizacji ze strony *eduappcenter.com*. Po zastosowaniu, tylko aplikacje, które organizacja zatwierdziła w EduAppCenter zostaną wymienione na stronie Zewnętrznych Aplikacji. Dowiedz się jak **wygenerować token dostępu**."
+  enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Wpisz adresy e-mail użytkowników, których chcesz dodać, oddzielając je przecinkiem"
+  enter_the_login_ids_of_the_users_you_would_like_to_d39fb0f7: "Wpisz nazwy użytkowników, których chcesz dodać, oddzielając je przecinkiem"
+  enter_the_sis_ids_of_the_users_you_would_like_to_a_1bdce982: "Wpisz ID SIS użytkowników, których chcesz dodać, oddzielając je przecinkiem"
   enter_your_question_and_multiple_answers_31370054: "Wprowadź pytanie z zestawem odpowiedzi do wyboru."
   enter_your_question_specifying_where_each_blank_sh_2c6e8035: "Wprowadź pytanie, określając rozmieszczenie luk. Uczestnicy wprowadzają odpowiedzi w pola tekstowe w miejscu każdej luki."
   enter_your_question_specifying_where_each_dropdown_b428a9ff: "Wprowadź pytanie, określając rozmieszczenie list rozwijanych. Następnie utwórz listę możliwych odpowiedzi."
@@ -6486,6 +6611,7 @@ pl:
     eportfolio: 
       entry_count: 
         few: "*%{count}* strony"
+        many: "*%{count}* stron"
         one: "*1* strona"
         other: "*%{count}* stron"
       updated_at: "ostatnia aktualizacja %{updated_at}"
@@ -6548,6 +6674,7 @@ pl:
       add_submission: "Aby utworzyć nową stronę do przesyłanego zadania, wybierz sekcję i wprowadź nazwę nowej strony."
       attachment_count: 
         few: "%{count} załączniki"
+        many: "%{count} załączników"
         one: "1 załącznik"
         other: "%{count} załączników"
       buttons: 
@@ -6563,6 +6690,7 @@ pl:
       current_pages: "Bieżące strony"
       delete_confirm: 
         few: "Obecnie masz %{count} strony w tym ePortfolio. Czy na pewno chcesz usunąć całe ePortfolio?"
+        many: "Obecnie masz %{count} stron w tym ePortfolio. Czy na pewno chcesz usunąć całe ePortfolio?"
         one: "Obecnie masz 1 stronę w tym ePortfolio. Czy na pewno chcesz usunąć całe ePortfolio?"
         other: "Obecnie masz %{count} stron w tym ePortfolio. Czy na pewno chcesz usunąć całe ePortfolio?"
       headers: 
@@ -6696,6 +6824,7 @@ pl:
   error_in_mastery_paths_range_index_7d17ddac: "%{error} w zakresie ścieżek mistrzowskich %{index}"
   error_message_2b9d12ee: "Błąd: %{message}"
   error_retrieving_assignment_configuration_tools_f7d75303: "Błąd pobierania narzędzi konfiguracji zadań"
+  error_retrieving_similarity_detection_tools_d6d4f9e9: "Błąd pobierania narzędzi do wykrywania podobieństw"
   error_uploading_file_e2d31b56: "Błąd podczas przekazywania pliku."
   error_while_importing_csv_please_contact_support_e_57e6b3b: "Błąd podczas importowania pliku CSV. Należy skontaktować się z działem pomocy (raport błędu %{number})"
   errors: 
@@ -6737,14 +6866,17 @@ pl:
       taken: "istnieje już w systemie"
       too_long: 
         few: "jest zbyt długa (maks. %{count} znaków)"
+        many: "jest zbyt długa (maks. %{count} znaków)"
         one: "jest zbyt długa (maks. 1 znak)"
         other: "jest zbyt długa (maks. %{count} znaków)"
       too_short: 
         few: "jest za krótka (min. %{count} znak)"
+        many: "jest za krótka (min. %{count} znak)"
         one: "jest za krótka (min. 1 znak)"
         other: "jest za krótka (min. %{count} znak)"
       wrong_length: 
         few: "ma nieprawidłową długość (liczba wymaganych znaków: %{count})"
+        many: "ma nieprawidłową długość (liczba wymaganych znaków: %{count})"
         one: "ma nieprawidłową długość (wymagany 1 znak)"
         other: "ma nieprawidłową długość (liczba wymaganych znaków: %{count})"
     no_attached_file: "Musisz dołączyć co najmniej jeden plik w tym zadaniu"
@@ -6766,6 +6898,7 @@ pl:
   ex_ba24edf6: EX
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   example_84698b7d: Przykład
+  example_cb3509b8: "Przykład:"
   example_final_score_355aff0f: "Przykładowy wynik końcowy"
   example_final_score_a92b30b9: "Przykładowy wynik końcowy]]"
   example_https_example_com_config_xml_be5f36ac: "Przykład: https://example.com/config.xml"
@@ -6791,7 +6924,9 @@ pl:
   expand_subdiscussion_cd226ed4: "Rozwiń sub-dyskusję"
   expanded_f4493860: Rozwinięte
   export_de71cd8e: Eksport
+  export_failed_5d615d6d: "Niepowodzenie eksportu"
   export_report_7c5899e: "Eksportuj raport"
+  exported_package_history_bfca44b9: "Historia eksportowanych pakietów"
   exporting_b1eab154: Eksportowanie
   external_apps_f5490181: "Zewnętrzne aplikacje"
   external_collaborations_tool_a4899abb: "Narzędzia zewnętrzne dla projektów współpracy"
@@ -6944,8 +7079,10 @@ pl:
     wiki_page_menu_configured: "Skonfigurowano menu strony Wiki"
   external_url_e9b87215: "Zewnętrzny adres URL"
   extreme_critical_emergency_80b3dbda: "EKSTREMALNIE KRYTYCZNA SYTUACJA!!"
+  faculty_journal_5634938e: "Dziennik wydziałowy"
   fail_62dbb06a: niepowodzenie
   failed_307449e1: Niepowodzenie
+  failed_creating_user_b706a1c5: "Nie udało się utworzyć użytkownika"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Nie udało się wczytać sekcji kursu. Odśwież stronę, aby spróbować ponownie."
   failed_to_create_webhook_b766cf5c: "Nie udało się utworzyć webhook."
   failed_to_create_zip_file_1a943d06: "Nie udało się utworzyć pliku zip"
@@ -7099,6 +7236,7 @@ pl:
       page_title: "Pogląd pliku"
   files_and_folder_contents_only_available_to_studen_944f9166: "Pliki i zawartość folderów dostępne jedynie dla uczestników posiadających łącze. Nie są widoczne w plikach uczestnika."
   files_c300e900: Pliki
+  files_quota_percentused_of_bytesavailable_used_7f62792c: "Liczba plików: %{percentUsed} z %{bytesAvailable} użytych"
   files_quota_percentused_of_bytesavailable_used_d208857a: "Ilość plików: %{percentUsed}% z %{bytesAvailable} wykorzystano"
   files_toolbar_2f2f0976: "Pasek narzędzi do pracy z plikami"
   files_uploaded_519844ed: "Pliki przekazane"
@@ -7179,6 +7317,7 @@ pl:
     other: "Znaleziono %{count} uszkodzonych linków"
   found_count_unresponsive_links_d1791380: 
     few: "Znaleziono  %{count} nieodpowiadających linków"
+    many: "Znaleziono  %{count} nieodpowiadających linków"
     one: "Znaleziono 1 nieodpowiadający link"
     other: "Znaleziono  %{count} nieodpowiadających linków"
   france_33_90b595d7: "Francja (+33)"
@@ -7263,6 +7402,7 @@ pl:
       no_students_in_section: "Nie można odnaleźć żadnego uczestnika w tej sekcji. Powrót do widoku wszystkich sekcji."
       scores_updated: 
         few: "%{count} Zaktualizowano wyniki uczestnika"
+        many: "%{count} Zaktualizowano wyniki uczestnika"
         one: "Zaktualizowano 1 wynik uczestnika"
         other: "%{count} Zaktualizowano wyniki uczestnika"
     all_sections: "Wszystkie sekcje"
@@ -7328,6 +7468,7 @@ pl:
     hide_student_names: "Ukryj nazwy uczestników"
     invalid_assignment_groups_warning: 
       few: "Wynik nie obejmuje %{groups}, ponieważ nie są dla nich możliwe punkty"
+      many: "Wynik nie obejmuje %{groups}, ponieważ nie są dla nich możliwe punkty"
       one: "Wynik nie obejmuje %{groups}, ponieważ nie są dla niej możliwe punkty"
       other: "Wynik nie obejmuje %{groups}, ponieważ nie są dla nich możliwe punkty"
     keyboard_assignment_desc: "Przejdź do bieżącej strony informacji szczegółowych o zadaniu"
@@ -7399,9 +7540,9 @@ pl:
       info_message: "Plik jest wciąż przetwarzany przez program Turnitin. Sprawdź wynik póżniej"
       resubmitting: "Ponowne przesyłanie..."
       tooltip: 
-        error: "Porównawczy wynik punktowy Turnitin - Zobacz szczegóły błędów wysyłki"
-        pending: "Porównawczy wynik punktowy Turnitin - Wysyłanie w toku"
-        score: "Porównawczy wynik punktowy Turnitin - Zobacz szczegółowy raport"
+        error: "Stopień podobieństwa – patrz szczegóły błędu przy wysyłaniu"
+        pending: "Stopień podobieństwa – oczekiwanie na wysłanie"
+        score: "Stopień podobieństwa – patrz raport szczegółowy"
     unmute_assignment: "Odkryj zadanie"
     vericite: 
       error_message: "Wystąpił błąd podczas wysyłania materiałów do VeriCite. Prosimy ponownie wysłać plik lub skontaktować się z działem pomocy technicznej"
@@ -7688,6 +7829,7 @@ pl:
       revert: "Powróć do tej oceny"
       submission_count: 
         few: " %{count} zmiany"
+        many: " %{count} zmian"
         one: "1 zmiana"
         other: " %{count} zmian"
       temporary_disabled: "Strona z historią dziennika nie jest dostępna dla kursu o takim rozmiarze."
@@ -7695,6 +7837,7 @@ pl:
         submission_graded: "%{graded_date} według %{grader}"
     invalid_assignment_groups_warning: 
       few: "Wynik nie uwzględnia %{groups} grup, ponieważ nie można w nich zdobywać punktów"
+      many: "Wynik nie uwzględnia %{groups} grup, ponieważ nie można w nich zdobywać punktów"
       one: "Wynik nie uwzględnia %{groups} grupy, ponieważ nie można w niej zdobywać punktów"
       other: "Wynik nie uwzględnia %{groups} grup, ponieważ nie można w nich zdobywać punktów"
     no_assignments_have_points_warning: "Wynik będzie można obliczyć, gdy zadanie będzie miało przydzielone punkty"
@@ -7703,6 +7846,7 @@ pl:
       updated: "Przesłane zadanie zostało pomyślnie zaktualizowane."
       uploaded: 
         few: "Pliki oraz komentarze utworzone dla %{count} przesłanych zadań"
+        many: "Pliki oraz komentarze utworzone dla %{count} przesłanych zadań"
         one: "Pliki oraz komentarze utworzone dla 1 przesłanego zadania"
         other: "Pliki oraz komentarze utworzone dla %{count} przesłanych zadań"
     out_of_final: "%{weight} oceny końcowej"
@@ -7819,12 +7963,14 @@ pl:
     submissions_zip_upload: 
       comments_made: 
         few: "Napisano %{count} komentarze"
+        many: "Napisano %{count} komentarzy"
         one: "Napisano 1 komentarz"
         other: "Napisano %{count} komentarzy"
       done: "Gotowe! Do przekazanych plików dołączono krótki komentarz do strony przesyłanego zadania dla tego zadania każdego uczestnika. Uczestnicy zostaną powiadomieni o dodaniu nowego komentarza."
       failures: "Niektóre pliki nie zostały dołączone. Nie dodano ich do strony przesyłanego zadania żadnego z uczestników. Pliki znajdują się na liście po lewej stronie."
       files_ignored: 
         few: "%{count} pliki zignorowane"
+        many: "%{count} plików zignorowanych"
         one: "1 plik zignorowany"
         other: "%{count} plików zignorowanych"
       header: 
@@ -7840,6 +7986,7 @@ pl:
     titles: 
       total: Łącznie
   graded_25cd3fcd: Oceniono
+  graded_date_by_grader_e8e1ff75: "%{graded_date} przez %{grader}"
   graded_discussion_a873bb3e: "Oceniana dyskusja:"
   graded_on_submission_60ac3010: "Oceniono przy odbiorze"
   graded_quiz_7fabdf1f: "Oceniony test"
@@ -7851,6 +7998,7 @@ pl:
     alerts: 
       scores_updated: 
         few: "%{count} Zaktualizowano wyniki uczestnika"
+        many: "%{count} Zaktualizowano wyniki uczestnika"
         one: "Zaktualizowano 1 wynik uczestnika"
         other: "%{count} Zaktualizowano wyniki uczestnika"
     all_sections: "Wszystkie sekcje"
@@ -7887,6 +8035,7 @@ pl:
     hide_student_names: "Ukryj nazwy uczestników"
     invalid_assignment_groups_warning: 
       few: "Wynik nie obejmuje %{groups}, ponieważ nie są dla nich możliwe punkty"
+      many: "Wynik nie obejmuje %{groups}, ponieważ nie są dla nich możliwe punkty"
       one: "Wynik nie obejmuje %{groups}, ponieważ nie są dla niej możliwe punkty"
       other: "Wynik nie obejmuje %{groups}, ponieważ nie są dla nich możliwe punkty"
     keyboard_assignment_desc: "Przejdź do bieżącej strony informacji szczegółowych o zadaniu"
@@ -7964,6 +8113,8 @@ pl:
     confirm: 
       delete_grading_scheme: "Czy na pewno chcesz usunąć ten schemat oceniania?"
       unlink_grading_scheme: "Czy na pewno chcesz usunąć łącze dla tego schematu oceniania?"
+    course_index: 
+      title: "Standardy oceniania"
     errors: 
       cannot_delete_grading_scheme: "Wystąpił problem podczas usuwania tego schematu oceniania"
       cannot_load_grading_standards: "Ładowanie standardów oceniania nie powiodło się.  Spróbuj ponownie"
@@ -8022,6 +8173,7 @@ pl:
     name_too_long: "Wprowadź krótszą nazwę kategorii"
     name_unavailable: "%{name} jest już w użyciu."
     self_signup_for_courses: "Samodzielny zapis może być jedynie włączony w przypadku grup kursu lub społeczności"
+  group_category_id_7001cf89: group_category_id
   group_category_locked: "Nie można zmienić kategorii grupy, ponieważ uczestnicy przesłali już zadanie"
   group_details_e51122f1: "Szczegóły grupy"
   group_group_name_is_for_a_different_section_4d84d256: "Grupa %{group_name} jest przeznaczona dla innej sekcji"
@@ -8031,6 +8183,7 @@ pl:
   group_is_full_56849d78: "Grupa jest pełna"
   group_is_joined_by_invitation_only_d00f5a63: "Grupa podlega łączeniu wyłącznie na podstawie zaproszenia"
   group_leader_user_name_6f24bebb: "lider grupy %{user_name}"
+  group_limit_87ae4421: group_limit
   group_members_ae5489ed: "członkowie grupy"
   group_membership: 
     errors: 
@@ -8458,22 +8611,27 @@ pl:
       x_more: "%{x} więcej..."
       x_new_in_announcements: 
         few: "*%{count}* ogłoszenia"
+        many: "*%{count}* ogłoszeń"
         one: "*1* ogłoszenie"
         other: "*%{count}* ogłoszeń"
       x_new_in_assignments: 
         few: "*%{count}* powiadomienia o zadaniach"
+        many: "*%{count}* powiadomień o zadaniach"
         one: "*1* powiadomienie o zadaniach"
         other: "*%{count}* powiadomień o zadaniach"
       x_new_in_conversations: 
         few: "*%{count}* wiadomości w rozmowach"
+        many: "*%{count}* wiadomości w rozmowach"
         one: "*1* wiadomość w rozmowie"
         other: "*%{count}* wiadomości w rozmowach"
       x_new_in_discussions: 
         few: "*%{count}* dyskusje"
+        many: "*%{count}* dyskusji"
         one: "*1* dyskusja"
         other: "*%{count}* dyskusji"
       x_new_in_peer_reviews: 
         few: "Liczba recenzji uczestnika: *%{count}*"
+        many: "Liczba recenzji uczestnika: *%{count}*"
         one: "*1* Recenzja uczestnika"
         other: "Liczba recenzji uczestnika: *%{count}*"
     local: Lokalne
@@ -8490,13 +8648,18 @@ pl:
   hidden_available_with_a_link_65ef2bda: "Ukryte. Dostępne za pomocą linka"
   hidden_available_with_a_link_click_to_modify_184990e7: "Ukryty. Dostępny z linkiem - Kliknij aby zmienić"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Ukryte, zawarte pliki będą dostępne za pomocą łączy."
+  hide_account_navigation_menu_ccdf9480: "Ukryj menu nawigacji na koncie"
+  hide_admin_navigation_menu_5cab9c9e: "Ukryj menu nawigacji administratora"
   hide_all_artifacts_d654fbd5: "Ukryj wszystkie artefakty"
   hide_all_details_61d7ebb: "Ukryj wszystkie informacje szczegółowe"
   hide_correct_answers_at_2421b0aa: "Ukryj poprawne odpowiedzi przy"
   hide_correct_answers_at_b1a59408: "Ukryj prawidłowe odpowiedzi w"
   hide_course_sections_for_course_name_bd1911af: "Ukryj sekcje kursu dla kursu %{name}"
   hide_courses_menu_1b8ca649: "Ukryj menu kursów"
+  hide_courses_navigation_menu_6f7c4cfd: "Ukryj menu nawigacji w kursie"
   hide_courses_without_enrollments_6df4dfad: "Ukryj kursy bez zapisów"
+  hide_groups_navigation_menu_62e8b3d0: "Ukryj menu nawigacji w grupach"
+  hide_navigation_menu_f0b3e90: "Ukryj menu nawigacji"
   hide_notes_column_7749f408: "Ukryj kolumnę uwag"
   hide_sidebar_2b5b3776: "Ukryj pasek boczny"
   hide_student_names_3e59e862: "Ukryj nazwy uczestników"
@@ -8568,6 +8731,10 @@ pl:
   if_you_would_like_to_link_to_your_own_campus_suppo_85a94934: "Jeśli chcesz wstawić łącze do własnej strony pomocy w okienku pomocy, możesz to zrobić tutaj"
   ignore_91750df8: Ignoruj
   ignore_assignment_738b3c99: "Zignoruj zadanie"
+  ignore_assignment_a4837cb3: "Ignoruj %{assignment}"
+  ignore_item_46c066f3: "Ignoruj %{item}"
+  ignore_item_until_new_mark_68518bf0: "Ignoruj %{item} aż do nowej oceny"
+  ignore_item_until_new_submission_58246b15: "Ignoruj %{item} aż do nowego przesłania"
   ignore_name_55edc6fe: "Zignoruj %{name}"
   ignore_these_3940f6f5: "Zignoruj to"
   ignore_this_assignment_b7a71f80: "Zignoruj to zadanie"
@@ -8591,6 +8758,7 @@ pl:
   import_content_b2fd6620: "Importuj zawartość"
   import_sis_data_428cc803: "Importuj dane z systemu SIS"
   important_note_educational_institutions_have_an_ob_c9350304: "*Uwaga: Instytucje edukacyjne mają obowiązek udostępniania swojej treści w jak największym, możliwym stopniu. Instructure zaleca stosunek conajmniej 3:1 tekstu-do-koloru-tła aby tekst był czytelny. Sprawdź współczynnik kontrastu za pomocą **WebAIM Color Contrast Checker***."
+  imported_from_sis_3006b19c: "Zaimportowano z SIS"
   importers/assignment_importer: 
     errors: 
       import: 
@@ -8666,6 +8834,7 @@ pl:
   insert_row_below_25187f89: "Wstaw rząd poniżej"
   installed_7b284a91: Zainstalowano
   installed_by_admin_97c3a721: "Zainstalowane przez administratora"
+  institution_14179014: Instytucja
   instructions: 
     authorize_google_docs: "Aby rozpocząć współpracę związaną z dokumentami, należy zezwolić systemowi Canvas na dostęp do konta Google Docs użytkownika:"
     authorize_google_drive: "Zanim będzie możliwa współpraca nad dokumentami, konieczne jest autoryzowanie systemu Canvas w zakresie dostępu do konta na dysku Google:"
@@ -8736,6 +8905,7 @@ pl:
     tooltips: 
       enter_search_terms: "wprowadź szukane terminy"
   integration_id_int_id_is_already_in_use_f30f03b5: "Integracja identyfikatora \"%{int_id}\"  jest już używany"
+  interactions_report_47c1219e: "Raport interakcji"
   international_sms_9edb9868: "Międzynarodowy SMS"
   international_sms_send_from_recipient_s_country_43881ea4: "Międzynarodowa wiadomość SMS - Wyślij z kraju odbiorcy"
   international_text_messaging_rates_may_apply_d4b4a97a: "Międzynarodowe stawki dla wiadomości tekstowych mogą być pobrane."
@@ -8995,6 +9165,7 @@ pl:
     progress_runner: 
       completed_message: 
         few: "Liczba przetworzonych elementów: %{count}"
+        many: "Liczba przetworzonych elementów: %{count}"
         one: "1 przetworzony element"
         other: "Liczba przetworzonych elementów: %{count}"
       error_message: "Błąd %{error}: %{ids}"
@@ -9063,6 +9234,7 @@ pl:
   load_more_9ca37ccc: "Ładowanie następnych..."
   loaded_more_collaborations_13f1d630: "Załadowano więcej projektów współpracy."
   loading_25990131: "Trwa ładowanie..."
+  loading_725811ca: wczytywanie
   loading_announcements_b927a86c: "Wczytywanie ogłoszeń"
   loading_bde52856: "Trwa ładowanie"
   loading_courses_bd1bffe: "Trwa ładowanie kursów..."
@@ -9188,6 +9360,7 @@ pl:
   login_button_text_c958250f: "Treść  przycisku logowania"
   login_footer_link_badb3898: "Link w stopce logowania"
   login_footer_link_hover_1b474e6c: "Uniesiony link w stopce logowania"
+  login_id_12109693: "Nazwa użytkownika"
   login_instructure_logo_8f2332db: "Logowanie w logo Instructure"
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "Nieprawidłowy login: musi być alfanumeryczny albo adres email"
   login_is_too_long_25373f95: "Login jest za długi"
@@ -9413,19 +9586,23 @@ pl:
       email: 
         body: 
           few: "Alarm został uruchomiony dla %{student}, ponieważ następujące warunki  zostały spełnione:"
+          many: "Alarm został uruchomiony dla %{student}, ponieważ następujące warunki  zostały spełnione:"
           one: "Alarm został uruchomiony dla %{student}, ponieważ następujący warunek  został spełniony:"
           other: "Alarm został uruchomiony dla %{student}, ponieważ następujące warunki  zostały spełnione:"
         body_student: 
           few: "Alarm został uruchomiony dla ciebie, ponieważ następujące warunki  zostały spełnione:"
+          many: "Alarm został uruchomiony dla ciebie, ponieważ następujące warunki  zostały spełnione:"
           one: "Alarm został uruchomiony dla ciebie, ponieważ następujący warunek  został spełniony:"
           other: "Alarm został uruchomiony dla ciebie, ponieważ następujące warunki  zostały spełnione:"
         html: 
           body: 
             few: "Na skutek pojawienia się następujących warunków, alarm został uruchomiony dla następującej liczby studentów: %{student}"
+            many: "Na skutek pojawienia się następujących warunków, alarm został uruchomiony dla następującej liczby studentów: %{student}"
             one: "Na skutek pojawienia się następujących warunków, alarm został uruchomiony dla następującej liczby studentów: %{student}"
             other: "Na skutek pojawienia się następujących warunków, alarm został uruchomiony dla następującej liczby studentów: %{student}"
           body_student: 
             few: "Alarm został uruchomiony dla Ciebie ponieważ następujące warunki  zostały spełnione:"
+            many: "Alarm został uruchomiony dla Ciebie, ponieważ następujące warunki zostały spełnione:"
             one: "Alarm został uruchomiony dla Ciebie ponieważ następujące warunki  zostały spełnione:"
             other: "Alarm został uruchomiony dla Ciebie, ponieważ następujące warunki zostały spełnione:"
           interaction_description: "Brak interakcji między instruktorem a uczestnikiem od %{count} dni"
@@ -9446,27 +9623,33 @@ pl:
       summary: 
         body: 
           few: "Alarm został uruchomiony dla %{student}, ponieważ następujące warunki  zostały spełnione:"
+          many: "Alarm został uruchomiony dla %{student}, ponieważ następujące warunki  zostały spełnione:"
           one: "Alarm został uruchomiony dla %{student}, ponieważ następujący warunek  został spełniony:"
           other: "Alarm został uruchomiony dla %{student}, ponieważ następujące warunki  zostały spełnione:"
         body_student: 
           few: "Alarm został uruchomiony dla ciebie, ponieważ następujące warunki  zostały spełnione:"
+          many: "Alarm został uruchomiony dla ciebie, ponieważ następujące warunki  zostały spełnione:"
           one: "Alarm został uruchomiony dla ciebie, ponieważ następujący warunek  został spełniony:"
           other: "Alarm został uruchomiony dla ciebie, ponieważ następujące warunki  zostały spełnione:"
         interaction_description: 
           few: "Brak interakcji uczestnik/nauczyciel przez %{count} lub więcej dni"
+          many: "Brak interakcji uczestnik/nauczyciel przez %{count} lub więcej dni"
           one: "Brak interakcji uczestnik/nauczyciel przez jeden dzień"
           other: "Brak interakcji uczestnik/nauczyciel przez %{count} lub więcej dni"
         subject: "Alert: %{user_name}"
         ungraded_count_description: 
           few: "%{count} lub więcej zadań nie zostało ocenionych."
+          many: "%{count} lub więcej zadań nie zostało ocenionych."
           one: "Jedno lub więcej zadań nie zostało ocenione."
           other: "%{count} lub więcej zadań nie zostało ocenionych."
         ungraded_timespan_description: 
           few: "Jedno lub więcej przesłanych zadań nie zostało ocenione przez %{count} lub więcej dni."
+          many: "Jedno lub więcej przesłanych zadań nie zostało ocenione przez %{count} lub więcej dni."
           one: "Jedno lub więcej przesłanych zadań nie zostało ocenione przez 1 lub więcej dni."
           other: "Jedno lub więcej przesłanych zadań nie zostało ocenione przez %{count} lub więcej dni."
         usernote_description: 
           few: "Brak wpisów do dziennika wydziału przez %{count} lub więcej dni"
+          many: "Brak wpisów do dziennika wydziału przez %{count} lub więcej dni"
           one: "Brak wpisów do dziennika wydziału przez dzień lub więcej"
           other: "Brak wpisów do dziennika wydziału przez %{count} lub więcej dni"
       twitter: 
@@ -11129,6 +11312,7 @@ pl:
   mobile_css_file_b86ded7f: "Mobilny plik CSS"
   mobile_homescreen_icon_f85d6b63: "Ikona mobilnego ekranu głównego"
   mobile_javascript_file_c429158d: "Mobilny plik JavaScript"
+  modal_dialog_add_people_bc1c6e14: "Okno modułu: Dodaj ludzi"
   modal_dialog_add_to_course_aec33759: "Okno modułu: Dodaj do kursu"
   modal_dialog_header_source_16ec3ac1: "Okno modułu: %{header} %{source}"
   model_is_already_located_in_newgroup_e5cea361: "%{model} już się znajduje w %{newGroup}"
@@ -11208,10 +11392,12 @@ pl:
       creating: "Trwa tworzenie..."
     assignments_to_grade: 
       few: "%{count} zadania pozostają nieocenionione"
+      many: "%{count} zadań pozostaje nieocenionione"
       one: "1 zadanie pozostaje nieocenionione"
       other: "%{count} zadań pozostaje nieocenionione"
     assignments_to_post: 
       few: "Możesz teraz zamieścić %{count} zadania."
+      many: "Możesz teraz zamieścić %{count} zadań."
       one: "Możesz teraz zamieścić 1 zadanie."
       other: "Możesz teraz zamieścić %{count} zadań."
     continue: Kontynuuj
@@ -11295,6 +11481,7 @@ pl:
     relock_modules: "Ponownie zablokuj moduły"
     requirements_changed: "Zmieniono wymagania"
   modules_c4325335: Moduły
+  modules_home_page_568c6bb9: "Strona główna modułów"
   modules_item_controller: 
     max_score_complete: "zdobył nie więcej niż *wynik*"
     max_score_incomplete: "musi zdobyć nie więcej niż *wynik*"
@@ -11318,6 +11505,7 @@ pl:
   more_than_999_submissions_need_grading_bc087dd0: "Ponad 999 przesłanych zadań wymaga oceny"
   more_than_9_submissions_need_grading_30157d49: "Ponad 9 przesłanych zadań wymaga oceny"
   more_than_a19b440: "%{more_than}+"
+  most_recent_export_7282b756: "Najnowszy eksport"
   most_recent_result_counts_as_calculation_int_of_ma_13628bf0: "Najnowszy wynik jest liczony jako %{calculation_int}% wagi nadrzędnej, średnia wsystkich pozostałych wyników jest liczona jako  %{remainder}% wagi. Muszą istnieć co najmniej 2 wyniki zanim zostanie nadana ocena."
   most_recent_result_counts_as_calculation_int_of_ma_a734a4db: "Najnowszy wynik jest liczony jako %{calculation_int}% wagi nadrzędnej, średnia wszystkich pozostałych wyników jest liczona jako %{remainder}% wagi. Jeżeli jest tylko jeden wynik,  zostanie zwrócony pojedynczy wynik."
   most_recent_score_13a87e8c: "Najnowszy wynik"
@@ -11350,6 +11538,7 @@ pl:
   move_this_section_890bee38: "Przenieś tę sekcję"
   move_to_9b91c6e0: "Przenieś do..."
   move_to_dde1a5e1: "Przenieś do..."
+  move_to_end_c6bfbcf5: "Przenieś na koniec"
   move_to_end_fef2fa15: "Przesuń do końca"
   move_to_front_7eae2e90: "Przesuń na początek"
   move_to_front_bf6f0194: "Przesuń na początek"
@@ -11364,6 +11553,7 @@ pl:
   multiple_modules_930713d4: "Wiele modułów"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
     few: "Należy osiągnąć biegłość co najmniej %{count} razy. Wyniki punktowe powyżej biegłości zostaną uśrednione w celu obliczenia końcowego wyniku punktowego."
+    many: "Należy osiągnąć biegłość co najmniej %{count} razy. Wyniki punktowe powyżej biegłości zostaną uśrednione w celu obliczenia końcowego wyniku punktowego."
     one: "Należy osiągnąć biegłość przynajmniej raz. Wyniki punktowe powyżej biegłości zostaną uśrednione w celu obliczenia końcowego wyniku punktowego."
     other: "Należy osiągnąć biegłość co najmniej %{count} razy. Wyniki punktowe powyżej biegłości zostaną uśrednione w celu obliczenia końcowego wyniku punktowego."
   must_be_after_start_date_95e251a3: "musi być po dacie początkowej"
@@ -11422,6 +11612,7 @@ pl:
   name_is_currently_status_9065c996: "*name* jest obecnie **status**."
   name_is_required_ba379522: "Wymagana jest nazwa"
   name_only_5f56718e: "Tylko nazwa"
+  name_options_bc5c95ce: "%{name} Opcje"
   nav_avatar_border_3246beb1: "Nawigacja obramowania Avatar"
   nav_background_fd299145: "Tło nawigacji"
   nav_badge_3c67de17: "Znaczek nawigacji"
@@ -11438,6 +11629,7 @@ pl:
   need_help_setting_up_your_course_2b763141: "Potrzebujesz pomocy przy konfigurowaniu kursu?"
   netherlands_14ca4f6d: Holandia
   netherlands_31_63e4f1b9: "Holandia (+31)"
+  never_df100b49: Nigdy
   new_13daf639: Nowy
   new_account_role_6e5c4964: "Nowa rola konta"
   new_annotations_66932016: "Nowe adnotacje"
@@ -11466,6 +11658,7 @@ pl:
   new_rating_created_54125331: "Utworzno nową klasyfikację"
   new_topic_for_course_3d98222a: "Nowy temat dla kursu %{course}"
   new_ui_487a624e: "Nowy IU"
+  new_user_s_name_909b6267: "Imię i nazwisko nowego użytkownika"
   new_zealand_64_f126cf2e: "Nowa Zelandia (+64)"
   new_zealand_ef5d7b74: "Nowa Zelandia"
   newest_oldest_d768cf1a: "Najnowsze - najstarsze"
@@ -11488,9 +11681,11 @@ pl:
   no_due_date_44271c53: "Brak terminu dostarczenia"
   no_due_date_6e6a23c1: "(brak terminu dostarczenia)"
   no_e16d9132: Nie
+  no_exports_to_display_7f1b630b: "Brak eksportów do wyświetlenia"
   no_final_grade_selected_3595c9c: "Nie wybrano końcowej oceny"
   no_grade_3fa326c: "brak oceny"
   no_grade_assigned_90e531f5: "Nie przydzielono oceny."
+  no_graded_submissions_e40c957a: "Brak ocenionych zadań"
   no_grading_periods_configured_for_this_term_ca22393e: "brak okresów oceniania skonfigurowanych dla danego semestru"
   no_grading_schemes_to_display_8b0e92e7: "Brak schematów oceniania do wyświetlenia"
   no_icon_1f6ea5f4: "brak ikony"
@@ -11502,6 +11697,7 @@ pl:
   no_password_was_given_472222e5: "Nie podano hasła"
   no_placements_enabled_f705f28: "Włączony Brak Miejsc Docelowych"
   no_points_possible_368669d: "Brak możliwych punktów"
+  no_points_possible_72db3a55: "Brak możliwych punktów"
   no_results_found_58717065: "Nie znaleziono wyników"
   no_score_yet_c94e919b: "Jeszcze nie ma wyniku punktowego"
   no_students_dd8de9f0: "Brak uczestników"
@@ -11512,6 +11708,7 @@ pl:
   no_unresponsive_links_found_8ea497f9: "Nie znaleziono nieodpowiadających linków"
   no_usage_rights_object_supplied_304b8d40: "Nie podano obiektu 'usage_rights'"
   no_users_found_64a043ff: "Nie znaleziono uzytkowników"
+  no_users_were_selected_to_add_to_the_course_a51c6083: "Nie wybrano użytkowników do dodania do kursu"
   none_3b5e34d2: Brak
   norway_47_bc598662: "Norwegia (+47)"
   norway_c11471b3: Norwegia
@@ -11628,13 +11825,12 @@ pl:
     grading_policies_description: "Zmiana polityki oceniania na kursie"
     grading_policies_display: "Polityki oceniania"
     invitation_description: |-
-        Zaproszenie do:⏎
-        ⏎
-        * Konferencji w sieci Web⏎
-        * Grupy⏎
-        * Współpracy⏎
-        * Kursu⏎
-        * Recenzji użytkownika i przypomnienia
+        Zaproszenie do:
+        
+        * Konferencja internetowa
+        * Grupa
+        * Współpraca
+        * Analiza i przypomnienia
     invitation_display: Zaproszenie
     late_grading_description: |-
         *Jedynie instruktor i administrator:*⏎
@@ -11784,14 +11980,17 @@ pl:
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Teraz kiedy Twój kurs jest skonfigurowany i dostępny, prawdopodobnie nie będzie Ci już potrzebna ta lista kontrolna. Jednak zachowamy ją na wypadek, jeśli uświadomisz sobie później, że chcesz spróbować czegoś nowego lub po prostu chcesz uzyskać dodatkową pomoc podczas dokonywania zmian w zawartości kursu."
   num_messages_c1949bbc: 
     few: "%{num} wiadomości"
+    many: "%{num} wiadomości"
     one: "1 wiadomość"
     other: "%{num} wiadomości"
   num_page_views_b087ba5: 
     few: "%{num} wyświetlenia strony"
+    many: "%{num} wyświetleń strony"
     one: "1 wyświetlenie strony"
     other: "%{num} wyświetleń strony"
   num_participations_f32f4f3f: 
     few: "%{num} uczestników"
+    many: "%{num} uczestników"
     one: "1 uczestnik"
     other: "%{num} uczestników"
   number: 
@@ -11828,6 +12027,7 @@ pl:
         units: 
           byte: 
             few: Bajty
+            many: Bajtów
             one: Bajt
             other: Bajtów
           gb: GB
@@ -11946,6 +12146,11 @@ pl:
   other_carrier_45531207: "Inny operator"
   other_ddacb37d: inne
   other_timezones_42530564: "Inne strefy czasowe"
+  out_of_formattedoutof_e08e90d5: "z %{formattedOutOf}"
+  out_of_n_assignment_points_possible_3b026ea9: "z %{n_assignment.points_possible}"
+  out_of_points_37a749d7: "(z %{points})"
+  out_of_points_possible_8ab14f7: "z %{points_possible}"
+  out_of_pointspossible_3fb5ee20: "Z %{pointsPossible}"
   outcome_groups: 
     invalid_file: "Nieprawidłowy plik grupy wyników"
   outcome_groups_api: 
@@ -12066,10 +12271,12 @@ pl:
     user_outcome_results: 
       artifacts: 
         few: "%{count} artefakty"
+        many: "%{count} artefaktów"
         one: "1 artefakt"
         other: "%{count} artefaktów"
       attempts: 
         few: "%{count} próby"
+        many: "%{count} prób"
         one: "1 próba"
         other: "%{count} prób"
       attempts_from_artifacts: "%{attempts} *z %{artifacts}*"
@@ -12084,6 +12291,7 @@ pl:
         average_percent: "Średnia wartość procentowa"
         latest_score: "Najnowszy wynik punktowy"
         outcome: Wynik
+  outcomes_report_8887bd49: "Raport wyników"
   overrides: 
     blank_override: "Musisz wybrać uczestnika lub sekcję"
     everyone: Wszyscy
@@ -12093,6 +12301,7 @@ pl:
       everyone: Wszyscy
   own_copyright_cc59db55: "Własne prawa autorskie"
   package_error: "Błąd identyfikacji rodzaju pakietu:  %{error}"
+  package_export_from_d6e2b073: "Eksport pakietu z"
   page_comment: 
     default_user_name: Anonimowy
   page_comments: 
@@ -12182,6 +12391,7 @@ pl:
   percent_of_students_scoring_1239d948: "Procent uczniów w punktacji"
   percentage_34ab7c2c: "Wartość procentowa"
   percentused_of_bytesavailable_used_894e2327: "Wykorzystano %{percentUsed}% z %{bytesAvailable}"
+  percentused_of_bytesavailable_used_a859a40d: "%{percentUsed} z %{bytesAvailable} użytych"
   performance_ac5f9e70: Wykonanie
   performance_enhancements_for_the_gradebook_e6c5d5a5: "Ulepszenia wydajnośći dla dziennika ocen"
   permission_must_be_enabled_for_someone_397e1ce3: "Pozwolenie musi zostać komuś przypisane"
@@ -12409,6 +12619,7 @@ pl:
         course_short_name_selection: "Wybór krótkiej nazwy kursu"
         course_sourcedid_name_prefix: "Zignorowano prefiks \"sourcedid\""
         default_email_domain: "Domyślna domena e-mail"
+        default_enrollment_status: "Status usuniętych zarejestrowań"
         email_preference: "Preferencja e-mail"
         lms_delivery_name: "Nazwa dostawy LMS"
         map_sections_to_courses: "Mapuj sekcje IMS z kursami Canvas"
@@ -12642,10 +12853,12 @@ pl:
   points_bb475533: Punkty
   points_bceb5005: punkty
   points_n_e0b20623: "Punkty %{n}"
+  points_out_of_total_24f61148: "*%{points}* z **%{total}**"
   points_points_b6b422e2: "Punkty: %{points}"
   points_possible_1c0b3445: "Maksymalna możliwa liczba punktów"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Maksymalna możliwa liczba punktów musi wynosić 0 lub więcej dla wybranego typu oceniania"
   points_pts_e5596bf7: "%{points} pkt"
+  points_total_pts_5b4cbd77: "%{points} / %{total} pkt"
   pointspossible_points_possible_964c8592: "Liczba punktów możliwych do zdobycia: %{pointsPossible}"
   pointspossible_pts_624a6733: "/%{pointsPossible} pkt"
   poland_48_e77cc14d: "Polska (+48)"
@@ -12671,6 +12884,7 @@ pl:
   port_75f69d1: Port
   position_f9c9b93c: Pozycja
   possible_combination_count_db651ca4: "Możliwa liczba kombinacji"
+  possible_matches_for_address_select_the_correct_on_e206f972: "Możliwe dopasowania dla \"%{address}\". Wybierz poprawny poniżej lub utwórz nowego użytkownika."
   possible_score_5e0a328e: "Możliwe: %{score}"
   post_1e445890: Wyślij
   post_grade_to_sis_disabled_click_to_toggle_6ee5ff3: "Wysyłka oceny do SIS wyłączona. Kliknij aby uruchomić."
@@ -12699,6 +12913,8 @@ pl:
   preview_53003fd2: Podgląd
   preview_your_changes_373557d8: "Przejrzyj zmiany"
   previous_bd2ac015: Poprzedni
+  previous_csv_file_time_d7bfe7ef: "Wcześniejszy plik CSV (%{time})"
+  previous_csv_timestamp_6673c69c: "Wcześniejszy CSV (%{timestamp})"
   previous_message_8804f87e: "Poprzednia wiadomość"
   previous_module_item_2bb5e499: "Poprzedni moduł/pozycje"
   previous_month_7adf1380: "Poprzedni miesiąc"
@@ -12712,6 +12928,7 @@ pl:
   primary_color_button_b75db628: "Przycisk koloru podstawowego"
   primary_color_button_disabled_9081ddff: "Przycisk koloru podstawowego wyłączony"
   privacy_290109ea: Prywatność
+  processing_2fcc9739: Przetwarzanie
   product_name: "System Canvas"
   profile: 
     access_token: 
@@ -13125,6 +13342,7 @@ pl:
     new: 
       payment_info: "Informacje o opłatach"
   purple_7678a9fc: Fioletowy
+  q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "P: Co to jest – na zmianę czarne, białe, czarne, białe?  O: Panda tocząca się po zboczu wzgórza."
   qatar_974_7e9684ca: "Katar (+974)"
   qatar_d52a8d27: Katar
   qti_display: QTI
@@ -13142,18 +13360,22 @@ pl:
     buttons: 
       submit_copying: 
         few: "Trwa kopiowanie pytań..."
+        many: "Trwa kopiowanie pytań..."
         one: "Trwa kopiowanie pytania..."
         other: "Trwa kopiowanie pytań..."
       submit_copying_failed: 
         few: "Kopiowanie pytań nie powiodło się, spróbuj ponownie"
+        many: "Kopiowanie pytań nie powiodło się, spróbuj ponownie"
         one: "Kopiowanie pytania nie powiodło się, spróbuj ponownie"
         other: "Kopiowanie pytań nie powiodło się, spróbuj ponownie"
       submit_moving: 
         few: "Trwa przenoszenie pytań..."
+        many: "Trwa przenoszenie pytań..."
         one: "Trwa przenoszenie pytania..."
         other: "Trwa przenoszenie pytań..."
       submit_moving_failed: 
         few: "Przenoszenie pytań nie powiodło się, spróbuj ponownie"
+        many: "Przenoszenie pytań nie powiodło się, spróbuj ponownie"
         one: "Przenoszenie pytania nie powiodło się, spróbuj ponownie"
         other: "Przenoszenie pytań nie powiodło się, spróbuj ponownie"
       submit_retry_copying: "Kopiowanie pytania nie powiodło się, spróbuj ponownie..."
@@ -13196,6 +13418,7 @@ pl:
       no_questions: "Brak pytań"
       question_count: 
         few: "%{count} Pytania"
+        many: "%{count} Pytań"
         one: "1 Pytanie"
         other: "%{count} Pytań"
       unbookmark_bank: "Usuń zakładkę do tego banku pytań"
@@ -13261,12 +13484,14 @@ pl:
       page_focused: Wznowiono.
       question_answered: 
         few: "Odpowiedziano na następujące pytania:"
+        many: "Odpowiedziano na następujące pytania:"
         one: "Odpowiedziano na pytanie:"
         other: "Odpowiedziano na następujące pytania:"
       question_flagged: "Oflagowane pytanie:"
       question_unflagged: "Pytanie z usuniętą flagą:"
       question_viewed: 
         few: "Wyświetlono (i być może przeczytano) następujące pytania:"
+        many: "Wyświetlono (i być może przeczytano) następujące pytania:"
         one: "Wyświetlono (i być może przeczytano) pytanie"
         other: "Wyświetlono (i być może przeczytano) następujące pytania:"
       session_started: "Sesja rozpoczęta"
@@ -13384,16 +13609,19 @@ pl:
     download_submissions: "Pobierz wszystkie pliki"
     duration_in_hours: 
       few: "%{count} godziny"
+      many: "%{count} godzin"
       one: "1 godzina"
       other: "%{count} godzin"
     duration_in_hours_and_minutes: "Liczba godzin %{hours} i minut %{minutes}"
     duration_in_minutes: 
       few: "%{count} minuty"
+      many: "%{count} minuty"
       one: "1 minuta"
       other: "%{count} minuty"
     duration_in_minutes_and_seconds: "Liczba minut %{minutes} i sekund %{seconds}"
     duration_in_seconds: 
       few: "%{count} sekundy"
+      many: "%{count} sekund"
       one: "1 sekunda"
       other: "%{count} sekund"
     empty_question_breakdown: "Brak dostępnej statystyki pytania."
@@ -13441,12 +13669,14 @@ pl:
       no_valid_combinations: "System nie był w stanie wygenerować prawidłowych kombinacji dla podanych parametrów"
       only_n_valid_combinations: 
         few: "System mógł utworzyć tylko %{count} prawidłowe kombinacje dla podanych parametrów."
+        many: "System mógł utworzyć tylko %{count} prawidłowych kombinacji dla podanych parametrów."
         one: "System mógł utworzyć tylko 1 prawidłową kombinację dla podanych parametrów."
         other: "System mógł utworzyć tylko %{count} prawidłowych kombinacji dla podanych parametrów."
     answer_comments: "Komentarze do odpowiedzi"
     answer_text: "Treść odpowiedzi"
     assignment_points_possible: 
       few: "Liczba punktów: %{count}"
+      many: "Liczba punktów: %{count}"
       one: "1 punkt"
       other: "Liczba punktów: %{count}"
     at_the_bottom: "--na dole --"
@@ -13582,6 +13812,7 @@ pl:
       extensions_for_student: "Rozszerzenia dla uczestnika %{student}"
       extensions_for_students: 
         few: "Przedłuzenie dla %{count} uczestników"
+        many: "Przedłużenie dla %{count} uczestników"
         one: "Przedłuzenie dla 1 uczestnika"
         other: "Przedłużenie dla %{count} uczestników"
       finished_in_duration: "zakończono w ciągu %{duration}"
@@ -13603,6 +13834,7 @@ pl:
     question_colon: "Pytanie:"
     question_count: 
       few: "Liczba pytań: %{count}"
+      many: "Liczba pytań: %{count}"
       one: "1 pytanie"
       other: "Liczba pytań: %{count}"
     question_limit_reached: |-
@@ -13889,6 +14121,7 @@ pl:
           allow_extra_attempt: "zezwól uczestnikowi na dodatkową próbę"
         count_attempts_left: 
           few: "%{user} pozostały %{count} próby"
+          many: "Użytkownikowi %{user} pozostało %{count} prób"
           one: "%{user} pozostała 1 próba"
           other: "Użytkownikowi %{user} pozostało %{count} prób"
         default_quiz_name: "Test z kursu %{course_name}"
@@ -13980,6 +14213,7 @@ pl:
         reload_student_table: "Ponownie załaduj tabelę uczestnika"
         student_gets_extra_time: 
           few: "Uczestnik *%{student_name}* **otrzymuje %{count} dodatkowe minuty na każdą próbę**"
+          many: "Uczestnik *%{student_name}* **otrzymuje %{count} dodatkowych minut na każdą próbę**"
           one: "Uczestnik *%{student_name}* **otrzymuje dodatkową minutę na każdą próbę**"
           other: "Uczestnik *%{student_name}* **otrzymuje %{count} dodatkowych minut na każdą próbę**"
         student_n: "Uczestnik %{n}"
@@ -14082,10 +14316,12 @@ pl:
         quiz_updated: "Test został pomyślnie zaktualizowany"
         quizzes_published: 
           few: "%{count} quizy opublikowano z powodzeniem!"
+          many: "%{count} quizów opublikowano z powodzeniem!"
           one: "1 quiz opublikowano z powodzeniem!"
           other: "%{count} quizów opublikowano z powodzeniem!"
         quizzes_unpublished: 
           few: "Pomyślnie cofnięto publikację następującej liczby testów: %{count} "
+          many: "Pomyślnie cofnięto publikację następującej liczby testów: %{count} "
           one: "Pomyślnie cofnięto publikację 1 testu! "
           other: "Pomyślnie cofnięto publikację następującej liczby testów: %{count} "
         submission_doesnt_count: "Ten test nie będzie juz wliczany do oceny."
@@ -14144,6 +14380,7 @@ pl:
         requires_lockdown: "Wymaga programu Respondus LockDown Browser"
         time_limit: 
           few: "%{count} Minuty"
+          many: "%{count} Minut"
           one: "1 Minuta"
           other: "%{count} Minut"
         unlimited: Nieograniczono
@@ -14154,10 +14391,12 @@ pl:
       quiz_right_side: 
         attempts_left: 
           few: " Pozostały jeszcze %{count} próby"
+          many: " Pozostało jeszcze %{count} prób"
           one: " Pozostała jeszcze 1 próba"
           other: " Pozostało jeszcze %{count} prób"
         attempts_so_far: 
           few: "%{count} Próby dotychczas"
+          many: "%{count} Prób dotychczas"
           one: "1 Próba dotychczas"
           other: "%{count} Prób dotychczas"
         labels: 
@@ -14199,6 +14438,7 @@ pl:
         shuffle_answers: "Pomieszaj odpowiedzi"
         time_limit: 
           few: "%{count} Minuty"
+          many: "%{count} Minut"
           one: "1 Minuta"
           other: "%{count} Minut"
         until: Do
@@ -14300,12 +14540,14 @@ pl:
         only_registered_users: "Tylko zarejestrowani, zapisani użytkownicy mogą podejść do ocenianych testów"
         quiz_regraded_your_score_affected: 
           few: "Test został oceniony ponownie; nowy wynik odzwierciedla %{count} pytania, które zostały zmienione."
+          many: "Test został oceniony ponownie; nowy wynik odzwierciedla %{count} pytań, które zostały zmienione."
           one: "Test został oceniony ponownie; nowy wynik odzwierciedla 1 pytanie, które zostało zmienione."
           other: "Test został oceniony ponownie; nowy wynik odzwierciedla %{count} pytań, które zostały zmienione."
         quiz_regraded_your_score_not_affected: "Test został ponownie oceniony; wynik nie został zmieniony."
         speed_grader: SpeedGrader™
         students_submitted_so_far: 
           few: "%{count} uczestników wysłało dotychczas"
+          many: "%{count} uczestników wysłało dotychczas"
           one: "1 uczestnik wysłał dotychczas"
           other: "%{count} uczestników wysłało dotychczas"
         titles: 
@@ -14410,6 +14652,7 @@ pl:
         delete_quiz: "Czy na pewno chcesz usunąć ten test?"
         delete_quiz_submissions_warning: 
           few: "Ostrzeżenie: %{count} uczestników rozwiązało ten quiz. Jeśli go usuniesz, wszystkie przekazane rozwiązania zostaną usunięte i nie będą dłużej widoczne  w dzienniku."
+          many: "Ostrzeżenie: %{count} uczestników rozwiązało ten test. Jeśli go usuniesz, wszystkie przekazane rozwiązania zostaną usunięte i nie będą dłużej widoczne  w dzienniku."
           one: "Ostrzeżenie: 1 uczestnik rozwiązał ten quiz. Jeśli go usuniesz, wszystkie przekazane rozwiązania zostaną usunięte i nie będą dłużej widoczne  w dzienniku."
           other: "Ostrzeżenie: %{count} uczestników rozwiązało ten test. Jeśli go usuniesz, wszystkie przekazane rozwiązania zostaną usunięte i nie będą dłużej widoczne  w dzienniku."
       links: 
@@ -14436,15 +14679,18 @@ pl:
         navigate_away: "Za chwilę opuścisz tę stronę.  Kontynuować mimo to?"
         unanswered_questions: 
           few: "Nie odpowiedziano na %{count} pytania (szczegóły sprawdż w panelu po prawej). Czy na pewno wysłać?"
+          many: "Nie odpowiedziano na %{count} pytań (szczegóły sprawdź w panelu po prawej). Czy na pewno wysłać?"
           one: "Nie odpowiedziano na 1 pytanie (szczegóły sprawdż w panelu po prawej). Czy na pewno wysłać?"
           other: "Nie odpowiedziano na %{count} pytań (szczegóły sprawdź w panelu po prawej). Czy na pewno wysłać?"
         unfinished_quiz: "Opuścisz ten test bez ukończenia.  Kontynuować mimo to?"
         unseen_questions: 
           few: "Wciąż są %{count} pytania, których jeszcze nie widziałeś/aś. Przesłać mimo to?"
+          many: "Wciąż jest %{count} pytań, których jeszcze nie widziałeś/aś. Przesłać mimo to?"
           one: "Wciąż jest 1 pytanie, którego jeszcze nie widziałeś. Przesłać mimo to?"
           other: "Wciąż jest %{count} pytań, których jeszcze nie widziałeś/aś. Przesłać mimo to?"
       days_count: 
         few: "%{count} Dni"
+        many: "%{count} Dni"
         one: "1 Dzień"
         other: "%{count} Dni"
       errors: 
@@ -14453,6 +14699,7 @@ pl:
       hide_time_link: Ukryj
       hours_count: 
         few: "%{count} Godziny"
+        many: "%{count} Godzin"
         one: "1 Godzina"
         other: "%{count} Godzin"
       labels: 
@@ -14461,10 +14708,12 @@ pl:
       login_successful: "Logowanie zakończone pomyślnie."
       minutes_count: 
         few: "%{count} Minuty"
+        many: "%{count} Minut"
         one: "1 Minuta"
         other: "%{count} Minut"
       months_count: 
         few: "%{count} Miesięcy"
+        many: "%{count} Miesięcy"
         one: "1 Miesiąc"
         other: "%{count} Miesięcy"
       notices: 
@@ -14483,6 +14732,7 @@ pl:
       saving_not_needed: "Brak nowych danych do zapisania. Termin ostatniego sprawdzenia: %{t}"
       seconds_count: 
         few: " %{count} Sekundy"
+        many: " %{count} Sekund"
         one: "1 Sekunda"
         other: " %{count} Sekund"
       show_time_link: Pokaż
@@ -14491,6 +14741,7 @@ pl:
         times_up: "Czas minął!"
       years_count: 
         few: " %{count}  lata"
+        many: "%{count}  lat"
         one: "1 Rok"
         other: "%{count}  lat"
     timing: 
@@ -14540,6 +14791,7 @@ pl:
     cancel: Anuluj
     confirm_delete_with_contents: 
       few: "Czy na pewno chcesz usunąć te %{count} elementy i wszystko co się w nich znajuje?"
+      many: "Czy na pewno chcesz usunąć tych %{count} elementów i wszystko co się w nich znajduje?"
       one: "Czy na pewno chcesz usunąć element o nazwie %{name}? Nie jest pusty, więc wszystko co się w nim znajduje zostanie również usunięte."
       other: "Czy na pewno chcesz usunąć tych %{count} elementów i wszystko co się w nich znajduje?"
     created_at: "Data utworzenia"
@@ -14566,10 +14818,12 @@ pl:
     move: Przenieś
     move_question: 
       few: "Gdzie chcesz przenieść te %{count} elementy?"
+      many: "Gdzie chcesz przenieść te %{count} elementów?"
       one: "Gdzie chcesz przenieść element %{item}?"
       other: "Gdzie chcesz przenieść te %{count} elementów?"
     move_success: 
       few: "%{count} elementy przeniesione do folderu docelowego %{destinationFolder}"
+      many: "%{count} elementów przeniesionych do folderu docelowego %{destinationFolder}"
       one: "element %{item} przeniesiony do folderu docelowego %{destinationFolder}"
       other: "%{count} elementów przeniesionych do folderu docelowego %{destinationFolder}"
     name: Nazwa
@@ -14599,15 +14853,18 @@ pl:
     context_search_title: "Nazwa, kurs lub grupa"
     groups_count: 
       few: "%{count}  grupy"
+      many: "%{count}  grup"
       one: "1 grupa"
       other: "%{count}  grup"
     no_results: "Nie znaleziono wyników"
     people_count: 
       few: "%{count} ludzi"
+      many: "%{count} ludzi"
       one: "1 osoba"
       other: "%{count} ludzi"
     sections_count: 
       few: "%{count} sekcje"
+      many: "%{count} sekcji"
       one: "1 sekcja"
       other: "%{count} sekcji"
   record_media_6637ff19: "Nagraj media"
@@ -14657,6 +14914,8 @@ pl:
   registration_url_60e0eaaa: "Adres URL rejestracji"
   regular_style_checkbox_ee3d71c1: "Regularne pole wyboru"
   released_by_mastery_path_b87fcdf5: "Pochodzi ze ścieżki mistrzowskiej"
+  released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Wydane przez Mastery Path: %{cyoe.releasedLabel}"
+  released_by_mastery_path_path_b562d741: "Wydane przez Mastery Path: %{path}"
   remind_me_next_time_6402eb7d: "Przypomnij mi następnym razem"
   reminder_ffd21289: Przypomnienie
   remove_account_from_this_profile_c3095eb2: "Usuń konto z tego profilu"
@@ -14699,6 +14958,7 @@ pl:
   require_respondus_lockdown_browser_31425b3a: "Wymagaj programu Respondus LockDown Browser"
   require_usage_rights_for_uploaded_files_4507865b: "Wymagaj praw użytkowania do przekazywanych plików"
   required_access_code_592902d7: "Wymagany kod dostępu"
+  required_email_address_379b2392: "Wymagany adres e-mail"
   required_to_view_quiz_results_dba7368b: "Wymagany do wyświetlenia wyników testu"
   requirement_f5b75da1: Wymóg
   requirement_subject_7cfac6c8: "Temat wymogu"
@@ -14749,7 +15009,9 @@ pl:
   right_sidebar_logo_5483dc0a: "Logo prawego paska bocznego"
   role: 
     duplicate_role: "Rola o tej nazwie już istnieje"
+  role_13a7be77: Rola
   role_7c0b7eaa: "Rola:"
+  role_b3951149: rola
   role_override: 
     permission: 
       read_sis: "Odczytaj dane SIS"
@@ -14920,6 +15182,7 @@ pl:
       page_title: "Kryteria ocen"
       points_possible: 
         few: "%{count} punkty do zdobycia"
+        many: "%{count} punktów do zdobycia"
         one: "1 punkt do zdobycia"
         other: "%{count} punktów do zdobycia"
       user_rubrics: "Kryteria ocen użytkownika"
@@ -14943,6 +15206,7 @@ pl:
       page_title: "Kryteria ocen"
       points_possible: 
         few: "punkty do zdobycia"
+        many: "punktów do zdobycia"
         one: "punkt do zdobycia"
         other: "punktów do zdobycia"
       prompts: 
@@ -14981,11 +15245,14 @@ pl:
   score_letter_grade_b3bb9e52: "%{score} ocena literowa"
   score_muted_82eef66: "Wynik: (wyłączony)"
   score_of_score_view_in_speedgrader_a7c1c954: "Wynik %{score}. Zobacz w programie SpeedGrader"
+  score_out_of_points_84f44331: "(%{score} z %{points})"
   score_out_of_points_possible_88f370fd: "%{score} na %{points_possible} możliwych"
   score_percent_11941c81: "%{score} procent"
   score_points_3c48e2a8: "%{score} punkty"
   score_pts_adcb1af3: "%{score} pkt"
   score_score_6f81e8c8: "Wynik: %{score}"
+  scored_less_than_cutoff_on_assignment_5f5c4303: "Uzyskał wynik poniżej %{cutoff} w dniu %{assignment}"
+  scored_more_than_cutoff_on_assignment_f422fec: "Uzyskał wynik powyżej %{cutoff} w dniu %{assignment}"
   screenreader_gradebook: 
     assignment_information: 
       actions: 
@@ -15173,6 +15440,7 @@ pl:
       access_limit: "Użytkownicy mogą uczestniczyć w kursie tylko w tym okresie"
       active_enrollment: 
         few: "%{count} Aktywne zapisy "
+        many: "%{count} Aktywnych zapisów"
         one: "1 Aktywne zapisy "
         other: "%{count} Aktywnych zapisów"
       buttons: 
@@ -15187,6 +15455,7 @@ pl:
         update_section: "Aktualizuj sekcję"
       completed_enrollment: 
         few: "%{count} Zapisy ukończono"
+        many: "%{count} Zapisów ukończono"
         one: "1 Zapisy ukończono"
         other: "%{count} Zapisów ukończono"
       crosslist_description: "Udostępnienie pozwala utworzyć sekcję na jednym koncie, a następnie przenieść ją na kurs na innym koncie. Aby udostępnić ten kurs, znajdź kurs, do którego chcesz go przenieść, używając narzędzia do wyszukiwania lub wprowadzając ID kursu."
@@ -15207,6 +15476,7 @@ pl:
       override_settings: "Zmiany te zastąpią wszystkie ustawienia terminu lub daty kursu."
       pending_enrollment: 
         few: "%{count} Zapisy w toku"
+        many: "%{count} Zapisów w toku"
         one: "1 Zapisy w toku"
         other: "%{count} Zapisów w toku"
       prompts: 
@@ -15316,6 +15586,7 @@ pl:
         go_to_dashboard: "Przejdź do pulpitu nawigacyjnego"
       not_available_yet: "Na chwilę przed rozpoczęciem kursu wyślemy Ci wiadomość e-mail."
   self_registration_156392d6: "Samodzielna rejestracja"
+  self_signup_15b23092: self_signup
   send_a_message_to_the_teacher_1ae115b6: "Wyślij wiadomość do instruktora"
   send_a_message_to_this_student_ec46b8dd: "Wyślij wiadomość do tego uczestnika"
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "Wyślij Niestandardowe Pola (odznacz, chyba że używasz Canvas zendesk)"
@@ -15746,6 +16017,7 @@ pl:
       unread_column: Nieprzeczytane
       unread_count_badge: 
         few: "%{count} *nieprzeczytane informacje*"
+        many: "%{count} *nieprzeczytanych informacji*"
         one: "1 *nieprzeczytana informacja*"
         other: "%{count} *nieprzeczytanych informacji*"
     recent_activity_item: 
@@ -15783,6 +16055,7 @@ pl:
         locked: "Nie można zmienić już używanych kryterium ocen."
         rubric_in_use: 
           few: "Pamiętaj, że %{count} uczestników zostało już ocenionych przy użyciu tych kryteriów. Zmiana kryteriów, będzie miała wpływ na ich oceny."
+          many: "Pamiętaj, że %{count} uczestników zostało już ocenionych przy użyciu tych kryteriów. Zmiana kryteriów będzie miała wpływ na ich oceny."
           one: "Pamiętaj, że 1 uczestnik został już oceniony przy użyciu tych kryteriów. Zmiana kryteriów, będzie miała wpływ na ich ocenę."
           other: "Pamiętaj, że %{count} uczestników zostało już ocenionych przy użyciu tych kryteriów. Zmiana kryteriów będzie miała wpływ na ich oceny."
         rubric_in_use2: "Uczestnicy zostali już ocenieni według tych kryteriów ocen. Jakiekolwiek poważne zmiany mogą wpłynąć na wyniki zadania."
@@ -16061,6 +16334,8 @@ pl:
   shared_secret_892c88f2: "Wspólny klucz"
   short_name_ad9bf84f: "krótka nazwa"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "powinno być oczywiste, canvas ID użytkownika zgłaszającego"
+  show_account_navigation_menu_d97270a9: "Pokaż menu nawigacji na koncie"
+  show_admin_navigation_menu_92fb579f: "Pokaż menu nawigacji administratora"
   show_all_artifacts_34b91a83: "Pokaż wszystkie artefakty"
   show_all_details_9879980c: "Pokaż wszystkie informacje szczegółowe"
   show_and_hide_courses_menu_9e09d1d0: "Ukryj i pokaż menu kursy"
@@ -16073,15 +16348,19 @@ pl:
   show_correct_answers_at_a5475aa3: "Pokaż poprawne odpowiedzi na"
   show_course_sections_for_course_name_5f715702: "Pokaż sekcje kursu dla kursu %{name}"
   show_courses_menu_4e17e480: "Pokaż menu kursów"
+  show_courses_navigation_menu_7ad1a8d4: "Pokaż menu nawigacji w kursie"
   show_current_grade_5bf4e0d9: "Pokaż ocenę bieżącą"
   show_dashboard_card_view_41ebd6c6: "Pokaż widok karty panela nawigacyjnego"
   show_dashcard_view_76078ecb: "Pokaż widok dashcard"
+  show_deleted_replies_a2e0a36f: "Pokaż usunięte odpowiedzi"
   show_final_grade_a95e14dc: "Pokaż ocenę końcową"
+  show_groups_navigation_menu_1521d38d: "Pokaż menu nawigacji w grupach"
   show_inactive_enrollments_8f4c4824: "Pokaż nieaktywne zapisy"
   show_links_to_unpublished_content_30c0450d: "Pokaż linki do nieopublikowanych treści"
   show_lti_2_configuration_ui_94ce35a9: "Pokaż interfejs użytkownika konfiguracji LTI 2 "
   show_me_76823679: "Pokaż mnie"
   show_more_af9cbc16: "Pokaż więcej"
+  show_navigation_menu_34e7f441: "Pokaż menu nawigacji"
   show_notes_column_22d2b6c1: "Pokaż kolumnę uwag"
   show_one_question_at_a_time_271e346d: "Wyświetlaj pytania po kolei"
   show_only_blueprint_courses_9fb37b41: "Pokaż tylko kursy wzorcowe"
@@ -16095,6 +16374,8 @@ pl:
   showing_all_sets_of_grading_periods_6c160874: "Wykaz wszystkicj zbiorów okresów oceniania."
   shuffle_answers_edb602b7: "Pomieszaj odpowiedzi"
   signup_type_8b4506f3: "Typ zapisów"
+  similarity_detection_dcada48: "Wykrywanie podobieństw"
+  similarity_score_more_information_b7010a87: "Stopień podobieństwa – więcej informacji"
   simple_tls_45df2648: "Proste TLS"
   singapore_65_b4927585: "Singapur (+65)"
   singapore_a145e422: Singapur
@@ -16251,6 +16532,7 @@ pl:
     final_point_ratio: "%{pointRatio} punktów"
     invalid_group_warning: 
       few: "Uwaga: wynik nie uwzględnia zadań z nazw grup %{list_of_group_names}, ponieważ nie można w nich zdobywać punktów."
+      many: "Uwaga: wynik nie uwzględnia zadań z nazw grup %{list_of_group_names}, ponieważ nie można w nich zdobywać punktów."
       one: "Uwaga: wynik nie uwzględnia zadań z nazwy grupy %{list_of_group_names}, ponieważ nie można w niej zdobywać punktów."
       other: "Uwaga: wynik nie uwzględnia zadań z nazw grup %{list_of_group_names}, ponieważ nie można w nich zdobywać punktów."
     media_recordin: "Nagranie multimedialne"
@@ -16279,6 +16561,7 @@ pl:
   start_from_a_template_theme_6c6e3dab: "Rozpocznij od motywu szablonowego:"
   start_from_a_theme_template_475c3d26: "Rozpocznij od motywu szablonowego"
   start_link_validation_dc0ac99c: "Rozpocznij walidację linku"
+  start_over_f7552aa9: "Rozpocznij ponownie"
   start_participating_f0c75256: "Rozpocznij uczestnictwo"
   start_time_2c3d11b5: "Czas rozpoczęcia"
   start_time_to_end_time_ee60f6eb: "%{start_time} do %{end_time}"
@@ -16310,7 +16593,9 @@ pl:
   student_921b864d: uczestnik
   student_assignment_outcome_map_title: "Kompetencje uczestnika"
   student_context_card_ad59967e: "Karta kontekstowa dla uczestnika"
+  student_details_49901ceb: "Informacje o uczestniku"
   student_extensions_d35a907: "Rozszerzenia dla uczestnika"
+  student_grades_4cbc59a1: "Oceny uczestnika"
   student_groups_desc: |-
       Umożliwia to dodanie strony z nową grupą studentów do konta. Nowa strona została utworzona w celu szybszego rejestrowania
       grupy.
@@ -16325,6 +16610,7 @@ pl:
   student_name_b446c661: "nazwa ucznia"
   student_name_c45b2a7: "Nazwa uczestnika"
   student_name_hidden_b894d102: "uczeń (nazwa ukryta)"
+  student_name_options_cb029725: "Opcje imion i nazwisk uczestników"
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Nazwy użytkowników muszą być ukryte ponieważ wymagana jest anonimowa klasyfikacja."
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Nazwy użytkowników muszą być ukryte ponieważ jest to badanie anonimowe."
   student_outcome_gradebook_description: |-
@@ -16338,6 +16624,16 @@ pl:
     student_summary_table_ascending: "Tabela podsumowująca uczestnika jest posortowana rosnąco według %{sortText}"
     student_summary_table_descending: "Tabela podsumowująca uczestnika jest posortowana malejąco według %{sortText}"
   student_viewed_document_9065adb8: "Dokument oglądany przez uczestnika"
+  studentcount_student_scores_updated_232ad7b7: 
+    few: "%{studentCount} Zaktualizowano wyniki uczestnika"
+    many: "%{studentCount} Zaktualizowano wyniki uczestnika"
+    one: "Zaktualizowano 1 wynik uczestnika"
+    other: "%{studentCount} Zaktualizowano wyniki uczestnika"
+  studentcount_students_will_get_num_points_fdd43b55: 
+    few: "%{studentCount} uczestników otrzyma %{num} pkt"
+    many: "%{studentCount} uczestników otrzyma %{num} pkt"
+    one: "1 uczestnik otrzyma %{num} pkt"
+    other: "%{studentCount} uczestników otrzyma %{num} pkt"
   students_1b8cd07b: Uczestnicy
   students_being_observed_4de3e520: "Obserwowani uczestnicy"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Uczestnicy nie mogą podglądać odpowiedzi do testu po zakończeniu kursu"
@@ -16371,6 +16667,7 @@ pl:
       delete_subaccount: "Czy na pewno chcesz usunąć to podkonto?"
     courses_count: 
       few: " %{count} Kursy"
+      many: " %{count} Kursów"
       one: "1 Kurs"
       other: " %{count} Kursów"
     index: 
@@ -16380,10 +16677,12 @@ pl:
     sub_accounts: 
       account_courses: 
         few: " %{count} Kursy"
+        many: " %{count} Kursów"
         one: "1 Kurs"
         other: " %{count} Kursów"
       account_sub_accounts: 
         few: "%{count} Subkonta"
+        many: "%{count} Subkont"
         one: "1 Subkonto"
         other: "%{count} Subkont"
       add_sub_accounts: "Dodaj podkonto"
@@ -16394,6 +16693,7 @@ pl:
       show_sub_accounts: "Pokaż podkonta"
     sub_accounts_count: 
       few: "%{count} Subkonta"
+      many: "%{count} Subkont"
       one: "1 Subkonto"
       other: "%{count} Subkont"
   subaccount_91f4c279: Subkonto
@@ -16668,6 +16968,7 @@ pl:
         update: "Aktualizuj termin"
       course_count: 
         few: " %{count} Kursy"
+        many: " %{count} Kursów"
         one: "1 Kurs"
         other: " %{count} Kursów"
       labels: 
@@ -16719,9 +17020,12 @@ pl:
       Identyfikator programu Canvas SAML Entity to %{metadata_url}, a metadane Usługodawcy
       są dostępne pod tym adresem URL.
   the_course_link_validator_searches_through_course__76f0bc63: "Walidator linka do kursu przeszukuje zawartość kursu i zwraca każdy, napotkany nieprawidłowy lub nieodpowiadający link. Proszę zauważyć, że niektóre linki oznaczone jako nieodpowiadające są zwyczajnie niedostępne dla naszych serwerów ale będą funkcjonować poprawnie dla uczniów."
+  the_download_process_has_started_this_can_take_awh_7e616db1: "Rozpoczęto proces pobierania. W przypadku dużych kursów może to trochę potrwać. Po zakończeniu pobierania otrzymasz powiadomienie i możesz opuścić stronę."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Błąd śladu, jeśli istnieje"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Zakładka Pliki służy do udostępniania materiałów związanych z wykładami, np. dokumentów, pomocy naukowych — wszystkiego, co uczestnicy mogliby pobrać. Program Canvas zapewnia łatwy sposób przekazywania i organizacji plików. Wszystko zostanie dokładnie przedstawione."
   the_following_fields_are_invalid_fields_b3565800: "Poniższe pola są nieprawidłowe: %{fields}"
+  the_following_users_are_ready_to_be_added_to_the_c_1ea01560: "Następnych użytkowników można dodać do kursu."
+  the_following_users_could_not_be_created_2573360a: "Nie można utworzyć następujących użytkowników."
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Pełna nazwa hosta dla instancji konta (cokolwiek.instructure.com, na przykład)"
   the_grade_for_this_assignment_will_not_sync_to_the_3bb4f6f5: "Ocena za to zadanie nie zostanie zsynchronizowana z systemem informacyjnym ucznia."
   the_grade_for_this_assignment_will_not_sync_to_the_8f4571aa: "Ocena za to zadanie nie zostanie zsynchronizowana z systemem informacyjnym ucznia. Kliknij tutaj, aby włączyć to ustawienie."
@@ -16780,6 +17084,7 @@ pl:
   themes_89bfe9c4: Motywy
   there_are_count_results_in_the_list_e74f6e36: 
     few: "Na liście są %{count} wyniki"
+    many: "Na liście jest %{count} wyników "
     one: "Na liście jest 1 wynik"
     other: "Na liście jest %{count} wyników "
   there_are_no_announcements_for_this_course_5ee649c3: "Brak ogłoszeń dla tego kursu."
@@ -16808,15 +17113,18 @@ pl:
   there_was_an_error_uploading_the_image_932fc4ce: "Wystąpił błąd podczas ładowania obrazu"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Twoje pytanie jest niepoprawne; spróbuj wpisać inne pytanie w wyszukiwarkę  "
   there_were_errors_with_the_form_errors_ab5b559a: "Wystąpiły błędy w formularzu: %{errors}"
+  there_were_several_possible_matches_with_the_impor_ad58bcd0: "Istnieje kilka potencjalnych dopasowań do importu. Rozwiąż je poniżej."
   these_credentials_are_for_academic_benchmark_api_v_324baaa4: "Te dane logowanie są przeznaczone dla interfejsu Academic Benchmark API v3. Pozostawienie pustego klucza partnera spowoduje domyślne przywrócenie interfejsu Academic Benchmark API v1. dla użytkownika importującego."
   these_credentials_are_for_academic_benchmark_api_v_952718b1: "Te dane logowania są przeznaczone dla interfejsu Academic Benchmark API v1, który zostanie wycofany w przyszłym wydaniu."
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Poniższe okresy klasyfikacyjne zostały stworzone dla ciebie przez administratora."
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "To działanie zostało wyłączone przez administratora."
+  this_assignment_does_not_count_toward_the_final_gr_29ede05f: "To zadanie nie jest uwzględniane w ocenie końcowej"
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Dane zadanie nie zalicza się do oceny ostatecznej."
   this_assignment_has_been_excused_87f1dc13: "To zadanie zostało usprawiedliwione."
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "To zadanie zostało opuszczone i nie zostanie wliczone w ostateczny wynik"
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: "To zadanie zostało usprawiedliwione i nie zostanie wliczone w ostateczny wynik"
   this_assignment_is_in_a_closed_grading_period_for__a22bb4ed: "To zadanie znajduje się w okresie oceniania zamkniętym dla tego uczestnika"
+  this_assignment_is_muted_915e2dab: "To zadanie jest wyłączone"
   this_assignment_is_overdue_a44bea3b: "To zadanie jest po terminie"
   this_assignment_is_still_unpublished_a9185624: "To zadanie nie zostało opublikowane"
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Zadanie nie będzie już wliczane do oceny."
@@ -16852,6 +17160,7 @@ pl:
   this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: "Ta pozycja pojawi się gdy zostanie przesłane nowe zadanie."
   this_item_will_reappear_when_there_are_new_grades__8f9e5383: "Ta pozycja pojawi się gdy będą nowe oceny do moderowania."
   this_login_is_for_provider_6f17462: "Ten login jest dla %{provider}"
+  this_may_take_a_bit_c061d0f6: "może to chwilę potrwać..."
   this_message_includes_media_comments_to_listen_or__5fc98641: "Wiadomość zawiera komentarze multimedialne. Aby przesłuchać zawartość lub odpowiedzieć na wiadomość, kliknij łącze: %{link}."
   this_module_is_locked_until_completing_all_of_the__ddf06070: "Niniejszy moduł jest zablokowany dopóki wszystkie wymogi dla poniższych modułów nie zostaną spełnione: %{prerequisites}"
   this_module_is_locked_until_datetime_b2486751: "Ten moduł jest zablokowany do %{datetime}"
@@ -16866,6 +17175,7 @@ pl:
   this_package_includes_iwb_file_s_which_are_not_com_6e3c37d2: "Pakiet ten zawiera pliki IWB, które nie są zgodne z Canvas i nie zostały dodane do importu."
   this_package_includes_the_question_type_pattern_ma_ce3dadc6: "Pakiet ten zawiera typ pytania (Dopasuj do wzorca), który nie jest zgodny z Canvas. Skonwertowano typ pytania na Uzupełnij puste pole"
   this_page_cannot_be_modified_because_grades_have_a_48646991: "Niniejsza strona nie może być modyfikowana ponieważ oceny zostały już opublikowane."
+  this_panel_lists_the_users_ready_to_be_added_to_th_79efad22: "Na tym panelu znajduje się lista użytkowników, których można dodać do kursu."
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Ta grupa pytań jest ustawiona aby wybrać więcej pytań niż jest dostępnych."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "W tym pytaniu pojawi się pole wyboru obok każdej odpowiedzi."
   this_quiz_has_been_excused_d89d2b74: "Test został zwolniony"
@@ -16901,10 +17211,12 @@ pl:
     am: rano
     count_hours_ago: 
       few: "%{count} godziny temu"
+      many: "%{count} godzin temu"
       one: "1 godzina temu"
       other: "%{count} godzin temu"
     count_minutes_ago: 
       few: "%{count} minuty temu"
+      many: "%{count} minut temu"
       one: "1 minuta temu"
       other: "%{count} minut temu"
     due_date: "%{date} do %{time}"
@@ -17157,8 +17469,9 @@ pl:
   top_box_background_6db383e9: "Tło pola górnego"
   top_box_border_94cee4a7: "Obramowanie pola górnego"
   topic_podcast_feed_dff98ab0: "Kanał informacyjny Podcast dot. tematu"
-  total_71a4807: Łącznie
+  total_71a4807: Razem
   total_column_options_4e6a6032: "Wszystkie opcje kolumn"
+  total_options_351e2682: "Opcje razem"
   total_range_45c8549a: "Łączny zakres"
   tours: 
     quiz_regrade: 
@@ -17196,6 +17509,7 @@ pl:
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Nie można wykreślić ocen, ponieważ termin tego zadania przypada na zamknięty okres oceniania dla co najmniej jednego uczestnika"
   unable_to_dismiss_update_df1e32eb: "Nie można odrzucić aktualizacji"
   unable_to_find_clever_district_district_id_61deb1cb: "Nie można znaleźć Rejonu Clever %{district_id}"
+  unable_to_find_matches_for_these_email_addresses_i_c2305106: "Nie można odnaleźć dopasowań dla tych adresów e-mail w instytucji. Wybierz tych, których chcesz utworzyć jako nowych użytkowników. Niezaznaczone zostaną pominięte."
   unable_to_remove_app_4293cb53: "Nie można usunąć aplikacji"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Nie można ustawić domyślnej oceny, ponieważ termin tego zadania przypada na zamknięty okres oceniania dla co najmniej jednego uczestnika"
   unarchive_selected_e0c4bd3d: "Wybrano zdezarchywizowanie"
@@ -17208,6 +17522,9 @@ pl:
   undated_15c2e5fe: "Bez daty"
   undated_items_toggle_list_visibility_6219e641: "Przełącz widoczność przedmiotów niedatowanych"
   undelivered_message_459916a9: "Niedostarczona wiadomość"
+  underline_all_links_description: |-
+      Łącza z podkreśleniem zawierają hiperłącza w menu nawigacji, panelu sterowania i paskach bocznych strony jako
+      *podkreślony tekst*. Ta opcja funkcji nie ma zastosowania do łączy do treści utworzonych przez użytkowników w programie Rich Content Editor, który zawsze podkreśla łącza użytkowników.
   underline_links_e7cf9b4f: "Podkreśl łącza"
   undo_a7be8fef: Cofnij
   unenrolled_users_e7632d24: "Użytkownicy wypisani z kursu"
@@ -17236,6 +17553,7 @@ pl:
   unlock_date_cannot_be_before_section_start_793ddc66: "Data odblokowania nie może przypadać przed rozpoczęciem sekcji"
   unlock_date_cannot_be_before_term_start_d3c01813: "Data odblokowania nie może przypadać przed rozpoczęciem semestru"
   unlock_module_on_date_17144fbd: "Odblokuj moduł w dniu"
+  unmatched_login_list_283ca77: "Lista niepasujących nazw użytkownika"
   unmute_assignment_29a49038: "Odkryj zadanie"
   unnamed_account_id_e688ad87: "Konto anonimowe (%{id})"
   unpin_a318452a: Odepnij
@@ -17294,6 +17612,7 @@ pl:
   usage_rights_f0960ad6: "Prawa użytkowania"
   usage_rights_have_been_set_d1b433c7: "Prawa użytkowania zostały nadane."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Prawa użytkowania zostaną nadane dla wszystkich plików zawartych w:"
+  use_between_for_adding_multiple_users_26bff207: "Użyj przecinka, aby dodać więcej użytkowników."
   use_default_890939b7: "Użyj domyślne ustawienia"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Zastosować MathMan aby zamienić LaTeX w MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Zastosować MathMan aby zamienić LaTeX w SVG?"
@@ -17309,6 +17628,8 @@ pl:
   use_the_new_scheduler_1273b832: "Wykorzystaj nowy program szeregujący"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Użyj tej konfiguracji dla celów rejestracji rodzica/obserwatora"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Użyj tej listy do usunięcia przypisanych uczestników. Dodaj nowych uczestników z polem kombi po liście."
+  use_this_panel_to_resolve_duplicates_or_people_not_fb437c9: "Użyj tego panelu do rozwiązania duplikatów lub odnalezienia osób niedostępnych w wyszukiwaniu."
+  use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Użyj tego panelu do wyszukania osób, które chcesz dodać do tego kursu."
   used_by_permission_314a78dd: "Użycie według uprawnień"
   user: 
     default_user_name: Użytkownik
@@ -17339,9 +17660,11 @@ pl:
   user_isn_t_allowed_to_edit_global_outcomes_a7eb4a87: "Użytkownik nie ma pozwolenia, żeby edytować wyniki globalne"
   user_just_accepted_their_invitation_to_participate_7a4b2ce4: "Użytkownik %{user} właśnie przyjął zaproszenie do udziału w kursie %{course}. Rola kursu:  %{role_type}"
   user_just_updated_title_88074ab2: "Użytkownik %{user} właśnie zaktualizował %{title}"
+  user_list_66428346: "Lista użytkowników"
   user_lists: 
     add_n_users: 
       few: "OK, Wygląda dobrze, dodaj tych %{count} użytkowników"
+      many: "OK, Wygląda dobrze, dodaj tych %{count} użytkowników"
       one: "OK, Wygląda dobrze, dodaj tego 1 użytkownika"
       other: "OK, Wygląda dobrze, dodaj tych %{count} użytkowników"
     adding_users: "Trwa dodawanie użytkowników..."
@@ -17351,6 +17674,7 @@ pl:
     delete_confirm: "Czy na pewno chcesz usunąć tego użytkownika?"
     duplicate_users: 
       few: "Znaleziono %{count} duplikaty użytkownika, duplikaty zostały usunięte."
+      many: "Znaleziono %{count} duplikatów użytkownika, duplikaty zostały usunięte."
       one: "Znaleziono 1 duplikat użytkownika, duplikat został usunięty."
       other: "Znaleziono %{count} duplikatów użytkownika, duplikaty zostały usunięte."
     invalid_users_notice: "Mogą również istnieć nieprawidłowi użytkownicy, być może trzeba powrócić i naprawić błędy."
@@ -17361,19 +17685,23 @@ pl:
       existing_user: "Istniejący użytkownik"
     user_parsing_errors: 
       few: "Wystąpiły %{count} błędy przetwarzania listy użytkowników."
+      many: "Wystąpiło %{count} błędów przetwarzania listy użytkowników."
       one: "Wystąpił 1 błąd przetwarzania listy użytkowników."
       other: "Wystąpiło %{count} błędów przetwarzania listy użytkowników."
     users_added: 
       few: "dodano %{count} użytkowników "
+      many: "dodano %{count} użytkowników "
       one: "1 użytkownik dodany"
       other: "dodano %{count} użytkowników "
     users_adding_failed: "Zapisywanie użytkowników nie powiodło się"
     users_existed: 
       few: "(%{count} użytkowników już istnieje)"
+      many: "(%{count} użytkowników już istnieje)"
       one: "(1 użytkownik już istnieje)"
       other: "(%{count} użytkowników już istnieje)"
     users_to_add: 
       few: "Jeśli będziesz kontynuować,tak jak jest, %{count} użytkowników zostanie dodanych."
+      many: "Jeśli będziesz kontynuować, tak jak jest, %{count} użytkowników zostanie dodanych."
       one: "Jeśli będziesz kontynuować,tak jak jest, 1 użytkownik zostanie dodany."
       other: "Jeśli będziesz kontynuować, tak jak jest, %{count} użytkowników zostanie dodanych."
   user_logins: 
@@ -17468,6 +17796,7 @@ pl:
   user_search_results_f5445b8b: "Wyniki wyszukiwania użytkownika"
   user_selected_answer: Wybrałeś
   user_selected_wrong: "Prawidłowa odpowiedź to %{correct_answer_text}."
+  user_selection_f6139840: "Wybór użytkowników"
   user_service: 
     descriptions: 
       delicious: "Delicious to narzędzie do wspólnego dzielenia się łączami.  Pozwala oznaczyć dowolną stronę internetową, po to by później do niej wrócić.  Umożliwia też łączenie się z innymi kontami użytkowników narzędzia Delicious, aby dzielić się łączami do stron o danej tematyce."
@@ -17528,6 +17857,7 @@ pl:
       current_conference_text: "Masz zaproszenie, aby przyłączyć się do konferencji **[%{conference}](%{link_to_conference})**. Rozpoczęła się o godz. %{started_at} i bierze w niej następująca liczba uczestników: %{participant_count}."
       participant_count: 
         few: "%{count} uczestników"
+        many: "%{count} uczestników"
         one: uczestnik
         other: "%{count} uczestników"
     dashboard_sidebar: 
@@ -17563,6 +17893,7 @@ pl:
     grades: 
       average_grades: 
         few: "średnia dla  %{count} uczestników"
+        many: "średnia dla  %{count} uczestników"
         one: "średnia dla 1 uczestnika"
         other: "średnia dla  %{count} uczestników"
       course: Kurs
@@ -17809,6 +18140,7 @@ pl:
       title: "Testowa instalacja Canvas"
       weekly_message: 
         few: "Ta instalacja Canvas jest przeznaczona jedynie do celów testowych; będzie się uruchamiać co %{count} tygodnie."
+        many: "Ta instalacja Canvas jest przeznaczona jedynie do celów testowych; będzie się uruchamiać co %{count} tygodni."
         one: "Ta instalacja Canvas jest przeznaczona jedynie do celów testowych; będzie się uruchamiać co tydzień."
         other: "Ta instalacja Canvas jest przeznaczona jedynie do celów testowych; będzie się uruchamiać co %{count} tygodni."
   watermark_c93fae0d: "Znak wodny"
@@ -17822,6 +18154,7 @@ pl:
   we_were_unable_to_add_the_access_token_1f471fe6: "Nie byliśmy w stanie dodać tokena dostępu."
   we_were_unable_to_add_the_app_418877ef: "Nie byliśmy w stanie dodać aplikacji."
   we_were_unable_to_deactivate_the_app_5e2632f3: "Nie byliśmy w stanie zdezaktywować aplikacji."
+  we_were_unable_to_find_matches_for_the_logins_belo_d5f79db2: "Nie udało się odnaleźć elementów pasujących do poniższych nazw. Wybierz te, które chcesz utworzyć jako nowych użytkowników."
   we_were_unable_to_update_the_app_659f5bc6: "Nie byliśmy w stanie zaktualizować aplikacji."
   web_conference: 
     default_name_for_courses: "Kursowa konferencja sieciowa"
@@ -17840,6 +18173,7 @@ pl:
   webct_name: "Blackboard Vista/CE (WebCT)"
   week_s_cb1492ee: Tydzień(tygodnie)
   weight_final_grade_based_on_assignment_groups_3124161: "Wyważ ocenę końcową na podstawie grup zadań"
+  weight_of_grade_dff535d9: "%{weight} oceny"
   welcome_to_the_canvas_theme_editor_73091d1: "Witamy w Edytorze motywu Canvas"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Witamy w twoich kursach! Aby dostosować listę kursów, kliknij na link \"Wszystkie kursy\" i oznacz gwiazdką kursy do wyświetlenia."
   well_below_mastery_37664bdc: "Znacznie poniżej poziomu biegłości"
@@ -18174,6 +18508,7 @@ pl:
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Twoje zdjęcie profilowe nie mogło zostać przesłane. Być może przekroczono limit przesyłania."
   your_search_encountered_the_following_errors_fc3e5e7f: 
     few: "Podczas wyszukiwanie pojawiły się następujące błędy:"
+    many: "Podczas wyszukiwanie pojawiły się następujące błędy:"
     one: "Podczas wyszukiwania pojawił się następujący błąd:"
     other: "Podczas wyszukiwanie pojawiły się następujące błędy:"
   your_submission_has_not_been_graded_yet_d6963e53: "Twoje zgłoszenie nie zostało jeszcze ocenione"
