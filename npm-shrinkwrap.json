@@ -86,7 +86,7 @@
         },
         "js-yaml": {
           "version": "3.5.5",
-          "from": "js-yaml>=3.5.5 <4.0.0",
+          "from": "js-yaml>=3.5.5 <3.7.1",
           "resolved": "https://registry.npmjs.org/js-yaml/-/js-yaml-3.5.5.tgz"
         },
         "lodash": {
@@ -540,6 +540,11 @@
           "resolved": "https://registry.npmjs.org/minimist/-/minimist-1.2.0.tgz"
         }
       }
+    },
+    "js-yaml": {
+      "version": "3.7.0",
+      "from": "js-yaml>=3.5.5 <3.7.1",
+      "resolved": "https://registry.npmjs.org/js-yaml/-/js-yaml-3.7.0.tgz"
     }
   }
 }

@@ -120,14 +120,20 @@ class CalendarEvent < ActiveRecord::Base
         'displayName' => 'Braven Portal'
       },
       'start' => {
-        'dateTime' => start_at.utc_datetime,
         'timeZone' => 'Etc/GMT',
       },
       'end' => {
-        'dateTime' => end_at.utc_datetime,
         'timeZone' => 'Etc/GMT',
       }
     }
+
+    if self.all_day?
+      event['start']['date'] = start_at.utc_datetime.to_date
+      event['end']['date'] = start_at.utc_datetime.to_date
+    else
+      event['start']['dateTime'] = start_at.utc_datetime
+      event['end']['dateTime'] = end_at.utc_datetime
+    end
 
     # Need to fetch existing attendee status (if available)
     # to the RSVP is unmodified across updates
@@ -419,12 +425,14 @@ class CalendarEvent < ActiveRecord::Base
   protected :populate_missing_dates
 
   def populate_all_day_flag
-    # If the all day flag has been changed to all day, set the times to 00:00
+    # If the all day flag has been changed to all day, set the times to noon instead of 00:00
+    # because it is more resilient to being set in different time zones - if someone in EST
+    # sets an event for all day in a PST course, the day can be wrong!
     if self.all_day_changed? && self.all_day?
-      self.start_at = self.end_at = zoned_start_at.beginning_of_day rescue nil
+      self.start_at = self.end_at = zoned_start_at.beginning_of_day + 12.hours rescue nil
 
     elsif self.start_at_changed? || self.end_at_changed?
-      if self.start_at && self.start_at == self.end_at && zoned_start_at.strftime("%H:%M") == '00:00'
+      if self.start_at && self.start_at == self.end_at # && zoned_start_at.strftime("%H:%M") == '00:00'
         self.all_day = true
       else
         self.all_day = false
@@ -432,7 +440,7 @@ class CalendarEvent < ActiveRecord::Base
     end
 
     if self.all_day && (!self.all_day_date || self.start_at_changed? || self.all_day_date_changed?)
-      self.start_at = self.end_at = zoned_start_at.beginning_of_day rescue nil
+      self.start_at = self.end_at = zoned_start_at.beginning_of_day + 12.hours rescue nil
       self.all_day_date = (zoned_start_at.to_date rescue nil)
     end
   end

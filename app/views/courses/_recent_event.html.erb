@@ -63,7 +63,7 @@
           <% end %>
           <%= due_at(recent_event, @current_user) %>
         <% else %>
-          <%= datetime_string(recent_event.start_at) %>
+          <%= recent_event.all_day? ? date_string(recent_event.start_at) : datetime_string(recent_event.start_at) %>
         <% end %>
       </p>
     </div>

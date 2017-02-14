@@ -211,13 +211,17 @@ define [
 
       startDate = event.startDate()
       endDate = event.endDate()
-      timeString = if !endDate || +startDate == +endDate
+      timeString = ''
+      if !endDate || +startDate == +endDate
+        if !endDate
           startDate.locale(calendarDefaults.lang)
-          startDate.format("LT")
+          timeString = startDate.format("LT")
         else
-          startDate.locale(calendarDefaults.lang)
-          endDate.locale(calendarDefaults.lang)
-          $.fullCalendar.formatRange(startDate, endDate, "LT")
+          timeString = "All Day"
+      else
+        startDate.locale(calendarDefaults.lang)
+        endDate.locale(calendarDefaults.lang)
+        timeString = $.fullCalendar.formatRange(startDate, endDate, "LT")
 
       screenReaderTitleHint = if event.eventType.match(/assignment/)
           I18n.t('event_assignment_title', 'Assignment Title:')

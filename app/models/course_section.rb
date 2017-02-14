@@ -265,6 +265,7 @@ class CourseSection < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.enrollments.not_fake.each(&:destroy)
     self.assignment_overrides.each(&:destroy)
+    self.calendar_events.each(&:destroy)
     save!
   end
 
