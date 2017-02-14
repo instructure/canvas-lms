@@ -102,7 +102,7 @@ I18n.localizeNumber = function (value, options) {
     // use a high precision and strip zeros if no precision is provided
     // 9 is as high as we want to go without causing precision issues
     // when used with toFixed()
-    strip_insignificant_zeros: options.precision == null,
+    strip_insignificant_zeros: options.strip_insignificant_zeros || options.precision == null,
     precision: options.precision != null ? options.precision : 9
   })
   var method = options.percentage ? 'toPercentage' : 'toNumber'

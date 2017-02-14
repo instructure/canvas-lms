@@ -124,3 +124,6 @@ define [
 
   test 'formats as a percentage if set to true', ->
     equal I18n.localizeNumber(1.2, percentage: true), "1#{@separator}2%"
+
+  test 'allows stripping of 0s to be explicitly toggled along with precision', ->
+    equal I18n.localizeNumber(1.12000, {precision: 4, strip_insignificant_zeros: true}), "1#{@separator}12"
