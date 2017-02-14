@@ -75,5 +75,18 @@ define([
     equal(tbls, null, 'no tables');
 
     equal(peopleReadyList.innerText, 'No users were selected to add to the course');
-  })
+  });
+  test('hides SIS ID column if not permitted', () => {
+    const p = Object.assign({}, props, {canReadSIS: true});
+    renderComponent(p);
+    let peopleReadyList = domNode.querySelector('.addpeople__peoplereadylist');
+    let cols = peopleReadyList.querySelectorAll('thead th');
+    equal(cols.length, 5, 'incluldes SIS ID column');
+
+    p.canReadSIS = false;
+    renderComponent(p);
+    peopleReadyList = domNode.querySelector('.addpeople__peoplereadylist');
+    cols = peopleReadyList.querySelectorAll('thead th');
+    equal(cols.length, 4, 'does not inclulde SIS ID column');
+  });
 })
