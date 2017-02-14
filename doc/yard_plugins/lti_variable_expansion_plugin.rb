@@ -6,9 +6,6 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
 
   def process
     variable_substitution = statement.parameters.first.jump(:tstring_content, :ident).source
-    guard = (
-      statement.parameters[3] && statement.parameters[3].jump(:tstring_content, :ident).source.to_s
-    ) || 'ALWAYS'
 
     object = register YARD::CodeObjects::MethodObject.new(namespace, variable_substitution)
     parse_block(statement, :owner => object)
@@ -17,10 +14,22 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
     deprecated_str = ' *[deprecated]*' if object.tags(:deprecated).count > 0
 
     example_tags = object.tags(:example)
-    example = example_tags.count > 0 && object.tags(:example).first
+    example = example_tags.count > 0 && example_tags.first
 
     example_text = ''
-    example_text = "\n\n#{example.text}" if example
+    example_text = "#{example.text}" if example
+
+    # launch_param_tags = object.tags(:launch_parameter)
+    # launch_param = launch_param_tags.count > 0 && launch_param_tags.first
+    #
+    # launch_param_text = ''
+    # launch_param_text = "Launch Parameter: *#{launch_param.text}*" if launch_param
+
+    duplicates_tags = object.tags(:duplicates)
+    duplicates = duplicates_tags.count > 0 && duplicates_tags.first
+
+    duplicates_text = ''
+    duplicates_text = " [duplicates #{duplicates.text}]" if duplicates
 
     description = if statement.comments
                     d = statement.comments.match(/([^@]+)@?/m)[1].strip
@@ -30,47 +39,74 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
                   else
                     ''
                   end
-    description = case guard
-                  when 'ALWAYS'
-                    "#{description}Should always be available."
-                  when 'USER_GUARD'
-                    "#{description}Only available when launched by a logged in user."
-                  when 'USAGE_RIGHTS_GUARD'
-                    "#{description}Only available when an attachment is present and has usage rights defined."
-                  when 'MEDIA_OBJECT_GUARD'
-                    "#{description}Only available when an attachment is present and has a media object defined."
-                  when 'PSEUDONYM_GUARD'
-                    "#{description}Only available when pseudonym is in use."
-                  when 'ENROLLMENT_GUARD'
-                    "#{description}Only available when launched from a course."
-                  when 'ROLES_GUARD'
-                    "#{description}Only available when launched from a course or an account."
-                  when 'CONTENT_TAG_GUARD'
-                    "#{description}Only available when content tag is present."
-                  when 'ASSIGNMENT_GUARD'
-                    "#{description}Only available when launched as an assignment."
-                  when 'MEDIA_OBJECT_ID_GUARD'
-                    "#{description}Only available when an attachment is present and it has either a media object or media entry id defined."
-                  when 'LTI1_GUARD'
-                    "#{description}Only available for LTI 1."
-                  when 'MASQUERADING_GUARD'
-                    "#{description}Only available when the user is being masqueraded."
-                  when 'COURSE_GUARD'
-                    "#{description}Only available when launched in a course."
-                  when 'TERM_START_DATE_GUARD'
-                    "#{description}Only available when launched in a course that has a term with a start date."
-                  else
-                    "#{description}"
-                  end
+    DocWriter.append_md <<~HEREDOC
+      ## #{variable_substitution}#{deprecated_str}#{duplicates_text}
+      #{description.strip}
 
-    DocWriter.append_md "## #{variable_substitution}#{deprecated_str}\n#{description}#{example_text}\n\n"
+      #{availability}
+      #{launch_param_text}
+
+      #{example_text}
+    HEREDOC
   end
 
   private
-  def object
-    @object ||= YARD::CodeObjects::ClassVariableObject.new(namespace, "LTI_Substitutions")
+
+  def launch_param_text
+    m = /default_name: '?"?([^'"]+)/.match(statement.parameters[statement.parameters.length - 2].source.to_s)
+    return "**Launch Parameter**: *#{m[1]}*  " if m
   end
 
+  def all_guards
+    guards = []
+    for i in 3..8
+      param = statement.parameters[i]
+      next unless param
+      text = param.jump(:tstring_content, :ident).source.to_s
+      guards.push(text) if /_GUARD$/.match text
+    end
+
+    guards.push('ALWAYS') if guards.size == 0
+    guards
+  end
+
+  def availability
+    all_availabilities = all_guards.map do |guard|
+      case guard
+      when 'ALWAYS', 'CONTROLLER_GUARD'
+        "always"
+      when 'USER_GUARD'
+        "when launched by a logged in user"
+      when 'SIS_USER_GUARD'
+        "when launched by a logged in user that was added via SIS"
+      when 'USAGE_RIGHTS_GUARD'
+        "when an attachment is present and has usage rights defined"
+      when 'MEDIA_OBJECT_GUARD'
+        "when an attachment is present and has a media object defined"
+      when 'PSEUDONYM_GUARD'
+        "when pseudonym is in use"
+      when 'ENROLLMENT_GUARD'
+        "when launched from a course"
+      when 'ROLES_GUARD'
+        "when launched from a course or an account"
+      when 'CONTENT_TAG_GUARD'
+        "when content tag is present"
+      when 'ASSIGNMENT_GUARD'
+        "when launched as an assignment"
+      when 'MEDIA_OBJECT_ID_GUARD'
+        "when an attachment is present and it has either a media object or media entry id defined"
+      when 'LTI1_GUARD'
+        "when in an LTI 1"
+      when 'MASQUERADING_GUARD'
+        "when the user is being masqueraded"
+      when 'COURSE_GUARD'
+        "when launched in a course"
+      when 'TERM_START_DATE_GUARD'
+        "when launched in a course that has a term with a start date"
+      end
+    end.compact
+    "**Availability**: *#{all_availabilities.join(' and ')}*  " if all_availabilities.size
+  end
 end
 
 module DocWriter

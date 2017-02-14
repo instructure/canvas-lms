@@ -1,3 +1,12 @@
+<!--
+  DONT EDIT THIS FILE DIRECTLY
+  Update:
+    - doc/api/tools_variable_substitutions.head.md
+    - lib/lti/variable_expander.rb
+
+  then run `script/generate_lti_variable_substitution_markdown`
+-->
+
 LTI Variable Substitutions
 ==========================
 
@@ -29,7 +38,7 @@ richer experience.
 Some substitutions may be used as 'enabled_capabilities' for LTI2 tools. These substitutions have a
 'Launch Parameter' label indicating the parameter name that will be sent in the tool launch if enabled.
 
-For more information on variable substitution, see the <a href="https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide#toc-9" target="_blank">IMS LTI specification.</a>
+For more information on variable substitution, see the [https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide#toc-9](IMS LTI specification).
 
 # Usage/Configuration
 Variable substitutions can be configured for a tool in 3 ways:
@@ -100,544 +109,749 @@ particular placement:
 
 # Supported Substitutions
 ## Context.id
-an opaque identifier that uniquely identifies the context of the tool launch
+an opaque identifier that uniquely identifies the context of the tool launch.
 
-Launch Parameter: *context_id*
+**Availability**: *always*  
+**Launch Parameter**: *context_id*  
 
 ```
 cdca1fe2c392a208bd8a657f8865ddb9ca359534
 ```
-
-## ToolConsumerInstance.guid
-returns a unique identifier for the Tool Consumer (Canvas)
-
-Launch Parameter: *tool_consumer_instance_guid*
-
-```
-0dWtgJjjFWRNT41WdQMvrleejGgv7AynCVm3lmZ2:canvas-lms
-```
-
-## Message.locale
-returns the current locale
-
-Launch Parameter: *launch_presentation_locale*
-
-```
-de
-```
-
 ## Message.documentTarget
-communicates the kind of browser window/frame where the Canvas has launched a tool
+communicates the kind of browser window/frame where the Canvas has launched a tool.
 
-Launch Parameter: *launch_presentation_document_target*
+**Availability**: *always*  
+**Launch Parameter**: *launch_presentation_document_target*  
 
 ```
 iframe
 ```
+## Message.locale
+returns the current locale.
 
+**Availability**: *always*  
+**Launch Parameter**: *launch_presentation_locale*  
+
+```
+de
+```
+## ToolConsumerInstance.guid
+returns a unique identifier for the Tool Consumer (Canvas).
+
+**Availability**: *always*  
+**Launch Parameter**: *tool_consumer_instance_guid*  
+
+```
+0dWtgJjjFWRNT41WdQMvrleejGgv7AynCVm3lmZ2:canvas-lms
+```
 ## Canvas.api.domain
-returns the canvas domain for the current context. Should always be available.
+returns the canvas domain for the current context.
+
+**Availability**: *always*  
+
 
 ```
 canvas.instructure.com
 ```
-
 ## Canvas.api.collaborationMembers.url
 returns the api url for the members of the collaboration.
+
+**Availability**: *always*  
+
 
 ```
 https://canvas.instructure.com/api/v1/collaborations/1/members
 ```
-
 ## Canvas.api.baseUrl
-returns the base URL for the current context. Should always be available.
+returns the base URL for the current context.
+
+**Availability**: *always*  
+
 
 ```
 https://canvas.instructure.com
 ```
-
 ## ToolProxyBinding.memberships.url
 returns the URL for the membership service associated with the current context.
+
+**Availability**: *always*  
+
 
 ```
 https://canvas.instructure.com/api/lti/courses/1/membership_service
 ```
-
 ## Canvas.account.id
-returns the account id for the current context. Should always be available.
+returns the account id for the current context.
+
+**Availability**: *always*  
+
 
 ```
 1234
 ```
-
 ## Canvas.account.name
-returns the account name for the current context. Should always be available.
+returns the account name for the current context.
+
+**Availability**: *always*  
+
 
 ```
 School Name
 ```
-
 ## Canvas.account.sisSourceId
-returns the account's sis source id for the current context. Only available if sis_account_id is specified.
+returns the account's sis source id for the current context.
+
+**Availability**: *always*  
+
+
 ```
 sis_account_id_1234
 ```
-
 ## Canvas.rootAccount.id
-returns the Root Account ID for the current context. Should always be available.
+returns the Root Account ID for the current context.
+
+**Availability**: *always*  
+
 
 ```
 1234
 ```
-
 ## Canvas.rootAccount.sisSourceId
-returns the root account's sis source id for the current context. Only available if sis_account_id is specified.
+returns the root account's sis source id for the current context.
+
+**Availability**: *always*  
+
+
 ```
 sis_account_id_1234
 ```
-
 ## Canvas.externalTool.url
 returns the URL for the external tool that was launched. Only available for LTI 1.
+
+**Availability**: *always and when in an LTI 1*  
+
 
 ```
 http://example.url/path
 ```
-
 ## Canvas.css.common
-returns the URL for the common CSS file. Should always be available.
+returns the URL for the common css file.
+
+**Availability**: *always*  
+
 
 ```
 http://example.url/path.css
 ```
-
 ## Canvas.shard.id
-returns the shard id for the current context. Should always be available.
+returns the shard id for the current context.
+
+**Availability**: *always*  
+
 
 ```
 1234
 ```
+## Canvas.root_account.global_id [duplicates Canvas.user.globalId]
+returns the root account's global id for the current context.
 
-## Canvas.root_account.global_id
-returns the root account's global id for the current context. Should always be available.
+**Availability**: *always*  
+
 
 ```
 123400000000123
 ```
-
 ## Canvas.root_account.id *[deprecated]*
-returns the root account id for the current context. Should always be available.
+returns the root account id for the current context.
+
+**Availability**: *always*  
+
 
 ```
 1234
 ```
+## vnd.Canvas.root_account.uuid
+returns the account uuid for the current context.
 
+**Availability**: *always*  
+**Launch Parameter**: *vnd_canvas_root_account_uuid*  
+
+```
+Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo
+```
 ## Canvas.root_account.sisSourceId *[deprecated]*
-returns the root account sis source id for the current context. Should always be available.
+returns the root account sis source id for the current context.
+
+**Availability**: *always*  
+
 
 ```
 1234
 ```
-
 ## Canvas.course.id
-returns the current course id. Only available when launched in a course.
+returns the current course id.
+
+**Availability**: *when launched in a course*  
+
 
 ```
 1234
 ```
+## Canvas.course.name
+returns the current course name.
 
-## Canvas.course.workflowState
-returns the current course workflow state. Workflow states of "claimed" or "created" indicate an unpublished course.
+**Availability**: *when launched in a course*  
+
 
 ```
-available
+Course Name
 ```
-
 ## Canvas.course.sisSourceId
-returns the current course sis source id. Only available when launched in a course.
+returns the current course sis source id.
+
+**Availability**: *when launched in a course*  
+
 
 ```
 1234
 ```
-
 ## Canvas.course.startAt
-returns the current course start date. Only available when launched in a course.
+returns the current course start date.
+
+**Availability**: *when launched in a course*  
+
 
 ```
 YYY-MM-DD HH:MM:SS -0700
 ```
+## Canvas.course.workflowState
+returns the current course workflow state. Workflow states of "claimed" or "created"
+indicate an unpublished course.
 
-## Canvas.term.startAt
-returns the current course's term start date. Only available when launched in a course that has a term with a start date.
+**Availability**: *when launched in a course*  
 
-```
-YYY-MM-DD HH:MM:SS -0700
-```
-
-## CourseSection.sourcedId
-returns the current course sis source id. Only available when launched in a course.
-to return the section source id use Canvas.course.sectionIds
-
-Launch Parameter: *lis_course_section_sourcedid*
-
-```
-1234
-```
-
-## Canvas.enrollment.enrollmentState
-returns the current course enrollment state. Only available when launched in a course.
 
 ```
 active
 ```
+## Canvas.term.startAt
+returns the current course's term start date.
 
+**Availability**: *when launched in a course that has a term with a start date*  
+
+
+```
+YYY-MM-DD HH:MM:SS -0700
+```
+## CourseSection.sourcedId
+returns the current course sis source id
+to return the section source id use Canvas.course.sectionIds.
+
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *lis_course_section_sourcedid*  
+
+```
+1234
+```
+## Canvas.enrollment.enrollmentState
+returns the current course enrollment state.
+
+**Availability**: *when launched in a course*  
+
+
+```
+active
+```
 ## Canvas.membership.roles
-returns the current course membership roles. Only available when launched from a course or an account.
+returns the current course membership roles.
+
+**Availability**: *when launched from a course or an account*  
+
 
 ```
 StudentEnrollment
 ```
-
 ## Canvas.membership.concludedRoles
-This is a list of IMS LIS roles should have a different key. Only available when launched in a course.
+This is a list of IMS LIS roles should have a different key.
+
+**Availability**: *when launched in a course*  
+
+
 ```
 urn:lti:sysrole:ims/lis/None
 ```
-
 ## Canvas.course.previousContextIds
-Returns the context ids from the course that the current course was copied from.
-Only available when launched in a course that was copied (excludes cartridge imports).
+Returns the context ids from the course that the current course was copied from (excludes cartridge imports).
+
+**Availability**: *when launched in a course*  
+
 
 ```
 1234
 ```
-
 ## Canvas.course.previousCourseIds
-Returns the course ids of the course that the current course was copied from.
-Only available when launched in a course that was copied (excludes cartridge imports).
+Returns the course ids of the course that the current course was copied from (excludes cartridge imports).
+
+**Availability**: *when launched in a course*  
+
 
 ```
 1234
 ```
-
 ## Person.name.full
-Returns the full name of the launching user. Only available when launched by a logged in user.
+Returns the full name of the launching user.
 
-Launch Parameter: *lis_person_name_full*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *lis_person_name_full*  
 
 ```
 John Doe
 ```
 ## Person.name.family
-Returns the last name of the launching user. Only available when launched by a logged in user.
+Returns the last name of the launching user.
 
-Launch Parameter: *lis_person_name_family*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *lis_person_name_family*  
 
 ```
 Doe
 ```
-
 ## Person.name.given
-Returns the last name of the launching user. Only available when launched by a logged in user.
+Returns the first name of the launching user.
 
-Launch Parameter: *lis_person_name_given*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *lis_person_name_given*  
 
 ```
 John
 ```
-
 ## Person.email.primary
-Returns the primary email of the launching user. Only available when launched by a logged in user.
+Returns the primary email of the launching user.
 
-Launch Parameter: *lis_person_contact_email_primary*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *lis_person_contact_email_primary*  
 
 ```
 john.doe@example.com
 ```
-
 ## vnd.Canvas.Person.email.sis
-Returns the institution assigned email of the launching user. Only available when launched by a logged in user that was added via SIS.
+Returns the institution assigned email of the launching user.
+
+**Availability**: *when launched by a logged in user that was added via SIS*  
+
 
 ```
 john.doe@example.com
 ```
-
 ## Person.address.timezone
-Returns the name of the timezone of the launching user. Only available when launched by a logged in user.
+Returns the name of the timezone of the launching user.
+
+**Availability**: *when launched by a logged in user*  
+
+
 ```
 America/Denver
 ```
-
 ## User.image
-Returns the profile picture URL of the launching user. Only available when launched by a logged in user.
+Returns the profile picture URL of the launching user.
 
-Launch Parameter: *user_image*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *user_image*  
 
 ```
 https://example.com/picture.jpg
 ```
+## User.id [duplicates Canvas.user.id]
+Returns the Canvas user_id of the launching user.
 
-## User.id [duplicates Canvas.user.id and Canvas.user.loginId]
-Returns the Canvas user_id of the launching user. Only available when launched by a logged in user.
-
-Launch Parameter: *user_id*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *user_id*  
 
 ```
 420000000000042
 ```
+## Canvas.user.id [duplicates User.id]
+Returns the Canvas user_id of the launching user.
 
-## Canvas.user.id [duplicates User.id and Canvas.user.loginId]
-Returns the Canvas user_id of the launching user. Only available when launched by a logged in user.
+**Availability**: *when launched by a logged in user*  
+
+
 ```
 420000000000042
 ```
-
 ## Canvas.user.prefersHighContrast
-Returns the users preference for high contrast colors (an accessibility feature). Only available when launched by a logged in user.
+Returns the users preference for high contrast colors (an accessibility feature).
+
+**Availability**: *when launched by a logged in user*  
+
+
 ```
 false
 ```
-
 ## Canvas.group.contextIds
 returns the context ids for the groups the user belongs to in the course.
+
+**Availability**: *always*  
+
 
 ```
 1c16f0de65a080803785ecb3097da99872616f0d,d4d8d6ae1611e2c7581ce1b2f5c58019d928b79d,...
 ```
-
 ## Membership.role
-Returns the <a href="https://www.imsglobal.org/specs/ltimemv1p0/specification-3">IMS LTI membership service</a> roles for filtering via query parameters. Only available when launched by a logged in user.
+Returns the [IMS LTI membership service](https://www.imsglobal.org/specs/ltimemv1p0/specification-3) roles for filtering via query parameters.
 
-Launch Parameter: *roles*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *roles*  
 
 ```
 http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator
 ```
-
 ## Canvas.xuser.allRoles [duplicates ext_roles which is sent by default]
-Returns list of <a href="https://www.imsglobal.org/specs/ltiv1p0/implementation-guide#toc-16" target ="_blank">LIS role full URNs</a>.
-Should always be available.
+Returns list of [LIS role full URNs](https://www.imsglobal.org/specs/ltiv1p0/implementation-guide#toc-16).
+
+**Availability**: *always*  
+
+
 ```
 urn:lti:instrole:ims/lis/Administrator,urn:lti:instrole:ims/lis/Instructor,urn:lti:sysrole:ims/lis/SysAdmin,urn:lti:sysrole:ims/lis/User
 ```
+## Canvas.user.globalId [duplicates Canvas.root_account.global_id]
+Returns the Canvas global user_id of the launching user.
 
-## Canvas.user.globalId [duplicates Canvas.user.id and User.id]
-Returns the canvas user_id of the launching user. Only available when launched by a logged in user.
+**Availability**: *when launched by a logged in user*  
+
+
 ```
 420000000000042
 ```
-
 ## Canvas.user.isRootAccountAdmin
-Returns true for root account admins and false for all other roles. Only available when launched by a logged in user.
+Returns true for root account admins and false for all other roles.
+
+**Availability**: *when launched by a logged in user*  
+
+
 ```
 true
 ```
-
 ## User.username [duplicates Canvas.user.loginId]
 Username/Login ID for the primary pseudonym for the user for the account.
-This may not be the pseudonym the user is actually logged in with. Only available when pseudonym is in use.
+This may not be the pseudonym the user is actually logged in with.
+
+**Availability**: *when pseudonym is in use*  
+
+
 ```
 jdoe
 ```
-
 ## Canvas.user.loginId [duplicates User.username]
-Returns the username/Login ID for the primary pseudonym for the user for the account.
-This may not be the pseudonym the user is actually logged in with. Only available when pseudonym is in use.
+Username/Login ID for the primary pseudonym for the user for the account.
+This may not be the pseudonym the user is actually logged in with.
+
+**Availability**: *when pseudonym is in use*  
+
+
 ```
 jdoe
 ```
+## Canvas.user.sisSourceId [duplicates Person.sourcedId]
+Returns the sis source id for the primary pseudonym for the user for the account
+This may not be the pseudonym the user is actually logged in with.
 
-## Canvas.user.sisSourceId [duplicates Person.sourceId]
-Returns the sis source id for the primary pseudonym for the user for the account.
-This may not be the pseudonym the user is actually logged in with. Only available when pseudonym is in use.
+**Availability**: *when pseudonym is in use*  
+
+
 ```
 sis_user_42
 ```
-
 ## Canvas.user.sisIntegrationId
-Returns the integration id for the primary pseudonym for the user for the account.
-This may not be the pseudonym the user is actually logged in with. Only available when pseudonym is in use.
+Returns the integration id for the primary pseudonym for the user for the account
+This may not be the pseudonym the user is actually logged in with.
+
+**Availability**: *when pseudonym is in use*  
+
+
 ```
 integration_user_42
 ```
-
 ## Person.sourcedId [duplicates Canvas.user.sisSourceId]
-Returns the sis source id for the primary pseudonym for the user for the account.
-This may not be the pseudonym the user is actually logged in with. Only available when pseudonym is in use.
+Returns the sis source id for the primary pseudonym for the user for the account
+This may not be the pseudonym the user is actually logged in with.
+
+**Availability**: *when pseudonym is in use*  
+**Launch Parameter**: *lis_person_sourcedid*  
+
 ```
 sis_user_42
 ```
-
 ## Canvas.logoutService.url
 Returns the logout service url for the user.
 This is the pseudonym the user is actually logged in as.
-it may not hold all the sis info needed in other launch substitutions.
+It may not hold all the sis info needed in other launch substitutions.
+
+**Availability**: *always*  
+
+
 ```
 https://<domain>.instructure.com/api/lti/v1/logout_service/<external_tool_id>-<user_id>-<current_unix_timestamp>-<opaque_string>
 ```
-
 ## Canvas.masqueradingUser.id
 Returns the Canvas user_id for the masquerading user.
-Only available when the user is being masqueraded.
+This is the pseudonym the user is actually logged in as.
+It may not hold all the sis info needed in other launch substitutions.
+
+**Availability**: *when the user is being masqueraded*  
+
+
 ```
 420000000000042
 ```
-
-
 ## Canvas.masqueradingUser.userId
 Returns the 40 character opaque user_id for masquerading user.
-Only available when the user is being masqueraded.
+This is the pseudonym the user is actually logged in as.
+It may not hold all the sis info needed in other launch substitutions.
+
+**Availability**: *when the user is being masqueraded*  
+
+
 ```
 da12345678cb37ba1e522fc7c5ef086b7704eff9
 ```
-
 ## Canvas.xapi.url
 Returns the xapi url for the user.
+
+**Availability**: *always*  
+
+
 ```
 https://<domain>.instructure.com/api/lti/v1/xapi/<external_tool_id>-<user_id>-<course_id>-<current_unix_timestamp>-<opaque_id>
 ```
-
 ## Caliper.url
 Returns the caliper url for the user.
+
+**Availability**: *always*  
+
+
 ```
 https://<domain>.instructure.com/api/lti/v1/caliper/<external_tool_id>-<user_id>-<course_id>-<current_unix_timestamp>-<opaque_id>
 ```
-
 ## Canvas.course.sectionIds
 Returns a comma separated list of section_id's that the user is enrolled in.
-Only available when launched from a course as an enrolled user.
+
+**Availability**: *when launched from a course*  
+
+
 ```
 42, 43
 ```
-
 ## Canvas.course.sectionSisSourceIds
 Returns a comma separated list of section sis_id's that the user is enrolled in.
-Only available when launched from a course as an enrolled user.
+
+**Availability**: *when launched from a course*  
+
+
 ```
 section_sis_id_1, section_sis_id_2
 ```
-
 ## Canvas.module.id
 Returns the module_id that the module item was launched from.
-Only available when content tag is present.
+
+**Availability**: *when content tag is present*  
+
+
 ```
 1234
 ```
-
 ## Canvas.moduleItem.id
 Returns the module_item_id of the module item that was launched.
-Only available when content tag is present.
+
+**Availability**: *when content tag is present*  
+
+
 ```
 1234
 ```
-
 ## Canvas.assignment.id
 Returns the assignment_id of the assignment that was launched.
-Only available when launched as an assignment.
+
+**Availability**: *when launched as an assignment*  
+
+
 ```
 1234
 ```
-
 ## Canvas.assignment.title
 Returns the title of the assignment that was launched.
-Only available when launched as an assignment.
+
+**Availability**: *when launched as an assignment*  
+
+
 ```
 Deep thought experiment
 ```
-
 ## Canvas.assignment.pointsPossible
 Returns the points possible of the assignment that was launched.
-Only available when launched as an assignment.
+
+**Availability**: *when launched as an assignment*  
+
+
 ```
 100
 ```
-
 ## Canvas.assignment.unlockAt *[deprecated]*
-deprecated in favor of ISO8601. Only available when launched as an assignment.
+deprecated in favor of ISO8601.
+
+**Availability**: *when launched as an assignment*  
+
+
 
 ## Canvas.assignment.lockAt *[deprecated]*
-deprecated in favor of ISO8601. Only available when launched as an assignment.
+deprecated in favor of ISO8601.
+
+**Availability**: *when launched as an assignment*  
+
+
 
 ## Canvas.assignment.dueAt *[deprecated]*
-deprecated in favor of ISO8601. Only available when launched as an assignment.
+deprecated in favor of ISO8601.
+
+**Availability**: *when launched as an assignment*  
+
+
 
 ## Canvas.assignment.unlockAt.iso8601
-Returns the unlock_at date of the assignment that was launched.
-Only available when launched as an assignment.
+Returns the `unlock_at` date of the assignment that was launched.
+Only available when launched as an assignment with an `unlock_at` set.
+
+**Availability**: *always*  
+
+
 ```
 YYYY-MM-DDT07:00:00Z
 ```
-
 ## Canvas.assignment.lockAt.iso8601
-Returns the lock_at date of the assignment that was launched.
-Only available when launched as an assignment.
+Returns the `lock_at` date of the assignment that was launched.
+Only available when launched as an assignment with a `lock_at` set.
+
+**Availability**: *always*  
+
+
 ```
 YYYY-MM-DDT07:00:00Z
 ```
-
 ## Canvas.assignment.dueAt.iso8601
-Returns the due_at date of the assignment that was launched.
-Only available when launched as an assignment.
+Returns the `due_at` date of the assignment that was launched.
+Only available when launched as an assignment with a `due_at` set.
+
+**Availability**: *always*  
+
+
 ```
 YYYY-MM-DDT07:00:00Z
 ```
-
 ## Canvas.assignment.published
 Returns true if the assignment that was launched is published.
 Only available when launched as an assignment.
+
+**Availability**: *when launched as an assignment*  
+
+
 ```
 true
 ```
-
 ## LtiLink.custom.url
 Returns the endpoint url for accessing link-level tool settings
-Only available for LTI 2.0
+Only available for LTI 2.0.
+
+**Availability**: *always*  
+
+
 ```
 https://<domain>.instructure.com/api/lti/tool_settings/<link_id>
 ```
-
 ## ToolProxyBinding.custom.url
 Returns the endpoint url for accessing context-level tool settings
-Only available for LTI 2.0
+Only available for LTI 2.0.
+
+**Availability**: *always*  
+
+
 ```
 https://<domain>.instructure.com/api/lti/tool_settings/<binding_id>
 ```
-
 ## ToolProxy.custom.url
 Returns the endpoint url for accessing system-wide tool settings
-Only available for LTI 2.0
+Only available for LTI 2.0.
+
+**Availability**: *always*  
+
+
 ```
 https://<domain>.instructure.com/api/lti/tool_settings/<proxy_id>
 ```
-
 ## ToolConsumerProfile.url
-Returns the <a href="https://www.imsglobal.org/specs/ltiv2p0/implementation-guide#toc-46" target="_blank">Tool Consumer Profile</a> url for the tool.
-Only available for LTI 2.0
+Returns the [Tool Consumer Profile](https://www.imsglobal.org/specs/ltiv2p0/implementation-guide#toc-46) url for the tool.
+Only available for LTI 2.0.
+
+**Availability**: *always*  
+
+
 ```
 https://<domain>.instructure.com/api/lti/courses/<course_id>/tool_consumer_profile/<opaque_id>
 https://<domain>.instructure.com/api/lti/accounts/<account_id>/tool_consumer_profile/<opaque_id>
 ```
-
-
 ## Canvas.file.media.id
-Only available when an attachment is present and it has either a media object or media entry id defined.
+
+
+**Availability**: *when an attachment is present and it has either a media object or media entry id defined*  
+
+
 
 ## Canvas.file.media.type
-Only available when an attachment is present and has a media object defined.
+
+
+**Availability**: *when an attachment is present and has a media object defined*  
+
+
 
 ## Canvas.file.media.duration
-Only available when an attachment is present and has a media object defined.
+
+
+**Availability**: *when an attachment is present and has a media object defined*  
+
+
 
 ## Canvas.file.media.size
-Only available when an attachment is present and has a media object defined.
+
+
+**Availability**: *when an attachment is present and has a media object defined*  
+
+
 
 ## Canvas.file.media.title
-Only available when an attachment is present and has a media object defined.
+
+
+**Availability**: *when an attachment is present and has a media object defined*  
+
+
 
 ## Canvas.file.usageRights.name
-Only available when an attachment is present and has usage rights defined.
+
+
+**Availability**: *when an attachment is present and has usage rights defined*  
+
+
 
 ## Canvas.file.usageRights.url
-Only available when an attachment is present and has usage rights defined.
+
+
+**Availability**: *when an attachment is present and has usage rights defined*  
+
+
 
 ## Canvas.file.usageRights.copyrightText
-Only available when an attachment is present and has usage rights defined.
+
+
+**Availability**: *when an attachment is present and has usage rights defined*  
+
+
+
