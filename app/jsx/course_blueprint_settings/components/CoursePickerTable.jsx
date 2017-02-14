@@ -129,7 +129,7 @@ define([
     renderBodyContent () {
       if (this.props.courses.length > 0) {
         return [(
-          <ScreenReaderContent key="select-all" tag="tr">
+          <ScreenReaderContent key="select-all" as="tr">
             <td>
               <Checkbox
                 onChange={this.onSelectAllToggle}
@@ -154,7 +154,7 @@ define([
       // in order to create a sticky table header, we'll create a separate table with
       // just the visual sticky headers, that will be hidden from screen readers
       return (
-        <PresentationContent tagName="div">
+        <PresentationContent as="div">
           <div className="btps-table__header-wrapper">
             <Table caption={<ScreenReaderContent>{I18n.t('Blueprint Courses')}</ScreenReaderContent>}>
               {this.renderColGroup()}
@@ -193,7 +193,7 @@ define([
             <Table caption={<ScreenReaderContent>{I18n.t('Blueprint Courses')}</ScreenReaderContent>}>
               {this.renderColGroup()}
               {/* on the real table, we'll include the headers again, but make them screen reader only */}
-              <ScreenReaderContent tag="thead">
+              <ScreenReaderContent as="thead">
                 {this.renderHeaders()}
               </ScreenReaderContent>
               <tbody className="bps-table__body">

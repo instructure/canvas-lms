@@ -71,7 +71,7 @@ define([
         return (
           <section
             className="StudentContextTray__Section StudentContextTray-Progress">
-            <Heading level="h4" tag="h3" border="bottom">
+            <Heading level="h4" as="h3" border="bottom">
               {I18n.t("Last %{length} Graded Items", {length: submissions.length})}
             </Heading>
             {submissions.map((submission) => {

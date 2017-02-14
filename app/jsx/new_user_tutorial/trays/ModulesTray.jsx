@@ -5,7 +5,7 @@ define([
 ], (React, I18n, { Heading }) => {
   const HomeTray = () => (
     <div>
-      <Heading tag="h2" level="h1" >{I18n.t('Modules')}</Heading>
+      <Heading as="h2" level="h1" >{I18n.t('Modules')}</Heading>
     </div>
   );
 

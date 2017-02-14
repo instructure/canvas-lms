@@ -35,7 +35,7 @@ define([
         return (
           <div
             className="StudentContextTray-Rating">
-            <Heading level="h5" tag="h4">
+            <Heading level="h5" as="h4">
               {this.props.label}
             </Heading>
             <div className="StudentContextTray-Rating__Stars">

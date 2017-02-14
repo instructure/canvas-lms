@@ -93,6 +93,7 @@ module.exports = {
       // once we are all-webpack we should remove this line and just change all the 'require's
       // to instructure-ui compnentns to have the right path
       'instructure-ui': path.resolve(__dirname, '../node_modules/instructure-ui/lib/components'),
+      'instructure-ui-themes': path.resolve(__dirname, '../node_modules/instructure-ui/lib/themes'),
 
       backbone: 'Backbone',
       timezone$: 'timezone_core',

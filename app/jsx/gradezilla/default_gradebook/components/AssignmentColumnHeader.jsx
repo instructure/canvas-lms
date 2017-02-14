@@ -73,7 +73,7 @@ define([
 
     static renderMutedIcon (screenreaderText) {
       return (
-        <Typography weight="bold" style="normal" size="small" color="error">
+        <Typography weight="bold" fontStyle="normal" size="small" color="error">
           <IconMutedSolid title={screenreaderText} />
         </Typography>
       );
@@ -81,7 +81,7 @@ define([
 
     static renderWarningIcon (screenreaderText) {
       return (
-        <Typography weight="bold" style="normal" size="small" color="brand">
+        <Typography weight="bold" fontStyle="normal" size="small" color="brand">
           <IconWarningSolid title={screenreaderText} />
         </Typography>
       );
@@ -163,7 +163,7 @@ define([
         <div className="Gradebook__ColumnHeaderContent">
           <span className="Gradebook__ColumnHeaderDetail">
             {this.renderAssignmentLink()}
-            <Typography weight="normal" style="normal" size="x-small">
+            <Typography weight="normal" fontStyle="normal" size="x-small">
               {this.renderPointsPossible()}
             </Typography>
           </span>

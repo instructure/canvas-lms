@@ -105,9 +105,12 @@ define([
       title: undefined,
       href: createAssignmentProp().htmlUrl
     };
+    const actualProps = actualElements.props();
 
     equal(actualElements.length, 1);
-    deepEqual(actualElements.props(), expectedLinkProps);
+    deepEqual(actualProps.children, expectedLinkProps.children);
+    equal(actualProps.title, expectedLinkProps.title);
+    equal(actualProps.href, expectedLinkProps.href);
   });
 
   test('renders the points possible', function () {
@@ -164,28 +167,28 @@ define([
 
   test('shows the menu item in an enabled state', function () {
     this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
-    this.renderOutput.find('PopoverMenu').simulate('click');
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
 
     const specificMenuItem = document.querySelector('[data-menu-item-id="show-assignment-details"]');
 
     equal(specificMenuItem.textContent, 'Assignment Details');
-    notOk(specificMenuItem.parentElement.getAttribute('aria-disabled'));
+    notOk(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'));
   });
 
   test('disables the menu item when the disabled prop is true', function () {
     this.props.assignmentDetailsAction.disabled = true;
 
     this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
-    this.renderOutput.find('PopoverMenu').simulate('click');
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
 
     const specificMenuItem = document.querySelector('[data-menu-item-id="show-assignment-details"]');
 
-    equal(specificMenuItem.parentElement.getAttribute('aria-disabled'), 'true');
+    equal(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
   });
 
   test('clicking the menu item invokes the Assignment Details dialog', function () {
     this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
-    this.renderOutput.find('PopoverMenu').simulate('click');
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
 
     const specificMenuItem = document.querySelector('[data-menu-item-id="show-assignment-details"]');
 
@@ -206,7 +209,7 @@ define([
           submissionsLoaded
         />
       );
-      this.wrapper.find('PopoverMenu').simulate('click');
+      this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
       const menuItem = document.querySelector('[data-menu-item-id="curve-grades"]');
       menuItem.click();
       return menuItem;
@@ -221,17 +224,17 @@ define([
     const menuItem = this.setupAndClick();
 
     equal(menuItem.textContent, 'Curve Grades');
-    notOk(menuItem.parentElement.getAttribute('aria-disabled'));
+    notOk(menuItem.parentElement.parentElement.getAttribute('aria-disabled'));
   });
 
   test('Curve Grades menu item is disabled when isDisabled is true', function () {
     const menuItem = this.setupAndClick({ isDisabled: true });
-    ok(menuItem.parentElement.getAttribute('aria-disabled'));
+    ok(menuItem.parentElement.parentElement.getAttribute('aria-disabled'));
   });
 
   test('Curve Grades menu item is enabled when isDisabled is false', function () {
     const menuItem = this.setupAndClick({ isDisabled: false });
-    notOk(menuItem.parentElement.getAttribute('aria-disabled'));
+    notOk(menuItem.parentElement.parentElement.getAttribute('aria-disabled'));
   });
 
   test('onSelect is called when menu item is clicked', function () {
@@ -268,25 +271,25 @@ define([
 
   test('shows the menu item in an enabled state', function () {
     this.wrapper = mount(<AssignmentColumnHeader {...this.props} />);
-    this.wrapper.find('PopoverMenu').simulate('click');
+    this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
     const menuItem = document.querySelector('[data-menu-item-id="message-students-who"]');
 
     equal(menuItem.textContent, 'Message Students Who');
-    notOk(menuItem.parentElement.getAttribute('aria-disabled'));
+    notOk(menuItem.parentElement.parentElement.getAttribute('aria-disabled'));
   });
 
   test('disables the menu item when submissions are not loaded', function () {
     this.props.submissionsLoaded = false;
     this.wrapper = mount(<AssignmentColumnHeader {...this.props} />);
-    this.wrapper.find('PopoverMenu').simulate('click');
+    this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
     const menuItem = document.querySelector('[data-menu-item-id="message-students-who"]');
 
-    equal(menuItem.parentElement.getAttribute('aria-disabled'), 'true');
+    equal(menuItem.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
   });
 
   test('clicking the menu item invokes the Message Students Who dialog', function () {
     this.wrapper = mount(<AssignmentColumnHeader {...this.props} />);
-    this.wrapper.find('PopoverMenu').simulate('click');
+    this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
     const messageStudentsStub = this.stub(window, 'messageStudents');
     const menuItem = document.querySelector('[data-menu-item-id="message-students-who"]');
     menuItem.click();
@@ -394,7 +397,7 @@ define([
 
   test('shows the menu item in an enabled state', function () {
     this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
-    this.renderOutput.find('PopoverMenu').simulate('click');
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
 
     const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
 
@@ -406,16 +409,16 @@ define([
     this.props.setDefaultGradeAction.disabled = true;
 
     this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
-    this.renderOutput.find('PopoverMenu').simulate('click');
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
 
     const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
 
-    equal(specificMenuItem.parentElement.getAttribute('aria-disabled'), 'true');
+    equal(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
   });
 
   test('clicking the menu item invokes the onSelect handler', function () {
     this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
-    this.renderOutput.find('PopoverMenu').simulate('click');
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
 
     const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
 

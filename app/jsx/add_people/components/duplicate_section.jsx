@@ -2,9 +2,14 @@ define([
   'i18n!roster',
   'react',
   './shapes',
-  'instructure-ui'
-], (I18n, React, shapes, {Table, ScreenReaderContent,
-    TextInput, RadioInput, Typography, Link}) => {
+  'instructure-ui/Table',
+  'instructure-ui/ScreenReaderContent',
+  'instructure-ui/TextInput',
+  'instructure-ui/RadioInput',
+  'instructure-ui/Typography',
+  'instructure-ui/Link'
+], (I18n, React, shapes, {default: Table}, {default: ScreenReaderContent},
+    {default: TextInput}, {default: RadioInput}, {default: Typography}, {default: Link}) => {
   const CREATE_NEW = '__CREATE_NEW__';
   const SKIP = '__SKIP';
   const nameLabel = I18n.t("New user's name");
@@ -39,7 +44,9 @@ define([
     onSelectNewForDuplicate = (event) => {
       // if the event was not from the radio button, find and focus it
       if (!(event.target.tagName === 'input' && event.target.getAttribute('type') === 'radio')) {
-        const radioButton = event.target.parentElement.parentElement.querySelector('input[type="radio"]');
+        let elem = event.target;
+        for (; elem.tagName !== 'TR'; elem = elem.parentElement);
+        const radioButton = elem.querySelector('input[type="radio"]');
         radioButton.focus();
       }
       this.props.onNewForDuplicate(this.props.duplicates.address, this.props.duplicates.newUserInfo);

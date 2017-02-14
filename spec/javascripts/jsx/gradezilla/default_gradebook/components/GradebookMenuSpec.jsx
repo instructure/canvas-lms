@@ -44,7 +44,7 @@ define([
 
   test('#handleIndividualGradebookSelect calls setLocation', function () {
     const setLocationStub = this.stub(GradebookMenu.prototype, 'setLocation');
-    this.wrapper.find('PopoverMenu').simulate('click');
+    this.wrapper.find('button').simulate('click');
     document.querySelector('[data-menu-item-id="individual-gradebook"]').click();
     const url = `${this.wrapper.props().courseUrl}/gradebook/change_gradebook_version?version=individual`;
     ok(setLocationStub.withArgs(url).calledOnce);
@@ -52,7 +52,7 @@ define([
 
   test('#handleGradeHistorySelect calls setLocation', function () {
     const setLocationStub = this.stub(GradebookMenu.prototype, 'setLocation');
-    this.wrapper.find('PopoverMenu').simulate('click');
+    this.wrapper.find('button').simulate('click');
     document.querySelector('[data-menu-item-id="grade-history"]').click();
     const url = `${this.wrapper.props().courseUrl}/gradebook/history`;
     ok(setLocationStub.withArgs(url).calledOnce);
@@ -69,7 +69,7 @@ define([
           navigate={this.navigateStub}
         />
       );
-      this.wrapper.find('PopoverMenu').simulate('click');
+      this.wrapper.find('button').simulate('click');
       this.menuItems = document.querySelector('[role="menu"]').children;
     },
     teardown () {
@@ -108,7 +108,7 @@ define([
           navigate={() => {}}
         />
       );
-      this.wrapper.find('PopoverMenu').simulate('click');
+      this.wrapper.find('button').simulate('click');
       this.menuItems = document.querySelector('[role="menu"]').children;
     },
     teardown () {
@@ -139,7 +139,7 @@ define([
           navigate={this.navigateStub}
         />
       );
-      this.wrapper.find('PopoverMenu').simulate('click');
+      this.wrapper.find('button').simulate('click');
       this.menuItems = document.querySelector('[role="menu"]').children;
     },
     teardown () {

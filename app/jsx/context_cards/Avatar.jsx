@@ -31,7 +31,7 @@ define([
             />
             {
               canMasquerade ? (
-                <Typography size="x-small" weight="bold" tag="div">
+                <Typography size="x-small" weight="bold" as="div">
                   <a
                     href={`/courses/${courseId}?become_user_id=${user.id}`}
                     aria-label={I18n.t('Masquerade as %{name}', { name: user.short_name })}

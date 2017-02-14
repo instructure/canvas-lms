@@ -247,7 +247,7 @@ describe "Gradezilla" do
       gradezilla_page.visit(@course)
 
       # And I click the dropdown menu on the assignment
-      f('.gradebook-header-drop').click
+      f('.Gradebook__ColumnHeaderAction').click
 
       # And I click the download submissions button
       f('[data-action="downloadSubmissions"]').click
@@ -256,7 +256,7 @@ describe "Gradezilla" do
       fj("div:contains('Download Assignment Submissions'):first .ui-dialog-titlebar-close").click
 
       # And I click the dropdown menu on the assignment again
-      f('.gradebook-header-drop').click
+      f('.Gradebook__ColumnHeaderAction').click
 
       # And I click the re-upload submissions link
       f('[data-action="reuploadSubmissions"]').click
@@ -292,7 +292,7 @@ describe "Gradezilla" do
 
     gradezilla_page.visit(@course)
 
-    f('.gradebook-header-drop').click
+    f('.Gradebook__ColumnHeaderAction').click
     expect(f('.gradebook-header-menu')).not_to include_text("SpeedGrader")
   end
 

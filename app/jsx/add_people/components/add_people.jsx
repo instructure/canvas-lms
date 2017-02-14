@@ -2,16 +2,21 @@ define([
   'i18n!roster',
   'react',
   'react-dom',
-  'instructure-ui',
+  'instructure-ui/Modal',
+  'instructure-ui/Heading',
+  'instructure-ui/Button',
+  'instructure-ui/Spinner',
+  'instructure-ui/Alert',
+  'instructure-ui/ScreenReaderContent',
   './shapes',
   './people_search',
   './people_ready_list',
   './people_validation_issues',
   './api_error'
 ], (I18n, React, ReactDOM,
-      {Modal, ModalHeader, ModalBody, ModalFooter,
-        Heading, Button, Spinner, Alert,
-        ScreenReaderContent, ApplyTheme},
+      {default: Modal, ModalHeader, ModalBody, ModalFooter},
+      {default: Heading}, {default: Button}, {default: Spinner}, {default: Alert},
+      {default: ScreenReaderContent},
         {courseParamsShape, apiStateShape, inputParamsShape, validateResultShape, personReadyToEnrollShape},
         PeopleSearch, PeopleReadyList, PeopleValidationIssues, APIError) => {
   const PEOPLESEARCH = 'peoplesearch';
@@ -307,13 +312,5 @@ define([
       );
     }
   }
-
-  const DeleteMe = props => (
-    <ApplyTheme theme={ApplyTheme.generateTheme('a11y')}>
-      <AddPeople {...props} />
-    </ApplyTheme>
-  )
-
-  /* TODO: after instui gets updated, just return AddPeople */
-  return ENV.use_high_contrast ? DeleteMe : AddPeople;
+  return AddPeople;
 });

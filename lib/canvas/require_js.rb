@@ -75,6 +75,7 @@ module Canvas
           {name: 'ic-ajax',            location: 'symlink_to_node_modules/ic-ajax/dist/amd'},
           {name: 'ic-tabs',            location: 'symlink_to_node_modules/ic-tabs'},
           {name: 'instructure-ui',     location: 'symlink_to_node_modules/instructure-ui/dist', main: 'instructure-ui'},
+          {name: 'instructure-ui-themes', location: 'symlink_to_node_modules/instructure-ui/dist/themes'},
           {name: 'instructure-icons',  location: 'symlink_to_node_modules/instructure-icons', main: 'react/index'},
           {name: 'lodash',             location: 'symlink_to_node_modules/lodash', main: 'lodash'},
           {name: 'moxios',             location: 'symlink_to_node_modules/moxios', main: 'dist/moxios'},
