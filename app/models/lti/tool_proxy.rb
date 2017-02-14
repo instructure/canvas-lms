@@ -33,6 +33,10 @@ module Lti
     validates_uniqueness_of :guid
     validates_inclusion_of :workflow_state, in: ['active', 'deleted', 'disabled']
 
+    def active_in_context?(context)
+      self.class.find_active_proxies_for_context(context).include?(self)
+    end
+
     def self.find_active_proxies_for_context(context)
       find_all_proxies_for_context(context).where('lti_tool_proxies.workflow_state = ?', 'active')
     end

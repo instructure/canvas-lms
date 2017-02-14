@@ -235,7 +235,6 @@ module Lti
              )
              expect(tcp_creator.create.guid).to eq ToolConsumerProfile::DEFAULT_TCP_UUID
           end
-
         end
       end
     end

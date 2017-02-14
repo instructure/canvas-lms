@@ -11,6 +11,23 @@ module Lti
 
     DEFAULT_TCP_UUID = "339b6700-e4cb-47c5-a54f-3ee0064921a9".freeze
 
+    WEBHOOK_GRANT_ALL_CAPABILITY = 'vnd.Canvas.webhooks.root_account.all'.freeze
+    WEBHOOK_SUBSCRIPTION_CAPABILITIES = {
+      all: [WEBHOOK_GRANT_ALL_CAPABILITY].freeze,
+      quiz_submitted: %w(vnd.instructure.webhooks.root_account.quiz_submitted
+                         vnd.instructure.webhooks.course.quiz_submitted
+                         vnd.instructure.webhooks.assignment.quiz_submitted).freeze,
+      assignment_submitted: %w(vnd.instructure.webhooks.root_account.assignment_submitted
+                               vnd.instructure.webhooks.course.assignment_submitted
+                               vnd.instructure.webhooks.assignment.assignment_submitted).freeze,
+      grade_changed: %w(vnd.instructure.webhooks.root_account.grade_changed
+                        vnd.instructure.webhooks.course.grade_changed).freeze,
+      attachment_created: %w(vnd.instructure.webhooks.root_account.attachment_created
+                             vnd.instructure.webhooks.assignment.attachment_created).freeze,
+      submission_created: %w(vnd.instructure.webhooks.root_account.submission_created
+                             vnd.instructure.webhooks.assignment.submission_created).freeze
+    }.freeze
+
     DEFAULT_CAPABILITIES = %w(
       basic-lti-launch-request
       User.id
@@ -38,9 +55,10 @@ module Lti
       Context.id
     ).concat(CapabilitiesHelper::SUPPORTED_CAPABILITIES).freeze
 
-    RESTRICTED_CAPABILITIES = %W(
-      #{Lti::OriginalityReportsApiController::ORIGINALITY_REPORT_SERVICE}.url
-    ).freeze
+    RESTRICTED_CAPABILITIES = [
+      "#{Lti::OriginalityReportsApiController::ORIGINALITY_REPORT_SERVICE}.url",
+      *WEBHOOK_SUBSCRIPTION_CAPABILITIES.values.flatten
+    ].freeze
 
 
     DEFAULT_SERVICES = [
@@ -50,7 +68,8 @@ module Lti
     ].freeze
 
     RESTRICTED_SERVICES = [
-      *Lti::OriginalityReportsApiController::SERVICE_DEFINITIONS
+      *Lti::OriginalityReportsApiController::SERVICE_DEFINITIONS,
+      *Lti::SubscriptionsApiController::SERVICE_DEFINITIONS
     ].freeze
 
     class << self
@@ -69,7 +88,13 @@ module Lti
       end
     end
 
+    def self.webhook_subscription_capabilities
+      WEBHOOK_SUBSCRIPTION_CAPABILITIES
+    end
 
+    def self.webhook_grant_all_capability
+      WEBHOOK_GRANT_ALL_CAPABILITY
+    end
 
 
     private
