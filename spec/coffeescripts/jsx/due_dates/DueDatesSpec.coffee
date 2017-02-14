@@ -283,8 +283,7 @@ define [
   test 'dropdown options do not include students whose sections are assigned in closed periods', ->
     notOk _.contains(@dropdownOptions, "Scipio Africanus")
 
-  test 'dropdown options include sections that are not assigned in closed periods and do not have'/
-  'any students assigned in closed periods', ->
+  test 'dropdown options include sections that are not assigned in closed periods and do not have any students assigned in closed periods', ->
     ok _.contains(@dropdownOptions, "Section 3")
 
   test 'dropdown options include students that do not belong to sections assigned in closed periods', ->

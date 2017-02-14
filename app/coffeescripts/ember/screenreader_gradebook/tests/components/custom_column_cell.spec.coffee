@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'ember'
   '../start_app'
   '../shared_ajax_fixtures'
   'compiled/gradebook/GradebookHelpers'
   'jsx/gradebook/shared/constants'
-], (Ember, startApp, fixtures, GradebookHelpers, GradebookConstants) ->
+], ($, Ember, startApp, fixtures, GradebookHelpers, GradebookConstants) ->
 
   {run} = Ember
 

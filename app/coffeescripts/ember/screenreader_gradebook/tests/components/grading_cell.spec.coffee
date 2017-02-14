@@ -1,9 +1,10 @@
 define [
+  'jquery'
   'ember'
   'timezone'
   '../start_app'
   '../shared_ajax_fixtures'
-], (Ember, tz, startApp, fixtures) ->
+], ($, Ember, tz, startApp, fixtures) ->
 
   {run} = Ember
 

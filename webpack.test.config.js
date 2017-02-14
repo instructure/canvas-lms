@@ -5,17 +5,7 @@ const webpack = require('webpack')
 const testWebpackConfig = require('./frontend_build/baseWebpackConfig')
 const jspecEnv = require('./spec/jspec_env')
 
-// the ember specs don't play nice with the rest,
-// so we run them in totally seperate bundles
-testWebpackConfig.entry = (process.env.WEBPACK_TEST_BUNDLE === 'ember')
-  ? {WebpackedEmberSpecs: './spec/javascripts/webpack_ember_spec_index.js'}
-  : {WebpackedSpecs: './spec/javascripts/webpack_spec_index.js'}
-
-testWebpackConfig.output.path = path.resolve(__dirname, 'spec/javascripts/webpack')
-testWebpackConfig.output.publicPath = '/base/spec/javascripts/webpack/'
-testWebpackConfig.output.filename = '[name].bundle.test.js';
-testWebpackConfig.output.chunkFilename = '[name].chunk.test.js';
-
+testWebpackConfig.entry = undefined
 testWebpackConfig.plugins.push(new webpack.DefinePlugin(jspecEnv))
 
 // These externals are necessary for Enzyme

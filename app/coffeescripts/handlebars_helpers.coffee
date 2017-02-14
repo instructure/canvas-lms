@@ -275,7 +275,7 @@ define [
       ret = ''
 
       if context and context.length > 0
-        for index, ctx of context
+        for own index, ctx of context
           ctx._index = index
           ret += fn ctx
       else

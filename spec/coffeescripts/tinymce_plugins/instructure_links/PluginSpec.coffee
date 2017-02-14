@@ -89,7 +89,7 @@ define [
 
   test "it inserts the link properly", ->
     @mock(@editor).expects("createLink").once().
-      withArgs('promptValue', "classes", sinon.match({'preview-alt': alt}))
+      withArgs('promptValue', "classes", {'preview-alt': 'preview alt text'})
     called = false
     @box.on('submit', (()-> called = true))
     EditorLinks.bindLinkSubmit(@box, @editor, @fetchClasses, (()->))
