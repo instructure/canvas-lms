@@ -1116,6 +1116,12 @@ class CoursesController < ApplicationController
   def blueprint_settings
     get_context
     if master_courses? && authorized_action(@context.account, @current_user, :manage_master_courses)
+      js_env({
+        course: @context.slice(:id, :name),
+        sub_accounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {:id => id, :name => name}},
+        terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {:id => id, :name => name}}
+      })
+
       css_bundle :course_blueprint_settings
       js_bundle :course_blueprint_settings
       render :text => '', :layout => true

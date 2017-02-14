@@ -10,11 +10,17 @@ define([
   class BlueprintSettingsApp {
     constructor (ENV, root) {
       this.root = root
-      this.store = createStore()
+      this.store = createStore({
+        course: ENV.course,
+        terms: ENV.terms,
+        subAccounts: ENV.sub_accounts,
+      })
       const boundActions = bindActionCreators(actions, this.store.dispatch)
 
-      this.ConnectedApp = connect(state => ({
-        // TODO: connect state to props
+      this.ConnectedApp = connect(({
+        course, terms, subAccounts
+      }) => ({
+        course, terms, subAccounts
       }))(BlueprintSettings)
     }
 
