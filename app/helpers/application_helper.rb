@@ -1024,4 +1024,8 @@ module ApplicationHelper
     link_to(t("Parents sign up here"), '#', id: "signup_parent", class: "signup_link",
             data: {template: template, path: path}, title: t("Parent Signup"))
   end
+
+  def tutorials_enabled?
+    @domain_root_account.try(:feature_enabled?, :new_user_tutorial)
+  end
 end

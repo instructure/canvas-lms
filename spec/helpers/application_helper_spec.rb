@@ -762,4 +762,25 @@ describe ApplicationHelper do
     end
   end
 
+  describe "tutorials_enabled?" do
+    before(:each) do
+      @domain_root_account = Account.default
+    end
+    context "with new_users_tutorial feature flag enabled" do
+      before(:each) do
+        @domain_root_account.enable_feature! :new_user_tutorial
+      end
+
+      it "returns true" do
+        expect(tutorials_enabled?).to be true
+      end
+    end
+
+    context "with new_users_tutorial feature flag disabled" do
+      it "returns false" do
+        expect(tutorials_enabled?).to be false
+      end
+    end
+  end
+
 end

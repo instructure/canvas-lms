@@ -6,6 +6,7 @@ require [
   'Backbone'
   'compiled/helpDialog'
   'jsx/subnav_menu/updateSubnavMenuToggle'
+  'jsx/new_user_tutorial/initializeNewUserTutorials'
 
   # modules that do their own thing on every page that simply need to
   # be required
@@ -40,9 +41,11 @@ require [
   'jqueryui/tabs'
   'compiled/registration/incompleteRegistrationWarning'
   'moment'
-], ($, _, I18n, Backbone, helpDialog, updateSubnavMenuToggle) ->
+], ($, _, I18n, Backbone, helpDialog, updateSubnavMenuToggle, initializeNewUserTutorials) ->
 
   helpDialog.initTriggers()
+
+  initializeNewUserTutorials()
 
   $('#skip_navigation_link').on 'click', (event) ->
     # preventDefault so we dont change the hash

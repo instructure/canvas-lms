@@ -136,6 +136,9 @@ class ApplicationController < ActionController::Base
           collapse_global_nav: @current_user.try(:collapse_global_nav?),
           show_feedback_link: show_feedback_link?,
           enable_profiles: (@domain_root_account && @domain_root_account.settings[:enable_profiles] != false)
+        },
+        NEW_USER_TUTORIALS: {
+          is_enabled: tutorials_enabled?
         }
       }
       @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view

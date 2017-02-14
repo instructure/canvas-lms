@@ -81,6 +81,9 @@
         <% end %>
         <%= render_crumbs %>
         <% if @show_left_side %></div><% end %>
+        <% if tutorials_enabled? %>
+          <div class="TutorialToggleHolder"></div>
+        <% end %>
       </div>
     <% end %>
     <div id="main" class="ic-Layout-columns">
