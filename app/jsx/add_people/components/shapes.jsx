@@ -15,7 +15,7 @@ define([
 
   const inputParamsShape = {
     searchType: PropTypes.oneOf(['cc_path', 'unique_id', 'sis_user_id']),
-    nameList: PropTypes.arrayOf(PropTypes.string),
+    nameList: PropTypes.string,
     role: PropTypes.string,
     section: PropTypes.string
   };
