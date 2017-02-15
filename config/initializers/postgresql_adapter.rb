@@ -244,6 +244,31 @@ module PostgreSQLAdapterExtensions
     end
   end
 
+  # we no longer use any triggers, so we removed hair_trigger,
+  # but don't want to go modifying all the old migrations, so just
+  # make them dummies
+  class CreateTriggerChain
+    def on(*)
+      self
+    end
+
+    def after(*)
+      self
+    end
+
+    def where(*)
+      self
+    end
+  end
+
+  def create_trigger(*)
+    CreateTriggerChain.new
+  end
+
+  def drop_trigger(name, table, generated: false)
+    execute("DROP TRIGGER IF EXISTS #{name} ON #{quote_table_name(table)};\nDROP FUNCTION IF EXISTS #{quote_table_name(name)}();\n")
+  end
+
   private
 
   OID = ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID

@@ -285,7 +285,7 @@ class Group < ActiveRecord::Base
   def potential_collaborators
     if context.is_a?(Course)
       # >99.9% of groups have fewer than 100 members
-      User.where(id: participating_group_memberships.pluck(:user_id) + context.participating_admins.pluck(:id))
+      User.where(id: participating_users_in_context.pluck(:id) + context.participating_admins.pluck(:id))
     else
       participating_users
     end

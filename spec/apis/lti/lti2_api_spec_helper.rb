@@ -3,11 +3,17 @@ require File.expand_path(File.dirname(__FILE__) + '/../../apis/api_spec_helper')
 
 RSpec.shared_context "lti2_api_spec_helper", :shared_context => :metadata do
   include_context 'lti2_spec_helper'
+  let(:developer_key) { DeveloperKey.create! }
+  let(:dev_key_access_token) do
+    aud = host rescue (@request || request).host
+    Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: developer_key.global_id)
+  end
   let(:access_token) do
     aud = host rescue (@request || request).host
     Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: tool_proxy.guid)
   end
   let(:request_headers) { {Authorization: "Bearer #{access_token}"} }
+  let(:dev_key_request_headers) { {Authorization: "Bearer #{dev_key_access_token}"} }
   let(:service_name) {controller.lti2_service_name}
   let(:raw_data) do
     rsp = IMS::LTI::Models::RestServiceProfile.new(

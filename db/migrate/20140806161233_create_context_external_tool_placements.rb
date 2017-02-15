@@ -16,49 +16,6 @@ class CreateContextExternalToolPlacements < ActiveRecord::Migration[4.2]
 
     add_foreign_key :context_external_tool_placements, :context_external_tools
 
-    # create some triggers so nothing falls through the cracks
-    if connection.adapter_name == 'PostgreSQL'
-
-      EXTENSION_TYPES.each do |type|
-        column = "has_#{type}"
-        create_trigger("tool_after_insert_#{type}_is_true__tr", :generated => true).
-            on("context_external_tools").
-            after(:insert).
-            where("NEW.#{column}") do
-          <<-SQL_ACTIONS
-            INSERT INTO context_external_tool_placements(placement_type, context_external_tool_id)
-            VALUES ('#{type}', NEW.id)
-          SQL_ACTIONS
-        end
-        connection.set_search_path_on_function("tool_after_insert_#{type}_is_true__tr")
-
-        create_trigger("tool_after_update_#{type}_is_true__tr", :generated => true).
-            on("context_external_tools").
-            after(:update).
-            where("NEW.#{column}") do
-          <<-SQL_ACTIONS
-            INSERT INTO context_external_tool_placements(placement_type, context_external_tool_id)
-            SELECT '#{type}', NEW.id
-            WHERE NOT EXISTS(
-              SELECT 1 FROM context_external_tool_placements WHERE placement_type = '#{type}' AND context_external_tool_id = NEW.id
-            )
-          SQL_ACTIONS
-        end
-        connection.set_search_path_on_function("tool_after_update_#{type}_is_true__tr")
-
-
-        create_trigger("tool_after_update_#{type}_is_false__tr", :generated => true).
-            on("context_external_tools").
-            after(:update).
-            where("NOT NEW.#{column}") do
-          <<-SQL_ACTIONS
-            DELETE FROM context_external_tool_placements WHERE placement_type = '#{type}' AND context_external_tool_id = NEW.id
-          SQL_ACTIONS
-        end
-        connection.set_search_path_on_function("tool_after_update_#{type}_is_false__tr")
-      end
-    end
-
     # now populate the placements
     EXTENSION_TYPES.each do |type|
       column = :"has_#{type}"

@@ -829,7 +829,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def context_allows_user_to_create?(user)
     return true unless context.respond_to?(:allow_student_discussion_topics)
-    return true unless context.user_is_student?(user)
+    return true if context.user_is_admin?(user)
     context.allow_student_discussion_topics
   end
 

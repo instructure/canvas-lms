@@ -341,6 +341,7 @@ ConditionalRelease, deparam, flashMessage, numberHelper) ->
           assignment_overrides: @dueDateOverrideView.getAllDates()
         errors = @dueDateOverrideView.validateBeforeSave(data2, errors)
         errors = @_validatePointsPossible(data, errors)
+        errors = @_validateTitle(data, errors)
       else
         @model.set 'assignment', @model.createAssignment(set_assignment: false)
 
@@ -354,6 +355,16 @@ ConditionalRelease, deparam, flashMessage, numberHelper) ->
         crErrors = @conditionalReleaseEditor.validateBeforeSave()
         errors['conditional_release'] = crErrors if crErrors
 
+      errors
+
+    _validateTitle: (data, errors) =>
+      max_name_length = 256
+      if data.assignment.attributes.post_to_sis == '1' && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT == true
+        max_name_length = ENV.MAX_NAME_LENGTH + 1
+      if $.trim(data.title.toString()).length > max_name_length
+        errors["title"] = [
+          message: I18n.t "Title is too long, must be under %{length} characters", length: max_name_length
+        ]
       errors
 
     _validatePointsPossible: (data, errors) =>

@@ -69,6 +69,10 @@ define([
       this.exportManager = new GradebookExportManager(this.props.gradebookExportUrl, this.props.currentUserId, existingExport);
     }
 
+    componentWillUnmount () {
+      if (this.exportManager) this.exportManager.clearMonitor();
+    }
+
     getExistingExport () {
       if (!(this.props.lastExport && this.props.attachment)) return undefined;
       if (!(this.props.lastExport.progressId && this.props.attachment.id)) return undefined;

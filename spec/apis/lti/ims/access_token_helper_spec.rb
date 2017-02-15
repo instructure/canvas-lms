@@ -34,16 +34,29 @@ module Lti
         expect(assigns[:_access_token].to_s).to eq access_token.to_s
       end
 
+      it 'decrypts access token when signed with dev key' do
+        @request.headers.merge!(dev_key_request_headers)
+        get :index, format: :json
+        expect(assigns[:_access_token].to_s).to eq dev_key_access_token.to_s
+      end
+
       it 'allows the request to go through' do
         @request.headers.merge!(request_headers)
         get :index, format: :json
         expect(response.code).to eq '200'
       end
 
-      it 'requires an active tool proxy' do
+      it 'requires an active tool proxy id signed with share secret' do
         @request.headers.merge!(request_headers)
         tool_proxy.workflow_state = 'disabled'
         tool_proxy.save!
+        get :index, format: :json
+        expect(response.code).to eq '401'
+      end
+
+      it 'requires an active developer key when signed with dev key' do
+        @request.headers.merge!(dev_key_request_headers)
+        developer_key.destroy!
         get :index, format: :json
         expect(response.code).to eq '401'
       end
@@ -76,6 +89,14 @@ module Lti
         expect(response.code).to eq '401'
       end
 
+      describe "#bearer_token" do
+        let(:access_token_helper){ subject }
+
+        it 'returns the bearer token for auth header' do
+          @request.headers['Authorization'] = "Bearer #{dev_key_access_token.to_s}"
+          expect(access_token_helper.oauth2_request?).to be_truthy
+        end
+      end
 
     end
   end

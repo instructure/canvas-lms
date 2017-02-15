@@ -1104,6 +1104,17 @@ class CoursesController < ApplicationController
     end
   end
 
+  def blueprint_settings
+    get_context
+    if master_courses? && authorized_action(@context.account, @current_user, :manage_master_courses)
+      css_bundle :course_blueprint_settings
+      js_bundle :course_blueprint_settings
+      render :text => '', :layout => true
+    else
+     render status: 404, template: 'shared/errors/404_message'
+    end
+  end
+
   # @API Get course settings
   # Returns some of a course's settings.
   #

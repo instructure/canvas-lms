@@ -78,6 +78,7 @@ module Importers
       # options[:skip_replies] = true unless options.importable_entries?
       [:migration_id, :title, :discussion_type, :position, :pinned,
        :require_initial_post, :allow_rating, :only_graders_can_rate, :sort_by_rating].each do |attr|
+        next if options[attr].nil? && item.class.columns_hash[attr.to_s].type == :boolean
         item.send("#{attr}=", options[attr])
       end
 

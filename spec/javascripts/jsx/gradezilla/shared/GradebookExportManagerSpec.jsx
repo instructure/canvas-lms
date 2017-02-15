@@ -136,12 +136,13 @@ define([
     teardown () {
       moxios.uninstall();
 
+      this.subject.clearMonitor();
       this.subject = undefined;
     }
   });
 
   test('returns a rejected promise if the manager has no exportingUrl set', function () {
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId, undefined);
+    this.subject = new GradebookExportManager(exportingUrl, currentUserId);
     this.subject.exportingUrl = undefined;
 
     return this.subject.startExport().catch((reason) => {
@@ -163,7 +164,7 @@ define([
       attachmentId: 'newAttachmentId'
     };
 
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId, undefined);
+    this.subject = new GradebookExportManager(exportingUrl, currentUserId);
     this.subject.monitorExport = (resolve, _reject) => {
       resolve('success');
     };
@@ -175,7 +176,7 @@ define([
 
   test('clears any new export and returns a rejected promise if no monitoring is possible', function () {
     this.stub(GradebookExportManager.prototype, 'monitoringUrl').returns(undefined);
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId, undefined);
+    this.subject = new GradebookExportManager(exportingUrl, currentUserId);
 
     return this.subject.startExport().catch((reason) => {
       equal(reason, 'No way to monitor gradebook exports provided!');
@@ -186,7 +187,7 @@ define([
   test('starts polling for progress and returns a rejected promise on progress failure', function () {
     const expectedMonitoringUrl = `${monitoringBase}/newProgressId`;
 
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId, undefined);
+    this.subject = new GradebookExportManager(exportingUrl, currentUserId);
 
     moxios.stubRequest(expectedMonitoringUrl, {
       status: 200,
@@ -201,11 +202,29 @@ define([
     });
   });
 
+  test('starts polling for progress and returns a rejected promise on unknown progress status', function () {
+    const expectedMonitoringUrl = `${monitoringBase}/newProgressId`;
+
+    this.subject = new GradebookExportManager(exportingUrl, currentUserId);
+
+    moxios.stubRequest(expectedMonitoringUrl, {
+      status: 200,
+      responseText: {
+        workflow_state: 'discombobulated',
+        message: 'Pattern buffer degradation'
+      }
+    });
+
+    return this.subject.startExport().catch((reason) => {
+      equal(reason, 'Error exporting gradebook: Pattern buffer degradation');
+    });
+  });
+
   test('starts polling for progress and returns a fulfilled promise on progress completion', function () {
     const expectedMonitoringUrl = `${monitoringBase}/newProgressId`;
     const expectedAttachmentUrl = `${attachmentBase}/newAttachmentId`;
 
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId, undefined);
+    this.subject = new GradebookExportManager(exportingUrl, currentUserId);
 
     moxios.stubRequest(expectedMonitoringUrl, {
       status: 200,

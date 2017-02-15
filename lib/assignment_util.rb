@@ -11,6 +11,10 @@ module AssignmentUtil
     assignment.post_to_sis.present? && name_length_required_for_account?(assignment)
   end
 
+  def self.assignment_max_name_length(assignment)
+    assignment.try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value).to_i
+  end
+
   def self.name_length_required_for_account?(assignment)
     assignment.try(:context).try(:account).try(:sis_syncing).try(:[], :value) &&
     assignment.try(:context).try(:account).try(:sis_assignment_name_length).try(:[], :value) &&

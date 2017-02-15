@@ -53,9 +53,9 @@ define([
       )
     }
 
-    getViewableExports () {
+    getFinishedExports () {
       return this.state.exports.filter(ex =>
-        ex.workflowState === 'generated' || ex.newExport
+        this.finishedStates.includes(ex.workflowState)
       )
     }
 
@@ -90,13 +90,13 @@ define([
     render () {
       let app = null
       const webzipInProgress = this.getExportsInProgress()
-      const viewableExports = this.getViewableExports()
+      const finishedExports = this.getFinishedExports()
       if (!this.state.loaded) {
         app = <Spinner size="small" title={I18n.t('Loading')} />
       } else if (this.state.errors.length > 0) {
         app = <Errors errors={this.state.errors} />
-      } else if (viewableExports.length > 0 || !webzipInProgress) {
-        app = <ExportList exports={viewableExports} />
+      } else if (finishedExports.length > 0 || !webzipInProgress) {
+        app = <ExportList exports={finishedExports} />
       }
       return (
         <div>

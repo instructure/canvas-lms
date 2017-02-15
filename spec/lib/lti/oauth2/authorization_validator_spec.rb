@@ -40,6 +40,19 @@ module Lti
         )
         raw_jwt
       end
+      let(:dev_key){ DeveloperKey.create! }
+      let(:raw_jwt_dev_key) do
+        raw_jwt = JSON::JWT.new(
+          {
+            sub: dev_key.global_id,
+            aud: auth_url,
+            exp: 1.minute.from_now,
+            iat: Time.zone.now.to_i,
+            jti: SecureRandom.uuid
+          }
+        )
+        raw_jwt
+      end
 
       let(:authValidator) do
         AuthorizationValidator.new(
@@ -125,17 +138,73 @@ module Lti
                                                 "the 'aud' must be the LTI Authorization endpoint"
         end
 
+        it "raises Lti::Oauth2::AuthorizationValidator::SecretNotFound if no ToolProxy or developer key" do
+          raw_jwt[:sub] = 'invalid'
+          validator = AuthorizationValidator.new(
+            jwt: raw_jwt.sign(tool_proxy.shared_secret, :HS256).to_s,
+            authorization_url: auth_url
+          )
+          expect { validator.validate! }.to raise_error Lti::Oauth2::AuthorizationValidator::SecretNotFound
+        end
+
+        context "JWT signed with dev key" do
+          let(:authValidator) do
+            AuthorizationValidator.new(
+              jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
+              authorization_url: auth_url
+            )
+          end
+
+          it "returns the decoded JWT" do
+            expect(authValidator.jwt.signature).to eq raw_jwt_dev_key.sign(dev_key.api_key, :HS256).signature
+          end
+        end
+
+      end
+
+      describe "#developer_key" do
+        let(:authValidator) do
+          AuthorizationValidator.new(
+            jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
+            authorization_url: auth_url
+          )
+        end
+
+        it 'gets the correct developer key' do
+          expect(authValidator.developer_key).to eq dev_key
+        end
+
+        it 'returns nil if developer key not found' do
+          validator = AuthorizationValidator.new(
+            jwt: raw_jwt.sign(tool_proxy.shared_secret, :HS256).to_s,
+            authorization_url: auth_url
+          )
+          expect(validator.developer_key).to be_nil
+        end
+      end
+
+      describe "#sub" do
+        it 'returns the tool proxy guid if tool proxy is present' do
+          validator = AuthorizationValidator.new(
+            jwt: raw_jwt.sign(tool_proxy.shared_secret, :HS256).to_s,
+            authorization_url: auth_url
+          )
+          expect(validator.sub).to eq tool_proxy.guid
+        end
+
+        it 'returns the developer key global id if dev key is present' do
+          validator = AuthorizationValidator.new(
+            jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
+            authorization_url: auth_url
+          )
+          expect(validator.sub).to eq dev_key.global_id
+        end
       end
 
       describe "#tool_proxy" do
 
         it 'returns the tool_proxy from the uuid specified in the sub' do
           expect(authValidator.tool_proxy).to eq tool_proxy
-        end
-
-        it "raises Lti::Oauth2::AuthorizationValidator::ToolProxyNotFound if it can't find a ToolProxy" do
-          raw_jwt[:sub] = 'invalid'
-          expect { authValidator.tool_proxy }.to raise_error Lti::Oauth2::AuthorizationValidator::ToolProxyNotFound
         end
 
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the Tool Proxy is not using a split secret" do

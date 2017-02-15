@@ -1,16 +1,17 @@
 module Autoextend
-  Extension = Struct.new(:const_name, :module_name, :method, :block, :singleton, :after_load) do
+  Extension = Struct.new(:const_name, :module, :method, :block, :singleton, :after_load, :optional, :used) do
     def extend(const, source: nil)
       return if after_load && source == :inherited
+      self.used = true
 
       target = singleton ? const.singleton_class : const
       if block
         block.call(target)
       else
-        mod = if module_name.is_a?(Module)
-                module_name
+        mod = if self.module.is_a?(Module)
+                self.module
               else
-                Object.const_get(module_name.to_s, false)
+                Object.const_get(self.module.to_s, false)
               end
         real_method = method
         # if we're hooking a module, and that module was included/prepended into
@@ -27,63 +28,79 @@ module Autoextend
   end
   private_constant :Extension
 
-  def self.const_added(const, source:)
-    const_name = const.is_a?(String) ? const : const.name
-    return [] unless const_name
-    extensions.fetch(const_name.to_sym, []).each do |extension|
-      if const == const_name
-        const = Object.const_get(const_name, false)
+  class << self
+    def const_added(const, source:)
+      const_name = const.is_a?(String) ? const : const.name
+      return [] unless const_name
+      extensions_hash.fetch(const_name.to_sym, []).each do |extension|
+        if const == const_name
+          const = Object.const_get(const_name, false)
+        end
+        extension.extend(const, source: source)
       end
-      extension.extend(const, source: source)
     end
-  end
 
-  # Add a hook to automatically extend a class or module with a module,
-  # or by calling a block, when it is extended (module or class)
-  # or defined (class only).
-  #
-  #   Autoextend.hook(:User, :MyUserExtension)
-  #
-  #   Autoextend.hook(:User, :"MyUserExtension::ClassMethods", singleton: true)
-  #
-  #   Autoextend.hook(:User) do |klass|
-  #     klass.send(:include, MyUserExtension)
-  #   end
-  #
-  # If User is already defined, it will immediately include
-  # the MyUserExtension module into it. It then sets up a hook
-  # to automatically include in User if it becomes defined again
-  # (like from ActiveSupport reloading).
-  #
-  # Note that this hook happens before any methods have been
-  # added to it, so you cannot directly modify anything you
-  # expect to exist in the class. If you want to do that, you can
-  # specify `after_load: true`, but this will only be compatible with
-  # classes loaded via ActiveSupport's autoloading.
-  #
-  # Instead you should either use prepend with super, or
-  # set up additional hooks to automatically modify methods
-  # as they are added (if you use :include as your method)
-  def self.hook(const_name, module_name = nil, method: :include, singleton: false, after_load: false, &block)
-    raise ArgumentError, "block is required if module_name is not passed" if !module_name && !block
-    raise ArgumentError, "cannot pass both a module_name and a block" if module_name && block
+    # Add a hook to automatically extend a class or module with a module,
+    # or by calling a block, when it is extended (module or class)
+    # or defined (class only).
+    #
+    #   Autoextend.hook(:User, :MyUserExtension)
+    #
+    #   Autoextend.hook(:User, :"MyUserExtension::ClassMethods", singleton: true)
+    #
+    #   Autoextend.hook(:User) do |klass|
+    #     klass.send(:include, MyUserExtension)
+    #   end
+    #
+    # If User is already defined, it will immediately include
+    # the MyUserExtension module into it. It then sets up a hook
+    # to automatically include in User if it becomes defined again
+    # (like from ActiveSupport reloading).
+    #
+    # Note that this hook happens before any methods have been
+    # added to it, so you cannot directly modify anything you
+    # expect to exist in the class. If you want to do that, you can
+    # specify `after_load: true`, but this will only be compatible with
+    # classes loaded via ActiveSupport's autoloading.
+    #
+    # Instead you should either use prepend with super, or
+    # set up additional hooks to automatically modify methods
+    # as they are added (if you use :include as your method)
+    #
+    # You can make an extension optional, which is for information only,
+    # so that if you have a spec that checks if all extensions were used
+    # it can ignore optional extensions.
+    def hook(const_name,
+      module_name = nil,
+      method: :include,
+      singleton: false,
+      after_load: false,
+      optional: false,
+      &block)
+      raise ArgumentError, "block is required if module_name is not passed" if !module_name && !block
+      raise ArgumentError, "cannot pass both a module_name and a block" if module_name && block
 
-    extension = Extension.new(const_name, module_name, method, block, singleton, after_load)
+      extension = Extension.new(const_name, module_name, method, block, singleton, after_load, optional)
 
-    const_extensions = extensions[const_name.to_sym] ||= []
-    const_extensions << extension
+      const_extensions = extensions_hash[const_name.to_sym] ||= []
+      const_extensions << extension
 
-    # immediately extend the class if it's already defined
-    if Object.const_defined?(const_name.to_s, false)
-      extension.extend(Object.const_get(const_name.to_s, false))
+      # immediately extend the class if it's already defined
+      if Object.const_defined?(const_name.to_s, false)
+        extension.extend(Object.const_get(const_name.to_s, false))
+      end
+      nil
     end
-    nil
-  end
 
-  private
+    def extensions
+      extensions_hash.values.flatten
+    end
 
-  def self.extensions
-    @extensions ||= {}
+    private
+
+    def extensions_hash
+      @extensions ||= {}
+    end
   end
 end
 

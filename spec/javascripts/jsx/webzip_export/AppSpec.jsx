@@ -40,6 +40,27 @@ define([
     })
   })
 
+  test('renders failed exports as well as generated exports', (assert) => {
+    const done = assert.async()
+    const data = [{
+      created_at: '1776-12-25T22:00:00Z',
+      zip_attachment: {url: null},
+      workflow_state: 'failed',
+    }]
+    moxios.stubRequest('/api/v1/courses/2/web_zip_exports', {
+      status: 200,
+      responseText: data
+    })
+    ENV.context_asset_string = 'courses_2'
+    const wrapper = enzyme.shallow(<WebZipExportApp />)
+    wrapper.instance().componentDidMount()
+    moxios.wait(() => {
+      const node = wrapper.find('ExportList')
+      equal(node.length, 1)
+      done()
+    })
+  })
+
   test('renders empty webzip list text if there are no exports from API', (assert) => {
     const done = assert.async()
     const data = []

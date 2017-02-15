@@ -328,6 +328,21 @@ describe "groups" do
         expect(f('.new-conference-btn')).to be_displayed
         verify_no_course_user_access(conferences_page)
       end
+
+      it "should not allow inviting users with inactive enrollments" do
+        inactive_student = @students.first
+        inactive_student.update_attribute(:name, "inactivee")
+        inactive_student.enrollments.first.deactivate
+        active_student = @students.last
+        active_student.update_attribute(:name, "imsoactive")
+
+        get conferences_page
+        f('.new-conference-btn').click
+        f('.all_users_checkbox').click
+
+        expect(f('#members_list')).to_not include_text(inactive_student.name)
+        expect(f('#members_list')).to include_text(active_student.name)
+      end
     end
     #-------------------------------------------------------------------------------------------------------------------
     describe "collaborations page" do
@@ -368,6 +383,15 @@ describe "groups" do
         @students.each do |student|
           expect(users).not_to contain_jqcss("li:contains(#{student.sortable_name}) .icon-user")
         end
+      end
+
+      it 'cannot invite students with inactive enrollments' do
+        inactive_student = @students.first
+        inactive_student.update_attribute(:name, "inactivee")
+        inactive_student.enrollments.first.deactivate
+
+        get collaborations_page
+        expect(f(".available-users")).not_to contain_jqcss("li:contains(#{inactive_student.sortable_name}) .icon-user")
       end
 
       it "should only allow group members to access the group collaborations page", priority: "1", test_id: 319904 do

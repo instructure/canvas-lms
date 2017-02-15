@@ -485,7 +485,7 @@ class Assignment < ActiveRecord::Base
       end
     else
       # no due at = all_day and all_day_date are irrelevant
-      return nil, nil
+      return false, nil
     end
   end
 
@@ -952,7 +952,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def all_day
-    read_attribute(:all_day) || (self.new_record? && self.due_at && (self.due_at.strftime("%H:%M") == '23:59' || self.due_at.strftime("%H:%M") == '00:00'))
+    read_attribute(:all_day) || (self.new_record? && !!self.due_at && (self.due_at.strftime("%H:%M") == '23:59' || self.due_at.strftime("%H:%M") == '00:00'))
   end
 
   def self.preload_context_module_tags(assignments, include_context_modules: false)
