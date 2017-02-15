@@ -55,6 +55,7 @@ describe TatlTael::Linter do
   LIB_RB_SPEC_PATH       = "spec/lib/reporting/counts_report_spec.rb"
 
   APP_ERB_PATH           = "app/views/announcements/index.html.erb"
+  OTHER_ERB_PATH         = "spec/formatters/error_context/html_page_formatter/template.html.erb"
   PUBLIC_JS_PATH         = "public/javascripts/eportfolios/eportfolio_section.js"
   PUBLIC_JS_SPEC_PATH    = "spec/javascripts/jsx/eportfolios/eportfolioSectionSpec.jsx"
 
@@ -216,11 +217,19 @@ describe TatlTael::Linter do
   end
 
   describe "#ban_new_erb" do
-    context "erb additions exist" do
+    context "app views erb additions exist" do
       let(:changes) { [double(path: APP_ERB_PATH, added?: true)] }
 
       it "yields" do
         expect { |b| subject.ban_new_erb(&b) }.to yield_with_no_args
+      end
+    end
+
+    context "other erb additions exist" do
+      let(:changes) { [double(path: OTHER_ERB_PATH, added?: true)] }
+
+      it "yields" do
+        expect { |b| subject.ban_new_erb(&b) }.not_to yield_with_no_args
       end
     end
 
