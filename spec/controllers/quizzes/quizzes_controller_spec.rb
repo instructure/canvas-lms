@@ -142,9 +142,30 @@ describe Quizzes::QuizzesController do
       expect(assigns[:quiz]).not_to eql(q)
 
       get 'new', :course_id => @course.id, :fresh => 1
-      # Quizzes::Quiz.where(id: q).first.should be_deleted
+
       expect(assigns[:quiz]).not_to be_nil
       expect(assigns[:quiz]).not_to eql(q)
+    end
+
+    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:name_length_required_for_account?).returns(true)
+      get 'new', :course_id => @course.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
+    end
+
+    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:name_length_required_for_account?).returns(false)
+      get 'new', :course_id => @course.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
+    end
+
+    it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:assignment_max_name_length).returns(15)
+      get 'new', :course_id => @course.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
   end
 
@@ -173,6 +194,27 @@ describe Quizzes::QuizzesController do
       expect(assigns[:quiz]).to eql(@quiz)
       expect(assigns[:js_env][:REGRADE_OPTIONS]).to eq({q.id => 'no_regrade' })
       expect(response).to render_template("new")
+    end
+
+    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:name_length_required_for_account?).returns(true)
+      get 'edit', :course_id => @course.id, :id => @quiz.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
+    end
+
+    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:name_length_required_for_account?).returns(false)
+      get 'edit', :course_id => @course.id, :id => @quiz.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
+    end
+
+    it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:assignment_max_name_length).returns(15)
+      get 'edit', :course_id => @course.id, :id => @quiz.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
     context "conditional release" do

@@ -1795,6 +1795,11 @@ define([
           $('html,body').scrollTo({top: offset.top, left:0});
           return false;
         }
+        if (quiz_title.length > ENV.MAX_NAME_LENGTH && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT && data['quiz[post_to_sis]'] == '1') {
+          var header_offset = $('#quiz_title').errorBox(I18n.t('The Quiz name must be under %{length} characters', {length: ENV.MAX_NAME_LENGTH + 1})).offset();
+          $('html,body').scrollTo({top: header_offset.top, left: 0});
+          return false;
+        }
         data['quiz[title]'] = quiz_title;
         data['quiz[description]'] = RichContentEditor.callOnRCE($("#quiz_description"), 'get_code');
         if ($("#quiz_notify_of_update").is(':checked')) {
