@@ -113,6 +113,24 @@ module Services
         end
       end
 
+      describe '.update_tool_proxy_subscription' do
+        it 'makes the expected request' do
+          subscription = { 'my' => 'subscription' }
+
+          HTTParty.expects(:send).with do |method, endpoint, options|
+            expect(method).to eq(:put)
+            expect(endpoint).to eq('http://example.com/api/subscriptions/subscription_id')
+            expect(options[:headers]['Content-Type']).to eq('application/json')
+            jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
+            expect(jwt['developerKey']).to eq('10000000000003')
+            expect(jwt['sub']).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
+            expect(JSON.parse(options[:body])).to eq(subscription)
+          end
+
+          LiveEventsSubscriptionService.update_tool_proxy_subscription(tool_proxy, 'subscription_id', subscription)
+        end
+      end
+
       context 'timeout protection' do
         it 'throws an exception for .tool_proxy_subscriptions' do
           Timeout.expects(:timeout).raises(Timeout::Error)

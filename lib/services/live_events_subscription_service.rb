@@ -23,6 +23,14 @@ module Services
         request(:post, '/api/subscriptions', options)
       end
 
+      def update_tool_proxy_subscription(tool_proxy, subscription_id, subscription)
+        options = {
+          headers: headers(tool_proxy_jwt_body(tool_proxy), { 'Content-Type' => 'application/json' }),
+          body: subscription.to_json
+        }
+        request(:put, "/api/subscriptions/#{subscription_id}", options)
+      end
+
       def destroy_tool_proxy_subscription(tool_proxy, subscription_id)
         options = { headers: headers(tool_proxy_jwt_body(tool_proxy)) }
         request(:delete, "/api/subscriptions/#{subscription_id}", options)
