@@ -4,15 +4,15 @@ if CANVAS_RAILS4_2
     gem 'activesupport', '4.2.7.1', github: 'rails/rails', ref: 'bff1f05813d02a5ddb6caa74d64722b22648c397'
     gem 'actionpack', '4.2.7.1', github: 'rails/rails', ref: 'bff1f05813d02a5ddb6caa74d64722b22648c397'
   gem 'rack', '1.6.5'
-  gem 'rails-observers', '0.1.2'
   gem 'activesupport-json_encoder', '1.1.0'
   gem 'oauth2', '1.0.0', require: false
 else
   gem 'rails', '5.0.1', github: 'rails/rails', ref: '02c229f35185add4da377f8040e2aec5b92dddfe'
-  gem 'rails-observers', github: 'rails/rails-observers', ref: '3fe157d6cbb5b5e767ded248009fc59443d63fa1'
   gem 'rack', '2.0.1'
   gem 'oauth2', '1.2.0', require: false
 end
+
+gem 'rails-observers', github: 'rails/rails-observers', ref: '3fe157d6cbb5b5e767ded248009fc59443d63fa1'
 
 gem 'builder', '3.2.3'
 gem 'tzinfo', '1.2.2'
