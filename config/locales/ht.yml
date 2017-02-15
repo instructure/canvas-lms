@@ -2604,6 +2604,7 @@ ht:
         calendar_week: Semenn
         improved_accessibility_recommend_agenda: "Atansyon: Tanpri itilize Kalandriye \"Afichaj Agenda\" pou yon pi bon aksesibilite."
       loading: Chajman
+      my_appointment_groups: "Gwoup Randevou Mwen"
     calendar_navigator: 
       enter_navigation_date: "Antre dat ou vle navige ladan li an."
       next: Pwochen
@@ -3804,6 +3805,7 @@ ht:
     titles: 
       add: "Ajoute Modil"
       add_item: "Ajoute Eleman nan %{module}"
+      add_prerequisite: "Ajoute Kondisyon pou %{module}"
       edit: "Modifye Paramèt Modil"
       edit_item: "Modifye Detay Eleman"
     tool_sequence_footer: 
@@ -4107,6 +4109,7 @@ ht:
       publishing: Pibliye
       publishing_with_message: "Pibliye: %{message}"
       unknown: "Estati enkoni, %{status}"
+      unknown_with_message: "Estati enkoni, %{status}: %{message}"
       unpublishable: "Non Pibliyab"
       unpublishable_with_message: "Non Pibliyab: %{message}"
       unpublished: "Pa Pibliye"
@@ -4762,6 +4765,7 @@ ht:
       headings: 
         assignments: "Rapò Itilizasyon Sesyon"
         files: "Estokaj Fichye"
+        stats: "Estatistik pou %{course}"
         students: "Itilizatè Ki Fèk Konekte"
         totals: "Total Kimile"
       labels: 
@@ -6087,6 +6091,7 @@ ht:
   epub_exporting_f5592ff2: "Ekspòtasyon ePub"
   error_59293a2c: erè
   error_98e81528: Erè
+  error_deleting_name_reason_11f9d399: "Erè ki fèt nan efase %{name}: %{reason}"
   error_in_mastery_paths_range_index_7d17ddac: "%{error} nan gam pakou metriz %{index}"
   error_message_2b9d12ee: "Erè: %{message}"
   error_retrieving_assignment_configuration_tools_f7d75303: "Erè pandan rekiperasyon zouti konfigirasyon sesyon yo"
@@ -8865,8 +8870,12 @@ ht:
         details: "Afiche lis enskripsyon aktyèl yo la:"
         html: 
           details: "Afiche lis enskripsyon aktyèl yo"
+          subject: "%{user} aksepte Envitasyon Kou a"
+        subject: "%{user} aksepte Envitasyon Kou a"
       sms: 
         details: "Plis enfo sou %{url}"
+      summary: 
+        subject: "%{user} aksepte Envitasyon Kou a"
     enrollment_invitation: 
       email: 
         details: "Vizite paj kou a la a:"
@@ -9566,9 +9575,11 @@ ht:
         tweet: "Alèt Canvas - Chanjman Nòt: %{date}"
     submission_graded: 
       email: 
+        body: "Sesyon %{assignment} ou a an klase."
         excused: "Yo egzante sesyon sa a."
         graded_date: "klase: %{date}"
         html: 
+          body: "Sesyon %{assignment} ou a an klase."
           excused: "Yo egzante sesyon sa a."
           graded_date: "klase: %{date}"
           link_message: "Ou ka revize sesyon an la"
@@ -11468,6 +11479,7 @@ ht:
     notices: 
       account_registered: "Kont anrejistre!"
       account_updated: "Kont aktyalize"
+      email_sent: "Konfimasyon imèl ale sou %{email}, asire w ou gade nan dosye spam nan."
       link_invalid: "Lyen ou te itilize a pa valid ankò. Si w paka konekte, klike \"Ou pa konnen modpas ou\" pou ou ka reyinisyalize modpas ou a."
       password_changed: "Modpas chanje"
   public_a749f507: Piblik
@@ -11709,6 +11721,7 @@ ht:
       discrimination_index: "Endis Diskriminasyon"
       discrimination_index_dialog_title: "Grafik Endis Diskriminasyon"
       discrimination_index_dialog_trigger: "Aprann plis sou Endis Diskriminasyon an."
+    discrimination_index_help: "* Endikatè sa a bay mezi sou kijan yon sèl kesyon ka fè diferans (oswa diskriminasyon) ant elèv ki byen reyisi yon egzamen ak lòt ki pa pase. * ** Li divizè elèv yo an twa gwoup an fonksyon de nòt yo fè nan tout quiz yo e afiche gwoup sa yo pa ki gwoup ki reponn kesyon an pi byen. ** *** ****Plis enfòmasyon dispanib la a.**** ***"
     download_submissions: "Telechaje Tout Fichye"
     duration_in_hours: 
       one: "1 èdtan"
@@ -11941,6 +11954,7 @@ ht:
         question_name: Kesyon
     quiz_short_answer_length_error: "Repons pou mete nan kesyon vid yo dwe genyen mwens ke 80 karaktè de longè"
     quiz_statistics: 
+      statistics_filename: "Rapò %{quiz_title} %{quiz_type} %{report_type}"
       types: 
         item_analysis: "Analiz Eleman"
         student_analysis: "Analiz Elèv"
@@ -12172,6 +12186,7 @@ ht:
         logged_out_user: " %{index} Itilizatè Dekonekte"
         named_quiz_results: "%{quiz_name} Rezilta pou %{user}"
         next_questions_arrow_title: "Pwochen kesyon"
+        no_more_attempts: "%{user} pa rete okenn tantativ"
         page_title_quiz: "Istorik Quiz %{user}"
         page_title_survey: "Istorik Ankèt %{user}"
         prev_questions_arrow_title: "Kesyon Anvan"
@@ -13671,6 +13686,7 @@ ht:
       no_links: "%{name} pa ajoute okenn lyen"
       nothing_in_common: "Nou pa gen anyen an komen"
       save_profile: "Anrejistre Pwofil"
+      service_contact: "Kontakte %{user} avèk %{service}"
       social_instructions: "Verifye metòd kontak ou ta renmen ki parèt sou pwofil ou pou lòt moun yo wè."
       title: Tit
       titles: 
@@ -14413,6 +14429,7 @@ ht:
   submitted_files_82dd3009: "Fichye Soumèt"
   submitted_late_3741af29: "Soumèt an reta"
   submitted_submitdate_bdd3bf09: "Soumèt: %{submitDate}"
+  submitting_types_7c5a7096: "Soumisyon: %{types}"
   success_grades_were_published_to_the_grade_book_da3b4fba: "Reyisi! Nòt yo ibliye nan grade book."
   successfully_created_a_set_38374719: "Yon ansam kreye kòrèkteman"
   successfully_moved_model_to_newgroup_f7b7aa5a: "Deplase %{model} kòrèkteman ale nan %{newGroup}"
@@ -14607,6 +14624,7 @@ ht:
       Mèsi
       Sèvis Sipò Canvas
   the_module_item_is_locked_27fe420b: "Eleman modil sa a bloke."
+  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Nòt ki pi resan pou %{current_user_name} e rezilta %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Pwochen randevou ki disponib nan kou sa a se pou *%{date}*"
   the_profile_picture_has_been_reported_d609d6dd: "Foto pwofil la te rapòte"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Fichye Referans Akademik yo bay la gen yon erè"
@@ -15207,6 +15225,8 @@ ht:
     buttons: 
       add_login: "Ajoute Koneksyon"
       update_login: "Aktyalize Koneksyon"
+    confirms: 
+      delete_login: "Ou kwè vrèman ou vle efase koneksyon sa a, \"%{login}\"?"
     error: 
       unauthorized: "Ou pa gen ase privilèj pou fè chanjman w ap mande a"
     notices: 
