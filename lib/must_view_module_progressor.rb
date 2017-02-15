@@ -53,6 +53,8 @@ class MustViewModuleProgressor
     return true unless item.visible_to_user?(user)
 
     progression = item.context_module.find_or_create_progression(user)
+    # unenrolled users don't have progressions and can always skip
+    return true if progression.nil?
     return true if progression.finished_item?(item)
 
     content = item.content
