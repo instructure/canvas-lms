@@ -12681,6 +12681,7 @@ pt:
   preview_your_changes_373557d8: "Pré-visualizar as suas alterações"
   previous_bd2ac015: Anterior
   previous_csv_file_time_d7bfe7ef: "Ficheiro CSV anterior (%{time})"
+  previous_csv_timestamp_6673c69c: "CSV anterior (%{timestamp})"
   previous_message_8804f87e: "Mensagem anterior"
   previous_module_item_2bb5e499: "Módulo/Item anterior"
   previous_month_7adf1380: "Mês anterior"
