@@ -1292,9 +1292,16 @@ ActiveRecord::Associations::CollectionAssociation.class_eval do
 end
 
 module UnscopeCallbacks
-  def __run_callbacks__(*args)
-    scope = self.class.base_class.unscoped
-    scope.scoping { super }
+  if CANVAS_RAILS4_2
+    def __run_callbacks__(*args)
+      scope = self.class.base_class.unscoped
+      scope.scoping { super }
+    end
+  else
+    def __run_callbacks__(*args)
+      scope = self.class.unscoped
+      scope.scoping { super }
+    end
   end
 end
 ActiveRecord::Base.send(:include, UnscopeCallbacks)

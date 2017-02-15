@@ -438,12 +438,6 @@ describe ActiveRecord::Base do
       @user = user_model
     end
 
-    it "should fail with improper nested hashes" do
-      expect {
-        User.where(:name => { :users => { :id => @user }}).first
-      }.to raise_error(ActiveRecord::StatementInvalid)
-    end
-
     it "should fail with dot in nested column name" do
       expect {
         User.where(:name => { "users.id" => @user }).first

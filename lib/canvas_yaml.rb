@@ -67,6 +67,8 @@ SafeYAML::OPTIONS.merge!(
         !ruby/object:OpenObject
         !ruby/object:DateTime
         !ruby/object:BigDecimal
+        !ruby/object:ActiveSupport::TimeWithZone
+        !ruby/object:ActiveSupport::TimeZone
       ],
 )
 
