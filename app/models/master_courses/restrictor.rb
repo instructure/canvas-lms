@@ -31,7 +31,7 @@ module MasterCourses::Restrictor
     end
 
     def mark_as_importing!(cm)
-      @importing_migration = cm
+      @importing_migration = cm if cm && cm.master_course_subscription
     end
 
     def check_for_restricted_column_changes

@@ -127,4 +127,58 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       expect(@template.child_subscriptions.active.pluck(:child_course_id)).to match_array([c1.id, c2.id])
     end
   end
+
+  describe "#queue_migration" do
+    before :once do
+      setup_template
+      @url = "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations"
+      @params = @base_params.merge(:action => 'queue_migration')
+      @child_course = course_factory
+      @sub = @template.add_child_course!(@child_course)
+    end
+
+    it "should require some associated courses" do
+      @sub.destroy! # deleted ones shouldn't count
+      json = api_call(:post, @url, @params, {}, {}, {:expected_status => 400})
+      expect(json['message']).to include("No associated courses")
+    end
+
+    it "should not allow double-queueing" do
+      MasterCourses::MasterMigration.start_new_migration!(@template, @user)
+
+      json = api_call(:post, @url, @params, {}, {}, {:expected_status => 400})
+      expect(json['message']).to include("currently running")
+    end
+
+    it "should queue a master migration" do
+      json = api_call(:post, @url, @params)
+      migration = @template.master_migrations.find(json['id'])
+      expect(migration).to be_queued
+    end
+  end
+
+  describe "migrations show/index" do
+    before :once do
+      setup_template
+      @child_course = Account.default.courses.create!
+      @sub = @template.add_child_course!(@child_course)
+      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
+    end
+
+    it "should show a migration" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations/#{@migration.id}",
+        @base_params.merge(:action => 'migrations_show', :id => @migration.to_param))
+      expect(json['workflow_state']).to eq 'queued'
+    end
+
+    it "should show migrations" do
+      run_jobs
+      expect(@migration.reload).to be_completed
+      migration2 = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations", @base_params.merge(:action => 'migrations_index'))
+      pairs = json.map{|hash| [hash['id'], hash['workflow_state']]}
+      expect(pairs).to eq [[migration2.id, 'queued'], [@migration.id, 'completed']]
+    end
+  end
 end
