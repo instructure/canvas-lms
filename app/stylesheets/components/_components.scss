@@ -47,10 +47,11 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
         text-decoration: none;
         color: $ic-font-color-dark;
         border-radius: $baseBorderRadius;
-        padding: $ic-sp/2 $ic-sp;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+        padding: ($ic-sp - 4) $ic-sp;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        hyphens: auto;
+        line-height: $ic-label-line-height;
 
         @if $use_high_contrast {
           text-decoration: underline;
