@@ -80,11 +80,11 @@ describe CanvasPartman::PartitionManager do
     describe "#create_initial_partitions" do
       it "creates sufficient partitions" do
         expect(subject.base_class).to receive(:maximum).and_return(13)
-        expect(subject).to receive(:create_partition).with(0)
-        expect(subject).to receive(:create_partition).with(5)
-        expect(subject).to receive(:create_partition).with(10)
-        expect(subject).to receive(:create_partition).with(15)
-        expect(subject).to receive(:create_partition).with(20)
+        expect(subject).to receive(:create_partition).with(0, graceful: true)
+        expect(subject).to receive(:create_partition).with(5, graceful: true)
+        expect(subject).to receive(:create_partition).with(10, graceful: true)
+        expect(subject).to receive(:create_partition).with(15, graceful: true)
+        expect(subject).to receive(:create_partition).with(20, graceful: true)
 
         subject.create_initial_partitions(2)
       end
