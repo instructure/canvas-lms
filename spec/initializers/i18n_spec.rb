@@ -85,6 +85,10 @@ describe I18n do
       it "formats with precision" do
         expect(I18n.n(76.6, precision: 2, percentage: true)).to eq "76,60 %"
       end
+
+      it "has a max precision of 5 by default" do
+        expect(I18n.n(100.567891, percentage: true)).to eq "100,56789 %"
+      end
     end
   end
 end

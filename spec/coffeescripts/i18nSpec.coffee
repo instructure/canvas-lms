@@ -127,3 +127,6 @@ define [
 
   test 'allows stripping of 0s to be explicitly toggled along with precision', ->
     equal I18n.localizeNumber(1.12000, {precision: 4, strip_insignificant_zeros: true}), "1#{@separator}12"
+
+  test 'does not have precision errors with large numbers', ->
+    equal I18n.localizeNumber(50000000.12), "50#{@delimiter}000#{@delimiter}000#{@separator}12"

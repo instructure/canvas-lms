@@ -158,7 +158,7 @@ module NumberLocalizer
     if percentage
       # no precision? default to the number's precision, not to some arbitrary precision
       if precision.nil?
-        precision = 9
+        precision = 5
         strip_insignificant_zeros = true
       end
       return ActiveSupport::NumberHelper.number_to_percentage(number,

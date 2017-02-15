@@ -100,10 +100,10 @@ I18n.localizeNumber = function (value, options) {
   }
   var format = _.extend({}, I18n.lookup('number.format'), {
     // use a high precision and strip zeros if no precision is provided
-    // 9 is as high as we want to go without causing precision issues
-    // when used with toFixed()
+    // 5 is as high as we want to go without causing precision issues
+    // when used with toFixed() and large numbers
     strip_insignificant_zeros: options.strip_insignificant_zeros || options.precision == null,
-    precision: options.precision != null ? options.precision : 9
+    precision: options.precision != null ? options.precision : 5
   })
   var method = options.percentage ? 'toPercentage' : 'toNumber'
   return I18n[method](value, format)
