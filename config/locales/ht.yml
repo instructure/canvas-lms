@@ -3833,7 +3833,7 @@ ht:
     subject: "Mesaj prive"
     subject_specified: "Mesaj prive: %{subject}"
     users_added: 
-      one: "%{list_of_users} te ajoute nan konvèsasyon an pa %{current_user}"
+      one: "%{user} te ajoute nan konvèsasyon an pa %{current_user}"
       other: "%{list_of_users} te ajoute nan konvèsasyon an pa %{current_user}"
   conversation_participant: 
     batch_update_message: 
@@ -10523,6 +10523,7 @@ ht:
         see_results: "Afiche rezilta %{user_name} pou"
       mastery: "Metriz sou dènye tantativ la"
       no_mastery: "Pa gen metriz sou dènye tantativ la"
+      outcomes_for: "Rezilta pou %{user_name}"
       score_out_of_possible: "%{score}* sou %{possible}*"
       short_title: 
         attempts: Tantativ
@@ -12172,6 +12173,7 @@ ht:
           allow_extra_attempt: "pèmèt elèv sa a fè yon tantativ anplis"
         count_attempts_left: 
           one: "%{user} rete 1 tantativ"
+          other: "%{user} gen %{count} tantativ ki rete"
         default_quiz_name: "Quiz %{course_name}"
         default_survey_name: "Ankèt %{course_name}"
         grade_by_question_warning: "Nòt an fonksyon de kesyon an afekte pa kesyon ki melanje nan yon gwoup."
@@ -15211,6 +15213,7 @@ ht:
       existing_user: "Itilizatè ki egziste"
     user_parsing_errors: 
       one: "Gen 1 erè nan analiz lis itilizatè sa a."
+      other: "Gen %{count} erè nan analiz lis itilizatè sa a."
     users_added: 
       one: "1 itilizatè ajoute"
       other: "%{count} itilizatè ajoute"
