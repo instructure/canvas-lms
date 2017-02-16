@@ -11534,13 +11534,12 @@ zh-Hant:
     grading_policies_description: 課程評分政策更改
     grading_policies_display: 評分政策
     invitation_description: |-
-        以下相關邀請：
+        簡介：
         
-        * 網路會議
+        * 網頁會議
         * 群組
         * 協作
-        * 课程
-        * 同行檢閱和提醒
+        * 同儕檢閱及提醒
     invitation_display: 邀請
     late_grading_description: |-
         *僅限導師和管理員：*
