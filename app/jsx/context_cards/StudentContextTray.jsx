@@ -38,12 +38,15 @@ define([
       returnFocusTo: React.PropTypes.func.isRequired
     }
 
-    static renderQuickLink (label, url, showIf) {
+    static renderQuickLink (label, srLabel, url, showIf) {
       return showIf() ? (
         <div className="StudentContextTray-QuickLinks__Link">
           <Button
             href={url}
-            variant="ghost" size="small" isBlock
+            variant="ghost"
+            size="small"
+            isBlock
+            aria-label={srLabel}
           >
             {label}
           </Button>
@@ -159,6 +162,7 @@ define([
         >
           {StudentContextTray.renderQuickLink(
             I18n.t('Grades'),
+            I18n.t('View grades for %{name}', { name: this.state.user.short_name }),
             `/courses/${this.props.courseId}/grades/${this.props.studentId}`,
             () =>
               this.state.permissions.manage_grades ||
@@ -166,6 +170,7 @@ define([
           )}
           {StudentContextTray.renderQuickLink(
             I18n.t('Analytics'),
+            I18n.t('View analytics for %{name}', { name: this.state.user.short_name }),
             `/courses/${this.props.courseId}/analytics/users/${this.props.studentId}`,
             () => (
               this.state.permissions.view_analytics && Object.keys(this.state.analytics).length > 0
@@ -224,7 +229,7 @@ define([
 
                     <div className="StudentContextTray-Header__Layout">
                       <div className="StudentContextTray-Header__Content">
-                        {this.state.user.short_name ? (
+                        {this.state.user.short_name  ? (
                           <div className="StudentContextTray-Header__Name">
                             <Heading level="h3" tag="h2">
                               <span className="StudentContextTray-Header__NameLink">
@@ -257,7 +262,7 @@ define([
                             onClick={this.handleMessageButtonClick}
                           >
                             <ScreenReaderContent>
-                              {I18n.t('Send a message to this student')}
+                              {I18n.t('Send a message to %{student}', {student: this.state.user.short_name})}
                             </ScreenReaderContent>
 
                             {/* Note: replace with instructure-icon */}
