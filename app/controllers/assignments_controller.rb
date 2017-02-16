@@ -443,6 +443,7 @@ class AssignmentsController < ApplicationController
         MULTIPLE_GRADING_PERIODS_ENABLED: @context.feature_enabled?(:multiple_grading_periods),
         PLAGIARISM_DETECTION_PLATFORM: @context.root_account.feature_enabled?(:plagiarism_detection_platform),
         POST_TO_SIS: post_to_sis,
+        SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@assignment),
         SECTION_LIST: @context.course_sections.active.map do |section|
           {
             id: section.id,

@@ -15,6 +15,10 @@ module AssignmentUtil
     assignment.try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value).to_i
   end
 
+  def self.post_to_sis_friendly_name(assignment)
+    assignment.try(:context).try(:account).try(:root_account).try(:settings).try(:[], :sis_name) || "SIS"
+  end
+
   def self.name_length_required_for_account?(assignment)
     assignment.try(:context).try(:account).try(:sis_syncing).try(:[], :value) &&
     assignment.try(:context).try(:account).try(:sis_assignment_name_length).try(:[], :value) &&

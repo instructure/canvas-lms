@@ -88,6 +88,7 @@ define [
         canChooseType: @assignmentGroup?
         uniqLabel: uniqLabel
         disableDueAt: @disableDueAt()
+        postToSISName: ENV.SIS_NAME
         isInClosedPeriod: @model.inClosedGradingPeriod()
 
     currentUserIsAdmin: ->

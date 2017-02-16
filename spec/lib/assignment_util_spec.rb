@@ -79,6 +79,17 @@ describe AssignmentUtil do
     end
   end
 
+  describe "post_to_sis_friendly_name" do
+    it "returns custom friendly name when the account setting sis_name is custom" do
+      assignment.context.account.root_account.settings[:sis_name] = 'Foo Bar'
+      expect(described_class.post_to_sis_friendly_name(assignment)).to eq('Foo Bar')
+    end
+
+    it "returns SIS when the account setting sis_name is not custom" do
+      expect(described_class.post_to_sis_friendly_name(assignment)).to eq('SIS')
+    end
+  end
+
   describe "due_date_ok?" do
     it "returns false when due_at is blank and due_date_required? is true" do
       assignment.due_at = nil

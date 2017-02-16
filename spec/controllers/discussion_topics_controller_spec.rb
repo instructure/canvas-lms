@@ -588,6 +588,13 @@ describe DiscussionTopicsController do
       get 'new', :course_id => @course.id
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
+
+    it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:post_to_sis_friendly_name).returns('Foo Bar')
+      get 'new', :course_id => @course.id
+      expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
+    end
   end
 
   describe "GET 'edit'" do
@@ -630,6 +637,13 @@ describe DiscussionTopicsController do
       AssignmentUtil.stubs(:assignment_max_name_length).returns(15)
       get :edit, course_id: @course.id, id: @topic.id
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
+    end
+
+    it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:post_to_sis_friendly_name).returns('Foo Bar')
+      get :edit, :course_id => @course.id, :id => @topic.id
+      expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
 
     context 'conditional-release' do

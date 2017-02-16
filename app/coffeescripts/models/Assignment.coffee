@@ -313,6 +313,9 @@ define [
     postToSISEnabled: =>
       return ENV.POST_TO_SIS
 
+    postToSISName: =>
+      return ENV.SIS_NAME
+
     defaultDates: =>
       group = new DateGroup
         due_at:    @get("due_at")

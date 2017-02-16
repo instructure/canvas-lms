@@ -306,6 +306,7 @@ define [
       _.extend data,
         kalturaEnabled: ENV?.KALTURA_ENABLED or false
         postToSISEnabled: ENV?.POST_TO_SIS or false
+        postToSISName: ENV.SIS_NAME
         isLargeRoster: ENV?.IS_LARGE_ROSTER or false
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
         conditionalReleaseServiceEnabled: ENV?.CONDITIONAL_RELEASE_SERVICE_ENABLED or false

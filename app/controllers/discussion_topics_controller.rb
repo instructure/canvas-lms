@@ -457,6 +457,7 @@ class DiscussionTopicsController < ApplicationController
       js_hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @topic.new_record?
       js_hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context.assignments.first) if @context.respond_to?(:assignments)
       js_hash[:MAX_NAME_LENGTH] = AssignmentUtil.assignment_max_name_length(@context.assignments.first) if @context.respond_to?(:assignments)
+      js_hash[:SIS_NAME] = AssignmentUtil.post_to_sis_friendly_name(@context.assignments.first) if @context.respond_to?(:assignments)
 
       if @context.is_a?(Course)
         js_hash['SECTION_LIST'] = sections.map { |section|
