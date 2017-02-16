@@ -1,5 +1,5 @@
 module SpecTimeLimit
-  class Error < StandardError
+  class Error < ::Timeout::Error
     # #initialize and #to_s are overwritten here to prevent Timeout.timeout
     # overwriting the error message to "execution expired"
     def initialize(message)
@@ -28,8 +28,8 @@ module SpecTimeLimit
       Timeout.timeout(timeout, Error.new(Error.message_for(type, timeout))) do
         example.run
       end
-      # we don't rescue here because example.run rescues the SpecTimeLimit::Error
-      # and performs set_exception(spec_time_limit_error) on the example
+      # no error handling needed, since rspec will catch the error and
+      # perform set_exception(spec_time_limit_error) on the example
     end
 
     # find an appropriate timeout for this spec
