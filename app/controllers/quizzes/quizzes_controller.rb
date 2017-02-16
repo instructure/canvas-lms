@@ -264,7 +264,8 @@ class Quizzes::QuizzesController < ApplicationController
 
       hash = {
         :MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT => max_name_length_required_for_account,
-        :MAX_NAME_LENGTH => max_name_length
+        :MAX_NAME_LENGTH => max_name_length,
+        :DUE_DATE_REQUIRED_FOR_ACCOUNT => AssignmentUtil.due_date_required_for_account?(@quiz),
       }
 
       js_env(hash)
@@ -277,7 +278,6 @@ class Quizzes::QuizzesController < ApplicationController
       return render_unauthorized_action if editing_restricted?(@quiz)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
       @assignment = @quiz.assignment
-
       @quiz.title = params[:title] if params[:title]
       @quiz.due_at = params[:due_at] if params[:due_at]
       @quiz.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
@@ -302,6 +302,7 @@ class Quizzes::QuizzesController < ApplicationController
         :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_for(@current_user,
                                                            ensure_set_not_empty: true),
                                                            @current_user),
+        :DUE_DATE_REQUIRED_FOR_ACCOUNT => AssignmentUtil.due_date_required_for_account?(@quiz),
         :QUIZ => quiz_json(@quiz, @context, @current_user, session),
         :SECTION_LIST => sections.map { |section|
           {
