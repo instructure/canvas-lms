@@ -176,6 +176,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
           sub.update_attribute(:use_selective_copy, true) # mark subscription as up-to-date
         end
       end
+      res[:skipped_count] = import_migration.skipped_master_course_items&.count || 0
       if self.import_results.values.all?{|r| r[:state] != 'queued'}
         # all imports are done
         if self.import_results.values.all?{|r| r[:state] == 'completed'}

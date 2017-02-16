@@ -388,6 +388,7 @@ describe MasterCourses::MasterMigration do
       [page, assignment].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)}
 
       run_master_migration # re-copy all the content but don't actually overwrite the downstream change
+      expect(@migration.import_results.values.first[:skipped_count]).to eq 2 # keep track of the number of "exceptions"
 
       expect(copied_page.reload.body).to eq new_child_text # should have been left alone
       expect(copied_page.title).to eq old_title # even the title
@@ -403,6 +404,7 @@ describe MasterCourses::MasterMigration do
       end
 
       run_master_migration # re-copy all the content but this time overwrite the downstream change because we locked it
+      expect(@migration.import_results.values.first[:skipped_count]).to eq 0
 
       expect(copied_assignment.reload.description).to eq new_master_text
       expect(copied_assignment.title).to eq new_master_title
