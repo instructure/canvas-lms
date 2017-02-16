@@ -68,7 +68,8 @@ module Lti
          User.image
          Message.documentTarget
          Message.locale
-         Context.id)
+         Context.id
+         vnd.Canvas.root_account.uuid)
     }
     describe '#supported_capabilities' do
       it 'returns all supported capabilities asociated with launch params' do

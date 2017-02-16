@@ -920,10 +920,10 @@ module UpdateAndDeleteWithJoins
   def update_all(updates, *args)
     return super if joins_values.empty?
 
-    stmt = Arel::UpdateManager.new(arel.engine)
+    stmt = CANVAS_RAILS4_2 ? Arel::UpdateManager.new(arel.engine) : Arel::UpdateManager.new
 
     stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
-    from = from_value.try(:first)
+    from = (CANVAS_RAILS4_2 ? from_value : from_clause).try(:first)
     stmt.table(from ? Arel::Nodes::SqlLiteral.new(from) : table)
     stmt.key = table[primary_key]
 

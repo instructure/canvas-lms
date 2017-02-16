@@ -165,6 +165,9 @@ describe ContentMigration do
 
       @assignment.save!
 
+      @copy_to.any_instantiation.expects(:turnitin_enabled?).at_least(1).returns(true)
+      @copy_to.any_instantiation.expects(:vericite_enabled?).at_least(1).returns(true)
+
       attrs = [:turnitin_enabled, :vericite_enabled, :peer_reviews,
           :automatic_peer_reviews, :anonymous_peer_reviews,
           :grade_group_students_individually, :allowed_extensions,
@@ -177,6 +180,22 @@ describe ContentMigration do
         expect(@assignment[attr]).to eq new_assignment[attr]
       end
       expect(new_assignment.only_visible_to_overrides).to be_falsey
+    end
+
+    it "shouldn't copy turnitin/vericite_enabled if it's not enabled on the copyee's account" do
+      assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
+      @assignment.turnitin_enabled = true
+      @assignment.vericite_enabled = true
+      @assignment.save!
+
+      @copy_to.any_instantiation.expects(:turnitin_enabled?).at_least(1).returns(false)
+      @copy_to.any_instantiation.expects(:vericite_enabled?).at_least(1).returns(false)
+
+      run_course_copy
+
+      new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
+      expect(new_assignment[:turnitin_enabled]).to be_falsey
+      expect(new_assignment[:vericite_enabled]).to be_falsey
     end
 
     it "should copy group assignment setting" do

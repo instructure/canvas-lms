@@ -215,6 +215,7 @@ describe "manage groups" do
       wait_for_ajaximations
       expect(fj([actions_button, message_users].join(" + "))).to be
       expect(fj([actions_button, randomly_assign_users].join(" + "))).to be
+      fj(actions_button).click # close the menu, or it can prevent the next step
 
       # assign the last unassigned member
       draggable_user = fj(".unassigned-students .group-user:first")

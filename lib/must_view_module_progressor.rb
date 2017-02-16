@@ -38,6 +38,15 @@ class MustViewModuleProgressor
     end
   end
 
+  def current_progress
+    progress = {}
+    modules.each do |mod|
+      progression = mod.context_module_progressions.find_or_create_by(user: user).evaluate
+      progress[mod.id] = { status: progression.workflow_state, items: items_current_progress(mod, progression) }
+    end
+    progress
+  end
+
   private
 
   def always_skippable?(item)
@@ -81,6 +90,14 @@ class MustViewModuleProgressor
 
   def progress_item(item)
     item.context_module_action(user, :read)
+  end
+
+  def items_current_progress(mod, progression)
+    progress = {}
+    mod.content_tags.each do |item|
+      progress[item.id] = progression.finished_item?(item)
+    end
+    progress
   end
 
 end

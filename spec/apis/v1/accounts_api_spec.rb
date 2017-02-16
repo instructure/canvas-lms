@@ -908,6 +908,48 @@ describe "Accounts API", type: :request do
         { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :search_term => search_term })
       expect(response).to eq 400
     end
+
+    context "blueprint courses" do
+      before :once do
+        @a = Account.create!
+        @a.enable_feature! :master_courses
+        @mc = course_model :name => 'MasterCourse', :account => @a
+        @cc = course_model :name => 'ChildCourse', :account => @a
+        @oc = course_model :name => 'OtherCourse', :account => @a
+        template = MasterCourses::MasterTemplate.set_as_master_course(@mc)
+        template.add_child_course!(@cc).destroy # ensure deleted subscriptions don't affect the result
+        template.add_child_course!(@cc)
+        account_admin_user(:account => @a)
+      end
+
+      it 'filters in blueprint courses' do
+        json = api_call(:get, "/api/v1/accounts/#{@a.id}/courses?blueprint=true",
+          { :controller => 'accounts', :action => 'courses_api', :account_id => @a.to_param,
+            :format => 'json', :blueprint => true })
+        expect(json.map{ |c| c['name'] }).to match_array %w(MasterCourse)
+      end
+
+      it 'filters out blueprint courses' do
+        json = api_call(:get, "/api/v1/accounts/#{@a.id}/courses?blueprint=false",
+          { :controller => 'accounts', :action => 'courses_api', :account_id => @a.to_param,
+            :format => 'json', :blueprint => false })
+        expect(json.map{ |c| c['name'] }).to match_array %w(ChildCourse OtherCourse)
+      end
+
+      it 'filters in associated courses' do
+        json = api_call(:get, "/api/v1/accounts/#{@a.id}/courses?blueprint_associated=true",
+          { :controller => 'accounts', :action => 'courses_api', :account_id => @a.to_param,
+            :format => 'json', :blueprint_associated => true })
+        expect(json.map{ |c| c['name'] }).to match_array %w(ChildCourse)
+      end
+
+      it 'filters out associated courses' do
+        json = api_call(:get, "/api/v1/accounts/#{@a.id}/courses?blueprint_associated=false",
+          { :controller => 'accounts', :action => 'courses_api', :account_id => @a.to_param,
+            :format => 'json', :blueprint_associated => false })
+        expect(json.map{ |c| c['name'] }).to match_array %w(MasterCourse OtherCourse)
+      end
+    end
   end
 
   context "account api extension" do

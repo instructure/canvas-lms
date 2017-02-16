@@ -8,7 +8,7 @@ define([], () => {
     },
     inputParams: {
       searchType: 'unique_id',
-      nameList: ['foo', 'bar', 'baz'],
+      nameList: 'foo, bar, baz',
       role: '1',
       section: '1',
       limitPrivilege: false,

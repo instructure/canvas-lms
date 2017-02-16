@@ -334,6 +334,13 @@ module Lti
         expect(exp_hash[:test]).to eq 54321
       end
 
+      it 'has substitution for $Canvas.account.name' do
+        allow(root_account).to receive(:uuid).and_return('123-123-123-123')
+        exp_hash = {test: '$vnd.Canvas.root_account.uuid'}
+        subject.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq '123-123-123-123'
+      end
+
       it 'has substitution for $Canvas.root_account.sisSourceId' do
         root_account.sis_source_id = 'cd45'
         exp_hash = {test: '$Canvas.root_account.sisSourceId'}

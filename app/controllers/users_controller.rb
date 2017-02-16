@@ -764,7 +764,9 @@ class UsersController < ApplicationController
     return render_unauthorized_action unless @current_user
 
     grading = @current_user.assignments_needing_grading().map { |a| todo_item_json(a, @current_user, session, 'grading') }
-    submitting = @current_user.assignments_needing_submitting(include_ungraded: true).map { |a| todo_item_json(a, @current_user, session, 'submitting') }
+    submitting = @current_user.assignments_needing_submitting(include_ungraded: true, limit: ToDoListPresenter::ASSIGNMENT_LIMIT).map { |a|
+      todo_item_json(a, @current_user, session, 'submitting')
+    }
     if Array(params[:include]).include? 'ungraded_quizzes'
       submitting += @current_user.ungraded_quizzes_needing_submitting.map { |q| todo_item_json(q, @current_user, session, 'submitting') }
       submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] }

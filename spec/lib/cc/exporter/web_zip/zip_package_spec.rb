@@ -3,18 +3,22 @@ require 'spec_helper'
 
 describe "ZipPackage" do
   before :once do
-    course_with_teacher(active_all: true)
-    student_in_course(active_all: true, user_name: 'a student')
+    course_with_student(active_all: true)
     @cartridge_path = 'spec/fixtures/migration/unicode-filename-test-export.imscc'
+    @cache_key = 'cache_key'
   end
 
   before do
     @module = @course.context_modules.create!(name: 'first_module')
-    exporter = CC::Exporter::WebZip::Exporter.new(File.open(@cartridge_path), false, :web_zip)
-    @zip_package = CC::Exporter::WebZip::ZipPackage.new(exporter, @course, @student)
+    @exporter = CC::Exporter::WebZip::Exporter.new(File.open(@cartridge_path), false, :web_zip)
   end
 
   context "parse_module_data" do
+
+    before do
+      @zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+    end
+
     it "should map context module data from Canvas" do
       module_data = @zip_package.parse_module_data
       expect(module_data).to eq [{id: @module.id, name: 'first_module', status: 'completed',
@@ -106,7 +110,37 @@ describe "ZipPackage" do
     end
   end
 
+  context "with_cached_progress_data" do
+    before do
+      enable_cache
+    end
+
+    it "should use cached module status" do
+      Rails.cache.fetch(@cache_key, expires_in: 30.minutes){ {@module.id => {status: 'started'}} }
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+
+      module_data = zip_package.parse_module_data.first
+      expect(module_data[:status]).to eq 'started'
+    end
+
+    it "should use cached module item data" do
+      url_item = @module.content_tags.create!(content_type: 'ExternalUrl', context: @course,
+        title: 'url', url: 'https://www.google.com')
+      @module.completion_requirements = [{id: url_item.id, type: 'must_view'}]
+      @module.save!
+      Rails.cache.fetch(@cache_key, expires_in: 30.minutes){ {@module.id => {items: {url_item.id => true}}} }
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+
+      module_item_data = zip_package.parse_module_item_data(@module).first
+      expect(module_item_data[:completed]).to be true
+    end
+  end
+
   context "parse_module_item_data" do
+    before do
+      @zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+    end
+
     it "should parse id, type, title and indent for items in the module" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: "<p>Hi</p>")
       assign_item = @module.content_tags.create!(content: assign, context: @course, indent: 3)

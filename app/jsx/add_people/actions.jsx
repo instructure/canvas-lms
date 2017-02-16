@@ -39,7 +39,8 @@ define([
     dispatch(actions.validateUsersStart());
     const state = getState();
     const courseId = state.courseParams.courseId;
-    const users = state.inputParams.nameList;
+    // split on a newline or comma, stripping surrounding whitespace in the process
+    const users = state.inputParams.nameList.trim().split(/\s*[\n,]\s*/);
     const searchType = state.inputParams.searchType;
     api.validateUsers({ courseId, users, searchType })
       .then((res) => {

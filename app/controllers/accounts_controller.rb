@@ -291,6 +291,14 @@ class AccountsController < ApplicationController
   #   'completed', or their enrollment term may have ended).  If false, exclude
   #   completed courses.  If not present, do not filter on completed status.
   #
+  # @argument blueprint [Boolean]
+  #   If true, include only blueprint courses. If false, exclude them.
+  #   If not present, do not filter on this basis.
+  #
+  # @argument blueprint_associated [Boolean]
+  #   If true, include only courses that inherit content from a blueprint course.
+  #   If false, exclude them. If not present, do not filter on this basis.
+  #
   # @argument by_teachers[] [Integer]
   #   List of User IDs of teachers; if supplied, include only courses taught by
   #   one of the referenced users.
@@ -344,6 +352,18 @@ class AccountsController < ApplicationController
       @courses = @courses.completed
     elsif !params[:completed].nil? && !value_to_boolean(params[:completed])
       @courses = @courses.not_completed
+    end
+
+    if value_to_boolean(params[:blueprint])
+      @courses = @courses.master_courses
+    elsif !params[:blueprint].nil?
+      @courses = @courses.not_master_courses
+    end
+
+    if value_to_boolean(params[:blueprint_associated])
+      @courses = @courses.associated_courses
+    elsif !params[:blueprint_associated].nil?
+      @courses = @courses.not_associated_courses
     end
 
     if params[:by_teachers].is_a?(Array)

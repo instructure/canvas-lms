@@ -31,7 +31,7 @@
 
 .group-category-contents {
   background: $wellBackground;
-  border-color: darken($wellBackground, 7%);
+  border-color: $ic-border-color;
   border-style: solid;
   border-width: 1px 0px;
   padding: 1em 1.5em;
@@ -63,14 +63,46 @@
 }
 
 .group-category-summary {
-  min-height: 32px;
-  margin: 0 1em 1em;
-  background: #fff;
-  .group-category-actions {
-    margin-left: 1em;
+  padding: 0 $ic-sp;
+  margin-bottom: $ic-sp;
+
+  @include breakpoint(desktop) {
+    display: flex;
+    align-items: flex-end;
   }
+
   .student-organized-groups {
     overflow: hidden; // so it doesn't overlap with the button/cog
+  }
+}
+
+.group-category-summary__search {
+  margin-bottom: $ic-sp / 2;
+
+  @include breakpoint(desktop) {
+    margin-bottom: 0;
+    margin-right: $ic-sp * 2;
+  }
+}
+
+.group-category-summary__detail {
+  flex: 1;
+}
+
+.group-category-summary__detailLayout {
+  @include breakpoint(tablet) {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+}
+
+.group-category-summary__messages {
+  flex: 1;
+  margin-bottom: $ic-sp / 2;
+
+  @include breakpoint(tablet) {
+    margin-bottom: 0;
   }
 }
 

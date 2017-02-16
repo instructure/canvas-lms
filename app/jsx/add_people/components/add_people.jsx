@@ -250,6 +250,7 @@ define([
             <PeopleReadyList
               nameList={this.props.usersToBeEnrolled}
               defaultInstitutionName={this.props.courseParams.defaultInstitutionName}
+              canReadSIS={this.props.inputParams.canReadSIS}
             />
           );
           onNext = this.enrollUsers;

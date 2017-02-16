@@ -263,6 +263,15 @@ module Lti
     register_expansion 'Canvas.root_account.id', [],
                        -> { @root_account.id }
 
+    # returns the account uuid for the current context.
+    # @example
+    #   ```
+    #   Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo
+    #   ```
+    register_expansion 'vnd.Canvas.root_account.uuid', [],
+                       -> { @root_account.uuid },
+                       default_name: 'vnd_canvas_root_account_uuid'
+
     # returns the root account sis source id for the current context.
     # @deprecated
     # @example

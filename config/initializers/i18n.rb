@@ -18,6 +18,7 @@ end
 
 load_path = Rails.application.config.i18n.railties_load_path
 if skip_locale_loading
+  load_path = load_path.map(&:existent).flatten unless CANVAS_RAILS4_2
   load_path.replace(load_path.grep(%r{/(locales|en)\.yml\z}))
 else
   load_path << (Rails.root + "config/locales/locales.yml").to_s # add it at the end, to trump any weird/invalid stuff in locale-specific files

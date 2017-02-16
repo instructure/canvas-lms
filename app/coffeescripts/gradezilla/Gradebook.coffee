@@ -609,6 +609,9 @@ define [
       cell = student["assignment_#{submission.assignment_id}"] ||= {}
       _.extend(cell, submission)
 
+    getColumnHeaderNode: (columnId) =>
+      document.getElementById(@grid.getUID() + columnId)
+
     # this is used after the CurveGradesDialog submit xhr comes back.  it does not use the api
     # because there is no *bulk* submissions#update endpoint in the api.
     # It is different from gotSubmissionsChunk in that gotSubmissionsChunk expects an array of students
@@ -618,10 +621,18 @@ define [
       activeCell = @grid.getActiveCell()
       editing = $(@grid.getActiveCellNode()).hasClass('editable')
       columns = @grid.getColumns()
+      changedColumnHeaders = {}
       for submission in submissions
         student = @student(submission.user_id)
         idToMatch = "assignment_#{submission.assignment_id}"
         cell = index for column, index in columns when column.id is idToMatch
+
+        unless changedColumnHeaders[cell]
+          changedColumnHeaders[cell] =
+            grid: @grid
+            column: columns[cell]
+            node: @getColumnHeaderNode(columns[cell].id)
+
         thisCellIsActive = activeCell? and
           editing and
           activeCell.row is student.row and
@@ -635,6 +646,9 @@ define [
         @calculateStudentGrade(student)
         @grid.updateCell student.row, cell unless thisCellIsActive
         @updateRowTotals student.row
+
+      for idx, columnHeader of changedColumnHeaders
+        @initAssignmentColumnHeader(columnHeader, true)
 
     updateRowTotals: (rowIndex) ->
       columns = @grid.getColumns()
@@ -854,7 +868,15 @@ define [
     # conjunction with a click listener on <body />. When we 'blur' the grid
     # by clicking outside of it, save the current field.
     onGridBlur: (e) =>
-      className = e.target.className.baseVal or ''
+      className = e.target.className
+
+      # PopoverMenu's trigger sends an event with a target whose className is a SVGAnimatedString
+      # This normalizes the className where possible
+      if typeof className != 'string'
+        if typeof className == 'object'
+          className = className.baseVal || ''
+        else
+          className = ''
 
       if className.match(/cell|slick/) or !@grid.getActiveCell
         return
@@ -1115,21 +1137,66 @@ define [
       mountPoint = document.querySelectorAll("[data-component='ViewOptionsMenu']")[0]
       ReactDOM.render(component, mountPoint)
 
-    initAssignmentColumnHeader: (obj) =>
-      original_assignment = obj.column.object
-
+    getAssignmentColumnHeaderProps: (originalAssignment, submissionsLoaded) =>
       assignment = {
-        htmlUrl: original_assignment.html_url,
-        id: original_assignment.id,
-        invalid: original_assignment.invalid,
-        muted: original_assignment.muted,
-        name: original_assignment.name,
-        omitFromFinalGrade: original_assignment.omit_from_final_grade,
-        pointsPossible: original_assignment.points_possible
+        htmlUrl: originalAssignment.html_url,
+        id: originalAssignment.id,
+        invalid: originalAssignment.invalid,
+        muted: originalAssignment.muted,
+        name: originalAssignment.name,
+        omitFromFinalGrade: originalAssignment.omit_from_final_grade,
+        pointsPossible: originalAssignment.points_possible,
+        submissionTypes: originalAssignment.submission_types,
+        courseId: originalAssignment.course_id
       }
 
-      component = React.createElement(AssignmentColumnHeader, { assignment }, null)
-      ReactDOM.render(component, $(obj.node).find('.slick-column-name')[0])
+      students = _.map @studentsThatCanSeeAssignment(@students, originalAssignment), (student) =>
+        studentRecord =
+          id: student.id,
+          name: student.name,
+          isInactive: student.isInactive
+
+        assignmentKey = "assignment_#{assignment.id}"
+        assignmentData = student[assignmentKey]
+
+        if assignmentData
+          studentRecord.submission =
+            score: assignmentData.score,
+            submittedAt: assignmentData.submitted_at
+        else
+          studentRecord.submission =
+            score: undefined,
+            submittedAt: undefined
+
+        studentRecord
+
+      props =
+        assignment: assignment
+        students: students
+        submissionsLoaded: submissionsLoaded
+
+    renderAssignmentColumnHeader: (mountPoint, assignment, submissionsLoaded) =>
+      props = @getAssignmentColumnHeaderProps(assignment, submissionsLoaded);
+
+      component = React.createElement(AssignmentColumnHeader, props, null)
+      ReactDOM.render(component, mountPoint)
+
+    initAssignmentColumnHeader: (columnDefinition, immediate = false) =>
+      mountPoint = $(columnDefinition.node).find('.slick-column-name')[0]
+      assignment = columnDefinition.column.object
+
+      # Mount the component immediately, assuming submissions have already been loaded.
+      # This is used mainly to update column headers as the user changes data in the gradebook
+      return @renderAssignmentColumnHeader(mountPoint, assignment, true) if immediate
+
+      # We're now in deferred mode => let's mount the component and indicate that the submissions
+      # might not all be loaded and kick off a deferred mount once all the submissions are loaded
+      @renderAssignmentColumnHeader(mountPoint, assignment, false)
+
+      # Now let's wait for all submissions data to finish loading and re-mount this component so it
+      # has all the data it needs to power its functionality
+      @allSubmissionsLoaded.then =>
+        @renderAssignmentColumnHeader(mountPoint, assignment, true)
 
     initAssignmentGroupColumnHeader: (columnDefinition) =>
       original_assignment_group = columnDefinition.column.object

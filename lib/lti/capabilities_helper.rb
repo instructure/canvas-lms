@@ -12,7 +12,8 @@ module Lti
                                 User.image
                                 Message.documentTarget
                                 Message.locale
-                                Context.id).freeze
+                                Context.id
+                                vnd.Canvas.root_account.uuid).freeze
 
     def self.supported_capabilities
       SUPPORTED_CAPABILITIES

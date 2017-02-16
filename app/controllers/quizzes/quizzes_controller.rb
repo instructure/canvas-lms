@@ -259,7 +259,12 @@ class Quizzes::QuizzesController < ApplicationController
         @assignment = @quiz.assignment
       end
 
+      max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@quiz)
+      max_name_length = AssignmentUtil.assignment_max_name_length(@quiz)
+
       hash = {
+        :MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT => max_name_length_required_for_account,
+        :MAX_NAME_LENGTH => max_name_length,
         :DUE_DATE_REQUIRED_FOR_ACCOUNT => AssignmentUtil.due_date_required_for_account?(@quiz),
       }
 
@@ -289,6 +294,9 @@ class Quizzes::QuizzesController < ApplicationController
       end]
       sections = @context.course_sections.active
 
+      max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@quiz)
+      max_name_length = AssignmentUtil.assignment_max_name_length(@quiz)
+
       hash = {
         :ASSIGNMENT_ID => @assignment.present? ? @assignment.id : nil,
         :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_for(@current_user,
@@ -312,7 +320,9 @@ class Quizzes::QuizzesController < ApplicationController
         :quiz_max_combination_count => QUIZ_MAX_COMBINATION_COUNT,
         :SHOW_QUIZ_ALT_TEXT_WARNING => true,
         :VALID_DATE_RANGE => CourseDateRange.new(@context),
-        :MULTIPLE_GRADING_PERIODS_ENABLED => @context.feature_enabled?(:multiple_grading_periods)
+        :MULTIPLE_GRADING_PERIODS_ENABLED => @context.feature_enabled?(:multiple_grading_periods),
+        :MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT => max_name_length_required_for_account,
+        :MAX_NAME_LENGTH => max_name_length
       }
 
       if @context.feature_enabled?(:multiple_grading_periods)
