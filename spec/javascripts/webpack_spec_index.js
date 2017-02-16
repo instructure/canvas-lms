@@ -1,4 +1,5 @@
 require('./support/sinon/sinon-qunit-1.0.0');
+require('vendor/ie11-polyfill.js')
 
 const fixturesDiv = document.createElement('div');
 fixturesDiv.id = 'fixtures';

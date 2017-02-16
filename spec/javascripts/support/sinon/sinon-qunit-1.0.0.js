@@ -36,24 +36,28 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 (function (factory) {
-  const global = (function () { return this }())
+  var global = (function () { return this }())
   if (typeof module === 'object' && module.exports) {
-    const sinon = require('sinon')
+    var sinon = require('sinon')
 
     // export sinon to the global scope for our specs that expect it there
     global.sinon = sinon
 
     // Karma will have already loaded QUnit as a global, we don't want to require a new one
     // so there is nothing funky from having 2 QUnits on the page.
-    const QUnit = global.QUnit
+    var QUnit = global.QUnit
 
     module.exports = factory(global, QUnit, sinon)
   } else {
     factory(global, global.QUnit, global.sinon)
   }
 }(function (global, QUnit, sinon) {
-  sinon.assert.fail = msg => QUnit.ok(false, msg)
-  sinon.assert.pass = assertion => QUnit.ok(true, assertion)
+  sinon.assert.fail = function (msg) {
+    return QUnit.ok(false, msg)
+  }
+  sinon.assert.pass = function (assertion) {
+    return QUnit.ok(true, assertion)
+  }
 
   sinon.config = {
     injectIntoThis: true,
@@ -63,20 +67,23 @@
     useFakeServer: false,
   }
 
-  const qModule = QUnit.module
-  let wrappingSandbox
+  var qModule = QUnit.module
+  var wrappingSandbox
 
-  const setup = function () {
-    const config = Object.assign({}, sinon.defaultConfig, sinon.config)
+  var setup = function () {
+    var config = Object.assign({}, sinon.defaultConfig, sinon.config)
     config.injectInto = config.injectIntoThis && this || config.injectInto
     wrappingSandbox = sinon.sandbox.create(config)
   }
 
-  const teardown = () => wrappingSandbox.verifyAndRestore()
+  var teardown = function () {
+    return wrappingSandbox.verifyAndRestore()
+  }
 
-  QUnit.module = global.module = (name, lifecycle = {}) => {
-    const origSetup = lifecycle.setup
-    const origTeardown = lifecycle.teardown
+  QUnit.module = global.module = function (name, lifecycle) {
+    lifecycle = lifecycle || {}
+    var origSetup = lifecycle.setup
+    var origTeardown = lifecycle.teardown
 
     lifecycle.setup = function () {
       setup.call(this)
