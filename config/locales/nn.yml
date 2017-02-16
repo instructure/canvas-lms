@@ -4195,19 +4195,20 @@ nn:
   course_assignments_menu_fa6aeb23: Emneoppgåvemeny
   course_atom_feed_9d95214e: "Emne i Atom-format"
   course_calendar_7d3cba7b: Emnekalender
-  course_catalog_4cc7c8ce: Kurskatalog
-  course_collaborations_dadb327e: Kurssamarbeid
-  course_conferences_3d914c96: Kurskonferansar
-  course_content_a92eca20: Kursinnhald
-  course_copy_argument_error: "Ein kurskopi skal ha eit kjeldekurs."
-  course_copy_description: "Programtillegg for overføring ved kopiering av Canvas-kurs"
-  course_copy_display: Kurskopi
-  course_copy_file_description: "Kopier eit Canvas-kurs"
-  course_copy_name: "Kopier eit Canvas-kurs"
-  course_copy_no_course_error: "Finn ikkje kjeldekurset."
-  course_copy_not_allowed_error: "Du har ikkje løyve til å kopiere kjeldekurset."
-  course_discussions_38c0b74f: Kursdiskusjonar
-  course_ends_at_e8b166df: "Kurset sluttar"
+  course_card_color_region_for_course_c356a69c: "Fargeområde for emnekort for %{course}"
+  course_catalog_4cc7c8ce: Emnekatalog
+  course_collaborations_dadb327e: Emnesamarbeid
+  course_conferences_3d914c96: Emnekonferansar
+  course_content_a92eca20: Emneinnhald
+  course_copy_argument_error: "Ein emnekopi skal ha eit kjeldeemne."
+  course_copy_description: "Programtillegg for overføring ved kopiering av Canvas-emne"
+  course_copy_display: Emnekopi
+  course_copy_file_description: "Kopier eit Canvas-emne"
+  course_copy_name: "Kopier eit Canvas-emne"
+  course_copy_no_course_error: "Finn ikkje kjeldeemnet."
+  course_copy_not_allowed_error: "Du har ikkje løyve til å kopiere kjeldeemnet."
+  course_discussions_38c0b74f: Emnediskusjonar
+  course_ends_at_e8b166df: "Emnet sluttar"
   course_exports: 
     errors: 
       assignment: "Kan ikkje eksportere oppgåva \"%{title}\""
@@ -4215,8 +4216,8 @@ nn:
       assignment_is_locked: "Kan ikkje kopiere oppgåva \"%{title}\" fordi ho er låst."
       assignments: "Kan ikkje eksportere enkelte oppgåver"
       canvas_meta: "Kan ikkje eksportere Canvas-spesifikke metadata"
-      course_export: "Det oppstod ein feil under køyring av kurseksport."
-      course_settings: "Kan ikkje eksportere kursinnstillingar"
+      course_export: "Det oppstod ein feil under køyring av emneeksport."
+      course_settings: "Kan ikkje eksportere emneinnstillingar"
       events: "Kan ikkje eksportere kalenderhendingar"
       external_feeds: "Kan ikkje eksportere eksterne straumar"
       file: "Kan ikkje eksportere fila \"%{file_name}\""
@@ -4248,17 +4249,18 @@ nn:
       file: "Ukjend fil"
       topic: "Ukjent emne"
       wiki_page: "Ukjend wiki-side"
-  course_files_62deb8f8: Kursfiler
-  course_grades_22adc27e: Kurskarakterar
-  course_home_4c4c0107: Kursheimeside
-  course_home_sub_navigation_b1ee6b03: "Navigering på kursheimesida"
-  course_id_a7c924d5: kurs-ID
+  course_files_62deb8f8: Emnefiler
+  course_grades_22adc27e: Emnekarakterar
+  course_home_4c4c0107: "Heimeside for emne"
+  course_home_sub_navigation_b1ee6b03: "Navigering på emneheimesida"
+  course_id_a7c924d5: emne-ID
   course_id_b0bc82d4: Emne-ID
-  course_image_settings_eba3ec55: "Innstillingar for kursbilde"
-  course_implemented_apps_fa658f5a: "Kursimplementerte applikasjonar"
+  course_image_for_course_cfbb08df: "Emnebilde for %{course}"
+  course_image_settings_eba3ec55: "Innstillingar for emnebilde"
+  course_implemented_apps_fa658f5a: "Emneimplementerte applikasjonar"
   course_list: 
-    favorited_tooltip: "Klikk for å fjerne frå kursmenyen."
-    nonfavorited_tooltip: "Klikk for å legge til kursmenyen."
+    favorited_tooltip: "Klikk for å fjerne frå emnemenyen."
+    nonfavorited_tooltip: "Klikk for å legge til emnemenyen."
     wrapper: 
       close_course_menu_title: lukk
       reset_course_menu: Tilbakestill
@@ -4282,7 +4284,7 @@ nn:
       unconcluded: "Ikkje fullført"
       updated: Oppdatert
     field_label: 
-      abstract_course_id: "Abstrakt kurs-ID"
+      abstract_course_id: "Abstrakt emne-ID"
       account_id: Konto-ID
       allow_student_discussion_editing: "Tillat redigering av studentdiskusjonar"
       allow_student_discussion_topics: "Tillat emne i studentdiskusjonar"
@@ -4291,7 +4293,7 @@ nn:
       allow_student_wiki_edits: "Tillat redigering av studentwiki"
       allow_wiki_comments: "Tillat kommentarar i wiki"
       conclude_at: "Fullført den"
-      course_code: Kurskode
+      course_code: Emnekode
       created_at: "Oppretta den"
       default_view: Standardvising
       default_wiki_editing_roles: "Standard redigeringsroller for wiki"
@@ -4311,8 +4313,8 @@ nn:
       open_enrollment: "Open påmelding"
       public_description: "Offentleg skildring"
       public_syllabus: "Offentleg kursoversikt"
-      replacement_course_id: "Erstatning av kurs-ID"
-      restrict_enrollments_to_course_dates: "Avgrens påmeldingar til kursdatoar"
+      replacement_course_id: "Erstatning av emne-ID"
+      restrict_enrollments_to_course_dates: "Avgrens påmeldingar til emnedatoar"
       root_account_id: Rotkonto-ID
       self_enrollment: "Eiga påmelding"
       self_enrollment_code: "Kode for eiga påmelding"
@@ -4324,32 +4326,34 @@ nn:
       storage_quota: Lagringskvote
       syllabus_body: syllabus_body
       tab_configuration: Fanekonfigurasjon
-      template_course_id: "Mal for kurs-ID"
+      template_course_id: "Mal for emne-ID"
       turnitin_comments: Turnitin-kommentarar
       updated_at: "Oppdatert den"
       uuid: UUID
       wiki_id: Wiki-ID
       workflow_state: Arbeidsflytstatus
-  course_members_are_free_to_join_9b2603d4: "Kursdeltakarar kan ta del"
-  course_modules_795cb95e: Kursmodular
-  course_name_63b973d1: Kursnamn
-  course_name_is_required_90919349: "Kursnamn er obligatorisk"
+  course_members_are_free_to_join_9b2603d4: "Emnedeltakarar kan ta del"
+  course_modules_795cb95e: Emnemodular
+  course_name_63b973d1: Emnenamn
+  course_name_is_required_90919349: "Emnenamn er obligatorisk"
   course_name_successfully_added_48116a50: "%{course_name} er lagt til."
-  course_navigation_dd035109: Kursnavigering
-  course_option_links_a79d263d: Kurslenker
-  course_outcomes_7dc1cbc7: Kursresultat
-  course_pages_449f1dd4: Kurssider
-  course_people_3058c948: Kursdeltakarar
-  course_quizzes_c337653c: Kursprøver
+  course_navigation_dd035109: Emnenavigering
+  course_option_links_a79d263d: Emnelenker
+  course_outcomes_7dc1cbc7: Emneresultat
+  course_pages_449f1dd4: Emnesider
+  course_people_3058c948: Emnedeltakarar
+  course_quizzes_c337653c: Emneprøver
   course_restore: 
-    restore_error: "Det oppstod ein feil under gjenoppretting av kurset. Kurset er ikkje gjenoppretta."
-  course_role_role_type_119c2f64: "Kursrolle: %{role_type}"
-  course_roles_1314f962: Kursroller
+    restore_error: "Det oppstod ein feil under gjenoppretting av emnet. Emnet er ikkje gjenoppretta."
+  course_role_role_type_119c2f64: "Emnerolle: %{role_type}"
+  course_roles_1314f962: Emneroller
+  course_roster_78f70e97: Emneliste
   course_search: 
     cant_be_blank: "Kan ikkje stå tom"
   course_section: 
     sis_id_taken: "SIS-ID \"%{sis_id}\" er allereie i bruk"
-  course_section_7a988066: Kursklasser
+  course_section_7a988066: Emneklasser
+  course_section_name_ea880ed1: "Emneklasse %{name}"
   course_settings: 
     buttons: 
       add_section: "Legg til klasse"
@@ -4391,19 +4395,21 @@ nn:
     titles: 
       link_to_students: "Lenker til studentar"
       move_course: "Flytt kurs"
-      reset_course_content_dialog_help: "Tilbakestill kursinnhald"
+      reset_course_content_dialog_help: "Tilbakestill emneinnhald"
       section_enrollments: Klassepåmeldingar
-  course_settings_sub_navigation_b95deae: "Navigering i kursinnstillingar"
-  course_setup_wizard_is_showing_a7c087c1: "Viser installasjonsvegvisar for kurset."
-  course_sis_7ae8f649: kurs-SIS
-  course_starts_at_3a01f9da: "Kurset startar den"
+  course_settings_sub_navigation_b95deae: "Navigering i emneinnstillingar"
+  course_setup_wizard_is_showing_a7c087c1: "Viser installasjonsvegvisar for emnet."
+  course_sis_7ae8f649: emne-SIS
+  course_sis_df8b379: Emne-SIS
+  course_starts_at_3a01f9da: "Emnet startar den"
   course_statistics: 
     unknown: ukjent
-  course_storage_391e1bd: "Lagringskapasitet for kurs"
-  course_syllabus_5de1b0af: Kursoversikt
+  course_storage_391e1bd: "Lagringskapasitet for emne"
+  course_syllabus_5de1b0af: Emneoversikt
   course_users: 
     greater_than_three: "Oppgi eit søkeord med tre eller fleire teikn"
     unknown_error: "Noko gjekk gale med søket. Prøv på nytt seinare."
+  course_visibility_options_ca8ab3a8: "Alternativ for emnesynlegheit"
   courses: 
     canvasnet_instructor: 
       avatar_url: Avatar
@@ -4413,26 +4419,26 @@ nn:
       remove_instructor: "Fjern faglærar"
     confirm_action: 
       buttons: 
-        conclude_course: "Avslutt kurset"
-        delete_course: "Slett kurset"
+        conclude_course: "Avslutt emnet"
+        delete_course: "Slett emnet"
       details: 
-        conclude_alt_text: "Dersom du vil halde fram med å kunne endre karakterar på same tid som du avgrensar studentane sin tilgang til kurset, kan du bruke innstillingane for kursdatoar. Du lærer meir om innstillingar for kursdatoar i vegvisarane *her*."
-        confirm_conclude: "Åtvaring: Dersom du avsluttar kurset vert alt innhald arkivert, og du kan ikkje lenger endre på karakterane."
-        confirm_delete: "Er du sikker på at du vil slette dette kurset? Når det er sletta har studentar og faglærarar ikkje lenger tilgang til kurset. Dersom du berre ynskjer å fjerne kurset frå rullegardinmenyen, kan du *avslutte kurset*."
-        confirm_delete_addendum: "Dersom du ikkje har lov til å avslutte kurset, kan du *endre sluttdatoen til kurset*, eller be administrator avslutte kurset."
+        conclude_alt_text: "Dersom du vil halde fram med å kunne endre karakterar på same tid som du avgrensar studentane sin tilgang til emnet, kan du bruke innstillingane for emnedatoar. Du lærer meir om innstillingar for emnedatoar i vegvisarane *her*."
+        confirm_conclude: "Åtvaring: Dersom du avsluttar emnet vert alt innhald arkivert, og du kan ikkje lenger endre på karakterane."
+        confirm_delete: "Er du sikker på at du vil slette dette emnet? Når det er sletta har studentar og faglærarar ikkje lenger tilgang til emnet. Dersom du berre ynskjer å fjerne emnet frå rullegardinmenyen, kan du *avslutte emnet*."
+        confirm_delete_addendum: "Dersom du ikkje har lov til å avslutte emnet, kan du *endre sluttdatoen til emnet*, eller be administrator avslutte emnet."
       headings: 
-        confirm_conclude: "Stadfest avslutning av kurs"
-        confirm_delete: "Stadfest sletting av kurs"
+        confirm_conclude: "Stadfest avslutning av emne"
+        confirm_delete: "Stadfest sletting av emne"
       titles: 
         confirm: "Stadfest handling"
-    confirm_reject_invitation: "Er du sikker på at du vil avvise invitasjonen til å delta på dette kurset?"
+    confirm_reject_invitation: "Er du sikker på at du vil avvise invitasjonen til å delta på dette emnet?"
     copy: 
       buttons: 
-        create_course: "Opprett kurs"
+        create_course: "Opprett emne"
       conclude_at: Sluttdato
       content_label: Innhald
-      course_code: Kurskode
-      details: "Sett inn detaljane for det nye kurset."
+      course_code: Emnekode
+      details: "Sett inn detaljane for det nye emnet."
       enrollment_term_id: Semester
       headings: 
         copy_course: "Kopier %{course}"
@@ -4441,13 +4447,13 @@ nn:
       select_specific_content: "Vel spesifikt innhald"
       start_at: Startdato
       titles: 
-        copy_course: "Kopier kurs"
+        copy_course: "Kopier emne"
     description: 
       links: 
-        join_course: "Ta del i dette kurset"
+        join_course: "Ta del i dette emnet"
     edit_profile: 
       about: Om
-      about_related_id: "felles ID for kopling av relaterte kurs/klasser"
+      about_related_id: "felles ID for kopling av relaterte emne/klasser"
       add_instructor: "Legg til faglærar"
       basic_info: "Grunnleggande informasjon"
       disabled: Lukka
@@ -4461,7 +4467,7 @@ nn:
         enrollment_fee: Påmeldingsavgift
         format: Format
         image: Bilde
-        path: Kursbane
+        path: Emnesti
         portal_path: Portalbane
         position: Plassering
         related_id: Koplings-ID
@@ -4471,9 +4477,9 @@ nn:
         tentative_start: "Førebels start"
         title: Tittel
         visibility: Synlegheit
-      leave_blank_if_free: "la stå tom dersom dette er eit gratis kurs"
+      leave_blank_if_free: "la stå tom dersom dette er eit gratis emne"
       logo: Logo
-      page_title: Kursprofil
+      page_title: Emneprofil
       path_syntax: "små bokstavar, tal og tankestrek"
       portal_path_syntax: "små bokstavar, tal, tankestrek og skråstrek (f.eks. Harvard/kjemi)"
       private: Skjult
@@ -4481,58 +4487,58 @@ nn:
       save_changes: "Lagre endringar"
       self_paced: "Eige tempo"
       unlisted: "Ikkje oppført på canvas.net (tilgjengeleg via URL)"
-      when_to_set_tentative_start: "f.eks. \"Hausten 2013\", dersom kurset ikkje har ein bestemt startdato"
+      when_to_set_tentative_start: "f.eks. \"Hausten 2013\", dersom emnet ikkje har ein bestemt startdato"
     errors: 
-      create_failed: "Kan ikkje opprette kurset"
+      create_failed: "Kan ikkje opprette emnet"
       role_not_active: "Kan ikkje legge til brukarar for ei inaktiv rolle: '%{role}'"
       role_not_found: "Finn ikkje rolla"
-      unpublish: "Kan ikkje fjerne publisering av kurset dersom det finst studentinnleveringar.\""
+      unpublish: "Kan ikkje fjerne publisering av emnet dersom det finst studentinnleveringar.\""
     group_list: 
       headings: 
-        groups: Kursgrupper
+        groups: Emnegrupper
     import_in_progress_notice: 
       course_import_notice: 
         status_link: Importstatus
-        text: "Eit eller fleire element vert importerte akkurat no. Dei vert synlege i kurset nedanfor når dei er tilgjengelege."
+        text: "Eit eller fleire element vert importerte akkurat no. Dei vert synlege i emnet nedanfor når dei er tilgjengelege."
     index: 
-      browse_more_courses: "Bla gjennom fleire kurs"
+      browse_more_courses: "Bla gjennom fleire emne"
       headings: 
         future_enrollments: "Komande påmeldingar"
-        my_courses: "Alle kurs"
+        my_courses: "Alle emne"
         my_groups: "Mine grupper"
         past_enrollments: "Tidlegare påmeldingar"
-      start_new_course: Kurs
+      start_new_course: Emne
       titles: 
-        courses: Kurs
+        courses: Emne
         rss: 
           course_announcements: "Emnekunngjeringar i Atom-format"
     link_enrollment: 
       buttons: 
         link: "Lenke til student"
       details: |-
-          Når ein observatør er kopla til ein student, har dei begge tilgang til studenten sine karakterar og kurssamhandlingar. *Akkurat no er observatøren kopla til studenten %{student}.*
+          Når ein observatør er kopla til ein student, har dei begge tilgang til studenten sine karakterar og emnesamhandlingar. *Akkurat no er observatøren kopla til studenten %{student}.*
           
-          Om du vil kople kursobservatøren %{user} til ein student, må du velje studenten sitt namn frå lista nedanfor."
+          Om du vil kople emneobservatøren %{user} til ein student, må du velje studenten sitt namn frå lista nedanfor."
       labels: 
         student: Student
       loading: "Lastar studentar ..."
       select_student: "Vel student"
     link_validator: 
-      link_validator: Kurskoplingsvalidator
-      page_title: Kurskoplingsvalidator
+      link_validator: Emnekoplingsvalidator
+      page_title: Emnekoplingsvalidator
     notices: 
       backup_restored: "Tryggingskopien er lagra på nytt."
-      concluded: "Kurset er avslutta"
-      deleted: "Kurset er sletta"
-      enrollment_not_active: "Medlemskapet i kurset %{course} er enno ikkje aktivert"
-      failed_conclude: "Kurset er ikkje fullført"
+      concluded: "Emnet er avslutta"
+      deleted: "Emnet er sletta"
+      enrollment_not_active: "Medlemskapet i emnet %{course} er enno ikkje aktivert"
+      failed_conclude: "Emnet er ikkje fullført"
       invitation_accepted: "Invitasjonen er godkjend.  Velkomen til %{course}!"
       invitation_cancelled: "Invitasjonen er kansellert."
       login_to_accept: "Du må logge på før du kan godkjenne påmeldinga."
-      preview_course: "Du er invitert til å ta del i dette kurset.  Du kan sjå deg rundt, men må godkjenne påmeldingsinvitasjonen før du kan ta del."
+      preview_course: "Du er invitert til å ta del i dette emnet.  Du kan sjå deg rundt, men må godkjenne påmeldingsinvitasjonen før du kan ta del."
       reset_test_student: "Teststudenten er nullstilt"
-      unconcluded: "Kurset er ikkje fullført"
-      updated: "Kurset er oppdatert."
+      unconcluded: "Emnet er ikkje fullført"
+      updated: "Emnet er oppdatert."
     recent_event: 
       all_graded: "alt er retta"
       needs_grading: "må karaktersetjast"
@@ -4563,9 +4569,9 @@ nn:
         validating: "Validerer ...\""
         will_not_be_added: "Brukarane har feil og vert ikkje lagt til. Sørg for at dei er korrekt formaterte."
       edit_sections_view: 
-        edit_sections_desc: "Klasser er ein annan måte å organisere brukarar på. Dette gjer at du kan undervise fleire klasser i det same kurset, og  ha alt kursinnhaldet på same plass. Nedanfor kan du flytte ein brukar til ei anna klasse, eller legge til/fjerne klassepåmeldingar. Brukarane må vere i minst eit område til kvar tid."
+        edit_sections_desc: "Klasser er ein annan måte å organisere brukarar på. Dette gjer at du kan undervise fleire klasser i det same emnet, og ha alt emneinnhaldet på same plass. Nedanfor kan du flytte ein brukar til ei anna klasse, eller legge til/fjerne klassepåmeldingar. Brukarane må vere i minst eit område til kvar tid."
       index: 
-        cannot_add_users: "Nye brukarar kan ikkje leggast til fordi kurset er avslutta"
+        cannot_add_users: "Nye brukarar kan ikkje leggast til fordi emnet er avslutta"
         filter_field_description: "Søk etter personar. Når du skriv i dette feltet, vert listene over personar automatisk filtrerte slik at dei berre inkluderer namna som samsvarer med dine inndata."
         group_set: Gruppesett
         people: Personar
@@ -4573,13 +4579,13 @@ nn:
         search_people: "Søk etter personar"
         title_add_people: "Legg til personar"
       invitations_view: 
-        accepted_invitation: "%{name} har allereie motteke og godkjent invitasjonen til å ta del i kurset, men du kan framleis sende invitasjonen på nytt om det er naudsynt."
-        admin_invitation_unaccepted: "%{name} har enno ikkje godkjent invitasjonen til å ta del i kurset. Invitasjonen vart send: %{time}"
-        invitations_pending_publish: "Invitasjonane vert ikkje sende før kurset er *publisert*"
-        student_invitation_unaccepted_available: "%{name} har enno ikkje godkjent invitasjonen til å ta del i kurset. Invitasjonen vart send: %{time}"
-        student_invitation_unaccepted_unavailable: "%{name} er lagt til kurset: %{time}"
+        accepted_invitation: "%{name} har allereie motteke og godkjent invitasjonen til å ta del i emnet, men du kan framleis sende invitasjonen på nytt om det er naudsynt."
+        admin_invitation_unaccepted: "%{name} har enno ikkje godkjent invitasjonen til å ta del i emnet. Invitasjonen vart send: %{time}"
+        invitations_pending_publish: "Invitasjonane vert ikkje sende før emnet er *publisert*"
+        student_invitation_unaccepted_available: "%{name} har enno ikkje godkjent invitasjonen til å ta del i emnet. Invitasjonen vart send: %{time}"
+        student_invitation_unaccepted_unavailable: "%{name} er lagt til emnet: %{time}"
       link_to_students_view: 
-        link_student_desc: "Når ein observatør er lenka til ein student, har begge tilgang til studenten sine karakterar og kurssamhandlingar.\""
+        link_student_desc: "Når ein observatør er lenka til ein student, har begge tilgang til studenten sine karakterar og emnesamhandlingar.\""
       resend_invitations: 
         pending_invitation: "1 invitasjon er ikkje godkjend."
         pending_invitations: "%{pendingInvitationsCount} invitasjonar er ikkje godkjende."
@@ -4594,11 +4600,11 @@ nn:
         links: 
           edit_sections: "Rediger klasser"
           link_to_students: "Lenker til studentar"
-          remove_from_course: "Fjern frå kurset"
+          remove_from_course: "Fjern frå emnet"
           resend_invitation: "Send invitasjonen på nytt"
           user_details: Brukardetaljar
         manage_user: "Administrer %{name}"
-        pending_acceptance_explanation: "Brukaren har enno ikkje godkjent invitasjonen til kurset"
+        pending_acceptance_explanation: "Brukaren har enno ikkje godkjent invitasjonen til emnet"
         pending_acceptance_of_invitation: ventar
       roster_users: 
         canvas_user_id: "Brukar-ID i Canvas"
@@ -4615,35 +4621,35 @@ nn:
     section: 
       enrollment: 
         links: 
-          unenroll_user: "Fjern brukaren frå kurset"
+          unenroll_user: "Fjern brukaren frå emnet"
     settings: 
       alerts_title: Varsel
       buttons: 
         add_section: Klasse
         edit_section_name: "Rediger klassenamn"
         move_course: "Flytt kurs"
-        update_course: "Oppdater kursdetaljar"
-      course_conclude_at_warning_message: "Kurset er sett til å slutte ved midnatt, som betyr at føregåande dag er den siste dagen kurset er aktivt."
-      course_conclude_at_warning_title: "Kurset sluttar ved midnatt"
-      course_open_enrollment: "Kurset har open påmelding. Studentane kan sjølve melde seg på kurset dersom du  deler denne URL-en med dei: *%{url}*. Eller dei kan melde seg på  i *%{url2}* og bruke følgande kode: *%{code}*"
-      course_open_enrollment_without_code: "Kurset har open påmelding. Studentane kan sjølve melde seg på kurset dersom du  deler denne URL-en med dei: *%{url}*"
+        update_course: "Oppdater emnedetaljar"
+      course_conclude_at_warning_message: "Emnet er sett til å slutte ved midnatt, som betyr at føregåande dag er den siste dagen emnet er aktivt."
+      course_conclude_at_warning_title: "Emnet sluttar ved midnatt"
+      course_open_enrollment: "Emnet har open påmelding. Studentane kan sjølve melde seg på emnet dersom du deler denne URL-en med dei: *%{url}*. Eller dei kan melde seg på  i *%{url2}* og bruke følgande kode: *%{code}*"
+      course_open_enrollment_without_code: "Emnet har open påmelding. Studentane kan sjølve melde seg på emnet dersom du  deler denne URL-en med dei: *%{url}*"
       course_overrides_term: "Dette overstyrer innstillingar for tilgjenge i semesteret."
-      course_settings_title: Kursinnstillingar
+      course_settings_title: Emneinnstillingar
       deatils: 
         move_course: "Vel ein ny rotkonto for kurset. Etter at du har flytta kurset må du oppgi ei ny avdeling for kurset."
-      drag_details: "Når du deaktiverer sider vert studentane som vitjar sidene omdirigerte til kurset si startside."
+      drag_details: "Når du deaktiverer sider vert studentane som vitjar sidene omdirigerte til emnet si startside."
       drag_to_hide: "Dra element hit om du vil skjule dei frå studentane."
       enrollment_count: 
         one: "1 brukar"
         other: "%{count} brukarar"
       headings: 
-        details: Kursdetaljar
+        details: Emnedetaljar
         grade_publishing: "Publisering av karakterar"
         move_course: "Flytt kurset til ein annan rotkonto"
-        navigation: Kursnavigering
-        sections: "Klasser i kurs"
+        navigation: Emnenavigering
+        sections: "Klasser i emnet"
       help: 
-        edit_navigation: "Dra og slepp elementa for å omorganisere dei i kursnavigasjonen."
+        edit_navigation: "Dra og slepp elementa for å omorganisere dei i emnenavigasjonen."
       images: 
         alt: 
           delete: Slett
@@ -4663,15 +4669,16 @@ nn:
         allow_student_forum_attachments: "La studentane legge ved filer i diskusjonar"
         allow_student_organized_groups: "La studentane organisere eigne grupper"
         conclude_at: Sluttar
-        course_code: Kurskode
+        course_code: Emnekode
         course_description: Skildring
         course_epub_export: EPUB-eksport
         course_format: Format
         course_lock_all_announcements: "Slå av kommentering av kunngjeringar"
         course_name: Namn
+        course_offline_export: "Fråkopla emne"
         course_section_name: "Legg til ei ny klasse"
-        course_status_published: "Kurset er publisert"
-        course_status_unpublished: "Kurset er ikkje publisert"
+        course_status_published: "Emnet er publisert"
+        course_status_unpublished: "Emnet er ikkje publisert"
         course_visibility: Synlegheit
         custom_course_visibility: Tilpass
         enrollment_term_id: Semester
@@ -4680,23 +4687,24 @@ nn:
         hide_distribution_graphs: "Skjul grafar for karakterfordeling for studentane"
         hide_final_grades: "Skjul totalen i studentane sitt karaktersamandrag"
         image: Bilde
-        indexed: "Inkluder dette kurset i den offentlege kurslista"
+        indexed: "Inkluder dette emnet i den offentlege emnelista"
         is_public_to_auth_users: "Gjer dette kurset synleg for godkjende brukarar"
         language: Språk
         license: Lisens
-        open_enrollment: "Legg til ei \"Delta i dette kurset\"-lenke på kurset si startside"
+        open_enrollment: "Legg til ei \"Delta i dette emnet\"-lenke på emnet si startside"
         public_syllabus: "Gjer undervisingsplanen offentleg synleg"
-        restrict_enrollments_to_course_dates: "Brukarar kan berre delta i kurset mellom desse datoane"
-        restrict_student_future_view: "Avgrens studentane frå å sjå kurset før startdato"
-        restrict_student_past_view: "Avgrens studentane frå å sjå kurset etter sluttdato"
+        restrict_enrollments_to_course_dates: "Brukarar kan berre delta i emnet mellom desse datoane"
+        restrict_student_future_view: "Avgrens studentane frå å sjå emnet før startdato"
+        restrict_student_past_view: "Avgrens studentane frå å sjå emnet etter sluttdato"
         root_account: Rotkonto
         root_account_id: Rotkonto
+        show_announcements_on_home_page: "Sjå nylege kunngjeringar på emnet si heimeside"
         sis_source_id: SIS-ID
         start_at: Startar
         storage_quota: Fillagring
         time_zone: Tidssone
         turnitin_comments: Turnitin-kommentarar
-      language_overrides_preferences: "Det overstyrer alle språkpreferansar for alle brukarar og system. Og er berre tilrådd for framandspråklege kurs"
+      language_overrides_preferences: "Dette overstyrer alle språkpreferansar for alle brukarar og system. Det er berre tilrådd for framandspråklege emne."
       links: 
         more_options: "fleire alternativ"
         move_course: "Flytt til ein annan konto"
