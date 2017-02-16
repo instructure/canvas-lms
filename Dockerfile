@@ -16,6 +16,7 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -\
        unzip \
        fontforge \
        python-lxml \
+       libicu-dev \
   && npm install -g gulp \
   && rm -rf /var/lib/apt/lists/*\
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0

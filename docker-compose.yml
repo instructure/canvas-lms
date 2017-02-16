@@ -13,7 +13,7 @@ services:
     command: bundle exec script/delayed_job run
 
   postgres:
-    image: postgres:9.3
+    build: ./docker-compose/postgres
 
   redis:
     image: redis:2.6
