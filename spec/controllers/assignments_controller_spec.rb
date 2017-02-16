@@ -326,6 +326,29 @@ describe AssignmentsController do
       get 'new', :course_id => @course.id, :id => @assignment.id
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
+
+    context "with ?quiz_lti query param" do
+      it "uses quizzes 2 if available" do
+        tool = @course.context_external_tools.create!(
+          :name => 'Quizzes.Next',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'Quizzes 2',
+          :url => 'http://example.com/launch'
+        )
+        user_session(@teacher)
+        get 'new', :course_id => @course.id, :quiz_lti => true
+        expect(assigns[:assignment].quiz_lti?).to be true
+        expect(assigns[:assignment].external_tool_tag.content).to eq tool
+        expect(assigns[:assignment].external_tool_tag.url).to eq tool.url
+      end
+
+      it "falls back to normal behaviour if quizzes 2 is not set up" do
+        user_session(@teacher)
+        get 'new', :course_id => @course.id, :quiz => true
+        expect(assigns[:assignment].quiz_lti?).to be false
+      end
+    end
   end
 
   describe "POST 'create'" do

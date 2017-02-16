@@ -865,6 +865,12 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[omit_from_final_grade] [Boolean]
   #   Whether this assignment is counted towards a student's final grade.
   #
+  # @argument assignment[quiz_lti] [Boolean]
+  #   Whether this assignment should use the Quizzes 2 LTI tool. Sets the
+  #   submission type to 'external_tool' and configures the external tool
+  #   attributes to use the Quizzes 2 LTI tool configured for this course.
+  #   Has no effect if no Quizzes 2 LTI tool is configured.
+  #
   # @returns Assignment
   def create
     @assignment = @context.assignments.build

@@ -799,6 +799,33 @@ describe Course do
       expect(@course.turnitin_originality).to eq("after_grading")
     end
   end
+
+  describe '#quiz_lti_tool' do
+    before do
+      @course.save!
+      @tool = ContextExternalTool.new(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+    end
+
+    it 'returns the quiz LTI tool for the course' do
+      @course.context_external_tools << @tool
+      expect(@course.quiz_lti_tool).to eq @tool
+    end
+
+    it 'returns the quiz LTI tool for the account if not set up on the course' do
+      @course.account.context_external_tools << @tool
+      expect(@course.quiz_lti_tool).to eq @tool
+    end
+
+    it 'returns nil if no quiz LTI tool is configured' do
+      expect(@course.quiz_lti_tool).to be nil
+    end
+  end
 end
 
 describe Course do

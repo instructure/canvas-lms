@@ -765,3 +765,28 @@ define [
     assignment.omitFromFinalGrade true
     json = assignment.toView()
     ok json.omitFromFinalGrade
+
+  QUnit.module "Assignment#isQuizLTIAssignment"
+
+  test "returns true if record uses quizzes 2", ->
+    assignment = new Assignment name: 'foo', is_quiz_lti_assignment: true
+    equal assignment.isQuizLTIAssignment(), true
+
+  test "returns false if record does not use quizzes 2", ->
+    assignment = new Assignment name: 'foo', is_quiz_lti_assignment: false
+    equal assignment.isQuizLTIAssignment(), false
+
+  QUnit.module "Assignment#canFreeze"
+
+  test "returns true if record is not frozen", ->
+    assignment = new Assignment name: 'foo', frozen_attributes: []
+    equal assignment.canFreeze(), true
+
+  test "returns false if record is frozen", ->
+    assignment = new Assignment name: 'foo', frozen_attributes: [], frozen: true
+    equal assignment.canFreeze(), false
+
+  test "returns false if record uses quizzes 2", ->
+    assignment = new Assignment name: 'foo', frozen_attributes: []
+    @stub assignment, "isQuizLTIAssignment", -> true
+    equal assignment.canFreeze(), false

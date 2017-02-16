@@ -684,3 +684,24 @@ define [
     view.$('#assignment_online_upload').attr('checked', true)
     view.handleSubmissionTypeChange()
     equal view.$('#similarity_detection_tools').css('display'), 'none'
+
+  QUnit.module 'EditView: Quizzes 2',
+    setup: ->
+      fakeENV.setup()
+      ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
+      @view = editView submission_types: ['external_tool'], is_quiz_lti_assignment: true
+
+    teardown: ->
+      @server.restore()
+      fakeENV.teardown()
+      document.getElementById('fixtures').innerHTML = ''
+
+  test 'does not show the description textarea', ->
+    equal @view.$description.length, 0
+
+  test 'does not show the moderated grading checkbox', ->
+    equal @view.$moderatedGradingBox.length, 0
+
+  test 'does not show the load in new tab checkbox', ->
+    equal @view.$externalToolsNewTab.length, 0

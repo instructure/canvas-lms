@@ -3095,6 +3095,12 @@ class Course < ActiveRecord::Base
     effective_due_dates.any_in_closed_grading_period?
   end
 
+  def quiz_lti_tool
+    query = { tool_id: 'Quizzes 2' }
+    context_external_tools.active.find_by(query) ||
+      account.context_external_tools.active.find_by(query)
+  end
+
   private
 
   def effective_due_dates

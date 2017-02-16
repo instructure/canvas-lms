@@ -348,6 +348,8 @@ class AssignmentsController < ApplicationController
       @assignment.lti_context_id = secure_params[:lti_context_id]
     end
 
+    @assignment.quiz_lti! if params.key?(:quiz_lti)
+
     @assignment.workflow_state ||= "unpublished"
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
@@ -380,6 +382,7 @@ class AssignmentsController < ApplicationController
     elsif @context.feature_enabled?(:conditional_release) && params[:submission_types] == 'wiki_page'
       redirect_to new_polymorphic_url([@context, :wiki_page], index_edit_params)
     else
+      @assignment.quiz_lti! if params.key?(:quiz_lti)
       edit
     end
   end
