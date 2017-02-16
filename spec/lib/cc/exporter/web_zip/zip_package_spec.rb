@@ -181,6 +181,35 @@ describe "ZipPackage" do
       expect(module_item_data[2][:pointsPossible]).to eq 0.0
     end
 
+    it "should parse graded status for assignments, quizzes and graded discussions" do
+      assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10)
+      @module.content_tags.create!(content: assign, context: @course)
+      graded_discussion = @course.assignments.create!(title: 'Disc 2', points_possible: 3,
+        submission_types: 'discussion_topic')
+      @module.content_tags.create!(content: graded_discussion, context: @course)
+      quiz = @course.quizzes.create!(title: 'Quiz 1')
+      @module.content_tags.create!(content: quiz, context: @course, indent: 1)
+
+      module_item_data = @zip_package.parse_module_item_data(@module)
+      expect(module_item_data[0][:graded]).to be true
+      expect(module_item_data[1][:graded]).to be true
+      expect(module_item_data[2][:graded]).to be true
+    end
+
+    it "should parse graded status for not graded assignments, quizzes and discussions" do
+      assign = @course.assignments.create!(title: 'Assignment 1', grading_type: 'not_graded')
+      @module.content_tags.create!(content: assign, context: @course)
+      discussion = @course.discussion_topics.create!(title: 'Disc 2')
+      @module.content_tags.create!(content: discussion, context: @course)
+      quiz = @course.quizzes.create!(title: 'Quiz 1', quiz_type: 'survey')
+      @module.content_tags.create!(content: quiz, context: @course, indent: 1)
+
+      module_item_data = @zip_package.parse_module_item_data(@module)
+      expect(module_item_data[0][:graded]).to be false
+      expect(module_item_data[1][:graded]).to be false
+      expect(module_item_data[2][:graded]).to be false
+    end
+
     it "should parse due dates for assignments, quizzes and graded discussions" do
       due = 1.day.from_now
       unlock = 1.day.ago
@@ -201,15 +230,17 @@ describe "ZipPackage" do
       @module.content_tags.create!(content: assign, context: @course)
 
       module_item_data = @zip_package.parse_module_item_data(@module).first
-      expect(module_item_data[:submissionTypes]).to eq 'online_text_entry,online_upload'
+      expect(module_item_data[:submissionTypes]).to eq 'a text entry box or a file upload'
     end
 
-    it "should parse question count for quizzes" do
-      quiz = assignment_quiz([], course: @course)
+    it "should parse question count, time limit and allowed attempts for quizzes" do
+      quiz = @course.quizzes.create!(title: 'Quiz 1', time_limit: 5, allowed_attempts: 2)
       @module.content_tags.create!(content: quiz, context: @course, indent: 1)
 
       module_item_data = @zip_package.parse_module_item_data(@module).first
       expect(module_item_data[:questionCount]).to eq 0
+      expect(module_item_data[:timeLimit]).to eq 5
+      expect(module_item_data[:attempts]).to eq 2
     end
 
     it "should parse module item requirements" do

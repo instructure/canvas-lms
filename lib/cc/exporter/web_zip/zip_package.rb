@@ -153,14 +153,19 @@ module CC::Exporter::WebZip
       case item.content_type
       when 'Assignment'
         assignment = item.content
-        item_hash[:submissionTypes] = assignment.submission_types
+        item_hash[:submissionTypes] = assignment.readable_submission_types
+        item_hash[:graded] = assignment.grading_type != 'not_graded'
       when 'Quizzes::Quiz'
         assignment = item.content
         item_hash[:questionCount] = assignment.question_count
+        item_hash[:timeLimit] = assignment.time_limit
+        item_hash[:attempts] = assignment.allowed_attempts
+        item_hash[:graded] = assignment.quiz_type != 'survey'
       when 'DiscussionTopic'
         assignment = item.content&.assignment
+        item_hash[:graded] = assignment.present?
       end
-      item_hash[:pointsPossible] = assignment&.points_possible
+      item_hash[:pointsPossible] = assignment&.points_possible if item_hash[:graded]
       item_hash[:dueAt] = force_timezone(assignment&.due_at)
       item_hash[:lockAt] = force_timezone(assignment&.lock_at)
       item_hash[:unlockAt] = force_timezone(assignment&.unlock_at)
