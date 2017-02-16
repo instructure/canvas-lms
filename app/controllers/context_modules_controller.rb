@@ -408,7 +408,7 @@ class ContextModulesController < ApplicationController
       else
         @progression.collapsed = !@progression.collapsed
       end
-      @progression.save
+      @progression.save unless @progression.new_record?
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_context_modules_url) }
         format.json { render :json => (@progression.collapsed ? @progression : @module.content_tags_visible_to(@current_user) )}
