@@ -11595,13 +11595,12 @@ zh-Hans:
     grading_policies_description: 课程评分政策更改
     grading_policies_display: 评分政策
     invitation_description: |-
-        以下各项的邀请:
+        邀请：
         
-        * 网络会议
+        * Web 会议
         * 小组
         * 协作
-        * 课程
-        * 同侪审阅和提醒
+        * 同行评估和提醒
     invitation_display: 邀请
     late_grading_description: |-
         *仅适用于导师和管理员：*⏎
