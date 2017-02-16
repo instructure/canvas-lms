@@ -1518,6 +1518,16 @@ describe Attachment do
       expect(a.open.read).to eq "this is a jpeg"
     end
 
+    it "should not overwrite the content_type if already present" do
+      url = "http://example.com/test.png"
+      a = attachment_model(:content_type => 'image/jpeg')
+      CanvasHttp.expects(:get).with(url).yields(FakeHttpResponse.new('200', 'this is a jpeg', 'content-type' => 'application/octet-stream'))
+      Attachment.clone_url_as_attachment(url, :attachment => a)
+      a.save!
+      expect(a.open.read).to eq "this is a jpeg"
+      expect(a.content_type).to eq 'image/jpeg'
+    end
+
     it "should detect the content_type from the body" do
       url = "http://example.com/test.png"
       CanvasHttp.expects(:get).with(url).yields(FakeHttpResponse.new('200', 'this is a jpeg', 'content-type' => 'image/jpeg'))

@@ -1602,7 +1602,12 @@ class Attachment < ActiveRecord::Base
         attachment.filename ||= File.basename(uri.path)
         attachment.uploaded_data = tmpfile
         if attachment.content_type.blank? || attachment.content_type == "unknown/unknown"
-          attachment.content_type = http_response.content_type
+          # uploaded_data= clobbers the content_type set in preflight; if it was given, prefer it to the HTTP response
+          attachment.content_type = if attachment.content_type_was.present? && attachment.content_type_was != 'unknown/unknown'
+            attachment.content_type_was
+          else
+            http_response.content_type
+          end
         end
         return attachment
       else
