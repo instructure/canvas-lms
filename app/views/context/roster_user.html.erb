@@ -129,7 +129,7 @@
                   </div>
                 <% end %>
                 <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.completed? || enrollment.inactive? %>" class="completed_at_holder">
-                  <% if enrollment.inactive? %>
+                  <% if enrollment.workflow_state == 'inactive' %>
                     <%= t 'inactive' %>
                   <% elsif enrollment.completed_at %>
                     <%= t 'completed_enrollment', "completed *%{completed_at}*", :completed_at => datetime_string(enrollment.completed_at), :wrapper => '<span class="completed_at">\1</span>' %>
