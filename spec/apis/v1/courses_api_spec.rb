@@ -3480,3 +3480,102 @@ describe CoursesController, type: :request do
     end
   end
 end
+
+describe CoursesController, type: :request do
+  describe "course#user(s)" do
+    let_once(:account) { Account.default }
+    let_once(:test_course) { account.courses.create! }
+    let_once(:grading_period) do
+      account.enable_feature!(:multiple_grading_periods)
+      group = account.grading_period_groups.create!(title: "Score Test Group")
+      group.enrollment_terms << test_course.enrollment_term
+      Factories::GradingPeriodHelper.new.create_presets_for_group(group, :current)
+      group.grading_periods.first
+    end
+    let_once(:student) { student_in_course(course: test_course, active_all: true) }
+    let_once(:teacher) { teacher_in_course(course: test_course, active_all: true) }
+
+    before(:once) do
+      student.scores.create!(grading_period_id: grading_period.id,
+                             current_score: 100, final_score: 50)
+      student.scores.create!(current_score: 80, final_score: 74)
+    end
+
+    context "users endpoint with mgp" do
+      let(:users_path) {"/api/v1/courses/#{test_course.id}/users?include[]=enrollments" }
+      let(:users_options) do
+        {
+          controller: "courses",
+          action: "users",
+          format: "json",
+          course_id: test_course.id,
+          include: ['enrollments']
+        }
+      end
+
+      it "uses the total score by default" do
+        json = api_call_as_user(teacher.user, :get, users_path, users_options)
+        grades = json.find { |j| j['id'] == student.user.id }.dig('enrollments', 0, 'grades')
+
+        expect(grades).to include({
+          "current_score" => 80.0,
+          "final_score" => 74.0,
+        })
+      end
+
+      it "uses the current grading period score if requested" do
+        path = "#{users_path}&include[]=current_grading_period_scores"
+        users_options[:include] << 'current_grading_period_scores'
+
+        json = api_call_as_user(teacher.user, :get, path, users_options)
+        grades = json.find { |j| j['id'] == student.user.id }.dig('enrollments', 0, 'grades')
+
+        expect(grades).to include({
+          "current_score" => 100.0,
+          "final_score" => 50.0,
+          "grading_period_id" => grading_period.id
+        })
+      end
+    end
+
+    context "user endpoint with mgp" do
+      let(:user_path) do
+        "/api/v1/courses/#{test_course.id}/users/#{student.user.id}?include[]=enrollments"
+      end
+      let(:user_options) do
+        {
+          controller: "courses",
+          action: "user",
+          format: "json",
+          course_id: test_course.id,
+          id: student.user.id,
+          include: ['enrollments']
+        }
+      end
+
+      it "uses the total score by default" do
+        json = api_call_as_user(teacher.user, :get, user_path, user_options)
+        grades = json.dig('enrollments', 0, 'grades')
+
+        expect(grades).to include({
+          "current_score" => 80.0,
+          "final_score" => 74.0,
+        })
+      end
+
+      it "uses the current grading period score if requested" do
+        path = "#{user_path}&include[]=current_grading_period_scores"
+        user_options[:include] << 'current_grading_period_scores'
+
+        json = api_call_as_user(teacher.user, :get, path, user_options)
+        grades = json.dig('enrollments', 0, 'grades')
+
+        expect(grades).to include({
+          "current_score" => 100.0,
+          "final_score" => 50.0,
+          "grading_period_id" => grading_period.id
+        })
+      end
+    end
+  end
+end
