@@ -308,7 +308,7 @@ class AssessmentItemConverter
         end
       when /associateinteraction|matching_question|matchinteraction/i
         q = AssociateInteraction.new(opts)
-      when /extendedtextinteraction|textinteraction|essay_question|short_answer_question/i
+      when /extendedtextinteraction|extendedtextentryinteraction|textinteraction|essay_question|short_answer_question/i
         if opts[:custom_type] and opts[:custom_type] =~ /calculated/i
           q = CalculatedInteraction.new(opts)
         elsif opts[:custom_type] and opts[:custom_type] =~ /numeric|numerical_question/
