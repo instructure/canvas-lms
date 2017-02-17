@@ -20,9 +20,9 @@
      data-course_id="{{course_id}}"
      class="roster_user_name student_context_card_trigger">
      {{#if roster_name}}
-       {{roster_name}}
+       <span id="roster_name_{{id}}">{{roster_name}}</span>
      {{else}}
-       {{name}}
+       <span id="roster_name_{{id}}">{{name}}</span>
      {{/if}}
      </a>
 {{/if}}
