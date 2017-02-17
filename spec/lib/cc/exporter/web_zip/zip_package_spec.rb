@@ -365,4 +365,21 @@ describe "ZipPackage" do
       expect(module_item_data.length).to eq 0
     end
   end
+
+  context "convert_html_to_local" do
+    before do
+      @zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, 'key')
+    end
+
+    it "should export html links as local content links" do
+      filename_prefix = @zip_package.instance_variable_get(:@filename_prefix)
+      attachment_model(context: @course, display_name: 'file1.jpg', filename: 'file1.jpg')
+      html = %(<a href="/courses/#{@course.id}/files/#{@attachment.id}/download") +
+             %( data-api-returntype="File">file1.jpg</a>)
+      expected_html = %(<a href="#{filename_prefix}/viewer/files/file1.jpg?canvas_download=1") +
+                      %( data-api-returntype="File">file1.jpg</a>)
+      converted_html = @zip_package.convert_html_to_local(html)
+      expect(converted_html).to eq expected_html
+    end
+  end
 end
