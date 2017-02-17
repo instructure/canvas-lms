@@ -823,7 +823,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "email"|"enrollments"|"locked"|"avatar_url"|"test_student"|"bio"|"custom_links"]
+  # @argument include[] [String, "email"|"enrollments"|"locked"|"avatar_url"|"test_student"|"bio"|"custom_links"|"current_grading_period_scores"]
   #   - "email": Optional user email.
   #   - "enrollments":
   #   Optionally include with each Course the user's current and invited
@@ -838,6 +838,13 @@ class CoursesController < ApplicationController
   #   if present. Default is to not include Test Student.
   #   - "custom_links": Optionally include plugin-supplied custom links for each student,
   #   such as analytics information
+  #   - "current_grading_period_scores": if enrollments is included as
+  #   well as this directive, the scores returned in the enrollment
+  #   will be for the current grading period if there is one. A
+  #   'grading_period_id' value will also be included with the
+  #   scores. if grading_period_id is nil there is no current grading
+  #   period and the score is a total score.
+  #
   # @argument user_id [String]
   #   If this parameter is given and it corresponds to a user in the course,
   #   the +page+ parameter will be ignored and the page containing the specified user
@@ -900,7 +907,7 @@ class CoursesController < ApplicationController
       if includes.include?('enrollments')
         enrollment_scope = @context.enrollments.
           where(user_id: users).
-          preload(:course)
+          preload(:course, :scores)
 
         if search_params[:enrollment_state]
           enrollment_scope = enrollment_scope.where(:workflow_state => search_params[:enrollment_state])
