@@ -29,6 +29,7 @@ class User < ActiveRecord::Base
 
 
   include Context
+  include ModelCache
 
   attr_accessor :previous_id, :menu_data, :gradebook_importer_submissions, :prior_enrollment
 
