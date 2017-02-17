@@ -92,9 +92,9 @@ Delayed::Worker.lifecycle.around(:pop) do |worker, &block|
   end
 end
 
-Delayed::Worker.lifecycle.around(:work_queue_pop) do |worker, &block|
+Delayed::Worker.lifecycle.around(:work_queue_pop) do |worker, config, &block|
   CanvasStatsd::Statsd.time(["delayedjob.workqueuepop", "delayedjob.workqueuepop.jobshard.#{Shard.current(:delayed_jobs).id}"]) do
-    block.call(worker)
+    block.call(worker, config)
   end
 end
 
