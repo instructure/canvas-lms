@@ -94,6 +94,7 @@ module LtiOutbound
         hash['custom_canvas_user_login_id'] = '$Canvas.user.loginId'
         if context.is_a?(LTICourse)
           hash['custom_canvas_course_id'] = '$Canvas.course.id'
+          hash['custom_canvas_workflow_state'] = '$Canvas.course.workflowState'
           hash['lis_course_offering_sourcedid'] = '$CourseSection.sourcedId' if context.sis_source_id
         elsif context.is_a?(LTIAccount) || context.is_a?(LTIUser)
           hash['custom_canvas_account_id'] = '$Canvas.account.id'

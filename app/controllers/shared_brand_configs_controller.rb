@@ -42,8 +42,8 @@
 #
 
 class SharedBrandConfigsController < ApplicationController
-  before_filter :require_account_context, except: [:destroy]
-  before_filter :require_user
+  before_action :require_account_context, except: [:destroy]
+  before_action :require_user
   before_action :set_shared_brand_config, only: [:destroy, :update]
 
 
@@ -121,6 +121,6 @@ class SharedBrandConfigsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def shared_brand_config_params
-      strong_params.require(:shared_brand_config).permit(:brand_config_md5, :name)
+      params.require(:shared_brand_config).permit(:brand_config_md5, :name)
     end
 end

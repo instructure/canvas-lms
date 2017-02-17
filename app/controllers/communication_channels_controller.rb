@@ -78,8 +78,8 @@
 #     }
 #
 class CommunicationChannelsController < ApplicationController
-  before_filter :require_user, :only => [:create, :destroy]
-  before_filter :reject_student_view_student
+  before_action :require_user, :only => [:create, :destroy]
+  before_action :reject_student_view_student
 
   include Api::V1::CommunicationChannel
 
@@ -338,13 +338,14 @@ class CommunicationChannelsController < ApplicationController
         # User chose to continue with this cc/pseudonym/user combination on confirmation page
         if @pseudonym && params[:register]
           @user.require_acceptance_of_terms = require_terms?
-          @user.attributes = params[:user] if params[:user]
+          @user.attributes = params[:user].permit(:time_zone, :subscribe_to_emails, :terms_of_use) if params[:user]
 
           if params[:pseudonym]
+            pseudonym_params = params[:pseudonym].permit(:password, :password_confirmation, :unique_id)
             if @pseudonym.unique_id.present?
-              params[:pseudonym].delete(:unique_id)
+              pseudonym_params.delete(:unique_id)
             end
-            @pseudonym.attributes = params[:pseudonym]
+            @pseudonym.attributes = pseudonym_params
           end
 
           @pseudonym.communication_channel = cc

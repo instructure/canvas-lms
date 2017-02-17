@@ -54,7 +54,7 @@ module CC
 
           add_exported_asset(rubric)
 
-          migration_id = CCHelper.create_key(rubric)
+          migration_id = create_key(rubric)
           rubrics_node.rubric(:identifier=>migration_id) do |r_node|
             atts = [:read_only, :title, :reusable, :public, :points_possible,
                     :hide_score_total, :free_form_criterion_comments]
@@ -92,7 +92,7 @@ module CC
         c_node.long_description criterion[:long_description] unless criterion[:long_description].blank?
         if criterion[:learning_outcome_id].present?
           if lo = @course.available_outcome(criterion[:learning_outcome_id])
-            c_node.learning_outcome_identifierref CCHelper.create_key(lo)
+            c_node.learning_outcome_identifierref create_key(lo)
           end
         end
 

@@ -1,4 +1,4 @@
-class AddUniqueIndexOnLtiContextId < ActiveRecord::Migration
+class AddUniqueIndexOnLtiContextId < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

@@ -21,8 +21,8 @@ require 'atom'
 class AnnouncementsController < ApplicationController
   include Api::V1::DiscussionTopics
 
-  before_filter :require_context, :except => :public_feed
-  before_filter { |c| c.active_tab = "announcements" }
+  before_action :require_context, :except => :public_feed
+  before_action { |c| c.active_tab = "announcements" }
 
   def index
     return unless authorized_action(@context, @current_user, :read)

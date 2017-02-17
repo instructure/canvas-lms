@@ -1,4 +1,4 @@
-class PopulateStreamItemNotificationCategory < ActiveRecord::Migration
+class PopulateStreamItemNotificationCategory < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

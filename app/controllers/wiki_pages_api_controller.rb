@@ -135,11 +135,11 @@
 #     }
 #
 class WikiPagesApiController < ApplicationController
-  before_filter :require_context
-  before_filter :get_wiki_page, :except => [:create, :index]
-  before_filter :require_wiki_page, :except => [:create, :update, :update_front_page, :index]
-  before_filter :was_front_page, :except => [:index]
-  before_filter only: [:show, :update, :destroy, :revisions, :show_revision, :revert] do
+  before_action :require_context
+  before_action :get_wiki_page, :except => [:create, :index]
+  before_action :require_wiki_page, :except => [:create, :update, :update_front_page, :index]
+  before_action :was_front_page, :except => [:index]
+  before_action only: [:show, :update, :destroy, :revisions, :show_revision, :revert] do
     check_differentiated_assignments(@page) if @context.feature_enabled?(:conditional_release)
   end
 
@@ -250,7 +250,10 @@ class WikiPagesApiController < ApplicationController
       scope = scope.order(order_clause)
 
       wiki_pages = Api.paginate(scope, self, pages_route)
-      render :json => wiki_pages_json(wiki_pages, @current_user, session)
+
+      check_for_restrictions = master_courses? && @context.wiki.grants_right?(@current_user, :manage)
+      MasterCourses::Restrictor.preload_restrictions(wiki_pages) if check_for_restrictions
+      render :json => wiki_pages_json(wiki_pages, @current_user, session, :include_master_course_restrictions => check_for_restrictions)
     end
   end
 
@@ -290,8 +293,8 @@ class WikiPagesApiController < ApplicationController
   #
   # @returns Page
   def create
-    initial_params = params.slice(:url)
-    initial_params.merge! (params[:wiki_page] || {}).slice(:url, :title)
+    initial_params = params.permit(:url)
+    initial_params.merge!(params[:wiki_page] ? params[:wiki_page].permit(:url, :title) : {})
 
     @wiki = @context.wiki
     @page = @wiki.build_wiki_page(@current_user, initial_params)
@@ -391,6 +394,7 @@ class WikiPagesApiController < ApplicationController
   # @returns Page
   def destroy
     if authorized_action(@page, @current_user, :delete)
+      return render_unauthorized_action if editing_restricted?(@page)
       if !@was_front_page
         @page.destroy
         process_front_page
@@ -532,7 +536,7 @@ class WikiPagesApiController < ApplicationController
 
   def get_update_params(allowed_fields=Set[])
     # normalize parameters
-    page_params = (params[:wiki_page] || {}).slice(*%w(title body notify_of_update published front_page editing_roles))
+    page_params = params[:wiki_page] ? params[:wiki_page].permit(*%w(title body notify_of_update published front_page editing_roles)) : {}
 
     if page_params.has_key?(:published)
       published_value = page_params.delete(:published)
@@ -622,7 +626,7 @@ class WikiPagesApiController < ApplicationController
   end
 
   def assignment_params
-    params[:wiki_page] && strong_params[:wiki_page][:assignment]
+    params[:wiki_page] && params[:wiki_page][:assignment]
   end
 
   def process_front_page

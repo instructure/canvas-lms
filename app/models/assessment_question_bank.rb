@@ -18,16 +18,18 @@
 
 class AssessmentQuestionBank < ActiveRecord::Base
   include Workflow
-  strong_params
 
   belongs_to :context, polymorphic: [:account, :course]
   has_many :assessment_questions, -> { order('assessment_questions.name, assessment_questions.position, assessment_questions.created_at') }
   has_many :assessment_question_bank_users
-  has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, class_name: 'ContentTag'
+  has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
   has_many :quiz_groups, class_name: 'Quizzes::QuizGroup'
   before_save :infer_defaults
   after_save :update_alignments
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
+
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:title]
 
   workflow do
     state :active
@@ -95,9 +97,9 @@ class AssessmentQuestionBank < ActiveRecord::Base
     # add/update current alignments
     unless outcomes.empty?
       alignments.each do |outcome_id, mastery_score|
-        outcome = outcomes.detect{ |outcome| outcome.id == outcome_id.to_i }
-        next unless outcome
-        outcome.align(self, context, :mastery_score => mastery_score)
+        matching_outcome = outcomes.detect{ |outcome| outcome.id == outcome_id.to_i }
+        next unless matching_outcome
+        matching_outcome.align(self, context, :mastery_score => mastery_score)
       end
     end
   end
@@ -121,13 +123,14 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
 
   def select_for_submission(quiz_id, quiz_group_id, count, exclude_ids=[], duplicate_index = 0)
+    # 1. select a random set of questions from the DB
     questions = assessment_questions.active
     questions = questions.where.not(id: exclude_ids) unless exclude_ids.empty?
-    questions = questions.order("RANDOM()").limit(count)
-    aqs = questions.to_a
+    questions = questions.reorder("RANDOM()").limit(count)
+    # 2. process the questions in :id order to minimize the risk of deadlock
+    aqs = questions.to_a.sort_by(&:id)
     quiz_questions = AssessmentQuestion.find_or_create_quiz_questions(aqs, quiz_id, quiz_group_id, duplicate_index)
-    # it's important that this shuffle come after the db updates, otherwise
-    # this can cause deadlocks when run in a transaction
+    # 3. re-randomize the resulting questions
     quiz_questions.shuffle
   end
 

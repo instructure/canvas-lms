@@ -1,4 +1,4 @@
-class AddNewTabToContentTags < ActiveRecord::Migration
+class AddNewTabToContentTags < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

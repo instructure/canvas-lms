@@ -5,7 +5,8 @@
 #
 module Canvas
   module RequestForgeryProtection
-    def form_authenticity_token
+    def form_authenticity_token(form_options: {})
+      # to implement per-form CSRF, see https://github.com/rails/rails/commit/3e98819e20bc113343d4d4c0df614865ad5a9d3a
       masked_authenticity_token
     end
 

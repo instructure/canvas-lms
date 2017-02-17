@@ -2,12 +2,12 @@ define [
   'jquery'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'compiled/models/File'
   'jsx/files/DragFeedback'
-], ($, React, ReactDOM, File, DragFeedback) ->
-  TestUtils = React.addons.TestUtils
+], ($, React, ReactDOM, TestUtils, File, DragFeedback) ->
 
-  module 'DragFeedback'
+  QUnit.module 'DragFeedback'
 
   test 'DF: shows a badge with number of items being dragged', ->
     file = new File(id: 1, name: 'Test File', thumbnail_url: 'blah')

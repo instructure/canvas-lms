@@ -48,7 +48,7 @@ describe Outcomes::ResultAnalytics do
 
   def outcome_from_score(score, args)
     title = args[:title] || "name, o1"
-    outcome = create_outcome(args)
+    outcome = args[:outcome] || create_outcome(args)
     user = args[:user] || MockUser[10, 'a']
     MockOutcomeResult[user, outcome, score, title, args[:submitted_time], args[:assessed_time]]
   end
@@ -64,7 +64,7 @@ describe Outcomes::ResultAnalytics do
 
   def create_quiz_outcome_results(outcome, title, *results)
     defaults = {
-      user: user,
+      user: MockUser[10, 'a'],
       learning_outcome: outcome,
       title: title,
       assessed_at: time,
@@ -229,6 +229,33 @@ describe Outcomes::ResultAnalytics do
       expect(aggregate_result.scores.map(&:score)).to eq [2.5, 6.0]
       expect(aggregate_result.scores[0].outcome_results.size).to eq 4
       expect(aggregate_result.scores[1].outcome_results.size).to eq 3
+    end
+
+    it "properly calculates a mix of assignment and quiz results" do
+      fake_context = MockUser.new(42, 'fake')
+      o1 = MockOutcome[80, 'decaying_average', 65, {points_possible: 5}]
+      o2 = MockOutcome[81, 'n_mastery', 3, {:mastery_points => 3.0, points_possible: 5}]
+      q_results1 = create_quiz_outcome_results(o1, "name, o1",
+        {score: 7.0, percent: 0.4, possible: 1.0, association_id: 1},
+        {score: 12.0, assessed_at: time - 1.day, percent: 0.9, possible: 1.0, association_id: 2}
+      )
+      q_results2 = create_quiz_outcome_results(o2, "name, o2",
+        {score: 30.0, percent: 0.2, possible: 1.0, association_id: 1},
+        {score: 75.0, percent: 0.5, possible: 1.0, association_id: 2},
+        {score: 120.0, percent: 0.8, possible: 1.0, association_id: 3}
+      )
+      a_results1 = [
+        outcome_from_score(3.0, {submitted_time: time - 2.days, outcome: o1}),
+        outcome_from_score(2.0, {submitted_time: time - 3.days, outcome: o1})
+      ]
+      a_results2 = [
+        outcome_from_score(3.0, {outcome: o2}),
+        outcome_from_score(3.5, {outcome: o2})
+      ]
+      results = [q_results1, q_results2, a_results1, a_results2].flatten
+      aggregate_result = ra.aggregate_outcome_results_rollup(results, fake_context)
+      expect(aggregate_result.size).to eq 2
+      expect(aggregate_result.scores.map(&:score)).to eq [2.41, 3.5]
     end
   end
 

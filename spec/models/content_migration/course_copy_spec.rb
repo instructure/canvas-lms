@@ -125,7 +125,7 @@ describe ContentMigration do
     end
 
     it "should keep date-locked files locked" do
-      student = user
+      student = user_factory
       @copy_from.enroll_student(student)
       att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt", :uploaded_data => StringIO.new('file'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from, :lock_at => 1.month.ago, :unlock_at => 1.month.from_now)
       expect(att.grants_right?(student, :download)).to be_falsey
@@ -182,6 +182,17 @@ describe ContentMigration do
 
       mod3_to = @copy_to.context_modules.where(migration_id: mig_id(mod3)).first
       expect(mod3_to.position).to eq 3 # put at end
+    end
+
+    it "shan't interweave module order when restoring deleting modules in the destination course neither" do
+      ['A', 'B'].map { |name| @copy_to.context_modules.create!(:name => name) }
+      ['C', 'D'].map { |name| @copy_from.context_modules.create!(:name => name) }
+      run_course_copy
+      expect(@copy_to.context_modules.order(:position).pluck(:name)).to eq(['A', 'B', 'C', 'D'])
+
+      @copy_to.context_modules.where(name: ['C', 'D']).map(&:destroy)
+      run_course_copy
+      expect(@copy_to.context_modules.order(:position).pluck(:name)).to eq(['A', 'B', 'C', 'D'])
     end
 
     it "should be able to copy links to files in folders with html entities and unicode in path" do
@@ -375,6 +386,8 @@ describe ContentMigration do
       @copy_from.allow_student_forum_attachments = false
       @copy_from.default_wiki_editing_roles = 'teachers'
       @copy_from.allow_student_organized_groups = false
+      @copy_from.show_announcements_on_home_page = false
+      @copy_from.home_page_announcement_limit = nil
       @copy_from.default_view = 'modules'
       @copy_from.open_enrollment = true
       @copy_from.storage_quota = 444
@@ -415,6 +428,28 @@ describe ContentMigration do
         expect(@copy_to.send(att)).to eq @copy_from.send(att)
       end
       expect(@copy_to.tab_configuration).to eq @copy_from.tab_configuration
+    end
+
+    it "should copy dashboard images" do
+      att = attachment_model(:context => @copy_from, :uploaded_data => stub_png_data, :filename => "homework.png")
+      @copy_from.image_id = att.id
+      @copy_from.save!
+
+      run_course_copy
+
+      @copy_to.reload
+      new_att = @copy_to.attachments.where(:migration_id => mig_id(att)).first
+      expect(@copy_to.image_id.to_i).to eq new_att.id
+
+      example_url = "example.com"
+      @copy_from.image_url = example_url
+      @copy_from.image_id = nil
+      @copy_from.save!
+
+      run_course_copy
+
+      @copy_to.reload
+      expect(@copy_to.image_url).to eq example_url
     end
 
     it "should convert domains in imported urls if specified in account settings" do
@@ -590,6 +625,83 @@ describe ContentMigration do
 
       new_topic = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
       expect(new_topic.message).to match(Regexp.new("/courses/#{@copy_to.id}/files/folder/#{folder.name}"))
+    end
+
+    it "should not desync imported module item published status with existing content" do
+      asmnt = @copy_from.assignments.create!(:title => "some assignment")
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
+
+      run_course_copy
+
+      new_asmnt = @copy_to.assignments.where(:migration_id => mig_id(asmnt)).first
+      new_asmnt.unpublish!
+
+      new_page = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
+      new_page.unpublish!
+
+      mod1 = @copy_from.context_modules.create!(:name => "some module")
+      tag = mod1.add_item({:id => asmnt.id, :type => 'assignment', :indent => 1})
+      tag2 = mod1.add_item({:id => page.id, :type => 'wiki_page', :indent => 1})
+
+      @cm.copy_options = {:all_context_modules => "1"}
+      @cm.save!
+      run_course_copy
+
+      new_tag = @copy_to.context_module_tags.where(:migration_id => mig_id(tag)).first
+      expect(new_tag).to be_unpublished
+
+      new_tag2 = @copy_to.context_module_tags.where(:migration_id => mig_id(tag2)).first
+      expect(new_tag2).to be_unpublished
+    end
+
+    it "should restore deleted module items on re-import" do
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
+
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      tag1 = mod.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })
+      tag2 = mod.add_item({:id => page.id, :type => 'wiki_page', :indent => 1})
+
+      run_course_copy
+
+      new_mod = @copy_to.context_modules.where(:migration_id => mig_id(mod)).first
+      new_mod.destroy!
+
+      run_course_copy
+
+      new_mod.reload
+      expect(new_mod).to_not be_deleted
+      new_mod.content_tags.each do |new_tag|
+        expect(new_tag).to_not be_deleted
+      end
+    end
+
+    it "should copy over published tableless module items" do
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      tag1 = mod.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })
+      tag1.publish!
+      tag2 = mod.add_item({ :title => 'Example 2', :type => 'external_url', :url => 'http://derp.derp/something2' })
+
+      run_course_copy
+
+      new_tag1 = @copy_to.context_module_tags.where(:migration_id => mig_id(tag1)).first
+      new_tag2 = @copy_to.context_module_tags.where(:migration_id => mig_id(tag2)).first
+      expect(new_tag1).to be_published
+      expect(new_tag2).to be_unpublished
+    end
+
+    it "preserves publish state of external tool items" do
+      tool = @copy_from.context_external_tools.create!(:name => "b", :url => "http://derp.derp/somethingelse", :consumer_key => '12345', :shared_secret => 'secret')
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      tag1 = mod.add_item :type => 'context_external_tool', :id => tool.id, :url => "#{tool.url}?queryyyyy=something"
+      tag1.publish!
+      tag2 = mod.add_item :type => 'context_external_tool', :id => tool.id, :url => "#{tool.url}?queryyyyy=something"
+
+      run_course_copy
+
+      new_tag1 = @copy_to.context_module_tags.where(:migration_id => mig_id(tag1)).first
+      new_tag2 = @copy_to.context_module_tags.where(:migration_id => mig_id(tag2)).first
+      expect(new_tag1).to be_published
+      expect(new_tag2).to be_unpublished
     end
   end
 end

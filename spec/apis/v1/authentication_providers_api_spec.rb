@@ -377,61 +377,6 @@ describe "AuthenticationProviders API", type: :request do
     end
   end
 
-  context "discovery url" do
-    before do
-      @account.auth_discovery_url = "http://example.com/auth"
-      @account.save!
-    end
-
-    it "should get the url" do
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/account_authorization_configs/discovery_url",
-             { :controller => 'account_authorization_configs', :action => 'show_discovery_url', :account_id => @account.id.to_s, :format => 'json' })
-      expect(json).to eq({'discovery_url' => @account.auth_discovery_url})
-    end
-
-    it "should set the url" do
-      json = api_call(:put, "/api/v1/accounts/#{@account.id}/account_authorization_configs/discovery_url",
-             { :controller => 'account_authorization_configs', :action => 'update_discovery_url', :account_id => @account.id.to_s, :format => 'json' },
-             {'discovery_url' => 'http://example.com/different_url'})
-      expect(json).to eq({'discovery_url' => 'http://example.com/different_url'})
-      @account.reload
-      expect(@account.auth_discovery_url).to eq 'http://example.com/different_url'
-    end
-
-    it "should clear if set to empty string" do
-      json = api_call(:put, "/api/v1/accounts/#{@account.id}/account_authorization_configs/discovery_url",
-             { :controller => 'account_authorization_configs', :action => 'update_discovery_url', :account_id => @account.id.to_s, :format => 'json' },
-             {'discovery_url' => ''})
-      expect(json).to eq({'discovery_url' => nil})
-      @account.reload
-      expect(@account.auth_discovery_url).to eq nil
-    end
-
-    it "should delete the url" do
-      json = api_call(:delete, "/api/v1/accounts/#{@account.id}/account_authorization_configs/discovery_url",
-             { :controller => 'account_authorization_configs', :action => 'destroy_discovery_url', :account_id => @account.id.to_s, :format => 'json' })
-      expect(json).to eq({'discovery_url' => nil})
-      @account.reload
-      expect(@account.auth_discovery_url).to eq nil
-    end
-
-    it "should return unauthorized" do
-      course_with_student(:course => @course)
-      api_call(:get, "/api/v1/accounts/#{@account.id}/account_authorization_configs/discovery_url",
-             { :controller => 'account_authorization_configs', :action => 'show_discovery_url', :account_id => @account.id.to_s, :format => 'json' },
-      {},{}, :expected_status => 401)
-      api_call(:put, "/api/v1/accounts/#{@account.id}/account_authorization_configs/discovery_url",
-             { :controller => 'account_authorization_configs', :action => 'update_discovery_url', :account_id => @account.id.to_s, :format => 'json' },
-      {'discovery_url' => ''},{}, :expected_status => 401)
-      @account.reload; @account.auth_discovery_url = "http://example.com/auth"
-      api_call(:delete, "/api/v1/accounts/#{@account.id}/account_authorization_configs/discovery_url",
-             { :controller => 'account_authorization_configs', :action => 'destroy_discovery_url', :account_id => @account.id.to_s, :format => 'json' },
-      {},{}, :expected_status => 401)
-      @account.reload; @account.auth_discovery_url = "http://example.com/auth"
-    end
-
-  end
-
   describe "sso settings" do
     let(:sso_path) do
       "/api/v1/accounts/#{@account.id}/sso_settings"

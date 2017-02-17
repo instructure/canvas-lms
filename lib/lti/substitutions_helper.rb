@@ -47,13 +47,12 @@ module Lti
       'student' => 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student',
       'admin' => 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator',
       AccountUser => 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator',
-
-      StudentEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/person#Learner',
-      TeacherEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/person#Instructor',
-      TaEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#TeachingAssistant',
+      TaEnrollment => ['http://purl.imsglobal.org/vocab/lis/v2/membership/instructor#TeachingAssistant', 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'],
+      StudentEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner',
+      TeacherEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor',
       DesignerEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper',
-      ObserverEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/person#Observer',
-      StudentViewEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/person#Learner'
+      ObserverEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor',
+      StudentViewEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner'
     }
 
     LIS_V2_ROLE_NONE = 'http://purl.imsglobal.org/vocab/lis/v2/person#None'
@@ -91,12 +90,13 @@ module Lti
       end
 
       if @user
-        context_roles = course_enrollments.map { |enrollment| role_map[enrollment.class] }
+        context_roles = course_enrollments.each_with_object(Set.new) { |role, set| set.add([*role_map[role.class]].join(",")) }
+
         institution_roles = @user.roles(@root_account).map { |role| role_map[role] }
         if Account.site_admin.account_users_for(@user).present?
           institution_roles << role_map['siteadmin']
         end
-        (context_roles + institution_roles).compact.uniq.sort.join(',')
+        (context_roles + institution_roles).to_a.compact.uniq.sort.join(',')
       else
         [role_none]
       end

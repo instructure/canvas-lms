@@ -12,11 +12,18 @@ require [
   'compiled/views/assignments/GroupCategorySelector'
   'compiled/views/assignments/PeerReviewsSelector'
   'grading_standards'
-  'manage_groups'
-], (Section, Assignment, EditHeaderView, EditView, SectionCollection,
-
-  DueDateList, OverrideView, AssignmentGroupSelector,
-  GradingTypeSelector, GroupCategorySelector, PeerReviewsSelector) ->
+], (
+  Section,
+  Assignment,
+  EditHeaderView,
+  EditView,
+  SectionCollection,
+  DueDateList,
+  DueDateOverride,
+  AssignmentGroupSelector,
+  GradingTypeSelector,
+  GroupCategorySelector,
+  PeerReviewsSelector) ->
 
   ENV.ASSIGNMENT.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES
 
@@ -36,6 +43,7 @@ require [
   groupCategorySelector = new GroupCategorySelector
     parentModel: assignment
     groupCategories: ENV?.GROUP_CATEGORIES || []
+    inClosedGradingPeriod: assignment.inClosedGradingPeriod()
   peerReviewsSelector = new PeerReviewsSelector
     parentModel: assignment
 
@@ -52,9 +60,10 @@ require [
     groupCategorySelector: groupCategorySelector
     peerReviewsSelector: peerReviewsSelector
     views:
-      'js-assignment-overrides': new OverrideView
+      'js-assignment-overrides': new DueDateOverride
         model: dueDateList
         views: {}
+        postToSIS: assignment.postToSIS()
 
   editHeaderView = new EditHeaderView
     el: headerEl

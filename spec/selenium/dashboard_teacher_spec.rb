@@ -1,9 +1,8 @@
 require_relative 'common'
 require_relative 'helpers/notifications_common'
-include NotificationsCommon
-
 
 describe "dashboard" do
+  include NotificationsCommon
   include_context "in-process server selenium tests"
 
   context "as a teacher" do
@@ -76,7 +75,7 @@ describe "dashboard" do
 
     context 'stream items' do
       before :once do
-        NotificationsCommon.setup_notification(@teacher, name: 'Assignment Created')
+        setup_notification(@teacher, name: 'Assignment Created')
       end
 
       it 'shows an assignment stream item under Recent Activity in dashboard', priority: "1", test_id: 108723 do
@@ -250,6 +249,25 @@ describe "dashboard" do
         f('#global_nav_courses_link').click
         expect(fj('.ic-NavMenu-list-item a:contains("All Courses")')).to be_present
       end
+    end
+  end
+
+  context 'as a teacher in an unpublished course' do
+    before do
+      course_with_teacher_logged_in(:active_course => false)
+    end
+
+    it 'should not show an unpublished assignment for an unpublished course', priority: "2", test_id: 56003 do
+      name = 'venkman'
+      due_date = Time.zone.now.utc + 2.days
+      assignment = @course.assignments.create(:name => name, :submission_types => 'online', :due_at => due_date, :lock_at => Time.zone.now, :unlock_at => due_date)
+
+      get '/'
+      expect(f('.coming_up')).to include_text(name)
+
+      assignment.unpublish
+      get '/'
+      expect(f('.coming_up')).not_to include_text(name)
     end
   end
 end

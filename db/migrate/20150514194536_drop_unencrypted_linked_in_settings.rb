@@ -1,4 +1,4 @@
-class DropUnencryptedLinkedInSettings < ActiveRecord::Migration
+class DropUnencryptedLinkedInSettings < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

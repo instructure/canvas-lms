@@ -1,4 +1,4 @@
-class DropAttachmentAndArtifactTypeFromEportfolioEntries < ActiveRecord::Migration
+class DropAttachmentAndArtifactTypeFromEportfolioEntries < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

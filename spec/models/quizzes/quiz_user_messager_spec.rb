@@ -22,7 +22,7 @@ describe Quizzes::QuizUserMessager do
   include Quizzes::QuizUserMessagerSpecHelper
 
   before :once do
-    course_with_teacher_logged_in(active_all: true)
+    course_with_teacher(active_all: true)
     course_quiz(true)
     course_with_student(active_all: true, course: @course)
     @unsubmitted = @student

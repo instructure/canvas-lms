@@ -1,4 +1,4 @@
-class AddAutoExpireTokensToDeveloperKey < ActiveRecord::Migration
+class AddAutoExpireTokensToDeveloperKey < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

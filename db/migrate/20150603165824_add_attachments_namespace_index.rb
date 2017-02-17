@@ -1,4 +1,4 @@
-class AddAttachmentsNamespaceIndex < ActiveRecord::Migration
+class AddAttachmentsNamespaceIndex < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

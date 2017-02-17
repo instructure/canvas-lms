@@ -17,12 +17,12 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require_dependency "lti/variable_expansion"
 
 module Lti
   describe VariableExpansion do
 
     class TestExpander
-
       attr_accessor :one, :two, :three
 
       def initialize
@@ -30,7 +30,19 @@ module Lti
         @two = 2
         @three = 3
       end
+    end
 
+    it 'must accept multiple guards and combine their results with a logical AND' do
+      var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> { true }, -> { true } )
+      expect(var_exp.expand(TestExpander.new)).to eq 6
+
+      var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> { false }, -> { true } )
+      expect(var_exp.expand(TestExpander.new)).to eq '$test'
+    end
+
+    it 'accepts and sets default_name' do
+      var_exp = described_class.new('test', [], -> { 'test' }, -> { true }, default_name: 'test_name' )
+      expect(var_exp.default_name).to eq 'test_name'
     end
 
     it 'expands variables' do
@@ -42,7 +54,5 @@ module Lti
       var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> {false} )
       expect(var_exp.expand(TestExpander.new)).to eq '$test'
     end
-
-
   end
 end

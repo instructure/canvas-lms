@@ -15,7 +15,10 @@ All API access is over HTTPS, against your normal Canvas domain.
 
 All API responses are in <a href="http://www.json.org/">JSON format</a>.
 
-All integer ids in Canvas are 64 bit integers.
+All integer ids in Canvas are 64 bit integers. String ids are also used in Canvas.
+
+To force all ids to strings add the request header `Accept: application/json+canvas-string-ids`
+This will cause Canvas to return even integer IDs as strings, preventing problems with languages (particularly JavaScript) that can't properly process large integers.
 
 All boolean parameters can be passed as true/false, t/f, yes/no, y/n, on/off, or 1/0. When using JSON format, a literal true/false is preferred, rather than as a string.
 

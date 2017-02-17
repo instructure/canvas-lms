@@ -1,4 +1,4 @@
-class DropWikiNamespaces < ActiveRecord::Migration
+class DropWikiNamespaces < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

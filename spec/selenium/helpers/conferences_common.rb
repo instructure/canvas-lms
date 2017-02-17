@@ -8,16 +8,8 @@ module ConferencesCommon
     f('.new-conference-btn')
   end
 
-  def start_conference_button
-    f('.start-button', new_conference_list)
-  end
-
   def end_conference_button
     f('.close_conference_link', new_conference_list)
-  end
-
-  def start_first_conference_in_list
-    expect_new_page_load { start_conference_button.click }
   end
 
   def end_first_conference_in_list
@@ -58,11 +50,12 @@ module ConferencesCommon
     )
   end
 
-  def create_wimba_conference(title = 'Wimba Conference')
+  def create_wimba_conference(title = 'Wimba Conference', duration=60)
     WimbaConference.create!(
       title: title,
       user: @user,
-      context: @course
+      context: @course,
+      duration: duration
     )
   end
 
@@ -81,6 +74,19 @@ module ConferencesCommon
     else
       driver.switch_to.alert.accept
     end
+
+    wait_for_ajaximations
+  end
+
+  def edit_conference(opts={})
+    cog_menu_item = opts.fetch(:cog_menu_item, f('.icon-settings'))
+    cancel_transaction = opts.fetch(:cancel, false)
+
+    cog_menu_item.click
+    wait_for_ajaximations
+
+    # click the pencil icon to delete the conference
+    f('.icon-edit.edit_conference_link.ui-corner-all').click
 
     wait_for_ajaximations
   end

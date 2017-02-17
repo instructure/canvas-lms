@@ -7,8 +7,9 @@ define [
   'jst/EmptyDialogFormWrapper'
   'i18n!assignments'
   'jquery'
+  'compiled/api/gradingPeriodsApi'
   'jquery.instructure_date_and_time'
-], (_, Assignment, DialogFormView, DateValidator, template, wrapper, I18n, $) ->
+], (_, Assignment, DialogFormView, DateValidator, template, wrapper, I18n, $, GradingPeriodsAPI) ->
 
   class CreateAssignmentView extends DialogFormView
     defaults:
@@ -86,12 +87,20 @@ define [
       _.extend json,
         canChooseType: @assignmentGroup?
         uniqLabel: uniqLabel
+        disableDueAt: @disableDueAt()
+        isInClosedPeriod: @model.inClosedGradingPeriod()
+
+    currentUserIsAdmin: ->
+      _.contains(ENV.current_user_roles, "admin")
+
+    disableDueAt: ->
+      _.contains(@model.frozenAttributes(), "due_at") || @model.inClosedGradingPeriod()
 
     openAgain: ->
       super
 
       timeField = @$el.find(".datetime_field")
-      if @model.multipleDueDates() || @model.isOnlyVisibleToOverrides() || @model.nonBaseDates()
+      if @model.multipleDueDates() || @model.isOnlyVisibleToOverrides() || @model.nonBaseDates() || @disableDueAt()
         timeField.tooltip
           position: {my: 'center bottom', at: 'center top-10', collision: 'fit fit'},
           tooltipClass: 'center bottom vertical',
@@ -111,13 +120,17 @@ define [
     _validateTitle: (data, errors) ->
       return errors if _.contains(@model.frozenAttributes(), "title")
 
+      max_name_length = 256
+      if data.post_to_sis == '1' && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT == true
+        max_name_length = ENV.MAX_NAME_LENGTH + 1
+
       if !data.name or $.trim(data.name.toString()).length == 0
         errors["name"] = [
           message: I18n.t 'name_is_required', 'Name is required!'
         ]
-      if $.trim(data.name.toString()).length > 255
+      else if $.trim(data.name.toString()).length > max_name_length
         errors["name"] = [
-          message: I18n.t 'name_too_long', 'Name is too long'
+          message: I18n.t "Name is too long, must be under %{length} characters", length: max_name_length
         ]
       errors
 
@@ -130,14 +143,27 @@ define [
         ]
       errors
 
+    _dueAtHasChanged: (dueAt) =>
+      originalDueAt = new Date(@model.dueAt()).getTime()
+      newDueAt = new Date(dueAt).getTime()
+      originalDueAt != newDueAt
+
     _validateDueDate: (data, errors) ->
       return errors unless data.due_at
 
       validRange = ENV.VALID_DATE_RANGE
       data.lock_at = @model.lockAt()
       data.unlock_at = @model.unlockAt()
-      dateValidator = new DateValidator({date_range: _.extend({}, validRange), data: data})
-      errs = dateValidator.validateDates()
+      data.persisted = !@_dueAtHasChanged(data.due_at)
+      dateValidator = new DateValidator(
+        date_range: _.extend({}, validRange)
+        data: data
+        multipleGradingPeriodsEnabled: !!ENV.MULTIPLE_GRADING_PERIODS_ENABLED
+        gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods)
+        userIsAdmin: @currentUserIsAdmin(),
+        data
+      )
+      errs = dateValidator.validateDatetimes()
 
       return errors if _.isEmpty(errs)
 

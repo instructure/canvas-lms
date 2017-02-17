@@ -1,6 +1,6 @@
 define([
   "react",
-  "bower/react-tabs/dist/react-tabs",
+  "react-tabs",
   "underscore",
   "jsx/shared/helpers/permissionFilter",
   "./CoursesStore",

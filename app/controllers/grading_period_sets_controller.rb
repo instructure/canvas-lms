@@ -74,7 +74,7 @@ class GradingPeriodSetsController < ApplicationController
   end
 
   def set_params
-    strong_params.require(:grading_period_set).permit(:title)
+    params.require(:grading_period_set).permit(:title)
   end
 
   def check_read_rights

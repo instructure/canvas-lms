@@ -43,6 +43,9 @@ describe ContentMigration do
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
       expect(to_assign.points_possible).to eq 1
       expect(to_assign.rubric.rubric_associations.for_grading.first.use_for_grading).to be_truthy
+
+      run_course_copy
+      expect(to_assign.reload.points_possible).to eq 1
     end
 
     it "should copy rubric outcomes in selective copy" do
@@ -162,11 +165,13 @@ describe ContentMigration do
 
       @assignment.save!
 
+      @copy_to.any_instantiation.expects(:turnitin_enabled?).at_least(1).returns(true)
+      @copy_to.any_instantiation.expects(:vericite_enabled?).at_least(1).returns(true)
+
       attrs = [:turnitin_enabled, :vericite_enabled, :peer_reviews,
           :automatic_peer_reviews, :anonymous_peer_reviews,
           :grade_group_students_individually, :allowed_extensions,
-          :position, :peer_review_count, :muted, :omit_from_final_grade,
-          :only_visible_to_overrides]
+          :position, :peer_review_count, :muted, :omit_from_final_grade]
 
       run_course_copy
 
@@ -174,6 +179,23 @@ describe ContentMigration do
       attrs.each do |attr|
         expect(@assignment[attr]).to eq new_assignment[attr]
       end
+      expect(new_assignment.only_visible_to_overrides).to be_falsey
+    end
+
+    it "shouldn't copy turnitin/vericite_enabled if it's not enabled on the copyee's account" do
+      assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
+      @assignment.turnitin_enabled = true
+      @assignment.vericite_enabled = true
+      @assignment.save!
+
+      @copy_to.any_instantiation.expects(:turnitin_enabled?).at_least(1).returns(false)
+      @copy_to.any_instantiation.expects(:vericite_enabled?).at_least(1).returns(false)
+
+      run_course_copy
+
+      new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
+      expect(new_assignment[:turnitin_enabled]).to be_falsey
+      expect(new_assignment[:vericite_enabled]).to be_falsey
     end
 
     it "should copy group assignment setting" do
@@ -524,13 +546,30 @@ describe ContentMigration do
 
       it "should copy only noop overrides" do
         assignment_override_model(assignment: @assignment, set_type: 'ADHOC')
-        assignment_override_model(assignment: @assignment, set_type: 'Noop', set_id: 1, title: 'Tag 1')
-        assignment_override_model(assignment: @assignment, set_type: 'Noop', set_id: nil, title: 'Tag 2')
+        assignment_override_model(assignment: @assignment, set_type: 'Noop',
+          set_id: 1, title: 'Tag 1')
+        assignment_override_model(assignment: @assignment, set_type: 'Noop',
+          set_id: nil, title: 'Tag 2')
+        @assignment.only_visible_to_overrides = true
+        @assignment.save!
         run_course_copy
         to_assignment = @copy_to.assignments.first
+        expect(to_assignment.only_visible_to_overrides).to be_truthy
         expect(to_assignment.assignment_overrides.length).to eq 2
         expect(to_assignment.assignment_overrides.detect{ |o| o.set_id == 1 }.title).to eq 'Tag 1'
-        expect(to_assignment.assignment_overrides.detect{ |o| o.set_id == nil }.title).to eq 'Tag 2'
+        expect(to_assignment.assignment_overrides.detect{ |o| o.set_id.nil? }.title).to eq 'Tag 2'
+      end
+
+      it "should copy dates" do
+        due_at = 1.hour.from_now.round
+        assignment_override_model(assignment: @assignment, set_type: 'Noop',
+          set_id: 1, title: 'Tag 1', due_at: due_at)
+        run_course_copy
+        to_override = @copy_to.assignments.first.assignment_overrides.first
+        expect(to_override.title).to eq 'Tag 1'
+        expect(to_override.due_at).to eq due_at
+        expect(to_override.due_at_overridden).to eq true
+        expect(to_override.unlock_at_overridden).to eq false
       end
     end
   end

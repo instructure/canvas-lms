@@ -1,4 +1,4 @@
-class CreateGradingPeriodGradesJoinTable < ActiveRecord::Migration
+class CreateGradingPeriodGradesJoinTable < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

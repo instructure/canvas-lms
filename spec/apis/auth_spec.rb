@@ -588,7 +588,6 @@ describe "API Authentication", type: :request do
       user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
       course_with_teacher(:user => @user)
       @token = @user.access_tokens.create!
-      expect(@token.full_token).not_to be_nil
     end
 
     def check_used
@@ -617,7 +616,7 @@ describe "API Authentication", type: :request do
     it "should allow passing the access token in the post body" do
       @me = @user
       Account.default.account_users.create!(user: @user)
-      u2 = user
+      u2 = user_factory
       Account.default.pseudonyms.create!(unique_id: 'user', user: u2)
       @user = @me
       check_used do

@@ -1,4 +1,4 @@
-class AddPermissionsForModeratedGrading < ActiveRecord::Migration
+class AddPermissionsForModeratedGrading < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

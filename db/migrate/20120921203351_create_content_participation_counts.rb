@@ -1,4 +1,4 @@
-class CreateContentParticipationCounts < ActiveRecord::Migration
+class CreateContentParticipationCounts < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -1,10 +1,11 @@
 define [
   'ember',
+  'jquery',
   'underscore',
   'ic-ajax',
   '../../shared/xhr/fetch_all_pages'
 ]
-, ({Route, ArrayProxy}, _, ajax, fetchAllPages) ->
+, ({Route, ArrayProxy, ObjectProxy, set}, $, _, ajax, fetchAllPages) ->
 
   ScreenreaderGradebookRoute = Route.extend
 
@@ -15,6 +16,12 @@ define [
         submissions: ArrayProxy.create(content: [])
         custom_columns: fetchAllPages(ENV.GRADEBOOK_OPTIONS.custom_columns_url)
         sections: fetchAllPages(ENV.GRADEBOOK_OPTIONS.sections_url)
+        effectiveDueDates: ObjectProxy.create(content: {})
+
+      $.ajaxJSON(ENV.GRADEBOOK_OPTIONS.effective_due_dates_url, "GET").then (result) =>
+        data = ObjectProxy.create(content: result)
+        data.set('isLoaded', true)
+        set(model, 'effectiveDueDates', data)
 
       if !ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled
         model.outcomes = model.outcome_rollups = ArrayProxy.create({content: []})

@@ -35,7 +35,6 @@ describe "QuizRegrading" do
     course_with_student_logged_in(active_all: true)
     quiz_model(course: @course)
     @regrade = @quiz.quiz_regrades.where(quiz_id: @quiz.id, quiz_version: @quiz.version_number).first_or_create(user: @student)
-    expect(@regrade).not_to be_new_record
     @true_false_question = create_quiz_question!({
       :points_possible => 1,
       :question_type => 'true_false_question',
@@ -73,7 +72,6 @@ describe "QuizRegrading" do
     @submission = @quiz.generate_submission(@student)
     reset_submission_data!
     @submission.save!
-    expect(@submission.score).to eq 0.5
   end
 
   it 'succesfully regrades the submissions and updates the scores' do

@@ -1,4 +1,4 @@
-class CreateUserMergeData < ActiveRecord::Migration
+class CreateUserMergeData < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

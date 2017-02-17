@@ -23,7 +23,7 @@ describe CourseLinkValidator do
   it "should validate all the links" do
     CourseLinkValidator.any_instance.stubs(:reachable_url?).returns(false).once # don't actually ping the links for the specs
 
-    course
+    course_factory
     attachment_model
 
     bad_url = "http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com"
@@ -84,7 +84,7 @@ describe CourseLinkValidator do
     CourseLinkValidator.any_instance.stubs(:reachable_url?).returns(false) # don't actually ping the links for the specs
     html = %{<a href='http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com'>linky</a>}
 
-    course
+    course_factory
     bank = @course.assessment_question_banks.create!(:title => 'bank')
     aq = bank.assessment_questions.create!(:question_data => {'name' => 'test question',
       'question_text' => html, 'answers' => [{'id' => 1}, {'id' => 2}]})
@@ -107,7 +107,7 @@ describe CourseLinkValidator do
   it "should not care if it can reach it" do
     CourseLinkValidator.any_instance.stubs(:reachable_url?).returns(true)
 
-    course
+    course_factory
     topic = @course.discussion_topics.create!(:message => %{<a href="http://www.www.www">pretend this is real</a>}, :title => "title")
 
     CourseLinkValidator.queue_course(@course)
@@ -118,7 +118,7 @@ describe CourseLinkValidator do
   end
 
   it "should check for deleted/unpublished objects" do
-    course
+    course_factory
     active = @course.assignments.create!(:title => "blah")
     unpublished = @course.assignments.create!(:title => "blah")
     unpublished.unpublish!
@@ -145,7 +145,7 @@ describe CourseLinkValidator do
   end
 
   it "should work with absolute links to local objects" do
-    course
+    course_factory
     deleted = @course.assignments.create!(:title => "blah")
     deleted.destroy
 
@@ -163,8 +163,8 @@ describe CourseLinkValidator do
   end
 
   it "should find links to other courses" do
-    other_course = course
-    course
+    other_course = course_factory
+    course_factory
 
     link = "http://#{HostUrl.default_host}/courses/#{other_course.id}/assignments"
 
@@ -182,7 +182,7 @@ describe CourseLinkValidator do
   end
 
   it "should find links to wiki pages" do
-    course
+    course_factory
     active = @course.wiki.wiki_pages.create!(:title => "active and stuff")
     unpublished = @course.wiki.wiki_pages.create!(:title => "unpub")
     unpublished.unpublish!
@@ -211,7 +211,7 @@ describe CourseLinkValidator do
   end
 
   it "should identify typo'd canvas links" do
-    course
+    course_factory
     invalid_link1 = "/cupbopourses"
     invalid_link2 = "http://#{HostUrl.default_host}/courses/#{@course.id}/pon3s"
 
@@ -232,7 +232,7 @@ describe CourseLinkValidator do
   end
 
   it "should not flag valid replaced attachments" do
-    course
+    course_factory
     att1 = attachment_with_context(@course, :display_name => "name")
     att2 = attachment_with_context(@course)
 
@@ -264,7 +264,7 @@ describe CourseLinkValidator do
   end
 
   it "should not flag links to public paths" do
-    course
+    course_factory
     @course.syllabus_body = %{<a href='/images/avatar-50.png'>link</a>}
     @course.save!
 
@@ -276,7 +276,7 @@ describe CourseLinkValidator do
   end
 
   it "should flag sneaky links" do
-    course
+    course_factory
     @course.syllabus_body = %{<a href='/../app/models/user.rb'>link</a>}
     @course.save!
 
@@ -288,7 +288,7 @@ describe CourseLinkValidator do
   end
 
   it "should not flag wiki pages with url encoding" do
-    course
+    course_factory
     page = @course.wiki.wiki_pages.create!(:title => "semi;colon", :body => 'sutff')
 
     @course.syllabus_body = %{<a href='/courses/#{@course.id}/pages/#{CGI.escape(page.title)}'>link</a>}

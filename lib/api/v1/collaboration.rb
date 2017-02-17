@@ -24,6 +24,10 @@ module Api::V1::Collaboration
     api_json(collaboration, current_user, session, :only => attribute_whitelist).tap do |hash|
       hash['user_name'] = collaboration.user[:name]
       hash['update_url'] = collaboration.update_url
+      hash['permissions'] = {
+        update: collaboration.grants_right?(current_user, session, :update),
+        delete: collaboration.grants_right?(current_user, session, :delete)
+      }
     end
   end
 end

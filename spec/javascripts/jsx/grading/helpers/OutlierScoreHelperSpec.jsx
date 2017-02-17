@@ -1,9 +1,9 @@
 define([
   'jsx/grading/helpers/OutlierScoreHelper',
-  'compiled/gradebook2/GradebookTranslations'
+  'compiled/gradebook/GradebookTranslations'
 ], (OutlierScoreHelper, GRADEBOOK_TRANSLATIONS) => {
 
-  module('#hasWarning', () => {
+  QUnit.module('#hasWarning', () => {
     test('returns true for exacty 1.5 times points possible', () => {
       ok(new OutlierScoreHelper(150, 100).hasWarning());
     });
@@ -45,7 +45,7 @@ define([
     });
   });
 
-  module('#warningMessage', {
+  QUnit.module('#warningMessage', {
     setup() {
       this.tooManyPointsWarning =
         GRADEBOOK_TRANSLATIONS.submission_too_many_points_warning;

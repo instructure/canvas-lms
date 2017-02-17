@@ -31,7 +31,7 @@
 # PaginatedList expects an empty <ul> wrapped in a <div>. The element
 # passed to the constructor should be the <div>.
 
-define ['jquery', 'i18n!paginated_list', 'vendor/spin', 'str/htmlEscape'], ($, I18n, Spinner, htmlEscape) ->
+define ['jquery', 'i18n!paginated_list', 'spin.js', 'str/htmlEscape'], ($, I18n, Spinner, htmlEscape) ->
   class PaginatedList
     ##
     # I18n keys used by class

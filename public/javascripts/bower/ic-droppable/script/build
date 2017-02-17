@@ -1,7 +1,0 @@
-#!/bin/sh
-echo "# running script/build"
-echo "# script/build: removing dist"
-rm -rf dist
-echo "# script/build: building with broccoli"
-broccoli build dist
-

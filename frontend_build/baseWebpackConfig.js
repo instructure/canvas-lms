@@ -1,238 +1,288 @@
-var webpack = require("webpack");
-var child_process = require('child_process');
-var I18nPlugin = require("./i18nPlugin");
-var ClientAppsPlugin = require("./clientAppPlugin");
-var CompiledReferencePlugin = require("./CompiledReferencePlugin");
-var bundleEntries = require("./bundles");
-var ShimmedAmdPlugin = require("./shimmedAmdPlugin");
-var BundleExtensionsPlugin = require("./BundleExtensionsPlugin");
-var WebpackOnBuildPlugin = require('on-build-webpack');
-var path = require('path');
+if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
+
+const glob = require('glob')
+const ManifestPlugin = require('webpack-manifest-plugin')
+const path = require('path')
+const webpack = require('webpack')
+const bundleEntries = require('./bundles')
+const BundleExtensionsPlugin = require('./BundleExtensionsPlugin')
+const ClientAppsPlugin = require('./clientAppPlugin')
+const CompiledReferencePlugin = require('./CompiledReferencePlugin')
+const I18nPlugin = require('./i18nPlugin')
+const WebpackHooks = require('./webpackHooks')
+const webpackPublicPath = require('./webpackPublicPath')
+const HappyPack = require('happypack')
+require('babel-polyfill')
+
+const root = path.resolve(__dirname, '..')
+const USE_BABEL_CACHE = process.env.NODE_ENV !== 'production' && process.env.DISABLE_HAPPYPACK === '1'
+
+const momentLocaleBundles = glob.sync('moment/locale/**/*.js', {cwd: 'node_modules'}).reduce((memo, filename) =>
+  Object.assign(memo, {[filename.replace(/.js$/, '')]: filename})
+, {})
+
+// Put any custom moment locales here:
+momentLocaleBundles['moment/locale/mi-nz'] = 'custom_moment_locales/mi_nz.js'
+momentLocaleBundles['moment/locale/ht-ht'] = 'custom_moment_locales/ht_ht.js'
+
+
+const happypackPlugins = []
+const getHappyThreadPool = (() => {
+  let pool
+  return () => pool || (pool = new HappyPack.ThreadPool({ size: 4 }))
+})()
+
+function happify (id, loaders) {
+  if (process.env.DISABLE_HAPPYPACK !== '1') {
+    happypackPlugins.push(new HappyPack({
+      id,
+      loaders,
+      threadPool: getHappyThreadPool(),
+      tempDir: 'node_modules/.happypack_tmp/',
+
+      // by default, we use the cache everywhere exept prod. but you can
+      // set HAPPYPACK_CACHE environment variable to override
+      cache: (typeof process.env.HAPPYPACK_CACHE === 'undefined' ?
+        process.env.NODE_ENV !== 'production' :
+        process.env.HAPPYPACK_CACHE === '1'
+      ),
+      cacheContext: {
+        env: process.env.NODE_ENV
+      }
+    }))
+    return [`happypack/loader?id=${id}`]
+  }
+  return loaders
+}
 
 module.exports = {
-  devtool: 'eval',
-  entry: bundleEntries,
+  // In prod build, don't attempt to continue if there are any errors.
+  bail: process.env.NODE_ENV === 'production',
+
+  // This makes the bundle appear split into separate modules in the devtools in dev/test.
+  devtool: process.env.NODE_ENV === 'production' ? undefined : 'eval',
+
+  entry: Object.assign({
+    vendor: require('./modulesToIncludeInVendorBundle'),
+    appBootstrap: 'jsx/appBootstrap'
+  }, bundleEntries, momentLocaleBundles),
+
   output: {
-    path: __dirname + '/../public/webpack-dist',
-    filename: "[name].bundle.js",
-    chunkFilename: "[id].bundle.js",
-    publicPath: "/webpack-dist/"
+    path: path.join(__dirname, '../public', webpackPublicPath),
+
+    // Add /* filename */ comments to generated require()s in the output.
+    pathinfo: process.env.NODE_ENV !== 'production',
+
+    filename: '[name].bundle-[chunkhash:10].js',
+    chunkFilename: '[name].chunk-[chunkhash:10].js',
+    sourceMapFilename: '[file].[id]-[chunkhash:10].sourcemap',
+    jsonpFunction: 'canvasWebpackJsonp'
   },
+
   resolveLoader: {
-    modulesDirectories: ['node_modules','frontend_build']
+    modules: ['node_modules', 'frontend_build']
   },
+
   resolve: {
     alias: {
-      qtip: "jquery.qtip",
-      'backbone': 'Backbone',
-      'React': 'react',
-      realTinymce: "bower/tinymce/tinymce",
-      'ic-ajax': "bower/ic-ajax/dist/amd/main",
-      'ic-tabs': "bower/ic-tabs/dist/amd/main",
-      'bower/axios/dist/axios': 'bower/axios/dist/axios.amd',
-      'timezone': 'timezone_webpack_shim'
+      d3: 'd3/d3',
+      handlebars: require.resolve('handlebars/dist/handlebars.runtime'),
+      'node_modules-version-of-backbone': require.resolve('backbone'),
+      'node_modules-version-of-react-modal': require.resolve('react-modal'),
+
+      // once we are all-webpack we should remove this line and just change all the 'require's
+      // to instructure-ui compnentns to have the right path
+      'instructure-ui': path.resolve(__dirname, '../node_modules/instructure-ui/lib/components'),
+
+      backbone: 'Backbone',
+      timezone$: 'timezone_core',
+      jst: path.resolve(__dirname, '../app/views/jst'),
+      jqueryui: path.resolve(__dirname, '../public/javascripts/vendor/jqueryui'),
+      coffeescripts: path.resolve(__dirname, '../app/coffeescripts'),
+      jsx: path.resolve(__dirname, '../app/jsx'),
+
+      // stuff for canvas_quzzes client_apps
+      'canvas_quizzes/apps': path.resolve(__dirname, '../client_apps/canvas_quizzes/apps'),
+      qtip$: path.resolve(__dirname, '../client_apps/canvas_quizzes/vendor/js/jquery.qtip.js'),
+      old_version_of_react_used_by_canvas_quizzes_client_apps$: path.resolve(__dirname, '../client_apps/canvas_quizzes/vendor/js/old_version_of_react_used_by_canvas_quizzes_client_apps.js'),
+      'old_version_of_react-router_used_by_canvas_quizzes_client_apps$': path.resolve(__dirname, '../client_apps/canvas_quizzes/vendor/js/old_version_of_react-router_used_by_canvas_quizzes_client_apps.js')
     },
-    root: [
-      __dirname + "/../public/javascripts",
-      __dirname + "/../app",
-      __dirname + "/../app/views",
-      __dirname + "/../client_apps",
-      __dirname + "/../gems/plugins",
-      __dirname + "/../public/javascripts/vendor",
-      __dirname + "/../client_apps/canvas_quizzes/vendor/js",
-      __dirname + "/../client_apps/canvas_quizzes/vendor/packages"
+
+    modules: [
+      path.resolve(__dirname, '../public/javascripts'),
+      path.resolve(__dirname, '../gems/plugins'),
+      'node_modules'
     ],
-    extensions: [
-      "",
-      ".webpack.js",
-      ".web.js",
-      ".js",
-      ".jsx",
-      ".coffee",
-      ".handlebars",
-      ".hbs"
-    ]
+
+    extensions: ['.js', '.jsx']
   },
+
   module: {
-    preLoaders: [],
-    noParse: [],
-    loaders: [
+    // This can boost the performance when ignoring big libraries.
+    // The files are expected to have no call to require, define or similar.
+    // They are allowed to use exports and module.exports.
+    noParse: [
+      /vendor\/md5/,
+      /tinymce\/tinymce/, // has 'require' and 'define' but they are from it's own internal closure
+    ],
+    rules: [
+      // to get tinymce to work. see: https://github.com/tinymce/tinymce/issues/2836
+      {
+        test: require.resolve('tinymce/tinymce'),
+        loaders: [
+          'imports-loader?this=>window',
+          'exports-loader?window.tinymce'
+        ]
+      },
+      {
+        test: /tinymce\/(themes|plugins)\//,
+        loaders: ['imports-loader?this=>window']
+      },
+
+      {
+        test: /vendor\/i18n/,
+        loaders: ['exports-loader?I18n']
+      },
+
+
       {
         test: /\.js$/,
-        include: path.resolve(__dirname, "../public/javascripts"),
-        loaders: [
-          "jsHandlebarsHelpers",
-          "pluginsJstLoader",
-          "nonAmdLoader"
-        ]
+        include: path.resolve(__dirname, '../public/javascripts'),
+        loaders: happify('js', [
+          path.join(root, 'frontend_build/jsHandlebarsHelpers'),
+          path.join(root, 'frontend_build/pluginsJstLoader'),
+        ])
       },
       {
-        test: /\.jsx$/,
+        test: /\.jsx?$/,
         include: [
-          path.resolve(__dirname, "../app/jsx"),
-          path.resolve(__dirname, "../spec/javascripts/jsx"),
+          path.resolve(__dirname, '../app/jsx'),
+          path.resolve(__dirname, '../spec/javascripts/jsx'),
           /gems\/plugins\/.*\/app\/jsx\//
         ],
-        exclude: [
-          /(node_modules|bower)/,
-          /public\/javascripts\/vendor/,
-          /public\/javascripts\/translations/,
-          /client_apps\/canvas_quizzes\/apps\//
-        ],
-        loaders: [
-          'babel?cacheDirectory=tmp',
-          'jsxYankPragma'
-        ]
+        loaders: happify('jsx', [
+          `babel-loader?cacheDirectory=${USE_BABEL_CACHE}`
+        ])
       },
       {
-        test: /\.jsx$/,
+        test: /\.jsx?$/,
         include: [/client_apps\/canvas_quizzes\/apps\//],
-        exclude: [/(node_modules|bower)/, /public\/javascripts\/vendor/, /public\/javascripts\/translations/, path.resolve(__dirname, "../app/jsx")],
-        loaders: ["jsx"]
+        loaders: ['jsx-loader']
       },
       {
         test: /\.coffee$/,
         include: [
-          path.resolve(__dirname, "../app/coffeescript"),
-          path.resolve(__dirname, "../spec/coffeescripts"),
-          /gems\/plugins\/.*\/app\/coffeescripts\//,
+          path.resolve(__dirname, '../app/coffeescript'),
+          path.resolve(__dirname, '../spec/coffeescripts'),
+          /app\/coffeescripts\//,
           /gems\/plugins\/.*\/spec_canvas\/coffeescripts\//
         ],
-        loaders: [
-          "coffee-loader",
-          "jsHandlebarsHelpers",
-          "pluginsJstLoader",
-          "nonAmdLoader"
-        ] },
+        loaders: happify('coffee', [
+          'coffee-loader',
+          path.join(root, 'frontend_build/jsHandlebarsHelpers'),
+          path.join(root, 'frontend_build/pluginsJstLoader')
+        ])
+      },
       {
         test: /\.handlebars$/,
         include: [
-          path.resolve(__dirname, "../app/views/jst"),
+          path.resolve(__dirname, '../app/views/jst'),
           /gems\/plugins\/.*\/app\/views\/jst\//
         ],
-        exclude: /bower/,
-        loaders: [
-          "i18nLinerHandlebars"
-        ]
+        loaders: happify('handlebars-i18n', [
+          'i18nLinerHandlebars'
+        ])
       },
       {
         test: /\.hbs$/,
         include: [
-          path.resolve(__dirname, "../app/coffeescript/ember"),
           /app\/coffeescripts\/ember\/screenreader_gradebook\/templates\//,
           /app\/coffeescripts\/ember\/shared\/templates\//
         ],
-        exclude: /bower/,
-        loaders: [
-          "emberHandlebars"
-        ]
+        loaders: happify('handlebars-ember', [path.join(root, 'frontend_build/emberHandlebars')]),
       },
       {
         test: /\.json$/,
-        include: path.resolve(__dirname, "../public/javascripts"),
-        exclude: [/(node_modules|bower)/, /public\/javascripts\/vendor/],
-        loader: "json-loader"
+        exclude: /public\/javascripts\/vendor/,
+        loader: 'json-loader'
       },
       {
-        test: /vendor\/jquery-1\.7\.2/,
-        include: path.resolve(__dirname, "../public/javascripts/vendor"),
-        loader: "exports-loader?window.jQuery"
+        test: require.resolve('../public/javascripts/vendor/jquery-1.7.2'),
+        loader: 'exports-loader?window.jQuery'
       },
       {
-        test: /bower\/handlebars\/handlebars\.runtime/,
-        loader: "exports-loader?Handlebars"
+        test: /node_modules\/handlebars\/dist\/handlebars\.runtime/,
+        loader: 'exports-loader?Handlebars'
       },
       {
         test: /vendor\/md5/,
-        loader: "exports-loader?CryptoJS"
+        loader: 'exports-loader?CryptoJS'
+      },
+      {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader'
       }
     ]
   },
+
   plugins: [
+
+    // A lot of our files expect a global `I18n` variable, this will provide it if it is used
+    new webpack.ProvidePlugin({I18n: 'vendor/i18n'}),
+
+    // sets these envirnment variables in compiled code.
+    // process.env.NODE_ENV will make it so react and others are much smaller and don't run their
+    // debug/proptype checking in prod.
+    // if you need to do something in webpack that you don't do in requireJS, you can do
+    // if (window.USE_WEBPACK) { // do something that will only happen in webpack}
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      'window.USE_WEBPACK': JSON.stringify(true)
     }),
+
+    // handles our custom 18n stuff
     new I18nPlugin(),
-    new ShimmedAmdPlugin(),
+
+    // handles the the quiz stats and quiz log auditing client_apps
     new ClientAppsPlugin(),
+
+    // tells webpack to look for 'compiled/foobar' at app/coffeescripts/foobar.coffee
+    // instead of public/javascripts/compiled/foobar.js
     new CompiledReferencePlugin(),
+
+    // handle the way we hook into bundles from our rails plugins like analytics
     new BundleExtensionsPlugin(),
-    new webpack.optimize.DedupePlugin(),
+
+    new WebpackHooks(),
+
+  ]
+  .concat(happypackPlugins)
+  .concat(process.env.NODE_ENV === 'test' ? [] : [
+
+    // don't include any of the moment locales in the common bundle (otherwise it is huge!)
+    // we load them explicitly onto the page in include_js_bundles from rails.
+    new webpack.IgnorePlugin(/^\.\/locale$/, /^moment$/),
+
+    // outputs a json file so Rails knows which hash fingerprints to add to each script url
+    new ManifestPlugin({fileName: 'webpack-manifest.json'}),
+
+    // these multiple commonsChunks make it so anything in the vendor bundle,
+    // or in the common bundle, won't get loaded any of our other app bundles.
     new webpack.optimize.CommonsChunkPlugin({
-      names: ["instructure-common", "vendor"],
+      name: 'vendor',
+      // children: true,
+
+      // ensures that no other module goes into the vendor chunk
       minChunks: Infinity
     }),
-    new webpack.IgnorePlugin(/\.md$/),
-    new webpack.IgnorePlugin(/(CHANGELOG|LICENSE|README)$/),
-    new webpack.IgnorePlugin(/package.json/),
-    new WebpackOnBuildPlugin(function(stats){
-      if(process.env.SKIP_JS_REV){
-        console.log("skipping rev...");
-      }else{
-        child_process.spawn("gulp", ["rev"]);
-      }
+    // gets moment locale setup before any app code runs
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'appBootstrap',
+      children: true
     }),
-    new webpack.PrefetchPlugin("./app/coffeescripts/calendar/ContextSelector.coffee"),
-    new webpack.PrefetchPlugin("./app/coffeescripts/calendar/TimeBlockRow.coffee"),
-    new webpack.PrefetchPlugin("./app/coffeescripts/react_files/components/FolderTree.coffee"),
-    new webpack.PrefetchPlugin("./app/coffeescripts/react_files/components/Toolbar.coffee"),
-    new webpack.PrefetchPlugin("./app/coffeescripts/react_files/utils/moveStuff.coffee"),
-    new webpack.PrefetchPlugin("./app/coffeescripts/views/grade_summary/OutcomeLineGraphView.coffee"),
-    new webpack.PrefetchPlugin("./app/coffeescripts/views/grade_summary/OutcomeView.coffee"),
-    new webpack.PrefetchPlugin("./app/coffeescripts/views/groups/manage/AssignToGroupMenu.coffee"),
-    new webpack.PrefetchPlugin("./app/coffeescripts/views/groups/manage/EditGroupAssignmentView.coffee"),
-    new webpack.PrefetchPlugin("./app/coffeescripts/views/groups/manage/GroupUserView.coffee"),
-    new webpack.PrefetchPlugin("./app/coffeescripts/views/MoveDialogSelect.coffee"),
-    new webpack.PrefetchPlugin("./app/coffeescripts/widget/TokenInput.coffee"),
-    new webpack.PrefetchPlugin("./app/jsx/assignments/ModerationApp.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/authentication_providers/AuthTypePicker.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/context_modules/FileSelectBox.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/course_wizard/Checklist.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/dashboard_card/DashboardCard.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/due_dates/DueDates.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/due_dates/DueDateCalendarPicker.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/epub_exports/CourseListItem.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/external_apps/components/AppDetails.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/external_apps/components/AppList.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/external_apps/components/Configurations.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/external_apps/components/ConfigurationForm.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/external_apps/components/ConfigurationFormUrl.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/external_apps/components/ExternalToolsTableRow.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/files/BreadcrumbCollapsedContainer.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/files/CurrentUploads.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/files/DialogPreview.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/files/FilesApp.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/files/FilePreview.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/files/ShowFolder.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/files/UploadButton.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/files/utils/openMoveDialog.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/gradebook/grid/components/column_types/headerRenderer.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/gradebook/grid/components/dropdown_components/assignmentHeaderDropdownOptions.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/gradebook/grid/components/gradebook.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/gradebook/grid/wrappers/columnFactory.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/gradebook/SISGradePassback/PostGradesApp.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/gradebook/SISGradePassback/PostGradesDialogCorrectionsPage.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/grading/gradingPeriodCollection.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/grading/gradingStandardCollection.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/groups/components/PaginatedGroupList.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/shared/ColorPicker.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/theme_editor/ThemeEditorAccordion.jsx"),
-    new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/common/js/core/dispatcher.js"),
-    new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/events/js/bundles/routes.jsx"),
-    new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/events/js/routes/event_stream.jsx"),
-    new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/events/js/routes/question.jsx"),
-    new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/events/js/views/answer_matrix.jsx"),
-    new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/events/js/views/answer_matrix/inverted_table.jsx"),
-    new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/events/js/views/question_inspector.jsx"),
-    new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/events/js/views/question_inspector/answers/essay.jsx"),
-    new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/events/js/stores/events.js"),
-    new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/statistics/js/stores/reports.js"),
-    new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/statistics/js/stores/statistics.js"),
-    new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/statistics/js/views/app.jsx"),
-    new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/statistics/js/views/questions/multiple_choice.jsx"),
-    new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/statistics/js/views/summary/report.jsx"),
-    new webpack.PrefetchPlugin("./public/javascripts/axios.js"),
-    new webpack.PrefetchPlugin("./public/javascripts/bower/k5uploader/lib/ui_config_from_node.js"),
-    new webpack.PrefetchPlugin("./public/javascripts/bower/reflux/dist/reflux.min.js")
-  ]
-};
+    new webpack.optimize.CommonsChunkPlugin({
+      name: bundleEntries.common,
+      children: true
+    }),
+  ])
+}

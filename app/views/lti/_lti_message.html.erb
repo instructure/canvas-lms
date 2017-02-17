@@ -12,7 +12,8 @@
     </div>
 <% end %>
 
-<div class="tool_content_wrapper">
+<div class="tool_content_wrapper
+  <%= 'custom_height' unless @lti_launch.tool_dimensions[:selection_height] == '100%' %>">
 
 <form action="<%= @lti_launch.resource_url %>"
       class="hide"

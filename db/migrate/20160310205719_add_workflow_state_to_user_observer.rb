@@ -1,4 +1,4 @@
-class AddWorkflowStateToUserObserver < ActiveRecord::Migration
+class AddWorkflowStateToUserObserver < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

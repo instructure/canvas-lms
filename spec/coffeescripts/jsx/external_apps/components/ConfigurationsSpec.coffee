@@ -1,10 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/external_apps/components/Configurations'
-], (React, ReactDOM,Configurations) ->
+], (React, ReactDOM, TestUtils, Configurations) ->
 
-  TestUtils = React.addons.TestUtils
   wrapper = document.getElementById('fixtures')
 
   createElement = (data = {}) ->
@@ -13,7 +13,7 @@ define [
   renderComponent = (data = {}) ->
     ReactDOM.render(createElement(data), wrapper)
 
-  module 'ExternalApps.Configurations',
+  QUnit.module 'ExternalApps.Configurations',
     teardown: ->
       ReactDOM.unmountComponentAtNode(wrapper)
 

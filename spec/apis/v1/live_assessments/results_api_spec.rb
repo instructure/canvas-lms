@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe LiveAssessments::ResultsController, type: :request do
-  let_once(:assessment_course) { course(active_all: true) }
+  let_once(:assessment_course) { course_factory(active_all: true) }
   let_once(:teacher) { assessment_course.teachers.first }
   let_once(:student) { course_with_student(course: assessment_course).user }
   let_once(:another_student) { course_with_student(course: assessment_course).user }

@@ -148,15 +148,6 @@ Canvas::Plugin.register('wimba', :web_conferencing, {
   :validator => 'WimbaValidator',
   :encrypted_settings => [:password]
 })
-Canvas::Plugin.register('error_reporting', :error_reporting, {
-  :name => lambda{ t :name, 'Error Reporting' },
-  :description => lambda{ t :description, 'Default error reporting mechanisms' },
-  :website => 'http://www.instructure.com',
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings_partial => 'plugins/error_reporting_settings'
-})
 Canvas::Plugin.register('big_blue_button', :web_conferencing, {
   :name => lambda{ t :name, "BigBlueButton" },
   :description => lambda{ t :description, "BigBlueButton web conferencing support" },

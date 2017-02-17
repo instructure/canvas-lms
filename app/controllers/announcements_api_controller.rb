@@ -24,8 +24,8 @@
 class AnnouncementsApiController < ApplicationController
   include Api::V1::DiscussionTopics
 
-  before_filter :parse_context_codes, :only => [:index]
-  before_filter :get_dates, :only => [:index]
+  before_action :parse_context_codes, :only => [:index]
+  before_action :get_dates, :only => [:index]
 
   # @API List announcements
   #
@@ -44,6 +44,12 @@ class AnnouncementsApiController < ApplicationController
   #   Only return announcements posted before the end_date (inclusive).
   #   Defaults to 28 days from start_date. The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
   #   Announcements scheduled for future posting will only be returned to course administrators.
+  # @argument active_only [Optional, Boolean]
+  #   Only return active announcements that have been published.
+  #   Applies only to requesting users that have permission to view
+  #   unpublished items.
+  #   Defaults to false for users with access to view unpublished items,
+  #   otherwise true and unmodifiable.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/announcements?context_codes[]=course_1&context_codes[]=course_2 \
@@ -68,7 +74,7 @@ class AnnouncementsApiController < ApplicationController
     scope = Announcement.where(:context_type => 'Course', :context_id => courses)
 
     include_unpublished = courses.all? { |course| course.grants_right?(@current_user, :view_unpublished_items) }
-    scope = if include_unpublished
+    scope = if include_unpublished && !value_to_boolean(params[:active_only])
       scope.where.not(:workflow_state => 'deleted')
     else
       # workflow state should be 'post_delayed' if delayed_post_at is in the future, but check because other endpoints do
@@ -78,6 +84,8 @@ class AnnouncementsApiController < ApplicationController
     @start_date ||= 14.days.ago.beginning_of_day
     @end_date ||= @start_date + 28.days
     scope = scope.where('COALESCE(delayed_post_at, posted_at) BETWEEN ? AND ?', @start_date, @end_date)
+    scope = scope.order('COALESCE(delayed_post_at, posted_at) DESC')
+
     @topics = Api.paginate(scope, self, api_v1_announcements_url)
 
     render :json => @topics.map { |topic|

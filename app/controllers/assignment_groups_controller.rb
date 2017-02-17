@@ -68,6 +68,16 @@
 #           "example": 20,
 #           "type": "integer"
 #         },
+#         "sis_source_id": {
+#           "description": "the sis source id of the Assignment Group",
+#           "example": "1234",
+#           "type": "string"
+#         },
+#         "integration_data": {
+#           "description": "the integration data of the Assignment Group",
+#           "example": {"5678": "0954"},
+#           "type": "object"
+#         },
 #         "assignments": {
 #           "description": "the assignments in this Assignment Group (see the Assignment API for a detailed list of fields)",
 #           "example": [],
@@ -82,7 +92,7 @@
 #     }
 #
 class AssignmentGroupsController < ApplicationController
-  before_filter :require_context
+  before_action :require_context
 
   include Api::V1::AssignmentGroup
 
@@ -151,7 +161,7 @@ class AssignmentGroupsController < ApplicationController
     if authorized_action(@group, @current_user, :update)
       order = params[:order].split(',').map{|id| id.to_i }
       group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.where(id: order).uniq.except(:order).pluck(:assignment_group_id)))
-      assignments = @context.active_assignments.where(id: order).preload(:active_assignment_overrides)
+      assignments = @context.active_assignments.where(id: order)
 
       return render_unauthorized_action unless can_reorder_assignments?(assignments, @group)
 
@@ -184,6 +194,9 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def create
+    unless valid_integration_data?
+      return render :json => 'Invalid integration data', :status => :bad_request
+    end
     @assignment_group = @context.assignment_groups.temp_record(assignment_group_params)
     if authorized_action(@assignment_group, @current_user, :create)
       respond_to do |format|
@@ -200,10 +213,15 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def update
+    unless valid_integration_data?
+      return render :json => 'Invalid integration data', :status => :bad_request
+    end
     @assignment_group = @context.assignment_groups.find(params[:id])
     if authorized_action(@assignment_group, @current_user, :update)
       respond_to do |format|
-        if @assignment_group.update_attributes(assignment_group_params)
+        updated = update_assignment_group(@assignment_group, params['assignment_group'])
+        if updated.present? && updated.save
+          @assignment_group = updated
           flash[:notice] = t 'notices.updated', 'Assignment Group was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
           format.json { render :json => @assignment_group.as_json(:permissions => {:user => @current_user, :session => session}), :status => :ok }
@@ -243,9 +261,21 @@ class AssignmentGroupsController < ApplicationController
 
   private
 
+  def valid_integration_data?
+    integration_data = assignment_group_params['integration_data']
+    integration_data.is_a?(Hash) || integration_data.nil?
+  end
+
   def assignment_group_params
-    strong_params.require(:assignment_group).
-      permit(:assignment_weighting_scheme, :default_assignment_name, :group_weight, :name, :position, :sis_source_id, :rules)
+    params.require(:assignment_group).
+      permit(:assignment_weighting_scheme,
+             :default_assignment_name,
+             :group_weight,
+             :name,
+             :position,
+             :rules,
+             :sis_source_id,
+             :integration_data => strong_anything)
   end
 
   def include_params
@@ -295,6 +325,11 @@ class AssignmentGroupsController < ApplicationController
     assignments_by_group = assignments.group_by(&:assignment_group_id)
     preloaded_attachments = user_content_attachments(assignments, context)
 
+    unless assignment_excludes.include?('in_closed_grading_period')
+      closed_grading_period_hash =
+        EffectiveDueDates.for_course(context, assignments).to_hash([:in_closed_grading_period])
+    end
+
     groups.map do |group|
       group.context = context
       group_assignments = assignments_by_group[group.id] || []
@@ -307,7 +342,8 @@ class AssignmentGroupsController < ApplicationController
         assignment_visibilities: assignment_visibilities(context, assignments),
         exclude_response_fields: assignment_excludes,
         include_overrides: include_overrides,
-        submissions: submissions
+        submissions: submissions,
+        closed_grading_period_hash: closed_grading_period_hash
       }
 
       assignment_group_json(group, current_user, session, params[:include], options)
@@ -370,6 +406,10 @@ class AssignmentGroupsController < ApplicationController
       assignments.each { |a| a.has_no_overrides = true if a.assignment_overrides.size == 0 }
     end
 
+    if master_courses? && context.grants_right?(@current_user, session, :manage_assignments)
+      MasterCourses::Restrictor.preload_restrictions(assignments)
+    end
+
     assignments
   end
 
@@ -386,12 +426,15 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def can_reorder_assignments?(assignments, group)
-    return true if @context.account_membership_allows(@current_user)
     return true unless @context.feature_enabled?(:multiple_grading_periods)
-    periods = GradingPeriod.for(@context)
+    return true if @context.account_membership_allows(@current_user)
+
+    effective_due_dates = EffectiveDueDates.for_course(@context, assignments)
     assignments.none? do |assignment|
+      # if the assignment is being moved into a different group and it's in
+      # a closed period, do not allow it to be moved.
       assignment.assignment_group_id != group.id &&
-        assignment.due_for_any_student_in_closed_grading_period?(periods)
+        effective_due_dates.in_closed_grading_period?(assignment.id)
     end
   end
 end

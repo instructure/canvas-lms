@@ -56,7 +56,7 @@ describe SearchController do
     it "should allow filtering out non-messageable courses" do
       course_with_student_logged_in(:active_all => true)
       @course.update_attribute(:name, "course1")
-      @course2 = course(:active_all => 1)
+      @course2 = course_factory(active_all: true)
       @course2.enroll_student(@user).accept
       @course2.update_attribute(:name, "course2")
       term = @course2.root_account.enrollment_terms.create! :name => "Fall", :end_at => 1.day.ago
@@ -85,8 +85,8 @@ describe SearchController do
 
     context "with admin_context" do
       it "should return nothing if the user doesn't have rights" do
-        user_session(user)
-        course(:active_all => true).course_sections.create(:name => "other section")
+        user_session(user_factory)
+        course_factory(active_all: true).course_sections.create(:name => "other section")
         expect(response).to be_success
 
         get 'recipients', {
@@ -99,7 +99,7 @@ describe SearchController do
       it "should return sub-contexts" do
         account_admin_user()
         user_session(@user)
-        course(:active_all => true).course_sections.create(:name => "other section")
+        course_factory(active_all: true).course_sections.create(:name => "other section")
 
         get 'recipients', {
           :type => 'section', :skip_visibility_checks => true,
@@ -112,7 +112,7 @@ describe SearchController do
       it "should return sub-users" do
         account_admin_user
         user_session(@user)
-        course(:active_all => true).course_sections.create(:name => "other section")
+        course_factory(active_all: true).course_sections.create(:name => "other section")
         course_with_student(:active_all => true)
 
         get 'recipients', {
@@ -163,8 +163,8 @@ describe SearchController do
 
   describe "GET 'all_courses'" do
     before(:once) do
-      @c1 = course(course_name: 'foo', active_course: true)
-      @c2 = course(course_name: 'bar', active_course: true)
+      @c1 = course_factory(course_name: 'foo', active_course: true)
+      @c2 = course_factory(course_name: 'bar', active_course: true)
       @c2.update_attribute(:indexed, true)
     end
 

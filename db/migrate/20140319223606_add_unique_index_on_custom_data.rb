@@ -1,4 +1,4 @@
-class AddUniqueIndexOnCustomData < ActiveRecord::Migration
+class AddUniqueIndexOnCustomData < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

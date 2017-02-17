@@ -5,9 +5,9 @@
 class SisApiController < ApplicationController
   include Api::V1::SisAssignment
 
-  before_filter :require_view_all_grades, only: [:sis_assignments]
-  before_filter :require_grade_export, only: [:sis_assignments]
-  before_filter :require_published_course, only: [:sis_assignments]
+  before_action :require_view_all_grades, only: [:sis_assignments]
+  before_action :require_grade_export, only: [:sis_assignments]
+  before_action :require_published_course, only: [:sis_assignments]
 
   GRADE_EXPORT_NOT_ENABLED_ERROR = {
     code: 'not_enabled',
@@ -22,21 +22,17 @@ class SisApiController < ApplicationController
   # @API Retrieve assignments enabled for grade export to SIS
   # @beta
   #
-  # Retrieve a list of published assignments flagged as "post_to_sis". Assignment group, section, and user override
-  # information are included for convenience.
+  # Retrieve a list of published assignments flagged as "post_to_sis". Assignment group and section information are
+  # included for convenience.
   #
   # Each section includes course information for the origin course and the cross-listed course, if applicable. The
   # `origin_course` is the course to which the section belongs or the course from which the section was cross-listed.
   # Generally, the `origin_course` should be preferred when performing integration work. The `xlist_course` is provided
   # for consistency and is only present when the section has been cross-listed.
   #
-  # Each user_override includes basic user information, if applicable. The `id` will either be a single users id or an
-  # array of hashes that contain the basic user information for each user associated to the override.
-  #
   # The `override` is only provided if the Differentiated Assignments course feature is turned on and the assignment
   # has an override for that section. When there is an override for the assignment the override object's keys/values can
-  # be merged with the top level assignment object to create a view of the assignment object specific to that section or
-  # user(s).
+  # be merged with the top level assignment object to create a view of the assignment object specific to that section.
   #
   # @argument account_id [Integer] The ID of the account to query.
   # @argument course_id [Integer] The ID of the course to query.
@@ -45,6 +41,9 @@ class SisApiController < ApplicationController
   #                                              this date (if they have a start date)
   # @argument ends_after [DateTime, Optional] When searching on an account, restricts to courses that end after this
   #                                              date (if they have an end date)
+  # @argument include [String, "student_overrides"] Array of additional information to include.
+  #
+  #   "student_overrides":: returns individual student override information
   #
   # @example_response
   #   [
@@ -88,35 +87,25 @@ class SisApiController < ApplicationController
   #             "due_at": "2015-02-01%17:00:00Z"
   #           }
   #         },
+  #       ],
   #       "user_overrides": [
   #         {
-  #           "id": 163,
-  #           "name": "Test McTest",
-  #           "sis_user_id": "123-456",
-  #           "override": {
-  #             "due_at": "2016-08-29T05:59:59Z"
-  #            }
-  #         },
-  #         {
-  #           "id": [
+  #           "id": 54351,
+  #           "title": "Some Title",
+  #           "due_at": "2017-02-08 22:11:10",
+  #           "unlock_at": null,
+  #           "lock_at": null,
+  #           "students": [
   #             {
-  #               "id": 5,
-  #               "name": "Bob",
-  #               "sis_user_id": "84746"
+  #               "user_id": 643194
+  #               "sis_user_id": SIS_123
   #             },
   #             {
-  #               "id": 7,
-  #               "name": "Joe",
-  #               "sis_user_id": "29361"
+  #               "user_id": 643195
+  #               "sis_user_id": SIS_456
   #             }
-  #           ],
-  #           "override": {
-  #             "due_at": "2016-08-28T05:59:59Z"
-  #           }
-  #         },
-  #
-  #         ...
-  #
+  #           ]
+  #         }
   #       ]
   #     },
   #
@@ -125,20 +114,22 @@ class SisApiController < ApplicationController
   #   ]
   #
   def sis_assignments
-    render json: sis_assignments_json(paginated_assignments)
+    includes = {}
+    includes[:student_overrides] = include_student_overrides?
+    render json: sis_assignments_json(paginated_assignments, includes)
   end
 
   private
 
   def context
     @context ||=
-        if params[:account_id]
-          api_find(Account, params[:account_id])
-        elsif params[:course_id]
-          api_find(Course, params[:course_id])
-        else
-          fail ActiveRecord::RecordNotFound, 'unknown context type'
-        end
+      if params[:account_id]
+        api_find(Account, params[:account_id])
+      elsif params[:course_id]
+        api_find(Course, params[:course_id])
+      else
+        fail ActiveRecord::RecordNotFound, 'unknown context type'
+      end
   end
 
   def published_course_ids
@@ -164,13 +155,26 @@ class SisApiController < ApplicationController
     end
   end
 
+  def include_student_overrides?
+    params[:include].to_a.include?('student_overrides')
+  end
+
   def published_assignments
-    Assignment.published.
+    assignments = Assignment.published.
       where(post_to_sis: true).
       where(context_type: 'Course', context_id: published_course_ids).
       preload(:assignment_group).
-      preload(:active_assignment_overrides).
       preload(context: { active_course_sections: [:nonxlist_course] })
+
+    if include_student_overrides?
+      assignments = assignments.preload(
+        active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]]
+      )
+    else
+      assignments = assignments.preload(:active_assignment_overrides)
+    end
+
+    assignments
   end
 
   def paginated_assignments

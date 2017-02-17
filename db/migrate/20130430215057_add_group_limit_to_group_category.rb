@@ -1,4 +1,4 @@
-class AddGroupLimitToGroupCategory < ActiveRecord::Migration
+class AddGroupLimitToGroupCategory < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

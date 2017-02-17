@@ -7,37 +7,58 @@
 
 <% content_for :right_side do %>
   <h2><%= t 'links.more_about_this_user', "More About This User" %></h2>
-  <div class="page-action-list" id="right_nav">
+  <div class="page-action-list rs-margin-bottom" id="right_nav">
     <% if can_do(@membership, @current_user, :read_grades) && @membership.is_a?(StudentEnrollment) %>
-      <a href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>"><i class="icon-check-plus"></i> <%= t 'links.user_grades', "Grades" %></a>
+      <a href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>">
+        <i class="icon-check-plus" aria-hidden="true"></i>
+        <%= t 'links.user_grades', "Grades" %>
+      </a>
     <% end %>
     <% if can_do(@context, @current_user, :send_messages) %>
-      <a href="<%= message_user_path(@user) %>"><i class="icon-email"></i> <%= t 'links.message_user', "Send Message" %></a>
+      <a href="<%= message_user_path(@user) %>">
+        <i class="icon-email" aria-hidden="true"></i>
+        <%= t 'links.message_user', "Send Message" %>
+      </a>
     <% end %>
     <% if @domain_root_account.enable_user_notes and can_do(@user, @current_user, :read_user_notes) %>
       <a href="<%= user_user_notes_path(@user) %>"> <%= t 'links.faculty_journal', "Faculty Journal" %></a>
     <% end %>
     <% if @context.is_a?(Course)%>
       <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :read_reports) %>
-        <%= link_to(t('links.teacher_activity', 'Student Interactions Report'), user_course_teacher_activity_url(@user, @context)) %>
+        <a href="<%= user_course_teacher_activity_url(@user, @context) %>">
+          <i class="icon-chat" aria-hidden="true"></i>
+          <%= t 'links.teacher_activity', 'Student Interactions Report' %>
+        </a>
       <% elsif @context.user_has_been_student?(@user) && @context.user_is_instructor?(@current_user) && can_do(@context, @current_user, :read_reports) %>
         <%= link_to(user_student_teacher_activity_url(@current_user, @user)) do %>
-          <i class="icon-peer-review"></i>
-          <%= t('links.student_teacher_activity', 'Interactions with You') %>
+          <i class="icon-chat" aria-hidden="true"></i>
+          <%= t('Interactions Report') %>
         <% end %>
       <% end %>
     <% end %>
     <% if can_do(@context, @current_user, :read_reports) %>
-      <a href="<%= context_url(@context, :context_user_usage_url, @user) %>"><i class="icon-clock"></i> <%= t 'links.access_report', "Access Report" %></a>
+      <a href="<%= context_url(@context, :context_user_usage_url, @user) %>">
+        <i class="icon-clock" aria-hidden="true"></i>
+        <%= t 'links.access_report', "Access Report" %>
+      </a>
     <% end %>
     <% if @context.is_a?(Course) && @context.has_outcomes? && can_do(@context, @current_user, :manage) %>
-      <a href="<%= context_url(@context, :context_user_outcomes_results_url, @user.id) %>"><i class="icon-star"></i> <%= t 'links.user_outcomes', "Outcomes" %></a>
+      <a href="<%= context_url(@context, :context_user_outcomes_results_url, @user.id) %>">
+        <i class="icon-outcomes" aria-hidden="true"></i>
+        <%= t "Outcomes Report" %>
+      </a>
     <% end %>
     <% if @user.grants_right?(@current_user, :view_statistics) %>
-      <a href="<%= user_path(@user.id) %>"><i class="icon-user"></i> <%= t('links.user_account_details', %{User Account Details}) %></a>
+      <a href="<%= user_path(@user.id) %>">
+        <i class="icon-user" aria-hidden="true"></i>
+        <%= t('links.user_account_details', %{User Account Details}) %>
+      </a>
     <% end %>
     <% roster_user_custom_links(@user).each do |link| %>
-      <a href="<%= link[:url] %>"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
+      <a href="<%= link[:url] %>">
+        <i class="<%= link[:icon_class] %>" aria-hidden="true"></i>
+        <%= link[:text] %>
+      </a>
     <% end %>
   </div>
   <a href="<%= user_profile_path(@current_user) %>" class="profile_url" style="display: none;">&nbsp;</a>

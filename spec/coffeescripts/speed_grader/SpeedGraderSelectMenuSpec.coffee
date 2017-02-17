@@ -3,7 +3,7 @@ define [
   'speed_grader_select_menu'
 ], ($, SpeedgraderSelectMenu)->
 
-  module "SpeedGraderSelectMenu",
+  QUnit.module "SpeedGraderSelectMenu",
     setup: ->
       @fixtureNode = document.getElementById("fixtures")
       @testArea = document.createElement('div')

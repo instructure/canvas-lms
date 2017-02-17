@@ -5,9 +5,9 @@ describe 'omit from final grade assignments' do
   include_context "in-process server selenium tests"
   include AssignmentsCommon
 
-  let(:test_course) { course(active_course: true) }
-  let(:teacher)     { user(active_all: true) }
-  let(:student)     { user(active_all: true) }
+  let(:test_course) { course_factory(active_course: true) }
+  let(:teacher)     { user_factory(active_all: true) }
+  let(:student)     { user_factory(active_all: true) }
   let(:enroll_teacher_and_students) do
     test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
     test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
@@ -62,8 +62,8 @@ describe 'omit from final grade assignments' do
   context 'in gradebook' do
     before(:each) do
       enroll_teacher_and_students
-      assignment_1.grade_student(student, grade: 10)
-      assignment_3.grade_student(student, grade: 5)
+      assignment_1.grade_student(student, grade: 10, grader: teacher)
+      assignment_3.grade_student(student, grade: 5, grader: teacher)
       user_session(teacher)
       get "/courses/#{test_course.id}/gradebook"
     end
@@ -81,8 +81,8 @@ describe 'omit from final grade assignments' do
   context 'as a student' do
     before(:each) do
       enroll_teacher_and_students
-      assignment_1.grade_student(student, grade: 10)
-      assignment_3.grade_student(student, grade: 5)
+      assignment_1.grade_student(student, grade: 10, grader: teacher)
+      assignment_3.grade_student(student, grade: 5, grader: teacher)
       user_session(student)
       get "/courses/#{test_course.id}/grades"
     end

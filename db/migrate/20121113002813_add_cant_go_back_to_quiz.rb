@@ -1,4 +1,4 @@
-class AddCantGoBackToQuiz < ActiveRecord::Migration
+class AddCantGoBackToQuiz < ActiveRecord::Migration[4.2]
   tag :predeploy
   def self.up
     add_column :quizzes, :cant_go_back, :boolean

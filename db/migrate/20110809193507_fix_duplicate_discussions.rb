@@ -1,4 +1,4 @@
-class FixDuplicateDiscussions < ActiveRecord::Migration
+class FixDuplicateDiscussions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

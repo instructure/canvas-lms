@@ -19,8 +19,6 @@
 require 'crocodoc'
 
 class CrocodocDocument < ActiveRecord::Base
-  attr_accessible :uuid, :process_state, :attachment_id
-
   belongs_to :attachment
 
   has_many :canvadocs_submissions
@@ -39,16 +37,22 @@ class CrocodocDocument < ActiveRecord::Base
   def upload
     return if uuid.present?
 
-    url = attachment.authenticated_s3_url(:expires => 1.day)
+    url = attachment.authenticated_s3_url(expires_in: 1.day)
 
-    response = Canvas.timeout_protection("crocodoc") {
-      crocodoc_api.upload(url)
-    }
+    begin
+      response = Canvas.timeout_protection("crocodoc_upload", raise_on_timeout: true) do
+        crocodoc_api.upload(url)
+      end
+    rescue Canvas::TimeoutCutoff
+      raise Canvas::Crocodoc::CutoffError, "not uploading due to timeout protection"
+    rescue Timeout::Error
+      raise Canvas::Crocodoc::TimeoutError, "not uploading due to timeout error"
+    end
 
     if response && response['uuid']
       update_attributes :uuid => response['uuid'], :process_state => 'QUEUED'
     elsif response.nil?
-      raise "no response received (request timed out?)"
+      raise "no response received"
     else
       raise response.inspect
     end
@@ -76,7 +80,7 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:editable] = false
     end
 
-    Canvas.timeout_protection("crocodoc", raise_on_timeout: true) do
+    Canvas.timeout_protection("crocodoc_session", raise_on_timeout: true) do
       response = crocodoc_api.session(uuid, opts)
       session = response['session']
       crocodoc_api.view(session)

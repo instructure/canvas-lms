@@ -1,6 +1,6 @@
 define ['compiled/util/round'], (round) ->
 
-  module "round"
+  QUnit.module "round"
 
   x = 1234.56789
 

@@ -1,4 +1,4 @@
-class DropBrokenQuizSubmissionEventPartitions < ActiveRecord::Migration
+class DropBrokenQuizSubmissionEventPartitions < ActiveRecord::Migration[4.2]
   tag :predeploy
   BAD_PARTITIONS = [
     Time.new(2014, 11),

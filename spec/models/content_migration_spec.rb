@@ -33,7 +33,7 @@ describe ContentMigration do
 
   context "import_object?" do
     before :once do
-      course
+      course_factory
       @cm = ContentMigration.new(context: @course)
     end
 
@@ -111,7 +111,7 @@ describe ContentMigration do
     end
 
     it "should import into a user" do
-      user
+      user_factory
       test_zip_import(@user)
     end
 
@@ -142,7 +142,7 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
-      @user = user
+      @user = user_factory
       account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
@@ -177,7 +177,7 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
-      @user = user
+      @user = user_factory
       account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
@@ -210,7 +210,7 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
-      @user = user
+      @user = user_factory
       account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
@@ -247,7 +247,7 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
-      @user = user
+      @user = user_factory
       account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
@@ -348,6 +348,40 @@ describe ContentMigration do
       new_quiz.quiz_questions.first.question_data[:question_text])
   end
 
+  it "selectively imports quizzes when id_prepender is in use" do
+    skip unless Qti.qti_enabled?
+
+    course_with_teacher
+    cm = ContentMigration.new(:context => @course, :user => @teacher)
+    cm.migration_type = 'qti_converter'
+    cm.migration_settings['import_immediately'] = true
+    cm.save!
+
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/quiz_qti.zip")
+    attachment = Attachment.new
+    attachment.context = cm
+    attachment.uploaded_data = File.open(package_path, 'rb')
+    attachment.filename = 'file.zip'
+    attachment.save!
+
+    cm.attachment = attachment
+    cm.save!
+
+    cm.queue_migration
+    run_jobs
+
+    expect(@course.quizzes.count).to eq 1
+    teh_quiz = @course.quizzes.first
+    teh_quiz.destroy!
+
+    cm.migration_settings['id_prepender'] = 'blah!'
+    cm.migration_settings['migration_ids_to_import'] = {'copy' => {'quizzes' => {teh_quiz.migration_id => '1'}}}
+    cm.save!
+    cm.queue_migration
+    run_jobs
+    expect(@course.quizzes.active.find_by_migration_id("blah!_#{teh_quiz.migration_id}")).not_to be_nil
+  end
+
   it "should identify and import compressed tarball archives" do
     skip unless Qti.qti_enabled?
 
@@ -427,6 +461,36 @@ describe ContentMigration do
     expect(qq.question_data).to be_present
     expect(qq.question_data.to_yaml).to include("/media_objects/m-5U5Jww6HL7zG35CgyaYGyA5bhzsremxY")
 
+  end
+
+  context "migrations with skip_job_progress enabled" do
+    before :once do
+      @account = Account.create!(:name => 'account')
+    end
+    def create_ab_cm
+      cm = ContentMigration.new(:context => @account)
+      cm.migration_settings[:migration_type] = 'academic_benchmark_importer'
+      cm.migration_settings[:import_immediately] = true
+      cm.migration_settings[:no_archive_file] = true
+      cm.migration_settings[:skip_import_notification] = true
+      cm.migration_settings[:skip_job_progress] = true
+      cm.save!
+      cm
+    end
+    it "should not throw an error when checking if blocked by current migration" do
+      cm = create_ab_cm
+      cm.queue_migration
+      cm = create_ab_cm
+      expect(cm.blocked_by_current_migration?(nil, 0, nil)).to be_truthy
+    end
+    it "should not throw an error checking for blocked migrations on save" do
+      cm1 = create_ab_cm
+      cm1.queue_migration
+      cm2 = create_ab_cm
+      cm2.queue_migration
+      cm1.workflow_state = 'imported'
+      cm1.save!
+    end
   end
 
   it "expires migration jobs after 48 hours" do

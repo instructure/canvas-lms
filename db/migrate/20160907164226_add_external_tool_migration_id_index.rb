@@ -1,4 +1,4 @@
-class AddExternalToolMigrationIdIndex < ActiveRecord::Migration
+class AddExternalToolMigrationIdIndex < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
   tag :postdeploy
 

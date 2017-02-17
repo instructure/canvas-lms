@@ -1,12 +1,13 @@
 define [
   'jquery'
   'underscore'
+  'spin.js'
   'compiled/views/CollectionView'
   'jst/DiscussionTopics/discussionList'
   'compiled/views/DiscussionTopics/DiscussionView'
   'jqueryui/draggable'
   'jqueryui/sortable'
-], ($, _, CollectionView, template, itemView) ->
+], ($, _, Spinner, CollectionView, template, itemView) ->
 
   class DiscussionListView extends CollectionView
     # Public: Template function (discussionList)

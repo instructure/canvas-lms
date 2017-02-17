@@ -1,4 +1,4 @@
-class AddLastLoggedOutToUsers < ActiveRecord::Migration
+class AddLastLoggedOutToUsers < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

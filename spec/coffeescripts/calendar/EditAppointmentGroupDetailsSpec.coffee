@@ -3,12 +3,12 @@ define [
   'compiled/calendar/EditAppointmentGroupDetails'
   'compiled/util/fcUtil'
   'timezone'
-  'vendor/timezone/America/Detroit'
-  'vendor/timezone/fr_FR'
+  'timezone/America/Detroit'
+  'timezone/fr_FR'
   'helpers/I18nStubber'
 ], ($, EditAppointmentGroupDetails, fcUtil, tz, detroit, french, I18nStubber) ->
 
-  module "EditAppointmentGroupDetails",
+  QUnit.module "EditAppointmentGroupDetails",
     setup: ->
       @snapshot = tz.snapshot()
       @$holder = $('<table />').appendTo(document.getElementById("fixtures"))

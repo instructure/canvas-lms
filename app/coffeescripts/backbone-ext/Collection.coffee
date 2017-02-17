@@ -1,5 +1,5 @@
 define [
-  'vendor/backbone'
+  'node_modules-version-of-backbone'
   'underscore'
   'compiled/util/mixin'
   'compiled/backbone-ext/DefaultUrlMixin'

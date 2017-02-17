@@ -19,9 +19,9 @@
 class ContextModulesController < ApplicationController
   include Api::V1::ContextModule
 
-  before_filter :require_context
+  before_action :require_context
   add_crumb(proc { t('#crumbs.modules', "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_context_modules_url }
-  before_filter { |c| c.active_tab = "modules" }
+  before_action { |c| c.active_tab = "modules" }
 
   module ModuleIndexHelper
     include ContextModulesHelper
@@ -67,12 +67,24 @@ class ContextModulesController < ApplicationController
 
       module_file_details = load_module_file_details if @context.grants_right?(@current_user, session, :manage_content)
       js_env :course_id => @context.id,
+        :CONTEXT_URL_ROOT => polymorphic_path([@context]),
         :FILES_CONTEXTS => [{asset_string: @context.asset_string}],
         :MODULE_FILE_DETAILS => module_file_details,
         :MODULE_FILE_PERMISSIONS => {
            usage_rights_required: @context.feature_enabled?(:usage_rights_required),
            manage_files: @context.grants_right?(@current_user, session, :manage_files)
         }
+
+      if master_courses?
+        is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)
+        if is_child_course # todo: someday expose master side data via here too
+          js_env(:MASTER_COURSE_SETTINGS => {
+            :HAS_MASTER_COURSE_SUBSCRIPTION => is_child_course,
+            :MASTER_COURSE_DATA_URL => context_url(@context, :context_context_modules_master_course_info_url)
+          })
+        end
+      end
+
       conditional_release_js_env(includes: :active_rules)
     end
   end
@@ -86,6 +98,10 @@ class ContextModulesController < ApplicationController
       if @is_student && tab_enabled?(@context.class::TAB_MODULES)
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
+      end
+
+      if @context.allow_web_export_download?
+        @last_web_export = @context.web_zip_exports.visible_to(@current_user).order('epub_exports.created_at').last
       end
     end
   end
@@ -101,7 +117,7 @@ class ContextModulesController < ApplicationController
 
         # locked assignments always have 0 sets, so this check makes it not return 404 if locked
         # but instead progress forward and return a warning message if is locked later on
-        if rule.present? && (rule[:locked] || rule[:assignment_sets].length > 1)
+        if rule.present? && (rule[:locked] || !rule[:selected_set_id] || rule[:assignment_sets].length > 1)
           if !rule[:locked]
             options = rule[:assignment_sets].map { |set|
               option = {
@@ -226,7 +242,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@context.context_modules.temp_record, @current_user, :create)
       @module = @context.context_modules.build
       @module.workflow_state = 'unpublished'
-      @module.attributes = params[:context_module]
+      @module.attributes = context_module_params
       respond_to do |format|
         if @module.save
           format.html { redirect_to named_context_url(@context, :context_context_modules_url) }
@@ -278,6 +294,26 @@ class ContextModulesController < ApplicationController
         else
           {:points_possible => nil, :due_date => nil}
         end
+      end
+      render :json => info
+    end
+  end
+
+  def content_tag_master_course_data
+    return not_found unless master_courses?
+    if authorized_action(@context, @current_user, :read_as_admin)
+      info = {}
+      if MasterCourses::ChildSubscription.is_child_course?(@context)
+        tag_scope = @context.module_items_visible_to(@current_user)
+        tag_scope = tag_scope.where(:id => params[:tag_id]) if params[:tag_id]
+        tag_ids = tag_scope.pluck(:id)
+        restriction_info = {}
+        if tag_ids.any?
+          MasterCourses::MasterContentTag.fetch_module_item_restrictions(tag_ids).each do |tag_id, restrictions|
+            restriction_info[tag_id] = restrictions.any?{|k, v| v} ? 'locked' : 'unlocked' # might need to elaborate in the future
+          end
+        end
+        info[:tag_restrictions] = restriction_info
       end
       render :json => info
     end
@@ -555,7 +591,7 @@ class ContextModulesController < ApplicationController
       elsif params[:unpublish]
         @module.unpublish
       end
-      if @module.update_attributes(params[:context_module])
+      if @module.update_attributes(context_module_params)
         json = @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => {:user => @current_user, :session => session})
         json['context_module']['relock_warning'] = true if @module.relock_warning?
         render :json => json
@@ -623,5 +659,10 @@ class ContextModulesController < ApplicationController
         assignments_or_quizzes.each{|o| o.has_too_many_overrides = true if ids.include?(o.id) }
       end
     end
+  end
+
+  def context_module_params
+    params.require(:context_module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade, :requirement_count,
+      :completion_requirements => strong_anything, :prerequisites => strong_anything)
   end
 end

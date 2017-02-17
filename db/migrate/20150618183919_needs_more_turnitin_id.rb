@@ -1,4 +1,4 @@
-class NeedsMoreTurnitinId < ActiveRecord::Migration
+class NeedsMoreTurnitinId < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

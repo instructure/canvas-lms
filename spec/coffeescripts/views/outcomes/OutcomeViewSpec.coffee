@@ -47,7 +47,7 @@ define [
     view.$el.appendTo($("#fixtures"))
     view.render()
 
-  module 'OutcomeView',
+  QUnit.module 'OutcomeView',
     setup: ->
       fakeENV.setup()
       ENV.PERMISSIONS = {manage_outcomes: true}

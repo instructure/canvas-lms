@@ -1,4 +1,4 @@
-class SetDevloperKeysAccountIdNil < ActiveRecord::Migration
+class SetDevloperKeysAccountIdNil < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

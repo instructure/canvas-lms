@@ -1,4 +1,4 @@
-class FixMaxConcurrentTrigger < ActiveRecord::Migration
+class FixMaxConcurrentTrigger < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def connection

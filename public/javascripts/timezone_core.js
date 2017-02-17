@@ -2,25 +2,27 @@ define([
   "jquery",
   "underscore",
   "require",
-  "vendor/timezone",
+  "timezone/index",
   "i18nObj",
   "moment",
   "moment_formats"
-], function($, _, require, tz, I18n, moment, MomentFormats) {
+], function($, _, require, _tz, I18n, moment, MomentFormats) {
   // start with the bare vendor-provided tz() function
   var currentLocale = "en_US" // default to US locale
   var momentLocale = "en"
-  var _tz = tz;
-  var _preloadedData = {};
+  var _preloadedData = window.__PRELOADED_TIMEZONE_DATA__ || (window.__PRELOADED_TIMEZONE_DATA__ = {});
 
   // wrap it up in a set of methods that will always call the most up-to-date
   // version. each method is intended to act as a subset of bigeasy's generic
   // tz() functionality.
-  tz = {
+  var tz = {
+
+    _preloadedData: _preloadedData,
+
     // wrap's moment() for parsing datetime strings. assumes the string to be
     // parsed is in the profile timezone unless if contains an offset string
     // *and* a format token to parse it, and unfudges the result.
-    moment: function(input, format) {
+    moment: function (input, format) {
       // ensure first argument is a string and second is a format or an array
       // of formats
       if (!_.isString(input) || !(_.isString(format) || _.isArray(format)))
@@ -243,44 +245,51 @@ define([
     // feature can be a chunk of previously loaded data, which is applied
     // immediately, or the name of a data file to load and then apply
     // asynchronously.
-    applyFeature: function(data, name) {
-      var promise = $.Deferred();
+    applyFeature: function (data, name) {
+      function extendConfig (preloadedData) {
+        tz.extendConfiguration(preloadedData, name);
+        return Promise.resolve();
+      }
       if (arguments.length > 1) {
         this.preload(name, data);
-        tz.extendConfiguration(data, name);
-        promise.resolve();
-        return promise;
+        return extendConfig(data);
       }
 
       name = data;
-      this.preload(name).then(function(preloadedData){
-        tz.extendConfiguration(preloadedData, name);
-        promise.resolve();
-      });
-
-      return promise;
+      var preloadedData = this.preload(name);
+      if (preloadedData instanceof Promise) {
+        return preloadedData.then(extendConfig);
+      }
+      return extendConfig(preloadedData);
     },
 
     // preload a specific data file without having to actually
     // change the timezone to do it. Future "applyFeature" calls
     // will apply synchronously if their data is already preloaded.
-    preload: function(name, data) {
-      var promise = $.Deferred();
-      if (arguments.length > 1){
+    preload: function (name, data) {
+      if (arguments.length > 1) {
         _preloadedData[name] = data;
-        promise.resolve(data);
-      } else if(_preloadedData[name]){
-        promise.resolve(_preloadedData[name]);
+        return _preloadedData[name];
+      } else if (_preloadedData[name]) {
+        return _preloadedData[name];
       } else {
-        require(["vendor/timezone/" + name], function(data){
-          _preloadedData[name] = data;
-          promise.resolve(data);
+        return new Promise(function(resolve, reject){
+          if (window.USE_WEBPACK) {
+            return reject(
+              new Error('In webpack, loading timezones on-demand is not supported. "' +
+                        name + '" should already be script tagged onto the page from Rails.')
+            )
+          } else {
+            require(['timezone/' + name], function (timezoneData){
+              _preloadedData[name] = timezoneData;
+              resolve(timezoneData);
+            });
+          }
         });
       }
-      return promise;
     },
 
-    changeLocale: function(){
+    changeLocale: function () {
       if (arguments.length > 2) {
         currentLocale = arguments[1];
         momentLocale = arguments[2];

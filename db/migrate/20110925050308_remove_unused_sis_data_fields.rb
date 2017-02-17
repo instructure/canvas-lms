@@ -1,4 +1,4 @@
-class RemoveUnusedSisDataFields < ActiveRecord::Migration
+class RemoveUnusedSisDataFields < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

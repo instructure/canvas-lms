@@ -59,7 +59,7 @@ describe "course grading schemes as account admin" do
   include_context "in-process server selenium tests"
   include GradingSchemesCommon
 
-  before(:once) do
+  before(:each) do
     course_with_admin_logged_in
     simple_grading_standard(@course.account)
   end

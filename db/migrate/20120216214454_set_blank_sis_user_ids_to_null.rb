@@ -1,4 +1,4 @@
-class SetBlankSisUserIdsToNull < ActiveRecord::Migration
+class SetBlankSisUserIdsToNull < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

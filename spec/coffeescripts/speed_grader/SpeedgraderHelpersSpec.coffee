@@ -3,7 +3,63 @@ define [
   'underscore'
 ], (SpeedgraderHelpers, _)->
 
-  module "SpeedgraderHelpers#buildIframe",
+  QUnit.module "SpeedGrader",
+    setup: ->
+      fixtures = document.getElementById('fixtures')
+      fixtures.innerHTML = """
+        <a id="assignment_submission_default_url" href="http://www.default.com"></a>
+        <a id="assignment_submission_originality_report_url" href="http://www.report.com"></a>
+      """
+    teardown: ->
+      fixtures.innerHTML = ""
+
+  test 'populateTurnitin sets correct URL for OriginalityReports', () ->
+    submission =
+      'id': '7'
+      'grade': null
+      'score': null
+      'submitted_at': '2016-11-29T22:29:44Z'
+      'assignment_id': '52'
+      'user_id': '2'
+      'submission_type': 'online_upload'
+      'workflow_state': 'submitted'
+      'updated_at': '2016-11-29T22:29:44Z'
+      'grade_matches_current_submission': true
+      'graded_at': null
+      'turnitin_data': 'attachment_103':
+        'similarity_score': 0.8
+        'state': 'acceptable'
+        'report_url': 'http://www.thebrickfan.com'
+        'status': 'scored'
+      'excused': null
+      'versioned_attachments': [ { 'attachment':
+        'id': '103'
+        'context_id': '2'
+        'context_type': 'User'
+        'size': null
+        'content_type': 'text/rtf'
+        'filename': '1480456390_119__Untitled.rtf'
+        'display_name': 'Untitled-2.rtf'
+        'workflow_state': 'pending_upload'
+        'viewed_at': null
+        'view_inline_ping_url': '/users/2/files/103/inline_view'
+        'mime_class': 'doc'
+        'currently_locked': false
+        'crocodoc_available?': null
+        'canvadoc_url': null
+        'crocodoc_url': null
+        'submitted_to_crocodoc': false
+        'provisional_crocodoc_url': null } ]
+      'late': false
+      'external_tool_url': null
+      'has_originality_report': true
+
+    reportContainer = $('#assignment_submission_originality_report_url')
+    defaultContainer = $('#assignment_submission_default_url')
+    container = SpeedgraderHelpers.urlContainer(submission, defaultContainer, reportContainer)
+    equal container, reportContainer
+
+  QUnit.module "SpeedgraderHelpers#buildIframe",
     setup: ->
       @buildIframe = SpeedgraderHelpers.buildIframe
 
@@ -25,7 +81,7 @@ define [
     }
     equal @buildIframe("path", options), expected
 
-  module "SpeedgraderHelpers#determineGradeToSubmit",
+  QUnit.module "SpeedgraderHelpers#determineGradeToSubmit",
     setup: ->
       @determineGrade = SpeedgraderHelpers.determineGradeToSubmit
       @student =
@@ -41,7 +97,7 @@ define [
   test "returns existing submission when use_existing_score is true", ->
     equal @determineGrade(true, @student, @grade), "89"
 
-  module "SpeedgraderHelpers#iframePreviewVersion",
+  QUnit.module "SpeedgraderHelpers#iframePreviewVersion",
     setup: ->
       @previewVersion = SpeedgraderHelpers.iframePreviewVersion
 
@@ -105,7 +161,7 @@ define [
       ]
     equal @previewVersion(submission), "&version=1"
 
-  module "SpeedgraderHelpers#setRightBarDisabled",
+  QUnit.module "SpeedgraderHelpers#setRightBarDisabled",
     setup: ->
       @fixtureNode = document.getElementById("fixtures")
       @testArea = document.createElement('div')
@@ -126,7 +182,7 @@ define [
     SpeedgraderHelpers.setRightBarDisabled(false)
     equal(@testArea.innerHTML, @startingHTML)
 
-  module "SpeedgraderHelpers#classNameBasedOnStudent",
+  QUnit.module "SpeedgraderHelpers#classNameBasedOnStudent",
     setup: ->
       @student =
         submission_state: null,
@@ -155,9 +211,9 @@ define [
   test "returns resubmitted data for graded_then_resubmitted", ->
     @student.submission_state = 'resubmitted'
     state = SpeedgraderHelpers.classNameBasedOnStudent(@student)
-    deepEqual(state, raw: 'resubmitted', formatted: 'graded, then resubmitted (Oct 13 at 12:22pm)')
+    deepEqual(state, raw: 'resubmitted', formatted: 'graded, then resubmitted (Oct 13, 2016 at 12:22pm)')
 
-  module "SpeedgraderHelpers#submissionState",
+  QUnit.module "SpeedgraderHelpers#submissionState",
     setup: ->
       @student =
         submission:

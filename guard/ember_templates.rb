@@ -1,24 +1,25 @@
 require 'guard'
-require 'guard/guard'
+require 'guard/plugin'
 require 'handlebars_tasks'
 
 module Guard
-  class EmberTemplates < Guard
+  class EmberTemplates < Plugin
 
     DEFAULT_OPTIONS = {
       :hide_success => false,
       :all_on_start => false
     }
 
-    def initialize(watchers=[], options={})
-      super([::Guard::Watcher.new(/(app\/coffeescripts\/ember\/.*.hbs)\z/)], {})
+    def initialize(options={})
+      options[:watchers] = [::Guard::Watcher.new(/(app\/coffeescripts\/ember\/.*.hbs)\z/)]
+      super(options)
     end
 
     def start
       run_all if options[:all_on_start]
     end
 
-    def run_on_change(paths)
+    def run_on_modifications(paths)
       paths.each do |path|
         begin
           UI.info "Compiling Ember template: #{path}"
@@ -43,8 +44,8 @@ module Guard
     end
 
 
-    def run_on_deletion(paths)
-      puts "TODO: run_on_deletion not implemented"
+    def run_on_removals(paths)
+      puts "TODO: run_on_removals not implemented"
     end
   end
 end

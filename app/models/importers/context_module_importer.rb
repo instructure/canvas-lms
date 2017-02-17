@@ -105,7 +105,7 @@ module Importers
       end
 
       position = hash[:position] || hash[:order]
-      if item.new_record? && migration.try(:last_module_position) # try to import new modules after current ones instead of interweaving positions
+      if (item.new_record? || item.workflow_state_was == 'deleted') && migration.try(:last_module_position) # try to import new modules after current ones instead of interweaving positions
         position = migration.last_module_position + (position || 1)
       end
       item.position = position
@@ -139,8 +139,8 @@ module Importers
 
       items.each do |tag_hash|
         begin
-          tag = self.add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
-          imported_migration_ids << tag.migration_id if tag
+          tags = self.add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
+          imported_migration_ids.concat tags.map(&:migration_id)
         rescue
           migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!)
         end
@@ -174,7 +174,10 @@ module Importers
       existing_item = context_module.content_tags.where(id: hash[:id]).first if hash[:id].present?
       existing_item ||= context_module.content_tags.where(migration_id: hash[:migration_id]).first if hash[:migration_id]
       existing_item ||= ContentTag.new(:context_module => context_module, :context => context)
+
+      existing_item.mark_as_importing!(migration)
       migration.add_imported_item(existing_item)
+
       existing_item.migration_id = hash[:migration_id]
       hash[:indent] = [hash[:indent] || 0, level].max
       resource_class = linked_resource_type_class(hash[:linked_resource_type])
@@ -294,23 +297,29 @@ module Importers
       else
         # We don't know what this is
       end
+      items = []
       if item
         item_map[hash[:migration_id]] = item if hash[:migration_id]
         item.migration_id = hash[:migration_id]
         item.new_tab = hash[:new_tab]
         item.position = (context_module.item_migration_position ||= context_module.content_tags.not_deleted.map(&:position).compact.max || 0)
-        if hash[:workflow_state] && !['active', 'published'].include?(item.workflow_state)
-          item.workflow_state = hash[:workflow_state]
+        if hash[:workflow_state]
+          if item.sync_workflow_state_to_asset?
+            item.workflow_state = item.asset_workflow_state if item.deleted? && hash[:workflow_state] != 'deleted'
+          elsif !['active', 'published'].include?(item.workflow_state)
+            item.workflow_state = hash[:workflow_state]
+          end
         end
         context_module.item_migration_position += 1
         item.save!
+        items << item
       end
       if hash[:sub_items]
         hash[:sub_items].each do |tag_hash|
-          self.add_module_item_from_migration(context_module, tag_hash, level + 1, context, item_map, migration)
+          items.concat self.add_module_item_from_migration(context_module, tag_hash, level + 1, context, item_map, migration)
         end
       end
-      item
+      items
     end
 
     def self.add_custom_fields_to_url(original_url, custom_fields)

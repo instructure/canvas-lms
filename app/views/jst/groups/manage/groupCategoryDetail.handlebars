@@ -1,64 +1,68 @@
-{{#if self_signup}}
-  <p class="pull-left">
-    {{#t "self_signup_blurb"}}Self sign-up is enabled for these groups.{{/t}}
-    {{#ifEqual self_signup "restricted"}}
-      <span>{{#t "restricted_self_signup_blurb"}}All students in a group are required to be in the same section.{{/t}}</span>
-    {{/ifEqual}}
-    {{> [groups/manage/selfSignupHelp]}}
-  </p>
-  {{#if group_limit}}
-    <p>{{#t "group_limit_blurb"}}Groups are limited to <strong>{{group_limit}}</strong> members.{{/t}}</p>
+<div class="group-category-summary__detailLayout">
+  {{#if self_signup}}
+    <div class="group-category-summary__messages">
+      <div>
+        {{#t "self_signup_blurb"}}Self sign-up is enabled for these groups.{{/t}}
+        {{#ifEqual self_signup "restricted"}}
+          <span>{{#t "restricted_self_signup_blurb"}}All students in a group are required to be in the same section.{{/t}}</span>
+        {{/ifEqual}}
+        {{> [groups/manage/selfSignupHelp]}}
+      </div>
+      {{#if group_limit}}
+        <div>{{#t "group_limit_blurb"}}Groups are limited to <strong>{{group_limit}}</strong> members.{{/t}}</div>
+      {{/if}}
+    </div>
   {{/if}}
-{{/if}}
 
-{{#unless randomlyAssignStudentsInProgress}}
-<div class="pull-right group-category-actions">
-  {{#unless locked}}
-    <button class="btn add-group" title="{{#t "add_group"}}Add Group{{/t}}"><i class='icon-plus'></i> {{#t "group"}}Group{{/t}}</button>
-  {{/unless}}
-  {{#unless protected}}
-    <span>
-      <a id="group-category-{{id}}-actions" class="al-trigger btn" role="button" aria-haspopup="true" aria-label="{{#t "settings"}}Settings{{/t}}" href="#">
-        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-        <span class="screenreader-only">{{#t "category_settings"}}Settings{{/t}}</span>
-      </a>
-      <ul class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
-        {{#if canMessageMembers}}
-           <li>
-             <a href="#" class="icon-email message-all-unassigned" data-focus-returns-to="group-category-{{id}}-actions">
-               {{#t "message_all_unassigned_option"}}Message All Unassigned Students{{/t}}
-             </a>
-           </li>
-        {{/if}}
-        {{#if canAssignMembers}}
+  {{#unless randomlyAssignStudentsInProgress}}
+  <div class="group-category-actions">
+    {{#unless locked}}
+      <button class="btn add-group" title="{{#t "add_group"}}Add Group{{/t}}"><i class='icon-plus'></i> {{#t "group"}}Group{{/t}}</button>
+    {{/unless}}
+    {{#unless protected}}
+      <span>
+        <a id="group-category-{{id}}-actions" class="al-trigger btn" role="button" aria-haspopup="true" aria-label="{{#t "settings"}}Settings{{/t}}" href="#">
+          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+          <span class="screenreader-only">{{#t "category_settings"}}Settings{{/t}}</span>
+        </a>
+        <ul class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+          {{#if canMessageMembers}}
+             <li>
+               <a href="#" class="icon-email message-all-unassigned" data-focus-returns-to="group-category-{{id}}-actions">
+                 {{#t "message_all_unassigned_option"}}Message All Unassigned Students{{/t}}
+               </a>
+             </li>
+          {{/if}}
+          {{#if canAssignMembers}}
+            <li>
+              <a href="#" class="icon-user randomly-assign-members" data-focus-returns-to="group-category-{{id}}-actions">
+                {{#t "randomly_assign_students_option"}}Randomly Assign Students{{/t}}
+              </a>
+            </li>
+          {{/if}}
           <li>
-            <a href="#" class="icon-user randomly-assign-members" data-focus-returns-to="group-category-{{id}}-actions">
-              {{#t "randomly_assign_students_option"}}Randomly Assign Students{{/t}}
+            <a href="#" class="icon-edit edit-category" data-focus-returns-to="group-category-{{id}}-actions" >
+              {{#t "edit_category_option"}}Edit{{/t}}
             </a>
           </li>
-        {{/if}}
-        <li>
-          <a href="#" class="icon-edit edit-category" data-focus-returns-to="group-category-{{id}}-actions" >
-            {{#t "edit_category_option"}}Edit{{/t}}
-          </a>
-        </li>
-        {{#ifEqual ENV.group_user_type "student"}}
-        <li>
-          <a href="#" class="icon-copy-course clone-category">
-            {{#t}}Clone Group Set{{/t}}
-          </a>
-        </li>
-        {{/ifEqual}}
-        <li>
-          <a href="#" class="icon-trash delete-category">
-            {{#t "delete_category_option"}}Delete{{/t}}
-          </a>
-        </li>
-      </ul>
-    </span>
+          {{#ifEqual ENV.group_user_type "student"}}
+          <li>
+            <a href="#" class="icon-copy-course clone-category">
+              {{#t}}Clone Group Set{{/t}}
+            </a>
+          </li>
+          {{/ifEqual}}
+          <li>
+            <a href="#" class="icon-trash delete-category">
+              {{#t "delete_category_option"}}Delete{{/t}}
+            </a>
+          </li>
+        </ul>
+      </span>
+    {{/unless}}
+  </div>
   {{/unless}}
 </div>
-{{/unless}}
 
 {{#if locked}}
   <div class="alert">

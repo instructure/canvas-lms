@@ -6,7 +6,7 @@ define([
 
   let elem, props
 
-  module('ThemeCard Component', {
+  QUnit.module('ThemeCard Component', {
     setup () {
       elem = document.createElement('div')
       props = {

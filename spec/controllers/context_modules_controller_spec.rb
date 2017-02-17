@@ -531,7 +531,7 @@ describe ContextModulesController do
   describe "GET progressions" do
     context "unauthenticated user in public course" do
       before(:once) do
-        course(:is_public => true, :active_all => true)
+        course_factory(:is_public => true, :active_all => true)
         @user = nil
         @mod1 = @course.context_modules.create!(:name => 'unlocked')
         @mod2 = @course.context_modules.create!(:name => 'locked', :unlock_at => 1.week.from_now)
@@ -780,11 +780,15 @@ describe ContextModulesController do
     end
 
     before :once do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student(:active_all => true)
       @mod = @course.context_modules.create!
       ag = @course.assignment_groups.create!
       @assg = ag.assignments.create!(:context => @course)
       @item = @mod.add_item :type => 'assignment', :id => @assg.id
+    end
+
+    before :each do
+      user_session @student
     end
 
     it "should return 404 if no rule matches item assignment" do
@@ -796,13 +800,14 @@ describe ContextModulesController do
       assert_response(:missing)
     end
 
-    it "should return 404 if matching rule is unlocked but has only one assignment set" do
+    it "should return 404 if matching rule is unlocked but has one selected assignment set" do
       user_session(@student)
 
       ConditionalRelease::Service.stubs(:rules_for).returns([
         {
           trigger_assignment: @assg.id,
           locked: false,
+          selected_set_id: 99,
           assignment_sets: [{}],
         }
       ])
@@ -856,6 +861,27 @@ describe ContextModulesController do
       expect(options[0][:setId]).to eq 1
       expect(options[1][:setId]).to eq 2
     end
+
+    it "should show choose page if matching rule is unlocked and has one unselected assignment set" do
+      user_session(@student)
+
+      ConditionalRelease::Service.stubs(:rules_for).returns([
+        {
+          trigger_assignment: @assg.id,
+          locked: false,
+          assignment_sets: [{ id: 1, assignments: []}],
+        }
+      ])
+
+      get 'choose_mastery_path', :course_id => @course.id, :id => @item.id
+      assert_response(:success)
+      mastery_path_data = controller.js_env[:CHOOSE_MASTERY_PATH_DATA]
+      expect(mastery_path_data).to include({
+        selectedOption: nil
+      })
+      expect(mastery_path_data[:options].length).to eq 1
+    end
+
 
     it "should show choose page if matches a rule that is unlocked and has more than two assignment sets even if multiple rules are present" do
       user_session(@student)

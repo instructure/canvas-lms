@@ -19,7 +19,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Module Items API", type: :request do
   before :once do
-    course.offer!
+    course_factory.offer!
 
     @module1 = @course.context_modules.create!(:name => "module1")
     @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 20)
@@ -991,6 +991,14 @@ describe "Module Items API", type: :request do
           expect(json['assignments'].map {|a| a['id']}).to eq assignment_ids.reverse
           expect(json['items']).to eq []
         end
+
+        it 'should return only published assignments' do
+          assignment_ids = create_assignments([@course.id], 5)
+          Assignment.find(assignment_ids.last).unpublish!
+          cyoe_returns assignment_ids
+          json = call_select_mastery_path @assignment_tag, 100, @student.id
+          expect(json['assignments'].map {|a| a['id']}).to eq assignment_ids[0..-2]
+        end
       end
     end
   end
@@ -1508,7 +1516,7 @@ describe "Module Items API", type: :request do
 
   context "unauthorized user" do
     before :once do
-      user
+      user_factory
     end
 
     it "should check permissions" do

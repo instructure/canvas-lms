@@ -43,7 +43,7 @@ module Factories
     opts = { active_user: true }.merge(opts)
     account = opts[:account] || Account.default
     create_grading_periods_for(account, opts) if opts[:grading_periods]
-    @user = opts[:user] || account.shard.activate { user(opts) }
+    @user = opts[:user] || account.shard.activate { user_factory(opts) }
     @admin = @user
 
     account.account_users.create!(:user => @user, :role => opts[:role])
@@ -54,7 +54,7 @@ module Factories
     account_admin_user(opts.merge(account: Account.site_admin))
   end
 
-  def user(opts={})
+  def user_factory(opts={})
     @user = User.create!(opts.slice(:name, :short_name))
     if opts[:active_user] || opts[:active_all]
       @user.accept_terms
@@ -66,21 +66,21 @@ module Factories
   end
 
   def user_with_pseudonym(opts={})
-    user(opts) unless opts[:user]
+    user_factory(opts) unless opts[:user]
     user = opts[:user] || @user
     @pseudonym = pseudonym(user, opts)
     user
   end
 
   def user_with_communication_channel(opts={})
-    user(opts) unless opts[:user]
+    user_factory(opts) unless opts[:user]
     user = opts[:user] || @user
     @cc = communication_channel(user, opts)
     user
   end
 
   def user_with_managed_pseudonym(opts={})
-    user(opts) unless opts[:user]
+    user_factory(opts) unless opts[:user]
     user = opts[:user] || @user
     managed_pseudonym(user, opts)
     user
@@ -97,7 +97,7 @@ module Factories
   end
 
   def student_in_section(section, opts={})
-    student = opts.fetch(:user) { user }
+    student = opts.fetch(:user) { user_factory }
     enrollment = section.course.enroll_user(student, 'StudentEnrollment', :section => section, :force_update => true)
     student.save!
     enrollment.workflow_state = 'active'
@@ -106,7 +106,7 @@ module Factories
   end
 
   def ta_in_section(section, opts={})
-    ta = opts.fetch(:user) { user }
+    ta = opts.fetch(:user) { user_factory }
     enrollment = section.course.enroll_user(ta, 'TaEnrollment', :section => section, :force_update => true)
     ta.save!
     enrollment.limit_privileges_to_course_section = true unless opts[:full_course_permissions]
@@ -116,8 +116,10 @@ module Factories
   end
 
   def teacher_in_section(section, opts={})
-    teacher = opts.fetch(:user) { user }
-    enrollment = section.course.enroll_user(teacher, 'TeacherEnrollment', :section => section, :force_update => true)
+    teacher = opts.fetch(:user) { user_factory }
+    limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
+    enrollment = section.course.enroll_user(teacher, 'TeacherEnrollment', :section => section,
+      :force_update => true, :limit_privileges_to_course_section => limit_privileges_to_course_section)
     teacher.save!
     enrollment.workflow_state = 'active'
     enrollment.save!
@@ -137,7 +139,7 @@ module Factories
   def create_users(records, options = {})
     @__create_user_count ||= 0
     name_prefix = options[:name_prefix] || "user"
-    records = records.times.map{ |i| { name: "#{name_prefix} #{@__create_user_count + i + 1}" } } if records.is_a?(Fixnum)
+    records = records.times.map{ |i| { name: "#{name_prefix} #{@__create_user_count + i + 1}" } } if records.is_a?(Integer)
     records = records.map { |record| valid_user_attributes.merge(workflow_state: "registered").merge(record) }
     @__create_user_count += records.size
     create_records(User, records, options[:return_type])

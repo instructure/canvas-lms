@@ -1,4 +1,4 @@
-class AddUniqueIndexToSettings < ActiveRecord::Migration
+class AddUniqueIndexToSettings < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

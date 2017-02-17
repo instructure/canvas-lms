@@ -1,4 +1,4 @@
-class AddCourseSelfEnrollmentCode < ActiveRecord::Migration
+class AddCourseSelfEnrollmentCode < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
   tag :predeploy
 

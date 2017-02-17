@@ -1,4 +1,4 @@
-class AddNonNullConstraintsToQuizSubmissionEvents < ActiveRecord::Migration
+class AddNonNullConstraintsToQuizSubmissionEvents < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

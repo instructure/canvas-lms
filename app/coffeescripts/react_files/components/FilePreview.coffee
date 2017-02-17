@@ -2,6 +2,7 @@ define [
   'jquery'
   'underscore'
   'react'
+  'react-addons-pure-render-mixin'
   'page'
   'react-modal'
   '../modules/customPropTypes'
@@ -18,13 +19,13 @@ define [
   '../modules/FocusStore'
   'jsx/files/codeToRemoveLater'
   'compiled/jquery.rails_flash_notifications'
-], ($, _, React, page, ReactModal, customPropTypes, Backbone, I18n, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore, codeToRemoveLater) ->
+], ($, _, React, PureRenderMixin, page, ReactModal, customPropTypes, Backbone, I18n, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore, codeToRemoveLater) ->
 
   FilePreview =
 
     displayName: 'FilePreview'
 
-    mixins: [React.addons.PureRenderMixin]
+    mixins: [PureRenderMixin]
 
     propTypes:
       currentFolder: customPropTypes.folder

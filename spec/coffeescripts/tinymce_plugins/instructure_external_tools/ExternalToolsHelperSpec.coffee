@@ -4,7 +4,7 @@ define [
   'jquery'
 ], (_, ExternalToolsHelper, $)->
 
-  module "ExternalToolsHelper:buttonConfig",
+  QUnit.module "ExternalToolsHelper:buttonConfig",
     setup: ->
       @buttonOpts = {
         name: "SomeName",
@@ -30,7 +30,7 @@ define [
     equal config.icon, null
     equal config.image, "example.com"
 
-  module "ExternalToolsHelper:clumpedButtonMapping",
+  QUnit.module "ExternalToolsHelper:clumpedButtonMapping",
     setup: ->
       @clumpedButtons = [
         {id: "ID_1", name: "NAME_1", icon_url: "", canvas_icon_class: "foo"},
@@ -70,7 +70,7 @@ define [
     imageTag = imageKey.split("&nbsp")[0]
     equal $(imageTag).prop("tagName"), "IMG"
 
-  module "ExternalToolsHelper:attachClumpedDropdown",
+  QUnit.module "ExternalToolsHelper:attachClumpedDropdown",
     setup: ->
       @theSpy = sinon.spy()
       @fakeTarget = {

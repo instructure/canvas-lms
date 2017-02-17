@@ -65,6 +65,8 @@ $ic-color-dark:              #2D3B45;
 $ic-color-medium-darker:     #394B58;
 $ic-color-medium:            #73818C;
 @if $use_high_contrast {     $ic-color-medium: #556572; }
+$ic-color-medium-lighter:    #8B969E;
+@if $use_high_contrast {     $ic-color-medium-lighter: #556572; }
 $ic-color-medium-light:      #F5F5F5;
 @if $use_high_contrast {     $ic-color-medium-light: #FFFFFF; }
 $ic-color-light:             #FFFFFF;
@@ -134,16 +136,19 @@ $contentBoxPadding:         8px;
 // Once all of those have been adjusted to use the new variable we can get rid of this
 $ic-line-height: 1.5;
 
-$ic-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-$ic-font-weight: 500; // instead of "bold"
+$ic-font-family: "LatoWeb", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+$ic-font-family-fallback: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+$ic-font-weight: bold; // we can phase this var out now we're on Lato
 
 $ic-font-size: 14px;
 
-$ic-font-size--xlarge:   28px;
-$ic-font-size--large:    23px;
-$ic-font-size--medium:   16px;
-$ic-font-size--small:    14px;
-$ic-font-size--xsmall:   12px;
+$ic-font-size--xlarge:   $ic-font-size + 14;
+$ic-font-size--large:    $ic-font-size + 9;
+$ic-font-size--medium:   $ic-font-size + 2;
+$ic-font-size--small:    $ic-font-size;
+$ic-font-size--xsmall:   $ic-font-size - 2;
 
 /* Legacy variables. Discontinue to use these: */
 $h1-font-size:  23px;
@@ -290,3 +295,6 @@ $ic-radio-checkbox-left-offset:   22px;
 
 // override bootstrap green buttons
 $green: #34832b !default;
+
+// override default opacity for disabled classes
+$ic-opacity-disabled: 0.6

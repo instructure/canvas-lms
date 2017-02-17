@@ -1,6 +1,6 @@
 define ['compiled/object/unflatten'], (unflatten) ->
 
-  module 'unflatten'
+  QUnit.module 'unflatten'
 
   test 'simple object', ->
     input =

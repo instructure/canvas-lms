@@ -21,7 +21,7 @@ module QTI
     include CC::CCHelper
 
     attr_accessor :exporter
-    delegate :add_error, :set_progress, :export_object?, :add_exported_asset, :qti_export?, :course, :user, :to => :exporter
+    delegate :add_error, :set_progress, :export_object?, :add_exported_asset, :qti_export?, :course, :user, :create_key, :to => :exporter
     delegate :referenced_files, :to => :@html_exporter
 
     def initialize(exporter)
@@ -30,6 +30,7 @@ module QTI
       @document = nil
       @html_exporter = CCHelper::HtmlContentExporter.new(@exporter.course,
                                                          @exporter.user,
+                                                         :key_generator => @exporter,
                                                          :track_referenced_files => true,
                                                          :media_object_flavor => Setting.get('exporter_media_object_flavor', nil).presence)
     end

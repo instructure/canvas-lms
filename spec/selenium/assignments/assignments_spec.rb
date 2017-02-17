@@ -209,6 +209,22 @@ describe "assignments" do
       expect(@assignment.due_at.strftime('%b %d')).to eq expected_date
     end
 
+    it 'creates a simple assignment and defaults post_to_sis' do
+      a = @course.account
+      a.settings[:sis_default_grade_export] = {locked: false, value: true}
+      a.save!
+      assignment_name = "test_assignment_thing_#{rand(10000)}"
+      get "/courses/#{@course.id}/assignments"
+      group = @course.assignment_groups.first
+      f('.add_assignment').click
+      replace_content(f("#ag_#{group.id}_assignment_name"), assignment_name)
+      f('.create_assignment').click
+      wait_for_ajaximations
+      assignment = @course.assignments.where(title: assignment_name).last
+      expect(assignment).not_to be_nil
+      expect(assignment).to be_post_to_sis
+    end
+
     it "should create an assignment with more options", priority: "2", test_id: 622614 do
       enable_cache do
         expected_text = "Assignment 1"
@@ -275,16 +291,6 @@ describe "assignments" do
         second_input_val = driver.execute_script("return $('.DueDateInput__Container:last input').val();")
         expect(second_input_val).to match ""
       end
-    end
-
-    it "should verify that self sign-up link works in more options", priority: "2", test_id: 622853 do
-      get "/courses/#{@course.id}/assignments"
-      manually_create_assignment
-      f('#has_group_category').click
-      wait_for_ajaximations
-      fj('.ui-dialog:visible .self_signup_help_link img').click
-      wait_for_ajaximations
-      expect(f('#self_signup_help_dialog')).to be_displayed
     end
 
     it "should validate that a group category is selected", priority: "1", test_id: 626905 do
@@ -499,7 +505,7 @@ describe "assignments" do
         @assignment.update_attributes(points_possible: 15)
         @assignment.publish
         course_with_student_logged_in(active_all: true, course: @course)
-        @assignment.grade_student(@student, grade: 14)
+        @assignment.grade_student(@student, grade: 14, grader: @teacher)
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
         expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").
@@ -517,6 +523,15 @@ describe "assignments" do
         expect(@assignment.reload).to be_published
         expect(f("#assignment_publish_button")).to include_text("Published")
         expect(f("#assignment-speedgrader-link")).not_to have_class("hidden")
+      end
+
+      it "should have a link to speedgrader from the show page", priority: "1", test_id: 3001903 do
+        @assignment.publish
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        speedgrader_link = f(".icon-speed-grader")
+        speedgrader_link_text = "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+        expect(speedgrader_link.attribute("href")).to include(speedgrader_link_text)
       end
 
       it "should show publishing status on the edit page", priority: "2", test_id: 647852 do
@@ -653,7 +668,7 @@ describe "assignments" do
   context "post to sis default setting" do
     before do
       account_model
-      @account.enable_feature!(:bulk_sis_grade_export)
+      @account.set_feature_flag! 'post_grades', 'on'
       course_with_teacher_logged_in(:active_all => true, :account => @account)
     end
 

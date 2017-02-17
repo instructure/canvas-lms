@@ -3,7 +3,7 @@ define [
   'i18n!overrides'
 ], ( Section, I18n ) ->
 
-  module "Section"
+  QUnit.module "Section"
 
   test "#initialize doesn't assign value for id if not given", ->
     section = new Section

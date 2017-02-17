@@ -1,4 +1,4 @@
-class AddUnknownUserUrlToAccountAuthorizationConfig < ActiveRecord::Migration
+class AddUnknownUserUrlToAccountAuthorizationConfig < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

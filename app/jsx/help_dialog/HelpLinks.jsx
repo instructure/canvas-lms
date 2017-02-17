@@ -1,14 +1,17 @@
 define([
   'react',
-  'i18n!help_dialog'
-], (React, I18n) => {
+  'i18n!help_dialog',
+  'instructure-ui/Spinner'
+], (React, I18n, { default: Spinner }) => {
   const HelpLinks = React.createClass({
     propTypes: {
       links: React.PropTypes.array,
+      hasLoaded: React.PropTypes.bool,
       onClick: React.PropTypes.func
     },
     getDefaultProps() {
       return {
+        hasLoaded: false,
         links: [],
         onClick: function (url) {}
       };
@@ -61,7 +64,13 @@ define([
 
       return (
         <ul className="ic-NavMenu__link-list">
-          {links}
+          {this.props.hasLoaded ?
+            links
+            :
+            <li className="ic-NavMenu-list-item ic-NavMenu-list-item--loading-message">
+              <Spinner size="small" title={I18n.t('Loading')} />
+            </li>
+          }
         </ul>
       );
     }

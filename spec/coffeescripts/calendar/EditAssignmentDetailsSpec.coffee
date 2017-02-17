@@ -3,12 +3,12 @@ define [
   'compiled/calendar/EditAssignmentDetails'
   'compiled/util/fcUtil'
   'timezone'
-  'vendor/timezone/America/Detroit'
-  'vendor/timezone/fr_FR'
+  'timezone/America/Detroit'
+  'timezone/fr_FR'
   'helpers/I18nStubber'
 ], ($, EditAssignmentDetails, fcUtil, tz, detroit, french, I18nStubber) ->
 
-  module "EditAssignmentDetails",
+  QUnit.module "EditAssignmentDetails",
     setup: ->
       @snapshot = tz.snapshot()
       @$holder = $('<table />').appendTo(document.getElementById("fixtures"))

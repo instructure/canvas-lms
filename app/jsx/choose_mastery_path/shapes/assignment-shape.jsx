@@ -6,6 +6,7 @@ define([
 
   return shape({
     name: string.isRequired,
+    description: string,
     points_possible: number.isRequired,
     due_at: instanceOf(Date),
     category: categoryShape.isRequired,

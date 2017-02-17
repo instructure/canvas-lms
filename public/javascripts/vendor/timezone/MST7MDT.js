@@ -1,1 +1,1 @@
-define(function () { return {"zones":{"MST7MDT":["z",{"wallclock":-1.7976931348623157e+308,"format":"M%sT","abbrev":"M%sT","offset":-25200000,"posix":-1.7976931348623157e+308,"save":0}]},"rules":{}} });
+!function(){var e={zones:{MST7MDT:["z",{wallclock:-1.7976931348623157e308,format:"M%sT",abbrev:"M%sT",offset:-252e5,posix:-1.7976931348623157e308,save:0}]},rules:{}};"function"==typeof define&&define.amd?define(e):("undefined"==typeof __PRELOADED_TIMEZONE_DATA__&&(__PRELOADED_TIMEZONE_DATA__={}),__PRELOADED_TIMEZONE_DATA__.MST7MDT=e)}();

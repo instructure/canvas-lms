@@ -1,4 +1,4 @@
-class AddOneQuestionAtATimeToQuiz < ActiveRecord::Migration
+class AddOneQuestionAtATimeToQuiz < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -124,7 +124,7 @@ module UserContent
     end
 
     def user_can_view_attachment?
-      is_public && !attachment.locked_for?(user)
+      (is_public || (user && attachment.context.respond_to?(:is_public_to_auth_users?) && attachment.context.is_public_to_auth_users?)) && !attachment.locked_for?(user)
     end
   end
 end

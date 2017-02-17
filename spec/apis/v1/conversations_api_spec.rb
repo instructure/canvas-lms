@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe ConversationsController, type: :request do
   before :once do
-    @other = user(active_all: true)
+    @other = user_factory(active_all: true)
 
     course_with_teacher(:active_course => true, :active_enrollment => true, :user => user_with_pseudonym(:active_user => true))
     @course.update_attribute(:name, "the course")
@@ -551,6 +551,24 @@ describe ConversationsController, type: :request do
           expect(conv.context).to eq @course
         end
 
+        it "should always have the right tags when sending a bulk message in course context" do
+          other_course = Account.default.courses.create!(:workflow_state => 'available')
+          other_course.enroll_teacher(@user).accept!
+          other_course.enroll_student(@bob).accept!
+          # if they happen to be in another course it shouldn't use those tags - otherwise it will show up in the "sent" for other courses
+          @course.account.role_overrides.where(permission: 'send_messages_all', role: teacher_role).update_all(enabled: true)
+
+          json = api_call(:post, "/api/v1/conversations",
+            { :controller => 'conversations', :action => 'create', :format => 'json' },
+            { :recipients => [@course.asset_string], :body => "test", :context_code => @course.asset_string,
+              :bulk_message => "1", :group_conversation => "1"}
+          )
+
+          @user.all_conversations.sent.each do |cp|
+            expect(cp.tags).to eq [@course.asset_string]
+          end
+        end
+
         it "should allow site admin to set any account context" do
           site_admin_user(name: "site admin", active_all: true)
           json = api_call(:post, "/api/v1/conversations",
@@ -716,6 +734,14 @@ describe ConversationsController, type: :request do
           [@billy, @joe].each {|u| expect(u.conversations.first.conversation.context).to eql(@course)}
         end
 
+        it "constraints the length of the subject of a conversation batch" do
+          json = api_call(:post, "/api/v1/conversations",
+              { :controller => 'conversations', :action => 'create', :format => 'json' },
+              { :recipients => [@bob.id, @joe.id, @billy.id], :subject => 'Z' * 300, :body => "test",
+                :context_code => "course_#{@course.id}" }, {}, { :expected_status => 400 })
+          expect(json['errors']['subject']).to be_present
+        end
+
         it "should create/update bulk private conversations asynchronously" do
           json = api_call(:post, "/api/v1/conversations",
                   { :controller => 'conversations', :action => 'create', :format => 'json' },
@@ -839,7 +865,7 @@ describe ConversationsController, type: :request do
         it "should not asplode" do
           @shard1.activate do
             course_with_teacher(:active_course => true, :active_enrollment => true, :user => @me)
-            @bob = student_in_course(:course => @course, :name => "bob")
+            @bob = student_in_course(:name => "bob")
 
             @message = conversation(@me, :sender => @bob).messages.first
           end
@@ -947,7 +973,8 @@ describe ConversationsController, type: :request do
 
   context "conversation" do
     it "should return the conversation" do
-      conversation = conversation(@bob)
+      conversation = conversation(@bob, :context_type => "Course", :context_id => @course.id)
+
       attachment = @me.conversation_attachments_folder.attachments.create!(:context => @me, :filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('test'))
       media_object = MediaObject.new
       media_object.media_id = '0_12345678'
@@ -1037,6 +1064,31 @@ describe ConversationsController, type: :request do
         "context_name" => conversation.context_name,
         "context_code" => conversation.conversation.context_code,
       })
+    end
+
+    it "should indicate if conversation permissions for the context are missing" do
+      @user = @billy
+      conversation = conversation(@bob, :sender => @billy, :context_type => "Course", :context_id => @course.id)
+
+      @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+
+      json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
+        { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s, :format => 'json' })
+
+      expect(json["cannot_reply"]).to eq true
+    end
+
+    it "should not explode on account group conversations" do
+      @user = @billy
+      group
+      @group.add_user(@bob)
+      @group.add_user(@billy)
+      conversation = conversation(@bob, :sender => @billy, :context_type => "Group", :context_id => @group.id)
+
+      json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
+        { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s, :format => 'json' })
+
+      expect(json["cannot_reply"]).to_not be_truthy
     end
 
     it "should still include attachment verifiers when using session auth" do
@@ -2097,6 +2149,83 @@ describe ConversationsController, type: :request do
               { :controller => 'conversations', :action => 'deleted_index', :format => 'json',
                 :user_id => @bob.id, :deleted_after => 1.hour.from_now })
       expect(json.count).to eql 0
+    end
+  end
+
+  context 'restore_message' do
+    before :once do
+      @me = nil
+      @c1 = conversation(@bob)
+
+      account_admin_user(:account => Account.site_admin)
+    end
+
+    before :each do
+      @c1.remove_messages(:all)
+      @c1.message_count = 0
+      @c1.last_message_at = nil
+      @c1.save!
+    end
+
+    it 'returns an error when the conversation_message_id is not provided' do
+      @c1.all_messages.first()
+
+      raw_api_call(:put, "/api/v1/conversations/restore",
+              { :controller => "conversations", :action => "restore_message", :format => "json",
+                :user_id => @bob.id, :conversation_id => @c1.conversation_id })
+
+      expect(response.status).to eql 400
+    end
+
+    it 'returns an error when the user_id is not provided' do
+      @c1.all_messages.first()
+
+      raw_api_call(:put, "/api/v1/conversations/restore",
+              { :controller => "conversations", :action => "restore_message", :format => "json",
+                :conversation_id => @c1.conversation_id, :conversation_message_id => message.id })
+
+      expect(response.status).to eql 400
+    end
+
+    it 'returns an error when the conversation_id is not provided' do
+      @c1.all_messages.first()
+
+      raw_api_call(:put, "/api/v1/conversations/restore",
+              { :controller => "conversations", :action => "restore_message", :format => "json",
+                :user_id => @bob.id, :conversation_message_id => message.id })
+
+      expect(response.status).to eql 400
+    end
+
+    it 'restores the message' do
+      message = @c1.all_messages.first()
+
+      json = api_call(:put, "/api/v1/conversations/restore",
+              { :controller => "conversations", :action => "restore_message", :format => "json",
+                :user_id => @bob.id, :message_id => message.id, :conversation_id => @c1.conversation_id })
+
+      expect(response.status).to eql 200
+
+      cmp = ConversationMessageParticipant.where(:user_id => @bob.id).where(:conversation_message_id => message.id).first()
+      expect(cmp.workflow_state).to eql "active"
+      expect(cmp.deleted_at).to eql nil
+    end
+
+    it 'updates the message count and last_message_at on the conversation' do
+      expect(@c1.message_count).to eql 0
+      expect(@c1.last_message_at).to eql nil
+
+      message = @c1.all_messages.first()
+
+      json = api_call(:put, "/api/v1/conversations/restore",
+              { :controller => "conversations", :action => "restore_message", :format => "json",
+                :user_id => @bob.id, :message_id => message.id, :conversation_id => @c1.conversation_id })
+
+      expect(response.status).to eql 200
+
+      @c1.reload()
+      expect(@c1.message_count).to eql 1
+      expect(@c1.last_message_at).to eql message.created_at
     end
   end
 

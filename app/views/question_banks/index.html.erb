@@ -41,7 +41,7 @@
     <a href="#" class="add_bank_link btn button-sidebar-wide"><i class="icon-add"></i> <%= t 'add_bank', 'Add Question Bank' %></a>
   <% end %>
   <% if @current_user && @context != @current_user %>
-    <a href="<%= context_url(@current_user, :context_question_banks_url) %>" class="btn button-sidebar-wide see_bookmarked_banks"><%= image_tag("bookmark.png", alt: "") %> <%= t 'see_bookmarked_banks', 'See My Bookmarked Banks' %></a>
+    <a href="<%= context_url(@current_user, :context_question_banks_url) %>" class="btn button-sidebar-wide see_bookmarked_banks"><i class="icon-bookmark" role="presentation"></i> <%= t 'see_bookmarked_banks', 'See My Bookmarked Banks' %></a>
   <% end %>
 <% end %>
 

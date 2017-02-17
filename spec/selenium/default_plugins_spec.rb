@@ -22,7 +22,7 @@ describe "default plugins" do
     f("#settings_consumer_secret").send_keys("asdf")
     submit_form('#new_plugin_setting')
 
-    assert_flash_error_message /There was an error/
+    assert_flash_error_message "There was an error"
 
     f("#settings_consumer_secret").send_keys("asdf")
     Twitter::Connection.stubs(:config_check).returns(nil)
@@ -30,7 +30,7 @@ describe "default plugins" do
     submit_form('#new_plugin_setting')
     wait_for_ajax_requests
 
-    assert_flash_notice_message /successfully updated/
+    assert_flash_notice_message "successfully updated"
 
     settings = Canvas::Plugin.find(:twitter).try(:settings)
     expect(settings).not_to be_nil
@@ -50,13 +50,13 @@ describe "default plugins" do
     f("#settings_domain").send_keys("asdf")
     submit_form('#new_plugin_setting')
 
-    assert_flash_error_message /There was an error/
+    assert_flash_error_message "There was an error"
 
     f("#settings_name").send_keys("asdf")
     submit_form('#new_plugin_setting')
     wait_for_ajax_requests
 
-    assert_flash_notice_message /successfully updated/
+    assert_flash_notice_message "successfully updated"
 
     settings = Canvas::Plugin.find(:etherpad).try(:settings)
     expect(settings).not_to be_nil
@@ -78,14 +78,14 @@ describe "default plugins" do
     f("#settings_client_secret").send_keys("asdf")
     submit_form('#new_plugin_setting')
 
-    assert_flash_error_message /There was an error/
+    assert_flash_error_message "There was an error"
 
     f("#settings_client_secret").send_keys("asdf")
     LinkedIn::Connection.stubs(:config_check).returns(nil)
     submit_form('#new_plugin_setting')
     wait_for_ajax_requests
 
-    assert_flash_notice_message /successfully updated/
+    assert_flash_notice_message "successfully updated"
 
     settings = Canvas::Plugin.find(:linked_in).try(:settings)
     expect(settings).not_to be_nil

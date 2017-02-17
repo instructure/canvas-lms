@@ -19,7 +19,7 @@ define([
   'compiled/util/objectCollection',
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'vendor/jquery.spin' /* /\.spin/ */
+  'spin.js/jquery.spin' /* /\.spin/ */
 ], function(I18n, objectCollection, $) {
 
   $.fn.disableWhileLoading = function(deferred, options) {

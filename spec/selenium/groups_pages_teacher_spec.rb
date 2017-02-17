@@ -43,7 +43,7 @@ describe "groups" do
       it_behaves_like 'announcements_page', :teacher
 
       it "should allow teachers to see announcements", priority: "1", test_id: 287049 do
-        @announcement = @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @students.first)
+        @announcement = @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group', user: @students.first)
         verify_member_sees_announcement
       end
 
@@ -55,7 +55,7 @@ describe "groups" do
       end
 
       it "should allow teachers to delete their own group announcements", priority: "1", test_id: 326522 do
-        @testgroup.first.announcements.create!(title: 'Student Announcement', message: 'test message', User: @teacher)
+        @testgroup.first.announcements.create!(title: 'Student Announcement', message: 'test message', user: @teacher)
 
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
@@ -64,7 +64,7 @@ describe "groups" do
       end
 
       it "should allow teachers to delete group member announcements", priority: "1", test_id: 326523 do
-        @testgroup.first.announcements.create!(title: 'Student Announcement', message: 'test message', User: @students.first)
+        @testgroup.first.announcements.create!(title: 'Student Announcement', message: 'test message', user: @students.first)
 
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
@@ -73,12 +73,12 @@ describe "groups" do
       end
 
       it "should let teachers edit their own announcements", priority: "1", test_id: 312865 do
-        @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'test message', User: @teacher)
+        @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'test message', user: @teacher)
         edit_group_announcement
       end
 
       it "should let teachers edit group member announcements", priority: "2", test_id: 323325 do
-        @testgroup.first.announcements.create!(title: 'Your Announcement', message: 'test message', User: @students.first)
+        @testgroup.first.announcements.create!(title: 'Your Announcement', message: 'test message', user: @students.first)
         edit_group_announcement
       end
     end
@@ -190,7 +190,7 @@ describe "groups" do
         get files_page
         add_folder
         delete(0, :toolbar_menu)
-        expect(all_files_folders.count).to eq 0
+        expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
       it "should allow a teacher to delete a file", priority: "2", test_id: 304183 do
@@ -198,7 +198,7 @@ describe "groups" do
         get files_page
         delete(0, :toolbar_menu)
         wait_for_ajaximations
-        expect(all_files_folders.count).to eq 0
+        expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
       it "should allow teachers to move a file", priority: "2", test_id: 304185 do
@@ -212,6 +212,20 @@ describe "groups" do
         get files_page
         create_folder_structure
         move_folder(@inner_folder)
+      end
+
+      it "hides the publish cloud", priority: "1", test_id: 304673 do
+        add_test_files
+        get files_page
+        expect(f('#content')).not_to contain_css('.btn-link.published-status')
+      end
+
+      it "does not allow teachers to restrict access to a file", priority: "1", test_id: 304900 do
+        add_test_files
+        get files_page
+        f('.ef-item-row .ef-date-created-col').click
+        expect(f('.ef-header')).to contain_css('.ef-header__secondary')
+        expect(f('.ef-header__secondary')).not_to contain_css('.btn-restrict')
       end
     end
 

@@ -36,7 +36,7 @@
 #     }
 #
 class CustomGradebookColumnDataApiController < ApplicationController
-  before_filter :require_context, :require_user
+  before_action :require_context, :require_user
 
   include Api::V1::CustomGradebookColumn
 
@@ -84,7 +84,7 @@ class CustomGradebookColumnDataApiController < ApplicationController
       d.user_id = user.id
     }
     if authorized_action? datum, @current_user, :update
-      datum.attributes = params[:column_data]
+      datum.attributes = params.require(:column_data).permit(:content)
       if datum.content.blank?
         datum.destroy
         render :json => custom_gradebook_column_datum_json(datum, @current_user, session)

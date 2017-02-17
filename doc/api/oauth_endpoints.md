@@ -1,7 +1,7 @@
 OAuth2 Endpoints
 ================
 
-<div class="warning-message"> We have started rolling out short lived access tokens. You will need to start using <a href="file.oauth.html#using-refresh-tokens">refresh tokens</a> to generate new access tokens.</div>
+<div class="warning-message"> Developer keys issued after Oct 2015 generate tokens with a 1 hour expiration. Applications must use <a href="file.oauth.html#using-refresh-tokens">refresh tokens</a> to generate new access tokens.</div>
 
 - [GET login/oauth2/auth](#get-login-oauth2-auth)
 - [POST login/oauth2/token](#post-login-oauth2-token)
@@ -61,8 +61,10 @@ wrong person in, as <a href="http://homakov.blogspot.com/2012/07/saferweb-most-c
       <td>This can be used to specify what information the access token
       will provide access to.  By default an access token will have access to
       all api calls that a user can make.  The only other accepted value
-      for this at present is '/auth/userinfo', which can be used to obtain
-      the current canvas user's identity</td>
+      for this at present is '/auth/userinfo'. When used, this will return only
+      the current canvas user's identity. Some OAuth libraries may require a
+      scope parameter to be specified; if so, passing no value for the scope
+      parameter will behave as if no scope parameter was specified.</td>
     </tr>
     <tr>
       <td class="mono">purpose<span class="label optional"></span></td>
@@ -134,14 +136,42 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
   </table>
 
 
-  <h4>Response</h4>
-  The response will be a JSON argument containing the access_token:
+  <h4>Example responses</h4>
+
+  When using grant_type=code:
 
   <pre class="example_code">
   {
-    access_token: "1/fFAGRNJru1FTz70BzhT3Zg",
-    refresh_token: "tIh2YBWGiC0GgGRglT9Ylwv2MnTvy8csfGyfK2PqZmkFYYqYZ0wui4tzI7uBwnN2"
-    expires_in: 3600
+    "access_token": "1/fFAGRNJru1FTz70BzhT3Zg",
+    "token_type": "Bearer",
+    "user": {"id":42, "name": "Jimi Hendrix"},
+    "refresh_token": "tIh2YBWGiC0GgGRglT9Ylwv2MnTvy8csfGyfK2PqZmkFYYqYZ0wui4tzI7uBwnN2",
+    "expires_in": 3600
+  }
+  </pre>
+
+  When using grant_type=refresh_token, the response will not contain a new
+  refresh token since the same refresh token can be used multiple times:
+
+  <pre class="example_code">
+  {
+    "access_token": "1/fFAGRNJru1FTz70BzhT3Zg",
+    "token_type": "Bearer",
+    "user": {"id":42, "name": "Jimi Hendrix"},
+    "expires_in": 3600
+  }
+  </pre>
+
+  If scope=auth/userinfo was specified in the
+  <a href=oauth_endpoints.html#get-login-oauth2-auth>GET login/oauth2/auth</a> request
+  then the response that results from
+  <a href=oauth_endpoints.html#post-login-oauth2-token>POST login/oauth2/token</a> would be:
+
+  <pre class="example_code">
+  {
+    "access_token": null,
+    "token_type": "Bearer",
+    "user":{"id": 42, "name": "Jimi Hendrix"}
   }
   </pre>
 
@@ -158,12 +188,20 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
         <td>The OAuth2 access token.</td>
       </tr>
       <tr>
+        <td class="mono">token_type</td>
+        <td>The type of token that is returned.</td>
+      </tr>
+      <tr>
+        <td class="mono">user</td>
+        <td>A JSON object of canvas user id and user name.</td>
+      </tr>
+      <tr>
         <td class="mono">refresh_token</td>
         <td>The OAuth2 refresh token.</td>
       </tr>
       <tr>
         <td class="mono">expires_in</td>
-        <td>Seconds until the access token expires</td>
+        <td>Seconds until the access token expires.</td>
       </tr>
     </tbody>
   </table>

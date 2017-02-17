@@ -15,10 +15,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "folio-pagination", "0.0.11"
-  spec.add_dependency "will_paginate", "3.0.7"
+  spec.add_dependency "will_paginate", "~> 3.0"
 
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec", "2.99.0"
+  spec.add_development_dependency "rspec", "~> 3.5.0"
   spec.add_development_dependency "sqlite3"
 end

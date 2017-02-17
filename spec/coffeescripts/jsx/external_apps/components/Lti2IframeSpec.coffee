@@ -1,10 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/external_apps/components/Lti2Iframe'
-], (React, ReactDOM, Lti2Iframe) ->
+], (React, ReactDOM, TestUtils, Lti2Iframe) ->
 
-  TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
@@ -17,7 +17,7 @@ define [
   renderComponent = (data) ->
     ReactDOM.render(createElement(data), wrapper)
 
-  module 'ExternalApps.Lti2Iframe',
+  QUnit.module 'ExternalApps.Lti2Iframe',
     teardown: ->
       ReactDOM.unmountComponentAtNode wrapper
 
@@ -28,3 +28,13 @@ define [
     component = renderComponent(data)
     ok component.isMounted()
     ok TestUtils.isCompositeComponentWithType(component, Lti2Iframe)
+
+  test 'renders any children after the iframe', ->
+    element = React.createElement(Lti2Iframe,{
+      registrationUrl: 'http://www.test.com',
+      handleInstall: ->
+    }, React.createElement('div', {id: 'test-child'}))
+    component = TestUtils.renderIntoDocument(element)
+    ok $(component.getDOMNode()).find('#test-child').length == 1
+
+

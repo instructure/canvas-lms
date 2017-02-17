@@ -492,8 +492,8 @@ module Api
   # and adds context (e.g. /courses/:id/) if it is missing
   # exception: it leaves user-context file links alone
   def process_incoming_html_content(html)
-    host = request.host_with_port if self.respond_to?(:request)
-    Html::Content.process_incoming(html, host: host)
+    host, port = [request.host, request.port] if self.respond_to?(:request)
+    Html::Content.process_incoming(html, host: host, port: port)
   end
 
   def value_to_boolean(value)

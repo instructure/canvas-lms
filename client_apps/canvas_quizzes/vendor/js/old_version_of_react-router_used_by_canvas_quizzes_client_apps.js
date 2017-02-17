@@ -1,4 +1,38 @@
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define(['old_version_of_react_used_by_canvas_quizzes_client_apps'],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.ReactRouter=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+! function(e) {
+    if ("object" == typeof exports && "undefined" != typeof module) module.exports = e();
+    else if ("function" == typeof define && define.amd) define(['old_version_of_react_used_by_canvas_quizzes_client_apps'], e);
+    else {
+        var f;
+        "undefined" != typeof window ? f = window : "undefined" != typeof global ? f = global : "undefined" != typeof self && (f = self), f.ReactRouter = e()
+    }
+}(function() {
+  var define, module, exports;
+  return (function e(t, n, r) {
+    function s(o, u) {
+      if (!n[o]) {
+        if (!t[o]) {
+          // INSTRUCTURE put this line to make it work for webpack
+          if (o === 'old_version_of_react_used_by_canvas_quizzes_client_apps') return require('old_version_of_react_used_by_canvas_quizzes_client_apps');
+          var a = typeof require == "function" && require;
+          if (!u && a) return a(o, !0);
+          if (i) return i(o, !0);
+          throw new Error("Cannot find module '" + o + "'")
+        }
+        var f = n[o] = {
+          exports: {}
+        };
+        t[o][0].call(f.exports, function(e) {
+          var n = t[o][1][e];
+          return s(n ? n : e)
+        }, f, f.exports, e, t, n, r)
+      }
+      return n[o].exports
+    }
+    var i = typeof require == "function" && require;
+    for (var o = 0; o < r.length; o++) s(r[o]);
+    return s
+  }
+)({1: [function(_dereq_, module, exports) {
 /**
  * Actions that modify the URL.
  */
@@ -68,7 +102,7 @@ var ScrollToTopBehavior = {
 module.exports = ScrollToTopBehavior;
 
 },{}],4:[function(_dereq_,module,exports){
-var merge = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/merge');
+var merge = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/merge');
 var Route = _dereq_('./Route');
 
 /**
@@ -88,10 +122,10 @@ function DefaultRoute(props) {
 
 module.exports = DefaultRoute;
 
-},{"./Route":8,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/merge":71}],5:[function(_dereq_,module,exports){
-var React = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps');
-var classSet = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/cx');
-var merge = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/merge');
+},{"./Route":8,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/merge":71}],5:[function(_dereq_,module,exports){
+var React = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps');
+var classSet = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/cx');
+var merge = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/merge');
 var ActiveState = _dereq_('../mixins/ActiveState');
 var Navigation = _dereq_('../mixins/Navigation');
 
@@ -197,8 +231,8 @@ var Link = React.createClass({
 
 module.exports = Link;
 
-},{"../mixins/ActiveState":15,"../mixins/Navigation":18,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/cx":61,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/merge":71}],6:[function(_dereq_,module,exports){
-var merge = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/merge');
+},{"../mixins/ActiveState":15,"../mixins/Navigation":18,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/cx":61,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/merge":71}],6:[function(_dereq_,module,exports){
+var merge = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/merge');
 var Route = _dereq_('./Route');
 
 /**
@@ -219,8 +253,8 @@ function NotFoundRoute(props) {
 
 module.exports = NotFoundRoute;
 
-},{"./Route":8,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/merge":71}],7:[function(_dereq_,module,exports){
-var React = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps');
+},{"./Route":8,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/merge":71}],7:[function(_dereq_,module,exports){
+var React = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps');
 var Route = _dereq_('./Route');
 
 function createRedirectHandler(to, _params, _query) {
@@ -252,7 +286,7 @@ function Redirect(props) {
 module.exports = Redirect;
 
 },{"./Route":8}],8:[function(_dereq_,module,exports){
-var React = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps');
+var React = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps');
 var withoutProperties = _dereq_('../utils/withoutProperties');
 
 /**
@@ -345,10 +379,10 @@ var Route = React.createClass({
 module.exports = Route;
 
 },{"../utils/withoutProperties":30}],9:[function(_dereq_,module,exports){
-var React = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps');
-var warning = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/warning');
-var invariant = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant');
-var copyProperties = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/copyProperties');
+var React = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps');
+var warning = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/warning');
+var invariant = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant');
+var copyProperties = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/copyProperties');
 var HashLocation = _dereq_('../locations/HashLocation');
 var ActiveContext = _dereq_('../mixins/ActiveContext');
 var LocationContext = _dereq_('../mixins/LocationContext');
@@ -915,7 +949,7 @@ var Routes = React.createClass({
 
 module.exports = Routes;
 
-},{"../locations/HashLocation":11,"../mixins/ActiveContext":14,"../mixins/LocationContext":17,"../mixins/RouteContext":19,"../mixins/ScrollContext":20,"../utils/Path":22,"../utils/Redirect":24,"../utils/Transition":26,"../utils/reversedArray":28,"./Route":8,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/copyProperties":60,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant":66,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/warning":76}],10:[function(_dereq_,module,exports){
+},{"../locations/HashLocation":11,"../mixins/ActiveContext":14,"../mixins/LocationContext":17,"../mixins/RouteContext":19,"../mixins/ScrollContext":20,"../utils/Path":22,"../utils/Redirect":24,"../utils/Transition":26,"../utils/reversedArray":28,"./Route":8,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/copyProperties":60,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant":66,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/warning":76}],10:[function(_dereq_,module,exports){
 exports.DefaultRoute = _dereq_('./components/DefaultRoute');
 exports.Link = _dereq_('./components/Link');
 exports.NotFoundRoute = _dereq_('./components/NotFoundRoute');
@@ -1122,8 +1156,8 @@ var RefreshLocation = {
 module.exports = RefreshLocation;
 
 },{"../utils/getWindowPath":27}],14:[function(_dereq_,module,exports){
-var React = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps');
-var copyProperties = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/copyProperties');
+var React = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps');
+var copyProperties = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/copyProperties');
 
 /**
  * A mixin for components that store the active state of routes,
@@ -1192,8 +1226,8 @@ var ActiveContext = {
 
 module.exports = ActiveContext;
 
-},{"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/copyProperties":60}],15:[function(_dereq_,module,exports){
-var React = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps');
+},{"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/copyProperties":60}],15:[function(_dereq_,module,exports){
+var React = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps');
 
 /**
  * A mixin for components that need to know the routes, URL
@@ -1256,7 +1290,7 @@ var ActiveState = {
 module.exports = ActiveState;
 
 },{}],16:[function(_dereq_,module,exports){
-var React = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps');
+var React = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps');
 
 /**
  * A mixin for components that need to know the current URL path.
@@ -1290,9 +1324,9 @@ var CurrentPath = {
 module.exports = CurrentPath;
 
 },{}],17:[function(_dereq_,module,exports){
-var React = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps');
-var invariant = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant');
-var canUseDOM = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ExecutionEnvironment').canUseDOM;
+var React = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps');
+var invariant = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant');
+var canUseDOM = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ExecutionEnvironment').canUseDOM;
 var HashLocation = _dereq_('../locations/HashLocation');
 var HistoryLocation = _dereq_('../locations/HistoryLocation');
 var RefreshLocation = _dereq_('../locations/RefreshLocation');
@@ -1391,8 +1425,8 @@ var LocationContext = {
 
 module.exports = LocationContext;
 
-},{"../locations/HashLocation":11,"../locations/HistoryLocation":12,"../locations/RefreshLocation":13,"../stores/PathStore":21,"../utils/supportsHistory":29,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ExecutionEnvironment":42,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant":66}],18:[function(_dereq_,module,exports){
-var React = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps');
+},{"../locations/HashLocation":11,"../locations/HistoryLocation":12,"../locations/RefreshLocation":13,"../stores/PathStore":21,"../utils/supportsHistory":29,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ExecutionEnvironment":42,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant":66}],18:[function(_dereq_,module,exports){
+var React = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps');
 
 /**
  * A mixin for components that modify the URL.
@@ -1451,8 +1485,8 @@ var Navigation = {
 module.exports = Navigation;
 
 },{}],19:[function(_dereq_,module,exports){
-var React = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps');
-var invariant = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant');
+var React = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps');
+var invariant = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant');
 var Path = _dereq_('../utils/Path');
 
 /**
@@ -1621,10 +1655,10 @@ var RouteContext = {
 
 module.exports = RouteContext;
 
-},{"../utils/Path":22,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant":66}],20:[function(_dereq_,module,exports){
-var React = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps');
-var invariant = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant');
-var canUseDOM = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ExecutionEnvironment').canUseDOM;
+},{"../utils/Path":22,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant":66}],20:[function(_dereq_,module,exports){
+var React = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps');
+var invariant = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant');
+var canUseDOM = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ExecutionEnvironment').canUseDOM;
 var ImitateBrowserBehavior = _dereq_('../behaviors/ImitateBrowserBehavior');
 var ScrollToTopBehavior = _dereq_('../behaviors/ScrollToTopBehavior');
 
@@ -1738,8 +1772,8 @@ var ScrollContext = {
 
 module.exports = ScrollContext;
 
-},{"../behaviors/ImitateBrowserBehavior":2,"../behaviors/ScrollToTopBehavior":3,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ExecutionEnvironment":42,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant":66}],21:[function(_dereq_,module,exports){
-var invariant = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant');
+},{"../behaviors/ImitateBrowserBehavior":2,"../behaviors/ScrollToTopBehavior":3,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ExecutionEnvironment":42,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant":66}],21:[function(_dereq_,module,exports){
+var invariant = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant');
 var EventEmitter = _dereq_('events').EventEmitter;
 var LocationActions = _dereq_('../actions/LocationActions');
 
@@ -1829,8 +1863,8 @@ var PathStore = {
 
 module.exports = PathStore;
 
-},{"../actions/LocationActions":1,"events":31,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant":66}],22:[function(_dereq_,module,exports){
-var invariant = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant');
+},{"../actions/LocationActions":1,"events":31,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant":66}],22:[function(_dereq_,module,exports){
+var invariant = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant');
 var merge = _dereq_('qs/lib/utils').merge;
 var qs = _dereq_('qs');
 
@@ -2007,7 +2041,7 @@ var Path = {
 
 module.exports = Path;
 
-},{"qs":32,"qs/lib/utils":36,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant":66}],23:[function(_dereq_,module,exports){
+},{"qs":32,"qs/lib/utils":36,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant":66}],23:[function(_dereq_,module,exports){
 var Promise = _dereq_('when/lib/Promise');
 
 // TODO: Use process.env.NODE_ENV check + envify to enable
@@ -2028,15 +2062,15 @@ function Redirect(to, params, query) {
 module.exports = Redirect;
 
 },{}],25:[function(_dereq_,module,exports){
-var ReactDescriptor = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactDescriptor');
-var ReactInstanceHandles = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactInstanceHandles');
-var ReactMarkupChecksum = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactMarkupChecksum');
-var ReactServerRenderingTransaction = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactServerRenderingTransaction');
+var ReactDescriptor = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactDescriptor');
+var ReactInstanceHandles = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactInstanceHandles');
+var ReactMarkupChecksum = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactMarkupChecksum');
+var ReactServerRenderingTransaction = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactServerRenderingTransaction');
 
-var cloneWithProps = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/cloneWithProps');
-var copyProperties = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/copyProperties');
-var instantiateReactComponent = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/instantiateReactComponent');
-var invariant = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant');
+var cloneWithProps = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/cloneWithProps');
+var copyProperties = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/copyProperties');
+var instantiateReactComponent = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/instantiateReactComponent');
+var invariant = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant');
 
 function cloneRoutesForServerRendering(routes) {
   return cloneWithProps(routes, {
@@ -2137,8 +2171,8 @@ module.exports = {
   renderRoutesToStaticMarkup: renderRoutesToStaticMarkup
 };
 
-},{"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactDescriptor":47,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactInstanceHandles":49,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactMarkupChecksum":50,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactServerRenderingTransaction":54,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/cloneWithProps":59,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/copyProperties":60,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/instantiateReactComponent":65,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant":66}],26:[function(_dereq_,module,exports){
-var mixInto = _dereq_('./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/mixInto');
+},{"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactDescriptor":47,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactInstanceHandles":49,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactMarkupChecksum":50,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/ReactServerRenderingTransaction":54,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/cloneWithProps":59,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/copyProperties":60,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/instantiateReactComponent":65,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/invariant":66}],26:[function(_dereq_,module,exports){
+var mixInto = _dereq_('old_version_of_react_used_by_canvas_quizzes_client_apps/lib/mixInto');
 var Promise = _dereq_('./Promise');
 var Redirect = _dereq_('./Redirect');
 
@@ -2178,7 +2212,7 @@ mixInto(Transition, {
 
 module.exports = Transition;
 
-},{"./Promise":23,"./Redirect":24,"./old_version_of_react_used_by_canvas_quizzes_client_apps/lib/mixInto":74}],27:[function(_dereq_,module,exports){
+},{"./Promise":23,"./Redirect":24,"old_version_of_react_used_by_canvas_quizzes_client_apps/lib/mixInto":74}],27:[function(_dereq_,module,exports){
 /**
  * Returns the current URL path from `window.location`, including query string
  */

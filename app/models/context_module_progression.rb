@@ -18,7 +18,7 @@
 
 class ContextModuleProgression < ActiveRecord::Base
   include Workflow
-  attr_accessible :context_module, :user
+
   belongs_to :context_module
   belongs_to :user
   before_save :set_completed_at

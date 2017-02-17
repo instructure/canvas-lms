@@ -1,4 +1,4 @@
-class MoveAccountMembershipTypes < ActiveRecord::Migration
+class MoveAccountMembershipTypes < ActiveRecord::Migration[4.2]
   # run twice, to pick up any new csv-memberships created
   # after the predeploy migration but before the deploy
   tag :postdeploy

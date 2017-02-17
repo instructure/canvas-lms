@@ -28,9 +28,11 @@ describe AssignmentsController do
   def course_assignment(course = nil)
     course ||= @course
     @group = course.assignment_groups.create(:name => "some group")
-    @assignment = course.assignments.create(:title => "some assignment", :assignment_group => @group)
-    expect(@assignment.assignment_group).to eql(@group)
-    expect(@group.assignments).to be_include(@assignment)
+    @assignment = course.assignments.create(
+      :title => "some assignment",
+      :assignment_group => @group,
+      :due_at => Time.zone.now + 1.week
+    )
     @assignment
   end
 
@@ -52,6 +54,13 @@ describe AssignmentsController do
       get 'index', :course_id => @course.id
       expect(response).to be_redirect
       expect(flash[:notice]).to match(/That page has been disabled/)
+    end
+
+    it "should set WEIGHT_FINAL_GRADES in js_env" do
+      user_session @teacher
+      get 'index', course_id: @course.id
+
+      expect(assigns[:js_env][:WEIGHT_FINAL_GRADES]).to eq(@course.apply_group_weights?)
     end
 
     context "draft state" do
@@ -106,7 +115,7 @@ describe AssignmentsController do
       #controller.use_rails_error_handling!
       user_session(@student)
 
-      get 'show', :course_id => @course.id, :id => 5
+      get 'show', :course_id => @course.id, :id => Assignment.maximum(:id) + 100
       assert_status(404)
     end
 
@@ -296,6 +305,20 @@ describe AssignmentsController do
 
       expect(assigns[:assignment].workflow_state).to eq 'unpublished'
     end
+
+    it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:due_date_required_for_account?).returns(true)
+      get 'new', :course_id => @course.id, :id => @assignment.id
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
+    end
+
+    it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:due_date_required_for_account?).returns(false)
+      get 'new', :course_id => @course.id, :id => @assignment.id
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
+    end
   end
 
   describe "POST 'create'" do
@@ -360,9 +383,23 @@ describe AssignmentsController do
       post 'create', :course_id => @course.id, :assignment => {:title => "some assignment", :assignment_group_id => group2.to_param}
       expect(response).to be_not_found
     end
+
+    it 'should use the default post-to-SIS setting' do
+      a = @course.account
+      a.settings[:sis_default_grade_export] = {locked: false, value: true}
+      a.save!
+      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
+      expect(assigns[:assignment]).to be_post_to_sis
+    end
   end
 
   describe "GET 'edit'" do
+    include_context "multiple grading periods within controller" do
+      let(:course) { @course }
+      let(:teacher) { @teacher }
+      let(:request_params) { [:edit, course_id: course, id: @assignment] }
+    end
+
     it "should require authorization" do
       #controller.use_rails_error_handling!
       get 'edit', :course_id => @course.id, :id => @assignment.id
@@ -377,9 +414,69 @@ describe AssignmentsController do
 
     it "bootstraps the correct assignment info to js_env" do
       user_session(@teacher)
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      @assignment.tool_settings_tool = tool
+
       get 'edit', :course_id => @course.id, :id => @assignment.id
       expect(assigns[:js_env][:ASSIGNMENT]['id']).to eq @assignment.id
       expect(assigns[:js_env][:ASSIGNMENT_OVERRIDES]).to eq []
+      expect(assigns[:js_env][:COURSE_ID]).to eq @course.id
+      expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_ID]).to eq tool.id
+      expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_TYPE]).to eq tool.class.to_s
+    end
+
+    it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:due_date_required_for_account?).returns(true)
+      get 'edit', :course_id => @course.id, :id => @assignment.id
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
+    end
+
+    it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:due_date_required_for_account?).returns(false)
+      get 'edit', :course_id => @course.id, :id => @assignment.id
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
+    end
+
+    it "bootstraps the correct message_handler id for LTI 2 tools to js_env" do
+      user_session(@teacher)
+      account = @course.account
+      product_family = Lti::ProductFamily.create(
+        vendor_code: '123',
+        product_code: 'abc',
+        vendor_name: 'acme',
+        root_account: account
+      )
+
+      tool_proxy = Lti:: ToolProxy.create(
+        shared_secret: 'shared_secret',
+        guid: 'guid',
+        product_version: '1.0beta',
+        lti_version: 'LTI-2p0',
+        product_family: product_family,
+        context: @course,
+        workflow_state: 'active',
+        raw_data: 'some raw data'
+      )
+
+      resource_handler = Lti::ResourceHandler.create(
+        resource_type_code: 'code',
+        name: 'resource name',
+        tool_proxy: tool_proxy
+      )
+
+      message_handler = Lti::MessageHandler.create(
+        message_type: 'message_type',
+        launch_path: 'https://samplelaunch/blti',
+        resource_handler: resource_handler
+      )
+
+      Lti::ToolProxyBinding.create(context: @course, tool_proxy: tool_proxy)
+      @assignment.tool_settings_tool = message_handler
+
+      get 'edit', :course_id => @course.id, :id => @assignment.id
+      expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_ID]).to eq message_handler.id
     end
 
     context "redirects" do

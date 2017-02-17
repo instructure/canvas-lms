@@ -35,7 +35,7 @@ describe "submissions" do
       student_in_course
       assignment = create_assignment
       assignment.submissions.create(:user => @student)
-      assignment.grade_student @student, :grade => 2
+      assignment.grade_student @student, grade: 2, grader: @teacher
       get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
       expect(f('.grading_value')[:value]).to eq '2'
     end
@@ -88,7 +88,7 @@ describe "submissions" do
       expect_new_page_load { f('#submit_file_button').click }
 
       expect(f('.details .header')).to include_text "Turned In!"
-      expect(f('.details .file-big')).to include_text "testfile1"
+      expect(f('.details')).to include_text "testfile1"
     end
   end
 end

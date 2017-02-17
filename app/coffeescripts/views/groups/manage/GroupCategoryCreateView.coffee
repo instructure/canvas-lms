@@ -12,6 +12,7 @@ define [
 
     messages:
       positive_group_count: I18n.t('positive_group_count', 'Must enter a positive group count')
+      groups_too_low: I18n.t('Must have at least 1 group per section')
 
     defaults:
       width: 600
@@ -20,6 +21,7 @@ define [
 
     els: _.extend {}, GroupCategoryEditView::els,
       '.admin-signup-controls': '$adminSignupControls'
+      '.group-by-section-controls': '$groupBySectionControls'
       '#split_groups': '$splitGroups'
       '.admin-signup-controls input[name=split_groups][value=1]': '$autoGroupSplitControl'
 
@@ -36,6 +38,7 @@ define [
       splitGroupsChecked = @$autoGroupSplitControl.prop("checked")
       show = (@selfSignupIsEnabled() or splitGroupsChecked)
       @$autoGroupLeaderControls.toggle(show)
+      @$groupBySectionControls.toggle(ENV.group_user_type == 'student' && splitGroupsChecked)
 
     toggleSelfSignup: ->
       enabled = @selfSignupIsEnabled()
@@ -65,8 +68,12 @@ define [
       errors = {}
       if data.split_groups is '1'
         create_group_count = parseInt(data.create_group_count)
-        unless create_group_count > 0
+        if create_group_count > 0
+          if data.group_by_section == '1' && ENV.student_section_count && ENV.student_section_count > create_group_count
+            errors["create_group_count"] = [{type: 'groups_too_low', message: @messages.groups_too_low}]
+        else
           errors["create_group_count"] = [{type: 'positive_group_count', message: @messages.positive_group_count}]
+
       errors
 
     setFocusAfterError: ->

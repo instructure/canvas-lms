@@ -92,7 +92,7 @@ describe 'new ui' do
       get "/courses/#{@course.id}/files"
       add_folder
       # verifying new files folder icon css property still displays with new ui
-      f('.media-object.ef-big-icon.FilesystemObjectThumbnail.mimeClass-folder').displayed?
+      expect(f('.media-object.ef-big-icon.FilesystemObjectThumbnail.mimeClass-folder')).to be_displayed
     end
 
     it 'should not override high contrast theme', priority: "2", test_id: 244898 do
@@ -123,7 +123,7 @@ describe 'new ui' do
       get "/courses/#{@course.id}/assignments/new"
       f('div#mceu_19.mce-widget.mce-btn').click
       wait_for_ajaximations
-      f('.mathquill-toolbar-panes, .mathquill-tab-bar').displayed?
+      expect(f('.mathquill-toolbar-panes, .mathquill-tab-bar')).to be_displayed
     end
   end
 

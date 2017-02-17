@@ -1,4 +1,4 @@
-class StringColumnsToText < ActiveRecord::Migration
+class StringColumnsToText < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -531,7 +531,7 @@ to because the assignment has no points possible.
     end
 
     it "should return the score if the assignment is scored" do
-      @assignment.grade_student(@student, :grade => "40%")
+      @assignment.grade_student(@student, grade: "40%", grader: @teacher)
 
       make_call('body' => read_result)
       check_success
@@ -558,7 +558,7 @@ to because the assignment has no points possible.
     end
 
     it "should delete the existing score for the submission (by creating a new version)" do
-      @assignment.grade_student(@student, :grade => "40%")
+      @assignment.grade_student(@student, grade: "40%", grader: @teacher)
 
       make_call('body' => delete_result)
       check_success
@@ -740,12 +740,12 @@ to because the assignment has no points possible.
         check_failure('Failure')
       end
 
-      it "should set the grader to nil" do
+      it "should set the grader to the negative tool id" do
         make_call('body' => update_result('1.0'))
 
         check_success
         submission = @assignment.submissions.where(user_id: @student).first
-        expect(submission.grader_id).to be_nil
+        expect(submission.grader_id).to eq(-@tool.id)
       end
     end
 
@@ -757,7 +757,7 @@ to because the assignment has no points possible.
       end
 
       it "should return the score if the assignment is scored" do
-        @assignment.grade_student(@student, :grade => "40%")
+        @assignment.grade_student(@student, grade: "40%", grader: @teacher)
 
         make_call('body' => read_result)
         xml = check_success
@@ -774,7 +774,7 @@ to because the assignment has no points possible.
       end
 
       it "should delete the existing score for the submission (by creating a new version)" do
-        @assignment.grade_student(@student, :grade => "40%")
+        @assignment.grade_student(@student, grade: "40%", grader: @teacher)
 
         make_call('body' => delete_result)
         xml = check_success

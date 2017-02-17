@@ -2,17 +2,17 @@ define [
   'jquery'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/context_modules/FileSelectBox'
-], ($, React, ReactDOM, FileSelectBox) ->
+], ($, React, ReactDOM, TestUtils, FileSelectBox) ->
 
-  TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
   renderComponent = ->
     ReactDOM.render(React.createFactory(FileSelectBox)({contextString: 'test_3'}), wrapper)
 
-  module 'FileSelectBox',
+  QUnit.module 'FileSelectBox',
     setup: ->
       @server = sinon.fakeServer.create()
 

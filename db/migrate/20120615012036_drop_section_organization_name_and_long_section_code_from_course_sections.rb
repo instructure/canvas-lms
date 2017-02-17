@@ -1,4 +1,4 @@
-class DropSectionOrganizationNameAndLongSectionCodeFromCourseSections < ActiveRecord::Migration
+class DropSectionOrganizationNameAndLongSectionCodeFromCourseSections < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

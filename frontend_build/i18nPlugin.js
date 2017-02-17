@@ -7,22 +7,19 @@
 // and that file actually does exist over in
 // public/javascripts/dummyI18nResource
 
-var I18nPlugin = function(){};
+class I18nPlugin {
+  apply (compiler) {
+    compiler.plugin('normal-module-factory', nmf => {
+      nmf.plugin('before-resolve', (result, callback) => {
+        if (/^i18n!/.test(result.request)) {
+          const scopeName = result.request.split('!')[1]
+          const newRequest = `i18n?${scopeName}!dummyI18nResource`
+          result.request = newRequest
+        }
+        return callback(null, result)
+      })
+    })
+  }
+}
 
-I18nPlugin.prototype.apply = function(compiler){
-
-  compiler.plugin("normal-module-factory", function(nmf) {
-    nmf.plugin("before-resolve", function(result, callback) {
-      if(/^i18n!/.test(result.request)){
-        var scopeName = result.request.split("!")[1];
-        var newRequest = "i18n?" + scopeName + "!dummyI18nResource";
-        result.request = newRequest;
-      }
-      return callback(null, result);
-    });
-  });
-
-};
-
-
-module.exports = I18nPlugin;
+module.exports = I18nPlugin

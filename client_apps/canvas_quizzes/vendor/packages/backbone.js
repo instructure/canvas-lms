@@ -2,14 +2,15 @@ requirejs.config({
   map: {
     'canvas/Backbone': {
       'compiled/behaviors/authenticity_token': 'canvas/compiled/behaviors/authenticity_token',
-      'vendor/backbone': 'canvas/vendor/backbone',
+      'node_modules-version-of-backbone': 'canvas/symlink_to_node_modules/backbone/backbone',
       'compiled/backbone-ext/Backbone.syncWithMultipart': 'canvas/compiled/backbone-ext/Backbone.syncWithMultipart',
       'compiled/backbone-ext/View': 'canvas/compiled/backbone-ext/View',
       'compiled/backbone-ext/Model': 'canvas/compiled/backbone-ext/Model',
       'compiled/backbone-ext/Collection': 'canvas/compiled/backbone-ext/Collection',
+      'jquery': '../../../vendor/packages/jquery',
     },
 
-    'canvas/vendor/backbone': {
+    'canvas/symlink_to_node_modules/backbone/backbone': {
       'jquery': '../../../vendor/packages/jquery',
     },
 

@@ -65,7 +65,7 @@ describe 'ProfileController', type: :request do
       end
       it "should return unauthorized when attempting to access another students profile" do
         user_one = user_with_pseudonym(:active_user => true)
-        user_two = user_with_pseudonym(:active_user => true, :user => user)
+        user_two = user_with_pseudonym(:active_user => true, :user => user_factory)
 
         json = call_setting(as_user: user_one, for_user: user_two, assert_unauthorized: true)
       end

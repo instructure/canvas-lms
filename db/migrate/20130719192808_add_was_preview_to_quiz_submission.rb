@@ -1,4 +1,4 @@
-class AddWasPreviewToQuizSubmission < ActiveRecord::Migration
+class AddWasPreviewToQuizSubmission < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -7,7 +7,7 @@ define [
   'jquery'
 ], (SyllabusBehaviors, Sidebar, editorUtils, fixtures, RichContentEditor, $) ->
 
-  module 'SyllabusBehaviors.bindToEditSyllabus',
+  QUnit.module 'SyllabusBehaviors.bindToEditSyllabus',
     setup: ->
       editorUtils.resetRCE()
       fixtures.setup()

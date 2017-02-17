@@ -1,11 +1,15 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'underscore',
-  'jsx/grading/GradingPeriodForm'
-], (React, ReactDOM, _, GradingPeriodForm) => {
+  'jsx/grading/GradingPeriodForm',
+  'timezone/America/Chicago',
+  'timezone',
+  'helpers/fakeENV'
+], (React, ReactDOM, {Simulate}, _, GradingPeriodForm, chicago, tz,
+  fakeENV) => {
   const wrapper = document.getElementById('fixtures');
-  const Simulate = React.addons.TestUtils.Simulate;
 
   const examplePeriod = {
     id: '1',
@@ -15,7 +19,7 @@ define([
     closeDate: new Date("2016-01-07T12:00:00Z")
   };
 
-  module('GradingPeriodForm', {
+  QUnit.module('GradingPeriodForm', {
     renderComponent: function(opts={}) {
       const defaults = {
         period: examplePeriod,
@@ -37,7 +41,7 @@ define([
     equal(form.refs.title.value, 'Q1');
     equal(form.refs.startDate.refs.dateInput.value, 'Nov 1, 2015 at 12pm');
     equal(form.refs.endDate.refs.dateInput.value, 'Dec 31, 2015 at 12pm');
-    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7 at 12pm');
+    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7, 2016 at 12pm');
   });
 
   test('renders with the save button enabled', function() {
@@ -82,7 +86,7 @@ define([
     endDateInput.value = 'Dec 30, 2015 at 12pm';
     endDateInput.dispatchEvent(new Event("change"));
     equal(form.refs.endDate.refs.dateInput.value, 'Dec 30, 2015 at 12pm');
-    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7 at 12pm');
+    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7, 2016 at 12pm');
   });
 
   test("preserves 'closeDate' when already set and 'endDate' changes to match, then changes again", function() {
@@ -93,7 +97,7 @@ define([
     endDateInput.value = 'Dec 30, 2015 at 12pm';
     endDateInput.dispatchEvent(new Event("change"));
     equal(form.refs.endDate.refs.dateInput.value, 'Dec 30, 2015 at 12pm');
-    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7 at 12pm');
+    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7, 2016 at 12pm');
   });
 
   test("auto-updates 'closeDate' when cleared and 'endDate' changes", function() {
@@ -106,6 +110,21 @@ define([
     endDateInput.dispatchEvent(new Event("change"));
     equal(form.refs.endDate.refs.dateInput.value, 'Jan 7 at 12pm');
     equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7 at 12pm');
+  });
+
+  test("given a different content timezone, local and server time are shown", function() {
+    tz.preload('America/Chicago', chicago);
+    fakeENV.setup({TIMEZONE: 'America/Denver', CONTEXT_TIMEZONE: 'America/Chicago'});
+    const form = this.renderComponent();
+    const datetimeSuggestList = ReactDOM.findDOMNode(form).querySelectorAll('.datetime_suggest');
+    equal(datetimeSuggestList.length, 6);
+    fakeENV.teardown();
+  });
+
+  test("given the same timezone, local and server time are not shown", function() {
+    const form = this.renderComponent();
+    const datetimeSuggestList = ReactDOM.findDOMNode(form).querySelectorAll('.datetime_suggest');
+    equal(datetimeSuggestList.length, 0);
   });
 
   test("calls the 'onSave' callback when the save button is clicked", function() {

@@ -27,17 +27,17 @@ describe Notifier do
       notification = Notification.create!(name: "New Context Group Membership", category: "Registration")
       to_list = [group_user]
       dispatch = :test_dispatch
-      message = mock('message')
+      message = double('message')
 
-      DelayedNotification.expects(:send_later_if_production_enqueue_args).with(
-          :process,
-          kind_of(Hash),
-          kind_of(ActiveRecord::Base),
-          kind_of(Notification),
-          ["user_#{group_user.id}"],
-          kind_of(ActiveRecord::Base),
-          nil
-      ).returns([message])
+      expect(DelayedNotification).to receive(:send_later_if_production_enqueue_args).with(
+        :process,
+        kind_of(Hash),
+        kind_of(ActiveRecord::Base),
+        kind_of(Notification),
+        ["user_#{group_user.id}"],
+        kind_of(ActiveRecord::Base),
+        nil
+      ).and_return([message])
 
       subject.send_notification(
           group_membership,

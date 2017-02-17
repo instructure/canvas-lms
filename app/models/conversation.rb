@@ -34,8 +34,6 @@ class Conversation < ActiveRecord::Base
     @participants
   end
 
-  attr_accessible
-
   def reload(options = nil)
     @current_context_strings = {}
     @participants = nil
@@ -709,6 +707,18 @@ class Conversation < ActiveRecord::Base
       conversation_message_participants.scope.delete_all
     end
     conversation_participants.shard(self).delete_all
+  end
+
+  def replies_locked_for?(user)
+    return false unless %w{Course Group}.include?(self.context_type)
+    course = self.context.is_a?(Course) ? self.context : self.context.context
+
+    # can still reply if a teacher is involved
+    if course.is_a?(Course) && self.conversation_participants.where(:user_id => course.admin_enrollments.active.select(:user_id)).exists?
+      false
+    else
+      !self.context.grants_any_right?(user, :send_messages, :send_messages_all)
+    end
   end
 
   protected

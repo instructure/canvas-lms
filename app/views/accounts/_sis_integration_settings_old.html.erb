@@ -1,0 +1,33 @@
+<%= render partial: 'sis_agent_token_auth', locals: { f: f } %>
+
+<% if Assignment.sis_grade_export_enabled?(@account) %>
+    <fieldset id="sis_grade_export_settings">
+        <legend><%= t("SIS Grade Export Settings") %></legend>
+        <table class="formtable">
+        <%= f.fields_for :settings do |settings| %>
+            <%= settings.fields_for :sis_default_grade_export do |r| %>
+
+                <%
+                hash = @account.sis_default_grade_export
+                disabled = hash[:locked] && hash[:inherited]
+                %>
+
+                <tr>
+                    <td colspan="2">
+                        <%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                        <%= r.label :value, t("\"Post Grades to SIS\" checkbox is enabled by default for assignments, graded discussions, and quizzes") %>
+                    </td>
+                </tr>
+                <% unless disabled %>
+                <tr>
+                    <td colspan="2" class="sub_checkbox">
+                        <%= r.check_box :locked, :checked => hash[:locked] %>
+                        <%= r.label :locked, t("Lock this setting for sub-accounts") %>
+                    </td>
+                </tr>
+                <% end %>
+            <% end %>
+        <% end %>
+        </table>
+    </fieldset>
+<% end %>

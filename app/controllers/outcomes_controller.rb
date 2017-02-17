@@ -18,10 +18,10 @@
 
 class OutcomesController < ApplicationController
   include Api::V1::Outcome
-  before_filter :require_context, :except => [:build_outcomes]
+  before_action :require_context, :except => [:build_outcomes]
   add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, :except => [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
-  before_filter { |c| c.active_tab = "outcomes" }
-  before_filter :rich_content_service_config, only: [:show, :index]
+  before_action { |c| c.active_tab = "outcomes" }
+  before_action :rich_content_service_config, only: [:show, :index]
 
   def index
     return unless authorized_action(@context, @current_user, :read)
@@ -43,7 +43,8 @@ class OutcomesController < ApplicationController
            :COMMON_CORE_GROUP_URL => common_core_group_url,
            :PERMISSIONS => {
              :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes),
-             :manage_rubrics => @context.grants_right?(@current_user, session, :manage_rubrics)
+             :manage_rubrics => @context.grants_right?(@current_user, session, :manage_rubrics),
+             :manage_courses => @context.grants_right?(@current_user, session, :manage_courses)
            })
   end
 
@@ -245,7 +246,7 @@ class OutcomesController < ApplicationController
       @outcome_group = @context.learning_outcome_groups.find(params[:learning_outcome_group_id])
     end
     @outcome_group ||= @context.root_outcome_group
-    @outcome = @context.created_learning_outcomes.build(params[:learning_outcome])
+    @outcome = @context.created_learning_outcomes.build(learning_outcome_params)
 
     respond_to do |format|
       if @outcome.save
@@ -267,7 +268,7 @@ class OutcomesController < ApplicationController
     @outcome = @context.created_learning_outcomes.find(params[:id])
 
     respond_to do |format|
-      if @outcome.update_attributes(params[:learning_outcome])
+      if @outcome.update_attributes(learning_outcome_params)
         flash[:notice] = t :successful_outcome_update, "Outcome successfully updated!"
         format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
         format.json { render :json => @outcome }
@@ -306,5 +307,9 @@ class OutcomesController < ApplicationController
   protected
   def rich_content_service_config
     rce_js_env(:basic)
+  end
+
+  def learning_outcome_params
+    params.require(:learning_outcome).permit(:description, :short_description, :title, :display_name, :vendor_guid)
   end
 end

@@ -64,7 +64,7 @@ describe UsersController do
 
     it "should show individual user info across courses" do
       @course1 = @course
-      @course2 = course(:active_course => true)
+      @course2 = course_factory(active_course: true)
       @course2.update_attribute(:name, 'coursename2')
       student_in_course(:course => @course2, :user => @e1.user)
       get user_student_teacher_activity_url(@teacher, @e1.user)
@@ -116,7 +116,7 @@ describe UsersController do
 
       it "should show activity for students located on another shard" do
         @shard1.activate do
-          @student = user(:name => "im2spoopy4u")
+          @student = user_factory(:name => "im2spoopy4u")
         end
         course_with_student(:course => @course, :user => @student, :active_all => true)
 
@@ -159,12 +159,12 @@ describe UsersController do
       @admin = account_admin_user
       user_session(@admin)
 
-      course
+      course_factory
       student_in_course(:course => @course)
       get "/users/#{@student.id}"
       expect(response).to be_success
 
-      course(:account => account_model)
+      course_factory(:account => account_model)
       student_in_course(:course => @course)
       get "/users/#{@student.id}"
       assert_status(401)
@@ -177,7 +177,7 @@ describe UsersController do
       role = custom_account_role('custom', :account => @account)
       RoleOverride.create!(:context => @account, :permission => 'read_roster',
                            :role => role, :enabled => true)
-      @account.account_users.create!(user: user, role: role)
+      @account.account_users.create!(user: user_factory, role: role)
       user_session(@user)
 
       get "/users/#{@student.id}"
@@ -190,7 +190,7 @@ describe UsersController do
       role = custom_account_role('custom', :account => @account)
       RoleOverride.create!(:context => @account, :permission => 'read_roster',
                            :role => role, :enabled => true)
-      @account.account_users.create!(user: user, role: role)
+      @account.account_users.create!(user: user_factory, role: role)
       user_session(@user)
 
       get "/courses/#{@course.id}/users/#{@student.id}"

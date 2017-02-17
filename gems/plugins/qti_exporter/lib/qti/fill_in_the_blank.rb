@@ -4,7 +4,7 @@ class FillInTheBlank < AssessmentItemConverter
   def initialize(opts)
     super(opts)
     @type = opts[:custom_type]
-    if @type == 'multiple_dropdowns_question'
+    if @type == 'multiple_dropdowns_question' || @type == 'inline_choice'
       @question[:question_type] = 'multiple_dropdowns_question'
     else
       @question[:question_type] = 'fill_in_multiple_blanks_question'
@@ -18,6 +18,8 @@ class FillInTheBlank < AssessmentItemConverter
       process_respondus
     elsif @type == 'text_entry_interaction'
       process_text_entry
+    elsif @type == 'inline_choice'
+      process_inline
     elsif @doc.at_css('itemBody extendedTextInteraction')
       process_d2l
     else
@@ -57,7 +59,7 @@ class FillInTheBlank < AssessmentItemConverter
     end
 
   end
-  
+
   def process_canvas
     answer_hash = {}
     @doc.css('choiceInteraction').each do |ci|
@@ -75,7 +77,7 @@ class FillInTheBlank < AssessmentItemConverter
         answer_hash[choice['identifier']] = answer
       end
     end
-    
+
     if @type == 'multiple_dropdowns_question'
       @doc.css('responseProcessing responseCondition responseIf,responseElseIf').each do |if_node|
         if if_node.at_css('setOutcomeValue[identifier=SCORE] sum')
@@ -87,7 +89,45 @@ class FillInTheBlank < AssessmentItemConverter
       end
     end
   end
-  
+
+  def process_inline
+    create_xml_doc
+    answer_hash = {}
+    body = recursively_get_inline_body_and_answers(@doc.at_css('itemBody'), "", answer_hash)
+    @question[:question_text] = body
+
+    @doc.css('responseDeclaration').each do |res_node|
+      res_id = res_node['identifier']
+      res_node.css('correctResponse value').each do |correct_id|
+        if answer = answer_hash[correct_id.text]
+          answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
+        end
+      end
+    end
+  end
+
+  def recursively_get_inline_body_and_answers(node, body, answer_hash)
+    node.children.each do |child|
+      if child.name == 'inlineChoiceInteraction'
+        body += "[#{child['responseIdentifier']}]"
+        child.search('inlineChoice').each do |choice|
+          answer = {}
+          answer[:id] = unique_local_id
+          answer[:migration_id] = choice['identifier']
+          answer[:text] = choice.text.strip
+          answer[:blank_id] = child['responseIdentifier']
+          @question[:answers] << answer
+          answer_hash[choice['identifier']] = answer
+        end
+      elsif child.name == 'text'
+        body += child.text.gsub(']]>', '').gsub('<div></div>', '').strip
+      else
+        body += recursively_get_inline_body_and_answers(child, body, answer_hash)
+      end
+    end
+    body
+  end
+
   def process_d2l
     @question[:question_text] = ''
     if body = @doc.at_css('itemBody')
@@ -103,7 +143,7 @@ class FillInTheBlank < AssessmentItemConverter
         @question[:question_text] += text
       end
     end
-    
+
     @doc.css('responseCondition stringMatch').each do |match|
       if blank_id = get_node_att(match, 'variable','identifier')
         text = get_node_val(match, 'baseValue')
@@ -114,7 +154,7 @@ class FillInTheBlank < AssessmentItemConverter
         @question[:answers] << answer
       end
     end
-    
+
   end
 
   def process_respondus

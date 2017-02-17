@@ -96,10 +96,6 @@ module CCHelper
   ASSIGNMENT_XML = 'assignment.xml'
   EXTERNAL_CONTENT_FOLDER = 'external_content'
 
-  def create_key(object, prepend="")
-    CCHelper.create_key(object, prepend)
-  end
-
   def ims_date(date=nil)
     CCHelper.ims_date(date)
   end
@@ -163,6 +159,7 @@ module CCHelper
       @track_referenced_files = opts[:track_referenced_files]
       @for_course_copy = opts[:for_course_copy]
       @for_epub_export = opts[:for_epub_export]
+      @key_generator = opts[:key_generator] || CC::CCHelper
       @referenced_files = {}
 
       @rewriter.set_handler('file_contents') do |match|
@@ -194,7 +191,7 @@ module CCHelper
           folder = obj.folder.full_name.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
           folder = folder.split("/").map{|part| URI.escape(part)}.join("/")
 
-          @referenced_files[obj.id] = CCHelper.create_key(obj) if @track_referenced_files && !@referenced_files[obj.id]
+          @referenced_files[obj.id] = @key_generator.create_key(obj) if @track_referenced_files && !@referenced_files[obj.id]
           # for files, turn it into a relative link by path, rather than by file id
           # we retain the file query string parameters
           path = "#{folder}/#{URI.escape(obj.display_name)}"

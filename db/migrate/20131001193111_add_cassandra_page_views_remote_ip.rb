@@ -1,4 +1,4 @@
-class AddCassandraPageViewsRemoteIp < ActiveRecord::Migration
+class AddCassandraPageViewsRemoteIp < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   include Canvas::Cassandra::Migration

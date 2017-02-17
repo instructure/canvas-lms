@@ -1,4 +1,4 @@
-class GrandfatherSelfRegistration < ActiveRecord::Migration
+class GrandfatherSelfRegistration < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

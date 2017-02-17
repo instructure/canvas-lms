@@ -4,9 +4,9 @@ define([
   'jquery',
   'i18n!dashcards',
   'jsx/shared/ColorPicker',
+  'jsx/shared/proptypes/DOMElement',
   'classnames'
-], function(_, React, $, I18n, ColorPicker, cx) {
-
+], (_, React, $, I18n, ColorPicker, DOMElement, cx) => {
   // ================
   //   COLOR PICKER
   // ================
@@ -14,6 +14,20 @@ define([
   var SPACE_NEEDED_FOR_TOOLTIP = 300;
 
   var ColorPickerTooltip = React.createClass({
+
+    propTypes: {
+      elementID: React.PropTypes.string,
+      isOpen: React.PropTypes.bool,
+      settingsToggle: DOMElement
+    },
+
+    getDefaultProps () {
+      return {
+        elementID: '',
+        isOpen: false,
+        settingsToggle: null
+      }
+    },
 
     // =================
     //     LIFECYCLE
@@ -33,9 +47,9 @@ define([
 
     closeIfClickedOutsideOf: function(e){
       if (this.isMounted()) {
-        var container = this.getDOMNode();
-        var settingsToggle = this.props.settingsToggle.getDOMNode();
-        if (!$.contains(container, e.target) && !$.contains(settingsToggle, e.target) && this.props.isOpen) {
+
+        const settingsToggle = this.props.settingsToggle;
+        if (!$.contains(this.container, e.target) && !$.contains(settingsToggle, e.target) && this.props.isOpen) {
           this.props.doneEditing(e);
         }
       }
@@ -46,8 +60,7 @@ define([
         return
       }
       if (this.isMounted()) {
-        var container = this.getDOMNode();
-        if ($.contains(container, document.activeElement) && this.props.isOpen) {
+        if ($.contains(this.container, document.activeElement) && this.props.isOpen) {
           this.props.doneEditing(e);
         }
       }
@@ -117,9 +130,12 @@ define([
       });
 
       return (
-        <div id        = {this.props.elementID}
-             className = {classes}
-             style     = {this.pickerToolTipStyle()} >
+        <div
+          id={this.props.elementID}
+          className={classes}
+          style={this.pickerToolTipStyle()}
+          ref={(c) => { this.container = c; }}
+        >
           <ColorPicker isOpen           = {this.props.isOpen}
                        assetString      = {this.props.assetString}
                        afterClose       = {this.props.doneEditing}

@@ -123,13 +123,13 @@ describe "grading standards" do
     end
 
     it "should extend ranges to fractional values at the boundary with the next range", priority: "1", test_id: 217597 do
-      student = user(:active_all => true)
+      student = user_factory(active_all: true)
       course_with_teacher_logged_in(:active_all => true)
       @course.enroll_student(student).accept!
       @course.update_attribute :grading_standard_id, 0
       @course.assignment_groups.create!
       @assignment = @course.assignments.create!(:title => "new assignment", :points_possible => 1000, :assignment_group => @course.assignment_groups.first, :grading_type => 'points')
-      @assignment.grade_student(student, :grade => 899)
+      @assignment.grade_student(student, grade: 899, grader: @teacher)
       get "/courses/#{@course.id}/grades/#{student.id}"
       grading_scheme = driver.execute_script "return ENV.grading_scheme"
       expect(grading_scheme[2][0]).to eq 'B+'

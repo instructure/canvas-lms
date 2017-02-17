@@ -27,7 +27,7 @@ describe "multiple grading periods account page" do
       grading_standards_page.delete_first_grading_period_set(false)
       expect(grading_standards_page.grading_period_set_displayed?(set.title)).to eq(true)
       grading_standards_page.delete_first_grading_period_set(true)
-      expect{ grading_standards_page.grading_period_set_deleted? }.to become(true)
+      expect(grading_standards_page.grading_periods_tab).not_to contain_css(grading_standards_page.grading_period_set_title_css)
     end
 
     it "edits grading period set", test_id: 2528628, priority: "1" do
@@ -58,7 +58,7 @@ describe "multiple grading periods account page" do
       grading_standards_page.delete_first_grading_period(false)
       expect(grading_standards_page.grading_period_displayed?("New Period")).to eq(true)
       grading_standards_page.delete_first_grading_period(true)
-      expect{ grading_standards_page.grading_period_deleted? }.to become(true)
+      expect(grading_standards_page.grading_period_list).not_to contain_css(grading_standards_page.period_css)
     end
 
     it "defaults close date to end date", test_id: 2887215, priority: "1" do

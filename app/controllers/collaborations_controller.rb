@@ -19,6 +19,78 @@
 # @API Collaborations
 # API for accessing course and group collaboration information.
 #
+# @model Collaboration
+#     {
+#       "id": "Collaboration",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The unique identifier for the collaboration",
+#           "example": 43,
+#           "type": "integer"
+#         },
+#         "collaboration_type": {
+#           "description": "A name for the type of collaboration",
+#           "example": "Microsoft Office",
+#           "type": "string"
+#         },
+#         "document_id": {
+#           "description": "The collaboration document identifier for the collaboration provider",
+#           "example": "oinwoenfe8w8ef_onweufe89fef",
+#           "type": "string"
+#         },
+#         "user_id": {
+#           "description": "The canvas id of the user who created the collaboration",
+#           "example": 92,
+#           "type": "integer"
+#         },
+#         "context_id": {
+#           "description": "The canvas id of the course or group to which the collaboration belongs",
+#           "example": 77,
+#           "type": "integer"
+#         },
+#         "context_type": {
+#           "description": "The canvas type of the course or group to which the collaboration belongs",
+#           "example": "Course",
+#           "type": "string"
+#         },
+#         "url": {
+#           "description": "The LTI launch url to view collaboration.",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "description": "The timestamp when the collaboration was created",
+#           "example": "2012-06-01T00:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "The timestamp when the collaboration was last modified",
+#           "example": "2012-06-01T00:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "description": {
+#           "type": "string"
+#         },
+#         "title": {
+#           "type": "string"
+#         },
+#         "type": {
+#           "description": "Another representation of the collaboration type",
+#           "example": "ExternalToolCollaboration",
+#           "type": "string"
+#         },
+#         "update_url": {
+#           "description": "The LTI launch url to edit the collaboration",
+#           "type": "string"
+#         },
+#         "user_name": {
+#           "description": "The name of the user who owns the collaboration",
+#           "example": "John Danger",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
 # @model Collaborator
 #     {
 #       "id": "Collaborator",
@@ -50,15 +122,16 @@
 #     }
 #
 class CollaborationsController < ApplicationController
-  before_filter :require_context, :except => [:members]
-  before_filter :require_collaboration_and_context, :only => [:members]
-  before_filter :require_collaborations_configured
-  before_filter :reject_student_view_student
+  before_action :require_context, :except => [:members]
+  before_action :require_collaboration_and_context, :only => [:members]
+  before_action :require_collaborations_configured
+  before_action :reject_student_view_student
 
-  before_filter { |c| c.active_tab = "collaborations" }
+  before_action { |c| c.active_tab = "collaborations" }
 
   include Api::V1::Collaborator
   include Api::V1::Collaboration
+  include Api::V1::User
 
   def index
     return unless authorized_action(@context, @current_user, :read) &&
@@ -78,12 +151,14 @@ class CollaborationsController < ApplicationController
     @hide_create_ui = @sunsetting_etherpad && @etherpad_only
     js_env :TITLE_MAX_LEN => Collaboration::TITLE_MAX_LENGTH,
            :CAN_MANAGE_GROUPS => @context.grants_right?(@current_user, session, :manage_groups),
-           :collaboration_types => Collaboration.collaboration_types
+           :collaboration_types => Collaboration.collaboration_types,
+           :POTENTIAL_COLLABORATORS_URL => polymorphic_url([:api_v1, @context, :potential_collaborators])
   end
 
   # @API List collaborations
   # List collaborations the current user has access to in the context of the course
-  # provided in the url
+  # provided in the url. NOTE: this only returns ExternalToolCollaboration type
+  # collaborations.
   #
   #   curl https://<canvas>/api/v1/courses/1/collaborations/
   #
@@ -99,10 +174,16 @@ class CollaborationsController < ApplicationController
                              where(type: 'ExternalToolCollaboration')
 
     unless @context.grants_right?(@current_user, session, :manage_content)
+      where_collaborators = Collaboration.arel_table[:user_id].eq(@current_user.id).
+                            or(Collaborator.arel_table[:user_id].eq(@current_user.id))
+      if @context.instance_of?(Course)
+        users_course_groups = @context.groups.joins(:users).where(User.arel_table[:id].eq(@current_user.id)).pluck(:id)
+        where_collaborators = where_collaborators.or(Collaborator.arel_table[:group_id].in(users_course_groups))
+      end
+
       collaborations_query = collaborations_query.
                                 eager_load(:collaborators).
-                                where(Collaboration.arel_table[:user_id].eq(@current_user.id).
-                                or(Collaborator.arel_table[:user_id].eq(@current_user.id)))
+                                where(where_collaborators)
     end
 
     collaborations = Api.paginate(
@@ -172,9 +253,11 @@ class CollaborationsController < ApplicationController
     else
       users     = User.where(:id => Array(params[:user])).to_a
       group_ids = Array(params[:group])
-      params[:collaboration][:user] = @current_user
+      collaboration_params = params.require(:collaboration).permit(:title, :description, :url)
+      collaboration_params[:user] = @current_user
       @collaboration = Collaboration.typed_collaboration_instance(params[:collaboration].delete(:collaboration_type))
-      @collaboration.attributes = params[:collaboration]
+      collaboration_params.delete(:url) unless @collaboration.is_a?(ExternalToolCollaboration)
+      @collaboration.attributes = collaboration_params
     end
     @collaboration.context = @context
     respond_to do |format|
@@ -204,8 +287,7 @@ class CollaborationsController < ApplicationController
       else
         users     = User.where(:id => Array(params[:user])).to_a
         group_ids = Array(params[:group])
-        params[:collaboration].delete :collaboration_type
-        @collaboration.attributes = params[:collaboration]
+        @collaboration.attributes = params.require(:collaboration).permit(:title, :description, :url)
       end
       @collaboration.update_members(users, group_ids)
       respond_to do |format|
@@ -275,6 +357,21 @@ class CollaborationsController < ApplicationController
     render :json => collaborators.map { |c| collaborator_json(c, @current_user, session, options) }
   end
 
+  # @API List potential members
+  #
+  # List the users who can potentially be added to a collaboration in the given context.
+  #
+  # For courses, this consists of all enrolled users.  For groups, it is comprised of the
+  # group members plus the admins of the course containing the group.
+  #
+  # @returns [User]
+  def potential_collaborators
+    return unless authorized_action(@context, @current_user, :read_roster)
+    scope = @context.potential_collaborators.order(:sortable_name)
+    users = Api.paginate(scope, self, polymorphic_url([:api_v1, @context, :potential_collaborators]))
+    render :json => users.map { |u| user_json(u, @current_user, session) }
+  end
+
   private
   def require_collaboration_and_context
     @collaboration = if @context.present?
@@ -312,7 +409,7 @@ class CollaborationsController < ApplicationController
     visibility = content_item['ext_canvas_visibility']
     lti_user_ids = visibility && visibility['users'] || []
     lti_group_ids = visibility && visibility['groups'] || []
-    users = User.where(lti_context_id: lti_user_ids)
+    users = User.where(lti_context_id: lti_user_ids).to_a
     group_ids = Group.where(lti_context_id: lti_group_ids).map(&:id)
     [users, group_ids]
   end

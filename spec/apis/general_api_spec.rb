@@ -76,7 +76,7 @@ describe "API", type: :request do
 
     it "should serialize permissions if obj responds" do
       course_with_teacher
-      @course.expects(:serialize_permissions).once.with(anything, @teacher, nil)
+      expect(@course).to receive(:serialize_permissions).once.with(anything, @teacher, nil)
       json = @course.as_json(:include_root => false, :permissions => { :user => @user, :session => nil, :include_permissions => true, :policies => [ "update" ] }, :only => %w(name))
       expect(json.keys.sort).to eq %w(name permissions)
     end

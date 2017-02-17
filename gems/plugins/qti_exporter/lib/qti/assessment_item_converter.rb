@@ -89,13 +89,14 @@ class AssessmentItemConverter
       type = @opts[:custom_type] || @migration_type || @type
       unless ['fill_in_multiple_blanks_question', 'canvas_matching', 'matching_question',
               'multiple_dropdowns_question', 'respondus_matching'].include?(type)
-        selectors << 'itemBody > choiceInteraction > prompt'
+        selectors << 'itemBody choiceInteraction > prompt'
         selectors << 'itemBody > extendedTextInteraction > prompt'
       end
 
       text_nodes = @doc.css(selectors.join(','))
       text_nodes = text_nodes.reject{|node| node.inner_html.strip.empty? ||
-        EXCLUDED_QUESTION_TEXT_CLASSES.any?{|c| c.casecmp(node['class'].to_s) == 0}}
+        EXCLUDED_QUESTION_TEXT_CLASSES.any?{|c| c.casecmp(node['class'].to_s) == 0} ||
+        node.at_css('choiceInteraction') || node.at_css('associateInteraction')}
 
       if text_nodes.length > 0
         @question[:question_text] = ''
@@ -107,6 +108,8 @@ class AssessmentItemConverter
             @question[:question_text] += sanitize_html!(node)
           end
         end
+      elsif @doc.at_css('itemBody associateInteraction prompt')
+        @question[:question_text] = "" # apparently they deliberately had a blank question?
       elsif text = @doc.at_css('itemBody div:first-child') || @doc.at_css('itemBody p:first-child') || @doc.at_css('itemBody div') || @doc.at_css('itemBody p')
         @question[:question_text] = sanitize_html!(text)
       elsif @doc.at_css('itemBody')
@@ -162,6 +165,9 @@ class AssessmentItemConverter
       end
       if ref = get_node_att(meta, 'instructureField[name=assessment_question_identifierref]', 'value')
         @question[:assessment_question_migration_id] = ref
+      end
+      if get_node_att(meta, 'instructureField[name=cc_profile]', 'value') == 'cc.pattern_match.v0p1'
+        @question[:is_cc_pattern_match] = true
       end
       if type =  get_node_att(meta, 'instructureField[name=bb_question_type]', 'value')
         @migration_type = type

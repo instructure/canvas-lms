@@ -46,6 +46,8 @@ module Importers
       item ||= WikiPage.where(wiki_id: context.wiki, id: hash[:id]).first
       item ||= WikiPage.where(wiki_id: context.wiki, migration_id: hash[:migration_id]).first
       item ||= context.wiki.wiki_pages.temp_record
+      item.mark_as_importing!(migration)
+
       new_record = item.new_record?
       # force the url to be the same as the url_name given, since there are
       # likely other resources in the import that link to that url
@@ -66,14 +68,18 @@ module Importers
       hide_from_students = hash[:hide_from_students] if !hash[:hide_from_students].nil?
       state = hash[:workflow_state]
       if state || !hide_from_students.nil?
-        if state == 'active' && Canvas::Plugin.value_to_boolean(hide_from_students) == false
+        if state == 'active' && !item.unpublished? && Canvas::Plugin.value_to_boolean(hide_from_students) == false
           item.workflow_state = 'active'
         else
           item.workflow_state = 'unpublished' if item.new_record? || item.deleted?
         end
+      else
+        item.workflow_state = 'unpublished' if item.deleted?
       end
 
       item.set_as_front_page! if !!hash[:front_page] && context.wiki.has_no_front_page
+      item.migration_id = hash[:migration_id]
+
       migration.add_imported_item(item)
 
       if hash[:assignment].present?
@@ -81,7 +87,6 @@ module Importers
           hash[:assignment], context, migration)
       end
 
-      item.migration_id = hash[:migration_id]
       (hash[:contents] || []).each do |sub_item|
         next if sub_item[:type] == 'embedded_content'
         Importers::WikiPageImporter.import_from_migration(sub_item.merge({

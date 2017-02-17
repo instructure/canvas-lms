@@ -1,4 +1,4 @@
-class CreateMigrationIssues < ActiveRecord::Migration
+class CreateMigrationIssues < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

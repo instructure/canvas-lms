@@ -1,4 +1,4 @@
-class AddCoursesSisSourceIdIndex < ActiveRecord::Migration
+class AddCoursesSisSourceIdIndex < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 

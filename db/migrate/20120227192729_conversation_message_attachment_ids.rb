@@ -1,4 +1,4 @@
-class ConversationMessageAttachmentIds < ActiveRecord::Migration
+class ConversationMessageAttachmentIds < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

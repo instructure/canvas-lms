@@ -23,9 +23,9 @@ class Attachments::S3Storage
     # so there's a bit of a cost here
     if !exists?
       if !attachment.size
-        attachment.size = bucket.objects[old_full_filename].head[:content_length]
+        attachment.size = bucket.object(old_full_filename).content_length
       end
-      bucket.objects[old_full_filename].copy_to(attachment.full_filename, {
+      bucket.object(old_full_filename).copy_to(attachment.full_filename, {
         :acl => attachment.attachment_options[:s3_access],
         :use_multipart_copy => (attachment.size >= 5.gigabytes),
         :content_length => attachment.size
@@ -35,11 +35,11 @@ class Attachments::S3Storage
 
   def initialize_ajax_upload_params(local_upload_url, s3_success_url, options)
     {
-        :upload_url => "#{options[:ssl] ? "https" : "http"}://#{bucket.name}.#{bucket.config.s3_endpoint}/",
+        :upload_url => bucket.url,
         :file_param => 'file',
         :success_url => s3_success_url,
         :upload_params => {
-            'AWSAccessKeyId' => bucket.config.access_key_id
+            'AWSAccessKeyId' => bucket.client.config.access_key_id
         }
     }
   end
@@ -50,12 +50,12 @@ class Attachments::S3Storage
   end
 
   def shared_secret
-    bucket.config.secret_access_key
+    bucket.client.config.secret_access_key
   end
 
   def open(opts, &block)
-    if block
-      attachment.s3object.read(&block)
+    if block_given?
+      attachment.s3object.get(&block)
     else
       # TODO: !need_local_file -- net/http and thus AWS::S3::S3Object don't
       # natively support streaming the response, except when a block is given.
@@ -68,9 +68,7 @@ class Attachments::S3Storage
       tempfile = Tempfile.new(["attachment_#{attachment.id}", attachment.extension],
                               opts[:temp_folder].presence || Dir::tmpdir)
       tempfile.binmode
-      attachment.s3object.read do |chunk|
-        tempfile.write(chunk)
-      end
+      attachment.s3object.get(response_target: tempfile)
       tempfile.rewind
       tempfile
     end

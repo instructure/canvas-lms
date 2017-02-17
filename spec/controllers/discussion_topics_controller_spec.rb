@@ -167,7 +167,7 @@ describe DiscussionTopicsController do
       @locked_module.unlock_at = 2.months.from_now
       @locked_module.save!
       user_session(@student)
-      
+
       get 'index', course_id: @course.id
       expect(response).to be_success
       expect(assigns["topics"]).to include(@locked_topic)
@@ -530,7 +530,32 @@ describe DiscussionTopicsController do
         get 'show', :course_id => @course.id, :id => @topic.id
         expect(assigns[:initial_post_required]).to be_falsey
       end
+    end
 
+    context "student context cards" do
+      before(:once) do
+        course_topic user: @teacher
+        @course.root_account.enable_feature! :student_context_cards
+      end
+
+      it "is disabed for students" do
+        user_session(@student)
+        get :show, course_id: @course.id, id: @topic.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
+      end
+
+      it "is disabled for teachers when feature_flag is off" do
+        @course.root_account.disable_feature! :student_context_cards
+        user_session(@teacher)
+        get :show, course_id: @course.id, id: @topic.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
+      end
+
+      it "is enabled for teachers when feature_flag is on" do
+        user_session(@teacher)
+        get :show, course_id: @course.id, id: @topic.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq true
+      end
     end
 
   end
@@ -542,6 +567,27 @@ describe DiscussionTopicsController do
       get 'new', course_id: @course.id, due_at: due_at.iso8601
       expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:assignment][:due_at]).to eq due_at.iso8601
     end
+
+    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:name_length_required_for_account?).returns(true)
+      get 'new', :course_id => @course.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
+    end
+
+    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:name_length_required_for_account?).returns(false)
+      get 'new', :course_id => @course.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
+    end
+
+    it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:assignment_max_name_length).returns(15)
+      get 'new', :course_id => @course.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
+    end
   end
 
   describe "GET 'edit'" do
@@ -549,11 +595,48 @@ describe DiscussionTopicsController do
       course_topic
     end
 
-    before do
+    include_context "multiple grading periods within controller" do
+      let(:course) { @course }
+      let(:teacher) { @teacher }
+      let(:request_params) { [:edit, course_id: course, id: @topic] }
+    end
+
+    it "should not explode with mgp and group context" do
+      @course.root_account.enable_feature!(:multiple_grading_periods)
       user_session(@teacher)
+      group = group_model(:context => @course)
+      group_topic = group.discussion_topics.create!(:title => "title")
+      get(:edit, group_id: group, id: group_topic)
+      expect(response).to be_success
+      expect(assigns[:js_env]).to have_key(:active_grading_periods)
+    end
+
+    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:name_length_required_for_account?).returns(true)
+      get :edit, course_id: @course.id, id: @topic.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
+    end
+
+    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:name_length_required_for_account?).returns(false)
+      get :edit, course_id: @course.id, id: @topic.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
+    end
+
+    it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:assignment_max_name_length).returns(15)
+      get :edit, course_id: @course.id, id: @topic.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
     context 'conditional-release' do
+      before do
+        user_session(@teacher)
+      end
+
       it 'should include environment variables if enabled' do
         ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
         ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'value' })
@@ -650,7 +733,6 @@ describe DiscussionTopicsController do
 
       specify { expect(topic).to be_a DiscussionTopic }
       specify { expect(topic.user).to eq @user }
-      specify { expect(topic.current_user).to eq @user }
       specify { expect(topic.delayed_post_at).to be_nil }
       specify { expect(topic.lock_at).to be_nil }
       specify { expect(topic.workflow_state).to eq 'active' }

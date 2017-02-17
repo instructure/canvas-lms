@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -22,6 +22,7 @@ module Api::V1::Assignment
   include Api::V1::ExternalTools::UrlHelpers
   include Api::V1::Locked
   include Api::V1::AssignmentOverride
+  include SubmittablesGradingPeriodProtection
 
   API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS = {
     :only => %w(
@@ -58,8 +59,37 @@ module Api::V1::Assignment
     )
   }.freeze
 
+  EDITABLE_ATTRS_IN_CLOSED_GRADING_PERIOD = %w[
+    description
+    submission_types
+    peer_reviews
+    peer_review_count
+    anonymous_peer_reviews
+    peer_reviews_due_at
+    automatic_peer_reviews
+    allowed_extensions
+    due_at
+    only_visible_to_overrides
+    post_to_sis
+  ].freeze
+
   def assignments_json(assignments, user, session, opts = {})
-    assignments.map{ |assignment| assignment_json(assignment, user, session, opts) }
+    # check if all assignments being serialized belong to the same course
+    contexts = assignments.map {|a| [a.context_id, a.context_type] }.uniq
+    if contexts.length == 1
+      # if so, calculate their effective due dates in one go, rather than individually
+      opts[:exclude_response_fields] ||= []
+      opts[:exclude_response_fields] << 'in_closed_grading_period'
+      due_dates = EffectiveDueDates.for_course(assignments.first.context, assignments)
+    end
+
+    assignments.map do |assignment|
+      json = assignment_json(assignment, user, session, opts)
+      unless json.key? 'in_closed_grading_period'
+        json['in_closed_grading_period'] = due_dates.in_closed_grading_period?(assignment)
+      end
+      json
+    end
   end
 
   def assignment_json(assignment, user, session, opts = {})
@@ -83,13 +113,17 @@ module Api::V1::Assignment
     end
 
     hash = api_json(assignment, user, session, fields)
-    hash['secure_params'] = assignment.secure_params
+    hash['secure_params'] = assignment.secure_params if assignment.has_attribute?(:lti_context_id)
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
-    hash['has_due_date_in_closed_grading_period'] =
-      assignment.due_for_any_student_in_closed_grading_period?
+    hash['due_date_required'] = assignment.due_date_required?
+    hash['max_name_length'] = assignment.max_name_length
+
+    unless opts[:exclude_response_fields].include?('in_closed_grading_period')
+      hash['in_closed_grading_period'] = assignment.in_closed_grading_period?
+    end
 
     if !opts[:overrides].blank?
       hash['overrides'] = assignment_overrides_json(opts[:overrides], user)
@@ -271,6 +305,10 @@ module Api::V1::Assignment
       hash['submissions_download_url'] = submissions_download_url(assignment.context, assignment)
     end
 
+    if opts[:include_master_course_restrictions]
+      hash.merge!(assignment.master_course_api_restriction_data)
+    end
+
     hash
   end
 
@@ -349,43 +387,36 @@ module Api::V1::Assignment
     store_in_index
   )
 
-  def update_api_assignment(assignment, assignment_params, user, context = assignment.context)
-    raise "needs strong params" unless assignment_params.is_a?(ActionController::Parameters)
+  def create_api_assignment(assignment, assignment_params, user, context = assignment.context)
+    return :forbidden unless grading_periods_allow_submittable_create?(assignment, assignment_params)
 
-    old_assignment = assignment.new_record? ? nil : assignment.clone
-    old_assignment.id = assignment.id if old_assignment.present?
+    prepared_create = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
+    return false unless prepared_create[:valid]
 
-    if assignment_params[:secure_params] && !old_assignment
-      secure_params = Canvas::Security.decode_jwt assignment_params[:secure_params]
-      assignment.lti_context_id = secure_params[:lti_assignment_id]
-    end
-
-    overrides = deserialize_overrides(assignment_params[:assignment_overrides])
-    overrides = [] if !overrides && assignment_params.has_key?(:assignment_overrides)
-    assignment_params.delete(:assignment_overrides)
-
-    return if overrides && !overrides.is_a?(Array)
-    return false unless valid_assignment_group_id?(assignment, assignment_params)
-    return false unless valid_assignment_dates?(assignment, assignment_params)
-    return false unless valid_submission_types?(assignment, assignment_params)
-
-    assignment = update_from_params(assignment, assignment_params, user, context, new_record: !old_assignment)
-
-    if overrides
-      assignment.transaction do
-        assignment.save_without_broadcasting!
-        batch_update_assignment_overrides(assignment, overrides, user)
-      end
-
-      assignment.do_notifications!(old_assignment, assignment_params[:notify_of_update])
+    if prepared_create[:overrides]
+      create_api_assignment_with_overrides(prepared_create, user)
     else
-      assignment.save!
+      prepared_create[:assignment].save!
+      :success
     end
-
-    return true
-    # some values need to be removed before sending the error
   rescue ActiveRecord::RecordInvalid
-    return false
+    false
+  end
+
+  def update_api_assignment(assignment, assignment_params, user, context = assignment.context)
+    return :forbidden unless grading_periods_allow_submittable_update?(assignment, assignment_params)
+
+    prepared_update = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
+    return false unless prepared_update[:valid]
+
+    if prepared_update[:overrides]
+      update_api_assignment_with_overrides(prepared_update, user)
+    else
+      prepared_update[:assignment].save!
+      :success
+    end
+  rescue ActiveRecord::RecordInvalid
+    false
   end
 
   API_ALLOWED_SUBMISSION_TYPES = [
@@ -403,7 +434,7 @@ module Api::V1::Assignment
     ""
   ].freeze
 
-  def valid_submission_types?(assignment, assignment_params)
+  def submission_types_valid?(assignment, assignment_params)
     return true if assignment_params['submission_types'].nil?
     assignment_params['submission_types'] = Array(assignment_params['submission_types'])
 
@@ -421,7 +452,7 @@ module Api::V1::Assignment
   end
 
   # validate that date and times are iso8601
-  def valid_assignment_dates?(assignment, assignment_params)
+  def assignment_dates_valid?(assignment, assignment_params)
     errors = ['due_at', 'lock_at', 'unlock_at', 'peer_reviews_assign_at'].map do |v|
       if assignment_params[v].present? && assignment_params[v] !~ Api::ISO8601_REGEX
         assignment.errors.add("assignment[#{v}]",
@@ -434,7 +465,7 @@ module Api::V1::Assignment
     errors.compact.empty?
   end
 
-  def valid_assignment_group_id?(assignment, assignment_params)
+  def assignment_group_id_valid?(assignment, assignment_params)
     ag_id = assignment_params["assignment_group_id"].presence
     # if ag_id is a non-numeric string, ag_id.to_i will == 0
     if ag_id and ag_id.to_i <= 0
@@ -445,10 +476,28 @@ module Api::V1::Assignment
     end
   end
 
-  def update_from_params(assignment, assignment_params, user, context = assignment.context, new_record: false)
+  def assignment_editable_fields_valid?(assignment, user)
+    return true if assignment.context.account_membership_allows(user)
+    # if not in closed grading period editable fields are valid
+    return true unless assignment.in_closed_grading_period?
+    # if assignment was not and is still not gradeable fields are valid
+    return true unless assignment.gradeable_was? || assignment.gradeable?
+
+    impermissible_changes = assignment.changes.keys - EDITABLE_ATTRS_IN_CLOSED_GRADING_PERIOD
+    # backend is title, frontend is name
+    impermissible_changes << "name" if impermissible_changes.delete("title")
+    return true unless impermissible_changes.present?
+
+    impermissible_changes.each do |change|
+      assignment.errors.add(change, I18n.t("cannot be changed because this assignment is due in a closed grading period"))
+    end
+    false
+  end
+
+  def update_from_params(assignment, assignment_params, user, context = assignment.context)
     update_params = assignment_params.permit(allowed_assignment_input_fields)
 
-    if update_params.has_key?('peer_reviews_assign_at')
+    if update_params.key?('peer_reviews_assign_at')
       update_params['peer_reviews_due_at'] = update_params['peer_reviews_assign_at']
       update_params.delete('peer_reviews_assign_at')
     end
@@ -461,17 +510,17 @@ module Api::V1::Assignment
       update_params["submission_types"] = update_params["submission_types"].join(',')
     end
 
-    if update_params.has_key?("assignment_group_id")
+    if update_params.key?("assignment_group_id")
       ag_id = update_params.delete("assignment_group_id").presence
       assignment.assignment_group = assignment.context.assignment_groups.where(id: ag_id).first
     end
 
-    if update_params.has_key?("group_category_id") && !assignment.group_category_deleted_with_submissions?
+    if update_params.key?("group_category_id") && !assignment.group_category_deleted_with_submissions?
       gc_id = update_params.delete("group_category_id").presence
       assignment.group_category = assignment.context.group_categories.where(id: gc_id).first
     end
 
-    if update_params.has_key?("grading_standard_id")
+    if update_params.key?("grading_standard_id")
       standard_id = update_params.delete("grading_standard_id")
       if standard_id.present?
         grading_standard = GradingStandard.for(context).where(id: standard_id).first
@@ -515,41 +564,33 @@ module Api::V1::Assignment
 
     # use Assignment#turnitin_settings= to normalize, but then assign back to
     # hash so that it is written with update_params
-    if update_params.has_key?("turnitin_settings")
-      turnitin_settings = update_params.delete("turnitin_settings").slice(*API_ALLOWED_TURNITIN_SETTINGS)
-      turnitin_settings['exclude_type'] = case turnitin_settings['exclude_small_matches_type']
-        when nil; '0'
-        when 'words'; '1'
-        when 'percent'; '2'
-      end
-      turnitin_settings['exclude_value'] = turnitin_settings['exclude_small_matches_value']
-      assignment.turnitin_settings = turnitin_settings
+    if update_params.key?("turnitin_settings")
+      assignment.turnitin_settings = turnitin_settings_hash(update_params)
     end
 
     # use Assignment#vericite_settings= to normalize, but then assign back to
     # hash so that it is written with update_params
-    if update_params.has_key?("vericite_settings")
-      vericite_settings = update_params.delete("vericite_settings").slice(*API_ALLOWED_VERICITE_SETTINGS)
-      assignment.vericite_settings = vericite_settings
+    if update_params.key?("vericite_settings")
+      assignment.vericite_settings = vericite_settings_hash(update_params)
     end
 
     # TODO: allow rubric creation
 
-    if update_params.has_key?("description")
+    if update_params.key?("description")
       update_params["description"] = process_incoming_html_content(update_params["description"])
     end
 
-    if assignment_params.has_key? "published"
+    if assignment_params.key? "published"
       published = value_to_boolean(assignment_params['published'])
       assignment.workflow_state = published ? 'published' : 'unpublished'
     end
 
-    if assignment_params.has_key? "only_visible_to_overrides"
+    if assignment_params.key? "only_visible_to_overrides"
       assignment.only_visible_to_overrides = value_to_boolean(assignment_params['only_visible_to_overrides'])
     end
 
     post_to_sis = assignment_params.key?('post_to_sis') ? value_to_boolean(assignment_params['post_to_sis']) : nil
-    if new_record && (post_to_sis.nil? || !Assignment.sis_grade_export_enabled?(context))
+    if assignment.new_record? && (post_to_sis.nil? || !Assignment.sis_grade_export_enabled?(context))
       # set the default setting if it is not included.
       assignment.post_to_sis = context.account.sis_default_grade_export[:value]
     elsif !post_to_sis.nil?
@@ -565,6 +606,22 @@ module Api::V1::Assignment
     assignment.infer_times
 
     assignment
+  end
+
+  def turnitin_settings_hash(assignment_params)
+    turnitin_settings = assignment_params.delete("turnitin_settings").slice(*API_ALLOWED_TURNITIN_SETTINGS)
+    turnitin_settings['exclude_type'] = case turnitin_settings['exclude_small_matches_type']
+      when nil; '0'
+      when 'words'; '1'
+      when 'percent'; '2'
+    end
+    turnitin_settings['exclude_value'] = turnitin_settings['exclude_small_matches_value']
+    turnitin_settings.to_hash.with_indifferent_access
+  end
+
+  def vericite_settings_hash(assignment_params)
+    vericite_settings = assignment_params.delete("vericite_settings").slice(*API_ALLOWED_VERICITE_SETTINGS)
+    vericite_settings.to_hash.with_indifferent_access
   end
 
   def submissions_hash(include_params, assignments, submissions_for_user=nil)
@@ -609,6 +666,108 @@ module Api::V1::Assignment
   end
 
   private
+
+  def prepare_assignment_create_or_update(assignment, assignment_params, user, context = assignment.context)
+    raise "needs strong params" unless assignment_params.is_a?(ActionController::Parameters)
+
+    unless assignment.new_record?
+      old_assignment = assignment.clone
+      old_assignment.id = assignment.id
+    end
+
+    if assignment_params[:secure_params] && assignment.new_record?
+      secure_params = Canvas::Security.decode_jwt assignment_params[:secure_params]
+      assignment.lti_context_id = secure_params[:lti_assignment_id]
+    end
+
+    apply_external_tool_settings(assignment, assignment_params)
+    overrides = pull_overrides_from_params(assignment_params)
+    invalid = { valid: false }
+    return invalid unless update_parameters_valid?(assignment, assignment_params, overrides)
+
+    updated_assignment = update_from_params(assignment, assignment_params, user, context)
+    return invalid unless assignment_editable_fields_valid?(updated_assignment, user)
+
+    {
+      assignment: assignment,
+      overrides: overrides,
+      old_assignment: old_assignment,
+      notify_of_update: assignment_params[:notify_of_update],
+      valid: true
+    }
+  end
+
+  def create_api_assignment_with_overrides(prepared_update, user)
+    assignment = prepared_update[:assignment]
+    overrides = prepared_update[:overrides]
+
+    return :forbidden unless grading_periods_allow_assignment_overrides_batch_create?(assignment, overrides)
+
+    assignment.transaction do
+      assignment.save_without_broadcasting!
+      batch_update_assignment_overrides(assignment, overrides, user)
+    end
+
+    assignment.do_notifications!(prepared_update[:old_assignment], prepared_update[:notify_of_update])
+    :success
+  end
+
+  def update_api_assignment_with_overrides(prepared_update, user)
+    assignment = prepared_update[:assignment]
+    overrides = prepared_update[:overrides]
+
+    prepared_batch = prepare_assignment_overrides_for_batch_update(assignment, overrides, user)
+
+    return :forbidden unless grading_periods_allow_assignment_overrides_batch_update?(assignment, prepared_batch)
+
+    assignment.transaction do
+      perform_batch_update_assignment_overrides(assignment, prepared_batch)
+      assignment.save_without_broadcasting!
+    end
+
+    assignment.do_notifications!(prepared_update[:old_assignment], prepared_update[:notify_of_update])
+    :success
+  end
+
+  def pull_overrides_from_params(assignment_params)
+    overrides = deserialize_overrides(assignment_params[:assignment_overrides])
+    overrides = [] if !overrides && assignment_params.key?(:assignment_overrides)
+    assignment_params.delete(:assignment_overrides)
+    overrides
+  end
+
+  def update_parameters_valid?(assignment, assignment_params, overrides)
+    return false unless !overrides || overrides.is_a?(Array)
+    return false unless assignment_group_id_valid?(assignment, assignment_params)
+    return false unless assignment_dates_valid?(assignment, assignment_params)
+    return false unless submission_types_valid?(assignment, assignment_params)
+    true
+  end
+
+  def apply_external_tool_settings(assignment, assignment_params)
+    if plagiarism_capable?(assignment_params)
+      tool = assignment_configuration_tool(assignment_params)
+      assignment.tool_settings_tool = tool
+    end
+  end
+
+  def assignment_configuration_tool(assignment_params)
+    tool_id = assignment_params['similarityDetectionTool'].to_i
+    tool = nil
+    if assignment_params['configuration_tool_type'] == 'ContextExternalTool'
+      tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)
+    elsif assignment_params['configuration_tool_type'] == 'Lti::MessageHandler'
+      mh = Lti::MessageHandler.find(tool_id)
+      mh_context = mh.resource_handler.tool_proxy.context
+      tool = mh if mh_context == @context || mh_context == @context.account || mh_context == @context.root_account
+    end
+    tool
+  end
+
+  def plagiarism_capable?(assignment_params)
+    assignment_params['submission_type'] == 'online' &&
+      assignment_params['submission_types'].include?('online_upload')
+  end
 
   def submissions_download_url(context, assignment)
     if assignment.quiz?

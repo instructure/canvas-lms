@@ -6,7 +6,7 @@ describe "self enrollment" do
   context "in a full course" do
     it "should not be allowed" do
       Account.default.allow_self_enrollment!
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.self_enrollment = true
       @course.self_enrollment_limit = 0
       @course.save!
@@ -19,7 +19,7 @@ describe "self enrollment" do
     before do
       Account.default.update_attribute(:settings, :self_enrollment => 'any', :open_registration => true)
       Account.default.canvas_authentication_provider.update_attribute(:self_registration, true)
-      course(:active_all => active_course)
+      course_factory(:active_all => active_course)
       set_up_course
       @course.update_attribute(:self_enrollment, true)
     end
@@ -93,7 +93,7 @@ describe "self enrollment" do
   shared_examples_for "closed registration" do
     before do
       Account.default.allow_self_enrollment!
-      course(:active_all => active_course)
+      course_factory(:active_all => active_course)
       set_up_course
       @course.update_attribute(:self_enrollment, true)
     end

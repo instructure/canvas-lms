@@ -199,7 +199,7 @@ describe "content migrations", :non_parallel do
       #  because of a cached default account
       #  that no longer exists in the db
       Account.clear_special_account_cache!(true)
-      @copy_from = course
+      @copy_from = course_factory
       @copy_from.update_attribute(:name, 'copy from me')
       data = File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip')
 

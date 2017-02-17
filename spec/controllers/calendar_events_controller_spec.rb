@@ -89,13 +89,13 @@ describe CalendarEventsController do
 
   describe "POST 'create'" do
     it "should require authorization" do
-      post 'create', :course_id => @course.id
+      post 'create', :course_id => @course.id, :calendar_event => {:title => "some event"}
       assert_unauthorized
     end
 
     it "should not allow students to create" do
       user_session(@student)
-      post 'create', :course_id => @course.id
+      post 'create', :course_id => @course.id, :calendar_event => {:title => "some event"}
       assert_unauthorized
     end
 

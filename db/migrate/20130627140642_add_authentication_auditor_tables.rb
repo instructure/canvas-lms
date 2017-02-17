@@ -1,4 +1,4 @@
-class AddAuthenticationAuditorTables < ActiveRecord::Migration
+class AddAuthenticationAuditorTables < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   include Canvas::Cassandra::Migration

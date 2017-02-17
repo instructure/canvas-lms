@@ -9,10 +9,12 @@ define([
   const HelpDialog = React.createClass({
     propTypes: {
       links: React.PropTypes.array,
+      hasLoaded: React.PropTypes.bool,
       onFormSubmit: React.PropTypes.func
     },
     getDefaultProps() {
       return {
+        hasLoaded: false,
         links: [],
         onFormSubmit: function () {}
       };
@@ -46,7 +48,10 @@ define([
           );
         default:
           return (
-            <HelpLinks links={this.props.links} onClick={this.handleLinkClick} />
+            <HelpLinks 
+              links={this.props.links} 
+              hasLoaded={this.props.hasLoaded} 
+              onClick={this.handleLinkClick} />
           );
       }
     }

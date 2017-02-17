@@ -72,6 +72,12 @@ module Lti
             definition[:placements][p.to_sym][:selection_width] = tool.extension_setting(:resource_selection, :selection_width)
             definition[:placements][p.to_sym][:selection_height] = tool.extension_setting(:resource_selection, :selection_height)
           end
+
+          %i[launch_width launch_height].each do |property|
+            if tool.extension_setting(p, property)
+              definition[:placements][p.to_sym][property] = tool.extension_setting(p, property)
+            end
+          end
         end
       end
       definition

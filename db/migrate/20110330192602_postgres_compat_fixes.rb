@@ -1,4 +1,4 @@
-class PostgresCompatFixes < ActiveRecord::Migration
+class PostgresCompatFixes < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

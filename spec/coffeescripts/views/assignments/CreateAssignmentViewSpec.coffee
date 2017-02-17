@@ -1,5 +1,6 @@
 define [
   'Backbone'
+  'underscore'
   'compiled/collections/AssignmentGroupCollection'
   'compiled/models/AssignmentGroup'
   'compiled/models/Assignment'
@@ -7,12 +8,26 @@ define [
   'compiled/views/DialogFormView'
   'jquery'
   'timezone'
-  'vendor/timezone/America/Juneau'
-  'vendor/timezone/fr_FR'
+  'timezone/America/Juneau'
+  'timezone/fr_FR'
   'helpers/I18nStubber'
+  'helpers/fakeENV'
   'helpers/jquery.simulate'
   'compiled/behaviors/tooltip'
-], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, CreateAssignmentView, DialogFormView, $, tz, juneau, french, I18nStubber) ->
+], (
+  Backbone,
+  _,
+  AssignmentGroupCollection,
+  AssignmentGroup,
+  Assignment,
+  CreateAssignmentView,
+  DialogFormView,
+  $,
+  tz,
+  juneau,
+  french,
+  I18nStubber,
+  fakeENV) ->
 
   fixtures = $('#fixtures')
 
@@ -107,7 +122,13 @@ define [
     view.$el.appendTo $('#fixtures')
     view.render()
 
-  module 'CreateAssignmentView',
+  nameLengthHelper = (view, length, maxNameLengthRequiredForAccount, maxNameLength, postToSis) ->
+    name = 'a'.repeat(length)
+    ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = maxNameLengthRequiredForAccount
+    ENV.MAX_NAME_LENGTH = maxNameLength
+    return view.validateBeforeSave({name: name, post_to_sis: postToSis}, [])
+
+  QUnit.module 'CreateAssignmentView',
     setup: ->
       @assignment1 = new Assignment(buildAssignment1())
       @assignment2 = new Assignment(buildAssignment2())
@@ -118,13 +139,10 @@ define [
 
       @snapshot = tz.snapshot()
       I18nStubber.pushFrame()
+      fakeENV.setup()
 
     teardown: ->
-      ENV.VALID_DATE_RANGE = {
-        start_at: {date: null, date_context: null}
-        end_at: {date: null, date_context: null}
-      }
-
+      fakeENV.teardown()
       tz.restore(@snapshot)
       I18nStubber.popFrame()
 
@@ -160,7 +178,7 @@ define [
     equal view.$('input[name=points_possible]').length, 0
 
   test "onSaveSuccess adds model to assignment group for creation", ->
-    @stub(DialogFormView.prototype, "close", ->)
+    @stub(DialogFormView.prototype, "close")
 
     equal @group.get("assignments").length, 2
 
@@ -170,7 +188,7 @@ define [
     equal @group.get("assignments").length, 3
 
   test "the form is cleared after adding an assignment", ->
-    @stub(DialogFormView.prototype, "close", ->)
+    @stub(DialogFormView.prototype, "close")
 
     view = createView(@group)
     view.onSaveSuccess()
@@ -179,8 +197,8 @@ define [
     equal view.$("#ag_#{@group.id}_assignment_points").val(), "0"
 
   test "moreOptions redirects to new page for creation", ->
-    @stub(CreateAssignmentView.prototype, "newAssignmentUrl", ->)
-    @stub(CreateAssignmentView.prototype, "redirectTo", ->)
+    @stub(CreateAssignmentView.prototype, "newAssignmentUrl")
+    @stub(CreateAssignmentView.prototype, "redirectTo")
 
     view = createView(@group)
     view.moreOptions()
@@ -188,7 +206,7 @@ define [
     ok view.redirectTo.called
 
   test "moreOptions redirects to edit page for editing", ->
-    @stub(CreateAssignmentView.prototype, "redirectTo", ->)
+    @stub(CreateAssignmentView.prototype, "redirectTo")
 
     view = createView(@assignment1)
     view.moreOptions()
@@ -220,8 +238,34 @@ define [
     json = view.toJSON()
     ok !json.canChooseType
 
+  test "toJSON includes key for disableDueAt", ->
+    view = createView(@assignment1)
+    keys = _.keys(view.toJSON())
+    ok _.contains(keys, "disableDueAt")
+
+  test "toJSON includes key for isInClosedPeriod", ->
+    view = createView(@assignment1)
+    keys = _.keys(view.toJSON())
+    ok _.contains(keys, "isInClosedPeriod")
+
+  test "disableDueAt returns true if due_at is a frozen attribute", ->
+    view = createView(@assignment1)
+    @stub(view.model, 'frozenAttributes').returns(["due_at"])
+    equal view.disableDueAt(), true
+
+  test "disableDueAt returns false if the user is an admin", ->
+    view = createView(@assignment1)
+    @stub(view, 'currentUserIsAdmin').returns(true)
+    equal view.disableDueAt(), false
+
+  test "disableDueAt returns true if the user is not an admin and the assignment has a due date in a closed grading period", ->
+    view = createView(@assignment1)
+    @stub(view, 'currentUserIsAdmin').returns(false)
+    @stub(view.model, 'inClosedGradingPeriod').returns(true)
+    equal view.disableDueAt(), true
+
   test "openAgain doesn't add datetime for multiple dates", ->
-    @stub(DialogFormView.prototype, "openAgain", ->)
+    @stub(DialogFormView.prototype, "openAgain")
     @spy $.fn, "datetime_field"
 
     view = createView(@assignment1)
@@ -230,13 +274,24 @@ define [
     ok $.fn.datetime_field.notCalled
 
   test "openAgain adds datetime picker", ->
-    @stub(DialogFormView.prototype, "openAgain", ->)
+    @stub(DialogFormView.prototype, "openAgain")
     @spy $.fn, "datetime_field"
 
     view = createView(@assignment2)
     view.openAgain()
 
     ok $.fn.datetime_field.called
+
+  test "openAgain doesn't add datetime picker if disableDueAt is true", ->
+    @stub(DialogFormView.prototype, "openAgain")
+    @spy $.fn, "datetime_field"
+
+    view = createView(@assignment2)
+    @stub(view, 'disableDueAt').returns(true)
+
+    view.openAgain()
+
+    ok $.fn.datetime_field.notCalled
 
   test "requires name to save assignment", ->
     view = createView(@assignment3)
@@ -248,17 +303,90 @@ define [
     equal errors["name"].length, 1
     equal errors["name"][0]["message"], "Name is required!"
 
-  test "requires a name < 255 chars to save assignment", ->
-    view = createView(@assignment3)
-    l1 = 'aaaaaaaaaa'
-    l2 = l1 + l1 + l1 + l1 + l1 + l1
-    l3 = l2 + l2 + l2 + l2 + l2 + l2
-    ok l3.length > 255
+  test "requires due_at to be in an open grading period if it is being changed and the user is a teacher", ->
+    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
+    ENV.active_grading_periods = [{
+      id: "1"
+      start_date: "2103-07-01T06:00:00Z"
+      end_date: "2103-08-31T06:00:00Z"
+      title: "Closed Period"
+      close_date: "2103-08-31T06:00:00Z"
+      is_last: false
+      is_closed: true
+    }]
 
-    errors = view.validateBeforeSave(name: l3, [])
+    view = createView(@assignment1)
+    @stub(view, 'currentUserIsAdmin').returns(false)
+    data =
+      name: "Foo"
+      due_at: "2103-08-15T06:00:00Z"
+    errors = view.validateBeforeSave(data, [])
+
+    equal errors["due_at"][0]["message"], "Due date cannot fall in a closed grading period"
+
+  test "does not require due_at to be in an open grading period if it is being changed and the user is an admin", ->
+    ENV.active_grading_periods = [{
+      id: "1"
+      start_date: "2103-07-01T06:00:00Z"
+      end_date: "2103-08-31T06:00:00Z"
+      title: "Closed Period"
+      close_date: "2103-08-31T06:00:00Z"
+      is_last: false
+      is_closed: true
+    }]
+
+    view = createView(@assignment1)
+    @stub(view, 'currentUserIsAdmin').returns(true)
+    data =
+      name: "Foo"
+      due_at: "2103-08-15T06:00:00Z"
+    errors = view.validateBeforeSave(data, [])
+
+    notOk errors["due_at"]
+
+  test "requires name to save assignment", ->
+    view = createView(@assignment3)
+    data =
+      name: ""
+    errors = view.validateBeforeSave(data, [])
+
     ok errors["name"]
     equal errors["name"].length, 1
-    equal errors["name"][0]["message"], "Name is too long"
+    equal errors["name"][0]["message"], "Name is required!"
+
+  test "has an error when a name > 256 chars", ->
+    view = createView(@assignment3)
+    errors = nameLengthHelper(view, 257, false, 30, '0')
+    ok errors["name"]
+    equal errors["name"].length, 1
+    equal errors["name"][0]["message"], "Name is too long, must be under 256 characters"
+
+  test "allows assignment to save when a name < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is true", ->
+    view = createView(@assignment3)
+    errors = nameLengthHelper(view, 254, false, 30, '1')
+    equal errors.length, 0
+
+  test "allows assignment to save when a name < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is false", ->
+    view = createView(@assignment3)
+    errors = nameLengthHelper(view, 254, false, 30, '0')
+    equal errors.length, 0
+
+  test "has an error when a name > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
+    view = createView(@assignment3)
+    errors = nameLengthHelper(view, 7, true, 5, '1')
+    ok errors["name"]
+    equal errors["name"].length, 1
+    equal errors["name"][0]["message"], "Name is too long, must be under #{ENV.MAX_NAME_LENGTH + 1} characters"
+
+  test "allows assignment to save when name > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is false", ->
+    view = createView(@assignment3)
+    errors = nameLengthHelper(view, 7, true, 5, '0')
+    equal errors.length, 0
+
+  test "allows assignment to save when name < MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
+    view = createView(@assignment3)
+    errors = nameLengthHelper(view, 30, true, 30, '1')
+    equal errors.length, 0
 
   test "don't validate name if it is frozen", ->
     view = createView(@assignment3)

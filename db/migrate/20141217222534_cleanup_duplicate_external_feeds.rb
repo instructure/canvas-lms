@@ -1,4 +1,4 @@
-class CleanupDuplicateExternalFeeds < ActiveRecord::Migration
+class CleanupDuplicateExternalFeeds < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
   tag :postdeploy
 

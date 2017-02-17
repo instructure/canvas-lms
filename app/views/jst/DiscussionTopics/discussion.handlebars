@@ -37,16 +37,8 @@
 
     <div class="discussion-due-date">
       {{#if assignment}}
-        {{#if assignment.due_at}}
-          <span class="discussion-date-type">
-            {{#t}}Due{{/t}}
-          </span>
-          <span {{ contextSensitiveDatetimeTitle assignment.due_at }}>
-            {{datetimeFormatted assignment.due_at}}
-          </span>
-        {{else}}
-          {{#t}}No Due Date{{/t}}
-        {{/if}}
+        <div class="ig-details__item assignment-date-due" data-view="date-due">
+        </div>
       {{/if}}
     </div>
 
@@ -58,27 +50,37 @@
         </div>
         {{/if}}
         {{#if cyoe.isReleased}}
-        <span class="pill mastery-path-icon" data-tooltip title="{{#t}}Released by Mastery Path{{/t}}">
+        <span class="pill mastery-path-icon" aria-hidden="true" data-tooltip title="{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}">
           <i class="icon-mastery-path"></i>{{cyoe.releasedLabel}}
         </span>
+        <span class="screenreader-only">{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}</span>
         {{/if}}
       {{/if}}
     {{/if}}
 
+    <div class="master-course-cell">
+      {{#if is_master_course_content}}
+        {{#if restricted_by_master_course}}
+          <i class="icon-lock"></i>
+        {{else}}
+          <i class="icon-unlock icon-Line"></i>
+        {{/if}}
+      {{/if}}
+    </div>
+
     <div class="discussion-status">
       <span id="publish-icon" class="publish-icon" data-view="publishIcon"></span>
-      <a href="#" data-view="toggleableSubscriptionIcon" class="subscription-toggler" role="button">
-        <span class="screenreader-only"></span>
-      </a>
+      <a href="#" data-view="toggleableSubscriptionIcon" class="subscription-toggler" role="button" aria-live="polite"></a>
     </div>
 
     <div class="discussion-unread-status">
+      {{#unless isRootTopic}}
       <div class="new-and-total-badge pull-right">
         <span class="new-items"
               title="{{unread_count_tooltip}}"
               aria-hidden="true"
               data-tooltip>
-          {{unread_count}}
+          {{n unread_count}}
         </span>
         <span class="screenreader-only">
           {{unread_count_tooltip}}
@@ -88,15 +90,17 @@
              title="{{reply_count_tooltip}}"
              aria-hidden="true"
              data-tooltip>
-          {{discussion_subentry_count}}
+          {{n discussion_subentry_count}}
         </div>
         <div class="screenreader-only">
           {{reply_count_tooltip}}
         </div>
       </div>
+      {{/unless}}
     </div>
 
     <div class="discussion-actions">
+      {{#unless restricted_by_master_course}}
       {{#if permissions.delete}}
         <a href="#" class="al-trigger al-trigger-gray" role="button" id="manage_link">
           <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
@@ -150,6 +154,7 @@
           {{/if}}
         </ul>
       {{/if}}
+      {{/unless}}
     </div>
   </div>
 </div>

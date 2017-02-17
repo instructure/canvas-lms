@@ -1,4 +1,4 @@
-class AddDelayedJobsTag < ActiveRecord::Migration
+class AddDelayedJobsTag < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.connection

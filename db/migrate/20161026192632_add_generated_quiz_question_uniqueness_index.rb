@@ -1,4 +1,4 @@
-class AddGeneratedQuizQuestionUniquenessIndex < ActiveRecord::Migration
+class AddGeneratedQuizQuestionUniquenessIndex < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 

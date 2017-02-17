@@ -1,6 +1,6 @@
 define ['compiled/util/BackoffPoller'], (BackoffPoller)->
 
-  module 'BackoffPoller',
+  QUnit.module 'BackoffPoller',
     setup: ->
       @ran_callback = false
       @callback = =>

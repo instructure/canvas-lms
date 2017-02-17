@@ -1,4 +1,4 @@
-class RemovePageViewsContributed < ActiveRecord::Migration
+class RemovePageViewsContributed < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

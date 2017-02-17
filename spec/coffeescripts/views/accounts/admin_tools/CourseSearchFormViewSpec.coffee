@@ -4,7 +4,7 @@ define [
   'compiled/views/accounts/admin_tools/CourseSearchFormView'
   'jquery'
 ], (Backbone, CourseRestore, CourseSearchFormView, $) ->
-  module 'CourseSearchFormView',
+  QUnit.module 'CourseSearchFormView',
     setup: ->
       @course_id = 42
       @courseRestore = new CourseRestore account_id: 4

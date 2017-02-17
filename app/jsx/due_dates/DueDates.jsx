@@ -1,16 +1,23 @@
 define([
   'underscore',
   'react',
+  'react-dom',
   'jsx/due_dates/DueDateRow',
   'jsx/due_dates/DueDateAddRowButton',
   'jsx/due_dates/OverrideStudentStore',
   'jsx/due_dates/StudentGroupStore',
   'jsx/due_dates/TokenActions',
   'compiled/models/AssignmentOverride',
+  'jsx/gradebook/AssignmentOverrideHelper',
   'i18n!assignments',
   'jquery',
+  'jsx/grading/helpers/GradingPeriodsHelper',
+  'timezone',
   'compiled/jquery.rails_flash_notifications'
-], (_ ,React, DueDateRow, DueDateAddRowButton, OverrideStudentStore, StudentGroupStore, TokenActions, Override, I18n, $) => {
+], (
+  _ ,React, ReactDOM, DueDateRow, DueDateAddRowButton, OverrideStudentStore, StudentGroupStore, TokenActions,
+  Override, AssignmentOverrideHelper, I18n, $, GradingPeriodsHelper, tz
+) => {
 
   var DueDates = React.createClass({
 
@@ -18,7 +25,16 @@ define([
       overrides: React.PropTypes.array.isRequired,
       syncWithBackbone: React.PropTypes.func.isRequired,
       sections: React.PropTypes.array.isRequired,
-      defaultSectionId: React.PropTypes.string.isRequired
+      defaultSectionId: React.PropTypes.string.isRequired,
+      multipleGradingPeriodsEnabled: React.PropTypes.bool.isRequired,
+      gradingPeriods: React.PropTypes.array.isRequired,
+      isOnlyVisibleToOverrides: React.PropTypes.bool.isRequired,
+      dueAt: function(props) {
+        const isDate = props['dueAt'] instanceof Date
+        if (!isDate && props['dueAt'] !== null) {
+          return new Error('Invalid prop `dueAt` supplied to `DueDates`. Validation failed.')
+        }
+      }
     },
 
     // -------------------
@@ -91,7 +107,7 @@ define([
     replaceRow(rowKey, newOverrides, rowDates){
       var tmp = {}
       var dates = rowDates || this.datesFromOverride(newOverrides[0])
-      tmp[rowKey] = {overrides: newOverrides, dates: dates}
+      tmp[rowKey] = {overrides: newOverrides, dates: dates, persisted: false}
 
       var newRows = _.extend(this.state.rows, tmp)
       this.setState({rows: newRows})
@@ -123,7 +139,12 @@ define([
       var rows = givenRows || this.state.rows
       return _.chain(rows).
                values().
-               map((row) => row["overrides"]).
+               map((row) => {
+                return _.map(row["overrides"], (override) => {
+                  override.attributes.persisted = row.persisted
+                  return override
+                })
+               }).
                flatten().
                compact().
                value()
@@ -176,7 +197,7 @@ define([
       return _.chain(overridesByKey)
         .map((overrides, key) => {
           var datesForGroup = this.datesFromOverride(overrides[0])
-          return [key, {overrides: overrides, dates: datesForGroup}]
+          return [key, {overrides: overrides, dates: datesForGroup, persisted: true}]
         })
         .object()
         .value()
@@ -227,7 +248,7 @@ define([
     },
 
     focusRow(rowKey){
-      this.refs[this.rowRef(rowKey)].getDOMNode().querySelector('input').focus();
+      ReactDOM.findDOMNode(this.refs[this.rowRef(rowKey)]).querySelector('input').focus();
     },
 
     // --------------------------
@@ -293,6 +314,31 @@ define([
       return I18n.t("Everyone Else")
     },
 
+    addStudentIfInClosedPeriod(gradingPeriodsHelper, students, dueDate, studentID) {
+      const student = this.state.students[studentID]
+
+      if (student && gradingPeriodsHelper.isDateInClosedGradingPeriod(dueDate)) {
+        students = students.concat(student)
+      }
+
+      return students
+    },
+
+    studentsInClosedPeriods() {
+      const allStudents = _.values(this.state.students)
+      if (_.isEmpty(allStudents)) return allStudents
+
+      const overrides = _.map(this.props.overrides, override => override.attributes)
+      const assignment = {
+        due_at: this.props.dueAt,
+        only_visible_to_overrides: this.props.isOnlyVisibleToOverrides
+      }
+
+      const effectiveDueDates = AssignmentOverrideHelper.effectiveDueDatesForAssignment(assignment, overrides, allStudents)
+      const gradingPeriodsHelper = new GradingPeriodsHelper(this.props.gradingPeriods)
+      return _.reduce(effectiveDueDates, this.addStudentIfInClosedPeriod.bind(this, gradingPeriodsHelper), [])
+    },
+
     // --------------------------
     //  Filtering Dropdown Opts
     // --------------------------
@@ -300,11 +346,57 @@ define([
     // it is no longer a valid option -> hide it
 
     validDropdownOptions(){
-      var validStudents = this.valuesWithOmission({object: this.state.students, keysToOmit: this.chosenStudentIds()})
-      var validGroups = this.valuesWithOmission({object: this.groupsForSelectedSet(), keysToOmit: this.chosenGroupIds()})
-      var validSections = this.valuesWithOmission({object: this.state.sections, keysToOmit: this.chosenSectionIds()})
-      var validNoops = this.valuesWithOmission({object: this.state.noops, keysToOmit: this.chosenNoops()})
+      let validStudents = this.valuesWithOmission({object: this.state.students, keysToOmit: this.chosenStudentIds()})
+      let validGroups = this.valuesWithOmission({object: this.groupsForSelectedSet(), keysToOmit: this.chosenGroupIds()})
+      let validSections = this.valuesWithOmission({object: this.state.sections, keysToOmit: this.chosenSectionIds()})
+      let validNoops = this.valuesWithOmission({object: this.state.noops, keysToOmit: this.chosenNoops()})
+      if (this.props.multipleGradingPeriodsEnabled && !_.contains(ENV.current_user_roles, "admin")) {
+        ({validStudents, validGroups, validSections} =
+          this.filterDropdownOptionsForMultipleGradingPeriods(validStudents, validGroups, validSections))
+      }
+
       return _.union(validStudents, validSections, validGroups, validNoops)
+    },
+
+    extractGroupsAndSectionsFromStudent(groups, toOmit, student) {
+      _.each(student.group_ids, function(groupID) {
+        toOmit.groupsToOmit[groupID] = toOmit.groupsToOmit[groupID] || groups[groupID]
+      })
+      _.each(student.sections, (sectionID) => {
+        toOmit.sectionsToOmit[sectionID] = toOmit.sectionsToOmit[sectionID] || this.state.sections[sectionID]
+      })
+      return toOmit
+    },
+
+    groupsAndSectionsInClosedPeriods(studentsToOmit) {
+      const groups = this.groupsForSelectedSet()
+      const omitted = _.reduce(
+        studentsToOmit,
+        this.extractGroupsAndSectionsFromStudent.bind(this, groups),
+        { groupsToOmit: {}, sectionsToOmit: {} }
+      )
+
+      return {
+        groupsToOmit: _.values(omitted.groupsToOmit),
+        sectionsToOmit: _.values(omitted.sectionsToOmit)
+      }
+    },
+
+    filterDropdownOptionsForMultipleGradingPeriods(students, groups, sections) {
+      const studentsToOmit = this.studentsInClosedPeriods()
+
+      if (_.isEmpty(studentsToOmit)) {
+        return { validStudents: students, validGroups: groups, validSections: sections }
+      } else {
+        const { groupsToOmit, sectionsToOmit } = this.groupsAndSectionsInClosedPeriods(studentsToOmit)
+
+        return {
+          validStudents: _.difference(students, studentsToOmit),
+          validGroups: _.difference(groups, groupsToOmit),
+          validSections: _.difference(sections, sectionsToOmit)
+        }
+      }
+
     },
 
     chosenIds(idType){
@@ -337,6 +429,23 @@ define([
                value()
     },
 
+    disableInputs(row) {
+      const rowIsNewOrUserIsAdmin = !row.persisted || _.contains(ENV.current_user_roles, "admin")
+      if (!this.props.multipleGradingPeriodsEnabled || rowIsNewOrUserIsAdmin) {
+        return false
+      }
+
+      const dates = (row.dates || {})
+      return this.isInClosedGradingPeriod(dates.due_at)
+    },
+
+    isInClosedGradingPeriod(date) {
+      if (date === undefined) return false
+
+      const dueAt = date === null ? null : new Date(date)
+      return new GradingPeriodsHelper(this.props.gradingPeriods).isDateInClosedGradingPeriod(dueAt)
+    },
+
     // -------------------
     //      Rendering
     // -------------------
@@ -346,23 +455,28 @@ define([
         var row = this.state.rows[rowKey]
         var overrides = row.overrides || []
         var dates = row.dates || {}
-        return <DueDateRow ref                  = {this.rowRef(rowKey)}
-                           overrides            = {overrides}
-                           key                  = {rowKey}
-                           rowKey               = {rowKey}
-                           dates                = {dates}
-                           students             = {this.state.students}
-                           sections             = {this.state.sections}
-                           groups               = {this.state.groups}
-                           canDelete            = {this.canRemoveRow()}
-                           validDropdownOptions = {this.validDropdownOptions()}
-                           handleDelete         = {this.removeRow.bind(this, rowKey)}
-                           handleTokenAdd       = {this.handleTokenAdd.bind(this, rowKey)}
-                           handleTokenRemove    = {this.handleTokenRemove.bind(this, rowKey)}
-                           defaultSectionNamer  = {this.defaultSectionNamer}
-                           replaceDate          = {this.replaceDate.bind(this, rowKey)}
-                           currentlySearching   = {this.state.currentlySearching}
-                           allStudentsFetched   = {this.state.allStudentsFetched} />
+        return (
+          <DueDateRow
+            ref                  = {this.rowRef(rowKey)}
+            inputsDisabled       = {this.disableInputs(row)}
+            overrides            = {overrides}
+            key                  = {rowKey}
+            rowKey               = {rowKey}
+            dates                = {dates}
+            students             = {this.state.students}
+            sections             = {this.state.sections}
+            groups               = {this.state.groups}
+            canDelete            = {this.canRemoveRow()}
+            validDropdownOptions = {this.validDropdownOptions()}
+            handleDelete         = {this.removeRow.bind(this, rowKey)}
+            handleTokenAdd       = {this.handleTokenAdd.bind(this, rowKey)}
+            handleTokenRemove    = {this.handleTokenRemove.bind(this, rowKey)}
+            defaultSectionNamer  = {this.defaultSectionNamer}
+            replaceDate          = {this.replaceDate.bind(this, rowKey)}
+            currentlySearching   = {this.state.currentlySearching}
+            allStudentsFetched   = {this.state.allStudentsFetched}
+          />
+        )
       })
     },
 

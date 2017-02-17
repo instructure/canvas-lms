@@ -1,4 +1,4 @@
-class RemoveBogusEnrollmentAssociatedUserIds < ActiveRecord::Migration
+class RemoveBogusEnrollmentAssociatedUserIds < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

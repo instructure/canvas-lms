@@ -1,11 +1,12 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'react-modal'
   'jsx/external_apps/components/AddExternalToolButton'
-], (React, ReactDOM, Modal, AddExternalToolButton) ->
+], (React, ReactDOM, TestUtils, Modal, AddExternalToolButton) ->
 
-  TestUtils = React.addons.TestUtils
+  Simulate = TestUtils.Simulate
   wrapper = null
 
   createElement = (data = {}) ->
@@ -25,7 +26,7 @@ define [
       configurationForm: component.refs.configurationForm?.getDOMNode()
     }
 
-  module 'ExternalApps.AddExternalToolButton',
+  QUnit.module 'ExternalApps.AddExternalToolButton',
     setup: ->
       wrapper = document.getElementById('fixtures')
       wrapper.innerHTML = ''
@@ -39,6 +40,19 @@ define [
     nodes = getDOMNodes()
     ok nodes.component.isMounted()
     ok TestUtils.isCompositeComponentWithType(nodes.component, AddExternalToolButton)
+
+  test 'does not include close button in footer if not LTI2 registration', ->
+    addToolButton = renderComponent({'canAddEdit': true})
+    addToolButton.setState({isLti2: false})
+    addToolButton.setState({modalIsOpen: true})
+    ok !document.querySelector('#footer-close-button')
+
+  test 'includes close button in footer if LTI2 registration', ->
+    addToolButton = renderComponent({'canAddEdit': true})
+    addToolButton.setState({isLti2: true})
+    addToolButton.setState({modalIsOpen: true})
+    console.log(addToolButton.state)
+    ok document.querySelector('#footer-close-button')
 
   test 'bad config url error message', ->
     addToolButton = renderComponent()

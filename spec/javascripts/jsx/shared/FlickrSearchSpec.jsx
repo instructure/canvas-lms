@@ -1,11 +1,10 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/shared/FlickrSearch'
-], (React, FlickrSearch) => {
+], (React, TestUtils, FlickrSearch) => {
 
-  const TestUtils = React.addons.TestUtils;
-
-  module('FlickrSearch View');
+  QUnit.module('FlickrSearch View');
 
   var getDummySearchResults = (pageCount) => {
     var photo = [{

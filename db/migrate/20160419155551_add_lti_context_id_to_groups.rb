@@ -1,4 +1,4 @@
-class AddLtiContextIdToGroups < ActiveRecord::Migration
+class AddLtiContextIdToGroups < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

@@ -196,6 +196,10 @@ define [
     # Add the backbone view for keyboardshortup help here
     $('.toggle_views_link').first().before((new KeyboardShortcuts()).render().$el)
 
+    resetToggleLinks = () ->
+      $('.toggle_html_editor_link').show()
+      $('.toggle_rich_editor_link').hide()
+
     $edit_course_syllabus_form = $('#edit_course_syllabus_form')
     $course_syllabus_body = $('#course_syllabus_body')
     $course_syllabus_details = $('#course_syllabus_details')
@@ -223,6 +227,7 @@ define [
       text = $.trim $course_syllabus.html()
       $course_syllabus_details.showIf not text
       RichContentEditor.destroyRCE($course_syllabus_body)
+      resetToggleLinks()
 
     $edit_syllabus_link.on 'click', (ev) ->
       ev.preventDefault()

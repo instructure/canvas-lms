@@ -1,0 +1,178 @@
+#!/usr/bin/env ruby
+
+$stdout.sync = $stderr.sync = true
+
+require 'test_queue'
+require 'test_queue/runner/rspec'
+
+class CanvasSpecRunner < TestQueue::Runner::RSpec
+  def initialize(*)
+    detect_instance_termination if ENV["TEST_QUEUE_DETECT_INSTANCE_TERMINATION"]
+    # make sure we're applying our config 'n stuff right away
+    require ::RSpec::Core::RubyProject.root + "/spec/spec_helper"
+
+    super
+  end
+
+  def detect_instance_termination
+    File.delete("/tmp/instance_terminating") if File.exist?("/tmp/instance_terminating")
+    exit if instance_terminating?
+
+    Thread.new do
+      loop do
+        break if instance_terminating?
+        sleep 5
+      end
+      puts "Received spot instance termination warning, shutting down relay"
+    end
+  end
+
+  def instance_terminating?
+    system("curl -f -s -o /tmp/instance_terminating http://169.254.169.254/latest/meta-data/spot/termination-time")
+  end
+
+  def after_fork(num)
+    # for the runtime logger
+    ENV["TEST_ENV_NUMBER"] = num > 1 ? num.to_s : ""
+    ENV["SELINIMUM_BATCH_NAME"] = "#{ENV["SERVER_NUMBER"]}.#{ENV["TEST_ENV_NUMBER"]}"
+    CanvasTestDatabase.reconnect!
+    BlankSlateProtection.truncate_all_tables!
+    CanvasTestDatabase.prepare_test_shards
+    Canvas.reconnect_redis
+  end
+
+  # test-queue does `exit!` in a couple places; override so at_exit hooks run (like simplecov)
+  # also preserve rspec exit codes
+  def summarize
+    output_profile_data if ::RSpec.configuration.profile_examples?
+
+    error_statuses = @completed.map { |worker| worker.status.exitstatus } - [0]
+
+    # a percentage of workers can abort/fail prior to running any specs
+    # (e.g. due to selenium/headless/firefox woes, etc)
+    allowed_sadness = 0.2
+    sadness_exit_status = 98
+    max_sadnesses = allowed_sadness * @completed.size
+    num_sadnesses = error_statuses.count(sadness_exit_status)
+    if num_sadnesses > 0 && num_sadnesses <= max_sadnesses
+      puts "Warning: #{num_sadnesses} workers failed prior to running specs, still below threshold"
+      error_statuses -= [sadness_exit_status]
+    end
+
+    error_statuses << 1 if @timed_out
+    error_statuses.uniq!
+
+    if error_statuses.empty?
+      # yay
+      exit 0
+    elsif error_statuses == [::RSpec.configuration.failure_exit_code]
+      # :'( but we can retry
+      exit ::RSpec.configuration.failure_exit_code
+    else
+      # this shouldn't happen, crap is broken
+      exit 1
+    end
+  end
+
+  def run_worker(iterator)
+    @run_worker_ret = super
+  end
+
+  def cleanup_worker
+    Kernel.exit @run_worker_ret || 0
+  end
+
+  def output_profile_data
+    e = "(?:\e\\[\\d+m)?"
+    examples = raw_profile_output.scan(/^(  .*\n    #{e}([\d.]+)#{e} #{e}seconds#{e} \..*\n)/)
+      .sort_by { |e| e.last.to_f }
+      .map(&:first)
+      .reverse
+      .first(::RSpec.configuration.profile_examples)
+    puts "\nTop #{examples.count} slowest examples:"
+    puts examples.join
+
+    groups = raw_profile_output.scan(/^(  .*\n    #{e}([\d.]+)#{e} #{e}seconds#{e} average .*\n)/)
+      .sort_by { |e| e.last.to_f }
+      .map(&:first)
+      .reverse
+      .first(::RSpec.configuration.profile_examples)
+    puts "\nTop #{groups.count} slowest example groups:"
+    puts groups.join
+    puts
+  end
+
+  def raw_profile_output
+    @raw_profile_output ||= ""
+  end
+
+  def worker_completed(worker)
+    return if @aborting
+    if ::RSpec.configuration.profile_examples? && profile_output = worker.output.match(/^Top \d+ slowest.*\n(?=Finished in )/m)
+      profile_output = profile_output[0]
+      raw_profile_output << profile_output
+      # take it out of the output, if we're displaying it
+      worker.output.sub!(profile_output, "") if ENV['TEST_QUEUE_VERBOSE'] || worker.status.exitstatus != 0
+    end
+    super
+  end
+end
+
+class CanvasTestDatabase
+  class << self
+    # for when we fork
+    def reconnect!
+      ActiveRecord::Base.configurations['test']['database'] = "canvas_test_#{ENV["TEST_ENV_NUMBER"]}"
+      Switchman::DatabaseServer.remove_instance_variable(:@database_servers)
+      ActiveRecord::Base.establish_connection(:test)
+    end
+
+    # this is the key stuff from the root-level before(:all) in switchman's
+    # RSpecHelper... need to run it before :allthethings:
+    def prepare_test_shards
+      BlankSlateProtection.disable do
+        shard1, shard2 = Switchman::TestHelper.recreate_persistent_test_shards
+        Switchman::RSpecHelper.class_variable_set :@@shard1, shard1
+        Switchman::RSpecHelper.class_variable_set :@@shard2, shard2
+        Switchman::RSpecHelper.class_variable_set :@@shard3, nil
+        Switchman::RSpecHelper.class_variable_set :@@default_shard, Shard.default
+        Switchman::RSpecHelper.class_variable_set :@@keep_the_shards, true
+        Switchman::Shard.delete_all
+        Switchman::Shard.default(true)
+      end
+    end
+  end
+end
+
+TestQueue::Iterator.prepend(Module.new {
+  def query(*)
+    super
+  ensure
+    if !@done && instance_terminating?
+      puts "Received spot instance termination warning, shutting down worker"
+      @done = true
+    end
+  end
+
+  def instance_terminating?
+    File.exist?("/tmp/instance_terminating")
+  end
+})
+
+TestQueue::Runner::RSpec::LazyGroups::BackgroundLoaderProxy.singleton_class.prepend(Module.new {
+  def order_files(files)
+    files = super
+    puts "Running files according to descending cost (slowest spec + hooks)"
+    puts "Any file with a cost of Infinity either 1. is brand new or 2. has no specs and could maybe be removed"
+    files.each do |file|
+      base_cost = (file_group_map[file] || [])
+        .map { |group| stats[group] }
+        .compact
+        .max || Float::INFINITY
+      puts "#{file} cost: #{base_cost}, file size: #{File.size(file)}"
+    end
+    files
+  end
+}) if defined?(TestQueue::Runner::RSpec::LazyGroups) && ENV["TEST_QUEUE_VERBOSE"]
+
+CanvasSpecRunner.new.execute

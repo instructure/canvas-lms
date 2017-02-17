@@ -1,4 +1,4 @@
-class ChangeSettingsValueToText < ActiveRecord::Migration
+class ChangeSettingsValueToText < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

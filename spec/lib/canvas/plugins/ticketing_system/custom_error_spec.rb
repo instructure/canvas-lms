@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_dependency "canvas/plugins/ticketing_system/custom_error"
 
 module Canvas::Plugins::TicketingSystem
   describe CustomError do

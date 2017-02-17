@@ -86,7 +86,7 @@ describe FilesController do
   end
 
   before :once do
-    @other_user = user(active_all: true)
+    @other_user = user_factory(active_all: true)
     course_with_teacher active_all: true
     student_in_course active_all: true
   end
@@ -150,25 +150,17 @@ describe FilesController do
       expect(assigns[:contexts][0]).to eql(@course)
     end
 
-    it "should return data for sub_folder if specified" do
+    it "should return a json format for wiki sidebar" do
       user_session(@teacher)
+      r1 = Folder.root_folders(@course).first
       f1 = course_folder
       a1 = folder_file
       get 'index', :course_id => @course.id, :format => 'json'
       expect(response).to be_success
       data = json_parse
       expect(data).not_to be_nil
-      expect(data['contexts'].length).to eql(1)
-      expect(data['contexts'][0]['course']['id']).to eql(@course.id)
-
-      f2 = course_folder
-      a2 = folder_file
-      get 'index', :course_id => @course.id, :folder_id => f2.id, :format => 'json'
-      expect(response).to be_success
-      expect(assigns[:current_folder]).to eql(f2)
-      expect(assigns[:current_attachments]).not_to be_nil
-      expect(assigns[:current_attachments]).not_to be_empty
-      expect(assigns[:current_attachments][0]).to eql(a2)
+      # order expected
+      expect(data["folders"].map{|x| x["folder"]["id"]}).to eql([r1.id, f1.id])
     end
 
     it "should work for a user context, too" do
@@ -194,7 +186,7 @@ describe FilesController do
 
     context "file menu tool visibility" do
       before do
-        course(:active_all => true)
+        course_factory(active_all: true)
         @tool = @course.context_external_tools.create!(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
         @tool.file_menu = {
           :visibility => "admins"
@@ -204,7 +196,7 @@ describe FilesController do
       end
 
       before :each do
-        user(:active_all => true)
+        user_factory(active_all: true)
         user_session(@user)
       end
 
@@ -228,7 +220,7 @@ describe FilesController do
 
       before :once do
         @shard2.activate do
-          user(:active_all => true)
+          user_factory(active_all: true)
         end
       end
 
@@ -307,11 +299,11 @@ describe FilesController do
     end
 
     it "should remember most recent sf_verifier in session" do
-      user1 = user(:active_all => true)
+      user1 = user_factory(active_all: true)
       file1 = user_file
       ts1, sf_verifier1 = user1.access_verifier
 
-      user2 = user(:active_all => true)
+      user2 = user_factory(active_all: true)
       file2 = user_file
       ts2, sf_verifier2 = user2.access_verifier
 
@@ -673,7 +665,7 @@ describe FilesController do
         root_attachment.save!
 
         @shard1.activate do
-          @student = user(:active_user => true)
+          @student = user_factory(active_user: true)
           @attachment = factory_with_protected_attributes(Attachment, :context => @student, :file_state => 'deleted', :workflow_state => 'unattached', :filename => 'test.txt', :content_type => 'text')
         end
 
@@ -810,8 +802,11 @@ describe FilesController do
       end
 
       before :once do
-        user_session(@student)
         submit_file
+      end
+
+      before :each do
+        user_session(@student)
       end
 
       it "should not delete" do
@@ -1025,9 +1020,9 @@ describe FilesController do
         local_storage!
         account = Account.create!
         @shard1.activate do
-          @student = user(:active_user => true)
+          @student = user_factory(active_user: true)
         end
-        course(:active_all => true, :account => account)
+        course_factory(active_all: true, :account => account)
         @course.enroll_user(@student, "StudentEnrollment").accept!
         @assignment = @course.assignments.create!(:title => 'upload_assignment', :submission_types => 'online_upload')
 

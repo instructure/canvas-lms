@@ -28,56 +28,8 @@ class Course < ActiveRecord::Base
   include ContentLicenses
   include TurnitinID
 
-  attr_accessor :teacher_names
-  attr_writer :student_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :invitation
-
-  attr_accessible :name,
-                  :section,
-                  :account,
-                  :group_weighting_scheme,
-                  :start_at,
-                  :conclude_at,
-                  :grading_standard_id,
-                  :is_public,
-                  :is_public_to_auth_users,
-                  :allow_student_wiki_edits,
-                  :show_public_context_messages,
-                  :syllabus_body,
-                  :public_description,
-                  :allow_student_forum_attachments,
-                  :allow_student_discussion_topics,
-                  :allow_student_discussion_editing,
-                  :show_total_grade_as_points,
-                  :default_wiki_editing_roles,
-                  :allow_student_organized_groups,
-                  :course_code,
-                  :default_view,
-                  :open_enrollment,
-                  :allow_wiki_comments,
-                  :turnitin_comments,
-                  :self_enrollment,
-                  :license,
-                  :indexed,
-                  :enrollment_term,
-                  :abstract_course,
-                  :root_account,
-                  :storage_quota,
-                  :storage_quota_mb,
-                  :restrict_enrollments_to_course_dates,
-                  :restrict_student_past_view,
-                  :restrict_student_future_view,
-                  :grading_standard,
-                  :grading_standard_enabled,
-                  :locale,
-                  :integration_id,
-                  :hide_final_grades,
-                  :hide_distribution_graphs,
-                  :lock_all_announcements,
-                  :public_syllabus,
-                  :public_syllabus_to_auth,
-                  :course_format,
-                  :time_zone,
-                  :organize_epub_by_content_type
+  attr_accessor :teacher_names, :master_course
+  attr_writer :student_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation
 
   time_zone_attribute :time_zone
   def time_zone
@@ -168,75 +120,79 @@ class Course < ActiveRecord::Base
   has_many :users, -> { uniq }, through: :enrollments, source: :user
   has_many :current_users, -> { uniq }, through: :current_enrollments, source: :user
   has_many :all_current_users, -> { uniq }, through: :all_current_enrollments, source: :user
-  has_many :group_categories, -> {where(deleted_at: nil) }, as: :context
-  has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
-  has_many :groups, :as => :context
-  has_many :active_groups, -> { where("groups.workflow_state<>'deleted'") }, as: :context, class_name: 'Group'
-  has_many :assignment_groups, -> { order('assignment_groups.position, assignment_groups.name') }, as: :context, dependent: :destroy
-  has_many :assignments, -> { order('assignments.created_at') }, as: :context, dependent: :destroy
-  has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, dependent: :destroy
+  has_many :group_categories, -> {where(deleted_at: nil) }, as: :context, inverse_of: :context
+  has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context, :inverse_of => :context
+  has_many :groups, :as => :context, :inverse_of => :context
+  has_many :active_groups, -> { where("groups.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'Group'
+  has_many :assignment_groups, -> { order('assignment_groups.position, assignment_groups.name') }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :assignments, -> { order('assignments.created_at') }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :submissions, -> { order('submissions.updated_at DESC') }, through: :assignments, dependent: :destroy
-  has_many :submission_comments, -> { published }, as: :context
-  has_many :discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user).order('discussion_topics.position DESC, discussion_topics.created_at DESC') }, as: :context, dependent: :destroy
-  has_many :active_discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user) }, as: :context, class_name: 'DiscussionTopic'
-  has_many :all_discussion_topics, -> { preload(:user) }, as: :context, class_name: "DiscussionTopic", dependent: :destroy
+  has_many :submission_comments, -> { published }, as: :context, inverse_of: :context
+  has_many :discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user).order('discussion_topics.position DESC, discussion_topics.created_at DESC') }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :active_discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user) }, as: :context, inverse_of: :context, class_name: 'DiscussionTopic'
+  has_many :all_discussion_topics, -> { preload(:user) }, as: :context, inverse_of: :context, class_name: "DiscussionTopic", dependent: :destroy
   has_many :discussion_entries, -> { preload(:discussion_topic, :user) }, through: :discussion_topics, dependent: :destroy
-  has_many :announcements, :as => :context, :class_name => 'Announcement', :dependent => :destroy
-  has_many :active_announcements, -> { where("discussion_topics.workflow_state<>'deleted'") }, as: :context, class_name: 'Announcement'
-  has_many :attachments, :as => :context, :dependent => :destroy, :extend => Attachment::FindInContextAssociation
-  has_many :active_images, -> { where("attachments.file_state<>? AND attachments.content_type LIKE 'image%'", 'deleted').order('attachments.display_name').preload(:thumbnail) }, as: :context, class_name: 'Attachment'
-  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'").order('assignments.title, assignments.position') }, as: :context, class_name: 'Assignment'
-  has_many :folders, -> { order('folders.name') }, as: :context, dependent: :destroy
-  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context
-  has_many :messages, :as => :context, :dependent => :destroy
-  has_many :context_external_tools, -> { order('name') }, as: :context, dependent: :destroy
+  has_many :announcements, :as => :context, :inverse_of => :context, :class_name => 'Announcement', :dependent => :destroy
+  has_many :active_announcements, -> { where("discussion_topics.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'Announcement'
+  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy, :extend => Attachment::FindInContextAssociation
+  has_many :active_images, -> { where("attachments.file_state<>? AND attachments.content_type LIKE 'image%'", 'deleted').order('attachments.display_name').preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: 'Attachment'
+  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'").order('assignments.title, assignments.position') }, as: :context, inverse_of: :context, class_name: 'Assignment'
+  has_many :folders, -> { order('folders.name') }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context, inverse_of: :context
+  has_many :messages, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_many :context_external_tools, -> { order('name') }, as: :context, inverse_of: :context, dependent: :destroy
   belongs_to :wiki
   has_many :wiki_pages, foreign_key: 'wiki_id', primary_key: 'wiki_id'
-  has_many :quizzes, -> { order('lock_at, title, id') }, class_name: 'Quizzes::Quiz', as: :context, dependent: :destroy
+  has_many :quizzes, -> { order('lock_at, title, id') }, class_name: 'Quizzes::Quiz', as: :context, inverse_of: :context, dependent: :destroy
   has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion', :through => :quizzes
-  has_many :active_quizzes, -> { preload(:assignment).where("quizzes.workflow_state<>'deleted'").order(:created_at) }, class_name: 'Quizzes::Quiz', as: :context
+  has_many :active_quizzes, -> { preload(:assignment).where("quizzes.workflow_state<>'deleted'").order(:created_at) }, class_name: 'Quizzes::Quiz', as: :context, inverse_of: :context
   has_many :assessment_questions, :through => :assessment_question_banks
-  has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context
+  has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context, inverse_of: :context
   def inherited_assessment_question_banks(include_self = false)
     self.account.inherited_assessment_question_banks(true, *(include_self ? [self] : []))
   end
 
-  has_many :external_feeds, :as => :context, :dependent => :destroy
+  has_many :external_feeds, :as => :context, :inverse_of => :context, :dependent => :destroy
   belongs_to :default_grading_standard, :class_name => 'GradingStandard', :foreign_key => 'grading_standard_id'
-  has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context
-  has_many :web_conferences, -> { order('created_at DESC') }, as: :context, dependent: :destroy
-  has_many :collaborations, -> { order("#{Collaboration.quoted_table_name}.title, #{Collaboration.quoted_table_name}.created_at") }, as: :context, dependent: :destroy
-  has_many :context_modules, -> { order(:position) }, as: :context, dependent: :destroy
+  has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
+  has_many :web_conferences, -> { order('created_at DESC') }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :collaborations, -> { order("#{Collaboration.quoted_table_name}.title, #{Collaboration.quoted_table_name}.created_at") }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :context_modules, -> { order(:position) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :context_module_progressions, through: :context_modules
-  has_many :active_context_modules, -> { where(workflow_state: 'active') }, as: :context, class_name: 'ContextModule'
-  has_many :context_module_tags, -> { order(:position).where(tag_type: 'context_module') }, class_name: 'ContentTag', as: 'context', dependent: :destroy
-  has_many :media_objects, :as => :context
-  has_many :page_views, :as => :context
-  has_many :asset_user_accesses, :as => :context
-  has_many :role_overrides, :as => :context
-  has_many :content_migrations, :as => :context
-  has_many :content_exports, :as => :context
-  has_many :epub_exports, -> { order("created_at DESC") }
+  has_many :active_context_modules, -> { where(workflow_state: 'active') }, as: :context, inverse_of: :context, class_name: 'ContextModule'
+  has_many :context_module_tags, -> { order(:position).where(tag_type: 'context_module') }, class_name: 'ContentTag', as: :context, inverse_of: :context, dependent: :destroy
+  has_many :media_objects, :as => :context, :inverse_of => :context
+  has_many :page_views, :as => :context, :inverse_of => :context
+  has_many :asset_user_accesses, :as => :context, :inverse_of => :context
+  has_many :role_overrides, :as => :context, :inverse_of => :context
+  has_many :content_migrations, :as => :context, :inverse_of => :context
+  has_many :content_exports, :as => :context, :inverse_of => :context
+  has_many :epub_exports, -> { where("type IS NULL").order("created_at DESC") }
   attr_accessor :latest_epub_export
-  has_many :alerts, -> { preload(:criteria) }, as: :context
-  has_many :appointment_group_contexts, :as => :context
+  has_many :web_zip_exports, -> { where(type: "WebZipExport") }
+  has_many :alerts, -> { preload(:criteria) }, as: :context, inverse_of: :context
+  has_many :appointment_group_contexts, :as => :context, :inverse_of => :context
   has_many :appointment_groups, :through => :appointment_group_contexts
   has_many :appointment_participants, -> { where("workflow_state = 'locked' AND parent_calendar_event_id IS NOT NULL") }, class_name: 'CalendarEvent', foreign_key: :effective_context_code, primary_key: :asset_string
   attr_accessor :import_source
-  has_many :content_participation_counts, :as => :context, :dependent => :destroy
+  has_many :content_participation_counts, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :poll_sessions, class_name: 'Polling::PollSession', dependent: :destroy
   has_many :grading_period_groups, dependent: :destroy
   has_many :grading_periods, through: :grading_period_groups
-  has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
+  has_many :usage_rights, as: :context, inverse_of: :context, class_name: 'UsageRights', dependent: :destroy
 
   has_many :sis_post_grades_statuses
 
-  has_many :progresses, as: :context
+  has_many :progresses, as: :context, inverse_of: :context
   has_many :gradebook_csvs, inverse_of: :course
+
+  has_many :master_course_templates, :class_name => "MasterCourses::MasterTemplate"
 
   prepend Profile::Association
 
   before_save :assign_uuid
+  before_save :assign_default_view
   before_validation :assert_defaults
   before_save :update_enrollments_later
   before_save :update_show_total_grade_as_on_weighting_scheme_change
@@ -306,6 +262,7 @@ class Course < ActiveRecord::Base
       end
     end
   end
+
   def self.skip_updating_account_associations?
     !!@skip_updating_account_associations
   end
@@ -434,7 +391,9 @@ class Course < ActiveRecord::Base
 
   def image
     if self.image_id.present?
-      self.attachments.active.where(id: self.image_id).first.download_url rescue nil
+      self.shard.activate do
+        self.attachments.active.where(id: self.image_id).first.download_url rescue nil
+      end
     elsif self.image_url
       self.image_url
     end
@@ -695,6 +654,12 @@ class Course < ActiveRecord::Base
 
   scope :deleted, -> { where(:workflow_state => 'deleted') }
 
+  scope :master_courses, -> { joins(:master_course_templates).where.not(MasterCourses::MasterTemplate.table_name => {:workflow_state => 'deleted'}) }
+
+  def potential_collaborators
+    current_users
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
     p.to { participating_students_by_date + participating_observers_by_date }
@@ -738,6 +703,15 @@ class Course < ActiveRecord::Base
       where("course_section_id IS NOT NULL")
     section_ids = scope.uniq.pluck(:course_section_id)
     participating_instructors.restrict_to_sections(section_ids)
+  end
+
+  def user_is_admin?(user)
+    return unless user
+    RequestCache.cache('user_is_admin', self, user) do
+      Rails.cache.fetch([self, user, "course_user_is_admin"].cache_key) do
+        self.enrollments.for_user(user).active_by_date.of_admin_type.exists?
+      end
+    end
   end
 
   def user_is_instructor?(user)
@@ -1069,10 +1043,10 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def recompute_student_scores(student_ids = nil)
+  def recompute_student_scores(student_ids = nil, grading_period_id: nil)
     student_ids ||= self.student_ids
     Rails.logger.info "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
-    Enrollment.recompute_final_score(student_ids, self.id)
+    Enrollment.recompute_final_score(student_ids, self.id, grading_period_id: grading_period_id)
   end
   handle_asynchronously_if_production :recompute_student_scores,
     :singleton => proc { |c| "recompute_student_scores:#{ c.global_id }" }
@@ -1104,10 +1078,10 @@ class Course < ActiveRecord::Base
   # Allows the account to be set directly
   belongs_to :account
 
-  def wiki_with_create
+  def wiki
+    return super if wiki_id
     Wiki.wiki_for_context(self)
   end
-  alias_method_chain :wiki, :create
 
   # A universal lookup for all messages.
   def messages
@@ -1281,8 +1255,7 @@ class Course < ActiveRecord::Base
     can :read_syllabus
 
     RoleOverride.permissions.each do |permission, details|
-      given {|user| (self.active_enrollment_allows(user, permission, !details[:restrict_future_enrollments]) || self.account_membership_allows(user, permission)) &&
-        (!details[:if] || send(details[:if])) }
+      given {|user| (self.active_enrollment_allows(user, permission, !details[:restrict_future_enrollments]) || self.account_membership_allows(user, permission)) }
       can permission
     end
 
@@ -1432,10 +1405,15 @@ class Course < ActiveRecord::Base
   # Public: Return true if the end date for a course (or its term, if the course doesn't have one) has passed.
   #
   # Returns boolean or nil.
-  def soft_concluded?
+  def soft_concluded?(enrollment_type = nil)
     now = Time.now
     return end_at < now if end_at && restrict_enrollments_to_course_dates
-    enrollment_term.end_at && enrollment_term.end_at < now
+    if enrollment_type
+      override = enrollment_term.enrollment_dates_overrides.where(enrollment_type: enrollment_type).first
+      end_at = override.end_at if override
+    end
+    end_at ||= enrollment_term.end_at
+    end_at && end_at < now
   end
 
   def soft_conclude!
@@ -1443,8 +1421,8 @@ class Course < ActiveRecord::Base
     self.restrict_enrollments_to_course_dates = true
   end
 
-  def concluded?
-    completed? || soft_concluded?
+  def concluded?(enrollment_type = nil)
+    completed? || soft_concluded?(enrollment_type)
   end
 
   def account_chain(include_site_admin: false)
@@ -1492,6 +1470,10 @@ class Course < ActiveRecord::Base
     @teacherless_course ||= Rails.cache.fetch(['teacherless_course', self].cache_key) do
       !self.sis_source_id && self.teacher_enrollments.empty?
     end
+  end
+
+  def allow_web_export_download?
+    root_account.enable_offline_web_export? && self.enable_offline_web_export?
   end
 
   def grade_publishing_status_translation(status, message)
@@ -1768,6 +1750,23 @@ class Course < ActiveRecord::Base
     participants.uniq
   end
 
+  def filter_users_by_permission(users, permission)
+    scope = self.enrollments.where(:user_id => users)
+    details = RoleOverride.permissions[permission]
+    scope = details[:applies_to_concluded] ? scope.not_inactive_by_date : scope.active_or_pending_by_date
+
+    role_user_ids = scope.pluck(:role_id, :user_id)
+    role_ids = role_user_ids.map(&:first).uniq
+
+    roles = Role.where(:id => role_ids).to_a
+    allowed_role_ids = roles.select{|role| RoleOverride.enabled_for?(self, permission, role, self).include?(:self)}.map(&:id)
+    return [] unless allowed_role_ids.any?
+
+    allowed_user_ids = Set.new
+    role_user_ids.each{|role_id, user_id| allowed_user_ids << user_id if allowed_role_ids.include?(role_id)}
+    users.select{|user| allowed_user_ids.include?(user.id)}
+  end
+
   def enroll_user(user, type='StudentEnrollment', opts={})
     enrollment_state = opts[:enrollment_state]
     enrollment_state ||= 'active' if type == 'ObserverEnrollment' && user.registered?
@@ -1880,7 +1879,7 @@ class Course < ActiveRecord::Base
 
   def resubmission_for(asset)
     asset.ignores.where(:purpose => 'grading', :permanent => false).delete_all
-    instructors.order(:id).each(&:touch)
+    instructors.touch_all
   end
 
   def grading_standard_enabled
@@ -1994,13 +1993,13 @@ class Course < ActiveRecord::Base
   def vericite_enabled?
     Canvas::Plugin.find(:vericite).try(:enabled?)
   end
-  
+
   def vericite_pledge
     if vericite_enabled?
       Canvas::Plugin.find(:vericite).settings[:pledge]
     end
   end
-  
+
   def vericite_comments
     if vericite_enabled?
       Canvas::Plugin.find(:vericite).settings[:comments]
@@ -2125,7 +2124,8 @@ class Course < ActiveRecord::Base
 
         if !ce || ce.export_object?(file)
           begin
-            new_file = file.clone_for(self, nil, :overwrite => true)
+            migration_id = ce && ce.create_key(file)
+            new_file = file.clone_for(self, nil, :overwrite => true, :migration_id => migration_id, :migration => cm)
             cm.add_attachment_path(file.full_display_path.gsub(/\A#{root_folder_name}/, ''), new_file.migration_id)
             new_folder_id = merge_mapped_id(file.folder)
 
@@ -2190,7 +2190,8 @@ class Course < ActiveRecord::Base
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
       :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements,
-      :organize_epub_by_content_type ]
+      :organize_epub_by_content_type, :show_announcements_on_home_page,
+      :home_page_announcement_limit, :enable_offline_web_export ]
   end
 
   def set_course_dates_if_blank(shift_options)
@@ -2583,6 +2584,7 @@ class Course < ActiveRecord::Base
           tab[:visibility] = default_tab[:visibility]
           tab[:external] = default_tab[:external]
           tab[:icon] = default_tab[:icon]
+          tab[:target] = default_tab[:target] if default_tab[:target]
           tab[:screenreader] = default_tab[:screenreader]
           default_tabs.delete_if {|t| t[:id] == tab[:id] }
           external_tabs.delete_if {|t| t[:id] == tab[:id] }
@@ -2752,7 +2754,7 @@ class Course < ActiveRecord::Base
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
   add_setting :show_total_grade_as_points, :boolean => true, :default => false
-  add_setting :lock_all_announcements, :boolean => true, :default => false
+  add_setting :lock_all_announcements, :boolean => true, :default => false, :inherited => true
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
   add_setting :public_syllabus, :boolean => true, :default => false
   add_setting :public_syllabus_to_auth, :boolean => true, :default => false
@@ -2760,6 +2762,7 @@ class Course < ActiveRecord::Base
   add_setting :image_id
   add_setting :image_url
   add_setting :organize_epub_by_content_type, :boolean => true, :default => false
+  add_setting :enable_offline_web_export, :boolean => true, :default => lambda { |c| c.root_account.enable_offline_web_export? }
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
 
   add_setting :restrict_student_future_view, :boolean => true, :inherited => true
@@ -2839,6 +2842,14 @@ class Course < ActiveRecord::Base
     end
     return :preferred if self.root_account.grants_right?(user, :manage_user_logins)
     :closed
+  end
+
+  def assign_default_view
+    self.default_view ||= default_home_page
+  end
+
+  def default_home_page
+    root_account.feature_enabled?(:modules_home_page) ? "modules" : "feed"
   end
 
   def participating_users(user_ids)
@@ -3001,7 +3012,7 @@ class Course < ActiveRecord::Base
     end
   end
 
-  %w{student_count primary_enrollment_type primary_enrollment_role_id primary_enrollment_rank primary_enrollment_state invitation}.each do |method|
+  %w{student_count primary_enrollment_type primary_enrollment_role_id primary_enrollment_rank primary_enrollment_state primary_enrollment_date invitation}.each do |method|
     class_eval <<-RUBY
       def #{method}
         read_attribute(:#{method}) || @#{method}
@@ -3073,5 +3084,15 @@ class Course < ActiveRecord::Base
 
   def apply_nickname_for!(user)
     @nickname = nickname_for(user, nil)
+  end
+
+  def any_assignment_in_closed_grading_period?
+    effective_due_dates.any_in_closed_grading_period?
+  end
+
+  private
+
+  def effective_due_dates
+    @effective_due_dates ||= EffectiveDueDates.for_course(self)
   end
 end

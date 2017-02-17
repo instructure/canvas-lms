@@ -35,7 +35,7 @@ describe "acts_as_list" do
 
   describe "#insert_at" do
     before :each do
-      course
+      course_factory
       @module_1 = @course.context_modules.create!(:name => "another module")
       @module_2 = @course.context_modules.create!(:name => "another module")
       @module_3 = @course.context_modules.create!(:name => "another module")
@@ -66,7 +66,7 @@ describe "acts_as_list" do
 
   describe "#fix_position_conflicts" do
     it "should order null positions last" do
-      course
+      course_factory
       module_1 = @course.context_modules.create :name => 'one'
       ContextModule.where(id: module_1).update_all(position: nil)
       module_2 = @course.context_modules.create :name => 'two'
@@ -77,7 +77,7 @@ describe "acts_as_list" do
     end
 
     it "should break ties by object id" do
-      course
+      course_factory
       module_1 = @course.context_modules.create :name => 'one'
       module_1.position = 1
       module_1.save!
@@ -89,7 +89,7 @@ describe "acts_as_list" do
     end
 
     it "should consolidate gaps" do
-      course
+      course_factory
       module_1 = @course.context_modules.create :name => 'one'
       module_1.position = 1
       module_1.save!

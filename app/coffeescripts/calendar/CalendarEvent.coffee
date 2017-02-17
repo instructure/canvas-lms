@@ -64,7 +64,7 @@ define [
         model.hideSpinner();
 
         [syncResp, syncStatus, syncXhr] = syncArgs
-        calEventData = CalendarEvent.mergeSectionsIntoCalendarEvent(syncResp, _.sortBy(sectionsResp, 'id'))
+        calEventData = CalendarEvent.mergeSectionsIntoCalendarEvent(syncResp, sectionsResp)
         return false unless model.set(model.parse(calEventData), options)
         success?(model, calEventData)
 

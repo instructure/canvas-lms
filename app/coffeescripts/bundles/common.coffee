@@ -1,11 +1,11 @@
 require [
+  # true modules that we use in this file
   'jquery'
   'underscore'
   'i18n!common'
-
-  # true modules that we manage in this file
   'Backbone'
   'compiled/helpDialog'
+  'jsx/subnav_menu/updateSubnavMenuToggle'
 
   # modules that do their own thing on every page that simply need to
   # be required
@@ -28,29 +28,26 @@ require [
   'compiled/behaviors/instructure_inline_media_comment'
   'compiled/behaviors/ping'
   'LtiThumbnailLauncher'
+  'compiled/badge_counts'
 
-  # other stuff several bundles use
+  # Other stuff several bundles use.
+  # If any of these really arn't used on most pages,
+  # we should remove them from this list, since this
+  # loads them on every page
   'media_comments'
   'jqueryui/effects/drop'
   'jqueryui/progressbar'
   'jqueryui/tabs'
   'compiled/registration/incompleteRegistrationWarning'
   'moment'
+], ($, _, I18n, Backbone, helpDialog, updateSubnavMenuToggle) ->
 
-  # random modules required by the js_blocks, put them all in here
-  # so RequireJS doesn't try to load them before common is loaded
-  # in an optimized environment
-  'jquery.fancyplaceholder'
-  'jqueryui/autocomplete'
-  'link_enrollment'
-  'media_comments'
-  'vendor/jquery.pageless'
-  'vendor/jquery.scrollTo'
-  'compiled/badge_counts'
-], ($, _, I18n, Backbone, helpDialog) ->
   helpDialog.initTriggers()
 
-  $('#skip_navigation_link').on 'click', ->
+  $('#skip_navigation_link').on 'click', (event) ->
+    # preventDefault so we dont change the hash
+    # this will make nested apps that use the hash happy
+    event.preventDefault()
     $($(this).attr('href')).attr('tabindex', -1).focus()
 
   # show and hide the courses vertical menu when the user clicks the hamburger button
@@ -69,15 +66,9 @@ require [
   $(resetMenuItemTabIndexes)
   $(window).on('resize', _.debounce(resetMenuItemTabIndexes, 50))
   $('body').on 'click', '#courseMenuToggle', ->
-    $('body').toggleClass("course-menu-expanded")
-
-    # update course menu and toggle for accessibility
-    courseMenuExpanded = $('body').hasClass('course-menu-expanded')
-    courseMenuToggleText = if courseMenuExpanded then I18n.t("Hide courses menu") else I18n.t("Show courses menu")
-    courseMenuToggle = $('#courseMenuToggle')
-    courseMenuToggle.attr("aria-label", courseMenuToggleText)
-    courseMenuToggle.attr("title", courseMenuToggleText)
-    $('#left-side').css({display: if courseMenuExpanded then 'block' else 'none'})
+    $('body').toggleClass('course-menu-expanded')
+    updateSubnavMenuToggle()
+    $('#left-side').css({display: if $('body').hasClass('course-menu-expanded') then 'block' else 'none'})
 
     resetMenuItemTabIndexes()
 

@@ -1,5 +1,5 @@
 require_relative '../../common'
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
 describe GradeSummaryPresenter do
   include_context 'in-process server selenium tests'
@@ -8,10 +8,12 @@ describe GradeSummaryPresenter do
   describe 'deleted submissions', priority: "2" do
     it 'should navigate to grade summary page' do
       course_with_student_logged_in
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
 
       a1, a2 = 2.times.map { @course.assignments.create! points_possible: 10 }
-      a1.grade_student @student, grade: 10
-      a2.grade_student @student, grade: 10
+      a1.grade_student @student, grade: 10, grader: @teacher
+      a2.grade_student @student, grade: 10, grader: @teacher
       a2.destroy
 
       get "/courses/#{@course.id}/grades"
@@ -25,7 +27,7 @@ describe GradeSummaryPresenter do
     end
 
     let(:observed_courses) do
-      2.times.map { course(active_course: true, active_all: true) }
+      2.times.map { course_factory(active_course: true, active_all: true) }
     end
     let(:active_element) { driver.execute_script('return document.activeElement') }
 

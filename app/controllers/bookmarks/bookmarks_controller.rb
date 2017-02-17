@@ -28,8 +28,8 @@
 #       }
 #     }
 class Bookmarks::BookmarksController < ApplicationController
-  before_filter :require_user
-  before_filter :find_bookmark, :only => [:show, :update, :destroy]
+  before_action :require_user
+  before_action :find_bookmark, :only => [:show, :update, :destroy]
 
   # @API List bookmarks
   # Returns the list of bookmarks.
@@ -148,7 +148,7 @@ class Bookmarks::BookmarksController < ApplicationController
   end
 
   def valid_params
-    strong_params.permit(:name, :url).merge(user_id: user_id).merge(params.slice(:data))
+    params.permit(:name, :url).merge(user_id: user_id).merge(params.slice(:data))
   end
 
   def set_position

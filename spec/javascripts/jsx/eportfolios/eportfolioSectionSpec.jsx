@@ -5,7 +5,7 @@ define([
   ], ($, EportfolioSection, fixtures) => {
   var $section = null
 
-  module("EportfolioSection -> fetchContent", {
+  QUnit.module("EportfolioSection -> fetchContent", {
     setup() {
       fixtures.setup()
       $section = fixtures.create(

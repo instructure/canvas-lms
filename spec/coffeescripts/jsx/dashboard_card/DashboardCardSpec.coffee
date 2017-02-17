@@ -1,15 +1,14 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jsx/dashboard_card/DashboardCard'
   'jsx/dashboard_card/CourseActivitySummaryStore',
   'helpers/assertions'
-], (React, ReactDOM, _, DashboardCard, CourseActivitySummaryStore, assertions) ->
+], (React, ReactDOM, TestUtils, _, DashboardCard, CourseActivitySummaryStore, assertions) ->
 
-  TestUtils = React.addons.TestUtils
-
-  module 'DashboardCard',
+  QUnit.module 'DashboardCard',
     setup: ->
       @stream = [{
         "type": "DiscussionTopic",
@@ -29,7 +28,7 @@ define [
         image: null,
         imagesEnabled: false
       }
-      @stub(CourseActivitySummaryStore, 'getStateForCourse', -> {})
+      @stub(CourseActivitySummaryStore, 'getStateForCourse').returns({})
 
     teardown: ->
       localStorage.clear()

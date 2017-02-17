@@ -4,46 +4,36 @@ module Selinimum
   class Capture
     # hooks so we know which templates are rendered in each selenium spec
     module TemplateExtensions
-      def render_with_selinimum(template, *args, &block)
+      def render(*)
         Selinimum::Capture.log_template_render inspect
-        render_without_selinimum(template, *args, &block)
-      end
-
-      def self.included(klass)
-        klass.alias_method_chain :render, :selinimum
+        super
       end
     end
 
     # hooks so we know which controllers, js and css are used in each
     # selenium spec
     module ControllerExtensions
-      def render_with_selinimum(*args)
+      def render(*)
         Selinimum::Capture.log_render self.class
-        render_without_selinimum(*args)
+        super
       end
 
-      def css_bundle_with_selinimum(*args)
+      def css_bundle(*args)
         Selinimum::Capture.log_bundle :css, *args
-        css_bundle_without_selinimum(*args)
+        super
       end
 
-      def js_bundle_with_selinimum(*args)
+      def js_bundle(*args)
         Selinimum::Capture.log_bundle :js, *args
-        js_bundle_without_selinimum(*args)
-      end
-
-      def self.included(klass)
-        klass.alias_method_chain :render, :selinimum
-        klass.alias_method_chain :css_bundle, :selinimum
-        klass.alias_method_chain :js_bundle, :selinimum
+        super
       end
     end
 
     class << self
       def install!
-        ActionView::Template.send :include, TemplateExtensions
-        ApplicationController.send :include, ControllerExtensions
-        ActiveSupport::Dependencies.send :extend, AutoloadExtensions
+        ActionView::Template.prepend TemplateExtensions
+        ApplicationController.prepend ControllerExtensions
+        ActiveSupport::Dependencies.singleton_class.prepend AutoloadExtensions
       end
 
       def dependencies

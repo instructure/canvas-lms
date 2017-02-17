@@ -1,4 +1,4 @@
-class PopulateConversationMessageParticipantUserIds < ActiveRecord::Migration
+class PopulateConversationMessageParticipantUserIds < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

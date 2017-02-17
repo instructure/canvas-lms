@@ -2,7 +2,7 @@ define([
   'jsx/course_settings/actions'
 ], (Actions) => {
 
-  module('Course Settings Actions');
+  QUnit.module('Course Settings Actions');
 
   test('calling setModalVisibility produces the proper object', () => {
     let actual = Actions.setModalVisibility(true);

@@ -1,4 +1,4 @@
-class AddCassandraGradedAnonymouslyToAuditorTables < ActiveRecord::Migration
+class AddCassandraGradedAnonymouslyToAuditorTables < ActiveRecord::Migration[4.2]
   tag :predeploy
   include Canvas::Cassandra::Migration
 

@@ -42,7 +42,7 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     (app.assignmentGroupCollection = new AssignmentGroupCollection).contextAssetString = ENV.context_asset_string
     app.render()
 
-  module 'EditView',
+  QUnit.module 'EditView',
     setup: ->
       fakeENV.setup()
     teardown: ->
@@ -59,7 +59,7 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     EditView.prototype.loadNewEditor.call()
     ok lne.firstCall.args[1].manageParent, 'manageParent flag should be set'
 
-  test 'does error message show on assignment point change with submissions', ->
+  test 'shows error message on assignment point change with submissions', ->
     view = @editView
       withAssignment: true,
       assignmentOpts: { has_submitted_submissions: true }
@@ -110,7 +110,7 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     view = @editView()
     equal view.locationAfterCancel({ return_to: 'http://bar' }), 'http://bar'
 
-  module 'EditView - ConditionalRelease',
+  QUnit.module 'EditView - ConditionalRelease',
     setup: ->
       fakeENV.setup()
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
@@ -168,6 +168,88 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     view = @editView({ withAssignment: true })
     view.loadConditionalRelease()
     equal 1, view.$conditionalReleaseTarget.children().size()
+
+  test "has an error when a title > 255 chars", ->
+    view = @editView({ withAssignment: true})
+    assignment = view.assignment
+    l1 = 'aaaaaaaaaa'
+    l2 = l1 + l1 + l1 + l1 + l1 + l1
+    l3 = l2 + l2 + l2 + l2 + l2 + l2
+
+    ENV.IS_LARGE_ROSTER = true
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    errors = view.validateBeforeSave({title: l3, set_assignment: '1', assignment: assignment}, [])
+
+    equal errors["title"][0]["message"], "Title is too long, must be under 256 characters"
+
+  test "allows dicussion to save when a title < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is true", ->
+    view = @editView({ withAssignment: true})
+    assignment = view.assignment
+    assignment.attributes.post_to_sis = '1'
+    l1 = 'aaaaaaaaaa'
+
+    ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = false
+    ENV.IS_LARGE_ROSTER = true
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    errors = view.validateBeforeSave({title: l1, set_assignment: '1', assignment: assignment}, [])
+    equal errors.length, 0
+
+  test "allows dicussion to save when a title < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is false", ->
+    view = @editView({ withAssignment: true})
+    assignment = view.assignment
+    assignment.attributes.post_to_sis = '1'
+    l1 = 'aaaaaaaaaa'
+
+    ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = false
+    ENV.IS_LARGE_ROSTER = true
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    errors = view.validateBeforeSave({title: l1, set_assignment: '1', assignment: assignment}, [])
+    equal errors.length, 0
+
+  test "has an error when a title > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
+    view = @editView({ withAssignment: true})
+    assignment = view.assignment
+    assignment.attributes.post_to_sis = '1'
+    l1 = 'aaaaaaaaaa'
+
+    ENV.MAX_NAME_LENGTH = 5
+    ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = true
+    ENV.IS_LARGE_ROSTER = true
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    errors = view.validateBeforeSave({title: l1, set_assignment: '1', assignment: assignment}, [])
+
+    equal errors["title"][0]["message"], "Title is too long, must be under #{ENV.MAX_NAME_LENGTH + 1} characters"
+
+  test "allows discussion to save when title > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is false", ->
+    view = @editView({ withAssignment: true})
+    assignment = view.assignment
+    assignment.attributes.post_to_sis = '0'
+    l1 = 'aaaaaaaaaa'
+    l2 = l1 + l1 + l1 + l1 + l1 + l1
+    l3 = l2 + l2 + l2 + l2 + l2 + l2
+
+    ENV.MAX_NAME_LENGTH = 5
+    ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = true
+    ENV.IS_LARGE_ROSTER = true
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    errors = view.validateBeforeSave({title: l3, set_assignment: '1', assignment: assignment}, [])
+
+    equal errors.length, 0
+
+
+  test "allows discussion to save when title < MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
+    view = @editView({ withAssignment: true})
+    assignment = view.assignment
+    assignment.attributes.post_to_sis = '1'
+    l1 = 'aaaaaaaaaa'
+
+    ENV.MAX_NAME_LENGTH = 20
+    ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = true
+    ENV.IS_LARGE_ROSTER = true
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    errors = view.validateBeforeSave({title: l1, set_assignment: '1', assignment: assignment}, [])
+
+    equal errors.length, 0
 
   test 'conditional release editor is updated on tab change', ->
     view = @editView({ withAssignment: true })

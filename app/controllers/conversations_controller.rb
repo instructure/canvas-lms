@@ -125,18 +125,18 @@ class ConversationsController < ApplicationController
   include Api::V1::Conversation
   include Api::V1::Progress
 
-  before_filter :require_user, :except => [:public_feed]
-  before_filter :reject_student_view_student
-  before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
-  before_filter :infer_scope, :only => [:index, :show, :create, :update, :add_recipients, :add_message, :remove_messages]
-  before_filter :normalize_recipients, :only => [:create, :add_recipients]
-  before_filter :infer_tags, :only => [:create, :add_message, :add_recipients]
+  before_action :require_user, :except => [:public_feed]
+  before_action :reject_student_view_student
+  before_action :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
+  before_action :infer_scope, :only => [:index, :show, :create, :update, :add_recipients, :add_message, :remove_messages]
+  before_action :normalize_recipients, :only => [:create, :add_recipients]
+  before_action :infer_tags, :only => [:create, :add_message, :add_recipients]
 
   # whether it's a bulk private message, or a big group conversation,
   # batch up all delayed jobs to make this more responsive to the user
   batch_jobs_in_actions :only => :create
 
-  API_ALLOWED_FIELDS = %w{workflow_state subscribed starred scope filter}.freeze
+  API_ALLOWED_FIELDS = %w{workflow_state subscribed starred}.freeze
 
   # @API List conversations
   # Returns the list of conversations for the current user, most recent ones first.
@@ -427,7 +427,7 @@ class ConversationsController < ApplicationController
   end
 
   # @API Get a single conversation
-  # Returns information for a single conversation. Response includes all
+  # Returns information for a single conversation for the current user. Response includes all
   # fields that are present in the list/index action as well as messages
   # and extended participant information.
   #
@@ -546,14 +546,13 @@ class ConversationsController < ApplicationController
                                       messages: messages,
                                       submissions: [],
                                       include_beta: params[:include_beta],
-                                      include_context_name: true)
+                                      include_context_name: true,
+                                      include_reply_permission_check: true
+    )
   end
 
   # @API Edit a conversation
   # Updates attributes for a single conversation.
-  #
-  # @argument conversation[subject] [String]
-  #   Change the subject of this conversation
   #
   # @argument conversation[workflow_state] [String, "read"|"unread"|"archived"]
   #   Change the state of this conversation
@@ -595,7 +594,7 @@ class ConversationsController < ApplicationController
   #     "participants": [{"id": 1, "name": "Joe TA"}]
   #   }
   def update
-    if @conversation.update_attributes(params[:conversation].slice(*API_ALLOWED_FIELDS))
+    if @conversation.update_attributes(params.require(:conversation).permit(*API_ALLOWED_FIELDS))
       render :json => conversation_json(@conversation, @current_user, session)
     else
       render :json => @conversation.errors, :status => :bad_request
@@ -669,6 +668,34 @@ class ConversationsController < ApplicationController
     end
 
     render :json => conversation_messages
+  end
+
+  #internal api
+  def restore_message
+    return render_unauthorized_action unless @current_user.roles(Account.site_admin).include? 'admin'
+    return render_error('message_id', 'required') unless params['message_id']
+    return render_error('user_id', 'required') unless params['user_id']
+    return render_error('conversation_id', 'required') unless params['conversation_id']
+
+    Conversation.find(params['conversation_id']).shard.activate do
+      cmp = ConversationMessageParticipant
+              .where(:user_id => params['user_id'])
+              .where(:conversation_message_id => params['message_id'])
+
+      cmp.update_all(:workflow_state => 'active', :deleted_at => nil)
+
+      participant = ConversationParticipant
+                      .where(:conversation_id => params['conversation_id'])
+                      .where(:user_id => params['user_id'])
+                      .first()
+      messages = participant.messages
+
+      participant.message_count = messages.count(:id)
+      participant.last_message_at = messages.first().created_at
+      participant.save!
+
+      render :json => cmp.map { |c| conversation_message_json(c.conversation_message, @current_user, session) }
+    end
   end
 
 
@@ -789,10 +816,13 @@ class ConversationsController < ApplicationController
   #
   def add_message
     get_conversation(true)
+    if @conversation.conversation.replies_locked_for?(@current_user)
+      return render_unauthorized_action
+    end
     if params[:body].present?
       # allow responses to be sent to anyone who is already a conversation participant.
       params[:from_conversation_id] = @conversation.conversation_id
-      # not a before_filter because we need to set the above parameter.
+      # not a before_action because we need to set the above parameter.
       normalize_recipients
       # find included_messages
       message_ids = params[:included_messages]
@@ -885,7 +915,7 @@ class ConversationsController < ApplicationController
   # @returns Progress
   def batch_update
     conversation_ids = params[:conversation_ids]
-    update_params = params.slice(:event).with_indifferent_access
+    update_params = params.slice(:event).to_hash.with_indifferent_access
 
     allowed_events = %w(mark_as_read mark_as_unread star unstar archive destroy)
     return render(:json => {:message => 'conversation_ids not specified'}, :status => :bad_request) unless params[:conversation_ids].is_a?(Array)
@@ -1058,7 +1088,7 @@ class ConversationsController < ApplicationController
         known_users(users, conversation_id: params[:from_conversation_id])
     end
     contexts.each{ |context| known.concat(@current_user.address_book.known_in_context(context)) }
-    @recipients = known.uniq(&:id)
+    @recipients = known.uniq(&:id).reject{|u| u.id == @current_user.id}
   end
 
   def infer_tags

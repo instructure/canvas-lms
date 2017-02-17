@@ -1,4 +1,4 @@
-class UpdateCollectionItemColumns < ActiveRecord::Migration
+class UpdateCollectionItemColumns < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

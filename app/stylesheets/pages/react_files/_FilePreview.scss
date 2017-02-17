@@ -65,7 +65,7 @@ $preview-html-background: whitesmoke;
 .ef-file-preview-header {
   height: $preview-header-height;
   color: $preview-font-color;
-  font-weight: 300;
+  font-weight: normal;
   flex: 0 0 $preview-header-height;
   display: flex;
   align-items: center;

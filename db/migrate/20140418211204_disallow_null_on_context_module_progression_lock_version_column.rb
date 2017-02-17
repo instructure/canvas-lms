@@ -1,4 +1,4 @@
-class DisallowNullOnContextModuleProgressionLockVersionColumn < ActiveRecord::Migration
+class DisallowNullOnContextModuleProgressionLockVersionColumn < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

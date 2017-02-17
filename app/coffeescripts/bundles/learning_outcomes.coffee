@@ -25,7 +25,10 @@ require [
   'compiled/models/OutcomeGroup'
   'jst/outcomes/browser'
   'jst/outcomes/mainInstructions'
-], ($, ToolbarView, SidebarView, ContentView, FindDialog, OutcomeGroup, browserTemplate, instructionsTemplate) ->
+  'react'
+  'react-dom'
+  'jsx/outcomes/OutcomesActionsPopoverMenu'
+], ($, ToolbarView, SidebarView, ContentView, FindDialog, OutcomeGroup, browserTemplate, instructionsTemplate, React, ReactDOM, OutcomesActionsPopoverMenu) ->
 
   renderInstructions = ENV.PERMISSIONS.manage_outcomes
 
@@ -34,6 +37,12 @@ require [
     canManageOutcomes: ENV.PERMISSIONS.manage_outcomes
     canManageRubrics: ENV.PERMISSIONS.manage_rubrics
     contextUrlRoot: ENV.CONTEXT_URL_ROOT
+
+  popoverMenu = React.createElement(OutcomesActionsPopoverMenu, {
+    contextUrlRoot: ENV.CONTEXT_URL_ROOT
+    permissions: ENV.PERMISSIONS
+  })
+  ReactDOM.render(popoverMenu, $el.find("#popoverMenu")[0])
 
   toolbar = new ToolbarView
     el: $el.find('.toolbar')

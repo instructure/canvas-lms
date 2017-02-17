@@ -3,11 +3,10 @@
 // this takes requirements for "analytics/jst/thing" and rewrites them
 // to "analytics/app/views/jst/thing" so that they can be found off of
 // the "gem/plugins" directory in the webpack path resolve config
-module.exports = function(input){
-  this.cacheable();
-  var pluginJstRegexp = /('|")[^/\s]+\/jst\//g;
-  var newInput = input.replace(pluginJstRegexp, function(match){
-    return match.replace("jst", "app/views/jst");
-  });
-  return newInput;
+
+const pluginJstRegexp = /('|")[^/\s]+\/jst\//g
+
+module.exports = function (input) {
+  this.cacheable()
+  return input.replace(pluginJstRegexp, match => match.replace('jst', 'app/views/jst'))
 }

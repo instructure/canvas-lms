@@ -1,4 +1,4 @@
-class AddIndexOnAssetUserAccess < ActiveRecord::Migration
+class AddIndexOnAssetUserAccess < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

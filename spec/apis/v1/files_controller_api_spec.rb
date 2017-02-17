@@ -108,7 +108,7 @@ describe "Files API", type: :request do
     it "should set the attachment to available (s3 storage)" do
       s3_storage!
 
-      AWS::S3::S3Object.any_instance.expects(:head).returns({
+      Aws::S3::Object.any_instance.expects(:data).returns({
                                           :content_type => 'text/plain',
                                           :content_length => 1234,
                                       })
@@ -165,7 +165,7 @@ describe "Files API", type: :request do
       FilesController.any_instance.stubs(:in_app?).returns(true)
       FilesController.any_instance.stubs(:verified_request?).returns(true)
 
-      AWS::S3::S3Object.any_instance.expects(:head).returns({
+      Aws::S3::Object.any_instance.expects(:data).returns({
                                           :content_type => 'text/plain',
                                           :content_length => 1234,
                                       })
@@ -199,7 +199,7 @@ describe "Files API", type: :request do
 
       it "should call back for s3" do
         s3_storage!
-         AWS::S3::S3Object.any_instance.expects(:head).returns({
+         Aws::S3::Object.any_instance.expects(:data).returns({
                                           :content_type => 'text/plain',
                                           :content_length => 1234,
                                       })
@@ -638,7 +638,7 @@ describe "Files API", type: :request do
     end
 
     it "should 404 with wrong context" do
-      course
+      course_factory
       user_session(@user)
       opts = @file_path_options.merge(:course_id => @course.id.to_param)
       api_call(:get, "/api/v1/courses/#{@course.id}/files/#{@att.id}", opts, {}, {}, :expected_status => 404)
@@ -944,7 +944,7 @@ describe "Files API", type: :request do
 
   describe "quota" do
     let_once(:t_course) do
-      course_with_teacher_logged_in active_all: true
+      course_with_teacher active_all: true
       @course.storage_quota = 111.megabytes
       @course.save
       attachment_model context: @course, size: 33.megabytes
@@ -953,6 +953,10 @@ describe "Files API", type: :request do
 
     let_once(:t_teacher) do
       t_course.teachers.first
+    end
+
+    before(:each) do
+      user_session(@teacher)
     end
 
     it "should return total and used quota" do

@@ -7,6 +7,7 @@ module RuboCop
               " and potentially wreak havoc on other specs."
 
         WHITELISTED_BLOCKS = %i[
+          class_eval
           context
           describe
           shared_context

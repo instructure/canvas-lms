@@ -1,10 +1,4 @@
 module OtherHelperMethods
-
-  #this is needed for using the before_label function in I18nUtilities
-  def t(*a, &b)
-    I18n.t(*a, &b)
-  end
-
   # usage
   # require_exec 'compiled/util/foo', 'bar', <<-CS
   #   foo('something')
@@ -119,29 +113,25 @@ module OtherHelperMethods
     @file.close
     fullpath = @file.path
     filename = File.basename(@file.path)
-    if $selenium_config[:host_and_port]
-      driver.file_detector = proc do |args|
-        args.first if File.exist?(args.first.to_s)
-      end
-    end
     [filename, fullpath, data, @file]
   end
 
-  unless EncryptedCookieStore.respond_to?(:test_secret)
-    EncryptedCookieStore.class_eval do
-      cattr_accessor :test_secret
+  module EncryptedCookieStoreTestSecret
+    cattr_accessor :test_secret
 
-      def call_with_test_secret(env)
-        if self.class.test_secret.present?
-          @secret = self.class.test_secret
-          @encryption_key = unhex(@secret)
-        end
-        call_without_test_secret(env)
+    def self.prepended(klass)
+      klass.cattr_accessor(:test_secret)
+    end
+
+    def call(env)
+      if self.class.test_secret.present?
+        @secret = self.class.test_secret
+        @encryption_key = unhex(@secret[0...(@data_cipher.key_len * 2)]).freeze
       end
-
-      alias_method_chain :call, :test_secret
+      super
     end
   end
+  EncryptedCookieStore.prepend(EncryptedCookieStoreTestSecret)
 
   def clear_timers!
     # we don't want any AJAX requests getting kicked off after a test ends.
@@ -161,5 +151,9 @@ module OtherHelperMethods
         clearInterval(i);
       }
     JS
+  end
+
+  def clear_local_storage
+    driver.execute_script 'localStorage.clear();'
   end
 end

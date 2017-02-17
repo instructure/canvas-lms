@@ -5,8 +5,8 @@ define [
   'compiled/views/assignments/AssignmentListItemView'
   'jquery'
   'timezone'
-  'vendor/timezone/America/Juneau'
-  'vendor/timezone/fr_FR'
+  'timezone/America/Juneau'
+  'timezone/fr_FR'
   'helpers/I18nStubber'
   'helpers/fakeENV'
   'jsx/shared/conditional_release/CyoeHelper'
@@ -120,7 +120,10 @@ define [
       ["First", "Second"]
 
   genSetup = (model=assignment1()) ->
-    fakeENV.setup(PERMISSIONS: {manage: false})
+    fakeENV.setup(
+      current_user_roles: ['teacher'],
+      PERMISSIONS: {manage: false}
+    )
     @model = model
     @submission = new Submission
     @view = createView(@model, canManage: false)
@@ -133,13 +136,17 @@ define [
     fakeENV.teardown()
     $('#fixtures').empty()
 
-  module 'AssignmentListItemViewSpec',
+  QUnit.module 'AssignmentListItemViewSpec',
     setup: ->
+      fakeENV.setup({
+        current_user_roles: ['teacher']
+      })
       genSetup.call @
       @snapshot = tz.snapshot()
       I18nStubber.pushFrame()
 
     teardown: ->
+      fakeENV.teardown()
       genTeardown.call @
       tz.restore(@snapshot)
       I18nStubber.popFrame()
@@ -189,8 +196,8 @@ define [
   test 'asks for confirmation before deleting an assignment', ->
     view = createView(@model)
 
-    @stub(view, 'visibleAssignments', -> [])
-    @stub(window, "confirm", -> true )
+    @stub(view, 'visibleAssignments').returns([])
+    @stub(window, "confirm").returns(true)
     @spy view, "delete"
 
     view.$("#assignment_#{@model.id} .delete_assignment").click()
@@ -199,10 +206,10 @@ define [
     ok view.delete.called
 
   test 'does not attempt to delete an assignment due in a closed grading period', ->
-    @model.set('has_due_date_in_closed_grading_period', true)
+    @model.set('in_closed_grading_period', true)
     view = createView(@model)
 
-    @stub(window, "confirm", -> true )
+    @stub(window, "confirm").returns(true)
     @spy view, "delete"
 
     view.$("#assignment_#{@model.id} .delete_assignment").click()
@@ -314,13 +321,13 @@ define [
     ok view.$("#assignment_#{@model.id} a.delete_assignment.disabled").length
 
   test "disallows deleting assignments due in closed grading periods", ->
-    @model.set('has_due_date_in_closed_grading_period', true)
+    @model.set('in_closed_grading_period', true)
     view = createView(@model)
     ok view.$("#assignment_#{@model.id} a.delete_assignment.disabled").length
 
   test "allows deleting non-frozen assignments not due in closed grading periods", ->
     @model.set('frozen', false)
-    @model.set('has_due_date_in_closed_grading_period', false)
+    @model.set('in_closed_grading_period', false)
     view = createView(@model)
     ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length
 
@@ -330,7 +337,7 @@ define [
     ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length
 
   test "allows deleting assignments due in closed grading periods for admins", ->
-    @model.set('has_assignment_due_in_closed_grading_period', true)
+    @model.set('any_assignment_in_closed_grading_period', true)
     view = createView(@model, userIsAdmin: true)
     ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length
 
@@ -478,28 +485,28 @@ define [
     ok json.canMove
     notOk view.className().includes('sort-disabled')
 
-  test 'can move when canManage is true and the model can be deleted', ->
-    @stub(@model, 'canDelete').returns(true)
+  test 'can move when canManage is true and the assignment group id is not locked', ->
+    @stub(@model, 'canMove').returns(true)
     view = createView(@model, userIsAdmin: false, canManage: true)
     json = view.toJSON()
     ok json.canMove
     notOk view.className().includes('sort-disabled')
 
-  test 'cannot move when canManage is true but the model cannot be deleted', ->
-    @stub(@model, 'canDelete').returns(false)
+  test 'cannot move when canManage is true but the assignment group id is locked', ->
+    @stub(@model, 'canMove').returns(false)
     view = createView(@model, userIsAdmin: false, canManage: true)
     json = view.toJSON()
     notOk json.canMove
     ok view.className().includes('sort-disabled')
 
-  test 'cannot move when canManage is false but the model can be deleted', ->
-    @stub(@model, 'canDelete').returns(true)
+  test 'cannot move when canManage is false but the assignment group id is not locked', ->
+    @stub(@model, 'canMove').returns(true)
     view = createView(@model, userIsAdmin: false, canManage: false)
     json = view.toJSON()
     notOk json.canMove
     ok view.className().includes('sort-disabled')
 
-  module 'AssignmentListItemViewSpec—alternate grading type: percent',
+  QUnit.module 'AssignmentListItemViewSpec—alternate grading type: percent',
     setup: ->
       genSetup.call @, assignment_grade_percent()
 
@@ -524,7 +531,7 @@ define [
     ok screenreaderText().match('This assignment has been excused.')
     ok nonScreenreaderText().match('Excused')
 
-  module 'AssignmentListItemViewSpec—alternate grading type: pass_fail',
+  QUnit.module 'AssignmentListItemViewSpec—alternate grading type: pass_fail',
     setup: ->
       genSetup.call @, assignment_grade_pass_fail()
 
@@ -541,7 +548,7 @@ define [
     ok nonScreenreaderText().match('1.56/5 pts')[0], 'sets non-screenreader score text'
     ok nonScreenreaderText().match('Complete')[0], 'sets non-screenreader grade text'
 
-  module 'AssignmentListItemViewSpec—alternate grading type: letter_grade',
+  QUnit.module 'AssignmentListItemViewSpec—alternate grading type: letter_grade',
     setup: ->
       genSetup.call @, assignment_grade_letter_grade()
 
@@ -558,7 +565,7 @@ define [
     ok nonScreenreaderText().match('1.56/5 pts')[0], 'sets non-screenreader score text'
     ok nonScreenreaderText().match('B')[0], 'sets non-screenreader grade text'
 
-  module 'AssignmentListItemViewSpec—alternate grading type: not_graded',
+  QUnit.module 'AssignmentListItemViewSpec—alternate grading type: not_graded',
     setup: ->
       genSetup.call @, assignment_grade_not_graded()
 
@@ -573,9 +580,14 @@ define [
     equal screenreaderText(), 'This assignment will not be assigned a grade.', 'sets screenreader text'
     equal nonScreenreaderText(), '', 'sets non-screenreader text'
 
-  module 'AssignListItemViewSpec - mastery paths menu option',
+  QUnit.module 'AssignListItemViewSpec - mastery paths menu option',
     setup: ->
-      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+      fakeENV.setup({
+        current_user_roles: ['teacher'],
+        CONDITIONAL_RELEASE_SERVICE_ENABLED: true
+      })
+    teardown: ->
+      fakeENV.teardown()
 
   test 'does not render for assignment if cyoe off', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
@@ -643,22 +655,27 @@ define [
     view = createView(model)
     equal view.$('.ig-admin .al-options .icon-mastery-path').length, 0
 
-  module 'AssignListItemViewSpec - mastery paths link',
+  QUnit.module 'AssignListItemViewSpec - mastery paths link',
     setup: ->
-      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-      ENV.CONDITIONAL_RELEASE_ENV = {
-        active_rules: [{
-          trigger_assignment: '1',
-          scoring_ranges: [
-            {
-              assignment_sets: [
-                { assignments: [{ assignment_id: '2' }] },
-              ],
-            },
-          ],
-        }],
-      }
+      fakeENV.setup({
+        current_user_roles: ['teacher'],
+        CONDITIONAL_RELEASE_SERVICE_ENABLED: true,
+        CONDITIONAL_RELEASE_ENV: {
+          active_rules: [{
+            trigger_assignment: '1',
+            scoring_ranges: [
+              {
+                assignment_sets: [
+                  { assignments: [{ assignment_id: '2' }] },
+                ],
+              },
+            ],
+          }],
+        }
+      })
       CyoeHelper.reloadEnv()
+    teardown: ->
+      fakeENV.teardown()
 
   test 'does not render for assignment if cyoe off', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
@@ -688,22 +705,27 @@ define [
     view = createView(model)
     equal view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 1
 
-  module 'AssignListItemViewSpec - mastery paths icon',
+  QUnit.module 'AssignListItemViewSpec - mastery paths icon',
     setup: ->
-      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-      ENV.CONDITIONAL_RELEASE_ENV = {
-        active_rules: [{
-          trigger_assignment: '1',
-          scoring_ranges: [
-            {
-              assignment_sets: [
-                { assignments: [{ assignment_id: '2' }] },
-              ],
-            },
-          ],
-        }],
-      }
+      fakeENV.setup({
+        current_user_roles: ['teacher'],
+        CONDITIONAL_RELEASE_SERVICE_ENABLED: true,
+        CONDITIONAL_RELEASE_ENV: {
+          active_rules: [{
+            trigger_assignment: '1',
+            scoring_ranges: [
+              {
+                assignment_sets: [
+                  { assignments: [{ assignment_id: '2' }] },
+                ],
+              },
+            ],
+          }],
+        }
+      })
       CyoeHelper.reloadEnv()
+    teardown: ->
+      fakeENV.teardown()
 
   test 'does not render for assignment if cyoe off', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false

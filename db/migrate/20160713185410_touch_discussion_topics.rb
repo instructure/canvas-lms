@@ -1,4 +1,4 @@
-class TouchDiscussionTopics < ActiveRecord::Migration
+class TouchDiscussionTopics < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

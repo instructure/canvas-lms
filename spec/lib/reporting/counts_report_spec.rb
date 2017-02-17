@@ -46,7 +46,7 @@ describe Reporting::CountsReport do
   describe "detailed report" do
     describe "courses" do
       it "should count available courses" do
-        course(:account => @account1, :active_all => 1)
+        course_factory(:account => @account1, :active_all => 1)
         Reporting::CountsReport.process
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data['courses']).to eq 1
@@ -192,7 +192,7 @@ describe Reporting::CountsReport do
     describe "files" do
       before :each do
         # the account needs a course in it to get data out of the report
-        course(account: @account1, active_course: 1)
+        course_factory(account: @account1, active_course: 1)
       end
 
       it "should count files with the account's local id in the namespace" do

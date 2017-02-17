@@ -44,7 +44,7 @@ describe "syllabus" do
 
   shared_examples_for "public syllabus file verifiers" do
     it "should allow viewing available files in a public syllabus" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       attachment_model
       @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
       @course.public_syllabus = true
@@ -60,7 +60,7 @@ describe "syllabus" do
     end
 
     it "should not allow viewing locked files in a public syllabus" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       attachment_model
       @attachment.locked = true
       @attachment.save!
@@ -81,7 +81,7 @@ describe "syllabus" do
 
   shared_examples_for "public syllabus for authenticated file verifiers" do
     it "should allow viewing available files in a public to authenticated syllabus" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       attachment_model
       @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
       @course.public_syllabus_to_auth = true
@@ -98,7 +98,7 @@ describe "syllabus" do
     end
 
     it "should not allow viewing locked files in a public to authenticated syllabus" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       attachment_model
       @attachment.locked = true
       @attachment.save!
@@ -120,7 +120,7 @@ describe "syllabus" do
 
   context "as an authenticated non-course user" do
     before :each do
-      user(:active_all => true)
+      user_factory(active_all: true)
       user_session(@user)
     end
 
@@ -133,7 +133,7 @@ describe "syllabus" do
 
   context "as an authenticated non-course user" do
     before :each do
-      user(:active_all => true)
+      user_factory(active_all: true)
       user_session(@user)
     end
 
@@ -141,10 +141,10 @@ describe "syllabus" do
   end
 
   it "as an authenticated non-course user with public_syllabus_to_auth true" do
-    course.public_syllabus_to_auth = true
-    course.public_syllabus = false
-    course.save
-    user(:active_user => true)
+    course_factory.public_syllabus_to_auth = true
+    course_factory.public_syllabus = false
+    course_factory.save
+    user_factory(active_user: true)
     user_session(@user)
 
   end

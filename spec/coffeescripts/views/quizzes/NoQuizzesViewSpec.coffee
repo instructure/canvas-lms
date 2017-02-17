@@ -5,7 +5,7 @@ define [
   'helpers/jquery.simulate'
 ], (Backbone, NoQuizzesView, $) ->
 
-  module 'NoQuizzesView',
+  QUnit.module 'NoQuizzesView',
     setup: ->
       @view = new NoQuizzesView()
 

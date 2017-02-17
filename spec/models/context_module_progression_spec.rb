@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContextModuleProgression do
   before do
-    @course = course(:active_all => true)
+    @course = course_factory(active_all: true)
     @module = @course.context_modules.create!(:name => "some module")
 
     @user = User.create!(:name => "some name")
@@ -234,5 +234,25 @@ describe ContextModuleProgression do
       progression.uncomplete_requirement(-1)
       expect(progression.requirements_met.length).to be(1)
     end
+  end
+
+  it "should update progressions when adding a must_contribute requirement on a topic" do
+    @assignment = @course.assignments.create!
+    @tag1 = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+    @topic = @course.discussion_topics.create!
+    entry = @topic.discussion_entries.create!(:user => @user)
+    @module.completion_requirements = {@tag1.id => {:type => 'must_view'}}
+
+    progression = @module.evaluate_for(@user)
+    expect(progression).to be_unlocked
+
+    @tag2 = @module.add_item({:id => @topic.id, :type => 'discussion_topic'})
+    @module.update_attribute(:completion_requirements, {@tag1.id => {:type => 'must_view'}, @tag2.id => {:type => 'must_contribute'}})
+
+    progression.reload
+    expect(progression).to be_started
+
+    @topic.any_instantiation.expects(:recalculate_context_module_actions!).never # doesn't recalculate unless it's a new requirement
+    @module.update_attribute(:completion_requirements, {@tag1.id => {:type => 'must_submit'}, @tag2.id => {:type => 'must_contribute'}})
   end
 end

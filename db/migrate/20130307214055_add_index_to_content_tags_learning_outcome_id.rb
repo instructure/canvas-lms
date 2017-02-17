@@ -1,4 +1,4 @@
-class AddIndexToContentTagsLearningOutcomeId < ActiveRecord::Migration
+class AddIndexToContentTagsLearningOutcomeId < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 

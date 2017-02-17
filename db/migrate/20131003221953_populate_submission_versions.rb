@@ -1,4 +1,4 @@
-class PopulateSubmissionVersions < ActiveRecord::Migration
+class PopulateSubmissionVersions < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

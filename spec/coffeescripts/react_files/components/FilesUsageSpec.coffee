@@ -1,13 +1,12 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/FilesUsage'
-], (React, ReactDOM, $, FilesUsage) ->
-  TestUtils = React.addons.TestUtils
-  Simulate = TestUtils.Simulate
+], (React, ReactDOM, TestUtils, $, FilesUsage) ->
 
-  module 'FilesUsage#update',
+  QUnit.module 'FilesUsage#update',
     filesUpdateTest: (props, test) ->
       @server = sinon.fakeServer.create()
       @filesUsage = TestUtils.renderIntoDocument(React.createElement(FilesUsage, props))

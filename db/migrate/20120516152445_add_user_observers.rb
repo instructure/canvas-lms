@@ -1,4 +1,4 @@
-class AddUserObservers < ActiveRecord::Migration
+class AddUserObservers < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
   tag :predeploy
 

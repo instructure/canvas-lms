@@ -1,4 +1,4 @@
-class AddCassandraGradeChangeScore < ActiveRecord::Migration
+class AddCassandraGradeChangeScore < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   include Canvas::Cassandra::Migration

@@ -167,7 +167,7 @@ module PostgreSQLAdapterExtensions
         AND a.attnum IN (#{indkey.join(",")})
       SQL
 
-      column_names = columns.values_at(*indkey).compact
+      column_names = columns.stringify_keys.values_at(*indkey).compact
 
       # add info on sort order for columns (only desc order is explicitly specified, asc is the default)
       desc_order_columns = inddef.scan(/(\w+) DESC/).flatten
@@ -242,6 +242,31 @@ module PostgreSQLAdapterExtensions
         end
       end
     end
+  end
+
+  # we no longer use any triggers, so we removed hair_trigger,
+  # but don't want to go modifying all the old migrations, so just
+  # make them dummies
+  class CreateTriggerChain
+    def on(*)
+      self
+    end
+
+    def after(*)
+      self
+    end
+
+    def where(*)
+      self
+    end
+  end
+
+  def create_trigger(*)
+    CreateTriggerChain.new
+  end
+
+  def drop_trigger(name, table, generated: false)
+    execute("DROP TRIGGER IF EXISTS #{name} ON #{quote_table_name(table)};\nDROP FUNCTION IF EXISTS #{quote_table_name(name)}();\n")
   end
 
   private

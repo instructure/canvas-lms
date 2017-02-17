@@ -1,4 +1,4 @@
-class AddRatingsToDiscussionTopics < ActiveRecord::Migration
+class AddRatingsToDiscussionTopics < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

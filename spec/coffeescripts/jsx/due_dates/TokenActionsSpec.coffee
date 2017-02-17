@@ -5,7 +5,7 @@ define [
   'compiled/models/AssignmentOverride'
 ], (React, _, TokenActions, AssignmentOverride) ->
 
-  module 'TokenActions is a thing',
+  QUnit.module 'TokenActions is a thing',
     setup: ->
       @assertValuesEqual = (override, keysAndVals) ->
         _.map(keysAndVals, (val, key) ->

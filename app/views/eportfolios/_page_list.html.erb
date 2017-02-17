@@ -17,25 +17,21 @@
     <ul id="page_list">
       <% @category.eportfolio_entries.each do |e| %>
         <li id="page_<%= e.id %>" class="page <%= "current" if e == @page %>">
-          <a href="#" class="edit_page_link" title="<%= t('titles.rename_page', "Rename Page") %>">
-            <i class="icon-edit standalone-icon"></i>
-          </a>
-          <a class="page_url no-hover" href="<%= @category.slug.presence && e.slug.presence && eportfolio_named_category_entry_path(@portfolio, @category.slug, e.slug) %>">
+          <a class="page_url edit_page_link no-hover" href="<%= @category.slug.presence && e.slug.presence && eportfolio_named_category_entry_path(@portfolio, @category.slug, e.slug) %>">
             <span class="name"><%= e.name %></span>
           </a>
           <a class="rename_page_url" href="<%= eportfolio_entry_path(@portfolio, e.id) %>" style="display: none;">&nbsp;</a>
-          &nbsp;<a href="#" class="remove_page_link" title="<%= t('titles.delete_page', "Delete this Page") %>"><i class="icon-trash standalone-icon"></i></a>
+          &nbsp;
+          <%= render :partial => "eportfolios/page_settings", locals: { title: e.name } %>
         </li>
       <% end %>
       <li id="page_blank" class="page unsaved" style="display: none;">
-        <a href="#" class="edit_page_link" title="<%= t('titles.rename_page', "Rename Page") %>">
-          <i class="icon-edit standalone-icon"></i>
-        </a>
-        <a class="page_url no-hover" href="<%= @category.slug.presence && eportfolio_named_category_entry_path(@portfolio, @category.slug, "{{ slug }}") %>">
-          <span class="name"><%= t(:default_page_name, "Page Name") %></span>
+        <a class="page_url edit_page_link no-hover" href="<%= @category.slug.presence && eportfolio_named_category_entry_path(@portfolio, @category.slug, "{{ slug }}") %>">
+          <span class="name"><%= t("Page Name") %></span>
         </a>
         <a class="rename_page_url" href="<%= eportfolio_entry_path(@portfolio, "{{ id }}") %>" style="display: none;">&nbsp;</a>
-        &nbsp;<a href="#" class="remove_page_link" title="<%= t('titles.delete_page', "Delete this Page") %>"><i class="icon-trash standalone-icon"></i></a>
+        &nbsp;
+        <%= render :partial => "eportfolios/page_settings", locals: { title: t("Page Name") } %>
       </li>
     </ul>
     <a href="#" class="add_page_link icon-add"><%= t('links.add_page', "Add Another Page") %></a>

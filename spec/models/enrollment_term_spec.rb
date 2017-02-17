@@ -89,7 +89,7 @@ describe EnrollmentTerm do
   describe "overridden_term_dates" do
     before(:once) do
       account_model
-      course account: @account
+      course_factory account: @account
       @term = @account.enrollment_terms.create!
     end
 
@@ -127,7 +127,7 @@ describe EnrollmentTerm do
 
     it "should not be able to delete an enrollment term with active courses" do
       @term = @account.enrollment_terms.create!
-      course account: @account
+      course_factory account: @account
       @course.enrollment_term = @term
       @course.save!
 
@@ -167,6 +167,107 @@ describe EnrollmentTerm do
         counts[@t2.id] = 1
         expect(EnrollmentTerm.course_counts([@t1, @t2])).to eq counts
       end
+    end
+  end
+
+  describe "scopes" do
+    before(:once) do
+      @root_account = account_model
+      @terms = {}
+
+      scopes = [{
+        name: :active,
+        criteria: {}
+      },
+      {
+        name: :not_default,
+        criteria: {}
+      },
+      {
+        name: :ended,
+        criteria: {
+          end_at: 10.days.ago
+        }
+      },
+      {
+        name: :started_1,
+        criteria: {
+          start_at: 10.days.ago
+        }
+      },
+      {
+        name: :started_2,
+        criteria: {
+          start_at: nil
+        }
+      },
+      {
+        name: :not_ended_1,
+        criteria: {
+          end_at: 10.days.from_now
+        }
+      },
+      {
+        name: :not_ended_2,
+        criteria: {
+          end_at: nil
+        }
+      },
+      {
+        name: :not_started,
+        criteria: {
+          start_at: 10.days.from_now
+        }
+      }]
+
+      scopes.each do |scope|
+        @terms[scope[:name]] = @root_account.enrollment_terms.create!({name: scope[:name].to_s}.merge(scope[:criteria]))
+        course_with_teacher(active_course: true, active_enrollment: true)
+        @course.enrollment_term_id = @terms[scope[:name]].id
+        @course.save!
+      end
+    end
+
+    def term_ids_for_scope(scope)
+      Array.wrap(@root_account
+                  .enrollment_terms
+                  .send(scope)
+                  .pluck(:id)).sort
+    end
+
+    def validate_scope(scope, expected_scopes = nil, include_default: false)
+      expected_scopes ||= scope
+      expected_ids = term_ids_for_scope(scope)
+
+      scopes = @terms.slice(*expected_scopes).values
+      scopes << @root_account.default_enrollment_term if include_default
+      actual_ids = scopes.map(&:id).sort
+
+      expect(expected_ids).to eq(actual_ids)
+    end
+
+    it "should limit by active terms" do
+      validate_scope(:active, @terms.keys, include_default: true)
+    end
+
+    it "should limit by ended terms" do
+      validate_scope(:ended)
+    end
+
+    it "should limit by started terms" do
+      validate_scope(:started, @terms.except(:not_started).keys, include_default: true)
+    end
+
+    it "should limit by not ended terms" do
+      validate_scope(:not_ended, @terms.except(:ended).keys, include_default: true)
+    end
+
+    it "should limit by not started terms" do
+      validate_scope(:not_started)
+    end
+
+    it "should limit by non-default terms" do
+      validate_scope(:not_default, @terms.keys)
     end
   end
 end

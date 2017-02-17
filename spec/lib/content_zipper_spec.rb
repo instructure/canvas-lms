@@ -196,7 +196,7 @@ describe ContentZipper do
 
   describe "assignment_zip_filename" do
     it "should use use course and title slugs to keep filename length down" do
-      course(active_all: true)
+      course_factory(active_all: true)
       @course.short_name = "a" * 31
       @course.save!
       assignment_model(course: @course, title: "b" * 31)
@@ -494,7 +494,7 @@ describe ContentZipper do
 
   describe "zip_quiz" do
     it "delegates to a QuizSubmissionZipper" do
-      course_with_teacher_logged_in(active_all: true)
+      course_with_teacher(active_all: true)
       attachment = Attachment.new(display_name: 'download.zip')
       quiz = Quizzes::Quiz.new(context: @course)
       zipper_stub = stub

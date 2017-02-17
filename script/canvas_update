@@ -99,8 +99,7 @@ function npm_install {
 
 function compile_assets {
   echo_console_and_log "  compiling assets ..."
-  # the `[1,0,1,0]` part means [do generate_documentation, don't check_syntax, do compile_css, don't build_js]
-  bundle exec rake 'canvas:compile_assets[0,0,1,0]' >>"$LOG" 2>&1 || \
+  bundle exec rake 'canvas:compile_assets_dev' >>"$LOG" 2>&1 || \
     ( echo "  failed to generate JS (see $LOG)"; kill -INT $$ )
 }
 

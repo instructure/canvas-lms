@@ -1,4 +1,4 @@
-class IndexCleanupPt1 < ActiveRecord::Migration
+class IndexCleanupPt1 < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   # cleaning up unused and inefficient indexes

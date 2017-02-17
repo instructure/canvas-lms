@@ -1,4 +1,4 @@
-class AddErrorReportsDataHash < ActiveRecord::Migration
+class AddErrorReportsDataHash < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

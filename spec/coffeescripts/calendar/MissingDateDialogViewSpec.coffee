@@ -3,7 +3,7 @@ define [
   'compiled/views/calendar/MissingDateDialogView'
 ], ($, MissingDateDialogView) ->
 
-  module 'MissingDateDialogView',
+  QUnit.module 'MissingDateDialogView',
     setup: ->
       $('#fixtures').append('<label for="date">Section one</label><input type="text" id="date" name="date" />')
       @dialog = new MissingDateDialogView

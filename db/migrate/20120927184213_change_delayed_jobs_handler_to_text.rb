@@ -1,4 +1,4 @@
-class ChangeDelayedJobsHandlerToText < ActiveRecord::Migration
+class ChangeDelayedJobsHandlerToText < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.connection

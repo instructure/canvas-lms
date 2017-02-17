@@ -1,7 +1,7 @@
 # copied from: https://gist.github.com/1998897
 
 define [
-  'vendor/backbone'
+  'node_modules-version-of-backbone'
   'underscore'
   'jquery'
   'compiled/behaviors/authenticity_token'

@@ -301,11 +301,21 @@
 #           "example": 2,
 #           "type": "integer"
 #         },
+#         "due_date_required": {
+#           "description": "Boolean flag indicating whether the assignment requires a due date based on the account level setting",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "allowed_extensions": {
 #           "description": "Allowed file extensions, which take effect if submission_types includes 'online_upload'.",
 #           "example": ["docx", "ppt"],
 #           "type": "array",
 #           "items": {"type": "string"}
+#         },
+#         "max_name_length": {
+#           "description": "An integer indicating the maximum length an assignment's name may be",
+#           "example": 15,
+#           "type": "integer"
 #         },
 #         "turnitin_enabled": {
 #           "description": "Boolean flag indicating whether or not Turnitin has been enabled for the assignment. NOTE: This flag will not appear unless your account has the Turnitin plugin available",
@@ -538,8 +548,8 @@
 #       }
 #     }
 class AssignmentsApiController < ApplicationController
-  before_filter :require_context
-  before_filter :require_user_visibility, :only=>[:user_index]
+  before_action :require_context
+  before_action :require_user_visibility, :only=>[:user_index]
   include Api::V1::Assignment
   include Api::V1::Submission
   include Api::V1::AssignmentOverride
@@ -860,7 +870,9 @@ class AssignmentsApiController < ApplicationController
     @assignment = @context.assignments.build
     @assignment.workflow_state = 'unpublished'
     if authorized_action(@assignment, @current_user, :create)
-      save_and_render_response
+      @assignment.content_being_saved_by(@current_user)
+      result = create_api_assignment(@assignment, params.require(:assignment), @current_user, @context)
+      render_create_or_update_result(result)
     end
   end
 
@@ -1013,20 +1025,22 @@ class AssignmentsApiController < ApplicationController
   def update
     @assignment = @context.active_assignments.api_id(params[:id])
     if authorized_action(@assignment, @current_user, :update)
-      save_and_render_response
+      @assignment.content_being_saved_by(@current_user)
+      result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context)
+      render_create_or_update_result(result)
     end
   end
 
   private
 
-  def save_and_render_response
-    @assignment.content_being_saved_by(@current_user)
-    if update_api_assignment(@assignment, strong_params.require(:assignment), @current_user, @context)
-      render :json => assignment_json(@assignment, @current_user, session), :status => 201
+  def render_create_or_update_result(result)
+    if result == :success
+      render json: assignment_json(@assignment, @current_user, session), status: :created
     else
+      status = result == :forbidden ? :forbidden : :bad_request
       errors = @assignment.errors.as_json[:errors]
-      errors['published'] = errors.delete(:workflow_state) if errors.has_key?(:workflow_state)
-      render :json => {errors: errors}, status: :bad_request
+      errors['published'] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
+      render json: {errors: errors}, status: status
     end
   end
 

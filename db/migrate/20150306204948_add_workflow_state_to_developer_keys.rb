@@ -1,4 +1,4 @@
-class AddWorkflowStateToDeveloperKeys < ActiveRecord::Migration
+class AddWorkflowStateToDeveloperKeys < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

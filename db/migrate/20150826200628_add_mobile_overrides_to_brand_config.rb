@@ -1,4 +1,4 @@
-class AddMobileOverridesToBrandConfig < ActiveRecord::Migration
+class AddMobileOverridesToBrandConfig < ActiveRecord::Migration[4.2]
   tag :predeploy
   def up
     unless column_exists? :brand_configs, :mobile_js_overrides

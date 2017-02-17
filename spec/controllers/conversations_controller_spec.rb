@@ -26,6 +26,7 @@ describe ConversationsController do
     users = create_users_in_course(course, user_data, account_associations: true, return_type: :record)
     @conversation = @user.initiate_conversation(users)
     @conversation.add_message(opts[:message] || 'test')
+    @conversation.conversation.update_attribute(:context, course)
     @conversation
   end
 
@@ -86,7 +87,7 @@ describe ConversationsController do
     it "should return conversations matching the specified filter" do
       user_session(@student)
       @c1 = conversation
-      @other_course = course(:active_all => true)
+      @other_course = course_factory(active_all: true)
       enrollment = @other_course.enroll_student(@user)
       enrollment.workflow_state = 'active'
       enrollment.save!
@@ -103,7 +104,7 @@ describe ConversationsController do
       user_session(@student)
       @course1 = @course
       @c1 = conversation(:course => @course1)
-      @course2 = course(:active_all => true)
+      @course2 = course_factory(active_all: true)
       enrollment = @course2.enroll_student(@user)
       enrollment.workflow_state = 'active'
       enrollment.save!
@@ -130,7 +131,7 @@ describe ConversationsController do
     it "should return conversations matching a user filter" do
       user_session(@student)
       @c1 = conversation
-      @other_course = course(:active_all => true)
+      @other_course = course_factory(active_all: true)
       enrollment = @other_course.enroll_student(@user)
       enrollment.workflow_state = 'active'
       enrollment.save!
@@ -156,8 +157,8 @@ describe ConversationsController do
         a = Account.default
         @student = user_with_pseudonym(:active_all => true)
         course_with_student(:active_all => true, :account => a, :user => @student)
-        @student.initiate_conversation([user]).add_message('test1', :root_account_id => a.id)
-        @student.initiate_conversation([user]).add_message('test2') # no root account, so teacher can't see it
+        @student.initiate_conversation([user_factory]).add_message('test1', :root_account_id => a.id)
+        @student.initiate_conversation([user_factory]).add_message('test2') # no root account, so teacher can't see it
 
         course_with_teacher(:active_all => true, :account => a)
         a.account_users.create!(user: @user)
@@ -236,15 +237,37 @@ describe ConversationsController do
       expect(assigns[:conversation]).not_to be_nil
     end
 
+    it "should require permissions for sending to other students" do
+      user_session(@student)
+
+      new_user = User.create
+      enrollment = @course.enroll_student(new_user)
+      enrollment.workflow_state = 'active'
+      enrollment.save
+      @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+
+      post 'create', :recipients => [new_user.id.to_s], :body => "yo", :context_code => @course.asset_string
+      expect(response).to_not be_success
+    end
+
+    it "should allow sending to instructors even if permissions are disabled" do
+      user_session(@student)
+      @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+
+      post 'create', :recipients => [@teacher.id.to_s], :body => "yo", :context_code => @course.asset_string
+      expect(response).to be_success
+      expect(assigns[:conversation]).not_to be_nil
+    end
+
     it "should not add the wrong tags in a certain terrible cached edge case" do
       # tl;dr - not including the updated_at when we instantiate the users
       # can cause us to grab stale conversation_context_codes
       # which screws everything up
       enable_cache do
-        course1 = course(:active_all => true)
+        course1 = course_factory(active_all: true)
 
-        student1 = user(:active_user => true)
-        student2 = user(:active_user => true)
+        student1 = user_factory(active_user: true)
+        student2 = user_factory(active_user: true)
 
         Timecop.freeze(5.seconds.ago) do
           course1.enroll_user(student1, "StudentEnrollment").accept!
@@ -256,7 +279,7 @@ describe ConversationsController do
           expect(response).to be_success
         end
 
-        course2 = course(:active_all => true)
+        course2 = course_factory(active_all: true)
         course2.enroll_user(student2, "StudentEnrollment").accept!
         course2.enroll_user(student1, "StudentEnrollment").accept!
         user_session(User.find(student1.id)) # clear process local enrollment cache
@@ -356,9 +379,10 @@ describe ConversationsController do
     it "should correctly infer context tags" do
       course_with_teacher_logged_in(:active_all => true)
       @course1 = @course
-      @course2 = course(:active_all => true)
+      @course2 = course_factory(active_all: true)
       @course2.enroll_teacher(@user).accept
-      @course3 = course(:active_all => true)
+      @course3 = course_factory(active_all: true)
+      @course3.enroll_student(@user)
       @group1 = @course1.groups.create!
       @group2 = @course1.groups.create!
       @group3 = @course3.groups.create!
@@ -468,6 +492,15 @@ describe ConversationsController do
       expect(response).to be_success
       expect(@conversation.messages.size).to eq 2
       expect(@conversation.reload.last_message_at).to eql expected_lma
+    end
+
+    it "should require permissions" do
+      course_with_student_logged_in(:active_all => true)
+      conversation
+      @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+
+      post 'add_message', :conversation_id => @conversation.conversation_id, :body => "hello world"
+      assert_unauthorized
     end
 
     it "should queue a job if needed" do
@@ -664,9 +697,9 @@ describe ConversationsController do
       it "should list conversation_ids across shards" do
         users = []
         # Create three users on different shards
-        users << user(:name => 'a')
-        @shard1.activate { users << user(:name => 'b') }
-        @shard2.activate { users << user(:name => 'c') }
+        users << user_factory(:name => 'a')
+        @shard1.activate { users << user_factory(:name => 'b') }
+        @shard2.activate { users << user_factory(:name => 'c') }
 
         Shard.default.activate do
           # Default shard conversation
@@ -707,8 +740,8 @@ describe ConversationsController do
     describe "show" do
       it "should find conversations across shards" do
         users = []
-        users << user(:name => 'a')
-        @shard1.activate { users << user(:name => 'b') }
+        users << user_factory(:name => 'a')
+        @shard1.activate { users << user_factory(:name => 'b') }
 
         @shard1.activate do
           @conversation = Conversation.initiate(users, false)

@@ -90,7 +90,10 @@ describe "assignment groups" do
       last_due_at_element.
         send_keys(format_date_for_view(other_section_due, :medium))
 
-      update_assignment!
+      # `return_to` is not set, so no redirect happens
+      submit_form('#edit_assignment_form')
+      wait_for_ajax_requests
+
       overrides = assign.reload.assignment_overrides
       expect(overrides.count).to eq 3
       default_override = overrides.detect{ |o| o.set_id == default_section.id }
@@ -151,7 +154,7 @@ describe "assignment groups" do
     end
 
     it "properly validates identical calendar dates when saving and editing", priority: "2", test_id: 216351 do
-      shared_date = "October 12 2014"
+      shared_date = "October 12 2014 at 23:59:00"
       other_section = @course.course_sections.create!(:name => "Section 31", :restrict_enrollments_to_section_dates => true, :end_at => shared_date)
       visit_new_assignment_page
       wait_for_ajaximations
@@ -190,7 +193,7 @@ describe "assignment groups" do
     let(:unlock_at) { Time.zone.now - 2.days }
     let(:lock_at) { Time.zone.now + 4.days }
 
-    before(:once) do
+    before(:each) do
       make_full_screen
       course_with_student_logged_in(:active_all => true)
     end

@@ -101,7 +101,7 @@
         <td><%= f.select :account_id, @account.sub_accounts_as_options, :selected => @term && @term.id %></td>
       </tr><tr>
         <td><%= f.label :enrollment_term_id, :en => "Enrollment Term" %></td>
-        <td><%= f.select :enrollment_term_id, @root_account.enrollment_terms.active.order(EnrollmentTerm.nulls(:first, :start_at)).map{|t| [t.name, t.id] }, :selected => @term && @term.id %></td>
+        <td><%= render :partial => 'shared/enrollment_term_select', :locals => { :name => 'course[enrollment_term_id]', :terms => @root_account.enrollment_terms.active, :selected_id => @term && @term.id, :exclude_all_option => true } %>
       </tr><tr>
         <td colspan="2">
           <div class="button-container">

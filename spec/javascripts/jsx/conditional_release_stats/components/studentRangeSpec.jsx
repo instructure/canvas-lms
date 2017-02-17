@@ -1,10 +1,10 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/conditional_release_stats/components/student-range',
-], (React, StudentRange) => {
-  const TestUtils = React.addons.TestUtils
+], (React, TestUtils, StudentRange) => {
 
-  module('Student Range')
+  QUnit.module('Student Range')
 
   const defaultProps = () => ({
     range: {

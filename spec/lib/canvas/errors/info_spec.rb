@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_dependency "canvas/errors/info"
 module Canvas
   class Errors
     describe Info do
@@ -47,7 +48,7 @@ module Canvas
         end
 
         it 'includes user information' do
-          expect(output[:user][:id]).to eq(5544332211)
+          expect(output[:tags][:user_id]).to eq(5544332211)
         end
 
         it 'passes important headers' do

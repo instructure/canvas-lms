@@ -53,7 +53,8 @@ describe SupportHelpers::TurnitinController do
 
       it "should create a new ShardFixer with after_time" do
         fixer = SupportHelpers::Tii::ShardFixer.new(@user.email, '2016-05-01')
-        SupportHelpers::Tii::ShardFixer.expects(:new).with(@user.email, '2016-05-01').returns(fixer)
+        SupportHelpers::Tii::ShardFixer.expects(:new).
+          with(@user.email, Time.zone.parse('2016-05-01')).returns(fixer)
         fixer.expects(:monitor_and_fix)
         get :shard, after_time: '2016-05-01'
         expect(response.body).to eq("Enqueued TurnItIn ShardFixer ##{fixer.job_id}...")
@@ -77,6 +78,20 @@ describe SupportHelpers::TurnitinController do
         assert_status(400)
       end
     end
+
+    context 'refresh_lti_attachment' do
+      it "should create a new RefreshLtiAttachmentFixter" do
+        submission_model
+        attachment_model
+        fixer = SupportHelpers::Tii::LtiAttachmentFixer.new(@user.email, nil, @submission.id, @attachment.id)
+        SupportHelpers::Tii::LtiAttachmentFixer.expects(:new)
+          .with(@user.email, nil, @submission.id, @attachment.id).returns(fixer)
+        fixer.expects(:monitor_and_fix)
+        get :lti_attachment, submission_id: @submission.id, attachment_id: @attachment.id
+        expect(response.body).to eq("Enqueued TurnItIn LtiAttachmentFixer ##{fixer.job_id}...")
+      end
+    end
+
 
     context 'pending' do
       it "should create a new StuckInPendingFixer" do

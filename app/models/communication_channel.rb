@@ -21,8 +21,6 @@ class CommunicationChannel < ActiveRecord::Base
   # as independent of pseudonyms
   include Workflow
 
-  attr_accessible :user, :path, :path_type, :build_pseudonym_on_confirm, :pseudonym
-
   serialize :last_bounce_details
   serialize :last_transient_bounce_details
 
@@ -205,7 +203,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def context
-    pseudonym.try(:account)
+    pseudonym&.account || user.pseudonym&.account
   end
 
   # Public: Determine if this channel is the product of an SIS import.

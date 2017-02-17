@@ -1,4 +1,4 @@
-class RemoveAssignmentReminders < ActiveRecord::Migration
+class RemoveAssignmentReminders < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

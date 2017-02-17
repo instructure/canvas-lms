@@ -1,4 +1,4 @@
-class AddBasicIndicesToGroupCategories < ActiveRecord::Migration
+class AddBasicIndicesToGroupCategories < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

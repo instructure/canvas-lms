@@ -1,6 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative "../grades/page_objects/speedgrader_page"
 
 module SpeedGraderCommon
+
   def student_submission(options = {})
     submission_model({:assignment => @assignment, :body => "first student submission text"}.merge(options))
   end
@@ -45,11 +47,6 @@ module SpeedGraderCommon
     @assignment.submit_homework(student, :submission_type => :online_upload, :attachments => [attachment])
   end
 
-  def submit_and_grade_homework(student, grade)
-    @assignment.submit_homework(student)
-    @assignment.grade_student(student, :grade => grade)
-  end
-
   # Creates a dummy rubric and scores its criteria as specified in the parameters (passed as strings)
   def setup_and_grade_rubric(score1, score2)
     student_submission
@@ -68,8 +65,8 @@ module SpeedGraderCommon
   end
 
   def clear_grade_and_validate
-    @assignment.grade_student @students[0], {grade: ''}
-    @assignment.grade_student @students[1], {grade: ''}
+    @assignment.grade_student @students[0], grade: '', grader: @teacher
+    @assignment.grade_student @students[1], grade: '', grader: @teacher
 
     refresh_page
     expect(f('#grading-box-extended')).to have_value ''
@@ -78,16 +75,17 @@ module SpeedGraderCommon
   end
 
   def cycle_students_correctly(direction_string)
-    current_index = @students.index(@students.find { |l| l.name == f(selectedStudent).text })
+    current_index = @students.index(@students.find { |l| l.name == Speedgrader.selected_student.text })
 
-    f(direction_string).click
+    Speedgrader.click_next_or_prev_student(direction_string)
 
-    direction = direction_string.include?(next_) ? 1 : -1
+    # move onto next student
+    direction = direction_string.equal?(:next) ? 1 : -1
     new_index = (current_index + direction) % @students.length
-    student_X_of_X_string = "Student #{new_index + 1} of #{@students.length}"
+    student_x_of_x_string = "#{new_index + 1}/#{@students.length}"
 
-    f(selectedStudent).text.include?(@students[new_index].name) &&
-        f(studentXofXlabel).text.include?(student_X_of_X_string)
+    Speedgrader.selected_student.text.include?(@students[new_index].name) &&
+        Speedgrader.student_x_of_x_label.text.include?(student_x_of_x_string)
   end
 
   def expand_right_pane

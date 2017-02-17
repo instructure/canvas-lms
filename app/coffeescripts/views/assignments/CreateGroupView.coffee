@@ -102,7 +102,7 @@ define [
       course?.get('apply_assignment_group_weights')
 
     canChangeWeighting: ->
-      @userIsAdmin or !@model.hasAssignmentDueInClosedGradingPeriod()
+      @userIsAdmin or not @model.anyAssignmentInClosedGradingPeriod()
 
     checkGroupWeight: ->
       if @showWeight() and @canChangeWeighting()

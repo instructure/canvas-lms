@@ -14,7 +14,7 @@ describe Canvas::Migration::ExternalContent::Translator do
 
       @cm = @course.content_migrations.create!
       @cm.add_imported_item(@quiz_copy)
-      @translator = described_class.new(@cm)
+      @translator = described_class.new(content_migration: @cm)
     end
 
     it "should search through arrays" do
@@ -43,7 +43,7 @@ describe Canvas::Migration::ExternalContent::Translator do
     before :once do
       course_model
       @cm = @course.content_migrations.create!
-      @translator = described_class.new(@cm)
+      @translator = described_class.new(content_migration: @cm)
     end
 
     it "should be able to search for all of the types in the course" do

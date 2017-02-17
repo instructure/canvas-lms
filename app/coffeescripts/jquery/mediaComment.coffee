@@ -187,7 +187,7 @@ define [
           dialogClass: "play_media_comment"
           title: I18n.t('titles.play_comment', "Play Media Comment")
           width: width
-          height: height
+          height: height + 60 # include height of dialog titlebar
           modal: false
           resizable: false
           close: ->
@@ -205,8 +205,7 @@ define [
               mediaCommentId: id
               googleAnalyticsTitle: id
 
-            spaceNeededForControls = 35
-            $mediaTag = createMediaTag({sourcesAndTracks, mediaPlayerOptions, mediaType, height: height-spaceNeededForControls, width})
+            $mediaTag = createMediaTag({sourcesAndTracks, mediaPlayerOptions, mediaType, height: height, width})
             $mediaTag.appendTo($dialog.html(''))
 
             $this.data

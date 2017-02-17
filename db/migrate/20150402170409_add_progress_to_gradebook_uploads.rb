@@ -1,4 +1,4 @@
-class AddProgressToGradebookUploads < ActiveRecord::Migration
+class AddProgressToGradebookUploads < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

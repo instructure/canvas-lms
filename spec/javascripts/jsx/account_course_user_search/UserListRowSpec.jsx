@@ -1,10 +1,10 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/account_course_user_search/UsersListRow'
-], (React, UsersListRow) => {
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, UsersListRow) => {
 
-  module('Account Course User Search UsersListRow View');
+  QUnit.module('Account Course User Search UsersListRow View');
 
   const user = {
     avatar_url: 'http://someurl'
@@ -21,7 +21,7 @@ define([
     can_message_users: true,
     can_edit_users: true
   };
-  const timezones = {};
+  const timezones = {timezones: ['123123123'], priority_zones: ['alsdkfjasldkfjs']};
 
   test('renders an avatar when needed', () => {
     const withPropComponent = TestUtils.renderIntoDocument(

@@ -6,7 +6,7 @@ define [
 
   rawEditor = null
 
-  module "LinkableEditor",
+  QUnit.module "LinkableEditor",
     setup: ->
       $("#fixtures").html("<div id='some_editor' data-value='42'></div>")
       rawEditor = {

@@ -1,11 +1,10 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/external_apps/components/ConfigurationFormManual'
-], (React, ConfigurationFormManual) => {
+], (React, TestUtils, ConfigurationFormManual) => {
 
-  const TestUtils = React.addons.TestUtils;
-
-  module('External Apps Manual Configuration Form');
+  QUnit.module('External Apps Manual Configuration Form');
 
   const fakeStore = {
     findAppByShortName () {

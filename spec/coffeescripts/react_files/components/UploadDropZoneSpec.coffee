@@ -1,15 +1,15 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/files/UploadDropZone'
-], (React, ReactDOM, UploadDropZone) ->
+], (React, ReactDOM, {Simulate}, UploadDropZone) ->
 
-  Simulate = React.addons.TestUtils.Simulate
   UploadDropZone = React.createFactory(UploadDropZone)
 
   node = document.querySelector('#fixtures')
 
-  module 'UploadDropZone',
+  QUnit.module 'UploadDropZone',
     setup: ->
       @uploadZone = ReactDOM.render(UploadDropZone({}), node)
 

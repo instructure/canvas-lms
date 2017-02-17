@@ -86,8 +86,9 @@ describe CustomGradebookColumnsApiController, type: :request do
       @user = @student
       raw_api_call :post,
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns",
-        course_id: @course.to_param, action: "create",
-        controller: "custom_gradebook_columns_api", format: "json"
+        {course_id: @course.to_param, action: "create",
+        controller: "custom_gradebook_columns_api", format: "json"},
+        "column[title]" => "Blah blah blah"
       assert_status(401)
     end
 

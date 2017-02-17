@@ -1,4 +1,4 @@
-class AddMigrationSelectionForExternalTools < ActiveRecord::Migration
+class AddMigrationSelectionForExternalTools < ActiveRecord::Migration[4.2]
   tag :predeploy
   def self.up
     add_column :context_external_tools, :has_migration_selection, :boolean

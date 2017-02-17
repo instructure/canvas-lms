@@ -53,14 +53,8 @@
         aria-label='{{#t "title_add_assignment"}}Add Assignment{{/t}}'
       >{{#t "add_assignment"}}Assignment{{/t}}</a>
 
-      <a
-        href="#"
-        class="btn"
-        id="assignmentSettingsCog"
-        role="button"
-        title='{{#t "assignments_settings"}}Assignments Settings{{/t}}'
-        aria-label="{{#t "assignments_settings_screenreader"}}Assignments Settings{{/t}}"
-      ><i class="icon-settings"></i></a>
+      <span id="settingsMountPoint"></span>
+      </div>
     {{else}}
       <div data-view="showBy"></div>
     {{/if}}
@@ -69,7 +63,7 @@
 
 <div data-view="assignmentGroups" class="item-group-container" id="ag-list"></div>
 
-{{#if ENV.PERMISSIONS.manage}}
+{{#if ENV.PERMISSIONS.manage_course}}
   <form data-view="createGroup" class="form-dialog"></form>
   <form data-view="assignmentSettings" class="form-dialog"></form>
 {{/if}}

@@ -1,15 +1,14 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/UsageRightsIndicator'
   'compiled/models/Folder'
   'compiled/models/File'
-], (React, ReactDOM, $, UsageRightsIndicator, Folder, File) ->
+], (React, ReactDOM, TestUtils, $, UsageRightsIndicator, Folder, File) ->
 
-  TestUtils = React.addons.TestUtils
-
-  module 'UsageRightsIndicator'
+  QUnit.module 'UsageRightsIndicator'
 
   test 'returns null for folders', ->
     props = {
@@ -66,7 +65,7 @@ define [
     ReactDOM.unmountComponentAtNode(uRI.getDOMNode().parentNode)
 
 
-  module "UsageRightsIndicator: Icon Classess & Screenreader text",
+  QUnit.module "UsageRightsIndicator: Icon Classess & Screenreader text",
     teardown: ->
       ReactDOM.unmountComponentAtNode(@uRI.getDOMNode().parentNode)
 

@@ -23,7 +23,7 @@
 class Quizzes::QuizSubmissionFilesController < ApplicationController
   include Api::V1::Submission
 
-  before_filter :require_user, :require_context
+  before_action :require_user, :require_context
 
   # @API Upload a file
   # @beta

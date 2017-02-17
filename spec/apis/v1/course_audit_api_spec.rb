@@ -23,7 +23,7 @@ describe "CourseAudit API", type: :request do
   context "not configured" do
     before do
       Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).with('auditors').returns(false)
-      course
+      course_factory
     end
 
     it "should 404" do

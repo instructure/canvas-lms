@@ -19,12 +19,12 @@
 class AssessmentQuestionsController < ApplicationController
   include Api::V1::QuizQuestion
 
-  before_filter :require_context
-  before_filter :require_bank
+  before_action :require_context
+  before_action :require_bank
   def create
     if authorized_action(@bank.assessment_questions.new, @current_user, :create)
-      strong_params[:assessment_question] ||= {}
-      strong_params[:assessment_question][:form_question_data] ||= params[:question]
+      params[:assessment_question] ||= {}
+      params[:assessment_question][:form_question_data] ||= params[:question]
 
       @question = @bank.assessment_questions.build(assessment_question_params)
       if @question.with_versioning(&:save)
@@ -38,8 +38,8 @@ class AssessmentQuestionsController < ApplicationController
   def update
     @question = @bank.assessment_questions.find(params[:id])
     if authorized_action(@question, @current_user, :update)
-      strong_params[:assessment_question] ||= {}
-      strong_params[:assessment_question][:form_question_data] ||= params[:question]
+      params[:assessment_question] ||= {}
+      params[:assessment_question][:form_question_data] ||= params[:question]
       @question.edited_independent_of_quiz_question
       if @question.with_versioning { @question.update_attributes(assessment_question_params) }
         render json: question_json(@question, @current_user, session, [:assessment_question])
@@ -63,6 +63,6 @@ class AssessmentQuestionsController < ApplicationController
   end
 
   def assessment_question_params
-    strong_params.require(:assessment_question).permit(:name, :form_question_data => strong_anything)
+    params.require(:assessment_question).permit(:name, :form_question_data => strong_anything)
   end
 end

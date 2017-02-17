@@ -1,11 +1,10 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/course_settings/components/UploadArea',
-], (React, UploadArea) => {
+], (React, TestUtils, UploadArea) => {
 
-  const TestUtils = React.addons.TestUtils;
-
-  module('UploadArea Component');
+  QUnit.module('UploadArea Component');
 
   test('it renders', () => {
     const component = TestUtils.renderIntoDocument(

@@ -3,9 +3,9 @@ define [
   'compiled/quizzes/log_auditing/event'
   'compiled/quizzes/log_auditing/event_manager'
   'compiled/quizzes/log_auditing/event_tracker'
-  'vendor/backbone'
+  'node_modules-version-of-backbone'
 ], (K, QuizEvent, EventManager, EventTracker, Backbone) ->
-  module 'Quizzes::LogAuditing::EventManager',
+  QUnit.module 'Quizzes::LogAuditing::EventManager',
     teardown: ->
       this.evtManager.stop() if this.evtManager && this.evtManager.isRunning()
 
@@ -17,7 +17,7 @@ define [
     this.evtManager.stop()
     ok !this.evtManager.isRunning()
 
-  module 'Quizzes::LogAuditing::EventManager - Event delivery',
+  QUnit.module 'Quizzes::LogAuditing::EventManager - Event delivery',
     setup: ->
       this.server = sinon.fakeServer.create()
 

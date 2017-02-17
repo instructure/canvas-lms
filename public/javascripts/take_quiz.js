@@ -23,7 +23,7 @@ define([
   'compiled/behaviors/autoBlurActiveInput',
   'underscore',
   'compiled/views/quizzes/LDBLoginPopup',
-  'worker!compiled/workers/quizzes/quiz_taking_police',
+  'quizzes/quiz_taking_police',
   'compiled/quizzes/log_auditing',
   'compiled/quizzes/dump_events',
   'compiled/views/editor/KeyboardShortcuts',
@@ -37,7 +37,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/behaviors/quiz_selectmenu'
 ], function(FileUploadQuestionView, File, I18n, $, autoBlurActiveInput, _,
-            LDBLoginPopup, QuizTakingPolice, QuizLogAuditing,
+            LDBLoginPopup, quizTakingPolice, QuizLogAuditing,
             QuizLogAuditingEventDumper, KeyboardShortcuts, RichContentEditor) {
 
   RichContentEditor.preloadRemoteModule();
@@ -45,10 +45,6 @@ define([
   var lastAnswerSelected = null;
   var lastSuccessfulSubmissionData = null;
   var showDeauthorizedDialog;
-
-  // need to keep a top level reference or
-  // it can get garbage collected
-  var quizTakingPoliceTopLevel = null;
 
   var quizSubmission = (function() {
     var timeMod = 0,
@@ -493,12 +489,19 @@ define([
 
     $('.file-upload-question-holder').each(function(i,el) {
       var $el = $(el);
-      var val = parseInt($el.find('input.attachment-id').val(),10);
-      if (val && val !==  0){
+      var attachID = parseInt($el.find('input.attachment-id').val(), 10);
+      var model = new File(ENV.ATTACHMENTS[attachID], {preflightUrl: ENV.UPLOAD_URL});
+      var fileUploadView = new FileUploadQuestionView({el: el, model: model});
+
+      if (attachID && attachID !== 0) {
         $el.find('.file-upload-box').addClass('file-upload-box-with-file');
       }
-      var model = new File(ENV.ATTACHMENTS[val], {preflightUrl: ENV.UPLOAD_URL});
-      new FileUploadQuestionView({el: el, model: model}).render();
+
+      fileUploadView.on('attachmentManipulationComplete', function () {
+        quizSubmission.updateSubmission();
+      })
+
+      fileUploadView.render();
     });
 
     $questions
@@ -691,21 +694,19 @@ define([
       });
     }, 2000);
 
-    if (QuizTakingPolice) {
-      quizTakingPoliceTopLevel = new QuizTakingPolice();
-
-      quizTakingPoliceTopLevel.addEventListener('message', function(e) {
+    if (quizTakingPolice) {
+      quizTakingPolice.addEventListener('message', function(e) {
         if (e.data === 'stopwatchTick') {
           quizSubmission.updateTime();
         }
       });
 
-      quizTakingPoliceTopLevel.postMessage({
+      quizTakingPolice.postMessage({
         code: 'startStopwatch',
         frequency: quizSubmission.clockInterval
       });
-    }
-    else {
+
+    } else {
       setInterval(quizSubmission.updateTime, quizSubmission.clockInterval);
     }
 

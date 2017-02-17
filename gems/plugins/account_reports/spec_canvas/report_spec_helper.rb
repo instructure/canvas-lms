@@ -29,7 +29,7 @@ module ReportSpecHelper
   def run_report(type = @type, options = {})
     account = options[:account] || @account
     parameters = options[:params]
-    account_report = AccountReport.new(:user => @admin || user,
+    account_report = AccountReport.new(:user => @admin || user_factory,
                                        :account => account,
                                        :report_type => type)
     account_report.parameters = parameters

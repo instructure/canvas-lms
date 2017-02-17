@@ -1,4 +1,4 @@
-class RemoveCourseIdAndAccountIdFromGradingPeriods < ActiveRecord::Migration
+class RemoveCourseIdAndAccountIdFromGradingPeriods < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

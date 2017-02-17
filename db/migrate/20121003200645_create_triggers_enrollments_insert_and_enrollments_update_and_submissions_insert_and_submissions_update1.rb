@@ -2,7 +2,7 @@
 # While you can edit this file, any changes you make to the definitions here
 # will be undone by the next auto-generated trigger migration.
 
-class CreateTriggersEnrollmentsInsertAndEnrollmentsUpdateAndSubmissionsInsertAndSubmissionsUpdate1 < ActiveRecord::Migration
+class CreateTriggersEnrollmentsInsertAndEnrollmentsUpdateAndSubmissionsInsertAndSubmissionsUpdate1 < ActiveRecord::Migration[4.2]
   tag :predeploy
   def self.up
     drop_trigger("enrollments_after_insert_row_when_new_type_in_studentenrollm_tr", "enrollments", :generated => true)

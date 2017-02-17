@@ -1,4 +1,4 @@
-class AddLtiMessageHandlerIdToLtiResourcePlacements < ActiveRecord::Migration
+class AddLtiMessageHandlerIdToLtiResourcePlacements < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -1,12 +1,12 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/NoResults'
-], (React, ReactDOM, $, NoResults) ->
-  TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, $, NoResults) ->
 
-  module "NoResults"
+  QUnit.module "NoResults"
 
   test "displays search term in no results text", ->
     noResults = React.createFactory(NoResults)

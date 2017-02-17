@@ -1,13 +1,13 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/account_course_user_search/NewUserModal'
-], (React, NewUserModal) => {
+], (React, TestUtils, NewUserModal) => {
 
-  const TestUtils = React.addons.TestUtils;
-
-  module('Account Course User Search NewUserModal View');
+  QUnit.module('Account Course User Search NewUserModal View');
 
   const props = {
+    contentLabel: 'label',
     userList: {
       errors: {}
     }

@@ -1,4 +1,4 @@
-class CleanupQuizQuestionLinks < ActiveRecord::Migration
+class CleanupQuizQuestionLinks < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

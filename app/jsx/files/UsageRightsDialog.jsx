@@ -99,6 +99,24 @@ define([
     }
   };
 
+  UsageRightsDialog.renderAccessManagement = function () {
+    if (this.props.userCanRestrictFilesForContext) {
+      return (
+        <div>
+          <hr />
+          <div className='form-horizontal'>
+            <p className="manage-access">{I18n.t("You can also manage access at this time:")}</p>
+            <RestrictedRadioButtons
+              ref='restrictedSelection'
+              models={this.props.itemsToManage}
+            >
+            </RestrictedRadioButtons>
+          </div>
+        </div>
+      );
+    }
+  };
+
   UsageRightsDialog.render = function () {
     return (
       <div className='ReactModal__Layout'>
@@ -142,15 +160,7 @@ define([
                     cc_value={this.cc_value}
                   >
                   </UsageRightsSelectBox>
-                  <hr />
-                  <div className='form-horizontal'>
-                  <p className="manage-access">{I18n.t("You can also manage access at this time:")}</p>
-                  <RestrictedRadioButtons
-                    ref='restrictedSelection'
-                    models={this.props.itemsToManage}
-                  >
-                  </RestrictedRadioButtons>
-                  </div>
+                  {this.renderAccessManagement()}
                 </div>
               </div>
             </div>

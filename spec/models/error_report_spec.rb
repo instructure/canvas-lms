@@ -19,38 +19,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ErrorReport do
-  it "should send emails if configured" do
-    account_model
-    PluginSetting.create!(:name => 'error_reporting', :settings => {
-      :action => 'email',
-      :email => 'nobody@nowhere.com'
-    })
-    report = ErrorReport.new
-    report.account = @account
-    report.message = "test"
-    report.subject = "subject"
-    report.save!
-    report.send_to_external
-    m = Message.last
-    expect(m).not_to be_nil
-    expect(m.to).to eql("nobody@nowhere.com")
-  end
-
-  it "should not send emails if not configured" do
-    account_model
-    report = ErrorReport.new
-    report.account = @account
-    report.message = "test"
-    report.subject = "subject"
-    report.save!
-    report.send_to_external
-    m = Message.last
-    expect(!!(m && m.to == "nobody@nowhere.com")).to eql(false)
-  end
-
   describe ".log_exception_from_canvas_errors" do
     it "should not fail with invalid UTF-8" do
-      data = { extra: { message: "he\xffllo" } }
+      message = "he"
+      message << 255.chr
+      message << "llo"
+      data = { extra: { message: message } }
       described_class.log_exception_from_canvas_errors('my error', data)
     end
 
@@ -72,6 +46,18 @@ describe ErrorReport do
       described_class.configure_to_ignore(["ErrorReportSpecException"])
       report = described_class.log_exception_from_canvas_errors(ErrorReportSpecException.new, {})
       expect(report).to be_nil
+    end
+
+    it "should plug together with Canvas::Errors::Info to log the user" do
+      req = instance_double("request", request_method_symbol: "GET", format: "html")
+      allow(Canvas::Errors::Info).to receive(:useful_http_env_stuff_from_request).
+        and_return({})
+      allow(Canvas::Errors::Info).to receive(:useful_http_headers).and_return({})
+      user = instance_double("User", global_id: 5)
+      err = Exception.new("error")
+      info = Canvas::Errors::Info.new(req, Account.default, user, {})
+      report = described_class.log_exception_from_canvas_errors(err, info.to_h)
+      expect(report.user_id).to eq 5
     end
   end
 

@@ -2,7 +2,6 @@ class Quizzes::QuizRegradeRun < ActiveRecord::Base
   self.table_name = 'quiz_regrade_runs'
 
   belongs_to :quiz_regrade, class_name: 'Quizzes::QuizRegrade'
-  attr_accessible :quiz_regrade_id, :started_at, :finished_at
 
   validates_presence_of :quiz_regrade_id
 

@@ -4,7 +4,7 @@ define [
   'compiled/views/wiki/WikiPageView'
 ], (_, WikiPage, WikiPageView) ->
 
-  module 'WikiPageView'
+  QUnit.module 'WikiPageView'
 
   test 'display_show_all_pages makes it through constructor', ->
     model = new WikiPage
@@ -37,7 +37,7 @@ define [
     equal view.publishButtonView.$el.data('test-data'), 'test-is-good', 'test data preserved (by detach)'
 
 
-  module 'WikiPageView:JSON'
+  QUnit.module 'WikiPageView:JSON'
 
   test 'modules_path', ->
     model = new WikiPage

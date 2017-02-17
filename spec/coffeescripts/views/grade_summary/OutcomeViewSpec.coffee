@@ -7,7 +7,7 @@ define [
   'compiled/views/grade_summary/ProgressBarView'
 ], (_, Outcome, OutcomePopoverView, OutcomeDialogView, OutcomeView, ProgressBarView) ->
 
-  module 'OutcomeViewSpec',
+  QUnit.module 'OutcomeViewSpec',
     setup: ->
       @outcomeView = new OutcomeView({
         el: $('<li><a class="more-details"></a></li>')

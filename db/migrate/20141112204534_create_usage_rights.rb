@@ -1,4 +1,4 @@
-class CreateUsageRights < ActiveRecord::Migration
+class CreateUsageRights < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

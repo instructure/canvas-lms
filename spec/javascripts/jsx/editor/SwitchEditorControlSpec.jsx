@@ -1,11 +1,11 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/editor/SwitchEditorControl',
   'jsx/shared/rce/RichContentEditor'
-], (React, SwitchEditorControl, RichContentEditor) => {
-  var TestUtils = React.addons.TestUtils
+], (React, TestUtils, SwitchEditorControl, RichContentEditor) => {
 
-  module("SwitchEditorControl", {
+  QUnit.module("SwitchEditorControl", {
     setup() {
       sinon.stub(RichContentEditor, 'callOnRCE')
     },

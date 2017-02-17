@@ -31,7 +31,7 @@ module CC
       add_referenced_grading_standards if for_course_copy
       standards_to_copy = (@course.grading_standards.to_a + [@course.grading_standard]).compact.uniq(&:id).select{|s| export_object?(s)}
       return nil unless standards_to_copy.size > 0
-      
+
       if document
         standards_file = nil
         rel_path = nil
@@ -40,7 +40,7 @@ module CC
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::GRADING_STANDARDS)
         document = Builder::XmlMarkup.new(:target=>standards_file, :indent=>2)
       end
-      
+
       document.instruct!
       document.gradingStandards(
               "xmlns" => CCHelper::CANVAS_NAMESPACE,
@@ -48,14 +48,14 @@ module CC
               "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |standards_node|
         standards_to_copy.each do |standard|
-          migration_id = CCHelper.create_key(standard)
+          migration_id = create_key(standard)
           standards_node.gradingStandard(:identifier=>migration_id, :version=>standard.version) do |standard_node|
             standard_node.title standard.title unless standard.title.blank?
             standard_node.data standard.data.to_json
           end
         end
       end
-      
+
       standards_file.close if standards_file
       rel_path
     end

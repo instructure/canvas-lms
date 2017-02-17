@@ -23,8 +23,8 @@ describe StreamItemsHelper do
     Notification.create!(:name => "Assignment Created", :category => "TestImmediately")
     course_with_teacher(:active_all => true)
     course_with_student(:active_all => true, :course => @course)
-    @other_user = user
-    @another_user = user
+    @other_user = user_factory
+    @another_user = user_factory
 
     @context = @course
     @discussion = discussion_topic_model

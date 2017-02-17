@@ -10,7 +10,7 @@ define [
   course = {id: 1, name: 'Course One', checked: false}
   currentSection = 1
 
-  module 'gradebook/SectionMenuView',
+  QUnit.module 'gradebook/SectionMenuView',
     setup: ->
       @view = new SectionMenuView(sections: sections, currentSection: currentSection, course: course)
       @view.render()
@@ -42,12 +42,4 @@ define [
       start()
     @view.$el.find('button').click()
     $('input[value=2]').parent().click()
-
-  module 'gradebook/SectionMenuView',
-    setup: ->
-      @view = new SectionMenuView(sections: sections, currentSection: currentSection, course: course)
-      @view.render()
-      @view.$el.appendTo('#fixtures')
-
-    teardown: ->
-      $('#fixtures').empty()
+    $.unsubscribe 'currentSection/change'

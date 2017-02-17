@@ -3,10 +3,14 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "people" do
   include_context "in-process server selenium tests"
 
+  before(:once) do
+    driver.manage.window.maximize
+  end
+
   def add_user(option_text, username, user_list_selector)
     click_option('#enrollment_type', option_text)
     f('textarea.user_list').send_keys(username)
-    fj('.verify_syntax_button').click
+    f('.verify_syntax_button').click
     wait_for_ajax_requests
     expect(f('#user_list_parsed')).to include_text(username)
     f('.add_users_button').click
@@ -135,7 +139,7 @@ describe "people" do
     end
 
     it "should have tabs" do
-      expect(fj('.collectionViewItems>li:first').text).to match "Everyone"
+      expect(f('.collectionViewItems>li:first-child').text).to match "Everyone"
     end
 
     it "should display a dropdown menu when item cog is clicked" do
@@ -199,21 +203,10 @@ describe "people" do
       driver.execute_script("$('.collectionViewItems > li:last a').focus()")
       active = driver.execute_script("return document.activeElement")
       active.send_keys(:tab)
-      check_element_has_focus(fj('.group-categories-actions .btn-primary'))
+      check_element_has_focus(f('.group-categories-actions .btn-primary'))
     end
 
-    it "should make sure focus is set to the X button each time the page changes" do
-      f('#addUsers').click
-      wait_for_ajaximations
-      check_element_has_focus(f('.ui-dialog-titlebar-close'))
-      f('#user_list_textarea').send_keys('student2@test.com')
-      f('#next-step').click
-      wait_for_ajaximations
-      check_element_has_focus(f('.ui-dialog-titlebar-close'))
-      f('#createUsersAddButton').click
-      wait_for_ajaximations
-      check_element_has_focus(f('.ui-dialog-titlebar-close'))
-    end
+    # focus test removed. delegated to inst-ui which now implements the modal
 
     it "should validate the main page" do
       users = ff('.roster_user_name')
@@ -250,7 +243,7 @@ describe "people" do
       dialog = open_student_group_dialog
       replace_content(f('#new_category_name'), 'new group')
       dialog.find_element(:css, '#enable_self_signup').click
-      fj('input[name="create_group_count"]:visible').send_keys(group_count)
+      replace_content(fj('input[name="create_group_count"]:visible'), group_count)
       submit_form('.group-category-create')
       wait_for_ajaximations
       expect(@course.groups.count).to eq 4
@@ -268,7 +261,7 @@ describe "people" do
       dialog = open_student_group_dialog
       replace_content(f('#new_category_name'), 'new group')
       dialog.find_element(:css, '#split_groups').click
-      fj('input[name="create_group_count"]:visible').send_keys(group_count)
+      replace_content(fj('input[name="create_group_count"]:visible'), group_count)
       expect(@course.groups.count).to eq 0
       submit_form('.group-category-create')
       wait_for_ajaximations
@@ -412,25 +405,22 @@ describe "people" do
       f('#addUsers').click
       wait_for_ajaximations
 
-      expect(f('#create-users-step-1')).to be_displayed
-      replace_content(f('#user_list_textarea'), 'student@example.com')
-      click_option('#role_id', ta_role.id.to_s, :value)
-      click_option('#course_section_id', 'Unnamed Course', :text)
-      scroll_page_to_bottom
-      move_to_click('#limit_privileges_to_course_section')
-      f('#next-step').click
+      expect(f(".addpeople")).to be_displayed
+      replace_content(f(".addpeople__peoplesearch textarea"),'student@example.com')
+      click_option('#peoplesearch_select_role', ta_role.id.to_s, :value)
+      click_option('#peoplesearch_select_section', 'Unnamed Course', :text)
+      f('#addpeople_next').click
       wait_for_ajaximations
 
-      expect(f('#create-users-step-2')).to be_displayed
-      f('.btn.createUsersStartOver').click
+      expect(f(".peoplevalidationissues__missing")).to be_displayed
+      f('#addpeople_back').click
       wait_for_ajaximations
 
       #verify form and options have not changed
-      expect(f('#create-users-step-1')).to be_displayed
-      expect(f('#user_list_textarea').text).to eq 'student@example.com'
-      expect(first_selected_option(f('#role_id')).text).to eq 'TA'
-      expect(first_selected_option(f('#course_section_id')).text).to eq 'Unnamed Course'
-      is_checked('#limit_privileges_to_course_section') == true
+      expect(f('.addpeople__peoplesearch')).to be_displayed
+      expect(f('.addpeople__peoplesearch textarea').text).to eq 'student@example.com'
+      expect(first_selected_option(f('#peoplesearch_select_role')).text).to eq 'TA'
+      expect(first_selected_option(f('#peoplesearch_select_section')).text).to eq 'Unnamed Course'
     end
 
     it "should add a student to a section", priority: "1", test_id: 296460 do
@@ -450,7 +440,7 @@ describe "people" do
     end
 
     it "should remove a student from a section", priority: "1", test_id: 296461 do
-     @student = user
+     @student = user_factory
      @course.enroll_student(@student, allow_multiple_enrollments: true)
      @course.enroll_student(@student, section: @section2, allow_multiple_enrollments: true)
      get "/courses/#{@course.id}/users"
@@ -494,13 +484,13 @@ describe "people" do
     course_with_admin_logged_in
     sec1 = @course.course_sections.create!(name: "section1")
     sec2 = @course.course_sections.create!(name: "section2")
-    @student = user
+    @student = user_factory
     e1 = @course.enroll_student(@student, section: sec1, allow_multiple_enrollments: true)
     @course.enroll_student(@student, section: sec2, allow_multiple_enrollments: true)
     Enrollment.where(:id => e1).update_all(:total_activity_time => 900)
     get "/courses/#{@course.id}/users"
     wait_for_ajaximations
-    expect(fj("#user_#{@student.id} td:nth-child(8)").text.strip).to eq "15:00"
+    expect(f("#user_#{@student.id} td:nth-child(8)").text.strip).to eq "15:00"
   end
 
   it "should filter by role ids" do
@@ -524,7 +514,7 @@ describe "people" do
 
   context "editing role" do
     before :once do
-      course
+      course_factory
       @section = @course.course_sections.create!(name: "section1")
 
       @teacher = user_with_pseudonym(:active_all => true)
@@ -545,7 +535,7 @@ describe "people" do
     end
 
     it "should not let observers with associated users have their roles changed" do
-      student = user
+      student = user_factory
       @course.enroll_student(student)
       @course.enroll_user(@teacher, "ObserverEnrollment", :allow_multiple_enrollments => true, :associated_user_id => student.id)
 
@@ -593,7 +583,7 @@ describe "people" do
       click_option("#edit_roles #role_id", role.id.to_s, :value)
       f('.ui-dialog-buttonpane .btn-primary').click
       wait_for_ajaximations
-      assert_flash_notice_message /Role successfully updated/
+      assert_flash_notice_message "Role successfully updated"
 
       expect(f("#user_#{@teacher.id}")).to include_text(role_name)
       @enrollment.reload
@@ -613,7 +603,7 @@ describe "people" do
       click_option("#edit_roles #role_id", ta_role.id.to_s, :value)
       f('.ui-dialog-buttonpane .btn-primary').click
       wait_for_ajaximations
-      assert_flash_notice_message /Role successfully updated/
+      assert_flash_notice_message "Role successfully updated"
 
       expect(@enrollment.reload).to be_deleted
       expect(enrollment2.reload).to be_deleted
@@ -634,7 +624,7 @@ describe "people" do
       click_option("#edit_roles #role_id", ta_role.id.to_s, :value)
       f('.ui-dialog-buttonpane .btn-primary').click
       wait_for_ajaximations
-      assert_flash_notice_message /Role successfully updated/
+      assert_flash_notice_message "Role successfully updated"
 
       expect(@enrollment.reload).to be_deleted
       expect(enrollment2.reload).to_not be_deleted
@@ -651,7 +641,7 @@ describe "people" do
       click_option("#edit_roles #role_id", student_role.id.to_s, :value)
       f('.ui-dialog-buttonpane .btn-primary').click
       wait_for_ajaximations
-      assert_flash_notice_message /Role successfully updated/
+      assert_flash_notice_message "Role successfully updated"
 
       expect(@enrollment.reload).to be_deleted
       expect(enrollment2.reload).to be_deleted

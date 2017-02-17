@@ -1,0 +1,18 @@
+<div class="al-dropdown__container page_settings_menu" style="position: relative;">
+  <a class="al-trigger al-trigger-gray" role="button" href="#">
+    <i class="icon-settings"></i>
+    <i class="icon-mini-arrow-down"></i>
+    <span class="screenreader-only settings-label"><%= t("Settings for %{title}", title: title) %></span>
+  </a>
+  <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+    <li role="presentation">
+      <a href="#" class="edit_page_link icon-edit" tabindex="-1" role="menuitem" title="<%= t("Rename this Page") %>"><%= t("Rename") %></a>
+    </li>
+    <li role="presentation">
+      <a href="#" class="remove_page_link icon-trash" tabindex="-1" role="menuitem" title="<%= t("Delete this Page") %>"><%= t("Delete") %></a>
+    </li>
+    <li role="presentation">
+      <a href="#" class="move_page_link icon-updown" tabindex="-1" role="menuitem" title="<%= t("Move this page") %>"><%= t("Move to...") %></a>
+    </li>
+  </ul>
+</div>

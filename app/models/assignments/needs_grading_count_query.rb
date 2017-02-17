@@ -27,10 +27,10 @@ module Assignments
 
     delegate :course, :section_visibilities, :visibility_level, :visible_section_ids, :to => :course_proxy
 
-    def initialize(_assignment, _user, _course_proxy=nil)
-      @assignment = _assignment
-      @user = _user
-      @course_proxy = _course_proxy || CourseProxy.new(@assignment.context, @user)
+    def initialize(assignment, user=nil, course_proxy=nil)
+      @assignment = assignment
+      @user = user
+      @course_proxy = course_proxy || CourseProxy.new(@assignment.context, @user)
     end
 
     def count
@@ -120,10 +120,7 @@ module Assignments
           AND e.course_id = ?
           AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
           AND e.workflow_state = 'active'
-          AND submissions.submission_type IS NOT NULL
-          AND (submissions.workflow_state = 'pending_review'
-            OR (submissions.workflow_state = 'submitted'
-              AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)))
+          AND #{Submission.needs_grading_conditions}
         SQL
 
       string += <<-SQL

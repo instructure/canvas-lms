@@ -17,11 +17,11 @@
 #
 
 module Factories
-  def assignment_model(opts={})
-    course = opts.delete(:course) || opts[:context] || course_model(:reusable => true)
+  def assignment_model(opts = {})
+    course = opts.delete(:course) || opts[:context] || course_model(reusable:  true)
     # turn the group_category title into a group category "object"
     group_category = opts.delete(:group_category)
-    @group_category = course.group_categories.create(:name => group_category) if group_category
+    @group_category = course.group_categories.create!(name: group_category) if group_category
     opts[:group_category] = @group_category if @group_category
     @assignment = factory_with_protected_attributes(course.assignments, assignment_valid_attributes.merge(opts))
     @a = @assignment
@@ -31,10 +31,10 @@ module Factories
 
   def assignment_valid_attributes
     {
-      :title => "value for title",
-      :description => "value for description",
-      :due_at => Time.zone.now,
-      :points_possible => "1.5"
+      title: "value for title",
+      description: "value for description",
+      due_at: Time.zone.now,
+      points_possible: "1.5"
     }
   end
 

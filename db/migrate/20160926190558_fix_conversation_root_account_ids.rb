@@ -1,4 +1,4 @@
-class FixConversationRootAccountIds < ActiveRecord::Migration
+class FixConversationRootAccountIds < ActiveRecord::Migration[4.2]
   tag :postdeploy
   def up
     return if Shard.current == Shard.birth

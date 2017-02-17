@@ -51,7 +51,7 @@ describe Api::V1::ContextModule do
 
     before do
       course_with_teacher(account: Account.default)
-      course_with_student_logged_in(course: @course)
+      course_with_student(course: @course)
 
       @cm = ContextModule.new(context: @course)
       @cm.prerequisites = {:type=>"context_module", :name=>'test', :id=>1}

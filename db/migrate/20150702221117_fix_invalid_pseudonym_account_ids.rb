@@ -1,4 +1,4 @@
-class FixInvalidPseudonymAccountIds < ActiveRecord::Migration
+class FixInvalidPseudonymAccountIds < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

@@ -1,4 +1,4 @@
-class AddAnnouncementCreatedNotification < ActiveRecord::Migration
+class AddAnnouncementCreatedNotification < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

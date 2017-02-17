@@ -26,10 +26,11 @@ class CalendarEvent < ActiveRecord::Base
   include CopyAuthorizedLinks
   include TextHelper
   include HtmlTextHelper
-  attr_accessible :title, :description, :start_at, :end_at, :location_name,
-      :location_address, :time_zone_edited, :cancel_reason,
-      :participants_per_appointment, :child_event_data,
-      :remove_child_events, :all_day, :comments
+
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:title, :description]
+  restrict_columns :settings, [:location_name, :location_address, :start_at, :end_at, :all_day, :all_day_date]
+
   attr_accessor :cancel_reason, :imported
 
   sanitize_field :description, CanvasSanitize::SANITIZE
@@ -37,6 +38,12 @@ class CalendarEvent < ActiveRecord::Base
 
   include Workflow
 
+  PERMITTED_ATTRIBUTES = [:title, :description, :start_at, :end_at, :location_name,
+    :location_address, :time_zone_edited, :cancel_reason, :participants_per_appointment,
+    :remove_child_events, :all_day, :comments].freeze
+  def self.permitted_attributes
+    PERMITTED_ATTRIBUTES
+  end
 
   belongs_to :context, polymorphic: [:course, :user, :group, :appointment_group, :course_section],
              polymorphic_prefix: true

@@ -9,6 +9,7 @@ describe "discussions" do
   let(:teacher) { teacher_in_course(course: course, name: 'teacher', active_all: true).user }
   let(:somebody) { student_in_course(course: course, name: 'somebody', active_all: true).user }
   let(:somebody_topic) { course.discussion_topics.create!(user: somebody, title: 'somebody topic title', message: 'somebody topic message') }
+  let(:group_topic) { group_discussion_assignment }
   let(:assignment_group) { course.assignment_groups.create!(name: 'assignment group') }
   let(:entry) { topic.discussion_entries.create!(user: teacher, message: 'teacher entry') }
 
@@ -105,6 +106,12 @@ describe "discussions" do
         get url
         expect(f('.new-items').text).to eq '1'
         expect(f('.total-items').text).to eq '1'
+      end
+
+      it "hides unread count for group discussions" do
+        group_topic
+        get url
+        expect(f(".discussion-unread-status").text).to eq ''
       end
 
       describe 'filtering' do

@@ -1,4 +1,4 @@
-class CreateAccountNotificationRoles < ActiveRecord::Migration
+class CreateAccountNotificationRoles < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

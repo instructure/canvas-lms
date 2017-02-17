@@ -8,8 +8,6 @@ define([
   'compiled/jquery.rails_flash_notifications'
 ], function($, React, ReactModal, I18n, CourseNicknameEdit, classnames) {
 
-  const ReactCSSTransitionGroup = React.addons.CSSTransitionGroup
-
   var PREDEFINED_COLORS = [
     {hexcode: '#EF4437', name: I18n.t('Red')},
     {hexcode: '#E71F63', name: I18n.t('Pink')},
@@ -144,16 +142,21 @@ define([
           success: () => {
             this.props.afterUpdateColor(color);
           },
-          error: () => {
-            console.log('Error setting color');
-          }
+          error: () => {}
         });
       }
     },
 
     isValidHex (color) {
-      var re = /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-      return (re.test(color));
+      // prevent selection of white (#fff or #ffffff)
+      const whiteHexRe = /^#?([fF]{3}|[fF]{6})$/;
+      if (whiteHexRe.test(color)) {
+        return false;
+      }
+
+      // ensure hex is valid
+      const validHexRe = /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+      return (validHexRe.test(color));
     },
 
     setCourseNickname() {

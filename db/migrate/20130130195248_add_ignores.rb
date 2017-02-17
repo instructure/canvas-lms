@@ -1,4 +1,4 @@
-class AddIgnores < ActiveRecord::Migration
+class AddIgnores < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

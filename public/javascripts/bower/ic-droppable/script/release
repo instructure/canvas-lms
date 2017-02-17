@@ -1,7 +1,0 @@
-#!/bin/sh
-echo "# running script/release"
-script/build
-rm -rf bower_components
-node_modules/.bin/bower install
-node_modules/.bin/release
-

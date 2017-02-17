@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*"]
   s.test_files = Dir["spec_canvas/**/*"]
 
-  s.add_dependency "rails",             ">= 3.2", "< 4.3"
+  s.add_dependency "rails",             ">= 3.2", "< 5.1"
   s.add_dependency "soap4r-middleware", "0.8.3"
   # in spite of the name, this fork of soap4r works with all rubies
   s.add_dependency "soap4r-ruby1.9",    "2.0.0"

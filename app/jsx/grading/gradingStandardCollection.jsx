@@ -1,13 +1,13 @@
 define([
   'react',
+  'react-addons-update',
   'jsx/grading/gradingStandard',
   'jquery',
   'i18n!external_tools',
   'underscore',
   'jquery.instructure_misc_plugins'
 ],
-function(React, GradingStandard, $, I18n, _) {
-  var update = React.addons.update;
+function(React, update, GradingStandard, $, I18n, _) {
   var GradingStandardCollection = React.createClass({
 
     getInitialState: function() {

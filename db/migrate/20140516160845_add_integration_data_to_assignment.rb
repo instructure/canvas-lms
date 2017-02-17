@@ -1,4 +1,4 @@
-class AddIntegrationDataToAssignment < ActiveRecord::Migration
+class AddIntegrationDataToAssignment < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

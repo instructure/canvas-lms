@@ -1,4 +1,4 @@
-class AddUniqueIndexToDiscussionTopics < ActiveRecord::Migration
+class AddUniqueIndexToDiscussionTopics < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

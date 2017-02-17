@@ -2,7 +2,7 @@ define([
   'jsx/calendar/scheduler/reducer'
 ], (reducer) => {
 
-  module('Scheduler Reducer');
+  QUnit.module('Scheduler Reducer');
 
   test('sets inFindAppointmentMode on SET_FIND_APPOINTMENT_MODE', () => {
 

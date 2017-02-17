@@ -1,4 +1,4 @@
-class AddUploadErrorCodeToAttachments < ActiveRecord::Migration
+class AddUploadErrorCodeToAttachments < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -1,4 +1,4 @@
-class AddMetadataUriToAuthenticationProviders < ActiveRecord::Migration
+class AddMetadataUriToAuthenticationProviders < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

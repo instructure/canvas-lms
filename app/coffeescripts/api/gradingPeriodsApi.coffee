@@ -18,8 +18,8 @@ define [
       }
     grading_periods: serialized
 
-  deserializePeriods = (data) ->
-    _.map data.grading_periods, (period) ->
+  deserializePeriods: (periods) ->
+    _.map periods, (period) ->
       {
         id: period.id
         title: period.title
@@ -28,13 +28,15 @@ define [
         # TODO: After the close_date data fixup has run, this can become:
         # `closeDate: new Date(period.close_date)`
         closeDate: new Date(period.close_date || period.end_date)
+        isLast: period.is_last
+        isClosed: period.is_closed
       }
 
   batchUpdate: (setId, periods) ->
     promise = new Promise (resolve, reject) =>
       axios.patch(batchUpdateUrl(setId), serializePeriods(periods))
-           .then (response) ->
-             resolve(deserializePeriods(response.data))
+           .then (response) =>
+             resolve(@deserializePeriods(response.data.grading_periods))
            .catch (error) ->
              reject(error)
     promise

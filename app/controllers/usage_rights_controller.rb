@@ -82,7 +82,7 @@
 class UsageRightsController < ApplicationController
   include Api::V1::UsageRights
 
-  before_filter :require_context
+  before_action :require_context
 
   # @API Set usage rights
   # Sets copyright and license information for one or more files
@@ -112,7 +112,7 @@ class UsageRightsController < ApplicationController
       return render json: { message: I18n.t("Must supply 'file_ids' and/or 'folder_ids' parameter") }, status: :bad_request unless params[:file_ids].present? || params[:folder_ids].present?
       return render json: { message: I18n.t("No 'usage_rights' object supplied") }, status: :bad_request unless params[:usage_rights].is_a?(Hash)
 
-      usage_rights_params = params[:usage_rights].slice(:use_justification, :legal_copyright, :license)
+      usage_rights_params = params.require(:usage_rights).permit(:use_justification, :legal_copyright, :license)
       usage_rights = @context.usage_rights.where(usage_rights_params).first
       usage_rights ||= @context.usage_rights.create(usage_rights_params)
       return render json: usage_rights.errors, status: :bad_request unless usage_rights && usage_rights.valid?

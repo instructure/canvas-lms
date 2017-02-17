@@ -293,7 +293,7 @@ define([
       }
 
       return (
-        <div id="main">
+        <div id="main" className="ic-Layout-columns">
           { this.props.useHighContrast &&
             <div role="alert" className="ic-flash-static ic-flash-error">
               <h4 className="ic-flash__headline">

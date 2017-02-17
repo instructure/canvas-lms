@@ -7,7 +7,7 @@ describe "course catalog" do
     "/search/all_courses"
   end
 
-  def get_catalog
+  def visit_catalog
     get catalog_url
     wait_for_ajaximations
   end
@@ -18,32 +18,38 @@ describe "course catalog" do
 
   def catalog_setup
     Account.default.enable_feature!(:course_catalog)
-    @public_course = course
-    @public_course.attributes = {
+    # create_courses factory returns id's of courses unless you specify return_type
+    create_courses([ public_indexed_course_attrs ], {return_type: :record}).first
+  end
+
+  def public_indexed_course_attrs
+     {
       name: 'Intro to Testing',
       public_description: 'An overview of testing with Selenium',
       is_public: true,
       indexed: true,
       self_enrollment: true,
+      workflow_state: 'available'
     }
-    @public_course.workflow_state = 'available'
-    @public_course.save!
-    @private_course = course
   end
 
   before do
     catalog_setup
-    get_catalog
+    visit_catalog
   end
 
   it "should list indexed courses" do
-    courses = course_elements
-    expect(courses.size).to eql 1
+    expect(course_elements.size).to eql 1
   end
 
   it "should work without course catalog" do
     Account.default.disable_feature!(:course_catalog)
-    courses = course_elements
-    expect(courses.size).to eql 1
+    expect(course_elements.size).to eql 1
+  end
+
+  it "should list a next button when >12 courses are in the index and public", priority: "1", test_id: 2963672 do
+      create_courses(13.times.map{ |i| public_indexed_course_attrs.merge(name: "#{i}") })
+      refresh_page
+      expect(f('#next-link').displayed?).to be(true)
   end
 end

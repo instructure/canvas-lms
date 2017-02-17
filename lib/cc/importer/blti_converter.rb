@@ -22,7 +22,7 @@ module CC::Importer
   class BLTIConverter
     class CCImportError < Exception; end
     include CC::Importer
-    
+
     def get_blti_resources(manifest)
       blti_resources = []
 
@@ -53,14 +53,14 @@ module CC::Importer
           tool = convert_blti_link(doc)
           tool[:migration_id] = res[:migration_id]
           res[:url] = tool[:url] # for the organization item to reference
-          
+
           tools << tool
         end
       end
 
       tools
     end
-    
+
     def convert_blti_link(doc)
       blti = get_blti_namespace(doc)
       blti = nil unless doc.namespaces["xmlns:#{blti}"]
@@ -70,6 +70,7 @@ module CC::Importer
       tool[:title] = get_node_val(doc, "#{link_css_path} > #{blti}|title")
       tool[:url] = get_node_val(doc, "#{link_css_path} > #{blti}|secure_launch_url")
       tool[:url] ||= get_node_val(doc, "#{link_css_path} > #{blti}|launch_url")
+      tool[:url] &&= tool[:url].strip
       if custom_node = doc.css("#{link_css_path} > #{blti}|custom").first
         tool[:custom_fields] = get_custom_properties(custom_node)
       end
@@ -80,7 +81,7 @@ module CC::Importer
         ext = {}
         ext[:platform] = extension['platform']
         ext[:custom_fields] = get_custom_properties(extension)
-        
+
         if ext[:platform] == CANVAS_PLATFORM
           tool[:privacy_level] = ext[:custom_fields].delete 'privacy_level'
           tool[:not_selectable] = ext[:custom_fields].delete 'not_selectable'
@@ -102,7 +103,7 @@ module CC::Importer
       end
       tool
     end
-    
+
     def convert_blti_xml(xml)
       doc = create_xml_doc(xml)
       if !doc.namespaces.to_s.downcase.include? 'imsglobal'
@@ -163,13 +164,13 @@ module CC::Importer
         raise CCImportError.new(I18n.t(:retrieve_timeout, "could not retrieve configuration, the server response timed out"))
       end
     end
-    
+
     def get_custom_properties(node)
       props = {}
       node.children.each do |property|
         next if property.name == 'text'
         if property.name == 'property'
-          props[property['name']] = property.text
+          props[property['name']] = property.text.strip
         elsif property.name == 'options'
           props[property['name']] = get_custom_properties(property)
         elsif property.name == 'custom'
@@ -178,7 +179,7 @@ module CC::Importer
       end
       props
     end
-    
+
     def get_blti_namespace(doc)
       doc.namespaces.each_pair do |key, val|
         if val == BLTI_NAMESPACE

@@ -327,7 +327,7 @@ describe CourseSection, "moving to new course" do
   describe 'deletable?' do
     before :once do
       course_with_teacher
-      @section = course.course_sections.create!
+      @section = @course.course_sections.create!
     end
 
     it 'should be deletable if empty' do
@@ -388,9 +388,9 @@ describe CourseSection, "moving to new course" do
 
   context 'enrollment state invalidation' do
     before :once do
-      course(:active_all => true)
+      course_factory(active_all: true)
       @section = @course.course_sections.create!
-      @enrollment = @course.enroll_student(user(:active_all => true), :section => @section)
+      @enrollment = @course.enroll_student(user_factory(:active_all => true), :section => @section)
     end
 
     it "should not invalidate unless something date-related changes" do
@@ -414,7 +414,7 @@ describe CourseSection, "moving to new course" do
     end
 
     it "should invalidate if course" do
-      other_course = course(:active_all => true)
+      other_course = course_factory(active_all: true)
       EnrollmentState.expects(:update_enrollment).with(@enrollment).once
       @section.crosslist_to_course(other_course)
     end

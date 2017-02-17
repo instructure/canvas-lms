@@ -56,7 +56,7 @@ define [
     view.$el.appendTo fixtures
     view.render()
 
-  module 'IndexView',
+  QUnit.module 'IndexView',
     setup: ->
       fixtures = $("#fixtures")
       fakeENV.setup()

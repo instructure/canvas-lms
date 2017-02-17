@@ -6,7 +6,7 @@ define([
 
   const container = document.getElementById('fixtures')
 
-  module('<CustomHelpLinkSettings/>', {
+  QUnit.module('<CustomHelpLinkSettings/>', {
     render(overrides={}) {
       const props = {
         name: 'Help',
@@ -48,5 +48,30 @@ define([
   test('render()', function () {
     const subject = this.render()
     ok(ReactDOM.findDOMNode(subject))
+  })
+
+  test('accepts properly formatted urls', function () {
+    const subject = this.render()
+
+    let link = {
+      text: 'test link',
+      available_to: ['user', 'student', 'teacher', 'admin'],
+      url: ''
+    }
+
+    link.url = 'http://testurl.com'
+    ok(subject.validate(link))
+
+    link.url = 'https://testurl.com'
+    ok(subject.validate(link))
+
+    link.url = 'ftp://test.url/.test'
+    ok(subject.validate(link))
+
+    link.url = 'tel:1-999-999-9999'
+    ok(subject.validate(link))
+
+    link.url = 'mailto:test@test.com'
+    ok(subject.validate(link))
   })
 })

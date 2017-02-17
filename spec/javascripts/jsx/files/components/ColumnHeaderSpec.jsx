@@ -1,11 +1,10 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/files/ColumnHeaders'
-], (React, ColumnHeaders) => {
+], (React, TestUtils, ColumnHeaders) => {
 
-  const { TestUtils } = React.addons;
-
-  module('ColumnHeaders');
+  QUnit.module('ColumnHeaders');
 
   test('`queryParamsFor` returns correct values', () => {
     const SORT_UPDATED_AT_DESC = {sort: 'updated_at', order: 'desc'};

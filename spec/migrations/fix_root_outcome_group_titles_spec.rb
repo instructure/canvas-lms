@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe DataFixup::FixRootOutcomeGroupTitles do
   it 'should replace old ROOT names of outcome groups' do
     # set up data
-    course(:active_all => true, :name => 'Test course')
+    course_factory(active_all: true, :name => 'Test course')
     @course.learning_outcome_groups.create!(:title => 'ROOT')
     @course.account.learning_outcome_groups.create!(:title => 'ROOT')
 

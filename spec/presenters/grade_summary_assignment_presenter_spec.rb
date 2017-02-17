@@ -18,20 +18,55 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe GradeSummaryAssignmentPresenter do
+  before :each do
+    attachment_model
+    course_factory(active_all: true)
+    student_in_course active_all: true
+    teacher_in_course active_all: true
+    @assignment = @course.assignments.create!(title: "some assignment",
+                                                assignment_group: @group,
+                                                points_possible: 12,
+                                                tool_settings_tool: @tool)
+    @attachment.context = @student
+    @attachment.save!
+    @submission = @assignment.submit_homework(@student, attachments: [@attachment])
+  end
+
   let(:summary) {
     GradeSummaryPresenter.new :first, :second, :third
   }
 
-  let(:assignment) {
-    Assignment.new
-  }
-
   let(:presenter) {
     GradeSummaryAssignmentPresenter.new(summary,
-                                        :current_user,
-                                        assignment,
-                                        :submission)
+                                        @student,
+                                        @assignment,
+                                        @submission)
   }
+
+  context '#is_plagiarism_attachment?' do
+    it 'returns true if the attachment has an OriginalityReport' do
+      OriginalityReport.create(originality_score: 0.8,
+                               attachment: @attachment,
+                               submission: @submission,
+                               workflow_state: 'pending')
+
+      expect(presenter.is_plagiarism_attachment?(@attachment)).to be_truthy
+    end
+  end
+
+  context '#originality_report' do
+    it 'returns true when an originality report exists' do
+      report = OriginalityReport.create(originality_score: 0.8,
+                                        attachment: @attachment,
+                                        submission: @submission,
+                                        workflow_state: 'pending')
+      expect(presenter.originality_report?).to be_truthy
+    end
+
+    it 'returns false if no originailty report exists' do
+      expect(presenter.originality_report?).not_to be_truthy
+    end
+  end
 
   context "#grade_distribution" do
     context "when a summary's assignment_stats is empty" do

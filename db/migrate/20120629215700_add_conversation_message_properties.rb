@@ -1,4 +1,4 @@
-class AddConversationMessageProperties < ActiveRecord::Migration
+class AddConversationMessageProperties < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -76,7 +76,7 @@ describe PseudonymsController do
     describe "forgot password" do
       before :once do
         Notification.create(:name => 'Forgot Password')
-        user
+        user_factory
       end
 
       it "should send password-change email for a registered user" do
@@ -376,7 +376,6 @@ describe PseudonymsController do
       post 'update', :format => 'json', :id => @pseudonym1.id, :user_id => @user1.id, :pseudonym => { :integration_id => 'sis2' }
       expect(response).to be_success
       expect(@pseudonym1.reload.integration_id).to eq 'sis2'
-
     end
 
     it "should be able to change unique_id with permission" do
@@ -434,6 +433,27 @@ describe PseudonymsController do
       expect(bob.pseudonym.unique_id).to eq 'old_username'
       expect(bob.pseudonym).to be_valid_password('new_password')
     end
+
+    it "should return an error message when trying to duplicate a sis id" do
+      user_with_pseudonym(:active_all => 1, :username => 'user@example.com', :password => 'qwertyuiop')
+      @user1 = @user
+      @pseudonym1 = @pseudonym
+      @pseudonym1.update_attribute(:sis_user_id, "sis_user")
+
+      user_with_pseudonym(:active_all => 1, :username => 'user2@example.com', :password => 'qwertyuiop')
+      @user2 = @user
+      @pseudonym2 = @pseudonym
+
+      user_with_pseudonym(:active_all => 1, :username => 'admin@example.com', :password => 'qwertyuiop')
+      account_admin_user(user: @user)
+      user_session(@user, @pseudonym)
+
+      post 'update', :format => 'json', :id => @pseudonym2.id, :user_id => @user2.id, :pseudonym => { :sis_user_id => 'sis_user' }
+      expect(response).to be_bad_request
+      res = JSON.parse(response.body)
+      expect(res["errors"]["sis_user_id"][0]["type"]).to eq "taken"
+      expect(res["errors"]["sis_user_id"][0]["message"]).to match(/is already in use/)
+    end
   end
 
   context "sharding" do
@@ -462,7 +482,7 @@ describe PseudonymsController do
 
         get 'index', :format => 'json', :user_id => @user.id
         expect(response).to be_success
-        expect(assigns['pseudonyms']).to eq [@p1, @p2]
+        expect(assigns['pseudonyms']).to match_array [@p1, @p2]
       end
     end
 

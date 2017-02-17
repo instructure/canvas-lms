@@ -5,7 +5,7 @@ describe "gradebook uploads" do
 
   before do
     course_with_teacher_logged_in(:active_all => 1, :username => 'teacher@example.com')
-    @student = user(:username => 'student@example.com', :active_all => 1)
+    @student = user_factory(:username => 'student@example.com', :active_all => 1)
     @course.enroll_student(@student).accept!
 
     get "/courses/#{@course.id}/gradebook_uploads/new"
@@ -30,7 +30,7 @@ describe "gradebook uploads" do
   it "should correctly update grades for assignments with GPA Scale grading type",priority: "1", test_id: 209969 do
     assignment = @course.assignments.create!(:title => "GPA Scale Assignment",
       :grading_type => "gpa_scale", :points_possible => 5)
-    assignment.grade_student(@student, :grade => "D")
+    assignment.grade_student(@student, grade: "D", grader: @teacher)
     filename, fullpath, data = gradebook_file("gradebook0.csv",
       "Student Name,ID,Section,GPA Scale Assignment",
       "User,#{@student.id},,B-")
@@ -48,7 +48,7 @@ describe "gradebook uploads" do
 
   it "should say no changes if no changes", priority: "1", test_id: 209970 do
     assignment = @course.assignments.create!(:title => "Assignment 1")
-    assignment.grade_student(@student, :grade => 10)
+    assignment.grade_student(@student, grade: 10, grader: @teacher)
 
     filename, fullpath, data = gradebook_file("gradebook1.csv",
           "Student Name,ID,Section,Assignment 1",
@@ -63,11 +63,11 @@ describe "gradebook uploads" do
 
   it "should show only changed assignment", priority: "1", test_id: 209972 do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
-    assignment1.grade_student(@student, :grade => 10)
+    assignment1.grade_student(@student, grade: 10, grader: @teacher)
     assignment2 = @course.assignments.create!(:title => "Assignment 2")
-    assignment2.grade_student(@student, :grade => 10)
+    assignment2.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook2.csv",
+    filename, fullpath, data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1,Assignment 2",
           "User,#{@student.id},,10,9")
     @upload_element.send_keys(fullpath)
@@ -120,9 +120,9 @@ describe "gradebook uploads" do
 
   it "should create an assignment with no grades", priority: "1", test_id: 209971 do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
-    assignment1.grade_student(@student, :grade => 10)
+    assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
-    _filename, fullpath, _data = gradebook_file("gradebook2.csv",
+    _filename, fullpath, _data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 2,Assignment 1",
           "User,#{@student.id},,,10")
     @upload_element.send_keys(fullpath)
@@ -156,7 +156,7 @@ describe "gradebook uploads" do
 
   it "should say no changes if no changes after matching assignment" do
     assignment = @course.assignments.create!(:title => "Assignment 1")
-    assignment.grade_student(@student, :grade => 10)
+    assignment.grade_student(@student, grade: 10, grader: @teacher)
 
     filename, fullpath, data = gradebook_file("gradebook4.csv",
           "Student Name,ID,Section,Assignment 2",
@@ -181,9 +181,9 @@ describe "gradebook uploads" do
 
   it "should show assignment with changes after matching assignment", priority: "1", test_id: 209977 do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
-    assignment1.grade_student(@student, :grade => 10)
+    assignment1.grade_student(@student, grade: 10, grader: @teacher)
     assignment2 = @course.assignments.create!(:title => "Assignment 2")
-    assignment2.grade_student(@student, :grade => 10)
+    assignment2.grade_student(@student, grade: 10, grader: @teacher)
 
     filename, fullpath, data = gradebook_file("gradebook5.csv",
           "Student Name,ID,Section,Assignment 1,Assignment 3",
@@ -212,7 +212,7 @@ describe "gradebook uploads" do
 
   it "should say no changes after matching student", priority: "1", test_id: 209978  do
     assignment = @course.assignments.create!(:title => "Assignment 1")
-    assignment.grade_student(@student, :grade => 10)
+    assignment.grade_student(@student, grade: 10, grader: @teacher)
 
     filename, fullpath, data = gradebook_file("gradebook6.csv",
           "Student Name,ID,Section,Assignment 1",
@@ -237,9 +237,9 @@ describe "gradebook uploads" do
 
   it "should show assignment with changes after matching student", priority: "1", test_id: 209979 do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
-    assignment1.grade_student(@student, :grade => 10)
+    assignment1.grade_student(@student, grade: 10, grader: @teacher)
     assignment2 = @course.assignments.create!(:title => "Assignment 2")
-    assignment2.grade_student(@student, :grade => 10)
+    assignment2.grade_student(@student, grade: 10, grader: @teacher)
 
     filename, fullpath, data = gradebook_file("gradebook7.csv",
           "Student Name,ID,Section,Assignment 1,Assignment 2",
@@ -267,9 +267,9 @@ describe "gradebook uploads" do
 
   it "should highlight scores if the original grade is more than the new grade", priority: "1", test_id: 209981 do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
-    assignment1.grade_student(@student, :grade => 10)
+    assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook2.csv",
+    filename, fullpath, data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,9")
 
@@ -284,9 +284,9 @@ describe "gradebook uploads" do
 
   it "should highlight scores if the original grade is replaced by empty grade", priority: "1", test_id: 209982 do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
-    assignment1.grade_student(@student, :grade => 10)
+    assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook2.csv",
+    filename, fullpath, data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,")
 
@@ -301,9 +301,9 @@ describe "gradebook uploads" do
 
   it "should not highlight scores if the original grade is less than the new grade", priority: "1", test_id: 209983 do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
-    assignment1.grade_student(@student, :grade => 10)
+    assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook2.csv",
+    filename, fullpath, data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,100")
 
@@ -318,9 +318,9 @@ describe "gradebook uploads" do
 
   it "should not highlight scores if the assignment is excused", priority: "1", test_id: 209983 do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
-    assignment1.grade_student(@student, :grade => 10)
+    assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook2.csv",
+    filename, fullpath, data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,EX")
 

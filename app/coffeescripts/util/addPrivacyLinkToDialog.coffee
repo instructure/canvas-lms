@@ -1,6 +1,7 @@
 define [
+  'jquery'
   'i18n!site'
-], (I18n) ->
+], ($, I18n) ->
 
   addPrivacyLinkToDialog = ($dialog) ->
     return unless ENV.ACCOUNT.privacy_policy_url

@@ -5,9 +5,10 @@ module Lti
 
     TCP_UUID = "339b6700-e4cb-47c5-a54f-3ee0064921a9".freeze # Hard coded until we start persisting the tcp
 
+    ORIGINALITY_REPORT_SERVICE = 'vnd.Canvas.OriginalityReport'.freeze
+
     CAPABILITIES = %w(
           basic-lti-launch-request
-          User.id
           Canvas.api.domain
           LtiLink.custom.url
           ToolProxyBinding.custom.url
@@ -17,24 +18,28 @@ module Lti
           Canvas.placements.assignmentSelection
           Canvas.placements.linkSelection
           Canvas.placements.postGrades
+          Canvas.placements.similarityDetection
           User.username
-          Person.email.primary
-          Person.name.given
-          Person.name.family
-          Person.name.full
-          CourseSection.sourcedId
-          Person.sourcedId
-          Membership.role
+          vnd.Canvas.Person.email.sis
           ToolConsumerProfile.url
-          OAuth.splitSecret
-          Context.id
-        ).freeze
+          Security.splitSecret
+        ).concat(CapabilitiesHelper.supported_capabilities).freeze
+
+    RESTRICTED_CAPABILITIES = %W(
+      #{ORIGINALITY_REPORT_SERVICE}.url
+    ).freeze
 
     SERVICES = [
       {
         id: 'ToolProxy.collection',
         endpoint: ->(context) { "api/lti/#{context.class.name.downcase}s/#{context.id}/tool_proxy" },
         format: ['application/vnd.ims.lti.v2.toolproxy+json'],
+        action: ['POST']
+      },
+      {
+        id: 'vnd.Canvas.authorization',
+        endpoint: ->(context) { "api/lti/authorize" },
+        format: ['application/json'],
         action: ['POST']
       },
       {
@@ -63,6 +68,15 @@ module Lti
       },
     ]
 
+    RESTRICTED_SERVICES = [
+      {
+        id: ORIGINALITY_REPORT_SERVICE,
+        endpoint: 'api/v1/assignments/{assignment_id}/submissions/{submission_id}/originality_report',
+        format: ['application/json'],
+        action: ['POST', 'PUT', 'GET']
+      }
+    ].freeze
+
     def initialize(context, tcp_url)
       @context = context
       @tcp_url = tcp_url
@@ -72,13 +86,14 @@ module Lti
       @scheme = uri.scheme
     end
 
-    def create
+    def create(developer_credentials = false)
       profile = IMS::LTI::Models::ToolConsumerProfile.new
       profile.id = @tcp_url
       profile.lti_version = IMS::LTI::Models::ToolConsumerProfile::LTI_VERSION_2P1
       profile.product_instance = create_product_instance
-      profile.service_offered = services
+      profile.service_offered = services(developer_credentials)
       profile.capability_offered = CAPABILITIES.dup
+      profile.capability_offered += RESTRICTED_CAPABILITIES.dup if developer_credentials
       profile.guid = TCP_UUID
 
       if @root_account.feature_enabled?(:lti2_rereg)
@@ -128,9 +143,11 @@ module Lti
       service_owner
     end
 
-    def services
+    def services(developer_credentials = false)
       endpoint_slug = "#{@scheme}://#{@domain}/"
-      SERVICES.map do |service|
+      authorized_services = SERVICES
+      authorized_services += RESTRICTED_SERVICES if developer_credentials
+      authorized_services.map do |service|
         endpoint = service[:endpoint].respond_to?(:call) ? service[:endpoint].call(@context) : service[:endpoint]
         reg_srv = IMS::LTI::Models::RestService.new
         reg_srv.id = "#{@tcp_url}##{service[:id]}"

@@ -12,13 +12,13 @@ define [
     window.ENV.ASSET_HOST = 'http://cdn.example.com'
     window.ENV.use_high_contrast = true
 
-  module 'brandableCss.loadStylesheet'
+  QUnit.module 'brandableCss.loadStylesheet'
   test 'should load correctly', ->
     brandableCss.loadStylesheet(testBundleId, {combinedChecksum: testFingerprint})
     expectedHref = "#{window.ENV.ASSET_HOST || ''}/dist/brandable_css/new_styles_normal_contrast/#{testBundleId}-#{testFingerprint}.css"
     equal $('head link[rel="stylesheet"]:last').attr('href'), expectedHref
 
-  module 'brandableCss.getCssVariant'
+  QUnit.module 'brandableCss.getCssVariant'
   test 'should be new_styles_normal_contrast by default', ->
     equal brandableCss.getCssVariant(), 'new_styles_normal_contrast'
 
@@ -26,7 +26,7 @@ define [
     stubENV()
     equal brandableCss.getCssVariant(), 'new_styles_high_contrast'
 
-  module 'brandableCss.urlFor'
+  QUnit.module 'brandableCss.urlFor'
   test 'should have right default', ->
     window.ENV = {}
     expected = "/dist/brandable_css/new_styles_normal_contrast/#{testBundleId}-#{testFingerprint}.css"

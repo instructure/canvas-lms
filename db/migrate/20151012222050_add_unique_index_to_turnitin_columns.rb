@@ -1,4 +1,4 @@
-class AddUniqueIndexToTurnitinColumns < ActiveRecord::Migration
+class AddUniqueIndexToTurnitinColumns < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 

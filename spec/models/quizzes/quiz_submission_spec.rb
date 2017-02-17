@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe Quizzes::QuizSubmission do
   context 'with course and quiz' do
     before(:once) do
-      course
+      course_factory
       @quiz = @course.quizzes.create!
     end
 
@@ -38,7 +38,7 @@ describe Quizzes::QuizSubmission do
         qs = Quizzes::QuizSubmission.new
         qs.extra_time = 10081
         expect(qs.valid?).to eq false
-        expect(Array(qs.errors[:extra_time])).to eq ["must be less than or equal to 10080"]
+        expect(Array(qs.errors[:extra_time])).to eq ["must be less than or equal to 10,080"]
       end
 
       it "should validate numericality of extra attempts" do
@@ -52,14 +52,14 @@ describe Quizzes::QuizSubmission do
         qs = Quizzes::QuizSubmission.new
         qs.extra_attempts = 1001
         expect(qs.valid?).to eq false
-        expect(Array(qs.errors[:extra_attempts])).to eq ["must be less than or equal to 1000"]
+        expect(Array(qs.errors[:extra_attempts])).to eq ["must be less than or equal to 1,000"]
       end
 
       it "should validate quiz points possible is not too long" do
         qs = Quizzes::QuizSubmission.new
         qs.quiz = Quizzes::Quiz.new(:points_possible => 2000000001)
         expect(qs.valid?).to eq false
-        expect(Array(qs.errors[:quiz_points_possible])).to eq ["must be less than or equal to 2000000000"]
+        expect(Array(qs.errors[:quiz_points_possible])).to eq ["must be less than or equal to 2,000,000,000"]
       end
     end
 
@@ -137,7 +137,7 @@ describe Quizzes::QuizSubmission do
     describe "#update_scores" do
       before(:once) do
         student_in_course
-        assignment_quiz([])
+        assignment_quiz([], course: @course)
         qd = multiple_choice_question_data
         @quiz.quiz_data = [qd]
         @quiz.points_possible = qd[:points_possible]
@@ -278,7 +278,7 @@ describe Quizzes::QuizSubmission do
 
         @quiz.publish!
 
-        quiz_submission = @quiz.generate_submission(user)
+        quiz_submission = @quiz.generate_submission(user_factory)
         quiz_submission.backup_submission_data({
           "question_#{qq1.id}" => "1",
           "question_#{qq2.id}" => "",
@@ -298,7 +298,7 @@ describe Quizzes::QuizSubmission do
 
           true_answer = question.question_data['answers'].find { |answer| answer['text'] == 'True' }
           false_answer = question.question_data['answers'].find { |answer| answer['text'] == 'False' }
-          quiz_submission = @quiz.generate_submission(user)
+          quiz_submission = @quiz.generate_submission(user_factory)
           quiz_submission.backup_submission_data({
             "question_#{question.id}" => true_answer['id'],
             :"_question_#{question.id}_read" => true
@@ -336,10 +336,11 @@ describe Quizzes::QuizSubmission do
     context "explicitly setting grade" do
 
       before(:once) do
-        course_with_student
+        course_with_teacher
+        course_with_student(course: @course)
         @quiz = @course.quizzes.create!
         @quiz.generate_quiz_data
-        @quiz.published_at = Time.now
+        @quiz.published_at = Time.zone.now
         @quiz.workflow_state = 'available'
         @quiz.scoring_policy = "keep_highest"
         @quiz.save!
@@ -355,7 +356,7 @@ describe Quizzes::QuizSubmission do
       end
 
       it "it should adjust the fudge points" do
-        @assignment.grade_student(@user, {:grade => 3})
+        @assignment.grade_student(@user, grade: 3, grader: @teacher)
 
         @quiz_sub.reload
         expect(@quiz_sub.score).to eq 3
@@ -381,7 +382,7 @@ describe Quizzes::QuizSubmission do
         expect(@submission.score).to eq 5
         expect(@submission.grade).to eq "5"
 
-        @assignment.grade_student(@user, {:grade => 3})
+        @assignment.grade_student(@user, grade: 3, grader: @teacher)
         @quiz_sub.reload
         expect(@quiz_sub.score).to eq 3
         expect(@quiz_sub.kept_score).to eq 3
@@ -396,7 +397,7 @@ describe Quizzes::QuizSubmission do
         @quiz_sub.score = 4.0
         @quiz_sub.attempt = 2
         @quiz_sub.with_versioning(true, &:save!)
-        @assignment.grade_student(@user, {:grade => 3})
+        @assignment.grade_student(@user, grade: 3, grader: @teacher)
         @quiz_sub.reload
         expect(@quiz_sub.manually_scored).to be_truthy
 
@@ -412,11 +413,11 @@ describe Quizzes::QuizSubmission do
       end
 
       it "should add a version to the submission" do
-        @assignment.grade_student(@user, {:grade => 3})
+        @assignment.grade_student(@user, grade: 3, grader: @teacher)
         @submission.reload
         expect(@submission.versions.count).to eq 2
         expect(@submission.score).to eq 3
-        @assignment.grade_student(@user, {:grade => 6})
+        @assignment.grade_student(@user, grade: 6, grader: @teacher)
         @submission.reload
         expect(@submission.versions.count).to eq 3
         expect(@submission.score).to eq 6
@@ -427,7 +428,7 @@ describe Quizzes::QuizSubmission do
         @quiz_sub.attempt = 2
         @quiz_sub.with_versioning(true, &:save!)
         @quiz.generate_submission(@user)
-        @assignment.grade_student(@user, {:grade => 3})
+        @assignment.grade_student(@user, grade: 3, grader: @teacher)
 
         expect(@quiz_sub.reload.score).to be_nil
         expect(@quiz_sub.kept_score).to eq 3
@@ -750,7 +751,7 @@ describe Quizzes::QuizSubmission do
     describe "#score_to_keep" do
       before(:once) do
         student_in_course
-        assignment_quiz([])
+        assignment_quiz([], course: @course)
         qd = multiple_choice_question_data
         @quiz.quiz_data = [qd]
         @quiz.points_possible = qd[:points_possible]
@@ -841,7 +842,7 @@ describe Quizzes::QuizSubmission do
     context "permissions" do
       it "should allow read to observers" do
         course_with_student(:active_all => true)
-        @observer = user
+        @observer = user_factory
         oe = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active')
         oe.update_attribute(:associated_user, @user)
         @quiz = @course.quizzes.create!
@@ -1134,13 +1135,11 @@ describe Quizzes::QuizSubmission do
           s.score = 10
           s.save(:validate => false)
         end
-        expect(submission.version_number).to eq 1
 
         submission.with_versioning(true) do |s|
           s.score = 15
           s.save(:validate => false)
         end
-        expect(submission.version_number).to eq 2
       end
 
       it "updates a previous version given current attributes" do
@@ -1244,7 +1243,7 @@ describe Quizzes::QuizSubmission do
     describe "#needs_grading?" do
       before :once do
         student_in_course
-        assignment_quiz([])
+        assignment_quiz([], course: @course)
         qd = multiple_choice_question_data
         @quiz.quiz_data = [qd]
         @quiz.points_possible = qd[:points_possible]
@@ -1310,7 +1309,7 @@ describe Quizzes::QuizSubmission do
     describe "#needs_grading" do
       before :once do
         student_in_course
-        assignment_quiz([])
+        assignment_quiz([], course: @course)
         qd = multiple_choice_question_data
         @quiz.quiz_data = [qd]
         @quiz.points_possible = qd[:points_possible]
@@ -1342,15 +1341,13 @@ describe Quizzes::QuizSubmission do
     describe "#questions_regraded_since_last_attempt" do
       before :once do
         @quiz = @course.quizzes.create! title: 'Test Quiz'
-        course_with_teacher_logged_in(active_all: true, course: @course)
+        course_with_teacher(active_all: true, course: @course)
 
         @submission = @quiz.quiz_submissions.build
         @submission.workflow_state = "complete"
         @submission.score = 5.0
         @submission.attempt = 1
         @submission.with_versioning(true, &:save!)
-        expect(@submission.version_number).to eql(1)
-        expect(@submission.score).to eql(5.0)
         @submission.save
       end
 
@@ -1486,7 +1483,8 @@ describe Quizzes::QuizSubmission do
 
     describe '#teachers' do
       before(:once) do
-        @quiz_submission = @quiz.quiz_submissions.create!
+        student_in_course(:active_all => true, :course => @course)
+        @quiz_submission = @quiz.quiz_submissions.create!(:user => @student)
         @active_teacher = User.create!
         @active_enrollment = @course.enroll_teacher(@active_teacher)
         @active_enrollment.accept
@@ -1523,6 +1521,14 @@ describe Quizzes::QuizSubmission do
         @active_enrollment.deactivate
         @active_enrollment.reactivate
         expect(@quiz_submission.teachers).to include @active_teacher
+      end
+
+      it "doesn't include section-restricted teachers from other sections" do
+        other_section = @course.course_sections.create!
+        other_teacher = User.create!
+        other_enrollment = @course.enroll_teacher(other_teacher, :section => other_section, :limit_privileges_to_course_section => true)
+        other_enrollment.accept
+        expect(@quiz_submission.teachers).to_not include other_teacher
       end
     end
   end

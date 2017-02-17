@@ -1,4 +1,4 @@
-class AddAssignmentStudentVisibilityView < ActiveRecord::Migration
+class AddAssignmentStudentVisibilityView < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

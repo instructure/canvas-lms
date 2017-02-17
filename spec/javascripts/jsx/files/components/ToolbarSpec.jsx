@@ -1,10 +1,10 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jquery',
   'jsx/files/Toolbar'
-], (React, $, Toolbar) => {
+], (React, TestUtils, $, Toolbar) => {
 
-  const { TestUtils } = React.addons;
   const Folder = require('compiled/models/Folder');
   const File = require('compiled/models/File');
 
@@ -37,7 +37,7 @@ define([
     return true;
   };
 
-  module('Toolbar', {
+  QUnit.module('Toolbar', {
     setup() {
       file = new File({id: 1});
       courseFolder = new Folder({context_type: 'Course', context_id: 1});

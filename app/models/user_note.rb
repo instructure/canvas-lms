@@ -18,7 +18,7 @@
 
 class UserNote < ActiveRecord::Base
   include Workflow
-  attr_accessible :user, :note, :title, :creator
+
   belongs_to :user
   belongs_to :creator, :class_name => 'User', :foreign_key => :created_by_id
 

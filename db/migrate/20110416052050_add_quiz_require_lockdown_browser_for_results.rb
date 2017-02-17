@@ -1,4 +1,4 @@
-class AddQuizRequireLockdownBrowserForResults < ActiveRecord::Migration
+class AddQuizRequireLockdownBrowserForResults < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

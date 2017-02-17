@@ -22,29 +22,34 @@ module Api
   module Html
     class Link
       attr_reader :link
-      def initialize(link_string, host: nil)
-        @link, @host = link_string, host
+      def initialize(link_string, host: nil, port: nil)
+        @link, @host, @port = link_string, host, port
       end
 
       def to_corrected_s
-        return link if is_not_actually_a_link? || should_skip_correction?
-        strip_verifier_params(scope_link_to_context(strip_host(link)))
+        local_link = strip_host(link)
+        return local_link if is_not_actually_a_file_link? || should_skip_correction?
+        strip_verifier_params(scope_link_to_context(local_link))
       end
 
       private
 
       APPLICABLE_CONTEXT_TYPES = ["Course", "Group", "Account"]
       SKIP_CONTEXT_TYPES = ["User"]
-      LINK_REGEX = %r{/files/(\d+)/(?:download|preview)}
+      FILE_LINK_REGEX = %r{/files/(\d+)/(?:download|preview)}
       VERIFIER_REGEX = %r{(\?)verifier=[^&]*&?|&verifier=[^&]*}
 
       def strip_host(link)
         return link if @host.nil?
-        uri = URI.parse(link)
-        if uri.host == @host
-          fragment = "##{uri.fragment}" if uri.fragment
-          "#{uri.request_uri}#{fragment}"
-        else
+        begin
+          uri = URI.parse(link)
+          if uri.host == @host && (uri.port.nil? || uri.port == @port)
+            fragment = "##{uri.fragment}" if uri.fragment
+            "#{uri.request_uri}#{fragment}"
+          else
+            link
+          end
+        rescue URI::InvalidURIError
           link
         end
       end
@@ -71,8 +76,8 @@ module Api
         attachment && SKIP_CONTEXT_TYPES.include?(attachment.context_type)
       end
 
-      def is_not_actually_a_link?
-        !(link =~ LINK_REGEX)
+      def is_not_actually_a_file_link?
+        !(link =~ FILE_LINK_REGEX)
       end
 
       def attachment
@@ -81,7 +86,7 @@ module Api
       end
 
       def attachment_id
-        match = link.match(LINK_REGEX)
+        match = link.match(FILE_LINK_REGEX)
         return nil unless match
         match.captures[0]
       end

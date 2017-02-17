@@ -1,7 +1,8 @@
 module SupportHelpers
   class TurnitinController < ApplicationController
+    include SupportHelpers::ControllerHelpers
 
-    before_filter :require_site_admin
+    before_action :require_site_admin
 
     protect_from_forgery with: :exception
 
@@ -33,18 +34,20 @@ module SupportHelpers
       run_fixer(SupportHelpers::Tii::ExpiredAccountFixer)
     end
 
-    private
-
-    def run_fixer(fixer_klass, *args)
-      params[:after_time] &&= Time.parse(params[:after_time])
-      fixer = fixer_klass.new(@current_user.email, params[:after_time], *args)
-      fixer.send_later_if_production(:monitor_and_fix)
-
-      render text: "Enqueued #{fixer.fixer_name}..."
+    def lti_attachment
+      param_keys = %w[submission_id attachment_id]
+      if (params.keys & param_keys).present?
+        ids = param_keys.map do |key|
+          error = {text:"Missing `#{key}` parameter", status: 400}
+          render error and return unless params[key]
+          params[key].to_i
+        end
+        run_fixer(SupportHelpers::Tii::LtiAttachmentFixer, *ids)
+      else
+        error = {text:"Missing attachment_id and submission_id parameters", status: 400}
+        render error and return
+      end
     end
 
-    def require_site_admin
-      require_site_admin_with_permission(:update)
-    end
   end
 end

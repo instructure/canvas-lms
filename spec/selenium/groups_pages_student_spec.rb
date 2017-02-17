@@ -268,7 +268,7 @@ describe "groups" do
         get files_page
         add_folder
         delete(0, :cog_icon)
-        expect(all_files_folders.count).to eq 0
+        expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
       it "should allow group members to move a folder", priority: "1", test_id: 273632 do
@@ -290,7 +290,7 @@ describe "groups" do
         expect(all_files_folders.count).to eq 1
         # Now try to delete the other one using toolbar menu
         delete(0, :toolbar_menu)
-        expect(all_files_folders.count).to eq 0
+        expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
       it "should allow group members to move a file", priority: "1", test_id: 273633 do
@@ -300,10 +300,18 @@ describe "groups" do
         move_file_to_folder('example.pdf','destination_folder')
       end
 
-      it "should hide the publish cloud" do
+      it "should hide the publish cloud", priority: "1", test_id: 273628 do
         add_test_files
         get files_page
-        expect(f('#content')).to_not contain_css('.btn-link.published-status')
+        expect(f('#content')).not_to contain_css('.btn-link.published-status')
+      end
+
+      it "does not allow group members to restrict access to a file", priority: "1", test_id: 304672 do
+        add_test_files
+        get files_page
+        f('.ef-item-row .ef-date-created-col').click
+        expect(f('.ef-header')).to contain_css('.ef-header__secondary')
+        expect(f('.ef-header__secondary')).not_to contain_css('.btn-restrict')
       end
     end
 
@@ -319,6 +327,21 @@ describe "groups" do
         get conferences_page
         expect(f('.new-conference-btn')).to be_displayed
         verify_no_course_user_access(conferences_page)
+      end
+
+      it "should not allow inviting users with inactive enrollments" do
+        inactive_student = @students.first
+        inactive_student.update_attribute(:name, "inactivee")
+        inactive_student.enrollments.first.deactivate
+        active_student = @students.last
+        active_student.update_attribute(:name, "imsoactive")
+
+        get conferences_page
+        f('.new-conference-btn').click
+        f('.all_users_checkbox').click
+
+        expect(f('#members_list')).to_not include_text(inactive_student.name)
+        expect(f('#members_list')).to include_text(active_student.name)
       end
     end
     #-------------------------------------------------------------------------------------------------------------------
@@ -360,6 +383,15 @@ describe "groups" do
         @students.each do |student|
           expect(users).not_to contain_jqcss("li:contains(#{student.sortable_name}) .icon-user")
         end
+      end
+
+      it 'cannot invite students with inactive enrollments' do
+        inactive_student = @students.first
+        inactive_student.update_attribute(:name, "inactivee")
+        inactive_student.enrollments.first.deactivate
+
+        get collaborations_page
+        expect(f(".available-users")).not_to contain_jqcss("li:contains(#{inactive_student.sortable_name}) .icon-user")
       end
 
       it "should only allow group members to access the group collaborations page", priority: "1", test_id: 319904 do

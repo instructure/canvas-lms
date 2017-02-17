@@ -19,7 +19,6 @@
 class GradingPeriodGroup < ActiveRecord::Base
   include Canvas::SoftDeletable
 
-  attr_accessible :title
   belongs_to :root_account, inverse_of: :grading_period_groups, foreign_key: :account_id, class_name: "Account"
   belongs_to :course
   has_many :grading_periods, dependent: :destroy

@@ -1,13 +1,13 @@
 define [
-  'underscore'
-  'react'
-  'react-dom'
-  'jsx/epub_exports/App'
+  'underscore',
+  'react',
+  'react-dom',
+  'react-addons-test-utils'
+  'jsx/epub_exports/App',
   'jsx/epub_exports/CourseStore'
-], (_, React, ReactDOM, App, CourseEpubExportStore) ->
-  TestUtils = React.addons.TestUtils
+], (_, React, ReactDOM, TestUtils, App, CourseEpubExportStore) ->
 
-  module 'AppSpec',
+  QUnit.module 'AppSpec',
     setup: ->
       @props = {
         1: {
@@ -19,7 +19,7 @@ define [
           id: 2
         }
       }
-      sinon.stub(CourseEpubExportStore, 'getAll', -> true)
+      sinon.stub(CourseEpubExportStore, 'getAll').returns(true)
 
     teardown: ->
       CourseEpubExportStore.getAll.restore()

@@ -107,6 +107,24 @@ describe "course settings" do
       expect(message).to include_text(code)
       expect(message).not_to include_text('self_enrollment_code')
     end
+
+    it "should enable announcement limit if show announcements enabled" do
+      get "/courses/#{@course.id}/settings"
+
+      more_options_link = f('.course_form_more_options_link')
+      more_options_link.click
+      wait_for_ajaximations
+
+      # Show announcements and limit setting elements
+      show_announcements_on_home_page = f('#course_show_announcements_on_home_page')
+      home_page_announcement_limit = f('#course_home_page_announcement_limit')
+
+      expect(is_checked(show_announcements_on_home_page)).not_to be_truthy
+      expect(home_page_announcement_limit).to be_disabled
+
+      show_announcements_on_home_page.click
+      expect(home_page_announcement_limit).not_to be_disabled
+    end
   end
 
   describe "course items" do
@@ -270,7 +288,7 @@ describe "course settings" do
   end
 
   it "should disable editing settings if :manage rights are not granted" do
-    user(:active_all => true)
+    user_factory(active_all: true)
     user_session(@user)
     role = custom_account_role('role', :account => @account)
     @account.role_overrides.create!(:permission => 'read_course_content', :role => role, :enabled => true)

@@ -24,7 +24,6 @@ class AssetUserAccess < ActiveRecord::Base
   belongs_to :user
   has_many :page_views
   before_save :infer_defaults
-  strong_params
 
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
   scope :for_user, lambda { |user| where(:user_id => user) }
@@ -269,11 +268,32 @@ class AssetUserAccess < ActiveRecord::Base
     self.view_score -= deductible_points
   end
 
+  ICON_MAP = {
+    announcements: "icon-announcements",
+    assignments: "icon-assignment",
+    calendar: "icon-calendar-month",
+    files: "icon-download",
+    grades: "icon-gradebook",
+    home: "icon-home",
+    inbox: "icon-message",
+    modules: "icon-module",
+    outcomes: "icon-outcomes",
+    pages: "icon-document",
+    quizzes: "icon-quiz",
+    roster: "icon-user",
+    syllabus: "icon-syllabus",
+    topics: "icon-discussion",
+    wiki: "icon-document",
+  }.freeze
+
+  def icon
+    ICON_MAP[asset_category.to_sym] || "icon-question"
+  end
+
   private
 
   def increment(attribute)
     incremented_value = (self.send(attribute) || 0) + 1
     self.send("#{attribute}=", incremented_value)
   end
-
 end

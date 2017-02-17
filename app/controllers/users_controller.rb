@@ -156,16 +156,16 @@ class UsersController < ApplicationController
   include I18nUtilities
   include CustomColorHelper
 
-  before_filter :require_user, :only => [:grades, :merge, :kaltura_session,
+  before_action :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
     :user_dashboard, :toggle_recent_activity_dashboard, :masquerade, :external_tool,
     :dashboard_sidebar, :settings, :all_menu_courses, :activity_stream, :activity_stream_summary]
-  before_filter :require_registered_user, :only => [:delete_user_service,
+  before_action :require_registered_user, :only => [:delete_user_service,
     :create_user_service]
-  before_filter :reject_student_view_student, :only => [:delete_user_service,
+  before_action :reject_student_view_student, :only => [:delete_user_service,
     :create_user_service, :merge, :user_dashboard, :masquerade]
-  skip_before_filter :load_user, :only => [:create_self_registered_user]
-  before_filter :require_self_registration, :only => [:new, :create, :create_self_registered_user]
+  skip_before_action :load_user, :only => [:create_self_registered_user]
+  before_action :require_self_registration, :only => [:new, :create, :create_self_registered_user]
 
   def grades
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?
@@ -236,12 +236,9 @@ class UsersController < ApplicationController
       )
       redirect_to request_token.authorize_url
     elsif params[:service] == "linked_in"
-      linkedin_connection = LinkedIn::Connection.new
+      success_url = oauth_success_url(:service => 'linked_in')
+      request_token = LinkedIn::Connection.request_token(success_url)
 
-      request_token = linkedin_connection.request_token(oauth_success_url(:service => 'linked_in'))
-
-      session[:oauth_linked_in_request_token_token] = request_token.token
-      session[:oauth_linked_in_request_token_secret] = request_token.secret
       OauthRequest.create(
         :service => 'linked_in',
         :token => request_token.token,
@@ -318,26 +315,24 @@ class UsersController < ApplicationController
     else
      if params[:service] == "linked_in"
         begin
-          linkedin_connection = LinkedIn::Connection.new
-          token = session.delete(:oauth_linked_in_request_token_token)
-          secret = session.delete(:oauth_linked_in_request_token_secret)
-          access_token = linkedin_connection.get_access_token(token, secret, params[:oauth_verifier])
-          service_user_id, service_user_name, service_user_url = linkedin_connection.get_service_user_info(access_token)
+          raise "No OAuth LinkedIn User" unless oauth_request.user
 
-          if oauth_request.user
-            UserService.register(
-              :service => "linked_in",
-              :access_token => access_token,
-              :user => oauth_request.user,
-              :service_domain => "linked_in.com",
-              :service_user_id => service_user_id,
-              :service_user_name => service_user_name,
-              :service_user_url => service_user_url
-            )
-          else
-            session[:oauth_linked_in_access_token_token] = access_token.token
-            session[:oauth_linked_in_access_token_secret] = access_token.secret
-          end
+          linkedin = LinkedIn::Connection.from_request_token(
+            oauth_request.token,
+            oauth_request.secret,
+            params[:oauth_verifier]
+          )
+
+          UserService.register(
+            :service => "linked_in",
+            :access_token => linkedin.access_token,
+            :user => oauth_request.user,
+            :service_domain => "linked_in.com",
+            :service_user_id => linkedin.service_user_id,
+            :service_user_name => linkedin.service_user_name,
+            :service_user_url => linkedin.service_user_url
+          )
+          oauth_request.destroy
 
           flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
         rescue => e
@@ -346,23 +341,22 @@ class UsersController < ApplicationController
         end
       else
         begin
-          twitter = Twitter::Connection.new(oauth_request.token, oauth_request.secret)
-          access_token = twitter.get_access_token(oauth_request.token, oauth_request.secret, params[:oauth_verifier])
-          service_user_id, service_user_name = twitter.get_service_user(access_token)
-          if oauth_request.user
-            UserService.register(
-              :service => "twitter",
-              :access_token => access_token,
-              :user => oauth_request.user,
-              :service_domain => "twitter.com",
-              :service_user_id => service_user_id,
-              :service_user_name => service_user_name
-            )
-            oauth_request.destroy
-          else
-            session[:oauth_twitter_access_token_token] = access_token.token
-            session[:oauth_twitter_access_token_secret] = access_token.secret
-          end
+          raise "No OAuth Twitter User" unless oauth_request.user
+
+          twitter = Twitter::Connection.from_request_token(
+            oauth_request.token,
+            oauth_request.secret,
+            params[:oauth_verifier]
+          )
+          UserService.register(
+            :service => "twitter",
+            :access_token => twitter.access_token,
+            :user => oauth_request.user,
+            :service_domain => "twitter.com",
+            :service_user_id => twitter.service_user_id,
+            :service_user_name => twitter.service_user_name
+          )
+          oauth_request.destroy
 
           flash[:notice] = t('twitter_added', "Twitter access authorized!")
         rescue => e
@@ -440,7 +434,7 @@ class UsersController < ApplicationController
           else
             @enrollment_terms = []
             if @root_account == @context
-              @enrollment_terms = @context.enrollment_terms.active.order(EnrollmentTerm.nulls(:first, :start_at))
+              @enrollment_terms = @context.enrollment_terms.active
             end
             format.html
           end
@@ -455,7 +449,7 @@ class UsersController < ApplicationController
   end
 
 
-  before_filter :require_password_session, :only => [:masquerade]
+  before_action :require_password_session, :only => [:masquerade]
   def masquerade
     @user = api_find(User, params[:user_id])
     return render_unauthorized_action unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
@@ -1443,6 +1437,83 @@ class UsersController < ApplicationController
     end
   end
 
+  # @API Get dashboard postions
+  # Returns all dashboard positions that have been saved for a user.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/dashboard_positions/ \
+  #     -X GET \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "dashboard_positions": {
+  #       "course_42": 2,
+  #       "course_88": 1
+  #     }
+  #   }
+  #
+  def get_dashboard_positions
+    user = api_find(User, params[:id])
+    return unless authorized_action(user, @current_user, :read)
+    render(json: {dashboard_positions: user.dashboard_positions})
+  end
+
+  # @API Update dashboard positions
+  # Updates the dashboard positions for a user for a given context.  This allows
+  # positions for the dashboard cards and elsewhere to be customized on a per
+  # user basis.
+  #
+  # The asset string parameter should be in the format 'context_id', for example
+  # 'course_42'
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/dashboard_positions/ \
+  #     -X PUT \
+  #     -F 'dashboard_positions[course_42]=1' \
+  #     -F 'dashboard_positions[course_53]=2' \
+  #     -F 'dashboard_positions[course_10]=3' \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "dashboard_positions": {
+  #       "course_10": 3,
+  #       "course_42": 1,
+  #       "course_53": 2
+  #     }
+  #   }
+  def set_dashboard_positions
+    user = api_find(User, params[:id])
+
+    return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
+    params[:dashboard_positions].each do |key, val|
+      context = Context.find_by_asset_string(key)
+      if context.nil?
+        raise(ActiveRecord::RecordNotFound, "Asset #{key} does not exist")
+      end
+      return unless authorized_action(context, @current_user, :read)
+      position = Integer(val) rescue nil
+      if position.nil?
+        return render(json: { :message => "Invalid position provided" }, status: :bad_request)
+      end
+    end
+
+    user.dashboard_positions = user.dashboard_positions.merge(params[:dashboard_positions])
+
+    respond_to do |format|
+      format.json do
+        if user.save
+          render(json: { dashboard_positions: user.dashboard_positions })
+        else
+          render(json: user.errors, status: :bad_request)
+        end
+      end
+    end
+  end
+
   # @API Edit a user
   # Modify an existing user. To modify a user's login, see the documentation for logins.
   #
@@ -1494,6 +1565,7 @@ class UsersController < ApplicationController
   # @returns User
   def update
     params[:user] ||= {}
+    user_params = params[:user]
     @user = api_request? ?
       api_find(User, params[:id]) :
       params[:id] ? api_find(User, params[:id]) : @current_user
@@ -1503,7 +1575,7 @@ class UsersController < ApplicationController
       @default_pseudonym.move_to_top
     end
 
-    update_email = @user.grants_right?(@current_user, :manage_user_details) && params[:user][:email]
+    update_email = @user.grants_right?(@current_user, :manage_user_details) && user_params[:email]
     managed_attributes = []
     managed_attributes.concat [:name, :short_name, :sortable_name, :birthdate] if @user.grants_right?(@current_user, :rename)
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
@@ -1514,26 +1586,27 @@ class UsersController < ApplicationController
     end
 
     if @user.grants_right?(@current_user, :update_avatar)
-      avatar = params[:user].delete(:avatar)
+      avatar = user_params.delete(:avatar)
 
       # delete any avatar_image passed, because we only allow updating avatars
       # based on [:avatar][:token].
-      params[:user].delete(:avatar_image)
+      user_params.delete(:avatar_image)
 
       managed_attributes << :avatar_image
       if token = avatar.try(:[], :token)
         if av_json = avatar_for_token(@user, token)
-          params[:user][:avatar_image] = { :type => av_json['type'],
+          user_params[:avatar_image] = { :type => av_json['type'],
             :url => av_json['url'] }
         end
       elsif url = avatar.try(:[], :url)
-        params[:user][:avatar_image] = { :type => 'external', :url => url }
+        user_params[:avatar_image] = { :type => 'external', :url => url }
       end
     end
 
-    user_params = params[:user].slice(*managed_attributes)
+    if managed_attributes.any? && user_params.except(*managed_attributes).empty?
+      managed_attributes << {:avatar_image => strong_anything} if managed_attributes.delete(:avatar_image)
+      user_params = user_params.permit(*managed_attributes)
 
-    if managed_attributes.any? && user_params == params[:user]
       # admins can update avatar images even if they are locked
       admin_avatar_update = user_params[:avatar_image] &&
         @user.grants_right?(@current_user, :update_avatar) &&
@@ -1875,7 +1948,7 @@ class UsersController < ApplicationController
   # @returns [User]
   def split
     user = api_find(User, params[:id])
-    unless UserMergeData.active.where(user_id: user).shard(user).where('created_at > ?', 90.days.ago).exists?
+    unless UserMergeData.active.splitable.where(user_id: user).shard(user).exists?
       return render json: {message: t('Nothing to split off of this user')}, status: :bad_request
     end
 
@@ -2179,18 +2252,22 @@ class UsersController < ApplicationController
     end
 
     if params[:user]
-      if self_enrollment && params[:user][:self_enrollment_code]
-        params[:user][:self_enrollment_code].strip!
+      user_params = params[:user].
+        permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
+          :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use,
+          :self_enrollment_code, :initial_enrollment_type)
+      if self_enrollment && user_params[:self_enrollment_code]
+        user_params[:self_enrollment_code].strip!
       else
-        params[:user].delete(:self_enrollment_code)
+        user_params.delete(:self_enrollment_code)
       end
-      if params[:user][:birthdate].present? && params[:user][:birthdate] !~ Api::ISO8601_REGEX &&
-          params[:user][:birthdate] !~ Api::DATE_REGEX
+      if user_params[:birthdate].present? && user_params[:birthdate] !~ Api::ISO8601_REGEX &&
+          user_params[:birthdate] !~ Api::DATE_REGEX
         return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
                                                             'Invalid date or invalid datetime for birthdate')}}, :status => 400)
       end
 
-      @user.attributes = params[:user]
+      @user.attributes = user_params
       accepted_terms = params[:user].delete(:terms_of_use)
       @user.accept_terms if value_to_boolean(accepted_terms)
       includes << "terms_of_use" unless accepted_terms.nil?
@@ -2230,20 +2307,23 @@ class UsersController < ApplicationController
     @pseudonym.require_password = require_password
     # pre-populate the reverse association
     @pseudonym.user = @user
+
+    pseudonym_params = params[:pseudonym] ?
+      params[:pseudonym].permit(:password, :password_confirmation, :unique_id) : {}
     # don't require password_confirmation on api calls
-    params[:pseudonym][:password_confirmation] = params[:pseudonym][:password] if api_request?
+    pseudonym_params[:password_confirmation] = pseudonym_params[:password] if api_request?
     # don't allow password setting for new users that are not self-enrolling
     # in a course (they need to go the email route)
     unless allow_password
-      params[:pseudonym].delete(:password)
-      params[:pseudonym].delete(:password_confirmation)
+      pseudonym_params.delete(:password)
+      pseudonym_params.delete(:password_confirmation)
     end
     if params[:pseudonym][:authentication_provider_id]
       @pseudonym.authentication_provider = @context.
           authentication_providers.active.
           find(params[:pseudonym][:authentication_provider_id])
     end
-    @pseudonym.attributes = params[:pseudonym]
+    @pseudonym.attributes = pseudonym_params
     @pseudonym.sis_user_id = sis_user_id
     @pseudonym.integration_id = integration_id
 

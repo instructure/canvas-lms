@@ -142,12 +142,12 @@ module SIS
               # delete the pseudonym.
               enrollment_ids = @root_account.enrollments.active.where(user_id: user).where.not(:workflow_state => 'deleted').pluck(:id)
               if enrollment_ids.any?
-                Enrollment.where(:id => enrollment_ids).update_all(workflow_state: 'deleted')
-                EnrollmentState.where(:enrollment_id => enrollment_ids).update_all(:state => 'deleted', :state_is_current => true)
+                Enrollment.where(id: enrollment_ids).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
+                EnrollmentState.where(enrollment_id: enrollment_ids).update_all(state: 'deleted', state_is_current: true)
               end
 
               d = enrollment_ids.count
-              d += @root_account.all_group_memberships.active.where(user_id: user).update_all(workflow_state: 'deleted')
+              d += @root_account.all_group_memberships.active.where(user_id: user).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
               d += user.account_users.shard(@root_account).where(account_id: @root_account.all_accounts).delete_all
               d += user.account_users.shard(@root_account).where(account_id: @root_account).delete_all
               if 0 < d

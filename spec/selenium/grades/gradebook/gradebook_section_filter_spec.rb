@@ -1,18 +1,18 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative '../../helpers/groups_common'
 
-describe "gradebook2" do
+describe "gradebook" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
   include GroupsCommon
 
-  let!(:setup) { gradebook_data_setup }
+  before(:once) { gradebook_data_setup }
+  before(:each) { user_session(@teacher) }
 
   it "should handle multiple enrollments correctly" do
     @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
 
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
+    get "/courses/#{@course.id}/gradebook"
 
     meta_cells = find_slick_cells(0, f('.grid-canvas'))
     expect(meta_cells[0]).to include_text @course.default_section.display_name
@@ -28,7 +28,7 @@ describe "gradebook2" do
   end
 
   it "should allow showing only a certain section", priority: "1", test_id: 210024 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     # grade the first assignment
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', 1)
@@ -36,12 +36,12 @@ describe "gradebook2" do
     switch_to_section(@other_section)
     expect(fj('.section-select-button:visible')).to include_text(@other_section.name)
 
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2').text).to eq '1'
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '1'
 
     # verify that it remembers the section to show across page loads
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     expect(fj('.section-select-button:visible')).to include_text @other_section.name
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2').text).to eq '1'
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '1'
 
     # now verify that you can set it back
 
@@ -51,7 +51,7 @@ describe "gradebook2" do
     expect(fj('.section-select-button:visible')).to include_text "All Sections"
 
     # validate all grades (i.e. submissions) were loaded
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2').text).to eq '0'
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2').text).to eq '1'
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '0'
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2')).to include_text '1'
   end
 end

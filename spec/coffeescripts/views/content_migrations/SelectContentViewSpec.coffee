@@ -63,7 +63,7 @@ define [
                                               }
                                           ])]
 
-  module 'SelectContentView: Integration Tests',
+  QUnit.module 'SelectContentView: Integration Tests',
     setup: -> 
       @server = sinon.fakeServer.create()
       fakeENV.setup()

@@ -1,4 +1,4 @@
-class FixProfilePictures < ActiveRecord::Migration
+class FixProfilePictures < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

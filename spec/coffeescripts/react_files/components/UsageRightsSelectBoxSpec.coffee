@@ -3,12 +3,11 @@ define [
   'underscore'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/files/UsageRightsSelectBox'
-  ], ($, _, React, ReactDOM, UsageRightsSelectBox ) ->
+  ], ($, _, React, ReactDOM, TestUtils, UsageRightsSelectBox ) ->
 
-    TestUtils = React.addons.TestUtils
-
-    module "UsageRightsSelectBox",
+    QUnit.module "UsageRightsSelectBox",
       setup: ->
       teardown: ->
         $("div.error_box").remove()

@@ -5,7 +5,7 @@ define [
   'compiled/views/grade_summary/OutcomeLineGraphView'
 ], (_, Outcome, OutcomeDialogView, OutcomeLineGraphView) ->
 
-  module 'OutcomeDialogViewSpec',
+  QUnit.module 'OutcomeDialogViewSpec',
     setup: ->
       @outcomeDialogView = new OutcomeDialogView({
         model: new Outcome()

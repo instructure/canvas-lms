@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 describe "Outcome Results API", type: :request do
 
   let_once(:outcome_course) do
-    course(active_all: true)
+    course_factory(active_all: true)
     @course
   end
 
@@ -218,7 +218,7 @@ describe "Outcome Results API", type: :request do
       end
 
       it "requires section id to be a section in the context" do
-        bogus_section = course(active_course: true).course_sections.create!(name: 'bogus section')
+        bogus_section = course_factory(active_course: true).course_sections.create!(name: 'bogus section')
         raw_api_call(:get, outcome_rollups_url(outcome_course, section_id: bogus_section.id),
           controller: 'outcome_results', action: 'rollups', format: 'json',
           course_id: outcome_course.id.to_s, section_id: bogus_section.id.to_s)

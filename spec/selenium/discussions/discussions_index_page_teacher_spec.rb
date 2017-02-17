@@ -210,9 +210,9 @@ describe "discussions" do
           driver.switch_to.alert.accept
           wait_for_ajaximations
           get url
-          expect(f('#open-discussions .discussion-title').text).to include('teacher topic title')
-          fln('teacher topic title').click
-          expect(ff('.discussion-entries .entry').count).to eq(1)
+          expect(f('#open-discussions .discussion-title')).to include_text('teacher topic title')
+          expect_new_page_load { fln('teacher topic title').click }
+          expect(ff('.discussion-entries .entry')).to have_size(1)
         end
 
         it "should sort the discussions", priority: "1", test_id: 150509 do

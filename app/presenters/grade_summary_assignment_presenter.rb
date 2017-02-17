@@ -1,12 +1,17 @@
 class GradeSummaryAssignmentPresenter
   include TextHelper
-  attr_reader :assignment, :submission
+  attr_reader :assignment, :submission, :originality_reports
 
   def initialize(summary, current_user, assignment, submission)
     @summary = summary
     @current_user = current_user
     @assignment = assignment
     @submission = submission
+    @originality_reports = @submission.originality_reports if @submission
+  end
+
+  def originality_report?
+    @originality_reports.present?
   end
 
   def hide_distribution_graphs?
@@ -108,7 +113,7 @@ class GradeSummaryAssignmentPresenter
     if has_no_score_display?
       ''
     else
-      "#{round_if_whole(submission.published_score)} #{published_grade}"
+      "#{I18n.n round_if_whole(submission.published_score)} #{published_grade}"
     end
   end
 
@@ -124,7 +129,7 @@ class GradeSummaryAssignmentPresenter
     if type == 'vericite'
       plagData = submission.vericite_data(true)
     else
-      plagData = submission.turnitin_data
+      plagData = submission.originality_data
     end
     t = if is_text_entry?
           plagData[submission.asset_string]
@@ -155,6 +160,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def is_plagiarism_attachment?(a)
+    @originality_reports.find_by(attachment: a, submission: submission) ||
     (submission.turnitin_data && submission.turnitin_data[a.asset_string]) ||
     (submission.vericite_data(true) && submission.vericite_data(true)[a.asset_string])
   end
@@ -229,7 +235,7 @@ class GradeSummaryGraph
 
   def title
     I18n.t('#grade_summary.graph_title', "Mean %{mean}, High %{high}, Low %{low}", {
-      mean: @mean.to_s, high: @high.to_s, low: @low.to_s
+      mean: I18n.n(@mean), high: I18n.n(@high), low: I18n.n(@low)
     })
   end
 

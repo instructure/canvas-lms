@@ -1,4 +1,4 @@
-class RefactorAbstractCourses < ActiveRecord::Migration
+class RefactorAbstractCourses < ActiveRecord::Migration[4.2]
   tag :predeploy
 
 

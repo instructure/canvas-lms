@@ -26,36 +26,42 @@ class SubmissionComment < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course]
   belongs_to :provisional_grade, :class_name => 'ModeratedGrading::ProvisionalGrade'
   has_many :submission_comment_participants, :dependent => :destroy
-  has_many :messages, :as => :context, :dependent => :destroy
+  has_many :messages, :as => :context, :inverse_of => :context, :dependent => :destroy
 
   validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
 
-  attr_accessible :comment, :submission, :submission_id, :author, :context_id,
-                  :context_type, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request,
-                  :attachments, :anonymous, :hidden, :provisional_grade_id, :draft
-
   before_save :infer_details
-  after_save :update_submission
   after_save :update_participation
   after_save :check_for_media_object
-  after_destroy :delete_other_comments_in_this_group
   after_create :update_participants
+  after_update :publish_other_comments_in_this_group
+  after_destroy :delete_other_comments_in_this_group
+  after_commit :update_submission
 
   serialize :cached_attachments
 
   scope :visible, -> { where(:hidden => false) }
   scope :draft, -> { where(draft: true) }
-  scope :published, -> {
-    where(SubmissionComment.arel_table[:draft].eq(nil).or(SubmissionComment.arel_table[:draft].eq(false)))
-  }
+  scope :published, -> { where("submission_comments.draft IS NOT TRUE") }
   scope :after, lambda { |date| where("submission_comments.created_at>?", date) }
   scope :for_final_grade, -> { where(:provisional_grade_id => nil) }
   scope :for_provisional_grade, ->(id) { where(:provisional_grade_id => id) }
   scope :for_assignment_id, lambda { |assignment_id| where(:submissions => { :assignment_id => assignment_id }).joins(:submission) }
 
   def delete_other_comments_in_this_group
-    return if !group_comment_id || skip_destroy_callbacks?
+    update_other_comments_in_this_group &:destroy
+  end
+
+  def publish_other_comments_in_this_group
+    return unless draft_changed?
+    update_other_comments_in_this_group do |comment|
+      comment.update_attributes(draft: draft)
+    end
+  end
+
+  def update_other_comments_in_this_group
+    return if !group_comment_id || skip_group_callbacks?
 
     # grab comment ids first because the objects built off
     # readonly attributes/objects are marked as readonly and
@@ -67,8 +73,8 @@ class SubmissionComment < ActiveRecord::Base
       .pluck(:id)
 
     SubmissionComment.find(comment_ids).each do |comment|
-      comment.skip_destroy_callbacks!
-      comment.destroy
+      comment.skip_group_callbacks!
+      yield comment
     end
   end
 
@@ -282,12 +288,12 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   protected
-  def skip_destroy_callbacks!
-    @skip_destroy_callbacks = true
+  def skip_group_callbacks!
+    @skip_group_callbacks = true
   end
 
   private
-  def skip_destroy_callbacks?
-    !!@skip_destroy_callbacks
+  def skip_group_callbacks?
+    !!@skip_group_callbacks
   end
 end

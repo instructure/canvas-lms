@@ -12,11 +12,12 @@ define [
     # blocks is an array of [ Date:start, Date:end, Bool:locked ].
     # The UI only supports start/end times which
     # are in the same day in the user's timezone.
-    constructor: (element, splitterSelector, blocks) ->
+    constructor: (element, splitterSelector, blocks, blankRow) ->
       @element = $(element)
       @splitterDiv = $(splitterSelector)
       @blocksManager = new TimeBlockListManager(blocks)
       @splitterDiv.find('.split-link').click @handleSplitClick
+      @blankRow = blankRow
 
       @element.delegate 'input', 'change', (event) =>
         @addRow() if $(event.currentTarget).closest('tr').is ':last-child'
@@ -26,7 +27,9 @@ define [
       @rows = []
       @element.empty()
       @addRow(block) for block in @blocksManager.blocks
-      @addRow() #add a blank row at the bottom
+      # only default to custom blank values if there's no existing timeblocks
+      blankRow = if @blocksManager.blocks.length == 0 then @blankRow else null
+      @addRow(blankRow) #add a blank row at the bottom
 
     rowRemoved: (rowToRemove) ->
       @rows = for row in @rows when row isnt rowToRemove

@@ -10,8 +10,14 @@ define [
 
   scope = I18n.scoped('foo')
   t = (args...) -> scope.t(args...)
+  interpolate = (args...) -> I18n.interpolate(args...)
 
-  module "I18n"
+  QUnit.module "I18n",
+    setup: ->
+      I18nStubber.pushFrame()
+
+    teardown: ->
+      I18nStubber.popFrame()
 
   test "missing placeholders", ->
     equal t("k", "ohai %{name}"),
@@ -72,5 +78,49 @@ define [
     equal t('bar', 'you need to *log in*', {wrapper: '<a href="%{url}">$1</a>', url: 'http://foo.bar'}),
       'you need to <a href="http://foo.bar">log in</a>'
 
+  test "interpolate: should format numbers", ->
+    equal interpolate("user count: %{foo}", {foo: 1500}), "user count: 1,500"
+
+  test "interpolate: should not format numbery strings", ->
+    equal interpolate("user count: %{foo}", {foo: "1500"}), "user count: 1500"
+
+  test "interpolate: should not mutate the options", ->
+    options = {foo: 1500}
+    interpolate("user count: %{foo}", options)
+    equal options.foo, 1500
+
   test "pluralize: should format the number", ->
     equal t({one: "1 thing", other: "%{count} things"}, {count: 1500}), '1,500 things'
+
+  QUnit.module 'I18n localize number',
+    setup: ->
+      @delimiter = ' '
+      @separator = ','
+      I18nStubber.pushFrame()
+      I18nStubber.stub 'foo',
+        number:
+          format:
+            delimiter: @delimiter
+            separator: @separator
+            precision: 3
+            strip_insignificant_zeros: false
+      I18nStubber.setLocale('foo')
+
+    teardown: ->
+      I18nStubber.popFrame()
+
+  test 'uses delimiter from local', ->
+    equal I18n.localizeNumber(1000), "1#{@delimiter}000"
+
+  test 'uses separator from local', ->
+    equal I18n.localizeNumber(1.2), "1#{@separator}2"
+
+  test 'uses precision from number if not specified', ->
+    equal I18n.localizeNumber(1.2345), "1#{@separator}2345"
+
+  test 'uses precision specified', ->
+    equal I18n.localizeNumber(1.2, precision: 3), "1#{@separator}200"
+    equal I18n.localizeNumber(1.2345, precision: 3), "1#{@separator}234"
+
+  test 'formats as a percentage if set to true', ->
+    equal I18n.localizeNumber(1.2, percentage: true), "1#{@separator}2%"

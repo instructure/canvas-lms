@@ -1,5 +1,5 @@
 define([
-  'compiled/gradebook2/GradebookTranslations'
+  'compiled/gradebook/GradebookTranslations'
   ], function(GRADEBOOK_TRANSLATIONS) {
 
   const MULTIPLIER = 1.5;

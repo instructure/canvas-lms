@@ -1,4 +1,4 @@
-class AddReportTypeToQuizStatistics < ActiveRecord::Migration
+class AddReportTypeToQuizStatistics < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

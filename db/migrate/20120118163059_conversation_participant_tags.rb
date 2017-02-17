@@ -1,4 +1,4 @@
-class ConversationParticipantTags < ActiveRecord::Migration
+class ConversationParticipantTags < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

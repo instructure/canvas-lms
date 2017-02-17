@@ -20,11 +20,12 @@
 
 //// Suppress scroll on the body for Theme Editor
 
-html, body, #main { height: 100%; }
+html, body { height: 100%; }
 
 body { overflow: hidden; }
 
-#main {
+.ic-Layout-columns {
+  height: 100%;
   max-width: 100% !important;
   margin-bottom: 0;
   padding-bottom: 0;
@@ -220,7 +221,6 @@ $te-footer-height: 72px;
   color: $ic-font-color-dark;
 
   .Theme__editor-upload-overrides_header {
-    font-weight: 300;
     padding: 10px;
     border-top: 1px solid $ic-border-light;
   }
@@ -302,7 +302,6 @@ $te-footer-height: 72px;
   .ui-accordion-header {
     border: none;
     background: $te-bgd;
-    font-weight: 300;
     border-radius: 0;
     color: $ic-font-color-dark;
     &:not(:first-child) {
@@ -332,7 +331,7 @@ $te-footer-height: 72px;
         border-radius: 0;
         transition: padding 0.2s;
         padding: $ic-sp/2 0;
-        font-weight: 500;
+        font-weight: bold;
         @include fontSize(14px);
         &:hover {
           color: $ic-color-light;
@@ -610,7 +609,7 @@ $te-footer-height: 72px;
   flex: 0 0 36%;
   padding-right: $ic-sp*2;
   font-size: $baseFontSize;
-  font-weight: 500;
+  font-weight: bold;
 }
 
 .Theme-editor-progress-list-item__bar {

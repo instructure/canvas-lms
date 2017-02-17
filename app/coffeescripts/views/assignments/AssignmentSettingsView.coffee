@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'compiled/util/round'
   'underscore'
   'compiled/views/DialogFormView'
   'jst/EmptyDialogFormWrapper'
   'jst/assignments/AssignmentSettings'
-], (round, _, DialogFormView, wrapper, assignmentSettingsTemplate) ->
+], ($, round, _, DialogFormView, wrapper, assignmentSettingsTemplate) ->
 
   class AssignmentSettingsView extends DialogFormView
     template: assignmentSettingsTemplate
@@ -35,7 +36,8 @@ define [
       @addAssignmentGroups()
 
     canChangeWeights: ->
-      @userIsAdmin or !_.any(@assignmentGroups.models, (ag) -> ag.hasAssignmentDueInClosedGradingPeriod())
+      @userIsAdmin or !_.any @assignmentGroups.models, (ag) ->
+        ag.anyAssignmentInClosedGradingPeriod()
 
     submit: (event) ->
       if @canChangeWeights()
@@ -57,6 +59,8 @@ define [
     onSaveSuccess: ->
       super
       @assignmentGroups.trigger 'change:groupWeights'
+      checked = @model.get('apply_assignment_group_weights')
+      @trigger('weightedToggle', checked)
 
     toggleTableByModel: ->
       checked = @model.get('apply_assignment_group_weights')

@@ -1,5 +1,6 @@
 <% add_crumb t(:page_title, 'Profile Pictures') %>
 <% content_for :page_title do %><%= t(:page_title, "Profile Pictures") %><% end %>
+
 <% content_for :stylesheets do %>
 <style>
 .views .selected {
@@ -13,18 +14,6 @@
 }
 #avatars tr .avatar_state {
   width: 50px;
-}
-#avatars tr.approved .avatar_state {
-  background: url(/images/graded.16px.png) no-repeat center center
-}
-#avatars tr.reported .avatar_state {
-  background: url(/images/warning.png) no-repeat center center
-}
-#avatars tr.re_reported .avatar_state {
-  background: url(/images/warning_dim.png) no-repeat center center
-}
-#avatars tr.locked .avatar_state {
-  background: url(/images/lock.png) no-repeat center center
 }
 #avatars td {
   border-bottom: 1px dotted #ddd;
@@ -54,6 +43,22 @@
       <%= avatar user, url: nil %>
     </td>
     <td class="avatar_state">
+      <% if user.avatar_state == :reported %>
+        <span class="screenreader-only"><%= t('Reported') %></span>
+        <i class="icon-warning" aria-hidden="true"></i>
+      <% end %>
+      <% if user.avatar_state == :re_reported %>
+        <span class="screenreader-only"><%= t('Re-Reported') %></span>
+        <i class="icon-warning" aria-hidden="true"></i>
+      <% end %>
+      <% if user.avatar_state == :locked %>
+        <span class="screenreader-only"><%= t('Locked') %></span>
+        <i class="icon-lock" aria-hidden="true"></i>
+      <% end %>
+      <% if user.avatar_state == :approved %>
+        <span class="screenreader-only"><%= t('Approved') %></span>
+        <i class="icon-check" aria-hidden="true"></i>
+      <% end %>
     </td>
     <td>
       <div class="name"><a href="<%= user_url(user.id) %>"><%= user.name %></a></div>

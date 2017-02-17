@@ -5,7 +5,7 @@ require File.expand_path('../spec_helper.rb', File.dirname(__FILE__))
 describe DiscussionTopicParticipant do
   describe 'check_unread_count' do
     before(:once) do
-      @participant = DiscussionTopicParticipant.create!(:user => user,
+      @participant = DiscussionTopicParticipant.create!(:user => user_factory,
         :discussion_topic => discussion_topic_model)
     end
 

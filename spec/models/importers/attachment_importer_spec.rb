@@ -17,9 +17,10 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '../../../spec_helper.rb')
+require_dependency "importers/attachment_importer"
 
 module Importers
-  describe Importers::AttachmentImporter do
+  describe AttachmentImporter do
 
     describe '#process_migration', no_retry: true do
       let(:course) { ::Course.new }
@@ -32,7 +33,8 @@ module Importers
              :migration_id= => true,
              :migration_id => migration_id,
              :save_without_broadcasting! => true,
-             :set_publish_state_for_usage_rights => nil)
+             :set_publish_state_for_usage_rights => nil,
+             :mark_as_importing! => nil)
       end
 
       before :each do

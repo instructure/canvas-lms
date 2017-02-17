@@ -239,7 +239,7 @@ button.ic-app-header__menu-list-link {
     transition:
       transform 0.3s cubic-bezier(0.175, 0.885, 0.320, 1.275),
       opacity 0.3s;
-    transition-delay: 1s;
+    transition-delay: 0.3s;
   }
 
   &::after {
@@ -368,14 +368,14 @@ body.primary-nav-expanded {
     opacity: 1;
     text-align: center;
     display: block;
-    line-height: 1;
+    line-height: 1.4;
     border-radius: 0;
     margin: $ic-sp/4 0 0;
     padding: 0;
     background: transparent;
     color: $ic-brand-global-nav-menu-item__text-color;
     white-space: normal;
-    word-break: break-all;
+    word-wrap: break-word;
     padding-left: 0.25rem;
     padding-right: 0.25rem;
 
@@ -486,6 +486,9 @@ body.primary-nav-expanded {
     .ic-NavMenu__headline {
       flex: 1;
       min-width: 1px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
 
   }

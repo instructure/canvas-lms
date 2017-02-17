@@ -1,5 +1,3 @@
-require_relative '../assignment'
-
 class Assignment
   class SpeedGrader
     include GradebookSettingsHelpers
@@ -97,7 +95,7 @@ class Assignment
       end
       res[:context][:quiz] = @assignment.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
-      includes = [:versions, :quiz_submission, :user, :attachment_associations, :assignment]
+      includes = [:versions, :quiz_submission, :user, :attachment_associations, :assignment, :originality_reports]
       key = @grading_role == :grader ? :submission_comments : :all_submission_comments
       includes << {key => {submission: {assignment: { context: :root_account }}}}
       submissions = @assignment.submissions.where(:user_id => students).preload(*includes)
@@ -177,7 +175,8 @@ class Assignment
         if json['submission_history'] && (@assignment.quiz.nil? || too_many)
           json['submission_history'] = json['submission_history'].map do |version|
             version.as_json(only: submission_fields,
-                            methods: [:versioned_attachments, :late]).tap do |version_json|
+                            methods: [:versioned_attachments, :late, :external_tool_url]).tap do |version_json|
+              version_json['submission']['has_originality_report'] = version.originality_reports.present?
               if version_json['submission'] && version_json['submission']['versioned_attachments']
                 version_json['submission']['versioned_attachments'].map! do |a|
                   if @grading_role == :moderator

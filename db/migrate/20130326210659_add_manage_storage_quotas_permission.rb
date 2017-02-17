@@ -1,4 +1,4 @@
-class AddManageStorageQuotasPermission < ActiveRecord::Migration
+class AddManageStorageQuotasPermission < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

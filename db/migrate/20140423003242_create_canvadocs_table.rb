@@ -1,4 +1,4 @@
-class CreateCanvadocsTable < ActiveRecord::Migration
+class CreateCanvadocsTable < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

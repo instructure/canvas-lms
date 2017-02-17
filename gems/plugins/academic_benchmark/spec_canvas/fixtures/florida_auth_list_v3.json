@@ -1,0 +1,959 @@
+  [
+    {
+      "data": {
+        "subject_doc": {
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Social Studies (2008)"
+        },
+        "label": "Strand",
+        "version": "1.11.2",
+        "course": {
+          "descr": "Grades: 9-12 Revised February 2014",
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "seq": "430"
+        },
+        "level": 1,
+        "number": "SS.912.A",
+        "status": "Active",
+        "subject": {
+          "code": "SOC",
+          "broad": "SOC"
+        },
+        "document": {
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22",
+          "acronym": "NGSSS",
+          "title": "Next Generation Sunshine State Standards"
+        },
+        "date_modified": "2014-04-08 12:34:30",
+        "adopt_year": "2008",
+        "deepest": "N",
+        "placeholder": "N",
+        "guid": "AF2EAFAE-CCB8-11DD-A7C8-69619DFF4B22",
+        "authority": {
+          "code": "FL",
+          "descr": "Florida",
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22"
+        },
+        "seq": "1",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF2EAFAE-CCB8-11DD-A7C8-69619DFF4B22",
+        "descr": "American History",
+        "grade": {
+          "seq": "2220",
+          "high": "12",
+          "low": "9"
+        }
+      }
+    },
+    {
+      "data": {
+        "parent": {
+          "guid": "AF2EAFAE-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "document": {
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22",
+          "acronym": "NGSSS",
+          "title": "Next Generation Sunshine State Standards"
+        },
+        "course": {
+          "descr": "Grades: 9-12 Revised February 2014",
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "seq": "430"
+        },
+        "version": "1.11.2",
+        "level": 2,
+        "subject_doc": {
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Social Studies (2008)"
+        },
+        "label": "Standard",
+        "subject": {
+          "broad": "SOC",
+          "code": "SOC"
+        },
+        "status": "Active",
+        "number": "SS.912.A.1",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF2F25CE-CCB8-11DD-A7C8-69619DFF4B22",
+        "guid": "AF2F25CE-CCB8-11DD-A7C8-69619DFF4B22",
+        "authority": {
+          "code": "FL",
+          "descr": "Florida",
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22"
+        },
+        "seq": "2",
+        "grade": {
+          "high": "12",
+          "low": "9",
+          "seq": "2220"
+        },
+        "descr": "Use research and inquiry skills to analyze American history using primary and secondary sources.",
+        "adopt_year": "2008",
+        "date_modified": "2014-04-08 12:36:55",
+        "placeholder": "N",
+        "deepest": "N"
+      }
+    },
+    {
+      "data": {
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF2F887A-CCB8-11DD-A7C8-69619DFF4B22",
+        "guid": "AF2F887A-CCB8-11DD-A7C8-69619DFF4B22",
+        "authority": {
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22",
+          "descr": "Florida",
+          "code": "FL"
+        },
+        "seq": "3",
+        "grade": {
+          "seq": "2220",
+          "low": "9",
+          "high": "12"
+        },
+        "descr": "Describe the importance of historiography, which includes how historical knowledge is obtained and transmitted, when interpreting events in history.",
+        "adopt_year": "2008",
+        "date_modified": "2008-12-17 15:10:35",
+        "placeholder": "N",
+        "deepest": "Y",
+        "parent": {
+          "guid": "AF2F25CE-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "document": {
+          "title": "Next Generation Sunshine State Standards",
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22",
+          "acronym": "NGSSS"
+        },
+        "course": {
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "seq": "430",
+          "descr": "Grades: 9-12 Revised February 2014"
+        },
+        "version": "1.11.2",
+        "level": 3,
+        "subject_doc": {
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Social Studies (2008)"
+        },
+        "label": "Benchmark",
+        "subject": {
+          "broad": "SOC",
+          "code": "SOC"
+        },
+        "number": "SS.912.A.1.1",
+        "status": "Active"
+      }
+    },
+    {
+      "data": {
+        "document": {
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22",
+          "acronym": "NGSSS",
+          "title": "Next Generation Sunshine State Standards"
+        },
+        "parent": {
+          "guid": "AF2F25CE-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "subject": {
+          "code": "SOC",
+          "broad": "SOC"
+        },
+        "status": "Active",
+        "number": "SS.912.A.1.2",
+        "level": 3,
+        "course": {
+          "seq": "430",
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Grades: 9-12 Revised February 2014"
+        },
+        "version": "1.11.2",
+        "label": "Benchmark",
+        "subject_doc": {
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Social Studies (2008)"
+        },
+        "grade": {
+          "low": "9",
+          "high": "12",
+          "seq": "2220"
+        },
+        "descr": "Utilize a variety of primary and secondary sources to identify author, historical significance, audience, and authenticity to understand a historical period.",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF2FEA9A-CCB8-11DD-A7C8-69619DFF4B22",
+        "seq": "4",
+        "authority": {
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22",
+          "code": "FL",
+          "descr": "Florida"
+        },
+        "guid": "AF2FEA9A-CCB8-11DD-A7C8-69619DFF4B22",
+        "placeholder": "N",
+        "deepest": "Y",
+        "adopt_year": "2008",
+        "date_modified": "2008-12-17 15:10:44"
+      }
+    },
+    {
+      "data": {
+        "document": {
+          "title": "Next Generation Sunshine State Standards",
+          "acronym": "NGSSS",
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22"
+        },
+        "parent": {
+          "guid": "AF2F25CE-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "subject": {
+          "code": "SOC",
+          "broad": "SOC"
+        },
+        "number": "SS.912.A.1.3",
+        "status": "Active",
+        "course": {
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "seq": "430",
+          "descr": "Grades: 9-12 Revised February 2014"
+        },
+        "version": "1.11.2",
+        "level": 3,
+        "subject_doc": {
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Social Studies (2008)"
+        },
+        "label": "Benchmark",
+        "grade": {
+          "low": "9",
+          "high": "12",
+          "seq": "2220"
+        },
+        "descr": "Utilize timelines to identify the time sequence of historical data.",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF3058F4-CCB8-11DD-A7C8-69619DFF4B22",
+        "guid": "AF3058F4-CCB8-11DD-A7C8-69619DFF4B22",
+        "authority": {
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22",
+          "code": "FL",
+          "descr": "Florida"
+        },
+        "seq": "5",
+        "placeholder": "N",
+        "deepest": "Y",
+        "adopt_year": "2008",
+        "date_modified": "2008-12-17 15:10:56"
+      }
+    },
+    {
+      "data": {
+        "deepest": "Y",
+        "placeholder": "N",
+        "date_modified": "2008-12-17 15:11:05",
+        "adopt_year": "2008",
+        "descr": "Analyze how images, symbols, objects, cartoons, graphs, charts, maps, and artwork may be used to interpret the significance of time periods and events from the past.",
+        "grade": {
+          "seq": "2220",
+          "low": "9",
+          "high": "12"
+        },
+        "authority": {
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22",
+          "descr": "Florida",
+          "code": "FL"
+        },
+        "seq": "6",
+        "guid": "AF30C56E-CCB8-11DD-A7C8-69619DFF4B22",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF30C56E-CCB8-11DD-A7C8-69619DFF4B22",
+        "status": "Active",
+        "number": "SS.912.A.1.4",
+        "subject": {
+          "code": "SOC",
+          "broad": "SOC"
+        },
+        "label": "Benchmark",
+        "subject_doc": {
+          "descr": "Social Studies (2008)",
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22"
+        },
+        "level": 3,
+        "course": {
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "seq": "430",
+          "descr": "Grades: 9-12 Revised February 2014"
+        },
+        "version": "1.11.2",
+        "document": {
+          "acronym": "NGSSS",
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22",
+          "title": "Next Generation Sunshine State Standards"
+        },
+        "parent": {
+          "guid": "AF2F25CE-CCB8-11DD-A7C8-69619DFF4B22"
+        }
+      }
+    },
+    {
+      "data": {
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF31281A-CCB8-11DD-A7C8-69619DFF4B22",
+        "authority": {
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22",
+          "descr": "Florida",
+          "code": "FL"
+        },
+        "seq": "7",
+        "guid": "AF31281A-CCB8-11DD-A7C8-69619DFF4B22",
+        "grade": {
+          "seq": "2220",
+          "low": "9",
+          "high": "12"
+        },
+        "descr": "Evaluate the validity, reliability, bias, and authenticity of current events and Internet resources.",
+        "adopt_year": "2008",
+        "date_modified": "2008-12-17 15:11:13",
+        "placeholder": "N",
+        "deepest": "Y",
+        "parent": {
+          "guid": "AF2F25CE-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "document": {
+          "title": "Next Generation Sunshine State Standards",
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22",
+          "acronym": "NGSSS"
+        },
+        "level": 3,
+        "course": {
+          "seq": "430",
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Grades: 9-12 Revised February 2014"
+        },
+        "version": "1.11.2",
+        "label": "Benchmark",
+        "subject_doc": {
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Social Studies (2008)"
+        },
+        "subject": {
+          "code": "SOC",
+          "broad": "SOC"
+        },
+        "status": "Active",
+        "number": "SS.912.A.1.5"
+      }
+    },
+    {
+      "data": {
+        "date_modified": "2008-12-17 15:11:22",
+        "adopt_year": "2008",
+        "deepest": "Y",
+        "placeholder": "N",
+        "seq": "9",
+        "authority": {
+          "code": "FL",
+          "descr": "Florida",
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22"
+        },
+        "guid": "AF319610-CCB8-11DD-A7C8-69619DFF4B22",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF319610-CCB8-11DD-A7C8-69619DFF4B22",
+        "descr": "Use case studies to explore social, political, legal, and economic relationships in history.",
+        "grade": {
+          "seq": "2220",
+          "low": "9",
+          "high": "12"
+        },
+        "label": "Benchmark",
+        "subject_doc": {
+          "descr": "Social Studies (2008)",
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22"
+        },
+        "level": 3,
+        "version": "1.11.2",
+        "course": {
+          "descr": "Grades: 9-12 Revised February 2014",
+          "seq": "430",
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22"
+        },
+        "number": "SS.912.A.1.6",
+        "status": "Active",
+        "subject": {
+          "code": "SOC",
+          "broad": "SOC"
+        },
+        "parent": {
+          "guid": "AF2F25CE-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "document": {
+          "title": "Next Generation Sunshine State Standards",
+          "acronym": "NGSSS",
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22"
+        }
+      }
+    },
+    {
+      "data": {
+        "adopt_year": "2008",
+        "date_modified": "2008-12-17 15:11:28",
+        "placeholder": "N",
+        "deepest": "Y",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF31F8F8-CCB8-11DD-A7C8-69619DFF4B22",
+        "authority": {
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22",
+          "code": "FL",
+          "descr": "Florida"
+        },
+        "seq": "10",
+        "guid": "AF31F8F8-CCB8-11DD-A7C8-69619DFF4B22",
+        "grade": {
+          "seq": "2220",
+          "low": "9",
+          "high": "12"
+        },
+        "descr": "Describe various socio-cultural aspects of American life including arts, artifacts, literature, education, and publications.",
+        "level": 3,
+        "course": {
+          "descr": "Grades: 9-12 Revised February 2014",
+          "seq": "430",
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22"
+        },
+        "version": "1.11.2",
+        "label": "Benchmark",
+        "subject_doc": {
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Social Studies (2008)"
+        },
+        "subject": {
+          "broad": "SOC",
+          "code": "SOC"
+        },
+        "status": "Active",
+        "number": "SS.912.A.1.7",
+        "parent": {
+          "guid": "AF2F25CE-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "document": {
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22",
+          "acronym": "NGSSS",
+          "title": "Next Generation Sunshine State Standards"
+        }
+      }
+    },
+    {
+      "data": {
+        "parent": {
+          "guid": "AF2EAFAE-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "document": {
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22",
+          "acronym": "NGSSS",
+          "title": "Next Generation Sunshine State Standards"
+        },
+        "subject_doc": {
+          "descr": "Social Studies (2008)",
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22"
+        },
+        "label": "Standard",
+        "version": "1.11.2",
+        "course": {
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "seq": "430",
+          "descr": "Grades: 9-12 Revised February 2014"
+        },
+        "level": 2,
+        "status": "Active",
+        "number": "SS.912.A.2",
+        "subject": {
+          "broad": "SOC",
+          "code": "SOC"
+        },
+        "guid": "AF325C58-CCB8-11DD-A7C8-69619DFF4B22",
+        "seq": "11",
+        "authority": {
+          "descr": "Florida",
+          "code": "FL",
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22"
+        },
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF325C58-CCB8-11DD-A7C8-69619DFF4B22",
+        "descr": "Understand the causes, course, and consequences of the Civil War and Reconstruction and its effects on the American people.",
+        "grade": {
+          "seq": "2220",
+          "low": "9",
+          "high": "12"
+        },
+        "date_modified": "2014-04-08 12:43:41",
+        "adopt_year": "2008",
+        "deepest": "N",
+        "placeholder": "N"
+      }
+    },
+    {
+      "data": {
+        "parent": {
+          "guid": "AF325C58-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "document": {
+          "title": "Next Generation Sunshine State Standards",
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22",
+          "acronym": "NGSSS"
+        },
+        "subject_doc": {
+          "descr": "Social Studies (2008)",
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22"
+        },
+        "label": "Benchmark",
+        "course": {
+          "descr": "Grades: 9-12 Revised February 2014",
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "seq": "430"
+        },
+        "version": "1.11.2",
+        "level": 3,
+        "number": "SS.912.A.2.1",
+        "status": "Active",
+        "subject": {
+          "broad": "SOC",
+          "code": "SOC"
+        },
+        "guid": "AF32D1B0-CCB8-11DD-A7C8-69619DFF4B22",
+        "seq": "12",
+        "authority": {
+          "code": "FL",
+          "descr": "Florida",
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22"
+        },
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF32D1B0-CCB8-11DD-A7C8-69619DFF4B22",
+        "descr": "Review causes and consequences of the Civil War.",
+        "grade": {
+          "high": "12",
+          "low": "9",
+          "seq": "2220"
+        },
+        "date_modified": "2008-12-17 15:12:10",
+        "adopt_year": "2008",
+        "deepest": "Y",
+        "placeholder": "N"
+      }
+    },
+    {
+      "data": {
+        "document": {
+          "title": "Next Generation Sunshine State Standards",
+          "acronym": "NGSSS",
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22"
+        },
+        "parent": {
+          "guid": "AF325C58-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "number": "SS.912.A.2.2",
+        "status": "Active",
+        "subject": {
+          "code": "SOC",
+          "broad": "SOC"
+        },
+        "label": "Benchmark",
+        "subject_doc": {
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Social Studies (2008)"
+        },
+        "level": 3,
+        "version": "1.11.2",
+        "course": {
+          "seq": "430",
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Grades: 9-12 Revised February 2014"
+        },
+        "descr": "Assess the influence of significant people or groups on Reconstruction.",
+        "grade": {
+          "seq": "2220",
+          "low": "9",
+          "high": "12"
+        },
+        "seq": "14",
+        "authority": {
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22",
+          "code": "FL",
+          "descr": "Florida"
+        },
+        "guid": "AF33354C-CCB8-11DD-A7C8-69619DFF4B22",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF33354C-CCB8-11DD-A7C8-69619DFF4B22",
+        "deepest": "Y",
+        "placeholder": "N",
+        "date_modified": "2008-12-17 15:12:19",
+        "adopt_year": "2008"
+      }
+    },
+    {
+      "data": {
+        "label": "Benchmark",
+        "subject_doc": {
+          "descr": "Social Studies (2008)",
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22"
+        },
+        "level": 3,
+        "version": "1.11.2",
+        "course": {
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "seq": "430",
+          "descr": "Grades: 9-12 Revised February 2014"
+        },
+        "status": "Active",
+        "number": "SS.912.A.2.3",
+        "subject": {
+          "broad": "SOC",
+          "code": "SOC"
+        },
+        "parent": {
+          "guid": "AF325C58-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "document": {
+          "acronym": "NGSSS",
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22",
+          "title": "Next Generation Sunshine State Standards"
+        },
+        "date_modified": "2008-12-17 15:12:28",
+        "adopt_year": "2008",
+        "deepest": "Y",
+        "placeholder": "N",
+        "seq": "16",
+        "authority": {
+          "code": "FL",
+          "descr": "Florida",
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22"
+        },
+        "guid": "AF3397F8-CCB8-11DD-A7C8-69619DFF4B22",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF3397F8-CCB8-11DD-A7C8-69619DFF4B22",
+        "descr": "Describe the issues that divided Republicans during the early Reconstruction era.",
+        "grade": {
+          "high": "12",
+          "low": "9",
+          "seq": "2220"
+        }
+      }
+    },
+    {
+      "data": {
+        "level": 3,
+        "course": {
+          "seq": "430",
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Grades: 9-12 Revised February 2014"
+        },
+        "version": "1.11.2",
+        "label": "Benchmark",
+        "subject_doc": {
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Social Studies (2008)"
+        },
+        "subject": {
+          "broad": "SOC",
+          "code": "SOC"
+        },
+        "status": "Active",
+        "number": "SS.912.A.2.4",
+        "parent": {
+          "guid": "AF325C58-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "document": {
+          "title": "Next Generation Sunshine State Standards",
+          "acronym": "NGSSS",
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22"
+        },
+        "adopt_year": "2008",
+        "date_modified": "2008-12-17 15:12:38",
+        "placeholder": "N",
+        "deepest": "Y",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF3405BC-CCB8-11DD-A7C8-69619DFF4B22",
+        "seq": "18",
+        "authority": {
+          "code": "FL",
+          "descr": "Florida",
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22"
+        },
+        "guid": "AF3405BC-CCB8-11DD-A7C8-69619DFF4B22",
+        "grade": {
+          "seq": "2220",
+          "low": "9",
+          "high": "12"
+        },
+        "descr": "Distinguish the freedoms guaranteed to African Americans and other groups with the 13th, 14th, and 15th Amendments to the Constitution."
+      }
+    },
+    {
+      "data": {
+        "parent": {
+          "guid": "AF325C58-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "document": {
+          "acronym": "NGSSS",
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22",
+          "title": "Next Generation Sunshine State Standards"
+        },
+        "version": "1.11.2",
+        "course": {
+          "descr": "Grades: 9-12 Revised February 2014",
+          "seq": "430",
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22"
+        },
+        "level": 3,
+        "subject_doc": {
+          "descr": "Social Studies (2008)",
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22"
+        },
+        "label": "Benchmark",
+        "subject": {
+          "code": "SOC",
+          "broad": "SOC"
+        },
+        "number": "SS.912.A.2.5",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF3467FA-CCB8-11DD-A7C8-69619DFF4B22",
+        "guid": "AF3467FA-CCB8-11DD-A7C8-69619DFF4B22",
+        "seq": "20",
+        "authority": {
+          "descr": "Florida",
+          "code": "FL",
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22"
+        },
+        "grade": {
+          "low": "9",
+          "high": "12",
+          "seq": "2220"
+        },
+        "descr": "Assess how Jim Crow Laws influenced life for African Americans and other racial/ethnic minority groups.",
+        "adopt_year": "2008",
+        "date_modified": "2008-12-17 15:12:48",
+        "placeholder": "N",
+        "deepest": "Y"
+      }
+    },
+    {
+      "data": {
+        "document": {
+          "title": "Next Generation Sunshine State Standards",
+          "acronym": "NGSSS",
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22"
+        },
+        "parent": {
+          "guid": "AF325C58-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "number": "SS.912.A.2.6",
+        "status": "Active",
+        "subject": {
+          "code": "SOC",
+          "broad": "SOC"
+        },
+        "label": "Benchmark",
+        "subject_doc": {
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Social Studies (2008)"
+        },
+        "level": 3,
+        "version": "1.11.2",
+        "course": {
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "seq": "430",
+          "descr": "Grades: 9-12 Revised February 2014"
+        },
+        "descr": "Compare the effects of the Black Codes and the Nadir on freed people, and analyze the sharecropping system and debt peonage as practiced in the United States.",
+        "grade": {
+          "high": "12",
+          "low": "9",
+          "seq": "2220"
+        },
+        "authority": {
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22",
+          "code": "FL",
+          "descr": "Florida"
+        },
+        "seq": "21",
+        "guid": "AF34D1E0-CCB8-11DD-A7C8-69619DFF4B22",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF34D1E0-CCB8-11DD-A7C8-69619DFF4B22",
+        "deepest": "Y",
+        "placeholder": "N",
+        "date_modified": "2008-12-17 15:12:57",
+        "adopt_year": "2008"
+      }
+    },
+    {
+      "data": {
+        "course": {
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "seq": "430",
+          "descr": "Grades: 9-12 Revised February 2014"
+        },
+        "version": "1.11.2",
+        "level": 3,
+        "subject_doc": {
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Social Studies (2008)"
+        },
+        "label": "Benchmark",
+        "subject": {
+          "code": "SOC",
+          "broad": "SOC"
+        },
+        "number": "SS.912.A.2.7",
+        "status": "Active",
+        "parent": {
+          "guid": "AF325C58-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "document": {
+          "acronym": "NGSSS",
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22",
+          "title": "Next Generation Sunshine State Standards"
+        },
+        "adopt_year": "2008",
+        "date_modified": "2008-12-17 15:13:06",
+        "placeholder": "N",
+        "deepest": "Y",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF3533EC-CCB8-11DD-A7C8-69619DFF4B22",
+        "guid": "AF3533EC-CCB8-11DD-A7C8-69619DFF4B22",
+        "seq": "22",
+        "authority": {
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22",
+          "code": "FL",
+          "descr": "Florida"
+        },
+        "grade": {
+          "low": "9",
+          "high": "12",
+          "seq": "2220"
+        },
+        "descr": "Review the Native American experience."
+      }
+    },
+    {
+      "data": {
+        "document": {
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22",
+          "acronym": "NGSSS",
+          "title": "Next Generation Sunshine State Standards"
+        },
+        "parent": {
+          "guid": "AF2EAFAE-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "subject": {
+          "broad": "SOC",
+          "code": "SOC"
+        },
+        "number": "SS.912.A.3",
+        "status": "Active",
+        "level": 2,
+        "course": {
+          "seq": "430",
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Grades: 9-12 Revised February 2014"
+        },
+        "version": "1.11.2",
+        "label": "Standard",
+        "subject_doc": {
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22",
+          "descr": "Social Studies (2008)"
+        },
+        "grade": {
+          "high": "12",
+          "low": "9",
+          "seq": "2220"
+        },
+        "descr": "Analyze the transformation of the American economy and the changing social and political conditions in response to the Industrial Revolution.",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF359634-CCB8-11DD-A7C8-69619DFF4B22",
+        "seq": "24",
+        "authority": {
+          "code": "FL",
+          "descr": "Florida",
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22"
+        },
+        "guid": "AF359634-CCB8-11DD-A7C8-69619DFF4B22",
+        "placeholder": "N",
+        "deepest": "N",
+        "adopt_year": "2008",
+        "date_modified": "2014-04-08 12:44:17"
+      }
+    },
+    {
+      "data": {
+        "subject": {
+          "broad": "SOC",
+          "code": "SOC"
+        },
+        "status": "Active",
+        "number": "SS.912.A.3.1",
+        "level": 3,
+        "course": {
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "seq": "430",
+          "descr": "Grades: 9-12 Revised February 2014"
+        },
+        "version": "1.11.2",
+        "label": "Benchmark",
+        "subject_doc": {
+          "descr": "Social Studies (2008)",
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22"
+        },
+        "document": {
+          "title": "Next Generation Sunshine State Standards",
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22",
+          "acronym": "NGSSS"
+        },
+        "parent": {
+          "guid": "AF359634-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "placeholder": "N",
+        "deepest": "Y",
+        "adopt_year": "2008",
+        "date_modified": "2008-12-17 15:13:46",
+        "grade": {
+          "low": "9",
+          "high": "12",
+          "seq": "2220"
+        },
+        "descr": "Analyze the economic challenges to American farmers and farmers' responses to these challenges in the mid to late 1800s.",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF35F82C-CCB8-11DD-A7C8-69619DFF4B22",
+        "authority": {
+          "descr": "Florida",
+          "code": "FL",
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22"
+        },
+        "seq": "25",
+        "guid": "AF35F82C-CCB8-11DD-A7C8-69619DFF4B22"
+      }
+    },
+    {
+      "data": {
+        "adopt_year": "2008",
+        "date_modified": "2008-12-17 15:13:55",
+        "placeholder": "N",
+        "deepest": "Y",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/AF365A92-CCB8-11DD-A7C8-69619DFF4B22",
+        "guid": "AF365A92-CCB8-11DD-A7C8-69619DFF4B22",
+        "seq": "27",
+        "authority": {
+          "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22",
+          "code": "FL",
+          "descr": "Florida"
+        },
+        "grade": {
+          "high": "12",
+          "low": "9",
+          "seq": "2220"
+        },
+        "descr": "Examine the social, political, and economic causes, course, and consequences of the second Industrial Revolution that began in the late 19th century.",
+        "version": "1.11.2",
+        "course": {
+          "descr": "Grades: 9-12 Revised February 2014",
+          "guid": "B8D25062-C801-11DD-B8FE-F90E9DFF4B22",
+          "seq": "430"
+        },
+        "level": 3,
+        "subject_doc": {
+          "descr": "Social Studies (2008)",
+          "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22"
+        },
+        "label": "Benchmark",
+        "subject": {
+          "code": "SOC",
+          "broad": "SOC"
+        },
+        "status": "Active",
+        "number": "SS.912.A.3.2",
+        "parent": {
+          "guid": "AF359634-CCB8-11DD-A7C8-69619DFF4B22"
+        },
+        "document": {
+          "title": "Next Generation Sunshine State Standards",
+          "acronym": "NGSSS",
+          "guid": "209823E4-2FB7-11DE-BA91-15719DFF4B22"
+        }
+      }
+    }
+  ]

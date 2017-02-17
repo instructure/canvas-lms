@@ -48,4 +48,96 @@ describe "Importing Learning Outcomes" do
     Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration, existing_outcome)
     expect(@context.learning_outcomes.count).to eq 2
   end
+
+  it "should not generate a new outcome when one already exists with the same guid" do
+    existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
+    identifier = existing_outcome.migration_id
+    lo_data = @data["learning_outcomes"].find{|lo| lo["migration_id"] == identifier }
+    AcademicBenchmark.stubs(:use_new_guid_columns?).returns(true)
+    Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration)
+    expect(@context.learning_outcomes.count).to eq 2
+    existing_outcome.write_attribute('migration_id_2', "7321d12e-3705-430d-9dfd-2511b0c73c14")
+    existing_outcome.save!
+    lo_data[:migration_id] = "7321d12e-3705-430d-9dfd-2511b0c73c14"
+    Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration)
+    expect(@context.learning_outcomes.count).to eq 2
+  end
+
+  it "change calculation method, calculation int and rubric criterion" do
+    existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
+    expect(existing_outcome.calculation_method).to eq "highest"
+    expect(existing_outcome.calculation_int).to eq nil
+    expect(existing_outcome.data).to eq nil
+    identifier = existing_outcome.migration_id
+    lo_data = @data["learning_outcomes"].find{|lo| lo["migration_id"] == identifier }
+    lo_data[:calculation_method] = "decaying_average"
+    lo_data[:calculation_int] = 65
+    lo_data[:points_possible] = 5
+    lo_data[:mastery_points] = 3
+    lo_data[:ratings] = [
+      { points: 5, description: "Exceeds Expectations" },
+      { points: 3, description: "Meets Expectations" },
+      { points: 0, description: "Does Not Meet Expectations" }
+    ]
+    Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration, existing_outcome)
+    expect(existing_outcome.calculation_method).to eq "decaying_average"
+    expect(existing_outcome.calculation_int).to eq 65
+    expect(existing_outcome.data[:rubric_criterion][:mastery_points]).to eq 3
+    expect(existing_outcome.data[:rubric_criterion][:points_possible]).to eq 5
+    expect(existing_outcome.data[:rubric_criterion][:ratings][0][:points]).to eq 5
+    expect(existing_outcome.data[:rubric_criterion][:ratings][0][:description]).to eq "Exceeds Expectations"
+    expect(existing_outcome.data[:rubric_criterion][:ratings][1][:points]).to eq 3
+    expect(existing_outcome.data[:rubric_criterion][:ratings][1][:description]).to eq "Meets Expectations"
+    expect(existing_outcome.data[:rubric_criterion][:ratings][2][:points]).to eq 0
+    expect(existing_outcome.data[:rubric_criterion][:ratings][2][:description]).to eq "Does Not Meet Expectations"
+    lo_data[:calculation_method] = "highest"
+    Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration, existing_outcome)
+    expect(existing_outcome.calculation_method).to eq "highest"
+    expect(existing_outcome.calculation_int).to eq nil
+  end
+
+  it "assessed outcomes cannot change calculation method, calculation int and rubric criterion" do
+    existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
+    identifier = existing_outcome.migration_id
+    lo_data = @data["learning_outcomes"].find{|lo| lo["migration_id"] == identifier }
+    lo_data[:calculation_method] = "decaying_average"
+    lo_data[:calculation_int] = 65
+    lo_data[:points_possible] = 5
+    lo_data[:mastery_points] = 3
+    current_ratings = [
+      { points: 5, description: "Exceeds Expectations" },
+      { points: 3, description: "Meets Expectations" },
+      { points: 0, description: "Does Not Meet Expectations" }
+    ]
+    lo_data[:ratings] = current_ratings
+    Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration, existing_outcome)
+    expect(existing_outcome.calculation_method).to eq lo_data[:calculation_method]
+    expect(existing_outcome.calculation_int).to eq lo_data[:calculation_int]
+    expect(existing_outcome.data[:rubric_criterion][:description]).to eq existing_outcome.short_description
+    expect(existing_outcome.data[:rubric_criterion][:mastery_points]).to eq lo_data[:mastery_points]
+    expect(existing_outcome.data[:rubric_criterion][:points_possible]).to eq lo_data[:points_possible]
+    expect(existing_outcome.data[:rubric_criterion][:ratings]).to eq current_ratings
+    lor = LearningOutcomeResult.new(
+      alignment: ContentTag.create!({
+        title: 'content',
+        context: @course,
+        learning_outcome: existing_outcome})
+      )
+    lor.save!
+    lo_data[:calculation_method] = "n_mastery"
+    lo_data[:calculation_int] = 5
+    lo_data[:points_possible] = 10
+    lo_data[:mastery_points] = 7
+    lo_data[:ratings] = [
+      { points: 10, description: "Excellent" },
+      { points: 0, description: "Fail" }
+    ]
+    Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration, existing_outcome)
+    expect(existing_outcome.calculation_method).to eq "decaying_average"
+    expect(existing_outcome.calculation_int).to eq 65
+    expect(existing_outcome.data[:rubric_criterion][:description]).to eq existing_outcome.short_description
+    expect(existing_outcome.data[:rubric_criterion][:mastery_points]).to eq 3
+    expect(existing_outcome.data[:rubric_criterion][:points_possible]).to eq 5
+    expect(existing_outcome.data[:rubric_criterion][:ratings]).to eq current_ratings
+  end
 end

@@ -25,8 +25,6 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   after_save :destroy_override_if_needed
   after_destroy :destroy_override_if_needed
 
-  strong_params
-
   validates_presence_of :assignment_override, :user
   validates_uniqueness_of :user_id, :scope => [:assignment_id, :quiz_id],
     :message => 'already belongs to an assignment override'
@@ -81,6 +79,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
 
   def self.clean_up_for_assignment(assignment)
     return unless assignment.context_type == "Course"
+    return if assignment.new_record?
 
     valid_student_ids = Enrollment
       .where(course_id: assignment.context_id)

@@ -1,15 +1,5 @@
 class StudentGradesPage
-  include SeleniumDriverSetup
-  include OtherHelperMethods
-  include CustomSeleniumActions
-  include CustomAlertActions
-  include CustomPageLoaders
-  include CustomScreenActions
-  include CustomValidators
-  include CustomWaitMethods
-  include CustomDateHelpers
-  include LoginAndSessionMethods
-  include SeleniumErrorRecovery
+  include SeleniumDependencies
 
   # Period components
   def period_options_css
@@ -33,14 +23,19 @@ class StudentGradesPage
     f('#submission_final-grade .grade')
   end
 
+  def grading_period_dropdown
+    f('.grading_periods_selector')
+  end
+
   def select_period_by_name(name)
-    period = ff(period_options_css).find do |option|
-      option.text == name
-    end
-    period.click
+    click_option(grading_period_dropdown, name)
   end
 
   def assignment_titles
     ff(assignment_titles_css).map(&:text)
+  end
+
+  def assignment_row(assignment)
+    f("#submission_#{assignment.id}")
   end
 end

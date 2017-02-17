@@ -64,6 +64,7 @@ module Api::V1::DiscussionTopics
   def discussion_topic_api_json(topic, context, user, session, opts = {})
     opts.reverse_merge!(
       include_assignment: true,
+      include_all_dates: false,
       override_dates: true
     )
 
@@ -79,6 +80,7 @@ module Api::V1::DiscussionTopics
       excludes = opts[:exclude_assignment_description] ? ['description'] : []
       json[:assignment] = assignment_json(topic.assignment, user, session,
         include_discussion_topic: false, override_dates: opts[:override_dates],
+        include_all_dates: opts[:include_all_dates],
         exclude_response_fields: excludes)
     end
 
@@ -109,7 +111,7 @@ module Api::V1::DiscussionTopics
       subscribed: topic.subscribed?(user), topic_children: topic.child_topics.pluck(:id),
       attachments: attachments, published: topic.published?,
       can_unpublish: opts[:user_can_moderate] ? topic.can_unpublish?(opts) : false,
-      locked: topic.locked?, can_lock: topic.can_lock?,
+      locked: topic.locked?, can_lock: topic.can_lock?, comments_disabled: topic.comments_disabled?,
       author: user_display_json(topic.user, topic.context),
       html_url: html_url, url: html_url, pinned: !!topic.pinned,
       group_category_id: topic.group_category_id, can_group: topic.can_group?(opts) }
@@ -123,6 +125,10 @@ module Api::V1::DiscussionTopics
       else
         fields[:message] = can_view ? api_user_content(topic.message, context) : lock_explanation(fields[:lock_info], 'topic', context)
       end
+    end
+
+    if opts[:include_master_course_restrictions]
+      fields.merge!(topic.master_course_api_restriction_data)
     end
 
     fields

@@ -17,8 +17,10 @@
 #
 
 class Feature
-  ATTRS = [:feature, :display_name, :description, :applies_to, :state, :root_opt_in, :enable_at, :beta, :development,
-    :release_notes_url, :custom_transition_proc, :after_state_change_proc, :autoexpand, :touch_context]
+  ATTRS = [:feature, :display_name, :description, :applies_to, :state,
+           :root_opt_in, :enable_at, :beta, :development,
+           :release_notes_url, :custom_transition_proc,
+           :after_state_change_proc, :autoexpand, :touch_context].freeze
   attr_reader *ATTRS
 
   def initialize(opts = {})
@@ -64,8 +66,8 @@ class Feature
   # Register one or more features.  Must be done during application initialization.
   # The feature_hash is as follows:
   #   automatic_essay_grading: {
-  #     display_name: lambda { I18n.t('features.automatic_essay_grading', 'Automatic Essay Grading') },
-  #     description: lambda { I18n.t('features.automatic_essay_grading_description, 'Popup text describing the feature goes here') },
+  #     display_name: -> { I18n.t('features.automatic_essay_grading', 'Automatic Essay Grading') },
+  #     description: -> { I18n.t('features.automatic_essay_grading_description, 'Popup text describing the feature goes here') },
   #     applies_to: 'Course', # or 'RootAccount' or 'Account' or 'User'
   #     state: 'allowed',     # or 'off', 'on', 'hidden', or 'hidden_in_prod'
   #                           # - 'hidden' means the feature must be set by a site admin before it will be visible
@@ -144,12 +146,11 @@ END
     'underline_all_links' =>
     {
       display_name: -> { I18n.t('Underline Links') },
-      description: -> { I18n.t('Display all text links in Canvas as *underlined text*.',
-        wrapper: {
-          '*' => '<span class="feature-detail-underline">\1</span>'
-        }
-      )
-    },
+      description: -> { I18n.t('underline_all_links_description', <<-END, wrapper: { '*' => '<span class="feature-detail-underline">\1</span>' })},
+Underline Links displays hyperlinks in navigation menus, the Dashboard, and page sidebars as
+*underlined text*. This feature option does not apply to user-generated content links in the
+Rich Content Editor, which always underlines links for all users.
+END
       applies_to: 'User',
       state: 'allowed',
       beta: true
@@ -283,38 +284,47 @@ END
     },
     'lti2_rereg' =>
     {
-        display_name: -> {I18n.t('LTI 2 Reregistration')},
-        description: -> { I18n.t('Enable reregistration for LTI 2 ')},
-        applies_to:'RootAccount',
-        state: 'hidden',
-        beta: true
+      display_name: -> {I18n.t('LTI 2 Reregistration')},
+      description: -> { I18n.t('Enable reregistration for LTI 2 ')},
+      applies_to:'RootAccount',
+      state: 'hidden',
+      beta: true
     },
     'quizzes_lti' =>
-      {
-        display_name: -> { I18n.t('Quiz LTI Plugin') },
-        description: -> { I18n.t('Use the new quiz LTI tool in place of regular canvas quizzes') },
-        applies_to: 'Course',
-        state: 'hidden',
-        beta: true,
-        root_opt_in: true
-      },
+    {
+      display_name: -> { I18n.t('Quiz LTI Plugin') },
+      description: -> { I18n.t('Use the new quiz LTI tool in place of regular canvas quizzes') },
+      applies_to: 'Course',
+      state: 'hidden',
+      beta: true,
+      root_opt_in: true
+    },
     'disable_lti_post_only' =>
-      {
-        display_name: -> { I18n.t('Don\'t Move LTI Query Params to POST Body') },
-        description: -> { I18n.t('If enabled, query parameters will not be copied to the POST body during an LTI launch.') },
-        applies_to: 'RootAccount',
-        state: 'hidden',
-        beta: true,
-        root_opt_in: true
-      },
+    {
+      display_name: -> { I18n.t('Don\'t Move LTI Query Params to POST Body') },
+      description: -> { I18n.t('If enabled, query parameters will not be copied to the POST body during an LTI launch.') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: true,
+      root_opt_in: true
+    },
+    'new_sis_integrations' =>
+    {
+      display_name: -> { I18n.t('Enable new SIS integration settings') },
+      description:  -> { I18n.t('Make new settings for SIS integrations visible and active') },
+      applies_to: 'Account',
+      state: 'hidden',
+      root_opt_in: true,
+      beta: true
+    },
     'bulk_sis_grade_export' =>
       {
-          display_name: -> { I18n.t('Allow Bulk Grade Export to SIS') },
-          description:  -> { I18n.t('Allows teachers to mark grade data to be exported in bulk to SIS integrations.') },
-          applies_to: 'RootAccount',
-          state: 'hidden',
-          root_opt_in: true,
-          beta: true
+        display_name: -> { I18n.t('Allow Bulk Grade Export to SIS') },
+        description:  -> { I18n.t('Allows teachers to mark grade data to be exported in bulk to SIS integrations.') },
+        applies_to: 'RootAccount',
+        state: 'hidden',
+        root_opt_in: true,
+        beta: true
       },
     'notification_service' =>
     {
@@ -333,7 +343,7 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       beta: true,
-      development: true,
+      development: false,
       root_opt_in: false
     },
     'use_new_tree' =>
@@ -354,13 +364,15 @@ END
       root_opt_in: true,
       beta: true
     },
-    'gradebook_performance' => {
-      display_name: -> { I18n.t('Gradebook Performance') },
-      description: -> { I18n.t('Performance enhancements for the Gradebook') },
-      applies_to: 'Course',
+    'dashcard_reordering' =>
+    {
+      display_name: -> { I18n.t('Allow Reorder Dashboard Cards') },
+      description: -> { I18n.t('Allow dashboard cards to be reordered for each user.') },
+      applies_to: 'RootAccount',
       state: 'hidden',
+      beta: true,
       development: true,
-      root_opt_in: true
+      root_opt_in: false
     },
     'anonymous_grading' => {
       display_name: -> { I18n.t('Anonymous Grading') },
@@ -390,7 +402,8 @@ END
       state: 'hidden',
       beta: true,
       development: true,
-      root_opt_in: true
+      root_opt_in: true,
+      touch_context: true
     },
     'rich_content_service' =>
     {
@@ -453,7 +466,8 @@ END
       applies_to: 'Course',
       state: 'hidden',
       development: false,
-      root_opt_in: true
+      root_opt_in: true,
+      touch_context: true
     },
     'new_annotations' =>
     {
@@ -473,6 +487,50 @@ END
       beta: true,
       root_opt_in: true,
       development: true,
+    },
+    'master_courses' =>
+    {
+      display_name: -> { I18n.t('Blueprint Courses') }, # this won't be confusing at all
+      description: -> { I18n.t('Enable the creation of Blueprint Courses') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: true,
+      development: true,
+    },
+    'student_context_cards' =>
+    {
+      display_name: -> { I18n.t('Student Context Card') },
+      description: -> { I18n.t('Enable student context card links') },
+      applies_to: "RootAccount",
+      state: "allowed",
+      beta: true
+    },
+    'gradezilla' =>
+    {
+      display_name: -> { I18n.t('Gradezilla') },
+      description: -> { I18n.t('Enable Gradezilla (name is only a placeholder as it will replace Gradebook in the future).') },
+      applies_to: "RootAccount",
+      state: "hidden",
+      beta: true,
+      development: true,
+    },
+    'modules_home_page' =>
+    {
+      display_name: -> { I18n.t('Modules Home Page') },
+      description: -> { I18n.t('Default to modules for the course home page') },
+      applies_to: "RootAccount",
+      state: "hidden",
+      beta: true,
+      development: true,
+    },
+    'new_user_tutorial' =>
+    {
+      display_name: -> { I18n.t('New User Tutorial')},
+      description: -> { I18n.t('Provide tutorial information for new users in a flyout tray.')},
+      applies_to: "RootAccount",
+      state: "hidden",
+      beta: true,
+      development: true
     }
   )
 
@@ -484,16 +542,16 @@ END
 
   def applies_to_object(object)
     case @applies_to
-      when 'RootAccount'
-        object.is_a?(Account) && object.root_account?
-      when 'Account'
-        object.is_a?(Account)
-      when 'Course'
-        object.is_a?(Course) || object.is_a?(Account)
-      when 'User'
-        object.is_a?(User) || object.is_a?(Account) && object.site_admin?
-      else
-        false
+    when 'RootAccount'
+      object.is_a?(Account) && object.root_account?
+    when 'Account'
+      object.is_a?(Account)
+    when 'Course'
+      object.is_a?(Course) || object.is_a?(Account)
+    when 'User'
+      object.is_a?(User) || object.is_a?(Account) && object.site_admin?
+    else
+      false
     end
   end
 

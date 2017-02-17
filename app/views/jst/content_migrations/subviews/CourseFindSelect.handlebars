@@ -4,13 +4,13 @@
   {{#if show_select}}
     <select id="courseSelect" class="span3">
       <option value="default">{{#t "select_default"}}Select a course{{/t}}</option>
-       {{#eachProp terms}}
-       <optgroup label="{{property}}">
-           {{#each value}}
+       {{#each terms}}
+       <optgroup label="{{term}}">
+           {{#each courses}}
              <option value="{{id}}">{{label}}</option>
            {{/each}}
          </optgroup>
-       {{/eachProp}}
+       {{/each}}
     </select>
     {{#t "or"}}or{{/t}}
   {{/if}}
@@ -25,5 +25,3 @@
     {{#t 'include_completed_courses'}}Include completed courses{{/t}}
   </label>
 </div>
-
-

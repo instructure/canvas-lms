@@ -31,7 +31,7 @@ describe "CrummyController" do
       @filter_blocks ||= []
     end
 
-    def self.before_filter(*filters, &block)
+    def self.before_action(*filters, &block)
       filter_blocks.push block
     end
 

@@ -1,4 +1,4 @@
-class AddLtiToolSettings < ActiveRecord::Migration
+class AddLtiToolSettings < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

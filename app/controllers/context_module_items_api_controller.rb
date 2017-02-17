@@ -196,11 +196,11 @@
 #     }
 #
 class ContextModuleItemsApiController < ApplicationController
-  before_filter :require_context
-  before_filter :require_user, :only => [:select_mastery_path]
-  before_filter :find_student, :only => [:index, :show, :select_mastery_path]
-  before_filter :disable_escape_html_entities, :only => [:index, :show]
-  after_filter :enable_escape_html_entities, :only => [:index, :show]
+  before_action :require_context
+  before_action :require_user, :only => [:select_mastery_path]
+  before_action :find_student, :only => [:index, :show, :select_mastery_path]
+  before_action :disable_escape_html_entities, :only => [:index, :show]
+  after_action :enable_escape_html_entities, :only => [:index, :show]
   include Api::V1::ContextModule
 
   # @API List module items
@@ -503,7 +503,13 @@ class ContextModuleItemsApiController < ApplicationController
     assignment = @item.assignment
     return render json: { message: 'requested item is not an assignment' }, status: :bad_request unless assignment
 
-    response = ConditionalRelease::Service.select_mastery_path(@context, @current_user, @student, assignment.id, params[:assignment_set_id], session)
+    response = ConditionalRelease::Service.select_mastery_path(
+      @context,
+      @current_user,
+      @student,
+      assignment,
+      params[:assignment_set_id],
+      session)
 
     if response[:code] != '200'
       render json: response[:body], status: response[:code]
@@ -514,8 +520,8 @@ class ContextModuleItemsApiController < ApplicationController
 
       Assignment.preload_context_module_tags(assignments)
 
-      # match cyoe order
-      assignments = assignments.index_by(&:id).values_at(*assignment_ids)
+      # match cyoe order, omit unpublished or deleted assignments
+      assignments = assignments.index_by(&:id).values_at(*assignment_ids).compact
 
       # grab locally relevant module items
       items = assignments.map(&:all_context_module_tags).flatten.select{|a| a.context_module_id == @module.id}

@@ -3,13 +3,14 @@
 // compilation to extract i18nliner scopes, and then we wrap the resulting
 // template in an AMD module, giving it dependencies on handlebars, it's scoped
 // i18n object if it needs one, and any brandableCss variant stuff it needs.
-import Handlebars from 'handlebars'
-import {pick} from 'lodash'
-import {EmberHandlebars} from 'ember-template-compiler'
-import ScopedHbsExtractor from './../gems/canvas_i18nliner/js/scoped_hbs_extractor'
-import {allFingerprintsFor} from 'brandable_css/lib/main'
-import PreProcessor from './../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor'
-import './../gems/canvas_i18nliner/js/scoped_hbs_pre_processor'
+const Handlebars = require('handlebars')
+const {pick} = require('lodash')
+const {EmberHandlebars} = require('ember-template-compiler')
+const ScopedHbsExtractor = require('./../gems/canvas_i18nliner/js/scoped_hbs_extractor')
+require('babel-polyfill')
+const {allFingerprintsFor} = require('brandable_css/lib/main')
+const PreProcessor = require('./../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor')
+require('./../gems/canvas_i18nliner/js/scoped_hbs_pre_processor')
 
 const compileHandlebars = (data) => {
   const path = data.path
@@ -21,14 +22,12 @@ const compileHandlebars = (data) => {
     const scope = extractor.scope
     PreProcessor.scope = scope
     PreProcessor.process(ast)
-    extractor.forEach(() => translationCount++ )
+    extractor.forEach(() => translationCount++)
 
     const precompiler = data.ember ? EmberHandlebars : Handlebars
-    const result = precompiler.precompile(ast).toString()
-    const payload = {template: result, scope: scope, translationCount: translationCount}
-    return payload
-  }
-  catch (e) {
+    const template = precompiler.precompile(ast).toString()
+    return {template, scope, translationCount}
+  } catch (e) {
     e = e.message || e
     console.log(e)
     throw {error: e}
@@ -42,8 +41,8 @@ const emitTemplate = (path, name, result, dependencies, cssRegistration, partial
       var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
       var name = '${name}';
       templates[name] = template(${result['template']});
-      ${partialRegistration}
-      ${cssRegistration}
+      ${partialRegistration};
+      ${cssRegistration};
       return templates[name];
     });
   `
@@ -92,7 +91,7 @@ const partialRegexp = /\{\{>\s?\[?(.+?)\]?( .*?)?}}/g
 const findReferencedPartials = (source) => {
   let partials = []
   let match
-  while(match = partialRegexp.exec(source)){
+  while (match = partialRegexp.exec(source)){
     partials.push(match[1].trim())
   }
 
@@ -123,15 +122,15 @@ const buildPartialRequirements = (partialPaths) => {
   return requirements
 }
 
-export default function i18nLinerHandlebarsLoader (source) {
+module.exports = function i18nLinerHandlebarsLoader (source) {
   this.cacheable()
   const name = resourceName(this.resourcePath)
   const dependencies = ['handlebars']
 
-  var partialRegistration = emitPartialRegistration(this.resourcePath, name)
+  const partialRegistration = emitPartialRegistration(this.resourcePath, name)
 
-  var cssRegistration = buildCssReference(name)
-  if (cssRegistration){
+  const cssRegistration = buildCssReference(name)
+  if (cssRegistration) {
     // arguments[1] will be brandableCss
     dependencies.push('compiled/util/brandableCss')
   }
@@ -141,7 +140,7 @@ export default function i18nLinerHandlebarsLoader (source) {
   partialRequirements.forEach(requirement => dependencies.push(requirement))
 
   const result = compileHandlebars({path: this.resourcePath, source})
-  if (result.error){
+  if (result.error) {
     console.log('THERE WAS AN ERROR IN PRECOMPILATION', result)
     throw result
   }
@@ -149,6 +148,6 @@ export default function i18nLinerHandlebarsLoader (source) {
   if (result.translationCount > 0) {
     dependencies.push('i18n!' + result.scope)
   }
-  var compiledTemplate = emitTemplate(this.resourcePath, name, result, dependencies, cssRegistration, partialRegistration)
+  const compiledTemplate = emitTemplate(this.resourcePath, name, result, dependencies, cssRegistration, partialRegistration)
   return compiledTemplate
 }

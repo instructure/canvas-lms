@@ -24,7 +24,31 @@ class Submission < ActiveRecord::Base
   include SendToStream
   include Workflow
 
-  attr_protected :submitted_at
+  GRADE_STATUS_MESSAGES_MAP = {
+    success: {
+      status: true
+    }.freeze,
+    account_admin: {
+      status: true
+    }.freeze,
+    unpublished: {
+      status: false,
+      message: I18n.t('This assignment is still unpublished')
+    }.freeze,
+    not_autograded: {
+      status: false,
+      message: I18n.t('This submission is not being autograded')
+    }.freeze,
+    cant_manage_grades: {
+      status: false,
+      message: I18n.t("You don't have permission to manage grades for this course")
+    }.freeze,
+    assignment_in_closed_grading_period: {
+      status: false,
+      message: I18n.t('This assignment is in a closed grading period for this student')
+    }.freeze
+  }.freeze
+
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
                 :skip_grade_calc
@@ -47,9 +71,10 @@ class Submission < ActiveRecord::Base
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
   has_many :rubric_assessments, :as => :artifact
-  has_many :attachment_associations, :as => :context
+  has_many :attachment_associations, :as => :context, :inverse_of => :context
   has_many :provisional_grades, class_name: 'ModeratedGrading::ProvisionalGrade'
-  has_one :rubric_assessment, -> { where(assessment_type: 'grading') }, as: :artifact
+  has_many :originality_reports
+  has_one :rubric_assessment, -> { where(assessment_type: 'grading') }, as: :artifact, inverse_of: :artifact
 
   # we no longer link submission comments and conversations, but we haven't fixed up existing
   # linked conversations so this relation might be useful
@@ -66,6 +91,7 @@ class Submission < ActiveRecord::Base
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :published_grade, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_as_url :url
+  validate :ensure_grader_can_grade
 
   scope :with_comments, -> { preload(:submission_comments) }
   scope :after, lambda { |date| where("submissions.created_at>?", date) }
@@ -103,6 +129,8 @@ class Submission < ActiveRecord::Base
 
 
   # see #needs_grading?
+  # When changing these conditions, consider updating index_submissions_on_assignment_id
+  # to maintain performance.
   def self.needs_grading_conditions
     conditions = <<-SQL
       submissions.submission_type IS NOT NULL
@@ -132,13 +160,25 @@ class Submission < ActiveRecord::Base
     needs_grading? != needs_grading?(:was)
   end
 
-  scope :needs_grading, -> { where(needs_grading_conditions) }
+  scope :needs_grading, -> {
+    s_name = quoted_table_name
+    e_name = Enrollment.quoted_table_name
+    joins("INNER JOIN #{e_name} ON #{s_name}.user_id=#{e_name}.user_id")
+    .where(needs_grading_conditions)
+    .where(Enrollment.active_student_conditions)
+    .distinct
+  }
 
+  scope :needs_grading_count, -> {
+    select("COUNT(#{quoted_table_name}.id)")
+    .needs_grading
+  }
 
   sanitize_field :body, CanvasSanitize::SANITIZE
 
   attr_accessor :saved_by,
-                :assignment_changed_not_sub
+                :assignment_changed_not_sub,
+                :grading_error_message
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
   before_save :prep_for_submitting_to_turnitin
@@ -165,25 +205,24 @@ class Submission < ActiveRecord::Base
     !!(self.grader_id && self.grader_id < 0)
   end
 
-  def adjust_needs_grading_count(mode = :increment)
-    amount = mode == :increment ? 1 : -1
+  def touch_assignments
     Assignment.
       where(id: assignment_id, context_type: 'Course').
       where("EXISTS (?)",
         Enrollment.where(Enrollment.active_student_conditions).
         where(user_id: user_id).
         where("course_id=assignments.context_id")).
-      update_all(["needs_grading_count=needs_grading_count+?, updated_at=?", amount, Time.now.utc])
+      update_all(["updated_at=?", Time.now.utc])
     # TODO: add this to the SQL above when DA is on for everybody
     # and remove NeedsGradingCountQuery#manual_count
     # AND EXISTS (SELECT assignment_student_visibilities.* WHERE assignment_student_visibilities.user_id = NEW.user_id AND assignment_student_visibilities.assignment_id = NEW.assignment_id);
   end
 
-  after_create :update_needs_grading_count, if: :needs_grading?
-  after_update :update_needs_grading_count, if: :needs_grading_changed?
-  def update_needs_grading_count
+  after_create :needs_grading_count_updated, if: :needs_grading?
+  after_update :needs_grading_count_updated, if: :needs_grading_changed?
+  def needs_grading_count_updated
     self.class.connection.after_transaction_commit do
-      adjust_needs_grading_count(needs_grading? ? :increment : :decrement)
+      touch_assignments
     end
   end
 
@@ -231,7 +270,17 @@ class Submission < ActiveRecord::Base
       self.assignment.published? &&
         self.assignment.context.grants_right?(user, session, :manage_grades)
     end
-    can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
+    can :read and can :comment and can :make_group_comment and can :read_grade
+
+    given do |user, _session|
+      can_grade?(user)
+    end
+    can :grade
+
+    given do
+      can_autograde?
+    end
+    can :autograde
 
     given do |user, session|
       self.assignment.user_can_read_grades?(user, session)
@@ -289,13 +338,15 @@ class Submission < ActiveRecord::Base
       plagData = self.vericite_data_hash
       @submit_to_vericite = false
       settings = assignment.vericite_settings
+      type_can_peer_review = true
     else
       plagData = self.turnitin_data
       @submit_to_turnitin = false
       settings = assignment.turnitin_settings
+      type_can_peer_review = false
     end
     return plagData &&
-    user_can_read_grade?(user, session) &&
+    (user_can_read_grade?(user, session) || (type_can_peer_review && user_can_peer_review_plagiarism?(user))) &&
     (assignment.context.grants_right?(user, session, :manage_grades) ||
       case settings[:originality_report_visibility]
        when 'immediate' then true
@@ -305,6 +356,18 @@ class Submission < ActiveRecord::Base
        when 'never' then false
       end
     )
+  end
+
+  def user_can_peer_review_plagiarism?(user)
+    assignment.peer_reviews &&
+    assignment.current_submissions_and_assessors[:submissions].select{ |submission|
+      # first filter by submissions for the requested reviewer
+      user.id == submission.user_id &&
+      submission.assigned_assessments
+    }.any? {|submission|
+      # next filter the assigned assessments by the submission user_id being reviewed
+      submission.assigned_assessments.any? {|review| user_id == review.user_id}
+    }
   end
 
   def user_can_read_grade?(user, session=nil)
@@ -333,7 +396,19 @@ class Submission < ActiveRecord::Base
       else
         Rails.logger.info "GRADES: submission #{global_id} score changed. recomputing grade for course #{context.global_id} user #{user_id}."
         self.class.connection.after_transaction_commit do
-          Enrollment.send_later_if_production_enqueue_args(:recompute_final_score, { run_at: 3.seconds.from_now }, self.user_id, self.context.id)
+          effective_due_dates = EffectiveDueDates.new(self.context, self.assignment_id)
+          grading_period_id = effective_due_dates.grading_period_id_for(
+            student_id: self.user_id,
+            assignment_id: self.assignment_id
+          )
+          Enrollment.send_later_if_production_enqueue_args(
+            :recompute_final_score,
+            { run_at: 3.seconds.from_now },
+            self.user_id,
+            self.context.id,
+            grading_period_id: grading_period_id,
+            update_all_grading_period_scores: false
+          )
         end
       end
       self.assignment.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score) if self.assignment
@@ -474,6 +549,22 @@ class Submission < ActiveRecord::Base
     true
   end
 
+  # This method pulls data from the OriginalityReport table
+  # Preload OriginalityReport before using this method in a collection of submissions
+  def originality_data
+    data = self.originality_reports.each_with_object({}) do |originality_report, hash|
+      hash[Attachment.asset_string(originality_report.attachment_id)] = {
+        similarity_score: originality_report.originality_score.round(2),
+        state: originality_report.state,
+        report_url: originality_report.originality_report_url,
+        status: originality_report.workflow_state
+      }
+    end
+    ret_val = turnitin_data.merge(data)
+    ret_val.delete(:provider)
+    ret_val
+  end
+
   def turnitin_assets
     if self.submission_type == 'online_upload'
       self.attachments.select{ |a| a.turnitinable? }
@@ -482,6 +573,17 @@ class Submission < ActiveRecord::Base
     else
       []
     end
+  end
+
+  # Preload OriginalityReport before using this method
+  def originality_report_url(asset_string, user)
+    url = nil
+    if self.grants_right?(user, :view_turnitin_report)
+      attachment = self.attachments.find_by_asset_string(asset_string)
+      report = self.originality_reports.find_by(attachment: attachment)
+      url = report.originality_report_url if report
+    end
+    url
   end
 
   def delete_turnitin_errors
@@ -684,6 +786,10 @@ class Submission < ActiveRecord::Base
 
   VERICITE_RETRY = 5
   def submit_to_vericite(attempt=0)
+    Rails.logger.info("VERICITE #submit_to_vericite submission ID: #{self.id}, vericiteable? #{vericiteable?}")
+    if vericiteable?
+      Rails.logger.info("VERICITE #submit_to_vericite submission ID: #{self.id}, plugin: #{Canvas::Plugin.find(:vericite)}, vericite plugin enabled? #{Canvas::Plugin.find(:vericite).try(:enabled?)}")
+    end
     return unless vericiteable? && Canvas::Plugin.find(:vericite).try(:enabled?)
     vericite = VeriCite::Client.new()
     reset_vericite_assets
@@ -819,6 +925,8 @@ class Submission < ActiveRecord::Base
       canSubmit = self.turnitinable?
     end
     last_attempt = plagData && plagData[:last_processed_attempt]
+    Rails.logger.info("VERICITE #prep_for_submitting_to_plagiarism submission ID: #{self.id}, type: #{type}, canSubmit? #{canSubmit}")
+    Rails.logger.info("VERICITE #prep_for_submitting_to_plagiarism submission ID: #{self.id}, last_attempt: #{last_attempt}, self.attempt: #{self.attempt}, @group_broadcast_submission: #{@group_broadcast_submission}, self.group: #{self.group}")
     if canSubmit && (!last_attempt || last_attempt < self.attempt) && (@group_broadcast_submission || !self.group)
       if plagData[:last_processed_attempt] != self.attempt
         plagData[:last_processed_attempt] = self.attempt
@@ -845,6 +953,7 @@ class Submission < ActiveRecord::Base
       delayFunction = :submit_to_turnitin
       delayOpts = TURNITIN_JOB_OPTS
     end
+    Rails.logger.info("VERICITE #submit_to_plagiarism_later submission ID: #{self.id}, type: #{type}, canSubmit? #{canSubmit}, submitPlag? #{submitPlag}")
     if canSubmit && submitPlag
       delay = Setting.get(delayName, 60.to_s).to_i
       send_later_enqueue_args(delayFunction, { :run_at => delay.seconds.from_now }.merge(delayOpts))
@@ -1036,6 +1145,9 @@ class Submission < ActiveRecord::Base
         # since vericite_data is a function, make sure you are cloning the most recent vericite_data_hash
         if self.vericiteable?
           model.turnitin_data = self.vericite_data(true)
+        # only use originality data if it's loaded, we want to avoid making N+1 queries
+        elsif self.association(:originality_reports).loaded?
+          model.turnitin_data = self.originality_data
         end
         if model.submitted_at && last_submitted_at.to_i != model.submitted_at.to_i
           res << model
@@ -1063,6 +1175,77 @@ class Submission < ActiveRecord::Base
     end
     true
   end
+
+  def ensure_grader_can_grade
+    return true if grader_can_grade?
+
+    error_msg = I18n.t(
+      'cannot be changed at this time: %{grading_error}',
+      { grading_error: grading_error_message }
+    )
+    errors.add(:grade, error_msg)
+    false
+  end
+
+  def grader_can_grade?
+    return true unless grade_changed?
+    return true if autograded? && grants_right?(nil, :autograde)
+    return true if grants_right?(grader, :grade)
+
+    false
+  end
+
+  def can_autograde?
+    result = GRADE_STATUS_MESSAGES_MAP[can_autograde_symbolic_status]
+    result ||= { status: false, message: I18n.t('Cannot autograde at this time') }
+
+    can_autograde_status, @grading_error_message = result[:status], result[:message]
+
+    can_autograde_status
+  end
+  private :can_autograde?
+
+  def can_autograde_symbolic_status
+    return :unpublished unless assignment.published?
+    return :not_autograded if grader_id >= 0
+
+    student_id = user_id || self.user.try(:id)
+
+    if assignment.in_closed_grading_period_for_student?(student_id)
+      :assignment_in_closed_grading_period
+    else
+      :success
+    end
+  end
+  private :can_autograde_symbolic_status
+
+  def can_grade?(user = nil)
+    user ||= grader
+    result = GRADE_STATUS_MESSAGES_MAP[can_grade_symbolic_status(user)]
+    result ||= { status: false, message: I18n.t('Cannot grade at this time') }
+
+    can_grade_status, @grading_error_message = result[:status], result[:message]
+
+    can_grade_status
+  end
+  private :can_grade?
+
+  def can_grade_symbolic_status(user = nil)
+    user ||= grader
+
+    return :unpublished unless assignment.published?
+    return :cant_manage_grades unless context.grants_right?(user, nil, :manage_grades)
+    return :account_admin if context.account_membership_allows(user)
+
+    student_id = self.user_id || self.user.try(:id)
+
+    if assignment.in_closed_grading_period_for_student?(student_id)
+      :assignment_in_closed_grading_period
+    else
+      :success
+    end
+  end
+  private :can_grade_symbolic_status
 
   def queue_websnap
     if !self.attachment_id && @url_changed && self.url && self.submission_type == 'online_url'
@@ -1270,8 +1453,10 @@ class Submission < ActiveRecord::Base
   end
   private :preferred_plugin_course_id
 
-  def grade_change_audit
-    return true unless (self.changed & %w(grade score excused)).present? || self.assignment_changed_not_sub
+  def grade_change_audit(force_audit = self.assignment_changed_not_sub)
+    newly_graded = self.workflow_state_changed? && self.workflow_state == 'graded'
+    grade_changed = (self.changed & %w(grade score excused)).present?
+    return true unless newly_graded || grade_changed || force_audit
     self.class.connection.after_transaction_commit { Auditors::GradeChange.record(self) }
   end
 
@@ -1335,7 +1520,7 @@ class Submission < ActiveRecord::Base
   end
 
   def last_teacher_comment
-    submission_comments.reverse.find{|com| com.author_id != user_id}
+    submission_comments.published.reverse.find{ |com| com.author_id != user_id }
   end
 
   def has_submission?
@@ -1577,7 +1762,7 @@ class Submission < ActiveRecord::Base
   #  * workflow_state (String)
   #  * cached_due_date (Time)
   #  * submitted_at (Time)
-  #  * score (Fixnum)
+  #  * score (Integer)
   #  * excused (Boolean)
   #
   module Tardiness
@@ -1799,6 +1984,10 @@ class Submission < ActiveRecord::Base
 
   def muted_assignment?
     self.assignment.muted?
+  end
+
+  def assignment_muted_changed
+    self.grade_change_audit(true)
   end
 
   def without_graded_submission?

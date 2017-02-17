@@ -3,14 +3,14 @@
         aria-hidden="true"
         data-tooltip
         data-bind='{"title":"unreadText", "text":"unreadCount"}'
-        title="<%= t('unread_count_tooltip', { 
+        title="<%= t('unread_count_tooltip', {
                      :zero => 'No unread replies.',
                      :one => '1 unread reply.',
                      :other => '%{count} unread replies.'
-                    }, :count => unread_count) %>"><%= unread_count if unread_count > 0 %></span>
+                    }, :count => unread_count) %>"><%= n(unread_count) if unread_count > 0 %></span>
   <span class="screenreader-only"
         data-bind='{"text":"unreadText"}'>
-    <%= t('unread_count_tooltip', { 
+    <%= t('unread_count_tooltip', {
            :zero => 'No unread replies.',
            :one => '1 unread reply.',
            :other => '%{count} unread replies.'
@@ -23,7 +23,7 @@
                      :zero => 'No replies.',
                      :one => '1 reply.',
                      :other => '%{count} replies.'
-                    }, :count => reply_count) %>"><%= reply_count if reply_count > 0 %></span>
+                    }, :count => reply_count) %>"><%= n(reply_count) if reply_count > 0 %></span>
   <span class="screenreader-only">
     <%= t('reply_count_tooltip', {
            :zero => 'No replies.',

@@ -108,22 +108,10 @@ class GoogleDocsCollaboration < Collaboration
     GoogleDrive::Connection.config
   end
 
-  # Internal: Update collaborators with the given groups.
-  #
-  # users - An array of users to add as collaborators.
-  #
-  # Returns nothing.
-  def add_users_to_collaborators(users)
-    if users.length > 0
-      existing_users = collaborators.where(:user_id => users).pluck(:user_id)
-      users.select { |u| !existing_users.include?(u.id) }.each do |u|
-        service = google_adapter_user_service(u)
-        service_user_id = service ? service.service_user_id : nil
-        collaborators.create(:user => u, :authorized_service_user_id => service_user_id)
-      end
-    end
+  def authorized_service_user_id_for(user)
+    service = google_adapter_user_service(user)
+    service ? service.service_user_id : nil
   end
-  protected :add_users_to_collaborators
 
   private
 

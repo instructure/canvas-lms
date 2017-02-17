@@ -9,7 +9,7 @@ describe 'RemoveDiscussionEntryAttachmentForeignKey' do
 
   it "should allow cross-shard users and attachments" do
     @shard1.activate do
-      @teacher = user
+      @teacher = user_factory
       @file = attachment_model context: @teacher, filename: 'wat.txt', uploaded_data: stub_file_data('wat.txt', nil, 'text/plain')
     end
     course_with_teacher user: @teacher

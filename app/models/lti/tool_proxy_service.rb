@@ -37,16 +37,19 @@ module Lti
 
     end
 
-    def process_tool_proxy_json(json, context, guid, tool_proxy_to_update = nil, tc_half_shared_secret = nil)
+    def process_tool_proxy_json(json:, context:, guid:, tool_proxy_to_update: nil, tc_half_shared_secret: nil, developer_key: nil)
       @tc_half_secret = tc_half_shared_secret
 
       tp = IMS::LTI::Models::ToolProxy.new.from_json(json)
       tp.tool_proxy_guid = guid
-
-      validate_proxy!(tp, context)
+      begin
+        validate_proxy!(tp, context, developer_key)
+      rescue Lti::ToolProxyService::InvalidToolProxyError
+        raise unless depricated_split_secret?(tp)
+      end
       tool_proxy = nil
       ToolProxy.transaction do
-        product_family = create_product_family(tp, context.root_account)
+        product_family = create_product_family(tp, context.root_account, developer_key)
         tool_proxy = create_tool_proxy(tp, context, product_family, tool_proxy_to_update)
         process_resources(tp, tool_proxy)
         create_proxy_binding(tool_proxy, context)
@@ -59,7 +62,8 @@ module Lti
 
     def create_secret(tp)
       security_contract = tp.security_contract
-      if (tp_half_secret = tp.enabled_capabilities.include?('OAuth.splitSecret') && security_contract.tp_half_shared_secret)
+      tp_half_secret = security_contract.tp_half_shared_secret
+      if (tp.enabled_capabilities & ['OAuth.splitSecret', 'Security.splitSecret']).present? && tp_half_secret.present?
         @tc_half_secret ||= SecureRandom.hex(64)
         tc_half_secret + tp_half_secret
       else
@@ -68,6 +72,12 @@ module Lti
     end
 
     private
+    def depricated_split_secret?(tp)
+      tp.enabled_capability.present? &&
+      tp.enabled_capability.include?("OAuth.splitSecret") &&
+      tp.security_contract.tp_half_shared_secret.present?
+    end
+
     def create_tool_proxy(tp, context, product_family, tool_proxy=nil)
       # make sure the guid never changes
       raise InvalidToolProxyError if tool_proxy && tp.tool_proxy_guid != tool_proxy.guid
@@ -88,13 +98,14 @@ module Lti
       tool_proxy
     end
 
-    def create_product_family(tp, account)
+    def create_product_family(tp, account, developer_key)
       vendor_code = tp.tool_profile.product_instance.product_info.product_family.vendor.code
       product_code = tp.tool_profile.product_instance.product_info.product_family.code
-      unless product_family = ProductFamily.where(vendor_code: vendor_code, product_code: product_code).first
+      unless product_family = ProductFamily.where(vendor_code: vendor_code, product_code: product_code, developer_key: developer_key).first
         product_family = ProductFamily.new
         product_family.vendor_code = vendor_code
         product_family.product_code = product_code
+        product_family.developer_key = developer_key
 
         vendor = tp.tool_profile.product_instance.product_info.product_family.vendor
         product_family.vendor_name = vendor.default_name
@@ -195,9 +206,9 @@ module Lti
       obj.kind_of?(Array) ? obj.map(&:as_json) : obj.as_json
     end
 
-    def validate_proxy!(tp, context)
+    def validate_proxy!(tp, context, developer_key = nil)
 
-      profile = Lti::ToolConsumerProfileCreator.new(context, tp.tool_consumer_profile).create
+      profile = Lti::ToolConsumerProfileCreator.new(context, tp.tool_consumer_profile).create(developer_key.present?)
       tp_validator = IMS::LTI::Services::ToolProxyValidator.new(tp)
       tp_validator.tool_consumer_profile = profile
 

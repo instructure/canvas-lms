@@ -1,4 +1,4 @@
-class MessageCounts < ActiveRecord::Migration
+class MessageCounts < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

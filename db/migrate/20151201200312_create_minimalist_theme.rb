@@ -1,4 +1,4 @@
-class CreateMinimalistTheme < ActiveRecord::Migration
+class CreateMinimalistTheme < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   NAME = "Minimalist Theme"

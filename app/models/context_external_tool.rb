@@ -6,13 +6,10 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :context_external_tool_placements, :autosave => true
 
   belongs_to :context, polymorphic: [:course, :account]
-  attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key,
-                  :name, :description, :custom_fields, :custom_fields_string,
-                  :course_navigation, :account_navigation, :user_navigation,
-                  :resource_selection, :editor_button, :homework_submission,
-                  :course_home_sub_navigation, :course_settings_sub_navigation,
-                  :config_type, :config_url, :config_xml, :tool_id,
-                  :not_selectable
+
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:name, :description]
+  restrict_columns :settings, [:consumer_key, :shared_secret, :url, :domain, :settings]
 
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_presence_of :name, :consumer_key, :shared_secret
@@ -66,6 +63,13 @@ class ContextExternalTool < ActiveRecord::Base
     return unless tag
     launch_url = assignment.external_tool_tag.url
     self.find_external_tool(launch_url, assignment.context)
+  end
+
+  def content_migration_configured?
+    settings.key?('content_migration') &&
+      settings['content_migration'].is_a?(Hash) &&
+      settings['content_migration'].key?('export_start_url') &&
+      settings['content_migration'].key?('import_start_url')
   end
 
   def extension_setting(type, property = nil)
@@ -472,7 +476,7 @@ class ContextExternalTool < ActiveRecord::Base
     url = ContextExternalTool.standardize_url(url)
     host = Addressable::URI.parse(url).host
     if domain
-      domain == host
+      domain.downcase == host.downcase
     elsif standard_url
       Addressable::URI.parse(standard_url).host == host
     else

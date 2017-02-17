@@ -1,7 +1,7 @@
 <tr {{#if locked}}class="locked"{{/if}}>
   <td class="date-column">
     <input name="date" class="date_field"
-      value="{{fcMomentToDateString start "medium_with_weekday"}}"
+      value="{{fcMomentToDateString date "medium_with_weekday"}}"
       aria-label="{{t "date_label" "Date"}}{{datepickerScreenreaderPrompt 'date'}}"
       {{#if locked}}disabled{{/if}} type="text"
       data-tooltip title="{{accessibleDateFormat 'date'}}"/>

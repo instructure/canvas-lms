@@ -1,0 +1,28 @@
+<a
+  {{#with author}}
+    {{#ifAll id course_id is_student}}
+      data-student_id="{{id}}" data-course_id="{{course_id}}"
+      class="author student_context_card_trigger"
+    {{else}}
+      class="author"
+    {{/ifAll}}
+    {{#if html_url}}
+      href="{{html_url}}"
+      data-bypass
+    {{/if}}
+    {{#if url}}
+        href="{{url}}"
+    {{/if}}
+    title="{{#t "authors_name"}}Author's name{{/t}}"
+    >{{display_name}}
+  {{else}}
+    class="author unknown"
+    >{{#t "unknown_author"}}>Unknown Author{{/t}}
+  {{/with}}
+  {{#if author.isInactive}}
+    <span class="label"
+          title="{{#t}}This user is currently not able to access the course{{/t}}">
+      {{#t}}inactive{{/t}}
+    </span>
+  {{/if}}
+</a>

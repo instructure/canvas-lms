@@ -18,7 +18,7 @@
 class FilePreviewsController < ApplicationController
   include AttachmentHelper
 
-  before_filter :get_context
+  before_action :get_context
 
   GOOGLE_PREVIEWABLE_TYPES = %w{
    application/vnd.openxmlformats-officedocument.wordprocessingml.template
@@ -59,7 +59,7 @@ class FilePreviewsController < ApplicationController
         formats: [:html]
     end
     if authorized_action(@file, @current_user, :read)
-      unless @file.grants_right?(@current_user, :download)
+      unless @file.grants_right?(@current_user, session, :download)
         @lock_info = @file.locked_for?(@current_user)
         return render template: 'file_previews/lock_explanation', layout: false
       end

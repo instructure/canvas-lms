@@ -25,9 +25,11 @@ define [
 
     app.render()
 
-  module 'EditHeaderView',
+  QUnit.module 'EditHeaderView',
     setup: ->
-      fakeENV.setup()
+      fakeENV.setup({
+        current_user_roles: ['teacher']
+      })
       $(document).on 'submit', -> false
     teardown: ->
       fakeENV.teardown()
@@ -49,11 +51,11 @@ define [
     ok view.$(".delete_assignment_link.disabled").length
 
   test "disallows deleting assignments due in closed grading periods", ->
-    view = editHeaderView(has_due_date_in_closed_grading_period: true)
+    view = editHeaderView(in_closed_grading_period: true)
     ok view.$(".delete_assignment_link.disabled").length
 
   test "allows deleting non-frozen assignments not due in closed grading periods", ->
-    view = editHeaderView(frozen: false, has_due_date_in_closed_grading_period: false)
+    view = editHeaderView(frozen: false, in_closed_grading_period: false)
     ok view.$(".delete_assignment_link:not(.disabled)").length
 
   test "allows deleting frozen assignments for admins", ->
@@ -61,13 +63,13 @@ define [
     ok view.$(".delete_assignment_link:not(.disabled)").length
 
   test "allows deleting assignments due in closed grading periods for admins", ->
-    view = editHeaderView({ has_due_date_in_closed_grading_period: true }, { userIsAdmin: true })
+    view = editHeaderView({ in_closed_grading_period: true }, { userIsAdmin: true })
     ok view.$(".delete_assignment_link:not(.disabled)").length
 
   test 'does not attempt to delete an assignment due in a closed grading period', ->
-    view = editHeaderView(has_due_date_in_closed_grading_period: true)
+    view = editHeaderView(in_closed_grading_period: true)
 
-    @stub(window, "confirm", -> true )
+    @stub(window, "confirm").returns(true)
     @spy view, "delete"
 
     view.$(".delete_assignment_link").click()
@@ -75,7 +77,7 @@ define [
     ok window.confirm.notCalled
     ok view.delete.notCalled
 
-  module 'EditHeaderView - ConditionalRelease',
+  QUnit.module 'EditHeaderView - ConditionalRelease',
     setup: ->
       fakeENV.setup()
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true

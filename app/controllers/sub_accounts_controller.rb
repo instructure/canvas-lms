@@ -42,7 +42,7 @@ class SubAccountsController < ApplicationController
     end
   end
 
-  before_filter :require_context, :require_account_management
+  before_action :require_context, :require_account_management
   def index
     @query = params[:account] && params[:account][:name] || params[:term]
     if @query
@@ -171,6 +171,6 @@ class SubAccountsController < ApplicationController
   end
 
   def account_params
-    strong_params.require(:account).permit(:name, :default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb)
+    params.require(:account).permit(:name, :default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb)
   end
 end

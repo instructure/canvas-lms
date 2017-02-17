@@ -20,30 +20,23 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'alert' do
-  before do
+  before :once do
     course_with_student
-    @alert = @course.alerts.create!(:recipients => [:student], :criteria => [:criterion_type => 'Interaction', :threshold => 7])
+    @alert = @course.alerts.create!(recipients: [:student],
+                                    criteria: [
+                                      criterion_type: 'Interaction',
+                                      threshold: 7
+                                    ])
+    @enrollment = @course.enrollments.first
   end
 
-  it "should render email" do
-    generate_message(:alert, :email, @alert, :asset_context => @course.enrollments.first)
+  let(:asset) { @alert }
+  let(:notification_name) { :alert }
+  let(:message_data) do
+    {
+      asset_context: @enrollment
+    }
   end
 
-  it "should render sms" do
-    generate_message(:alert, :sms, @alert, :asset_context => @course.enrollments.first)
-  end
-
-  it "should render summary" do
-    generate_message(:alert, :summary, @alert, :asset_context => @course.enrollments.first)
-  end
-
-  it "should render twitter" do
-    generate_message(:alert, :twitter, @alert, :asset_context => @course.enrollments.first)
-    expect(@message.main_link).to be_present
-    expect(@message.body).to be_present
-  end
-
-  it "should render push" do
-    generate_message(:alert, :push, @alert, asset_context: @course.enrollments.first)
-  end
+  include_examples "a message"
 end

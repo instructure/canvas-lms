@@ -14,6 +14,9 @@ define ['jquery'], ($) ->
       start = $start.data('unfudged-date')
       end = $end.data('unfudged-date')
 
+      realStart = $start.data('date')
+      realEnd = $end.data('date')
+
       if start and end
         # we only care about comparing the time of day, not the date portion
         # (since they'll both be interpreted relative to some other date field
@@ -22,7 +25,8 @@ define ['jquery'], ($) ->
         start.setFullYear(end.getFullYear())
         start.setMonth(end.getMonth())
         start.setDate(end.getDate())
-        if end < start
+
+        if realEnd < realStart
           # both present and valid, but violate expected ordering, set the one
           # not just changed equal to the one just changed
           if $blurred is $end

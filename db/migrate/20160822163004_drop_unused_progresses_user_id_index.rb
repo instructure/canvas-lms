@@ -1,4 +1,4 @@
-class DropUnusedProgressesUserIdIndex < ActiveRecord::Migration
+class DropUnusedProgressesUserIdIndex < ActiveRecord::Migration[4.2]
  tag :postdeploy
 
   def change

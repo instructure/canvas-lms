@@ -2,12 +2,11 @@ define [
   'jquery'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/shared/modal-content'
-], ($, React, ReactDOM, ModalContent) ->
+], ($, React, ReactDOM, TestUtils, ModalContent) ->
 
-  TestUtils = React.addons.TestUtils
-
-  module 'ModalContent'
+  QUnit.module 'ModalContent'
 
   test "applies className to parent node", ->
     ModalContentElement = React.createElement(ModalContent, className: 'cat')

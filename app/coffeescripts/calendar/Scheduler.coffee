@@ -13,7 +13,7 @@ define [
   'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
-  'vendor/jquery.spin'
+  'spin.js/jquery.spin'
   'compiled/behaviors/activate'
 ], ($, _, I18n, fcUtil, appointmentGroupListTemplate, schedulerRightSideAdminSectionTemplate, EditAppointmentGroupDialog, MessageParticipantsDialog, deleteItemTemplate, semanticDateRange) ->
 

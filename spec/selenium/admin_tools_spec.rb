@@ -46,8 +46,6 @@ describe "admin_tools" do
   def click_view_tab(tab_name)
     wait_for_ajaximations
     tab = fj("#adminToolsTabs .#{tab_name} > a")
-    expect(tab).not_to be_nil
-    expect(tab).to be_displayed
     tab.click
     wait_for_ajaximations
   end
@@ -531,7 +529,7 @@ describe "admin_tools" do
     end
 
     it "should show copied_to event details" do
-      @course, @copied_course = @course, course(active_course: true, course_name: "Copied Course")
+      @course, @copied_course = @course, course_factory(active_course: true, course_name: "Copied Course")
       @from_event, @to_event = Auditors::Course.record_copied(@course, @copied_course, @teacher)
 
       show_event_details("Copied To", @course.name, @to_event)
@@ -539,7 +537,7 @@ describe "admin_tools" do
     end
 
     it "should show copied_from event details" do
-      @course, @copied_course = @course, course(active_course: true, course_name: "Copied Course")
+      @course, @copied_course = @course, course_factory(active_course: true, course_name: "Copied Course")
       @from_event, @to_event = Auditors::Course.record_copied(@course, @copied_course, @teacher)
 
       show_event_details("Copied From", @copied_course.name, @from_event)
@@ -547,7 +545,7 @@ describe "admin_tools" do
     end
 
     it "should show reset_to event details" do
-      @course, @reset_course = @course, course(active_course: true, course_name: "Reset Course")
+      @course, @reset_course = @course, course_factory(active_course: true, course_name: "Reset Course")
       @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
 
       show_event_details("Reset To", @course.name, @to_event)
@@ -555,7 +553,7 @@ describe "admin_tools" do
     end
 
     it "should show copied_from event details" do
-      @course, @reset_course = @course, course(active_course: true, course_name: "Reset Course")
+      @course, @reset_course = @course, course_factory(active_course: true, course_name: "Reset Course")
       @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
 
       show_event_details("Reset From", @reset_course.name, @from_event)

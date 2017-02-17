@@ -26,7 +26,7 @@ describe 'DataFixup::FixBulkMessageAttachments' do
       attachment = attachment_model(:context => @user, :folder => @user.conversation_attachments_folder)
       root_message = Conversation.build_message @user, "hi all", :attachment_ids => [attachment.id]
       
-      ConversationBatch.generate(root_message, 20.times.map{ user }, :sync)
+      ConversationBatch.generate(root_message, 20.times.map{ user_factory }, :sync)
 
       # ensure they aren't linked to the attachment
       AttachmentAssociation.where("context_id<>?", root_message).delete_all

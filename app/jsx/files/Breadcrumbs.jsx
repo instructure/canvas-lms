@@ -20,7 +20,6 @@ define([
       <li key={name}>
         <a
           href={(isRootCrumb && isContextRoot) ? filesEnv.baseUrl : `${filesEnv.baseUrl}/folder/${(folder) ? folder.urlPath(): null}`}
-          params={{splat: (isRootCrumb) ? null : folder.urlPath()}}
           // only add title tooltips if there's a chance they could be ellipsized
           title={(this.state.maxCrumbWidth < 500) ? name : null}
         >
@@ -41,11 +40,7 @@ define([
       return [
         this.renderSingleCrumb(null, !'isLastCrumb', !!'isRootCrumb'),
         <li key='searchLink'>
-          <a
-            href='/search'
-            query={this.props.query}
-            params={{splat: ''}}
-          >
+          <a href="/search">
             <span className='ellipsis'>
               {this.props.query.search_term &&
                 I18n.t('search_results_for', 'search results for "%{search_term}"', {search_term: this.props.query.search_term})

@@ -72,7 +72,7 @@ describe ApplicationHelper do
     Account.default.update_attribute(:settings, { :teachers_can_create_courses => true, :students_can_create_courses => true })
     @domain_root_account = Account.default
     expect(show_user_create_course_button(nil)).to be_falsey
-    user
+    user_factory
     expect(show_user_create_course_button(@user)).to be_falsey
     course_with_teacher
     expect(show_user_create_course_button(@teacher)).to be_truthy
@@ -326,15 +326,15 @@ describe ApplicationHelper do
         end
 
         it "should fall-back to @domain_root_account's branding if I'm logged in but not enrolled in anything" do
-          @current_user = user
+          @current_user = user_factory
           output = helper.include_account_css
           expect(output).to have_tag 'link'
           expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root']]
         end
 
         it "should load custom css even for high contrast users" do
-          @current_user = user
-          user.enable_feature!(:high_contrast)
+          @current_user = user_factory
+          user_factory.enable_feature!(:high_contrast)
           @context = @grandchild_account
           output = helper.include_account_css
           expect(output).to have_tag 'link'
@@ -387,8 +387,8 @@ describe ApplicationHelper do
           end
 
           it "should load custom js even for high contrast users" do
-            @current_user = user
-            user.enable_feature!(:high_contrast)
+            @current_user = user_factory
+            user_factory.enable_feature!(:high_contrast)
             output = helper.include_account_js
             expect(output).to have_tag 'script'
             expect(output).to match(/#{Regexp.quote('["https:\/\/example.com\/root\/account.js"].forEach')}/)
@@ -452,10 +452,6 @@ describe ApplicationHelper do
   end
 
   describe "hidden dialogs" do
-    before do
-      expect(hidden_dialogs).to be_empty
-    end
-
     it "should generate empty string when there are no dialogs" do
       str = render_hidden_dialogs
       expect(str).to eq ''
@@ -489,7 +485,7 @@ describe ApplicationHelper do
 
   describe "collection_cache_key" do
     it "should generate a cache key, changing when an element cache_key changes" do
-      collection = [user, user, user]
+      collection = [user_factory, user_factory, user_factory]
       key1 = collection_cache_key(collection)
       key2 = collection_cache_key(collection)
       expect(key1).to eq key2
@@ -535,7 +531,7 @@ describe ApplicationHelper do
 
       context "with a user logged in" do
         before :each do
-          @current_user = user
+          @current_user = user_factory
         end
 
         it "returns the custom dashboard_url with the current user's id" do
@@ -665,7 +661,7 @@ describe ApplicationHelper do
   describe "active_brand_config" do
 
     it "returns nil if user prefers high contrast" do
-      @current_user = user
+      @current_user = user_factory
       @current_user.enable_feature!(:high_contrast)
       expect(helper.send(:active_brand_config)).to be_nil
     end
@@ -694,6 +690,7 @@ describe ApplicationHelper do
       helper.stubs(:js_bundles).returns([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
     end
     it "creates the correct javascript tags" do
+      helper.stubs(:use_webpack?).returns(false)
       base_url = helper.use_optimized_js? ? '/optimized' : '/javascripts'
       expect(helper.include_js_bundles).to eq %{
 <script src="#{base_url}/compiled/bundles/some_bundle.js"></script>
@@ -704,16 +701,65 @@ describe ApplicationHelper do
 
     it "creates the correct javascript tags with webpack enabled" do
       helper.stubs(:use_webpack?).returns(true)
-      base_url = helper.use_optimized_js? ? "/webpack-dist-optimized" : "/webpack-dist"
+      helper.stubs(:js_env).returns({
+        BIGEASY_LOCALE: 'nb_NO',
+        MOMENT_LOCALE: 'nb',
+        TIMEZONE: 'America/La_Paz',
+        CONTEXT_TIMEZONE: 'America/Denver'
+      })
+      base_url = helper.use_optimized_js? ? 'dist/webpack-production' : 'dist/webpack-dev'
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/vendor.js').returns('vendor_url')
+      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('javascripts/vendor/timezone/America/La_Paz.js').returns('La_Paz_url')
+      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('javascripts/vendor/timezone/America/Denver.js').returns('Denver_url')
+      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('javascripts/vendor/timezone/nb_NO.js').returns('nb_NO_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/moment/locale/nb.js').returns('nb_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/appBootstrap.js').returns('app_bootstrap_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/common.js').returns('common_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/some_bundle.js').returns('some_bundle_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/some_plugin-some_plugin_bundle.js').returns('plugin_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/another_bundle.js').returns('another_bundle_url')
+
       expect(helper.include_js_bundles).to eq %{
-<script src="#{base_url}/vendor.bundle.js"></script>
-<script src="#{base_url}/instructure-common.bundle.js"></script>
-<script src="#{base_url}/some_bundle.bundle.js"></script>
-<script src="#{base_url}/some_plugin-some_plugin_bundle.bundle.js"></script>
-<script src="#{base_url}/another_bundle.bundle.js"></script>
+<script src="/vendor_url"></script>
+<script src="/La_Paz_url"></script>
+<script src="/Denver_url"></script>
+<script src="/nb_NO_url"></script>
+<script src="/nb_url"></script>
+<script src="/app_bootstrap_url"></script>
+<script src="/common_url"></script>
+<script src="/some_bundle_url"></script>
+<script src="/plugin_url"></script>
+<script src="/another_bundle_url"></script>
       }.strip
     end
   end
 
+  describe "map_courses_for_menu" do
+    context "with Dashcard Reordering feature enabled" do
+      before(:each) do
+        @account = Account.default
+        @account.enable_feature! :dashcard_reordering
+        @domain_root_account = @account
+      end
+
+      it "returns the list of courses sorted by position" do
+        course1 = @account.courses.create!
+        course2 = @account.courses.create!
+        course3 = @account.courses.create!
+        user = user_model
+        course1.enroll_student(user)
+        course2.enroll_student(user)
+        course3.enroll_student(user)
+        courses = [course1, course2, course3]
+        user.dashboard_positions[course1.asset_string] = 3
+        user.dashboard_positions[course2.asset_string] = 2
+        user.dashboard_positions[course3.asset_string] = 1
+        user.save!
+        @current_user = user
+        mapped_courses = map_courses_for_menu(courses)
+        expect(mapped_courses.map {|h| h[:id]}).to eq [course3.id, course2.id, course1.id]
+      end
+    end
+  end
 
 end

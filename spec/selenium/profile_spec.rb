@@ -21,16 +21,21 @@ describe "profile" do
   end
 
   def generate_access_token(purpose = 'testing', close_dialog = false)
+    generate_access_token_with_expiration(nil, purpose)
+    if close_dialog
+      close_visible_dialog
+    end
+  end
+
+  def generate_access_token_with_expiration(date, purpose = 'testing')
     f('.add_access_token_link').click
     access_token_form = f('#access_token_form')
     access_token_form.find_element(:id, 'access_token_purpose').send_keys(purpose)
+    access_token_form.find_element(:id, 'access_token_expires_at').send_keys(date) unless date.nil?
     submit_dialog_form(access_token_form)
     wait_for_ajax_requests
     details_dialog = f('#token_details_dialog')
     expect(details_dialog).to be_displayed
-    if close_dialog
-      close_visible_dialog
-    end
   end
 
   def log_in_to_settings
@@ -163,7 +168,7 @@ describe "profile" do
 
       get "/profile/settings"
       edit_form = click_edit
-      expect(edit_form.find_elements(:id, 'user_short_name').first).to be_nil
+      expect(edit_form).not_to contain_css('#user_short_name')
       click_option('#user_locale', 'Español')
       expect_new_page_load { submit_form(edit_form) }
       expect(get_value('#user_locale')).to eq 'es'
@@ -193,8 +198,7 @@ describe "profile" do
     it "should delete a service" do
       get "/profile/settings"
       add_skype_service
-      #had to use add class because tests were failing inconsistently in aws
-      driver.execute_script("$('.service').addClass('service-hover')")
+      driver.action.move_to(f('.service')).perform
       f('.delete_service_link').click
       expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
@@ -218,9 +222,35 @@ describe "profile" do
       expect(f(selector).selected?).to be_truthy
     end
 
-    it "should generate a new access token" do
+    it "should generate a new access token without an expiration", priority: "2", test_id: 588918 do
+      get "/profile/settings"
+      generate_access_token('testing', true)
+      # some jquery replaces the expiration which makes it hard to select until refresh
+      driver.navigate.refresh
+      expect(f('.access_token .expires')).to include_text('never')
+    end
+
+    it "should generate a new access token with an expiration", priority: "2", test_id: 588919 do
+      Timecop.freeze do
+        get "/profile/settings"
+        generate_access_token_with_expiration(format_date_for_view(2.days.from_now, :medium))
+        close_visible_dialog
+        # some jquery replaces the 'never' with the expiration which makes it hard to select until refresh
+        driver.navigate.refresh
+      end
+      expect(f('.access_token .expires')).to include_text(format_time_for_view(2.days.from_now.midnight))
+    end
+
+    it "should regenerate a new access token", priority: "2", test_id: 588920 do
       get "/profile/settings"
       generate_access_token
+      token = f('.visible_token').text
+      f('.regenerate_token').click
+      expect(driver.switch_to.alert).not_to be_nil
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      new_token = f('.visible_token').text
+      expect(token).not_to eql(new_token)
     end
 
     it "should test canceling creating a new access token" do
@@ -234,15 +264,15 @@ describe "profile" do
     it "should view the details of an access token" do
       get "/profile/settings"
       generate_access_token('testing', true)
-      #had to use :visible because it was failing saying element wasn't visible
+      # had to use :visible because it was failing saying element wasn't visible
       fj('#access_tokens .show_token_link:visible').click
       expect(f('#token_details_dialog')).to be_displayed
     end
 
-    it "should delete an access token" do
+    it "should delete an access token", priority: "2", test_id: 588921 do
       get "/profile/settings"
       generate_access_token('testing', true)
-      #had to use :visible because it was failing saying element wasn't visible
+      # had to use :visible because it was failing saying element wasn't visible
       fj("#access_tokens .delete_key_link:visible").click
       expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
@@ -264,7 +294,7 @@ describe "profile" do
   end
 
   context "services test" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
     end
 
@@ -291,7 +321,7 @@ describe "profile" do
       expect(is_checked('#account_services_avatars')).to be_truthy
     end
 
-    # TODO reimplement per CNVS-29610, but make sure we're testing at the right level
+    # TODO: reimplement per CNVS-29610, but make sure we're testing at the right level
     it "should successfully upload profile pictures"
 
     it "should allow users to choose an avatar from their profile page" do
@@ -313,7 +343,7 @@ describe "profile" do
   end
 
   describe "profile pictures s3 tests" do
-    # TODO reimplement per CNVS-29611, but make sure we're testing at the right level
+    # TODO: reimplement per CNVS-29611, but make sure we're testing at the right level
     it "should successfully upload profile pictures"
   end
 
@@ -324,7 +354,7 @@ describe "profile" do
       Account.default.save!
 
       course_with_student_logged_in(:active_all => true)
-      @other_student = user
+      @other_student = user_factory
       @other_student.avatar_state = "submitted"
       @other_student.save!
       student_in_course(:course => @course, :user => @other_student, :active_all => true)

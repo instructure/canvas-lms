@@ -1,4 +1,4 @@
-class DropStreamItemsUserId < ActiveRecord::Migration
+class DropStreamItemsUserId < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

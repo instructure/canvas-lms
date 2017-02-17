@@ -17,14 +17,15 @@
 #
 
 class DeveloperKeysController < ApplicationController
-  before_filter :set_key, only: [:update, :destroy ]
-  before_filter :require_manage_developer_keys
-  before_filter :set_keys, only: [:index]
+  before_action :set_key, only: [:update, :destroy ]
+  before_action :require_manage_developer_keys
 
   include Api::V1::DeveloperKey
 
   def index
-    @keys = Api.paginate(@keys, self, developer_keys_url)
+    scope = @context.site_admin? ? DeveloperKey : @context.developer_keys
+    scope = scope.nondeleted.preload(:account).order("id DESC")
+    @keys = Api.paginate(scope, self, account_developer_keys_url(@context))
     respond_to do |format|
       format.html do
         set_navigation
@@ -35,7 +36,7 @@ class DeveloperKeysController < ApplicationController
   end
 
   def create
-    @key = DeveloperKey.new(params[:developer_key])
+    @key = DeveloperKey.new(developer_key_params)
     @key.account = @context if params[:account_id] && @context != Account.site_admin
     if @key.save
       render :json => developer_key_json(@key, @current_user, session, account_context)
@@ -46,7 +47,7 @@ class DeveloperKeysController < ApplicationController
 
   def update
     @key.process_event!(params[:developer_key].delete(:event)) if params[:developer_key].key?(:event)
-    @key.attributes = params[:developer_key]
+    @key.attributes = developer_key_params unless params[:developer_key].empty?
     if @key.save
       render :json => developer_key_json(@key, @current_user, session, account_context)
     else
@@ -70,16 +71,6 @@ class DeveloperKeysController < ApplicationController
     @key = DeveloperKey.nondeleted.find(params[:id])
   end
 
-  def set_keys
-    # this can be simplified once we remove the non-account index route
-    if params[:account_id] && @context != Account.site_admin
-      @keys = @context.developer_keys.nondeleted.preload(:account).order("id DESC")
-    else
-      @context = Account.site_admin
-      @keys = DeveloperKey.nondeleted.preload(:account).order("id DESC")
-    end
-  end
-
   def account_context
     if @key
       return @key.account || Account.site_admin
@@ -94,5 +85,9 @@ class DeveloperKeysController < ApplicationController
 
   def require_manage_developer_keys
     require_context_with_permission(account_context, :manage_developer_keys)
+  end
+
+  def developer_key_params
+    params.require(:developer_key).permit(:api_key, :name, :icon_url, :redirect_uri, :redirect_uris, :email, :auto_expire_tokens)
   end
 end

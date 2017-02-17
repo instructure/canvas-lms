@@ -1,4 +1,4 @@
-class AddProfiles < ActiveRecord::Migration
+class AddProfiles < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

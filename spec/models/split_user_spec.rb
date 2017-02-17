@@ -5,9 +5,9 @@ describe SplitUsers do
     let!(:user1) { user_model }
     let!(:user2) { user_model }
     let(:user3) { user_model }
-    let(:course1) { course(active_all: true) }
-    let(:course2) { course(active_all: true) }
-    let(:course3) { course(active_all: true) }
+    let(:course1) { course_factory(active_all: true) }
+    let(:course2) { course_factory(active_all: true) }
+    let(:course3) { course_factory(active_all: true) }
     let(:account1) { Account.default }
     let(:sub_account) { account1.sub_accounts.create! }
 
@@ -28,7 +28,7 @@ describe SplitUsers do
     it 'should not split if the data is too old' do
       pseudonym1 = user1.pseudonyms.create!(unique_id: 'sam1@example.com')
       pseudonym2 = user2.pseudonyms.create!(unique_id: 'sam2@example.com')
-      Timecop.travel(93.days.ago) do
+      Timecop.travel(183.days.ago) do
         UserMerge.from(user2).into(user1)
       end
 
@@ -247,7 +247,13 @@ describe SplitUsers do
       assignment = course1.assignments.new(title: "some assignment")
       assignment.workflow_state = "published"
       assignment.save
-      valid_attributes = {assignment_id: assignment.id, user_id: user1.id, grade: "1.5", url: "www.instructure.com"}
+      valid_attributes = {
+        assignment_id: assignment.id,
+        user_id: user1.id,
+        grade: "1.5",
+        grader: @teacher,
+        url: "www.instructure.com"
+      }
       submission = Submission.create!(valid_attributes)
 
       UserMerge.from(user1).into(user2)
@@ -262,7 +268,13 @@ describe SplitUsers do
       assignment = course1.assignments.new(title: "some assignment")
       assignment.workflow_state = "published"
       assignment.save
-      valid_attributes = {assignment_id: assignment.id, user_id: user1.id, grade: "1.5", url: "www.instructure.com"}
+      valid_attributes = {
+        assignment_id: assignment.id,
+        user_id: user1.id,
+        grade: "1.5",
+        grader: @teacher,
+        url: "www.instructure.com"
+      }
       submission1 = Submission.create!(valid_attributes)
       valid_attributes[:user_id] = user2.id
       submission2 = Submission.create!(valid_attributes)

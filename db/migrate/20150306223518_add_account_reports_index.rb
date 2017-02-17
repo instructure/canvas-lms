@@ -1,4 +1,4 @@
-class AddAccountReportsIndex < ActiveRecord::Migration
+class AddAccountReportsIndex < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

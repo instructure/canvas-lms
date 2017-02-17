@@ -1,4 +1,4 @@
-class AddUniqueIndexToGroupMemberships < ActiveRecord::Migration
+class AddUniqueIndexToGroupMemberships < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

@@ -26,7 +26,7 @@ ul.context_list {
       font-weight: bold;
       display: block;
       .subtitle {
-        color: #888;
+        color: $ic-font-color--subdued;
       }
     }
     .reminder {
@@ -34,8 +34,8 @@ ul.context_list {
     }
   }
   .unpublished {
-    a {
-      color: #888;
+    a, i {
+      color: $ic-font-color--subdued;
       font-weight: normal;
     }
   }

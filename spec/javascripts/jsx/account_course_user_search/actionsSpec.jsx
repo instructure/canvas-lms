@@ -47,7 +47,7 @@ define([
         "time_zone": "Mountain Time (US & Canada)"
     }];
 
-  module('Account Course User Search Actions');
+  QUnit.module('Account Course User Search Actions');
 
   asyncTest('apiCreateUser', () => {
     const server = sinon.fakeServer.create();

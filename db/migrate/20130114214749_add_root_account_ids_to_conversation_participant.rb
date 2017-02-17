@@ -1,4 +1,4 @@
-class AddRootAccountIdsToConversationParticipant < ActiveRecord::Migration
+class AddRootAccountIdsToConversationParticipant < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

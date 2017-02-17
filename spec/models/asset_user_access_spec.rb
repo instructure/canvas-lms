@@ -300,4 +300,16 @@ describe AssetUserAccess do
       expect(subject.corrected_view_score).to eq -4
     end
   end
+
+  describe '#icon' do
+    it 'works for quizzes' do
+      quiz = @course.quizzes.create!(:title => 'My Quiz')
+
+      asset = factory_with_protected_attributes(AssetUserAccess, :user => @user, :context => @course, :asset_code => quiz.asset_string)
+      asset.log(@course, { category: 'quizzes' })
+      asset.save!
+
+      expect(asset.icon).to eq 'icon-quiz'
+    end
+  end
 end

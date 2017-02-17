@@ -35,6 +35,14 @@ module GroupCategories
       split_group_enabled? && create_group_count && create_group_count > 0
     end
 
+    def group_by_section
+      value_to_boolean(raw_params[:group_by_section])
+    end
+
+    def assign_async
+      value_to_boolean(raw_params[:assign_async])
+    end
+
     private
 
     def value_to_boolean(value)

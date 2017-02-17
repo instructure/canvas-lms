@@ -28,10 +28,10 @@ describe "/quizzes/quizzes/history" do
 
   context 'beta quiz navigation' do
     before do
-      assigns[:quiz] = @course.quizzes.create!
-      assigns[:submission] = assigns[:quiz].generate_submission(@user)
-      assigns[:current_submission] = assigns[:submission]
-      assigns[:version_instances] = assigns[:submission].submitted_attempts
+      assigns[:quiz] = quiz = @course.quizzes.create!
+      assigns[:submission] = sub = quiz.generate_submission(@user)
+      assigns[:current_submission] = sub
+      assigns[:version_instances] = sub.submitted_attempts
     end
 
     it 'displays when configured' do
@@ -59,19 +59,19 @@ describe "/quizzes/quizzes/history" do
       @quiz = @course.quizzes.create!
       @quiz.quiz_groups.create!
       assigns[:quiz] = @quiz
-      assigns[:submission] = assigns[:quiz].generate_submission(@user)
-      assigns[:current_submission] = assigns[:submission]
-      assigns[:version_instances] = assigns[:submission].submitted_attempts
+      assigns[:submission] = sub = @quiz.generate_submission(@user)
+      assigns[:current_submission] = sub
+      assigns[:version_instances] = sub.submitted_attempts
 
       render "quizzes/quizzes/history"
       expect(response.body).to match /grade-by-question-warning/
     end
 
     it 'does not display when quiz has only questions' do
-      assigns[:quiz] = @course.quizzes.create!
-      assigns[:submission] = assigns[:quiz].generate_submission(@user)
-      assigns[:current_submission] = assigns[:submission]
-      assigns[:version_instances] = assigns[:submission].submitted_attempts
+      assigns[:quiz] = quiz = @course.quizzes.create!
+      assigns[:submission] = sub = quiz.generate_submission(@user)
+      assigns[:current_submission] = sub
+      assigns[:version_instances] = sub.submitted_attempts
 
       render "quizzes/quizzes/history"
       expect(response.body).not_to match /grade-by-question-warning/

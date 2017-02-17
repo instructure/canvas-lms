@@ -31,12 +31,13 @@ define [
       @contexts or= availableContexts
 
       @contexts = _.intersection(@contexts, availableContexts)
-      @contexts = @contexts.slice(0, 10)
+      @contexts = @contexts.slice(0, ENV.CALENDAR.VISIBLE_CONTEXTS_LIMIT)
 
       @notify()
 
       $.subscribe 'Calendar/saveVisibleContextListAndClear', @saveAndClear
       $.subscribe 'Calendar/restoreVisibleContextList', @restoreList
+      $.subscribe 'Calendar/ensureCourseVisible', @ensureCourseVisible
 
     saveAndClear: () =>
       if !@savedContexts
@@ -50,13 +51,17 @@ define [
         @savedContexts = null
         @notifyOnChange()
 
+    ensureCourseVisible: (context) =>
+      if $.inArray(context, @contexts) < 0
+        @toggle(context)
+
     toggle: (context) ->
       index = $.inArray context, @contexts
       if index >= 0
         @contexts.splice index, 1
       else
         @contexts.push context
-        @contexts.shift() if @contexts.length > 10
+        @contexts.shift() if @contexts.length > ENV.CALENDAR.VISIBLE_CONTEXTS_LIMIT
       @notifyOnChange()
 
     notifyOnChange: =>

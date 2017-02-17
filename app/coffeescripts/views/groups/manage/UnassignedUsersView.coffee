@@ -82,7 +82,7 @@ define [
       $target = $(e.currentTarget)
       @fromAddButton = true
       assignToGroupMenu = @_getAssignToGroup()
-      assignToGroupMenu.model = @collection.get($target.data('user-id'))
+      assignToGroupMenu.model = @collection.getUser($target.data('user-id'))
       assignToGroupMenu.showBy($target, true)
 
     showAssignToGroup: (e) ->
@@ -92,7 +92,7 @@ define [
       $target = $(e.currentTarget)
 
       assignToGroupMenu = @_getAssignToGroup()
-      assignToGroupMenu.model = @collection.get($target.data('user-id'))
+      assignToGroupMenu.model = @collection.getUser($target.data('user-id'))
       assignToGroupMenu.showBy($target)
 
 

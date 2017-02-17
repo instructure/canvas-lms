@@ -1,13 +1,13 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jsx/course_settings/components/CourseImageSelector',
   'jsx/course_settings/store/initialState'
-], (React, ReactDOM, CourseImageSelector, initialState) => {
+], (React, ReactDOM, TestUtils, CourseImageSelector, initialState) => {
   const wrapper = document.getElementById('fixtures');
-  const TestUtils = React.addons.TestUtils;
 
-  module('CourseImageSelector View', {
+  QUnit.module('CourseImageSelector View', {
     renderComponent(props = {}) {
       const element = React.createElement(CourseImageSelector, props);
       return ReactDOM.render(element, wrapper);

@@ -16,9 +16,9 @@
 #
 module Lti
   class ToolProxyController < ApplicationController
-    before_filter :require_context
-    before_filter :require_user
-    before_filter :set_tool_proxy, only: [:destroy, :update, :accept_update, :dismiss_update]
+    before_action :require_context
+    before_action :require_user
+    before_action :set_tool_proxy, only: [:destroy, :update, :accept_update, :dismiss_update]
 
     def destroy
       if authorized_action(@context, @current_user, :update)
@@ -49,7 +49,13 @@ module Lti
 
           ActiveRecord::Base.transaction do
 
-            tp_service.process_tool_proxy_json(payload, context, guid, @tool_proxy, tc_half_shared_secret)
+            tp_service.process_tool_proxy_json(
+              json: payload,
+              context: context,
+              guid: guid,
+              tool_proxy_to_update: @tool_proxy,
+              tc_half_shared_secret: tc_half_shared_secret
+            )
 
             ack_response = CanvasHttp.put(ack_url)
             if ack_response.code == "200"

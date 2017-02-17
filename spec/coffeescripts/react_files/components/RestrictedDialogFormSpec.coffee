@@ -1,15 +1,14 @@
 define [
-  '../mockFilesENV'
+  '../mockFilesENV' + (if window.USE_WEBPACK then '.coffee' else '')
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/RestrictedDialogForm'
   'compiled/models/Folder'
-], (mockFilesENV, React, ReactDOM, $, RestrictedDialogForm, Folder) ->
+], (mockFilesENV, React, ReactDOM, {Simulate}, $, RestrictedDialogForm, Folder) ->
 
-  Simulate = React.addons.TestUtils.Simulate
-
-  module 'RestrictedDialogForm Multiple Selected Items',
+  QUnit.module 'RestrictedDialogForm Multiple Selected Items',
     setup: ->
       props =
         models: [new Folder(id: 1000, hidden: false), new Folder(id: 999, hidden: true)]
@@ -28,7 +27,7 @@ define [
 
     equal @restrictedDialogForm.refs.updateBtn.props.disabled, false, 'is enabled after an option is selected'
 
-  module 'RestrictedDialogForm#handleSubmit',
+  QUnit.module 'RestrictedDialogForm#handleSubmit',
     setup: ->
       props =
         models: [new Folder(id: 999, hidden: true, lock_at: undefined, unlock_at: undefined)]

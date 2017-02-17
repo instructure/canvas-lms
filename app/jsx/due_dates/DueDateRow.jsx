@@ -27,6 +27,7 @@ define([
       canDelete: React.PropTypes.bool.isRequired,
       currentlySearching: React.PropTypes.bool.isRequired,
       allStudentsFetched: React.PropTypes.bool.isRequired,
+      inputsDisabled: React.PropTypes.bool.isRequired
     },
 
     // --------------------
@@ -63,8 +64,9 @@ define([
 
     tokenizedSections(sectionOverrides){
       var sectionOverrides = sectionOverrides || []
-      return _.map(sectionOverrides, (override) => {
+      return _.map(sectionOverrides, (override, index) => {
         return {
+            id: `section-key-${index}`,
             type: "section",
             course_section_id: override.get("course_section_id"),
             name: this.nameForCourseSection(override.get("course_section_id"))
@@ -74,8 +76,9 @@ define([
 
     tokenizedGroups(groupOverrides){
       var groupOverrides = groupOverrides || []
-      return _.map(groupOverrides, (override) => {
+      return _.map(groupOverrides, (override, index) => {
         return {
+            id: `group-key-${index}`,
             type: "group",
             group_id: override.get("group_id"),
             name: this.nameForGroup(override.get("group_id"))
@@ -93,16 +96,18 @@ define([
 
     tokenizedNoop(noopOverrides){
       var noopOverrides = noopOverrides || []
-      return _.map(noopOverrides, (override) => {
+      return _.map(noopOverrides, (override, index) => {
         return {
+            id: `noop-key-${index}`,
             noop_id: override.get("noop_id"),
             name: override.get("title")
           }
       })
     },
 
-    tokenFromStudentId(studentId){
+    tokenFromStudentId(studentId, index){
       return {
+        id: `student-key-${index}`,
         type: "student",
         student_id: studentId,
         name: this.nameForStudentToken(studentId)
@@ -143,8 +148,16 @@ define([
     // -------------------
 
     removeLinkIfNeeded(){
-      if(this.props.canDelete){
+      if(this.props.canDelete && !this.props.inputsDisabled){
         return <DueDateRemoveRowLink handleClick={this.props.handleDelete}/>
+      }
+    },
+
+    renderClosedGradingPeriodNotification() {
+      if (this.props.inputsDisabled) {
+        return (
+          <span>{I18n.t("Due date falls in a closed Grading Period")}</span>
+        )
       }
     },
 
@@ -152,20 +165,27 @@ define([
       return (
         <div className="Container__DueDateRow-item" role="region" aria-label={I18n.t("Due Date Set")} data-row-key={this.props.rowKey} >
           {this.removeLinkIfNeeded()}
-          <DueDateTokenWrapper tokens              = {this.tokenizedOverrides()}
-                               handleTokenAdd      = {this.props.handleTokenAdd}
-                               handleTokenRemove   = {this.props.handleTokenRemove}
-                               potentialOptions    = {this.props.validDropdownOptions}
-                               rowKey              = {this.props.rowKey}
-                               defaultSectionNamer = {this.props.defaultSectionNamer}
-                               currentlySearching  = {this.props.currentlySearching}
-                               allStudentsFetched  = {this.props.allStudentsFetched}/>
+          <DueDateTokenWrapper
+            tokens              = {this.tokenizedOverrides()}
+            disabled            = {this.props.inputsDisabled}
+            handleTokenAdd      = {this.props.handleTokenAdd}
+            handleTokenRemove   = {this.props.handleTokenRemove}
+            potentialOptions    = {this.props.validDropdownOptions}
+            rowKey              = {this.props.rowKey}
+            defaultSectionNamer = {this.props.defaultSectionNamer}
+            currentlySearching  = {this.props.currentlySearching}
+            allStudentsFetched  = {this.props.allStudentsFetched}
+          />
 
-          <DueDateCalendars dates       = {this.props.dates}
-                            rowKey      = {this.props.rowKey}
-                            overrides   = {this.props.overrides}
-                            replaceDate = {this.props.replaceDate}
-                            sections    = {this.props.sections}/>
+          <DueDateCalendars
+            dates       = {this.props.dates}
+            disabled    = {this.props.inputsDisabled}
+            rowKey      = {this.props.rowKey}
+            overrides   = {this.props.overrides}
+            replaceDate = {this.props.replaceDate}
+            sections    = {this.props.sections}
+          />
+          {this.renderClosedGradingPeriodNotification()}
         </div>
       )
     }

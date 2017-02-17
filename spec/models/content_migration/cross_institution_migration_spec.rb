@@ -82,7 +82,6 @@ describe ContentMigration do
       expect(@copy_to.quizzes.first.quiz_groups.first.assessment_question_bank).to be_nil
 
       expect(@cm.warnings.detect { |w| w =~ /account External Tool.+must be configured/ }).not_to be_nil
-      expect(@cm.warnings.detect { |w| w =~ /external Rubric couldn't be found.+creating a copy/ }).not_to be_nil
       expect(@cm.warnings.detect { |w| w =~ /external Learning Outcome couldn't be found.+creating a copy/ }).not_to be_nil
       expect(@cm.warnings.detect { |w| w =~ /Couldn't find the question bank/ }).not_to be_nil
       expect(@cm.warnings.detect { |w| w =~ /referenced a grading scheme that was not found/ }).not_to be_nil

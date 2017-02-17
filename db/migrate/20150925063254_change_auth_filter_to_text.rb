@@ -1,4 +1,4 @@
-class ChangeAuthFilterToText < ActiveRecord::Migration
+class ChangeAuthFilterToText < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

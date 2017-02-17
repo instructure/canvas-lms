@@ -1,12 +1,12 @@
 define([
-  '../../../compiled/react_files/mockFilesENV',
+  (window.USE_WEBPACK ? '../../../../coffeescripts/react_files/mockFilesENV.coffee' : 'spec/javascripts/compiled/react_files/mockFilesENV'),
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jquery',
   'jsx/files/ItemCog',
   'compiled/models/Folder'
-], (mockFilesENV, React, ReactDOM, $, ItemCog, Folder) => {
-  const { TestUtils } = React.addons;
+], (mockFilesENV, React, ReactDOM, TestUtils, $, ItemCog, Folder) => {
   const { Simulate } = TestUtils;
 
   let itemCog = null;
@@ -59,7 +59,7 @@ define([
     };
   };
 
-  module('ItemCog', {
+  QUnit.module('ItemCog', {
     setup () {
       itemCog = ReactDOM.render(<ItemCog {...sampleProps(true)} />, $('<div>').appendTo('#fixtures')[0]);
     },

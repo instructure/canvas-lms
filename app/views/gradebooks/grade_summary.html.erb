@@ -3,6 +3,7 @@
   css_bundle :grade_summary
   content_for :page_title, join_title(t(:page_title, "Grades for %{student}", :student => @presenter.student_name), @context.name)
 %>
+<% whatif_instructions = t("You can view your grades based on What-If scores so that you know how grades will be affected by upcoming or resubmitted assignments. You can test scores for an assignment that already includes a score, or an assignment that has yet to be graded.") %>
 
 <h1 class="screenreader-only"><%= t(:page_title, "Grades for %{student}", :student => @presenter.student_name) %></h1>
 
@@ -45,7 +46,7 @@
     </div>
     <% if @presenter.editable? %>
       <div id="whatif-score-description">
-        <%= t(:change_score_instructions, "Click any score and enter a new value to see how the change will affect your total.") %>
+        <%= whatif_instructions %>
       </div>
     <% end %>
   </div>
@@ -134,7 +135,11 @@
 <% end %>
 
 <div id="assignments">
+  <span id="aria-announcer" class="hide-text affix" aria-live="polite" aria-relevant="additions"></span>
 <table style="width: 100%;" id="grades_summary" class="<%= 'editable' if @presenter.editable? %>">
+  <% if @presenter.editable? %>
+    <caption class="screenreader-only"><%= whatif_instructions %></caption>
+  <% end %>
   <thead>
     <tr>
       <th scope="col"><%= t('headers.name', "Name") %></th>
@@ -203,7 +208,7 @@
               <% end %>
             >
               <% if assignment.muted? %>
-                <%= image_tag "sound_mute.png", :alt => t("#gradebooks.grade.muted", "Muted"), :class => "muted_icon" %>
+                <i class="icon-muted" title="<%= t("#gradebooks.grade.muted", "Muted") %>"></i>
               <% else %>
                 <span class="screenreader-only" role="link">
                   <%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>
@@ -242,7 +247,9 @@
           </div>
         </div>
       </td>
-      <td class="possible points_possible" <%= "colspan='2'".html_safe if assignment.special_class %>><%= round_if_whole(assignment.points_possible) %></td>
+      <td class="possible points_possible" <%= "colspan='2'".html_safe if assignment.special_class %>>
+        <%= n(round_if_whole(assignment.points_possible)) %>
+      </td>
       <% if !assignment.special_class %>
       <td class="details">
         <a href="#"
@@ -275,7 +282,7 @@
             style='visibility: hidden;'
           <% end %>>
           <span class="tooltip_wrap right">
-            <span class="tooltip_text"><%= t("comment", count: (submission.visible_submission_comments.size rescue 0)) %></span>
+            <span class="tooltip_text"><%= t("comment", count: n((submission.visible_submission_comments.size rescue 0))) %></span>
           </span>
           <i class="icon-discussion standalone-icon"></i>
         </a>
@@ -310,28 +317,40 @@
           </span>
           <i class="icon-rubric"></i>
         </a>
-        <% if @presenter.turnitin_enabled? %>
+        <% if @presenter.turnitin_enabled? || assignment_presenter.originality_report? %>
           <%
             turntitin = nil
             url = '#'
+            anchor_title = t('Similarity score -- more information')
+            alt_text = t('See Turnitin results')
+            tooltip_text = t('See Turnitin results')
+
             if can_do(submission, @current_user, :view_turnitin_report)
               turnitin = assignment_presenter.turnitin
               if assignment_presenter.is_text_entry?
                 url = context_url(@context, :context_assignment_submission_turnitin_report_url, assignment.id, @presenter.student_id, submission.asset_string)
+              elsif assignment_presenter.originality_report? && turnitin
+                asset_string = assignment_presenter.file.asset_string
+                url = polymorphic_url([@context, assignment, submission, :originality_report], asset_string: asset_string)
+                anchor_title = t('Originality Report')
+                alt_text = t('Originality Report')
+                tooltip_text = t('Originality Report')
               elsif assignment_presenter.is_online_upload? && assignment_presenter.file
                 asset_string = assignment_presenter.file.asset_string
                 url = context_url(@context, :context_assignment_submission_turnitin_report_url, assignment.id, @presenter.student_id, asset_string)
               end
             end
           %>
-          <a class="tooltip" title="<%= t('titles.turnitin_score', "Turnitin similarity score -- more information") %>" href="<%= url %>" style="<%= 'visibility: hidden;' if !turnitin %>" target="_blank">
-            <%= turnitin ? image_tag("turnitin_#{turnitin && turnitin[:state]}_score.png", :alt => t('icons.turnitin_results', 'See Turnitin results')) : image_tag("blank.png", :alt => '') %>
-            <span class="tooltip_wrap right">
-              <span class="tooltip_text"><%= t(:see_turnitin_results, "See Turnitin results") %></span>
-            </span>
-          </a>
+          <% if url && url != '#' %>
+            <a class="tooltip" title="<%= anchor_title %>" href="<%= url %>" style="<%= 'visibility: hidden;' if !turnitin %>" target="_blank">
+              <%= turnitin ? image_tag("turnitin_#{turnitin && turnitin[:state]}_score.png", :alt => alt_text) : image_tag("blank.png", :alt => '') %>
+              <span class="tooltip_wrap right">
+                <span class="tooltip_text"><%= tooltip_text %></span>
+              </span>
+            </a>
+          <% end %>
         <% end %>
-        <% if @presenter.vericite_enabled? %>
+        <% if @presenter.vericite_enabled? && !assignment_presenter.originality_report? %>
           <%
             vericite = nil
             url = '#'
@@ -413,15 +432,15 @@
                     <% high, low, mean = assignment_presenter.grade_distribution %>
                     <td>
                       <%= before_label(:mean, "Mean") %>
-                      <%= round_if_whole(mean) %>
+                      <%= n(round_if_whole(mean)) %>
                     </td>
                     <td>
                       <%= before_label(:high, "High") %>
-                      <%= round_if_whole(high) %>
+                      <%= n(round_if_whole(high)) %>
                     </td>
                     <td>
                       <%= before_label(:low, "Low") %>
-                      <%= round_if_whole(low) %>
+                      <%= n(round_if_whole(low)) %>
                     </td>
                     <td>
                       <% graph = assignment_presenter.graph %>
@@ -434,7 +453,7 @@
                         <div class="grade-summary-graph-component" style="left: <%= graph.max_left %>px; height: 10px; margin: 5px 0px; border-width: 2px; border-left-width: 0;">&nbsp;</div>
                         <% if submission && submission.score %>
                           <div class="grade-summary-graph-component" style="top: 5px; height: 10px; width: 10px; left: <%= graph.score_left %>px; border: 2px solid #248; background: #abd; border-radius: 3px;" title="<%= before_label(:your_score, "Your Score") %>
-                            <%= t(:submission_score, "*%{score}* out of %{possible}", :wrapper => '\1', :score => submission.score, :possible => round_if_whole(assignment.points_possible)) %>">&nbsp;
+                            <%= t(:submission_score, "*%{score}* out of %{possible}", :wrapper => '\1', :score => n(submission.score), :possible => n(round_if_whole(assignment.points_possible))) %>">&nbsp;
                           </div>
                         <% end %>
                       </div>
@@ -512,7 +531,7 @@
 </table>
 </div>
 <% if @presenter.has_muted_assignments? %>
-  <small><%= image_tag "sound_mute.png", :alt => "" %><%= t(:student_mute_legend, "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable.") %></small>
+  <small><i class="icon-muted" role="presentation"></i><%= t(:student_mute_legend, "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable.") %></small>
 <% end %>
 <div id="total_groups_weight" style="display: none;"><%= @presenter.total_weight %></div>
 <%= render :partial => "shared/rubric_criterion_dialog" %>

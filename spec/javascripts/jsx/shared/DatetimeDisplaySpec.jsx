@@ -1,11 +1,11 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/shared/DatetimeDisplay',
   'timezone'
-], (React, DatetimeDisplay, tz) => {
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, DatetimeDisplay, tz) => {
 
-  module('DatetimeDisplay');
+  QUnit.module('DatetimeDisplay');
 
   test('renders the formatted datetime using the provided format', () => {
     let datetime = (new Date()).toString();

@@ -1,4 +1,4 @@
-class DropCcBccFromMessages < ActiveRecord::Migration
+class DropCcBccFromMessages < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

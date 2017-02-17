@@ -51,8 +51,11 @@ module CustomAlertActions
   end
 
   def close_modal_if_present
-    driver.title # if an alert is present, this will trigger the error below
+    # if an alert is present, this will trigger the error below
+    block_given? ? yield : driver.title
   rescue Selenium::WebDriver::Error::UnhandledAlertError, Selenium::WebDriver::Error::UnknownError
     driver.switch_to.alert.accept
+    # try again
+    yield if block_given?
   end
 end

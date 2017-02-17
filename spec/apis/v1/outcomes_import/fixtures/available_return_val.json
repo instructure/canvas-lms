@@ -1,368 +1,314 @@
 [
   {
     "title": "Common Core State Standards",
-    "guid": "89c8ea94",
-    "type": "document",
-    "chld": "2"
+    "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22"
+  },
+  {
+    "title": "NGSS Arranged by Disciplinary Core Idea (DCI)",
+    "guid": "39294526-BF3F-11E1-8A35-552B9DFF4B22"
   },
   {
     "title": "NGSS Arranged by Topic",
-    "guid": "138c9cb7",
-    "type": "document",
-    "chld": "1"
+    "guid": "EE71D20C-A645-11E2-8098-4A539DFF4B22"
   },
   {
-    "title": "Next Generation Science Standards NGSS Arranged by Disciplinary Core Idea (DCI)",
-    "guid": "923ce7bf",
-    "type": "document",
-    "chld": "1"
+    "title": "ISTE Standards for Coaches",
+    "guid": "2bf42eba-de83-49f9-bb7a-88fea5616502"
+  },
+  {
+    "title": "ISTE Standards for Computer Science Educators",
+    "guid": "9426dcae-734c-40d5-abf6-fb748cd8be65"
   },
   {
     "title": "NETS for Administrators",
-    "guid": "923ce7ba",
-    "type": "document",
-    "chld": "1"
-  },
-  {
-    "title": "NETS for Teachers",
-    "guid": "923ce7bb",
-    "type": "document",
-    "chld": "1"
+    "guid": "993F2364-C0DA-11DA-98F4-97E8A2D02702"
   },
   {
     "title": "NETS for Students",
-    "guid": "923ce7bc",
-    "type": "document",
-    "chld": "1"
+    "guid": "99395B3C-C0DA-11DA-8BD7-97BD8BBE078D"
   },
   {
-    "title": "Alabama",
-    "guid": "46bb3879",
-    "type": "authority",
-    "chld": "3"
+    "title": "NETS for Teachers",
+    "guid": "993F125C-C0DA-11DA-ACD9-80F47857C4EE"
   },
   {
-    "title": "Alaska",
-    "guid": "21f67573",
-    "type": "authority",
-    "chld": "4"
+    "code": "NRC",
+    "guid": "095383F6-BBCB-11E1-9321-88419DFF4B22",
+    "description": "Achieve"
   },
   {
-    "title": "Arizona",
-    "guid": "55fb05de",
-    "type": "authority",
-    "chld": "4"
+    "code": "CC",
+    "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+    "description": "NGA Center/CCSSO"
   },
   {
-    "title": "Arkansas",
-    "guid": "9fadba9f",
-    "type": "authority",
-    "chld": "2"
+    "code": "NT",
+    "guid": "A834CC02-901A-11DF-A622-0C319DFF4B22",
+    "description": "National Standards"
   },
   {
-    "title": "Australia",
-    "guid": "24d23683",
-    "type": "authority",
-    "chld": "1"
+    "code": "AU",
+    "guid": "A8326BEC-901A-11DF-A622-0C319DFF4B22",
+    "description": "Australia"
   },
   {
-    "title": "California",
-    "guid": "51a90b1c",
-    "type": "authority",
-    "chld": "7"
+    "code": "UK",
+    "guid": "A8363E2A-901A-11DF-A622-0C319DFF4B22",
+    "description": "United Kingdom"
   },
   {
-    "title": "Colorado",
-    "guid": "87740e39",
-    "type": "authority",
-    "chld": "3"
+    "code": "AL",
+    "guid": "A8325A6C-901A-11DF-A622-0C319DFF4B22",
+    "description": "Alabama"
   },
   {
-    "title": "Connecticut",
-    "guid": "ebf5916a",
-    "type": "authority",
-    "chld": "5"
+    "code": "AK",
+    "guid": "A83250D0-901A-11DF-A622-0C319DFF4B22",
+    "description": "Alaska"
   },
   {
-    "title": "Delaware",
-    "guid": "6de6b316",
-    "type": "authority",
-    "chld": "5"
+    "code": "AZ",
+    "guid": "A83274AC-901A-11DF-A622-0C319DFF4B22",
+    "description": "Arizona"
   },
   {
-    "title": "District of Columbia",
-    "guid": "7063136c",
-    "type": "authority",
-    "chld": "5"
+    "code": "AR",
+    "guid": "A8326336-901A-11DF-A622-0C319DFF4B22",
+    "description": "Arkansas"
   },
   {
-    "title": "Florida",
-    "guid": "33ed68e9",
-    "type": "authority",
-    "chld": "5"
+    "code": "CA",
+    "guid": "A832862C-901A-11DF-A622-0C319DFF4B22",
+    "description": "California"
   },
   {
-    "title": "Georgia",
-    "guid": "6eca1d5b",
-    "type": "authority",
-    "chld": "6"
+    "code": "CO",
+    "guid": "A832A9A4-901A-11DF-A622-0C319DFF4B22",
+    "description": "Colorado"
   },
   {
-    "title": "Hawaii",
-    "guid": "c4e475d5",
-    "type": "authority",
-    "chld": "4"
+    "code": "CT",
+    "guid": "A832BBEC-901A-11DF-A622-0C319DFF4B22",
+    "description": "Connecticut"
   },
   {
-    "title": "Idaho",
-    "guid": "c4d27bbf",
-    "type": "authority",
-    "chld": "2"
+    "code": "DE",
+    "guid": "A832CDE4-901A-11DF-A622-0C319DFF4B22",
+    "description": "Delaware"
   },
   {
-    "title": "Illinois",
-    "guid": "c52909fe",
-    "type": "authority",
-    "chld": "7"
+    "code": "DC",
+    "guid": "A832C4DE-901A-11DF-A622-0C319DFF4B22",
+    "description": "District of Columbia"
   },
   {
-    "title": "Indiana",
-    "guid": "5405f7cd",
-    "type": "authority",
-    "chld": "3"
+    "code": "FL",
+    "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22",
+    "description": "Florida"
   },
   {
-    "title": "Iowa",
-    "guid": "a1408ccf",
-    "type": "authority",
-    "chld": "5"
+    "code": "GA",
+    "guid": "A832E9D2-901A-11DF-A622-0C319DFF4B22",
+    "description": "Georgia"
   },
   {
-    "title": "Kansas",
-    "guid": "d9e92a00",
-    "type": "authority",
-    "chld": "3"
+    "code": "HI",
+    "guid": "A832F2EC-901A-11DF-A622-0C319DFF4B22",
+    "description": "Hawaii"
   },
   {
-    "title": "Kentucky",
-    "guid": "e935b719",
-    "type": "authority",
-    "chld": "4"
+    "code": "ID",
+    "guid": "A833087C-901A-11DF-A622-0C319DFF4B22",
+    "description": "Idaho"
   },
   {
-    "title": "Louisiana",
-    "guid": "6b6ab39f",
-    "type": "authority",
-    "chld": "3"
+    "code": "IL",
+    "guid": "A8333252-901A-11DF-A622-0C319DFF4B22",
+    "description": "Illinois"
   },
   {
-    "title": "Maine",
-    "guid": "7aa35836",
-    "type": "authority",
-    "chld": "3"
+    "code": "IN",
+    "guid": "A8334A58-901A-11DF-A622-0C319DFF4B22",
+    "description": "Indiana"
   },
   {
-    "title": "Maryland",
-    "guid": "ab7c9a74",
-    "type": "authority",
-    "chld": "8"
+    "code": "IA",
+    "guid": "A832FC24-901A-11DF-A622-0C319DFF4B22",
+    "description": "Iowa"
   },
   {
-    "title": "Massachusetts",
-    "guid": "e47b1fd7",
-    "type": "authority",
-    "chld": "4"
+    "code": "KS",
+    "guid": "A833636C-901A-11DF-A622-0C319DFF4B22",
+    "description": "Kansas"
   },
   {
-    "title": "Michigan",
-    "guid": "f674f704",
-    "type": "authority",
-    "chld": "4"
+    "code": "KY",
+    "guid": "A8337BFE-901A-11DF-A622-0C319DFF4B22",
+    "description": "Kentucky"
   },
   {
-    "title": "Minnesota",
-    "guid": "49412237",
-    "type": "authority",
-    "chld": "4"
+    "code": "LA",
+    "guid": "A8339404-901A-11DF-A622-0C319DFF4B22",
+    "description": "Louisiana"
   },
   {
-    "title": "Mississippi",
-    "guid": "16e8ef83",
-    "type": "authority",
-    "chld": "3"
+    "code": "ME",
+    "guid": "A833DCB6-901A-11DF-A622-0C319DFF4B22",
+    "description": "Maine"
   },
   {
-    "title": "Missouri",
-    "guid": "7eb6d9c1",
-    "type": "authority",
-    "chld": "4"
+    "code": "MD",
+    "guid": "A833C528-901A-11DF-A622-0C319DFF4B22",
+    "description": "Maryland"
   },
   {
-    "title": "Montana",
-    "guid": "f8b810b0",
-    "type": "authority",
-    "chld": "4"
+    "code": "MA",
+    "guid": "A833AC96-901A-11DF-A622-0C319DFF4B22",
+    "description": "Massachusetts"
   },
   {
-    "title": "National Standards",
-    "guid": "be4ae687",
-    "type": "authority",
-    "chld": "3"
+    "code": "MI",
+    "guid": "A833F5CA-901A-11DF-A622-0C319DFF4B22",
+    "description": "Michigan"
   },
   {
-    "title": "Nebraska",
-    "guid": "1d80aef1",
-    "type": "authority",
-    "chld": "3"
+    "code": "MN",
+    "guid": "A8340E5C-901A-11DF-A622-0C319DFF4B22",
+    "description": "Minnesota"
   },
   {
-    "title": "Nevada",
-    "guid": "4ac3bf40",
-    "type": "authority",
-    "chld": "2"
+    "code": "MS",
+    "guid": "A8343EFE-901A-11DF-A622-0C319DFF4B22",
+    "description": "Mississippi"
   },
   {
-    "title": "New Hampshire",
-    "guid": "b879cab0",
-    "type": "authority",
-    "chld": "5"
+    "code": "MO",
+    "guid": "A83425EA-901A-11DF-A622-0C319DFF4B22",
+    "description": "Missouri"
   },
   {
-    "title": "New Jersey",
-    "guid": "28ccaa7f",
-    "type": "authority",
-    "chld": "4"
+    "code": "MT",
+    "guid": "A83457FE-901A-11DF-A622-0C319DFF4B22",
+    "description": "Montana"
   },
   {
-    "title": "New Mexico",
-    "guid": "62d48dfb",
-    "type": "authority",
-    "chld": "4"
+    "code": "NE",
+    "guid": "A834A0B0-901A-11DF-A622-0C319DFF4B22",
+    "description": "Nebraska"
   },
   {
-    "title": "New South Wales",
-    "guid": "dc11940b",
-    "type": "authority",
-    "chld": "1"
+    "code": "NV",
+    "guid": "A834D620-901A-11DF-A622-0C319DFF4B22",
+    "description": "Nevada"
   },
   {
-    "title": "New York",
-    "guid": "5ba1414e",
-    "type": "authority",
-    "chld": "5"
+    "code": "NH",
+    "guid": "A834AE7A-901A-11DF-A622-0C319DFF4B22",
+    "description": "New Hampshire"
   },
   {
-    "title": "North Carolina",
-    "guid": "60d9162b",
-    "type": "authority",
-    "chld": "5"
+    "code": "NJ",
+    "guid": "A834B848-901A-11DF-A622-0C319DFF4B22",
+    "description": "New Jersey"
   },
   {
-    "title": "North Dakota",
-    "guid": "3a254e65",
-    "type": "authority",
-    "chld": "4"
+    "code": "NM",
+    "guid": "A834C22A-901A-11DF-A622-0C319DFF4B22",
+    "description": "New Mexico"
   },
   {
-    "title": "Ohio",
-    "guid": "3cad1282",
-    "type": "authority",
-    "chld": "4"
+    "code": "NY",
+    "guid": "A834E00C-901A-11DF-A622-0C319DFF4B22",
+    "description": "New York"
   },
   {
-    "title": "Oklahoma",
-    "guid": "75e44c01",
-    "type": "authority",
-    "chld": "4"
+    "code": "NC",
+    "guid": "A8346F1E-901A-11DF-A622-0C319DFF4B22",
+    "description": "North Carolina"
   },
   {
-    "title": "Oregon",
-    "guid": "b73ef744",
-    "type": "authority",
-    "chld": "4"
+    "code": "ND",
+    "guid": "A834881E-901A-11DF-A622-0C319DFF4B22",
+    "description": "North Dakota"
   },
   {
-    "title": "Pennsylvania",
-    "guid": "f049b761",
-    "type": "authority",
-    "chld": "6"
+    "code": "OH",
+    "guid": "A834F40C-901A-11DF-A622-0C319DFF4B22",
+    "description": "Ohio"
   },
   {
-    "title": "Rhode Island",
-    "guid": "182583c5",
-    "type": "authority",
-    "chld": "5"
+    "code": "OK",
+    "guid": "A834FE5C-901A-11DF-A622-0C319DFF4B22",
+    "description": "Oklahoma"
   },
   {
-    "title": "South Carolina",
-    "guid": "dbe6080d",
-    "type": "authority",
-    "chld": "4"
+    "code": "OR",
+    "guid": "A8350866-901A-11DF-A622-0C319DFF4B22",
+    "description": "Oregon"
   },
   {
-    "title": "South Dakota",
-    "guid": "e4279125",
-    "type": "authority",
-    "chld": "3"
+    "code": "PA",
+    "guid": "A8351270-901A-11DF-A622-0C319DFF4B22",
+    "description": "Pennsylvania"
   },
   {
-    "title": "Tennessee",
-    "guid": "02becaac",
-    "type": "authority",
-    "chld": "5"
+    "code": "RI",
+    "guid": "A8351CA2-901A-11DF-A622-0C319DFF4B22",
+    "description": "Rhode Island"
   },
   {
-    "title": "Texas",
-    "guid": "ce3b417f",
-    "type": "authority",
-    "chld": "4"
+    "code": "SC",
+    "guid": "A835312E-901A-11DF-A622-0C319DFF4B22",
+    "description": "South Carolina"
   },
   {
-    "title": "Utah",
-    "guid": "33eb23e4",
-    "type": "authority",
-    "chld": "3"
+    "code": "SD",
+    "guid": "A8353B56-901A-11DF-A622-0C319DFF4B22",
+    "description": "South Dakota"
   },
   {
-    "title": "Vermont",
-    "guid": "56164380",
-    "type": "authority",
-    "chld": "6"
+    "code": "TN",
+    "guid": "A836285E-901A-11DF-A622-0C319DFF4B22",
+    "description": "Tennessee"
   },
   {
-    "title": "Virginia",
-    "guid": "7ff76448",
-    "type": "authority",
-    "chld": "4"
+    "code": "TX",
+    "guid": "A8363358-901A-11DF-A622-0C319DFF4B22",
+    "description": "Texas"
   },
   {
-    "title": "Washington",
-    "guid": "fd5eab70",
-    "type": "authority",
-    "chld": "7"
+    "code": "UT",
+    "guid": "A83653D8-901A-11DF-A622-0C319DFF4B22",
+    "description": "Utah"
   },
   {
-    "title": "West Virginia",
-    "guid": "7f9edddc",
-    "type": "authority",
-    "chld": "3"
+    "code": "VT",
+    "guid": "A83669D6-901A-11DF-A622-0C319DFF4B22",
+    "description": "Vermont"
   },
   {
-    "title": "Wisconsin",
-    "guid": "8b18ea97",
-    "type": "authority",
-    "chld": "4"
+    "code": "VA",
+    "guid": "A8365EE6-901A-11DF-A622-0C319DFF4B22",
+    "description": "Virginia"
   },
   {
-    "title": "Wyoming",
-    "guid": "7121df7d",
-    "type": "authority",
-    "chld": "2"
+    "code": "WA",
+    "guid": "A83674DA-901A-11DF-A622-0C319DFF4B22",
+    "description": "Washington"
   },
   {
-    "title": "United Kingdom",
-    "guid": "e13189f3",
-    "type": "country",
-    "chld": "1"
+    "code": "WV",
+    "guid": "A8368AEC-901A-11DF-A622-0C319DFF4B22",
+    "description": "West Virginia"
+  },
+  {
+    "code": "WI",
+    "guid": "A8367FDE-901A-11DF-A622-0C319DFF4B22",
+    "description": "Wisconsin"
+  },
+  {
+    "code": "WY",
+    "guid": "A83695FA-901A-11DF-A622-0C319DFF4B22",
+    "description": "Wyoming"
   }
 ]

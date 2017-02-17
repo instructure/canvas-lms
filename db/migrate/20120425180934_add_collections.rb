@@ -1,4 +1,4 @@
-class AddCollections < ActiveRecord::Migration
+class AddCollections < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

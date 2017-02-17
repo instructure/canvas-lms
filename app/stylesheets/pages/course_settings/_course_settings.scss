@@ -273,7 +273,7 @@ ul.user_list div.enrollment_type.pending {
     line-height: inherit;
     margin: 0;
     @include fontSize(13px);
-    font-weight: 500;
+    font-weight: bold;
   }
 }
 

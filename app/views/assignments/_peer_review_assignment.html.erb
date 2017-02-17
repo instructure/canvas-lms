@@ -1,8 +1,13 @@
 <li class="peer_review <%= request.try_rescue(:workflow_state) || 'assigned' %>" id="review_request_<%= request ? request.id : 'blank' %>" style="<%= hidden unless request %>">
   <span style="float: left;">
-    <%= image_tag "pass.png", :alt => I18n.t("Finished") if request && request.completed? %>
-    <%= image_tag "warning_dim.png", :alt => I18n.t("Assessment not yet Completed") if (request && !request.completed?) || request.nil? %>
-    <%= image_tag "file.png", :alt => '' %>
+    <% if request && request.completed? %>
+      <i class="icon-check" aria-hidden="true"></i>
+      <span class="screenreader-only"><%= I18n.t("Finished") %></span>
+    <% end %>
+    <% if (request && !request.completed?) || request.nil? %>
+      <i class="icon-warning" aria-hidden="true"></i>
+      <span class="screenreader-only"><%= I18n.t("Assessment not yet Completed") %></span>
+    <% end %>
     <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, request ? request.asset.user_id : '{{ user_id }}') %>">
       <span class="asset_user_name"><%= request.try_rescue(:asset).try_rescue(:user).try_rescue(:last_name_first) || nbsp %></span>
     </a>
@@ -14,8 +19,8 @@
        reminder = t 'titles.remind_reviewer', "Remind %{user} about Assessment", :user => user
        reminder = t 'titles.remind_reviewier_with_last_notification', "Remind %{user} about Assessment, last notified %{at}", :user => user, :at => datetime_string(request.updated_at) if request && request.assigned?
     %>
-    <a class="remind_peer_review_link no-hover" style="<%= hidden if request && request.completed? %>" href="<%= context_url(@context, :context_assignment_remind_peer_review_url, @assignment.id, request ? request.id : '{{ id }}') %>" title="<%= reminder %>"><%= image_tag "reply.png", :alt => reminder %></a>
-    <a class="delete_review_link no-hover" href="<%= context_url(@context, :context_assignment_delete_peer_review_url, @assignment.id, request ? request.id : '{{ id }}') %>"><%= image_tag "delete.png", :alt => I18n.t('Delete') %></a>
+    <a class="remind_peer_review_link no-hover" style="<%= hidden if request && request.completed? %>" href="<%= context_url(@context, :context_assignment_remind_peer_review_url, @assignment.id, request ? request.id : '{{ id }}') %>" title="<%= reminder %>"><i class="icon-alert" title="<%= t('Reminder') %>"></i></a>
+    <a class="delete_review_link no-hover" href="<%= context_url(@context, :context_assignment_delete_peer_review_url, @assignment.id, request ? request.id : '{{ id }}') %>"><i class="icon-trash" title="<%= t('Delete') %>"></i></a>
   </div>
   <div class="clear"></div>
 </li>

@@ -19,6 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe AssignmentsHelper do
+  include TextHelper
   include AssignmentsHelper
 
   describe "#assignment_publishing_enabled?" do
@@ -42,20 +43,61 @@ describe AssignmentsHelper do
     end
   end
 
+  describe "#due_at" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      @due_date = 1.month.from_now
+      assignment_model(course: @course, due_at: @due_date)
+    end
+
+    it "renders due date" do
+      expect(due_at(@assignment, @teacher)).to eq datetime_string(@due_date)
+    end
+
+    it "renders no due date when none present" do
+      @assignment.due_at = nil
+      expect(due_at(@assignment, @teacher)).to eq 'No Due Date'
+    end
+
+    context "with multiple due dates" do
+      before(:once) do
+        @section = @course.course_sections.create!(name: "test section")
+        student_in_section(@section, user: @student)
+        @section_due_date = 2.months.from_now
+        create_section_override_for_assignment(@assignment, course_section: @section, due_at: @section_due_date)
+      end
+
+      it "renders multiple dates" do
+        expect(due_at(@assignment, @teacher)).to eq 'Multiple Due Dates'
+      end
+
+      it "renders override date when it applies to all assignees" do
+        @assignment.only_visible_to_overrides = true
+        expect(due_at(@assignment, @teacher)).to eq datetime_string(@section_due_date)
+      end
+
+      it "renders applicable date to student" do
+        expect(due_at(@assignment, @student)).to eq datetime_string(@section_due_date)
+      end
+    end
+  end
+
   describe "#turnitin active?" do
     before(:once) do
       course_with_teacher(active_all: true)
       student_in_course(active_all: true)
       assignment_model(course: @course)
       @assignment.turnitin_enabled = true
-      @context = @assignment.context
       @assignment.update_attributes!({
         submission_types: ["online_url"]
       })
-      @context.account.update_attributes!({
-        turnitin_account_id: 12345,
-        turnitin_shared_secret: "the same combination on my luggage"
-      })
+      @context = @assignment.context
+      account = @context.account
+      account.turnitin_account_id = 12345
+      account.turnitin_shared_secret = "the same combination on my luggage"
+      account.settings[:enable_turnitin] = true
+      account.save!
     end
 
     it "returns true if turnitin is active on the assignment and account" do

@@ -9,57 +9,82 @@
 // directory with the same name, and load them directly rather than needing
 // a compile step ahead of time.
 
-var CompiledReferencePlugin = function(){};
-var pluginTranspiledRegexp = /^([^/]+)\/compiled\//;
+const path = require('path')
 
-var rewritePluginPath = function(requestString){
-  var pluginName = pluginTranspiledRegexp.exec(requestString)[1];
-  var jsxRegexp = /compiled\/jsx/;
-  var relativePath = requestString.replace(pluginName + "/compiled/", "");
-  if(jsxRegexp.test(requestString)){
-    // this references a JSX file which already has "jsx" in it's file path
-    return pluginName + "/app/" + relativePath;
-  }else{
+const specRoot = path.resolve(__dirname, '../spec')
+
+function addExt (requestString) {
+  const ext = /\/templates\//.test(requestString) ? '.hbs' : '.coffee'
+  return requestString + ext
+}
+
+const pluginTranspiledRegexp = /^([^/]+)\/compiled\//
+const jsxRegexp = /compiled\/jsx/
+
+function rewritePluginPath (requestString) {
+  const pluginName = pluginTranspiledRegexp.exec(requestString)[1]
+  const relativePath = requestString.replace(`${pluginName}/compiled/`, '')
+  if (jsxRegexp.test(requestString)) {
+    // this references a JSX file which already has "jsx" in its file path
+    return `${pluginName}/app/${relativePath}`
+  } else {
     // this references a coffeescript file which needs "coffeescripts" to
     // replace the "compiled" part of the path
-    return pluginName + "/app/coffeescripts/" + relativePath;
+    return `${pluginName}/app/coffeescripts/${relativePath}.coffee`
   }
-};
+}
 
-CompiledReferencePlugin.prototype.apply = function(compiler){
+class CompiledReferencePlugin {
+  apply (compiler) {
+    compiler.plugin('normal-module-factory', (nmf) => {
+      nmf.plugin('before-resolve', (input, callback) => {
+        const result = input
+        const requestString = result.request
 
-  compiler.plugin("normal-module-factory", function(nmf) {
-    nmf.plugin("before-resolve", function(result, callback) {
-      var requestString = result.request;
+        if (/^jsx\//.test(requestString)) {
+          // this is a jsx file in canvas. We have to require it with its full
+          // extension while we still have a require-js build or we risk loading
+          // its compiled js instead
+          result.request = `${requestString}.jsx`
+        } else if (
+          requestString.startsWith('.') &&
+          path.join(input.context, input.request).includes('app/coffeescripts') &&
+          !/\.coffee$/.test(requestString)
+        ) {
+          // this is a relative require to  a compiled coffeescript (or hbs) file
+          result.request = addExt(requestString)
+        } else if (/jst\//.test(requestString)) {
+          // this is a handlebars file in canvas. We have to require it with its full
+          // extension while we still have a require-js build or we risk loading
+          // its compiled js instead
+          result.request = `${requestString}.handlebars`
+        } else if ((
+          /^compiled\//.test(requestString) ||
+          requestString.includes('ic-submission-download-dialog')
+        ) && !requestString.includes('dummyI18nResource')) {
+          // this references either a coffeescript or ember handlebars file in canvas
+          result.request = addExt(requestString.replace('compiled/', 'coffeescripts/'))
+        } else if (process.env.NODE_ENV === 'test') {
+          if (/^spec\/javascripts\/compiled/.test(requestString)) {
+            // this references a coffesscript spec file in canvas
+            result.request = `${requestString.replace('spec/javascripts/compiled/', '')}.coffee`
+          } else if (input.context.startsWith(specRoot) && requestString.startsWith('helpers/')) {
+            // we have a bunch of specs that require eg: 'helpers/fakeENV'. in order to not have to add
+            // `spec/coffescripts` to `resolve.modules` and '.coffee' to `resolve.extensions` (which
+            // would slow everything down because it would add to the # of files it has to stat when
+            // looking for things), we rewrite those requests here
+            result.request = `${specRoot}/coffeescripts/${requestString}.coffee`
+          }
+        }
 
-      if(/^jsx\//.test(requestString)){
-        // this is a jsx file in canvas. We have to require it with it's full
-        // extension while we still have a require-js build or we risk loading
-        // it's compiled js instead
-        result.request = requestString + ".jsx"
-      } else if(/^jst\//.test(requestString)){
-        // this is a handlebars file in canvas. We have to require it with it's full
-        // extension while we still have a require-js build or we risk loading
-        // it's compiled js instead
-        result.request = requestString + ".handlebars"
-      } else if(/^compiled\//.test(requestString)){
-        // this references a coffesscript file in canvas
-        result.request = requestString.replace("compiled/", "coffeescripts/");
-      }else if(/^spec\/javascripts\/compiled/.test(requestString)){
-        // this references a coffesscript spec file in canvas
-        result.request = requestString.replace("spec/javascripts/compiled/", "");
-      }
+        // this references a file in a canvas plugin
+        if (pluginTranspiledRegexp.test(requestString)) {
+          result.request = rewritePluginPath(requestString)
+        }
+        return callback(null, result)
+      })
+    })
+  }
+}
 
-      // this references a file in a canvas plugin
-      var pluginTranspiledRegexp = /^([^/]+)\/compiled\//;
-      if(pluginTranspiledRegexp.test(requestString)){
-        result.request = rewritePluginPath(requestString);
-      }
-      return callback(null, result);
-    });
-  });
-
-};
-
-
-module.exports = CompiledReferencePlugin;
+module.exports = CompiledReferencePlugin

@@ -1,4 +1,4 @@
-class AssignmentOverrideMigration < ActiveRecord::Migration
+class AssignmentOverrideMigration < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

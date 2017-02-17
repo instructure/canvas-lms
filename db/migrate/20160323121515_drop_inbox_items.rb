@@ -1,4 +1,4 @@
-class DropInboxItems < ActiveRecord::Migration
+class DropInboxItems < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

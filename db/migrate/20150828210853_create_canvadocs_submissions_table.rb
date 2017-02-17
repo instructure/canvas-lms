@@ -1,4 +1,4 @@
-class CreateCanvadocsSubmissionsTable < ActiveRecord::Migration
+class CreateCanvadocsSubmissionsTable < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

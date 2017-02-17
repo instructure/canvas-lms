@@ -49,7 +49,7 @@ define [
 
     app.render()
 
-  module 'assignmentIndex',
+  QUnit.module 'assignmentIndex',
     setup: ->
       fakeENV.setup(PERMISSIONS: {manage: true})
       @enable_spy = @spy(IndexView.prototype, 'enableSearch')
@@ -103,7 +103,7 @@ define [
     ok view.$("#assignment_2 .modules").text().match(/Three Module/)
 
 
-  module 'student index view',
+  QUnit.module 'student index view',
     setup: ->
       fakeENV.setup(PERMISSIONS: {manage: false})
 

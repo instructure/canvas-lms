@@ -3,12 +3,12 @@ define [
   'compiled/util/fcUtil',
   'moment'
   'timezone'
-  'vendor/timezone/America/Denver'
+  'timezone/America/Denver'
   'helpers/fixtures'
   'jquery'
 ], (Calendar, fcUtil, moment, tz, denver, fixtures, $) ->
 
-  module "Calendar",
+  QUnit.module "Calendar",
     setup: ->
       @snapshot = tz.snapshot()
       tz.changeZone(denver, 'America/Denver')

@@ -71,7 +71,7 @@ describe "profile communication settings" do
 
   let(:sns_response) { stub(data: {endpointarn: 'endpointarn'}) }
   let(:sns_client) { stub(create_platform_endpoint: sns_response) }
-  let(:sns_developer_key_sns_field) { stub(client: sns_client) }
+  let(:sns_developer_key_sns_field) { sns_client }
 
   let(:sns_developer_key) do
     DeveloperKey.stubs(:sns).returns(sns_developer_key_sns_field)
@@ -143,7 +143,7 @@ describe "profile communication settings" do
 
     # Change to a different value and verify flash and the save. (click on the radio)
     immediate_input = cell.find_element(:css, "input#cat_#{category_string}_ch_#{channel.id}_immediately")
-    immediate_input.send_keys(' ')
+    driver.execute_script("arguments[0].click()", immediate_input)
     expect(immediate_input).to be_selected
 
     wait_for_ajaximations

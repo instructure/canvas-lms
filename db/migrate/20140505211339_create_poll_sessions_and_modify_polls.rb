@@ -1,4 +1,4 @@
-class CreatePollSessionsAndModifyPolls < ActiveRecord::Migration
+class CreatePollSessionsAndModifyPolls < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   # rubocop:disable Migration/RemoveColumn

@@ -8,7 +8,7 @@ define([
   let helper;
   let fixtures;
 
-  module('RailsFlashNotificationsHelper#holderReady', {
+  QUnit.module('RailsFlashNotificationsHelper#holderReady', {
     setup: function() {
       fixtures = document.getElementById('fixtures');
       helper = new NotificationsHelper();
@@ -40,7 +40,7 @@ define([
     ok(helper.holderReady());
   });
 
-  module('RailsFlashNotificationsHelper#getIconType', {
+  QUnit.module('RailsFlashNotificationsHelper#getIconType', {
     setup: function() {
       helper = new NotificationsHelper();
     }
@@ -62,7 +62,7 @@ define([
     equal(helper.getIconType('some input'), 'info');
   });
 
-  module('RailsFlashNotificationsHelper#generateNodeHTML', {
+  QUnit.module('RailsFlashNotificationsHelper#generateNodeHTML', {
     setup: function() {
       helper = new NotificationsHelper();
     }
@@ -76,7 +76,7 @@ define([
     ok(result.search('Some Data') !== -1);
   });
 
-  module('RailsFlashNotificationsHelper#createNode', {
+  QUnit.module('RailsFlashNotificationsHelper#createNode', {
     setup: function() {
       fixtures = document.getElementById('fixtures');
       fixtures.innerHTML = '<div id="flash_message_holder"></div>';
@@ -147,7 +147,7 @@ define([
     equal(holder.firstChild, null);
   });
 
-  module('RailsFlashNotificationsHelper#screenreaderHolderReady', {
+  QUnit.module('RailsFlashNotificationsHelper#screenreaderHolderReady', {
     setup: function() {
       fixtures = document.getElementById('fixtures');
       helper = new NotificationsHelper();
@@ -179,7 +179,7 @@ define([
     ok(helper.screenreaderHolderReady());
   });
 
-  module('RailsFlashNotificationsHelper#setScreenreaderAttributes', {
+  QUnit.module('RailsFlashNotificationsHelper#setScreenreaderAttributes', {
     setup: function() {
       fixtures = document.getElementById('fixtures');
       fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>';
@@ -222,7 +222,7 @@ define([
     equal(screenreaderHolder.getAttribute('aria-relevant'), 'additions');
   });
 
-  module('RailsFlashNotificationsHelper#resetScreenreaderAttributes', {
+  QUnit.module('RailsFlashNotificationsHelper#resetScreenreaderAttributes', {
     setup: function() {
       fixtures = document.getElementById('fixtures');
       fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>';
@@ -267,7 +267,7 @@ define([
     equal(screenreaderHolder.getAttribute('aria-relevant'), null);
   });
 
-  module('RailsFlashNotificationsHelper#generateScreenreaderNodeHTML', {
+  QUnit.module('RailsFlashNotificationsHelper#generateScreenreaderNodeHTML', {
     setup: function() {
       helper = new NotificationsHelper();
     }
@@ -291,7 +291,7 @@ define([
     ok(result.search(htmlEscape(I18n.t('close', 'Close'))) == -1);
   });
 
-  module('RailsFlashNotificationsHelper#createScreenreaderNode', {
+  QUnit.module('RailsFlashNotificationsHelper#createScreenreaderNode', {
     setup: function() {
       fixtures = document.getElementById('fixtures');
       fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>';
@@ -312,7 +312,7 @@ define([
     equal(screenreaderHolder.firstChild.tagName, 'SPAN');
   });
 
-  module('RailsFlashNotificationsHelper#createScreenreaderNodeExclusive', {
+  QUnit.module('RailsFlashNotificationsHelper#createScreenreaderNodeExclusive', {
     setup: function() {
       fixtures = document.getElementById('fixtures');
       fixtures.innerHTML = '<div id="flash_screenreader_holder"></div>';
@@ -339,7 +339,7 @@ define([
     equal(screenreaderHolder.childNodes.length, 1);
   });
 
-  module('RailsFlashNotificationsHelper#escapeContent', {
+  QUnit.module('RailsFlashNotificationsHelper#escapeContent', {
     setup: function() {
       helper = new NotificationsHelper();
     }

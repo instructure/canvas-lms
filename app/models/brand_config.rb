@@ -7,8 +7,6 @@ class BrandConfig < ActiveRecord::Base
   OVERRIDE_TYPES = [:js_overrides, :css_overrides, :mobile_js_overrides, :mobile_css_overrides].freeze
   ATTRS_TO_INCLUDE_IN_MD5 = ([:variables, :parent_md5] + OVERRIDE_TYPES).freeze
 
-  attr_accessible(*([:variables] + OVERRIDE_TYPES))
-
   validates :variables, presence: true, unless: :overrides?
   validates :md5, length: {is: 32}
 
@@ -166,6 +164,7 @@ class BrandConfig < ActiveRecord::Base
       chain_of_ancestor_configs.each_with_object({}) do |brand_config, includes|
         BrandConfig::OVERRIDE_TYPES.each do |override_type|
           if brand_config[override_type].present?
+
             (includes[override_type] ||= []).unshift(brand_config[override_type])
           end
         end

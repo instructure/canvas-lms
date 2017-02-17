@@ -5,13 +5,14 @@ define([
   'helpers/fakeENV',
   'jsx/grading/helpers/OutlierScoreHelper',
   'compiled/userSettings',
+  'jsx/speed_grader/gradingPeriod',
+  'jsx/shared/helpers/numberHelper',
   'jquery.ajaxJSON'
-  ], ($, SpeedGrader, SpeedgraderHelpers, fakeENV, OutlierScoreHelper, userSettings) => {
-
-  module("SpeedGrader", {
-    setup() {
+], ($, SpeedGrader, SpeedgraderHelpers, fakeENV, OutlierScoreHelper, userSettings, MGP, numberHelper) => {
+  QUnit.module('SpeedGrader#showDiscussion', {
+    setup () {
       fakeENV.setup();
-      this.spy($, 'ajaxJSON');
+      this.stub($, 'ajaxJSON');
       this.spy($.fn, 'append');
       this.originalWindowJSONData = window.jsonData;
       window.jsonData = {
@@ -21,7 +22,7 @@ define([
       };
       SpeedGrader.EG.currentStudent = {
         id: 4,
-        name: "Guy B. Studying",
+        name: 'Guy B. Studying',
         submission_state: 'not_graded',
         submission: {
           score: 7,
@@ -30,19 +31,19 @@ define([
             group_comment_id: null,
             anonymous: false,
             assessment_request_id: null,
-            attachment_ids: "",
+            attachment_ids: '',
             author_id: 1000,
-            author_name: "neil@instructure.com",
-            comment: "test",
+            author_name: 'neil@instructure.com',
+            comment: 'test',
             context_id: 1,
-            context_type: "Course",
-            created_at: "2016-07-12T23:47:34Z",
+            context_type: 'Course',
+            created_at: '2016-07-12T23:47:34Z',
             hidden: false,
             id: 11,
-            posted_at:"Jul 12 at 5:47pm",
+            posted_at: 'Jul 12 at 5:47pm',
             submission_id: 1,
             teacher_only_comment: false,
-            updated_at: "2016-07-12T23:47:34Z"
+            updated_at: '2016-07-12T23:47:34Z'
           }]
         }
       };
@@ -53,25 +54,296 @@ define([
         assessment_type: 'grading',
         assessor_id: 1
       };
-      $("#fixtures").html(
-        "<div id='grade_container'>"                          +
-        "  <a class='update_submission_grade_url'"            +
-        "   href='my_url.com' title='POST'></a>"              +
-        "  <input class='grading_value' value='56' />"        +
-        "  <div id='combo_box_container'></div>"              +
-        "  <div id='comments'></div>"                         +
-        "</div>"
-      );
+
+      const gradeContainerHtml = `
+        <div id="grade_container">
+          <a class="update_submission_grade_url" href="my_url.com" title="POST"></a>
+          <input class="grading_value" value="56" />
+          <div id="combo_box_container"></div>
+          <div id="comments">
+          </div>
+        </div>
+      `;
+
+      $('#fixtures').html(gradeContainerHtml);
     },
 
-    teardown() {
-      fakeENV.teardown();
+    teardown () {
+      $('#fixtures').empty();
       window.jsonData = this.originalWindowJSONData;
-      $("#fixtures").empty();
+      fakeENV.teardown();
     }
   });
 
-  test('hasWarning and flashWarning are called', function() {
+  test('showDiscussion should not show private comments for a group assignment', () => {
+    window.jsonData.GROUP_GRADING_MODE = true;
+    SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = null;
+    SpeedGrader.EG.showDiscussion();
+    sinon.assert.notCalled($.fn.append);
+  });
+
+  test('showDiscussion should show group comments for group assignments', () => {
+    window.jsonData.GROUP_GRADING_MODE = true;
+    SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = 'hippo';
+    SpeedGrader.EG.showDiscussion();
+    sinon.assert.calledTwice($.fn.append);
+  });
+
+  test('showDiscussion should show private comments for non group assignments', () => {
+    window.jsonData.GROUP_GRADING_MODE = false;
+    SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = null;
+    SpeedGrader.EG.showDiscussion();
+    sinon.assert.calledTwice($.fn.append);
+  });
+
+  let commentRenderingOptions;
+  QUnit.module('SpeedGrader#renderComment', {
+    setup () {
+      fakeENV.setup();
+      this.originalWindowJSONData = window.jsonData;
+      window.jsonData = {
+        id: 27,
+        GROUP_GRADING_MODE: false,
+      };
+      SpeedGrader.EG.currentStudent = {
+        id: 4,
+        name: 'Guy B. Studying',
+        submission_state: 'not_graded',
+        submission: {
+          score: 7,
+          grade: 70,
+          submission_comments: [{
+            group_comment_id: null,
+            anonymous: false,
+            assessment_request_id: null,
+            attachment_ids: '',
+            author_id: 1000,
+            author_name: 'neil@instructure.com',
+            comment: 'test',
+            context_id: 1,
+            context_type: 'Course',
+            created_at: '2016-07-12T23:47:34Z',
+            hidden: false,
+            id: 11,
+            posted_at: 'Jul 12 at 5:47pm',
+            submission_id: 1,
+            teacher_only_comment: false,
+            updated_at: '2016-07-12T23:47:34Z'
+          }, {
+            group_comment_id: null,
+            anonymous: false,
+            assessment_request_id: null,
+            attachment_ids: '',
+            cached_attachments: [{
+              attachment: {
+                cloned_item_id: null,
+                content_type: 'video/mp4',
+                context_id: 1,
+                context_type: 'Assignment',
+                could_be_locked: null,
+                created_at: '2017-01-23T22:23:11Z',
+                deleted_at: null,
+                display_name: 'SampleVideo_1280x720_1mb (1).mp4',
+                encoding: null,
+                file_state: 'available',
+                filename: 'SampleVideo_1280x720_1mb.mp4',
+                folder_id: null,
+                id: 21,
+                last_lock_at: null,
+                last_unlock_at: null,
+                lock_at: null,
+                locked: false,
+                md5: 'd55bddf8d62910879ed9f605522149a8',
+                media_entry_id: 'maybe',
+                migration_id: null,
+                modified_at: '2017-01-23T22:23:11Z',
+                namespace: '_localstorage_/account_1',
+                need_notify: null,
+                position: null,
+                replacement_attachment_id: null,
+                root_attachment_id: 19,
+                size: 1055736,
+                unlock_at: null,
+                updated_at: '2017-01-23T22:23:11Z',
+                upload_error_message: null,
+                usage_rights_id: null,
+                user_id: 1,
+                uuid: 'zR4YRxttAe8Aw53vmcOmUWCGq8g443Mqb8dr7IsJ',
+                viewed_at: null,
+                workflow_state: 'processed'
+              }
+            }],
+            author_id: 1000,
+            author_name: 'neil@instructure.com',
+            comment: 'test',
+            context_id: 1,
+            context_type: 'Course',
+            created_at: '2016-07-13T23:47:34Z',
+            hidden: false,
+            id: 12,
+            posted_at: 'Jul 12 at 5:47pm',
+            submission_id: 1,
+            teacher_only_comment: false,
+            updated_at: '2016-07-13T23:47:34Z'
+          }]
+        }
+      };
+      ENV.RUBRIC_ASSESSMENT = {
+        assessment_type: 'grading',
+        assessor_id: 1
+      };
+
+      const commentBlankHtml = `
+        <div class="comment" style="display: none;">
+          <div class="comment_flex">
+            <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="avatar" alt="" style="display: none;"/>
+            <span class="draft-marker" aria-label="Draft comment">*</span>
+            <span class="comment"></span>
+            <button class="submit_comment_button">
+              <span>Submit</span>
+            </button>
+            <a href="javascript:void 0;" class="delete_comment_link icon-x">
+              <span class="screenreader-only">Delete comment</span>
+            </a>
+          </div>
+          <a href="#" class="play_comment_link media-comment" style="display:none;">click here to view</a>
+          <div class="media_comment_content" style="display:none"></div>
+          <div class="comment_attachments"></div>
+          <div class="comment_citation">
+            <span class="author_name">&nbsp;</span>,
+            <span class="posted_at">&nbsp;</span>
+          </div>
+        </div>
+      `;
+
+      const commentAttachmentBlank = `
+        <div class="comment_attachment" id="comment_attachment_blank" style="display: none;">
+          <a href="example.com/{{ submitter_id }}/{{ id }}/{{ comment_id }}"><span class="display_name">&nbsp;</span></a>
+        </div>
+      `;
+
+      const gradeContainerHtml = `
+        <div id="grade_container">
+          <a class="update_submission_grade_url" href="my_url.com" title="POST"></a>
+          <input class="grading_value" value="56" />
+          <div id="combo_box_container"></div>
+          <div id="comments">
+          </div>
+        </div>
+      `;
+
+      $('#fixtures').html(gradeContainerHtml);
+
+      commentRenderingOptions = { commentBlank: $(commentBlankHtml), commentAttachmentBlank: $(commentAttachmentBlank) };
+    },
+
+    teardown () {
+      $('#fixtures').empty();
+      window.jsonData = this.originalWindowJSONData;
+      fakeENV.teardown();
+    }
+  });
+
+  test('renderComment renders a comment', () => {
+    const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
+    const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
+    const commentText = renderedComment.find('span.comment').text();
+
+    equal(commentText, 'test');
+  });
+
+  test('renderComment renders a comment with an attachment', () => {
+    const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[1];
+    const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
+    const commentText = renderedComment.find('.comment_attachment a').text();
+
+    equal(commentText, 'SampleVideo_1280x720_1mb (1).mp4');
+  });
+
+  test('renderComment should add the comment text to the delete link for screenreaders', () => {
+    const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
+    const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
+    const deleteLinkScreenreaderText = renderedComment.find('.delete_comment_link .screenreader-only').text();
+
+    equal(deleteLinkScreenreaderText, 'Delete comment: test');
+  });
+
+  test('renderComment should add the comment text to the submit link for draft comments', () => {
+    const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
+    commentToRender.draft = true;
+    const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
+    const submitLinkScreenreaderText = renderedComment.find('.submit_comment_button').attr('aria-label');
+
+    equal(submitLinkScreenreaderText, 'Submit comment: test');
+  });
+
+  QUnit.module('SpeedGrader#handleGradeSubmit', {
+    setup () {
+      fakeENV.setup();
+      this.stub($, 'ajaxJSON');
+      this.spy($.fn, 'append');
+      this.originalWindowJSONData = window.jsonData;
+      window.jsonData = {
+        id: 27,
+        GROUP_GRADING_MODE: false,
+        points_possible: 10
+      };
+      SpeedGrader.EG.currentStudent = {
+        id: 4,
+        name: 'Guy B. Studying',
+        submission_state: 'not_graded',
+        submission: {
+          score: 7,
+          grade: 70,
+          submission_comments: [{
+            group_comment_id: null,
+            anonymous: false,
+            assessment_request_id: null,
+            attachment_ids: '',
+            author_id: 1000,
+            author_name: 'neil@instructure.com',
+            comment: 'test',
+            context_id: 1,
+            context_type: 'Course',
+            created_at: '2016-07-12T23:47:34Z',
+            hidden: false,
+            id: 11,
+            posted_at: 'Jul 12 at 5:47pm',
+            submission_id: 1,
+            teacher_only_comment: false,
+            updated_at: '2016-07-12T23:47:34Z'
+          }]
+        }
+      };
+      ENV.SUBMISSION = {
+        grading_role: 'teacher'
+      };
+      ENV.RUBRIC_ASSESSMENT = {
+        assessment_type: 'grading',
+        assessor_id: 1
+      };
+
+      const gradeContainerHtml = `
+        <div id="grade_container">
+          <a class="update_submission_grade_url" href="my_url.com" title="POST"></a>
+          <input class="grading_value" value="56" />
+          <div id="combo_box_container"></div>
+          <div id="comments">
+          </div>
+        </div>
+      `;
+
+      $('#fixtures').html(gradeContainerHtml);
+    },
+
+    teardown () {
+      $('#fixtures').empty();
+      window.jsonData = this.originalWindowJSONData;
+      fakeENV.teardown();
+    }
+  });
+
+  test('hasWarning and flashWarning are called', function () {
     const flashWarningStub = this.stub($, 'flashWarning');
     this.stub(SpeedgraderHelpers, 'determineGradeToSubmit').returns('15');
     this.stub(SpeedGrader.EG, 'setOrUpdateSubmission');
@@ -84,27 +356,6 @@ define([
     }];
     callback(submissions);
     ok(flashWarningStub.calledOnce);
-  });
-
-  test('showDiscussion should not show private comments for a group assignment', () => {
-    jsonData.GROUP_GRADING_MODE = true;
-    SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = null;
-    SpeedGrader.EG.showDiscussion();
-    sinon.assert.notCalled($.fn.append);
-  });
-
-  test('showDiscussion should show group comments for group assignments', () => {
-    jsonData.GROUP_GRADING_MODE = true;
-    SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = "hippo";
-    SpeedGrader.EG.showDiscussion();
-    sinon.assert.calledOnce($.fn.append);
-  });
-
-  test('showDiscussion should show private comments for non group assignments', () => {
-    jsonData.GROUP_GRADING_MODE = false;
-    SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = null;
-    SpeedGrader.EG.showDiscussion();
-    sinon.assert.calledOnce($.fn.append);
   });
 
   test('handleGradeSubmit should submit score if using existing score', () => {
@@ -130,10 +381,10 @@ define([
   });
 
   let $div = null;
-  module('loading a submission Preview', {
+  QUnit.module('loading a submission Preview', {
     setup() {
       fakeENV.setup();
-      this.spy($, 'ajaxJSON');
+      this.stub($, 'ajaxJSON');
       $div = $("<div id='iframe_holder'>not empty</div>")
       $("#fixtures").html($div)
     },
@@ -148,10 +399,37 @@ define([
     ok(typeof SpeedGrader.EG.loadSubmissionPreview === 'function');
   })
 
-  module('emptyIframeHolder', {
+  QUnit.module('resizeImg', {
+    setup () {
+      fakeENV.setup();
+      $div = $("<div id='iframe_holder'><iframe src='about:blank'></iframe></div>");
+      $('#fixtures').html($div);
+    },
+
+    teardown () {
+      fakeENV.teardown();
+      $('#fixtures').empty();
+    }
+  });
+
+  test('resizes images', () => {
+    const $body = $('#iframe_holder').find('iframe').contents().find('body');
+    $body.html('<img src="#" />');
+    SpeedGrader.EG.resizeImg.call($('#iframe_holder').find('iframe').get(0));
+    equal($body.find('img').attr('style'), 'max-width: 100vw; max-height: 100vh;');
+  });
+
+  test('does not resize other types of content', () => {
+    const $body = $('#iframe_holder').find('iframe').contents().find('body');
+    $body.html('<p>This is more than an img.</p><img src="#" />');
+    SpeedGrader.EG.resizeImg.call($('#iframe_holder').find('iframe').get(0));
+    notEqual($body.find('img').attr('style'), 'max-width: 100vw; max-height: 100vh;');
+  });
+
+  QUnit.module('emptyIframeHolder', {
     setup() {
       fakeENV.setup();
-      this.spy($, 'ajaxJSON');
+      this.stub($, 'ajaxJSON');
       $div = $("<div id='iframe_holder'>not empty</div>")
       $("#fixtures").html($div)
     },
@@ -171,10 +449,10 @@ define([
     ok($div.is(':empty'));
   });
 
-  module('renderLtiLaunch', {
+  QUnit.module('renderLtiLaunch', {
     setup() {
       fakeENV.setup();
-      this.spy($, 'ajaxJSON');
+      this.stub($, 'ajaxJSON');
       $div = $("<div id='iframe_holder'>not empty</div>")
       $("#fixtures").html($div)
     },
@@ -198,7 +476,15 @@ define([
     ok(srcUrl.indexOf(encodeURIComponent(url)) > -1)
   });
 
-  module('speed_grader#getGradeToShow');
+  test('can be fullscreened', () => {
+    let retrieveUrl = 'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22';
+    let url = 'www.example.com/lti/launch/user/4';
+    SpeedGrader.EG.renderLtiLaunch($div, retrieveUrl, url);
+    let fullscreenAttr = $div.find('iframe').attr('allowfullscreen');
+    equal(fullscreenAttr, "true");
+  })
+
+  QUnit.module('speed_grader#getGradeToShow');
 
   test('returns an empty string if submission is null', () => {
     let grade = SpeedGrader.EG.getGradeToShow(null, 'some_role');
@@ -260,7 +546,7 @@ define([
     equal(grade, '15');
   });
 
-  module('speed_grader#getStudentNameAndGrade');
+  QUnit.module('speed_grader#getStudentNameAndGrade');
 
   test('returns name and status', () => {
     let result = SpeedGrader.EG.getStudentNameAndGrade();
@@ -272,5 +558,142 @@ define([
     this.stub(SpeedGrader.EG, 'currentIndex').returns(5);
     let result = SpeedGrader.EG.getStudentNameAndGrade();
     equal(result, 'Student 6 - not graded');
+  });
+
+  QUnit.module('handleSubmissionSelectionChange', {
+    setup() {
+      fakeENV.setup();
+      this.originalWindowJSONData = window.jsonData;
+      SpeedGrader.EG.currentStudent = {
+        id: 4,
+        name: "Guy B. Studying",
+        enrollments: [{
+          workflow_state: 'active'
+        }],
+        submission_state: 'not_graded',
+        submission: {
+          currentSelectedIndex: 1,
+          score: 7,
+          grade: 70,
+          submission_type: 'basic_lti_launch',
+          workflow_state: 'submitted',
+          submission_history: [
+            {
+              submission: {
+                submission_type: 'basic_lti_launch',
+                external_tool_url: 'foo'
+              }
+            },
+            {
+              submission: {
+                submission_type: 'basic_lti_launch',
+                external_tool_url: 'bar'
+              }
+            }
+          ]
+        }
+      };
+
+      window.jsonData = {
+        id: 27,
+        GROUP_GRADING_MODE: false,
+        points_possible: 10,
+        studentMap : {
+          4 : SpeedGrader.EG.currentStudent
+        }
+      };
+    },
+
+    teardown() {
+      fakeENV.teardown();
+      window.jsonData = this.originalWindowJSONData;
+    }
+  });
+
+  test('should use submission history lti launch url', () => {
+    let renderLtiLaunch = sinon.stub(SpeedGrader.EG, 'renderLtiLaunch');
+    sinon.stub(MGP, 'assignmentClosedForStudent').returns(false);
+    SpeedGrader.EG.handleSubmissionSelectionChange();
+    ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, "bar"));
+  });
+
+  QUnit.module('SpeedGrader#isGradingTypePercent', {
+    setup () {
+      fakeENV.setup();
+    },
+    teardown () {
+      fakeENV.teardown();
+    }
+  });
+
+  test('should return true when grading type is percent', () => {
+    ENV.grading_type = 'percent';
+    const result = SpeedGrader.EG.isGradingTypePercent();
+    ok(result);
+  });
+
+  test('should return false when grading type is not percent', () => {
+    ENV.grading_type = 'foo';
+    const result = SpeedGrader.EG.isGradingTypePercent();
+    notOk(result);
+  });
+
+  QUnit.module('SpeedGrader#shouldParseGrade', {
+    setup () {
+      fakeENV.setup();
+    },
+    teardown () {
+      fakeENV.teardown();
+    }
+  });
+
+  test('should return true when grading type is percent', () => {
+    ENV.grading_type = 'percent';
+    const result = SpeedGrader.EG.shouldParseGrade();
+    ok(result);
+  });
+
+  test('should return true when grading type is points', () => {
+    ENV.grading_type = 'points';
+    const result = SpeedGrader.EG.shouldParseGrade();
+    ok(result);
+  });
+
+  test('should return false when grading type is neither percent nor points', () => {
+    ENV.grading_type = 'foo';
+    const result = SpeedGrader.EG.shouldParseGrade();
+    notOk(result);
+  });
+
+  QUnit.module('SpeedGrader#formatGradeForSubmission', {
+    setup () {
+      fakeENV.setup();
+      this.stub(numberHelper, 'parse').returns(42);
+    },
+
+    teardown () {
+      fakeENV.teardown();
+    }
+  });
+
+  test('should call numberHelper#parse if grading type is points', () => {
+    ENV.grading_type = 'points';
+    const result = SpeedGrader.EG.formatGradeForSubmission('1,000');
+    equal(numberHelper.parse.callCount, 1);
+    strictEqual(result, '42');
+  });
+
+  test('should call numberHelper#parse if grading type is a percentage', () => {
+    ENV.grading_type = 'percent';
+    const result = SpeedGrader.EG.formatGradeForSubmission('75%');
+    equal(numberHelper.parse.callCount, 1);
+    strictEqual(result, '42%')
+  });
+
+  test('should not call numberHelper#parse if grading type is neither points nor percentage', () => {
+    ENV.grading_type = 'foo';
+    const result = SpeedGrader.EG.formatGradeForSubmission('A');
+    ok(numberHelper.parse.notCalled);
+    equal(result, 'A');
   });
 });

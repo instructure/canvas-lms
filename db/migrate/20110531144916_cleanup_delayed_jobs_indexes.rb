@@ -1,4 +1,4 @@
-class CleanupDelayedJobsIndexes < ActiveRecord::Migration
+class CleanupDelayedJobsIndexes < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.connection

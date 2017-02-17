@@ -1,4 +1,4 @@
-class AddOnlyVisibleToOverrides < ActiveRecord::Migration
+class AddOnlyVisibleToOverrides < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

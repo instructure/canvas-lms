@@ -1,16 +1,17 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jquery',
   'jsx/theme_editor/ThemeEditorAccordion',
   'jsx/theme_editor/RangeInput',
   'jsx/theme_editor/ThemeEditorColorRow',
   'jsx/theme_editor/ThemeEditorImageRow',
-], (React, ReactDOM, jQuery, ThemeEditorAccordion, RangeInput, ColorRow, ImageRow) => {
+], (React, ReactDOM, TestUtils, jQuery, ThemeEditorAccordion, RangeInput, ColorRow, ImageRow) => {
 
   let elem, props
 
-  module('ThemeEditorAccordion Component', {
+  QUnit.module('ThemeEditorAccordion Component', {
     setup () {
       elem = document.createElement('div')
       props = {
@@ -42,7 +43,7 @@ define([
 
   test('Opens last used accordion tab', () => {
     var options; // Stores the last object passed to $dom.accorion({...})
-    sinon.stub(jQuery.fn, 'accordion', (opts)=>{
+    sinon.stub(jQuery.fn, 'accordion').callsFake((opts) => {
       // Allows us to save the last accordion call if it was an object
       // Ex: it won't save if $dom.accordion('options','active') is called
       if(typeof opts==='object'){
@@ -222,7 +223,7 @@ define([
         accept: 'image/*'
       }]
     }]
-    const shallowRenderer = React.addons.TestUtils.createRenderer()
+    const shallowRenderer = TestUtils.createRenderer()
     shallowRenderer.render(<ThemeEditorAccordion {...props} />)
     const vdom = shallowRenderer.getRenderOutput()
     const rows = vdom.props.children[0][1].props.children

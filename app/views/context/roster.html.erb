@@ -1,19 +1,18 @@
 <%
-  add_crumb t('#crumbs.people', 'People'), context_url(@context, :context_users_url)
   @active_tab = 'people'
-  translated_title = @context.is_a?(Course) ? t('titles.course_roster', 'Course Roster') : t('titles.group_roster', 'Group Roster')
+  add_crumb t('People'), context_url(@context, :context_users_url)
 
+  translated_title = @context.is_a?(Course) ? t('Course Roster') : t('Group Roster')
   content_for :page_title, join_title(translated_title, @context.name)
+
+  css_bundle :roster
+
+  is_teacher = can_do(@context, @current_user, :manage_students)
 %>
-
-
-
-<% css_bundle :roster %>
-
 
 <div class="ic-Action-header">
   <div class="ic-Action-header__Primary">
-    <h1 class="screenreader-only"><%= t('#titles.people', 'People') %></h1>
+    <h1 class="screenreader-only"><%= t('People') %></h1>
   </div>
   <div class="ic-Action-header__Secondary">
     <%= render :partial => 'context/roster_right_side' %>
@@ -23,84 +22,52 @@
   <% js_bundle :roster %>
   <% js_env :canManageCourse => can_do(@context, @current_user, :manage) %>
 <% else %>
-  <% content_for :stylesheets do %>
-    <style>
-      .roster .more_info {
-        font-size: 0.85em;
-        margin-left: 10px;
-      }
-
-      .roster div.avatar {
-        float: left;
-        padding-right: 5px;
-      }
-
-      .fill_height_div { overflow: auto; }
-    </style>
-  <% end %>
-
-  <table style="width: 100%;">
-    <tr>
-      <td style="width: 50%; vertical-align: top;" class="roster student_roster">
-        <h2><%= @primary_users.keys.first %></h2>
-        <div style="max-height: 300px; margin-right: 20px;" class="fill_height_div">
-        <table>
-        <% @primary_users[@primary_users.keys.first].each do |student| %>
-          <tr class="user" id="user_<%= student.id %>">
-            <td style="vertical-align: top;">
-              <%= avatar(student, context_code: @context.asset_string, size: 30) %>
-            </td>
-            <td>
-              <div><a href="<%= context_url(@context, :context_user_url, student.id) %>" class="user_name"><%= can_do(@context, @current_user, :manage_students) ? student.name : student.short_name %></a></div>
-              <% if can_do(@context, @current_user, :manage_students) %>
-                <div class="more_info">
-                  <div class="short_name"><%= student.short_name %></div>
-                  <div class="email"><%= student.email %></div>
-                  <% if @enrollments_hash %>
-                    <% @enrollments_hash[student.id].each do |e| %>
-                      <div class="course_section"><%= e.try(:course_section).try(:display_name) %></div>
-                    <% end %>
-                  <% end %>
-                </div>
+  <div class="roster-container">
+    <div class="roster roster-column student_roster">
+      <h2><%= @primary_users.keys.first %></h2>
+      <ul class="user-list">
+      <% @primary_users[@primary_users.keys.first].each do |student| %>
+        <li class="user-list__item" id="user_<%= student.id %>">
+          <%= avatar(student, context_code: @context.asset_string, size: 30) %>
+          <div class="user-list__item-details">
+            <a href="<%= context_url(@context, :context_user_url, student.id) %>" class="user_name"><%= is_teacher ? student.name : student.short_name %></a>
+            <% if is_teacher %>
+              <div class="short_name"><%= student.short_name %></div>
+              <div class="email"><%= student.email %></div>
+              <% if @enrollments_hash %>
+                <% @enrollments_hash[student.id].each do |e| %>
+                  <div class="course_section"><%= e.try(:course_section).try(:display_name) %></div>
+                <% end %>
               <% end %>
-              <div style="clear: left;"></div>
-            </td>
-          </tr>
-        <% end %>
-        </table>
-        </div>
-      </td>
-      <% unless !@secondary_users || @secondary_users.empty? %>
-      <td style="vertical-align: top;" class="roster teacher_roster">
-        <h2><%= @secondary_users.keys.first %></h2>
-        <div style="max-height: 300px;" class="fill_height_div">
-        <table>
-        <% @secondary_users[@secondary_users.keys.first].each do |teacher| %>
-          <tr class="user" id="user_<%= teacher.id %>">
-            <td style="vertical-align: top;">
-              <%= avatar(teacher, context_code: @context.context.asset_string, size: 30) %>
-            </td>
-            <td>
-              <div><a href="<%= context_url(@context.context, :context_user_url, teacher.id) %>" class="user_name"><%= teacher.name %></a></div>
-              <% if can_do(@context, @current_user, :manage_admin_users) %>
-                <div class="more_info">
-                  <div class="short_name"><%= teacher.short_name %></div>
-                  <div class="email"><%= teacher.email %></div>
-                  <% if @enrollments_hash %>
-                    <% @enrollments_hash[teacher.id].each do |e| %>
-                      <div class="course_section"><%= e.try(:course_section).try(:display_name) %></div>
-                    <% end %>
-                  <% end %>
-                </div>
-              <% end %>
-              <div style="clear: left;"></div>
-            </td>
-          </tr>
-        <% end %>
-        </table>
-        </div>
-      </td>
+            <% end %>
+          </div>
+        </li>
       <% end %>
-    </tr>
-  </table>
+      </ul>
+    </div>
+    <% unless !@secondary_users || @secondary_users.empty? %>
+    <div class="roster roster-column teacher_roster">
+      <h2><%= @secondary_users.keys.first %></h2>
+      <ul class="user-list">
+      <% @secondary_users[@secondary_users.keys.first].each do |teacher| %>
+        <li class="user-list__item" id="user_<%= teacher.id %>">
+          <%= avatar(teacher, context_code: @context.context.asset_string, size: 30) %>
+          <div class="user-list__item-details">
+            <a href="<%= context_url(@context.context, :context_user_url, teacher.id) %>" class="user_name"><%= teacher.name %></a>
+            <% if is_teacher %>
+              <div class="short_name"><%= teacher.short_name %></div>
+              <div class="email"><%= teacher.email %></div>
+              <% if @enrollments_hash %>
+                <% @enrollments_hash[teacher.id].each do |e| %>
+                  <div class="course_section"><%= e.try(:course_section).try(:display_name) %></div>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+        </li>
+      <% end %>
+      </ul>
+    </div>
+    <% end %>
+  </div>
 <% end %>

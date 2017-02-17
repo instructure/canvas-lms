@@ -3,7 +3,7 @@ define([
   'redux-thunk',
   '../reducers/FlickrReducer',
   './FlickrInitialState'
-], function (Redux, ReduxThunk, FlickrReducer, FlickrInitialState) {
+], function (Redux, {default:ReduxThunk}, FlickrReducer, FlickrInitialState) {
 
   const { createStore, applyMiddleware } = Redux;
 

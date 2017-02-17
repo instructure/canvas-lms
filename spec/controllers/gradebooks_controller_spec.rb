@@ -26,7 +26,7 @@ describe GradebooksController do
     student_in_course active_all: true
     @student_enrollment = @enrollment
 
-    user(:active_all => true)
+    user_factory(active_all: true)
     @observer = @user
     @oe = @course.enroll_user(@user, 'ObserverEnrollment')
     @oe.accept
@@ -77,7 +77,7 @@ describe GradebooksController do
     end
 
     it "does not allow access for wrong user" do
-      user(:active_all => true)
+      user_factory(active_all: true)
       user_session(@user)
       get 'grade_summary', :course_id => @course.id, :id => nil
       assert_unauthorized
@@ -93,7 +93,7 @@ describe GradebooksController do
     end
 
     it "does not allow access for a linked student" do
-      user(:active_all => true)
+      user_factory(active_all: true)
       user_session(@user)
       @se = @course.enroll_student(@user)
       @se.accept
@@ -105,7 +105,7 @@ describe GradebooksController do
 
     it "does not allow access for an observer linked in a different course" do
       @course1 = @course
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course2 = @course
 
       user_session(@observer)
@@ -189,14 +189,23 @@ describe GradebooksController do
       expect(assigns[:js_env][:assignment_groups].first[:assignments].first["discussion_topic"]).to be_nil
     end
 
+    it "includes muted assignments" do
+      user_session(@student)
+      assignment = @course.assignments.create!(title: "Example Assignment")
+      assignment.mute!
+      get 'grade_summary', course_id: @course.id, id: @student.id
+      expect(assigns[:js_env][:assignment_groups].first[:assignments].size).to eq 1
+      expect(assigns[:js_env][:assignment_groups].first[:assignments].first[:muted]).to eq true
+    end
+
     it "does not leak muted scores" do
       user_session(@student)
       a1, a2 = 2.times.map { |i|
         @course.assignments.create! name: "blah#{i}", points_possible: 10
       }
       a1.mute!
-      a1.grade_student(@student, grade: 10)
-      a2.grade_student(@student, grade: 5)
+      a1.grade_student(@student, grade: 10, grader: @teacher)
+      a2.grade_student(@student, grade: 5, grader: @teacher)
       get 'grade_summary', course_id: @course.id, id: @student.id
       expected =
       expect(assigns[:js_env][:submissions].sort_by { |s|
@@ -209,7 +218,7 @@ describe GradebooksController do
     it "includes necessary attributes on the submissions" do
       user_session(@student)
       assignment = @course.assignments.create!(points_possible: 10)
-      assignment.grade_student(@student, grade: 10)
+      assignment.grade_student(@student, grade: 10, grader: @teacher)
       get('grade_summary', course_id: @course.id, id: @student.id)
       submission = assigns[:js_env][:submissions].first
       expect(submission).to include :excused
@@ -484,7 +493,7 @@ describe GradebooksController do
       it "redirects to Grid View with a friendly URL" do
         @teacher.preferences[:gradebook_version] = "2"
         get "show", :course_id => @course.id
-        expect(response).to render_template("gradebook2")
+        expect(response).to render_template("gradebook")
       end
 
       it "redirects to Individual View with a friendly URL" do
@@ -504,10 +513,55 @@ describe GradebooksController do
       get "show", :course_id => @course.id
       assert_unauthorized
     end
+
+    context 'includes data needed by the Gradebook Action menu in ENV' do
+      before do
+        user_session(@teacher)
+
+        get 'show', course_id: @course.id
+
+        @gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+      end
+
+      it 'includes the context_allows_gradebook_uploads key in ENV' do
+        actual_value = @gradebook_env[:context_allows_gradebook_uploads]
+        expected_value = @course.allows_gradebook_uploads?
+
+        expect(actual_value).to eq(expected_value)
+      end
+
+      it 'includes the gradebook_import_url key in ENV' do
+        actual_value = @gradebook_env[:gradebook_import_url]
+        expected_value = new_course_gradebook_upload_path(@course)
+
+        expect(actual_value).to eq(expected_value)
+      end
+    end
+
+    context "includes student context card info in ENV" do
+      before { user_session(@teacher) }
+
+      it "includes context_id" do
+        get :show, course_id: @course.id
+        context_id = assigns[:js_env][:GRADEBOOK_OPTIONS][:context_id]
+        expect(context_id).to eq @course.id.to_param
+      end
+
+      it "doesn't enable context cards when feature is off" do
+        get :show, course_id: @course.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq false
+      end
+
+      it "enables context cards when feature is on" do
+        @course.root_account.enable_feature! :student_context_cards
+        get :show, course_id: @course.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq true
+      end
+    end
   end
 
   describe "GET 'change_gradebook_version'" do
-    it 'switches to gradebook2 if clicked' do
+    it 'switches to gradebook if clicked' do
       user_session(@teacher)
       get 'grade_summary', :course_id => @course.id, :id => nil
 
@@ -521,7 +575,7 @@ describe GradebooksController do
 
   describe "POST 'submissions_zip_upload'" do
     it "requires authentication" do
-      course
+      course_factory
       assignment_model
       post 'submissions_zip_upload', :course_id => @course.id, :assignment_id => @assignment.id, :submissions_zip => 'dummy'
       assert_unauthorized
@@ -783,6 +837,18 @@ describe GradebooksController do
       get 'speed_grader', course_id: @course, assignment_id: @assignment.id
       expect(assigns[:js_env][:lti_retrieve_url]).not_to be_nil
     end
+
+    it 'includes the grading_type in the js_env' do
+      user_session(@teacher)
+      @assignment = @course.assignments.create!(
+        title: "A Title",
+        submission_types: 'online_url,online_file',
+        grading_type: 'percent'
+      )
+
+      get 'speed_grader', course_id: @course, assignment_id: @assignment.id
+      expect(assigns[:js_env][:grading_type]).to eq('percent')
+    end
   end
 
   describe "POST 'speed_grader_settings'" do
@@ -834,7 +900,8 @@ describe GradebooksController do
               id: a.id,
               points_possible: 10,
               submission_types: ['online_upload'],
-              omit_from_final_grade: true
+              omit_from_final_grade: true,
+              muted: false
             }
           ],
         },
@@ -866,11 +933,37 @@ describe GradebooksController do
             due_at: nil,
             points_possible: 10,
             submission_types: ['online_upload'],
-            omit_from_final_grade: false
+            omit_from_final_grade: false,
+            muted: false
           }
         ],
       },
     ]
+    end
+  end
+
+  describe '#external_tool_detail' do
+    let(:tool) do
+      {
+        name: 'test lti',
+        placements: {
+          post_grades: {
+            canvas_launch_url: 'http://example.com/lti/post_grades',
+            launch_width: 100,
+            launch_height: 100
+          }
+        }
+      }
+    end
+
+    it 'maps a tool to launch details' do
+      expect(@controller.external_tool_detail(tool)).to eql(
+        data_url: 'http://example.com/lti/post_grades',
+        name: 'test lti',
+        type: :lti,
+        data_width: 100,
+        data_height: 100
+      )
     end
   end
 end

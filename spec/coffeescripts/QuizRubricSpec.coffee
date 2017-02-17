@@ -18,7 +18,7 @@ define ['quiz_rubric', 'jquery'], (QuizRubric, $)->
       "DUMMY CONTENT FOR RUBRIC FORM" +
     "</div>"
 
-  module "QuizRubric",
+  QUnit.module "QuizRubric",
     setup: ->
       $("#fixtures").append(defaultRubric)
 

@@ -90,6 +90,23 @@ to run it headless in a container, so I run it with:
 which spools up the "js-tests" container specified in docker-compose.yml, which
 has an entry point that knows how to kick off karma with a headless runner.
 
+### Webpack Notifications
+
+If you use macOS, you can setup system notifications for when the Webpack build
+starts and ends so that you don't have to constantly watch the terminal for it.
+
+To do so, add the following to your .bashrc or .zshrc:
+```
+export ENABLE_CANVAS_WEBPACK_HOOKS=1
+source ~/canvas-lms/frontend_build/webpackHooks/macNotifications.sh
+```
+
+`macNotifications.sh` simply defines some shell variables that Webpack will use
+to execute commands on specific hooks during the build process.
+
+If you use Linux, or would like to setup your own custom Webpack notifications,
+you can take a at how `macNotifications.sh` works and write your own hooks.
+
 ### FAQ!
 
 *I got some errors that look like "Cannot resolve module", but the module is totally there. What gives?*
@@ -203,8 +220,6 @@ with the docker workflow
 [X] Solve module resolution error in ./app/coffeescripts/bundles/grade_question.coffee
 (was a missing bundle, need to start sniffing for which bundles are actually in the
   directory soon)
-
-[X] solve Module build failed: SyntaxError: /app/frontend_build/jsxYankPragma.js!/app/app/jsx/gradebook/grid/stores/tableStore.jsx: Argument name clash in strict mode (13:13)
 
 [X] test in development and
 make sure we have source to

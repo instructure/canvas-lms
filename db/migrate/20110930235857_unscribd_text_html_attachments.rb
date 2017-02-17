@@ -1,4 +1,4 @@
-class UnscribdTextHtmlAttachments < ActiveRecord::Migration
+class UnscribdTextHtmlAttachments < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

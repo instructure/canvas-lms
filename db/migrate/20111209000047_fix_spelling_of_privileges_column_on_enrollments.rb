@@ -1,4 +1,4 @@
-class FixSpellingOfPrivilegesColumnOnEnrollments < ActiveRecord::Migration
+class FixSpellingOfPrivilegesColumnOnEnrollments < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

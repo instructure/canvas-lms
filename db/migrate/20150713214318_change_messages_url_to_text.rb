@@ -1,4 +1,4 @@
-class ChangeMessagesUrlToText < ActiveRecord::Migration
+class ChangeMessagesUrlToText < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

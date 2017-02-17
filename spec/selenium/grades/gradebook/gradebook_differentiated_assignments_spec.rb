@@ -1,11 +1,11 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2" do
+describe "gradebook" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
   context "differentiated assignments" do
-    before :each do
+    before :once do
       gradebook_data_setup
       @da_assignment = assignment_model({
         :course => @course,
@@ -16,6 +16,10 @@ describe "gradebook2" do
         :only_visible_to_overrides => true
       })
       @override = create_section_override_for_assignment(@da_assignment, course_section: @other_section)
+    end
+
+    before(:each) do
+      user_session(@teacher)
     end
 
     it "should gray out cells" do
@@ -33,11 +37,10 @@ describe "gradebook2" do
 
     it "should gray out cells after removing a score which removes visibility" do
       selector = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l5'
-      @da_assignment.grade_student(@student_1, :grade => 42)
+      @da_assignment.grade_student(@student_1, grade: 42, grader: @teacher)
       @override.destroy
       get "/courses/#{@course.id}/gradebook"
       edit_grade(selector, '')
-      wait_for_ajax_requests
       cell = f(selector)
       expect(cell.find_element(:css, '.gradebook-cell')).to have_class('grayed-out')
     end

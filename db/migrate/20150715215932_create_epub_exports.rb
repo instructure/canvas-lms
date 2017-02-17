@@ -1,4 +1,4 @@
-class CreateEpubExports < ActiveRecord::Migration
+class CreateEpubExports < ActiveRecord::Migration[4.2]
   tag :predeploy
   def self.up
     create_table :epub_exports do |t|

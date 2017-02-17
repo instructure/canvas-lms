@@ -16,7 +16,7 @@
       <a href="<%= disable_mfa_path('self') %>" class="btn button-sidebar-wide" id="disable_mfa_link"><%= image_tag "unlock.png", :alt => '' %> <%= t('links.disable_mfa', "Disable Multi-Factor Authentication") %></a>
     <% end %>
     <a href="<%= dashboard_content_exports_path %>" class="btn button-sidebar-wide"><i class="icon-download"></i> <%= t("Download Submissions") %></a>
-    <% if @current_user.account.feature_allowed?(:epub_export)%>
+    <% if @domain_root_account.feature_allowed?(:epub_export) && !@domain_root_account.enable_offline_web_export? %>
         <%= link_to  epub_exports_path, class: 'btn button-sidebar-wide' do %>
           <i class="icon-download" aria-hidden='true'></i> <%= t("Download Course Content") %>
         <% end %>

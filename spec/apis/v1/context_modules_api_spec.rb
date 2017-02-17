@@ -19,7 +19,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Modules API", type: :request do
   before :once do
-    course.offer!
+    course_factory.offer!
 
     @module1 = @course.context_modules.create!(:name => "module1")
     @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 42)
@@ -321,7 +321,6 @@ describe "Modules API", type: :request do
                        :course_id => @course.to_param }
         @test_modules = (1..4).map { |x| @course.context_modules.create! :name => "test module #{x}" }
         @test_modules[2..3].each { |m| m.update_attribute(:workflow_state , 'unpublished') }
-        expect(@test_modules.map { |tm| tm.workflow_state }).to eq %w(active active unpublished unpublished)
         @modules_to_update = [@test_modules[1], @test_modules[3]]
 
         @wiki_page = @course.wiki.wiki_pages.create(:title => 'Wiki Page Title')
@@ -872,7 +871,7 @@ describe "Modules API", type: :request do
 
   context "unauthorized user" do
     before do
-      user
+      user_factory
     end
 
     it "should check permissions" do

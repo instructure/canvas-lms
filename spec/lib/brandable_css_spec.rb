@@ -84,6 +84,8 @@ describe BrandableCSS do
 
     it 'uploads file to s3 if cdn is enabled' do
       Canvas::Cdn.stubs(:enabled?).returns(true)
+      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1'))
+
       file = StringIO.new
       BrandableCSS.stubs(:default_brand_json_file).returns(file)
       File.stubs(:delete)
@@ -93,6 +95,7 @@ describe BrandableCSS do
 
     it 'delete the local file if cdn is enabled' do
       Canvas::Cdn.stubs(:enabled?).returns(true)
+      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1'))
       file = StringIO.new
       BrandableCSS.stubs(:default_brand_json_file).returns(file)
       File.expects(:delete).with(BrandableCSS.default_brand_json_file)

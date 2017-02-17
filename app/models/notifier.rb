@@ -5,7 +5,7 @@ class Notifier
   def send_notification(record, dispatch, messages, to_list, asset_context=nil, data=nil)
     messages = DelayedNotification.send_later_if_production_enqueue_args(
         :process,
-        {:priority => Delayed::LOW_PRIORITY},
+        {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1},
         record,
         messages,
         (to_list || []).compact.map(&:asset_string),

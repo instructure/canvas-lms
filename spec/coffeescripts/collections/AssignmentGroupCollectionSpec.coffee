@@ -8,7 +8,7 @@ define [
 
   COURSE_SUBMISSIONS_URL = "/courses/1/submissions"
 
-  module "AssignmentGroupCollection",
+  QUnit.module "AssignmentGroupCollection",
     setup: ->
       fakeENV.setup()
       @server       = sinon.fakeServer.create()

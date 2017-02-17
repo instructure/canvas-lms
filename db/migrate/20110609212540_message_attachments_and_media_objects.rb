@@ -1,4 +1,4 @@
-class MessageAttachmentsAndMediaObjects < ActiveRecord::Migration
+class MessageAttachmentsAndMediaObjects < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

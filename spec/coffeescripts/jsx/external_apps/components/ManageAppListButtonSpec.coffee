@@ -1,11 +1,11 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'react-modal'
   'jsx/external_apps/components/ManageAppListButton',
-], (React, ReactDOM, Modal, ManageAppListButton) ->
+], (React, ReactDOM, TestUtils, Modal, ManageAppListButton) ->
 
-  TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
@@ -21,7 +21,7 @@ define [
   renderComponent = ->
     ReactDOM.render(createElement(), wrapper)
 
-  module 'ExternalApps.ManageAppListButton',
+  QUnit.module 'ExternalApps.ManageAppListButton',
     teardown: ->
       ReactDOM.unmountComponentAtNode wrapper
 

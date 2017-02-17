@@ -1,4 +1,4 @@
-class FixRootOutcomeGroupTitles < ActiveRecord::Migration
+class FixRootOutcomeGroupTitles < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

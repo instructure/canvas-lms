@@ -21,7 +21,7 @@ define [
       @constructor['testing removed'] ?= 0
       @constructor['testing removed']++
 
-  module 'CollectionView',
+  QUnit.module 'CollectionView',
     setup: ->
       fakeENV.setup()
       collection = new Collection [

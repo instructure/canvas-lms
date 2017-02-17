@@ -73,18 +73,32 @@ describe Api::V1::DiscussionTopics do
     expect(data[:permissions][:attach]).to eq true
   end
 
-  it "should recognize include_assignment flag" do
-    #set @domain_root_account
-    @test_api.instance_variable_set(:@domain_root_account, Account.default)
-
+  it "should include assignment" do
     data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
     expect(data[:assignment]).to be_nil
+  end
 
-    @topic.assignment = assignment_model(:course => @course)
-    @topic.save!
+  context "with assignment" do
+    before :once do
+      @test_api.instance_variable_set(:@domain_root_account, Account.default)
 
-    data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil, include_assignment: true)
-    expect(data[:assignment]).not_to be_nil
+      @topic.assignment = assignment_model(:course => @course)
+      @topic.save!
+    end
+
+    it "should include assignment" do
+      data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
+      expect(data[:assignment]).not_to be_nil
+    end
+
+    it "should include all_dates" do
+      data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
+      expect(data[:assignment][:all_dates]).to be_nil
+
+      data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil,
+        include_all_dates: true)
+      expect(data[:assignment][:all_dates]).not_to be_nil
+    end
   end
 end
 
@@ -131,7 +145,7 @@ describe DiscussionTopicsController, type: :request do
 
   context "create topic" do
     it "should check permissions" do
-      @user = user(:active_all => true)
+      @user = user_factory(active_all: true)
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                {:controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param},
                {:title => "hai", :message => "test message"}, {}, :expected_status => 401)
@@ -310,6 +324,7 @@ describe DiscussionTopicsController, type: :request do
        "discussion_type" => 'side_comment',
        "locked" => false,
        "can_lock" => true,
+       "comments_disabled" => false,
        "locked_for_user" => false,
        "author" => user_display_json(@topic.user, @topic.context).stringify_keys!,
        "permissions" => {"delete" => true, "attach" => true, "update" => true, "reply" => true},
@@ -448,7 +463,7 @@ describe DiscussionTopicsController, type: :request do
 
         # get rid of random characters in podcast url
         json["podcast_url"].gsub!(/_[^.]*/, '_randomness')
-        expect(json).to eq response_json.merge("subscribed" => @topic.subscribed?(@user))
+        expect(json.sort.to_h).to eq response_json.merge("subscribed" => @topic.subscribed?(@user)).sort.to_h
       end
 
       it "should require course to be published for students" do
@@ -500,7 +515,7 @@ describe DiscussionTopicsController, type: :request do
 
     describe "PUT 'update'" do
       it "should require authorization" do
-        @user = user(:active_all => true)
+        @user = user_factory(active_all: true)
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                  {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
                  {:title => "hai", :message => "test message"}, {}, :expected_status => 401)
@@ -622,6 +637,20 @@ describe DiscussionTopicsController, type: :request do
         expect(@topic.lock_at).to be_nil
         expect(@topic).to be_active
         expect(@topic).not_to be_locked
+      end
+
+      it "should not update certain attributes for group discussions" do
+        group_category = @course.group_categories.create(:name => 'watup')
+        group = group_category.groups.create!(:name => "group1", :context => @course)
+        gtopic = create_topic(group, :title => "topic")
+
+        api_call(:put, "/api/v1/groups/#{group.id}/discussion_topics/#{gtopic.id}",
+          {:controller => "discussion_topics", :action => "update", :format => "json", :group_id => group.to_param, :topic_id => gtopic.to_param},
+          {:allow_rating => '1', :require_initial_post => '1'})
+
+        gtopic.reload
+        expect(gtopic.allow_rating).to be_truthy
+        expect(gtopic.require_initial_post).to_not be_truthy
       end
 
       context "publishing" do
@@ -884,7 +913,7 @@ describe DiscussionTopicsController, type: :request do
 
     describe "DELETE 'destroy'" do
       it "should require authorization" do
-        @user = user(:active_all => true)
+        @user = user_factory(active_all: true)
         api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                  {:controller => "discussion_topics", :action => "destroy", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
                  {}, {}, :expected_status => 401)
@@ -1121,6 +1150,7 @@ describe DiscussionTopicsController, type: :request do
       "permissions" => {"delete" => true, "attach" => true, "update" => true, "reply" => true},
       "locked" => false,
       "can_lock" => true,
+      "comments_disabled" => false,
       "locked_for_user" => false,
       "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!,
       "group_category_id" => nil,
@@ -1129,7 +1159,7 @@ describe DiscussionTopicsController, type: :request do
       "only_graders_can_rate" => nil,
       "sort_by_rating" => nil,
     }
-    expect(json).to eq expected
+    expect(json.sort.to_h).to eq expected.sort.to_h
   end
 
   it "should paginate and return proper pagination headers for groups" do
@@ -1543,7 +1573,7 @@ describe DiscussionTopicsController, type: :request do
     before(:once) do
       course_with_student(:active_all => true)
 
-      @observer = user(:name => "Observer", :active_all => true)
+      @observer = user_factory(:name => "Observer", :active_all => true)
       e = @course.enroll_user(@observer, 'ObserverEnrollment')
       e.associated_user = @student
       e.save
@@ -1733,9 +1763,10 @@ describe DiscussionTopicsController, type: :request do
       RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
                            :role => observer_role, :enabled => false)
 
-      expect { api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
-                        {:controller => 'discussion_topics', :action => 'index', :format => 'json',
-                         :course_id => @course.id.to_s}) }.to raise_error
+      api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+               {:controller => 'discussion_topics', :action => 'index', :format => 'json',
+               :course_id => @course.id.to_s})
+      expect(response).to be_client_error
     end
   end
 
@@ -2263,6 +2294,16 @@ describe DiscussionTopicsController, type: :request do
       expect(v1_r0['updated_at']).to eq @reply3.updated_at.as_json
     end
 
+    it "can include extra information for context cards" do
+      topic_with_nested_replies
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
+                      {:controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, include_new_entries: "1", include_context_card_info: "1"})
+      participants = json["participants"]
+      expect(participants.map { |p| p["course_id"] }).to eq [@course.to_param, @course.to_param]
+      expect(participants.find { |p| !p["is_student"] }["id"]).to eq @teacher.id
+      expect(participants.find { |p| p["is_student"] }["id"]).to eq @student.id
+    end
+
     context "with mobile overrides" do
       before :once do
         course_with_teacher(:active_all => true)
@@ -2369,6 +2410,30 @@ describe DiscussionTopicsController, type: :request do
                                         ]
 
     end
+
+    it "should resolve the placeholder domain in new entries" do
+      course_with_teacher(:active_all => true)
+      student_in_course(:course => @course, :active_all => true)
+      @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
+      @root1 = @topic.reply_from(:user => @student, :html => "root1")
+
+      link = "/courses/#{@course.id}/discussion_topics"
+      # materialized view jobs are now delayed
+      Timecop.travel(Time.now + 20.seconds) do
+        run_jobs
+
+        # make everything slightly in the past to test updating
+        DiscussionEntry.update_all(:updated_at => 5.minutes.ago)
+        @reply1 = @root1.reply_from(:user => @teacher, :html => "<a href='#{link}'>locallink</a>")
+      end
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
+        {:controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}, {:include_new_entries => '1'})
+
+      message = json['new_entries'].first['message']
+      expect(message).to_not include("placeholder.invalid")
+      expect(message).to include("www.example.com#{link}")
+    end
   end
 
   it "returns due dates as they apply to the user" do
@@ -2428,7 +2493,6 @@ describe DiscussionTopicsController, type: :request do
 
     before :each do
       course_with_teacher(active_all: true, is_public: true) # sets @teacher and @course
-      expect(@course.is_public).to be_truthy
       account_admin_user(account: @course.account) # sets @admin
       @student1 = student_in_course(active_all: true).user
       @student2 = student_in_course(active_all: true).user

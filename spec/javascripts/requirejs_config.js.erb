@@ -3,6 +3,8 @@ var require = {
 
   paths: <%= paths %>,
 
+  map: <%= map %>,
+
   // non-amd shims
   shim: <%= shims %>,
 
@@ -22,6 +24,10 @@ var require = {
       location: '../../spec/javascripts/support',
       main: 'support',
       lib: './'
+    },
+    {
+      name: 'spec/jsx',
+      location: '../../spec/javascripts/compiled'
     },
     {
       name: 'spec',

@@ -1,4 +1,4 @@
-class MoveCanvadocsSubmissionsToAttachmentShard < ActiveRecord::Migration
+class MoveCanvadocsSubmissionsToAttachmentShard < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

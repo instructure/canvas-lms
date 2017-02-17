@@ -19,7 +19,7 @@
 <% if course.group_weighting_scheme == 'percent' %>
   <p>
   <%= before_label('grades_based_on_percent', 'Grading is based on the weighted total for each assignment group') %>
-  <% course.assignment_groups.each do |group |%>
+  <% course.assignment_groups.active.each do |group |%>
     <br/>- <%= group.name %>: <%= group.group_weight %>%
   <% end %>
   </p>

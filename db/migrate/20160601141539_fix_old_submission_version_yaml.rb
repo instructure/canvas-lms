@@ -1,4 +1,4 @@
-class FixOldSubmissionVersionYaml < ActiveRecord::Migration
+class FixOldSubmissionVersionYaml < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

@@ -1,4 +1,4 @@
-class AddEnrollmentSisStickiness < ActiveRecord::Migration
+class AddEnrollmentSisStickiness < ActiveRecord::Migration[4.2]
   tag :predeploy
 
 

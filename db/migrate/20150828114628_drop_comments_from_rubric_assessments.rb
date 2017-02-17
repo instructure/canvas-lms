@@ -1,4 +1,4 @@
-class DropCommentsFromRubricAssessments < ActiveRecord::Migration
+class DropCommentsFromRubricAssessments < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

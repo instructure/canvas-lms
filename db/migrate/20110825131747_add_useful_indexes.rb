@@ -1,4 +1,4 @@
-class AddUsefulIndexes < ActiveRecord::Migration
+class AddUsefulIndexes < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

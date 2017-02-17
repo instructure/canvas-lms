@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../lib/canvas/draft_state
 describe Quizzes::Quiz do
 
   before :once do
-    course
+    course_factory
   end
 
   describe ".mark_quiz_edited" do
@@ -809,7 +809,8 @@ describe Quizzes::Quiz do
     expect(q.quiz_submissions.size).to eq 0
 
     # create a graded submission
-    Quizzes::SubmissionGrader.new(q.generate_submission(User.create!(:name => "some_user"))).grade_submission
+    student_in_course(course: @course, active_all: true)
+    Quizzes::SubmissionGrader.new(q.generate_submission(@student)).grade_submission
     q.reload
 
     expect(q.quiz_submissions.size).to eq 1
@@ -1120,7 +1121,7 @@ describe Quizzes::Quiz do
       it "should not allow quiz points higher than allowable by postgres" do
         q = Quizzes::Quiz.new(:points_possible => 2000000001)
         expect(q.valid?).to eq false
-        expect(Array(q.errors[:points_possible])).to eq ["must be less than or equal to 2000000000"]
+        expect(Array(q.errors[:points_possible])).to eq ["must be less than or equal to 2,000,000,000"]
       end
     end
 
@@ -1302,7 +1303,7 @@ describe Quizzes::Quiz do
     before(:once) { @quiz = @course.quizzes.create! title: 'Test Quiz' }
 
     it "returns the regrade for the quiz and quiz version" do
-      course_with_teacher_logged_in(active_all: true, course: @course)
+      course_with_teacher(active_all: true, course: @course)
       question = @quiz.quiz_questions.create(question_data: { question_text: "test 1" })
 
       regrade = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number, user: @teacher)
@@ -1311,7 +1312,7 @@ describe Quizzes::Quiz do
     end
 
     it "should not return disabled regrade options" do
-      course_with_teacher_logged_in(active_all: true, course: @course)
+      course_with_teacher(active_all: true, course: @course)
       question = @quiz.quiz_questions.create(question_data: { question_text: "test 1" })
 
       regrade = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number, user: @teacher)
@@ -1325,7 +1326,7 @@ describe Quizzes::Quiz do
     before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
 
     it "returns the correct question ids" do
-      course_with_teacher_logged_in(active_all: true, course: @course)
+      course_with_teacher(active_all: true, course: @course)
       q = @quiz.quiz_questions.create!
       regrade = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number, user: @teacher)
       rq = regrade.quiz_question_regrades.create! quiz_question_id: q.id, regrade_option: 'current_correct_only'
@@ -1336,7 +1337,7 @@ describe Quizzes::Quiz do
   describe "#regrade_if_published" do
 
     it "queues a job to regrade if there are current question regrades" do
-      course_with_teacher_logged_in(course: @course, active_all: true)
+      course_with_teacher(course: @course, active_all: true)
       quiz = @course.quizzes.create!
       q = quiz.quiz_questions.create!
       regrade = Quizzes::QuizRegrade.create!(quiz: quiz, quiz_version: quiz.version_number, user: @teacher)
@@ -1349,7 +1350,7 @@ describe Quizzes::Quiz do
     end
 
     it "does not queue a job to regrade when no current question regrades" do
-      course_with_teacher_logged_in(course: @course, active_all: true)
+      course_with_teacher(course: @course, active_all: true)
       Quizzes::QuizRegrader::Regrader.expects(:send_later).never
       quiz = @course.quizzes.create!
       quiz.save!
@@ -1358,7 +1359,7 @@ describe Quizzes::Quiz do
 
   describe "#questions_regraded_since" do
     before :once do
-      course_with_teacher_logged_in(active_all: true)
+      course_with_teacher(active_all: true)
       @quiz = @course.quizzes.create!
     end
 
@@ -1642,7 +1643,7 @@ describe Quizzes::Quiz do
     end
 
     context "show_correct_answers_last_attempt is true" do
-      let(:user) { User.create! }
+      let(:student) { student_in_course(course: @course, active_all: true) }
 
       it "shows the correct answers on last attempt completed" do
         quiz = @course.quizzes.create!({
@@ -1654,15 +1655,15 @@ describe Quizzes::Quiz do
 
         quiz.publish!
 
-        submission = quiz.generate_submission(user)
-        expect(quiz.show_correct_answers?(user, submission)).to be_falsey
+        submission = quiz.generate_submission(student)
+        expect(quiz.show_correct_answers?(student, submission)).to be_falsey
         submission.complete!
 
-        submission = quiz.generate_submission(user)
-        expect(quiz.show_correct_answers?(user, submission)).to be_falsey
+        submission = quiz.generate_submission(student)
+        expect(quiz.show_correct_answers?(student, submission)).to be_falsey
         submission.complete!
 
-        expect(quiz.show_correct_answers?(user, submission)).to be_truthy
+        expect(quiz.show_correct_answers?(student, submission)).to be_truthy
       end
 
       it "hides the correct answers on last attempt" do
@@ -1675,9 +1676,9 @@ describe Quizzes::Quiz do
 
         quiz.publish!
 
-        submission = quiz.generate_submission(user)
+        submission = quiz.generate_submission(student)
 
-        expect(quiz.show_correct_answers?(user, submission)).to be_falsey
+        expect(quiz.show_correct_answers?(student, submission)).to be_falsey
       end
     end
   end
@@ -1713,7 +1714,7 @@ describe Quizzes::Quiz do
     end
 
     it "doesn't let students submit quizzes that are excused" do
-      @quiz.assignment.grade_student(@student, excuse: true)
+      @quiz.assignment.grade_student(@student, excuse: true, grader: @teacher)
       expect(@quiz.grants_right?(@student, :submit)).to eq false
       expect(@quiz.grants_right?(@student, :read)).to eq true
     end
@@ -1918,7 +1919,7 @@ describe Quizzes::Quiz do
 
   describe "restore" do
     before do
-      course
+      course_factory
     end
 
     it "should restore to published state if there are student submissions" do
@@ -2037,10 +2038,6 @@ describe Quizzes::Quiz do
       end
 
       context 'assignment is not locked' do
-        before do
-          expect(assignment_lock_info).not_to be_present
-        end
-
         it { is_expected.to be false }
       end
 

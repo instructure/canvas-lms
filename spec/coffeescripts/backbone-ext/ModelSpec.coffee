@@ -1,6 +1,6 @@
 define ['Backbone'], ({Model}) ->
 
-  module 'Backbone.Model',
+  QUnit.module 'Backbone.Model',
     setup: -> @model = new Model
 
   test '@mixin', ->

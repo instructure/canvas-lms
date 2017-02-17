@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Polling::PollSession do
   before :once do
-    course
+    course_factory
     @section = @course.course_sections.create!(name: 'Section 2')
     teacher_in_course(course: @course, active_all: true)
 
@@ -41,7 +41,7 @@ describe Polling::PollSession do
 
     it "insures that the given course section belongs to the given course" do
       old_course = @course
-      new_course = course
+      new_course = course_factory
 
       section = new_course.course_sections.create!(name: "Alien Section")
       expect { Polling::PollSession.create!(poll: @poll, course: old_course, course_section: section) }.to raise_error(ActiveRecord::RecordInvalid,

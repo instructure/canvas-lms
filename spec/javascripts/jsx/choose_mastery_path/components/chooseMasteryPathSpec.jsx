@@ -1,10 +1,10 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/choose_mastery_path/components/choose-mastery-path',
-], (React, ChooseMasterPath) => {
-  const TestUtils = React.addons.TestUtils
+], (React, TestUtils, ChooseMasterPath) => {
 
-  module('Choose Mastery Path')
+  QUnit.module('Choose Mastery Path')
 
   const defaultProps = () => ({
     options: [

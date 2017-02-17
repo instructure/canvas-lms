@@ -17,9 +17,10 @@
 #
 
 define [
+  'jquery'
   'i18n!lib.text_helper'
   'str/htmlEscape'
-], (I18n, htmlEscape) ->
+], ($, I18n, htmlEscape) ->
 
   AUTO_LINKIFY_PLACEHOLDER = "LINK-PLACEHOLDER"
   AUTO_LINKIFY_REGEX = ///

@@ -27,10 +27,10 @@ describe 'DataFixup::FixBrokenFileLinksInAssignments' do
   end
   
   it "should fix links in assignment descriptions that point to deleted files with a verifier param" do
-    course1 = course
+    course1 = course_factory
     att1 = attachment_model(:context => course1)
     att3 = attachment_model(:context => course1)
-    course2 = course
+    course2 = course_factory
     att2 = att1.clone_for(course2, nil, :overwrite => true)
     att2.save!
 
@@ -91,9 +91,9 @@ describe 'DataFixup::FixBrokenFileLinksInAssignments' do
   end
 
   it "should find new courses's attachment by old attachment cloned_item_id" do
-    course1 = course
+    course1 = course_factory
     att1 = attachment_model(:context => course1)
-    course2 = course
+    course2 = course_factory
     att2 = att1.clone_for(course2, nil, :overwrite => true)
     att2.save!
 
@@ -105,7 +105,7 @@ describe 'DataFixup::FixBrokenFileLinksInAssignments' do
   end
 
   it "shouldn't break a discussion assignment" do
-    course1 = course
+    course1 = course_factory
     att1 = attachment_model(:context => course1)
     assignment_model(:context => course1, :submission_types => "discussion_topic", :description => "<a id=\"l3\" href=\"/files/#{att1.id}/download?verifier=hurpdurpdurp\">no context, verifier</a>")
     topic = @assignment.discussion_topic

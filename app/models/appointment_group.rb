@@ -54,6 +54,7 @@ class AppointmentGroup < ActiveRecord::Base
   after_save :update_appointments
 
   validates_length_of :title, :maximum => maximum_string_length
+  validates_length_of :location_name, :maximum => maximum_string_length
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_inclusion_of :participant_visibility, :in => ['private', 'protected'] # presumably we might add public if we decide to show appointments on the public calendar feed
   validates_each :appointments do |record, attr, value|
@@ -75,8 +76,6 @@ class AppointmentGroup < ActiveRecord::Base
                  t('errors.needs_contexts', 'Must have at least one context')
     end
   end
-
-  strong_params
 
   # when creating/updating an appointment, you can give it a list of (new)
   # appointment times. these will be added to the existing appointment times

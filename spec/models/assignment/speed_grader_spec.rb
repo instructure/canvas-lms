@@ -140,7 +140,7 @@ describe Assignment::SpeedGrader do
 
   context "students and active course sections" do
     before(:once) do
-      @course = course(:active_course => true)
+      @course = course_factory(active_course: true)
       @teacher, @student1, @student2 = (1..3).map{User.create}
       @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
       @course.enroll_teacher(@teacher)
@@ -217,6 +217,14 @@ describe Assignment::SpeedGrader do
     expect(attachment_json['view_inline_ping_url']).to match %r{/users/#{@student.id}/files/#{attachment.id}/inline_view\z}
   end
 
+  it "includes lti launch url in submission history" do
+    setup_assignment_without_submission
+    @assignment.submit_homework(@user, :submission_type => 'basic_lti_launch', :url => 'http://www.example.com')
+    json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+    url_json = json['submissions'][0]['submission_history'][0]['submission']['external_tool_url']
+    expect(url_json).to eql('http://www.example.com')
+  end
+
   context "group assignments" do
     before :once do
       course_with_teacher(active_all: true)
@@ -249,7 +257,7 @@ describe Assignment::SpeedGrader do
     it 'chooses the student with turnitin data to represent' do
       turnitin_submissions = @groups.map do |group|
         rep = group.users.shuffle.first
-        turnitin_submission, *others = @assignment.grade_student(rep, grade: 10)
+        turnitin_submission = @assignment.grade_student(rep, grade: 10, grader: @teacher)[0]
         turnitin_submission.update_attribute :turnitin_data, {blah: 1}
         turnitin_submission
       end
@@ -264,7 +272,7 @@ describe Assignment::SpeedGrader do
 
     it 'prefers people with submissions' do
       g1, _ = @groups
-      @assignment.grade_student(g1.users.first, score: 10)
+      @assignment.grade_student(g1.users.first, score: 10, grader: @teacher)
       g1rep = g1.users.shuffle.first
       s = @assignment.submission_for_student(g1rep)
       s.update_attribute :submission_type, 'online_upload'
@@ -279,7 +287,7 @@ describe Assignment::SpeedGrader do
         body: 'hi'
       })
       others.each { |u|
-        @assignment.grade_student(u, excuse: true)
+        @assignment.grade_student(u, excuse: true, grader: @teacher)
       }
       expect(@assignment.representatives(@teacher)).to include g1rep
     end
@@ -373,7 +381,7 @@ describe Assignment::SpeedGrader do
       quiz.offer
 
       assignment = quiz.assignment
-      assignment.grade_student(@student, grade: 1)
+      assignment.grade_student(@student, grade: 1, grader: @teacher)
       json = Assignment::SpeedGrader.new(assignment, @teacher).json
       expect(json[:submissions].all? { |s|
         s.has_key? 'submission_history'
@@ -474,7 +482,7 @@ describe Assignment::SpeedGrader do
           }
         })
 
-      @other_student = user(:active_all => true)
+      @other_student = user_factory(active_all: true)
       student_in_course(:course => @course, :user => @other_student, :active_all => true)
     end
 
@@ -550,9 +558,49 @@ describe Assignment::SpeedGrader do
     end
   end
 
+  context "OriginalityReport" do
+    let_once(:test_course) do
+      test_course = course_factory(active_course: true)
+      test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
+      test_course.enroll_student(test_student, enrollment_state: 'active')
+      test_course
+    end
+
+    let_once(:test_teacher) { User.create }
+    let_once(:test_student) { User.create }
+
+    it 'includes the OriginalityReport in the json' do
+      assignment = Assignment.create!(title: "title", context: test_course)
+      attachment = test_student.attachments.new :filename => "homework.doc"
+      attachment.content_type = "foo/bar"
+      attachment.size = 10
+      attachment.save!
+      submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
+      submission.update_attribute(:turnitin_data, {blah: 1})
+      OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
+      json = Assignment::SpeedGrader.new(assignment, test_teacher).json
+      tii_data = json['submissions'].first['submission_history'].first['submission']['turnitin_data']
+      expect(tii_data[attachment.asset_string]['state']).to eq 'acceptable'
+    end
+
+    it "includes 'has_originality_report' in the json" do
+      assignment = Assignment.create!(title: "title", context: test_course)
+      attachment = test_student.attachments.new :filename => "homework.doc"
+      attachment.content_type = "foo/bar"
+      attachment.size = 10
+      attachment.save!
+      submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
+      submission.update_attribute(:turnitin_data, {blah: 1})
+      OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
+      json = Assignment::SpeedGrader.new(assignment, test_teacher).json
+      has_report = json['submissions'].first['submission_history'].first['submission']['has_originality_report']
+      expect(has_report).to be_truthy
+    end
+  end
+
   context "honoring gradebook preferences" do
     let_once(:test_course) do
-      test_course = course(active_course: true)
+      test_course = course_factory(active_course: true)
       test_course.enroll_teacher(teacher, enrollment_state: 'active')
       test_course.enroll_student(active_student, enrollment_state: 'active')
       test_course.enroll_student(inactive_student, enrollment_state: 'inactive')

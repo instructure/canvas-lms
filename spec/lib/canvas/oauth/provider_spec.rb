@@ -1,4 +1,5 @@
 require File.expand_path('../../../spec_helper', File.dirname(__FILE__))
+require_dependency "canvas/oauth/provider"
 
 module Canvas::Oauth
   describe Provider do

@@ -208,7 +208,7 @@ class RequestThrottle
   # and hwm were equal, then the bucket would always leak at least a tiny bit
   # by the beginning of the next request, and thus would never be considered
   # full.
-  class LeakyBucket < Struct.new(:client_identifier, :count, :last_touched)
+  LeakyBucket = Struct.new(:client_identifier, :count, :last_touched) do
     def initialize(client_identifier, count = 0.0, last_touched = nil)
       super
     end

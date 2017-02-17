@@ -1,4 +1,4 @@
-class FixDissociatedDiscussionTopics < ActiveRecord::Migration
+class FixDissociatedDiscussionTopics < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

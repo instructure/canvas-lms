@@ -15,7 +15,7 @@ define [
   class Assignments extends Backbone.Collection
     model: AssignmentStub
 
-  module 'MoveDialogSelect',
+  QUnit.module 'MoveDialogSelect',
     setup: ->
       @set_coll_spy = @spy MoveDialogSelect.prototype, 'setCollection'
 

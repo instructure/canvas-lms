@@ -1,4 +1,4 @@
-class CreateGradingPeriods < ActiveRecord::Migration
+class CreateGradingPeriods < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

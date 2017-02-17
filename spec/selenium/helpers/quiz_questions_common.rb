@@ -9,7 +9,6 @@ module QuizQuestionsCommon
     @quiz = @course.quizzes.create
     quiz_question("Question 1", "What is the first question?", 1)
     quiz_question("Question 2", "What is the second question?", 2)
-    quiz_question("Question 3", "What is the third question?", 3)
     @quiz.title = "OQAAT quiz"
     @quiz.one_question_at_a_time = true
     if opts[:publish]
@@ -56,15 +55,8 @@ module QuizQuestionsCommon
   end
 
   def navigate_away_and_resume_quiz
-    click_quiz_link("Quizzes")
-    driver.switch_to.alert.accept
-
-    wait_for_ajaximations
-
-    click_quiz_link("OQAAT quiz")
-    wait_for_ajaximations
+    open_quiz_show_page
     click_quiz_link("Resume Quiz")
-    wait_for_ajaximations
   end
 
   def navigate_directly_to_first_question
@@ -94,14 +86,10 @@ module QuizQuestionsCommon
     it_should_be_on_question 'second question'
   end
 
-  def it_should_be_on_third_question
-    it_should_be_on_question 'third question'
-  end
-
   def it_should_be_on_question(which_question)
     body = f('body')
     expect(body).to include_text which_question
-    questions = ['first question', 'second question', 'third question'] - [which_question]
+    questions = ['first question', 'second question'] - [which_question]
     questions.each do |question|
       expect(body).not_to include_text question
     end
@@ -135,8 +123,16 @@ module QuizQuestionsCommon
     wait_for_ajaximations
   end
 
+  def it_should_show_previous_button
+    expect(f("#content")).to contain_css("button.previous-question")
+  end
+
   def it_should_not_show_previous_button
     expect(f("#content")).not_to contain_css("button.previous-question")
+  end
+
+  def it_should_show_next_button
+    expect(f("#content")).to contain_css("button.next-question")
   end
 
   def it_should_not_show_next_button
@@ -147,12 +143,10 @@ module QuizQuestionsCommon
     f("#submit_quiz_button").click
   end
 
-  def submit_unfinished_quiz(alert_message=nil)
+  def submit_unfinished_quiz(alert_message)
     submit_the_quiz
 
-    if alert_message
-      expect(driver.switch_to.alert.text).to include alert_message
-    end
+    expect(driver.switch_to.alert.text).to include alert_message
 
     driver.switch_to.alert.accept
     driver.switch_to.default_content
@@ -181,47 +175,19 @@ module QuizQuestionsCommon
     wait_for_ajaximations
   end
 
-  def it_should_show_two_correct_answers
-    expect(f('body')).to include_text "Score for this quiz: 2"
+  def it_should_show_one_correct_answer
+    expect(f('body')).to include_text "Score for this quiz: 1"
   end
 
   def back_and_forth_flow
     it_should_be_on_first_question
-    it_should_have_sidebar_navigation
-
     it_should_not_show_previous_button
+    it_should_show_next_button
 
     click_next_button
     it_should_be_on_second_question
-
-    click_previous_button
-    it_should_be_on_first_question
-
-    click_next_button
-    click_next_button
-
-    it_should_be_on_third_question
-
+    it_should_show_previous_button
     it_should_not_show_next_button
-
-    submit_unfinished_quiz
-  end
-
-  def sequential_flow
-    it_should_be_on_first_question
-    answer_the_question_correctly
-
-    click_next_button
-    it_should_be_on_second_question
-    it_should_not_show_previous_button
-    answer_the_question_correctly
-
-    click_next_button
-    it_should_be_on_third_question
-    it_should_not_show_next_button
-    answer_the_question_correctly
-
-    submit_finished_quiz
   end
 
   def check_if_cant_go_back
@@ -237,9 +203,7 @@ module QuizQuestionsCommon
     answer_the_question_correctly
     click_next_button
     answer_the_question_incorrectly
-    click_next_button
-    answer_the_question_correctly
     submit_finished_quiz
-    it_should_show_two_correct_answers
+    it_should_show_one_correct_answer
   end
 end

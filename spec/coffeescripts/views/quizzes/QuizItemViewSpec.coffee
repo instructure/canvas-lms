@@ -36,7 +36,7 @@ define [
     view.$el.appendTo $('#fixtures')
     view.render()
 
-  module 'QuizItemView',
+  QUnit.module 'QuizItemView',
     setup: ->
       fakeENV.setup({
         CONDITIONAL_RELEASE_ENV: {
@@ -105,7 +105,7 @@ define [
     view = createView(quiz)
     quiz.destroy = -> true
 
-    @stub(window, "confirm", -> true )
+    @stub(window, "confirm").returns(true)
 
     view.$('.delete-item').simulate 'click'
     ok window.confirm.called
@@ -116,7 +116,7 @@ define [
 
     destroyed = false
     quiz.destroy = ->  destroyed = true
-    @stub(window, "confirm", -> true )
+    @stub(window, "confirm").returns(true)
 
     view.$('.delete-item').simulate 'click'
     ok destroyed

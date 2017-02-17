@@ -23,8 +23,6 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   include Workflow
   validates :auth_filter, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
 
-  strong_params
-
   workflow do
     state :active
     state :deleted
@@ -44,6 +42,10 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     end
   end
   # end
+
+  def self.subclass_from_attributes?(attrs)
+    false
+  end
 
   # we have a lot of old data that didn't actually use STI,
   # so we shim it

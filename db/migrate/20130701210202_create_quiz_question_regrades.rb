@@ -1,4 +1,4 @@
-class CreateQuizQuestionRegrades < ActiveRecord::Migration
+class CreateQuizQuestionRegrades < ActiveRecord::Migration[4.2]
   tag :predeploy
   def self.up
     create_table :quiz_question_regrades do |t|

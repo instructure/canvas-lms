@@ -18,6 +18,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require 'db/migrate/20150709205405_create_k12_theme.rb'
 
 describe BrandConfig do
   it "should create an instance with a parent_md5" do
@@ -120,7 +121,7 @@ describe BrandConfig do
     describe "with cdn disabled" do
       before :each do
         Canvas::Cdn.expects(:enabled?).returns(false)
-        @subaccount_bc.s3_uploader.expects(:upload_file).never
+        @subaccount_bc.expects(:s3_uploader).never
         File.expects(:delete).never
       end
 
@@ -138,6 +139,8 @@ describe BrandConfig do
     describe "with cdn enabled" do
       before :each do
         Canvas::Cdn.expects(:enabled?).returns(true)
+        s3 = stub(bucket: nil)
+        Aws::S3::Resource.stubs(:new).returns(s3)
         @upload_expectation = @subaccount_bc.s3_uploader.expects(:upload_file).once
         @delete_expectation = File.expects(:delete).once
       end
@@ -157,5 +160,20 @@ describe BrandConfig do
         @subaccount_bc.save_all_files!
       end
     end
+  end
+
+  it "doesn't let you update an existing brand config" do
+    bc = BrandConfig.create(variables: {"ic-brand-primary" => "#321"})
+    bc.variables = { "ic-brand-primary" => "#123" }
+    expect { bc.save! }.to raise_error(/md5 digest/)
+  end
+
+  it "returns a default config" do
+    expect(BrandConfig.default).to be_present
+  end
+
+  it "returns a k12 config" do
+    CreateK12Theme.new.up
+    expect(BrandConfig.k12_config).to be_present
   end
 end

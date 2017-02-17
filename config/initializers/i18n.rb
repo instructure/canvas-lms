@@ -1,15 +1,29 @@
 # loading all the locales has a significant (>30%) impact on the speed of initializing canvas
 # so we skip it in situations where we don't need the locales, such as in development mode and in rails console
-skip_locale_loading = (Rails.env.development? || Rails.env.test? || $PROGRAM_NAME == 'irb') &&
-    !ENV['RAILS_LOAD_ALL_LOCALES']
+skip_locale_loading = (Rails.env.development? ||
+  Rails.env.test? ||
+  $0 == 'irb' ||
+  $PROGRAM_NAME == 'rails_console' ||
+  $0 =~ /rake$/)
+if ENV['RAILS_LOAD_ALL_LOCALES']
+  skip_locale_loading = ENV['RAILS_LOAD_ALL_LOCALES'] == '0'
+end
+# always load locales for rake tasks that we know need them
+if $0 =~ /rake$/ && !($ARGV & ["i18n:generate_js",
+                               "canvas:compile_assets",
+                               "canvas:compile_assets_dev",
+                               "js:test"]).empty?
+  skip_locale_loading = false
+end
+
 load_path = Rails.application.config.i18n.railties_load_path
 if skip_locale_loading
+  load_path = load_path.map(&:existent).flatten unless CANVAS_RAILS4_2
   load_path.replace(load_path.grep(%r{/(locales|en)\.yml\z}))
 else
   load_path << (Rails.root + "config/locales/locales.yml").to_s # add it at the end, to trump any weird/invalid stuff in locale-specific files
 end
 
-Rails.application.config.i18n.backend = I18nema::Backend.new
 Rails.application.config.i18n.enforce_available_locales = true
 Rails.application.config.i18n.fallbacks = true
 
@@ -20,14 +34,22 @@ module DontTrustI18nPluralizations
     Rails.logger.error("#{e.message} in locale #{locale.inspect}")
     ""
   end
+
+  # make sure count special values get formatted
+  def interpolate(locale, string, values = {})
+    if values[:count] && values[:count].is_a?(Numeric)
+      values[:count] = ActiveSupport::NumberHelper.number_to_delimited(values[:count])
+    end
+    super
+  end
 end
-I18nema::Backend.include(DontTrustI18nPluralizations)
+I18n::Backend::Simple.include(DontTrustI18nPluralizations)
 
 module CalculateDeprecatedFallbacks
   def reload!
     super
     I18n.available_locales.each do |locale|
-      if (deprecated_for = I18n.backend.direct_lookup(locale.to_s, 'deprecated_for'))
+      if (deprecated_for = I18n.backend.send(:lookup, locale.to_s, 'deprecated_for'))
         I18n.fallbacks[locale] = I18n.fallbacks[deprecated_for.to_sym]
       end
     end
@@ -77,11 +99,17 @@ module I18nUtilities
     text = before_label(text) if options.delete(:before)
     return text, options
   end
+
+  def n(*args)
+    I18n.n(*args)
+  end
 end
 
 ActionView::Base.send(:include, I18nUtilities)
 ActionView::Helpers::FormHelper.send(:include, I18nUtilities)
-ActionView::Helpers::FormHelper.module_eval do
+ActionView::Helpers::FormTagHelper.send(:include, I18nUtilities)
+
+module I18nFormHelper
   # a convenience method to put the ":" after the label text (or do whatever
   # the selected locale dictates)
   def blabel(object_name, method, text = nil, options = {})
@@ -93,21 +121,22 @@ ActionView::Helpers::FormHelper.module_eval do
     label(object_name, method, text, options)
   end
 
-  def label_with_symbol_translation(object_name, method, text = nil, options = {})
+  # when removing this, be sure to remove it from i18nliner_extensions.rb
+  def label(object_name, method, text = nil, options = {})
     text, options = _label_symbol_translation(method, text, options)
-    label_without_symbol_translation(object_name, method, text, options)
+    super(object_name, method, text, options)
   end
-  alias_method_chain :label, :symbol_translation
 end
+ActionView::Base.include(I18nFormHelper)
+ActionView::Helpers::FormHelper.prepend(I18nFormHelper)
 
-ActionView::Helpers::FormTagHelper.send(:include, I18nUtilities)
-ActionView::Helpers::FormTagHelper.class_eval do
-  def label_tag_with_symbol_translation(method, text = nil, options = {})
+module I18nFormTagHelper
+  def label_tag(method, text = nil, options = {})
     text, options = _label_symbol_translation(method, text, options)
-    label_tag_without_symbol_translation(method, text, options)
+    super(method, text, options)
   end
-  alias_method_chain :label_tag, :symbol_translation
 end
+ActionView::Helpers::FormTagHelper.prepend(I18nFormTagHelper)
 
 ActionView::Helpers::FormBuilder.class_eval do
   def blabel(method, text = nil, options = {})
@@ -119,6 +148,32 @@ ActionView::Helpers::FormBuilder.class_eval do
     label(method, text, options)
   end
 end
+
+module NumberLocalizer
+  # precision (default nil): if nil, use the precision of the passed in number.
+  #   if you want to cap precision, and have less precise numbers not have trailing zeros, you should be
+  #   rounding the number before passing to this helper, and not passing precision
+  # percentage (default false): format as a percentage
+  def n(number, precision: nil, percentage: false)
+    if percentage
+      # no precision? default to the number's precision, not to some arbitrary precision
+      if precision.nil?
+        precision = 9
+        strip_insignificant_zeros = true
+      end
+      return ActiveSupport::NumberHelper.number_to_percentage(number,
+                                                              precision: precision,
+                                                              strip_insignificant_zeros: strip_insignificant_zeros)
+    end
+
+    if precision.nil?
+      return ActiveSupport::NumberHelper.number_to_delimited(number)
+    end
+
+    ActiveSupport::NumberHelper.number_to_rounded(number, precision: precision)
+  end
+end
+I18n.singleton_class.include(NumberLocalizer)
 
 I18n.send(:extend, Module.new {
   attr_accessor :localizer
@@ -153,15 +208,15 @@ I18n.send(:extend, Module.new {
   alias :t :translate
 
   def bigeasy_locale
-    backend.direct_lookup(locale.to_s, "bigeasy_locale") || locale.to_s.tr('-', '_')
+    backend.send(:lookup, locale.to_s, "bigeasy_locale") || locale.to_s.tr('-', '_')
   end
 
   def fullcalendar_locale
-    backend.direct_lookup(locale.to_s, "fullcalendar_locale") || locale.to_s.downcase
+    backend.send(:lookup, locale.to_s, "fullcalendar_locale") || locale.to_s.downcase
   end
 
   def moment_locale
-    backend.direct_lookup(locale.to_s, "moment_locale") || locale.to_s.downcase
+    backend.send(:lookup, locale.to_s, "moment_locale") || locale.to_s.downcase
   end
 })
 
@@ -169,18 +224,18 @@ I18n.send(:extend, Module.new {
 # i18n_extraction/i18nliner_extensions
 require "i18n_extraction/i18nliner_scope_extensions"
 
-ActionView::Template.class_eval do
-  def render_with_i18nliner_scope(view, *args, &block)
+module I18nTemplate
+  def render(view, *args)
     old_i18nliner_scope = view.i18nliner_scope
     if @virtual_path
       view.i18nliner_scope = I18nliner::Scope.new(@virtual_path.gsub(/\/_?/, '.'))
     end
-    render_without_i18nliner_scope(view, *args, &block)
+    super
   ensure
     view.i18nliner_scope = old_i18nliner_scope
   end
-  alias_method_chain :render, :i18nliner_scope
 end
+ActionView::Template.prepend(I18nTemplate)
 
 ActionView::Base.class_eval do
   attr_accessor :i18nliner_scope
@@ -244,14 +299,14 @@ end
 
 require 'active_support/core_ext/array/conversions'
 
-class Array
-  def to_sentence_with_simple_or(options = {})
+module ToSentenceWithSimpleOr
+  def to_sentence(options = {})
     if options == :or
-      to_sentence_without_simple_or(:two_words_connector => I18n.t('support.array.or.two_words_connector'),
-                                    :last_word_connector => I18n.t('support.array.or.last_word_connector'))
+      super(:two_words_connector => I18n.t('support.array.or.two_words_connector'),
+            :last_word_connector => I18n.t('support.array.or.last_word_connector'))
     else
-      to_sentence_without_simple_or(options)
+      super
     end
   end
-  alias_method_chain :to_sentence, :simple_or
 end
+Array.prepend(ToSentenceWithSimpleOr)

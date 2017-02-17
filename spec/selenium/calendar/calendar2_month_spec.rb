@@ -201,9 +201,6 @@ describe "calendar2" do
         end
 
         it "allows dropping onto the minical" do
-          # fullcalendar drop onto minical doesn't work under webpack. We should figure out why...
-          pending("fullcalendar drop onto minical doesn't work under webpack") if CANVAS_WEBPACK
-
           event = make_event(start: @initial_time)
           load_month_view
           quick_jump_to_date(@initial_time_str)
@@ -388,7 +385,7 @@ describe "calendar2" do
 
         # Switch the month and verify that there is no highlighted day
         2.times { change_calendar }
-        expect(find_all(".fc-state-highlight").size).to eq 0
+        expect(f('body')).not_to contain_css(".fc-state-highlight")
 
         # Go back to the present month. Verify that there is a highlighted day
         change_calendar(:today)

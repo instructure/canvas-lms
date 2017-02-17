@@ -51,6 +51,7 @@ module CC::Importer::Standard
       @manifest.remove_namespaces!
 
       get_all_resources(@manifest)
+      check_for_unsupported_resources
       process_variants
       create_file_map
 
@@ -199,5 +200,23 @@ module CC::Importer::Standard
       tools
     end
 
+    # these types all came from https://www.imsglobal.org/cc/ccv1p3/imscc_Overview-v1p3.html#toc-7
+    UNSUPPORTED_RESOURCE_TYPES = [
+      ['imsapip_zipv1p0', -> { I18n.t("This package includes APIP file(s), which are not compatible with Canvas and were not included in the import.")}],
+      ['imsiwb_iwbv1p0', -> { I18n.t("This package includes IWB file(s), which are not compatible with Canvas and were not included in the import.")}],
+      ['idpfepub_epubv3p0', -> { I18n.t("This package includes EPub3 file(s), which are not compatible with Canvas and were not included in the import.")}]
+    ].freeze
+
+    def check_for_unsupported_resources
+      UNSUPPORTED_RESOURCE_TYPES.each do |type, message_proc|
+        if @resources.values.any?{|r| r[:type] == type}
+          add_warning(message_proc.call)
+        end
+      end
+
+      if @manifest.at_css('metadata curriculumStandardsMetadata')
+        add_warning(I18n.t("This package includes Curriculum Standards, which are not compatible with Canvas and were not included in the import."))
+      end
+    end
   end
 end

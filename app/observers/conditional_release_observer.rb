@@ -25,6 +25,7 @@ class ConditionalReleaseObserver < ActiveRecord::Observer
       ConditionalRelease::Service.clear_rules_cache_for(record.context, record.student)
     when Assignment
       ConditionalRelease::Service.clear_active_rules_cache(record.context)
+      ConditionalRelease::Service.clear_applied_rules_cache(record.context)
     end
   end
 end

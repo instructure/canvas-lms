@@ -18,16 +18,18 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-include Api::V1::Collaboration
-
 describe Api::V1::Collaboration do
+  include Api::V1::Collaboration
+
   before(:once) do
     @current_user  = user_with_pseudonym(:active_all => true)
+    course = course_with_teacher(user: @current_user).course
     @collaboration = ExternalToolCollaboration.new(:title => 'Test collaboration',
                                        :description => 'Let us collaborate',
                                        :type => 'ExternalToolCollaboration',
                                        :url => 'https://google.com',
                                        :user => @current_user)
+    @collaboration.context = course
     @collaboration.data = {updateUrl: 'https://google.com'}
     @collaboration.save!
   end

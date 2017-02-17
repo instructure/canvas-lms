@@ -1,10 +1,5 @@
 @import "base/environment";
 
-#main {
-  background-color: transparent;
-  border: none;
-}
-
 #calendar-app {
   position: relative;
 }
@@ -18,22 +13,17 @@
     background-color: #f6f7f9;
     line-height: 35px;
     color: $ic-font-color--subdued;
-    font-weight: 500;
+    font-weight: bold;
   }
   .fc-row .fc-content-skeleton td, .fc-row .fc-helper-skeleton td {
     border-color: $ic-border-light;
   }
   .fc-head thead .fc-widget-header {
     color: $ic-font-color--subdued;
-    font-weight: bold;
     padding: 10px 0;
     text-transform: uppercase;
   }
-  .fc-widget-header, .fc-widget-content {
-    border-color: #dadada;
-  }
 }
-
 .fc-event.grayed {
   opacity: 0.5;
 }
@@ -51,7 +41,6 @@
 
     a:focus {
       outline: 0;
-      text-decoration: underline;
     }
   }
   &.carat-bottom .ui-menu-carat span {
@@ -68,7 +57,6 @@
     @include reset-list;
   }
   th {
-    font-weight: bold;
     padding-bottom: 3px;
     padding-right: 8px;
   }
@@ -214,4 +202,34 @@
 .calendar__event--completed {
   text-decoration: line-through;
   opacity: 0.7;
+}
+
+//////////////////////////////////////
+/////// NEW CALENDAR LOOK / OVERRIDES
+/////////////////////////////////////
+
+//lose the horizontal border for weekly view
+.fc-time-grid .fc-slats td {
+  border-top: 0;
+}
+.fc-agendaWeek-view .fc-event {
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left-width: 3px;
+}
+.fc-day-header__week-number {
+  @include fontSize(36px);
+  font-weight: 200;
+}
+.fc-day-header__week-day {
+  @include fontSize(16px);
+  font-weight: 500;
+}
+
+// to change the size/color of the event time only within the event container
+.fc-agendaWeek-view .fc-event-container a[class*="group_"] .fc-content .fc-time {
+  color: $ic-font-color-dark;
 }

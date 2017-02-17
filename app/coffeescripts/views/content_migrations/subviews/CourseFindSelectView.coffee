@@ -3,12 +3,13 @@ define [
   'Backbone'
   'underscore'
   'i18n!content_migrations'
+  'compiled/util/natcompare'
   'jst/content_migrations/subviews/CourseFindSelect'
   'jst/courses/autocomplete_item'
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
   'jqueryui/autocomplete'
-], ($, Backbone, _, I18n, template, autocompleteItemTemplate) ->
+], ($, Backbone, _, I18n, natcompare, template, autocompleteItemTemplate) ->
   class CourseFindSelectView extends Backbone.View
     @optionProperty 'current_user_id', 'show_select'
     template: template
@@ -28,7 +29,14 @@ define [
       @$el.disableWhileLoading dfd
       dfd.done (data) =>
         @courses = data
-        @coursesByTerms = _.groupBy data, (course) -> course.term
+        @coursesByTerms = _.chain(@courses)
+          .groupBy((course) ->
+            course.term
+          ).map((value, key) ->
+            {term: key, courses: value.sort(natcompare.byKey('label'))}
+          ).sort((a, b) ->
+            new Date(b.courses[0].enrollment_start) - new Date(a.courses[0].enrollment_start)
+          ).value()
         super
 
     afterRender: ->

@@ -4,7 +4,7 @@ define [
   'jquery'
 ], (mediaEditorLoader, RceCommandShim, $)->
 
-  module "mediaEditorLoader",
+  QUnit.module "mediaEditorLoader",
     setup: ->
       sinon.stub(RceCommandShim, 'send')
       @mel = mediaEditorLoader

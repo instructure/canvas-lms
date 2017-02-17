@@ -1,4 +1,4 @@
-class AddQuizStudentVisibilityView < ActiveRecord::Migration
+class AddQuizStudentVisibilityView < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

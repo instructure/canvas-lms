@@ -115,21 +115,27 @@ describe AssignmentGroupsController, type: :request do
         'name' => 'group2',
         'position' => 7,
         'rules' => {},
-        'group_weight' => 0
+        'group_weight' => 0,
+        'sis_source_id' => nil,
+        'integration_data' => {}
       },
       {
         'id' => group1.id,
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
-        'group_weight' => 0
+        'group_weight' => 0,
+        'sis_source_id' => nil,
+        'integration_data' => {}
       },
       {
         'id' => group3.id,
         'name' => 'group3',
         'position' => 12,
         'rules' => {},
-        'group_weight' => 0
+        'group_weight' => 0,
+        'sis_source_id' => nil,
+        'integration_data' => {}
       }
     ]
   end
@@ -162,11 +168,11 @@ describe AssignmentGroupsController, type: :request do
         'name' => 'group2',
         'position' => 7,
         'rules' => {},
-        'has_assignment_due_in_closed_grading_period' => false,
+        'any_assignment_in_closed_grading_period' => false,
         'assignments' => [
           controller.assignment_json(@a3,@user,session),
           controller.assignment_json(@a4,@user,session, include_discussion_topic: true)
-        ],
+        ]
       },
       {
         'group_weight' => 40,
@@ -174,11 +180,11 @@ describe AssignmentGroupsController, type: :request do
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
-        'has_assignment_due_in_closed_grading_period' => false,
+        'any_assignment_in_closed_grading_period' => false,
         'assignments' => [
           controller.assignment_json(@a1,@user,session),
           controller.assignment_json(@a2,@user,session)
-        ],
+        ]
       }
     ]
 
@@ -237,9 +243,11 @@ describe AssignmentGroupsController, type: :request do
       @user.enrollments.each(&:destroy_permanently!)
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @user)
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
       # make a1 and a3 visible
       create_section_override_for_assignment(@a1, course_section: @section)
-      @a3.grade_student(@user, {grade: 10})
+      @a3.grade_student(@user, grade: 10, grader: @teacher)
 
       [@a1, @a2, @a3, @a4].each(&:reload)
 
@@ -325,8 +333,8 @@ describe AssignmentGroupsController, type: :request do
           course_id: @course.id, grading_period_id: @gp_future.id,
           assignment_group_id: @group1.id, include: ['assignments', 'submission']
         }
-        @group1_assignment_future.grade_student(student, grade: 10)
-        @group1_assignment_today.grade_student(student, grade: 8)
+        @group1_assignment_future.grade_student(student, grade: 10, grader: @teacher)
+        @group1_assignment_today.grade_student(student, grade: 8, grader: @teacher)
         json = api_call_as_user(student, :get, api_path, api_settings)
         expect(json["assignments"].length).to eq(1)
         expect(json["assignments"].first["submission"]).to be_present
@@ -383,11 +391,11 @@ describe AssignmentGroupsController, type: :request do
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
-        'has_assignment_due_in_closed_grading_period' => false,
+        'any_assignment_in_closed_grading_period' => false,
         'assignments' => [
           controller.assignment_json(a1, @user,session),
           controller.assignment_json(a2, @user,session)
-        ],
+        ]
       }
     ]
 
@@ -424,11 +432,11 @@ describe AssignmentGroupsController, type: :request do
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
-        'has_assignment_due_in_closed_grading_period' => false,
+        'any_assignment_in_closed_grading_period' => false,
         'assignments' => [
           controller.assignment_json(a1, @user,session, include_all_dates: true),
           controller.assignment_json(a2, @user,session, include_all_dates: true)
-        ],
+        ]
       }
     ]
 
@@ -509,8 +517,26 @@ describe AssignmentGroupsApiController, type: :request do
   include Api::V1::Assignment
   include AssignmentGroupsApiSpecHelper
 
-  context '#show' do
+  let(:name)             { "Awesome group name" }
+  let(:position)         { 1 }
+  let(:integration_data) { {"my existing" => "data", "more" => "data"} }
 
+  let(:params) do
+    {
+      'name'             => name,
+      'position'         => position,
+      'integration_data' => integration_data
+    }
+  end
+
+  let(:invalid_integration_data) { 'invalid integration data format' }
+
+  let(:assignment_group) do
+    rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
+    @course.assignment_groups.create!(name: 'group', rules: rules_in_db)
+  end
+
+  context '#show' do
     before :once do
       course_with_teacher(active_all: true)
       rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
@@ -518,23 +544,27 @@ describe AssignmentGroupsApiController, type: :request do
     end
 
     it 'should succeed' do
-      api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}",
+      response = raw_api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{assignment_group.id}",
         controller: 'assignment_groups_api',
         action: 'show',
         format: 'json',
         course_id: @course.id.to_s,
-        assignment_group_id: @group.id.to_s)
+        assignment_group_id: assignment_group.id.to_s)
+
+      expect(response).to eq(200)
     end
 
     it 'should fail if the assignment group does not exist' do
-      not_exist = @group.id + 100
-      raw_api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{not_exist}",
+      non_existing_assignment_group_id = assignment_group.id + 1
+      response = raw_api_call(:get,
+        "/api/v1/courses/#{@course.id}/assignment_groups/#{non_existing_assignment_group_id}",
         controller: 'assignment_groups_api',
         action: 'show',
         format: 'json',
         course_id: @course.id.to_s,
-        assignment_group_id: not_exist.to_s)
-      assert_status(404)
+        assignment_group_id: non_existing_assignment_group_id)
+
+      expect(response).to eq(404)
     end
 
     context 'with assignments' do
@@ -560,9 +590,11 @@ describe AssignmentGroupsApiController, type: :request do
 
       it 'should include submission when flag is present' do
         student_in_course(active_all: true)
+        teacher_in_course(active_all: true, course: @course)
         @submission = bare_submission_model(@assignment, @student, {
           score: '25',
           grade: '25',
+          grader: @teacher,
           submitted_at: Time.zone.now
         })
 
@@ -670,45 +702,161 @@ describe AssignmentGroupsApiController, type: :request do
 
       expect(json['rules']).to eq rules
     end
-
   end
+
   context '#create' do
     before do
       course_with_teacher(active_all: true)
     end
 
     it 'should create an assignment_group' do
-      params = {'name' => 'Some group', 'position' => 1}
-      expect {
-        api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
-          controller: 'assignment_groups_api',
+      api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
+        controller: 'assignment_groups_api',
           action: 'create',
           format: 'json',
           course_id: @course.id.to_s},
           params)
-      }.to change(AssignmentGroup, :count).by(1)
+      assignment_group = AssignmentGroup.last
+      expect(assignment_group.name).to eq(name)
+      expect(assignment_group.position).to eq(position)
+      expect(assignment_group.integration_data).to eq(integration_data)
+    end
+
+    it 'does not create an assignment_group with invalid integration_data' do
+      params['integration_data'] = invalid_integration_data
+
+      expect do
+        raw_api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
+          controller: 'assignment_groups_api',
+            action: 'create',
+            format: 'json',
+            course_id: @course.id.to_s},
+            params)
+      end.to change(AssignmentGroup, :count).by(0)
+    end
+
+    it 'responds with a 400 when invalid integration_data is included' do
+      params['integration_data'] = invalid_integration_data
+
+      response = raw_api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
+        controller: 'assignment_groups_api',
+        action: 'create',
+        format: 'json',
+        course_id: @course.id.to_s},
+        params)
+
+      expect(response).to eq(400)
     end
   end
 
   context '#update' do
-    before :once do
-      course_with_teacher(active_all: true)
-      @assignment_group = @course.assignment_groups.create!(name: 'Some group', position: 1)
+    let(:assignment_group) do
+      @course.assignment_groups.create!(params)
     end
 
-    it 'should update an assignment group' do
-      params = {'name' => 'A different name'}
-      json = api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}", {
+    let(:updated_name)             { "Newer Awesome group name" }
+    let(:updated_position)         { 2 }
+    let(:updated_integration_data) { {"new" => "datum", "v2" => "fractal"} }
+
+    let(:updated_params) do
+      {
+        'name'             => updated_name,
+        'position'         => updated_position,
+        'integration_data' => updated_integration_data
+      }
+    end
+
+    let(:put_url) { "/api/v1/courses/#{@course.id}/assignment_groups/#{assignment_group.id}" }
+
+    let(:api_details) do
+      {
         controller: 'assignment_groups_api',
         action: 'update',
         format: 'json',
         course_id: @course.id.to_s,
-        assignment_group_id: @assignment_group.id.to_s},
-        params)
+        assignment_group_id: assignment_group.id.to_s
+      }
+    end
 
-      expect(json['name']).to eq 'A different name'
-      @assignment_group.reload
-      expect(@assignment_group.name).to eq 'A different name'
+    before :once do
+      course_with_teacher(active_all: true)
+      @assignment_group = @course.assignment_groups.create!(name: 'Some group',
+                                                            position: 1,
+                                                            integration_data: {"oh" => 'hello'})
+    end
+
+    it 'should update an assignment group' do
+      response = api_call(:put, put_url, api_details, updated_params)
+
+      # Check the api response
+      expect(response['name']).to eq(updated_name)
+      expect(response['position']).to eq(updated_position)
+      expect(response['integration_data']).to eq(integration_data.merge(updated_integration_data))
+
+      # Check the db record
+      assignment_group.reload
+      expect(assignment_group.name).to eq(updated_name)
+      expect(assignment_group.position).to eq(updated_position)
+      expect(assignment_group.integration_data).to eq(integration_data.merge(updated_integration_data))
+    end
+
+    it 'should update an assignment group when integration_data is nil' do
+      updated_params['integration_data'] = nil
+      response = api_call(:put, put_url, api_details, updated_params)
+
+      # Check the api response
+      expect(response['name']).to eq(updated_name)
+      expect(response['integration_data']).to eq(integration_data)
+
+      # Check the db record
+      assignment_group.reload
+      expect(assignment_group.name).to eq(updated_name)
+      expect(assignment_group.integration_data).to eq(integration_data)
+    end
+
+    it 'should update an assignment group when integration_data is {}' do
+      updated_params['integration_data'] = {}
+      response = api_call(:put, put_url, api_details, updated_params)
+
+      # Check the api response
+      expect(response['name']).to eq(updated_name)
+      expect(response['integration_data']).to eq(integration_data)
+
+      # Check the db record
+      assignment_group.reload
+      expect(assignment_group.name).to eq(updated_name)
+      expect(assignment_group.integration_data).to eq(integration_data)
+    end
+
+    it 'should update an assignment group without integration_data' do
+      updated_params.delete('integration_data')
+      response = api_call(:put, put_url, api_details, updated_params)
+
+      # Check the api response
+      expect(response['name']).to eq(updated_name)
+      expect(response['integration_data']).to eq(integration_data)
+
+      # Check the db record
+      assignment_group.reload
+      expect(assignment_group.name).to eq(updated_name)
+      expect(assignment_group.integration_data).to eq(integration_data)
+    end
+
+    it 'does not update when integration_data is malformed' do
+      updated_params['integration_data'] = invalid_integration_data
+      raw_api_call(:put, put_url, api_details, updated_params)
+
+      # Check the db record
+      assignment_group.reload
+      expect(assignment_group.name).to eq(name)
+      expect(assignment_group.position).to eq(position)
+      expect(assignment_group.integration_data).to eq(integration_data)
+    end
+
+    it 'returns a 400 when integration data is malformed' do
+      updated_params['integration_data'] = invalid_integration_data
+      response = raw_api_call(:put, put_url, api_details, updated_params)
+      expect(response).to eq(400)
     end
 
     it 'should update rules properly' do
@@ -732,7 +880,8 @@ describe AssignmentGroupsApiController, type: :request do
     context "when an assignment is due in a closed grading period" do
       let(:call_update) do
         -> (params, expected_status) do
-          api_call(
+          api_call_as_user(
+            @current_user,
             :put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}",
             {
               controller: 'assignment_groups_api',
@@ -751,9 +900,7 @@ describe AssignmentGroupsApiController, type: :request do
       before :once do
         @course.root_account.enable_feature!(:multiple_grading_periods)
         @grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
-        term = @course.enrollment_term
-        term.grading_period_group = @grading_period_group
-        term.save!
+        @grading_period_group.enrollment_terms << @course.enrollment_term
         Factories::GradingPeriodHelper.new.create_for_group(@grading_period_group, {
           start_date: 2.weeks.ago, end_date: 2.days.ago, close_date: 1.day.ago
         })
@@ -762,9 +909,13 @@ describe AssignmentGroupsApiController, type: :request do
 
       context "as a teacher" do
         before :each do
-          user_session(@teacher)
+          @current_user = @teacher
+          student_in_course(course: @course, active_all: true)
           @assignment = @course.assignments.create!({
-            title: 'assignment', assignment_group: @assignment_group, due_at: 1.week.ago
+            title: 'assignment',
+            assignment_group: @assignment_group,
+            due_at: 1.week.ago,
+            workflow_state: 'published'
           })
         end
 
@@ -815,8 +966,7 @@ describe AssignmentGroupsApiController, type: :request do
           @course.assignments.create!({
             title: 'assignment', assignment_group: @assignment_group, due_at: 1.week.ago
           })
-          admin = account_admin_user(account: @course.root_account)
-          user_session(admin)
+          @current_user = account_admin_user(account: @course.root_account)
           call_update.call({ group_weight: 75 }, 200)
           expect(@assignment_group.reload.group_weight).to eq(75)
         end

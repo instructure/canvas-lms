@@ -1,7 +1,7 @@
 define [
   'jquery'
   'timezone'
-  'bower/fullcalendar/dist/fullcalendar'
+  'fullcalendar'
   'jquery.instructure_date_and_time'
 ], ($, tz) ->
 

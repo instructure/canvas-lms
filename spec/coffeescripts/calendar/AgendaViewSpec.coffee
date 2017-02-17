@@ -3,9 +3,9 @@ define [
   'underscore'
   'timezone'
   'compiled/util/fcUtil'
-  'vendor/timezone/America/Denver'
-  'vendor/timezone/America/Juneau'
-  'vendor/timezone/fr_FR'
+  'timezone/America/Denver'
+  'timezone/America/Juneau'
+  'timezone/fr_FR'
   'compiled/views/calendar/AgendaView'
   'compiled/calendar/Calendar'
   'compiled/calendar/EventDataSource'
@@ -17,13 +17,14 @@ define [
   loadEventPage = (server, includeNext = false) ->
     sendCustomEvents(server, eventResponse, assignmentResponse, includeNext)
 
-  sendCustomEvents = (server, events, assignments, includeNext = false, requestIndex = 0) ->
+  sendCustomEvents = (server, events, assignments, includeNext = false) ->
+    requestIndex = server.requests.length - 2
     server.requests[requestIndex].respond 200,
       { 'Content-Type': 'application/json', 'Link': '</api/magic>; rel="'+(if includeNext then 'next' else 'current')+'"' }, events
     server.requests[requestIndex+1].respond 200,
       { 'Content-Type': 'application/json' }, assignments
 
-  module "AgendaView",
+  QUnit.module "AgendaView",
     setup: ->
       @container = $('<div />', id: 'agenda-wrapper').appendTo('#fixtures')
       @contexts = [{"asset_string":"user_1"}, {"asset_string":"course_2"}, {"asset_string":"group_3"}]
@@ -114,7 +115,7 @@ define [
     for i in [1..2]
       addEvents(events, date)
       date.setFullYear(date.getFullYear()+1)
-    sendCustomEvents(@server, JSON.stringify(events), JSON.stringify([]), false, 2)
+    sendCustomEvents(@server, JSON.stringify(events), JSON.stringify([]), false)
 
     equal @container.find('.agenda-event__item-container').length, 70, 'finds 70 agenda-event__item-containers'
 

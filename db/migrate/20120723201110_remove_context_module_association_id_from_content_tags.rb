@@ -1,4 +1,4 @@
-class RemoveContextModuleAssociationIdFromContentTags < ActiveRecord::Migration
+class RemoveContextModuleAssociationIdFromContentTags < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

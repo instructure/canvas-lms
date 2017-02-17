@@ -1,4 +1,4 @@
-class AddLtiContextIdToAccountsCoursesUsers < ActiveRecord::Migration
+class AddLtiContextIdToAccountsCoursesUsers < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -1,4 +1,4 @@
-class LoadQuizRegradeFinishedNotification < ActiveRecord::Migration
+class LoadQuizRegradeFinishedNotification < ActiveRecord::Migration[4.2]
   tag :predeploy
   def self.up
     return unless Shard.current == Shard.default

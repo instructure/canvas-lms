@@ -24,14 +24,9 @@ describe StudentViewEnrollment do
     @student = User.create(:name => "some student")
     @course = Course.create(:name => "some course")
     @se = @course.enroll_student(@student)
-    expect(@se.user_id).to eql(@student.id)
-    expect(@course.students).to include(@student)
     @assignment = @course.assignments.create!(:title => 'some assignment')
-    expect(@course.assignments).to include(@assignment)
     @submission = @assignment.submit_homework(@student)
     @assignment.reload
-    expect(@submission).not_to be_nil
-    expect(@assignment.submissions.to_a).to eql([@submission])
     @course.save!
     @se = @course.student_enrollments.first
   end

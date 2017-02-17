@@ -1,4 +1,4 @@
-class AddTimestampsToCrocodocDocuments < ActiveRecord::Migration
+class AddTimestampsToCrocodocDocuments < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

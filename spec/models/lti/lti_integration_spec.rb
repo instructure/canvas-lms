@@ -45,10 +45,10 @@ describe "LTI integration tests" do
     end
   }
 
-  let_once(:canvas_user) { user(name: 'Shorty McLongishname') }
+  let_once(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
 
   let_once(:canvas_course) {
-    course(active_course: true, course_name: 'my course').tap do |course|
+    course_factory(active_course: true, course_name: 'my course').tap do |course|
       course.course_code = 'abc'
       course.sis_source_id = 'course_sis_id'
       course.root_account = root_account
@@ -171,7 +171,7 @@ describe "LTI integration tests" do
 
     it "should generate correct parameters" do
       @user = user_with_managed_pseudonym(:sis_user_id => 'testfun', :name => "A Name")
-      course_with_teacher_logged_in(:active_all => true, :user => @user, :account => @account)
+      course_with_teacher(:active_all => true, :user => @user, :account => @account)
       @course.sis_source_id = 'coursesis'
       @course.save!
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
@@ -435,7 +435,7 @@ describe "LTI integration tests" do
 
   it "gets the correct width and height based on resource type" do
     @user = user_with_managed_pseudonym(:sis_user_id => 'testfun', :name => "A Name")
-    course_with_teacher_logged_in(:active_all => true, :user => @user, :account => @account)
+    course_with_teacher(:active_all => true, :user => @user, :account => @account)
     @course.sis_source_id = 'coursesis'
     @course.save!
     @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
@@ -465,7 +465,7 @@ describe "LTI integration tests" do
         tag.content_type = 'ContextExternalTool'
         tag.save!
       end
-      user
+      user_factory
       @course.enroll_student(@user)
 
       source_id = @tool.shard.activate do
@@ -486,7 +486,7 @@ describe "LTI integration tests" do
       user2 = @shard2.activate do
         user_with_managed_pseudonym(:sis_user_id => 'testfun', :name => "A Name", :id => user1.id)
       end
-      course_with_teacher_logged_in(:active_all => true, :user => user1, :account => @account)
+      course_with_teacher(:active_all => true, :user => user1, :account => @account)
       @course.sis_source_id = 'coursesis'
       @course.save!
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')

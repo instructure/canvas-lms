@@ -27,6 +27,7 @@ describe 'Grading quizzes' do
       context 'after changing a quiz question\'s correct answer' do
         before(:each) do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+          dismiss_flash_messages
           click_questions_tab
 
           edit_first_question
@@ -109,7 +110,7 @@ describe 'Grading quizzes' do
       end
 
       it "doesn't show the 'Q' icon for spacer text-only questions", priority: "1", test_id: 377893 do
-        get "/courses/#{@course.id}/gradebook2"
+        get "/courses/#{@course.id}/gradebook"
         expect(f("#gradebook_grid")).not_to contain_css(".icon-quiz")
       end
     end

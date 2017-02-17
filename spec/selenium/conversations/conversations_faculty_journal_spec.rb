@@ -13,9 +13,9 @@ describe "conversations new" do
 
   before do
     conversation_setup
-    @s1 = user(name: "first student")
-    @s2 = user(name: "second student")
-    @s3 = user(name: 'third student')
+    @s1 = user_factory(name: "first student")
+    @s2 = user_factory(name: "second student")
+    @s3 = user_factory(name: 'third student')
     [@s1, @s2, @s3].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
     cat = @course.group_categories.create(:name => "the groups")
     @group = cat.groups.create(:name => "the group", :context => @course)
@@ -72,10 +72,11 @@ describe "conversations new" do
     it "should allow a new entry by an admin", priority: "1", test_id: 75702 do
       get student_user_notes_url
       f('#new_user_note_button').click
+      wait_for_ajaximations # wait for the form to `.slideDown()`
       replace_content(f('#user_note_title'),'FJ Title 2')
       replace_content(f('textarea'),'FJ Body text 2')
-      wait_for_ajaximations
       f('.send_button').click
+      wait_for_ajaximations
       time = format_time_for_view(UserNote.last.updated_at)
       get student_user_notes_url
       expect(f('.subject').text).to eq 'FJ Title 2'
@@ -187,7 +188,7 @@ describe "conversations new" do
       conversations
       # First verify teacher can send a message with faculty journal entry checked to one student
       compose course: @course, to: [@s1], body: 'hallo!', journal: true, send: true
-      expect_flash_message :success, /Message sent!/
+      expect_flash_message :success, "Message sent!"
       # Now verify adding another user while the faculty journal entry checkbox is checked doesn't uncheck it and
       #   still lets teacher know it was sent successfully.
       fj('.ic-flash-success:last').click
@@ -195,7 +196,7 @@ describe "conversations new" do
       add_message_recipient(@s2)
       expect(is_checked('.user_note')).to be_truthy
       click_send
-      expect_flash_message :success, /Message sent!/
+      expect_flash_message :success, "Message sent!"
     end
   end
 end

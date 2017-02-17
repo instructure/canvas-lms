@@ -1,6 +1,4 @@
 class EnrollmentState < ActiveRecord::Base
-  strong_params
-
   belongs_to :enrollment
 
   attr_accessor :skip_touch_user, :user_needs_touch, :is_direct_recalculation
@@ -168,6 +166,14 @@ class EnrollmentState < ActiveRecord::Base
   def self.process_states_in_ranges(start_at, end_at, enrollment_scope=Enrollment.all)
     Enrollment.find_ids_in_ranges(:start_at => start_at, :end_at => end_at, :batch_size => 250) do |min_id, max_id|
       process_states_for(enrollments_needing_calculation(enrollment_scope).where(:id => min_id..max_id))
+    end
+  end
+
+  def self.build_states_in_ranges
+    Enrollment.find_ids_in_ranges(:batch_size => 250) do |min_id, max_id|
+      enrollments = Enrollment.joins("LEFT OUTER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id = enrollments.id").
+        where("enrollment_states IS NULL").where(:id => min_id..max_id).to_a
+      enrollments.each(&:create_enrollment_state)
     end
   end
 

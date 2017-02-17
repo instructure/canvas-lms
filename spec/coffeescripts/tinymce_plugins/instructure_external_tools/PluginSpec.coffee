@@ -1,8 +1,9 @@
 define [
-  'bower/tinymce/tinymce',
+  'tinymce/tinymce',
   'tinymce_plugins/instructure_external_tools/plugin'
 ], (tinymce)->
-  module "ExternalTools Plugin",
+
+  QUnit.module "ExternalTools Plugin",
     setup: ->
     teardown: ->
       $(".ui-dialog").remove()

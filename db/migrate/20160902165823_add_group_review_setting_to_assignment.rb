@@ -1,4 +1,4 @@
-class AddGroupReviewSettingToAssignment < ActiveRecord::Migration
+class AddGroupReviewSettingToAssignment < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

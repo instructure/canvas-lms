@@ -28,7 +28,7 @@ describe GroupsController do
 
   describe "GET context_index" do
     it "should require authorization" do
-      user_session(user) # logged in user without course access
+      user_session(user_factory) # logged in user_factory without course access
       category1 = @course.group_categories.create(:name => "category 1")
       category2 = @course.group_categories.create(:name => "category 2")
       g1 = @course.groups.create(:name => "some group", :group_category => category1)
@@ -134,6 +134,15 @@ describe GroupsController do
       expect(assigns[:previous_groups]).to eq([])
     end
 
+    it 'should put groups in courses in terms concluded for students in "previous groups"' do
+      @course.enrollment_term.set_overrides(@course.account, 'StudentEnrollment' => {end_at: 1.week.ago})
+      group_with_user(group_context: @course, user: @student, active_all: true)
+      user_session(@student)
+      get 'index'
+      expect(assigns[:current_groups]).to eq([])
+      expect(assigns[:previous_groups]).to eq([@group])
+    end
+
     describe 'pagination' do
       before :once do
         group_with_user(:group_context => @course, :user => @student, :active_all => true)
@@ -223,6 +232,18 @@ describe GroupsController do
       g1.reload
       expect(g1.users.map(&:id)).not_to include @student.id
     end
+
+    it "should allow teachers to view after conclusion" do
+      @teacher.enrollments.first.conclude
+      user_session(@teacher)
+      category = @course.group_categories.create(:name => "category")
+      group = @course.groups.create(:name => "some group", :group_category => category)
+
+      get 'show', :id => group.id
+
+      expect(response).to be_success
+      expect(assigns[:group]).to eql(group)
+    end
   end
 
   describe "GET new" do
@@ -243,7 +264,7 @@ describe GroupsController do
     it "should add user" do
       user_session(@teacher)
       @group = @course.groups.create!(:name => "PG 1", :group_category => @category)
-      @user = user(:active_all => true)
+      @user = user_factory(active_all: true)
       post 'add_user', :group_id => @group.id, :user_id => @user.id
       expect(response).to be_success
       expect(assigns[:membership]).not_to be_nil
@@ -273,7 +294,7 @@ describe GroupsController do
   describe "DELETE remove_user" do
     it "should require authorization" do
       @group = Account.default.groups.create!(:name => "some group")
-      @user = user(:active_all => true)
+      @user = user_factory(active_all: true)
       @group.add_user(@user)
       delete 'remove_user', :group_id => @group.id, :user_id => @user.id, :id => @user.id
       assert_unauthorized
@@ -588,7 +609,7 @@ describe GroupsController do
     before :once do
       @communities = GroupCategory.communities_for(Account.default)
       group_model(:group_category => @communities)
-      user(:active_user => true)
+      user_factory(active_user: true)
       @membership = @group.add_user(@user, 'invited', false)
     end
 

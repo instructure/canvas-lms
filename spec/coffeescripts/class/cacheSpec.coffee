@@ -3,7 +3,7 @@ define [
   'compiled/class/cache'
 ], (_, cache) ->
 
-  module 'class/cache',
+  QUnit.module 'class/cache',
     setup: ->
       # need to get the cache from its wrapper object
       # because cache is meant to be used as a class

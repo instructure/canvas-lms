@@ -1,4 +1,4 @@
-class AddGradingPeriodsForeignKeys < ActiveRecord::Migration
+class AddGradingPeriodsForeignKeys < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

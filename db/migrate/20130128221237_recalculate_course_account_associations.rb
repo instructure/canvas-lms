@@ -1,4 +1,4 @@
-class RecalculateCourseAccountAssociations < ActiveRecord::Migration
+class RecalculateCourseAccountAssociations < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

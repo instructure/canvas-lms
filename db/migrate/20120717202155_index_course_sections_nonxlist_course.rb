@@ -1,4 +1,4 @@
-class IndexCourseSectionsNonxlistCourse < ActiveRecord::Migration
+class IndexCourseSectionsNonxlistCourse < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 

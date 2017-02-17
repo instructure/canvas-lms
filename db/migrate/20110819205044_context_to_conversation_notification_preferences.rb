@@ -1,4 +1,4 @@
-class ContextToConversationNotificationPreferences < ActiveRecord::Migration
+class ContextToConversationNotificationPreferences < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

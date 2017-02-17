@@ -193,16 +193,6 @@
     "default": "#ffffff"
   },
   {
-    "variable_name": "ic-brand-Login-Content-button-bgd",
-    "type": "color",
-    "default": "#008EE2"
-  },
-  {
-    "variable_name": "ic-brand-Login-Content-button-text",
-    "type": "color",
-    "default": "#ffffff"
-  },
-  {
     "variable_name": "ic-brand-Login-footer-link-color",
     "type": "color",
     "default": "#ffffff"

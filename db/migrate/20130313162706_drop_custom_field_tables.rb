@@ -1,4 +1,4 @@
-class DropCustomFieldTables < ActiveRecord::Migration
+class DropCustomFieldTables < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

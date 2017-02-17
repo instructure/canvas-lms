@@ -30,6 +30,10 @@ describe "Outcome Reports" do
     @course1.sis_source_id = "SIS_COURSE_ID_1"
     @course1.save!
     @course1.offer!
+
+    @teacher = User.create!
+    @course1.enroll_teacher(@teacher)
+
     @user1 = user_with_managed_pseudonym(
       :active_all => true, :account => @account, :name => 'John St. Clair',
       :sortable_name => 'St. Clair, John', :username => 'john@stclair.com',
@@ -73,7 +77,7 @@ describe "Outcome Reports" do
     @rubric.save!
     @a = @rubric.associate_with(@assignment, @course1, :purpose => 'grading')
     @assignment.reload
-    @submission = @assignment.grade_student(@user1, :grade => "10").first
+    @submission = @assignment.grade_student(@user1, grade: "10", grader: @teacher).first
     @submission.submission_type = 'online_url'
     @submission.submitted_at = 1.week.ago
     @submission.save!

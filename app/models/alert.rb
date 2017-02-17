@@ -22,8 +22,6 @@ class Alert < ActiveRecord::Base
 
   serialize :recipients
 
-  strong_params
-
   validates_presence_of :context_id
   validates_presence_of :context_type
   validates_presence_of :criteria

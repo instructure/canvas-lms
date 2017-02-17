@@ -1,4 +1,4 @@
-class CreateSelectionTable < ActiveRecord::Migration
+class CreateSelectionTable < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

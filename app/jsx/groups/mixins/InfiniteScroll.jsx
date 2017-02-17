@@ -1,6 +1,7 @@
 define([
-  'underscore'
-], (_) => {
+  'underscore',
+  'react-dom',
+], (_, ReactDOM) => {
   var InfiniteScroll = {
     topPosition(el) {
       if (!el) {
@@ -14,7 +15,7 @@ define([
       if (this.scrollElement) {
         atBottom = this.scrollElement.scrollTop + this.scrollElement.clientHeight + 100 >= this.scrollElement.scrollHeight;
       } else {
-        var el = this.getDOMNode();
+        var el = ReactDOM.findDOMNode(this)
         var scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
         atBottom = this.topPosition(el) + el.offsetHeight - scrollTop - window.innerHeight < 100;
       }
@@ -25,7 +26,7 @@ define([
 
     attachScroll() {
       if (this.refs.scrollElement) {
-        this.scrollElement = this.refs.scrollElement.getDOMNode();
+        this.scrollElement = this.refs.scrollElement
       }
       (this.scrollElement || window).addEventListener('scroll', this.loadMoreIfNeeded);
       (this.scrollElement || window).addEventListener('resize', this.loadMoreIfNeeded);

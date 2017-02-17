@@ -10,12 +10,14 @@ define([
     propTypes: {
       closeTray: React.PropTypes.func.isRequired,
       userDisplayName: React.PropTypes.string.isRequired,
-      userAvatarURL: React.PropTypes.string.isRequired
+      userAvatarURL: React.PropTypes.string.isRequired,
+      profileEnabled: React.PropTypes.bool.isRequired,
+      eportfoliosEnabled: React.PropTypes.bool.isRequired
     },
 
     render() {
       return (
-        <div>
+        <div className='profile-tray'>
           <div className="ic-NavMenu__header ic-NavMenu__header--is-profile" id="global_nav_profile_header">
             <div className="ic-NavMenu-profile-header-close">
               <button
@@ -56,9 +58,11 @@ define([
             </form>
           </div>
           <ul className="ic-NavMenu__link-list">
-            <li className="ic-NavMenu-list-item">
-              <a href="/profile" className="ic-NavMenu-list-item__link">{I18n.t('Profile')}</a>
-            </li>
+            {this.props.profileEnabled &&
+              <li className="ic-NavMenu-list-item">
+                <a href="/profile" className="ic-NavMenu-list-item__link">{I18n.t('Profile')}</a>
+              </li>
+            }
             <li className="ic-NavMenu-list-item">
               <a href="/profile/settings" className="ic-NavMenu-list-item__link">{I18n.t('Settings')}</a>
             </li>
@@ -68,7 +72,7 @@ define([
             <li className="ic-NavMenu-list-item">
               <a href="/files" className="ic-NavMenu-list-item__link">{I18n.t('Files')}</a>
             </li>
-            {window.ENV.SETTINGS.eportfolios_enabled &&
+            {this.props.eportfoliosEnabled &&
               <li className="ic-NavMenu-list-item">
                 <a href="/dashboard/eportfolios" className="ic-NavMenu-list-item__link">{I18n.t('ePortfolios')}</a>
               </li>

@@ -1,14 +1,14 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'react-modal',
   'jsx/files/FilePreview',
   'compiled/models/Folder',
   'compiled/models/File',
   'compiled/collections/FilesCollection',
   'compiled/collections/FoldersCollection'
-], (React, ReactDOM, ReactModal, FilePreview, Folder, File, FilesCollection, FoldersCollection) => {
-  const TestUtils = React.addons.TestUtils;
+], (React, ReactDOM, TestUtils, ReactModal, FilePreview, Folder, File, FilesCollection, FoldersCollection) => {
 
   let filesCollection = {};
   let folderCollection = {};
@@ -17,7 +17,7 @@ define([
   let file3 = {};
   let currentFolder = {};
 
-  module('File Preview Rendering', {
+  QUnit.module('File Preview Rendering', {
     setup () {
       // Initialize a few things to view in the preview.
       filesCollection = new FilesCollection();

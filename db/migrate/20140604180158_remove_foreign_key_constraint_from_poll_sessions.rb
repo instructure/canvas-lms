@@ -1,4 +1,4 @@
-class RemoveForeignKeyConstraintFromPollSessions < ActiveRecord::Migration
+class RemoveForeignKeyConstraintFromPollSessions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

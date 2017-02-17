@@ -24,11 +24,40 @@ describe ContextExternalTool do
     @root_account = @course.root_account
     @account = account_model(:root_account => @root_account, :parent_account => @root_account)
     @course.update_attribute(:account, @account)
-    expect(@course.account).to eql(@account)
-    expect(@course.root_account).to eql(@root_account)
-    expect(@account.parent_account).to eql(@root_account)
-    expect(@account.root_account).to eql(@root_account)
   end
+
+  describe '#content_migration_configured?' do
+    let(:tool) do
+      ContextExternalTool.new.tap do |t|
+        t.settings = {
+          'content_migration' => {
+            'export_start_url' => 'https://lti.example.com/begin_export',
+            'import_start_url' => 'https://lti.example.com/begin_import',
+          }
+        }
+      end
+    end
+
+    it 'must return false when the content_migration key is missing from the settings hash' do
+      tool.settings.delete('content_migration')
+      expect(tool.content_migration_configured?).to eq false
+    end
+
+    it 'must return false when the content_migration key is present in the settings hash but the export_start_url sub key is missing' do
+      tool.settings['content_migration'].delete('export_start_url')
+      expect(tool.content_migration_configured?).to eq false
+    end
+
+    it 'must return false when the content_migration key is present in the settings hash but the import_start_url sub key is missing' do
+      tool.settings['content_migration'].delete('import_start_url')
+      expect(tool.content_migration_configured?).to eq false
+    end
+
+    it 'must return true when the content_migration key and all relevant sub-keys are present' do
+      expect(tool.content_migration_configured?).to eq true
+    end
+  end
+
   describe "url or domain validation" do
     it "should validate with a domain setting" do
       @tool = @course.context_external_tools.create(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -144,6 +173,12 @@ describe ContextExternalTool do
     it "should match on the same domain" do
       @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @found_tool = ContextExternalTool.find_external_tool("http://google.com/is/cool", Course.find(@course.id))
+      expect(@found_tool).to eql(@tool)
+    end
+
+    it "should be case insensitive when matching on the same domain" do
+      @tool = @course.context_external_tools.create!(:name => "a", :domain => "Google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @found_tool = ContextExternalTool.find_external_tool("http://google.com/is/cool", Course.find(@course.id), @tool.id)
       expect(@found_tool).to eql(@tool)
     end
 
@@ -1010,9 +1045,9 @@ describe ContextExternalTool do
     end
 
     describe ".visible?" do
-      let(:u) {user}
+      let(:u) {user_factory}
       let(:admin) {account_admin_user(account:c.root_account)}
-      let(:c) {course(active_course:true)}
+      let(:c) {course_factory(active_course:true)}
       let(:student) do
         student = factory_with_protected_attributes(User, valid_user_attributes)
         e = c.enroll_student(student)
@@ -1084,16 +1119,16 @@ describe ContextExternalTool do
         @admin = account_admin_user()
 
         course_with_teacher(:active_all => true, :account => Account.default)
-        @teacher = user(:active_all => true)
+        @teacher = user_factory(active_all: true)
         @course.enroll_teacher(@teacher).accept!
 
-        @designer = user(:active_all => true)
+        @designer = user_factory(active_all: true)
         @course.enroll_designer(@designer).accept!
 
-        @ta = user(:active_all => true)
+        @ta = user_factory(active_all: true)
         @course.enroll_ta(@ta).accept!
 
-        @student = user(:active_all => true)
+        @student = user_factory(active_all: true)
         @course.enroll_student(@student).accept!
 
         expect(tool.grants_right?(@admin, :update_manually)).to be_truthy

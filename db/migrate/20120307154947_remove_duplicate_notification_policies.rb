@@ -1,4 +1,4 @@
-class RemoveDuplicateNotificationPolicies < ActiveRecord::Migration
+class RemoveDuplicateNotificationPolicies < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

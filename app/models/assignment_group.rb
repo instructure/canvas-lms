@@ -20,12 +20,11 @@ class AssignmentGroup < ActiveRecord::Base
 
   include Workflow
 
-  strong_params
-
   attr_readonly :context_id, :context_type
   belongs_to :context, polymorphic: [:course]
   acts_as_list scope: { context: self, workflow_state: 'available' }
   has_a_broadcast_policy
+  serialize :integration_data, Hash
 
   has_many :assignments, -> { order('position, due_at, title') }, dependent: :destroy
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'").order('assignments.position, assignments.due_at, assignments.title') }, class_name: 'Assignment'
@@ -74,7 +73,7 @@ class AssignmentGroup < ActiveRecord::Base
     given do |user, session|
       self.context.grants_right?(user, session, :manage_assignments) &&
         (self.context.account_membership_allows(user) ||
-         !has_assignment_due_in_closed_grading_period?)
+         !any_assignment_in_closed_grading_period?)
     end
     can :delete
   end
@@ -198,14 +197,14 @@ class AssignmentGroup < ActiveRecord::Base
     end
   end
 
-  def has_assignment_due_in_closed_grading_period?
-    published_assignments = context.assignments.published.where(assignment_group_id: self).
-      preload(:active_assignment_overrides, :context)
-    periods = GradingPeriod.for(self.course)
-    published_assignments.any? do |assignment|
-      assignment.due_for_any_student_in_closed_grading_period?(periods)
-    end
+  def any_assignment_in_closed_grading_period?
+    effective_due_dates.any_in_closed_grading_period?
   end
+
+  def effective_due_dates
+    @effective_due_dates ||= EffectiveDueDates.for_course(context, published_assignments)
+  end
+  private :effective_due_dates
 
   def visible_assignments(user, includes=[])
     self.class.visible_assignments(user, self.context, [self], includes)

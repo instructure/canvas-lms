@@ -1,4 +1,4 @@
-class DropDataExports < ActiveRecord::Migration
+class DropDataExports < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

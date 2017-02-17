@@ -1,4 +1,4 @@
-class AddReplyToNameToMessages < ActiveRecord::Migration
+class AddReplyToNameToMessages < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

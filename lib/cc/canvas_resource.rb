@@ -146,6 +146,15 @@ JOKE
         atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
         atts << :grading_standard_enabled
         atts << :storage_quota
+
+        if @course.image_url.present?
+          atts << :image_url
+        elsif @course.image_id.present?
+          if image_att = @course.attachments.active.where(id: @course.image_id).first
+            c.image_identifier_ref(create_key(image_att))
+          end
+        end
+
         @course.disable_setting_defaults do # so that we don't copy defaulted settings
           atts.each do |att|
             c.tag!(att, @course.send(att)) unless @course.send(att).nil? || @course.send(att) == ''

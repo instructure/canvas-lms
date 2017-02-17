@@ -9,7 +9,7 @@ define [
   class MessageParticipantsDialog
     constructor: (@opts) ->
       if @opts.timeslot
-        @recipients = _(@opts.timeslot.child_events).map (e) -> e.user or e.group
+        @recipients = @opts.timeslot.child_events.map (e) -> e.user or e.group
         participantType = if @recipients[0].short_name == undefined then 'Group' else 'User'
 
         @$form = $(messageParticipantsTemplate participant_type: participantType)

@@ -32,6 +32,13 @@ describe Pseudonym do
     @pseudonym.save!
   end
 
+  it "should allow a username that starts with a special character" do
+    user_model
+    pseudonym_model
+    @pseudonym.unique_id = '+c'
+    @pseudonym.save!
+  end
+
   it "should allow apostrophes in usernames" do
     pseudonym = Pseudonym.new(:unique_id => "o'brien@example.com",
                               :password => 'password',
@@ -154,7 +161,7 @@ describe Pseudonym do
   end
 
   it "should change a blank sis_user_id to nil" do
-    user
+    user_factory
     pseudonym = Pseudonym.new(:user => @user, :unique_id => 'test@example.com', :password => 'passwd123')
     pseudonym.password_confirmation = 'passwd123'
     pseudonym.sis_user_id = ''
@@ -434,7 +441,7 @@ describe Pseudonym do
 
     let(:bob) { student_in_course(
       user: student_in_course(account: account2).user,
-      course: course(account: account1)).user }
+      course: course_factory(account: account1)).user }
 
     let(:charlie) { student_in_course(account: account2).user }
 
@@ -697,6 +704,17 @@ describe Pseudonym do
     expect(p2.errors[:unique_id].first.type).to eq :taken
     p2.authentication_provider = aac
     expect(p2).to be_valid
+  end
+
+  describe ".find_all_by_arbtrary_credentials" do
+    it "doesn't choke on if global lookups is down" do
+      u = User.create!
+      p = u.pseudonyms.create!(unique_id: 'a', account: Account.default, password: 'abcdefgh', password_confirmation: 'abcdefgh')
+      expect(GlobalLookups).to receive(:enabled?).and_return(true)
+      expect(Pseudonym).to receive(:associated_shards).and_raise("an error")
+      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: 'a', password: 'abcdefgh' },
+        [Account.default.id], '127.0.0.1')).to eq [p]
+    end
   end
 end
 

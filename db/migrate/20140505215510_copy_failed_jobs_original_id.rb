@@ -1,4 +1,4 @@
-class CopyFailedJobsOriginalId < ActiveRecord::Migration
+class CopyFailedJobsOriginalId < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.connection

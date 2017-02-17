@@ -285,17 +285,16 @@ describe BasicLTI::BasicOutcomes do
         expect(assignment.submissions.where(user_id: @user.id).first.submission_type).to eq 'external_tool'
       end
 
-      it "doesn't create a new submission if there is only a score sent" do
-        submission = assignment.submit_homework(
+      it "sets the submission type to external tool if the existing submission_type is nil" do
+        submission = assignment.grade_student(
           @user,
           {
-            submission_type: "online_text_entry",
-            body: "text data for canvas submission",
-            grade: "92%"
-          })
+            grade: "92%",
+            grader_id: -1
+          }).first
         xml.css('resultData').remove
         BasicLTI::BasicOutcomes.process_request(tool, xml)
-        expect(submission.reload.versions.count).to eq 1
+        expect(submission.reload.submission_type).to eq 'external_tool'
       end
 
       it "creates a new submission if result_data_text is sent" do
@@ -338,6 +337,22 @@ describe BasicLTI::BasicOutcomes do
         expect(submission.reload.versions.count).to eq 2
       end
 
+      it "creates a new submission if result_data_download_url is sent" do
+        submission = assignment.submit_homework(
+          @user,
+          {
+            submission_type: "online_text_entry",
+            body: "sample text",
+            grade: "92%"
+          })
+        xml.css('resultScore').remove
+        xml.at_css('text').replace('<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>')
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(submission.reload.versions.count).to eq 2
+        expect(submission.attachments.count).to eq 1
+        expect(submission.attachments.first.display_name).to eq "face.doc"
+      end
+
       it "doesn't change the submission type if only the score is sent" do
         submission_type = 'online_text_entry'
         submission = assignment.submit_homework(
@@ -351,10 +366,6 @@ describe BasicLTI::BasicOutcomes do
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         expect(submission.reload.submission_type).to eq submission_type
       end
-
     end
-
-
-
   end
 end

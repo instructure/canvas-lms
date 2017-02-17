@@ -98,7 +98,7 @@
 class Quizzes::QuizReportsController < ApplicationController
   include ::Filters::Quizzes
 
-  before_filter :require_context, :require_quiz
+  before_action :require_context, :require_quiz
 
   # @API Retrieve all quiz reports
   #
@@ -108,7 +108,7 @@ class Quizzes::QuizReportsController < ApplicationController
   #   Whether to retrieve reports that consider all the submissions or only
   #   the most recent. Defaults to false, ignored for item_analysis reports.
   #
-  # @returns [ QuizReport ]
+  # @returns [QuizReport]
   def index
     if authorized_action(@quiz, @current_user, :read_statistics)
       all_versions = value_to_boolean(params[:includes_all_versions])

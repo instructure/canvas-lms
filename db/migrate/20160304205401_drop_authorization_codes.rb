@@ -1,4 +1,4 @@
-class DropAuthorizationCodes < ActiveRecord::Migration
+class DropAuthorizationCodes < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

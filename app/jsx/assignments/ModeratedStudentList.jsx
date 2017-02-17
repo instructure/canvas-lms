@@ -4,12 +4,25 @@ define([
   './actions/ModerationActions',
   './constants',
   'i18n!moderated_grading'
-], function (_, React, ModerationActions, Constants, I18n) {
-
+], (_, React, ModerationActions, Constants, I18n) => {
   // CONSTANTS
   var PG_ONE_INDEX = 0;
   var PG_TWO_INDEX = 1;
   var PG_THREE_INDEX = 2;
+
+  const StudentName = React.createClass({
+    render() {
+      if (ENV.STUDENT_CONTEXT_CARDS_ENABLED) {
+        return <a href="#"
+                  className="student_context_card_trigger"
+                  data-course_id={this.props.course_id}
+                  data-student_id={this.props.student_id}
+                  >{this.props.children}</a>
+      } else {
+        return <span>{this.props.children}</span>
+      }
+    }
+  });
 
   return React.createClass({
     displayName: 'ModeratedStudentList',
@@ -20,7 +33,7 @@ define([
       handleCheckbox: React.PropTypes.func.isRequired,
       includeModerationSetColumns: React.PropTypes.bool,
       urls: React.PropTypes.object.isRequired,
-      onSelectProvisionalGrade: React.PropTypes.func.isRequired
+      onSelectProvisionalGrade: React.PropTypes.func.isRequired,
     },
 
     generateSpeedgraderUrl (baseSpeedgraderUrl, student) {
@@ -41,6 +54,7 @@ define([
       }
 
       if (student.provisional_grades && student.provisional_grades[markIndex]) {
+        const formattedScore = I18n.n(student.provisional_grades[markIndex].score);
         if (this.props.includeModerationSetColumns) {
           var provisionalGradeId = student.provisional_grades[markIndex].provisional_grade_id;
           return (
@@ -58,8 +72,10 @@ define([
                   )
                 }
                   <a target='_blank' href={student.provisional_grades[markIndex].speedgrader_url}>
-                    <span className='screenreader-only'>{I18n.t('Score of %{score}. View in SpeedGrader', {score: student.provisional_grades[markIndex].score})}</span>
-                    <span aria-hidden='true'>{student.provisional_grades[markIndex].score}</span>
+                    <span className="screenreader-only">
+                      {I18n.t('Score of %{score}. View in SpeedGrader', {score: formattedScore})}
+                    </span>
+                    <span aria-hidden="true">{formattedScore}</span>
                   </a>
               </div>
             </div>
@@ -69,8 +85,10 @@ define([
             <div className='col-xs-2' role="gridcell">
               <div className='AssignmentList__Mark'>
                 <a target='_blank' href={student.provisional_grades[markIndex].speedgrader_url}>
-                  <span className='screenreader-only'>{I18n.t('Score of %{score}. View in SpeedGrader', {score: student.provisional_grades[markIndex].score})}</span>
-                  <span aria-hidden='true'>{student.provisional_grades[markIndex].score}</span>
+                  <span className="screenreader-only">
+                    {I18n.t('Score of %{score}. View in SpeedGrader', {score: formattedScore})}
+                  </span>
+                  <span aria-hidden="true">{formattedScore}</span>
                 </a>
               </div>
             </div>
@@ -112,11 +130,14 @@ define([
             return pg.provisional_grade_id === student.selected_provisional_grade_id;
           });
         }
+        const formattedScore = grade.score ? I18n.n(grade.score) : I18n.t('Not available');
         return (
           <div className='col-xs-2' role="gridcell">
             <div className='AssignmentList_Grade'>
-              <span className='screenreader-only'>{I18n.t('Final grade: %{score}', {score: (grade.score || I18n.t('Not available'))})}</span>
-              <span aria-hidden='true'>{grade.score}</span>
+              <span className="screenreader-only">
+                {I18n.t('Final grade: %{score}', {score: formattedScore})}
+              </span>
+              <span aria-hidden="true">{formattedScore}</span>
             </div>
           </div>
         );
@@ -150,7 +171,10 @@ define([
                               onChange={this.props.handleCheckbox.bind(null, student)}
                             />
                             <img className='img-circle AssignmentList_StudentPhoto' alt='' src={student.avatar_image_url} />
-                            <span>{student.display_name}</span>
+                            <StudentName
+                              course_id={this.props.assignment.course_id}
+                              student_id={student.id}
+                              >{student.display_name}</StudentName>
                           </label>
                         </div>
                       </div>
@@ -175,7 +199,10 @@ define([
                               onChange={this.props.handleCheckbox.bind(null, student)}
                             />
                             <img className='img-circle AssignmentList_StudentPhoto' alt='' src={student.avatar_image_url} />
-                            <span>{student.display_name}</span>
+                            <StudentName
+                              course_id={this.props.assignment.course_id}
+                              student_id={student.id}
+                              >{student.display_name}</StudentName>
                           </label>
                         </div>
                       </div>

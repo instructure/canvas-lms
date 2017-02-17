@@ -1,10 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/external_apps/components/SelectInput'
-], (React, ReactDOM, SelectInput) ->
+], (React, ReactDOM, TestUtils, SelectInput) ->
 
-  TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
@@ -29,7 +29,7 @@ define [
     hintNode = component.refs.hintText?.getDOMNode()
     [ component, inputNode, hintNode ]
 
-  module 'ExternalApps.SelectInput',
+  QUnit.module 'ExternalApps.SelectInput',
     teardown: ->
       ReactDOM.unmountComponentAtNode wrapper
 

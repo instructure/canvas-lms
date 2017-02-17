@@ -2,7 +2,7 @@
 <% ot(:timespan, "%{start_at} *to* %{end_at}", :start_at => capture { %>
     <td class="start_date">
       <div class="show_term">
-        <span class="<%= date_class_prefix %>start_at"><%= date_string(object.try(:start_at), :long) || (whenever[0] ? t('date.unspecified', "whenever") : t('date.term_start', "term start")) %></span>
+        <span class="<%= date_class_prefix %>start_at"><%= date_string(object.try(:start_at), :full) || (whenever[0] ? t('date.unspecified', "whenever") : t('date.term_start', "term start")) %></span>
       </div>
       <div class="edit_term">
         <div class="date_field_container">
@@ -27,7 +27,7 @@
   <% }, :end_at => capture { %>
     <td class="end_date">
       <div class="show_term">
-        <span class="<%= date_class_prefix %>end_at"><%= date_string(object.try(:end_at), :long) || (whenever[1] ? t('date.unspecified', "whenever") : t('date.term_end', "term end")) %></span>
+        <span class="<%= date_class_prefix %>end_at"><%= date_string(object.try(:end_at), :full) || (whenever[1] ? t('date.unspecified', "whenever") : t('date.term_end', "term end")) %></span>
       </div>
       <div class="edit_term">
         <div class="date_field_container">

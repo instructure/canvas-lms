@@ -1,4 +1,4 @@
-class RemoveDuplicateGroupDiscussions < ActiveRecord::Migration
+class RemoveDuplicateGroupDiscussions < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

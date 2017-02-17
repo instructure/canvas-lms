@@ -1,4 +1,4 @@
-define(['bower/react-modal/dist/react-modal'], function(ReactModal) {
+define(['node_modules-version-of-react-modal'], function(ReactModal) {
   var appElement = document.getElementById('application');
 
   // In general this will be present, but in the case that it's not present,

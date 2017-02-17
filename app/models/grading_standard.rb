@@ -19,8 +19,6 @@
 class GradingStandard < ActiveRecord::Base
   include Workflow
 
-  attr_accessible :title, :standard_data, :data
-
   belongs_to :context, polymorphic: [:account, :course]
   belongs_to :user
   has_many :assignments
@@ -129,7 +127,7 @@ class GradingStandard < ActiveRecord::Base
     # round values to the nearest 0.01 (0.0001 since e.g. 78 is stored as .78)
     # and dup the data while we're at it. (new_val.dup only dups one level, the
     # elements of new_val.dup are the same objects as the elements of new_val)
-    new_val = new_val.map{ |grade_name, lower_bound| [ grade_name, lower_bound.round(4) ] }
+    new_val = new_val.map{ |grade_name, lower_bound| [ grade_name, lower_bound.round(4) ] } unless new_val.nil?
     write_attribute(:data, new_val)
     @ordered_scheme = nil
   end
@@ -137,7 +135,7 @@ class GradingStandard < ActiveRecord::Base
   def data
     unless self.version == VERSION
       data = read_attribute(:data)
-      data = GradingStandard.upgrade_data(data, self.version)
+      data = GradingStandard.upgrade_data(data, self.version) unless data.nil?
       self.data = data
     end
     read_attribute(:data)
@@ -207,8 +205,8 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def valid_grading_scheme_data
-    self.errors.add(:data, 'grading scheme values cannot be negative') if self.data.any?{ |v| v[1] < 0 }
-    self.errors.add(:data, 'grading scheme cannot contain duplicate values') if self.data.map{|v| v[1]} != self.data.map{|v| v[1]}.uniq
+    self.errors.add(:data, 'grading scheme values cannot be negative') if self.data.present? && self.data.any?{ |v| v[1] < 0 }
+    self.errors.add(:data, 'grading scheme cannot contain duplicate values') if self.data.present? && self.data.map{|v| v[1]} != self.data.map{|v| v[1]}.uniq
   end
 
   def self.default_grading_standard

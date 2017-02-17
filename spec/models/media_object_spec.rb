@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe MediaObject do
   context "loading with legacy support" do
     it "should load by either media_id or old_media_id" do
-      course
+      course_factory
       mo = factory_with_protected_attributes(MediaObject, :media_id => '0_abcdefgh', :old_media_id => '1_01234567', :context => @course)
 
       expect(MediaObject.by_media_id('0_abcdefgh').first).to eq mo
@@ -35,7 +35,7 @@ describe MediaObject do
 
   describe ".build_media_objects" do
     it "should delete attachments created temporarily for import" do
-      course
+      course_factory
       folder = Folder.assert_path(CC::CCHelper::MEDIA_OBJECTS_FOLDER, @course)
       @a1 = attachment_model(:folder => folder, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       @a2 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
@@ -51,7 +51,7 @@ describe MediaObject do
     end
 
     it "should build media objects from attachment_id" do
-      course
+      course_factory
       @a1 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       @a3 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       @a4 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
@@ -62,9 +62,9 @@ describe MediaObject do
               { :entryId => "test4", :originalId => "attachment_id=#{@a4.id}" }
           ],
       }
-      MediaObject.create!(:context => user, :media_id => "test")
-      MediaObject.create!(:context => user, :media_id => "test2")
-      MediaObject.create!(:context => user, :media_id => "test3")
+      MediaObject.create!(:context => user_factory, :media_id => "test")
+      MediaObject.create!(:context => user_factory, :media_id => "test2")
+      MediaObject.create!(:context => user_factory, :media_id => "test3")
       MediaObject.build_media_objects(data, Account.default.id)
       media_object = MediaObject.where(attachment_id: @a1).first
       expect(media_object).not_to be_nil
@@ -77,7 +77,7 @@ describe MediaObject do
 
   describe ".ensure_media_object" do
     it "should not create if the media object exists already" do
-      MediaObject.create!(:context => user, :media_id => "test")
+      MediaObject.create!(:context => user_factory, :media_id => "test")
       MediaObject.expects(:create!).never
       MediaObject.ensure_media_object("test", {})
     end
@@ -91,7 +91,7 @@ describe MediaObject do
 
     it "should create the media object" do
       MediaObject.expects(:media_id_exists?).with("test").returns(true)
-      MediaObject.ensure_media_object("test", { :context => user })
+      MediaObject.ensure_media_object("test", { :context => user_factory })
       run_jobs
       obj = MediaObject.by_media_id("test").first
       expect(obj.context).to eq @user
@@ -100,7 +100,7 @@ describe MediaObject do
 
   describe '#transcoded_details' do
     it 'returns the mp3 info' do
-      mo = MediaObject.create!(:context => user, :media_id => "test")
+      mo = MediaObject.create!(:context => user_factory, :media_id => "test")
       expect(mo.transcoded_details).to be_nil
       mo.data = { extensions: { mov: { id: "t-xxx" } } }
       expect(mo.transcoded_details).to be_nil
@@ -109,7 +109,7 @@ describe MediaObject do
     end
 
     it 'returns the mp4 info' do
-      mo = MediaObject.create!(:context => user, :media_id => "test")
+      mo = MediaObject.create!(:context => user_factory, :media_id => "test")
       mo.data = { extensions: { mp4: { id: "t-yyy" } } }
       expect(mo.transcoded_details).to eq(id: "t-yyy")
     end
@@ -118,7 +118,7 @@ describe MediaObject do
   describe '#retrieve_details_ensure_codecs' do
     it "retries later when the transcode isn't available" do
       Timecop.freeze do
-        mo = MediaObject.create!(:context => user, :media_id => "test")
+        mo = MediaObject.create!(:context => user_factory, :media_id => "test")
         mo.expects(:retrieve_details)
         mo.expects(:send_at).with(5.minutes.from_now, :retrieve_details_ensure_codecs, 2)
         mo.retrieve_details_ensure_codecs(1)
@@ -126,7 +126,7 @@ describe MediaObject do
     end
 
     it "verifies existence of the transcoded details" do
-      mo = MediaObject.create!(:context => user, :media_id => "test")
+      mo = MediaObject.create!(:context => user_factory, :media_id => "test")
       mo.data = { extensions: { mp4: { id: "t-yyy" } } }
       mo.expects(:retrieve_details)
       mo.expects(:send_at).never
@@ -172,7 +172,7 @@ describe MediaObject do
       it "should not allow course non-admin users to add_captions to objects not belonging to them" do
         course_with_student
         mo = media_object
-        user
+        user_factory
 
         mo.user = @user
         mo.save!

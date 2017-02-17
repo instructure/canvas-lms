@@ -1,4 +1,4 @@
-class SetDiscussionEntryRootIds < ActiveRecord::Migration
+class SetDiscussionEntryRootIds < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

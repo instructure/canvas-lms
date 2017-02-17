@@ -176,6 +176,7 @@ module Importers
         end
       end
       item ||= context.quizzes.temp_record
+      item.mark_as_importing!(migration)
       new_record = item.new_record? || item.deleted?
 
       hash[:due_at] ||= hash[:due_date]
@@ -223,7 +224,8 @@ module Importers
       item.save!
       build_assignment = false
 
-      if question_data
+      skip_questions = migration.for_master_course_import? && item.edit_types_locked_for_overwrite_on_import.include?(:content)
+      if question_data && !skip_questions
         question_data[:qq_ids] ||= {}
         hash[:questions] ||= []
 
@@ -253,7 +255,7 @@ module Importers
       item.reload # reload to catch question additions
 
       if hash[:assignment]
-        if hash[:assignment][:migration_id]
+        if hash[:assignment][:migration_id] && !hash[:assignment][:migration_id].start_with?(MasterCourses::MIGRATION_ID_PREFIX)
           item.assignment ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:assignment][:migration_id]).first
         end
         item.assignment = nil if item.assignment && item.assignment.quiz && item.assignment.quiz.id != item.id
@@ -272,11 +274,18 @@ module Importers
 
       if hash[:assignment_overrides]
         hash[:assignment_overrides].each do |o|
-          override = item.assignment_overrides.build
+          override = item.assignment_overrides.where(o.slice(:set_type, :set_id)).first
+          override ||= item.assignment_overrides.build
           override.set_type = o[:set_type]
           override.title = o[:title]
           override.set_id = o[:set_id]
+          AssignmentOverride.overridden_dates.each do |field|
+            next unless o.key?(field)
+            override.send "override_#{field}", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(o[field])
+          end
           override.save!
+          migration.add_imported_item(override,
+            key: [item.migration_id, override.set_type, override.set_id].join('/'))
         end
       end
 

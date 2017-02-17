@@ -1,4 +1,4 @@
-class DropPsqlJobsPopFn < ActiveRecord::Migration
+class DropPsqlJobsPopFn < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.connection

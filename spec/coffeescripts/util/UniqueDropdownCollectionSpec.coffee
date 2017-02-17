@@ -5,7 +5,7 @@ define [
   'underscore'
 ], (UniqueDropdownCollection, Backbone, _) ->
 
-  module "UniqueDropdownCollection",
+  QUnit.module "UniqueDropdownCollection",
     setup: ->
       @records = (new Backbone.Model(id: i, state: i.toString()) for i in [1..3])
       @coll = new UniqueDropdownCollection @records,
@@ -68,7 +68,7 @@ define [
     @coll.add {}
 
 
-  module "UniqueDropdownCollection, lazy setup",
+  QUnit.module "UniqueDropdownCollection, lazy setup",
     setup: ->
       @records = (new Backbone.Model(id: i, state: i.toString()) for i in [1..3])
       @coll = new UniqueDropdownCollection [],

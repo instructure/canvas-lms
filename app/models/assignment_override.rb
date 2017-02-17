@@ -22,8 +22,6 @@ class AssignmentOverride < ActiveRecord::Base
 
   simply_versioned :keep => 10
 
-  strong_params
-
   attr_accessor :dont_touch_assignment, :preloaded_student_ids, :changed_student_ids
 
   belongs_to :assignment
@@ -128,7 +126,9 @@ class AssignmentOverride < ActiveRecord::Base
 
     if ActiveRecord::Relation === visible_ids
       column = visible_ids.klass == User ? :id : visible_ids.select_values.first
-      scope = scope.joins("INNER JOIN #{visible_ids.klass.quoted_table_name} ON assignment_override_students.user_id=#{visible_ids.klass.table_name}.#{column}")
+      scope = scope.primary_shard.activate {
+        scope.joins("INNER JOIN #{visible_ids.klass.quoted_table_name} ON assignment_override_students.user_id=#{visible_ids.klass.table_name}.#{column}")
+      }
       return scope.merge(visible_ids.except(:select))
     end
 
@@ -211,9 +211,14 @@ class AssignmentOverride < ActiveRecord::Base
     (override.assignment || override.quiz).context.enrollments_visible_to(user)
   end
 
-  override :due_at
-  override :unlock_at
-  override :lock_at
+  OVERRIDDEN_DATES = %i(due_at unlock_at lock_at).freeze
+  OVERRIDDEN_DATES.each do |field|
+    override field
+  end
+
+  def self.overridden_dates
+    OVERRIDDEN_DATES
+  end
 
   def due_at=(new_due_at)
     new_due_at = CanvasTime.fancy_midnight(new_due_at)

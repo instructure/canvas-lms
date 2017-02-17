@@ -1,4 +1,4 @@
-class DropCollectionItemUserFk < ActiveRecord::Migration
+class DropCollectionItemUserFk < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

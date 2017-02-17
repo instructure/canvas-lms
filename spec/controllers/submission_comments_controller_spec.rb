@@ -32,7 +32,8 @@ describe SubmissionCommentsController do
 
   describe "PATCH 'update'" do
     before(:once) do
-      course_with_teacher_logged_in(active_all: true)
+      course_with_teacher(active_all: true)
+      @the_teacher = @teacher
       submission_comment_model(author: @teacher, draft_comment: true)
 
       @test_params = {
@@ -42,6 +43,10 @@ describe SubmissionCommentsController do
           draft: false
         }
       }
+    end
+
+    before(:each) do
+      user_session(@the_teacher)
     end
 
     it 'allows updating the status field' do

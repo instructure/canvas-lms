@@ -1,15 +1,14 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/FilePreviewInfoPanel'
   'compiled/models/File'
   'compiled/react_files/utils/getFileStatus'
-], (React, ReactDOM, $, FilePreviewInfoPanel, File, getFileStatus) ->
+], (React, ReactDOM, TestUtils, $, FilePreviewInfoPanel, File, getFileStatus) ->
 
-  TestUtils = React.addons.TestUtils
-
-  module 'File Preview Info Panel Specs',
+  QUnit.module 'File Preview Info Panel Specs',
     setup: ->
       @file = new File
               'content-type': 'text/plain'

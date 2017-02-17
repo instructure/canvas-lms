@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 shared_examples_for "submittable" do
   describe "visible_ids_by_user" do
     before :once do
-      @course = course(active_course: true)
+      @course = course_factory(active_course: true)
 
       @item_without_assignment = submittable_without_assignment
       @item_with_assignment_and_only_vis, @assignment = submittable_and_assignment(only_visible_to_overrides: true)

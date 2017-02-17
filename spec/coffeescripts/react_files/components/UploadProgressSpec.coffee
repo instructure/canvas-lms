@@ -6,7 +6,7 @@ define [
   'compiled/react_files/modules/FileUploader'
 ], (React, ReactDOM, $, UploadProgress, FileUploader) ->
 
-  module 'UploadProgress',
+  QUnit.module 'UploadProgress',
     setup: ->
       ProgressContainer = React.createClass
         getInitialState: ->

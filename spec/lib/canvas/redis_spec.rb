@@ -162,6 +162,100 @@ describe "Canvas::Redis" do
     end
   end
 
+  describe "logging" do
+    let(:key) { 'mykey' }
+    let(:key2) { 'mykey2' }
+    let(:val) { 'myvalue' }
+
+    def json_logline(get = :shift)
+      # drop the non-json logging at the start of the line
+      JSON.parse(Rails.logger.captured_messages.send(get).match(/\{.*/)[0])
+    end
+
+    it "should log information on the redis request" do
+      Rails.logger.capture_messages do
+        Canvas.redis.set(key, val)
+        message = json_logline
+        expect(message["message"]).to eq("redis_request")
+        expect(message["command"]).to eq("set")
+        expect(message["key"]).to eq("mykey")
+        expect(message["request_size"]).to eq((key+val).size)
+        expect(message["response_size"]).to eq(2) # "OK"
+        expect(message["host"]).not_to be_nil
+        expect(message["request_time_ms"]).to be_a(Float)
+      end
+    end
+
+    it "should not log the lua eval code" do
+      Rails.logger.capture_messages do
+        Canvas.redis.eval('local a = 1')
+        message = json_logline
+        expect(message["key"]).to be_nil
+      end
+    end
+
+    it "should log error on redis error response" do
+      Rails.logger.capture_messages do
+        expect { Canvas.redis.eval('totes not lua') }.to raise_error(Redis::CommandError)
+        message = json_logline
+        expect(message["response_size"]).to eq(0)
+        expect(message["error"]).to be_a(String)
+      end
+    end
+
+    context "rails caching" do
+      let(:cache) do
+        ActiveSupport::Cache::RedisStore.new([]).tap do |cache|
+          cache.instance_variable_set(:@data, Canvas.redis.__getobj__)
+        end
+      end
+
+      it "should log the cache fetch block generation time" do
+        begin
+          Timecop.safe_mode = false
+          Timecop.freeze
+          Rails.logger.capture_messages do
+            # make sure this works with fetching nested fetches
+            cache.fetch(key, force: true) do
+              val = "a1"
+              val << cache.fetch(key2, force: true) do
+                Timecop.travel(Time.zone.now + 1.second)
+                "b1"
+              end
+              Timecop.travel(Time.zone.now + 2.seconds)
+              val << "a2"
+            end
+            outer_message = json_logline(:pop)
+            expect(outer_message["command"]).to eq("set")
+            expect(outer_message["key"]).to eq(key)
+            expect(outer_message["request_time_ms"]).to be_a(Float)
+            # 3000 (3s) == 2s outer fetch + 1s inner fetch
+            expect(outer_message["generate_time_ms"]).to be_within(500).of(3000)
+
+            inner_message = json_logline(:pop)
+            expect(inner_message["command"]).to eq("set")
+            expect(inner_message["key"]).to eq(key2)
+            expect(inner_message["request_time_ms"]).to be_a(Float)
+            expect(inner_message["generate_time_ms"]).to be_within(500).of(1000)
+          end
+        ensure
+          Timecop.return
+          Timecop.safe_mode = true
+        end
+      end
+
+      it "should log zero response size on cache miss" do
+        cache.delete(key)
+        Rails.logger.capture_messages do
+          expect(cache.read(key)).to be_nil
+          message = json_logline(:pop)
+          expect(message["command"]).to eq("get")
+          expect(message["response_size"]).to eq(0)
+        end
+      end
+    end
+  end
+
   describe "Canvas::RedisWrapper" do
     it "should wrap redis connections" do
       expect(Canvas.redis.class).to eq Canvas::RedisWrapper

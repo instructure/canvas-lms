@@ -1,4 +1,4 @@
-class CreateSharedBrandConfigs < ActiveRecord::Migration
+class CreateSharedBrandConfigs < ActiveRecord::Migration[4.2]
   tag :predeploy
   LENGTH_OF_AN_MD5_HASH = 32
 

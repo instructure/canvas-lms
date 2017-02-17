@@ -1,4 +1,4 @@
-class DropUnusedColumnsFromAssetUserAccesses < ActiveRecord::Migration
+class DropUnusedColumnsFromAssetUserAccesses < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

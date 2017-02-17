@@ -20,8 +20,6 @@ class AbstractCourse < ActiveRecord::Base
 
   include Workflow
 
-  strong_params
-
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :account
   belongs_to :enrollment_term

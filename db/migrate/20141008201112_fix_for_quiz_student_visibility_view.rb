@@ -1,4 +1,4 @@
-class FixForQuizStudentVisibilityView < ActiveRecord::Migration
+class FixForQuizStudentVisibilityView < ActiveRecord::Migration[4.2]
   tag :predeploy
   def self.up
     self.connection.execute "DROP VIEW #{connection.quote_table_name('quiz_student_visibilities')};"

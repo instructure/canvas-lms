@@ -64,14 +64,14 @@ module CC::Exporter::Epub::Converters
     end
 
     # exports the package into the intermediary json
-    def export
+    def export(export_type)
       unzip_archive
 
       @manifest = open_file(File.join(@unzipped_file_path, MANIFEST_FILE))
       get_all_resources(@manifest)
 
       @course[:title] = get_node_val(@manifest, "string")
-      @course[:files], @unsupported_files = convert_files
+      @course[:files], @unsupported_files = convert_files(export_type)
 
       @course[:pages] = convert_wikis
       @course[:assignments] = convert_assignments

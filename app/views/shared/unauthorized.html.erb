@@ -34,7 +34,7 @@
     <% elsif @needs_cookies %>
       <p><%= t('needs_cookies', %{Cookies are not enabled on your browser. Please adjust this in your security preferences before continuing.}) %></p>
     <% elsif @files_domain %>
-      <p><%= t('needs_login', %{Access to this page is limited to authorized users.  You do not have currently have permission to view this page.}) %></p>
+      <p><%= t('needs_login', %{Access to this page is limited to authorized users.  You do not currently have permission to view this page.}) %></p>
     <% elsif @context %>
       <p>
         <% if @context.try_rescue(:is_public) %>

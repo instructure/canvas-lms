@@ -1,4 +1,4 @@
-class AddCalculationMethodToLearningOutcomes < ActiveRecord::Migration
+class AddCalculationMethodToLearningOutcomes < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

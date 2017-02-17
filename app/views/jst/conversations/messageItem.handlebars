@@ -34,6 +34,7 @@
 
     {{#unless for_submission}}
     <ul class="actions pull-right unstyled">
+      {{#unless cannot_reply}}
       <li>
         <a href="#"
            class="icon-reply-2 reply-btn Button Button--icon-action"
@@ -42,6 +43,7 @@
           <span class="screenreader-only">{{#t "reply"}}Reply{{/t}}</span>
         </a>
       </li>
+      {{/unless}}
 
       <li>
         <div class="inline-block">
@@ -56,9 +58,11 @@
             <span class="screenreader-only">{{#t "message_actions"}}Message actions{{/t}}</span>
           </a>
           <ul class="al-options">
-            <li>
-              <a href="#" class="reply-all-btn">{{#t "reply_all"}}Reply all{{/t}}</a>
-            </li>
+            {{#unless cannot_reply}}
+              <li>
+                <a href="#" class="reply-all-btn">{{#t "reply_all"}}Reply all{{/t}}</a>
+              </li>
+            {{/unless}}
             <li>
               <a href="#" class="forward-btn">{{#t "forward"}}Forward{{/t}}</a>
             </li>

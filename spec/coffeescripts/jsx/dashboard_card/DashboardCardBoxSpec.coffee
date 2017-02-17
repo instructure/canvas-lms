@@ -1,16 +1,15 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jsx/dashboard_card/DashboardCardBox'
   'jsx/dashboard_card/CourseActivitySummaryStore'
-], (React, ReactDOM, _, DashboardCardBox, CourseActivitySummaryStore) ->
+], (React, ReactDOM, TestUtils, _, DashboardCardBox, CourseActivitySummaryStore) ->
 
-  TestUtils = React.addons.TestUtils
-
-  module 'DashboardCardBox',
+  QUnit.module 'DashboardCardBox',
     setup: ->
-      @stub(CourseActivitySummaryStore, 'getStateForCourse', -> {})
+      @stub(CourseActivitySummaryStore, 'getStateForCourse').returns({})
       @courseCards = [{
         id: 1,
         shortName: 'Bio 101'

@@ -1,4 +1,4 @@
-class CreateQuizRegradeRuns < ActiveRecord::Migration
+class CreateQuizRegradeRuns < ActiveRecord::Migration[4.2]
   tag :predeploy
   def self.up
     create_table :quiz_regrade_runs do |t|

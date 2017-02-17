@@ -48,13 +48,13 @@ describe "/gradebooks/grade_summary" do
     @user = @teacher
     view_context
     a = @course.assignments.create!(:title => "some assignment")
-    assigns[:presenter] = GradeSummaryPresenter.new(@course, @teacher, @student.id)
-    expect(assigns[:presenter].student_enrollment).not_to be_nil
+    assigns[:presenter] = presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+    expect(presenter.student_enrollment).not_to be_nil
     render "gradebooks/grade_summary"
     expect(response).not_to be_nil
     expect(response.body).not_to match(/Click any score/)
   end
-  
+
   it "should know the types of media comments" do
     stub_kaltura
     course_with_teacher
@@ -77,7 +77,7 @@ describe "/gradebooks/grade_summary" do
     @user = @teacher
     view_context
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 10)
-    a.grade_student(@student, grade: "10")
+    a.grade_student(@student, grade: "10", grader: @teacher)
     assigns[:presenter] = GradeSummaryPresenter.new(@course, @teacher, @student.id)
     render "gradebooks/grade_summary"
     expect(response).not_to be_nil

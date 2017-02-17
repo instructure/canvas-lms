@@ -1,15 +1,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/conversations_common')
 require_relative '../helpers/shared_examples_common'
-include SharedExamplesCommon
 
 describe "conversations new" do
   include_context "in-process server selenium tests"
+  include SharedExamplesCommon
   include ConversationsCommon
 
   before do
     conversation_setup
-    @s1 = user(name: "first student")
-    @s2 = user(name: "second student")
+    @s1 = user_factory(name: "first student")
+    @s2 = user_factory(name: "second student")
     [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
     cat = @course.group_categories.create(:name => "the groups")
     @group = cat.groups.create(:name => "the group", :context => @course)
@@ -19,7 +19,7 @@ describe "conversations new" do
   context 'submission comment stream items' do
     before do
       @course1 = @course
-      @course2 = course(active_course: true)
+      @course2 = course_factory(active_course: true)
       teacher_in_course(user: @teacher, course: @course2, active_all: true)
       student_in_course(user: @s1, active_all: true, course: @course1)
       student_in_course(user: @s2, active_all: true, course: @course2)
@@ -28,8 +28,8 @@ describe "conversations new" do
         assignment = course.assignments.create!(:title => title, :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
         sub = assignment.grade_student(student, { :grade => '12', :grader => @teacher}).first
         sub.workflow_state = 'submitted'
-        sub.submission_comments.create!(:comment => 'c1', :author => @teacher, :recipient_id => student.id)
-        sub.submission_comments.create!(:comment => 'c2', :author => student, :recipient_id => @teacher.id)
+        sub.submission_comments.create!(:comment => 'c1', :author => @teacher)
+        sub.submission_comments.create!(:comment => 'c2', :author => student)
         sub.save!
         sub
       end

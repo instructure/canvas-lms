@@ -1,4 +1,4 @@
-class MoveScribdDocsToRootAttachments < ActiveRecord::Migration
+class MoveScribdDocsToRootAttachments < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

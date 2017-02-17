@@ -117,7 +117,7 @@ define([
           </div>
 
           <div className="col-xs-1" role='gridcell'>
-            <div className="totalStudents">{total_students}</div>
+            <div className="totalStudents">{I18n.n(total_students)}</div>
           </div>
           <div className="col-xs-2" role='gridcell'>
             <div className="courses-user-list-actions">

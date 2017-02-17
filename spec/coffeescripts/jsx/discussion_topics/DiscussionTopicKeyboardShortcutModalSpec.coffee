@@ -3,9 +3,8 @@ define [
   'jsx/discussion_topics/DiscussionTopicKeyboardShortcutModal'
   'react'
   'react-dom'
-], ($, DiscussionTopicKeyboardShortcutModal, React, ReactDOM) ->
-
-  TestUtils = React.addons.TestUtils
+  'react-addons-test-utils'
+], ($, DiscussionTopicKeyboardShortcutModal, React, ReactDOM, TestUtils) ->
 
   SHORTCUTS = [
     { keycode: 'j', description: I18n.t('Next Message') },
@@ -16,7 +15,7 @@ define [
     { keycode: 'n', description: I18n.t('Reply to Topic') }
   ]
 
-  module 'DiscussionTopicKeyboardShortcutModal#render',
+  QUnit.module 'DiscussionTopicKeyboardShortcutModal#render',
     setup: ->
       $('#fixtures').append('<div id="application" />')
 

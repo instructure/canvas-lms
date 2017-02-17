@@ -3,11 +3,10 @@ define [
   'jsx/shared/KeyboardShortcutModal'
   'react'
   'react-dom'
-], ($, KeyboardShortcutModal, React, ReactDOM) ->
+  'react-addons-test-utils'
+], ($, KeyboardShortcutModal, React, ReactDOM, TestUtils) ->
 
-  TestUtils = React.addons.TestUtils
-
-  module 'KeyboardShortcutModal#handleKeydown',
+  QUnit.module 'KeyboardShortcutModal#handleKeydown',
     setup: ->
       $('#fixtures').append('<div id="application" />')
       KeyboardShortcutModalElement = React.createElement(KeyboardShortcutModal)
@@ -32,7 +31,7 @@ define [
     document.dispatchEvent(e)
     ok $('.ReactModalPortal').find('.keyboard_navigation').length is 1
 
-  module 'KeyboardShortcutModal#render',
+  QUnit.module 'KeyboardShortcutModal#render',
     setup: ->
       $('#fixtures').append('<div id="application" />')
 

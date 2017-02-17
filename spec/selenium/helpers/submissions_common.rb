@@ -18,7 +18,7 @@ module SubmissionsCommon
   end
 
   def open_media_comment_dialog
-    f('.media_comment_link').click
+    move_to_click('.media_comment_link')
     # swf and stuff loads, give it a sec to do its thing
     sleep 0.5
   end

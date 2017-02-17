@@ -120,7 +120,7 @@ describe "enhanceable_content" do
   context "media file preview thumbnails" do
     before :each do
       stub_kaltura
-      course(:active_all => true)
+      course_factory(active_all: true)
 
       @attachment = @course.attachments.create!(:uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       @page = @course.wiki.wiki_pages.build(:title => 'title')

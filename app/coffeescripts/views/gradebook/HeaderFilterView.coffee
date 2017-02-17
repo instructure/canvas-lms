@@ -1,8 +1,8 @@
 define [
-  'i18n!gradebook2'
+  'i18n!gradebook'
   'Backbone'
-  'compiled/gradebook2/OutcomeGradebookGrid'
-  'jst/gradebook2/header_filter'
+  'compiled/gradebook/OutcomeGradebookGrid'
+  'jst/gradebook/header_filter'
 ], (I18n, {View}, Grid, template) ->
 
   class HeaderFilterView extends View

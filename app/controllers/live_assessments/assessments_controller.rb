@@ -45,8 +45,8 @@ module LiveAssessments
   #     }
 
   class AssessmentsController < ApplicationController
-    before_filter :require_user
-    before_filter :require_context
+    before_action :require_user
+    before_action :require_context
 
     # @API Create or find a live assessment
     # @beta

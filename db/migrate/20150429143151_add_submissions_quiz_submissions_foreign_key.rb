@@ -1,4 +1,4 @@
-class AddSubmissionsQuizSubmissionsForeignKey < ActiveRecord::Migration
+class AddSubmissionsQuizSubmissionsForeignKey < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

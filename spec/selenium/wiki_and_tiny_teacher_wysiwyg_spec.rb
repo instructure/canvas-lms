@@ -63,7 +63,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       f(".mce-i-bullist").click
       in_frame wiki_page_body_ifr_id do
-        ff('#tinymce li').length == 3
+        expect(ff('#tinymce li').length).to eq 3
       end
     end
 
@@ -71,7 +71,10 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       text = "<ul><li>1</li><li>2</li><li>3</li></ul>"
       wysiwyg_state_setup(text, html: true)
 
+      # editor window needs focus in chrome to enable bullet list button
+      f("form.edit-form .edit-content").click if driver.browser == :chrome
       f(".mce-i-bullist").click
+
       in_frame wiki_page_body_ifr_id do
         expect(f("#tinymce")).not_to contain_css('li')
       end
@@ -82,7 +85,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       f('.mce-i-numlist').click
       in_frame wiki_page_body_ifr_id do
-        ff('#tinymce li').length == 3
+        expect(ff('#tinymce li').length).to eq 3
       end
     end
 
@@ -90,7 +93,10 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       text = "<ol><li>1</li><li>2</li><li>3</li></ol>"
       wysiwyg_state_setup(text, html: true)
 
+      # editor window needs focus in chrome to enable number list button
+      f("form.edit-form .edit-content").click if driver.browser == :chrome
       f('.mce-i-numlist').click
+
       in_frame wiki_page_body_ifr_id do
         expect(f("#tinymce")).not_to contain_css('li')
       end
@@ -520,6 +526,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should add an equation to the rce by using the equation editor", priority: "2", test_id: 397972 do
+      skip('this test depends on codecogs.com.  needs to be rewritten: CNVS-33123')
       equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}=\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
 
       get "/courses/#{@course.id}/pages/front-page/edit"
@@ -573,6 +580,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should add an equation to the rce by using the equation editor in advanced view" do
+      skip('this test depends on codecogs.com.  needs to be rewritten: CNVS-33123')
       equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}= \\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
 
       get "/courses/#{@course.id}/pages/front-page/edit"
@@ -613,6 +621,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it 'should not throw page error with invalid LaTex on assignments', priority: "2", test_id: 237012 do
+      skip('this test depends on codecogs.com.  needs to be rewritten: CNVS-33123')
       Assignment.new.tap do |a|
         a.id = 1
         a.title = 'test assignment'
@@ -631,6 +640,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it 'should not throw page error with invalid LaTex on discussions', priority: "2", test_id: 237013 do
+      skip('this test depends on codecogs.com.  needs to be rewritten: CNVS-33123')
       DiscussionTopic.new.tap do |d|
         d.id = 1
         d.title = 'test discussion'

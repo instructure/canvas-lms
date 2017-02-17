@@ -1,12 +1,11 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/assignments/ModerationHeader'
-], (React, ReactDOM, Header) ->
+], (React, ReactDOM, TestUtils, Header) ->
 
-  TestUtils = React.addons.TestUtils
-
-  module 'ModerationHeader',
+  QUnit.module 'ModerationHeader',
     setup: ->
       @props =
         onPublishClick: ->

@@ -1,4 +1,4 @@
-class UnreadCounts < ActiveRecord::Migration
+class UnreadCounts < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

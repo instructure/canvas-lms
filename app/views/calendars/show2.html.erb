@@ -9,7 +9,8 @@
     :CAL2_ONLY => true,
     :SHOW_SCHEDULER => @domain_root_account.show_scheduler?,
     :BETTER_SCHEDULER => @domain_root_account.feature_enabled?(:better_scheduler) && @domain_root_account.show_scheduler?,
-    :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size
+    :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size,
+    :VISIBLE_CONTEXTS_LIMIT => @domain_root_account.settings[:calendar_contexts_limit] || 10
   }
   js_bundle :calendar2
   css_bundle :calendar2, :agenda_view
@@ -43,7 +44,7 @@
   <div class="rs-section" id="undated-events-section">
     <span href="#" role="button" id="undated-events-button" class="element_toggler" aria-controls="undated-events" aria-expanded="false"
         aria-label="<%= t("Undated items toggle list visibility") %>" tabindex="0">
-      <i class="icon-mini-arrow-right auto_rotate"></i> <%= t(:undated_items, "Undated items") %>
+      <i class="icon-mini-arrow-right auto_rotate"></i> <%= t(:undated_items, "Undated") %>
     </span>
     <div id="undated-events"></div>
   </div>

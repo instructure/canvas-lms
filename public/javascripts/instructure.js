@@ -207,7 +207,7 @@ define([
         menuItemHoverTimeoutId;
 
     // Makes sure that the courses/groups menu is openable by clicking
-    $coursesItem = $menu.find('#courses_menu_item .menu-item-title');
+    var $coursesItem = $menu.find('#courses_menu_item .menu-item-title');
     $coursesItem.click(function (e) {
       if (e.metaKey || e.ctrlKey) return;
       e.preventDefault();
@@ -405,7 +405,7 @@ define([
           if (attachment &&
                 ($.isPreviewable(attachment.content_type, 'google') ||
                  attachment.canvadoc_session_url)) {
-            var $div = $("<span><br /></span>")
+            var $div = $("<div>")
               .insertAfter($link.parents(".link_holder:last"))
               .loadDocPreview({
                 canvadoc_session_url: attachment.canvadoc_session_url,
@@ -413,7 +413,7 @@ define([
                 public_url: attachment.authenticated_s3_url,
                 attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
               })
-              .append(
+              .prepend(
                 $('<a href="#" style="font-size: 0.8em;" class="hide_file_preview_link">' + htmlEscape(I18n.t('links.minimize_file_preview', 'Minimize File Preview')) + '</a>')
                 .click(function(event) {
                   event.preventDefault();
@@ -838,10 +838,12 @@ define([
       var sf = $('#sequence_footer')
       if (sf.length) {
         var el = $(sf[0]);
-        el.moduleSequenceFooter({
-          courseID: el.attr("data-course-id"),
-          assetType: el.attr("data-asset-type"),
-          assetID: el.attr("data-asset-id")
+        require(['compiled/jquery/ModuleSequenceFooter'], function (){
+          el.moduleSequenceFooter({
+            courseID: el.attr("data-course-id"),
+            assetType: el.attr("data-asset-type"),
+            assetID: el.attr("data-asset-id")
+          });
         });
       }
     }

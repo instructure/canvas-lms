@@ -10,10 +10,10 @@ class ConversationBatch < ActiveRecord::Base
   after_create :queue_delivery
 
   validates_presence_of :user_id, :workflow_state, :root_conversation_message_id
+  validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
 
   scope :in_progress, -> { where(:workflow_state => ['created', 'sending']) }
 
-  attr_accessible
   attr_accessor :mode
 
   attr_reader :conversations

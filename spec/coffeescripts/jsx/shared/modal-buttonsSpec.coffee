@@ -2,12 +2,11 @@ define [
   'jquery'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/shared/modal-buttons'
-], ($, React, ReactDOM, ModalButtons) ->
+], ($, React, ReactDOM, TestUtils, ModalButtons) ->
 
-  TestUtils = React.addons.TestUtils
-
-  module 'ModalButtons'
+  QUnit.module 'ModalButtons'
 
   test "applies className", ->
     ModalButtonsElement = React.createElement(ModalButtons, className: "cat", footerClassName: "dog")

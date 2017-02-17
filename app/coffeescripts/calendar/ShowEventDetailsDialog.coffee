@@ -41,7 +41,7 @@ define [
       $("<div />").confirmDelete
         url: url
         message: $ deleteItemTemplate(message: opts.message || event.deleteConfirmation, hide_reason: event.object.workflow_state isnt 'locked')
-        dialog: {title: opts.dialogTitle || I18n.t('confirm_deletion', "Confirm Deletion")}
+        dialog: {title: opts.dialogTitle || I18n.t("Confirm Deletion")}
         prepareData: ($dialog) => {cancel_reason: $dialog.find('#cancel_reason').val() }
         confirmed: () =>
           @popover.hide()
@@ -49,7 +49,8 @@ define [
         success: () =>
           $.publish "CommonEvent/eventDeleted", event
 
-    reserveErrorCB: (data) =>
+    reserveErrorCB: (data, request) =>
+      $.publish "CommonEvent/eventSaveFailed", @event
       for error in data when error.message is 'participant has met per-participant limit'
         errorHandled = true
         error.reschedulable = error.reservations.length == 1
@@ -58,10 +59,10 @@ define [
           width: 450
           buttons: if error.reschedulable
                      [
-                       text: I18n.t 'do_nothing', 'Do Nothing'
+                       text: I18n.t 'Do Nothing'
                        click: -> $dialog.dialog('close')
                      ,
-                       text: I18n.t 'reschedule', 'Reschedule'
+                       text: I18n.t 'Reschedule'
                        'class': 'btn-primary'
                        click: =>
                          $dialog.disableWhileLoading @reserveEvent({cancel_existing:true}).always ->
@@ -69,17 +70,15 @@ define [
                      ]
                    else
                      [
-                       text: I18n.t 'ok', 'OK'
+                       text: I18n.t 'OK'
                        click: -> $dialog.dialog('close')
                      ]
-
       unless errorHandled
-        alert "Could not reserve event: #{data}"
-        $.publish "CommonEvent/eventSaveFailed", @event
+        # defer to the default error dialog
+        $.ajaxJSON.unhandledXHRs.push(request);
+        $.fn.defaultAjaxError.func.apply($.fn.defaultAjaxError.object, arguments)
 
     reserveSuccessCB: (cancel_existing, data) ->
-      @popover.hide()
-
       # remove previous signup(s), if applicable (this has already happened on the backend)
       if cancel_existing
         for own k, v of @dataSource.cache.contexts[@event.contextInfo.asset_string].events
@@ -99,6 +98,7 @@ define [
 
     reserveEvent: (params={}) =>
       params['comments'] = $('#appointment-comment').val()
+      @popover.hide()
       $.publish "CommonEvent/eventSaving", @event
       $.ajaxJSON @event.object.reserve_url, 'POST', params, @reserveSuccessCB.bind(this, params.cancel_existing), @reserveErrorCB
 
@@ -110,7 +110,7 @@ define [
           e.object?.own_reservation
 
       for e in events
-        @deleteEvent(e, dialogTitle: I18n.t('confirm_unreserve', "Confirm Reservation Removal"), message: I18n.t('prompts.unreserve_event', "Are you sure you want to delete your reservation to this event?"))
+        @deleteEvent(e, dialogTitle: I18n.t("Confirm Reservation Removal"), message: I18n.t("Are you sure you want to delete your reservation to this event?"))
         return
 
     cancelAppointment: ($appt) =>
@@ -119,12 +119,11 @@ define [
       $("<div/>").confirmDelete
         url: url
         message: $ deleteItemTemplate(message: I18n.t(
-          'cancel_appointment'
           'Are you sure you want to cancel your appointment with %{name}?'
           name: event.user?.short_name or event.group.name)
         )
         dialog:
-          title: I18n.t('confirm_removal', "Confirm Removal")
+          title: I18n.t("Confirm Removal")
           width: '400px'
           resizable: false
         prepareData: ($dialog) => {cancel_reason: $dialog.find('#cancel_reason').val() }
@@ -173,11 +172,23 @@ define [
       else if @event.object?.available_slots > 0
         params.availableSlotsText = @event.object.available_slots
 
+      if @event.calendarEvent
+        contextCodes = @event.calendarEvent.all_context_codes.split(',')
+        params.isGreaterThanOne = contextCodes.length > 1
+        params.contextsCount = contextCodes.length - 1
+        params.contextsName = @dataSource.contexts.map((context) =>
+          if contextCodes.includes(context.asset_string)
+            return context.name
+          else
+            ""
+        ).filter((context) => context.length > 0)
+
       params.use_new_scheduler = ENV.CALENDAR.BETTER_SCHEDULER
       params.is_appointment_group = !!@event.isAppointmentGroupEvent() # this returns the actual url so make it boolean for clarity
       params.reserve_comments = @event.object.reserve_comments ?= @event.object.comments
       params.showEventLink   = params.fullDetailsURL()
       params.showEventLink or= params.isAppointmentGroupEvent()
+
       @popover = new Popover(jsEvent, eventDetailsTemplate(params))
       @popover.el.data('showEventDetailsDialog', @)
 

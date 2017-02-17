@@ -59,7 +59,7 @@ class GradeSummaryPresenter
   def turnitin_enabled?
     @context.turnitin_enabled? && assignments.any?(&:turnitin_enabled)
   end
-  
+
   def vericite_enabled?
     @context.vericite_enabled? && assignments.any?(&:vericite_enabled)
   end
@@ -121,43 +121,29 @@ class GradeSummaryPresenter
   end
 
   def groups
-    @groups ||= @context.assignment_groups.active.to_a
+    all_groups
   end
 
-  def assignments(grading_period_id: nil)
+  def assignments
     @assignments ||= begin
-      visible_assignments = assignments_visible_to_student(grading_period_id)
+      visible_assignments = assignments_visible_to_student
       overridden_assignments = assignments_overridden_for_student(visible_assignments)
       sorted_assignments(overridden_assignments)
     end
   end
 
-  def assignments_visible_to_student(grading_period_id)
+  def assignments_visible_to_student
     includes = [:assignment_overrides]
     includes << :assignment_group if @assignment_order == :assignment_group
-    visible_assignments = AssignmentGroup
-      .visible_assignments(student, @context, groups, includes)
-      .where.not(submission_types: %w(not_graded wiki_page))
-      .except(:order)
-
-    if grading_period_id
-      visible_assignments = grading_period_assignments(grading_period_id, visible_assignments)
-    end
-
-    visible_assignments
+    AssignmentGroup.
+      visible_assignments(student, @context, all_groups, includes).
+      where.not(submission_types: %w(not_graded wiki_page)).
+      except(:order)
   end
 
-  def grading_period_assignments(grading_period_id, assignments)
-    grading_period = GradingPeriod.for(@context).find_by(id: grading_period_id)
-    if grading_period
-      grading_period.assignments_for_student(assignments, student)
-    else
-      assignments
-    end
-  end
 
   def assignments_overridden_for_student(assignments)
-    group_index = groups.index_by(&:id)
+    group_index = all_groups.index_by(&:id)
     assignments.map do |assignment|
       assignment.context = @context
       assignment.assignment_group = group_index.fetch(assignment.assignment_group_id)
@@ -299,6 +285,10 @@ class GradeSummaryPresenter
   end
 
   private
+
+  def all_groups
+    @all_groups ||= @context.assignment_groups.active.to_a
+  end
 
   def sorted_by_modules(assignments)
     Assignment.preload_context_module_tags(assignments, include_context_modules: true)

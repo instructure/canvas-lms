@@ -1,7 +1,7 @@
 define([
   "react",
   "underscore",
-  "bower/classnames/index"
+  "classnames"
 ], function(React, _, classnames) {
 
   var { string, any, bool } = React.PropTypes;

@@ -315,8 +315,8 @@
 #     }
 #
 class ContextModulesApiController < ApplicationController
-  before_filter :require_context
-  before_filter :find_student, :only => [:index, :show]
+  before_action :require_context
+  before_action :find_student, :only => [:index, :show]
   include Api::V1::ContextModule
 
   # @API List modules
@@ -519,7 +519,7 @@ class ContextModulesApiController < ApplicationController
       return render :json => {:message => "missing module parameter"}, :status => :bad_request unless params[:module]
       return render :json => {:message => "missing module name"}, :status => :bad_request unless params[:module][:name].present?
 
-      module_parameters = params[:module].slice(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
+      module_parameters = params.require(:module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
 
       @module = @context.context_modules.build(module_parameters)
 
@@ -579,7 +579,7 @@ class ContextModulesApiController < ApplicationController
     @module = @context.context_modules.not_deleted.find(params[:id])
     if authorized_action(@module, @current_user, :update)
       return render :json => {:message => "missing module parameter"}, :status => :bad_request unless params[:module]
-      module_parameters = params[:module].slice(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
+      module_parameters = params.require(:module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
 
       if ids = params[:module][:prerequisite_module_ids]
         if ids.blank?
@@ -593,6 +593,7 @@ class ContextModulesApiController < ApplicationController
         if value_to_boolean(params[:module][:published])
           @module.publish
           @module.publish_items!
+          publish_warning = @module.content_tags.any?(&:unpublished?)
         else
           @module.unpublish
         end
@@ -602,6 +603,7 @@ class ContextModulesApiController < ApplicationController
       if @module.update_attributes(module_parameters) && set_position
         json = module_json(@module, @current_user, session, nil)
         json['relock_warning'] = true if relock_warning || @module.relock_warning?
+        json['publish_warning'] = publish_warning.present?
         render :json => json
       else
         render :json => @module.errors, :status => :bad_request

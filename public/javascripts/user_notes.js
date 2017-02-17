@@ -22,7 +22,8 @@ define([
   'jquery.instructure_forms',
   'jquery.loadingImg',
   'jquery.instructure_date_and_time',
-  'jquery.instructure_misc_plugins'
+  'jquery.instructure_misc_plugins',
+  'vendor/jquery.pageless' // this is for the $(...).pageless call in app/helpers/user_notes_helper.rb
 ], function(I18n, $) {
 
   $(".cancel_button").click(function() {

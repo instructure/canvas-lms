@@ -9,7 +9,7 @@ describe ExternalContentController do
     end
 
     it "gets a context for external_tool_dialog" do
-      c = course
+      c = course_factory
       get :success, service: 'external_tool_dialog', course_id: c.id
       expect(assigns[:context]).to_not be_nil
     end
@@ -18,7 +18,7 @@ describe ExternalContentController do
   describe "POST success/external_tool_dialog" do
     it "js env is set correctly" do
 
-      c = course
+      c = course_factory
       post(:success, service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
            lti_version: 'LTI-1p0',
            data: '',
@@ -51,7 +51,7 @@ describe ExternalContentController do
     end
 
     context 'external_tool service_id' do
-      let(:test_course) {course}
+      let(:test_course) {course_factory}
       let(:launch_url) {'http://test.com/launch'}
       let(:tool) do
         test_course.context_external_tools.create!(
@@ -151,7 +151,7 @@ describe ExternalContentController do
 
   describe "#content_items_for_canvas" do
     it 'sets default placement advice' do
-      c = course
+      c = course_factory
       post(:success, service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
            lti_version: 'LTI-1p0',
            data: '',
@@ -168,7 +168,7 @@ describe ExternalContentController do
     end
 
     it "uses the default url if one isn't provided" do
-      c = course
+      c = course_factory
       json = JSON.parse(File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items_2.json')))
       json['@graph'][0].delete('url')
       launch_url = 'http://example.com/launch'
@@ -187,7 +187,7 @@ describe ExternalContentController do
 
     context 'lti_links' do
       it "generates a canvas tool launch url" do
-        c = course
+        c = course_factory
         json = JSON.parse(File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')))
         post(:success, service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
              lti_version: 'LTI-1p0' ,
@@ -199,7 +199,7 @@ describe ExternalContentController do
       end
 
       it "generates a borderless launch url for iframe target" do
-        c = course
+        c = course_factory
         json = JSON.parse(File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')))
         json['@graph'][0]['placementAdvice']['presentationDocumentTarget'] = 'iframe'
         post(:success, service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
@@ -211,7 +211,7 @@ describe ExternalContentController do
       end
 
       it "generates a borderless launch url for window target" do
-        c = course
+        c = course_factory
         json = JSON.parse(File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')))
         json['@graph'][0]['placementAdvice']['presentationDocumentTarget'] = 'window'
         post(:success, service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',

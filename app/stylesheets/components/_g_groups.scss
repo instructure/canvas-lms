@@ -156,13 +156,16 @@
 // group switcher within left sub-nav
 .al-trigger--within-left-menu {
   margin: 0 0 $ic-sp $ic-sp/2;
+
+  &.ui-menu-item {
+    max-width: 200px; //override the kyle menu width for this instance
+  }
 }
-// set a max-width for this particular use case
+// don't let content overflow the width
 .al-options {
   .ui-menu-item {
     a {
       box-sizing: border-box;
-      max-width: 200px;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;

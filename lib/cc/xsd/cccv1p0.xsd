@@ -37,6 +37,8 @@
         <xs:element name="hide_distribution_graphs" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_discussion_topics" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_discussion_editing" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="image_url" type="xs:string" minOccurs="0"/>
+        <xs:element name="image_identifier_ref" type="xs:string" minOccurs="0"/>
         <xs:element name="default_view" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">
@@ -141,6 +143,12 @@
                 <xs:attribute name="set_type" type="xs:string" use="required"/>
                 <xs:attribute name="set_id" type="xs:string" use="required"/>
                 <xs:attribute name="title" type="xs:string" use="required"/>
+                <xs:attribute name="due_at" type="xs:dateTime"/>
+                <xs:attribute name="unlock_at" type="xs:dateTime"/>
+                <xs:attribute name="lock_at" type="xs:dateTime"/>
+                <xs:attribute name="due_at_overridden" type="xs:boolean"/>
+                <xs:attribute name="unlock_at_overridden" type="xs:boolean"/>
+                <xs:attribute name="lock_at_overridden" type="xs:boolean"/>
               </xs:complexType>
             </xs:element>
           </xs:sequence>
@@ -567,6 +575,12 @@
                   <xs:attribute name="set_type" type="xs:string" use="required"/>
                   <xs:attribute name="set_id" type="xs:string" use="required"/>
                   <xs:attribute name="title" type="xs:string" use="required"/>
+                  <xs:attribute name="due_at" type="xs:dateTime"/>
+                  <xs:attribute name="unlock_at" type="xs:dateTime"/>
+                  <xs:attribute name="lock_at" type="xs:dateTime"/>
+                  <xs:attribute name="due_at_overridden" type="xs:boolean"/>
+                  <xs:attribute name="unlock_at_overridden" type="xs:boolean"/>
+                  <xs:attribute name="lock_at_overridden" type="xs:boolean"/>
                 </xs:complexType>
               </xs:element>
             </xs:sequence>

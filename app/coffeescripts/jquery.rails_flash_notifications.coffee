@@ -47,7 +47,7 @@ define [
     initFlashContainer()
 
   renderServerNotifications = ->
-    if ENV.notices?
+    if ENV?.notices?
       for notice in ENV.notices
         helper.createNode(notice.type, notice.content)
         createScreenreaderNodeWithDelay(notice.content)

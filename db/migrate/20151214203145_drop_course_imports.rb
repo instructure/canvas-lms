@@ -1,4 +1,4 @@
-class DropCourseImports < ActiveRecord::Migration
+class DropCourseImports < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

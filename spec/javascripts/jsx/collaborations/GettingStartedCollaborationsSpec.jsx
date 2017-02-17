@@ -1,10 +1,10 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/collaborations/GettingStartedCollaborations'
-], (react, GettingStartedCollaborations) => {
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, GettingStartedCollaborations) => {
 
-  module('GettingStartedCollaborations');
+  QUnit.module('GettingStartedCollaborations');
 
   function setEnvironment (roles, context) {
     ENV.context_asset_string = context;

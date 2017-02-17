@@ -1,4 +1,4 @@
-class AddHttpMethodToPageViews < ActiveRecord::Migration
+class AddHttpMethodToPageViews < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

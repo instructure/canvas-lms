@@ -1,4 +1,4 @@
-class AddGradedAnonymouslyToSubmissions < ActiveRecord::Migration
+class AddGradedAnonymouslyToSubmissions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

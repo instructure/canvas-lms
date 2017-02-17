@@ -16,12 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'protected_attributes'
-
 class EventStream::Failure < ActiveRecord::Base
   self.table_name = :event_stream_failures
-
-  attr_accessible :operation, :event_stream, :record_id, :payload, :exception, :backtrace
 
   serialize :payload, Hash
   serialize :backtrace, Array

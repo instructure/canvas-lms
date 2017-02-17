@@ -63,7 +63,7 @@ describe "site-wide" do
   end
 
   it "should not set x-frame-options when on a files domain" do
-    user_session user(:active_all => true)
+    user_session user_factory(active_all: true)
     attachment_model(:context => @user)
     FilesController.any_instance.expects(:files_domain?).returns(true)
     get "http://files-test.host/files/#{@attachment.id}/download"
@@ -142,7 +142,7 @@ describe "site-wide" do
   end
 
   it "should use the real user's timezone and locale setting when masquerading as a fake student" do
-    @fake_user = course(:active_all => true).student_view_student
+    @fake_user = course_factory(active_all: true).student_view_student
 
     user_with_pseudonym(:active_all => true)
     account_admin_user(:user => @user)

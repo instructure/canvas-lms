@@ -17,9 +17,10 @@
 #
 
 define [
+  'jquery'
   'Backbone'
   'underscore'
-], (Backbone, _) ->
+], ($, Backbone, _) ->
 
   capitalize = (string = '') ->
     string.charAt(0).toUpperCase() + string.substring(1).toLowerCase()
@@ -129,4 +130,3 @@ define [
         links[key] = val
         links
       , {}
-

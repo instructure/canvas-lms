@@ -1,4 +1,4 @@
-class RemoveDiscussionEntryAttachmentForeignKey < ActiveRecord::Migration
+class RemoveDiscussionEntryAttachmentForeignKey < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

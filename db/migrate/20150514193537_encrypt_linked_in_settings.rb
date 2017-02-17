@@ -1,4 +1,4 @@
-class EncryptLinkedInSettings < ActiveRecord::Migration
+class EncryptLinkedInSettings < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

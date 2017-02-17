@@ -18,8 +18,6 @@
 
 module Polling
   class PollSubmission < ActiveRecord::Base
-    attr_accessible :poll, :poll_choice, :poll_session, :user
-
     belongs_to :poll, class_name: 'Polling::Poll'
     belongs_to :poll_choice, class_name: 'Polling::PollChoice'
     belongs_to :poll_session, class_name: 'Polling::PollSession'
@@ -28,7 +26,10 @@ module Polling
     validates_presence_of :poll, :poll_choice, :poll_session, :user
     validates_uniqueness_of :user_id,
       scope: :poll_session_id,
-      message: I18n.t('polling.poll_submissions.validations.user_and_poll_session_uniqueness', 'can only submit one choice per poll session.')
+      message: -> { t(
+        'polling.poll_submissions.validations.user_and_poll_session_uniqueness',
+        'can only submit one choice per poll session.'
+      ) }
 
     validate :poll_choices_belong_to_poll
     validate :poll_is_published

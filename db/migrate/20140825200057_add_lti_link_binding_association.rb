@@ -1,4 +1,4 @@
-class AddLtiLinkBindingAssociation < ActiveRecord::Migration
+class AddLtiLinkBindingAssociation < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

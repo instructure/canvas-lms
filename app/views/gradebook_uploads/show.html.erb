@@ -1,8 +1,11 @@
 <%
-  content_for :page_title, join_title(t(:page_title, "Gradebook"), @context.name)
+  title = join_title t("Upload Gradebook"), @context.name
+  content_for :page_title, title
   css_bundle :slickgrid, :gradebook_uploads
   js_bundle :gradebook_uploads
 %>
+
+<h1><%= title %></h1>
 
 <div id="spinner" style="height:250px"></div>
 

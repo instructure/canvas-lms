@@ -1,4 +1,4 @@
-class FixCorruptAssessmentQuestionsFromCnvs19292 < ActiveRecord::Migration
+class FixCorruptAssessmentQuestionsFromCnvs19292 < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

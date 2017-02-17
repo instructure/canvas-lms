@@ -88,6 +88,7 @@ class UserList
 
   private
 
+  module Parsing
   def parse_single_user(path)
     return if path.blank?
 
@@ -159,6 +160,8 @@ class UserList
       end
     end
   end
+  end
+  include Parsing
 
   def resolve
     trusted_account_ids = @root_account.trusted_account_ids

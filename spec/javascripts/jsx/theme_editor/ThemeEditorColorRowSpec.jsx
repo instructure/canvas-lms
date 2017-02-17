@@ -7,7 +7,7 @@ define([
 
   let elem, props
 
-  module('ThemeEditorColorRow Component', {
+  QUnit.module('ThemeEditorColorRow Component', {
     setup () {
       elem = document.createElement('div')
       props = {

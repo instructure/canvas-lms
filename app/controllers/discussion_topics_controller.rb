@@ -236,8 +236,8 @@ require 'atom'
 #     }
 #
 class DiscussionTopicsController < ApplicationController
-  before_filter :require_context_and_read_access, :except => :public_feed
-  before_filter :rich_content_service_config
+  before_action :require_context_and_read_access, :except => :public_feed
+  before_action :rich_content_service_config
 
   include Api::V1::DiscussionTopics
   include Api::V1::Assignment
@@ -248,6 +248,10 @@ class DiscussionTopicsController < ApplicationController
   # @API List discussion topics
   #
   # Returns the paginated list of discussion topics for this course or group.
+  #
+  # @argument include[] [String, "all_dates"]
+  #   If "all_dates" is passed, all dates associated with graded discussions'
+  #   assignments will be included.
   #
   # @argument order_by [String, "position"|"recent_activity"]
   #   Determines the order of the discussion topic list. Defaults to "position".
@@ -274,6 +278,8 @@ class DiscussionTopicsController < ApplicationController
   #
   # @returns [DiscussionTopic]
   def index
+    include_params = Array(params[:include])
+
     if params[:only_announcements]
       return unless authorized_action(@context.announcements.temp_record, @current_user, :read)
     else
@@ -366,10 +372,16 @@ class DiscussionTopicsController < ApplicationController
         end
       end
       format.json do
+        check_for_restrictions = master_courses? && @context.grants_right?(@current_user, session, :moderate_forum)
+        MasterCourses::Restrictor.preload_restrictions(@topics) if check_for_restrictions
+
         render json: discussion_topics_api_json(@topics, @context, @current_user, session,
-          :user_can_moderate => user_can_moderate,
-          :plain_messages => value_to_boolean(params[:plain_messages]),
-          :exclude_assignment_description => value_to_boolean(params[:exclude_assignment_descriptions]))
+          user_can_moderate: user_can_moderate,
+          plain_messages: value_to_boolean(params[:plain_messages]),
+          exclude_assignment_description: value_to_boolean(params[:exclude_assignment_descriptions]),
+          include_all_dates: include_params.include?('all_dates'),
+          include_master_course_restrictions: check_for_restrictions
+        )
       end
     end
   end
@@ -391,6 +403,7 @@ class DiscussionTopicsController < ApplicationController
   def edit
     @topic ||= @context.all_discussion_topics.find(params[:id])
     if authorized_action(@topic, @current_user, (@topic.new_record? ? :create : :update))
+      return render_unauthorized_action if !@topic.new_record? && editing_restricted?(@topic)
       hash =  {
         URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
         PERMISSIONS: {
@@ -427,18 +440,22 @@ class DiscussionTopicsController < ApplicationController
 
       sections = @context.respond_to?(:course_sections) ? @context.course_sections.active : []
 
-      js_hash = {DISCUSSION_TOPIC: hash,
-                 SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
-                 GROUP_CATEGORIES: categories.
-                     reject { |category| category.student_organized? }.
-                     map { |category| { id: category.id, name: category.name } },
-                 CONTEXT_ID: @context.id,
-                 CONTEXT_ACTION_SOURCE: :discussion_topic
+      js_hash = {
+        CONTEXT_ACTION_SOURCE: :discussion_topic,
+        CONTEXT_ID: @context.id,
+        DISCUSSION_TOPIC: hash,
+        GROUP_CATEGORIES: categories.
+           reject(&:student_organized?).
+           map { |category| { id: category.id, name: category.name } },
+        MULTIPLE_GRADING_PERIODS_ENABLED: @context.feature_enabled?(:multiple_grading_periods),
+        SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } }
       }
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
       js_hash[:POST_TO_SIS] = post_to_sis
       js_hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @topic.new_record?
+      js_hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context.assignments.first) if @context.respond_to?(:assignments)
+      js_hash[:MAX_NAME_LENGTH] = AssignmentUtil.assignment_max_name_length(@context.assignments.first) if @context.respond_to?(:assignments)
 
       if @context.is_a?(Course)
         js_hash['SECTION_LIST'] = sections.map { |section|
@@ -454,6 +471,15 @@ class DiscussionTopicsController < ApplicationController
       end
       js_hash[:CANCEL_TO] = cancel_redirect_url
       append_sis_data(js_hash)
+
+      if @context.feature_enabled?(:multiple_grading_periods)
+        gp_context = @context.is_a?(Group) ? @context.context : @context
+        js_hash[:active_grading_periods] = GradingPeriod.json_for(gp_context, @current_user)
+      end
+      if context.is_a?(Course)
+        js_hash[:allow_self_signup] = true  # for group creation
+        js_hash[:group_user_type] = 'student'
+      end
       js_env(js_hash)
 
       conditional_release_js_env(@topic.assignment)
@@ -594,6 +620,10 @@ class DiscussionTopicsController < ApplicationController
 
             js_hash = {:DISCUSSION => env_hash}
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
+            js_hash[:STUDENT_CONTEXT_CARDS_ENABLED] = @context.is_a?(Course) &&
+              @domain_root_account.feature_enabled?(:student_context_cards) &&
+              @context.grants_right?(@current_user, session, :manage)
+
             append_sis_data(js_hash)
             js_env(js_hash)
             conditional_release_js_env(@topic.assignment, includes: [:rule])
@@ -783,6 +813,7 @@ class DiscussionTopicsController < ApplicationController
   def destroy
     @topic = @context.all_discussion_topics.find(params[:id] || params[:topic_id])
     if authorized_action(@topic, @current_user, :delete)
+      return render_unauthorized_action if editing_restricted?(@topic)
       @topic.destroy
       respond_to do |format|
         format.html {
@@ -871,13 +902,16 @@ class DiscussionTopicsController < ApplicationController
   end
 
   API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at lock_at podcast_enabled
-                                podcast_has_student_posts require_initial_post is_announcement pinned
+                                podcast_has_student_posts require_initial_post pinned
                                 group_category_id allow_rating only_graders_can_rate sort_by_rating).freeze
+
+  API_ALLOWED_TOPIC_FIELDS_FOR_GROUP = %w(title message discussion_type podcast_enabled pinned
+                                allow_rating only_graders_can_rate sort_by_rating).freeze
+
 
   def process_discussion_topic(is_new = false)
     @errors = {}
-    discussion_topic_hash = params.slice(*API_ALLOWED_TOPIC_FIELDS)
-    model_type = value_to_boolean(discussion_topic_hash.delete(:is_announcement)) && @context.announcements.temp_record.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
+    model_type = value_to_boolean(params[:is_announcement]) && @context.announcements.temp_record.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
     if is_new
       @topic = @context.send(model_type).build
     else
@@ -885,6 +919,9 @@ class DiscussionTopicsController < ApplicationController
     end
 
     return unless authorized_action(@topic, @current_user, (is_new ? :create : :update))
+
+    allowed_fields = @context.is_a?(Group) ? API_ALLOWED_TOPIC_FIELDS_FOR_GROUP : API_ALLOWED_TOPIC_FIELDS
+    discussion_topic_hash = params.permit(*allowed_fields)
 
     prior_version = @topic.generate_prior_version
     process_podcast_parameters(discussion_topic_hash)
@@ -929,7 +966,7 @@ class DiscussionTopicsController < ApplicationController
         apply_positioning_parameters
         apply_attachment_parameters
         unless @topic.root_topic_id?
-          apply_assignment_parameters(strong_params[:assignment], @topic)
+          apply_assignment_parameters(params[:assignment], @topic)
         end
 
         if publish_later

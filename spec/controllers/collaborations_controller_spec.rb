@@ -191,7 +191,7 @@ describe CollaborationsController do
     it 'redirects to the lti launch url for ExternalToolCollaborations' do
       course_with_teacher(:active_all => true)
       user_session(@teacher)
-      collab = ExternalToolCollaboration.create!(
+      collab = ExternalToolCollaboration.new(
         title: "my collab",
         user: @teacher,
         url: 'http://www.example.com'
@@ -331,7 +331,7 @@ describe CollaborationsController do
 
       it "adds groups if sent" do
         user_session(@teacher)
-        group = group_model
+        group = group_model(:context => @course)
         group.add_user(@teacher, 'active')
         content_items.first['ext_canvas_visibility'] = {groups: [Lti::Asset.opaque_identifier_for(group)]}
         post 'create', :course_id => @course.id, :contentItems => content_items.to_json
@@ -414,7 +414,7 @@ describe CollaborationsController do
 
       it "adds groups if sent" do
         user_session(@teacher)
-        group = group_model
+        group = group_model(:context => @course)
         group.add_user(@teacher, 'active')
         content_items.first['ext_canvas_visibility'] = {groups: [Lti::Asset.opaque_identifier_for(group)]}
         put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
@@ -424,7 +424,7 @@ describe CollaborationsController do
 
       it "adds each group only once on multiple requests" do
         user_session(@teacher)
-        group = group_model
+        group = group_model(:context => @course)
         group.add_user(@teacher, 'active')
         content_items.first['ext_canvas_visibility'] = {
           groups: [Lti::Asset.opaque_identifier_for(group)],

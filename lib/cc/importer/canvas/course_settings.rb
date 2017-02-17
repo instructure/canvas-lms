@@ -55,7 +55,7 @@ module CC::Importer::Canvas
       ['title', 'course_code', 'default_wiki_editing_roles',
        'turnitin_comments', 'default_view', 'license', 'locale',
        'group_weighting_scheme', 'storage_quota', 'grading_standard_identifier_ref',
-       'root_account_uuid'].each do |string_type|
+       'root_account_uuid', 'image_url', 'image_identifier_ref'].each do |string_type|
         val = get_node_val(doc, string_type)
         course[string_type] = val unless val.nil?
       end
@@ -65,7 +65,7 @@ module CC::Importer::Canvas
        'open_enrollment', 'allow_wiki_comments',
        'self_enrollment', 'hide_final_grade', 'grading_standard_enabled',
        'hide_distribution_graphs', 'allow_student_discussion_topics',
-       'allow_student_discussion_editing'].each do |bool_val|
+       'allow_student_discussion_editing', 'show_announcements_on_home_page', 'home_page_announcement_limit'].each do |bool_val|
         val = get_bool_val(doc, bool_val)
         course[bool_val] = val unless val.nil?
       end

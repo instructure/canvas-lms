@@ -20,9 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Collaborator do
   before :once do
+    course_with_teacher(:active_all => true)
     @notification       = Notification.create!(:name => 'Collaboration Invitation')
-    @author             = user_with_pseudonym(:active_all => true)
+    @author             = @teacher
     @collaboration      = Collaboration.new(:title => 'Test collaboration')
+    @collaboration.context = @course
     @collaboration.type = 'EtherpadCollaboration'
     @collaboration.user = @author
   end
@@ -30,6 +32,7 @@ describe Collaborator do
   context 'broadcast policy' do
     it 'should notify collaborating users', priority: "1", test_id: 193152 do
       user = user_with_pseudonym(:active_all => true)
+      @course.enroll_student(user)
       NotificationPolicy.create(:notification => @notification,
                                 :communication_channel => user.communication_channel,
                                 :frequency => 'immediately')
@@ -49,7 +52,7 @@ describe Collaborator do
     end
 
     it 'should notify all members of a group' do
-      group = group_model(:name => 'Test group')
+      group = group_model(:name => 'Test group', :context => @course)
       users = (1..2).map { user_with_pseudonym(:active_all => true) }
       users.each { |u| group.add_user(u, 'active') }
       @collaboration.update_members([], [group.id])

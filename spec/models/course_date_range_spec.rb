@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CourseDateRange do
   before(:once) do
-    @course = course
+    @course = course_factory
   end
 
   it "should have a date and date_context for start and end" do

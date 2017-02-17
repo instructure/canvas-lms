@@ -1,4 +1,4 @@
-class AddGroupsToAssignmentVisibilityView < ActiveRecord::Migration
+class AddGroupsToAssignmentVisibilityView < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

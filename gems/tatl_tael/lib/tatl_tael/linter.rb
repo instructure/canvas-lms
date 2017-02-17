@@ -56,7 +56,7 @@ module TatlTael
     end
 
     NEED_SPEC_PUBLIC_JS_REGEX = /public\/javascripts\/.*.js$/
-    EXCLUDED_PUBLIC_SUB_DIRS_REGEX = /(bower|mediaelement|shims|vendor)\//
+    EXCLUDED_PUBLIC_SUB_DIRS_REGEX = /(bower|mediaelement|shims|vendor|symlink_to_node_modules)\//
     def needs_public_js_specs?
       changes.any? do |change|
         !change.deleted? &&

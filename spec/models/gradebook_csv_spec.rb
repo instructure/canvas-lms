@@ -18,6 +18,8 @@
 require_relative '../spec_helper'
 
 describe GradebookCsv do
+  it { is_expected.to validate_presence_of(:progress) }
+
   context "given a course with a teacher" do
     def csv(course:, user:, force_failure: false)
       attachment = course.attachments.create!(uploaded_data: default_uploaded_data)

@@ -14,16 +14,16 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "activesupport", ">= 3.2", "< 4.3"
+  spec.add_dependency "activesupport", ">= 3.2", "< 5.1"
 
-  spec.add_dependency "mail", "2.5.4"
+  spec.add_dependency "mail", "2.6.4"
   spec.add_dependency "html_text_helper"
   spec.add_dependency "utf8_cleaner"
   spec.add_dependency "canvas_statsd"
-  spec.add_dependency "aws-sdk-v1"
+  spec.add_dependency "aws-sdk", "~> 2.6.7"
 
   spec.add_development_dependency "bundler", "~> 1.5"
-  spec.add_development_dependency "rspec", "2.99.0"
-  spec.add_development_dependency "mocha"
+  spec.add_development_dependency "byebug"
+  spec.add_development_dependency "rspec", "~> 3.5.0"
   spec.add_development_dependency 'timecop'
 end

@@ -8,7 +8,7 @@ define([
   let forgotPasswordForm;
   let switcher;
 
-  module("LoginFormSwitcher", {
+  QUnit.module("LoginFormSwitcher", {
     setup() {
       loginFormInput = {
         focus: sinon.stub()

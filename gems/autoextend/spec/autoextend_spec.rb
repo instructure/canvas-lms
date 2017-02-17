@@ -1,4 +1,12 @@
 require 'minitest/autorun'
+require 'active_support'
+
+# this is a weird thing we have to do to avoid a weird circular
+# require problem
+_x = ActiveSupport::Deprecation
+ActiveSupport::Dependencies.autoload_paths << File.expand_path("..", __FILE__)
+ActiveSupport::Dependencies.hook!
+
 require 'autoextend'
 
 describe Autoextend do
@@ -8,7 +16,7 @@ describe Autoextend do
 
   after do
     Object.send(:remove_const, :AutoextendSpec)
-    Autoextend.extensions.reject! { |k, _| k =~ /^AutoextendSpec::/ }
+    Autoextend.send(:extensions_hash).reject! { |k, _| k =~ /^AutoextendSpec::/ }
   end
 
   it "should autoextend a class afterwards" do
@@ -58,5 +66,26 @@ describe Autoextend do
     module AutoextendSpec::MyExtension; end
     Autoextend.hook(:"AutoextendSpec::Class", AutoextendSpec::MyExtension)
     AutoextendSpec::Class.ancestors.must_include AutoextendSpec::MyExtension
+  end
+
+  # yes, this whole spec is awful and pollutes global state,
+  # but it's just one spec, and this file is small and should never
+  # be run in the same process as other specs
+  describe "ActiveSupport" do
+    it "should hook an autoloaded module" do
+      hooked = 0
+      Autoextend.hook(:"AutoextendSpec::TestModule") do
+        hooked += 1
+      end
+      Autoextend.hook(:"AutoextendSpec::TestModule::Nested") do
+        hooked += 1
+      end
+      defined?(AutoextendSpec::TestModule).must_equal(nil)
+      hooked.must_equal(0)
+      _x = AutoextendSpec::TestModule
+      # this could have only been detected by Rails' autoloading
+      defined?(AutoextendSpec::TestModule).must_equal('constant')
+      hooked.must_equal(2)
+    end
   end
 end

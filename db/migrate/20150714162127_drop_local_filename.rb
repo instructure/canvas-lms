@@ -1,4 +1,4 @@
-class DropLocalFilename < ActiveRecord::Migration
+class DropLocalFilename < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

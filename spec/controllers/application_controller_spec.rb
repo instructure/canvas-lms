@@ -26,32 +26,6 @@ describe ApplicationController do
                                             :headers => {}, :format => stub(:html? => true)))
   end
 
-  describe "#twitter_connection" do
-    it "uses current user if available" do
-      mock_current_user = mock()
-      controller.instance_variable_set(:@current_user, mock_current_user)
-      session[:oauth_gdocs_access_token_token] = "session_token"
-      session[:oauth_gdocs_access_token_secret] = "sesion_secret"
-
-      mock_user_services = mock("mock_user_services")
-      mock_current_user.expects(:user_services).returns(mock_user_services)
-      mock_user_services.expects(:where).with(service: "twitter").returns(stub(first: mock(token: "current_user_token", secret: "current_user_secret")))
-
-      Twitter::Connection.expects(:new).with("current_user_token", "current_user_secret")
-
-      controller.send(:twitter_connection)
-    end
-    it "uses session if no current user" do
-      controller.instance_variable_set(:@current_user, nil)
-      session[:oauth_twitter_access_token_token] = "session_token"
-      session[:oauth_twitter_access_token_secret] = "sesion_secret"
-
-      Twitter::Connection.expects(:new).with("session_token", "sesion_secret")
-
-      controller.send(:twitter_connection)
-    end
-  end
-
   describe "#google_drive_connection" do
     before :each do
       settings_mock = mock()
@@ -692,8 +666,22 @@ describe ApplicationController do
   end
 
   describe "#get_all_pertinent_contexts" do
+    it "doesn't show unpublished courses to students" do
+      student = user_factory(active_all: true)
+      c1 = course_factory
+      e = c1.enroll_student(student)
+      e.update_attribute(:workflow_state, 'active')
+      c2 = course_factory(active_all: true)
+      c2.enroll_student(student).accept!
+
+      controller.instance_variable_set(:@context, student)
+      controller.send(:get_all_pertinent_contexts)
+      expect(controller.instance_variable_get(:@contexts).select{|c| c.is_a?(Course)}).to eq [c2]
+    end
+
+
     it "doesn't touch the database if there are no valid courses" do
-      user
+      user_factory
       controller.instance_variable_set(:@context, @user)
 
       Course.expects(:where).never
@@ -701,13 +689,30 @@ describe ApplicationController do
     end
 
     it "doesn't touch the database if there are no valid groups" do
-      user
+      user_factory
       controller.instance_variable_set(:@context, @user)
 
-      group_scope = stub('current_groups')
-      group_scope.expects(:none).returns(Group.none)
-      @user.stubs(:current_groups).returns(group_scope)
+      @user.expects(:current_groups).never
       controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: 'Course_1')
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should not asplode with cross-shard groups" do
+        user_factory(active_all: true)
+        controller.instance_variable_set(:@context, @user)
+
+        @shard1.activate do
+          account = Account.create!
+          teacher_in_course(:user => @user, :active_all => true, :account => account)
+          @other_group = group_model(:context => @course)
+          group_model(:context => @course)
+          @group.add_user(@user)
+        end
+        controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: "group_#{@other_group.id},group_#{@group.id}")
+        expect(controller.instance_variable_get(:@contexts).select{|c| c.is_a?(Group)}).to eq [@group]
+      end
     end
   end
 
@@ -757,6 +762,33 @@ describe WikiPagesController do
 
       expect(controller.js_env).to include(:WIKI_RIGHTS)
       expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eq Hash[@course.wiki.check_policy(@teacher).map { |right| [right, true] }]
+    end
+  end
+end
+
+describe CoursesController do
+  describe "set_js_wiki_data" do
+    before :each do
+      course_with_teacher_logged_in :active_all => true
+      @course.default_view = "wiki"
+      @course.show_announcements_on_home_page = true
+      @course.home_page_announcement_limit = 5
+      @course.save!
+      @course.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
+    end
+
+    it "should populate js_env with course_home setting" do
+      controller.instance_variable_set(:@context, @course)
+      get 'show', id: @course.id
+      expect(controller.js_env).to include(:COURSE_HOME)
+    end
+
+    it "should populate js_env with setting for show_announcements flag" do
+      controller.instance_variable_set(:@context, @course)
+      get 'show', id: @course.id
+      expect(controller.js_env).to include(:SHOW_ANNOUNCEMENTS, :ANNOUNCEMENT_LIMIT)
+      expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_truthy
+      expect(controller.js_env[:ANNOUNCEMENT_LIMIT]).to eq(5)
     end
   end
 end

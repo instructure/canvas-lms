@@ -1,4 +1,4 @@
-class DropLockingAccountIdFromFeatureFlags < ActiveRecord::Migration
+class DropLockingAccountIdFromFeatureFlags < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def change

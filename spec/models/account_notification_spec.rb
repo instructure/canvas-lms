@@ -22,7 +22,7 @@ describe AccountNotification do
 
   before :once do
     account_notification
-    user
+    user_factory
   end
 
   it "should find notifications" do
@@ -265,7 +265,7 @@ describe AccountNotification do
 
       @shard1.activate do
         @account = Account.create!
-        user
+        user_factory
         expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
       end
 

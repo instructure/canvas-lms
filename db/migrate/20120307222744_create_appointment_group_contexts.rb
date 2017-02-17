@@ -1,4 +1,4 @@
-class CreateAppointmentGroupContexts < ActiveRecord::Migration
+class CreateAppointmentGroupContexts < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -37,6 +37,31 @@ describe WikiPage do
     expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to be_include(@user)
   end
 
+  it "should send page updated notifications to students if active" do
+    course_with_student(:active_all => true)
+    n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")
+    NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
+    p = @course.wiki.wiki_pages.create(:title => "some page")
+    p.created_at = 3.days.ago
+    p.notify_of_update = true
+    p.save!
+    p.update_attributes(:body => "Awgawg")
+    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to be_include(@student)
+  end
+
+  it "should not send page updated notifications to students if not active" do
+    course_with_student(:active_all => true)
+    n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")
+    NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
+    @course.update_attributes(:start_at => 2.days.from_now, :restrict_enrollments_to_course_dates => true)
+    p = @course.wiki.wiki_pages.create(:title => "some page")
+    p.created_at = 3.days.ago
+    p.notify_of_update = true
+    p.save!
+    p.update_attributes(:body => "Awgawg")
+    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to_not be_include(@student)
+  end
+
   it "should validate the title" do
     course_with_teacher(:active_all => true)
     expect(@course.wiki.wiki_pages.new(:title => "").valid?).not_to be_truthy
@@ -215,18 +240,18 @@ describe WikiPage do
     end
 
     it 'is not true for users who are not in the course (if it is not public)' do
-      course(:active_all => true)
+      course_factory(active_all: true)
       page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'public')
-      user(:active_all => true)
+      user_factory(active_all: true)
       expect(page.can_edit_page?(@user)).to be_falsey
     end
 
     it 'is true for users who are not in the course (if it is public)' do
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.is_public = true
       @course.save!
       page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'public')
-      user(:active_all => true)
+      user_factory(active_all: true)
       expect(page.can_edit_page?(@user)).to be_truthy
     end
   end
@@ -259,7 +284,7 @@ describe WikiPage do
 
     context 'on a group' do
       before do
-        group_with_user_logged_in
+        group_with_user
       end
 
       it 'should set the front page body' do
@@ -274,7 +299,7 @@ describe WikiPage do
 
   context 'set policy' do
     before :once do
-      course :active_all => true
+      course_factory :active_all => true
     end
 
     context 'admins' do
@@ -466,7 +491,7 @@ describe WikiPage do
   end
 
   describe "destroy" do
-    before (:once) { course }
+    before (:once) { course_factory }
 
     it "should destroy its assignment if enabled" do
       @course.enable_feature!(:conditional_release)
@@ -494,7 +519,7 @@ describe WikiPage do
   end
 
   describe "restore" do
-    before (:once) { course }
+    before (:once) { course_factory }
 
     it "should restore to unpublished state" do
       @page = @course.wiki.wiki_pages.create! title: 'dot dot dot'
@@ -534,7 +559,7 @@ describe WikiPage do
 
   describe "context_module_action" do
     it "should process all content tags" do
-      course_with_student_logged_in active_all: true
+      course_with_student active_all: true
       page = @course.wiki.wiki_pages.create! title: 'teh page'
       mod1 = @course.context_modules.create name: 'module1'
       tag1 = mod1.add_item type: 'wiki_page', id: page.id
@@ -552,7 +577,7 @@ describe WikiPage do
 
   describe "locked_for?" do
     it "should lock by preceding item and sequential progress" do
-      course_with_student_logged_in active_all: true
+      course_with_student active_all: true
       pageB = @course.wiki.wiki_pages.create! title: 'B'
       pageC = @course.wiki.wiki_pages.create! title: 'C'
       mod = @course.context_modules.create name: 'teh module'
@@ -565,7 +590,7 @@ describe WikiPage do
     end
 
     it "includes a future unlock date" do
-      course_with_student_logged_in active_all: true
+      course_with_student active_all: true
       page = @course.wiki.wiki_pages.create! title: 'page'
       mod = @course.context_modules.create name: 'teh module', unlock_at: 1.week.from_now
       mod.add_item type: 'wiki_page', id: page.id
@@ -575,7 +600,7 @@ describe WikiPage do
     end
 
     it "doesn't reference an expired unlock-at date" do
-      course_with_student_logged_in active_all: true
+      course_with_student active_all: true
       page = @course.wiki.wiki_pages.create! title: 'page'
       mod = @course.context_modules.create name: 'teh module', unlock_at: 1.week.ago
       mod.add_item type: 'wiki_page', id: page.id
@@ -588,7 +613,7 @@ describe WikiPage do
   describe 'revised_at' do
     before(:once) do
       Timecop.freeze(1.hour.ago) do
-        course
+        course_factory
         @page = @course.wiki.wiki_pages.create! title: 'page'
         @old_timestamp = @page.revised_at
       end
@@ -615,7 +640,7 @@ describe WikiPage do
 
   describe "visible_to_students_in_course_with_da" do
     before :once do
-      @course = course(:active_course => true)
+      @course = course_factory(active_course: true)
       @page_unassigned = wiki_page_model(:title => "plain old page", :course => @course)
       @page_assigned = wiki_page_model(:title => "page with assignment", :course => @course)
       @student1, @student2 = create_users(2, return_type: :record)

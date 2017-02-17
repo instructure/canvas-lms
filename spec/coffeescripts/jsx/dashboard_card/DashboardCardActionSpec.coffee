@@ -1,13 +1,12 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jsx/dashboard_card/DashboardCardAction'
-], (React, ReactDOM, _, DashboardCardAction) ->
+], (React, ReactDOM, TestUtils, _, DashboardCardAction) ->
 
-  TestUtils = React.addons.TestUtils
-
-  module 'DashboardCardAction',
+  QUnit.module 'DashboardCardAction',
     setup: ->
       @props = {
         iconClass: 'icon-assignment',

@@ -25,7 +25,7 @@ module Factories
     {
       :url => "http://www.example.com/courses/1",
       :request_id => SecureRandom.uuid,
-      :user => @user || user
+      :user => @user || user_factory
     }
   end
 
@@ -57,7 +57,7 @@ module Factories
         :interaction_seconds => 5,
         :user => @user,
         :remote_ip => '192.168.0.42'
-      }, :without_protection => true)
+      })
     end
     @page_view.save!
     @page_view

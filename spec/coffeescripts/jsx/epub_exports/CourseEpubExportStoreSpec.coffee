@@ -1,11 +1,9 @@
 define [
   'underscore',
-  'react',
   'jsx/epub_exports/CourseStore'
-], (_, React, CourseStore, I18n) ->
-  TestUtils = React.addons.TestUtils
+], (_, CourseStore) ->
 
-  module 'CourseEpubExportStoreSpec',
+  QUnit.module 'CourseEpubExportStoreSpec',
     setup: ->
       CourseStore.clearState()
       @courses = {

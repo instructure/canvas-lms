@@ -1,4 +1,4 @@
-class AddQuizIdToAssignmentOverrideStudents < ActiveRecord::Migration
+class AddQuizIdToAssignmentOverrideStudents < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

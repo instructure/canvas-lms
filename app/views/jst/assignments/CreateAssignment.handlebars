@@ -79,7 +79,12 @@
             aria-labelledby="due_at_label_{{uniqLabel}}"
             data-tooltip
             title="{{accessibleDateFormat}}"
-            {{disabledIfIncludes frozenAttributes "due_at"}}/>
+            {{disabledIf disableDueAt}}/>
+            {{#if isInClosedPeriod}}
+            <div>
+              <span>{{#t}}Due date falls in a closed Grading Period{{/t}}</span>
+            </div>
+            {{/if}}
           </div>
       {{/ifAny}}
       </div>

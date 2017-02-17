@@ -138,7 +138,7 @@
 class FeatureFlagsController < ApplicationController
   include Api::V1::FeatureFlag
 
-  before_filter :get_context
+  before_action :get_context
 
   # @API List features
   #
@@ -263,7 +263,7 @@ class FeatureFlagsController < ApplicationController
         end
         render json: feature_flag_json(new_flag, @context, @current_user, session)
       else
-        render json: new_flag.errors.to_json, status: :bad_request
+        render json: new_flag.errors, status: :bad_request
       end
     end
   end
@@ -295,7 +295,7 @@ class FeatureFlagsController < ApplicationController
 
   def create_or_update_feature_flag(attributes, current_flag = nil)
     FeatureFlag.unique_constraint_retry do
-      new_flag = @context.feature_flags.find(current_flag) if current_flag &&
+      new_flag = @context.feature_flags.find(current_flag.id) if current_flag &&
           !current_flag.default? && !current_flag.new_record? &&
           current_flag.context_type == @context.class.name && current_flag.context_id == @context.id
       new_flag ||= @context.feature_flags.build

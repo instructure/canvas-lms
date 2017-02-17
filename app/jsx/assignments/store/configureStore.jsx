@@ -2,7 +2,7 @@ define([
   'redux',
   'redux-thunk',
   '../reducers/rootReducer'
-], function (Redux, ReduxThunk, rootReducer) {
+], function (Redux, {default:ReduxThunk}, rootReducer) {
 
   var { createStore, applyMiddleware } = Redux;
 

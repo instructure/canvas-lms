@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+require_relative './linter'
+
+linter_options = {
+  linter_name: "brakeman",
+  file_regex: /\.rb$/,
+  format: 'brakeman',
+  command: 'bundle exec brakeman --quiet --format json --confidence-level 2',
+  append_files_to_command: false,
+}
+
+brakeman = Linter.new(linter_options)
+brakeman.run

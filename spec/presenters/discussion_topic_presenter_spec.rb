@@ -107,21 +107,21 @@ describe DiscussionTopicPresenter do
 
   end
 
-  describe "#comments_diabled?" do
+  describe "#comments_disabled?" do
     it "only returns true when topic is assignment, its context is a course, "+
       "and the course settings lock all announcements" do
-      announcement = Announcement.new(:title => "Announcement")
-      announcement.context = Course.new(:name => "Canvas Yah Yeah")
-      announcement.context.expects(:settings).
-        returns({:lock_all_announcements => true })
+      course_factory
+      @course.lock_all_announcements = true
+      @course.save!
+      announcement = Announcement.new(:title => "Announcement", :context => @course)
       expect(DiscussionTopicPresenter.new(announcement).comments_disabled?).
         to eq true
     end
 
     it "returns false for announcements or other criteria not met" do
       expect(presenter.comments_disabled?).to eq false
-      course = Course.new :name => "Canvas 101"
-      announcement = Announcement.new(:title => "b", :context => course)
+      course_factory
+      announcement = Announcement.new(:title => "b", :context => @course)
       expect(DiscussionTopicPresenter.new(announcement).comments_disabled?).
         to eq false
     end

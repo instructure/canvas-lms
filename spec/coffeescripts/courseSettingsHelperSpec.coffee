@@ -1,5 +1,5 @@
 define ['course_settings_helper', 'jquery'], (courseSettingsHelper, $) ->
-  module "course_settings_helper",
+  QUnit.module "course_settings_helper",
     test 'non LTI 2 tools', ->
       externalTool = document.createElement('li')
       externalTool.id = 'nav_edit_tab_id_context_external_tool_165'

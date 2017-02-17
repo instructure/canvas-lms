@@ -122,10 +122,29 @@ define [
     assignmentGroupsView.$el.appendTo $('#fixtures')
     assignmentGroupsView.render()
     assignmentGroupsView
+    
+  test "shows imported icon when integration_data is not empty", ->
+    model = createAssignmentGroup()
+    model.set('integration_data', { property: 'value' })
+    view = createView(model)
+    ok view.$("#assignment_group_#{model.id} .ig-header-title .icon-sis-imported").length
 
-  module 'AssignmentGroupListItemView',
+  test "does not show imported icon when integration_data is not set", ->
+    model = createAssignmentGroup()
+    view = createView(model)
+    ok !view.$("#assignment_group_#{model.id} .ig-header-title .icon-sis-imported").length
+
+  test "does not show imported icon when integration_data is empty", ->
+    model = createAssignmentGroup()
+    model.set('integration_data', { })
+    view = createView(model)
+    ok !view.$("#assignment_group_#{model.id} .ig-header-title .icon-sis-imported").length
+
+  QUnit.module 'AssignmentGroupListItemView as a teacher',
     setup: ->
-      fakeENV.setup()
+      fakeENV.setup({
+        current_user_roles: ['teacher']
+      })
       @model = createAssignmentGroup()
       $(document).off()
       elementToggler.bind()
@@ -254,14 +273,14 @@ define [
     ok view.$("#assignment_group_#{@model.id} a.delete_group.disabled").length
 
   test "disallows deleting groups with assignments due in closed grading periods", ->
-    @model.set('has_assignment_due_in_closed_grading_period', true)
+    @model.set('any_assignment_in_closed_grading_period', true)
     assignments = @model.get('assignments')
-    assignments.first().set('frozen', true)
+    assignments.first().set('frozen', false)
     view = createView(@model)
     ok view.$("#assignment_group_#{@model.id} a.delete_group.disabled").length
 
   test "allows deleting non-frozen groups without assignments due in closed grading periods", ->
-    @model.set('has_assignment_due_in_closed_grading_period', false)
+    @model.set('any_assignment_in_closed_grading_period', false)
     view = createView(@model)
     ok view.$("#assignment_group_#{@model.id} a.delete_group:not(.disabled)").length
 
@@ -272,12 +291,12 @@ define [
     ok view.$("#assignment_group_#{@model.id} a.delete_group:not(.disabled)").length
 
   test "allows deleting groups with assignments due in closed grading periods for admins", ->
-    @model.set('has_assignment_due_in_closed_grading_period', true)
+    @model.set('any_assignment_in_closed_grading_period', true)
     view = createView(@model, userIsAdmin: true)
     ok view.$("#assignment_group_#{@model.id} a.delete_group:not(.disabled)").length
 
   test 'does not provide a view to delete a group with assignments due in a closed grading period', ->
-    @model.set('has_assignment_due_in_closed_grading_period', true)
+    @model.set('any_assignment_in_closed_grading_period', true)
     view = createView(@model)
     ok !view.deleteGroupView
 
@@ -287,3 +306,28 @@ define [
     anchor = view.$("#assignment_group_3 .ag-header-controls .tooltip_link")
     equal anchor.text(), "2 Rules"
     equal anchor.attr("title"), "Drop the lowest score and Drop the highest score"
+
+  QUnit.module 'AssignmentGroupListItemView as an admin',
+    setup: ->
+      @model = createAssignmentGroup()
+      $(document).off()
+      elementToggler.bind()
+
+    teardown: ->
+      $("form.dialogFormView").remove()
+      $('#fixtures').empty()
+      fakeENV.teardown()
+
+  test 'provides a view to delete a group when canDelete is true', ->
+    @stub @model, 'canDelete', -> true
+    @model.set('any_assignment_in_closed_grading_period', true)
+    view = createView(@model, userIsAdmin: true)
+    ok view.deleteGroupView
+    notOk view.$("#assignment_group_#{@model.id} a.delete_group.disabled").length
+
+  test 'provides a view to delete a group when canDelete is false', ->
+    @stub @model, 'canDelete', -> false
+    @model.set('any_assignment_in_closed_grading_period', true)
+    view = createView(@model, userIsAdmin: true)
+    ok view.deleteGroupView
+    notOk view.$("#assignment_group_#{@model.id} a.delete_group.disabled").length

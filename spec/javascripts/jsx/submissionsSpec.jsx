@@ -4,7 +4,7 @@ define([
   'jquery.ajaxJSON'
   ], ($, submissions) => {
 
-  module("submissions", {
+  QUnit.module("submissions", {
     setup() {
       sinon.spy($, 'ajaxJSON');
       ENV.SUBMISSION = {

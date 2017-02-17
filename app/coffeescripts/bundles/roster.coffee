@@ -34,6 +34,7 @@ require [
   'compiled/views/courses/roster/RosterTabsView'
   'compiled/views/courses/roster/ResendInvitationsView'
   'jquery'
+  'jsx/context_cards/StudentContextCardTrigger'
 ], (I18n, {Model}, CreateUserList, Role, CreateUsersView, RoleSelectView, rosterUsersTemplate, RosterUserCollection, RolesCollection, SectionCollection, GroupCategoryCollection, InputFilterView, PaginatedCollectionView, RosterUserView, RosterView, RosterTabsView, ResendInvitationsView, $) ->
 
   fetchOptions =
@@ -79,7 +80,7 @@ require [
 
   rosterTabsView.fetch()
 
-  @app = new RosterView
+  app = new RosterView
     usersView: usersView
     rosterTabsView: rosterTabsView
     inputFilterView: inputFilterView
@@ -103,7 +104,7 @@ require [
       $('#aria_alerts').empty().text msg
 
 
-  @app.render()
-  @app.$el.appendTo $('#content')
+  app.render()
+  app.$el.appendTo $('#content')
   users.fetch()
 

@@ -14,11 +14,29 @@ define [
   'helpers/fakeENV'
   'compiled/userSettings'
   'helpers/jquery.simulate'
-], ($, _, SectionCollection, Assignment, DueDateList, Section,
-  AssignmentGroupSelector, DueDateOverrideView, EditView,
-  GradingTypeSelector, GroupCategorySelector, PeerReviewsSelector, fakeENV, userSettings) ->
+], (
+  $,
+  _,
+  SectionCollection,
+  Assignment,
+  DueDateList,
+  Section,
+  AssignmentGroupSelector,
+  DueDateOverrideView,
+  EditView,
+  GradingTypeSelector,
+  GroupCategorySelector,
+  PeerReviewsSelector,
+  fakeENV,
+  userSettings) ->
 
-  s_params = 'asdf32.asdf31.asdf2'
+  s_params = 'some super secure params'
+
+  nameLengthHelper = (view, length, maxNameLengthRequiredForAccount, maxNameLength, postToSis) ->
+    name = 'a'.repeat(length)
+    ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = maxNameLengthRequiredForAccount
+    ENV.MAX_NAME_LENGTH = maxNameLength
+    return view.validateBeforeSave({name: name, post_to_sis: postToSis}, [])
 
   editView = (assignmentOpts = {}) ->
     defaultAssignmentOpts =
@@ -40,6 +58,7 @@ define [
     groupCategorySelector = new GroupCategorySelector
       parentModel: assignment
       groupCategories: ENV?.GROUP_CATEGORIES || []
+      inClosedGradingPeriod: assignment.inClosedGradingPeriod()
     peerReviewsSelector = new PeerReviewsSelector
       parentModel: assignment
 
@@ -54,18 +73,25 @@ define [
           model: dueDateList
           views: {}
 
-    app.enableCheckbox = () -> {}
     app.render()
 
-  module 'EditView',
+  QUnit.module 'EditView',
     setup: ->
-      fakeENV.setup()
-      ENV.VALID_DATE_RANGE = {}
+      fakeENV.setup({
+        current_user_roles: ['teacher'],
+        VALID_DATE_RANGE: {},
+        COURSE_ID: 1,
+      })
+      @server = sinon.fakeServer.create()
+
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       $(".ui-dialog").remove()
       $("ul[id^=ui-id-]").remove()
       $(".form-dialog").remove()
+      document.getElementById("fixtures").innerHTML = ""
+
     editView: ->
       editView.apply(this, arguments)
 
@@ -117,24 +143,46 @@ define [
     equal errors["name"].length, 1
     equal errors["name"][0]["message"], "Name is required!"
 
-  test "requires a name < 255 chars to save assignment", ->
+  test "has an error when a name > 255 chars", ->
     view = @editView()
-    l1 = 'aaaaaaaaaa'
-    l2 = l1 + l1 + l1 + l1 + l1 + l1
-    l3 = l2 + l2 + l2 + l2 + l2 + l2
-    ok l3.length > 255
-
-    errors = view.validateBeforeSave(name: l3, [])
+    errors = nameLengthHelper(view, 257, false, 30, '0')
     ok errors["name"]
     equal errors["name"].length, 1
-    equal errors["name"][0]["message"], "Name is too long"
+    equal errors["name"][0]["message"], "Name is too long, must be under 256 characters"
+
+  test "allows assignment to save when a name < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is true", ->
+    view = @editView()
+    errors = nameLengthHelper(view, 254, false, 30, '1')
+    equal errors.length, 0
+
+  test "allows assignment to save when a name < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is false", ->
+    view = @editView()
+    errors = nameLengthHelper(view, 254, false, 30, '0')
+    equal errors.length, 0
+
+  test "has an error when a name > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
+    view = @editView()
+    errors = nameLengthHelper(view, 35, true, 30, '1')
+    ok errors["name"]
+    equal errors["name"].length, 1
+    equal errors["name"][0]["message"], "Name is too long, must be under #{ENV.MAX_NAME_LENGTH + 1} characters"
+
+  test "allows assignment to save when name > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is false", ->
+    view = @editView()
+    errors = nameLengthHelper(view, 35, true, 30, '0')
+    equal errors.length, 0
+
+  test "allows assignment to save when name < MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
+    view = @editView()
+    errors = nameLengthHelper(view, 25, true, 30, '1')
+    equal errors.length, 0
 
   test "don't validate name if it is frozen", ->
     view = @editView()
     view.model.set('frozen_attributes', ['title'])
 
     errors = view.validateBeforeSave({}, [])
-    ok !errors["name"]
+    notOk errors["name"]
 
   test "renders a hidden secure_params field", ->
     view = @editView()
@@ -146,33 +194,27 @@ define [
   test 'does show error message on assignment point change with submissions', ->
     view = @editView has_submitted_submissions: true
     view.$el.appendTo $('#fixtures')
-    ok !view.$el.find('#point_change_warning:visible').attr('aria-expanded')
+    notOk view.$el.find('#point_change_warning:visible').attr('aria-expanded')
     view.$el.find('#assignment_points_possible').val(1)
     view.$el.find('#assignment_points_possible').trigger("change")
     ok view.$el.find('#point_change_warning:visible').attr('aria-expanded')
     view.$el.find('#assignment_points_possible').val(0)
     view.$el.find('#assignment_points_possible').trigger("change")
-    ok !view.$el.find('#point_change_warning:visible').attr('aria-expanded')
+    notOk view.$el.find('#point_change_warning:visible').attr('aria-expanded')
 
   test 'does show error message on assignment point change without submissions', ->
     view = @editView has_submitted_submissions: false
     view.$el.appendTo $('#fixtures')
-    ok !view.$el.find('#point_change_warning:visible').attr('aria-expanded')
+    notOk view.$el.find('#point_change_warning:visible').attr('aria-expanded')
     view.$el.find('#assignment_points_possible').val(1)
     view.$el.find('#assignment_points_possible').trigger("change")
-    ok !view.$el.find('#point_change_warning:visible').attr('aria-expanded')
+    notOk view.$el.find('#point_change_warning:visible').attr('aria-expanded')
 
   test 'does not allow point value of "" if grading type is letter', ->
     view = @editView()
     data = points_possible: '', grading_type: 'letter_grade'
     errors = view._validatePointsRequired(data, [])
     equal errors['points_possible'][0]['message'], 'Points possible must be 0 or more for selected grading type'
-
-    #fragile spec on Firefox, Safari
-    #adds student group
-    # view.$('#has_group_category').click()
-    # view.$('#assignment_group_category_id option:eq(0)').attr("selected", "selected")
-    # equal view.getFormData()['group_category_id'], "1"
 
     #removes student group
     view.$('#has_group_category').click()
@@ -208,7 +250,7 @@ define [
     ENV.HAS_GRADED_SUBMISSIONS = false
     view = @editView has_submitted_submissions: true, moderated_grading: true
     ok view.$("[type=checkbox][name=moderated_grading]").prop("checked")
-    ok !view.$("[type=checkbox][name=moderated_grading]").prop("disabled")
+    notOk view.$("[type=checkbox][name=moderated_grading]").prop("disabled")
     equal view.$('[type=hidden][name=moderated_grading]').attr('value'), '0'
 
   test 'locks down moderation setting after students submit', ->
@@ -236,15 +278,115 @@ define [
     view = @editView()
     equal view.locationAfterCancel({ return_to: 'http://bar' }), 'http://bar'
 
+  test 'disables fields when inClosedGradingPeriod', ->
+    view = @editView(in_closed_grading_period: true)
+    view.$el.appendTo $('#fixtures')
 
-  module 'EditView: group category locked',
+    ok view.$el.find('#assignment_name').attr('readonly')
+    ok view.$el.find('#assignment_points_possible').attr('readonly')
+    ok view.$el.find('#assignment_group_id').attr('readonly')
+    equal view.$el.find('#assignment_group_id').attr('aria-readonly'), 'true'
+    ok view.$el.find('#assignment_grading_type').attr('readonly')
+    equal view.$el.find('#assignment_grading_type').attr('aria-readonly'), 'true'
+    ok view.$el.find('#has_group_category').attr('readonly')
+    equal view.$el.find('#has_group_category').attr('aria-readonly'), 'true'
+
+  test 'does not disable post to sis when inClosedGradingPeriod', ->
+    ENV.POST_TO_SIS = true
+    view = @editView(in_closed_grading_period: true)
+    view.$el.appendTo $('#fixtures')
+    notOk view.$el.find('#assignment_post_to_sis').attr('disabled')
+
+  test 'disableCheckbox is called for a disabled checkbox', ->
+    view = @editView(in_closed_grading_period: true)
+    view.$el.appendTo $('#fixtures')
+    $('<input type="checkbox" id="checkbox_fixture"/>').appendTo $(view.$el)
+
+    # because we're stubbing so late we must call disableFields() again
+    disableCheckboxStub =  @stub view, 'disableCheckbox'
+    view.disableFields()
+
+    equal disableCheckboxStub.called, true
+
+  test 'ignoreClickHandler is called for a disabled radio', ->
+    view = @editView(in_closed_grading_period: true)
+    view.$el.appendTo $('#fixtures')
+
+    $('<input type="radio" id="fixture_radio"/>').appendTo $(view.$el)
+
+    # because we're stubbing so late we must call disableFields() again
+    ignoreClickHandlerStub =  @stub view, 'ignoreClickHandler'
+    view.disableFields()
+
+    view.$el.find('#fixture_radio').click()
+    equal ignoreClickHandlerStub.calledOnce, true
+
+  test 'lockSelectValueHandler is called for a disabled select', ->
+    view = @editView(in_closed_grading_period: true)
+    view.$el.html('')
+    $('<select id="select_fixture"><option selected>1</option></option>2</option></select>').appendTo $(view.$el)
+    view.$el.appendTo $('#fixtures')
+
+    # because we're stubbing so late we must call disableFields() again
+    lockSelectValueHandlerStub =  @stub view, 'lockSelectValueHandler'
+    view.disableFields()
+    equal lockSelectValueHandlerStub.calledOnce, true
+
+  test 'lockSelectValueHandler freezes selected value', ->
+    view = @editView(in_closed_grading_period: true)
+    view.$el.html('')
+    $('<select id="select_fixture"><option selected>1</option></option>2</option></select>').appendTo $(view.$el)
+    view.$el.appendTo $('#fixtures')
+
+    selectedValue = view.$el.find('#fixture_select').val()
+    view.$el.find('#fixture_select').val(2).trigger('change')
+    equal view.$el.find('#fixture_select').val(), selectedValue
+
+  test 'fields are enabled when not inClosedGradingPeriod', ->
+    view = @editView()
+    view.$el.appendTo $('#fixtures')
+
+    notOk view.$el.find('#assignment_name').attr('readonly')
+    notOk view.$el.find('#assignment_points_possible').attr('readonly')
+    notOk view.$el.find('#assignment_group_id').attr('readonly')
+    notOk view.$el.find('#assignment_group_id').attr('aria-readonly')
+    notOk view.$el.find('#assignment_grading_type').attr('readonly')
+    notOk view.$el.find('#assignment_grading_type').attr('aria-readonly')
+    notOk view.$el.find('#has_group_category').attr('readonly')
+    notOk view.$el.find('#has_group_category').attr('aria-readonly')
+
+  QUnit.module 'EditView: handleGroupCategoryChange',
     setup: ->
       fakeENV.setup()
-      @oldAddGroupCategory = window.addGroupCategory
-      window.addGroupCategory = @stub()
+      ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
+
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
-      window.addGroupCategory = @oldAddGroupCategory
+      document.getElementById('fixtures').innerHTML = ''
+
+    editView: ->
+      editView.apply(this, arguments)
+
+  test 'calls handleModeratedGradingChange', ->
+    view = @editView()
+    spy = @spy(view, 'handleModeratedGradingChange')
+    view.handleGroupCategoryChange()
+
+    ok spy.calledOnce
+
+  QUnit.module 'EditView: group category inClosedGradingPeriod',
+    setup: ->
+      fakeENV.setup()
+      ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
+
+    teardown: ->
+      @server.restore()
+      fakeENV.teardown()
+      document.getElementById("fixtures").innerHTML = ""
+
     editView: ->
       editView.apply(this, arguments)
 
@@ -253,20 +395,58 @@ define [
     ok view.$(".group_category_locked_explanation").length
     ok view.$("#has_group_category").prop("disabled")
     ok view.$("#assignment_group_category_id").prop("disabled")
-    ok !view.$("[type=checkbox][name=grade_group_students_individually]").prop("disabled")
+    notOk view.$("[type=checkbox][name=grade_group_students_individually]").prop("disabled")
 
     view = @editView has_submitted_submissions: false
     equal view.$(".group_category_locked_explanation").length, 0
-    ok !view.$("#has_group_category").prop("disabled")
-    ok !view.$("#assignment_group_category_id").prop("disabled")
-    ok !view.$("[type=checkbox][name=grade_group_students_individually]").prop("disabled")
+    notOk view.$("#has_group_category").prop("disabled")
+    notOk view.$("#assignment_group_category_id").prop("disabled")
+    notOk view.$("[type=checkbox][name=grade_group_students_individually]").prop("disabled")
 
-  module 'EditView: setDefaultsIfNew',
+  QUnit.module 'EditView: enableCheckbox',
     setup: ->
       fakeENV.setup()
-      @stub(userSettings, 'contextGet').returns {submission_types: "foo", peer_reviews: "1", assignment_group_id: 99}
+      ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
+
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
+      document.getElementById('fixtures').innerHTML = ''
+
+    editView: ->
+      editView.apply(this, arguments)
+
+  test 'enables checkbox', ->
+    view = @editView()
+    @stub(view.$('#assignment_peer_reviews'), 'parent').returns(view.$('#assignment_peer_reviews'))
+
+    view.$('#assignment_peer_reviews').prop('disabled', true)
+    view.enableCheckbox(view.$('#assignment_peer_reviews'))
+
+    notOk view.$('#assignment_peer_reviews').prop('disabled')
+
+  test 'does nothing if assignment is in closed grading period', ->
+    view = @editView()
+    @stub(view.assignment, 'inClosedGradingPeriod').returns true
+
+    view.$('#assignment_peer_reviews').prop('disabled', true)
+    view.enableCheckbox(view.$('#assignment_peer_reviews'))
+
+    ok view.$('#assignment_peer_reviews').prop('disabled')
+
+  QUnit.module 'EditView: setDefaultsIfNew',
+    setup: ->
+      fakeENV.setup()
+      ENV.COURSE_ID = 1
+      @stub(userSettings, 'contextGet').returns {submission_types: "foo", peer_reviews: "1", assignment_group_id: 99}
+      @server = sinon.fakeServer.create()
+
+    teardown: ->
+      @server.restore()
+      fakeENV.teardown()
+      document.getElementById("fixtures").innerHTML = ""
+
     editView: ->
       editView.apply(this, arguments)
 
@@ -296,12 +476,18 @@ define [
 
     equal view.assignment.get('submission_types'), "foo"
 
-  module 'EditView: setDefaultsIfNew: no localStorage',
+  QUnit.module 'EditView: setDefaultsIfNew: no localStorage',
     setup: ->
       fakeENV.setup()
+      ENV.COURSE_ID = 1
       @stub(userSettings, 'contextGet').returns null
+      @server = sinon.fakeServer.create()
+
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
+      document.getElementById("fixtures").innerHTML = ""
+
     editView: ->
       editView.apply(this, arguments)
 
@@ -311,11 +497,17 @@ define [
 
     equal view.assignment.get('submission_type'), "online"
 
-  module 'EditView: cacheAssignmentSettings',
+  QUnit.module 'EditView: cacheAssignmentSettings',
     setup: ->
       fakeENV.setup()
+      ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
+
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
+      document.getElementById("fixtures").innerHTML = ""
+
     editView: ->
       editView.apply(this, arguments)
 
@@ -335,15 +527,21 @@ define [
 
     equal null, userSettings.contextGet("new_assignment_settings")["invalid_attribute_example"]
 
-  module 'EditView: Conditional Release',
+  QUnit.module 'EditView: Conditional Release',
     setup: ->
       fakeENV.setup()
+      ENV.COURSE_ID = 1
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
       ENV.CONDITIONAL_RELEASE_ENV = { assignment: { id: 1 }, jwt: 'foo' }
       $(document).on 'submit', -> false
+      @server = sinon.fakeServer.create()
+
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       $(document).off 'submit'
+      document.getElementById("fixtures").innerHTML = ""
+
     editView: ->
       editView.apply(this, arguments)
 
@@ -374,6 +572,7 @@ define [
 
   test 'validates conditional release', ->
     view = @editView()
+    ENV.ASSIGNMENT = view.assignment
     stub = @stub(view.conditionalReleaseEditor, 'validateBeforeSave').returns 'foo'
     errors = view.validateBeforeSave(view.getFormData(), {})
     ok errors['conditional_release'] == 'foo'
@@ -400,11 +599,17 @@ define [
     view.showErrors({ conditional_release: 'foo' })
     ok focusOnError.called
 
-  module 'Editview: Intra-Group Peer Review toggle',
+  QUnit.module 'Editview: Intra-Group Peer Review toggle',
     setup: ->
       fakeENV.setup()
+      ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
+
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
+      document.getElementById("fixtures").innerHTML = ""
+
     editView: ->
       editView.apply(this, arguments)
 
@@ -422,10 +627,60 @@ define [
     @stub(userSettings, 'contextGet').returns {peer_reviews: "1", group_category_id: 1}
     view = @editView()
     view.$el.appendTo $('#fixtures')
-    ok !view.$('#intra_group_peer_reviews').is(":visible")
+    notOk view.$('#intra_group_peer_reviews').is(":visible")
 
   test 'toggle does not appear when there is no group', ->
     @stub(userSettings, 'contextGet').returns {peer_reviews: "1"}
     view = @editView()
     view.$el.appendTo $('#fixtures')
-    ok !view.$('#intra_group_peer_reviews').is(":visible")
+    notOk view.$('#intra_group_peer_reviews').is(":visible")
+
+  QUnit.module 'EditView: Assignment Configuration Tools',
+    setup: ->
+      fakeENV.setup()
+      ENV.COURSE_ID = 1
+      ENV.PLAGIARISM_DETECTION_PLATFORM = true
+      @server = sinon.fakeServer.create()
+
+    teardown: ->
+      @server.restore()
+      fakeENV.teardown()
+      document.getElementById("fixtures").innerHTML = ""
+
+    editView: ->
+      editView.apply(this, arguments)
+
+  test 'it attaches assignment configuration component', ->
+    view = @editView()
+    equal view.$similarityDetectionTools.children().size(), 1
+
+  test 'it is hidden if submission type is not online with a file upload', ->
+    view = @editView()
+    view.$el.appendTo $('#fixtures')
+    equal view.$('#similarity_detection_tools').css('display'), 'none'
+
+    view.$('#assignment_submission_type').val('on_paper')
+    view.handleSubmissionTypeChange()
+    equal view.$('#similarity_detection_tools').css('display'), 'none'
+
+    view.$('#assignment_submission_type').val('external_tool')
+    view.handleSubmissionTypeChange()
+    equal view.$('#similarity_detection_tools').css('display'), 'none'
+
+    view.$('#assignment_submission_type').val('online')
+    view.$('#assignment_online_upload').attr('checked', false)
+    view.handleSubmissionTypeChange()
+    equal view.$('#similarity_detection_tools').css('display'), 'none'
+
+    view.$('#assignment_submission_type').val('online')
+    view.$('#assignment_online_upload').attr('checked', true)
+    view.handleSubmissionTypeChange()
+    equal view.$('#similarity_detection_tools').css('display'), 'block'
+
+  test 'it is hidden if the plagiarism_detection_platform flag is disabled', ->
+    ENV.PLAGIARISM_DETECTION_PLATFORM = false
+    view = @editView()
+    view.$('#assignment_submission_type').val('online')
+    view.$('#assignment_online_upload').attr('checked', true)
+    view.handleSubmissionTypeChange()
+    equal view.$('#similarity_detection_tools').css('display'), 'none'

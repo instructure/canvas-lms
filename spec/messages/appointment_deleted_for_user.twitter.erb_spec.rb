@@ -20,6 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'appointment_deleted_for_user.twitter' do
+  include MessagesCommon
+
   it "should render" do
     user = user_model(:name => 'bob')
     appointment_participant_model(:participant => user)
@@ -30,7 +32,6 @@ describe 'appointment_deleted_for_user.twitter' do
                                        :cancel_reason => "just because"})
 
     expect(@message.body).to include('some title')
-    expect(@message.main_link).to be_present
   end
 
   it "should render for groups" do
@@ -47,6 +48,5 @@ describe 'appointment_deleted_for_user.twitter' do
                                        :cancel_reason => "just because"})
 
     expect(@message.body).to include('some title')
-    expect(@message.main_link).to be_present
   end
 end

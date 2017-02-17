@@ -1,4 +1,4 @@
-class RemoveInactiveEnrollmentState < ActiveRecord::Migration
+class RemoveInactiveEnrollmentState < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

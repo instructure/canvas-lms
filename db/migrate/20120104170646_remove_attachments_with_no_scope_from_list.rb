@@ -1,4 +1,4 @@
-class RemoveAttachmentsWithNoScopeFromList < ActiveRecord::Migration
+class RemoveAttachmentsWithNoScopeFromList < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   disable_ddl_transaction!

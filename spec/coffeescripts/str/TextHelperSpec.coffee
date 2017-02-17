@@ -1,5 +1,5 @@
 define [ 'compiled/str/TextHelper' ], ({delimit, truncateText, formatMessage}) ->
-  module 'TextHelper'
+  QUnit.module 'TextHelper'
 
   test 'delimit: comma-delimits long numbers', ->
     equal delimit(123456), '123,456'

@@ -60,7 +60,7 @@ class Announcement < DiscussionTopic
 
   set_broadcast_policy! do
     dispatch :new_announcement
-    to { users_with_permissions(active_participants(true) - [user]) }
+    to { users_with_permissions(active_participants_include_tas_and_teachers(true) - [user]) }
     whenever { |record|
       record.send_notification_for_context? and
         ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))

@@ -17,6 +17,7 @@
 #
 
 require_relative '../../../spec_helper.rb'
+require_dependency "api/html/url_proxy"
 
 module Api
   module Html

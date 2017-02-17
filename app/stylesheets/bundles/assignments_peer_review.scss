@@ -1,0 +1,30 @@
+@import "base/environment";
+
+.peer_review {
+  padding: 2px 5px;
+}
+.peer_review.submission-hover {
+  background-color: $ic-color-medium-light;
+  -moz-border-radius: 3px;
+}
+.peer_review .review_links {
+  display: none;
+}
+.peer_review.submission-hover .review_links {
+  display: inline;
+}
+.student_reviews .person_gray {
+  padding-left: 20px;
+  background: url(/images/grading_icon_gray.png) no-repeat left center;
+  color: #888;
+}
+.student_reviews .person {
+  padding-left: 20px;
+  background: url(/images/grading_icon.png) no-repeat left center;
+}
+
+a.icon-add.assign_peer_review_link,
+a.remind_peer_review_link,
+a.delete_review_link {
+  color: $ic-color-medium-darker;
+}

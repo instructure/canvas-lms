@@ -1,14 +1,13 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/UploadButton'
   'compiled/react_files/modules/FileOptionsCollection'
-], (React, ReactDOM, $, UploadButton, FileOptionsCollection) ->
+], (React, ReactDOM, {Simulate}, $, UploadButton, FileOptionsCollection) ->
 
-  Simulate = React.addons.TestUtils.Simulate
-
-  module 'UploadButton',
+  QUnit.module 'UploadButton',
     setup: ->
       props =
         currentFolder:

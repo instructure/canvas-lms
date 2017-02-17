@@ -80,7 +80,7 @@
 #
 class ContentExportsApiController < ApplicationController
   include Api::V1::ContentExport
-  before_filter :require_context
+  before_action :require_context
 
   # @API List content exports
   #
@@ -156,7 +156,7 @@ class ContentExportsApiController < ApplicationController
       # recheck, since the export type influences permissions (e.g., students can download zips of non-locked files, but not common cartridges)
       return unless authorized_action(export, @current_user, :create)
 
-      opts = params.slice(:version)
+      opts = params.slice(:version).to_hash.with_indifferent_access
       export.progress = 0
       if export.save
         export.queue_api_job(opts)

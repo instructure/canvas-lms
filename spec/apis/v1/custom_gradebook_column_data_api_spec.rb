@@ -27,11 +27,11 @@ describe CustomGradebookColumnDataApiController, type: :request do
     s1, s2 = 2.times.map { |i|
       @course.course_sections.create! name: "section #{i}"
     }
-    @student1, @student2 = 2.times.map { user(active_all: true) }
+    @student1, @student2 = 2.times.map { user_factory(active_all: true) }
     s1.enroll_user @student1, 'StudentEnrollment', 'active'
     s2.enroll_user @student2, 'StudentEnrollment', 'active'
 
-    @ta = user(active_all: true)
+    @ta = user_factory(active_all: true)
     @course.enroll_user @ta, 'TaEnrollment',
       workflow_state: 'active', section: s2,
       limit_privileges_to_course_section: true

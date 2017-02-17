@@ -12,7 +12,9 @@
 
 .bundle/
 .byebug_history
+.env
 /.yardoc/
+/.ruby-version
 /app/coffeescripts/ember/*/main.coffee
 /app/coffeescripts/ember/screenreader_gradebook/templates/**/*.js
 /app/views/info/styleguide.html.erb
@@ -31,7 +33,7 @@ app/stylesheets/brandable_css_brands
 /db/*sql
 /exports/
 Gemfile.lock
-Gemfile.lock5
+Gemfile.lock.5
 /log/
 mkmf.log
 /node_modules
@@ -52,12 +54,11 @@ npm-debug.log
 /public/webpack-dist/
 /spec/javascripts/webpack/
 /spec/javascripts/compiled/
+/spec/javascripts/load_tests.js
 /spec/javascripts/requirejs_config.js
-/spec/javascripts/runner.html
 /spec/javascripts/tests.js
 /tmp/
 /vendor/bundle
-docker-compose.override.yml
 
 # generated plugin stuff
 /app/coffeescripts/plugins/
@@ -71,10 +72,11 @@ docker-compose.override.yml
 # generated client app stuff
 /public/javascripts/client_apps/
 
-# remove this once we move jquery into bower
-/public/javascripts/bower/jquery/
 
 # canvas-gems
 /gems/*/coverage
 /gems/*/tmp
 /gems/*/node_modules
+
+# user docker compose overrides
+docker-compose.local.*

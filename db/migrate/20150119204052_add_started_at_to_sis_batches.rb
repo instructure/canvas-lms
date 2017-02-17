@@ -1,4 +1,4 @@
-class AddStartedAtToSisBatches < ActiveRecord::Migration
+class AddStartedAtToSisBatches < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

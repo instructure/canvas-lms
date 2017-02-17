@@ -17,12 +17,10 @@
 #
 
 class GradebookUpload < ActiveRecord::Base
-  strong_params
-
   belongs_to :course
   belongs_to :user
   belongs_to :progress
-  has_many :attachments, as: :context, dependent: :destroy
+  has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
 
   serialize :gradebook, JSON
 

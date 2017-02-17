@@ -78,7 +78,7 @@
           </a>
         </li>
         <li>
-          <label for="appointment-blocks-participant-visibility-button-{{uniqid}}">{{checkbox "participant_visibility" id="appointment-blocks-participant-visibility-button" uniqid=true}} 
+          <label for="appointment-blocks-participant-visibility-button-{{uniqid}}">{{checkbox "participant_visibility" id="appointment-blocks-participant-visibility-button" uniqid=true}}
             {{#t}}Allow students to see who has signed up for time slots.{{/t}}
           </label>
         </li>
@@ -103,7 +103,12 @@
     <textarea id="edit-appointment-details-{{uniqid}}" name="description" class="input-block-level">{{appointment_group.description}}</textarea>
   </div>
   <div class="popover-links-holder event-details-footer pull-right scheduler-event-details-footer">
-    <a href="#" class="event_button btn btn-secondary more_options_link save_without_publishing_link">{{#t}}Save{{/t}}</a>
-    <button type="submit" class="event_button btn btn-primary">{{#t}}Save & Publish{{/t}}</button>
+    {{#if better_scheduler}}
+      <a href="#" class="event_button btn btn-secondary more_options_link cancel_btn">{{#t}}Cancel{{/t}}</a>
+      <button type="submit" class="event_button btn btn-primary">{{#t}}Publish{{/t}}</button>
+    {{else}}
+       <a href="#" class="event_button btn btn-secondary more_options_link save_without_publishing_link">{{#t}}Save{{/t}}</a>
+       <button type="submit" class="event_button btn btn-primary">{{#t}}Save & Publish{{/t}}</button>
+    {{/if}}
   </div>
 </form>

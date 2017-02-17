@@ -1,14 +1,19 @@
 module GroupsCommon
+  def self.included(mod)
+    mod.singleton_class.include(ClassMethods)
+  end
 
-  def setup_group_page_urls
-    let(:url) {"/groups/#{@testgroup.first.id}"}
-    let(:announcements_page) {url + '/announcements'}
-    let(:people_page) {url + '/users'}
-    let(:discussions_page) {url + '/discussion_topics'}
-    let(:pages_page) {url + '/pages'}
-    let(:files_page) {url + '/files'}
-    let(:conferences_page) {url + '/conferences'}
-    let(:collaborations_page) {url + '/collaborations'}
+  module ClassMethods
+    def setup_group_page_urls
+      let(:url) {"/groups/#{@testgroup.first.id}"}
+      let(:announcements_page) {url + '/announcements'}
+      let(:people_page) {url + '/users'}
+      let(:discussions_page) {url + '/discussion_topics'}
+      let(:pages_page) {url + '/pages'}
+      let(:files_page) {url + '/files'}
+      let(:conferences_page) {url + '/conferences'}
+      let(:collaborations_page) {url + '/collaborations'}
+    end
   end
 
   def seed_students(count, base_name = 'Test Student')
@@ -202,7 +207,7 @@ module GroupsCommon
   end
 
   def select_randomly_assign_students_option
-    f('.icon-settings').click
+    f('.group-category-summary .icon-settings').click
     wait_for_ajaximations
     f('.randomly-assign-members').click
     wait_for_ajaximations
@@ -299,7 +304,7 @@ module GroupsCommon
   def verify_member_sees_group_page(index = 0)
     get pages_page
     expect_new_page_load { ff('.wiki-page-link')[index].click }
-    expect expect(f('.page-title')).to include_text("#{@page.title}")
+    expect(f('.page-title')).to include_text(@page.title)
   end
 
   # context test. if true, allows you to test files both in and out of group context,

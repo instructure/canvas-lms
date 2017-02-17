@@ -98,8 +98,12 @@ define [
       # e.g. SIS groups, we shouldn't be able to edit them
       @get('role') is 'uncategorized'
 
-    assignUnassignedMembers: ->
-      $.ajaxJSON "/api/v1/group_categories/#{@id}/assign_unassigned_members", 'POST', {}, @setUpProgress
+    assignUnassignedMembers: (group_by_section) ->
+      if group_by_section
+        qs = "?group_by_section=1"
+      else
+        qs = ''
+      $.ajaxJSON "/api/v1/group_categories/#{@id}/assign_unassigned_members#{qs}", 'POST', {}, @setUpProgress
 
     cloneGroupCategoryWithName: (name) ->
       $.ajaxJSON "/group_categories/#{@id}/clone_with_name", 'POST', {name: name}
@@ -122,11 +126,13 @@ define [
     sync: (method, model, options = {}) ->
       options.url = @urlFor(method)
       if method is 'create' and model.get('split_groups') is '1'
+        model.set('assign_async', true) # if we don't specify this, it will auto-assign on creation, not asyncronously
+        group_by_section = (model.get('group_by_section') == '1')
         success = options.success ? ->
         options.success = (args) =>
           @progressStarting = true
           success(args)
-          @assignUnassignedMembers()
+          @assignUnassignedMembers(group_by_section)
       else if method is 'delete'
         if model.progressModel
           model.progressModel.onPoll = ->

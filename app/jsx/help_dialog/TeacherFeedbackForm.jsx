@@ -61,7 +61,7 @@ define([
 
         return (
           <option key={value} value={value} selected={window.ENV.context_id == c.id}>
-            {htmlEscape(c.name)}
+            {c.name}
           </option>
         );
       });

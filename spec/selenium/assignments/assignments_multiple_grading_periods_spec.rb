@@ -24,20 +24,20 @@ describe "assignments index grading period filter" do
     get "/courses/#{@course.id}/assignments"
 
     select_grading_period "0"
-    expect(ff("li.assignment:not(.hidden)").count).to eq 1
+    expect(ff("li.assignment:not(.hidden)")).to have_size 1
     expect(f("#assignment_#{@assignments[0].id}")).to be_displayed
 
     select_grading_period "1"
-    expect(ff("li.assignment:not(.hidden)").count).to eq 1
+    expect(ff("li.assignment:not(.hidden)")).to have_size 1
     expect(f("#assignment_#{@assignments[1].id}")).to be_displayed
 
     select_grading_period "2"
-    expect(ff("li.assignment:not(.hidden)").count).to eq 2
+    expect(ff("li.assignment:not(.hidden)")).to have_size 2
     expect(f("#assignment_#{@assignments[2].id}")).to be_displayed
     expect(f("#assignment_#{@undated_assignment.id}")).to be_displayed
 
     select_grading_period "all"
-    expect(ff("li.assignment:not(.hidden)").count).to eq 4
+    expect(ff("li.assignment:not(.hidden)")).to have_size 4
   end
 
   it "retains the selected grading period in local storage" do

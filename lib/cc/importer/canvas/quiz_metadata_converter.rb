@@ -61,11 +61,16 @@ module CC::Importer::Canvas
       if doc.at_css("assignment_overrides override")
         quiz['assignment_overrides'] = []
         doc.css("assignment_overrides override").each do |override_node|
-          quiz['assignment_overrides'] << {
+          override = {
             set_type: override_node["set_type"],
             set_id: override_node["set_id"],
             title: override_node["title"]
           }
+          AssignmentOverride.overridden_dates.each do |field|
+            next unless override_node.has_attribute?(field.to_s)
+            override[field] = override_node[field.to_s]
+          end
+          quiz['assignment_overrides'] << override
         end
       end
 

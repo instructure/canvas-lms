@@ -20,10 +20,11 @@ define [
   'jsx/shared/conditional_release/ConditionalRelease'
   'compiled/util/deparam'
   'compiled/jquery.rails_flash_notifications' #flashMessage
+  'jsx/shared/helpers/numberHelper'
 ], (I18n, ValidatedFormView, AssignmentGroupSelector, GradingTypeSelector,
 GroupCategorySelector, PeerReviewsSelector, PostToSisSelector, _, template, RichContentEditor,
 htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, MissingDateDialog, KeyboardShortcuts,
-ConditionalRelease, deparam) ->
+ConditionalRelease, deparam, flashMessage, numberHelper) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -110,6 +111,7 @@ ConditionalRelease, deparam) ->
         canModerate: @permissions.CAN_MODERATE
         isLargeRoster: ENV?.IS_LARGE_ROSTER || false
         threaded: data.discussion_type is "threaded"
+        inClosedGradingPeriod: @assignment.inClosedGradingPeriod()
       json.assignment = json.assignment.toView()
       json
 
@@ -121,8 +123,9 @@ ConditionalRelease, deparam) ->
 
     handlePointsChange:(ev) =>
       ev.preventDefault()
+      @assignment.pointsPossible(@$assignmentPointsPossible.val())
       if @assignment.hasSubmittedSubmissions()
-        @$discussionPointPossibleWarning.toggleAccessibly(@$assignmentPointsPossible.val() != "#{@initialPointsPossible}")
+        @$discussionPointPossibleWarning.toggleAccessibly(@assignment.pointsPossible() != @initialPointsPossible)
 
 
     # also separated for easy stubbing
@@ -189,6 +192,7 @@ ConditionalRelease, deparam) ->
         sectionLabel: @messages.group_category_section_label
         fieldLabel: @messages.group_category_field_label
         lockedMessage: @messages.group_locked_message
+        inClosedGradingPeriod: @assignment.inClosedGradingPeriod()
 
       @groupCategorySelector.render()
 
@@ -235,6 +239,12 @@ ConditionalRelease, deparam) ->
 
       assign_data = data.assignment
       delete data.assignment
+
+      if assign_data?.points_possible
+        # this happens before validation, so we better validate it here
+        if numberHelper.validate(assign_data.points_possible)
+          assign_data.points_possible = numberHelper.parse(assign_data.points_possible)
+
 
       if assign_data?.set_assignment is '1'
         data.set_assignment = '1'
@@ -331,6 +341,7 @@ ConditionalRelease, deparam) ->
           assignment_overrides: @dueDateOverrideView.getAllDates()
         errors = @dueDateOverrideView.validateBeforeSave(data2, errors)
         errors = @_validatePointsPossible(data, errors)
+        errors = @_validateTitle(data, errors)
       else
         @model.set 'assignment', @model.createAssignment(set_assignment: false)
 
@@ -346,11 +357,21 @@ ConditionalRelease, deparam) ->
 
       errors
 
+    _validateTitle: (data, errors) =>
+      max_name_length = 256
+      if data.assignment.attributes.post_to_sis == '1' && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT == true
+        max_name_length = ENV.MAX_NAME_LENGTH + 1
+      if $.trim(data.title.toString()).length > max_name_length
+        errors["title"] = [
+          message: I18n.t "Title is too long, must be under %{length} characters", length: max_name_length
+        ]
+      errors
+
     _validatePointsPossible: (data, errors) =>
       assign = data.assignment
       frozenPoints = _.contains(assign.frozenAttributes(), "points_possible")
 
-      if !frozenPoints and assign.pointsPossible() and isNaN(parseFloat(assign.pointsPossible()))
+      if !frozenPoints and assign.pointsPossible() and !numberHelper.validate(assign.pointsPossible())
         errors["assignment[points_possible]"] = [
           message: I18n.t 'points_possible_number', 'Points possible must be a number'
         ]
@@ -359,7 +380,6 @@ ConditionalRelease, deparam) ->
     showErrors: (errors) ->
       # override view handles displaying override errors, remove them
       # before calling super
-      # see getFormValues in DueDateView.coffee
       delete errors.assignmentOverrides
       if @showConditionalRelease()
         # switch to a tab with errors

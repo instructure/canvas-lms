@@ -1,4 +1,4 @@
-class PopulateManageCatalogPermission < ActiveRecord::Migration
+class PopulateManageCatalogPermission < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

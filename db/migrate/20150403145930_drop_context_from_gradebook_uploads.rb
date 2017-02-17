@@ -1,4 +1,4 @@
-class DropContextFromGradebookUploads < ActiveRecord::Migration
+class DropContextFromGradebookUploads < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

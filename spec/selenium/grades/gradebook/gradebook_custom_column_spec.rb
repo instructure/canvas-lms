@@ -1,18 +1,19 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2 - custom columns" do
+describe "gradebook - custom columns" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
-  let!(:setup) { gradebook_data_setup }
+  before(:once) { gradebook_data_setup }
+  before(:each) { user_session(@teacher) }
 
   def custom_column(opts = {})
     opts.reverse_merge! title: "<b>SIS ID</b>"
     @course.custom_gradebook_columns.create! opts
   end
 
-  def header_text(n)
-    f(".container_0 .slick-header-column:nth-child(#{n})").text
+  def header(n)
+    f(".container_0 .slick-header-column:nth-child(#{n})")
   end
 
   it "shows custom columns", priority: "2", test_id: 164225 do
@@ -25,16 +26,15 @@ describe "gradebook2 - custom columns" do
       d.content = "123456"
     end.save!
 
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
+    get "/courses/#{@course.id}/gradebook"
 
-    expect(header_text(3)).to eq col.title
+    expect(header(3)).to include_text col.title
     expect(ff(".container_0 .slick-header-column").map(&:text).join).not_to include hidden.title
     expect(ff(".slick-cell.custom_column").count { |c| c.text == "123456" }).to eq 1
   end
 
   it "lets you show and hide the teacher notes column", priority: "1", test_id: 164008 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     has_notes_column = lambda do
       ff(".container_0 .slick-header-column").any? { |h| h.text == "Notes" }

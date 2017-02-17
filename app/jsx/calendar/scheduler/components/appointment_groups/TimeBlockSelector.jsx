@@ -129,7 +129,7 @@ define([
               <label
                 dangerouslySetInnerHTML={{
                   __html: I18n.t('Divide into equal slots of %{input_value} minutes. ', {
-                    input_value: '<input class="TimeBlockSelector__DivideSection-Input" />'
+                    input_value: '<input class="TimeBlockSelector__DivideSection-Input" value="30" type="number"/>'
                   })
                 }}
               />

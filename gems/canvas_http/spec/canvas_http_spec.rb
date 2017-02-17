@@ -29,13 +29,13 @@ describe "CanvasHttp" do
       stub_request(:get, "http://www.example.com/a/b").
         to_return(body: "Hello", headers: { 'Content-Length' => 5 })
       res = CanvasHttp.get("http://www.example.com/a/b")
-      res.should be_a Net::HTTPOK
-      res.body.should == "Hello"
+      expect(res).to be_a Net::HTTPOK
+      expect(res.body).to eq("Hello")
     end
 
     it "does not use ssl" do
       http = double.as_null_object
-      Net::HTTP.stub(:new) { http }
+      allow(Net::HTTP).to receive(:new) { http }
       expect(http).to receive(:use_ssl=).with(false)
       response = double('Response')
       expect(response).to receive(:body)
@@ -46,7 +46,7 @@ describe "CanvasHttp" do
 
     it "should use ssl" do
       http = double
-      Net::HTTP.stub(:new) { http }
+      allow(Net::HTTP).to receive(:new) { http }
       expect(http).to receive(:use_ssl=).with(true)
       expect(http).to receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_NONE)
       expect(http).to receive(:request).and_yield(double(body: 'Hello SSL'))
@@ -54,7 +54,7 @@ describe "CanvasHttp" do
       expect(http).to receive(:ssl_timeout=).with(5)
       expect(http).to receive(:read_timeout=).with(30)
 
-      CanvasHttp.get("https://www.example.com/a/b").body.should == "Hello SSL"
+      expect(CanvasHttp.get("https://www.example.com/a/b").body).to eq("Hello SSL")
     end
 
     it "should follow redirects" do
@@ -65,8 +65,8 @@ describe "CanvasHttp" do
       stub_request(:get, "http://www.example3.com/a").
         to_return(body: "Hello", headers: { 'Content-Length' => 5 })
       res = CanvasHttp.get("http://www.example.com/a")
-      res.should be_a Net::HTTPOK
-      res.body.should == "Hello"
+      expect(res).to be_a Net::HTTPOK
+      expect(res.body).to eq("Hello")
     end
 
     it "should follow relative redirects" do
@@ -75,8 +75,8 @@ describe "CanvasHttp" do
       stub_request(:get, "http://www.example.com/b").
         to_return(body: "Hello", headers: { 'Content-Length' => 5 })
       res = CanvasHttp.get("http://www.example.com/a")
-      res.should be_a Net::HTTPOK
-      res.body.should == "Hello"
+      expect(res).to be_a Net::HTTPOK
+      expect(res.body).to eq("Hello")
     end
 
     it "should fail on too many redirects" do
@@ -94,8 +94,8 @@ describe "CanvasHttp" do
       CanvasHttp.get("http://www.example.com/a/b") do |yielded_res|
         res = yielded_res
       end
-      res.should be_a Net::HTTPOK
-      res.body.should == "Hello"
+      expect(res).to be_a Net::HTTPOK
+      expect(res.body).to eq("Hello")
     end
 
   end
@@ -103,12 +103,12 @@ describe "CanvasHttp" do
   describe ".tempfile_for_url" do
     before(:each) do
       tempfile = double('tempfile')
-      tempfile.stub(:binmode)
-      Tempfile.stub(:new).and_return(tempfile)
+      allow(tempfile).to receive(:binmode)
+      allow(Tempfile).to receive(:new).and_return(tempfile)
     end
 
     it "truncates uris to 100 characters" do
-      Tempfile.should_receive(:new).with('1234567890' * 10)
+      expect(Tempfile).to receive(:new).with('1234567890' * 10)
       CanvasHttp.tempfile_for_uri(URI.parse('1234567890' * 12))
     end
   end
@@ -116,15 +116,15 @@ describe "CanvasHttp" do
   describe ".connection_for_uri" do
     it "returns a connection for host/port" do
       http = CanvasHttp.connection_for_uri(URI.parse("http://example.com:1234/x/y/z"))
-      http.address.should == "example.com"
-      http.port.should == 1234
-      http.use_ssl?.should == false
+      expect(http.address).to eq("example.com")
+      expect(http.port).to eq(1234)
+      expect(http.use_ssl?).to eq(false)
     end
 
     it "returns an https connection" do
       http = CanvasHttp.connection_for_uri(URI.parse("https://example.com"))
-      http.address.should == "example.com"
-      http.use_ssl?.should == true
+      expect(http.address).to eq("example.com")
+      expect(http.use_ssl?).to eq(true)
     end
   end
 end

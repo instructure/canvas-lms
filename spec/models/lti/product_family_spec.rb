@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require_dependency "lti/product_family"
 
 module Lti
   describe ProductFamily do
@@ -53,6 +54,14 @@ module Lti
         subject.root_account = nil
         subject.save
         expect(subject.errors.first).to eq [:root_account, "can't be blank"]
+      end
+
+      it 'requires unique productcode,vendorcode,rootaccount,developerkey combo' do
+        dev_key = DeveloperKey.create(api_key:'testapikey')
+        subject.update_attributes(developer_key: dev_key, root_account: account)
+        dup_subject = subject.dup
+        dup_subject.save
+        expect(dup_subject.errors.first).to eq [:product_code, "has already been taken"]
       end
 
     end

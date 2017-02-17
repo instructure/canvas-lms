@@ -1,13 +1,36 @@
 @import "base/environment";
 @import "components/context_search";
 
-tr.rosterUser .avatar {
-  width: 20px;
-  height: 20px;
-  margin-top: 1px;
-  margin-right: -7px;
-  position: relative;
-  z-index: 1;
+// to reduce the avatar from displaying so large in the roster table
+.rosterUser .avatar {
+  width: $ic-sp*2;
+  height: $ic-sp*2;
+}
+
+.roster-container {
+  display: flex;
+}
+
+.roster-column {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-list {
+  list-style-type: none;
+  margin: 10px 0 0;
+}
+
+.user-list__item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.user-list__item-details {
+  margin-left: 10px;
 }
 
 .token_input {
@@ -28,4 +51,51 @@ tr.rosterUser .avatar {
   a.browser {
     background: transparent url(/images/messages/context-search-sprite.png) 0 0 no-repeat;
   }
+}
+
+/* Add People */
+.addpeople {
+  .addpeople__peoplesearch {
+    fieldset {
+      margin-top:1.5em;
+    }
+    fieldset.peoplesearch__selections {
+      margin-right: auto;
+      margin-left: auto;
+      text-align: center;
+      .peoplesearch__selection {
+        text-align: left;
+        margin: 0 1em;
+        display: inline-block;
+        width: 30%;
+      }
+    }
+    .peoplesearch__instructions {
+      margin: 1.5em 0;
+      text-align: center;
+      i.icon-user {
+        display:block;
+        height: 50px;
+        margin: 0 auto;
+      }
+      i.icon-user::before {
+        font-size: 48px;
+      }
+    }
+
+
+    /* need a little space between inline inst-ui <RadioInput>s */
+    label[for^='peoplesearch_radio'] {
+        margin-right: 1em;
+    }
+  }
+  .namelist {
+    margin: 1.5em 0;
+  }
+  .peoplevalidationissues__missing tr td:first-child {
+    width: 30px;
+  }
+}
+.addpeople:focus {
+  outline: none;
 }

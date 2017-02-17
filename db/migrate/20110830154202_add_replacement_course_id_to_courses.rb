@@ -1,4 +1,4 @@
-class AddReplacementCourseIdToCourses < ActiveRecord::Migration
+class AddReplacementCourseIdToCourses < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

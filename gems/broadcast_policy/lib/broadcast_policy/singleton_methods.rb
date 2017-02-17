@@ -20,7 +20,7 @@ module BroadcastPolicy
   module SingletonMethods
 
     def self.extended(klass)
-      klass.send(:class_attribute, :broadcast_policy_list)
+      klass.send(:class_attribute, :broadcast_policy_list) unless klass.respond_to?(:broadcast_policy_list)
     end
 
     # This stores the policy for broadcasting changes on a class.  It works like a

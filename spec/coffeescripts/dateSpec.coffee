@@ -1,6 +1,6 @@
 define [ 'vendor/date' ], () ->
 
-  module 'Date'
+  QUnit.module 'Date'
 
   test 'Date.parse', ->
     # create the same date the "new Date" would if the browser were in UTC

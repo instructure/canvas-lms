@@ -33,7 +33,7 @@ define [
       e.preventDefault()
       e.stopPropagation()
       $target = $(e.currentTarget)
-      user = @collection.get($target.data('user-id'))
+      user = @collection.getUser($target.data('user-id'))
       user.save({'group': @group})
       @hide()
 

@@ -1,4 +1,4 @@
-class DropBatchIdFromSisBatches < ActiveRecord::Migration
+class DropBatchIdFromSisBatches < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

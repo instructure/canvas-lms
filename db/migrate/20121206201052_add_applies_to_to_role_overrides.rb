@@ -1,4 +1,4 @@
-class AddAppliesToToRoleOverrides < ActiveRecord::Migration
+class AddAppliesToToRoleOverrides < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

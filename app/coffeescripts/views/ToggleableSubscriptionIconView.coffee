@@ -26,7 +26,7 @@ define [
       position: my: 'center bottom', at: 'center top-10', collision: 'none'
       tooltipClass: 'center bottom vertical'
 
-    events: { 'click', 'hover', 'focus', 'blur' }
+    events: { 'click', 'keyclick' : 'click', 'hover', 'focus', 'blur' }
 
     initialize: ->
       @model.on('change:subscribed', @render)
@@ -96,13 +96,10 @@ define [
       @$el.tooltip('open')
 
     setScreenreaderText: ->
-      @$srElement = @$srElement || @$el.find('.screenreader-only')
-      # Doing this here because for some reason, the handlebars template
-      # doesn't get called for a re-render like it should. :(
       if (@model.get('subscribed'))
-        @$srElement.text(I18n.t('You are subscribed to this topic. Click to unsubscribe.'))
+        @$el.attr('aria-label', I18n.t('You are subscribed to this topic. Click to unsubscribe.'))
       else
-        @$srElement.text(I18n.t('You are not subscribed to this topic. Click to subscribe.'))
+        @$el.attr('aria-label', I18n.t('You are not subscribed to this topic. Click to subscribe.'))
 
     afterRender: ->
       [newClass, tooltipText] = @classAndTextForTooltip()

@@ -1,11 +1,10 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/shared/TimeZoneSelect'
-], (React, TimeZoneSelect) => {
+], (React, TestUtils, TimeZoneSelect) => {
 
-  const TestUtils = React.addons.TestUtils;
-
-  module('TimeZoneSelect Component');
+  QUnit.module('TimeZoneSelect Component');
 
   test('filterTimeZones', () => {
     const timezones = [{

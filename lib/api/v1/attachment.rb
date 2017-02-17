@@ -23,10 +23,14 @@ module Api::V1::Attachment
   include Api::V1::UsageRights
 
   def can_view_hidden_files?(context=@context, user=@current_user, session=nil)
-    context.grants_any_right?(user, session, :manage_files, :read_as_admin)
+    context.grants_any_right?(user, session, :manage_files, :read_as_admin, :manage_contents)
   end
 
   def attachments_json(files, user, url_options = {}, options = {})
+    if options[:can_view_hidden_files] && master_courses?
+      options[:include_master_course_restrictions] = true
+      MasterCourses::Restrictor.preload_restrictions(files)
+    end
     files.map do |f|
       attachment_json(f, user, url_options, options)
     end
@@ -105,7 +109,7 @@ module Api::V1::Attachment
       hash['user'] = user_display_json(attachment.user, context)
     end
     if includes.include? 'preview_url'
-      hash['preview_url'] = attachment.crocodoc_url(user) ||
+      hash['preview_url'] = attachment.crocodoc_url(user, options[:crocodoc_ids]) ||
                             attachment.canvadoc_url(user)
     end
     if includes.include? 'enhanced_preview_url'
@@ -116,6 +120,10 @@ module Api::V1::Attachment
     end
     if includes.include? "context_asset_string"
       hash['context_asset_string'] = attachment.context.try(:asset_string)
+    end
+
+    if options[:include_master_course_restrictions]
+      hash.merge!(attachment.master_course_api_restriction_data)
     end
 
     hash

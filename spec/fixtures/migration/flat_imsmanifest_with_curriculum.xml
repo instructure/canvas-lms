@@ -1,0 +1,801 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- ************************************************************************************************** -->
+<!--                                                                                                    -->
+<!-- Authors:       Colin Smythe    (IMS Global, UK)                                                    -->
+<!-- Version:       1.0                                                                                 -->
+<!-- Date:          30th November, 2014                                                                 -->
+<!--                                                                                                    -->
+<!-- Description:   Test manifest for use in testing Thin CCv1.3 compliant systems.                     -->
+<!--                Consists of 5 LTI and 5 URL links using mixed inline and external LTI and Web Link  -->
+<!--                instances. All compliant systems should import this CC LTI instance.                -->
+<!--                                                                                                    -->
+<!-- History:       First formal release.                                                               -->
+<!--                                                                                                    -->
+<!-- Copyright:     2014 (c) IMS Global Learning Consortium 1999-2014. All Rights Reserved.             -->
+<!--                                                                                                    -->
+<!--                Use of this example to develop products or services is governed by the license with -->
+<!--                IMS found on the IMS website: http://www.imsglobal.org/license.html.                -->
+<!--                                                                                                    -->
+<!--                Permission is granted to all parties to use excerpts from this document as needed   -->
+<!--                in producing requests for proposals.                                                -->
+<!--                                                                                                    -->
+<!--                The limited permissions granted above are perpetual and will not be revoked by IMS  -->
+<!--                or its successors or assigns.                                                       -->
+<!--                                                                                                    -->
+<!--                THIS EXAMPLE IS BEING OFFERED WITHOUT ANY WARRANTY WHATSOEVER, AND IN PARTICULAR,   -->
+<!--                ANY WARRANTY OF NONINFRINGEMENT IS EXPRESSLY DISCLAIMED. ANY USE OF THIS SPECIFICA- -->
+<!--                TION SHALL BE MADE ENTIRELY AT THE IMPLEMENTERS OWN RISK, AND NEITHER THE CONSORTI- -->
+<!--                UM NOR ANY OF ITS MEMBERS OR SUBMITTERS, SHALL HAVE ANY LIABILITY WHATSOEVER TO ANY -->
+<!--                IMPLEMENTER OR THIRD PARTY FOR ANY DAMAGES OF ANY NATURE WHATSOEVER, DIRECTLY OR    -->
+<!--                INDIRECTLY, ARISING FROM THE USE OF THIS SPECIFICATION.                             -->
+<!--                                                                                                    -->
+<!--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
+
+<manifest identifier="thinccvp1_test05"
+  xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imscp_v1p1"
+  xmlns:lomr="http://ltsc.ieee.org/xsd/imsccv1p3/LOM/resource"
+  xmlns:lomm="http://ltsc.ieee.org/xsd/imsccv1p3/LOM/manifest"
+  xmlns:lticc="http://www.imsglobal.org/xsd/imslticc_v1p3"
+  xmlns:lomc="http://ltsc.ieee.org/xsd/imsccv1p3/LOM/imscclti"
+  xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+  xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0"
+  xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0"
+  xmlns:wl="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3"
+  xmlns:csm="http://www.imsglobal.org/xsd/imsccv1p3/imscsmd_v1p0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imscp_v1p1 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imscp_v1p2_v1p0.xsd 
+                      http://ltsc.ieee.org/xsd/imsccv1p3/LOM/resource http://www.imsglobal.org/profile/cc/ccv1p3/LOM/ccv1p3_lomresource_v1p0.xsd 
+                      http://ltsc.ieee.org/xsd/imsccv1p3/LOM/manifest http://www.imsglobal.org/profile/cc/ccv1p3/LOM/ccv1p3_lommanifest_v1p0.xsd 
+                      http://www.imsglobal.org/xsd/imsccv1p3/imscsmd_v1p0 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imscsmd_v1p0.xsd
+                      http://www.imsglobal.org/xsd/imslticc_v1p3 http://www.imsglobal.org/xsd/lti/ltiv1p3/imslticc_v1p3.xsd
+                      http://ltsc.ieee.org/xsd/imsccv1p3/LOM/imscclti http://www.imsglobal.org/profile/cc/ccv1p3/LOM/ccv1p3_lomccltilink_v1p0.xsd
+                      http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd 
+                      http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd 
+                      http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd
+                      http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imswl_v1p3.xsd">
+  <metadata>
+    <schema>IMS Thin Common Cartridge</schema>
+    <schemaversion>1.3.0</schemaversion>
+    <lomm:lom>
+      <lomm:general>
+        <lomm:identifier>
+          <lomm:catalog>TEST</lomm:catalog>
+          <lomm:entry>ThinCCv1p3_Test05</lomm:entry>
+        </lomm:identifier>
+        <lomm:title>
+          <lomm:string language="en-US">Thin CC Test Manifest (Test 05)</lomm:string>
+        </lomm:title>
+        <lomm:description>
+          <lomm:string language="en-US">Set of 5 LTI Links and 5 Web Links using inline and external files and extensive metadata inc. curriculum standards.</lomm:string>
+        </lomm:description>
+        <lomm:keyword>
+          <lomm:string language="en-US">IMS Global | Thin CC | Test Example</lomm:string>
+        </lomm:keyword>
+      </lomm:general>
+      <lomm:educational>
+        <lomm:learningResourceType>
+          <lomm:value>IMS Thin Common Cartridge</lomm:value>
+        </lomm:learningResourceType>
+        <lomm:intendedEndUserRole>
+          <lomm:source>IMSGLC_CC_Rolesv1p2</lomm:source>
+          <lomm:value>Learner</lomm:value>
+        </lomm:intendedEndUserRole>
+      </lomm:educational>
+      <lomm:rights>
+        <lomm:copyrightAndOtherRestrictions>
+          <lomm:value>yes</lomm:value>
+        </lomm:copyrightAndOtherRestrictions>
+      </lomm:rights>
+      <lomm:lifeCycle>
+        <lomm:contribute>
+          <lomm:role>
+            <lomm:value>publisher</lomm:value>
+          </lomm:role>
+          <lomm:date>
+            <lomm:dateTime>2014</lomm:dateTime>
+          </lomm:date>
+        </lomm:contribute>
+      </lomm:lifeCycle>    
+    </lomm:lom>
+    <csm:curriculumStandardsMetadataSet>
+      <csm:curriculumStandardsMetadata providerId="ASN">
+        <csm:setOfGUIDs region="Florida" version="1.0">
+          <csm:labelledGUID>
+            <csm:label>Human readable string about the standard (Manifest 1)</csm:label>
+            <csm:GUID>GUID for Standard/Standard-part Manifest 1</csm:GUID>
+          </csm:labelledGUID>
+          <csm:labelledGUID>
+            <csm:label>Human readable string about the standard (Manifest 2)</csm:label>
+            <csm:GUID>GUID for Standard/Standard-part Manifest 2</csm:GUID>
+          </csm:labelledGUID>
+          <csm:labelledGUID>
+            <csm:label>Human readable string about the standard (Manifest 3)</csm:label>
+            <csm:GUID>GUID for Standard/Standard-part Manifest 3</csm:GUID>
+          </csm:labelledGUID>
+        </csm:setOfGUIDs>
+        <csm:setOfGUIDs region="Texas" version="1.0">
+          <csm:labelledGUID>
+            <csm:label>Human readable string about the standard (Manifest 4)</csm:label>
+            <csm:GUID>GUID for Standard/Standard-part Manifest 4</csm:GUID>
+          </csm:labelledGUID>
+          <csm:labelledGUID>
+            <csm:label>Human readable string about the standard (Manifest 5)</csm:label>
+            <csm:GUID>GUID for Standard/Standard-part Manifest 5</csm:GUID>
+          </csm:labelledGUID>
+          <csm:labelledGUID>
+            <csm:label>Human readable string about the standard (Manifest 6)</csm:label>
+            <csm:GUID>GUID for Standard/Standard-part Manifest 6</csm:GUID>
+          </csm:labelledGUID>
+        </csm:setOfGUIDs>
+      </csm:curriculumStandardsMetadata>
+      <csm:curriculumStandardsMetadata providerId="Not ASN">
+        <csm:setOfGUIDs region="Florida" version="1.0">
+          <csm:labelledGUID>
+            <csm:label>Human readable string about the standard (Manifest 7)</csm:label>
+            <csm:GUID>GUID for Standard/Standard-part Manifest 7</csm:GUID>
+          </csm:labelledGUID>
+          <csm:labelledGUID>
+            <csm:label>Human readable string about the standard (Manifest 8)</csm:label>
+            <csm:GUID>GUID for Standard/Standard-part Manifest 8</csm:GUID>
+          </csm:labelledGUID>
+          <csm:labelledGUID>
+            <csm:label>Human readable string about the standard (Manifest 9)</csm:label>
+            <csm:GUID>GUID for Standard/Standard-part Manifest 9</csm:GUID>
+          </csm:labelledGUID>
+        </csm:setOfGUIDs>
+        <csm:setOfGUIDs region="Texas" version="1.0">
+          <csm:labelledGUID>
+            <csm:label>Human readable string about the standard (Manifest 10)</csm:label>
+            <csm:GUID>GUID for Standard/Standard-part Manifest 10</csm:GUID>
+          </csm:labelledGUID>
+          <csm:labelledGUID>
+            <csm:label>Human readable string about the standard (Manifest 11)</csm:label>
+            <csm:GUID>GUID for Standard/Standard-part Manifest 11</csm:GUID>
+          </csm:labelledGUID>
+          <csm:labelledGUID>
+            <csm:label>Human readable string about the standard (Manifest 12)</csm:label>
+            <csm:GUID>GUID for Standard/Standard-part Manifest 12</csm:GUID>
+          </csm:labelledGUID>
+        </csm:setOfGUIDs>
+      </csm:curriculumStandardsMetadata>
+    </csm:curriculumStandardsMetadataSet>
+  </metadata>
+  <organizations>
+    <organization identifier="TOC" structure="rooted-hierarchy">
+      <item identifier="root">
+        <item identifier="ITEM_01" identifierref="RESOURCE_LTI_01">
+          <title>Launch Resource LTI 01</title>
+          <metadata>
+            <lomm:lom>
+              <lomm:general>
+                <lomm:title>
+                  <lomm:string language="en-US">Item 1 description.</lomm:string>
+                </lomm:title>
+                <lomm:language>en-us</lomm:language>
+              </lomm:general>
+              <lomm:lifeCycle>
+                <lomm:contribute>
+                  <lomm:role>
+                    <lomm:value>publisher</lomm:value>
+                  </lomm:role>
+                  <lomm:entity>IMS GLOBAL</lomm:entity>
+                  <lomm:date>
+                    <lomm:dateTime>2014</lomm:dateTime>
+                  </lomm:date>
+                </lomm:contribute>
+              </lomm:lifeCycle>
+            </lomm:lom>
+          </metadata>
+        </item>
+        <item identifier="ITEM_02" identifierref="RESOURCE_LTI_02">
+          <title>Launch Resource LTI 02</title>
+          <metadata>
+            <lomm:lom>
+              <lomm:general>
+                <lomm:title>
+                  <lomm:string language="en-US">Item 2 description.</lomm:string>
+                </lomm:title>
+                <lomm:language>en-us</lomm:language>
+              </lomm:general>
+              <lomm:lifeCycle>
+                <lomm:contribute>
+                  <lomm:role>
+                    <lomm:value>publisher</lomm:value>
+                  </lomm:role>
+                  <lomm:entity>IMS GLOBAL</lomm:entity>
+                  <lomm:date>
+                    <lomm:dateTime>2014</lomm:dateTime>
+                  </lomm:date>
+                </lomm:contribute>
+              </lomm:lifeCycle>
+            </lomm:lom>
+          </metadata>
+        </item>
+        <item identifier="ITEM_03" identifierref="RESOURCE_LTI_03">
+          <title>Launch Resource LTI 03</title>
+          <metadata>
+            <lomm:lom>
+              <lomm:general>
+                <lomm:title>
+                  <lomm:string language="en-US">Item 3 description.</lomm:string>
+                </lomm:title>
+                <lomm:language>en-us</lomm:language>
+              </lomm:general>
+              <lomm:lifeCycle>
+                <lomm:contribute>
+                  <lomm:role>
+                    <lomm:value>publisher</lomm:value>
+                  </lomm:role>
+                  <lomm:entity>IMS GLOBAL</lomm:entity>
+                  <lomm:date>
+                    <lomm:dateTime>2014</lomm:dateTime>
+                  </lomm:date>
+                </lomm:contribute>
+              </lomm:lifeCycle>
+            </lomm:lom>
+          </metadata>
+        </item>
+        <item identifier="ITEM_04" identifierref="RESOURCE_LTI_04">
+          <title>Launch Resource LTI 04</title>
+          <metadata>
+            <lomm:lom>
+              <lomm:general>
+                <lomm:title>
+                  <lomm:string language="en-US">Item 4 description.</lomm:string>
+                </lomm:title>
+                <lomm:language>en-us</lomm:language>
+              </lomm:general>
+              <lomm:lifeCycle>
+                <lomm:contribute>
+                  <lomm:role>
+                    <lomm:value>publisher</lomm:value>
+                  </lomm:role>
+                  <lomm:entity>IMS GLOBAL</lomm:entity>
+                  <lomm:date>
+                    <lomm:dateTime>2014</lomm:dateTime>
+                  </lomm:date>
+                </lomm:contribute>
+              </lomm:lifeCycle>
+            </lomm:lom>
+          </metadata>
+        </item>
+        <item identifier="ITEM_05" identifierref="RESOURCE_LTI_05">
+          <title>Launch Resource LTI 05</title>
+          <metadata>
+            <lomm:lom>
+              <lomm:general>
+                <lomm:title>
+                  <lomm:string language="en-US">Item 5 description.</lomm:string>
+                </lomm:title>
+                <lomm:language>en-us</lomm:language>
+              </lomm:general>
+              <lomm:lifeCycle>
+                <lomm:contribute>
+                  <lomm:role>
+                    <lomm:value>publisher</lomm:value>
+                  </lomm:role>
+                  <lomm:entity>IMS GLOBAL</lomm:entity>
+                  <lomm:date>
+                    <lomm:dateTime>2014</lomm:dateTime>
+                  </lomm:date>
+                </lomm:contribute>
+              </lomm:lifeCycle>
+            </lomm:lom>
+          </metadata>
+        </item>
+        <item identifier="ITEM_06" identifierref="RESOURCE_URL_01">
+          <title>Launch Resource URL 01</title>
+          <metadata>
+            <lomm:lom>
+              <lomm:general>
+                <lomm:title>
+                  <lomm:string language="en-US">Item 6 description.</lomm:string>
+                </lomm:title>
+                <lomm:language>en-us</lomm:language>
+              </lomm:general>
+              <lomm:lifeCycle>
+                <lomm:contribute>
+                  <lomm:role>
+                    <lomm:value>publisher</lomm:value>
+                  </lomm:role>
+                  <lomm:entity>IMS GLOBAL</lomm:entity>
+                  <lomm:date>
+                    <lomm:dateTime>2014</lomm:dateTime>
+                  </lomm:date>
+                </lomm:contribute>
+              </lomm:lifeCycle>
+            </lomm:lom>
+          </metadata>
+        </item>
+        <item identifier="ITEM_07" identifierref="RESOURCE_URL_02">
+          <title>Launch Resource URL 02</title>
+          <metadata>
+            <lomm:lom>
+              <lomm:general>
+                <lomm:title>
+                  <lomm:string language="en-US">Item 7 description.</lomm:string>
+                </lomm:title>
+                <lomm:language>en-us</lomm:language>
+              </lomm:general>
+              <lomm:lifeCycle>
+                <lomm:contribute>
+                  <lomm:role>
+                    <lomm:value>publisher</lomm:value>
+                  </lomm:role>
+                  <lomm:entity>IMS GLOBAL</lomm:entity>
+                  <lomm:date>
+                    <lomm:dateTime>2014</lomm:dateTime>
+                  </lomm:date>
+                </lomm:contribute>
+              </lomm:lifeCycle>
+            </lomm:lom>
+          </metadata>
+        </item>
+        <item identifier="ITEM_08" identifierref="RESOURCE_URL_03">
+          <title>Launch Resource URL 03</title>
+          <metadata>
+            <lomm:lom>
+              <lomm:general>
+                <lomm:title>
+                  <lomm:string language="en-US">Item 8 description.</lomm:string>
+                </lomm:title>
+                <lomm:language>en-us</lomm:language>
+              </lomm:general>
+              <lomm:lifeCycle>
+                <lomm:contribute>
+                  <lomm:role>
+                    <lomm:value>publisher</lomm:value>
+                  </lomm:role>
+                  <lomm:entity>IMS GLOBAL</lomm:entity>
+                  <lomm:date>
+                    <lomm:dateTime>2014</lomm:dateTime>
+                  </lomm:date>
+                </lomm:contribute>
+              </lomm:lifeCycle>
+            </lomm:lom>
+          </metadata>
+        </item>
+        <item identifier="ITEM_09" identifierref="RESOURCE_URL_04">
+          <title>Launch Resource URL 04</title>
+          <metadata>
+            <lomm:lom>
+              <lomm:general>
+                <lomm:title>
+                  <lomm:string language="en-US">Item 9 description.</lomm:string>
+                </lomm:title>
+                <lomm:language>en-us</lomm:language>
+              </lomm:general>
+              <lomm:lifeCycle>
+                <lomm:contribute>
+                  <lomm:role>
+                    <lomm:value>publisher</lomm:value>
+                  </lomm:role>
+                  <lomm:entity>IMS GLOBAL</lomm:entity>
+                  <lomm:date>
+                    <lomm:dateTime>2014</lomm:dateTime>
+                  </lomm:date>
+                </lomm:contribute>
+              </lomm:lifeCycle>
+            </lomm:lom>
+          </metadata>
+        </item>
+        <item identifier="ITEM_10" identifierref="RESOURCE_URL_05">
+          <title>Launch Resource URL 05</title>
+          <metadata>
+            <lomm:lom>
+              <lomm:general>
+                <lomm:title>
+                  <lomm:string language="en-US">Item 10 description.</lomm:string>
+                </lomm:title>
+                <lomm:language>en-us</lomm:language>
+              </lomm:general>
+              <lomm:lifeCycle>
+                <lomm:contribute>
+                  <lomm:role>
+                    <lomm:value>publisher</lomm:value>
+                  </lomm:role>
+                  <lomm:entity>IMS GLOBAL</lomm:entity>
+                  <lomm:date>
+                    <lomm:dateTime>2014</lomm:dateTime>
+                  </lomm:date>
+                </lomm:contribute>
+              </lomm:lifeCycle>
+            </lomm:lom>
+          </metadata>
+        </item>
+      </item>
+    </organization>
+  </organizations>
+  <resources>
+    <resource identifier="RESOURCE_LTI_01" type="imsbasiclti_xmlv1p3">
+      <metadata>
+        <lomr:lom>
+          <lomr:educational>
+            <lomr:typicalAgeRange>
+              <lomr:string>k to a</lomr:string>
+            </lomr:typicalAgeRange>
+            <lomr:learningResourceType>
+              <lomr:value>self assessment</lomr:value>
+            </lomr:learningResourceType>
+            <lomr:intendedEndUserRole>
+              <lomr:source>ThinCC_Access_Permission_Vocab</lomr:source>
+              <lomr:value>student</lomr:value>
+            </lomr:intendedEndUserRole>
+            <lomr:intendedEndUserRole>
+              <lomr:source>ThinCC_UseType_Vocab</lomr:source>
+              <lomr:value>primary</lomr:value>
+            </lomr:intendedEndUserRole>
+            <lomr:intendedEndUserRole>
+              <lomr:source>ThinCC_Visibility_Vocab</lomr:source>
+              <lomr:value>public</lomr:value>
+            </lomr:intendedEndUserRole>
+            <lomr:intendedEndUserRole>
+              <lomr:source>IMSGLC_CC_Rolesv1p2</lomr:source>
+              <lomr:value>Learner</lomr:value>
+            </lomr:intendedEndUserRole>
+          </lomr:educational>
+          <lomr:technical>
+            <lomr:installationRemarks>
+              <lomr:string>http://...lti authentication URL ...</lomr:string>
+            </lomr:installationRemarks>
+            <lomr:location>http://...lti launch URL...</lomr:location>
+          </lomr:technical>         
+        </lomr:lom>
+        <csm:curriculumStandardsMetadataSet>
+          <csm:curriculumStandardsMetadata providerId="ASN">
+            <csm:setOfGUIDs region="Florida" version="1.0">
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 1a)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-part Resource LTI 1a</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 1b)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 1b</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 1c)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-part Resource LTI 1c</csm:GUID>
+              </csm:labelledGUID>
+            </csm:setOfGUIDs>
+            <csm:setOfGUIDs region="Texas" version="1.0">
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 1d)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-part Resource LTI 1d</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 1e)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 1e</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 1f)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-part Resource LTI 1f</csm:GUID>
+              </csm:labelledGUID>
+            </csm:setOfGUIDs>
+          </csm:curriculumStandardsMetadata>
+          <csm:curriculumStandardsMetadata providerId="Not ASN">
+            <csm:setOfGUIDs region="Florida" version="1.0">
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 1g)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 1g</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 1h)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 1h</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 1i)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 1i</csm:GUID>
+              </csm:labelledGUID>
+            </csm:setOfGUIDs>
+            <csm:setOfGUIDs region="Texas" version="1.0">
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 1j)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 1j</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 1k)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 1k</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 1l)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 1l</csm:GUID>
+              </csm:labelledGUID>
+            </csm:setOfGUIDs>
+          </csm:curriculumStandardsMetadata>
+        </csm:curriculumStandardsMetadataSet>
+      </metadata>
+      <lticc:cartridge_basiclti_link>       
+        <blti:title>Example LTI Resource for Thin CC Testing</blti:title>
+        <blti:description>LTI link for Thin CC testing.</blti:description>
+        <blti:launch_url>http://www-k6.thinkcentral.com/ePC/toolprovider/ltivalidator</blti:launch_url>
+        <blti:vendor>
+          <lticp:code>imsglobal.com</lticp:code>
+          <lticp:name>IMS Global</lticp:name>
+        </blti:vendor>
+        <lticc:metadata>
+          <lomc:lom>
+            <lomc:general>
+              <lomc:identifier>
+                <lomc:entry>LTI_CC_Resource_01_GUID</lomc:entry>
+              </lomc:identifier>
+            </lomc:general>
+          </lomc:lom>
+        </lticc:metadata>
+      </lticc:cartridge_basiclti_link>
+    </resource>
+    <resource identifier="RESOURCE_LTI_02" type="imsbasiclti_xmlv1p3">
+      <metadata>
+        <lomr:lom>
+          <lomr:educational>
+            <lomr:intendedEndUserRole>
+              <lomr:source>ThinCC_Access_Permission_Vocab</lomr:source>
+              <lomr:value>student</lomr:value>
+            </lomr:intendedEndUserRole>
+            <lomr:intendedEndUserRole>
+              <lomr:source>ThinCC_UseType_Vocab</lomr:source>
+              <lomr:value>primary</lomr:value>
+            </lomr:intendedEndUserRole>
+            <lomr:intendedEndUserRole>
+              <lomr:source>ThinCC_Visibility_Vocab</lomr:source>
+              <lomr:value>public</lomr:value>
+            </lomr:intendedEndUserRole>
+            <lomr:intendedEndUserRole>
+              <lomr:source>IMSGLC_CC_Rolesv1p2</lomr:source>
+              <lomr:value>Learner</lomr:value>
+            </lomr:intendedEndUserRole>
+          </lomr:educational>
+        </lomr:lom>
+        <csm:curriculumStandardsMetadataSet>
+          <csm:curriculumStandardsMetadata providerId="ASN">
+            <csm:setOfGUIDs region="Florida" version="1.0">
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 2a)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-part Resource LTI 2a</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 2b)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 2b</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 2c)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-part Resource LTI 2c</csm:GUID>
+              </csm:labelledGUID>
+            </csm:setOfGUIDs>
+            <csm:setOfGUIDs region="Texas" version="1.0">
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 2d)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-part Resource LTI 2d</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 2e)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 2e</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 2f)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-part Resource LTI 2f</csm:GUID>
+              </csm:labelledGUID>
+            </csm:setOfGUIDs>
+          </csm:curriculumStandardsMetadata>
+          <csm:curriculumStandardsMetadata providerId="Not ASN">
+            <csm:setOfGUIDs region="Florida" version="1.0">
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 2g)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 2g</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 2h)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 1h</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 2i)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 1i</csm:GUID>
+              </csm:labelledGUID>
+            </csm:setOfGUIDs>
+            <csm:setOfGUIDs region="Texas" version="1.0">
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 2j)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 2j</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 2k)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 2k</csm:GUID>
+              </csm:labelledGUID>
+              <csm:labelledGUID>
+                <csm:label>Human readable string about the standard (Resource LTI 2l)</csm:label>
+                <csm:GUID>GUID for Standard/Standard-partResource LTI 2l</csm:GUID>
+              </csm:labelledGUID>
+            </csm:setOfGUIDs>
+          </csm:curriculumStandardsMetadata>
+        </csm:curriculumStandardsMetadataSet>
+      </metadata>
+      <lticc:cartridge_basiclti_link>        
+        <blti:title>Example LTI Resource 2 for Thin CC Testing</blti:title>
+        <blti:description>LTI link for Thin CC testing.</blti:description>
+        <blti:launch_url>http://www-k6.thinkcentral.com/ePC/toolprovider/ltivalidator</blti:launch_url>
+        <blti:vendor>
+          <lticp:code>imsglobal.com</lticp:code>
+          <lticp:name>IMS Global</lticp:name>
+        </blti:vendor>
+        <lticc:metadata>
+          <lomc:lom>
+            <lomc:general>
+              <lomc:identifier>
+                <lomc:entry>LTI_CC_Resource_02_GUID</lomc:entry>
+              </lomc:identifier>
+            </lomc:general>
+          </lomc:lom>
+        </lticc:metadata>
+      </lticc:cartridge_basiclti_link>
+    </resource>
+    <resource identifier="RESOURCE_LTI_03" type="imsbasiclti_xmlv1p3">
+      <metadata>
+        <lomr:lom>
+          <lomr:educational>
+            <lomr:intendedEndUserRole>
+              <lomr:source>IMSGLC_CC_Rolesv1p2</lomr:source>
+              <lomr:value>Learner</lomr:value>
+            </lomr:intendedEndUserRole>
+          </lomr:educational>
+        </lomr:lom>
+      </metadata>
+      <lticc:cartridge_basiclti_link>        
+        <blti:title>Example LTI Resource for Thin CC Testing</blti:title>
+        <blti:description>LTI link for Thin CC testing.</blti:description>
+        <blti:launch_url>http://www-k6.thinkcentral.com/ePC/toolprovider/ltivalidator</blti:launch_url>
+        <blti:vendor>
+          <lticp:code>imsglobal.com</lticp:code>
+          <lticp:name>IMS Global</lticp:name>
+        </blti:vendor>
+        <lticc:metadata>
+          <lomc:lom>
+            <lomc:general>
+              <lomc:identifier>
+                <lomc:entry>LTI_CC_Resource_03_GUID</lomc:entry>
+              </lomc:identifier>
+            </lomc:general>
+          </lomc:lom>
+        </lticc:metadata>
+      </lticc:cartridge_basiclti_link>
+    </resource>
+    <resource identifier="RESOURCE_LTI_04" type="imsbasiclti_xmlv1p3">
+      <metadata>
+        <lomr:lom>
+          <lomr:educational>
+            <lomr:intendedEndUserRole>
+              <lomr:source>IMSGLC_CC_Rolesv1p2</lomr:source>
+              <lomr:value>Learner</lomr:value>
+            </lomr:intendedEndUserRole>
+          </lomr:educational>
+        </lomr:lom>
+      </metadata>
+      <lticc:cartridge_basiclti_link>      
+        <blti:title>Example LTI Resource 4 for Thin CC Testing</blti:title>
+        <blti:description>LTI link for Thin CC testing.</blti:description>
+        <blti:launch_url>http://www-k6.thinkcentral.com/ePC/toolprovider/ltivalidator</blti:launch_url>
+        <blti:vendor>
+          <lticp:code>imsglobal.com</lticp:code>
+          <lticp:name>IMS Global</lticp:name>
+        </blti:vendor>
+        <lticc:metadata>
+          <lomc:lom>
+            <lomc:general>
+              <lomc:identifier>
+                <lomc:entry>LTI_CC_Resource_04_GUID</lomc:entry>
+              </lomc:identifier>
+            </lomc:general>
+          </lomc:lom>
+        </lticc:metadata>
+      </lticc:cartridge_basiclti_link>
+    </resource>
+    <resource identifier="RESOURCE_LTI_05" type="imsbasiclti_xmlv1p3">
+      <metadata>
+        <lomr:lom>
+          <lomr:educational>
+            <lomr:intendedEndUserRole>
+              <lomr:source>IMSGLC_CC_Rolesv1p2</lomr:source>
+              <lomr:value>Learner</lomr:value>
+            </lomr:intendedEndUserRole>
+          </lomr:educational>
+        </lomr:lom>
+      </metadata>
+      <lticc:cartridge_basiclti_link>     
+        <blti:title>Example LTI Resource for Thin CC Testing</blti:title>
+        <blti:description>LTI link for Thin CC testing.</blti:description>
+        <blti:launch_url>http://www-k6.thinkcentral.com/ePC/toolprovider/ltivalidator</blti:launch_url>
+        <blti:vendor>
+          <lticp:code>imsglobal.com</lticp:code>
+          <lticp:name>IMS Global</lticp:name>
+        </blti:vendor>
+        <lticc:metadata>
+          <lomc:lom>
+            <lomc:general>
+              <lomc:identifier>
+                <lomc:entry>LTI_CC_Resource_05_GUID</lomc:entry>
+              </lomc:identifier>
+            </lomc:general>
+          </lomc:lom>
+        </lticc:metadata>
+      </lticc:cartridge_basiclti_link>
+    </resource>
+    <resource identifier="RESOURCE_URL_01" type="imswl_xmlv1p3">
+      <metadata>
+        <lomr:lom>
+          <lomr:educational>
+            <lomr:intendedEndUserRole>
+              <lomr:source>IMSGLC_CC_Rolesv1p2</lomr:source>
+              <lomr:value>Learner</lomr:value>
+            </lomr:intendedEndUserRole>
+          </lomr:educational>
+        </lomr:lom>
+      </metadata>
+      <wl:webLink>
+        <wl:title>IMS Global Web Site</wl:title>
+        <wl:url href="http://www.imsglobal.org"/>
+      </wl:webLink>
+    </resource>
+    <resource identifier="RESOURCE_URL_02" type="imswl_xmlv1p3">
+      <metadata>
+        <lomr:lom>
+          <lomr:educational>
+            <lomr:intendedEndUserRole>
+              <lomr:source>IMSGLC_CC_Rolesv1p2</lomr:source>
+              <lomr:value>Learner</lomr:value>
+            </lomr:intendedEndUserRole>
+          </lomr:educational>
+        </lomr:lom>
+      </metadata>
+      <wl:webLink>
+        <wl:title>W3C Web Site</wl:title>
+        <wl:url href="http://www.w3.org"/>
+      </wl:webLink>
+    </resource>
+    <resource identifier="RESOURCE_URL_03" type="imswl_xmlv1p3">
+      <metadata>
+        <lomr:lom>
+          <lomr:educational>
+            <lomr:intendedEndUserRole>
+              <lomr:source>IMSGLC_CC_Rolesv1p2</lomr:source>
+              <lomr:value>Learner</lomr:value>
+            </lomr:intendedEndUserRole>
+          </lomr:educational>
+        </lomr:lom>
+      </metadata>
+      <wl:webLink>
+        <wl:title>BBC Web Site</wl:title>
+        <wl:url href="http://www.bbc.co.uk"/>
+      </wl:webLink>
+    </resource>
+    <resource identifier="RESOURCE_URL_04" type="imswl_xmlv1p3">
+      <metadata>
+        <lomr:lom>
+          <lomr:educational>
+            <lomr:intendedEndUserRole>
+              <lomr:source>IMSGLC_CC_Rolesv1p2</lomr:source>
+              <lomr:value>Learner</lomr:value>
+            </lomr:intendedEndUserRole>
+          </lomr:educational>
+        </lomr:lom>
+      </metadata>
+      <wl:webLink>
+        <wl:title>Element14 Community Web Site</wl:title>
+        <wl:url href="http://www.element14.com/community/welcome"/>
+      </wl:webLink>
+    </resource>
+    <resource identifier="RESOURCE_URL_05" type="imswl_xmlv1p3">
+      <metadata>
+        <lomr:lom>
+          <lomr:educational>
+            <lomr:intendedEndUserRole>
+              <lomr:source>IMSGLC_CC_Rolesv1p2</lomr:source>
+              <lomr:value>Learner</lomr:value>
+            </lomr:intendedEndUserRole>
+          </lomr:educational>
+        </lomr:lom>
+      </metadata>
+      <wl:webLink>
+        <wl:title>Apple iTunes University Web Site</wl:title>
+        <wl:url href="http://www.apple.com/education/ipad/itunes-u/"/>
+      </wl:webLink>
+    </resource>
+  </resources>
+</manifest>

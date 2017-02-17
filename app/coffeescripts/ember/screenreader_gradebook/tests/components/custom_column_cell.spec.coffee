@@ -2,15 +2,15 @@ define [
   'ember'
   '../start_app'
   '../shared_ajax_fixtures'
-  'compiled/gradebook2/GradebookHelpers'
-  'jsx/gradebook/grid/constants'
+  'compiled/gradebook/GradebookHelpers'
+  'jsx/gradebook/shared/constants'
 ], (Ember, startApp, fixtures, GradebookHelpers, GradebookConstants) ->
 
   {run} = Ember
 
   setType = null
 
-  module 'custom_column_cell',
+  QUnit.module 'custom_column_cell',
     setup: ->
       fixtures.create()
       App = startApp()

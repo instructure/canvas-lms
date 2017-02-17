@@ -34,7 +34,7 @@ $assign-border-color: #ccc;
   width: 100%;
 }
 .Date__label{
-  font-weight: 500;
+  font-weight: bold;
 }
 .ContainerDueDate {
   margin: 20px 0; // matches legacy margins
@@ -65,7 +65,7 @@ $assign-border-color: #ccc;
 
 .UnlockLockInput {
   display: inline;
-  width: 90px;
+  width: 107px;
 }
 
 .DueDateInput {
@@ -80,6 +80,12 @@ $assign-border-color: #ccc;
 
 .Available-from-to {
   display: flex;
+  .from {
+    margin-right: 3px;
+  }
+  .to {
+    margin-left: 3px;
+  }
   .Available-from-to__prompt {
     text-align: center;
     line-height: 38px;

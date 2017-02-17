@@ -1,4 +1,4 @@
-class CleanUpUserAccountAssociations < ActiveRecord::Migration
+class CleanUpUserAccountAssociations < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 

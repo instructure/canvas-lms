@@ -2,6 +2,7 @@ require_dependency 'importers'
 
 module Importers
   class LearningOutcomeImporter < Importer
+    extend OutcomeImporter
 
     self.item_class = LearningOutcome
 
@@ -52,15 +53,16 @@ module Importers
             # import from vendor with global outcomes
             context = nil
             hash[:learning_outcome_group] ||= LearningOutcomeGroup.global_root_outcome_group
-            item ||= LearningOutcome.global.where(migration_id: hash[:migration_id]).first if hash[:migration_id] && !migration.cross_institution?
-            item ||= LearningOutcome.global.where(vendor_guid: hash[:vendor_guid]).first if hash[:vendor_guid]
+            item ||= LearningOutcome.global.where(migration_clause(hash[:migration_id])).first if hash[:migration_id] && !migration.cross_institution?
+            item ||= LearningOutcome.global.where(vendor_clause(hash[:vendor_guid])).first if hash[:vendor_guid]
             item ||= LearningOutcome.new
           else
             migration.add_warning(t(:no_global_permission, %{You're not allowed to manage global outcomes, can't add "%{title}"}, :title => hash[:title]))
             return
           end
         else
-          item ||= LearningOutcome.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
+          item ||= LearningOutcome.where(context_id: context, context_type: context.class.to_s).
+            where(migration_clause(hash[:migration_id])).first if hash[:migration_id]
           item ||= context.created_learning_outcomes.temp_record
           item.context = context
         end
@@ -71,14 +73,19 @@ module Importers
         item.workflow_state = 'active' if item.deleted?
         item.short_description = hash[:title]
         item.description = hash[:description]
-        item.calculation_method ||= hash[:calculation_method]
-        item.calculation_int ||= hash[:calculation_int]
+        assessed = item.assessed?
+        unless assessed
+          item.calculation_method = hash[:calculation_method] || item.calculation_method
+          item.calculation_int = hash[:calculation_int] || item.calculation_int
+        end
 
         if hash[:ratings]
-          item.data = {:rubric_criterion=>{}}
-          item.data[:rubric_criterion][:ratings] = hash[:ratings] ? hash[:ratings].map(&:symbolize_keys) : []
-          item.data[:rubric_criterion][:mastery_points] = hash[:mastery_points]
-          item.data[:rubric_criterion][:points_possible] = hash[:points_possible]
+          unless assessed
+            item.data = {:rubric_criterion=>{}}
+            item.data[:rubric_criterion][:ratings] = hash[:ratings] ? hash[:ratings].map(&:symbolize_keys) : []
+            item.data[:rubric_criterion][:mastery_points] = hash[:mastery_points]
+            item.data[:rubric_criterion][:points_possible] = hash[:points_possible]
+          end
           item.data[:rubric_criterion][:description] = item.short_description || item.description
         end
 
@@ -88,6 +95,9 @@ module Importers
       else
         item = outcome
       end
+
+      log = hash[:learning_outcome_group] || context.root_outcome_group
+      log.add_outcome(item)
 
       if hash[:alignments]
         alignments = hash[:alignments].sort_by{|a| a[:position].to_i}
@@ -108,9 +118,6 @@ module Importers
           end
         end
       end
-
-      log = hash[:learning_outcome_group] || context.root_outcome_group
-      log.add_outcome(item)
 
       migration.outcome_to_id_map[hash[:migration_id]] = item.id
 

@@ -1,12 +1,12 @@
 define [
-  'underscore'
-  'react'
-  'react-dom'
+  'underscore',
+  'react',
+  'react-dom',
+  'react-addons-test-utils'
   'jsx/epub_exports/CourseList'
-], (_, React, ReactDOM, CourseList, I18n) ->
-  TestUtils = React.addons.TestUtils
+], (_, React, ReactDOM, TestUtils, CourseList, I18n) ->
 
-  module 'CourseListSpec',
+  QUnit.module 'CourseListSpec',
     setup: ->
       @props = {
         1: {

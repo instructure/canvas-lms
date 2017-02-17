@@ -36,7 +36,6 @@ describe EpubExportsController do
 
     context "with user" do
       before(:once) do
-        user_session(@student)
         @n = @student.courses.count
         @n_more = 4
         create_courses(@n_more, {
@@ -46,6 +45,10 @@ describe EpubExportsController do
         @student.enrollments.last.update_attribute(
           :workflow_state, 'completed'
         )
+      end
+
+      before(:each) do
+        user_session(@student)
       end
 
       it "should assign collection of courses and render" do
@@ -155,6 +158,27 @@ describe EpubExportsController do
           })
         }.not_to change{EpubExport.count}
       end
+    end
+  end
+
+  context "with feature disabled" do
+    before(:each) do
+      user_session(@student)
+    end
+    it "should return 404 with the feature disabled" do
+      account = Account.default
+      account.disable_feature!(:epub_export)
+      get :index
+      expect(response.code).to eq '404'
+    end
+
+    it "should return 404 with the feature enabled and offline web enabled" do
+      account = Account.default
+      account.enable_feature!(:epub_export)
+      account.settings[:enable_offline_web_export] = true
+      account.save!
+      get :index
+      expect(response.code).to eq '404'
     end
   end
 end

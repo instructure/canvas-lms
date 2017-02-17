@@ -1,9 +1,8 @@
 require_relative 'common'
 require_relative 'helpers/notifications_common'
-include NotificationsCommon
-
 
 describe "dashboard" do
+  include NotificationsCommon
   include_context "in-process server selenium tests"
 
   shared_examples_for 'load events list' do
@@ -156,7 +155,7 @@ describe "dashboard" do
     end
 
     it "shows an assignment stream item under Recent Activity in dashboard", priority: "1", test_id: 108725 do
-      NotificationsCommon.setup_notification(@student, name: 'Assignment Created')
+      setup_notification(@student, name: 'Assignment Created')
       assignment_model({:submission_types => ['online_text_entry'], :course => @course})
       get "/"
       f('#dashboardToggleButton').click
@@ -244,7 +243,7 @@ describe "dashboard" do
         group = Group.create!(:name => "group1", :context => @course)
         group.add_user(@user)
 
-        other_unpublished_course = course
+        other_unpublished_course = course_factory
         other_group = Group.create!(:name => "group2", :context => other_unpublished_course)
         other_group.add_user(@user)
 
@@ -355,7 +354,7 @@ describe "dashboard" do
 
     it "should show recent feedback and it should work", priority: "1", test_id: 216373 do
       assign = @course.assignments.create!(:title => 'hi', :due_at => 1.day.ago, :points_possible => 5)
-      assign.grade_student(@student, :grade => '4')
+      assign.grade_student(@student, grade: '4', grader: @teacher)
 
       get "/"
       wait_for_ajaximations

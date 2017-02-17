@@ -1,9 +1,11 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/external_apps/components/ConfigurationFormManual'
-], (React, ReactDOM, ConfigurationFormManual) ->
+], (React, ReactDOM, TestUtils, ConfigurationFormManual) ->
 
+  Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
   createElement = (data) ->
@@ -21,7 +23,7 @@ define [
   renderComponent = (data) ->
     ReactDOM.render(createElement(data), wrapper)
 
-  module 'ExternalApps.ConfigurationFormManual',
+  QUnit.module 'ExternalApps.ConfigurationFormManual',
     teardown: ->
       ReactDOM.unmountComponentAtNode wrapper
 

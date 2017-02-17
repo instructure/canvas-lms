@@ -89,7 +89,6 @@
         <i class="icon-user-add"></i>
         <%= t('links.join_course', %{Join this Course}) %>
       </a>
-      </div>
     <% elsif @context_enrollment && @context_enrollment.self_enrolled && @context_enrollment.active? %>
       <a href="#" class="btn button-sidebar-wide self_unenrollment_link">
         <i class="icon-end"></i>
@@ -204,6 +203,9 @@
 
   <% if @course_home_view == 'wiki' %>
     <% js_bundle :wiki_page_show %>
+    <% if @context.show_announcements_on_home_page? %>
+      <div id="announcements_on_home_page"></div>
+    <% end %>
     <div id="wiki_page_show"></div>
   <% elsif @course_home_view == 'modules' %>
     <%= render :partial => 'context_modules/content_next', :locals => {:course_home => true} %>

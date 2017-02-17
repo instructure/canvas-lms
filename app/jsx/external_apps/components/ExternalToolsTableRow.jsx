@@ -21,7 +21,7 @@ define([
     },
 
     renderButtons() {
-      if (this.props.tool.installed_locally) {
+      if (this.props.tool.installed_locally && !this.props.tool.restricted_by_master_course) {
         var configureButton, updateBadge, updateOption, dimissUpdateOption = null;
         var reregistrationButton = null;
 
@@ -85,6 +85,20 @@ define([
                title={I18n.t('Installed by Admin')}></i>
           </span>
         );
+      } else if (this.props.tool.is_master_course_content) {
+        if (this.props.tool.restricted_by_master_course) {
+          return (
+            <span className="master-course-cell">
+              <i className="icon-lock"></i>
+            </span>
+          );
+        } else {
+          return (
+            <span className="master-course-cell">
+              <i className="icon-unlock icon-Line"></i>
+            </span>
+          );
+        }
       }
     },
 

@@ -24,7 +24,7 @@ $answersSprite: url(/images/answers_sprite.png);
 // quiz index
 li.quiz {
   cursor: pointer;
-  .ellipses, i[class^=icon-]:not(.icon-publish):not(.icon-quiz):not(.icon-post-to-sis) {
+  .ellipses, i[class^=icon-]:not(.icon-publish):not(.icon-quiz):not(.icon-post-to-sis):not(.icon-lock) {
     color: darken($ic-color-neutral, 40);
   }
   .ig-title {
@@ -134,7 +134,7 @@ li.quiz {
   }
 }
 
-.ic-app-main-layout-vertical {
+.ic-Layout-wrapper {
   overflow: visible;
 }
 
@@ -143,7 +143,7 @@ li.quiz {
   overflow: hidden;
   h1, h2 {
     margin-top: 0;
-    font-weight: 500;
+    font-weight: bold;
   }
 }
 
@@ -498,6 +498,10 @@ li.quiz {
     display: none;
     // Don't display the "move"  icon since the the new order change isn't persisted for a bank. #10148
 
+  }
+  .icon-bookmark,
+  .icon-remove-bookmark {
+    color: $ic-color-medium-darker;
   }
 }
 
@@ -2252,3 +2256,11 @@ li.quiz.quiz-loading-overrides {
     margin-left: 2px;
   }
 }
+
+.master-course-cell i {
+  margin-right: 12px;
+}
+.options-spacer {
+  width: 52px;
+}
+

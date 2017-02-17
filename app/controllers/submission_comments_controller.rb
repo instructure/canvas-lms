@@ -43,6 +43,6 @@ class SubmissionCommentsController < ApplicationController
   private
 
   def submission_comment_params
-    strong_params.require(:submission_comment).permit(:draft)
+    params.require(:submission_comment).permit(:draft)
   end
 end

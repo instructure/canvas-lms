@@ -66,14 +66,14 @@ describe "collaborations" do
       all_icons.last.click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      expect(check_element_has_focus(all_icons.first))
+      expect(check_element_has_focus(all_icons.first)).to be
     end
 
     it 'should set focus to the add collaboration button if there are no previous collaborations' do
       f('.delete_collaboration_link').click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      expect(check_element_has_focus(f('.add_collaboration_link')))
+      expect(check_element_has_focus(f('.add_collaboration_link'))).to be
     end
   end
 end

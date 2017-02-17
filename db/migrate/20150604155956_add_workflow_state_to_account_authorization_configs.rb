@@ -1,4 +1,4 @@
-class AddWorkflowStateToAccountAuthorizationConfigs < ActiveRecord::Migration
+class AddWorkflowStateToAccountAuthorizationConfigs < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

@@ -60,6 +60,22 @@ describe 'Account Notification API', type: :request do
       json = api_call(:get, @path, @api_params,)
       expect(json["id"]).to eq @an.id
     end
+
+    it "should show the notification as a non admin" do
+      user = user_with_managed_pseudonym(:account => @admin.account)
+
+      @path = "/api/v1/accounts/#{user.account.id}/users/#{user.id}/account_notifications/#{@an.id}"
+
+      @api_params = {controller: 'account_notifications',
+                     action: 'show',
+                     format: 'json',
+                     user_id: user.id,
+                     id: @an.id,
+                     account_id: @user.account.id.to_s}
+
+      json = api_call(:get, @path, @api_params)
+      expect(json["id"]).to eq @an.id
+    end
   end
 
   describe 'user_close_notification' do
@@ -300,4 +316,3 @@ describe 'Account Notification API', type: :request do
     end
   end
 end
-

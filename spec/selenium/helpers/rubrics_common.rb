@@ -38,8 +38,8 @@ module RubricsCommon
 
     driver.execute_script <<-JS
               var $rating = $('.rubric .criterion:visible .rating:eq(#{idx})');
-              $rating.addClass('add_column add_right');
-              $rating.prev().addClass('add_left');
+              $rating.addClass('add_column add_left');
+              $rating.prev().addClass('add_right');
               $rating.click();
     JS
   end

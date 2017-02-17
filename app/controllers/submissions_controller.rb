@@ -86,8 +86,8 @@ require 'action_controller_test_process'
 #
 class SubmissionsController < ApplicationController
   include Submissions::ShowHelper
-  before_filter :get_course_from_section, :only => :create
-  before_filter :require_context
+  before_action :get_course_from_section, :only => :create
+  before_action :require_context
 
   include Api::V1::Submission
 
@@ -240,13 +240,17 @@ class SubmissionsController < ApplicationController
       end
     end
 
-    params[:submission][:attachments] = params[:submission][:attachments].compact.uniq
+    submission_params = params[:submission].permit(
+      :body, :url, :submission_type, :comment, :group_comment,
+      :media_comment_type, :media_comment_id, :attachment_ids => []
+    )
+    submission_params[:attachments] = params[:submission][:attachments].compact.uniq
     if @context.root_account.feature_enabled?(:submissions_folder)
-      params[:submission][:attachments] = self.class.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments])
+      submission_params[:attachments] = self.class.copy_attachments_to_submissions_folder(@context, submission_params[:attachments])
     end
 
     begin
-      @submission = @assignment.submit_homework(@current_user, params[:submission])
+      @submission = @assignment.submit_homework(@current_user, submission_params)
     rescue ActiveRecord::RecordInvalid => e
       respond_to do |format|
         format.html {
@@ -477,6 +481,31 @@ class SubmissionsController < ApplicationController
     resubmit_to_plagiarism('vericite')
   end
 
+  def originality_report
+    plagiarism_report('originality_report')
+  end
+
+  def legacy_plagiarism_report(submission, asset_string, type)
+    plag_data = submission.turnitin_data
+    url = nil
+    if type == 'vericite'
+      plag_data = submission.vericite_data
+    end
+    if (report_url = plag_data[asset_string] && plag_data[asset_string][:report_url])
+      url = polymorphic_url([:retrieve, @context, :external_tools], url:report_url, display:'borderless')
+    else
+      if type == 'vericite'
+        # VeriCite URL
+        url = submission.vericite_report_url(asset_string, @current_user, session) rescue nil
+      else
+        # Turnitin URL
+        url = submission.turnitin_report_url(asset_string, @current_user) rescue nil
+      end
+    end
+    url
+  end
+  private :legacy_plagiarism_report
+
   def plagiarism_report(type)
     return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
 
@@ -484,21 +513,12 @@ class SubmissionsController < ApplicationController
     @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
     @asset_string = params[:asset_string]
     if authorized_action(@submission, @current_user, :read)
-      plag_data = @submission.turnitin_data
-      if type == 'vericite'
-        plag_data = @submission.vericite_data
-      end
-      if (report_url = plag_data[@asset_string] && plag_data[@asset_string][:report_url])
-        url = polymorphic_url([:retrieve, @context, :external_tools], url:report_url, display:'borderless')
+      if type == 'originality_report'
+        url = @submission.originality_report_url(@asset_string, @current_user)
       else
-        if type == 'vericite'
-          # VeriCite URL
-          url = @submission.vericite_report_url(@asset_string, @current_user, session) rescue nil
-        else
-          # Turnitin URL
-          url = @submission.turnitin_report_url(@asset_string, @current_user) rescue nil
-        end
+        url = legacy_plagiarism_report(@submission, @asset_string, type)
       end
+
       if url
         redirect_to url
       else
@@ -555,7 +575,7 @@ class SubmissionsController < ApplicationController
       if params[:attachments]
         attachments = []
         params[:attachments].keys.each do |idx|
-          attachment = strong_params[:attachments][idx].permit(Attachment.permitted_attributes)
+          attachment = params[:attachments][idx].permit(Attachment.permitted_attributes)
           attachment[:user] = @current_user
           attachments << @assignment.attachments.create(attachment)
         end

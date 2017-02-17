@@ -55,6 +55,13 @@ module LiveEvents
       aws
     end
 
+    def valid?
+      @kinesis.describe_stream(stream_name: @stream_name, limit: 1)
+      true
+    rescue Aws::Kinesis::Errors::ServiceError
+      false
+    end
+
     def post_event(event_name, payload, time = Time.now, ctx = {}, partition_key = nil)
       statsd_prefix = "live_events.events.#{event_name}"
 

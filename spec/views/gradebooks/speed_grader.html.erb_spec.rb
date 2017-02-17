@@ -35,7 +35,7 @@ describe "/gradebooks/speed_grader" do
     expect(rendered).not_to be_nil
   end
 
-  it "includes a link back to the gradebook (gradebook2 by default)" do
+  it "includes a link back to the gradebook (gradebook by default)" do
     render "gradebooks/speed_grader"
     course_id = @course.id
     expect(rendered).to include "a href=\"http://test.host/courses/#{course_id}/gradebook\""

@@ -47,6 +47,7 @@ module Lti
     # params once no matter how many times it appears. For query params since we copy them to the body, it should
     # appear a minimum of twice in the base string.
     def self.generate_params_deprecated(params, url, key, secret)
+      url.strip!
       uri = URI.parse(url)
 
       if uri.port == uri.default_port
@@ -85,19 +86,32 @@ module Lti
     private_class_method :generate_params_deprecated
 
     ##
-    ## Timeline Examples for valid and invalid timestamps
-    ##
-    ## |---exp---timestamp---now---|  VALID
-    ##
-    ## |---timestamp---exp---now---| INVALID
-    ##
-    ## |---exp---now---timestamp---| INVALID
-    ##
-    def self.check_and_store_nonce(cache_key, timestamp, expiration)
-      valid = timestamp.to_i > expiration.ago.to_i
-      valid &&= timestamp.to_i <= Time.now.to_i
+    #  Used to determine if the nonce is still valid
+    #
+    #  +cache_key+:: This is the redis cache key used to check if the nonce key has been used
+    #  +timestamp+:: The timestamp of when the request was signed
+    #  +nonce_age+:: An ActiveSupport::Duration describing how old a nonce can be
+    #
+    #  The +nonce_age+ creates a range that the timestamp must fall between for the nonce to be valid
+    #  valid_range = +Time.now+ - (the +nonce_age+ duration)
+    #  i.e. if the current time was 2010-04-23T12:30:00Z and the +nonce_age+ was 30min
+    #  then the valid time range that the timestamp must fall between would
+    #  be "2010-04-23T12:30:00Z/2010-04-23T13:00:00Z"
+    #
+    #  =Time line Examples for valid and invalid timestamps
+    #
+    #  |---nonce_age---timestamp---Time.now---|  VALID
+    #
+    #  |---timestamp---nonce_age---Time.now---| INVALID
+    #
+    #  |---nonce_age---Time.now---timestamp---| INVALID
+    #
+    def self.check_and_store_nonce(cache_key, timestamp, nonce_age)
+      allowed_future_skew = Setting.get('oauth.allowed_timestamp_future_skew', 1.minute.to_s).to_i.seconds
+      valid = timestamp.to_i > nonce_age.ago.to_i
+      valid &&= timestamp.to_i <= (Time.zone.now + allowed_future_skew).to_i
       valid &&= !Rails.cache.exist?(cache_key)
-      Rails.cache.write(cache_key, 'OK', expires_in: expiration) if valid
+      Rails.cache.write(cache_key, 'OK', expires_in: nonce_age + allowed_future_skew) if valid
       valid
     end
 

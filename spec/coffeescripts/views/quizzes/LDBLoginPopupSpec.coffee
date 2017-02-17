@@ -7,7 +7,7 @@ define [
   popup = undefined
   server = undefined
   root = this
-  module "LDBLoginPopup",
+  QUnit.module "LDBLoginPopup",
     setup: ->
       popup = new LDBLoginPopup(sticky: false)
 

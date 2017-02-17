@@ -1,4 +1,4 @@
-class DropOldAssignmentPublishingFields < ActiveRecord::Migration
+class DropOldAssignmentPublishingFields < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

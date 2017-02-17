@@ -1,4 +1,4 @@
-class GenericSisStickinessRefactorData < ActiveRecord::Migration
+class GenericSisStickinessRefactorData < ActiveRecord::Migration[4.2]
   tag :predeploy
 
 

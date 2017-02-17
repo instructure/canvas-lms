@@ -1,4 +1,4 @@
-class ChangeSubmissionNeedsGradingNotificationTypeToAllSubmissions < ActiveRecord::Migration
+class ChangeSubmissionNeedsGradingNotificationTypeToAllSubmissions < ActiveRecord::Migration[4.2]
   tag :predeploy
   def self.up
     return unless Shard.current == Shard.default

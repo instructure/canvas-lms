@@ -1,4 +1,4 @@
-class AddCassandraPageViewsHttpMethod < ActiveRecord::Migration
+class AddCassandraPageViewsHttpMethod < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   include Canvas::Cassandra::Migration

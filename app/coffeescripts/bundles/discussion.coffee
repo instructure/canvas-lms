@@ -22,6 +22,7 @@ require [
   'rubricEditBinding'     # sets up event listener for 'rubricEditDataReady'
   'compiled/jquery/sticky'
   'compiled/jquery/ModuleSequenceFooter'
+  'jsx/context_cards/StudentContextCardTrigger'
 ], (I18n, EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, _, Backbone, React, ReactDOM, DiscussionTopicKeyboardShortcutModal, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, DiscussionTopicToolbarView, TopicView, EntriesView, CyoeStats) ->
 
   descendants = 5
@@ -31,7 +32,7 @@ require [
   # create the objects ...
   router        = new Backbone.Router
 
-  @data         = if ENV.DISCUSSION.THREADED
+  data          = if ENV.DISCUSSION.THREADED
                     new MaterializedDiscussionTopic root_url: ENV.DISCUSSION.ROOT_URL
                   else
                     new SideCommentDiscussionTopic root_url: ENV.DISCUSSION.ROOT_URL
@@ -52,7 +53,7 @@ require [
                     model: new Backbone.Model
                     filterModel: filterModel
 
-  @entriesView   = new EntriesView
+  entriesView   = new EntriesView
                     el: '#discussion_subentries'
                     collection: entries
                     descendants: descendants
@@ -125,6 +126,9 @@ require [
 
   filterView.on 'clickEntry', (entry) ->
     router.navigate "entry-#{entry.get 'id'}", yes
+
+  toolbarView.on 'showDeleted', (show) ->
+    entriesView.showDeleted(show)
 
   toolbarView.on 'expandAll', ->
     EntryView.expandRootEntries()

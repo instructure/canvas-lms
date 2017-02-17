@@ -15,27 +15,11 @@
   <div class="discussion-header-content right-of-avatar">
     <div class="pull-left span4">
       <h2 class="discussion-title">
-          {{#if hiddenName}}
-            <span>{{hiddenName}}</span>
-          {{else}}
-            <a
-            {{#if author}}
-              class="author"
-              {{#if author.html_url}}
-                href="{{author.html_url}}"
-                data-bypass
-              {{/if}}
-              {{#if author.url}}
-                  href="{{author.url}}"
-              {{/if}}
-              title="{{#t "authors_name"}}Author's name{{/t}}">{{author.display_name}}
-            {{else}}
-              class="author unknown"
-              >{{#t "unknown_author"}}>Unknown Author{{/t}}
-            {{/if}}
-          {{/if}}
-          {{#if author.isInactive}}<span class="label" title="{{#t}}This user is currently not able to access the course{{/t}}">{{#t}}inactive{{/t}}</span>{{/if}}
-        </a>
+        {{#if hiddenName}}
+          <span>{{hiddenName}}</span>
+        {{else}}
+          {{>discussions/author_link}}
+        {{/if}}
       </h2>
       <div class="discussion-pubdate hide-if-collapsed">{{friendlyDatetime created_at pubdate=true contextSensitive=true}}</div>
       <div class="show-if-collapsed discussion-subtitle summary ellipsis">{{summary}}</div>

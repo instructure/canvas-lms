@@ -1,4 +1,4 @@
-class AddResultsToProgresses < ActiveRecord::Migration
+class AddResultsToProgresses < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

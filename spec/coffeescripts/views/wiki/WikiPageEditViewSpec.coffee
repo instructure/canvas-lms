@@ -10,7 +10,7 @@ define [
 ], ($, Assignment, WikiPage, WikiPageEditView, RichContentEditor, fixtures, editorUtils, fakeENV) ->
 
 
-  module 'WikiPageEditView:Init',
+  QUnit.module 'WikiPageEditView:Init',
     setup: ->
       @initSpy = sinon.spy(RichContentEditor, 'initSidebar')
 
@@ -40,7 +40,7 @@ define [
     conditionalToggle = view.$el.find('#conditional_content')
     equal conditionalToggle.length, 0, 'Toggle is hidden'
 
-  module 'WikiPageEditView:ConditionalContent',
+  QUnit.module 'WikiPageEditView:ConditionalContent',
     setup: ->
       fakeENV.setup(CONDITIONAL_RELEASE_SERVICE_ENABLED: true)
 
@@ -98,7 +98,7 @@ define [
     equal assignment.get('set_assignment'), '1', 'Sets assignment'
     equal assignment.get('only_visible_to_overrides'), '1', 'Sets override visibility'
 
-  module 'WikiPageEditView:UnsavedChanges',
+  QUnit.module 'WikiPageEditView:UnsavedChanges',
     setup: ->
       fixtures.setup()
 
@@ -187,7 +187,7 @@ define [
     ok @view.onUnload({}) isnt undefined, "Returns warning if changed"
 
 
-  module 'WikiPageEditView:Validate'
+  QUnit.module 'WikiPageEditView:Validate'
 
   test 'validation of the title is only performed if the title is present', ->
     view = new WikiPageEditView
@@ -202,7 +202,7 @@ define [
     ok errors['title'], 'error when title is present, but blank'
     ok errors['title'][0].message, 'error message when title is present, but blank'
 
-  module 'WikiPageEditView:JSON'
+  QUnit.module 'WikiPageEditView:JSON'
 
   testRights = (subject, options) ->
     test "#{subject}", ->

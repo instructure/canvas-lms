@@ -1,4 +1,4 @@
-class AddBioToUser < ActiveRecord::Migration
+class AddBioToUser < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -1,4 +1,4 @@
-class RemoveOrphanedContextModuleProgressions < ActiveRecord::Migration
+class RemoveOrphanedContextModuleProgressions < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

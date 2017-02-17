@@ -1,10 +1,11 @@
 require 'guard'
-require 'guard/guard'
+require 'guard/plugin'
 
 module Guard
-  class Styleguide < Guard
-    def initialize(watchers=[], options={})
-      super([::Guard::Watcher.new(/(app\/stylesheets.*)/)], {})
+  class Styleguide < Plugin
+    def initialize(options={})
+      options[:watchers] = [::Guard::Watcher.new(/(app\/stylesheets.*)/)]
+      super(options)
     end
 
     def run_on_change(paths)

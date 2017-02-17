@@ -22,7 +22,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
   context 'as a teacher' do
     before :once do
-      @course = course
+      @course = course_factory
       teacher_in_course active_all: true
       @quiz = @course.quizzes.create!(:title => "A Sample Quiz")
     end
@@ -184,14 +184,11 @@ describe Quizzes::QuizQuestionsController, type: :request do
       end
 
       context "non-existent question" do
-        before do
-          @json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/9034831",
-                           {:controller => "quizzes/quiz_questions", :action => "show", :format => "json", :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s, :id => "9034831"},
-                             {}, {}, {:expected_status => 404})
-        end
-
         it "should return a not found error message" do
-          expect(@json.inspect).to include "does not exist"
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/9034831",
+                          {:controller => "quizzes/quiz_questions", :action => "show", :format => "json", :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s, :id => "9034831"},
+                            {}, {}, {:expected_status => 404})
+          expect(json.inspect).to include "does not exist"
         end
       end
     end

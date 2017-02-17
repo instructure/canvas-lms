@@ -80,11 +80,11 @@ describe AppointmentGroupsController, type: :request do
     ag2 = AppointmentGroup.create!(:title => "me neither", :contexts => [Course.create!])
     ag2.publish!
 
-    student_in_course :course => course(:active_all => true), :user => @me
+    student_in_course :course => course_factory(active_all: true), :user => @me
     ag3 = AppointmentGroup.create!(:title => "enrollment not active", :contexts => [@course])
     ag3.publish!
 
-    student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
+    student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     ag4 = AppointmentGroup.create!(:title => "unpublished", :contexts => [@course])
     ag5 = AppointmentGroup.create!(:title => "no times", :contexts => [@course])
     ag5.publish!
@@ -129,11 +129,11 @@ describe AppointmentGroupsController, type: :request do
   end
 
   it "should restrict reservable appointment groups by context_codes" do
-    student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
+    student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     ag1 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
     ag1.publish!
 
-    student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
+    student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     ag2 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
     ag2.publish!
 
@@ -147,7 +147,7 @@ describe AppointmentGroupsController, type: :request do
   end
 
   it "should return past reservable appointment groups, if requested" do
-    student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
+    student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     ag = AppointmentGroup.create!(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]], :contexts => [@course])
     ag.publish!
     json = api_call(:get, "/api/v1/appointment_groups?scope=reservable&include_past_appointments=1", {
@@ -190,6 +190,17 @@ describe AppointmentGroupsController, type: :request do
     expect(cjson.first['user']['id']).to eql @student1.id
   end
 
+  it 'should include all associated context codes, if requested' do
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
+
+    json = api_call(:get, "/api/v1/appointment_groups/#{ag.id}?include[]=all_context_codes", {
+                      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s, :include => ['all_context_codes']})
+    expect(json.keys.sort).to eql((expected_fields + ['all_context_codes', 'appointments']).sort)
+    expect(json['id']).to eql ag.id
+    ccs = json['all_context_codes']
+    expect(ccs).to eql [@course.asset_string]
+  end
+
   it 'should get a manageable appointment group' do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
 
@@ -220,7 +231,7 @@ describe AppointmentGroupsController, type: :request do
   end
 
   it 'should get a reservable appointment group' do
-    student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
+    student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
     ag.publish!
 
@@ -252,7 +263,7 @@ describe AppointmentGroupsController, type: :request do
   end
 
   it 'should require action until the min has been met' do
-    student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
+    student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :min_appointments_per_participant => 1, :contexts => [@course])
     ag.publish!
     appt = ag.appointments.first
@@ -295,7 +306,7 @@ describe AppointmentGroupsController, type: :request do
   end
 
   it 'should enforce create permissions' do
-    student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
+    student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     raw_api_call(:post, "/api/v1/appointment_groups",
                       {:controller => 'appointment_groups', :action => 'create', :format => 'json'},
                       {:appointment_group => {:context_codes => [@course.asset_string], :title => "ohai"} })
@@ -323,7 +334,7 @@ describe AppointmentGroupsController, type: :request do
   end
 
   it 'should enforce update permissions' do
-    student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
+    student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     raw_api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
                       {:controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s},
@@ -359,7 +370,7 @@ describe AppointmentGroupsController, type: :request do
   end
 
   it 'should enforce delete permissions' do
-    student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
+    student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     raw_api_call(:delete, "/api/v1/appointment_groups/#{ag.id}",
                       {:controller => 'appointment_groups', :action => 'destroy', :format => 'json', :id => ag.id.to_s})

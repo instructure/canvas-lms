@@ -338,7 +338,9 @@
   align-items: center;
   background-color: $ic-font-color--subdued;
   color: $ic-color-light;
-
+  &::before {
+    font-size: 1rem;
+  }
   .ig-published:not(.student-view) & {
     background-color: $ic-color-success;
   }
@@ -353,11 +355,11 @@
 .ig-title {
   display: inline-block;
   box-sizing: border-box;
+  font-weight: bold;
   padding-right: $ic-sp;
   line-height: $ic-label-line-height;
   margin-bottom: $ic-sp/4;
   min-width: 1px; // firefox flex breaks the parent container
-  font-weight: 500;
 }
 
 .ig-details {

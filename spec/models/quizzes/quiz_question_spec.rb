@@ -23,7 +23,7 @@ describe Quizzes::QuizQuestion do
   it "should deserialize its json data" do
     answers = [{'id' => 1}, {'id' => 2}]
     qd = {'name' => 'test question', 'question_type' => 'multiple_choice_question', 'answers' => answers}
-    course
+    course_factory
     bank = @course.assessment_question_banks.create!
     a = bank.assessment_questions.create!
     q = Quizzes::QuizQuestion.create(:question_data => qd, :assessment_question => a)
@@ -94,7 +94,7 @@ describe Quizzes::QuizQuestion do
     end
 
     before :once do
-      course
+      course_factory
       @quiz = @course.quizzes.create!(:title => "some quiz")
       @question1 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 1', 'answers' => [{'id' => 1}, {'id' => 2}]})
       @question2 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})

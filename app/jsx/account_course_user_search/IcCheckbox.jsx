@@ -1,7 +1,7 @@
 define([
   "react",
   "./IcInput",
-  "bower/classnames/index"
+  "classnames"
 ], function(React, IcInput, classnames) {
 
   var { string } = React.PropTypes;

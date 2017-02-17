@@ -47,9 +47,11 @@ module DifferentiatedAssignments
   end
 
   def grade_da_assignments
-    @da_quiz.assignment.grade_student(@student, {:grade => 10})
-    @da_discussion.assignment.grade_student(@student, {:grade => 10})
-    @da_assignment.grade_student(@student, {:grade => 10})
+    @teacher = User.create!
+    @course.enroll_teacher(@teacher)
+    @da_quiz.assignment.grade_student(@student, grade: 10, grader: @teacher)
+    @da_discussion.assignment.grade_student(@student, grade: 10, grader: @teacher)
+    @da_assignment.grade_student(@student, grade: 10, grader: @teacher)
   end
 
   def create_da_assignment

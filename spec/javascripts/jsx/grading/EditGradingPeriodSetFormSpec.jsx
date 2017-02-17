@@ -1,12 +1,12 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jquery',
   'underscore',
   'jsx/grading/EditGradingPeriodSetForm'
-], (React, ReactDOM, $, _, GradingPeriodSetForm) => {
+], (React, ReactDOM, {Simulate}, $, _, GradingPeriodSetForm) => {
   const wrapper = document.getElementById('fixtures');
-  const Simulate = React.addons.TestUtils.Simulate;
 
   const assertDisabled = function(component) {
     let $el = ReactDOM.findDOMNode(component);
@@ -20,7 +20,7 @@ define([
 
   const exampleSet = { id: "1", title: "Fall 2015" };
 
-  module('EditGradingPeriodSetForm', {
+  QUnit.module('EditGradingPeriodSetForm', {
     renderComponent(opts={}) {
       const defaults = {
         set: exampleSet,

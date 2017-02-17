@@ -1,4 +1,4 @@
-class AddCourseStorageReport < ActiveRecord::Migration
+class AddCourseStorageReport < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

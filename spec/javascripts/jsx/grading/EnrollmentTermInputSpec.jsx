@@ -1,13 +1,13 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'underscore',
   'jsx/grading/EnrollmentTermInput'
-], (React, ReactDOM, _, Input) => {
+], (React, ReactDOM, {findRenderedDOMComponentWithClass}, _, Input) => {
   const wrapper = document.getElementById('fixtures');
-  const { findRenderedDOMComponentWithClass } = React.addons.TestUtils;
 
-  module('EnrollmentTermInput', {
+  QUnit.module('EnrollmentTermInput', {
     renderComponent(props={}) {
       const defaultProps = {
         enrollmentTerms: [

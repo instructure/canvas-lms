@@ -1,4 +1,4 @@
-class AddJitProvisioningToAuthenticationProviders < ActiveRecord::Migration
+class AddJitProvisioningToAuthenticationProviders < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

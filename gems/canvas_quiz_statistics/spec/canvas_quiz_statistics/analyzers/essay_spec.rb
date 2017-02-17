@@ -6,7 +6,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
 
   it 'should not blow up when no responses are provided' do
     expect {
-      subject.run([]).should be_present
+      expect(subject.run([])).to be_present
     }.to_not raise_error
   end
 
@@ -15,13 +15,13 @@ describe CanvasQuizStatistics::Analyzers::Essay do
   describe 'output [#run]' do
     describe '[:responses]' do
       it 'should count students who have written anything' do
-        subject.run([{ text: 'foo' }])[:responses].should == 1
+        expect(subject.run([{ text: 'foo' }])[:responses]).to eq(1)
       end
 
       it 'should not count students who have written a blank response' do
-        subject.run([{ }])[:responses].should == 0
-        subject.run([{ text: nil }])[:responses].should == 0
-        subject.run([{ text: '' }])[:responses].should == 0
+        expect(subject.run([{ }])[:responses]).to eq(0)
+        expect(subject.run([{ text: nil }])[:responses]).to eq(0)
+        expect(subject.run([{ text: '' }])[:responses]).to eq(0)
       end
     end
 
@@ -30,7 +30,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
         { correct: 'defined' }, { correct: 'undefined' }
       ])
 
-      output[:graded].should == 1
+      expect(output[:graded]).to eq(1)
     end
 
     describe ':full_credit' do
@@ -43,7 +43,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
           { points: 3 }, { points: 2 }, { points: 3 }
         ])
 
-        output[:full_credit].should == 2
+        expect(output[:full_credit]).to eq(2)
       end
 
       it 'should count students who received more than full credit' do
@@ -51,7 +51,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
           { points: 3 }, { points: 2 }, { points: 5 }
         ])
 
-        output[:full_credit].should == 2
+        expect(output[:full_credit]).to eq(2)
       end
 
       it 'should be 0 otherwise' do
@@ -59,12 +59,12 @@ describe CanvasQuizStatistics::Analyzers::Essay do
           { points: 1 }
         ])
 
-        output[:full_credit].should == 0
+        expect(output[:full_credit]).to eq(0)
       end
 
       it 'should count those who exceed the maximum points possible' do
         output = subject.run([{ points: 5 }])
-        output[:full_credit].should == 1
+        expect(output[:full_credit]).to eq(1)
       end
     end
 
@@ -93,22 +93,22 @@ describe CanvasQuizStatistics::Analyzers::Essay do
         bottom = answers[2]
         expect(bottom[:responses]).to eq 2
         expect(bottom[:user_names]).to include('Joe1')
-        expect(bottom[:full_credit]).to be_false
+        expect(bottom[:full_credit]).to be_falsey
 
         middle = answers[1]
         expect(middle[:responses]).to eq 5
         expect(middle[:user_names]).to include('Joe6')
-        expect(middle[:full_credit]).to be_false
+        expect(middle[:full_credit]).to be_falsey
 
         top = answers[0]
         expect(top[:responses]).to eq 2
         expect(top[:user_names]).to include('Joe10')
-        expect(top[:full_credit]).to be_true
+        expect(top[:full_credit]).to be_truthy
 
         undefined = answers[3]
         expect(undefined[:responses]).to eq 3
         expect(undefined[:user_names].uniq).to eq ['Joe0']
-        expect(undefined[:full_credit]).to be_false
+        expect(undefined[:full_credit]).to be_falsey
       end
     end
 
@@ -120,9 +120,9 @@ describe CanvasQuizStatistics::Analyzers::Essay do
           { points: nil, user_id: 5 }
         ])
 
-        output[:point_distribution].should include({ score: nil, count: 1 })
-        output[:point_distribution].should include({ score: 1, count: 1 })
-        output[:point_distribution].should include({ score: 3, count: 2 })
+        expect(output[:point_distribution]).to include({ score: nil, count: 1 })
+        expect(output[:point_distribution]).to include({ score: 1, count: 1 })
+        expect(output[:point_distribution]).to include({ score: 3, count: 2 })
       end
 
       it 'should sort them in score ascending mode' do
@@ -132,7 +132,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
           { points: nil, user_id: 5 }
         ])
 
-        output[:point_distribution].map { |v| v[:score] }.should == [ nil, 1, 3 ]
+        expect(output[:point_distribution].map { |v| v[:score] }).to eq([ nil, 1, 3 ])
       end
     end
   end

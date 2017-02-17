@@ -13,7 +13,7 @@ define [
   group = null
   users = null
 
-  module 'GroupView',
+  QUnit.module 'GroupView',
     setup: ->
       fakeENV.setup()
       group = new Group

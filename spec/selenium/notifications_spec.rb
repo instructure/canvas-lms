@@ -1,16 +1,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/notifications_common')
-include NotificationsCommon
 require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 
 describe "Notifications" do
+  include NotificationsCommon
   include_context "in-process server selenium tests"
   include Calendar2Common
 
   context "admin" do
     before :once do
       course_with_student(active_all: true)
-      NotificationsCommon.setup_comm_channel(@student, 'student@example.com')
+      setup_comm_channel(@student, 'student@example.com')
       @teacher = user_with_pseudonym(username: 'teacher@example.com', active_all: 1)
       enrollment = teacher_in_course(course: @course, user: @teacher)
       enrollment.accept!
@@ -92,7 +92,7 @@ describe "Notifications" do
         end
 
         it "should show assignment graded notification to the observer", priority: "2", test_id: 1040284 do
-          @assignment.grade_student @student, grade: 2
+          @assignment.grade_student @student, grade: 2, grader: @teacher
 
           get "/users/#{@observer.id}/messages"
 
@@ -106,7 +106,7 @@ describe "Notifications" do
         it "should not send assignment graded notification to observers not linked to students", priority: "2", test_id: 1040286 do
           @observer2 = user_with_pseudonym(username: 'observer2@example.com', active_all: 1)
           @course.enroll_user(@observer2, 'ObserverEnrollment', enrollment_state: 'active')
-          @assignment.grade_student @student, grade: 2
+          @assignment.grade_student @student, grade: 2, grader: @teacher
 
           get "/users/#{@observer2.id}/messages"
           expect(f("#content")).not_to contain_css('.messages .message')

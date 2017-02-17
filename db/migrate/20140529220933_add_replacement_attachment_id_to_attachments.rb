@@ -1,4 +1,4 @@
-class AddReplacementAttachmentIdToAttachments < ActiveRecord::Migration
+class AddReplacementAttachmentIdToAttachments < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

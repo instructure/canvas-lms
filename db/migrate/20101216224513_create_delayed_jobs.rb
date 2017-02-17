@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CreateDelayedJobs < ActiveRecord::Migration
+class CreateDelayedJobs < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.connection

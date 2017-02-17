@@ -38,6 +38,17 @@ describe SharedBrandConfigsController, type: :request do
         })
       }.to change(Account.default.shared_brand_configs, :count).by(1)
     end
+
+    it "errors if invalid" do
+      account_admin_user
+      raw_api_call(:post, url, api_args_for_create, {
+        shared_brand_config: {
+          'name' => 'New Theme',
+          'brand_config_md5' => 'INVALID'
+        }
+      })
+      assert_status(422)
+    end
   end
 
   describe "#update" do
@@ -66,6 +77,13 @@ describe SharedBrandConfigsController, type: :request do
         expect(json["name"]).to eq('Updated Name')
       }.to_not change(Account.default.shared_brand_configs, :count)
       expect(Account.default.shared_brand_configs.find(shared_config.id).name).to eq('Updated Name')
+    end
+
+    it "returns invalid for a bad md5" do
+      account_admin_user
+      json = api_call(:put, url, api_args_for_update, {
+        shared_brand_config: { brand_config_md5: 'abc' }
+      }, {}, expected_status: 422)
     end
   end
 

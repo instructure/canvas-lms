@@ -40,9 +40,9 @@ describe ContextController do
     end
 
     it "should only show active group members to students" do
-      active_student = user
+      active_student = user_factory
       @course.enroll_student(active_student).accept!
-      inactive_student = user
+      inactive_student = user_factory
       @course.enroll_student(inactive_student).deactivate
 
       @group = @course.groups.create!
@@ -56,9 +56,9 @@ describe ContextController do
     end
 
     it "should only show active course instructors to students" do
-      active_teacher = user
+      active_teacher = user_factory
       @course.enroll_teacher(active_teacher).accept!
-      inactive_teacher = user
+      inactive_teacher = user_factory
       @course.enroll_teacher(inactive_teacher).deactivate
 
       @group = @course.groups.create!
@@ -71,9 +71,9 @@ describe ContextController do
     end
 
     it "should show all group members to admins" do
-      active_student = user
+      active_student = user_factory
       @course.enroll_student(active_student).accept!
-      inactive_student = user
+      inactive_student = user_factory
       @course.enroll_student(inactive_student).deactivate
 
       @group = @course.groups.create!
@@ -83,6 +83,34 @@ describe ContextController do
       user_session(@teacher)
       get 'roster', :group_id => @group.id
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to match_array [@student.id, active_student.id, inactive_student.id]
+    end
+
+    context "student content cards" do
+      before(:once) do
+        @course.root_account.enable_feature! :student_context_cards
+      end
+
+      it "is disabled when feature_flag is off" do
+        @course.root_account.disable_feature! :student_context_cards
+        user_session(@teacher)
+        get :roster, course_id: @course.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
+      end
+
+      it "is enabled for teachers when feature_flag is on" do
+        %w[manage_students manage_admin_users].each do |perm|
+          RoleOverride.manage_role_override(Account.default, teacher_role, perm, override: false)
+        end
+        user_session(@teacher)
+        get :roster, course_id: @course.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be true
+      end
+
+      it "is always disabled for students" do
+        user_session(@student)
+        get :roster, course_id: @course.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
+      end
     end
   end
 
@@ -94,7 +122,7 @@ describe ContextController do
 
     it "should assign variables" do
       user_session(@teacher)
-      @enrollment = @course.enroll_student(user(:active_all => true))
+      @enrollment = @course.enroll_student(user_factory(:active_all => true))
       @enrollment.accept!
       @student = @enrollment.user
       get 'roster_user', :course_id => @course.id, :id => @student.id
@@ -111,12 +139,12 @@ describe ContextController do
 
       it 'allows merged users from other shards to be referenced' do
         user1 = user_model
-        course1 = course(:active_all => 1)
+        course1 = course_factory(active_all: true)
         course1.enroll_user(user1)
 
         @shard2.activate do
           @user2 = user_model
-          @course2 = course(:active_all => 1)
+          @course2 = course_factory(active_all: true)
           @course2.enroll_user(@user2)
         end
 
@@ -289,6 +317,36 @@ describe ContextController do
 
       post :undelete_item, course_id: @course.id, asset_string: @attachment.asset_string
       expect(@attachment.reload).not_to be_deleted
+    end
+  end
+
+  describe "GET 'roster_user_usage'" do
+    before(:once) do
+      page = @course.wiki.wiki_pages.create(:title => "some page")
+      AssetUserAccess.create!({
+        user_id: @student,
+        asset_code: page.asset_string,
+        context: @course,
+        category: 'pages'
+      })
+    end
+
+    it "returns accesses" do
+      user_session(@teacher)
+
+      get :roster_user_usage, course_id: @course.id, user_id: @student.id
+
+      expect(response).to be_success
+      expect(assigns[:accesses].length).to eq 1
+    end
+
+    it "returns json" do
+      user_session(@teacher)
+
+      get :roster_user_usage, course_id: @course.id, user_id: @student.id, format: :json
+
+      expect(response).to be_success
+      expect(JSON.parse(response.body.gsub("while(1);", "")).length).to eq 1
     end
   end
 end

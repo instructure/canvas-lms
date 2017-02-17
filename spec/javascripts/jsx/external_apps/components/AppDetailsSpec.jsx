@@ -1,12 +1,11 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/external_apps/components/AppDetails',
   'jsx/external_apps/lib/AppCenterStore'
-], (React, AppDetails, AppCenterStore) => {
+], (React, TestUtils, AppDetails, AppCenterStore) => {
 
-  const TestUtils = React.addons.TestUtils;
-
-  module('External Apps App Details');
+  QUnit.module('External Apps App Details');
 
   test('the back to app center link goes to the proper place', () => {
 

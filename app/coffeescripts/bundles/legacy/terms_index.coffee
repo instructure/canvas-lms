@@ -7,6 +7,8 @@ require [
   "jquery.instructure_misc_plugins",
   "jquery.templateData"
 ], (I18n, $) ->
+  dateOpts = { format: 'full' }
+
   $(document).ready ->
     $(".edit_term_link").click (event) ->
       event.preventDefault()
@@ -66,18 +68,18 @@ require [
           # and designer roles without an overridden start date allow access from the dawn of time. The logic
           # implementing this is in EnrollmentTerm#enrollment_dates_for.
           if override.start_at
-            start_string = $.dateString(override.start_at)
+            start_string = $.dateString(override.start_at, dateOpts)
           else if type_string == "student_enrollment"
             start_string = I18n.t("term start")
           else
             start_string = I18n.t("whenever")
           term[type_string + "_start_at"] = start_string
           # Non-overridden end dates always inherit the term end date, no matter the role.
-          term[type_string + "_end_at"] = $.dateString(override.end_at) or I18n.t("date.term_end", "term end")
-          term["enrollment_term[overrides][" + type_string + "][start_at]"] = $.dateString(override.start_at)
-          term["enrollment_term[overrides][" + type_string + "][end_at]"] = $.dateString(override.end_at)
-        term.start_at = $.dateString(term.start_at) or I18n.t("date.unspecified", "whenever")
-        term.end_at = $.dateString(term.end_at) or I18n.t("date.unspecified", "whenever")
+          term[type_string + "_end_at"] = $.dateString(override.end_at, dateOpts) or I18n.t("date.term_end", "term end")
+          term["enrollment_term[overrides][" + type_string + "][start_at]"] = $.dateString(override.start_at, dateOpts)
+          term["enrollment_term[overrides][" + type_string + "][end_at]"] = $.dateString(override.end_at, dateOpts)
+        term.start_at = $.dateString(term.start_at, dateOpts) or I18n.t("date.unspecified", "whenever")
+        term.end_at = $.dateString(term.end_at, dateOpts) or I18n.t("date.unspecified", "whenever")
         $tr.fillTemplateData data: term
         $tr.attr "id", "term_" + term.id
         $tr.fillFormData data,

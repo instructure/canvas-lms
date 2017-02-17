@@ -389,10 +389,6 @@ describe Login::SamlController do
         )
         controller.request.env['canvas.domain_root_account'] = @account
         post :create, :SAMLResponse => "foo", :RelayState => "/courses"
-
-        expect(response).to redirect_to(courses_url)
-        expect(session[:saml_unique_id]).to eq @unique_id
-        expect(session[:login_aac]).to eq @aac2.id
       end
 
       describe '#destroy' do

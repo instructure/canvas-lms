@@ -1,4 +1,4 @@
-class FixUserMergeConversations2 < ActiveRecord::Migration
+class FixUserMergeConversations2 < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up
@@ -7,7 +7,7 @@ class FixUserMergeConversations2 < ActiveRecord::Migration
     # for any private conversations that were merged into existing private
     # conversations since 57d3a82.
     # the previous merging was done incorrectly due to a scoping issue
-    
+
     # there are only about 100 that need to be fixed, so we just load them all
     convos = ConversationParticipant.where("NOT EXISTS (?)", Conversation.where("id=conversation_id"))
     convos.group_by(&:conversation_id).each do |conversation_id, cps|

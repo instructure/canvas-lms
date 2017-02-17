@@ -69,11 +69,11 @@ describe ActiveRecord::Base do
 
   describe "find in batches" do
     before :once do
-      @c1 = course(:name => 'course1', :active_course => true)
-      @c2 = course(:name => 'course2', :active_course => true)
-      u1 = user(:name => 'user1', :active_user => true)
-      u2 = user(:name => 'user2', :active_user => true)
-      u3 = user(:name => 'user3', :active_user => true)
+      @c1 = course_factory(:name => 'course1', :active_course => true)
+      @c2 = course_factory(:name => 'course2', :active_course => true)
+      u1 = user_factory(:name => 'user1', :active_user => true)
+      u2 = user_factory(:name => 'user2', :active_user => true)
+      u3 = user_factory(:name => 'user3', :active_user => true)
       @e1 = @c1.enroll_student(u1, :enrollment_state => 'active')
       @e2 = @c1.enroll_student(u2, :enrollment_state => 'active')
       @e3 = @c1.enroll_student(u3, :enrollment_state => 'active')
@@ -577,8 +577,6 @@ describe ActiveRecord::Base do
       @u4 = User.create!(name: 'b')
 
       @us = [@u1, @u2, @u3, @u4]
-      # for sanity
-      expect(User.where(id: @us, name: nil).order(:id).all).to eq [@u1, @u3]
     end
 
     it "should sort nulls first" do
@@ -710,6 +708,20 @@ describe ActiveRecord::Base do
       v.versionable = u
       expect(v.versionable_type).to eq 'User'
       expect(v).to be_valid
+    end
+  end
+
+  describe "temp_record" do
+    it "should not reload the base association for normal invertible associations" do
+      c = Course.create!(:name => "some name")
+      Course.where(:id => c).update_all(:name => "sadness")
+      expect(c.enrollments.temp_record.course.name).to eq c.name
+    end
+
+    it "should not reload the base association for polymorphic associations" do
+      c = Course.create!(:name => "some name")
+      Course.where(:id => c).update_all(:name => "sadness")
+      expect(c.discussion_topics.temp_record.course.name).to eq c.name
     end
   end
 end

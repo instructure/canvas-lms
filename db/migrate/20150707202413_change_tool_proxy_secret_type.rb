@@ -1,4 +1,4 @@
-class ChangeToolProxySecretType < ActiveRecord::Migration
+class ChangeToolProxySecretType < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

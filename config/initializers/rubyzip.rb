@@ -7,23 +7,23 @@ require 'zip'
 
 Zip.write_zip64_support = true
 
-Zip::Entry::class_eval do
+module ZipEncodingFix
   def fix_name_encoding
     @name.force_encoding('UTF-8')
     @name.force_encoding('ASCII-8BIT') unless @name.valid_encoding?
   end
 
-  def read_c_dir_entry_with_encoding_fix(io)
-    retval = read_c_dir_entry_without_encoding_fix(io)
+  def read_c_dir_entry(io)
+    retval = super
     fix_name_encoding
     retval
   end
-  alias_method_chain :read_c_dir_entry, :encoding_fix
 
-  def read_local_entry_with_encoding_fix(io)
-    retval = read_local_entry_without_encoding_fix(io)
+  def read_local_entry(io)
+    retval = super
     fix_name_encoding
     retval
   end
-  alias_method_chain :read_local_entry, :encoding_fix
 end
+
+Zip::Entry.prepend(ZipEncodingFix)

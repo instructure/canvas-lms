@@ -29,7 +29,7 @@ module UserNotesHelper
     }
     
     javascript_tag("
-      require(['jquery', 'vendor/jquery.pageless'], function(){
+      $(function(){
         $('#user_note_list').pageless(#{opts.to_json});
       });
     ")

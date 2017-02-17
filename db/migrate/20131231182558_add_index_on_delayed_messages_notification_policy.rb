@@ -1,4 +1,4 @@
-class AddIndexOnDelayedMessagesNotificationPolicy < ActiveRecord::Migration
+class AddIndexOnDelayedMessagesNotificationPolicy < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

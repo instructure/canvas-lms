@@ -18,8 +18,6 @@
 
 module LiveAssessments
   class Submission < ActiveRecord::Base
-    attr_accessible :user, :assessment, :possible, :score, :assessed_at
-
     belongs_to :user
     belongs_to :assessment, class_name: 'LiveAssessments::Assessment'
 

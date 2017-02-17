@@ -2,7 +2,7 @@
 # While you can edit this file, any changes you make to the definitions here
 # will be undone by the next auto-generated trigger migration.
 
-class DropTriggersForCollections < ActiveRecord::Migration
+class DropTriggersForCollections < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   # we had to switch to another strategy rather than triggers because the

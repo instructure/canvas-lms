@@ -191,12 +191,21 @@ describe "scheduler" do
     end
 
     context "when un-reserving appointments" do
+      # Today at 8am
+      let(:now) { Time.zone.now.beginning_of_day + 8.hours }
+
+      around :each do |example|
+        Timecop.freeze(now, &example)
+      end
+
       before do
-        date = (Date.today + 1.day).to_s
         create_appointment_group(
           max_appointments_per_participant: 1,
           new_appointments: [
-            [date + ' 12:00:00', date + ' 13:00:00']
+            [
+              now.strftime("%Y-%m-%d 12:00:00"), # noon
+              now.strftime("%Y-%m-%d 13:00:00") # 1pm
+            ]
           ]
         )
         get "/calendar2"

@@ -1,4 +1,4 @@
-class CreateLearningOutcomeQuestionResults < ActiveRecord::Migration
+class CreateLearningOutcomeQuestionResults < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

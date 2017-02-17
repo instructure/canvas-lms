@@ -13,7 +13,7 @@ define [
   'compiled/util/fcUtil'
   'compiled/userSettings'
   'compiled/util/hsvToRgb'
-  'bower/color-slicer/dist/color-slicer'
+  'color-slicer'
   'jst/calendar/calendarApp'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/commonEventFactory'
@@ -29,7 +29,9 @@ define [
   'compiled/calendar/CalendarEventFilter'
   'jsx/calendar/scheduler/actions'
 
-  'fullcalendar-with-lang-all'
+  'fullcalendar'
+  'fullcalendar/dist/lang-all'
+  'jsx/calendar/patches-to-fullcalendar'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
@@ -49,6 +51,7 @@ define [
       @subscribeToEvents()
       @header = @options.header
       @schedulerState = {}
+      @useBetterScheduler = !!@options.schedulerStore
       if @options.schedulerStore
         @schedulerStore = @options.schedulerStore
         @schedulerState = @schedulerStore.getState()
@@ -250,7 +253,9 @@ define [
 
       reservedText = ""
       if event.isAppointmentGroupEvent()
-        if event.reservedUsers == ""
+        if event.appointmentGroupEventStatus == "Reserved"
+          reservedText = "\n\n#{I18n.t('Reserved By You')}"
+        else if event.reservedUsers == ""
             reservedText = "\n\n#{I18n.t('Unreserved')}"
         else
           reservedText = "\n\n#{I18n.t('Reserved By: ')} #{event.reservedUsers}"
@@ -338,8 +343,7 @@ define [
       # create a new dummy event
       event = commonEventFactory(null, @activeContexts())
       event.date = @getCurrentDate()
-
-      new EditEventDetailsDialog(event).show()
+      new EditEventDetailsDialog(event, @useBetterScheduler).show()
 
     eventClick: (event, jsEvent, view) =>
       $event = $(jsEvent.currentTarget)
@@ -358,7 +362,7 @@ define [
       event = commonEventFactory(null, @activeContexts())
       event.date = date
       event.allDay = not date.hasTime()
-      (new EditEventDetailsDialog(event)).show()
+      (new EditEventDetailsDialog(event, @useBetterScheduler)).show()
 
     updateFragment: (opts) ->
       replaceState = !!opts.replaceState
@@ -503,6 +507,14 @@ define [
       if parentEvent
         parentEvent.calendarEvent.reserved = false
         parentEvent.calendarEvent.available_slots += 1
+        # remove the unreserved event from the parent's children.
+        parentEvent.calendarEvent.child_events = parentEvent.calendarEvent.child_events.filter((obj) ->
+          obj.id != event.calendarEvent.id
+        )
+        # need to update the appointmentGroupEventStatus to make sure it
+        # correctly displays the new status in the calendar.
+        parentEvent.appointmentGroupEventStatus = parentEvent.calculateAppointmentGroupEventStatus()
+
         @refetchEvents()
 
     eventSaving: (event) =>
@@ -762,7 +774,9 @@ define [
       @schedulerState = newState
       if changed
         @refetchEvents()
-        @findNextAppointment() if @schedulerState.inFindAppointmentMode
+        if @schedulerState.inFindAppointmentMode
+          @findNextAppointment()
+          @ensureCourseVisible(@schedulerState.selectedCourse)
         @loadAgendaView() if (@currentView == 'agenda')
 
     findAppointmentModeGroups: () =>
@@ -770,6 +784,9 @@ define [
         @reservable_appointment_groups[@schedulerState.selectedCourse.asset_string] || []
       else
         []
+
+    ensureCourseVisible: (course) ->
+      $.publish('Calendar/ensureCourseVisible', course.asset_string)
 
     visibleDateRange: () =>
       range = {}

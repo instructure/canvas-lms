@@ -28,7 +28,7 @@ define [
     view.open()
     view
 
-  module 'AssignmentSettingsView',
+  QUnit.module 'AssignmentSettingsView',
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
 
@@ -64,6 +64,27 @@ define [
     equal(attributes.apply_assignment_group_weights, "0")
     view.remove()
 
+  test 'onSaveSuccess triggers weightedToggle event with expected argument', ->
+    sandbox = sinon.sandbox.create()
+
+    stub1 = sandbox.stub()
+    view = createView(weighted: true)
+    view.on('weightedToggle', stub1)
+    view.onSaveSuccess()
+    equal stub1.callCount, 1
+    deepEqual stub1.getCall(0).args, [true]
+    view.remove()
+
+    stub2 = sandbox.stub()
+    view = createView(weighted: false)
+    view.on('weightedToggle', stub2)
+    view.onSaveSuccess()
+    equal stub2.callCount, 1
+    deepEqual stub2.getCall(0).args, [false]
+    view.remove()
+
+    sandbox.restore()
+
   test 'saves group weights', ->
     view = createView(weighted: true)
     view.$(".ag-weights-tr:eq(0) .group_weight_value").val("20")
@@ -74,12 +95,12 @@ define [
     equal view.assignmentGroups.last().get('group_weight'), 80
     view.remove()
 
-  module 'AssignmentSettingsView with an assignment in a closed grading period',
+  QUnit.module 'AssignmentSettingsView with an assignment in a closed grading period',
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
 
   test 'disables the checkbox', ->
-    closed_group = group(has_assignment_due_in_closed_grading_period: true)
+    closed_group = group(any_assignment_in_closed_grading_period: true)
     groups = new AssignmentGroupCollection([group(), closed_group])
     view = createView(weighted: true, assignmentGroups: groups)
     ok view.$('#apply_assignment_group_weights').hasClass("disabled")
@@ -91,7 +112,7 @@ define [
     view.remove()
 
   test 'does not disable the checkbox when the user is an admin', ->
-    closed_group = group(has_assignment_due_in_closed_grading_period: true)
+    closed_group = group(any_assignment_in_closed_grading_period: true)
     groups = new AssignmentGroupCollection([group(), closed_group])
     view = createView(weighted: true, assignmentGroups: groups, userIsAdmin: true)
     notOk view.$('#apply_assignment_group_weights').hasClass("disabled")
@@ -103,7 +124,7 @@ define [
     view.remove()
 
   test 'does not change the apply_assignment_group_weights flag', ->
-    closed_group = group(has_assignment_due_in_closed_grading_period: true)
+    closed_group = group(any_assignment_in_closed_grading_period: true)
     groups = new AssignmentGroupCollection([group(), closed_group])
     view = createView(weighted: true, assignmentGroups: groups)
     view.$('#apply_assignment_group_weights').click()
@@ -112,7 +133,7 @@ define [
     view.remove()
 
   test 'changes the apply_assignment_group_weights flag when the user is an admin', ->
-    closed_group = group(has_assignment_due_in_closed_grading_period: true)
+    closed_group = group(any_assignment_in_closed_grading_period: true)
     groups = new AssignmentGroupCollection([group(), closed_group])
     view = createView(weighted: true, assignmentGroups: groups, userIsAdmin: true)
     view.$('#apply_assignment_group_weights').click()
@@ -121,14 +142,14 @@ define [
     view.remove()
 
   test 'disables the weight input fields in the table', ->
-    closed_group = group(has_assignment_due_in_closed_grading_period: true, group_weight: 35)
+    closed_group = group(any_assignment_in_closed_grading_period: true, group_weight: 35)
     groups = new AssignmentGroupCollection([group(group_weight: 25), closed_group])
     view = createView(weighted: true, assignmentGroups: groups)
     ok view.$('.ag-weights-tr:eq(0) .group_weight_value').attr('readonly')
     ok view.$('.ag-weights-tr:eq(1) .group_weight_value').attr('readonly')
 
   test 'disables the Save and Cancel buttons', ->
-    closed_group = group(has_assignment_due_in_closed_grading_period: true)
+    closed_group = group(any_assignment_in_closed_grading_period: true)
     groups = new AssignmentGroupCollection([group(), closed_group])
     view = createView(weighted: true, assignmentGroups: groups)
     ok view.$('#cancel-assignment-settings').hasClass('disabled')
@@ -136,7 +157,7 @@ define [
     view.remove()
 
   test 'disables the Save and Cancel button handlers', ->
-    closed_group = group(has_assignment_due_in_closed_grading_period: true)
+    closed_group = group(any_assignment_in_closed_grading_period: true)
     groups = new AssignmentGroupCollection([group(), closed_group])
     view = createView(weighted: true, assignmentGroups: groups)
     @spy view, 'saveFormData'
@@ -148,7 +169,7 @@ define [
     view.remove()
 
   test 'calculates the total weight', ->
-    closed_group = group(has_assignment_due_in_closed_grading_period: true, group_weight: 35)
+    closed_group = group(any_assignment_in_closed_grading_period: true, group_weight: 35)
     groups = new AssignmentGroupCollection([group(group_weight: 25), closed_group])
     view = createView(weighted: true, assignmentGroups: groups)
     equal view.$('#percent_total').text(), '60%'

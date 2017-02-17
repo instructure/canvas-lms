@@ -1,4 +1,4 @@
-class AddDraftToSubmissionComments < ActiveRecord::Migration
+class AddDraftToSubmissionComments < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

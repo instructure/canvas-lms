@@ -1,4 +1,4 @@
-class FixSisCommunicationChannels < ActiveRecord::Migration
+class FixSisCommunicationChannels < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   disable_ddl_transaction!

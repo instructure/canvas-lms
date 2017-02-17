@@ -1,4 +1,4 @@
-class PopulateGroupCategoryOnDiscussionTopics < ActiveRecord::Migration
+class PopulateGroupCategoryOnDiscussionTopics < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

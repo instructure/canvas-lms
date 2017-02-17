@@ -28,15 +28,30 @@ describe GradeCalculator do
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 100)
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
       @assignment2 = @course.assignments.create!(:title => "Some Assignment2", :points_possible => 10, :assignment_group => @group)
-      @submission = @assignment2.grade_student(@user, :grade => "5")
+      @submission = @assignment2.grade_student(@user, grade: "5", grader: @teacher)
       expect(@user.enrollments.first.computed_current_score).to eql(50.0)
       expect(@user.enrollments.first.computed_final_score).to eql(25.0)
+    end
+
+    it "can compute scores for users with deleted enrollments when grading periods are used" do
+      @course.root_account.enable_feature!(:multiple_grading_periods)
+      grading_period_set = @course.root_account.grading_period_groups.create!
+      grading_period_set.enrollment_terms << @course.enrollment_term
+      period = grading_period_set.grading_periods.create!(
+        title: "A Grading Period",
+        start_date: 10.days.ago,
+        end_date: 10.days.from_now
+      )
+      @user.enrollments.first.destroy
+      expect {
+        GradeCalculator.recompute_final_score(@user.id, @course.id, grading_period_id: period.id)
+      }.not_to raise_error
     end
 
     it "should recompute when an assignment's points_possible changes'" do
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 100)
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
-      @submission = @assignment.grade_student(@user, :grade => "5")
+      @submission = @assignment.grade_student(@user, grade: "5", grader: @teacher)
       expect(@user.enrollments.first.computed_current_score).to eql(50.0)
       expect(@user.enrollments.first.computed_final_score).to eql(50.0)
 
@@ -53,7 +68,7 @@ describe GradeCalculator do
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 50)
       @group2 = @course.assignment_groups.create!(:name => "some group2", :group_weight => 50)
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
-      @assignment.grade_student(@user, :grade => "10")
+      @assignment.grade_student(@user, grade: "10", grader: @teacher)
       @course.assignments.create! :points_possible => 1,
                                   :assignment_group => @group2
       expect(@user.enrollments.first.computed_current_score).to eql(100.0)
@@ -82,14 +97,14 @@ describe GradeCalculator do
         omit_from_final_grade: true
       )
       # grade first assignment for student
-      assignment.grade_student(@user, grade: "5")
+      assignment.grade_student(@user, grade: "5", grader: @teacher)
 
       # assert that at this point both current and final scores are 50%
       expect(@user.enrollments.first.computed_current_score).to eql(50.0)
       expect(@user.enrollments.first.computed_final_score).to eql(50.0)
 
       # grade second assignment for same student with a different score
-      assignment2.grade_student(@user, grade: "10")
+      assignment2.grade_student(@user, grade: "10", grader: @teacher)
 
       # assert that current and final scores have not changed since second assignment
       # is flagged to be omitted from final grade
@@ -106,8 +121,8 @@ describe GradeCalculator do
       a2 = ag2.assignments.create! points_possible: 10, name: "Assignment 2",
              context: @course
 
-      a1.grade_student(@student, grade: 0)
-      a2.grade_student(@student, grade: 10)
+      a1.grade_student(@student, grade: 0, grader: @teacher)
+      a2.grade_student(@student, grade: 10, grader: @teacher)
 
       enrollment = @student.enrollments.first
 
@@ -120,7 +135,7 @@ describe GradeCalculator do
     it "recomputes during #run_if_overrides_changed!" do
       a = @course.assignments.create! name: "Foo", points_possible: 10,
             context: @assignment
-      a.grade_student(@student, grade: 10)
+      a.grade_student(@student, grade: 10, grader: @teacher)
 
       e = @student.enrollments.first
       expect(e.computed_final_score).to eq 100
@@ -145,10 +160,7 @@ describe GradeCalculator do
     describe "group with no grade or muted grade" do
       before(:each) do
         two_groups_two_assignments(50, 10, 50, 10)
-        expect(@user.enrollments.first.computed_current_score).to eql(nil)
-        expect(@user.enrollments.first.computed_final_score).to eql(0.0)
-        @submission = @assignment.grade_student(@user, :grade => "5")
-        expect(@submission[0].score).to eql(5.0)
+        @submission = @assignment.grade_student(@user, grade: "5", grader: @teacher)
       end
 
       it "should ignore no grade for current grade calculation, even when weighted" do
@@ -172,7 +184,7 @@ describe GradeCalculator do
 
         it "should ignore muted assignments by default" do
           # should have same scores as previous spec despite having a grade
-          @assignment2.grade_student(@user, :grade => "500")
+          @assignment2.grade_student(@user, grade: "500", grader: @teacher)
           @user.reload
           expect(@user.enrollments.first.computed_current_score).to eql(50.0)
           expect(@user.enrollments.first.computed_final_score).to eql(25.0)
@@ -180,7 +192,7 @@ describe GradeCalculator do
 
         it "should ignore muted grade for current grade calculation, even when weighted" do
           # should have same scores as previous spec despite having a grade
-          @assignment2.grade_student(@user, :grade => "500")
+          @assignment2.grade_student(@user, grade: "500", grader: @teacher)
           @course.group_weighting_scheme = "percent"
           @course.save!
           @user.reload
@@ -214,8 +226,8 @@ describe GradeCalculator do
 
     it "returns assignment group info" do
       two_groups_two_assignments(25, 10, 75, 10)
-      @assignment.grade_student @user, grade: 5
-      @assignment2.grade_student @user, grade: 10
+      @assignment.grade_student @user, grade: 5, grader: @teacher
+      @assignment2.grade_student @user, grade: 10, grader: @teacher
       calc = GradeCalculator.new [@user.id], @course.id
 
       computed_scores = calc.compute_scores.first
@@ -231,7 +243,7 @@ describe GradeCalculator do
       two_groups_two_assignments(50, 10, 50, 40)
       expect(@user.enrollments.first.computed_current_score).to eql(nil)
       expect(@user.enrollments.first.computed_final_score).to eql(0.0)
-      @submission = @assignment.grade_student(@user, :grade => "9")
+      @submission = @assignment.grade_student(@user, grade: "9", grader: @teacher)
       expect(@submission[0].score).to eql(9.0)
       expect(@user.enrollments).not_to be_empty
       @user.reload
@@ -242,7 +254,7 @@ describe GradeCalculator do
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(90.0)
       expect(@user.enrollments.first.computed_final_score).to eql(45.0)
-      @submission2 = @assignment2.grade_student(@user, :grade => "20")
+      @submission2 = @assignment2.grade_student(@user, grade: "20", grader: @teacher)
       expect(@submission2[0].score).to eql(20.0)
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(70.0)
@@ -258,7 +270,7 @@ describe GradeCalculator do
       two_groups_two_assignments(50, 10, 60, 40)
       expect(@user.enrollments.first.computed_current_score).to eql(nil)
       expect(@user.enrollments.first.computed_final_score).to eql(0.0)
-      @submission = @assignment.grade_student(@user, :grade => "10")
+      @submission = @assignment.grade_student(@user, grade: "10", grader: @teacher)
       expect(@submission[0].score).to eql(10.0)
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(100.0)
@@ -268,7 +280,7 @@ describe GradeCalculator do
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(100.0)
       expect(@user.enrollments.first.computed_final_score).to eql(50.0)
-      @submission2 = @assignment2.grade_student(@user, :grade => "40")
+      @submission2 = @assignment2.grade_student(@user, grade: "40", grader: @teacher)
       expect(@submission2[0].score).to eql(40.0)
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(110.0)
@@ -284,7 +296,7 @@ describe GradeCalculator do
       two_groups_two_assignments(50, 10, 60, 40)
       expect(@user.enrollments.first.computed_current_score).to eql(nil)
       expect(@user.enrollments.first.computed_final_score).to eql(0.0)
-      @submission = @assignment.grade_student(@user, :grade => "11")
+      @submission = @assignment.grade_student(@user, grade: "11", grader: @teacher)
       expect(@submission[0].score).to eql(11.0)
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(110.0)
@@ -294,7 +306,7 @@ describe GradeCalculator do
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(110.0)
       expect(@user.enrollments.first.computed_final_score).to eql(55.0)
-      @submission2 = @assignment2.grade_student(@user, :grade => "45")
+      @submission2 = @assignment2.grade_student(@user, grade: "45", grader: @teacher)
       expect(@submission2[0].score).to eql(45.0)
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(122.5)
@@ -308,14 +320,14 @@ describe GradeCalculator do
 
     it "should properly calculate the grade when total weight is less than 100%" do
       two_groups_two_assignments(50, 10, 40, 40)
-      @submission = @assignment.grade_student(@user, :grade => "10")
+      @submission = @assignment.grade_student(@user, grade: "10", grader: @teacher)
       @course.group_weighting_scheme = "percent"
       @course.save!
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(100.0)
       expect(@user.enrollments.first.computed_final_score).to eql(55.56)
 
-      @submission2 = @assignment2.grade_student(@user, :grade => "40")
+      @submission2 = @assignment2.grade_student(@user, grade: "40", grader: @teacher)
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(100.0)
       expect(@user.enrollments.first.computed_final_score).to eql(100.0)
@@ -329,8 +341,8 @@ describe GradeCalculator do
       @assignment2 = @group.assignments.build(:title => "Not graded assignment", :submission_types => 'not_graded')
       @assignment2.context = @course
       @assignment2.save!
-      @submission = @assignment.grade_student(@user, :grade => "9")
-      @submission2 = @assignment2.grade_student(@user, :grade => "1")
+      @submission = @assignment.grade_student(@user, grade: "9", grader: @teacher)
+      @submission2 = @assignment2.grade_student(@user, grade: "1", grader: @teacher)
       @course.save!
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(90.0)
@@ -345,8 +357,8 @@ describe GradeCalculator do
       @assignment2 = @group.assignments.build(:title => "yet another", :points_possible => 5)
       @assignment2.context = @course
       @assignment2.save!
-      @submission = @assignment.grade_student(@user, :grade => "2")
-      @submission2 = @assignment2.grade_student(@user, :grade => "4")
+      @submission = @assignment.grade_student(@user, grade: "2", grader: @teacher)
+      @submission2 = @assignment2.grade_student(@user, grade: "4", grader: @teacher)
       @course.save!
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(60.0)
@@ -393,9 +405,9 @@ describe GradeCalculator do
       @assignment2_1.context = @course
       @assignment2_1.save!
 
-      @assignment_1.grade_student(@user, :grade => nil)
-      @assignment_2.grade_student(@user, :grade => "1")
-      @assignment2_1.grade_student(@user, :grade => "40")
+      @assignment_1.grade_student(@user, grade: nil, grader: @teacher)
+      @assignment_2.grade_student(@user, grade: "1", grader: @teacher)
+      @assignment2_1.grade_student(@user, grade: "40", grader: @teacher)
     end
 
     it "should properly handle submissions with no score" do
@@ -418,7 +430,7 @@ describe GradeCalculator do
       nil_graded_assignment
 
       @assignment_1.mute!
-      @assignment_1.grade_student(@user, :grade => 500)
+      @assignment_1.grade_student(@user, grade: 500, grader: @teacher)
 
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(93.18)
@@ -436,10 +448,10 @@ describe GradeCalculator do
       a1 = @course.assignments.create! name: "fake quiz", points_possible: 50
       a2 = @course.assignments.create! name: "assignment", points_possible: 50
 
-      s1 = a1.grade_student(@student, grade: 25).first
+      s1 = a1.grade_student(@student, grade: 25, grader: @teacher).first
       Submission.where(:id => s1.id).update_all(workflow_state: "pending_review")
 
-      a2.grade_student(@student, grade: 50)
+      a2.grade_student(@student, grade: 50, grader: @teacher)
 
       enrollment = @student.enrollments.first.reload
       expect(enrollment.computed_current_score).to eq 100.0
@@ -456,14 +468,112 @@ describe GradeCalculator do
     end
   end
 
+  describe '#number_or_null' do
+    it "should return a valid score" do
+      calc = GradeCalculator.new [@user.id], @course.id
+      score = 23.4
+      expect(calc.send(:number_or_null, score)).to eql(score)
+    end
+
+    it "should convert NaN to NULL" do
+      calc = GradeCalculator.new [@user.id], @course.id
+      score = 0/0.0
+      expect(calc.send(:number_or_null, score)).to eql('NULL')
+    end
+
+    it "should convert nil to NULL" do
+      calc = GradeCalculator.new [@user.id], @course.id
+      score = nil
+      expect(calc.send(:number_or_null, score)).to eql('NULL')
+    end
+  end
+
+  describe '#compute_and_save_scores' do
+    before(:once) do
+      @first_period, @second_period = grading_periods(count: 2)
+      first_assignment = @course.assignments.create!(
+        due_at: 1.day.from_now(@first_period.start_date),
+        points_possible: 100
+      )
+      second_assignment = @course.assignments.create!(
+        due_at: 1.day.from_now(@second_period.start_date),
+        points_possible: 100
+      )
+      first_assignment.grade_student(@student, grade: 25, grader: @teacher)
+      second_assignment.grade_student(@student, grade: 75, grader: @teacher)
+      # update_column to avoid callbacks on submission that would trigger score updates
+      Submission.where(user: @student, assignment: first_assignment).first.update_column(:score, 100.0)
+      Submission.where(user: @student, assignment: second_assignment).first.update_column(:score, 95.0)
+    end
+
+    let(:scores) { @student.enrollments.first.scores }
+    let(:overall_course_score) { scores.where(grading_period_id: nil).first }
+
+    it 'updates the overall course score' do
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+      expect(overall_course_score.current_score).to eq(97.5)
+    end
+
+    it 'updates all grading period scores' do
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+      grading_period_scores = scores.where.not(grading_period_id: nil).order(:current_score).pluck(:current_score)
+      expect(grading_period_scores).to match_array([100.0, 95.0])
+    end
+
+    it 'does not update grading period scores if update_all_grading_period_scores is false' do
+      GradeCalculator.new(@student.id, @course, update_all_grading_period_scores: false).compute_and_save_scores
+      grading_period_scores = scores.where.not(grading_period_id: nil).order(:current_score).pluck(:current_score)
+      expect(grading_period_scores).to match_array([25.0, 75.0])
+    end
+
+    it 'restores and updates previously deleted scores' do
+      overall_course_score.destroy
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+      expect(overall_course_score.reload).to be_active
+    end
+
+    context 'grading period is provided' do
+      it 'updates the grading period score' do
+        GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
+        score = scores.where(grading_period_id: @first_period).first
+        expect(score.current_score).to eq(100.0)
+      end
+
+      it 'updates the overall course score' do
+        GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
+        expect(overall_course_score.current_score).to eq(97.5)
+      end
+
+      it 'does not update scores for other grading periods' do
+        GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
+        score = scores.where(grading_period_id: @second_period).first
+        expect(score.current_score).to eq(75.0)
+      end
+
+      it 'does not update the overall course score if update_course_score is false' do
+        GradeCalculator.new(
+          @student.id, @course, grading_period: @first_period, update_course_score: false
+        ).compute_and_save_scores
+        expect(overall_course_score.current_score).to eq(50.0)
+      end
+      
+      it 'does not restore previously deleted score if grading period is deleted too' do
+        score = scores.where(grading_period_id: @first_period).first
+        @first_period.destroy
+        GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
+        expect(score.reload).to be_deleted
+      end
+    end
+  end
+
   it "should return grades in the order they are requested" do
     @student1 = @student
     student_in_course
     @student2 = @student
 
     a = @course.assignments.create! :points_possible => 100
-    a.grade_student @student1, :grade => 50
-    a.grade_student @student2, :grade => 100
+    a.grade_student @student1, grade: 50, grader: @teacher
+    a.grade_student @student2, grade: 100, grader: @teacher
 
     calc = GradeCalculator.new([@student2.id, @student1.id], @course)
     grades = calc.compute_scores
@@ -476,7 +586,7 @@ describe GradeCalculator do
 
   it "returns point information for unweighted courses" do
     a = @course.assignments.create! :points_possible => 50
-    a.grade_student @student, :grade => 25
+    a.grade_student @student, grade: 25, grader: @teacher
     calc = GradeCalculator.new([@student.id], @course)
     grade_info = calc.compute_scores.first[:current]
     expect(grade_info).to eq({:grade => 50, :total => 25, :possible => 50})
@@ -502,7 +612,7 @@ describe GradeCalculator do
       @assignments.each_with_index do |a,i|
         score = @grades[i].first
         next unless score # don't grade nil submissions
-        a.grade_student @student, :grade => score
+        a.grade_student @student, grade: score, grader: @teacher
       end
     end
 
@@ -673,8 +783,8 @@ describe GradeCalculator do
           @course.assignments.create! due_at: gp.start_date + 1,
             points_possible: 100
         }
-        @a1.grade_student(@student, grade: 25)
-        @a2.grade_student(@student, grade: 75)
+        @a1.grade_student(@student, grade: 25, grader: @teacher)
+        @a2.grade_student(@student, grade: 75, grader: @teacher)
       end
 
       it "can compute grades for a grading period" do
@@ -755,10 +865,10 @@ describe GradeCalculator do
 
       it "works" do
         enrollment = @student.enrollments.first
-        @a1.grade_student(@student, grade: 10)
+        @a1.grade_student(@student, grade: 10, grader: @teacher)
         expect(enrollment.reload.computed_final_score).to eql(10.0)
 
-        @a2.grade_student(@student, excuse: 1)
+        @a2.grade_student(@student, excuse: 1, grader: @teacher)
         expect(enrollment.reload.computed_final_score).to eql(100.0)
       end
     end

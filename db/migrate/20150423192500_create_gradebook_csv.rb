@@ -1,4 +1,4 @@
-class CreateGradebookCsv < ActiveRecord::Migration
+class CreateGradebookCsv < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

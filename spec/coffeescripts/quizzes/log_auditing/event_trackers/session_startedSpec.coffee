@@ -3,7 +3,7 @@ define [
   'compiled/quizzes/log_auditing/constants'
   'jquery'
 ], (Subject, K, $) ->
-  module 'Quizzes::LogAuditing::EventTrackers::SessionStarted'
+  QUnit.module 'Quizzes::LogAuditing::EventTrackers::SessionStarted'
 
   test '#constructor: it sets up the proper context', ->
     tracker = new Subject()

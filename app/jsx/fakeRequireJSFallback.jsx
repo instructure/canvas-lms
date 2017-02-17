@@ -20,17 +20,18 @@
 if (!('require' in window)) {
   const jQuery = require('jquery')
 
-  const thingsWeStillAllowThemToRequire  = {
+  const thingsWeStillAllowThemToRequire = {
     jquery: () => jQuery,
     // load these asynchronously so they are not downloaded unless asked for
-    underscore: () => new Promise(resolve => require(['underscore'], resolve)),
-    'jsx/course_wizard/ListItems': () => new Promise(resolve => require(['jsx/course_wizard/ListItems'], resolve))
+    i18nObj: () => System.import('i18nObj'),
+    underscore: () => System.import('underscore'),
+    'jsx/course_wizard/ListItems': () => System.import('jsx/course_wizard/ListItems')
   }
 
-  const getModule = module => {
+  const getModule = (module) => {
     if (module in thingsWeStillAllowThemToRequire) {
       return thingsWeStillAllowThemToRequire[module]()
-    } else if (/^(https?:)?\/\//.test(module)) { //starts with 'http://', 'https://' or '//'
+    } else if (/^(https?:)?\/\//.test(module)) { // starts with 'http://', 'https://' or '//'
       return jQuery.getScript(module)
     } else {
       throw new Error(`Can't load ${module}, use your own RequireJS or something else to load this script`)

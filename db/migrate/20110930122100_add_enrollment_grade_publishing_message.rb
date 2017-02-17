@@ -1,4 +1,4 @@
-class AddEnrollmentGradePublishingMessage < ActiveRecord::Migration
+class AddEnrollmentGradePublishingMessage < ActiveRecord::Migration[4.2]
   tag :predeploy
 
 

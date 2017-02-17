@@ -1,12 +1,12 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jsx/grading/SearchGradingPeriodsField'
-], (React, ReactDOM, SearchGradingPeriodsField) => {
+], (React, ReactDOM, {Simulate}, SearchGradingPeriodsField) => {
   const wrapper = document.getElementById('fixtures');
-  const Simulate = React.addons.TestUtils.Simulate;
 
-  module("SearchGradingPeriodsField", {
+  QUnit.module("SearchGradingPeriodsField", {
     renderComponent() {
       const props = { changeSearchText: this.spy() };
       const element = React.createElement(SearchGradingPeriodsField, props);

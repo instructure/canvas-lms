@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe FeatureFlag do
   let_once(:t_root_account) { account_model }
   let_once(:t_sub_account) { account_model parent_account: t_root_account }
-  let_once(:t_course) { course account: t_sub_account, active_all: true }
+  let_once(:t_course) { course_factory account: t_sub_account, active_all: true }
 
   before do
     Feature.stubs(:definitions).returns({

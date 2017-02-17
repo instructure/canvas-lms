@@ -28,7 +28,7 @@ module CC
     include WebLinks
     include BasicLTILinks
 
-    delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :to => :@manifest
+    delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :create_key, :to => :@manifest
     delegate :referenced_files, :to => :@html_exporter
 
     def initialize(manifest, manifest_node)
@@ -43,6 +43,7 @@ module CC
       # flv files rather than the larger original files.
       @html_exporter = CCHelper::HtmlContentExporter.new(@course,
                                                          @manifest.exporter.user,
+                                                         :key_generator => @manifest,
                                                          :for_course_copy => for_course_copy,
                                                          :for_epub_export => @manifest.exporter.epub_export?,
                                                          :track_referenced_files => true,

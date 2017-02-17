@@ -19,7 +19,7 @@ define [
   class TestItemView extends Backbone.View
     template: ({name}) -> name
 
-  module 'SearchView',
+  QUnit.module 'SearchView',
     setup: ->
       collection = new TestCollection
       inputFilterView = new InputFilterView

@@ -1,4 +1,4 @@
-class AddModeratorFlagToGroupMemberships < ActiveRecord::Migration
+class AddModeratorFlagToGroupMemberships < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

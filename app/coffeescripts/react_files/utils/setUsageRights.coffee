@@ -47,6 +47,6 @@ define [
       },
       success: (data) ->
         callback(true, data)
-      error: ->
+      error: (data) ->
         callback(false, data)
     )

@@ -9,7 +9,7 @@ describe Api::V1::ExternalTools do
 
   describe "#external_tool_json" do
     before(:each) do
-      course_with_student_logged_in
+      course_with_student
     end
 
     let(:tool) do

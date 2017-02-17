@@ -11,44 +11,41 @@ be following this path when doing front-end development on Canvas.  If you need 
 getting started with that please see [development_with_docker.md](https://github.com/instructure/canvas-lms/blob/master/doc/development_with_docker.md)
 and [working_with_webpack.md](https://github.com/instructure/canvas-lms/blob/master/doc/working_with_webpack.md).
 
-Before we can get started in earnest, we need to make a few changes to a couple of files.
-Inside `docker-compose.yml` you should see an entry for `phantomjs-tests`.  You should
-uncomment it so we can use it. It is the container we will use because of its awesome
-flexibility even if we aren't planning to run tests using PhantomJS.
+Before we can get started in earnest, we need to make a few changes to a couple
+of files. Inside your `.env` file, add the phantomjs-tests override in your
+`COMPOSE_FILE` definition: `docker-compose/js-phantomjs-tests.override.yml`
 
-The next file to be aware of is `webpack_spec_index.js`.  This file is how the test bundle
-gets created.  We can modify it to limit what tests get run.  For instance, if you don't
-want to run any of the CoffeeScript tests, just comment out that portion of the file.
-If you want to scope tests to a certain folder, adjust the path to that folder so that
+### JSpec
 
-```
-var jsxTestsContext = require.context(__dirname + "/jsx", true, /Spec$/);
+The `jspec` npm script allows you to build and run specific JavaScript specs as follows:
 
-requireAll(jsxTestsContext);
-```
+1) `npm run jspec path/to/specs`
+  This will build the specified specs using webpack and run them locally using Chrome.
 
-becomes
+  You can specify a directory or a single spec file to build and run. If no path
+  is provided, all javascript specs are built and ran.
 
-```
-var jsxTestsContext = require.context(__dirname + "/jsx/theFolderIWanted", true, /Spec$/);
+2) `npm run jspec-watch path/to/specs`
+  This will get webpack building the specified specs in watch mode, making it so your
+  changes are instantly (or close to instantly) reflected in the test bundle.
 
-requireAll(jsxTestsContext);
-```
+  You can specify a directory or a single spec file to watch and build. If no path
+  is provided, all javascript specs are watched and built.
 
-If you want to scope it to a single file adjust the RegEx as needed so it might look
-something like this:
+  Using `jspec` in this way assumes you will run the specs yourself using PhantomJS
+  (see below) or by using `npm run test` to run them locally in Chrome.
 
-```
-var jsxTestsContext = require.context(__dirname + "/jsx", true, /MyCoolComponentSpec$/);
+### PhantomJS
 
-requireAll(jsxTestsContext);
-```
+To run javascript specs using PhantomJS you can do so as follow:
 
-Now that we have all the files we needed prepared we are going to do two things:
-
-1) `docker-compose run --rm web npm run webpack-test-watch`
+1) `npm run jspec-watch path/to/specs`
    This will get webpack building the test bundle in watch mode, making it so your
    changes are instantly (or close to instantly) reflected in the test bundle.
+
+   You can specify a directory or a single spec file to watch and build. If no path
+   is provided, all javascript specs are watched and built.
+
 2) `docker-compose run --rm phantomjs-tests`
    This will start the PhantomJS container in watch mode running the test bundle
    anytime the test bundle gets updated.

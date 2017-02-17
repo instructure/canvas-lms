@@ -1587,7 +1587,7 @@ form.ic-Form-group { margin: 0; }
   margin: 0 0 $ic-sp/2;
   display: block;
   line-height: $ic-label-line-height;
-  font-weight: 500;
+  font-weight: bold;
   @include fontSize($ic-font-size--small);
 }
 
@@ -1615,7 +1615,7 @@ form.ic-Form-group { margin: 0; }
 
     .ic-Legend {
       margin-bottom: $ic-sp/2;
-      font-weight: 500;
+      font-weight: bold;
       @include fontSize($ic-font-size--small);
       border-bottom: none;
       padding-bottom: 0;
@@ -1649,7 +1649,7 @@ form.ic-Form-group { margin: 0; }
     position: relative;
     z-index: 1;
     padding: $ic-sp/3 0 $ic-sp/3 $ic-radio-checkbox-left-offset;
-    font-weight: 400;
+    font-weight: normal;
     display: inline-block;
 
     &:before {
@@ -1788,7 +1788,7 @@ form.ic-Form-group { margin: 0; }
     position: relative;
     z-index: 1;
     padding: $ic-sp/3 0 $ic-sp/3 $ic-radio-checkbox-left-offset;
-    font-weight: 400;
+    font-weight: normal;
     display: inline-block;
 
     &:before {

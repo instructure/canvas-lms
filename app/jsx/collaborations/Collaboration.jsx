@@ -39,7 +39,6 @@ define([
     render () {
       let { collaboration } = this.props;
       let [context, contextId] = splitAssetString(ENV.context_asset_string);
-
       let editUrl = `/${context}/${contextId}/lti_collaborations/external_tools/retrieve?content_item_id=${collaboration.id}&placement=collaboration&url=${collaboration.update_url}&display=borderless`
 
       return (
@@ -57,13 +56,15 @@ define([
             <DatetimeDisplay datetime={collaboration.updated_at} format='%b %d, %l:%M %p' />
           </div>
           <div className='Collaboration-actions'>
-            <a className='icon-edit' href={editUrl}>
+            {collaboration.permissions.update && (<a className='icon-edit' href={editUrl}>
               <span className='screenreader-only'>{i18n.t('Edit Collaboration')}</span>
-            </a>
-            <button ref='deleteButton' className='btn btn-link' onClick={this.openConfirmation}>
-              <i className='icon-trash'></i>
-              <span className='screenreader-only'>{i18n.t('Delete Collaboration')}</span>
-            </button>
+            </a>)}
+
+            {collaboration.permissions.delete && (<button ref='deleteButton' className='btn btn-link' onClick={this.openConfirmation}>
+                <i className='icon-trash'></i>
+                <span className='screenreader-only'>{i18n.t('Delete Collaboration')}</span>
+              </button>
+            )}
           </div>
           {this.state.deleteConfirmationOpen &&
             <DeleteConfirmation collaboration={collaboration} onCancel={this.closeConfirmation} onDelete={this.deleteCollaboration} />

@@ -2,7 +2,7 @@ define [
   'underscore'
   'Backbone'
   'compiled/collections/OutcomeResultCollection'
-  'vendor/d3.v3'
+  'd3'
   'jst/outcomes/accessibleLineGraph'
   'compiled/underscore-ext/sum'
 ], (_, Backbone, OutcomeResultCollection, d3, accessibleTemplate) ->

@@ -21,7 +21,7 @@
 # This API can be used to create files to attach to submission comments.  The
 # submission comments themselves can be created using the Submissions API.
 class SubmissionCommentsApiController < ApplicationController
-  before_filter :require_context
+  before_action :require_context
 
   include Api::V1::Attachment
 

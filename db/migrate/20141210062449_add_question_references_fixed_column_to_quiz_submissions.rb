@@ -1,4 +1,4 @@
-class AddQuestionReferencesFixedColumnToQuizSubmissions < ActiveRecord::Migration
+class AddQuestionReferencesFixedColumnToQuizSubmissions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

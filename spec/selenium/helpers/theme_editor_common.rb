@@ -2,12 +2,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 module ThemeEditorCommon
   def open_theme_editor_with_btn
-    fj('.btn.button-sidebar-wide').click
+    f('.btn.button-sidebar-wide').click
   end
 
   def open_theme_editor(account_id)
     get "/accounts/#{account_id}/theme_editor"
-    wait_for_ajaximations
   end
 
   # the close mechanism only works with beta and not with how it is in master
@@ -17,7 +16,7 @@ module ThemeEditorCommon
 
   def select_template(template)
     # "Canvas Default" "K12 Theme"
-    select_list = Selenium::WebDriver::Support::Select.new(fj('#sharedThemes'))
+    select_list = Selenium::WebDriver::Support::Select.new(f('#sharedThemes'))
     select_list.select_by(:text, template)
   end
 
@@ -42,113 +41,94 @@ module ThemeEditorCommon
   end
 
   def click_global_branding
-    f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > h3:first-child').click
-    wait_for_ajaximations
+    f('.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > h3:first-child').click
   end
 
   def click_global_navigation
-    f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > h3:nth-of-type(2)').click
-    wait_for_ajaximations
+    f('.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > h3:nth-of-type(2)').click
   end
 
   def click_watermarks_and_other_images
-    f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > h3:nth-of-type(3)').click
-    wait_for_ajaximations
+    f('.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > h3:nth-of-type(3)').click
+  end
+  
+  def primary_color
+    f('#brand_config\\[variables\\]\\[ic-brand-primary\\]') 
   end
 
-  # finds a hex text input by its text label
-  # i.e. 'Primary Color'
-  def find_theme_text_input(text_label)
-    js_string =
-        "$('label').filter(function(){return $(this).text() === '#{text_label}'}).siblings('.Theme__editor-color-block').find('.Theme__editor-color-block_input-text')"
-    driver.execute_script(js_string)
+  def primary_button
+    f('#brand_config\\[variables\\]\\[ic-brand-button--primary-bgd\\]')
   end
 
-  def primary_color(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:first-child > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:first-child > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def primary_button_text
+    f('#brand_config\\[variables\\]\\[ic-brand-button--primary-text\\]')
   end
 
-  def primary_button(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:nth-of-type(2) > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:nth-of-type(2) > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def secondary_button
+    f('#brand_config\\[variables\\]\\[ic-brand-button--secondary-bgd\\]')
   end
 
-  def primary_button_text(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:nth-of-type(3) > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:nth-of-type(3) > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def secondary_button_text
+    f('#brand_config\\[variables\\]\\[ic-brand-button--secondary-text\\]')
   end
 
-  def secondary_button(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:nth-of-type(4) > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:nth-of-type(4) > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def link_color
+    f('#brand_config\\[variables\\]\\[ic-link-color\\]')
   end
 
-  def secondary_button_text(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:nth-of-type(5) > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:nth-of-type(5) > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def nav_background
+    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-bgd\\]')
   end
 
-  def link(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:nth-of-type(6) > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:nth-of-type(6) > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def nav_icon
+    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-ic-icon-svg-fill\\]')
   end
 
-  def nav_background(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:first-child > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:first-child > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def nav_icon_active
+    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-ic-icon-svg-fill--active\\]')
   end
 
-  def nav_icon(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:nth-of-type(2) > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:nth-of-type(2) > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def nav_text
+    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-menu-item__text-color\\]')
   end
 
-  def nav_icon_active(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:nth-of-type(3) > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:nth-of-type(3) > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def nav_text_active
+    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-menu-item__text-color--active\\]')
   end
 
-  def nav_text(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:nth-of-type(4) > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:nth-of-type(4) > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def nav_avatar_border
+    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-avatar-border\\]')
   end
 
-  def nav_text_active(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:nth-of-type(5) > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:nth-of-type(5) > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def nav_badge
+    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-menu-item__badge-bgd\\]')
   end
 
-  def nav_avatar_border(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:nth-of-type(6) > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:nth-of-type(6) > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def logo_background
+    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-logo-bgd\\]')
   end
 
-  def nav_badge(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:nth-of-type(7) > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:nth-of-type(7) > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def window_title_color
+    f('#brand_config\\[variables\\]\\[ic-brand-msapplication-tile-color\\]')
   end
 
-  def logo_background(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:nth-of-type(8) > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(2) > section:nth-of-type(8) > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def all_global_branding
+    [primary_color, primary_button, primary_button_text, secondary_button, secondary_button_text, link_color]
   end
 
-  def window_title_color(option = 'text_field')
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(3) > section.Theme__editor-accordion_element.Theme__editor-color.ic-Form-control > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input') if option == 'text_field'
-    return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(3) > section.Theme__editor-accordion_element.Theme__editor-color.ic-Form-control > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
+  def all_global_navigation
+    [nav_background, 
+     nav_icon, 
+     nav_icon_active, 
+     nav_text, 
+     nav_text_active, 
+     nav_avatar_border, 
+     nav_badge, 
+     logo_background]
   end
 
-  def all_global_branding(option = 'text_field')
-    [primary_color(option), primary_button(option), primary_button_text(option), secondary_button(option), secondary_button_text(option), link(option)]
-  end
-
-  def all_global_navigation(option = 'text_field')
-    [nav_background(option), nav_icon(option), nav_icon_active(option), nav_text(option), nav_text_active(option), nav_avatar_border(option), nav_badge(option), logo_background(option)]
-  end
-
-  def all_watermarks(option = 'text_field')
-    [window_title_color(option)]
+  def all_watermarks
+    [window_title_color]
   end
 
   def all_colors(array, color = 'random')
@@ -159,15 +139,12 @@ module ThemeEditorCommon
 
   def create_theme(color = 'random')
     click_global_branding
-    wait_for_ajaximations
     all_colors(all_global_branding, color)
 
     click_global_navigation
-    wait_for_ajaximations
     all_colors(all_global_navigation, color)
 
     click_watermarks_and_other_images
-    wait_for_ajaximations
     all_colors(all_watermarks, color)
   end
 end

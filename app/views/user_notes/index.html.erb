@@ -19,10 +19,14 @@
     <%= f.hidden_field :user_id, :value=>@user.id %>
     <table class="formtable" style="width: 100%;">
       <tr>
-        <td><%= f.text_field :title, :class => "title", :style => "width: 98%;", :placeholder => t(:title, "Title") %></td>
+        <td>
+          <%= f.label :title, t("Title") %>
+          <%= f.text_field :title, :class => "title", :style => "width: 98%;", :placeholder => t(:title, "Title") %>
+        </td>
       </tr>
       <tr>
         <td colspan="2">
+          <%= f.label :note, t("Note") %>
           <%= f.text_area :note, :class => "note", :style => "width: 98%; height: 200px;" %>
         </td>
       </tr>

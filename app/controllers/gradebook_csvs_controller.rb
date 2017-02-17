@@ -17,8 +17,8 @@
 #
 
 class GradebookCsvsController < ApplicationController
-  before_filter :require_context
-  before_filter :require_user
+  before_action :require_context
+  before_action :require_user
 
   def show
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])

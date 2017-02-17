@@ -1,4 +1,4 @@
-class AddPrivateHashToConversationParticipants < ActiveRecord::Migration
+class AddPrivateHashToConversationParticipants < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 

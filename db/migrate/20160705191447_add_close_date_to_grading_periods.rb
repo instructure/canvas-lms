@@ -1,4 +1,4 @@
-class AddCloseDateToGradingPeriods < ActiveRecord::Migration
+class AddCloseDateToGradingPeriods < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

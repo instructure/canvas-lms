@@ -225,26 +225,27 @@ ul.submission_list.instTree li.submission.leaf {
     padding-left: 0;
     margin-top: 5px;
     list-style-type: none;
+    .page {
+      display: flex;
+      justify-content: space-between;
+    }
     .page.current a {
       font-weight: bold;
     }
     .page a:hover {
       text-decoration: underline;
     }
-    .page .remove_page_link {
-      display: none;
-    }
-    .page .edit_page_link {
+    .page .page_settings_menu {
       display: none;
     }
     &.editing {
-      .page .remove_page_link {
+      .page .page_settings_menu {
         display: inline;
         float: right;
         font-weight: normal;
       }
-      .page .edit_page_link {
-        display: inline;
+      .page_url {
+        flex: 1 1 auto;
       }
     }
   }
@@ -295,7 +296,6 @@ ul.submission_list.instTree li.submission.leaf {
       &:hover, &:focus {
         background-color: darken(#e4e7e9, 2%);
         // color: #fff
-        z-index: 0;
         position: static;
         text-decoration: none;
       }
@@ -304,19 +304,18 @@ ul.submission_list.instTree li.submission.leaf {
       }
     }
   }
-  li.active {
+  .section.active {
     .section_url {
       position: relative;
       background-color: $bodyBackground;
       margin-right: -1px;
       position: relative;
-      z-index: 11;
       padding: 7px 0 7px 23px;
       // color: #2C4C5E
 
     }
   }
-  li.hidden {
+  .section.hidden {
     .section_url {
       color: #AAAAAA;
     }
@@ -345,41 +344,29 @@ ul.submission_list.instTree li.submission.leaf {
 }
 
 #section_list {
-  .remove_section_link {
+  .section_settings_menu {
     float: right;
     padding-right: 5px;
     display: none;
   }
-  .edit_section_link {
-    display: none;
-  }
   &.editing {
-    li.active {
-      .section_url {
-        padding-left: 5px;
-      }
-    }
     li {
       cursor: pointer;
       font-size: 0.9em;
+      display: flex;
+
+      .section_url {
+        flex: 1 1 auto;
+      }
+
       a.name {
         display: inline;
       }
     }
-    .section_url {
-      padding-left: 5px;
-    }
-    .remove_section_link {
+    .section_settings_menu {
       display: inline;
       margin-left: 3px;
       cursor: pointer;
-    }
-    .edit_section_link {
-      display: inline;
-      opacity: 0.3;
-    }
-    li.section:hover .edit_section_link {
-      opacity: 1;
     }
     li.section .name {
       cursor: move;

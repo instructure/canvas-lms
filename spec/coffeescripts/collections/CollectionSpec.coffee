@@ -17,7 +17,7 @@ define [
 
     model: Backbone.Model.extend()
 
-  module 'Backbone.Collection',
+  QUnit.module 'Backbone.Collection',
     setup: ->
       @xhr = sinon.useFakeXMLHttpRequest()
       @ajaxSpy = @spy $, 'ajax'

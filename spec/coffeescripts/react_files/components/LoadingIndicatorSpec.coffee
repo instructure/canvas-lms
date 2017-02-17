@@ -1,13 +1,12 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/LoadingIndicator'
-], (React, ReactDOM, $, LoadingIndicator) ->
+], (React, ReactDOM, TestUtils, $, LoadingIndicator) ->
 
-  TestUtils = React.addons.TestUtils
-
-  module 'LoadingIndicator'
+  QUnit.module 'LoadingIndicator'
 
   test 'display none if no props supplied', ->
     loadingIndicator = React.createFactory(LoadingIndicator)

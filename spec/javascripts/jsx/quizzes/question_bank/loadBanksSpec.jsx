@@ -1,7 +1,7 @@
 define([
   'jsx/quizzes/question_bank/loadBanks'
 ], (loadBanks) => {
-  module("loadBanks");
+  QUnit.module("loadBanks");
 
   test("is a function", () => {
     ok(typeof loadBanks === 'function')

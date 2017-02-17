@@ -1,11 +1,10 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/shared/FlickrImage'
-], (React, FlickrImage) => {
+], (React, TestUtils, FlickrImage) => {
 
-  const TestUtils = React.addons.TestUtils;
-
-  module('FlickrImage View');
+  QUnit.module('FlickrImage View');
 
   test('it renders', () => {
     const flickrImage = TestUtils.renderIntoDocument(

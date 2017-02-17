@@ -6,11 +6,12 @@ module FilesCommon
   # - fixture: location of the file to be uploaded
   # - context: course in which file would be uploaded
   # - name: file name
-  def add_file(fixture, context, name)
+  # - folder: course folder it should go under (defaults to root folder)
+  def add_file(fixture, context, name, folder = Folder.root_folders(context).first)
     context.attachments.create! do |attachment|
       attachment.uploaded_data = fixture
       attachment.filename = name
-      attachment.folder = Folder.root_folders(context).first
+      attachment.folder = folder
     end
   end
 
@@ -42,8 +43,7 @@ module FilesCommon
       ff('.ef-item-row')[row_selected].click
       f('.btn-move').click
     end
-    wait_for_ajaximations
-    expect(f(".ReactModal__Header-Title h4").text).to eq "Where would you like to move #{file_name}?"
+    expect(f(".ReactModal__Header-Title h4")).to include_text "Where would you like to move #{file_name}?"
     if destination.present?
       folders = destination.split('/')
       folders.each do |folder|
@@ -138,14 +138,14 @@ module FilesCommon
 
   def add_folder(name = 'new folder')
     click_new_folder_button
-    new_folder = f("input.ef-edit-name-form__input")
+    new_folder = f("input[aria-label='Folder Name']")
     new_folder.send_keys(name)
     new_folder.send_keys(:return)
     wait_for_ajaximations
   end
 
   def click_new_folder_button
-    f(".btn-add-folder").click
+    f("button[aria-label='Add Folder']").click
     wait_for_ajaximations
   end
 
@@ -157,6 +157,7 @@ module FilesCommon
   end
 
   def all_files_folders
+    # TODO: switch to ff once specs stop using this to find non-existence of stuff
     driver.find_elements(:class, 'ef-item-row')
   end
 
@@ -176,7 +177,7 @@ module FilesCommon
       ff(".name.text")[3].click
       ff(".btn-primary")[3].click
     elsif insert_into == :discussion
-      ff(".btn-primary")[2].click
+      f("#edit_discussion_form_buttons .btn-primary").click
     else
       f(".btn-primary").click
     end

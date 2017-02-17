@@ -8,5 +8,3 @@ require 'rake/testtask'
 Bundler.require(:i18n_tools)
 
 CanvasRails::Application.load_tasks
-
-begin; require 'parallelized_specs/lib/parallelized_specs/tasks'; rescue LoadError; end

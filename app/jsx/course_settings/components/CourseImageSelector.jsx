@@ -79,7 +79,7 @@ define([
                 <li role="presentation">
                   <a href="#"
                      onClick={() => this.changeImage()}
-                     className="icon-compose"
+                     className="icon-compose icon-Line"
                      id="courseImage-editDropdown-2"
                      tabIndex="-1"
                      ref="changeImage"

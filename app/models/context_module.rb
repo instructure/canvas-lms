@@ -19,8 +19,7 @@
 class ContextModule < ActiveRecord::Base
   include Workflow
   include SearchTermHelper
-  attr_accessible :context, :name, :unlock_at, :require_sequential_progress,
-                  :completion_requirements, :prerequisites, :publish_final_grade, :requirement_count
+
   belongs_to :context, polymorphic: [:course]
   has_many :context_module_progressions, :dependent => :destroy
   has_many :content_tags, -> { order('content_tags.position, content_tags.title') }, dependent: :destroy
@@ -90,6 +89,11 @@ class ContextModule < ActiveRecord::Base
       if context_module_progressions.where(current: true).update_all(current: false) > 0
         # don't queue a job unless necessary
         send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{self.global_context_id}"})
+      end
+      if @discussion_topics_to_recalculate
+        @discussion_topics_to_recalculate.each do |dt|
+          dt.send_later_if_production_enqueue_args(:recalculate_context_module_actions!, {:strand => "module_reeval_#{self.global_context_id}"})
+        end
       end
     end
   end
@@ -204,7 +208,15 @@ class ContextModule < ActiveRecord::Base
 
   def publish_items!
     self.content_tags.each do |tag|
-      tag.publish if tag.unpublished?
+      if tag.unpublished?
+        if tag.content_type == 'Attachment'
+          tag.content.set_publish_state_for_usage_rights
+          tag.content.save!
+          tag.publish if tag.content.published?
+        else
+          tag.publish
+        end
+      end
       tag.update_asset_workflow_state!
     end
   end
@@ -331,7 +343,7 @@ class ContextModule < ActiveRecord::Base
     end
 
     tags = self.content_tags.not_deleted.index_by(&:id)
-    requirements.select do |req|
+    validated_reqs = requirements.select do |req|
       if req[:id] && (tag = tags[req[:id]])
         if %w(must_view must_mark_done must_contribute).include?(req[:type])
           true
@@ -340,6 +352,21 @@ class ContextModule < ActiveRecord::Base
         end
       end
     end
+
+    unless self.new_record?
+      old_requirements = self.completion_requirements || []
+      validated_reqs.each do |req|
+        if req[:type] == 'must_contribute' && !old_requirements.detect{|r| r[:id] == req[:id] && r[:type] == req[:type]} # new requirement
+          tag = tags[req[:id]]
+          if tag.content_type == "DiscussionTopic"
+            @discussion_topics_to_recalculate ||= []
+            @discussion_topics_to_recalculate << tag.content
+          end
+        end
+      end
+    end
+
+    validated_reqs
   end
 
   def completion_requirements_visible_to(user)

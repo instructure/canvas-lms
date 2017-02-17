@@ -67,7 +67,7 @@ describe "Migration package importers" do
   context "migrator" do
     it "should deal with backslashes path separators in migrations" do
       file = File.new(File.dirname(__FILE__) + "/../../fixtures/migration/whatthebackslash.zip")
-      cm = ContentMigration.create!(:context => course)
+      cm = ContentMigration.create!(:context => course_factory)
 
       mig = Canvas::Migration::Migrator.new({:archive_file => file, :content_migration => cm}, "test")
       mig.unzip_archive

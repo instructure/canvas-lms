@@ -91,6 +91,8 @@ describe AccountAuthorizationConfig::SAML do
     HostUrl.stubs(:default_host).returns('bob.cody.instructure.com')
     @aac = @account.authentication_providers.create!(:auth_type => "saml")
     expect(@aac.entity_id).to eq "http://bob.cody.instructure.com/saml2"
+    @account.reload
+    expect(@account.settings[:saml_entity_id]).to eq "http://bob.cody.instructure.com/saml2"
   end
 
   it "should not overwrite a specific entity_id" do
@@ -99,6 +101,13 @@ describe AccountAuthorizationConfig::SAML do
       entity_id: "http://wtb.instructure.com/saml2"
     )
     expect(@aac.entity_id).to eq "http://wtb.instructure.com/saml2"
+  end
+
+  it "uses the entity id set on the account" do
+    @account.settings[:saml_entity_id] = 'my_entity'
+    @account.save!
+    @aac = @account.authentication_providers.create!(:auth_type => "saml")
+    expect(@aac.entity_id).to eq "my_entity"
   end
 
   it "should set requested_authn_context to nil if empty string" do

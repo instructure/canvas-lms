@@ -42,4 +42,17 @@ describe "assignments" do
       expect(f('.submit_assignment_link')).to be_displayed
     end
   end
+
+  it "shouldn't kersplode on the index with a certain set of limited permissions" do
+    @student = user_with_pseudonym(:active_user => true)
+    course_with_student(:active_all => true, :user => @student)
+    assignment_model(:course => @course, :submission_types => 'online_upload', :title => 'Assignment 1')
+
+    account_admin_user_with_role_changes(:role_changes => {:manage_courses => false})
+    user_session(@user)
+
+    get "/courses/#{@course.id}/assignments"
+
+    expect(f("#assignment_#{@assignment.id}").text).to include(@assignment.title)
+  end
 end

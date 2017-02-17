@@ -1,4 +1,4 @@
-class AddAssignmentGradesPublishedAt < ActiveRecord::Migration
+class AddAssignmentGradesPublishedAt < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

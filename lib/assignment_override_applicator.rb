@@ -85,7 +85,7 @@ module AssignmentOverrideApplicator
       next [] if self.has_invalid_args?(assignment_or_quiz, user)
       context = assignment_or_quiz.context
 
-      if context.grants_right?(user, :read_as_admin)
+      if (context.user_has_been_admin?(user) || context.user_has_no_enrollments?(user)) && context.grants_right?(user, :read_as_admin)
         overrides = assignment_or_quiz.assignment_overrides
         if assignment_or_quiz.current_version?
           visible_user_ids = context.enrollments_visible_to(user).select(:user_id)

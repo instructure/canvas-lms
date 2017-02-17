@@ -147,7 +147,6 @@ listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="bu
   overflow: hidden;
   text-shadow: none;
   user-select: none;
-  @if not $use_high_contrast { font-weight: 300; }
 
   &:focus {
     text-decoration: none;

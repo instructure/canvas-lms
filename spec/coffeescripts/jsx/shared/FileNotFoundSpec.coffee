@@ -1,12 +1,12 @@
 define [
-  'jquery'
-  'react'
-  'react-dom'
+  'jquery',
+  'react',
+  'react-dom',
+  'react-addons-test-utils',
   'jsx/shared/FileNotFound'
-], ($, React, ReactDOM, FileNotFound) ->
-  TestUtils = React.addons.TestUtils
+], ($, React, ReactDOM, TestUtils, FileNotFound) ->
 
-  module 'FileNotFoundSpec',
+  QUnit.module 'FileNotFoundSpec',
     setup: ->
       @element = React.createElement(FileNotFound, {
         contextCode: 'fakeContextCode'

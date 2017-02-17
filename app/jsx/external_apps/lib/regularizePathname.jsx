@@ -6,7 +6,7 @@ define([], () => {
    */
   const regularizePathname = (ctx, next) => {
     ctx.originalPathname = ctx.pathname;
-    ctx.pathname = ctx.pathname.replace(/\/$/, '');
+    ctx.pathname = ctx.pathname.replace('#' + ctx.hash, '').replace(/\/$/, '');
     next();
   };
 

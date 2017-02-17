@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
+require_dependency "lti/ims/tool_setting_controller"
 
 module Lti
   module Ims
@@ -30,7 +31,6 @@ module Lti
           guid: SecureRandom.uuid,
           shared_secret: 'abc',
           product_family: product_family,
-          root_account: account,
           product_version: '1',
           workflow_state: 'disabled',
           raw_data: {'proxy' => 'value'},

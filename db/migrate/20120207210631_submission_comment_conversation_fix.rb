@@ -1,4 +1,4 @@
-class SubmissionCommentConversationFix < ActiveRecord::Migration
+class SubmissionCommentConversationFix < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

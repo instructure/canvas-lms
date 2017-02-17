@@ -45,6 +45,13 @@ describe GradingStandard do
     end
   end
 
+  describe 'validations' do
+    it 'does not throw an error if `data` is not supplied' do
+      standard = GradingStandard.new()
+      expect { standard.valid? }.not_to raise_error
+    end
+  end
+
   it "should upgrade the standard scheme from v1 to v2" do
     converted = GradingStandard.upgrade_data(@default_standard_v1, 1)
     default = GradingStandard.default_grading_standard
@@ -271,7 +278,7 @@ describe GradingStandard do
       before(:once) do
         @root_account = Account.default
         @sub_account = @root_account.sub_accounts.create!
-        course_with_teacher_logged_in(account: @root_account)
+        course_with_teacher(account: @root_account)
         @enrollment.update_attributes(workflow_state: "active")
         @root_account_standard = grading_standard_for(@root_account)
         @sub_account_standard = grading_standard_for(@sub_account)
@@ -335,7 +342,7 @@ describe GradingStandard do
       before(:once) do
         @root_account = Account.default
         @sub_account = @root_account.sub_accounts.create!
-        course_with_teacher_logged_in(account: @sub_account)
+        course_with_teacher(account: @sub_account)
         @enrollment.update_attributes(workflow_state: "active")
         @root_account_standard = grading_standard_for(@root_account)
         @sub_account_standard = grading_standard_for(@sub_account)

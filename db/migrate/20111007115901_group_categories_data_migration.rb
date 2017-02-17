@@ -1,4 +1,4 @@
-class GroupCategoriesDataMigration < ActiveRecord::Migration
+class GroupCategoriesDataMigration < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.uncached_group_category_id_for(context, name)

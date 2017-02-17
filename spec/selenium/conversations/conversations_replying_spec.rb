@@ -6,8 +6,8 @@ describe "conversations new" do
 
   before do
     conversation_setup
-    @s1 = user(name: "first student")
-    @s2 = user(name: "second student")
+    @s1 = user_factory(name: "first student")
+    @s2 = user_factory(name: "second student")
     [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
     cat = @course.group_categories.create(:name => "the groups")
     @group = cat.groups.create(:name => "the group", :context => @course)
@@ -98,6 +98,26 @@ describe "conversations new" do
         f('.ui-menu-item .reply-all-btn').click
         assert_number_of_recipients(2)
       end
+    end
+
+    it "should not let a student reply to a student conversation if they lose messaging permissions" do
+      @convo.conversation_participants.where(:user_id => @teacher).delete_all
+      @convo.update_attribute(:context, @course)
+      user_session(@s1)
+      go_to_inbox_and_select_message
+      expect(f('#reply-btn')).to_not be_disabled
+
+      @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+      go_to_inbox_and_select_message
+      expect(f('#reply-btn')).to be_disabled
+    end
+
+    it "should let a student reply to a conversation including a teacher even if they lose messaging permissions" do
+      @convo.update_attribute(:context, @course)
+      user_session(@s1)
+      @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+      go_to_inbox_and_select_message
+      expect(f('#reply-btn')).to_not be_disabled
     end
   end
 end

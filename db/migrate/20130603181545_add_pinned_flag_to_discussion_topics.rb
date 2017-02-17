@@ -1,4 +1,4 @@
-class AddPinnedFlagToDiscussionTopics < ActiveRecord::Migration
+class AddPinnedFlagToDiscussionTopics < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -53,15 +53,14 @@ define([
               this.props.nicknameInfo.onNicknameChange(data.nickname || data.name);
             },
             error: () => {
-              console.log('Error setting course nickname');
             }
         });
       }
     },
 
     focus () {
-      if (this.refs.nicknameInput) {
-        this.refs.nicknameInput.getDOMNode().focus();
+      if (this.nicknameInput) {
+        this.nicknameInput.focus();
       }
     },
 
@@ -75,15 +74,16 @@ define([
           <label htmlFor='NicknameInput' className='ic-Label'>
             {I18n.t('Nickname:')}
           </label>
-          <input id='NicknameInput'
-                 type='text'
-                 ref='nicknameInput'
-                 className='ic-Input'
-                 maxLength='59'
-                 placeholder={this.props.nicknameInfo.originalName}
-                 value={this.state.nickname}
-                 onChange={this.handleChange}
-                 onKeyPress={this.onKeyPress}
+          <input
+            id="NicknameInput"
+            type="text"
+            ref={(c) => { this.nicknameInput = c; }}
+            className="ic-Input"
+            maxLength="59"
+            placeholder={this.props.nicknameInfo.originalName}
+            value={this.state.nickname}
+            onChange={this.handleChange}
+            onKeyPress={this.onKeyPress}
           />
         </div>
       );

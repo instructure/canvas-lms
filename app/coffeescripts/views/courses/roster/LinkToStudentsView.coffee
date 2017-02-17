@@ -51,7 +51,7 @@ define [
       this
 
     getUserData: (id) ->
-      $.get("/api/v1/courses/#{ENV.course.id}/users/#{id}", include:['enrollments'])
+      $.getJSON("/api/v1/courses/#{ENV.course.id}/users/#{id}", include:['enrollments'])
 
     update: (e) =>
       e.preventDefault()
@@ -80,7 +80,7 @@ define [
             data =
               enrollment:
                 user_id: @model.get('id')
-                associated_user_id: id
+                associated_user_id: user.id
                 type: enrollment.type
                 limit_privileges_to_course_section: enrollment.limit_priveleges_to_course_section
             if enrollment.role != enrollment.type

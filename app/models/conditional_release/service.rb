@@ -23,14 +23,15 @@ module ConditionalRelease
     private_class_method :new
 
     DEFAULT_PATHS = {
-      edit_rule_path: "ui/editor",
+      base_path: '',
       stats_path: "stats",
       create_account_path: 'api/accounts',
       content_exports_path: 'api/content_exports',
       content_imports_path: 'api/content_imports',
       rules_path: 'api/rules?include[]=all&active=true',
       rules_summary_path: 'api/rules/summary',
-      select_assignment_set_path: 'api/rules/select_assignment_set'
+      select_assignment_set_path: 'api/rules/select_assignment_set',
+      editor_path: 'javascripts/generated/conditional_release_editor.bundle.js'
     }.freeze
 
     DEFAULT_CONFIG = {
@@ -51,9 +52,11 @@ module ConditionalRelease
         cyoe_env = {
           jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
           assignment: assignment_attributes(assignment),
-          edit_rule_url: edit_rule_url,
           stats_url: stats_url,
-          locale: I18n.locale.to_s
+          locale: I18n.locale.to_s,
+          editor_url: editor_url,
+          base_url: base_url,
+          context_id: context.id
         }
 
         cyoe_env[:rule] = rule_triggered_by(assignment, user, session) if includes.include? :rule
@@ -92,6 +95,11 @@ module ConditionalRelease
       return unless course.present?
       clear_cache_with_key(active_rules_cache_key(course))
       clear_cache_with_key(active_rules_reverse_cache_key(course))
+    end
+
+    def self.clear_applied_rules_cache(course)
+      return unless course.present?
+      clear_cache_with_key(assignments_cache_key(course))
     end
 
     def self.clear_submissions_cache_for(user)
@@ -140,14 +148,21 @@ module ConditionalRelease
     end
 
     # Returns an http response-like hash { code: string, body: string or object }
-    def self.select_mastery_path(context, current_user, student, trigger_assignment_id, assignment_set_id, session)
+    def self.select_mastery_path(context, current_user, student, trigger_assignment, assignment_set_id, session)
       return unless enabled_in_context?(context)
-      if context.blank? || student.blank? || trigger_assignment_id.blank? || assignment_set_id.blank?
+      if context.blank? || student.blank? || trigger_assignment.blank? || assignment_set_id.blank?
         return { code: '400', body: { message: 'invalid request' } }
       end
 
+      trigger_submission = trigger_assignment.submission_for_student(student)
+      if trigger_submission.blank? || !trigger_submission.graded? || trigger_assignment.muted?
+        return { code: '400', body: { message: 'invalid submission state' } }
+      end
+
       request_data = {
-        trigger_assignment: trigger_assignment_id,
+        trigger_assignment: trigger_assignment.id,
+        trigger_assignment_score: trigger_submission.score,
+        trigger_assignment_points_possible: trigger_assignment.points_possible,
         student_id: student.id,
         assignment_set_id: assignment_set_id
       }
@@ -272,13 +287,17 @@ module ConditionalRelease
         Context.get_account(context).root_account.domain
       end
 
-      def submissions_for(student, context)
+      def submissions_for(student, context, force: false)
         return [] unless student.present?
-
-        Rails.cache.fetch(submissions_cache_key(student)) do
+        Rails.cache.fetch(submissions_cache_key(student), force: force) do
           keys = [:id, :assignment_id, :score, :"assignments.points_possible"]
-          context.submissions.for_user(student).eager_load(:assignment)
-            .pluck(*keys).map do |values|
+          context.submissions
+                  .for_user(student)
+                  .in_workflow_state(:graded)
+                  .where(assignments: { muted: false })
+                  .eager_load(:assignment)
+                  .pluck(*keys)
+                  .map do |values|
             submission = Hash[keys.zip(values)]
             submission[:points_possible] = submission.delete(:"assignments.points_possible")
             submission
@@ -290,11 +309,9 @@ module ConditionalRelease
         return [] if context.blank? || student.blank?
         cached = rules_cache(context, student)
         assignments = assignments_for(cached[:rules]) if cached
-        cache_expired = newer_than_cache?(content_tags.select(&:content), cached) ||
-                        newer_than_cache?(assignments, cached)
-
-        rules_data = rules_cache(context, student, force: cache_expired) do
-          data = { submissions: submissions_for(student, context) }
+        force_cache = rules_cache_expired?(context, cached)
+        rules_data = rules_cache(context, student, force: force_cache) do
+          data = { submissions: submissions_for(student, context, force: force_cache) }
           headers = headers_for(context, student, domain_for(context), session)
           req = request_rules(headers, data)
           {rules: req, updated_at: Time.zone.now}
@@ -310,9 +327,15 @@ module ConditionalRelease
         Rails.cache.fetch(rules_cache_key(context, student), force: force, &block)
       end
 
-      def newer_than_cache?(items, cache)
-        cache && cache.key?(:updated_at) && items &&
-        items.detect { |item| item.updated_at > cache[:updated_at] }.present?
+      def rules_cache_expired?(context, cache)
+        assignment_timestamp = Rails.cache.fetch(assignments_cache_key(context)) do
+          Time.zone.now
+        end
+        if cache && cache.key?(:updated_at)
+          assignment_timestamp > cache[:updated_at]
+        else
+          true
+        end
       end
 
       def request_rules(headers, data)
@@ -357,13 +380,13 @@ module ConditionalRelease
             set[:assignments].map! do |asg|
               assignment = assignments.find { |a| a[:id].to_s == asg[:assignment_id].to_s }
               asg[:model] = assignment
-              asg
-            end
-            set
-          end
+              asg if asg[:model].present?
+            end.compact!
+            set if set[:assignments].present?
+          end.compact!
           rule
-        end
-        rules
+        end.compact!
+        rules.compact
       end
 
       def assignment_keys
@@ -374,11 +397,15 @@ module ConditionalRelease
       end
 
       def rules_cache_key(context, student)
-        ['conditional_release_rules:1', context.global_id, student.global_id].cache_key
+        ['conditional_release_rules:2', context.global_id, student.global_id].cache_key
+      end
+
+      def assignments_cache_key(context)
+        ['conditional_release_rules:assignments:2', context.global_id].cache_key
       end
 
       def submissions_cache_key(student)
-        ['conditional_release_submissions', student.global_id].cache_key
+        ['conditional_release_submissions:2', student.global_id].cache_key
       end
 
       def active_rules_cache_key(course)

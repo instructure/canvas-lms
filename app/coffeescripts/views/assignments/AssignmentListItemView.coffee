@@ -216,7 +216,7 @@ define [
       @userIsAdmin or @model.canDelete()
 
     canMove: ->
-      @userIsAdmin or (@canManage() and @model.canDelete())
+      @userIsAdmin or (@canManage() and @model.canMove())
 
     canManage: ->
       ENV.PERMISSIONS.manage

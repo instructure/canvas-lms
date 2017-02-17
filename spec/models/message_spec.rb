@@ -23,7 +23,7 @@ describe Message do
 
   describe "#get_template" do
     it "should get the template with an existing file path" do
-      HostUrl.stubs(:protocol).returns("https")
+      allow(HostUrl).to receive(:protocol).and_return("https")
       au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, au)
       template = msg.get_template('alert.email.erb')
@@ -33,8 +33,8 @@ describe Message do
 
   describe '#populate body' do
     it 'should save an html body if a template exists' do
-      Message.any_instance.expects(:apply_html_template).returns('template')
-      user         = user(:active_all => true)
+      expect_any_instance_of(Message).to receive(:apply_html_template).and_return('template')
+      user         = user_factory(:active_all => true)
       account_user = AccountUser.create!(:account => account_model, :user => user)
       message      = generate_message(:account_user_notification, :email, account_user)
 
@@ -42,10 +42,10 @@ describe Message do
     end
 
     it 'should sanitize html' do
-      Message.any_instance.expects(:load_html_template).returns <<-ZOMGXSS
+      expect_any_instance_of(Message).to receive(:load_html_template).and_return <<-ZOMGXSS
         <b>Your content</b>: <%= "<script>alert()</script>" %>
       ZOMGXSS
-      user         = user(:active_all => true)
+      user         = user_factory(active_all: true)
       account_user = AccountUser.create!(:account => account_model, :user => user)
       message      = generate_message(:account_user_notification, :email, account_user)
 
@@ -56,7 +56,7 @@ describe Message do
 
   describe "parse!" do
     it "should use https when the domain is configured as ssl" do
-      HostUrl.stubs(:protocol).returns("https")
+      allow(HostUrl).to receive(:protocol).and_return("https")
       @au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, @au)
       expect(msg.body).to include('Account Admin')
@@ -159,9 +159,9 @@ describe Message do
 
   context "named scopes" do
     it "should be able to get messages in any state" do
-      m1 = message_model(:workflow_state => 'bounced', :user => user)
-      m2 = message_model(:workflow_state => 'sent', :user => user)
-      m3 = message_model(:workflow_state => 'sending', :user => user)
+      m1 = message_model(:workflow_state => 'bounced', :user => user_factory)
+      m2 = message_model(:workflow_state => 'sent', :user => user_factory)
+      m3 = message_model(:workflow_state => 'sending', :user => user_factory)
       expect(Message.in_state(:bounced)).to eq [m1]
       expect(Message.in_state([:bounced, :sent]).sort_by(&:id)).to eq [m1, m2].sort_by(&:id)
       expect(Message.in_state([:bounced, :sent])).not_to be_include(m3)
@@ -175,7 +175,7 @@ describe Message do
     end
 
     it "should have a list of messages to dispatch" do
-      message_model(:dispatch_at => Time.now - 1, :workflow_state => 'staged', :to => 'somebody', :user => user)
+      message_model(:dispatch_at => Time.now - 1, :workflow_state => 'staged', :to => 'somebody', :user => user_factory)
       expect(Message.to_dispatch).to eq [@message]
     end
 
@@ -192,15 +192,15 @@ describe Message do
     end
 
     it "should offer staged messages (waiting to be dispatched)" do
-      message_model(:dispatch_at => Time.now + 100, :user => user)
+      message_model(:dispatch_at => Time.now + 100, :user => user_factory)
       expect(Message.staged).to eq [@message]
     end
 
     it "should have a list of messages that can be cancelled" do
-      Message.any_instance.stubs(:stage_message)
+      allow_any_instance_of(Message).to receive(:stage_message)
       Message.workflow_spec.states.each do |state_symbol, state|
         Message.destroy_all
-        message = message_model(:workflow_state => state_symbol.to_s, :user => user, :to => 'nobody')
+        message = message_model(:workflow_state => state_symbol.to_s, :user => user_factory, :to => 'nobody')
         if state.events.any?{ |event_symbol, event| event.transitions_to == :cancelled }
           expect(Message.cancellable).to eq [message]
         else
@@ -211,7 +211,7 @@ describe Message do
   end
 
   it "should go back to the staged state if sending fails" do
-    message_model(:dispatch_at => Time.now - 1, :workflow_state => 'sending', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user)
+    message_model(:dispatch_at => Time.now - 1, :workflow_state => 'sending', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory)
     @message.errored_dispatch
     expect(@message.workflow_state).to eq 'staged'
     expect(@message.dispatch_at).to be > Time.now + 4.minutes
@@ -219,28 +219,28 @@ describe Message do
 
   describe "#deliver" do
     it "should not deliver if canceled" do
-      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
       @message.cancel
-      @message.expects(:deliver_via_email).never
-      Mailer.expects(:create_message).never
+      expect(@message).to receive(:deliver_via_email).never
+      expect(Mailer).to receive(:create_message).never
       expect(@message.deliver).to be_nil
       expect(@message.reload.state).to eq :cancelled
     end
 
     it "should log errors and raise based on error type" do
-      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
-      Mailer.expects(:create_message).raises("something went wrong")
-      ErrorReport.expects(:log_exception)
+      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
+      expect(Mailer).to receive(:create_message).and_raise("something went wrong")
+      expect(ErrorReport).to receive(:log_exception)
       expect { @message.deliver }.to raise_exception("something went wrong")
 
-      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
-      Mailer.expects(:create_message).raises(Timeout::Error.new)
-      ErrorReport.expects(:log_exception).never
+      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
+      expect(Mailer).to receive(:create_message).and_raise(Timeout::Error.new)
+      expect(ErrorReport).to receive(:log_exception).never
       expect { @message.deliver }.to raise_exception(Timeout::Error)
 
-      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
-      Mailer.expects(:create_message).raises("450 recipient address rejected")
-      ErrorReport.expects(:log_exception).never
+      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
+      expect(Mailer).to receive(:create_message).and_raise("450 recipient address rejected")
+      expect(ErrorReport).to receive(:log_exception).never
       expect(@message.deliver).to eq false
     end
 
@@ -253,7 +253,7 @@ describe Message do
         path_type: 'email'
       })
       message.workflow_state = "staged"
-      Mailer.stubs(create_message: stub(deliver: "Response!"))
+      allow(Mailer).to receive(:create_message).and_return(double(deliver: "Response!"))
       expect(message.workflow_state).to eq("staged")
       expect{ message.deliver }.not_to raise_error
     end
@@ -265,9 +265,9 @@ describe Message do
 
       it "deletes unreachable push endpoints" do
         ne = mock()
-        ne.expects(:push_json).returns(false)
-        ne.expects(:destroy)
-        @user.expects(:notification_endpoints).returns([ne])
+        expect(ne).to receive(:push_json).and_return(false)
+        expect(ne).to receive(:destroy)
+        expect(@user).to receive(:notification_endpoints).and_return([ne])
 
         message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
         @message.deliver
@@ -275,9 +275,9 @@ describe Message do
 
       it "delivers to each of a user's push endpoints" do
         ne = mock()
-        ne.expects(:push_json).twice.returns(true)
-        ne.expects(:destroy).never
-        @user.expects(:notification_endpoints).returns([ne, ne])
+        expect(ne).to receive(:push_json).twice.and_return(true)
+        expect(ne).to receive(:destroy).never
+        expect(@user).to receive(:notification_endpoints).and_return([ne, ne])
 
         message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
         @message.deliver
@@ -291,7 +291,7 @@ describe Message do
       end
 
       before do
-        Canvas::Twilio.stubs(:enabled?).returns(true)
+        allow(Canvas::Twilio).to receive(:enabled?).and_return(true)
       end
 
       it "uses Twilio for E.164 paths" do
@@ -303,8 +303,8 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
-        Canvas::Twilio.expects(:deliver).with('+18015550100', @message.body, from_recipient_country: true)
-        @message.expects(:deliver_via_email).never
+        expect(Canvas::Twilio).to receive(:deliver).with('+18015550100', @message.body, from_recipient_country: true)
+        expect(@message).to receive(:deliver_via_email).never
         @message.deliver
       end
 
@@ -317,8 +317,8 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
-        @message.expects(:deliver_via_email)
-        Canvas::Twilio.expects(:deliver).never
+        expect(@message).to receive(:deliver_via_email)
+        expect(Canvas::Twilio).to receive(:deliver).never
         @message.deliver
       end
 
@@ -331,8 +331,8 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
-        @message.expects(:deliver_via_email)
-        Canvas::Twilio.expects(:deliver).never
+        expect(@message).to receive(:deliver_via_email)
+        expect(Canvas::Twilio).to receive(:deliver).never
         @message.deliver
       end
 
@@ -345,7 +345,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
-        Canvas::Twilio.expects(:deliver)
+        expect(Canvas::Twilio).to receive(:deliver)
         @message.deliver
         @message.reload
         expect(@message.workflow_state).to eq('sent')
@@ -360,7 +360,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
-        Canvas::Twilio.expects(:deliver).raises('some error')
+        expect(Canvas::Twilio).to receive(:deliver).and_raise('some error')
         @message.deliver
         @message.reload
         expect(@message.workflow_state).to eq('cancelled')
@@ -375,7 +375,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
-        Canvas::Twilio.expects(:deliver).with('+18015550100', anything, from_recipient_country: true)
+        expect(Canvas::Twilio).to receive(:deliver).with('+18015550100', anything, from_recipient_country: true)
         @message.deliver
         @message.reload
         expect(@message.workflow_state).to eq('sent')
@@ -398,10 +398,11 @@ describe Message do
       assignment.workflow_state = "published"
       assignment.save
       valid_attributes = {
-        :assignment_id => assignment.id,
-        :user_id => user1.id,
-        :grade => "1.5",
-        :url => "www.instructure.com"
+        assignment_id: assignment.id,
+        user_id: user1.id,
+        grade: "1.5",
+        grader: @teacher,
+        url: "www.instructure.com"
       }
       Submission.create!(valid_attributes)
     end
@@ -559,8 +560,8 @@ describe Message do
 
       it 'uses the authors account if there is no root account' do
         acct = Account.new
-        User.stubs(find: user)
-        user.stubs(account: acct)
+        allow(User).to receive(:find).and_return(user)
+        allow(user).to receive(:account).and_return(acct)
         conversation_message = ConversationMessage.new
         conversation_message.author_id = user.id
         message = Message.new(context: conversation_message)
@@ -577,8 +578,8 @@ describe Message do
         message = Message.new(context: convo_message)
         message.root_account_id = Account.default.id
         acct = Account.default
-        Account.stubs(find: acct)
-        acct.stubs(service_enabled?: true)
+        allow(Account).to receive(:find).and_return(acct)
+        allow(acct).to receive(:service_enabled?).and_return(true)
         message.root_account_id = Account.default.id
         expect(message.avatar_enabled?).to be_truthy
       end

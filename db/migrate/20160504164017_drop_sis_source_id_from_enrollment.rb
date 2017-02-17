@@ -1,4 +1,4 @@
-class DropSisSourceIdFromEnrollment < ActiveRecord::Migration
+class DropSisSourceIdFromEnrollment < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def change

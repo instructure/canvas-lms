@@ -1,4 +1,4 @@
-class ChangeAnswersToDataInQuizSubmissionEvents < ActiveRecord::Migration
+class ChangeAnswersToDataInQuizSubmissionEvents < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

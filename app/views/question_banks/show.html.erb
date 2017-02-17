@@ -8,13 +8,13 @@
     <% if can_do(@bank, @current_user, :manage) %>
       <a href="#" class="btn button-sidebar-wide add_question_link"><i class="icon-add"></i> <%= t 'buttons.add_a_question', "Add a Question" %></a>
       <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide edit_bank_link"><i class="icon-edit"></i> <%= t 'buttons.edit', "Edit Bank Details" %></a>
-      <a href="#" class="btn button-sidebar-wide move_questions_link"><i class="icon-arrow-right"></i> <%= t 'buttons.move_questions', "Move Multiple Questions" %></a>
-      <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide delete_bank_link"><i class="icon-end"></i> <%= t 'buttons.delete', "Delete Bank" %></a>
+      <a href="#" class="btn button-sidebar-wide move_questions_link"><i class="icon-arrow-right" role="presentation"></i> <%= t 'buttons.move_questions', "Move Multiple Questions" %></a>
+      <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide delete_bank_link"><i class="icon-end" role="presentation"></i> <%= t 'buttons.delete', "Delete Bank" %></a>
     <% end %>
     <% if @bank && !@bank.bookmarked_for?(@current_user) %>
-      <a href="<%= context_url(@context, :context_question_bank_bookmark_url, @bank ? @bank.id : "{{ id }}") %>" class="btn button-sidebar-wide bookmark_bank_link"><%= image_tag("bookmark_gray.png", alt: "") %> <span class="message"><%= t 'buttons.bookmark', "Bookmark this Bank" %></span></a>
+      <a href="<%= context_url(@context, :context_question_bank_bookmark_url, @bank ? @bank.id : "{{ id }}") %>" class="btn button-sidebar-wide bookmark_bank_link"><i class="icon-bookmark" role="presentation"></i> <span class="message"><%= t 'buttons.bookmark', "Bookmark this Bank" %></span></a>
     <% else %>
-      <button class="btn button-sidebar-wide disabled" disabled="true"><%= image_tag("bookmark.png", alt: "") %> <%= t 'buttons.already_bookmarked', "Already Bookmarked" %></button>
+      <button class="btn button-sidebar-wide disabled" disabled="true"><i class="icon-bookmark" role="presentation"></i><%= t 'buttons.already_bookmarked', "Already Bookmarked" %></button>
     <% end %>
   </div>
   <% css_bundle("aligned_outcomes") %>

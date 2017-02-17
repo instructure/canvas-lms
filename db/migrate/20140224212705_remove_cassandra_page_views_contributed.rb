@@ -1,4 +1,4 @@
-class RemoveCassandraPageViewsContributed < ActiveRecord::Migration
+class RemoveCassandraPageViewsContributed < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   include Canvas::Cassandra::Migration

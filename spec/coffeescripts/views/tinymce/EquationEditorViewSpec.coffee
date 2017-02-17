@@ -3,7 +3,7 @@ define [
   'compiled/views/tinymce/EquationEditorView'
 ], ($, EquationEditorView) ->
 
-  module "EquationEditorView#getEquationText",
+  QUnit.module "EquationEditorView#getEquationText",
     setup: ->
     teardown: ->
 
@@ -19,7 +19,7 @@ define [
     elem.text(equation)
     equal(EquationEditorView.getEquationText(elem), "52\\ast\\sqrt{64}")
 
-  module "EquationEditorView#render",
+  QUnit.module "EquationEditorView#render",
     setup: ->
     teardown: ->
       $('.ui-dialog').remove()

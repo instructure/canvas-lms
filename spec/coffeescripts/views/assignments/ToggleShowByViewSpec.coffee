@@ -57,7 +57,7 @@ define [
     collection.getGrades()
     server.respond()
 
-  module 'ToggleShowByView',
+  QUnit.module 'ToggleShowByView',
     setup: ->
       @server = sinon.fakeServer.create()
       fakeENV.setup()

@@ -2,7 +2,7 @@ define([
   'jquery',
   'react',
   'i18n!dashcards',
-  'bower/classnames/index'
+  'classnames'
 ], function($, React, I18n, classnames) {
   var DashboardCardAction = React.createClass({
     displayName: 'DashboardCardAction',

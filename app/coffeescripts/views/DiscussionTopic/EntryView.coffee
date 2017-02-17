@@ -64,12 +64,15 @@ define [
       super
       @constructor.instances[@cid] = this
       @$el.attr 'id', "entry-#{@model.get 'id'}"
+      @$el.toggleClass 'no-replies', !@model.hasActiveReplies()
+      @$el.addClass 'deleted' if @model.get 'deleted'
       @model.on 'change:deleted', @toggleDeleted
       @model.on 'change:read_state', @toggleReadState
       @model.on 'change:editor', (entry) =>
         @render()
         entry.trigger('edited')
       @model.on 'change:replies', (model, value) =>
+        @$el.toggleClass 'no-replies', !@model.hasActiveReplies()
         if _.isEmpty(value)
           delete @treeView
         else
@@ -136,16 +139,11 @@ define [
 
     addCountsToHeader: ->
       stats = @countPosterity()
-      html = """
-        <div class='new-and-total-badge'>
-          <span class="new-items">#{htmlEscape stats.unread}</span>
-          <span class="total-items">#{htmlEscape stats.total}</span>
-        </div>
-        """
       @$headerBadges.append entryStatsTemplate({stats})
       @addedCountsToHeader = true
 
     toggleDeleted: (model, deleted) =>
+      @$el.toggleClass 'deleted', deleted
       @$entryContent.toggleClass 'deleted-discussion-entry', deleted
       if deleted
         @model.set('updated_at', (new Date).toISOString())

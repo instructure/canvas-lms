@@ -1,5 +1,6 @@
 require_relative "../../spec_helper"
 require 'diplomat'
+require_dependency "canvas/dynamic_settings"
 
 module Canvas
   describe DynamicSettings do

@@ -51,7 +51,7 @@ describe Api::V1::CourseEvent do
       p.assign_attributes({
         :request_id => @request_id,
         :remote_ip => '10.10.10.10'
-      }, :without_protection => true)
+      })
     }
 
     PageView.stubs(

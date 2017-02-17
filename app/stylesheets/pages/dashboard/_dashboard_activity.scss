@@ -19,9 +19,6 @@
   border-bottom: 1px solid #ddd;
   .title {
     font-weight: normal;
-    @if not $use_high_contrast {
-      font-weight: 300;
-    }
   }
   .links {
     @include fontSize(11px);
@@ -142,7 +139,7 @@ $ignore-col-width: 50px;
       text-decoration: none;
     }
   }
-  font-weight: 500;
+  font-weight: bold;
   @include fontSize($ic-font-size--xsmall);
 }
 

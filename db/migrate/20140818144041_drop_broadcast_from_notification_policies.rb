@@ -1,4 +1,4 @@
-class DropBroadcastFromNotificationPolicies < ActiveRecord::Migration
+class DropBroadcastFromNotificationPolicies < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

@@ -1,4 +1,4 @@
-class DropLimitPrivelegesToCourseSectionFromEnrollments < ActiveRecord::Migration
+class DropLimitPrivelegesToCourseSectionFromEnrollments < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

@@ -1,4 +1,4 @@
-class RenameLocales < ActiveRecord::Migration
+class RenameLocales < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

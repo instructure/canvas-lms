@@ -1,4 +1,4 @@
-class AddOtpToUsers < ActiveRecord::Migration
+class AddOtpToUsers < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

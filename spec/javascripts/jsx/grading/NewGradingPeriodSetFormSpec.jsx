@@ -1,13 +1,13 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jquery',
   'underscore',
   'compiled/api/gradingPeriodSetsApi',
   'jsx/grading/NewGradingPeriodSetForm'
-], (React, ReactDOM, $, _, setsApi, NewSetForm) => {
+], (React, ReactDOM, {Simulate}, $, _, setsApi, NewSetForm) => {
   const wrapper = document.getElementById('fixtures');
-  const Simulate = React.addons.TestUtils.Simulate;
 
   const assertDisabled = function(component) {
     let $el = ReactDOM.findDOMNode(component);
@@ -29,7 +29,7 @@ define([
     }
   };
 
-  module('NewGradingPeriodSetForm', {
+  QUnit.module('NewGradingPeriodSetForm', {
     renderComponent(props={}) {
       const defaultProps = {
         enrollmentTerms: [],
@@ -75,7 +75,7 @@ define([
   test('disables the create button when it is clicked', function() {
     this.stubCreateSuccess();
     let form = this.renderComponent();
-    this.stub(form, 'isValid', () => true);
+    this.stub(form, 'isValid').returns(true);
     Simulate.click(ReactDOM.findDOMNode(form.refs.createButton));
     assertDisabled(form.refs.createButton);
   });
@@ -83,7 +83,7 @@ define([
   test('disables the cancel button when the create button is clicked', function() {
     this.stubCreateSuccess();
     let form = this.renderComponent();
-    this.stub(form, 'isValid', () => true);
+    this.stub(form, 'isValid').returns(true);
     Simulate.click(ReactDOM.findDOMNode(form.refs.createButton));
     assertDisabled(form.refs.cancelButton);
   });
@@ -91,7 +91,7 @@ define([
   asyncTest('re-enables the cancel button when the ajax call fails', function() {
     this.stubCreateFailure();
     let form = this.renderComponent();
-    this.stub(form, 'isValid', () => true);
+    this.stub(form, 'isValid').returns(true);
     Simulate.click(ReactDOM.findDOMNode(form.refs.cancelButton));
     requestAnimationFrame(function() {
       assertEnabled(form.refs.cancelButton);
@@ -102,7 +102,7 @@ define([
   asyncTest('re-enables the create button when the ajax call fails', function() {
     this.stubCreateFailure();
     let form = this.renderComponent();
-    this.stub(form, 'isValid', () => true);
+    this.stub(form, 'isValid').returns(true);
     Simulate.click(ReactDOM.findDOMNode(form.refs.createButton));
     requestAnimationFrame(function() {
       assertEnabled(form.refs.createButton);

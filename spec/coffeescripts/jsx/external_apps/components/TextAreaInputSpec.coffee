@@ -1,10 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/external_apps/components/TextAreaInput'
-], (React, ReactDOM, TextAreaInput) ->
+], (React, ReactDOM, TestUtils, TextAreaInput) ->
 
-  TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
@@ -28,7 +28,7 @@ define [
     hintNode = component.refs.hintText?.getDOMNode()
     [ component, inputNode, hintNode ]
 
-  module 'ExternalApps.TextAreaInput',
+  QUnit.module 'ExternalApps.TextAreaInput',
     teardown: ->
       ReactDOM.unmountComponentAtNode wrapper
 

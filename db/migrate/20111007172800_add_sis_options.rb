@@ -1,4 +1,4 @@
-class AddSisOptions < ActiveRecord::Migration
+class AddSisOptions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
 

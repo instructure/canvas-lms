@@ -1,14 +1,14 @@
 define [
-  'jquery'
-  'react'
-  'react-dom'
-  'jsx/epub_exports/GenerateLink'
-  'jsx/epub_exports/CourseStore'
-  'i18n!epub_exports'
-], ($, React, ReactDOM, GenerateLink, CourseEpubExportStore, I18n) ->
-  TestUtils = React.addons.TestUtils
+  'jquery',
+  'react',
+  'react-dom',
+  'react-addons-test-utils',
+  'jsx/epub_exports/GenerateLink',
+  'jsx/epub_exports/CourseStore',
+  'i18n!epub_exports',
+], ($, React, ReactDOM, TestUtils, GenerateLink, CourseEpubExportStore, I18n) ->
 
-  module 'GenerateLink',
+  QUnit.module 'GenerateLink',
     setup: ->
       @props = {
         course: {

@@ -16,7 +16,7 @@ define [
       return @get 'post_to_sis' unless arguments.length > 0
       @set 'post_to_sis', postToSisBoolean
 
-  module 'SisButtonView',
+  QUnit.module 'SisButtonView',
     setup: ->
       @assignment = new AssignmentStub()
       @quiz = new QuizStub()

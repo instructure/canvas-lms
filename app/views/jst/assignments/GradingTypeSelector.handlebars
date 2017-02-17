@@ -7,6 +7,10 @@
 <div class="form-column-right">
   <select id="assignment_grading_type"
     name="{{#if nested}}assignment[grading_type]{{else}}grading_type{{/if}}"
+    {{#if inClosedGradingPeriod}}
+      readonly
+      aria-readonly="true"
+    {{/if}}
     aria-controls="graded_assignment_fields view-grading-levels"
     {{disabledIfIncludes frozenAttributes "grading_type"}}>
     <option value="percent" {{selectedIf gradingType "percent"}}>

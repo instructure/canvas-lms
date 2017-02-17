@@ -1,4 +1,4 @@
-class AddUniqueIndexOnNotifications < ActiveRecord::Migration
+class AddUniqueIndexOnNotifications < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

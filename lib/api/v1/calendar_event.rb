@@ -191,6 +191,7 @@ module Api::V1::CalendarEvent
         :start_at => event.start_at,
         :end_at => event.end_at}} if include.include?('reserved_times')
     hash['context_codes'] = group.context_codes_for_user(user)
+    hash['all_context_codes'] = group.context_codes if include.include?('all_context_codes') && group.grants_right?(user, session, :manage)
     hash['requiring_action'] = group.requiring_action?(user)
     if group.new_appointments.present?
       hash['new_appointments'] = group.new_appointments.map{ |event| calendar_event_json(event, user, session, :skip_details => true, :appointment_group_id => group.id) }

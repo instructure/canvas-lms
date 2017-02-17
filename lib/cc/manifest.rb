@@ -21,7 +21,7 @@ module CC
 
     attr_accessor :exporter, :weblinks, :basic_ltis
     attr_reader :options
-    delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :user, :to => :exporter
+    delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :user, :create_key, :to => :exporter
 
     def initialize(exporter, opts = {})
       @exporter = exporter

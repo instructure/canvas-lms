@@ -27,7 +27,9 @@ module Utils
     end
 
     def as_string(style=:normal)
-      if style != :long
+      if style == :full
+        return i18n_date(:full)
+      elsif style != :long
         if style != :no_words && special_value_type != :none
           string = special_string(special_value_type)
           return string if string && string.strip.present?

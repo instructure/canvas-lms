@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe AccountsController do
   def account_with_admin_logged_in(opts = {})
@@ -209,7 +209,7 @@ describe AccountsController do
     it "should count total courses correctly" do
       account = Account.create!
       account_with_admin_logged_in(account: account)
-      course(account: account)
+      course_factory(account: account)
       @course.course_sections.create!
       @course.course_sections.create!
       @course.update_account_associations
@@ -242,6 +242,25 @@ describe AccountsController do
       expect(assigns[:courses].find {|c| c.id == c1.id }.student_count).to eq c1.student_enrollments.count
       expect(assigns[:courses].find {|c| c.id == c2.id }.student_count).to eq c2.student_enrollments.count
 
+    end
+
+    it "should sort courses as specified" do
+      account_with_admin_logged_in(account: @account)
+      course_with_teacher(:account => @account)
+      Account.any_instance.expects(:fast_all_courses).with(has_entry(order: "courses.created_at DESC"))
+      get 'show', :id => @account.id, :courses_sort_order => "created_at_desc", :format => 'html'
+      expect(@admin.reload.preferences[:course_sort]).to eq 'created_at_desc'
+    end
+
+    it 'can search and sort simultaneously' do
+      account_with_admin_logged_in(account: @account)
+      @account.courses.create! name: 'blah A'
+      @account.courses.create! name: 'blah C'
+      @account.courses.create! name: 'blah B'
+      @account.courses.create! name: 'bleh Z'
+      get 'courses', :account_id => @account.id, :course => { :name => 'blah' }, :courses_sort_order => 'name_desc', :format => 'html'
+      expect(assigns['courses'].map(&:name)).to eq(['blah C', 'blah B', 'blah A'])
+      expect(@admin.reload.preferences[:course_sort]).to eq 'name_desc'
     end
   end
 
@@ -312,30 +331,34 @@ describe AccountsController do
       post 'update', :id => @account.id, :account => { :settings => {
         :global_includes => true,
         :enable_profiles => true,
+        :enable_turnitin => true,
         :admins_can_change_passwords => true,
         :admins_can_view_notifications => true,
       } }
       @account.reload
       expect(@account.global_includes?).to be_falsey
       expect(@account.enable_profiles?).to be_falsey
+      expect(@account.enable_turnitin?).to be_falsey
       expect(@account.admins_can_change_passwords?).to be_falsey
       expect(@account.admins_can_view_notifications?).to be_falsey
     end
 
     it "should allow site_admin to update certain settings" do
-      user
+      user_factory
       user_session(@user)
       @account = Account.create!
       Account.site_admin.account_users.create!(user: @user)
       post 'update', :id => @account.id, :account => { :settings => {
         :global_includes => true,
         :enable_profiles => true,
+        :enable_turnitin => true,
         :admins_can_change_passwords => true,
         :admins_can_view_notifications => true,
       } }
       @account.reload
       expect(@account.global_includes?).to be_truthy
       expect(@account.enable_profiles?).to be_truthy
+      expect(@account.enable_turnitin?).to be_truthy
       expect(@account.admins_can_change_passwords?).to be_truthy
       expect(@account.admins_can_view_notifications?).to be_truthy
     end
@@ -345,7 +368,7 @@ describe AccountsController do
                                        { name: 'test1', description: '', expose_to_ui: :setting, default: false })
       AccountServices.register_service(:test2,
                                        { name: 'test2', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { false } })
-      user_session(user)
+      user_session(user_factory)
       @account = Account.create!
       AccountServices.register_service(:test3,
                                        { name: 'test3', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |_, account| account == @account } })
@@ -366,7 +389,7 @@ describe AccountsController do
     describe "quotas" do
       before :once do
         @account = Account.create!
-        user
+        user_factory
         @account.default_storage_quota_mb = 123
         @account.default_user_storage_quota_mb = 45
         @account.default_group_storage_quota_mb = 9001
@@ -517,6 +540,19 @@ describe AccountsController do
       expect(assigns[:last_reports].first.last).to eq report
     end
 
+    context "sharding" do
+      specs_require_sharding
+
+      it "loads even from the wrong shard" do
+        account_with_admin_logged_in
+
+        @shard1.activate do
+          get 'settings', account_id: @account
+          expect(response).to be_success
+        end
+      end
+    end
+
     context "external_integration_keys" do
       before(:once) do
         ExternalIntegrationKey.key_type :external_key0, rights: { write: true }
@@ -525,7 +561,7 @@ describe AccountsController do
       end
 
       before do
-        user
+        user_factory
         user_session(@user)
         @account = Account.create!
         Account.site_admin.account_users.create!(user: @user)
@@ -588,7 +624,7 @@ describe AccountsController do
   end
 
   def admin_logged_in(account)
-    user_session(user)
+    user_session(user_factory)
     Account.site_admin.account_users.create!(user: @user)
     account_with_admin_logged_in(account: account)
   end
@@ -596,8 +632,8 @@ describe AccountsController do
   describe "#account_courses" do
     before do
       @account = Account.create!
-      @c1 = course(account: @account, name: "foo")
-      @c2 = course(account: @account, name: "bar")
+      @c1 = course_factory(account: @account, name: "foo")
+      @c2 = course_factory(account: @account, name: "bar")
     end
 
     it "should not allow get a list of courses with no permissions" do
@@ -622,7 +658,7 @@ describe AccountsController do
 
     it "should properly remove sections from includes" do
       @s1 = @course.course_sections.create!
-      @course.enroll_student(user(:active_all => true), :section => @s1, :allow_multiple_enrollments => true)
+      @course.enroll_student(user_factory(:active_all => true), :section => @s1, :allow_multiple_enrollments => true)
 
       admin_logged_in(@account)
       get 'courses_api', :account_id => @account.id, :include => [:sections]

@@ -73,11 +73,18 @@ describe Lti::Security do
         expect(Lti::Security.check_and_store_nonce(cache_key, timestamp, expiration)).to be false
       end
 
-      it 'rejects a nonce in the future' do
+      it 'rejects a nonce more than 1 minute in the future' do
         cache_key = 'abcdefghijklmnopqrstuvwxyz'
         expiration = 5.minutes
-        timestamp = 5.minutes.from_now
+        timestamp = 61.seconds.from_now
         expect(Lti::Security.check_and_store_nonce(cache_key, timestamp, expiration)).to be false
+      end
+
+      it 'accepts a nonce less than 1 minute in the future' do
+        cache_key = 'abcdefghijklmnopqrstuvwxyz'
+        expiration = 5.minutes
+        timestamp = 59.seconds.from_now
+        expect(Lti::Security.check_and_store_nonce(cache_key, timestamp, expiration)).to be true
       end
 
     end
@@ -91,6 +98,25 @@ describe Lti::Security do
       header = SimpleOAuth::Header.new(
         :post,
         launch_url,
+        params,
+        consumer_key: consumer_key,
+        consumer_secret: consumer_secret,
+        nonce: nonce,
+        timestamp: timestamp
+      )
+      expect(header.valid?(signature: signed_params['oauth_signature'])).to eq true
+    end
+
+    it "handles whitespace in URLs" do
+      url_with_whitespace = "http://www.test.com "
+      signed_params = Lti::Security.signed_post_params(params, url_with_whitespace, consumer_key, consumer_secret)
+
+      nonce = signed_params['oauth_nonce']
+      timestamp = signed_params['oauth_timestamp']
+
+      header = SimpleOAuth::Header.new(
+        :post,
+        url_with_whitespace,
         params,
         consumer_key: consumer_key,
         consumer_secret: consumer_secret,

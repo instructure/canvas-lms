@@ -1,4 +1,4 @@
-class DropWikiPageComments < ActiveRecord::Migration
+class DropWikiPageComments < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

@@ -1,4 +1,4 @@
-class MakeNotificationPolicyFrequencyNotNull < ActiveRecord::Migration
+class MakeNotificationPolicyFrequencyNotNull < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
   tag :postdeploy
 

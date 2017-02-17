@@ -35,7 +35,7 @@ module Factories
   end
 
   def quiz_with_submission(complete_quiz = true)
-    test_data = [{:correct_comments=>"", :assessment_question_id=>nil, :incorrect_comments=>"", :question_name=>"Question 1", :points_possible=>1, :question_text=>"Which book(s) are required for this course?", :name=>"Question 1", :id=>128, :answers=>[{:weight=>0, :text=>"A", :comments=>"", :id=>1490}, {:weight=>0, :text=>"B", :comments=>"", :id=>1020}, {:weight=>0, :text=>"C", :comments=>"", :id=>7051}], :question_type=>"multiple_choice_question"}]
+    test_data = [{:correct_comments=>"", :assessment_question_id=>nil, :incorrect_comments=>"", :question_name=>"Question 1", :points_possible=>1, :question_text=>"Which book(s) are required for this course?", :name=>"Question 1", :id=>128, :answers=>[{:weight=>100, :text=>"A", :comments=>"", :id=>1490}, {:weight=>0, :text=>"B", :comments=>"", :id=>1020}, {:weight=>0, :text=>"C", :comments=>"", :id=>7051}], :question_type=>"multiple_choice_question"}]
     @course ||= course_model(:reusable => true)
     @student ||= user_model
     @course.enroll_student(@student).accept
@@ -46,9 +46,17 @@ module Factories
 
     @qsub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
     @qsub.quiz_data = test_data
-    @qsub.submission_data = complete_quiz ? [{:points=>0, :text=>"7051", :question_id=>128, :correct=>false, :answer_id=>7051}] : test_data.first
-    # {"context_id"=>"3", "text_after_answers"=>"", "context_type"=>"Course", "attempt"=>1, "user_id"=>"3", "controller"=>"quiz_submissions", "cnt"=>1, "course_id"=>"3", "quiz_id"=>"6", "question_text"=>"<p>true?</p>"}
-    @qsub.workflow_state = 'complete' if complete_quiz
+    @qsub.started_at = 1.minute.ago
+    @qsub.attempt = 1
+    if complete_quiz
+      @qsub.submission_data = [{:points=>0, :text=>"7051", :question_id=>128, :correct=>false, :answer_id=>7051}]
+      @qsub.score = 0
+      @qsub.finished_at = Time.now.utc
+      @qsub.workflow_state = 'complete'
+      @qsub.submission = @quiz.assignment.find_or_create_submission(@student.id)
+    else
+      @qsub.submission_data = {}
+    end
     @qsub.with_versioning(true) do
       @qsub.save!
     end
@@ -239,15 +247,15 @@ module Factories
   end
 
   def assignment_quiz(questions, opts={})
-    course = opts[:course] || course(:active_course => true)
-    user = opts[:user] || user(:active_user => true)
+    course = opts[:course] || course_factory(active_course: true)
+    user = opts[:user] || user_factory(:active_user => true)
     course.enroll_student(user, :enrollment_state => 'active') unless user.enrollments.any? { |e| e.course_id == course.id }
     @assignment = course.assignments.create(title: opts.fetch(:title, "Test Assignment"))
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
     @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
-    @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
+    @questions = questions.map { |q| @quiz.quiz_questions.create!(q.slice(:quiz_group, :assessment_question, :question_data, :assessment_question_version)) }
     @quiz.generate_quiz_data
     @quiz.due_at = opts.fetch(:due_at, Time.zone.now.advance(days: 7))
     @quiz.published_at = Time.zone.now
@@ -256,15 +264,19 @@ module Factories
     @quiz
   end
 
-  # The block should return the submission_data. A block is used so
-  # that we have access to the @questions variable that is created
-  # in this method
+  # The block should return the submission_data. We pass the newly created
+  # questions to the block (legacy code uses @questions)
   def quiz_with_graded_submission(questions, opts={}, &block)
     assignment_quiz(questions, opts)
-    @quiz_submission = @quiz.generate_submission(@user)
-    @quiz_submission.mark_completed
-    @quiz_submission.submission_data = yield if block_given?
-    Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
+    @quiz_submission = graded_submission(@quiz, @user, &block)
+  end
+
+  def graded_submission(quiz, user)
+    quiz_submission = quiz.generate_submission(user)
+    quiz_submission.mark_completed
+    quiz_submission.submission_data = yield(quiz.quiz_questions.order(:id)) if block_given?
+    Quizzes::SubmissionGrader.new(quiz_submission).grade_submission
+    quiz_submission
   end
 
   def survey_with_submission(questions, &block)

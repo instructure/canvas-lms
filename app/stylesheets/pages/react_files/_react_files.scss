@@ -12,7 +12,7 @@ $ef-thumbnail-size: 36px;
 }
 
 body.files {
-  #content { padding-top: 0; }
+  .ic-Layout-contentMain { padding-top: 0; }
   .ic-app-nav-toggle-and-crumbs {
     /* display: none; */
     &.ic-app-nav-toggle-and-crumbs--files { display: flex; }
@@ -411,4 +411,9 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
     @include accessibility-prompt($is-link: false);
     height: auto;
   }
+}
+
+.master-course-cell {
+  margin-top: 6px;
+  margin-right: 6px;
 }

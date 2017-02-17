@@ -55,7 +55,16 @@
                     "migration_id":"1865116014002",
                     "attachment_ids":[],
                     "multiple_instructions":false,
-                    "assignment_id":"1865116014002"
+                    "assignment_id":"1865116014002",
+                    "assignment_overrides":
+                        [
+                            {
+                                "title":"we've got to go back",
+                                "set_type":"Noop",
+                                "set_id":1985,
+                                "due_at":"1238219700000"
+                            }
+                        ]
                 },
                 {
                     "take_backable":true,

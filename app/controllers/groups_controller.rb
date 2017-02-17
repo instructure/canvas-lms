@@ -134,8 +134,8 @@ require 'atom'
 #     }
 #
 class GroupsController < ApplicationController
-  before_filter :get_context
-  before_filter :require_user, :only => %w[index accept_invitation activity_stream activity_stream_summary]
+  before_action :get_context
+  before_action :require_user, :only => %w[index accept_invitation activity_stream activity_stream_summary]
 
   include Api::V1::Attachment
   include Api::V1::Group
@@ -214,7 +214,7 @@ class GroupsController < ApplicationController
 
         # Split the groups out into those in concluded courses and those not in concluded courses
         @current_groups, @previous_groups = groups.partition do |group|
-          group.context_type != 'Course' || !group.context.concluded?
+          group.context_type != 'Course' || !group.context.concluded?('StudentEnrollment')
         end
       end
 
@@ -285,6 +285,10 @@ class GroupsController < ApplicationController
           js_env group_categories: categories_json,
                  group_user_type: @group_user_type,
                  allow_self_signup: @allow_self_signup
+          if @context.is_a?(Course)
+            # get number of sections with students in them so we can enforce a min group size for random assignment on sections
+            js_env(:student_section_count => @context.enrollments.active_or_pending.where(:type => "StudentEnrollment").distinct.count(:course_section_id))
+          end
           # since there are generally lots of users in an account, always do large roster view
           @js_env[:IS_LARGE_ROSTER] ||= @context.is_a?(Account)
           render :context_manage_groups
@@ -344,8 +348,8 @@ class GroupsController < ApplicationController
           redirect_to named_context_url(@group.context, :context_url)
           return
         end
-        @current_conferences = @group.web_conferences.select{|c| c.active? && c.users.include?(@current_user) } rescue []
-        @scheduled_conferences = @context.web_conferences.select{|c| c.scheduled? && c.users.include?(@current_user)} rescue []
+        @current_conferences = @group.web_conferences.active.select{|c| c.active? && c.users.include?(@current_user) } rescue []
+        @scheduled_conferences = @context.web_conferences.active.select{|c| c.scheduled? && c.users.include?(@current_user)} rescue []
         @stream_items = @current_user.try(:cached_recent_stream_items, { :contexts => @context }) || []
         if params[:join] && @group.grants_right?(@current_user, :join)
           if @group.full?
@@ -421,29 +425,31 @@ class GroupsController < ApplicationController
   #
   # @returns Group
   def create
+    attrs = api_request? ? params : params.require(:group)
+    attrs = attrs.permit(:name, :description, :join_level, :is_public, :storage_quota_mb, :max_membership)
+
     if api_request?
       if params[:group_category_id]
         group_category = GroupCategory.active.find(params[:group_category_id])
         return render :json => {}, :status => bad_request unless group_category
         @context = group_category.context
-        params[:group_category] = group_category
+        attrs[:group_category] = group_category
         return unless authorized_action(group_category.context, @current_user, :manage_groups)
       else
         @context = @domain_root_account
-        params[:group_category] = GroupCategory.communities_for(@context)
+        attrs[:group_category] = GroupCategory.communities_for(@context)
       end
     elsif params[:group]
       group_category_id = params[:group].delete :group_category_id
       if group_category_id && @context.grants_right?(@current_user, session, :manage_groups)
         group_category = @context.group_categories.where(id: group_category_id).first
         return render :json => {}, :status => :bad_request unless group_category
-        params[:group][:group_category] = group_category
+        attrs[:group_category] = group_category
       else
-        params[:group][:group_category] = nil
+        attrs[:group_category] = nil
       end
     end
 
-    attrs = api_request? ? params : params[:group]
     attrs.delete :storage_quota_mb unless @context.grants_right? @current_user, session, :manage_storage_quotas
     @group = @context.groups.temp_record(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
 
@@ -506,11 +512,12 @@ class GroupsController < ApplicationController
   # @returns Group
   def update
     find_group
-    attrs = api_request? ? params : params[:group]
+    attrs = api_request? ? params : params.require(:group)
+    attrs = attrs.permit(:name, :description, :join_level, :is_public, :avatar_id, :storage_quota_mb, :max_membership,
+      :leader => strong_anything, :members => strong_anything)
 
-    attrs.delete :group_category
-    if !api_request? && attrs[:group_category_id]
-      group_category_id = attrs.delete :group_category_id
+    if !api_request? && params[:group][:group_category_id]
+      group_category_id = params[:group].delete :group_category_id
       group_category = @context.group_categories.where(id: group_category_id).first
       return render :json => {}, :status => :bad_request unless group_category
       attrs[:group_category] = group_category

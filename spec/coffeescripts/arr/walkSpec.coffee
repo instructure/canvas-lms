@@ -1,6 +1,6 @@
 define ['compiled/arr/walk'], (walk) ->
 
-  module 'arr/walk'
+  QUnit.module 'arr/walk'
 
   test 'walks a tree object', ->
     arr = [{name: 'a'}, {name: 'b'}]

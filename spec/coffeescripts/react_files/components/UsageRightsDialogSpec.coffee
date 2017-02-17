@@ -1,15 +1,14 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/UsageRightsDialog'
   'compiled/models/File'
   'compiled/models/Folder'
-], (React, ReactDOM, $, UsageRightsDialog, File, Folder) ->
+], (React, ReactDOM, TestUtils, $, UsageRightsDialog, File, Folder) ->
 
-  TestUtils = React.addons.TestUtils
-
-  module 'UsageRightsDialog',
+  QUnit.module 'UsageRightsDialog',
     setup: ->
     teardown: ->
       $("#ui-datepicker-div").empty()
@@ -173,7 +172,7 @@ define [
 
     ReactDOM.unmountComponentAtNode(uRD.getDOMNode().parentNode)
 
-  module 'UploadProgress: Submitting'
+  QUnit.module 'UploadProgress: Submitting'
 
   test 'validate they selected usage right', ->
     usage_rights = {

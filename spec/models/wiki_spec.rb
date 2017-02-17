@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Wiki do
   before :once do
-    course
+    course_factory
     @wiki = @course.wiki
   end
 
@@ -73,7 +73,7 @@ describe Wiki do
   context 'set policy' do
     before :once do
       @course.offer!
-      user :active_all => true
+      user_factory :active_all => true
     end
 
     it 'should give read rights to public courses' do

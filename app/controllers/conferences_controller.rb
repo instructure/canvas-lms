@@ -133,17 +133,17 @@
 class ConferencesController < ApplicationController
   include Api::V1::Conferences
 
-  before_filter :require_context
-  skip_before_filter :load_user, :only => [:recording_ready]
+  before_action :require_context
+  skip_before_action :load_user, :only => [:recording_ready]
 
   add_crumb(proc{ t '#crumbs.conferences', "Conferences"}) do |c|
     c.send(:named_context_url, c.instance_variable_get("@context"), :context_conferences_url)
   end
 
-  before_filter { |c| c.active_tab = "conferences" }
-  before_filter :require_config
-  before_filter :reject_student_view_student
-  before_filter :get_conference, :except => [:index, :create]
+  before_action { |c| c.active_tab = "conferences" }
+  before_action :require_config
+  before_action :reject_student_view_student
+  before_action :get_conference, :except => [:index, :create]
 
   # @API List conferences
   # Retrieve the list of conferences for this context
@@ -164,8 +164,8 @@ class ConferencesController < ApplicationController
     return unless tab_enabled?(@context.class::TAB_CONFERENCES)
     return unless @current_user
     conferences = @context.grants_right?(@current_user, :manage_content) ?
-      @context.web_conferences :
-      @current_user.web_conferences.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
+      @context.web_conferences.active :
+      @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
     conferences = conferences.with_config.order("created_at DESC, id DESC")
     api_request? ? api_index(conferences) : web_index(conferences)
   end
@@ -182,9 +182,12 @@ class ConferencesController < ApplicationController
       conference.ended_at.nil?
     }
     log_asset_access([ "conferences", @context ], "conferences", "other")
-    if @context.is_a? Course
+    case @context
+    when Course
       @users = User.where(:id => @context.typical_current_enrollments.active_by_date.where.not(:user_id => @current_user).select(:user_id)).
         order(User.sortable_name_order_by_clause).to_a
+    when Group
+      @users = @context.participating_users_in_context.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
     else
       @users = @context.users.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
     end
@@ -216,8 +219,7 @@ class ConferencesController < ApplicationController
 
   def create
     if authorized_action(@context.web_conferences.temp_record, @current_user, :create)
-      params[:web_conference].try(:delete, :long_running)
-      @conference = @context.web_conferences.build(params[:web_conference])
+      @conference = @context.web_conferences.build(conference_params)
       @conference.settings[:default_return_url] = named_context_url(@context, :context_url, :include_host => true)
       @conference.user = @current_user
       members = get_new_members
@@ -246,7 +248,7 @@ class ConferencesController < ApplicationController
       respond_to do |format|
         params[:web_conference].try(:delete, :long_running)
         params[:web_conference].try(:delete, :conference_type)
-        if @conference.update_attributes(params[:web_conference])
+        if @conference.update_attributes(conference_params)
           # TODO: ability to dis-invite people
           members.uniq.each do |u|
             @conference.add_invitee(u)
@@ -374,8 +376,13 @@ class ConferencesController < ApplicationController
     members - @conference.invitees
   end
 
+  private
   def get_conference
     @conference = @context.web_conferences.find(params[:conference_id] || params[:id])
   end
-  private :get_conference
+
+  def conference_params
+    params.require(:web_conference).
+      permit(:title, :duration, :description, :conference_type, :user_settings => strong_anything)
+  end
 end

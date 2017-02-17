@@ -4,14 +4,14 @@ define [
   'compiled/calendar/TimeBlockList'
   'compiled/calendar/TimeBlockRow'
   'timezone'
-  'vendor/timezone/America/Detroit'
+  'timezone/America/Detroit'
 ], ($, fcUtil, TimeBlockList, TimeBlockRow, tz, detroit) ->
 
   nextYear = new Date().getFullYear() + 1
   unfudged_start = tz.parse("#{nextYear}-02-03T12:32:00Z")
   unfudged_end   = tz.parse("#{nextYear}-02-03T17:32:00Z")
 
-  module "TimeBlockRow",
+  QUnit.module "TimeBlockRow",
     setup: ->
       @snapshot = tz.snapshot()
       tz.changeZone(detroit, 'America/Detroit')

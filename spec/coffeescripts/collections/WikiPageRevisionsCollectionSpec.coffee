@@ -3,7 +3,7 @@ define [
   'compiled/collections/WikiPageRevisionsCollection'
 ], (WikiPage, WikiPageRevisionsCollection) ->
 
-  module 'WikiPageRevisionsCollection'
+  QUnit.module 'WikiPageRevisionsCollection'
 
   test 'parentModel accepted in constructor', ->
     parentModel = new WikiPage

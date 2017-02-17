@@ -36,7 +36,7 @@ define [
 
     events:
       'click .treeLabel': 'toggle'
-      'selectItem .treeLabel': 'selectItem'
+      'selectItem .treeFile, .treeLabel': 'selectItem'
 
     initialize: ->
       @tagId = _.uniqueId 'treenode-'

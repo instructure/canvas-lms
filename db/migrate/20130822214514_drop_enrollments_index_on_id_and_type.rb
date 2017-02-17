@@ -1,4 +1,4 @@
-class DropEnrollmentsIndexOnIdAndType < ActiveRecord::Migration
+class DropEnrollmentsIndexOnIdAndType < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

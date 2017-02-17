@@ -21,6 +21,7 @@ define([
   'i18n!select_content_dialog',
   'jquery' /* $ */,
   'react',
+  'react-dom',
   'jsx/context_modules/FileSelectBox',
   'underscore',
   'jquery.instructure_date_and_time' /* datetime_field */,
@@ -33,7 +34,7 @@ define([
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData */
-], function(INST, I18n, $, React, FileSelectBox, _) {
+], function(INST, I18n, $, React, ReactDOM, FileSelectBox, _) {
 
   var SelectContentDialog = {};
 
@@ -79,6 +80,22 @@ define([
             borderstyle: '0',
             tabindex: '0'
           }));
+          var tabHelperHeight = 35;
+          $dialog.append(
+            $('<div/>',
+              {id: 'tab-helper', style: 'height: ' + tabHelperHeight + 'px;padding:5px', tabindex: '0'}
+            ).focus(function () {
+              $(this).height(tabHelperHeight + 'px')
+              var joke = document.createTextNode(I18n.t('Q: What goes black, white, black, white?  A: A panda rolling down a hill.'))
+              this.appendChild(joke)
+              var currentHeight = $dialog.dialog('option', 'height');
+              $dialog.dialog('option', 'height', currentHeight + tabHelperHeight)
+            }).blur(function () {
+              $(this).html('').height('0px');
+              var currentHeight = $dialog.dialog('option', 'height');
+              $dialog.dialog('option', 'height', currentHeight - tabHelperHeight)
+            }))
+
           $("body").append($dialog.hide());
           $dialog.on("dialogbeforeclose", dialogCancelHandler);
           $dialog
@@ -379,7 +396,7 @@ define([
 
       $("#select_context_content_dialog .module_item_option").hide();
       if ($(this).val() === 'attachment') {
-        React.render(React.createFactory(FileSelectBox)({contextString: ENV.context_asset_string}), $('#module_item_select_file')[0]);
+        ReactDOM.render(React.createFactory(FileSelectBox)({contextString: ENV.context_asset_string}), $('#module_item_select_file')[0]);
       }
       $("#" + $(this).val() + "s_select").show().find(".module_item_select").change();
       if($(this).val() == 'context_external_tool') {

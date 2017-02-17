@@ -1,0 +1,19 @@
+@import "components/autocomplete";
+@import "base/environment";
+
+.MessageStudents__Alert {
+  margin-bottom: $ic-sp * 2;
+}
+
+.MessageStudents__Form {
+  // override Canvas default bottom form margin
+  margin-bottom: 0;
+}
+
+.MessageStudents__FormField {
+  margin-bottom: $ic-sp * 2;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}

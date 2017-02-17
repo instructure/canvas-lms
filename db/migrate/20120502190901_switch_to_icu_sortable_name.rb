@@ -1,4 +1,4 @@
-class SwitchToIcuSortableName < ActiveRecord::Migration
+class SwitchToIcuSortableName < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
   # yes, predeploy; Rails processes will need restarted after collkey function is created
   # in order to use the new order by clause
@@ -17,7 +17,7 @@ class SwitchToIcuSortableName < ActiveRecord::Migration
       end
 
       concurrently = " CONCURRENTLY" if connection.open_transactions == 0
-      remove_index :users, :sortable_name
+      remove_index :users, name: 'index_users_on_sortable_name'
       if collkey = connection.extension_installed?(:pg_collkey)
         execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON #{User.quoted_table_name} (#{collkey}.collkey(sortable_name, 'root', true, 2, true))")
       else
@@ -28,7 +28,7 @@ class SwitchToIcuSortableName < ActiveRecord::Migration
 
   def self.down
     if connection.adapter_name == 'PostgreSQL'
-      remove_index :users, :sortable_name
+      remove_index :users, name: 'index_users_on_sortable_name'
       concurrently = " CONCURRENTLY" if connection.open_transactions == 0
       execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON #{User.quoted_table_name} (LOWER(sortable_name))")
     end

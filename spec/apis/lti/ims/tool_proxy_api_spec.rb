@@ -15,12 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
+require File.expand_path(File.dirname(__FILE__) + '/../lti2_api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
+require_dependency "lti/ims/tool_proxy_controller"
 
 module Lti
   module Ims
     describe ToolProxyController, type: :request do
+      include_context 'lti2_api_spec_helper'
 
       let(:account) { Account.new }
       let(:product_family) do
@@ -32,7 +34,6 @@ module Lti
           guid: SecureRandom.uuid,
           shared_secret: 'abc',
           product_family: product_family,
-          root_account: account,
           product_version: '1',
           workflow_state: 'disabled',
           raw_data: {'proxy' => 'value'},
@@ -64,6 +65,7 @@ module Lti
         before(:each) do
           OAuth::Signature.stubs(:build).returns(mock(verify: true))
           OAuth::Helper.stubs(:parse_header).returns({'oauth_consumer_key' => 'key'})
+          Lti::RegistrationRequestService.stubs(:retrieve_registration_password).returns('password')
         end
 
         it 'returns a tool_proxy id object' do
@@ -109,7 +111,18 @@ module Lti
           expect(response).to eq 201
           expect(JSON.parse(body).keys).to match_array ["@context", "@type", "@id", "tool_proxy_guid", "tc_half_shared_secret"]
         end
+      end
 
+      describe "POST #create with JWT access token" do
+        it 'accepts valid JWT access tokens' do
+          course_with_teacher_logged_in(:active_all => true)
+          tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
+          json = JSON.parse(tool_proxy_fixture)
+          json[:format] = 'json'
+          json[:account_id] = @course.account.id
+          response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture, dev_key_request_headers
+          expect(response).to eq 201
+        end
       end
 
       describe "POST #reregistration" do
@@ -118,6 +131,7 @@ module Lti
           mock_siq = mock('signature')
           mock_siq.stubs(:verify).returns(true)
           OAuth::Signature.stubs(:build).returns(mock_siq)
+
         end
 
         let(:auth_header) do

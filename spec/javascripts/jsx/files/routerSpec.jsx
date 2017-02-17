@@ -1,14 +1,11 @@
 define([
-  'react',
   'jsx/files/router',
-], (React, router) => {
-
-  const TestUtils = React.addons.TestUtils;
+], (router) => {
 
   // No op for next().
   const fakeNext = () => {};
 
-  module('Files Client-side Router');
+  QUnit.module('Files Client-side Router');
 
   test('getFolderSplat returns the proper splat on ctx given uri characters', () => {
     const fakeCtx = {

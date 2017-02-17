@@ -2,14 +2,13 @@ define([
   'jquery',
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jsx/files/Breadcrumbs',
   'compiled/models/Folder',
   'helpers/fakeENV'
-], ($, React, ReactDOM, Breadcrumbs, Folder, fakeENV) => {
+], ($, React, ReactDOM, TestUtils, Breadcrumbs, Folder, fakeENV) => {
 
-  const TestUtils = React.addons.TestUtils
-
-  module('Files Breadcrumbs Component', {
+  QUnit.module('Files Breadcrumbs Component', {
     setup () {
       fakeENV.setup({context_asset_string: 'course_1'});
     },

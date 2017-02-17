@@ -1,4 +1,4 @@
-class AddEvaluatedAtToContextModuleProgressions < ActiveRecord::Migration
+class AddEvaluatedAtToContextModuleProgressions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

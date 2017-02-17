@@ -44,27 +44,26 @@ values such as url.
     <td>url=&lt;url&gt;</td>
     <td>this is URL that will be used to load the external tool</td>
     <td>(required)</td>
+      </tr><tr>
+        <td>text=&lt;text&gt;</td>
+        <td>this is the suggested text for the inserted link. Highlighted content will be overwritten by this value.</td>
+        <td>(required)</td>
+      </tr>
   </tr><tr>
     <td>title=&lt;text&gt;</td>
     <td>this is used as the 'title' attribute of the inserted external tool link</td>
     <td>(optional)</td>
-  </tr><tr>
-    <td>text=&lt;text&gt;</td>
-    <td>this is the suggested text for the inserted link. If the user has already selected some content before opening this dialog, the link will wrap that content and this value will be ignored.</td>
-    <td>(optional, defaults to 'link')</td>
-  </tr>
 </table>
 
 #### examples:
 If the `launch_presentation_return_url` were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
-- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link
-- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link&text=other+site+link
-- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link&title=link
+- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link&text=Link+Text
+- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link&title=link_title&text=Link+Text
 
 ## Settings
-All of these settings are contained under "resource_selection"
+All of these settings are configurable for the "resource_selection" placement in the tool configuration
 
 -   url: &lt;url&gt; (optional)
     

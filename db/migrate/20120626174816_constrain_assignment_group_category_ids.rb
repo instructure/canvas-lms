@@ -1,4 +1,4 @@
-class ConstrainAssignmentGroupCategoryIds < ActiveRecord::Migration
+class ConstrainAssignmentGroupCategoryIds < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

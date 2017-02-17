@@ -1,4 +1,4 @@
-class FixUserMergeConversations < ActiveRecord::Migration
+class FixUserMergeConversations < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

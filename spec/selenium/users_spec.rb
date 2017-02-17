@@ -10,7 +10,7 @@ describe "users" do
       user_session(admin)
 
       @user = User.create!
-      course.enroll_student(@user)
+      course_factory.enroll_student(@user)
 
       get "/users/#{@user.id}"
       pseudonym_form = f('#edit_pseudonym_form')
@@ -52,7 +52,7 @@ describe "users" do
     it "should validate page view with a participation" do
       page_view(:user => @student, :course => @course, :participated => true)
       get "/users/#{@student.id}"
-      expect(f("#page_view_results img")).to have_attribute(:src, '/images/checked.png')
+      expect(f("#page_view_results .icon-check")).to be_displayed
     end
 
     it "should validate a page view url" do
@@ -168,7 +168,7 @@ describe "users" do
       f('#manual_user_id').send_keys(@student_1.id)
       expect_new_page_load { f('button[type="submit"]').click }
       wait_for_ajaximations
-      expect_flash_message :error, /You can't merge an account with itself./
+      expect_flash_message :error, "You can't merge an account with itself."
     end
 
     it "should show an error if invalid text is entered in the id box" do
@@ -177,7 +177,7 @@ describe "users" do
       f('#manual_user_id').send_keys("azxcvbytre34567uijmm23456yhj")
       expect_new_page_load { f('button[type="submit"]').click }
       wait_for_ajaximations
-      expect_flash_message :error, /No active user with that ID was found./
+      expect_flash_message :error, "No active user with that ID was found."
     end
 
     it "should show an error if the user id doesnt exist" do
@@ -185,7 +185,7 @@ describe "users" do
       expect_no_flash_message :error
       f('#manual_user_id').send_keys(1234567809)
       expect_new_page_load { f('button[type="submit"]').click }
-      expect_flash_message :error, /No active user with that ID was found./
+      expect_flash_message :error, "No active user with that ID was found."
     end
   end
 
@@ -239,7 +239,7 @@ describe "users" do
 
     it "should register a student with a join code" do
       Account.default.allow_self_enrollment!
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.update_attribute(:self_enrollment, true)
 
       get '/register'

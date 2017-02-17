@@ -1,4 +1,4 @@
-class DropContextMessageParticipants < ActiveRecord::Migration
+class DropContextMessageParticipants < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

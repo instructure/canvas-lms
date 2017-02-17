@@ -40,7 +40,7 @@ define([
           <div className="content-box">
             <div className="grid-row">
               <div className="col-xs-7">
-                <ul className="nav nav-pills">
+                <ul className="nav nav-pills" role="tablist">
                   <li className={activeFilter === 'all' ? 'active' : ''}>
                     <a ref="tabAll" onClick={this.handleFilterClick.bind(this, 'all')} href="#" role="tab" aria-selected="false">{I18n.t('All')}</a>
                   </li>

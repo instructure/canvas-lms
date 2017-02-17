@@ -1,11 +1,9 @@
 define [
   'underscore',
-  'react',
   'jsx/shared/stores/ProgressStore'
-], (_, React, ProgressStore, I18n) ->
-  TestUtils = React.addons.TestUtils
+], (_, ProgressStore, I18n) ->
 
-  module 'ProgressStoreSpec',
+  QUnit.module 'ProgressStoreSpec',
     setup: ->
       @progress_id = 2
       @progress = {

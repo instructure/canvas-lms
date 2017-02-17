@@ -8,7 +8,7 @@ define [
   useMemoryStorage = ->
     EventBuffer.setStorageAdapter(K.EVT_STORAGE_MEMORY)
 
-  module 'Quizzes::LogAuditing::EventBuffer',
+  QUnit.module 'Quizzes::LogAuditing::EventBuffer',
     setup: ->
       useMemoryStorage()
 

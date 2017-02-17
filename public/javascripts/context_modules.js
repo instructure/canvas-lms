@@ -21,11 +21,13 @@ define([
   'compiled/models/ModuleFile',
   'jsx/shared/PublishCloud',
   'react',
+  'react-dom',
   'compiled/models/PublishableModuleItem',
   'compiled/views/PublishIconView',
   'INST' /* INST */,
   'i18n!context_modules',
   'jquery' /* $ */,
+  'context_modules_helper', /* Helper */
   'jsx/shared/conditional_release/CyoeHelper',
   'compiled/views/context_modules/context_modules' /* handles the publish/unpublish state */,
   'compiled/views/modules/RelockModulesDialog',
@@ -49,7 +51,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'compiled/jquery.rails_flash_notifications'
-], function(_, ModuleFile, PublishCloud, React, PublishableModuleItem, PublishIconView, INST, I18n, $, CyoeHelper, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds) {
+], function(_, ModuleFile, PublishCloud, React, ReactDOM, PublishableModuleItem, PublishIconView, INST, I18n, $, Helper, CyoeHelper, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds) {
 
   // TODO: AMD don't export global, use as module
   window.modules = (function() {
@@ -211,6 +213,27 @@ define([
         }, function() {
           if (callback) { callback(); }
         });
+      },
+
+      loadMasterCourseData: function(tag_id) {
+        if (ENV.MASTER_COURSE_SETTINGS) {
+          // Grab the stuff for master courses if needed
+          $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', {tag_id: tag_id}, function(data) {
+            if (data.tag_restrictions) {
+              $.each(data.tag_restrictions, function (id, restriction) {
+                var $item = $("#context_module_item_" + id).not('.master_course_content');
+                $item.addClass('master_course_content');
+                var $admin_links = $item.find('.ig-admin');
+                if (restriction == 'locked') {
+                  $item.addClass('locked_by_master_course');
+                  $admin_links.prepend("<span class='master-course-cell'><i class='icon-lock'/></span>");
+                } else {
+                  $admin_links.prepend("<span class='master-course-cell'><i class='icon-unlock icon-Line'/></span>");
+                }
+              });
+            }
+          });
+        }
       },
 
       itemClass: function(content_tag) {
@@ -518,15 +541,20 @@ define([
         var cyoe = CyoeHelper.getItemData(data.assignment_id, data.is_cyoe_able)
 
         if (cyoe.isReleased) {
-          var $pathIcon = $('<span class="pill mastery-path-icon" data-tooltip><i class="icon-mastery-path" /></span>')
-            .attr('title', I18n.t('Released by Mastery Path'))
+          var fullText = I18n.t('Released by Mastery Path: %{path}', { path: cyoe.releasedLabel })
+          var $pathIcon = $('<span class="pill mastery-path-icon" aria-hidden="true" data-tooltip><i class="icon-mastery-path" /></span>')
+            .attr('title', fullText)
             .append(htmlEscape(cyoe.releasedLabel))
+          var $srPath = $('<span class="screenreader-only">')
+            .append(htmlEscape(fullText))
+          $admin.prepend($srPath)
           $admin.prepend($pathIcon)
         }
 
         if (cyoe.isCyoeAble) {
           var $mpLink = $('<a class="mastery_paths_link" />')
-            .attr('href', './modules/items/' +
+            .attr('href', ENV.CONTEXT_URL_ROOT +
+                          '/modules/items/' +
                           data.id +
                           '/edit_mastery_paths?return_to=' +
                           encodeURIComponent(window.location.pathname))
@@ -704,7 +732,7 @@ define([
         placeholder: 'context_module_placeholder',
         forcePlaceholderSize: true,
         axis: 'y',
-        containment: "#context_modules"
+        containment: '#content'
       }
     };
   })();
@@ -751,7 +779,7 @@ define([
         prereqsList += prereqs[i].name + ', ';
       }
       prereqsList = prereqsList.slice(0, -2)
-      var $prerequisitesMessage = $('<div />', {text: 'Prerequisites: ' + htmlEscape(prereqsList),'class': 'prerequisites_message'});
+      var $prerequisitesMessage = $('<div />', {text: 'Prerequisites: ' + prereqsList, 'class': 'prerequisites_message'});
       $prerequisitesDiv.append($prerequisitesMessage);
 
     }
@@ -1135,6 +1163,10 @@ define([
       $("#edit_item_form").find(".external").showIf($item.hasClass('external_url') || $item.hasClass('context_external_tool'));
       $("#edit_item_form").attr('action', $(this).attr('href'));
       $("#edit_item_form").fillFormData(data, {object_name: 'content_tag'});
+
+      var $title_input = $("#edit_item_form #content_tag_title")
+      $title_input.attr('disabled', $item.hasClass('locked_by_master_course'))
+
       $("#edit_item_form").dialog({
         title: I18n.t('titles.edit_item', "Edit Item Details"),
         open: function(){
@@ -1326,6 +1358,7 @@ define([
               $module.find(".context_module_items.ui-sortable").sortable('enable').sortable('refresh');
               initNewItemPublishButton($item, data.content_tag);
               modules.updateAssignmentData();
+              modules.loadMasterCourseData(data.content_tag.id);
             }), { onComplete: function() {
               $module.find('.add_module_item_link').focus();
             }}
@@ -1496,7 +1529,7 @@ define([
         }
 
         var Cloud = React.createElement(PublishCloud, props);
-        React.render(Cloud, $el[0]);
+        ReactDOM.render(Cloud, $el[0]);
         return {model: file} // Pretending this is a backbone view
       }
 
@@ -1559,6 +1592,10 @@ define([
       var publish = model.publish, unpublish = model.unpublish;
       model.publish = function() {
         return publish.apply(model, arguments).done(function(data) {
+          if (data.publish_warning) {
+            $.flashWarning(I18n.t('Some module items could not be published'))
+          }
+
           relock_modules_dialog.renderIfNeeded(data);
           model
             .fetch({data: {include: 'items'}})
@@ -1655,8 +1692,8 @@ define([
       $('.context_module_item .ig-row').addClass('student-view');
     }
 
-    $('.external_url_link').click(function() {
-      window.location = $(this).attr('data-item-href');
+    $('.external_url_link').click(function(event) {
+      Helper.externalUrlLinkClick(event, $(this))
     });
 
     $(".datetime_field").datetime_field();
@@ -1808,6 +1845,7 @@ define([
     }
     if($("#context_modules").hasClass('editable')) {
       setTimeout(modules.initModuleManagement, 1000);
+      modules.loadMasterCourseData();
     }
 
     // need the assignment data to check past due state

@@ -46,7 +46,7 @@ define [
               else
                 tabKey = { which: $.ui.keyCode.TAB }
 
-              pressTab = jQuery.Event('keydown', tabKey)
+              pressTab = $.Event('keydown', tabKey)
               @$trigger.focus().trigger(pressTab)
 
         popupInstance = @$menu.data('popup')

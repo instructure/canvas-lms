@@ -1,4 +1,4 @@
-class GrandfatherDefaultAccountSelfRegistration < ActiveRecord::Migration
+class GrandfatherDefaultAccountSelfRegistration < ActiveRecord::Migration[4.2]
   # yes, predeploy, so that the setting is preserved before the new code goes live
   tag :predeploy
 

@@ -1,4 +1,4 @@
-// TO-DO: Change CSS animation to ReactTransitionGroup once 
+// TO-DO: Change CSS animation to ReactTransitionGroup once
 // we upgrade to React 0.13
 
 @keyframes color-picker-enter {
@@ -18,7 +18,7 @@
   margin: 0 0 $ic-sp; padding: 0;
   line-height: 1.1;
   @include fontSize($ic-font-size--small);
-  font-weight: 500;
+  font-weight: bold;
 }
 
 .ColorPicker__Container {
@@ -73,7 +73,7 @@
 }
 
 .middle > .ColorPicker__Container {
-  &:after, &:before { top: 50%; } 
+  &:after, &:before { top: 50%; }
 }
 
 .ColorPicker__ColorContainer {
@@ -98,7 +98,7 @@
   text-align: center;
   color: $ic-color-light;
   &:hover { box-shadow: 0 1px 2px rgba(black, 0.25); }
-  &:focus { 
+  &:focus {
     box-shadow: 0 1px 2px rgba(black, 0.25), inset 0 0 0 1px $ic-color-light;
     @if $use_high_contrast == false { outline: none; }
   }
@@ -118,9 +118,9 @@
 
 .ColorPicker__ColorPreview {
   width: $ic-sp*3;
-  i[class*=icon-], i[class^=icon-] { 
+  i[class*=icon-], i[class^=icon-] {
     margin: 0 auto;
-    color: $ic-color-alert; 
+    color: $ic-color-alert;
   }
 }
 
@@ -128,7 +128,7 @@
   text-align: right;
   body.chrome & {
     // fixes weird Chrome bug, where left border of first button gets cut off
-    .Button:first-of-type { margin-left: 1px; } 
+    .Button:first-of-type { margin-left: 1px; }
   }
-  
+
 }

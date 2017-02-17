@@ -23,7 +23,6 @@
   clear: left;
   display: block;
   font-size: 0.8em;
-  color: #888;
   padding-left: 10px;
 }
 
@@ -79,7 +78,7 @@
   flex: 1;
   box-sizing: border-box;
   padding-right: $ic-sp;
-  font-weight: 500;
+  font-weight: bold;
 }
 
 .announcement-details-roles {
@@ -87,7 +86,6 @@
 }
 
 .announcements_list_item {
-  background: $ic-bg-light-neutral;
   margin-bottom: $ic-sp*2;
   padding: $ic-sp*2;
   .edit_notification_form {
@@ -101,6 +99,28 @@
 #self_registration_type_radios {
   margin-left: 1.5em;
 }
+
+.sis-name {
+  margin-left: 50px;
+}
+
+.small-input{
+  width: 45px;
+}
+
+.name-length-wrapper{
+  display: inline;
+}
+
+.require_assignment_due_date_nested_cleanup {
+  margin-bottom: -30px;
+}
+
+.sis_name_length_nested_cleanup {
+  margin-bottom: -60px;
+  display: none;
+}
+
 
 #account_settings,
 .account_settings {
@@ -169,4 +189,8 @@
 
 .hidden_form {
   display: none;
+}
+
+textarea#account_notification_message, .edit_notification_form textarea {
+  width: 500px;
 }
