@@ -20,7 +20,7 @@ module ErrorContext
     end
 
     def example_finished(*)
-      @summary.finish
+      ErrorSummary.finish
     end
 
     def errors_path
@@ -59,7 +59,10 @@ module ErrorContext
       # In the case of loads of specs failing, don't generate error pages
       # beyond a certain point
       MAX_FAILURES_TO_RECORD = 20
-      attr_accessor :num_failures
+      attr_writer :num_failures
+      def num_failures
+        @num_failures ||= 0
+      end
 
       def start(example)
         @summary ||= begin
@@ -73,6 +76,7 @@ module ErrorContext
       def finish
         return unless @summary
         note_recent_spec_run @summary.example
+        @summary.finish
         @summary = nil
       end
 
@@ -82,11 +86,10 @@ module ErrorContext
           exception: example.exception,
           pending: example.pending
         }
-        self.num_failures ||= 0
         self.num_failures += 1 if example.exception
       end
 
-      def discard?
+      def discard_remaining?
         num_failures > MAX_FAILURES_TO_RECORD
       end
 
@@ -106,7 +109,7 @@ module ErrorContext
     end
 
     def discard?
-      ErrorSummary.discard?
+      !example.exception || ErrorSummary.discard_remaining?
     end
 
     def selenium?
@@ -116,23 +119,36 @@ module ErrorContext
 
     def start
       Rails.logger.capture_messages!
-      start_capturing_video if capture_video?
+      start_capturing_video! if capture_video? && !ErrorSummary.discard_remaining?
     end
 
     def finish
-      ErrorSummary.finish
-      discard_video if capture_video? && discard?
+      if discard?
+        discard_video! if capturing_video?
+      else
+        save_screenshot! if capture_screenshot?
+        save_video! if capturing_video?
+      end
     end
 
-    def video_unused?
-      @screen_capture_name.nil?
+    def capturing_video?
+      @capturing_video
     end
 
-    def start_capturing_video
+    def start_capturing_video!
+      @capturing_video = true
       SeleniumDriverSetup.headless.video.start_capture
     end
 
-    def discard_video
+    def save_screenshot!
+      SeleniumDriverSetup.driver.save_screenshot(File.join(errors_path, screenshot_name))
+    end
+
+    def save_video!
+      SeleniumDriverSetup.headless.video.stop_and_save(File.join(errors_path, screen_capture_name))
+    end
+
+    def discard_video!
       SeleniumDriverSetup.headless.video.stop_and_discard
     end
 
@@ -140,7 +156,7 @@ module ErrorContext
       Rails.logger.captured_messages
     end
 
-    def capture_screenshots?
+    def capture_screenshot?
       selenium?
     end
 
@@ -178,25 +194,11 @@ module ErrorContext
     end
 
     def screenshot_name
-      return unless capture_screenshots?
-      return if discard?
-
-      @screenshot_name ||= begin
-        screenshot_name = "screenshot.png"
-        SeleniumDriverSetup.driver.save_screenshot(File.join(errors_path, screenshot_name))
-        screenshot_name
-      end
+      "screenshot.png" if capture_screenshot? && !discard?
     end
 
     def screen_capture_name
-      return unless capture_video?
-      return if discard?
-
-      @screen_capture_name ||= begin
-        screen_capture_name = "capture.mp4"
-        SeleniumDriverSetup.headless.video.stop_and_save(File.join(errors_path, screen_capture_name))
-        screen_capture_name
-      end
+      "capture.mp4" if capture_video? && !discard?
     end
   end
 end

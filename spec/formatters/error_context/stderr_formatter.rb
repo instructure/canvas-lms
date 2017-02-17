@@ -17,10 +17,8 @@ module ErrorContext
         output << "  JS Error: #{error['errorMessage']} (#{error['sourceName']}:#{error['lineNumber']})"
       end
 
-      if summary.example.exception && !summary.discard?
-        output << "  Screenshot: #{File.join(errors_path, summary.screenshot_name)}" if summary.capture_screenshots?
-        output << "  Screen capture: #{File.join(errors_path, summary.screen_capture_name)}" if summary.capture_video?
-      end
+      output << "  Screenshot: #{File.join(errors_path, summary.screenshot_name)}" if summary.screenshot_name
+      output << "  Screen capture: #{File.join(errors_path, summary.screen_capture_name)}" if summary.screen_capture_name
 
       if output.any?
         output.unshift summary.example.location_rerun_argument
