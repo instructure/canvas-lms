@@ -10,6 +10,7 @@ define([
 ], (I18n, React, {default: TextInput}, {default: Select}, {default: ScreenReaderContent}, {default: Grid, GridCol, GridRow},
   {default: ApplyTheme}, propTypes) => {
   const { func } = React.PropTypes
+  const MIN_SEACH = 3 // min search term length for API
 
   return class CourseFilter extends React.Component {
     static propTypes = {
@@ -22,23 +23,37 @@ define([
       onChange: () => {},
     }
 
-    constructor () {
-      super()
+    constructor (props) {
+      super(props)
       this.state = {
-        course: '',
-        term: '0',
-        subAccount: '0',
+        search: '',
+        term: '',
+        subAccount: '',
       }
     }
 
+    getSearchText () {
+      const searchText = this.searchInput.value.trim().toLowerCase()
+      return searchText.length >= MIN_SEACH ? searchText : ''
+    }
+
+    hasChanged () {
+      const { search, term, subAccount } = this.state
+      return search !== this.getSearchText()
+          || term !== this.termInput.value
+          || subAccount !== this.subAccountInput.value
+    }
+
     onChange = () => {
-      this.setState({
-        course: this.courseInput.value,
-        term: this.termInput.value,
-        subAccount: this.subAccountInput.value,
-      }, () => {
-        this.props.onChange(this.state)
-      })
+      if (this.hasChanged()) {
+        this.setState({
+          search: this.getSearchText(),
+          term: this.termInput.value,
+          subAccount: this.subAccountInput.value,
+        }, () => {
+          this.props.onChange(this.state)
+        })
+      }
     }
 
     render () {
@@ -46,9 +61,9 @@ define([
         <div className="bps-course-filter">
           <Grid colSpacing="none">
             <GridRow>
-              <GridCol width={8}>
+              <GridCol width={7}>
                 <TextInput
-                  ref={(c) => { this.courseInput = c }}
+                  ref={(c) => { this.searchInput = c }}
                   type="search"
                   onChange={this.onChange}
                   placeholder={I18n.t('Search by title, short name, or SIS ID')}
@@ -66,13 +81,13 @@ define([
                     <ScreenReaderContent>{I18n.t('Select Term')}</ScreenReaderContent>
                   }
                 >
-                  <option key="0" value="0">{I18n.t('Term')}</option>
+                  <option key="all" value="">{I18n.t('Any Term')}</option>
                   {this.props.terms.map(term => (
                     <option key={term.id} value={term.id}>{term.name}</option>
                   ))}
                 </Select>
               </GridCol>
-              <GridCol width={2}>
+              <GridCol width={3}>
                 <Select
                   selectRef={(c) => { this.subAccountInput = c }}
                   key="subAccounts"
@@ -81,7 +96,7 @@ define([
                     <ScreenReaderContent>{I18n.t('Select Subaccount')}</ScreenReaderContent>
                   }
                 >
-                  <option key="0" value="0">{I18n.t('Subaccount')}</option>
+                  <option key="all" value="">{I18n.t('Any Subaccount')}</option>
                   {this.props.subAccounts.map(account => (
                     <option key={account.id} value={account.id}>{account.name}</option>
                   ))}

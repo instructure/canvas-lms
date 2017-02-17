@@ -4,18 +4,13 @@ define([
   'react-addons-test-utils',
   'enzyme',
   'jsx/course_blueprint_settings/components/CourseFilter',
-], (React, ReactDOM, TestUtils, enzyme, CourseFilter) => {
+  '../sampleData',
+], (React, ReactDOM, TestUtils, enzyme, CourseFilter, data) => {
   QUnit.module('CourseFilter component')
 
   const defaultProps = () => ({
-    terms: [
-      { id: '1', name: 'Term One' },
-      { id: '2', name: 'Term Two' },
-    ],
-    subAccounts: [
-      { id: '1', name: 'Account One' },
-      { id: '2', name: 'Account Two' },
-    ],
+    subAccounts: data.subAccounts,
+    terms: data.terms,
   })
 
   test('renders the CourseFilter component', () => {
@@ -24,11 +19,11 @@ define([
     ok(node.exists())
   })
 
-  test('onChange fires with course filter when text is entered in course search box', (assert) => {
+  test('onChange fires with search filter when text is entered in search box', (assert) => {
     const done = assert.async()
     const props = defaultProps()
     props.onChange = (filter) => {
-      equal(filter.course, 'giraffe')
+      equal(filter.search, 'giraffe')
       done()
     }
     const tree = enzyme.mount(<CourseFilter {...props} />)

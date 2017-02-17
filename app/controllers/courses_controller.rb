@@ -1117,14 +1117,17 @@ class CoursesController < ApplicationController
     get_context
     if master_courses? && authorized_action(@context.account, @current_user, :manage_master_courses)
       js_env({
+        accountId: @context.account.id,
         course: @context.slice(:id, :name),
-        sub_accounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {:id => id, :name => name}},
-        terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {:id => id, :name => name}}
+        subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
+        terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}}
       })
 
       css_bundle :course_blueprint_settings
       js_bundle :course_blueprint_settings
-      render :text => '', :layout => true
+
+      @page_title = join_title(t('Blueprint Settings'), @context.name)
+      render text: '', layout: true
     else
      render status: 404, template: 'shared/errors/404_message'
     end

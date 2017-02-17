@@ -3,19 +3,17 @@ define([
   'react-dom',
   'enzyme',
   'jsx/course_blueprint_settings/components/BlueprintSettings',
-], (React, ReactDOM, enzyme, BlueprintSettings) => {
+  '../sampleData',
+], (React, ReactDOM, enzyme, BlueprintSettings, data) => {
   QUnit.module('BlueprintSettings component')
 
   const defaultProps = () => ({
-    course: { id: '1', name: 'Course One' },
-    terms: [
-      { id: '1', name: 'Term One' },
-      { id: '2', name: 'Term Two' },
-    ],
-    subAccounts: [
-      { id: '1', name: 'Account One' },
-      { id: '2', name: 'Account Two' },
-    ],
+    courses: [],
+    errors: [],
+    loadCourses: () => {},
+    isLoadingCourses: false,
+    subAccounts: data.subAccounts,
+    terms: data.terms,
   })
 
   test('renders the BlueprintSettings component', () => {

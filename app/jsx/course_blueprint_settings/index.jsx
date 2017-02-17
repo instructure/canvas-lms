@@ -11,17 +11,24 @@ define([
     constructor (ENV, root) {
       this.root = root
       this.store = createStore({
+        accountId: ENV.accountId,
         course: ENV.course,
         terms: ENV.terms,
-        subAccounts: ENV.sub_accounts,
+        subAccounts: ENV.subAccounts,
       })
       const boundActions = bindActionCreators(actions, this.store.dispatch)
 
-      this.ConnectedApp = connect(({
-        course, terms, subAccounts
-      }) => ({
-        course, terms, subAccounts
-      }))(BlueprintSettings)
+      this.ConnectedApp = connect((state) => {
+        const props = [
+          'courses',
+          'terms',
+          'subAccounts',
+          'errors',
+          'isLoadingCourses',
+        ].reduce((propSet, prop) => Object.assign(propSet, { [prop]: state[prop] }), {})
+        props.loadCourses = boundActions.loadCourses
+        return props
+      })(BlueprintSettings)
     }
 
     unmount () {

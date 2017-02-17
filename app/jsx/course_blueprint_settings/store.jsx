@@ -1,12 +1,15 @@
 define([
   'redux',
   'redux-thunk',
+  'redux-logger',
   './reducer',
-], (Redux, {default: ReduxThunk}, rootReducer) => {
+], (Redux, {default: ReduxThunk}, ReduxLogger, rootReducer) => {
   const { createStore, applyMiddleware } = Redux
+  const logger = ReduxLogger()
 
   const createStoreWithMiddleware = applyMiddleware(
-    ReduxThunk
+    ReduxThunk,
+    logger
   )(createStore)
 
   return function configStore (initialState) {
