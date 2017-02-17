@@ -97,6 +97,29 @@ describe AssignmentOverride do
     expect(@override2.set).to eq [@student]
   end
 
+  context '#mastery_paths?' do
+    let(:override) do
+      described_class.new({
+        set_type: AssignmentOverride::SET_TYPE_NOOP,
+        set_id: AssignmentOverride::NOOP_MASTERY_PATHS
+      })
+    end
+
+    it "returns true when it is a mastery_paths override" do
+      expect(override.mastery_paths?).to eq true
+    end
+
+    it "returns false when it is not a mastery_paths noop" do
+      override.set_id = 999
+      expect(override.mastery_paths?).to eq false
+    end
+
+    it "returns false when it is not a noop override" do
+      override.set_type = 'EvilType'
+      expect(override.mastery_paths?).to eq false
+    end
+  end
+
   describe 'versioning' do
     before :once do
       @override = assignment_override_model

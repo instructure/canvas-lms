@@ -20,6 +20,10 @@ class AssignmentOverride < ActiveRecord::Base
   include Workflow
   include TextHelper
 
+  NOOP_MASTERY_PATHS = 1
+
+  SET_TYPE_NOOP = 'Noop'.freeze
+
   simply_versioned :keep => 10
 
   attr_accessor :dont_touch_assignment, :preloaded_student_ids, :changed_student_ids
@@ -30,7 +34,7 @@ class AssignmentOverride < ActiveRecord::Base
   has_many :assignment_override_students, :dependent => :destroy, :validate => false
   validates_presence_of :assignment_version, :if => :assignment
   validates_presence_of :title, :workflow_state
-  validates :set_type, inclusion: %w(CourseSection Group ADHOC Noop)
+  validates :set_type, inclusion: ['CourseSection', 'Group', 'ADHOC', SET_TYPE_NOOP]
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
 
   concrete_set = lambda{ |override| ['CourseSection', 'Group'].include?(override.set_type) }
@@ -81,7 +85,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def set_not_empty?
     overridable = assignment? ? assignment : quiz
-    ['CourseSection', 'Group', 'Noop'].include?(self.set_type) ||
+    ['CourseSection', 'Group', SET_TYPE_NOOP].include?(self.set_type) ||
     (set.any? && overridable.context.current_enrollments.where(user_id: set).exists?)
   end
 
@@ -175,6 +179,10 @@ class AssignmentOverride < ActiveRecord::Base
   end
   protected :default_values
 
+  def mastery_paths?
+    set_type == SET_TYPE_NOOP && set_id == NOOP_MASTERY_PATHS
+  end
+
   # override set read accessor and set_id read/write accessors so that reading
   # set/set_id or setting set_id while set_type=ADHOC doesn't try and find the
   # ADHOC model
@@ -185,7 +193,7 @@ class AssignmentOverride < ActiveRecord::Base
   def set
     if self.set_type == 'ADHOC'
       assignment_override_students.preload(:user).map(&:user)
-    elsif self.set_type == 'Noop'
+    elsif self.set_type == SET_TYPE_NOOP
       nil
     else
       super
@@ -193,7 +201,7 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set_id=(id)
-    if %w(ADHOC Noop).include? self.set_type
+    if ['ADHOC', SET_TYPE_NOOP].include? self.set_type
       write_attribute(:set_id, id)
     else
       super

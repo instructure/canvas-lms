@@ -59,4 +59,13 @@ module Factories
     end
     @override
   end
+
+  def create_mastery_paths_override_for_assignment(assignment_or_quiz, opts={})
+    mastery_paths_opts = {
+      assignment: assignment_or_quiz,
+      set_type: AssignmentOverride::SET_TYPE_NOOP,
+      set_id: AssignmentOverride::NOOP_MASTERY_PATHS
+    }
+    assignment_override_model(opts.merge(mastery_paths_opts))
+  end
 end
