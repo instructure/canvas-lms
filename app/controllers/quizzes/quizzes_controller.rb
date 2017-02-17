@@ -381,13 +381,12 @@ class Quizzes::QuizzesController < ApplicationController
         @quiz.update_attributes!(quiz_params)
         batch_update_assignment_overrides(@quiz, overrides, @current_user) unless overrides.nil?
       end
-      if Assignment.sis_grade_export_enabled?(@context) && @quiz.assignment
-        post_to_sis = nil
-        post_to_sis = params[:assignment][:post_to_sis] if params[:assignment].present?
-        post_to_sis = @context.account.sis_default_grade_export[:value] if post_to_sis.nil?
-        @quiz.assignment.post_to_sis = post_to_sis
-        @quiz.assignment.save
+
+      if params[:post_to_sis]
+        @quiz.assignment.post_to_sis = params[:post_to_sis] == '1' ? true : false
       end
+
+
       @quiz.did_edit if @quiz.created?
       @quiz.reload
       render :json => @quiz.as_json(:include => {:assignment => {:include => :assignment_group}})
@@ -444,9 +443,7 @@ class Quizzes::QuizzesController < ApplicationController
             old_assignment = @quiz.assignment.clone
             old_assignment.id = @quiz.assignment.id
 
-            if params[:assignment] && Assignment.sis_grade_export_enabled?(@context)
-              @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
-            end
+            @quiz.assignment.post_to_sis = params[:post_to_sis] == '1' ? true : false
           end
 
           auto_publish = @quiz.published?
