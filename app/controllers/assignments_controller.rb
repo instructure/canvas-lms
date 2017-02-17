@@ -40,6 +40,7 @@ class AssignmentsController < ApplicationController
       log_asset_access([ "assignments", @context ], 'assignments', 'other')
 
       add_crumb(t('#crumbs.assignments', "Assignments"), named_context_url(@context, :context_assignments_url))
+      sis_name = @context.respond_to?(:assignments) ? AssignmentUtil.post_to_sis_friendly_name(@context.assignments.first) : 'SIS'
 
       # It'd be nice to do this as an after_create, but it's not that simple
       # because of course import/copy.
@@ -47,7 +48,8 @@ class AssignmentsController < ApplicationController
       set_js_assignment_data # in application_controller.rb, because the assignments page can be shared with the course home
 
       js_env(WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
-             POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value])
+             POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
+             SIS_NAME: sis_name)
 
       respond_to do |format|
         format.html do

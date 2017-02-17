@@ -401,6 +401,11 @@ table.full_assignment_table {
 .ui-widget.ui-tooltip {
   max-width: 240px;
 }
+
+input[type="checkbox"].post_to_sis_checkbox {
+  margin-left: 20px;
+}
+
 .dl-horizontal.vdd_tooltip_content {
   margin: 7px 0;
   dt {
