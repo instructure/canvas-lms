@@ -148,6 +148,8 @@ module Importers
         self.import_syllabus_from_migration(course, syllabus_body, migration) if syllabus_body
       end
 
+      course.save! if course.changed?
+
       migration.resolve_content_links!
       migration.update_import_progress(95)
 
