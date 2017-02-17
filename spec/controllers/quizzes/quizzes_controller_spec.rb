@@ -1249,14 +1249,14 @@ describe Quizzes::QuizzesController do
       it "should set post_to_sis quizzes" do
         user_session(@teacher)
         course_quiz
-        post 'update', :course_id => @course.id, :id => @quiz.id, :quiz => {:title => "some quiz"}, :assignment => {post_to_sis: true}
+        post 'update', :course_id => @course.id, :id => @quiz.id, :quiz => {:title => "some quiz"}, :post_to_sis => '1'
         expect(assigns[:quiz].assignment.post_to_sis).to eq true
       end
 
       it "doesn't blow up for surveys" do
         user_session(@teacher)
         survey = @course.quizzes.create! quiz_type: "survey", title: "survey"
-        post 'update', :course_id => @course.id, :id => survey.id, :quiz => {:title => "changed"}, :assignment => {post_to_sis: true}
+        post 'update', :course_id => @course.id, :id => survey.id, :quiz => {:title => "changed"}, :post_to_sis => '1'
         expect(assigns[:quiz].title).to eq "changed"
       end
     end
