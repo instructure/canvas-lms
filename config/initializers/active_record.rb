@@ -923,7 +923,7 @@ module UpdateAndDeleteWithJoins
     stmt = CANVAS_RAILS4_2 ? Arel::UpdateManager.new(arel.engine) : Arel::UpdateManager.new
 
     stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
-    from = (CANVAS_RAILS4_2 ? from_value : from_clause).try(:first)
+    from = (CANVAS_RAILS4_2 ? from_value&.first : from_clause.value)
     stmt.table(from ? Arel::Nodes::SqlLiteral.new(from) : table)
     stmt.key = table[primary_key]
 

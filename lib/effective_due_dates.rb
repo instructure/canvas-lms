@@ -32,7 +32,7 @@ class EffectiveDueDates
         attributes[:grading_period_id] = row["grading_period_id"] && row["grading_period_id"].to_i
       end
       if include?(included, :in_closed_grading_period)
-        attributes[:in_closed_grading_period] = row["closed"] == "t"
+        attributes[:in_closed_grading_period] = (CANVAS_RAILS4_2 ? (row["closed"] == "t") : row["closed"])
       end
       if include?(included, :override_id)
         attributes[:override_id] = row["override_id"] && row["override_id"].to_i
