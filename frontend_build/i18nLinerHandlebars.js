@@ -11,6 +11,12 @@ const {allFingerprintsFor} = require('brandable_css/lib/main')
 const PreProcessor = require('./../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor')
 require('./../gems/canvas_i18nliner/js/scoped_hbs_pre_processor')
 
+// In this main file, we do a bunch of stuff to monkey-patch the default behavior of
+// i18nliner's HbsProcessor (specifically, we set the the `directories` and define a
+// `normalizePath` function so that translation keys stay relative to canvas root dir).
+// By requiring it here the code here will use that monkeypatched behavior.
+require('../gems/canvas_i18nliner/js/main')
+
 const compileHandlebars = (data) => {
   const path = data.path
   const source = data.source

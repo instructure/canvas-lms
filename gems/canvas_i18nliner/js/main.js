@@ -22,7 +22,7 @@ var ScopedTranslationHash = require("./scoped_translation_hash");
 
 // remove path stuff we don't want in the scope
 var pathRegex = new RegExp(
-  "^(" + HbsProcessor.prototype.directories.join("|") + ")(/plugins/[^/]+)?/"
+  ".*(" + HbsProcessor.prototype.directories.join("|") + ")(/plugins/[^/]+)?/"
 );
 ScopedHbsExtractor.prototype.normalizePath = function(path) {
   return path.replace(pathRegex, "").replace(/^([^\/]+\/)templates\//, '$1');
