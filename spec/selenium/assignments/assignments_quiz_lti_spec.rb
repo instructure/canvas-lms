@@ -18,7 +18,9 @@ describe "quiz LTI assignments" do
   end
 
   it "creates an LTI assignment", priority: "2" do
-    get "/courses/#{@course.id}/assignments/new?quiz_lti"
+    get "/courses/#{@course.id}/assignments"
+    f('.new_quiz_lti').click
+
     f('#assignment_name').send_keys('LTI quiz')
     submit_assignment_form
 

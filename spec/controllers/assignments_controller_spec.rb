@@ -70,6 +70,25 @@ describe AssignmentsController do
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
 
+    it "should set QUIZ_LTI_ENABLED in js_env if quizzes 2 is available" do
+      user_session @teacher
+      @course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+      get 'index', course_id: @course.id
+      expect(assigns[:js_env][:QUIZ_LTI_ENABLED]).to be true
+    end
+
+    it "should not set QUIZ_LTI_ENABLED in js_env if quizzes 2 is not available" do
+      user_session @teacher
+      get 'index', course_id: @course.id
+      expect(assigns[:js_env][:QUIZ_LTI_ENABLED]).to be false
+    end
+
     context "draft state" do
       it "should create a default group if none exist" do
         user_session(@student)

@@ -206,9 +206,8 @@ define [
             if setting_from_cache && (!@assignment.get(setting)? || @assignment.get(setting)?.length == 0)
               @assignment.set(setting, setting_from_cache)
           )
-        else
-          @assignment.set('submission_type','online')
-          @assignment.set('submission_types',['online'])
+        if @assignment.submissionTypes().length == 0
+          @assignment.submissionTypes(['online'])
 
     cacheAssignmentSettings: =>
       new_assignment_settings = _.pick(@getFormData(), @settingsToCache()...)

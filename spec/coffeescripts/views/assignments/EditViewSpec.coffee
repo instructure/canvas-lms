@@ -434,7 +434,6 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
-      @stub(userSettings, 'contextGet').returns {submission_types: "foo", peer_reviews: "1", assignment_group_id: 99}
       @server = sinon.fakeServer.create()
 
     teardown: ->
@@ -446,30 +445,47 @@ define [
       editView.apply(this, arguments)
 
   test 'returns values from localstorage', ->
+    @stub(userSettings, 'contextGet').returns {submission_types: ['foo']}
     view = @editView()
     view.setDefaultsIfNew()
 
-    equal view.assignment.get('submission_types'), "foo"
+    deepEqual view.assignment.get('submission_types'), ['foo']
 
   test 'returns string booleans as integers', ->
+    @stub(userSettings, 'contextGet').returns {peer_reviews: '1'}
     view = @editView()
     view.setDefaultsIfNew()
 
     equal view.assignment.get('peer_reviews'), 1
 
   test 'doesnt overwrite existing assignment settings', ->
+    @stub(userSettings, 'contextGet').returns {assignment_group_id: 99}
     view = @editView()
     view.assignment.set('assignment_group_id', 22)
     view.setDefaultsIfNew()
 
     equal view.assignment.get('assignment_group_id'), 22
 
+  test 'sets assignment submission type to online if not already set', ->
+    view = @editView()
+    view.setDefaultsIfNew()
+
+    deepEqual view.assignment.get('submission_types'), ['online']
+
+  test 'doesnt overwrite assignment submission type', ->
+    view = @editView()
+    view.assignment.set('submission_types', ['external_tool'])
+    view.setDefaultsIfNew()
+
+    deepEqual view.assignment.get('submission_types'), ['external_tool']
+
   test 'will overwrite empty arrays', ->
+    @stub(userSettings, 'contextGet').returns {submission_types: ['foo']}
     view = @editView()
     view.assignment.set('submission_types', [])
     view.setDefaultsIfNew()
 
-    equal view.assignment.get('submission_types'), "foo"
+    deepEqual view.assignment.get('submission_types'), ['foo']
 
   QUnit.module 'EditView: setDefaultsIfNew: no localStorage',
     setup: ->
@@ -490,7 +506,7 @@ define [
     view = @editView()
     view.setDefaultsIfNew()
 
-    equal view.assignment.get('submission_type'), "online"
+    deepEqual view.assignment.get('submission_types'), ['online']
 
   QUnit.module 'EditView: cacheAssignmentSettings',
     setup: ->

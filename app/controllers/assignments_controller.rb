@@ -49,7 +49,8 @@ class AssignmentsController < ApplicationController
 
       js_env(WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
              POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
-             SIS_NAME: sis_name)
+             SIS_NAME: sis_name,
+             QUIZ_LTI_ENABLED: @context.quiz_lti_tool.present?)
 
       respond_to do |format|
         format.html do
