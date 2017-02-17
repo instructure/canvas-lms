@@ -4,40 +4,47 @@ define([
   'instructure-ui/Button',
   'instructure-icons/react/Line/IconArrowOpenLeftLine',
   'instructure-icons/react/Line/IconArrowOpenRightLine',
-], (React, I18n, { default: Button }, { default: IconArrowOpenLeftLine }, { default: IconArrowOpenRightLine }) => {
+  'jsx/shared/proptypes/plainStoreShape'
+], (React, I18n, { default: Button }, { default: IconArrowOpenLeftLine }, { default: IconArrowOpenRightLine }, plainStoreShape) => {
   class NewUserTutorialToggleButton extends React.Component {
 
     static propTypes = {
-      initiallyCollapsed: React.PropTypes.bool,
-      onClick: React.PropTypes.func
-    }
-
-    static defaultProps = {
-      initiallyCollapsed: false,
-      onClick () {}
+      store: React.PropTypes.shape(plainStoreShape).isRequired
     }
 
     constructor (props) {
       super(props);
-      this.state = {
-        isCollapsed: props.initiallyCollapsed
-      }
+      this.state = props.store.getState();
+    }
+
+    componentDidMount () {
+      this.props.store.addChangeListener(this.handleStoreChange)
+    }
+
+    componentWillUnmount () {
+      this.props.store.removeChangeListener(this.handleStoreChange)
+    }
+
+    focus () {
+      this.button.focus();
+    }
+
+    handleStoreChange = () => {
+      this.setState(this.props.store.getState());
     }
 
     handleButtonClick = (event) => {
       event.preventDefault();
-      this.setState({
+
+      this.props.store.setState({
         isCollapsed: !this.state.isCollapsed
-      }, () => {
-        if (this.props.onClick) {
-          this.props.onClick()
-        }
-      })
+      });
     }
 
     render () {
       return (
         <Button
+          ref={(c) => { this.button = c; }}
           variant="icon"
           id="new_user_tutorial_toggle"
           onClick={this.handleButtonClick}
