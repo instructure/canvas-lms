@@ -19,7 +19,9 @@ define([], () => {
     const XscrollPosition = window.scrollX;
 
     // Thrash the DOM for the node we've been given.
-    node.style = node.style || {};
+    if (!node.style) {
+      node.setAttribute('style', ' ');
+    }
     const oldDisplay = node.style.display || '';
     node.style.display = 'none';
     // We just access this property to force recalculation of data and a redraw
