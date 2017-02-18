@@ -4719,30 +4719,30 @@ nn:
         after: Etter
         before: Før
         or: ELLER
-      nav_items_keyboard_drag_and_drop: "Åtvaring: Dersom du vil ha betre tilgang til å omorganisere kursnavigasjonselement, må du velje alternativet Flytt til dialog, i menyen."
+      nav_items_keyboard_drag_and_drop: "Åtvaring: Dersom du vil ha betre tilgang til å omorganisere emnenavigasjonselement, må du velje alternativet Flytt til dialog, i menyen."
       no_language_preference: "Ikkje oppgitt (brukarkonfigurert, standard til %{language})"
       none: Ingen
-      page_title: Kursdetaljar
+      page_title: Emnedetaljar
       section_sis_id: "SIS-ID: %{section_sis}"
       self_enrollment: "La studentane melde seg på kurset sjølve gjennom å dele ei hemmeleg URL-adresse eller kode med dei"
       self_enrollment_without_code: "La studentane melde seg på sjølve gjennom å dele ei hemmeleg URL-adresse med dei"
       set_grading_scheme: "oppgi karakteroppsett"
       sis_source_id: SIS-ID
       tab_cant_disable: "Du kan ikkje deaktivere, berre skjule, denne sida"
-      tab_disabled: "Sida er deaktivert og omdirigerer til kurset si startside"
+      tab_disabled: "Sida er deaktivert og omdirigerer til emnet si startside"
       tab_hidden_if_disabled: "Sida er deaktivert og vert ikkje vist i navigasjon"
       tabs: 
         alerts: Varsel
-        details: Kursdetaljar
+        details: Emnedetaljar
         feature_options: Funksjonsval
         grade_publishing: "Publisering av karakterar"
         navigation: Navigasjon
         sections: Klasser
         tools: Appar
       titles: 
-        edit_navigation: "Rediger kursnavigasjon"
+        edit_navigation: "Rediger emnenavigasjon"
       tooltips: 
-        cannot_unpublish_course: "Du kan ikkje avslutte publisering av dette kurset dersom det har karaktersette studentinnleveringar"
+        cannot_unpublish_course: "Du kan ikkje avslutte publisering av dette emnet dersom det har karaktersette studentinnleveringar"
       transifex_message: "Bli med i [Canvas Translation Community](%{transifex_url})"
       turnitin: "desse kommentarane vert viste til studentar når dei leverer inn ei Turnitin-aktivert oppgåve"
       view_grading_scheme: "vis oppsett for karaktersetjing"
@@ -4750,28 +4750,28 @@ nn:
       wiki_editing_roles_change_existing: "Kan endre sider redigerbare frå \"%{current_setting}\" til \"%{new_setting}\"."
     settings_sidebar: 
       buttons: 
-        reset: "Tilbakestill kursinnhald"
-        unconclude: "Angre avslutting av kurs"
+        reset: "Tilbakestill emneinnhald"
+        unconclude: "Angre avslutting av emne"
       headings: 
         current_users: "Gjeldande brukarar"
       help: 
-        reset_course_content: "Nullstilling av kursinnhald slettar alle tilknytte oppgåver, diskusjonar, prøver, modular, vurderingskriterium, sider, filer, læringsmål, spørsmålsbankar, samarbeid, konferansar og anna innhald for godt. Handlinga er endeleg og dataa *kan ikkje* be gjenopprettast. Er du sikker på at du vil halde fram?"
+        reset_course_content: "Nullstilling av emneinnhald slettar alle tilknytte oppgåver, diskusjonar, prøver, modular, vurderingskriterium, sider, filer, læringsmål, spørsmålsbankar, samarbeid, konferansar og anna innhald for godt. Handlinga er endeleg og dataa *kan ikkje* gjenopprettast. Er du sikker på at du vil halde fram?"
       links: 
-        calendar: Kurskalender
-        conclude: "Avslutt kurset"
-        copy: "Kopier kurset"
-        delete: "Slett kurset for godt"
-        export_content: "Eksporter kursinnhaldet"
-        import: "Importer innhaldet til dette kurset"
-        reset: "Tilbakestill kursinnhald"
-        stats: Kursstatistikk
+        calendar: Emnekalender
+        conclude: "Avslutt emnet"
+        copy: "Kopier emnet"
+        delete: "Slett emnet for godt"
+        export_content: "Eksporter emneinnhaldet"
+        import: "Importer innhaldet til dette emnet"
+        reset: "Tilbakestill emneinnhald"
+        stats: Emnestatistikk
         student_view: Studentvising
       role: 
         inactive: inaktiv
     show: 
       change_home_page: Endre
       details: 
-        confirm_unenroll: "Er du sikker på at du vil melde deg av dette kurset? Du vil ikkje lenger kunne sjå kurslista eller kommunisere direkte med faglærarar, og heller ikkje sjå kurshendingar i straumen eller som meldingar."
+        confirm_unenroll: "Er du sikker på at du vil melde deg av dette emnet? Du vil ikkje lenger kunne sjå emnelista eller kommunisere direkte med faglærarar, og heller ikkje sjå emnehendingar i straumen eller som meldingar."
       draft_state: 
         buttons: 
           cancel: Avbryt
@@ -4782,31 +4782,31 @@ nn:
           select_content: "Vel kva du vil vise på startsida."
         options: 
           assignments: Oppgåveliste
-          course_activity_stream: "Kurset sin aktivitetsstraum"
+          course_activity_stream: "Emnet sin aktivitetsstraum"
           custom_page: "Undersider på startsida"
-          modules: Kursmodular
+          modules: Emnemodular
           syllabus: Kursoversikt
       empty_body: "Utan innhald"
       front_page_not_set: "Startsida må fastsettast først"
       headers: 
-        course_status: Kursstatus
+        course_status: Emnestatus
       headings: 
         choose_home_page_title: "Vel startside"
         confirm_unenroll: "Stadfest utmelding"
-        unpublished: "Kurset er ikkje publisert"
-      license_notice: "Kursinnhaldet er eit tilbod gjennom ein %{license_type}-lisens. Innhaldet i kurset er underlagt denne lisensen om ikkje anna er notert."
+        unpublished: "Emnet er ikkje publisert"
+      license_notice: "Emneinnhaldet er eit tilbod gjennom ein %{license_type}-lisens. Innhaldet i emnet er underlagt denne lisensen om ikkje anna er notert."
       links: 
         choose_home_page: "Vel startside"
-        course_setup: "Sjekkliste for kursoppsett"
-        drop_course: "Vel bort dette kurset"
-        join_course: "Ta del i dette kurset"
+        course_setup: "Sjekkliste for emneoppsett"
+        drop_course: "Vel bort dette emnet"
+        join_course: "Ta del i dette emnet"
         new_announcement: "Ny kunngjering"
-        view_course_stream: "Vis kursaktivitet"
+        view_course_stream: "Vis emneaktivitet"
       re_sending: "Sender på nytt ...\""
       send_done: "Fullført. Det kan ta litt tid før meldinga er send."
       send_failed: "Førespurnad mislukkast Prøv på nytt seinare."
       titles: 
-        drop_course: "Vel bort dette kurset"
+        drop_course: "Vel bort dette emnet"
         recent_feedback: "Siste tilbakemelding"
     sidebar_weighting: 
       default_name: Gruppe
@@ -4817,7 +4817,7 @@ nn:
       labels: 
         assignments_weighting: "Oppgåver er vekta etter gruppe"
       no_groups: "Ingen grupper er etablerte"
-      not_weighted: "Kursoppgåver er ikkje vekta."
+      not_weighted: "Emneoppgåver er ikkje vekta."
     statistics: 
       active_students: "Aktive studentar"
       all_rubrics: "Alle vurderingsskjema"
@@ -4847,7 +4847,7 @@ nn:
       new_discussions: "Nye diskusjonar"
       number_of_assignments: "# Oppgåver"
       number_of_submissions: "# Innleveringar"
-      page_title: Kursstatistikk
+      page_title: Emnestatistikk
       quiz: Prøve
       quiz_questions: Prøvespørsmål
       quiz_submissions: Prøveinnleveringar
@@ -4876,8 +4876,8 @@ nn:
       links: 
         show_more: "%{count} fleire"
     unauthorized: 
-      invalid_link: "Påmeldingslenka du brukte er ikkje lenger gyldig.  Kontakt faglærar for kurset og kontroller at du framleis er registrert."
-  courses_43204aae: Kurs
+      invalid_link: "Påmeldingslenka du brukte er ikkje lenger gyldig. Kontakt faglærar for emnet og kontroller at du framleis er registrert."
+  courses_43204aae: Emne
   create_132b3be1: Opprett
   create_a_new_account_4cf7c0f9: "Opprett ny konto"
   create_account_263ec6: "Opprett konto"
@@ -4891,7 +4891,7 @@ nn:
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Oppretta av SIS"
   created_group_group_name_2097306b: "Oppretta gruppa %{group_name}"
-  creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Dersom du opprettar innleveringseksport kan du laste ned ei ZIP-fil med alle innleveringane dine i noverande og tidlegare kurs. Fila kan vere stor, så det kan ta ei stund. Du kan forlate sida og kome tilbake seinare."
+  creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Dersom du opprettar innleveringseksport kan du laste ned ei ZIP-fil med alle innleveringane dine i noverande og tidlegare emne. Fila kan vere stor, så det kan ta ei stund. Du kan forlate sida og kome tilbake seinare."
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Creative Commons-lisens:"
   criterion_5f0b62f8: Kriterium
@@ -4904,7 +4904,7 @@ nn:
     collaborations: Samarbeid
     conferences: Konferansar
     confirmation: Stadfesting
-    copy_course: "Kopier kurs"
+    copy_course: "Kopier emne"
     developer_keys: Utviklarnøklar
     discussions: Diskusjonar
     eportfolio_welcome: "Velkomen til din e-portefølje"
@@ -4980,7 +4980,7 @@ nn:
         count: "Feil studenttal"
         ratio: "Feil studenttettleik"
   current_367624e9: Gjeldande
-  current_courses_d5287d50: "Gjeldande kurs"
+  current_courses_d5287d50: "Gjeldande emne"
   current_grading_scheme_for_this_assignment_d525463e: "Gjeldande karaktersetjingskjema for denne oppgåva"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "Gjeldande meistringsnivå: %{score} av %{mastery_points}"
   current_provider_6c3f7f96: "Gjeldande leverandør"
