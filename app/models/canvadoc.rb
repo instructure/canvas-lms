@@ -17,8 +17,6 @@
 #
 
 class Canvadoc < ActiveRecord::Base
-  attr_accessible :document_id, :process_state, :preferred_plugin_course_id
-
   belongs_to :attachment
 
   has_many :canvadocs_submissions
@@ -26,7 +24,7 @@ class Canvadoc < ActiveRecord::Base
   def upload(opts = {})
     return if document_id.present?
 
-    url = attachment.authenticated_s3_url(:expires => 1.day)
+    url = attachment.authenticated_s3_url(expires_in: 1.day)
 
     opts.delete(:annotatable) unless Canvadocs.annotations_supported?
 

@@ -117,7 +117,9 @@ module Factories
 
   def teacher_in_section(section, opts={})
     teacher = opts.fetch(:user) { user_factory }
-    enrollment = section.course.enroll_user(teacher, 'TeacherEnrollment', :section => section, :force_update => true)
+    limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
+    enrollment = section.course.enroll_user(teacher, 'TeacherEnrollment', :section => section,
+      :force_update => true, :limit_privileges_to_course_section => limit_privileges_to_course_section)
     teacher.save!
     enrollment.workflow_state = 'active'
     enrollment.save!
@@ -137,7 +139,7 @@ module Factories
   def create_users(records, options = {})
     @__create_user_count ||= 0
     name_prefix = options[:name_prefix] || "user"
-    records = records.times.map{ |i| { name: "#{name_prefix} #{@__create_user_count + i + 1}" } } if records.is_a?(Fixnum)
+    records = records.times.map{ |i| { name: "#{name_prefix} #{@__create_user_count + i + 1}" } } if records.is_a?(Integer)
     records = records.map { |record| valid_user_attributes.merge(workflow_state: "registered").merge(record) }
     @__create_user_count += records.size
     create_records(User, records, options[:return_type])

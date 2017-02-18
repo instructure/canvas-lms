@@ -162,7 +162,7 @@ describe Quizzes::QuizSerializer do
     it "when stringify_json_ids? is false" do
       controller.expects(:accepts_jsonapi?).at_least_once.returns false
       expect(serializer.as_json[:quiz][:id]).to eq quiz.id
-      expect(serializer.as_json[:quiz][:id].is_a?(Fixnum)).to be_truthy
+      expect(serializer.as_json[:quiz][:id].is_a?(Integer)).to be_truthy
     end
 
   end

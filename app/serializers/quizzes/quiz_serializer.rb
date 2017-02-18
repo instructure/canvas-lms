@@ -260,6 +260,9 @@ module Quizzes
         hash['links']['quiz_statistics'] = hash.delete(:quiz_statistics_url)
         hash['links']['quiz_reports'] = hash.delete(:quiz_reports_url)
       end
+      if serializer_option(:include_master_course_restrictions)
+        hash.merge!(quiz.master_course_api_restriction_data)
+      end
       hash
     end
 

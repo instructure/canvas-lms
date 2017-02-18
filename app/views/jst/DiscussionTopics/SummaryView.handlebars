@@ -38,6 +38,15 @@
       <div class="discussion-last-reply">
         {{friendlyDatetime last_reply_at contextSensitive=true}}
       </div>
+      <div class="master-course-cell">
+        {{#if is_master_course_content}}
+          {{#if restricted_by_master_course}}
+            <i class="icon-lock"></i>
+          {{else}}
+            <i class="icon-unlock icon-Line"></i>
+          {{/if}}
+        {{/if}}
+      </div>
       <div class="discussion-info-icons">
         {{#if locked}}
           <i data-tooltip
@@ -64,6 +73,7 @@
         {{/if}}
       </div>
       <div class="discussion-actions">
+        {{#unless restricted_by_master_course}}
         {{#if permissions.delete}}
           <a href="#" class="al-trigger al-trigger-gray" role="button" id="manage_link" aria-haspopup="true">
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
@@ -93,6 +103,7 @@
             </li>
           </ul>
         {{/if}}
+        {{/unless}}
       </div>
     </div>
   </div>

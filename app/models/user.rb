@@ -30,7 +30,6 @@ class User < ActiveRecord::Base
 
   include Context
 
-  attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code, :initial_enrollment_type
   attr_accessor :previous_id, :menu_data, :gradebook_importer_submissions, :prior_enrollment
 
   before_save :infer_defaults
@@ -73,7 +72,7 @@ class User < ActiveRecord::Base
   has_many :associated_root_accounts, -> { order("user_account_associations.depth").where(accounts: { parent_account_id: nil }) }, source: :account, through: :user_account_associations
   has_many :developer_keys
   has_many :access_tokens, -> { preload(:developer_key) }
-  has_many :context_external_tools, -> { order(:name) }, as: :context, dependent: :destroy
+  has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
 
   has_many :student_enrollments
   has_many :ta_enrollments
@@ -84,23 +83,23 @@ class User < ActiveRecord::Base
   has_many :pseudonym_accounts, :source => :account, :through => :pseudonyms
   has_one :pseudonym, -> { where("pseudonyms.workflow_state<>'deleted'").order(:position) }
   has_many :attachments, :as => 'context', :dependent => :destroy
-  has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted').order('attachments.display_name').preload(:thumbnail) }, as: :context, class_name: 'Attachment'
-  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, class_name: 'Assignment'
+  has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted').order('attachments.display_name').preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: 'Attachment'
+  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'Assignment'
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
   has_many :assignment_student_visibilities
   has_many :quiz_student_visibilities, :class_name => 'Quizzes::QuizStudentVisibility'
-  has_many :folders, -> { order('folders.name') }, as: 'context'
-  has_many :submissions_folders, -> { where.not(:folders => {:submission_context_code => nil}) }, as: 'context', class_name: 'Folder'
-  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context
-  has_many :calendar_events, -> { preload(:parent_event) }, as: 'context', dependent: :destroy
+  has_many :folders, -> { order('folders.name') }, as: :context, inverse_of: :context
+  has_many :submissions_folders, -> { where.not(:folders => {:submission_context_code => nil}) }, as: :context, inverse_of: :context, class_name: 'Folder'
+  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context, inverse_of: :context
+  has_many :calendar_events, -> { preload(:parent_event) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :eportfolios, :dependent => :destroy
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
   has_many :dashboard_messages, -> { where(to: "dashboard", workflow_state: 'dashboard').order('created_at DESC') }, class_name: 'Message', dependent: :destroy
   has_many :collaborations, -> { order('created_at DESC') }
   has_many :user_services, -> { order('created_at') }, dependent: :destroy
-  has_many :rubric_associations, -> { preload(:rubric).order('rubric_associations.created_at DESC') }, as: :context
+  has_many :rubric_associations, -> { preload(:rubric).order('rubric_associations.created_at DESC') }, as: :context, inverse_of: :context
   has_many :rubrics
-  has_many :context_rubrics, :as => :context, :class_name => 'Rubric'
+  has_many :context_rubrics, :as => :context, :inverse_of => :context, :class_name => 'Rubric'
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }
   has_many :context_module_progressions
   has_many :assessment_question_bank_users
@@ -118,7 +117,7 @@ class User < ActiveRecord::Base
   has_many :web_conferences, :through => :web_conference_participants
   has_many :account_users
   has_many :accounts, :through => :account_users
-  has_many :media_objects, :as => :context
+  has_many :media_objects, :as => :context, :inverse_of => :context
   has_many :user_generated_media_objects, :class_name => 'MediaObject'
   has_many :user_notes
   has_many :account_reports
@@ -129,10 +128,10 @@ class User < ActiveRecord::Base
   has_many :messages
   has_many :sis_batches
   has_many :sis_post_grades_statuses
-  has_many :content_migrations, :as => :context
-  has_many :content_exports, :as => :context
+  has_many :content_migrations, :as => :context, :inverse_of => :context
+  has_many :content_exports, :as => :context, :inverse_of => :context
   has_many :usage_rights,
-    as: :context,
+    as: :context, inverse_of: :context,
     class_name: 'UsageRights',
     dependent: :destroy
   has_many :gradebook_csvs, dependent: :destroy
@@ -140,7 +139,7 @@ class User < ActiveRecord::Base
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
 
-  has_many :progresses, :as => :context
+  has_many :progresses, :as => :context, :inverse_of => :context
 
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 
@@ -751,16 +750,23 @@ class User < ActiveRecord::Base
   end
 
   def email
-    # if you change this cache_key, change it in email_cached? as well (and email=)
-    value = Rails.cache.fetch(['user_email', self].cache_key) do
+    value = Rails.cache.fetch(email_cache_key) do
       email_channel.try(:path) || :none
     end
     # this sillyness is because rails equates falsey as not in the cache
     value == :none ? nil : value
   end
 
+  def email_cache_key
+    ['user_email', self].cache_key
+  end
+
+  def clear_email_cache!
+    Rails.cache.delete(email_cache_key)
+  end
+
   def email_cached?
-    Rails.cache.exist?(['user_email', self].cache_key)
+    Rails.cache.exist?(email_cache_key)
   end
 
   def gmail_channel
@@ -801,7 +807,7 @@ class User < ActiveRecord::Base
     cc.move_to_top
     cc.save!
     self.reload
-    Rails.cache.delete(['user_email', self].cache_key)
+    self.clear_email_cache!
     cc.path
   end
 
@@ -2079,18 +2085,7 @@ class User < ActiveRecord::Base
     # (hopefully) don't need to include cross-shard because calendar events/assignments/etc are only seached for on current shard anyway
     @cached_context_codes ||=
       Rails.cache.fetch([self, 'cached_context_codes', Shard.current].cache_key, :expires_in => 15.minutes) do
-        group_admin_course_ids =
-          Rails.cache.fetch([self, 'group_admin_course_ids', Shard.current].cache_key, :expires_in => 1.hour) do
-            # permissions are cached for an hour anyways
-            admin_enrolls = self.enrollments.shard(Shard.current).of_admin_type.active_by_date
-            Course.where(:id => admin_enrolls.select(:course_id)).to_a.select{|c| c.grants_right?(self, :manage_groups)}.map(&:id)
-          end
-
-        group_ids = group_admin_course_ids.any? ?
-          Group.active.where(:context_type => "Course", :context_id => group_admin_course_ids).pluck(:id) : []
-        group_ids += self.groups.active.pluck(:id)
-        group_ids.uniq!
-
+        group_ids = self.groups.active.pluck(:id)
         cached_current_course_ids = Rails.cache.fetch([self, 'cached_current_course_ids', Shard.current].cache_key) do
           # don't need an expires at because user will be touched if enrollment state changes from 'active'
           self.enrollments.shard(Shard.current).active_by_date.distinct.pluck(:course_id)

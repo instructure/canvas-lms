@@ -115,7 +115,6 @@ describe Assignment do
       guid: SecureRandom.uuid,
       shared_secret: 'abc',
       product_family: product_family,
-      root_account: account,
       product_version: '1',
       workflow_state: 'disabled',
       raw_data: {'proxy' => 'value'},
@@ -527,71 +526,25 @@ describe Assignment do
       setup_assignment_with_homework
     end
 
-    it "should update when submissions transition state" do
-      expect(@assignment.needs_grading_count).to eql(1)
-      @assignment.grade_student(@user, grade: "0", grader: @teacher)
-      @assignment.reload
-      expect(@assignment.needs_grading_count).to eql(0)
+    it "should delegate to NeedsGradingCountQuery" do
+      query = mock('Assignments::NeedsGradingCountQuery')
+      query.expects(:manual_count)
+      Assignments::NeedsGradingCountQuery.expects(:new).with(@assignment).returns(query)
+      @assignment.needs_grading_count
     end
 
-    it "should not update when non-student submissions transition state" do
-      assignment_model(course: @course)
-      s = @assignment.find_or_create_submission(@teacher)
-      s.submission_type = 'online_quiz'
-      s.workflow_state = 'submitted'
-      s.save!
-      expect(@assignment.needs_grading_count).to eql(0)
-      s.workflow_state = 'graded'
-      s.save!
-      @assignment.reload
-      expect(@assignment.needs_grading_count).to eql(0)
-    end
-
-    it "should update when enrollment changes" do
+    it "should update when section (and its enrollments) are moved" do
+      @assignment.update_attribute(:updated_at, 1.minute.ago)
       expect(@assignment.needs_grading_count).to eql(1)
-      @course.enrollments.where(user_id: @user.id).first.destroy
-      @assignment.reload
+      enable_cache do
+        expect(Assignments::NeedsGradingCountQuery.new(@assignment, nil).manual_count).to be(1)
+        course2 = @course.account.courses.create!
+        e = @course.enrollments.where(user_id: @user.id).first.course_section
+        e.move_to_course(course2)
+        @assignment.reload
+        expect(Assignments::NeedsGradingCountQuery.new(@assignment, nil).manual_count).to be(0)
+      end
       expect(@assignment.needs_grading_count).to eql(0)
-      e = @course.enroll_student(@user)
-      e.invite
-      e.accept
-      @assignment.reload
-      expect(@assignment.needs_grading_count).to eql(1)
-
-      # multiple enrollments should not cause double-counting (either by creating as or updating into "active")
-      section2 = @course.course_sections.create!(:name => 's2')
-      e2 = @course.enroll_student(@user,
-                                  :enrollment_state => 'invited',
-                                  :section => section2,
-                                  :allow_multiple_enrollments => true)
-      e2.accept
-      section3 = @course.course_sections.create!(:name => 's2')
-      e3 = @course.enroll_student(@user,
-                                  :enrollment_state => 'active',
-                                  :section => section3,
-                                  :allow_multiple_enrollments => true)
-      expect(@user.enrollments.where(:workflow_state => 'active').count).to eql(3)
-      @assignment.reload
-      expect(@assignment.needs_grading_count).to eql(1)
-
-      # and as long as one enrollment is still active, the count should not change
-      e2.destroy
-      e3.complete
-      @assignment.reload
-      expect(@assignment.needs_grading_count).to eql(1)
-
-      # ok, now gone for good
-      e.destroy
-      @assignment.reload
-      expect(@assignment.needs_grading_count).to eql(0)
-      expect(@user.enrollments.where(:workflow_state => 'active').count).to eql(0)
-
-      # enroll the user as a teacher, it should have no effect
-      e4 = @course.enroll_teacher(@user)
-      e4.accept
-      @assignment.reload
-      expect(@assignment.needs_grading_count).to eql(0)
-      expect(@user.enrollments.where(:workflow_state => 'active').count).to eql(1)
     end
 
     it "updated_at should be set when needs_grading_count changes due to a submission" do
@@ -2710,7 +2663,7 @@ describe Assignment do
     end
 
     it "should not be locked by wiki page when feature is disabled" do
-      a1 = wiki_page_assignment_model(:course => @course, :submission_types => "wiki_page")
+      a1 = wiki_page_assignment_model(:course => @course)
       a1.reload
       expect(a1.locked_for?(@user)).to be_falsey
 
@@ -3461,6 +3414,38 @@ describe Assignment do
     end
   end
 
+  describe "due_date" do
+    let(:assignment) do
+      @course.assignments.new(assignment_valid_attributes)
+    end
+
+    it "is valid when due_date_ok? is true" do
+      AssignmentUtil.stubs(:due_date_ok?).returns(true)
+      expect(assignment.valid?).to eq(true)
+    end
+
+    it "is not valid when due_date_ok? is false" do
+      AssignmentUtil.stubs(:due_date_ok?).returns(false)
+      expect(assignment.valid?).to eq(false)
+    end
+  end
+
+  describe "due_date_required?" do
+    let(:assignment) do
+      @course.assignments.create!(assignment_valid_attributes)
+    end
+
+    it "is true when due_date_required? is true" do
+      AssignmentUtil.stubs(:due_date_required?).returns(true)
+      expect(assignment.due_date_required?).to eq(true)
+    end
+
+    it "is false when due_date_required? is false" do
+      AssignmentUtil.stubs(:due_date_required?).returns(false)
+      expect(assignment.due_date_required?).to eq(false)
+    end
+  end
+
   describe "external_tool_tag" do
     it "should update the existing tag when updating the assignment" do
       a = @course.assignments.create!(title: "test",
@@ -3983,12 +3968,33 @@ describe Assignment do
     before(:once) do
       @assignment = @course.assignments.create! points_possible: 10
       @submission = @assignment.submit_homework(@student, body: "hello")
+      @assignment.mute!
     end
 
     it "touches submissions if you mute the assignment" do
-      @assignment.mute!
       touched = @submission.reload.updated_at > @assignment.updated_at
       expect(touched).to eq true
+    end
+
+    context "calls assignment_muted_changed" do
+      it "for graded submissions" do
+        @assignment.grade_student(@student, grade: 10, grader: @teacher)
+        @called = false
+        Submission.any_instance.stubs(:assignment_muted_changed).with() do
+          @called = true
+          expect(self.submission_model).to eq @submission
+        end
+
+        @assignment.unmute!
+        expect(@called).to eq true
+      end
+
+      it "does not dispatch update for ungraded submissions" do
+        @assignment.unmute!
+        Submission.any_instance.stubs(:assignment_muted_changed).with() do
+          fail
+        end
+      end
     end
   end
 

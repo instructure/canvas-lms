@@ -44,7 +44,6 @@ class Role < ActiveRecord::Base
 
   belongs_to :account
   belongs_to :root_account, :class_name => 'Account'
-  attr_accessible :name
 
   before_validation :infer_root_account_id, :if => :belongs_to_account?
 

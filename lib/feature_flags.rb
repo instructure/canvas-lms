@@ -18,7 +18,7 @@
 
 module FeatureFlags
   def self.included(base)
-    base.has_many :feature_flags, as: :context, dependent: :destroy
+    base.has_many :feature_flags, as: :context, inverse_of: :context, dependent: :destroy
   end
 
   def feature_enabled?(feature)
@@ -137,5 +137,5 @@ module FeatureFlags
 
     @feature_flag_cache[feature] = retval
   end
-
 end
+

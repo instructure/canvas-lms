@@ -28,7 +28,11 @@ describe AssignmentsController do
   def course_assignment(course = nil)
     course ||= @course
     @group = course.assignment_groups.create(:name => "some group")
-    @assignment = course.assignments.create(:title => "some assignment", :assignment_group => @group)
+    @assignment = course.assignments.create(
+      :title => "some assignment",
+      :assignment_group => @group,
+      :due_at => Time.zone.now + 1.week
+    )
     expect(@assignment.assignment_group).to eql(@group)
     expect(@group.assignments).to be_include(@assignment)
     @assignment
@@ -113,7 +117,7 @@ describe AssignmentsController do
       #controller.use_rails_error_handling!
       user_session(@student)
 
-      get 'show', :course_id => @course.id, :id => 5
+      get 'show', :course_id => @course.id, :id => Assignment.maximum(:id) + 100
       assert_status(404)
     end
 
@@ -366,6 +370,14 @@ describe AssignmentsController do
       group2 = course2.assignment_groups.create!(name: 'group2')
       post 'create', :course_id => @course.id, :assignment => {:title => "some assignment", :assignment_group_id => group2.to_param}
       expect(response).to be_not_found
+    end
+
+    it 'should use the default post-to-SIS setting' do
+      a = @course.account
+      a.settings[:sis_default_grade_export] = {locked: false, value: true}
+      a.save!
+      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
+      expect(assigns[:assignment]).to be_post_to_sis
     end
   end
 

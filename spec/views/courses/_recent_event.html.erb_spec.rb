@@ -26,7 +26,7 @@ describe "/courses/_recent_event" do
     view_context
     render :partial => "courses/recent_event", :object => assignment, :locals => { :is_hidden => false }
     expect(response).not_to be_nil
-    expect(response.body).to match %r{<b>my assignment</b>}
+    expect(response.body).to match %r{<b class="event-details__title">my assignment</b>}
   end
 
   it "should render without a user" do
@@ -35,7 +35,7 @@ describe "/courses/_recent_event" do
     view_context
     render :partial => "courses/recent_event", :object => assignment, :locals => { :is_hidden => false }
     expect(response).not_to be_nil
-    expect(response.body).to match %r{<b>my assignment</b>}
+    expect(response.body).to match %r{<b class="event-details__title">my assignment</b>}
   end
 
   it "shows the context when asked to" do
@@ -108,7 +108,7 @@ describe "/courses/_recent_event" do
       Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
 
       @submission = @quiz_submission.submission
-      Submission.any_instance.stubs(:grade).returns(1234567890987654400)
+      Submission.any_instance.stubs(:grade).returns('1234567890')
     end
 
     it "should show the grade for a non-muted assignment" do

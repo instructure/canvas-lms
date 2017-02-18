@@ -280,6 +280,28 @@ describe "Accounts API", type: :request do
   end
 
   describe 'update' do
+
+    let(:header_options_hash) do
+      {
+        :controller => 'accounts',
+        :action => 'update',
+        :id => @a1.to_param,
+        :format => 'json'
+      }
+    end
+
+    let(:query_params_hash) do
+      {
+        :account => {
+          :settings => {
+            :sis_assignment_name_length_input => {
+              :value => nil
+            }
+          }
+        }
+      }
+    end
+
     it "should update the name for an account" do
       new_name = 'root2'
       json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
@@ -315,54 +337,70 @@ describe "Accounts API", type: :request do
       expect(Account.find(@a1.id).service_enabled?(:avatars)).to be_truthy
     end
 
-    it "should update account with sis_assignment_name_length_input with string value" do
-      api_call(:put, "/api/v1/accounts/#{@a1.id}",
-                      { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
-                      { :account => {
-                          :settings => {
-                            :sis_assignment_name_length_input => {
-                              :value => '120'
-                            }
-                      }}})
+    # These following tests focus on testing the sis_assignment_name_length_input account setting
+    # through the API. This setting is used to enforce assignment name length for assignments.
+    # Valid values for this setting are integers/strings between 0-255. If a value is set greater
+    # than or less than those boundaries OR if the value is nil/some arbitrary string the default
+    # assignment name length value of 255 will be assigned to the setting to mitigate these cases.
+    # Otherwise the value sent in will be assigned to the setting.
+    it "should update account with sis_assignment_name_length_input with string number value" do
+      query_params_hash[:account][:settings][:sis_assignment_name_length_input][:value] = '120'
+      api_call(:put, "/api/v1/accounts/#{@a1.id}", header_options_hash, query_params_hash)
 
       expect(Account.find(@a1.id).settings[:sis_assignment_name_length_input][:value]).to eq '120'
     end
 
+    it "should update account with sis_assignment_name_length_input with string text value" do
+      query_params_hash[:account][:settings][:sis_assignment_name_length_input][:value] = 'too much tuna'
+      api_call(:put, "/api/v1/accounts/#{@a1.id}", header_options_hash, query_params_hash)
+
+      expect(Account.find(@a1.id).settings[:sis_assignment_name_length_input][:value]).to eq '255'
+    end
+
+    it "should update account with sis_assignment_name_length_input with nil value" do
+      api_call(:put, "/api/v1/accounts/#{@a1.id}", header_options_hash, query_params_hash)
+
+      expect(Account.find(@a1.id).settings[:sis_assignment_name_length_input][:value]).to eq '255'
+    end
+
+    it "should update account with sis_assignment_name_length_input with empty string value" do
+      query_params_hash[:account][:settings][:sis_assignment_name_length_input][:value] = ''
+      api_call(:put, "/api/v1/accounts/#{@a1.id}", header_options_hash, query_params_hash)
+
+      expect(Account.find(@a1.id).settings[:sis_assignment_name_length_input][:value]).to eq '255'
+    end
+
     it "should update account with sis_assignment_name_length_input with integer value" do
-      api_call(:put, "/api/v1/accounts/#{@a1.id}",
-               { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
-               { :account => {
-                 :settings => {
-                   :sis_assignment_name_length_input => {
-                     :value => 200
-                   }
-                 }}})
+      query_params_hash[:account][:settings][:sis_assignment_name_length_input][:value] = 200
+      api_call(:put, "/api/v1/accounts/#{@a1.id}", header_options_hash, query_params_hash)
 
       expect(Account.find(@a1.id).settings[:sis_assignment_name_length_input][:value]).to eq '200'
     end
 
     it "should set sis_assignment_name_length_input to default 255 if value is integer and over 255" do
-      api_call(:put, "/api/v1/accounts/#{@a1.id}",
-               { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
-               { :account => {
-                 :settings => {
-                   :sis_assignment_name_length_input => {
-                     :value => 400
-                   }
-                 }}})
+      query_params_hash[:account][:settings][:sis_assignment_name_length_input][:value] = 400
+      api_call(:put, "/api/v1/accounts/#{@a1.id}", header_options_hash, query_params_hash)
 
       expect(Account.find(@a1.id).settings[:sis_assignment_name_length_input][:value]).to eq '255'
     end
 
     it "should set sis_assignment_name_length_input to default 255 if value is string and over 255" do
-      api_call(:put, "/api/v1/accounts/#{@a1.id}",
-               { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
-               { :account => {
-                 :settings => {
-                   :sis_assignment_name_length_input => {
-                     :value => '300'
-                   }
-                 }}})
+      query_params_hash[:account][:settings][:sis_assignment_name_length_input][:value] = '300'
+      api_call(:put, "/api/v1/accounts/#{@a1.id}", header_options_hash, query_params_hash)
+
+      expect(Account.find(@a1.id).settings[:sis_assignment_name_length_input][:value]).to eq '255'
+    end
+
+    it "should set sis_assignment_name_length_input to default 255 if value is string and less than 0" do
+      query_params_hash[:account][:settings][:sis_assignment_name_length_input][:value] = '-2'
+      api_call(:put, "/api/v1/accounts/#{@a1.id}", header_options_hash, query_params_hash)
+
+      expect(Account.find(@a1.id).settings[:sis_assignment_name_length_input][:value]).to eq '255'
+    end
+
+    it "should set sis_assignment_name_length_input to default 255 if value is integer and under 0" do
+      query_params_hash[:account][:settings][:sis_assignment_name_length_input][:value] = -12
+      api_call(:put, "/api/v1/accounts/#{@a1.id}", header_options_hash, query_params_hash)
 
       expect(Account.find(@a1.id).settings[:sis_assignment_name_length_input][:value]).to eq '255'
     end

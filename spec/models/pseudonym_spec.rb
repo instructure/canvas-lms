@@ -32,6 +32,13 @@ describe Pseudonym do
     @pseudonym.save!
   end
 
+  it "should allow a username that starts with a special character" do
+    user_model
+    pseudonym_model
+    @pseudonym.unique_id = '+c'
+    @pseudonym.save!
+  end
+
   it "should allow apostrophes in usernames" do
     pseudonym = Pseudonym.new(:unique_id => "o'brien@example.com",
                               :password => 'password',

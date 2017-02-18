@@ -20,6 +20,8 @@ define([
   'jsx/speed_grader/gradingPeriod',
   'jsx/grading/helpers/OutlierScoreHelper',
   'jsx/grading/quizzesNextSpeedGrading',
+  'jsx/shared/helpers/numberHelper',
+  'jsx/gradebook/shared/helpers/GradeFormatHelper',
   'jst/speed_grader/student_viewed_at',
   'jst/speed_grader/submissions_dropdown',
   'jst/speed_grader/speech_recognition',
@@ -57,8 +59,11 @@ define([
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(MGP, OutlierScoreHelper, quizzesNextSpeedGrading, studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate, vericiteInfoTemplate, vericiteScoreTemplate) {
-
+], function (MGP, OutlierScoreHelper, quizzesNextSpeedGrading, numberHelper,
+  GradeFormatHelper, studentViewedAtTemplate, submissionsDropdownTemplate,
+  speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape,
+  rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate,
+  turnitinScoreTemplate, vericiteInfoTemplate, vericiteScoreTemplate) {
   // PRIVATE VARIABLES AND FUNCTIONS
   // all of the $ variables here are to speed up access to dom nodes,
   // so that the jquery selector does not have to be run every time.
@@ -1305,7 +1310,7 @@ define([
 
       var $mark_grade = $tab.find('.mark_grade');
       if (prov_grade && prov_grade.score) {
-        $mark_grade.html(htmlEscape(prov_grade.score + "/" + jsonData.points_possible));
+        $mark_grade.html(htmlEscape(I18n.n(prov_grade.score) + '/' + I18n.n(window.jsonData.points_possible)));
       } else {
         $mark_grade.empty();
       }
@@ -1427,13 +1432,13 @@ define([
         $turnitinScoreContainer.html(turnitinScoreTemplate({
           state: (turnitinAsset.state || 'no') + '_score',
           reportUrl: $.replaceTags(urlContainer.attr('href'), { user_id: submission.user_id, asset_string: assetString }),
-          tooltip: I18n.t('turnitin.tooltip.score', 'Turnitin Similarity Score - See detailed report'),
+          tooltip: I18n.t('turnitin.tooltip.score', 'Similarity Score - See detailed report'),
           score: turnitinAsset.similarity_score + '%'
         }));
       } else if (turnitinAsset.status) {
         // status == 'error' or status == 'pending'
-        var pendingTooltip = I18n.t('turnitin.tooltip.pending', 'Turnitin Similarity Score - Submission pending'),
-            errorTooltip = I18n.t('turnitin.tooltip.error', 'Turnitin Similarity Score - See submission error details');
+        var pendingTooltip = I18n.t('turnitin.tooltip.pending', 'Similarity Score - Submission pending'),
+            errorTooltip = I18n.t('turnitin.tooltip.error', 'Similarity Score - See submission error details');
         $turnitinSimilarityScore = $(turnitinScoreTemplate({
           state: 'submission_' + turnitinAsset.status,
           reportUrl: '#',
@@ -1706,9 +1711,11 @@ define([
                                      10);
         var templateSubmissions = _(submissionHistory).map(function(o, i) {
           var s = o.submission;
+          var grade;
+
           if (s.grade && (s.grade_matches_current_submission ||
                           s.show_grade_in_dropdown)) {
-            var grade = s.grade;
+            grade = GradeFormatHelper.formatGrade(s.grade);
           }
           return {
             value: i,
@@ -1746,17 +1753,19 @@ define([
     },
 
     updateStatsInHeader: function(){
+      var outOf = '';
+      var percent;
+      var gradedStudents = $.grep(window.jsonData.studentsWithSubmissions, function (s) {
+        return (s.submission_state === 'graded' || s.submission_state === 'not_gradeable');
+      });
+
       $x_of_x_students.text(
         I18n.t('%{x}/%{y}', {
-          x: EG.currentIndex() + 1,
-          y: this.totalStudentCount()
+          x: I18n.n(EG.currentIndex() + 1),
+          y: I18n.n(this.totalStudentCount())
         })
       );
       $("#gradee").text(gradeeLabel);
-
-      var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s) {
-        return (s.submission_state == 'graded' || s.submission_state == 'not_gradeable');
-      });
 
       var scores = $.map(gradedStudents , function(s){
         return s.submission.score;
@@ -1776,8 +1785,17 @@ define([
           var coefficient = Math.pow(10, precision);
           return Math.round(number*coefficient)/coefficient;
         }
-        var outOf = jsonData.points_possible ? ([" / ", jsonData.points_possible, " (", Math.round( 100 * (avg(scores) / jsonData.points_possible)), "%)"].join("")) : "";
-        $average_score.text( [roundWithPrecision(avg(scores), 2) + outOf].join("") );
+
+        if (window.jsonData.points_possible) {
+          percent = I18n.n(
+            Math.round(100 * (avg(scores) / window.jsonData.points_possible)),
+            { percentage: true }
+          );
+
+          outOf = [' / ', I18n.n(window.jsonData.points_possible), ' (', percent, ')'].join('');
+        }
+
+        $average_score.text([I18n.n(roundWithPrecision(avg(scores), 2)) + outOf].join(''));
       }
       else { //there are no submissions that have been graded.
         $average_score_wrapper.hide();
@@ -1785,8 +1803,8 @@ define([
 
       $grded_so_far.text(
         I18n.t('portion_graded', '%{x}/%{y}', {
-          x: gradedStudents.length,
-          y: jsonData.context.students.length
+          x: I18n.n(gradedStudents.length),
+          y: I18n.n(window.jsonData.context.students.length)
         })
       );
     },
@@ -1905,7 +1923,7 @@ define([
         }));
       } else if (attachment.canvadoc_url) {
         $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
-          canvadoc_session_url: attachment.canvadoc_url + '&wants_annotation=true'
+          canvadoc_session_url: attachment.canvadoc_url
         }));
       } else if ($.isPreviewable(attachment.content_type, 'google')) {
         if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
@@ -2330,10 +2348,10 @@ define([
       } else if (use_existing_score) {
         // If we're resubmitting a score, pass it as a raw score not grade.
         // This allows percentage grading types to be handled correctly.
-        formData["submission[score]"] = grade;
+        formData['submission[score]'] = grade;
       } else {
         // Any manually entered grade is a grade.
-        formData["submission[grade]"] = grade;
+        formData['submission[grade]'] = EG.formatGradeForSubmission(grade);
       }
       if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
         formData['submission[provisional]'] = true;
@@ -2370,7 +2388,7 @@ define([
 
       $('#submit_same_score').hide();
       if (typeof submission != "undefined" && submission.score !== null) {
-        $score.text(round(submission.score, round.DEFAULT));
+        $score.text(I18n.n(round(submission.score, round.DEFAULT)));
         if (!submission.grade_matches_current_submission) {
           $('#submit_same_score').show();
         }
@@ -2432,6 +2450,32 @@ define([
 
     },
 
+    isGradingTypePercent: function () {
+      return ENV.grading_type === 'percent';
+    },
+
+    shouldParseGrade: function () {
+      return EG.isGradingTypePercent() || ENV.grading_type === 'points';
+    },
+
+    formatGradeForSubmission: function (grade) {
+      var formattedGrade = grade;
+
+      if (EG.shouldParseGrade()) {
+        // Percent sign could be located on left or right, with or without space
+        // https://en.wikipedia.org/wiki/Percent_sign
+        formattedGrade = grade.replace(/%/g, '');
+        formattedGrade = numberHelper.parse(formattedGrade);
+        formattedGrade = round(formattedGrade, 2).toString();
+
+        if (EG.isGradingTypePercent()) {
+          formattedGrade += '%';
+        }
+      }
+
+      return formattedGrade;
+    },
+
     getGradeToShow: function(submission, grading_role) {
       var grade = '';
 
@@ -2439,12 +2483,12 @@ define([
         if (submission.excused) {
           grade = 'EX';
         } else if (submission.score != null && (grading_role === 'moderator' || grading_role === 'provisional_grader')) {
-          grade = round(submission.score, 2).toString();
+          grade = GradeFormatHelper.formatGrade(round(submission.score, 2));
         } else if (submission.grade != null) {
           if (submission.grade !== '' && !isNaN(submission.grade)) {
-            grade = round(submission.grade, 2).toString();
+            grade = GradeFormatHelper.formatGrade(round(submission.grade, 2));
           } else {
-            grade = submission.grade;
+            grade = GradeFormatHelper.formatGrade(submission.grade);
           }
         }
       }

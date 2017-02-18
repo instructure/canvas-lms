@@ -1022,7 +1022,9 @@ ActiveRecord::Associations::CollectionProxy.class_eval do
 
   def temp_record(*args)
     # creates a record with attributes like a child record but is not added to the collection for autosaving
-    klass.unscoped.merge(scope).new(*args)
+    record = klass.unscoped.merge(scope).new(*args)
+    @association.set_inverse_instance(record)
+    record
   end
 end
 

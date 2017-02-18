@@ -20,5 +20,4 @@ class SubmissionCommentParticipant < ActiveRecord::Base
   belongs_to :user
   belongs_to :submission_comment
 
-  attr_accessible :user_id, :participation_type
 end

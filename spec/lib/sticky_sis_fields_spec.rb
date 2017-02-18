@@ -295,20 +295,20 @@ describe StickySisFields do
   end
 
   it "should only write to the database when there's a change" do
+    skip('mocking :write_attribute causes infinite loop with rspec-mocks + ruby 2.3.1') if RUBY_VERSION == "2.3.1"
     ac = AbstractCourse.create!(:name => "1",
                                 :short_name => "2",
                                 :account => Account.default,
                                 :root_account => Account.default,
                                 :enrollment_term => Account.default.default_enrollment_term)
     expect(ac.stuck_sis_fields).to eq [].to_set
-    ac.stubs(:write_attribute).with(any_parameters)
-    ac.expects(:write_attribute).with(:stuck_sis_fields, anything).never
+    expect(ac).to receive(:write_attribute).with(:stuck_sis_fields, anything).never
     ac.save!
     ac.add_sis_stickiness(:name)
     ac.clear_sis_stickiness(:name)
     ac.save!
     ac.add_sis_stickiness(:name)
-    ac.expects(:write_attribute).with(:stuck_sis_fields, 'name').once
+    expect(ac).to receive(:write_attribute).with(:stuck_sis_fields, 'name').once
     ac.save!
   end
 
@@ -570,34 +570,48 @@ describe StickySisFields do
       end
     end
 
-    it "should fire the callback in the right scenarios" do
-      ac = AbstractCourse.create!(name: "1",
-                                  short_name: "2",
-                                  account: Account.default,
-                                  root_account: Account.default,
-                                  enrollment_term: Account.default.default_enrollment_term)
-
-      ac.expects(:set_sis_stickiness).once
-      ac.save!
-
-      ac.expects(:set_sis_stickiness).never
-      AbstractCourse.process_as_sis do
-        ac.save!
+    describe "callback firing" do
+      before(:once) do
+        @ac = AbstractCourse.create!(
+          name: "1",
+          short_name: "2",
+          account: Account.default,
+          root_account: Account.default,
+          enrollment_term: Account.default.default_enrollment_term
+        )
       end
 
-      ac.expects(:set_sis_stickiness).never
-      AbstractCourse.process_as_sis override_sis_stickiness: true do
-        ac.save!
+      it "fires on normal save" do
+        expect(@ac).to receive(:set_sis_stickiness).once
+        @ac.save!
       end
 
-      ac.expects(:set_sis_stickiness).once
-      AbstractCourse.process_as_sis clear_sis_stickiness: true do
-        ac.save!
+      it "doesn't fire processing_as_sis with default args" do
+        expect(@ac).to receive(:set_sis_stickiness).never
+        AbstractCourse.process_as_sis do
+          @ac.save!
+        end
       end
 
-      ac.expects(:set_sis_stickiness).once
-      AbstractCourse.process_as_sis add_sis_stickiness: true do
-        ac.save!
+      it "doesn't fire processing_as_sis with sis_stickiness" do
+        expect(@ac).to receive(:set_sis_stickiness).never
+        AbstractCourse.process_as_sis override_sis_stickiness: true do
+          @ac.save!
+        end
+      end
+
+      it "fires processing_as_sis and clearing sis_stickiness" do
+        expect(@ac).to receive(:set_sis_stickiness).once
+        AbstractCourse.process_as_sis clear_sis_stickiness: true do
+          @ac.save!
+        end
+      end
+
+      it "fires processing_as_sis and adding sis_stickiness" do
+        expect(@ac).to receive(:set_sis_stickiness).once
+        AbstractCourse.process_as_sis add_sis_stickiness: true do
+          @ac.save!
+        end
       end
     end
   end

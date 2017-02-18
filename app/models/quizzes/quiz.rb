@@ -30,15 +30,6 @@ class Quizzes::Quiz < ActiveRecord::Base
   include SearchTermHelper
   include Canvas::DraftStateValidations
 
-  attr_accessible :title, :description, :points_possible, :assignment_id, :shuffle_answers,
-    :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
-    :lock_at, :unlock_at, :due_at, :access_code, :anonymous_submissions, :assignment_group_id,
-    :hide_results, :locked, :ip_filter, :require_lockdown_browser,
-    :require_lockdown_browser_for_results, :context, :notify_of_update,
-    :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at,
-    :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
-    :one_time_results, :only_visible_to_overrides, :show_correct_answers_last_attempt
-
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
 
@@ -46,7 +37,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
   has_many :quiz_groups, -> { order(:position) }, dependent: :destroy, class_name: 'Quizzes::QuizGroup'
   has_many :quiz_statistics, -> { order(:created_at) }, class_name: 'Quizzes::QuizStatistics'
-  has_many :attachments, :as => :context, :dependent => :destroy
+  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :quiz_regrades, class_name: 'Quizzes::QuizRegrade'
   has_many :quiz_student_visibilities
   belongs_to :context, polymorphic: [:course]
@@ -80,7 +71,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   simply_versioned
 
-  has_many :context_module_tags, -> { where("content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'")}, as: :content, class_name: 'ContentTag'
+  has_many :context_module_tags, -> { where("content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'")}, as: :content, inverse_of: :content, class_name: 'ContentTag'
 
   # This callback is listed here in order for the :link_assignment_overrides
   # method to be called after the simply_versioned callbacks. We want the
@@ -90,6 +81,18 @@ class Quizzes::Quiz < ActiveRecord::Base
   # last version of the assignment, because the next callback would be a
   # simply_versioned callback updating the version.
   after_save :link_assignment_overrides, :if => :new_assignment_id?
+
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:title, :description]
+  restrict_columns :settings, [
+    :quiz_type, :assignment_group_id, :shuffle_answers, :time_limit,
+    :anonymous_submissions, :scoring_policy, :allowed_attempts, :hide_results,
+    :one_time_results, :show_correct_answers, :show_correct_answers_last_attempt,
+    :hide_correct_answers_at, :one_question_at_a_time, :cant_go_back, :access_code,
+    :ip_filter, :require_lockdown_browser, :require_lockdown_browser_for_results,
+    :lock_at, :unlock_at
+  ]
+  restrict_columns :settings, Assignment::RESTRICTED_SETTINGS
 
   # override has_one relationship provided by simply_versioned
   def current_version_unidirectional
@@ -416,6 +419,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         end
         @notify_of_update ||= a.workflow_state_changed? && a.published?
         a.notify_of_update = @notify_of_update
+        a.mark_as_importing!(@importing_migration) if @importing_migration
         a.with_versioning(false) do
           @notify_of_update ? a.save : a.save_without_broadcasting!
         end

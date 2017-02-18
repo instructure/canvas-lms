@@ -1,16 +1,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/notifications_common')
-include NotificationsCommon
 require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 
 describe "Notifications" do
+  include NotificationsCommon
   include_context "in-process server selenium tests"
   include Calendar2Common
 
   context "admin" do
     before :once do
       course_with_student(active_all: true)
-      NotificationsCommon.setup_comm_channel(@student, 'student@example.com')
+      setup_comm_channel(@student, 'student@example.com')
       @teacher = user_with_pseudonym(username: 'teacher@example.com', active_all: 1)
       enrollment = teacher_in_course(course: @course, user: @teacher)
       enrollment.accept!

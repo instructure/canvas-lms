@@ -16,7 +16,7 @@ define [
     ).property("pointRatio")
 
     pointRatio: ( ->
-      "#{@get('student.total_grade.score')} / #{@get('student.total_grade.possible')}"
+      "#{I18n.n @get('student.total_grade.score')} / #{I18n.n @get('student.total_grade.possible')}"
     ).property("weighted_groups", "student.total_grade.score", "student.total_grade.possible")
 
     letterGrade:(->

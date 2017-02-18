@@ -26,8 +26,6 @@ class ConversationMessageParticipant < ActiveRecord::Base
   belongs_to :conversation_participant
   delegate :author, :author_id, :generated, :body, :to => :conversation_message
 
-  attr_accessible
-
   scope :active, -> { where("(conversation_message_participants.workflow_state <> 'deleted' OR conversation_message_participants.workflow_state IS NULL)") }
   scope :deleted, -> { where(workflow_state: 'deleted') }
 

@@ -591,6 +591,13 @@ describe Quizzes::QuizzesApiController, type: :request do
       expect(updated_quiz.title).to eq 'title'
     end
 
+    context 'anonymous_submissions' do
+      it "updates anonymous_submissions" do
+        api_update_quiz({}, {anonymous_submissions: true})
+        expect(updated_quiz.anonymous_submissions).to eq true
+      end
+    end
+
     context 'lockdown_browser' do
       before :once do
         # require_lockdown_browser, require_lockdown_browser_for_results and

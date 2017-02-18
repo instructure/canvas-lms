@@ -1,4 +1,3 @@
-const fs = require('fs')
 const glob = require('glob')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const path = require('path')
@@ -21,14 +20,9 @@ const timezoneAndLocaleBundles = timezones.concat(momentLocales).reduce((memo, f
   Object.assign(memo, {[filename.replace(/.js$/, '')]: filename})
 , {})
 
-// this is to make our regexs to plugin things work with caturday, which uses symlinks
-function pluginsRegex (pathPart) {
-  const pluginsRoot = fs.realpathSync(path.resolve(__dirname, '../gems/plugins'))
-  return RegExp(path.join(pluginsRoot, '.*', pathPart))
-}
-
 // Put any custom moment locales here:
 timezoneAndLocaleBundles['moment/locale/mi-nz'] = 'custom_moment_locales/mi_nz.js'
+timezoneAndLocaleBundles['moment/locale/ht-ht'] = 'custom_moment_locales/ht_ht.js'
 
 module.exports = {
   // In prod build, don't attempt to continue if there are any errors.
@@ -145,7 +139,7 @@ module.exports = {
         include: [
           path.resolve(__dirname, '../app/jsx'),
           path.resolve(__dirname, '../spec/javascripts/jsx'),
-          pluginsRegex('app/jsx')
+          /gems\/plugins\/.*\/app\/jsx\//
         ],
         loaders: [
           // make sure we don't try to cache JSX assets when building for production
@@ -162,8 +156,8 @@ module.exports = {
         include: [
           path.resolve(__dirname, '../app/coffeescript'),
           path.resolve(__dirname, '../spec/coffeescripts'),
-          pluginsRegex('app/coffeescripts'),
-          pluginsRegex('spec_canvas/coffeescripts')
+          /gems\/plugins\/.*\/app\/coffeescripts\//,
+          /gems\/plugins\/.*\/spec_canvas\/coffeescripts\//
         ],
         loaders: [
           'coffee-loader',
@@ -175,7 +169,7 @@ module.exports = {
         test: /\.handlebars$/,
         include: [
           path.resolve(__dirname, '../app/views/jst'),
-          pluginsRegex('app/views/jst')
+          /gems\/plugins\/.*\/app\/views\/jst\//
         ],
         loaders: ['i18nLinerHandlebars']
       },
@@ -188,6 +182,11 @@ module.exports = {
         loaders: ['emberHandlebars']
       },
       {
+        test: /\.json$/,
+        exclude: /public\/javascripts\/vendor/,
+        loader: 'json-loader'
+      },
+      {
         test: require.resolve('../public/javascripts/vendor/jquery-1.7.2'),
         loader: 'exports-loader?window.jQuery'
       },
@@ -198,6 +197,10 @@ module.exports = {
       {
         test: /vendor\/md5/,
         loader: 'exports-loader?CryptoJS'
+      },
+      {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader'
       }
     ]
   },

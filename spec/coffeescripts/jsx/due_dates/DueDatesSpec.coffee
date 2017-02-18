@@ -1,16 +1,17 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jsx/due_dates/DueDates'
   'jsx/due_dates/OverrideStudentStore'
   'jsx/due_dates/StudentGroupStore'
   'compiled/models/AssignmentOverride'
   'helpers/fakeENV'
-], (React, ReactDOM, _, DueDates, OverrideStudentStore, StudentGroupStore, AssignmentOverride, fakeENV) ->
+], (React, ReactDOM, TestUtils, _, DueDates, OverrideStudentStore, StudentGroupStore, AssignmentOverride, fakeENV) ->
 
-  findAllByTag = React.addons.TestUtils.scryRenderedDOMComponentsWithTag
-  findAllByClass = React.addons.TestUtils.scryRenderedDOMComponentsWithClass
+  findAllByTag = TestUtils.scryRenderedDOMComponentsWithTag
+  findAllByClass = TestUtils.scryRenderedDOMComponentsWithClass
 
   module 'DueDates',
     setup: ->

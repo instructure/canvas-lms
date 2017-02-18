@@ -10,14 +10,7 @@ define([
   './SectionInfo',
   './SubmissionProgressBars',
   'jsx/shared/MessageStudents',
-  'instructure-ui/Heading',
-  'instructure-ui/Button',
-  'instructure-ui/Link',
-  'instructure-ui/Overlay',
-  'instructure-ui/Typography',
-  'instructure-ui/ScreenReaderContent',
-  'instructure-ui/Spinner',
-  'instructure-ui/Tray'
+  'instructure-ui',
 ], function(React, I18n, FriendlyDatetime,
    StudentCardStore,
    Avatar,
@@ -27,14 +20,7 @@ define([
    SectionInfo,
    SubmissionProgressBars,
    MessageStudents,
-   { default: Heading },
-   { default: Button },
-   { default: Link },
-   { default: Overlay },
-   { default: Typography },
-   { default: ScreenReaderContent },
-   { default: Spinner },
-   { default: Tray }) {
+   {Heading, Button, Link, Typography, ScreenReaderContent, Spinner, Tray, ApplyTheme}) {
 
   class StudentContextTray extends React.Component {
 
@@ -47,14 +33,9 @@ define([
         React.PropTypes.string,
         React.PropTypes.number
       ]),
-      isOpen: React.PropTypes.bool,
       store: React.PropTypes.instanceOf(StudentCardStore),
       onClose: React.PropTypes.func,
-      isLoading: React.PropTypes.bool
-    }
-
-    static defaultProps = {
-      isOpen: false
+      returnFocusTo: React.PropTypes.func.isRequired
     }
 
     static renderQuickLink (label, url, showIf) {
@@ -75,8 +56,8 @@ define([
       this.state = {
         analytics: {},
         course: {},
-        isLoading: this.props.isLoading,
-        isOpen: this.props.isOpen,
+        isLoading: this.props.store.isLoading,
+        isOpen: true,
         messageFormOpen: false,
         permissions: {},
         submissions: [],
@@ -92,11 +73,17 @@ define([
       this.props.store.onChange = this.onChange
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps (nextProps) {
       if (nextProps.store !== this.props.store) {
         this.props.store.onChange = null
         nextProps.store.onChange = this.onChange
-        this.setState({isLoading: true})
+        const newState = {
+          isLoading: true
+        };
+        if (!this.state.isOpen) {
+          newState.isOpen = true
+        }
+        this.setState(newState)
       }
     }
 
@@ -104,7 +91,7 @@ define([
      * Handlers
      */
 
-    onChange = (e) => {
+    onChange = () => {
       const {store} = this.props;
       this.setState({
         analytics: store.state.analytics,
@@ -113,7 +100,17 @@ define([
         permissions: store.state.permissions,
         submissions: store.state.submissions,
         user: store.state.user
+      }, () => {
+        if (!store.state.loading && this.state.isOpen) {
+          if (this.closeButtonRef) {
+            this.closeButtonRef.focus()
+          }
+        }
       })
+    }
+
+    getCloseButtonRef = (ref) => {
+      this.closeButtonRef = ref
     }
 
     handleRequestClose = (e) => {
@@ -121,6 +118,14 @@ define([
       this.setState({
         isOpen: false
       })
+      if (this.props.returnFocusTo) {
+        const focusableItems = this.props.returnFocusTo();
+        // Because of the way native focus calls return undefined, all focus
+        // objects should be wrapped in something that will return truthy like
+        // jQuery wrappers do... and it should be able to check visibility like a
+        // jQuery wrapper... so just use jQuery.
+        focusableItems.some($itemToFocus => $itemToFocus.is(':visible') && $itemToFocus.focus())
+      }
     }
 
     handleMessageButtonClick = (e) => {
@@ -162,7 +167,9 @@ define([
           {StudentContextTray.renderQuickLink(
             I18n.t('Analytics'),
             `/courses/${this.props.courseId}/analytics/users/${this.props.studentId}`,
-            () => this.state.permissions.view_analytics
+            () => (
+              this.state.permissions.view_analytics && Object.keys(this.state.analytics).length > 0
+            )
           )}
         </section>
       ) : null
@@ -185,8 +192,10 @@ define([
           ) : null}
 
           <Tray
+            label={I18n.t('Student Details')}
             isDismissable={!this.state.isLoading}
             closeButtonLabel={I18n.t('Close')}
+            closeButtonRef={this.getCloseButtonRef}
             isOpen={this.state.isOpen}
             onRequestClose={this.handleRequestClose}
             placement='right'
@@ -218,13 +227,13 @@ define([
                         {this.state.user.short_name ? (
                           <div className="StudentContextTray-Header__Name">
                             <Heading level="h3" tag="h2">
-                              <Link
-                                href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
-                              >
-                                <span className="StudentContextTray-Header__NameLink">
+                              <span className="StudentContextTray-Header__NameLink">
+                                <Link
+                                  href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
+                                >
                                   {this.state.user.short_name}
-                                </span>
-                              </Link>
+                                </Link>
+                              </span>
                             </Heading>
                           </div>
                         ) : null}
@@ -244,7 +253,7 @@ define([
                         <div className="StudentContextTray-Header__Actions">
                           <Button
                             ref={ (b) => this.messageStudentsButton = b }
-                            variant="link" size="small"
+                            variant="icon" size="small"
                             onClick={this.handleMessageButtonClick}
                           >
                             <ScreenReaderContent>
@@ -288,5 +297,12 @@ define([
     }
   }
 
-  return StudentContextTray
+  const DeleteMe = (props) => (
+    <ApplyTheme theme={ApplyTheme.generateTheme('a11y')}>
+      <StudentContextTray {...props}/>
+    </ApplyTheme>
+  )
+
+  /* TODO: after instui gets updated, just return StudentContextTray */
+  return ENV.use_high_contrast ? DeleteMe : StudentContextTray
 })

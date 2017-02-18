@@ -105,7 +105,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
     .points_uneditable .no_points { display: inline; }
 
     label, select { font-size: 0.8em; }
-    
+
     .input-append {
       display: inline;
     }
@@ -424,5 +424,25 @@ table.full_assignment_table {
   }
   input {
     min-width: 210px;
+  }
+}
+
+// implemented to allow the icons that appear with submission
+// links to be colorized gray vs the default link color
+.Submission__Link--has-icon,
+.Submission__List {
+  & .icon-rubric,
+  & .icon-check,
+  & .icon-warning {
+    color: $ic-color-medium-darker;
+  }
+}
+
+.assignment .ig-row {
+  .master-course-cell i {
+    margin-right: 12px;
+  }
+  .options-spacer {
+    width: 48px;
   }
 }

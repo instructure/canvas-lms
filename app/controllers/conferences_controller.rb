@@ -216,8 +216,7 @@ class ConferencesController < ApplicationController
 
   def create
     if authorized_action(@context.web_conferences.temp_record, @current_user, :create)
-      params[:web_conference].try(:delete, :long_running)
-      @conference = @context.web_conferences.build(params[:web_conference])
+      @conference = @context.web_conferences.build(conference_params)
       @conference.settings[:default_return_url] = named_context_url(@context, :context_url, :include_host => true)
       @conference.user = @current_user
       members = get_new_members
@@ -246,7 +245,7 @@ class ConferencesController < ApplicationController
       respond_to do |format|
         params[:web_conference].try(:delete, :long_running)
         params[:web_conference].try(:delete, :conference_type)
-        if @conference.update_attributes(params[:web_conference])
+        if @conference.update_attributes(conference_params)
           # TODO: ability to dis-invite people
           members.uniq.each do |u|
             @conference.add_invitee(u)
@@ -374,8 +373,13 @@ class ConferencesController < ApplicationController
     members - @conference.invitees
   end
 
+  private
   def get_conference
     @conference = @context.web_conferences.find(params[:conference_id] || params[:id])
   end
-  private :get_conference
+
+  def conference_params
+    params.require(:web_conference).
+      permit(:title, :duration, :description, :conference_type, :user_settings => strong_anything)
+  end
 end

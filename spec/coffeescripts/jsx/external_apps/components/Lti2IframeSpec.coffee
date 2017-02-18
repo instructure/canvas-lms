@@ -28,3 +28,13 @@ define [
     component = renderComponent(data)
     ok component.isMounted()
     ok TestUtils.isCompositeComponentWithType(component, Lti2Iframe)
+
+  test 'renders any children after the iframe', ->
+    element = React.createElement(Lti2Iframe,{
+      registrationUrl: 'http://www.test.com',
+      handleInstall: ->
+    }, React.createElement('div', {id: 'test-child'}))
+    component = TestUtils.renderIntoDocument(element)
+    ok $(component.getDOMNode()).find('#test-child').length == 1
+
+

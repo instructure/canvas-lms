@@ -11,84 +11,86 @@
     <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
     <%= f.label :allow_sis_import, t("SIS imports") %>
   </div>
-  <%= f.fields_for :settings do |settings| %>
-    <%= settings.fields_for :sis_syncing do |ff_syncing| %>
-      <%
-        sis_syncing = @account.sis_syncing
-        sis_syncing_locked_subs = sis_syncing[:locked] && sis_syncing[:inherited]
-      %>
-      <div>
-        <%= ff_syncing.check_box :value, :checked => sis_syncing[:value],
-                                 :disabled => sis_syncing_locked_subs,
-                                 "aria-controls" => "account_settings_sis_syncing_value_settings" %>
-        <%= ff_syncing.label :value, t("SIS syncing") %>
-      </div>
-      <fieldset id="account_settings_sis_syncing_value_settings" class="nested" style="display: none;">
-        <legend class="screenreader-only"><%= t("Additional settings for SIS syncing") %></legend>
+  <% if @account.feature_allowed?(:post_grades)%>
+    <%= f.fields_for :settings do |settings| %>
+      <%= settings.fields_for :sis_syncing do |ff_syncing| %>
+        <%
+          sis_syncing = @account.sis_syncing
+          sis_syncing_locked_subs = sis_syncing[:locked] && sis_syncing[:inherited]
+        %>
         <div>
-          <%= ff_syncing.check_box :locked, :checked => sis_syncing[:locked],
-                                   :disabled => sis_syncing_locked_subs %>
-          <%= ff_syncing.label :locked, t("Lock this setting for sub-accounts") %>
+          <%= ff_syncing.check_box :value, :checked => sis_syncing[:value],
+                                   :disabled => sis_syncing_locked_subs,
+                                   "aria-controls" => "account_settings_sis_syncing_value_settings" %>
+          <%= ff_syncing.label :value, t("SIS syncing") %>
         </div>
-        <% if Assignment.sis_grade_export_enabled?(@account) %>
-          <%= settings.fields_for :sis_default_grade_export do |ff_default| %>
-            <%
-              default_export = @account.sis_default_grade_export
-              default_disabled = sis_syncing_locked_subs ||
-                  (default_export[:locked] && default_export[:inherited])
-            %>
-            <div>
-              <%= ff_default.check_box :value, :checked => default_export[:value],
-                                       :disabled => default_disabled,
-                                       "aria-controls" => "account_settings_sis_default_grade_export_value_settings" %>
-              <%= ff_default.label :value, t("Default SIS Sync for assignments, quizzes, grade discussion") %>
-            </div>
-            <fieldset id="account_settings_sis_default_grade_export_value_settings" class="nested nested_setting_cleanup" style="display: none;">
-              <legend class="screenreader-only"><%= t("Additional SIS Sync Assignment, Quiz, and Discussion settings") %></legend>
+        <fieldset id="account_settings_sis_syncing_value_settings" class="nested" style="display: none;">
+          <legend class="screenreader-only"><%= t("Additional settings for SIS syncing") %></legend>
+          <div>
+            <%= ff_syncing.check_box :locked, :checked => sis_syncing[:locked],
+                                     :disabled => sis_syncing_locked_subs %>
+            <%= ff_syncing.label :locked, t("Lock this setting for sub-accounts") %>
+          </div>
+          <% if Assignment.sis_grade_export_enabled?(@account) %>
+            <%= settings.fields_for :sis_default_grade_export do |ff_default| %>
+              <%
+                default_export = @account.sis_default_grade_export
+                default_disabled = sis_syncing_locked_subs ||
+                    (default_export[:locked] && default_export[:inherited])
+              %>
+              <div>
+                <%= ff_default.check_box :value, :checked => default_export[:value],
+                                         :disabled => default_disabled,
+                                         "aria-controls" => "account_settings_sis_default_grade_export_value_settings" %>
+                <%= ff_default.label :value, t("Default SIS Sync for assignments, quizzes, grade discussion") %>
+              </div>
+              <fieldset id="account_settings_sis_default_grade_export_value_settings" class="nested" style="display: none;">
+                <legend class="screenreader-only"><%= t("Additional SIS Sync Assignment, Quiz, and Discussion settings") %></legend>
                 <%= settings.fields_for :sis_require_assignment_due_date do |ff_due_date| %>
                   <%
                     require_due_date = @account.sis_require_assignment_due_date
                     require_due_date_disabled = sis_syncing_locked_subs ||
                         (require_due_date[:locked] && require_due_date[:inherited])
                   %>
-                  <div>
+                  <div class="require_assignment_due_date_nested_cleanup">
                     <%= ff_due_date.check_box :value, :checked => require_due_date[:value],
                                               :disabled => require_due_date_disabled %>
                     <%= ff_due_date.label :value, t("Require assignment due date") %>
                   </div>
                 <% end %>
-                <%= settings.fields_for :sis_assignment_name_length do |ff_name_length| %>
-                  <%
-                    name_length = @account.sis_assignment_name_length
-                    name_length_disabled = sis_syncing_locked_subs ||
-                        (name_length[:locked] && name_length[:inherited])
-                  %>
-                  <div>
-                    <%= ff_name_length.check_box :value, :checked => name_length[:value],
-                                              :disabled => name_length_disabled,
-                                              "aria-controls" => "account_settings_sis_assignment_name_length_value_settings" %>
-                    <%= ff_name_length.label :value, t("Limit assignment names lengths (max 255)") %>
+              </fieldset>
+              <%= settings.fields_for :sis_assignment_name_length do |ff_name_length| %>
+                <%
+                  name_length = @account.sis_assignment_name_length
+                  name_length_disabled = sis_syncing_locked_subs ||
+                      (name_length[:locked] && name_length[:inherited])
+                %>
+                <div>
+                  <%= ff_name_length.check_box :value, :checked => name_length[:value],
+                                               :disabled => name_length_disabled,
+                                               "aria-controls" => "account_settings_sis_assignment_name_length_value_settings" %>
+                  <%= ff_name_length.label :value, t("Limit assignment names lengths (max 255)") %>
+                </div>
+                <fieldset id="account_settings_sis_assignment_name_length_value_settings" class="nested sis_name_length_nested_cleanup">
+                  <div class="name-length-wrapper">
+                    <%= settings.fields_for :sis_assignment_name_length_input do |ff_name_input|%>
+                      <%= ff_name_input.label :value, :en => "Characters"%>
+                      <%= ff_name_input.text_field :value,
+                                                   :type => "number",
+                                                   :value => @account.sis_assignment_name_length_input[:value],
+                                                   :class => "small-input",
+                                                   :max => 255,
+                                                   :min => 0,
+                                                   :disabled => name_length_disabled,
+                                                   :placeholder => "255"%>
+                    <% end %>
                   </div>
-                  <fieldset id="account_settings_sis_assignment_name_length_value_settings" class="nested" style="display: none;">
-                    <div class="name-length-wrapper">
-                      <%= settings.fields_for :sis_assignment_name_length_input do |ff_name_input|%>
-                        <%= ff_name_input.label :value, :en => "Characters"%>
-                        <%= ff_name_input.text_field :value,
-                                                     :type => "number",
-                                                     :value => @account.sis_assignment_name_length_input[:value],
-                                                     :class => "small-input",
-                                                     :max => 255,
-                                                     :min => 0,
-                                                     :disabled => name_length_disabled,
-                                                     :placeholder => "255"%>
-                      <% end %>
-                    </div>
-                  </fieldset>
-                <% end %>
-            </fieldset>
+                </fieldset>
+              <% end %>
+            <% end %>
           <% end %>
-        <% end %>
-      </fieldset>
+        </fieldset>
+      <% end %>
     <% end %>
   <% end %>
 </fieldset>

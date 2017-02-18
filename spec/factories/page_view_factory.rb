@@ -57,7 +57,7 @@ module Factories
         :interaction_seconds => 5,
         :user => @user,
         :remote_ip => '192.168.0.42'
-      }, :without_protection => true)
+      })
     end
     @page_view.save!
     @page_view

@@ -33,13 +33,13 @@ define [
     teardown: ->
       FileOptionsCollection.resetState()
 
-    test 'fileNameExists correctly finds existing files by display_name', ->
+    test 'findMatchingFile correctly finds existing files by display_name', ->
       setupFolderWith(['foo', 'bar', 'baz'])
-      ok FileOptionsCollection.fileNameExists('foo')
+      ok FileOptionsCollection.findMatchingFile('foo')
 
-    test 'fileNameExists returns falsy value when no matching file exists', ->
+    test 'findMatchingFile returns falsy value when no matching file exists', ->
       setupFolderWith(['foo', 'bar', 'baz'])
-      equal FileOptionsCollection.fileNameExists('xyz')?, false
+      equal FileOptionsCollection.findMatchingFile('xyz')?, false
 
     test 'segregateOptionBuckets divides files into collsion and resolved buckets', ->
       setupFolderWith(['foo', 'bar', 'baz'])

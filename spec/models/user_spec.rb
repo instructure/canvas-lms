@@ -504,7 +504,7 @@ describe User do
     teacher = teacher_in_course(:active_all => true).user
     student = student_in_course(:active_all => true).user
     sub = @assignment.grade_student(student, grade: 9, grader: @teacher).first
-    sub.submission_comments.create!(:comment => 'c1', :author => other_teacher, :recipient_id => student.id)
+    sub.submission_comments.create!(:comment => 'c1', :author => other_teacher)
     sub.save!
     expect(teacher.recent_feedback(:contexts => [@course])).to be_empty
   end
@@ -1763,13 +1763,13 @@ describe User do
 
         it "should be able to filter section events after fetching" do
           # trigger the after db filtering
-          Setting.stubs(:get).with('filter_events_by_section_code_threshold', anything).returns(0)
+          allow(Setting).to receive(:get).with('filter_events_by_section_code_threshold', anything).and_return(0)
           @course.enroll_student(@student, :section => @sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
           expect(@student.upcoming_events(:limit => 2)).to eq [@events[1]]
         end
 
         it "should use the old behavior as a fallback" do
-          Setting.stubs(:get).with('filter_events_by_section_code_threshold', anything).returns(0)
+          allow(Setting).to receive(:get).with('filter_events_by_section_code_threshold', anything).and_return(0)
           # the optimized call will retrieve the first two events, and then filter them out
           # since it didn't retrieve enough events it will use the old code as a fallback
           @course.enroll_student(@student, :section => @sections[2], :enrollment_state => 'active', :allow_multiple_enrollments => true)
@@ -2462,9 +2462,24 @@ describe User do
     end
 
     it "should limit the number of returned assignments" do
-      # since we're bulk inserting, the assignments_needing_grading callback doesn't happen, so we manually populate it
-      assignment_ids = create_records(Assignment, 20.times.map{ |x| {title: "excess assignment #{x}", submission_types: 'online_text_entry', workflow_state: "available", context_type: "Course", context_id: @course1.id, needs_grading_count: 1} })
-      create_records(Submission, assignment_ids.map{ |id| {assignment_id: id, user_id: @studentB.id, body: "hello", workflow_state: "submitted", submission_type: 'online_text_entry'} })
+      assignment_ids = create_records(Assignment, Array.new(20) do |x|
+        {
+          title: "excess assignment #{x}",
+          submission_types: 'online_text_entry',
+          workflow_state: "available",
+          context_type: "Course",
+          context_id: @course1.id
+        }
+      end)
+      create_records(Submission, assignment_ids.map do |id|
+        {
+          assignment_id: id,
+          user_id: @studentB.id,
+          body: "hello",
+          workflow_state: "submitted",
+          submission_type: 'online_text_entry'
+        }
+      end)
       expect(@teacher.assignments_needing_grading.size).to eq 15
     end
 

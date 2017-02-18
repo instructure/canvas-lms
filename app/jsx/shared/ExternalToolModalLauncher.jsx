@@ -4,8 +4,7 @@ define([
   'react',
   'jsx/shared/modal',
   'jsx/shared/modal-content',
-  'jsx/shared/modal-buttons',
-], function (_, $, React, Modal, ModalContent, ModalButtons) {
+], function (_, $, React, Modal, ModalContent) {
   return React.createClass({
     displayName: 'ExternalToolModalLauncher',
 
@@ -82,6 +81,7 @@ define([
       return {
         ...dimensions,
         padding: 0,
+        display: 'flex',
       };
     },
 
@@ -109,7 +109,6 @@ define([
               tabIndex={0}
             ></iframe>
           </ModalContent>
-          <ModalButtons></ModalButtons>
         </Modal>
       );
     }

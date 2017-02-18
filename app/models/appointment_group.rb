@@ -77,8 +77,6 @@ class AppointmentGroup < ActiveRecord::Base
     end
   end
 
-  strong_params
-
   # when creating/updating an appointment, you can give it a list of (new)
   # appointment times. these will be added to the existing appointment times
   # format is [[start, end], [start, end], ...]

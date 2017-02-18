@@ -32,7 +32,6 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   include Workflow
 
-  attr_accessible :quiz, :quiz_group, :assessment_question, :question_data, :assessment_question_version
   attr_readonly :quiz_id
   belongs_to :quiz, class_name: 'Quizzes::Quiz', inverse_of: :quiz_questions
   belongs_to :assessment_question
@@ -51,6 +50,10 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   validates_presence_of :quiz_id
   serialize :question_data
   after_save :update_quiz
+
+  include MasterCourses::CollectionRestrictor
+  self.collection_owner_association = :quiz
+  restrict_columns :content, [:question_data, :position, :quiz_group_id]
 
   workflow do
     state :active

@@ -34,8 +34,6 @@ class SisBatch < ActiveRecord::Base
   validates_length_of :diffing_data_set_identifier, maximum: 128
 
   attr_accessor :zip_path
-  attr_accessible :batch_mode, :batch_mode_term
-
   def self.max_attempts
     5
   end
@@ -288,7 +286,7 @@ class SisBatch < ActiveRecord::Base
 
   def non_batch_courses_scope
     if data[:supplied_batches].include?(:course)
-      scope = account.all_courses.active.where.not(sis_batch_id: nil).where.not(sis_batch_id: self)
+      scope = account.all_courses.active.where.not(sis_batch_id: nil, sis_source_id: nil).where.not(sis_batch_id: self)
       scope.where(enrollment_term_id: self.batch_mode_term)
     end
   end
@@ -313,7 +311,7 @@ class SisBatch < ActiveRecord::Base
   def non_batch_sections_scope
     if data[:supplied_batches].include?(:section)
       scope = self.account.course_sections.active.where(courses: {enrollment_term_id: self.batch_mode_term})
-      scope = scope.where.not(sis_batch_id: nil).where.not(sis_batch_id: self)
+      scope = scope.where.not(sis_batch_id: nil, sis_source_id: nil).where.not(sis_batch_id: self)
       scope.joins("INNER JOIN #{Course.quoted_table_name} ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
     end
   end

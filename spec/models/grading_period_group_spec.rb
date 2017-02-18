@@ -30,8 +30,6 @@ describe GradingPeriodGroup do
   it { is_expected.to have_many(:enrollment_terms).inverse_of(:grading_period_group) }
   it { is_expected.to have_many(:grading_periods).dependent(:destroy) }
 
-  it { is_expected.to allow_mass_assignment_of(:title) }
-
   describe ".for" do
     context "when given a root account" do
       it "fetches sets on a root account" do
@@ -87,19 +85,6 @@ describe GradingPeriodGroup do
 
     it "is not valid without an account or a course" do
       expect(group).not_to be_valid
-    end
-
-    it "is not able to mass-assign the account id" do
-      grading_period_group = GradingPeriodGroup.new(valid_attributes.merge(account_id: account.id))
-      expect(grading_period_group.account_id).to be_nil
-      expect(grading_period_group.root_account).to be_nil
-    end
-
-    it "is not able to mass-assign the course id" do
-      course = course_factory()
-      grading_period_group = GradingPeriodGroup.new(valid_attributes.merge(course_id: course.id))
-      expect(grading_period_group.course_id).to be_nil
-      expect(grading_period_group.course).to be_nil
     end
 
     it "cannot be created for a soft-deleted account" do

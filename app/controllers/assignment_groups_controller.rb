@@ -219,7 +219,7 @@ class AssignmentGroupsController < ApplicationController
     @assignment_group = @context.assignment_groups.find(params[:id])
     if authorized_action(@assignment_group, @current_user, :update)
       respond_to do |format|
-        updated = update_assignment_group(@assignment_group, strong_params['assignment_group'])
+        updated = update_assignment_group(@assignment_group, params['assignment_group'])
         if updated.present? && updated.save
           @assignment_group = updated
           flash[:notice] = t 'notices.updated', 'Assignment Group was successfully updated.'
@@ -267,7 +267,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def assignment_group_params
-    strong_params.require(:assignment_group).
+    params.require(:assignment_group).
       permit(:assignment_weighting_scheme,
              :default_assignment_name,
              :group_weight,
@@ -404,6 +404,10 @@ class AssignmentGroupsController < ApplicationController
 
     if assignment_includes.include?(:assignment_overrides)
       assignments.each { |a| a.has_no_overrides = true if a.assignment_overrides.size == 0 }
+    end
+
+    if master_courses? && context.grants_right?(@current_user, session, :manage_assignments)
+      MasterCourses::Restrictor.preload_restrictions(assignments)
     end
 
     assignments

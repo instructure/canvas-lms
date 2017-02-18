@@ -462,7 +462,7 @@ describe PseudonymsController do
 
         get 'index', :format => 'json', :user_id => @user.id
         expect(response).to be_success
-        expect(assigns['pseudonyms']).to eq [@p1, @p2]
+        expect(assigns['pseudonyms']).to match_array [@p1, @p2]
       end
     end
 

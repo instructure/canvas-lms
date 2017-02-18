@@ -179,6 +179,7 @@ define [
         groupWeight: data.group_weight
         toggleMessage: @messages.toggleMessage
         hasFrozenAssignments: @model.hasFrozenAssignments? and @model.hasFrozenAssignments()
+        hasIntegrationData: @model.hasIntegrationData? and @model.hasIntegrationData()
         ENV: ENV
       })
 

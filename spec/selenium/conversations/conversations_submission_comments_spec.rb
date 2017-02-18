@@ -1,9 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/conversations_common')
 require_relative '../helpers/shared_examples_common'
-include SharedExamplesCommon
 
 describe "conversations new" do
   include_context "in-process server selenium tests"
+  include SharedExamplesCommon
   include ConversationsCommon
 
   before do
@@ -28,8 +28,8 @@ describe "conversations new" do
         assignment = course.assignments.create!(:title => title, :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
         sub = assignment.grade_student(student, { :grade => '12', :grader => @teacher}).first
         sub.workflow_state = 'submitted'
-        sub.submission_comments.create!(:comment => 'c1', :author => @teacher, :recipient_id => student.id)
-        sub.submission_comments.create!(:comment => 'c2', :author => student, :recipient_id => @teacher.id)
+        sub.submission_comments.create!(:comment => 'c1', :author => @teacher)
+        sub.submission_comments.create!(:comment => 'c2', :author => student)
         sub.save!
         sub
       end

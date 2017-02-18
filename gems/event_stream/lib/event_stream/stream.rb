@@ -23,7 +23,7 @@ class EventStream::Stream
   attr_config :table, :type => String
   attr_config :id_column, :type => String, :default => 'id'
   attr_config :record_type, :default => EventStream::Record
-  attr_config :time_to_live, :type => Fixnum, :default => 1.year
+  attr_config :time_to_live, :type => Integer, :default => 1.year
   attr_config :read_consistency_level, :default => nil
 
   attr_accessor :raise_on_error

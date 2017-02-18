@@ -72,9 +72,9 @@ describe "conversations new" do
     it "should allow a new entry by an admin", priority: "1", test_id: 75702 do
       get student_user_notes_url
       f('#new_user_note_button').click
+      wait_for_ajaximations # wait for the form to `.slideDown()`
       replace_content(f('#user_note_title'),'FJ Title 2')
       replace_content(f('textarea'),'FJ Body text 2')
-      wait_for_ajaximations
       f('.send_button').click
       wait_for_ajaximations
       time = format_time_for_view(UserNote.last.updated_at)

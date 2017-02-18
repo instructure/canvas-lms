@@ -125,7 +125,9 @@ define [
       $('li.external-tools-dialog > a[data-url], button.external-tools-dialog').on 'click keyclick', (event) ->
         postGradesDialog = new PostGradesFrameDialog({
           returnFocusTo: $('#post_grades'),
-          baseUrl: $(event.target).attr('data-url')
+          baseUrl: $(event.target).attr('data-url'),
+          launchHeight: $(event.target).attr('data-height'),
+          launchWidth: $(event.target).attr('data-width'),
         })
         postGradesDialog.open()
 
@@ -705,10 +707,10 @@ define [
         letterGrade = GradingSchemeHelper.scoreToGrade(percentage, @options.grading_standard)
 
       templateOpts =
-        score: round(val.score, round.DEFAULT)
-        possible: round(val.possible, round.DEFAULT)
+        score: I18n.n(round(val.score, round.DEFAULT))
+        possible: I18n.n(round(val.possible, round.DEFAULT))
         letterGrade: letterGrade
-        percentage: percentage
+        percentage: I18n.n(round(percentage, round.DEFAULT), percentage: true)
       if columnDef.type == 'total_grade'
         templateOpts.warning = @totalGradeWarning
         templateOpts.lastColumn = true
@@ -881,7 +883,7 @@ define [
     # conjunction with a click listener on <body />. When we 'blur' the grid
     # by clicking outside of it, save the current field.
     onGridBlur: (e) =>
-      if e.target.className.match(/cell|slick/) or !@grid.getActiveCell
+      if e.target.className.match?(/cell|slick/) or !@grid.getActiveCell
         return
 
       if e.target.className is 'grade' and @grid.getCellEditor() instanceof SubmissionCell.out_of
@@ -1151,7 +1153,7 @@ define [
                   document.getElementById('csv_download').src = response.url
 
                   updated_date = $.datetimeString(response.created_at)
-                  updated_previous_report = "#{I18n.t('Previous (%{timestamp})', timestamp: updated_date)}"
+                  updated_previous_report = "#{I18n.t('Previous CSV (%{timestamp})', timestamp: updated_date)}"
                   $previous_link = $('#csv_export_options .open_in_a_new_tab')
                   $previous_link.text(updated_previous_report)
                   $previous_link.attr('href', response.url)

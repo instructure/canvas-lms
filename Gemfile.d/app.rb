@@ -1,22 +1,30 @@
 if CANVAS_RAILS4_2
-  gem 'rails', '4.2.7.1'
-  gem 'rack', '1.6.4'
-  gem 'protected_attributes', '1.1.3'
+  # if you want to run Ruby 2.4, you have to use an unreleased version of Rails 4.2. but that's a
+  # pain for deployment, since Rails is so big, so only do it locally
+  if RUBY_VERSION >= '2.4'
+    gem 'rails', '4.2.7.1', github: 'rails/rails', ref: '047cd2ae5d4beddc27c0ebd223fa0c6aed634766'
+      # for some reason bundler doesn't realize to lock these sub-gems to 4.2.7.1 automatically, and tries to use 5.0.1
+      gem 'activesupport', '4.2.7.1', github: 'rails/rails', ref: '047cd2ae5d4beddc27c0ebd223fa0c6aed634766'
+      gem 'actionpack', '4.2.7.1', github: 'rails/rails', ref: '047cd2ae5d4beddc27c0ebd223fa0c6aed634766'
+  else
+    gem 'rails', '4.2.7.1'
+  end
+  gem 'rack', '1.6.5'
   gem 'rails-observers', '0.1.2'
   gem 'activesupport-json_encoder', '1.1.0'
   gem 'oauth2', '1.0.0', require: false
 else
-  gem 'rails', '5.0.0.1'
+  gem 'rails', '5.0.1'
   gem 'rails-observers', github: 'rails/rails-observers', ref: '3fe157d6cbb5b5e767ded248009fc59443d63fa1'
   gem 'rack', '2.0.1'
   gem 'oauth2', '1.2.0', require: false
 end
 
-gem 'builder', '3.2.2'
+gem 'builder', '3.2.3'
 gem 'tzinfo', '1.2.2'
 gem 'oj_mimic_json', require: false
 
-gem 'encrypted_cookie_store-instructure', '1.2.2', require: 'encrypted_cookie_store'
+gem 'encrypted_cookie_store-instructure', '1.2.4', require: 'encrypted_cookie_store'
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '3.5.0'
@@ -32,7 +40,6 @@ gem 'folio-pagination', '0.0.11', require: 'folio/rails'
 
 gem "after_transaction_commit", '1.1.0'
 gem "aws-sdk", '2.6.7', require: false
-gem "aws-sdk-v1", '1.66.0', require: false
 gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false
   gem 'chunky_png', '1.3.8', require: false
@@ -53,15 +60,17 @@ gem 'i18n', '0.7.0'
 gem 'i18nliner', '0.0.12'
 gem 'icalendar', '1.5.4', require: false
 gem 'ims-lti', '2.1.0.beta.3', require: 'ims'
-gem 'json', '1.8.3'
+if RUBY_VERSION >= '2.4'
+  gem 'json', '2.0.3'
+else
+  gem 'json', '1.8.3'
+end
 gem 'oj', '2.17.1'
 gem 'jwt', '1.2.1', require: false
 gem 'json-jwt', '1.6.5', require: false
 gem 'twilio-ruby', '4.2.1'
 
-gem 'mail', '2.5.4', require: false
-  gem 'treetop', '1.4.15', require: false
-    gem 'polyglot', '0.3.5', require: false
+gem 'mail', '2.6.4', require: false
 gem 'marginalia', '1.4.0', require: false
 gem 'mime-types', '1.25.1', require: 'mime/types'
 gem 'mini_magick', '4.2.7'

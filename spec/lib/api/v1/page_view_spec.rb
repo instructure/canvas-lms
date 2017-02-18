@@ -51,7 +51,7 @@ describe Api::V1::PageView do
           :action => "index",
           :controller => "controller",
           :account_id => @domain_root_account.id
-        }, :without_protection => true)
+        })
       }
     end
     @page_view = @page_views.first

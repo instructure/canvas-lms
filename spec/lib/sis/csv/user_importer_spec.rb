@@ -405,7 +405,7 @@ describe SIS::CSV::UserImporter do
     before_pseudo_count = Pseudonym.count
     importer = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",
-      "U1,@,User,Uno,user@example.com,active"
+      "U1,%user,User,Uno,user@example.com,active"
     )
     expect(CommunicationChannel.by_path('user@example.com').first).to be_nil
 

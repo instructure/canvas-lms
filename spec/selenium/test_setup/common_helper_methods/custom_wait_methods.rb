@@ -122,7 +122,8 @@ module CustomWaitMethods
   end
 
   def keep_trying_until(seconds = SeleniumDriverSetup::SECONDS_UNTIL_GIVING_UP)
-    frd_error = Selenium::WebDriver::Error::TimeOutError
+    frd_error = Selenium::WebDriver::Error::TimeOutError.new
+    frd_error.set_backtrace CallStackUtils.useful_backtrace
     wait_for(timeout: seconds, method: :keep_trying_until) do
       begin
         yield
@@ -132,7 +133,7 @@ module CustomWaitMethods
         frd_error = $ERROR_INFO
         nil
       end
-    end or raise frd_error
+    end or CallStackUtils.raise(frd_error)
   end
 
   # pass in an Element pointing to the textarea that is tinified.

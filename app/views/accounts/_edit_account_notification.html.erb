@@ -23,9 +23,9 @@
           <%= t("Announcement type") %>
         </label>
         <select id="account_notification_icon" class="ic-Input" name="account_notification[icon]">
-          <%= options_for_select([[t("warning"), "warning", {:class=>"warning"}],
+          <%= options_for_select([[t("information"), "information", {:class=>"information"}],
             [t("error"), "error", {:class=>"error"}],
-            [t("information"), "information", {:class=>"information"}],
+            [t("warning"), "warning", {:class=>"warning"}],
             [t("question"), "question", {:class=>"question"}],
             [t("calendar"), "calendar", {:class=>"calendar"}]], announcement.icon) %>
         </select>

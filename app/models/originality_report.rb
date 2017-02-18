@@ -1,5 +1,4 @@
 class OriginalityReport < ActiveRecord::Base
-  strong_params
   belongs_to :submission
   belongs_to :attachment
   belongs_to :originality_report_attachment, class_name: "Attachment"
@@ -9,7 +8,7 @@ class OriginalityReport < ActiveRecord::Base
 
   alias_attribute :file_id, :attachment_id
   alias_attribute :originality_report_file_id, :originality_report_attachment_id
-  before_validation { self.workflow_state ||= 'pending' }
+  before_validation :infer_workflow_state
 
   def state
     Turnitin.state_from_similarity_score(originality_score)
@@ -20,5 +19,12 @@ class OriginalityReport < ActiveRecord::Base
       h[:file_id] = h.delete :attachment_id
       h[:originality_report_file_id] = h.delete :originality_report_attachment_id
     end
+  end
+
+  private
+
+  def infer_workflow_state
+    return if self.workflow_state == 'error'
+    self.workflow_state = self.originality_score.present? ? 'scored' : 'pending'
   end
 end

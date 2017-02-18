@@ -13,8 +13,15 @@ module Twitter
 
     def deliver
       return unless @twitter_service
-      twitter_connection = Twitter::Connection.new(@twitter_service.token, @twitter_service.secret)
-      twitter_connection.send_direct_message(@twitter_service.service_user_name, @twitter_service.service_user_id, "#{body}")
+      twitter = Twitter::Connection.from_service_token(
+        @twitter_service.token,
+        @twitter_service.secret
+      )
+      twitter.send_direct_message(
+        @twitter_service.service_user_name,
+        @twitter_service.service_user_id,
+        "#{body}"
+      )
     end
 
     def url

@@ -42,6 +42,6 @@ class TokensController < ApplicationController
   private
 
   def access_token_params
-    strong_params.require(:access_token).permit(:purpose, :expires_at, :regenerate,  :remember_access, :scopes => [])
+    params.require(:access_token).permit(:purpose, :expires_at, :regenerate,  :remember_access, :scopes => [])
   end
 end

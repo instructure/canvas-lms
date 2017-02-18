@@ -1249,7 +1249,8 @@ describe CoursesController, type: :request do
     end
     context "an authorized user" do
       it "should be able to reset a course" do
-        Auditors::Course.expects(:record_reset).once.with(@course, anything, @user, anything)
+        expect(Auditors::Course).to receive(:record_reset).once.
+          with(@course, anything, @user, anything)
 
         json = api_call(:post, @path, @params)
         @course.reload
@@ -1988,7 +1989,6 @@ describe CoursesController, type: :request do
       specs_require_sharding
 
       it "returns courses for out-of-shard users" do
-        pend_with_bullet
         @shard1.activate { @user = User.create!(name: 'outofshard') }
         enrollment = @course1.enroll_student(@user)
 
@@ -2289,7 +2289,6 @@ describe CoursesController, type: :request do
         specs_require_sharding
 
         it "should load the user's enrollment for an out-of-shard user" do
-          pend_with_bullet
           @shard1.activate { @user = User.create!(name: 'outofshard') }
           enrollment = @course1.enroll_student(@user)
           @course1.root_account.pseudonyms.create!(user: @user, unique_id: 'outofshard')
@@ -2417,7 +2416,6 @@ describe CoursesController, type: :request do
       end
 
       it "doesn't return enrollments from another course" do
-        pend_with_bullet
         other_enroll = @course2.enroll_user(@student1, 'StudentEnrollment')
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
@@ -3045,7 +3043,8 @@ describe CoursesController, type: :request do
     end
 
     it "should update settings" do
-      Auditors::Course.expects(:record_updated).with(anything, anything, anything, source: :api)
+      expect(Auditors::Course).to receive(:record_updated).
+        with(anything, anything, anything, source: :api)
 
       json = api_call(:put, "/api/v1/courses/#{@course.id}/settings", {
         :controller => 'courses',

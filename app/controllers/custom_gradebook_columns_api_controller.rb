@@ -87,7 +87,7 @@ class CustomGradebookColumnsApiController < ApplicationController
   #
   # @returns CustomColumn
   def create
-    column = @context.custom_gradebook_columns.build(params[:column])
+    column = @context.custom_gradebook_columns.build(column_params)
     update_column(column)
   end
 
@@ -98,7 +98,7 @@ class CustomGradebookColumnsApiController < ApplicationController
   # @returns CustomColumn
   def update
     column = @context.custom_gradebook_columns.not_deleted.find(params[:id])
-    column.attributes = params[:column]
+    column.attributes = column_params
     update_column(column)
   end
 
@@ -128,6 +128,7 @@ class CustomGradebookColumnsApiController < ApplicationController
     render :status => 200, :json => {}
   end
 
+  private
   def update_column(column)
     if authorized_action? column, @current_user, :manage
       if column.save
@@ -138,5 +139,8 @@ class CustomGradebookColumnsApiController < ApplicationController
       end
     end
   end
-  private :update_column
+
+  def column_params
+    params.require(:column).permit(:title, :position, :teacher_notes, :hidden)
+  end
 end

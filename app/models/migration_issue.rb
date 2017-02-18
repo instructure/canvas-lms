@@ -1,8 +1,6 @@
 class MigrationIssue < ActiveRecord::Base
   include Workflow
 
-  attr_accessible :issue_type, :description, :fix_issue_html_url, :error_message, :error_report_id, :workflow_state
-
   belongs_to :content_migration
   belongs_to :error_report
 

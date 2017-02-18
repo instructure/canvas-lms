@@ -31,7 +31,7 @@ define [
       @$el.attr 'data-id', @model.get 'id'
       @$el.html """
           <a href="#" class="ellipsis" title="#{h @model.get('title')}">
-            <i class="icon-note-light"></i>
+            <i class="icon-outcomes" aria-hidden="true"></i>
             <span>#{h @model.get('title')}</span>
           </a>
         """

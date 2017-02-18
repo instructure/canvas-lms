@@ -48,6 +48,9 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
         color: $ic-font-color-dark;
         border-radius: $baseBorderRadius;
         padding: $ic-sp/2 $ic-sp;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
 
         @if $use_high_contrast {
           text-decoration: underline;

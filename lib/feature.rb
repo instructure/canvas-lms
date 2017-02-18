@@ -146,9 +146,11 @@ END
     'underline_all_links' =>
     {
       display_name: -> { I18n.t('Underline Links') },
-      description: -> { I18n.t('Display all text links in Canvas as *underlined text*.',
-        wrapper: { '*' => '<span class="feature-detail-underline">\1</span>' }
-      )},
+      description: -> { I18n.t('underline_all_links_description', <<-END, wrapper: { '*' => '<span class="feature-detail-underline">\1</span>' })},
+Underline Links displays hyperlinks in navigation menus, the Dashboard, and page sidebars as
+*underlined text*. This feature option does not apply to user-generated content links in the
+Rich Content Editor, which always underlines links for all users.
+END
       applies_to: 'User',
       state: 'allowed',
       beta: true
@@ -500,7 +502,7 @@ END
       display_name: -> { I18n.t('Student Context Card') },
       description: -> { I18n.t('Enable student context card links') },
       applies_to: "RootAccount",
-      state: "hidden_in_prod",
+      state: "allowed",
       beta: true
     },
     'gradezilla' =>
@@ -511,7 +513,16 @@ END
       state: "hidden",
       beta: true,
       development: true,
-    }
+    },
+    'modules_home_page' =>
+    {
+      display_name: -> { I18n.t('Modules Home Page') },
+      description: -> { I18n.t('Default to modules for the course home page') },
+      applies_to: "RootAccount",
+      state: "hidden",
+      beta: true,
+      development: true,
+    },
   )
 
   def self.definitions

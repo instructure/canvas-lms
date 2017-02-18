@@ -24,6 +24,7 @@ describe "discussions" do
 
     context "as anyone"  do
       let(:topic) { somebody_topic }
+      let(:topic_participant) { topic.discussion_topic_participants.find_by(user: somebody) }
 
       before(:each) do
         user_session(somebody)
@@ -46,7 +47,8 @@ describe "discussions" do
           #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
           scroll_into_view ".entry-content:last"
           expect(f("#content")).not_to contain_css('.discussion_entry.unread')
-          expect(ff('.discussion_entry.read').length).to eq reply_count + 1 # +1 because the topic also has the .discussion_entry class
+          expect(ff('.discussion_entry.read')).to have_size reply_count + 1 # +1 because the topic also has the .discussion_entry class
+          expect { topic_participant.reload.unread_entry_count }.to become(0) # ajax requests are kicked off after UI changes; make sure they complete
 
           # refresh page and make sure nothing is unread and everthing is .read
           get url
@@ -61,13 +63,11 @@ describe "discussions" do
           topic.create_materialized_view
 
           get url
-          expect(ff(".discussion_entry.unread").size).to eq 2
-          expect(f('.new-and-total-badge .new-items').text).to eq '2'
+          expect(ff(".discussion_entry.unread")).to have_size(2)
+          expect(f('.new-and-total-badge .new-items')).to include_text('2')
 
           scroll_into_view '.entry-content:last'
           expect(ff('.discussion_entry.unread')).to have_size(1)
-          wait_for_ajaximations
-          expect(ff(".discussion_entry.unread").size).to eq 1
         end
 
         it "should mark all as read", priority: "1", test_id: 150488 do

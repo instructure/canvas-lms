@@ -14,6 +14,7 @@
 .byebug_history
 .env
 /.yardoc/
+/.ruby-version
 /app/coffeescripts/ember/*/main.coffee
 /app/coffeescripts/ember/screenreader_gradebook/templates/**/*.js
 /app/views/info/styleguide.html.erb
@@ -32,7 +33,9 @@ app/stylesheets/brandable_css_brands
 /db/*sql
 /exports/
 Gemfile.lock
-Gemfile.lock5
+Gemfile.lock.24
+Gemfile.lock.5
+Gemfile.lock.24.5
 /log/
 mkmf.log
 /node_modules

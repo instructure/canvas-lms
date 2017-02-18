@@ -14,6 +14,9 @@
 #     rich-content-service:
 #       app-host: rce.docker
 #       cdn-host: rce.docker
+#     live-events-subscription-service:
+#       app-host: http://les.docker
+#       sad-panda: null
 # development:
 #   host: consul
 #   port: 8500
@@ -25,3 +28,6 @@
 #     rich-content-service:
 #       app-host: rce.docker
 #       cdn-host: null
+#     live-events-subscription-service:
+#       app-host: http://les.docker
+#       sad-panda: null

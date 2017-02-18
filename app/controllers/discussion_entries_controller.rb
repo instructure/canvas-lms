@@ -40,7 +40,10 @@ class DiscussionEntriesController < ApplicationController
     @topic = @context.discussion_topics.active.find(params[:discussion_entry].delete(:discussion_topic_id))
     params[:discussion_entry].delete :remove_attachment rescue nil
     parent_id = params[:discussion_entry].delete(:parent_id)
-    @entry = @topic.discussion_entries.temp_record(params[:discussion_entry])
+
+    entry_params = params.require(:discussion_entry).permit(:message, :plaintext_message)
+
+    @entry = @topic.discussion_entries.temp_record(entry_params)
     @entry.current_user = @current_user
     @entry.user_id = @current_user ? @current_user.id : nil
     @entry.parent_id = parent_id
@@ -89,12 +92,11 @@ class DiscussionEntriesController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def update
     @topic = @context.all_discussion_topics.active.find(params[:topic_id]) if params[:topic_id].present?
-    params[:discussion_entry] ||= params
-    @remove_attachment = params[:discussion_entry].delete :remove_attachment
-    # unused attributes during update
-    params[:discussion_entry].delete(:discussion_topic_id)
-    params[:discussion_entry].delete(:parent_id)
-    params[:discussion_entry][:message] = process_incoming_html_content(params[:discussion_entry][:message])
+
+    entry_params = (params[:discussion_entry] || params).permit(:message, :plaintext_message, :remove_attachment)
+    entry_params[:message] = process_incoming_html_content(entry_params[:message]) if entry_params[:message]
+
+    @remove_attachment = entry_params.delete :remove_attachment
 
     @entry = (@topic || @context).discussion_entries.find(params[:id])
     raise(ActiveRecord::RecordNotFound) if @entry.deleted?
@@ -106,7 +108,7 @@ class DiscussionEntriesController < ApplicationController
       return if context_file_quota_exceeded?
       @entry.editor = @current_user
       respond_to do |format|
-        if @entry.update_attributes(params[:discussion_entry].slice(:message, :plaintext_message))
+        if @entry.update_attributes(entry_params)
           save_attachment
           format.html {
             flash[:notice] = t :updated_entry_notice, 'Entry was successfully updated.'
@@ -210,7 +212,7 @@ class DiscussionEntriesController < ApplicationController
   def save_attachment
     return unless can_attach?
 
-    attachment_params = strong_params.require(:attachment).
+    attachment_params = params.require(:attachment).
       permit(Attachment.permitted_attributes)
     @attachment = @context.attachments.create(attachment_params)
     @entry.attachment = @attachment

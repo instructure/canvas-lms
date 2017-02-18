@@ -31,7 +31,8 @@ describe MessagesController do
 
       it "should be able to send messages" do
         secure_id, message_id = ['secure_id', 42]
-        IncomingMailProcessor::IncomingMessageProcessor.any_instance.expects(:process_single).with(anything, "#{secure_id}-#{message_id}")
+        expect_any_instance_of(IncomingMailProcessor::IncomingMessageProcessor).to receive(:process_single).
+          with(anything, "#{secure_id}-#{message_id}")
         post 'create', :secure_id  => secure_id,
                        :message_id => message_id,
                        :subject    => 'subject',

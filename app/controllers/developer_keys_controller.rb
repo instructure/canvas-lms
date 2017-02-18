@@ -36,7 +36,7 @@ class DeveloperKeysController < ApplicationController
   end
 
   def create
-    @key = DeveloperKey.new(params[:developer_key])
+    @key = DeveloperKey.new(developer_key_params)
     @key.account = @context if params[:account_id] && @context != Account.site_admin
     if @key.save
       render :json => developer_key_json(@key, @current_user, session, account_context)
@@ -47,7 +47,7 @@ class DeveloperKeysController < ApplicationController
 
   def update
     @key.process_event!(params[:developer_key].delete(:event)) if params[:developer_key].key?(:event)
-    @key.attributes = params[:developer_key]
+    @key.attributes = developer_key_params unless params[:developer_key].empty?
     if @key.save
       render :json => developer_key_json(@key, @current_user, session, account_context)
     else
@@ -85,5 +85,9 @@ class DeveloperKeysController < ApplicationController
 
   def require_manage_developer_keys
     require_context_with_permission(account_context, :manage_developer_keys)
+  end
+
+  def developer_key_params
+    params.require(:developer_key).permit(:api_key, :name, :icon_url, :redirect_uri, :redirect_uris, :email, :auto_expire_tokens)
   end
 end

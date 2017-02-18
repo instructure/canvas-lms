@@ -19,11 +19,13 @@
 require_relative '../api_spec_helper'
 require_relative '../locked_spec'
 require_relative '../../sharding_spec_helper'
+require_relative '../../lti_spec_helper'
 
-describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
+describe AssignmentsApiController, type: :request do
   include Api
   include Api::V1::Assignment
   include Api::V1::Submission
+  include LtiSpecHelper
 
   context 'locked api item' do
     include_examples 'a locked api item'
@@ -98,6 +100,12 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       @course.assignments.create!(title: "Example Assignment")
       json = api_get_assignments_index_from_course(@course)
       expect(json.first).to have_key('in_closed_grading_period')
+    end
+
+    it "includes due_date_required in returned json" do
+      @course.assignments.create!(title: "Example Assignment")
+      json = api_get_assignments_index_from_course(@course)
+      expect(json.first).to have_key('due_date_required')
     end
 
     it "sorts the returned list of assignments" do
@@ -1116,7 +1124,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
       api_create_assignment_in_course(@course, {
         'description' => 'description',
-        'assignmentConfigurationTool' => tool.id,
+        'similarityDetectionTool' => tool.id,
         'configuration_tool_type' => 'ContextExternalTool',
         'submission_type' => 'online',
         'submission_types' => ['online_upload']
@@ -1126,7 +1134,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       expect(a.tool_settings_tool).to eq(tool)
     end
 
-    it "sets the configuration an LTI 2 tool in account context" do
+    it "sets the configuration LTI 2 tool in account context" do
       account = @course.account
       product_family = Lti::ProductFamily.create(
         vendor_code: '123',
@@ -1162,7 +1170,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
       api_create_assignment_in_course(@course, {
         'description' => 'description',
-        'assignmentConfigurationTool' => message_handler.id,
+        'similarityDetectionTool' => message_handler.id,
         'configuration_tool_type' => 'Lti::MessageHandler',
         'submission_type' => 'online',
         'submission_types' => ['online_upload']
@@ -1208,7 +1216,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
       api_create_assignment_in_course(@course, {
         'description' => 'description',
-        'assignmentConfigurationTool' => message_handler.id,
+        'similarityDetectionTool' => message_handler.id,
         'configuration_tool_type' => 'Lti::MessageHandler',
         'submission_type' => 'online',
         'submission_types' => ['online_upload']
@@ -1221,7 +1229,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
     it "does not set the configuration tool if the submission type is not online with uploads" do
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
       api_create_assignment_in_course(@course, {'description' => 'description',
-        'assignmentConfigurationTool' => tool.id,
+        'similarityDetectionTool' => tool.id,
         'configuration_tool_type' => 'ContextExternalTool'
       })
 

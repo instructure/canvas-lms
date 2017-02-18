@@ -48,7 +48,7 @@
   >
     <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
     <div class="event-details">
-      <b><%= recent_event.title %></b>
+      <b class="event-details__title"><%= recent_event.title %></b>
       <% if show_context %>
         <p><%= context.nickname_for(@current_user, :short_name) %></p>
       <% end %>

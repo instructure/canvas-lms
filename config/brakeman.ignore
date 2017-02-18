@@ -18,6 +18,63 @@
         },
         "user_input": "Enrollment.active_student_conditions",
         "confidence": "High"
+      },
+      {
+        "note": "Enrollment.active_student_conditions accepts no user input",
+        "warning_type": "SQL Injection",
+        "warning_code": 0,
+        "fingerprint": "b67a9b9726298fc3e829fd40dd141316eff1c8084cdc07e15a57ecc5b0bbacb9",
+        "message": "Possible SQL injection",
+        "file": "app/models/submission.rb",
+        "line": 213,
+        "link": "http://brakemanscanner.org/docs/warning_types/sql_injection/",
+        "code": "Enrollment.where(Enrollment.active_student_conditions)",
+        "render_path": null,
+        "location": {
+          "type": "method",
+          "class": "Submission",
+          "method": "touch_assignments"
+        },
+        "user_input": "Enrollment.active_student_conditions",
+        "confidence": "High"
+      },
+      {
+        "note": "Submission.needs_grading_conditions accepts no user input",
+        "warning_type": "SQL Injection",
+        "warning_code": 0,
+        "fingerprint": "90b239bee8ac22b4c5d6c4d81572f155d3c073446542fa3bad6135b4578e2a91",
+        "message": "Possible SQL injection",
+        "file": "app/models/assignment.rb",
+        "line": 1949,
+        "link": "http://brakemanscanner.org/docs/warning_types/sql_injection/",
+        "code": "Submission.where(\"assignment_id=assignments.id\").where(Submission.needs_grading_conditions)",
+        "render_path": null,
+        "location": {
+          "type": "method",
+          "class": "Assignment",
+          "method": "need_grading_info"
+        },
+        "user_input": "Submission.needs_grading_conditions",
+        "confidence": "High"
+      },
+      {
+        "note": "Enrollment.active_student_conditions accepts no user input",
+        "warning_type": "SQL Injection",
+        "warning_code": 0,
+        "fingerprint": "aba39acd96b69d6eb24de776b3a972a2d8f68133fe89c477b5acab2cb41a99f6",
+        "message": "Possible SQL injection",
+        "file": "app/models/enrollment.rb",
+        "line": 163,
+        "link": "http://brakemanscanner.org/docs/warning_types/sql_injection/",
+        "code": "Enrollment.where(Enrollment.active_student_conditions)",
+        "render_path": null,
+        "location": {
+          "type": "method",
+          "class": "Enrollment",
+          "method": "touch_assignments"
+        },
+        "user_input": "Enrollment.active_student_conditions",
+        "confidence": "High"
       }
     ]
 }

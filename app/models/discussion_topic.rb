@@ -37,13 +37,8 @@ class DiscussionTopic < ActiveRecord::Base
   restrict_columns :content, [:title, :message]
   restrict_columns :settings, [:delayed_post_at, :require_initial_post, :discussion_type,
                                :lock_at, :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating]
+  restrict_columns :settings, Assignment::RESTRICTED_SETTINGS
 
-  attr_accessible(
-    :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
-    :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
-    :require_initial_post, :threaded, :discussion_type, :context, :pinned, :locked,
-    :group_category, :allow_rating, :only_graders_can_rate, :sort_by_rating
-  )
   attr_accessor :user_has_posted, :saved_by
 
   module DiscussionTypes
@@ -776,7 +771,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.grants_right?(user, :read) }
     can :read_replies
 
-    given { |user| self.user && self.user == user && self.visible_for?(user) && !self.locked_for?(user, :check_policies => true) && !has_concluded_contexts?}
+    given { |user| self.user && self.user == user && self.visible_for?(user) && !self.locked_for?(user, :check_policies => true) && can_participate_in_course?(user)}
     can :reply
 
     given { |user| self.user && self.user == user && self.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) && context.grants_right?(user, :participate_as_student) }
@@ -786,8 +781,8 @@ class DiscussionTopic < ActiveRecord::Base
     can :delete
 
     given { |user, session| !self.locked_for?(user, :check_policies => true) &&
-        self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user) && !has_concluded_contexts?}
-    can :reply and can :read
+        self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user) && can_participate_in_course?(user)}
+    can :reply
 
     given { |user, session|
       !is_announcement &&
@@ -1052,8 +1047,15 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def has_concluded_contexts?
-    course.concluded? || (group && !group.available?)
+  def can_participate_in_course?(user)
+    if self.group && self.group.deleted?
+      false
+    elsif self.course.is_a?(Course)
+      # this probably isn't a perfect way to determine this but I can't think of a better one
+      self.course.enrollments.for_user(user).active_by_date.exists? || self.course.grants_right?(user, :read_as_admin)
+    else
+      true
+    end
   end
 
   # Public: Determine if the discussion topic is locked for a specific user. The topic is locked when the

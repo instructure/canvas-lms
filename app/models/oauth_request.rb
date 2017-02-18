@@ -19,7 +19,5 @@
 class OauthRequest < ActiveRecord::Base
   belongs_to :user
 
-  attr_accessible :service, :token, :secret, :user_secret, :return_url, :user, :original_host_with_port
-  
   def self.serialization_excludes; [:secret, :user_secret]; end
 end

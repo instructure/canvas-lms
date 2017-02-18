@@ -63,6 +63,10 @@ module AcademicBenchmark
     self.config.present? && self.config[:partner_key].present?
   end
 
+  def self.use_new_guid_columns?
+    self.config.present? && self.config[:new_guid_columns]
+  end
+
   def self.extract_nat_stds(api, nat_stds_guid)
     return [] if nat_stds_guid.nil?
     if AcademicBenchmark.v3?

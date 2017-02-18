@@ -32,14 +32,12 @@ describe SupportHelpers::Crocodoc::CrocodocFixer do
 
   let!(:crocodocument) do
     cd = shardattachment.create_crocodoc_document
-    cd.update_attributes(uuid: 'some stuff', attachment: shardattachment,
-                         process_state: 'ERROR')
+    cd.update_attributes(uuid: 'some stuff', process_state: 'ERROR')
     cd
   end
   let!(:crocodocument2) do
     cd = shardattachment2.create_crocodoc_document
-    cd.update_attributes(uuid: 'some stuff', attachment: shardattachment,
-                         process_state: 'ERROR')
+    cd.update_attributes(uuid: 'some stuff', process_state: 'ERROR')
     cd
   end
 

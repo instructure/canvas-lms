@@ -1,17 +1,44 @@
 define([
   'react',
   'react-dom',
-  'react-addons-test-utils',
+  'enzyme',
   'jsx/webzip_export/components/ExportListItem',
-], (React, ReactDOM, TestUtils, ExportListItem) => {
+], (React, ReactDOM, enzyme, ExportListItem) => {
   module('ExportListItem')
 
   test('renders the ExportListItem component', () => {
-    const date = 'Sept 11, 2001 @ 8:46 AM'
-    const link = 'https://example.com/neverforget'
+    const props = {
+      date: 'Sept 11, 2001 at 8:46am',
+      link: 'https://example.com/neverforget',
+      workflowState: 'generated',
+      newExport: false
+    }
+    const tree = enzyme.shallow(<ExportListItem {...props} />)
+    const node = tree.find('.webzipexport__list__item')
+    ok(node.exists())
+  })
 
-    const tree = TestUtils.renderIntoDocument(<ExportListItem date={date} link={link} />)
-    const ExportListItemComponent = TestUtils.scryRenderedDOMComponentsWithClass(tree, 'webzipexport__list__item')[0]
-    ok(ExportListItemComponent)
+  test('renders different text for last success', () => {
+    const props = {
+      date: '2017-01-13T2:30:00Z',
+      link: 'https://example.com/alwaysremember',
+      workflowState: 'generated',
+      newExport: true
+    }
+    const tree = enzyme.shallow(<ExportListItem {...props} />)
+    const node = tree.find('.webzipexport__list__item')
+    ok(node.text().startsWith('Most recent export'))
+  })
+
+  test('renders error text if last object failed', () => {
+    const props = {
+      date: '2017-01-13T2:30:00Z',
+      link: 'https://example.com/alwaysremember',
+      workflowState: 'failed',
+      newExport: true
+    }
+    const tree = enzyme.shallow(<ExportListItem {...props} />)
+    const node = tree.find('.text-error')
+    ok(node.text().startsWith('Export failed'))
   })
 })

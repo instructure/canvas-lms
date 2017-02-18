@@ -43,9 +43,10 @@ describe "admin settings tab" do
   end
 
   context "SIS Agent Token Authentication" do
-    it "should test SIS Agent Token Authentication", priority: "2", test_id: 132577 do
+    let(:sis_token){ 'too much tuna' }
+
+    it "should test SIS Agent Token Authentication with post_grades feature enabled", priority: "2", test_id: 132577 do
       course_with_admin_logged_in(:account => Account.site_admin)
-      sis_token = "canvas"
       account.enable_feature!(:post_grades)
 
       get_settings_page(account)
@@ -58,7 +59,22 @@ describe "admin settings tab" do
 
       account.disable_feature!(:post_grades)
       refresh_page
-      expect(f("#account_settings")).not_to contain_css("#account_settings_sis_app_token")
+      expect(f("#account_settings")).to contain_css("#account_settings_sis_app_token")
+    end
+
+    it "should test SIS Agent Token Authentication with post_grades feature disabled", priority: "2", test_id: 132578 do
+      course_with_admin_logged_in(:account => Account.site_admin)
+      get_settings_page(account)
+      expect(f("#add_sis_app_token")).to be_displayed
+      expect(f("#account_settings_sis_app_token")).to be_displayed
+      f("#account_settings_sis_app_token").send_keys(sis_token)
+      f(".Button--primary").click
+      token = f("#account_settings_sis_app_token")
+      expect(token).to have_value(sis_token)
+
+      account.disable_feature!(:post_grades)
+      refresh_page
+      expect(f("#account_settings")).to contain_css("#account_settings_sis_app_token")
     end
   end
 
@@ -155,11 +171,15 @@ describe "admin settings tab" do
       end
 
       context "persists SIS syncing settings on refresh" do
+        before do
+          account.set_feature_flag! 'post_grades', 'on'
+          get_settings_page(account)
+        end
+
         it { test_checkbox_on_off(sis_syncing) }
 
         context "SIS syncing => true" do
           before do
-            account.set_feature_flag! 'post_grades', 'on'
             account.settings = { sis_syncing: { value: true } }
             account.save
             get_settings_page(account)
@@ -200,6 +220,10 @@ describe "admin settings tab" do
         before do
           account.set_feature_flag! 'post_grades', 'off'
           get_settings_page(account)
+        end
+
+        it "does not display SIS Syncing option" do
+          expect(f("body")).not_to contain_css(sis_syncing)
         end
 
         it "does not display the 'Post Grades to SIS' option" do

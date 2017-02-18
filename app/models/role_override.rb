@@ -22,7 +22,6 @@ class RoleOverride < ActiveRecord::Base
   belongs_to :role
   include Role::AssociationHelper
 
-  attr_accessible :context, :permission, :role, :enabled, :locked, :applies_to_self, :applies_to_descendants
   validates :enabled, inclusion: [true, false]
   validates :locked, inclusion: [true, false]
 
@@ -441,7 +440,8 @@ class RoleOverride < ActiveRecord::Base
           'DesignerEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :applies_to_concluded => true
       },
       :manage_files => {
         :label => lambda { t('permissions.manage_files', "Manage (add / edit / delete) course files") },
@@ -584,6 +584,18 @@ class RoleOverride < ActiveRecord::Base
         :true_for => [
           'AccountAdmin'
         ]
+      },
+      :manage_master_courses => {
+        :label => lambda { t('Blueprint Courses (create / edit / associate / delete)') },
+        :available_to => [
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :account_only => true,
+        :true_for => [
+          'AccountAdmin'
+        ],
+        :account_allows => lambda {|a| a.feature_allowed?(:master_courses)}
       },
       :manage_user_logins => {
         :label => lambda { t('permissions.manage_user_logins', "Modify login details for users") },

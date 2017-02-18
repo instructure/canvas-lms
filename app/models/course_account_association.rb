@@ -21,7 +21,6 @@ class CourseAccountAssociation < ActiveRecord::Base
   belongs_to :course_section
   belongs_to :account
   has_many :account_users, :foreign_key => 'account_id', :primary_key => 'account_id'
-  attr_accessible :account, :depth, :course_section
 
   validates_presence_of :course_id, :account_id, :depth
 end

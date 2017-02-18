@@ -29,5 +29,5 @@ define [
       model.get('sortable_name') or model.get('name')
 
     parse: (response) ->
-      map(response, (model) -> extend(model, id: model.collaborator_id))
+      map(response, (model) -> extend(model, id: "#{model.type}_#{model.collaborator_id}"))
 

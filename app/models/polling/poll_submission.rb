@@ -18,8 +18,6 @@
 
 module Polling
   class PollSubmission < ActiveRecord::Base
-    attr_accessible :poll, :poll_choice, :poll_session, :user
-
     belongs_to :poll, class_name: 'Polling::Poll'
     belongs_to :poll_choice, class_name: 'Polling::PollChoice'
     belongs_to :poll_session, class_name: 'Polling::PollSession'

@@ -52,3 +52,50 @@
     background: transparent url(/images/messages/context-search-sprite.png) 0 0 no-repeat;
   }
 }
+
+/* Add People */
+.addpeople {
+  .addpeople__peoplesearch {
+    fieldset {
+      margin-top:1.5em;
+    }
+    fieldset.peoplesearch__selections {
+      margin-right: auto;
+      margin-left: auto;
+      text-align: center;
+      .peoplesearch__selection {
+        text-align: left;
+        margin: 0 1em;
+        display: inline-block;
+        width: 30%;
+      }
+    }
+    .peoplesearch__instructions {
+      margin: 1.5em 0;
+      text-align: center;
+      i.icon-user {
+        display:block;
+        height: 50px;
+        margin: 0 auto;
+      }
+      i.icon-user::before {
+        font-size: 48px;
+      }
+    }
+
+
+    /* need a little space between inline inst-ui <RadioInput>s */
+    label[for^='peoplesearch_radio'] {
+        margin-right: 1em;
+    }
+  }
+  .namelist {
+    margin: 1.5em 0;
+  }
+  .peoplevalidationissues__missing tr td:first-child {
+    width: 30px;
+  }
+}
+.addpeople:focus {
+  outline: none;
+}

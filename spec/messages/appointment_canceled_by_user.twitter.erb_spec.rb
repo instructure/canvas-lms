@@ -30,7 +30,6 @@ describe 'appointment_canceled_by_user.twitter' do
 
     expect(@message.body).to include('some title')
     expect(@message.body).to include(user.name)
-    expect(@message.main_link).to be_present
   end
 
   it "should render for groups" do
@@ -47,6 +46,5 @@ describe 'appointment_canceled_by_user.twitter' do
 
     expect(@message.body).to include('some title')
     expect(@message.body).to include(user.name)
-    expect(@message.main_link).to be_present
   end
 end

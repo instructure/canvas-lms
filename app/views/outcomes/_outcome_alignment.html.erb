@@ -1,8 +1,6 @@
 <% outcome_alignment ||= nil %>
 <%= outcome_alignment_tag(@context, @outcome, outcome_alignment) do -%>
   <div class="header">
-    <a href="#" class="move_alignment_link no-hover"><%= image_tag "move.png", :alt => t('Move') %></a>
-    <%= image_tag "blank.png", :class => "type_icon", :alt => outcome_alignment.try_rescue(:content_type).try_rescue(:titleize), :title => outcome_alignment.try_rescue(:content_type).try_rescue(:titleize) %>
     <%= link_to_outcome_alignment(@context, @outcome, outcome_alignment) %>
   </div>
   <div class="links"></div>

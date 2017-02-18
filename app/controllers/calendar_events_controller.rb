@@ -48,14 +48,14 @@ class CalendarEventsController < ApplicationController
   def new
     @event = @context.calendar_events.temp_record
     add_crumb(t('crumbs.new', "New Calendar Event"), named_context_url(@context, :new_context_calendar_event_url))
-    @event.assign_attributes(params.slice(:title, :start_at, :end_at, :location_name, :location_address))
+    @event.assign_attributes(params.permit(:title, :start_at, :end_at, :location_name, :location_address))
     js_env(:RECURRING_CALENDAR_EVENTS_ENABLED => feature_context.feature_enabled?(:recurring_calendar_events))
     authorized_action(@event, @current_user, :create)
   end
 
   def create
     params[:calendar_event][:time_zone_edited] = Time.zone.name if params[:calendar_event]
-    @event = @context.calendar_events.build(params[:calendar_event])
+    @event = @context.calendar_events.build(calendar_event_params)
     if authorized_action(@event, @current_user, :create)
       respond_to do |format|
         @event.updating_user = @current_user
@@ -74,7 +74,7 @@ class CalendarEventsController < ApplicationController
   def edit
     @event = @context.calendar_events.find(params[:id])
     if @event.grants_right?(@current_user, session, :update)
-      @event.update_attributes!(params.slice(:title, :start_at, :end_at, :location_name, :location_address))
+      @event.update_attributes!(params.permit(:title, :start_at, :end_at, :location_name, :location_address))
     end
     if authorized_action(@event, @current_user, :update_content)
       render :new
@@ -87,7 +87,7 @@ class CalendarEventsController < ApplicationController
       respond_to do |format|
         params[:calendar_event][:time_zone_edited] = Time.zone.name if params[:calendar_event]
         @event.updating_user = @current_user
-        if @event.update_attributes(params[:calendar_event])
+        if @event.update_attributes(calendar_event_params)
           log_asset_access(@event, "calendar", "calendar", 'participate')
           flash[:notice] = t 'notices.updated', "Event was successfully updated."
           format.html { redirect_to calendar_url_for(@context) }
@@ -125,5 +125,10 @@ class CalendarEventsController < ApplicationController
     else
       @context
     end
+  end
+
+  def calendar_event_params
+    params.require(:calendar_event).
+      permit(CalendarEvent.permitted_attributes + [:child_event_data => strong_anything])
   end
 end

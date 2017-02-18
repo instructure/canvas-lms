@@ -305,7 +305,8 @@ module QuizzesCommon
   end
 
   def start_quiz_question
-    quiz_model(course: @course)
+    @context = @course
+    quiz_model
     open_quiz_edit_form
     click_questions_tab
     click_new_question_button
@@ -368,7 +369,9 @@ module QuizzesCommon
   end
 
   def submit_quiz
-    expect_new_page_load(true) { f('#submit_quiz_button').click }
+    f('#submit_quiz_button').click
+    accept_alert if alert_present?
+    wait_for_ajax_requests
 
     expect(f('.quiz-submission .quiz_score .score_value')).to be_truthy
   end

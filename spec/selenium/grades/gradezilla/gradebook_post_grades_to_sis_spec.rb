@@ -13,6 +13,7 @@ describe "Gradezilla - post grades to SIS" do
   end
 
   before(:each) do
+    Account.default.set_feature_flag!('gradezilla', 'on')
     user_session(@teacher)
   end
 
@@ -96,7 +97,6 @@ describe "Gradezilla - post grades to SIS" do
           }
         }
       )
-      post_grades_tool.context_external_tool_placements.create!(placement_type: 'post_grades')
       post_grades_tool
     end
 
@@ -110,7 +110,7 @@ describe "Gradezilla - post grades to SIS" do
     end
 
     it "should show post grades lti button when only one section available" do
-      course = Course.new(course_name: 'Math 201', account: @account, active_course: true, sis_source_id: 'xyz')
+      course = Course.new(name: 'Math 201', account: @account, sis_source_id: 'xyz')
       course.save
       course.enroll_teacher(@user).accept!
       course.assignments.create!(name: 'Assignment1', post_to_sis: true)
@@ -118,7 +118,9 @@ describe "Gradezilla - post grades to SIS" do
 
       gradezilla_page.visit(course)
       expect(f('button.external-tools-dialog')).to be_displayed
-      f('button.external-tools-dialog').click
+
+      # Click with javascript to avoid some page load errors in chrome
+      driver.execute_script("$('button.external-tools-dialog').click()")
       expect(f('iframe.post-grades-frame')).to be_displayed
     end
 
@@ -159,16 +161,14 @@ describe "Gradezilla - post grades to SIS" do
       expect(f('button#post_grades')).to be_displayed
     end
 
-    it "should show as drop down menu with an ellipsis when too many " \
+    it "should show as drop down menu with max items when too many " \
       "tools are installed", priority: "1", test_id: 244961 do
       (0...11).each do |i|
         create_post_grades_tool(name: "test tool #{i}")
       end
 
       gradezilla_page.visit(@course)
-      expect(ff('li.external-tools-dialog')).to have_size(11)
-      # check for ellipsis (we only display top 10 added tools)
-      expect(ff('li.external-tools-dialog.ellip')).to have_size(1)
+      expect(ff('li.external-tools-dialog')).to have_size(10)
     end
 
     it "should show as drop down menu when powerschool is configured " \
@@ -187,7 +187,7 @@ describe "Gradezilla - post grades to SIS" do
 
       expect(f('#post_grades .icon-mini-arrow-down')).to be_displayed
       move_to_click('button#post_grades')
-      f('li.post-grades-placeholder > a').click
+      f('a#post-grades-button').click
       expect(f('.post-grades-dialog')).to be_displayed
       # close post grade dialog
       fj('.ui-icon-closethick:visible').click

@@ -196,15 +196,20 @@ class BrandConfigsController < ApplicationController
   end
 
   def upload_file(file)
-    attachment = Attachment.create(uploaded_data: file, context: @account)
     expires_in = 15.years
-    attachment.authenticated_s3_url({
-      # this is how long the s3 verifier token will work
-      expires: expires_in,
-      # these are the http cache headers that will be set on the response
-      response_expires: expires_in,
-      response_cache_control: "Cache-Control:max-age=#{expires_in}, public"
-    })
-  end
+    attachment = Attachment.new(attachment_options: {
+                                  s3_access: 'public-read',
+                                  skip_sis: true,
+                                  cache_control: "Cache-Control:max-age=#{expires_in.to_i}, public",
+                                  expires: expires_in.from_now.httpdate },
+                                context: @account)
+    attachment.uploaded_data = file
+    attachment.save!
 
+    if Attachment.s3_storage?
+      attachment.s3_url
+    else
+      attachment.authenticated_s3_url
+    end
+  end
 end

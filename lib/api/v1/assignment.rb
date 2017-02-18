@@ -118,6 +118,7 @@ module Api::V1::Assignment
     hash['name'] = assignment.title
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
+    hash['due_date_required'] = assignment.due_date_required?
 
     unless opts[:exclude_response_fields].include?('in_closed_grading_period')
       hash['in_closed_grading_period'] = assignment.in_closed_grading_period?
@@ -302,6 +303,11 @@ module Api::V1::Assignment
     if assignment.context.present?
       hash['submissions_download_url'] = submissions_download_url(assignment.context, assignment)
     end
+
+    if opts[:include_master_course_restrictions]
+      hash.merge!(assignment.master_course_api_restriction_data)
+    end
+
     hash
   end
 
@@ -745,7 +751,7 @@ module Api::V1::Assignment
   end
 
   def assignment_configuration_tool(assignment_params)
-    tool_id = assignment_params['assignmentConfigurationTool'].to_i
+    tool_id = assignment_params['similarityDetectionTool'].to_i
     tool = nil
     if assignment_params['configuration_tool_type'] == 'ContextExternalTool'
       tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)

@@ -39,8 +39,6 @@ class LearningOutcomeResult < ActiveRecord::Base
 
   before_save :infer_defaults
 
-  attr_accessible :learning_outcome, :user, :association_object, :alignment, :associated_asset
-
   def calculate_percent!
     scale_data = scale_params
     if needs_scale?(scale_data) && self.score && self.possible

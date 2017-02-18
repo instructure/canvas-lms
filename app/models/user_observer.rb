@@ -19,8 +19,6 @@
 class UserObserver < ActiveRecord::Base
   belongs_to :user, inverse_of: :user_observees
   belongs_to :observer, :class_name => 'User', inverse_of: :user_observers
-  strong_params
-
   after_create :create_linked_enrollments
 
   validate :not_same_user, :if => lambda { |uo| uo.changed? }

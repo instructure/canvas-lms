@@ -20,7 +20,6 @@ require 'atom'
 
 class Account < ActiveRecord::Base
   include Context
-  strong_params
 
   INSTANCE_GUID_SUFFIX = 'canvas-lms'
 
@@ -31,9 +30,9 @@ class Account < ActiveRecord::Base
   authenticates_many :pseudonym_sessions
   has_many :courses
   has_many :all_courses, :class_name => 'Course', :foreign_key => 'root_account_id'
-  has_many :group_categories, -> { where(deleted_at: nil) }, as: :context
-  has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
-  has_many :groups, :as => :context
+  has_many :group_categories, -> { where(deleted_at: nil) }, as: :context, inverse_of: :context
+  has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context, :inverse_of => :context
+  has_many :groups, :as => :context, :inverse_of => :context
   has_many :all_groups, :class_name => 'Group', :foreign_key => 'root_account_id'
   has_many :all_group_memberships, source: 'group_memberships', through: :all_groups
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
@@ -51,13 +50,13 @@ class Account < ActiveRecord::Base
   has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
   has_many :users, :through => :account_users
   has_many :pseudonyms, -> { preload(:user) }, inverse_of: :account
-  has_many :role_overrides, :as => :context
+  has_many :role_overrides, :as => :context, :inverse_of => :context
   has_many :course_account_associations
   has_many :child_courses, -> { where(course_account_associations: { depth: 0 }) }, through: :course_account_associations, source: :course
-  has_many :attachments, :as => :context, :dependent => :destroy
-  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, class_name: 'Assignment'
-  has_many :folders, -> { order('folders.name') }, as: :context, dependent: :destroy
-  has_many :active_folders, -> { where("folder.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context
+  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'Assignment'
+  has_many :folders, -> { order('folders.name') }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :active_folders, -> { where("folder.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context, inverse_of: :context
   has_many :developer_keys
   has_many :authentication_providers,
            -> { order(:position) },
@@ -65,13 +64,13 @@ class Account < ActiveRecord::Base
            class_name: "AccountAuthorizationConfig"
 
   has_many :account_reports
-  has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context
+  has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
   has_many :assessment_questions, :through => :assessment_question_banks
-  has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context
+  has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context, inverse_of: :context
   has_many :roles
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
-  has_many :progresses, :as => :context
-  has_many :content_migrations, :as => :context
+  has_many :progresses, :as => :context, :inverse_of => :context
+  has_many :content_migrations, :as => :context, :inverse_of => :context
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql = []
@@ -89,13 +88,13 @@ class Account < ActiveRecord::Base
   include LearningOutcomeContext
   include RubricContext
 
-  has_many :context_external_tools, -> { order(:name) }, as: :context, dependent: :destroy
+  has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :error_reports
   has_many :announcements, :class_name => 'AccountNotification'
-  has_many :alerts, -> { preload(:criteria) }, as: :context
+  has_many :alerts, -> { preload(:criteria) }, as: :context, inverse_of: :context
   has_many :user_account_associations
   has_many :report_snapshots
-  has_many :external_integration_keys, :as => :context, :dependent => :destroy
+  has_many :external_integration_keys, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :shared_brand_configs
   belongs_to :brand_config, foreign_key: "brand_config_md5"
 
@@ -269,7 +268,6 @@ class Account < ActiveRecord::Base
       root_account.try(:sub_account_includes?) && root_account.try(:allow_global_includes?)
     end
   end
-
 
   def mfa_settings
     settings[:mfa_settings].try(:to_sym) || :disabled

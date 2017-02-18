@@ -17,7 +17,6 @@
 #
 
 class AccountNotificationRole < ActiveRecord::Base
-  strong_params
   belongs_to :account_notification
 
   belongs_to :role

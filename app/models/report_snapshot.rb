@@ -22,8 +22,6 @@ class ReportSnapshot < ActiveRecord::Base
 
   belongs_to :account
 
-  attr_accessible :report_type
-
   after_create :push_to_instructure_if_collection_enabled
   before_save :serialize_data
 
@@ -46,7 +44,7 @@ class ReportSnapshot < ActiveRecord::Base
     end
     items.sort_by(&:first).uniq(&:first)
   end
-  
+
   def report_value_over_time(*args)
     if args.length == 1
       ReportSnapshot.report_value_over_time(self.data, args.first)
@@ -84,9 +82,9 @@ class ReportSnapshot < ActiveRecord::Base
       return if self.report_type != REPORT_TO_SEND
       collection_type = Setting.get("usage_statistics_collection", "opt_out")
       return if collection_type  == "opt_out"
-      
+
       require 'lib/ssl_common'
-      
+
       data = {
           "collection_type" => collection_type,
           "installation_uuid" => Canvas.installation_uuid,
@@ -99,7 +97,7 @@ class ReportSnapshot < ActiveRecord::Base
         data["account_name"] = Account.default.name
         data["admin_email"] = Account.site_admin.users.first.pseudonyms.first.unique_id
       end
-      
+
       SSLCommon.post_form(STATS_COLLECTION_URL, data)
     rescue
     end

@@ -83,7 +83,6 @@ define([
     },
 
     augmentView: function(){
-      $("#add_notification_form textarea").width('100%');
       $("textarea.edit_notification_form, #add_notification_form textarea").each(function(i){
         RichContentEditor.loadNewEditor($(this));
       })

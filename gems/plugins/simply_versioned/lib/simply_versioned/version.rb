@@ -18,7 +18,7 @@ class Version < ActiveRecord::Base #:nodoc:
   validates_presence_of :versionable_id, :versionable_type
 
   before_create :initialize_number
-
+  
   # Return an instance of the versioned ActiveRecord model with the attribute
   # values of this version.
   def model

@@ -22,8 +22,6 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
 
   self.table_name = :quiz_statistics
 
-  attr_accessible :includes_all_versions, :anonymous, :report_type
-
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
   has_one :csv_attachment, :class_name => 'Attachment', :as => 'context',
     :dependent => :destroy

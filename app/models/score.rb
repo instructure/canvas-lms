@@ -19,8 +19,6 @@
 class Score < ActiveRecord::Base
   include Canvas::SoftDeletable
 
-  attr_accessible :current_score, :final_score, :grading_period
-
   belongs_to :enrollment
   belongs_to :grading_period
   has_one :course, through: :enrollment

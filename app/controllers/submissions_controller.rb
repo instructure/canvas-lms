@@ -240,13 +240,17 @@ class SubmissionsController < ApplicationController
       end
     end
 
-    params[:submission][:attachments] = params[:submission][:attachments].compact.uniq
+    submission_params = params[:submission].permit(
+      :body, :url, :submission_type, :comment, :group_comment,
+      :media_comment_type, :media_comment_id, :attachment_ids => []
+    )
+    submission_params[:attachments] = params[:submission][:attachments].compact.uniq
     if @context.root_account.feature_enabled?(:submissions_folder)
-      params[:submission][:attachments] = self.class.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments])
+      submission_params[:attachments] = self.class.copy_attachments_to_submissions_folder(@context, submission_params[:attachments])
     end
 
     begin
-      @submission = @assignment.submit_homework(@current_user, params[:submission])
+      @submission = @assignment.submit_homework(@current_user, submission_params)
     rescue ActiveRecord::RecordInvalid => e
       respond_to do |format|
         format.html {
@@ -571,7 +575,7 @@ class SubmissionsController < ApplicationController
       if params[:attachments]
         attachments = []
         params[:attachments].keys.each do |idx|
-          attachment = strong_params[:attachments][idx].permit(Attachment.permitted_attributes)
+          attachment = params[:attachments][idx].permit(Attachment.permitted_attributes)
           attachment[:user] = @current_user
           attachments << @assignment.attachments.create(attachment)
         end

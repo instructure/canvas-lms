@@ -88,11 +88,11 @@ class AssignmentGroupsApiController < ApplicationController
   def create
     @assignment_group = @context.assignment_groups.temp_record
     if authorized_action(@assignment_group, @current_user, :create)
-      unless valid_integration_data?(strong_params)
+      unless valid_integration_data?(params)
         return render :json => 'Invalid integration data', :status => :bad_request
       end
 
-      updated = update_assignment_group(@assignment_group, strong_params)
+      updated = update_assignment_group(@assignment_group, params)
       process_assignment_group(updated)
     end
   end
@@ -105,11 +105,11 @@ class AssignmentGroupsApiController < ApplicationController
   # @returns AssignmentGroup
   def update
     if authorized_action(@assignment_group, @current_user, :update)
-      unless valid_integration_data?(strong_params)
+      unless valid_integration_data?(params)
         return render :json => 'Invalid integration data', :status => :bad_request
       end
 
-      updated = update_assignment_group(@assignment_group, strong_params)
+      updated = update_assignment_group(@assignment_group, params)
       unless can_update_assignment_group?(@assignment_group)
         return render_unauthorized_action
       end

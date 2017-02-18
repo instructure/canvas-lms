@@ -21,6 +21,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe ProfileController do
+  def enter_student_view(opts={})
+    course = opts[:course] || @course || course(opts)
+    @fake_student = course.student_view_student
+    post "/users/#{@fake_student.id}/masquerade"
+    expect(session[:become_user_id]).to eq @fake_student.id.to_s
+  end
+
   it "should respect account setting for editing names" do
     a = Account.create!
     u = user_with_pseudonym(:account => a, :active_user => true)

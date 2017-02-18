@@ -185,7 +185,10 @@ define([
     submissionsFolderSelected = submissionsFolderSelected || this.props.selectedItems.some(function(item) {
       return item.get('for_submissions');
     });
-    var canManage = this.props.userCanManageFilesForContext && !submissionsFolderSelected;
+    var restrictedByMasterCourse = this.props.selectedItems.some(function(item) {
+      return item.get('restricted_by_master_course');
+    });
+    var canManage = this.props.userCanManageFilesForContext && !submissionsFolderSelected && !restrictedByMasterCourse;
 
     this.showingButtons = this.props.selectedItems.length
 
@@ -271,6 +274,5 @@ define([
       </header>
     );
   }
-
   return React.createClass(Toolbar);
 });

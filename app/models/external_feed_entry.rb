@@ -34,8 +34,6 @@ class ExternalFeedEntry < ActiveRecord::Base
   validates :author_email, length: {maximum: maximum_string_length, allow_nil: true, allow_blank: false}
   sanitize_field :message, CanvasSanitize::SANITIZE
 
-  attr_accessible :title, :message, :source_name, :source_url, :posted_at, :start_at, :end_at, :user, :url, :uuid, :author_name, :author_url, :author_email, :asset
-
   def infer_defaults
     self.uuid ||= Digest::MD5.hexdigest("#{title || rand.to_s}#{posted_at.strftime('%Y-%m-%d') rescue 'no-time'}")
   end

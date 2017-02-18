@@ -7,7 +7,7 @@ module.exports = function timezoneLoader (content) {
   // remove the define(function () { return ... }); wrapper
   const bareContent = content
     .replace(/^define\(function \(\) { return/, '')
-    .replace(/}\);$/, '')
+    .replace(/}\);\n?$/, '')
 
   return `
     var _preloadedData = require('timezone_core')._preloadedData;

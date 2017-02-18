@@ -12,6 +12,7 @@ module.exports = {
   ],
   // 0 - off, 1 - warning, 2 - error
   rules: {
+    "class-methods-use-this": [0],
     "comma-dangle": [2, "only-multiline"],
     "func-names": [0],
     "max-len": [1, {"code": 140}],

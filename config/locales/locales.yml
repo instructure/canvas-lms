@@ -43,6 +43,12 @@ he:
     he: עברית (crowd-sourced)
   bigeasy_locale: he_IL
   crowdsourced: true
+ht:
+  locales:
+    ht: Kreyòl Ayisyen
+  bigeasy_locale: ht_HT
+  fullcalendar_locale: ht_HT
+  moment_locale: ht-ht
 hy:
   locales:
     hy: Հայերեն (crowd-sourced)
@@ -63,7 +69,7 @@ mi:
   locales:
     mi: Reo Māori (Aotearoa)
   bigeasy_locale: mi_NZ
-  fullcalendar_locale: en
+  fullcalendar_locale: mi_NZ
   moment_locale: mi-nz
 nl:
   locales:

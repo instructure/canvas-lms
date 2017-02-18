@@ -112,9 +112,15 @@
   display: inline;
 }
 
-.nested_setting_cleanup {
-  margin-bottom: -50px;
+.require_assignment_due_date_nested_cleanup {
+  margin-bottom: -30px;
 }
+
+.sis_name_length_nested_cleanup {
+  margin-bottom: -60px;
+  display: none;
+}
+
 
 #account_settings,
 .account_settings {
@@ -183,4 +189,8 @@
 
 .hidden_form {
   display: none;
+}
+
+textarea#account_notification_message, .edit_notification_form textarea {
+  width: 500px;
 }

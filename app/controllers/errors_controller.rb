@@ -134,7 +134,7 @@ class ErrorsController < ApplicationController
     increment_request_cost(200)
 
     reporter = @current_user.try(:fake_student?) ? @real_current_user : @current_user
-    error = params[:error] || {}
+    error = (params[:error] || {}).to_hash.with_indifferent_access
 
     # this is a honeypot field to catch spambots. it's hidden via css and should always be empty.
     return render(nothing: true, status: 400) if error.delete(:username).present?

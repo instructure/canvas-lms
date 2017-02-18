@@ -14,13 +14,13 @@ module Services
     # which of the users does the sender know, and what contexts do they and
     # the sender have in common?
     def self.common_contexts(sender, users)
-      recipients(sender: sender, user_ids: users)
+      recipients(sender: sender, user_ids: users).common_contexts
     end
 
     # which of the users have roles in the context and what are those roles?
     def self.roles_in_context(context, users)
       context = context.course if context.is_a?(CourseSection)
-      recipients(context: context, user_ids: users)
+      recipients(context: context, user_ids: users).common_contexts
     end
 
     # which users:
@@ -33,11 +33,10 @@ module Services
     #  - have roles in the context and what are those roles? (is_admin=true)
     #
     def self.known_in_context(sender, context, is_admin=false)
-      if is_admin
-        recipients(context: context)
-      else
-        recipients(sender: sender, context: context)
-      end
+      params = { context: context }
+      params[:sender] = sender unless is_admin
+      response = recipients(params)
+      [response.user_ids, response.common_contexts]
     end
 
     # how many users does the sender know in the context?
@@ -60,18 +59,24 @@ module Services
     #    and is_admin true)
     #
     def self.search_users(sender, options, service_options={})
-      # [CNVS-31303] TODO
-      #  - send pagination as specified in service_options
-      #  - pass back pagination info from service call instead of just always true
       params = options.slice(:search, :context, :exclude_ids, :weak_checks)
+
       # include sender only if not admin
-      params.merge!(sender: sender) unless options[:context] && options[:is_admin]
-      # second return value indicates whether there are more pages of results
-      [recipients(params), true]
+      params[:sender] = sender unless options[:context] && options[:is_admin]
+
+      # interpret pagination as specified in service_options
+      params[:per_page] = service_options[:per_page] if service_options[:per_page]
+      params[:cursor] = service_options[:cursor] if service_options[:cursor]
+
+      # call out to service
+      response = recipients(params)
+
+      # interpret response
+      [response.user_ids, response.common_contexts, response.cursors]
     end
 
     def self.recipients(params)
-      reshape(fetch("/recipients", query_params(params)))
+      Response.new(fetch("/recipients", query_params(params)))
     end
 
     def self.count_recipients(params)
@@ -109,6 +114,7 @@ module Services
       def fetch(path, params={})
         url = app_host + path
         url += '?' + params.to_query unless params.empty?
+        fallback = { "records" => [] }
         Canvas.timeout_protection("address_book") do
           response = CanvasHttp.get(url, 'Authorization' => "Bearer #{jwt}")
           if response.code.to_i == 200
@@ -118,14 +124,16 @@ module Services
               extra: { url: url, response: response.body },
               tags: { type: 'address_book_fault' }
             })
-            return {}
+            return fallback
           end
-        end || {}
+        end || fallback
       end
 
       # serialize logical params into query string values
       def query_params(params={})
         query_params = {}
+        query_params[:cursor] = params[:cursor] if params[:cursor]
+        query_params[:per_page] = params[:per_page] if params[:per_page]
         query_params[:search] = params[:search] if params[:search]
         query_params[:for_sender] = serialize_user(params[:sender]) if params[:sender]
         query_params[:in_context] = serialize_context(params[:context]) if params[:context]
@@ -154,31 +162,53 @@ module Services
           asset_string
         end
       end
+    end
 
-      # /recipients returns data in the (JSON) shape:
-      #
-      #   {
-      #     '10000000000002': [
-      #       { 'context_type': 'course', 'context_id': '10000000000001', 'roles': ['TeacherEnrollment'] }
-      #     ],
-      #     '10000000000005': [
-      #       { 'context_type': 'course', 'context_id': '10000000000002', 'roles': ['StudentEnrollment'] },
-      #       { 'context_type': 'group', 'context_id': '10000000000001', 'roles': ['Member'] }
-      #     ]
-      #   }
-      #
-      # where top-level keys are string representations of the recipient global
-      # user IDs, and values are the list of contexts they have in common with
-      # the sender. each context states the type, id (again as a string
-      # representation of the global ID), and roles the recipient has in that
-      # context (to the knowledge of the sender).
-      #
-      # the return from the service methods need to reshape that response into
-      # a similar ruby hash, but with integers instead of strings for IDs (but
-      # still global), and context types collated. this matches the
-      # expectations of existing code that uses the common context information.
-      # e.g. for the above example, the transformed data would have the (ruby)
-      # shape:
+    # /recipients returns data in the (JSON) shape:
+    #
+    #   {
+    #     records: [
+    #       {
+    #         'user_id': '10000000000002',
+    #         'contexts': [
+    #           { 'context_type': 'course', 'context_id': '10000000000001', 'roles': ['TeacherEnrollment'] }
+    #         ],
+    #         cursor: ...
+    #       },
+    #       {
+    #         'user_id': '10000000000005',
+    #         'contexts': [
+    #           { 'context_type': 'course', 'context_id': '10000000000002', 'roles': ['StudentEnrollment'] },
+    #           { 'context_type': 'group', 'context_id': '10000000000001', 'roles': ['Member'] }
+    #         ],
+    #         cursor: ...
+    #       }
+    #     ],
+    #     ...
+    #   }
+    #
+    # where `user_id` is a string representation of the recipient's global
+    # user ID, `contexts` is a list of contexts they have in common with
+    # the sender, and `cursor` is the cursor to pass to start at the next
+    # record. each context states the type, id (again as a string
+    # representation of the global ID), and roles the recipient has in that
+    # context (to the knowledge of the sender).
+    #
+    # this class facilitates separating those pieces
+    class Response
+      def initialize(response)
+        @response = response
+      end
+
+      # extract just the user IDs from the response, as an ordered list
+      def user_ids
+        @response['records'].map{ |record| record['user_id'].to_i }
+      end
+
+      # reshape the records into a ruby hash with integers instead of strings
+      # for IDs (but still global), user_ids promoted to keys, and context
+      # types collated. e.g. for the above example, the transformed data would
+      # have the (ruby) shape:
       #
       #   {
       #     10000000000002 => {
@@ -191,18 +221,25 @@ module Services
       #     }
       #   }
       #
-      def reshape(data)
+      def common_contexts
         common_contexts = {}
-        data.each do |global_user_id,contexts|
-          global_user_id = global_user_id.to_i
+        @response['records'].each do |recipient|
+          global_user_id = recipient['user_id'].to_i
+          contexts = recipient['contexts']
           common_contexts[global_user_id] ||= { courses: {}, groups: {} }
           contexts.each do |context|
             context_type = context['context_type'].pluralize.to_sym
+            next unless common_contexts[global_user_id].key?(context_type)
             global_context_id = context['context_id'].to_i
             common_contexts[global_user_id][context_type][global_context_id] = context['roles']
           end
         end
         common_contexts
+      end
+
+      # extract the next page cursor from the response
+      def cursors
+        @response['records'].map{ |record| record['cursor'] }
       end
     end
   end

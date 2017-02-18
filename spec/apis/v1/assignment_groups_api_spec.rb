@@ -766,6 +766,18 @@ describe AssignmentGroupsApiController, type: :request do
       }
     end
 
+    let(:put_url) { "/api/v1/courses/#{@course.id}/assignment_groups/#{assignment_group.id}" }
+
+    let(:api_details) do
+      {
+        controller: 'assignment_groups_api',
+        action: 'update',
+        format: 'json',
+        course_id: @course.id.to_s,
+        assignment_group_id: assignment_group.id.to_s
+      }
+    end
+
     before :once do
       course_with_teacher(active_all: true)
       @assignment_group = @course.assignment_groups.create!(name: 'Some group',
@@ -774,13 +786,7 @@ describe AssignmentGroupsApiController, type: :request do
     end
 
     it 'should update an assignment group' do
-      response = api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{assignment_group.id}", {
-        controller: 'assignment_groups_api',
-        action: 'update',
-        format: 'json',
-        course_id: @course.id.to_s,
-        assignment_group_id: assignment_group.id.to_s},
-        updated_params)
+      response = api_call(:put, put_url, api_details, updated_params)
 
       # Check the api response
       expect(response['name']).to eq(updated_name)
@@ -796,13 +802,7 @@ describe AssignmentGroupsApiController, type: :request do
 
     it 'should update an assignment group when integration_data is nil' do
       updated_params['integration_data'] = nil
-      response = api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{assignment_group.id}", {
-        controller: 'assignment_groups_api',
-        action: 'update',
-        format: 'json',
-        course_id: @course.id.to_s,
-        assignment_group_id: assignment_group.id.to_s},
-        updated_params)
+      response = api_call(:put, put_url, api_details, updated_params)
 
       # Check the api response
       expect(response['name']).to eq(updated_name)
@@ -816,13 +816,7 @@ describe AssignmentGroupsApiController, type: :request do
 
     it 'should update an assignment group when integration_data is {}' do
       updated_params['integration_data'] = {}
-      response = api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{assignment_group.id}", {
-        controller: 'assignment_groups_api',
-        action: 'update',
-        format: 'json',
-        course_id: @course.id.to_s,
-        assignment_group_id: assignment_group.id.to_s},
-        updated_params)
+      response = api_call(:put, put_url, api_details, updated_params)
 
       # Check the api response
       expect(response['name']).to eq(updated_name)
@@ -836,13 +830,7 @@ describe AssignmentGroupsApiController, type: :request do
 
     it 'should update an assignment group without integration_data' do
       updated_params.delete('integration_data')
-      response = api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{assignment_group.id}", {
-        controller: 'assignment_groups_api',
-        action: 'update',
-        format: 'json',
-        course_id: @course.id.to_s,
-        assignment_group_id: assignment_group.id.to_s},
-        updated_params)
+      response = api_call(:put, put_url, api_details, updated_params)
 
       # Check the api response
       expect(response['name']).to eq(updated_name)
@@ -856,13 +844,7 @@ describe AssignmentGroupsApiController, type: :request do
 
     it 'does not update when integration_data is malformed' do
       updated_params['integration_data'] = invalid_integration_data
-      raw_api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{assignment_group.id}", {
-        controller: 'assignment_groups_api',
-          action: 'update',
-          format: 'json',
-          course_id: @course.id.to_s,
-          assignment_group_id: assignment_group.id.to_s},
-          updated_params)
+      raw_api_call(:put, put_url, api_details, updated_params)
 
       # Check the db record
       assignment_group.reload
@@ -873,14 +855,7 @@ describe AssignmentGroupsApiController, type: :request do
 
     it 'returns a 400 when integration data is malformed' do
       updated_params['integration_data'] = invalid_integration_data
-      response = raw_api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{assignment_group.id}", {
-        controller: 'assignment_groups_api',
-        action: 'update',
-        format: 'json',
-        course_id: @course.id.to_s,
-        assignment_group_id: assignment_group.id.to_s},
-        updated_params)
-
+      response = raw_api_call(:put, put_url, api_details, updated_params)
       expect(response).to eq(400)
     end
 

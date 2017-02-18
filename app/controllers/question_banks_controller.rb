@@ -150,6 +150,6 @@ class QuestionBanksController < ApplicationController
   private
 
   def bank_params
-    strong_params.require(:assessment_question_bank).permit(:title, :alignments => strong_anything)
+    params.require(:assessment_question_bank).permit(:title, :alignments => strong_anything)
   end
 end

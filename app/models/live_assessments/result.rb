@@ -18,8 +18,6 @@
 
 module LiveAssessments
   class Result < ActiveRecord::Base
-    attr_accessible :user, :assessor, :passed, :assessed_at
-
     belongs_to :assessor, class_name: 'User'
     belongs_to :user
     belongs_to :assessment, class_name: 'LiveAssessments::Assessment'

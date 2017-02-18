@@ -23,26 +23,6 @@ end
 
 require 'securerandom'
 require 'tmpdir'
-require_relative './lti_spec_helper'
-
-RSpec.configure do |c|
-  c.raise_errors_for_deprecations!
-  c.color = true
-  c.include LtiSpecHelper, :include_lti_spec_helpers
-  c.around(:each) do |example|
-    record_spec_info(example) do
-      Timeout::timeout(60) do
-        Rails.logger.info "STARTING SPEC #{example.full_description}"
-        example.run
-      end
-    end
-  end
-
-  # TODO: spec failure pages for everything, not just selenium
-  def record_spec_info(*)
-    yield
-  end
-end
 
 ENV["RAILS_ENV"] = 'test'
 
@@ -66,16 +46,13 @@ module WebMock::API
   end
 end
 
+Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+
 # nuke the db (say, if `rake db:migrate RAILS_ENV=test` created records),
 # and then ensure people aren't creating records outside the rspec
 # lifecycle, e.g. inside a describe/context block rather than a
 # let/before/example
-require_relative 'support/blank_slate_protection'
 BlankSlateProtection.install!
-
-require_relative 'support/discourage_slow_specs'
-
-Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 
@@ -235,12 +212,6 @@ end
 examples = "#{File.dirname(__FILE__).gsub(/\\/, "/")}/shared_examples/*.rb"
 Dir.glob(examples).each { |file| require file }
 
-def pend_with_bullet
-  if defined?(Bullet) && Bullet.enable?
-    skip ('PENDING: Bullet')
-  end
-end
-
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
 # so we remove rspec's definition. This does not prevent 'context' from being
@@ -346,20 +317,31 @@ module Helpers
 end
 
 RSpec.configure do |config|
-  # If you're not using ActiveRecord you should remove these
-  # lines, delete config/database.yml and disable :active_record
-  # in your config/boot.rb
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false
   config.fixture_path = Rails.root+'spec/fixtures/'
   config.infer_spec_type_from_file_location!
-
+  config.raise_errors_for_deprecations!
+  config.color = true
   config.order = :random
 
   config.include Helpers
   config.include Factories
-
   config.include Onceler::BasicHelpers
+
+  config.around(:each) do |example|
+    record_spec_info(example) do
+      Rails.logger.info "STARTING SPEC #{example.full_description}"
+      SpecTimeLimit.enforce(example) do
+        example.run
+      end
+    end
+  end
+
+  # TODO: spec failure pages for everything, not just selenium
+  def record_spec_info(*)
+    yield
+  end
 
   def reset_all_the_things!
     I18n.locale = :en
@@ -491,13 +473,6 @@ RSpec.configure do |config|
   # correspond with the model that should be built by the factory.
   # Please see spec/factories for examples!
   #****************************************************************
-
-  def enter_student_view(opts={})
-    course = opts[:course] || @course || course(opts)
-    @fake_student = course.student_view_student
-    post "/users/#{@fake_student.id}/masquerade"
-    expect(session[:become_user_id]).to eq @fake_student.id.to_s
-  end
 
   def login_as(username = "nobody@example.com", password = "asdfasdf")
     post_via_redirect "/login",
@@ -675,13 +650,13 @@ RSpec.configure do |config|
         # overridden by Attachment anyway; don't re-overwrite it
         next if base.instance_method(method).owner == base
         if method.to_s[-1..-1] == '='
-          base.class_eval <<-CODE
+          base.class_eval <<-CODE, __FILE__, __LINE__ + 1
           def #{method}(arg)
             self.as(self.class.current_backend).#{method} arg
           end
           CODE
         else
-          base.class_eval <<-CODE
+          base.class_eval <<-CODE, __FILE__, __LINE__ + 1
           def #{method}(*args, &block)
             self.as(self.class.current_backend).#{method}(*args, &block)
           end
@@ -699,6 +674,26 @@ RSpec.configure do |config|
     end
   end
 
+  module StubS3
+    def self.stubbed?
+      false
+    end
+
+    def load(file, *args)
+      if StubS3.stubbed? && file == 'amazon_s3'
+        return {
+          access_key_id: 'stub_id',
+          secret_access_key: 'stub_key',
+          region: 'us-east-1',
+          stub_responses: true,
+          bucket_name: 'no-bucket'
+        }
+      end
+
+      super
+    end
+  end
+
   def s3_storage!(opts = {:stubs => true})
     [Attachment, Thumbnail].each do |model|
       model.send(:include, AttachmentStorageSwitcher) unless model.ancestors.include?(AttachmentStorageSwitcher)
@@ -709,15 +704,8 @@ RSpec.configure do |config|
     end
 
     if opts[:stubs]
-      conn = mock('AWS::S3::Client')
-
-      AWS::S3::S3Object.any_instance.stubs(:read).returns("i am stub data from spec helper. nom nom nom")
-      AWS::S3::S3Object.any_instance.stubs(:write).returns(true)
-      AWS::S3::S3Object.any_instance.stubs(:create_temp_file).returns(true)
-      AWS::S3::S3Object.any_instance.stubs(:client).returns(conn)
-      AWS::Core::Configuration.any_instance.stubs(:access_key_id).returns('stub_id')
-      AWS::Core::Configuration.any_instance.stubs(:secret_access_key).returns('stub_key')
-      AWS::S3::Bucket.any_instance.stubs(:name).returns('no-bucket')
+      ConfigFile.singleton_class.prepend(StubS3)
+      StubS3.stubs(:stubbed?).returns(true)
     else
       if Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == 'access_key'
         skip "Please put valid S3 credentials in config/amazon_s3.yml"
@@ -769,43 +757,8 @@ RSpec.configure do |config|
     expect(created_jobs.count { |j| j.tag == tag }).to eq count
   end
 
-  # send a multipart post request in an integration spec post_params is
-  # an array of [k,v] params so that the order of the params can be
-  # defined
-  def send_multipart(url, post_params = {}, http_headers = {}, method = :post)
-    mp = Multipart::Post.new
-    query, headers = mp.prepare_query(post_params)
-
-    # A bug in the testing adapter in Rails 3-2-stable doesn't corretly handle
-    # translating this header to the Rack/CGI compatible version:
-    # (https://github.com/rails/rails/blob/3-2-stable/actionpack/lib/action_dispatch/testing/integration.rb#L289)
-    #
-    # This issue is fixed in Rails 4-0 stable, by using a newer version of
-    # ActionDispatch Http::Headers which correctly handles the merge
-    headers = headers.dup.tap { |h| h['CONTENT_TYPE'] ||= h.delete('Content-type') }
-
-    send(method, url, query, headers.merge(http_headers))
-  end
-
   def content_type_key
     'Content-Type'
-  end
-
-  def force_string_encoding(str, encoding = "UTF-8")
-    if str.respond_to?(:force_encoding)
-      str.force_encoding(encoding)
-    end
-    str
-  end
-
-  # from minitest, MIT licensed
-  def capture_io
-    orig_stdout, orig_stderr = $stdout, $stderr
-    $stdout, $stderr = StringIO.new, StringIO.new
-    yield
-    return $stdout.string, $stderr.string
-  ensure
-    $stdout, $stderr = orig_stdout, orig_stderr
   end
 
   def compare_json(actual, expected)
@@ -819,7 +772,7 @@ RSpec.configure do |config|
         compare_json(a, e)
       end
     else
-      if actual.is_a?(Fixnum) || actual.is_a?(Float)
+      if actual.is_a?(Integer) || actual.is_a?(Float)
         expect(actual).to eq expected
       else
         expect(actual.to_json).to eq expected.to_json

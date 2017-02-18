@@ -45,5 +45,39 @@ describe Api::V1::Course do
       hash = course_json(@course, nil, nil, [], nil)
       expect(hash['id']).to be_present
     end
+
+    it "should include course locale" do
+      course_factory
+      @course.locale = 'tlh'
+      @course.save
+      hash = course_json(@course, nil, nil, [], nil)
+      expect(hash['locale']).to eql @course.locale
+    end
+
+    it "should include the image when it is asked for and the feature flag is on" do
+      course_factory
+      @course.enable_feature!('course_card_images')
+      @course.image_url = "http://image.jpeg"
+      @course.save
+
+      hash = course_json(@course, nil, nil, ['course_image'], nil)
+      expect(hash['image_download_url']).to eql 'http://image.jpeg'
+    end
+
+    it "should not include the image if the feature flag is off" do
+      course_factory
+      @course.disable_feature!('course_card_images')
+
+      hash = course_json(@course, nil, nil, ['course_image'], nil)
+      expect(hash['image_download_url']).not_to be_present
+    end
+
+    it "should not include the image if the course_image include is not present" do
+      course_factory
+      @course.enable_feature!('course_card_images')
+
+      hash = course_json(@course, nil, nil, [], nil)
+      expect(hash['image_download_url']).not_to be_present
+    end
   end
 end

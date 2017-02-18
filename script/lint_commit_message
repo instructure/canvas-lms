@@ -46,8 +46,8 @@ end
 # not perfect (won't get irregular verbs, only checks first word), but
 # close enough... does the right thing on most existing commits
 maybe_wrong_tense_regex = /\A(spec: )?[a-z]+([^e]ed|[^aijoqsu]s|ing) /i
-actually_ok_rejex = /\A
-  (spec: )?
+actually_ok_regex = /\A
+  (spec:\s+)?
   (
     # *ing words
     (brand|br|[^ ]*learn|masquerad|upcom|shard|word|grad)ing |
@@ -61,7 +61,7 @@ actually_ok_rejex = /\A
 /xi
 
 maybe_start_with_wrong_tense = subject =~ maybe_wrong_tense_regex &&
-                               subject !~ actually_ok_rejex
+                               subject !~ actually_ok_regex
 if maybe_start_with_wrong_tense
   comment "warn", 1, "make sure your commit message has an imperative verb (e.g. \"add\" instead of \"adds\", \"added\", or \"adding\")", true
 end
@@ -126,4 +126,14 @@ end
 has_a_test_plan = commit_message =~ /test[ -]plan/i
 unless has_a_test_plan
   comment "warn", 3, "y u no add test plan? ლ(ಠ益ಠლ)"
+end
+
+references_webpack = commit_message =~ /webpack/i
+gerrit_topic = ENV["GERRIT_TOPIC"]
+has_webpack_topic = gerrit_topic && gerrit_topic =~ /webpack/i
+if references_webpack && !has_webpack_topic
+  comment "warn", 3,
+          "looks like your commit is webpack related." \
+          " trigger webpack builds by pushing to the webpack topic:" \
+          " `git push origin HEAD:refs/for/master/webpack`"
 end

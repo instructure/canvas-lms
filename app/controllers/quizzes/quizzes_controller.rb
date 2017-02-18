@@ -264,6 +264,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def edit
     if authorized_action(@quiz, @current_user, :update)
+      return render_unauthorized_action if editing_restricted?(@quiz)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
       @assignment = @quiz.assignment
 
@@ -332,30 +333,31 @@ class Quizzes::QuizzesController < ApplicationController
         return render_forbidden unless grading_periods_allow_assignment_overrides_batch_create?(@quiz, overrides)
       end
 
-      params[:quiz][:title] = nil if params[:quiz][:title] == "undefined"
-      params[:quiz][:title] ||= t(:default_title, "New Quiz")
-      params[:quiz].delete(:points_possible) unless params[:quiz][:quiz_type] == 'graded_survey'
-      params[:quiz][:access_code] = nil if params[:quiz][:access_code] == ""
-      if params[:quiz][:quiz_type] == 'assignment' || params[:quiz][:quiz_type] == 'graded_survey'
-        params[:quiz][:assignment_group_id] ||= @context.assignment_groups.first.id
-        if (assignment_group_id = params[:quiz].delete(:assignment_group_id)) && assignment_group_id.present?
+      quiz_params = get_quiz_params
+      quiz_params[:title] = nil if quiz_params[:title] == "undefined"
+      quiz_params[:title] ||= t(:default_title, "New Quiz")
+      quiz_params.delete(:points_possible) unless quiz_params[:quiz_type] == 'graded_survey'
+      quiz_params[:access_code] = nil if quiz_params[:access_code] == ""
+      if quiz_params[:quiz_type] == 'assignment' || quiz_params[:quiz_type] == 'graded_survey'
+        quiz_params[:assignment_group_id] ||= @context.assignment_groups.first.id
+        if (assignment_group_id = quiz_params.delete(:assignment_group_id)) && assignment_group_id.present?
           @assignment_group = @context.assignment_groups.active.where(id: assignment_group_id).first
         end
         if @assignment_group
-          @assignment = @context.assignments.build(:title => params[:quiz][:title], :due_at => params[:quiz][:lock_at], :submission_types => 'online_quiz')
+          @assignment = @context.assignments.build(:title => quiz_params[:title], :due_at => quiz_params[:lock_at], :submission_types => 'online_quiz')
           @assignment.assignment_group = @assignment_group
           @assignment.saved_by = :quiz
           @assignment.workflow_state = 'unpublished'
           @assignment.save
-          params[:quiz][:assignment_id] = @assignment.id
+          quiz_params[:assignment_id] = @assignment.id
         end
-        params[:quiz][:assignment_id] = nil unless @assignment
-        params[:quiz][:title] = @assignment.title if @assignment
+        quiz_params[:assignment_id] = nil unless @assignment
+        quiz_params[:title] = @assignment.title if @assignment
       end
       @quiz.content_being_saved_by(@current_user)
       @quiz.infer_times
       @quiz.transaction do
-        @quiz.update_attributes!(params[:quiz])
+        @quiz.update_attributes!(quiz_params)
         batch_update_assignment_overrides(@quiz, overrides, @current_user) unless overrides.nil?
       end
       if Assignment.sis_grade_export_enabled?(@context) && @quiz.assignment
@@ -376,10 +378,11 @@ class Quizzes::QuizzesController < ApplicationController
   def update
     n = Time.now.to_f
     if authorized_action(@quiz, @current_user, :update)
+      quiz_params = get_quiz_params
       params[:quiz] ||= {}
 
       return render_forbidden unless grading_periods_allow_submittable_update?(
-        @quiz, params[:quiz], flash_message: true
+        @quiz, quiz_params, flash_message: true
       )
       overrides = delete_override_params
 
@@ -391,20 +394,20 @@ class Quizzes::QuizzesController < ApplicationController
         return render_forbidden unless batch_update_allowed
       end
 
-      params[:quiz][:title] = t("New Quiz") if params[:quiz][:title] == "undefined"
-      params[:quiz].delete(:points_possible) unless params[:quiz][:quiz_type] == 'graded_survey'
-      params[:quiz][:access_code] = nil if params[:quiz][:access_code] == ""
-      if params[:quiz][:quiz_type] == 'assignment' || params[:quiz][:quiz_type] == 'graded_survey' #'new' && params[:quiz][:assignment_group_id]
-        if (assignment_group_id = params[:quiz].delete(:assignment_group_id)) && assignment_group_id.present?
+      quiz_params[:title] = t("New Quiz") if quiz_params[:title] == "undefined"
+      quiz_params.delete(:points_possible) unless quiz_params[:quiz_type] == 'graded_survey'
+      quiz_params[:access_code] = nil if quiz_params[:access_code] == ""
+      if quiz_params[:quiz_type] == 'assignment' || quiz_params[:quiz_type] == 'graded_survey' #'new' && params[:quiz][:assignment_group_id]
+        if (assignment_group_id = quiz_params.delete(:assignment_group_id)) && assignment_group_id.present?
           @assignment_group = @context.assignment_groups.active.where(id: assignment_group_id).first
         end
         @assignment_group ||= @context.assignment_groups.first
         # The code to build an assignment for a quiz used to be here, but it's
         # been moved to the model quiz.rb instead.  See Quiz:build_assignment.
-        params[:quiz][:assignment_group_id] = @assignment_group && @assignment_group.id
+        quiz_params[:assignment_group_id] = @assignment_group && @assignment_group.id
       end
 
-      params[:quiz][:lock_at] = nil if params[:quiz].delete(:do_lock_at) == 'false'
+      quiz_params[:lock_at] = nil if quiz_params.delete(:do_lock_at) == 'false'
 
       @quiz.with_versioning(false) do
         @quiz.did_edit if @quiz.created?
@@ -414,7 +417,6 @@ class Quizzes::QuizzesController < ApplicationController
       respond_to do |format|
         @quiz.transaction do
           notify_of_update = value_to_boolean(params[:quiz][:notify_of_update])
-          params[:quiz][:notify_of_update] = false
 
           old_assignment = nil
           if @quiz.assignment.present?
@@ -431,7 +433,7 @@ class Quizzes::QuizzesController < ApplicationController
           @quiz.with_versioning(auto_publish) do
             # using attributes= here so we don't need to make an extra
             # database call to get the times right after save!
-            @quiz.attributes = params[:quiz]
+            @quiz.attributes = quiz_params
             @quiz.infer_times
             @quiz.content_being_saved_by(@current_user)
             if auto_publish
@@ -478,6 +480,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def destroy
     if authorized_action(@quiz, @current_user, :delete)
+      return render_unauthorized_action if editing_restricted?(@quiz)
       respond_to do |format|
         if @quiz.destroy
           format.html { redirect_to course_quizzes_url(@context) }
@@ -958,5 +961,11 @@ class Quizzes::QuizzesController < ApplicationController
         format.json { render json: @quiz.errors, status: :forbidden }
       end
     end
+  end
+
+  protected
+
+  def get_quiz_params
+    params[:quiz] ? params[:quiz].permit(API_ALLOWED_QUIZ_INPUT_FIELDS[:only]) : {}
   end
 end

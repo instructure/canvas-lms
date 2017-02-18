@@ -26,38 +26,38 @@ describe Quizzes::QuizEligibility do
   let(:eligibility) { Quizzes::QuizEligibility.new(course: course, user: user, quiz: quiz) }
 
   before do
-    user.stubs(:workflow_state).returns('active')
-    course.stubs(:enrollment_term).returns(term)
-    quiz.stubs(:grants_right?).returns(true)
-    quiz.stubs(:grants_right?)
-    .with(anything, anything, :manage).returns(false)
+    allow(user).to receive(:workflow_state).and_return('active')
+    allow(course).to receive(:enrollment_term).and_return(term)
+    allow(quiz).to receive(:grants_right?).and_return(true)
+    allow(quiz).to receive(:grants_right?).
+      with(anything, anything, :manage).and_return(false)
   end
 
   describe '#eligible?' do
 
     it 'always returns true if the user is a teacher' do
-      quiz.stubs(:grants_right?).returns(false)
-      quiz.stubs(:grants_right?)
-      .with(anything, anything, :manage).returns(true)
+      allow(quiz).to receive(:grants_right?).and_return(false)
+      allow(quiz).to receive(:grants_right?).
+        with(anything, anything, :manage).and_return(true)
       expect(eligibility.eligible?).to be_truthy
       expect(eligibility.potentially_eligible?).to be_truthy
     end
 
     it 'returns false if no course is provided' do
-      eligibility.stubs(:course).returns(nil)
+      allow(eligibility).to receive(:course).and_return(nil)
       expect(eligibility.eligible?).to be_falsey
       expect(eligibility.potentially_eligible?).to be_falsey
     end
 
     it 'returns false if the student is inactive' do
-      user.stubs(:workflow_state).returns('deleted')
+      allow(user).to receive(:workflow_state).and_return('deleted')
       expect(eligibility.eligible?).to be_falsey
       expect(eligibility.potentially_eligible?).to be_falsey
     end
 
     it 'returns false if a user cannot read as an admin' do
-      user.stubs(:new_record?).returns(false)
-      course.stubs(:grants_right?).returns(false)
+      allow(user).to receive(:new_record?).and_return(false)
+      allow(course).to receive(:grants_right?).and_return(false)
       expect(eligibility.eligible?).to be_falsey
       expect(eligibility.potentially_eligible?).to be_falsey
     end
@@ -174,10 +174,10 @@ describe Quizzes::QuizEligibility do
       let(:restricted_concluded_section) { create_restricted_course_section(six_days_ago, three_days_ago) }
 
       let!(:scenario_setup) do
-        eligibility.stubs(:term).returns(term)
-        eligibility.stubs(:course).returns(course)
-        course.stubs(:enrollment_term).returns(term)
-        eligibility.stubs(:student_sections).returns([section])
+        allow(eligibility).to receive(:term).and_return(term)
+        allow(eligibility).to receive(:course).and_return(course)
+        allow(course).to receive(:enrollment_term).and_return(term)
+        allow(eligibility).to receive(:student_sections).and_return([section])
       end
 
       context 'when the term, course, and section have no dates' do
@@ -198,10 +198,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an eligible quiz'
           end
@@ -222,10 +222,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an eligible quiz'
           end
@@ -280,10 +280,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an eligible quiz'
           end
@@ -334,10 +334,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an eligible quiz'
           end
@@ -388,10 +388,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -442,10 +442,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an eligible quiz'
           end
@@ -496,10 +496,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an eligible quiz'
           end
@@ -550,10 +550,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -604,10 +604,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an eligible quiz'
           end
@@ -658,10 +658,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an eligible quiz'
           end
@@ -716,10 +716,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an eligible quiz'
           end
@@ -770,10 +770,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -824,10 +824,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -878,10 +878,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -932,10 +932,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -986,10 +986,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -1040,10 +1040,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -1094,10 +1094,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -1152,10 +1152,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an eligible quiz'
           end
@@ -1206,10 +1206,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -1260,10 +1260,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -1314,10 +1314,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -1368,10 +1368,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -1422,10 +1422,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -1476,10 +1476,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -1530,10 +1530,10 @@ describe Quizzes::QuizEligibility do
 
           context 'when no sections exist' do
             let!(:scenario_setup) do
-              eligibility.stubs(:term).returns(term)
-              eligibility.stubs(:course).returns(course)
-              course.stubs(:enrollment_term).returns(term)
-              eligibility.stubs(:student_sections).returns([])
+              allow(eligibility).to receive(:term).and_return(term)
+              allow(eligibility).to receive(:course).and_return(course)
+              allow(course).to receive(:enrollment_term).and_return(term)
+              allow(eligibility).to receive(:student_sections).and_return([])
             end
             it_behaves_like 'an ineligible quiz'
           end
@@ -1555,9 +1555,9 @@ describe Quizzes::QuizEligibility do
       describe 'when an active course has many section enrollments' do
         let(:course) { active_course }
         let!(:scenario_setup) do
-          eligibility.stubs(:term).returns(term)
-          eligibility.stubs(:course).returns(course)
-          eligibility.stubs(:student_sections).returns(student_sections)
+          allow(eligibility).to receive(:term).and_return(term)
+          allow(eligibility).to receive(:course).and_return(course)
+          allow(eligibility).to receive(:student_sections).and_return(student_sections)
         end
 
         context 'when an active section overrides' do
@@ -1596,8 +1596,8 @@ describe Quizzes::QuizEligibility do
             ]
           end
           let!(:scenario_setup) do
-            eligibility.stubs(:assignment_override_sections).returns(assignment_override_sections)
-            eligibility.stubs(:student_sections).returns([])
+            allow(eligibility).to receive(:assignment_override_sections).and_return(assignment_override_sections)
+            allow(eligibility).to receive(:student_sections).and_return([])
           end
           it_behaves_like 'an eligible quiz'
         end
@@ -1610,10 +1610,10 @@ describe Quizzes::QuizEligibility do
             ]
           end
           let!(:scenario_setup) do
-            eligibility.stubs(:assignment_override_sections).returns(assignment_override_sections)
-            eligibility.stubs(:term).returns(concluded_term)
-            eligibility.stubs(:course).returns(restricted_concluded_course)
-            eligibility.stubs(:student_sections).returns([restricted_concluded_section])
+            allow(eligibility).to receive(:assignment_override_sections).and_return(assignment_override_sections)
+            allow(eligibility).to receive(:term).and_return(concluded_term)
+            allow(eligibility).to receive(:course).and_return(restricted_concluded_course)
+            allow(eligibility).to receive(:student_sections).and_return([restricted_concluded_section])
           end
           it_behaves_like 'an ineligible quiz'
         end
@@ -1627,10 +1627,10 @@ describe Quizzes::QuizEligibility do
             ]
           end
           let!(:scenario_setup) do
-            eligibility.stubs(:assignment_override_sections).returns(assignment_override_sections)
-            eligibility.stubs(:term).returns(concluded_term)
-            eligibility.stubs(:course).returns(restricted_concluded_course)
-            eligibility.stubs(:student_sections).returns([restricted_concluded_section])
+            allow(eligibility).to receive(:assignment_override_sections).and_return(assignment_override_sections)
+            allow(eligibility).to receive(:term).and_return(concluded_term)
+            allow(eligibility).to receive(:course).and_return(restricted_concluded_course)
+            allow(eligibility).to receive(:student_sections).and_return([restricted_concluded_section])
           end
           it_behaves_like 'an eligible quiz'
         end
@@ -1643,8 +1643,8 @@ describe Quizzes::QuizEligibility do
             ]
           end
           let!(:scenario_setup) do
-            eligibility.stubs(:assignment_override_sections).returns(assignment_override_sections)
-            eligibility.stubs(:student_sections).returns([restricted_active_section])
+            allow(eligibility).to receive(:assignment_override_sections).and_return(assignment_override_sections)
+            allow(eligibility).to receive(:student_sections).and_return([restricted_active_section])
           end
           it_behaves_like 'an eligible quiz'
         end
@@ -1676,15 +1676,15 @@ describe Quizzes::QuizEligibility do
     end
 
     it 'returns false if quiz explicitly grant access to the user' do
-      quiz.stubs(:locked_for?)   { true }
-      quiz.stubs(:grants_right?) { true }
+      allow(quiz).to receive(:locked_for?)   { true }
+      allow(quiz).to receive(:grants_right?) { true }
       expect(eligibility.locked?).to be_falsey
     end
 
     it 'returns true if the quiz is locked and access is not granted' do
-      quiz.stubs(:locked_for?)   { true }
-      quiz.stubs(:grants_right?) { false }
-      expect(eligibility.locked?).to be_falsey
+      allow(quiz).to receive(:locked_for?)   { true }
+      allow(quiz).to receive(:grants_right?) { false }
+      expect(eligibility.locked?).to be_truthy
     end
   end
 end

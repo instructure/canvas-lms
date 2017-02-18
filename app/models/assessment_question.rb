@@ -18,10 +18,9 @@
 
 class AssessmentQuestion < ActiveRecord::Base
   include Workflow
-  strong_params
 
   has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion'
-  has_many :attachments, :as => :context
+  has_many :attachments, :as => :context, :inverse_of => :context
   delegate :context, :context_id, :context_type, :to => :assessment_question_bank
   attr_accessor :initial_context
   belongs_to :assessment_question_bank, :touch => true

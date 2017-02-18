@@ -20,5 +20,4 @@ class WebConferenceParticipant < ActiveRecord::Base
   belongs_to :web_conference
   belongs_to :user
 
-  attr_accessible :web_conference, :user
 end

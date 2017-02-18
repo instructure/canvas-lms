@@ -43,18 +43,23 @@ nn:
   LongTextEditor: 
     cancel: Avbryt
     save: Lagre
+  _at_the_bottom__4360f2b4: "-- Nedst --"
   _b4455c8b: "%"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Utrekningsverdi vert ikkje brukt med denne utrekningsmetoden"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Ei fil med namnet %{itemName} finst allereie i denne mappa."
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Ein logo i full storleik i høgre sidestolpe på Canvas-skrivebordet. Ideell storleik er 360 x 140 pikslar. Aksepterte format: .svg, .png, .jpeg, .gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Ein praktisk nøkkel-/verdidump med ei mengd interessant informasjon for rapporteringsbrukaren"
+  a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "Eit låst element med namnet \"%{name}\" finst allereie. Skriv inn eit anna namn."
   a_message_is_required_129e1814: "Ei melding er nødvendig"
   a_name_for_this_set_is_required_222bad23: "Eit namn er obligatorisk. "
-  a_new_assignment_has_been_created_for_your_course__12b72639: "Ei ny oppgåve er oppretta for kurset ditt, %{course_name}"
+  a_new_assignment_has_been_created_for_your_course__12b72639: "Ei ny oppgåve er oppretta for emnet ditt, %{course_name}"
+  a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Ein partnar-ID er nødvendig for å bruke Academic Benchmarks"
+  a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Ein partnarnøkkel er nødvendig for å bruke Academic Benchmarks"
   a_problem_occurred_adding_reviewers_57b083d9: "Det oppstod eit problem då nye brukarar vart lagt til."
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "Ein tabell som inneheld namnet på karakterskjemaet og knappar for redigering eller sletting av skjemaet."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Ein tabell med svar og overordna statistikk om studentars svaralternativer."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Ein tabell som inneheld data frå graderingsskjemaet. Kvar rad inneheld eit namn, ein maksimum prosentverdi og ein minimum prosentverdi. Kvar rad inneheld også ein knapp for å legge til ei ny rad nedanfor, og ein knapp for å slette gjeldande rad."
+  a_z_29d8e67c: "A - Å"
   academic_benchmark: 
     no_api_key: "Ein API-nøkkel er nødvendig for å bruke Academic Benchmarks"
     no_file: "Resultatfil eller autoritet er ikkje gitt"
@@ -68,10 +73,13 @@ nn:
         api_key: API-nøkkel
         api_url: API-URL
         common_core_guid: "Vanleg kjerne-GUID (valfri)"
+        partner_id: Partnar-ID
+        partner_key: Partnarnøkkel
   accept_2fdd362e: Godta
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "godkjende format: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Godkjende format: svg, png, jpg, gif"
-  accepted_user_role_type_course_course_2ce91589: "Godkjend: %{user}, %{role_type}, kurs, %{course}"
+  accepted_user_role_type_course_course_2ce91589: "Godkjend: %{user}, %{role_type}, emne, %{course}"
+  access_report_80d28095: Tilgangsrapport
   access_token_3be22221: Tilgangstoken
   access_token_is_valid_until_d2f048cf: "Tilgangstoken er gyldig til"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Tilgangstoken kan gi andre applikasjonar lov til å gjere API-kall på dine vegne. Du kan óg generere tilgangstoken og *bruke Canvas sine opne API-ar* til å sette opp eigne integrasjonar. "
@@ -88,18 +96,18 @@ nn:
     feedback_coach: "Spør nettamfunnet"
     feedback_coach_sub: "Få hjelp frå ein Canvas-ekspert"
     feedback_feature_request_sub: "Har du ein ide som kan gjere Canvas betre?"
-    manually_created_courses: "Manuelt oppretta kurs"
+    manually_created_courses: "Manuelt oppretta emne"
     root_account_cant_have_sis_id: "SIS-ID-ar kan ikkje setjast på rot-kontoar"
     sis_id_in_use: "SIS-ID \"%{sis_id}\" er allereie i bruk"
     tab_admin_tools: Administrasjonsverktøy
     tab_authentication: Godkjenning
     tab_brand_configs: Tema
-    tab_courses: Kurs
+    tab_courses: Emne
     tab_developer_keys: Utviklarnøklar
     tab_faculty_journal: Faglærarprotokoll
     tab_grading_standards: Karaktersetjing
     tab_jobs: Jobbar
-    tab_outcomes: Resultat
+    tab_outcomes: Læringsmål
     tab_permissions: Løyve
     tab_plugins: Programtillegg
     tab_question_banks: Spørsmålsbankar
@@ -221,12 +229,14 @@ nn:
       discovery_url_description: "Dersom ein oppdagings-URL vert oppgitt, kjem Canvas til å sende vidare alle brukarar til URL-adressa når dei skal godkjennast. Sida hjelper brukaren med å finne ut kvar han skal gå for å logge på. Dersom URL-adressa ikkje er konfigurert, vert den første konfigurasjonen brukt for brukaren si godkjenning."
       login_handle_name_description: "Etiketten som vert brukt for unike påloggings-ID-ar. Eksempel: Pålogging, brukarnamn, student-ID osv."
       unknown_user_url_description: "URL-en for omdirigering av godkjend brukar finst ikkje i Canvas."
-  account_course_and_user_search_22bf297a: "Konto, kurs- og brukarsøk"
+  account_course_and_user_search_22bf297a: "Konto, emne- og brukarsøk"
   account_domain_78f43049: Kontoområde
   account_id_2c3b4f15: konto-ID
+  account_id_f6e26867: Konto-ID
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: kontonamn
   account_name_analytics_62bf60ae: "%{account.name} Analytics"
+  account_name_bff54ed5: Kontonamn
   account_navigation_80bbefd4: Kontonavigering
   account_notification: 
     errors: 
@@ -236,7 +246,7 @@ nn:
   account_reports: 
     default: 
       all_terms: "Alle semester"
-      course_text: "For kurs: %{course};"
+      course_text: "For emne: %{course};"
       description: 
         header: Eksempel
       end_text: "Sluttar: %{end_at};"
@@ -271,12 +281,12 @@ nn:
     report_header_canvas_term_id: canvas_term_id
     report_header_canvas_user_id: canvas_user_id
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
-    report_header_course: kurs
+    report_header_course: emne
     report_header_course__id: course_id
-    report_header_course_id: kurs-ID
-    report_header_course_name: kursnamn
-    report_header_course_sis: kurs-SIS
-    report_header_course_sis_id: kurs-SIS-ID
+    report_header_course_id: emne-ID
+    report_header_course_name: emnenamn
+    report_header_course_sis: emne-SIS
+    report_header_course_sis_id: emne-SIS-ID
     report_header_created_at: "oppretta den"
     report_header_current_score: "gjeldande poeng"
     report_header_email: e-post
@@ -350,8 +360,9 @@ nn:
       delete_announcement: "Er du sikker på at du vil slette kunngjeringa?"
       global_announcement: "Du må stadfeste den globale kunngjeringa"
       remove_account_admin: "Er du sikker på at du vil fjerne kontoadministratoren?"
-    course: Kurs
+    course: Emne
     custom_text_blank: "[Eigendefinert tekst]"
+    help_menu_name_too_long: "Hjelpemeny-namnet er for langt"
     links: 
       turnitin: 
         confirm_settings: "stadfest Turnitin-innstillingar"
@@ -363,9 +374,10 @@ nn:
     titles: 
       configure_report: "Konfigurer rapport"
       open_registration_delegated_warning_dialog: "Ein ekstern  identitetsleverandør er aktivert"
-      what_are_quiz_ip_filters: "Kva er prøve-IP-filter?"
+      what_are_quiz_ip_filters: "Kva er IP-filter for testar?"
     user: Brukar
   account_sis_id_2e4a461: konto-SIS-ID
+  account_sis_id_5da8fd2d: konto-SIS-ID
   account_surveys_b0039876: Kontoundersøkingar
   account_user: 
     types: 
@@ -376,11 +388,11 @@ nn:
     account_quotas_updated: "Kontokvotene er oppdaterte"
     account_user: 
       remove_admin_tooltip: "Fjern administratoren"
-    add_course_button: "Legg til kurs"
-    add_course_dialog_title: "Legg til eit nytt kurs"
+    add_course_button: "Legg til emne"
+    add_course_dialog_title: "Legg til eit nytt emne"
     add_course_or_user: 
-      add_course_button: "Legg til kurs"
-      add_course_link: "Nytt kurs"
+      add_course_button: "Legg til emne"
+      add_course_link: "Nytt emne"
       add_user_button: "Legg til brukar"
       add_user_link: "Ny brukar"
       display_name_help: "Namnet vil vere synleg for alle i diskusjonar, meldingar og kommentarar."
@@ -390,7 +402,7 @@ nn:
         course_code: Referansekode
         enrollment_term_id: "Påmelding semester"
         full_name: "Fullstendig namn"
-        name: Kursnamn
+        name: Emnenamn
         path: E-post
         send_confirmation: "Send e-post til brukaren om kontoopprettinga"
         short_name: "Namn som skal visast"
@@ -400,7 +412,7 @@ nn:
       unique_id_label_1: "%{label}:"
     add_user_button: "Legg til brukar"
     add_user_dialog_title: "Legg til ein ny brukar"
-    adding_course_message: "Legg til kurs ..."
+    adding_course_message: "Legg til emne..."
     adding_user_message: "Legg til brukar ..."
     additional_settings: 
       account_status: Kontostatus
@@ -426,7 +438,7 @@ nn:
       admin_tools: 
         tab_labels: 
           admin_tools_logging: Loggføring
-          restore_course: "Gjenopprett kurs"
+          restore_course: "Gjenopprett emne"
         view_messages: "Vis varslingane"
       admin_tools_cumb: Administratorverktøy
       admin_tools_title: Administratorverktøy
@@ -451,7 +463,7 @@ nn:
       comm_messages_search_results: 
         no_messages_found: "Finn ingen meldingar"
       course_logging_content: 
-        course_activity: Kursaktivitet
+        course_activity: Emneaktivitet
         find: Finn
       course_logging_details: 
         Field: Felt
@@ -482,28 +494,28 @@ nn:
         time: Tidspunkt
         user: Brukar
       course_search_form: 
-        course_id: Kurs-ID
+        course_id: Emne-ID
         labels: 
-          find_deleted_course: "Søk etter sletta kurs etter ID"
-        select_default: "Vel eit kurs"
-        select_label: "Vel eit kurs"
+          find_deleted_course: "Søk etter sletta emne etter ID"
+        select_default: "Vel eit emne"
+        select_label: "Vel eit emne"
       course_search_results: 
-        error_message: "Finn ikkje eit sletta kurs med den ID-en for kontoen."
-        info_text: "Påmeldingar til dette kurset skal gjenopprettast manuelt."
+        error_message: "Finn ikkje eit sletta emne med den ID-en for denne kontoen."
+        info_text: "Påmeldingar til dette emnet skal gjenopprettast manuelt."
         labels: 
           account_id: "Konto-ID:"
           account_id2: "Konto-ID:"
-          coures_id1: "Kurs-ID:"
-          coures_id2: "Kurs-ID:"
-          course_code1: "Kurskode:"
-          course_code2: "Kurskode:"
+          coures_id1: "Emne-ID:"
+          coures_id2: "Emne-ID:"
+          course_code1: "Emnekode:"
+          course_code2: "Emnekode:"
           restore_btn: Gjenopprett
         notdeleted_restore: 
           add_enrollments: "Legg til påmeldingar"
           header_subtext: "(Ikkje sletta)"
-          view_course: "Vis kurs"
+          view_course: "Vis emne"
         successful_restore: 
-          view_course: "Vis kurs"
+          view_course: "Vis emne"
         successfull_restore: 
           add_enrollments: "Legg til påmeldingar"
           subtext: "Kva vil du gjere vidare?"
@@ -514,7 +526,7 @@ nn:
         find: Finn
         grade_change_activity: Karakterendringsaktivitet
         message_assignment_id: Oppgåve-ID
-        message_course_id: Kurs-ID
+        message_course_id: Emne-ID
       grade_change_logging_item: 
         blank_placeholder: –
         event_type: 
@@ -524,7 +536,7 @@ nn:
       grade_change_logging_results: 
         Anonymous: Anonym
         Assignment: Oppgåve
-        Course: Kurs
+        Course: Emne
         Grader: Karaktersetjing
         Student: Student
         To: Til
@@ -534,7 +546,7 @@ nn:
         time: Tidspunkt
       logging_content_pane: 
         authentication: "På- og avloggingsaktivitet"
-        course: Kursaktivitet
+        course: Emneaktivitet
         grade_change: Karakterendringsaktivitet
         select_default: "Vel ei loggtype"
         select_label: "Vel ei loggtype å søke etter."
@@ -601,7 +613,7 @@ nn:
           filter_online: 
             check_box: "Berre undervisning på nettet"
     confirm_delete_user: 
-      confirm_delete: "Er du sikker på at du vil slette denne brukaren frå kontoen %{account}? Det fjernar brukardataa (inkludert karakterar) frå alle kurs og grupper. Du kan ikkje angre kommandoen."
+      confirm_delete: "Er du sikker på at du vil slette denne brukaren frå kontoen %{account}? Det fjernar brukardataa (inkludert karakterar) frå alle emne og grupper. Du kan ikkje angre kommandoen."
       delete_button: "slett %{user}"
       page_title: "Stadfest sletting"
       title: "Stadfest sletting av %{user} frå %{account}"
@@ -611,7 +623,10 @@ nn:
     consortium_users: 
       user_search_label: Brukarsøk
     course: 
-      course_unpublished_title: "Kurset er ikkje publisert enno"
+      associated_count: 
+        one: "1 tilknytta emne"
+        other: "%{count} tilknytta emne"
+      course_unpublished_title: "Emnet er ikkje publisert enno"
       course_unpublished_tooltip: "Ikkje publisert"
       homepage_link: Heimeside
       more_count: 
@@ -625,33 +640,33 @@ nn:
         one: "1 student"
         other: "%{count} studentar"
       teachers_label: Faglærarar
-    course_add_failed_message: "Kan ikkje legge til kurs, prøv på nytt seinare"
+    course_add_failed_message: "Kan ikkje legge til emne, prøv på nytt seinare"
     course_added_message: "%{course} lagt til"
     course_selector_parameters: 
       account_reports: 
         linn_benton: 
           course_ids: 
             text: "course_ids:"
-    course_type: kurs
+    course_type: emne
     courses: 
-      courses_crumb: Kurs
+      courses_crumb: Emne
       no_results_message: "Finn ikkje resultat"
-      page_title: "Søkeresultat kurs for \"%{query}\""
+      page_title: "Emne-søkeresultat for \"%{query}\""
       search_results_crumb: "Søkeresultat \"%{query}\""
-      title: "Søkeresultat kurs for \"%{query}\""
+      title: "Emne-søkeresultat for \"%{query}\""
     courses_right_side: 
       all_terms: "Alle semester"
-      course_filtering: kursfiltrering
-      enrollment_term_label: "Vis kurs frå semesteret"
-      filter_label: "Finn eit kurs"
+      course_filtering: emnefiltrering
+      enrollment_term_label: "Vis emne frå semesteret"
+      filter_label: "Finn eit emne"
       go_button: "Gå til"
-      hide_enrollmentless_courses: "Skjul kurs utan påmeldingar"
+      hide_enrollmentless_courses: "Skjul emne utan påmeldingar"
     crumb_statistics: Statistikk
     custom_grade_export_csv_parameters: 
       account_reports: 
         ross: 
           parameters: 
-            note: "Kurs med skjulte oppgåver kan vise unøyaktige resultat i rapporten ."
+            note: "Emne med skjulte oppgåver kan vise unøyaktige resultat i rapporten ."
     custom_outcomes_csv_parameters: 
       account_reports: 
         edison: 
@@ -680,13 +695,18 @@ nn:
         bryan_engagement: 
           enrollment_term_ids: 
             field: "ID-ar for påmeldingssemester"
+    excelsior_activity_report_csv_parameters: 
+      account_reports: 
+        excelsior: 
+          outcome: 
+            text: "Klassemønster:"
     find_not_authorized: "Du har ikkje autorisasjon for tilgang til denne %{type}"
     find_not_found: "Finn ikkje ein %{type} med den ID-en"
     grade_export_csv_description: 
       account_reports: 
         default: 
           description: 
-            text: "Rapporten viser alle studentane sine sluttkarakterar i eit bestemt semester.  CSV-fila inneheld ei rad per påmelding og viser gjeldande og endelege karakterar som er lagt ut i kurset si karakterbok."
+            text: "Rapporten viser alle studentane sine sluttkarakterar i eit bestemt semester. CSV-fila inneheld ei rad per påmelding og viser gjeldande og endelege karakterar som er lagt ut i emnekarakterboka."
     group_type: gruppe
     include_deleted_parameter: 
       account_reports: 
@@ -714,10 +734,10 @@ nn:
         samuel_merrit_university: 
           course: 
             sis: 
-              text: Kurs-SIS-ID
-            text: Kurs-ID
+              text: Emne-SIS-ID
+            text: Emne-ID
           parameters: 
-            note1: "Kurs-ID kan stå tom slik at rapport for at alle kursa i semesteret kan køyrast."
+            note1: "Emne-ID kan stå tom slik at rapport for at alle emna i semesteret kan køyrast."
     lti_report_csv_description: 
       account_reports: 
         default: 
@@ -742,28 +762,56 @@ nn:
       account_reports: 
         outcomes: 
           course: 
-            radio: Kurs
+            radio: Emne
           order: 
             label: Rekkefølgje
           outcome: 
-            radio: Resultat
+            radio: Læringsmål
           user: 
             radio: Brukarar
     ph_student_grades_csv_parameters: 
       account_reports: 
         penn_harris: 
           parameters: 
-            note: "Kurs med skjulte oppgåver kan vise unøyaktige resultat i rapporten ."
+            note: "Emne med skjulte oppgåver kan vise unøyaktige resultat i rapporten ."
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
           description: 
             text: "Rapporten eksporterer all nødvendig informasjon som er relatert til klargjering av Canvas i dei respektive kategoriane."
+    provisioning_csv_parameters: 
+      account_reports: 
+        default: 
+          accounts: 
+            check_box: "CSV-fil for kontoar"
+          courses: 
+            check_box: "CSV-fil for emne"
+          enrollments: 
+            check_box: "CSV-fil over påmeldingar"
+          group_categories: 
+            login: 
+              check_box: "CSV-fil for gruppekategoriar"
+          group_membership: 
+            login: 
+              check_box: "CSV-fil for gruppemedlemskap"
+          groups: 
+            check_box: "CSV-fil for grupper"
+          sections: 
+            check_box: "CSV-fil over klasser"
+          terms: 
+            check_box: "CSV-fil for semester"
+          users: 
+            check_box: "CSV-fil over brukarar"
+          xlist: 
+            check_box: "CSV-fil for x-liste"
+        sis_default: 
+          parameters: 
+            note: "*Semesterinnstillingar påverkar berre CSV-filer for emne, klasser, påmeldingar og x-lister."
     public_courses_csv_description: 
       account_reports: 
         default: 
           public_courses: 
-            text: "Rapporten viser alle kursa som ikkje er sletta i eit bestemt offentleggjort semester. Den endelege CSV-fila inneheld ei rad per kurs og viser kurs-ID-en, kurs-SIS-ID-en, forkorting av kursnamnet, kursnamnet og  start- og sluttdato for kurset."
+            text: "Rapporten viser alle emna som ikkje er sletta i eit bestemt offentleggjort semester. Den endelege CSV-fila inneheld ei rad per emne og viser emne-ID-en, emne-SIS-ID-en, forkorting av emnenamnet, emnenamnet og  start- og sluttdato for emnet."
     quota_integer_required: "Ein heiltalverdi er nødvendig"
     quota_must_be_positive: "Verdien skal vere positiv"
     quota_not_updated: "Kvoten er ikkje oppdatert"
@@ -773,7 +821,7 @@ nn:
       account_reports: 
         default: 
           recently_deleted_courses: 
-            text: "Rapporten viser alle kursa i eit bestemt semester som er sletta dei siste 30 dagane. Den endelege CSV-fila inneheld ei rad per kurs og viser kurs-ID-en, kurs-SIS-ID-en, forkorting av kursnamnet, kursnamnet og  start- og sluttdato for kurset."
+            text: "Rapporten viser alle emna i eit bestemt semester som er sletta dei siste 30 dagane. Den endelege CSV-fila inneheld ei rad per emne og viser emne-ID-en, emne-SIS-ID-en, forkorting av emnenamnet, emnenamnet og  start- og sluttdato for emnet."
     retry_login: "Logg på ein gong til"
     root_accounts: 
       labels: 
@@ -799,7 +847,7 @@ nn:
       account_reports: 
         edison: 
           quiz_id: 
-            field: Prøve-ID
+            field: Test-ID
           section_id: 
             field: Klasse-ID
     settings: 
@@ -835,10 +883,10 @@ nn:
         continue: "Hald fram ...\""
         modify_users: "Gå tilbake og rediger brukarlista"
       confirm_turnitin_settings_link: "stadfest Turnitin-innstillingar"
-      create_courses_description: "(Kontoadministratorar kan alltid opprette kurs)"
-      create_courses_title: "Desse kan opprette nye kurs"
+      create_courses_description: "(Kontoadministratorar kan alltid opprette emne)"
+      create_courses_title: "Desse kan opprette nye emne"
       custom_links_to_include_in_the_help_dialog_popup: "Eigendefinerte koplingar som kan leggast til i hurtigmenyen for dialogboksen"
-      default_language_description: "Dette vil overstyre språkinnstillingar i nettlesar/operativsystem. Føretrekte språk kan framleis setjast inn på kurs-/brukarnivå."
+      default_language_description: "Dette vil overstyre språkinnstillingar i nettlesar/operativsystem. Føretrekte språk kan framleis setjast inn på emne-/brukarnivå."
       delete: slett
       email_notification_from_description: "Innstillinga gir administratoren løyve til å merke eller klassifisere 'Frå'-feltet på alle varsel som vert sende frå Canvas for denne kontoen."
       email_notification_from_settings: "Innstillingar i \"Frå\"-feltet for e-postvarsel"
@@ -882,6 +930,7 @@ nn:
         enable_alerts: "Varsel (beta)"
         enable_eportfolios: e-porteføljer
         enable_profiles: "Aktiver profilar"
+        enable_turnitin: Turnitin
         enable_user_notes: Faglærarprotokoll
         equella: EQUELLA
         equella_endpoint: EQUELLA-endepunkt
@@ -894,7 +943,8 @@ nn:
         help_link_text: "Tekst som skal visast for kopling"
         help_link_url: URL-adresse
         include_students_in_global_survey: "Inkluder studentar i globale undersøkingar"
-        locked: "Lås innstillinga for underkontoar og kurs"
+        lock_all_announcements: "Slå av kommentering av kunngjeringar"
+        locked: "Lås innstillinga for underkontoar og emne"
         locked_for_sub_accounts: "Lås innstillinga for underkontoar"
         login_handle_name: Påloggingsetikett
         mfa_settings: "Godkjenning med fleire faktorar"
@@ -905,9 +955,9 @@ nn:
         originality_report_visibility: "Studentane kan sjå rapporten om originalitet"
         outgoing_email_default_name_option_custom: "Eigendefinert\"Frå\" Namn"
         outgoing_email_default_name_option_default: "Standard Canvas-innstilling"
-        prevent_course_renaming_by_teachers: "Faglærarar skal ikkje endre namn på kursa"
-        restrict_quiz_questions: "Studentar skal ikkje kunne sjå prøvespørsmål etter sluttdato for kurset"
-        restrict_student_future_listing: "Studentar skal ikkje kunne sjå framtidige kurs blant eigne påmeldingar"
+        prevent_course_renaming_by_teachers: "Faglærarar skal ikkje endre namn på emna"
+        restrict_quiz_questions: "Studentar skal ikkje kunne sjå testspørsmål etter sluttdato for emnet"
+        restrict_student_future_listing: "Studentar skal ikkje kunne sjå framtidige emne blant eigne påmeldingar"
         restrict_student_future_view: "Studentar skal ikkje få tilgang til kurs før startdato"
         restrict_student_past_view: "Studentar skal ikkje få tilgang til kurs etter sluttdato"
         role_id: "Legg til meir"
@@ -917,7 +967,7 @@ nn:
         sis_app_url: "URL-adresse til SIS-app"
         sis_source_id: SIS-ID
         students_can_create_courses: Studentar
-        sub_account_includes: "La underordna kontoar definere tilleggsinkluderingar"
+        sub_account_includes: "Underordna kontoar må bruke temaredigeringsprogrammet for å tilpasse eigen utsjånad"
         teachers_can_create_courses: Faglærarar
         trusted_referers: "Klarerte HTTP-referentar"
         turnitin: Turnitin
@@ -937,25 +987,25 @@ nn:
         manual_quotas_title: "Kvoter som kan innstillast manuelt"
         megabytes: megabyte
         megabytes_tooltip: megabyte
-        select_type_courses: Kurs-ID
+        select_type_courses: Emne-ID
         select_type_groups: Gruppe-ID
-        select_type_label: "Finn kurs eller gruppe"
+        select_type_label: "Finn emne eller gruppe"
         update_button: "Oppdater kvote"
       never_allow_self_enrollment_option: Aldri
       no_enrollment_roles: "Brukarar utan kurspåmeldingar"
       no_language_preference: "Ikkje oppgitt (standardar til %{language})"
       notifications: 
-        custom_name_description: "Dette vil erstatte all anna merking som er send som Canvas-varsel."
+        custom_name_description: "Dette vil erstatte utsjånaden på alle Canvas-varsel."
         email_date: Dato
         email_reply_to: "Send svar til"
         email_to: Til
         example: "Eksempel:"
         external_services: "Varsel sende til eksterne tenester"
         external_services_label: "Vis popup-åtvaring ein gong på sida for varslingsinnstillingar."
-        external_services_warning: "Melding: Nokre varsel kan innehalde konfidensiell informasjon. Når du vel å ta imot varsel på ei anna e-postadresse enn den du er tildelt frå institusjonen, risikerer du å sende sensitiv kurs- og gruppeinformasjon ut frå institusjonssystemet."
+        external_services_warning: "Melding: Nokre varsel kan innehalde konfidensiell informasjon. Når du vel å ta imot varsel på ei anna e-postadresse enn den du er tildelt frå institusjonen, risikerer du å sende sensitiv emne- og gruppeinformasjon ut frå institusjonssystemet."
         external_services_warning_label: "Innhald i popup-melding:"
         from: Frå
-        sample_subject: "Karakter er endra: Kontrollundersøking, testar kurs"
+        sample_subject: "Karakter er endra: Kontrollundersøking, emnetest"
         subject: Emne
       open_registration_delegated_warning_message: "Ein ekstern identitetsleverandør er aktivert og brukarar som er oppretta via open registrering kan kanskje ikkje logge på utan at den eksterne identitetsleverandøren har ei kopling attende til %{url}."
       open_registration_delegated_warning_tooltip: "Ein ekstern  identitetsleverandør er aktivert"
@@ -964,15 +1014,15 @@ nn:
       page_title: Kontoinnstillingar
       quiz_ip_filters_delete: "Fjern filter"
       quiz_ip_filters_help_message: |-
-          IP-filter for prøver er ei metode for å avgrense tilgang til spørsmål i datamaskiner i eit bestemt IP-intervall."
+          IP-filter for testar er ei metode for å avgrense tilgang til spørsmål i datamaskiner i eit bestemt IP-intervall."
           
-          Spesifiser eit sett med IP-adressefilter som faglærarar kan bruke for å hindre tilgang til spørsmål.  Filtera kan vere ei kommadelt adresseliste eller ei adresse følgd av ei maske ("192.168.217.1/24" eller "192.168.217.1/255.255.255.0")."
-      quiz_ip_filters_help_title: "Kva er IP-filter for prøver?"
-      quiz_ip_filters_help_tooltip: "Kva er prøve-IP-filter?"
-      quiz_ip_filters_title: "IP-adressefilter for prøver"
+          Spesifiser eit sett med IP-adressefilter som faglærarar kan bruke for å hindre tilgang til spørsmål. Filtera kan vere ei kommadelt adresseliste eller ei adresse følgd av ei maske ("192.168.217.1/24" eller "192.168.217.1/255.255.255.0")."
+      quiz_ip_filters_help_title: "Kva er IP-filter for testar?"
+      quiz_ip_filters_help_tooltip: "Kva er IP-filter for testar?"
+      quiz_ip_filters_title: "IP-adressefilter for testar"
       quotas: 
         default_account_quota_title: "Standard kontokvoter"
-        default_course_storage_quota: Kurskvote
+        default_course_storage_quota: Emnekvote
         default_group_storage_quota: Gruppekvote
         default_user_storage_quota: Brukarkvote
         megabytes: megabyte
@@ -986,8 +1036,8 @@ nn:
           optional: Valfri
           required: Obligatorisk
           required_for_admins: "Obligatorisk for administratorar"
-      self_enroll_for_any_courses_option: "For alle kurs"
-      self_enroll_for_manually_created_courses_option: "For manuelt oppretta kurs"
+      self_enroll_for_any_courses_option: "For alle emne"
+      self_enroll_for_manually_created_courses_option: "For manuelt oppretta emne"
       settings_crumb: Innstillingar
       tab_admins: Administratorar
       tab_alerts: Varsel
@@ -1003,22 +1053,26 @@ nn:
       turnitin_settings_title: Turnitin-innstillingar
       update_settings_button: "Oppdater innstillingar"
     show: 
-      courses_crumb: Kurs
-      no_courses_account_message: "Det er ingen kurs i denne kontoen"
-      no_courses_term_message: "Det er ingen kurs i dette semesteret"
+      courses_crumb: Emne
+      no_courses_account_message: "Det er ingen emne i denne kontoen"
+      no_courses_term_message: "Det er ingen emne i dette semesteret"
       subtitle_term: "For semester **%{term}**"
-      title: "Kurs i denne kontoen"
-      too_many_courses_message: "Det er for mange kurs å vise (%{count}). Dersom du leitar etter eit bestemt kurs, kan du bruke søkaren til høgre."
+      title: "Emne i denne kontoen"
+      too_many_courses_message: "Det er for mange emne å vise (%{count}). Dersom du leitar etter eit bestemt emne, kan du bruke søkaren til høgre."
     single_course_ag_selector_parameters: 
       account_reports: 
         linn_benton: 
           assignment_group_id: 
             text: "Oppgåvegruppe-ID:"
           course_id: 
-            text: "Kurs-ID:"
+            text: "Emne-ID:"
+    sis_agent_token_auth: 
+      labels: 
+        sis_app_token: SIS-agenttoken
+        sis_app_url: "URL-adresse til SIS-app"
     sis_batch_counts: 
       accounts_label: Kontoar
-      courses_label: Kurs
+      courses_label: Emne
       crosslists_label: Krysslister
       enrollments_label: Påmelding
       group_enrollments: Gruppepåmeldingar
@@ -1034,14 +1088,14 @@ nn:
       account_reports: 
         sis_export: 
           description: 
-            text: "SIS-rapport: Denne rapporten eksporterer alle filer naudsynte for brukarar, kontoar, semester, kurs, klassar, påmeldingar, grupper, gruppepåmeldingar og krysslistingar som gjeld for SIS-import i deira respektive kategoriar. Den returnerer berre element oppretta eller endra via SIS. "
+            text: "SIS-rapport: Denne rapporten eksporterer alle filer nødvendige for brukarar, kontoar, semester, emne, klassar, påmeldingar, grupper, gruppepåmeldingar og krysslistingar som gjeld for SIS-import i deira respektive kategoriar. Den returnerer berre element oppretta eller endra via SIS. "
     sis_export_csv_parameters: 
       account_reports: 
         default: 
           accounts: 
             check_box: "CSV-fil for kontoar"
           courses: 
-            check_box: "CSV-fil for kurs"
+            check_box: "CSV-fil for emne"
           enrollments: 
             check_box: "CSV-fil over påmeldingar"
           group_membership: 
@@ -1059,12 +1113,12 @@ nn:
             check_box: "CSV-fil for x-liste"
         sis_default: 
           parameters: 
-            note: "*Semesterinnstillingar påverkar berre CSV-filer for kurs, klasser, påmeldingar og x-lister."
+            note: "*Semesterinnstillingar påverkar berre CSV-filer for emne, klasser, påmeldingar og x-lister."
     sis_import: 
       add_sis_stickiness_instructions: "Dersom du vel dette alternativet, vil endringar som er gjort gjennom SIS-importen behandlast som om dei er endringar i brukargrensesnittet og hindre overstyrande SIS-importar i å endre felta som er endra her."
       add_sis_stickiness_label: "Behandle som endringar i brukargrensesnittet"
       batch_import_instructions: |-
-          Dette vil det erstatte alt for dette semesteret, og inkluderer alle kurs og påmeldingar som ikkje er i den valde importfila ovanfor.
+          Dette vil det erstatte alt for dette semesteret, og inkluderer alle emne og påmeldingar som ikkje er i den valde importfila ovanfor.
           Sjå i dokumentasjonen etter detaljar.
       batch_mode_label: "Dette er ei fullstendig batchoppdatering"
       clear_sis_stickiness_instructions: "Dersom du vel dette alternativet, kan alle felt og postar som vedkjem SIS-importen endrast i framtidige SIS-importar som ikkje er overstyrande."
@@ -1094,6 +1148,9 @@ nn:
       started_at_message: "Starta: %{started_at}"
       title: SIS-import
       try_import_again_link: "Importer på nytt"
+    sis_integration_settings: 
+      labels: 
+        value: Teikn
     site_admin_statistics: 
       page_title: "Statistikk for %{account}"
     statistics: 
@@ -1106,7 +1163,7 @@ nn:
       heading_date: Dato
       heading_value: Verdi
       labels: 
-        courses: Kurs
+        courses: Emne
         generated_at: Generert
         media_storage: Media
         students: Studentar
@@ -1124,10 +1181,10 @@ nn:
       over_time_link: "over tid"
       page_header_title: Kontostatistikk
       page_title: "Statistikk for %{account}"
-      recently_created_courses_title: "Nyleg oppretta kurs"
-      recently_ended_courses_title: "Nyleg avslutta kurs"
+      recently_created_courses_title: "Nyleg oppretta emne"
+      recently_ended_courses_title: "Nyleg avslutta emne"
       recently_logged_in_users_title: "Nyleg pålogga brukarar"
-      recently_started_courses_title: "Nyleg oppstarta kurs"
+      recently_started_courses_title: "Nyleg oppstarta emne"
       started_at: "starta %{at}"
       title_data_point_over_time: "%{data_point} over tid"
       uploaded_data: 
@@ -1138,22 +1195,27 @@ nn:
       account_reports: 
         orbis: 
           parameters: 
-            note: "Kurs med skjulte oppgåver kan vise unøyaktige resultat i rapporten ."
+            note: "Emne med skjulte oppgåver kan vise unøyaktige resultat i rapporten."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
           description: 
-            text: "Rapporten viser læringsmålsresultat for alle studentane. CSV-fila inneheld ei rad per par med brukar-mål-resultat og viser detaljane i resultatet inkludert den tilknytte oppgåva. Rapporten vise berre målresultat for oppgåver og omfattar ikkje resultat som er knytte til spørsmålsbankar."
+            text: "Rapporten viser læringsmålsresultat for alle studentane. CSV-fila inneheld ei rad per par med brukar-mål-resultat og viser detaljane i resultatet inkludert den tilknytte oppgåva. Rapporten vise berre målresultat for oppgåver og omfattar ikkje læringsmål som er knytte til spørsmålsbankar."
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
           pseudonym_ids: 
             field: Pseudonym-ID-ar
+    student_progress_custom_report_csv_parameters: 
+      account_reports: 
+        pearson: 
+          outcome: 
+            text: "Emne-SIS-ID:"
     students_with_no_submissions_csv_description: 
       account_reports: 
         default: 
           students_with_no_submissions: 
-            text: "Rapporten er for alle studentar som er registrerte i eit kurs i eit bestemt semester og som ikkje har levert oppgåver i det oppgitte datointervallet i eit kurs. Rapporten inneheld ei rad per studenpåmeldingar som fyller kriteria. Datointervallet kan ikkje vere lenger enn to veker."
+            text: "Rapporten er for alle studentar som er registrerte i eit emne i eit bestemt semester og som ikkje har levert oppgåver i det oppgitte datointervallet i eit kurs. Rapporten inneheld ei rad per studenpåmeldingar som fyller kriteria. Datointervallet kan ikkje vere lenger enn to veker."
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
@@ -1167,10 +1229,10 @@ nn:
       account_reports: 
         tempe: 
           course: 
-            text: Kurs-ID
+            text: Emne-ID
           parameters: 
-            note1: "Kurs-ID kan stå tom slik at rapport for at alle kursa i semesteret kan køyrast."
-            note2: "Kurs med skjulte oppgåver kan vise unøyaktige resultat i rapporten ."
+            note1: "Emne-ID kan stå tom slik at rapport for at alle kursa i semesteret kan køyrast."
+            note2: "Emne med skjulte oppgåver kan vise unøyaktige resultat i rapporten ."
     terms_parameters: 
       account_reports: 
         default: 
@@ -1187,13 +1249,13 @@ nn:
       account_reports: 
         default: 
           unpublishd_courses: 
-            text: "Rapporten viser alle kursa for eit bestemt semester som ikkje er publiserte. Den endelege CSV-fila inneheld ei rad per kurs og viser kurs-ID-en, kurs-SIS-ID-en, forkorting av kursnamnet, kursnamnet og  start- og sluttdato for kurset."
+            text: "Rapporten viser alle emna for eit bestemt semester som ikkje er publiserte. Den endelege CSV-fila inneheld ei rad per emne og viser emne-ID-en, emne-SIS-ID-en, forkorting av emnenamnet, emnenamnet og start- og sluttdato for emnet."
     unrecognized_time_zone: "'%{timezone}' er ikkje ei godkjend tidssone"
     unused_courses_csv_description: 
       account_reports: 
         unused_courses: 
           main: 
-            text: "Dette er ein rapport for alle kursa som ikkje inneheld fylgjande element: oppgåver, kunngjeringar, diskusjonar, filer, modular, sider eller prøver."
+            text: "Dette er ein rapport for alle emna som ikkje inneheld fylgjande element: oppgåver, kunngjeringar, diskusjonar, filer, modular, sider eller testar."
     update_failed_notice: "Kan ikkje oppdatere kontoinnstillingar"
     user_access_csv_parameters: 
       account_reports: 
@@ -1219,7 +1281,7 @@ nn:
       account_reports: 
         webster: 
           login: 
-            day_drop: "Minimum kurselement som er besøkte:"
+            day_drop: "Minste tal sider som er besøkt på emnet:"
     users_list: 
       login_name_or_sis_id: Pålogging/SIS-ID
       name: Namn
@@ -1229,7 +1291,7 @@ nn:
       account_reports: 
         default: 
           zero_activity: 
-            text: "Rapporten viser alle studentane som er registrerte i alle kurs i eit bestemt semester. Den endelege csv-fila inneheld ei rad per brukarpåmelding som ikkje har besøkt kurset sidan datoen."
+            text: "Rapporten viser alle studentane som er registrerte i alle emne i eit bestemt semester. Den endelege csv-fila inneheld ei rad per brukarpåmelding som ikkje har besøkt emnet sidan datoen."
   achieve_mastery_count_times_8c9bbcec: 
     one: "Oppnå meistring ein gong"
     other: "Oppnå meistring %{count} gongar"
@@ -1238,6 +1300,7 @@ nn:
   actions_taken_6fb20fd0: Gjennomført
   activate_this_key_6cd98f4b: "Aktiver denne nøkkelen"
   active_d7e32718: Aktiv
+  active_terms_83df727e: "Aktive semester"
   activerecord: 
     errors: 
       messages: 
@@ -1247,20 +1310,23 @@ nn:
           one: "Kan ikkje slette oppføringa fordi ei avhengig %{record} eksisterer"
   activity_by_category_9c2033d1: "Aktivitet etter kategori"
   activity_by_date_878c5b49: "Aktivitet etter dato"
+  activity_compared_to_class_8133cb0: "Aktivitet samanlikna med klasse"
   add_2nd_review_ea988088: "Legg til 2. gjennomgang"
   add_8523c19b: "Legg til"
   add_a_comment_872470ac: "Legg til ein kommentar"
-  add_a_course_b72b18d7: "Legg til eit kurs"
+  add_a_course_b72b18d7: "Legg til eit emne"
   add_a_custom_help_link_4328252f: "Legg til eigendefinert Hjelp-kopling"
   add_a_new_announcement_878b717f: "Legg til ei ny kunngjering"
-  add_a_new_course_4a041207: "Legg til eit nytt kurs"
+  add_a_new_course_4a041207: "Legg til eit nytt emne"
   add_a_new_outcome_cbdbe96c: "Legg til nytt læringsmål"
   add_a_new_outcome_group_e3fab2fc: "Legg til ny læringsmålgruppe"
   add_a_new_user_c440d053: "Legg til ein ny brukar"
   add_a_reviewer_for_the_selected_students_1c7b5d6f: "Legg til ein reviewar for dei valgte studentane"
   add_account_admins_99c03c9e: "Legg til kontoadministratorar"
   add_alert_b2729c99: "Legg til varsel"
+  add_an_assignment_fb73942e: "Legg til ei oppgåve"
   add_an_identity_provider_to_this_account_c2644478: "Legg til ein identitetsleverandør til kontoen:"
+  add_another_assignment_fc5c908f: "Legg til ei ny oppgåve"
   add_app_baf540f: "Legg til app"
   add_assignment_to_name_caf173b0: "Legg til oppgåve til %{name}"
   add_attachment_93868828: "Legg til vedlegg"
@@ -1270,13 +1336,13 @@ nn:
   add_collaboration_da9665ac: "Legg til samarbeid"
   add_contact_method_d2dfea03: "Legg til kontaktmetode"
   add_content_to_module_name_589a8d54: "Legg innhald til %{module_name}"
-  add_course_406cb773: "Legg til kurs"
-  add_course_assignments_628ed6d0: "Legg til kursoppgåver"
-  add_course_calendar_events_146154a5: "Legg til kalenderhendingar for kurset"
+  add_course_406cb773: "Legg til emne"
+  add_course_assignments_628ed6d0: "Legg til emneoppgåver"
+  add_course_calendar_events_146154a5: "Legg til kalenderhendingar for emnet"
   add_criterion_eb9587ef: "Legg til kriterium"
   add_custom_link_22059c0: "Legg til eigendefinert lenke"
   add_email_address_aef3b61: "Legg til e-postadresse"
-  add_files_to_the_course_da6ffd32: "Legg filer til kurset"
+  add_files_to_the_course_da6ffd32: "Legg filer til emnet"
   add_folder_ba50d107: "Legg til mappe"
   add_grading_period_6f774dc3: "Legg til periode for karaktersetjing"
   add_grading_scheme_81e23c05: " Legg til skjema for karaktersetjing"
@@ -1289,22 +1355,33 @@ nn:
   add_new_announcement_ddacd624: "Legg til ei ny kunngjering"
   add_new_group_7ac49f31: "Legg til ny gruppe"
   add_new_set_of_due_dates_e8e240f: "Legg til nye forfallsdatoar"
+  add_new_term_d2217c0d: "Legg til nytt semester"
   add_people_7ee4b2ec: "Legg til personar"
-  add_quiz_ip_filter_c7b37dc5: "Legg til IP-filter for prøver"
+  add_quiz_ip_filter_c7b37dc5: "Legg til IP-filter for testar"
   add_recipient_ff135ed7: "Legg til mottakar"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Legg til, fjerne eller ordne klasse på nytt for porteføljen"
   add_review_2fb1590c: "Legg til gjennomgang"
   add_rubric_3636d9a6: "Legg til vurderingskriterium"
   add_section_8b027a1c: "Legg til klasse"
   add_set_of_grading_periods_5b4d6e51: "Legg til fleire periodar for karaktersetjing"
-  add_students_to_the_course_874be8fb: "Legg studentar til kurset"
-  add_tas_to_the_course_2aac6e02: "Legg undervisingsassistentar til kurset"
+  add_students_by_searching_by_name_course_section_o_abb9e2f2: "Legg til studentar ved å søkje på namn, emneklasse eller gruppe. Etter å ha skrive inn tekst, kan du navigere i resultatet ved å bruke ned-piltasten på  tastaturet. Vel resultat ved å trykkje Enter-tasten. "
+  add_students_to_the_course_874be8fb: "Legg til studentar på emnet "
+  add_tas_to_the_course_2aac6e02: "Legg til undervisingsassistentar på emnet"
   add_theme_32fa3d50: "Legg til tema"
+  add_to_course_481a51c4: "Legg til emnet..."
   add_trigger_bc1a0fae: "Legg til utløysar"
+  add_user_by_email_address_login_id_or_sis_id_7dd370dd: "Legg til brukar med e-postadresse, Login-ID eller SIS-ID"
   add_user_e73e8e50: "Legg til brukar"
+  add_user_s_by_b2549f89: "Legg til brukar(ar) ved å"
+  add_users_b10c7fb1: "Legg til brukarar"
   add_users_to_name_b8109bbb: "Legg brukarar til %{name}"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Legg til oppgåvene dine.  Du kan lage ei lang liste, dele dei opp i grupper eller spesifisere vekttal for kvar enkelt oppgåvegruppe."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Legg til ID for eigendefinert felt i Zendesk for kvar av dei følgande (felt utan ID vert ikkje registrerte):"
+  additional_occurrence_s_7b5b0173: Tilleggsførekomst(ar)
+  additional_outcomes_options_6df428f1: "Fleire læringsmålalternativ"
+  additional_settings_for_sis_syncing_f926973e: "Tilleggsinnstillingar for SIS-synkronisering"
+  additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Fleire alternativ for SIS-synkroniserte oppgåver, testar og diskusjonar"
+  adjust_final_grade_fa45e7e0: "Juster sluttkarakter"
   admin_4d3ba42f: Admin
   admins_3e1dce15: Administratorar
   after_date_981cd41b: "Etter %{date}"
@@ -1366,27 +1443,32 @@ nn:
   all_accounts_3bafc860: "Alle kontoar"
   all_changes_were_saved_f6f3ddcc: "Alle endringar er lagra"
   all_configured_apps_a14eef0a: "Alle konfigurerte appar"
-  all_courses_a7dbb853: "Alle kurs"
+  all_courses_a7dbb853: "Alle emne"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alle datofelt må finnast og vere korrekt formaterte"
-  all_finished_time_to_publish_your_course_click_the_b6f07217: "Er du ferdig?  Du kan publisere kurset ditt.  Klikk på knappen nedanfor. Publisering inneber at brukarane kan ta del i kurset."
+  all_finished_time_to_publish_your_course_click_the_b6f07217: "Er du ferdig?  Du kan publisere emnet ditt. Klikk på knappen nedanfor. Publisering inneber at brukarane kan ta del i emnet."
   all_grading_period_sets_must_have_a_title_799538f: "Alle sett med karaktersetjingsperiodar må ha ein tittel"
   all_grading_periods_77974940: "Alle periodar for karaktersetjing"
   all_grading_periods_must_have_a_title_a1a38d87: "Alle karaktersetjingsperiodar må ha ein tittel"
   all_groups_cea25817: "Alle grupper"
   all_my_files_a0213441: "Alle filene mine"
   all_start_dates_must_be_before_the_end_date_d949eca9: "Alle startdatoar må setjast før sluttdatoen"
-  all_students_have_taken_the_quiz_b558f8b4: "Alle studentar har teke prøva"
+  all_students_have_taken_the_quiz_b558f8b4: "Alle studentar har teke testen"
   all_students_have_taken_the_survey_494f9f42: "Alle studentar har teke undersøkinga"
   all_submissions_must_have_a_selected_grade_3a84e5a9: "Alle innleveringar må ha ein karakter."
   all_terms_cd27b0fb: "Alle semester"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "La ein sensuransvarleg gå gjennom fleire uavhengige karaktersetjingar for utvalde innleveringar"
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillat gruppeeksport av karakterar til SIS"
-  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillat at kursbilde vert tilordna til eit kurs og brukt på dashbordkorta. "
+  allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Tillat at emneinnhaldet kan bli lasta ned og lest når du ikkje er på nett"
+  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillat at emnebilde vert tilordna til eit emne og brukt på dashbordkorta. "
+  allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillat at kvar brukar kan reorganisere dashbordkorta sine. "
   allow_in_mastery_paths_5332c786: "Tillat i meistringsstiane"
+  allow_intra_group_peer_reviews_53f1e455: "Tillat fagfellevurdering innad i gruppa"
   allow_lor_tools: "Tillat brukarar å vise og bruke eksterne verktøy som er konfigurerte for LOR."
   allow_multiple_attempts_e67a0a37: "Tillat fleire forsøk"
   allow_opt_out_of_inbox: "Tillat brukarar å trekkje seg frå samtaleinnboksen. Dette vil medføre at alle samtalemeldingar og -varsel vert sende direkte til den primære e-postadressa til brukaren, at meldingsindikatoren for ulesne meldingar vert skjult, og at varslingsinnstillingar for samtalar vert skjulte."
+  allow_reorder_dashboard_cards_78215947: "Tillat reorganisering av dashbordkorta"
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Tillat studentar å sjå kven som har registrert seg for tidsluker."
+  allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Tillat studentar å sjå kven som var registrert for tidsluker."
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Tillat å sende varsel gjennom vår dispatch-kø"
   allowed_attempts_4e229caa: "Tillatne forsøk"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Gir faglærarar løyve til å markere karakterdata for masseeksport til SIS-integrasjonar."
@@ -1394,6 +1476,8 @@ nn:
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Gjer at brukarar med internasjonale telefonnummer kan ta imot tekstmeldingar frå Canvas."
   always_3a59e701: Alltid
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Last alltid RCE og sidestolpe fra Canvas sin rikt innhald-teneste"
+  an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "Ein API-nøkkel er nødvendig for å bruke Academic Benchmarks"
+  an_assignment_name_dc624e70: "Eit oppgåvenamn"
   an_error_occured_please_try_again_e59b65b: "Det oppstod ein feil. Prøv på nytt seinare."
   an_error_occured_while_deleting_the_grading_period_81bb16e5: "Det oppstod eit problem under sletting av settet med karaktersetjingsperiodar"
   an_error_occured_while_deleting_the_grading_period_c8343484: "Det oppstod eit problem under sletting av karaktersetjingsperioden"
@@ -1401,6 +1485,7 @@ nn:
   an_error_occured_while_fetching_grading_period_set_b4f12aa5: "Det oppstod eit problem under importeringa av setta med karaktersetjingsperiodar"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Det oppstod eit problem under oppdateringa av setta med karaktersetjingsperiodar"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Det oppstod ein feil*, legg inn svaret ditt på nytt seinare"
+  an_error_occurred_please_try_again_later_84223241: "Det oppstod ein feil. Prøv på nytt seinare."
   an_error_occurred_publishing_grades_cfdf7631: "Det oppstod ein feil under publisering av karakterar."
   an_error_occurred_selecting_provisional_grades_9d7bcda: "Det oppstod ein feil under val av mellombelse karakterar"
   an_error_occurred_trying_to_apply_this_theme_pleas_253d0996: "Det oppstod ein feil under bruk av temaet. Prøv på nytt seinare."
@@ -1408,6 +1493,7 @@ nn:
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Det oppstod ein feil under førebuing av nedlasting. Prøv på nytt seinare."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Det oppstod ein feil under innstilling av bruksretten for %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Ein feil oppstod ved forsøk på å kontakte Turnitin"
+  an_internal_error_occurred_83b8a685: "Det oppstod ein feil"
   an_item_named_name_already_exists_in_this_location_147b7312: "Eit element med namnet \"%{name}\" finst allereie.\" Vil du erstatte den eksisterande fila?"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Det oppstod ein ukjent feil i tenaren.  Prøv på nytt seinare."
   an_update_is_available_for_toolname_bba3fa2: "Ein oppdatering er tilgjengeleg for %{toolName}"
@@ -1416,16 +1502,16 @@ nn:
       analytics: Analyse
       page_title: "Analyse: %{course}"
     crumb: 
-      completed: "Fullførte kurs"
-      current: "Gjeldande kurs"
+      completed: "Fullførte emne"
+      current: "Gjeldande emne"
     department: 
       analytics: Analyse
     filters: 
-      completed: "Fullførte kurs"
-      current: "Gjeldande kurs"
+      completed: "Fullførte emne"
+      current: "Gjeldande emne"
     page_title: 
-      completed: "Analyse: %{account} -- fullførte kurs"
-      current: "Analyse: %{account} -- gjeldande kurs"
+      completed: "Analyse: %{account} -- fullførte emne"
+      current: "Analyse: %{account} -- gjeldande emne"
       term: "Analyse: %{account} -- %{term}"
     student_in_course: 
       analytics: Analyse
@@ -1434,6 +1520,7 @@ nn:
   analytics_c94ba601: Analyse
   analytics_course_code_student_name_d63bab4c: "Analyse: %{course_code} -- %{student_name}"
   and_count_more_43eae021: "and %{count} moreâ€¦"
+  and_more_1c35b232: "og meir ..."
   ange_name: Angel-konverteringsprogram
   angel: 
     file_copy_fail: "Kan ikkje kopiere mappe \"%{base_path}\""
@@ -1457,9 +1544,9 @@ nn:
     error_draft_state: "Emnet kan ikkje endrast til kladd fordi det er ei kunngjering."
     feed_name: "%{course} kunngjeringsstraum"
     index: 
-      feed_title_course: "Kurskunngjeringar, Atom-straum"
-      feed_title_group: "Gruppekunngjeringar, Atom-straum"
-      podcast_title_course: "Kurskunngjeringar, podkaststraum"
+      feed_title_course: "Emnekunngjeringar i Atom-format"
+      feed_title_group: "Gruppekunngjeringar i Atom-format"
+      podcast_title_course: "Emnekunngjeringar i podkastformat"
       podcast_title_group: "Gruppekunngjeringar, podkaststraum"
     index_view: 
       announcements_title: Kunngjeringar
@@ -1475,15 +1562,16 @@ nn:
       try_disabling_the_unread_filters: "Prøv med å deaktivere \"Unread\"-filteret."
       unread: "Ikkje lest"
       your_search_did_not_match_any_announcements: "Søket ditt samsvara ikkje med kunngjeringar."
-    podcast_feed_description_course: "Alle mediafiler tilkopla eller innebygde i kunngjeringar i kurset \"%{course}\" vert viste i denne straumen."
+    podcast_feed_description_course: "Alle mediafiler tilkopla eller innebygde i kunngjeringar i emnet \"%{course}\" vert viste i denne straumen."
     podcast_feed_description_group: "Alle mediafiler tilkopla eller innebygde i kunngjeringar i gruppa \"%{group}\" vert viste i denne straumen."
-    podcast_feed_name: "%{course} kunngjeringar som podkaststraum"
+    podcast_feed_name: "%{course} kunngjeringar i podkastformat"
   announcements_a4b8ed4a: Kunngjeringar
   anonymous_e1b8ad27: Anonym
   anonymous_grading_ccb5045c: "Anonym karaktersetjing"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym karaktersetjing tvingar studentnamn til å vere skjulte i SpeedGrader™"
   anonymous_user: "Anonym brukar"
   anonymous_user_d984b9ce: "Anonym brukar"
+  another_assignment_name_369f8481: "Eit nytt oppgåvenamn"
   another_configuration_is_currently_selected_select_95b394e: "Ein annan konfigurasjon er vald.  Om du vel denne konfigurasjonen fjernar du den andre."
   answer_address_book_queries_through_76842372: "Svar på adressebok-spørsmål gjennom"
   answer_answerid_97fc4afc: "Svar %{answerId}"
@@ -1498,7 +1586,7 @@ nn:
   answers_which_scored_in_the_top_27_a605232d: "Svar innan dei høgste 27%"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Svar vert viste etter det siste forsøket"
   app_b157c2b3: App
-  app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center vil visast i \"Apps\"-fana på innstillingssida til anten eit kurs eller ein konto. URL-en som er oppgitt nedanfor skal vise til eit gyldig App Center-sluttpunkt (for eksempel, %{url} -- husk å utelate den etterfølgjande skråstreken"
+  app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center vil visast i \"Apps\"-fana på innstillingssida til anten eit emne eller ein konto. URL-en som er oppgitt nedanfor skal vise til eit gyldig App Center-sluttpunkt (for eksempel, %{url} -- husk å utelate den etterfølgjande skråstreken"
   app_placements_6d877225: App-plasseringar
   app_reregistration_87cc8817: "Ny registrering av app"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Legg til eit tal på slutten av kvar hendingstittel (f.eks. Hending 1, Hending 2, osv.)"
@@ -1507,9 +1595,9 @@ nn:
     errors: 
       feed_not_found: "Finn ikkje straum."
       feed_private: "Samsvarande kontekst er no privat, og offentlege straumar som denne er ikkje lenger synlege."
-      feed_private_course: "Samsvarande kurs er no privat, og offentlege straumar som denne er ikkje lenger synlege."
+      feed_private_course: "Samsvarande emne er no privat, og offentlege straumar som denne er ikkje lenger synlege."
       feed_private_group: "Samsvarande gruppe er no privat, og offentlege straumar som denne er ikkje lenger synlege."
-      feed_unpublished_course: "Straumar for dette kurset er ikkje tilgjengelege før kurset er publisert."
+      feed_unpublished_course: "Straumar for dette emnet er ikkje tilgjengelege før emnet er publisert."
       feed_unpublished_group: "Straumar for denne gruppa er ikkje tilgjengelege før gruppa er publisert."
       invalid_external_tool: "Finn ikkje gyldige innstillingar for denne koplinga"
       invalid_external_tool_id: "Finn ikkje gyldige innstillingar for dette verktøyet"
@@ -1520,22 +1608,22 @@ nn:
       permission_denied: "Du har ikkje tilgang til denne sida"
       quota_exceeded: "Lagringskvote er overskriden"
       quota_exceeded_account: "Lagringskvote for konto er overskriden"
-      quota_exceeded_course: "Lagringskvote for kurs er overskriden"
+      quota_exceeded_course: "Lagringskvote for emnet er overskriden"
       quota_exceeded_group: "Lagringskvote for gruppe er overskriden"
       quota_exceeded_user: "Lagringskvote for brukar er overskriden"
       student_view_unauthorized: "Du har ikkje tilgang til denne funksjonaliteten i studentvising."
       submission_unauthorized: "Du har ikkje tilgang til innleveringa."
       unauthorized: 
-        not_started_yet: "Kurset du vil ha tilgang til har ikkje byrja enno.  Det startar %{date}."
-        unpublished: "Kurset er ikkje publisert av faglæraren enno."
+        not_started_yet: "Emnet du vil ha tilgang til har enno ikkje starta. Det startar %{date}."
+        unpublished: "Emnet er enno ikkje publisert av faglæraren."
     notices: 
-      first_teacher: "Kurset er no gjort krav på og du er registrert som den fyrste faglæraren."
-      first_teacher_with_email: "Kurset er no gjort krav på og du er registrert som den fyrste faglæraren. Du vil om kort tid ta imot ein e-post og kunne fullføre registreringsprosessen."
-      need_to_accept_enrollment: "Du må [godta invitasjonen til påmelding](%{url}) før du kan delta på kurset fullt ut."
-      need_to_accept_future_enrollment: "Du må [godta invitasjonen til påmelding](%{url}) før du kan delta på kurset fullt ut, startdato %{date}."
+      first_teacher: "Emnet er no gjort krav på og du er registrert som den fyrste faglæraren."
+      first_teacher_with_email: "Emnet er no gjort krav på og du er registrert som den fyrste faglæraren. Du vil om kort tid ta imot ein e-post og kunne fullføre registreringsprosessen."
+      need_to_accept_enrollment: "Du må [godta invitasjonen til påmelding](%{url}) før du kan delta på emnet fullt ut."
+      need_to_accept_future_enrollment: "Du må [godta invitasjonen til påmelding](%{url}) før du kan delta på emnet fullt ut, startdato %{date}."
       page_disabled: "Sida er deaktivert"
       page_disabled_for_account: "Sida er deaktivert for denne kontoen"
-      page_disabled_for_course: "Sida er deaktivert for dette kurset"
+      page_disabled_for_course: "Sida er deaktivert for dette emnet"
       page_disabled_for_group: "Sida er deaktivert for denne gruppa"
     warnings: 
       details: 
@@ -1543,7 +1631,7 @@ nn:
       please_log_in: "Av tryggleiksgrunnar må du oppgi passordet for å halde fram"
       titles: 
         suspended: "Institusjonen er suspendert"
-    wiki_front_page_default_content_course: "Velkomen til din nye kurswiki."
+    wiki_front_page_default_content_course: "Velkomen til din nye emnewiki."
     wiki_front_page_default_content_group: "Velkomen til din nye gruppewiki."
   application_id_2aa1640f: Applikasjons-ID
   application_secret_e6803c7e: Applikasjonshemmelegheit
@@ -1558,11 +1646,13 @@ nn:
       overlapping_appointments: "Avtalar overlappar kvarandre"
   appointment_group_sub_context: 
     errors: 
-      invalid_course_section: "Ugyldig kursområde"
+      invalid_course_section: "Ugyldig emneområde"
       invalid_group_category: "Ugyldig gruppekategori"
       missing_group_category: "Gruppeavtalar må ha ein gruppekategori"
+  appointments_dcb41d23: Avtalar
+  approved_c3b285d4: Godkjent
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} med presisjon %{precision}"
-  apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Appar er ein enkel måte å legge nye funksjonar i Canvas. Dei kan leggast til individuelle kurs eller til alle kursa i ein konto. Når dei er konfigurerte, kan du kople deg til dei gjennom kursmodular og opprette oppgåver for vurderingsverktøy."
+  apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Appar er ein enkel måte å legge nye funksjonar i Canvas. Dei kan leggast til individuelle emne eller til alle emna i ein konto. Når dei er konfigurerte, kan du kople deg til dei gjennom emnemodular og opprette oppgåver for vurderingsverktøy."
   appt_calendar_event_dialog: 
     invalid_participants: "Du må tillate at minst ein brukar deltek"
     title: "Rediger %{name}"
@@ -1570,16 +1660,20 @@ nn:
   archive_3f794d7e: Arkiv
   archive_selected_d64506ca: "Arkiv er valt"
   are_you_sure_26795d3c: "Er du sikker?"
+  are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: "Er du sikker på at du vil avbryte? Endringar vert kanskje ikkje lagra."
+  are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "Er du sikker på at du vil avlyse avtalen med %{name}?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Er du sikker på at du vil kopiere til den siste karakteren? Dette overskriv den gjeldande karakteren."
-  are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: "Er du sikker på at du vil deaktivere brukaren? Då vil ikkje brukarar lenger kunne delta i kurset."
+  are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: "Er du sikker på at du vil deaktivere brukaren? Då vil ikkje brukaren lenger kunne delta i emnet."
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "Er du sikker på at du vil slette %{name}?"
     other: "Er du sikker på at du vil slette desse %{count} elementa?"
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Er du sikker på at du vil slette kunngjeringa?"
+  are_you_sure_you_want_to_delete_this_assignment_88be6f5e: "Er du sikker på at du vil slette denne oppgåva?"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "Er du sikker på at du vil slette denne kommentaren?"
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Er du sikker på at du vil slette settet med karaktersetjingsperiodar?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Er du sikker på at du vil slette karaktersetjingsperioden?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Er du sikker på at du vil slette karaktersetjingsskjemaet?"
+  are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Er du sikker på at du vil slette reservasjonen av denne hendinga?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Er du sikker på at du vil gjennomføre dette? Det kan ikkje angrast og overstyrer eksisterande karakterar i karakterboka."
   are_you_sure_you_want_to_publish_this_comment_26989c2f: "Er du sikker på at du vil publisere denne kommentaren?"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Er du sikker på at du vil fjerne karaktersetjingsperioden?"
@@ -1638,7 +1732,7 @@ nn:
       a_discussion_post: "eit diskusjonsinnlegg"
       a_file_upload: "ei filopplasting"
       a_media_recording: "ei mediainnspeling"
-      a_quiz: "ei prøve"
+      a_quiz: "ein test"
       a_text_entry_box: teksteditoren
       a_website_url: "ei URL-adresse til ein nettstad"
       external_tool: "eit eksternt verktøy"
@@ -1646,6 +1740,7 @@ nn:
     titles: 
       gpa_scale_explainer: "Kva er GPA Scale Grading?"
       grading_scheme_info: "Vis/rediger karakterskjema"
+    vericite_submission_types_validation: "VeriCite støttar kun filinnleveringar og tekstinnlegging i editor"
   assignment_976578a8: Oppgåve
   assignment_comments_e43ed898: Oppgåvekommentarar
   assignment_created_assignment_name_course_name_324a5639: "Oppgåve er oppretta – %{assignment_name}, %{course_name}"
@@ -1776,7 +1871,7 @@ nn:
       more: "Fleire alternativ"
       multiple_due_dates: "Fleire forfallsdatoar"
       not_graded_type: "Ikkje karaktersett"
-      quiz_type: Prøve
+      quiz_type: Test
       save: Lagre
       saving: "Lagrar ...\""
     create_group: 
@@ -1967,7 +2062,7 @@ nn:
     non_number: "Du må bruke eit tal"
     notices: 
       assignment_delete: "Oppgåva er sletta"
-      assignment_not_available: "Oppgåva du spør etter er ikkje tilgjengeleg i kursområdet ditt."
+      assignment_not_available: "Oppgåva du spør etter er ikkje tilgjengeleg for emneklassen din."
       created: "Oppgåva er oppretta."
       updated: "Oppgåva er oppdatert."
     overdue_assignments: "Oppgåver med passert innleveringsfrist"
@@ -2054,6 +2149,9 @@ nn:
       turnitin_enabled: "Turnitin er aktivert for denne oppgåva."
       turnitin_enabled_short: "(Turnitin aktivert)"
       until: Til
+      vericite: VeriCite
+      vericite_enabled: "VeriCite er aktivert for denne oppgåva."
+      vericite_enabled_short: "(VeriCite aktivert)"
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
@@ -2069,7 +2167,7 @@ nn:
           details: Innleveringsdetaljar
           download_attachment: "Last ned %{attachment_display_name}"
           view_original_page: "Vis opphavleg side"
-          view_quiz: "Vis prøveinnleveringa"
+          view_quiz: "Vis innleveringa av testen"
           view_survey: "Vis innleveringa av undersøkinga"
         view_rubric_evaluation: "Vis evalueringa for vurderingsskjema"
       messages: 
@@ -2083,6 +2181,7 @@ nn:
         submission_turned_in: Levert.
     submission_types_form: 
       advanced_turnitin_settings: "Avanserte Turnitin-innstillingar"
+      advanced_vericite_settings: "Avanserte VeriCite-innstillingar"
       descriptions: 
         allowed_extensions: "Oppgi ei liste med aksepterte filtypar, for eksempel: doc,xls,txt"
       external_tool_group_warning: "Gruppeoppgåver kan ikkje bruke eksterne verktøy. Markering for gruppeinnstilling vert fjerna når du lagrar"
@@ -2090,6 +2189,7 @@ nn:
       label: 
         external_tool_new_tab: "Last inn verktøyet i ei ny fane"
         turnitin_enabled: "Aktiver Turnitin-innleveringar"
+        vericite_enabled: "Aktiver VeriCite-innleveringar"
       labels: 
         allow_file_uploads: Filopplasting
         allow_media_recordings: Medieinnspelingar
@@ -2148,7 +2248,7 @@ nn:
         media_recordings_disabled: "Medieopptak er ikkje aktivert for dette Canvas-området"
       upload_or_choose_file: "Last opp fila, eller vel ei fil du allereie har lasta opp."
     syllabus: 
-      page_title: "Kursoversikt for %{course}"
+      page_title: "Emneoversikt for %{course}"
     syllabus_content: 
       buttons: 
         update_syllabus: "Oppdater kursoversikten "
@@ -2157,18 +2257,19 @@ nn:
         details: Detaljar
       instructions: 
         syllabus: |-
-            Sida for kursoversikt viser eit tabelloppsett av timeplanen for kurset og grunnlaget for
-            karaktersetjing. Du kan legge til kommentarar, merknader eller idear du har om kursstrukturen,
-            kursreglane eller andre ting.
+            Sida for emneoversikt viser eit tabelloppsett av timeplanen for emnet og grunnlaget for
+            karaktersetjing. Du kan legge til kommentarar, merknader eller idear du har om emnestrukturen,
+            emnereglane eller andre ting.
             
             Dersom du vil legge til kommentarar, klikkar du på lenka "Rediger" øvst.
       labels: 
+        assignments_summary: Emnesamandrag
         syllabus_body: "Skildring av kursoversikt"
       links: 
         edit_syllabus_description: Rediger
         jump_to_today: "Hopp til i dag"
       titles: 
-        course_syllabus: Kursoversikt
+        course_syllabus: Emneoversikt
     titles: 
       add_assignment_group: "Legg til oppgåvegruppe"
       uploading: "Lastar opp innlevering"
@@ -2204,16 +2305,27 @@ nn:
         settings_exclude_less_than_percent: "Mindre enn %{percentInput} av dokumentet"
     undated_assignments: "Udaterte oppgåver"
     upcoming_assignments: "Komande oppgåver"
+    veri_cite_settings_dialog: 
+      buttons: 
+        update_settings: "Oppdater innstillingar"
+      vericite_settings: 
+        originality_report_never: Aldri
+        originality_report_visibility: "Studentane kan sjå rapporten om originalitet"
+        originality_report_visible_after_due_date: "Etter innleveringsfristen"
+        originality_report_visible_after_grading: "Etter at oppgåva er karaktersett"
+        originality_report_visible_immediately: "Med ein gong"
   assignments_1e02582c: Oppgåver
   assignments_api: 
     invalid_date_time: "Ugyldig dato og klokkeslett for %{attribute}"
     invalid_submission_types: "Ugyldige innleveringstypar"
   assignments_in_this_group_have_no_points_possible__3cd35922: "Oppgåver i denne gruppa har ikkje moglege poeng og kan ikkje inkluderast i karakterutrekninga"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "Oppgåver i denne gruppa har ikkje moglege poeng og kan ikkje inkluderast i karakterutrekninga."
-  associated_account_course_id_d87a01c5: "Tilknytta konto-/kurs-ID"
+  assignments_settings_30613d0c: Oppgåveinnstillingar
+  associated_account_course_id_d87a01c5: "Tilknytta konto-/emne-ID"
   associated_account_name_91854e37: "Tilknytta kontonamn"
-  associated_course_name_9b5b1945: "Tilknytta kursnamn"
+  associated_course_name_9b5b1945: "Tilknytta emnenamn"
   attach_terms_2b8770a5: "Legg ved semester"
+  attached_display_name_afa00c2e: "Lagt ved: %{display_name}"
   attached_files_must_be_greater_than_0_bytes_7f57bee7: "Vedlagde filer skal vere større enn 0 byte"
   attachment: 
     default_filename: Fil
@@ -2252,6 +2364,7 @@ nn:
     login: Pålogging
     logout: "LOGG AV"
   authentication_with_provider_was_successful_but_no_6a194137: "Autorisering med %{provider} vart vellykka, men ein unik ID for pålogging til Canvas vart ikkje tilbydd."
+  author_s_name_b35e905a: "Forfattaren sitt namn"
   authorize_e3f25bb4: Autoriser
   available_8606e40c: Tilgjengeleg
   available_after_unlock_at_b5682224: "Tilgjengeleg etter %{unlock_at}"
@@ -2307,6 +2420,10 @@ nn:
     no_manifest: "ZIP-fil for Blackboard har inga imsmanifest.xml-fil i rotkatalogen."
   blocked_by_running_migration_d8a57cb7: "Blokkert av \"running migration\""
   blue_daf8fea9: Blå
+  blueprint_course_e16ed131: Blåkopiemne
+  blueprint_courses_9dd321b8: Blåkopiemne
+  blueprint_courses_create_edit_associate_delete_bf41988e: "Blåkopiemne (opprett / rediger / tilknytt / slett)"
+  body_9f663faf: Brødtekst
   body_shadow_d36e8c2e: "Body Shadow"
   bolivia_591_9b8a7a5c: "Bolivia (+591)"
   bookmark_service: 
@@ -2318,19 +2435,19 @@ nn:
   brazil_c1d6e73a: Brasil
   breadcrumb_1_cb3c504: "Breadcrumb 1"
   breadcrumb_2_95ba94be: "Breadcrumb 2"
-  broken_file_link_found_in_your_course_7cc24395: "Broten fillenke i kurset"
+  broken_file_link_found_in_your_course_7cc24395: "Broten fillenke i emnet"
   browse_your_computer_9a735a4: "Bla gjennom innhald på datamaskinen"
-  browse_your_computer_for_a_course_image_d7db2376: "Bla gjennom innhald på datamaskinen etter eit kursbilde"
+  browse_your_computer_for_a_course_image_d7db2376: "Bla gjennom innhald på datamaskinen etter eit emnebilde"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "namn på minneområde må vere eit av dei følgande: %{bucket_names}"
   bulk_course_migration: 
-    export_failed: "Det oppstod ein feil under eksport av kurset med bb_lcid %{id} frå Blackboard"
-    export_failed_no_id: "Det oppstod ein feil under import av eit kurs"
-    export_failed_not_found: "Finn ikkje kurset med bb_lcid %{id} i Blackboard, med brukar %{user_name}"
-    export_failed_with_id: "Det oppstod ein feil under import av kurset med bb_lcid %{id} til Canvas"
-    no_course_found: "Finn ikkje kurs med  %{id_type} av %{id}"
-    no_course_id_given: "Finn ikkje Canvas-kurs for bb_lcid %{id}"
+    export_failed: "Det oppstod ein feil under eksport av emnet med bb_lcid %{id} frå Blackboard"
+    export_failed_no_id: "Det oppstod ein feil under import av eit emne"
+    export_failed_not_found: "Finn ikkje emnet med bb_lcid %{id} i Blackboard, med brukar %{user_name}"
+    export_failed_with_id: "Det oppstod ein feil under import av emnet med bb_lcid %{id} til Canvas"
+    no_course_found: "Finn ikkje emne med  %{id_type} av %{id}"
+    no_course_id_given: "Finn ikkje Canvas-emne for bb_lcid %{id}"
     no_credentials_found: "Finn ikkje legitimasjon for brukarnamn %{user_name}"
-    no_credentials_given: "Brukarnamn er ikkje oppgitt for kurset %{course_identifier}"
+    no_credentials_given: "Brukarnamn er ikkje oppgitt for emnet %{course_identifier}"
     no_lcid_found: "bb_lcid er ikkje oppgitt for ei rad"
     queue_error: "Det oppstod ein feil i kø for overføring."
   bulk_course_migrations: 
@@ -2342,7 +2459,7 @@ nn:
       migration_cancelled_on: "Avbroten den %{date}"
       migration_failed_on: "Mislukkast den %{date}"
       migration_finished_on: "Fullført den %{date}"
-      migration_queueing: "Dei enkelte overføringane av kurs står i kø for køyring."
+      migration_queueing: "Dei enkelte overføringane av emne står i kø for køyring."
       migration_started_at: "Masseoverføring starta %{time}"
       migration_waiting: "Masseoverføringa står i kø for køyring."
       see_results: "Sjå resultat"
@@ -2350,15 +2467,15 @@ nn:
       waiting_to_export: "Ventar på å eksportere frå Blackboard"
       waiting_to_import: "Ventar på å importere til Canvas"
     index: 
-      available_courses: "Tilgjengelege kurs"
+      available_courses: "Tilgjengelege emne"
       bulk_description: "Dette er dei forventa topptekstene i CSV:"
       buttons: 
         add_credentials: "Legg til legitimasjon"
-        migrate_courses: "Overfør kurs"
+        migrate_courses: "Overfør emne"
       column_name: Kolonnenamn
-      course_id_description: "Canvas-ID-en for kurset det skal importerast til."
-      credential_description: "Verktøyet gjer at du kan overføre fleire kurs på same tid frå eit Blackboard Vista/CE-system. Legg fleire legitimasjonar til Blackboard-systemet og legg deretter ID-ar for Canvas-kurs til CSV-malen for å overføre kursa dine."
-      csv_description: "Du kan  legge til fleire kolonnar men dei vert ignorerte. Dette er eit eksempel av enkelt CSV-fil for 3 kurs i kontoen for brukarnamnet \"greg\":"
+      course_id_description: "Canvas-ID-en for emnet det skal importerast til."
+      credential_description: "Verktøyet gjer at du kan overføre fleire emne på same tid frå eit Blackboard Vista/CE-system. Legg fleire legitimasjonar til Blackboard-systemet og legg deretter ID-ar for Canvas-emne til CSV-malen for å overføre emna dine."
+      csv_description: "Du kan  legge til fleire kolonnar men dei vert ignorerte. Dette er eit eksempel av enkelt CSV-fil for 3 emne i kontoen for brukarnamnet \"greg\":"
       csv_template: CSV-mal
       current_migration_batch: "Gjeldande overføringsgruppe"
       description: Skildring
@@ -2369,22 +2486,22 @@ nn:
         password: Passord
         school: Institusjon
         user_name: Brukarnamn
-      lcid_description: "Lcid til kurset i Blackboard-systemet."
+      lcid_description: "Emnets lcid i Blackboard-systemet."
       login_credentials: "Blackboard påloggingslegitimasjon"
-      page_title: "Masseoverføring av kurs"
+      page_title: "Masseoverføring av emne"
       previous_migration_batches: "Tidlegare overføringsgrupper"
       school: Institusjon
       school_not_supported: "Be administratoren om å kontakte Instructure slik at institusjonen din får brukarstøtte."
-      sis_id_description: "SIS-ID-en til Canvas-kurset skal importerast til."
+      sis_id_description: "SIS-ID-en til Canvas-emnet det skal importerast til."
       upload_migration_csv: "Last opp ein overførings-CSV"
       user_name: Brukarnamn
-      user_name_description: "Brukarnamnet til brukaren som har faglærar-/designartilgang til kurset for rada. Det må samsvare med eit av brukaren sine namn som er oppført i påloggingslegitimasjonen for Blackboard ovanfor."
-    only_one_bulk_migration: "Berre ei masseoverføring av kurs kan køyrast om gongen."
+      user_name_description: "Brukarnamnet til brukaren som har faglærar-/designartilgang til emnet for rada. Dette må samsvare med eitt av brukarnamna som er oppført i påloggingslegitimasjonen for Blackboard ovanfor."
+    only_one_bulk_migration: "Berre ei masseoverføring av emne kan køyrast om gongen."
   bulk_migration: 
     buttons: 
-      migrate_courses: "Overfør kurs"
+      migrate_courses: "Overfør emne"
     confirm: 
-      cancel_migration: "Er du sikker på at du vil kansellere migreringa av kurs? Kursa som er igangsatt vil bli gjort ferdig. "
+      cancel_migration: "Er du sikker på at du vil kansellere overføringa av emnet? Emnet som er igangsett vil bli gjort ferdig. "
       delete_credential: "Er du sikker på at du vil fjerne denne autorisasjonen?"
     errors: 
       upload_failed: "Opplastinga mislukkast, prøv på nytt seinare"
@@ -2396,7 +2513,7 @@ nn:
     add_item: "Legg til element"
     apply: Bruk
     authorize_google_drive: "Autoriser Google Drive-tilgang"
-    back_to_outcomes: "Tilbake til resultat"
+    back_to_outcomes: "Tilbake til læringsmål"
     cancel: Avbryt
     choose_a_file: "Vel ei fil"
     delete: Slett
@@ -2537,8 +2654,8 @@ nn:
       message_groups: "Send melding til grupper som ..."
       message_students: "Send melding til studentar som ..."
       scheduler_explanation_student_header: "Du har ingen avtalegrupper du kan melde deg på"
-      scheduler_explanation_student_paragraph_1: "Faglærarar kan bruke dette planleggingsverktøyet til å planlegge aktivitetar som studentane kan melde seg på. Aktivitetar som: \"kontortid\", \"tidspunkt for gruppepresentasjon\" eller \"lunsj med ein tidlegare student\"."
-      scheduler_explanation_student_paragraph_2: "Ingen av faglærarane dine har sett opp avtalar du kan melde deg på og difor har du ingen aktivitetar akkurat no. Du får ei melding dersom nokon opprettar aktivitetar du kan melde deg på."
+      scheduler_explanation_student_paragraph_1: "Faglærarar kan bruke dette verktøyet til å setje opp aktivitetar som studentane kan registrere seg på, t.d. kontortid, tidsluker for gruppepresentasjonar, o.a."
+      scheduler_explanation_student_paragraph_2: "Akkurat no har ingen av faglærarane dine ledige avtaletider. Du vil få varsel om ein avtaletid blir ledig. "
       scheduler_explanation_teacher_header: "Du har ikkje oppretta avtalegrupper og det finst ingen du kan melde deg på"
       scheduler_explanation_teacher_paragraph_1: "Dette er planleggingsverktøyet. Du kan bruke det til å opprette avtalegrupper som studentane kan melde seg på."
       scheduler_explanation_teacher_paragraph_2: "La oss seie at du ynskjer å gå gjennom ei semesteroppgåve med kvar enkelt student på kurset. Du opprettar ei ny avtalegruppe, oppgir datoar og klokkeslett du er ledig, legg inn avtalebolkar på 15 minutt og tillet berre ein student per avtale."
@@ -2644,6 +2761,7 @@ nn:
       start_time: Starttidspunkt
     edit_event: 
       tabs: 
+        appointment_group: Avtalegruppe
         assignment: Oppgåve
         event: Hending
     end_before_start_error: "Starttidspunkt må setjast før sluttidspunkt"
@@ -2730,6 +2848,7 @@ nn:
       no_undated_events: "Ingen element utan dato."
       show_undated_events: "Vis element utan dato."
   calendar_283a9ed9: kalender
+  calendar_a8563bb2: "Kalender:"
   calendar_d14cfc8f: Kalender
   calendar_event: 
     errors: 
@@ -2776,12 +2895,12 @@ nn:
       calendar_feed_instructions: "Kopier lenka nedanfor og lim ho inn i ein kalenderapp som tek imot straum frå iCal (Google Calendar, iCal, Outlook, osv.)"
       calendars: Kalendrar
       feed_dialog_title: Kalenderstraum
-      feed_title: "Kurskalender, Atom-straum"
+      feed_title: "Emnekalender i Atom-format"
       links: 
         feed: "klikk her for å vise straum"
       page_title_header: Kalender
       skip_to_calendar: "Hopp til kalender"
-      undated_items: "Element utan dato"
+      undated_items: "Utan dato"
     wizard_box: 
       descriptions: 
         assignment: "Flott. Klikk på fana \"Oppgåve\" i dialogen for å opprette ei oppgåvehending i staden for ei kalenderhending."
@@ -2802,7 +2921,9 @@ nn:
         create_assignment: "Opprette ei  ny oppgåve"
         delete: "Slette ei hending/oppgåve"
         new: "Opprette ei ny hending"
+  calendars_a756c286: Kalendrar
   calendars_toggle_list_visibility_488db143: "Vis/skjul liste i kalender"
+  can_create_rename_and_edit_course_pages_by_default_f9ad4253: "kan opprette, endre namn på og redigere sider som standard"
   can_interact_with_users_in_their_section_only_48cb8c43: "Kan samhandle med brukarar berre i klassene deira"
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Kan ikkje rekne ut poengsum før ei oppgåve har moglege poeng"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan ikkje slette justeringar som er baserte på tilknytte vurderingskriterier.  Dersom du vil fjerne tilknytingane, må du fjerne rada frå vurderingsskjemaet"
@@ -2839,12 +2960,12 @@ nn:
         stream_name_required: "Namnet på Kinesis-dataflyt er obligatorisk."
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas-varsel – endring: %{assignment_name}, %{course_name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas-varsel – invitasjon: %{course} som %{role_type}"
-  canvas_alert_invited_course_as_role_type_ea825937: "Canvas-varsel – invitasjon: kurs som %{role_type}"
+  canvas_alert_invited_course_as_role_type_ea825937: "Canvas-varsel – invitasjon: emne som %{role_type}"
   canvas_attribute_eaa7e31a: Canvas-attributt
   canvas_by_instructure_1490381: "Canvas by Instructure"
   canvas_cartridge_description: "Dette gjer at du kan konvertere Canvas-eksport til mellombels JSON-format som kan importerast"
   canvas_cartridge_display: "Canvas Common Cartridge"
-  canvas_cartridge_file_description: "Canvas kurseksportpakke"
+  canvas_cartridge_file_description: "Canvas emneeksportpakke"
   canvas_cartridge_name: "Canvas Cartridge-import"
   canvas_cloud_information_fdd404f2: "Canvas skyinfo"
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Canvas sine dashbord-lenker navigerer til dashbordet for katalogen"
@@ -2891,11 +3012,12 @@ nn:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Endringane gjeld sjølv om du forlèt denne sida."
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "Diagram som viser ein student sine karakterer per oppgåve"
   chat_2153c6b7: Chat
+  child_course_must_belong_to_the_same_root_account__66ed7b8e: "Underordna emne må høyre til den same rotkontoen som hovudemnet."
   child_s_username_dde3aa9: "Barnets brukarnamn"
   chile_56_88238b47: "Chile (+56)"
   chile_9081cde6: Chile
   choose_a_color_or_course_nickname_for_course_2585e42c: "Vel ein farge eller eit alias for %{course}"
-  choose_a_course_home_page_8059c7b: "Vel ei startside for kurset"
+  choose_a_course_home_page_8059c7b: "Vel ei startside for emnet"
   choose_a_csv_file_to_upload_9644480c: "Vel ei CSV-fil å laste opp:"
   choose_a_timezone_d9c52998: "Vel tidssone"
   choose_an_authentication_service_47dc8875: "Vel ei godkjenningsteneste"
@@ -3098,7 +3220,7 @@ nn:
             Kven av dei er dine?"
         none_of_these: "Ingen av dei. Eg er ein ny brukar"
         register: "Dersom du vil opprette konto, må vi ha meir informasjon."
-        register_with_course: "Dersom du vil fullføre påmelding til kurset **%{course}**, må vi ha meir informasjon."
+        register_with_course: "Dersom du vil fullføre påmelding til emnet **%{course}**, må vi ha meir informasjon."
         wrong_account: "Invitasjonen til %{course} er send til **%{invited_user}**, men du er logga på som **%{current_user}** akkurat no"
       labels: 
         password: Passord
@@ -3126,7 +3248,7 @@ nn:
   completed_9b809e44: fullført
   concluded_63150003: fullført
   concluded_conferences_cdbe53f9: "Ferdige konferansar"
-  concluded_courses_94782e21: "Ferdige kurs"
+  concluded_courses_94782e21: "Ferdige emne"
   conditional_release_d206e93b: "Release på vilkår"
   conference_was_deleted_30869390: "Konferanse er sletta"
   conferences: 
@@ -3150,7 +3272,7 @@ nn:
       duration: Tidslengd
       duration_in_minutes: minutt
       invite_all: 
-        course: "Inviter alle kursmedlemmar"
+        course: "Inviter alle emnemedlemmar"
         group: "Inviter alle gruppemedlemmar"
       long_running: "Ingen tidsgrense (for langvarige konferansar)"
       members: Medlemmar
@@ -3221,15 +3343,15 @@ nn:
       content_exports: "Innhald i eksport"
       export_type: Eksporttype
       labels: 
-        course: Kurs
+        course: Emne
         quiz: Prøve
       links: 
-        download: "Kurseksport frå %{date}: *Klikk her for å laste ned*"
+        download: "Emneeksport frå %{date}: *Klikk her for å laste ned*"
         download_file_export: "Fileksport frå %{date}: *Klikk her for å laste ned*"
         download_qti: "QTI-eksport frå %{date}: *Klikk her for å laste ned*"
         download_user_export: "Eksport av brukardata frå %{date}: *Klikk her for å laste ned*"
       message: 
-        export_started: "Eksportprosessen har starta. Det kan ta litt tid for store kurs. *Du kan forlate sida* og du får ein e-post når eksporten er fullført."
+        export_started: "Eksportprosessen har starta. Dette kan ta litt tid for store emne. *Du kan forlate sida* og du får ein e-post når eksporten er fullført."
       no_submissions: "Du har ingen innleveringar å eksportere akkurat no."
       user_data_exports: "Last ned innleverte filer"
     labels: 
@@ -3251,7 +3373,7 @@ nn:
       import_failed: "Det oppstod ein feil under import av overføringa.  Ta kontakt med systemansvarleg og gi dei følgande kode: \"%{code}\""
       no_only_and_except: "Du kan ikkje bruke alternativa \"berre\" og \"unntak\" på same tid."
     messages: 
-      import_complete: "Import er fullført.  Returnerer til kurssida ..."
+      import_complete: "Import er fullført.  Returnerer til emnesida..."
       importing_button: "Importerer ... dette kan ta ei stund"
     titles: 
       home_page: Startside
@@ -3318,7 +3440,7 @@ nn:
     copy_course: 
       content: Innhald
       options: Alternativ
-    course_list_error: "Kan ikkje ta imot kurs. Er du tilkopla Internett?"
+    course_list_error: "Kan ikkje ta imot emne. Er du tilkopla Internett?"
     d2_l_export: 
       content: Innhald
       options: Alternativ
@@ -3360,17 +3482,17 @@ nn:
       cancel_btn: Avbryt
       select_content_btn: "Vel innhald"
       select_content_label: "Vel innhald ved å navigere med rullgardinpila gjennom trestrukturen. Trykk på høgre musetast for å utvide og venstre musetast for å skjule."
-    select_course: "Vel kurs"
+    select_course: "Vel emne"
     show_issues: "Vis problem"
     subviews: 
       choose_migration_file: 
         migration_text: Kjelde
       course_find_select: 
-        course_name: Kursnamn
-        include_completed_courses: "Inkluder fullførte kurs"
+        course_name: Emnenamn
+        include_completed_courses: "Inkluder fullførte emne"
         or: eller
-        search_label: "Søk etter eit kurs"
-        select_default: "Vel eit kurs"
+        search_label: "Søk etter eit emne"
+        select_default: "Vel eit emne"
       date_shift: 
         add_day_sub_title: "Legg til erstatningsdag"
         beginning_change_to: "endre til"
@@ -3392,8 +3514,8 @@ nn:
         remove_day_substitution_link_label: "Fjern erstatningsdag"
         to_happen_on: til
       external_tool_launch: 
-        course: Kurs
-        find_a_course: "Finn eit kurs"
+        course: Emne
+        find_a_course: "Finn eit emne"
       folder_picker: 
         default_select_folder: "Vel mappe"
         upload_to: "Last opp til"
@@ -3419,18 +3541,18 @@ nn:
     uploading: "Lastar opp ...\""
     web_ct: 
       cancel: Avbryt
-      get_courses: "Hent kurs"
+      get_courses: "Hent emne"
       password: Passord
       select_school: "Vel institusjon"
       username: Brukarnamn
     web_ct_course_list: 
       course_list: Kurs
       no_files_help_label: "Meir informasjon om alternativet 'Ikkje last ned filer'"
-      no_files_help_text: "Det kan ta lang tid å laste ned filer frå WebCT-kurs, og kan føre til at overføringa mislukkast. Du kan i staden kopiere filene manuelt og deretter velje dette alternativt for å overføre resten av innhaldet."
+      no_files_help_text: "Det kan ta lang tid å laste ned filer frå WebCT-kurs, noko som kan føre til at overføringa mislukkast. Du kan i staden kopiere filene manuelt og deretter velje dette alternativt for å overføre resten av innhaldet."
       no_files_help_title: "Meir informasjon om å ikkje velje alternativet 'Ikkje last ned filer'"
       no_files_help_title_icon: "Meir informasjon om alternativet 'Ikkje last ned filer'"
       options: Alternativ
-      skip_all_files: "Ikkje last ned filer frå kurset"
+      skip_all_files: "Ikkje last ned filer frå emnet"
   content_tag: 
     no_title: "Utan tittel"
   content_tags: 
@@ -3474,11 +3596,11 @@ nn:
         user_grades: "Karakterar for %{user}"
         user_only_view_section: "avgrens brukaren til å sjå berre brukarar i same klasse"
         user_outcomes: "Resultat for %{user}"
-        user_view_all_sections: "la brukaren sjå alle kursbrukarane"
+        user_view_all_sections: "la brukaren sjå alle emnebrukarane"
       user_only_view_section: "brukaren kan berre sjå studentar i dei tildelte klasser"
       user_view_all_sections: "brukaren kan sjå studentar i alle klasser"
     no_user: 
-      course: "Brukaren finst ikkje eller er ikkje medlem av dette kurset akkurat no"
+      course: "Brukaren finst ikkje eller er ikkje medlem av dette emnet akkurat no"
       group: "Brukaren finst ikkje eller er ikkje medlem av denne gruppa akkurat no"
     prior_users: 
       headings: 
@@ -3508,10 +3630,10 @@ nn:
         recent_messages: "Siste meldingar"
         user_services: "Registrerte nettenester"
       help: 
-        list_services: "Du har ikkje aktivert lista over registrerte tenester. Om du aktiverer lista blir det enklare for andre kurs- og gruppemedlemmar å kople seg opp mot deg utanfor kurset."
-        services: "Du har ikkje kopla brukarprofilen din opp mot eksterne tenester. Du kan kople Canvas-kontoen din til tenester som Twitter. Dette gjer det enklare for andre kurs- og gruppemedlemmar å kople seg opp mot deg utanfor kurset."
+        list_services: "Du har ikkje aktivert lista over registrerte tenester. Om du aktiverer lista blir det enklare for andre emne- og gruppemedlemmar å kople seg opp mot deg utanfor emnet."
+        services: "Du har ikkje kopla brukarprofilen din opp mot eksterne tenester. Du kan kople Canvas-kontoen din til tenester som Twitter. Dette gjer det enklare for andre emne- og gruppemedlemmar å kople seg opp mot deg utanfor emnet."
       labels: 
-        public_list_services: "La andre kurs- og gruppemedlemmar sjå kva tenester eg har kopla til profilen min"
+        public_list_services: "La andre emne- og gruppemedlemmar sjå kva tenester eg har kopla til profilen min"
         user_privileges: Privilegium
       legends: 
         memberships: Medlemskap
@@ -3536,7 +3658,7 @@ nn:
         user_grades: Karakterar
         user_only_view_section: "avgrens brukaren til å sjå berre brukarar i same klasse"
         user_outcomes: Resultat
-        user_view_all_sections: "la brukaren sjå alle kursbrukarane"
+        user_view_all_sections: "la brukaren sjå alle emnebrukarane"
       no_messages: "Ingen meldingar"
       no_services: "%{user} har ikkje kopla eksterne tenester til kontoen enno."
       services_not_visible: "%{user} sine registrerte tenester er ikkje synlege for deg akkurat no."
@@ -3548,10 +3670,10 @@ nn:
         service_types: Tenestetypar
       help: 
         no_services: "Du har ikkje kopla brukarprofilen din opp mot eksterne tenester. Du kan kople Canvas-kontoen din til tenester som Twitter."
-        services_private: "Du har ikkje aktivert lista over registrerte tenester. Om du aktiverer lista blir det enklare for andre kurs- og gruppemedlemmar å sjå kva tenester du har kopla til Canvas-kontoen din."
+        services_private: "Du har ikkje aktivert lista over registrerte tenester. Om du aktiverer lista blir det enklare for andre emne- og gruppemedlemmar å sjå kva tenester du har kopla til Canvas-kontoen din."
         user_services: "Andre medlemmar kan, om dei vil, la deg sjå kva eksterne tenester dei har kopla til Canvas-kontoen sin. Dette kan gjere det enklare å koordinere gruppeprosjekt og kople opp mot kvarandre utanfor kurset."
       labels: 
-        allow_view_services: "La andre kurs- og gruppemedlemmar sjå kva tenester eg har kopla til profilen min"
+        allow_view_services: "La andre emne- og gruppemedlemmar sjå kva tenester eg har kopla til profilen min"
       links: 
         back_to_roster: "Tilbake til liste"
         link_existing_service_account: "Kople gjeldande konto"
@@ -3629,15 +3751,15 @@ nn:
       criterion_for_assignment: "%{assignment} %{select_criterion}"
       headings: 
         add_prerequisite: "Legg til føresetnad til %{name}"
-        course_modules: Kursmodular
+        course_modules: Emnemodular
       help: 
         create: |-
-            I kursmodulane kan du organisere oppgåver, sider, filer o.a. inn i mindre område eller einingar. Modulane kan organiserast rundt eit tema, fokusere på eit bestemt emne eller rett og slett grupperast kronologisk."
+            I emnemodulane kan du organisere oppgåver, sider, filer o.a. inn i mindre område eller einingar. Modulane kan organiserast rundt eit tema, fokusere på eit bestemt emne eller rett og slett grupperast kronologisk.
             
-            Du kan også organisere modulane ved å definere kriterium og føresetnader for kvar enkelt modul. Studentane får ikkje tilgang til modulane før dei har låst opp alle føresetnadene. På den måten kan du hindre at studentane gjeng inn i bestemt type innhald eller filer før dei har fått minst 75 % på vurderinga av ei prøve."
+            Du kan også organisere modulane ved å definere kriterium og føresetnader for kvar enkelt modul. Studentane får ikkje tilgang til modulane før dei har låst opp alle føresetnadene. På den måten kan du hindre at studentane gjeng inn i bestemt type innhald eller filer før dei har fått minst 75 % på vurderinga av ei prøve.
             
-            Klikk på "%{button}"-knappen til høgre for å byrje å organisere kurs i modular."
-        no_modules: "Ingen modular er oppgitt for dette kurset."
+            Klikk på "%{button}"-knappen til høgre for å byrje å organisere emnet i modular."
+        no_modules: "Ingen modular er oppgitt for dette emnet."
       images: 
         alt: 
           min_score: "minimum poengsum"
@@ -3711,7 +3833,7 @@ nn:
       reorder: "Kan ikkje omorganisere. Prøv på nytt seinare."
     index: 
       titles: 
-        course_modules: Kursmodular
+        course_modules: Emnemodular
     module_complete: Fullført
     module_empty: "Det finst ikkje element i modulen \"%{module}\""
     module_item_next: 
@@ -3773,8 +3895,8 @@ nn:
   contributed_to_this_module_item_and_is_complete_2799d5c: "Bidratt til denne delen av modulen og har fullført"
   conversation_dialog: 
     message_sent: "Meldinga er send"
-    no_course: "Ingen kurs"
-    select_course: "Vel kurs"
+    no_course: "Ingen emne"
+    select_course: "Vel emne"
   conversation_message: 
     subject: "Privat melding"
     subject_specified: "Privat melding: %{subject}"
@@ -3791,7 +3913,7 @@ nn:
       titles: 
         attachment: "Fil som skal leggast til"
         remove_attachment: "Fjern vedlegget"
-    all_courses: "Alle kurs"
+    all_courses: "Alle emne"
     all_in_context: "Alle i %{context}"
     archive: Arkiv
     autocomplete_result: 
@@ -3836,7 +3958,7 @@ nn:
       course_options: 
         concluded: Fullført
         groups: Grupper
-        more_courses: "Fleire kurs"
+        more_courses: "Fleire emne"
     hide: Skjul
     index_new: 
       archive: Arkiv
@@ -3844,7 +3966,7 @@ nn:
       clear_search: "Fjern søkeresultat"
       compose_new_message: "Skriv ei ny melding"
       delete: Slett
-      filter_messages_by_course: "Filtrer meldingar etter kurs"
+      filter_messages_by_course: "Filtrer meldingar etter emne"
       filter_messages_by_type: "Filtrer meldingar etter type"
       forward: Vidaresend
       inbox: Innboks
@@ -3855,7 +3977,7 @@ nn:
       reply: Svar
       reply_all: "Svar alle"
       search_for_recipients: "Søk etter mottakarar"
-      search_names_groups_courses: "Søk etter namn, grupper og kurs"
+      search_names_groups_courses: "Søk etter namn, grupper og emne"
       sending: sender
       sent: Sendt
       settings: Innstillingar
@@ -3896,16 +4018,16 @@ nn:
       labels: 
         add_to_faculty_journal: "Legg til som ei oppføring i faglærarprotokoll"
         attachments: Vedlegg
-        course: Kurs
-        select_course: "Vel eit kurs"
+        course: Emne
+        select_course: "Vel eit emne"
         subject: Emne
         to: Til
       links: 
         media_comment: Opptak
       media_comment: Mediekommentar
-      no_course: "Ingen kurs"
+      no_course: "Ingen emne"
       no_subject: "Utan emne"
-      search_names_groups_courses: "Søk etter namn, grupper og kurs"
+      search_names_groups_courses: "Søk etter namn, grupper og emne"
       send_individual_messages: "Send ei individuell melding til kvar mottakar"
       titles: 
         media_comment: "Innspelt mediekommentar"
@@ -4022,18 +4144,18 @@ nn:
   course: 
     access_denied: "Ingen tilgang"
     batch_update_message: 
-      one: "1 kurs er handsama"
-      other: "%{count} kurs er handsama"
-    course: Kurs
+      one: "1 emne er handsama"
+      other: "%{count} emne er handsama"
+    course: Emne
     course_format: 
       blended: Blanda
       not_set: "Ikkje oppgitt"
       on_campus: "På universitetsområdet"
       online: "På internett"
-    course_not_found: "Finn ikkje kurset"
+    course_not_found: "Finn ikkje emnet"
     default_grading_scheme_name: "Standard karakteroppsett"
-    default_name: "Mitt kurs"
-    default_short_name: Kurs-101
+    default_name: "Mitt emne"
+    default_short_name: Emne-101
     errors: 
       sis_in_use: "SIS-ID \"%{sis_id}\" er allereie i bruk"
     file_copy_error: "Kan ikkje kopiere fila \"%{name}\""
@@ -4055,7 +4177,7 @@ nn:
       unpublished: "Ikkje publisert"
       unpublished_with_message: "Ikkje publisert: %{message}"
     institution: Institusjon
-    missing_name: "Kurs utan namn"
+    missing_name: "Emne utan namn"
     public: Offentleg
     student_summary: 
       not_sorted: "Studenttabellsamandrag er ikkje sortert"
@@ -4065,26 +4187,28 @@ nn:
       all: "Kven som helst"
       only_teachers: "Berre faglærarar"
       teachers_students: "Faglærarar og studentar"
-  course_8a63b4a3: Kurs
-  course_8dcfb195: kurs
+  course_8a63b4a3: Emne
+  course_8dcfb195: emne
   course_and_user_search_ebc1ae41: "Kurs- og brukarsøk"
-  course_announcements_76b07340: Kurskunngjeringar
-  course_assignments_833b8cf1: Kursoppgåver
-  course_atom_feed_9d95214e: "Kurs, Atom-straum"
-  course_calendar_7d3cba7b: Kurskalender
-  course_catalog_4cc7c8ce: Kurskatalog
-  course_collaborations_dadb327e: Kurssamarbeid
-  course_conferences_3d914c96: Kurskonferansar
-  course_content_a92eca20: Kursinnhald
-  course_copy_argument_error: "Ein kurskopi skal ha eit kjeldekurs."
-  course_copy_description: "Programtillegg for overføring ved kopiering av Canvas-kurs"
-  course_copy_display: Kurskopi
-  course_copy_file_description: "Kopier eit Canvas-kurs"
-  course_copy_name: "Kopier eit Canvas-kurs"
-  course_copy_no_course_error: "Finn ikkje kjeldekurset."
-  course_copy_not_allowed_error: "Du har ikkje løyve til å kopiere kjeldekurset."
-  course_discussions_38c0b74f: Kursdiskusjonar
-  course_ends_at_e8b166df: "Kurset sluttar"
+  course_announcements_76b07340: Emnekunngjeringar
+  course_assignments_833b8cf1: Emneoppgåver
+  course_assignments_menu_fa6aeb23: Emneoppgåvemeny
+  course_atom_feed_9d95214e: "Emne i Atom-format"
+  course_calendar_7d3cba7b: Emnekalender
+  course_card_color_region_for_course_c356a69c: "Fargeområde for emnekort for %{course}"
+  course_catalog_4cc7c8ce: Emnekatalog
+  course_collaborations_dadb327e: Emnesamarbeid
+  course_conferences_3d914c96: Emnekonferansar
+  course_content_a92eca20: Emneinnhald
+  course_copy_argument_error: "Ein emnekopi skal ha eit kjeldeemne."
+  course_copy_description: "Programtillegg for overføring ved kopiering av Canvas-emne"
+  course_copy_display: Emnekopi
+  course_copy_file_description: "Kopier eit Canvas-emne"
+  course_copy_name: "Kopier eit Canvas-emne"
+  course_copy_no_course_error: "Finn ikkje kjeldeemnet."
+  course_copy_not_allowed_error: "Du har ikkje løyve til å kopiere kjeldeemnet."
+  course_discussions_38c0b74f: Emnediskusjonar
+  course_ends_at_e8b166df: "Emnet sluttar"
   course_exports: 
     errors: 
       assignment: "Kan ikkje eksportere oppgåva \"%{title}\""
@@ -4092,8 +4216,8 @@ nn:
       assignment_is_locked: "Kan ikkje kopiere oppgåva \"%{title}\" fordi ho er låst."
       assignments: "Kan ikkje eksportere enkelte oppgåver"
       canvas_meta: "Kan ikkje eksportere Canvas-spesifikke metadata"
-      course_export: "Det oppstod ein feil under køyring av kurseksport."
-      course_settings: "Kan ikkje eksportere kursinnstillingar"
+      course_export: "Det oppstod ein feil under køyring av emneeksport."
+      course_settings: "Kan ikkje eksportere emneinnstillingar"
       events: "Kan ikkje eksportere kalenderhendingar"
       external_feeds: "Kan ikkje eksportere eksterne straumar"
       file: "Kan ikkje eksportere fila \"%{file_name}\""
@@ -4125,16 +4249,18 @@ nn:
       file: "Ukjend fil"
       topic: "Ukjent emne"
       wiki_page: "Ukjend wiki-side"
-  course_files_62deb8f8: Kursfiler
-  course_grades_22adc27e: Kurskarakterar
-  course_home_4c4c0107: Kursheimeside
-  course_home_sub_navigation_b1ee6b03: "Navigering på kursheimesida"
-  course_id_a7c924d5: kurs-ID
-  course_image_settings_eba3ec55: "Innstillingar for kursbilde"
-  course_implemented_apps_fa658f5a: "Kursimplementerte applikasjonar"
+  course_files_62deb8f8: Emnefiler
+  course_grades_22adc27e: Emnekarakterar
+  course_home_4c4c0107: "Heimeside for emne"
+  course_home_sub_navigation_b1ee6b03: "Navigering på emneheimesida"
+  course_id_a7c924d5: emne-ID
+  course_id_b0bc82d4: Emne-ID
+  course_image_for_course_cfbb08df: "Emnebilde for %{course}"
+  course_image_settings_eba3ec55: "Innstillingar for emnebilde"
+  course_implemented_apps_fa658f5a: "Emneimplementerte applikasjonar"
   course_list: 
-    favorited_tooltip: "Klikk for å fjerne frå kursmenyen."
-    nonfavorited_tooltip: "Klikk for å legge til kursmenyen."
+    favorited_tooltip: "Klikk for å fjerne frå emnemenyen."
+    nonfavorited_tooltip: "Klikk for å legge til emnemenyen."
     wrapper: 
       close_course_menu_title: lukk
       reset_course_menu: Tilbakestill
@@ -4158,7 +4284,7 @@ nn:
       unconcluded: "Ikkje fullført"
       updated: Oppdatert
     field_label: 
-      abstract_course_id: "Abstrakt kurs-ID"
+      abstract_course_id: "Abstrakt emne-ID"
       account_id: Konto-ID
       allow_student_discussion_editing: "Tillat redigering av studentdiskusjonar"
       allow_student_discussion_topics: "Tillat emne i studentdiskusjonar"
@@ -4167,7 +4293,7 @@ nn:
       allow_student_wiki_edits: "Tillat redigering av studentwiki"
       allow_wiki_comments: "Tillat kommentarar i wiki"
       conclude_at: "Fullført den"
-      course_code: Kurskode
+      course_code: Emnekode
       created_at: "Oppretta den"
       default_view: Standardvising
       default_wiki_editing_roles: "Standard redigeringsroller for wiki"
@@ -4187,8 +4313,8 @@ nn:
       open_enrollment: "Open påmelding"
       public_description: "Offentleg skildring"
       public_syllabus: "Offentleg kursoversikt"
-      replacement_course_id: "Erstatning av kurs-ID"
-      restrict_enrollments_to_course_dates: "Avgrens påmeldingar til kursdatoar"
+      replacement_course_id: "Erstatning av emne-ID"
+      restrict_enrollments_to_course_dates: "Avgrens påmeldingar til emnedatoar"
       root_account_id: Rotkonto-ID
       self_enrollment: "Eiga påmelding"
       self_enrollment_code: "Kode for eiga påmelding"
@@ -4200,32 +4326,34 @@ nn:
       storage_quota: Lagringskvote
       syllabus_body: syllabus_body
       tab_configuration: Fanekonfigurasjon
-      template_course_id: "Mal for kurs-ID"
+      template_course_id: "Mal for emne-ID"
       turnitin_comments: Turnitin-kommentarar
       updated_at: "Oppdatert den"
       uuid: UUID
       wiki_id: Wiki-ID
       workflow_state: Arbeidsflytstatus
-  course_members_are_free_to_join_9b2603d4: "Kursdeltakarar kan ta del"
-  course_modules_795cb95e: Kursmodular
-  course_name_63b973d1: Kursnamn
-  course_name_is_required_90919349: "Kursnamn er obligatorisk"
+  course_members_are_free_to_join_9b2603d4: "Emnedeltakarar kan ta del"
+  course_modules_795cb95e: Emnemodular
+  course_name_63b973d1: Emnenamn
+  course_name_is_required_90919349: "Emnenamn er obligatorisk"
   course_name_successfully_added_48116a50: "%{course_name} er lagt til."
-  course_navigation_dd035109: Kursnavigering
-  course_option_links_a79d263d: Kurslenker
-  course_outcomes_7dc1cbc7: Kursresultat
-  course_pages_449f1dd4: Kurssider
-  course_people_3058c948: Kursdeltakarar
-  course_quizzes_c337653c: Kursprøver
+  course_navigation_dd035109: Emnenavigering
+  course_option_links_a79d263d: Emnelenker
+  course_outcomes_7dc1cbc7: Emneresultat
+  course_pages_449f1dd4: Emnesider
+  course_people_3058c948: Emnedeltakarar
+  course_quizzes_c337653c: Emneprøver
   course_restore: 
-    restore_error: "Det oppstod ein feil under gjenoppretting av kurset. Kurset er ikkje gjenoppretta."
-  course_role_role_type_119c2f64: "Kursrolle: %{role_type}"
-  course_roles_1314f962: Kursroller
+    restore_error: "Det oppstod ein feil under gjenoppretting av emnet. Emnet er ikkje gjenoppretta."
+  course_role_role_type_119c2f64: "Emnerolle: %{role_type}"
+  course_roles_1314f962: Emneroller
+  course_roster_78f70e97: Emneliste
   course_search: 
     cant_be_blank: "Kan ikkje stå tom"
   course_section: 
     sis_id_taken: "SIS-ID \"%{sis_id}\" er allereie i bruk"
-  course_section_7a988066: Kursklasser
+  course_section_7a988066: Emneklasser
+  course_section_name_ea880ed1: "Emneklasse %{name}"
   course_settings: 
     buttons: 
       add_section: "Legg til klasse"
@@ -4267,19 +4395,21 @@ nn:
     titles: 
       link_to_students: "Lenker til studentar"
       move_course: "Flytt kurs"
-      reset_course_content_dialog_help: "Tilbakestill kursinnhald"
+      reset_course_content_dialog_help: "Tilbakestill emneinnhald"
       section_enrollments: Klassepåmeldingar
-  course_settings_sub_navigation_b95deae: "Navigering i kursinnstillingar"
-  course_setup_wizard_is_showing_a7c087c1: "Viser installasjonsvegvisar for kurset."
-  course_sis_7ae8f649: kurs-SIS
-  course_starts_at_3a01f9da: "Kurset startar den"
+  course_settings_sub_navigation_b95deae: "Navigering i emneinnstillingar"
+  course_setup_wizard_is_showing_a7c087c1: "Viser installasjonsvegvisar for emnet."
+  course_sis_7ae8f649: emne-SIS
+  course_sis_df8b379: Emne-SIS
+  course_starts_at_3a01f9da: "Emnet startar den"
   course_statistics: 
     unknown: ukjent
-  course_storage_391e1bd: "Lagringskapasitet for kurs"
-  course_syllabus_5de1b0af: Kursoversikt
+  course_storage_391e1bd: "Lagringskapasitet for emne"
+  course_syllabus_5de1b0af: Emneoversikt
   course_users: 
     greater_than_three: "Oppgi eit søkeord med tre eller fleire teikn"
     unknown_error: "Noko gjekk gale med søket. Prøv på nytt seinare."
+  course_visibility_options_ca8ab3a8: "Alternativ for emnesynlegheit"
   courses: 
     canvasnet_instructor: 
       avatar_url: Avatar
@@ -4289,26 +4419,26 @@ nn:
       remove_instructor: "Fjern faglærar"
     confirm_action: 
       buttons: 
-        conclude_course: "Avslutt kurset"
-        delete_course: "Slett kurset"
+        conclude_course: "Avslutt emnet"
+        delete_course: "Slett emnet"
       details: 
-        conclude_alt_text: "Dersom du vil halde fram med å kunne endre karakterar på same tid som du avgrensar studentane sin tilgang til kurset, kan du bruke innstillingane for kursdatoar. Du lærer meir om innstillingar for kursdatoar i vegvisarane *her*."
-        confirm_conclude: "Åtvaring: Dersom du avsluttar kurset vert alt innhald arkivert, og du kan ikkje lenger endre på karakterane."
-        confirm_delete: "Er du sikker på at du vil slette dette kurset? Når det er sletta har studentar og faglærarar ikkje lenger tilgang til kurset. Dersom du berre ynskjer å fjerne kurset frå rullegardinmenyen, kan du *avslutte kurset*."
-        confirm_delete_addendum: "Dersom du ikkje har lov til å avslutte kurset, kan du *endre sluttdatoen til kurset*, eller be administrator avslutte kurset."
+        conclude_alt_text: "Dersom du vil halde fram med å kunne endre karakterar på same tid som du avgrensar studentane sin tilgang til emnet, kan du bruke innstillingane for emnedatoar. Du lærer meir om innstillingar for emnedatoar i vegvisarane *her*."
+        confirm_conclude: "Åtvaring: Dersom du avsluttar emnet vert alt innhald arkivert, og du kan ikkje lenger endre på karakterane."
+        confirm_delete: "Er du sikker på at du vil slette dette emnet? Når det er sletta har studentar og faglærarar ikkje lenger tilgang til emnet. Dersom du berre ynskjer å fjerne emnet frå rullegardinmenyen, kan du *avslutte emnet*."
+        confirm_delete_addendum: "Dersom du ikkje har lov til å avslutte emnet, kan du *endre sluttdatoen til emnet*, eller be administrator avslutte emnet."
       headings: 
-        confirm_conclude: "Stadfest avslutning av kurs"
-        confirm_delete: "Stadfest sletting av kurs"
+        confirm_conclude: "Stadfest avslutning av emne"
+        confirm_delete: "Stadfest sletting av emne"
       titles: 
         confirm: "Stadfest handling"
-    confirm_reject_invitation: "Er du sikker på at du vil avvise invitasjonen til å delta på dette kurset?"
+    confirm_reject_invitation: "Er du sikker på at du vil avvise invitasjonen til å delta på dette emnet?"
     copy: 
       buttons: 
-        create_course: "Opprett kurs"
+        create_course: "Opprett emne"
       conclude_at: Sluttdato
       content_label: Innhald
-      course_code: Kurskode
-      details: "Sett inn detaljane for det nye kurset."
+      course_code: Emnekode
+      details: "Sett inn detaljane for det nye emnet."
       enrollment_term_id: Semester
       headings: 
         copy_course: "Kopier %{course}"
@@ -4317,13 +4447,13 @@ nn:
       select_specific_content: "Vel spesifikt innhald"
       start_at: Startdato
       titles: 
-        copy_course: "Kopier kurs"
+        copy_course: "Kopier emne"
     description: 
       links: 
-        join_course: "Ta del i dette kurset"
+        join_course: "Ta del i dette emnet"
     edit_profile: 
       about: Om
-      about_related_id: "felles ID for kopling av relaterte kurs/klasser"
+      about_related_id: "felles ID for kopling av relaterte emne/klasser"
       add_instructor: "Legg til faglærar"
       basic_info: "Grunnleggande informasjon"
       disabled: Lukka
@@ -4337,7 +4467,7 @@ nn:
         enrollment_fee: Påmeldingsavgift
         format: Format
         image: Bilde
-        path: Kursbane
+        path: Emnesti
         portal_path: Portalbane
         position: Plassering
         related_id: Koplings-ID
@@ -4347,9 +4477,9 @@ nn:
         tentative_start: "Førebels start"
         title: Tittel
         visibility: Synlegheit
-      leave_blank_if_free: "la stå tom dersom dette er eit gratis kurs"
+      leave_blank_if_free: "la stå tom dersom dette er eit gratis emne"
       logo: Logo
-      page_title: Kursprofil
+      page_title: Emneprofil
       path_syntax: "små bokstavar, tal og tankestrek"
       portal_path_syntax: "små bokstavar, tal, tankestrek og skråstrek (f.eks. Harvard/kjemi)"
       private: Skjult
@@ -4357,58 +4487,58 @@ nn:
       save_changes: "Lagre endringar"
       self_paced: "Eige tempo"
       unlisted: "Ikkje oppført på canvas.net (tilgjengeleg via URL)"
-      when_to_set_tentative_start: "f.eks. \"Hausten 2013\", dersom kurset ikkje har ein bestemt startdato"
+      when_to_set_tentative_start: "f.eks. \"Hausten 2013\", dersom emnet ikkje har ein bestemt startdato"
     errors: 
-      create_failed: "Kan ikkje opprette kurset"
+      create_failed: "Kan ikkje opprette emnet"
       role_not_active: "Kan ikkje legge til brukarar for ei inaktiv rolle: '%{role}'"
       role_not_found: "Finn ikkje rolla"
-      unpublish: "Kan ikkje fjerne publisering av kurset dersom det finst studentinnleveringar.\""
+      unpublish: "Kan ikkje fjerne publisering av emnet dersom det finst studentinnleveringar.\""
     group_list: 
       headings: 
-        groups: Kursgrupper
+        groups: Emnegrupper
     import_in_progress_notice: 
       course_import_notice: 
         status_link: Importstatus
-        text: "Eit eller fleire element vert importerte akkurat no. Dei vert synlege i kurset nedanfor når dei er tilgjengelege."
+        text: "Eit eller fleire element vert importerte akkurat no. Dei vert synlege i emnet nedanfor når dei er tilgjengelege."
     index: 
-      browse_more_courses: "Bla gjennom fleire kurs"
+      browse_more_courses: "Bla gjennom fleire emne"
       headings: 
         future_enrollments: "Komande påmeldingar"
-        my_courses: "Alle kurs"
+        my_courses: "Alle emne"
         my_groups: "Mine grupper"
         past_enrollments: "Tidlegare påmeldingar"
-      start_new_course: Kurs
+      start_new_course: Emne
       titles: 
-        courses: Kurs
+        courses: Emne
         rss: 
-          course_announcements: "Kurskunngjeringar, Atom-straum"
+          course_announcements: "Emnekunngjeringar i Atom-format"
     link_enrollment: 
       buttons: 
         link: "Lenke til student"
       details: |-
-          Når ein observatør er kopla til ein student, har dei begge tilgang til studenten sine karakterar og kurssamhandlingar. *Akkurat no er observatøren kopla til studenten %{student}.*
+          Når ein observatør er kopla til ein student, har dei begge tilgang til studenten sine karakterar og emnesamhandlingar. *Akkurat no er observatøren kopla til studenten %{student}.*
           
-          Om du vil kople kursobservatøren %{user} til ein student, må du velje studenten sitt namn frå lista nedanfor."
+          Om du vil kople emneobservatøren %{user} til ein student, må du velje studenten sitt namn frå lista nedanfor."
       labels: 
         student: Student
       loading: "Lastar studentar ..."
       select_student: "Vel student"
     link_validator: 
-      link_validator: Kurskoplingsvalidator
-      page_title: Kurskoplingsvalidator
+      link_validator: Emnekoplingsvalidator
+      page_title: Emnekoplingsvalidator
     notices: 
       backup_restored: "Tryggingskopien er lagra på nytt."
-      concluded: "Kurset er avslutta"
-      deleted: "Kurset er sletta"
-      enrollment_not_active: "Medlemskapet i kurset %{course} er enno ikkje aktivert"
-      failed_conclude: "Kurset er ikkje fullført"
+      concluded: "Emnet er avslutta"
+      deleted: "Emnet er sletta"
+      enrollment_not_active: "Medlemskapet i emnet %{course} er enno ikkje aktivert"
+      failed_conclude: "Emnet er ikkje fullført"
       invitation_accepted: "Invitasjonen er godkjend.  Velkomen til %{course}!"
       invitation_cancelled: "Invitasjonen er kansellert."
       login_to_accept: "Du må logge på før du kan godkjenne påmeldinga."
-      preview_course: "Du er invitert til å ta del i dette kurset.  Du kan sjå deg rundt, men må godkjenne påmeldingsinvitasjonen før du kan ta del."
+      preview_course: "Du er invitert til å ta del i dette emnet.  Du kan sjå deg rundt, men må godkjenne påmeldingsinvitasjonen før du kan ta del."
       reset_test_student: "Teststudenten er nullstilt"
-      unconcluded: "Kurset er ikkje fullført"
-      updated: "Kurset er oppdatert."
+      unconcluded: "Emnet er ikkje fullført"
+      updated: "Emnet er oppdatert."
     recent_event: 
       all_graded: "alt er retta"
       needs_grading: "må karaktersetjast"
@@ -4439,9 +4569,9 @@ nn:
         validating: "Validerer ...\""
         will_not_be_added: "Brukarane har feil og vert ikkje lagt til. Sørg for at dei er korrekt formaterte."
       edit_sections_view: 
-        edit_sections_desc: "Klasser er ein annan måte å organisere brukarar på. Dette gjer at du kan undervise fleire klasser i det same kurset, og  ha alt kursinnhaldet på same plass. Nedanfor kan du flytte ein brukar til ei anna klasse, eller legge til/fjerne klassepåmeldingar. Brukarane må vere i minst eit område til kvar tid."
+        edit_sections_desc: "Klasser er ein annan måte å organisere brukarar på. Dette gjer at du kan undervise fleire klasser i det same emnet, og ha alt emneinnhaldet på same plass. Nedanfor kan du flytte ein brukar til ei anna klasse, eller legge til/fjerne klassepåmeldingar. Brukarane må vere i minst eit område til kvar tid."
       index: 
-        cannot_add_users: "Nye brukarar kan ikkje leggast til fordi kurset er avslutta"
+        cannot_add_users: "Nye brukarar kan ikkje leggast til fordi emnet er avslutta"
         filter_field_description: "Søk etter personar. Når du skriv i dette feltet, vert listene over personar automatisk filtrerte slik at dei berre inkluderer namna som samsvarer med dine inndata."
         group_set: Gruppesett
         people: Personar
@@ -4449,13 +4579,13 @@ nn:
         search_people: "Søk etter personar"
         title_add_people: "Legg til personar"
       invitations_view: 
-        accepted_invitation: "%{name} har allereie motteke og godkjent invitasjonen til å ta del i kurset, men du kan framleis sende invitasjonen på nytt om det er naudsynt."
-        admin_invitation_unaccepted: "%{name} har enno ikkje godkjent invitasjonen til å ta del i kurset. Invitasjonen vart send: %{time}"
-        invitations_pending_publish: "Invitasjonane vert ikkje sende før kurset er *publisert*"
-        student_invitation_unaccepted_available: "%{name} har enno ikkje godkjent invitasjonen til å ta del i kurset. Invitasjonen vart send: %{time}"
-        student_invitation_unaccepted_unavailable: "%{name} er lagt til kurset: %{time}"
+        accepted_invitation: "%{name} har allereie motteke og godkjent invitasjonen til å ta del i emnet, men du kan framleis sende invitasjonen på nytt om det er naudsynt."
+        admin_invitation_unaccepted: "%{name} har enno ikkje godkjent invitasjonen til å ta del i emnet. Invitasjonen vart send: %{time}"
+        invitations_pending_publish: "Invitasjonane vert ikkje sende før emnet er *publisert*"
+        student_invitation_unaccepted_available: "%{name} har enno ikkje godkjent invitasjonen til å ta del i emnet. Invitasjonen vart send: %{time}"
+        student_invitation_unaccepted_unavailable: "%{name} er lagt til emnet: %{time}"
       link_to_students_view: 
-        link_student_desc: "Når ein observatør er lenka til ein student, har begge tilgang til studenten sine karakterar og kurssamhandlingar.\""
+        link_student_desc: "Når ein observatør er lenka til ein student, har begge tilgang til studenten sine karakterar og emnesamhandlingar.\""
       resend_invitations: 
         pending_invitation: "1 invitasjon er ikkje godkjend."
         pending_invitations: "%{pendingInvitationsCount} invitasjonar er ikkje godkjende."
@@ -4470,11 +4600,11 @@ nn:
         links: 
           edit_sections: "Rediger klasser"
           link_to_students: "Lenker til studentar"
-          remove_from_course: "Fjern frå kurset"
+          remove_from_course: "Fjern frå emnet"
           resend_invitation: "Send invitasjonen på nytt"
           user_details: Brukardetaljar
         manage_user: "Administrer %{name}"
-        pending_acceptance_explanation: "Brukaren har enno ikkje godkjent invitasjonen til kurset"
+        pending_acceptance_explanation: "Brukaren har enno ikkje godkjent invitasjonen til emnet"
         pending_acceptance_of_invitation: ventar
       roster_users: 
         canvas_user_id: "Brukar-ID i Canvas"
@@ -4491,35 +4621,35 @@ nn:
     section: 
       enrollment: 
         links: 
-          unenroll_user: "Fjern brukaren frå kurset"
+          unenroll_user: "Fjern brukaren frå emnet"
     settings: 
       alerts_title: Varsel
       buttons: 
         add_section: Klasse
         edit_section_name: "Rediger klassenamn"
         move_course: "Flytt kurs"
-        update_course: "Oppdater kursdetaljar"
-      course_conclude_at_warning_message: "Kurset er sett til å slutte ved midnatt, som betyr at føregåande dag er den siste dagen kurset er aktivt."
-      course_conclude_at_warning_title: "Kurset sluttar ved midnatt"
-      course_open_enrollment: "Kurset har open påmelding. Studentane kan sjølve melde seg på kurset dersom du  deler denne URL-en med dei: *%{url}*. Eller dei kan melde seg på  i *%{url2}* og bruke følgande kode: *%{code}*"
-      course_open_enrollment_without_code: "Kurset har open påmelding. Studentane kan sjølve melde seg på kurset dersom du  deler denne URL-en med dei: *%{url}*"
+        update_course: "Oppdater emnedetaljar"
+      course_conclude_at_warning_message: "Emnet er sett til å slutte ved midnatt, som betyr at føregåande dag er den siste dagen emnet er aktivt."
+      course_conclude_at_warning_title: "Emnet sluttar ved midnatt"
+      course_open_enrollment: "Emnet har open påmelding. Studentane kan sjølve melde seg på emnet dersom du deler denne URL-en med dei: *%{url}*. Eller dei kan melde seg på  i *%{url2}* og bruke følgande kode: *%{code}*"
+      course_open_enrollment_without_code: "Emnet har open påmelding. Studentane kan sjølve melde seg på emnet dersom du  deler denne URL-en med dei: *%{url}*"
       course_overrides_term: "Dette overstyrer innstillingar for tilgjenge i semesteret."
-      course_settings_title: Kursinnstillingar
+      course_settings_title: Emneinnstillingar
       deatils: 
         move_course: "Vel ein ny rotkonto for kurset. Etter at du har flytta kurset må du oppgi ei ny avdeling for kurset."
-      drag_details: "Når du deaktiverer sider vert studentane som vitjar sidene omdirigerte til kurset si startside."
+      drag_details: "Når du deaktiverer sider vert studentane som vitjar sidene omdirigerte til emnet si startside."
       drag_to_hide: "Dra element hit om du vil skjule dei frå studentane."
       enrollment_count: 
         one: "1 brukar"
         other: "%{count} brukarar"
       headings: 
-        details: Kursdetaljar
+        details: Emnedetaljar
         grade_publishing: "Publisering av karakterar"
         move_course: "Flytt kurset til ein annan rotkonto"
-        navigation: Kursnavigering
-        sections: "Klasser i kurs"
+        navigation: Emnenavigering
+        sections: "Klasser i emnet"
       help: 
-        edit_navigation: "Dra og slepp elementa for å omorganisere dei i kursnavigasjonen."
+        edit_navigation: "Dra og slepp elementa for å omorganisere dei i emnenavigasjonen."
       images: 
         alt: 
           delete: Slett
@@ -4539,15 +4669,16 @@ nn:
         allow_student_forum_attachments: "La studentane legge ved filer i diskusjonar"
         allow_student_organized_groups: "La studentane organisere eigne grupper"
         conclude_at: Sluttar
-        course_code: Kurskode
+        course_code: Emnekode
         course_description: Skildring
         course_epub_export: EPUB-eksport
         course_format: Format
-        course_lock_all_announcements: "Deaktiver kommentarar eller kunngjeringar"
+        course_lock_all_announcements: "Slå av kommentering av kunngjeringar"
         course_name: Namn
+        course_offline_export: "Fråkopla emne"
         course_section_name: "Legg til ei ny klasse"
-        course_status_published: "Kurset er publisert"
-        course_status_unpublished: "Kurset er ikkje publisert"
+        course_status_published: "Emnet er publisert"
+        course_status_unpublished: "Emnet er ikkje publisert"
         course_visibility: Synlegheit
         custom_course_visibility: Tilpass
         enrollment_term_id: Semester
@@ -4556,23 +4687,24 @@ nn:
         hide_distribution_graphs: "Skjul grafar for karakterfordeling for studentane"
         hide_final_grades: "Skjul totalen i studentane sitt karaktersamandrag"
         image: Bilde
-        indexed: "Inkluder dette kurset i den offentlege kurslista"
+        indexed: "Inkluder dette emnet i den offentlege emnelista"
         is_public_to_auth_users: "Gjer dette kurset synleg for godkjende brukarar"
         language: Språk
         license: Lisens
-        open_enrollment: "Legg til ei \"Delta i dette kurset\"-lenke på kurset si startside"
+        open_enrollment: "Legg til ei \"Delta i dette emnet\"-lenke på emnet si startside"
         public_syllabus: "Gjer undervisingsplanen offentleg synleg"
-        restrict_enrollments_to_course_dates: "Brukarar kan berre delta i kurset mellom desse datoane"
-        restrict_student_future_view: "Avgrens studentane frå å sjå kurset før startdato"
-        restrict_student_past_view: "Avgrens studentane frå å sjå kurset etter sluttdato"
+        restrict_enrollments_to_course_dates: "Brukarar kan berre delta i emnet mellom desse datoane"
+        restrict_student_future_view: "Avgrens studentane frå å sjå emnet før startdato"
+        restrict_student_past_view: "Avgrens studentane frå å sjå emnet etter sluttdato"
         root_account: Rotkonto
         root_account_id: Rotkonto
+        show_announcements_on_home_page: "Sjå nylege kunngjeringar på emnet si heimeside"
         sis_source_id: SIS-ID
         start_at: Startar
         storage_quota: Fillagring
         time_zone: Tidssone
         turnitin_comments: Turnitin-kommentarar
-      language_overrides_preferences: "Det overstyrer alle språkpreferansar for alle brukarar og system. Og er berre tilrådd for framandspråklege kurs"
+      language_overrides_preferences: "Dette overstyrer alle språkpreferansar for alle brukarar og system. Det er berre tilrådd for framandspråklege emne."
       links: 
         more_options: "fleire alternativ"
         move_course: "Flytt til ein annan konto"
@@ -4623,7 +4755,7 @@ nn:
       headings: 
         current_users: "Gjeldande brukarar"
       help: 
-        reset_course_content: "Nullstilling av kursinnhald slettar alle tilknytte oppgåver, diskusjonar, prøver, modular, vurderingskriterier, sider, filer, læringsmål, spørsmålsbankar, samarbeid, konferansar og anna innhald for godt. Handlinga er endeleg og dataa *kan ikkje* be gjenopprettast. Er du sikker på at du vil halde fram?"
+        reset_course_content: "Nullstilling av kursinnhald slettar alle tilknytte oppgåver, diskusjonar, prøver, modular, vurderingskriterium, sider, filer, læringsmål, spørsmålsbankar, samarbeid, konferansar og anna innhald for godt. Handlinga er endeleg og dataa *kan ikkje* be gjenopprettast. Er du sikker på at du vil halde fram?"
       links: 
         calendar: Kurskalender
         conclude: "Avslutt kurset"
@@ -4692,7 +4824,7 @@ nn:
       any: Alle
       assignment_groups: Oppgåvegrupper
       assignments: Oppgåver
-      course_rubrics: "Vurderingsskjema for kurs"
+      course_rubrics: "Vurderingsskjema for emnet"
       discussion_posts: Diskusjonsinnlegg
       discussion_topic: Diskusjonsemne
       discussions: Diskusjonar
@@ -4785,7 +4917,7 @@ nn:
     media: Media
     messages: Meldingar
     modules: Modular
-    outcomes: Resultat
+    outcomes: Læringsmål
     people: Personar
     plugins: Programtillegg
     prior_users: "Tidlegare brukarar"
@@ -5058,6 +5190,7 @@ nn:
   default_grade_cannot_be_set_to_ex_723caa59: "Standard karakter kan ikkje setjast til %{ex}"
   default_question_name: Spørsmål
   default_question_text: Spørsmålstekst
+  default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "Standard SIS-synkronisering for oppgåver, testar, karakterdiskusjon"
   default_template_f2a759ed: Standardmal
   default_templates_are_used_as_starting_points_for__f06f9e33: "Standardmalar vert nytta som utgangspunkt for nye tema og kan ikke slettast. "
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Skriv inn teksta som skal stå før og etter rullegardinmenyen og set saman ei samling moglege svar."
@@ -5339,7 +5472,7 @@ nn:
     group_discussion_locked: "Studentar har allereie sendt innlegg til diskusjonen og gruppeinnstillingar kan difor ikkje endrast."
     group_discussion_title: Gruppediskusjon
     index: 
-      course_discussions_atom_feed_title: "Kursdiskusjonar, Atom-straum"
+      course_discussions_atom_feed_title: "Emnediskusjonar i Atom-format"
     index_view: 
       assignments: Oppgåver
       delete: Slett
@@ -5391,7 +5524,7 @@ nn:
       collapse_replies: "Skjul svar"
       confirm_delete_discussion: "Er du sikker på at du vil slette denne diskusjonen?"
       delete: Slett
-      discussion_atom_feed_title: "Diskusjon, Atom-straum"
+      discussion_atom_feed_title: "Diskusjon i Atom-format"
       discussion_podcast_feed_title: "Diskusjon, podkaststraum"
       edit: Rediger
       edited_by: "Emnet er redigert av %{user}."
@@ -5953,7 +6086,7 @@ nn:
       recent_submissions: "Klikk på ei innlevering for å legge ho i ei ny side i e-porteføljen."
       titles: 
         already_used: "Innleveringa er allereie inkludert i porteføljen din"
-        feed: "e-portefølje, Atom-straum"
+        feed: "E-portefølje i Atom-format"
         view_submission: "Vis innleveringa"
       welcome: "Dersom dette er første gongen du er her, kan du hente opp vegvisaren og finne ut korleis det er best å starte. Du kan også raskt legge til dei siste innleveringane eller hoppe direkte til porteføljen."
       write_only_comments: "Kommentarar på denne sida er private. Du kan legge inn kommentarar, men berre den som eig porteføljen kan lese dei."
@@ -6140,7 +6273,7 @@ nn:
         add_feed: "Legg til straum"
         adding_feed: "Legg til straum ..."
       descriptions: 
-        add_new_feed: "Du kan automatisk legge til postar frå ein RSS- eller Atom-straum som kunngjeringar for dette kurset. Det er berre å lime URL-straumen nedanfor og nye oppføringar vert lagde til."
+        add_new_feed: "Du kan automatisk legge til postar frå ein RSS-straum eller i Atom-format som kunngjeringar for dette kurset. Det er berre å lime URL-en nedanfor og nye oppføringar vert lagde til."
       feed_url_label: "Straum frå URL"
       keyword: "Nøkkelord:"
       labels: 
@@ -6306,11 +6439,11 @@ nn:
   find_ip_address_filter_96ec70bb: "Finn IP-adressefilter"
   find_outcome: 
     errors: 
-      outcome_retrieval_failed: "Henting av resultat mislukkast.  Prøv på nytt seinare."
+      outcome_retrieval_failed: "Henting av læringsmål mislukkast.  Prøv på nytt seinare."
     messages: 
-      loading_outcomes: "Lastar resultat ..."
-      no_outcomes_found: "Finn ingen resultat"
-      no_rubric_outcomes_found: "Finn ingen resultat basert på vurderingskriteria"
+      loading_outcomes: "Lastar læringsmål..."
+      no_outcomes_found: "Finn ingen læringsmål"
+      no_rubric_outcomes_found: "Finn ingen læringsmål basert på vurderingskriteria"
     titles: 
       find_outcome: "Finn resultat"
   find_questions_4930b38f: "Finn spørsmål"
@@ -6367,7 +6500,7 @@ nn:
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Få feilrapportar for brukarane lagt inn i Salesforce Service Cloud"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Få feilrapportar for brukarane oppført hos Salesforce"
   getting_started_with_collaborations_794240ba: "Start eit samarbeid"
-  global_branding_df1cae12: "Global varemerking"
+  global_branding_df1cae12: "Global utsjånad"
   global_message_icons: 
     announcement: kunngjering
     calendar: kalender
@@ -6441,6 +6574,8 @@ nn:
     edit_view_rubric: "Vis vurderingskriterium"
     errors: 
       select_an_option: "Vel eit alternativ"
+    gradebook_header_menu: 
+      set_default_grade: "Bruk standardkarakter"
     graded: karaktersett
     graded_by_me: "%{graded_time} av meg"
     graded_then_resubmitted: "karaktersett og deretter levert på nytt (%{when})"
@@ -6457,6 +6592,7 @@ nn:
     portion_graded: "%{x}/%{y}"
     recording_expired_message: "Taleattkjenning er utgått på grunn av inaktivitet. Klikk på \"Stopp\"-knappen for å sette inn korrekt kommentartekst, eller \"Avbryt\" for å forkaste."
     recording_message: "Spelar inn ...\""
+    secondary_id: "Sekundær ID"
     show_all_details_button: "Vis alle detaljar"
     student: Student
     student_index: "Student %{index}"
@@ -6870,6 +7006,9 @@ nn:
   grades_a61eba0a: Karakterar
   grades_are_now_reverted_to_original_scores_e6deade1: "Karakterer vert no tilbakestilt til det opprinnelege resultatet"
   grades_are_now_showing_what_if_scores_711a8be2: "Karakterar viser no kva-skjer-dersom-resultat"
+  gradezilla: 
+    gradebook_header_menu: 
+      set_default_grade: "Bruk standardkarakter"
   grading_aa6de9: Karaktersetjing
   grading_box: 
     out_of_points_possible: "av  %{assignment.points_possible}"
@@ -7320,7 +7459,7 @@ nn:
     show: 
       coming_up: "Kjem snart"
       edit_group: "Rediger gruppe"
-      group_atom_feed: "Gruppe, Atom-straum"
+      group_atom_feed: "Gruppe i Atom-format"
       new_announcement: Kunngjering
     status: 
       assigning_students: "Tilordnar studentar ..."
@@ -7432,7 +7571,7 @@ nn:
   high_b5cbd048: Høy
   high_contrast_description: |-
       Høgkontrast forsterkar fargekontrasten i brukargrensesnittet (tekst, knappar osv.), og gjer desse elementa
-      tydelegare og enklare å finne. Merk: Varemerking av institusjon vert deaktivert.
+      tydelegare og enklare å finne. Merk: Institusjonsutsjånaden vert deaktivert.
   high_score_47924c1a: "Høgt: %{score}"
   highest_28ad71e6: Høgast
   highest_score_e080551e: "Høgaste resultat"
@@ -7529,10 +7668,10 @@ nn:
     due_dates_warning: "Kan ikkje justere innleveringsdatoane."
     file_import_warning: "Finn ikkje fila %{file}"
   importers/learning_outcome_group_importer: 
-    no_global_permission: "Du har ikkje løyve til å administrere globale resultat, kan ikkje legge til \"%{title}\""
+    no_global_permission: "Du har ikkje løyve til å administrere globale læringsmål, kan ikkje legge til \"%{title}\""
   importers/learning_outcome_importer: 
     no_context_found: "Finn ikkje eksternt læringsmål for \"%{title}\", opprettar kopi."
-    no_global_permission: "Du har ikkje løyve til å administrere globale resultat, kan ikkje legge til \"%{title}\""
+    no_global_permission: "Du har ikkje løyve til å administrere globale læringsmål, kan ikkje legge til \"%{title}\""
   importers/rubric_importer: 
     no_context_found: "Finn ikkje ekstern vurderingskriterium for \"%{title}\", opprettar kopi."
   importers/wiki_page_importer: 
@@ -7797,7 +7936,7 @@ nn:
   learn_more_about_collaborations_2978f66d: "Lær meir om samarbeid"
   learning_mastery_5fc34276: "Meistringsbasert læring"
   learning_mastery_gradebook_description: |-
-      Karakterbok for meistringsbasert læring gir faglærarane ein metode til raskt å vise framgang hjå
+      Karakterbok for meistringsbasert læring gir faglærarane ein metode til raskt å vise framgang hos
       studentar og i kurs i forhold til kursets læringsmål. Måla er presenterte i eit karakterbokliknande
       format og studentframgangen vert vist både som numerisk resultat og som meistring/nær
       meistring/trengst forbetring."
@@ -8045,6 +8184,7 @@ nn:
   login_button_text_c958250f: "Tekst påloggingsknapp"
   login_footer_link_badb3898: "Pålogging botntekstlenke"
   login_footer_link_hover_1b474e6c: "Pålogging peikarfølsam botntekstlenke"
+  login_id_12109693: Påloggings-ID
   login_instructure_logo_8f2332db: "Pålogging Instructure-logo"
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "Pålogginga er ugyldig: Må vere alfanumerisk eller ei e-postadresse"
   login_is_too_long_25373f95: "Pålogginga er for lang"
@@ -8097,6 +8237,7 @@ nn:
   manage_module_name_dfe16816: "Administrere %{module_name}"
   manage_name_7f55f792: "Administrer %{name}"
   manage_profile_pictures_40c958ce: "Administrer profilbilete"
+  manage_rubrics_5d274f6a: "Administrer vurderingsskjema"
   manage_update_23de23a1: "Rediger oppdatering"
   manage_update_for_toolname_f8e3b2fb: "Rediger oppdatering for %{toolName}"
   manage_usage_rights_c5a8c216: "Administrere bruksrettar"
@@ -9948,6 +10089,7 @@ nn:
   need_help_setting_up_your_course_2b763141: "Treng du hjelp med å sette opp kurset ditt?"
   netherlands_14ca4f6d: Nederland
   netherlands_31_63e4f1b9: "Nederland (+31)"
+  never_df100b49: Aldri
   new_account_role_6e5c4964: "Ny kontorolle"
   new_annotations_66932016: "Nye merknader"
   new_announcement_23af4598: "Ny kunngjering"
@@ -10417,7 +10559,7 @@ nn:
   outcome_path_mastery_points: "%{path} meistringspoeng"
   outcome_path_result: "%{path} resultat"
   outcome_results: 
-    outcomes_filename: Resultat
+    outcomes_filename: Læringsmål
   outcome_results_title: Resultat
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Resultat: %{title} har status som %{statusTooltip}"
   outcomes: 
@@ -10431,7 +10573,7 @@ nn:
         new_group: Gruppe
         new_outcome: Læringsmål
     common_core: "Felles kjernestandardar"
-    common_core_description: "Til venstre er den vanlege mappestrukturen for resultat for kvar gruppering i felles kjernestandardar. Slik kan du enkelt bruke alle dei felles kjernestandardane til karaktersetjing i kurset ditt."
+    common_core_description: "Til venstre er den vanlege mappestrukturen for læringsmål for kvar gruppering i felles kjernestandardar. Slik kan du enkelt bruke alle dei felles kjernestandardane til karaktersetjing i kurset ditt."
     confirm: 
       delete: "Er du sikker på at du vil slette?"
       import_group: "Importer gruppe \"%{group}\" til gruppe \"%{target}\"?"
@@ -10457,7 +10599,7 @@ nn:
       instructions: 
         find: 
           description: "*Nasjonale eller institusjonsspesifikke læringsmål er tilgjengelege her. Som i kurset, kan du via panelet til venstre navigere mellom gjeldande mål. Når du finn mål eller målgruppa du vil bruke, klikkar du på importknappen nedanfor og legg til målet i kurset ditt.*"
-          title: "Finne resultat"
+          title: "Finne læringsmål"
     flash: 
       addSuccess: Oppretta
       deleteError: "Noko gjekk feil. Kan ikkje slette akkurat no."
@@ -10473,7 +10615,7 @@ nn:
         main: 
           manage: 
             description: "*Læringsmål er oppretta for å spore meistringa i eit kurs. Bruk menylinja øvst på sida når du vil starte. Om du vil opprette eit nytt læringsmål, klikkar du på Ny-knappen. Om du vil opprette ei ny gruppe for å organisere læringsmåla, klikkar du på Ny gruppe-knappen. Med Finn-knappen kan du gå inn og bruke læringsmål som allereie er oppretta av andre, t.d. basert på nasjonale eller institusjonelle krav. Når du opprettar og brukar læringsmål, kan du bruke panelet til venstre for å navigere mellom måla. Du kan dra og sleppe læringsmål mellom dei ulike nivåa for å opprette struktur.* *Like viktig er det at du i Canvas kan legge læringsmål til vurderingsskjema for karakterar, slik at du vurderer meistring medan du set karakterar på oppgåvene. Når du har registrert læringsmåla, klikkar du på Behandle vurderingsskjema, slik at du kan bruke læringsmåla når du set karakterar.*"
-            title: "Registrer resultat"
+            title: "Registrer læringsmål"
     mastery_error: "Må vere større enn eller lik 0"
     missing_outcome: "Finn ikkje det læringsmålet"
     new_outcome_group: "Ny læringsmålgruppe"
@@ -10495,7 +10637,7 @@ nn:
       criterion_dialog: "Læringsmål kan inkluderast i vurderingsskjema for oppgåver, slik at du på ein enkel måte kan vurdere meistringsnivå i bestemte oppgåver. Når du definerer eit læringsmål, bør du også definere eit kriterium som kan brukast når du lagar vurderingskriterium for oppgåver. Opprett dei rubrikkane du treng og set ein poengterskel for å definere meistringa av læringsmålet."
       criterion_info_link: "Klikk her for å lære om kriterievurderingar"
       description: "Skildre resultatet"
-      display_name: "Venleg namn (valfritt)"
+      display_name: "Kallenamn (valfritt)"
       mastery: "Meistringsnivå på"
       points: "%{points_possible} poeng"
       title: "Set namn på resultatet"
@@ -10525,7 +10667,7 @@ nn:
     successful_outcome_removal: "Resultat fjerna"
     successful_outcome_update: "Resultat oppdatert."
     titles: 
-      find_outcomes: "Finn resultat"
+      find_outcomes: "Finn læringsmål"
     top_level: "%{context} toppnivå"
     user_outcome_results: 
       artifacts: 
@@ -10539,13 +10681,14 @@ nn:
         see_results: "Sjå %{user_name}s resultat i"
       mastery: "Meistringsnivå oppnådd i seinaste forsøk"
       no_mastery: "Meistringsnivå ikkje oppnådd i seinaste forsøk"
-      outcomes_for: "Resultat for %{user_name}"
+      outcomes_for: "Læringsmål for %{user_name}"
       score_out_of_possible: "%{score}* av %{possible}*"
       short_title: 
         attempts: Forsøk
         average_percent: "Gjennomsnitt i prosent"
         latest_score: "Siste resultat"
         outcome: Resultat
+  outcomes_report_8887bd49: Læringsmålrapport
   overrides: 
     blank_override: "Du må velje ein student eller ei klasse"
     everyone: Alle
@@ -11026,6 +11169,12 @@ nn:
       labels: 
         consumer_key: Forbrukarnøkkel
         consumer_secret: Forbrukarhemmelegheit
+    vericite: 
+      name: VeriCite
+    vericite_settings: 
+      default_assignment_settings: "**Standard oppgåveinnstillingar**"
+      labels: 
+        type: "Studentane kan sjå rapporten om originalitet"
     webct_scraper_settings: 
       description: |-
           Dersom institusjonen ikkje brukar WebCT sine "Læringsmodular" (inkludert institusjonar som tok i bruk WebCT
@@ -11531,7 +11680,7 @@ nn:
   question_9121487: Spørsmål
   question_answered: "Svart på"
   question_bank: 
-    align_outcomes: "Juster resultat"
+    align_outcomes: "Juster læringsmål"
     already_bookmarked: "Allereie laga bokmerke"
     bookmark_failed: "Bokmerking mislukka"
     bookmarking: "Lagar bokmerke  ...\""
@@ -11564,8 +11713,8 @@ nn:
     remove_outcome_from_bank: "Er du sikker på at du vil fjerne resultatet frå banken?"
     title: 
       move_copy_questions: "Flytt/kopier spørsmål"
-    update_outcomes_fail: "Oppdatering av resultat mislukkast"
-    updating_outcomes: "Oppdaterer resultat ..."
+    update_outcomes_fail: "Oppdatering av læringsmål mislukkast"
+    updating_outcomes: "Oppdaterer læringsmål..."
   question_banks: 
     bank_fail: "Kan ikkje opprette spørsmålsbank."
     bank_success: "Spørsmålsbank er oppretta."
@@ -11609,7 +11758,7 @@ nn:
         move_questions: "Flytt fleire spørsmål"
       edit_warning: "Hugs at endringar i spørsmålsmalar ikkje automatisk oppdaterer prøver som allereie har teke desse spørsmåla i bruk."
       headings: 
-        aligned_outcomes: "Justerte resultat"
+        aligned_outcomes: "Justerte læringsmål"
       labels: 
         keep_copy: "Oppbevar ein kopi av dette spørsmålet i spørsmålsbanken"
         new_bank_name: "Nytt namn på bank"
@@ -13048,11 +13197,14 @@ nn:
   score_letter_grade_b3bb9e52: "%{score} bokstavkarakter"
   score_muted_82eef66: "Poengsum: (skjult)"
   score_of_score_view_in_speedgrader_a7c1c954: "Resultat av %{score}. Vis i SpeedGrader"
+  score_out_of_points_84f44331: "(%{score} av %{points})"
   score_out_of_points_possible_88f370fd: "%{score} av %{points_possible}"
   score_percent_11941c81: "%{score} prosent"
   score_points_3c48e2a8: "%{score} poeng"
   score_pts_adcb1af3: "%{score} poeng"
   score_score_6f81e8c8: "Poengsum: %{score}"
+  scored_less_than_cutoff_on_assignment_5f5c4303: "Skåra lågare enn %{cutoff} på %{assignment}"
+  scored_more_than_cutoff_on_assignment_f422fec: "Skåra høgare enn %{cutoff} på %{assignment}"
   screenreader_gradebook: 
     assignment_information: 
       actions: 
@@ -13098,6 +13250,7 @@ nn:
     header: 
       gradebook_individual_view: "Karakterbok: Individuell vising"
       save_instructions: "Merk: Karakterar og merknader vert lagra automatisk etter at dei er flytta frå feltet."
+      switch_to_gradebook: "Byt til standard karakterbok"
       switch_to_gradebook2: "Byt til standard karakterbok"
     learning_mastery: 
       download_results: "Last ned resultat (.csv)"
@@ -13193,6 +13346,7 @@ nn:
   secondary_button_text_e92b3e52: "Tekst sekundær knapp"
   secondary_color_button_7589827d: "Sekundær fargeknapp"
   secondary_color_button_disabled_ac2252d2: "Sekundær fargeknapp er deaktivert"
+  secondary_id_822f5c52: "Sekundær ID"
   secondary_navigation_f701dc45: Sekundærnavigering
   section: 
     confirms: 
@@ -13215,10 +13369,14 @@ nn:
       confirming_course: "Stadfestar %{course_name} ..."
       removing_crosslisting_of_section: "Fjernar krysslisting av klasse ..."
   section_84b5391: klasse
+  section_c7f66a0d: Klasse
   section_ends_at_bb9df3c0: "Klasse sluttar på"
   section_filter_cde54d0a: Klassefilter
   section_id_6f73f3d5: klasse-ID
+  section_id_b5aad4a7: Klasse-ID
   section_name_b6d82574: Klassenamn
+  section_section_names_98f172e6: "Klasse: %{section_names}"
+  section_sis_2a80d2fa: Klasse-SIS
   section_sis_94511bcd: klasse-SIS
   section_starts_at_65eaed1: "Klasse startar på"
   sections: 
@@ -13282,11 +13440,13 @@ nn:
   see_rubric_results_62a6447d: "Sjå resultat av vurderinga"
   see_scoring_details_f7fd1f3b: "Sjå resultatdetaljar"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Sjå LTI-verktøy* som fungerer bra med Canvas."
+  see_turnitin_results_cd9d4a6c: "Sjå Turnitin-resultat"
   select_a_grading_period_5ea50f1: "Vel ei karaktersetjingsperiode ..."
   select_a_grading_period_aab25483: "Vel ei karaktersetjingsperiode"
   select_a_predefined_color_c77ab2f5: "Vel ein førehandsdefinert farge."
   select_all_students_7c2c34b3: "Vel alle studentar"
   select_audio_file_7d905cce: "Vel lydfil"
+  select_calendars_d5fa50b6: "Vel kalendrar"
   select_content: "Vel innhald"
   select_content_checkbox: 
     select_content_error: "Du må velje eit innhaldsalternativ"
@@ -13304,16 +13464,25 @@ nn:
       add_item_to_module: "Legg element til modul"
       find_links_using_service: "Finn lenker som brukar %{service}"
   select_country_d21cb85a: "Vel land"
+  select_course_5cf89177: "Vel emne"
   select_course_a_selection_is_required_before_recip_f622d9df: "Vel kurs: eit utval er nødvendig før mottakarfeltet vert tilgjengeleg"
   select_course_color_cad8e62b: "Vel kursfarge"
   select_d70f31da: Vel
   select_image_e1696a4d: "Vel bilde"
+  select_indentation_d056bab8: "Vel innrykk"
   select_input_3dbd73c1: "Vel inndata"
   select_itemname_f70db487: "Vel %{itemName}"
   select_navigation_links_68e1e924: "Vel navigasjonslenker"
+  select_one_of_the_options_c8b0c6e4: "Vel ein av alternativa:"
+  select_prerequisite_module_57894963: "Vel modulen som er føresetnad"
+  select_student_name_caaff244: "Vel student %{name}"
   select_students_for_review_6e004a12: "Vel studentar for vurdering"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Vel fila du vil kople til, eller legg til ei fil ved å velje \"Ny fil\"."
+  select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Vel sida du vil knyte til, eller legg til ei ny side ved å velje \"Ny side\"."
+  select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Vel sida du vil knyte til denne *modulen*, eller legg til ei ny side ved å velje \"Ny side\"."
+  select_type_of_prerequisite_8d6fa902: "Vel type føresetnad"
   select_video_file_35b61d4e: "Vel videofil"
+  selected_274ce24f: Valt
   selected_answer: "Du valde dette svaret."
   selected_subtree_a7693937: "Valt %{subtree}"
   self_enrollments: 
@@ -13358,7 +13527,9 @@ nn:
         go_to_dashboard: "Gå til dashbord"
       not_available_yet: "Vi sender deg ein e-post rett før kurset startar."
   self_registration_156392d6: Sjølvregistrering
+  self_signup_15b23092: self_signup
   send_a_message_to_the_teacher_1ae115b6: "Send ei melding til faglærar"
+  send_a_message_to_this_student_ec46b8dd: "Send ei melding til denne studenten"
   send_e3bd0ed0: Send
   send_message_6ccc90e8: "Send melding"
   send_message_to_name_c8ac05fc: "Send melding til %{name}"
@@ -13424,6 +13595,7 @@ nn:
         ret_val: Retur-URL
   settings_5aa0fd0c: Innstillingar
   settings_for_assignment_name_c19565e1: "Innstillingar for oppgåve %{name}"
+  settings_for_title_d3ca495: "Innstillingar for %{title}"
   setup_checklist_eb8b00b8: "Sjekkliste for oppsett"
   shared: 
     account_notification: 
@@ -13952,7 +14124,7 @@ nn:
         unauthorized_action: Uuautorisert
         unpublished: "Ikkje tilgjengeleg"
       needs_cookies: "Informasjonskapslar er ikkje aktiverte på nettlesaren din. Juster dette i tryggleiksinnstillingane før du held fram."
-      needs_login: "Tilgang til sida er avgrensa til godkjende brukarar. Du har ikkje løyve til å sjå denne sida akkurat no."
+      needs_login: "Tilgang til denne sida er avgrensa til autoriserte brukarar. Du har ikkje løyve til å sjå denne sida. "
       public_course: "Denne sida er del av innhaldet i kurset **%{course}**."
       titles: 
         log_in: "Logg på"
@@ -14072,6 +14244,7 @@ nn:
   shared_secret_892c88f2: "Delt hemmelegheit"
   short_name_ad9bf84f: "kort namn"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "Må vere sjølvforklarande, Canvas-ID-en til rapporteringsbrukaren"
+  show_account_navigation_menu_d97270a9: "Vis meny for kontonavigasjon"
   show_all_artifacts_34b91a83: "Vis alle artefaktar"
   show_all_details_9879980c: "Vis alle detaljar"
   show_and_hide_courses_menu_9e09d1d0: "Vis og skjul kursmeny"
@@ -14550,7 +14723,7 @@ nn:
     logout: "Logg av"
     modules: Modular
     observees: Observerer
-    outcomes: Resultat
+    outcomes: Læringsmål
     pages: Sider
     people: Personar
     profile: Profil
@@ -14772,7 +14945,7 @@ nn:
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "Rapporten viser alle kursa for eit bestemt semester. Den endelege CSV-fila inneheld ei rad per kurs og viser kurs-ID-en, kurs-SIS-ID-en, kurset sitt kortnamn, kursnamnet, konto-ID, konto-SIS-ID, kontonamn, lagringskapasitet brukt i MB og summen av alle filene i MB. Lagringskapasitet brukt måler total filstorleik mot kurskvoten. Summen av alle filer i kurset tar ikkje omsyn til kurskvoten."
   this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "Rapporten viser alle kursa for eit bestemt semester. Den endelege CSV-fila inneheld ei rad per kurs og viser kurs-ID-en, kurs-SIS-ID-en, kurset sitt kortnamn, kursnamnet, konto-ID, konto-SIS-ID, kontonamn og lagringskapasitet brukt i MB."
   this_report_shows_grading_period_grades_and_overal_a86346a: "Rapporten viser alle karaktersetjingsperiodane (og alle karakterar) for kvar student som er påmeldt i eit bestemt semester. Den endelege csv-fila inneheld ei rad per brukarpåmelding."
-  this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Eksempelsida inneheld vanlege UI-element i Canvas, som kan hjelpe deg med å bygge di eiga merkevare. Når du gjer endringar i fargeverdiar og bilde i venstre sidestolpe, ser du knappen *Førehandsvis endringane*. Klikk på knappen for å oppdatere sida og sjå på endringane."
+  this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Eksempelsida inneheld vanlege UI-element i Canvas, som kan hjelpe deg med å lage din eigen utsjånad. Når du gjer endringar i fargeverdiar og bilde i venstre sidestolpe, ser du knappen *Førehandsvis endringane*. Klikk på knappen for å oppdatere sida og sjå på endringane."
   this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: "Denne studenten har fått ein uvanleg høg karakter."
   this_student_was_just_awarded_negative_points_55741a37: "Denne studenten har fått negative poeng."
   this_student_wrote_f1a3f22d: "Studenten skriv:"
@@ -15015,7 +15188,7 @@ nn:
       Om leverandøren kan konfigurere gyldig tilbakeringing eller omdirigere URI-ar, bruk %{callback_url}."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Om du vil lenke kursobservatøren *%{name}* til ein student, kan du skrive og finne studenten sitt namn nedanfor og deretter klikke på Oppdater."
   to_minscore_43e5452e: "to %{minScore}%"
-  to_preview_theme_editor_branding_you_will_need_to__462dda1a: "For å førehandvise endringar i Theme Editor, må du *slå av høgkontrast-UI*."
+  to_preview_theme_editor_branding_you_will_need_to__462dda1a: "For å førehandvise endringar i temaredigeringsprogrammet, må du *slå av høgkontrast-UI*."
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "For å avgrense tilgangen til brukarar frå eit spesifikt Clever-district, legg inn kvart distrikt sine Clever-ID-ar her. Det er eit krav for at Clever Instant Login kan fungere i eit multi-tenar-miljø. "
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "For å hindre brukartilgong til spesifikke Google Apps-domene, list domena her."
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "For å avgrense tilgangen til berre Azure Active Directory-brukarar, registrer tenaren her. "
@@ -15199,6 +15372,7 @@ nn:
   user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: "Brukar-ID eller SIS-IS (SIS-ID må ha forstavinga sis_user_id:)"
   user_id_user_id_69a9e865: "Brukar-ID: %{user_id}"
   user_is_now_group_leader_60ec9b98: "%{user} er no gruppeleiar"
+  user_isn_t_allowed_to_edit_global_outcomes_a7eb4a87: "Brukaren har ikkje løyve til å redigere globale læringsmål"
   user_just_accepted_their_invitation_to_participate_7a4b2ce4: "%{user} aksepterte nett no invitasjonen til å ta del i kurset %{course}. Kursrolle: %{role_type}"
   user_just_updated_title_88074ab2: "%{user} nettopp oppdatert %{title}"
   user_lists: 
@@ -15572,7 +15746,7 @@ nn:
     twitter_fail_whale: "Twitter-godkjenninga mislukkast. Prøv på nytt seinare"
     user_dashboard: 
       dashboard: Dashbord
-      user_atom_feed: "Atom-straum for brukar (alle kursa)"
+      user_atom_feed: "Atom-format for brukar (alle emne)"
       user_dashboard: Brukar-dashbord
     user_is_deleted: "%{user_name} er sletta"
     user_merge_fail: "Samanslåing av brukarar mislukkast. Kontroller om du har korrekt løyve og prøv på nytt."
@@ -15889,8 +16063,8 @@ nn:
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har endra krav for progresjon for eit aktivt kurs. Det kan vere studentar som allereie har kome til denne modulen og andre som reknar med å kome hit."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har gjort endringar i spørsmåla i denne prøva.* Endringane vert synlege for studentane etter at du har lagra prøva."
   you_have_no_collaboration_apps_configured_talk_to__6733123a: "Ingen samarbeids-app-er er tilgjengeleg for deg. Ta kontakt med kursadministrator eller underviser. "
-  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har ingen resultat. *Klikk her* for å opprette eit."
-  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har ingen resultat. Klikk her for å gå  til resultatsida."
+  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har ingen læringsmål. *Klikk her* for å opprette eit."
+  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har ingen læringsmål. Klikk her for å gå til læringsmålsida."
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Du har nådd maksimal grense for webkrokar per konto (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Du har nådd maksimal grense for webkrokar per brukar (%{max})"
   you_just_sent_a_message_in_canvas_86b4945c: "Du sendte nettopp ei melding i Canvas"

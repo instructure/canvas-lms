@@ -268,10 +268,10 @@ define([
 
       UsageRights.render('#usage-rights');
 
-      $editor_tabs.find("#pages_accordion a.add").click(function(event){
+      $editor_tabs.find('#pages_accordion a.icon-add').click(function (event) {
         event.preventDefault();
         $editor_tabs.find('#new_page_drop_down').slideToggle("fast", function() {
-          $(this).find(":text:visible:first").focus().select();
+          $(this).find(':text:visible:first').focus().select();
         });
       });
 

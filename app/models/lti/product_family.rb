@@ -19,14 +19,12 @@
 module Lti
   class ProductFamily < ActiveRecord::Base
 
-    attr_accessible :vendor_code, :product_code, :vendor_name, :vendor_description, :website, :vendor_email, :root_account
-
     belongs_to :root_account, class_name: 'Account'
     has_many :tool_proxies, class_name: "Lti::ToolProxy", dependent: :destroy
+    belongs_to :developer_key
 
     validates_presence_of :vendor_code, :product_code, :vendor_name, :root_account
-    validates_uniqueness_of :product_code, scope: [:vendor_code, :root_account_id]
-
+    validates_uniqueness_of :product_code, scope: [:vendor_code, :root_account_id, :developer_key]
   end
 end
 

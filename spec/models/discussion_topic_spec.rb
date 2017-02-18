@@ -333,6 +333,34 @@ describe DiscussionTopic do
           expect((@topic.check_policy(@student1) & @relevant_permissions).sort).to eq [:read, :read_replies].sort
         end
 
+        it "should not grant reply permissions to group if course is soft-concluded" do
+          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          group_category = @course.group_categories.create(:name => "new cat")
+          @group = @course.groups.create(:name => "group", :group_category => group_category)
+          @group.add_user(@student1)
+          @course.update_attributes(:start_at => 2.days.ago, :conclude_at => 1.day.ago, :restrict_enrollments_to_course_dates => true)
+          @topic = @group.discussion_topics.create(:title => "group topic")
+          @topic.save!
+
+          expect(@topic.context).to eq(@group)
+          expect((@topic.check_policy(@student1) & @relevant_permissions).sort).to eq [:read, :read_replies].sort
+        end
+
+        it "should grant reply permissions to group members if course is concluded but their section isn't" do
+          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          group_category = @course.group_categories.create(:name => "new cat")
+          @group = @course.groups.create(:name => "group", :group_category => group_category)
+          @group.add_user(@student1)
+          @course.update_attributes(:start_at => 2.days.ago, :conclude_at => 1.day.ago, :restrict_enrollments_to_course_dates => true)
+          @section.update_attributes(:start_at => 2.days.ago, :end_at => 2.days.from_now,
+            :restrict_enrollments_to_section_dates => true)
+          @topic = @group.discussion_topics.create(:title => "group topic")
+          @topic.save!
+
+          expect(@topic.context).to eq(@group)
+          expect((@topic.check_policy(@student1) & @relevant_permissions).sort).to eq [:read, :read_replies, :reply].sort
+        end
+
         it "should not grant reply permissions to group if group isn't active" do
           @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
           group_category = @course.group_categories.create(:name => "new cat")

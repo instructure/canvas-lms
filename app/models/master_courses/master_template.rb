@@ -12,8 +12,6 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   serialize :default_restrictions, Hash
   validate :require_valid_restrictions
 
-  strong_params
-
   attr_accessor :child_course_count
   attr_writer :last_export_completed_at
 
@@ -71,6 +69,9 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def migration_id_for(obj, prepend="")
+    if obj.is_a?(Assignment) && submittable = obj.submittable_object
+      obj = submittable # i.e. use the same migration id as the topic on a graded topic's assignment - same restrictions
+    end
     key = obj.is_a?(ActiveRecord::Base) ? obj.global_asset_string : obj.to_s
     "#{MasterCourses::MIGRATION_ID_PREFIX}#{self.shard.id}_#{self.id}_#{Digest::MD5.hexdigest(prepend + key)}"
   end
@@ -110,8 +111,6 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def ensure_attachment_tags_on_export
-    return unless self.default_restrictions.present?
-
     # because attachments don't get "added" to the export
     self.course.attachments.where("file_state <> 'deleted'").each do |att|
       ensure_tag_on_export(att)

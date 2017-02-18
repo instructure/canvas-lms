@@ -74,7 +74,7 @@ define([
       var allPlacements = {
         "account_navigation":I18n.t("Account Navigation"),
         "assignment_selection":I18n.t("Assignment Selection"),
-        "assignment_configuration":I18n.t("Assignment Configuration"),
+        "similarity_detection":I18n.t("Similarity Detection"),
         "assignment_menu":I18n.t("Assignment Menu"),
         "collaboration":I18n.t("Collaboration"),
         "course_assignments_menu":I18n.t("Course Assignments Menu"),

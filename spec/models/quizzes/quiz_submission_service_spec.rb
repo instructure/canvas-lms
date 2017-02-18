@@ -22,9 +22,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 shared_examples_for 'Takeable Quiz Services' do
 
   it 'should deny access to locked quizzes' do
-    quiz.stubs(:locked_for?).returns true
-    quiz.stubs(:grants_right?)
-    .with(anything, anything, :manage).returns(false)
+    allow(quiz).to receive(:locked_for?).and_return(true)
+    allow(quiz).to receive(:grants_right?).
+      with(anything, anything, :manage).and_return(false)
 
     expect { service_action.call }.to raise_error(RequestError, /is locked/i)
   end
@@ -71,12 +71,12 @@ describe Quizzes::QuizSubmissionService do
   describe '#create' do
     before :each do
       # consume all calls to actual QS generation, no need to test this
-      quiz.stubs(:generate_submission)
+      allow(quiz).to receive(:generate_submission)
     end
 
     context 'as an authentic user' do
       before :each do
-        quiz.stubs(:grants_right?).returns true
+        allow(quiz).to receive(:grants_right?).and_return true
       end
 
       let :service_action do
@@ -92,18 +92,18 @@ describe Quizzes::QuizSubmissionService do
       context 'retrying a quiz' do
         let :retriable_qs do
           qs = Quizzes::QuizSubmission.new
-          qs.stubs(:retriable?).returns true
+          allow(qs).to receive(:retriable?).and_return true
           qs
         end
 
         let :unretriable_qs do
           qs = Quizzes::QuizSubmission.new
-          qs.stubs(:retriable?).returns false
+          allow(qs).to receive(:retriable?).and_return false
           qs
         end
 
         it 'should regenerate when possible' do
-          Quizzes::QuizSubmission.expects(:for_participant).with(participant).returns { stub(first: retriable_qs) }
+          expect(Quizzes::QuizSubmission).to receive(:for_participant).with(participant) { double(first: retriable_qs) }
 
           expect do
             subject.create quiz
@@ -111,7 +111,7 @@ describe Quizzes::QuizSubmissionService do
         end
 
         it 'should not regenerate if the QS is not retriable' do
-          Quizzes::QuizSubmission.expects(:for_participant).with(participant).returns { stub(first: unretriable_qs) }
+          expect(Quizzes::QuizSubmission).to receive(:for_participant).with(participant) { double(first: unretriable_qs) }
 
           expect do
             subject.create quiz
@@ -128,11 +128,11 @@ describe Quizzes::QuizSubmissionService do
           participant.user = user_factory
           quiz.context.enroll_user(participant.user)
 
-          quiz.stubs(:grants_right?).returns(true)
-          quiz.stubs(:grants_right?).with(anything, anything, :manage).returns(false)
+          allow(quiz).to receive(:grants_right?).and_return(true)
+          allow(quiz).to receive(:grants_right?).with(anything, anything, :manage).and_return(false)
 
-          participant.user.stubs(:sections_for_course).returns([inactive_course_section, active_course_section])
-          participant.user.stubs(:new_record?).returns(false)
+          allow(participant.user).to receive(:sections_for_course).and_return([inactive_course_section, active_course_section])
+          allow(participant.user).to receive(:new_record?).and_return(false)
 
           expect do
             subject.create quiz
@@ -148,7 +148,7 @@ describe Quizzes::QuizSubmissionService do
       end
 
       it 'should allow taking a quiz in a public course' do
-        quiz.stubs(:grants_right?).returns true
+        allow(quiz).to receive(:grants_right?).and_return true
         quiz.context.is_public = true
 
         expect { subject.create quiz }.to_not raise_error
@@ -164,8 +164,8 @@ describe Quizzes::QuizSubmissionService do
 
   describe '#create_preview' do
     it 'should utilize the user code instead of the user' do
-      quiz.expects(:generate_submission).with(participant.user_code, true)
-      quiz.stubs(:grants_right?).returns true
+      expect(quiz).to receive(:generate_submission).with(participant.user_code, true)
+      allow(quiz).to receive(:grants_right?).and_return true
 
       subject.create_preview quiz, nil
     end
@@ -181,7 +181,7 @@ describe Quizzes::QuizSubmissionService do
 
     context 'as the participant' do
       before :each do
-        quiz.stubs(:grants_right?).returns true
+        allow(quiz).to receive(:grants_right?).and_return true
       end
 
       let :service_action do
@@ -232,14 +232,14 @@ describe Quizzes::QuizSubmissionService do
       qs = Quizzes::QuizSubmission.new
       qs.attempt = 1
       qs.quiz = quiz
-      qs.stubs(:completed?).returns false
-      qs.stubs(:backup_submission_data)
+      allow(qs).to receive(:completed?).and_return false
+      allow(qs).to receive(:backup_submission_data)
       qs
     end
 
     context 'as the participant' do
       before :each do
-        quiz.stubs(:grants_right?).returns true
+        allow(quiz).to receive(:grants_right?).and_return true
       end
 
       let :service_action do
@@ -255,7 +255,7 @@ describe Quizzes::QuizSubmissionService do
       end
 
       it 'should reject when the QS is complete' do
-        qs.stubs(:completed?).returns true
+        allow(qs).to receive(:completed?).and_return true
 
         expect do
           subject.update_question({ question_5_marked: true }, qs, qs.attempt)
@@ -285,17 +285,21 @@ describe Quizzes::QuizSubmissionService do
 
     context 'as a teacher' do
       before :each do
-        qs.expects(:grants_right?).with(participant.user, :update_scores).returns true
-        qs.versions.expects(:get).with(qs.attempt).at_most_once.returns do
+        expect(qs).to receive(:grants_right?).with(participant.user, :update_scores).and_return true
+      end
+
+      def expect_version_object
+        expect(qs.versions).to receive(:get).with(qs.attempt).at_most(:once) do
           o = Object.new
-          o.stubs(:model).returns(qs)
+          allow(o).to receive(:model).and_return(qs)
           o
         end
       end
 
       it 'should update the scores' do
+        expect_version_object
         qs.workflow_state = 'complete'
-        qs.expects(:update_scores)
+        expect(qs).to receive(:update_scores)
 
         expect do
           subject.update_scores qs, qs.attempt, {
@@ -305,8 +309,9 @@ describe Quizzes::QuizSubmissionService do
       end
 
       it 'should generate the correct "legacy" format' do
+        expect_version_object
         qs.workflow_state = 'complete'
-        qs.expects(:update_scores).with({
+        expect(qs).to receive(:update_scores).with({
           "submission_version_number" => qs.attempt,
           "fudge_points" => 2.0,
           "question_score_5" => 3.2,
@@ -330,7 +335,7 @@ describe Quizzes::QuizSubmissionService do
       end
 
       it 'should require a valid attempt' do
-        qs.versions.stubs(:get).returns nil
+        allow(qs.versions).to receive(:get).and_return nil
 
         expect do
           subject.update_scores qs, qs.attempt, {}
@@ -338,12 +343,14 @@ describe Quizzes::QuizSubmissionService do
       end
 
       it 'should require a complete attempt' do
+        expect_version_object
         expect do
           subject.update_scores qs, qs.attempt, {}
         end.to raise_error(RequestError, /attempt must be complete/i)
       end
 
       it 'should reject a bad score' do
+        expect_version_object
         qs.workflow_state = 'complete'
 
         expect do
@@ -356,8 +363,9 @@ describe Quizzes::QuizSubmissionService do
       end
 
       it 'should be a no-op if no changes are requested' do
+        expect_version_object
         qs.workflow_state = 'complete'
-        qs.expects(:update_scores).never
+        expect(qs).to receive(:update_scores).never
 
         subject.update_scores qs, qs.attempt, {}
       end
@@ -365,7 +373,7 @@ describe Quizzes::QuizSubmissionService do
 
     context 'as someone else' do
       before :each do
-        qs.expects(:grants_right?).with(participant.user, :update_scores).returns false
+        expect(qs).to receive(:grants_right?).with(participant.user, :update_scores).and_return false
       end
 
       it 'should deny access' do

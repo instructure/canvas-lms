@@ -13,7 +13,7 @@ describe "master courses - child courses - wiki page locking" do
 
     course_with_teacher(:active_all => true)
     @copy_to = @course
-    @page_copy = @copy_to.wiki.wiki_pages.new(:title => "blah", :body => "bloo") # just create a copy directly instead of doing a real migraiton
+    @page_copy = @copy_to.wiki.wiki_pages.new(:title => "bloo", :body => "bloo") # just create a copy directly instead of doing a real migraiton
     @page_copy.migration_id = @tag.migration_id
     @page_copy.save!
   end
@@ -27,6 +27,8 @@ describe "master courses - child courses - wiki page locking" do
 
     get "/courses/#{@copy_to.id}/pages"
 
+    expect(f('.master-course-cell')).to contain_css('.icon-lock')
+
     f('.al-trigger').click
     expect(f('.al-options')).to_not contain_css('.edit-menu-item')
     expect(f('.al-options')).to_not contain_css('.delete-menu-item')
@@ -34,6 +36,8 @@ describe "master courses - child courses - wiki page locking" do
 
   it "should show the edit/delete cog-menu options on the index when not locked" do
     get "/courses/#{@copy_to.id}/pages"
+
+    expect(f('.master-course-cell')).to contain_css('.icon-unlock')
 
     f('.al-trigger').click
     expect(f('.al-options')).to contain_css('.edit-menu-item')
@@ -50,7 +54,7 @@ describe "master courses - child courses - wiki page locking" do
     expect(f('.al-options')).to_not contain_css('.delete_page')
   end
 
-  it "should show the edit/delete cog-menu options on the index when not locked" do
+  it "should show the edit/delete cog-menu options on the show page when not locked" do
     get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
 
     expect(f('#content')).to contain_css('.edit-wiki')

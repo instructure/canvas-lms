@@ -19,9 +19,6 @@
 class CourseSection < ActiveRecord::Base
   include Workflow
 
-  attr_protected :sis_source_id, :sis_batch_id, :course_id,
-      :root_account_id, :enrollment_term_id, :integration_id
-
   belongs_to :course
   belongs_to :nonxlist_course, :class_name => 'Course'
   belongs_to :root_account, :class_name => 'Account'
@@ -35,7 +32,7 @@ class CourseSection < ActiveRecord::Base
   has_many :admin_enrollments, -> { where(type: ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment']) }, class_name: 'Enrollment'
   has_many :users, :through => :enrollments
   has_many :course_account_associations
-  has_many :calendar_events, :as => :context
+  has_many :calendar_events, :as => :context, :inverse_of => :context
   has_many :assignment_overrides, :as => :set, :dependent => :destroy
 
   before_validation :infer_defaults, :verify_unique_sis_source_id
@@ -221,14 +218,15 @@ class CourseSection < ActiveRecord::Base
     assignment_overrides.active.destroy_all
     user_ids = self.all_enrollments.map(&:user_id).uniq
 
-    old_course_is_unrelated = old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
+    all_attrs = { course_id: course }
     if self.root_account_id_changed?
-      self.save!
-      self.all_enrollments.update_all :course_id => course, :root_account_id => self.root_account_id
-    else
-      self.save!
-      self.all_enrollments.update_all :course_id => course
+      all_attrs[:root_account_id] = self.root_account_id
     end
+    self.save!
+    self.all_enrollments.update_all all_attrs
+    Assignment.joins(:submissions)
+      .where(context: [old_course, self.course])
+      .where(submissions: { user_id: user_ids }).touch_all
     EnrollmentState.send_later_if_production(:invalidate_states_for_course_or_section, self)
     User.send_later_if_production(:update_account_associations, user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?
     if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id

@@ -18,7 +18,7 @@
 
 class LearningOutcomeGroup < ActiveRecord::Base
   include Workflow
-  attr_accessible :context, :title, :description, :learning_outcome_group, :vendor_guid
+  include OutcomeAttributes
   belongs_to :learning_outcome_group
   has_many :child_outcome_groups, :class_name => 'LearningOutcomeGroup', :foreign_key => "learning_outcome_group_id"
   has_many :child_outcome_links, -> { where(tag_type: 'learning_outcome_association', content_type: 'LearningOutcome') }, class_name: 'ContentTag', as: :associated_asset

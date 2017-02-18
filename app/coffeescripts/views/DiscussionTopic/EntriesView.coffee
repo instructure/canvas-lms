@@ -26,6 +26,9 @@ define [
       @collection.on 'add', @addEntry
       @model.on 'change', @hideIfFiltering
 
+    showDeleted: (show) =>
+      @$el.toggleClass 'show-deleted', show
+
     hideIfFiltering: =>
       if @model.hasFilter()
         @$el.addClass 'hidden'

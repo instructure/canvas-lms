@@ -5,7 +5,7 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
 
 .discussionTopicIndexList {
   .discussion-actions {
-    float: right;
+    display: inline-block;
     padding: $ic-sp 0 0;
   }
   .discussion-topic {
@@ -30,6 +30,10 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
     &.selected {
       background-color: $ic-bg-light-primary;
     }
+
+    .image-block-image {
+      float: left;
+    }
   }
   .discussion-summary {
     max-width: 740px;
@@ -40,13 +44,20 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
     float: right;
     margin-top: -50px;
   }
-  .discussion-info-icons { float: right; }
-  .discussion-unread-container, .discussion-last-reply, .discussion-info-icons {
+  .discussion-unread-container, .discussion-last-reply {
     display: inline-block;
-    padding: 11px 10px 0;
+    padding: $ic-sp 10px 0;
     // 'not-important' styles
     color: $announcements_disscussion-summary-color;
-    @include fontSize(11px); }
+    @include fontSize(11px);
+  }
+  .discussion-info-icons, .master-course-cell {
+    display: inline-block;
+    padding: $ic-sp 0 0;
+    i {
+      padding: 0 $ic-sp/2;
+    }
+  }
   .discussion-unread-container { width: 56px; }
   .discussion-author { @include fontSize(12px); }
   .discussion-summary { @include fontSize(12px); color: $announcements_disscussion-summary-color; }
@@ -211,6 +222,10 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
   .discussion-row {
     display: table-row;
 
+    .master-course-cell i {
+      margin-right: 10px;
+    }
+
     .mastery-path-icon {
       margin-right: 10px;
       padding: 2px 7px;
@@ -303,7 +318,7 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
   }
 
   .discussion-actions {
-    width: 45px;
+    width: 48px;
   }
 
   .title {

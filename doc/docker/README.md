@@ -9,13 +9,15 @@ These commands should get you going
 
 ```bash
 cp docker-compose/config/* config/
+docker-compose run --rm web bash -c "bundle install"
 docker-compose run --rm web bash -c "bundle exec rake db:create db:initial_setup"
 ```
 
 Now you can do `docker-compose up` and you should be good to go. If you're
-using Dingy or Dory. You should be able to access Canvas by going to: [http://web.canvaslms.docker/](http://web.canvaslms.docker/)
+using Dinghy or Dory. You should be able to access Canvas by going to: [http://web.canvaslms.docker/](http://web.canvaslms.docker/)
 
-On Linux you should probably run this
+On Linux you may want to run this to avoid a few permissions issues:
+
 ```bash
 touch mkmf.log .listen_test
 chmod 777 !:2 !:3

@@ -127,6 +127,9 @@ require [
   filterView.on 'clickEntry', (entry) ->
     router.navigate "entry-#{entry.get 'id'}", yes
 
+  toolbarView.on 'showDeleted', (show) ->
+    entriesView.showDeleted(show)
+
   toolbarView.on 'expandAll', ->
     EntryView.expandRootEntries()
     scrollToTop()

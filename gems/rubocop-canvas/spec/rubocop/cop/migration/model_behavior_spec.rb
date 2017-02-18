@@ -7,7 +7,8 @@ describe RuboCop::Cop::Migration::ModelBehavior do
         "Whitelist" => [
           "Migrations::FooFix",
           "*.update_all",
-          "*.delete_all"
+          "*.delete_all",
+          "*.connection"
         ]
       }
     )
@@ -20,6 +21,17 @@ describe RuboCop::Cop::Migration::ModelBehavior do
       class Foo < ActiveRecord::Migration
         def up
           Migrations::FooFix.run
+        end
+      end
+    })
+    expect(subject.offenses.size).to eq(0)
+  end
+
+  it "should find no offenses when calling methods on whitelisted classes/methods" do
+    inspect_source(subject, %{
+      class Foo < ActiveRecord::Migration
+        def up
+          User.connection.execute "YOLO"
         end
       end
     })

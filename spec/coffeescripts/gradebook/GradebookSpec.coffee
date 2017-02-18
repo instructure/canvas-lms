@@ -40,11 +40,11 @@ define [
     , 'assignment1') < 0
     , "other fields are sorted by score"
 
-  gradebookStubs = ->
-    indexedOverrides: Gradebook.prototype.indexedOverrides
-    indexedGradingPeriods: _.indexBy(@gradingPeriods, 'id')
-
   module "Gradebook#hideAggregateColumns",
+    gradebookStubs: ->
+      indexedOverrides: Gradebook.prototype.indexedOverrides
+      indexedGradingPeriods: _.indexBy(@gradingPeriods, 'id')
+
     setupThis: (options) ->
       customOptions = options || {}
       defaults =
@@ -53,7 +53,7 @@ define [
         options:
           all_grading_periods_totals: false
 
-      _.defaults customOptions, defaults, gradebookStubs()
+      _.defaults customOptions, defaults, @gradebookStubs()
 
     setup: ->
       @hideAggregateColumns = Gradebook.prototype.hideAggregateColumns

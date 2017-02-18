@@ -6,8 +6,9 @@ define([
   'jsx/grading/helpers/OutlierScoreHelper',
   'compiled/userSettings',
   'jsx/speed_grader/gradingPeriod',
+  'jsx/shared/helpers/numberHelper',
   'jquery.ajaxJSON'
-], ($, SpeedGrader, SpeedgraderHelpers, fakeENV, OutlierScoreHelper, userSettings, MGP) => {
+], ($, SpeedGrader, SpeedgraderHelpers, fakeENV, OutlierScoreHelper, userSettings, MGP, numberHelper) => {
   module('SpeedGrader#showDiscussion', {
     setup () {
       fakeENV.setup();
@@ -614,5 +615,85 @@ define([
     sinon.stub(MGP, 'assignmentClosedForStudent').returns(false);
     SpeedGrader.EG.handleSubmissionSelectionChange();
     ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, "bar"));
-  })
+  });
+
+  module('SpeedGrader#isGradingTypePercent', {
+    setup () {
+      fakeENV.setup();
+    },
+    teardown () {
+      fakeENV.teardown();
+    }
+  });
+
+  test('should return true when grading type is percent', () => {
+    ENV.grading_type = 'percent';
+    const result = SpeedGrader.EG.isGradingTypePercent();
+    ok(result);
+  });
+
+  test('should return false when grading type is not percent', () => {
+    ENV.grading_type = 'foo';
+    const result = SpeedGrader.EG.isGradingTypePercent();
+    notOk(result);
+  });
+
+  module('SpeedGrader#shouldParseGrade', {
+    setup () {
+      fakeENV.setup();
+    },
+    teardown () {
+      fakeENV.teardown();
+    }
+  });
+
+  test('should return true when grading type is percent', () => {
+    ENV.grading_type = 'percent';
+    const result = SpeedGrader.EG.shouldParseGrade();
+    ok(result);
+  });
+
+  test('should return true when grading type is points', () => {
+    ENV.grading_type = 'points';
+    const result = SpeedGrader.EG.shouldParseGrade();
+    ok(result);
+  });
+
+  test('should return false when grading type is neither percent nor points', () => {
+    ENV.grading_type = 'foo';
+    const result = SpeedGrader.EG.shouldParseGrade();
+    notOk(result);
+  });
+
+  module('SpeedGrader#formatGradeForSubmission', {
+    setup () {
+      fakeENV.setup();
+      this.stub(numberHelper, 'parse').returns(42);
+    },
+
+    teardown () {
+      fakeENV.teardown();
+    }
+  });
+
+  test('should call numberHelper#parse if grading type is points', () => {
+    ENV.grading_type = 'points';
+    const result = SpeedGrader.EG.formatGradeForSubmission('1,000');
+    equal(numberHelper.parse.callCount, 1);
+    strictEqual(result, '42');
+  });
+
+  test('should call numberHelper#parse if grading type is a percentage', () => {
+    ENV.grading_type = 'percent';
+    const result = SpeedGrader.EG.formatGradeForSubmission('75%');
+    equal(numberHelper.parse.callCount, 1);
+    strictEqual(result, '42%')
+  });
+
+  test('should not call numberHelper#parse if grading type is neither points nor percentage', () => {
+    ENV.grading_type = 'foo';
+    const result = SpeedGrader.EG.formatGradeForSubmission('A');
+    ok(numberHelper.parse.notCalled);
+    equal(result, 'A');
+  });
 });

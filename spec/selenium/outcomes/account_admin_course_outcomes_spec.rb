@@ -139,7 +139,7 @@ describe "account admin outcomes" do
 
     def import_state_standart_into_account
       ffj(".outcome-level:last .outcome-group .ellipsis").first.click
-      f(".btn-primary").click
+      f('.ui-dialog-buttonpane .btn-primary').click
       expect(driver.switch_to.alert).not_to be nil
       driver.switch_to.alert.accept
       wait_for_ajaximations

@@ -153,7 +153,7 @@
 .reminder, .reminder-content {
   border: 1px solid #aaa;
   border-radius: 5px;
-  margin: 5px 20px;
+  margin: 5px;
   clear: both;
   font-size: 0.9em;
   h2, .h2 {
@@ -220,10 +220,9 @@
   table.summary {
     margin: 5px 0px;
     width: 100%;
-    td, tbody th {
-      background-color: $lightBackground;
+    tbody th {
+      font-weight: bold;
     }
-    tbody th { font-weight: bold; }
   }
   table.notifications {
     border-top: 2px solid #999;
@@ -260,9 +259,6 @@
     }
   }
   .events_list, .to-do-list {
-    word-break: break-all;
-    word-wrap: break-word;
-    hyphens: auto;
 
     li.event, li.todo {
       i.icon-check {
@@ -274,13 +270,53 @@
         margin-top: 2px;
       }
     }
-    .event-details, .todo-details {
-      display: inline-block;
-      padding-right: $ic-sp*2+2;
+
+    .event-details,
+    .todo-details {
+      padding-right: $ic-sp;
+      flex: 1;
+      min-width: 1px;
+      overflow: hidden;
+      position: relative;
+
+      &:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: $ic-sp;
+        background: linear-gradient(
+          to right, rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 1) 80%);
+      }
+    }
+
+    .todo-details {
+      // gets more padding/width to accommodate close X button
+      padding-right: $ic-sp * 2.5;
+      &:after {
+        width: $ic-sp * 2.5;
+        background: linear-gradient(
+          to right, rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 1) 50%);
+      }
+    }
+
+    .todo-details__title,
+    .event-details__title {
+      + * {
+        margin-top: $ic-sp / 4;
+      }
+    }
+
+    .todo-details__context,
+    .event-details__context {
+      margin-bottom: $ic-sp / 4;
     }
   }
   .events_list {
-    margin-bottom: $ic-sp*2;
+    margin-bottom: $ic-sp * 1.5;
     .event-list-view-calendar {
       float: right;
       @include fontSize(12px);
@@ -291,7 +327,7 @@
       }
     }
   }
-  * + .events_list { margin-top: $ic-sp*2; }
+  * + .events_list { margin-top: $ic-sp * 1.5; }
   .details {
     margin: 5px;
     padding: 5px 10px;

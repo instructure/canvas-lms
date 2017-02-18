@@ -691,7 +691,6 @@ describe DiscussionTopicsController do
 
       specify { expect(topic).to be_a DiscussionTopic }
       specify { expect(topic.user).to eq @user }
-      specify { expect(topic.current_user).to eq @user }
       specify { expect(topic.delayed_post_at).to be_nil }
       specify { expect(topic.lock_at).to be_nil }
       specify { expect(topic.workflow_state).to eq 'active' }

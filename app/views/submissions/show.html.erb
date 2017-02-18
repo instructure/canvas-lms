@@ -77,7 +77,7 @@
         <% if (vericite_score = @submission.vericite_data(true)[@submission.asset_string]) && @submission.turnitin_data[:provider] == :vericite && vericite_score[:similarity_score] %>
           <span class="turnitin_score_container">
             <span class="vericite_score_container_caret <%= vericite_score[:state] %>_score"></span>
-            <a href="<%= context_url(@context, :context_assignment_submission_vericite_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string) %>" target="_blank" title="VeriCite similarity score -- more information" class="tooltip not_external turnitin_similarity_score <%= vericite_score[:state] %>_score">
+            <a href="<%= context_url(@context, :context_assignment_submission_vericite_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string) %>" target="_blank" title="Similarity score -- more information" class="tooltip not_external turnitin_similarity_score <%= vericite_score[:state] %>_score">
               <%= vericite_score[:similarity_score] %>%
               <span class="tooltip_wrap right">
                 <span class="tooltip_text"><%= t(:see_vericite_results, "See VeriCite results") %></span>
@@ -92,13 +92,16 @@
            can_do(@assignment.rubric, @current_user, :read)
          )
       %>
-        <a href="#" class="assess_submission_link rubric" style="font-size: 0.8em;" tabindex='0'><%= t('show_rubric', 'Show Rubric') %></a>
+        <a href="#" class="assess_submission_link Submission__Link--has-icon" style="font-size: 0.8em;" tabindex='0'>
+          <i class="icon-rubric" aria-hidden="true"></i>
+          <%= t('show_rubric', 'Show Rubric') %>
+        </a>
       <% end %>
     </div>
     <h2 class="submission_header" style="margin-bottom: 0;"><%= @assessment_request ? t('peer_review', "Peer Review") : t('submission_details', "Submission Details") %></h2>
-    <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em;"><%= @assignment.title %>, <%= submission_author_name_for @assessment_request %></span>
+    <span class="SubmissionDetails__Text"><%= @assignment.title %>, <%= submission_author_name_for @assessment_request %></span>
 
-    <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em; <%= 'color: #800; font-weight: bold;' if @submission.late? %> <%= hidden unless @submission.submitted_at %>">
+    <span class="SubmissionDetails__Text <%='late' if @submission.late? %> <%= hidden unless @submission.submitted_at %>">
       <%= t('submitted_at', 'submitted %{submit_date}', :submit_date => datetime_string(@submission.submitted_at)) %>
       <%= t('late_submission', '(late)') if @submission.late? %>
     </span>
@@ -106,7 +109,7 @@
       <a class="forward" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) + "#" + CGI::escape({:student_id => @submission.user_id }.to_json) %>" style="float: right; padding-right: 10px;"><%= t('speedgrader', 'SpeedGrader™') %></a>
     <% end %>
     <% if @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) && @current_user == @submission.user %>
-      <span style="padding-left: 10px;"><a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>#submit" class="add" >
+      <span><a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>#submit" class="Button Button--primary" >
         <%= @submission.has_submission? ? t('links.resubmit', "Re-submit Assignment") : t('links.submit', "Submit Assignment") %>
       </a></span>
     <% end %>
@@ -254,7 +257,7 @@
           </div>
           <div class="comment_attachment_input nobr" id="comment_attachment_input_blank" style="display: none;">
             <input type="file" name="attachments[-1][uploaded_data]"/>
-            <a href="#" class="delete_comment_attachment_link no-hover"><%= image_tag "delete_circle.png", :alt => t('Delete') %></a>
+            <a href="#" class="delete_comment_attachment_link no-hover"><i class="icon-end" role="presentation"></i><span class="screenreader-only"> t('Delete') </span></a>
           </div>
           <div id="media_media_recording" style="display: none;">
             <div class="media_recording">

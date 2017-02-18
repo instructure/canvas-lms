@@ -19,14 +19,12 @@
 module AssignmentsHelper
   def completed_link_options
     {
-      class: 'pass',
       title: I18n.t('tooltips.finished', 'finished')
     }
   end
 
   def in_progress_link_options
     {
-      class: 'warning',
       title: I18n.t('tooltips.incomplete', 'incomplete')
     }
   end
@@ -39,8 +37,14 @@ module AssignmentsHelper
   end
 
   def student_peer_review_link_for(context, assignment, assessment)
-    link_options = assessment.completed? ? completed_link_options : in_progress_link_options
-    link_to submission_author_name_for(assessment), context_url(context, :context_assignment_submission_url, assignment.id, assessment.asset.user_id), link_options
+    options = assessment.completed? ? completed_link_options : in_progress_link_options
+    icon_class = assessment.completed? ? 'icon-check' : 'icon-warning'
+    text = safe_join [
+      "<i class='#{icon_class}' aria-hidden='true'></i>".html_safe,
+      submission_author_name_for(assessment)
+    ]
+    href = context_url(context, :context_assignment_submission_url, assignment.id, assessment.asset.user_id)
+    link_to text, href, options
   end
 
   def due_at(assignment, user)

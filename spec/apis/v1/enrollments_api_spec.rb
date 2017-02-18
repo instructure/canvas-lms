@@ -1656,8 +1656,6 @@ describe EnrollmentsApiController, type: :request do
 
       context "when not scoped by a user" do
         it "returns enrollments from the course's shard" do
-          pend_with_bullet
-
           @shard1.activate { @user = user_factory(active_user: true) }
 
           account_admin_user(account: @course.account, user: @user)
@@ -1672,8 +1670,6 @@ describe EnrollmentsApiController, type: :request do
 
       context "when scoped by a user" do
         it "returns enrollments from all of a user's associated shards" do
-          pend_with_bullet
-
           # create a user on a different shard
           @shard1.activate { @user = User.create!(name: 'outofshard') }
 

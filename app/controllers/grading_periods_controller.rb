@@ -134,7 +134,7 @@ class GradingPeriodsController < ApplicationController
   #   }
   #
   def update
-    grading_period_params = params[:grading_periods].first
+    grading_period_params = params.require(:grading_periods).first.permit(:weight, :start_date, :end_date, :close_date, :title)
 
     if authorized_action(grading_period(inherit: false), @current_user, :update)
       respond_to do |format|
@@ -181,7 +181,7 @@ class GradingPeriodsController < ApplicationController
 
   def account_batch_update
     grading_period_group = GradingPeriodGroup.active.find(params.fetch(:set_id))
-    periods = find_or_build_periods(params[:grading_periods], grading_period_group)
+    periods = find_or_build_periods(params.require(:grading_periods), grading_period_group)
     unless batch_update_rights?(periods)
       return render_unauthorized_action
     end
@@ -268,7 +268,7 @@ class GradingPeriodsController < ApplicationController
       else
         period = grading_period_group.grading_periods.build
       end
-      period.assign_attributes(period_params.except(:id))
+      period.assign_attributes(period_params.permit(:weight, :start_date, :end_date, :close_date, :title))
       period
     end
   end

@@ -33,8 +33,10 @@ must be specified when uploading the SIS import. Use this option with caution, a
 large data sets without any prompting on the individual records. Currently, this affects courses,
 sections and enrollments.
 
-This option will only affect data created via previous SIS imports. Manually created courses, for
-example, won't be deleted even if they don't appear in the new SIS import.
+This option will only affect data that has been involved in a previous SIS job
+-- either created by a previous import, or referenced by a SIS job after a SIS
+ID was manually added. Manually created courses with no SIS ID, for example,
+won't be deleted even if they don't appear in the new SIS import.
 
 Diffing Mode
 ------------
@@ -94,6 +96,17 @@ rather than applying just the diff.  To enable this mode, set the
 will be applied without diffing. The next import for the same data
 set will still diff against that import.
 
+Stickiness
+----------
+When a user makes a change to imported data in Canvas (e.g., changes a name),
+this change is "sticky" and is set as the new default. By default, these "sticky"
+changes are not overwritten on the next SIS import. This can be overridden by
+selecting the Override UI option, which allows Canvas to overwrite any "sticky"
+data updated in the Canvas UI.  Otherwise, changes from an import with
+conflicting data would be disregarded and the existing user data would not be
+changed. See below for an indication of which fields have this "sticky"
+property
+
 CSV Data Formats
 ================
 
@@ -104,31 +117,41 @@ users.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>user_id</td>
 <td>text</td>
-<td><b>Required field</b>. A unique identifier used to reference users in the enrollments table.
+<td>✓</td>
+<td></td>
+<td>A unique identifier used to reference users in the enrollments table.
 This identifier must not change for the user, and must be globally unique. In the user interface,
  this is called the SIS ID.</td>
 </tr>
 <tr>
 <td>integration_id</td>
 <td>text</td>
+<td></td>
+<td></td>
 <td>A secondary unique identifier useful for more complex SIS integrations.
 This identifier must not change for the user, and must be globally unique.</td>
 </tr>
 <tr>
 <td>login_id</td>
 <td>text</td>
-<td><b>Required field</b>. The name that a user will use to login to Instructure. If you have an
-authentication service configured (like LDAP), this will be their username
-from the remote system.</td>
+<td>✓</td>
+<td>✓</td>
+<td>The name that a user will use to
+login to Instructure. If you have an authentication service configured (like
+LDAP), this will be their username from the remote system.</td>
 </tr>
 <tr>
 <td>password</td>
 <td>text</td>
+<td></td>
+<td></td>
 <td><p>If the account is configured to use LDAP or an SSO protocol then
 this should not be set. Otherwise this is the password that will be used to
 login to Canvas along with the 'login_id' above.</p>
@@ -143,6 +166,8 @@ SSO protocol.</p>
 <tr>
 <td>ssha_password</td>
 <td>text</td>
+<td></td>
+<td></td>
 <td>Instead of a plain-text password, you can pass a pre-hashed password using
 the SSHA password generation scheme in this field. While better than passing
 a plain text password, you should still encourage users to change their
@@ -151,6 +176,8 @@ password after logging in for the first time.</td>
 <tr>
 <td>authentication_provider_id</td>
 <td>text or integer</td>
+<td></td>
+<td></td>
 <td>
 <p>The authentication provider this login is associated with. Logins
 associated with a specific provider can only be used with that provider.
@@ -163,40 +190,57 @@ first matching provider).</p>
 <tr>
 <td>first_name</td>
 <td>text</td>
-<td>Given name of the user.</td>
+<td></td>
+<td>✓</td>
+<td>Given name of the user. If present, used to construct
+full_name and/or sortable_name.</td>
 </tr>
 <tr>
 <td>last_name</td>
 <td>text</td>
-<td>Last name of the user.</td>
+<td></td>
+<td>✓</td>
+<td>Last name of the user. If present, used to construct
+full_name and/or sortable_name.</td>
 </tr>
 <tr>
 <td>full_name</td>
 <td>text</td>
-<td>Full name of the user. Omit first_name and last_name if this is provided.</td>
+<td></td>
+<td>✓</td>
+<td> Full name of the user. Omit first_name and last_name if this
+is provided.</td>
 </tr>
 <tr>
 <td>sortable_name</td>
 <td>text</td>
-<td>Sortable name of the user. This is normally inferred from the user's name,
-but you can customize it here.</td>
+<td></td>
+<td>✓</td>
+<td>Sortable name of the user. This is normally inferred from the
+user's name, but you can customize it here.</td>
 </tr>
 <tr>
 <td>short_name</td>
 <td>text</td>
-<td>Display name of the user. This is normally inferred from the user's name,
-but you can customize it here.</td>
+<td></td>
+<td>✓</td>
+<td>Display name of the user. This is normally inferred from the
+user's name, but you can customize it here.</td>
 </tr>
 <tr>
 <td>email</td>
 <td>text</td>
+<td></td>
+<td></td>
 <td>The email address of the user. This might be the same as login_id, but should
 still be provided.</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td><b>Required field</b>. active, deleted</td>
+<td>✓</td>
+<td></td>
+<td>active, deleted</td>
 </tr>
 </table>
 
@@ -223,19 +267,25 @@ accounts.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>account_id</td>
 <td>text</td>
-<td><b>Required field</b>. A unique identifier used to reference accounts in the enrollments data.
+<td>✓</td>
+<td></td>
+<td>A unique identifier used to reference accounts in the enrollments data.
 This identifier must not change for the account, and must be globally unique. In the user
 interface, this is called the SIS ID.</td>
 </tr>
 <tr>
 <td>parent_account_id</td>
 <td>text</td>
-<td><b>Required column</b>. The account identifier of the parent account.
+<td>✓</td>
+<td></td>
+<td>The account identifier of the parent account.
 If this is blank the parent account will be the root account. Note that even if
 all values are blank, the column must be included to differentiate the file
 from a group import.</td>
@@ -243,12 +293,16 @@ from a group import.</td>
 <tr>
 <td>name</td>
 <td>text</td>
-<td><b>Required field</b>. The name of the account</td>
+<td>✓</td>
+<td>✓</td>
+<td>The name of the account</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td><b>Required field</b>. active, deleted</td>
+<td>✓</td>
+<td></td>
+<td>active, deleted</td>
 </tr>
 </table>
 
@@ -270,34 +324,48 @@ terms.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>term_id</td>
 <td>text</td>
-<td><b>Required field</b>. A unique identifier used to reference terms in the enrollments data.
+<td>✓</td>
+<td></td>
+<td>A unique identifier used to reference terms in the enrollments data.
 This identifier must not change for the account, and must be globally unique. In the user
 interface, this is called the SIS ID.</td>
 </tr>
 <tr>
 <td>name</td>
 <td>text</td>
-<td><b>Required field</b>. The name of the term</td>
+<td>✓</td>
+<td>✓</td>
+<td>The name of the term</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td><b>Required field</b>. active, deleted</td>
+<td>✓</td>
+<td></td>
+<td>active, deleted</td>
 </tr>
 <tr>
 <td>start_date</td>
 <td>date</td>
-<td>The date the term starts. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
+<td></td>
+<td>✓</td>
+<td>The date the term starts. The format should be in ISO 8601:
+YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
 <tr>
 <td>end_date</td>
 <td>date</td>
-<td>The date the term ends. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
+<td></td>
+<td>✓</td>
+<td>The date the term ends. The format should be in ISO 8601:
+YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
 </table>
 
@@ -316,56 +384,79 @@ courses.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>course_id</td>
 <td>text</td>
-<td><b>Required field</b>. A unique identifier used to reference courses in the enrollments data.
+<td>✓</td>
+<td></td>
+<td>A unique identifier used to reference courses in the enrollments data.
 This identifier must not change for the account, and must be globally unique. In the user
 interface, this is called the SIS ID.</td>
 </tr>
 <tr>
 <td>short_name</td>
 <td>text</td>
-<td><b>Required field</b>. A short name for the course</td>
+<td>✓</td>
+<td>✓</td>
+<td>A short name for the course</td>
 </tr>
 <tr>
 <td>long_name</td>
 <td>text</td>
-<td><b>Required field</b>. A long name for the course. (This can be the same as the short name,
-but if both are available, it will provide a better user experience to provide both.)</td>
+<td>✓</td>
+<td>✓</td>
+<td>A long name for the course. (This can
+be the same as the short name, but if both are available, it will provide
+a better user experience to provide both.)</td>
 </tr>
 <tr>
 <td>account_id</td>
 <td>text</td>
+<td></td>
+<td></td>
 <td>The account identifier from accounts.csv, if none is specified the course will be attached to
 the root account</td>
 </tr>
 <tr>
 <td>term_id</td>
 <td>text</td>
-<td>The term identifier from terms.csv, if no term_id is specified the
-default term for the account will be used</td>
+<td></td>
+<td>✓</td>
+<td>The term identifier from terms.csv, if no term_id is
+specified the default term for the account will be used</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td><b>Required field</b>. active, deleted, completed</td>
+<td>✓</td>
+<td>✓</td>
+<td>active, deleted, completed</td>
 </tr>
 <tr>
 <td>start_date</td>
 <td>date</td>
-<td>The course start date. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
+<td></td>
+<td>✓</td>
+<td>The course start date. The format should be in ISO 8601:
+YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
 <tr>
 <td>end_date</td>
 <td>date</td>
-<td>The course end date. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
+<td></td>
+<td>✓</td>
+<td>The course end date. The format should be in ISO 8601:
+YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
 <tr>
 <td>course_format</td>
 <td>enum</td>
+<td></td>
+<td></td>
 <td>on_campus, online, blended</td>
 </tr>
 </table>
@@ -388,38 +479,52 @@ sections.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>section_id</td>
 <td>text</td>
-<td><b>Required field</b>. A unique identifier used to reference sections in the enrollments data.
+<td>✓</td>
+<td></td>
+<td>A unique identifier used to reference sections in the enrollments data.
 This identifier must not change for the account, and must be globally unique. In the user
 interface, this is called the SIS ID.</td>
 </tr>
 <tr>
 <td>course_id</td>
 <td>text</td>
-<td><b>Required field</b>. The course identifier from courses.csv</td>
+<td>✓</td>
+<td>✓</td>
+<td>The course identifier from courses.csv</td>
 </tr>
 <tr>
 <td>name</td>
 <td>text</td>
-<td><b>Required field</b>. The name of the section</td>
+<td>✓</td>
+<td>✓</td>
+<td>The name of the section</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td><b>Required field</b>. active, deleted</td>
+<td>✓</td>
+<td></td>
+<td>active, deleted</td>
 </tr>
 <tr>
 <td>start_date</td>
 <td>date</td>
+<td></td>
+<td>✓</td>
 <td>The section start date. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
 <tr>
 <td>end_date</td>
 <td>date</td>
+<td></td>
+<td>✓</td>
 <td>The section end date The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
 </table>
@@ -442,54 +547,73 @@ enrollments.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>course_id</td>
 <td>text</td>
-<td><b>Required field if section_id is missing</b>. The course identifier from courses.csv</td>
+<td>✓&#42;</td>
+<td></td>
+<td>The course identifier from courses.csv</td>
 </tr>
 <tr>
 <td>root_account</td>
 <td>text</td>
+<td></td>
+<td></td>
 <td>The domain of the account to search for the user.</td>
 </tr>
 <tr>
 <td>user_id</td>
 <td>text</td>
-<td><b>Required field</b>. The User identifier from users.csv</td>
+<td>✓</td>
+<td></td>
+<td>The User identifier from users.csv</td>
 </tr>
 <tr>
 <td>role</td>
 <td>text</td>
-<td><b>Required field if role_id missing</b>. student, teacher, ta, observer, designer, or a custom role defined
+<td>✓&#42;</td>
+<td></td>
+<td>student, teacher, ta, observer, designer, or a custom role defined
 by the account</td>
 </tr>
 <tr>
 <td>role_id</td>
 <td>text</td>
-<td><b>Required field if role missing</b>. Uses a role id, either built-in or defined by the account</td>
+<td>✓&#42;</td>
+<td></td>
+<td>Uses a role id, either built-in or defined by the account</td>
 </tr>
 <tr>
 <td>section_id</td>
 <td>text</td>
-<td><b>Required field if course_id missing</b>. The section identifier from sections.csv, if none
+<td>✓&#42;</td>
+<td></td>
+<td>The section identifier from sections.csv, if none
 is specified the default section for the course will be used</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td><b>Required field</b>. active, deleted, completed, inactive</td>
+<td>✓</td>
+<td></td>
+<td>active, deleted, completed, inactive</td>
 </tr>
 <tr>
 <td>associated_user_id</td>
 <td>text</td>
+<td></td>
+<td></td>
 <td>For observers, the user identifier from users.csv of a student
 in the same course that this observer should be able to see grades for.
 Ignored for any role other than observer</td>
 </tr>
 </table>
 
+&#42; course_id or section_id is required, and role or role_id is required.
 
 When an enrollment is in a 'completed' state the student is limited to read-only access to the
 course.
@@ -512,29 +636,39 @@ groups.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>group_id</td>
 <td>text</td>
-<td><b>Required field</b>. A unique identifier used to reference groups in the group_users data.
+<td>✓</td>
+<td></td>
+<td>A unique identifier used to reference groups in the group_users data.
 This identifier must not change for the group, and must be globally unique.</td>
 </tr>
 <tr>
 <td>account_id</td>
 <td>text</td>
+<td></td>
+<td></td>
 <td>The account identifier from accounts.csv, if none is specified the group will be attached to
 the root account.</td>
 </tr>
 <tr>
 <td>name</td>
 <td>text</td>
-<td><b>Required field</b>. The name of the group.</td>
+<td>✓</td>
+<td>✓</td>
+<td>The name of the group.</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td><b>Required field</b>. available, deleted</td>
+<td>✓</td>
+<td></td>
+<td>available, deleted</td>
 </tr>
 </table>
 
@@ -553,22 +687,30 @@ groups_membership.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>group_id</td>
 <td>text</td>
-<td><b>Required field</b>. The group identifier from groups.csv</td>
+<td>✓</td>
+<td></td>
+<td>The group identifier from groups.csv</td>
 </tr>
 <tr>
 <td>user_id</td>
 <td>text</td>
-<td><b>Required field</b>. The user identifier from users.csv</td>
+<td>✓</td>
+<td></td>
+<td>The user identifier from users.csv</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td><b>Required field</b>. accepted, deleted</td>
+<td>✓</td>
+<td></td>
+<td>accepted, deleted</td>
 </tr>
 </table>
 
@@ -587,22 +729,30 @@ xlists.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>xlist_course_id</td>
 <td>text</td>
-<td><b>Required field</b>. The course identifier from courses.csv</td>
+<td>✓</td>
+<td></td>
+<td>The course identifier from courses.csv</td>
 </tr>
 <tr>
 <td>section_id</td>
 <td>text</td>
-<td><b>Required field</b>. The section identifier from sections.csv</td>
+<td>✓</td>
+<td></td>
+<td>The section identifier from sections.csv</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td><b>Required field</b>. active, deleted</td>
+<td>✓</td>
+<td></td>
+<td>active, deleted</td>
 </tr>
 </table>
 
@@ -629,22 +779,30 @@ user_observers.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>observer_id</td>
 <td>text</td>
-<td><b>Required field</b>. The User identifier from users.csv for the observing user.</td>
+<td>✓</td>
+<td></td>
+<td>The User identifier from users.csv for the observing user.</td>
 </tr>
 <tr>
 <td>student_id</td>
 <td>text</td>
-<td><b>Required field</b>. The User identifier from users.csv for the student user.</td>
+<td>✓</td>
+<td></td>
+<td>The User identifier from users.csv for the student user.</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td><b>Required field</b>. active, deleted</td>
+<td>✓</td>
+<td></td>
+<td>active, deleted</td>
 </tr>
 </table>
 

@@ -8,6 +8,9 @@ development:
   address-book:
     app-host: "http://address-book.docker"
     secret: "opensesame"
+  live-events-subscription-service:
+    app-host: "http://les.docker"
+    sad-panda: null
   rich-content-service:
     app-host: "rce.docker"
   canvas:
