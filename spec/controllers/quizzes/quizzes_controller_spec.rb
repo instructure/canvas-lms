@@ -1347,6 +1347,18 @@ describe Quizzes::QuizzesController do
       expect(quiz.unlock_at.to_i).to eq time.to_i
     end
 
+    it "should accept a hash value for 'hide_results'" do
+      user_session(@teacher)
+      quiz = @course.quizzes.create!(:title => "jamesw is the worst q_q")
+      post :update, :course_id => @course.id,
+        :id => quiz.id,
+        :quiz => {
+          :hide_results => {:never => '0'}
+        }
+      quiz.reload
+      expect(quiz.hide_results).to eq 'always'
+    end
+
     context 'notifications' do
       before :once do
         @notification = Notification.create(:name => 'Assignment Due Date Changed')
