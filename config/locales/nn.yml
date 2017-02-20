@@ -14255,12 +14255,16 @@ nn:
   show_concluded_enrollments_6a05544c: "Vis avslutta påmeldingar"
   show_correct_answers_at_30c37e01: "Vis korrekte svar på"
   show_correct_answers_at_a5475aa3: "Vis korrekte svar på"
+  show_courses_navigation_menu_7ad1a8d4: "Vis meny for kursnavigasjon"
   show_current_grade_5bf4e0d9: "Vis gjeldande karakter"
   show_dashboard_card_view_41ebd6c6: "Vis dashbordkorta"
+  show_deleted_replies_a2e0a36f: "Vis svar som er sletta"
   show_final_grade_a95e14dc: "Vis sluttkarakter"
+  show_groups_navigation_menu_1521d38d: "Vis meny for gruppenavigasjon"
   show_inactive_enrollments_8f4c4824: "Vis inaktive påmeldingar"
   show_links_to_unpublished_content_30c0450d: "Vis lenker til upublisert innhald"
   show_more_af9cbc16: "Vis meir"
+  show_navigation_menu_34e7f441: "Vis navigeringsmeny"
   show_notes_column_22d2b6c1: "Vis merknadskolonne"
   show_one_question_at_a_time_271e346d: "Vis eitt spørsmål om gongen"
   show_question_details_b059df00: "Vis spørsmålsdetaljar"
@@ -14286,6 +14290,7 @@ nn:
     instructure_csv: "Instructure-formatert CSV-fil eller ei ZIP-fil med CSV-filer"
     upload_filename: "sis_upload_%{id}.zip"
   sis_export_title: "SIS-eksport:"
+  sis_friendly_name_52b5683d: "SIS-vennleg namn"
   sis_grade_export_settings_45a9f709: "Innstillingar for SIS-karaktereksport"
   sis_id_4495a887: SIS-ID
   sis_id_8c2029e1: SIS-ID
@@ -14316,10 +14321,13 @@ nn:
       processing_takes_awhile: "dette kan ta ei stund ..."
     status: 
       processing: Handsamar
+  sis_imports_17308c02: SIS-importar
   sis_imports_api: 
     errors: 
       invalid_content_type: "Ugyldig innhaldstype, krev UTF-8"
     sis_import_in_process_notice: "Ein SIS-import er allereie i gang."
+  sis_integration_settings_18c28506: "Innstillingar for SIS-integrasjon"
+  sis_syncing_635bfb63: SIS-synkronisering
   site: 
     view_privacy_policy: "Vis retningslinjer for personvern"
   site_admin: 
@@ -14354,11 +14362,17 @@ nn:
     android_banner_title: "Canvas by Instructure"
     android_banner_view_button: VIS
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Nokre av konferansane på denne sida er skjulte på grunn av feil under korrigering av status"
+  some_module_items_could_not_be_published_e4be3c0: "Nokre modulelement kunne ikkje publiserast"
+  some_settings_have_been_administratively_locked_9e3ee880: "Nokre innstillingar er låste administrativt."
+  some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "Nokre innstillingar er deaktivert fordi oppgåva er i ein lukka karaktersetjingsperiode."
+  some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Nokre innleveringar er ikke mogleg å karaktersetje; endring av karakter for desse innleveringane er ignorert. "
   someone: Nokon
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Det er noko som ikkje fungerer, men eg kan bruke alternative løysingar for ei stund"
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Noko gjekk gale under aktiveringa av brukaren. Prøv på nytt seinare."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Noko gjekk gale under oppdateringa av brukaren si rolle. Prøv på nytt seinare."
   something_went_wrong_while_deactivating_the_user_p_8ff3e261: "Noko gjekk gale under deaktiveringa av brukaren. Prøv på nytt seinare."
+  sort_40afa70: "Sorter: "
+  sort_courses_cf94b8d4: "Sorter kurs"
   sortable_name_73f707cf: "Namn som kan sorterast"
   sorted_ascending_1f9b52c6: "Sortert i stigande rekkefølge."
   sorted_ascending_2318ec99: "Sortert i stigande rekkefølge"
@@ -14423,7 +14437,9 @@ nn:
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_field_for_styleguide_8a8ab1d6: "Startdatofelt for stilguide"
   start_link_validation_dc0ac99c: "Godkjenning av startlenke"
+  start_over_f7552aa9: "Start på nytt"
   start_participating_f0c75256: "Begynn å delta"
+  start_time_2c3d11b5: Starttidspunkt
   start_tls_26e4b0dc: "Start TLS"
   statistics: 
     csv_columns: 
