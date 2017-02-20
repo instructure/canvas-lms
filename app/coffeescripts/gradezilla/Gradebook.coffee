@@ -719,14 +719,16 @@ define [
       return '' unless val?
 
       percentage = @calculateAndRoundGroupTotalScore val.score, val.possible
-      percentage = 0 if isNaN(percentage)
+      percentage = 0 unless isFinite(percentage)
+      possible = round(val.possible, round.DEFAULT)
+      possible = if possible then I18n.n(possible) else possible
 
       if val.possible and @options.grading_standard and columnDef.type is 'total_grade'
         letterGrade = GradingSchemeHelper.scoreToGrade(percentage, @options.grading_standard)
 
       templateOpts =
         score: I18n.n(round(val.score, round.DEFAULT))
-        possible: I18n.n(round(val.possible, round.DEFAULT))
+        possible: possible
         letterGrade: letterGrade
         percentage: I18n.n(round(percentage, round.DEFAULT), percentage: true)
       if columnDef.type == 'total_grade'
