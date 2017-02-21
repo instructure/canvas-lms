@@ -1608,7 +1608,7 @@ class UsersController < ApplicationController
     if managed_attributes.any? && user_params.except(*managed_attributes).empty?
       managed_attributes << {:avatar_image => strong_anything} if managed_attributes.delete(:avatar_image)
       user_params = user_params.permit(*managed_attributes)
-
+      new_email = user_params.delete(:email)
       # admins can update avatar images even if they are locked
       admin_avatar_update = user_params[:avatar_image] &&
         @user.grants_right?(@current_user, :update_avatar) &&
@@ -1632,7 +1632,7 @@ class UsersController < ApplicationController
       respond_to do |format|
         if @user.update_attributes(user_params)
           @user.avatar_state = (old_avatar_state == :locked ? old_avatar_state : 'approved') if admin_avatar_update
-          @user.email = user_params[:email] if update_email
+          @user.email = new_email if update_email
           @user.save if admin_avatar_update || update_email
           session.delete(:require_terms)
           flash[:notice] = t('user_updated', 'User was successfully updated.')
