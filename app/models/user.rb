@@ -1364,6 +1364,10 @@ class User < ActiveRecord::Base
     read_or_initialize_attribute(:preferences, {})
   end
 
+  def new_user_tutorial_statuses
+    preferences[:new_user_tutorial_statuses] ||= {}
+  end
+
   def custom_colors
     preferences[:custom_colors] ||= {}
   end
