@@ -52,6 +52,7 @@ nn:
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "Eit låst element med namnet \"%{name}\" finst allereie. Skriv inn eit anna namn."
   a_message_is_required_129e1814: "Ei melding er nødvendig"
   a_name_for_this_set_is_required_222bad23: "Eit namn er obligatorisk. "
+  a_name_is_required_b5df38a9: "Eit namn er obligatorisk"
   a_new_assignment_has_been_created_for_your_course__12b72639: "Ei ny oppgåve er oppretta for emnet ditt, %{course_name}"
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Ein partnar-ID er nødvendig for å bruke Academic Benchmarks"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Ein partnarnøkkel er nødvendig for å bruke Academic Benchmarks"
@@ -1196,6 +1197,11 @@ nn:
         orbis: 
           parameters: 
             note: "Emne med skjulte oppgåver kan vise unøyaktige resultat i rapporten."
+    student_assignment_grades_csv_parameters: 
+      account_reports: 
+        auburn: 
+          pseudonym_ids: 
+            field: Påloggings-ID-ar
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -1442,6 +1448,7 @@ nn:
   all_account_types_e83c1516: "Alle kontoar"
   all_accounts_3bafc860: "Alle kontoar"
   all_changes_were_saved_f6f3ddcc: "Alle endringar er lagra"
+  all_close_dates_must_be_on_or_after_the_end_date_b898d85d: "Alle lukkedatoar må vere på eller etter sluttdatoen"
   all_configured_apps_a14eef0a: "Alle konfigurerte appar"
   all_courses_a7dbb853: "Alle emne"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alle datofelt må finnast og vere korrekt formaterte"
@@ -6559,6 +6566,8 @@ nn:
       submitting: "Leverer ...\""
     cancel_button: Avbryt
     click_to_change: "Klikk for å teste eit anna resultat"
+    column_header: 
+      this_assignment_is_muted: "Denne oppgåva er skjult"
     confirms: 
       delete_comment: "Er du sikker på at du vil slette denne kommentaren?"
       unsaved_changes: |-
@@ -6827,6 +6836,7 @@ nn:
       see_scoring_details: "Sjå resultatdetaljar"
       see_scoring_details_screenreader: "Sjå resultatdetaljar"
       see_turnitin_results: "Sjå Turnitin-resultat"
+      see_vericite_results: "Sjå VeriCite-resultat"
       student_mute_legend: "Faglæraren jobbar med å setje karakterar. Når faglæraren jobbar med karakterane, er karakter- og kommentarinformasjon ikkje tilgjengeleg."
       student_mute_notification: "Faglærar jobbar med å setje karakter"
       submission_score: "*%{score}* av %{possible}"
@@ -13208,7 +13218,7 @@ nn:
   screenreader_gradebook: 
     assignment_information: 
       actions: 
-        assignment_is_muted: Skjult?"
+        assignment_is_muted: Skjult?
         curve_grades: "Juster karakterer"
         message_students: "Send melding til studentar som ..."
         set_default_grade: "Bruk standardkarakter"
@@ -14464,9 +14474,11 @@ nn:
   student_5da6bfd1: Student
   student_921b864d: student
   student_assignment_outcome_map_title: Studentkompetanse
+  student_details_49901ceb: Studentdetaljar
   student_extensions_d35a907: "Utvidingar for studentar"
   student_id: Student-ID
   student_id_7cc45fb5: student-ID
+  student_id_a61d78c7: Student-ID
   student_interactions_report_7717b685: "Rapport studentsamhandlingar"
   student_messages_b0a242d: Studentbeskjeder
   student_must_complete_one_of_these_requirements_6046eb3a: "Studenten må fullføre eit av desse krava"
@@ -14474,6 +14486,7 @@ nn:
   student_name_b446c661: studentnamn
   student_name_c45b2a7: Studentnamn
   student_name_hidden_b894d102: "student (namn er skjult)"
+  student_name_options_cb029725: "Alternativ for studentnamn"
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Studentnamn må vere skjulte på grunn av krav om anonym karaktersetjing."
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Studentnamn må vere skjulte på fordi dette er ei anonym undersøking."
   student_outcome_gradebook_description: |-
@@ -14481,13 +14494,21 @@ nn:
       i forhold til læringsmål i kurset. Måla er presenterte i eit karakterbokliknande
       format og framgangen vert vist både som numerisk resultat og som meistring/nær
       meistring/trengst forbetring."
+  student_sis_6721040e: Student-SIS
   student_sis_d9f0cd39: student-SIS
   student_viewed_document_9065adb8: "Student opna dokumentet"
+  studentcount_student_scores_updated_232ad7b7: 
+    one: "1 studentresultat er oppdatert"
+    other: "%{studentCount} studentresultat er oppdaterte"
+  studentcount_students_will_get_num_points_fdd43b55: 
+    one: "1 student får %{num} poeng"
+    other: "%{studentCount} studentar får %{num} poeng"
   students_1b8cd07b: Studentar
   students_being_observed_4de3e520: "Studentar er observerte"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Studentane kan ikkje sjå prøverespons etter at kurset er fullført"
   students_have_either_already_taken_or_started_taki_a076336: "Studentar har enten gjennomført eller er i gang med å ta denne prøva. Ver forsiktig med å redigere ho. Dersom du endrar prøvespørsmål på ein markant måte, bør du vurdere å karaktersetje på nytt dei studentane tok den tidlegare versjonen av prøva."
   students_must_complete_all_of_these_requirements_15fa97f7: "Studentane må fullføre alle desse krava"
+  students_must_sign_up_in_groups_681206ac: "Studentar må melde seg på gruppevis."
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "Studentar som har teke prøva (%{count})"
     other: "Studentar som har teke prøva (%{count})"
@@ -14539,6 +14560,7 @@ nn:
   subaccount_91f4c279: Underkonto
   subdomain_url_1e43b6f0: Underdomene-URL
   subject_114b2e98: Emne
+  subject_must_contain_fewer_than_255_characters_2e72cd02: "Emne må innehalde færre enn 255 teikn"
   subject_reply_to: "Ang.: %{subject}"
   submission: 
     atom_no_author: "Utan forfattar"
@@ -14621,6 +14643,7 @@ nn:
       peer_review_not_done: "**Denne fagfellevurderinga er ikkje fullført.**  Du må legge inn minst ein kommentar for at vurderinga skal reknast for fullført."
       peer_review_not_done_rubric: "**Denne kverandrevurderinga er ikkje fullført.**  Du må legge inn minst ein kommentar og fylle ut vurderingskriteriet til høgre, for at vurderinga skal reknast for fullført."
       peer_review_steps_complete: "Du har fullført trinna som krevst for denne fagfellevurderinga."
+      see_vericite_results: "Sjå VeriCite-resultat"
       sent_to_whole_group: "Send kommentar til heile gruppa"
       show_rubric: "Vis vurderingskriterium"
       speedgrader: SpeedGrader™
@@ -14646,6 +14669,7 @@ nn:
       preview_submission: "Førehandsvis innleveringa"
       preview_title: "Førehandsvising av %{title}"
       quiz_submission: "Innleveringa er ei prøveinnlevering. Omdirigerer til prøvesida."
+      see_vericite_results: "Sjå VeriCite-resultat"
       show_entire_discussion: "Vis heile diskusjonen"
       titles: 
         external_link: "Lenker til eit ekstern område."
@@ -14663,16 +14687,20 @@ nn:
   submit_a3cc6859: Send!
   submit_a_feature_idea_2d4baa3d: "Send ein funksjonsidé"
   submit_assignment_5799b4e3: "Lever oppgåve"
+  submit_comment_commenttext_8e5638d7: "Send kommentar: %{commentText}"
   submit_media_file_f334c1ba: "Send mediefil"
   submit_ticket_5515ffd: "Send feilmelding"
   submitted_at_4d5ea3aa: Levert
   submitted_datetime_fa2e9287: "Levert: %{dateTime}"
   submitted_files_82dd3009: "Leverte filer"
   submitted_late_3741af29: "Levert etter fristen"
+  submitted_submitdate_bdd3bf09: "Innlevert %{submitDate}"
   submitting_types_7c5a7096: "Leverer: %{types}"
   success_grades_were_published_to_the_grade_book_da3b4fba: "Positivt utfall. Karakterane er publiserte i karakterboka."
   successfully_created_a_set_38374719: "Settet er oppretta"
   successfully_moved_model_to_newgroup_f7b7aa5a: "Flytta %{model} til %{newGroup}"
+  successfully_resubmitted_to_turnitin_c908de0f: "Levert på nytt til Turnitin."
+  successfully_resubmitted_to_vericite_dab924b6: "Levert på nytt til VeriCite."
   sum_of_all_files_in_mb_2b705055: "summen av alle filene i MB"
   summary_statistics_f74852a5: "Samandrag av statistikk"
   support: 
@@ -14699,6 +14727,7 @@ nn:
       support_desk_livechat: "Brukarstøtte direkte"
   sweden_1add8e79: Sverige
   sweden_46_55cc3620: "Sverige (+46)"
+  switch_group_42e23c11: "Byt gruppe"
   switch_style_checkbox_97a44345: "Avmerkingsboks for byte"
   switch_to_3f310557: "Byt til"
   switch_to_graph_view_f1153fc1: "Bytt til grafisk vising"
@@ -14710,6 +14739,7 @@ nn:
   switzerland_f4f7137c: Sveits
   syllabus: Kursoversikt
   syllabus_f191f65b: Kursoversikt
+  syllabus_visibility_options_a81ef419: "Alternativ for kursoversiktsynlegheit"
   system_default_language_28a1052d: "Systemstandard (%{language})"
   tab_1_3d6b3fb: "Fane 1"
   tab_1_content_8944c219: "Fane 1 innhald"
@@ -14761,8 +14791,10 @@ nn:
   term_41f37cae: semester
   term_created_27d27c2b: "Semester oppretta"
   term_e1c1d390: Semester
+  term_id_2e802ed1: Semester-ID
   term_id_74b933ef: semester-ID
   term_sis_7edb8ab7: semester-SIS
+  term_sis_bfe0ae01: Semester-SIS
   term_start_b8c2aad1: semesterstart
   term_starting_5bd5e070: "Semester startar"
   terms: 
@@ -14836,9 +14868,16 @@ nn:
       Canvas sin SAML entitets-ID er %{metadata_url}, og metadata frå tjenesteleverandør
       er tilgjengeleg på denne URL-en.
   the_course_link_validator_searches_through_course__76f0bc63: "Kurskoplingsvalidatoren søker i kursinnhaldet og returnerer alle lenker som er ugyldige eller ikkje responderer. Merk at nokre av koblingane som merkast som ikkje responsive kun er utilgjengeleg frå våre serverar og vil fortsatt vere gyldig for studentar."
+  the_download_process_has_started_this_can_take_awh_7e616db1: |-
+      Nedlastingsprosessen har starta. Dette
+      kan ta litt tid for store kurs. Du kan forlate
+      sida og får ein e-post når nedlastinga
+      er fullført.
   the_error_stack_trace_if_there_is_one_b7e008a1: "Feil stabelsporing, om gjeldande"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "I kategorien Filer kan du dele forelesingsdokument, eksempeldokument, studiehjelp – alt studentane vil laste ned.  Opplasting og organisering av filene er enkelt i Canvas.  Vi  viser deg korleis du gjer det."
   the_following_fields_are_invalid_fields_b3565800: "Følgande felt er ugyldige: %{fields}"
+  the_following_users_are_ready_to_be_added_to_the_c_1ea01560: "Følgande brukarar kan leggast til kurset. "
+  the_following_users_could_not_be_created_2573360a: "Følgande brukarar kunne ikkje opprettast. "
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Fullstendig vertsnamn for kontoen (something.instructure.com, for eksempel)"
   the_grade_for_this_assignment_will_not_sync_to_the_3bb4f6f5: "Resultatet for denne oppgåva vert ikkje synkronisert til studentsystemet/SIS. "
   the_grade_for_this_assignment_will_sync_to_the_stu_5d32cedb: "Resultatet for denne oppgåva vert synkronisert til studentsystemet/SIS. "
@@ -14847,6 +14886,7 @@ nn:
   the_grading_period_was_deleted_7814a349: "Karaktersetjingsperioden er sletta"
   the_imported_question_text_for_this_question_was_t_83b4e6fb: "Den importerte spørsmålsteksten for dette spørsmålet er for lang."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Institusjonen der du logga på er ikkje konfigurert på denne kontoen."
+  the_launched_tool_returned_an_invalid_resource_for_24512878: "Det oppstarta verktøyet returnerte ein ugyldig ressurs for denne oppgåva"
   the_material_is_in_the_public_domain_279c39a3: "Materialet er i det offentlege domenet"
   the_material_is_licensed_under_creative_commons_3242cb5e: "Materialet er lisensiert under Creative Commons"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "Materialet er underlagt unntak frå rimeleg bruk"
@@ -14862,6 +14902,7 @@ nn:
       Canvas brukarstøtte
   the_module_item_is_locked_27fe420b: "Modulelementet er låst."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Det siste resultata for brukar %{current_user_name} og resultat %{outcome_name}."
+  the_next_available_appointment_in_this_course_is_o_da10316c: "Neste tilgjengelege avtale i dette kurset er *%{date}*"
   the_profile_picture_has_been_reported_d609d6dd: "Profilbildet er rapportert"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Academic Benchmark-fila som ligg ved har ein feil"
   the_question_text_for_the_question_question_name_w_3a68a2c7: "Den importerte spørsmålsteksten for spørsmålet \"%{question_name}\" er for lang."
@@ -14873,6 +14914,7 @@ nn:
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Denne brukaren (%{id})er ikkje student i dette kurset"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Denne brukaren er ikkje student i dette kurset"
   the_state_parameter_is_required_ffadf213: "Tilstandsparameter er nødvendig"
+  the_title_of_the_following_question_bank_was_trunc_b6c86975: "Tittelen til følgande spørsmålsbank er avkorta: \"%{title}\""
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "ID-en som vert brukt for å vise den spesifikke syklusen for førespurnad/respons som feilrapporten oppstod i"
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "URL-adressa ein privilegert brukar kan bruke til å opptre som rapporteringsbrukaren på same sida, for å prøve å gjenskape problemet"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "URL-adressa til sida brukaren var på då feilen vart rapportert"
@@ -14885,6 +14927,7 @@ nn:
     one: "Det er 1 resultat i lista"
     other: "Det er %{count} resultat i lista"
   there_are_no_announcements_for_this_course_5ee649c3: "Finn ikkje kunngjeringar for dette kurset."
+  there_are_no_available_signups_for_this_course_26b05c56: "Det er ingen ledige plassar på dette kurset."
   there_are_no_unsaved_changes_9276e87c: "Det finst ingen endringar som ikkje er lagra"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Det oppstod eit problem hjå IdP-en under utlogging"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Det oppstod eit problem under sletting av karaktersetjingsperioden"
@@ -14895,6 +14938,7 @@ nn:
   there_was_a_problem_logging_in_at_institution_5a298155: "Det oppstod eit problem under pålogging til %{institution}"
   there_was_a_problem_saving_the_grading_period_243bed6c: "Det oppstod eit problem under lagring av karaktersetjingsperioden"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Det oppstod eit problem under lagring av karaktersetjingsskjemaet"
+  there_was_a_problem_sending_your_message_22b249a5: "Det oppstod eit problem under sending av meldinga."
   there_was_a_problem_submitting_your_set_27ca2ed0: "Det oppstod eit problem under innleveringa"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Det oppstod ein feil under oppstarten av verktyet"
   there_was_an_error_in_processing_your_request_6513a49a: "Det oppstod ein feil under handsaming av førespurnaden"
@@ -14907,11 +14951,17 @@ nn:
   there_was_an_error_uploading_the_image_932fc4ce: "Det oppstod feil under opplasting av bildet"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Det oppstod ein feil med spørjinga, prøv eit anna søk"
   there_were_errors_with_the_form_errors_ab5b559a: "Det oppstod feil i skjemaet: %{errors}"
+  these_credentials_are_for_academic_benchmark_api_v_324baaa4: "Denne legitimasjonen er for Academic Benchmark API v3. Ved å utelate partnarnøkkelen vil importfunksjonen bruke Academic Benchmark API v1 som standard. "
+  these_credentials_are_for_academic_benchmark_api_v_952718b1: "Denne legitimasjonen er for Academic Benchmark API v1, som vil bli nedprioritert i framtidige versjonar. "
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Desse karaktersetjingsperiodane er oppretta for deg av ein administrator."
+  this_action_has_been_disabled_by_your_admin_5e34bfa0: "Handlinga er deaktivert av administrator. "
+  this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Denne oppgåva vert ikkje rekna med i sluttresultatet"
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Denne oppgåva vert ikkje rekna med i sluttresultatet"
   this_assignment_has_been_excused_87f1dc13: "Oppgåva er fritatt."
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Oppgåva er fjerna og er ikkje med i den totale utrekninga"
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: "Oppgåva er fritatt og er ikkje med i den totale utrekninga"
+  this_assignment_is_in_a_closed_grading_period_for__a22bb4ed: "Oppgåva er i ein lukka karaktersetjingsperiode for denne studenten"
+  this_assignment_is_muted_915e2dab: "Denne oppgåva er skjult"
   this_assignment_is_overdue_a44bea3b: "Innleveringsfristen for oppgåva er passert"
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Denne oppgåva tel ikkje lenger for karakteren din."
   this_conference_may_be_recorded_f76deeeb: "Det kan verte opptak av konferansen."
