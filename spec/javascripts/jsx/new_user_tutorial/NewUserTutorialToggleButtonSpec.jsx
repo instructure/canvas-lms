@@ -9,13 +9,13 @@ define([
 ], (React, { shallow }, NewUserTutorialToggleButton, { default: IconArrowOpenLeftLine }, { default: IconArrowOpenRightLine }, createTutorialStore) => {
   QUnit.module('NewUserTutorialToggleButton Spec');
 
-  test('Deafaults to collapsed', () => {
+  test('Deafaults to expanded', () => {
     const store = createTutorialStore();
     const wrapper = shallow(
       <NewUserTutorialToggleButton store={store} />
     );
 
-    ok(wrapper.state('isCollapsed'))
+    ok(!wrapper.state('isCollapsed'))
   });
 
   test('Toggles isCollapsed when clicked', () => {
@@ -29,11 +29,11 @@ define([
     );
 
     wrapper.simulate('click', fakeEvent);
-    ok(!wrapper.state('isCollapsed'))
+    ok(wrapper.state('isCollapsed'))
   });
 
   test('shows IconArrowOpenLeftLine when isCollapsed is true', () => {
-    const store = createTutorialStore();
+    const store = createTutorialStore({ isCollapsed: true });
     const wrapper = shallow(
       <NewUserTutorialToggleButton store={store} />
     );

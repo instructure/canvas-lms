@@ -3,8 +3,8 @@ define([
 ], (createTutorialStore) => {
   QUnit.module('createTutorialStore test');
 
-  test('sets isCollapsed to true initially', () => {
+  test('sets isCollapsed to false initially', () => {
     const store = createTutorialStore();
-    ok(store.getState().isCollapsed);
+    ok(!store.getState().isCollapsed);
   });
 });

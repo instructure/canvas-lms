@@ -12,7 +12,13 @@ define([
   const getDefaultProps = overrides => (
     Object.assign({}, {
       label: 'TutorialTray Test',
-      returnFocusToFunc () {},
+      returnFocusToFunc () {
+        return {
+          focus () {
+            return document.body;
+          }
+        }
+      },
       store
     }, overrides)
   );
@@ -64,6 +70,6 @@ define([
 
     wrapper.instance().handleToggleClick();
 
-    ok(!store.getState().isCollapsed);
+    ok(store.getState().isCollapsed);
   });
 });

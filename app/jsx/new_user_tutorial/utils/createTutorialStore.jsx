@@ -1,7 +1,6 @@
 define(['jsx/shared/helpers/createStore'], (createStore) => {
-
   const defaultState = Object.freeze({
-    isCollapsed: true
+    isCollapsed: false
   });
 
   const createTutorialStore = (initialState = defaultState) => {
