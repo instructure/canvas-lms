@@ -10,12 +10,13 @@ module Exporters
       @course = @content_export.context
       @context_id = @course.id
       @logger = Rails.logger
-      # TO-DO: initialize @quiz; we need pass in the ID of the
+      @quiz = course.quizzes.find(content_export.selected_content)
+      # TO-DO: we need pass in the ID of the
       # quiz from the view, which is not hooked up yet
     end
 
     def build_assignment_payload
-      assignment_title = "Cloned Quiz" # TO-DO: Replace with quiz.title
+      assignment_title = @quiz.title
       {
         assignment: {
           title: assignment_title
@@ -24,7 +25,7 @@ module Exporters
       # TO-DO: Payload should look like the example below
       # {
       #   assignment: {
-      #     title: "Some Name"
+      #     title: @quiz.title
       #     resouce_link_id: "SHA from Assignment Creation"
       #     qti_export: {
       #       content_url: "Endpoint for the export"
