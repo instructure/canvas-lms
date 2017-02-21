@@ -1771,6 +1771,7 @@ class ApplicationController < ActionController::Base
   end
 
   def json_cast(obj)
+    obj = obj.as_json if obj.respond_to?(:as_json) unless obj.is_a?(Hash) || obj.is_a?(Array)
     stringify_json_ids? ? StringifyIds.recursively_stringify_ids(obj) : obj
   end
 
