@@ -337,9 +337,10 @@ ConditionalRelease, deparam, flashMessage, numberHelper) ->
       if @isTopic() && data.set_assignment is '1'
         if @assignmentGroupSelector?
           errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
-        data2 =
-          assignment_overrides: @dueDateOverrideView.getAllDates()
-        errors = @dueDateOverrideView.validateBeforeSave(data2, errors)
+        validateBeforeSaveData =
+          assignment_overrides: @dueDateOverrideView.getAllDates(),
+          postToSIS: data.assignment.postToSIS()
+        errors = @dueDateOverrideView.validateBeforeSave(validateBeforeSaveData, errors)
         errors = @_validatePointsPossible(data, errors)
         errors = @_validateTitle(data, errors)
       else
