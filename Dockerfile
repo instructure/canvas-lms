@@ -52,6 +52,7 @@ COPY . $APP_HOME
 RUN mkdir -p log \
             tmp \
             public/javascripts/client_apps \
+            public/javascripts/compiled \
             public/dist \
             public/assets \
   && chown -R docker:docker ${APP_HOME} /home/docker
