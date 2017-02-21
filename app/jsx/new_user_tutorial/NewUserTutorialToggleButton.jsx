@@ -2,10 +2,10 @@ define([
   'react',
   'i18n!new_user_tutorial',
   'instructure-ui/Button',
-  'instructure-icons/react/Line/IconArrowOpenLeftLine',
-  'instructure-icons/react/Line/IconArrowOpenRightLine',
+  'instructure-icons/react/Line/IconMoveLeftLine',
+  'instructure-icons/react/Line/IconMoveRightLine',
   'jsx/shared/proptypes/plainStoreShape'
-], (React, I18n, { default: Button }, { default: IconArrowOpenLeftLine }, { default: IconArrowOpenRightLine }, plainStoreShape) => {
+], (React, I18n, { default: Button }, { default: IconMoveLeftLine }, { default: IconMoveRightLine }, plainStoreShape) => {
   class NewUserTutorialToggleButton extends React.Component {
 
     static propTypes = {
@@ -51,8 +51,8 @@ define([
         >
           {
             (this.state.isCollapsed) ?
-            (<IconArrowOpenLeftLine title={I18n.t('Expand tutorial tray')} />) :
-            (<IconArrowOpenRightLine title={I18n.t('Collapse tutorial tray')} />)
+            (<IconMoveLeftLine title={I18n.t('Expand tutorial tray')} />) :
+            (<IconMoveRightLine title={I18n.t('Collapse tutorial tray')} />)
           }
         </Button>
       );

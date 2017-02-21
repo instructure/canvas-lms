@@ -11,7 +11,7 @@
     "canvas_offline_course_viewer": "https://github.com/instructure/canvas_offline_course_viewer.git#0.2.1",
     "fullcalendar": "https://github.com/ryankshaw/fullcalendar.git#aa686b36d10cee1e1e3ec7c7784145e46667d47d",
     "instructure-ui": "0.18.2-bugfix.12",
-    "instructure-icons": "1.1.2",
+    "instructure-icons": "1.2.1",
     "tinymce": "4.1.9"
   },
   "devDependencies": "the first group is all the things our build tooling needs",
