@@ -125,13 +125,12 @@ describe "Gradezilla" do
   end
 
   it "should validate assignment details", priority: "1", test_id: 210048 do
-    pending('TODO: Refactor this and add it back as part of CNVS-35031')
     submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
 
     gradezilla_page.visit(@course)
 
-    open_assignment_options(1)
-    f('[data-action="showAssignmentDetails"]').click
+    gradezilla_page.open_assignment_options(1)
+    f('[data-menu-item-id="show-assignment-details"]').click
     details_dialog = f('#assignment-details-dialog')
     expect(details_dialog).to be_displayed
     table_rows = ff('#assignment-details-dialog-stats-table tr')

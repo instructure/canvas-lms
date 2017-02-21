@@ -101,7 +101,8 @@ define [
       assignment:@assignment,
       students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment)
     })=>
-      new AssignmentDetailsDialog(opts)
+      dialog = new AssignmentDetailsDialog(opts)
+      dialog.show()
 
     messageStudentsWho: (opts={
       assignment:@assignment,

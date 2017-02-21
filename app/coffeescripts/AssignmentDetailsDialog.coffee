@@ -9,6 +9,8 @@ define [
 
   class AssignmentDetailsDialog
     constructor: ({@assignment, @students}) ->
+
+    show: () ->
       {scores, locals} = @compute()
       tally = 0
       width = 0

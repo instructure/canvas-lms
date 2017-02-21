@@ -15,7 +15,7 @@ define([
   { default: Link }, { MenuItem }, { default: PopoverMenu }, { default: Typography },
   messageStudents, MessageStudentsWhoHelper, I18n
 ) => {
-  const { arrayOf, bool, instanceOf, number, shape, string } = React.PropTypes;
+  const { arrayOf, bool, func, instanceOf, number, shape, string } = React.PropTypes;
 
   class AssignmentColumnHeader extends React.Component {
     static propTypes = {
@@ -39,7 +39,11 @@ define([
           submittedAt: instanceOf(Date)
         }).isRequired,
       })).isRequired,
-      submissionsLoaded: bool.isRequired
+      submissionsLoaded: bool.isRequired,
+      assignmentDetailsAction: shape({
+        disabled: bool.isRequired,
+        onSelect: func.isRequired
+      }).isRequired
     };
 
     static renderMutedIcon (screenreaderText) {
@@ -92,6 +96,17 @@ define([
       );
     }
 
+    renderShowAssignmentDetailsAction () {
+      return (
+        <MenuItem
+          disabled={this.props.assignmentDetailsAction.disabled}
+          onSelect={this.props.assignmentDetailsAction.onSelect}
+        >
+          <span data-menu-item-id="show-assignment-details">{I18n.t('Assignment Details')}</span>
+        </MenuItem>
+      );
+    }
+
     renderAssignmentLink () {
       const assignment = this.props.assignment;
       let assignmentTitle;
@@ -120,12 +135,11 @@ define([
 
     renderPointsPossible () {
       const assignment = this.props.assignment;
-
-      if (!assignment.pointsPossible) return '';
+      const pointsPossible = I18n.n(assignment.pointsPossible || 0);
 
       return (
         <div className="assignment-points-possible">
-          { I18n.t('Out of %{pointsPossible}', { pointsPossible: I18n.n(assignment.pointsPossible) }) }
+          { I18n.t('Out of %{pointsPossible}', { pointsPossible }) }
         </div>
       )
     }
@@ -152,6 +166,7 @@ define([
               </span>
             }
           >
+            {this.renderShowAssignmentDetailsAction()}
             {this.renderMessageStudentsWhoMenu()}
           </PopoverMenu>
         </div>

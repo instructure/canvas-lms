@@ -4,8 +4,8 @@ define([
   'enzyme',
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
 ], (React, TestUtils, { mount }, AssignmentColumnHeader) => {
-  const assignmentProp = () => (
-    {
+  function assignmentProp () {
+    return {
       id: '1',
       htmlUrl: 'http://assignment_htmlUrl',
       invalid: false,
@@ -15,10 +15,11 @@ define([
       pointsPossible: 13,
       submissionTypes: ['online_text_entry'],
       courseId: '42'
-    }
-  );
-  const studentsProp = () => (
-    [
+    };
+  }
+
+  function studentsProp () {
+    return [
       {
         id: '11',
         name: 'Clark Kent',
@@ -46,15 +47,19 @@ define([
           submittedAt: undefined
         }
       }
-    ]
-  );
+    ];
+  }
 
   QUnit.module('AssignmentColumnHeader - base behavior', {
     setup () {
       const props = {
         assignment: assignmentProp(),
         students: studentsProp(),
-        submissionsLoaded: true
+        submissionsLoaded: true,
+        assignmentDetailsAction: {
+          disabled: false,
+          onSelect: this.stub()
+        }
       };
 
       this.renderOutput = mount(<AssignmentColumnHeader {...props} />);
@@ -105,12 +110,67 @@ define([
     equal(actualElements.props().title, 'Assignment #1 Options');
   });
 
+  QUnit.module('AssignmentColumnHeader - Assignment Details Action', {
+    setup () {
+      this.onSelectStub = this.stub();
+      this.props = {
+        assignment: assignmentProp(),
+        students: studentsProp(),
+        submissionsLoaded: true,
+        assignmentDetailsAction: {
+          disabled: false,
+          onSelect: this.onSelectStub
+        }
+      };
+    },
+
+    teardown () {
+      this.renderOutput.unmount();
+    }
+  });
+
+  test('shows the menu item in an enabled state', function () {
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('PopoverMenu').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="show-assignment-details"]');
+
+    equal(specificMenuItem.textContent, 'Assignment Details');
+    notOk(specificMenuItem.parentElement.getAttribute('aria-disabled'));
+  });
+
+  test('disables the menu item when the disabled prop is true', function () {
+    this.props.assignmentDetailsAction.disabled = true;
+
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('PopoverMenu').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="show-assignment-details"]');
+
+    equal(specificMenuItem.parentElement.getAttribute('aria-disabled'), 'true');
+  });
+
+  test('clicking the menu item invokes the Assignment Details dialog', function () {
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('PopoverMenu').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="show-assignment-details"]');
+
+    specificMenuItem.click();
+
+    equal(this.onSelectStub.callCount, 1);
+  });
+
   QUnit.module('AssignmentColumnHeader - Message Students Who Menu', {
     setup () {
       this.props = {
         assignment: assignmentProp(),
         students: studentsProp(),
-        submissionsLoaded: true
+        submissionsLoaded: true,
+        assignmentDetailsAction: {
+          disabled: false,
+          onSelect: this.stub()
+        }
       };
     },
 
@@ -158,19 +218,24 @@ define([
       this.props = {
         assignment: this.assignment,
         students: [],
-        submissionsLoaded: false
+        submissionsLoaded: false,
+        assignmentDetailsAction: {
+          disabled: false,
+          onSelect: this.stub()
+        }
       }
-    }
+    },
   });
 
-  test('does not render points possible when the assignment has no possible points', function () {
+  test('renders 0 points possible when the assignment has no possible points', function () {
     this.assignment.pointsPossible = undefined;
 
     this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
 
     const actualElements = this.renderOutput.find('.assignment-points-possible');
 
-    equal(actualElements.length, 0);
+    equal(actualElements.length, 1);
+    equal(actualElements.props().children, 'Out of 0');
   });
 
   test('renders a muted icon when the assignment is muted', function () {

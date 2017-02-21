@@ -49,6 +49,7 @@ define [
   'compiled/util/NumberCompare'
   'compiled/util/natcompare'
   'str/htmlEscape'
+  'jsx/gradezilla/shared/AssignmentDetailsDialogManager',
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
@@ -86,10 +87,10 @@ define [
   GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
-  GradebookHeaderMenu, NumberCompare, natcompare, htmlEscape, AssignmentColumnHeader, AssignmentGroupColumnHeader,
-  StudentColumnHeader, TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore,
-  PostGradesApp, SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView,
-  GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper
+  GradebookHeaderMenu, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, AssignmentColumnHeader,
+  AssignmentGroupColumnHeader, StudentColumnHeader, TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu,
+  ActionMenu, PostGradesStore, PostGradesApp, SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate,
+  SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper
 ) ->
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
     component = React.createElement(reactClass, props, children)
@@ -1743,6 +1744,10 @@ define [
 
         studentRecord
 
+      assignmentDetailsDialogManager = new AssignmentDetailsDialogManager(
+        assignment, students, @contentLoadStates.submissionsLoaded
+      )
+
       {
         assignment:
           htmlUrl: assignment.html_url
@@ -1756,6 +1761,9 @@ define [
           courseId: assignment.course_id
         students: students
         submissionsLoaded: @contentLoadStates.submissionsLoaded
+        assignmentDetailsAction:
+          disabled: !assignmentDetailsDialogManager.isDialogEnabled(),
+          onSelect: assignmentDetailsDialogManager.showDialog
       }
 
     renderAssignmentColumnHeader: (assignmentId) =>

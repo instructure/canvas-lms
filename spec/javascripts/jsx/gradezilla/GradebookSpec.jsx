@@ -1111,6 +1111,13 @@ define([
     equal(props.assignment.name, 'Math Assignment');
   });
 
+  test('includes props for the Assignment Details action', function () {
+    const props = this.createGradebook().getAssignmentColumnHeaderProps('201');
+    ok(props.assignmentDetailsAction, 'Assignment Details action config is present');
+    ok('disabled' in props.assignmentDetailsAction, 'props include "disabled"');
+    equal(typeof props.assignmentDetailsAction.onSelect, 'function', 'props include "onSelect"');
+  });
+
   QUnit.module('Gradebook#getAssignmentGroupColumnHeaderProps', {
     createGradebook (options = {}) {
       const gradebook = createGradebook({
