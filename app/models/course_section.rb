@@ -232,7 +232,8 @@ class CourseSection < ActiveRecord::Base
     if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
       old_course.send_later_if_production(:update_account_associations) unless Course.skip_updating_account_associations?
     end
-    Enrollment.send_now_or_later(opts.include?(:run_jobs_immediately) ? :now : :later, :recompute_final_score, user_ids, course.id)
+    recompute_method = opts.include?(:run_jobs_immediately) ? :recompute_final_score : :recompute_final_score_in_singleton
+    Enrollment.send(recompute_method, user_ids, course.id)
   end
 
   def crosslist_to_course(course, *opts)

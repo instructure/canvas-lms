@@ -399,9 +399,7 @@ class Submission < ActiveRecord::Base
             student_id: self.user_id,
             assignment_id: self.assignment_id
           )
-          Enrollment.send_later_if_production_enqueue_args(
-            :recompute_final_score,
-            { run_at: 3.seconds.from_now },
+          Enrollment.recompute_final_score_in_singleton(
             self.user_id,
             self.context.id,
             grading_period_id: grading_period_id,
