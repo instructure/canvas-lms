@@ -77,7 +77,7 @@ namespace :js do
         puts "Building client app '#{app_name}'"
 
         if File.exists?('./package.json')
-          output = `npm install` rescue `npm cache clean && npm install`
+          output = `yarn install || npm install` rescue `npm cache clean && npm install`
           unless $?.exitstatus == 0
             puts "INSTALL FAILURE:\n#{output}"
             raise "Package installation failure for client app #{app_name}"
@@ -150,6 +150,7 @@ namespace :js do
 
   desc "Build webpack js"
   task :webpack do
+    puts "this webpack rake task is going away. just run `yarn run webpack-production` or `yarn run webpack-development` directly."
     if CANVAS_WEBPACK
       if ENV['RAILS_ENV'] == 'production' || ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
         puts "--> Building PRODUCTION webpack bundles"
@@ -209,7 +210,7 @@ namespace :js do
   desc "Ensure up-to-date node environment"
   task :npm_install do
     puts "node is: #{`node -v`.strip} (#{`which node`.strip})"
-    raise 'error running npm install' unless `npm install`
+    raise 'error running yarn install' unless `yarn install || npm install`
   end
 
   desc "Run Gulp Rev, for fingerprinting assets"

@@ -39,13 +39,13 @@ the translations (eg when you run webpack-production), make sure you've
 run "rake i18nliner:generate_js" first so translations are in place,
 webpack depends on those already existing. You can use these scripts with "npm run":
 
-`npm run webpack`
+`yarn run webpack`
 
 This will build uncompressed js with eval'd sourcemaps, useful for development.
 It also runs webpack with the "--watch" option so as you continue to
 change things your updates will get compiled quickly.
 
-`npm run webpack-production`
+`yarn run webpack-production`
 
 This uglifies the resulting bundles, and takes longer.  Don't use for development.
 
@@ -68,7 +68,7 @@ to see webpack's js instead of the default requirejs loaded assets.
 ### Running js tests with webpack
 
 Lets say you are working on the “dashboard_cards” feature, just run:
- `npm run jspec-watch spec/javascripts/jsx/dashboard_card`
+ `yarn run jspec-watch spec/javascripts/jsx/dashboard_card`
 While you write code and it will have a watcher that catches
 any changes and re-runs just the dashboard_card specs if you save any
 file that went into it. It should run & reload in less than a few 
@@ -76,7 +76,7 @@ seconds. You can give it the path to a specific spec file or have it
 run an entire directory.
 
 Or, if you are working on something that might touch a lot of stuff, run:
-`npm run test-watch`
+`yarn run test-watch`
 and while you are changing stuff, it will run *all* the QUnit specs on
 any change. It should only take a couple seconds for webpack to process
 the file change and to reload the specs in the browser.
@@ -87,7 +87,7 @@ more info on how it works.
 
 To run all the tests, you can run:
 
-`npm test`
+`yarn test`
 
 If you are using docker and want to run them all in a headless container you can 
 do so with with:
