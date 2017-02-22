@@ -159,7 +159,7 @@ class UsersController < ApplicationController
   before_action :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
     :user_dashboard, :toggle_recent_activity_dashboard, :masquerade, :external_tool,
-    :dashboard_sidebar, :settings, :all_menu_courses, :activity_stream, :activity_stream_summary]
+    :dashboard_sidebar, :settings, :activity_stream, :activity_stream_summary]
   before_action :require_registered_user, :only => [:delete_user_service,
     :create_user_service]
   before_action :reject_student_view_student, :only => [:delete_user_service,
@@ -1838,12 +1838,6 @@ class UsersController < ApplicationController
     respond_to do |format|
       format.atom { render :text => feed.to_xml }
     end
-  end
-
-  def all_menu_courses
-    render :json => Rails.cache.fetch(['menu_courses', @current_user].cache_key) {
-      map_courses_for_menu(@current_user.courses_with_primary_enrollment)
-    }
   end
 
   def teacher_activity

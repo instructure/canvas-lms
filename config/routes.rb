@@ -656,7 +656,6 @@ CanvasRails::Application.routes.draw do
   get 'images/thumbnails/show/:id/:uuid' => 'files#show_thumbnail', as: :show_thumbnail_image
   post 'images/users/:user_id/report' => 'users#report_avatar_image', as: :report_avatar_image
   put 'images/users/:user_id' => 'users#update_avatar_image', as: :update_avatar_image
-  get 'all_menu_courses' => 'users#all_menu_courses'
   get 'grades' => 'users#grades'
   get 'grades_for_student' => 'users#grades_for_student'
 

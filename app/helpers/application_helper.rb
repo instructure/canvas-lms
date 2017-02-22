@@ -610,44 +610,6 @@ module ApplicationHelper
     mapped
   end
 
-  def menu_courses_locals
-    courses = @current_user.menu_courses
-    all_courses_count = @current_user.courses_with_primary_enrollment.size
-
-    {
-      :collection             => map_courses_for_menu(courses),
-      :collection_size        => all_courses_count,
-      :more_link_for_over_max => courses_path,
-      :title                  => t('#menu.my_courses', "My Courses"),
-      :link_text              => t('#layouts.menu.view_all_or_customize', 'View All or Customize'),
-      :edit                   => t("#menu.customize", "Customize")
-    }
-  end
-
-  def menu_groups_locals
-    {
-      :collection => @current_user.menu_data[:group_memberships],
-      :collection_size => @current_user.menu_data[:group_memberships_count],
-      :partial => "shared/menu_group_membership",
-      :max_to_show => 8,
-      :more_link_for_over_max => groups_path,
-      :title => t('#menu.current_groups', "Current Groups"),
-      :link_text => t('#layouts.menu.view_all_groups', 'View all groups')
-    }
-  end
-
-  def menu_accounts_locals
-    {
-      :collection => @current_user.menu_data[:accounts],
-      :collection_size => @current_user.menu_data[:accounts_count],
-      :partial => "shared/menu_account",
-      :max_to_show => 8,
-      :more_link_for_over_max => accounts_path,
-      :title => t('#menu.managed_accounts', "Managed Accounts"),
-      :link_text => t('#layouts.menu.view_all_accounts', 'View all accounts')
-    }
-  end
-
   def cache_if(cond, *args)
     if cond
       cache(*args) { yield }
