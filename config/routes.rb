@@ -1881,6 +1881,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :jwts) do
       post 'jwts', action: :create
+      post 'jwts/refresh', action: :refresh
     end
 
     scope(controller: :gradebook_settings) do
