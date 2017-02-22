@@ -287,6 +287,13 @@ describe SplitUsers do
       expect(submission2.reload.user).to eq user2
     end
 
+    it 'should not blow up on deleted courses' do
+      course1.enroll_student(user1, enrollment_state: 'active')
+      UserMerge.from(user1).into(user2)
+      course1.destroy
+      expect { SplitUsers.split_db_users(user2) }.not_to raise_error
+    end
+
     it 'should restore admins even with stale data' do
       admin = account1.account_users.create(user: user1)
       admin2 = sub_account.account_users.create(user: user1)
