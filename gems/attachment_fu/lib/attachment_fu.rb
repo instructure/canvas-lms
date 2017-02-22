@@ -203,8 +203,21 @@ module AttachmentFu # :nodoc:
       # thanks to test_after_commit, we can use transactional fixtures,
       # but we still need reach into connection, since we conditionally
       # use after_transaction_commit based on transaction nesting
-      def open_transactions
-        connection.instance_variable_get(:@test_open_transactions)
+      if CANVAS_RAILS4_2
+        def open_transactions
+          connection.instance_variable_get(:@test_open_transactions)
+        end
+      else
+        # count the number of transactions since the last joinable transaction
+        def open_transactions
+          stack = connection.transaction_manager.instance_variable_get(:@stack)
+          count = 0
+          stack.reverse.each do |transaction|
+            break unless transaction.joinable?
+            count += 1
+          end
+          count
+        end
       end
     else
       def open_transactions

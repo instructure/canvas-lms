@@ -125,6 +125,11 @@ module Rails5Errors
   def details
     error_collection
   end
+
+  def copy!(other)
+    @error_collection = ActiveModel::BetterErrors::ErrorCollection.new(base)
+    @error_collection.instance_variable_set(:@collection, other.error_collection.instance_variable_get(:@collection).dup)
+  end
 end
 
 module Rails5ErrorCollection

@@ -97,6 +97,9 @@ module BlankSlateProtection
         end
       end
       randomize_sequences!
+      # now delete any shard objects we created
+      Shard.delete_all
+      Shard.default(reload: true)
     end
 
     def get_sequences(connection)

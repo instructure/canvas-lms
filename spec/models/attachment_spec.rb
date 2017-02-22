@@ -309,16 +309,6 @@ describe Attachment do
         @attachment.expects(:ensure_media_object).never
         @attachment.save
       end
-
-      it "should upload immediately when in a non-joinable transaction" do
-        Attachment.connection.transaction(:joinable => false) do
-          @attachment.uploaded_data = default_uploaded_data
-          Attachment.connection.expects(:after_transaction_commit).once
-          @attachment.expects(:touch_context_if_appropriate)
-          @attachment.expects(:ensure_media_object)
-          @attachment.save
-        end
-      end
     end
   end
 
@@ -1109,7 +1099,7 @@ describe Attachment do
       thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
       expect(thumb).to eq nil
 
-      expect(@attachment).to receive(:create_or_update_thumbnail).with(anything, sz, sz) { 
+      expect(@attachment).to receive(:create_or_update_thumbnail).with(anything, sz, sz) {
         @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data)
       }
       url = @attachment.thumbnail_url(:size => "640x>")
