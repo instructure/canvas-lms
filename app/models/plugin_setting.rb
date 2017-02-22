@@ -102,14 +102,15 @@ class PluginSetting < ActiveRecord::Base
   end
 
   def self.cached_plugin_setting(name)
-    plugin_setting = MultiCache.fetch(settings_cache_key(name)) do
-      PluginSetting.find_by_name(name.to_s)
+    RequestCache.cache(settings_cache_key(name)) do
+      MultiCache.fetch(settings_cache_key(name)) do
+        PluginSetting.find_by_name(name.to_s)
+      end
     end
-    plugin_setting
   end
 
   def self.settings_for_plugin(name, plugin=nil)
-    RequestCache.cache(settings_cache_key(name)) do
+    RequestCache.cache(settings_cache_key(name.to_s + "_settings")) do
       if (plugin_setting = cached_plugin_setting(name)) && plugin_setting.valid_settings? && plugin_setting.enabled?
         plugin_setting.plugin = plugin
         settings = plugin_setting.settings
