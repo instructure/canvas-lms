@@ -74,7 +74,6 @@
     "stylelint": "7.8.0",
     "timezone": "1.0.5",
     "uglify-js": "~2.7.0",
-    "vinyl-fs": "0.3.7",
     "webpack": "2.2.1",
     "webpack-manifest-plugin": "^1.0.1",
     "webpack-parallel-uglify-plugin": "0.2.0",
