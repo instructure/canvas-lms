@@ -285,10 +285,9 @@ class AssignmentOverride < ActiveRecord::Base
     self.assignment.context.available? &&
     self.assignment.published? &&
     self.assignment.created_at < 3.hours.ago &&
-    (!self.prior_version ||
-      self.workflow_state != self.prior_version.workflow_state ||
-      self.due_at_overridden != self.prior_version.due_at_overridden ||
-      self.due_at_overridden && !Assignment.due_dates_equal?(self.due_at, self.prior_version.due_at))
+    (workflow_state_changed? ||
+      due_at_overridden_changed? ||
+      due_at_overridden && !Assignment.due_dates_equal?(due_at, due_at_was))
   end
 
   def set_title_if_needed

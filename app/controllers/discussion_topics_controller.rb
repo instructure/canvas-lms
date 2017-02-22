@@ -921,8 +921,10 @@ class DiscussionTopicsController < ApplicationController
     model_type = value_to_boolean(params[:is_announcement]) && @context.announcements.temp_record.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
     if is_new
       @topic = @context.send(model_type).build
+      prior_version = @topic.dup
     else
       @topic = @context.send(model_type).active.find(params[:id] || params[:topic_id])
+      prior_version = DiscussionTopic.find(@topic.id)
     end
 
     return unless authorized_action(@topic, @current_user, (is_new ? :create : :update))
@@ -930,7 +932,6 @@ class DiscussionTopicsController < ApplicationController
     allowed_fields = @context.is_a?(Group) ? API_ALLOWED_TOPIC_FIELDS_FOR_GROUP : API_ALLOWED_TOPIC_FIELDS
     discussion_topic_hash = params.permit(*allowed_fields)
 
-    prior_version = @topic.generate_prior_version
     process_podcast_parameters(discussion_topic_hash)
 
     if is_new
@@ -982,9 +983,7 @@ class DiscussionTopicsController < ApplicationController
         end
 
         @topic = DiscussionTopic.find(@topic.id)
-        @topic.just_created = is_new
-        @topic.prior_version = prior_version
-        @topic.broadcast_notifications
+        @topic.broadcast_notifications(prior_version)
 
         render :json => discussion_topic_api_json(@topic, @context, @current_user, session)
       else

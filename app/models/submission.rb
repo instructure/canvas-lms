@@ -1391,7 +1391,7 @@ class Submission < ActiveRecord::Base
   end
 
   def assignment_graded_in_the_last_hour?
-    self.prior_version && self.prior_version.graded_at && self.prior_version.graded_at > 1.hour.ago
+    graded_at_was && graded_at_was > 1.hour.ago
   end
 
   def teacher
