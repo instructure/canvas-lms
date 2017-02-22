@@ -76,6 +76,10 @@ define([
       reuploadSubmissionsAction: shape({
         hidden: bool.isRequired,
         onSelect: func.isRequired
+      }).isRequired,
+      muteAssignmentAction: shape({
+        disabled: bool.isRequired,
+        onSelect: func.isRequired
       }).isRequired
     };
 
@@ -166,34 +170,6 @@ define([
       );
     }
 
-    renderDownloadSubmissionsAction () {
-      if (this.props.downloadSubmissionsAction.hidden) {
-        return null;
-      }
-
-      return (
-        <MenuItem
-          onSelect={this.props.downloadSubmissionsAction.onSelect}
-        >
-          <span data-menu-item-id="download-submissions">{I18n.t('Download Submissions')}</span>
-        </MenuItem>
-      );
-    }
-
-    renderReuploadSubmissionsAction () {
-      if (this.props.reuploadSubmissionsAction.hidden) {
-        return null;
-      }
-
-      return (
-        <MenuItem
-          onSelect={this.props.reuploadSubmissionsAction.onSelect}
-        >
-          <span data-menu-item-id="reupload-submissions">{I18n.t('Re-Upload Submissions')}</span>
-        </MenuItem>
-      );
-    }
-
     render () {
       return (
         <div className="Gradebook__ColumnHeaderContent">
@@ -228,8 +204,26 @@ define([
             >
               <span data-menu-item-id="set-default-grade">{I18n.t('Set Default Grade')}</span>
             </MenuItem>
-            {this.renderDownloadSubmissionsAction()}
-            {this.renderReuploadSubmissionsAction()}
+            {
+              !this.props.downloadSubmissionsAction.hidden &&
+              <MenuItem onSelect={this.props.downloadSubmissionsAction.onSelect}>
+                <span data-menu-item-id="download-submissions">{I18n.t('Download Submissions')}</span>
+              </MenuItem>
+            }
+            {
+              !this.props.reuploadSubmissionsAction.hidden &&
+              <MenuItem onSelect={this.props.reuploadSubmissionsAction.onSelect}>
+                <span data-menu-item-id="reupload-submissions">{I18n.t('Re-Upload Submissions')}</span>
+              </MenuItem>
+            }
+            <MenuItem
+              disabled={this.props.muteAssignmentAction.disabled}
+              onSelect={this.props.muteAssignmentAction.onSelect}
+            >
+              <span data-menu-item-id="assignment-muter">
+                {this.props.assignment.muted ? I18n.t('Unmute Assignment') : I18n.t('Mute Assignment')}
+              </span>
+            </MenuItem>
           </PopoverMenu>
         </div>
       );

@@ -1159,6 +1159,13 @@ define([
     equal(typeof props.reuploadSubmissionsAction.onSelect, 'function', 'props include "onSelect"');
   });
 
+  test('includes props for the Mute Assignment action', function () {
+    const props = this.createGradebook().getAssignmentColumnHeaderProps('201');
+    ok(props.muteAssignmentAction, 'Mute Assignment action config is present');
+    ok('disabled' in props.muteAssignmentAction, 'props include "disabled"');
+    equal(typeof props.muteAssignmentAction.onSelect, 'function', 'props include "onSelect"');
+  });
+
   QUnit.module('Gradebook#getAssignmentGroupColumnHeaderProps', {
     createGradebook (options = {}) {
       const gradebook = createGradebook({

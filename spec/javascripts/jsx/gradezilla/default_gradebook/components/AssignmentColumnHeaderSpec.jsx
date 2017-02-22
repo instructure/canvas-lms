@@ -92,6 +92,10 @@ define([
           disabled: false,
           onSelect: () => {}
         },
+        muteAssignmentAction: {
+          disabled: false,
+          onSelect () {}
+        },
         students: createStudentsProp(),
         submissionsLoaded: true
       };
@@ -171,6 +175,10 @@ define([
           hidden: true,
           onSelect () {}
         },
+        muteAssignmentAction: {
+          disabled: false,
+          onSelect () {}
+        },
         students: createStudentsProp(),
         submissionsLoaded: true
       };
@@ -224,6 +232,7 @@ define([
           students={createStudentsProp()}
           downloadSubmissionsAction={{ hidden: true, onSelect () {} }}
           reuploadSubmissionsAction={{ disabled: true, hidden: true, onSelect () {} }}
+          muteAssignmentAction={{ disabled: false, onSelect () {} }}
           submissionsLoaded
         />
       );
@@ -261,7 +270,7 @@ define([
     ok(onSelectSpy.calledOnce);
   });
 
-  QUnit.module('AssignmentColumnHeader - Message Students Who Menu', {
+  QUnit.module('AssignmentColumnHeader - Message Students Who Action', {
     setup () {
       this.props = {
         assignment: createAssignmentProp(),
@@ -283,6 +292,10 @@ define([
         },
         reuploadSubmissionsAction: {
           hidden: true,
+          onSelect () {}
+        },
+        muteAssignmentAction: {
+          disabled: false,
           onSelect () {}
         },
         students: createStudentsProp(),
@@ -323,6 +336,89 @@ define([
     ok(messageStudentsStub.calledOnce);
   });
 
+  QUnit.module('AssignmentColumnHeader - Mute/Unmute Assignment Action', {
+    setup () {
+      this.assignment = createAssignmentProp();
+      this.props = {
+        assignment: this.assignment,
+        assignmentDetailsAction: {
+          disabled: false,
+          onSelect: () => {}
+        },
+        curveGradesAction: {
+          isDisabled: false,
+          onSelect: () => {}
+        },
+        setDefaultGradeAction: {
+          disabled: false,
+          onSelect: () => {}
+        },
+        downloadSubmissionsAction: {
+          hidden: false,
+          onSelect () {}
+        },
+        reuploadSubmissionsAction: {
+          hidden: false,
+          onSelect () {}
+        },
+        muteAssignmentAction: {
+          disabled: false,
+          onSelect () {}
+        },
+        students: createStudentsProp(),
+        submissionsLoaded: true
+      };
+    },
+
+    teardown () {
+      this.renderOutput.unmount();
+    }
+  });
+
+  test('shows the enabled "Mute Assignment" option when assignment is not muted', function () {
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
+
+    equal(specificMenuItem.textContent, 'Mute Assignment');
+    notOk(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'));
+  });
+
+  test('shows the enabled "Unmute Assignment" option when assignment is muted', function () {
+    this.assignment.muted = true;
+
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
+
+    equal(specificMenuItem.textContent, 'Unmute Assignment');
+    notOk(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'));
+  });
+
+  test('disables the option when prop muteAssignmentAction.disabled is truthy', function () {
+    this.props.muteAssignmentAction.disabled = true;
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
+
+    equal(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
+  });
+
+  test('clicking the option invokes prop muteAssignmentAction.onSelect', function () {
+    this.spy(this.props.muteAssignmentAction, 'onSelect');
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
+
+    specificMenuItem.click();
+
+    equal(this.props.muteAssignmentAction.onSelect.callCount, 1);
+  });
+
   QUnit.module('AssignmentColumnHeader - non-standard assignment', {
     setup () {
       this.assignment = createAssignmentProp();
@@ -346,6 +442,10 @@ define([
         },
         reuploadSubmissionsAction: {
           hidden: true,
+          onSelect () {}
+        },
+        muteAssignmentAction: {
+          disabled: false,
           onSelect () {}
         },
         students: [],
@@ -428,6 +528,10 @@ define([
         reuploadSubmissionsAction: {
           hidden: true,
           onSelect () {}
+        },
+        muteAssignmentAction: {
+          disabled: false,
+          onSelect () {}
         }
       };
     },
@@ -492,6 +596,10 @@ define([
         },
         reuploadSubmissionsAction: {
           hidden: true,
+          onSelect () {}
+        },
+        muteAssignmentAction: {
+          disabled: false,
           onSelect () {}
         }
       };
@@ -558,6 +666,10 @@ define([
         reuploadSubmissionsAction: {
           hidden: false,
           onSelect: this.stub()
+        },
+        muteAssignmentAction: {
+          disabled: false,
+          onSelect () {}
         }
       };
     },

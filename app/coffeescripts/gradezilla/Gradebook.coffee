@@ -40,6 +40,7 @@ define [
   'jsx/gradebook/GradingSchemeHelper'
   'compiled/userSettings'
   'spin.js'
+  'compiled/AssignmentMuter'
   'compiled/SubmissionDetailsDialog'
   'compiled/gradezilla/AssignmentGroupWeightsDialog'
   'compiled/gradezilla/GradeDisplayWarningDialog'
@@ -68,6 +69,7 @@ define [
   'compiled/views/gradezilla/SectionMenuView'
   'compiled/views/gradezilla/GradingPeriodMenuView'
   'compiled/gradezilla/GradebookKeyboardNav'
+  'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
   'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
@@ -87,14 +89,16 @@ define [
   'jsx/context_cards/StudentContextCardTrigger'
 ], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
-  CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog,
-  AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
-  NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, CurveGradesDialogManager,
+  CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, AssignmentMuter,
+  SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
+  SubmissionCell, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, CurveGradesDialogManager,
   SetDefaultGradeDialogManager, AssignmentColumnHeader, AssignmentGroupColumnHeader, StudentColumnHeader,
   TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp,
   SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GroupTotalCellTemplate,
-  RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper) ->
+  RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
+  assignmentHelper) ->
   IS_ADMIN = _.contains(ENV.current_user_roles, 'admin')
+
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
     component = React.createElement(reactClass, props, children)
     ReactDOM.render(component, mountPoint)
@@ -570,7 +574,7 @@ define [
 
     handleAssignmentMutingChange: (assignment) =>
       @renderAssignmentColumnHeader(assignment.id)
-      @grid.setColumns(@grid.getColumns())
+      @setAssignmentWarnings()
       @fixColumnReordering()
       @buildRows()
 
@@ -1770,6 +1774,11 @@ define [
         assignment, studentsThatCanSeeAssignment, @options.context_id, @sectionToShow,
         IS_ADMIN, @contentLoadStates.submissionsLoaded
       )
+      assignmentMuterDialogManager = new AssignmentMuterDialogManager(
+        assignment,
+        "#{@options.context_url}/assignments/#{assignmentId}/mute",
+        @contentLoadStates.submissionsLoaded
+      )
 
       {
         assignment:
@@ -1802,6 +1811,9 @@ define [
         reuploadSubmissionsAction:
           hidden: !reuploadSubmissionsManager.isDialogEnabled()
           onSelect: reuploadSubmissionsManager.showDialog
+        muteAssignmentAction:
+          disabled: !assignmentMuterDialogManager.isDialogEnabled()
+          onSelect: assignmentMuterDialogManager.showDialog
       }
 
     renderAssignmentColumnHeader: (assignmentId) =>
