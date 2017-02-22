@@ -43,7 +43,7 @@ require [
   'jqueryui/tabs'
   'compiled/registration/incompleteRegistrationWarning'
   'moment'
-], ($, _, I18n, Backbone, helpDialog, updateSubnavMenuToggle, initializeNewUserTutorials, ApplyTheme) ->
+], ($, _, I18n, Backbone, helpDialog, updateSubnavMenuToggle, initializeNewUserTutorials, {default: ApplyTheme}) ->
 
   helpDialog.initTriggers()
 
@@ -85,6 +85,7 @@ require [
 
   # setup the inst-ui default theme
   if ENV.use_high_contrast
-    ApplyTheme.default.setDefaultTheme('canvas-a11y')
+    ApplyTheme.setDefaultTheme('canvas-a11y')
   else
-    ApplyTheme.default.setDefaultTheme('canvas')
+    brandvars = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
+    ApplyTheme.setDefaultTheme('canvas', brandvars)

@@ -20,5 +20,6 @@ if (typeof ENV !== 'undefined') {
 if (ENV.use_high_contrast) {
   ApplyTheme.setDefaultTheme('canvas-a11y')
 } else {
-  ApplyTheme.setDefaultTheme('canvas')
+  const brandvars = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
+  ApplyTheme.setDefaultTheme('canvas', brandvars)
 }
