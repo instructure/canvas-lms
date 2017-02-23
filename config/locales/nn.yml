@@ -599,7 +599,7 @@ nn:
         one: "Rapportert %{count}"
         other: "Rapportert %{count}"
         zero: Rapportert
-      saving: "Lagrar ...\""
+      saving: Lagrar...
       submitted_link: 
         one: "Innlevert  %{count}"
         other: "Innlevert  %{count}"
@@ -881,7 +881,7 @@ nn:
       announcement_sent_to_subset: "Sendt til 1 / %{denominator} brukarar kvar månad"
       buttons: 
         add_users: "Du kan legge til desse brukarane"
-        continue: "Hald fram ...\""
+        continue: "Hald fram..."
         modify_users: "Gå tilbake og rediger brukarlista"
       confirm_turnitin_settings_link: "stadfest Turnitin-innstillingar"
       create_courses_description: "(Kontoadministratorar kan alltid opprette emne)"
@@ -980,7 +980,7 @@ nn:
         users_can_edit_name: "Brukarar kan redigere namnet sitt"
       links: 
         add_admins: Kontoadministratorar
-        configure_report: "Konfigurerer ...\""
+        configure_report: Konfigurerer...
         run_report: "Køyr rapport"
       login_handle_name_placeholder: "eksempel: Pålogging, brukarnamn eller student-ID"
       manual_quotas: 
@@ -993,7 +993,7 @@ nn:
         select_type_label: "Finn emne eller gruppe"
         update_button: "Oppdater kvote"
       never_allow_self_enrollment_option: Aldri
-      no_enrollment_roles: "Brukarar utan kurspåmeldingar"
+      no_enrollment_roles: "Brukarar utan emnepåmeldingar"
       no_language_preference: "Ikkje oppgitt (standardar til %{language})"
       notifications: 
         custom_name_description: "Dette vil erstatte utsjånaden på alle Canvas-varsel."
@@ -1221,7 +1221,7 @@ nn:
       account_reports: 
         default: 
           students_with_no_submissions: 
-            text: "Rapporten er for alle studentar som er registrerte i eit emne i eit bestemt semester og som ikkje har levert oppgåver i det oppgitte datointervallet i eit kurs. Rapporten inneheld ei rad per studenpåmeldingar som fyller kriteria. Datointervallet kan ikkje vere lenger enn to veker."
+            text: "Rapporten er for alle studentar som er registrerte i eit emne i eit bestemt semester og som ikkje har levert oppgåver i det oppgitte datointervallet i eit emne. Rapporten inneheld ei rad per studenpåmeldingar som fyller kriteria. Datointervallet kan ikkje vere lenger enn to veker."
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
@@ -1237,7 +1237,7 @@ nn:
           course: 
             text: Emne-ID
           parameters: 
-            note1: "Emne-ID kan stå tom slik at rapport for at alle kursa i semesteret kan køyrast."
+            note1: "Emne-ID kan stå tom slik at rapport for at alle emna i semesteret kan køyrast."
             note2: "Emne med skjulte oppgåver kan vise unøyaktige resultat i rapporten ."
     terms_parameters: 
       account_reports: 
@@ -2267,7 +2267,7 @@ nn:
       page_title: "Emneoversikt for %{course}"
     syllabus_content: 
       buttons: 
-        update_syllabus: "Oppdater kursoversikten "
+        update_syllabus: "Oppdater emneoversikten "
       headers: 
         date: Dato
         details: Detaljar
@@ -2280,7 +2280,7 @@ nn:
             Dersom du vil legge til kommentarar, klikkar du på lenka "Rediger" øvst.
       labels: 
         assignments_summary: Emnesamandrag
-        syllabus_body: "Skildring av kursoversikt"
+        syllabus_body: "Skildring av emneoversikt"
       links: 
         edit_syllabus_description: Rediger
         jump_to_today: "Hopp til i dag"
@@ -2565,7 +2565,7 @@ nn:
     update: Oppdatering
     view_account_roster: "Vis kontoliste"
     view_course_roster: "Vis kursliste"
-  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard er alle koplingar aktiverte for eit kurs.  Studentar ser ikkje lenker til klasser som er utan innhald.  Dersom du f.eks. ikkje har oppretta prøver, er ikkje koplinga til prøver synleg.  Du kan sortere og spesifikt deaktivere koplingar dersom det er område i kurset du ikkje vil at studentane skal ha tilgang til."
+  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard er alle koplingar aktiverte for eit emne.  Studentar ser ikkje lenker til klasser som er utan innhald.  Dersom du f.eks. ikkje har oppretta prøver, er ikkje koplinga til prøver synleg.  Du kan sortere og spesifikt deaktivere koplingar dersom det er område i emnet du ikkje vil at studentane skal ha tilgang til."
   by_lti_2_registration_url_e421e523: "Etter LTI 2 sin registrerings-URL"
   by_url_a163275e: "Etter URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -2685,7 +2685,7 @@ nn:
       scheduler_explanation_student_paragraph_2: "Akkurat no har ingen av faglærarane dine ledige avtaletider. Du vil få varsel om ein avtaletid blir ledig. "
       scheduler_explanation_teacher_header: "Du har ikkje oppretta avtalegrupper og det finst ingen du kan melde deg på"
       scheduler_explanation_teacher_paragraph_1: "Dette er planleggingsverktøyet. Du kan bruke det til å opprette avtalegrupper som studentane kan melde seg på."
-      scheduler_explanation_teacher_paragraph_2: "La oss seie at du ynskjer å gå gjennom ei semesteroppgåve med kvar enkelt student på kurset. Du opprettar ei ny avtalegruppe, oppgir datoar og klokkeslett du er ledig, legg inn avtalebolkar på 15 minutt og tillet berre ein student per avtale."
+      scheduler_explanation_teacher_paragraph_2: "La oss seie at du ynskjer å gå gjennom ei semesteroppgåve med kvar enkelt student på emnet. Du opprettar ei ny avtalegruppe, oppgir datoar og klokkeslett du er ledig, legg inn avtalebolkar på 15 minutt og tillet berre ein student per avtale."
       scheduler_explanation_teacher_paragraph_3: "Studentane får deretter ei fråsegn om at dei må melde seg på ein av dei spesifiserte avtalebolkane. Dei ser ein kalender med dei ledige avtalebolkane som er lagt over alle andre avtalar i kalenderen, slik at dei kan velje det tidspunktet som passar."
       scheduler_explanation_teacher_paragraph_4: "* Kom i gang no ved å klikke på knappen \"Opprett avtalegruppe\" til høgre. *"
       signed_up_for: "Du har meldt deg på *avtalegruppa %{title}*"
@@ -2908,7 +2908,7 @@ nn:
   calendar_events_api: 
     feed_title: "%{course_or_group_name} kalenderstraum"
     ics_description: "Kalenderhendingar for %{context_name}"
-    ics_description_course: "Kalenderhendingar for kurset %{course_name}"
+    ics_description_course: "Kalenderhendingar for emnet %{course_name}"
     ics_description_group: "Kalenderhendingar for gruppa %{group_name}"
     ics_description_user: "Kalenderhendingar for brukaren %{user_name}"
     ics_title: "%{course_or_group_name}-kalender i Canvas"
@@ -3742,7 +3742,7 @@ nn:
       help: 
         no_services: "Du har ikkje kopla brukarprofilen din opp mot eksterne tenester. Du kan kople Canvas-kontoen din til tenester som Twitter."
         services_private: "Du har ikkje aktivert lista over registrerte tenester. Om du aktiverer lista blir det enklare for andre emne- og gruppemedlemmar å sjå kva tenester du har kopla til Canvas-kontoen din."
-        user_services: "Andre medlemmar kan, om dei vil, la deg sjå kva eksterne tenester dei har kopla til Canvas-kontoen sin. Dette kan gjere det enklare å koordinere gruppeprosjekt og kople opp mot kvarandre utanfor kurset."
+        user_services: "Andre medlemmar kan, om dei vil, la deg sjå kva eksterne tenester dei har kopla til Canvas-kontoen sin. Dette kan gjere det enklare å koordinere gruppeprosjekt og kople opp mot kvarandre utanfor emnet."
       labels: 
         allow_view_services: "La andre emne- og gruppemedlemmar sjå kva tenester eg har kopla til profilen min"
       links: 
@@ -4271,7 +4271,7 @@ nn:
     student_summary: 
       not_sorted: "Studenttabellsamandrag er ikkje sortert"
     student_view_student_name: Teststudent
-    syllabus: Kursoversikt
+    syllabus: Emneoversikt
     wiki_permissions: 
       all: "Kven som helst"
       only_teachers: "Berre faglærarar"
@@ -4401,7 +4401,7 @@ nn:
       name: Namn
       open_enrollment: "Open påmelding"
       public_description: "Offentleg skildring"
-      public_syllabus: "Offentleg kursoversikt"
+      public_syllabus: "Offentleg emneoversikt"
       replacement_course_id: "Erstatning av emne-ID"
       restrict_enrollments_to_course_dates: "Avgrens påmeldingar til emnedatoar"
       root_account_id: Rotkonto-ID
@@ -4483,7 +4483,7 @@ nn:
     remove_user_from_course_section: "Fjern brukar frå %{course_section}"
     titles: 
       link_to_students: "Lenker til studentar"
-      move_course: "Flytt kurs"
+      move_course: "Flytt emne"
       reset_course_content_dialog_help: "Tilbakestill emneinnhald"
       section_enrollments: Klassepåmeldingar
   course_settings_sub_navigation_b95deae: "Navigering i emneinnstillingar"
@@ -4716,7 +4716,7 @@ nn:
       buttons: 
         add_section: Klasse
         edit_section_name: "Rediger klassenamn"
-        move_course: "Flytt kurs"
+        move_course: "Flytt emne"
         update_course: "Oppdater emnedetaljar"
       course_conclude_at_warning_message: "Emnet er sett til å slutte ved midnatt, som betyr at føregåande dag er den siste dagen emnet er aktivt."
       course_conclude_at_warning_title: "Emnet sluttar ved midnatt"
@@ -4725,7 +4725,7 @@ nn:
       course_overrides_term: "Dette overstyrer innstillingar for tilgjenge i semesteret."
       course_settings_title: Emneinnstillingar
       deatils: 
-        move_course: "Vel ein ny rotkonto for kurset. Etter at du har flytta kurset må du oppgi ei ny avdeling for kurset."
+        move_course: "Vel ein ny rotkonto for emnet. Etter at du har flytta emnet må du oppgi ei ny avdeling for emnet."
       drag_details: "Når du deaktiverer sider vert studentane som vitjar sidene omdirigerte til emnet si startside."
       drag_to_hide: "Dra element hit om du vil skjule dei frå studentane."
       enrollment_count: 
@@ -4734,7 +4734,7 @@ nn:
       headings: 
         details: Emnedetaljar
         grade_publishing: "Publisering av karakterar"
-        move_course: "Flytt kurset til ein annan rotkonto"
+        move_course: "Flytt emnet til ein annan rotkonto"
         navigation: Emnenavigering
         sections: "Klasser i emnet"
       help: 
@@ -4782,7 +4782,7 @@ nn:
         is_public_to_auth_users: "Gjer dette kurset synleg for godkjende brukarar"
         language: Språk
         license: Lisens
-        master_course: "Gjer kurset til eit blåkopiemne"
+        master_course: "Gjer emnet til eit blåkopiemne"
         open_enrollment: "Legg til ei \"Delta i dette emnet\"-lenke på emnet si startside"
         public_syllabus: "Gjer undervisingsplanen offentleg synleg"
         restrict_enrollments_to_course_dates: "Brukarar kan berre delta i emnet mellom desse datoane"
@@ -4816,7 +4816,7 @@ nn:
       none: Ingen
       page_title: Emnedetaljar
       section_sis_id: "SIS-ID: %{section_sis}"
-      self_enrollment: "La studentane melde seg på kurset sjølve gjennom å dele ei hemmeleg URL-adresse eller kode med dei"
+      self_enrollment: "La studentane melde seg på emnet sjølve gjennom å dele ei hemmeleg URL-adresse eller kode med dei"
       self_enrollment_without_code: "La studentane melde seg på sjølve gjennom å dele ei hemmeleg URL-adresse med dei"
       set_grading_scheme: "oppgi karakteroppsett"
       sis_source_id: SIS-ID
@@ -4877,7 +4877,7 @@ nn:
           course_activity_stream: "Emnet sin aktivitetsstraum"
           custom_page: "Undersider på startsida"
           modules: Emnemodular
-          syllabus: Kursoversikt
+          syllabus: Emneoversikt
       empty_body: "Utan innhald"
       front_page_not_set: "Startsida må fastsettast først"
       headers: 
@@ -5024,7 +5024,7 @@ nn:
     settings: Innstillingar
     site_admin: Områdeadministrator
     stats: Statistikk
-    syllabus: Kursoversikt
+    syllabus: Emneoversikt
     users: Brukarar
     wiki_pages: Sider
   css_file_709e6a83: CSS-fil
@@ -5157,18 +5157,18 @@ nn:
       - laur
     abbr_month_names: 
       - ~
-      - jan."
-      - feb."
+      - jan
+      - feb
       - mars
       - april
       - mai
       - juni
       - juli
-      - aug."
-      - sep."
-      - okt."
-      - nov."
-      - des."
+      - aug
+      - sep
+      - okt
+      - nov
+      - des
     datepicker: 
       column_headings: 
         - sun
@@ -5192,10 +5192,10 @@ nn:
       tomorrow: "I morgon"
       yesterday: "I går"
     formats: 
-      date_at_time: "%-d. %b %-k:%M"
+      date_at_time: "%b %-d %l:%M%P"
       default: "%d.%m.%Y"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      full: "%b %-d, %Y %-l:%M%P"
+      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
       long: "%-d %B %Y"
       long_with_weekday: "%A %-d. %B"
       medium: "%-d %b %Y"
@@ -5340,7 +5340,7 @@ nn:
       add_site: "Legg til område"
       invalid_email: "Ugyldig e-postadresse"
       personalizing: "Tilpassar ...\""
-      ready: Klar."
+      ready: Klar!
       registered_successfully: "Er registrert."
       specify_location: "Oppgi geografisk plassering"
       try_again: "Prøv på nytt"
@@ -5453,7 +5453,7 @@ nn:
     cancel: Avbryt
     save_settings: "Lagre innstillingar"
     saving: "Lagrar ...\""
-  different_course_b875770e: "anna kurs"
+  different_course_b875770e: "anna emne"
   diigo_993c4646: Diigo
   disable_a5c05db3: Deaktiver
   disabled_18c33a73: (deaktivert)
@@ -5768,7 +5768,7 @@ nn:
   dismiss_dacdb625: Forkast
   display_all_text_links_in_canvas_as_underlined_tex_e698e714: "Vis all lenketekst i Canvas som *understreka tekst*"
   display_as_points_63084235: "Vis som poeng"
-  display_course_catalog: "Vis ei søkeliste med kurs for denne rotkontoen med \"Inkluder dette kurset i offentleg kursliste\" aktivert."
+  display_course_catalog: "Vis ei søkeliste med emne for denne rotkontoen med \"Inkluder dette emnet i offentleg kursliste\" aktivert."
   display_name_b80c243e: "Namn som skal visast"
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "Vis alle karakterane når rullegardinmenyen \"Alle karakterperiodane\" er vald (Fleire karakterperiodar må vere aktivert)."
   display_totals_for_all_grading_periods_ad1ea050: "Vis totalsummane i \"Alle karakterperiodar\""
@@ -5788,7 +5788,7 @@ nn:
   download_as_zip_5dae7f19: "Last ned som ZIP"
   download_associated_files_f35dcb5e: "Last ned tilknytte filer"
   download_c7ffdfb9: "Last ned"
-  download_course_content_7f66edc9: "Last ned kursinnhald"
+  download_course_content_7f66edc9: "Last ned emneinnhald"
   download_epub_757cf0af: "Last ned EPUB"
   download_item_analysis_report_statuslabel_8c9387ec: "Last ned elementanalyserapport %{statusLabel}"
   download_report_77164f62: "Last ned rapport"
@@ -5796,7 +5796,7 @@ nn:
   download_student_analysis_report_statuslabel_1471c8c2: "Last ned studentanalyserapport %{statusLabel}"
   download_submissions_7454665f: "Last ned innleverte filer"
   download_this_file_669f9174: "Last ned denne fila"
-  downloading_course_content_allows_access_to_conten_164d9336: "Nedlasting av kursinnhald gir tilgang til innhald når du ikkje er på nett. Innhaldet kan omfatte filer, sider, oppgåver, diskusjonsemne og prøver. Klikk på \"Generer EPUB\" for kvart kurs og opne med eReader-programvare for vising."
+  downloading_course_content_allows_access_to_conten_164d9336: "Nedlasting av emneinnhald gir tilgang til innhald når du ikkje er på nett. Innhaldet kan omfatte filer, sider, oppgåver, diskusjonsemne og prøver. Klikk på \"Generer EPUB\" for kvart emne og opne med eReader-programvare for vising."
   draft_comment_b2376ea4: "Kommentar til utkast"
   drag_and_drop_your_image_here_or_7fba7c14: "Dra og slipp bildet ditt her eller"
   drag_to_rearrange_sections_637efee3: "Dra for å ordne klassa på nytt"
@@ -5816,11 +5816,11 @@ nn:
   due_date_5d0a953c: "Innleveringsfrist:"
   due_date_6a281fe3: "Frist: %{date}"
   due_date_822625d8: Innleveringsfrist
-  due_date_cannot_be_after_course_end_fd128a14: "Innleveringsfristen kan ikkje vere etter kursslutt"
+  due_date_cannot_be_after_course_end_fd128a14: "Innleveringsfristen kan ikkje vere etter emneslutt"
   due_date_cannot_be_after_lock_date_675b30aa: "Innleveringsfristen kan ikkje vere etter sperredato"
   due_date_cannot_be_after_section_end_b0f54388: "Innleveringsfristen kan ikkje vere etter at klassa er låst"
   due_date_cannot_be_after_term_end_5d504cb1: "Innleveringsfristen kan ikkje vere etter semesterslutt"
-  due_date_cannot_be_before_course_start_ecc523ba: "Innleveringsfristen kan ikkje vere før kursstart"
+  due_date_cannot_be_before_course_start_ecc523ba: "Innleveringsfristen kan ikkje vere før emnestart"
   due_date_cannot_be_before_section_start_f8950484: "Innleveringsfristen kan ikkje vere før klassestart"
   due_date_cannot_be_before_term_start_ea660b2c: "Innleveringsfristen kan ikkje vere før semesterstart"
   due_date_cannot_be_before_unlock_date_f263aab0: "Innleveringsfristen kan ikkje vere før datosperre er oppheva"
@@ -5859,7 +5859,7 @@ nn:
   edit_assignment_name_mastery_paths_40b50541: "Rediger oppgåve %{name} meistringsstiar"
   edit_c5fbea07: Rediger
   edit_conference_title_6e234815: "Endre \"%{conference_title}\""
-  edit_course_role_3b992fc2: "Rediger kursrolle"
+  edit_course_role_3b992fc2: "Rediger emnerolle"
   edit_current_message_da650d4c: "Rediger denne meldinga"
   edit_grading_period_e39af45d: "Rediger karaktersetjingsperiode"
   edit_grading_period_set_c548f4df: "Rediger sett med karaktersetjingsperiodar"
@@ -5988,7 +5988,7 @@ nn:
   email_the_user_about_this_account_creation_e63f8759: "Send e-post til brukaren om kontoopprettinga"
   empty_stub_for_testing_only_37aad38: "Tom stubb (berre for testing)"
   enable_6f5d1328: Aktiver
-  enable_dashboard_images_for_courses_5af458b0: "Slå på dashbordbilder for kurs"
+  enable_dashboard_images_for_courses_5af458b0: "Slå på dashbordbilder for emne"
   enable_feature_title_987d8e9a: "Aktiver funksjon: %{title}"
   enable_gradebook_list_students_by_sortable_name: "Før opp studentane i liste etter sorterte namn i karakterbok. Standard sortering av namn er 'Etternamn, fornamn' og kan endrast i innstillingar."
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Aktiver Gradezilla (namnet er kun mellombels og skal erstatte karakterbok i framtida)."
@@ -6007,7 +6007,7 @@ nn:
   ending_date_e1ea13a4: Sluttdato
   enrolled_as_272da3b9: "Påmeld som"
   enrollment: 
-    default_course_name: Kurs
+    default_course_name: Emne
     default_email: "Ingen e-post"
     default_user_name: "Ukjend brukar"
     roles: 
@@ -6032,7 +6032,7 @@ nn:
       pending: Ventar
       rejected: Forkasta
   enrollmentNames: 
-    course_designer: Kursdesignar
+    course_designer: Emnedesignar
     observer: Observatør
     student: Student
     teacher: Faglærar
@@ -6042,7 +6042,7 @@ nn:
   enrollment_term: 
     errors: 
       delete_default_term: "Kan ikkje slette standardsemester"
-      delete_term_with_courses: "Kan ikkje slette eit semester med aktive kurs"
+      delete_term_with_courses: "Kan ikkje slette eit semester med aktive emne"
       not_unique: "SIS-ID \"%{sis_source_id}\" er allereie i bruk"
   enrollment_term_7bfe840: "Påmelding semester"
   enrollments_e250c9c3: Påmelding
@@ -6111,7 +6111,7 @@ nn:
         attachment: Bilde-/filopplasting
         html: "HTML/innebygd innhald"
         rich_text: "Innhald rikt tekstformat."
-        submission: Kursinnlevering
+        submission: Emneinnlevering
     crumb: e-porteføljer
     edit_link_text: "%{edit_icon} rediger denne sida"
     eportfolio: 
@@ -6149,7 +6149,7 @@ nn:
         attachment: Bilde-/filopplasting
         html: "HTML/innebygd innhald"
         rich_text: "Innhald rikt tekstformat."
-        submission: Kursinnlevering
+        submission: Emneinnlevering
       titles: 
         delete_section: "Slett denne klassa"
         move_section: "Dra for å ordne klassa på nytt"
@@ -6206,7 +6206,7 @@ nn:
         uploading_file: "Lastar opp"
       links: 
         back: "Tilbake til porteføljedashbord"
-        choose_submission: Kursinnlevering
+        choose_submission: Emneinnlevering
         delete: "Slett e-portefølje"
         download_eportfolio: "Last ned innhald i e-porteføljen som ZIP-fil"
         download_file: "Klikk her for å laste ned %{filename}"
@@ -6315,7 +6315,7 @@ nn:
   error_uploading_file_e2d31b56: "Feil under opplasting av fil."
   error_while_importing_csv_please_contact_support_e_57e6b3b: "Feil under import av CSV. Ta kontakt med brukarstøtte. (Feilrapport %{number})"
   errors: 
-    bad_navigation_config: "Ugyldig konfigurasjon av kursfane"
+    bad_navigation_config: "Ugyldig konfigurasjon av emnefane"
     blank: Obligatorisk
     format: "%{attribute} %{message}"
     index: 
@@ -6403,6 +6403,7 @@ nn:
   export_failed_5d615d6d: "Eksport mislukkast"
   export_in_progress_70db262a: "Eksport i gang"
   export_report_7c5899e: Eksportrapport
+  exported_package_history_bfca44b9: "Historie for eksportert pakke"
   exporting_b1eab154: Eksporterer
   external_apps_f5490181: "Eksterne appar"
   external_collaborations_tool_a4899abb: "Eksternt verktøy for samarbeid"
@@ -6428,7 +6429,7 @@ nn:
         add_feed: "Legg til straum"
         adding_feed: "Legg til straum ..."
       descriptions: 
-        add_new_feed: "Du kan automatisk legge til postar frå ein RSS-straum eller i Atom-format som kunngjeringar for dette kurset. Det er berre å lime URL-en nedanfor og nye oppføringar vert lagde til."
+        add_new_feed: "Du kan automatisk legge til postar frå ein RSS-straum eller i Atom-format som kunngjeringar for dette emnet. Det er berre å lime URL-en nedanfor og nye oppføringar vert lagde til."
       feed_url_label: "Straum frå URL"
       keyword: "Nøkkelord:"
       labels: 
@@ -6450,7 +6451,7 @@ nn:
     cannot_locate_launch_request: "Finn ikkje førespurnad om oppstart. Prøv på nytt seinare."
     external_tool: 
       account_navigation_configured: "Kontonavigasjon er konfigurert"
-      course_navigation_configured: "Kursnavigasjon er konfigurert"
+      course_navigation_configured: "Emnenavigasjon er konfigurert"
       delete_tool: "Slett verktøy"
       edit_tool: "Rediger verktøy"
       editor_button_configured: "Redigeringsknapp er konfigurert"
@@ -6472,11 +6473,15 @@ nn:
       load_success_title: "Bruk av verktøy er fullført"
   external_url_e9b87215: "Ekstern URL"
   extreme_critical_emergency_80b3dbda: "EKSTREMT KRITISK NØDSTILFELLE!"
+  faculty_journal_5634938e: Faglærarprotokoll
   failed_307449e1: "Mislukkast:"
+  failed_creating_user_b706a1c5: "Kan ikkje opprette brukar"
+  failed_loading_course_sections_refresh_page_to_try_f97160bf: "Kan ikkje laste emneklassar. Last sida på nytt og prøv igjen."
   failed_to_create_webhook_b766cf5c: "Kan ikkje opprette webkrok."
   failed_to_import_media_objects_4c1fcb4f: "Kan ikkje importere medieobjekt"
   failed_to_log_in_7ceec561: "Kan ikkje logge på"
   failed_to_publish_draft_comment_853761e9: "Kunne ikkje publisere kommentar til utkast"
+  failed_to_save_please_try_again_later_bb7070fb: "Kan ikkje lagre. Prøv på nytt seinare."
   failed_to_submit_draft_comment_1de83451: "Kunne ikkje sende kommentar til utkast"
   fair_38e62237: "Nokså godt"
   fair_score_554e2558: "Nokså godt resultat"
@@ -6525,6 +6530,7 @@ nn:
   file_list_350d08df: Filliste
   file_list_updated_38e2a5ad: "Fillista er oppdatert"
   file_menu_cc0ca54: Filmeny
+  file_name_2fe68ec1: Filnamn
   file_not_found_9eec054c: "Finn ikkje fil"
   file_preview_eedb43f2: "Førehandsvising av fil"
   file_previews: 
@@ -6568,11 +6574,13 @@ nn:
         folder_locked: "Mappa \"%{folder},\" som inneheld denne fila, er låst."
   files_and_folder_contents_only_available_to_studen_944f9166: "Fil- og mappeinnhald er er berre tilgjengeleg for studentar med lenketilgang. Ikkje synleg i studentmapper."
   files_c300e900: Filer
+  files_quota_percentused_of_bytesavailable_used_7f62792c: "Filkvote: %{percentUsed} av %{bytesAvailable} brukte"
   files_quota_percentused_of_bytesavailable_used_d208857a: "Filkvote: %{percentUsed}% av %{bytesAvailable} brukte"
   files_toolbar_2f2f0976: "Verktøylinje filer"
   files_uploaded_519844ed: "Opplasta filer"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Fyll ut det tome feltet og les tilhøyrande tekst"
   filled_5d8c39e: Utfylt
+  filter_9df28e5b: "Filter:"
   filter_announcements_by_unread_495eeeb3: "filtrer kunngjeringar som ulesne"
   filter_by_ip_address_40965f66: "Filtrer etter IP-adresse"
   filter_by_name_34cbe139: "Filtrer etter namn"
@@ -6584,10 +6592,13 @@ nn:
   filter_replies_by_unread_342e8e90: "filtrer svar som ulesne"
   final_grade_info_2aa35d25: "Informasjon om sluttkarakter"
   final_grade_score_fe69a301: "Sluttkarakter: %{score}"
+  final_letter_grade_80dccec1: "Endeleg bokstavkarakter"
+  final_score_26bcfc20: "Endeleg resultat"
   final_score_61e15cf3: sluttresultat
   find_8d605019: Finn
   find_an_existing_grading_scheme_d836ea: "Finn eit gjeldande karakterskjema"
   find_an_outcome_919328e6: "Finn eit læringsmål"
+  find_appointment_85d6922e: "Finn avtale"
   find_flickr_image_view: 
     find_cc_on_flickr: "Finn Creative Commons-bilde på Flickr"
     search: Søk
@@ -6605,6 +6616,7 @@ nn:
   finished_19aaf6f5: Fullført
   finland_1f322b39: Finland
   finland_358_abeffc8a: "Finland (+358)"
+  first_name_d5c12500: Fornamn
   first_reviewer_9ea05caa: "Fyrste korrekturlesar"
   flash_6afbf65a: Flash
   folder: 
@@ -6689,7 +6701,7 @@ nn:
   grade_assignment_7c1abc11: "Sett karakter på %{assignment}"
   grade_display_warning_dialog: 
     grade_display_warning: 
-      checkbox: "Ikkje vis for dette kurset igjen."
+      checkbox: "Ikkje vis for dette emnet igjen."
       warning: Åtvaring
   grade_distribution_e52c9256: Karakterfordeling
   grade_export_title: Karaktereksport
@@ -6701,7 +6713,7 @@ nn:
       alignment_count_summary: "*8* av *%{count}* justeringar"
   gradebook: 
     alerts: 
-      no_active_students: "Enten er det ikkje aktive studentar i kurset eller så kan ingen karaktersetjast av deg."
+      no_active_students: "Enten er det ikkje aktive studentar i emnet eller så kan ingen karaktersetjast av deg."
       no_students_in_groups_back: "Fordi det ikkje finst tildelte brukarar kan innleveringar for denne oppgåva ikkje karaktersetjast i SpeedGrader™. Tildel brukarar til gruppesettet og prøv på nytt. Klikk på 'OK' for å tilbake."
       no_students_in_groups_close: "Fordi det ikkje finst tildelte brukarar kan innleveringar for denne oppgåva ikkje karaktersetjast i SpeedGrader™. Tildel brukarar til gruppesettet og prøv på nytt. Klikk på 'OK' for å lukke vindauget."
       no_students_in_section: "Finn ingen studentar i klassa, går tilbake til å vise alle klassene."
@@ -6928,7 +6940,7 @@ nn:
     crumb: Frammøte
     errors: 
       missing_file: "Finn ikkje fil å laste opp"
-      not_allowed: "Dette kurset tillet ikkje opplasting av resultat."
+      not_allowed: "Dette emnet tillet ikkje opplasting av resultat."
       submission_failed: "Innlevering lukkast ikkje: %{error}"
       submission_failed_default: "Innlevering mislukkast"
     grade: 
@@ -6952,7 +6964,7 @@ nn:
       disabled_for_student_view: "Testresultat for studentar er ikkje inkludert i karakterstatistikk."
       expand: "Vis alle grupper for meistringsbasert læring"
       expand_title: Vis
-      for_course: "For kurset,"
+      for_course: "For emnet"
       grading_in_progress: "Faglærar jobbar med å setje karakter"
       headers: 
         details: Detaljar
@@ -7015,7 +7027,7 @@ nn:
       submission_count: 
         one: "1 endring"
         other: "%{count} endringar"
-      temporary_disabled: "Sida for karakterbokhistorikk er ikkje tilgjengeleg akkurat no for eit kurs på denne storleiken."
+      temporary_disabled: "Sida for karakterbokhistorikk er ikkje tilgjengeleg akkurat no for eit emne av denne storleiken."
       titles: 
         submission_graded: "%{graded_date} av %{grader}"
     invalid_assignment_groups_warning: 
@@ -7023,7 +7035,7 @@ nn:
       other: "Resultatet omfattar ikkje %{groups}fordi dei ikkje har moglege poeng"
     no_assignments_have_points_warning: "Kan ikkje rekne ut resultatet før ei oppgåve har moglege poeng"
     notices: 
-      unauthorized: "Du er ikkje autorisert til å sjå oppmøte for dette kurset"
+      unauthorized: "Du er ikkje autorisert til å sjå oppmøte for dette emnet"
       updated: "Oppgåveinnlevering er oppdatert."
       uploaded: 
         one: "Filer og kommentarar oppretta for 1 innlevering"
@@ -7120,7 +7132,7 @@ nn:
         file_attachment: Filvedlegg
         media_comment: Mediekommentar
         speech_recognition: Taleattkjenning
-    speed_grader_disabled: "SpeedGrader er slått av for dette kurset"
+    speed_grader_disabled: "SpeedGrader er slått av for dette emnet"
     speedgrader_enabled_only_for_published_content: "SpeedGrader er aktivert berre for publisert innhald."
     student_attendance: 
       headers: 
@@ -7228,7 +7240,7 @@ nn:
   graph_of_the_distribution_of_grades_in_the_departm_30445777: "Graf over karakterfordeling ved instituttet/avdelinga"
   graph_showing_the_fraction_of_on_time_submissions__735e47db: "Graf som viser andel innleveringar innan frist per oppgåve"
   graphs_89fcfeb: Grafar
-  great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Flott, du har eit kurs. Kva skjer no? Før du publiserer bør du kontrollere at du har det grunnleggande i orden.  Gå gjennom lista til venstre og sjekk at kurset er klart for bruk."
+  great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Flott, du har eit emne. Kva skjer no? Før du publiserer bør du kontrollere at du har det grunnleggande i orden. Gå gjennom lista til venstre og sjekk at emnet er klart for bruk."
   green_15af4778: Grønt
   group: 
     greater_than_1: "Må vere større enn 1"
@@ -7262,7 +7274,7 @@ nn:
     name_reserved: "%{name} er eit reservert namn."
     name_too_long: "Oppgi eit kortare kategorinamn"
     name_unavailable: "%{name} er allereie i bruk."
-    self_signup_for_courses: "Sjølvregistrering aktivert for kursgrupper eller fellesskap"
+    self_signup_for_courses: "Sjølvregistrering aktivert for emnegrupper eller fellesskap"
   group_category_locked: "Gruppekategorien kan ikkje endrast fordi studentar allereie har levert arbeid for denne oppgåva"
   group_group_name_is_for_a_different_section_4d84d256: "Gruppa %{group_name} høyrer til ei anna klasse"
   group_group_name_is_full_297880d6: "Gruppa %{group_name} er full"
@@ -7366,8 +7378,8 @@ nn:
         add: "Start ei ny gruppe"
       buttons: 
         create: "Opprett gruppe"
-      course_groups: Kursgrupper
-      group_explanation: "Grupper fungerer flott for prosjektsamarbeid eller for planlegging av studiegrupper og liknande.  Kvar gruppe har kalender, wiki, diskusjonar og fillagringsplass. Gruppene kan samarbeide om dokument eller planlegge webkonferansar. Det er som eit minikurs der du kan jobbe med færre studentar og på eit meir fokusert prosjekt."
+      course_groups: Emnegrupper
+      group_explanation: "Grupper fungerer flott for prosjektsamarbeid eller for planlegging av studiegrupper og liknande.  Kvar gruppe har kalender, wiki, diskusjonar og fillagringsplass. Gruppene kan samarbeide om dokument eller planlegge webkonferansar. Det er som eit miniemne der du kan jobbe med færre studentar og på eit meir fokusert prosjekt."
       groups_disabled: "Studentorganiserte grupper er slått av for dette kurset, så du må nøye deg med gruppene faglærar startar opp for deg."
       headings: 
         available_groups: "Tilgjengelege grupper"
@@ -7378,8 +7390,8 @@ nn:
         users_to_invite: Invitasjon
       options: 
         invite_only: "Medlemskap berre etter invitasjon"
-        open_to_course_members: "Kursdeltakarar kan ta del"
-      page_title: Kursgrupper
+        open_to_course_members: "Emnedeltakarar kan ta del"
+      page_title: Emnegrupper
       student_group_warning: "Dersom faglærar har snakka om å plassere deg i gruppe som del av ei oppgåve, er ikkje dette måten å gjere det på. I eigenorganiserte grupper kan det ikkje setjast karakterar ... Du kan framleis starte opp eigne grupper, men det er berre når faglærar opprettar gruppa at du kan levere elektroniske eksemplar av oppgåver."
       student_groups_tabs_everyone: Alle
       student_groups_tabs_groups: Grupper
@@ -7399,7 +7411,7 @@ nn:
         course_groups: Studentgrupper
       messages: 
         no_students: "Ingen studentar er lagt til for dette kurset"
-      page_title: Kursgrupper
+      page_title: Emnegrupper
       page_title_accounts: Kontogrupper
     create_group_set: "Opprett gruppesett"
     delete_confirm: "Er du sikker på at du vil fjerne dette gruppesettet?"
@@ -15184,11 +15196,11 @@ nn:
     due_date: "%{date} innan %{time}"
     event: "%{date} %{time}"
     formats: 
-      default: "%a %d %b %Y %H:%M:%S %z"
+      default: "%a, %d %b %Y %H:%M:%S %z"
       long: "%d %B %Y %H:%M"
       short: "%d %b %H:%M"
-      tiny: "%-k:%M"
-      tiny_on_the_hour: "%-k:%M"
+      tiny: "%l:%M%P"
+      tiny_on_the_hour: "%l%P"
     less_than_a_minute_ago: "mindre enn eit minutt sidan"
     pm: pm
     ranges: 
@@ -15595,7 +15607,7 @@ nn:
       other: "Det ser bra ut, legg til desse %{count} brukarane"
     adding_users: "Legg til brukarar ..."
     buttons: 
-      continue: "Hald fram ...\""
+      continue: "Hald fram..."
     cant_unenroll: "Brukaren er automatisk påmeld via påmeldingssystemet på universitetet, og kan ikkje fjernast manuelt.  Kontakt systemadministrator dersom du har spørsmål."
     delete_confirm: "Er du sikker på at du vil fjerne denne brukaren?"
     duplicate_users: 
