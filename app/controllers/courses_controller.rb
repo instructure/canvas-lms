@@ -2755,9 +2755,11 @@ class CoursesController < ApplicationController
 
     hash = []
 
-    enrollments.sort_by!(&:course_id)
     Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values
+    enrollments_by_course.sort_by! do |course_enrollments|
+      Canvas::ICU.collation_key(course_enrollments.first.course.nickname_for(user))
+    end
     enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
     courses = enrollments_by_course.map(&:first).map(&:course)
     preloads = [:account, :root_account]

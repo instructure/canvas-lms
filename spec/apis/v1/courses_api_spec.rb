@@ -375,11 +375,14 @@ describe CoursesController, type: :request do
     expect(courses.length).to eq 2
   end
 
-  it "returns course list in id sort order", priority: "2", test_id: 3058053 do
-    json = api_call(:get, "/api/v1/courses.json",
-    {controller: 'courses', action: 'index', format: 'json'})
-    course_ids = json.map{ |c| c["id"]}
-    expect(course_ids).to eq course_ids.sort
+  it "returns course list ordered by name (including nicknames)" do
+    c1 = course_with_student(course_name: 'def', active_all: true).course
+    c2 = course_with_student(user: @student, course_name: 'abc', active_all: true).course
+    c3 = course_with_student(user: @student, course_name: 'jkl', active_all: true).course
+    c4 = course_with_student(user: @student, course_name: 'xyz', active_all: true).course
+    @student.course_nicknames[c4.id] = 'ghi'; @student.save!
+    json = api_call(:get, "/api/v1/courses.json", controller: 'courses', action: 'index', format: 'json')
+    expect(json.map { |course| course['name'] }).to eq %w(abc def ghi jkl)
   end
 
   describe "user index" do
