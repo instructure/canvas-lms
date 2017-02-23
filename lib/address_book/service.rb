@@ -114,6 +114,8 @@ module AddressBook
     end
 
     def preload_users(users)
+      return if users.empty?
+
       # make sure we're dealing with user objects
       users = hydrate(users) unless users.first.is_a?(User)
 
