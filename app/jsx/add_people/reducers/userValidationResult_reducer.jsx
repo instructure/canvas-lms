@@ -42,7 +42,10 @@ define([
           address: d.address,
           type: d.type,
           createNew: false,
-          newUserInfo: {name: '', email: d.type === 'email' ? d.address : ''}
+          newUserInfo: {
+            name: d.user_name || '',  // if the user entered a name as part of the email, it comes back in user_name
+            email: d.type === 'email' ? d.address : ''
+          }
         };
       });
     }
