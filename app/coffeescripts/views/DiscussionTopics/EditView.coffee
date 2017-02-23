@@ -21,10 +21,29 @@ define [
   'compiled/util/deparam'
   'compiled/jquery.rails_flash_notifications' #flashMessage
   'jsx/shared/helpers/numberHelper'
-], (I18n, ValidatedFormView, AssignmentGroupSelector, GradingTypeSelector,
-GroupCategorySelector, PeerReviewsSelector, PostToSisSelector, _, template, RichContentEditor,
-htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, MissingDateDialog, KeyboardShortcuts,
-ConditionalRelease, deparam, flashMessage, numberHelper) ->
+], (
+    I18n,
+    ValidatedFormView,
+    AssignmentGroupSelector,
+    GradingTypeSelector,
+    GroupCategorySelector,
+    PeerReviewsSelector,
+    PostToSisSelector,
+    _,
+    template,
+    RichContentEditor,
+    htmlEscape,
+    DiscussionTopic,
+    Announcement,
+    Assignment,
+    $,
+    preventDefault,
+    MissingDateDialog,
+    KeyboardShortcuts,
+    ConditionalRelease,
+    deparam,
+    flashMessage,
+    numberHelper) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -361,10 +380,10 @@ ConditionalRelease, deparam, flashMessage, numberHelper) ->
     _validateTitle: (data, errors) =>
       max_name_length = 256
       if data.assignment.attributes.post_to_sis == '1' && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT == true
-        max_name_length = ENV.MAX_NAME_LENGTH + 1
+        max_name_length = ENV.MAX_NAME_LENGTH
       if $.trim(data.title.toString()).length > max_name_length
         errors["title"] = [
-          message: I18n.t "Title is too long, must be under %{length} characters", length: max_name_length
+          message: I18n.t("Title is too long, must be under %{length} characters", length: (max_name_length + 1))
         ]
       errors
 
