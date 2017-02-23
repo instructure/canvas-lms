@@ -123,7 +123,7 @@ define [
 
       max_name_length = 256
       if data.post_to_sis == '1' && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT == true
-        max_name_length = ENV.MAX_NAME_LENGTH + 1
+        max_name_length = ENV.MAX_NAME_LENGTH
 
       if !data.name or $.trim(data.name.toString()).length == 0
         errors["name"] = [
@@ -131,7 +131,7 @@ define [
         ]
       else if $.trim(data.name.toString()).length > max_name_length
         errors["name"] = [
-          message: I18n.t "Name is too long, must be under %{length} characters", length: max_name_length
+          message: I18n.t("Name is too long, must be under %{length} characters", length: max_name_length + 1)
         ]
       errors
 
