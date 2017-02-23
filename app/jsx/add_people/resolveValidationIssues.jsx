@@ -5,7 +5,7 @@ define([], () => {
 
     Object.keys(duplicates).forEach((addr) => {
       const dupeSet = duplicates[addr];
-      if (dupeSet.createNew && dupeSet.newUserInfo.name && dupeSet.newUserInfo.email) {
+      if (dupeSet.createNew && dupeSet.newUserInfo.email) { // newUserInfo.name now optional
         usersToBeCreated.push(dupeSet.newUserInfo);
       } else if (dupeSet.selectedUserId >= 0) {
         const selectedUser = dupeSet.userList.find(u => u.user_id === dupeSet.selectedUserId);
@@ -14,7 +14,7 @@ define([], () => {
     });
     Object.keys(missings).forEach((addr) => {
       const missing = missings[addr];
-      if (missing.createNew && missing.newUserInfo.name && missing.newUserInfo.email) {
+      if (missing.createNew && missing.newUserInfo.email) { // newUserInfo.name now optional
         usersToBeCreated.push(missing.newUserInfo);
       }
     });
