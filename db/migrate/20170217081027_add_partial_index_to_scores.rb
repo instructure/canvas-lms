@@ -1,5 +1,6 @@
 class AddPartialIndexToScores < ActiveRecord::Migration[4.2]
   tag :predeploy
+  disable_ddl_transaction!
 
   def up
     duplicate_enrollment_ids = Score.
@@ -12,7 +13,7 @@ class AddPartialIndexToScores < ActiveRecord::Migration[4.2]
     Score.where(enrollment_id: duplicate_enrollment_ids, grading_period_id: nil).
       where.not(id: saved_scores).delete_all
 
-    add_index :scores, :enrollment_id, unique: true, where: 'grading_period_id is null'
+    add_index :scores, :enrollment_id, unique: true, where: 'grading_period_id is null', algorithm: :concurrently
   end
 
   def down
