@@ -285,18 +285,18 @@ module Lti
         }
       end
       let(:tool_proxy) do
-          Lti::ToolProxy.create!(
-            context: account,
-            guid: SecureRandom.uuid,
-            shared_secret: 'abc',
-            product_family: product_family,
-            product_version: '1',
-            workflow_state: 'active',
-            raw_data: {'enabled_capability' => ['vnd.Canvas.webhooks.root_account.all']},
-            lti_version: '1'
-          )
-        end
-        let(:validator){ SubscriptionsValidator.new(subscription, tool_proxy) }
+        Lti::ToolProxy.create!(
+          context: account,
+          guid: SecureRandom.uuid,
+          shared_secret: 'abc',
+          product_family: product_family,
+          product_version: '1',
+          workflow_state: 'active',
+          raw_data: {'enabled_capability' => ['vnd.Canvas.webhooks.root_account.all']},
+          lti_version: '1'
+        )
+      end
+      let(:validator){ SubscriptionsValidator.new(subscription, tool_proxy) }
 
       it "does not raise error if ToolProxy::active_in_context? returns true" do
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)

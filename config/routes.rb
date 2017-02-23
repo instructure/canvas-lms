@@ -1949,6 +1949,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: 'lti/subscriptions_api') do
       post "subscriptions", action: :create
+      delete "subscriptions/:id", action: :destroy
     end
 
     %w(course account).each do |context|
