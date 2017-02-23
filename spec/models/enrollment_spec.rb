@@ -1905,7 +1905,7 @@ describe Enrollment do
       @enrollment.save
       score = @enrollment.scores.create!
       @enrollment.destroy
-      expect(score).to be_deleted
+      expect(score.reload).to be_deleted
     end
   end
 
