@@ -25,11 +25,35 @@ define([
       inviteUsersURL: undefined
     }
 
+    constructor (props) {
+      super(props);
+
+      this.state = {
+        selectAll: false
+      };
+    }
+
+    componentWillReceiveProps (nextProps) {
+      const all = Object.keys(nextProps.missing).every(m => nextProps.missing[m].createNew)
+      this.setState({selectAll: all});
+    }
+
     // event handlers ------------------------------------
     // user has chosen to create a new user for this group of duplicates
     onSelectNewForMissing = (event) => {
       eatEvent(event);
+
+      // user may have clicked on the link. if so, put focus on the adjacent checkbox
+      if (!(event.target.tagName === 'input' && event.target.getAttribute('type') === 'checkbox')) {
+        const checkbox = event.target.parentElement.parentElement.querySelector('input[type="checkbox"]');
+        checkbox.focus();
+      }
+
       const address = event.target.value || event.target.getAttribute('data-address');
+      this.onSelectNewForMissingByAddress(address);
+    }
+
+    onSelectNewForMissingByAddress (address) {
       const missingUser = this.props.missing[address];
       let defaultEmail = '';
       if (this.props.searchType === 'cc_path') {
@@ -40,16 +64,21 @@ define([
         email: (missingUser.newUserInfo && missingUser.newUserInfo.email) || defaultEmail
       };
 
-      // user may have clicked on the link. if so, put focus on the adjacent checkbox
-      if (!(event.target.tagName === 'input' && event.target.getAttribute('type') === 'checkbox')) {
-        const checkbox = event.target.parentElement.parentElement.querySelector('input[type="checkbox"]');
-        checkbox.focus();
-      }
-
       if (typeof this.props.onChange === 'function') {
         this.props.onChange(address, newUserInfo);
       }
     }
+
+    // check or uncheck all the missing users' checkboxes
+    onSelectNewForMissingAll = (event) => {
+      this.setState({selectAll: event.target.checked});
+      if (event.target.checked) {
+        Object.keys(this.props.missing).forEach(address => this.onSelectNewForMissingByAddress(address));
+      } else {
+        Object.keys(this.props.missing).forEach(address => this.onUncheckUserByAddress(address));
+      }
+    }
+
     // when either of the TextInputs for creating a new user for a missing person
     // changes, we come here collect the input
     // @param event: the event that triggered the change
@@ -60,13 +89,17 @@ define([
       newUserInfo[field] = event.target.value;
       this.props.onChange(address, newUserInfo);
     }
+
     // when user unchecks a checked new user
-    // @param address: the address field of this user
     // @param event: the click event
     onUncheckUser = (event) => {
-      const address = event.target.value;
+      this.onUncheckUserByAddress(event.target.value);
+      this.setState({selectAll: false});
+    }
+    onUncheckUserByAddress = (address) => {
       this.props.onChange(address, false);
     }
+
     // send the current list of users on up
     onChangeUsers () {
       const userList = this.state.candidateUsers.filter(u => (
@@ -184,6 +217,7 @@ define([
                   label={<ScreenReaderContent>{nameLabel}</ScreenReaderContent>}
                   data-address={missing.address}
                   onChange={this.onNewForMissingChange}
+                  value={missing.newUserInfo.name || null}
                 />
               </td>
               <td>{missing.address}</td>
@@ -226,6 +260,13 @@ define([
             <tr>
               <th scope="col">
                 <ScreenReaderContent>{I18n.t('User Selection')}</ScreenReaderContent>
+                <Checkbox
+                  id="missing_users_select_all"
+                  value="__ALL__"
+                  checked={this.state.selectAll}
+                  onChange={this.onSelectNewForMissingAll}
+                  label={<ScreenReaderContent>{I18n.t('Check to select all')}</ScreenReaderContent>}
+                />
               </th>
               <th scope="col">{I18n.t('Name')}</th>
               <th scope="col">{I18n.t('Email Address')}</th>
