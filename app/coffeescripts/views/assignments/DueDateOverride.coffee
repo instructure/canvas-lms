@@ -11,11 +11,23 @@ define [
   'jsx/due_dates/StudentGroupStore'
   'compiled/api/gradingPeriodsApi'
   'timezone'
-], ($, Backbone, _, React, ReactDOM, template, DateValidator, I18n, DueDates, StudentGroupStore, GradingPeriodsAPI, tz) ->
+], (
+  $,
+  Backbone,
+  _,
+  React,
+  ReactDOM,
+  DueDateOverride,
+  DateValidator,
+  I18n,
+  DueDates,
+  StudentGroupStore,
+  GradingPeriodsAPI,
+  tz) ->
 
   class DueDateOverrideView extends Backbone.View
 
-    template: template
+    template: DueDateOverride
 
     # =================
     #   ui interaction
