@@ -175,7 +175,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       end
 
       if ids_to_remove.any?
-        @template.child_subscriptions.active.where(:child_course_id => ids_to_remove).update_all(:workflow_state => 'deleted')
+        @template.child_subscriptions.active.where(:child_course_id => ids_to_remove).preload(:child_course => :wiki).each(&:destroy)
       end
 
       render :json => {:success => true}

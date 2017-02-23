@@ -127,8 +127,8 @@ describe MasterCourses::MasterTemplate do
 
       # can re-add
       new_sub = template.add_child_course!(new_course)
-      expect(new_sub).to_not eq sub
-      expect(template.child_subscriptions.active.count).to eq 1
+      expect(new_sub).to eq sub # should restore the old one
+      expect(new_sub).to be_active
     end
 
     it "should require child courses to belong to the same root account" do
