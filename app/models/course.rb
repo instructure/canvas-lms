@@ -3095,7 +3095,8 @@ class Course < ActiveRecord::Base
   def quiz_lti_tool
     query = { tool_id: 'Quizzes 2' }
     context_external_tools.active.find_by(query) ||
-      account.context_external_tools.active.find_by(query)
+      account.context_external_tools.active.find_by(query) ||
+        root_account.context_external_tools.active.find_by(query)
   end
 
   private
