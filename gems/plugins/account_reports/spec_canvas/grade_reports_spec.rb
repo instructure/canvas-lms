@@ -78,14 +78,6 @@ describe "Default Account Reports" do
   # have sis id's and not sis ids
   describe "Grade Export report" do
     before(:once) do
-      # We don't expect these values.  The report should only be
-      # looking at course_score
-      @enrollment1.update_attribute :computed_final_score, 1
-      @enrollment2.update_attribute :computed_final_score, 2
-      @enrollment3.update_attribute :computed_final_score, 3
-      @enrollment4.update_attribute :computed_final_score, 3
-      @enrollment5.update_attribute :computed_final_score, 2
-
       @enrollment1.find_score.update_attribute(:final_score, 88)
       @enrollment2.find_score.update_attribute(:final_score, 90)
       @enrollment3.find_score.update_attribute(:final_score, 93)

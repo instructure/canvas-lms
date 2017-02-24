@@ -98,6 +98,8 @@ ActiveRecord::Base::DROPPED_COLUMNS = {
                              ignore_term_date_restrictions).freeze,
     'enrollments' => %w(invitation_email
                         can_participate_before_start_at
+                        computed_current_score
+                        computed_final_score
                         limit_priveleges_to_course_sections
                         role_name
                         sis_source_id).freeze,

@@ -245,14 +245,14 @@ describe Api::V1::User do
 
     context "computed scores" do
       before :once do
-        @enrollment.computed_current_score = 95.0;
-        @enrollment.computed_final_score = 85.0;
+        @enrollment.scores.create!(current_score: 95.0, final_score: 85.0)
         @student1_enrollment = @enrollment
         @student2 = course_with_student(:course => @course).user
       end
 
       before :each do
-        def @course.grading_standard_enabled?; true; end
+        @course.grading_standard_enabled = true
+        @course.save!
       end
 
       it "should return scores as admin" do
@@ -1098,7 +1098,8 @@ describe "Users API", type: :request do
           'locale' => 'en',
           'time_zone' => "Tijuana"
         })
-        expect(user.birthdate.to_date).to eq birthday.to_date
+
+        expect(user.birthdate.to_date).to eq birthday.getutc.to_date
         expect(user.time_zone.name).to eql 'Tijuana'
       end
 

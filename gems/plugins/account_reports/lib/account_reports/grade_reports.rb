@@ -91,8 +91,8 @@ module AccountReports
           arr << student["term_name"]
           arr << student["term_id"]
           arr << student["term_sis_id"]
-          arr << student["computed_current_score"]
-          arr << student["computed_final_score"]
+          arr << student["current_score"]
+          arr << student["final_score"]
           arr << student["enroll_state"]
           csv << arr
         end
@@ -178,8 +178,8 @@ module AccountReports
                 arr << nil
                 arr << nil
               end
-              arr << student["computed_current_score"]
-              arr << student["computed_final_score"]
+              arr << student["current_score"]
+              arr << student["final_score"]
               arr << student["enroll_state"]
               csv << arr
             end
@@ -229,8 +229,8 @@ module AccountReports
                 e.course_section_id, s.sis_source_id AS section_sis_id,
                 t.name AS term_name, t.id AS term_id,
                 t.sis_source_id AS term_sis_id,
-                CASE WHEN sc.id IS NOT NULL THEN sc.current_score ELSE e.computed_current_score END AS computed_current_score,
-                CASE WHEN sc.id IS NOT NULL THEN sc.final_score ELSE e.computed_final_score END AS computed_final_score,
+                sc.current_score,
+                sc.final_score,
            CASE WHEN e.workflow_state = 'active' THEN 'active'
                 WHEN e.workflow_state = 'completed' THEN 'concluded'
                 WHEN e.workflow_state = 'deleted' THEN 'deleted' END AS enroll_state").

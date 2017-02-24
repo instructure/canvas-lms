@@ -1026,15 +1026,7 @@ class Enrollment < ActiveRecord::Base
 
   def cached_score_or_grade(current_or_final, score_or_grade, grading_period_id: nil)
     score = find_score(grading_period_id: grading_period_id)
-    if score.present?
-      score.send("#{current_or_final}_#{score_or_grade}")
-    else
-      return nil if grading_period_id.present?
-      # TODO: drop the computed_current_score / computed_final_score columns
-      # after the data fixup to populate the scores table completes
-      score = read_attribute("computed_#{current_or_final}_score")
-      score_or_grade == :score ? score : course.score_to_grade(score)
-    end
+    score&.send("#{current_or_final}_#{score_or_grade}")
   end
   private :cached_score_or_grade
 
