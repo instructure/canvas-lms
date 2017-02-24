@@ -304,7 +304,7 @@ en-AU:
     report_header_email: email
     report_header_end__date: end_date
     report_header_end_date: "end date"
-    report_header_enrollment_state: "enrollment state"
+    report_header_enrollment_state: "enrolment state"
     report_header_expiration: expiration
     report_header_final_score: "final score"
     report_header_first_name: first_name
@@ -362,8 +362,8 @@ en-AU:
     sis_exporter: 
       reports: "Reports: %{files}"
     student: 
-      enrollment_state: "Include Enrollment State: true;"
-      enrollment_states: "Enrollment States: %{states};"
+      enrollment_state: "Include Enrolment State: true;"
+      enrollment_states: "Enrolment States: %{states};"
   account_roles_d13f8f75: "Account roles"
   account_settings: 
     account: Account
@@ -412,7 +412,7 @@ en-AU:
       labels: 
         account_id: Sub-account
         course_code: "Reference Code"
-        enrollment_term_id: "Enrollment Term"
+        enrollment_term_id: "Enrolment Term"
         full_name: "Full Name"
         name: "Course Name"
         path: Email
@@ -513,7 +513,7 @@ en-AU:
         select_label: "Select a course"
       course_search_results: 
         error_message: "A deleted course with that ID could not be found for this account."
-        info_text: "Enrollments to this course must be restored manually."
+        info_text: "Enrolments to this course must be restored manually."
         labels: 
           account_id: "Account ID:"
           account_id2: "Account ID:"
@@ -523,13 +523,13 @@ en-AU:
           course_code2: "Course Code:"
           restore_btn: Restore
         notdeleted_restore: 
-          add_enrollments: "Add Enrollments"
+          add_enrollments: "Add Enrolments"
           header_subtext: "(Not Deleted)"
           view_course: "View Course"
         successful_restore: 
           view_course: "View Course"
         successfull_restore: 
-          add_enrollments: "Add Enrollments"
+          add_enrollments: "Add Enrolments"
           subtext: "What would you like to do next?"
       date_range_search: 
         message_date_from: "From Date"
@@ -672,7 +672,7 @@ en-AU:
       enrollment_term_label: "Show courses from the term"
       filter_label: "Find a Course"
       go_button: Go
-      hide_enrollmentless_courses: "Hide enrollmentless courses"
+      hide_enrollmentless_courses: "Hide enrolmentless courses"
     crumb_statistics: Statistics
     custom_grade_export_csv_parameters: 
       account_reports: 
@@ -718,7 +718,7 @@ en-AU:
       account_reports: 
         default: 
           description: 
-            text: "This report shows the student final mark results for all students in a given term. The resulting csv file will have one row per enrollment, and will show the current and final mark that is displayed in the course gradebook."
+            text: "This report shows the student final mark results for all students in a given term. The resulting csv file will have one row per enrolment, and will show the current and final mark that is displayed in the course gradebook."
     group_type: group
     include_deleted_parameter: 
       account_reports: 
@@ -759,7 +759,7 @@ en-AU:
       account_reports: 
         default: 
           enrollments: 
-            check_box: "Enrollments CSV"
+            check_box: "Enrolments CSV"
           sections: 
             check_box: "Sections CSV"
           users: 
@@ -799,7 +799,7 @@ en-AU:
           courses: 
             check_box: "Courses CSV"
           enrollments: 
-            check_box: "Enrollments CSV"
+            check_box: "Enrolments CSV"
           group_categories: 
             login: 
               check_box: "Group Categories CSV"
@@ -818,7 +818,7 @@ en-AU:
             check_box: "X list CSV"
         sis_default: 
           parameters: 
-            note: "*Term settings only impact Courses, Sections, Enrollments, and X list CSV files."
+            note: "*Term settings only impact Courses, Sections, Enrolments, and X list CSV files."
     public_courses_csv_description: 
       account_reports: 
         default: 
@@ -981,7 +981,7 @@ en-AU:
         mfa_settings: "Multi-Factor Authentication"
         name: "Account Name"
         new_sub_account_includes: "Let sub-accounts use the Theme Editor to customise their own branding."
-        no_enrollments_can_create_courses: "Users with no enrollments"
+        no_enrollments_can_create_courses: "Users with no enrolments"
         open_registration: "Open Registration"
         originality_report_visibility: "Students can see the originality report."
         outgoing_email_default_name_option_custom: "Custom \"From\" Name"
@@ -992,7 +992,7 @@ en-AU:
         restrict_student_future_view: "Restrict students from accessing courses before start date"
         restrict_student_past_view: "Restrict students from accessing courses after end date"
         role_id: "Add More"
-        self_enrollment: "Allow Self-Enrollment"
+        self_enrollment: "Allow Self-Enrolment"
         self_registration: "Self Registration"
         self_registration_type_all: "All Account Types"
         self_registration_type_observer: "Observer Accounts Only"
@@ -1112,8 +1112,8 @@ en-AU:
       accounts_label: Accounts
       courses_label: Courses
       crosslists_label: Crosslists
-      enrollments_label: Enrollments
-      group_enrollments: "Group Enrollments"
+      enrollments_label: Enrolments
+      group_enrollments: "Group Enrolments"
       groups: Groups
       imported_items_title: "Imported Items"
       sections_label: Sections
@@ -1135,7 +1135,7 @@ en-AU:
           courses: 
             check_box: "Courses CSV"
           enrollments: 
-            check_box: "Enrollments CSV"
+            check_box: "Enrolments CSV"
           group_membership: 
             login: 
               check_box: "Group Membership CSV"
@@ -1151,12 +1151,12 @@ en-AU:
             check_box: "X list CSV"
         sis_default: 
           parameters: 
-            note: "*Term settings only impact Courses, Sections, Enrollments, and X list CSV files."
+            note: "*Term settings only impact Courses, Sections, Enrolments, and X list CSV files."
     sis_import: 
       add_sis_stickiness_instructions: "With this option selected, changes made through this SIS import will be processed as if they are UI changes, preventing subsequent non-overriding SIS imports from changing the fields changed here."
       add_sis_stickiness_label: "Process as UI changes"
       batch_import_instructions: |-
-          If selected, this will delete everything for this term, which includes all courses and enrollments that are not in the selected import file above.
+          If selected, this will delete everything for this term, which includes all courses and enrolments that are not in the selected import file above.
           See the documentation for details.
       batch_mode_label: "This is a full batch update"
       clear_sis_stickiness_instructions: "With this option selected, all fields in all records touched by this SIS import will be able to be changed in future non-overriding SIS imports."
@@ -1253,16 +1253,16 @@ en-AU:
       account_reports: 
         default: 
           students_with_no_submissions: 
-            text: "This is a report of all students enrolled in a course in a given term that have not submitted an assignment between the given date range in a course. This report contains one row per student enrollment that meet the criteria. The date range can be no longer than two weeks."
+            text: "This is a report of all students enrolled in a course in a given term that have not submitted an assignment between the given date range in a course. This report contains one row per student enrolment that meet the criteria. The date range can be no longer than two weeks."
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
           enrollment_state: 
-            header: "Enrollment State"
+            header: "Enrolment State"
           include_enrollment_state: 
-            check_box: "Include Enrollment State"
-      active: "Active Enrollments"
-      all: "All Enrollments"
+            check_box: "Include Enrolment State"
+      active: "Active Enrolments"
+      all: "All Enrolments"
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -1299,13 +1299,13 @@ en-AU:
       account_reports: 
         usu: 
           enrollment_type: 
-            header: "Enrollment Type"
-      all: "All Enrollments"
-      designer: "Designer Enrollments"
-      observer: "Observer Enrollments"
-      students: "Student Enrollments"
-      ta: "Ta Enrollments"
-      teachers: "Teacher Enrollments"
+            header: "Enrolment Type"
+      all: "All Enrolments"
+      designer: "Designer Enrolments"
+      observer: "Observer Enrolments"
+      students: "Student Enrolments"
+      ta: "Ta Enrolments"
+      teachers: "Teacher Enrolments"
     user_access_tokens_csv_description: 
       account_reports: 
         default: 
@@ -1329,7 +1329,7 @@ en-AU:
       account_reports: 
         default: 
           zero_activity: 
-            text: "This report shows all the students enrolled in any courses in a given term. Resulting csv file will have one row per user enrollment that have not visited the course since the date."
+            text: "This report shows all the students enrolled in any courses in a given term. Resulting csv file will have one row per user enrolment that have not visited the course since the date."
   achieve_mastery_count_times_8c9bbcec: 
     one: "Achieve mastery one time"
     other: "Achieve mastery %{count} times"
@@ -3435,7 +3435,7 @@ en-AU:
         ? "no"
         : "No"
         register: Register
-        transfer_enrollment: "Transfer Enrollment"
+        transfer_enrollment: "Transfer Enrolment"
         ? "yes"
         : "Yes"
       details: 
@@ -3845,7 +3845,7 @@ en-AU:
         student_teacher_activity: "Your Interactions Report with %{user}"
         teacher_activity: "Student Interactions Report for %{user}"
         title: 
-          enrollment_sis_defined: "This enrollment was defined by the university, and can't be deleted"
+          enrollment_sis_defined: "This enrolment was defined by the university, and can't be deleted"
         user_account_details: "User Account Details"
         user_grades: "Marks for %{user}"
         user_only_view_section: "limit this user to only see fellow section users"
@@ -3878,10 +3878,10 @@ en-AU:
     roster_user: 
       completed_enrollment: "completed *%{completed_at}*"
       confirm: 
-        conclude_student: "Are you sure you want to conclude this student's enrollment?"
-        delete_enrollment: "Are you sure you want to delete this student's enrollment?"
+        conclude_student: "Are you sure you want to conclude this student's enrolment?"
+        delete_enrollment: "Are you sure you want to delete this student's enrolment?"
       enrolled_as: "Enrolled as a %{enrollment_type}"
-      enrollment_change_failed: "Enrollment privilege change failed, please try again"
+      enrollment_change_failed: "Enrolment privilege change failed, please try again"
       enrollment_linked_to: "linked to *%{linked_user}*"
       headings: 
         recent_messages: "Recent Messages"
@@ -3897,8 +3897,8 @@ en-AU:
       links: 
         access_report: "Access Report"
         cant_delete: "Can't Delete"
-        conclude_enrollment: "Conclude this Enrollment"
-        delete_enrollment: "Delete this Enrollment"
+        conclude_enrollment: "Conclude this Enrolment"
+        delete_enrollment: "Delete this Enrolment"
         faculty_journal: "Faculty Journal"
         link_enrollment: "Link this Enrollment"
         link_services: "Link web services to my account"
@@ -3907,11 +3907,11 @@ en-AU:
         more_user_details: "more user details..."
         remove_avatar: "Remove avatar picture"
         report_avatar: "Report inappropriate picture"
-        restore_enrollment: "Restore this Enrollment"
+        restore_enrollment: "Restore this Enrolment"
         student_teacher_activity: "Interactions with You"
         teacher_activity: "Student Interactions Report"
         title: 
-          enrollment_sis_defined: "This enrollment was defined by the university, and can't be deleted"
+          enrollment_sis_defined: "This enrolment was defined by the university, and can't be deleted"
         user_account_details: "User Account Details"
         user_grades: Marks
         user_only_view_section: "limit this user to only see fellow section users"
@@ -4632,7 +4632,7 @@ en-AU:
       created_at: "Created At"
       default_view: "Default View"
       default_wiki_editing_roles: "Default Wiki Editing Roles"
-      enrollment_term_id: "Enrollment Term Id"
+      enrollment_term_id: "Enrolment Term Id"
       grading_standard_id: "Grading Standard Id"
       group_weighting_scheme: "Group Weighting Scheme"
       hide_distribution_graphs: "Hide Distribution Graphs"
@@ -4646,15 +4646,15 @@ en-AU:
       lock_all_announcements: "Lock All Announcements"
       name: Name
       old_account_id: "Old Account Id"
-      open_enrollment: "Open Enrollment"
+      open_enrollment: "Open Enrolment"
       public_description: "Public Description"
       public_syllabus: "Public Syllabus"
       replacement_course_id: "Replacement Course Id"
-      restrict_enrollments_to_course_dates: "Restrict Enrollments To Course Dates"
+      restrict_enrollments_to_course_dates: "Restrict Enrolments To Course Dates"
       root_account_id: "Root Account Id"
-      self_enrollment: "Self Enrollment"
-      self_enrollment_code: "Self Enrollment Code"
-      self_enrollment_limit: "Self Enrollment Limit"
+      self_enrollment: "Self Enrolment"
+      self_enrollment_code: "Self Enrolment Code"
+      self_enrollment_limit: "Self Enrolment Limit"
       show_all_discussion_entries: "Show All Discussion Entries"
       show_public_context_messages: "Show Public Context Message"
       sis_batch_id: "SIS Batch Id"
@@ -4715,7 +4715,7 @@ en-AU:
       linkError: "Something went wrong updating the user's student links. Please try again later."
       links: "Student links successfully updated"
       sectionError: "Something went wrong updating the user's sections. Please try again later."
-      sections: "Section enrollments successfully updated"
+      sections: "Section enrolments successfully updated"
     invitation_sent: "Invitation Sent!"
     invitation_sent_now: "Just Now"
     link_students_placeholder: "Enter a student name"
@@ -4733,7 +4733,7 @@ en-AU:
       link_to_students: "Link to Students"
       move_course: "Move Course"
       reset_course_content_dialog_help: "Reset Course Content"
-      section_enrollments: "Section Enrollments"
+      section_enrollments: "Section Enrolments"
   course_settings_sub_navigation_b95deae: "Course Settings Sub Navigation"
   course_setup_wizard_is_showing_a7c087c1: "Course Setup Wizard is showing."
   course_sis_7ae8f649: "course sis"
@@ -4814,15 +4814,15 @@ en-AU:
       instructors: Instructors
       labels: 
         description: Description
-        enrollment_fee: "Enrollment Fee"
+        enrollment_fee: "Enrolment Fee"
         format: Format
         image: Image
         path: "Course Path"
         portal_path: "Portal Path"
         position: Position
         related_id: "Link ID"
-        self_enrollment: Enrollment
-        self_enrollment_limit: "Enrollment Cap"
+        self_enrollment: Enrolment
+        self_enrollment_limit: "Enrolment Cap"
         tags: Tags
         tentative_start: "Tentative Start"
         title: Title
@@ -4869,10 +4869,10 @@ en-AU:
     index: 
       browse_more_courses: "Browse More Courses"
       headings: 
-        future_enrollments: "Future Enrollments"
+        future_enrollments: "Future Enrolments"
         my_courses: "All Courses"
         my_groups: "My Groups"
-        past_enrollments: "Past Enrollments"
+        past_enrollments: "Past Enrolments"
       start_new_course: Course
       titles: 
         courses: Courses
@@ -4901,8 +4901,8 @@ en-AU:
       failed_conclude: "Course failed to conclude"
       invitation_accepted: "Invitation accepted!  Welcome to %{course}!"
       invitation_cancelled: "Invitation canceled."
-      login_to_accept: "You'll need to log in before you can accept the enrollment."
-      preview_course: "You've been invited to join this course.  You can look around, but you'll need to accept the enrollment invitation before you can participate."
+      login_to_accept: "You'll need to log in before you can accept the enrolment."
+      preview_course: "You've been invited to join this course.  You can look around, but you'll need to accept the enrolment invitation before you can participate."
       reset_test_student: "The test student has been reset successfully."
       unconcluded: "Course un-concluded"
       updated: "Course was successfully updated."
@@ -4945,7 +4945,7 @@ en-AU:
         validating: Validating...
         will_not_be_added: "These users had errors and will not be added. Please ensure they are formatted correctly."
       edit_sections_view: 
-        edit_sections_desc: "Sections are an additional way to organize users. This can allow you to teach multiple classes from the same course, so that you can have the course content all in one place. Below you can move a user to a different section, or add/remove section enrollments. Users must be in at least one section at all times."
+        edit_sections_desc: "Sections are an additional way to organize users. This can allow you to teach multiple classes from the same course, so that you can have the course content all in one place. Below you can move a user to a different section, or add/remove section enrolments. Users must be in at least one section at all times."
       index: 
         cannot_add_users: "New users can not be added because this course is concluded"
         filter_field_description: "Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input."
@@ -5008,8 +5008,8 @@ en-AU:
         update_course: "Update Course Details"
       course_conclude_at_warning_message: "The course is currently set to end at midnight, meaning that the previous day will be the last day this course is active."
       course_conclude_at_warning_title: "Course Ending at Midnight"
-      course_open_enrollment: "This course has enabled open enrollment. Students can self-enroll in the course once you share with them this URL: *%{url}*. Alternatively, they can sign up at *%{url2}* and use the following join code: *%{code}*"
-      course_open_enrollment_without_code: "This course has enabled open enrollment. Students can self-enroll in the course once you share with them this URL: *%{url}*"
+      course_open_enrollment: "This course has enabled open enrolment. Students can self-enroll in the course once you share with them this URL: *%{url}*. Alternatively, they can sign up at *%{url2}* and use the following join code: *%{code}*"
+      course_open_enrollment_without_code: "This course has enabled open enrolment. Students can self-enroll in the course once you share with them this URL: *%{url}*"
       course_overrides_term: "This will override any term availability settings."
       course_settings_title: "Course Settings"
       deatils: 
@@ -5171,7 +5171,7 @@ en-AU:
         course_status: "Course Status"
       headings: 
         choose_home_page_title: "Choose Home Page"
-        confirm_unenroll: "Confirm Unenrollment"
+        confirm_unenroll: "Confirm Unenrolment"
         importing: "This course is being imported"
         unpublished: "This Course is Unpublished"
       importing: "Course copy/migration in progress. This means some content may be temporarily unavailable."
@@ -5258,7 +5258,7 @@ en-AU:
       links: 
         show_more: "%{count} more..."
     unauthorized: 
-      invalid_link: "The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled."
+      invalid_link: "The enrolment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled."
   courses_43204aae: Courses
   create_132b3be1: Create
   create_a_new_account_4cf7c0f9: "Create a New Account"
@@ -10117,14 +10117,14 @@ en-AU:
         body_student: "%{user} just accepted their invitation to participate in the course, %{course}, as a student."
         body_ta: "%{user} just accepted their invitation to participate in the course, %{course}, as a TA."
         body_teacher: "%{user} just accepted their invitation to participate in the course, %{course}, as a teacher."
-        details: "See the list of current enrollments here:"
+        details: "See the list of current enrolments here:"
         html: 
           body_designer: "%{user} just accepted their invitation to participate in the course, %{course}, as a designer."
           body_observer: "%{user} just accepted their invitation to participate in the course, %{course}, as an observer."
           body_student: "%{user} just accepted their invitation to participate in the course, %{course}, as a student."
           body_ta: "%{user} just accepted their invitation to participate in the course, %{course}, as a TA."
           body_teacher: "%{user} just accepted their invitation to participate in the course, %{course}, as a teacher."
-          details: "See the list of current enrollments"
+          details: "See the list of current enrolments"
           subject: "%{user} accepted the Course Invitation"
         subject: "%{user} accepted the Course Invitation"
       sms: 
@@ -10209,7 +10209,7 @@ en-AU:
           link: "Click here to view the course page."
           name: Name
           none: none
-          subject: "Course Enrollment"
+          subject: "Course Enrolment"
           username: Username
         labels: 
           email: Email
@@ -10217,7 +10217,7 @@ en-AU:
           username: Username
         none: none
         register: "Visit %{link} to complete registration"
-        subject: "Course Enrollment"
+        subject: "Course Enrolment"
       sms: 
         body_designer: "You've been enrolled in the course as a designer."
         body_observer: "You've been enrolled in the course as an observer."
@@ -10236,7 +10236,7 @@ en-AU:
         body_student: "You've been enrolled in the course, %{course}, as a student."
         body_ta: "You've been enrolled in the course, %{course}, as a TA."
         body_teacher: "You've been enrollment in the course, %{course}, as a teacher."
-        subject: "Course Enrollment"
+        subject: "Course Enrolment"
       twitter: 
         body: "Canvas Alert - Enrolled: course as %{role_type}"
     enrollment_registration: 
@@ -11629,9 +11629,9 @@ en-AU:
         Late assignment submission
     late_grading_display: "Late Grading"
     membership_update_description: |-
-        *Admin only: pending enrollment activated*
+        *Admin only: pending enrolment activated*
         
-        * Group enrollment
+        * Group enrolment
         * accepted/rejected
     membership_update_display: "Membership Update"
     missing_description_description: "For %{category} notifications"
@@ -11666,10 +11666,10 @@ en-AU:
       content_export_finished: "Content Export Finished"
       conversation_created: "Conversation Created"
       conversation_message: "Conversation Message"
-      enrollment_accepted: "Enrollment Accepted"
-      enrollment_invitation: "Enrollment Invitation"
-      enrollment_notification: "Enrollment Notification"
-      enrollment_registration: "Enrollment Registration"
+      enrollment_accepted: "Enrolment Accepted"
+      enrollment_invitation: "Enrolment Invitation"
+      enrollment_notification: "Enrolment Notification"
+      enrollment_registration: "Enrolment Registration"
       event_date_changed: "Event Date Changed"
       forgot_password: "Forgot Password"
       grade_weight_changed: "Mark Weight Changed"
@@ -11711,7 +11711,7 @@ en-AU:
     other_description: |-
         *Instructor and Admin only:*
         
-        * Course enrollment
+        * Course enrolment
         * Report generated
         * Content export
         * Migration report
@@ -15018,7 +15018,7 @@ en-AU:
         hide_student_names_label: "Hide Student Names"
         include_ungraded_assignments: "Treat Unmarked as 0"
         set_group_weights: "Set Group Weights"
-        show_concluded_enrollments_label: "Show Concluded Enrollments"
+        show_concluded_enrollments_label: "Show Concluded Enrolments"
         show_notes: "Show Notes in Student Info"
         show_total_as_points: "Show Totals as Points on Student Mark Page"
         sis_export: "Publish marks to SIS"
@@ -15050,7 +15050,7 @@ en-AU:
   search: 
     all_courses: 
       name: Name
-      open_enrollment_only: "Open enrollment courses only"
+      open_enrollment_only: "Open enrolment courses only"
       public_only: "Public courses only"
       search: Search
       titles: 
@@ -15088,7 +15088,7 @@ en-AU:
   secondary_navigation_f701dc45: "Secondary Navigation"
   section: 
     confirms: 
-      delete_enrollment: "Are you sure you want to delete this enrollment permanently?"
+      delete_enrollment: "Are you sure you want to delete this enrolment permanently?"
     default_course_name: "Course ID \"%{course_id}\""
     enrolled_as_designer: "enrolled as a designer"
     enrolled_as_limited_designer: "enrolled as a designer with section-only access"
@@ -15122,15 +15122,15 @@ en-AU:
     section_creation_failed: "Section creation failed"
     section_crosslisted: "Section successfully cross-listed!"
     section_decrosslisted: "Section successfully de-cross-listed!"
-    section_delete_not_allowed: "You can't delete a section that has enrollments"
+    section_delete_not_allowed: "You can't delete a section that has enrolments"
     section_deleted: "Course section successfully deleted!"
     section_update_error: "Section update failed"
     section_updated: "Section successfully updated!"
     show: 
       access_limit: "Users can only participate in the course between these dates"
       active_enrollment: 
-        one: "1 Active Enrollment"
-        other: "%{count} Active Enrollments"
+        one: "1 Active Enrolment"
+        other: "%{count} Active Enrolments"
       buttons: 
         back_to_course: "Back to Course Settings"
         cancel: Cancel
@@ -15142,8 +15142,8 @@ en-AU:
         uncrosslist_section: "De-Cross-List this Section"
         update_section: "Update Section"
       completed_enrollment: 
-        one: "1 Completed Enrollment"
-        other: "%{count} Completed Enrollments"
+        one: "1 Completed Enrolment"
+        other: "%{count} Completed Enrolments"
       crosslist_description: "Cross-listing allows you to create a section in one account and then move it to a course on a different account. To cross-list this course, you'll need to find the course you want to move it to, either using the search tool or by entering the course's ID."
       decrosslist_description: "This will move the section back to its original course, **%{course_name}**."
       decrosslist_long_description: "All marks for students in this course will no longer be visible. You can retrieve the marks later by re-cross-listing the course, but in the mean time the marks for these students will come from the original course."
@@ -15161,8 +15161,8 @@ en-AU:
         start_at: Starts
       override_settings: "This will override any term or course date settings."
       pending_enrollment: 
-        one: "1 Pending Enrollment"
-        other: "%{count} Pending Enrollments"
+        one: "1 Pending Enrolment"
+        other: "%{count} Pending Enrolments"
       prompts: 
         are_you_sure_decrosslist: "Are you sure you want to de-cross-list this section?"
       run_dates: "Runs from %{start_date} to %{end_date}"
@@ -15170,10 +15170,10 @@ en-AU:
       runs_until: "Runs until %{end_date}"
       student_access_dates: "Students can only access the course between these dates"
       titles: 
-        completed_enrollments: "Completed Enrollments"
+        completed_enrollments: "Completed Enrolments"
         cross_listed_sections: "Cross-List Section"
         crosslist_this_section: "Cross-List this Section"
-        current_enrollments: "Current Enrollments"
+        current_enrollments: "Current Enrolments"
         decrosslist_section: "De-Cross-List this Section"
   see_rubric_results_62a6447d: "See rubric results."
   see_scoring_details_f7fd1f3b: "See scoring details."
@@ -15257,9 +15257,9 @@ en-AU:
         next: Next
       getting_started: "You are enrolling in **%{course}**"
     course_full: 
-      class_full: "Enrollment has filled up for **%{course}**. We apologise for the inconvenience."
+      class_full: "Enrolment has filled up for **%{course}**. We apologise for the inconvenience."
     enrollment_closed: 
-      enrollment_is_closed: "Enrollment is closed for **%{course}**."
+      enrollment_is_closed: "Enrolment is closed for **%{course}**."
     new: 
       titles: 
         course_enrollment: "Enroll in %{course}"
@@ -16093,8 +16093,8 @@ en-AU:
       accounts: "Accounts: %{account_count}"
       courses: "Courses: %{course_count}"
       crosslists: "Crosslists: %{crosslist_count}"
-      enrollments: "Enrollments: %{enrollment_count}"
-      group_enrollments: "Group Enrollments: %{group_enrollments_count}"
+      enrollments: "Enrolments: %{enrollment_count}"
+      group_enrollments: "Group Enrolments: %{group_enrollments_count}"
       groups: "Groups: %{group_count}"
       sections: "Sections: %{section_count}"
       terms: "Terms: %{term_count}"
@@ -17337,7 +17337,7 @@ en-AU:
     adding_users: "Adding Users..."
     buttons: 
       continue: Continue...
-    cant_unenroll: "This user was automatically enrolled using the campus enrollment system, so they can't be manually removed.  Please contact your system administrator if you have questions."
+    cant_unenroll: "This user was automatically enrolled using the campus enrolment system, so they can't be manually removed.  Please contact your system administrator if you have questions."
     delete_confirm: "Are you sure you want to remove this user?"
     duplicate_users: 
       one: "1 duplicate user found, duplicates have been removed."
@@ -17573,7 +17573,7 @@ en-AU:
       crumbs: 
         users: Users
       labels: 
-        show_users_for_term: "Show users with enrollments in the term"
+        show_users_for_term: "Show users with enrolments in the term"
       no_results_found: "No Results Found"
       search_for_user: "User Search results for %{user_name}"
       titles: 
@@ -17618,10 +17618,10 @@ en-AU:
     merge_results: 
       action: Action
       emails: Emails
-      enrollments: Enrollments
+      enrollments: Enrolments
       logins: Logins
       no_emails: "no emails"
-      no_enrollments: "no enrollments"
+      no_enrollments: "no enrolments"
       no_logins: "no logins"
       user: User
       will_be_deleted: "will be deleted"
@@ -17677,7 +17677,7 @@ en-AU:
       buttons: 
         faculty_journal_for: "Faculty Journal for %{user}"
       courses: Courses
-      enrollments: Enrollments
+      enrollments: Enrolments
       groups: Groups
       links: 
         message_user: "Message %{user}"
