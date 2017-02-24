@@ -11,6 +11,7 @@ module CC::Exporter::WebZip
       @course = course
       @user = user
       @current_progress = Rails.cache.fetch(progress_key)
+      @current_progress ||= MustViewModuleProgressor.new(user, course).current_progress
       @html_converter = CC::CCHelper::HtmlContentExporter.new(course, user)
     end
     attr_reader :files, :course, :user, :current_progress
@@ -113,18 +114,13 @@ module CC::Exporter::WebZip
     end
 
     def user_module_status(modul)
-      progress = current_progress&.dig(modul.id, :status)
-      return progress unless progress.nil?
-      progression = modul.context_module_progressions.find_or_create_by(user: user).evaluate
-      progression.workflow_state
+      status = current_progress&.dig(modul.id, :status)
+      status || (modul.locked_for?(user, deep_check_if_needed: true) ? 'locked' : 'unlocked')
     end
 
     def item_completed?(item)
       modul = item.context_module
-      progress = current_progress&.dig(modul.id, :items, item.id)
-      return progress unless progress.nil?
-      progression = modul.context_module_progressions.find_or_create_by(user: user).evaluate
-      progression.finished_item?(item)
+      current_progress&.dig(modul.id, :items, item.id) || false
     end
 
     def requirement_type(modul)

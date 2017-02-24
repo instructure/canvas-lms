@@ -41,8 +41,15 @@ class MustViewModuleProgressor
   def current_progress
     progress = {}
     modules.each do |mod|
-      progression = mod.context_module_progressions.find_or_create_by(user: user).evaluate
-      progress[mod.id] = { status: progression.workflow_state, items: items_current_progress(mod, progression) }
+      progress[mod.id] =
+        if (progression = mod.find_or_create_progression(user)&.evaluate)
+          { status: progression.workflow_state }
+        elsif mod.grants_right?(user, :read)
+          { status: 'unlocked' }
+        else
+          { status: 'locked' }
+        end
+      progress[mod.id][:items] = items_current_progress(mod, progression)
     end
     progress
   end
@@ -97,7 +104,7 @@ class MustViewModuleProgressor
   def items_current_progress(mod, progression)
     progress = {}
     mod.content_tags.each do |item|
-      progress[item.id] = progression.finished_item?(item)
+      progress[item.id] = (progression&.finished_item?(item) || false)
     end
     progress
   end

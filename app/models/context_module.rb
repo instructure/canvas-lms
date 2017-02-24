@@ -262,17 +262,17 @@ class ContextModule < ActiveRecord::Base
     # matter. we're not available.
 
     tag = opts[:tag]
-    res = progression && !progression.locked?
-    if tag && tag.context_module_id == self.id && self.require_sequential_progress
-      res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
-    end
-    if !res && opts[:deep_check_if_needed]
+    avail = progression && !progression.locked? && !locked_for_tag?(tag, progression)
+    if !avail && opts[:deep_check_if_needed]
       progression = self.evaluate_for(progression)
-      if tag && tag.context_module_id == self.id && self.require_sequential_progress
-        res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
-      end
+      avail = progression && !progression.locked? && !locked_for_tag?(tag, progression)
     end
-    res
+    avail
+  end
+
+  def locked_for_tag?(tag, progression)
+    locked = (tag&.context_module_id == self.id && self.require_sequential_progress)
+    locked && (progression.current_position &.< tag.position)
   end
 
   def self.module_names(context)

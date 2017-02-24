@@ -386,5 +386,21 @@ describe "MustViewModuleProgressor" do
       progress = MustViewModuleProgressor.new(@student, @course).current_progress
       expect(progress[@module.id][:items][assign_item.id]).to be false
     end
+
+    it "should not create progressions for non-enrolled admins and allow view if appropriate" do
+      account_admin_user
+      progress = MustViewModuleProgressor.new(@admin, @course).current_progress
+      expect(progress[@module.id][:status]).to eq 'unlocked'
+      expect(ContextModuleProgression.where(user: @admin, context_module: @module).count).to eq 0
+    end
+
+    it "should not create progressions for non-enrolled non-admins" do
+      course_factory(is_public: true, active_all: true)
+      user_factory(active_all: true)
+      modul = module_with_item(:assignment, 'must_contribute')
+      progress = MustViewModuleProgressor.new(@user, @course).current_progress
+      expect(progress[modul.id][:status]).to eq 'unlocked'
+      expect(ContextModuleProgression.where(user: @user, context_module: modul).count).to eq 0
+    end
   end
 end
