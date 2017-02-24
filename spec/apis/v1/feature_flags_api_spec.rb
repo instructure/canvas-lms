@@ -27,6 +27,7 @@ describe "Feature Flags API", type: :request do
   let_once(:t_root_admin) { account_admin_user account: t_root_account }
 
   before do
+    User.any_instance.stubs(:set_default_feature_flags)
     Feature.stubs(:definitions).returns({
       'root_account_feature' => Feature.new(feature: 'root_account_feature', applies_to: 'RootAccount', state: 'allowed'),
       'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account', state: 'on', display_name: lambda { "Account Feature FRD" }, description: lambda { "FRD!!" }, beta: true,  autoexpand: true),

@@ -155,6 +155,15 @@ END
       state: 'allowed',
       beta: true
     },
+    'new_user_tutorial_on_off' =>
+    {
+      display_name: -> { I18n.t('Course Set-up Tutorial') },
+      description: -> { I18n.t('Course set-up tutorial provides tips on how to leverage the feature opportunities on each page in Canvas. It is especially useful when you are new to Canvas or are setting up a new course for the first time in a long time.') },
+      applies_to: 'User',
+      state: 'allowed',
+      beta: true
+    },
+
     'outcome_gradebook' =>
     {
       display_name: -> { I18n.t('features.learning_mastery_gradebook', 'Learning Mastery Gradebook') },

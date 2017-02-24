@@ -769,10 +769,17 @@ describe ApplicationHelper do
     context "with new_users_tutorial feature flag enabled" do
       before(:each) do
         @domain_root_account.enable_feature! :new_user_tutorial
+        @current_user = User.create!
       end
 
-      it "returns true" do
+      it "returns true if the user has the flag enabled" do
+        @current_user.enable_feature!(:new_user_tutorial_on_off)
         expect(tutorials_enabled?).to be true
+      end
+
+      it "returns false if the user has the flag disabled" do
+        @current_user.disable_feature!(:new_user_tutorial_on_off)
+        expect(tutorials_enabled?).to be false
       end
     end
 

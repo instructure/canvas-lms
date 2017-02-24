@@ -3,8 +3,16 @@ define([
   'i18n!new_user_tutorial',
   'instructure-ui',
   '../NewUserTutorialToggleButton',
+  '../ConfirmEndTutorialDialog',
   'jsx/shared/proptypes/plainStoreShape'
-], (React, I18n, { Tray }, NewUserTutorialToggleButton, plainStoreShape) => {
+], (
+  React,
+  I18n,
+  { Tray, Button },
+  NewUserTutorialToggleButton,
+  ConfirmEndTutorialDialog,
+  plainStoreShape
+) => {
   class TutorialTray extends React.Component {
 
     static propTypes = {
@@ -20,7 +28,10 @@ define([
 
     constructor (props) {
       super(props);
-      this.state = props.store.getState();
+      this.state = {
+        ...props.store.getState(),
+        endUserTutorialShown: false
+      };
     }
 
     componentDidMount () {
@@ -39,6 +50,21 @@ define([
       this.props.store.setState({
         isCollapsed: !this.state.isCollapsed
       });
+    }
+
+    handleEndTutorialClick = () => {
+      this.setState({
+        endUserTutorialShown: true
+      });
+    }
+
+    closeEndTutorialDialog = () => {
+      this.setState({
+        endUserTutorialShown: false
+      });
+      if (this.endTutorialButton) {
+        this.endTutorialButton.focus();
+      }
     }
 
     handleEntering = () => {
@@ -69,6 +95,18 @@ define([
               />
             </div>
             {this.props.children}
+            <div className="NewUserTutorialTray__EndTutorialContainer">
+              <Button
+                onClick={this.handleEndTutorialClick}
+                ref={(c) => { this.endTutorialButton = c; }}
+              >
+                {I18n.t('End Tutorial')}
+              </Button>
+            </div>
+            <ConfirmEndTutorialDialog
+              isOpen={this.state.endUserTutorialShown}
+              handleRequestClose={this.closeEndTutorialDialog}
+            />
           </div>
         </Tray>
       );

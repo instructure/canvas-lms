@@ -72,4 +72,38 @@ define([
 
     ok(store.getState().isCollapsed);
   });
+
+  test('initial state sets endUserTutorialShown to false', () => {
+    const wrapper = shallow(
+      <TutorialTray {...getDefaultProps()}>
+        <div>Some Content</div>
+      </TutorialTray>
+    );
+
+    equal(wrapper.state('endUserTutorialShown'), false);
+  });
+
+  test('handleEndTutorialClick sets endUserTutorialShown to true', () => {
+    const wrapper = shallow(
+      <TutorialTray {...getDefaultProps()}>
+        <div>Some Content</div>
+      </TutorialTray>
+    );
+
+    wrapper.instance().handleEndTutorialClick();
+
+    equal(wrapper.state('endUserTutorialShown'), true);
+  });
+
+  test('closeEndTutorialDialog sets endUserTutorialShown to false', () => {
+    const wrapper = shallow(
+      <TutorialTray {...getDefaultProps()}>
+        <div>Some Content</div>
+      </TutorialTray>
+    );
+
+    wrapper.instance().closeEndTutorialDialog();
+
+    equal(wrapper.state('endUserTutorialShown'), false);
+  });
 });

@@ -22,3 +22,9 @@
   margin-top: $ic-sp*6;
   text-align: center;
 }
+
+.NewUserTutorialTray__EndTutorialContainer {
+  position: absolute;
+  bottom: $ic-sp;
+  right: $ic-sp;
+}

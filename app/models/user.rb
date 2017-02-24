@@ -34,6 +34,7 @@ class User < ActiveRecord::Base
   attr_accessor :previous_id, :menu_data, :gradebook_importer_submissions, :prior_enrollment
 
   before_save :infer_defaults
+  after_create :set_default_feature_flags
   serialize :preferences
   include TimeZoneHelper
   time_zone_attribute :time_zone
@@ -723,6 +724,10 @@ class User < ActiveRecord::Base
     self.reminder_time_for_grading ||= 0
     self.initial_enrollment_type = nil unless ['student', 'teacher', 'ta', 'observer'].include?(initial_enrollment_type)
     true
+  end
+
+  def set_default_feature_flags
+    self.enable_feature!(:new_user_tutorial_on_off)
   end
 
   def sortable_name

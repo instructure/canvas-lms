@@ -3176,5 +3176,12 @@ describe User do
     end
   end
 
+  describe "after_create" do
+    it "sets the new_user_tutorial_on_off feature flag to true" do
+      u = User.create!
+      expect(u.feature_enabled?(:new_user_tutorial_on_off)).to be true
+    end
+  end
+
   it { is_expected.to have_many(:submission_comment_participants) }
 end

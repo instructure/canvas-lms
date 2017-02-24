@@ -988,7 +988,8 @@ module ApplicationHelper
   end
 
   def tutorials_enabled?
-    @domain_root_account.try(:feature_enabled?, :new_user_tutorial)
+    @domain_root_account&.feature_enabled?(:new_user_tutorial) &&
+    @current_user&.feature_enabled?(:new_user_tutorial_on_off)
   end
 
   def set_tutorial_js_env
