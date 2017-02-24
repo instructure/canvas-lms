@@ -25,12 +25,22 @@ define [
   test 'properly populates initial settings', ->
     @assignment.set('post_to_sis', true)
     @quiz.set('post_to_sis', false)
-    @view1 = new SisButtonView(model: @assignment)
-    @view2 = new SisButtonView(model: @quiz)
+    @view1 = new SisButtonView(model: @assignment, sisName: 'SIS')
+    @view2 = new SisButtonView(model: @quiz, sisName: 'SIS')
     @view1.render()
     @view2.render()
-    equal @view1.$input.attr('title'), 'Post grade to SIS enabled. Click to toggle.'
-    equal @view2.$input.attr('title'), 'Post grade to SIS disabled. Click to toggle.'
+    equal @view1.$input.attr('title'), 'Sync to SIS enabled. Click to toggle.'
+    equal @view2.$input.attr('title'), 'Sync to SIS disabled. Click to toggle.'
+
+  test 'properly populates initial settings with custom SIS name', ->
+    @assignment.set('post_to_sis', true)
+    @quiz.set('post_to_sis', false)
+    @view1 = new SisButtonView(model: @assignment, sisName: 'PowerSchool')
+    @view2 = new SisButtonView(model: @quiz, sisName: 'PowerSchool')
+    @view1.render()
+    @view2.render()
+    equal @view1.$input.attr('title'), 'Sync to PowerSchool enabled. Click to toggle.'
+    equal @view2.$input.attr('title'), 'Sync to PowerSchool disabled. Click to toggle.'
 
   test 'properly toggles model sis status when clicked', ->
     @assignment.set('post_to_sis', false)

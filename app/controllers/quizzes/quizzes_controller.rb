@@ -104,6 +104,7 @@ class Quizzes::QuizzesController < ApplicationController
       skip_date_overrides: true,
       skip_lock_tests: true
     }]
+    sis_name = @context.respond_to?(:assignments) ? AssignmentUtil.post_to_sis_friendly_name(@context.assignments.first) : 'SIS'
 
     js_env({
       :QUIZZES => {
@@ -127,6 +128,7 @@ class Quizzes::QuizzesController < ApplicationController
         post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context)
       },
       :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
+      :SIS_NAME => sis_name
     })
 
     conditional_release_js_env(includes: :active_rules)

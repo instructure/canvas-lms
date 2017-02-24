@@ -144,6 +144,9 @@ define [
       return @get 'post_to_sis' unless arguments.length > 0
       @set 'post_to_sis', postToSisBoolean
 
+    postToSISName: =>
+      return ENV.SIS_NAME
+
     toView: =>
       fields = [
         'htmlUrl', 'multipleDueDates', 'nonBaseDates', 'allDates', 'dueAt', 'lockAt', 'unlockAt', 'singleSectionDueDate'
