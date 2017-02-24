@@ -323,37 +323,42 @@ class SearchController < ApplicationController
       }
     end
 
-    result = result.reject{ |context| context[:state] == :inactive } unless options[:include_inactive]
-    result = result.map{ |context|
+    result.map{ |context|
       asset_string = "#{context[:type]}_#{context[:id]}"
+
+      next if exclude.include?(asset_string)
+      next if !options[:include_inactive] && context[:state] == :inactive
+      next if terms.present? && terms.any?{ |part| !context[:name].downcase.include?(part) }
+
+      permissions =
+        if context[:type] == :section
+          # TODO: have load_all_contexts actually return section-level
+          # permissions. but before we do that, sections will need to grant many
+          # more permission (possibly inherited from the course, like
+          # :send_messages_all)
+          course_for_section(context)[:permissions]
+        elsif context[:type] == :group && context[:parent]
+          course = course_for_group(context)
+          # People have groups in unpublished courses that they use for messaging.
+          # We should really train them to use subaccount-level groups.
+          course ? course[:permissions] : {send_messages: true}
+        else
+          context[:permissions] || {}
+        end
+
+      next if options[:messageable_only] && !permissions.include?(:send_messages)
+
       ret = {
         :id => asset_string,
         :name => context[:name],
         :avatar_url => avatar_url,
         :type => :context,
         :user_count => @current_user.address_book.count_in_context(asset_string),
-        :permissions => context[:permissions] || {}
+        :permissions => permissions,
       }
-      if context[:type] == :section
-        # TODO: have load_all_contexts actually return section-level
-        # permissions. but before we do that, sections will need to grant many
-        # more permission (possibly inherited from the course, like
-        # :send_messages_all)
-        ret[:permissions] = course_for_section(context)[:permissions]
-      elsif context[:type] == :group && context[:parent]
-        course = course_for_group(context)
-        # People have groups in unpublished courses that they use for messaging.
-        # We should really train them to use subaccount-level groups.
-        ret[:permissions] = course ? course[:permissions] : {send_messages: true}
-      end
       ret[:context_name] = context[:context_name] if context[:context_name] && context_name.nil?
       ret
-    }
-    result = result.select{ |context| context[:permissions].include? :send_messages } if options[:messageable_only]
-
-    result.reject!{ |context| terms.any?{ |part| !context[:name].downcase.include?(part) } } if terms.present?
-    result.reject!{ |context| exclude.include?(context[:id]) }
-    result
+    }.compact
   end
 
   def course_for_section(section)
