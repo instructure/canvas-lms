@@ -568,23 +568,6 @@ describe AssignmentsController do
     end
   end
 
-  describe "PUT 'update'" do
-    it "should require authorization" do
-      #controller.use_rails_error_handling!
-      put 'update', :course_id => @course.id, :id => @assignment.id
-      assert_unauthorized
-    end
-
-    it "should update attributes" do
-      user_session(@teacher)
-      put 'update', :course_id => @course.id, :id => @assignment.id,
-        :assignment_type => "attendance", :assignment => { :title => "test title" }
-      expect(assigns[:assignment]).to eql(@assignment)
-      expect(assigns[:assignment].title).to eql("test title")
-      expect(assigns[:assignment].submission_types).to eql("attendance")
-    end
-  end
-
   describe "DELETE 'destroy'" do
     it "should require authorization" do
       delete 'destroy', :course_id => @course.id, :id => @assignment.id
