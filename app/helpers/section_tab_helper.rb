@@ -78,7 +78,7 @@ module SectionTabHelper
     def cache_key
       [ context, current_user, domain_root_account,
         Lti::NavigationCache.new(domain_root_account),
-        "section_tabs_hash", I18n.locale
+        "section_tabs_hash2", I18n.locale
       ].cache_key
     end
 
