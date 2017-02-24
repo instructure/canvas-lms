@@ -17,7 +17,7 @@ define([
     static propTypes = {
       assignmentGroup: React.PropTypes.shape({
         name: React.PropTypes.string.isRequired,
-        weight: React.PropTypes.number
+        groupWeight: React.PropTypes.number
       }).isRequired,
       weightedGroups: React.PropTypes.bool.isRequired
     };
@@ -25,7 +25,7 @@ define([
     renderWeight () {
       if (!this.props.weightedGroups) return '';
 
-      const weightValue = this.props.assignmentGroup.weight || 0;
+      const weightValue = this.props.assignmentGroup.groupWeight || 0;
       const weightStr = I18n.n(weightValue, { precision: 2, percentage: true });
       const weightDesc = I18n.t('%{weight} of grade', { weight: weightStr });
 

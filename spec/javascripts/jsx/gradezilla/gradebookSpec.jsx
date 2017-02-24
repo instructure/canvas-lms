@@ -1,7 +1,10 @@
-define(['compiled/gradezilla/Gradebook',
+define([
   'underscore',
-  'helpers/fakeENV'
-], (Gradebook, _, fakeENV) => {
+  'react',
+  'react-dom',
+  'helpers/fakeENV',
+  'compiled/gradezilla/Gradebook'
+], (_, React, ReactDOM, fakeENV, Gradebook) => {
   QUnit.module("addRow", {
     setup: function() {
       fakeENV.setup({
@@ -45,7 +48,7 @@ define(['compiled/gradezilla/Gradebook',
     },
   });
 
-  test('calculates percentage from given  score and possible values', function () {
+  test('calculates percentage from given score and possible values', function () {
     const gradebook = new Gradebook({ settings: {}, sections: {} });
     const groupTotalOutput = gradebook.groupTotalFormatter(0, 0, { score: 9, possible: 10 }, {});
     ok(groupTotalOutput.includes('9 / 10'));
@@ -74,5 +77,72 @@ define(['compiled/gradezilla/Gradebook',
     const groupTotalOutput = gradebook.groupTotalFormatter(0, 0, { score: 9, possible: 0 }, {});
     ok(groupTotalOutput.includes('9 / 0'));
     ok(groupTotalOutput.includes('-'));
+  });
+
+  QUnit.module('Gradebook#getAssignmentColumnId');
+
+  test('returns a unique key for the assignment column', function () {
+    equal(Gradebook.prototype.getAssignmentColumnId('201'), 'assignment_201');
+  });
+
+  QUnit.module('Gradebook#getAssignmentGroupColumnId');
+
+  test('returns a unique key for the assignment group column', function () {
+    equal(Gradebook.prototype.getAssignmentGroupColumnId('301'), 'assignment_group_301');
+  });
+
+  QUnit.module('Gradebook#getAssignmentColumnHeaderProps', {
+    createGradebook (options = {}) {
+      const gradebook = new Gradebook({
+        settings: {},
+        sections: {},
+        ...options
+      });
+      gradebook.setAssignments({
+        201: { name: 'Math Assignment' },
+        202: { name: 'English Assignment' }
+      });
+      return gradebook;
+    }
+  });
+
+  test('includes properties from the assignment', function () {
+    const props = this.createGradebook().getAssignmentColumnHeaderProps('201');
+    ok(props.assignment, 'assignment is present');
+    equal(props.assignment.name, 'Math Assignment');
+  });
+
+  QUnit.module('Gradebook#getAssignmentGroupColumnHeaderProps', {
+    createGradebook (options = {}) {
+      const gradebook = new Gradebook({
+        group_weighting_scheme: 'percent',
+        settings: {},
+        sections: {},
+        ...options
+      });
+      gradebook.setAssignmentGroups({
+        301: { name: 'Assignments', group_weight: 40 },
+        302: { name: 'Homework', group_weight: 60 }
+      });
+      return gradebook;
+    }
+  });
+
+  test('includes properties from the assignment group', function () {
+    const props = this.createGradebook().getAssignmentGroupColumnHeaderProps('301');
+    ok(props.assignmentGroup, 'assignmentGroup is present');
+    equal(props.assignmentGroup.name, 'Assignments');
+    equal(props.assignmentGroup.groupWeight, 40);
+  });
+
+  test('sets weightedGroups to true when assignment group weighting scheme is "percent"', function () {
+    const props = this.createGradebook().getAssignmentGroupColumnHeaderProps('301');
+    equal(props.weightedGroups, true);
+  });
+
+  test('sets weightedGroups to false when assignment group weighting scheme is not "percent"', function () {
+    const options = { group_weighting_scheme: 'equal' };
+    const props = this.createGradebook(options).getAssignmentGroupColumnHeaderProps('301');
+    equal(props.weightedGroups, false);
   });
 });

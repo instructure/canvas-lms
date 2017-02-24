@@ -264,7 +264,7 @@ define [
 
       @submissionDialogArgs = undefined
 
-      @fakeSubmissionDetailsDialog = @stub SubmissionDetailsDialog, 'open', =>
+      @stub(SubmissionDetailsDialog, 'open').callsFake =>
         @submissionDialogArgs = arguments
 
       @event = {
@@ -278,7 +278,6 @@ define [
     teardown: ->
       @fixtureParent.innerHTML = ""
       @fixture = undefined
-      @fakeSubmissionDetailsDialog.restore()
 
   test 'when not editable, returns false if the active cell node has the "cannot_edit" class', ->
     @fixture.className = 'cannot_edit'
@@ -308,7 +307,7 @@ define [
       2: {}
     }
 
-    ok @fakeSubmissionDetailsDialog.called
+    equal SubmissionDetailsDialog.open.callCount, 1
     deepEqual expectedArguments, @submissionDialogArgs
 
   QUnit.module 'Menus',

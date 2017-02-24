@@ -202,6 +202,18 @@ define [
 
       @gotSections(@options.sections)
 
+      dataLoader.gotStudents.then () =>
+        @contentLoadStates.studentsLoaded = true
+        @updateColumnHeaders()
+
+      dataLoader.gotAssignmentGroups.then () =>
+        @contentLoadStates.assignmentsLoaded = true
+        @updateColumnHeaders()
+
+      dataLoader.gotSubmissions.then () =>
+        @contentLoadStates.submissionsLoaded = true
+        @updateColumnHeaders()
+
     loadOverridesForSIS: ->
       return unless $('.post-grades-placeholder').length > 0
 
@@ -412,8 +424,6 @@ define [
       _.each _.values(@studentViewStudents), (testStudent) =>
         @addRow(testStudent)
 
-    defaultSortType: 'assignment_group'
-
     studentsThatCanSeeAssignment: (potential_students, assignment) ->
       if assignment.only_visible_to_overrides
         _.pick potential_students, assignment.assignment_visibility...
@@ -548,9 +558,7 @@ define [
       matchingSection and matchingFilter
 
     handleAssignmentMutingChange: (assignment) =>
-      idx = @grid.getColumnIndex("assignment_#{assignment.id}")
-      colDef = @grid.getColumns()[idx]
-      @renderAssignmentColumnHeader(colDef)
+      @renderAssignmentColumnHeader(assignment.id)
       @grid.setColumns(@grid.getColumns())
       @fixColumnReordering()
       @buildRows()
@@ -631,9 +639,6 @@ define [
       cell = student["assignment_#{submission.assignment_id}"] ||= {}
       _.extend(cell, submission)
 
-    getColumnHeaderNode: (columnId) =>
-      document.getElementById(@grid.getUID() + columnId)
-
     # this is used after the CurveGradesDialog submit xhr comes back.  it does not use the api
     # because there is no *bulk* submissions#update endpoint in the api.
     # It is different from gotSubmissionsChunk in that gotSubmissionsChunk expects an array of students
@@ -646,14 +651,11 @@ define [
       changedColumnHeaders = {}
       for submission in submissions
         student = @student(submission.user_id)
-        idToMatch = "assignment_#{submission.assignment_id}"
+        idToMatch = @getAssignmentColumnId(submission.assignment_id)
         cell = index for column, index in columns when column.id is idToMatch
 
-        unless changedColumnHeaders[cell]
-          changedColumnHeaders[cell] =
-            grid: @grid
-            column: columns[cell]
-            node: @getColumnHeaderNode(columns[cell].id)
+        unless changedColumnHeaders[submission.assignment_id]
+          changedColumnHeaders[submission.assignment_id] = cell
 
         thisCellIsActive = activeCell? and
           editing and
@@ -669,8 +671,8 @@ define [
         @grid.updateCell student.row, cell unless thisCellIsActive
         @updateRowTotals student.row
 
-      for idx, columnHeader of changedColumnHeaders
-        @renderAssignmentColumnHeader(columnHeader, true)
+      for assignmentId, cell of changedColumnHeaders
+        @renderAssignmentColumnHeader(assignmentId)
 
     updateRowTotals: (rowIndex) ->
       columns = @grid.getColumns()
@@ -1165,77 +1167,6 @@ define [
       mountPoint = document.querySelector("[data-component='ActionMenu']")
       renderComponent(ActionMenu, mountPoint, actionMenuProps)
 
-    getAssignmentColumnHeaderProps: (originalAssignment, submissionsLoaded) =>
-      assignment = {
-        htmlUrl: originalAssignment.html_url,
-        id: originalAssignment.id,
-        invalid: originalAssignment.invalid,
-        muted: originalAssignment.muted,
-        name: originalAssignment.name,
-        omitFromFinalGrade: originalAssignment.omit_from_final_grade,
-        pointsPossible: originalAssignment.points_possible,
-        submissionTypes: originalAssignment.submission_types,
-        courseId: originalAssignment.course_id
-      }
-
-      students = _.map @studentsThatCanSeeAssignment(@students, originalAssignment), (student) =>
-        studentRecord =
-          id: student.id,
-          name: student.name,
-          isInactive: student.isInactive
-
-        assignmentKey = "assignment_#{assignment.id}"
-        assignmentData = student[assignmentKey]
-
-        if assignmentData
-          studentRecord.submission =
-            score: assignmentData.score,
-            submittedAt: assignmentData.submitted_at
-        else
-          studentRecord.submission =
-            score: undefined,
-            submittedAt: undefined
-
-        studentRecord
-
-      props =
-        assignment: assignment
-        students: students
-        submissionsLoaded: submissionsLoaded
-
-    renderAssignmentColumnHeader: (columnDefinition, immediate = false) =>
-      mountPoint = $(columnDefinition.node).find('.slick-column-name')[0]
-      assignment = columnDefinition.column.object
-
-      # Mount the component immediately, assuming submissions have already been loaded.
-      # This is used mainly to update column headers as the user changes data in the gradebook
-      if immediate
-        props = @getAssignmentColumnHeaderProps(assignment, true)
-        renderComponent(AssignmentColumnHeader, mountPoint, props)
-
-      # We're now in deferred mode => let's mount the component and indicate that the submissions
-      # might not all be loaded and kick off a deferred mount once all the submissions are loaded
-      props = @getAssignmentColumnHeaderProps(assignment, false)
-      renderComponent(AssignmentColumnHeader, mountPoint, props)
-
-      # Now let's wait for all submissions data to finish loading and re-mount this component so it
-      # has all the data it needs to power its functionality
-      @allSubmissionsLoaded.then =>
-        props = @getAssignmentColumnHeaderProps(assignment, true)
-        renderComponent(AssignmentColumnHeader, mountPoint, props)
-
-    renderAssignmentGroupColumnHeader: (columnDefinition, mountPoint) =>
-      originalAssignmentGroup = columnDefinition.column.object
-
-      assignmentGroup =
-        name: originalAssignmentGroup.name
-        weight: originalAssignmentGroup.group_weight
-
-      headerProps =
-        assignmentGroup: assignmentGroup
-        weightedGroups: @weightedGroups()
-      renderComponent(AssignmentGroupColumnHeader, mountPoint, headerProps)
-
     checkForUploadComplete: () ->
       if UserSettings.contextGet('gradebookUploadComplete')
         $.flashMessage I18n.t('Upload successful')
@@ -1354,7 +1285,7 @@ define [
                          assignment.points_possible? &&
                          SubmissionCell.out_of
         minWidth = if outOfFormatter then 70 else 90
-        fieldName = "assignment_#{id}"
+        fieldName = @getAssignmentColumnId(id)
 
         assignmentWidth = testWidth(assignment.name, minWidth, columnWidths.assignment.default_max)
         if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
@@ -1374,6 +1305,7 @@ define [
           width: assignmentWidth
           toolTip: assignment.name
           type: 'assignment'
+          assignmentId: assignment.id
           neverSort: true
 
         if fieldName in @assignmentsToHide
@@ -1409,6 +1341,7 @@ define [
             width: aggregateWidth
             cssClass: "meta-cell assignment-group-cell"
             type: 'assignment_group'
+            assignmentGroupId: group.id
             neverSort: true
           }
 
@@ -1451,7 +1384,7 @@ define [
       }, @options)
 
       @grid = new Slick.Grid('#gradebook_grid', @rows, @getVisibleGradeGridColumns(), options)
-      @grid.setSortColumn("student")
+      @grid.setSortColumn('student')
       # this is the magic that actually updates group and final grades when you edit a cell
 
       @grid.onCellChange.subscribe @onCellChange
@@ -1480,6 +1413,7 @@ define [
         false
 
       @grid.onHeaderCellRendered.subscribe @onHeaderCellRendered
+      @grid.onBeforeHeaderCellDestroy.subscribe @onBeforeHeaderCellDestroy
       @grid.onColumnsReordered.subscribe @onColumnsReordered
       @grid.onBeforeEditCell.subscribe @onBeforeEditCell
       @grid.onColumnsResized.subscribe @onColumnsResized
@@ -1487,15 +1421,19 @@ define [
       @onGridInit()
 
     onHeaderCellRendered: (event, obj) =>
-      mountPoint = obj.node.querySelector('.slick-column-name')
-      if obj.column.id == 'student'
-        renderComponent(StudentColumnHeader, mountPoint)
-      else if obj.column.id == 'total_grade'
-        renderComponent(TotalGradeColumnHeader, mountPoint)
-      else if obj.column.id.match(/^assignment_\d+$/)
-        @renderAssignmentColumnHeader(obj, mountPoint)
-      else if obj.column.id.match(/^assignment_group_\d+$/)
-        @renderAssignmentGroupColumnHeader(obj, mountPoint)
+      if obj.column.type == 'student'
+        @renderStudentColumnHeader()
+      else if obj.column.type == 'total_grade'
+        @renderTotalGradeColumnHeader()
+      else if obj.column.type == 'assignment'
+        @renderAssignmentColumnHeader(obj.column.assignmentId)
+      else if obj.column.type == 'assignment_group'
+        @renderAssignmentGroupColumnHeader(obj.column.assignmentGroupId)
+
+    onBeforeHeaderCellDestroy: (event, obj) =>
+      ReactDOM.unmountComponentAtNode(obj.node)
+
+    # TODO: destructive cell events will need appropriate React cleanup
 
     onColumnsResized: (event, obj) =>
       grid = obj.grid
@@ -1726,3 +1664,126 @@ define [
         when @showInactiveEnrollments
           'students_with_inactive_enrollments_url'
         else 'students_url'
+
+    ## Grid DOM Access/Reference Methods
+
+    getAssignmentColumnId: (assignmentId) =>
+      "assignment_#{assignmentId}"
+
+    getAssignmentGroupColumnId: (assignmentGroupId) =>
+      "assignment_group_#{assignmentGroupId}"
+
+    getColumnHeaderNode: (columnId) =>
+      document.getElementById(@grid.getUID() + columnId)
+
+    ## React Grid Component Rendering Methods
+
+    updateColumnHeaders: ->
+      return unless @grid
+
+      for column in @grid.getColumns()
+        if column.type == 'assignment'
+          @renderAssignmentColumnHeader(column.assignmentId)
+        else if column.type == 'assignment_group'
+          @renderAssignmentGroupColumnHeader(column.assignmentGroupId)
+      @renderStudentColumnHeader()
+      @renderTotalGradeColumnHeader()
+
+    # Student Column Header
+
+    renderStudentColumnHeader: =>
+      mountPoint = @getColumnHeaderNode('student')
+      renderComponent(StudentColumnHeader, mountPoint)
+
+    # Total Grade Column Header
+
+    renderTotalGradeColumnHeader: =>
+      return if @hideAggregateColumns
+      mountPoint = @getColumnHeaderNode('total_grade')
+      renderComponent(TotalGradeColumnHeader, mountPoint)
+
+    # Assignment Column Header
+
+    getAssignmentColumnHeaderProps: (assignmentId) =>
+      assignment = @getAssignment(assignmentId)
+
+      assignmentKey = "assignment_#{assignmentId}"
+      students = _.map @studentsThatCanSeeAssignment(@students, assignment), (student) =>
+        studentRecord =
+          id: student.id
+          name: student.name
+          isInactive: student.isInactive
+
+        submission = student[assignmentKey]
+
+        if submission
+          studentRecord.submission =
+            score: submission.score
+            submittedAt: submission.submitted_at
+        else
+          studentRecord.submission =
+            score: undefined
+            submittedAt: undefined
+
+        studentRecord
+
+      {
+        assignment:
+          htmlUrl: assignment.html_url
+          id: assignment.id
+          invalid: assignment.invalid
+          muted: assignment.muted
+          name: assignment.name
+          omitFromFinalGrade: assignment.omit_from_final_grade
+          pointsPossible: assignment.points_possible
+          submissionTypes: assignment.submission_types
+          courseId: assignment.course_id
+        students: students
+        submissionsLoaded: @contentLoadStates.submissionsLoaded
+      }
+
+    renderAssignmentColumnHeader: (assignmentId) =>
+      columnId = @getAssignmentColumnId(assignmentId)
+      mountPoint = @getColumnHeaderNode(columnId)
+      props = @getAssignmentColumnHeaderProps(assignmentId)
+      renderComponent(AssignmentColumnHeader, mountPoint, props)
+
+    # Assignment Group Column Header
+
+    getAssignmentGroupColumnHeaderProps: (assignmentGroupId) =>
+      assignmentGroup = @getAssignmentGroup(assignmentGroupId)
+      {
+        assignmentGroup:
+          name: assignmentGroup.name
+          groupWeight: assignmentGroup.group_weight
+        weightedGroups: @weightedGroups()
+      }
+
+    renderAssignmentGroupColumnHeader: (assignmentGroupId) =>
+      columnId = @getAssignmentGroupColumnId(assignmentGroupId)
+      mountPoint = @getColumnHeaderNode(columnId)
+      props = @getAssignmentGroupColumnHeaderProps(assignmentGroupId)
+      renderComponent(AssignmentGroupColumnHeader, mountPoint, props)
+
+    ## Gradebook Application State
+
+    defaultSortType: 'assignment_group'
+
+    contentLoadStates:
+      studentsLoaded: false
+      submissionsLoaded: false
+      assignmentsLoaded: false
+
+    ## Gradebook Content Access Methods
+
+    setAssignments: (assignmentMap) =>
+      @assignments = assignmentMap
+
+    setAssignmentGroups: (assignmentGroupMap) =>
+      @assignmentGroups = assignmentGroupMap
+
+    getAssignment: (assignmentId) =>
+      @assignments[assignmentId]
+
+    getAssignmentGroup: (assignmentGroupId) =>
+      @assignmentGroups[assignmentGroupId]
