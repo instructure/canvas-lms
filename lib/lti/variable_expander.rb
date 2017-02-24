@@ -66,7 +66,7 @@ module Lti
     end
 
     def lti_helper
-      @lti_helper ||= Lti::SubstitutionsHelper.new(@context, @root_account, @current_user)
+      @lti_helper ||= Lti::SubstitutionsHelper.new(@context, @root_account, @current_user, @tool)
     end
 
     def current_user=(current_user)
@@ -435,7 +435,7 @@ module Lti
     #   john.doe@example.com
     #   ```
     register_expansion 'Person.email.primary', [],
-                       -> { @current_user.email },
+                       -> { lti_helper.email },
                        USER_GUARD,
                        default_name: 'lis_person_contact_email_primary'
 
@@ -446,10 +446,7 @@ module Lti
     #   john.doe@example.com
     #   ```
     register_expansion 'vnd.Canvas.Person.email.sis', [],
-                       -> { @current_user.communication_channels.joins(
-                         "INNER JOIN #{Pseudonym.quoted_table_name}
-                          ON communication_channels.id=pseudonyms.sis_communication_channel_id")
-                              .limit(1).pluck(:path).first }, SIS_USER_GUARD
+                       -> {lti_helper.sis_email}, SIS_USER_GUARD
 
     # Returns the name of the timezone of the launching user. Only available when launched by a logged in user.
     # @example

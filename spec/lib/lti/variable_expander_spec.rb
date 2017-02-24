@@ -40,6 +40,7 @@ module Lti
       m = mock('tool')
       m.stubs(:id).returns(1)
       m.stubs(:context).returns(root_account)
+      m.stubs(:extension_setting).with(nil, :prefer_sis_email).returns(nil)
       shard_mock = mock('shard')
       shard_mock.stubs(:settings).returns({encription_key: 'abc'})
       m.stubs(:shard).returns(shard_mock)
@@ -732,8 +733,8 @@ module Lti
         end
 
         it 'has substitution for $Person.email.primary' do
-          user.save
-          user.email = 'someone@somewhere'
+          substitution_helper.stubs(:email).returns('someone@somewhere')
+          SubstitutionsHelper.stubs(:new).returns(substitution_helper)
           exp_hash = {test: '$Person.email.primary'}
           subject.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'someone@somewhere'
