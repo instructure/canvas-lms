@@ -14,17 +14,18 @@ module Lti
     def initialize(canvas_user, canvas_root_account, canvas_tool, canvas_context)
       @canvas_user = canvas_user
       @canvas_root_account = canvas_root_account
+      @canvas_tool = canvas_tool
       @canvas_context = canvas_context
-      @opaque_identifier = canvas_tool.opaque_identifier_for(@canvas_user)
+      @opaque_identifier = @canvas_tool.opaque_identifier_for(@canvas_user)
       @pseudonym = false
     end
 
     def convert
+      lti_helper = Lti::SubstitutionsHelper.new(@canvas_context, @canvas_root_account, @canvas_user, @canvas_tool)
       user = ::LtiOutbound::LTIUser.new
-
       user.id = @canvas_user.id
       user.avatar_url = @canvas_user.avatar_url
-      user.email = @canvas_user.email
+      user.email = lti_helper.email
       user.first_name = @canvas_user.first_name
       user.last_name = @canvas_user.last_name
       user.name = @canvas_user.name
@@ -36,8 +37,6 @@ module Lti
       user.login_id = -> { pseudonym ? pseudonym.unique_id : nil }
       user.sis_source_id = -> { pseudonym ? pseudonym.sis_user_id : nil }
       user.current_observee_ids = -> { current_course_observee_lti_context_ids() }
-
-      lti_helper = Lti::SubstitutionsHelper.new(@canvas_context, @canvas_root_account, @canvas_user)
       user.current_roles = lti_helper.current_lis_roles.split(',')
 
       user

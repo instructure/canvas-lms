@@ -98,6 +98,7 @@ class ContextExternalTool < ActiveRecord::Base
       :icon_svg_path_64,
       :icon_url,
       :message_type,
+      :prefer_sis_email,
       :selection_height,
       :selection_width,
       :text,
