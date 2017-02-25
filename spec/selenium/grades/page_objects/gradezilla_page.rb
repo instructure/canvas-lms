@@ -1,3 +1,5 @@
+require_relative '../../common'
+
 module Gradezilla
   class MultipleGradingPeriods
     include SeleniumDependencies
@@ -80,6 +82,13 @@ module Gradezilla
       cell = f('.container_1')
       cell = f(".slick-row:nth-child(#{row_idx})", cell)
       f(".slick-cell:nth-child(#{col_idx})", cell)
+    end
+
+    def total_score_for_row(row)
+      grade_grid = f('#gradebook_grid .container_1')
+      rows = grade_grid.find_elements(:css, '.slick-row')
+      total = f('.total-cell', rows[row])
+      total.text
     end
 
     def select_grading_period(grading_period_id)

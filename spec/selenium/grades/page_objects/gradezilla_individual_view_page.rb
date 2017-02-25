@@ -1,6 +1,6 @@
 require_relative '../../common'
 
-class SRGB
+class GradezillaIndividualViewPage
   class << self
     include SeleniumDependencies
 
@@ -9,11 +9,6 @@ class SRGB
       alpha: 'Alphabetically',
       due_date: 'By Due Date'
     }.freeze
-
-
-    def switch_to_default_gradebook_link
-      f('#switch_to_default_gradebook')
-    end
 
     def assignment_sorting_dropdown
       f(assignment_sort_order_selector)
@@ -119,7 +114,8 @@ class SRGB
     end
 
     def visit(course_id)
-      get "/courses/#{course_id}/gradebook/change_gradebook_version?version=srgb"
+      Account.default.enable_feature!(:gradezilla)
+      get "/courses/#{course_id}/gradebook/change_gradebook_version?version=individual"
     end
 
     def sort_assignments_by(sort_order)
@@ -171,7 +167,7 @@ class SRGB
 
     def drop_lowest(course, num_assignment)
       ag = course.assignment_groups.first
-      ag.rules_hash = {"drop_lowest"=>num_assignment}
+      ag.rules_hash = {"drop_lowest": num_assignment}
       ag.save!
     end
 

@@ -1,3 +1,5 @@
+require_relative '../../common'
+
 class StudentGradesPage
   include SeleniumDependencies
 
