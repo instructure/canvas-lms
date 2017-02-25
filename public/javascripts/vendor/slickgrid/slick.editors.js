@@ -556,8 +556,13 @@ define(['jquery','vendor/slickgrid/slick.core'],function(jQuery) {
         //if there is something typed in to the grade,
         //can't do if (value.grade) because if they had a grade of 0 it would break.
         if (typeof(value.grade) !== "undefined" && value.grade + "" !== "" ) {
-          $input[0].defaultValue = value.grade;
-          $input.val(defaultValue);
+          if (typeof(columnDef.editorFormatter) === 'function') {
+            $input[0].defaultValue = columnDef.editorFormatter(value.grade);
+            $input.val($input[0].defaultValue);
+          } else {
+            $input[0].defaultValue = value.grade;
+            $input.val(defaultValue);
+          }
         }
 
         $input.appendTo($container);
@@ -582,7 +587,11 @@ define(['jquery','vendor/slickgrid/slick.core'],function(jQuery) {
       }
 
       this.applyValue = function(item, state) {
-        item[columnDef.id].grade = state;
+        if (typeof(columnDef.editorParser) === 'function') {
+          item[columnDef.id].grade = columnDef.editorParser(state);
+        } else {
+          item[columnDef.id].grade = state;
+        }
       }
 
       this.getValue = function() {

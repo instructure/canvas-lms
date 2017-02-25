@@ -102,6 +102,13 @@ define([
             cssClass: "new-grade"
           };
 
+          if (this.grading_type !== 'letter_grade') {
+            newGrade.editorFormatter = function (grade) {
+              return GradeFormatHelper.formatGrade(grade, {defaultValue: ''});
+            };
+            newGrade.editorParser = GradeFormatHelper.delocalizeGrade;
+          }
+
           var conflictingGrade = {
             id: this.id + "_conflicting",
             width: 125,
