@@ -9,10 +9,13 @@ module Lti
       end
       class InvalidAuthJwt < StandardError
       end
+      class MissingAuthorizationCode < StandardError
+      end
 
-      def initialize(jwt:, authorization_url:)
+      def initialize(jwt:, authorization_url:, code: nil)
         @raw_jwt = jwt
         @authorization_url = authorization_url
+        @code = code
       end
 
       def jwt
@@ -52,9 +55,13 @@ module Lti
       end
 
       def developer_key
-        @_developer_key ||= DeveloperKey.find_cached(unverified_jwt[:sub])
-      rescue ActiveRecord::RecordNotFound
-        return nil
+        @_developer_key ||= begin
+          dev_key = DeveloperKey.find_cached(unverified_jwt[:sub])
+          raise MissingAuthorizationCode if dev_key && @code.blank?
+          dev_key
+        rescue ActiveRecord::RecordNotFound
+          return nil
+        end
       end
 
       def sub

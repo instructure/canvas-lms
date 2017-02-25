@@ -67,4 +67,8 @@ module Lti::Ims::AccessTokenHelper
     raise 'the method #lti2_service_name must be defined in the class'
   end
 
+  def render_unauthorized
+    render json: {error: 'unauthorized'}, status: :unauthorized
+  end
+
 end
