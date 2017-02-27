@@ -148,4 +148,22 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   def find_preloaded_restriction(migration_id)
     @preloaded_restrictions[migration_id]
   end
+
+  def deletions_since_last_export
+    deletions_by_type = {}
+    MasterCourses::ALLOWED_CONTENT_TYPES.each do |klass|
+      item_scope = case klass
+      when 'Attachment'
+        course.attachments.where(:file_state => 'deleted')
+      when 'WikiPage'
+        course.wiki.wiki_pages.where(:workflow_state => 'deleted')
+      else
+        klass.constantize.where(:context_id => course, :context_type => 'Course', :workflow_state => 'deleted')
+      end
+      item_scope = item_scope.where('updated_at>?', last_export_started_at).select(:id)
+      deleted_mig_ids = content_tags.where(content_type: klass, content_id: item_scope).pluck(:migration_id)
+      deletions_by_type[klass] = deleted_mig_ids if deleted_mig_ids.any?
+    end
+    deletions_by_type
+  end
 end

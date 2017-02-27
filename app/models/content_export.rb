@@ -236,6 +236,10 @@ class ContentExport < ActiveRecord::Base
     @master_migration ||= MasterCourses::MasterMigration.find(settings[:master_migration_id])
   end
 
+  def deletions
+    settings[:deletions]
+  end
+
   def common_cartridge?
     self.export_type == COMMON_CARTRIDGE
   end

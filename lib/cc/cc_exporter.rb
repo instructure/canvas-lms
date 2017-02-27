@@ -82,7 +82,7 @@ module CC
         if @for_master_migration
           # for efficiency to the max, short-circuit the usual course copy process (i.e. zip up, save, and then unzip again)
           # and instead go straight to the intermediate json
-          converter = CC::Importer::Canvas::Converter.new(:unzipped_file_path => @export_dir)
+          converter = CC::Importer::Canvas::Converter.new(:unzipped_file_path => @export_dir, :deletions => @content_export.deletions)
           @export_dirs << converter.base_export_dir # make sure we clean this up too afterwards
           converter.export
           @export_path = converter.course["full_export_file_path"] # this is the course_export.json

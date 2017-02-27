@@ -524,8 +524,10 @@ class ContentMigration < ActiveRecord::Base
       if !self.import_immediately?
         update_import_progress(100)
       end
-
-      self.update_master_migration('completed') if self.for_master_course_import?
+      if self.for_master_course_import?
+        process_master_deletions(data['deletions']) if data['deletions'].present?
+        self.update_master_migration('completed')
+      end
     rescue => e
       self.workflow_state = :failed
       er_id = Canvas::Errors.capture_exception(:content_migration, e)[:error_report]
@@ -573,6 +575,31 @@ class ContentMigration < ActiveRecord::Base
 
   def for_master_course_import?
     self.migration_type == 'master_course_import'
+  end
+
+  def process_master_deletions(deletions)
+    deletions.keys.each do |klass|
+      next unless MasterCourses::ALLOWED_CONTENT_TYPES.include?(klass)
+      mig_ids = deletions[klass]
+      item_scope = case klass
+      when 'WikiPage'
+        self.context.wiki.wiki_pages.not_deleted.where(migration_id: mig_ids)
+      when 'Attachment'
+        self.context.attachments.not_deleted.where(migration_id: mig_ids)
+      else
+        klass.constantize.where(context_id: self.context, context_type: 'Course', migration_id: mig_ids).
+          where.not(workflow_state: 'deleted')
+      end
+      item_scope.each do |content|
+        child_tag = master_course_subscription.content_tag_for(content)
+        if child_tag.downstream_changes.any?
+          Rails.logger.debug("skipping deletion sync for #{content.asset_string} due to downstream changes #{child_tag.downstream_changes}")
+        else
+          Rails.logger.debug("syncing deletion of #{content.asset_string} from master course")
+          content.destroy
+        end
+      end
+    end
   end
 
   def check_cross_institution

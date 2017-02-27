@@ -191,6 +191,72 @@ describe MasterCourses::MasterMigration do
       expect(cm2.migration_settings[:imported_assets]["WikiPage"]).to eq page_to.id.to_s
     end
 
+    it "syncs deletions in incremental updates (excepting items modified downstream)" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      assmt = @copy_from.assignments.create!
+      topic = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
+      ann = @copy_from.announcements.create!(:message => "goodbye")
+      page = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      page2 = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "bluh")
+      quiz = @copy_from.quizzes.create!
+      quiz2 = @copy_from.quizzes.create!
+      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      aq = bank.assessment_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+      file = @copy_from.attachments.create!(:filename => 'blah', :uploaded_data => default_uploaded_data)
+      event = @copy_from.calendar_events.create!(:title => 'thing', :description => 'blargh', :start_at => 1.day.from_now)
+      tool = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key",
+        :shared_secret => "secret", :custom_fields => {'a' => '1', 'b' => '2'}, :url => "http://www.example.com")
+
+      run_master_migration
+
+      assmt_to = @copy_to.assignments.where(:migration_id => mig_id(assmt)).first
+      topic_to = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
+      ann_to = @copy_to.announcements.where(:migration_id => mig_id(ann)).first
+      page_to = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
+      page2_to = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page2)).first
+      quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      quiz2_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz2)).first
+      bank_to = @copy_to.assessment_question_banks.where(:migration_id => mig_id(bank)).first
+      file_to = @copy_to.attachments.where(:migration_id => mig_id(file)).first
+      event_to = @copy_to.calendar_events.where(:migration_id => mig_id(event)).first
+      tool_to = @copy_to.context_external_tools.where(:migration_id => mig_id(tool)).first
+
+      Timecop.freeze(10.minutes.from_now) do
+        page2_to.update_attribute(:body, 'changed!')
+        quiz2_to.update_attribute(:title, 'blargh!')
+
+        assmt.destroy
+        topic.destroy
+        ann.destroy
+        page.destroy
+        page2.destroy
+        quiz.destroy
+        quiz2.destroy
+        bank.destroy
+        file.destroy
+        event.destroy
+        tool.destroy
+      end
+
+      Timecop.travel(20.minutes.from_now) do
+        run_master_migration
+
+        expect(assmt_to.reload).to be_deleted
+        expect(topic_to.reload).to be_deleted
+        expect(ann_to.reload).to be_deleted
+        expect(page_to.reload).to be_deleted
+        expect(page2_to.reload).not_to be_deleted
+        expect(quiz_to.reload).to be_deleted
+        expect(quiz2_to.reload).not_to be_deleted
+        expect(bank_to.reload).to be_deleted
+        expect(file_to.reload).to be_deleted
+        expect(event_to.reload).to be_deleted
+        expect(tool_to.reload).to be_deleted
+      end
+    end
+
     it "should create master content tags with default restrictions on export" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
