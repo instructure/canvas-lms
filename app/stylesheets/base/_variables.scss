@@ -44,32 +44,46 @@ $ic-brand-primary: null;
 // "default value" for it to use.
 
 //====================================
-// Default Swatches
+// Abstract Color Variables
+//====================================
+$electric:                  #008EE2; // blue
+@if $use_high_contrast {    $electric: #0770A3; }
+$shamrock:                  #00AC18; // green
+@if $use_high_contrast {    $shamrock: #127A1B; }
+$barney:                    #BF32A4; // magenta
+@if $use_high_contrast {    $barney: #B8309E; }
+$crimson:                   #EE0612; // red
+@if $use_high_contrast {    $crimson: #D01A19; }
+$fire:                      #FC5E13; // orange
+@if $use_high_contrast {    $fire: #C23C0D; }
+
+//====================================
+// Default Functional Swatches
 //====================================
 
 @if $use_high_contrast {    $ic-brand-primary: #0770A3; }
-$ic-color-success:          #00AC18; // green
-@if $use_high_contrast {    $ic-color-success: #127A1B; }
-$ic-color-action:           #BF32A4; // magenta
-@if $use_high_contrast {    $ic-color-action: #B8309E; }
-$ic-color-danger:           #EE0612; // red
-@if $use_high_contrast {    $ic-color-danger: #D01A19; }
-$ic-color-alert:            #FC5E13; // orange
-@if $use_high_contrast {    $ic-color-alert: #C23C0D; }
+$ic-color-success:          $shamrock;
+$ic-color-action:           $barney;
+$ic-color-danger:           $crimson;
+$ic-color-alert:            $fire;
 
 //====================================
 // Gray-ish Scale
 //====================================
 
-$ic-color-dark:              #2D3B45;
-$ic-color-medium-darker:     #394B58;
-$ic-color-medium:            #73818C;
+$ic-color-dark:              #2D3B45; // licorice
+$ic-color-medium-darker:     #394B58; // oxford
+$ic-color-medium:            #73818C; // slate
 @if $use_high_contrast {     $ic-color-medium: #556572; }
-$ic-color-medium-lighter:    #8B969E;
+$ic-color-medium-lighter:    #8B969E; // ash
 @if $use_high_contrast {     $ic-color-medium-lighter: #556572; }
-$ic-color-medium-light:      #F5F5F5;
+$heather:                    #A5AFB5; // heather
+@if $use_high_contrast {     $ic-border-dark: #556572; }
+$tiara:                      #C7CDD1; // tiara
+@if $use_high_contrast {     $ic-border-color: #667887; }
+$ic-color-medium-light:      #F5F5F5; // porcelain
 @if $use_high_contrast {     $ic-color-medium-light: #FFFFFF; }
-$ic-color-light:             #FFFFFF;
+$ic-color-light:             #FFFFFF; // white
 
 // Then, pull in the defaults for the brandable varables, which are auto-generated
 // from app/stylesheets/brandable_variables.json (so if you are looking to set the
@@ -174,17 +188,14 @@ $ic-list-item-background--selected:   #d9edf9;
 //=====================
 // Global border colors
 //=====================
-
-$ic-border-color:         #C7CDD1;
-@if $use_high_contrast {  $ic-border-color: #667887; }
+$ic-border-color:         $tiara;
 // If it's a light border, it should be this color.
-$ic-border-light:         $ic-border-color;
+$ic-border-light:         $tiara;
 // If it's a dark border, it should be this color.
 // the most often use case for this is when the line is
 // dashed on a light gray background so it visually
 // looks the same as the outer border
-$ic-border-dark:          #A5AFB5;
-@if $use_high_contrast {  $ic-border-dark: #556572; }
+$ic-border-dark:          $heather;
 
 //=====================
 // Text-color variables
