@@ -1,10 +1,11 @@
 define [
   'jquery'
   'jsx/shared/rce/serviceRCELoader'
+  'jsx/shared/jwt',
   'helpers/editorUtils'
   'helpers/fakeENV'
   'helpers/fixtures'
-], ($, RCELoader, editorUtils, fakeENV, fixtures) ->
+], ($, RCELoader, jwt, editorUtils, fakeENV, fixtures) ->
   QUnit.module 'loadRCE',
     setup: ->
       fakeENV.setup()
@@ -160,6 +161,8 @@ define [
       @sidebar = {}
       @rce = { renderSidebarIntoDiv: sinon.stub().callsArgWith(2, @sidebar) }
       sinon.stub(RCELoader, 'loadRCE').callsArgWith(0, @rce)
+      @refreshToken = sinon.spy()
+      @stub(jwt, 'refreshFn').returns(@refreshToken)
 
     teardown: ->
       fakeENV.teardown()
@@ -191,7 +194,8 @@ define [
     RCELoader.loadSidebarOnTarget(@$div, cb)
     ok @rce.renderSidebarIntoDiv.called
     props = @rce.renderSidebarIntoDiv.args[0][1]
-    equal(typeof props.refreshToken, 'function')
+    ok jwt.refreshFn.calledWith(props.jwt)
+    equal(props.refreshToken, @refreshToken)
 
   test 'passes brand config json url', ->
     ENV.active_brand_config_json_url = {}

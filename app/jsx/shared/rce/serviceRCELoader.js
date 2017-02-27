@@ -1,15 +1,10 @@
 import $ from 'jquery'
 import _ from 'underscore'
+import {refreshFn as refreshToken} from 'jsx/shared/jwt'
 import editorOptions from 'jsx/shared/rce/editorOptions'
 import loadEventListeners from 'jsx/shared/rce/loadEventListeners'
 import polyfill from 'jsx/shared/rce/polyfill'
 import splitAssetString from 'compiled/str/splitAssetString'
-
-  let refreshToken = function(callback){
-    return $.post("/api/v1/jwts").done((response)=>{
-      callback(response.token)
-    })
-  }
 
   let RCELoader = {
     preload() {
@@ -32,7 +27,7 @@ import splitAssetString from 'compiled/str/splitAssetString'
       let context = splitAssetString(ENV.context_asset_string)
       let props = {
         jwt: ENV.JWT,
-        refreshToken: refreshToken,
+        refreshToken: refreshToken(ENV.JWT),
         host: ENV.RICH_CONTENT_APP_HOST,
         canUploadFiles: ENV.RICH_CONTENT_CAN_UPLOAD_FILES,
         contextType: context[0],
