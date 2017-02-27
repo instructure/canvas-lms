@@ -92,6 +92,19 @@ module Lti
       forward_service_response(service_response)
     end
 
+    # @API Update a Webhook Subscription
+    # Same parameters as create
+    def update
+      subscription = params.require(:subscription)
+      subscription['Id'] = params.require(:id)
+
+      subscription_helper = SubscriptionsValidator.new(params.require(:subscription), tool_proxy)
+      subscription_helper.validate_subscription_request!
+
+      service_response = Services::LiveEventsSubscriptionService.update_tool_proxy_subscription(tool_proxy, params.require(:id), subscription)
+      forward_service_response(service_response)
+    end
+
     private
 
     def forward_service_response(service_response)

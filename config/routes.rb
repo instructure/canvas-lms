@@ -1951,6 +1951,7 @@ CanvasRails::Application.routes.draw do
       post "subscriptions", action: :create
       delete "subscriptions/:id", action: :destroy
       get "subscriptions/:id", action: :show
+      put "subscriptions/:id", action: :update
     end
 
     %w(course account).each do |context|
