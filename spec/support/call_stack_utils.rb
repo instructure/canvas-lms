@@ -10,10 +10,11 @@ module CallStackUtils
     super exception.class, exception.message, exception.backtrace
   end
 
+  APP_IGNORE_REGEX = %r{/spec/(support|selenium/test_setup/)}
   def self.prune_backtrace!(bt)
     line_regex = RSpec.configuration.in_project_source_dir_regex
     # remove things until we get to the frd error cause
-    bt.shift while bt.first !~ line_regex || bt.first =~ %r{/spec/(support|selenium/test_setup/)}
+    bt.shift while bt.first !~ line_regex || bt.first =~ APP_IGNORE_REGEX
     bt
   end
 
@@ -31,4 +32,7 @@ module CallStackUtils
   end
 end
 
+ignore_regex = RSpec::CallerFilter::IGNORE_REGEX
+RSpec::CallerFilter.send :remove_const, :IGNORE_REGEX
+RSpec::CallerFilter::IGNORE_REGEX = Regexp.union(ignore_regex, CallStackUtils::APP_IGNORE_REGEX)
 RSpec::Core::Formatters::ExceptionPresenter.prepend CallStackUtils::ExceptionPresenter
