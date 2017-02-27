@@ -14,7 +14,50 @@ define([
   return class CoursePickerTable extends React.Component {
     static propTypes = {
       courses: propTypes.courseList.isRequired,
-      onCourseSelect: func.isRequired,
+      onSelectedChanged: func,
+    }
+
+    static defaultProps = {
+      onSelectedChanged: () => {},
+    }
+
+    constructor (props) {
+      super(props)
+      this.state = {
+        selected: {},
+        selectedAll: false,
+      }
+    }
+
+    componentWillReceiveProps (nextProps) {
+      // remove selected state for courses that are removed from props
+      const courseIds = nextProps.courses.map(course => course.id)
+      this.setState({
+        selectedAll: false,
+        selected: Object.keys(this.state.selected)
+          .filter(id => courseIds.includes(id))
+          .reduce((selected, id) => Object.assign(selected, { [id]: this.state.selected[id] }), {}),
+      })
+    }
+
+    onSelectToggle = (e) => {
+      const selected = this.state.selected
+      selected[e.target.value] = e.target.checked
+      this.setState({ selected, selectedAll: false }, () => {
+        this.props.onSelectedChanged(this.state.selected)
+      })
+    }
+
+    onSelectAllToggle = (e) => {
+      this.setState({
+        selectedAll: e.target.checked,
+        selected: e.target.checked ? this.props.courses
+                    .reduce((selected, course) =>
+                      Object.assign(selected, { [course.id]: true })
+                    , {}) : {}
+      }, () => {
+        this.props.onSelectedChanged(this.state.selected)
+      })
     }
 
     renderColGroup () {
@@ -52,10 +95,11 @@ define([
     renderRows () {
       return this.props.courses.map(course =>
         <tr key={course.id} className="bps-table__course-row">
-          <td key="select">
+          <td>
             <Checkbox
-              onChange={this.props.onCourseSelect}
+              onChange={this.onSelectToggle}
               value={course.id}
+              checked={this.state.selected[course.id]}
               label={
                 <ScreenReaderContent>
                   {I18n.t('Toggle select course %{name}', { name: course.name })}
@@ -63,19 +107,19 @@ define([
               }
             />
           </td>
-          <td key="title">
+          <td>
             {this.renderCellText(course.name)}
           </td>
-          <td key="short_name">
+          <td>
             {this.renderCellText(course.course_code)}
           </td>
-          <td key="term">
+          <td>
             {this.renderCellText(course.term.name)}
           </td>
-          <td key="sis_id">
+          <td>
             {this.renderCellText(course.sis_course_id)}
           </td>
-          <td key="teachers">
+          <td>
             {this.renderCellText(course.teachers.map(teacher => teacher.display_name).join(', '))}
           </td>
         </tr>
@@ -88,8 +132,9 @@ define([
           <ScreenReaderContent key="select-all" tag="tr">
             <td>
               <Checkbox
-                onChange={this.props.onCourseSelect}
+                onChange={this.onSelectAllToggle}
                 value="all"
+                checked={this.state.selectedAll}
                 label={I18n.t({ one: 'Select (%{count}) Course', other: 'Select All (%{count}) Courses' },
                 { count: this.props.courses.length })}
               />
@@ -118,10 +163,11 @@ define([
               </thead>
               <tbody>
                 <tr>
-                  <td key="select">
+                  <td>
                     <Checkbox
-                      onChange={this.props.onCourseSelect}
+                      onChange={this.onSelectAllToggle}
                       value="all"
+                      checked={this.state.selectedAll}
                       label={
                         <ScreenReaderContent>
                           {I18n.t({ one: 'Select (%{count}) Course', other: 'Select All (%{count}) Courses' },
@@ -130,7 +176,7 @@ define([
                       }
                     />
                   </td>
-                  <td colSpan="5" key="label">{I18n.t('Select All (%{count})', { count: this.props.courses.length })}</td>
+                  <td colSpan="5">{I18n.t('Select All (%{count})', { count: this.props.courses.length })}</td>
                 </tr>
               </tbody>
             </Table>

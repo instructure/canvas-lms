@@ -17,13 +17,25 @@ define([
       subAccounts: propTypes.accountList.isRequired,
       loadCourses: func.isRequired,
       isLoadingCourses: bool.isRequired,
+      onSelectedChanged: func,
+      isExpanded: bool,
     }
 
-    constructor (props = {}) {
+    static defaultProps = {
+      onSelectedChanged: () => {},
+      isExpanded: true,
+    }
+
+    constructor (props) {
       super(props)
       this.state = {
-        isOpen: false,
+        isExpanded: props.isExpanded,
       }
+    }
+
+    onSelectedChanged = (selected) => {
+      this.props.onSelectedChanged(selected)
+      this.setState({ isExpanded: true })
     }
 
     // when the filter updates, load new courses
@@ -32,12 +44,8 @@ define([
 
       this.setState({
         filters,
-        isOpen: true,
+        isExpanded: true,
       })
-    }
-
-    toggleCourseSelect = (e) => {
-      // TODO
     }
 
     render () {
@@ -50,13 +58,13 @@ define([
             onChange={this.onFilterChange}
           />
           <div className="bps-course-details__wrapper">
-            <ToggleDetails isExpanded={this.state.isOpen} summary={<Typography>{I18n.t('Courses')}</Typography>}>
+            <ToggleDetails isExpanded={this.state.isExpanded} summary={<Typography>{I18n.t('Courses')}</Typography>}>
               {this.props.isLoadingCourses && (<div className="bps-course-picker__loading">
                 <Spinner title={I18n.t('Loading Courses')} />
               </div>)}
               <CoursePickerTable
                 courses={this.props.courses}
-                onCourseSelect={this.toggleCourseSelect}
+                onSelectedChanged={this.onSelectedChanged}
               />
             </ToggleDetails>
           </div>

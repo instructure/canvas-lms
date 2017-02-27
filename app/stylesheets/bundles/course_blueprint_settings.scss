@@ -48,47 +48,58 @@
   padding: 77px 0 0;
   position: relative;
   overflow: hidden;
-}
 
-.btps-table__header-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-}
+  .btps-table__header-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
 
-.bps-table__head {
-  background: $ic-color-medium-light;
+    .bps-table__head {
+      background: $ic-color-medium-light;
 
-  th {
-    line-height: 180%;
+      th {
+        line-height: 180%;
+      }
+    }
+  }
+
+  .bps-table__content-wrapper {
+    height: 270px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 30px;
+
+    .bps-table__body {
+      tr {
+        // overwrite instui borders to match design
+        border-left: none !important;
+
+        td:first-child {
+          // overwrite instui borders to match design
+          border-bottom: none !important;
+
+          // recreate the borders using box shadow
+          box-shadow: -42px 1px 0 0 $ic-color-light, 0 1px 0 0 $ic-border-color;
+        }
+
+        &.bps-table__no-results {
+          td {
+           box-shadow: none;
+         }
+        }
+      }
+    }
   }
 }
 
-.bps-table__content-wrapper {
-  height: 270px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-bottom: 30px;
-}
+.bps-associations-table {
+  padding-left: 10px;
+  margin-bottom: 40px;
 
-.bps-table__body {
-  tr {
-    // overwrite instui borders to match design
-    border-left: none !important;
-
-    td:first-child {
-      // overwrite instui borders to match design
-      border-bottom: none !important;
-
-      // recreate the borders using box shadow
-      box-shadow: -42px 1px 0 0 $ic-color-light, 0 1px 0 0 $ic-border-color;
-    }
-
-    &.bps-table__no-results {
-      td {
-       box-shadow: none;
-     }
+  .bps-associations__course-row {
+    form {
+      margin: 0;
     }
   }
 }

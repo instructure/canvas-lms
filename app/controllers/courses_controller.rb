@@ -1115,21 +1115,23 @@ class CoursesController < ApplicationController
 
   def blueprint_settings
     get_context
-    if master_courses? && authorized_action(@context.account, @current_user, :manage_master_courses)
-      js_env({
-        accountId: @context.account.id,
-        course: @context.slice(:id, :name),
-        subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
-        terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}}
-      })
+    if authorized_action(@context.account, @current_user, :manage_master_courses)
+      if master_courses?
+        js_env({
+          accountId: @context.account.id,
+          course: @context.slice(:id, :name),
+          subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
+          terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}}
+        })
 
-      css_bundle :course_blueprint_settings
-      js_bundle :course_blueprint_settings
+        css_bundle :course_blueprint_settings
+        js_bundle :course_blueprint_settings
 
-      @page_title = join_title(t('Blueprint Settings'), @context.name)
-      render text: '', layout: true
-    else
-     render status: 404, template: 'shared/errors/404_message'
+        @page_title = join_title(t('Blueprint Settings'), @context.name)
+        render text: '', layout: true
+      else
+       render status: 404, template: 'shared/errors/404_message'
+      end
     end
   end
 

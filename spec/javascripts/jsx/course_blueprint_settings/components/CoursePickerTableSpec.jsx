@@ -9,7 +9,7 @@ define([
 
   const defaultProps = () => ({
     courses: data.courses,
-    onCourseSelect: () => {},
+    onSelectedChanged: () => {},
   })
 
   test('renders the CoursePickerTable component', () => {
@@ -34,5 +34,40 @@ define([
     equal(rows.length, props.courses.length)
     equal(rows.at(0).find('td').at(1).text(), props.courses[0].name)
     equal(rows.at(1).find('td').at(1).text(), props.courses[1].name)
+  })
+
+  test('calls onSelectedChanged when courses are selected', () => {
+    const props = defaultProps()
+    props.onSelectedChanged = sinon.spy()
+    const tree = enzyme.mount(<CoursePickerTable {...props} />)
+    const checkbox = tree.find('.bps-table__course-row input[type="checkbox"]')
+    checkbox.at(0).simulate('change', { target: { checked: true, value: '1' } })
+
+    equal(props.onSelectedChanged.callCount, 1)
+    deepEqual(props.onSelectedChanged.getCall(0).args[0], { 1: true })
+  })
+
+  test('calls onSelectedChanged when courses are unselected', () => {
+    const props = defaultProps()
+    props.onSelectedChanged = sinon.spy()
+    const tree = enzyme.mount(<CoursePickerTable {...props} />)
+    const checkbox = tree.find('.bps-table__course-row input[type="checkbox"]')
+    checkbox.at(0).simulate('change', { target: { checked: true, value: '1' } })
+    checkbox.at(0).simulate('change', { target: { checked: false, value: '1' } })
+
+    equal(props.onSelectedChanged.callCount, 2)
+    deepEqual(props.onSelectedChanged.getCall(0).args[0], { 1: false })
+  })
+
+  test('calls onSelectedChanged with correct data when "Select All" is selected', () => {
+    const props = defaultProps()
+    props.onSelectedChanged = sinon.spy()
+    const tree = enzyme.mount(<CoursePickerTable {...props} />)
+
+    const checkbox = tree.find('.btps-table__header-wrapper input[type="checkbox"]')
+    checkbox.at(0).simulate('change', { target: { checked: true, value: 'all' } })
+
+    equal(props.onSelectedChanged.callCount, 1)
+    deepEqual(props.onSelectedChanged.getCall(0).args[0], { 1: true, 2: true })
   })
 })

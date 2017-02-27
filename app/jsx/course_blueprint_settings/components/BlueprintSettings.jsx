@@ -3,9 +3,12 @@ define([
   'react',
   'instructure-ui/Heading',
   'instructure-ui/Alert',
+  'instructure-ui/Button',
+  'instructure-ui/Grid',
   '../propTypes',
-  './CoursePicker',
-], (I18n, React, {default: Heading}, {default: Alert}, propTypes, CoursePicker) => {
+  './CourseAssociations',
+], (I18n, React, {default: Heading}, {default: Alert}, {default: Button}, {default: Grid, GridRow, GridCol},
+  propTypes, CourseAssociations) => {
   const { string, arrayOf, func, bool } = React.PropTypes
 
   return class BlueprintSettings extends React.Component {
@@ -26,6 +29,10 @@ define([
       this.props.loadCourses()
     }
 
+    // TODO: implement these
+    onCancel = () => {}
+    onDone = () => {}
+
     render () {
       return (
         <div className="bps__wrapper">
@@ -37,13 +44,24 @@ define([
           <hr />
           <Heading level="h3">{I18n.t('Search Courses')}</Heading>
           <br />
-          <CoursePicker
+          <CourseAssociations
             terms={this.props.terms}
             subAccounts={this.props.subAccounts}
             courses={this.props.courses}
             loadCourses={this.props.loadCourses}
             isLoadingCourses={this.props.isLoadingCourses}
           />
+          <hr />
+          <Grid startAt="tablet" vAlign="middle" colSpacing="none">
+            <GridRow>
+              <GridCol />
+              <GridCol width="auto">
+                <Button onClick={this.onCancel}>Cancel</Button>
+                &nbsp;&nbsp;
+                <Button variant="primary" onClick={this.onDone}>Save</Button>
+              </GridCol>
+            </GridRow>
+          </Grid>
         </div>
       )
     }

@@ -13,6 +13,7 @@ define([
     terms: data.terms,
     isLoadingCourses: false,
     loadCourses: () => {},
+    onSelectedChanged: () => {},
   })
 
   test('renders the CoursePicker component', () => {
