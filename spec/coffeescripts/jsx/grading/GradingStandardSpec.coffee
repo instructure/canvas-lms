@@ -6,7 +6,7 @@ define [
   'jsx/grading/gradingStandard'
 ], (React, ReactDOM, {Simulate}, $, GradingStandard) ->
 
-  module 'GradingStandard not being edited',
+  QUnit.module 'GradingStandard not being edited',
     setup: ->
       @props =
         key: 1
@@ -74,7 +74,7 @@ define [
   test 'does not show the cancel button', ->
     deepEqual @gradingStandard.refs.cancelButton, undefined
 
-  module "GradingStandard without 'manage' permissions",
+  QUnit.module "GradingStandard without 'manage' permissions",
     setup: ->
       props =
         key: 1
@@ -106,7 +106,7 @@ define [
   test 'disables edit and delete buttons', ->
     ok @gradingStandard.refs.disabledButtons
 
-  module "GradingStandard being edited",
+  QUnit.module "GradingStandard being edited",
     setup: ->
       @props =
         key: 1
@@ -194,7 +194,7 @@ define [
     @gradingStandard.changeRowName(2, "Q")
     deepEqual @gradingStandard.state.editingStandard.data[2], ["Q", 0.00]
 
-  module "GradingStandard being edited with blank names",
+  QUnit.module "GradingStandard being edited with blank names",
     setup: ->
       props =
         key: 1
@@ -231,7 +231,7 @@ define [
     deepEqual @gradingStandard.refs.invalidStandardAlert.textContent,
       "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again."
 
-  module "GradingStandard being edited with duplicate names",
+  QUnit.module "GradingStandard being edited with duplicate names",
     setup: ->
       props =
         key: 1
@@ -268,7 +268,7 @@ define [
     deepEqual @gradingStandard.refs.invalidStandardAlert.textContent,
       "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again."
 
-  module "GradingStandard being edited with empty values",
+  QUnit.module "GradingStandard being edited with empty values",
     setup: ->
       props =
         key: 1
@@ -305,7 +305,7 @@ define [
     deepEqual @gradingStandard.refs.invalidStandardAlert.textContent,
       "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again."
 
-  module "GradingStandard being edited with duplicate values",
+  QUnit.module "GradingStandard being edited with duplicate values",
     setup: ->
       props =
         key: 1
@@ -342,7 +342,7 @@ define [
     deepEqual @gradingStandard.refs.invalidStandardAlert.textContent,
       "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again."
 
-  module "GradingStandard being edited with values that round to the same number",
+  QUnit.module "GradingStandard being edited with values that round to the same number",
     setup: ->
       props =
         key: 1
@@ -379,7 +379,7 @@ define [
     deepEqual @gradingStandard.refs.invalidStandardAlert.textContent,
       "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again."
 
-  module "GradingStandard being edited with overlapping values",
+  QUnit.module "GradingStandard being edited with overlapping values",
     setup: ->
       props =
         key: 1

@@ -2,7 +2,7 @@ define([
   'jsx/conditional_release_stats/actions',
   'jsx/conditional_release_stats/reducers/root-reducer',
 ], ({ actions }, reducer) => {
-  module('Conditional Release Stats reducer')
+  QUnit.module('Conditional Release Stats reducer')
 
   const reduce = (action, state = {}) => {
     return reducer(state, action)

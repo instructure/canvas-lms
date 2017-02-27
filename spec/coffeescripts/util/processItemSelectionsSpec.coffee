@@ -1,5 +1,5 @@
 define ['compiled/util/processItemSelections'], (processItemSelections)->
-  module "processItemSelections"
+  QUnit.module "processItemSelections"
   test 'move hash of selected items to list of selected', ->
     data = {
       authenticity_token: "watup="

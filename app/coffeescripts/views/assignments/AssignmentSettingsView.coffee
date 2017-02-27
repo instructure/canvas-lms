@@ -1,10 +1,12 @@
 define [
+  'jquery'
+  'i18n!assignments'
   'compiled/util/round'
   'underscore'
   'compiled/views/DialogFormView'
   'jst/EmptyDialogFormWrapper'
   'jst/assignments/AssignmentSettings'
-], (round, _, DialogFormView, wrapper, assignmentSettingsTemplate) ->
+], ($, I18n, round, _, DialogFormView, wrapper, assignmentSettingsTemplate) ->
 
   class AssignmentSettingsView extends DialogFormView
     template: assignmentSettingsTemplate
@@ -28,6 +30,16 @@ define [
     initialize: ->
       super
       @weights = []
+
+    validateFormData: ->
+      errors = {}
+      weights = @$el.find('.group_weight_value')
+      _.each weights, (weight) =>
+        weight_value = $(weight).val()
+        field_selector = weight.getAttribute("name")
+        if (weight_value && isNaN(parseFloat(weight_value)))
+          errors[field_selector] = [{type: 'number', message: I18n.t("Must be a valid number")}]
+      errors
 
     openAgain: ->
       super

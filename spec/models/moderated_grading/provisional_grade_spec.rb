@@ -235,7 +235,6 @@ describe ModeratedGrading::ProvisionalGrade do
         :assessment => { :assessment_type => 'grading',
                          :"criterion_#{@rubric.criteria_object.first.id}" => { :points => 3, :comments => "wat" } })
       @prov_comment = @sub.add_comment(:commenter => @scorer, :comment => 'blah', :provisional => true)
-      expect(@prov_comment.provisional_grade_id).to eq @pg.id
     end
 
     def test_copy_to_final_mark

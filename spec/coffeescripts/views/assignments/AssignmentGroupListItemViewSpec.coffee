@@ -122,8 +122,25 @@ define [
     assignmentGroupsView.$el.appendTo $('#fixtures')
     assignmentGroupsView.render()
     assignmentGroupsView
+    
+  test "shows imported icon when integration_data is not empty", ->
+    model = createAssignmentGroup()
+    model.set('integration_data', { property: 'value' })
+    view = createView(model)
+    ok view.$("#assignment_group_#{model.id} .ig-header-title .icon-sis-imported").length
 
-  module 'AssignmentGroupListItemView as a teacher',
+  test "does not show imported icon when integration_data is not set", ->
+    model = createAssignmentGroup()
+    view = createView(model)
+    ok !view.$("#assignment_group_#{model.id} .ig-header-title .icon-sis-imported").length
+
+  test "does not show imported icon when integration_data is empty", ->
+    model = createAssignmentGroup()
+    model.set('integration_data', { })
+    view = createView(model)
+    ok !view.$("#assignment_group_#{model.id} .ig-header-title .icon-sis-imported").length
+
+  QUnit.module 'AssignmentGroupListItemView as a teacher',
     setup: ->
       fakeENV.setup({
         current_user_roles: ['teacher']
@@ -290,7 +307,7 @@ define [
     equal anchor.text(), "2 Rules"
     equal anchor.attr("title"), "Drop the lowest score and Drop the highest score"
 
-  module 'AssignmentGroupListItemView as an admin',
+  QUnit.module 'AssignmentGroupListItemView as an admin',
     setup: ->
       @model = createAssignmentGroup()
       $(document).off()

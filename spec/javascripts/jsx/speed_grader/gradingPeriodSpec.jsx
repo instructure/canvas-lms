@@ -3,7 +3,7 @@ require(["jsx/speed_grader/gradingPeriod"], ({
   dueDateForStudent,
   assignmentClosedForStudent,
 }) => {
-  module("Speedgrader MGP Spec");
+  QUnit.module("Speedgrader MGP Spec");
 
   const MS_IN_DAY = 24 * 60 * 60 * 1000;
   const NOW = new Date().getTime();

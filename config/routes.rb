@@ -187,6 +187,7 @@ CanvasRails::Application.routes.draw do
     get 'undelete' => 'context#undelete_index', as: :undelete_items
     post 'undelete/:asset_string' => 'context#undelete_item', as: :undelete_item
 
+    get 'blueprint_settings', action: :blueprint_settings
     get "settings#{full_path_glob}", action: :settings
     get :settings
     get 'details' => 'courses#settings'
@@ -291,7 +292,7 @@ CanvasRails::Application.routes.draw do
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
     get 'lti/tool_proxy_reregistration/:tool_proxy_id', controller: 'lti/message', action: 'reregistration',
         as: :tool_proxy_reregistration
-    get 'lti/registration_return/:tool_proxy_uuid', controller: 'lti/message', action: 'registration_return',
+    get 'lti/registration_return', controller: 'lti/message', action: 'registration_return',
         as: :registration_return
 
     resources :submissions
@@ -601,7 +602,7 @@ CanvasRails::Application.routes.draw do
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
     get 'lti/tool_proxy_reregistration/:tool_proxy_id', controller: 'lti/message', action: 'reregistration',
         as: :tool_proxy_reregistration
-    get 'lti/registration_return/:tool_proxy_uuid', controller: 'lti/message', action: 'registration_return',
+    get 'lti/registration_return', controller: 'lti/message', action: 'registration_return',
         as: :registration_return
 
     get 'outcomes/users/:user_id' => 'outcomes#user_outcome_results', as: :user_outcomes_results
@@ -1045,11 +1046,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/assignments/:assignment_id/gradeable_students", action: :gradeable_students, as: "course_assignment_gradeable_students"
     end
 
-    scope(controller: :originality_reports_api) do
-      post "assignments/:assignment_id/submissions/:submission_id/originality_report", action: :create
-      put "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :update
-      get "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :show
-    end
+
 
     scope(controller: :provisional_grades) do
       get "courses/:course_id/assignments/:assignment_id/provisional_grades/status", action: :status, as: "course_assignment_provisional_status"
@@ -1898,6 +1895,16 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/rubrics', action: :index, as: :course_rubrics
       get 'courses/:course_id/rubrics/:id', action: :show
     end
+
+    scope(controller: 'master_courses/master_templates') do
+      get 'courses/:course_id/blueprint_templates/:template_id', action: :show
+      get 'courses/:course_id/blueprint_templates/:template_id/associated_courses', action: :associated_courses, as: :course_blueprint_associated_courses
+      put 'courses/:course_id/blueprint_templates/:template_id/update_associations', action: :update_associations
+
+      post 'courses/:course_id/blueprint_templates/:template_id/migrations', action: :queue_migration
+      get 'courses/:course_id/blueprint_templates/:template_id/migrations', action: :migrations_index, as: :course_blueprint_migrations
+      get 'courses/:course_id/blueprint_templates/:template_id/migrations/:id', action: :migrations_show
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
@@ -1935,9 +1942,10 @@ CanvasRails::Application.routes.draw do
   end
 
   ApiRouteSet.draw(self, "/api/lti") do
+    post "authorize", controller: 'lti/ims/authorization', action: :authorize, as: 'lti_oauth2_authorize'
     %w(course account).each do |context|
       prefix = "#{context}s/:#{context}_id"
-      get  "#{prefix}/tool_consumer_profile/:tool_consumer_profile_id", controller: 'lti/ims/tool_consumer_profile',
+      get  "#{prefix}/tool_consumer_profile(/:tool_consumer_profile_id)", controller: 'lti/ims/tool_consumer_profile',
            action: 'show', as: "#{context}_tool_consumer_profile"
       post "#{prefix}/tool_proxy", controller: 'lti/ims/tool_proxy', action: :re_reg,
            as: "re_reg_#{context}_lti_tool_proxy", constraints: Lti::ReRegConstraint.new
@@ -1955,6 +1963,13 @@ CanvasRails::Application.routes.draw do
     # Membership Service
     get "courses/:course_id/membership_service", controller: "lti/membership_service", action: :course_index, as: :course_membership_service
     get "groups/:group_id/membership_service", controller: "lti/membership_service", action: :group_index, as: :group_membership_service
+
+    # Originality Report Service
+    scope(controller: 'lti/originality_reports_api') do
+      post "assignments/:assignment_id/submissions/:submission_id/originality_report", action: :create
+      put "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :update
+      get "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :show
+    end
   end
 
   ApiRouteSet.draw(self, '/api/sis') do

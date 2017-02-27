@@ -40,7 +40,7 @@ define([
   // time this is being written a significant amount of work is needed
   // to be able to require javascript files that live in the spec directory
 
-  module('SubmissionStateMap without grading periods');
+  QUnit.module('SubmissionStateMap without grading periods');
 
   test('submission has no tooltip for a student without assignment visibility', function() {
     const assignment = { id: '1', effectiveDueDates: {}, only_visible_to_overrides: true };
@@ -62,7 +62,7 @@ define([
     equal(state.tooltip, tooltipKeys.NONE);
   });
 
-  module('SubmissionStateMap with grading periods and all grading periods selected', {
+  QUnit.module('SubmissionStateMap with grading periods and all grading periods selected', {
     setup() {
       this.DATE_IN_CLOSED_PERIOD = '2015-07-15';
       this.DATE_NOT_IN_CLOSED_PERIOD = '2015-08-15';
@@ -117,7 +117,7 @@ define([
     equal(state.tooltip, tooltipKeys.NONE);
   });
 
-  module('SubmissionStateMap with grading periods and a non-closed grading period selected', {
+  QUnit.module('SubmissionStateMap with grading periods and a non-closed grading period selected', {
     setup() {
       this.SELECTED_PERIOD_ID = '1';
       this.DATE_IN_SELECTED_PERIOD = '2015-06-15';
@@ -172,7 +172,7 @@ define([
     equal(state.tooltip, tooltipKeys.IN_ANOTHER_GP);
   });
 
-  module('SubmissionStateMap with grading periods and a closed grading period selected', {
+  QUnit.module('SubmissionStateMap with grading periods and a closed grading period selected', {
     setup() {
       this.SELECTED_PERIOD_ID = '1';
       this.DATE_IN_SELECTED_PERIOD = '2015-07-15';

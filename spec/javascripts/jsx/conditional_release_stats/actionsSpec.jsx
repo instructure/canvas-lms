@@ -1,7 +1,7 @@
 define([
   'jsx/conditional_release_stats/helpers/actions',
 ], ({ createAction, createActions }) => {
-  module('Conditional Release Stats actions')
+  QUnit.module('Conditional Release Stats actions')
 
   test('creates a new action', () => {
     const actionCreator = createAction('ACTION_ONE')

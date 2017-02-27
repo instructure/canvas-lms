@@ -9,7 +9,7 @@ define [
   list = null
   textarea = null
 
-  module "Tinymce Commands -> removing an editor",
+  QUnit.module "Tinymce Commands -> removing an editor",
     setup: ->
       testbed = $("<div id='command-testbed'></div>")
       $("#fixtures").append(testbed)
@@ -41,7 +41,7 @@ define [
     EditorCommands.remove(textarea, list)
     equal(undefined, list._editor_boxes['43'])
 
-  module "Tinymce Commands -> inserting content with tables",
+  QUnit.module "Tinymce Commands -> inserting content with tables",
     setup: ->
       testbed = $("<div id='command-testbed'></div>")
       $("#fixtures").append(testbed)

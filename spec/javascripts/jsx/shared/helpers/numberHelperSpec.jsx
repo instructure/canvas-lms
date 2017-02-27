@@ -6,7 +6,7 @@ define([
 
   let input, output, delimiter, separator
 
-  module('Number Helper Parse and Validate', {
+  QUnit.module('Number Helper Parse and Validate', {
     setup () {
       delimiter = ' '
       separator = ','
@@ -79,6 +79,11 @@ define([
     numberHelper._parseNumber.restore()
     const obj = {toString: () => `2${separator}3`}
     equal(numberHelper.parse(obj), 2.3)
+  })
+
+  test('parses positive numbers beginning with "+"', () => {
+    numberHelper._parseNumber.restore()
+    equal(numberHelper.parse('+4'), 4)
   })
 
   test('validate returns false if parse returns NaN', () => {

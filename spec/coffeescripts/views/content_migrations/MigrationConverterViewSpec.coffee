@@ -7,7 +7,7 @@ define [
     className: 'someViewRendered'
     template: -> '<div id="rendered">Rendered</div>'
 
-  module 'MigrationConverterView',
+  QUnit.module 'MigrationConverterView',
     setup: ->
       @clock = sinon.useFakeTimers()
       @migrationConverterView = new MigrationConverterView

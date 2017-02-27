@@ -1,9 +1,9 @@
 define [
   'tinymce_plugins/instructure_external_tools/TinyMCEContentItem',
-  'spec/javascripts/compiled/tinymce_plugins/instructure_external_tools/ContentItems'
+  (if window.USE_WEBPACK then './ContentItems.coffee' else 'spec/javascripts/compiled/tinymce_plugins/instructure_external_tools/ContentItems')
 ], (TinyMCEContentItem, contentItems)->
 
-  module "TinyMCEContentItem LTI Link",
+  QUnit.module "TinyMCEContentItem LTI Link",
     setup: ->
     teardown: ->
 
@@ -57,7 +57,7 @@ define [
     equal(contentItem.codePayload, '<a href="/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like sexy for your computer" target="_blank">Arch Linux plain window</a>')
 
 
-  module "TinyMCEContentItem File Item",
+  QUnit.module "TinyMCEContentItem File Item",
     setup: ->
     teardown: ->
 

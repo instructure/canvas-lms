@@ -1,16 +1,13 @@
 define([
+  'jquery',
   'react',
   'react-dom',
   'react-addons-test-utils',
-  'instructure-ui/Avatar',
+  'instructure-ui',
   'jsx/context_cards/StudentContextTray',
-  'jsx/context_cards/StudentCardStore',
-  'instructure-ui/Tray'
-], (React, ReactDOM, TestUtils, Avatar, StudentContextTray, StudentCardStore, {
-  default: Tray
-}) => {
-
-  module('StudentContextTray', (hooks) => {
+  'jsx/context_cards/StudentCardStore'
+], ($, React, ReactDOM, TestUtils, { Avatar, Tray }, StudentContextTray, StudentCardStore) => {
+  QUnit.module('StudentContextTray', (hooks) => {
     let store, subject
     const courseId = '1'
     const studentId = '1'
@@ -23,6 +20,7 @@ define([
           courseId={courseId}
           studentId={studentId}
           canMasquerade={false}
+          returnFocusTo={() => {}}
         />
       )
     })
@@ -59,7 +57,44 @@ define([
       subject.setState.restore()
     })
 
-    module('analytics button', () => {
+    test('tray should set focus to the close button when mounting', () => {
+      store.state.loading = false
+      // eslint-disable-next-line react/no-render-return-value
+      const component = TestUtils.renderIntoDocument(
+        <StudentContextTray
+          store={store}
+          courseId={courseId}
+          studentId={studentId}
+          returnFocusTo={() => {}}
+        />,
+        document.getElementById('fixtures')
+      )
+
+      component.onChange()
+      ok(component.closeButtonRef.focused)
+    })
+
+    test('tray should set focus back to the result of the returnFocusTo prop', () => {
+      $('#fixtures').append('<button id="someButton"><button>')
+      // eslint-disable-next-line react/no-render-return-value
+      const component = TestUtils.renderIntoDocument(
+        <StudentContextTray
+          store={store}
+          courseId={courseId}
+          studentId={studentId}
+          returnFocusTo={() => [$('#someButton')]}
+        />,
+        document.getElementById('fixtures')
+      )
+
+      const fakeEvent = {
+        preventDefault () {}
+      }
+      component.handleRequestClose(fakeEvent)
+      ok(document.activeElement === document.getElementById('someButton'))
+    })
+
+    QUnit.module('analytics button', () => {
       test('it renders with analytics data', () => {
         store.setState({
           analytics: {

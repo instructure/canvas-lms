@@ -208,7 +208,7 @@ describe "conversations new" do
       f('#delete-btn').click
 
       driver.switch_to.alert.accept
-      expect_flash_message :success, /Message Deleted!/
+      expect_flash_message :success, "Message Deleted!"
     end
 
     it "should show a flash message when deleting a message via cog dropdown", priority: "1", test_id: 201493 do
@@ -219,7 +219,7 @@ describe "conversations new" do
       click_more_options(convo:true)
       f('.delete-btn.ui-corner-all').click
       driver.switch_to.alert.accept
-      expect_flash_message :success, /Message Deleted!/
+      expect_flash_message :success, "Message Deleted!"
     end
 
     it "should archive a message via the admin archive button", priority: "1", test_id: 201494 do

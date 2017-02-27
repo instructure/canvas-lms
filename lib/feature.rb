@@ -306,6 +306,15 @@ END
       root_opt_in: true,
       beta: true
     },
+    'bulk_sis_grade_export' =>
+      {
+        display_name: -> { I18n.t('Allow Bulk Grade Export to SIS') },
+        description:  -> { I18n.t('Allows teachers to mark grade data to be exported in bulk to SIS integrations.') },
+        applies_to: 'RootAccount',
+        state: 'hidden',
+        root_opt_in: true,
+        beta: true
+      },
     'notification_service' =>
     {
       display_name: -> { I18n.t('Use remote service for notifications') },
@@ -499,7 +508,27 @@ END
       display_name: -> { I18n.t('Modules Home Page') },
       description: -> { I18n.t('Default to modules for the course home page') },
       applies_to: "RootAccount",
+      state: "hidden",
       beta: true,
+      development: true,
+    },
+    'new_user_tutorial' =>
+    {
+      display_name: -> { I18n.t('New User Tutorial')},
+      description: -> { I18n.t('Provide tutorial information for new users in a flyout tray.')},
+      applies_to: "RootAccount",
+      state: "hidden",
+      beta: true,
+      development: true
+    },
+    'quizzes2_exporter' =>
+    {
+      display_name: -> { I18n.t('Export to Quizzes 2 format') },
+      description: -> { I18n.t('Export an existing quiz to new Quizzes 2 format') },
+      applies_to: "RootAccount",
+      state: "hidden",
+      beta: false,
+      development: true,
     },
   )
 

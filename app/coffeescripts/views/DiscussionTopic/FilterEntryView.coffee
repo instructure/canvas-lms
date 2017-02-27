@@ -26,7 +26,15 @@ define [
       @model.on 'change:read_state', @updateReadState
 
     toJSON: ->
-      @model.attributes
+      json = @model.attributes
+      json.edited_at = $.datetimeString(json.updated_at)
+      if json.editor
+        json.editor_name = json.editor.display_name
+        json.editor_href = json.editor.html_url
+      else
+        json.editor_name = I18n.t 'unknown', 'Unknown'
+        json.editor_href = "#"
+      json
 
     click: ->
       @trigger 'click', this

@@ -22,7 +22,7 @@ define [
       'Content-Type': 'application/json'
     }, JSON.stringify(json)]
 
-  module 'DialogFormView',
+  QUnit.module 'DialogFormView',
     setup: ->
       @closeSpy = @spy DialogFormView::, 'close'
       server = sinon.fakeServer.create()

@@ -6,6 +6,7 @@ define([
 
   var HelpTray = React.createClass({
     propTypes: {
+      trayTitle: React.PropTypes.string,
       closeTray: React.PropTypes.func.isRequired,
       links: React.PropTypes.array,
       hasLoaded: React.PropTypes.bool
@@ -13,6 +14,7 @@ define([
 
     getDefaultProps() {
       return {
+        trayTitle: I18n.t('Help'),
         hasLoaded: false,
         links: []
       };
@@ -23,7 +25,7 @@ define([
         <div id="help_tray">
           <div className="ic-NavMenu__header">
             <h1 className="ic-NavMenu__headline">
-              {I18n.t('Help')}
+              {this.props.trayTitle}
             </h1>
             <button
               className="Button Button--icon-action ic-NavMenu__closeButton"
@@ -36,9 +38,9 @@ define([
               </span>
             </button>
           </div>
-          <HelpDialog 
+          <HelpDialog
             links={this.props.links}
-            hasLoaded={this.props.hasLoaded}  
+            hasLoaded={this.props.hasLoaded}
             onFormSubmit={this.props.closeTray} />
         </div>
       );

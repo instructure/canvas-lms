@@ -7,7 +7,7 @@ define([
   const wrapper = document.getElementById("fixtures");
   const tokens = ["John Smith", "Section 2", "Group 1"];
 
-  module('DisabledTokenInput', {
+  QUnit.module('DisabledTokenInput', {
     setup() {
       this.input = ReactDOM.render(<DisabledTokenInput tokens={tokens}/>, wrapper);
     },

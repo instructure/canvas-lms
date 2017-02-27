@@ -32,6 +32,7 @@ define([
   'jquery.instructure_misc_helpers' /* replaceTags */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'compiled/jquery/mediaCommentThumbnail', /* mediaCommentThumbnail */
   'media_comments' /* mediaComment, mediaCommentThumbnail */
 ], function (
   INST, I18n, $, _, CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, gradingPeriodSetsApi, round,
@@ -103,15 +104,28 @@ define([
     });
   }
 
+  function canBeConvertedToGrade (score, possible) {
+    return possible > 0 && !isNaN(score);
+  }
+
+  function calculatePercentGrade (score, possible) {
+    return round((score / possible) * 100, round.DEFAULT);
+  }
+
+  function formatPercentGrade (percentGrade) {
+    return I18n.n(percentGrade, {percentage: true});
+  }
+
+  function calculateGrade (score, possible) {
+    if (canBeConvertedToGrade(score, possible)) {
+      return formatPercentGrade(calculatePercentGrade(score, possible));
+    }
+
+    return I18n.t('N/A');
+  }
+
   function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme) {
     var showTotalGradeAsPoints = ENV.show_total_grade_as_points;
-
-    var calculateGrade = function (score, possible) {
-      if (possible === 0 || isNaN(score)) {
-        return 'N/A';
-      }
-      return round((score / possible) * 100, round.DEFAULT);
-    };
 
     for (var i = 0; i < ENV.assignment_groups.length; i++) {
       var assignmentGroupId = ENV.assignment_groups[i].id;
@@ -123,23 +137,27 @@ define([
         grade = { score: 0, possible: 0 };
       }
       $groupRow.find('.grade').text(
-        calculateGrade(grade.score, grade.possible) + '%'
+        calculateGrade(grade.score, grade.possible)
       );
       $groupRow.find('.score_teaser').text(
-        round(grade.score, round.DEFAULT) + ' / ' + round(grade.possible, round.DEFAULT)
+        I18n.n(grade.score, {precision: round.DEFAULT}) + ' / ' + I18n.n(grade.possible, {precision: round.DEFAULT})
       );
     }
 
     var finalScore = calculatedGrades[currentOrFinal].score;
     var finalPossible = calculatedGrades[currentOrFinal].possible;
-    var scoreAsPoints = round(finalScore, round.DEFAULT) + ' / ' + round(finalPossible, round.DEFAULT);
+    var scoreAsPoints = I18n.n(finalScore, {precision: round.DEFAULT}) + ' / ' + I18n.n(finalPossible, {precision: round.DEFAULT});
     var scoreAsPercent = calculateGrade(finalScore, finalPossible);
 
-    var finalGrade = scoreAsPercent + '%';
-    var teaserText = scoreAsPoints;
+    var finalGrade;
+    var teaserText;
+
     if (showTotalGradeAsPoints && groupWeightingScheme !== 'percent') {
       finalGrade = scoreAsPoints;
-      teaserText = scoreAsPercent + '%';
+      teaserText = scoreAsPercent;
+    } else {
+      finalGrade = scoreAsPercent;
+      teaserText = scoreAsPoints;
     }
 
     var $finalGradeRow = $('.student_assignment.final_grade');
@@ -156,7 +174,11 @@ define([
     }
 
     if (ENV.grading_scheme) {
-      $('.final_letter_grade .grade').text(GradingSchemeHelper.scoreToGrade(scoreAsPercent, ENV.grading_scheme));
+      $('.final_letter_grade .grade').text(
+        GradingSchemeHelper.scoreToGrade(
+          calculatePercentGrade(finalScore, finalPossible), ENV.grading_scheme
+        )
+      );
     }
 
     $('.revert_all_scores').showIf($('#grades_summary .revert_score_link').length > 0);
@@ -202,11 +224,40 @@ define([
     }
   }
 
+  function bindShowAllDetailsButton ($ariaAnnouncer) {
+    $('#show_all_details_button').click(function (event) {
+      event.preventDefault();
+      var $button = $('#show_all_details_button');
+      $button.toggleClass('showAll');
+
+      if ($button.hasClass('showAll')) {
+        $button.text(I18n.t('Hide All Details'));
+        $('tr.student_assignment.editable').each(function () {
+          var assignmentId = $(this).getTemplateValue('assignment_id');
+          var muted = $(this).data('muted');
+          if (!muted) {
+            $('#comments_thread_' + assignmentId).show();
+            $('#rubric_' + assignmentId).show();
+            $('#grade_info_' + assignmentId).show();
+            $('#final_grade_info_' + assignmentId).show();
+          }
+        });
+        $ariaAnnouncer.text(I18n.t('assignment details expanded'));
+      } else {
+        $button.text(I18n.t('Show All Details'));
+        $('tr.rubric_assessments').hide();
+        $('tr.comments').hide();
+        $ariaAnnouncer.text(I18n.t('assignment details collapsed'));
+      }
+    });
+  }
+
   function setup () {
     $(document).ready(function () {
       updateStudentGrades();
       var showAllWhatIfButton = $(this).find('#student-grades-whatif button');
       var revertButton = $(this).find('#revert-all-to-actual-score');
+      var $ariaAnnouncer = $(this).find('#aria-announcer');
 
       $('.revert_all_scores_link').click(function (event) {
         event.preventDefault();
@@ -262,6 +313,7 @@ define([
           $(this).find('.grade').data('screenreader_link', $screenreaderLinkClone);
           $(this).find('.grade').empty().append($('#grade_entry'));
           $(this).find('.score_value').hide();
+          $ariaAnnouncer.text(I18n.t('Enter a What-If score.'));
 
           // Get the current shown score (possibly a "What-If" score) and use it as the default value in the text entry field
           var val = $(this).parents('.student_assignment').find('.what_if_score').text();
@@ -276,8 +328,12 @@ define([
 
       $('#grade_entry').keydown(function (event) {
         if (event.keyCode === 13) {
+          // Enter Key: Finish Changes
+          $ariaAnnouncer.text('');
           $(this)[0].blur();
         } else if (event.keyCode === 27) {
+          // Enter Key: Clear the Text Field
+          $ariaAnnouncer.text('');
           var val = $(this).parents('.student_assignment')
             .addClass('dont_update')
             .find('.original_score')
@@ -342,7 +398,11 @@ define([
         }
         if (val === 0) { val = '0.0'; }
         if (val === originalVal) { val = originalScore; }
-        $assignment.find('.grade').html($.raw(htmlEscape(val) || $assignment.find('.grade').data('originalValue')));
+
+        var $grade = $assignment.find('.grade');
+        var gradeValue = htmlEscape((val || '').trim());
+        var originalValue = $grade.data('originalValue');
+        $grade.html($.raw(gradeValue || originalValue));
 
         if (!isChanged) {
           var $screenreaderLinkClone = $assignment.find('.grade').data('screenreader_link');
@@ -464,29 +524,7 @@ define([
         this.form.submit();
       });
 
-      $('#show_all_details_button').click(function (event) {
-        event.preventDefault();
-        var $button = $('#show_all_details_button');
-        $button.toggleClass('showAll');
-
-        if ($button.hasClass('showAll')) {
-          $button.text(I18n.t('Hide All Details'));
-          $('tr.student_assignment.editable').each(function () {
-            var assignmentId = $(this).getTemplateValue('assignment_id');
-            var muted = $(this).data('muted');
-            if (!muted) {
-              $('#comments_thread_' + assignmentId).show();
-              $('#rubric_' + assignmentId).show();
-              $('#grade_info_' + assignmentId).show();
-              $('#final_grade_info_' + assignmentId).show();
-            }
-          });
-        } else {
-          $button.text(I18n.t('Show All Details'));
-          $('tr.rubric_assessments').hide();
-          $('tr.comments').hide();
-        }
-      });
+      bindShowAllDetailsButton($ariaAnnouncer);
     });
 
     $(document).on('change', '.grading_periods_selector', function () {
@@ -511,8 +549,12 @@ define([
     removeWhatIfAssignment: removeWhatIfAssignment,
     getGradingPeriodSet: getGradingPeriodSet,
     listAssignmentGroupsForGradeCalculation: listAssignmentGroupsForGradeCalculation,
+    canBeConvertedToGrade: canBeConvertedToGrade,
+    calculateGrade: calculateGrade,
     calculateGrades: calculateGrades,
-    calculateTotals: calculateTotals
+    calculateTotals: calculateTotals,
+    calculatePercentGrade: calculatePercentGrade,
+    formatPercentGrade: formatPercentGrade
   });
 
   return GradeSummary;

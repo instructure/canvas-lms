@@ -16,11 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require_relative '../../spec_helper'
+require_relative '../../lti_spec_helper'
 require_dependency "lti/app_launch_collator"
 
 module Lti
-  describe AppLaunchCollator, :include_lti_spec_helpers do
+  describe AppLaunchCollator do
+    include LtiSpecHelper
+
     let(:account) { Account.create }
     let(:resource_handler) do
       ResourceHandler.create(resource_type_code: 'code', name: 'resource name', tool_proxy: tool_proxy)

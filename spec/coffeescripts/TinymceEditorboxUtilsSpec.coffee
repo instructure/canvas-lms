@@ -1,5 +1,5 @@
 define ['tinymce.editor_box_utils'], (Utils)->
-  module "Tinymce Utils #cleanUrl", ->
+  QUnit.module "Tinymce Utils #cleanUrl", ->
     setup: ->
     teardown: ->
 

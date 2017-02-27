@@ -5,7 +5,7 @@ define [
   'helpers/jquery.simulate'
 ], (Backbone, PublishButtonView, $) ->
 
-  module 'PublishButtonView',
+  QUnit.module 'PublishButtonView',
     setup: ->
       @publishable = class Publishable extends Backbone.Model
         defaults:

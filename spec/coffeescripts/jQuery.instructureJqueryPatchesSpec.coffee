@@ -1,6 +1,6 @@
 define ['jquery'], (jQuery) ->
 
-  module 'instructure jquery patches'
+  QUnit.module 'instructure jquery patches'
 
   test 'parseJSON', ->
     deepEqual(jQuery.parseJSON('{ "var1": "1", "var2" : 2 }'), { "var1": "1", "var2" : 2 }, 'should still parse without the prefix')

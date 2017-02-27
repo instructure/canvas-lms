@@ -14,7 +14,7 @@ define([
     static propTypes = {
       announcements: React.PropTypes.arrayOf(
         React.PropTypes.shape({
-          id: React.PropTypes.string.isRequired,
+          id: React.PropTypes.number.isRequired,
           title: React.PropTypes.string.isRequired,
           message: React.PropTypes.string.isRequired,
           posted_at: React.PropTypes.string.isRequired,
@@ -23,22 +23,24 @@ define([
       )
     }
 
+    static defaultProps = {
+      announcements: []
+    }
+
     renderAnnouncement () {
-      return this.props.announcements.map((c) => {
-        return (
-          <tr key={c.id}>
-            <td>
-              <ToggleDetails summary={TextHelper.truncateText(c.title, { max: 100 })} className="AnnouncementList__message">
-                <p dangerouslySetInnerHTML={{ __html: TextHelper.truncateText(c.message, { max: 200 }) }}></p>
-                <Link href={c.url}>{I18n.t('View Announcement')}</Link>
-              </ToggleDetails>
-            </td>
-            <td className="AnnouncementList__posted-at">
-              { I18n.t('%{posted_at}', { posted_at: $.datetimeString(c.posted_at) }) }
-            </td>
-          </tr>
-        )
-      })
+      return this.props.announcements.map(c => (
+        <tr key={c.id}>
+          <td>
+            <ToggleDetails summary={TextHelper.truncateText(c.title, { max: 100 })} className="AnnouncementList__message">
+              <p>{TextHelper.truncateText(c.message, { max: 200 })}</p>
+              <Link href={c.url}>{I18n.t('View Announcement')}</Link>
+            </ToggleDetails>
+          </td>
+          <td className="AnnouncementList__posted-at">
+            { I18n.t('%{posted_at}', { posted_at: $.datetimeString(c.posted_at) }) }
+          </td>
+        </tr>
+      ))
     }
 
     renderTable () {

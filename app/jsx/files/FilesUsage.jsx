@@ -3,17 +3,17 @@ define([
   'i18n!react_files',
   'compiled/react_files/components/FilesUsage',
   'compiled/util/friendlyBytes',
-], function (React, I18n, FilesUsage, friendlyBytes) {
+], (React, I18n, FilesUsage, friendlyBytes) => {
 
   FilesUsage.render = function () {
     if (this.state) {
-      var percentUsed = Math.round(this.state.quota_used / this.state.quota * 100);
-      var label = I18n.t('%{percentUsed}% of %{bytesAvailable} used', {
-        percentUsed: percentUsed,
+      const percentUsed = Math.round(this.state.quota_used / this.state.quota * 100);
+      const label = I18n.t('%{percentUsed} of %{bytesAvailable} used', {
+        percentUsed: I18n.n(percentUsed, { percentage: true }),
         bytesAvailable: friendlyBytes(this.state.quota)
       });
-      const srLabel = I18n.t('Files Quota: %{percentUsed}% of %{bytesAvailable} used', {
-        percentUsed: percentUsed,
+      const srLabel = I18n.t('Files Quota: %{percentUsed} of %{bytesAvailable} used', {
+        percentUsed: I18n.n(percentUsed, { percentage: true }),
         bytesAvailable: friendlyBytes(this.state.quota)
       });
       return (
@@ -41,5 +41,4 @@ define([
   };
 
   return React.createClass(FilesUsage);
-
 });

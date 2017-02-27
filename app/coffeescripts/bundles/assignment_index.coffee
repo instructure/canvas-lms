@@ -66,7 +66,7 @@ require [
   else
     "#content"
 
-  if ENV.PERMISSIONS.manage
+  if ENV.PERMISSIONS.manage_course
     assignmentSettingsView = new AssignmentSettingsView
       model: course
       assignmentGroups: assignmentGroups

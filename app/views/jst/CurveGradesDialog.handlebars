@@ -3,7 +3,7 @@
   <input type="hidden" name="assignment_id" class="assignment_id" value="{{assignment.id}}" />
   <p id="curved_grades_description">
     {{#t "curve_average"}}
-      Enter an average grade for the curve for <b>{{assignment.name}}</b>. The chart shows a best attempt at curving the grades based on current student scores.  
+      Enter an average grade for the curve for <b>{{assignment.name}}</b>. The chart shows a best attempt at curving the grades based on current student scores.
     {{/t}}
   </p>
   <div style="min-height: 100px;">
@@ -14,14 +14,14 @@
   </div>
   <p style="text-align: center;">
     {{#t "average_score"}}Average Score{{/t}}
-    <input type="number" min="0" name="middle_score" id="middle_score"
+    <input type="text" min="0" name="middle_score" id="middle_score"
            style="width: 45px;" value="{{middleScore}}"
            aria-labelledby="curved_grades_points_possible"
            aria-describedby="curved_grades_description" />
     <label for="middle_score" id="curved_grades_points_possible">
     {{#if showOutOf}}
-      {{#t "out_of_points_possible"}}
-        out of {{assignment.points_possible}}
+      {{#t}}
+        out of {{formattedOutOf}}
       {{/t}}
     {{/if}}
     </label>

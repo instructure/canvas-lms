@@ -82,7 +82,7 @@
 class UsageRightsController < ApplicationController
   include Api::V1::UsageRights
 
-  before_filter :require_context
+  before_action :require_context
 
   # @API Set usage rights
   # Sets copyright and license information for one or more files

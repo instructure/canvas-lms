@@ -26,7 +26,7 @@ describe "login logout test" do
   it "should show error message if wrong credentials are used", priority: "2" do
     get "/login"
     fill_in_login_form("fake@user.com", "fakepass")
-    assert_flash_error_message(/Invalid username/)
+    assert_flash_error_message("Invalid username")
   end
 
   it "should show invalid password message if password is nil", priority: "2" do
@@ -53,7 +53,7 @@ describe "login logout test" do
   it "should prompt must be logged in message when accessing permission based pages while not logged in", priority: "2" do
     expected_url = app_url + "/login/canvas"
     get "/grades"
-    assert_flash_warning_message /You must be logged in to access this page/
+    assert_flash_warning_message "You must be logged in to access this page"
     expect(driver.current_url).to eq expected_url
   end
 
@@ -63,7 +63,7 @@ describe "login logout test" do
     f('#pseudonym_session_unique_id_forgot').send_keys(@user.primary_pseudonym.unique_id)
     submit_form('#forgot_password_form')
     wait_for_ajaximations
-    assert_flash_notice_message /Password confirmation sent to #{@user.primary_pseudonym.unique_id}/
+    assert_flash_notice_message "Password confirmation sent to #{@user.primary_pseudonym.unique_id}"
   end
 
   it "should validate back button works in forgot password page", priority: "2" do
@@ -78,7 +78,7 @@ describe "login logout test" do
       get "/login"
       driver.execute_script "$.cookie('_csrf_token', '42')"
       fill_in_login_form("nobody@example.com", 'asdfasdf')
-      assert_flash_error_message /Invalid Authenticity Token/
+      assert_flash_error_message "Invalid Authenticity Token"
     ensure
       driver.execute_script "$.cookie('_csrf_token', '', { expires: -1 })"
     end

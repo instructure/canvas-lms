@@ -20,14 +20,14 @@ define [
   'jquery'
   'underscore'
   'timezone'
-  'vendor/timezone/America/Denver'
-  'vendor/timezone/America/New_York'
+  'timezone/America/Denver'
+  'timezone/America/New_York'
   'compiled/behaviors/SyllabusBehaviors'
   'compiled/collections/SyllabusCollection'
   'compiled/collections/SyllabusCalendarEventsCollection'
   'compiled/collections/SyllabusAppointmentGroupsCollection'
   'compiled/views/courses/SyllabusView'
-  'spec/javascripts/compiled/views/SyllabusViewPrerendered'
+  (if window.USE_WEBPACK then './SyllabusViewPrerendered.coffee' else 'spec/javascripts/compiled/views/SyllabusViewPrerendered')
   'helpers/fakeENV'
   'helpers/jquery.simulate'
 ], ($, _, tz, denver, newYork, SyllabusBehaviors, SyllabusCollection, SyllabusCalendarEventsCollection, SyllabusAppointmentGroupsCollection, SyllabusView, SyllabusViewPrerendered, fakeENV) ->
@@ -75,7 +75,7 @@ define [
     server.respondWith /\/api\/v1\/appointment_groups($|\?)/, appointment_groups_endpoint
     server
 
-  module 'Syllabus',
+  QUnit.module 'Syllabus',
     setup: ->
       fakeENV.setup(TIMEZONE: 'America/Denver', CONTEXT_TIMEZONE: 'America/New_York')
       # Setup stubs/mocks

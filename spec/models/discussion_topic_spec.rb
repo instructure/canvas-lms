@@ -333,6 +333,34 @@ describe DiscussionTopic do
           expect((@topic.check_policy(@student1) & @relevant_permissions).sort).to eq [:read, :read_replies].sort
         end
 
+        it "should not grant reply permissions to group if course is soft-concluded" do
+          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          group_category = @course.group_categories.create(:name => "new cat")
+          @group = @course.groups.create(:name => "group", :group_category => group_category)
+          @group.add_user(@student1)
+          @course.update_attributes(:start_at => 2.days.ago, :conclude_at => 1.day.ago, :restrict_enrollments_to_course_dates => true)
+          @topic = @group.discussion_topics.create(:title => "group topic")
+          @topic.save!
+
+          expect(@topic.context).to eq(@group)
+          expect((@topic.check_policy(@student1) & @relevant_permissions).sort).to eq [:read, :read_replies].sort
+        end
+
+        it "should grant reply permissions to group members if course is concluded but their section isn't" do
+          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          group_category = @course.group_categories.create(:name => "new cat")
+          @group = @course.groups.create(:name => "group", :group_category => group_category)
+          @group.add_user(@student1)
+          @course.update_attributes(:start_at => 2.days.ago, :conclude_at => 1.day.ago, :restrict_enrollments_to_course_dates => true)
+          @section.update_attributes(:start_at => 2.days.ago, :end_at => 2.days.from_now,
+            :restrict_enrollments_to_section_dates => true)
+          @topic = @group.discussion_topics.create(:title => "group topic")
+          @topic.save!
+
+          expect(@topic.context).to eq(@group)
+          expect((@topic.check_policy(@student1) & @relevant_permissions).sort).to eq [:read, :read_replies, :reply].sort
+        end
+
         it "should not grant reply permissions to group if group isn't active" do
           @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
           group_category = @course.group_categories.create(:name => "new cat")
@@ -393,6 +421,7 @@ describe DiscussionTopic do
     it "should allow students to create topics by default" do
       expect(@topic.check_policy(@teacher)).to include :create
       expect(@topic.check_policy(@student)).to include :create
+      expect(@topic.check_policy(@course.student_view_student)).to include :create
     end
 
     it "should disallow students from creating topics" do
@@ -401,6 +430,7 @@ describe DiscussionTopic do
       @topic.reload
       expect(@topic.check_policy(@teacher)).to include :create
       expect(@topic.check_policy(@student)).not_to include :create
+      expect(@topic.check_policy(@course.student_view_student)).not_to include :create
     end
 
   end
@@ -1692,6 +1722,13 @@ describe DiscussionTopic do
       expect(announcement.reload.comments_disabled?).to be_truthy
     end
 
+    it "should reflect account setting for when lock_all_announcements is enabled" do
+      announcement = @course.announcements.create!(message: "Lock this")
+      expect(announcement.comments_disabled?).to be_falsey
+      @course.account.tap{|a| a.settings[:lock_all_announcements] = {:value => true, :locked => true}; a.save!}
+      expect(announcement.reload.comments_disabled?).to be_truthy
+    end
+
     it "should not allow replies from students to topics locked based on date" do
       course_with_teacher(:active_all => true)
       discussion_topic_model(:context => @course)
@@ -1700,38 +1737,6 @@ describe DiscussionTopic do
       @topic.reply_from(:user => @teacher, :text => "reply") # should not raise error
       student_in_course(:course => @course).accept!
       expect { @topic.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
-    end
-  end
-
-  describe "locked flag" do
-    before :once do
-      discussion_topic_model
-    end
-
-    it "should ignore workflow_state if the flag is set" do
-      @topic.locked = true
-      @topic.workflow_state = 'active'
-      expect(@topic.locked?).to be_truthy
-      @topic.locked = false
-      @topic.workflow_state = 'locked'
-      expect(@topic.locked?).to be_falsey
-    end
-
-    it "should fall back to the workflow_state if the flag is nil" do
-      @topic.locked = nil
-      @topic.workflow_state = 'active'
-      expect(@topic.locked?).to be_falsey
-      @topic.workflow_state = 'locked'
-      expect(@topic.locked?).to be_truthy
-    end
-
-    it "should fix up a 'locked' workflow_state" do
-      @topic.workflow_state = 'locked'
-      @topic.locked = nil
-      @topic.save!
-      @topic.unlock!
-      expect(@topic.workflow_state).to eql 'active'
-      expect(@topic.locked?).to be_falsey
     end
   end
 

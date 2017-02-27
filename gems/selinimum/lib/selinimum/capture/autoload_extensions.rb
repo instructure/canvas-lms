@@ -90,31 +90,23 @@ module Selinimum
         # whenever we first autoload something, keep track of what it
         # autoloads. returns an array of file paths
         def track_dependencies(const_names)
-          nested = !dependencies_stack.empty?
-
           dependencies_stack << []
-
-          if nested
-            # top-most track_dependencies call has us covered wrt resetting
-            yield
-          else
-            # this is a top-level autoload (e.g. the top-most `Foo` in the
-            # stack). to really know what this thing depends on, we need to
-            # reset autoloaded stuff yet again, so we don't get freeloaders
-            # from a previous autoload.
-            #
-            # note that we exempt nesting names, since we want to make sure
-            # we don't create dummy duplicate modules/classes (either due to
-            # redundant definitions, or rails' automatic module-from-
-            # directories), e.g.:
-            #
-            #   # foo/bar/baz.rb
-            #   class Foo::Bar # <- we want Baz to be the previously
-            #     class Baz    #    autoloaded class, not a new one
-            #       ...
-            nesting_names = const_names.map { |c| nesting_names_for(c) }.flatten
-            temporarily_reset_autoloads(nesting_names) { yield }
-          end
+          # when we auto-load something, to really know what it depends on,
+          # we need to reset autoloaded stuff, so we don't get freeloaders
+          # from a previous autoload. this is true both for top-level
+          # autoloads as well as for ones triggered by them.
+          #
+          # note that we exempt nesting names, since we want to make sure
+          # we don't create dummy duplicate modules/classes (either due to
+          # redundant definitions, or rails' automatic module-from-
+          # directories), e.g.:
+          #
+          #   # foo/bar/baz.rb
+          #   class Foo::Bar # <- we want Baz to be the previously
+          #     class Baz    #    autoloaded class, not a new one
+          #       ...
+          nesting_names = const_names.map { |c| nesting_names_for(c) }.flatten
+          temporarily_reset_autoloads(nesting_names) { yield }
           current_dependencies
         ensure
           dependencies_stack.pop

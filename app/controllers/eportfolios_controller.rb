@@ -21,9 +21,9 @@ require 'securerandom'
 
 class EportfoliosController < ApplicationController
   include EportfolioPage
-  before_filter :require_user, :only => [:index, :user_index]
-  before_filter :reject_student_view_student
-  before_filter :rich_content_service_config
+  before_action :require_user, :only => [:index, :user_index]
+  before_action :reject_student_view_student
+  before_action :rich_content_service_config
 
   def index
     user_index

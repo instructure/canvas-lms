@@ -38,8 +38,8 @@ module Quizzes
         s.save
       end
       @submission.context_module_action
-      track_outcomes(@submission.attempt)
       quiz = @submission.quiz
+      track_outcomes(@submission.attempt) if quiz.assignment?
       previous_version = quiz.versions.where(number: @submission.quiz_version).first
       if previous_version && @submission.quiz_version != quiz.version_number
         quiz = previous_version.model.reload

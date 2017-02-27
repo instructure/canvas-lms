@@ -4,7 +4,7 @@ define([
   'jsx/shared/load-more'
 ], (React, TestUtils, LoadMore) => {
 
-  module('LoadMore');
+  QUnit.module('LoadMore');
 
   function defaultProps () {
     return {

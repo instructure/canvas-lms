@@ -20,7 +20,7 @@ define [
   </div>
   """)
 
-  module 'autocomplete',
+  QUnit.module 'autocomplete',
     teardown: ->
       $el.remove()
       $('#fixtures').empty()

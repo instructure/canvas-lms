@@ -4,7 +4,7 @@ define [
   'compiled/views/wiki/WikiPageContentView'
 ], ($, WikiPage, WikiPageContentView) ->
 
-  module 'WikiPageContentView'
+  QUnit.module 'WikiPageContentView'
 
   test 'setModel causes a re-render', ->
     wikiPage = new WikiPage

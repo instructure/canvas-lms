@@ -7,7 +7,7 @@ define([
 ], (React, ReactDOM, {findRenderedDOMComponentWithClass}, _, Input) => {
   const wrapper = document.getElementById('fixtures');
 
-  module('EnrollmentTermInput', {
+  QUnit.module('EnrollmentTermInput', {
     renderComponent(props={}) {
       const defaultProps = {
         enrollmentTerms: [

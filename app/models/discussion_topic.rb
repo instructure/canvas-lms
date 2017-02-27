@@ -227,10 +227,14 @@ class DiscussionTopic < ActiveRecord::Base
     # transition from graded to ungraded) we acknowledge that the users that
     # have posted have contributed to the topic
     if self.assignment_id && self.assignment_id_changed?
-      posters.each{ |user| self.context_module_action(user, :contributed) }
+      recalculate_context_module_actions!
     end
   end
   protected :update_assignment
+
+  def recalculate_context_module_actions!
+    posters.each{ |user| self.context_module_action(user, :contributed) }
+  end
 
   def is_announcement; false end
 
@@ -564,7 +568,7 @@ class DiscussionTopic < ActiveRecord::Base
   def comments_disabled?
     !!(self.is_a?(Announcement) &&
       self.context.is_a?(Course) &&
-      self.context.settings[:lock_all_announcements])
+      self.context.lock_all_announcements)
   end
 
   def lock(opts = {})
@@ -580,12 +584,6 @@ class DiscussionTopic < ActiveRecord::Base
     save! unless opts[:without_save]
   end
   alias_method :unlock!, :unlock
-
-  # deprecated with draft state: use publish+available_[from|until] machinery instead
-  # you probably want available?
-  def locked?
-    locked.nil? ? workflow_state == 'locked' : locked
-  end
 
   def published?
     return false if workflow_state == 'unpublished'
@@ -760,8 +758,10 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def initialize_last_reply_at
-    self.posted_at ||= Time.now.utc
-    self.last_reply_at ||= Time.now.utc unless [:migration, :after_migration].include?(self.saved_by)
+    unless [:migration, :after_migration].include?(self.saved_by)
+      self.posted_at ||= Time.now.utc
+      self.last_reply_at ||= Time.now.utc
+    end
   end
 
   set_policy do
@@ -771,7 +771,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.grants_right?(user, :read) }
     can :read_replies
 
-    given { |user| self.user && self.user == user && self.visible_for?(user) && !self.locked_for?(user, :check_policies => true) && !has_concluded_contexts?}
+    given { |user| self.user && self.user == user && self.visible_for?(user) && !self.locked_for?(user, :check_policies => true) && can_participate_in_course?(user)}
     can :reply
 
     given { |user| self.user && self.user == user && self.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) && context.grants_right?(user, :participate_as_student) }
@@ -781,8 +781,8 @@ class DiscussionTopic < ActiveRecord::Base
     can :delete
 
     given { |user, session| !self.locked_for?(user, :check_policies => true) &&
-        self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user) && !has_concluded_contexts?}
-    can :reply and can :read
+        self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user) && can_participate_in_course?(user)}
+    can :reply
 
     given { |user, session|
       !is_announcement &&
@@ -823,7 +823,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def context_allows_user_to_create?(user)
     return true unless context.respond_to?(:allow_student_discussion_topics)
-    return true unless context.user_is_student?(user)
+    return true if context.user_is_admin?(user)
     context.allow_student_discussion_topics
   end
 
@@ -1047,8 +1047,15 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def has_concluded_contexts?
-    course.concluded? || (group && !group.available?)
+  def can_participate_in_course?(user)
+    if self.group && self.group.deleted?
+      false
+    elsif self.course.is_a?(Course)
+      # this probably isn't a perfect way to determine this but I can't think of a better one
+      self.course.enrollments.for_user(user).active_by_date.exists? || self.course.grants_right?(user, :read_as_admin)
+    else
+      true
+    end
   end
 
   # Public: Determine if the discussion topic is locked for a specific user. The topic is locked when the

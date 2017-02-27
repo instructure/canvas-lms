@@ -51,7 +51,7 @@ define([
     setGradeReadOnlStub.reset()
   }
 
-  module("quizzesNextSpeedGrading", {
+  QUnit.module("quizzesNextSpeedGrading", {
     teardown: function () {
       resetStubs();
     }

@@ -81,7 +81,7 @@ module CanvasRails
     # Activate observers that should always be running
     config.active_record.observers = [:cacher, :stream_item_cache, :live_events_observer, :conditional_release_observer ]
 
-    config.active_record.raise_in_transactional_callbacks = true # may as well opt into the new behavior
+    config.active_record.raise_in_transactional_callbacks = true if CANVAS_RAILS4_2
 
     config.active_support.encode_big_decimal_as_string = false
 
@@ -102,12 +102,12 @@ module CanvasRails
     # we don't know what middleware to make SessionsTimeout follow until after
     # we've loaded config/initializers/session_store.rb
     initializer("extend_middleware_stack", after: "load_config_initializers") do |app|
-      request_throttle_position = CANVAS_RAILS4_2 ? 'ActionDispatch::ParamsParser' : 'Rack::Head'
-      app.config.middleware.insert_before(config.session_store, 'LoadAccount')
-      app.config.middleware.swap('ActionDispatch::RequestId', 'RequestContextGenerator')
-      app.config.middleware.insert_after(config.session_store, 'RequestContextSession')
-      app.config.middleware.insert_before(request_throttle_position, 'RequestThrottle')
-      app.config.middleware.insert_before('Rack::MethodOverride', 'PreventNonMultipartParse')
+      request_throttle_position = CANVAS_RAILS4_2 ? ActionDispatch::ParamsParser : Rack::Head
+      app.config.middleware.insert_before(config.session_store, LoadAccount)
+      app.config.middleware.swap(ActionDispatch::RequestId, RequestContextGenerator)
+      app.config.middleware.insert_after(config.session_store, RequestContextSession)
+      app.config.middleware.insert_before(request_throttle_position, RequestThrottle)
+      app.config.middleware.insert_before(Rack::MethodOverride, PreventNonMultipartParse)
     end
 
     config.to_prepare do

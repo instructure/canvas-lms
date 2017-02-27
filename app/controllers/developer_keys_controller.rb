@@ -17,8 +17,8 @@
 #
 
 class DeveloperKeysController < ApplicationController
-  before_filter :set_key, only: [:update, :destroy ]
-  before_filter :require_manage_developer_keys
+  before_action :set_key, only: [:update, :destroy ]
+  before_action :require_manage_developer_keys
 
   include Api::V1::DeveloperKey
 

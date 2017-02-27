@@ -13,7 +13,7 @@ module DrDiff
 
     def initialize(git_dir: nil, sha: nil)
       @git_dir = git_dir
-      @run_on_outstanding = !sha
+      @run_on_outstanding = !sha && dirty?
       @sha = sha || "HEAD"
     end
 
@@ -28,6 +28,10 @@ module DrDiff
     end
 
     private
+
+    def dirty?
+      !shell("git status --porcelain --untracked-files=no").empty?
+    end
 
     def outstanding_change_files
       shell("git diff --name-only")

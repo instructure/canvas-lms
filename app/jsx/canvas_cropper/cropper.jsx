@@ -22,6 +22,12 @@ define([
       height: React.PropTypes.number,     // desired cropped height
       onImageLoaded: React.PropTypes.func // if you care when the image is loaded
     };
+    static defaultProps = {
+      imgFile: null,
+      width: 270,
+      height: 270,
+      onImageLoaded: null
+    };
 
     constructor (/* props */) {
       super();

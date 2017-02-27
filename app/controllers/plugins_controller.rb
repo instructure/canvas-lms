@@ -18,7 +18,7 @@
 require 'dynamic_form'
 
 class PluginsController < ApplicationController
-  before_filter :require_setting_site_admin, :set_site_admin_context, :set_navigation
+  before_action :require_setting_site_admin, :set_site_admin_context, :set_navigation
 
   def index
     @plugins = Canvas::Plugin.all

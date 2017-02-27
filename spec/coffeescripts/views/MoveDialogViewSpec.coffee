@@ -39,7 +39,7 @@ define [
       parentKey: 'assignment_group_id'
       saveURL: saveURL
 
-  module 'MoveDialogView',
+  QUnit.module 'MoveDialogView',
     setup: ->
       genSetup.call @
       @update_spy = @spy MoveDialogView.prototype, 'updateListView'
@@ -91,7 +91,7 @@ define [
         equal value, @assignments_2.at(ind).id
 
 
-  module 'MoveDialogView without a parentCollection',
+  QUnit.module 'MoveDialogView without a parentCollection',
     setup: ->
       genSetup.call @
       createDialog.call @, false
@@ -103,7 +103,7 @@ define [
     equal @moveDialog.$('select').length, 1
 
 
-  module 'MoveDialogView save and save success',
+  QUnit.module 'MoveDialogView save and save success',
     setup: ->
       genSetup.call @
       server = sinon.fakeServer.create()

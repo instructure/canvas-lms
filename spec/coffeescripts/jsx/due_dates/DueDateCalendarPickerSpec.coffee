@@ -6,7 +6,7 @@ define [
   'jquery'
   'jsx/due_dates/DueDateCalendarPicker'
   'timezone'
-  'vendor/timezone/fr_FR'
+  'timezone/fr_FR'
   'helpers/I18nStubber'
   'helpers/fakeENV'
 ], ( React, ReactDOM, { findRenderedDOMComponentWithTag }, _, $,
@@ -14,7 +14,7 @@ define [
 
   wrapper = document.getElementById('fixtures')
 
-  module 'unlock_at DueDateCalendarPicker',
+  QUnit.module 'unlock_at DueDateCalendarPicker',
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"
@@ -81,7 +81,7 @@ define [
     date = tz.parse('2015-08-31T00:00:00')
     equal @dueDateCalendarPicker.changeToFancyMidnightIfNeeded(date), date
 
-  module 'due_at DueDateCalendarPicker',
+  QUnit.module 'due_at DueDateCalendarPicker',
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"
@@ -122,7 +122,7 @@ define [
     equal date.getMinutes(), 59
     tz.restore(snapshot)
 
-  module 'disabled DueDateCalendarPicker',
+  QUnit.module 'disabled DueDateCalendarPicker',
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"
@@ -151,7 +151,7 @@ define [
     button = findRenderedDOMComponentWithTag(@dueDateCalendarPicker, 'button')
     ok button.getAttribute("aria-disabled"), true
 
-  module 'given isFancyMidnight false',
+  QUnit.module 'given isFancyMidnight false',
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"

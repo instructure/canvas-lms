@@ -7,7 +7,7 @@ define [
   'helpers/fakeENV'
 ], (React, ReactDOM, {Simulate, SimulateNative}, _, DueDateRow, fakeENV) ->
 
-  module 'DueDateRow with empty props and canDelete true',
+  QUnit.module 'DueDateRow with empty props and canDelete true',
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"
@@ -42,7 +42,7 @@ define [
   test 'returns a remove link if canDelete', ->
     ok @dueDateRow.removeLinkIfNeeded()
 
-  module 'DueDateRow with realistic props and canDelete false',
+  QUnit.module 'DueDateRow with realistic props and canDelete false',
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"
@@ -117,7 +117,7 @@ define [
     token = _.find(tokens, (t) -> t["name"] == "Loading...")
     ok !!token
 
-  module 'DueDateRow with empty props and inputsDisabled true',
+  QUnit.module 'DueDateRow with empty props and inputsDisabled true',
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"

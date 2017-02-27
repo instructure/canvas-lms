@@ -2,27 +2,26 @@ define([
   'react',
   'jquery'
 ], (React, $) => {
+  const DOCUMENT_NODE = 9;
+  const ELEMENT_NODE = 1;
 
-  var DOCUMENT_NODE = 9;
-  var ELEMENT_NODE = 1;
-
-  var SVGWrapper = React.createClass({
-    propTypes: {
+  class SVGWrapper extends React.Component {
+    static propTypes = {
       url: React.PropTypes.string.isRequired,
       fillColor: React.PropTypes.string
-    },
+    }
 
-    componentWillReceiveProps: function (newProps) {
+    componentDidMount () {
+      this.fetchSVG();
+    }
+
+    componentWillReceiveProps (newProps) {
       if (newProps.url !== this.props.url) {
         this.fetchSVG();
       }
-    },
+    }
 
-    componentDidMount: function () {
-      this.fetchSVG();
-    },
-
-    fetchSVG: function () {
+    fetchSVG () {
       $.ajax(this.props.url, {
         success: function (data) {
           this.svg = data;
@@ -32,24 +31,23 @@ define([
           }
 
           if (this.svg.nodeType !== ELEMENT_NODE && this.svg.nodeName !== 'SVG') {
-            throw new Error('SVGWrapper: SVG Element must be returned by request to ' + this.props.url);
+            throw new Error(`SVGWrapper: SVG Element must be returned by request to ${this.props.url}`);
           }
 
           if (this.props.fillColor) {
-            this.svg.setAttribute('style', 'fill:'+this.props.fillColor);
+            this.svg.setAttribute('style', `fill:${this.props.fillColor}`);
           }
 
           this.svg.setAttribute('focusable', false);
-          this.getDOMNode().appendChild(this.svg);
+          this.rootSpan.appendChild(this.svg);
         }.bind(this)
       });
-    },
-
-    render: function () {
-      return <span/>;
     }
-  });
+
+    render () {
+      return <span ref={(c) => { this.rootSpan = c; }} />;
+    }
+  }
 
   return SVGWrapper;
-
 });

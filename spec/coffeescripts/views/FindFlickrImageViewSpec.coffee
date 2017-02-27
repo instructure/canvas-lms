@@ -44,7 +44,7 @@ define [
 
     server
 
-  module 'FindFlickrImage',
+  QUnit.module 'FindFlickrImage',
     setup: ->
       @server = setupServerResponses()
 

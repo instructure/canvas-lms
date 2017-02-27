@@ -106,7 +106,6 @@ module CC
     def create_canvas_topic(doc, topic)
       doc.topic_id create_key(topic)
       doc.title topic.title
-      doc.posted_at ims_datetime(topic.posted_at) if topic.posted_at
       doc.delayed_post_at ims_datetime(topic.delayed_post_at) if topic.delayed_post_at
       doc.lock_at ims_datetime(topic.lock_at) if topic.lock_at
       doc.position topic.position

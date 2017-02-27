@@ -31,6 +31,9 @@ describe "one time passwords" do
   context "mid-login" do
     before do
       post '/login/canvas', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }
+    end
+
+    it "should redirect" do
       expect(response).to redirect_to(otp_login_url)
     end
 

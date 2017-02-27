@@ -13,7 +13,13 @@ define([
         return input
       }
 
-      let num = helper._parseNumber(String(input), {
+      let inputStr = input.toString()
+
+      // this hack can be removed once this gets merged:
+      // https://github.com/AndreasPizsa/parse-decimal-number/pull/5
+      inputStr = inputStr.replace(/^\+/, '')
+
+      let num = helper._parseNumber(inputStr, {
         thousands: I18n.lookup('number.format.delimiter'),
         decimal: I18n.lookup('number.format.separator')
       })

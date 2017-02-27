@@ -37,7 +37,7 @@ class ContentMigration < ActiveRecord::Base
 
   DATE_FORMAT = "%m/%d/%Y"
 
-  attr_accessor :imported_migration_items, :outcome_to_id_map, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :last_module_position
+  attr_accessor :imported_migration_items, :outcome_to_id_map, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :last_module_position, :skipped_master_course_items
 
   workflow do
     state :created
@@ -495,6 +495,7 @@ class ContentMigration < ActiveRecord::Base
         # copy the attachments
         source_export = ContentExport.find(self.migration_settings[:master_course_export_id])
         self.context.copy_attachments_from_course(source_export.context, :content_export => source_export, :content_migration => self)
+        MasterCourses::FolderLockingHelper.recalculate_locked_folders(self.context)
 
         data = JSON.parse(self.exported_attachment.open, :max_nesting => 50)
         data = prepare_data(data)

@@ -69,9 +69,10 @@ module CollaborationsSpecsCommon
 
     get "/courses/#{@course.id}/collaborations"
     wait_for_ajaximations
-
-    fj('.available-users:visible a').click
+    f(".available-users a[data-id=\"#{@student.id}\"]").click
     expect(ff('.members-list li')).to have_size(1)
+    expect(f('.members-list')).to contain_css("a[data-id=\"user_#{@student.id}\"]")
+    expect(f('.members-list')).to contain_css("input[value=\"#{@student.id}\"]")
   end
 
   def select_from_all_course_groups(type, title)
@@ -86,9 +87,11 @@ module CollaborationsSpecsCommon
     wait_for_ajaximations
 
     expect(ffj("ul[aria-label='Available groups']:visible a")).to have_size 1
-    fj("ul[aria-label='Available groups']:visible").click
+    f(".available-groups a[data-id=\"#{@group.id}\"]").click
     wait_for_ajaximations
     expect(ff('.members-list li')).to have_size 2
+    expect(f('.members-list')).to contain_css("a[data-id=\"group_#{@group.id}\"]")
+    expect(f('.members-list')).to contain_css("input[value=\"#{@group.id}\"]")
     expect_new_page_load do
       submit_form('.edit_collaboration')
     end
@@ -109,6 +112,7 @@ module CollaborationsSpecsCommon
     wait_for_ajaximations
     f('.members-list a').click
     expect(f('.members-list')).not_to contain_css('li')
+    expect(f('.available-users')).to contain_css("a[data-id=\"#{@student.id}\"]")
   end
 
   def select_collaborators_and_look_for_start(type)

@@ -1,5 +1,5 @@
 define ['jsx/external_apps/lib/AppCenterStore'], (store) ->
-  module 'ExternalApps.AppCenterStore',
+  QUnit.module 'ExternalApps.AppCenterStore',
     setup: ->
       @server = sinon.fakeServer.create()
       store.reset()

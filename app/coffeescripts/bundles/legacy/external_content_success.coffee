@@ -8,7 +8,7 @@ require [
 
   dataReady = (data, service_id) ->
 
-    e = jQuery.Event( "externalContentReady" )
+    e = $.Event( "externalContentReady" )
     e.contentItems = data
     e.service_id = service_id
     parentWindow.$(parentWindow).trigger "externalContentReady", e

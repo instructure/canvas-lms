@@ -2,7 +2,7 @@ define [
   'compiled/models/QuizOverrideLoader'
 ], (QuizOverrideLoader) ->
 
-  module 'QuizOverrideLoader dates selection',
+  QUnit.module 'QuizOverrideLoader dates selection',
     setup: ->
       @loader = QuizOverrideLoader
       @latestDate = "2015-04-05"

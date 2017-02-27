@@ -5,6 +5,41 @@ describe GradesPresenter do
   let(:presenter) { GradesPresenter.new(enrollments) }
   let(:shard){ FakeShard.new }
 
+  describe '#course_grade_summaries' do
+    before(:once) do
+      account = Account.create!
+      course = account.courses.create!
+      student = User.create!
+      teacher = User.create!
+      section_one = course.course_sections.create!
+      section_two = course.course_sections.create!
+      course.enroll_teacher(teacher, enrollment_state: 'active')
+      @section_one_student_enrollment = course.enroll_student(
+        student,
+        section: section_one,
+        allow_multiple_enrollments: true,
+        enrollment_state: 'active'
+      )
+      course.enroll_student(
+        student,
+        section: section_two,
+        allow_multiple_enrollments: true,
+        enrollment_state: 'active'
+      )
+      @presenter = GradesPresenter.new(course.enrollments)
+    end
+
+    it 'does not throw an error when there exists a user with multiple student enrollments' do
+      expect { @presenter.course_grade_summaries }.not_to raise_error
+    end
+
+    it 'does not throw an error when there exists a user with multiple student enrollments and ' \
+      'some of those enrollments have a score while others do not' do
+        @section_one_student_enrollment.scores.create!(current_score: 80.0)
+        expect { @presenter.course_grade_summaries }.not_to raise_error
+    end
+  end
+
   describe '#student_enrollments' do
     let(:course1) { stub }
     let(:course2) { stub }

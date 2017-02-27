@@ -22,7 +22,7 @@ describe "Sessions Timeout" do
         f("#plugin_setting_disabled").click
         f('#settings_session_timeout').send_keys('19')
         expect_new_page_load{ f('.save_button').click }
-        assert_flash_error_message /There was an error saving the plugin settings/
+        assert_flash_error_message "There was an error saving the plugin settings"
       end
     end
   end
@@ -37,7 +37,7 @@ describe "Sessions Timeout" do
     Timecop.travel(Time.now + 1.minute) do
       get "/courses"
 
-      assert_flash_warning_message(/You must be logged in to access this page/)
+      assert_flash_warning_message("You must be logged in to access this page")
     end
   end
 end

@@ -27,7 +27,7 @@ describe Selinimum::Capture::AutoloadExtensions do
       end
 
       context "dependency tracking" do
-        it "temporarily resets other top-level autoloads" do
+        it "temporarily resets top-level sibling autoloads" do
           cache_constants("SelinimumFoo") do
             SelinimumFoo = Class.new
           end
@@ -41,15 +41,38 @@ describe Selinimum::Capture::AutoloadExtensions do
           expect(Object.const_defined?("SelinimumBar")).to be true
         end
 
-        it "doesn't reset nested autoloads" do
-          cache_constants("SelinimumFoo") do
-            SelinimumFoo = Class.new
+        it "temporarily resets nested sibling autoloads" do
+          cache_constants("SelinimumTopLevel") do
+            SelinimumTopLevel = Class.new
+
+            cache_constants("SelinimumFoo") do
+              SelinimumFoo = Class.new
+            end
 
             cache_constants("SelinimumBar") do
-              expect(Object.const_defined?("SelinimumFoo")).to be true
+              expect(Object.const_defined?("SelinimumFoo")).to be false
               SelinimumBar = Class.new
             end
+            expect(Object.const_defined?("SelinimumFoo")).to be true
+            expect(Object.const_defined?("SelinimumBar")).to be true
           end
+        end
+
+        # this will require some refactoring...
+        it "temporarily resets outer autoloads" do
+          pending "not implemented"
+
+          cache_constants("SelinimumFoo") do
+            SelinimumTopLevel = Class.new
+
+            cache_constants("SelinimumBar") do
+              expect(Object.const_defined?("SelinimumFoo")).to be false
+              SelinimumFoo = Class.new
+            end
+          end
+
+          expect(Object.const_defined?("SelinimumFoo")).to be true
+          expect(Object.const_defined?("SelinimumBar")).to be true
         end
 
         it "doesn't reset autoloads from surrounding modules" do
@@ -71,7 +94,6 @@ describe Selinimum::Capture::AutoloadExtensions do
             SelinimumFoo = Class.new
 
             cache_constants("SelinimumBar") do
-              expect(Object.const_defined?("SelinimumFoo")).to be true
               SelinimumBar = Class.new
             end
           end

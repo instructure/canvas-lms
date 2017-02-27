@@ -9,7 +9,7 @@ define [
     url: 'http://lti.example.com/content/launch/42'
     comment: 'Foo all the bars!'
 
-  module 'ExternalContentLtiLinkSubmissionView',
+  QUnit.module 'ExternalContentLtiLinkSubmissionView',
     setup: ->
       fakeENV.setup()
       window.ENV.COURSE_ID = 42

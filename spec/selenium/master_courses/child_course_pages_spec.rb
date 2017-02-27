@@ -13,6 +13,7 @@ describe "master courses - child courses - wiki page locking" do
 
     course_with_teacher(:active_all => true)
     @copy_to = @course
+    @template.add_child_course!(@copy_to)
     @page_copy = @copy_to.wiki.wiki_pages.new(:title => "bloo", :body => "bloo") # just create a copy directly instead of doing a real migraiton
     @page_copy.migration_id = @tag.migration_id
     @page_copy.save!

@@ -385,7 +385,7 @@ describe "calendar2" do
 
         # Switch the month and verify that there is no highlighted day
         2.times { change_calendar }
-        expect(find_all(".fc-state-highlight").size).to eq 0
+        expect(f('body')).not_to contain_css(".fc-state-highlight")
 
         # Go back to the present month. Verify that there is a highlighted day
         change_calendar(:today)

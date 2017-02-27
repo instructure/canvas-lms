@@ -37,13 +37,16 @@ module Lti
 
     end
 
-    def process_tool_proxy_json(json:, context:, guid:, tool_proxy_to_update: nil, tc_half_shared_secret: nil, developer_key: nil)
+    def process_tool_proxy_json(json:, context:, guid:, tool_proxy_to_update: nil, tc_half_shared_secret: nil, developer_key: nil, tcp_uuid: Lti::ToolConsumerProfile::DEFAULT_TCP_UUID)
       @tc_half_secret = tc_half_shared_secret
 
       tp = IMS::LTI::Models::ToolProxy.new.from_json(json)
       tp.tool_proxy_guid = guid
-
-      validate_proxy!(tp, context)
+      begin
+        validate_proxy!(tp, context, developer_key, tcp_uuid)
+      rescue Lti::ToolProxyService::InvalidToolProxyError
+        raise unless depricated_split_secret?(tp)
+      end
       tool_proxy = nil
       ToolProxy.transaction do
         product_family = create_product_family(tp, context.root_account, developer_key)
@@ -59,7 +62,8 @@ module Lti
 
     def create_secret(tp)
       security_contract = tp.security_contract
-      if (tp_half_secret = tp.enabled_capabilities.include?('OAuth.splitSecret') && security_contract.tp_half_shared_secret)
+      tp_half_secret = security_contract.tp_half_shared_secret
+      if (tp.enabled_capabilities & ['OAuth.splitSecret', 'Security.splitSecret']).present? && tp_half_secret.present?
         @tc_half_secret ||= SecureRandom.hex(64)
         tc_half_secret + tp_half_secret
       else
@@ -68,6 +72,12 @@ module Lti
     end
 
     private
+    def depricated_split_secret?(tp)
+      tp.enabled_capability.present? &&
+      tp.enabled_capability.include?("OAuth.splitSecret") &&
+      tp.security_contract.tp_half_shared_secret.present?
+    end
+
     def create_tool_proxy(tp, context, product_family, tool_proxy=nil)
       # make sure the guid never changes
       raise InvalidToolProxyError if tool_proxy && tp.tool_proxy_guid != tool_proxy.guid
@@ -193,12 +203,17 @@ module Lti
     end
 
     def create_json(obj)
-      obj.kind_of?(Array) ? obj.map(&:as_json) : obj.as_json
+      obj.is_a?(Array) ? obj.map(&:as_json) : obj.as_json
     end
 
-    def validate_proxy!(tp, context)
+    def validate_proxy!(tp, context, developer_key = nil, tcp_uuid)
 
-      profile = Lti::ToolConsumerProfileCreator.new(context, tp.tool_consumer_profile).create
+      profile = Lti::ToolConsumerProfileCreator.new(
+        context,
+        tp.tool_consumer_profile,
+        developer_key: developer_key,
+        tcp_uuid: tcp_uuid
+      ).create
       tp_validator = IMS::LTI::Services::ToolProxyValidator.new(tp)
       tp_validator.tool_consumer_profile = profile
 

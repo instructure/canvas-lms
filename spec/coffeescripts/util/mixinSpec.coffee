@@ -1,6 +1,6 @@
 define ['compiled/util/mixin'], (mixin) ->
 
-  module 'mixin'
+  QUnit.module 'mixin'
 
   test 'merges objects without blowing away events or defaults', 4, ->
     mixin1 =

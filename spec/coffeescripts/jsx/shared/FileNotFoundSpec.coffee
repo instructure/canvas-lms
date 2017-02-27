@@ -6,7 +6,7 @@ define [
   'jsx/shared/FileNotFound'
 ], ($, React, ReactDOM, TestUtils, FileNotFound) ->
 
-  module 'FileNotFoundSpec',
+  QUnit.module 'FileNotFoundSpec',
     setup: ->
       @element = React.createElement(FileNotFound, {
         contextCode: 'fakeContextCode'

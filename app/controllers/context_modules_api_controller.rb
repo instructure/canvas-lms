@@ -315,8 +315,8 @@
 #     }
 #
 class ContextModulesApiController < ApplicationController
-  before_filter :require_context
-  before_filter :find_student, :only => [:index, :show]
+  before_action :require_context
+  before_action :find_student, :only => [:index, :show]
   include Api::V1::ContextModule
 
   # @API List modules

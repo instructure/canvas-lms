@@ -7,7 +7,7 @@ define [
   'jquery.ajaxJSON'
 ], ($, Quiz, Assignment, DateGroup, AssignmentOverrideCollection) ->
 
-  module 'Quiz',
+  QUnit.module 'Quiz',
     setup: ->
       @quiz = new Quiz(id: 1, html_url: 'http://localhost:3000/courses/1/quizzes/24')
       @ajaxStub = @stub $, 'ajaxJSON'
@@ -109,7 +109,7 @@ define [
 
   # multiple due dates
 
-  module "Quiz#multipleDueDates"
+  QUnit.module "Quiz#multipleDueDates"
 
   test "checks for multiple due dates from assignment overrides", ->
     quiz = new Quiz all_dates: [{title: "Winter"}, {title: "Summer"}]
@@ -119,7 +119,7 @@ define [
     quiz = new Quiz
     ok !quiz.multipleDueDates()
 
-  module "Quiz#allDates"
+  QUnit.module "Quiz#allDates"
 
   test "gets the due dates from the assignment overrides", ->
     dueAt = new Date("2013-08-20T11:13:00Z")
@@ -157,7 +157,7 @@ define [
 
   # toView
 
-  module "Quiz#toView"
+  QUnit.module "Quiz#toView"
 
   test "returns the quiz's dueAt", ->
     date = Date.now()

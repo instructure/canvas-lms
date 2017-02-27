@@ -8,7 +8,7 @@ define [
   'compiled/models/File'
 ], (React, ReactDOM, TestUtils, $, UsageRightsIndicator, Folder, File) ->
 
-  module 'UsageRightsIndicator'
+  QUnit.module 'UsageRightsIndicator'
 
   test 'returns null for folders', ->
     props = {
@@ -65,7 +65,7 @@ define [
     ReactDOM.unmountComponentAtNode(uRI.getDOMNode().parentNode)
 
 
-  module "UsageRightsIndicator: Icon Classess & Screenreader text",
+  QUnit.module "UsageRightsIndicator: Icon Classess & Screenreader text",
     teardown: ->
       ReactDOM.unmountComponentAtNode(@uRI.getDOMNode().parentNode)
 

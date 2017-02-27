@@ -17,7 +17,7 @@ module CanvasCrummy
         html_options[:id] = options[:id] if options[:id]
         raise ArgumentError, "Need more arguments" unless name or options[:record] or block_given?
         raise ArgumentError, "Cannot pass url and use block" if url && block_given?
-        before_filter(options) do |instance|
+        before_action(options) do |instance|
           url_value = url
           url_value = yield instance if block_given?
           url_value = instance.send url_value if url_value.is_a? Symbol

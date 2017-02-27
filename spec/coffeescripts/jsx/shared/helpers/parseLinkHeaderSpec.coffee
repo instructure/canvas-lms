@@ -2,7 +2,7 @@ define [
   'jsx/shared/helpers/parseLinkHeader'
 ], (parseLinkHeader) ->
 
-  module 'parseLinkHeader',
+  QUnit.module 'parseLinkHeader',
     setup: ->
       @axiosResponse =
         data: {}

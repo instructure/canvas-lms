@@ -74,6 +74,7 @@ define [
       binding = extend collaborator.toJSON(),
         name: collaborator.get('sortable_name') or collaborator.get('name')
         type: collaborator.modelType
+        collaborator_id: collaborator.id
       collaboratorTemplate(binding)
 
     # Internal: Set focus after render.

@@ -2,9 +2,9 @@ define  [
   'compiled/models/VeriCiteSettings'
 ], ( VeriCiteSettings ) ->
 
-  module "VeriCiteSettings"
+  QUnit.module "VeriCiteSettings"
 
-  module "VeriCiteSettings#constructor"
+  QUnit.module "VeriCiteSettings#constructor"
 
   test "assigns originalityReportVisibility", ->
     ts = new VeriCiteSettings originality_report_visibility: 'after_grading'
@@ -18,7 +18,7 @@ define  [
       exclude_quoted: '1'
     strictEqual ts.excludeQuoted, true
 
-  module "VeriCiteSettings#toJSON"
+  QUnit.module "VeriCiteSettings#toJSON"
 
   test "it converts back to snake_case", ->
     options =
@@ -29,7 +29,7 @@ define  [
     ts = new VeriCiteSettings options
     deepEqual ts.toJSON(), options
 
-  module "VeriCiteSettings#present",
+  QUnit.module "VeriCiteSettings#present",
     setup: ->
       @options =
         exclude_biblio: true

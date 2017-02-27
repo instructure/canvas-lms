@@ -1,39 +1,33 @@
 define([
   'i18n!roster',
   'react',
-  'instructure-ui/Button',
-  'instructure-ui/Typography',
-  'instructure-ui/RadioInputGroup',
-  'instructure-ui/RadioInput',
-  'instructure-ui/Select',
-  'instructure-ui/TextArea',
-  'instructure-ui/ScreenReaderContent',
-  'instructure-ui/Checkbox',
-  'instructure-ui/Alert',
+  'instructure-ui',
   './shapes'
-], (I18n, React, {default: Button}, {default: Typography}, {default: RadioInputGroup},
-    {default: RadioInput}, {default: Select}, {default: TextArea}, {default: ScreenReaderContent},
-    {default: Checkbox}, {default: Alert}, {courseParamsShape, inputParamsShape}) => {
+], (I18n, React, {Button, Typography, RadioInputGroup,
+    RadioInput, Select, TextArea, ScreenReaderContent,
+    Checkbox, Alert}, {courseParamsShape, inputParamsShape}) => {
   class PeopleSearch extends React.Component {
     static propTypes = Object.assign({}, inputParamsShape, courseParamsShape);
 
     static defaultProps = {
       searchType: 'cc_path',
-      nameList: []
+      nameList: ''
     };
 
     constructor (props) {
       super(props);
 
       this.namelistta = null;
-    }
-    shouldComponentUpdate (nextProps /* , nextState */) {
-      return nextProps.searchType !== this.props.searchType
-          || nextProps.nameList.join(',') !== this.props.nameList.join(',')
-          || nextProps.role !== this.props.role
-          || nextProps.section !== this.props.section;
+      this.emailValidator = /.+@.+\..+/;
     }
 
+    shouldComponentUpdate (nextProps, /* nextState */) {
+      return nextProps.searchType !== this.props.searchType
+          || nextProps.nameList !== this.props.nameList
+          || nextProps.role !== this.props.role
+          || nextProps.section !== this.props.section
+          || nextProps.limitPrivilege !== this.props.limitPrivilege;
+    }
 
     // event handlers ------------------------------------
     // inst-ui form elements are currently inconsistent in what args they send
@@ -44,12 +38,9 @@ define([
       this.props.onChange({searchType: newValue});
     }
     onChangeNameList = (newValue) => {
-      let nameList = newValue.trim();
-      // split the user enteredd name list on commas,
-      // then trim each result
-      nameList = nameList.length ? nameList.split(/\s*,\s*/).map(n => n.trim()) : [];
-      this.props.onChange({nameList});
+      this.props.onChange({nameList: newValue});
     }
+
     onChangeSection = (event) => {
       this.props.onChange({section: event.target.value});
     }
@@ -60,10 +51,26 @@ define([
       this.props.onChange({limitPrivilege: event.target.checked});
     }
 
+    // validate the user's input of names in the textbox
+    // @returns: a message for <TextArea> or null
+    getHint () {
+      let message = ' '; // that's a copy/pasted en-space to trick TextArea into
+                         // reserving space for the message so the UI doesn't jump
+      if (this.props.nameList.length > 0 && this.props.searchType === 'cc_path') {   // search by email
+        const badEmail = this.props.nameList.split(/[\n,]/).find(n => !this.emailValidator.test(n))
+        if (badEmail) {
+          message = I18n.t('It looks like you have an invalid email address: "%{addr}"', {addr: badEmail});
+        }
+      }
+      return [{text: message, type: 'hint'}];
+    }
+
     // rendering ------------------------------------
     render () {
       let exampleText = '';
       let labelText = '';
+      const message = this.getHint()
+
       switch (this.props.searchType) {
         case 'sis_user_id':
           exampleText = 'student_2708, student_3693';
@@ -101,20 +108,23 @@ define([
               value="unique_id"
               label={I18n.t('Login ID')}
             />
-            <RadioInput
-              id="peoplesearch_radio_sis_user_id"
-              isBlock={false}
-              key="sis_user_id"
-              value="sis_user_id"
-              label={I18n.t('SIS ID')}
-            />
+            {this.props.canReadSIS
+              ? <RadioInput
+                id="peoplesearch_radio_sis_user_id"
+                isBlock={false}
+                key="sis_user_id"
+                value="sis_user_id"
+                label={I18n.t('SIS ID')}
+              />
+              : null}
           </RadioInputGroup>
           <fieldset>
             <div style={{marginBottom: '.5em'}}>{I18n.t('Example:')} {exampleText}</div>
             <TextArea
               label={<ScreenReaderContent>{labelText}</ScreenReaderContent>}
               autoGrow={false} resize="vertical" height="9em"
-              value={this.props.nameList.join(',')} textareaRef={(ta) => { this.namelistta = ta; }}
+              value={this.props.nameList} textareaRef={(ta) => { this.namelistta = ta; }}
+              messages={message}
               onChange={this.onChangeNameList}
             />
           </fieldset>
@@ -148,6 +158,7 @@ define([
             </div>
             <div style={{marginTop: '1em'}}>
               <Checkbox
+                key="limit_privileges_to_course_section"
                 id="limit_privileges_to_course_section"
                 label={I18n.t('Can interact with users in their section only')}
                 isBlock value={0}
@@ -157,10 +168,10 @@ define([
             </div>
           </fieldset>
           <div className="peoplesearch__instructions">
-            <i className="peoplesearch__icon-user" />
+            <i className="icon-user" />
             <Typography size="medium">
               {I18n.t('Add user by Email Address, Login ID, or SIS ID.')}<br />
-              {I18n.t('Use "," between for adding multiple users.')}
+              {I18n.t('Use a "," or new line between for adding multiple users.')}
             </Typography>
           </div>
         </div>

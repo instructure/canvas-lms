@@ -71,6 +71,7 @@ module Api::V1::Assignment
     due_at
     only_visible_to_overrides
     post_to_sis
+    time_zone_edited
   ].freeze
 
   def assignments_json(assignments, user, session, opts = {})
@@ -119,6 +120,7 @@ module Api::V1::Assignment
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
     hash['due_date_required'] = assignment.due_date_required?
+    hash['max_name_length'] = assignment.max_name_length
 
     unless opts[:exclude_response_fields].include?('in_closed_grading_period')
       hash['in_closed_grading_period'] = assignment.in_closed_grading_period?
@@ -304,8 +306,8 @@ module Api::V1::Assignment
       hash['submissions_download_url'] = submissions_download_url(assignment.context, assignment)
     end
 
-    if opts[:include_master_course_restrictions]
-      hash.merge!(assignment.master_course_api_restriction_data)
+    if opts[:master_course_status]
+      hash.merge!(assignment.master_course_api_restriction_data(opts[:master_course_status]))
     end
 
     hash
@@ -751,7 +753,7 @@ module Api::V1::Assignment
   end
 
   def assignment_configuration_tool(assignment_params)
-    tool_id = assignment_params['assignmentConfigurationTool'].to_i
+    tool_id = assignment_params['similarityDetectionTool'].to_i
     tool = nil
     if assignment_params['configuration_tool_type'] == 'ContextExternalTool'
       tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)

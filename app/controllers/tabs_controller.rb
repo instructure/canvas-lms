@@ -59,7 +59,7 @@
 class TabsController < ApplicationController
   include Api::V1::Tab
 
-  before_filter :require_context
+  before_action :require_context
 
   # @API List available tabs for a course or group
   #
@@ -101,7 +101,7 @@ class TabsController < ApplicationController
   #         "label": "Grades",
   #         "position": 3,
   #         "hidden": true
-  #         "visibility": admin
+  #         "visibility": "admins"
   #         "type": "internal"
   #       }
   #     ]

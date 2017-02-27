@@ -52,8 +52,8 @@ describe "/quizzes/quizzes/_quiz_submission" do
       quiz.save!
 
       assigns[:quiz] = quiz
-      assigns[:submission] = assigns[:quiz].generate_submission(@user)
-      Quizzes::SubmissionGrader.new(assigns[:submission]).grade_submission
+      assigns[:submission] = sub = quiz.generate_submission(@user)
+      Quizzes::SubmissionGrader.new(sub).grade_submission
       render :partial => "quizzes/quizzes/quiz_submission"
       expect(response).not_to be_nil
     end
@@ -73,8 +73,8 @@ describe "/quizzes/quizzes/_quiz_submission" do
       @course.soft_conclude!
 
       assigns[:quiz] = quiz
-      assigns[:submission] = assigns[:quiz].generate_submission(@student)
-      Quizzes::SubmissionGrader.new(assigns[:submission]).grade_submission
+      assigns[:submission] = sub = quiz.generate_submission(@student)
+      Quizzes::SubmissionGrader.new(sub).grade_submission
       render :partial => "quizzes/quizzes/quiz_submission"
       expect(response).not_to be_nil
     end

@@ -261,10 +261,10 @@ require 'atom'
 class CalendarEventsApiController < ApplicationController
   include Api::V1::CalendarEvent
 
-  before_filter :require_user, :except => %w(public_feed index)
-  before_filter :get_calendar_context, :only => :create
-  before_filter :require_user_or_observer, :only => [:user_index]
-  before_filter :require_authorization, :only => %w(index user_index)
+  before_action :require_user, :except => %w(public_feed index)
+  before_action :get_calendar_context, :only => :create
+  before_action :require_user_or_observer, :only => [:user_index]
+  before_action :require_authorization, :only => %w(index user_index)
 
   # @API List calendar events
   #

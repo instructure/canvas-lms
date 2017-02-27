@@ -98,6 +98,9 @@ describe ContextController do
       end
 
       it "is enabled for teachers when feature_flag is on" do
+        %w[manage_students manage_admin_users].each do |perm|
+          RoleOverride.manage_role_override(Account.default, teacher_role, perm, override: false)
+        end
         user_session(@teacher)
         get :roster, course_id: @course.id
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be true
@@ -314,6 +317,36 @@ describe ContextController do
 
       post :undelete_item, course_id: @course.id, asset_string: @attachment.asset_string
       expect(@attachment.reload).not_to be_deleted
+    end
+  end
+
+  describe "GET 'roster_user_usage'" do
+    before(:once) do
+      page = @course.wiki.wiki_pages.create(:title => "some page")
+      AssetUserAccess.create!({
+        user_id: @student,
+        asset_code: page.asset_string,
+        context: @course,
+        category: 'pages'
+      })
+    end
+
+    it "returns accesses" do
+      user_session(@teacher)
+
+      get :roster_user_usage, course_id: @course.id, user_id: @student.id
+
+      expect(response).to be_success
+      expect(assigns[:accesses].length).to eq 1
+    end
+
+    it "returns json" do
+      user_session(@teacher)
+
+      get :roster_user_usage, course_id: @course.id, user_id: @student.id, format: :json
+
+      expect(response).to be_success
+      expect(JSON.parse(response.body.gsub("while(1);", "")).length).to eq 1
     end
   end
 end

@@ -2,7 +2,7 @@ define([
   'jsx/choose_mastery_path/actions',
   'jsx/choose_mastery_path/reducer',
 ], (actions, reducer) => {
-  module('Choose Mastery Path Reducer')
+  QUnit.module('Choose Mastery Path Reducer')
 
   const reduce = (action, state = {}) => {
     return reducer(state, action)

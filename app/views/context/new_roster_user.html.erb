@@ -8,29 +8,53 @@
 <% content_for :right_side do %>
   <div id="right_nav">
     <% if can_do(@membership, @current_user, :read_grades) && @membership.is_a?(StudentEnrollment) %>
-      <a class="btn button-sidebar-wide" href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>"><i class="icon-check-plus" role="presentation"></i> <%= t 'links.user_grades', "Grades for %{user}", :user => context_user_name(@context, @user) %></a>
+      <a class="btn button-sidebar-wide" href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>">
+        <i class="icon-check-plus" aria-hidden="true"></i>
+        <%= t "Student Grades" %>
+      </a>
     <% end %>
     <% if @domain_root_account.enable_user_notes and can_do(@user, @current_user, :read_user_notes) %>
-      <a href="<%= user_user_notes_path(@user) %>" class="btn button-sidebar-wide"> <%= t 'links.faculty_journal', "Faculty Journal for %{user}", :user => context_user_name(@context, @user) %></a>
+      <a href="<%= user_user_notes_path(@user) %>" class="btn button-sidebar-wide">
+        <i class="icon-note-light" aria-hidden="true"></i>
+        <%= t "Faculty Journal" %>
+      </a>
     <% end %>
     <% if @context.is_a?(Course)%>
       <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :read_reports) %>
-        <%= link_to(t('links.teacher_activity', 'Student Interactions Report for %{user}', :user => context_user_name(@context, @user)), user_course_teacher_activity_url(@user, @context), :class => 'btn button-sidebar-wide') %>
+        <a href="<%= user_course_teacher_activity_url(@user, @context) %>" class="btn button-sidebar-wide">
+          <i class="icon-chat" aria-hidden="true"></i>
+          <%= t 'Student Interactions Report' %>
+        </a>
       <% elsif @context.user_has_been_student?(@user) && @context.user_is_instructor?(@current_user) && can_do(@context, @current_user, :read_reports) %>
-        <%= link_to(t('links.student_teacher_activity', 'Your Interactions Report with %{user}', :user => context_user_name(@context, @user)), user_student_teacher_activity_url(@current_user, @user), :class => 'btn button-sidebar-wide') %>
+        <a href="<%= user_student_teacher_activity_url(@current_user, @user) %>" class="btn button-sidebar-wide">
+          <i class="icon-chat" aria-hidden="true"></i>
+          <%= t 'Interactions Report' %>
+        </a>
       <% end %>
     <% end %>
     <% if can_do(@context, @current_user, :read_reports) %>
-      <a href="<%= context_url(@context, :context_user_usage_url, @user) %>" class="btn button-sidebar-wide"><i class="icon-clock" role="presentation"></i> <%= t 'links.access_report', "Access Report for %{user}", :user => context_user_name(@context, @user) %></a>
+      <a href="<%= context_url(@context, :context_user_usage_url, @user) %>" class="btn button-sidebar-wide">
+        <i class="icon-clock" aria-hidden="true"></i>
+        <%= t "Access Report" %>
+      </a>
     <% end %>
     <% if @context.is_a?(Course) && @context.has_outcomes? && can_do(@context, @current_user, :manage) %>
-      <a href="<%= context_url(@context, :context_user_outcomes_results_url, @user.id) %>" class="btn button-sidebar-wide"><i class="icon-star" role="presentation"></i> <%= t 'links.user_outcomes', "Outcomes for %{user}", :user => @user.short_name %></a>
+      <a href="<%= context_url(@context, :context_user_outcomes_results_url, @user.id) %>" class="btn button-sidebar-wide">
+        <i class="icon-outcomes" aria-hidden="true"></i>
+        <%= t "Outcomes Report" %>
+      </a>
     <% end %>
     <% if @user.grants_right?(@current_user, :view_statistics) %>
-      <a href="<%= user_path(@user.id) %>" class="btn button-sidebar-wide"><i class="icon-user" role="presentation"></i> <%= t('links.user_account_details', %{User Account Details}) %></a>
+      <a href="<%= user_path(@user.id) %>" class="btn button-sidebar-wide">
+        <i class="icon-user" aria-hidden="true"></i>
+        <%= t('links.user_account_details', %{User Account Details}) %>
+      </a>
     <% end %>
     <% roster_user_custom_links(@user).each do |link| %>
-      <a href="<%= link[:url] %>" class="btn button-sidebar-wide"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
+      <a href="<%= link[:url] %>" class="btn button-sidebar-wide">
+        <i class="<%= link[:icon_class] %>" aria-hidden="true"></i>
+        <%= link[:text] %>
+      </a>
     <% end %>
   </div>
   <a href="<%= user_profile_path(@current_user) %>" class="profile_url" style="display: none;">&nbsp;</a>

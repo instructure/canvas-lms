@@ -93,9 +93,9 @@
 class WebZipExportsController < ApplicationController
   include Api::V1::WebZipExport
 
-  before_filter :require_user
-  before_filter :require_context
-  before_filter :check_feature_enabled
+  before_action :require_user
+  before_action :require_context
+  before_action :check_feature_enabled
 
   def check_feature_enabled
     unless @context.allow_web_export_download?

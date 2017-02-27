@@ -312,6 +312,11 @@
 #           "type": "array",
 #           "items": {"type": "string"}
 #         },
+#         "max_name_length": {
+#           "description": "An integer indicating the maximum length an assignment's name may be",
+#           "example": 15,
+#           "type": "integer"
+#         },
 #         "turnitin_enabled": {
 #           "description": "Boolean flag indicating whether or not Turnitin has been enabled for the assignment. NOTE: This flag will not appear unless your account has the Turnitin plugin available",
 #           "example": true,
@@ -543,8 +548,8 @@
 #       }
 #     }
 class AssignmentsApiController < ApplicationController
-  before_filter :require_context
-  before_filter :require_user_visibility, :only=>[:user_index]
+  before_action :require_context
+  before_action :require_user_visibility, :only=>[:user_index]
   include Api::V1::Assignment
   include Api::V1::Submission
   include Api::V1::AssignmentOverride
@@ -1021,16 +1026,25 @@ class AssignmentsApiController < ApplicationController
     @assignment = @context.active_assignments.api_id(params[:id])
     if authorized_action(@assignment, @current_user, :update)
       @assignment.content_being_saved_by(@current_user)
+      # update_api_assignment mutates params so this has to be done here
+      opts = assignment_json_opts
       result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context)
-      render_create_or_update_result(result)
+      render_create_or_update_result(result, opts)
     end
   end
 
   private
 
-  def render_create_or_update_result(result)
+  def assignment_json_opts
+    return {} unless params[:assignment]&.key?(:override_dates)
+    {
+      override_dates: value_to_boolean(params[:assignment][:override_dates])
+    }
+  end
+
+  def render_create_or_update_result(result, opts = {})
     if result == :success
-      render json: assignment_json(@assignment, @current_user, session), status: :created
+      render json: assignment_json(@assignment, @current_user, session, opts), status: :created
     else
       status = result == :forbidden ? :forbidden : :bad_request
       errors = @assignment.errors.as_json[:errors]

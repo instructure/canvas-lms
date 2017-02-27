@@ -4,7 +4,7 @@ define([
   'jsx/conditional_release_stats/components/student-assignment-item',
 ], (React, TestUtils, AssignmentItem) => {
 
-  module('Student Assignment Item')
+  QUnit.module('Student Assignment Item')
 
   const renderComponent = (props) => {
     return TestUtils.renderIntoDocument(

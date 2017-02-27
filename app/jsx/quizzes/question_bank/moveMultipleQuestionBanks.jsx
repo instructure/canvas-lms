@@ -67,8 +67,9 @@ define([
       $.ajaxJSON(window.location.href + '/questions?page=' + this.page, 'GET', {}, $.proxy(this.onData, this))
     },
     onData: function(data){
+      const html = moveQuestionTemplate(data)
       this.elements.$loadMessage.remove()
-      this.elements.$questions.append(moveQuestionTemplate(data))
+      this.elements.$questions.append(html)
       if (this.page < data.pages){
         this.elements.$questions.append(this.elements.$loadMessage)
         this.page += 1

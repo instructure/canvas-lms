@@ -37,7 +37,7 @@ module Factories
   end
 
   def create_enrollment_states(enrollment_ids, options)
-    enrollment_ids = enrollment_ids.map(&:id) unless enrollment_ids.first.is_a? Fixnum
+    enrollment_ids = enrollment_ids.map(&:id) unless enrollment_ids.first.is_a? Integer
     create_records(EnrollmentState, enrollment_ids.map { |id| options.merge({ enrollment_id: id}) }, :nil)
   end
 

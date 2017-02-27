@@ -66,6 +66,13 @@ describe BrandableCSS do
     end
   end
 
+  describe "all_brand_variable_values_as_js" do
+    it "eports the default js to the right global variable" do
+      expected_js = "CANVAS_ACTIVE_BRAND_VARIABLES = #{BrandableCSS.default_json};"
+      expect(BrandableCSS.default_js).to eq expected_js
+    end
+  end
+
   describe "default_json" do
     it "includes default variables not found in brand config" do
       brand_variables = JSON.parse(BrandableCSS.default_json)
@@ -73,8 +80,8 @@ describe BrandableCSS do
     end
   end
 
-  describe "save_default_file!" do
-    it "writes the default json represendation to the default json file" do
+  describe "save_default_json!" do
+    it "writes the default json representation to the default json file" do
       Canvas::Cdn.stubs(:enabled?).returns(false)
       file = StringIO.new
       BrandableCSS.stubs(:default_brand_json_file).returns(file)
@@ -82,7 +89,7 @@ describe BrandableCSS do
       expect(file.string).to eq BrandableCSS.default_json
     end
 
-    it 'uploads file to s3 if cdn is enabled' do
+    it 'uploads json file to s3 if cdn is enabled' do
       Canvas::Cdn.stubs(:enabled?).returns(true)
       Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1'))
 
@@ -93,7 +100,7 @@ describe BrandableCSS do
       BrandableCSS.save_default_json!
     end
 
-    it 'delete the local file if cdn is enabled' do
+    it 'deletes the local json file if cdn is enabled' do
       Canvas::Cdn.stubs(:enabled?).returns(true)
       Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1'))
       file = StringIO.new
@@ -101,6 +108,37 @@ describe BrandableCSS do
       File.expects(:delete).with(BrandableCSS.default_brand_json_file)
       BrandableCSS.s3_uploader.expects(:upload_file)
       BrandableCSS.save_default_json!
+    end
+  end
+
+  describe "save_default_js!" do
+    it "writes the default javascript representation to the default js file" do
+      Canvas::Cdn.stubs(:enabled?).returns(false)
+      file = StringIO.new
+      BrandableCSS.stubs(:default_brand_js_file).returns(file)
+      BrandableCSS.save_default_js!
+      expect(file.string).to eq BrandableCSS.default_js
+    end
+
+    it 'uploads javascript file to s3 if cdn is enabled' do
+      Canvas::Cdn.stubs(:enabled?).returns(true)
+      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1'))
+
+      file = StringIO.new
+      BrandableCSS.stubs(:default_brand_js_file).returns(file)
+      File.stubs(:delete)
+      BrandableCSS.s3_uploader.expects(:upload_file).with(BrandableCSS.public_default_js_path)
+      BrandableCSS.save_default_js!
+    end
+
+    it 'delete the local javascript file if cdn is enabled' do
+      Canvas::Cdn.stubs(:enabled?).returns(true)
+      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1'))
+      file = StringIO.new
+      BrandableCSS.stubs(:default_brand_js_file).returns(file)
+      File.expects(:delete).with(BrandableCSS.default_brand_js_file)
+      BrandableCSS.s3_uploader.expects(:upload_file)
+      BrandableCSS.save_default_js!
     end
   end
 end

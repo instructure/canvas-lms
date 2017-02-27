@@ -105,7 +105,7 @@ class Notification < ActiveRecord::Base
     to_list.each do |to|
       msgs = NotificationMessageCreator.new(self, asset, options.merge(:to_list => to)).create_message
       messages.concat msgs if Rails.env.test?
-      to.clear_association_cache if to.is_a?(User)
+      to.send(:clear_association_cache) if to.is_a?(User)
     end
     messages
   end
@@ -497,7 +497,6 @@ Invitation for:
 * Web conference
 * Group
 * Collaboration
-* Course
 * Peer Review & reminder
 EOS
     when 'Other'

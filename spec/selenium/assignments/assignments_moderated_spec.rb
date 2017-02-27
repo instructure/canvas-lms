@@ -23,7 +23,7 @@ describe "moderated grading assignments" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
     f('.ModeratedGrading__Header-PublishBtn').click
     driver.switch_to.alert.accept
-    assert_flash_notice_message(/Success! Grades were published to the grade book/)
+    assert_flash_notice_message("Success! Grades were published to the grade book")
   end
 
 end

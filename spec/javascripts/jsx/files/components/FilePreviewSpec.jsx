@@ -17,7 +17,7 @@ define([
   let file3 = {};
   let currentFolder = {};
 
-  module('File Preview Rendering', {
+  QUnit.module('File Preview Rendering', {
     setup () {
       // Initialize a few things to view in the preview.
       filesCollection = new FilesCollection();

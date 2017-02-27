@@ -1,6 +1,6 @@
 define [
   'i18n!mimeClass'
-], ->
+], (I18n) ->
 
   # this module works together with app/stylesheets/components/_MimeClassIcons.scss
   # so, given the mime-type of a file you can give it a css class name that corresponds to it.

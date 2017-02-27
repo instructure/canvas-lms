@@ -22,7 +22,7 @@ require [
   options =
     permissions: ENV.PERMISSIONS,
     accountId: ENV.ACCOUNT_ID.toString()
-    roles: ENV.COURSE_ROLES
+    roles: Array.prototype.slice.call(ENV.COURSE_ROLES)
     addUserUrls: ENV.URLS
     store: store
 

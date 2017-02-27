@@ -3,7 +3,7 @@ define [
   'compiled/jquery/redirectClickTo'
 ], ($) ->
 
-  module 'redirectClickTo'
+  QUnit.module 'redirectClickTo'
 
   createClick = ->
     e = document.createEvent('MouseEvents')

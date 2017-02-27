@@ -95,6 +95,7 @@ define([
               contextAssetString={this.props.contextAssetString}
             />
           </div>
+          <div className="TutorialToggleHolder" />
         </div>
         <Toolbar
           currentFolder={this.state.currentFolder}
@@ -196,7 +197,7 @@ define([
           <ReactModal
             isOpen={this.state.showingModal}
             onRequestClose={this.closeModal}
-            closeTimeoutMS='10'
+            closeTimeoutMS={10}
             className='ReactModal__Content--canvas'
             overlayClassName='ReactModal__Overlay--canvas'
             style={modalOverrides}

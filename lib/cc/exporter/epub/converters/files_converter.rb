@@ -55,9 +55,10 @@ module CC::Exporter::Epub::Converters
     class FilePresenter
       include CC::CCHelper
 
-      def initialize(original_path, data)
+      def initialize(original_path, data, export_type)
         @original_path = original_path
         @data = data
+        @export_type = export_type
       end
       attr_reader :data, :original_path
 
@@ -103,10 +104,12 @@ module CC::Exporter::Epub::Converters
       # media/m-ArYKbPPdLwtbhcHPjxYsQvMeDCPZKZp.mp3
       def local_path
         unless @_local_path
+          file_basename = File.basename(path_to_file)
+          file_basename = CGI.escape(file_basename) unless @export_type == :web_zip
           path_args = [
             CC::Exporter::Epub::FILE_PATH,
             File.dirname(original_path.match(/#{WEB_RESOURCES_FOLDER}\/(.+)$/)[1]),
-            CGI.escape(File.basename(path_to_file))
+            file_basename
           ].reject do |path_part|
             path_part.match(/^\.$/)
           end
@@ -138,10 +141,10 @@ module CC::Exporter::Epub::Converters
       end
     end
 
-    def convert_files
+    def convert_files(export_type)
       all_files = @manifest.css("resource[type=#{WEBCONTENT}][href^=#{WEB_RESOURCES_FOLDER}]").map do |res|
         original_path = File.expand_path(get_full_path(res['href']))
-        FilePresenter.new(original_path, res).to_h
+        FilePresenter.new(original_path, res, export_type).to_h
       end
 
       # Unsupported file types will end up with a `nil` media_type, and they

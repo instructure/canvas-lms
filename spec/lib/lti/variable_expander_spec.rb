@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require_dependency "lti/variable_expander"
 module Lti
   describe VariableExpander do
-    let(:root_account) { Account.new }
+    let(:root_account) { Account.new(lti_guid: 'test-lti-guid') }
     let(:account) { Account.new(root_account: root_account) }
     let(:course) { Course.new(account: account) }
     let(:group_category) { course.group_categories.new(name: 'Category') }
@@ -116,6 +116,108 @@ module Lti
       expect(expanded[:some_name]).to eq "my variable is buried in here ${tests_expan} can you find it?"
     end
 
+    describe '#enabled_capability_params' do
+      let(:enabled_capability) {
+        %w(TestCapability.Foo
+           ToolConsumerInstance.guid
+           CourseSection.sourcedId
+           Membership.role
+           Person.email.primary
+           Person.name.given
+           Person.name.family
+           Person.name.full
+           Person.sourcedId
+           User.id
+           User.image
+           Message.documentTarget
+           Message.locale
+           Context.id)
+      }
+
+      it 'does not use expansions that do not have default names' do
+        described_class.register_expansion('TestCapability.Foo', ['a'], -> {'test'})
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.keys).not_to include 'TestCapability.Foo'
+      end
+
+      it 'does use expansion that have default names' do
+        described_class.register_expansion('TestCapability.Foo', ['a'], -> { 'test' }, default_name: 'test_capability_foo')
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.values).to include('test')
+      end
+
+      it 'does use the default name as the key' do
+        described_class.register_expansion('TestCapability.Foo', ['a'], -> { 'test' }, default_name: 'test_capability_foo')
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded['test_capability_foo']).to eq 'test'
+      end
+
+      it 'includes ToolConsumerInstance.guid when in enabled capability' do
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded['tool_consumer_instance_guid']).to eq 'test-lti-guid'
+      end
+
+      it 'includes CourseSection.sourcedId when in enabled capability' do
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.keys).to include 'lis_course_section_sourcedid'
+      end
+
+      it 'includes Membership.role when in enabled capability' do
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.keys).to include 'roles'
+      end
+
+      it 'includes Person.email.primary when in enabled capability' do
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.keys).to include 'lis_person_contact_email_primary'
+      end
+
+      it 'includes Person.name.given when in enabled capability' do
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.keys).to include 'lis_person_name_given'
+      end
+
+      it 'includes Person.name.family when in enabled capability' do
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.keys).to include 'lis_person_name_family'
+      end
+
+      it 'includes Person.name.full when in enabled capability' do
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.keys).to include 'lis_person_name_full'
+      end
+
+      it 'includes Person.sourcedId when in enabled capability' do
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.keys).to include 'lis_person_sourcedid'
+      end
+
+      it 'includes User.id when in enabled capability' do
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.keys).to include 'user_id'
+      end
+
+      it 'includes User.image when in enabled capability' do
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.keys).to include 'user_image'
+      end
+
+      it 'includes Message.documentTarget' do
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.keys).to include 'launch_presentation_document_target'
+      end
+
+      it 'includes Message.locale' do
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.keys).to include 'launch_presentation_locale'
+      end
+
+      it 'includes Context.id' do
+        expanded = subject.enabled_capability_params(enabled_capability)
+        expect(expanded.keys).to include 'context_id'
+      end
+    end
+
     context 'lti1' do
       it 'handles expansion' do
         described_class.register_expansion('test_expan', ['a'], -> { @context })
@@ -132,7 +234,19 @@ module Lti
         expect(expanded['some_name']).to eq "my variable is buried in here 42 can you find it?"
       end
     end
+
     describe "#variable expansions" do
+      it 'has substitution for Message.documentTarget' do
+        exp_hash = {test: '$Message.documentTarget'}
+        subject.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
+      end
+
+      it 'has substitution for Message.locale' do
+        exp_hash = {test: '$Message.locale'}
+        subject.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq I18n.locale
+      end
 
       it 'has substitution for $Canvas.api.domain' do
         exp_hash = {test: '$Canvas.api.domain'}
@@ -220,6 +334,13 @@ module Lti
         expect(exp_hash[:test]).to eq 54321
       end
 
+      it 'has substitution for $Canvas.account.name' do
+        allow(root_account).to receive(:uuid).and_return('123-123-123-123')
+        exp_hash = {test: '$vnd.Canvas.root_account.uuid'}
+        subject.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq '123-123-123-123'
+      end
+
       it 'has substitution for $Canvas.root_account.sisSourceId' do
         root_account.sis_source_id = 'cd45'
         exp_hash = {test: '$Canvas.root_account.sisSourceId'}
@@ -277,6 +398,13 @@ module Lti
           exp_hash = {test: '$Canvas.course.id'}
           subject.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 123
+        end
+
+        it 'has substitution for $Canvas.course.name' do
+          course.stubs(:name).returns('Course 101')
+          exp_hash = {test: '$Canvas.course.name'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'Course 101'
         end
 
         it 'has substitution for $Canvas.course.workflowState' do

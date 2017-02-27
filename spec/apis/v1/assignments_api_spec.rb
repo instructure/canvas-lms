@@ -19,11 +19,13 @@
 require_relative '../api_spec_helper'
 require_relative '../locked_spec'
 require_relative '../../sharding_spec_helper'
+require_relative '../../lti_spec_helper'
 
-describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
+describe AssignmentsApiController, type: :request do
   include Api
   include Api::V1::Assignment
   include Api::V1::Submission
+  include LtiSpecHelper
 
   context 'locked api item' do
     include_examples 'a locked api item'
@@ -104,6 +106,24 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       @course.assignments.create!(title: "Example Assignment")
       json = api_get_assignments_index_from_course(@course)
       expect(json.first).to have_key('due_date_required')
+    end
+
+    it "includes name_length_required in returned json with default value" do
+      @course.assignments.create!(title: "Example Assignment")
+      json = api_get_assignments_index_from_course(@course)
+      expect(json.first['max_name_length']).to eq(255)
+    end
+
+    it "includes name_length_required in returned json with custom value" do
+      a = @course.account
+      a.settings[:sis_syncing] = {value: true}
+      a.settings[:sis_assignment_name_length] = {value: true}
+      a.enable_feature!(:new_sis_integrations)
+      a.settings[:sis_assignment_name_length_input] = {value: 20}
+      a.save!
+      @course.assignments.create!(title: "Example Assignment", post_to_sis: true)
+      json = api_get_assignments_index_from_course(@course)
+      expect(json.first['max_name_length']).to eq(20)
     end
 
     it "sorts the returned list of assignments" do
@@ -1122,7 +1142,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
       api_create_assignment_in_course(@course, {
         'description' => 'description',
-        'assignmentConfigurationTool' => tool.id,
+        'similarityDetectionTool' => tool.id,
         'configuration_tool_type' => 'ContextExternalTool',
         'submission_type' => 'online',
         'submission_types' => ['online_upload']
@@ -1132,7 +1152,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       expect(a.tool_settings_tool).to eq(tool)
     end
 
-    it "sets the configuration an LTI 2 tool in account context" do
+    it "sets the configuration LTI 2 tool in account context" do
       account = @course.account
       product_family = Lti::ProductFamily.create(
         vendor_code: '123',
@@ -1168,7 +1188,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
       api_create_assignment_in_course(@course, {
         'description' => 'description',
-        'assignmentConfigurationTool' => message_handler.id,
+        'similarityDetectionTool' => message_handler.id,
         'configuration_tool_type' => 'Lti::MessageHandler',
         'submission_type' => 'online',
         'submission_types' => ['online_upload']
@@ -1214,7 +1234,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
       api_create_assignment_in_course(@course, {
         'description' => 'description',
-        'assignmentConfigurationTool' => message_handler.id,
+        'similarityDetectionTool' => message_handler.id,
         'configuration_tool_type' => 'Lti::MessageHandler',
         'submission_type' => 'online',
         'submission_types' => ['online_upload']
@@ -1227,7 +1247,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
     it "does not set the configuration tool if the submission type is not online with uploads" do
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
       api_create_assignment_in_course(@course, {'description' => 'description',
-        'assignmentConfigurationTool' => tool.id,
+        'similarityDetectionTool' => tool.id,
         'configuration_tool_type' => 'ContextExternalTool'
       })
 
@@ -1457,7 +1477,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         api_call_to_update_adhoc_override(student_ids: [@student.id])
 
         ao = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
-        expect(AssignmentOverrideStudent.count ==1)
+        expect(AssignmentOverrideStudent.count).to eq 1
       end
 
       it 'allows the update of an adhoc override with different student' do
@@ -2064,7 +2084,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           @user = @teacher
         end
 
-        before :each do
+        let(:update_assignment) do
           api_update_assignment_call(@course,@assignment,{
             'name' => 'Assignment With Overrides',
             'assignment_overrides' => {
@@ -2087,6 +2107,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         end
 
         it "updates any ADHOC overrides" do
+          update_assignment
           expect(@assignment.assignment_overrides.count).to eq 3
           @adhoc_override = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
           expect(@adhoc_override).not_to be_nil
@@ -2096,6 +2117,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         end
 
         it "updates any CourseSection overrides" do
+          update_assignment
           @section_override = @assignment.assignment_overrides.where(set_type: 'CourseSection').first
           expect(@section_override).not_to be_nil
           expect(@section_override.set).to eq @course.default_section
@@ -2104,6 +2126,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         end
 
         it "updates any Noop overrides" do
+          update_assignment
           @noop_override = @assignment.assignment_overrides.where(set_type: 'Noop').first
           expect(@noop_override).not_to be_nil
           expect(@noop_override.set).to be_nil
@@ -2111,6 +2134,33 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           expect(@noop_override.set_id).to eq 999
           expect(@noop_override.title).to eq 'Helpful Tag'
           expect(@noop_override.due_at_overridden).to be_falsey
+        end
+
+        it 'overrides the assignment for the user' do
+          @assignment.update!(due_at: 1.day.from_now)
+          response = api_update_assignment_call(@course, @assignment,
+            assignment_overrides: {
+              0 => {
+                course_section_id: @course.default_section.id,
+                due_at: @section_due_at.iso8601
+              }
+            }
+          )
+          expect(response['due_at']).to eq(@section_due_at.iso8601)
+        end
+
+        it 'does not override the assignment for the user if passed false for override_dates' do
+          @assignment.update!(due_at: 1.day.from_now)
+          response = api_update_assignment_call(@course, @assignment,
+            override_dates: false,
+            assignment_overrides: {
+              0 => {
+                course_section_id: @course.default_section.id,
+                due_at: @section_due_at.iso8601
+              }
+            }
+          )
+          expect(response['due_at']).to eq(@assignment.due_at.iso8601)
         end
       end
 
@@ -2942,7 +2992,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           'locked_for_user' => false,
           'root_topic_id' => @topic.root_topic_id,
           'podcast_url' => nil,
-          'podcast_has_student_posts' => nil,
+          'podcast_has_student_posts' => false,
           'read_state' => 'unread',
           'unread_count' => 0,
           'user_can_see_posts' => @topic.user_can_see_posts?(@user),
@@ -2958,9 +3008,9 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           'discussion_type' => 'side_comment',
           'group_category_id' => nil,
           'can_group' => true,
-          'allow_rating' => nil,
-          'only_graders_can_rate' => nil,
-          'sort_by_rating' => nil,
+          'allow_rating' => false,
+          'only_graders_can_rate' => false,
+          'sort_by_rating' => false,
         })
       end
 
@@ -3224,7 +3274,6 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           @tool_tag.save!
           @assignment.submission_types = 'external_tool'
           @assignment.save!
-          expect(@assignment.external_tool_tag).not_to be_nil
         end
 
         before :each do

@@ -9,7 +9,7 @@ define [
 ], ( DueDateList, Assignment, AssignmentOverride, AssignmentOverrideCollection,
 Section, SectionList, _ ) ->
 
-  module "DueDateList",
+  QUnit.module "DueDateList",
     setup: ->
       @date = Date.now()
       @assignment = new Assignment

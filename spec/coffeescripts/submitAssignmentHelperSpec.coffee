@@ -32,7 +32,7 @@ define ['submit_assignment_helper','jquery'], (SubmitAssignmentHelper, $) ->
   contentItem = null
   originalEnv = null
 
-  module "SubmitAssignmentHelper",
+  QUnit.module "SubmitAssignmentHelper",
     setup: ->
       $('#fixtures').append(formHtml)
       contentItem =

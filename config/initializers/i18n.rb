@@ -18,6 +18,7 @@ end
 
 load_path = Rails.application.config.i18n.railties_load_path
 if skip_locale_loading
+  load_path = load_path.map(&:existent).flatten unless CANVAS_RAILS4_2
   load_path.replace(load_path.grep(%r{/(locales|en)\.yml\z}))
 else
   load_path << (Rails.root + "config/locales/locales.yml").to_s # add it at the end, to trump any weird/invalid stuff in locale-specific files
@@ -106,7 +107,9 @@ end
 
 ActionView::Base.send(:include, I18nUtilities)
 ActionView::Helpers::FormHelper.send(:include, I18nUtilities)
-ActionView::Helpers::FormHelper.module_eval do
+ActionView::Helpers::FormTagHelper.send(:include, I18nUtilities)
+
+module I18nFormHelper
   # a convenience method to put the ":" after the label text (or do whatever
   # the selected locale dictates)
   def blabel(object_name, method, text = nil, options = {})
@@ -118,22 +121,22 @@ ActionView::Helpers::FormHelper.module_eval do
     label(object_name, method, text, options)
   end
 
-  def label_with_symbol_translation(object_name, method, text = nil, options = {})
-    text, options = _label_symbol_translation(method, text, options)
-    label_without_symbol_translation(object_name, method, text, options)
-  end
   # when removing this, be sure to remove it from i18nliner_extensions.rb
-  alias_method_chain :label, :symbol_translation
-end
-
-ActionView::Helpers::FormTagHelper.send(:include, I18nUtilities)
-ActionView::Helpers::FormTagHelper.class_eval do
-  def label_tag_with_symbol_translation(method, text = nil, options = {})
+  def label(object_name, method, text = nil, options = {})
     text, options = _label_symbol_translation(method, text, options)
-    label_tag_without_symbol_translation(method, text, options)
+    super(object_name, method, text, options)
   end
-  alias_method_chain :label_tag, :symbol_translation
 end
+ActionView::Base.include(I18nFormHelper)
+ActionView::Helpers::FormHelper.prepend(I18nFormHelper)
+
+module I18nFormTagHelper
+  def label_tag(method, text = nil, options = {})
+    text, options = _label_symbol_translation(method, text, options)
+    super(method, text, options)
+  end
+end
+ActionView::Helpers::FormTagHelper.prepend(I18nFormTagHelper)
 
 ActionView::Helpers::FormBuilder.class_eval do
   def blabel(method, text = nil, options = {})
@@ -155,7 +158,7 @@ module NumberLocalizer
     if percentage
       # no precision? default to the number's precision, not to some arbitrary precision
       if precision.nil?
-        precision = 9
+        precision = 5
         strip_insignificant_zeros = true
       end
       return ActiveSupport::NumberHelper.number_to_percentage(number,
@@ -221,18 +224,18 @@ I18n.send(:extend, Module.new {
 # i18n_extraction/i18nliner_extensions
 require "i18n_extraction/i18nliner_scope_extensions"
 
-ActionView::Template.class_eval do
-  def render_with_i18nliner_scope(view, *args, &block)
+module I18nTemplate
+  def render(view, *args)
     old_i18nliner_scope = view.i18nliner_scope
     if @virtual_path
       view.i18nliner_scope = I18nliner::Scope.new(@virtual_path.gsub(/\/_?/, '.'))
     end
-    render_without_i18nliner_scope(view, *args, &block)
+    super
   ensure
     view.i18nliner_scope = old_i18nliner_scope
   end
-  alias_method_chain :render, :i18nliner_scope
 end
+ActionView::Template.prepend(I18nTemplate)
 
 ActionView::Base.class_eval do
   attr_accessor :i18nliner_scope
@@ -296,14 +299,14 @@ end
 
 require 'active_support/core_ext/array/conversions'
 
-class Array
-  def to_sentence_with_simple_or(options = {})
+module ToSentenceWithSimpleOr
+  def to_sentence(options = {})
     if options == :or
-      to_sentence_without_simple_or(:two_words_connector => I18n.t('support.array.or.two_words_connector'),
-                                    :last_word_connector => I18n.t('support.array.or.last_word_connector'))
+      super(:two_words_connector => I18n.t('support.array.or.two_words_connector'),
+            :last_word_connector => I18n.t('support.array.or.last_word_connector'))
     else
-      to_sentence_without_simple_or(options)
+      super
     end
   end
-  alias_method_chain :to_sentence, :simple_or
 end
+Array.prepend(ToSentenceWithSimpleOr)

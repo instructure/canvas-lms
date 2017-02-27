@@ -6,7 +6,7 @@ define([
   'jsx/grading/CourseTabContainer',
   'jqueryui/tabs',
 ], (React, { mount }, $, _, CourseTabContainer) => {
-  module('CourseTabContainer', {
+  QUnit.module('CourseTabContainer', {
     renderComponent (props = {}) {
       const defaults = {};
       const mergedProps = _.defaults(props, defaults);

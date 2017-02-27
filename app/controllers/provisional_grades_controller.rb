@@ -69,8 +69,8 @@
 #       }
 #     }
 class ProvisionalGradesController < ApplicationController
-  before_filter :require_user
-  before_filter :load_assignment
+  before_action :require_user
+  before_action :load_assignment
 
   include Api::V1::Submission
 
@@ -225,6 +225,11 @@ class ProvisionalGradesController < ApplicationController
             .select { |pg| pg.graded_at.present? }
           selected_provisional_grade = provisional_grades.first if provisional_grades.count == 1
         end
+
+        # We still don't have a provisional grade.  Let's pick up the first blank provisional grade
+        # for this submission if it exists.  This will happen as a result of commenting on a
+        # submission without grading it
+        selected_provisional_grade ||= submission.provisional_grades.detect { |pg| pg.graded_at.nil? }
 
         unless selected_provisional_grade
           return render json: { message: "All submissions must have a selected grade" },

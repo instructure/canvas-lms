@@ -14,7 +14,7 @@ define [
                "instructure_links,unlink,instructure_image,instructure_equation"
   toolbar3 = "ltr,rtl,fontsizeselect,formatselect"
 
-  module "EditorConfig",
+  QUnit.module "EditorConfig",
     setup: ->
       INST = {}
       INST.editorButtons = []
@@ -78,7 +78,7 @@ define [
     schema = config.defaultConfig()
     equal(schema.browser_spellcheck, true)
 
-  module "Tinymce Config Integration",
+  QUnit.module "Tinymce Config Integration",
     setup: ->
       $("body").append("<textarea id=42></textarea>")
 
@@ -93,8 +93,9 @@ define [
       plugins: "",
       external_plugins: {},
       init_instance_callback: (editor)->
-        start()
         content = editor.setContent("<span></span>")
         ok(content.match("<span></span>"))
+        start()
+
     })
     tinymce.init(configHash)

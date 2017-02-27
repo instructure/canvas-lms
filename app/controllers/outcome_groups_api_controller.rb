@@ -139,9 +139,9 @@
 class OutcomeGroupsApiController < ApplicationController
   include Api::V1::Outcome
 
-  before_filter :require_user
-  before_filter :get_context
-  before_filter :require_context, :only => [:link_index]
+  before_action :require_user
+  before_action :get_context
+  before_action :require_context, :only => [:link_index]
 
   # @API Redirect to root outcome group for context
   #

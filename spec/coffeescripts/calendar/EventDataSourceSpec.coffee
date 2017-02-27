@@ -2,10 +2,10 @@ define [
   'compiled/calendar/EventDataSource'
   'compiled/util/fcUtil',
   'timezone'
-  'vendor/timezone/America/Denver'
+  'timezone/America/Denver'
 ], (EventDataSource, fcUtil, tz, denver) ->
 
-  module "EventDataSource: getEvents",
+  QUnit.module "EventDataSource: getEvents",
     setup: ->
       @snapshot = tz.snapshot()
       tz.changeZone(denver, 'America/Denver')

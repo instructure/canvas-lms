@@ -19,7 +19,8 @@ describe "Gradezilla - assignment column headers" do
     user_session(@teacher)
   end
 
-  it "should validate row sorting works when first column is clicked", priority: "1", test_id: 220023  do
+  it "should validate row sorting works when first column is clicked", priority: "1", test_id: 220023 do
+    pending("to be added back in with CNVS-31611")
     gradezilla_page.visit(@course)
     first_column = f('.slick-column-name')
     first_column.click
@@ -116,9 +117,13 @@ describe "Gradezilla - assignment column headers" do
   end
 
   it "should show letter grade in total column", priority: "1", test_id: 220035 do
+    row1_selector = '#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .letter-grade-points'
+    row2_selector = '#gradebook_grid .container_1 .slick-row:nth-child(2) .total-cell .letter-grade-points'
+
     gradezilla_page.visit(@course)
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .letter-grade-points')).to include_text("A")
+    expect(f(row1_selector)).to include_text("A")
+    gradezilla_page.enter_grade('50', 0,1)
     edit_grade('#gradebook_grid .slick-row:nth-child(2) .l2', '50')
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(2) .total-cell .letter-grade-points')).to include_text("A")
+    expect(f(row2_selector)).to include_text("A")
   end
 end

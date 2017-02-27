@@ -61,6 +61,29 @@ describe ContentExport do
     end
   end
 
+  context "Quizzes2 Export" do
+    before :once do
+      course = Account.default.courses.create!
+      quiz = course.quizzes.create!(:title => 'quiz1')
+      @ce = course.content_exports.create!(
+        :export_type => ContentExport::QUIZZES2,
+        :selected_content => quiz.id
+      )
+    end
+
+    it "changes the workflow_state when :quizzes2_exporter is enabled" do
+      Account.default.enable_feature!(:quizzes2_exporter)
+      expect { @ce.export_without_send_later }.to change { @ce.workflow_state }
+      expect(@ce.workflow_state).to eq "exported"
+    end
+
+    it "fails the content export when :quizzes2_exporter is disabled" do
+      Account.default.disable_feature!(:quizzes2_exporter)
+      @ce.export_without_send_later
+      expect(@ce.workflow_state).to eq "created"
+    end
+  end
+
   context "add_item_to_export" do
     before :once do
       course = Account.default.courses.create!

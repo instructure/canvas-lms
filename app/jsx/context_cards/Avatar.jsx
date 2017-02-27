@@ -1,16 +1,20 @@
 define([
+  'i18n!student_context_tray',
   'react',
-  'instructure-ui/Avatar',
-  'instructure-ui/Typography',
-], (React, { default: InstUIAvatar }, { default: Typography }) => {
-
+  'instructure-ui',
+], (I18n, React, { Avatar: InstUIAvatar, Typography }) => {
   class Avatar extends React.Component {
     static propTypes = {
-      user: React.PropTypes.object.isRequired,
+      user: React.PropTypes.shape({
+        name: React.PropTypes.string,
+        avatar_url: React.PropTypes.string,
+        short_name: React.PropTypes.string,
+        id: React.PropTypes.string
+      }).isRequired,
       courseId: React.PropTypes.oneOfType([
-        React.PropTypes.string.isRequired,
-        React.PropTypes.number.isRequired
-      ]),
+        React.PropTypes.string,
+        React.PropTypes.number
+      ]).isRequired,
       canMasquerade: React.PropTypes.bool.isRequired,
     }
 
@@ -28,7 +32,12 @@ define([
             {
               canMasquerade ? (
                 <Typography size="x-small" weight="bold" tag="div">
-                  <a href={`/courses/${courseId}?become_user_id=${user.id}`}>Masquerade</a>
+                  <a
+                    href={`/courses/${courseId}?become_user_id=${user.id}`}
+                    aria-label={I18n.t('Masquerade as %{name}', { name: user.short_name })}
+                  >
+                    {I18n.t('Masquerade')}
+                  </a>
                 </Typography>
               ) : (
                 null
@@ -36,7 +45,8 @@ define([
             }
           </div>
         )
-      } else { return null }
+      }
+      return null
     }
   }
 

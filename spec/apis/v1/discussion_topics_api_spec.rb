@@ -299,7 +299,7 @@ describe DiscussionTopicsController, type: :request do
        "position" => @topic.position,
        "url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
        "html_url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-       "podcast_has_student_posts" => nil,
+       "podcast_has_student_posts" => false,
        "attachments" => [{"content-type" => "unknown/unknown",
                           "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
                           "filename" => "content.txt",
@@ -330,9 +330,9 @@ describe DiscussionTopicsController, type: :request do
        "permissions" => {"delete" => true, "attach" => true, "update" => true, "reply" => true},
        "group_category_id" => nil,
        "can_group" => true,
-       "allow_rating" => nil,
-       "only_graders_can_rate" => nil,
-       "sort_by_rating" => nil,
+       "allow_rating" => false,
+       "only_graders_can_rate" => false,
+       "sort_by_rating" => false,
       }
     end
 
@@ -637,6 +637,20 @@ describe DiscussionTopicsController, type: :request do
         expect(@topic.lock_at).to be_nil
         expect(@topic).to be_active
         expect(@topic).not_to be_locked
+      end
+
+      it "should not update certain attributes for group discussions" do
+        group_category = @course.group_categories.create(:name => 'watup')
+        group = group_category.groups.create!(:name => "group1", :context => @course)
+        gtopic = create_topic(group, :title => "topic")
+
+        api_call(:put, "/api/v1/groups/#{group.id}/discussion_topics/#{gtopic.id}",
+          {:controller => "discussion_topics", :action => "update", :format => "json", :group_id => group.to_param, :topic_id => gtopic.to_param},
+          {:allow_rating => '1', :require_initial_post => '1'})
+
+        gtopic.reload
+        expect(gtopic.allow_rating).to be_truthy
+        expect(gtopic.require_initial_post).to_not be_truthy
       end
 
       context "publishing" do
@@ -1091,7 +1105,7 @@ describe DiscussionTopicsController, type: :request do
       "user_can_see_posts" => true,
       "subscribed" => true,
       "podcast_url" => nil,
-      "podcast_has_student_posts" => nil,
+      "podcast_has_student_posts" => false,
       "require_initial_post" => nil,
       "title" => "Group Topic 1",
       "discussion_subentry_count" => 0,
@@ -1141,9 +1155,9 @@ describe DiscussionTopicsController, type: :request do
       "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!,
       "group_category_id" => nil,
       "can_group" => true,
-      "allow_rating" => nil,
-      "only_graders_can_rate" => nil,
-      "sort_by_rating" => nil,
+      "allow_rating" => false,
+      "only_graders_can_rate" => false,
+      "sort_by_rating" => false,
     }
     expect(json.sort.to_h).to eq expected.sort.to_h
   end
@@ -1749,9 +1763,10 @@ describe DiscussionTopicsController, type: :request do
       RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
                            :role => observer_role, :enabled => false)
 
-      expect { api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
-                        {:controller => 'discussion_topics', :action => 'index', :format => 'json',
-                         :course_id => @course.id.to_s}) }.to raise_error
+      api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+               {:controller => 'discussion_topics', :action => 'index', :format => 'json',
+               :course_id => @course.id.to_s})
+      expect(response).to be_client_error
     end
   end
 
@@ -2395,6 +2410,30 @@ describe DiscussionTopicsController, type: :request do
                                         ]
 
     end
+
+    it "should resolve the placeholder domain in new entries" do
+      course_with_teacher(:active_all => true)
+      student_in_course(:course => @course, :active_all => true)
+      @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
+      @root1 = @topic.reply_from(:user => @student, :html => "root1")
+
+      link = "/courses/#{@course.id}/discussion_topics"
+      # materialized view jobs are now delayed
+      Timecop.travel(Time.now + 20.seconds) do
+        run_jobs
+
+        # make everything slightly in the past to test updating
+        DiscussionEntry.update_all(:updated_at => 5.minutes.ago)
+        @reply1 = @root1.reply_from(:user => @teacher, :html => "<a href='#{link}'>locallink</a>")
+      end
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
+        {:controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}, {:include_new_entries => '1'})
+
+      message = json['new_entries'].first['message']
+      expect(message).to_not include("placeholder.invalid")
+      expect(message).to include("www.example.com#{link}")
+    end
   end
 
   it "returns due dates as they apply to the user" do
@@ -2454,7 +2493,6 @@ describe DiscussionTopicsController, type: :request do
 
     before :each do
       course_with_teacher(active_all: true, is_public: true) # sets @teacher and @course
-      expect(@course.is_public).to be_truthy
       account_admin_user(account: @course.account) # sets @admin
       @student1 = student_in_course(active_all: true).user
       @student2 = student_in_course(active_all: true).user

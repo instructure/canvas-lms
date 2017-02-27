@@ -13,6 +13,7 @@ describe "master courses - child courses - quiz locking" do
 
     course_with_teacher(:active_all => true)
     @copy_to = @course
+    @template.add_child_course!(@copy_to)
     @quiz_copy = @copy_to.quizzes.new(:title => "blah", :description => "bloo") # just create a copy directly instead of doing a real migration
     @quiz_copy.migration_id = @tag.migration_id
     @quiz_copy.save!

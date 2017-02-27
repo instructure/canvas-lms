@@ -28,6 +28,8 @@ class DeveloperKey < ActiveRecord::Base
   has_many :page_views
   has_many :access_tokens
 
+  has_one :tool_consumer_profile, :class_name => 'Lti::ToolConsumerProfile'
+
   before_create :generate_api_key
   before_create :set_auto_expire_tokens
   before_save :nullify_empty_icon_url

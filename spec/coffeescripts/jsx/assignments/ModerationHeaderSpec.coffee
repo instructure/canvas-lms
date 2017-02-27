@@ -5,7 +5,7 @@ define [
   'jsx/assignments/ModerationHeader'
 ], (React, ReactDOM, TestUtils, Header) ->
 
-  module 'ModerationHeader',
+  QUnit.module 'ModerationHeader',
     setup: ->
       @props =
         onPublishClick: ->

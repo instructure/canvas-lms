@@ -48,8 +48,8 @@ describe "/gradebooks/grade_summary" do
     @user = @teacher
     view_context
     a = @course.assignments.create!(:title => "some assignment")
-    assigns[:presenter] = GradeSummaryPresenter.new(@course, @teacher, @student.id)
-    expect(assigns[:presenter].student_enrollment).not_to be_nil
+    assigns[:presenter] = presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+    expect(presenter.student_enrollment).not_to be_nil
     render "gradebooks/grade_summary"
     expect(response).not_to be_nil
     expect(response.body).not_to match(/Click any score/)

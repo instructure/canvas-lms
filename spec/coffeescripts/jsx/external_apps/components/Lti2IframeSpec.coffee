@@ -17,7 +17,7 @@ define [
   renderComponent = (data) ->
     ReactDOM.render(createElement(data), wrapper)
 
-  module 'ExternalApps.Lti2Iframe',
+  QUnit.module 'ExternalApps.Lti2Iframe',
     teardown: ->
       ReactDOM.unmountComponentAtNode wrapper
 

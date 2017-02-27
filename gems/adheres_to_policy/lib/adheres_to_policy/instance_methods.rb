@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'canvas_statsd'
+
 module AdheresToPolicy
   module InstanceMethods
     # Public: Gets the requested rights granted to a user.
@@ -223,34 +225,39 @@ module AdheresToPolicy
       # Check the cache for the sought_right.  If it exists in the cache its
       # state (true or false) will be returned.  Otherwise we calculate the
       # state and cache it.
-      Cache.fetch(permission_cache_key_for(user, session, sought_right)) do
+      value, how_it_got_it = Cache.fetch(permission_cache_key_for(user, session, sought_right)) do
+        CanvasStatsd::BlockTracking.track("adheres_to_policy.#{self.class.name&.underscore}.#{sought_right}", category: :adheres_to_policy) do
 
-        conditions = self.class.policy.conditions[sought_right]
-        next false unless conditions
+          conditions = self.class.policy.conditions[sought_right]
+          next false unless conditions
 
-        # Loop through all the conditions until we find the first one that
-        # grants us the sought_right.
-        conditions.any? do |condition|
-          if condition.applies?(self, user, session)
+          # Loop through all the conditions until we find the first one that
+          # grants us the sought_right.
+          conditions.any? do |condition|
+            if condition.applies?(self, user, session)
 
-            # Since the condition is true we can loop through all the rights
-            # that belong to it and cache them.  This will short circut the above
-            # Rails.cache.fetch for future checks that we won't have to do again.
-            condition.rights.each do |condition_right|
+              # Since the condition is true we can loop through all the rights
+              # that belong to it and cache them.  This will short circut the above
+              # Rails.cache.fetch for future checks that we won't have to do again.
+              condition.rights.each do |condition_right|
 
-              # Skip the condition_right if its the one we are looking for.
-              # The Rails.cache.fetch will take care of caching it for us.
-              if condition_right != sought_right
+                # Skip the condition_right if its the one we are looking for.
+                # The Rails.cache.fetch will take care of caching it for us.
+                if condition_right != sought_right
 
-                # Cache the condition_right since we already know they have access.
-                Cache.write(permission_cache_key_for(user, session, condition_right), true)
+                  # Cache the condition_right since we already know they have access.
+                  Cache.write(permission_cache_key_for(user, session, condition_right), true)
+                end
               end
-            end
 
-            true
+              true
+            end
           end
         end
       end
+      CanvasStatsd::Statsd.instance&.increment("adheres_to_policy.#{self.class.name&.underscore}.#{sought_right}.#{how_it_got_it}")
+
+      value
     end
 
     # Internal: Gets the cache key for the user and right.

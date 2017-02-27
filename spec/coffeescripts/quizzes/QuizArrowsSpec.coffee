@@ -3,7 +3,7 @@ define [
   'helpers/fakeENV'
 ], (QuizArrowApplicator, fakeENV) ->
 
-  module 'QuizArrowApplicator',
+  QUnit.module 'QuizArrowApplicator',
     setup: ->
       fakeENV.setup()
       @arrowApplicator = new QuizArrowApplicator()

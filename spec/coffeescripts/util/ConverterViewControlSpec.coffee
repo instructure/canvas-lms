@@ -9,7 +9,7 @@ define [
   class ParentView extends Backbone.View
     template: -> "<div>Random Backbone View</div>"
 
-  module 'ConverterViewControlSpec',
+  QUnit.module 'ConverterViewControlSpec',
     teardown: ->
       ConverterViewControl.resetControl()
 

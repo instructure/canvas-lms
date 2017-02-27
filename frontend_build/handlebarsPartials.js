@@ -16,7 +16,7 @@ module.exports = function (input) {
   let newInput = input.replace(partialsRegexp, partialInvocation => {
     const fixedInvocation = partialInvocation.replace(/([^\{\}> ]+) ?/, partialName => {
       // replace the name of the partial with a reference webpack can resolve
-      const newPartialName = addPartialLeader(`$jst/${partialName}`)
+      const newPartialName = addPartialLeader(`$jst/${partialName}.handlebars`)
       return newPartialName
     })
     return fixedInvocation

@@ -67,7 +67,9 @@ SafeYAML::OPTIONS.merge!(
         !ruby/object:OpenObject
         !ruby/object:DateTime
         !ruby/object:BigDecimal
-      ]
+        !ruby/object:ActiveSupport::TimeWithZone
+        !ruby/object:ActiveSupport::TimeZone
+      ],
 )
 
 module Syckness
@@ -85,6 +87,26 @@ SafeYAML::PsychResolver.class_eval do
   attr_accessor :aliased_nodes
 end
 
+module AddClassWhitelist
+  SafeYAML::OPTIONS[:whitelisted_classes] ||= []
+
+  # This isn't really a bang method but it has been included here to maintain
+  # consistency with SafeYAML's whitelist! methods
+  def whitelist_classes!(*constants)
+    constants.each do |const|
+      whitelist_constant!(const)
+    end
+  end
+
+  def whitelist_class!(const)
+    const_name = const.name
+
+    raise "#{const} cannont be anonymous" unless const_name.present?
+    SafeYAML::OPTIONS[:whitelisted_classes] << const_name
+  end
+end
+SafeYAML.singleton_class.prepend(AddClassWhitelist)
+
 module MaintainAliases
   def accept(node)
     if node.respond_to?(:anchor) && node.anchor && @resolver.get_node_type(node) != :alias
@@ -94,6 +116,38 @@ module MaintainAliases
   end
 end
 SafeYAML::SafeToRubyVisitor.prepend(MaintainAliases)
+
+module AcceptClasses
+  def accept(node)
+    if node.tag && node.tag == '!ruby/class'
+      val = node.value
+      if @resolver.options[:whitelisted_classes].include?(val)
+        val.constantize
+      else
+        raise "YAML deserialization of constant not allowed: #{val}"
+      end
+    else
+      super
+    end
+  end
+end
+SafeYAML::SafeToRubyVisitor.prepend(AcceptClasses)
+
+module ResolveClasses
+  def resolve_scalar(node)
+    if node.tag && node.tag == '!ruby/class'
+      val = node.value
+      if options[:whitelisted_classes].include?(val)
+        val.constantize
+      else
+        raise "YAML deserialization of constant not allowed: #{val}"
+      end
+    else
+      super
+    end
+  end
+end
+SafeYAML::Resolver.prepend(ResolveClasses)
 
 module FloatScannerFix
   def tokenize string

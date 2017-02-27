@@ -18,6 +18,7 @@
 
 define [
   'i18n!outcomes'
+  'jsx/shared/helpers/numberHelper'
   'jquery'
   'underscore'
   'compiled/views/outcomes/OutcomeContentBase'
@@ -26,7 +27,7 @@ define [
   'jst/outcomes/outcomeForm'
   'jst/outcomes/_criterion' # for outcomeForm
   'jqueryui/dialog'
-], (I18n, $, _, OutcomeContentBase, CalculationMethodFormView,
+], (I18n, numberHelper, $, _, OutcomeContentBase, CalculationMethodFormView,
   outcomeTemplate, outcomeFormTemplate, criterionTemplate) ->
 
   # For outcomes in the main content view.
@@ -48,7 +49,7 @@ define [
         if data.display_name.length > 255
           I18n.t('length_error', 'Must be 255 characters or less')
       mastery_points: (data) ->
-        if _.isEmpty(data.mastery_points) or parseFloat(data.mastery_points) < 0
+        if _.isNaN(data.mastery_points) or data.mastery_points < 0
           I18n.t('mastery_error', 'Must be greater than or equal to 0')
     , OutcomeContentBase::validations
 
@@ -61,10 +62,13 @@ define [
     # overriding superclass
     getFormData: ->
       data = super()
+      data['mastery_points'] = numberHelper.parse(data['mastery_points'])
+      data['ratings'] = _.map(data['ratings'], (rating) ->
+        _.extend(rating, {points: numberHelper.parse(rating['points'])}))
       if data.calculation_method in ['highest', 'latest']
         delete data.calculation_int
       else
-        data.calculation_int = Number(data.calculation_int)
+        data.calculation_int = parseInt(numberHelper.parse(data.calculation_int))
       data
 
     editRating: (e) =>
@@ -99,7 +103,12 @@ define [
       $editWrapper = $(e.currentTarget).parents('.edit:first')
       $showWrapper = $editWrapper.prev()
       $showWrapper.find('h5').text($editWrapper.find('input.outcome_rating_description').val())
-      $showWrapper.find('.points').text($editWrapper.find('input.outcome_rating_points').val() or 0)
+      points = numberHelper.parse($editWrapper.find('input.outcome_rating_points').val())
+      if _.isNaN(points)
+        points = 0
+      else
+        points = I18n.n(points, {precision: 2, strip_insignificant_zeros: true})
+      $showWrapper.find('.points').text(points)
       $editWrapper.attr('aria-expanded', 'false').hide()
       $showWrapper.attr('aria-expanded', 'true').show()
       $showWrapper.find('.edit_rating').focus()
@@ -122,11 +131,11 @@ define [
     changeMasteryPoints: (e) ->
       clearTimeout(@timeout) if @timeout
       @timeout = setTimeout(=>
-        val = parseInt($(e.target).val())
+        val = numberHelper.parse($(e.target).val())
         return if _.isNaN(val)
         if 0 <= val <= @model.get('points_possible')
           @model.set({
-            mastery_points: $(e.target).val()
+            mastery_points: val
           })
           @calculationMethodFormView?.render()
       , 500)
@@ -136,13 +145,14 @@ define [
       total = 0
       for r in @$('.rating')
         rating = $(r).find('.outcome_rating_points').val() or 0
-        total = _.max [total, parseFloat rating]
+        total = _.max [total, numberHelper.parse(rating)]
         index = _i
         for i in $(r).find('input')
           # reset indices
           $(i).attr 'name', i.name.replace /\[[0-9]+\]/, "[#{index}]"
       points = @$('.points_possible')
-      points.html $.raw points.html().replace(/[0-9/.]+/, total)
+      points.html $.raw I18n.t("%{points_possible} Points", {points_possible:
+        I18n.n(total, {precision: 2, strip_insignificant_zeros: true})})
       @model.set({
         points_possible: total
       })

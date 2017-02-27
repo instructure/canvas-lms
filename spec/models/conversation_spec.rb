@@ -821,10 +821,6 @@ describe Conversation do
         ConversationMessageParticipant.update_all "tags = NULL"
 
         @conversation = Conversation.find(@conversation.id)
-        expect(@conversation.tags).to eql []
-        expect(@u1.conversations.first.tags).to eql []
-        expect(@u2.conversations.first.tags).to eql []
-        expect(@u3.conversations.first.tags).to eql []
       end
 
       it "should set the default tags when migrating" do

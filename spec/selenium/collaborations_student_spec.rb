@@ -71,7 +71,7 @@ describe "collaborations" do
       user_session(@student)
       get "/courses/#{@course.id}/collaborations"
 
-      ff('#collaborations .collaboration').length == 1
+      expect(ff('#collaborations .collaboration')).to have_size(1)
     end
   end
 end

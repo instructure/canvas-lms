@@ -28,20 +28,20 @@ describe AdheresToPolicy::Cache do
       AdheresToPolicy::Cache.write(:key, 'value')
       expect(AdheresToPolicy::Cache).to_not receive(:write)
       value = AdheresToPolicy::Cache.fetch(:key){ 'new_value' }
-      expect(value).to eq 'value'
+      expect(value).to eq ['value', :in_proc]
     end
 
     it "writes the key and value if it was not read" do
       expect(AdheresToPolicy::Cache).to receive(:write).with(:key, 'value')
       value = AdheresToPolicy::Cache.fetch(:key){ 'value' }
-      expect(value).to eq 'value'
+      expect(value).to eq ['value', :generated]
     end
 
     it "does not write the key if the value is 'false'" do
       AdheresToPolicy::Cache.write(:key, false)
       expect(AdheresToPolicy::Cache).to_not receive(:write)
       value = AdheresToPolicy::Cache.fetch(:key){ 'new_value' }
-      expect(value).to eq false
+      expect(value).to eq [false, :in_proc]
     end
   end
 
@@ -59,12 +59,12 @@ describe AdheresToPolicy::Cache do
     end
 
     it "reads the provided key" do
-      expect(AdheresToPolicy::Cache.read(:key)).to eq 'value'
+      expect(AdheresToPolicy::Cache.read(:key)).to eq ['value', :in_proc]
     end
 
     it "returns nil if the key does not exist" do
       expect(Rails.cache).to receive(:read).with(:key2)
-      expect(AdheresToPolicy::Cache.read(:key2)).to eq nil
+      expect(AdheresToPolicy::Cache.read(:key2)).to eq [nil, :out_of_proc]
     end
   end
 

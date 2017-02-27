@@ -8,7 +8,7 @@ module SessionsTimeout
 
   # When loading an account, set the expire_after key if they have set up session
   # timeouts in the plugin settings. :expire_after is relative to Time.now and
-  # should be a Fixnum. This will work it's way up to encrypted_cookie_store.rb
+  # should be a Integer. This will work it's way up to encrypted_cookie_store.rb
   # where the session's expire time is determined. EncryptedCookieStore is in a gem.
   def get_cookie(req)
     sessions_settings = Canvas::Plugin.find('sessions').settings

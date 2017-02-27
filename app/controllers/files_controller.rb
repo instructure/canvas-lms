@@ -102,27 +102,27 @@ require 'securerandom'
 #         },
 #         "preview_url": {
 #           "type": "string",
-#           "description": "optional: url to the document preview (only included in submission endpoints)"
+#           "description": "optional: url to the document preview. This url is specific to the user making the api call. Only included in submission endpoints."
 #         }
 #       }
 #     }
 #
 class FilesController < ApplicationController
-  before_filter :require_user, only: :create_pending
-  before_filter :require_context, except: [
+  before_action :require_user, only: :create_pending
+  before_action :require_context, except: [
     :assessment_question_show, :image_thumbnail, :show_thumbnail,
     :create_pending, :s3_success, :show, :api_create, :api_create_success, :api_create_success_cors,
     :api_show, :api_index, :destroy, :api_update, :api_file_status, :public_url
   ]
 
-  before_filter :check_file_access_flags, only: [:show_relative, :show]
-  before_filter :open_cors, only: [
+  before_action :check_file_access_flags, only: [:show_relative, :show]
+  before_action :open_cors, only: [
     :api_create, :api_create_success, :api_create_success_cors, :show_thumbnail
   ]
 
-  prepend_around_filter :load_pseudonym_from_policy, only: :create
-  skip_before_filter :verify_authenticity_token, only: :api_create
-  before_filter :verify_api_id, only: [
+  prepend_around_action :load_pseudonym_from_policy, only: :create
+  skip_before_action :verify_authenticity_token, only: :api_create
+  before_action :verify_api_id, only: [
     :api_show, :api_create_success, :api_file_status, :api_update, :destroy
   ]
 
@@ -130,7 +130,7 @@ class FilesController < ApplicationController
   include Api::V1::Avatar
   include AttachmentHelper
 
-  before_filter { |c| c.active_tab = "files" }
+  before_action { |c| c.active_tab = "files" }
 
   def verify_api_id
     raise ActiveRecord::RecordNotFound unless params[:id] =~ Api::ID_REGEX
@@ -192,46 +192,19 @@ class FilesController < ApplicationController
   protected :check_file_access_flags
 
   def index
+    # This is only used by the old wiki sidebar, see
+    # public/javascripts/wikiSidebar.js#loadFolders
     if request.format == :json
       if authorized_action(@context.attachments.build, @current_user, :read)
-        @current_folder = Folder.find_folder(@context, params[:folder_id])
-        if !@current_folder || authorized_action(@current_folder, @current_user, :read)
-          if params[:folder_id]
-            if @context.grants_right?(@current_user, session, :manage_files)
-              @current_attachments = @current_folder.active_file_attachments.by_position_then_display_name
-            else
-              @current_attachments = @current_folder.visible_file_attachments.by_position_then_display_name
-            end
-            @current_attachments = @current_attachments.preload(:thumbnail, :media_object)
-            render :json => @current_attachments.map do |a|
-              a.as_json({
-                methods: [ :readable_size, :currently_locked, :thumbnail_url ],
-                permissions: {
-                  user: @current_user, session: session
-                }
-              })
-            end
-          else
-            file_structure = {
-              :contexts => [@context.as_json(permissions: {user: @current_user})],
-              :collaborations => [],
-              :folders => @context.active_folders.preload(:active_sub_folders).
-                order("COALESCE(parent_folder_id, 0), COALESCE(position, 0), COALESCE(name, ''), created_at").map{ |f|
-                f.as_json(permissions: {user: @current_user}, methods: [:mime_class, :currently_locked])
-              },
-              :folders_with_subcontent => [],
-              :files => []
-            }
+        root_folder = Folder.root_folders(@context).first
+        if authorized_action(root_folder, @current_user, :read)
+          file_structure = {
+            :folders => @context.active_folders.
+              reorder("COALESCE(parent_folder_id, 0), COALESCE(position, 0), COALESCE(name, ''), created_at").
+              select(:id, :parent_folder_id, :name)
+          }
 
-            if @current_user
-              file_structure[:collaborations] = @current_user.collaborations.for_context(@context).active.
-                preload(:user, :users).order("created_at DESC").map{ |c|
-                c.as_json(permissions: {user: @current_user}, methods: [:collaborator_ids])
-              }
-            end
-
-            render :json => file_structure
-          end
+          render :json => file_structure
         end
       end
     else
@@ -318,6 +291,7 @@ class FilesController < ApplicationController
       @files = Api.paginate(scope, self, url)
       render json: attachments_json(@files, @current_user, {}, {
         can_view_hidden_files: can_view_hidden_files?(@context || @folder, @current_user, session),
+        context: @context || @folder.context,
         include: params[:include],
         only: params[:only],
         omit_verifier_in_app: !value_to_boolean(params[:use_verifiers])
@@ -681,7 +655,7 @@ class FilesController < ApplicationController
       redirect_to(inline ? attachment.inline_url : attachment.download_url)
     else
       send_file_headers!( :length=> attachment.s3object.content_length, :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type_with_encoding)
-      render :status => 200, :text => attachment.s3object.read
+      render :status => 200, :text => attachment.s3object.get.body.read
     end
   end
   protected :send_stored_file
@@ -786,7 +760,7 @@ class FilesController < ApplicationController
       verify_api_id
       @attachment = Attachment.where(id: params[:id], workflow_state: 'unattached', uuid: params[:uuid]).first
     end
-    details = @attachment.s3object.head rescue nil
+    details = @attachment.s3object.data rescue nil
     if @attachment && details
       deleted_attachments = @attachment.handle_duplicates(params[:duplicate_handling])
       @attachment.process_s3_details!(details)
@@ -825,7 +799,7 @@ class FilesController < ApplicationController
     return unless check_quota_after_attachment(request)
     if Attachment.s3_storage?
       return render(:nothing => true, :status => :bad_request) unless @attachment.state == :unattached
-      details = @attachment.s3object.head
+      details = @attachment.s3object.data
       @attachment.process_s3_details!(details)
     else
       @attachment.file_state = 'available'
@@ -1081,6 +1055,7 @@ class FilesController < ApplicationController
   def destroy
     @attachment = Attachment.find(params[:id])
     if can_do(@attachment, @current_user, :delete)
+      return render_unauthorized_action if master_courses? && editing_restricted?(@attachment)
       @attachment.destroy
       respond_to do |format|
         format.html {

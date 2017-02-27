@@ -1,7 +1,8 @@
 require [
+  'jquery'
   'jsx/login/LoginFormSwitcher'
   'login'
-], (LoginFormSwitcher) ->
+], ($, LoginFormSwitcher) ->
 
   switcher = new LoginFormSwitcher(
     $("#login_form")

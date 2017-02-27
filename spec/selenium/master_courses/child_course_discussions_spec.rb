@@ -13,6 +13,7 @@ describe "master courses - child courses - discussion locking" do
 
     course_with_teacher(:active_all => true)
     @copy_to = @course
+    @template.add_child_course!(@copy_to)
     @topic_copy = @copy_to.discussion_topics.new(:title => "blah", :message => "bloo") # just create a copy directly instead of doing a real migration
     @topic_copy.migration_id = @tag.migration_id
     @topic_copy.save!

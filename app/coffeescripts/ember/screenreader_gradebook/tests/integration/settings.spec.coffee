@@ -9,7 +9,7 @@ define [
 
   App = null
 
-  module 'global settings',
+  QUnit.module 'global settings',
     setup: ->
       fixtures.create()
       App = startApp()

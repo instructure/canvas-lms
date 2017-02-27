@@ -113,7 +113,7 @@ class GradeSummaryAssignmentPresenter
     if has_no_score_display?
       ''
     else
-      "#{round_if_whole(submission.published_score)} #{published_grade}"
+      "#{I18n.n round_if_whole(submission.published_score)} #{published_grade}"
     end
   end
 
@@ -235,7 +235,7 @@ class GradeSummaryGraph
 
   def title
     I18n.t('#grade_summary.graph_title', "Mean %{mean}, High %{high}, Low %{low}", {
-      mean: @mean.to_s, high: @high.to_s, low: @low.to_s
+      mean: I18n.n(@mean), high: I18n.n(@high), low: I18n.n(@low)
     })
   end
 

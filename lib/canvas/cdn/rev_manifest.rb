@@ -59,14 +59,18 @@ module Canvas
           "/#{webpack_dir}/#{fingerprinted}" if fingerprinted
         end
 
+        def revved_url_for(source)
+          fingerprinted = gulp_manifest[source]
+          "/dist/#{fingerprinted}" if fingerprinted
+        end
+
         def url_for(source)
           # remove the leading slash if there is one
           source = source.sub(/^\//, '')
           if webpack_request?(source)
             webpack_url_for(source)
           else
-            fingerprinted = gulp_manifest[source]
-            "/dist/#{fingerprinted}" if fingerprinted
+            revved_url_for(source)
           end
         end
 

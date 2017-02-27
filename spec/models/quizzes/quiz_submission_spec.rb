@@ -1135,13 +1135,11 @@ describe Quizzes::QuizSubmission do
           s.score = 10
           s.save(:validate => false)
         end
-        expect(submission.version_number).to eq 1
 
         submission.with_versioning(true) do |s|
           s.score = 15
           s.save(:validate => false)
         end
-        expect(submission.version_number).to eq 2
       end
 
       it "updates a previous version given current attributes" do
@@ -1350,8 +1348,6 @@ describe Quizzes::QuizSubmission do
         @submission.score = 5.0
         @submission.attempt = 1
         @submission.with_versioning(true, &:save!)
-        expect(@submission.version_number).to eql(1)
-        expect(@submission.score).to eql(5.0)
         @submission.save
       end
 

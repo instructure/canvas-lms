@@ -13,7 +13,7 @@ define [
   class Assignments extends Backbone.Collection
     model: AssignmentStub
 
-  module "NeverDropCollection",
+  QUnit.module "NeverDropCollection",
     setup: ->
       list = [1..5]
       @assignments = new Assignments []

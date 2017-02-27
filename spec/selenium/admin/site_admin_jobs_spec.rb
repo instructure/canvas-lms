@@ -41,13 +41,10 @@ describe "site admin jobs ui" do
     all_jobs.each { |job| expect(job).to have_class('selected') }
   end
 
-  def first_jobs_cell_displayed?
-    expect(f('#jobs-grid .slick-cell')).to be
-  end
-
   def load_jobs_page
     get "/jobs"
-    first_jobs_cell_displayed?
+    # wait for it
+    f('#jobs-grid .slick-cell')
   end
 
   def filter_jobs(job_flavor_text)

@@ -5,6 +5,8 @@ require [
   'i18n!common'
   'Backbone'
   'compiled/helpDialog'
+  'jsx/subnav_menu/updateSubnavMenuToggle'
+  'jsx/new_user_tutorial/initializeNewUserTutorials'
 
   # modules that do their own thing on every page that simply need to
   # be required
@@ -39,9 +41,11 @@ require [
   'jqueryui/tabs'
   'compiled/registration/incompleteRegistrationWarning'
   'moment'
-], ($, _, I18n, Backbone, helpDialog) ->
+], ($, _, I18n, Backbone, helpDialog, updateSubnavMenuToggle, initializeNewUserTutorials) ->
 
   helpDialog.initTriggers()
+
+  initializeNewUserTutorials()
 
   $('#skip_navigation_link').on 'click', (event) ->
     # preventDefault so we dont change the hash
@@ -65,15 +69,9 @@ require [
   $(resetMenuItemTabIndexes)
   $(window).on('resize', _.debounce(resetMenuItemTabIndexes, 50))
   $('body').on 'click', '#courseMenuToggle', ->
-    $('body').toggleClass("course-menu-expanded")
-
-    # update course menu and toggle for accessibility
-    courseMenuExpanded = $('body').hasClass('course-menu-expanded')
-    courseMenuToggleText = if courseMenuExpanded then I18n.t("Hide courses menu") else I18n.t("Show courses menu")
-    courseMenuToggle = $('#courseMenuToggle')
-    courseMenuToggle.attr("aria-label", courseMenuToggleText)
-    courseMenuToggle.attr("title", courseMenuToggleText)
-    $('#left-side').css({display: if courseMenuExpanded then 'block' else 'none'})
+    $('body').toggleClass('course-menu-expanded')
+    updateSubnavMenuToggle()
+    $('#left-side').css({display: if $('body').hasClass('course-menu-expanded') then 'block' else 'none'})
 
     resetMenuItemTabIndexes()
 

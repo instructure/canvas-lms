@@ -3,7 +3,7 @@ define [
   'compiled/models/ContentMigration'
   'compiled/collections/DaySubstitutionCollection'
 ], (Backbone, ContentMigration, DaySubstitutionCollection) -> 
-  module 'ContentMigration',
+  QUnit.module 'ContentMigration',
     setup: -> @model = new ContentMigration foo: 'bar'
 
   test 'dynamicDefaults are set when initializing the model', -> 

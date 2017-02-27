@@ -2444,12 +2444,9 @@ describe Submission do
       expect(Submission.needs_grading.count).to eq(0)
     end
   end
-end
 
-def submission_spec_model(opts={})
-  @submission = Submission.new(@valid_attributes.merge(opts))
-  expect(@submission.assignment).to eql(@assignment)
-  expect(@assignment.context).to eql(@context)
-  expect(@submission.assignment.context).to eql(@context)
-  @submission.save!
+  def submission_spec_model(opts={})
+    @submission = Submission.new(@valid_attributes.merge(opts))
+    @submission.save!
+  end
 end

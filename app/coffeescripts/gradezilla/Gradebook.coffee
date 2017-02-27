@@ -47,11 +47,15 @@ define [
   'compiled/gradezilla/SubmissionCell'
   'compiled/gradezilla/GradebookHeaderMenu'
   'compiled/util/NumberCompare'
+  'compiled/util/natcompare'
   'str/htmlEscape'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader'
+  'jsx/gradezilla/default_gradebook/components/GradebookMenu'
+  'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
+  'jsx/gradezilla/default_gradebook/components/ActionMenu'
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
   'jsx/gradezilla/SISGradePassback/PostGradesApp'
   'jsx/gradezilla/SubmissionStateMap'
@@ -82,12 +86,15 @@ define [
   GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
-  GradebookHeaderMenu, NumberCompare, htmlEscape, AssignmentColumnHeader, AssignmentGroupColumnHeader,
-  StudentColumnHeader, TotalGradeColumnHeader, PostGradesStore, PostGradesApp, SubmissionStateMap,
-  GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav,
-  assignmentHelper
+  GradebookHeaderMenu, NumberCompare, natcompare, htmlEscape, AssignmentColumnHeader, AssignmentGroupColumnHeader,
+  StudentColumnHeader, TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore,
+  PostGradesApp, SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView,
+  GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper
 ) ->
-  # This class both creates the slickgrid instance, and acts as the data source for that instance.
+  renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
+    component = React.createElement(reactClass, props, children)
+    ReactDOM.render(component, mountPoint)
+
   class Gradebook
     columnWidths =
       assignment:
@@ -350,11 +357,12 @@ define [
     setupGrading: (students) =>
       @submissionStateMap.setup(students, @assignments)
       for student in students
-        for assignment_id of @assignments
+        for assignment_id, assignment of @assignments
           student["assignment_#{assignment_id}"] ?=
             @submissionStateMap.getSubmission student.id, assignment_id
           submissionState = @submissionStateMap.getSubmissionState(student["assignment_#{assignment_id}"])
           student["assignment_#{assignment_id}"].gradeLocked = submissionState.locked
+          student["assignment_#{assignment_id}"].gradingType = assignment.grading_type
 
         student.initialized = true
         @calculateStudentGrade(student)
@@ -549,7 +557,7 @@ define [
     handleAssignmentMutingChange: (assignment) =>
       idx = @grid.getColumnIndex("assignment_#{assignment.id}")
       colDef = @grid.getColumns()[idx]
-      @initAssignmentColumnHeader(colDef)
+      @renderAssignmentColumnHeader(colDef)
       @grid.setColumns(@grid.getColumns())
       @fixColumnReordering()
       @buildRows()
@@ -630,6 +638,9 @@ define [
       cell = student["assignment_#{submission.assignment_id}"] ||= {}
       _.extend(cell, submission)
 
+    getColumnHeaderNode: (columnId) =>
+      document.getElementById(@grid.getUID() + columnId)
+
     # this is used after the CurveGradesDialog submit xhr comes back.  it does not use the api
     # because there is no *bulk* submissions#update endpoint in the api.
     # It is different from gotSubmissionsChunk in that gotSubmissionsChunk expects an array of students
@@ -639,10 +650,18 @@ define [
       activeCell = @grid.getActiveCell()
       editing = $(@grid.getActiveCellNode()).hasClass('editable')
       columns = @grid.getColumns()
+      changedColumnHeaders = {}
       for submission in submissions
         student = @student(submission.user_id)
         idToMatch = "assignment_#{submission.assignment_id}"
         cell = index for column, index in columns when column.id is idToMatch
+
+        unless changedColumnHeaders[cell]
+          changedColumnHeaders[cell] =
+            grid: @grid
+            column: columns[cell]
+            node: @getColumnHeaderNode(columns[cell].id)
+
         thisCellIsActive = activeCell? and
           editing and
           activeCell.row is student.row and
@@ -656,6 +675,9 @@ define [
         @calculateStudentGrade(student)
         @grid.updateCell student.row, cell unless thisCellIsActive
         @updateRowTotals student.row
+
+      for idx, columnHeader of changedColumnHeaders
+        @renderAssignmentColumnHeader(columnHeader, true)
 
     updateRowTotals: (rowIndex) ->
       columns = @grid.getColumns()
@@ -710,10 +732,10 @@ define [
         letterGrade = GradingSchemeHelper.scoreToGrade(percentage, @options.grading_standard)
 
       templateOpts =
-        score: round(val.score, round.DEFAULT)
-        possible: round(val.possible, round.DEFAULT)
+        score: I18n.n(round(val.score, round.DEFAULT))
+        possible: I18n.n(round(val.possible, round.DEFAULT))
         letterGrade: letterGrade
-        percentage: percentage
+        percentage: I18n.n(round(percentage, round.DEFAULT), percentage: true)
       if columnDef.type == 'total_grade'
         templateOpts.warning = @totalGradeWarning
         templateOpts.lastColumn = true
@@ -884,7 +906,15 @@ define [
     # conjunction with a click listener on <body />. When we 'blur' the grid
     # by clicking outside of it, save the current field.
     onGridBlur: (e) =>
-      className = e.target.className.baseVal or ''
+      className = e.target.className
+
+      # PopoverMenu's trigger sends an event with a target whose className is a SVGAnimatedString
+      # This normalizes the className where possible
+      if typeof className != 'string'
+        if typeof className == 'object'
+          className = className.baseVal || ''
+        else
+          className = ''
 
       if className.match(/cell|slick/) or !@grid.getActiveCell
         return
@@ -1042,6 +1072,7 @@ define [
       $('.post-grades-placeholder').toggle(showButton)
 
     initHeader: =>
+      @renderGradebookMenus()
       @drawSectionSelectButton() if @sections_enabled
       @drawGradingPeriodSelectButton() if @hasGradingPeriods
 
@@ -1103,137 +1134,121 @@ define [
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
 
-      @initGradebookExporter()
+    renderGradebookMenus: =>
+      @renderGradebookMenu()
+      @renderViewOptionsMenu()
+      @renderActionMenu()
 
-    initStudentColumnHeader: (obj) =>
-      component = React.createElement(StudentColumnHeader, {}, null)
-      ReactDOM.render(component, $(obj.node).find('.slick-column-name')[0])
+    renderGradebookMenu: =>
+      mountPoints = document.querySelectorAll('[data-component="GradebookMenu"]')
+      props =
+        assignmentOrOutcome: @options.assignmentOrOutcome
+        courseUrl: ENV.GRADEBOOK_OPTIONS.context_url,
+        learningMasteryEnabled: ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled,
+        navigate: @options.navigate
+      for mountPoint in mountPoints
+        props.variant = mountPoint.getAttribute('data-variant')
+        renderComponent(GradebookMenu, mountPoint, props)
 
-    initTotalGradeColumnHeader: (obj) =>
-      component = React.createElement(TotalGradeColumnHeader, {}, null)
-      ReactDOM.render(component, $(obj.node).find('.slick-column-name')[0])
+    renderViewOptionsMenu: =>
+      mountPoint = document.querySelector("[data-component='ViewOptionsMenu']")
+      renderComponent(ViewOptionsMenu, mountPoint)
 
-    initAssignmentColumnHeader: (obj) =>
-      original_assignment = obj.column.object
+    renderActionMenu: =>
+      actionMenuProps =
+        gradebookIsEditable: @options.gradebook_is_editable
+        contextAllowsGradebookUploads: @options.context_allows_gradebook_uploads
+        gradebookImportUrl: @options.gradebook_import_url
+        currentUserId: ENV.current_user_id
+        gradebookExportUrl: @options.export_gradebook_csv_url
 
+      progressData = @options.gradebook_csv_progress
+
+      if @options.gradebook_csv_progress
+        actionMenuProps.lastExport =
+          progressId: "#{progressData.progress.id}"
+          workflowState: progressData.progress.workflow_state
+
+        attachmentData = @options.attachment
+        if attachmentData
+          actionMenuProps.attachment =
+            id: "#{attachmentData.attachment.id}"
+            downloadUrl: @options.attachment_url
+            updatedAt: attachmentData.attachment.updated_at
+
+      mountPoint = document.querySelector("[data-component='ActionMenu']")
+      renderComponent(ActionMenu, mountPoint, actionMenuProps)
+
+    getAssignmentColumnHeaderProps: (originalAssignment, submissionsLoaded) =>
       assignment = {
-        htmlUrl: original_assignment.html_url,
-        id: original_assignment.id,
-        invalid: original_assignment.invalid,
-        muted: original_assignment.muted,
-        name: original_assignment.name,
-        omitFromFinalGrade: original_assignment.omit_from_final_grade,
-        pointsPossible: original_assignment.points_possible
+        htmlUrl: originalAssignment.html_url,
+        id: originalAssignment.id,
+        invalid: originalAssignment.invalid,
+        muted: originalAssignment.muted,
+        name: originalAssignment.name,
+        omitFromFinalGrade: originalAssignment.omit_from_final_grade,
+        pointsPossible: originalAssignment.points_possible,
+        submissionTypes: originalAssignment.submission_types,
+        courseId: originalAssignment.course_id
       }
 
-      component = React.createElement(AssignmentColumnHeader, { assignment }, null)
-      ReactDOM.render(component, $(obj.node).find('.slick-column-name')[0])
+      students = _.map @studentsThatCanSeeAssignment(@students, originalAssignment), (student) =>
+        studentRecord =
+          id: student.id,
+          name: student.name,
+          isInactive: student.isInactive
 
-    initAssignmentGroupColumnHeader: (columnDefinition) =>
-      original_assignment_group = columnDefinition.column.object
+        assignmentKey = "assignment_#{assignment.id}"
+        assignmentData = student[assignmentKey]
 
-      assignment_group =
-        name: original_assignment_group.name
-        weight: original_assignment_group.group_weight
+        if assignmentData
+          studentRecord.submission =
+            score: assignmentData.score,
+            submittedAt: assignmentData.submitted_at
+        else
+          studentRecord.submission =
+            score: undefined,
+            submittedAt: undefined
 
-      header_props =
-        assignmentGroup: assignment_group
+        studentRecord
+
+      props =
+        assignment: assignment
+        students: students
+        submissionsLoaded: submissionsLoaded
+
+    renderAssignmentColumnHeader: (columnDefinition, immediate = false) =>
+      mountPoint = $(columnDefinition.node).find('.slick-column-name')[0]
+      assignment = columnDefinition.column.object
+
+      # Mount the component immediately, assuming submissions have already been loaded.
+      # This is used mainly to update column headers as the user changes data in the gradebook
+      if immediate
+        props = @getAssignmentColumnHeaderProps(assignment, true)
+        renderComponent(AssignmentColumnHeader, mountPoint, props)
+
+      # We're now in deferred mode => let's mount the component and indicate that the submissions
+      # might not all be loaded and kick off a deferred mount once all the submissions are loaded
+      props = @getAssignmentColumnHeaderProps(assignment, false)
+      renderComponent(AssignmentColumnHeader, mountPoint, props)
+
+      # Now let's wait for all submissions data to finish loading and re-mount this component so it
+      # has all the data it needs to power its functionality
+      @allSubmissionsLoaded.then =>
+        props = @getAssignmentColumnHeaderProps(assignment, true)
+        renderComponent(AssignmentColumnHeader, mountPoint, props)
+
+    renderAssignmentGroupColumnHeader: (columnDefinition, mountPoint) =>
+      originalAssignmentGroup = columnDefinition.column.object
+
+      assignmentGroup =
+        name: originalAssignmentGroup.name
+        weight: originalAssignmentGroup.group_weight
+
+      headerProps =
+        assignmentGroup: assignmentGroup
         weightedGroups: @weightedGroups()
-
-      component = React.createElement(AssignmentGroupColumnHeader, header_props, null)
-      ReactDOM.render(component, $(columnDefinition.node).find('.slick-column-name')[0])
-
-    initGradebookExporter: () =>
-      self = this
-
-      @initPreviousGradebookExportLink()
-
-      current_progress = @options.gradebook_csv_progress
-      attachment = @options.attachment
-
-      if current_progress && current_progress.progress.workflow_state != 'completed'
-        $('#download_csv').prop('disabled', true)
-        loading_interval = self.exportingGradebookStatus()
-
-        attachment_progress =
-          progress_id: current_progress.progress.id
-          attachment_id: attachment.attachment.id
-
-        @pollProgressForCSVExport(loading_interval, attachment_progress)
-
-      $('.generate_new_csv').click =>
-        $('#download_csv').prop('disabled', true)
-        $('.icon-import').parent().focus()
-        loading_interval = self.exportingGradebookStatus()
-
-        params =
-          grading_period_id: @getGradingPeriodToShow()
-
-        $.ajaxJSON(
-            @options.export_gradebook_csv_url,
-            'GET',
-            params
-        ).then((attachment_progress) ->
-          self.pollProgressForCSVExport(loading_interval, attachment_progress)
-        )
-
-    pollProgressForCSVExport: (loading_interval, attachment_progress) =>
-      self = this
-      polling = setInterval(() ->
-        $.ajaxJSON("/api/v1/progress/#{attachment_progress.progress_id}", 'GET').promise()
-          .then((response) ->
-            if response.workflow_state == 'failed'
-              clearInterval polling
-              clearInterval loading_interval
-              $.flashError(I18n.t('There was a problem exporting.'))
-
-            if response.workflow_state == 'completed'
-              $.ajaxJSON("/api/v1/users/#{ENV.current_user_id}/files/#{attachment_progress.attachment_id}", 'get')
-                .then((response) ->
-                  document.getElementById('csv_download').src = response.url
-
-                  updated_date = $.datetimeString(response.created_at)
-                  updated_previous_report = "#{I18n.t('Previous (%{timestamp})', timestamp: updated_date)}"
-                  $previous_link = $('#csv_export_options .open_in_a_new_tab')
-                  $previous_link.text(updated_previous_report)
-                  $previous_link.attr('href', response.url)
-                  $('#csv_export_options').children('li').last().css('display', 'block')
-                  self.initPreviousGradebookExportLink()
-
-                  $('#download_csv').prop('disabled', false)
-                  self.setExportButtonTitle(I18n.t('Export'))
-
-                  clearInterval polling
-                  clearInterval loading_interval
-               )
-          )
-      , 2000)
-
-    initPreviousGradebookExportLink: () ->
-      link = $('#csv_export_options').children('li').last().children()
-      link.on 'click', (event) ->
-        event.preventDefault()
-        document.getElementById('csv_download').src = link[0].href
-
-    exportingGradebookStatus: () =>
-      self = this
-      loading_indicator = ''
-      count = 0
-      loading = setInterval(() ->
-        count++
-
-        loading_indicator = new Array(count % 5).join('.')
-        nonBreakingSpacesCount = 3 - loading_indicator.length
-        nonBreakingSpaces = ""
-        for scale in [0..nonBreakingSpacesCount]
-          nonBreakingSpaces += "&nbsp;"
-
-        self.setExportButtonTitle("#{I18n.t("Exporting")}#{loading_indicator}#{nonBreakingSpaces}")
-      , 200)
-      loading
-
-    setExportButtonTitle: (updated_title) ->
-      $($('#download_csv').children('span').contents()[2]).replaceWith(updated_title)
+      renderComponent(AssignmentGroupColumnHeader, mountPoint, headerProps)
 
     checkForUploadComplete: () ->
       if UserSettings.contextGet('gradebookUploadComplete')
@@ -1486,14 +1501,15 @@ define [
       @onGridInit()
 
     onHeaderCellRendered: (event, obj) =>
+      mountPoint = obj.node.querySelector('.slick-column-name')
       if obj.column.id == 'student'
-        @initStudentColumnHeader(obj)
+        renderComponent(StudentColumnHeader, mountPoint)
       else if obj.column.id == 'total_grade'
-        @initTotalGradeColumnHeader(obj)
+        renderComponent(TotalGradeColumnHeader, mountPoint)
       else if obj.column.id.match(/^assignment_\d+$/)
-        @initAssignmentColumnHeader(obj)
+        @renderAssignmentColumnHeader(obj, mountPoint)
       else if obj.column.id.match(/^assignment_group_\d+$/)
-        @initAssignmentGroupColumnHeader(obj)
+        @renderAssignmentGroupColumnHeader(obj, mountPoint)
 
     onColumnsResized: (event, obj) =>
       grid = obj.grid
@@ -1550,9 +1566,7 @@ define [
       @grid.invalidate()
 
     localeSort: (a, b) ->
-      (a || "").localeCompare b || "",
-        i18nObj.locale,
-        sensitivity: 'accent', numeric: true
+      natcompare.strings(a || '', b || '')
 
     gradeSort: (a, b, field, asc) =>
       scoreForSorting = (obj) =>

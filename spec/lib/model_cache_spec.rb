@@ -22,6 +22,7 @@ describe ModelCache do
   before(:all) do
     class TestModelCacheUser < ActiveRecord::Base
       self.table_name = :users # reuse exiting tables so AR doesn't asplode
+      include ModelCache
     end
 
     class TestModelCachePseudonym < ActiveRecord::Base

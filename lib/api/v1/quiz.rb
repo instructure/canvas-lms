@@ -19,43 +19,42 @@ module Api::V1::Quiz
   include Api::V1::Json
 
   API_ALLOWED_QUIZ_INPUT_FIELDS = {
-    :only => %w(
-      title
-      description
-      quiz_type
-      assignment_group_id
-      time_limit
-      shuffle_answers
-      hide_results
-      show_correct_answers
-      show_correct_answers_last_attempt
-      show_correct_answers_at
-      hide_correct_answers_at
-      one_time_results
-      scoring_policy
-      allowed_attempts
-      one_question_at_a_time
-      cant_go_back
+    :only => (%w(
       access_code
-      ip_filter
+      allowed_attempts
+      anonymous_submissions
+      assignment_group_id
+      cant_go_back
+      description
       due_at
+      hide_correct_answers_at
+      ip_filter
       lock_at
-      unlock_at
+      lockdown_browser_monitor_data
+      one_question_at_a_time
+      one_time_results
+      only_visible_to_overrides
       published
+      quiz_type
       require_lockdown_browser
       require_lockdown_browser_for_results
       require_lockdown_browser_monitor
-      lockdown_browser_monitor_data
-      only_visible_to_overrides
-      )
-  }
+      scoring_policy
+      show_correct_answers
+      show_correct_answers_at
+      show_correct_answers_last_attempt
+      shuffle_answers
+      time_limit
+      title
+      unlock_at
+    ) + [{'hide_results' => ArbitraryStrongishParams::ANYTHING}] # because sometimes this is a hash :/
+    ).freeze
+  }.freeze
 
   def quizzes_json(quizzes, context, user, session, options={})
-    options.merge!(description_formatter: description_formatter(context, user))
-    check_for_restrictions = master_courses? && context.grants_right?(user, session, :manage_assignments)
-    if check_for_restrictions
-      MasterCourses::Restrictor.preload_restrictions(quizzes)
-      options[:include_master_course_restrictions] = true
+    options[:description_formatter] = description_formatter(context, user)
+    if context.grants_right?(user, session, :manage_assignments)
+      options[:master_course_status] = setup_master_course_restrictions(quizzes, context)
     end
 
     quizzes.map do |quiz|

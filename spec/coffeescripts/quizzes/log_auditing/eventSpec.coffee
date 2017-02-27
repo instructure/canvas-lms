@@ -1,7 +1,7 @@
 define [
   'compiled/quizzes/log_auditing/event'
 ], (QuizEvent) ->
-  module 'Quizzes::LogAuditing::QuizEvent'
+  QUnit.module 'Quizzes::LogAuditing::QuizEvent'
 
   test '#constructor', ->
     ok !!(new QuizEvent('some_event_type')),

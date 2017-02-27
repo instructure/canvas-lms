@@ -552,6 +552,30 @@ describe GradebooksController do
       assert_unauthorized
     end
 
+    context 'includes data needed by the Gradebook Action menu in ENV' do
+      before do
+        user_session(@teacher)
+
+        get 'show', course_id: @course.id
+
+        @gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+      end
+
+      it 'includes the context_allows_gradebook_uploads key in ENV' do
+        actual_value = @gradebook_env[:context_allows_gradebook_uploads]
+        expected_value = @course.allows_gradebook_uploads?
+
+        expect(actual_value).to eq(expected_value)
+      end
+
+      it 'includes the gradebook_import_url key in ENV' do
+        actual_value = @gradebook_env[:gradebook_import_url]
+        expected_value = new_course_gradebook_upload_path(@course)
+
+        expect(actual_value).to eq(expected_value)
+      end
+    end
+
     context "includes student context card info in ENV" do
       before { user_session(@teacher) }
 
@@ -894,6 +918,18 @@ describe GradebooksController do
       get 'speed_grader', course_id: @course, assignment_id: @assignment.id
       expect(assigns[:js_env][:lti_retrieve_url]).not_to be_nil
     end
+
+    it 'includes the grading_type in the js_env' do
+      user_session(@teacher)
+      @assignment = @course.assignments.create!(
+        title: "A Title",
+        submission_types: 'online_url,online_file',
+        grading_type: 'percent'
+      )
+
+      get 'speed_grader', course_id: @course, assignment_id: @assignment.id
+      expect(assigns[:js_env][:grading_type]).to eq('percent')
+    end
   end
 
   describe "POST 'speed_grader_settings'" do
@@ -986,7 +1022,7 @@ describe GradebooksController do
     ]
     end
   end
-  
+
   describe '#external_tool_detail' do
     let(:tool) do
       {
@@ -1000,7 +1036,7 @@ describe GradebooksController do
         }
       }
     end
-    
+
     it 'maps a tool to launch details' do
       expect(@controller.external_tool_detail(tool)).to eql(
         data_url: 'http://example.com/lti/post_grades',

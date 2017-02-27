@@ -5,7 +5,7 @@ define [
   'jquery.disableWhileLoading'
 ], (WikiPageCollection,WikiPageIndexView,$) ->
 
-  module 'WikiPageIndexView:sort',
+  QUnit.module 'WikiPageIndexView:sort',
     setup: ->
       @collection = new WikiPageCollection
       @view = new WikiPageIndexView
@@ -49,7 +49,7 @@ define [
     equal @view.currentSortField, 'created_at', 'currentSortField set correctly'
 
 
-  module 'WikiPageIndexView:JSON'
+  QUnit.module 'WikiPageIndexView:JSON'
 
   testRights = (subject, options) ->
     test "#{subject}", ->

@@ -3,7 +3,7 @@ define([
   'jsx/collaborations/actions/collaborationsActions'
 ], (reducer, actions) => {
 
-  module('ltiCollaboratorsReducer');
+  QUnit.module('ltiCollaboratorsReducer');
 
   const defaults = reducer(undefined, {})
 

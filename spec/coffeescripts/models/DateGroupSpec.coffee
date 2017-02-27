@@ -3,7 +3,7 @@ define [
   'compiled/models/DateGroup'
 ], (Backbone, DateGroup) ->
 
-  module 'DateGroup',
+  QUnit.module 'DateGroup',
     setup: ->
 
   test 'default title is set', ->

@@ -205,6 +205,20 @@ describe ContentMigrationsController, type: :request do
       expect(@migration.migration_issues.first.description).to eq "The file upload process timed out."
     end
 
+    context "Site Admin" do
+      it "should contain additional auditing information for site admins" do
+        course_with_teacher_logged_in(:course => @course, :active_all => true, :user => site_admin_user)
+        json = api_call(:get, @migration_url, @params)
+        expect(json['audit_info']).not_to be_falsey
+      end
+
+      it "should not contain additional auditing information if not site admin" do
+        course_with_teacher_logged_in(:course => @course, :active_all => true, :user => user_with_pseudonym)
+        json = api_call(:get, @migration_url, @params)
+        expect(json['audit_info']).to be_falsey
+      end
+    end
+
     context "User" do
       before do
         @migration = @user.content_migrations.create

@@ -89,7 +89,7 @@ describe Submissions::SubmissionForShow do
             submission.quiz_submission.with_versioning(true) do
               submission.quiz_submission.update_attribute(:finished_at, 1.hour.ago)
             end
-            @options = @options.merge({ preview: true, version: submission.quiz_submission_version })
+            @options = @options.merge({ preview: true, version: submission.quiz_submission.versions.last.number, assignment_id: @assignment.id })
           end
 
           it 'ignores version params' do

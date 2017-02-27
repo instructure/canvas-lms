@@ -15,11 +15,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require_relative '../../spec_helper'
+require_relative '../../lti_spec_helper'
 require_dependency "lti/app_collator"
 
 module Lti
-  describe AppCollator, :include_lti_spec_helpers do
+  describe AppCollator do
+    include LtiSpecHelper
 
     subject { described_class.new(account, mock_reregistration_url_builder)}
     let(:account) { Account.create }

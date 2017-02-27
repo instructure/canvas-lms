@@ -140,6 +140,7 @@
                 type="url"
                 required
                 aria-required="true"
+                disabled={this.props.link.type === 'default'}
                 name={`${namePrefix}[url]`}
                 className="ic-Input"
                 onKeyDown={(e) => this.handleKeyDown(e, 'url')}

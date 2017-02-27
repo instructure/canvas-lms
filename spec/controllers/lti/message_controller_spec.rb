@@ -36,6 +36,13 @@ module Lti
         resource_handler: resource_handler
       )
     end
+    let(:enabled_capability) {
+      %w(ToolConsumerInstance.guid
+         Message.documentTarget
+         Message.locale
+         Membership.role
+         Context.id)
+    }
     let(:tool_proxy) do
       ToolProxy.create(
         shared_secret: 'shared_secret',
@@ -45,7 +52,7 @@ module Lti
         product_family: product_family,
         context: account,
         workflow_state: 'active',
-        raw_data: 'some raw data'
+        raw_data: {enabled_capability: enabled_capability}
       )
     end
     let(:default_resource_handler) do
@@ -73,10 +80,10 @@ module Lti
           expect(launch_params['reg_key']).not_to be_empty
           expect(launch_params['reg_password']).not_to be_empty
           expect(launch_params['launch_presentation_return_url'])
-            .to include "courses/#{course.id}/lti/registration_return/#{launch_params['reg_key']}"
+            .to include "courses/#{course.id}/lti/registration_return"
           expect(launch_params['ext_tool_consumer_instance_guid']).to eq @course.root_account.lti_guid
           expect(launch_params['ext_api_domain']).to eq HostUrl.context_host(course, request.host)
-          account_tp_url_stub = course_tool_consumer_profile_url(course, 'abc123').gsub('abc123', '')
+          account_tp_url_stub = course_tool_consumer_profile_url(course)
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end
 
@@ -101,7 +108,7 @@ module Lti
           expect(launch_params['launch_presentation_document_target']).to eq 'iframe'
           expect(launch_params['reg_key']).not_to be_empty
           expect(launch_params['reg_password']).not_to be_empty
-          account_tp_url_stub = account_tool_consumer_profile_url(Account.default, 'abc123').gsub('abc123', '')
+          account_tp_url_stub = account_tool_consumer_profile_url(Account.default)
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end
 
@@ -166,7 +173,7 @@ module Lti
           get 'reregistration', course_id: course.id, tool_proxy_id: tool_proxy.id
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
-          account_tp_url_stub = course_tool_consumer_profile_url(course, 'abc123').gsub('abc123', '')
+          account_tp_url_stub = course_tool_consumer_profile_url(course)
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end
 
@@ -177,7 +184,7 @@ module Lti
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
 
-          expected_launch = "courses/#{course.id}/lti/registration_return/#{launch_params['reg_key']}"
+          expected_launch = "courses/#{course.id}/lti/registration_return"
           expect(launch_params['launch_presentation_return_url']).to include expected_launch
         end
 
@@ -262,10 +269,12 @@ module Lti
         end
 
         it 'returns the roles' do
+          course_with_student(account: account, active_all: true)
+          user_session(@student)
           get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,
               params: {tool_launch_context: 'my_custom_context'}
           params = assigns[:lti_launch].params.with_indifferent_access
-          expect(params['roles']).to eq ["http://purl.imsglobal.org/vocab/lis/v2/person#None"]
+          expect(params['roles']).to eq "http://purl.imsglobal.org/vocab/lis/v2/system/person#User"
         end
 
         it 'adds module item substitutions' do
@@ -334,32 +343,47 @@ module Lti
           expect(params['ext_lti_assignment_id']).to eq lti_assignment_id
         end
 
-      end
+        it 'does only adds non-required params if they are present in enabled_capability' do
+          allow_any_instance_of(IMS::LTI::Models::ToolProxy).to receive(:enabled_capability) { {} }
 
-      describe "resource link" do
-
-        it 'creates resource_links without a resource_link_fragment' do
-          Account.any_instance.stubs(:global_id).returns(3)
-          MessageHandler.any_instance.stubs(:global_id).returns(4)
           get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,
               params: {tool_launch_context: 'my_custom_context'}
           expect(response.code).to eq "200"
 
           lti_launch = assigns[:lti_launch]
           params = lti_launch.params.with_indifferent_access
-          expect(params[:resource_link_id]).to eq "bc460437e3f6cf7a7eecb017487c145f4957334d"
+
+          expect(params[:launch_presentation_locale]).to be_nil
+          expect(params[:tool_consumer_instance_guid]).to be_nil
+          expect(params[:launch_presentation_document_target]).to be_nil
+        end
+      end
+
+      describe "resource link" do
+        it 'creates resource_links without a resource_link_fragment' do
+          Timecop.freeze do
+            get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,
+                params: {tool_launch_context: 'my_custom_context'}
+            expect(response.code).to eq "200"
+
+            lti_launch = assigns[:lti_launch]
+            params = lti_launch.params.with_indifferent_access
+            expected_id = Canvas::Security.hmac_sha1("Account_#{account.global_id},MessageHandler_#{message_handler.global_id}")
+            expect(params[:resource_link_id]).to eq expected_id
+          end
         end
 
-        it 'creates resource_links with a resource_link_fragment' do
-          Account.any_instance.stubs(:global_id).returns(3)
-          MessageHandler.any_instance.stubs(:global_id).returns(4)
-          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,
-              resource_link_fragment: 'my_custom_postfix'
-          expect(response.code).to eq "200"
+        it 'creates with a resource_link_fragment' do
+          Timecop.freeze do
+            get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,
+                resource_link_fragment: 'my_custom_postfix'
+            expect(response.code).to eq "200"
 
-          lti_launch = assigns[:lti_launch]
-          params = lti_launch.params.with_indifferent_access
-          expect(params[:resource_link_id]).to eq "c5c1cef6a293b2c173cc8f4ec4412916019324f8"
+            lti_launch = assigns[:lti_launch]
+            params = lti_launch.params.with_indifferent_access
+            expected_id = Canvas::Security.hmac_sha1("Account_#{account.global_id},MessageHandler_#{message_handler.global_id},my_custom_postfix")
+            expect(params[:resource_link_id]).to eq expected_id
+          end
         end
 
 

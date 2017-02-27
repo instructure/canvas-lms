@@ -2,7 +2,7 @@ define([
   "jquery",
   "underscore",
   "require",
-  "vendor/timezone",
+  "timezone/index",
   "i18nObj",
   "moment",
   "moment_formats"
@@ -10,7 +10,7 @@ define([
   // start with the bare vendor-provided tz() function
   var currentLocale = "en_US" // default to US locale
   var momentLocale = "en"
-  var _preloadedData = {};
+  var _preloadedData = window.__PRELOADED_TIMEZONE_DATA__ || (window.__PRELOADED_TIMEZONE_DATA__ = {});
 
   // wrap it up in a set of methods that will always call the most up-to-date
   // version. each method is intended to act as a subset of bigeasy's generic
@@ -274,15 +274,15 @@ define([
         return _preloadedData[name];
       } else {
         return new Promise(function(resolve, reject){
-          if (window.USE_WEBPACK && process.env.NODE_ENV !== 'test') {
+          if (window.USE_WEBPACK) {
             return reject(
-              new Error('In webpack, loading timezones on-demand is not supported unless in test mode. "' +
+              new Error('In webpack, loading timezones on-demand is not supported. "' +
                         name + '" should already be script tagged onto the page from Rails.')
             )
           } else {
-            require(['vendor/timezone/' + name], function (data){
-              _preloadedData[name] = data;
-              resolve(data);
+            require(['timezone/' + name], function (timezoneData){
+              _preloadedData[name] = timezoneData;
+              resolve(timezoneData);
             });
           }
         });

@@ -22,6 +22,7 @@ define([
   'jquery' /* $ */,
   'underscore' /* _ */,
   'str/htmlEscape',
+  'jsx/shared/helpers/numberHelper',
   'find_outcome',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */,
@@ -34,11 +35,14 @@ define([
   'vendor/jquery.ba-tinypubsub',
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/jquery/fixDialogButtons'
-], function(I18n, changePointsPossibleToMatchRubricDialog, $, _, htmlEscape) {
+], function(I18n, changePointsPossibleToMatchRubricDialog, $, _, htmlEscape, numberHelper) {
 
   var rubricEditing = {
     htmlBody: null,
 
+    localizedPoints: function(points) {
+      return I18n.n(points, {precision: 2, strip_insignificant_zeros: true})
+    },
     updateCriteria: function($rubric) {
       $rubric.find(".criterion:not(.blank)").each(function(i) {
         $(this).attr('id', 'criterion_' + (i + 1));
@@ -59,20 +63,19 @@ define([
       $this.addClass('add_column');
       if($rubric.hasClass('editing')){
         var $td = $this.clone(true).removeClass('edge_rating'),
-            pts = parseFloat($this.find(".points").text()),
+            pts = numberHelper.parse($this.find(".points").text()),
             $criterion = $this.parents(".criterion"),
             $criterionPoints = $criterion.find(".criterion_points"),
-            criterion_total = parseFloat($criterionPoints.val(), 10) || 5,
             data = { description: "Rating Description" },
             hasClassAddLeft = $this.hasClass('add_left');
         if($this.hasClass('add_left')) {
-          var more_points = parseFloat($this.prev(".rating").find(".points").text());
+          var more_points = numberHelper.parse($this.prev(".rating").find(".points").text());
           data.points = Math.round((pts + more_points) / 2);
           if(data.points == pts || data.points == more_points) {
             data.points = pts;
           }
         } else {
-          var less_points = parseFloat($this.next(".rating").find(".points").text());
+          var less_points = numberHelper.parse($this.next(".rating").find(".points").text());
           data.points = Math.round((pts + less_points) / 2);
           if(data.points == pts || data.points == less_points) {
             data.points = less_points;
@@ -134,56 +137,58 @@ define([
     updateRubricPoints: function($rubric) {
       var total = 0;
       $rubric.find(".criterion:not(.blank):not(.ignore_criterion_for_scoring) .criterion_points").each(function() {
-        var points = parseFloat($(this).val(), 10);
+        var points = numberHelper.parse($(this).val());
         if(!isNaN(points)) {
           total += points;
         }
       });
       total = round(total, 2);
-      $rubric.find(".rubric_total").text(total);
+      $rubric.find(".rubric_total").text(rubricEditing.localizedPoints(total));
     },
     updateCriterionPoints: function($criterion, baseOnRatings) {
       rubricEditing.hideEditRating();
       var ratings = $.makeArray($criterion.find(".rating")).reverse();
       var rating_points = -1;
-      var points = parseFloat($criterion.find(".criterion_points").val());
+      var points = numberHelper.parse($criterion.find(".criterion_points").val());
       if(isNaN(points)) {
         points = 5;
       } else {
         points = round(points, 2);
       }
-      $criterion.find(".rating:first .points").text(points);
+      $criterion.find(".rating:first .points").text(rubricEditing.localizedPoints(points));
       // From right to left, make sure points never decrease
       // and round to 2 decimal places.
       $.each(ratings, function(i, rating) {
         var $rating = $(rating);
         var data = $rating.getTemplateData({textValues: ['points']});
+        data.points = numberHelper.parse(data.points);
         if(data.points < rating_points) {
           data.points = rating_points;
         }
         data.points = round(data.points, 2);
+        rating_points = data.points;
+        data.points = rubricEditing.localizedPoints(data.points);
         $rating.fillTemplateData({data: data});
-        rating_points = parseFloat(data.points);
       });
       if(baseOnRatings && rating_points > points) { points = rating_points; }
-      $criterion.find(".criterion_points").val(points);
-      $criterion.find(".display_criterion_points").text(points);
-      if(!$criterion.data('criterion_points') || $criterion.data('criterion_points') != points) {
+      $criterion.find(".criterion_points").val(rubricEditing.localizedPoints(points));
+      $criterion.find(".display_criterion_points").text(rubricEditing.localizedPoints(points));
+      if(!$criterion.data('criterion_points') || numberHelper.parse($criterion.data('criterion_points')) != points) {
         if(!$criterion.data('criterion_points')) {
-          var pts = parseFloat($criterion.find(".rating:first .points").text());
-          $criterion.data('criterion_points', pts);
+          var pts = $criterion.find(".rating:first .points").text();
+          $criterion.data('criterion_points', numberHelper.parse(pts));
         }
-        var oldMax = parseFloat($criterion.data('criterion_points'));
+        var oldMax = numberHelper.parse($criterion.data('criterion_points'));
         var newMax = points;
         if (oldMax !== newMax) {
           var $ratingList = $criterion.find(".rating");
-          $($ratingList[0]).find(".points").text(points);
+          $($ratingList[0]).find(".points").text(rubricEditing.localizedPoints(points));
           var lastPts = points;
           // From left to right, scale points proportionally to new range.
           // So if originally they were 3,2,1 and now we increased the
           // total possible to 9, they'd be 9,6,3
           for(var i = 1; i < $ratingList.length - 1; i++) {
-            var pts = parseFloat($($ratingList[i]).find(".points").text());
+            var pts = numberHelper.parse($($ratingList[i]).find(".points").text());
             var newPts = Math.round((pts / oldMax) * newMax);
             if(isNaN(pts) || (pts == 0 && lastPts > 0)) {
               newPts = lastPts - Math.round(lastPts / ($ratingList.length - i));
@@ -193,7 +198,7 @@ define([
             }
             newPts = Math.max(0, newPts);
             lastPts = newPts;
-            $($ratingList[i]).find(".points").text(newPts);
+            $($ratingList[i]).find(".points").text(rubricEditing.localizedPoints(newPts));
           }
         }
         $criterion.data('criterion_points', points);
@@ -298,7 +303,8 @@ define([
       $rubric.find(".criterion:not(.blank)").each(function() {
         var $criterion = $(this);
         if(!$criterion.hasClass('learning_outcome_criterion')) {
-          $criterion.find("span.mastery_points").text(parseFloat($criterion.find("input.mastery_points").val(), 10) || "0");
+          var masteryPoints = $criterion.find("input.mastery_points").val();
+          $criterion.find("span.mastery_points").text(numberHelper.validate(masteryPoints) ? masteryPoints : 0);
         }
         var vals = $criterion.getTemplateData({textValues: ['description', 'display_criterion_points', 'learning_outcome_id', 'mastery_points', 'long_description', 'criterion_id']});
         vals.long_description = $criterion.find("textarea.long_description").val();
@@ -321,14 +327,14 @@ define([
           var vals = $rating.getTemplateData({textValues: ['description', 'points', 'rating_id']});
           var pre_rating = pre_criterion + "[ratings][" + rating_idx + "]";
           data[pre_rating + "[description]"] = vals.description;
-          data[pre_rating + "[points]"] = vals.points;
+          data[pre_rating + "[points]"] = numberHelper.parse(vals.points);
           data[pre_rating + "[id]"] = vals.rating_id;
           rating_idx++;
         });
         criterion_idx++;
       });
       data.title = data['rubric[title]'];
-      data.points_possible = data['rubric[points_possible]'];
+      data.points_possible = numberHelper.parse(data['rubric[points_possible]']);
       data.rubric_id = $rubric.attr('id').substring(7);
       data = $.extend(data, $("#rubrics #rubric_parameters").getFormData());
       return data;
@@ -750,7 +756,7 @@ define([
         if (!$rubric.find(".criterion:not(.blank)").length) return false;
         var data = rubricEditing.rubricData($rubric);
         if (data['rubric_association[use_for_grading]'] == '1') {
-          var assignmentPoints = parseFloat($("#assignment_show .points_possible, .discussion-title .discussion-points").text());
+          var assignmentPoints = numberHelper.parse($("#assignment_show .points_possible, .discussion-title .discussion-points").text());
           var rubricPoints = parseFloat(data.points_possible);
           if (assignmentPoints != null && assignmentPoints != undefined && rubricPoints != assignmentPoints && !forceSubmit) {
             var pointRatio = assignmentPoints === 0 ? rubricPoints : rubricPoints / assignmentPoints;
@@ -886,9 +892,9 @@ define([
       if(!$.data(this, 'hover_offset')) {
         $.data(this, 'hover_offset', $this.offset());
         $.data(this, 'hover_width', $this.outerWidth());
-        var points = $.data(this, 'points', parseFloat($this.find(".points").text()));
-        var prevPoints = $.data(this, 'prev_points', parseFloat($this.prev(".rating").find(".points").text()));
-        var nextPoints = $.data(this, 'next_points', parseFloat($this.next(".rating").find(".points").text()));
+        var points = $.data(this, 'points', numberHelper.parse($this.find(".points").text()));
+        var prevPoints = $.data(this, 'prev_points', numberHelper.parse($this.prev(".rating").find(".points").text()));
+        var nextPoints = $.data(this, 'next_points', numberHelper.parse($this.next(".rating").find(".points").text()));
         $.data(this, 'prev_diff', Math.abs(points - prevPoints));
         $.data(this, 'next_diff', Math.abs(points - nextPoints));
       }
@@ -985,15 +991,15 @@ define([
       event.preventDefault();
       event.stopPropagation();
       var data = $(this).parents("#edit_rating").getFormData();
-      data.points = parseFloat(data.points);
+      data.points = numberHelper.parse(data.points);
       if(isNaN(data.points)) {
-        data.points = parseFloat($(this).parents(".criterion").find(".criterion_points").val());
+        data.points = numberHelper.parse($(this).parents(".criterion").find(".criterion_points").val());
         if(isNaN(data.points)) { data.points = 5; }
       }
       var $rating = $(this).parents(".rating");
       $rating.fillTemplateData({data: data});
       if($rating.prev(".rating").length === 0) {
-        $(this).parents(".criterion").find(".criterion_points").val(data.points);
+        $(this).parents(".criterion").find(".criterion_points").val(rubricEditing.localizedPoints(data.points));
       }
       rubricEditing.updateCriterionPoints($(this).parents(".criterion"), true);
       $target.focus();

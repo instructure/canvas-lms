@@ -94,6 +94,7 @@ module Api::V1::Course
       hash['is_favorite'] = course.favorite_for_user?(user) if includes.include?('favorites')
       hash['teachers'] = course.teachers.map { |teacher| user_display_json(teacher) } if includes.include?('teachers')
       hash['tabs'] = tabs_available_json(course, user, session, ['external']) if includes.include?('tabs')
+      hash['locale'] = course.locale unless course.locale.nil?
       add_helper_dependant_entries(hash, course, builder)
       apply_nickname(hash, course, user) if user
 

@@ -216,13 +216,11 @@ module ActiveRecord
         end
 
         it "uses FOR UPDATE on a normal exclusive lock" do
-          scope.expects(:lock_without_exclusive_smarts).with(true)
-          scope.lock(true)
+          expect(scope.lock(true).lock_value).to eq true
         end
 
         it "substitutes 'FOR NO KEY UPDATE' if specified" do
-          scope.expects(:lock_without_exclusive_smarts).with("FOR NO KEY UPDATE")
-          scope.lock(:no_key_update)
+          expect(scope.lock(:no_key_update).lock_value).to eq "FOR NO KEY UPDATE"
         end
       end
 
@@ -232,13 +230,11 @@ module ActiveRecord
         end
 
         it "uses FOR UPDATE on a normal exclusive lock" do
-          scope.expects(:lock_without_exclusive_smarts).with(true)
-          scope.lock(true)
+          expect(scope.lock(true).lock_value).to eq true
         end
 
         it "ignores 'FOR NO KEY UPDATE' if specified" do
-          scope.expects(:lock_without_exclusive_smarts).with(true)
-          scope.lock(:no_key_update)
+          expect(scope.lock(:no_key_update).lock_value).to eq true
         end
       end
     end

@@ -37,8 +37,8 @@ module AddressBook
 
     def known_in_context(context, is_admin=false)
       # just query, hydrate, and cache
-      common_contexts = Services::AddressBook.known_in_context(@sender, context, is_admin)
-      users = hydrate(common_contexts.keys)
+      user_ids, common_contexts = Services::AddressBook.known_in_context(@sender, context, is_admin)
+      users = hydrate(user_ids)
       cache_contexts(users, common_contexts)
       users
     end
@@ -47,34 +47,56 @@ module AddressBook
       Services::AddressBook.count_in_context(@sender, context)
     end
 
-    # TODO figure out how this works
-    module Bookmarker
-      def self.bookmark_for(user)
-        'unused'
+    class Bookmarker
+      def initialize
+        @cursors = {}
+        @more = false
       end
 
-      def self.validate(bookmark)
-        true
+      def update(user_ids, cursors)
+        @cursors = Hash[user_ids.zip(cursors)]
+        @more = !!@cursors[user_ids.last]
+      end
+
+      def more?
+        @more
+      end
+
+      def bookmark_for(user)
+        @cursors[user.global_id]
+      end
+
+      def validate(bookmark)
+        bookmark.is_a?(Integer) && bookmark >= 0
       end
     end
 
     def search_users(options={})
-      BookmarkedCollection.build(Bookmarker) do |pager|
+      bookmarker = Bookmarker.new
+      BookmarkedCollection.build(bookmarker) do |pager|
         # include bookmark info in service call if necessary
         service_options = { per_page: pager.per_page }
         if pager.current_bookmark
-          service_options[:current_bookmark] = pager.current_bookmark
-          service_options[:include_bookmark] = pager.include_bookmark ? '1' : '0'
+          if pager.include_bookmark
+            # don't raise the exception; there's no place better to handle it
+            # than here. handling it is just complaining in an error report,
+            # and then ignoring
+            Canvas::Errors.capture(RuntimeError.new(
+              "AddressBook::Service#search_users should not be paged with include_bookmark: true"
+            ))
+          end
+          service_options[:cursor] = pager.current_bookmark
         end
 
         # query, hydrate, and cache
-        common_contexts, finished = Services::AddressBook.search_users(@sender, options, service_options)
-        users = hydrate(common_contexts.keys)
+        user_ids, common_contexts, cursors = Services::AddressBook.search_users(@sender, options, service_options)
+        bookmarker.update(user_ids, cursors)
+        users = hydrate(user_ids)
         cache_contexts(users, common_contexts)
 
         # place results in pager
         pager.replace(users)
-        pager.has_more! unless finished
+        pager.has_more! if bookmarker.more?
         pager
       end
     end

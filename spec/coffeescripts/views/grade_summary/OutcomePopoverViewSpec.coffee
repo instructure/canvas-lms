@@ -7,7 +7,7 @@ define [
   'jst/outcomes/outcomePopover'
 ], ($, _, Popover, Outcome, OutcomePopoverView, template) ->
 
-  module 'OutcomePopoverViewSpec',
+  QUnit.module 'OutcomePopoverViewSpec',
     setup: ->
       $(document.body).append('<div id="application"></div>')
       @popoverView = new OutcomePopoverView({

@@ -1,5 +1,5 @@
 define [
-  'vendor/timezone/Europe/London'
+  'timezone/Europe/London'
   'timezone'
   'compiled/util/coupleTimeFields'
   'compiled/widget/DatetimeField'
@@ -20,7 +20,7 @@ define [
   tomorrow = new Date(fixed)
   tomorrow.setDate(tomorrow.getDate() + 1)
 
-  module 'initial coupling',
+  QUnit.module 'initial coupling',
     setup: ->
       @$start = $('<input type="text">')
       @$end = $('<input type="text">')
@@ -78,7 +78,7 @@ define [
     equal @start.datetime.getDate(), tomorrow.getDate()
     equal @end.datetime.getDate(), tomorrow.getDate()
 
-  module 'post coupling',
+  QUnit.module 'post coupling',
     setup: ->
       @$start = $('<input type="text">')
       @$end = $('<input type="text">')
@@ -176,7 +176,7 @@ define [
     # check that the end datetime has not been changed
     equal +@end.datetime, endTime
 
-  module 'with date field',
+  QUnit.module 'with date field',
     setup: ->
       @$start = $('<input type="text">')
       @$end = $('<input type="text">')

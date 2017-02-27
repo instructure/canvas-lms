@@ -7,7 +7,7 @@ define [
   fixtures = $("#fixtures")
   containerDiv = null
 
-  module "EditorToggle",
+  QUnit.module "EditorToggle",
     setup: ->
       containerDiv = $("<div></div>")
       fixtures.append(containerDiv)

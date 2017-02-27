@@ -26,6 +26,9 @@ masquerading users.  Additionally, when we don't provide enough information or c
 directly through LTI, tools can request everything they need to use the Canvas API for an even
 richer experience.
 
+Some substitutions may be used as 'enabled_capabilities' for LTI2 tools. These substitutions have a
+'Launch Parameter' label indicating the parameter name that will be sent in the tool launch if enabled.
+
 For more information on variable substitution, see the <a href="https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide#toc-9" target="_blank">IMS LTI specification.</a>
 
 # Usage/Configuration
@@ -96,6 +99,42 @@ particular placement:
 ```
 
 # Supported Substitutions
+## Context.id
+an opaque identifier that uniquely identifies the context of the tool launch
+
+Launch Parameter: *context_id*
+
+```
+cdca1fe2c392a208bd8a657f8865ddb9ca359534
+```
+
+## ToolConsumerInstance.guid
+returns a unique identifier for the Tool Consumer (Canvas)
+
+Launch Parameter: *tool_consumer_instance_guid*
+
+```
+0dWtgJjjFWRNT41WdQMvrleejGgv7AynCVm3lmZ2:canvas-lms
+```
+
+## Message.locale
+returns the current locale
+
+Launch Parameter: *launch_presentation_locale*
+
+```
+de
+```
+
+## Message.documentTarget
+communicates the kind of browser window/frame where the Canvas has launched a tool
+
+Launch Parameter: *launch_presentation_document_target*
+
+```
+iframe
+```
+
 ## Canvas.api.domain
 returns the canvas domain for the current context. Should always be available.
 
@@ -104,7 +143,7 @@ canvas.instructure.com
 ```
 
 ## Canvas.api.collaborationMembers.url
-returns the api url for the members of the collaboration. 
+returns the api url for the members of the collaboration.
 
 ```
 https://canvas.instructure.com/api/v1/collaborations/1/members
@@ -118,7 +157,7 @@ https://canvas.instructure.com
 ```
 
 ## ToolProxyBinding.memberships.url
-returns the URL for the membership service associated with the current context. 
+returns the URL for the membership service associated with the current context.
 
 ```
 https://canvas.instructure.com/api/lti/courses/1/membership_service
@@ -238,6 +277,8 @@ YYY-MM-DD HH:MM:SS -0700
 returns the current course sis source id. Only available when launched in a course.
 to return the section source id use Canvas.course.sectionIds
 
+Launch Parameter: *lis_course_section_sourcedid*
+
 ```
 1234
 ```
@@ -280,23 +321,35 @@ Only available when launched in a course that was copied (excludes cartridge imp
 
 ## Person.name.full
 Returns the full name of the launching user. Only available when launched by a logged in user.
+
+Launch Parameter: *lis_person_name_full*
+
 ```
 John Doe
 ```
 ## Person.name.family
 Returns the last name of the launching user. Only available when launched by a logged in user.
+
+Launch Parameter: *lis_person_name_family*
+
 ```
 Doe
 ```
 
 ## Person.name.given
 Returns the last name of the launching user. Only available when launched by a logged in user.
+
+Launch Parameter: *lis_person_name_given*
+
 ```
 John
 ```
 
 ## Person.email.primary
 Returns the primary email of the launching user. Only available when launched by a logged in user.
+
+Launch Parameter: *lis_person_contact_email_primary*
+
 ```
 john.doe@example.com
 ```
@@ -316,12 +369,18 @@ America/Denver
 
 ## User.image
 Returns the profile picture URL of the launching user. Only available when launched by a logged in user.
+
+Launch Parameter: *user_image*
+
 ```
 https://example.com/picture.jpg
 ```
 
 ## User.id [duplicates Canvas.user.id and Canvas.user.loginId]
 Returns the Canvas user_id of the launching user. Only available when launched by a logged in user.
+
+Launch Parameter: *user_id*
+
 ```
 420000000000042
 ```
@@ -339,7 +398,7 @@ false
 ```
 
 ## Canvas.group.contextIds
-returns the context ids for the groups the user belongs to in the course. 
+returns the context ids for the groups the user belongs to in the course.
 
 ```
 1c16f0de65a080803785ecb3097da99872616f0d,d4d8d6ae1611e2c7581ce1b2f5c58019d928b79d,...
@@ -347,6 +406,9 @@ returns the context ids for the groups the user belongs to in the course.
 
 ## Membership.role
 Returns the <a href="https://www.imsglobal.org/specs/ltimemv1p0/specification-3">IMS LTI membership service</a> roles for filtering via query parameters. Only available when launched by a logged in user.
+
+Launch Parameter: *roles*
+
 ```
 http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator
 ```
@@ -579,4 +641,3 @@ Only available when an attachment is present and has usage rights defined.
 
 ## Canvas.file.usageRights.copyrightText
 Only available when an attachment is present and has usage rights defined.
-

@@ -16,7 +16,7 @@ describe Autoextend do
 
   after do
     Object.send(:remove_const, :AutoextendSpec)
-    Autoextend.extensions.reject! { |k, _| k =~ /^AutoextendSpec::/ }
+    Autoextend.send(:extensions_hash).reject! { |k, _| k =~ /^AutoextendSpec::/ }
   end
 
   it "should autoextend a class afterwards" do

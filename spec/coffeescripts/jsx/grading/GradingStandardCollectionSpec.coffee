@@ -10,11 +10,11 @@ define [
 
   Simulate = TestUtils.Simulate
 
-  module 'GradingStandardCollection',
+  QUnit.module 'GradingStandardCollection',
     setup: ->
-      @stub($, 'flashMessage', ->)
-      @stub($, 'flashError', ->)
-      @stub(window, 'confirm', -> )
+      @stub($, 'flashMessage')
+      @stub($, 'flashError')
+      @stub(window, 'confirm')
       @server = sinon.fakeServer.create()
       ENV.current_user_roles = ["admin", "teacher"]
       ENV.GRADING_STANDARDS_URL = "/courses/1/grading_standards"

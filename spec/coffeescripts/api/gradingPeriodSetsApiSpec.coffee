@@ -82,7 +82,7 @@ define [
     ]
   }
 
-  module 'gradingPeriodSetsApi.list',
+  QUnit.module 'gradingPeriodSetsApi.list',
     setup: ->
       @server = sinon.fakeServer.create()
       @fakeHeaders =
@@ -162,7 +162,7 @@ define [
     }
   }
 
-  module 'gradingPeriodSetsApi.create',
+  QUnit.module 'gradingPeriodSetsApi.create',
     setup: ->
       fakeENV.setup()
       ENV.GRADING_PERIOD_SETS_URL = 'api/grading_period_sets'
@@ -226,7 +226,7 @@ define [
     }
   }
 
-  module 'gradingPeriodSetsApi.update',
+  QUnit.module 'gradingPeriodSetsApi.update',
     setup: ->
       fakeENV.setup()
       ENV.GRADING_PERIOD_SET_UPDATE_URL = 'api/grading_period_sets/%7B%7B%20id%20%7D%7D'

@@ -9,11 +9,14 @@ test:
   ssl: false
   init_values:
     canvas:
-      signing-secret: somebigsecret
-      encryption-secret: somebigsecret
+      signing-secret: astringthatisactually32byteslong
+      encryption-secret: astringthatisactually32byteslong
     rich-content-service:
       app-host: rce.docker
       cdn-host: rce.docker
+    address-book:
+      app-host: http://address-book.docker
+      secret: opensesame
     live-events-subscription-service:
       app-host: http://les.docker
       sad-panda: null
@@ -23,8 +26,8 @@ development:
   ssl: false
   init_values:
     canvas:
-      signing-secret: somebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecret
-      encryption-secret: somebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecret
+      signing-secret: astringthatisactually32byteslong
+      encryption-secret: astringthatisactually32byteslong
     rich-content-service:
       app-host: rce.docker
       cdn-host: null

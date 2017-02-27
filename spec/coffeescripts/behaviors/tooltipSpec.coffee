@@ -2,7 +2,7 @@ define [
   'compiled/behaviors/tooltip'
 ], (tooltip) ->
 
-  module 'tooltip position selection',
+  QUnit.module 'tooltip position selection',
     setup: ->
     teardown: ->
 

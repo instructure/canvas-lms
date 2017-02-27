@@ -4,7 +4,7 @@ define ['compiled/models/Progress'], (Progress) ->
   clock = null
   model = null
 
-  module 'progressable',
+  QUnit.module 'progressable',
     setup: ->
       server = sinon.fakeServer.create()
       clock = sinon.useFakeTimers()

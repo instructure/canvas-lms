@@ -2,6 +2,8 @@ define [
   'jquery'
   'jst/SubmissionDetailsDialog'
   'i18n!submission_details_dialog'
+  'jsx/shared/helpers/numberHelper'
+  'jsx/gradebook/shared/helpers/GradeFormatHelper'
   'compiled/gradebook/GradebookHelpers'
   'compiled/gradebook/Turnitin'
   'jsx/grading/helpers/OutlierScoreHelper'
@@ -14,8 +16,7 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.scrollTo'
   'vendor/jquery.ba-tinypubsub'
-], ($, submissionDetailsDialog, I18n, GradebookHelpers, {extractDataForTurnitin}, OutlierScoreHelper) ->
-
+], ($, submissionDetailsDialog, I18n, numberHelper, GradeFormatHelper, GradebookHelpers, {extractDataForTurnitin}, OutlierScoreHelper) ->
   class SubmissionDetailsDialog
     constructor: (@assignment, @student, @options) ->
       speedGraderUrl = if @options.speed_grader_enabled
@@ -32,6 +33,7 @@ define [
         speedGraderUrl: speedGraderUrl
         loading: true
         showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
+        formattedPointsPossible: I18n.n(@assignment.points_possible)
         shouldShowExcusedOption: true
         isInPastGradingPeriodAndNotAdmin: submission.gradeLocked
       @submission["assignment_grading_type_is_#{@assignment.grading_type}"] = true
@@ -50,8 +52,11 @@ define [
       .delegate '.submission_details_grade_form', 'submit', (event) =>
         event.preventDefault()
         formData = $(event.currentTarget).getFormData()
-        if formData["submission[posted_grade]"].toUpperCase() == "EX"
+        rawGrade = formData["submission[posted_grade]"]
+        if rawGrade.toUpperCase() == "EX"
           formData = {"submission[excuse]": true}
+        else
+          formData['submission[posted_grade]'] = GradeFormatHelper.delocalizeGrade(rawGrade)
         $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', formData, (data) =>
           @update(data)
           unless data.excused
@@ -92,7 +97,11 @@ define [
         submission.turnitin = extractDataForTurnitin(submission, "submission_#{submission.id}", @options.context_url)
         for attachment in submission.attachments || []
           attachment.turnitin = extractDataForTurnitin(submission, "attachment_#{attachment.id}", @options.context_url)
-      @submission.grade = "EX" if @submission.excused
+
+      if @submission.excused
+        @submission.grade = "EX"
+      else if @assignment.grading_type in ['points', 'percent']
+        @submission.grade = GradeFormatHelper.formatGrade(@submission.grade)
       @dialog.html(submissionDetailsDialog(@submission))
       @dialog.find('select').trigger('change')
       @scrollCommentsToBottom()

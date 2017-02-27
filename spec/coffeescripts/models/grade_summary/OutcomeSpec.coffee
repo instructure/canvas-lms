@@ -2,7 +2,7 @@ define [
   'compiled/models/grade_summary/Outcome'
 ], (Outcome) ->
 
-  module "Outcome"
+  QUnit.module "Outcome"
 
   test "#status should be mastery if the score equals the mastery points", ->
     outcome = new Outcome({score: 3, mastery_points: 3})

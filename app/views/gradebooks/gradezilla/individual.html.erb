@@ -1,0 +1,28 @@
+<%
+# Copyright (C) 2014 - 2017 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+  css_bundle :screenreader_gradebook
+  js_bundle :screenreader_gradebook
+%>
+<% content_for :page_title, t("Gradezilla: Individual View") %>
+<div style="float: right;">
+  <span data-component="GradebookSelector" data-variant="IndividualGradebook"></span>
+</div>
+<div style="display:none;">
+  <%= render :partial => "shared/message_students" %>
+</div>

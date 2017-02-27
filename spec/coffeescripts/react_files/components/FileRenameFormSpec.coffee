@@ -7,7 +7,7 @@ define [
   'compiled/models/Folder'
 ], (React, ReactDOM, {Simulate}, $, FileRenameForm, Folder) ->
 
-  module 'FileRenameForm',
+  QUnit.module 'FileRenameForm',
     setup: ->
       props =
         fileOptions:

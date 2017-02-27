@@ -241,14 +241,11 @@ describe Quizzes::QuizzesApiController, type: :request do
     end
 
     context "non-existent quiz" do
-      before do
-        @json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/10101",
-                        {:controller=>"quizzes/quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "10101"},
-                        {}, {}, {:expected_status => 404})
-      end
-
       it "should return a not found error message" do
-        expect(@json.inspect).to include "does not exist"
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/10101",
+                       {:controller=>"quizzes/quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "10101"},
+                       {}, {}, {:expected_status => 404})
+        expect(json.inspect).to include "does not exist"
       end
     end
   end
@@ -588,6 +585,13 @@ describe Quizzes::QuizzesApiController, type: :request do
       json = api_update_quiz({}, {'title' => long_title}, :expected_status => 400 )
       expect(json).to have_key 'errors'
       expect(updated_quiz.title).to eq 'title'
+    end
+
+    context 'anonymous_submissions' do
+      it "updates anonymous_submissions" do
+        api_update_quiz({}, {anonymous_submissions: true})
+        expect(updated_quiz.anonymous_submissions).to eq true
+      end
     end
 
     context 'lockdown_browser' do

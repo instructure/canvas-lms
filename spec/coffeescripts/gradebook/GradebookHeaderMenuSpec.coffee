@@ -7,7 +7,7 @@ define [
   'compiled/gradebook/CurveGradesDialog'
 ], ($, _, fakeENV, GradebookHeaderMenu, SetDefaultGradeDialog, CurveGradesDialog) ->
 
-  module 'GradebookHeaderMenu#menuPopupOpenHandler',
+  QUnit.module 'GradebookHeaderMenu#menuPopupOpenHandler',
     setup: ->
       @menuPopupOpenHandler = GradebookHeaderMenu.prototype.menuPopupOpenHandler
       @hideMenuActionsWithUnmetDependencies = @stub()
@@ -38,7 +38,7 @@ define [
     @menuPopupOpenHandler()
     ok @disableUnavailableMenuActions.called
 
-  module 'GradebookHeaderMenu#hideMenuActionsWithUnmetDependencies',
+  QUnit.module 'GradebookHeaderMenu#hideMenuActionsWithUnmetDependencies',
     setup: ->
       fakeENV.setup()
       @hideMenuActionsWithUnmetDependencies = GradebookHeaderMenu.prototype.hideMenuActionsWithUnmetDependencies
@@ -160,7 +160,7 @@ define [
 
     notOk _.contains(@visibleMenuItemNames(@menu), 'reuploadSubmissions')
 
-  module 'GradebookHeaderMenu#disableUnavailableMenuActions',
+  QUnit.module 'GradebookHeaderMenu#disableUnavailableMenuActions',
     setup: ->
       fakeENV.setup({
         GRADEBOOK_OPTIONS: {
@@ -220,7 +220,7 @@ define [
     ok disabledMenuItems[0].getAttribute('aria-disabled')
     ok disabledMenuItems[1].getAttribute('aria-disabled')
 
-  module 'GradebookHeaderMenu#setDefaultGrade',
+  QUnit.module 'GradebookHeaderMenu#setDefaultGrade',
     setup: ->
       fakeENV.setup({
         GRADEBOOK_OPTIONS: {
@@ -270,7 +270,7 @@ define [
       notOk @dialogStub.called
       ok $.flashError.called
 
-  module 'GradebookHeaderMenu#curveGrades',
+  QUnit.module 'GradebookHeaderMenu#curveGrades',
     setup: ->
       fakeENV.setup({
         GRADEBOOK_OPTIONS: {

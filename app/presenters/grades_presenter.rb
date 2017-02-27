@@ -26,7 +26,7 @@ class GradesPresenter
           Rails.cache.fetch(['computed_avg_grade_for', e.course].cache_key) do
             student_enrollments = e.course.student_enrollments.not_fake.preload(:scores)
             current_scores = student_enrollments.group_by(&:user_id).map do |_, enrollments|
-              enrollments.max(&:computed_current_score).computed_current_score
+              enrollments.map(&:computed_current_score).compact.max
             end.compact
             score = (current_scores.sum.to_f * 100.0 / current_scores.length.to_f).round.to_f / 100.0 rescue nil
             {:score => score, :students => current_scores.length }

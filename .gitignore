@@ -33,15 +33,13 @@ app/stylesheets/brandable_css_brands
 /db/*sql
 /exports/
 Gemfile.lock
-Gemfile.lock5
+Gemfile.lock.5
 /log/
 mkmf.log
 /node_modules
 npm-debug.log
 /public/assets/
 /public/dist/
-/public/webpack-dist/
-/public/webpack-dist-optimized/
 /public/doc/api/
 /public/javascripts/compiled/
 /public/javascripts/jst/
@@ -50,9 +48,6 @@ npm-debug.log
 /public/javascripts/**/*.gz
 /public/optimized/
 /public/vendor/tinymce_themes/**/*.gz
-/public/stylesheets_compiled/
-/public/webpack-dist/
-/spec/javascripts/webpack/
 /spec/javascripts/compiled/
 /spec/javascripts/load_tests.js
 /spec/javascripts/requirejs_config.js

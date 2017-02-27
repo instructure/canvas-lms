@@ -26,7 +26,7 @@ define [
     filterText = component.refs.filterText?.getDOMNode()
     [ component, tabAll, tabNotInstalled, tabInstalled, filterText ]
 
-  module 'ExternalApps.AppFilters',
+  QUnit.module 'ExternalApps.AppFilters',
     setup: ->
       @apps = [
         {

@@ -23,12 +23,12 @@ describe "/eportfolios/show" do
   before do
     eportfolio_with_user
     view_portfolio
-    assigns[:category] = @portfolio.eportfolio_categories.create!(:name => "some category")
-    assigns[:categories] = [assigns[:category]]
+    assigns[:category] = category = @portfolio.eportfolio_categories.create!(:name => "some category")
+    assigns[:categories] = [category]
     assigns[:recent_submissions] = []
     assigns[:folders] = []
     assigns[:files] = []
-    assigns[:page] = @portfolio.eportfolio_entries.create!(:name => "some entry", :eportfolio_category => assigns[:category])
+    assigns[:page] = @portfolio.eportfolio_entries.create!(:name => "some entry", :eportfolio_category => category)
   end
 
   it "should render" do
@@ -43,9 +43,9 @@ describe "/eportfolios/show" do
   end
 
   it "should link the user name if @owner_url is set" do
-    assigns[:owner_url] = user_url(@portfolio.user)
+    assigns[:owner_url] = owner_url = user_url(@portfolio.user)
     render "eportfolios/show"
-    expect(view.content_for(:left_side)[assigns[:owner_url]]).not_to be_nil
+    expect(view.content_for(:left_side)[owner_url]).not_to be_nil
     expect(view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/]).not_to be_nil
     expect(view.content_for(:left_side)[/<span [^>]*id="section-tabs-header-subtitle"/]).to be_nil
   end

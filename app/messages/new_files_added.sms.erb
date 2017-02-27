@@ -2,6 +2,6 @@
   <%= polymorphic_url([asset.context, :files]) %>
 <% end -%>
 <%= t('body', '%{count} new files added for %{name}.',
-        :count => data.count,
+        :count => n(data.count),
         :name => asset.context.name) %>
 <%= t('link', 'More info at %{link}', :link => content(:link)) %>

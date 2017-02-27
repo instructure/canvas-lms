@@ -1,6 +1,6 @@
 define ['compiled/util/enrollmentName'], (enrollmentName) ->
 
-  module 'enrollmentName'
+  QUnit.module 'enrollmentName'
 
   test 'it converts a role name to the name', ->
     equal enrollmentName('StudentEnrollment'), 'Student'

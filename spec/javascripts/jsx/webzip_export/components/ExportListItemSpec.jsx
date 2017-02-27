@@ -4,7 +4,7 @@ define([
   'enzyme',
   'jsx/webzip_export/components/ExportListItem',
 ], (React, ReactDOM, enzyme, ExportListItem) => {
-  module('ExportListItem')
+  QUnit.module('ExportListItem')
 
   test('renders the ExportListItem component', () => {
     const props = {

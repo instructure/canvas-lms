@@ -59,12 +59,9 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
     padding: 0 1em 1em;
   }
 
-  body.ic-framed-lti-tool & {
-    padding: 0 $ic-sp*2;
-  }
-
+  body.ic-framed-lti-tool &,
   body.ic-full-screen-lti-tool & {
-    padding: 0;
+    padding: 0 $ic-sp*2;
   }
 }
 

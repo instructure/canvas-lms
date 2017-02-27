@@ -6,12 +6,14 @@ define([
   'jsx/grading/helpers/OutlierScoreHelper',
   'compiled/userSettings',
   'jsx/speed_grader/gradingPeriod',
+  'jsx/shared/helpers/numberHelper',
+  'compiled/util/natcompare',
   'jquery.ajaxJSON'
-], ($, SpeedGrader, SpeedgraderHelpers, fakeENV, OutlierScoreHelper, userSettings, MGP) => {
-  module('SpeedGrader#showDiscussion', {
+], ($, SpeedGrader, SpeedgraderHelpers, fakeENV, OutlierScoreHelper, userSettings, MGP, numberHelper, natcompare) => {
+  QUnit.module('SpeedGrader#showDiscussion', {
     setup () {
       fakeENV.setup();
-      this.spy($, 'ajaxJSON');
+      this.stub($, 'ajaxJSON');
       this.spy($.fn, 'append');
       this.originalWindowJSONData = window.jsonData;
       window.jsonData = {
@@ -96,7 +98,7 @@ define([
   });
 
   let commentRenderingOptions;
-  module('SpeedGrader#renderComment', {
+  QUnit.module('SpeedGrader#renderComment', {
     setup () {
       fakeENV.setup();
       this.originalWindowJSONData = window.jsonData;
@@ -128,6 +130,62 @@ define([
             submission_id: 1,
             teacher_only_comment: false,
             updated_at: '2016-07-12T23:47:34Z'
+          }, {
+            group_comment_id: null,
+            anonymous: false,
+            assessment_request_id: null,
+            attachment_ids: '',
+            cached_attachments: [{
+              attachment: {
+                cloned_item_id: null,
+                content_type: 'video/mp4',
+                context_id: 1,
+                context_type: 'Assignment',
+                could_be_locked: null,
+                created_at: '2017-01-23T22:23:11Z',
+                deleted_at: null,
+                display_name: 'SampleVideo_1280x720_1mb (1).mp4',
+                encoding: null,
+                file_state: 'available',
+                filename: 'SampleVideo_1280x720_1mb.mp4',
+                folder_id: null,
+                id: 21,
+                last_lock_at: null,
+                last_unlock_at: null,
+                lock_at: null,
+                locked: false,
+                md5: 'd55bddf8d62910879ed9f605522149a8',
+                media_entry_id: 'maybe',
+                migration_id: null,
+                modified_at: '2017-01-23T22:23:11Z',
+                namespace: '_localstorage_/account_1',
+                need_notify: null,
+                position: null,
+                replacement_attachment_id: null,
+                root_attachment_id: 19,
+                size: 1055736,
+                unlock_at: null,
+                updated_at: '2017-01-23T22:23:11Z',
+                upload_error_message: null,
+                usage_rights_id: null,
+                user_id: 1,
+                uuid: 'zR4YRxttAe8Aw53vmcOmUWCGq8g443Mqb8dr7IsJ',
+                viewed_at: null,
+                workflow_state: 'processed'
+              }
+            }],
+            author_id: 1000,
+            author_name: 'neil@instructure.com',
+            comment: 'test',
+            context_id: 1,
+            context_type: 'Course',
+            created_at: '2016-07-13T23:47:34Z',
+            hidden: false,
+            id: 12,
+            posted_at: 'Jul 12 at 5:47pm',
+            submission_id: 1,
+            teacher_only_comment: false,
+            updated_at: '2016-07-13T23:47:34Z'
           }]
         }
       };
@@ -159,6 +217,12 @@ define([
         </div>
       `;
 
+      const commentAttachmentBlank = `
+        <div class="comment_attachment" id="comment_attachment_blank" style="display: none;">
+          <a href="example.com/{{ submitter_id }}/{{ id }}/{{ comment_id }}"><span class="display_name">&nbsp;</span></a>
+        </div>
+      `;
+
       const gradeContainerHtml = `
         <div id="grade_container">
           <a class="update_submission_grade_url" href="my_url.com" title="POST"></a>
@@ -171,7 +235,7 @@ define([
 
       $('#fixtures').html(gradeContainerHtml);
 
-      commentRenderingOptions = { commentBlank: $(commentBlankHtml) };
+      commentRenderingOptions = { commentBlank: $(commentBlankHtml), commentAttachmentBlank: $(commentAttachmentBlank) };
     },
 
     teardown () {
@@ -187,6 +251,14 @@ define([
     const commentText = renderedComment.find('span.comment').text();
 
     equal(commentText, 'test');
+  });
+
+  test('renderComment renders a comment with an attachment', () => {
+    const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[1];
+    const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
+    const commentText = renderedComment.find('.comment_attachment a').text();
+
+    equal(commentText, 'SampleVideo_1280x720_1mb (1).mp4');
   });
 
   test('renderComment should add the comment text to the delete link for screenreaders', () => {
@@ -206,10 +278,10 @@ define([
     equal(submitLinkScreenreaderText, 'Submit comment: test');
   });
 
-  module('SpeedGrader#handleGradeSubmit', {
+  QUnit.module('SpeedGrader#handleGradeSubmit', {
     setup () {
       fakeENV.setup();
-      this.spy($, 'ajaxJSON');
+      this.stub($, 'ajaxJSON');
       this.spy($.fn, 'append');
       this.originalWindowJSONData = window.jsonData;
       window.jsonData = {
@@ -310,10 +382,10 @@ define([
   });
 
   let $div = null;
-  module('loading a submission Preview', {
+  QUnit.module('loading a submission Preview', {
     setup() {
       fakeENV.setup();
-      this.spy($, 'ajaxJSON');
+      this.stub($, 'ajaxJSON');
       $div = $("<div id='iframe_holder'>not empty</div>")
       $("#fixtures").html($div)
     },
@@ -328,7 +400,7 @@ define([
     ok(typeof SpeedGrader.EG.loadSubmissionPreview === 'function');
   })
 
-  module('resizeImg', {
+  QUnit.module('resizeImg', {
     setup () {
       fakeENV.setup();
       $div = $("<div id='iframe_holder'><iframe src='about:blank'></iframe></div>");
@@ -355,10 +427,10 @@ define([
     notEqual($body.find('img').attr('style'), 'max-width: 100vw; max-height: 100vh;');
   });
 
-  module('emptyIframeHolder', {
+  QUnit.module('emptyIframeHolder', {
     setup() {
       fakeENV.setup();
-      this.spy($, 'ajaxJSON');
+      this.stub($, 'ajaxJSON');
       $div = $("<div id='iframe_holder'>not empty</div>")
       $("#fixtures").html($div)
     },
@@ -378,10 +450,10 @@ define([
     ok($div.is(':empty'));
   });
 
-  module('renderLtiLaunch', {
+  QUnit.module('renderLtiLaunch', {
     setup() {
       fakeENV.setup();
-      this.spy($, 'ajaxJSON');
+      this.stub($, 'ajaxJSON');
       $div = $("<div id='iframe_holder'>not empty</div>")
       $("#fixtures").html($div)
     },
@@ -413,7 +485,7 @@ define([
     equal(fullscreenAttr, "true");
   })
 
-  module('speed_grader#getGradeToShow');
+  QUnit.module('speed_grader#getGradeToShow');
 
   test('returns an empty string if submission is null', () => {
     let grade = SpeedGrader.EG.getGradeToShow(null, 'some_role');
@@ -475,7 +547,7 @@ define([
     equal(grade, '15');
   });
 
-  module('speed_grader#getStudentNameAndGrade');
+  QUnit.module('speed_grader#getStudentNameAndGrade');
 
   test('returns name and status', () => {
     let result = SpeedGrader.EG.getStudentNameAndGrade();
@@ -489,7 +561,7 @@ define([
     equal(result, 'Student 6 - not graded');
   });
 
-  module('handleSubmissionSelectionChange', {
+  QUnit.module('handleSubmissionSelectionChange', {
     setup() {
       fakeENV.setup();
       this.originalWindowJSONData = window.jsonData;
@@ -544,5 +616,145 @@ define([
     sinon.stub(MGP, 'assignmentClosedForStudent').returns(false);
     SpeedGrader.EG.handleSubmissionSelectionChange();
     ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, "bar"));
-  })
+  });
+
+  QUnit.module('SpeedGrader#isGradingTypePercent', {
+    setup () {
+      fakeENV.setup();
+    },
+    teardown () {
+      fakeENV.teardown();
+    }
+  });
+
+  test('should return true when grading type is percent', () => {
+    ENV.grading_type = 'percent';
+    const result = SpeedGrader.EG.isGradingTypePercent();
+    ok(result);
+  });
+
+  test('should return false when grading type is not percent', () => {
+    ENV.grading_type = 'foo';
+    const result = SpeedGrader.EG.isGradingTypePercent();
+    notOk(result);
+  });
+
+  QUnit.module('SpeedGrader#shouldParseGrade', {
+    setup () {
+      fakeENV.setup();
+    },
+    teardown () {
+      fakeENV.teardown();
+    }
+  });
+
+  test('should return true when grading type is percent', () => {
+    ENV.grading_type = 'percent';
+    const result = SpeedGrader.EG.shouldParseGrade();
+    ok(result);
+  });
+
+  test('should return true when grading type is points', () => {
+    ENV.grading_type = 'points';
+    const result = SpeedGrader.EG.shouldParseGrade();
+    ok(result);
+  });
+
+  test('should return false when grading type is neither percent nor points', () => {
+    ENV.grading_type = 'foo';
+    const result = SpeedGrader.EG.shouldParseGrade();
+    notOk(result);
+  });
+
+  QUnit.module('SpeedGrader#formatGradeForSubmission', {
+    setup () {
+      fakeENV.setup();
+      this.stub(numberHelper, 'parse').returns(42);
+    },
+
+    teardown () {
+      fakeENV.teardown();
+    }
+  });
+
+  test('should call numberHelper#parse if grading type is points', () => {
+    ENV.grading_type = 'points';
+    const result = SpeedGrader.EG.formatGradeForSubmission('1,000');
+    equal(numberHelper.parse.callCount, 1);
+    strictEqual(result, '42');
+  });
+
+  test('should call numberHelper#parse if grading type is a percentage', () => {
+    ENV.grading_type = 'percent';
+    const result = SpeedGrader.EG.formatGradeForSubmission('75%');
+    equal(numberHelper.parse.callCount, 1);
+    strictEqual(result, '42%')
+  });
+
+  test('should not call numberHelper#parse if grading type is neither points nor percentage', () => {
+    ENV.grading_type = 'foo';
+    const result = SpeedGrader.EG.formatGradeForSubmission('A');
+    ok(numberHelper.parse.notCalled);
+    equal(result, 'A');
+  });
+
+  QUnit.module('Function returned by SpeedGrader#compareStudentsBy', {
+    setup () {
+      this.spy(natcompare, 'strings');
+    }
+  });
+
+  test('returns 1 when the given function returns false for the first student and non-false for the second', () => {
+    const studentA = { sortable_name: 'b' };
+    const studentB = { sortable_name: 'a' };
+    const stub = sinon.stub().returns(false, 'foo');
+    const compare = SpeedGrader.EG.compareStudentsBy(stub);
+    strictEqual(compare(studentA, studentB), 1);
+  });
+
+  test('returns 1 when the given function returns a greater value for the first student than the second', () => {
+    const studentA = { sortable_name: 'b' };
+    const studentB = { sortable_name: 'a' };
+    const stub = sinon.stub();
+    stub.onFirstCall().returns(2);
+    stub.onSecondCall().returns(1);
+    const compare = SpeedGrader.EG.compareStudentsBy(stub);
+    strictEqual(compare(studentA, studentB), 1);
+  });
+
+  test('returns -1 when the given function returns a lesser value for the first student than the second', () => {
+    const studentA = { sortable_name: 'b' };
+    const studentB = { sortable_name: 'a' };
+    const stub = sinon.stub();
+    stub.onFirstCall().returns(1);
+    stub.onSecondCall().returns(2);
+    const compare = SpeedGrader.EG.compareStudentsBy(stub);
+    strictEqual(compare(studentA, studentB), -1);
+  });
+
+  test('compares student sortable names when given function returns falsey for both students', () => {
+    const studentA = { sortable_name: 'b' };
+    const studentB = { sortable_name: 'a' };
+    const compare = SpeedGrader.EG.compareStudentsBy(() => false);
+    const order = compare(studentA, studentB);
+    equal(natcompare.strings.callCount, 1);
+    ok(natcompare.strings.calledWith(studentA.sortable_name, studentB.sortable_name));
+    equal(order, 1);
+  });
+
+  test('compares student sortable names when given function returns equal values for both students', () => {
+    const studentA = { sortable_name: 'b' };
+    const studentB = { sortable_name: 'a' };
+    let compare = SpeedGrader.EG.compareStudentsBy(() => 42);
+    let order = compare(studentA, studentB);
+    equal(natcompare.strings.callCount, 1);
+    ok(natcompare.strings.calledWith(studentA.sortable_name, studentB.sortable_name));
+    equal(order, 1);
+
+    compare = SpeedGrader.EG.compareStudentsBy(() => 'foo');
+    order = compare(studentA, studentB);
+    equal(natcompare.strings.callCount, 2);
+    ok(natcompare.strings.calledWith(studentA.sortable_name, studentB.sortable_name));
+    equal(order, 1);
+  });
 });

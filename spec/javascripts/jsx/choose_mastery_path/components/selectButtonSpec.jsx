@@ -4,7 +4,7 @@ define([
   'jsx/choose_mastery_path/components/select-button',
 ], (React, TestUtils, SelectButton) => {
 
-  module('Select Button')
+  QUnit.module('Select Button')
 
   const defaultProps = () => ({
     isSelected: false,

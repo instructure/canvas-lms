@@ -78,8 +78,8 @@
 #     }
 #
 class CommunicationChannelsController < ApplicationController
-  before_filter :require_user, :only => [:create, :destroy]
-  before_filter :reject_student_view_student
+  before_action :require_user, :only => [:create, :destroy]
+  before_action :reject_student_view_student
 
   include Api::V1::CommunicationChannel
 

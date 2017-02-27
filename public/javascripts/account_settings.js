@@ -173,10 +173,11 @@ define([
       '#account_settings_sis_syncing_value, ' +
       '#account_settings_sis_default_grade_export_value').change(function () {
         var $myFieldset = $('#'+ $(this).attr('id') + '_settings');
-        var iAmChecked = $(this).attr('checked');
+        var iAmChecked = $(this).prop('checked');
       $myFieldset.showIf(iAmChecked);
       if (!iAmChecked) {
-        $myFieldset.find("input,textarea").val("");
+        $myFieldset.find(":text").val("");
+        $myFieldset.find(":checkbox").prop("checked", false);
       }
     }).change();
 

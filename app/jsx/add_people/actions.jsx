@@ -39,7 +39,8 @@ define([
     dispatch(actions.validateUsersStart());
     const state = getState();
     const courseId = state.courseParams.courseId;
-    const users = state.inputParams.nameList;
+    // split on a newline or comma, stripping surrounding whitespace in the process
+    const users = state.inputParams.nameList.trim().split(/\s*[\n,]\s*/);
     const searchType = state.inputParams.searchType;
     api.validateUsers({ courseId, users, searchType })
       .then((res) => {
@@ -60,6 +61,7 @@ define([
     dispatch(actions.createUsersStart());
     const state = getState();
     const courseId = state.courseParams.courseId;
+    const inviteUsersURL = state.courseParams.inviteUsersURL;
 
     const newUsers = resolveValidationIssues(
       state.userValidationResult.duplicates,
@@ -71,7 +73,7 @@ define([
     // and the list of users to be created
     const usersToBeCreated = newUsers.usersToBeCreated;
 
-    api.createUsers({ courseId, users: usersToBeCreated })
+    api.createUsers({ courseId, users: usersToBeCreated, inviteUsersURL })
       .then((res) => {
         dispatch(actions.createUsersSuccess(res.data));
         // merge in the newly created users

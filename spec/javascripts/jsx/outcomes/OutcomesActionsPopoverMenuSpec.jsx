@@ -1,9 +1,9 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jsx/outcomes/OutcomesActionsPopoverMenu'
-], (React, ReactDOM, OutcomesActionsPopoverMenu) => {
-  const TestUtils = React.addons.TestUtils;
+], (React, ReactDOM, TestUtils, OutcomesActionsPopoverMenu) => {
   const Simulate = TestUtils.Simulate;
 
   const fixtures = document.getElementById('fixtures');
@@ -11,7 +11,7 @@ define([
     contextUrlRoot: "test"
   };
 
-  module("OutcomesActionsPopoverMenu", {
+  QUnit.module("OutcomesActionsPopoverMenu", {
     renderComponent(props = {}) {
       let attrs = Object.assign({}, defaultProps, props);
       const element = React.createElement(OutcomesActionsPopoverMenu, attrs);

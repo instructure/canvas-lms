@@ -82,7 +82,7 @@ module SpeedGraderCommon
     # move onto next student
     direction = direction_string.equal?(:next) ? 1 : -1
     new_index = (current_index + direction) % @students.length
-    student_x_of_x_string = "Student #{new_index + 1} of #{@students.length}"
+    student_x_of_x_string = "#{new_index + 1}/#{@students.length}"
 
     Speedgrader.selected_student.text.include?(@students[new_index].name) &&
         Speedgrader.student_x_of_x_label.text.include?(student_x_of_x_string)

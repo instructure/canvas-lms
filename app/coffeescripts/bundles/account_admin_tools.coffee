@@ -77,7 +77,7 @@ require [
     collection: messages
 
     # Render tabs
-  @app = new AdminToolsView
+  app = new AdminToolsView
     el: "#admin-tools-app"
     tabs:
       courseRestore: ENV.PERMISSIONS.restore_course
@@ -93,4 +93,4 @@ require [
                               permissions: ENV.PERMISSIONS.logging
                               users: loggingUsers
 
-  @app.render()
+  app.render()

@@ -18,8 +18,8 @@
 
 # @API Assignment Groups
 class AssignmentGroupsApiController < ApplicationController
-  before_filter :require_context
-  before_filter :get_assignment_group, :except => [:create]
+  before_action :require_context
+  before_action :get_assignment_group, :except => [:create]
 
   include Api::V1::AssignmentGroup
 

@@ -21,6 +21,10 @@
           <i class="icon-mini-arrow-down"></i>
           {{name}}
         </a>
+        {{#if hasIntegrationData}}
+          <i class="icon-sis-imported" aria-hidden="true" title='{{#t}}Imported from SIS{{/t}}'></i>
+          <span class="screenreader-only">{{#t}}Imported from SIS{{/t}}</span>
+        {{/if}}
       </h3>
     {{else}}
       <h2 class="ig-header-title">
@@ -32,9 +36,13 @@
         tabindex="0"
         href="#"
         >
-          <i class="icon-mini-arrow-down"></i>
+          <i class="icon-mini-arrow-down" aria-hidden="true"></i>
           {{name}}
         </a>
+        {{#if hasIntegrationData}}
+          <i class="icon-sis-imported" aria-hidden="true" title='{{#t}}Imported from SIS{{/t}}'></i>
+          <span class="screenreader-only">{{#t}}Imported from SIS{{/t}}</span>
+        {{/if}}
       </h2>
     {{/if}}
 

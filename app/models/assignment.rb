@@ -69,7 +69,6 @@ class Assignment < ActiveRecord::Base
   has_many :ignores, :as => :asset
   has_many :moderated_grading_selections, class_name: 'ModeratedGrading::Selection'
   belongs_to :context, polymorphic: [:course]
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
   belongs_to :grading_standard
   belongs_to :group_category
 
@@ -81,9 +80,11 @@ class Assignment < ActiveRecord::Base
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
   validate :due_date_ok?
+  validate :assignment_overrides_due_date_ok?
   validate :discussion_group_ok?
   validate :positive_points_possible?
   validate :moderation_setting_ok?
+  validate :assignment_name_length_ok?
   validates :lti_context_id, presence: true, uniqueness: true
 
   after_save :clear_effective_due_dates_memo
@@ -144,6 +145,13 @@ class Assignment < ActiveRecord::Base
     AssignmentUtil.due_date_required?(self)
   end
 
+  def max_name_length
+    if AssignmentUtil.assignment_name_length_required?(self)
+      return self.try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value).to_i
+    end
+    Assignment.maximum_string_length
+  end
+
   def secure_params
     body = {}
     body[:lti_assignment_id] = self.lti_context_id || SecureRandom.uuid
@@ -169,15 +177,11 @@ class Assignment < ActiveRecord::Base
     (graded_count > 0) || provisional_grades_exist?
   end
 
-  def moderated_grading_setting_changed?
-    moderated_grading_changed? && moderated_grading.presence != moderated_grading_was.presence
-  end
-
   def moderation_setting_ok?
-    if moderated_grading_setting_changed? && graded_submissions_exist?
+    if moderated_grading_changed? && graded_submissions_exist?
       errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be changed if graded submissions exist")
     end
-    if (moderated_grading_setting_changed? || new_record?) && moderated_grading?
+    if (moderated_grading_changed? || new_record?) && moderated_grading?
       if !graded?
         errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be enabled for ungraded assignments")
       end
@@ -239,7 +243,6 @@ class Assignment < ActiveRecord::Base
   validates_presence_of :context_id, :context_type, :workflow_state
 
   validates_presence_of :title, if: :title_changed?
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :allowed_extensions, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
@@ -285,6 +288,7 @@ class Assignment < ActiveRecord::Base
               :update_submissions_if_details_changed,
               :maintain_group_category_attribute,
               :validate_assignment_overrides
+
 
   after_save  :update_grades_if_details_changed,
               :touch_assignment_group,
@@ -477,7 +481,7 @@ class Assignment < ActiveRecord::Base
       end
     else
       # no due at = all_day and all_day_date are irrelevant
-      return nil, nil
+      return false, nil
     end
   end
 
@@ -808,7 +812,7 @@ class Assignment < ActiveRecord::Base
       result = passed ? "complete" : "incomplete"
     when "letter_grade", "gpa_scale"
       if self.points_possible.to_f > 0.0
-        score = (BigDecimal.new(score.to_s) / BigDecimal.new(points_possible.to_s)).to_f
+        score = (BigDecimal.new(score.to_s.presence || '0.0') / BigDecimal.new(points_possible.to_s)).to_f
         result = grading_standard_or_default.score_to_grade(score * 100)
       elsif given_grade
         # the score for a zero-point letter_grade assignment could be considered
@@ -944,7 +948,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def all_day
-    read_attribute(:all_day) || (self.new_record? && self.due_at && (self.due_at.strftime("%H:%M") == '23:59' || self.due_at.strftime("%H:%M") == '00:00'))
+    read_attribute(:all_day) || (self.new_record? && !!self.due_at && (self.due_at.strftime("%H:%M") == '23:59' || self.due_at.strftime("%H:%M") == '00:00'))
   end
 
   def self.preload_context_module_tags(assignments, include_context_modules: false)
@@ -1545,7 +1549,7 @@ class Assignment < ActiveRecord::Base
 
   def student_needs_provisional_grade?(student, preloaded_counts=nil)
     pg_count = if preloaded_counts
-      preloaded_counts[student.id.to_s] || 0
+      preloaded_counts[CANVAS_RAILS4_2 ? student.id.to_s : student.id] || 0
     else
       self.provisional_grades.not_final.where(:submissions => {:user_id => student}).count
     end
@@ -1628,7 +1632,8 @@ class Assignment < ActiveRecord::Base
     enrollment_priority = { 'active' => 1, 'inactive' => 2 }
     enrollment_priority.default = 100
 
-    reps_and_others = groups_and_ungrouped(user, includes: includes).map do |group_name, group_students|
+    reps_and_others = groups_and_ungrouped(user, includes: includes).map do |group_name, group_info|
+      group_students = group_info[:users]
       visible_group_students =
         group_students & visible_students_for_speed_grader(user, includes: includes)
 
@@ -1644,7 +1649,7 @@ class Assignment < ActiveRecord::Base
 
       representative.readonly!
       representative.name = group_name
-      representative.sortable_name = group_name
+      representative.sortable_name = group_info[:sortable_name]
       representative.short_name = group_name
 
       [representative, others]
@@ -1655,16 +1660,19 @@ class Assignment < ActiveRecord::Base
     if block_given?
       sorted_reps_with_others.each { |r,o| yield r, o }
     end
-    sorted_reps_with_others.map &:first
+    sorted_reps_with_others.map(&:first)
   end
 
   def groups_and_ungrouped(user, includes: [])
     groups_and_users = group_category.
       groups.active.preload(group_memberships: :user).
-      map { |g| [g.name, g.users] }
-    users_in_group = groups_and_users.flat_map { |_,users| users }
+      map { |g| [g.name, { sortable_name: g.name, users: g.users}] }
+    users_in_group = groups_and_users.flat_map { |_, group_info| group_info[:users] }
     groupless_users = visible_students_for_speed_grader(user, includes: includes) - users_in_group
-    phony_groups = groupless_users.map { |u| [u.name, [u]] }
+    phony_groups = groupless_users.map do |u|
+      sortable_name = users_in_group.empty? ? u.sortable_name : u.name
+      [u.name, { sortable_name: sortable_name, users: [u] }]
+    end
     groups_and_users + phony_groups
   end
   private :groups_and_ungrouped
@@ -2298,7 +2306,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.sis_grade_export_enabled?(context)
-    context.feature_enabled?(:post_grades) || Lti::AppLaunchCollator.any?(context, [:post_grades])
+    context.feature_enabled?(:post_grades) ||
+      context.root_account.feature_enabled?(:bulk_sis_grade_export) ||
+      Lti::AppLaunchCollator.any?(context, [:post_grades])
   end
 
   def run_if_overrides_changed!(student_ids=nil)
@@ -2327,5 +2337,25 @@ class Assignment < ActiveRecord::Base
       errors.add(:due_at, I18n.t("due_at", "cannot be blank when Post to Sis is checked"))
     end
   end
-end
 
+  def assignment_overrides_due_date_ok?
+    if AssignmentUtil.due_date_required?(self)
+      if active_assignment_overrides.where(due_at: nil).count > 0
+        errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
+      end
+    end
+  end
+
+  def assignment_name_length_ok?
+    name_length = max_name_length
+
+    # Due to the removal of the multiple `validates_length_of :title` validations we need this nil check
+    # here to act as those validations so we can reduce the number of validations for this attribute
+    # to just one single check
+    return if self.nil? || self.title.nil?
+
+    if self.title.to_s.length > name_length
+      errors.add(:title, I18n.t('The title cannot be longer than %{length} characters', length: name_length))
+    end
+  end
+end

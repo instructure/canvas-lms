@@ -46,6 +46,14 @@ describe Api::V1::Course do
       expect(hash['id']).to be_present
     end
 
+    it "should include course locale" do
+      course_factory
+      @course.locale = 'tlh'
+      @course.save
+      hash = course_json(@course, nil, nil, [], nil)
+      expect(hash['locale']).to eql @course.locale
+    end
+
     it "should include the image when it is asked for and the feature flag is on" do
       course_factory
       @course.enable_feature!('course_card_images')

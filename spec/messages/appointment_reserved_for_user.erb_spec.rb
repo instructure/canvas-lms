@@ -20,6 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'appointment_reserved_for_user' do
+  include MessagesCommon
+
   before :once do
     @user = user_model
     @course = course_model

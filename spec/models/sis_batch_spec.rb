@@ -40,14 +40,11 @@ describe SisBatch do
         end
       end
 
-      old_job_count = sis_jobs.count
       batch = File.open(path, 'rb') do |tmp|
         # arrrgh attachment.rb
         def tmp.original_filename; File.basename(path); end
         SisBatch.create_with_attachment(@account, 'instructure_csv', tmp, @user || user_factory)
       end
-      # SisBatches shouldn't need any background processing
-      expect(sis_jobs.count).to eq old_job_count
       yield batch if block_given?
       batch
     end
@@ -153,7 +150,6 @@ test_1,TC 101,Test Course 101,,term1,deleted
     }
 
     before do
-      expect(@account).to respond_to(:update_account_associations)
       track_jobs { job.reschedule }
     end
 
@@ -250,12 +246,18 @@ s2,test_1,section2,active},
       @previous_batch = @account.sis_batches.create!
       @old_batch = @account.sis_batches.create!
 
-      @c1 = factory_with_protected_attributes(@subacct.courses, :name => "delete me", :enrollment_term => @term1, :sis_batch_id => @previous_batch.id)
+      @c1 = factory_with_protected_attributes(@subacct.courses, name: "delete me", enrollment_term: @term1,
+                                              sis_source_id: 'my_first_course', sis_batch_id: @previous_batch.id)
       @c1.offer!
-      @c2 = factory_with_protected_attributes(@account.courses, :name => "don't delete me", :enrollment_term => @term1, :sis_source_id => 'my_course', :root_account => @account)
+      @c2 = factory_with_protected_attributes(@account.courses, name: "don't delete me", enrollment_term: @term1,
+                                              sis_source_id: 'my_course', root_account: @account)
       @c2.offer!
-      @c3 = factory_with_protected_attributes(@account.courses, :name => "delete me if terms", :enrollment_term => @term2, :sis_batch_id => @previous_batch.id)
+      @c3 = factory_with_protected_attributes(@account.courses, name: "delete me if terms", enrollment_term: @term2,
+                                              sis_source_id: 'my_third_course', sis_batch_id: @previous_batch.id)
       @c3.offer!
+      @c5 = factory_with_protected_attributes(@account.courses, name: "don't delete me cause sis was removed",
+                                              enrollment_term: @term1, sis_batch_id: @previous_batch.id, sis_source_id: nil)
+      @c5.offer!
 
       # initial import of one course, to test courses that haven't changed at all between imports
       process_csv_data([
@@ -265,10 +267,17 @@ another_course,not-delete,not deleted not changed,,term1,active}
       @c4 = @account.courses.where(course_code: 'not-delete').first
 
       # sections are keyed off what term their course is in
-      @s1 = factory_with_protected_attributes(@c1.course_sections, :name => "delete me", :sis_batch_id => @old_batch.id)
-      @s2 = factory_with_protected_attributes(@c2.course_sections, :name => "don't delete me", :sis_source_id => 'my_section')
-      @s3 = factory_with_protected_attributes(@c3.course_sections, :name => "delete me if terms", :sis_batch_id => @old_batch.id)
-      @s4 = factory_with_protected_attributes(@c2.course_sections, :name => "delete me", :sis_batch_id => @old_batch.id) # c2 won't be deleted, but this section should still be
+      @s1 = factory_with_protected_attributes(@c1.course_sections, name: "delete me",
+                                              sis_source_id: 's1', sis_batch_id: @old_batch.id)
+      @s2 = factory_with_protected_attributes(@c2.course_sections, name: "don't delete me",
+                                              sis_source_id: 'my_section')
+      @s3 = factory_with_protected_attributes(@c3.course_sections, name: "delete me if terms",
+                                              sis_source_id: 's3', sis_batch_id: @old_batch.id)
+      # c2 won't be deleted, but this section should still be
+      @s4 = factory_with_protected_attributes(@c2.course_sections, name: "delete me",
+                                              sis_source_id: 's4', sis_batch_id: @old_batch.id)
+      @sn = factory_with_protected_attributes(@c2.course_sections, name: "don't delete me, I've lost my sis",
+                                              sis_source_id: nil, sis_batch_id: @old_batch.id)
 
       # enrollments are keyed off what term their course is in
       @e1 = factory_with_protected_attributes(@c1.enrollments, :workflow_state => 'active', :user => user_factory, :sis_batch_id => @old_batch.id, :type => 'StudentEnrollment')
@@ -301,6 +310,7 @@ s2,test_1,section2,active},
       expect(@c2.reload).to be_available
       expect(@c3.reload).to be_available
       expect(@c4.reload).to be_claimed
+      expect(@c5.reload).to be_available
       @cnew = @account.reload.courses.where(course_code: 'TC 101').first
       expect(@cnew).not_to be_nil
       expect(@cnew.sis_batch_id).to eq @batch.id
@@ -310,6 +320,7 @@ s2,test_1,section2,active},
       expect(@s2.reload).to be_active
       expect(@s3.reload).to be_active
       expect(@s4.reload).to be_deleted
+      expect(@sn.reload).to be_active
       @s5 = @cnew.course_sections.where(sis_source_id: 's2').first
       expect(@s5).not_to be_nil
 

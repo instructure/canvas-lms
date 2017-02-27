@@ -52,10 +52,10 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   include Api::V1::QuizSubmissionQuestion
   include ::Filters::QuizSubmissions
 
-  before_filter :require_user, :require_quiz_submission, :export_scopes
-  before_filter :require_question, only: [ :show, :flag, :unflag ]
-  before_filter :prepare_service, only: [ :answer, :flag, :unflag ]
-  before_filter :validate_ldb_status!, only: [ :answer, :flag, :unflag ]
+  before_action :require_user, :require_quiz_submission, :export_scopes
+  before_action :require_question, only: [ :show, :flag, :unflag ]
+  before_action :prepare_service, only: [ :answer, :flag, :unflag ]
+  before_action :validate_ldb_status!, only: [ :answer, :flag, :unflag ]
 
   # @API Get all quiz submission questions.
   # @beta

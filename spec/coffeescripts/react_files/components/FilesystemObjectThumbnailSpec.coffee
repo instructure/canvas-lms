@@ -8,7 +8,7 @@ define [
   'jsx/files/FilesystemObjectThumbnail'
 ], (React, ReactDOM, TestUtils, File, Folder, FilesystemObject, FilesystemObjectThumbnail) ->
 
-  module 'Filesystem Object Thumbnail: file',
+  QUnit.module 'Filesystem Object Thumbnail: file',
     setup: ->
       file = new File(id: 65, thumbnail_url: "sweet_thumbnail_url")
 
@@ -28,7 +28,7 @@ define [
   test "adds class name from props to the span", ->
     ok $(@thumbnail.getDOMNode()).hasClass("customClassname"), "finds the custom className"
 
-  module 'Filesystem Object Thumbnail: folder',
+  QUnit.module 'Filesystem Object Thumbnail: folder',
     setup: ->
       folder = new Folder(id: 65)
 
@@ -48,7 +48,7 @@ define [
   test "adds on className to i tag if set in props", ->
     ok $(@thumbnail.getDOMNode()).hasClass("customClassname"), "finds the custom className"
 
-  module 'Filesystem Object Thumbnail: other'
+  QUnit.module 'Filesystem Object Thumbnail: other'
 
   test "adds on className to i tag if set in props", ->
     fso = new FilesystemObject(id: 65)
@@ -65,7 +65,7 @@ define [
     clock.restore()
     ReactDOM.unmountComponentAtNode(thumbnail.getDOMNode().parentNode)
 
-  module 'Filesystem Object Thumbnail: checkForThumbnail',
+  QUnit.module 'Filesystem Object Thumbnail: checkForThumbnail',
     setup: ->
       url = "/api/v1/files/65"
       @server = sinon.fakeServer.create()

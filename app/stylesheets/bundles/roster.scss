@@ -44,12 +44,7 @@
   li {
     @include name_bubbles;
     clear: left;
-  }
-}
-
-#edit_sections {
-  a.browser {
-    background: transparent url(/images/messages/context-search-sprite.png) 0 0 no-repeat;
+    margin-top: $ic-sp/2;
   }
 }
 
@@ -62,6 +57,7 @@
     fieldset.peoplesearch__selections {
       margin-right: auto;
       margin-left: auto;
+      margin-top: .5rem;
       text-align: center;
       .peoplesearch__selection {
         text-align: left;
@@ -73,12 +69,12 @@
     .peoplesearch__instructions {
       margin: 1.5em 0;
       text-align: center;
-      i.peoplesearch__icon-user {
+      i.icon-user {
         display:block;
         height: 50px;
         margin: 0 auto;
       }
-      i.peoplesearch__icon-user::before {
+      i.icon-user::before {
         font-size: 48px;
       }
     }

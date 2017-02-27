@@ -36,7 +36,7 @@ define([
       const self = this;
       const toolsUrl = this.getDefinitionsUrl();
       const data = {
-        'placements[]': 'assignment_configuration'
+        'placements[]': 'similarity_detection'
       };
 
       $.ajax({
@@ -62,7 +62,7 @@ define([
           });
         }, self),
         error: function(xhr) {
-          $.flashError(I18n.t('Error retrieving assignment configuration tools'));
+          $.flashError(I18n.t('Error retrieving similarity detection tools'));
         }
       });
     },
@@ -72,7 +72,7 @@ define([
     },
 
     getLaunch(tool) {
-      const url = tool.placements.assignment_configuration.url
+      const url = tool.placements.similarity_detection.url
       let query = '';
       let endpoint = '';
 
@@ -88,7 +88,7 @@ define([
     },
 
     setToolLaunchUrl() {
-      const selector = this.refs.assignmentConfigurationTool;
+      const selector = this.refs.similarityDetectionTool;
       const selectedOption = selector.options[selector.selectedIndex];
       const selectedType = selectedOption.getAttribute('data-type');
 
@@ -100,10 +100,10 @@ define([
 
     renderOptions() {
       return (
-        <select id="assignment_configuration_tool"
-                name="assignmentConfigurationTool"
+        <select id="similarity_detection_tool"
+                name="similarityDetectionTool"
                 onChange={this.setToolLaunchUrl}
-                ref="assignmentConfigurationTool">
+                ref="similarityDetectionTool">
           <option data-launch="none">None</option>
           {
             this.state.tools.map((tool) => {
@@ -141,7 +141,7 @@ define([
       return (
         <div>
           <div className="form-column-left">
-            <label htmlFor="assignment_configuration_tool">
+            <label htmlFor="similarity_detection_tool">
               Plagiarism Review
             </label>
           </div>

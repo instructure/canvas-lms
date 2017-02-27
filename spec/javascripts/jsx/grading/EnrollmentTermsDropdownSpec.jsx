@@ -7,7 +7,7 @@ define([
 ], (React, ReactDOM, {Simulate}, _, Dropdown) => {
   const wrapper = document.getElementById('fixtures');
 
-  module('EnrollmentTermsDropdown', {
+  QUnit.module('EnrollmentTermsDropdown', {
     renderComponent() {
       const props = {
         terms: this.terms(),

@@ -127,8 +127,8 @@ module Api::V1::DiscussionTopics
       end
     end
 
-    if opts[:include_master_course_restrictions]
-      fields.merge!(topic.master_course_api_restriction_data)
+    if opts[:master_course_status]
+      fields.merge!(topic.master_course_api_restriction_data(opts[:master_course_status]))
     end
 
     fields

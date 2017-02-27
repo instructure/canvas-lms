@@ -24,10 +24,6 @@ describe ContextExternalTool do
     @root_account = @course.root_account
     @account = account_model(:root_account => @root_account, :parent_account => @root_account)
     @course.update_attribute(:account, @account)
-    expect(@course.account).to eql(@account)
-    expect(@course.root_account).to eql(@root_account)
-    expect(@account.parent_account).to eql(@root_account)
-    expect(@account.root_account).to eql(@root_account)
   end
 
   describe '#content_migration_configured?' do

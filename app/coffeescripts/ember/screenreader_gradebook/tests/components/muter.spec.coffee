@@ -16,7 +16,7 @@ define [
     equal assignment.muted, fixture.muted, 'muted status'
     equal assignment.id, fixture.id, 'assignment id'
 
-  module 'screenreader_gradebook assignment_muter_component',
+  QUnit.module 'screenreader_gradebook assignment_muter_component',
     setup: ->
       fixtures.create()
       mutedAssignment = fixtures.assignment_groups[0].assignments[1]

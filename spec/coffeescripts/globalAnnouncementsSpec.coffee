@@ -5,7 +5,7 @@ define [
   'jsx/shared/rce/serviceRCELoader'
 ], ($, fakeENV, globalAnnouncements, serviceRCELoader)->
 
-  module "GlobalAnnouncements",
+  QUnit.module "GlobalAnnouncements",
     setup: ->
       fakeENV.setup()
       ENV.RICH_CONTENT_SERVICE_ENABLED = true

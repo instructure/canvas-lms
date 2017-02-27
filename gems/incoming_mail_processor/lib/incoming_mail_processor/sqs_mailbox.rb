@@ -75,7 +75,8 @@ module IncomingMailProcessor
     private
 
     def raw_contents(msg)
-      sns_body = JSON.parse(msg.body)
+      sqs_body = JSON.parse(msg.body)
+      sns_body = JSON.parse(sqs_body['Message'])
       key = sns_body['mail']['messageId']
       s3 = Aws::S3::Resource.new(access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key],
         region: config[:region] || 'us-east-1')

@@ -2,9 +2,9 @@
 # Should be removed once firefox fixes the issue and is used in production version of firefox.
 define [
   'jquery'
-  'jquery.instructure_forms'
   'i18n!firefox_fix'
-], ($) ->
+  'jquery.instructure_forms'
+], ($, I18n) ->
 
   onChangeHandler = (e) ->
     numInput = $(e.target)

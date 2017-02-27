@@ -123,7 +123,7 @@ class Attachment < ActiveRecord::Base
   has_attachment(
       :storage => self.store_type.key,
       :path_prefix => file_store_config['path_prefix'],
-      :s3_access => :private,
+      :s3_access => 'private',
       :thumbnails => { :thumb => '128x128' },
       :thumbnail_class => 'Thumbnail'
   )
@@ -654,7 +654,7 @@ class Attachment < ActiveRecord::Base
     end
 
     if method == :overwrite
-      atts = self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id)
+      atts = self.shard.activate { self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id) }
       method = :rename if atts.any? { |att| att.editing_restricted?(:any) }
     end
 
@@ -900,11 +900,11 @@ class Attachment < ActiveRecord::Base
   end
 
   def download_url(ttl = url_ttl)
-    authenticated_s3_url(expires: ttl, response_content_disposition: "attachment; " + disposition_filename)
+    authenticated_s3_url(expires_in: ttl, response_content_disposition: "attachment; " + disposition_filename)
   end
 
   def inline_url(ttl = url_ttl)
-    authenticated_s3_url(expires: ttl, response_content_disposition: "inline; " + disposition_filename)
+    authenticated_s3_url(expires_in: ttl, response_content_disposition: "inline; " + disposition_filename)
   end
 
   def url_ttl
@@ -943,10 +943,9 @@ class Attachment < ActiveRecord::Base
     super(name)
   end
 
-  def thumbnail_with_root_attachment
-    self.thumbnail_without_root_attachment || self.root_attachment.try(:thumbnail)
+  def thumbnail
+    super || root_attachment.try(:thumbnail)
   end
-  alias_method_chain :thumbnail, :root_attachment
 
   def content_directory
     self.directory_name || Folder.root_folders(self.context).first.name
@@ -1603,7 +1602,12 @@ class Attachment < ActiveRecord::Base
         attachment.filename ||= File.basename(uri.path)
         attachment.uploaded_data = tmpfile
         if attachment.content_type.blank? || attachment.content_type == "unknown/unknown"
-          attachment.content_type = http_response.content_type
+          # uploaded_data= clobbers the content_type set in preflight; if it was given, prefer it to the HTTP response
+          attachment.content_type = if attachment.content_type_was.present? && attachment.content_type_was != 'unknown/unknown'
+            attachment.content_type_was
+          else
+            http_response.content_type
+          end
         end
         return attachment
       else

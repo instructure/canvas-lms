@@ -11,7 +11,6 @@ describe "admin settings tab" do
 
   def get_settings_page(account)
     get "/accounts/#{account.id}/settings"
-    wait_for_ajaximations
   end
 
   def set_checkbox(id,checked)
@@ -32,14 +31,9 @@ describe "admin settings tab" do
   end
 
   def click_submit
-    f("#account_settings button[type=submit]").click
-    wait_for_ajaximations
-  end
-
-  def go_to_feature_options(account)
-    get_settings_page(account)
-    f("#tab-features-link").click
-    wait_for_ajaximations
+    expect_new_page_load do
+      f("#account_settings button[type=submit]").click
+    end
   end
 
   context "SIS Agent Token Authentication" do
@@ -53,13 +47,9 @@ describe "admin settings tab" do
       expect(f("#add_sis_app_token")).to be_displayed
       expect(f("#account_settings_sis_app_token")).to be_displayed
       f("#account_settings_sis_app_token").send_keys(sis_token)
-      f(".Button--primary").click
+      click_submit
       token = f("#account_settings_sis_app_token")
       expect(token).to have_value(sis_token)
-
-      account.disable_feature!(:post_grades)
-      refresh_page
-      expect(f("#account_settings")).to contain_css("#account_settings_sis_app_token")
     end
 
     it "should test SIS Agent Token Authentication with post_grades feature disabled", priority: "2", test_id: 132578 do
@@ -68,13 +58,9 @@ describe "admin settings tab" do
       expect(f("#add_sis_app_token")).to be_displayed
       expect(f("#account_settings_sis_app_token")).to be_displayed
       f("#account_settings_sis_app_token").send_keys(sis_token)
-      f(".Button--primary").click
+      click_submit
       token = f("#account_settings_sis_app_token")
       expect(token).to have_value(sis_token)
-
-      account.disable_feature!(:post_grades)
-      refresh_page
-      expect(f("#account_settings")).to contain_css("#account_settings_sis_app_token")
     end
   end
 
@@ -101,14 +87,15 @@ describe "admin settings tab" do
     context ":new_sis_integrations => false" do
       before do
         account.set_feature_flag! :new_sis_integrations, 'off'
-        get_settings_page(account)
       end
 
       it "persists SIS import settings on refresh" do
+        get_settings_page(account)
         test_checkbox_on_off(allow_sis_import)
       end
 
       it "does not display SIS syncing setting" do
+        get_settings_page(account)
         expect(f("body")).not_to contain_css(sis_syncing)
       end
 
@@ -151,32 +138,30 @@ describe "admin settings tab" do
     context ":new_sis_integrations => true (root account)" do
       before do
         account.set_feature_flag! :new_sis_integrations, 'on'
-        get_settings_page(account)
       end
 
       it "should persist custom SIS name" do
+        get_settings_page(account)
         custom_sis_name = "PowerSchool"
         f(sis_name).send_keys(custom_sis_name)
-        f(".Button--primary").click
-        name = f(sis_name)
-        keep_trying_until do
-          expect(name.attribute("value")).to eq custom_sis_name
-        end
         click_submit
-        expect(name.attribute("value")).to eq(custom_sis_name)
+        expect(f(sis_name)).to have_value(custom_sis_name)
       end
 
       it "persists SIS import settings on refresh" do
+        get_settings_page(account)
         test_checkbox_on_off(allow_sis_import)
       end
 
       context "persists SIS syncing settings on refresh" do
         before do
           account.set_feature_flag! 'post_grades', 'on'
-          get_settings_page(account)
         end
 
-        it { test_checkbox_on_off(sis_syncing) }
+        it do
+          get_settings_page(account)
+          test_checkbox_on_off(sis_syncing)
+        end
 
         context "SIS syncing => true" do
           before do
@@ -187,31 +172,22 @@ describe "admin settings tab" do
 
           it { test_checkbox_on_off(sis_syncing_locked) }
           it "toggles require assignment due date" do
-             set_checkbox_via_label(default_grade_export,true)
-             click_submit
-             test_checkbox_on_off(require_assignment_due_date)
+            set_checkbox_via_label(default_grade_export,true)
+            test_checkbox_on_off(require_assignment_due_date)
           end
 
           it "toggles assignment name length" do
             set_checkbox_via_label(default_grade_export,true)
-            click_submit
             test_checkbox_on_off(assignment_name_length)
           end
 
           it "should test sis assignment name length" do
             set_checkbox_via_label(default_grade_export,true)
-            click_submit
             set_checkbox_via_label(assignment_name_length,true)
-            click_submit
             name_length = 123
             f("#account_settings_sis_assignment_name_length_input_value").send_keys(name_length)
-            f(".Button--primary").click
-            length = f("#account_settings_sis_assignment_name_length_input_value")
-            keep_trying_until do
-              expect(length.attribute("value")).to eq name_length.to_s
-            end
-            refresh_page
-            expect(length.attribute("value")).to eq(name_length.to_s)
+            click_submit
+            expect(f("#account_settings_sis_assignment_name_length_input_value")).to have_value(name_length.to_s)
           end
         end
       end

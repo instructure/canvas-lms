@@ -35,6 +35,13 @@ describe AssignmentGroup do
     expect(AssignmentGroup).to be_respond_to(:acts_as_list)
   end
 
+  it "should convert NaN group weight values to 0 on save" do
+    ag = @course.assignment_groups.create!(@valid_attributes)
+    ag.group_weight = 0/0.0
+    ag.save!
+    expect(ag.group_weight).to eq 0
+  end
+
   context "visible assignments" do
     before(:each) do
       @ag = @course.assignment_groups.create!(@valid_attributes)

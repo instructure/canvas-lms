@@ -3,7 +3,7 @@ define [
   'underscore'
   'compiled/xhr/RemoteSelect'
 ], ($, _, RemoteSelect) ->
-  module 'RemoteSelect',
+  QUnit.module 'RemoteSelect',
     setup: ->
       @response = [200, { 'Content-Type': 'application/json' }, '[{ "label": "one", "value": 1 }, {"label": "two", "value": 2 }]']
       @el       = $('<select id="test-select"></select>').appendTo('#fixtures')

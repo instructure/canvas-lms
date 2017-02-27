@@ -23,7 +23,8 @@ module AdheresToPolicy
 
     # Public: Gets the cached object with the provided key.  Will call the block
     #         if the key does not exist in the cache and store that returned value
-    #         from the block into the cache.
+    #         from the block into the cache, along with how it got the value
+    #         (:in_proc, :out_of_proc, :generated)
     #
     # key - The key to use for the cached object.
     # block - The block to call to get the value to write to the cache.
@@ -31,21 +32,22 @@ module AdheresToPolicy
     # Examples
     #
     #   fetch(:key) { 'value' }
-    #   # => 'value'
+    #   # => ['value', :in_proc]
     #
     # Returns the value of the cached object from the key.
     def self.fetch(key)
-      return yield unless key
+      return [yield, :bypass_generated] unless key
 
-      value = self.read(key)
+      value, how_it_got_it = self.read(key)
       if value.nil?
         if block_given?
+          how_it_got_it = :generated
           value = yield
           self.write(key, value)
         end
       end
 
-      value
+      [value, how_it_got_it]
     end
 
     # Public: Writes an object to the cache with the provided key.  This also
@@ -84,10 +86,11 @@ module AdheresToPolicy
       return unless key
 
       @cache ||= {}
-      if @cache.has_key?(key)
-        @cache[key]
+      if @cache.key?(key)
+        [@cache[key], :in_proc]
       else
-        @cache[key] = Rails.cache.read(key)
+        result = @cache[key] = Rails.cache.read(key)
+        [result, :out_of_proc]
       end
     end
 

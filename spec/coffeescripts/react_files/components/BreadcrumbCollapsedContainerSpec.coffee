@@ -6,13 +6,13 @@ define [
   'jsx/files/BreadcrumbCollapsedContainer'
   'compiled/models/Folder'
   'compiled/react_files/modules/filesEnv'
-  '../mockFilesENV'
-  '../../helpers/stubRouterContext'
+  '../mockFilesENV' + (if window.USE_WEBPACK then '.coffee' else '')
+  '../../helpers/stubRouterContext' + (if window.USE_WEBPACK then '.coffee' else '')
 ], ($, React, ReactDOM, TestUtils, BreadcrumbCollapsedContainer, Folder, filesEnv, mockFilesENV, stubRouterContext) ->
   simulate = TestUtils.Simulate
   simulateNative = TestUtils.SimulateNative
 
-  module 'BreadcrumbsCollapsedContainer',
+  QUnit.module 'BreadcrumbsCollapsedContainer',
     setup: ->
       folder = new Folder(name: 'Test Folder', urlPath: 'test_url', url: 'stupid')
       folder.url = -> "stupid"

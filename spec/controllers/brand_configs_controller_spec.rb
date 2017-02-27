@@ -117,7 +117,7 @@ describe BrandConfigsController do
 
     it 'should return an existing brand config' do
       user_session(admin)
-      post 'create', account_id: @account.id, brand_config: { 
+      post 'create', account_id: @account.id, brand_config: {
         variables: {
           "ic-brand-primary" => "#321"
         }
@@ -130,7 +130,8 @@ describe BrandConfigsController do
     it 'should upload a js file successfully' do
       user_session(admin)
       tf = Tempfile.new('test.js')
-      uf = ActionDispatch::Http::UploadedFile.new(tempfile: tf)
+      tf.write("test")
+      uf = ActionDispatch::Http::UploadedFile.new(tempfile: tf, filename: 'test.js')
       post 'create', account_id: @account.id, brand_config: bcin, js_overrides: uf
       assert_status(200)
       json = JSON.parse(response.body)

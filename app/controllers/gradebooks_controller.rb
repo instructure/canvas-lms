@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2017 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -25,13 +25,13 @@ class GradebooksController < ApplicationController
   include Api::V1::CustomGradebookColumn
   include Api::V1::Section
 
-  before_filter :require_context
-  before_filter :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary]
+  before_action :require_context
+  before_action :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary]
 
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
 
   add_crumb(proc { t '#crumbs.grades', "Grades" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
-  before_filter { |c| c.active_tab = "grades" }
+  before_action { |c| c.active_tab = "grades" }
 
   MAX_POST_GRADES_TOOLS = 10
 
@@ -202,13 +202,24 @@ class GradebooksController < ApplicationController
       @post_grades_tools = post_grades_tools
 
       version = @current_user.preferred_gradebook_version
-      if version == '2'
-        render :gradebook and return
-      elsif version == "gradezilla" && @context.root_account.feature_enabled?(:gradezilla)
-        render :gradezilla and return
-      elsif version == "srgb"
-        render :screenreader and return
+      if @context.root_account.feature_enabled?(:gradezilla)
+        # params[:version] is a temporary gradezilla feature to help devs flip back and forth
+        # between gradebook versions. This param should never be used in the UI.
+        case params[:version]
+        when 'srgb'
+          render :screenreader and return
+        when '2'
+          render :gradebook and return
+        when 'gradezilla-individual'
+          render 'gradebooks/gradezilla/individual' and return
+        when 'gradezilla-gradebook'
+          render 'gradebooks/gradezilla/gradebook' and return
+        else # fallback to the current user's preferences hash
+          render 'gradebooks/gradezilla/individual' and return if version == 'individual'
+          render 'gradebooks/gradezilla/gradebook' and return
+        end
       else
+        render :screenreader and return if version == 'srgb'
         render :gradebook and return
       end
     end
@@ -317,6 +328,7 @@ class GradebooksController < ApplicationController
                  end
     js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
     js_env GRADEBOOK_OPTIONS: {
+      gradezilla: @context.root_account.feature_enabled?(:gradezilla),
       chunk_size: chunk_size,
       assignment_groups_url: api_v1_course_assignment_groups_url(
         @context,
@@ -362,6 +374,8 @@ class GradebooksController < ApplicationController
       course_is_concluded: @context.completed?,
       course_name: @context.name,
       gradebook_is_editable: @gradebook_is_editable,
+      context_allows_gradebook_uploads: @context.allows_gradebook_uploads?,
+      gradebook_import_url: new_course_gradebook_upload_path(@context),
       setting_update_url: api_v1_course_settings_url(@context),
       show_total_grade_as_points: @context.settings[:show_total_grade_as_points],
       publish_to_sis_enabled: @context.allows_grade_publishing_by(@current_user) && @gradebook_is_editable,
@@ -394,6 +408,7 @@ class GradebooksController < ApplicationController
       sections: sections_json(@context.active_course_sections, @current_user, session),
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
       settings: @current_user.preferences.fetch(:gradebook_settings, {}).fetch(@context.id, {}),
+      version: params.fetch(:version, nil)
     }
   end
 
@@ -590,7 +605,10 @@ class GradebooksController < ApplicationController
           :settings_url => speed_grader_settings_course_gradebook_path,
           :force_anonymous_grading => force_anonymous_grading?(@assignment),
           :grading_role => grading_role,
-          :lti_retrieve_url => retrieve_course_external_tools_url(@context.id, assignment_id: @assignment.id, display: 'borderless'),
+          :grading_type => @assignment.grading_type,
+          :lti_retrieve_url => retrieve_course_external_tools_url(
+            @context.id, assignment_id: @assignment.id, display: 'borderless'
+          ),
           :course_id => @context.id,
           :assignment_id => @assignment.id,
         }

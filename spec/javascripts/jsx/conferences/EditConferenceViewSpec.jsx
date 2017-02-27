@@ -2,11 +2,11 @@ define([
   'compiled/views/conferences/EditConferenceView',
   'compiled/models/Conference',
   'timezone',
-  'vendor/timezone/fr_FR',
+  'timezone/fr_FR',
   'helpers/I18nStubber',
   'helpers/fakeENV'
 ], (EditConferenceView, Conference, tz, french, I18nStubber, fakeENV) => {
-  module('EditConferenceView', {
+  QUnit.module('EditConferenceView', {
     setup () {
       this.view = new EditConferenceView();
       this.snapshot = tz.snapshot();
@@ -66,5 +66,25 @@ define([
     this.view.show(conference, {isEditing: true});
     const title = this.view.$el.dialog('option', 'title');
     equal(title, expectedTitle);
+  });
+
+  test('#show sets localized durataion when editing conference', function () {
+    const expectedDuration = '1,234.5';
+    const attributes = {
+      title: 'InstructureCon',
+      recordings: [],
+      user_settings: {
+        scheduled_date: new Date()
+      },
+      permissions: {
+        update: true
+      },
+      duration: 1234.5
+    };
+
+    const conference = new Conference(attributes);
+    this.view.show(conference, {isEditing: true});
+    const duration = this.view.$('#web_conference_duration')[0].value;
+    equal(duration, expectedDuration);
   });
 });

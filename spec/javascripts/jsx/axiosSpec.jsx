@@ -1,5 +1,5 @@
 define(['axios', 'moxios'], (axios, moxios) => {
-  module('Custom Axios Tests', {
+  QUnit.module('Custom Axios Tests', {
     setup () {
       moxios.install();
     },

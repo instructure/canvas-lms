@@ -6,7 +6,7 @@ define [
   'jst/outcomes/mainInstructions'
 ], ($, Backbone, ContentView, fakeENV, instructionsTemplate) ->
 
-  module 'CollectionView',
+  QUnit.module 'CollectionView',
     setup: ->
       fakeENV.setup()
       viewEl = $('<div id="content-view-el">original_text</div>')

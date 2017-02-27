@@ -20,7 +20,7 @@ class OutcomesImportApiController < ApplicationController
   include Api::V1::Outcome
   include Api::V1::ContentMigration
 
-  before_filter :require_user, :can_manage_global_outcomes, :has_api_config
+  before_action :require_user, :can_manage_global_outcomes, :has_api_config
 
   def available
     render json: AcademicBenchmark.list_of_available_guids

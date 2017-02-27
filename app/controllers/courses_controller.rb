@@ -145,6 +145,11 @@ require 'securerandom'
 #           "example": "2012-09-01T00:00:00-06:00",
 #           "type": "datetime"
 #         },
+#         "locale": {
+#           "description": "the course-set locale, if applicable",
+#           "example": "en",
+#           "type": "string"
+#         },
 #         "enrollments": {
 #           "description": "A list of enrollments linking the current user to the course. for student enrollments, grading information may be included if include[]=total_scores",
 #           "type": "array",
@@ -300,10 +305,10 @@ class CoursesController < ApplicationController
   include CustomSidebarLinksHelper
   include SyllabusHelper
 
-  before_filter :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
-  before_filter :require_user_or_observer, :only=>[:user_index]
-  before_filter :require_context, :only => [:roster, :locks, :create_file, :ping, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
-  skip_after_filter :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
+  before_action :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
+  before_action :require_user_or_observer, :only=>[:user_index]
+  before_action :require_context, :only => [:roster, :locks, :create_file, :ping, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
+  skip_after_action :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
 
   include Api::V1::Course
   include Api::V1::Progress
@@ -818,7 +823,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "email"|"enrollments"|"locked"|"avatar_url"|"test_student"|"bio"|"custom_links"]
+  # @argument include[] [String, "email"|"enrollments"|"locked"|"avatar_url"|"test_student"|"bio"|"custom_links"|"current_grading_period_scores"]
   #   - "email": Optional user email.
   #   - "enrollments":
   #   Optionally include with each Course the user's current and invited
@@ -833,6 +838,13 @@ class CoursesController < ApplicationController
   #   if present. Default is to not include Test Student.
   #   - "custom_links": Optionally include plugin-supplied custom links for each student,
   #   such as analytics information
+  #   - "current_grading_period_scores": if enrollments is included as
+  #   well as this directive, the scores returned in the enrollment
+  #   will be for the current grading period if there is one. A
+  #   'grading_period_id' value will also be included with the
+  #   scores. if grading_period_id is nil there is no current grading
+  #   period and the score is a total score.
+  #
   # @argument user_id [String]
   #   If this parameter is given and it corresponds to a user in the course,
   #   the +page+ parameter will be ignored and the page containing the specified user
@@ -895,7 +907,7 @@ class CoursesController < ApplicationController
       if includes.include?('enrollments')
         enrollment_scope = @context.enrollments.
           where(user_id: users).
-          preload(:course)
+          preload(:course, :scores)
 
         if search_params[:enrollment_state]
           enrollment_scope = enrollment_scope.where(:workflow_state => search_params[:enrollment_state])
@@ -1016,7 +1028,9 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read)
       grading = @current_user.assignments_needing_grading(:contexts => [@context]).map { |a| todo_item_json(a, @current_user, session, 'grading') }
-      submitting = @current_user.assignments_needing_submitting(:include_ungraded => true, :contexts => [@context]).map { |a| todo_item_json(a, @current_user, session, 'submitting') }
+      submitting = @current_user.assignments_needing_submitting(:include_ungraded => true, :contexts => [@context], :limit => ToDoListPresenter::ASSIGNMENT_LIMIT).map { |a|
+        todo_item_json(a, @current_user, session, 'submitting')
+      }
       if Array(params[:include]).include? 'ungraded_quizzes'
         submitting += @current_user.ungraded_quizzes_needing_submitting(:contexts => [@context]).map { |q| todo_item_json(q, @current_user, session, 'submitting') }
         submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] }
@@ -1096,6 +1110,23 @@ class CoursesController < ApplicationController
         end
         format.json { render :json => @categories }
       end
+    end
+  end
+
+  def blueprint_settings
+    get_context
+    if master_courses? && authorized_action(@context.account, @current_user, :manage_master_courses)
+      js_env({
+        course: @context.slice(:id, :name),
+        sub_accounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {:id => id, :name => name}},
+        terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {:id => id, :name => name}}
+      })
+
+      css_bundle :course_blueprint_settings
+      js_bundle :course_blueprint_settings
+      render :text => '', :layout => true
+    else
+     render status: 404, template: 'shared/errors/404_message'
     end
   end
 
@@ -2151,6 +2182,12 @@ class CoursesController < ApplicationController
         end
       end
 
+      root_account_id = params[:course].delete :root_account_id
+      if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
+        @course.root_account = Account.root_accounts.find(root_account_id)
+        @course.account = @course.root_account if @course.account.root_account != @course.root_account
+      end
+
       if params[:course].key?(:apply_assignment_group_weights)
         @course.apply_assignment_group_weights =
           value_to_boolean params[:course].delete(:apply_assignment_group_weights)
@@ -2255,6 +2292,12 @@ class CoursesController < ApplicationController
 
       params_for_update[:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
+
+      if params[:course].has_key?(:master_course)
+        master_course = value_to_boolean(params[:course].delete(:master_course))
+        action = master_course ? "set" : "remove"
+        MasterCourses::MasterTemplate.send("#{action}_as_master_course", @course)
+      end
 
       @course.attributes = params_for_update
 
@@ -2520,7 +2563,9 @@ class CoursesController < ApplicationController
 
       # destroy these after enrollment so
       # needs_grading_count callbacks work
-      ModeratedGrading::ProvisionalGrade.where(:submission_id => @fake_student.submissions).delete_all
+      pg_scope = ModeratedGrading::ProvisionalGrade.where(:submission_id => @fake_student.submissions)
+      SubmissionComment.where(:provisional_grade_id => pg_scope).delete_all
+      pg_scope.delete_all
       @fake_student.submissions.destroy_all
       @fake_student.quiz_submissions.each{|qs| qs.events.destroy_all}
       @fake_student.quiz_submissions.destroy_all
@@ -2710,6 +2755,7 @@ class CoursesController < ApplicationController
 
     hash = []
 
+    enrollments.sort_by!(&:course_id)
     Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values
     enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
@@ -2799,6 +2845,8 @@ class CoursesController < ApplicationController
       :abstract_course, :storage_quota, :storage_quota_mb, :restrict_enrollments_to_course_dates,
       :restrict_student_past_view, :restrict_student_future_view, :grading_standard, :grading_standard_enabled,
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :lock_all_announcements, :public_syllabus,
-      :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export)
+      :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
+      :show_announcements_on_home_page, :home_page_announcement_limit
+    )
   end
 end

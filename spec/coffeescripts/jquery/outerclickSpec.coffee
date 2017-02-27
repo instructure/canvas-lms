@@ -3,7 +3,7 @@ define [
   'compiled/jquery/outerclick'
 ], ($) ->
 
-  module 'outerclick'
+  QUnit.module 'outerclick'
 
   test 'should work', ->
     handler = @spy()

@@ -1050,9 +1050,6 @@ describe ContextModule do
         {id: @other_assignment_tag.id, type: 'min_score', min_score: 90},
       ]
       @module.save!
-
-      expect(@module.completion_requirements.include?({id: @assignment_tag.id, type: 'min_score', min_score: 90})).to be_truthy
-      expect(@module.completion_requirements.include?({id: @other_assignment_tag.id, type: 'min_score', min_score: 90})).to be_truthy
     end
 
     it 'should not prevent a student from completing a module' do

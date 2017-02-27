@@ -12,7 +12,7 @@ define [
     view.$el.appendTo($("#fixtures"))
     view.render()
 
-  module 'OutcomeGroupView',
+  QUnit.module 'OutcomeGroupView',
     setup: ->
       fixtures.setup()
       fakeENV.setup()

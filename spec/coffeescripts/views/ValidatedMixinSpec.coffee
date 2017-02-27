@@ -5,7 +5,7 @@ define [
 ],($,tinymce,ValidatedMixin)->
 
   textarea = null
-  module "ValidatedMixin",
+  QUnit.module "ValidatedMixin",
     setup: ->
       textarea = $("<textarea id='42' name='message' data-rich_text='true'></textarea>")
       $('#fixtures').append textarea

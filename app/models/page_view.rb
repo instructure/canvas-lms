@@ -323,7 +323,7 @@ class PageView < ActiveRecord::Base
   end
 
   class << self
-    def transaction_with_cassandra_check(*args)
+    def transaction(*args)
       if PageView.cassandra?
         # Rails 3 autosave associations re-assign the attributes;
         # for sharding to work, the page view's shard has to be
@@ -338,10 +338,9 @@ class PageView < ActiveRecord::Base
           yield
         end
       else
-        self.transaction_without_cassandra_check(*args) { yield }
+        super
       end
     end
-    alias_method_chain :transaction, :cassandra_check
   end
 
   def add_to_transaction

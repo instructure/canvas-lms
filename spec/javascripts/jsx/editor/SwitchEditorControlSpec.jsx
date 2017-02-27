@@ -5,7 +5,7 @@ define([
   'jsx/shared/rce/RichContentEditor'
 ], (React, TestUtils, SwitchEditorControl, RichContentEditor) => {
 
-  module("SwitchEditorControl", {
+  QUnit.module("SwitchEditorControl", {
     setup() {
       sinon.stub(RichContentEditor, 'callOnRCE')
     },

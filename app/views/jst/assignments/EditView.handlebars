@@ -112,7 +112,7 @@
 
     {{>[assignments/submission_types_form]}}
 
-    <fieldset id="assignment_configuration_tools">
+    <fieldset id="similarity_detection_tools">
     </fieldset>
 
     {{#unless isLargeRoster}}
@@ -131,7 +131,7 @@
 
     {{#if postToSISEnabled}}
       <fieldset>
-        <div class="form-column-left">{{#t}}Post Grades to SIS{{/t}}</div>
+        <div class="form-column-left">{{#t}}Sync to {{postToSISName}}{{/t}}</div>
           <div class="form-column-right" style="margin-top: 14px;">
             <label class="checkbox">
               {{checkbox "postToSIS"

@@ -212,12 +212,25 @@ describe Course do
       expect(result).to be_empty
     end
 
-    it 'ignores enrollments that are not active' do
+    it 'ignores enrollments that rejected the course invitation' do
+      @student1_enrollment.reject
+      edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+      student_ids = edd.to_hash[@assignment1.id].keys
+      expect(student_ids).not_to include @student1.id
+    end
+
+    it 'includes deactivated enrollments' do
       @student1_enrollment.deactivate
       edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-      result = edd.to_hash
-      student_ids = result[@assignment1.id].keys
-      expect(student_ids).not_to include @student1.id
+      student_ids = edd.to_hash[@assignment1.id].keys
+      expect(student_ids).to include @student1.id
+    end
+
+    it 'includes concluded enrollments' do
+      @student1_enrollment.conclude
+      edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+      student_ids = edd.to_hash[@assignment1.id].keys
+      expect(student_ids).to include @student1.id
     end
 
     it 'ignores enrollments that are not students' do

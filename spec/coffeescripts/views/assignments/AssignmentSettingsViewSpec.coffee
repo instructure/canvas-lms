@@ -28,7 +28,7 @@ define [
     view.open()
     view
 
-  module 'AssignmentSettingsView',
+  QUnit.module 'AssignmentSettingsView',
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
 
@@ -95,7 +95,7 @@ define [
     equal view.assignmentGroups.last().get('group_weight'), 80
     view.remove()
 
-  module 'AssignmentSettingsView with an assignment in a closed grading period',
+  QUnit.module 'AssignmentSettingsView with an assignment in a closed grading period',
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
 
@@ -167,6 +167,17 @@ define [
     notOk view.saveFormData.called
     notOk view.cancel.called
     view.remove()
+
+  test 'does not allow NaN values to be saved', ->
+    closed_group = group(any_assignment_in_closed_grading_period: true)
+    groups = new AssignmentGroupCollection([group(), closed_group])
+    view = createView(weighted: true, assignmentGroups: groups)
+    weight_input = view.$el.find('.group_weight_value')[0]
+    $(weight_input).val('weight for it')
+
+    errors = view.validateFormData()
+    ok errors
+    equal _.keys(errors).length, 1
 
   test 'calculates the total weight', ->
     closed_group = group(any_assignment_in_closed_grading_period: true, group_weight: 35)

@@ -15,7 +15,7 @@ define [
     { keycode: 'n', description: I18n.t('Reply to Topic') }
   ]
 
-  module 'DiscussionTopicKeyboardShortcutModal#render',
+  QUnit.module 'DiscussionTopicKeyboardShortcutModal#render',
     setup: ->
       $('#fixtures').append('<div id="application" />')
 

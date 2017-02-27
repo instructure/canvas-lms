@@ -4,7 +4,7 @@ define([
   'moxios',
   'jsx/webzip_export/App',
 ], (React, enzyme, moxios, WebZipExportApp) => {
-  module('WebZip Export App', {
+  QUnit.module('WebZip Export App', {
     setup () {
       moxios.install()
     },
@@ -36,6 +36,27 @@ define([
     moxios.wait(() => {
       const node = wrapper.find('ExportList')
       ok(node.exists())
+      done()
+    })
+  })
+
+  test('renders failed exports as well as generated exports', (assert) => {
+    const done = assert.async()
+    const data = [{
+      created_at: '1776-12-25T22:00:00Z',
+      zip_attachment: {url: null},
+      workflow_state: 'failed',
+    }]
+    moxios.stubRequest('/api/v1/courses/2/web_zip_exports', {
+      status: 200,
+      responseText: data
+    })
+    ENV.context_asset_string = 'courses_2'
+    const wrapper = enzyme.shallow(<WebZipExportApp />)
+    wrapper.instance().componentDidMount()
+    moxios.wait(() => {
+      const node = wrapper.find('ExportList')
+      equal(node.length, 1)
       done()
     })
   })
@@ -195,7 +216,7 @@ define([
     })
   })
 
-  module('webZipFormat')
+  QUnit.module('webZipFormat')
 
   test('returns a JS object with necessary info', () => {
     const data = [{

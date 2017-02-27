@@ -37,9 +37,9 @@ class MediaTracksController < ApplicationController
   #
   # @example_request
   #     curl https://<canvas>/media_objects/<media_object_id>/media_tracks \
-  #         -F kind='subtitles' \ 
-  #         -F locale='es' \ 
-  #         -F content='0\n00:00:00,000 --> 00:00:01,000\nInstructor…This is the first sentance\n\n\n1\n00:00:01,000 --> 00:00:04,000\nand a second...' \ 
+  #         -F kind='subtitles' \
+  #         -F locale='es' \
+  #         -F content='0\n00:00:00,000 --> 00:00:01,000\nInstructor…This is the first sentance\n\n\n1\n00:00:01,000 --> 00:00:04,000\nand a second...' \
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns MediaObject
@@ -47,7 +47,7 @@ class MediaTracksController < ApplicationController
     @media_object = MediaObject.active.by_media_id(params[:media_object_id]).first
     if authorized_action(@media_object, @current_user, :add_captions)
       track = @media_object.media_tracks.where(user_id: @current_user.id, locale: params[:locale]).first_or_initialize
-      track.update_attributes! params.slice(*TRACK_SETTABLE_ATTRIBUTES)
+      track.update_attributes! params.permit(*TRACK_SETTABLE_ATTRIBUTES)
       render :json => media_object_api_json(@media_object, @current_user, session)
     end
   end

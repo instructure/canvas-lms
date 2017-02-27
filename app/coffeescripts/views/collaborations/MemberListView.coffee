@@ -63,8 +63,9 @@ define [
       @updateElementVisibility()
       collaboratorsHtml = @collection.map (c) =>
         collaboratorTemplate(extend(c.toJSON(),
-                                    type: c.modelType or c.get('type'),
-                                    id: c.get('collaborator_id') or c.get('id')
+                                    type: c.modelType or c.get('type')
+                                    collaborator_id: c.get('collaborator_id')
+                                    id: c.get('id')
                                     name: c.get('sortable_name') or c.get('name')
                                     selected: true))
       collaboratorsHtml = collaboratorsHtml.join('')

@@ -18,9 +18,9 @@
 
 # @API Courses
 class ContentImportsController < ApplicationController
-  before_filter :require_context
-  before_filter { |c| c.active_tab = "home" }
-  prepend_around_filter :load_pseudonym_from_policy, :only => :migrate_content_upload
+  before_action :require_context
+  before_action { |c| c.active_tab = "home" }
+  prepend_around_action :load_pseudonym_from_policy, :only => :migrate_content_upload
 
   include Api::V1::Course
   include ContentImportsHelper

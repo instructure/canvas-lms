@@ -7,7 +7,7 @@ define [
   dangerousHTML= '"><img src=/ onerror=alert(document.cookie);>'
   escapedDangerousHTML = htmlEscape dangerousHTML
 
-  module "SubmissionCell",
+  QUnit.module "SubmissionCell",
     setup: ->
       @opts =
         item:
@@ -40,7 +40,7 @@ define [
     equal @cell.$input[0].defaultValue, escapedDangerousHTML
 
   test "#class.formatter rounds numbers if they are numbers", ->
-    @stub(SubmissionCell.prototype, 'cellWrapper').withArgs(0.67).returns('ok')
+    @stub(SubmissionCell.prototype, 'cellWrapper').withArgs('0.67').returns('ok')
     formattedResponse = SubmissionCell.formatter(0, 0, { grade: 0.666 }, {}, {})
     equal formattedResponse, 'ok'
 
@@ -177,7 +177,7 @@ define [
     submissionCellResponse = SubmissionCell.pass_fail.formatter(0, 0, { grade: "complete" }, {}, {}, { tooltip: "dora_the_explorer" })
     ok submissionCellResponse.indexOf("dora_the_explorer") > -1
 
-  module "Pass/Fail SubmissionCell",
+  QUnit.module "Pass/Fail SubmissionCell",
     setup: ->
       opts =
         item:

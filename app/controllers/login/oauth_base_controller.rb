@@ -19,8 +19,8 @@
 class Login::OauthBaseController < ApplicationController
   include Login::Shared
 
-  before_filter :forbid_on_files_domain
-  before_filter :run_login_hooks, :check_sa_delegated_cookie, :fix_ms_office_redirects, only: :new
+  before_action :forbid_on_files_domain
+  before_action :run_login_hooks, :check_sa_delegated_cookie, :fix_ms_office_redirects, only: :new
 
   def new
     # a subclass might explicitly set the AAC, so that we don't need to infer

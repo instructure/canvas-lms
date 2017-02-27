@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <style>
+      <%= escape_code_stylesheet %>
+    </style>
+  </head>
+  <body style="font-family:sans-serif;line-height:1.25;font-size:14px">
+    <h1><%= example.full_description %></h1>
+
+    <code><b>bin/rspec <%= example.location_rerun_argument %></b></code>
+
+    <h2>Failure/Error</h2>
+    <pre style="overflow:auto; max-height: 300px;"><%= escape_code formatted_exception %></pre>
+
+    <% if summary.js_errors.present? %>
+      <h2>JS Errors</h2>
+      <ul>
+        <% summary.js_errors.each do |error| %>
+          <li><%= error["errorMessage"] %> (<%= error["sourceName"] %>:<%= error["lineNumber"] %>)
+        <% end %>
+      </ul>
+    <% end %>
+
+    <h2>Rails Log</h2>
+    <pre style="overflow:auto; max-height: 300px;"><%= escape_code summary.log_messages.join("\n") %></pre>
+
+    <h2>Preceding Specs</h2>
+    <div style="overflow: auto; max-height: 300px;"><%= recent_spec_runs %></div>
+
+    <% if summary.screen_capture_name %>
+      <h2>Screen Capture</h2>
+      <a href="./<%= summary.screen_capture_name %>">here</a>
+    <% end %>
+
+    <% if summary.screenshot_name %>
+      <h2>Screenshot</h2>
+      <img style="border:1px solid #000" src="./<%= summary.screenshot_name %>" />
+    <% end %>
+  </body>
+</html>
+

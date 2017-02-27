@@ -3,7 +3,7 @@ define [
   'compiled/views/wiki/WikiPageIndexItemView'
 ], (WikiPage, WikiPageIndexItemView) ->
   
-  module 'WikiPageIndexItemView'
+  QUnit.module 'WikiPageIndexItemView'
 
   test 'model.view maintained by item view', ->
     model = new WikiPage
@@ -40,7 +40,7 @@ define [
     ok stub.calledOnce
 
 
-  module 'WikiPageIndexItemView:JSON'
+  QUnit.module 'WikiPageIndexItemView:JSON'
 
   testRights = (subject, options) ->
     test "#{subject}", ->

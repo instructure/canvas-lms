@@ -7,7 +7,7 @@ define [
   'compiled/react_files/modules/FileOptionsCollection'
 ], (React, ReactDOM, {Simulate}, $, UploadButton, FileOptionsCollection) ->
 
-  module 'UploadButton',
+  QUnit.module 'UploadButton',
     setup: ->
       props =
         currentFolder:

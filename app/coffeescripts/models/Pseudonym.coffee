@@ -15,6 +15,7 @@ define [
         not_email:    I18n.t("errors.not_email", "Not a valid email address")
       sis_user_id:
         too_long:     I18n.t("errors.too_long", "Can't exceed %{max} characters", {max: 255})
+        taken:        I18n.t("errors.sis_taken", "The SIS ID is already in use")
       password:
         too_short:    I18n.t("errors.too_short", "Must be at least %{min} characters", {min: policy.min_length})
         sequence:     I18n.t("errors.sequence", "Can't incude a run of more than %{max} characters (e.g. abcdef)", {max: policy.max_sequence})

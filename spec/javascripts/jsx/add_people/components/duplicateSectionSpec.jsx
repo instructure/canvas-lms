@@ -5,7 +5,7 @@ define([
   'react-addons-test-utils',
   'jsx/add_people/components/duplicate_section',
 ], (_, React, ReactDOM, TestUtils, DuplicateSection) => {
-  module('DuplicateSection')
+  QUnit.module('DuplicateSection')
 
   const duplicates = {
     address: 'addr1',
@@ -32,10 +32,17 @@ define([
     }]
   };
   const noop = function () {};
+  const inviteUsersURL = '/couses/#/invite_users';
 
   test('renders the component', () => {
     const component = TestUtils.renderIntoDocument(
-      <DuplicateSection duplicates={duplicates} onSelectDuplicate={noop} onNewForDuplicate={noop} onSkipDuplicate={noop} />
+      <DuplicateSection
+        duplicates={duplicates}
+        inviteUsersURL={inviteUsersURL}
+        onSelectDuplicate={noop}
+        onNewForDuplicate={noop}
+        onSkipDuplicate={noop}
+      />
     );
     const duplicateSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist');
     ok(duplicateSection);
@@ -43,7 +50,13 @@ define([
 
   test('renders the table', () => {
     const component = TestUtils.renderIntoDocument(
-      <DuplicateSection duplicates={duplicates} onSelectDuplicate={noop} onNewForDuplicate={noop} onSkipDuplicate={noop} />
+      <DuplicateSection
+        duplicates={duplicates}
+        inviteUsersURL={inviteUsersURL}
+        onSelectDuplicate={noop}
+        onNewForDuplicate={noop}
+        onSkipDuplicate={noop}
+      />
     );
     const duplicateSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist');
 
@@ -51,16 +64,30 @@ define([
     equal(rows.length, 5, 'five rows');
     const headings = rows[0].querySelectorAll('th');
     equal(headings.length, 6, 'six column headings');
-    const createUserBtn = rows[3].querySelectorAll('td')[1].firstChild;
-    equal(createUserBtn.tagName, 'BUTTON', 'create new user button');
-    const skipUserBtn = rows[4].querySelectorAll('td')[1].firstChild;
-    equal(skipUserBtn.tagName, 'BUTTON', 'skip user button');
+    const createNewRow = duplicateSection.querySelector('tr.create-new')
+    ok(createNewRow, 'create new row exists');
+
+    const createUserBtn = createNewRow.querySelector('button');
+    ok(createUserBtn)
+    equal(createUserBtn.innerHTML, 'Create a new user for "addr1"')
+
+    const skipUserRow = duplicateSection.querySelector('tr.skip-addr')
+    ok(skipUserRow, 'skip user row exists')
+
+    const skipUserBtn = skipUserRow.querySelector('button')
+    equal(skipUserBtn.innerHTML, 'Don’t add this user for now.', 'skip user button');
   });
   test('select a user', () => {
     const dupes = _.cloneDeep(duplicates);
     dupes.selectedUserId = 2;
     const component = TestUtils.renderIntoDocument(
-      <DuplicateSection duplicates={dupes} onSelectDuplicate={noop} onNewForDuplicate={noop} onSkipDuplicate={noop} />
+      <DuplicateSection
+        duplicates={dupes}
+        inviteUsersURL={inviteUsersURL}
+        onSelectDuplicate={noop}
+        onNewForDuplicate={noop}
+        onSkipDuplicate={noop}
+      />
     );
     const duplicateSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist');
 
@@ -75,7 +102,13 @@ define([
     dupes.createNew = true;
     dupes.newUserInfo = {name: 'bob', email: 'bob@em.ail'}
     const component = TestUtils.renderIntoDocument(
-      <DuplicateSection duplicates={dupes} onSelectDuplicate={noop} onNewForDuplicate={noop} onSkipDuplicate={noop} />
+      <DuplicateSection
+        duplicates={dupes}
+        inviteUsersURL={inviteUsersURL}
+        onSelectDuplicate={noop}
+        onNewForDuplicate={noop}
+        onSkipDuplicate={noop}
+      />
     );
     const duplicateSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist');
 
@@ -87,11 +120,17 @@ define([
     ok(emailInput, 'email input', 'email input exists');
     equal(emailInput.value, 'bob@em.ail', 'email has correct value');
   });
-  test('create a user', () => {
+  test('skip a set of dupes', () => {
     const dupes = _.cloneDeep(duplicates);
     dupes.skip = true;
     const component = TestUtils.renderIntoDocument(
-      <DuplicateSection duplicates={dupes} onSelectDuplicate={noop} onNewForDuplicate={noop} onSkipDuplicate={noop} />
+      <DuplicateSection
+        duplicates={dupes}
+        inviteUsersURL={inviteUsersURL}
+        onSelectDuplicate={noop}
+        onNewForDuplicate={noop}
+        onSkipDuplicate={noop}
+      />
     );
     const duplicateSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist');
 
@@ -99,4 +138,21 @@ define([
     const skipUserRadioBtn = rows[4].querySelector('input[type="radio"]');
     equal(skipUserRadioBtn.checked, true, 'duplicate set skipped');
   });
+  test('cannot create a user', () => {
+    const dupes = _.cloneDeep(duplicates);
+
+    const component = TestUtils.renderIntoDocument(
+      <DuplicateSection
+        duplicates={dupes}
+        inviteUsersURL={undefined}
+        onSelectDuplicate={noop}
+        onNewForDuplicate={noop}
+        onSkipDuplicate={noop}
+      />
+    );
+    const duplicateSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist');
+
+    const createNewRow = duplicateSection.querySelector('tr.create-new');
+    equal(createNewRow, null, 'create new user row does not exist');
+  })
 })

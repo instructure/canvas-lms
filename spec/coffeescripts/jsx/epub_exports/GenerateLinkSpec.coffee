@@ -8,7 +8,7 @@ define [
   'i18n!epub_exports',
 ], ($, React, ReactDOM, TestUtils, GenerateLink, CourseEpubExportStore, I18n) ->
 
-  module 'GenerateLink',
+  QUnit.module 'GenerateLink',
     setup: ->
       @props = {
         course: {

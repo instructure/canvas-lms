@@ -39,7 +39,8 @@ define([
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
-  'jquery.instructure_misc_helpers' /* replaceTags */,
+  'compiled/jquery.rails_flash_notifications' /* $.screenReaderFlashMessageExclusive */,
+  'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
@@ -325,6 +326,9 @@ define([
         if (section_type == "html") {
           $edit.find(".edit_section").focus().select();
         }
+        if (section_type == "submission") {
+          $edit.find(".submission:first .text").focus()
+        }
       });
     });
     $(".delete_page_section_link").click(function(event) {
@@ -366,7 +370,8 @@ define([
       var $section = $(this).parents(".section");
       var $selection = $section.find(".submission_list li.active-leaf:first");
       if($selection.length === 0) { return; }
-      var url = $selection.find(".submission_preview_url").attr('href');
+      var url = $selection.find(".submission_info").attr('href');
+      var title = $selection.find(".submission_info").text();
       var id = $selection.attr('id').substring(11);
       $section.fillTemplateData({
         data: {submission_id: id}
@@ -376,6 +381,8 @@ define([
       $frame.attr('src', url);
       $section.append($frame);
       $section.addClass('read_only');
+      $(this).focus()
+      $.screenReaderFlashMessageExclusive(I18n.t('submission added: %{title}', { title: title }))
     }).delegate('.upload_file_button', 'click', function(event) {
       event.preventDefault();
       event.stopPropagation();

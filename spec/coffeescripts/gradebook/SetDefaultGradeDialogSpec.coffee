@@ -5,7 +5,7 @@ define [
   'jst/SetDefaultGradeDialog'
 ], ($, Assignment, SetDefaultGradeDialog) ->
 
-  module 'SetDefaultGradeDialog',
+  QUnit.module 'SetDefaultGradeDialog',
     setup: ->
       @assignment = new Assignment(id: 1, points_possible: 10)
 

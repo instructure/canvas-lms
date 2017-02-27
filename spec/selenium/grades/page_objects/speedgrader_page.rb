@@ -83,9 +83,23 @@ class Speedgrader
       f('#submission_to_view')
     end
 
+    def attachment_button
+      f('#add_attachment')
+    end
+
+    def attachment_input
+      f('#comment_attachments input')
+    end
+
+    def attachment_link
+      f('.display_name')
+    end
+
     # action
     def visit(course_id, assignment_id)
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
+      visibility_check = grade_input
+      keep_trying_until { visibility_check.displayed? }
     end
 
     def enter_grade(grade)
@@ -123,6 +137,11 @@ class Speedgrader
     def add_comment_and_submit(comment)
       replace_content(comment_text_area, comment)
       comment_submit_button.click
+    end
+
+    def add_comment_attachment(file_path)
+      attachment_button.click
+      attachment_input.send_keys(file_path)
     end
 
     def click_submissions_to_view

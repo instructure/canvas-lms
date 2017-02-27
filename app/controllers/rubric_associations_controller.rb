@@ -17,7 +17,7 @@
 #
 
 class RubricAssociationsController < ApplicationController
-  before_filter :require_context
+  before_action :require_context
   def create
     update
   end

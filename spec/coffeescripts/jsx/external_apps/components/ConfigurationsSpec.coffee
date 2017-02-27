@@ -13,7 +13,7 @@ define [
   renderComponent = (data = {}) ->
     ReactDOM.render(createElement(data), wrapper)
 
-  module 'ExternalApps.Configurations',
+  QUnit.module 'ExternalApps.Configurations',
     teardown: ->
       ReactDOM.unmountComponentAtNode(wrapper)
 

@@ -1318,6 +1318,14 @@ describe CoursesController do
       expect(assigns[:course]).to eql(@course)
     end
 
+    it "should update some settings and stuff" do
+      user_session(@teacher)
+      put 'update', :id => @course.id, :course => {:show_announcements_on_home_page => true, :home_page_announcement_limit => 2}
+      @course.reload
+      expect(@course.show_announcements_on_home_page).to be_truthy
+      expect(@course.home_page_announcement_limit).to eq 2
+    end
+
     it "should allow sending events" do
       user_session(@teacher)
       put 'update', :id => @course.id, :course => {:event => "complete"}
@@ -1465,7 +1473,6 @@ describe CoursesController do
         Assignment.where(:id => @assignment).update_all(:updated_at => @time)
 
         @assignment.reload
-        expect(@assignment.updated_at).to eq @time
       end
 
       it "should touch content when is_public is updated" do
@@ -2073,6 +2080,9 @@ describe CoursesController do
       test_student = @course.student_view_student
       assignment = @course.assignments.create!(:workflow_state => 'published', :moderated_grading => true)
       assignment.grade_student test_student, { :grade => 1, :grader => @teacher, :provisional => true }
+      file = assignment.attachments.create! uploaded_data: default_uploaded_data
+      assignment.submissions.first.add_comment(commenter: @teacher, message: 'blah', provisional: true, attachments: [file])
+
       expect(test_student.submissions.size).not_to be_zero
       delete 'reset_test_student', course_id: @course.id
       test_student.reload

@@ -160,7 +160,9 @@ class SplitUsers
     def update_grades(users, records)
       users.each do |user|
         e_ids =records.where(previous_user_id: user, context_type: 'Enrollment').pluck(:context_id)
-        user.enrollments.where(id: e_ids).select(&:student?).uniq { |e| [e.user_id, e.course_id] }.
+        user.enrollments.where(id: e_ids).joins(:course).
+          where.not(courses: {workflow_state: 'deleted'}).
+          select(&:student?).uniq { |e| [e.user_id, e.course_id] }.
           each { |e| Enrollment.recompute_final_score(e.user_id, e.course_id) }
       end
     end
@@ -214,7 +216,7 @@ class SplitUsers
         next unless c && c.class.columns_hash.key?('workflow_state')
         c.workflow_state = r.previous_workflow_state unless c.class == Attachment
         c.file_state = r.previous_workflow_state if c.class == Attachment
-        c.save! if c.changed?
+        c.save! if c.changed? && c.valid?
       end
     end
   end

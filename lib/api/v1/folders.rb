@@ -30,6 +30,10 @@ module Api::V1::Folders
     json = api_json(folder, user, session,
             :only => %w(id name full_name position parent_folder_id context_type context_id unlock_at lock_at created_at updated_at))
     if folder
+      if opts[:master_course_restricted_folder_ids]&.include?(folder.id)
+        json['is_master_course_content'] = true
+        json['restricted_by_master_course'] = true
+      end
       json['locked'] = !!folder.locked
       json['folders_url'] = api_v1_list_folders_url(folder)
       json['files_url'] = api_v1_list_files_url(folder)

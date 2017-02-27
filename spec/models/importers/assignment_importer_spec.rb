@@ -148,6 +148,7 @@ describe "Importing assignments" do
 
   it "should include turnitin_settings" do
     course_model
+    @course.expects(:turnitin_enabled?).at_least(1).returns(true)
     migration = @course.content_migrations.create!
     nameless_assignment_hash = {
         "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
@@ -185,7 +186,7 @@ describe "Importing assignments" do
       expect(settings[field]).to eq("0")
     end
   end
-  
+
   it "should not explode if it tries to import negative points possible" do
     course_model
     assign_hash = {

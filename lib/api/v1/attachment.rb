@@ -27,6 +27,9 @@ module Api::V1::Attachment
   end
 
   def attachments_json(files, user, url_options = {}, options = {})
+    if options[:can_view_hidden_files] && options[:context] && master_courses?
+      options[:master_course_status] = setup_master_course_restrictions(files, options[:context])
+    end
     files.map do |f|
       attachment_json(f, user, url_options, options)
     end
@@ -116,6 +119,10 @@ module Api::V1::Attachment
     end
     if includes.include? "context_asset_string"
       hash['context_asset_string'] = attachment.context.try(:asset_string)
+    end
+
+    if options[:master_course_status]
+      hash.merge!(attachment.master_course_api_restriction_data(options[:master_course_status]))
     end
 
     hash

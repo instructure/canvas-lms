@@ -5,7 +5,7 @@ define [
 
 
   view = null
-  module "editor KeyboardShortcuts",
+  QUnit.module "editor KeyboardShortcuts",
     setup: ->
       view = new KeyboardShortcuts()
       view.$dialog = {

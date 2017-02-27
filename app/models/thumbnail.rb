@@ -27,7 +27,7 @@ class Thumbnail < ActiveRecord::Base
       :content_type => :image,
       :storage => (Attachment.local_storage? ? :file_system : :s3),
       :path_prefix => Attachment.file_store_config['path_prefix'],
-      :s3_access => :private,
+      :s3_access => 'private',
       :keep_profile => true,
       :thumbnail_max_image_size_pixels => Setting.get('thumbnail_max_image_size_pixels', 100_000_000).to_i
   )
@@ -46,7 +46,7 @@ class Thumbnail < ActiveRecord::Base
   end
 
   def cached_s3_url
-    @cached_s3_url = authenticated_s3_url(:expires => 144.hours)
+    @cached_s3_url = authenticated_s3_url(expires_in: 144.hours)
   end
 
   before_save :assign_uuid

@@ -30,10 +30,14 @@
                   </div>
                   <span class="agenda-event__title group_{{contextCode}} {{#if isCompleted}}calendar__event--completed{{/if}}">
                     {{#if ../../meta.better_scheduler}}
-                      {{#if can_edit}}
-                        {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}} {{#if reservedUsers }} - {{reservedUsers}} {{/if}}
+                      {{#if isAppointmentGroupEvent}}
+                        {{#if can_edit}}
+                          {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}} {{#if reservedUsers }} - {{reservedUsers}} {{/if}}
+                        {{else}}
+                          {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}}
+                        {{/if}}
                       {{else}}
-                        {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}}
+                        {{#truncate title 60}}{{/truncate}}
                       {{/if}}
                     {{else}}
                       {{#ifAll ../../../meta.displayAppointmentEvents isAppointmentGroupEvent}}

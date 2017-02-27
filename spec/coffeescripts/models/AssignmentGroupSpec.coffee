@@ -4,7 +4,7 @@ define [
   'helpers/fakeENV'
 ], (Assignment, AssignmentGroup, fakeENV) ->
 
-  module "AssignmentGroup"
+  QUnit.module "AssignmentGroup"
 
   test "#hasRules returns true if group has regular rules", ->
     ag = new AssignmentGroup rules: { drop_lowest: 1 }
@@ -41,8 +41,20 @@ define [
   test "#countRules returns false if the group has no rules", ->
     ag = new AssignmentGroup
     strictEqual ag.countRules(), 0
+    
+  test "#hasIntegrationData returns true if integration_data is not empty", ->
+    ag = new AssignmentGroup integration_data: { key: "value" }
+    strictEqual ag.hasIntegrationData(), true
+    
+  test "#hasIntegrationData returns false if integration_data is empty", ->
+    ag = new AssignmentGroup integration_data: { }
+    strictEqual ag.hasIntegrationData(), false
+      
+  test "#hasIntegrationData returns false if integration_data is not set", ->
+    ag = new AssignmentGroup
+    strictEqual ag.hasIntegrationData(), false
 
-  module "AssignmentGroup#canDelete as admin",
+  QUnit.module "AssignmentGroup#canDelete as admin",
     setup: ->
       fakeENV.setup({
         current_user_roles: ['admin']
@@ -78,7 +90,7 @@ define [
     group.set 'any_assignment_in_closed_grading_period', false
     deepEqual group.canDelete(), true
 
-  module "AssignmentGroup#canDelete as non admin",
+  QUnit.module "AssignmentGroup#canDelete as non admin",
     setup: ->
       fakeENV.setup({
         current_user_roles: ['teacher']
@@ -114,7 +126,7 @@ define [
     group.set 'any_assignment_in_closed_grading_period', true
     equal group.canDelete(), false
 
-  module "AssignmentGroup#hasFrozenAssignments"
+  QUnit.module "AssignmentGroup#hasFrozenAssignments"
 
   test "returns true if AssignmentGroup has frozen assignments", ->
     assignment = new Assignment name: 'cheese'
@@ -122,7 +134,7 @@ define [
     group = new AssignmentGroup name: 'taco', assignments: [ assignment ]
     deepEqual group.hasFrozenAssignments(), true
 
-  module "AssignmentGroup#anyAssignmentInClosedGradingPeriod"
+  QUnit.module "AssignmentGroup#anyAssignmentInClosedGradingPeriod"
 
   test "returns the value of 'any_assignment_in_closed_grading_period'", ->
     group = new AssignmentGroup name: 'taco', assignments: []

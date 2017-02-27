@@ -6,7 +6,7 @@ define [
 
   ArrayProxy = Ember.ArrayProxy
 
-  module 'Fetch all pages component',
+  QUnit.module 'Fetch all pages component',
     setup: ->
       # yes, this looks weird.  if you run
       # screenreader gradebook tests before this, it puts

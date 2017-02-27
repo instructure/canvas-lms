@@ -134,9 +134,16 @@
       <div style="float: right;" class="total_points_holder">
         <span style="padding-right: 10px;"><%= before_label :total_points, "Total Points" %>
           <% ot(:out_of, "%{points} *out of %{total}*", :points => capture { %>
-            <span class="rubric_total"><%= assessment ? assessment.score : (rubric.points_possible rescue 5) %></span><% },
-            :wrapper => '<span class="assessing">\1</span>',
-            :total => (rubric.points_possible rescue 5)) %>
+            <span class="rubric_total">
+              <%=
+                assessment ? n(assessment.score) : n((rubric.points_possible rescue 5))
+              %>
+            </span>
+            <%
+              },
+              wrapper: '<span class="assessing">\1</span>',
+              total: n((rubric.points_possible rescue 5)))
+            %>
         </span>
       </div>
       <div style="float: left;" class="editing">

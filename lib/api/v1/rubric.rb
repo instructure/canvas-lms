@@ -46,4 +46,12 @@ module Api::V1::Rubric
     hash['assessments'] = rubric_assessments_json(opts[:assessments], user, session, opts) if opts[:assessments].present?
     hash
   end
+
+  def rubric_pagination_url
+    if @context.is_a? Course
+      api_v1_course_rubrics_url(@context)
+    else
+      api_v1_account_rubrics_url(@context)
+    end
+  end
 end

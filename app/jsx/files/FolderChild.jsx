@@ -43,6 +43,23 @@ define([
       );
     }
   }
+  FolderChild.renderMasterCourseIcon = function (canManage) {
+    if (canManage && this.props.model.get('is_master_course_content')) {
+      if (this.props.model.get('restricted_by_master_course')) {
+        return (
+          <span className="master-course-cell">
+            <i className="icon-lock"></i>
+          </span>
+        );
+      } else {
+        return (
+          <span className="master-course-cell">
+            <i className="icon-unlock icon-Line"></i>
+          </span>
+        );
+      }
+    }
+  }
 
   FolderChild.renderEditingState = function () {
     if(this.state.editing) {
@@ -55,7 +72,7 @@ define([
               ref='newName'
               className='ic-Input ef-edit-name-form__input'
               placeholder={I18n.t('name', 'Name')}
-              aria-label={I18n.t('folder_name', 'Folder Name')}
+              aria-label={(this.props.model instanceof Folder) ? I18n.t('folder_name', 'Folder Name') : I18n.t('File Name')}
               defaultValue={this.props.model.displayName()}
               maxLength='255'
               onKeyUp={function (event){ if (event.keyCode === 27) {this.cancelEditingName()} }.bind(this)}
@@ -188,6 +205,7 @@ define([
         { this.renderUsageRightsIndicator() }
 
         <div className= 'ef-links-col' role= 'gridcell'>
+          { this.renderMasterCourseIcon(canManage) }
           { this.renderPublishCloud(canManage && this.props.userCanRestrictFilesForContext) }
           { this.renderItemCog(canManage) }
         </div>

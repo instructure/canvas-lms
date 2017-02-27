@@ -3,14 +3,16 @@ define([], () => {
     courseParams: {
       courseId: 1,
       roles: [{id: 1}, {id: 2}, {id: 3}],
-      sections: [{id: 1}, {id: 2}, {id: 3}]
+      sections: [{id: 1}, {id: 2}, {id: 3}],
+      inviteUsersURL: '/courses/#/invite_users'
     },
     inputParams: {
       searchType: 'unique_id',
-      nameList: ['foo', 'bar', 'baz'],
+      nameList: 'foo, bar, baz',
       role: '1',
       section: '1',
-      limitPrivilege: false
+      limitPrivilege: false,
+      canReadSIS: true
     },
     apiState: {
       pendingCount: 0,

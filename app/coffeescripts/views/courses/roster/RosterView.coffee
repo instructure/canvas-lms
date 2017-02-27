@@ -37,13 +37,20 @@ define [
 
     afterRender: ->
       @$addUsersButton.on('click', @showCreateUsersModal.bind(this))
+
+      canReadSIS = if 'permissions' of ENV
+        !!ENV.permissions.read_sis
+      else
+        true
+
       @addPeopleApp = new AddPeopleApp(@$createUsersModalHolder[0], {
         courseId: (ENV.course && ENV.course.id) || 0,
         defaultInstitutionName: ENV.ROOT_ACCOUNT_NAME || '',
-        roles: ENV.ALL_ROLES || [],
+        roles: ((ENV.ALL_ROLES || []).filter (role) -> role.manageable_by_user),
         sections: ENV.SECTIONS || [],
         onClose: @fetchOnCreateUsersClose,
-        theme: if ENV.use_high_contrast then 'a11y' else 'canvas'
+        inviteUsersURL: ENV.INVITE_USERS_URL,
+        canReadSIS: canReadSIS
       })
 
     attach: ->

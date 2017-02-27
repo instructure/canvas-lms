@@ -6,8 +6,5 @@ module Selenium::WebDriver::SearchContext
 
   def find_all(css)
     find_elements(:css, css)
-
-  rescue Selenium::WebDriver::Error::NoSuchElementError
-    []
   end
 end

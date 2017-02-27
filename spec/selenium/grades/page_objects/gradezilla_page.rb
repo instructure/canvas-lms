@@ -26,13 +26,23 @@ module Gradezilla
     end
 
     def visit(course)
+      Account.default.enable_feature!(:gradezilla)
       get "/courses/#{course.id}/gradebook/change_gradebook_version?version=gradezilla"
     end
 
+    def open_assignment_options(cell_index)
+      assignment_cell = ff('#gradebook_grid .container_1 .slick-header-column')[cell_index]
+      driver.action.move_to(assignment_cell).perform
+      trigger = assignment_cell.find_element(:css, '.Gradebook__ColumnHeaderAction')
+      trigger.click
+    end
+
     def grading_cell(x=0, y=0)
-      cell = f(".container_1")
-      cell = f(".slick-row:nth-child(#{y+1})", cell)
-      f(".slick-cell:nth-child(#{x+1})", cell)
+      row_idx, col_idx = y + 1, x + 1
+
+      cell = f('.container_1')
+      cell = f(".slick-row:nth-child(#{row_idx})", cell)
+      f(".slick-cell:nth-child(#{col_idx})", cell)
     end
 
     def select_grading_period(grading_period_id)
@@ -40,7 +50,7 @@ module Gradezilla
       period = gp_menu_list.find do |item|
         f('label', item).attribute("for") == "period_option_#{grading_period_id}"
       end
-      expect_new_page_load { period.click }
+      wait_for_new_page_load { period.click } or raise "page not loaded"
     end
 
     def enter_grade(grade, x_coordinate, y_coordinate)

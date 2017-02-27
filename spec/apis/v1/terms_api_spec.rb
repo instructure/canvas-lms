@@ -122,6 +122,13 @@ describe TermsApiController, type: :request do
       expect(response.headers['Link']).to match(/rel="next"/)
     end
 
+    it "includes overrides if requested" do
+      @term1.set_overrides(@account, 'StudentEnrollment' => { end_at: "2017-01-20T00:00:00Z" })
+      json = get_terms(include: ['overrides'])
+      expect(json.map { |el| el['overrides'] }).to match_array([
+        {}, {"StudentEnrollment"=>{"start_at"=>nil, "end_at"=>"2017-01-20T00:00:00Z"}}])
+    end
+
     describe "authorization" do
       def expect_terms_index_401
         api_call(:get, "/api/v1/accounts/#{@account.id}/terms",
@@ -251,7 +258,7 @@ describe TermsController, type: :request do
         expect(@account.grants_right?(@user, :manage_sis)).to be_truthy
         json = api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
           { controller: 'terms', action: 'update', format: 'json', account_id: @account.to_param, id: @term1.to_param },
-          { enrollment_term: { name: 'Term 2', sis_term_id: 'SIS Term 2' } })
+          { enrollment_term: { sis_term_id: 'SIS Term 2' } })
 
         expect(json['sis_term_id']).to eq 'SIS Term 2'
         expect(@term1.reload.sis_source_id).to eq 'SIS Term 2'
@@ -278,6 +285,39 @@ describe TermsController, type: :request do
 
         expect(json['sis_term_id']).to be_nil
         expect(@term1.reload.sis_source_id).to be_nil
+      end
+    end
+
+    describe "overrides" do
+      it "sets override dates for enrollments" do
+        overrides_hash = {
+          'StudentEnrollment' => {'start_at' => '2017-01-20T20:00:00Z', 'end_at' => '2017-03-20T20:00:00Z'},
+          'TeacherEnrollment' => {'start_at' => '2017-01-16T20:00:00Z', 'end_at' => '2017-03-22T20:00:00Z'}
+        }
+        json = api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
+                  { controller: 'terms', action: 'update', format: 'json', account_id: @account.to_param, id: @term1.to_param },
+                  { enrollment_term: {overrides: overrides_hash} }
+               )
+        expect(json['overrides']).to eq overrides_hash
+        teacher_override = @term1.enrollment_dates_overrides.where(enrollment_type: 'TeacherEnrollment').first
+        expect(teacher_override.start_at.iso8601).to eq "2017-01-16T20:00:00Z"
+        expect(teacher_override.end_at.iso8601).to eq "2017-03-22T20:00:00Z"
+        student_override = @term1.enrollment_dates_overrides.where(enrollment_type: 'StudentEnrollment').first
+        expect(student_override.start_at.iso8601).to eq "2017-01-20T20:00:00Z"
+        expect(student_override.end_at.iso8601).to eq "2017-03-20T20:00:00Z"
+      end
+
+      it "rejects override for invalid enrollment type", priority: "1", test_id: 3046399 do
+        result = @term1.enrollment_dates_overrides.where(enrollment_type: 'ObserverEnrollment').to_a
+        api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
+          { controller: 'terms', action: 'update', format: 'json',
+              account_id: @account.to_param, id: @term1.to_param },
+          { enrollment_term: {overrides: { 'ObserverEnrollment': {
+              'start_at': '2017-01-17T20:00:00Z', 'end_at': '2017-01-17T20:00:00Z'
+              } } } },
+          {},
+          { expected_status: 400 })
+        expect(result).to eq(@term1.enrollment_dates_overrides.where(enrollment_type: 'ObserverEnrollment').to_a)
       end
     end
 

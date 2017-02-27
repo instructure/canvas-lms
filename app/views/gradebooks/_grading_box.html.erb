@@ -2,20 +2,47 @@
   submission ||= nil
 %>
 <% if assignment.grading_type == "points" %>
-  <input type="text" value="<%= submission.grade if submission %>" size="3" class="grading_value grading_box" id="student_grading_<%= assignment.id %>" style="<%= hidden unless submission %> text-align: center;"/>
+  <input
+    type="text" size="3"
+    value="<%= I18n.n(submission.score) if submission %>"
+    class="grading_value grading_box" id="student_grading_<%= assignment.id %>"
+    style="<%= hidden unless submission %> text-align: center;"/>
 <% elsif assignment.grading_type == "percent" %>
   <span class="grading_box" id="student_grading_<%= assignment.id %>" style="<%= hidden unless submission %>">
-    <input type="text" value="<%= submission.grade if submission %>" size="3" class="grading_value" style="text-align: center;"/>
+    <input
+      type="text" size="3" class="grading_value" style="text-align: center;"
+      value="<%= I18n.n(submission.grade.to_f, percentage: true) if submission %>"
+    />
     <span style="display: none;">%</span>
   </span>
 <% elsif assignment.grading_type == "letter_grade" %>
-  <input type="text" value="<%= submission.score if submission %>" size="3" class="grading_value grading_box score_value" id="student_grading_<%= assignment.id %>" style="<%= hidden unless submission %> text-align: center;"/>
+  <input
+    type="text" size="3" class="grading_value grading_box score_value"
+    value="<%= I18n.n(submission.score) if submission %>"
+    id="student_grading_<%= assignment.id %>"
+    style="<%= hidden unless submission %> text-align: center;"
+  />
 <% elsif assignment.grading_type == "gpa_scale" %>
-  <input type="text" value="<%= submission.score if submission %>" size="3" class="grading_value grading_box score_value gpa_scale_cell" id="student_grading_<%= assignment.id %>" style="<%= hidden unless submission %> text-align: center;"/>
-<% elsif assignment.grading_type == "pass_fail" %>
-  <select class="grading_value grading_box pass_fail" id="student_grading_<%= assignment.id %>" style="<%= hidden unless submission %> text-align: left;">
+  <input
+    type="text" size="3" class="grading_value grading_box score_value gpa_scale_cell"
+    value="<%= I18n.n(submission.score) if submission %>"
+    id="student_grading_<%= assignment.id %>"
+    style="<%= hidden unless submission %> text-align: center;"/>
+<% elsif assignment.grading_type == "pass_fail"
+     complete_selected = submission && %w[pass complete].include?(submission.grade)
+     incomplete_selected = submission && %w[fail incomplete].include?(submission.grade)
+%>
+  <select
+    class="grading_value grading_box pass_fail"
+    id="student_grading_<%= assignment.id %>"
+    style="<%= hidden unless submission %> text-align: left;"
+  >
     <option value="" style="padding-left: 5px;">---</option>
-    <option value="complete" style="padding-left: 5px;" <%= "selected" if submission && (submission.grade == "pass" || submission.grade == "complete") %>><%= t('#gradebooks.grades.complete', "Complete") %></option>
-    <option value="incomplete" style="padding-left: 5px;" <%= "selected" if submission && (submission.grade == "fail" || submission.grade == "incomplete") %>><%= t('#gradebooks.grades.incomplete', "Incomplete") %></option>
+    <option value="complete" style="padding-left: 5px;" <%= "selected" if complete_selected %>>
+      <%= t("Complete") %>
+    </option>
+    <option value="incomplete" style="padding-left: 5px;" <%= "selected" if incomplete_selected %>>
+      <%= t("Incomplete") %>
+    </option>
   </select>
 <% end %>

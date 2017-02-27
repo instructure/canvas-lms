@@ -2,7 +2,7 @@ define [
   'jsx/external_apps/lib/ExternalAppsStore',
   'helpers/fakeENV'
 ], (store, fakeENV) ->
-  module 'ExternalApps.ExternalAppsStore',
+  QUnit.module 'ExternalApps.ExternalAppsStore',
     setup: ->
       fakeENV.setup({
         CONTEXT_BASE_URL: "/accounts/1"

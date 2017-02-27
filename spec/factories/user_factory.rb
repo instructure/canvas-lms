@@ -139,7 +139,7 @@ module Factories
   def create_users(records, options = {})
     @__create_user_count ||= 0
     name_prefix = options[:name_prefix] || "user"
-    records = records.times.map{ |i| { name: "#{name_prefix} #{@__create_user_count + i + 1}" } } if records.is_a?(Fixnum)
+    records = records.times.map{ |i| { name: "#{name_prefix} #{@__create_user_count + i + 1}" } } if records.is_a?(Integer)
     records = records.map { |record| valid_user_attributes.merge(workflow_state: "registered").merge(record) }
     @__create_user_count += records.size
     create_records(User, records, options[:return_type])

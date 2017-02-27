@@ -6,7 +6,7 @@ define([
   'jsx/shared/FriendlyDatetime'
 ], (React, ReactDOM, TestUtils, LastActivity, FriendlyDatetime) => {
 
-  module('StudentContextTray/LastActivity', (hooks) => {
+  QUnit.module('StudentContextTray/LastActivity', (hooks) => {
     let subject
     hooks.afterEach(() => {
       if (subject) {
@@ -20,7 +20,7 @@ define([
 
     const lastActivity = "Wed, 16 Nov 2016 00:29:34 UTC +00:00"
 
-    module('lastActivity', () => {
+    QUnit.module('lastActivity', () => {
       test('returns null by default', () => {
         subject = TestUtils.renderIntoDocument(
           <LastActivity user={{}} />

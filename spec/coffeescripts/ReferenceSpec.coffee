@@ -13,7 +13,7 @@ define ['compiled/Reference'], (Reference) ->
   fixtures = null
   storedStupidAwesomeFunction = null
 
-  module "Reference",
+  QUnit.module "Reference",
     setup: ->
       # DO put any necessary DOM artifacts into #fixtures, not "body"
       fixtures = document.getElementById('fixtures')

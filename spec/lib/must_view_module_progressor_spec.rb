@@ -368,4 +368,23 @@ describe "MustViewModuleProgressor" do
       expect(progression.requirements_met).to eq []
     end
   end
+
+  describe '#current_progress' do
+    before :once do
+      course_with_student(active_all: true)
+      @module, @assignment = module_with_item_return_all(:assignment, 'must_contribute')
+    end
+
+    it "should export module status into a hash" do
+      progress = MustViewModuleProgressor.new(@student, @course).current_progress
+      expect(progress[@module.id][:status]).to eq 'unlocked'
+      expect(progress[@module.id][:items].keys.length).to eq 1
+    end
+
+    it "should export module item completion into a hash" do
+      assign_item = @module.content_tags.find_by(content: @assignment)
+      progress = MustViewModuleProgressor.new(@student, @course).current_progress
+      expect(progress[@module.id][:items][assign_item.id]).to be false
+    end
+  end
 end

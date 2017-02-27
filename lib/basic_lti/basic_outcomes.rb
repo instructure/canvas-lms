@@ -225,12 +225,6 @@ module BasicLTI
             user: user
           )
 
-          job_options = {
-            :priority => Delayed::LOW_PRIORITY,
-            :max_attempts => 1,
-            :n_strand => 'file_download'
-          }
-          attachment.send_later_enqueue_args(:clone_url, job_options, url, 'rename', true)
           submission_hash[:attachments] = [attachment]
           submission_hash[:submission_type] = 'online_upload'
         elsif (launch_url = result_data_launch_url)
@@ -253,6 +247,7 @@ module BasicLTI
         elsif !text && !url && !launch_url
           error_message = I18n.t('lib.basic_lti.no_score', "No score given")
         end
+
         if error_message
           self.code_major = 'failure'
           self.description = error_message
@@ -269,27 +264,41 @@ to because the assignment has no points possible.
           self.code_major = 'failure'
           self.description = I18n.t('lib.basic_lti.no_points_possible', 'Assignment has no points possible.')
         else
-          if submission_hash[:submission_type].present? && submission_hash[:submission_type] != 'external_tool'
-            @submission = assignment.submit_homework(user, submission_hash.clone)
-          end
+          if attachment
+            job_options = {
+              :priority => Delayed::LOW_PRIORITY,
+              :max_attempts => 1,
+              :n_strand => 'file_download'
+            }
 
-          if new_score || raw_score
-            submission_hash[:grade] = (new_score >= 1 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
-            submission_hash[:grader_id] = -_tool.id
-            @submission = assignment.grade_student(user, submission_hash).first
-          end
-
-          if @submission
-            @submission.save
+            send_later_enqueue_args(:fetch_attachment_and_save_submission, job_options, url, attachment, _tool, submission_hash, assignment, user, new_score, raw_score)
           else
-            self.code_major = 'failure'
-            self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
+            create_homework_submission _tool, submission_hash, assignment, user, new_score, raw_score
           end
         end
 
         self.body = "<replaceResultResponse />"
 
         true
+      end
+
+      def create_homework_submission(_tool, submission_hash, assignment, user, new_score, raw_score)
+        if submission_hash[:submission_type].present? && submission_hash[:submission_type] != 'external_tool'
+          @submission = assignment.submit_homework(user, submission_hash.clone)
+        end
+
+        if new_score || raw_score
+          submission_hash[:grade] = (new_score >= 1 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
+          submission_hash[:grader_id] = -_tool.id
+          @submission = assignment.grade_student(user, submission_hash).first
+        end
+
+        if @submission
+          @submission.save
+        else
+          self.code_major = 'failure'
+          self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
+        end
       end
 
       def handle_deleteResult(tool, _course, assignment, user)
@@ -311,6 +320,11 @@ to because the assignment has no points possible.
         </readResultResponse>
       }
         true
+      end
+
+      def fetch_attachment_and_save_submission(url, attachment, _tool, submission_hash, assignment, user, new_score, raw_score)
+        attachment.clone_url(url, 'rename', true)
+        create_homework_submission _tool, submission_hash, assignment, user, new_score, raw_score
       end
 
       def submission_score

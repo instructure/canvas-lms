@@ -7,7 +7,7 @@ define([
 ], (React, ReactDOM, TestUtils, CourseImagePicker, initialState) => {
   const wrapper = document.getElementById('fixtures');
 
-  module('CourseImagePicker Component', {
+  QUnit.module('CourseImagePicker Component', {
     renderComponent(props = {}) {
       const element = React.createElement(CourseImagePicker, props);
       return ReactDOM.render(element, wrapper);

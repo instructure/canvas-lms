@@ -68,3 +68,6 @@ define [
 
     anyAssignmentInClosedGradingPeriod: ->
       @get('any_assignment_in_closed_grading_period')
+      
+    hasIntegrationData: ->
+      !_.isEmpty(@get('integration_data'))

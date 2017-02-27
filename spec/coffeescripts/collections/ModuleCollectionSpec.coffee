@@ -1,7 +1,7 @@
 define [
   'compiled/collections/ModuleCollection'
 ], (ModuleCollection) ->
-  module 'ModuleCollection',
+  QUnit.module 'ModuleCollection',
 
   test "generates the correct fetch url", ->
     course_id = 5

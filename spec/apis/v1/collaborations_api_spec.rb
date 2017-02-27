@@ -206,7 +206,7 @@ describe CollaborationsController, type: :request do
     it 'returns group members plus course admins for group collaborations' do
       group_model(:context => @course)
       user_with_pseudonym
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
       @group.add_user(@user)
       gc = collaboration_model(:user => @user, :context => @group)
       json = api_call(:get, "/api/v1/groups/#{@group.id}/potential_collaborators",

@@ -742,6 +742,8 @@ describe "Canvas Cartridge importing" do
     hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
+    @copy_to.expects(:turnitin_enabled?).at_least(1).returns(true)
+    @copy_to.expects(:vericite_enabled?).at_least(1).returns(true)
     Importers::AssignmentImporter.import_from_migration(hash, @copy_to, @migration)
 
     asmnt_2 = @copy_to.assignments.where(migration_id: migration_id).first
@@ -849,7 +851,6 @@ XML
     expect(dt_2.title).to eq dt.title
     expect(dt_2.message).to eq body_with_link % @copy_to.id
     expect(dt_2.delayed_post_at.to_i).to eq dt.delayed_post_at.to_i
-    expect(dt_2.posted_at.to_i).to eq orig_posted_at.to_i
     expect(dt_2.type).to eq dt.type
   end
 

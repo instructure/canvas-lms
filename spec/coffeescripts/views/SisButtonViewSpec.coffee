@@ -16,7 +16,7 @@ define [
       return @get 'post_to_sis' unless arguments.length > 0
       @set 'post_to_sis', postToSisBoolean
 
-  module 'SisButtonView',
+  QUnit.module 'SisButtonView',
     setup: ->
       @assignment = new AssignmentStub()
       @quiz = new QuizStub()
@@ -40,6 +40,13 @@ define [
     ok @assignment.postToSIS()
     @view.$el.click()
     ok !@assignment.postToSIS()
+
+  test 'does not override dates', ->
+    saveStub = @stub(@assignment, 'save').callsFake(() ->)
+    @view = new SisButtonView(model: @assignment)
+    @view.render()
+    @view.$el.click()
+    ok saveStub.calledWith(override_dates: false)
 
   test 'properly saves model with a custom url if present', ->
     @stub @quiz, 'save', (attributes, options) ->

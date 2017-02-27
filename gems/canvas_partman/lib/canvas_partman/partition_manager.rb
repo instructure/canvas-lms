@@ -21,7 +21,7 @@ See CanvasPartman::Concerns::Partitioned.
     # Create partitions to hold existing data in a non-partitioned
     # table, and n future partitions
     #
-    # @param [Fixnum] advance
+    # @param [Integer] advance
     #   The number of partitions to create in advance
     def create_initial_partitions(_advance = 1)
       raise NotImplementedError
@@ -29,7 +29,7 @@ See CanvasPartman::Concerns::Partitioned.
 
     # Ensure the current partition, and n future partitions exist
     #
-    # @param [Fixnum] advance
+    # @param [Integer] advance
     #   The number of partitions to create in advance
     def ensure_partitions(_advance = 1)
       raise NotImplementedError
@@ -37,14 +37,14 @@ See CanvasPartman::Concerns::Partitioned.
 
     # Prune old partitions
     #
-    # @param [Fixnum] number_to_keep
+    # @param [Integer] number_to_keep
     #   The number of partitions to keep (excluding the current partition)
     def prune_partitions(_number_to_keep = 6)
     end
 
     # Create a new partition table.
     #
-    # @param [Boolean] graceful
+    # @param [Integer] graceful
     #   Do nothing if the partition table already exists.
     #
     # @return [String]

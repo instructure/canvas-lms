@@ -39,7 +39,7 @@ define([
     );
   }
 
-  module('CourseGradeCalculator.calculate with no submissions and no assignments', {
+  QUnit.module('CourseGradeCalculator.calculate with no submissions and no assignments', {
     setup () {
       submissions = [];
       assignmentGroups = [
@@ -90,7 +90,7 @@ define([
     equal(grades.scoreUnit, 'percentage');
   });
 
-  module('CourseGradeCalculator.calculate with no submissions and some assignments', {
+  QUnit.module('CourseGradeCalculator.calculate with no submissions and some assignments', {
     setup () {
       submissions = [];
       assignments = [
@@ -153,7 +153,7 @@ define([
     equal(grades.final.score, null, 'assignment groups must have a defined group weight');
   });
 
-  module('CourseGradeCalculator.calculate with some assignments and submissions', {
+  QUnit.module('CourseGradeCalculator.calculate with some assignments and submissions', {
     setup () {
       submissions = [
         { assignment_id: 201, score: 100 },
@@ -271,7 +271,7 @@ define([
     equal(grades.final.score, null, 'assignment groups must have a defined group weight');
   });
 
-  module('CourseGradeCalculator.calculate with zero-point assignments', {
+  QUnit.module('CourseGradeCalculator.calculate with zero-point assignments', {
     setup () {
       submissions = [
         { assignment_id: 201, score: 10 },
@@ -328,7 +328,7 @@ define([
     equal(grades.final.possible, 100, 'percent possible is 100 when submissions are counted');
   });
 
-  module('CourseGradeCalculator.calculate with only ungraded submissions', {
+  QUnit.module('CourseGradeCalculator.calculate with only ungraded submissions', {
     setup () {
       submissions = [
         { assignment_id: 201, score: null },

@@ -131,9 +131,7 @@ describe "account admin outcomes" do
     end
 
     def click_on_state_standards
-      top_level_groups = ff(".outcome-level .outcome-group")
-      expect(top_level_groups.count).to eq 3
-      top_level_groups[1].click
+      fj(".outcome-level .outcome-group:eq(1)").click
       wait_for_ajaximations
     end
 

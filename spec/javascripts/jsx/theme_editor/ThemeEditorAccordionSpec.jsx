@@ -11,7 +11,7 @@ define([
 
   let elem, props
 
-  module('ThemeEditorAccordion Component', {
+  QUnit.module('ThemeEditorAccordion Component', {
     setup () {
       elem = document.createElement('div')
       props = {
@@ -43,7 +43,7 @@ define([
 
   test('Opens last used accordion tab', () => {
     var options; // Stores the last object passed to $dom.accorion({...})
-    sinon.stub(jQuery.fn, 'accordion', (opts)=>{
+    sinon.stub(jQuery.fn, 'accordion').callsFake((opts) => {
       // Allows us to save the last accordion call if it was an object
       // Ex: it won't save if $dom.accordion('options','active') is called
       if(typeof opts==='object'){

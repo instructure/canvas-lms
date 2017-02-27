@@ -524,7 +524,7 @@ describe "people" do
       click_option("#edit_roles #role_id", role.id.to_s, :value)
       f('.ui-dialog-buttonpane .btn-primary').click
       wait_for_ajaximations
-      assert_flash_notice_message /Role successfully updated/
+      assert_flash_notice_message "Role successfully updated"
 
       expect(f("#user_#{@teacher.id}")).to include_text(role_name)
       @enrollment.reload
@@ -544,7 +544,7 @@ describe "people" do
       click_option("#edit_roles #role_id", ta_role.id.to_s, :value)
       f('.ui-dialog-buttonpane .btn-primary').click
       wait_for_ajaximations
-      assert_flash_notice_message /Role successfully updated/
+      assert_flash_notice_message "Role successfully updated"
 
       expect(@enrollment.reload).to be_deleted
       expect(enrollment2.reload).to be_deleted
@@ -565,7 +565,7 @@ describe "people" do
       click_option("#edit_roles #role_id", ta_role.id.to_s, :value)
       f('.ui-dialog-buttonpane .btn-primary').click
       wait_for_ajaximations
-      assert_flash_notice_message /Role successfully updated/
+      assert_flash_notice_message "Role successfully updated"
 
       expect(@enrollment.reload).to be_deleted
       expect(enrollment2.reload).to_not be_deleted
@@ -582,7 +582,7 @@ describe "people" do
       click_option("#edit_roles #role_id", student_role.id.to_s, :value)
       f('.ui-dialog-buttonpane .btn-primary').click
       wait_for_ajaximations
-      assert_flash_notice_message /Role successfully updated/
+      assert_flash_notice_message "Role successfully updated"
 
       expect(@enrollment.reload).to be_deleted
       expect(enrollment2.reload).to be_deleted

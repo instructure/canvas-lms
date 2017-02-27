@@ -6,8 +6,8 @@ require [
 
   groupCategories = new GroupCategoryCollection(ENV.group_categories)
 
-  @app = new GroupCategoriesView
+  app = new GroupCategoriesView
     collection: groupCategories
-  @app.render()
-  $('#content').html @app.$el
+  app.render()
+  $('#content').html app.$el
 

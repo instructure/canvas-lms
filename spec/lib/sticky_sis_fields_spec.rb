@@ -294,7 +294,7 @@ describe StickySisFields do
     end
   end
 
-  it "should only write to the database when there's a change" do
+  it "doesn't write to the database when there's not a change" do
     skip('mocking :write_attribute causes infinite loop with rspec-mocks + ruby 2.3.1') if RUBY_VERSION == "2.3.1"
     ac = AbstractCourse.create!(:name => "1",
                                 :short_name => "2",
@@ -307,8 +307,21 @@ describe StickySisFields do
     ac.add_sis_stickiness(:name)
     ac.clear_sis_stickiness(:name)
     ac.save!
+  end
+
+  it "writes to the database when there's a change" do
+    skip('mocking :write_attribute causes infinite loop with rspec-mocks + ruby 2.3.1') if RUBY_VERSION == "2.3.1"
+    ac = AbstractCourse.create!(:name => "1",
+                                :short_name => "2",
+                                :account => Account.default,
+                                :root_account => Account.default,
+                                :enrollment_term => Account.default.default_enrollment_term)
     ac.add_sis_stickiness(:name)
-    expect(ac).to receive(:write_attribute).with(:stuck_sis_fields, 'name').once
+    expect(ac).to receive(:write_attribute).with(:workflow_state, 'active').ordered
+    expect(ac).to receive(:write_attribute).with('root_account_id', Account.default.id).ordered
+    expect(ac).to receive(:write_attribute).with('account_id', Account.default.id).ordered
+    expect(ac).to receive(:write_attribute).with('enrollment_term_id', Account.default.default_enrollment_term.id).ordered
+    expect(ac).to receive(:write_attribute).with(:stuck_sis_fields, 'name').ordered
     ac.save!
   end
 

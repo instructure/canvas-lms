@@ -2,9 +2,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "admin settings tab" do
   include_context "in-process server selenium tests"
+  before :once do
+    account_admin_user
+  end
+
   before :each do
-    course_with_admin_logged_in
-    get "/accounts/#{Account.default.id}/settings"
+    user_session(@admin)
   end
 
   def get_default_services
@@ -89,6 +92,9 @@ describe "admin settings tab" do
   end
 
   context "account settings" do
+    before :each do
+      get "/accounts/#{Account.default.id}/settings"
+    end
 
     it "should change the default time zone to Lima" do
       f("#account_default_time_zone option[value='Lima']").click
@@ -145,6 +151,9 @@ describe "admin settings tab" do
   end
 
   context "quiz ip address filter" do
+    before :each do
+      get "/accounts/#{Account.default.id}/settings"
+    end
 
     def add_quiz_filter name ="www.canvas.instructure.com", value="192.168.217.1/24"
       fj("#ip_filters .name[value='']:visible").send_keys name
@@ -204,6 +213,10 @@ describe "admin settings tab" do
   end
 
   context "features" do
+    before :each do
+      get "/accounts/#{Account.default.id}/settings"
+    end
+
     it "should check 'open registration'" do
       check_box_verifier("#account_settings_open_registration", :open_registration)
     end
@@ -228,8 +241,8 @@ describe "admin settings tab" do
 
       before(:each) do
         f("#enable_equella").click
-        expect(is_checked("#enable_equella")).to be_truthy
       end
+
       it "should add an equella feature" do
         add_equella_feature
       end
@@ -262,6 +275,9 @@ describe "admin settings tab" do
   end
 
   context "enabled web services" do
+    before :each do
+      get "/accounts/#{Account.default.id}/settings"
+    end
 
     it "should click on the google help dialog" do
       fj("label['for'='account_services_google_docs_previews'] .icon-question").click
@@ -312,6 +328,9 @@ describe "admin settings tab" do
   end
 
   context "who can create new courses" do
+    before :each do
+      get "/accounts/#{Account.default.id}/settings"
+    end
 
     it "should check on teachers" do
       check_box_verifier("#account_settings_teachers_can_create_courses", :teachers_can_create_courses)
@@ -327,14 +346,16 @@ describe "admin settings tab" do
   end
 
   context "custom help links" do
+    before :once do
+      Setting.set('show_feedback_link', 'true')
+    end
+
     def set_checkbox(checkbox, checked)
       selector = "##{checkbox['id']}"
       checkbox.click if is_checked(selector) != checked
     end
 
     it "should set custom help link text and icon" do
-      Setting.set('show_feedback_link', 'true')
-
       link_name = 'Links'
       icon = 'cog'
       help_link_name_input = '[name="account[settings][help_link_name]"]'
@@ -359,7 +380,6 @@ describe "admin settings tab" do
           {"text"=>"text", "subtext"=>"subtext", "url"=>"http://www.example.com/example", "available_to"=>["user", "student", "teacher"]}]
       Account.default.save!
 
-      Setting.set('show_feedback_link', 'true')
       get "/accounts/#{Account.default.id}/settings"
 
       f("#tab-notifications-link").click
@@ -380,7 +400,6 @@ describe "admin settings tab" do
       expect(help_links).to include(help_link.merge(:type => "custom"))
       expect(help_links & Account::HelpLinks.default_links).to eq Account::HelpLinks.default_links
 
-      Setting.set('show_feedback_link', 'true')
       get "/accounts/#{Account.default.id}/settings"
 
       top = f('#custom_help_link_settings .ic-Sortable-item')
@@ -393,6 +412,44 @@ describe "admin settings tab" do
       expect(new_help_links).to_not include(Account::HelpLinks.default_links.first)
       expect(new_help_links).to include(Account::HelpLinks.default_links.last)
       expect(new_help_links).to include(help_link.merge(:type => "custom"))
+    end
+
+    it "adds a custom link" do
+      get "/accounts/#{Account.default.id}/settings"
+      f('#custom_help_link_settings .al-trigger').click
+      fln('Add Custom Link', f('#custom_help_link_settings')).click
+      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), 'text'
+      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), 'subtext'
+      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://url.example.com'
+      f('#custom_help_link_settings button[type="submit"]').click
+      click_submit
+      cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://url.example.com' }
+      expect(cl).to eq({"text"=>"text", "subtext"=>"subtext", "url"=>"https://url.example.com", "type"=>"custom", "available_to"=>["user", "student", "teacher", "admin"]})
+    end
+
+    it "edits a custom link" do
+      a = Account.default
+      a.settings[:custom_help_links] = [{"text"=>"custom-link-text-frd", "subtext"=>"subtext", "url"=>"https://url.example.com", "type"=>"custom", "available_to"=>["user", "student", "teacher", "admin"]}]
+      a.save!
+      get "/accounts/#{Account.default.id}/settings"
+      fj('#custom_help_link_settings span:contains("Edit custom-link-text-frd")').find_element(:xpath, '..').click
+      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://whatever.example.com'
+      f('#custom_help_link_settings button[type="submit"]').click
+      click_submit
+      cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://whatever.example.com' }
+      expect(cl).not_to be_blank
+    end
+
+    it "edits a default link" do
+      get "/accounts/#{Account.default.id}/settings"
+      fj('#custom_help_link_settings span:contains("Edit Report a Problem")').find_element(:xpath, '..').click
+      url = fj('#custom_help_link_settings input[name$="[url]"]:visible')
+      expect(url).to be_disabled
+      fj('#custom_help_link_settings fieldset .ic-Label:contains("Teachers"):visible').click
+      f('#custom_help_link_settings button[type="submit"]').click
+      click_submit
+      cl = Account.default.help_links.detect { |hl| hl['url'] == '#create_ticket' }
+      expect(cl['available_to']).not_to include('teacher')
     end
   end
 
@@ -417,6 +474,8 @@ describe "admin settings tab" do
     end
 
     it "should display keys with the correct rights" do
+      get "/accounts/#{Account.default.id}/settings"
+
       eik = ExternalIntegrationKey.new
       eik.context = Account.default
       eik.key_type = 'external_key0'
@@ -441,6 +500,8 @@ describe "admin settings tab" do
     end
 
     it "should update writable keys" do
+      get "/accounts/#{Account.default.id}/settings"
+
       set_value f("#account_external_integration_keys_external_key0"), key_value
       click_submit
 

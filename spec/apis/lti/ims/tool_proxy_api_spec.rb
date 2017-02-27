@@ -15,13 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
+require File.expand_path(File.dirname(__FILE__) + '/../lti2_api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require_dependency "lti/ims/tool_proxy_controller"
 
 module Lti
   module Ims
     describe ToolProxyController, type: :request do
+      include_context 'lti2_api_spec_helper'
 
       let(:account) { Account.new }
       let(:product_family) do
@@ -112,26 +113,14 @@ module Lti
         end
       end
 
-      describe "POST #create with Developer Key" do
-        before(:each) do
-          OAuth::Signature.stubs(:build).returns(mock(verify: true))
-          Lti::RegistrationRequestService.stubs(:retrieve_registration_password).returns(nil)
-
-          dev_key = 'developer_key'
-          OAuth::Helper.stubs(:parse_header).returns({'oauth_consumer_key' => dev_key})
-
-          dev_key_object = DeveloperKey.create(api_key: 'test_api_key')
-          DeveloperKey.expects(:find_cached).with(dev_key).returns(dev_key_object)
-        end
-
-        it 'accepts developer key/secret' do
+      describe "POST #create with JWT access token" do
+        it 'accepts valid JWT access tokens' do
           course_with_teacher_logged_in(:active_all => true)
           tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
           json = JSON.parse(tool_proxy_fixture)
           json[:format] = 'json'
           json[:account_id] = @course.account.id
-          headers = {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
-          response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture, headers
+          response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture, dev_key_request_headers
           expect(response).to eq 201
         end
       end
@@ -142,6 +131,7 @@ module Lti
           mock_siq = mock('signature')
           mock_siq.stubs(:verify).returns(true)
           OAuth::Signature.stubs(:build).returns(mock_siq)
+
         end
 
         let(:auth_header) do
@@ -183,7 +173,7 @@ module Lti
           tool_proxy_fixture = JSON.parse(File.read(fixture_file))
 
           tcp_url = polymorphic_url([@course.account, :tool_consumer_profile],
-                                    tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID)
+                                    tool_consumer_profile_id: Lti::ToolConsumerProfile::DEFAULT_TCP_UUID)
           tool_proxy_fixture["tool_consumer_profile"] = tcp_url
 
           headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(auth_header)

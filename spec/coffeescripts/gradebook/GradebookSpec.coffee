@@ -22,9 +22,12 @@ define [
   'jsx/gradebook/DataLoader'
   'underscore'
   'timezone'
+  'compiled/util/natcompare'
   'compiled/SubmissionDetailsDialog'
   'jsx/gradebook/CourseGradeCalculator'
-], (GradeCalculatorSpecHelper, Gradebook, DataLoader, _, tz, SubmissionDetailsDialog, CourseGradeCalculator) ->
+], (
+  GradeCalculatorSpecHelper, Gradebook, DataLoader, _, tz, natcompare, SubmissionDetailsDialog, CourseGradeCalculator
+) ->
   exampleGradebookOptions =
     settings:
       show_concluded_enrollments: 'true'
@@ -33,7 +36,7 @@ define [
 
   createExampleGrades = GradeCalculatorSpecHelper.createCourseGradesWithGradingPeriods
 
-  module 'Gradebook'
+  QUnit.module 'Gradebook'
 
   test 'normalizes the grading period set from the env', ->
     options = _.extend {}, exampleGradebookOptions,
@@ -50,7 +53,7 @@ define [
     gradingPeriodSet = new Gradebook(exampleGradebookOptions).gradingPeriodSet
     deepEqual(gradingPeriodSet, null)
 
-  module 'Gradebook#calculateStudentGrade',
+  QUnit.module 'Gradebook#calculateStudentGrade',
     setupThis:(options = {}) ->
       assignments = [{ id: 201, points_possible: 10, omit_from_final_grade: false }]
       submissions = [{ assignment_id: 201, score: 10 }]
@@ -157,7 +160,19 @@ define [
     @calculate.call(self, id: '101', loaded: true, initialized: false)
     notOk(CourseGradeCalculator.calculate.called)
 
-  module 'Gradebook#gradeSort'
+  QUnit.module "Gradebook#localeSort"
+
+  test "delegates to natcompare.strings", ->
+    natCompareSpy = @spy(natcompare, 'strings')
+    Gradebook.prototype.localeSort('a', 'b')
+    ok natCompareSpy.calledWith('a', 'b')
+
+  test "substitutes falsy args with empty string", ->
+    natCompareSpy = @spy(natcompare, 'strings')
+    Gradebook.prototype.localeSort(0, false)
+    ok natCompareSpy.calledWith('', '')
+
+  QUnit.module 'Gradebook#gradeSort'
 
   test 'gradeSort - total_grade', ->
     gradeSort = (showTotalGradeAsPoints, a, b, field, asc) ->
@@ -191,11 +206,11 @@ define [
     , 'assignment1') < 0
     , 'other fields are sorted by score'
 
-  gradebookStubs = ->
-    indexedOverrides: Gradebook.prototype.indexedOverrides
-    indexedGradingPeriods: _.indexBy(@gradingPeriods, 'id')
+  QUnit.module 'Gradebook#hideAggregateColumns',
+    gradebookStubs: ->
+      indexedOverrides: Gradebook.prototype.indexedOverrides
+      indexedGradingPeriods: _.indexBy(@gradingPeriods, 'id')
 
-  module 'Gradebook#hideAggregateColumns',
     setupThis: (options) ->
       customOptions = options || {}
       defaults =
@@ -204,7 +219,7 @@ define [
         options:
           all_grading_periods_totals: false
 
-      _.defaults customOptions, defaults, gradebookStubs()
+      _.defaults customOptions, defaults, @gradebookStubs()
 
     setup: ->
       @hideAggregateColumns = Gradebook.prototype.hideAggregateColumns
@@ -243,7 +258,7 @@ define [
 
     notOk @hideAggregateColumns.call(self)
 
-  module 'Gradebook#getVisibleGradeGridColumns',
+  QUnit.module 'Gradebook#getVisibleGradeGridColumns',
     setup: ->
       @getVisibleGradeGridColumns = Gradebook.prototype.getVisibleGradeGridColumns
       @makeColumnSortFn = Gradebook.prototype.makeColumnSortFn
@@ -282,7 +297,7 @@ define [
     @getVisibleGradeGridColumns()
     notOk @makeColumnSortFn.called
 
-  module 'Gradebook#fieldsToExcludeFromAssignments',
+  QUnit.module 'Gradebook#fieldsToExcludeFromAssignments',
     setup: ->
       @excludedFields = Gradebook.prototype.fieldsToExcludeFromAssignments
 
@@ -292,7 +307,7 @@ define [
   test 'includes "needs_grading_count" in the response', ->
     ok _.contains(@excludedFields, 'needs_grading_count')
 
-  module 'Gradebook#submissionsForStudent',
+  QUnit.module 'Gradebook#submissionsForStudent',
     setupThis: (options = {}) ->
       effectiveDueDates = {
         1: { 1: { grading_period_id: '1' } },
@@ -336,7 +351,7 @@ define [
     submissions = @submissionsForStudent.call(self, @student)
     propEqual _.pluck(submissions, 'assignment_id'), ['2']
 
-  module 'Gradebook#studentsUrl',
+  QUnit.module 'Gradebook#studentsUrl',
     setupThis:(options) ->
       options = options || {}
       defaults = {
@@ -363,7 +378,7 @@ define [
     self = @setupThis(showConcludedEnrollments: true, showInactiveEnrollments: true)
     equal @studentsUrl.call(self), 'students_with_concluded_and_inactive_enrollments_url'
 
-  module 'Gradebook#weightedGroups',
+  QUnit.module 'Gradebook#weightedGroups',
     setup: ->
       @weightedGroups = Gradebook.prototype.weightedGroups
 
@@ -374,7 +389,7 @@ define [
     equal @weightedGroups.call(options: { group_weighting_scheme: 'points' }), false
     equal @weightedGroups.call(options: { group_weighting_scheme: null }), false
 
-  module 'Gradebook#weightedGrades',
+  QUnit.module 'Gradebook#weightedGrades',
     setupThis:(group_weighting_scheme, gradingPeriodSet) ->
       { options: { group_weighting_scheme }, gradingPeriodSet }
     setup: ->
@@ -396,7 +411,7 @@ define [
     self = @setupThis('points', null)
     equal @weightedGrades.call(self), false
 
-  module 'Gradebook#displayPointTotals',
+  QUnit.module 'Gradebook#displayPointTotals',
     setupThis:(show_total_grade_as_points, weightedGrades) ->
       options: { show_total_grade_as_points }
       weightedGrades: () -> weightedGrades
@@ -415,7 +430,7 @@ define [
     self = @setupThis(false, false)
     equal @displayPointTotals.call(self), false
 
-  module 'Gradebook#showNotesColumn',
+  QUnit.module 'Gradebook#showNotesColumn',
     setup: ->
       @loadNotes = @stub(DataLoader, 'getDataForColumn')
 
@@ -436,7 +451,7 @@ define [
     @showNotesColumn()
     ok @loadNotes.notCalled
 
-  module 'Gradebook#cellCommentClickHandler',
+  QUnit.module 'Gradebook#cellCommentClickHandler',
     setup: ->
       @cellCommentClickHandler = Gradebook.prototype.cellCommentClickHandler
       @assignments = {

@@ -6,7 +6,7 @@ define [
   'jsx/epub_exports/CourseListItem'
 ], (_, React, ReactDOM, TestUtils, CourseListItem, I18n) ->
 
-  module 'CourseListItemSpec',
+  QUnit.module 'CourseListItemSpec',
     setup: ->
       @props = {
         course: {

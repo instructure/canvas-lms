@@ -17,7 +17,7 @@ define [
     }
   ]
 
-  module 'ExternalToolCollection',
+  QUnit.module 'ExternalToolCollection',
     setup: ->
       @externalToolCollection = new ExternalToolCollection
       @externalToolCollection.add(data)
