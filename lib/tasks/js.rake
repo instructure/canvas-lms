@@ -38,11 +38,6 @@ namespace :js do
       puts "--> Pre-compiling ember handlebars templates finished in #{ember_handlebars_time}"
     end
 
-    # can't be in own thread, needs to happen before coffeescript
-    puts "--> Creating ember app bundles"
-    bundle_time = Benchmark.realtime { Rake::Task['js:bundle_ember_apps'].invoke }
-    puts "--> Creating ember app bundles finished in #{bundle_time}"
-
     threads << Thread.new do
       coffee_time = Benchmark.realtime do
         Rake::Task['js:coffee'].invoke
@@ -214,14 +209,6 @@ namespace :js do
       opts = Rails.env.development? ? "--source-maps inline" : ""
       msg = `node_modules/.bin/babel #{source} --out-dir #{dest} #{opts} 2>&1 >/dev/null`
       raise msg unless $?.success?
-    end
-  end
-
-  desc "Creates ember app bundles"
-  task :bundle_ember_apps do
-    require 'lib/ember_bundle'
-    Dir.entries('app/coffeescripts/ember').reject { |d| d.match(/^\./) || d == 'shared' }.each do |app|
-      EmberBundle.new(app).build
     end
   end
 

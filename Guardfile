@@ -10,7 +10,6 @@ directories %w(app spec gems/plugins)
 guard :coffeescript, input: 'app/coffeescripts', output: 'public/javascripts/compiled'
 guard :coffeescript, input: 'spec/coffeescripts', output: 'spec/javascripts/compiled'
 guard :coffeescript, input: 'spec_canvas/coffeescripts', output: 'spec_canvas/javascripts'
-guard :ember_bundles
 guard :ember_templates
 guard :js_extensions
 guard :jst, input: 'app/views/jst', output: 'public/javascripts/jst'
