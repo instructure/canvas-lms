@@ -42,7 +42,11 @@ define [
                                     document.activeElement
 
       setTimeout () =>
-        ReactDOM.findDOMNode(@refs.newName)?.focus()
+        input = @refs.newName
+        if input
+          ext = input.value.lastIndexOf('.')
+          input.setSelectionRange(0, if ext < 0 then input.value.length else ext)
+          input.focus()
       , 0
 
     focusNameLink: ->

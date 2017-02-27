@@ -4,7 +4,7 @@ define [
   'helpers/fakeENV'
   'underscore'
 ], (Backbone, CourseFindSelectView, fakeENV, _) ->
-  module 'CourseFindSelectView: #setSourceCourseId',
+  QUnit.module 'CourseFindSelectView: #setSourceCourseId',
     setup: ->
       fakeENV.setup()
       @url = '/users/101/manageable_courses'

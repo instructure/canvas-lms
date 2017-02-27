@@ -4,7 +4,7 @@ define [
 
   globalObj = this
 
-  module 'UserSettings',
+  QUnit.module 'UserSettings',
     setup: ->
       @_ENV = globalObj.ENV
       globalObj.ENV =

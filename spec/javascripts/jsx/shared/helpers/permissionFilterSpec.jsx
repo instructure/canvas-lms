@@ -3,7 +3,7 @@ define([
 ], (applyPermissions) => {
 
 
-  module('Permissions Filter Helper Function');
+  QUnit.module('Permissions Filter Helper Function');
 
   test('Item requires no permissions', () => {
     const items = [

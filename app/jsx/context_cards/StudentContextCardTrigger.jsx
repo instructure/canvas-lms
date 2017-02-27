@@ -12,13 +12,26 @@ define([
       const container = document.getElementById('StudentContextTray__Container')
       const store = new StudentCardStore(studentId, courseId)
       store.load()
+
+      const returnFocusToHandler = () => {
+        const focusableItems = [$(event.target)];
+        if ($('.search-query')) {
+          focusableItems.push($('.search-query'))
+        }
+        if ($('[name="search_term"]')) {
+          focusableItems.push($('[name="search_term"]'))
+        }
+
+        return focusableItems;
+      }
+
       ReactDOM.render(
         <StudentContextTray
-          isLoading
-          isOpen
+          key={`student_context_card_${courseId}_${studentId}`}
           courseId={courseId}
           store={store}
           studentId={studentId}
+          returnFocusTo={returnFocusToHandler}
           onClose={() => {
             ReactDOM.unmountComponentAtNode(container)
           }}

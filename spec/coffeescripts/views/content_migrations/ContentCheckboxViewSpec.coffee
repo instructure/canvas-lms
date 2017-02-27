@@ -72,7 +72,7 @@ define [
                                               }
                                           ])]
 
-  module "Content Checkbox Behaviors",
+  QUnit.module "Content Checkbox Behaviors",
     teardown: -> CheckboxHelper.teardown()
 
   test 'renders a checkbox with name set from model property', ->
@@ -81,7 +81,7 @@ define [
 
     equal nameValue, 'copy[all_assignments]', 'Adds the correct name attribute from property'
 
-  module "Sublevel Content Checkbox and Carrot Behaviors",
+  QUnit.module "Sublevel Content Checkbox and Carrot Behaviors",
     setup: ->
       fakeENV.setup()
       @url = '/api/v1/courses/42/content_migrations/5/selective_data?type=assignments'

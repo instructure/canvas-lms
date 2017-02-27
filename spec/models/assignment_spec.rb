@@ -179,7 +179,7 @@ describe Assignment do
     end
 
     it 'returns a jwt' do
-      expect(Canvas::Security.decode_jwt @assignment.secure_params)
+      expect(Canvas::Security.decode_jwt(@assignment.secure_params)).to be
     end
   end
 
@@ -3384,6 +3384,11 @@ describe Assignment do
       @assignment = assignment_model(course: @course)
     end
 
+    let(:errors) do
+      @assignment.valid?
+      @assignment.errors
+    end
+
     it "should hard truncate at 30 characters" do
       @assignment.title = "a" * 31
       expect(@assignment.title.length).to eq 31
@@ -3410,7 +3415,7 @@ describe Assignment do
                            qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                            qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
 
-      expect(lambda { @assignment.save! }).to raise_error("Validation failed: Title is too long (maximum is 255 characters), Title is too long (maximum is 255 characters)")
+      expect(errors[:title]).not_to be_empty
     end
   end
 
@@ -3427,6 +3432,55 @@ describe Assignment do
     it "is not valid when due_date_ok? is false" do
       AssignmentUtil.stubs(:due_date_ok?).returns(false)
       expect(assignment.valid?).to eq(false)
+    end
+  end
+
+  describe "validate_assignment_overrides_due_date" do
+    let(:section_1) { @course.course_sections.create!(name: "section 1") }
+    let(:section_2) { @course.course_sections.create!(name: "section 2") }
+
+    let(:assignment) do
+      @course.assignments.create!(assignment_valid_attributes)
+    end
+
+    describe "when an override has no due date" do
+      before do
+        # Create an override with a due date
+        create_section_override_for_assignment(assignment, course_section: section_1)
+
+        # Create an override without a due date
+        override = create_section_override_for_assignment(assignment, course_section: section_2)
+        override.due_at = nil
+        override.save
+      end
+
+      it "is not valid when AssignmentUtil.due_date_required? is true" do
+        AssignmentUtil.stubs(:due_date_required?).returns(true)
+        expect(assignment.valid?).to eq(false)
+      end
+
+      it "is valid when AssignmentUtil.due_date_required? is false" do
+        AssignmentUtil.stubs(:due_date_required?).returns(false)
+        expect(assignment.valid?).to eq(true)
+      end
+    end
+
+    describe "when all overrides have a due date" do
+      before do
+        # Create 2 overrides with due dates
+        create_section_override_for_assignment(assignment, course_section: section_1)
+        create_section_override_for_assignment(assignment, course_section: section_2)
+      end
+
+      it "is valid when AssignmentUtil.due_date_required? is true and " do
+        AssignmentUtil.stubs(:due_date_required?).returns(true)
+        expect(assignment.valid?).to eq(true)
+      end
+
+      it "is valid when AssignmentUtil.due_date_required? is false" do
+        AssignmentUtil.stubs(:due_date_required?).returns(false)
+        expect(assignment.valid?).to eq(true)
+      end
     end
   end
 
@@ -3780,7 +3834,9 @@ describe Assignment do
   end
 
   describe 'title validation' do
-    let(:assignment) { Assignment.new }
+    let(:assignment) do
+      @course.assignments.create!(assignment_valid_attributes)
+    end
     let(:errors) {
       assignment.valid?
       assignment.errors
@@ -3797,7 +3853,6 @@ describe Assignment do
     end
 
     it 'must allow a blank title when it is unchanged and was previously blank' do
-      assignment = @course.assignments.create!(assignment_valid_attributes)
       assignment.title = ''
       assignment.save(validate: false)
 
@@ -3807,11 +3862,29 @@ describe Assignment do
     end
 
     it 'must not allow the title to be blank if changed' do
-      assignment = @course.assignments.create!(assignment_valid_attributes)
       assignment.title = ' '
       assignment.valid?
       errors = assignment.errors
       expect(errors[:title]).not_to be_empty
+    end
+  end
+
+  describe "max_name_length" do
+    let(:assignment) do
+      @course.assignments.new(assignment_valid_attributes)
+    end
+
+    it "returns custom name length if sis_assignment_name_length_input is present" do
+      assignment.post_to_sis = true
+      assignment.context.account.stubs(:sis_syncing).returns({value: true})
+      assignment.context.account.stubs(:sis_assignment_name_length).returns({value: true})
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+      assignment.context.account.stubs(:sis_assignment_name_length_input).returns({value: 15})
+      expect(assignment.max_name_length).to eq(15)
+    end
+
+    it "returns default of 255 if sis_assignment_name_length_input is not present " do
+      expect(assignment.max_name_length).to eq(255)
     end
   end
 
@@ -4012,87 +4085,80 @@ describe Assignment do
       end
     end
   end
-end
 
-def setup_assignment_with_group
-  assignment_model(:group_category => "Study Groups", :course => @course)
-  @group = @a.context.groups.create!(:name => "Study Group 1", :group_category => @a.group_category)
-  @u1 = @a.context.enroll_user(User.create(:name => "user 1")).user
-  @u2 = @a.context.enroll_user(User.create(:name => "user 2")).user
-  @u3 = @a.context.enroll_user(User.create(:name => "user 3")).user
-  @group.add_user(@u1)
-  @group.add_user(@u2)
-  @assignment.reload
-end
-
-def setup_assignment_without_submission
-  assignment_model(:course => @course)
-  @assignment.reload
-end
-
-def setup_assignment_with_homework
-  setup_assignment_without_submission
-  res = @assignment.submit_homework(@user, {:submission_type => 'online_text_entry', :body => 'blah'})
-  expect(res).not_to be_nil
-  expect(res).to be_is_a(Submission)
-  @assignment.reload
-end
-
-def setup_assignment_with_students
-  @graded_notify = Notification.create!(:name => "Submission Graded")
-  @grade_change_notify = Notification.create!(:name => "Submission Grade Changed")
-  @stu1 = @student
-  @course.enroll_student(@stu2 = user_factory)
-  @assignment = @course.assignments.create(:title => "asdf", :points_possible => 10)
-  @sub1 = @assignment.grade_student(@stu1, grade: 9, grader: @teacher).first
-  expect(@sub1.score).to eq 9
-  # Took this out until it is asked for
-  # @sub1.published_score.should_not == @sub1.score
-  expect(@sub1.published_score).to eq @sub1.score
-  @assignment.reload
-  expect(@assignment.submissions).to be_include(@sub1)
-end
-
-def submit_homework(student)
-  file_context = @assignment.group_category.group_for(student) if @assignment.has_group_category?
-  file_context ||= student
-  a = Attachment.create! context: file_context,
-                         filename: "homework.pdf",
-                         uploaded_data: StringIO.new("blah blah blah")
-  @assignment.submit_homework(student, attachments: [a],
-                                       submission_type: "online_upload")
-  a
-end
-
-def zip_submissions
-  zip = Attachment.new filename: 'submissions.zip'
-  zip.user = @teacher
-  zip.workflow_state = 'to_be_zipped'
-  zip.context = @assignment
-  zip.save!
-  ContentZipper.process_attachment(zip, @teacher)
-  raise "zip failed" if zip.workflow_state != "zipped"
-  zip
-end
-
-def setup_differentiated_assignments(opts={})
-  if !opts[:course]
-    course_with_teacher(active_all: true)
+  def setup_assignment_with_group
+    assignment_model(:group_category => "Study Groups", :course => @course)
+    @group = @a.context.groups.create!(:name => "Study Group 1", :group_category => @a.group_category)
+    @u1 = @a.context.enroll_user(User.create(:name => "user 1")).user
+    @u2 = @a.context.enroll_user(User.create(:name => "user 2")).user
+    @u3 = @a.context.enroll_user(User.create(:name => "user 3")).user
+    @group.add_user(@u1)
+    @group.add_user(@u2)
+    @assignment.reload
   end
 
-  @section1 = @course.course_sections.create!(name: 'Section One')
-  @section2 = @course.course_sections.create!(name: 'Section Two')
-
-  if opts[:ta]
-    @ta = course_with_ta(course: @course, active_all: true).user
+  def setup_assignment_without_submission
+    assignment_model(:course => @course)
+    @assignment.reload
   end
 
-  @student1, @student2, @student3 = create_users(3, return_type: :record)
-  student_in_section(@section1, user: @student1)
-  student_in_section(@section2, user: @student2)
+  def setup_assignment_with_homework
+    setup_assignment_without_submission
+    res = @assignment.submit_homework(@user, {:submission_type => 'online_text_entry', :body => 'blah'})
+    @assignment.reload
+  end
 
-  @assignment = assignment_model(course: @course, submission_types: "online_url", workflow_state: "published")
-  @override_s1 = differentiated_assignment(assignment: @assignment, course_section: @section1)
-  @override_s1.due_at = 1.day.from_now
-  @override_s1.save!
+  def setup_assignment_with_students
+    @graded_notify = Notification.create!(:name => "Submission Graded")
+    @grade_change_notify = Notification.create!(:name => "Submission Grade Changed")
+    @stu1 = @student
+    @course.enroll_student(@stu2 = user_factory)
+    @assignment = @course.assignments.create(:title => "asdf", :points_possible => 10)
+    @sub1 = @assignment.grade_student(@stu1, grade: 9, grader: @teacher).first
+    @assignment.reload
+  end
+
+  def submit_homework(student)
+    file_context = @assignment.group_category.group_for(student) if @assignment.has_group_category?
+    file_context ||= student
+    a = Attachment.create! context: file_context,
+                           filename: "homework.pdf",
+                           uploaded_data: StringIO.new("blah blah blah")
+    @assignment.submit_homework(student, attachments: [a],
+                                         submission_type: "online_upload")
+    a
+  end
+
+  def zip_submissions
+    zip = Attachment.new filename: 'submissions.zip'
+    zip.user = @teacher
+    zip.workflow_state = 'to_be_zipped'
+    zip.context = @assignment
+    zip.save!
+    ContentZipper.process_attachment(zip, @teacher)
+    raise "zip failed" if zip.workflow_state != "zipped"
+    zip
+  end
+
+  def setup_differentiated_assignments(opts={})
+    if !opts[:course]
+      course_with_teacher(active_all: true)
+    end
+
+    @section1 = @course.course_sections.create!(name: 'Section One')
+    @section2 = @course.course_sections.create!(name: 'Section Two')
+
+    if opts[:ta]
+      @ta = course_with_ta(course: @course, active_all: true).user
+    end
+
+    @student1, @student2, @student3 = create_users(3, return_type: :record)
+    student_in_section(@section1, user: @student1)
+    student_in_section(@section2, user: @student2)
+
+    @assignment = assignment_model(course: @course, submission_types: "online_url", workflow_state: "published")
+    @override_s1 = differentiated_assignment(assignment: @assignment, course_section: @section1)
+    @override_s1.due_at = 1.day.from_now
+    @override_s1.save!
+  end
 end

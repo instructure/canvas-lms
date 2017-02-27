@@ -489,12 +489,19 @@ define([
 
     $('.file-upload-question-holder').each(function(i,el) {
       var $el = $(el);
-      var val = parseInt($el.find('input.attachment-id').val(),10);
-      if (val && val !==  0){
+      var attachID = parseInt($el.find('input.attachment-id').val(), 10);
+      var model = new File(ENV.ATTACHMENTS[attachID], {preflightUrl: ENV.UPLOAD_URL});
+      var fileUploadView = new FileUploadQuestionView({el: el, model: model});
+
+      if (attachID && attachID !== 0) {
         $el.find('.file-upload-box').addClass('file-upload-box-with-file');
       }
-      var model = new File(ENV.ATTACHMENTS[val], {preflightUrl: ENV.UPLOAD_URL});
-      new FileUploadQuestionView({el: el, model: model}).render();
+
+      fileUploadView.on('attachmentManipulationComplete', function () {
+        quizSubmission.updateSubmission();
+      })
+
+      fileUploadView.render();
     });
 
     $questions

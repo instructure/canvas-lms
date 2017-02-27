@@ -44,7 +44,7 @@ module CustomWaitMethods
           // so it's not a big deal.
           window.wait_for_ajax_requests_hit_fallback = 1;
           callback(-2);
-        }, 55000);
+        }, #{SeleniumDriverSetup::SCRIPT_TIMEOUT * 1000 - 500});
         var doCallback = function(value) {
           window.clearTimeout(fallbackCallback);
           callback(value);
@@ -123,7 +123,6 @@ module CustomWaitMethods
 
   def keep_trying_until(seconds = SeleniumDriverSetup::SECONDS_UNTIL_GIVING_UP)
     frd_error = Selenium::WebDriver::Error::TimeOutError.new
-    frd_error.set_backtrace CallStackUtils.useful_backtrace
     wait_for(timeout: seconds, method: :keep_trying_until) do
       begin
         yield

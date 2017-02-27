@@ -551,6 +551,24 @@ describe ConversationsController, type: :request do
           expect(conv.context).to eq @course
         end
 
+        it "should always have the right tags when sending a bulk message in course context" do
+          other_course = Account.default.courses.create!(:workflow_state => 'available')
+          other_course.enroll_teacher(@user).accept!
+          other_course.enroll_student(@bob).accept!
+          # if they happen to be in another course it shouldn't use those tags - otherwise it will show up in the "sent" for other courses
+          @course.account.role_overrides.where(permission: 'send_messages_all', role: teacher_role).update_all(enabled: true)
+
+          json = api_call(:post, "/api/v1/conversations",
+            { :controller => 'conversations', :action => 'create', :format => 'json' },
+            { :recipients => [@course.asset_string], :body => "test", :context_code => @course.asset_string,
+              :bulk_message => "1", :group_conversation => "1"}
+          )
+
+          @user.all_conversations.sent.each do |cp|
+            expect(cp.tags).to eq [@course.asset_string]
+          end
+        end
+
         it "should allow site admin to set any account context" do
           site_admin_user(name: "site admin", active_all: true)
           json = api_call(:post, "/api/v1/conversations",
@@ -714,6 +732,14 @@ describe ConversationsController, type: :request do
 
           [@me, @bob].each {|u| expect(u.conversations.first.conversation.context).to be_nil} # an existing conversation does not get a context
           [@billy, @joe].each {|u| expect(u.conversations.first.conversation.context).to eql(@course)}
+        end
+
+        it "constraints the length of the subject of a conversation batch" do
+          json = api_call(:post, "/api/v1/conversations",
+              { :controller => 'conversations', :action => 'create', :format => 'json' },
+              { :recipients => [@bob.id, @joe.id, @billy.id], :subject => 'Z' * 300, :body => "test",
+                :context_code => "course_#{@course.id}" }, {}, { :expected_status => 400 })
+          expect(json['errors']['subject']).to be_present
         end
 
         it "should create/update bulk private conversations asynchronously" do

@@ -47,7 +47,7 @@ module TatlTael
       git.wip?
     end
 
-    ERB_REGEX = /\.erb$/
+    ERB_REGEX = /app\/views\/.*\.erb$/
     def new_erb?
       changes.any? do |change|
         change.path =~ ERB_REGEX &&
@@ -55,7 +55,7 @@ module TatlTael
       end
     end
 
-    NEED_SPEC_PUBLIC_JS_REGEX = /public\/javascripts\/.*.js$/
+    NEED_SPEC_PUBLIC_JS_REGEX = /public\/javascripts\/.*\.js$/
     EXCLUDED_PUBLIC_SUB_DIRS_REGEX = /(bower|mediaelement|shims|vendor|symlink_to_node_modules)\//
     def needs_public_js_specs?
       changes.any? do |change|

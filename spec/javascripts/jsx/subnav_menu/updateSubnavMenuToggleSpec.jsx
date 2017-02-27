@@ -4,7 +4,7 @@ define([
 ], ($, updateSubnavMenuToggle) => {
   const container = $('#fixtures')
 
-  module('SubnavMenuToggle', {
+  QUnit.module('SubnavMenuToggle', {
     setup () {
       $('<button/>', {
         id: 'courseMenuToggle',

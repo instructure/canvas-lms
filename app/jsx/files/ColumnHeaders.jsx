@@ -24,11 +24,10 @@ define([
         });
 
         const href = `${this.props.pathname}?${$.param(this.queryParamsFor(this.props.query, column.property))}`;
-        var linkProps = _.defaults({
-              query: this.queryParamsFor(this.props.query, column.property),
-              className: 'ef-plain-link',
-              href
-            }, this.props);
+        const linkProps = {
+          className: 'ef-plain-link',
+          href
+        };
         var linkText;
         if (column.property === 'select') {
           linkText = <span className='screenreader-only'>{column.displayName}</span>;

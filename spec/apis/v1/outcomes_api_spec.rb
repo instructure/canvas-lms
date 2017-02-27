@@ -663,23 +663,12 @@ describe "Outcomes API", type: :request do
       context "mastery calculations" do
         context "not allow updating the outcome after being used for assessing" do
           before :each do
-            expect(@outcome).not_to be_assessed
-
             @outcome.calculation_method = 'decaying_average'
             @outcome.calculation_int = 62
             @outcome.save!
             @outcome.reload
 
-            expect(@outcome.calculation_method).to eq('decaying_average')
-            expect(@outcome.calculation_int).to eq(62)
-
             assess_outcome(@outcome)
-            expect(@outcome).to be_assessed
-
-            # make sure that the process of getting assessed didn't change
-            # the things our tests expect to be true
-            expect(@outcome.calculation_method).to eq('decaying_average')
-            expect(@outcome.calculation_int).to eq(62)
           end
 
           let(:update_outcome_api) do

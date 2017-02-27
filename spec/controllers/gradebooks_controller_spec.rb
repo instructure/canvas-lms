@@ -514,6 +514,30 @@ describe GradebooksController do
       assert_unauthorized
     end
 
+    context 'includes data needed by the Gradebook Action menu in ENV' do
+      before do
+        user_session(@teacher)
+
+        get 'show', course_id: @course.id
+
+        @gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+      end
+
+      it 'includes the context_allows_gradebook_uploads key in ENV' do
+        actual_value = @gradebook_env[:context_allows_gradebook_uploads]
+        expected_value = @course.allows_gradebook_uploads?
+
+        expect(actual_value).to eq(expected_value)
+      end
+
+      it 'includes the gradebook_import_url key in ENV' do
+        actual_value = @gradebook_env[:gradebook_import_url]
+        expected_value = new_course_gradebook_upload_path(@course)
+
+        expect(actual_value).to eq(expected_value)
+      end
+    end
+
     context "includes student context card info in ENV" do
       before { user_session(@teacher) }
 

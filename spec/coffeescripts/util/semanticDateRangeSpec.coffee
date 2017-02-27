@@ -1,6 +1,6 @@
 define ['compiled/util/semanticDateRange'], (semanticDateRange) ->
 
-  module 'semanticDateRange'
+  QUnit.module 'semanticDateRange'
 
   test 'different day', ->
     date1 = new Date(0)

@@ -11,8 +11,7 @@ describe "add content box" do
     @assignment.submit_homework(@student)
     attachment_model(:context => @student)
     eportfolio_model({:user => @user, :name => "student content"})
-    get "/eportfolios/#{@eportfolio.id}"
-    expect_new_page_load { f(".icon-arrow-right").click }
+    get "/eportfolios/#{@eportfolio.id}?view=preview"
     f("#right-side .edit_content_link").click
     wait_for_ajaximations
   end

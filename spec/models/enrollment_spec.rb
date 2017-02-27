@@ -992,7 +992,6 @@ describe Enrollment do
       describe 'term dates' do
         before do
           @term = @course.enrollment_term
-          expect(@term).to_not be_nil
         end
 
         it "should return active" do
@@ -1042,7 +1041,6 @@ describe Enrollment do
       describe 'enrollment_dates_override dates' do
         before do
           @term = @course.enrollment_term
-          expect(@term).to_not be_nil
           @override = @term.enrollment_dates_overrides.create!(:enrollment_type => @enrollment.type, :enrollment_term => @term)
         end
 
@@ -1099,7 +1097,6 @@ describe Enrollment do
       describe 'section dates' do
         before do
           @section = @course.course_sections.first
-          expect(@section).to_not be_nil
           @section.restrict_enrollments_to_section_dates = true
         end
 
@@ -1908,15 +1905,15 @@ describe Enrollment do
       @enrollment.save
       score = @enrollment.scores.create!
       @enrollment.destroy
-      expect(score).to be_deleted
+      expect(score.reload).to be_deleted
     end
   end
 
   describe "effective_start_at" do
     before :once do
       course_with_student(:active_all => true)
-      expect(@term = @course.enrollment_term).not_to be_nil
-      expect(@section = @enrollment.course_section).not_to be_nil
+      @term = @course.enrollment_term
+      @section = @enrollment.course_section
 
       # 7 different possible times, make sure they're distinct
       @enrollment_date_start_at = 7.days.ago
@@ -1974,8 +1971,8 @@ describe Enrollment do
   describe "effective_end_at" do
     before :once do
       course_with_student(:active_all => true)
-      expect(@term = @course.enrollment_term).not_to be_nil
-      expect(@section = @enrollment.course_section).not_to be_nil
+      @term = @course.enrollment_term
+      @section = @enrollment.course_section
 
       # 5 different possible times, make sure they're distinct
       @enrollment_date_end_at = 1.days.ago

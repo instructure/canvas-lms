@@ -48,33 +48,27 @@ module CustomValidators
   end
 
   def expect_flash_message(type = :warning, message = nil)
-    message = Regexp.new(Regexp.escape(message)) if message.is_a?(String)
-    wait_for method: :expect_flash_message, ignore: [Selenium::WebDriver::Error::StaleElementReferenceError] do
-      messages = disable_implicit_wait { driver.find_elements :css, "#flash_message_holder .ic-flash-#{type}" }
-      text = messages.map(&:text).join('\n')
-      message ? !!text.match(message) : messages.present?
-    end or raise(RSpec::Expectations::ExpectationNotMetError, "expected flash #{type} message#{message ? " " + message.inspect : ""}, none found", CallStackUtils.useful_backtrace)
+    selector = ".ic-flash-#{type}"
+    selector << ":contains(#{message.inspect})" if message
+    expect(f("#flash_message_holder")).to contain_jqcss(selector)
   end
 
   def expect_no_flash_message(type = :warning, message = nil)
-    message = Regexp.new(Regexp.escape(message)) if message.is_a?(String)
-    wait_for method: :expect_no_flash_message, ignore: [Selenium::WebDriver::Error::StaleElementReferenceError] do
-      messages = disable_implicit_wait { driver.find_elements :css, "#flash_message_holder .ic-flash-#{type}" }
-      text = messages.map(&:text).join('\n')
-      message ? !text.match(message) : messages.empty?
-    end or raise(RSpec::Expectations::ExpectationNotMetError, "expected no flash #{type} message#{message ? " " + message.inspect : ""}, one was found", CallStackUtils.useful_backtrace)
+    selector = ".ic-flash-#{type}"
+    selector << ":contains(#{message.inspect})" if message
+    expect(f("#flash_message_holder")).not_to contain_jqcss(selector)
   end
 
-  def assert_flash_notice_message(okay_message_regex)
-    expect_flash_message :success, okay_message_regex
+  def assert_flash_notice_message(okay_message)
+    expect_flash_message :success, okay_message
   end
 
-  def assert_flash_warning_message(warn_message_regex)
-    expect_flash_message :warning, warn_message_regex
+  def assert_flash_warning_message(warn_message)
+    expect_flash_message :warning, warn_message
   end
 
-  def assert_flash_error_message(fail_message_regex)
-    expect_flash_message :error, fail_message_regex
+  def assert_flash_error_message(fail_message)
+    expect_flash_message :error, fail_message
   end
 
   def assert_error_box(selector)
@@ -86,18 +80,26 @@ module CustomValidators
     expect(box[0]).to be_displayed
   end
 
-  def expect_new_page_load(accept_alert = false)
+  def wait_for_new_page_load(accept_alert = false)
     driver.execute_script("window.INST = window.INST || {}; INST.still_on_old_page = true;")
     yield
-    wait_for method: :expect_new_page_load do
+    wait_for(method: :wait_for_new_page_load) do
       begin
         driver.execute_script("return window.INST && INST.still_on_old_page !== true;")
       rescue Selenium::WebDriver::Error::UnhandledAlertError, Selenium::WebDriver::Error::UnknownError
         raise unless accept_alert
         driver.switch_to.alert.accept
       end
-    end
+    end or return false
     wait_for_dom_ready
     wait_for_ajaximations
+    true
+  end
+
+  def expect_new_page_load(accept_alert = false)
+    success = wait_for_new_page_load(accept_alert) do
+      yield
+    end
+    expect(success).to be, "expected new page load, none happened"
   end
 end

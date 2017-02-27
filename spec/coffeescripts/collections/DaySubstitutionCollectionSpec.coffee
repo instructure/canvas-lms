@@ -1,7 +1,7 @@
 define [
   'compiled/collections/DaySubstitutionCollection'
 ], (DaySubCollection) ->
-  module 'DaySubstitutionCollection'
+  QUnit.module 'DaySubstitutionCollection'
 
   test 'toJSON contains nested day_substitution objects', ->
     collection = new DaySubCollection

@@ -9,7 +9,7 @@ define [
     element.innerHTML = html
     fixtureNode.appendChild(element)
 
-  module "AuthenticationProviders.changedAuthType",
+  QUnit.module "AuthenticationProviders.changedAuthType",
     setup: ->
      fixtureNode = document.getElementById("fixtures")
 

@@ -1,7 +1,7 @@
 define([
   'jsx/assignments/actions/IndexMenuActions',
 ], (Actions) => {
-  module('AssignmentsIndexMenuActions')
+  QUnit.module('AssignmentsIndexMenuActions')
 
   test('setModalOpen returns the expected action', () => {
     const expectedAction1 = {

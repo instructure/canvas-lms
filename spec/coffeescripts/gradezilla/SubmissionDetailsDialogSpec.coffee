@@ -7,7 +7,7 @@ define [
   'jst/SubmissionDetailsDialog'
 ], ($, Assignment, SubmissionDetailsDialog, _, tz) ->
 
-  module 'SubmissionDetailsDialog',
+  QUnit.module 'SubmissionDetailsDialog',
     setup: ->
       defaults =
         current_user_roles: [ "teacher" ]
@@ -49,7 +49,7 @@ define [
 
     ok dialog.dialog.find('.submission-details').text().match('LATE')
 
-  module '_submission_detail',
+  QUnit.module '_submission_detail',
     setup: ->
       defaults =
         current_user_roles: [ "teacher" ]
@@ -81,7 +81,7 @@ define [
 
     equal dialog.dialog.find('.submisison-attachment').length, 3
 
-  module '_grading_box',
+  QUnit.module '_grading_box',
     setup: ->
       defaults =
         current_user_roles: [ "teacher" ]

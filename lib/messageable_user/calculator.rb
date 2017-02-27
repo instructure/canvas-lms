@@ -226,12 +226,15 @@ class MessageableUser
       messageable_groups_by_shard.values.flatten
     end
 
+    def self.slave_module
+      @slave_module ||= Module.new.tap { |m| prepend(m) }
+    end
+
     def self.slave(method)
-      module_eval <<-RUBY, __FILE__, __LINE__ + 1
-        def #{method}_with_slave(*args)
-          Shackles.activate(:slave) { #{method}_without_slave(*args) }
+      slave_module.module_eval <<-RUBY, __FILE__, __LINE__ + 1
+        def #{method}(*)
+          Shackles.activate(:slave) { super }
         end
-        alias_method_chain #{method.inspect}, :slave
       RUBY
     end
 

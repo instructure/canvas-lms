@@ -39,7 +39,7 @@ define [
     </form>
   ''')
 
-  module "SerializeForm"
+  QUnit.module "SerializeForm"
 
   test "Serializes valid input items correctly", ->
     serialized = $sampleForm.serializeForm()

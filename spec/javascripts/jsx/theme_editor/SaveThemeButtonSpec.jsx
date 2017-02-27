@@ -12,7 +12,7 @@ define([
 
   const isType = (type) => (child) => child.type === type
 
-  module('SaveThemeButton Component', {
+  QUnit.module('SaveThemeButton Component', {
     setup () {
       elem = document.createElement('div')
       props = {

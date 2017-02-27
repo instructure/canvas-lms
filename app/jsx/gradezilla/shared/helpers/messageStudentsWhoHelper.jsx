@@ -1,41 +1,59 @@
 define([
   'underscore',
   'i18n!gradebook',
-], function (_, I18n) {
-  var MessageStudentsWhoHelper = {
-    settings: function(assignment, students) {
+], (_, I18n) => {
+  function getSubmittedAt (student) {
+    return (student.submittedAt || student.submitted_at);
+  }
+
+  function getSubmissionTypes (assignment) {
+    return (assignment.submissionTypes || assignment.submission_types);
+  }
+
+  function getCourseId (assignment) {
+    return (assignment.courseId || assignment.course_id);
+  }
+
+  const MessageStudentsWhoHelper = {
+    settings (assignment, students) {
       return {
         options: this.options(assignment),
         title: assignment.name,
         points_possible: assignment.points_possible,
-        students: students,
-        context_code: "course_" + assignment.course_id,
+        students,
+        context_code: `course_${getCourseId(assignment)}`,
         callback: this.callbackFn.bind(this),
         subjectCallback: this.generateSubjectCallbackFn(assignment)
       }
     },
 
-    options: function(assignment) {
-      var options = this.allOptions();
-      var noSubmissions = !this.hasSubmission(assignment);
-      if(noSubmissions) options.splice(0,1);
+    options (assignment) {
+      const options = this.allOptions();
+      const noSubmissions = !this.hasSubmission(assignment);
+      if (noSubmissions) options.splice(0, 1);
       return options;
     },
 
-    allOptions: function() {
+    allOptions () {
       return [
         {
-          text: I18n.t("students_who.havent_submitted_yet", "Haven't submitted yet"),
-          subjectFn: (assignment) => I18n.t('students_who.no_submission_for', 'No submission for %{assignment}', { assignment: assignment.name }),
-          criteriaFn: (student) => !student.submitted_at
+          text: I18n.t("Haven't submitted yet"),
+          subjectFn: assignment => I18n.t(
+            'No submission for %{assignment}',
+            { assignment: assignment.name }
+          ),
+          criteriaFn: student => !getSubmittedAt(student)
         },
         {
-          text: I18n.t("students_who.havent_been_graded", "Haven't been graded"),
-          subjectFn: (assignment) => I18n.t('students_who.no_grade_for', 'No grade for %{assignment}', { assignment: assignment.name }),
-          criteriaFn: (student) => !this.exists(student.score)
+          text: I18n.t("Haven't been graded"),
+          subjectFn: assignment => I18n.t(
+            'No grade for %{assignment}',
+            { assignment: assignment.name }
+          ),
+          criteriaFn: student => !this.exists(student.score)
         },
         {
-          text: I18n.t("students_who.scored_less_than", "Scored less than"),
+          text: I18n.t('Scored less than'),
           cutoff: true,
           subjectFn: (assignment, cutoff) => I18n.t(
             'Scored less than %{cutoff} on %{assignment}',
@@ -44,7 +62,7 @@ define([
           criteriaFn: (student, cutoff) => this.scoreWithCutoff(student, cutoff) && student.score < cutoff
         },
         {
-          text: I18n.t("students_who.scored_more_than", "Scored more than"),
+          text: I18n.t('Scored more than'),
           cutoff: true,
           subjectFn: (assignment, cutoff) => I18n.t(
             'Scored more than %{cutoff} on %{assignment}',
@@ -55,39 +73,37 @@ define([
       ];
     },
 
-    hasSubmission: function(assignment) {
-      var submissionTypes = assignment.submission_types;
-      if(submissionTypes.length === 0) return false;
+    hasSubmission (assignment) {
+      const submissionTypes = getSubmissionTypes(assignment);
+      if (submissionTypes.length === 0) return false;
 
-      return _.any(submissionTypes, (submissionType) => {
-        return submissionType !== 'none' && submissionType !== 'on_paper';
-      });
+      return _.any(submissionTypes, submissionType => submissionType !== 'none' && submissionType !== 'on_paper');
     },
 
-    exists: function(value) {
+    exists (value) {
       return !_.isUndefined(value) && !_.isNull(value);
     },
 
-    scoreWithCutoff: function(student, cutoff) {
+    scoreWithCutoff (student, cutoff) {
       return this.exists(student.score)
         && student.score !== ''
         && this.exists(cutoff);
     },
 
-    callbackFn: function(selected, cutoff, students) {
-      var criteriaFn = this.findOptionByText(selected).criteriaFn;
-      var students = _.filter(students, student => criteriaFn(student.user_data, cutoff));
-      return _.map(students, student => student.user_data.id);
+    callbackFn (selected, cutoff, students) {
+      const criteriaFn = this.findOptionByText(selected).criteriaFn;
+      const studentsMatchingCriteria = _.filter(students, student => criteriaFn(student.user_data, cutoff));
+      return _.map(studentsMatchingCriteria, student => student.user_data.id);
     },
 
-    findOptionByText: function(text) {
+    findOptionByText (text) {
       return _.find(this.allOptions(), option => option.text === text);
     },
 
-    generateSubjectCallbackFn: function(assignment) {
+    generateSubjectCallbackFn (assignment) {
       return (selected, cutoff) => {
-        var cutoffString = cutoff || '';
-        var subjectFn = this.findOptionByText(selected).subjectFn;
+        const cutoffString = cutoff || '';
+        const subjectFn = this.findOptionByText(selected).subjectFn;
         return subjectFn(assignment, cutoffString);
       }
     }

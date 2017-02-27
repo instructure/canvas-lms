@@ -7,7 +7,7 @@ define [
   'compiled/react_files/modules/UploadQueue'
 ], (React, ReactDOM, $, CurrentUploads, FileUploader, UploadQueue) ->
 
-  module 'CurrentUploads',
+  QUnit.module 'CurrentUploads',
     setup: ->
       @uploads = ReactDOM.render(React.createElement(CurrentUploads), $('<div>').appendTo('#fixtures')[0])
 

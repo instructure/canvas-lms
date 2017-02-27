@@ -6,7 +6,7 @@ define [
   'compiled/util/fcUtil'
 ], ($, TimeBlockList, moment, fcUtil) ->
 
-  module "TimeBlockList",
+  QUnit.module "TimeBlockList",
     setup: ->
       wrappedDate = (str) ->
         moment( new Date(str))
@@ -91,7 +91,7 @@ define [
     equal @me.rows.length, 12
     equal @me.blocks().length, 10
 
-  module "TimeBlockList with no time blocks",
+  QUnit.module "TimeBlockList with no time blocks",
     setup: ->
       wrappedDate = (str) ->
         moment( new Date(str))

@@ -1,5 +1,5 @@
 define([
-  'i18n!timezone',
+  'i18n!edit_timezone',
   'react',
   "jsx/shared/modal",
   "jsx/shared/modal-content",

@@ -1,1 +1,1 @@
-define(function () { return {"zones":{"Etc/GMT-14":["z",{"wallclock":-1.7976931348623157e+308,"format":"GMT-14","abbrev":"GMT-14","offset":50400000,"posix":-1.7976931348623157e+308,"save":0}]},"rules":{}} });
+!function(){var e={zones:{"Etc/GMT-14":["z",{wallclock:-1.7976931348623157e308,format:"GMT-14",abbrev:"GMT-14",offset:504e5,posix:-1.7976931348623157e308,save:0}]},rules:{}};"function"==typeof define&&define.amd?define(e):("undefined"==typeof __PRELOADED_TIMEZONE_DATA__&&(__PRELOADED_TIMEZONE_DATA__={}),__PRELOADED_TIMEZONE_DATA__["Etc/GMT-14"]=e)}();

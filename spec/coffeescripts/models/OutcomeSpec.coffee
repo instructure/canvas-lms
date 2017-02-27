@@ -2,7 +2,7 @@ define [
   'compiled/models/Outcome'
 ], (Outcome) ->
 
-  module "Outcome",
+  QUnit.module "Outcome",
 
     setup: ->
       @accountOutcome =

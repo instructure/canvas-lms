@@ -3,7 +3,7 @@ define [
   'compiled/models/Assignment'
 ], ( AssignmentOverride, Assignment ) ->
 
-  module "AssignmentOverride",
+  QUnit.module "AssignmentOverride",
     setup: ->
       @clock = sinon.useFakeTimers()
 

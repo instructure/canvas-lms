@@ -3,7 +3,7 @@ define [
   'compiled/util/mixin'
   'helpers/fakeENV'
 ], (Backbone, mixing, fakeENV) ->
-  module 'View',
+  QUnit.module 'View',
     setup: ->
       fakeENV.setup()
     teardown: ->

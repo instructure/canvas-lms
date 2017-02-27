@@ -13,7 +13,7 @@ define [
   findAllByTag = TestUtils.scryRenderedDOMComponentsWithTag
   findAllByClass = TestUtils.scryRenderedDOMComponentsWithClass
 
-  module 'DueDates',
+  QUnit.module 'DueDates',
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"
@@ -135,7 +135,7 @@ define [
     attributes = _.keys(@dueDates.getAllOverrides()[0].attributes)
     ok _.contains(attributes, "persisted")
 
-  module 'DueDates with Multiple Grading Periods enabled',
+  QUnit.module 'DueDates with Multiple Grading Periods enabled',
     setup: ->
       fakeENV.setup()
       @server = sinon.fakeServer.create()
@@ -236,9 +236,9 @@ define [
           sections: ["8"]
           group_ids: []
 
-      @stub(OverrideStudentStore, 'getStudents', -> students)
-      @stub(OverrideStudentStore, 'currentlySearching', -> false)
-      @stub(OverrideStudentStore, 'allStudentsFetched', -> true)
+      @stub(OverrideStudentStore, 'getStudents').returns(students)
+      @stub(OverrideStudentStore, 'currentlySearching').returns(false)
+      @stub(OverrideStudentStore, 'allStudentsFetched').returns(true)
 
       props =
         overrides: overrides
@@ -283,14 +283,13 @@ define [
   test 'dropdown options do not include students whose sections are assigned in closed periods', ->
     notOk _.contains(@dropdownOptions, "Scipio Africanus")
 
-  test 'dropdown options include sections that are not assigned in closed periods and do not have'/
-  'any students assigned in closed periods', ->
+  test 'dropdown options include sections that are not assigned in closed periods and do not have any students assigned in closed periods', ->
     ok _.contains(@dropdownOptions, "Section 3")
 
   test 'dropdown options include students that do not belong to sections assigned in closed periods', ->
     ok _.contains(@dropdownOptions, "Publius Publicoa")
 
-  module 'DueDates render callbacks',
+  QUnit.module 'DueDates render callbacks',
     setup: ->
       fakeENV.setup()
       @server = sinon.fakeServer.create()

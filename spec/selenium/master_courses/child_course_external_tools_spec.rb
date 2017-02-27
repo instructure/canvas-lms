@@ -15,6 +15,7 @@ describe "master courses - child courses - external tool locking" do
 
     course_with_teacher(:active_all => true)
     @copy_to = @course
+    @template.add_child_course!(@copy_to)
     @tool_copy = @copy_to.context_external_tools.new(attributes) # just create a copy directly instead of doing a real migration
     @tool_copy.migration_id = @tag.migration_id
     @tool_copy.save!

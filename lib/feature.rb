@@ -502,7 +502,7 @@ END
       display_name: -> { I18n.t('Student Context Card') },
       description: -> { I18n.t('Enable student context card links') },
       applies_to: "RootAccount",
-      state: "hidden_in_prod",
+      state: "allowed",
       beta: true
     },
     'gradezilla' =>
@@ -519,8 +519,19 @@ END
       display_name: -> { I18n.t('Modules Home Page') },
       description: -> { I18n.t('Default to modules for the course home page') },
       applies_to: "RootAccount",
+      state: "hidden",
       beta: true,
+      development: true,
     },
+    'new_user_tutorial' =>
+    {
+      display_name: -> { I18n.t('New User Tutorial')},
+      description: -> { I18n.t('Provide tutorial information for new users in a flyout tray.')},
+      applies_to: "RootAccount",
+      state: "hidden",
+      beta: true,
+      development: true
+    }
   )
 
   def self.definitions

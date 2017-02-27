@@ -6,7 +6,7 @@ define [
 
   rawEditor = null
 
-  module "LinkableEditor",
+  QUnit.module "LinkableEditor",
     setup: ->
       $("#fixtures").html("<div id='some_editor' data-value='42'></div>")
       rawEditor = {
@@ -34,12 +34,13 @@ define [
     text = "Link HREF"
     classes = ""
     expectedOpts = {
-      url: text,
-      classes: classes,
-      selectedContent: "Some Content"
+      classes: "",
+      dataAttributes: undefined,
+      selectedContent: "Some Content",
+      url: "Link HREF"
     }
     edMock = @mock(jqueryEditor)
-    edMock.expects("editorBox").withArgs('create_link', sinon.match(expectedOpts))
+    edMock.expects("editorBox").withArgs('create_link', expectedOpts)
     editor.createLink(text, classes)
 
   test "createLink passes data attributes to create_link command", ->

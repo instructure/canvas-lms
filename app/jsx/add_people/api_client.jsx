@@ -6,8 +6,9 @@
 // on the api input.
 //
 define([
+  'i18n!roster',
   'axios',
-], axios => ({
+], (I18n, axios) => ({
   /* eslint-disable no-param-reassign */
 
   // @param courseId: id of current course
@@ -40,28 +41,33 @@ define([
   },
 
   // @param users: array of user objects, email is req [{ email, name }]
+  // @param inviteUsersURL: string: URL to invite_users api endpoint.
   // @returns {
   //   invited_users:  [{ email, id }] -- successfully created users
   //   errored_users:  [{ email, errors[{ message }] }] -- bad & already existing users end up in here
   // }
-  createUsers ({courseId, users}) {
+  createUsers ({users, inviteUsersURL}) {
     if (users.length === 0) {
       return Promise.resolve({data: {invited_users: [], errored_users: []}});
     }
-    return axios.post(`/courses/${courseId}/invite_users`, { users })
-      .then((response) => {
-        response.data.invited_users = response.data.invited_users.map((u) => {
-          u.user_id = u.id;
-          delete u.id;
-          // find the matching user from the action input
-          const uindex = users.findIndex(u2 => u2.email === u.email);
-          if (uindex >= 0) {
-            u.name = users[uindex].name;
-          }
-          return u;
+    // if inviteUsersURL is missing, error
+    if (inviteUsersURL) {
+      return axios.post(inviteUsersURL, { users })
+        .then((response) => {
+          response.data.invited_users = response.data.invited_users.map((u) => {
+            u.user_id = u.id;
+            delete u.id;
+            // find the matching user from the action input
+            const uindex = users.findIndex(u2 => u2.email === u.email);
+            if (uindex >= 0) {
+              u.name = users[uindex].name;
+            }
+            return u;
+          });
+          return response;
         });
-        return response;
-      });
+    }
+    return Promise.reject({message: I18n.t('You do not have permission to invite users that do not already exist.')});
   },
 
   // @param courseId: the course id

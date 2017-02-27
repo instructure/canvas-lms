@@ -4,7 +4,7 @@ define [
   'compiled/models/ProgressingContentMigration'
 ], ($, ProgressStatusView, ProgressingModel) -> 
 
-  module 'ProgressStatusViewSpec', 
+  QUnit.module 'ProgressStatusViewSpec',
     setup: -> 
       @progressingModel = new ProgressingModel
       @psv = new ProgressStatusView(model: @progressingModel)

@@ -135,11 +135,11 @@
 #     }
 #
 class WikiPagesApiController < ApplicationController
-  before_filter :require_context
-  before_filter :get_wiki_page, :except => [:create, :index]
-  before_filter :require_wiki_page, :except => [:create, :update, :update_front_page, :index]
-  before_filter :was_front_page, :except => [:index]
-  before_filter only: [:show, :update, :destroy, :revisions, :show_revision, :revert] do
+  before_action :require_context
+  before_action :get_wiki_page, :except => [:create, :index]
+  before_action :require_wiki_page, :except => [:create, :update, :update_front_page, :index]
+  before_action :was_front_page, :except => [:index]
+  before_action only: [:show, :update, :destroy, :revisions, :show_revision, :revert] do
     check_differentiated_assignments(@page) if @context.feature_enabled?(:conditional_release)
   end
 
@@ -251,9 +251,10 @@ class WikiPagesApiController < ApplicationController
 
       wiki_pages = Api.paginate(scope, self, pages_route)
 
-      check_for_restrictions = master_courses? && @context.wiki.grants_right?(@current_user, :manage)
-      MasterCourses::Restrictor.preload_restrictions(wiki_pages) if check_for_restrictions
-      render :json => wiki_pages_json(wiki_pages, @current_user, session, :include_master_course_restrictions => check_for_restrictions)
+      if @context.wiki.grants_right?(@current_user, :manage)
+        mc_status = setup_master_course_restrictions(wiki_pages, @context)
+      end
+      render :json => wiki_pages_json(wiki_pages, @current_user, session, :master_course_status => mc_status)
     end
   end
 

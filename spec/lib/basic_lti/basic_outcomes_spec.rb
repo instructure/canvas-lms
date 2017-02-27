@@ -348,6 +348,8 @@ describe BasicLTI::BasicOutcomes do
         xml.css('resultScore').remove
         xml.at_css('text').replace('<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>')
         BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(Delayed::Job.strand_size('file_download')).to be > 0
+        run_jobs
         expect(submission.reload.versions.count).to eq 2
         expect(submission.attachments.count).to eq 1
         expect(submission.attachments.first.display_name).to eq "face.doc"

@@ -42,7 +42,7 @@ define [
     start_at: null
     workflow_state: "deleted"
 
-  module 'CourseRestore',
+  QUnit.module 'CourseRestore',
     setup: ->
       @account_id = 4
       @course_id = 42

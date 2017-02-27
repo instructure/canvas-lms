@@ -4,7 +4,7 @@ define([
   'jsx/collaborations/GettingStartedCollaborations'
 ], (React, TestUtils, GettingStartedCollaborations) => {
 
-  module('GettingStartedCollaborations');
+  QUnit.module('GettingStartedCollaborations');
 
   function setEnvironment (roles, context) {
     ENV.context_asset_string = context;

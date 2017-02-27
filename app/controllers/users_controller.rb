@@ -156,16 +156,16 @@ class UsersController < ApplicationController
   include I18nUtilities
   include CustomColorHelper
 
-  before_filter :require_user, :only => [:grades, :merge, :kaltura_session,
+  before_action :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
     :user_dashboard, :toggle_recent_activity_dashboard, :masquerade, :external_tool,
     :dashboard_sidebar, :settings, :all_menu_courses, :activity_stream, :activity_stream_summary]
-  before_filter :require_registered_user, :only => [:delete_user_service,
+  before_action :require_registered_user, :only => [:delete_user_service,
     :create_user_service]
-  before_filter :reject_student_view_student, :only => [:delete_user_service,
+  before_action :reject_student_view_student, :only => [:delete_user_service,
     :create_user_service, :merge, :user_dashboard, :masquerade]
-  skip_before_filter :load_user, :only => [:create_self_registered_user]
-  before_filter :require_self_registration, :only => [:new, :create, :create_self_registered_user]
+  skip_before_action :load_user, :only => [:create_self_registered_user]
+  before_action :require_self_registration, :only => [:new, :create, :create_self_registered_user]
 
   def grades
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?
@@ -449,7 +449,7 @@ class UsersController < ApplicationController
   end
 
 
-  before_filter :require_password_session, :only => [:masquerade]
+  before_action :require_password_session, :only => [:masquerade]
   def masquerade
     @user = api_find(User, params[:user_id])
     return render_unauthorized_action unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
@@ -764,7 +764,9 @@ class UsersController < ApplicationController
     return render_unauthorized_action unless @current_user
 
     grading = @current_user.assignments_needing_grading().map { |a| todo_item_json(a, @current_user, session, 'grading') }
-    submitting = @current_user.assignments_needing_submitting(include_ungraded: true).map { |a| todo_item_json(a, @current_user, session, 'submitting') }
+    submitting = @current_user.assignments_needing_submitting(include_ungraded: true, limit: ToDoListPresenter::ASSIGNMENT_LIMIT).map { |a|
+      todo_item_json(a, @current_user, session, 'submitting')
+    }
     if Array(params[:include]).include? 'ungraded_quizzes'
       submitting += @current_user.ungraded_quizzes_needing_submitting.map { |q| todo_item_json(q, @current_user, session, 'submitting') }
       submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] }
@@ -1606,7 +1608,7 @@ class UsersController < ApplicationController
     if managed_attributes.any? && user_params.except(*managed_attributes).empty?
       managed_attributes << {:avatar_image => strong_anything} if managed_attributes.delete(:avatar_image)
       user_params = user_params.permit(*managed_attributes)
-
+      new_email = user_params.delete(:email)
       # admins can update avatar images even if they are locked
       admin_avatar_update = user_params[:avatar_image] &&
         @user.grants_right?(@current_user, :update_avatar) &&
@@ -1630,7 +1632,7 @@ class UsersController < ApplicationController
       respond_to do |format|
         if @user.update_attributes(user_params)
           @user.avatar_state = (old_avatar_state == :locked ? old_avatar_state : 'approved') if admin_avatar_update
-          @user.email = user_params[:email] if update_email
+          @user.email = new_email if update_email
           @user.save if admin_avatar_update || update_email
           session.delete(:require_terms)
           flash[:notice] = t('user_updated', 'User was successfully updated.')

@@ -2,9 +2,9 @@ define  [
   'compiled/models/TurnitinSettings'
 ], ( TurnitinSettings ) ->
 
-  module "TurnitinSettings"
+  QUnit.module "TurnitinSettings"
 
-  module "TurnitinSettings#constructor"
+  QUnit.module "TurnitinSettings#constructor"
 
   test "assigns originalityReportVisibility", ->
     ts = new TurnitinSettings originality_report_visibility: 'after_grading'
@@ -71,7 +71,7 @@ define  [
       exclude_small_matches_value: 100
     strictEqual ts.words(), ""
 
-  module "TurnitinSettings#toJSON"
+  QUnit.module "TurnitinSettings#toJSON"
 
   test "it converts back to snake_case", ->
     options =
@@ -87,7 +87,7 @@ define  [
     ts = new TurnitinSettings options
     deepEqual ts.toJSON(), options
 
-  module "TurnitinSettings#excludesSmallMatches"
+  QUnit.module "TurnitinSettings#excludesSmallMatches"
 
   test "returns true when excludeSmallMatchesType is not null", ->
     ts = new TurnitinSettings exclude_small_matches_type: 'words'
@@ -97,7 +97,7 @@ define  [
     ts = new TurnitinSettings exclude_small_matches_type: null
     strictEqual ts.excludesSmallMatches(), false
 
-  module "TurnitinSettings#present",
+  QUnit.module "TurnitinSettings#present",
     setup: ->
       @options =
         exclude_small_matches_value: 100

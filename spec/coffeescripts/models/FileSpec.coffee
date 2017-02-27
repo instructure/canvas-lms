@@ -7,7 +7,7 @@ define [
   server = null
   model = null
 
-  module 'File',
+  QUnit.module 'File',
     setup: ->
       server = sinon.fakeServer.create()
       $el = $('<input type="file">')

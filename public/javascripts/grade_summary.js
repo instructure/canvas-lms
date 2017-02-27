@@ -30,7 +30,8 @@ define([
   'jquery.instructure_misc_helpers' /* replaceTags */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'media_comments' /* mediaComment, mediaCommentThumbnail */
+  'compiled/jquery/mediaCommentThumbnail', /* mediaCommentThumbnail */
+  'media_comments' /* mediaComment */
 ], function (INST, I18n, $, _, CourseGradeCalculator, GradingSchemeHelper, round, htmlEscape) {
   /* eslint-disable vars-on-top */
   /* eslint-disable newline-per-chained-call */
@@ -175,11 +176,40 @@ define([
     }
   }
 
+  function bindShowAllDetailsButton ($ariaAnnouncer) {
+    $('#show_all_details_button').click(function (event) {
+      event.preventDefault();
+      var $button = $('#show_all_details_button');
+      $button.toggleClass('showAll');
+
+      if ($button.hasClass('showAll')) {
+        $button.text(I18n.t('Hide All Details'));
+        $('tr.student_assignment.editable').each(function () {
+          var assignmentId = $(this).getTemplateValue('assignment_id');
+          var muted = $(this).data('muted');
+          if (!muted) {
+            $('#comments_thread_' + assignmentId).show();
+            $('#rubric_' + assignmentId).show();
+            $('#grade_info_' + assignmentId).show();
+            $('#final_grade_info_' + assignmentId).show();
+          }
+        });
+        $ariaAnnouncer.text(I18n.t('assignment details expanded'));
+      } else {
+        $button.text(I18n.t('Show All Details'));
+        $('tr.rubric_assessments').hide();
+        $('tr.comments').hide();
+        $ariaAnnouncer.text(I18n.t('assignment details collapsed'));
+      }
+    });
+  }
+
   function setup () {
     $(document).ready(function () {
       updateStudentGrades();
       var showAllWhatIfButton = $(this).find('#student-grades-whatif button');
       var revertButton = $(this).find('#revert-all-to-actual-score');
+      var $ariaAnnouncer = $(this).find('#aria-announcer');
 
       $('.revert_all_scores_link').click(function (event) {
         event.preventDefault();
@@ -235,6 +265,7 @@ define([
           $(this).find('.grade').data('screenreader_link', $screenreaderLinkClone);
           $(this).find('.grade').empty().append($('#grade_entry'));
           $(this).find('.score_value').hide();
+          $ariaAnnouncer.text(I18n.t('Enter a What-If score.'));
 
           // Get the current shown score (possibly a "What-If" score) and use it as the default value in the text entry field
           var val = $(this).parents('.student_assignment').find('.what_if_score').text();
@@ -249,8 +280,12 @@ define([
 
       $('#grade_entry').keydown(function (event) {
         if (event.keyCode === 13) {
+          // Enter Key: Finish Changes
+          $ariaAnnouncer.text('');
           $(this)[0].blur();
         } else if (event.keyCode === 27) {
+          // Enter Key: Clear the Text Field
+          $ariaAnnouncer.text('');
           var val = $(this).parents('.student_assignment')
             .addClass('dont_update')
             .find('.original_score')
@@ -315,7 +350,11 @@ define([
         }
         if (val === 0) { val = '0.0'; }
         if (val === originalVal) { val = originalScore; }
-        $assignment.find('.grade').html($.raw(htmlEscape(val) || $assignment.find('.grade').data('originalValue')));
+
+        var $grade = $assignment.find('.grade');
+        var gradeValue = htmlEscape((val || '').trim());
+        var originalValue = $grade.data('originalValue');
+        $grade.html($.raw(gradeValue || originalValue));
 
         if (!isChanged) {
           var $screenreaderLinkClone = $assignment.find('.grade').data('screenreader_link');
@@ -437,29 +476,7 @@ define([
         this.form.submit();
       });
 
-      $('#show_all_details_button').click(function (event) {
-        event.preventDefault();
-        var $button = $('#show_all_details_button');
-        $button.toggleClass('showAll');
-
-        if ($button.hasClass('showAll')) {
-          $button.text(I18n.t('Hide All Details'));
-          $('tr.student_assignment.editable').each(function () {
-            var assignmentId = $(this).getTemplateValue('assignment_id');
-            var muted = $(this).data('muted');
-            if (!muted) {
-              $('#comments_thread_' + assignmentId).show();
-              $('#rubric_' + assignmentId).show();
-              $('#grade_info_' + assignmentId).show();
-              $('#final_grade_info_' + assignmentId).show();
-            }
-          });
-        } else {
-          $button.text(I18n.t('Show All Details'));
-          $('tr.rubric_assessments').hide();
-          $('tr.comments').hide();
-        }
-      });
+      bindShowAllDetailsButton($ariaAnnouncer);
     });
 
     $(document).on('change', '.grading_periods_selector', function () {
@@ -483,7 +500,11 @@ define([
     addWhatIfAssignment: addWhatIfAssignment,
     removeWhatIfAssignment: removeWhatIfAssignment,
     listAssignmentGroupsForGradeCalculation: listAssignmentGroupsForGradeCalculation,
+    canBeConvertedToGrade: canBeConvertedToGrade,
+    calculateGrade: calculateGrade,
     calculateGrades: calculateGrades,
-    calculateTotals: calculateTotals
+    calculateTotals: calculateTotals,
+    calculatePercentGrade: calculatePercentGrade,
+    formatPercentGrade: formatPercentGrade
   }
 });

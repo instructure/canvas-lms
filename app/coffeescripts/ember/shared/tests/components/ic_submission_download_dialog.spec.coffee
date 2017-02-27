@@ -12,7 +12,7 @@ define [
       'assignmentUrl': '/courses/1/assignments/1'
     DownloadDialog.create(props)
 
-  module 'ic_submission_download_dialog',
+  QUnit.module 'ic_submission_download_dialog',
     setup: ->
       fixtures.create()
 
@@ -30,7 +30,7 @@ define [
     component = buildComponent()
     equal component.get('status'), 'starting'
 
-  module 'progress:'
+  QUnit.module 'progress:'
 
   test 'percentComplete is 100 if file ready', ->
     # initialize percentComplete at 100
@@ -48,7 +48,7 @@ define [
     component.progress()
     equal component.get('percentComplete'), 0
 
-  module 'keepChecking'
+  QUnit.module 'keepChecking'
 
   test 'is true if open', ->
     component = buildComponent

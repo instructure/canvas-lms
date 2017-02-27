@@ -31,7 +31,7 @@ describe ContentMigration do
 
       expect(new_topic.last_reply_at).to be_nil
       expect(new_topic.allow_rating).to eq false
-      expect(topic.posted_at.to_i).to eq new_topic.posted_at.to_i
+      expect(new_topic.posted_at).to be_nil
     end
 
     it "copies rating settings" do

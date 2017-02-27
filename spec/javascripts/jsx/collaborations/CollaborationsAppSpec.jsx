@@ -4,7 +4,7 @@ define([
   'jsx/collaborations/CollaborationsApp'
 ], (React, TestUtils, CollaborationsApp) => {
 
-  module('CollaborationsApp');
+  QUnit.module('CollaborationsApp');
 
   let applicationState = {
     listCollaborations: {

@@ -34,7 +34,7 @@ Warning: case-insensitive comparison of identifiers not supported in version 2
 <simpleChoice identifier="QUE_1053_A3" fixed="true">
 <div class="html">Facebook &lt;script&gt;alert(0xFACE)&lt;/script&gt;</div></simpleChoice>
 <simpleChoice identifier="QUE_1054_A4" fixed="true">
-<div class="html"> &lt;br&gt; Twitter &lt; br &gt; </div></simpleChoice>
+<div class="html"> &lt;br&gt; Twitter &lt;br&gt; </div></simpleChoice>
 </choiceInteraction>
 </itemBody>
 <responseProcessing>

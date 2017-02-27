@@ -20,6 +20,18 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
+  class << self
+    [:before, :after, :around,
+     :skip_before, :skip_after, :skip_around,
+     :prepend_before, :prepend_after, :prepend_around].each do |type|
+      class_eval <<-RUBY, __FILE__, __LINE__ + 1
+        def #{type}_filter(*)
+          raise "Please use #{type}_action instead of #{type}_filter"
+        end
+      RUBY
+    end
+  end
+
   attr_accessor :active_tab
   attr_reader :context
 
@@ -28,8 +40,8 @@ class ApplicationController < ActionController::Base
   include Api::V1::User
   include Api::V1::WikiPage
   include LegalInformationHelper
-  around_filter :set_locale
-  around_filter :enable_request_cache
+  around_action :set_locale
+  around_action :enable_request_cache
 
   helper :all
 
@@ -39,29 +51,29 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   # load_user checks masquerading permissions, so this needs to be cleared first
-  before_filter :clear_cached_contexts
-  prepend_before_filter :load_user, :load_account
+  before_action :clear_cached_contexts
+  prepend_before_action :load_user, :load_account
   # make sure authlogic is before load_user
-  skip_before_filter :activate_authlogic
-  prepend_before_filter :activate_authlogic
+  skip_before_action :activate_authlogic
+  prepend_before_action :activate_authlogic
 
-  before_filter :check_pending_otp
-  before_filter :set_user_id_header
-  before_filter :set_time_zone
-  before_filter :set_page_view
-  before_filter :require_reacceptance_of_terms
-  before_filter :clear_policy_cache
-  before_filter :setup_live_events_context
-  after_filter :log_page_view
-  after_filter :discard_flash_if_xhr
-  after_filter :cache_buster
+  before_action :check_pending_otp
+  before_action :set_user_id_header
+  before_action :set_time_zone
+  before_action :set_page_view
+  before_action :require_reacceptance_of_terms
+  before_action :clear_policy_cache
+  before_action :setup_live_events_context
+  after_action :log_page_view
+  after_action :discard_flash_if_xhr
+  after_action :cache_buster
   # Yes, we're calling this before and after so that we get the user id logged
   # on events that log someone in and log someone out.
-  after_filter :set_user_id_header
-  before_filter :fix_xhr_requests
-  before_filter :init_body_classes
-  after_filter :set_response_headers
-  after_filter :update_enrollment_last_activity_at
+  after_action :set_user_id_header
+  before_action :fix_xhr_requests
+  before_action :init_body_classes
+  after_action :set_response_headers
+  after_action :update_enrollment_last_activity_at
 
   add_crumb(proc {
     title = I18n.t('links.dashboard', 'My Dashboard')
@@ -230,6 +242,19 @@ class ApplicationController < ActionController::Base
     @domain_root_account && @domain_root_account.feature_enabled?(:master_courses)
   end
   helper_method :master_courses?
+
+  def setup_master_course_restrictions(objects, course)
+    return unless master_courses? && course.is_a?(Course)
+
+    if MasterCourses::MasterTemplate.is_master_course?(course)
+      MasterCourses::Restrictor.preload_default_template_restrictions(objects, course)
+      return :master # return master/child status
+    elsif MasterCourses::ChildSubscription.is_child_course?(course)
+      MasterCourses::Restrictor.preload_restrictions(objects)
+      return :child
+    end
+  end
+  helper_method :setup_master_course_restrictions
 
   def editing_restricted?(content, edit_type=:all)
     return false unless master_courses? && content.respond_to?(:editing_restricted?)
@@ -536,7 +561,7 @@ class ApplicationController < ActionController::Base
     set_no_cache_headers
   end
 
-  # To be used as a before_filter, requires controller or controller actions
+  # To be used as a before_action, requires controller or controller actions
   # to have their urls scoped to a context in order to be valid.
   # So /courses/5/assignments or groups/1/assignments would be valid, but
   # not /assignments
@@ -578,7 +603,7 @@ class ApplicationController < ActionController::Base
 
   MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS = 3
 
-  # Can be used as a before_filter, or just called from controller code.
+  # Can be used as a before_action, or just called from controller code.
   # Assigns the variable @context to whatever context the url is scoped
   # to.  So /courses/5/assignments would have a @context=Course.find(5).
   # Also assigns @context_membership to the membership type of @current_user
@@ -1943,7 +1968,7 @@ class ApplicationController < ActionController::Base
 
   def self.batch_jobs_in_actions(opts = {})
     batch_opts = opts.delete(:batch)
-    around_filter(opts) do |controller, action|
+    around_action(opts) do |controller, action|
       Delayed::Batch.serial_batch(batch_opts || {}) do
         action.call
       end
@@ -1985,8 +2010,11 @@ class ApplicationController < ActionController::Base
     end
 
     if @page
-      check_for_restrictions = master_courses? && @context.wiki.grants_right?(@current_user, :manage)
-      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, :deep_check_if_needed => true, :include_master_course_restrictions => check_for_restrictions)
+      if @context.wiki.grants_right?(@current_user, :manage)
+        mc_status = setup_master_course_restrictions(@page, @context)
+      end
+
+      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, :deep_check_if_needed => true, :master_course_status => mc_status)
       hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? StringifyIds.stringify_id(current_version.number) : nil
       hash[:WIKI_PAGE_SHOW_PATH] = named_context_url(@context, :context_wiki_page_path, @page)
       hash[:WIKI_PAGE_EDIT_PATH] = named_context_url(@context, :edit_context_wiki_page_path, @page)

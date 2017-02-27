@@ -87,6 +87,24 @@ describe MasterCourses::Restrictor do
     end
   end
 
+  describe "preload_default_template_restrictions" do
+    it "should bulk preload master-side restrictions in a single query" do
+      page2 = @copy_from.wiki.wiki_pages.create!(:title => "blah2")
+      tag2 = @template.create_content_tag_for!(page2, {:restrictions => {:content => true}})
+
+      # should also work for associated assignments (since they share a master content tag)
+      quiz = @copy_from.quizzes.create!(:title => "quiz", :quiz_type => "assignment")
+      assignment = quiz.assignment
+      tag3 = @template.create_content_tag_for!(quiz, {:restrictions => {:content => true, :settings => true}})
+
+      MasterCourses::Restrictor.preload_default_template_restrictions([@original_page, page2, assignment], @copy_from)
+
+      expect(@original_page.current_master_template_restrictions).to eq({})
+      expect(page2.current_master_template_restrictions).to eq(tag2.restrictions)
+      expect(assignment.current_master_template_restrictions).to eq(tag3.restrictions)
+    end
+  end
+
   describe "file weirdness" do
     before(:once) do
       @original_file = @copy_from.attachments.create! :display_name => 'blargh',

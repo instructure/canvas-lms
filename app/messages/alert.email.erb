@@ -16,13 +16,13 @@
   <%=
     case criterion.criterion_type
     when 'Interaction'
-      t('interaction_description', 'No student/teacher interaction for %{count} days', :count => criterion.threshold)
+      t('interaction_description', 'No student/teacher interaction for %{count} days', :count => n(criterion.threshold))
     when 'UngradedCount'
-      t('ungraded_count_description', '%{count} or more submissions have not been graded', :count => criterion.threshold)
+      t('ungraded_count_description', '%{count} or more submissions have not been graded', :count => n(criterion.threshold))
     when 'UngradedTimespan'
-      t('ungraded_timespan_description', 'A submission has been left ungraded for %{count} days', :count => criterion.threshold)
+      t('ungraded_timespan_description', 'A submission has been left ungraded for %{count} days', :count => n(criterion.threshold))
     when 'UserNote'
-      t('usernote_description', 'No faculty journal entries for %{count} days', :count => criterion.threshold)
+      t('usernote_description', 'No faculty journal entries for %{count} days', :count => n(criterion.threshold))
     end
   %>
 <% end %>

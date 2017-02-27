@@ -24,7 +24,7 @@ define [
     btnTriggerReregister = component.refs.reregisterExternalToolButton?.getDOMNode()
     [component, btnTriggerReregister]
 
-  module 'ExternalApps.ReregisterExternalToolButton',
+  QUnit.module 'ExternalApps.ReregisterExternalToolButton',
     setup: ->
       @tools = [
         {

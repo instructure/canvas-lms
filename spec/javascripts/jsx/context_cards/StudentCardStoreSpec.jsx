@@ -1,7 +1,7 @@
 define(['jsx/context_cards/StudentCardStore'], (StudentCardStore) => {
   const gradedSubmission = {graded_at: new Date(), id: 2, grade: '5'};
 
-  module('StudentCardStore', {
+  QUnit.module('StudentCardStore', {
     setup () {
       this.server = sinon.fakeServer.create();
 

@@ -116,21 +116,22 @@ module OtherHelperMethods
     [filename, fullpath, data, @file]
   end
 
-  unless EncryptedCookieStore.respond_to?(:test_secret)
-    EncryptedCookieStore.class_eval do
-      cattr_accessor :test_secret
+  module EncryptedCookieStoreTestSecret
+    cattr_accessor :test_secret
 
-      def call_with_test_secret(env)
-        if self.class.test_secret.present?
-          @secret = self.class.test_secret
-          @encryption_key = unhex(@secret)
-        end
-        call_without_test_secret(env)
+    def self.prepended(klass)
+      klass.cattr_accessor(:test_secret)
+    end
+
+    def call(env)
+      if self.class.test_secret.present?
+        @secret = self.class.test_secret
+        @encryption_key = unhex(@secret[0...(@data_cipher.key_len * 2)]).freeze
       end
-
-      alias_method_chain :call, :test_secret
+      super
     end
   end
+  EncryptedCookieStore.prepend(EncryptedCookieStoreTestSecret)
 
   def clear_timers!
     # we don't want any AJAX requests getting kicked off after a test ends.

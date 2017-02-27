@@ -989,7 +989,6 @@ describe Account do
 
     before do
       account.authentication_providers.scope.delete_all
-      expect(account.delegated_authentication?).to eq false
     end
 
     it "is false for LDAP" do

@@ -3,7 +3,7 @@ define [
   'compiled/calendar/commonEventFactory'
   'helpers/fakeENV'
 ], (CommonEvent, commonEventFactory, fakeENV) ->
-  module "CommonEvent",
+  QUnit.module "CommonEvent",
     setup: ->
     teardown: ->
 
@@ -70,7 +70,7 @@ define [
     notOk event == null
 
 
-  module 'CommonEvent#iconType',
+  QUnit.module 'CommonEvent#iconType',
     setup: ->
       fakeENV.setup({
         CALENDAR: {

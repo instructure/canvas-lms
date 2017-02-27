@@ -112,6 +112,7 @@ define([
             className={this.props.className}
             style={modalOverrides}
             overlayClassName={this.props.overlayClassName}
+            contentLabel={this.props.contentLabel}
             appElement={this.getAppElement()}>
             <div ref="modal"
               className="ReactModal__Layout"

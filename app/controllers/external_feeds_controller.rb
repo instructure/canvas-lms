@@ -70,7 +70,7 @@
 class ExternalFeedsController < ApplicationController
   include Api::V1::ExternalFeeds
 
-  before_filter :require_context
+  before_action :require_context
 
   # @API List external feeds
   #

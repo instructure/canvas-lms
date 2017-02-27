@@ -4,7 +4,7 @@ define([
   'compiled/SubmissionDetailsDialog'
 ], ($, fakeENV, SubmissionDetailsDialog) => {
 
-  module('#SubmissionDetailsDialog', {
+  QUnit.module('#SubmissionDetailsDialog', {
 
     setup() {
       fakeENV.setup();

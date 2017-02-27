@@ -17,8 +17,8 @@
 #
 
 class InfoController < ApplicationController
-  skip_before_filter :load_account, :only => :health_check
-  skip_before_filter :load_user, :only => [:health_check, :browserconfig]
+  skip_before_action :load_account, :only => :health_check
+  skip_before_action :load_user, :only => [:health_check, :browserconfig]
 
   def styleguide
     js_bundle :styleguide

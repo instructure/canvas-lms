@@ -7,7 +7,7 @@ define [
   'helpers/fakeENV'
 ], (_, Outcome, OutcomeResultCollection, OutcomeLineGraphView, tz, fakeENV) ->
 
-  module 'OutcomeLineGraphViewSpec',
+  QUnit.module 'OutcomeLineGraphViewSpec',
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = 'course_1'

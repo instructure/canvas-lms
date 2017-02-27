@@ -2,7 +2,7 @@ define([
   'jsx/assignments/actions/IndexMenuActions',
   'jsx/assignments/reducers/indexMenuReducer',
 ], (Actions, Reducer) => {
-  module('AssignmentsIndexMenuReducer')
+  QUnit.module('AssignmentsIndexMenuReducer')
 
   test('SET_MODAL_OPEN actions result in expected state', () => {
     const initialState1 = { modalIsOpen: false };

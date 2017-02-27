@@ -184,7 +184,6 @@ describe Quizzes::QuizQuestionLinkMigrator do
     context "with assessment questions" do
       before :once do
         @question = @quiz.quiz_questions.create!(:question_data => {:question_type => :multiple_choice})
-        expect(@question.assessment_question).not_to be_nil
       end
 
       let_once(:file) do

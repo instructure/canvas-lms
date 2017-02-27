@@ -7,7 +7,7 @@ define [
   'compiled/models/Folder'
 ], (React, ReactDOM, {Simulate}, $, RestrictedRadioButtons, Folder) ->
 
-  module 'RestrictedRadioButtons',
+  QUnit.module 'RestrictedRadioButtons',
     setup: ->
       props =
         models: [new Folder(id: 999)]
@@ -33,7 +33,7 @@ define [
     Simulate.change(@RestrictedRadioButtons.refs.permissionsInput.getDOMNode())
     ok @RestrictedRadioButtons.refs.dateRange, "should have a dateRange input field"
 
-  module 'RestrictedRadioButtons Multiple Selected Items',
+  QUnit.module 'RestrictedRadioButtons Multiple Selected Items',
     setup: ->
       props =
         models: [new Folder(id: 1000, hidden: false), new Folder(id: 999, hidden: true)]
@@ -56,7 +56,7 @@ define [
 
     equal @RestrictedRadioButtons.refs.link_only.props.checked, true, 'default checks hiddenInput'
 
-  module 'RestrictedRadioButtons#extractFormValues',
+  QUnit.module 'RestrictedRadioButtons#extractFormValues',
     setup: ->
       props =
         models: [new Folder(id: 999)]
@@ -120,7 +120,7 @@ define [
 
     deepEqual @restrictedRadioButtons.extractFormValues(), expectedObject, "returns the correct object"
 
-  module 'RestrictedRadioButtons Multiple Items',
+  QUnit.module 'RestrictedRadioButtons Multiple Items',
     setup: ->
       props =
         models: [new Folder(id: 999, hidden: true, lock_at: undefined, unlock_at: undefined), new Folder(id: 1000, hidden: true, lock_at: undefined, unlock_at: undefined)]

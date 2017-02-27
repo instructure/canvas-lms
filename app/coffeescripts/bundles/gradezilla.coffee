@@ -5,7 +5,13 @@ require [
   'compiled/gradezilla/Gradebook'
   'compiled/views/gradezilla/NavigationPillView'
   'compiled/views/gradezilla/OutcomeGradebookView'
-], ($, Backbone, userSettings, Gradebook, NavigationPillView, OutcomeGradebookView) ->
+  'react'
+  'react-dom'
+  'jsx/gradezilla/default_gradebook/components/ActionMenu'
+], (
+  $, Backbone, userSettings, Gradebook, NavigationPillView, OutcomeGradebookView, React, ReactDOM,
+  ActionMenu
+) ->
 
   class GradebookRouter extends Backbone.Router
     routes:
@@ -42,5 +48,5 @@ require [
       @views[viewName].onShow()
       userSettings.contextSet 'gradebook_tab', viewName
 
-  @router = new GradebookRouter
+  router = new GradebookRouter
   Backbone.history.start()

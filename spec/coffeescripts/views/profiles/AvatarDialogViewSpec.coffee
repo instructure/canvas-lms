@@ -3,7 +3,7 @@ define [
   'compiled/views/profiles/AvatarDialogView'
 ], ($, AvatarDialogView) ->
 
-  module 'AvatarDialogView#onPreflight',
+  QUnit.module 'AvatarDialogView#onPreflight',
     setup: ->
       @avatarDialogView = new AvatarDialogView()
     teardown: ->
@@ -16,7 +16,7 @@ define [
     @avatarDialogView.onPreflight({}, [{responseText:'{"errors":{"base":[{"message":"User storage quota exceeded"}]}}'}])
     ok(mock.verify())
 
-  module 'AvatarDialogView#postAvatar',
+  QUnit.module 'AvatarDialogView#postAvatar',
     setup: ->
       @avatarDialogView = new AvatarDialogView()
     teardown: ->

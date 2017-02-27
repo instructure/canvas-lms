@@ -22,10 +22,10 @@
 #
 # NOTE: Placements not documented here should be considered beta features and are not officially supported.
 class ExternalToolsController < ApplicationController
-  before_filter :require_context
-  before_filter :require_access_to_context, except: [:index, :sessionless_launch]
-  before_filter :require_user, only: [:generate_sessionless_launch]
-  before_filter :get_context, :only => [:retrieve, :show, :resource_selection]
+  before_action :require_context
+  before_action :require_access_to_context, except: [:index, :sessionless_launch]
+  before_action :require_user, only: [:generate_sessionless_launch]
+  before_action :get_context, :only => [:retrieve, :show, :resource_selection]
   include Api::V1::ExternalTools
 
   REDIS_PREFIX = 'external_tool:sessionless_launch:'

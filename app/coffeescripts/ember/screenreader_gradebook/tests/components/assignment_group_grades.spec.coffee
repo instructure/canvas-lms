@@ -18,7 +18,7 @@ define [
       weight: 90
 
 
-  module 'assignment_group_grades_component',
+  QUnit.module 'assignment_group_grades_component',
     setup: ->
       fixtures.create()
       App = startApp()

@@ -6,7 +6,7 @@ define [
   'jsx/shared/modal-buttons'
 ], ($, React, ReactDOM, TestUtils, ModalButtons) ->
 
-  module 'ModalButtons'
+  QUnit.module 'ModalButtons'
 
   test "applies className", ->
     ModalButtonsElement = React.createElement(ModalButtons, className: "cat", footerClassName: "dog")

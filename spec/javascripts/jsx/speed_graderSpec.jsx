@@ -9,7 +9,7 @@ define([
   'jsx/shared/helpers/numberHelper',
   'jquery.ajaxJSON'
 ], ($, SpeedGrader, SpeedgraderHelpers, fakeENV, OutlierScoreHelper, userSettings, MGP, numberHelper) => {
-  module('SpeedGrader#showDiscussion', {
+  QUnit.module('SpeedGrader#showDiscussion', {
     setup () {
       fakeENV.setup();
       this.stub($, 'ajaxJSON');
@@ -97,7 +97,7 @@ define([
   });
 
   let commentRenderingOptions;
-  module('SpeedGrader#renderComment', {
+  QUnit.module('SpeedGrader#renderComment', {
     setup () {
       fakeENV.setup();
       this.originalWindowJSONData = window.jsonData;
@@ -277,7 +277,7 @@ define([
     equal(submitLinkScreenreaderText, 'Submit comment: test');
   });
 
-  module('SpeedGrader#handleGradeSubmit', {
+  QUnit.module('SpeedGrader#handleGradeSubmit', {
     setup () {
       fakeENV.setup();
       this.stub($, 'ajaxJSON');
@@ -381,7 +381,7 @@ define([
   });
 
   let $div = null;
-  module('loading a submission Preview', {
+  QUnit.module('loading a submission Preview', {
     setup() {
       fakeENV.setup();
       this.stub($, 'ajaxJSON');
@@ -399,7 +399,7 @@ define([
     ok(typeof SpeedGrader.EG.loadSubmissionPreview === 'function');
   })
 
-  module('resizeImg', {
+  QUnit.module('resizeImg', {
     setup () {
       fakeENV.setup();
       $div = $("<div id='iframe_holder'><iframe src='about:blank'></iframe></div>");
@@ -426,7 +426,7 @@ define([
     notEqual($body.find('img').attr('style'), 'max-width: 100vw; max-height: 100vh;');
   });
 
-  module('emptyIframeHolder', {
+  QUnit.module('emptyIframeHolder', {
     setup() {
       fakeENV.setup();
       this.stub($, 'ajaxJSON');
@@ -449,7 +449,7 @@ define([
     ok($div.is(':empty'));
   });
 
-  module('renderLtiLaunch', {
+  QUnit.module('renderLtiLaunch', {
     setup() {
       fakeENV.setup();
       this.stub($, 'ajaxJSON');
@@ -484,7 +484,7 @@ define([
     equal(fullscreenAttr, "true");
   })
 
-  module('speed_grader#getGradeToShow');
+  QUnit.module('speed_grader#getGradeToShow');
 
   test('returns an empty string if submission is null', () => {
     let grade = SpeedGrader.EG.getGradeToShow(null, 'some_role');
@@ -546,7 +546,7 @@ define([
     equal(grade, '15');
   });
 
-  module('speed_grader#getStudentNameAndGrade');
+  QUnit.module('speed_grader#getStudentNameAndGrade');
 
   test('returns name and status', () => {
     let result = SpeedGrader.EG.getStudentNameAndGrade();
@@ -560,7 +560,7 @@ define([
     equal(result, 'Student 6 - not graded');
   });
 
-  module('handleSubmissionSelectionChange', {
+  QUnit.module('handleSubmissionSelectionChange', {
     setup() {
       fakeENV.setup();
       this.originalWindowJSONData = window.jsonData;
@@ -617,7 +617,7 @@ define([
     ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, "bar"));
   });
 
-  module('SpeedGrader#isGradingTypePercent', {
+  QUnit.module('SpeedGrader#isGradingTypePercent', {
     setup () {
       fakeENV.setup();
     },
@@ -638,7 +638,7 @@ define([
     notOk(result);
   });
 
-  module('SpeedGrader#shouldParseGrade', {
+  QUnit.module('SpeedGrader#shouldParseGrade', {
     setup () {
       fakeENV.setup();
     },
@@ -665,7 +665,7 @@ define([
     notOk(result);
   });
 
-  module('SpeedGrader#formatGradeForSubmission', {
+  QUnit.module('SpeedGrader#formatGradeForSubmission', {
     setup () {
       fakeENV.setup();
       this.stub(numberHelper, 'parse').returns(42);

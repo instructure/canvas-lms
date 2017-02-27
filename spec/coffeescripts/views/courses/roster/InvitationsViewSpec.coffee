@@ -5,7 +5,7 @@ define [
   'helpers/assertions'
 ], ($, InvitationsView, RosterUser, assert) ->
 
-  module 'InvitationsView',
+  QUnit.module 'InvitationsView',
     setup: ->
     teardown: ->
       $(".ui-tooltip").remove()

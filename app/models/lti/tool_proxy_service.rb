@@ -42,8 +42,11 @@ module Lti
 
       tp = IMS::LTI::Models::ToolProxy.new.from_json(json)
       tp.tool_proxy_guid = guid
-
-      validate_proxy!(tp, context, developer_key)
+      begin
+        validate_proxy!(tp, context, developer_key)
+      rescue Lti::ToolProxyService::InvalidToolProxyError
+        raise unless depricated_split_secret?(tp)
+      end
       tool_proxy = nil
       ToolProxy.transaction do
         product_family = create_product_family(tp, context.root_account, developer_key)
@@ -59,7 +62,8 @@ module Lti
 
     def create_secret(tp)
       security_contract = tp.security_contract
-      if (tp_half_secret = tp.enabled_capabilities.include?('OAuth.splitSecret') && security_contract.tp_half_shared_secret)
+      tp_half_secret = security_contract.tp_half_shared_secret
+      if (tp.enabled_capabilities & ['OAuth.splitSecret', 'Security.splitSecret']).present? && tp_half_secret.present?
         @tc_half_secret ||= SecureRandom.hex(64)
         tc_half_secret + tp_half_secret
       else
@@ -68,6 +72,12 @@ module Lti
     end
 
     private
+    def depricated_split_secret?(tp)
+      tp.enabled_capability.present? &&
+      tp.enabled_capability.include?("OAuth.splitSecret") &&
+      tp.security_contract.tp_half_shared_secret.present?
+    end
+
     def create_tool_proxy(tp, context, product_family, tool_proxy=nil)
       # make sure the guid never changes
       raise InvalidToolProxyError if tool_proxy && tp.tool_proxy_guid != tool_proxy.guid

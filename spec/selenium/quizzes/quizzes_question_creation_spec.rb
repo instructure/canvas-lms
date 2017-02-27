@@ -277,15 +277,8 @@ describe 'quizzes question creation' do
 
       # get focus out of tinymce to allow change event to propogate
       f(".question_header").click
-      f('button.recompute_variables').click
-      val = f('.variable .value').text.to_i
-      expect(val <= 10 && val >= 0)
       recompute_button = f('button.recompute_variables')
-      var_el = f('.variable .value')
-      keep_trying_until do
-        recompute_button.click
-        var_el.text.to_i != val
-      end
+      recompute_button.click
       fj('.supercalc:visible').send_keys('x + y')
       f('button.save_formula_button').click
       # normally it's capped at 200 (to keep the yaml from getting crazy big)...
@@ -418,6 +411,7 @@ describe 'quizzes question creation' do
       type_in_tiny '.question:visible textarea.question_content', 'This is an essay question.'
       submit_form(fj('.question_form:visible'))
       wait_for_ajax_requests
+      expect(Quizzes::QuizQuestion.where("question_data like '%This is an essay question%'")).to be_present
     end
   end
 

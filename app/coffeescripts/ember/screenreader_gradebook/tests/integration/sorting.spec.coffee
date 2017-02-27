@@ -11,7 +11,7 @@ define [
   checkSelection = (selection) ->
     equal(selection, find('#arrange_assignments').val())
 
-  module 'screenreader_gradebook assignment sorting: no saved setting',
+  QUnit.module 'screenreader_gradebook assignment sorting: no saved setting',
     setup: ->
       fixtures.create()
       App = startApp()
@@ -23,7 +23,7 @@ define [
     checkSelection('assignment_group')
 
 
-  module 'screenreader_gradebook assignment sorting: toggle settings',
+  QUnit.module 'screenreader_gradebook assignment sorting: toggle settings',
     setup: ->
       fixtures.create()
       App = startApp()

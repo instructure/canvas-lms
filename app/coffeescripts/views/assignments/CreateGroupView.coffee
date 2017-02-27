@@ -36,11 +36,11 @@ define [
     @optionProperty 'userIsAdmin'
 
     messages:
-      non_number: I18n.t('non_number', 'You must use a number')
-      positive_number: I18n.t('positive_number', 'You must use a positive number')
-      max_number: I18n.t('higher_than_max', 'You cannot use a number greater than the number of assignments')
-      no_name_error: I18n.t('no_name_error', 'A name is required')
-      name_too_long_error: I18n.t('name_too_long_error', 'Name is too long')
+      non_number: I18n.t('You must use a number')
+      positive_number: I18n.t('You must use a positive number')
+      max_number: I18n.t('You cannot use a number greater than the number of assignments')
+      no_name_error: I18n.t('A name is required')
+      name_too_long_error: I18n.t('Name is too long')
 
     initialize: ->
       super
@@ -84,6 +84,8 @@ define [
         errors["name"] = [{type: 'name_too_long_error', message: @messages.name_too_long_error}]
       if data.name == ""
         errors["name"] = [{type: 'no_name_error', message: @messages.no_name_error}]
+      if (data.group_weight && isNaN(parseFloat(data.group_weight)))
+        errors["group_weight"] = [{type: 'number', message: @messages.non_number}]
       _.each data.rules, (value, name) =>
         # don't want to validate the never_drop field
         return if name is 'never_drop'
@@ -129,7 +131,10 @@ define [
     roundWeight: (e) ->
       value = $(e.target).val()
       rounded_value = round(parseFloat(value), 2)
-      $(e.target).val(rounded_value)
+      if isNaN(rounded_value)
+        return
+      else
+        $(e.target).val(rounded_value)
 
     toJSON: ->
       data = @model.toJSON()

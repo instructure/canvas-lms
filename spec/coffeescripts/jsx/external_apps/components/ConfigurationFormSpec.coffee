@@ -35,7 +35,7 @@ define [
       submit: component.refs.submit?.getDOMNode()
     }
 
-  module 'ExternalApps.ConfigurationForm',
+  QUnit.module 'ExternalApps.ConfigurationForm',
     teardown: ->
       ReactDOM.unmountComponentAtNode wrapper
 

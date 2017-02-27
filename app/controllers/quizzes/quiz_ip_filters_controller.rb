@@ -48,7 +48,7 @@ class Quizzes::QuizIpFiltersController < ApplicationController
   include Api::V1::QuizIpFilter
   include ::Filters::Quizzes
 
-  before_filter :require_user, :require_context, :require_quiz
+  before_action :require_user, :require_context, :require_quiz
 
   # @API Get available quiz IP filters.
   # @beta

@@ -47,11 +47,6 @@
   min-width: 95px;
 }
 
-#calendar-feed-message {
-  background: url("/images/ical_big.png") no-repeat top left;
-  padding-left: 40px;
-}
-
 #calendar-feed-box-lower {
   text-align: center;
   input {
@@ -99,8 +94,7 @@
     position: absolute;
     right: 5px;
   }
-}
-
-.ContextList__MoreBtn {
-  float: right;
+  .ContextList__MoreBtn {
+    float: right;
+  }
 }

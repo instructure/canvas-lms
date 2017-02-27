@@ -3,7 +3,7 @@ define([
   ], (moveMultipleQuestionBanks) => {
   var $modal = null
 
-  module("Move Multiple Question Banks", {
+  QUnit.module("Move Multiple Question Banks", {
     setup() {
       $modal = $('#fixtures').html(
         "<div id='parent'>"                                +

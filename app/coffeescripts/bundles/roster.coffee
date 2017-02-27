@@ -80,7 +80,7 @@ require [
 
   rosterTabsView.fetch()
 
-  @app = new RosterView
+  app = new RosterView
     usersView: usersView
     rosterTabsView: rosterTabsView
     inputFilterView: inputFilterView
@@ -104,7 +104,7 @@ require [
       $('#aria_alerts').empty().text msg
 
 
-  @app.render()
-  @app.$el.appendTo $('#content')
+  app.render()
+  app.$el.appendTo $('#content')
   users.fetch()
 

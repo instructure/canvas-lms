@@ -34,19 +34,20 @@ if (!('require' in window)) {
     } else if (/^(https?:)?\/\//.test(module)) { // starts with 'http://', 'https://' or '//'
       return jQuery.getScript(module)
     } else {
-      throw new Error(`Can't load ${module}, use your own RequireJS or something else to load this script`)
+      throw new Error(`Cannot load ${module}, use your own RequireJS or something else to load this script`)
     }
   }
 
   window.require = function fakeRequire (deps, callback) {
-    console.error(
-      `Canvas no longer uses RequireJS. We're providing
-      this global window.require shim as convience to try to
-      prevent existing code from breaking, but you should fix
-      your Custom JS to do you own script loading and not
-      depend on this fallback.`,
-      'modules required:', deps, 'callback:',callback
-    )
+    if (callback.name !== 'fnCanvasUsesToLoadAccountJSAfterJQueryIsReady') {
+      console.error(
+        'Canvas no longer uses RequireJS. We are providing this global window.require ' +
+        'shim as convenience to try to prevent existing code from breaking, but you should fix your ' +
+        'Custom JS to do you own script loading and not depend on this fallback.\n' +
+        'If you are trying to require jQuery, you can just depend on the global "$" variable directly.\n',
+        'modules required:', deps, 'callback:', callback
+      )
+    }
     Promise.all(deps.map(getModule)).then((modules) => {
       if (callback) callback(...modules)
     })

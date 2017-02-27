@@ -21,7 +21,7 @@ define [
   renderComponent = ->
     ReactDOM.render(createElement(), wrapper)
 
-  module 'ExternalApps.ManageAppListButton',
+  QUnit.module 'ExternalApps.ManageAppListButton',
     teardown: ->
       ReactDOM.unmountComponentAtNode wrapper
 

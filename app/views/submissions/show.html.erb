@@ -55,12 +55,16 @@
           <% end %>
           <br/>
         <% if can_do(@assignment, @current_user, :grade) %>
-          <span class="published_score" style="<%= hidden if @assignment.grading_type == 'points' %>"><% if @submission.published_score? %><%= @submission.published_score.round(2)%><% end %></span>
+          <span class="published_score" style="<%= hidden if @assignment.grading_type == 'points' %>">
+            <% if @submission.published_score? %><%= I18n.n(@submission.published_score.round(2)) %><% end %>
+          </span>
         <% elsif @submission.user_can_read_grade?(@current_user, session) %>
-          <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>"><% if @submission.score? %><%=@submission.score.round(2) %><% end %></span>
+          <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>">
+            <% if @submission.score? %><%= I18n.n(@submission.score.round(2)) %><% end %>
+          </span>
         <% end %>
-        <% if @submission.assignment.points_possible %>
-          <%= t('out_of_points', 'out of %{points_possible}', :points_possible => round_if_whole(@submission.assignment.points_possible)) %>
+        <% if @assignment.points_possible %>
+          <%= t('out of %{points_possible}', points_possible: I18n.n(round_if_whole(@assignment.points_possible))) %>
         <% end %>
         <br/>
 

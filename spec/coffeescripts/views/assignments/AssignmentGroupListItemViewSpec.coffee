@@ -140,7 +140,7 @@ define [
     view = createView(model)
     ok !view.$("#assignment_group_#{model.id} .ig-header-title .icon-sis-imported").length
 
-  module 'AssignmentGroupListItemView as a teacher',
+  QUnit.module 'AssignmentGroupListItemView as a teacher',
     setup: ->
       fakeENV.setup({
         current_user_roles: ['teacher']
@@ -307,7 +307,7 @@ define [
     equal anchor.text(), "2 Rules"
     equal anchor.attr("title"), "Drop the lowest score and Drop the highest score"
 
-  module 'AssignmentGroupListItemView as an admin',
+  QUnit.module 'AssignmentGroupListItemView as an admin',
     setup: ->
       @model = createAssignmentGroup()
       $(document).off()

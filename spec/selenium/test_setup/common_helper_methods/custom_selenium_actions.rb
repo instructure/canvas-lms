@@ -12,14 +12,6 @@ module CustomSeleniumActions
     skip("skipping test, fails in Chrome: #{additional_error_text}") if driver.browser == :chrome
   end
 
-  def find(css)
-    driver.find(css)
-  end
-
-  def find_all(css)
-    driver.find_all(css)
-  end
-
   def find_radio_button_by_value(value, scope = nil)
     fj("input[type=radio][value=#{value}]", scope)
   end
@@ -39,6 +31,7 @@ module CustomSeleniumActions
       (scope || driver).find_element :css, selector
     end
   end
+  alias find f
 
   # short for find with link
   def fln(link_text, scope = nil)
@@ -64,7 +57,7 @@ module CustomSeleniumActions
     stale_element_protection do
       wait_for(method: :fj) do
         find_with_jquery selector, scope
-      end or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{selector.inspect}", CallStackUtils.useful_backtrace
+      end or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{selector.inspect}"
     end
   end
 
@@ -74,11 +67,10 @@ module CustomSeleniumActions
   # the page, and will eventually raise if none are found
   def ff(selector, scope = nil)
     reloadable_collection do
-      result = (scope || driver).find_elements(:css, selector)
-      result.present? or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{selector.inspect}", CallStackUtils.useful_backtrace
-      result
+      (scope || driver).find_elements(:css, selector)
     end
   end
+  alias find_all ff
 
   # same as `fj`, but returns all matching elements
   #
@@ -90,7 +82,7 @@ module CustomSeleniumActions
       wait_for(method: :ffj) do
         result = find_all_with_jquery(selector, scope)
         result.present?
-      end or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{selector.inspect}", CallStackUtils.useful_backtrace
+      end or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{selector.inspect}"
       result
     end
   end
@@ -222,7 +214,6 @@ module CustomSeleniumActions
       assert_can_switch_views!
       switch_editor_views(tiny_controlling_element)
       tiny_controlling_element.clear
-      expect(tiny_controlling_element[:value]).to be_empty
       switch_editor_views(tiny_controlling_element)
     end
   end
@@ -237,23 +228,16 @@ module CustomSeleniumActions
 
     clear_tiny(tiny_controlling_element, iframe_id) if clear
 
-    if text.length > 1000
+    if text.length > 100 || text.lines.size > 1
       switch_editor_views(tiny_controlling_element)
-      driver.execute_script("return $(#{selector}).val('#{text}')")
+      html = "<p>" + ERB::Util.html_escape(text).gsub("\n", "</p><p>") + "</p>"
+      driver.execute_script("return $(#{selector}).val(#{html.inspect})")
       switch_editor_views(tiny_controlling_element)
     else
-      text_lines = text.split("\n")
       in_frame iframe_id do
         tinymce_element = f("body")
         tinymce_element.click
-        if text_lines.size > 1
-          text_lines.each_with_index do |line, index|
-            tinymce_element.send_keys(line)
-            tinymce_element.send_keys(:return) unless index >= text_lines.size - 1
-          end
-        else
-          tinymce_element.send_keys(text)
-        end
+        tinymce_element.send_keys(text)
       end
     end
   end

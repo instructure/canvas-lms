@@ -7,7 +7,7 @@ define [
 ], (InsertUpdateImageView, loadEventListeners) ->
   fakeEditor = undefined
 
-  module 'loadEventListeners',
+  QUnit.module 'loadEventListeners',
     setup: ->
       window.INST.maxVisibleEditorButtons = 10
       window.INST.editorButtons = [

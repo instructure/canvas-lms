@@ -6,7 +6,7 @@ define [
   'jsx/files/FilesUsage'
 ], (React, ReactDOM, TestUtils, $, FilesUsage) ->
 
-  module 'FilesUsage#update',
+  QUnit.module 'FilesUsage#update',
     filesUpdateTest: (props, test) ->
       @server = sinon.fakeServer.create()
       @filesUsage = TestUtils.renderIntoDocument(React.createElement(FilesUsage, props))

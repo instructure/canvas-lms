@@ -73,8 +73,8 @@
 class GradingStandardsApiController < ApplicationController
   include Api::V1::GradingStandard
 
-  before_filter :require_user
-  before_filter :require_context
+  before_action :require_user
+  before_action :require_context
 
   # @API Create a new grading standard
   # Create a new grading standard

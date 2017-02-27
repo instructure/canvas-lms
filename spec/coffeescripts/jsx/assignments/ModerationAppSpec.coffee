@@ -6,7 +6,7 @@ define [
   'jsx/assignments/actions/ModerationActions'
 ], (React, ReactDOM, TestUtils, ModerationApp, Actions) ->
 
-  module 'ModerationApp',
+  QUnit.module 'ModerationApp',
     setup: ->
       @store =
         subscribe: sinon.spy()
@@ -36,7 +36,7 @@ define [
 
     teardown: ->
       @store = null
-      ReactDOM.unmountComponentAtNode(@moderationApp.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@moderationApp).parentNode)
 
   test 'it subscribes to the store when mounted', ->
     # TODO: Once the rest of the components get dumbed down, this could be

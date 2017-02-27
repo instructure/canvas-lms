@@ -6,7 +6,7 @@ define [
 
   App = null
 
-  module 'grading_cell_component integration test for isPoints',
+  QUnit.module 'grading_cell_component integration test for isPoints',
     setup: ->
       fixtures.create()
       App = startApp()

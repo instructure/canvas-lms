@@ -13,7 +13,7 @@ define [
     Nav = React.createElement(Navigation)
     ReactDOM.render(Nav, componentHolder)
 
-  module 'GlobalNavigation',
+  QUnit.module 'GlobalNavigation',
     setup: ->
       # Need to setup the global nav stuff we are testing
       @$inbox_data = $('<a id="global_nav_conversations_link" href="/conversations" class="ic-app-header__menu-list-link">' +

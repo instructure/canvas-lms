@@ -268,9 +268,9 @@ module ApplicationHelper
 
       # We preemptive load these timezone/locale data files so they are ready
       # by the time our app-code runs and so webpack doesn't need to know how to load them
-      paths << "#{js_base_url}/vendor/timezone/#{js_env[:TIMEZONE]}" if js_env[:TIMEZONE]
-      paths << "#{js_base_url}/vendor/timezone/#{js_env[:CONTEXT_TIMEZONE]}" if js_env[:CONTEXT_TIMEZONE]
-      paths << "#{js_base_url}/vendor/timezone/#{js_env[:BIGEASY_LOCALE]}" if js_env[:BIGEASY_LOCALE]
+      paths << "/javascripts/vendor/timezone/#{js_env[:TIMEZONE]}.js" if js_env[:TIMEZONE]
+      paths << "/javascripts/vendor/timezone/#{js_env[:CONTEXT_TIMEZONE]}.js" if js_env[:CONTEXT_TIMEZONE]
+      paths << "/javascripts/vendor/timezone/#{js_env[:BIGEASY_LOCALE]}.js" if js_env[:BIGEASY_LOCALE]
       paths << "#{js_base_url}/moment/locale/#{js_env[:MOMENT_LOCALE]}" if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != 'en'
 
       paths << "#{js_base_url}/appBootstrap"
@@ -598,7 +598,10 @@ module ApplicationHelper
 
   def map_courses_for_menu(courses, opts={})
     mapped = courses.map do |course|
-      tabs = opts[:include_section_tabs] && available_section_tabs(course)
+      tabs = opts[:dashboard_cards] && available_section_tabs(
+        course,
+        dashboard_cards: opts[:dashboard_cards]
+      )
       presenter = CourseForMenuPresenter.new(course, tabs, @current_user, @domain_root_account)
       presenter.to_h
     end
@@ -739,6 +742,12 @@ module ApplicationHelper
     "#{Canvas::Cdn.config.host}/#{path}"
   end
 
+  def active_brand_config_js_url(opts={})
+    path = active_brand_config(opts).try(:public_js_path)
+    path ||= BrandableCSS.public_default_js_path
+    "#{Canvas::Cdn.config.host}/#{path}"
+  end
+
   def brand_config_for_account(opts={})
     account = Context.get_account(@context || @course)
 
@@ -818,7 +827,7 @@ module ApplicationHelper
         javascript_include_tag(*includes)
       else
         str = <<-ENDSCRIPT
-          require(['jquery'], function () {
+          require(['jquery'], function fnCanvasUsesToLoadAccountJSAfterJQueryIsReady () {
             #{includes.to_json}.forEach(function (src) {
               var s = document.createElement('script');
               s.src = src;

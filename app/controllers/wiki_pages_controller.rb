@@ -20,13 +20,13 @@ class WikiPagesController < ApplicationController
   include KalturaHelper
   include SubmittableHelper
 
-  before_filter :require_context
-  before_filter :get_wiki_page, :except => [:front_page]
-  before_filter :set_front_page, :only => [:front_page]
-  before_filter :set_pandapub_read_token
-  before_filter :set_js_rights
-  before_filter :set_js_wiki_data
-  before_filter :rich_content_service_config, only: [:edit, :index]
+  before_action :require_context
+  before_action :get_wiki_page, :except => [:front_page]
+  before_action :set_front_page, :only => [:front_page]
+  before_action :set_pandapub_read_token
+  before_action :set_js_rights
+  before_action :set_js_wiki_data
+  before_action :rich_content_service_config, only: [:edit, :index]
 
   add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
     context = c.instance_variable_get('@context')
@@ -35,7 +35,7 @@ class WikiPagesController < ApplicationController
       c.send :polymorphic_path, [context, :wiki_pages]
     end
   end
-  before_filter { |c| c.active_tab = "pages" }
+  before_action { |c| c.active_tab = "pages" }
 
   def js_rights
     [:wiki, :page]

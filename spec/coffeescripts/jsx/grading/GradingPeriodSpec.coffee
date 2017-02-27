@@ -12,10 +12,10 @@ define [
 
   wrapper = document.getElementById('fixtures')
 
-  module 'GradingPeriod',
+  QUnit.module 'GradingPeriod',
     setup: ->
-      @stub($, 'flashMessage', -> )
-      @stub($, 'flashError', -> )
+      @stub($, 'flashMessage')
+      @stub($, 'flashError')
       @server = sinon.fakeServer.create()
       fakeENV.setup()
       ENV.GRADING_PERIODS_URL = "api/v1/courses/1/grading_periods"

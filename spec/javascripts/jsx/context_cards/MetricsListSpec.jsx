@@ -5,7 +5,7 @@ define([
   'jsx/context_cards/MetricsList'
 ], (React, ReactDOM, TestUtils, MetricsList) => {
 
-  module('StudentContextTray/MetricsList', (hooks) => {
+  QUnit.module('StudentContextTray/MetricsList', (hooks) => {
     let subject
     hooks.afterEach(() => {
       if (subject) {
@@ -17,7 +17,7 @@ define([
       subject = null
     })
 
-    module('grade', (hooks) => {
+    QUnit.module('grade', (hooks) => {
       test('returns null by default', () => {
         subject = TestUtils.renderIntoDocument(
           <MetricsList />
@@ -63,7 +63,7 @@ define([
       })
     })
 
-    module('missingCount', (hooks) => {
+    QUnit.module('missingCount', (hooks) => {
       test('returns null by default', () => {
         subject = TestUtils.renderIntoDocument(
           <MetricsList />
@@ -87,7 +87,7 @@ define([
       })
     })
 
-    module('lateCount', () => {
+    QUnit.module('lateCount', () => {
       test('returns null by default', () => {
         subject = TestUtils.renderIntoDocument(
           <MetricsList />

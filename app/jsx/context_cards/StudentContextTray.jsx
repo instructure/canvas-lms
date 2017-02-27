@@ -33,22 +33,20 @@ define([
         React.PropTypes.string,
         React.PropTypes.number
       ]),
-      isOpen: React.PropTypes.bool,
       store: React.PropTypes.instanceOf(StudentCardStore),
       onClose: React.PropTypes.func,
-      isLoading: React.PropTypes.bool
+      returnFocusTo: React.PropTypes.func.isRequired
     }
 
-    static defaultProps = {
-      isOpen: false
-    }
-
-    static renderQuickLink (label, url, showIf) {
+    static renderQuickLink (label, srLabel, url, showIf) {
       return showIf() ? (
         <div className="StudentContextTray-QuickLinks__Link">
           <Button
             href={url}
-            variant="ghost" size="small" isBlock
+            variant="ghost"
+            size="small"
+            isBlock
+            aria-label={srLabel}
           >
             {label}
           </Button>
@@ -61,8 +59,8 @@ define([
       this.state = {
         analytics: {},
         course: {},
-        isLoading: this.props.isLoading,
-        isOpen: this.props.isOpen,
+        isLoading: this.props.store.isLoading,
+        isOpen: true,
         messageFormOpen: false,
         permissions: {},
         submissions: [],
@@ -78,11 +76,17 @@ define([
       this.props.store.onChange = this.onChange
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps (nextProps) {
       if (nextProps.store !== this.props.store) {
         this.props.store.onChange = null
         nextProps.store.onChange = this.onChange
-        this.setState({isLoading: true})
+        const newState = {
+          isLoading: true
+        };
+        if (!this.state.isOpen) {
+          newState.isOpen = true
+        }
+        this.setState(newState)
       }
     }
 
@@ -90,7 +94,7 @@ define([
      * Handlers
      */
 
-    onChange = (e) => {
+    onChange = () => {
       const {store} = this.props;
       this.setState({
         analytics: store.state.analytics,
@@ -99,7 +103,17 @@ define([
         permissions: store.state.permissions,
         submissions: store.state.submissions,
         user: store.state.user
+      }, () => {
+        if (!store.state.loading && this.state.isOpen) {
+          if (this.closeButtonRef) {
+            this.closeButtonRef.focus()
+          }
+        }
       })
+    }
+
+    getCloseButtonRef = (ref) => {
+      this.closeButtonRef = ref
     }
 
     handleRequestClose = (e) => {
@@ -107,6 +121,14 @@ define([
       this.setState({
         isOpen: false
       })
+      if (this.props.returnFocusTo) {
+        const focusableItems = this.props.returnFocusTo();
+        // Because of the way native focus calls return undefined, all focus
+        // objects should be wrapped in something that will return truthy like
+        // jQuery wrappers do... and it should be able to check visibility like a
+        // jQuery wrapper... so just use jQuery.
+        focusableItems.some($itemToFocus => $itemToFocus.is(':visible') && $itemToFocus.focus())
+      }
     }
 
     handleMessageButtonClick = (e) => {
@@ -140,6 +162,7 @@ define([
         >
           {StudentContextTray.renderQuickLink(
             I18n.t('Grades'),
+            I18n.t('View grades for %{name}', { name: this.state.user.short_name }),
             `/courses/${this.props.courseId}/grades/${this.props.studentId}`,
             () =>
               this.state.permissions.manage_grades ||
@@ -147,6 +170,7 @@ define([
           )}
           {StudentContextTray.renderQuickLink(
             I18n.t('Analytics'),
+            I18n.t('View analytics for %{name}', { name: this.state.user.short_name }),
             `/courses/${this.props.courseId}/analytics/users/${this.props.studentId}`,
             () => (
               this.state.permissions.view_analytics && Object.keys(this.state.analytics).length > 0
@@ -176,6 +200,7 @@ define([
             label={I18n.t('Student Details')}
             isDismissable={!this.state.isLoading}
             closeButtonLabel={I18n.t('Close')}
+            closeButtonRef={this.getCloseButtonRef}
             isOpen={this.state.isOpen}
             onRequestClose={this.handleRequestClose}
             placement='right'
@@ -204,16 +229,16 @@ define([
 
                     <div className="StudentContextTray-Header__Layout">
                       <div className="StudentContextTray-Header__Content">
-                        {this.state.user.short_name ? (
+                        {this.state.user.short_name  ? (
                           <div className="StudentContextTray-Header__Name">
                             <Heading level="h3" tag="h2">
-                              <Link
-                                href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
-                              >
-                                <span className="StudentContextTray-Header__NameLink">
+                              <span className="StudentContextTray-Header__NameLink">
+                                <Link
+                                  href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
+                                >
                                   {this.state.user.short_name}
-                                </span>
-                              </Link>
+                                </Link>
+                              </span>
                             </Heading>
                           </div>
                         ) : null}
@@ -237,7 +262,7 @@ define([
                             onClick={this.handleMessageButtonClick}
                           >
                             <ScreenReaderContent>
-                              {I18n.t('Send a message to this student')}
+                              {I18n.t('Send a message to %{student}', {student: this.state.user.short_name})}
                             </ScreenReaderContent>
 
                             {/* Note: replace with instructure-icon */}

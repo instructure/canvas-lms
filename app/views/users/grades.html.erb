@@ -15,7 +15,7 @@
       <% if course.hide_final_grades? || (@grading_periods[course.id] && @grading_periods[course.id][:selected_period_id] == 0 && !course.feature_enabled?(:all_grading_periods_totals))%>
         --
       <% elsif @grades[:student_enrollments][course.id] %>
-        <%= @grades[:student_enrollments][course.id] %>%
+        <%= I18n.n(@grades[:student_enrollments][course.id], percentage: true) %>
       <% else %>
         <%= t('no_grade', 'no grade') %>
       <% end %>

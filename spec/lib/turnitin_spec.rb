@@ -27,9 +27,7 @@ describe Turnitin::Client do
   end
 
   def turnitin_submission
-    expects_job_with_tag('Submission#submit_to_turnitin') do
-      @submission = @assignment.submit_homework(@user, :submission_type => 'online_upload', :attachments => [attachment_model(:context => @user, :content_type => 'text/plain')])
-    end
+    @submission = @assignment.submit_homework(@user, :submission_type => 'online_upload', :attachments => [attachment_model(:context => @user, :content_type => 'text/plain')])
     @submission.reload
   end
 

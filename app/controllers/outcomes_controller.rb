@@ -18,10 +18,10 @@
 
 class OutcomesController < ApplicationController
   include Api::V1::Outcome
-  before_filter :require_context, :except => [:build_outcomes]
+  before_action :require_context, :except => [:build_outcomes]
   add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, :except => [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
-  before_filter { |c| c.active_tab = "outcomes" }
-  before_filter :rich_content_service_config, only: [:show, :index]
+  before_action { |c| c.active_tab = "outcomes" }
+  before_action :rich_content_service_config, only: [:show, :index]
 
   def index
     return unless authorized_action(@context, @current_user, :read)

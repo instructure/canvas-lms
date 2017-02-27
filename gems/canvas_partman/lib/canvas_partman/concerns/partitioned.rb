@@ -99,7 +99,11 @@ module CanvasPartman::Concerns
 
         @arel_tables ||= {}
         @arel_tables[partition_table_name] ||= begin
-          Arel::Table.new(partition_table_name, { engine: self.arel_engine })
+          if ::ActiveRecord.version < Gem::Version.new('5')
+            Arel::Table.new(partition_table_name, { engine: self.arel_engine })
+          else
+            Arel::Table.new(partition_table_name, type_caster: type_caster)
+          end
         end
       end
 

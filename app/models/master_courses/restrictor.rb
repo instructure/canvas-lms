@@ -2,6 +2,7 @@ module MasterCourses::Restrictor
   def self.included(klass)
     klass.include(CommonMethods)
     klass.send(:attr_writer, :master_course_restrictions)
+    klass.send(:attr_accessor, :current_master_template_restrictions)
 
     klass.after_create :create_child_content_tag
 
@@ -122,6 +123,8 @@ module MasterCourses::Restrictor
       end
     end
     if columns_to_restore.any?
+      @importing_migration.skipped_master_course_items ||= Set.new
+      @importing_migration.skipped_master_course_items << self.asset_string
       Rails.logger.debug("Undoing imported changes to #{self.class} #{self.id} because changed downstream - #{columns_to_restore.join(', ')}")
       self.restore_attributes(columns_to_restore)
     end
@@ -154,11 +157,14 @@ module MasterCourses::Restrictor
     @master_course_restrictions ||= find_master_course_restrictions || {}
   end
 
-  def master_course_api_restriction_data
+  def master_course_api_restriction_data(course_status)
     hash = {}
-    if self.is_child_content?
+    if course_status == :child && self.is_child_content?
       hash['is_master_course_content'] = true
       hash['restricted_by_master_course'] = self.editing_restricted?
+    elsif course_status == :master && self.current_master_template_restrictions
+      # this won't be confusing at all... :|
+      hash['master_template_restrictions'] = self.current_master_template_restrictions
     end
     hash
   end
@@ -175,6 +181,7 @@ module MasterCourses::Restrictor
     !!@master_course_restrictions
   end
 
+  # preload restrictions on the child course
   def self.preload_restrictions(objects)
     objects = Array(objects)
     objects_to_load = objects.select{|obj| obj.is_child_content? && !obj.master_course_restrictions_loaded?}.index_by(&:migration_id)
@@ -185,6 +192,24 @@ module MasterCourses::Restrictor
     all_restrictions = MasterCourses::MasterContentTag.where(:migration_id => migration_ids).pluck(:migration_id, :restrictions)
     all_restrictions.each do |migration_id, restrictions|
       objects_to_load[migration_id].master_course_restrictions = restrictions
+    end
+  end
+
+  def self.preload_default_template_restrictions(objects, course)
+    # this is for preloading restrictions on the master/blueprint course side
+    # this is basically almost the same as the child side and it really isn't obvious what the difference is
+    # but i kind of backed myself into a corner there by naming them "master_course_restrictions" on the child-side
+    # so this all is probably going to be confusing to the poor soul that reads this
+    template = MasterCourses::MasterTemplate.full_template_for(course)
+    return unless template
+
+    objects_to_load = Array(objects).select{|obj| MasterCourses::ALLOWED_CONTENT_TYPES.include?(obj.class.base_class.name)}.index_by do |obj|
+      template.migration_id_for(obj) # use their future migration ids because that'll actually make partial bulk-loading easier
+    end
+
+    objects_to_load.values.each{|obj| obj.current_master_template_restrictions = {}} # default if restrictions are missing
+    template.master_content_tags.where(:migration_id => objects_to_load.keys).pluck(:migration_id, :restrictions).each do |migration_id, restrictions|
+      objects_to_load[migration_id].current_master_template_restrictions = restrictions
     end
   end
 end

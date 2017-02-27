@@ -4,7 +4,7 @@ define [
   'jsx/dashboard_card/CourseActivitySummaryStore'
 ], (TestUtils, _, CourseActivitySummaryStore) ->
 
-  module 'CourseActivitySummaryStore',
+  QUnit.module 'CourseActivitySummaryStore',
     setup: ->
       CourseActivitySummaryStore.setState(streams: {})
       @server = sinon.fakeServer.create()
@@ -25,7 +25,7 @@ define [
     ok _.has(CourseActivitySummaryStore.getStateForCourse(), 'streams'),
       'should return root state object when no courseId is provided'
 
-    spy = @stub(CourseActivitySummaryStore, '_fetchForCourse', -> true)
+    spy = @stub(CourseActivitySummaryStore, '_fetchForCourse').returns(true)
     ok _.isEmpty(CourseActivitySummaryStore.getStateForCourse(1)),
       'should return empty object for course id not already in state'
     ok spy.called, 'should call _fetchForCourse to fetch stream info for course'

@@ -2,7 +2,7 @@ define [
   'compiled/notifications/NotificationPreferences'
 ], (NotificationPreferences) ->
 
-  module "NotificationPreferences"
+  QUnit.module "NotificationPreferences"
 
   test 'tooltip instance was added', ->
     options = { update_url: "/profile/communication_update" }

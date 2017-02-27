@@ -5,7 +5,7 @@ define [
 ], (_, StudentGroupStore, fakeENV) ->
 
 
-  module 'StudentGroupStore',
+  QUnit.module 'StudentGroupStore',
     setup: ->
       StudentGroupStore.reset()
       fakeENV.setup()

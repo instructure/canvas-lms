@@ -28,8 +28,8 @@
 #       }
 #     }
 class Bookmarks::BookmarksController < ApplicationController
-  before_filter :require_user
-  before_filter :find_bookmark, :only => [:show, :update, :destroy]
+  before_action :require_user
+  before_action :find_bookmark, :only => [:show, :update, :destroy]
 
   # @API List bookmarks
   # Returns the list of bookmarks.

@@ -5,7 +5,7 @@ define [
   'compiled/views/content_migrations/CopyCourseView'
   'compiled/views/content_migrations/subviews/DateShiftView'
 ], ($, Backbone, ContentMigration, CopyCourseView, DateShiftView) ->
-  module 'CopyCourseView: Initializer'
+  QUnit.module 'CopyCourseView: Initializer'
   test 'after init, calls updateNewDates when @courseFindSelect.triggers "course_changed" event', ->
 
     copyCourseView = new CopyCourseView

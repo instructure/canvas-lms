@@ -142,11 +142,11 @@
 #     }
 #
 class ProfileController < ApplicationController
-  before_filter :require_registered_user, :except => [:show, :settings, :communication, :communication_update]
-  before_filter :require_user, :only => [:settings, :communication, :communication_update]
-  before_filter :require_user_for_private_profile, :only => :show
-  before_filter :reject_student_view_student
-  before_filter :require_password_session, :only => [:communication, :communication_update, :update]
+  before_action :require_registered_user, :except => [:show, :settings, :communication, :communication_update]
+  before_action :require_user, :only => [:settings, :communication, :communication_update]
+  before_action :require_user_for_private_profile, :only => :show
+  before_action :reject_student_view_student
+  before_action :require_password_session, :only => [:communication, :communication_update, :update]
 
   include Api::V1::Avatar
   include Api::V1::CommunicationChannel

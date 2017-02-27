@@ -20,7 +20,7 @@ define([
   'underscore',
   'jsx/gradebook/AssignmentGroupGradeCalculator'
 ], function (_, AssignmentGroupGradeCalculator) {
-  module('AssignmentGroupGradeCalculator.calculate with no submissions and no assignments', {
+  QUnit.module('AssignmentGroupGradeCalculator.calculate with no submissions and no assignments', {
     setup () {
       this.submissions = [];
       this.assignmentGroup = { id: 301, rules: {}, assignments: [] };
@@ -39,7 +39,7 @@ define([
     equal(grades.final.possible, 0);
   });
 
-  module('AssignmentGroupGradeCalculator.calculate with no submissions and some assignments', {
+  QUnit.module('AssignmentGroupGradeCalculator.calculate with no submissions and some assignments', {
     setup () {
       this.submissions = [];
       const assignments = [
@@ -65,7 +65,7 @@ define([
     equal(grades.final.possible, 1284);
   });
 
-  module('AssignmentGroupGradeCalculator.calculate with some assignments and submissions', {
+  QUnit.module('AssignmentGroupGradeCalculator.calculate with some assignments and submissions', {
     setup () {
       this.submissions = [
         { assignment_id: 201, score: 100 },
@@ -160,7 +160,7 @@ define([
     equal(grades.final.possible, 284);
   });
 
-  module('AssignmentGroupGradeCalculator.calculate with assignments having no points possible', {
+  QUnit.module('AssignmentGroupGradeCalculator.calculate with assignments having no points possible', {
     setup () {
       this.submissions = [
         { assignment_id: 201, score: 10 },
@@ -180,7 +180,7 @@ define([
     equal(grades.final.score, 20);
   });
 
-  module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set to 1)', {
+  QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set to 1)', {
     setup () {
       this.submissions = [
         { assignment_id: 201, score: 31 },
@@ -260,7 +260,7 @@ define([
     equal(grades.final.possible, 74, 'final possible includes all assignments');
   });
 
-  module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule', {
+  QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule', {
     setup () {
       this._qunitTimeout = QUnit.config.testTimeout;
       QUnit.config.testTimeout = 100;
@@ -358,7 +358,7 @@ define([
     equal(grades.final.possible, 20);
   });
 
-  module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule (set to 1)', {
+  QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule (set to 1)', {
     setup () {
       this.submissions = [
         { assignment_id: 201, score: 31 },
@@ -429,7 +429,7 @@ define([
     equal(grades.final.possible, 74, 'final possible includes all assignments');
   });
 
-  module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule', {
+  QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule', {
     setup () {
       this.submissions = [
         { assignment_id: 201, score: 100 },
@@ -523,7 +523,7 @@ define([
     notOk(grades.final.submissions[4].drop);
   });
 
-  module('AssignmentGroupGradeCalculator.calculate with "drop_lowest" and "drop_highest" rules', {
+  QUnit.module('AssignmentGroupGradeCalculator.calculate with "drop_lowest" and "drop_highest" rules', {
     setup () {
       this.submissions = [
         { assignment_id: 201, score: 100 },
@@ -599,7 +599,7 @@ define([
     notOk(grades.final.submissions[2].drop);
   });
 
-  module('AssignmentGroupGradeCalculator.calculate with equivalent submissions and assignments', {
+  QUnit.module('AssignmentGroupGradeCalculator.calculate with equivalent submissions and assignments', {
     setup () {
       this.submissions = [
         { assignment_id: 201, score: 9 },
@@ -665,7 +665,7 @@ define([
     equal(droppedSubmission1.assignment_id, droppedSubmission2.assignment_id);
   });
 
-  module('AssignmentGroupGradeCalculator.calculate with only unpointed assignments', {
+  QUnit.module('AssignmentGroupGradeCalculator.calculate with only unpointed assignments', {
     setup () {
       this.submissions = [
         { assignment_id: 201, score: 10 },
@@ -706,7 +706,7 @@ define([
     ok(grades.current.submissions[3].drop);
   });
 
-  module('AssignmentGroupGradeCalculator.calculate with only ungraded submissions', {
+  QUnit.module('AssignmentGroupGradeCalculator.calculate with only ungraded submissions', {
     setup () {
       this.submissions = [
         { assignment_id: 201, score: null },
@@ -734,7 +734,7 @@ define([
     equal(grades.final.possible, 35, 'final possible is sum of all assignment points');
   });
 
-  module('AssignmentGroupGradeCalculator.calculate "never_drop" rule', {
+  QUnit.module('AssignmentGroupGradeCalculator.calculate "never_drop" rule', {
     // drop 31/40, keep 19/24, keep 12/16, keep 6/10 = 37/50 = 74.0%
     // keep 31/40, drop 19/24, keep 12/16, keep 6/10 = 49/66 = 74.2%
     // keep 31/40, keep 19/24, drop 12/16, keep 6/10 = 56/74 = 75.7%

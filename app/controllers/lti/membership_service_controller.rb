@@ -16,9 +16,9 @@
 #
 module Lti
   class MembershipServiceController < ApplicationController
-    before_filter :require_context
-    before_filter :require_user
-    before_filter :check_authorized_action
+    before_action :require_context
+    before_action :require_user
+    before_action :check_authorized_action
 
     def course_index
       render_page_presenter

@@ -5,7 +5,7 @@ define([
   'jsx/external_apps/lib/AppCenterStore'
 ], (React, TestUtils, AppDetails, AppCenterStore) => {
 
-  module('External Apps App Details');
+  QUnit.module('External Apps App Details');
 
   test('the back to app center link goes to the proper place', () => {
 

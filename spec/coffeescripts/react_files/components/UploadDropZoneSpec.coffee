@@ -9,7 +9,7 @@ define [
 
   node = document.querySelector('#fixtures')
 
-  module 'UploadDropZone',
+  QUnit.module 'UploadDropZone',
     setup: ->
       @uploadZone = ReactDOM.render(UploadDropZone({}), node)
 

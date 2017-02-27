@@ -125,13 +125,20 @@ module Lti
           expect(subject.create.capability_offered).to include 'Canvas.placements.similarityDetection'
         end
 
-
         it 'adds the ToolConsumerProfile.url capability' do
           expect(subject.create.capability_offered).to include 'ToolConsumerProfile.url'
         end
 
-        it 'adds the OAuth.splitSecret capability' do
-          expect(subject.create.capability_offered).to include 'OAuth.splitSecret'
+        it 'adds the Security.splitSecret capability' do
+          expect(subject.create.capability_offered).to include 'Security.splitSecret'
+        end
+
+        it 'adds the Person.sourcedId capability' do
+          expect(subject.create.capability_offered).to include 'Person.sourcedId'
+        end
+
+        it 'adds the CourseSection.sourcedId capability' do
+          expect(subject.create.capability_offered).to include 'CourseSection.sourcedId'
         end
 
         it 'adds the Context.id capability' do
@@ -140,6 +147,26 @@ module Lti
 
         it 'adds the OriginalityReport capability if developer_key is true' do
           expect(subject.create(true).capability_offered).to include 'vnd.Canvas.OriginalityReport.url'
+        end
+
+        it 'adds the Message.documentTarget capability' do
+          expect(subject.create(true).capability_offered).to include 'Message.documentTarget'
+        end
+
+        it 'adds the ToolConsumerInstance.guid capability' do
+          expect(subject.create(true).capability_offered).to include 'ToolConsumerInstance.guid'
+        end
+
+        it 'adds the Message.locale capability' do
+          expect(subject.create(true).capability_offered).to include 'Message.locale'
+        end
+
+        it 'adds the Membership.role capability' do
+          expect(subject.create(true).capability_offered).to include 'Membership.role'
+        end
+
+        it 'adds the Context.id capability' do
+          expect(subject.create(true).capability_offered).to include 'Context.id'
         end
 
         it 'does not add the OriginalityReport capability if developer_key is false' do

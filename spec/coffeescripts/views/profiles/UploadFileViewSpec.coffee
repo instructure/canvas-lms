@@ -3,7 +3,7 @@ define [
   'compiled/util/BlobFactory'
 ], (UploadFileView, BlobFactory) ->
 
-  module 'UploadFileView',
+  QUnit.module 'UploadFileView',
     setup: ->
       @view  = new UploadFileView(avatarSize: { h: 128, w: 128 })
       @view.$el.appendTo('#fixtures')

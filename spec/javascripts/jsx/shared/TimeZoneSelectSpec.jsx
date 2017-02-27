@@ -4,7 +4,7 @@ define([
   'jsx/shared/TimeZoneSelect'
 ], (React, TestUtils, TimeZoneSelect) => {
 
-  module('TimeZoneSelect Component');
+  QUnit.module('TimeZoneSelect Component');
 
   test('filterTimeZones', () => {
     const timezones = [{

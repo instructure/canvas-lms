@@ -6,7 +6,7 @@ define [
   'jsx/shared/modal-content'
 ], ($, React, ReactDOM, TestUtils, ModalContent) ->
 
-  module 'ModalContent'
+  QUnit.module 'ModalContent'
 
   test "applies className to parent node", ->
     ModalContentElement = React.createElement(ModalContent, className: 'cat')

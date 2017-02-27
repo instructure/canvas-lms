@@ -16,8 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ActiveRecord::Base
-  DROPPED_COLUMNS = {
+ActiveRecord::Base::DROPPED_COLUMNS = {
     'abstract_courses' => %w(sis_name sis_course_code).freeze,
     'accounts' => %w(type
                      sis_name
@@ -149,27 +148,23 @@ class ActiveRecord::Base
     'wiki_pages' => %w(hide_from_students delayed_post_at recent_editors wiki_page_comments_count).freeze
   }.freeze
 
-  def self.columns_with_remove_dropped_columns
-    @columns_with_dropped ||= self.columns_without_remove_dropped_columns.reject { |c|
-      (DROPPED_COLUMNS[self.table_name] || []).include?(c.name)
+module DroppedColumns
+  def columns
+    @columns_with_dropped ||= super.reject { |c|
+      (ActiveRecord::Base::DROPPED_COLUMNS[self.table_name] || []).include?(c.name)
     }
   end
 
-  def self.reset_column_information_with_remove_dropped_columns
+  def reset_column_information
     @columns_with_dropped = nil
-    self.reset_column_information_without_remove_dropped_columns
+    super
   end
 
-  def self.instantiate_with_remove_dropped_columns(attributes, *args)
-    (DROPPED_COLUMNS[self.table_name] || []).each do |attr|
+  def instantiate(attributes, *args)
+    (ActiveRecord::Base::DROPPED_COLUMNS[self.table_name] || []).each do |attr|
       attributes.delete(attr)
     end unless self < Tableless
-    instantiate_without_remove_dropped_columns(attributes, *args)
-  end
-
-  class << self
-    alias_method_chain :columns, :remove_dropped_columns
-    alias_method_chain :reset_column_information, :remove_dropped_columns
-    alias_method_chain :instantiate, :remove_dropped_columns
+    super
   end
 end
+ActiveRecord::Base.singleton_class.prepend(DroppedColumns)

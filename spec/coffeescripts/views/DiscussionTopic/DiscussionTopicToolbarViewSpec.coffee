@@ -11,7 +11,7 @@ define [
   </div>
   """
 
-  module 'DiscussionTopicToolbarView',
+  QUnit.module 'DiscussionTopicToolbarView',
     setup: ->
       $('#fixtures').html(fixture)
       @view = new DiscussionTopicToolbarView(el: '#discussion-topic-toolbar')

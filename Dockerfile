@@ -1,5 +1,5 @@
 # See doc/docker/README.md or https://github.com/instructure/canvas-lms/tree/master/doc/docker
-FROM instructure/ruby-passenger:2.3
+FROM instructure/ruby-passenger:2.4
 
 ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV "production"
@@ -31,14 +31,22 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
 WORKDIR $APP_HOME
+
 USER root
 COPY Gemfile      ${APP_HOME}
 COPY Gemfile.d    ${APP_HOME}Gemfile.d
 COPY config       ${APP_HOME}config
 COPY gems         ${APP_HOME}gems
-RUN bundle install --jobs 8
+COPY script       ${APP_HOME}script
 COPY package.json ${APP_HOME}
+RUN chown -R docker:docker ${APP_HOME} /home/docker
+
+# Install deps as docker to avoid sadness w/ npm lifecycle hooks
+USER docker
+RUN bundle install --jobs 8
 RUN npm install
+USER root
+
 COPY . $APP_HOME
 RUN mkdir -p log \
             tmp \

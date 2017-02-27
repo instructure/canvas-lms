@@ -23,15 +23,16 @@ module CC::Exporter::Epub
       "WikiPage" => :pages
     }.freeze
 
-    def initialize(cartridge, sort_by_content=false)
+    def initialize(cartridge, sort_by_content=false, export_type=:epub)
       @cartridge = cartridge
+      @export_type = export_type
       @sort_by_content = sort_by_content || cartridge_json[:modules].empty?
     end
     attr_reader :cartridge, :sort_by_content
     delegate :unsupported_files, to: :cartridge_converter, allow_nil: true
 
     def cartridge_json
-      @_cartridge_json ||= cartridge_converter.export
+      @_cartridge_json ||= cartridge_converter.export(@export_type)
     end
 
     def templates

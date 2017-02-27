@@ -206,8 +206,8 @@
 #     }
 #
  class GradebookHistoryApiController < ApplicationController
-  before_filter :require_context
-  before_filter :require_manage_grades
+  before_action :require_context
+  before_action :require_manage_grades
 
   include Api::V1::GradebookHistory
 

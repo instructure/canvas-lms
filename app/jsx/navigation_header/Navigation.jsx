@@ -123,7 +123,7 @@ define([
 
     updateUnreadCount (count) {
       count = parseInt(count, 10);
-      this.unreadCountElement().text(count);
+      this.unreadCountElement().text(I18n.n(count));
       this.unreadCountElement().toggle(count > 0);
     },
 
@@ -220,6 +220,7 @@ define([
         case 'help':
           return (
             <HelpTray
+              trayTitle={window.ENV.help_link_name}
               links={this.state.help}
               hasLoaded={this.state.helpAreLoaded}
               closeTray={this.closeTray}

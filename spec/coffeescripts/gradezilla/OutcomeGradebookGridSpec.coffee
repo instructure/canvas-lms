@@ -5,7 +5,7 @@ define [
   'i18n!gradezilla'
 ], (_, Grid,fakeENV) ->
 
-  module 'OutcomeGradebookGrid',
+  QUnit.module 'OutcomeGradebookGrid',
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
 

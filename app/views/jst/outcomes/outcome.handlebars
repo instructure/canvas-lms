@@ -17,12 +17,12 @@
     {{#each ratings}}
     <td class="rating">
       <h5>{{description}}</h5>
-      {{#t "points.rating"}}{{points}} Points{{/t}}
+      {{#t}}{{n points precision=2 strip_insignificant_zeros=true}} Points{{/t}}
     </td>
     {{/each}}
     <td class="total">
       <h5 class="total">{{#t "total_points"}}Total Points{{/t}}</h5>
-      {{#t "points.total"}}{{points_possible}} Points{{/t}}
+      {{#t}}{{n points_possible precision=2 strip_insignificant_zeros=true}} Points{{/t}}
     </td>
   </tr>
 </table>
@@ -40,7 +40,7 @@
       {{#t "use_for_scoring"}}Use this criterion for scoring{{/t}}
     </label>
   {{else}}
-    <p>{{#t "point_mastery"}}Mastery: {{mastery_points}} Points{{/t}}</p>
+    <p>{{#t}}Mastery: {{n mastery_points precision=2 strip_insignificant_zeros=true}} Points{{/t}}</p>
   {{/if}}
 {{/if}}
 

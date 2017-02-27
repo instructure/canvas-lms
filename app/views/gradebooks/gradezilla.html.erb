@@ -77,6 +77,7 @@
     <div id="gradebook-toolbar" class="toolbar">
       <div class="gradebook_dropdowns">
         <span data-component="ViewOptionsMenu"></span>
+        <span data-component="ActionMenu"></span>
         <% if multiple_grading_periods? %>
           <span class="multiple-grading-periods-selector-placeholder"></span>
         <% end %>
@@ -86,32 +87,6 @@
         <input type="text" class="search-query" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
       </div>
       <div class="gradebook_menu">
-        <span class="ui-buttonset">
-          <% if @gradebook_is_editable && @context.allows_gradebook_uploads? %>
-            <%= link_to(new_course_gradebook_upload_path(@context), class: "ui-button") do %>
-              <i class="icon-import"></i>
-              <%= t 'Import' %>
-            <% end %>
-          <% end %>
-          <button class="ui-button" id="download_csv">
-            <i class="icon-export"></i>
-            <%= t('Export') %>
-          </button>
-          <ul style="display: none;" id="csv_export_options" class="export_dropdown ui-kyle-menu">
-            <li class="generate_new_csv"><a href="#"><%=t('Current') %></a></li>
-            <% if @last_exported_gradebook_csv.present? %>
-              <li><a href="<%= @last_exported_gradebook_csv.attachment.download_url %>" class="open_in_a_new_tab">
-                <%= t('Previous (%{time})', time: datetime_string(@last_exported_gradebook_csv.attachment.updated_at)) %>
-              </a></li>
-            <% else %>
-              <li style="display:none;">
-                <a class="open_in_a_new_tab"></a>
-              </li>
-            <% end %>
-          </ul>
-        </span>
-        <iframe id="csv_download" style="display:none"></iframe>
-
         <button id="gradebook_settings"><i class="icon-settings"></i></button>
         <ul style="display: none;" class="gradebook_dropdown ui-kyle-menu">
           <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= t('View Grading History') %></a></li>

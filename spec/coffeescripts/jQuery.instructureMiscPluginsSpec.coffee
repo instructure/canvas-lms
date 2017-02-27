@@ -4,7 +4,7 @@ define [
 ], (jQuery) ->
   $ = jQuery
 
-  module 'instructure misc plugins'
+  QUnit.module 'instructure misc plugins'
 
   test 'showIf', ->
     el = $('<input type="checkbox" id="checkbox1">').appendTo("#fixtures")

@@ -1,6 +1,6 @@
 define(['jsx/course_settings/reducer'], (reducer) => {
 
-  module('Course Settings Reducer');
+  QUnit.module('Course Settings Reducer');
 
   test('Unknown action types return initialState', () => {
     const initialState = {

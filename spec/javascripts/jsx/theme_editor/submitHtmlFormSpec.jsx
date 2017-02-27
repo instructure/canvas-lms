@@ -5,7 +5,7 @@ define([
 
   let action, method, md5, csrfToken, form
 
-  module('submitHtmlForm', {
+  QUnit.module('submitHtmlForm', {
     setup () {
       this.spy(jQuery.fn, 'appendTo')
       this.stub(jQuery.fn, 'submit')

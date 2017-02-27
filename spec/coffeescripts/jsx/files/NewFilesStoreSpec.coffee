@@ -1,6 +1,6 @@
 define ['jsx/files/NewFilesStore'], (NewFilesStore) ->
 
-  module 'NewFilesStore'
+  QUnit.module 'NewFilesStore'
 
   test 'constructor', ->
     store = new NewFilesStore()

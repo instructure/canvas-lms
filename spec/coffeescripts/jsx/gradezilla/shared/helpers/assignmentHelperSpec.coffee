@@ -3,7 +3,7 @@ define [
   'jsx/gradezilla/shared/helpers/assignmentHelper',
 ], (_, assignmentHelper) ->
 
-  module 'assignmentHelper#getComparator',
+  QUnit.module 'assignmentHelper#getComparator',
     setup: ->
     teardown: ->
 
@@ -17,7 +17,7 @@ define [
     returnedFn = assignmentHelper.getComparator('assignment_group')
     propEqual returnedFn, expectedFn
 
-  module 'assignmentHelper#compareByDueDate',
+  QUnit.module 'assignmentHelper#compareByDueDate',
     setup: ->
     teardown: ->
 
@@ -151,7 +151,7 @@ define [
     comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
     ok comparisonVal > 0
 
-  module 'assignmentHelper#compareByAssignmentGroup',
+  QUnit.module 'assignmentHelper#compareByAssignmentGroup',
     setup: ->
     teardown: ->
 

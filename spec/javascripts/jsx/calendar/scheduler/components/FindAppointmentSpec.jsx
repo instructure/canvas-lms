@@ -4,7 +4,7 @@ define([
   'enzyme',
   'jsx/calendar/scheduler/components/FindAppointment'
 ], (React, TestUtils, Enzyme, FindAppointmentApp) => {
-  module('FindAppointmentApp')
+  QUnit.module('FindAppointmentApp')
 
   test('renders the FindAppoint component', () => {
     const courses = [

@@ -1,7 +1,7 @@
 define([
   'react',
   'underscore',
-  'i18n!timezone'
+  'i18n!edit_timezone'
 ], function (React, _, I18n) {
   const { array } = React.PropTypes;
 

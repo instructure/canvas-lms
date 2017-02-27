@@ -7,7 +7,7 @@ define [
   'helpers/I18nStubber'
 ], (React, ReactDOM, TestUtils, FriendlyDatetime, I18n, I18nStubber) ->
 
-  module 'FriendlyDatetime',
+  QUnit.module 'FriendlyDatetime',
     setup: ->
       I18nStubber.clear()
 

@@ -49,7 +49,7 @@
 #     }
 #
 class CourseNicknamesController < ApplicationController
-  before_filter :require_user
+  before_action :require_user
 
   # @API List course nicknames
   #

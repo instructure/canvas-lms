@@ -18,7 +18,7 @@
 class FilePreviewsController < ApplicationController
   include AttachmentHelper
 
-  before_filter :get_context
+  before_action :get_context
 
   GOOGLE_PREVIEWABLE_TYPES = %w{
    application/vnd.openxmlformats-officedocument.wordprocessingml.template

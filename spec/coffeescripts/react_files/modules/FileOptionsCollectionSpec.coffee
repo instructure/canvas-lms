@@ -26,7 +26,7 @@ define [
     options.name = optionName if optionName
     options
 
-  module 'FileOptionsCollection',
+  QUnit.module 'FileOptionsCollection',
     setup: ->
       FileOptionsCollection.resetState()
 

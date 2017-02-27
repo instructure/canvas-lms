@@ -144,7 +144,7 @@ describe 'Provisional Grades API', type: :request do
     end
   end
 
-  describe "publish_provisional_grades" do
+  describe "publish" do
     before :once do
       course_with_student :active_all => true
       course_with_ta :course => @course, :active_all => true
@@ -176,6 +176,41 @@ describe 'Provisional Grades API', type: :request do
         @assignment.update_attribute :grades_published_at, Time.now.utc
         json = api_call_as_user(@teacher, :post, @path, @params, {}, {}, { :expected_status => 400 })
         expect(json['message']).to eq 'Assignment grades have already been published'
+      end
+
+      context 'with empty provisional grades (comments only)' do
+        before(:once) do
+          @submission = @assignment.submit_homework(@student, :body => "hello")
+          @submission.add_comment(author: @ta, provisional: true, comment: 'A provisional comment')
+          @provisional_grade = @submission.provisional_grades.first
+        end
+
+        it 'publishes an empty provisional grade for an active student' do
+          api_call_as_user(@teacher, :post, @path, @params)
+
+          expect(@assignment.reload.grades_published?).to be_truthy
+          expect(@submission.reload.grade).to be_nil
+        end
+
+        it 'publishes an empty provisional grade for a student with concluded enrollment' do
+          student_enrollment = @course.enrollments.find_by(user: @student)
+          student_enrollment.conclude
+
+          api_call_as_user(@teacher, :post, @path, @params)
+
+          expect(@assignment.reload.grades_published?).to be_truthy
+          expect(@submission.reload.grade).to be_nil
+        end
+
+        it 'publishes an empty provisional grade for a student with an inactive enrollment' do
+          student_enrollment = @course.enrollments.find_by(user: @student)
+          student_enrollment.deactivate
+
+          api_call_as_user(@teacher, :post, @path, @params)
+
+          expect(@assignment.reload.grades_published?).to be_truthy
+          expect(@submission.reload.grade).to be_nil
+        end
       end
 
       context "with provisional grades" do

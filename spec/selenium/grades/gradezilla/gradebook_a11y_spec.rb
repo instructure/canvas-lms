@@ -14,18 +14,21 @@ describe "Gradezilla" do
     gradebook_data_setup
   end
 
-  before(:each) do
+  before do
+    Account.default.set_feature_flag!('gradezilla', 'on')
     extra_setup
     user_session(@teacher)
     gradezilla_page.visit(@course)
   end
 
   context "export menu" do
-    before { f('#download_csv').click }
+    before { f('span[data-component="ActionMenu"] button').click }
 
-    it "moves focus to import button during current export", priority: "2", test_id: 720459 do
-      f('.generate_new_csv').click
-      expect(active_element).to have_class('ui-button')
+    it "moves focus to Actions menu trigger button during current export", priority: "2", test_id: 720459 do
+      f('span[data-menu-id="export"]').click
+
+      expect(active_element.tag_name).to eq('button')
+      expect(active_element.text).to eq('Actions')
     end
 
     context "when a csv already exists" do
@@ -39,10 +42,11 @@ describe "Gradezilla" do
                                        attachment: attachment)
       end
 
-      it "maintains focus on export button during past csv export", priority: "2", test_id: 720460 do
-        wait_for_ajax_requests
-        f('#csv_export_options .ui-menu-item:not(.generate_new_csv)').click
-        expect(active_element).to have_attribute('id', 'download_csv')
+      it "maintains focus to Actions menu trigger during past csv export", priority: "2", test_id: 720460 do
+        f('span[data-menu-id="previous-export"]').click
+
+        expect(active_element.tag_name).to eq('button')
+        expect(active_element.text).to eq('Actions')
       end
     end
   end

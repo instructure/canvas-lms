@@ -40,9 +40,9 @@ define([
     },
   }
 
-  module('CYOE Helper', () => {
+  QUnit.module('CYOE Helper', () => {
 
-    module('isEnabled', testSetup)
+    QUnit.module('isEnabled', testSetup)
 
     test('returns false if not enabled', () => {
       notOk(CyoeHelper.isEnabled())
@@ -53,7 +53,7 @@ define([
       ok(CyoeHelper.isEnabled())
     })
 
-    module('getItemData', testSetup)
+    QUnit.module('getItemData', testSetup)
 
     test('return isTrigger = false if item is not a trigger assignment', () => {
       setEnv(cyoeEnv())
@@ -113,7 +113,7 @@ define([
       equal(itemData.releasedLabel, 'Multiple')
     })
 
-    module('reloadEnv', testSetup)
+    QUnit.module('reloadEnv', testSetup)
 
     test('reloads data from ENV', () => {
       const env = cyoeEnv()

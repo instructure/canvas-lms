@@ -6,7 +6,7 @@ define [
   'jquery.ajaxJSON'
 ], ($, _, WikiPage, WikiPageRevision) ->
 
-  module 'WikiPageRevision::urls'
+  QUnit.module 'WikiPageRevision::urls'
   test 'captures contextAssetString, page, pageUrl, latest, and summary as constructor options', ->
     page = new WikiPage
     revision = new WikiPageRevision {}, contextAssetString: 'course_73', page: page, pageUrl: 'page-url', latest: true, summary: true
@@ -32,7 +32,7 @@ define [
     revision = new WikiPageRevision {revision_id: 42}, contextAssetString: 'course_73', pageUrl: 'page-url', latest: true
     strictEqual revision.url(), '/api/v1/courses/73/pages/page-url/revisions/latest', 'latest'
 
-  module 'WikiPageRevision::parse'
+  QUnit.module 'WikiPageRevision::parse'
   test 'parse sets the id to the url', ->
     revision = new WikiPageRevision
     strictEqual revision.parse({url: 'bob'}).id, 'bob', 'url set through parse'
@@ -47,7 +47,7 @@ define [
     mock.expects('ajaxJSON').atLeast(1).withArgs('/api/v1/courses/73/pages/page-url/revisions/42', 'POST').returns($.Deferred().resolve())
     revision.restore()
 
-  module 'WikiPageRevision::fetch'
+  QUnit.module 'WikiPageRevision::fetch'
   test 'the summary flag is passed to the server', ->
     @stub($, 'ajax').returns($.Deferred())
 

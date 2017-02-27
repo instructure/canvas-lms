@@ -3,7 +3,7 @@ define [
   'compiled/views/wiki/WikiPageDeleteDialog'
 ], (WikiPage, WikiPageDeleteDialog) ->
 
-  module 'WikiPageDeleteDialog'
+  QUnit.module 'WikiPageDeleteDialog'
 
   test 'maintains the view of the model', ->
     model = new WikiPage

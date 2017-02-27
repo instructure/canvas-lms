@@ -36,11 +36,9 @@ module.exports.pitch = function (remainingRequest, precedingRequest, data) {
     i--
   }
 
-  const extendedJavascript = `
-    define(${JSON.stringify(pluginPaths)},function(orig, ${pluginArgs.join(",")}){
+  return `
+    define(${JSON.stringify(pluginPaths)},function(orig, ${pluginArgs.join(',')}){
       return ${pluginChain}
     });
   `
-
-  return extendedJavascript
 }

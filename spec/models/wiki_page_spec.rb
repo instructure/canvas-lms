@@ -37,6 +37,31 @@ describe WikiPage do
     expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to be_include(@user)
   end
 
+  it "should send page updated notifications to students if active" do
+    course_with_student(:active_all => true)
+    n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")
+    NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
+    p = @course.wiki.wiki_pages.create(:title => "some page")
+    p.created_at = 3.days.ago
+    p.notify_of_update = true
+    p.save!
+    p.update_attributes(:body => "Awgawg")
+    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to be_include(@student)
+  end
+
+  it "should not send page updated notifications to students if not active" do
+    course_with_student(:active_all => true)
+    n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")
+    NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
+    @course.update_attributes(:start_at => 2.days.from_now, :restrict_enrollments_to_course_dates => true)
+    p = @course.wiki.wiki_pages.create(:title => "some page")
+    p.created_at = 3.days.ago
+    p.notify_of_update = true
+    p.save!
+    p.update_attributes(:body => "Awgawg")
+    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to_not be_include(@student)
+  end
+
   it "should validate the title" do
     course_with_teacher(:active_all => true)
     expect(@course.wiki.wiki_pages.new(:title => "").valid?).not_to be_truthy

@@ -4,7 +4,7 @@ define([
   'jsx/choose_mastery_path/components/path-option',
 ], (React, TestUtils, PathOption) => {
 
-  module('Path Option')
+  QUnit.module('Path Option')
 
   const defaultProps = () => ({
     assignments: [

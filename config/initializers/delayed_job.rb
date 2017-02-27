@@ -92,6 +92,12 @@ Delayed::Worker.lifecycle.around(:pop) do |worker, &block|
   end
 end
 
+Delayed::Worker.lifecycle.around(:work_queue_pop) do |worker, config, &block|
+  CanvasStatsd::Statsd.time(["delayedjob.workqueuepop", "delayedjob.workqueuepop.jobshard.#{Shard.current(:delayed_jobs).id}"]) do
+    block.call(worker, config)
+  end
+end
+
 Delayed::Worker.lifecycle.before(:perform) do |job|
   # Since AdheresToPolicy::Cache uses an instance variable class cache lets clear
   # it so we start with a clean slate.

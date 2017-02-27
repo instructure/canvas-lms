@@ -24,7 +24,7 @@ define [
     }
   ]
 
-  module 'MessageFormDialog',
+  QUnit.module 'MessageFormDialog',
     setup: ->
       @server = sinon.fakeServer.create()
       @clock = sinon.useFakeTimers()

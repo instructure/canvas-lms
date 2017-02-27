@@ -100,7 +100,7 @@ define [
 
     # focus the last item in the tree.
     focusLast: ($from) ->
-      $to = $tree.find '[role=treeitem][aria-level=1]'
+      $to = @$tree.find '[role=treeitem][aria-level=1]'
       level = 1
       # if the last item is expanded, focus the last node from the last expanded item.
       while @ariaPropIsTrue($to, 'aria-expanded') and $to.find('[role=treeitem]:first').length

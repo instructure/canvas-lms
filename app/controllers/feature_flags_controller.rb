@@ -138,7 +138,7 @@
 class FeatureFlagsController < ApplicationController
   include Api::V1::FeatureFlag
 
-  before_filter :get_context
+  before_action :get_context
 
   # @API List features
   #

@@ -20,6 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'appointment_canceled_by_user.twitter' do
+  include MessagesCommon
+
   it "should render" do
     user = user_model
     appointment_participant_model(:participant => user)

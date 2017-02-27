@@ -106,31 +106,48 @@ describe BrandConfig do
     end
   end
 
+  describe "to_js" do
+    before :once do
+      setup_subaccount_with_config
+    end
+
+    it "exports to the correct global variable" do
+      expect(@subaccount_bc.to_js).to eq "CANVAS_ACTIVE_BRAND_VARIABLES = #{@subaccount_bc.to_json};"
+    end
+  end
+
   describe "save_all_files!" do
     before :once do
       setup_subaccount_with_config
     end
 
-    before :each do
+    before do
       @json_file = StringIO.new
+      @js_file = StringIO.new
       @scss_file = StringIO.new
       @subaccount_bc.stubs(:json_file).returns(@json_file)
+      @subaccount_bc.stubs(:js_file).returns(@js_file)
       @subaccount_bc.stubs(:scss_file).returns(@scss_file)
     end
 
     describe "with cdn disabled" do
-      before :each do
-        Canvas::Cdn.expects(:enabled?).returns(false)
+      before do
+        Canvas::Cdn.expects(:enabled?).at_least_once.returns(false)
         @subaccount_bc.expects(:s3_uploader).never
         File.expects(:delete).never
       end
 
-      it "writes the json represendation to the json file" do
+      it "writes the json representation to the json file" do
         @subaccount_bc.save_all_files!
         expect(@json_file.string).to eq @subaccount_bc.to_json
       end
 
-      it "writes the scss represendation to scss file" do
+      it "writes the JavaScript representation to the js file" do
+        @subaccount_bc.save_all_files!
+        expect(@js_file.string).to eq "CANVAS_ACTIVE_BRAND_VARIABLES = #{@subaccount_bc.to_json};"
+      end
+
+      it "writes the scss representation to scss file" do
         @subaccount_bc.save_all_files!
         expect(@scss_file.string).to eq @subaccount_bc.to_scss
       end
@@ -138,25 +155,33 @@ describe BrandConfig do
 
     describe "with cdn enabled" do
       before :each do
-        Canvas::Cdn.expects(:enabled?).returns(true)
+        Canvas::Cdn.expects(:enabled?).at_least_once.returns(true)
         s3 = stub(bucket: nil)
         Aws::S3::Resource.stubs(:new).returns(s3)
-        @upload_expectation = @subaccount_bc.s3_uploader.expects(:upload_file).once
-        @delete_expectation = File.expects(:delete).once
+        @upload_expectation = @subaccount_bc.s3_uploader.expects(:upload_file).twice
+        @delete_expectation = File.expects(:delete).twice
       end
 
-      it "writes the json represendation to the json file" do
+      it "writes the json representation to the json file" do
         @subaccount_bc.save_all_files!
         expect(@json_file.string).to eq @subaccount_bc.to_json
       end
 
-      it 'uploads json file to s3 if cdn enabled' do
-        @upload_expectation.with(@subaccount_bc.public_json_path)
+      it "writes the javascript representation to the js file" do
+        @subaccount_bc.save_all_files!
+        expect(@js_file.string).to eq @subaccount_bc.to_js
+      end
+
+      it 'uploads json & js file to s3' do
+        @upload_expectation.with(any_of(
+          @subaccount_bc.public_json_path,
+          @subaccount_bc.public_js_path
+        ))
         @subaccount_bc.save_all_files!
       end
 
-      it 'deletes local json file if cdn enabled' do
-        @delete_expectation.with(@subaccount_bc.json_file)
+      it 'deletes local json & js file when its done' do
+        @delete_expectation.with(@subaccount_bc.js_file).then.with(@subaccount_bc.json_file)
         @subaccount_bc.save_all_files!
       end
     end

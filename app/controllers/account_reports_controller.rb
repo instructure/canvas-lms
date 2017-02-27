@@ -162,8 +162,8 @@
 #     }
 #
 class AccountReportsController < ApplicationController
-  before_filter :require_user
-  before_filter :get_context
+  before_action :require_user
+  before_action :get_context
 
   include Api::V1::Account
   include Api::V1::AccountReport

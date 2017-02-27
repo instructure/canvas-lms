@@ -119,6 +119,7 @@ module Api::V1::Assignment
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
     hash['due_date_required'] = assignment.due_date_required?
+    hash['max_name_length'] = assignment.max_name_length
 
     unless opts[:exclude_response_fields].include?('in_closed_grading_period')
       hash['in_closed_grading_period'] = assignment.in_closed_grading_period?
@@ -304,8 +305,8 @@ module Api::V1::Assignment
       hash['submissions_download_url'] = submissions_download_url(assignment.context, assignment)
     end
 
-    if opts[:include_master_course_restrictions]
-      hash.merge!(assignment.master_course_api_restriction_data)
+    if opts[:master_course_status]
+      hash.merge!(assignment.master_course_api_restriction_data(opts[:master_course_status]))
     end
 
     hash

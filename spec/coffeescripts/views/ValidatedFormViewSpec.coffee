@@ -5,7 +5,7 @@ define [
   'helpers/simulateClick'
 ], ($, {Model}, ValidatedFormView, click) ->
 
-  module 'ValidatedFormView',
+  QUnit.module 'ValidatedFormView',
     setup: ->
       @server = sinon.fakeServer.create()
       @clock = sinon.useFakeTimers()

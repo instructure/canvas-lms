@@ -91,8 +91,7 @@ describe "add_people" do
         expect(people_ready_panel).to be_displayed
 
         # no table
-        tables = find_all('.addpeople__peoplereadylist table')
-        expect(tables).to have_size(0)
+        expect(f('body')).not_to contain_css('.addpeople__peoplereadylist table')
 
         # the message_user_path
         msg = fj(".addpeople__peoplereadylist:contains('No users were selected to add to the course')")
@@ -106,6 +105,32 @@ describe "add_people" do
       get "/courses/#{@course.id}/users"
       f('#addUsers').click
       expect(ff('#peoplesearch_select_role option').map(&:text)).not_to include 'Student'
+    end
+
+    # CNVS-34781
+    it "should have a working checkbox after cancelling and reopening" do
+      get "/courses/#{@course.id}/users"
+
+      # open the dialog
+      f('a#addUsers').click
+      expect(f(".addpeople")).to be_displayed
+
+      # check the checkbox
+      f('label[for="limit_privileges_to_course_section"]').click
+      expect(f('#limit_privileges_to_course_section')).to be_selected
+
+      # cancel the dialog
+      f('#addpeople_cancel').click
+      expect(f("body")).not_to contain_css(".addpeople")
+
+      # reopen the dialog
+      f('a#addUsers').click
+      expect(f(".addpeople")).to be_displayed
+
+      # check the checkbox again
+      f('label[for="limit_privileges_to_course_section"]').click
+      expect(f('#limit_privileges_to_course_section')).to be_selected
+
     end
   end
 end

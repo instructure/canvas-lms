@@ -1,8 +1,8 @@
 define([
   'i18n!roster',
   'react',
-  'instructure-ui/Alert'
-], (I18n, React, {default: Alert}) => {
+  'instructure-ui'
+], (I18n, React, {Alert}) => {
   class ApiError extends React.Component {
     static propTypes = {
       error: React.PropTypes.oneOfType([

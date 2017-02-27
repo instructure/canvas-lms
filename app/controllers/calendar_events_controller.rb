@@ -17,8 +17,8 @@
 #
 
 class CalendarEventsController < ApplicationController
-  before_filter :require_context
-  before_filter :rich_content_service_config, only: [:new, :edit]
+  before_action :require_context
+  before_action :rich_content_service_config, only: [:new, :edit]
 
   add_crumb(proc { t(:'#crumbs.calendar_events', "Calendar Events")}, :only => [:show, :new, :edit]) { |c| c.send :calendar_url_for, c.instance_variable_get("@context") }
 

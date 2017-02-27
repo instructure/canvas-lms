@@ -27,7 +27,7 @@ define([
     return override;
   }
 
-  module('AssignmentOverrideHelper#effectiveDueDatesForAssignment - assignment only visible to overrides', {
+  QUnit.module('AssignmentOverrideHelper#effectiveDueDatesForAssignment - assignment only visible to overrides', {
     setup() {
       this.dates = {
         june: new Date("2009-06-03T02:57:42.000Z"),
@@ -57,7 +57,7 @@ define([
     propEqual(effectiveDates, [this.dates.october.getTime(), this.dates.august.getTime()]);
   });
 
-  module('AssignmentOverrideHelper#effectiveDueDatesForAssignment - assignment visible to all students', {
+  QUnit.module('AssignmentOverrideHelper#effectiveDueDatesForAssignment - assignment visible to all students', {
     setup() {
       this.dates = {
         june: new Date("2009-06-03T02:57:42.000Z"),
@@ -83,7 +83,7 @@ define([
     equal(this.dueDates[2].getTime(), this.dates.may.getTime())
   });
 
-  module('AssignmentOverrideHelper#effectiveDueDatesForAssignment - students without sections and group_ids', {
+  QUnit.module('AssignmentOverrideHelper#effectiveDueDatesForAssignment - students without sections and group_ids', {
     setup() {
       this.assignment = { due_at: new Date('2009-05-03T02:57:42.000Z'), only_visible_to_overrides: false };
       this.overrides = [];

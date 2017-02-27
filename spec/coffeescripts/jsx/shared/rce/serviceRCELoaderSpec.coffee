@@ -5,7 +5,7 @@ define [
   'helpers/fakeENV'
   'helpers/fixtures'
 ], ($, RCELoader, editorUtils, fakeENV, fixtures) ->
-  module 'loadRCE',
+  QUnit.module 'loadRCE',
     setup: ->
       fakeENV.setup()
       ENV.RICH_CONTENT_APP_HOST = 'app-host'
@@ -71,7 +71,7 @@ define [
       equal(module, "fakeModule")
     resolveGetScript()
 
-  module 'loadOnTarget',
+  QUnit.module 'loadOnTarget',
     setup: ->
       fixtures.setup()
       @$div = fixtures.create('<div><textarea id="theTarget" name="elementName" /></div>')
@@ -149,7 +149,7 @@ define [
     equal typeof @editor.call, 'function'
     equal typeof @editor.focus, 'function'
 
-  module 'loadSidebarOnTarget',
+  QUnit.module 'loadSidebarOnTarget',
     setup: ->
       fakeENV.setup()
       ENV.RICH_CONTENT_APP_HOST = 'http://rce.host'

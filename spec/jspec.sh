@@ -3,22 +3,18 @@ RED="\033[0;31m"
 YELLOW="\033[0;33m"
 NC="\033[0m" # No Color
 
-# Fail fast if Webpack not configured
-if [ ! -f config/WEBPACK ] && [[ ! ${USE_WEBPACK+x} ]]; then
-    echo -e "${RED}Webpack must be enabled to use jspec${NC}"
-    echo -e "${YELLOW}Run 'touch config/WEBPACK' to enable Webpack."
-    echo -e "For more information, see the following documentation:"
-    echo -e "  doc/working_with_webpack.md"
-    echo -e "  doc/testing_javascript.md${NC}"
-    exit
-fi
+# only the webapack version of the karma config works whith jspec
+export USE_WEBPACK=true
 
 export JSPEC_WD=$(pwd)
 
+# The "--silent" and "|| true" here are to supress the standard npm
+# "...npm ERR! Tell the author that this fails on your system..."
+# error messages if there is a spec that fails.
 if [ "$1" == "--watch" ]; then
   export JSPEC_PATH=$2
-  npm run webpack-test-watch --silent || true
+  npm run test-watch --silent || true
 else
   export JSPEC_PATH=$1
-  npm run webpack-test --silent && npm run test --silent || true
+  npm run test || true
 fi

@@ -7,7 +7,7 @@ define([
 
   const container = document.getElementById('fixtures')
 
-  module('Sticky Sidebar', {
+  QUnit.module('Sticky Sidebar', {
     teardown () {
       ReactDOM.unmountComponentAtNode(container)
     }

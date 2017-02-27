@@ -6,7 +6,7 @@ define [
 ], ($,helpDialog,fakeENV)->
   # more tests are in spec/selenium/help_dialog_spec.rb
 
-  module 'HelpDialog',
+  QUnit.module 'HelpDialog',
     setup: ->
       fakeENV.setup({
         help_link_name: 'Links'

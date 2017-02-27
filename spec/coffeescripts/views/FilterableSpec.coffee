@@ -7,7 +7,7 @@ define [
 
   view = null
 
-  module 'Filterable',
+  QUnit.module 'Filterable',
     setup: ->
       fakeENV.setup()
       class MyCollectionView extends CollectionView

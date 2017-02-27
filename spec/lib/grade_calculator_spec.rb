@@ -160,10 +160,7 @@ describe GradeCalculator do
     describe "group with no grade or muted grade" do
       before(:each) do
         two_groups_two_assignments(50, 10, 50, 10)
-        expect(@user.enrollments.first.computed_current_score).to eql(nil)
-        expect(@user.enrollments.first.computed_final_score).to eql(0.0)
         @submission = @assignment.grade_student(@user, grade: "5", grader: @teacher)
-        expect(@submission[0].score).to eql(5.0)
       end
 
       it "should ignore no grade for current grade calculation, even when weighted" do

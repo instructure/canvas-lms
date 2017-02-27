@@ -21,7 +21,7 @@ define [
     start_at: null
     workflow_state: "deleted"
 
-  module "CourseSearchResultsView",
+  QUnit.module "CourseSearchResultsView",
     setup: ->
       @courseRestore = new CourseRestore account_id: 6
       @courseSearchResultsView = new CourseSearchResultsView model: @courseRestore

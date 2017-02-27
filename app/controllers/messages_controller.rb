@@ -19,7 +19,7 @@
 require 'mail'
 
 class MessagesController < ApplicationController
-  before_filter :require_read_messages, :get_context
+  before_action :require_read_messages, :get_context
 
   def require_read_messages
     require_site_admin_with_permission(:read_messages)

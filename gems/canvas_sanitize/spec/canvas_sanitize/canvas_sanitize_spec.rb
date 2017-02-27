@@ -43,4 +43,9 @@ describe CanvasSanitize do
     cleaned = Sanitize.clean("<math href=\"javascript:alert(1)\">CLICKME</math>", CanvasSanitize::SANITIZE)
     expect(cleaned).to eq("<math>CLICKME</math>")
   end
+
+  it "allows abbr elements" do
+    cleaned = Sanitize.clean("<abbr title=\"Internationalization\">I18N</abbr>", CanvasSanitize::SANITIZE)
+    expect(cleaned).to eq("<abbr title=\"Internationalization\">I18N</abbr>")
+  end
 end

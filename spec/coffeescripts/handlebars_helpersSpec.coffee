@@ -5,14 +5,14 @@ define [
   'helpers/assertions'
   'helpers/fakeENV'
   'timezone'
-  'vendor/timezone/America/Detroit'
-  'vendor/timezone/America/Chicago'
-  'vendor/timezone/America/New_York'
+  'timezone/America/Detroit'
+  'timezone/America/Chicago'
+  'timezone/America/New_York'
 ], ({helpers}, $, _, {contains}, fakeENV, tz, detroit, chicago, newYork) ->
 
-  module 'handlebars_helpers'
+  QUnit.module 'handlebars_helpers'
 
-  module 'checkbox'
+  QUnit.module 'checkbox'
 
   context =
     likes:
@@ -67,7 +67,7 @@ define [
   test 'toPrecision', ->
     equal helpers.toPrecision(3.6666666, 2), '3.7'
 
-  module 'truncate'
+  QUnit.module 'truncate'
 
   test 'default truncates 30 characters', ->
     text = "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
@@ -84,7 +84,7 @@ define [
     truncText = helpers.truncate_left text, 15
     equal truncText, "...to the store", "Reverse truncates"
 
-  module 'friendlyDatetime',
+  QUnit.module 'friendlyDatetime',
     setup: ->
       @snapshot = tz.snapshot()
       tz.changeZone(detroit, 'America/Detroit')
@@ -111,7 +111,7 @@ define [
     contains helpers.friendlyDatetime(new Date(0), hash: {pubDate: false}).string,
       "<span aria-hidden='true'>Dec 31, 1969</span>"
 
-  module 'contextSensitive FriendlyDatetime',
+  QUnit.module 'contextSensitive FriendlyDatetime',
     setup: ->
       @snapshot = tz.snapshot()
       fakeENV.setup()
@@ -143,7 +143,7 @@ define [
     timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00Z', hash: {pubDate: false, contextSensitive: true}).string
     contains timeTag, "<span aria-hidden='true'>Dec 31, 1969</span>"
 
-  module 'contextSensitiveDatetimeTitle',
+  QUnit.module 'contextSensitiveDatetimeTitle',
     setup: ->
       @snapshot = tz.snapshot()
       fakeENV.setup()
@@ -189,7 +189,7 @@ define [
     titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', hash: {justText: undefined})
     equal titleText, "data-tooltip data-html-tooltip-title=\"Dec 31, 1969 at 7pm\""
 
-  module 'datetimeFormatted',
+  QUnit.module 'datetimeFormatted',
     setup: -> @snapshot = tz.snapshot()
     teardown: -> tz.restore(@snapshot)
 
@@ -198,7 +198,7 @@ define [
     equal helpers.datetimeFormatted('1970-01-01 00:00:00'),
       "Jan 1, 1970 at 12am"
 
-  module 'ifSettingIs'
+  QUnit.module 'ifSettingIs'
 
   test 'it runs primary case if setting matches', ->
     ENV.SETTINGS = {key: 'value'}
@@ -230,7 +230,7 @@ define [
     helpers.ifSettingIs('key', 'value', funcs)
     equal semaphore, true
 
-   module 'accessible date pickers'
+   QUnit.module 'accessible date pickers'
 
    test 'it provides a format', ->
      equal(typeof(helpers.accessibleDateFormat()), "string")
@@ -254,7 +254,7 @@ define [
      equal(shortFormatPrompt.indexOf(helpers.accessibleDateFormat()), -1)
      ok(shortFormatPrompt.indexOf(helpers.accessibleDateFormat('date')) > -1)
 
-  module 'i18n number helper',
+  QUnit.module 'i18n number helper',
     setup: ->
       @ret = '47.00%'
       @stub(I18n, 'n').returns(@ret)

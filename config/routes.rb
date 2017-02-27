@@ -187,6 +187,7 @@ CanvasRails::Application.routes.draw do
     get 'undelete' => 'context#undelete_index', as: :undelete_items
     post 'undelete/:asset_string' => 'context#undelete_item', as: :undelete_item
 
+    get 'blueprint_settings', action: :blueprint_settings
     get "settings#{full_path_glob}", action: :settings
     get :settings
     get 'details' => 'courses#settings'
@@ -1893,6 +1894,12 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/rubrics/:id', action: :show
       get 'courses/:course_id/rubrics', action: :index, as: :course_rubrics
       get 'courses/:course_id/rubrics/:id', action: :show
+    end
+
+    scope(controller: 'master_courses/master_templates') do
+      get 'courses/:course_id/blueprint_templates/:template_id', action: :show
+      get 'courses/:course_id/blueprint_templates/:template_id/associated_courses', action: :associated_courses, as: :course_blueprint_associated_courses
+      put 'courses/:course_id/blueprint_templates/:template_id/update_associations', action: :update_associations
     end
   end
 

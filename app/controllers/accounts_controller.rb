@@ -96,10 +96,10 @@ require 'csv'
 #     }
 #
 class AccountsController < ApplicationController
-  before_filter :require_user, :only => [:index]
-  before_filter :reject_student_view_student
-  before_filter :get_context
-  before_filter :rich_content_service_config, only: [:settings]
+  before_action :require_user, :only => [:index]
+  before_action :reject_student_view_student
+  before_action :get_context
+  before_action :rich_content_service_config, only: [:settings]
 
   include Api::V1::Account
   include CustomSidebarLinksHelper
@@ -291,6 +291,14 @@ class AccountsController < ApplicationController
   #   'completed', or their enrollment term may have ended).  If false, exclude
   #   completed courses.  If not present, do not filter on completed status.
   #
+  # @argument blueprint [Boolean]
+  #   If true, include only blueprint courses. If false, exclude them.
+  #   If not present, do not filter on this basis.
+  #
+  # @argument blueprint_associated [Boolean]
+  #   If true, include only courses that inherit content from a blueprint course.
+  #   If false, exclude them. If not present, do not filter on this basis.
+  #
   # @argument by_teachers[] [Integer]
   #   List of User IDs of teachers; if supplied, include only courses taught by
   #   one of the referenced users.
@@ -344,6 +352,18 @@ class AccountsController < ApplicationController
       @courses = @courses.completed
     elsif !params[:completed].nil? && !value_to_boolean(params[:completed])
       @courses = @courses.not_completed
+    end
+
+    if value_to_boolean(params[:blueprint])
+      @courses = @courses.master_courses
+    elsif !params[:blueprint].nil?
+      @courses = @courses.not_master_courses
+    end
+
+    if value_to_boolean(params[:blueprint_associated])
+      @courses = @courses.associated_courses
+    elsif !params[:blueprint_associated].nil?
+      @courses = @courses.not_associated_courses
     end
 
     if params[:by_teachers].is_a?(Array)
@@ -659,16 +679,18 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :read)
       @available_reports = AccountReport.available_reports if @account.grants_right?(@current_user, @session, :read_reports)
       if @available_reports
-        scope = @account.account_reports.where("report_type=name").most_recent
-        @last_complete_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
-              LATERAL (#{scope.complete.to_sql}) account_reports ").
-            order("report_types.name").
-            preload(:attachment).
-            index_by(&:report_type)
-        @last_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
-              LATERAL (#{scope.to_sql}) account_reports ").
-            order("report_types.name").
-            index_by(&:report_type)
+        @account.shard.activate do
+          scope = @account.account_reports.where("report_type=name").most_recent
+          @last_complete_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
+                LATERAL (#{scope.complete.to_sql}) account_reports ").
+              order("report_types.name").
+              preload(:attachment).
+              index_by(&:report_type)
+          @last_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
+                LATERAL (#{scope.to_sql}) account_reports ").
+              order("report_types.name").
+              index_by(&:report_type)
+        end
       end
       load_course_right_side
       @account_users = @account.account_users

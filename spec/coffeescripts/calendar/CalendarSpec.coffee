@@ -3,12 +3,12 @@ define [
   'compiled/util/fcUtil',
   'moment'
   'timezone'
-  'vendor/timezone/America/Denver'
+  'timezone/America/Denver'
   'helpers/fixtures'
   'jquery'
 ], (Calendar, fcUtil, moment, tz, denver, fixtures, $) ->
 
-  module "Calendar",
+  QUnit.module "Calendar",
     setup: ->
       @snapshot = tz.snapshot()
       tz.changeZone(denver, 'America/Denver')
@@ -108,3 +108,10 @@ define [
     ok Calendar.prototype.isSameWeek(date2, datetime3), 'sun-sat 1'
     ok Calendar.prototype.isSameWeek(datetime2, date3), 'sun-sat 2'
     ok Calendar.prototype.isSameWeek(date2, date3), 'sun-sat 3'
+
+  test 'gets appointment groups when show scheduler activated', ->
+    mockHeader = makeMockHeader()
+    mockDataSource = makeMockDataSource()
+    cal = new Calendar('#fixtures', [], null, mockDataSource, {header: mockHeader, showScheduler: true})
+    ok mockDataSource.getAppointmentGroups.called
+    ok mockDataSource.getEvents.called

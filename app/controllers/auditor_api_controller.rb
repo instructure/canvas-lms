@@ -17,7 +17,7 @@
 #
 
 class AuditorApiController < ApplicationController
-  before_filter :check_configured
+  before_action :check_configured
 
   private
 

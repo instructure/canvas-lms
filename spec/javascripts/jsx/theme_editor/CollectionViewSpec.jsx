@@ -8,7 +8,7 @@ define([
 
   let elem, props
 
-  module('CollectionView', {
+  QUnit.module('CollectionView', {
     setup () {
       elem = document.createElement('div')
       props = {

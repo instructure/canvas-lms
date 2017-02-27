@@ -356,6 +356,9 @@ define([
         link: $('#mute_link'),
         modal: $('#mute_dialog')
       },
+      unmute: {
+        modal: $('#unmute_dialog')
+      },
       nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
       settings: {
         form: $('#settings_form'),
@@ -399,7 +402,7 @@ define([
           }, this)
         },{
           text: I18n.t('mute_assignment', 'Mute Assignment'),
-          'class': 'btn-primary',
+          class: 'btn-primary btn-mute',
           click: $.proxy(function(){
             this.toggleMute();
             this.elements.mute.modal.dialog('close');
@@ -408,6 +411,26 @@ define([
         modal: true,
         resizable: false,
         title: this.elements.mute.modal.data('title'),
+        width: 400
+      });
+      this.elements.unmute.modal.dialog({
+        autoOpen: false,
+        buttons: [{
+          text: I18n.t('Cancel'),
+          click: $.proxy(function () {
+            this.elements.unmute.modal.dialog('close');
+          }, this)
+        }, {
+          text: I18n.t('Unmute Assignment'),
+          class: 'btn-primary btn-unmute',
+          click: $.proxy(function () {
+            this.toggleMute();
+            this.elements.unmute.modal.dialog('close');
+          }, this)
+        }],
+        modal: true,
+        resizable: false,
+        title: this.elements.unmute.modal.data('title'),
         width: 400
       });
     },
@@ -451,7 +474,11 @@ define([
 
     onMuteClick: function(e){
       e.preventDefault();
-      this.muted ? this.toggleMute() : this.elements.mute.modal.dialog('open');
+      if (this.muted) {
+        this.elements.unmute.modal.dialog('open');
+      } else {
+        this.elements.mute.modal.dialog('open');
+      }
     },
 
     muteUrl: function(){
@@ -1923,7 +1950,7 @@ define([
         }));
       } else if (attachment.canvadoc_url) {
         $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
-          canvadoc_session_url: attachment.canvadoc_url + '&wants_annotation=true'
+          canvadoc_session_url: attachment.canvadoc_url
         }));
       } else if ($.isPreviewable(attachment.content_type, 'google')) {
         if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();

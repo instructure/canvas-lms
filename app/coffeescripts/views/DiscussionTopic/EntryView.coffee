@@ -139,12 +139,6 @@ define [
 
     addCountsToHeader: ->
       stats = @countPosterity()
-      html = """
-        <div class='new-and-total-badge'>
-          <span class="new-items">#{htmlEscape stats.unread}</span>
-          <span class="total-items">#{htmlEscape stats.total}</span>
-        </div>
-        """
       @$headerBadges.append entryStatsTemplate({stats})
       @addedCountsToHeader = true
 

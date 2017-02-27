@@ -4,7 +4,7 @@ define([
   'react-addons-test-utils',
   'jsx/navigation_header/trays/ProfileTray',
 ], (React, ReactDOM, TestUtils, ProfileTray) => {
-  module('MissingPeopleSection')
+  QUnit.module('MissingPeopleSection')
 
   function noop(){}
 

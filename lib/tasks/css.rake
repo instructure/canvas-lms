@@ -10,6 +10,8 @@ namespace :css do
     require 'lib/brandable_css'
     puts "--> Starting: 'compile css (including custom brands)'"
     time = Benchmark.realtime { BrandableCSS.compile_all! }
+    BrandableCSS.save_default_json!
+    BrandableCSS.save_default_js!
     puts "--> Finished: 'compile css (including custom brands)' in #{time}"
   end
 end

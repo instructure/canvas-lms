@@ -17,7 +17,7 @@
 #
 
 class CalendarsController < ApplicationController
-  before_filter :require_user, :except => [ :public_feed ]
+  before_action :require_user, :except => [ :public_feed ]
 
   def show2
     get_context

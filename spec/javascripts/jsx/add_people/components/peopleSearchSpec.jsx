@@ -4,7 +4,7 @@ define([
   'react-addons-test-utils',
   'jsx/add_people/components/people_search',
 ], (React, ReactDOM, TestUtils, PeopleSearch) => {
-  module('PeopleSearch')
+  QUnit.module('PeopleSearch')
 
   const searchProps = {
     roles: [{id: '1', name: 'Student'}, {id: '2', name: 'TA'}],
@@ -13,7 +13,8 @@ define([
     role: '2',
     limitPrivilege: true,
     searchType: 'unique_id',
-    nameList: ['foo', 'bar', 'baz']
+    nameList: 'foo, bar, baz',
+    canReadSIS: true
   };
 
   test('renders the component', () => {
@@ -27,7 +28,7 @@ define([
     const loginRadio = peopleSearch.querySelector('input[type="radio"][value="unique_id"]');
     equal(loginRadio.checked, true, 'login id radio button is checked');
     const nameInput = peopleSearch.querySelector('textarea');
-    equal(nameInput.value, 'foo,bar,baz', 'names are in the textarea');
+    equal(nameInput.value, searchProps.nameList, 'names are in the textarea');
     const selects = peopleSearch.querySelectorAll('.peoplesearch__selections select');
     equal(selects[0].value, '2', 'role 2 is selected');
     equal(selects[1].value, '1', 'section 1 is selected');
@@ -35,5 +36,21 @@ define([
     deepEqual(sections, ['section 2', 'section 10'], 'sections are sorted by name');
     const limitPrivilegeCheckbox = peopleSearch.querySelector('#limit_privileges_to_course_section');
     equal(limitPrivilegeCheckbox.checked, true, 'limit privileges checkbox is checked');
+  });
+  test('removes search by SIS ID', () => {
+    const newProps = Object.assign({}, searchProps, {canReadSIS: false});
+    const component = TestUtils.renderIntoDocument(<PeopleSearch {...newProps} />);
+    const peopleSearch = TestUtils.findRenderedDOMComponentWithClass(component, 'addpeople__peoplesearch');
+    const sisRadio = peopleSearch.querySelector('input[type="radio"][value="sis_user_id"]');
+    equal(sisRadio, null, 'sis id radio button is not displayed');
+  });
+  test('shows hint with bad email address', () => {
+    const badEmail = 'foobar@';
+    const newProps = Object.assign({}, searchProps, {searchType: 'cc_path', nameList: badEmail});
+    const component = TestUtils.renderIntoDocument(<PeopleSearch {...newProps} />);
+    const peopleSearch = TestUtils.findRenderedDOMComponentWithClass(component, 'addpeople__peoplesearch');
+    const nameInput = peopleSearch.querySelector('textarea');
+    equal(nameInput.value, badEmail, 'email is in the textarea');
+    ok(peopleSearch.innerHTML.includes('It looks like you have an invalid email address: "foobar@"'));
   });
 });

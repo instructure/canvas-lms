@@ -42,7 +42,7 @@
        <td class="total">
          <h5 class="total">{{#t "total_points"}}Total Points{{/t}}</h5>
          <div class="points_possible">
-           {{#t "points"}}{{points_possible}} Points{{/t}}
+           {{#t}}{{n points_possible precision=2 strip_insignificant_zeros=true}} Points{{/t}}
          </div>
        </td>
       </tr>
@@ -50,7 +50,7 @@
   </table>
   <div>
     <label for="mastery_points" style="display: inline">{{#t "mastery"}}Mastery at{{/t}}:</label>
-    <input type="text" name="mastery_points" style="width: 20px;" class="mastery_points" id="mastery_points" value="{{mastery_points}}">
+    <input type="text" name="mastery_points" style="width: 20px;" class="mastery_points" id="mastery_points" value="{{n mastery_points precision=2 strip_insignificant_zeros=true}}">
   </div>
   <div>
     <label for="calculation_method" style="display: inline">{{#t "calculation_method"}}Calculation Method{{/t}}:</label>

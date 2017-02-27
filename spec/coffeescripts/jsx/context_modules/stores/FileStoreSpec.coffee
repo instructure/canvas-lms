@@ -1,5 +1,5 @@
 define ['jsx/context_modules/stores/FileStore'], (store) ->
-  module 'FileStore'
+  QUnit.module 'FileStore'
 
   test 'constructor', ->
     fileStore = new store('tests/1', {perPage:100})

@@ -90,6 +90,7 @@ class ContentExport < ActiveRecord::Base
   end
 
   def export(opts={})
+    opts = opts.with_indifferent_access
     case export_type
     when ZIP
       export_zip(opts)

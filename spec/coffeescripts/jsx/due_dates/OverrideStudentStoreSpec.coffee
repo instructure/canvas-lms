@@ -6,7 +6,7 @@ define [
   'helpers/fakeENV'
 ], (React, {Simulate, SimulateNative}, _, OverrideStudentStore, fakeENV) ->
 
-  module 'OverrideStudentStore',
+  QUnit.module 'OverrideStudentStore',
     setup: ->
       OverrideStudentStore.reset()
       fakeENV.setup()

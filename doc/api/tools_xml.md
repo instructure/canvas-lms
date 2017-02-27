@@ -145,7 +145,7 @@ found below.
 </cartridge_basiclti_link>
 ```
 
-### Teacher/Admin-only navigation
+### Admin/Teacher/TA/Designer-only navigation
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>

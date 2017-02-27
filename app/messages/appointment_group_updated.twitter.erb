@@ -1,4 +1,4 @@
 <% define_content :link do -%>
-  <%= appointment_group_url(asset, :find_appointment => true) %>
+  <%= appointment_group_url(asset) %>
 <% end -%>
 <%= t :message, 'Canvas Alert - New time slots are available for "%{appointment_name}".', :appointment_name => asset.title %>

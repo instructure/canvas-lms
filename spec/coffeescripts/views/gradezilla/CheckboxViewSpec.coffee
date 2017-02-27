@@ -1,6 +1,6 @@
 define ['jquery', 'underscore', 'compiled/views/gradezilla/CheckboxView'], ($, _, CheckboxView) ->
 
-  module 'gradezilla/CheckboxView',
+  QUnit.module 'gradezilla/CheckboxView',
     setup: ->
       @view = new CheckboxView(color: 'red', label: 'test label')
       @view.render()

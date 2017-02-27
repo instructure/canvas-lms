@@ -49,7 +49,16 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def self.set_as_master_course(course)
     self.unique_constraint_retry do
-      course.master_course_templates.active.for_full_course.first_or_create
+      template = course.master_course_templates.for_full_course.first_or_create
+      template.undestroy unless template.active?
+      template
+    end
+  end
+
+  def self.remove_as_master_course(course)
+    self.unique_constraint_retry do
+      template = course.master_course_templates.active.for_full_course.first
+      template.destroy && template if template.present?
     end
   end
 
@@ -76,12 +85,21 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     "#{MasterCourses::MIGRATION_ID_PREFIX}#{self.shard.id}_#{self.id}_#{Digest::MD5.hexdigest(prepend + key)}"
   end
 
-  def add_child_course!(child_course)
+  def add_child_course!(child_course_or_id)
     MasterCourses::ChildSubscription.unique_constraint_retry do |retry_count|
       child_sub = nil
-      child_sub = self.child_subscriptions.active.where(:child_course_id => child_course).first if retry_count > 0
-      child_sub ||= self.child_subscriptions.create!(:child_course => child_course)
+      child_sub = self.child_subscriptions.active.where(:child_course_id => child_course_or_id).first if retry_count > 0
+      child_sub ||= begin
+        key = child_course_or_id.is_a?(Course) ? :child_course : :child_course_id
+        self.child_subscriptions.create!(key => child_course_or_id)
+      end
       child_sub
+    end
+  end
+
+  def child_course_scope
+    self.shard.activate do
+      Course.shard(self.shard).not_deleted.where(:id => self.child_subscriptions.active.select(:child_course_id))
     end
   end
 

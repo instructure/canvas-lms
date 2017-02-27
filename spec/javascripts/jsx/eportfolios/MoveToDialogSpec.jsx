@@ -24,7 +24,7 @@ define([
     return dialog
   }
 
-  module('MoveToDialog', {
+  QUnit.module('MoveToDialog', {
     setup() {
     },
 

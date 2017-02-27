@@ -6,7 +6,7 @@ define([
   'axios',
   'moment',
   'jsx/calendar/scheduler/components/appointment_groups/EditPage',
-  'vendor/timezone/Europe/London',
+  'timezone/Europe/London',
   'timezone',
   'helpers/fakeENV',
   'instructure-ui/Button',
@@ -21,7 +21,7 @@ define([
   const renderComponentInDOM = (props = { appointment_group_id: '1' }) => ReactDOM.render(<EditPage {...props} />, container)
 
   let sandbox = null
-  module('AppointmentGroup EditPage', {
+  QUnit.module('AppointmentGroup EditPage', {
     setup () {
       moxios.install()
     },
@@ -37,7 +37,7 @@ define([
   })
 
 
-  module('Message Users', {
+  QUnit.module('Message Users', {
     setup () {
       moxios.install()
     },
@@ -110,7 +110,7 @@ define([
   })
 
 
-  module('Delete Group', {
+  QUnit.module('Delete Group', {
     setup: () => {
       sandbox = sinon.sandbox.create()
       moxios.install()
@@ -134,7 +134,7 @@ define([
 
   test('flashes error on error delete response', () => {
     const component = renderComponent()
-    sandbox.stub(axios, 'delete', () => Promise.reject({ respose: { data: new Error('Something bad happened') } }))
+    sandbox.stub(axios, 'delete').callsFake(() => Promise.reject({ respose: { data: new Error('Something bad happened') } }))
     sandbox.spy($, 'flashError')
 
     component.deleteGroup()
@@ -142,7 +142,7 @@ define([
     ok($.flashError.withArgs('An error ocurred while deleting the appointment group'))
   })
 
-  module('Change Handlers', {
+  QUnit.module('Change Handlers', {
     setup () {
       moxios.install()
     },
@@ -175,7 +175,7 @@ define([
     equal(component.state.formValues.han, true)
   })
 
-  module('Save Group', {
+  QUnit.module('Save Group', {
     setup () {
       sandbox = sinon.sandbox.create()
       moxios.install()
@@ -330,7 +330,7 @@ define([
 
   test('flashes error on error delete response', () => {
     const component = renderComponent()
-    sandbox.stub(axios, 'put', () => Promise.reject({ respose: { data: new Error('Something bad happened') } }))
+    sandbox.stub(axios, 'put').callsFake(() => Promise.reject({ respose: { data: new Error('Something bad happened') } }))
     sandbox.stub($, 'flashError')
 
     component.handleSave()

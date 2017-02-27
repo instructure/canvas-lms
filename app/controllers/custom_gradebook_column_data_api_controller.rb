@@ -36,7 +36,7 @@
 #     }
 #
 class CustomGradebookColumnDataApiController < ApplicationController
-  before_filter :require_context, :require_user
+  before_action :require_context, :require_user
 
   include Api::V1::CustomGradebookColumn
 

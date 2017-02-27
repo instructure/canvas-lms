@@ -1,4 +1,4 @@
 <% define_content :link do -%>
   <%= communication_profile_url %>
 <% end %>
-<%= t :notifications_sms, "%{notifications_count} new notifications at %{url}", :notifications_count => delayed_messages.length, :url => content(:link) %>
+<%= t :notifications_sms, "%{notifications_count} new notifications at %{url}", :notifications_count => n(delayed_messages.length), :url => content(:link) %>

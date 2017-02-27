@@ -19,7 +19,7 @@ define [
     }
     @INST = INST
 
-  module "initializeExternalTools: with 2 max maxVisibleEditorButtons",
+  QUnit.module "initializeExternalTools: with 2 max maxVisibleEditorButtons",
     setup: ->
       setUp.call(@, 2)
     teardown: ->
@@ -31,7 +31,7 @@ define [
     ok @buttonSpy.calledWith "instructure_external_button_button_id"
     ok @commandSpy.calledWith "instructureExternalButtonbutton_id"
 
-  module "initializeExternalTools: with 0 max maxVisibleEditorButtons",
+  QUnit.module "initializeExternalTools: with 0 max maxVisibleEditorButtons",
     setup: ->
       setUp.call(@, 0)
     teardown: ->
@@ -42,7 +42,7 @@ define [
     ok @buttonSpy.calledWith("instructure_external_button_clump")
     ok @commandSpy.notCalled
 
-  module "buttonSelected",
+  QUnit.module "buttonSelected",
     setup: ->
       fixtures = document.getElementById('fixtures')
       fixtures.innerHTML = '<a href="http://example.com" id="context_external_tool_resource_selection_url"></a>'

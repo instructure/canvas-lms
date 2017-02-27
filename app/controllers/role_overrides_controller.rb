@@ -109,9 +109,9 @@
 #     }
 #
 class RoleOverridesController < ApplicationController
-  before_filter :require_context
-  before_filter :require_role, :only => [:activate_role, :remove_role, :update, :show]
-  before_filter :set_js_env_for_current_account
+  before_action :require_context
+  before_action :require_role, :only => [:activate_role, :remove_role, :update, :show]
+  before_action :set_js_env_for_current_account
 
   # @API List roles
   # List the roles available to an account.

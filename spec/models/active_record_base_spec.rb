@@ -438,12 +438,6 @@ describe ActiveRecord::Base do
       @user = user_model
     end
 
-    it "should fail with improper nested hashes" do
-      expect {
-        User.where(:name => { :users => { :id => @user }}).first
-      }.to raise_error(ActiveRecord::StatementInvalid)
-    end
-
     it "should fail with dot in nested column name" do
       expect {
         User.where(:name => { "users.id" => @user }).first
@@ -577,8 +571,6 @@ describe ActiveRecord::Base do
       @u4 = User.create!(name: 'b')
 
       @us = [@u1, @u2, @u3, @u4]
-      # for sanity
-      expect(User.where(id: @us, name: nil).order(:id).all).to eq [@u1, @u3]
     end
 
     it "should sort nulls first" do

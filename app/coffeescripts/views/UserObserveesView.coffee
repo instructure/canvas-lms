@@ -1,11 +1,12 @@
 define [
+  'jquery'
   'underscore'
   'i18n!observees'
   'jst/UserObservees'
   'jst/ExternalAuthUserObservees'
   'compiled/views/UserObserveeView'
   'compiled/views/PaginatedCollectionView'
-], (_, I18n, template, extAuthTemplate, itemView, PaginatedCollectionView) ->
+], ($, _, I18n, template, extAuthTemplate, itemView, PaginatedCollectionView) ->
 
   class UserObserveesView extends PaginatedCollectionView
     autoFetch: true

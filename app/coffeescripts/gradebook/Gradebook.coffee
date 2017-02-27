@@ -28,6 +28,7 @@ define [
   'compiled/gradebook/SubmissionCell'
   'compiled/gradebook/GradebookHeaderMenu'
   'compiled/util/NumberCompare'
+  'compiled/util/natcompare'
   'str/htmlEscape'
   'jsx/gradebook/SISGradePassback/PostGradesStore'
   'jsx/gradebook/SISGradePassback/PostGradesApp'
@@ -60,8 +61,8 @@ define [
   $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   TotalColumnHeaderView, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS, CourseGradeCalculator,
   GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
-  GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, htmlEscape,
-  PostGradesStore, PostGradesApp, SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate,
+  GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, natcompare,
+  htmlEscape, PostGradesStore, PostGradesApp, SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate,
   RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper,
   GradingPeriodsAPI
 ) ->
@@ -326,11 +327,12 @@ define [
     setupGrading: (students) =>
       @submissionStateMap.setup(students, @assignments)
       for student in students
-        for assignment_id of @assignments
+        for assignment_id, assignment of @assignments
           student["assignment_#{assignment_id}"] ?=
             @submissionStateMap.getSubmission student.id, assignment_id
           submissionState = @submissionStateMap.getSubmissionState(student["assignment_#{assignment_id}"])
           student["assignment_#{assignment_id}"].gradeLocked = submissionState.locked
+          student["assignment_#{assignment_id}"].gradingType = assignment.grading_type
 
         student.initialized = true
         @calculateStudentGrade(student)
@@ -701,14 +703,16 @@ define [
       return '' unless val?
 
       percentage = @calculateAndRoundGroupTotalScore val.score, val.possible
-      percentage = 0 if isNaN(percentage)
+      percentage = 0 unless isFinite(percentage)
+      possible = round(val.possible, round.DEFAULT)
+      possible = if possible then I18n.n(possible) else possible
 
       if val.possible and @options.grading_standard and columnDef.type is 'total_grade'
         letterGrade = GradingSchemeHelper.scoreToGrade(percentage, @options.grading_standard)
 
       templateOpts =
         score: I18n.n(round(val.score, round.DEFAULT))
-        possible: I18n.n(round(val.possible, round.DEFAULT))
+        possible: possible
         letterGrade: letterGrade
         percentage: I18n.n(round(percentage, round.DEFAULT), percentage: true)
       if columnDef.type == 'total_grade'
@@ -883,7 +887,7 @@ define [
     # conjunction with a click listener on <body />. When we 'blur' the grid
     # by clicking outside of it, save the current field.
     onGridBlur: (e) =>
-      if e.target.className.match(/cell|slick/) or !@grid.getActiveCell
+      if e.target.className.match?(/cell|slick/) or !@grid.getActiveCell
         return
 
       if e.target.className is 'grade' and @grid.getCellEditor() instanceof SubmissionCell.out_of
@@ -1263,6 +1267,7 @@ define [
     assignmentHeaderHtml: (assignment) ->
       ColumnHeaderTemplate
         assignment: assignment
+        pointsPossible: I18n.n(assignment.points_possible)
         href: assignment.html_url
         showPointsPossible: assignment.points_possible?
 
@@ -1504,9 +1509,7 @@ define [
       @grid.invalidate()
 
     localeSort: (a, b) ->
-      (a || "").localeCompare b || "",
-        i18nObj.locale,
-        sensitivity: 'accent', numeric: true
+      natcompare.strings(a || '', b || '')
 
     gradeSort: (a, b, field, asc) =>
       scoreForSorting = (obj) =>

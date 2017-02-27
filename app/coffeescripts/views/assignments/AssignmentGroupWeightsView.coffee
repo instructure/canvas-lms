@@ -18,7 +18,10 @@ define [
     roundWeight: (e) ->
       value = $(e.target).val()
       rounded_value = round(parseFloat(value), 2)
-      $(e.target).val(rounded_value)
+      if isNaN(rounded_value)
+        return
+      else
+        $(e.target).val(rounded_value)
 
     findWeight: ->
       round(parseFloat(@$el.find('.group_weight_value').val()), 2)

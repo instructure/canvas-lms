@@ -14,38 +14,38 @@ require [
   'jsx/calendar/scheduler/store/configureStore'
   'compiled/jquery.kylemenu'
 ], ($, Calendar, ReactDOM, React, MiniCalendar, FindAppointment, CalendarHeader, drawSidebar, EventDataSource, UndatedEventsList, configureSchedulerStore) ->
-  @eventDataSource = new EventDataSource(ENV.CALENDAR.CONTEXTS)
+  eventDataSource = new EventDataSource(ENV.CALENDAR.CONTEXTS)
 
-  @schedulerStore = if ENV.CALENDAR.BETTER_SCHEDULER then configureSchedulerStore() else null
+  schedulerStore = if ENV.CALENDAR.BETTER_SCHEDULER then configureSchedulerStore() else null
 
-  @header = new CalendarHeader(
+  header = new CalendarHeader(
     el: "#calendar_header"
     calendar2Only: ENV.CALENDAR.CAL2_ONLY
     showScheduler: ENV.CALENDAR.SHOW_SCHEDULER and !ENV.CALENDAR.BETTER_SCHEDULER
     )
-  @calendar = new Calendar(
-    "#calendar-app", ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.MANAGE_CONTEXTS, @eventDataSource,
+  calendar = new Calendar(
+    "#calendar-app", ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.MANAGE_CONTEXTS, eventDataSource,
     activateEvent: ENV.CALENDAR.ACTIVE_EVENT
     viewStart:     ENV.CALENDAR.VIEW_START
     showScheduler: ENV.CALENDAR.SHOW_SCHEDULER
-    header:        @header
+    header:        header
     userId:        ENV.current_user_id
-    schedulerStore: @schedulerStore
+    schedulerStore: schedulerStore
     onLoadAppointmentGroups: (ag_map) =>
       if ENV.CALENDAR.BETTER_SCHEDULER
-        courses = @eventDataSource.contexts.filter (context) ->
+        courses = eventDataSource.contexts.filter (context) ->
           ag_map.hasOwnProperty(context.asset_string)
         if courses.length > 0
           ReactDOM.render(
             React.createElement(
               FindAppointment,
                 courses: courses
-                store: @schedulerStore
+                store: schedulerStore
             ), $('#select-course-component')[0])
     )
-  new MiniCalendar("#minical", @calendar)
-  new UndatedEventsList("#undated-events", @eventDataSource, @calendar)
-  drawSidebar(ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.SELECTED_CONTEXTS, @eventDataSource)
+  new MiniCalendar("#minical", calendar)
+  new UndatedEventsList("#undated-events", eventDataSource, calendar)
+  drawSidebar(ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.SELECTED_CONTEXTS, eventDataSource)
 
   keyboardUser = true
 

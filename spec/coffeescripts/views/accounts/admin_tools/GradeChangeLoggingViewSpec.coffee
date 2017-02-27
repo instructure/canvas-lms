@@ -46,7 +46,7 @@ define [
     view.render()
     view
 
-  module 'GradeChangeLoggingItemView',
+  QUnit.module 'GradeChangeLoggingItemView',
     setup: ->
       fakeENV.setup()
       $(document).off()

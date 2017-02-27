@@ -227,10 +227,14 @@ class DiscussionTopic < ActiveRecord::Base
     # transition from graded to ungraded) we acknowledge that the users that
     # have posted have contributed to the topic
     if self.assignment_id && self.assignment_id_changed?
-      posters.each{ |user| self.context_module_action(user, :contributed) }
+      recalculate_context_module_actions!
     end
   end
   protected :update_assignment
+
+  def recalculate_context_module_actions!
+    posters.each{ |user| self.context_module_action(user, :contributed) }
+  end
 
   def is_announcement; false end
 
@@ -564,7 +568,7 @@ class DiscussionTopic < ActiveRecord::Base
   def comments_disabled?
     !!(self.is_a?(Announcement) &&
       self.context.is_a?(Course) &&
-      self.context.settings[:lock_all_announcements])
+      self.context.lock_all_announcements)
   end
 
   def lock(opts = {})
@@ -760,8 +764,10 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def initialize_last_reply_at
-    self.posted_at ||= Time.now.utc
-    self.last_reply_at ||= Time.now.utc unless [:migration, :after_migration].include?(self.saved_by)
+    unless [:migration, :after_migration].include?(self.saved_by)
+      self.posted_at ||= Time.now.utc
+      self.last_reply_at ||= Time.now.utc
+    end
   end
 
   set_policy do
@@ -823,7 +829,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def context_allows_user_to_create?(user)
     return true unless context.respond_to?(:allow_student_discussion_topics)
-    return true unless context.user_is_student?(user)
+    return true if context.user_is_admin?(user)
     context.allow_student_discussion_topics
   end
 

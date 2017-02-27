@@ -19,7 +19,7 @@ define [
   renderComponent = (data) ->
     ReactDOM.render(createElement(data), wrapper)
 
-  module 'ExternalApps.Lti2Edit',
+  QUnit.module 'ExternalApps.Lti2Edit',
     teardown: ->
       ReactDOM.unmountComponentAtNode wrapper
 

@@ -283,18 +283,50 @@ describe GradingPeriod do
     end
   end
 
-  describe "#destroy" do
-    it_behaves_like "soft deletion" do
+  describe '#destroy' do
+    it_behaves_like 'soft deletion' do
       let(:creation_arguments) { params }
       subject { grading_period_group.grading_periods }
     end
 
-    it "calls destroy on associated scores" do
+    it 'destroys associated scores' do
       course = Course.create!
       enrollment = student_in_course(course: course)
       score = enrollment.scores.create!(grading_period: grading_period)
       grading_period.destroy
       expect(score.reload).to be_deleted
+    end
+
+    it 'does not destroy the set when the last grading period is destroyed (account grading periods)' do
+      grading_period.save!
+      grading_period.destroy
+      expect(grading_period_group).not_to be_deleted
+    end
+
+    context 'course grading periods (legacy support)' do
+      before(:once) do
+        @grading_period_set = course.grading_period_groups.create!
+        @period = @grading_period_set.grading_periods.create!(
+          title: 'Grading Period',
+          start_date: 5.days.ago,
+          end_date: 2.days.ago
+        )
+      end
+
+      it 'destroys the set when the last grading period is destroyed' do
+        @period.destroy
+        expect(@grading_period_set).to be_deleted
+      end
+
+      it 'does not destroy the set when a grading period is destroyed and it is not the last period' do
+        @grading_period_set.grading_periods.create!(
+          title: 'A New Grading Period',
+          start_date: 2.days.from_now,
+          end_date: 5.days.from_now
+        )
+        @period.destroy
+        expect(@grading_period_set).not_to be_deleted
+      end
     end
   end
 

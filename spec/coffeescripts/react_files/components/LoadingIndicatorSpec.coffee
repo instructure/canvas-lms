@@ -6,7 +6,7 @@ define [
   'jsx/files/LoadingIndicator'
 ], (React, ReactDOM, TestUtils, $, LoadingIndicator) ->
 
-  module 'LoadingIndicator'
+  QUnit.module 'LoadingIndicator'
 
   test 'display none if no props supplied', ->
     loadingIndicator = React.createFactory(LoadingIndicator)

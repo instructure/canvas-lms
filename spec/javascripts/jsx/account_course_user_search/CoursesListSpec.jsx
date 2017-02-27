@@ -1,14 +1,17 @@
 define([
   'react',
-  'react-addons-test-utils',
-  'jsx/account_course_user_search/CoursesList'
-], (React, TestUtils, CoursesList) => {
-
-  module('Account Course User Search CoursesList View');
+  'enzyme',
+  'jsx/account_course_user_search/CoursesList',
+  'jsx/account_course_user_search/CoursesListRow'
+], (React, {shallow}, CoursesList, CoursesListRow) => {
+  QUnit.module('Account Course User Search CoursesList View');
 
   const props = {
     courses: [{
       id: '123',
+      name: 'this is a name',
+      workflow_state: 'alive',
+      total_students: 6,
       teachers: [{
         id: '1',
         display_name: 'Testing Teacher'
@@ -27,11 +30,10 @@ define([
   };
 
   test('renders with the proper urls and roles', () => {
+    const wrapper = shallow(<CoursesList {...props} />)
 
-    const component = TestUtils.renderIntoDocument(<CoursesList {...props} />);
-
-    const renderedList = TestUtils.findRenderedDOMComponentWithClass(component, 'courses-list')
-    const renderedUrls = renderedList.props.children[0].props.urls;
+    const renderedList = wrapper.find(CoursesListRow)
+    const renderedUrls = renderedList.props().urls;
     deepEqual(renderedUrls, {
       USER_LISTS_URL: 'http://courses/123/users',
       ENROLL_USERS_URL: 'http://courses/123/users/enroll'

@@ -255,10 +255,21 @@ module Lti
         end
       end
 
-      it 'creates a split secret' do
+      it 'creates a split secret whith the depricated Oauth.splitSecret' do
         tp_half_secret = SecureRandom.hex(64)
         tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
         tp.enabled_capability = ['OAuth.splitSecret']
+        tp.security_contract.shared_secret = nil
+        tp.security_contract.tp_half_shared_secret = tp_half_secret
+        tool_proxy = subject.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid)
+        expect(subject.tc_half_secret).to_not be_nil
+        expect(tool_proxy.shared_secret).to eq(subject.tc_half_secret + tp_half_secret)
+      end
+
+      it 'creates a split secret whith Security.splitSecret' do
+        tp_half_secret = SecureRandom.hex(64)
+        tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+        tp.enabled_capability = ['Security.splitSecret']
         tp.security_contract.shared_secret = nil
         tp.security_contract.tp_half_shared_secret = tp_half_secret
         tool_proxy = subject.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid)

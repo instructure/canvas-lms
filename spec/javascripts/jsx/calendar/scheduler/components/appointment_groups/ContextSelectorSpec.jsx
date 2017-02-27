@@ -5,7 +5,7 @@ define([
 ], (React, TestUtils, ContextSelector) => {
   let props
 
-  module('ContextSelector', {
+  QUnit.module('ContextSelector', {
     setup () {
       props = {
         contexts: [],

@@ -2,7 +2,7 @@ define([
   'moment',
 
 ], (moment) => {
-  module('moment module test');
+  QUnit.module('moment module test');
 
   test('moment should include the locale mi-nz', () => {
 

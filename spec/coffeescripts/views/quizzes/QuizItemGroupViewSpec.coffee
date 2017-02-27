@@ -16,7 +16,7 @@ define [
     view.$el.appendTo $('#fixtures')
     view.render()
 
-  module 'QuizItemGroupView',
+  QUnit.module 'QuizItemGroupView',
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
 

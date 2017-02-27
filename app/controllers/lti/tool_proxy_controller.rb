@@ -16,9 +16,9 @@
 #
 module Lti
   class ToolProxyController < ApplicationController
-    before_filter :require_context
-    before_filter :require_user
-    before_filter :set_tool_proxy, only: [:destroy, :update, :accept_update, :dismiss_update]
+    before_action :require_context
+    before_action :require_user
+    before_action :set_tool_proxy, only: [:destroy, :update, :accept_update, :dismiss_update]
 
     def destroy
       if authorized_action(@context, @current_user, :update)

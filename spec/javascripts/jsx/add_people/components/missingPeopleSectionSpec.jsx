@@ -4,21 +4,35 @@ define([
   'react-addons-test-utils',
   'jsx/add_people/components/missing_people_section',
 ], (React, ReactDOM, TestUtils, MissingPeopleSection) => {
-  module('MissingPeopleSection')
+  QUnit.module('MissingPeopleSection')
 
   const missing = {
     addr1: {address: 'addr1', type: 'unique_id', createNew: false, newUserInfo: undefined},
     addr2: {address: 'addr2', type: 'unique_id', createNew: true, newUserInfo: {name: 'the name2', email: 'email2'}}
   }
+  const noop = function () {};
+  const inviteUsersURL = '/courses/#/invite_users';
 
   test('renders the component', () => {
-    const component = TestUtils.renderIntoDocument(<MissingPeopleSection searchType="unique_id" missing={missing} />)
+    const component = TestUtils.renderIntoDocument(
+      <MissingPeopleSection
+        searchType="unique_id"
+        inviteUsersURL={inviteUsersURL}
+        missing={missing}
+        onChange={noop}
+      />)
     const missingPeopleSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist')
     ok(missingPeopleSection)
   });
 
   test('renders the table', () => {
-    const component = TestUtils.renderIntoDocument(<MissingPeopleSection searchType="unique_id" missing={missing} />)
+    const component = TestUtils.renderIntoDocument(
+      <MissingPeopleSection
+        searchType="unique_id"
+        inviteUsersURL={inviteUsersURL}
+        missing={missing}
+        onChange={noop}
+      />)
     const missingPeopleSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist')
 
     const rows = missingPeopleSection.querySelectorAll('tr');
@@ -32,4 +46,17 @@ define([
     const emailInput = rows[2].querySelector('input[type="email"]');
     ok(emailInput, 'email input');
   });
+  test('cannot create users', () => {
+    const component = TestUtils.renderIntoDocument(
+      <MissingPeopleSection
+        searchType="unique_id"
+        inviteUsersURL={undefined}
+        missing={missing}
+        onChange={noop}
+      />)
+    const missingPeopleSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist')
+
+    const createUserBtn = missingPeopleSection.querySelector('button');
+    equal(createUserBtn, null, 'create new user button');
+  })
 })

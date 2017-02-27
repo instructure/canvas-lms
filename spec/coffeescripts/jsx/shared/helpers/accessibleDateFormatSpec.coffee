@@ -2,7 +2,7 @@ define [
   'jsx/shared/helpers/accessibleDateFormat'
 ], (accessibleDateFormat) ->
 
-  module 'accessibleDateFormat',
+  QUnit.module 'accessibleDateFormat',
     setup: ->
 
   test 'it pulls out the links from an Axios response header', ->

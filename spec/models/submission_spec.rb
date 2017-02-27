@@ -1075,6 +1075,7 @@ describe Submission do
       end
 
       before(:once) do
+        setup_account_for_turnitin(@assignment.context.account)
         @assignment.submission_types = "online_upload,online_text_entry"
         @assignment.turnitin_enabled = true
         @assignment.turnitin_settings = @assignment.turnitin_settings
@@ -1196,6 +1197,7 @@ describe Submission do
         @context.enroll_teacher(@teacher)
         @context.enroll_student(@student)
         @context.enroll_student(@student1)
+        setup_account_for_turnitin(@context.account)
 
         @a = assignment_model(:course => @context, :group_category => "Study Groups")
         @a.submission_types = "online_upload,online_text_entry"
@@ -2454,12 +2456,54 @@ describe Submission do
       expect(Submission.needs_grading.count).to eq(0)
     end
   end
-end
 
-def submission_spec_model(opts={})
-  @submission = Submission.new(@valid_attributes.merge(opts))
-  expect(@submission.assignment).to eql(@assignment)
-  expect(@assignment.context).to eql(@context)
-  expect(@submission.assignment.context).to eql(@context)
-  @submission.save!
+  describe "#plagiarism_service_to_use" do
+    it "returns nil when no service is configured" do
+      submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry',
+                                               body: 'whee')
+
+      expect(submission.plagiarism_service_to_use).to be_nil
+    end
+
+    it "returns :turnitin when only turnitin is configured" do
+      setup_account_for_turnitin(@context.account)
+      submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry',
+                                               body: 'whee')
+
+      expect(submission.plagiarism_service_to_use).to eq(:turnitin)
+    end
+
+    it "returns :vericite when only vericite is configured" do
+      plugin = Canvas::Plugin.find(:vericite)
+      PluginSetting.create!(name: plugin.id, settings: plugin.default_settings, disabled: false)
+
+      submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry',
+                                               body: 'whee')
+
+      expect(submission.plagiarism_service_to_use).to eq(:vericite)
+    end
+
+    it "returns :vericite when both vericite and turnitin are enabled" do
+      setup_account_for_turnitin(@context.account)
+      plugin = Canvas::Plugin.find(:vericite)
+      PluginSetting.create!(name: plugin.id, settings: plugin.default_settings, disabled: false)
+
+      submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry',
+                                               body: 'whee')
+
+      expect(submission.plagiarism_service_to_use).to eq(:vericite)
+    end
+  end
+
+
+  def submission_spec_model(opts={})
+    @submission = Submission.new(@valid_attributes.merge(opts))
+    @submission.save!
+  end
+
+  def setup_account_for_turnitin(account)
+    account.update_attributes(turnitin_account_id: 'test_account',
+                              turnitin_shared_secret: 'skeret',
+                              settings: account.settings.merge(enable_turnitin: true))
+  end
 end

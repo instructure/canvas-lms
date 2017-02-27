@@ -97,3 +97,4 @@ module CC::Importer::Canvas
     end
   end
 end
+SafeYAML.whitelist_class!(CC::Importer::Canvas::Converter)

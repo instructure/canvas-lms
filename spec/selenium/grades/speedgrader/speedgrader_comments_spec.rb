@@ -1,6 +1,7 @@
 require_relative "../../common"
 require_relative "../../helpers/speed_grader_common"
 require_relative "../../helpers/assignments_common"
+require_relative "../page_objects/speedgrader_page"
 
 describe "speed grader" do
   include_context "in-process server selenium tests"
@@ -63,6 +64,17 @@ describe "speed grader" do
         f('#speed_grader_gradebook_link').click
       end
       expect(f('body.grades')).to be_displayed
+    end
+
+    it 'displays attachments', test_id: 3058055, priority: "1" do
+      student_submission
+      filename, fullpath, _data = get_file("amazing_file.txt")
+      Speedgrader.visit(@course.id, @assignment.id)
+      Speedgrader.add_comment_attachment(fullpath)
+      Speedgrader.add_comment_and_submit("commenting")
+
+      expect(Speedgrader.attachment_link).to include_text("amazing_file")
+      expect(Speedgrader.attachment_link).to be_displayed
     end
 
     it "shows comment post time", priority: "1", test_id: 283755 do

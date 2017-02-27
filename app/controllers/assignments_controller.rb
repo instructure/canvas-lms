@@ -27,10 +27,10 @@ class AssignmentsController < ApplicationController
 
   include KalturaHelper
   include SyllabusHelper
-  before_filter :require_context
+  before_action :require_context
   add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
-  before_filter { |c| c.active_tab = "assignments" }
-  before_filter :normalize_title_param, :only => [:new, :edit]
+  before_action { |c| c.active_tab = "assignments" }
+  before_action :normalize_title_param, :only => [:new, :edit]
 
   def index
     return redirect_to(dashboard_url) if @context == @current_user
@@ -395,7 +395,13 @@ class AssignmentsController < ApplicationController
       @assignment.submission_types = params[:submission_types] if params[:submission_types]
       @assignment.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
       @assignment.ensure_assignment_group(false)
-      @assignment.post_to_sis = params[:post_to_sis] if params[:post_to_sis]
+
+      if params.key?(:post_to_sis)
+        @assignment.post_to_sis = value_to_boolean(params[:post_to_sis])
+      elsif @assignment.new_record?
+        @assignment.post_to_sis = @context.account.sis_default_grade_export[:value]
+      end
+
       if @assignment.submission_types == 'online_quiz' && @assignment.quiz
         return redirect_to edit_course_quiz_url(@context, @assignment.quiz, index_edit_params)
       elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic
@@ -437,6 +443,7 @@ class AssignmentsController < ApplicationController
         MULTIPLE_GRADING_PERIODS_ENABLED: @context.feature_enabled?(:multiple_grading_periods),
         PLAGIARISM_DETECTION_PLATFORM: @context.root_account.feature_enabled?(:plagiarism_detection_platform),
         POST_TO_SIS: post_to_sis,
+        SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@assignment),
         SECTION_LIST: @context.course_sections.active.map do |section|
           {
             id: section.id,
@@ -457,6 +464,9 @@ class AssignmentsController < ApplicationController
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
       hash[:CONTEXT_ID] = @context.id
       hash[:CONTEXT_ACTION_SOURCE] = :assignments
+      hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@assignment)
+      hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@assignment)
+      hash[:MAX_NAME_LENGTH] = self.try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value).to_i
 
       selected_tool = @assignment.tool_settings_tool
       hash[:SELECTED_CONFIG_TOOL_ID] = selected_tool ? selected_tool.id : nil

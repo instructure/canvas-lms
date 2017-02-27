@@ -189,13 +189,13 @@ class OutcomeResultsController < ApplicationController
   include Api::V1::OutcomeResults
   include Outcomes::ResultAnalytics
 
-  before_filter :require_user
-  before_filter :require_context
-  before_filter :require_outcome_context
-  before_filter :verify_aggregate_parameter, only: :rollups
-  before_filter :verify_include_parameter
-  before_filter :require_outcomes
-  before_filter :require_users
+  before_action :require_user
+  before_action :require_context
+  before_action :require_outcome_context
+  before_action :verify_aggregate_parameter, only: :rollups
+  before_action :verify_include_parameter
+  before_action :require_outcomes
+  before_action :require_users
 
   # @API Get outcome results
   # @beta

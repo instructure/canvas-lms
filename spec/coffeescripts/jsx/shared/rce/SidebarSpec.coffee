@@ -6,7 +6,7 @@ define [
   'helpers/editorUtils'
 ], (Sidebar, RCELoader, wikiSidebar, fakeENV, editorUtils) ->
 
-  module 'Sidebar - init',
+  QUnit.module 'Sidebar - init',
     setup: ->
       # in case other specs left it not fresh
       editorUtils.resetRCE()
@@ -41,7 +41,7 @@ define [
     ok wikiSidebar.init.calledOnce
     wikiSidebar.init.restore()
 
-  module 'Sidebar - show',
+  QUnit.module 'Sidebar - show',
     setup: ->
       fakeENV.setup()
       ENV.RICH_CONTENT_SERVICE_ENABLED = false
@@ -78,7 +78,7 @@ define [
     ok cb1.notCalled
     ok cb2.called
 
-  module 'Sidebar - hide',
+  QUnit.module 'Sidebar - hide',
     setup: ->
       fakeENV.setup()
       ENV.RICH_CONTENT_SERVICE_ENABLED = false

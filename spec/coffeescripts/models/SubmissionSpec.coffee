@@ -2,9 +2,9 @@ define [
   'compiled/models/Submission'
 ], (Submission) ->
 
-  module "Submission"
+  QUnit.module "Submission"
 
-  module "Submission#isGraded"
+  QUnit.module "Submission#isGraded"
 
   test "returns false if grade is null", ->
     submission = new Submission grade: null
@@ -14,7 +14,7 @@ define [
     submission = new Submission grade: 'A'
     deepEqual submission.isGraded(), true
 
-  module "Submission#hasSubmission"
+  QUnit.module "Submission#hasSubmission"
 
   test "returns false if submission type is null", ->
     submission = new Submission submission_type: null

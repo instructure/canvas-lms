@@ -6,7 +6,7 @@ define [
   'helpers/editorUtils'
 ], (RichContentEditor, RCELoader, $, fakeENV, editorUtils) ->
 
-  module 'Rce Abstraction - integration',
+  QUnit.module 'Rce Abstraction - integration',
     setup: ->
       fakeENV.setup()
       ENV.RICH_CONTENT_CDN_HOST = "fakeCDN.com"
@@ -22,10 +22,10 @@ define [
            $(renderingTarget).append("<div id='fake-editor'>" + propsForRCE.toString() + "</div>")
            renderCallback()
       }
-      sinon.stub($, "getScript", ((url, callback)=>
+      sinon.stub($, "getScript").callsFake((url, callback) =>
         window.RceModule = @fakeRceModule
         callback()
-      ));
+      )
 
     teardown: ->
       fakeENV.teardown()

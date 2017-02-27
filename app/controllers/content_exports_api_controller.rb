@@ -80,7 +80,7 @@
 #
 class ContentExportsApiController < ApplicationController
   include Api::V1::ContentExport
-  before_filter :require_context
+  before_action :require_context
 
   # @API List content exports
   #

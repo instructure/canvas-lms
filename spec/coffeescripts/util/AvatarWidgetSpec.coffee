@@ -1,6 +1,6 @@
 define ['jquery', 'compiled/util/AvatarWidget'], ($, AvatarWidget)->
 
-  module 'AvatarWidget',
+  QUnit.module 'AvatarWidget',
     setup: ->
     teardown: ->
       $(".avatar-nav").remove()

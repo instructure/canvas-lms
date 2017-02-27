@@ -4,7 +4,7 @@ define([
   'react-addons-test-utils',
   'jsx/calendar/scheduler/components/appointment_groups/AppointmentGroupList',
 ], (React, ReactDOM, TestUtils, AppointmentGroupList) => {
-  module('AppointmentGroupList')
+  QUnit.module('AppointmentGroupList')
 
   test('renders the AppointmentGroupList component', () => {
     const appointmentGroup = { appointments: [{ child_events: [{ user: { sortable_name: 'test' } }], start_at: '2016-10-18T19:00:00Z', end_at: '2016-10-18T110:00:00Z' }], appointments_count: 1 }
@@ -108,6 +108,36 @@ define([
     equal(appointmentGroupNames.length, 2)
     equal(appointmentGroupNames[0].textContent, 'test1; Available')
     equal(appointmentGroupNames[1].textContent, 'test2; test3')
+  })
+
+  test('renders date at start of datestring to accommodate multi-date events', () => {
+    const appointmentGroup = {
+      appointments: [{
+        child_events: [{
+          user: { sortable_name: 'test1' }
+        }],
+        start_at: '2016-10-18T19:00:00Z',
+        end_at: '2016-10-19T110:00:00Z',
+        child_events_count: 1
+      }, {
+        child_events: [{
+          user: { sortable_name: 'test2' }
+        }, {
+          user: { sortable_name: 'test3' }
+        }],
+        start_at: '2016-10-19T16:00:00Z',
+        end_at: '2016-10-19T17:00:00Z',
+        child_events_count: 2
+      }],
+      appointments_count: 2,
+      participants_per_appointment: 2
+    }
+
+    const component = TestUtils.renderIntoDocument(<AppointmentGroupList appointmentGroup={appointmentGroup} />)
+    const appointmentGroupNames = TestUtils.scryRenderedDOMComponentsWithClass(component, 'AppointmentGroupList__Appointment-timeLabel')
+    equal(appointmentGroupNames.length, 2)
+    equal(appointmentGroupNames[0].textContent, 'Oct 18, 2016, 7pm to 12am')
+    equal(appointmentGroupNames[1].textContent, 'Oct 19, 2016, 4pm to 5pm')
   })
 
 

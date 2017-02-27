@@ -178,10 +178,11 @@ define([
     },
     inputParams: {
       searchType: 'cc_path',
-      nameList: [],
+      nameList: '',
       role: '',
       section: '',
-      limitPrivilege: false
+      limitPrivilege: false,
+      canReadSIS: true
     },
     apiState: {
       pendingCount: 0,         // >0 while api calls are in-flight
@@ -221,7 +222,7 @@ define([
   const API_ENROLL_RESPONSE = [{}, {}];
 
   // the tests ---------------------
-  module('Course Enrollment Add Prople Reducer')
+  QUnit.module('Course Enrollment Add People Reducer')
 
   const reduce = (action, state = INITIAL_STATE) => reducer(state, action)
 
@@ -230,7 +231,7 @@ define([
   test('set input paramaters', () => {
     const newSearchParams = {
       fieldType: 'unique_id',
-      nameList: ['foo', 'bar', 'baz'],
+      nameList: 'foo, bar, baz',
       role: '2',
       secion: '2',
       limitPrivilege: true
@@ -451,7 +452,7 @@ define([
     const newState = reduce(actions.enrollUsersError('whoops'), state);
     deepEqual(newState.apiState, {pendingCount: 0, error: 'whoops'}, 'api is no longer in-flight and has error');
   });
-  test('RESET', () => {
+  test(' ', () => {
     const newState = reduce(actions.reset(), runningState);
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams');
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams');

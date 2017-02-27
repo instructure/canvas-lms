@@ -5,7 +5,7 @@ define [
   'jquery'
 ], (GroupCategorySelector, Assignment, StudentGroupStore, $) ->
 
-  module "GroupCategorySelector",
+  QUnit.module "GroupCategorySelector",
     setup: ->
       @assignment = new Assignment
       @assignment.groupCategoryId("1")

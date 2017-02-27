@@ -218,8 +218,8 @@
 #     }
 #
 class SisImportsApiController < ApplicationController
-  before_filter :get_context
-  before_filter :check_account
+  before_action :get_context
+  before_action :check_account
 
   def check_account
     return render json: {errors: ["SIS imports can only be executed on root accounts"]}, status: :bad_request unless @account.root_account?

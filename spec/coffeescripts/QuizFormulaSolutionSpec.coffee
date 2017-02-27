@@ -1,5 +1,5 @@
 define ['quiz_formula_solution'], (QuizFormulaSolution)->
-  module "QuizForumlaSolution",
+  QUnit.module "QuizForumlaSolution",
     setup: ->
     teardown: ->
 
@@ -37,7 +37,7 @@ define ['quiz_formula_solution'], (QuizFormulaSolution)->
     solution = new QuizFormulaSolution(undefined)
     ok(isNaN(solution.rawValue()))
 
-  module "QuizForumlaSolution#isValid",
+  QUnit.module "QuizForumlaSolution#isValid",
     setup: ->
     teardown: ->
 

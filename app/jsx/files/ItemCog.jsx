@@ -131,7 +131,8 @@ define([
       }
 
       return (
-        <div className='al-dropdown__container' style={{minWidth: '45px', display: 'inline-block'}}>
+        // without the stopPropagation(), using the cog menu causes the file's invisible selection checkbox to be toggled as well
+        <div className='al-dropdown__container' style={{minWidth: '45px', display: 'inline-block'}} onClick={(e) => e.stopPropagation()}>
           <button
             type='button'
             ref='settingsCogBtn'

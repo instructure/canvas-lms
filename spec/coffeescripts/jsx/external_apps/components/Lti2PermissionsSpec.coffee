@@ -18,7 +18,7 @@ define [
   renderComponent = (data) ->
     ReactDOM.render(createElement(data), wrapper)
 
-  module 'ExternalApps.Lti2Permissions',
+  QUnit.module 'ExternalApps.Lti2Permissions',
     teardown: ->
       ReactDOM.unmountComponentAtNode wrapper
 

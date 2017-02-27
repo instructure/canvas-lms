@@ -4,7 +4,7 @@ define([
   'jsx/conditional_release_stats/components/breakdown-graph-bar',
 ], (React, TestUtils, BreakdownBarComponent) => {
 
-  module('Breakdown Stats Graph Bar')
+  QUnit.module('Breakdown Stats Graph Bar')
 
   const renderComponent = (props) => {
     return TestUtils.renderIntoDocument(

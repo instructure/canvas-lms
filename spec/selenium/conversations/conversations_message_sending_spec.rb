@@ -79,6 +79,12 @@ describe "conversations new" do
       wait_for_ajaximations
       select_message_course(@group, true)
       add_message_recipient @s2
+      write_message_subject('blah')
+      write_message_body('bluh')
+      click_send
+      run_jobs
+      conv = @s2.conversations.last.conversation
+      expect(conv.subject).to eq 'blah'
     end
 
     it "should allow messages to be sent individually for account-level groups", priority: "2", test_id: 201506 do
@@ -245,7 +251,7 @@ describe "conversations new" do
         f('.message-body textarea').send_keys("I'll pay you Tuesday for a hamburger today")
         click_send
 
-        expect_flash_message :success, /Message sent!/
+        expect_flash_message :success, "Message sent!"
       end
 
       context "Message Address Book" do
@@ -261,7 +267,7 @@ describe "conversations new" do
           fj('.btn.dropdown-toggle :contains("Select course")').click
           wait_for_ajaximations
 
-          expect(f('.dropdown-menu.open')).to be_truthy
+          f('.dropdown-menu.open')
 
           fj('.message-header-input .text:contains("Unnamed Course")').click
           wait_for_ajaximations
@@ -318,7 +324,7 @@ describe "conversations new" do
     wait_for_ajaximations
     f('.icon-compose').click
     wait_for_ajaximations
-    expect(f("#compose-new-message")).to be_present
+    f("#compose-new-message")
   end
 
 end

@@ -1,5 +1,5 @@
 define ['jquery', 'compiled/calendar/TimeBlockListManager', 'moment'], ($, TimeBlockListManager, moment) ->
-  module "TimeBlockListManager",
+  QUnit.module "TimeBlockListManager",
     setup: ->
     teardown: ->
       $("#ui-datepicker-div").empty()

@@ -349,7 +349,6 @@ describe 'Speedgrader' do
       user_session(@teacher)
       # see first student
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      expect(Speedgrader.selected_student).to include_text(@students[0].name)
     end
 
     after :each do
@@ -359,26 +358,30 @@ describe 'Speedgrader' do
     let(:next_) {'.next'}
     let(:previous) {'.prev'}
 
+    it 'selects the first student' do
+      expect(Speedgrader.selected_student).to include_text(@students[0].name)
+    end
+
     it 'has working next and previous arrows ', priority: "1", test_id: 164018 do
       # click next to second student
-      expect(cycle_students_correctly(next_))
+      expect(cycle_students_correctly(next_)).to be
 
       # click next to third student
-      expect(cycle_students_correctly(next_))
+      expect(cycle_students_correctly(next_)).to be
 
-      # go bak to the first student
-      expect(cycle_students_correctly(previous))
+      # go back to the first student
+      expect(cycle_students_correctly(previous)).to be
     end
 
     it 'arrows wrap around to start when you reach the last student', priority: "1", test_id: 272512 do
       # click next to second student
-      expect(cycle_students_correctly(next_))
+      expect(cycle_students_correctly(next_)).to be
 
       # click next to third student
-      expect(cycle_students_correctly(next_))
+      expect(cycle_students_correctly(next_)).to be
 
       # wrap around to the first student
-      expect(cycle_students_correctly(next_))
+      expect(cycle_students_correctly(next_)).to be
     end
 
     it 'list all students', priority: "1", test_id: 164206 do
@@ -551,6 +554,44 @@ describe 'Speedgrader' do
       expect(f("#grade_container input")["readonly"]).to eq "true"
       expect(f("#closed_gp_notice")).to be_displayed
     end
+  end
+
+  context "mute/unmute dialogs" do
+    before(:once) do
+      init_course_with_students
+
+      @assignment = @course.assignments.create!(
+        grading_type: 'points',
+        points_possible: 10
+      )
+    end
+
+    before(:each) do
+      user_session(@teacher)
+    end
+
+    it "shows dialog when attempting to mute and mutes" do
+      @assignment.update_attributes(muted: false)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+      f('#mute_link').click
+      expect(f('#mute_dialog').attribute('style')).not_to include('display: none')
+      f('button.btn-mute').click
+      @assignment.reload
+      expect(@assignment.muted?).to be true
+    end
+
+    it "shows dialog when attempting to unmute and unmutes" do
+      @assignment.update_attributes(muted: true)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+      f('#mute_link').click
+      expect(f('#unmute_dialog').attribute('style')).not_to include('display: none')
+      f('button.btn-unmute').click
+      @assignment.reload
+      expect(@assignment.muted?).to be false
+    end
+
   end
 
   private

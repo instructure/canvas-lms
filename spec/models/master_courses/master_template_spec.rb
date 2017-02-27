@@ -15,15 +15,37 @@ describe MasterCourses::MasterTemplate do
       expect(MasterCourses::MasterTemplate.full_template_for(@course)).to eq template
     end
 
-    it "should ignore deleted templates" do
+    it "should restore deleted templates" do
       template = MasterCourses::MasterTemplate.set_as_master_course(@course)
       template.destroy!
 
       expect(template).to be_deleted
 
       template2 = MasterCourses::MasterTemplate.set_as_master_course(@course)
-      expect(template2).to_not eq template
+      expect(template2).to eq template
       expect(template2).to be_active
+    end
+  end
+
+  describe "remove_as_master_course" do
+    it "should remove a template from a course" do
+      template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      expect(template.workflow_state).to eq "active"
+      expect(template.active?).to eq true
+
+      expect{MasterCourses::MasterTemplate.remove_as_master_course(@course)}.to change{template.reload.workflow_state}.from("active").to("deleted")
+      expect(MasterCourses::MasterTemplate.full_template_for(@course)).to be_nil
+    end
+
+    it "should ignore deleted templates" do
+      template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      template.destroy
+      expect(template).to be_deleted
+
+      MasterCourses::MasterTemplate.remove_as_master_course(@course)
+
+      template.expects(:destroy).never
+      expect(template).to be_deleted
     end
   end
 

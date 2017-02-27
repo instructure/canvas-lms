@@ -6,7 +6,7 @@ define [
   model = null
   file = {}
 
-  module 'ImageFile',
+  QUnit.module 'ImageFile',
     setup: ->
       model = new ImageFile(null, preflightUrl: '/preflight')
       file = {}

@@ -1,3 +1,4 @@
+<%= javascript_include_tag(active_brand_config_js_url) %>
 <script>
   INST = <%= raw(inst_env.to_json) %>;
   ENV = <%= raw StringifyIds.recursively_stringify_ids(js_env.clone).to_json %>;

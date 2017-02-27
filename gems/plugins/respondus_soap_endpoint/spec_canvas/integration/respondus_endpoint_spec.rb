@@ -258,8 +258,6 @@ Implemented for: Canvas LMS}
                                               '', ['itemType', 'course'],
                                               ['itemID', @course.to_param],
                                               ['clearState', ''])
-      expect(status).to eq "Success"
-
       @mock_migration = ContentMigration.create!(context: @course)
       def @mock_migration.export_content
         self.workflow_state = 'importing'
@@ -271,8 +269,6 @@ Implemented for: Canvas LMS}
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,
         ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
         ['fileName', 'import.zip'], ['fileData', 'pretend this is a zip file'])
-      expect(status).to eq "Success"
-      expect(item_id).to eq 'pending'
       @token = context
     end
 

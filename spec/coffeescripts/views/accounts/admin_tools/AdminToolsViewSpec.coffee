@@ -3,7 +3,7 @@ define [
   'jquery'
   'compiled/views/accounts/admin_tools/AdminToolsView'
 ], (Backbone, $, AdminToolsView) -> 
-  module 'AdminToolsViewSpec',
+  QUnit.module 'AdminToolsViewSpec',
     setup: -> 
       @admin_tools_view = new AdminToolsView
         restoreContentPaneView: new Backbone.View

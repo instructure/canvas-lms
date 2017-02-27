@@ -23,7 +23,7 @@ define(function(require) {
     },
 
     toggleViewable: function(e) {
-      this.setState({accessibilityWarningFocused: !this.state.A11yWarningFocused});
+      this.setState({accessibilityWarningFocused: !this.state.accessibilityWarningFocused});
     },
 
     render: function() {
@@ -31,6 +31,10 @@ define(function(require) {
       if (!this.state.accessibilityWarningFocused) {
         accessibilityWarningClasses += " screenreader-only";
       }
+
+      const warningMessage = I18n.t('links.log_accessibility_warning',
+        'Warning: For improved accessibility when using Quiz Logs, please remain in the current Stream View.');
+
       return(
         <div id="ic-QuizInspector__Session">
           <div className="ic-QuizInspector__Header">
@@ -46,10 +50,13 @@ define(function(require) {
 
               {Config.allowMatrixView &&
                 <span>
-                  <span tabIndex="0" className={accessibilityWarningClasses} onFocus={this.toggleViewable} onBlur={this.toggleViewable}>
-                    {I18n.t("links.log_accessibility_warning", "Warning: The Table View is not accessible to screenreaders. Please use the current view instead.")}
+                  <span
+                    id="refreshButtonDescription" tabIndex="0" className={accessibilityWarningClasses}
+                    onFocus={this.toggleViewable} onBlur={this.toggleViewable} aria-label={warningMessage}
+                  >
+                    {warningMessage}
                   </span>
-                  <Link to="answer_matrix" className="btn btn-default" query={this.props.query}>
+                  <Link to="answer_matrix" className="btn btn-default" query={this.props.query} aria-describedby="refreshButtonDescription">
                     {I18n.t('buttons.table_view', 'View Table')}
                   </Link>
                 </span>

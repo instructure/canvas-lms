@@ -2038,10 +2038,6 @@ describe Quizzes::Quiz do
       end
 
       context 'assignment is not locked' do
-        before do
-          expect(assignment_lock_info).not_to be_present
-        end
-
         it { is_expected.to be false }
       end
 

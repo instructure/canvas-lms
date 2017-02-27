@@ -135,20 +135,28 @@ module Services
         query_params[:cursor] = params[:cursor] if params[:cursor]
         query_params[:per_page] = params[:per_page] if params[:per_page]
         query_params[:search] = params[:search] if params[:search]
-        query_params[:for_sender] = serialize_user(params[:sender]) if params[:sender]
+        if params[:sender]
+          sender = params[:sender]
+          sender = User.find(sender) unless sender.is_a?(User)
+          visible_accounts = sender.associated_accounts.select{ |account| account.grants_right?(sender, :read_roster) }
+          restricted_courses = sender.all_courses.reject{ |course| course.grants_right?(sender, :send_messages) }
+          query_params[:for_sender] = serialize_item(sender)
+          query_params[:visible_account_ids] = serialize_list(visible_accounts) unless visible_accounts.empty?
+          query_params[:restricted_course_ids] = serialize_list(restricted_courses) unless restricted_courses.empty?
+        end
         query_params[:in_context] = serialize_context(params[:context]) if params[:context]
-        query_params[:user_ids] = serialize_users(params[:user_ids]) if params[:user_ids]
-        query_params[:exclude_ids] = serialize_users(params[:exclude_ids]) if params[:exclude_ids]
+        query_params[:user_ids] = serialize_list(params[:user_ids]) if params[:user_ids]
+        query_params[:exclude_ids] = serialize_list(params[:exclude_ids]) if params[:exclude_ids]
         query_params[:weak_checks] = 1 if params[:weak_checks]
         query_params
       end
 
-      def serialize_user(user)
-        Shard.global_id_for(user)
+      def serialize_item(item)
+        Shard.global_id_for(item)
       end
 
-      def serialize_users(users)
-        users.map{ |user| serialize_user(user) }.join(',')
+      def serialize_list(list) # can be either IDs or objects (e.g. User)
+        list.map{ |item| serialize_item(item) }.join(',')
       end
 
       def serialize_context(context)
@@ -156,7 +164,7 @@ module Services
           context.global_asset_string
         else
           context_type, context_id, scope = context.split('_', 3)
-          global_context_id = Shard.global_id_for(context_id)
+          global_context_id = serialize_item(context_id)
           asset_string = "#{context_type}_#{global_context_id}"
           asset_string += "_#{scope}" if scope
           asset_string

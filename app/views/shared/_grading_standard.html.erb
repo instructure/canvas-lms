@@ -66,21 +66,39 @@
           </td>
           <td style="padding: 2px 5px; width: 25%;" class="max_score_cell" aria-label="<%= t('range_upper', 'Upper limit of range') %>">
             <div class="editing_box" aria-hidden="true">
-              <span class="edit_max_score"><%= idx == 0 ? 100 : "< #{(grading_standard.data[idx - 1][1] * 100).round(2)}" %></span>%
+              <span class="edit_max_score">
+                <% if idx == 0 %>
+                  <%= I18n.n(100) %>
+                <% else %>
+                  <%= I18n.n((grading_standard.data[idx - 1][1] * 100).round(2)) %>
+                <% end %>
+              </span>%
             </div>
             <div class="displaying">
-              <span class="max_score"><%= idx == 0 ? 100 : "< #{(grading_standard.data[idx - 1][1] * 100).round(2)}" %></span>%
+              <span class="max_score">
+                <% if idx == 0 %>
+                  <%= I18n.n(100) %>
+                <% else %>
+                  &lt; <%= I18n.n((grading_standard.data[idx - 1][1] * 100).round(2)) %>
+                <% end %>
+              </span>%
             </div>
           </td>
           <td style="padding: 2px 5px; width: 25%;">
             <div class="editing_box">
               <span style="padding-right: 5px;" aria-hidden="true"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
-              <input type="text" class="standard_value" title="<%= t('range_lower', 'Lower limit of range') %>"
-                     aria-label="<%= t('range_lower', 'Lower limit of range') %>" name="grading_standard[standard_data][scheme_<%= idx %>][value]" value="<%= row[1] * 100 %>" style="width: 37px;"/>%
+              <input
+                type="text"
+                class="standard_value"
+                title="<%= t('range_lower', 'Lower limit of range') %>"
+                aria-label="<%= t('range_lower', 'Lower limit of range') %>"
+                name="grading_standard[standard_data][scheme_<%= idx %>][value]"
+                value="<%= I18n.n(row[1] * 100) %>"
+                style="width: 37px;"/>%
             </div>
             <div class="displaying">
               <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
-              <span class="min_score"><%= (row[1] * 100).round(2) %></span>%
+              <span class="min_score"><%= I18n.n((row[1] * 100).round(2)) %></span>%
             </div>
           </td>
           <td class="editing_box" style="padding: 2px 5px 2px 15px; width: 25%;">

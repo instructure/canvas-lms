@@ -2,7 +2,7 @@ define [
   'compiled/models/Conversation'
 ], (Conversation) ->
 
-  module "Conversation",
+  QUnit.module "Conversation",
     setup: ->
       @conversation = new Conversation
 

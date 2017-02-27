@@ -25,7 +25,7 @@ define [
     btnTriggerDelete = component.refs.btnTriggerDelete?.getDOMNode()
     [component, btnTriggerDelete]
 
-  module 'ExternalApps.DeleteExternalToolButton',
+  QUnit.module 'ExternalApps.DeleteExternalToolButton',
     setup: ->
       @tools = [
         {
