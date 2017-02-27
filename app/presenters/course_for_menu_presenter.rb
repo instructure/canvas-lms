@@ -2,11 +2,18 @@ class CourseForMenuPresenter
   include I18nUtilities
   include Rails.application.routes.url_helpers
 
+  DASHBOARD_CARD_TABS = [
+    Course::TAB_DISCUSSIONS, Course::TAB_ASSIGNMENTS,
+    Course::TAB_ANNOUNCEMENTS, Course::TAB_FILES
+  ].freeze
+
   def initialize(course, available_section_tabs, user = nil, context = nil)
     @course = course
     @user = user
     @context = context
-    @available_section_tabs = available_section_tabs || []
+    @available_section_tabs = (available_section_tabs || []).select do |tab|
+      DASHBOARD_CARD_TABS.include?(tab[:id])
+    end
   end
   attr_reader :course, :available_section_tabs
 
