@@ -1,7 +1,7 @@
 module SectionTabHelper
-  def available_section_tabs(context, dashboard_cards: false)
+  def available_section_tabs(context)
     AvailableSectionTabs.new(
-      context, @current_user, @domain_root_account, session, dashboard_cards: dashboard_cards
+      context, @current_user, @domain_root_account, session
     ).to_a
   end
 
@@ -28,19 +28,13 @@ module SectionTabHelper
   end
 
   class AvailableSectionTabs
-    DASHBOARD_CARD_TABS = [
-      Course::TAB_DISCUSSIONS, Course::TAB_ASSIGNMENTS,
-      Course::TAB_ANNOUNCEMENTS, Course::TAB_FILES
-    ].freeze
-
-    def initialize(context, current_user, domain_root_account, session, dashboard_cards: false)
+    def initialize(context, current_user, domain_root_account, session)
       @context = context
       @current_user = current_user
       @domain_root_account = domain_root_account
       @session = session
-      @dashboard_cards = dashboard_cards
     end
-    attr_reader :context, :current_user, :domain_root_account, :session, :dashboard_cards
+    attr_reader :context, :current_user, :domain_root_account, :session
 
     def to_a
       return [] unless context.respond_to?(:tabs_available)
@@ -48,29 +42,21 @@ module SectionTabHelper
       Rails.cache.fetch(cache_key, expires_in: 1.hour) do
         new_collaborations_enabled = context.feature_enabled?(:new_collaborations) if context.respond_to?(:feature_enabled?)
 
-        tabs = context.tabs_available(current_user, {
+        context.tabs_available(current_user, {
           session: session,
           root_account: domain_root_account
         }).select { |tab|
           tab_has_required_attributes?(tab)
+        }.reject { |tab|
+          if tab_is?(tab, 'TAB_COLLABORATIONS')
+            new_collaborations_enabled ||
+              !Collaboration.any_collaborations_configured?(@context)
+          elsif tab_is?(tab, 'TAB_COLLABORATIONS_NEW')
+            !new_collaborations_enabled
+          elsif tab_is?(tab, 'TAB_CONFERENCES')
+            !WebConference.config
+          end
         }
-
-        if dashboard_cards
-          tabs.select! { |tab| DASHBOARD_CARD_TABS.include?(tab[:id]) }
-        else
-          tabs.reject! { |tab|
-            if tab_is?(tab, 'TAB_COLLABORATIONS')
-              new_collaborations_enabled ||
-                !Collaboration.any_collaborations_configured?(@context)
-            elsif tab_is?(tab, 'TAB_COLLABORATIONS_NEW')
-              !new_collaborations_enabled
-            elsif tab_is?(tab, 'TAB_CONFERENCES')
-              !WebConference.config
-            end
-          }
-        end
-
-        tabs
       end
     end
 
@@ -78,7 +64,7 @@ module SectionTabHelper
     def cache_key
       [ context, current_user, domain_root_account,
         Lti::NavigationCache.new(domain_root_account),
-        "section_tabs_hash2", I18n.locale
+        "section_tabs_hash", I18n.locale
       ].cache_key
     end
 

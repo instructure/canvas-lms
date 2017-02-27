@@ -31,6 +31,16 @@ describe CourseForMenuPresenter do
     )
   end
 
+  describe '#initialize' do
+    it 'should limit available_section_tabs to be those for dashboard' do
+      available_section_tab_ids = presenter.available_section_tabs.map do |tab|
+        tab[:id]
+      end
+      expect(available_section_tab_ids).to include(Course::TAB_ASSIGNMENTS)
+      expect(available_section_tab_ids).not_to include(Course::TAB_HOME)
+    end
+  end
+
   describe '#to_h' do
     it 'returns hash of info about course' do
       expect(presenter.to_h).to be_a Hash
