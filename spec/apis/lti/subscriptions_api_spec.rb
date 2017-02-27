@@ -5,7 +5,18 @@ module Lti
     include_context 'lti2_api_spec_helper'
 
     let(:controller){ double(lti2_service_name: 'vnd.Canvas.webhooksSubscription') }
+    let(:subscription_id){ 'ab342-c444-29392-e222' }
+    let(:test_subscription){ {'RootAccountId' => '1', 'Id' => subscription_id} }
 
+    let(:show_endpoint){ "/api/lti/subscriptions/#{subscription_id}" }
+    let(:delete_endpoint){ "/api/lti/subscriptions/#{subscription_id}" }
+    let(:create_endpoint){ "/api/lti/subscriptions" }
+
+    let(:ok_response){ double(code: 200, body: subscription.to_json) }
+    let(:not_found_response){ double(code: 404, body: "{}") }
+    let(:delete_response){ double(code: 200, body: "{}") }
+
+    let(:subscription_service){ class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
     let(:subscription) do
       {
         EventTypes:["attachment_created"],
@@ -19,7 +30,6 @@ module Lti
 
     describe '#create' do
       let(:test_subscription){ {'RootAccountId' => '1', 'foo' => 'bar'} }
-      let(:create_endpoint){ "/api/lti/subscriptions" }
       let(:stub_response){ double(code: 200, body: test_subscription.to_json) }
 
       before(:each) do
@@ -80,14 +90,6 @@ module Lti
     end
 
     describe '#destroy' do
-      let(:subscription_id){ 'ab342-c444-29392-e222' }
-      let(:test_subscription){ {'RootAccountId' => '1', 'Id' => subscription_id} }
-      let(:delete_endpoint){ "/api/lti/subscriptions/#{subscription_id}" }
-      let(:ok_response){ double(code: 200, body: subscription.to_json) }
-      let(:not_found_response){ double(code: 404, body: "{}") }
-      let(:delete_response){ double(code: 200, body: "{}") }
-      let(:subscription_service){ class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
-
       before(:each) do
         allow(subscription_service).to receive_messages(destroy_tool_proxy_subscription: delete_response)
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).with(an_instance_of(Account)).and_return(true)
@@ -118,6 +120,40 @@ module Lti
 
       it 'requires JWT Access token' do
         delete delete_endpoint, {}
+        expect(response).to be_unauthorized
+      end
+    end
+
+    describe '#show' do
+      before(:each) do
+        allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).with(an_instance_of(Account)).and_return(true)
+        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy.save!
+      end
+
+      it 'updates subscriptions' do
+        allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
+        get show_endpoint, {}, request_headers
+        expect(response).to be_success
+      end
+
+      it 'gives gives 404 if subscription does not exist' do
+        allow(subscription_service).to receive_messages(destroy_tool_proxy_subscription: not_found_response)
+        get show_endpoint, {}, request_headers
+        expect(response).not_to be_success
+      end
+
+      it 'checks that the tool proxy has an active developer key' do
+        product_family.update_attributes(developer_key: nil)
+        allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
+        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy.save!
+        get show_endpoint, {}, request_headers
+        expect(response).to be_unauthorized
+      end
+
+      it 'requires JWT Access token' do
+        get show_endpoint, {}
         expect(response).to be_unauthorized
       end
     end

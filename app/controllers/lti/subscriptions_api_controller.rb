@@ -81,11 +81,14 @@ module Lti
 
 
     # @API Delete a Webhook Subscription
-    #
-    # @argument id [Required, String]
-    #   The id of the submission to delete
     def destroy
       service_response = Services::LiveEventsSubscriptionService.destroy_tool_proxy_subscription(tool_proxy, params.require(:id))
+      forward_service_response(service_response)
+    end
+
+    # @API Show a single Webhook Subscription
+    def show
+      service_response = Services::LiveEventsSubscriptionService.tool_proxy_subscription(tool_proxy, params.require(:id))
       forward_service_response(service_response)
     end
 
