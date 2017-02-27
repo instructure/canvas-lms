@@ -12,6 +12,7 @@ module Lti
     let(:delete_endpoint){ "/api/lti/subscriptions/#{subscription_id}" }
     let(:update_endpoint){ "/api/lti/subscriptions/#{subscription_id}" }
     let(:create_endpoint){ "/api/lti/subscriptions" }
+    let(:index_endpoint){ "/api/lti/subscriptions" }
 
     let(:ok_response){ double(code: 200, body: subscription.to_json) }
     let(:not_found_response){ double(code: 404, body: "{}") }
@@ -219,6 +220,34 @@ module Lti
 
       it 'requires JWT Access token' do
         put update_endpoint, {subscription: subscription}
+        expect(response).to be_unauthorized
+      end
+    end
+
+    describe '#index' do
+      before(:each) do
+        allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).with(an_instance_of(Account)).and_return(true)
+        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy.save!
+      end
+
+      it 'shows subscriptions for a tool proxy' do
+        allow(subscription_service).to receive_messages(tool_proxy_subscriptions: ok_response)
+        get index_endpoint, {}, request_headers
+        expect(response).to be_success
+      end
+
+      it 'checks that the tool proxy has an active developer key' do
+        product_family.update_attributes(developer_key: nil)
+        allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
+        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy.save!
+        get index_endpoint, {}, request_headers
+        expect(response).to be_unauthorized
+      end
+
+      it 'requires JWT Access token' do
+        get index_endpoint, {}
         expect(response).to be_unauthorized
       end
     end

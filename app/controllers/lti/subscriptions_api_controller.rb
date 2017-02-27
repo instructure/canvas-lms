@@ -105,6 +105,13 @@ module Lti
       forward_service_response(service_response)
     end
 
+
+    # @API List all Webhook Subscription for a tool proxy
+    def index
+      service_response = Services::LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy)
+      forward_service_response(service_response)
+    end
+
     private
 
     def forward_service_response(service_response)

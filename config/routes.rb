@@ -1952,6 +1952,7 @@ CanvasRails::Application.routes.draw do
       delete "subscriptions/:id", action: :destroy
       get "subscriptions/:id", action: :show
       put "subscriptions/:id", action: :update
+      get "subscriptions", action: :index
     end
 
     %w(course account).each do |context|
