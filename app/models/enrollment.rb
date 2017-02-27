@@ -65,6 +65,7 @@ class Enrollment < ActiveRecord::Base
   before_validation :infer_privileges
   after_create :create_linked_enrollments
   after_create :create_enrollment_state
+  after_save :copy_scores_from_existing_enrollment, if: :need_to_copy_scores?
   after_save :clear_email_caches
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
@@ -336,7 +337,7 @@ class Enrollment < ActiveRecord::Base
 
   def update_user_account_associations_if_necessary
     return if self.fake_student?
-    if id_was.nil? || (workflow_state_changed? && workflow_state_was == 'deleted')
+    if id_was.nil? || being_restored?
       return if %w{creation_pending deleted}.include?(self.user.workflow_state)
       associations = User.calculate_account_associations_from_accounts([self.course.account_id, self.course_section.course.account_id, self.course_section.nonxlist_course.try(:account_id)].compact.uniq)
       self.user.update_account_associations(:incremental => true, :precalculated_associations => associations)
@@ -1306,5 +1307,35 @@ class Enrollment < ActiveRecord::Base
         .where(user_id: self.user_id, assignment_id: assignment_ids)
         .find_each(&:destroy)
     end
+  end
+
+  private
+
+  def copy_scores_from_existing_enrollment
+    Score.where(enrollment_id: self).each(&:destroy_permanently!)
+    other_enrollment_of_same_type.scores.each { |score| score.dup.update!(enrollment: self) }
+  end
+
+  def need_to_copy_scores?
+    return false unless id_changed? || being_restored?
+    student_or_fake_student? && other_enrollment_of_same_type.present?
+  end
+
+  def student_or_fake_student?
+    ['StudentEnrollment', 'StudentViewEnrollment'].include?(type)
+  end
+
+  def other_enrollment_of_same_type
+    return @other_enrollment_of_same_type if defined?(@other_enrollment_of_same_type)
+
+    @other_enrollment_of_same_type = Enrollment.where(
+      course_id: course,
+      user_id: user,
+      type: type
+    ).where.not(id: id, workflow_state: :deleted).first
+  end
+
+  def being_restored?
+    workflow_state_changed? && workflow_state_was == 'deleted'
   end
 end
