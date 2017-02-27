@@ -1,10 +1,16 @@
 var I18nliner = require("../js/main").I18nliner;
+var mkdirp = require("mkdirp");
 
 var subject = function(path) {
   var command = new I18nliner.Commands.Check({});
   var origDir = process.cwd();
   try {
     process.chdir(path);
+    command.processors.forEach(function(processor) {
+      processor.directories.forEach(function(directory) {
+        mkdirp.sync(directory);
+      });
+    });
     command.run();
   }
   finally {
@@ -44,7 +50,9 @@ describe("I18nliner", function() {
         },
         nested: {
           relative_key: "Relative key in nested scope"
-        }
+        },
+        yay_coffee_d4d65736: 'yay coffee',
+        yay_jsx_49700f4a: 'yay jsx'
       });
     });
   });

@@ -9,7 +9,7 @@ const {EmberHandlebars} = require('ember-template-compiler')
 const ScopedHbsExtractor = require('./../gems/canvas_i18nliner/js/scoped_hbs_extractor')
 require('babel-polyfill')
 const {allFingerprintsFor} = require('brandable_css/lib/main')
-const PreProcessor = require('./../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor')
+const PreProcessor = require('./../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor').default
 require('./../gems/canvas_i18nliner/js/scoped_hbs_pre_processor')
 
 // In this main file, we do a bunch of stuff to monkey-patch the default behavior of

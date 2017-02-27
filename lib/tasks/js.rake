@@ -6,12 +6,7 @@ namespace :js do
   # (add functionality as a separate task below)
 
   desc "Generates compiled coffeescript, handlebars templates and plugin extensions"
-  task :generate do
-    require 'config/initializers/client_app_symlinks'
-    require 'config/initializers/plugin_symlinks'
-
-    Rake::Task['js:clean'].invoke
-    Rake::Task['js:build_client_apps'].invoke
+  task generate: %i[clean build_client_apps] do
 
     threads = []
     threads << Thread.new do
@@ -105,7 +100,6 @@ namespace :js do
 
   desc "Cleans build javascript files"
   task :clean do
-    require 'config/initializers/client_app_symlinks'
     require 'config/initializers/plugin_symlinks'
 
     paths_to_remove = [
