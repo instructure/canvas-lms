@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2017 Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* eslint-disable react/style-prop-object */
 define([
   'react',
   'instructure-icons/react/Solid/IconMoreSolid',
@@ -9,17 +28,16 @@ define([
   'instructure-ui/Typography',
   'message_students',
   'jsx/gradezilla/shared/helpers/messageStudentsWhoHelper',
-  'i18n!gradebook'
-], (
-  React, { default: IconMoreSolid }, { default: IconMutedSolid }, { default: IconWarningSolid },
+  'i18n!gradebook',
+], (React, { default: IconMoreSolid }, { default: IconMutedSolid }, { default: IconWarningSolid },
   { default: Link }, { MenuItem }, { default: PopoverMenu }, { default: Typography },
-  messageStudents, MessageStudentsWhoHelper, I18n
-) => {
+  messageStudents, MessageStudentsWhoHelper, I18n) => {
   const { arrayOf, bool, func, instanceOf, number, shape, string } = React.PropTypes;
 
   class AssignmentColumnHeader extends React.Component {
     static propTypes = {
       assignment: shape({
+        courseId: string.isRequired,
         htmlUrl: string.isRequired,
         id: string.isRequired,
         invalid: bool,
@@ -27,8 +45,11 @@ define([
         name: string.isRequired,
         omitFromFinalGrade: bool.isRequired,
         pointsPossible: number,
-        submissionTypes: arrayOf(string).isRequired,
-        courseId: string.isRequired
+        submissionTypes: arrayOf(string).isRequired
+      }).isRequired,
+      curveGradesAction: shape({
+        isDisabled: bool.isRequired,
+        onSelect: func.isRequired
       }).isRequired,
       students: arrayOf(shape({
         isInactive: bool.isRequired,
@@ -70,10 +91,8 @@ define([
 
     activeStudentDetails () {
       const activeStudents = this.props.students.filter(student => !student.isInactive);
-
       return activeStudents.map((student) => {
         const { score, submittedAt } = student.submission;
-
         return {
           id: student.id,
           name: student.name,
@@ -86,25 +105,6 @@ define([
     showMessageStudentsWhoDialog () {
       const settings = MessageStudentsWhoHelper.settings(this.props.assignment, this.activeStudentDetails());
       window.messageStudents(settings);
-    }
-
-    renderMessageStudentsWhoMenu () {
-      return (
-        <MenuItem disabled={!this.props.submissionsLoaded} onSelect={this.showMessageStudentsWhoDialog}>
-          <span data-menu-item-id="message-students-who">{I18n.t('Message Students Who')}</span>
-        </MenuItem>
-      );
-    }
-
-    renderShowAssignmentDetailsAction () {
-      return (
-        <MenuItem
-          disabled={this.props.assignmentDetailsAction.disabled}
-          onSelect={this.props.assignmentDetailsAction.onSelect}
-        >
-          <span data-menu-item-id="show-assignment-details">{I18n.t('Assignment Details')}</span>
-        </MenuItem>
-      );
     }
 
     renderAssignmentLink () {
@@ -134,19 +134,27 @@ define([
     }
 
     renderPointsPossible () {
-      const assignment = this.props.assignment;
-      const pointsPossible = I18n.n(assignment.pointsPossible || 0);
+      const pointsPossible = I18n.n(this.props.assignment.pointsPossible || 0);
 
       return (
         <div className="assignment-points-possible">
           { I18n.t('Out of %{pointsPossible}', { pointsPossible }) }
         </div>
-      )
+      );
+    }
+
+    renderTrigger () {
+      const optionsTitle = I18n.t('%{name} Options', { name: this.props.assignment.name });
+      return (
+        <span className="Gradebook__ColumnHeaderAction">
+          <Typography weight="bold" style="normal" size="large" color="brand">
+            <IconMoreSolid title={optionsTitle} />
+          </Typography>
+        </span>
+      );
     }
 
     render () {
-      const optionsTitle = I18n.t('%{name} Options', { name: this.props.assignment.name });
-
       return (
         <div className="Gradebook__ColumnHeaderContent">
           <span className="Gradebook__ColumnHeaderDetail">
@@ -156,18 +164,25 @@ define([
             </Typography>
           </span>
 
-          <PopoverMenu
-            zIndex="9999"
-            trigger={
-              <span className="Gradebook__ColumnHeaderAction">
-                <Typography weight="bold" style="normal" size="large" color="brand">
-                  <IconMoreSolid title={optionsTitle} />
-                </Typography>
-              </span>
-            }
-          >
-            {this.renderShowAssignmentDetailsAction()}
-            {this.renderMessageStudentsWhoMenu()}
+          <PopoverMenu zIndex="9999" trigger={this.renderTrigger()}>
+            <MenuItem
+              disabled={this.props.assignmentDetailsAction.disabled}
+              onSelect={this.props.assignmentDetailsAction.onSelect}
+            >
+              <span data-menu-item-id="show-assignment-details">{I18n.t('Assignment Details')}</span>
+            </MenuItem>
+            <MenuItem
+              disabled={!this.props.submissionsLoaded}
+              onSelect={this.showMessageStudentsWhoDialog}
+            >
+              <span data-menu-item-id="message-students-who">{I18n.t('Message Students Who')}</span>
+            </MenuItem>
+            <MenuItem
+              disabled={this.props.curveGradesAction.isDisabled}
+              onSelect={this.props.curveGradesAction.onSelect}
+            >
+              <span data-menu-item-id="curve-grades">{I18n.t('Curve Grades')}</span>
+            </MenuItem>
           </PopoverMenu>
         </div>
       );

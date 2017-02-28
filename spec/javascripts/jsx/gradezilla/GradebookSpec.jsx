@@ -991,6 +991,11 @@ define([
 
   QUnit.module('Gradebook#renderAssignmentColumnHeader', {
     setup () {
+      fakeENV.setup({
+        GRADEBOOK_OPTIONS: {
+          context_url: 'http://contextUrl/'
+        }
+      });
       this.$mountPoint = document.createElement('div');
       $fixtures.appendChild(this.$mountPoint);
     },
@@ -1014,6 +1019,7 @@ define([
     teardown () {
       ReactDOM.unmountComponentAtNode(this.$mountPoint);
       $fixtures.innerHTML = '';
+      fakeENV.teardown();
     }
   });
 
@@ -1095,6 +1101,14 @@ define([
   });
 
   QUnit.module('Gradebook#getAssignmentColumnHeaderProps', {
+    setup () {
+      fakeENV.setup({
+        GRADEBOOK_OPTIONS: {
+          context_url: 'http://contextUrl/'
+        }
+      });
+    },
+
     createGradebook (options = {}) {
       const gradebook = createGradebook(options);
       gradebook.setAssignments({
@@ -1102,6 +1116,10 @@ define([
         202: { name: 'English Assignment' }
       });
       return gradebook;
+    },
+
+    teardown () {
+      fakeENV.teardown();
     }
   });
 

@@ -45,11 +45,11 @@ define [
   'compiled/gradezilla/GradeDisplayWarningDialog'
   'compiled/gradezilla/PostGradesFrameDialog'
   'compiled/gradezilla/SubmissionCell'
-  'compiled/gradezilla/GradebookHeaderMenu'
   'compiled/util/NumberCompare'
   'compiled/util/natcompare'
   'str/htmlEscape'
   'jsx/gradezilla/shared/AssignmentDetailsDialogManager',
+  'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
@@ -82,16 +82,16 @@ define [
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
   'jsx/context_cards/StudentContextCardTrigger'
-], (
-  $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
+], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
-  GradebookHeaderMenu, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, AssignmentColumnHeader,
-  AssignmentGroupColumnHeader, StudentColumnHeader, TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu,
-  ActionMenu, PostGradesStore, PostGradesApp, SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate,
-  SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper
-) ->
+  NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, CurveGradesDialogManager,
+  AssignmentColumnHeader, AssignmentGroupColumnHeader, StudentColumnHeader, TotalGradeColumnHeader,
+  GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp, SubmissionStateMap,
+  GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView,
+  GradebookKeyboardNav, assignmentHelper) ->
+  IS_ADMIN = _.contains(ENV.current_user_roles, 'admin')
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
     component = React.createElement(reactClass, props, children)
     ReactDOM.render(component, mountPoint)
@@ -141,7 +141,7 @@ define [
       @submissionStateMap = new SubmissionStateMap
         hasGradingPeriods: @hasGradingPeriods
         selectedGradingPeriodID: @gradingPeriodToShow
-        isAdmin: _.contains(ENV.current_user_roles, "admin")
+        isAdmin: IS_ADMIN
       @gradebookColumnSizeSettings = @options.gradebook_column_size_settings
       @gradebookColumnOrderSettings = @options.gradebook_column_order_settings
       @teacherNotesNotYetLoaded = !@options.teacher_notes? || @options.teacher_notes.hidden
@@ -1723,16 +1723,17 @@ define [
 
     getAssignmentColumnHeaderProps: (assignmentId) =>
       assignment = @getAssignment(assignmentId)
-
       assignmentKey = "assignment_#{assignmentId}"
-      students = _.map @studentsThatCanSeeAssignment(@students, assignment), (student) =>
+      studentsThatCanSeeAssignment = @studentsThatCanSeeAssignment(@students, assignment)
+      contextUrl = ENV.GRADEBOOK_OPTIONS.context_url
+
+      students = _.map studentsThatCanSeeAssignment, (student) =>
         studentRecord =
           id: student.id
           name: student.name
           isInactive: student.isInactive
 
         submission = student[assignmentKey]
-
         if submission
           studentRecord.submission =
             score: submission.score
@@ -1747,6 +1748,10 @@ define [
       assignmentDetailsDialogManager = new AssignmentDetailsDialogManager(
         assignment, students, @contentLoadStates.submissionsLoaded
       )
+      curveGradesActionOptions =
+        isAdmin: IS_ADMIN
+        contextUrl: contextUrl
+        submissionsLoaded: @contentLoadStates.submissionsLoaded
 
       {
         assignment:
@@ -1759,11 +1764,14 @@ define [
           pointsPossible: assignment.points_possible
           submissionTypes: assignment.submission_types
           courseId: assignment.course_id
+        assignmentDetailsAction:
+          disabled: !assignmentDetailsDialogManager.isDialogEnabled()
+          onSelect: assignmentDetailsDialogManager.showDialog
+        curveGradesAction: CurveGradesDialogManager.createCurveGradesAction(
+          assignment, studentsThatCanSeeAssignment, curveGradesActionOptions
+        )
         students: students
         submissionsLoaded: @contentLoadStates.submissionsLoaded
-        assignmentDetailsAction:
-          disabled: !assignmentDetailsDialogManager.isDialogEnabled(),
-          onSelect: assignmentDetailsDialogManager.showDialog
       }
 
     renderAssignmentColumnHeader: (assignmentId) =>

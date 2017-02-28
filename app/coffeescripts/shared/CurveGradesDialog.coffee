@@ -1,5 +1,23 @@
+#
+# Copyright (C) 2011 - 2017 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 define [
-  'i18n!gradezilla'
+  'i18n!gradebook'
   'jsx/shared/helpers/numberHelper'
   'jquery'
   'jst/CurveGradesDialog'
@@ -11,12 +29,10 @@ define [
   'compiled/jquery/fixDialogButtons'
   'vendor/jquery.ba-tinypubsub'
 ], (I18n, numberHelper, $, curveGradesDialogTemplate, htmlEscape) ->
-
   class CurveGradesDialog
     constructor: ({@assignment, @students, @context_url}) ->
-      @initDialog()
 
-    initDialog: =>
+    show: =>
       locals =
         assignment: @assignment
         action: "#{@context_url}/gradebook/update_submission"
@@ -149,6 +165,7 @@ define [
             pct = (users.length / maxCount)
             cnt = users.length
           color = (if idx == 0 then "#a03536" else "#007ab8")
+
           title = I18n.t(
             {
               one: "1 student will get %{num} points",
