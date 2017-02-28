@@ -540,6 +540,15 @@ END
       beta: false,
       development: true,
     },
+    'lti_2_auth_url_registration' =>
+    {
+      display_name: -> { I18n.t('Send Authorization URL in LTI2 Registration') },
+      description: -> { I18n.t("If enabled, 'oauth2_access_token_url' will be sent in LTI2 registration launch") },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: false,
+      root_opt_in: true
+    },
   )
 
   def self.definitions

@@ -89,12 +89,22 @@ module Lti
           expect(launch_params['ext_api_domain']).to eq HostUrl.context_host(course, request.host)
           account_tp_url_stub = course_tool_consumer_profile_url(course)
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
+          expect(launch_params['oauth2_access_token_url']).to be_nil
         end
 
         it "doesn't allow student to register an app" do
           course_with_student_logged_in(active_all:true)
           get 'registration', course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'
           expect(response.code).to eq '401'
+        end
+
+        it "includes the authorization URL when feature flag enabled" do
+          Account.any_instance.stubs(:feature_enabled?).returns(true)
+          course_with_teacher_logged_in(active_all: true)
+          get 'registration', course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'
+          lti_launch = assigns[:lti_launch]
+          launch_params = lti_launch.params
+          expect(launch_params['oauth2_access_token_url']).to eq lti_oauth2_authorize_url
         end
 
       end
