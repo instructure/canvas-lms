@@ -51,7 +51,7 @@ namespace :canvas do
     build_js = ENV["COMPILE_ASSETS_BUILD_JS"] != "0"
     build_api_docs = ENV["COMPILE_ASSETS_API_DOCS"] != "0"
 
-    compile_js = !CANVAS_WEBPACK
+    compile_js = !CANVAS_WEBPACK || ENV["COMPILE_ASSETS_WEBPACK_RJS_FALLBACK"] == "1"
     # normally one or the other
     build_requirejs = build_js && !CANVAS_WEBPACK
     build_webpack = build_js && CANVAS_WEBPACK
