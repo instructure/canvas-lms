@@ -29,12 +29,12 @@ module Lti
         id: WEBHOOK_SUBSCRIPTION_SERVICE,
         endpoint: 'api/lti/subscriptions',
         format: ['application/json'].freeze,
-        action: ['POST'].freeze
+        action: ['POST', 'GET', 'PUT', 'DELETE'].freeze
       }.freeze
     ].freeze
 
     skip_before_action :require_user, :load_user
-    before_action :authorized_lti2_tool
+    before_action :authorized_lti2_tool, :verify_service_configured
 
     rescue_from Lti::SubscriptionsValidator::InvalidContextType do
       render json: {error: 'Invalid subscription'}, status: :bad_request
@@ -113,6 +113,12 @@ module Lti
     end
 
     private
+
+    def verify_service_configured
+      unless Services::LiveEventsSubscriptionService.available?
+        render json: {error: 'Subscription service not configured'}, status: :internal_server_error
+      end
+    end
 
     def forward_service_response(service_response)
       render json: service_response.body, status: service_response.code

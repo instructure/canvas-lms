@@ -30,13 +30,14 @@ module Lti
       }
     end
 
+    before(:each){allow(subscription_service).to receive_messages(available?: true)}
+
     describe '#create' do
       let(:test_subscription){ {'RootAccountId' => '1', 'foo' => 'bar'} }
       let(:stub_response){ double(code: 200, body: test_subscription.to_json) }
 
       before(:each) do
-        ss = class_double(Services::LiveEventsSubscriptionService).as_stubbed_const
-        allow(ss).to receive_messages(create_tool_proxy_subscription: stub_response)
+        allow(subscription_service).to receive_messages(create_tool_proxy_subscription: stub_response)
       end
 
       it 'creates subscriptions' do
@@ -89,6 +90,24 @@ module Lti
         post create_endpoint, { subscription: subscription }
         expect(response).to be_unauthorized
       end
+
+      it 'gives 500 if the subscription service is not configured' do
+        allow(subscription_service).to receive_messages(available?: false)
+        allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).with(an_instance_of(Account)).and_return(true)
+        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy.save!
+        post create_endpoint, { subscription: subscription }, request_headers
+        expect(response.status).to eq 500
+      end
+
+      it 'gives useful message if the subscription service is not configured' do
+        allow(subscription_service).to receive_messages(available?: false)
+        allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).with(an_instance_of(Account)).and_return(true)
+        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy.save!
+        post create_endpoint, { subscription: subscription }, request_headers
+        expect(JSON.parse(response.body)['error']).to eq 'Subscription service not configured'
+      end
     end
 
     describe '#destroy' do
@@ -124,6 +143,20 @@ module Lti
         delete delete_endpoint, {}
         expect(response).to be_unauthorized
       end
+
+      it 'gives 500 if the subscription service is not configured' do
+        allow(subscription_service).to receive_messages(available?: false)
+        allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
+        delete delete_endpoint, {}, request_headers
+        expect(response.status).to eq 500
+      end
+
+      it 'gives useful message if the subscription service is not configured' do
+        allow(subscription_service).to receive_messages(available?: false)
+        allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
+        delete delete_endpoint, {}, request_headers
+        expect(JSON.parse(response.body)['error']).to eq 'Subscription service not configured'
+      end
     end
 
     describe '#show' do
@@ -157,6 +190,20 @@ module Lti
       it 'requires JWT Access token' do
         get show_endpoint, {}
         expect(response).to be_unauthorized
+      end
+
+      it 'gives 500 if the subscription service is not configured' do
+        allow(subscription_service).to receive_messages(available?: false)
+        allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
+        get show_endpoint, {}, request_headers
+        expect(response.status).to eq 500
+      end
+
+      it 'gives useful message if the subscription service is not configured' do
+        allow(subscription_service).to receive_messages(available?: false)
+        allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
+        get show_endpoint, {}, request_headers
+        expect(JSON.parse(response.body)['error']).to eq 'Subscription service not configured'
       end
     end
 
@@ -222,6 +269,19 @@ module Lti
         put update_endpoint, {subscription: subscription}
         expect(response).to be_unauthorized
       end
+
+      it 'gives 500 if the subscription service is not configured' do
+        allow(subscription_service).to receive_messages(available?: false)
+        put update_endpoint, {subscription: subscription}, request_headers
+        expect(response.status).to eq 500
+      end
+
+      it 'gives useful message if the subscription service is not configured' do
+        allow(subscription_service).to receive_messages(available?: false)
+        put update_endpoint, {subscription: subscription}, request_headers
+        expect(JSON.parse(response.body)['error']).to eq 'Subscription service not configured'
+      end
+
     end
 
     describe '#index' do
@@ -250,6 +310,21 @@ module Lti
         get index_endpoint, {}
         expect(response).to be_unauthorized
       end
+
+      it 'gives 500 if the subscription service is not configured' do
+        allow(subscription_service).to receive_messages(available?: false)
+        allow(subscription_service).to receive_messages(tool_proxy_subscriptions: ok_response)
+        get index_endpoint, {}, request_headers
+        expect(response.status).to eq 500
+      end
+
+      it 'gives useful message if the subscription service is not configured' do
+        allow(subscription_service).to receive_messages(available?: false)
+        allow(subscription_service).to receive_messages(tool_proxy_subscriptions: ok_response)
+        get index_endpoint, {}, request_headers
+        expect(JSON.parse(response.body)['error']).to eq 'Subscription service not configured'
+      end
+
     end
 
   end
