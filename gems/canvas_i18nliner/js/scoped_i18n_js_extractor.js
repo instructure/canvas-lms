@@ -13,13 +13,24 @@ function ScopedI18nJsExtractor() {
 ScopedI18nJsExtractor.prototype = Object.create(I18nJsExtractor.prototype);
 ScopedI18nJsExtractor.prototype.constructor = ScopedI18nJsExtractor;
 
-
-ScopedI18nJsExtractor.prototype.processCall = function(node) {
-  this.inferI18nScope(node);
-  I18nJsExtractor.prototype.processCall.call(this, node);
+ScopedI18nJsExtractor.prototype.enter = function(node) {
+  if (node.type === "CallExpression") {
+    this.inferI18nScopeFromCall(node.node);
+  }
+  else if (node.type === "ImportDeclaration") {
+    this.inferI18nScopeFromImport(node.node);
+  }
+  I18nJsExtractor.prototype.enter.call(this, node);
 };
 
-ScopedI18nJsExtractor.prototype.inferI18nScope = function(node) {
+ScopedI18nJsExtractor.prototype.exit = function(node) {
+  I18nJsExtractor.prototype.exit.call(this, node);
+  if (this.i18nScope && this.i18nScope.node === node.node) {
+    this.popI18nScope();
+  }
+};
+
+ScopedI18nJsExtractor.prototype.inferI18nScopeFromCall = function(node) {
   var callee = node.callee;
   var method = callee.name;
   var args = node.arguments;
@@ -48,9 +59,19 @@ ScopedI18nJsExtractor.prototype.inferI18nScope = function(node) {
   }
 };
 
-ScopedI18nJsExtractor.prototype.exit = function(node) {
-  if (this.i18nScope && this.i18nScope.node === node.node) {
-    this.popI18nScope();
+ScopedI18nJsExtractor.prototype.inferI18nScopeFromImport = function(node) {
+  var source = node.source;
+  var specifier = node.specifiers[0];
+
+  if (source.type !== "StringLiteral")             return;
+  if (!specifier)                                  return;
+  if (specifier.type !== "ImportDefaultSpecifier") return;
+  if (specifier.local.type !== "Identifier")       return;
+  if (specifier.local.name !== "I18n")             return;
+
+  var scope = /^i18n!(.*)$/.exec(source.value);
+  if (scope && (scope = scope[1])) {
+    this.pushI18nScope({name: scope});
   }
 };
 

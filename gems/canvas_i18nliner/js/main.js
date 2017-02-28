@@ -3,6 +3,7 @@ var Commands = I18nliner.Commands;
 var Check = Commands.Check;
 
 var CoffeeScript = require("coffee-script");
+var babylon = require("babylon");
 var fs = require('fs');
 
 var JsProcessor = require("i18nliner/dist/lib/processors/js_processor").default;
@@ -22,8 +23,11 @@ JsProcessor.prototype.sourceFor = function(file) {
   var source = fs.readFileSync(file).toString();
   var data = { source: source, skip: !source.match(/I18n\.t/) };
 
-  if (file.match(/\.coffee$/)) {
-    data.source = CoffeeScript.compile(source, {});
+  if (!data.skip) {
+    if (file.match(/\.coffee$/)) {
+      data.source = CoffeeScript.compile(source, {});
+    }
+    data.ast = babylon.parse(data.source, { plugins: ["jsx", "classProperties", "objectRestSpread"], sourceType: "module" });
   }
   return data;
 };
