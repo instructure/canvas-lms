@@ -228,7 +228,7 @@ class ContextController < ApplicationController
           js_env({:INVITE_USERS_URL => course_invite_users_url(@context)})
         end
       end
-      if @context.grants_right? @current_user, session, :manage
+      if @context.grants_right? @current_user, session, :read_as_admin
         js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
       end
     elsif @context.is_a?(Group)
