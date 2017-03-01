@@ -261,12 +261,12 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     end
     if pseudonym.changed?
       unless pseudonym.save
-        Rails.logger.warning("Unable to save federated pseudonym: #{pseudonym.errors}")
+        Rails.logger.warn("Unable to save federated pseudonym: #{pseudonym.errors}")
       end
     end
     if user.changed?
       unless user.save
-        Rails.logger.warning("Unable to save federated user: #{user.errors}")
+        Rails.logger.warn("Unable to save federated user: #{user.errors}")
       end
     end
   end
