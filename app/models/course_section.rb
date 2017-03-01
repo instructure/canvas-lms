@@ -39,6 +39,7 @@ class CourseSection < ActiveRecord::Base
   validates_presence_of :course_id, :root_account_id, :workflow_state
   validates_length_of :sis_source_id, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => false
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false
+  validate :validate_section_dates
 
   has_many :sis_post_grades_statuses
 
@@ -49,6 +50,15 @@ class CourseSection < ActiveRecord::Base
 
   include StickySisFields
   are_sis_sticky :course_id, :name, :start_at, :end_at, :restrict_enrollments_to_section_dates
+
+  def validate_section_dates
+    if start_at.present? && end_at.present? && end_at < start_at
+      self.errors.add(:end_at, t("End date cannot be before start date"))
+      false
+    else
+      true
+    end
+  end
 
   def maybe_touch_all_enrollments
     self.touch_all_enrollments if self.start_at_changed? || self.end_at_changed? || self.restrict_enrollments_to_section_dates_changed? || self.course_id_changed?

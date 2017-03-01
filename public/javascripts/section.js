@@ -48,7 +48,6 @@ define([
       error: function(data) {
         $edit_section_form.loadingImage('remove');
         $edit_section_form.show();
-        $edit_section_form.formErrors(data);
       }
     })
     .find(":text")
