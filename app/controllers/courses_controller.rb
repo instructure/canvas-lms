@@ -1662,7 +1662,8 @@ class CoursesController < ApplicationController
         @wiki = @context.wiki
         @page = @wiki.front_page
         set_js_rights [:wiki, :page]
-        set_js_wiki_data :course_home => true, :show_announcements => @context.show_announcements_on_home_page?
+        show_announcements = @context.show_announcements_on_home_page? && @context.grants_right?(@current_user, session, :read_announcements)
+        set_js_wiki_data :course_home => true, :show_announcements => show_announcements
         @padless = true
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))

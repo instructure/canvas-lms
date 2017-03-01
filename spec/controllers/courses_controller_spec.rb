@@ -818,6 +818,20 @@ describe CoursesController do
         expect(controller.js_env[:ANNOUNCEMENT_LIMIT]).to eq(3)
       end
 
+      it "should not show announcements for public users" do
+        @course1.default_view = "wiki"
+        @course1.show_announcements_on_home_page = true
+        @course1.home_page_announcement_limit = 3
+        @course1.is_public = true
+        @course1.save!
+        @course1.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
+        remove_user_session
+        get 'show', :id => @course1.id
+        expect(response).to be_success
+        expect(controller.js_env[:COURSE_HOME]).to be_truthy
+        expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_falsey
+      end
+
       it "should work for syllabus view" do
         @course1.default_view = "syllabus"
         @course1.save
