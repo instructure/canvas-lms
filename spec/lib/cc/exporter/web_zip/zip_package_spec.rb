@@ -50,6 +50,20 @@ describe "ZipPackage" do
       expect(module_data[:unlockDate]).to eq lock_date
     end
 
+    it "should not export module lock dates that are in the past" do
+      lock_date = 5.minutes.ago.iso8601
+      assign = @course.assignments.create!(title: 'Assignment 1')
+      assign_item = @module.content_tags.create!(content: assign, context: @course)
+      @module.completion_requirements = [{id: assign_item.id, type: 'must_submit'}]
+      @module.unlock_at = lock_date
+      @module.save!
+
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_data = zip_package.parse_module_data.first
+      expect(module_data[:status]).to eq 'unlocked'
+      expect(module_data[:unlockDate]).to be_nil
+    end
+
     it "should not show module status as locked if it only has require sequential progress set to true" do
       assign = @course.assignments.create!(title: 'Assignment 1')
       assign_item = @module.content_tags.create!(content: assign, context: @course)
@@ -123,6 +137,23 @@ describe "ZipPackage" do
     it "should use cached module status" do
       module_data = @zip_package.parse_module_data.first
       expect(module_data[:status]).to eq 'started'
+    end
+
+    it "should not show module as locked if it is not locked at time of export" do
+      Rails.cache.write(@cache_key, {@module.id => {status: 'locked'}}, expires_in: 30.minutes)
+      module_data = @zip_package.parse_module_data.first
+      expect(module_data[:status]).to eq 'started'
+    end
+
+    it "should show module as locked if it is locked at time of export" do
+      module2 = @course.context_modules.create!(name: 'second_module')
+      module2.unlock_at = 1.day.from_now
+      module2.save!
+      Rails.cache.write(@cache_key, {@module.id => {status: 'locked'}}, expires_in: 30.minutes)
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+
+      module_data = zip_package.parse_module_data.last
+      expect(module_data[:status]).to eq 'locked'
     end
 
     it "should use cached module item data" do

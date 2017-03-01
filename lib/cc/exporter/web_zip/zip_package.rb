@@ -100,11 +100,12 @@ module CC::Exporter::WebZip
 
     def parse_module_data
       course.context_modules.active.map do |mod|
+        unlock_date = force_timezone(mod.unlock_at) if mod.unlock_at &.> Time.now
         {
           id: mod.id,
           name: mod.name,
           status: user_module_status(mod),
-          unlockDate: force_timezone(mod.unlock_at),
+          unlockDate: unlock_date,
           prereqs: mod.prerequisites.map{|pre| pre[:id]},
           requirement: requirement_type(mod),
           sequential: mod.require_sequential_progress || false,
@@ -114,8 +115,9 @@ module CC::Exporter::WebZip
     end
 
     def user_module_status(modul)
-      status = current_progress&.dig(modul.id, :status)
-      status || (modul.locked_for?(user, deep_check_if_needed: true) ? 'locked' : 'unlocked')
+      return 'locked' if modul.locked_for?(user, deep_check_if_needed: true)
+      status = current_progress&.dig(modul.id, :status) || 'unlocked'
+      status == 'locked' ? 'unlocked' : status
     end
 
     def item_completed?(item)
@@ -135,7 +137,8 @@ module CC::Exporter::WebZip
           id: item.id,
           title: item.title,
           type: item.content_type,
-          indent: item.indent
+          indent: item.indent,
+          locked: !item.available_for?(user, deep_check_if_needed: true)
         }
         parse_module_item_details(item, item_hash) if item.content_type != 'ContextModuleSubHeader'
         item_hash
@@ -147,7 +150,6 @@ module CC::Exporter::WebZip
       requirement, score = parse_requirement(item)
       item_hash[:requirement] = requirement
       item_hash[:requiredPoints] = score if score
-      item_hash[:locked] = !item.available_for?(user, deep_check_if_needed: true)
       item_hash[:completed] = item_completed?(item)
       item_hash[:content] = parse_content(item) unless item_hash[:locked]
     end
