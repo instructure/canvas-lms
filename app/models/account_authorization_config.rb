@@ -30,18 +30,18 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
   self.inheritance_column = :auth_type
 
-  # unless Rails.version > '5.0'? (https://github.com/rails/rails/pull/19500)
-  def self.new(*args, &block)
-    attrs = args.first
-    attrs.is_a?(Hash) && (subclass_name = attrs.with_indifferent_access[inheritance_column])
-    subclass = subclass_name.present? && find_sti_class(subclass_name)
-    if subclass && subclass != self
-      subclass.new(*args, &block)
-    else
-      super
+  if CANVAS_RAILS4_2
+    def self.new(*args, &block)
+      attrs = args.first
+      attrs.is_a?(Hash) && (subclass_name = attrs.with_indifferent_access[inheritance_column])
+      subclass = subclass_name.present? && find_sti_class(subclass_name)
+      if subclass && subclass != self
+        subclass.new(*args, &block)
+      else
+        super
+      end
     end
   end
-  # end
 
   def self.subclass_from_attributes?(attrs)
     false
