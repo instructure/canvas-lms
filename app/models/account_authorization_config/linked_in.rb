@@ -47,10 +47,19 @@ class AccountAuthorizationConfig::LinkedIn < AccountAuthorizationConfig::Oauth2
   def client_options
     {
       site: 'https://api.linkedin.com'.freeze,
-      authorize_url: 'https://www.linkedin.com/uas/oauth2/authorization',
-      token_url: 'https://www.linkedin.com/uas/oauth2/accessToken'
+      authorize_url: 'https://www.linkedin.com/oauth/v2/authorization',
+      token_url: 'https://www.linkedin.com/oauth/v2/accessToken'
     }
   end
+
+## Legacy URLs
+#  def client_options
+#    {
+#      site: 'https://api.linkedin.com'.freeze,
+#      authorize_url: 'https://www.linkedin.com/uas/oauth2/authorization',
+#      token_url: 'https://www.linkedin.com/uas/oauth2/accessToken'
+#    }
+#  end
 
   def authorize_options
     { scope: scope }
