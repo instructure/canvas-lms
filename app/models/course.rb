@@ -2830,8 +2830,9 @@ class Course < ActiveRecord::Base
       self.replacement_course_id = new_course.id
       self.workflow_state = 'deleted'
       self.save!
-      # Assign original course profile to the new course (automatically saves it)
-      new_course.profile = self.profile unless self.profile.new_record?
+      unless profile.new_record?
+        profile.update_attribute(:context, new_course)
+      end
 
       Course.find(new_course.id)
     end

@@ -849,7 +849,7 @@ ActiveRecord::Relation.class_eval do
     uniq_identifier = "#{table_name}.#{primary_key}"
     scopes << self
     sub_query = (scopes).map {|s| s.except(:select, :order).select(uniq_identifier).to_sql}.join(" UNION ALL ")
-    engine.where("#{uniq_identifier} IN (#{sub_query})")
+    unscoped.where("#{uniq_identifier} IN (#{sub_query})")
   end
 
   # returns batch_size ids at a time, working through the primary key from

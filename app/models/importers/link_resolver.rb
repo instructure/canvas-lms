@@ -46,7 +46,7 @@ module Importers
           end
         elsif context.respond_to?(type) && context.send(type).respond_to?(:scope)
           scope = context.send(type).scope
-          if scope.table.engine.columns_hash['migration_id']
+          if scope.klass.columns_hash['migration_id']
             if object_id = scope.where(migration_id: migration_id).limit(1).pluck(:id).first
               link[:new_value] = "#{context_path}/#{type_for_url}/#{object_id}"
             end

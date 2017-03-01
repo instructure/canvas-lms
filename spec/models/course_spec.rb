@@ -4579,8 +4579,6 @@ describe Course, 'touch_root_folder_if_necessary' do
       expect(@course.restrict_student_future_view?).to be_truthy
     end
   end
-
-  it { is_expected.to have_many(:submission_comments).conditions(-> { published }) }
 end
 
 describe Course, 'invited_count_visible_to' do

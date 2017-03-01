@@ -50,6 +50,7 @@ module SimpleTags
 
   module WriterInstanceMethods
     def tags=(new_tags)
+      tags_will_change! unless tags == new_tags
       @tag_array = new_tags || []
     end
 
