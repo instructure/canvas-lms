@@ -26,7 +26,7 @@ define([
   function arePeopleValidationIssuesResolved (props) {
     function isReadyToCreate (candidate) {
       return !!(candidate.createNew && candidate.newUserInfo
-        && candidate.newUserInfo.email && candidate.newUserInfo.name);
+        && candidate.newUserInfo.email);    // newUserInfo.name is now optional
     }
 
     let found = Object.keys(props.userValidationResult.duplicates).find((address) => {

@@ -385,7 +385,7 @@ define([
     equal(grades.final.score, null, 'final score cannot be calculated without group weight');
   });
 
-  module('CourseGradeCalculator.calculate with unweighted grading periods', {
+  QUnit.module('CourseGradeCalculator.calculate with unweighted grading periods', {
     setup () {
       submissions = [
         { assignment_id: 201, score: 10 },
@@ -578,7 +578,7 @@ define([
     equal(grades.gradingPeriods[702].scoreUnit, 'percentage');
   });
 
-  module('CourseGradeCalculator.calculate with weighted grading periods', {
+  QUnit.module('CourseGradeCalculator.calculate with weighted grading periods', {
     setup () {
       submissions = [
         { assignment_id: 201, score: 10 },
@@ -855,7 +855,7 @@ define([
   // prevented. Assignment group rules must never be applied to multiple grading
   // periods in combination. Doing so would impact grades in closed grading
   // periods, which must never occur.
-  module('CourseGradeCalculator.calculate with assignment groups across multiple weighted grading periods', {
+  QUnit.module('CourseGradeCalculator.calculate with assignment groups across multiple weighted grading periods', {
     setup () {
       submissions = [
         { assignment_id: 201, score: 10 },

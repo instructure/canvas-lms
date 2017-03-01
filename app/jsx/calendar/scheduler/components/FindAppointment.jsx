@@ -6,7 +6,7 @@ define([
 ], (React, Modal, I18n, Actions) => {
   class FindAppointment extends React.Component {
 
-    static propTypes: {
+    static propTypes = {
       courses: React.PropTypes.array.isRequired,
       store: React.PropTypes.object.isRequired,
     }

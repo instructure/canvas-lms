@@ -91,7 +91,7 @@ define([
     fakeENV.teardown();
   }
 
-  module('grade_summary.getGradingPeriodSet', {
+  QUnit.module('grade_summary.getGradingPeriodSet', {
     setup () {
       commonSetup();
     },
@@ -361,7 +361,7 @@ define([
     equal($('#show_all_details_button').text(), 'Show All Details');
   });
 
-  module('grade_summary.getGradingPeriodIdFromUrl');
+  QUnit.module('grade_summary.getGradingPeriodIdFromUrl');
 
   test('returns the value for grading_period_id in the url', function () {
     const url = 'example.com/course/1/grades?grading_period_id=701';

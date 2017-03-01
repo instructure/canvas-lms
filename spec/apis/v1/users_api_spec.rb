@@ -1811,6 +1811,78 @@ describe "Users API", type: :request do
     end
   end
 
+  describe "New User Tutorial Collapsed Status" do
+    before :once do
+      @a = Account.default
+      @u = user_factory(active_all: true)
+      @a.account_users.create!(user: @u)
+    end
+
+    describe "GET new user tutorial statuses" do
+      before :once do
+        @user.preferences[:new_user_tutorial_statuses] = {
+          "home" => true,
+          "modules" => false,
+        }
+        @user.save!
+      end
+
+      it "should return new user tutorial collapsed statuses for a user" do
+        json = api_call(
+          :get,
+          "/api/v1/users/#{@user.id}/new_user_tutorial_statuses",
+          { controller: "users", action: "get_new_user_tutorial_statuses", format: "json",
+            id: @user.to_param }
+        )
+        expect(json).to eq({"new_user_tutorial_statuses" => {"collapsed" => {"home" => true, "modules" => false}}})
+      end
+
+      it "should return empty if the user has no preference set" do
+        @user.preferences.delete(:new_user_tutorial_statuses)
+        @user.save!
+
+        json = api_call(
+          :get,
+          "/api/v1/users/#{@user.id}/new_user_tutorial_statuses",
+          { controller: "users", action: "get_new_user_tutorial_statuses", format: "json",
+            id: @user.to_param }
+        )
+        expect(json).to eq({"new_user_tutorial_statuses" => {"collapsed" => {}}})
+      end
+    end
+
+    describe "PUT new user tutorial status" do
+      it "should allow setting new user tutorial status" do
+        page_name = "modules"
+        json = api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/new_user_tutorial_statuses/#{page_name}",
+          { controller: "users", action: "set_new_user_tutorial_status", format: "json",
+            id: @user.to_param, page_name: page_name },
+          {
+            collapsed: true
+          },
+          {}
+        )
+        expect(json["new_user_tutorial_statuses"]["collapsed"]["modules"]).to eq true
+      end
+
+      it "should reject setting status for pages that are not whitelisted" do
+        page_name = "some_random_page"
+        api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/new_user_tutorial_statuses/#{page_name}",
+          { controller: "users", action: "set_new_user_tutorial_status", format: "json",
+            id: @user.to_param, page_name: page_name },
+          {},
+          {},
+          {:expected_status => 400}
+        )
+      end
+
+    end
+  end
+
   describe 'missing submissions' do
     before :once do
       course_with_student(active_all: true)

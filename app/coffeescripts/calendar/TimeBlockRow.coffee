@@ -3,8 +3,9 @@ define [
   'i18n!calendar'
   'jst/calendar/TimeBlockRow'
   'compiled/util/fcUtil'
+  'jsx/shared/helpers/datePickerFormat'
   'compiled/calendar/fcMomentHandlebarsHelpers' # make sure fcMomentToString and fcMomentToDateString are available to TimeBlockRow.handlebars
-], ($, I18n, timeBlockRowTemplate, fcUtil) ->
+], ($, I18n, timeBlockRowTemplate, fcUtil, datePickerFormat) ->
 
   class TimeBlockRow
     constructor: (@TimeBlockList, data={}) ->
@@ -21,7 +22,8 @@ define [
       @$start_time = @$row.find("input[name='start_time']")
       @$end_time = @$row.find("input[name='end_time']")
 
-      @$date.date_field().change(@validate)
+      $date_field = @$date.date_field({ datepicker: { dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday')) } })
+      $date_field.change(@validate)
       @$start_time.time_field().change(@validate)
       @$end_time.time_field().change(@validate)
 

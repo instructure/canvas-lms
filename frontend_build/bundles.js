@@ -24,8 +24,6 @@ appBundles.forEach((entryFilepath) => {
   }
 })
 
-entries.screenreader_gradebook = './app/jsx/bundles/screenreader_gradebook.js'
-
 pluginBundles.forEach((entryFilepath) => {
   const pluginName = pluginNameRegexp.exec(entryFilepath)[1]
   const fileName = fileNameRegexp.exec(entryFilepath)[1]

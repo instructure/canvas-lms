@@ -381,6 +381,79 @@ module Lti
       end
     end
 
+    context "email" do
+      let(:course) { Course.create!(root_account: root_account, account: account) }
 
+      let(:tool) do
+        ContextExternalTool.create!(
+          name: 'test tool',
+          context: course,
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          url: 'http://exmaple.com/launch'
+        )
+      end
+
+      let(:substitution_helper) { SubstitutionsHelper.new(course, root_account, user, tool) }
+
+      let(:user) do
+        user = User.create!
+        user.email ='test@foo.com'
+        user.save!
+        user
+      end
+
+      describe "#email" do
+        it "returns the users email" do
+          expect(substitution_helper.email).to eq user.email
+        end
+
+        context "prefer_sis_email" do
+          before(:each) do
+            tool.settings[:prefer_sis_email] = "true"
+            tool.save!
+          end
+
+          it "returns the sis_email" do
+            sis_email = 'sis@example.com'
+            cc = user.communication_channels.email.create!(path: sis_email)
+            cc.user = user
+            cc.save!
+            pseudonym = cc.user.pseudonyms.build(:unique_id => cc.path, :account => Account.default)
+            pseudonym.sis_communication_channel_id=cc.id
+            pseudonym.communication_channel_id=cc.id
+            pseudonym.sis_user_id="some_sis_id"
+            pseudonym.save
+            expect(substitution_helper.email).to eq sis_email
+          end
+
+          it "returns the users email if there isn't an sis email" do
+            expect(substitution_helper.email).to eq user.email
+          end
+          
+        end
+      end
+
+      describe "#sis_email" do
+
+        it "returns the sis email" do
+          sis_email = 'sis@example.com'
+          cc = user.communication_channels.email.create!(path: sis_email)
+          cc.user = user
+          cc.save!
+          pseudonym = cc.user.pseudonyms.build(:unique_id => cc.path, :account => Account.default)
+          pseudonym.sis_communication_channel_id=cc.id
+          pseudonym.communication_channel_id=cc.id
+          pseudonym.sis_user_id="some_sis_id"
+          pseudonym.save
+          expect(substitution_helper.sis_email).to eq sis_email
+        end
+
+        it "returns nil if there isn't an sis email" do
+          expect(substitution_helper.sis_email).to eq nil
+        end
+
+      end
+    end
   end
 end

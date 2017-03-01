@@ -1327,6 +1327,43 @@ class UsersController < ApplicationController
     end
   end
 
+
+  def get_new_user_tutorial_statuses
+    user = api_find(User, params[:id])
+    unless user == @current_user
+      return render(json: { :message => "This endpoint only works against the current user" }, status: :unauthorized)
+    end
+    return unless authorized_action(user, @current_user, :manage)
+    render_new_user_tutorial_statuses(user)
+  end
+
+  def set_new_user_tutorial_status
+    user = api_find(User, params[:id])
+    unless user == @current_user
+      return render(json: { :message => "This endpoint only works against the current user" }, status: :unauthorized)
+    end
+
+    valid_names = %w{home modules}
+
+    # Check if the page_name is valid
+    unless valid_names.include?(params[:page_name])
+      return render(json: { :message => "Invalid Page Name Provided" }, status: :bad_request)
+    end
+
+    user.new_user_tutorial_statuses[params[:page_name]] = value_to_boolean(params[:collapsed])
+
+    respond_to do |format|
+      format.json do
+        if user.save
+          render_new_user_tutorial_statuses(user)
+        else
+          render(json: user.errors, status: :bad_request)
+        end
+      end
+    end
+  end
+
+
   # @API Get custom colors
   # Returns all custom colors that have been saved for a user.
   #
@@ -2083,6 +2120,10 @@ class UsersController < ApplicationController
     # nil and '' will get converted to 0 in the .to_i call
     id = period_id.to_i
     id == 0 ? nil : id
+  end
+
+  def render_new_user_tutorial_statuses(user)
+    render(json: { new_user_tutorial_statuses: { collapsed: user.new_user_tutorial_statuses }})
   end
 
   def authenticate_observee

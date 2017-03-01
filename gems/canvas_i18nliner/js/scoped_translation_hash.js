@@ -1,4 +1,4 @@
-var TranslationHash = require("i18nliner/dist/lib/extractors/translation_hash");
+var TranslationHash = require("i18nliner/dist/lib/extractors/translation_hash").default;
 
 function keys(obj) {
   var result = [];

@@ -208,7 +208,7 @@ define [
       @srgb.set('groupsAreWeighted', false)
       equal @srgb.get('gradesAreWeighted'), false
 
-  module '#getGradingPeriodSet',
+  QUnit.module '#getGradingPeriodSet',
     setup: ->
       setup.call this
 
@@ -492,7 +492,7 @@ define [
       equal @srgb.get('students.firstObject.total_percent'), '0%'
       start()
 
-  module 'screenreader_gradebook_controller: calculate',
+  QUnit.module 'screenreader_gradebook_controller: calculate',
     setupThis:(options = {}) ->
       assignments = [{ id: 201, points_possible: 10, omit_from_final_grade: false }]
       submissions = [{ assignment_id: 201, score: 10 }]
@@ -553,7 +553,7 @@ define [
     equal(typeof args[3], 'undefined')
     equal(typeof args[4], 'undefined')
 
-  module 'screenreader_gradebook_controller: calculateStudentGrade',
+  QUnit.module 'screenreader_gradebook_controller: calculateStudentGrade',
     setupThis:(options = {}) ->
       assignments = [{ id: 201, points_possible: 10, omit_from_final_grade: false }]
       submissions = [{ assignment_id: 201, score: 10 }]

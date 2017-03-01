@@ -52,7 +52,7 @@ define(['axios'], (axios) => {
 
     loadUser (studentId, courseId) {
       return axios.get(
-        `/api/v1/courses/${courseId}/users/${studentId}?include[]=avatar_url&include[]=enrollments`
+        `/api/v1/courses/${courseId}/users/${studentId}?include[]=avatar_url&include[]=enrollments&include[]=current_grading_period_scores`
       ).then(response => this.setState({user: response.data}))
       .catch(() => {})
     }

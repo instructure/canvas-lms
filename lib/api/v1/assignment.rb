@@ -156,6 +156,16 @@ module Api::V1::Assignment
 
     hash['is_quiz_assignment'] = assignment.quiz? && assignment.quiz.assignment?
 
+    if assignment.quiz_lti?
+      hash['is_quiz_lti_assignment'] = true
+      hash['frozen_attributes'] ||= []
+      hash['frozen_attributes'] << 'submission_types'
+    end
+
+    if assignment.external_tool? && assignment.external_tool_tag.present?
+      hash['external_tool_tag_attributes'] = { 'url' => assignment.external_tool_tag.url }
+    end
+
     return hash if assignment.new_record?
 
     # use already generated hash['description'] because it is filtered by
@@ -393,6 +403,8 @@ module Api::V1::Assignment
 
     prepared_create = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
     return false unless prepared_create[:valid]
+
+    assignment.quiz_lti! if assignment_params.key?(:quiz_lti)
 
     if prepared_create[:overrides]
       create_api_assignment_with_overrides(prepared_create, user)
@@ -767,6 +779,7 @@ module Api::V1::Assignment
 
   def plagiarism_capable?(assignment_params)
     assignment_params['submission_type'] == 'online' &&
+      assignment_params['submission_types'].present? &&
       assignment_params['submission_types'].include?('online_upload')
   end
 

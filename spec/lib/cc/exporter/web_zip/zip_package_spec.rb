@@ -14,13 +14,9 @@ describe "ZipPackage" do
   end
 
   context "parse_module_data" do
-
-    before do
-      @zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
-    end
-
     it "should map context module data from Canvas" do
-      module_data = @zip_package.parse_module_data
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_data = zip_package.parse_module_data
       expect(module_data).to eq [{id: @module.id, name: 'first_module', status: 'completed',
         unlockDate: nil, prereqs: [], requirement: nil, sequential: false, items: []}]
     end
@@ -37,7 +33,8 @@ describe "ZipPackage" do
       module2.completion_requirements = [{id: quiz_item.id, type: 'must_submit'}]
       module2.save!
 
-      module2_data = @zip_package.parse_module_data.last
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module2_data = zip_package.parse_module_data.last
       expect(module2_data[:status]).to eq 'locked'
       expect(module2_data[:prereqs]).to eq [@module.id]
     end
@@ -47,7 +44,8 @@ describe "ZipPackage" do
       @module.unlock_at = lock_date
       @module.save!
 
-      module_data = @zip_package.parse_module_data.first
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_data = zip_package.parse_module_data.first
       expect(module_data[:status]).to eq 'locked'
       expect(module_data[:unlockDate]).to eq lock_date
     end
@@ -60,13 +58,15 @@ describe "ZipPackage" do
       @module.require_sequential_progress = true
       @module.save!
 
-      module_data = @zip_package.parse_module_data.first
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_data = zip_package.parse_module_data.first
       expect(module_data[:status]).to eq 'unlocked'
       expect(module_data[:sequential]).to be true
     end
 
     it "should show module status as completed if there are no further module items to complete" do
-      module_data = @zip_package.parse_module_data.first
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_data = zip_package.parse_module_data.first
       expect(module_data[:status]).to eq 'completed'
     end
 
@@ -80,7 +80,8 @@ describe "ZipPackage" do
       @module.save!
       bare_submission_model(assign, @student)
 
-      module_data = @zip_package.parse_module_data.first
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_data = zip_package.parse_module_data.first
       expect(module_data[:status]).to eq 'started'
     end
 
@@ -88,7 +89,8 @@ describe "ZipPackage" do
       module2 = @course.context_modules.create!(name: 'second_module')
       module2.workflow_state = 'unpublished'
       module2.save!
-      expect(@zip_package.parse_module_data.length).to eq 1
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      expect(zip_package.parse_module_data.length).to eq 1
     end
 
     it "should parse module completion requirements settings" do
@@ -104,22 +106,22 @@ describe "ZipPackage" do
       module2.save!
       @course.context_modules.create!(name: 'third_module')
 
-      expect(@zip_package.parse_module_data[0][:requirement]).to eq :all
-      expect(@zip_package.parse_module_data[1][:requirement]).to eq :one
-      expect(@zip_package.parse_module_data[2][:requirement]).to be_nil
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      expect(zip_package.parse_module_data[0][:requirement]).to eq :all
+      expect(zip_package.parse_module_data[1][:requirement]).to eq :one
+      expect(zip_package.parse_module_data[2][:requirement]).to be_nil
     end
   end
 
-  context "with_cached_progress_data" do
+  context "with cached progress data" do
     before do
       enable_cache
+      Rails.cache.write(@cache_key, {@module.id => {status: 'started'}}, expires_in: 30.minutes)
+      @zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
     end
 
     it "should use cached module status" do
-      Rails.cache.fetch(@cache_key, expires_in: 30.minutes){ {@module.id => {status: 'started'}} }
-      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
-
-      module_data = zip_package.parse_module_data.first
+      module_data = @zip_package.parse_module_data.first
       expect(module_data[:status]).to eq 'started'
     end
 
@@ -127,27 +129,47 @@ describe "ZipPackage" do
       url_item = @module.content_tags.create!(content_type: 'ExternalUrl', context: @course,
         title: 'url', url: 'https://www.google.com')
       @module.completion_requirements = [{id: url_item.id, type: 'must_view'}]
-      @module.save!
-      Rails.cache.fetch(@cache_key, expires_in: 30.minutes){ {@module.id => {items: {url_item.id => true}}} }
+      Rails.cache.write(@cache_key, {@module.id => {items: {url_item.id => true}}}, expires_in: 30.minutes)
       zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
 
       module_item_data = zip_package.parse_module_item_data(@module).first
       expect(module_item_data[:completed]).to be true
     end
+
+    it "should calculate module state for modules created after current_progress" do
+      module2 = @course.context_modules.create!(name: 'second_module')
+      url_item = module2.content_tags.create!(content_type: 'ExternalUrl', context: @course,
+        title: 'url', url: 'https://www.google.com')
+      module2.completion_requirements = [{id: url_item.id, type: 'must_view'}]
+      module2.prerequisites = [{id: @module.id, type: 'context_module', name: 'first_module'}]
+      module2.save!
+
+      module_data = @zip_package.parse_module_data[1]
+      expect(module_data[:status]).to eq 'unlocked'
+    end
+
+    it "should calculate module item state as false for module items created after current_progress" do
+      module2 = @course.context_modules.create!(name: 'second_module')
+      url_item = module2.content_tags.create!(content_type: 'ExternalUrl', context: @course,
+        title: 'url', url: 'https://www.google.com')
+      module2.completion_requirements = [{id: url_item.id, type: 'must_view'}]
+      module2.prerequisites = [{id: @module.id, type: 'context_module', name: 'first_module'}]
+      module2.save!
+
+      module_item_data = @zip_package.parse_module_item_data(module2).first
+      expect(module_item_data[:completed]).to be false
+    end
   end
 
   context "parse_module_item_data" do
-    before do
-      @zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
-    end
-
     it "should parse id, type, title and indent for items in the module" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: "<p>Hi</p>")
       assign_item = @module.content_tags.create!(content: assign, context: @course, indent: 3)
       @module.completion_requirements = [{id: assign_item.id, type: 'must_submit'}]
       @module.save!
 
-      module_item_data = @zip_package.parse_module_item_data(@module).first
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module).first
       expect(module_item_data[:id]).to eq assign_item.id
       expect(module_item_data[:title]).to eq 'Assignment 1'
       expect(module_item_data[:type]).to eq 'Assignment'
@@ -161,7 +183,8 @@ describe "ZipPackage" do
       @module.save!
       bare_submission_model(assign, @student)
 
-      module_item_data = @zip_package.parse_module_item_data(@module).first
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module).first
       expect(module_item_data[:locked]).to be false
       expect(module_item_data[:completed]).to be true
     end
@@ -175,7 +198,8 @@ describe "ZipPackage" do
       quiz = @course.quizzes.create!(title: 'Quiz 1')
       @module.content_tags.create!(content: quiz, context: @course, indent: 1)
 
-      module_item_data = @zip_package.parse_module_item_data(@module)
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module)
       expect(module_item_data[0][:pointsPossible]).to eq 10.0
       expect(module_item_data[1][:pointsPossible]).to eq 3.0
       expect(module_item_data[2][:pointsPossible]).to eq 0.0
@@ -190,7 +214,8 @@ describe "ZipPackage" do
       quiz = @course.quizzes.create!(title: 'Quiz 1')
       @module.content_tags.create!(content: quiz, context: @course, indent: 1)
 
-      module_item_data = @zip_package.parse_module_item_data(@module)
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module)
       expect(module_item_data[0][:graded]).to be true
       expect(module_item_data[1][:graded]).to be true
       expect(module_item_data[2][:graded]).to be true
@@ -204,7 +229,8 @@ describe "ZipPackage" do
       quiz = @course.quizzes.create!(title: 'Quiz 1', quiz_type: 'survey')
       @module.content_tags.create!(content: quiz, context: @course, indent: 1)
 
-      module_item_data = @zip_package.parse_module_item_data(@module)
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module)
       expect(module_item_data[0][:graded]).to be false
       expect(module_item_data[1][:graded]).to be false
       expect(module_item_data[2][:graded]).to be false
@@ -218,7 +244,8 @@ describe "ZipPackage" do
         unlock_at: unlock, lock_at: lock)
       @module.content_tags.create!(content: assign, context: @course)
 
-      module_item_data = @zip_package.parse_module_item_data(@module).first
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module).first
       expect(module_item_data[:dueAt]).to eq due.iso8601
       expect(module_item_data[:unlockAt]).to eq unlock.iso8601
       expect(module_item_data[:lockAt]).to eq lock.iso8601
@@ -229,7 +256,8 @@ describe "ZipPackage" do
         submission_types: 'online_text_entry,online_upload')
       @module.content_tags.create!(content: assign, context: @course)
 
-      module_item_data = @zip_package.parse_module_item_data(@module).first
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module).first
       expect(module_item_data[:submissionTypes]).to eq 'a text entry box or a file upload'
     end
 
@@ -237,7 +265,8 @@ describe "ZipPackage" do
       quiz = @course.quizzes.create!(title: 'Quiz 1', time_limit: 5, allowed_attempts: 2)
       @module.content_tags.create!(content: quiz, context: @course, indent: 1)
 
-      module_item_data = @zip_package.parse_module_item_data(@module).first
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module).first
       expect(module_item_data[:questionCount]).to eq 0
       expect(module_item_data[:timeLimit]).to eq 5
       expect(module_item_data[:attempts]).to eq 2
@@ -252,7 +281,8 @@ describe "ZipPackage" do
       @module.completion_requirements = [{id: assign_item.id, type: 'must_submit'}]
       @module.save!
 
-      module_item_data = @zip_package.parse_module_item_data(@module)
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module)
       expect(module_item_data[0][:requirement]).to eq 'must_submit'
       expect(module_item_data[1][:requirement]).to be_nil
     end
@@ -264,7 +294,8 @@ describe "ZipPackage" do
       @module.completion_requirements = [{id: assign_item.id, type: 'min_score', min_score: 7}]
       @module.save!
 
-      module_item_data = @zip_package.parse_module_item_data(@module).first
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module).first
       expect(module_item_data[:requiredPoints]).to eq 7
     end
 
@@ -274,7 +305,8 @@ describe "ZipPackage" do
       quiz = @course.quizzes.create!(title: 'Quiz 1', description: '<p>Quiz</p>')
       @module.content_tags.create!(content: quiz, context: @course)
 
-      module_item_data = @zip_package.parse_module_item_data(@module)
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module)
       expect(module_item_data[0][:content]).to eq '<p>Assignment</p>'
       expect(module_item_data[1][:content]).to eq '<p>Quiz</p>'
     end
@@ -286,7 +318,8 @@ describe "ZipPackage" do
       @module.content_tags.create!(content: discussion, context: @course)
       @module.content_tags.create!(content: graded_discussion, context: @course)
 
-      module_item_data = @zip_package.parse_module_item_data(@module)
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module)
       expect(module_item_data[0][:content]).to eq '<h1>Discussion</h1>'
       expect(module_item_data[1][:content]).to eq '<p>Graded Discussion</p>'
     end
@@ -295,7 +328,8 @@ describe "ZipPackage" do
       wiki = @course.wiki_pages.create!(title: 'Wiki Page 1', body: "<h2>Wiki Page</h2>", wiki: @course.wiki)
       @module.content_tags.create!(content: wiki, context: @course)
 
-      module_item_data = @zip_package.parse_module_item_data(@module)
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module)
       expect(module_item_data[0][:content]).to eq '<h2>Wiki Page</h2>'
     end
 
@@ -303,7 +337,8 @@ describe "ZipPackage" do
       @module.content_tags.create!(content_type: 'ExternalUrl', context: @course,
         title: 'url', url: 'https://www.google.com')
 
-      module_item_data = @zip_package.parse_module_item_data(@module)
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module)
       expect(module_item_data[0][:content]).to eq 'https://www.google.com'
     end
 
@@ -311,19 +346,25 @@ describe "ZipPackage" do
       file = attachment_model(context: @course, display_name: 'file1.jpg', filename: 'file1.jpg')
       @module.content_tags.create!(content: file, context: @course)
 
-      file_data = @zip_package.parse_module_item_data(@module).first
-      filename_prefix = @zip_package.instance_variable_get(:@filename_prefix)
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      file_data = zip_package.parse_module_item_data(@module).first
+      filename_prefix = zip_package.instance_variable_get(:@filename_prefix)
       expect(file_data[:content]).to eq "#{filename_prefix}/viewer/files/file1.jpg"
     end
 
     it "should not export item content for items in locked modules" do
+      assign1 = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: "<p>Yo</p>")
+      assign_item1 = @module.content_tags.create!(content: assign1, context: @course, indent: 0)
+      @module.completion_requirements = [{id: assign_item1.id, type: 'must_submit'}]
+      @module.save!
       module2 = @course.context_modules.create!(name: 'second_module')
       module2.prerequisites = [{id: @module.id, type: 'context_module', name: 'first_module'}]
       module2.save!
-      assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: "<p>Hi</p>")
-      module2.content_tags.create!(content: assign, context: @course, indent: 0)
+      assign2 = @course.assignments.create!(title: 'Assignment 2', points_possible: 10, description: "<p>Hi</p>")
+      module2.content_tags.create!(content: assign2, context: @course, indent: 0)
 
-      module_item_data = @zip_package.parse_module_item_data(module2)
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(module2)
       expect(module_item_data.first.values.include?('<p>Hi</p>')).to be false
     end
 
@@ -337,7 +378,8 @@ describe "ZipPackage" do
       @module.completion_requirements = [{id: assign_item.id, type: 'must_submit'}]
       @module.save!
 
-      module_item_data = @zip_package.parse_module_item_data(@module)
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module)
       expect(module_item_data.first[:content]).to eq '<p>Hi</p>'
       expect(module_item_data.last[:locked]).to be true
       expect(module_item_data.last.values.include?('<p>Yo</p>')).to be false
@@ -349,20 +391,39 @@ describe "ZipPackage" do
       assign_item.workflow_state = 'unpublished'
       assign_item.save!
 
-      module_item_data = @zip_package.parse_module_item_data(@module)
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module)
       expect(module_item_data.length).to eq 0
     end
 
     it "should not export items not visible to the user" do
-      student_in_course(active_all: true, user_name: '2-student')
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: '<p>Hi</p>')
       create_adhoc_override_for_assignment(assign, [@student])
+      student_in_course(active_all: true, user_name: '2-student')
       assign.only_visible_to_overrides = true
       assign.save!
       @module.content_tags.create!(content: assign, context: @course, indent: 0)
 
-      module_item_data = @zip_package.parse_module_item_data(@module)
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module)
       expect(module_item_data.length).to eq 0
+    end
+  end
+
+  context "convert_html_to_local" do
+    before do
+      @zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, 'key')
+    end
+
+    it "should export html links as local content links" do
+      filename_prefix = @zip_package.instance_variable_get(:@filename_prefix)
+      attachment_model(context: @course, display_name: 'file1.jpg', filename: 'file1.jpg')
+      html = %(<a href="/courses/#{@course.id}/files/#{@attachment.id}/download") +
+             %( data-api-returntype="File">file1.jpg</a>)
+      expected_html = %(<a href="#{filename_prefix}/viewer/files/file1.jpg?canvas_download=1") +
+                      %( data-api-returntype="File">file1.jpg</a>)
+      converted_html = @zip_package.convert_html_to_local(html)
+      expect(converted_html).to eq expected_html
     end
   end
 end

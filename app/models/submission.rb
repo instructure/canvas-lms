@@ -181,8 +181,7 @@ class Submission < ActiveRecord::Base
                 :grading_error_message
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
-  before_save :prep_for_submitting_to_turnitin
-  before_save :prep_for_submitting_to_vericite
+  before_save :prep_for_submitting_to_plagiarism
   before_save :check_url_changed
   before_save :check_reset_graded_anonymously
   before_create :cache_due_date
@@ -193,8 +192,7 @@ class Submission < ActiveRecord::Base
   after_save :submit_attachments_to_canvadocs
   after_save :queue_websnap
   after_save :update_final_score
-  after_save :submit_to_turnitin_later
-  after_save :submit_to_vericite_later
+  after_save :submit_to_plagiarism_later
   after_save :update_admins_if_just_submitted
   after_save :check_for_media_object
   after_save :update_quiz_submission
@@ -491,15 +489,7 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def prep_for_submitting_to_turnitin
-    prep_for_submitting_to_plagiarism('turnitin')
-  end
-
   TURNITIN_JOB_OPTS = { :n_strand => 'turnitin', :priority => Delayed::LOW_PRIORITY, :max_attempts => 2 }
-
-  def submit_to_turnitin_later
-    submit_to_plagiarism_later('turnitin')
-  end
 
   TURNITIN_RETRY = 5
   def submit_to_turnitin(attempt=0)
@@ -612,7 +602,7 @@ class Submission < ActiveRecord::Base
     self.save
 
     @submit_to_turnitin = true
-    turnitinable_by_lti? ? retrieve_lti_tii_score : submit_to_turnitin_later
+    turnitinable_by_lti? ? retrieve_lti_tii_score : submit_to_plagiarism_later
   end
 
   def retrieve_lti_tii_score
@@ -774,15 +764,7 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def prep_for_submitting_to_vericite
-    prep_for_submitting_to_plagiarism('vericite')
-  end
-
   VERICITE_JOB_OPTS = { :n_strand => 'vericite', :priority => Delayed::LOW_PRIORITY, :max_attempts => 2 }
-
-  def submit_to_vericite_later
-    submit_to_plagiarism_later('vericite')
-  end
 
   VERICITE_RETRY = 5
   def submit_to_vericite(attempt=0)
@@ -914,8 +896,22 @@ class Submission < ActiveRecord::Base
 
   # Plagiarism functions:
 
-  def prep_for_submitting_to_plagiarism(type)
-    if(type == "vericite")
+  def plagiarism_service_to_use
+    return @plagiarism_service_to_use if defined? @plagiarism_service_to_use
+    # Because vericite is new and people are moving to vericite, not
+    # moving from vericite to turnitin, we'll give vericite precedence
+    # for now.
+    @plagiarism_service_to_use = if Canvas::Plugin.find(:vericite).try(:enabled?)
+      :vericite
+    elsif !self.context.turnitin_settings.nil?
+      :turnitin
+    end
+  end
+
+  def prep_for_submitting_to_plagiarism
+    return unless plagiarism_service_to_use
+
+    if plagiarism_service_to_use == :vericite
       plagData = self.vericite_data_hash
       @submit_to_vericite = false
       canSubmit = self.vericiteable?
@@ -925,13 +921,13 @@ class Submission < ActiveRecord::Base
       canSubmit = self.turnitinable?
     end
     last_attempt = plagData && plagData[:last_processed_attempt]
-    Rails.logger.info("VERICITE #prep_for_submitting_to_plagiarism submission ID: #{self.id}, type: #{type}, canSubmit? #{canSubmit}")
-    Rails.logger.info("VERICITE #prep_for_submitting_to_plagiarism submission ID: #{self.id}, last_attempt: #{last_attempt}, self.attempt: #{self.attempt}, @group_broadcast_submission: #{@group_broadcast_submission}, self.group: #{self.group}")
+    Rails.logger.info("#prep_for_submitting_to_plagiarism submission ID: #{self.id}, type: #{plagiarism_service_to_use}, canSubmit? #{canSubmit}")
+    Rails.logger.info("#prep_for_submitting_to_plagiarism submission ID: #{self.id}, last_attempt: #{last_attempt}, self.attempt: #{self.attempt}, @group_broadcast_submission: #{@group_broadcast_submission}, self.group: #{self.group}")
     if canSubmit && (!last_attempt || last_attempt < self.attempt) && (@group_broadcast_submission || !self.group)
       if plagData[:last_processed_attempt] != self.attempt
         plagData[:last_processed_attempt] = self.attempt
       end
-      if(type == "vericite")
+      if plagiarism_service_to_use == :vericite
         @submit_to_vericite = true
       else
         @submit_to_turnitin = true
@@ -939,8 +935,10 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def submit_to_plagiarism_later(type)
-    if(type == "vericite")
+  def submit_to_plagiarism_later
+    return unless plagiarism_service_to_use
+
+    if plagiarism_service_to_use == :vericite
       submitPlag = @submit_to_vericite
       canSubmit = self.vericiteable?
       delayName = 'vericite_submission_delay_seconds'
@@ -953,7 +951,7 @@ class Submission < ActiveRecord::Base
       delayFunction = :submit_to_turnitin
       delayOpts = TURNITIN_JOB_OPTS
     end
-    Rails.logger.info("VERICITE #submit_to_plagiarism_later submission ID: #{self.id}, type: #{type}, canSubmit? #{canSubmit}, submitPlag? #{submitPlag}")
+    Rails.logger.info("#submit_to_plagiarism_later submission ID: #{self.id}, type: #{plagiarism_service_to_use}, canSubmit? #{canSubmit}, submitPlag? #{submitPlag}")
     if canSubmit && submitPlag
       delay = Setting.get(delayName, 60.to_s).to_i
       send_later_enqueue_args(delayFunction, { :run_at => delay.seconds.from_now }.merge(delayOpts))

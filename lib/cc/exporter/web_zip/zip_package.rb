@@ -1,15 +1,18 @@
 module CC::Exporter::WebZip
   class ZipPackage < CC::Exporter::Epub::FilesDirectory
+
     def initialize(exporter, course, user, progress_key)
       @files = exporter.unsupported_files + exporter.cartridge_json[:files]
       @filename_prefix = exporter.filename_prefix
       @viewer_path_prefix = @filename_prefix + '/viewer'
-      @files_path_prefix = @viewer_path_prefix + '/files/'
+      @files_path_prefix = @viewer_path_prefix + '/files'
       @path_to_files = nil
       @course_data_filename = 'course-data.js'
       @course = course
       @user = user
       @current_progress = Rails.cache.fetch(progress_key)
+      @current_progress ||= MustViewModuleProgressor.new(user, course).current_progress
+      @html_converter = CC::CCHelper::HtmlContentExporter.new(course, user)
     end
     attr_reader :files, :course, :user, :current_progress
     attr_accessor :file_data
@@ -20,6 +23,11 @@ module CC::Exporter::WebZip
       time&.in_time_zone(user.time_zone)&.iso8601
     end
 
+    def convert_html_to_local(html)
+      exported_html = @html_converter.html_content(html)
+      exported_html&.gsub(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN), @files_path_prefix)
+    end
+
     def add_files
       files.each do |file_data|
         next unless file_data[:exists]
@@ -28,7 +36,7 @@ module CC::Exporter::WebZip
           @path_to_files = match.to_s
         end
         File.open(file_data[:path_to_file]) do |file|
-          file_path = file_data[:local_path].sub(%r{^media/}, @files_path_prefix)
+          file_path = file_data[:local_path].sub(%r{^media/}, @files_path_prefix + '/')
           zip_file.add(file_path, file) { add_clone(file_path, file) }
         end
       end
@@ -106,18 +114,13 @@ module CC::Exporter::WebZip
     end
 
     def user_module_status(modul)
-      progress = current_progress&.dig(modul.id, :status)
-      return progress unless progress.nil?
-      progression = modul.context_module_progressions.find_or_create_by(user: user).evaluate
-      progression.workflow_state
+      status = current_progress&.dig(modul.id, :status)
+      status || (modul.locked_for?(user, deep_check_if_needed: true) ? 'locked' : 'unlocked')
     end
 
     def item_completed?(item)
       modul = item.context_module
-      progress = current_progress&.dig(modul.id, :items, item.id)
-      return progress unless progress.nil?
-      progression = modul.context_module_progressions.find_or_create_by(user: user).evaluate
-      progression.finished_item?(item)
+      current_progress&.dig(modul.id, :items, item.id) || false
     end
 
     def requirement_type(modul)
@@ -182,11 +185,11 @@ module CC::Exporter::WebZip
     def parse_content(item)
       case item.content_type
       when 'Assignment', 'Quizzes::Quiz'
-        item.content&.description
+        convert_html_to_local(item.content&.description)
       when 'DiscussionTopic'
-        item.content&.message
+        convert_html_to_local(item.content&.message)
       when 'WikiPage'
-        item.content&.body
+        convert_html_to_local(item.content&.body)
       when 'ExternalUrl'
         item.url
       when 'Attachment'
@@ -198,7 +201,7 @@ module CC::Exporter::WebZip
     def file_path(item)
       folder = item.content&.folder&.full_name || ''
       local_folder = folder.sub(/\/?course files\/?/, '')
-      local_folder.length > 0 ? "/#{local_folder}/" : local_folder
+      local_folder.length > 0 ? "/#{local_folder}/" : '/'
     end
 
     def dist_package_path

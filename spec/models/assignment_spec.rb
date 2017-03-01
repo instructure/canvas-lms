@@ -2135,6 +2135,35 @@ describe Assignment do
     end
   end
 
+  describe "#quiz_lti?" do
+    before :once do
+      assignment_model(:submission_types => "external_tool", :course => @course)
+    end
+
+    context "when quizzes 2 external tool not present" do
+      it "returns false" do
+        expect(@a.quiz_lti?).to be false
+      end
+    end
+
+    context "when quizzes 2 external tool is present" do
+      before do
+        tool = @c.context_external_tools.create!(
+          :name => 'Quizzes.Next',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'Quizzes 2',
+          :url => 'http://example.com/launch'
+        )
+        @a.external_tool_tag_attributes = { :content => tool }
+      end
+
+      it "returns true" do
+        expect(@a.quiz_lti?).to be true
+      end
+    end
+  end
+
   describe "linked submissions" do
     shared_examples_for "submittable" do
       before :once do

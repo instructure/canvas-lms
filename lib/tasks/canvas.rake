@@ -51,8 +51,13 @@ namespace :canvas do
     build_js = ENV["COMPILE_ASSETS_BUILD_JS"] != "0"
     build_api_docs = ENV["COMPILE_ASSETS_API_DOCS"] != "0"
 
-    # opt in
-    webpack_and_rjs = ENV["COMPILE_ASSETS_WEBPACK_RJS_FALLBACK"] == "1"
+    compile_js = !CANVAS_WEBPACK || ENV["COMPILE_ASSETS_WEBPACK_RJS_FALLBACK"] == "1"
+    # normally one or the other
+    build_requirejs = build_js && !CANVAS_WEBPACK
+    build_webpack = build_js && CANVAS_WEBPACK
+
+    # unless you opt-in to both
+    build_requirejs = true if ENV["COMPILE_ASSETS_WEBPACK_RJS_FALLBACK"] == "1"
 
     if npm_install
       log_time('Making sure node_modules are up to date') {
@@ -76,32 +81,31 @@ namespace :canvas do
       }
     end
 
-    # TODO: Once webpack is the only way, remove js:build
-    if CANVAS_WEBPACK
-      build_js_msg = build_js ? ", js 18n, run webpack" : ""
-      msg = webpack_and_rjs ? ", r.js optimizer" : ""
-      tasks["compile coffee/jsx#{build_js_msg}#{msg}"] = -> {
-        log_time('js:generate') { Rake::Task['js:generate'].invoke }
-        if build_js
-          log_time('i18n:generate_js') { Rake::Task['i18n:generate_js'].invoke }
-          ptasks = ['js:webpack']
-          ptasks << 'js:build' if webpack_and_rjs
-          # webpack and js:build can run concurrently
-          Parallel.each(ptasks, in_threads: parallel_processes) do |name|
-            log_time(name) { Rake::Task[name].invoke }
-          end
+    # do this up front, since concurrent `i18n:generate_js` + `js:clean` = sadness
+    Rake::Task['js:clean'].invoke
+    Rake::Task['js:build_client_apps'].invoke
+
+    generate_tasks = []
+    generate_tasks << 'js:generate' if compile_js
+    generate_tasks << 'i18n:generate_js' if build_requirejs || build_webpack
+    build_tasks = []
+    build_tasks << 'js:webpack' if build_webpack
+    build_tasks << 'js:build' if build_requirejs
+
+    msg = "run " + (generate_tasks + build_tasks).join(", ")
+    tasks[msg] = -> {
+      if generate_tasks.any?
+        Parallel.each(generate_tasks, in_processes: parallel_processes) do |name|
+          log_time(name) { Rake::Task[name].invoke }
         end
-      }
-    else
-      msg = build_js ? ", js i18n, r.js optimizer" : ""
-      tasks["compile coffee/jsx#{msg}"] = -> {
-        log_time('js:generate') { Rake::Task['js:generate'].invoke }
-        if build_js
-          log_time('i18n:generate_js') { Rake::Task['i18n:generate_js'].invoke }
-          log_time('js:build') { Rake::Task['js:build'].invoke }
+      end
+
+      if build_tasks.any?
+        Parallel.each(build_tasks, in_threads: parallel_processes) do |name|
+          log_time(name) { Rake::Task[name].invoke }
         end
-      }
-    end
+      end
+    }
 
     if build_api_docs
       tasks["Generate documentation [yardoc]"] = -> {

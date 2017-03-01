@@ -245,15 +245,15 @@ module ActiveRecord
           wheres = base.active.where(id:99).union(User.where(id:1)).where_values
           expect(wheres.count).to eq 1
           sql_before_union, sql_after_union = wheres.first.split("UNION ALL")
-          expect(sql_before_union.include?("99")).to be_falsey
-          expect(sql_after_union.include?("99")).to be_truthy
+          expect(sql_before_union.include?('"id" = 99')).to be_falsey
+          expect(sql_after_union.include?('"id" = 99')).to be_truthy
         end
 
         it "should include conditions prior to the union outside of the subquery" do
           wheres = base.active.union(User.where(id:1)).where(id:99).where_values
           expect(wheres.count).to eq 2
           union_where = wheres.detect{|w| w.is_a?(String) && w.include?("UNION ALL")}
-          expect(union_where.include?("99")).to be_falsey
+          expect(union_where.include?('"id" = 99')).to be_falsey
         end
       end
 

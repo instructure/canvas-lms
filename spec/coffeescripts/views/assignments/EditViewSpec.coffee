@@ -143,38 +143,33 @@ define [
     equal errors["name"].length, 1
     equal errors["name"][0]["message"], "Name is required!"
 
-  test "has an error when a name > 255 chars", ->
+  test "has an error when a name has 257 chars", ->
     view = @editView()
     errors = nameLengthHelper(view, 257, false, 30, '0')
     ok errors["name"]
     equal errors["name"].length, 1
-    equal errors["name"][0]["message"], "Name is too long, must be under 256 characters"
+    equal errors["name"][0]["message"], "Name is too long, must be under 257 characters"
 
-  test "allows assignment to save when a name < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is true", ->
+  test "allows assignment to save when a name has 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true", ->
     view = @editView()
-    errors = nameLengthHelper(view, 254, false, 30, '1')
+    errors = nameLengthHelper(view, 256, false, 30, '1')
     equal errors.length, 0
 
-  test "allows assignment to save when a name < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is false", ->
+  test "has an error when a name has 11 chars, MAX_NAME_LENGTH is 10 and required and post_to_sis is true", ->
     view = @editView()
-    errors = nameLengthHelper(view, 254, false, 30, '0')
-    equal errors.length, 0
-
-  test "has an error when a name > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
-    view = @editView()
-    errors = nameLengthHelper(view, 35, true, 30, '1')
+    errors = nameLengthHelper(view, 11, true, 10, '1')
     ok errors["name"]
     equal errors["name"].length, 1
-    equal errors["name"][0]["message"], "Name is too long, must be under #{ENV.MAX_NAME_LENGTH + 1} characters"
+    equal errors["name"][0]["message"], "Name is too long, must be under 11 characters"
 
-  test "allows assignment to save when name > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is false", ->
+  test "allows assignment to save when name has 11 chars, MAX_NAME_LENGTH is 10 and required, but post_to_sis is false", ->
     view = @editView()
-    errors = nameLengthHelper(view, 35, true, 30, '0')
+    errors = nameLengthHelper(view, 11, true, 10, '0')
     equal errors.length, 0
 
-  test "allows assignment to save when name < MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
+  test "allows assignment to save when name has 10 chars, MAX_NAME_LENGTH is 10 and required, and post_to_sis is true", ->
     view = @editView()
-    errors = nameLengthHelper(view, 25, true, 30, '1')
+    errors = nameLengthHelper(view, 10, true, 10, '1')
     equal errors.length, 0
 
   test "don't validate name if it is frozen", ->
@@ -684,3 +679,24 @@ define [
     view.$('#assignment_online_upload').attr('checked', true)
     view.handleSubmissionTypeChange()
     equal view.$('#similarity_detection_tools').css('display'), 'none'
+
+  QUnit.module 'EditView: Quizzes 2',
+    setup: ->
+      fakeENV.setup()
+      ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
+      @view = editView submission_types: ['external_tool'], is_quiz_lti_assignment: true
+
+    teardown: ->
+      @server.restore()
+      fakeENV.teardown()
+      document.getElementById('fixtures').innerHTML = ''
+
+  test 'does not show the description textarea', ->
+    equal @view.$description.length, 0
+
+  test 'does not show the moderated grading checkbox', ->
+    equal @view.$moderatedGradingBox.length, 0
+
+  test 'does not show the load in new tab checkbox', ->
+    equal @view.$externalToolsNewTab.length, 0

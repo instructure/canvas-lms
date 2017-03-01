@@ -34,16 +34,20 @@ module DontTrustI18nPluralizations
     Rails.logger.error("#{e.message} in locale #{locale.inspect}")
     ""
   end
-
-  # make sure count special values get formatted
-  def interpolate(locale, string, values = {})
-    if values[:count] && values[:count].is_a?(Numeric)
-      values[:count] = ActiveSupport::NumberHelper.number_to_delimited(values[:count])
-    end
-    super
-  end
 end
 I18n::Backend::Simple.include(DontTrustI18nPluralizations)
+
+module FormatInterpolatedNumbers
+  def interpolate_hash(string, values)
+    values = values.dup
+    values.each do |key, value|
+      next unless value.is_a?(Numeric)
+      values[key] = ActiveSupport::NumberHelper.number_to_delimited(value)
+    end
+    super(string, values)
+  end
+end
+I18n.singleton_class.prepend(FormatInterpolatedNumbers)
 
 module CalculateDeprecatedFallbacks
   def reload!

@@ -21,10 +21,11 @@
         event.source.postMessage(JSON.stringify({quicklaunch: <%= embedded_chat_quicklaunch_params.to_json.html_safe %>}), '*');
         return;
       }
-    if (!data.width) {return;}
+    if (!data.width && data.width !== 0) {return;}
     if (data.width > document.documentElement.clientWidth / 2) {return;}
     iframe.style.width = data.width+'px';
     iframe.style.height = data.height+'px';
+    iframe.style.bottom = data.bottom+'px';
   }, false);
 </script>
 <iframe

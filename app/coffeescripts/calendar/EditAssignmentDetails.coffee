@@ -1,4 +1,5 @@
 define [
+  'i18n!calendar'
   'jquery'
   'timezone'
   'compiled/util/fcUtil'
@@ -7,10 +8,12 @@ define [
   'jst/calendar/editAssignment'
   'jst/calendar/editAssignmentOverride'
   'jst/calendar/genericSelectOptions'
+  'jsx/shared/helpers/datePickerFormat'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
   'jquery.instructure_misc_helpers'
-], ($, tz, fcUtil, natcompare, commonEventFactory, editAssignmentTemplate, editAssignmentOverrideTemplate, genericSelectOptionsTemplate) ->
+  'compiled/calendar/fcMomentHandlebarsHelpers'
+], (I18n, $, tz, fcUtil, natcompare, commonEventFactory, editAssignmentTemplate, editAssignmentOverrideTemplate, genericSelectOptionsTemplate, datePickerFormat) ->
 
   class EditAssignmentDetails
     constructor: (selector, @event, @contextChangeCB, @closeCB) ->
@@ -19,6 +22,8 @@ define [
       @$form = $(tpl({
         title: @event.title
         contexts: @event.possibleContexts()
+        date: @event.startDate()
+        datePickerFormat: if @event.allDay then 'medium_with_weekday' else 'full_with_weekday'
       }))
       $(selector).append @$form
 
@@ -89,13 +94,7 @@ define [
 
     setupTimeAndDatePickers: () =>
       $field = @$form.find(".datetime_field")
-      $field.datetime_field()
-      widget = $field.data('instance')
-      startDate = fcUtil.unwrap(@event.startDate())
-      if @event.allDay
-        widget.setDate(startDate)
-      else if startDate
-        widget.setDatetime(startDate)
+      $field.datetime_field({ datepicker: { dateFormat: datePickerFormat(if @event.allDay then I18n.t('#date.formats.medium_with_weekday') else I18n.t('#date.formats.full_with_weekday')) } })
 
     formSubmit: (e) =>
       e.preventDefault()

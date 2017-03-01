@@ -2297,6 +2297,20 @@ class Assignment < ActiveRecord::Base
     submission_types == 'online_quiz' && quiz.present?
   end
 
+  def quiz_lti?
+    external_tool? &&
+      external_tool_tag.present? &&
+      external_tool_tag.content.present? &&
+      external_tool_tag.content.tool_id == 'Quizzes 2'
+  end
+
+  def quiz_lti!
+    tool = context.present? && context.quiz_lti_tool
+    return unless tool
+    self.submission_types = 'external_tool'
+    self.external_tool_tag_attributes = { content: tool, url: tool.url }
+  end
+
   def discussion_topic?
     submission_types == 'discussion_topic' && discussion_topic.present?
   end

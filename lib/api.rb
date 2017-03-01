@@ -136,10 +136,7 @@ module Api
           :scope => 'root_account_id' }.freeze,
   }.freeze
 
-  # (digits in 2**63-1) - 1, so that any ID representable in MAX_ID_LENGTH
-  # digits is < 2**63, which is the max signed 64-bit integer, which is what's
-  # used for the DB ids.
-  MAX_ID_LENGTH = 18
+  MAX_ID_LENGTH = (2**63 - 1).to_s.length
   ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}
 
   def self.sis_parse_id(id, lookups, _current_user = nil,

@@ -6,9 +6,12 @@ define([
 ], (React, ReactDOM, TestUtils, MissingPeopleSection) => {
   QUnit.module('MissingPeopleSection')
 
-  const missing = {
+  const missingLogins = {
     addr1: {address: 'addr1', type: 'unique_id', createNew: false, newUserInfo: undefined},
     addr2: {address: 'addr2', type: 'unique_id', createNew: true, newUserInfo: {name: 'the name2', email: 'email2'}}
+  }
+  const missingEmails = {
+    addr1: {address: 'addr1', type: 'email', createNew: true, newUserInfo: {name: 'Searched Name1', email: 'addr1'}}
   }
   const noop = function () {};
   const inviteUsersURL = '/courses/#/invite_users';
@@ -18,7 +21,7 @@ define([
       <MissingPeopleSection
         searchType="unique_id"
         inviteUsersURL={inviteUsersURL}
-        missing={missing}
+        missing={missingLogins}
         onChange={noop}
       />)
     const missingPeopleSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist')
@@ -30,7 +33,7 @@ define([
       <MissingPeopleSection
         searchType="unique_id"
         inviteUsersURL={inviteUsersURL}
-        missing={missing}
+        missing={missingLogins}
         onChange={noop}
       />)
     const missingPeopleSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist')
@@ -46,12 +49,12 @@ define([
     const emailInput = rows[2].querySelector('input[type="email"]');
     ok(emailInput, 'email input');
   });
-  test('cannot create users', () => {
+  test('cannot create users because we don\'t have the URL', () => {
     const component = TestUtils.renderIntoDocument(
       <MissingPeopleSection
         searchType="unique_id"
         inviteUsersURL={undefined}
-        missing={missing}
+        missing={missingLogins}
         onChange={noop}
       />)
     const missingPeopleSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist')
@@ -59,4 +62,19 @@ define([
     const createUserBtn = missingPeopleSection.querySelector('button');
     equal(createUserBtn, null, 'create new user button');
   })
+  test('renders real names with email addresses', () => {
+    const component = TestUtils.renderIntoDocument(
+      <MissingPeopleSection
+        searchType="cc_path"
+        inviteUsersURL={inviteUsersURL}
+        missing={missingEmails}
+        onChange={noop}
+      />)
+    const missingPeopleSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist')
+
+    const rows = missingPeopleSection.querySelectorAll('tbody tr');
+    equal(rows.length, 1, 'two rows')
+    const nameInput = rows[0].querySelector('input[type="text"]');
+    equal(nameInput.value, 'Searched Name1', 'name input');
+  });
 })

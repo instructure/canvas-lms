@@ -296,7 +296,7 @@ describe GradingPeriod do
       subject { grading_period_group.grading_periods }
     end
 
-    it 'calls destroy on associated scores' do
+    it 'destroys associated scores' do
       course = Course.create!
       enrollment = student_in_course(course: course)
       score = enrollment.scores.create!(grading_period: grading_period)

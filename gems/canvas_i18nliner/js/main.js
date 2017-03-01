@@ -1,19 +1,41 @@
-var I18nliner = require("i18nliner");
+var I18nliner = require("i18nliner").default;
 var Commands = I18nliner.Commands;
 var Check = Commands.Check;
 
+var CoffeeScript = require("coffee-script");
+var babylon = require("babylon");
+var fs = require('fs');
 
-var JsProcessor = require("i18nliner/dist/lib/processors/js_processor");
-var HbsProcessor = require("i18nliner-handlebars/dist/lib/hbs_processor");
-var CallHelpers = require("i18nliner/dist/lib/call_helpers");
+var JsProcessor = require("i18nliner/dist/lib/processors/js_processor").default;
+var HbsProcessor = require("i18nliner-handlebars/dist/lib/hbs_processor").default;
+var CallHelpers = require("i18nliner/dist/lib/call_helpers").default;
 
 var glob = require("glob");
 
 // explict subdirs, to work around perf issues
 // https://github.com/jenseng/i18nliner-js/issues/7
-JsProcessor.prototype.directories = ["public/javascripts"];
+JsProcessor.prototype.directories = ["public/javascripts", "app/coffeescripts", "app/jsx"];
+JsProcessor.prototype.defaultPattern = ["*.js", "*.jsx", "*.coffee"];
 HbsProcessor.prototype.directories = ["app/views/jst", "app/coffeescripts/ember"];
 HbsProcessor.prototype.defaultPattern = ["*.hbs", "*.handlebars"];
+
+JsProcessor.prototype.sourceFor = function(file) {
+  var source = fs.readFileSync(file).toString();
+  var data = { source: source, skip: !source.match(/I18n\.t/) };
+
+  if (!data.skip) {
+    if (file.match(/\.coffee$/)) {
+      data.source = CoffeeScript.compile(source, {});
+    }
+    data.ast = babylon.parse(data.source, { plugins: ["jsx", "classProperties", "objectRestSpread"], sourceType: "module" });
+  }
+  return data;
+};
+
+// we do the actual pre-processing in sourceFor, so just pass data straight through
+JsProcessor.prototype.preProcess = function(data) {
+  return data;
+};
 
 require("./scoped_hbs_pre_processor");
 var ScopedI18nJsExtractor = require("./scoped_i18n_js_extractor");

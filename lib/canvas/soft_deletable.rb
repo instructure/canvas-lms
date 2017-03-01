@@ -18,10 +18,9 @@ module Canvas::SoftDeletable
     # `destroy` DOES throw errors due to `save!`
     alias_method :destroy_permanently!, :destroy
     def destroy
+      return true if deleted?
       self.workflow_state = 'deleted'
-      save!
-      run_callbacks :destroy
-      true
+      run_callbacks(:destroy) { save! }
     end
 
     # `restore` was taken by too many other methods...

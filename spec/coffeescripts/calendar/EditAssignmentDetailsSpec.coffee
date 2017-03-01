@@ -27,7 +27,7 @@ define [
   test "should initialize input with start date and time", ->
     instance = new EditAssignmentDetails('#fixtures', @event, null, null)
     $field = instance.$form.find(".datetime_field")
-    equal $field.val(), "Aug 7, 2015 5:00pm"
+    equal $field.val(), "Fri Aug 7, 2015 5:00pm"
 
   test "should have blank input when no start date", ->
     @event.startDate = -> null
@@ -39,22 +39,22 @@ define [
     @event.allDay = true
     instance = new EditAssignmentDetails('#fixtures', @event, null, null)
     $field = instance.$form.find(".datetime_field")
-    equal $field.val(), "Aug 7, 2015"
+    equal $field.val(), "Fri Aug 7, 2015"
 
   test "should treat start date as fudged", ->
     tz.changeZone(detroit, 'America/Detroit')
     instance = new EditAssignmentDetails('#fixtures', @event, null, null)
     $field = instance.$form.find(".datetime_field")
-    equal $field.val(), "Aug 7, 2015 1:00pm"
+    equal $field.val(), "Fri Aug 7, 2015 1:00pm"
 
   test "should localize start date", ->
     I18nStubber.pushFrame()
     tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
-    I18nStubber.stub 'fr_FR', 'date.formats.full': '%-d %b %Y %-k:%M'
+    I18nStubber.stub 'fr_FR', 'date.formats.full_with_weekday': '%a %-d %b %Y %-k:%M'
 
     instance = new EditAssignmentDetails('#fixtures', @event, null, null)
     $field = instance.$form.find(".datetime_field")
-    equal $field.val(), "7 août 2015 17:00"
+    equal $field.val(), "ven. 7 août 2015 17:00"
 
     I18nStubber.popFrame()

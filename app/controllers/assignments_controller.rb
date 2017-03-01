@@ -348,6 +348,8 @@ class AssignmentsController < ApplicationController
       @assignment.lti_context_id = secure_params[:lti_context_id]
     end
 
+    @assignment.quiz_lti! if params.key?(:quiz_lti)
+
     @assignment.workflow_state ||= "unpublished"
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
@@ -380,6 +382,7 @@ class AssignmentsController < ApplicationController
     elsif @context.feature_enabled?(:conditional_release) && params[:submission_types] == 'wiki_page'
       redirect_to new_polymorphic_url([@context, :wiki_page], index_edit_params)
     else
+      @assignment.quiz_lti! if params.key?(:quiz_lti)
       edit
     end
   end
@@ -483,52 +486,6 @@ class AssignmentsController < ApplicationController
       js_env(hash)
       conditional_release_js_env(@assignment)
       render :edit
-    end
-  end
-
-  def update
-    @assignment = @context.assignments.find(params[:id])
-    if authorized_action(@assignment, @current_user, :update)
-      assignment_params = params[:assignment] ? strong_assignment_params : []
-      assignment_params[:time_zone_edited] = Time.zone.name
-
-      @assignment.post_to_sis = assignment_params[:post_to_sis] if assignment_params.has_key?(:post_to_sis)
-      @assignment.updating_user = @current_user
-      if params[:assignment][:default_grade]
-        params[:assignment][:overwrite_existing_grades] = (params[:assignment][:overwrite_existing_grades] == "1")
-        @assignment.set_default_grade(params[:assignment])
-        render :json => @assignment.submissions.map{ |s| s.as_json(:include => :quiz_submission) }
-        return
-      end
-      params[:assignment].delete :default_grade
-      params[:assignment].delete :overwrite_existing_grades
-      if params[:publish]
-        @assignment.workflow_state = 'published'
-      end
-      if Assignment.assignment_type?(params[:assignment_type])
-        assignment_params[:submission_types] = Assignment.get_submission_type(params[:assignment_type])
-      end
-      respond_to do |format|
-        @assignment.content_being_saved_by(@current_user)
-        group = get_assignment_group(params[:assignment])
-        @assignment.assignment_group = group if group
-        if @assignment.update_attributes(assignment_params)
-          log_asset_access(@assignment, "assignments", @assignment_group, 'participate')
-          @assignment.context_module_action(@current_user, :contributed)
-          @assignment.reload
-          flash[:notice] = t 'notices.updated', "Assignment was successfully updated."
-          format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment) }
-          format.json do
-            render json: @assignment.as_json(
-              permissions: { user: @current_user, session: session },
-              include: [:quiz, :discussion_topic, :wiki_page]
-            ), status: :ok
-          end
-        else
-          format.html { render :edit }
-          format.json { render :json => @assignment.errors, :status => :bad_request }
-        end
-      end
     end
   end
 

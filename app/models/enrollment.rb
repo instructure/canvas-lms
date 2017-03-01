@@ -44,7 +44,7 @@ class Enrollment < ActiveRecord::Base
   has_many :role_overrides, :as => :context, :inverse_of => :context
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
-  has_many :scores, -> { active }, dependent: :destroy
+  has_many :scores, -> { active }
 
   validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state, :role_id
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
@@ -807,7 +807,7 @@ class Enrollment < ActiveRecord::Base
     if result
       self.user.try(:update_account_associations)
       self.user.touch
-      scores.destroy_all
+      scores.update_all(workflow_state: :deleted)
     end
     result
   end

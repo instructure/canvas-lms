@@ -3111,6 +3111,12 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def quiz_lti_tool
+    query = { tool_id: 'Quizzes 2' }
+    context_external_tools.active.find_by(query) ||
+      account.context_external_tools.active.find_by(query)
+  end
+
   private
 
   def effective_due_dates

@@ -42,7 +42,7 @@ define([
     }
   };
 
-  module('EffectiveDueDates.scopeToUser');
+  QUnit.module('EffectiveDueDates.scopeToUser');
 
   test('returns a map with effective due dates keyed to assignment ids', () => {
     const scopedDueDates = EffectiveDueDates.scopeToUser(exampleDueDatesData, '101');

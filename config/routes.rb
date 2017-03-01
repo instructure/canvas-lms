@@ -1219,6 +1219,9 @@ CanvasRails::Application.routes.draw do
       get 'users/:id/colors/:asset_string', controller: 'users', action: 'get_custom_color'
       put 'users/:id/colors/:asset_string', controller: 'users', action: 'set_custom_color'
 
+      get 'users/:id/new_user_tutorial_statuses', action: 'get_new_user_tutorial_statuses'
+      put 'users/:id/new_user_tutorial_statuses/:page_name', action: 'set_new_user_tutorial_status'
+
       get 'users/:id/dashboard_positions', controller: 'users', action: 'get_dashboard_positions'
       put 'users/:id/dashboard_positions', controller: 'users', action: 'set_dashboard_positions'
 
