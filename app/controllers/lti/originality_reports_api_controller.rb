@@ -79,7 +79,7 @@ module Lti
       }.freeze
     ].freeze
 
-    skip_before_action :require_user, :load_user
+    skip_before_action :load_user
     before_action :authorized_lti2_tool, :plagiarism_feature_flag_enabled
     before_action :attachment_in_context, only: [:create]
     before_action :report_in_context, only: [:update, :show]

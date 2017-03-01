@@ -22,8 +22,6 @@ module Lti
     class ToolSettingController < ApplicationController
       include Lti::ApiServiceHelper
 
-      skip_before_action :require_context
-      skip_before_action :require_user
       skip_before_action :load_user
       before_action :authenticate_api_call
 
