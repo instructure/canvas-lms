@@ -1,13 +1,10 @@
 if CANVAS_RAILS4_2
-  gem 'rails', '4.2.7.1', github: 'rails/rails', ref: 'bff1f05813d02a5ddb6caa74d64722b22648c397'
-    # for some reason bundler doesn't realize to lock these sub-gems to 4.2.7.1 automatically, and tries to use 5.0.1
-    gem 'activesupport', '4.2.7.1', github: 'rails/rails', ref: 'bff1f05813d02a5ddb6caa74d64722b22648c397'
-    gem 'actionpack', '4.2.7.1', github: 'rails/rails', ref: 'bff1f05813d02a5ddb6caa74d64722b22648c397'
+  gem 'rails', '4.2.8'
   gem 'rack', '1.6.5'
   gem 'activesupport-json_encoder', '1.1.0'
   gem 'oauth2', '1.0.0', require: false
 else
-  gem 'rails', '5.0.1', github: 'rails/rails', ref: '02c229f35185add4da377f8040e2aec5b92dddfe'
+  gem 'rails', '5.0.2rc1'
   gem 'rack', '2.0.1'
   gem 'oauth2', '1.2.0', require: false
 end
