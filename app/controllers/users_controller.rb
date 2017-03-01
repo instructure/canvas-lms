@@ -1343,7 +1343,7 @@ class UsersController < ApplicationController
       return render(json: { :message => "This endpoint only works against the current user" }, status: :unauthorized)
     end
 
-    valid_names = %w{home modules pages assignments}
+    valid_names = %w{home modules pages assignments quizzes}
 
     # Check if the page_name is valid
     unless valid_names.include?(params[:page_name])

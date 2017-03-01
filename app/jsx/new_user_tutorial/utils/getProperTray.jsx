@@ -3,8 +3,9 @@ define([
   '../trays/HomeTray',
   '../trays/ModulesTray',
   '../trays/PagesTray',
-  '../trays/AssignmentsTray'
-], (I18n, HomeTray, ModulesTray, PagesTray, AssignmentsTray) => {
+  '../trays/AssignmentsTray',
+  '../trays/QuizzesTray'
+], (I18n, HomeTray, ModulesTray, PagesTray, AssignmentsTray, QuizzesTray) => {
   const generateObject = (component, label, pageName) => ({
     component,
     label,
@@ -18,6 +19,8 @@ define([
       return generateObject(PagesTray, I18n.t('Pages Tutorial Tray'), 'pages');
     } else if (path.includes('assignments')) {
       return generateObject(AssignmentsTray, I18n.t('Assignments Tutorial Tray'), 'assignments');
+    } else if (path.includes('quizzes')) {
+      return generateObject(QuizzesTray, I18n.t('Quizzes Tutorial Tray'), 'quizzes');
     }
     return generateObject(HomeTray, I18n.t('Home Tutorial Tray'), 'home');
   }
