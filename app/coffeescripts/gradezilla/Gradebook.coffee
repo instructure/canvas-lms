@@ -61,6 +61,8 @@ define [
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
   'jsx/gradezilla/SISGradePassback/PostGradesApp'
   'jsx/gradezilla/SubmissionStateMap'
+  'jsx/gradezilla/shared/DownloadSubmissionsDialogManager'
+  'jsx/gradezilla/shared/ReuploadSubmissionsDialogManager'
   'jst/gradezilla/group_total_cell'
   'jst/gradezilla/row_student_name'
   'compiled/views/gradezilla/SectionMenuView'
@@ -90,8 +92,8 @@ define [
   NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, CurveGradesDialogManager,
   SetDefaultGradeDialogManager, AssignmentColumnHeader, AssignmentGroupColumnHeader, StudentColumnHeader,
   TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp,
-  SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView,
-  GradebookKeyboardNav, assignmentHelper) ->
+  SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GroupTotalCellTemplate,
+  RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper) ->
   IS_ADMIN = _.contains(ENV.current_user_roles, 'admin')
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
     component = React.createElement(reactClass, props, children)
@@ -581,6 +583,10 @@ define [
       @grid.setColumns(columns)
       # TODO: don't buildRows?
       @buildRows()
+
+    handleSubmissionsDownloading: (assignmentId) =>
+      @getAssignment(assignmentId).hasDownloadedSubmissions = true
+      @renderAssignmentColumnHeader(assignmentId)
 
     moveTotalColumn: =>
       @totalColumnInFront = not @totalColumnInFront
@@ -1750,6 +1756,12 @@ define [
       assignmentDetailsDialogManager = new AssignmentDetailsDialogManager(
         assignment, students, @contentLoadStates.submissionsLoaded
       )
+      downloadSubmissionsManager = new DownloadSubmissionsDialogManager(
+        assignment, @options.download_assignment_submissions_url, @handleSubmissionsDownloading
+      )
+      reuploadSubmissionsManager = new ReuploadSubmissionsDialogManager(
+        assignment, @options.re_upload_submissions_url
+      )
       curveGradesActionOptions =
         isAdmin: IS_ADMIN
         contextUrl: contextUrl
@@ -1784,6 +1796,12 @@ define [
           onSelect: setDefaultGradeDialogManager.showDialog
         students: students
         submissionsLoaded: @contentLoadStates.submissionsLoaded
+        downloadSubmissionsAction:
+          hidden: !downloadSubmissionsManager.isDialogEnabled()
+          onSelect: downloadSubmissionsManager.showDialog
+        reuploadSubmissionsAction:
+          hidden: !reuploadSubmissionsManager.isDialogEnabled()
+          onSelect: reuploadSubmissionsManager.showDialog
       }
 
     renderAssignmentColumnHeader: (assignmentId) =>

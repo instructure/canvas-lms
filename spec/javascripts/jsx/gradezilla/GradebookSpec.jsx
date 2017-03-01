@@ -1145,6 +1145,20 @@ define([
     equal(typeof props.setDefaultGradeAction.onSelect, 'function', 'props include "onSelect"');
   });
 
+  test('includes props for the Download Submissions action', function () {
+    const props = this.createGradebook().getAssignmentColumnHeaderProps('201');
+    ok(props.downloadSubmissionsAction, 'Download Submissions action config is present');
+    ok('hidden' in props.downloadSubmissionsAction, 'props include "hidden"');
+    equal(typeof props.downloadSubmissionsAction.onSelect, 'function', 'props include "onSelect"');
+  });
+
+  test('includes props for the Reupload Submissions action', function () {
+    const props = this.createGradebook().getAssignmentColumnHeaderProps('201');
+    ok(props.reuploadSubmissionsAction, 'Reupload Submissions action config is present');
+    ok('hidden' in props.reuploadSubmissionsAction, 'props include "hidden"');
+    equal(typeof props.reuploadSubmissionsAction.onSelect, 'function', 'props include "onSelect"');
+  });
+
   QUnit.module('Gradebook#getAssignmentGroupColumnHeaderProps', {
     createGradebook (options = {}) {
       const gradebook = createGradebook({

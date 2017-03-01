@@ -68,6 +68,14 @@ define([
       setDefaultGradeAction: shape({
         disabled: bool.isRequired,
         onSelect: func.isRequired
+      }).isRequired,
+      downloadSubmissionsAction: shape({
+        hidden: bool.isRequired,
+        onSelect: func.isRequired
+      }).isRequired,
+      reuploadSubmissionsAction: shape({
+        hidden: bool.isRequired,
+        onSelect: func.isRequired
       }).isRequired
     };
 
@@ -158,6 +166,34 @@ define([
       );
     }
 
+    renderDownloadSubmissionsAction () {
+      if (this.props.downloadSubmissionsAction.hidden) {
+        return null;
+      }
+
+      return (
+        <MenuItem
+          onSelect={this.props.downloadSubmissionsAction.onSelect}
+        >
+          <span data-menu-item-id="download-submissions">{I18n.t('Download Submissions')}</span>
+        </MenuItem>
+      );
+    }
+
+    renderReuploadSubmissionsAction () {
+      if (this.props.reuploadSubmissionsAction.hidden) {
+        return null;
+      }
+
+      return (
+        <MenuItem
+          onSelect={this.props.reuploadSubmissionsAction.onSelect}
+        >
+          <span data-menu-item-id="reupload-submissions">{I18n.t('Re-Upload Submissions')}</span>
+        </MenuItem>
+      );
+    }
+
     render () {
       return (
         <div className="Gradebook__ColumnHeaderContent">
@@ -167,7 +203,6 @@ define([
               {this.renderPointsPossible()}
             </Typography>
           </span>
-
           <PopoverMenu zIndex="9999" trigger={this.renderTrigger()}>
             <MenuItem
               disabled={this.props.assignmentDetailsAction.disabled}
@@ -193,6 +228,8 @@ define([
             >
               <span data-menu-item-id="set-default-grade">{I18n.t('Set Default Grade')}</span>
             </MenuItem>
+            {this.renderDownloadSubmissionsAction()}
+            {this.renderReuploadSubmissionsAction()}
           </PopoverMenu>
         </div>
       );

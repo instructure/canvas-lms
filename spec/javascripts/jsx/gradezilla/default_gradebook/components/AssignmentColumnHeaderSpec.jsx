@@ -74,7 +74,15 @@ define([
         assignment: createAssignmentProp(),
         assignmentDetailsAction: {
           disabled: false,
-          onSelect: this.stub()
+          onSelect () {},
+        },
+        downloadSubmissionsAction: {
+          hidden: true,
+          onSelect () {}
+        },
+        reuploadSubmissionsAction: {
+          hidden: true,
+          onSelect () {}
         },
         curveGradesAction: {
           isDisabled: false,
@@ -155,6 +163,14 @@ define([
           disabled: false,
           onSelect: () => {}
         },
+        downloadSubmissionsAction: {
+          hidden: true,
+          onSelect () {}
+        },
+        reuploadSubmissionsAction: {
+          hidden: true,
+          onSelect () {}
+        },
         students: createStudentsProp(),
         submissionsLoaded: true
       };
@@ -206,6 +222,8 @@ define([
           curveGradesAction={{ isDisabled, onSelect }}
           setDefaultGradeAction={{ disabled: false, onSelect: () => {} }}
           students={createStudentsProp()}
+          downloadSubmissionsAction={{ hidden: true, onSelect () {} }}
+          reuploadSubmissionsAction={{ disabled: true, hidden: true, onSelect () {} }}
           submissionsLoaded
         />
       );
@@ -258,6 +276,14 @@ define([
         setDefaultGradeAction: {
           disabled: false,
           onSelect: () => {}
+        },
+        downloadSubmissionsAction: {
+          hidden: true,
+          onSelect () {}
+        },
+        reuploadSubmissionsAction: {
+          hidden: true,
+          onSelect () {}
         },
         students: createStudentsProp(),
         submissionsLoaded: true
@@ -313,6 +339,14 @@ define([
         setDefaultGradeAction: {
           disabled: false,
           onSelect: () => {}
+        },
+        downloadSubmissionsAction: {
+          hidden: true,
+          onSelect () {}
+        },
+        reuploadSubmissionsAction: {
+          hidden: true,
+          onSelect () {}
         },
         students: [],
         submissionsLoaded: false
@@ -386,6 +420,14 @@ define([
         setDefaultGradeAction: {
           disabled: false,
           onSelect: this.onSelect
+        },
+        downloadSubmissionsAction: {
+          hidden: true,
+          onSelect () {}
+        },
+        reuploadSubmissionsAction: {
+          hidden: true,
+          onSelect () {}
         }
       };
     },
@@ -402,12 +444,11 @@ define([
     const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
 
     equal(specificMenuItem.textContent, 'Set Default Grade');
-    notOk(specificMenuItem.parentElement.getAttribute('aria-disabled'));
+    strictEqual(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'), null);
   });
 
   test('disables the menu item when the disabled prop is true', function () {
     this.props.setDefaultGradeAction.disabled = true;
-
     this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
     this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
 
@@ -425,5 +466,136 @@ define([
     specificMenuItem.click();
 
     equal(this.onSelect.callCount, 1);
+  });
+
+  QUnit.module('AssignmentColumnHeader - Download Submissions Action', {
+    setup () {
+      this.props = {
+        assignment: createAssignmentProp(),
+        students: createStudentsProp(),
+        submissionsLoaded: true,
+        assignmentDetailsAction: {
+          disabled: false,
+          onSelect () {},
+        },
+        curveGradesAction: {
+          isDisabled: false,
+          onSelect () {}
+        },
+        setDefaultGradeAction: {
+          disabled: false,
+          onSelect: () => {}
+        },
+        downloadSubmissionsAction: {
+          hidden: false,
+          onSelect: this.stub()
+        },
+        reuploadSubmissionsAction: {
+          hidden: true,
+          onSelect () {}
+        }
+      };
+    },
+
+    teardown () {
+      this.renderOutput.unmount();
+    }
+  });
+
+  test('shows the menu item in an enabled state', function () {
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="download-submissions"]');
+
+    equal(specificMenuItem.textContent, 'Download Submissions');
+    notOk(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'));
+  });
+
+  test('does not render the menu item when the hidden prop is true', function () {
+    this.props.downloadSubmissionsAction.hidden = true;
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="download-submissions"]');
+
+    equal(specificMenuItem, null);
+  });
+
+  test('clicking the menu item invokes the onSelect handler', function () {
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="download-submissions"]');
+
+    specificMenuItem.click();
+
+    equal(this.props.downloadSubmissionsAction.onSelect.callCount, 1);
+  });
+
+  QUnit.module('AssignmentColumnHeader - Reupload Submissions Action', {
+    setup () {
+      this.props = {
+        assignment: createAssignmentProp(),
+        students: createStudentsProp(),
+        submissionsLoaded: true,
+        assignmentDetailsAction: {
+          disabled: false,
+          onSelect () {},
+        },
+        curveGradesAction: {
+          isDisabled: false,
+          onSelect () {}
+        },
+        setDefaultGradeAction: {
+          disabled: false,
+          onSelect: () => {}
+        },
+        downloadSubmissionsAction: {
+          hidden: true,
+          onSelect () {}
+        },
+        reuploadSubmissionsAction: {
+          hidden: false,
+          onSelect: this.stub()
+        }
+      };
+    },
+
+    teardown () {
+      this.renderOutput.unmount();
+    }
+  });
+
+  test('shows the menu item in an enabled state', function () {
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="reupload-submissions"]');
+
+    equal(specificMenuItem.textContent, 'Re-Upload Submissions');
+    strictEqual(specificMenuItem.parentElement.getAttribute('aria-disabled'), null);
+  });
+
+  test('does not render the menu item when the hidden prop is true', function () {
+    this.props.reuploadSubmissionsAction.hidden = true;
+
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="reupload-submissions"]');
+
+    equal(specificMenuItem, null);
+  });
+
+  test('clicking the menu item invokes the onSelect property', function () {
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="reupload-submissions"]');
+
+    specificMenuItem.click();
+
+    strictEqual(this.props.reuploadSubmissionsAction.onSelect.callCount, 1);
   });
 });
