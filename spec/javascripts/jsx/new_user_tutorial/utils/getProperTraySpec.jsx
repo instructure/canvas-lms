@@ -4,8 +4,9 @@ define([
   'jsx/new_user_tutorial/trays/ModulesTray',
   'jsx/new_user_tutorial/trays/PagesTray',
   'jsx/new_user_tutorial/trays/AssignmentsTray',
-  'jsx/new_user_tutorial/trays/QuizzesTray'
-], (getProperTray, HomeTray, ModulesTray, PagesTray, AssignmentsTray, QuizzesTray) => {
+  'jsx/new_user_tutorial/trays/QuizzesTray',
+  'jsx/new_user_tutorial/trays/SettingsTray'
+], (getProperTray, HomeTray, ModulesTray, PagesTray, AssignmentsTray, QuizzesTray, SettingsTray) => {
   QUnit.module('getProperTray test');
 
   test('if no match is in the path argument returns the HomeTray', () => {
@@ -40,5 +41,12 @@ define([
     equal(trayObj.component, QuizzesTray, 'component matches');
 
     equal(trayObj.label, 'Quizzes Tutorial Tray', 'label matches');
+  });
+
+  test('if settings is in the path argument returns the SettingsTray', () => {
+    const trayObj = getProperTray('/courses/3/settings/');
+    equal(trayObj.component, SettingsTray, 'component matches');
+
+    equal(trayObj.label, 'Settings Tutorial Tray', 'label matches');
   });
 });
