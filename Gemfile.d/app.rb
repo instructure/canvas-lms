@@ -46,8 +46,8 @@ gem 'highline', '1.7.8', require: false
 gem 'httparty', '0.14.0'
 gem 'i18n', '0.7.0'
 gem 'i18nliner', '0.0.12'
-  gem 'ruby2ruby', '2.0.8', require: false
-  gem 'ruby_parser', '3.8.3', require: false
+  gem 'ruby2ruby', '2.3.1', require: false
+  gem 'ruby_parser', '3.8.4', require: false
 gem 'icalendar', '1.5.4', require: false
 gem 'ims-lti', '2.1.0.beta.4', require: 'ims'
 gem 'json', '2.0.3'
