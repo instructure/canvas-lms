@@ -545,6 +545,19 @@
       "version": "3.7.0",
       "from": "js-yaml>=3.5.5 <3.7.1",
       "resolved": "https://registry.npmjs.org/js-yaml/-/js-yaml-3.7.0.tgz"
+    },
+    {
+    "name": "coffee-loader": {
+      "version": "0.7.2",
+      "from": "coffee-loader@0.7.2",
+      "resolved": "https://registry.npmjs.org/coffee-loader/-/coffee-loader-0.7.2.tgz",
+      "dependencies": {
+        "loader-utils": {
+          "version": "0.2.16",
+          "from": "loader-utils@0.2.16",
+          "resolved": "https://registry.npmjs.org/loader-utils/-/loader-utils-0.2.16.tgz"
+        }
+      }    
     }
   }
 }
