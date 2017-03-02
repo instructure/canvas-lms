@@ -37,23 +37,14 @@ define([
       return searchText.length >= MIN_SEACH ? searchText : ''
     }
 
-    hasChanged () {
-      const { search, term, subAccount } = this.state
-      return search !== this.getSearchText()
-          || term !== this.termInput.value
-          || subAccount !== this.subAccountInput.value
-    }
-
     onChange = () => {
-      if (this.hasChanged()) {
-        this.setState({
-          search: this.getSearchText(),
-          term: this.termInput.value,
-          subAccount: this.subAccountInput.value,
-        }, () => {
-          this.props.onChange(this.state)
-        })
-      }
+      this.setState({
+        search: this.getSearchText(),
+        term: this.termInput.value,
+        subAccount: this.subAccountInput.value,
+      }, () => {
+        this.props.onChange(this.state)
+      })
     }
 
     render () {
@@ -93,10 +84,10 @@ define([
                   key="subAccounts"
                   onChange={this.onChange}
                   label={
-                    <ScreenReaderContent>{I18n.t('Select Subaccount')}</ScreenReaderContent>
+                    <ScreenReaderContent>{I18n.t('Select Sub-Account')}</ScreenReaderContent>
                   }
                 >
-                  <option key="all" value="">{I18n.t('Any Subaccount')}</option>
+                  <option key="all" value="">{I18n.t('Any Sub-Account')}</option>
                   {this.props.subAccounts.map(account => (
                     <option key={account.id} value={account.id}>{account.name}</option>
                   ))}

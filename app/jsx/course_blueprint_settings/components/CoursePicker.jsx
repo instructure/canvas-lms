@@ -1,5 +1,6 @@
 define([
   'i18n!blueprint_config',
+  'jquery',
   'react',
   'instructure-ui/ToggleDetails',
   'instructure-ui/Typography',
@@ -7,12 +8,14 @@ define([
   '../propTypes',
   './CourseFilter',
   './CoursePickerTable',
-], (I18n, React, {default: ToggleDetails}, {default: Typography}, {default: Spinner}, propTypes, CourseFilter, CoursePickerTable) => {
-  const { func, bool } = React.PropTypes
+  'compiled/jquery.rails_flash_notifications',
+], (I18n, $, React, {default: ToggleDetails}, {default: Typography}, {default: Spinner}, propTypes, CourseFilter, CoursePickerTable) => {
+  const { func, bool, arrayOf, string } = React.PropTypes
 
   return class CoursePicker extends React.Component {
     static propTypes = {
       courses: propTypes.courseList.isRequired,
+      excludeCourses: arrayOf(string),
       terms: propTypes.termList.isRequired,
       subAccounts: propTypes.accountList.isRequired,
       loadCourses: func.isRequired,
@@ -22,6 +25,7 @@ define([
     }
 
     static defaultProps = {
+      excludeCourses: [],
       onSelectedChanged: () => {},
       isExpanded: true,
     }
@@ -30,7 +34,26 @@ define([
       super(props)
       this.state = {
         isExpanded: props.isExpanded,
+        announceChanges: false,
       }
+    }
+
+    componentWillReceiveProps (nextProps) {
+      if (this.state.announceChanges && !this.props.isLoadingCourses && nextProps.isLoadingCourses) {
+        $.screenReaderFlashMessage(I18n.t('Loading courses started'))
+      }
+
+      if (this.state.announceChanges && this.props.isLoadingCourses && !nextProps.isLoadingCourses) {
+        this.setState({ announceChanges: false })
+        $.screenReaderFlashMessage(I18n.t({
+          one: 'Loading courses complete: one course found',
+          other: 'Loading courses complete: %{count} courses found'
+        }, { count: nextProps.courses.length }))
+      }
+    }
+
+    reloadCourses () {
+      this.props.loadCourses(this.state.filters)
     }
 
     onSelectedChanged = (selected) => {
@@ -45,10 +68,13 @@ define([
       this.setState({
         filters,
         isExpanded: true,
+        announceChanges: true,
       })
     }
 
     render () {
+      const courses = this.props.courses.filter(course => !this.props.excludeCourses.includes(course.id))
+
       return (
         <div className="bps-course-picker">
           <CourseFilter
@@ -63,7 +89,7 @@ define([
                 <Spinner title={I18n.t('Loading Courses')} />
               </div>)}
               <CoursePickerTable
-                courses={this.props.courses}
+                courses={courses}
                 onSelectedChanged={this.onSelectedChanged}
               />
             </ToggleDetails>

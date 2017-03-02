@@ -107,18 +107,10 @@ define([
               }
             />
           </td>
-          <td>
-            {this.renderCellText(course.name)}
-          </td>
-          <td>
-            {this.renderCellText(course.course_code)}
-          </td>
-          <td>
-            {this.renderCellText(course.term.name)}
-          </td>
-          <td>
-            {this.renderCellText(course.sis_course_id)}
-          </td>
+          <td>{this.renderCellText(course.name)}</td>
+          <td>{this.renderCellText(course.course_code)}</td>
+          <td>{this.renderCellText(course.term.name)}</td>
+          <td>{this.renderCellText(course.sis_course_id)}</td>
           <td>
             {this.renderCellText(course.teachers.map(teacher => teacher.display_name).join(', '))}
           </td>

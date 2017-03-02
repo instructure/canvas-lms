@@ -1116,7 +1116,7 @@ class CoursesController < ApplicationController
   def blueprint_settings
     get_context
     if authorized_action(@context.account, @current_user, :manage_master_courses)
-      if master_courses?
+      if master_courses? && MasterCourses::MasterTemplate.is_master_course?(@context)
         js_env({
           accountId: @context.account.id,
           course: @context.slice(:id, :name),

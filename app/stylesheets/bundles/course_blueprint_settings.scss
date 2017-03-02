@@ -2,6 +2,26 @@
 
 .bps__wrapper {
   max-width: 850px;
+  position: relative;
+}
+
+.bps__overlay {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,.85);
+  text-align: center;
+}
+
+.bps__overlay__save {
+  padding-top: 100px;
+}
+
+.bps__footer {
+  display: flex; justify-content: flex-end; flex: 0 0 auto;
 }
 
 .bps-course-filter {
@@ -96,6 +116,8 @@
 .bps-associations-table {
   padding-left: 10px;
   margin-bottom: 40px;
+  position: relative;
+  min-height: 75px;
 
   .bps-associations__course-row {
     form {

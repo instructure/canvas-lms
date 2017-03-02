@@ -9,9 +9,19 @@ define([
 
   const defaultProps = () => ({
     courses: [],
+    existingAssociations: [],
+    addedAssociations: [],
+    removedAssociations: [],
     errors: [],
+    addAssociations: () => {},
+    removeAssociations: () => {},
+    cancel: () => {},
     loadCourses: () => {},
+    loadAssociations: () => {},
+    saveAssociations: () => {},
     isLoadingCourses: false,
+    isLoadingAssociations: false,
+    isSavingAssociations: false,
     subAccounts: data.subAccounts,
     terms: data.terms,
   })

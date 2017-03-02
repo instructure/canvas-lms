@@ -16,19 +16,27 @@ define([
         terms: ENV.terms,
         subAccounts: ENV.subAccounts,
       })
+
       const boundActions = bindActionCreators(actions, this.store.dispatch)
 
-      this.ConnectedApp = connect((state) => {
-        const props = [
+      this.ConnectedApp = connect(state =>
+        [
+          'existingAssociations',
+          'addedAssociations',
+          'removedAssociations',
           'courses',
           'terms',
           'subAccounts',
           'errors',
           'isLoadingCourses',
-        ].reduce((propSet, prop) => Object.assign(propSet, { [prop]: state[prop] }), {})
-        props.loadCourses = boundActions.loadCourses
-        return props
-      })(BlueprintSettings)
+          'isLoadingAssociations',
+          'isSavingAssociations',
+        ].reduce((propSet, prop) => Object.assign(propSet, { [prop]: state[prop] }), {}),
+      () => boundActions)(BlueprintSettings)
+
+      // load initial data
+      boundActions.loadCourses()
+      boundActions.loadAssociations()
     }
 
     unmount () {
