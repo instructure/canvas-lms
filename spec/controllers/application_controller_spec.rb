@@ -562,7 +562,7 @@ describe ApplicationController do
     end
 
     before :each do
-      controller.stubs(:request).returns(ActionDispatch::TestRequest.new)
+      controller.stubs(:request).returns(CANVAS_RAILS4_2 ? ActionDispatch::TestRequest.new : ActionDispatch::TestRequest.create)
       controller.instance_variable_set(:@context, @course)
     end
 

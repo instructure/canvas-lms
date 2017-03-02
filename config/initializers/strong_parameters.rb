@@ -43,7 +43,7 @@ module ArbitraryStrongishParams
   end
 
   def recursive_arbitrary_filter(value)
-    if value.is_a?(Hash)
+    if value.is_a?(Hash) || value.is_a?(ActionController::Parameters)
       hash = {}
       value.each do |k, v|
         hash[k] = recursive_arbitrary_filter(v) if permitted_scalar?(k)

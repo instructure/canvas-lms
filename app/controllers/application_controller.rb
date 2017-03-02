@@ -541,7 +541,7 @@ class ApplicationController < ActionController::Base
       format.html {
         return unless fix_ms_office_redirects
         store_location
-        return redirect_to login_url(params.slice(:authentication_provider)) if !@files_domain && !@current_user
+        return redirect_to login_url(params.permit(:authentication_provider)) if !@files_domain && !@current_user
 
         if @context.is_a?(Course) && @context_enrollment
           if @context_enrollment.inactive?
