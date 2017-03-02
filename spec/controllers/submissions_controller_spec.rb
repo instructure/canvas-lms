@@ -489,6 +489,25 @@ describe SubmissionsController do
       expect(@submission.reload.student_entered_score).to eq 2.0
     end
 
+    it 'changing student_entered_grade for a quiz does not change the workflow_state of a submission' do
+      course_with_student_logged_in(active_all: true)
+      assignment = @course.assignments.create!
+      assignment.workflow_state = :published
+      assignment.submission_types = :online_quiz
+      assignment.save!
+      quiz = Quizzes::Quiz.find_by(assignment_id: assignment)
+      quiz_submission = quiz.generate_submission(@user).complete!
+      quiz_submission.update_column(:workflow_state, :pending_review)
+      put(
+        :update,
+        course_id: @course.id,
+        assignment_id: assignment.id,
+        id: @user.id,
+        submission: { student_entered_score: 2 }
+      )
+      expect(quiz_submission.submission.reload).not_to be_pending_review
+    end
+
     context "moderated grading" do
       before :once do
         course_with_student(:active_all => true)
