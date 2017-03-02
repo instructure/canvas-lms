@@ -17,9 +17,23 @@ module Exporters
       # quiz from the view, which is not hooked up yet
     end
 
+    def build_assignment_payload
+      external_tool_tag = @assignment.external_tool_tag
+      {
+        assignment: {
+          resource_link_id: ContextExternalTool.opaque_identifier_for(
+            external_tool_tag, @assignment.shard
+          ),
+          title: @quiz.title,
+          context_title: @quiz.context.name,
+          context_type: 'external_url',
+          context_id: @quiz.context_id
+        }
+      }
+    end
+
     def export
       begin
-        trigger_import
         create_assignment
       rescue
         add_error(I18n.t("Error running Quizzes 2 export."), $ERROR_INFO)
@@ -29,25 +43,6 @@ module Exporters
     end
 
     private
-
-    def build_assignment_payload
-      assignment_title = @quiz.title
-      {
-        assignment: {
-          title: assignment_title
-        }
-      }
-      # TO-DO: Payload should look like the example below
-      # {
-      #   assignment: {
-      #     title: @quiz.title
-      #     resouce_link_id: "SHA from Assignment Creation"
-      #     qti_export: {
-      #       content_url: "Endpoint for the export"
-      #     }
-      #   }
-      # }
-    end
 
     def assignment_group
       @assignment_group ||=
@@ -71,11 +66,7 @@ module Exporters
       assignment_params[:post_to_sis] = quiz.assignment.post_to_sis if post_to_sis
       assignment = course.assignments.create(assignment_params)
       assignment.quiz_lti! && assignment.save!
-    end
-
-    def trigger_import
-      build_assignment_payload
-      # TO-DO: Queue the Live Event here
+      @assignment = assignment
     end
   end
 end

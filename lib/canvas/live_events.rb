@@ -353,4 +353,9 @@ module Canvas::LiveEvents
       level: level
     })
   end
+
+  def self.quiz_export_complete(content_export)
+    payload = content_export.settings[:quizzes2]
+    post_event_stringified('quiz_export_complete', payload)
+  end
 end

@@ -1,5 +1,6 @@
 class LiveEventsObserver < ActiveRecord::Observer
-  observe :course,
+  observe :content_export,
+          :course,
           :discussion_entry,
           :discussion_topic,
           :enrollment,
@@ -19,6 +20,12 @@ class LiveEventsObserver < ActiveRecord::Observer
     changes = obj.changes
     obj.class.connection.after_transaction_commit do
     case obj
+    when ContentExport
+      if obj.quizzes2_export? && changes["workflow_state"]
+        if obj.workflow_state == "exported"
+          Canvas::LiveEvents.quiz_export_complete(obj)
+        end
+      end
     when Course
       if changes["syllabus_body"]
         Canvas::LiveEvents.course_syllabus_updated(obj, changes["syllabus_body"].first)

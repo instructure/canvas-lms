@@ -194,6 +194,7 @@ class ContentExport < ActiveRecord::Base
 
       @quizzes2 = Exporters::Quizzes2Exporter.new(self)
       if @quizzes2.export
+        self.settings[:quizzes2] = @quizzes2.build_assignment_payload
         self.progress = 100
         mark_exported
       end

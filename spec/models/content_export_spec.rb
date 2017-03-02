@@ -65,6 +65,13 @@ describe ContentExport do
     before :once do
       course = Account.default.courses.create!
       quiz = course.quizzes.create!(:title => 'quiz1')
+      Account.default.context_external_tools.create!(
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
+      )
       @ce = course.content_exports.create!(
         :export_type => ContentExport::QUIZZES2,
         :selected_content => quiz.id
