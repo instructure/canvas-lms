@@ -20,9 +20,8 @@ define [
 
   class SetDefaultGradeDialog
     constructor: ({@assignment, @students, @context_id, @selected_section}) ->
-      @initDialog()
 
-    initDialog: =>
+    show: =>
       templateLocals =
         assignment: @assignment
         showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"

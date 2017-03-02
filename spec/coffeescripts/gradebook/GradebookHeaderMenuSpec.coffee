@@ -247,7 +247,7 @@ define [
         }
       }
       @spy($, 'flashError')
-      @dialogStub = @stub SetDefaultGradeDialog.prototype, 'initDialog'
+      @dialogStub = @stub SetDefaultGradeDialog.prototype, 'show'
 
     teardown: ->
       fakeENV.teardown()

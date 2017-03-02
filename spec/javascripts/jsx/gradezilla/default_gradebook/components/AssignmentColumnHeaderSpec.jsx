@@ -22,7 +22,7 @@ define([
   'enzyme',
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader',
 ], (React, TestUtils, { mount }, AssignmentColumnHeader) => {
-  function assignmentProps () {
+  function createAssignmentProp () {
     return {
       courseId: '42',
       htmlUrl: 'http://assignment_htmlUrl',
@@ -36,7 +36,7 @@ define([
     };
   }
 
-  function studentProps () {
+  function createStudentsProp () {
     return [
       {
         id: '11',
@@ -71,7 +71,7 @@ define([
   QUnit.module('AssignmentColumnHeader - base behavior', {
     setup () {
       const props = {
-        assignment: assignmentProps(),
+        assignment: createAssignmentProp(),
         assignmentDetailsAction: {
           disabled: false,
           onSelect: this.stub()
@@ -80,7 +80,11 @@ define([
           isDisabled: false,
           onSelect: () => {}
         },
-        students: studentProps(),
+        setDefaultGradeAction: {
+          disabled: false,
+          onSelect: () => {}
+        },
+        students: createStudentsProp(),
         submissionsLoaded: true
       };
       this.wrapper = mount(<AssignmentColumnHeader {...props} />);
@@ -96,10 +100,10 @@ define([
     const expectedLinkProps = {
       children: [
         undefined,
-        assignmentProps().name
+        createAssignmentProp().name
       ],
       title: undefined,
-      href: assignmentProps().htmlUrl
+      href: createAssignmentProp().htmlUrl
     };
 
     equal(actualElements.length, 1);
@@ -135,7 +139,7 @@ define([
     setup () {
       this.onSelectStub = this.stub();
       this.props = {
-        assignment: assignmentProps(),
+        assignment: createAssignmentProp(),
         assignmentDetailsAction: {
           disabled: false,
           onSelect: this.onSelectStub
@@ -144,7 +148,11 @@ define([
           isDisabled: false,
           onSelect: () => {}
         },
-        students: studentProps(),
+        setDefaultGradeAction: {
+          disabled: false,
+          onSelect: () => {}
+        },
+        students: createStudentsProp(),
         submissionsLoaded: true
       };
     },
@@ -190,10 +198,11 @@ define([
     setupAndClick ({isDisabled = false, onSelect = () => {}} = {}) {
       this.wrapper = mount(
         <AssignmentColumnHeader
-          assignment={assignmentProps()}
+          assignment={createAssignmentProp()}
           assignmentDetailsAction={{ disabled: false, onSelect: () => {} }}
           curveGradesAction={{ isDisabled, onSelect }}
-          students={studentProps()}
+          setDefaultGradeAction={{ disabled: false, onSelect: () => {} }}
+          students={createStudentsProp()}
           submissionsLoaded
         />
       );
@@ -234,16 +243,20 @@ define([
   QUnit.module('AssignmentColumnHeader - Message Students Who Menu', {
     setup () {
       this.props = {
-        assignment: assignmentProps(),
+        assignment: createAssignmentProp(),
         assignmentDetailsAction: {
           disabled: false,
-          onSelect: this.stub()
+          onSelect: () => {}
         },
         curveGradesAction: {
           isDisabled: false,
           onSelect: () => {}
         },
-        students: studentProps(),
+        setDefaultGradeAction: {
+          disabled: false,
+          onSelect: () => {}
+        },
+        students: createStudentsProp(),
         submissionsLoaded: true
       };
     },
@@ -283,15 +296,19 @@ define([
 
   QUnit.module('AssignmentColumnHeader - non-standard assignment', {
     setup () {
-      this.assignment = assignmentProps();
+      this.assignment = createAssignmentProp();
       this.props = {
         assignment: this.assignment,
         assignmentDetailsAction: {
           disabled: false,
-          onSelect: this.stub()
+          onSelect: () => {}
         },
         curveGradesAction: {
           isDisabled: false,
+          onSelect: () => {}
+        },
+        setDefaultGradeAction: {
+          disabled: false,
           onSelect: () => {}
         },
         students: [],
@@ -346,5 +363,64 @@ define([
     deepEqual(actualLinkElements.props().title, expectedLinkTitle);
     equal(actualIconElements.length, 1);
     equal(actualIconElements.props().title, expectedLinkTitle);
+  });
+
+  QUnit.module('AssignmentColumnHeader - Set Default Grade Action', {
+    setup () {
+      this.onSelect = this.stub();
+      this.props = {
+        assignment: createAssignmentProp(),
+        students: createStudentsProp(),
+        submissionsLoaded: true,
+        assignmentDetailsAction: {
+          disabled: false,
+          onSelect: () => {}
+        },
+        curveGradesAction: {
+          isDisabled: false,
+          onSelect: () => {}
+        },
+        setDefaultGradeAction: {
+          disabled: false,
+          onSelect: this.onSelect
+        }
+      };
+    },
+
+    teardown () {
+      this.renderOutput.unmount();
+    }
+  });
+
+  test('shows the menu item in an enabled state', function () {
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('PopoverMenu').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
+
+    equal(specificMenuItem.textContent, 'Set Default Grade');
+    notOk(specificMenuItem.parentElement.getAttribute('aria-disabled'));
+  });
+
+  test('disables the menu item when the disabled prop is true', function () {
+    this.props.setDefaultGradeAction.disabled = true;
+
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('PopoverMenu').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
+
+    equal(specificMenuItem.parentElement.getAttribute('aria-disabled'), 'true');
+  });
+
+  test('clicking the menu item invokes the onSelect handler', function () {
+    this.renderOutput = mount(<AssignmentColumnHeader {...this.props} />);
+    this.renderOutput.find('PopoverMenu').simulate('click');
+
+    const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
+
+    specificMenuItem.click();
+
+    equal(this.onSelect.callCount, 1);
   });
 });

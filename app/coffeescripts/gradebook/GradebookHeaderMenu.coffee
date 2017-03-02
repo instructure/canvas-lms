@@ -146,7 +146,7 @@ define [
       selected_section: @gradebook.sectionToShow
     }) =>
       if isAdmin() or not opts.assignment.inClosedGradingPeriod
-        new SetDefaultGradeDialog(opts)
+        new SetDefaultGradeDialog(opts).show()
       else
         $.flashError(I18n.t("Unable to set default grade because this " +
           "assignment is due in a closed grading period for at least one student"))

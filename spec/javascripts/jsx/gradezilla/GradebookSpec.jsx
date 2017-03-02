@@ -994,7 +994,8 @@ define([
       fakeENV.setup({
         GRADEBOOK_OPTIONS: {
           context_url: 'http://contextUrl/'
-        }
+        },
+        current_user_roles: []
       });
       this.$mountPoint = document.createElement('div');
       $fixtures.appendChild(this.$mountPoint);
@@ -1105,7 +1106,8 @@ define([
       fakeENV.setup({
         GRADEBOOK_OPTIONS: {
           context_url: 'http://contextUrl/'
-        }
+        },
+        current_user_roles: []
       });
     },
 
@@ -1134,6 +1136,13 @@ define([
     ok(props.assignmentDetailsAction, 'Assignment Details action config is present');
     ok('disabled' in props.assignmentDetailsAction, 'props include "disabled"');
     equal(typeof props.assignmentDetailsAction.onSelect, 'function', 'props include "onSelect"');
+  });
+
+  test('includes props for the Set Default Grade action', function () {
+    const props = this.createGradebook().getAssignmentColumnHeaderProps('201');
+    ok(props.setDefaultGradeAction, 'Set Default Grade action config is present');
+    ok('disabled' in props.setDefaultGradeAction, 'props include "disabled"');
+    equal(typeof props.setDefaultGradeAction.onSelect, 'function', 'props include "onSelect"');
   });
 
   QUnit.module('Gradebook#getAssignmentGroupColumnHeaderProps', {

@@ -64,6 +64,10 @@ define([
       assignmentDetailsAction: shape({
         disabled: bool.isRequired,
         onSelect: func.isRequired
+      }).isRequired,
+      setDefaultGradeAction: shape({
+        disabled: bool.isRequired,
+        onSelect: func.isRequired
       }).isRequired
     };
 
@@ -182,6 +186,12 @@ define([
               onSelect={this.props.curveGradesAction.onSelect}
             >
               <span data-menu-item-id="curve-grades">{I18n.t('Curve Grades')}</span>
+            </MenuItem>
+            <MenuItem
+              disabled={this.props.setDefaultGradeAction.disabled}
+              onSelect={this.props.setDefaultGradeAction.onSelect}
+            >
+              <span data-menu-item-id="set-default-grade">{I18n.t('Set Default Grade')}</span>
             </MenuItem>
           </PopoverMenu>
         </div>

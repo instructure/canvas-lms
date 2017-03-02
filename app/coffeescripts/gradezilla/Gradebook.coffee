@@ -50,6 +50,7 @@ define [
   'str/htmlEscape'
   'jsx/gradezilla/shared/AssignmentDetailsDialogManager',
   'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
+  'jsx/gradezilla/shared/SetDefaultGradeDialogManager'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
@@ -87,9 +88,9 @@ define [
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
   NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, CurveGradesDialogManager,
-  AssignmentColumnHeader, AssignmentGroupColumnHeader, StudentColumnHeader, TotalGradeColumnHeader,
-  GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp, SubmissionStateMap,
-  GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView,
+  SetDefaultGradeDialogManager, AssignmentColumnHeader, AssignmentGroupColumnHeader, StudentColumnHeader,
+  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp,
+  SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView,
   GradebookKeyboardNav, assignmentHelper) ->
   IS_ADMIN = _.contains(ENV.current_user_roles, 'admin')
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
@@ -1752,6 +1753,10 @@ define [
         isAdmin: IS_ADMIN
         contextUrl: contextUrl
         submissionsLoaded: @contentLoadStates.submissionsLoaded
+      setDefaultGradeDialogManager = new SetDefaultGradeDialogManager(
+        assignment, studentsThatCanSeeAssignment, @options.context_id, @sectionToShow,
+        IS_ADMIN, @contentLoadStates.submissionsLoaded
+      )
 
       {
         assignment:
@@ -1764,12 +1769,18 @@ define [
           pointsPossible: assignment.points_possible
           submissionTypes: assignment.submission_types
           courseId: assignment.course_id
+          inClosedGradingPeriod: assignment.in_closed_grading_period
+        students: students
+        submissionsLoaded: @contentLoadStates.submissionsLoaded
         assignmentDetailsAction:
           disabled: !assignmentDetailsDialogManager.isDialogEnabled()
           onSelect: assignmentDetailsDialogManager.showDialog
         curveGradesAction: CurveGradesDialogManager.createCurveGradesAction(
           assignment, studentsThatCanSeeAssignment, curveGradesActionOptions
         )
+        setDefaultGradeAction:
+          disabled: !setDefaultGradeDialogManager.isDialogEnabled()
+          onSelect: setDefaultGradeDialogManager.showDialog
         students: students
         submissionsLoaded: @contentLoadStates.submissionsLoaded
       }
