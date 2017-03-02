@@ -3,6 +3,7 @@ group :test do
     gem 'rails-dom-testing', '1.0.8'
   else
     gem 'rails-dom-testing', '2.0.2'
+    gem 'rails-controller-testing', '1.0.1'
   end
 
   gem 'gergich', '0.1.11', require: false
