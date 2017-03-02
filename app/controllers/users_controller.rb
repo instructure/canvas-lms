@@ -2057,7 +2057,7 @@ class UsersController < ApplicationController
     # find last interactions
     last_comment_dates = SubmissionCommentInteraction.in_course_between(course, teacher.id, ids)
     last_comment_dates.each do |(user_id, author_id), date|
-      next unless student = data[user_id.to_i]
+      next unless student = data[user_id]
       student[:last_interaction] = [student[:last_interaction], date].compact.max
     end
     scope = ConversationMessage.

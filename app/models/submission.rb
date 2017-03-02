@@ -1000,14 +1000,13 @@ class Submission < ActiveRecord::Base
 
   def update_attachment_associations
     return if @assignment_changed_not_sub
-    associations = self.attachment_associations
-    association_ids = associations.map(&:attachment_id)
-    ids = (Array(self.attachment_ids || "").join(',')).split(",").map{|id| id.to_i}
+    association_ids = attachment_associations.pluck(:attachment_id)
+    ids = (self.attachment_ids || "").split(",").map(&:to_i)
     ids << self.attachment_id if self.attachment_id
     ids.uniq!
-    existing_associations = associations.select{|a| ids.include?(a.attachment_id) }
-    (associations - existing_associations).each{|a| a.destroy }
-    unassociated_ids = ids.reject{|id| association_ids.include?(id) }
+    associations_to_delete = association_ids - ids
+    attachment_associations.where(attachment_id: associations_to_delete).delete_all unless associations_to_delete.empty?
+    unassociated_ids = ids - association_ids
     return if unassociated_ids.empty?
     attachments = Attachment.where(id: unassociated_ids)
     attachments.each do |a|
@@ -1015,8 +1014,7 @@ class Submission < ActiveRecord::Base
          (a.context_type == 'Group' && a.context_id == group_id) ||
          (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?) ||
          attachment_fake_belongs_to_group(a)
-        aa = self.attachment_associations.where(attachment_id: a).first
-        aa ||= self.attachment_associations.create(:attachment => a)
+        attachment_associations.where(attachment: a).first_or_create
       end
     end
   end

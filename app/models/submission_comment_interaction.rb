@@ -19,11 +19,8 @@
 class SubmissionCommentInteraction
   # returns an array mapping [user_id, author_id] => time of last submission
   # comment
-  #
-  # warning: user_id comes back as a string for some reason, so the actual
-  # object looks like: {["3", 1]=>2015-02-03 22:52:51 UTC}
   def self.in_course_between(course, teacher_or_ids, student_or_ids)
-    course.submission_comments.
+    result = course.submission_comments.
       joins(:submission).
       group([:user_id, :author_id]).
       where({
@@ -31,5 +28,9 @@ class SubmissionCommentInteraction
         submissions: { user_id: student_or_ids }
       }).
       maximum(:created_at)
+    if CANVAS_RAILS4_2
+      result = result.map { |(key, value)| [key.map(&:to_i), value] }.to_h
+    end
+    result
   end
 end

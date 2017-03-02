@@ -8,8 +8,8 @@ module Alerts
       @last_interaction_for_user = {}
       last_comment_dates = SubmissionCommentInteraction.in_course_between(course, teacher_ids, student_ids)
       last_comment_dates.each do |(user_id, author_id), date|
-        student = data[user_id.to_i]
-        (student[:last_interaction] ||= {})[author_id.to_i] = date
+        student = data[user_id]
+        (student[:last_interaction] ||= {})[author_id] = date
       end
       scope = ConversationMessage.
           joins("INNER JOIN #{ConversationParticipant.quoted_table_name} ON conversation_participants.conversation_id=conversation_messages.conversation_id").

@@ -1727,7 +1727,7 @@ describe Submission do
       sub = @assignment.submit_homework @student, attachments: [old_attachment_1, old_attachment_2]
       attachment_model context: @student
       sub = @assignment.submit_homework @student, attachments: [@attachment]
-      expect(sub.attachments).to eq([@attachment])
+      expect(sub.attachments.to_a).to eq([@attachment])
       expect(sub.includes_attachment?(old_attachment_1)).to eq true
       expect(sub.includes_attachment?(old_attachment_2)).to eq true
     end
