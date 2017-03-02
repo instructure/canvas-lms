@@ -4,6 +4,7 @@ FROM postgres:9.3
 RUN apt-get update -qq \
   && apt-get install -qqy \
       build-essential \
+      ca-certificates \
       libicu-dev \
       postgresql-server-dev-all \
       pgxnclient \
