@@ -30,7 +30,7 @@ acorn-dynamic-import@^2.0.0:
   dependencies:
     acorn "^4.0.3"
 
-acorn-jsx@^3.0.0, acorn-jsx@^3.0.1:
+acorn-jsx@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-3.0.1.tgz#afdf9488fb1ecefc8348f6fb22f464e32a58b36b"
   dependencies:
@@ -40,7 +40,7 @@ acorn@4.0.4:
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-4.0.4.tgz#17a8d6a7a6c4ef538b814ec9abac2779293bf30a"
 
-acorn@^3.0.0, acorn@^3.0.4, acorn@^3.1.0, acorn@~3.2.0:
+acorn@^3.0.0, acorn@^3.0.4, acorn@^3.1.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-3.2.0.tgz#7a82989ef6f063a237ababaf8df20d2965184b9f"
 
@@ -869,7 +869,7 @@ babel-plugin-transform-strict-mode@^6.22.0:
     babel-runtime "^6.22.0"
     babel-types "^6.22.0"
 
-babel-polyfill@6.22.0:
+babel-polyfill@6.22.0, babel-polyfill@^6.9.1:
   version "6.22.0"
   resolved "https://registry.yarnpkg.com/babel-polyfill/-/babel-polyfill-6.22.0.tgz#1ac99ebdcc6ba4db1e2618c387b2084a82154a3b"
   dependencies:
@@ -877,7 +877,7 @@ babel-polyfill@6.22.0:
     core-js "^2.4.0"
     regenerator-runtime "^0.10.0"
 
-babel-polyfill@^6.23.0, babel-polyfill@^6.9.1:
+babel-polyfill@^6.23.0:
   version "6.23.0"
   resolved "https://registry.yarnpkg.com/babel-polyfill/-/babel-polyfill-6.23.0.tgz#8364ca62df8eafb830499f699177466c3b03499d"
   dependencies:
@@ -987,7 +987,7 @@ babel-template@^6.22.0, babel-template@^6.23.0:
     babylon "^6.11.0"
     lodash "^4.2.0"
 
-babel-traverse@^6.15.0, babel-traverse@^6.22.0, babel-traverse@^6.23.0, babel-traverse@^6.23.1:
+babel-traverse@^6.0.0, babel-traverse@^6.15.0, babel-traverse@^6.22.0, babel-traverse@^6.23.0, babel-traverse@^6.23.1:
   version "6.23.1"
   resolved "https://registry.yarnpkg.com/babel-traverse/-/babel-traverse-6.23.1.tgz#d3cb59010ecd06a97d81310065f966b699e14f48"
   dependencies:
@@ -1010,7 +1010,7 @@ babel-types@^6.15.0, babel-types@^6.19.0, babel-types@^6.22.0, babel-types@^6.23
     lodash "^4.2.0"
     to-fast-properties "^1.0.1"
 
-babylon@^6.11.0, babylon@^6.13.0, babylon@^6.15.0:
+babylon@^6.0.0, babylon@^6.11.0, babylon@^6.13.0, babylon@^6.15.0:
   version "6.16.1"
   resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.16.1.tgz#30c5a22f481978a9e7f8cdfdf496b11d94b404d3"
 
@@ -3663,9 +3663,9 @@ instructure-icons@0.1.0:
   dependencies:
     shortid "2.2.6"
 
-instructure-icons@1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/instructure-icons/-/instructure-icons-1.1.2.tgz#8c28721644d17ef1c4b0982e59ef3bc81713bbf7"
+instructure-icons@1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/instructure-icons/-/instructure-icons-1.2.1.tgz#6ae4e8de07ff6821192746bef79a2cab01a179be"
   dependencies:
     shortid "2.2.6"
 
@@ -4490,11 +4490,11 @@ lodash.uniq@^4.3.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
 
-lodash@4.16.4, lodash@^4.2.0, lodash@~4.16.4:
+lodash@4.16.4, lodash@^4.13.1, lodash@^4.2.0, lodash@~4.16.4:
   version "4.16.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.16.4.tgz#01ce306b9bad1319f2a5528674f88297aeb70127"
 
-"lodash@>=3.5 <5", lodash@^4.0.0, lodash@^4.0.1, lodash@^4.1.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.17.2, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.0:
+"lodash@>=3.5 <5", lodash@^4.0.0, lodash@^4.0.1, lodash@^4.1.0, lodash@^4.14.0, lodash@^4.17.2, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.0:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 
@@ -7395,13 +7395,12 @@ xmlhttprequest-ssl@1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/xmlhttprequest-ssl/-/xmlhttprequest-ssl-1.5.1.tgz#3b7741fea4a86675976e908d296d4445961faa67"
 
-xsslint@^0.1.3:
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/xsslint/-/xsslint-0.1.3.tgz#2eeb5f591121275ceb65eca8174f1d8662e6d763"
+xsslint@0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/xsslint/-/xsslint-0.1.4.tgz#1d4c5742d2f6076ae81ecced6c935375a8525114"
   dependencies:
-    acorn "~3.2.0"
-    acorn-jsx "^3.0.1"
-    estraverse "^4.1.1"
+    babel-traverse "^6.0.0"
+    babylon "^6.0.0"
 
 "xtend@>=4.0.0 <4.1.0-0", xtend@^4.0.0, xtend@~4.0.1:
   version "4.0.1"
