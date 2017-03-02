@@ -23,7 +23,7 @@ module Api::V1::User
 
   API_USER_JSON_OPTS = {
     :only => %w(id name).freeze,
-    :methods => %w(sortable_name short_name display_name).freeze
+    :methods => %w(sortable_name short_name).freeze
   }.freeze
 
   def user_json_preloads(users, preload_email=false, opts={})
