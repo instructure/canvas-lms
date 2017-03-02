@@ -131,8 +131,11 @@ class RubricAssociation < ActiveRecord::Base
   attr_accessor :assessing_user_id
 
   set_policy do
-    given {|user, session| self.context.grants_right?(user, session, :manage) }
-    can :update and can :delete and can :manage and can :assess
+    given {|user, session| self.context.grants_right?(user, session, :manage_rubrics) }
+    can :update and can :delete and can :manage
+
+    given {|user, session| self.context.grants_right?(user, session, :manage_grades) }
+    can :assess
 
     given {|user| user && @assessing_user_id && self.assessment_requests.for_assessee(@assessing_user_id).map{|r| r.assessor_id}.include?(user.id) }
     can :assess
