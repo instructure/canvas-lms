@@ -303,10 +303,11 @@ describe Attachment do
       end
 
       it "should delay upload until the #save transaction is committed" do
+        allow(Rails.env).to receive(:test?).and_return(false)
         @attachment.uploaded_data = default_uploaded_data
-        Attachment.connection.expects(:after_transaction_commit).twice
-        @attachment.expects(:touch_context_if_appropriate).never
-        @attachment.expects(:ensure_media_object).never
+        expect(Attachment.connection).to receive(:after_transaction_commit).twice
+        expect(@attachment).to receive(:touch_context_if_appropriate).never
+        expect(@attachment).to receive(:ensure_media_object).never
         @attachment.save
       end
     end

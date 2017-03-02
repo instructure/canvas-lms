@@ -198,32 +198,6 @@ module AttachmentFu # :nodoc:
         tmp.close
       end
     end
-
-    if Rails.env.test?
-      # thanks to test_after_commit, we can use transactional fixtures,
-      # but we still need reach into connection, since we conditionally
-      # use after_transaction_commit based on transaction nesting
-      if CANVAS_RAILS4_2
-        def open_transactions
-          connection.instance_variable_get(:@test_open_transactions)
-        end
-      else
-        # count the number of transactions since the last joinable transaction
-        def open_transactions
-          stack = connection.transaction_manager.instance_variable_get(:@stack)
-          count = 0
-          stack.reverse.each do |transaction|
-            break unless transaction.joinable?
-            count += 1
-          end
-          count
-        end
-      end
-    else
-      def open_transactions
-        connection.open_transactions
-      end
-    end
   end
 
   module InstanceMethods
@@ -567,10 +541,10 @@ module AttachmentFu # :nodoc:
             run_callbacks(:save_and_attachment_processing)
           end
 
-          if self.class.open_transactions == 1 # yes, == 1, not > 0 ... see comment above
-            self.class.connection.after_transaction_commit(&save_and_callbacks)
-          else
+          if Rails.env.test?
             save_and_callbacks.call()
+          else
+            self.class.connection.after_transaction_commit(&save_and_callbacks)
           end
         else
           run_callbacks(:save_and_attachment_processing)
