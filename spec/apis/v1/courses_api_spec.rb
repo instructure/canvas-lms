@@ -139,9 +139,9 @@ describe Api::V1::Course do
 
     context "total_scores" do
       before do
-        @enrollment.computed_current_score = 95.0;
-        @enrollment.computed_final_score = 85.0;
-        def @course.grading_standard_enabled?; true; end
+        @enrollment.scores.create!(current_score: 95.0, final_score: 85.0)
+        @course.grading_standard_enabled = true
+        @course.save!
       end
 
       let(:json) { @test_api.course_json(@course1, @me, {}, ['total_scores'], [@enrollment]) }
@@ -153,8 +153,8 @@ describe Api::V1::Course do
           "role_id" => student_role.id,
           "user_id" => @me.id,
           "enrollment_state" => "active",
-          "computed_current_score" => 95,
-          "computed_final_score" => 85,
+          "computed_current_score" => 95.0,
+          "computed_final_score" => 85.0,
           "computed_current_grade" => "A",
           "computed_final_grade" => "B"
         }]
@@ -1592,10 +1592,8 @@ describe CoursesController, type: :request do
 
     context "include total scores" do
       before(:once) do
-        @course2.all_student_enrollments.update_all(
-          computed_current_score: 80,
-          computed_final_score: 70
-        )
+        student_enrollment = @course2.all_student_enrollments.first
+        student_enrollment.scores.create!(current_score: 80, final_score: 70)
       end
 
       it "includes scores in course list if requested" do

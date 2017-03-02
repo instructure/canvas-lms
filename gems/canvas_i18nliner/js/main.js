@@ -14,9 +14,19 @@ var glob = require("glob");
 
 // explict subdirs, to work around perf issues
 // https://github.com/jenseng/i18nliner-js/issues/7
-JsProcessor.prototype.directories = ["public/javascripts", "app/coffeescripts", "app/jsx"];
+JsProcessor.prototype.directories = [
+    "public/javascripts",
+    "app/coffeescripts",
+    "app/jsx"
+  ].concat(glob.sync("gems/plugins/*/app/jsx"))
+   .concat(glob.sync("gems/plugins/*/app/coffeescripts"))
+   .concat(glob.sync("gems/plugins/*/public/javascripts"));
 JsProcessor.prototype.defaultPattern = ["*.js", "*.jsx", "*.coffee"];
-HbsProcessor.prototype.directories = ["app/views/jst", "app/coffeescripts/ember"];
+
+HbsProcessor.prototype.directories = [
+    "app/views/jst",
+    "app/coffeescripts/ember"
+]  .concat(glob.sync("gems/plugins/*/app/views/jst"))
 HbsProcessor.prototype.defaultPattern = ["*.hbs", "*.handlebars"];
 
 JsProcessor.prototype.sourceFor = function(file) {
@@ -44,7 +54,7 @@ var ScopedTranslationHash = require("./scoped_translation_hash");
 
 // remove path stuff we don't want in the scope
 var pathRegex = new RegExp(
-  ".*(" + HbsProcessor.prototype.directories.join("|") + ")(/plugins/[^/]+)?/"
+  ".*(" + HbsProcessor.prototype.directories.join("|") + ")(/plugins/[^/]+)?/" // remove plugins bit once we drop requirejs/handlebars_tasks/plugin symlinks
 );
 ScopedHbsExtractor.prototype.normalizePath = function(path) {
   return path.replace(pathRegex, "").replace(/^([^\/]+\/)templates\//, '$1');

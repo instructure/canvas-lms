@@ -1,6 +1,7 @@
 /bower
 /symlink_to_node_modules
 /compiled
+/plugins
 /i18n.js
 /i18nObj.js
 /jsx

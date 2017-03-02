@@ -11,11 +11,12 @@ define [
   'compiled/util/mimeClass'
   'compiled/str/apiUserContent'
   'compiled/str/TextHelper'
+  'jsx/shared/helpers/numberFormat'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'translations/_core_en'
-], (tz, enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, apiUserContent, textHelper) ->
+], (tz, enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, apiUserContent, textHelper, numberFormat) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (args..., options) ->
@@ -560,6 +561,9 @@ define [
 
     n:(number, {hash: {precision, percentage, strip_insignificant_zeros}}) ->
       I18n.n(number, {precision, percentage, strip_insignificant_zeros})
+
+    nf:(number, {hash: {format}}) ->
+      numberFormat[format](number)
   }
 
   return Handlebars

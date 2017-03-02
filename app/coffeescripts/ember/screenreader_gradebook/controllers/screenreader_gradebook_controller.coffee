@@ -866,7 +866,7 @@ define [
       outcome = @get 'selectedOutcome'
       result = @get('outcome_rollups').find (x) ->
         x.user_id == student.id && x.outcome_id == outcome.id
-      result.mastery_points = outcome.mastery_points if result
+      result.mastery_points = round(outcome.mastery_points, 2) if result
       result or {
         user_id: student.id
         outcome_id: outcome.id
@@ -874,7 +874,7 @@ define [
     ).property('selectedStudent', 'selectedOutcome')
 
     outcomeResultIsDefined: ( ->
-      @get('selectedOutcomeResult').score?
+      @get('selectedOutcomeResult')?.score?
     ).property('selectedOutcomeResult')
 
     showAssignmentPointsWarning: (->

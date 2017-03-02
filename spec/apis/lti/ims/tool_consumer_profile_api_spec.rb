@@ -113,7 +113,6 @@ module Lti
               {tool_consumer_profile_id: tcp.uuid, account_id: account.id},
               request_headers
           profile = IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
-
           expect(profile.capability_offered).to include restricted_cap
         end
       end

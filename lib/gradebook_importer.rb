@@ -73,8 +73,9 @@ class GradebookImporter
 
   def parse!
     # preload a ton of data that presumably we'll be querying
+    @context.preload_user_roles!
     @all_assignments = @context.assignments
-      .preload(:context)
+      .preload({ context: :account }, :assignment_overrides, :assignment_override_students)
       .published
       .gradeable
       .select(ASSIGNMENT_PRELOADED_FIELDS)
@@ -116,6 +117,8 @@ class GradebookImporter
     is_admin = @context.account_membership_allows(@user)
 
     @original_submissions = @context.submissions
+      .preload(assignment: [{ context: :account }, :assignment_overrides,
+                            :assignment_override_students])
       .select(['submissions.id', :assignment_id, :user_id, :score, :excused, :cached_due_date, 'submissions.updated_at'])
       .where(assignment_id: assignment_ids, user_id: user_ids)
       .map do |submission|

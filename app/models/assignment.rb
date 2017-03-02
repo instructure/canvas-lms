@@ -621,15 +621,12 @@ class Assignment < ActiveRecord::Base
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)
   def do_notifications!(prior_version=nil, notify=false)
-    self.prior_version = prior_version
-    @broadcasted = false
     # TODO: this will blow up if the group_category string is set on the
     # previous version, because it gets confused between the db string field
     # and the association.  one more reason to drop the db column
-    self.prior_version ||= self.versions.previous(self.current_version.number).try(:model)
-    self.just_created = self.prior_version.nil?
+    prior_version ||= self.versions.previous(self.current_version.number).try(:model)
     self.notify_of_update = notify || false
-    broadcast_notifications
+    broadcast_notifications(prior_version || dup)
     remove_assignment_updated_flag
   end
 

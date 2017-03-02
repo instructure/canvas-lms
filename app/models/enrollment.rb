@@ -635,7 +635,7 @@ class Enrollment < ActiveRecord::Base
     Message.where(:id => ids).delete_all if ids.present?
     update_attribute(:workflow_state, 'active')
     if self.type == 'StudentEnrollment'
-      Enrollment.recompute_final_score([self.user_id], self.course_id)
+      Enrollment.recompute_final_score_in_singleton(self.user_id, self.course_id)
     end
     touch_user
   end
@@ -933,14 +933,6 @@ class Enrollment < ActiveRecord::Base
     Enrollment.readable_type(self.class.to_s)
   end
 
-  def self.recompute_final_scores(user_id)
-    user = User.find(user_id)
-    enrollments = user.student_enrollments.to_a.uniq { |e| e.course_id }
-    enrollments.each do |enrollment|
-      send_later(:recompute_final_score, user_id, enrollment.course_id)
-    end
-  end
-
   # This is called to recompute the users' cached scores for a given course
   # when:
   #
@@ -997,6 +989,25 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
+  def self.recompute_final_score_in_singleton(user_id, course_id, opts = {})
+    send_later_if_production_enqueue_args(
+      :recompute_final_score,
+      {
+        singleton: "Enrollment.recompute_final_score:#{user_id}:#{course_id}:#{opts[:grading_period_id]}",
+        run_at: 2.seconds.from_now # why is this needed?
+      },
+      user_id,
+      course_id,
+      opts
+    )
+  end
+
+  def self.recompute_final_scores(user_id)
+    StudentEnrollment.where(user_id: user_id).pluck('distinct course_id').each do |course_id|
+      recompute_final_score_in_singleton(user_id, course_id)
+    end
+  end
+
   def computed_current_grade(grading_period_id: nil)
     cached_score_or_grade(:current, :grade, grading_period_id: grading_period_id)
   end
@@ -1015,15 +1026,7 @@ class Enrollment < ActiveRecord::Base
 
   def cached_score_or_grade(current_or_final, score_or_grade, grading_period_id: nil)
     score = find_score(grading_period_id: grading_period_id)
-    if score.present?
-      score.send("#{current_or_final}_#{score_or_grade}")
-    else
-      return nil if grading_period_id.present?
-      # TODO: drop the computed_current_score / computed_final_score columns
-      # after the data fixup to populate the scores table completes
-      score = read_attribute("computed_#{current_or_final}_score")
-      score_or_grade == :score ? score : course.score_to_grade(score)
-    end
+    score&.send("#{current_or_final}_#{score_or_grade}")
   end
   private :cached_score_or_grade
 

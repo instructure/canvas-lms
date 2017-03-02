@@ -25,6 +25,7 @@ define([
 ], (_, $, ProcessGradebookUpload, fakeENV) => {
   const oldAssignment1 = {id: 1, title: 'Old Assignment 1', points_possible: 25, published: true};
 
+  const submissionWithNumericGrade = {assignment_id: 1, grade: 20, original_grade: '20'};
   const submissionOld1NoChange = {assignment_id: 1, grade: '20', original_grade: '20'};
   const submissionOld1Change = {assignment_id: 1, grade: '20', original_grade: '25'};
   const submissionOld1Excused = {assignment_id: 1, grade: 'EX', original_grade: '20'};
@@ -273,6 +274,11 @@ define([
     ProcessGradebookUpload.populateGradeDataPerSubmission(submissionOld1Excused, 0, [], gradeData);
 
     equal(gradeData[submissionOld1Excused.assignment_id][0].excuse, true);
+  });
+
+  test('does not error on non-string grades', () => {
+    ProcessGradebookUpload.populateGradeDataPerSubmission(submissionWithNumericGrade, 0, [], {});
+    ok(true, 'Previous line did not cause error');
   });
 
   QUnit.module('ProcessGradebookUpload.populateGradeDataPerStudent');

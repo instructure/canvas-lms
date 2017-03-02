@@ -4,8 +4,9 @@ define [
   'compiled/util/Popover'
   'compiled/models/grade_summary/Outcome'
   'd3'
+  'i18n!outcomes'
   'jst/outcomes/outcomePopover'
-], (_, {View}, Popover, Outcome, d3, popover_template) ->
+], (_, {View}, Popover, Outcome, d3, I18n, popover_template) ->
 
   class OutcomeColumnView extends View
 
@@ -125,7 +126,7 @@ define [
           return "middle" if distanceToPi < Math.PI/6
           if angle > Math.PI then "hanging" else "auto"
         )
-        .text((d, i) => @data[i].percent+'%' )
+        .text((d, i) => I18n.n(@data[i].percent, { percentage: true }))
 
     getAngleInfo: (d, sideways) ->
       angle = (d.endAngle + d.startAngle) / 2

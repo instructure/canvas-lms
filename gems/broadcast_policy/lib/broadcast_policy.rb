@@ -33,14 +33,14 @@
 # set_broadcast_policy do
 #   dispatch :new_assignment
 #   to { self.students }
-#   whenever { |record| record.just_created? }
+#   whenever { |record| record.just_created }
 # end
 #
 # set_broadcast_policy do
 #   dispatch :assignment_change
 #   to { self.students }
 #   whenever { |record|
-#     record.prior_version != self.version and true
+#     record.workflow_state_changed?
 #     # ... some field-wise comparison
 #   }
 # end

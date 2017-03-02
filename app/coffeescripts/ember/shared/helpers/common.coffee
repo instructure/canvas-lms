@@ -6,4 +6,5 @@
 define [
   './t'
   './format-date'
+  './n'
 ], ->

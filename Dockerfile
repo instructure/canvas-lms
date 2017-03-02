@@ -8,16 +8,19 @@ ENV NGINX_MAX_UPLOAD_SIZE 10g
 USER root
 WORKDIR /root
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -\
+  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -\
+  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list \
   && apt-get update -qq \
   && apt-get install -qqy \
        nodejs \
+       yarn \
        postgresql-client \
        libxmlsec1-dev \
        unzip \
        fontforge \
        python-lxml \
        libicu-dev \
-  && npm install -g gulp \
+  && yarn global add gulp \
   && rm -rf /var/lib/apt/lists/*\
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 
@@ -44,8 +47,8 @@ RUN chown -R docker:docker ${APP_HOME} /home/docker
 
 # Install deps as docker to avoid sadness w/ npm lifecycle hooks
 USER docker
-RUN bundle install --jobs 8
-RUN npm install
+RUN bundle install --jobs 8 \
+  && yarn install
 USER root
 
 COPY . $APP_HOME

@@ -19,13 +19,13 @@
       {{/if}}
     </div>
     <div class="outcome-info">
-      <div class="mastery">{{#t "mastery_set_at"}}Mastery set at{{/t}}: {{mastery_points}}</div>
+      <div class="mastery">{{#t "mastery_set_at"}}Mastery set at{{/t}}: {{nf mastery_points format="outcomeScore"}}</div>
       {{#if description}}<div class="description">{{{description}}}</div>{{/if}}
     </div>
     {{else}}
     <div class="mastery-details pull-right" aria-hidden="true">
       {{#if scoreDefined}}
-        <span>{{roundedScore}} / {{mastery_points}}</span>
+        <span>{{nf roundedScore format="outcomeScore"}} / {{nf mastery_points format="outcomeScore"}}</span>
         <span class="screenreader-only">
           {{#t}}Outcome: {{title}} has a status of {{statusTooltip}}{{/t}}
         </span>

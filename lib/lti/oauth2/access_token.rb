@@ -5,10 +5,10 @@ module Lti
 
       ISS = 'Canvas'.freeze
 
-      attr_reader :aud, :sub
+      attr_reader :aud, :sub, :reg_key
 
-      def self.create_jwt(aud:, sub:)
-        new(aud: aud, sub: sub)
+      def self.create_jwt(aud:, sub:, reg_key: nil)
+        new(aud: aud, sub: sub, reg_key: reg_key)
       end
 
       def self.from_jwt(aud:, jwt:)
@@ -20,8 +20,9 @@ module Lti
         raise InvalidTokenError, e
       end
 
-      def initialize(aud:, sub:, jwt: nil)
+      def initialize(aud:, sub:, jwt: nil, reg_key: nil)
         @_jwt = jwt if jwt
+        @reg_key = reg_key || (jwt && decoded_jwt['reg_key'])
         @aud = aud
         @sub = sub
       end
@@ -62,6 +63,7 @@ module Lti
             nbf: Setting.get('lti.oauth2.access_token.nbf', 30.seconds).to_i.seconds.ago,
             jti: SecureRandom.uuid
           }
+          body[:reg_key] = @reg_key if @reg_key
           Canvas::Security.create_jwt(body)
         end
       end

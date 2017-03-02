@@ -93,7 +93,7 @@ function rake_db_migrate_dev_and_test {
 
 function npm_install {
   echo_console_and_log "  Installing npm packages ..."
-  npm install >>"$LOG" 2>&1 || \
+  (yarn install || npm install) >>"$LOG" 2>&1 || \
     ( echo "  failed to install npm packages (see $LOG)"; kill -INT $$ )
 }
 

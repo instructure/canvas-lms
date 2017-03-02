@@ -37,9 +37,15 @@ module Services
         Canvas::DynamicSettings.unstub(:find)
       end
 
+      let(:developer_key) do
+        developer_key = mock
+        developer_key.stubs(:global_id).returns(10000000000003)
+        developer_key
+      end
+
       let(:product_family) do
         product_family = mock()
-        product_family.stubs(:developer_key).returns(10000000000003)
+        product_family.stubs(:developer_key).returns(developer_key)
         product_family
       end
 

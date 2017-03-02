@@ -28,6 +28,10 @@ module Lti::Ims::AccessTokenHelper
     header && header.match(pattern)
   end
 
+  def tool_proxy
+    @_tool_proxy ||= Lti::ToolProxy.find_by(guid: access_token.sub)
+  end
+
   def validate_services!(tool_proxy)
     ims_tp = IMS::LTI::Models::ToolProxy.from_json(tool_proxy.raw_data)
     service = ims_tp.security_contract.tool_services.find(
@@ -61,6 +65,10 @@ module Lti::Ims::AccessTokenHelper
 
   def lti2_service_name
     raise 'the method #lti2_service_name must be defined in the class'
+  end
+
+  def render_unauthorized
+    render json: {error: 'unauthorized'}, status: :unauthorized
   end
 
 end

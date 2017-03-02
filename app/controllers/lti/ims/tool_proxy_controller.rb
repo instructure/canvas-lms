@@ -56,14 +56,19 @@ module Lti
       def create
         if oauth2_request?
           dev_key = DeveloperKey.find_cached(access_token.sub)
-          render_new_tool_proxy(context, SecureRandom.uuid, dev_key) and return if authorized_lti2_tool
+          begin
+            validate_access_token!
+            reg_key = access_token.reg_key
+            reg_secret = RegistrationRequestService.retrieve_registration_password(context, reg_key) if reg_key
+            render_new_tool_proxy(context, reg_key, dev_key) and return if reg_secret.present?
+          rescue Lti::Oauth2::InvalidTokenError
+            render_unauthorized and return
+          end
         else
-          tool_proxy_guid = oauth_consumer_key
           secret = RegistrationRequestService.retrieve_registration_password(context, oauth_consumer_key)
-          render_new_tool_proxy(context, SecureRandom.uuid) and return if secret.present? && oauth_authenticated_request?(secret)
+          render_new_tool_proxy(context, oauth_consumer_key) and return if secret.present? && oauth_authenticated_request?(secret)
         end
-
-        render json: {error: 'unauthorized'}, status: :unauthorized
+        render_unauthorized
       end
 
       def re_reg

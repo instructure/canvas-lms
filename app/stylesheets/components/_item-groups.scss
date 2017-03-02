@@ -344,6 +344,12 @@
   .ig-published:not(.student-view) & {
     background-color: $ic-color-success;
   }
+  & i[class*=icon-],
+  & i[class^=icon-], {
+    &::before {
+      top: 0;
+    }
+  }
 }
 
 .ig-handle {

@@ -81,6 +81,11 @@ module Lti
           expect(Canvas::Security.decode_jwt(access_token.to_s)['sub']).to eq sub
         end
 
+        it "includes the reg_key if passed in" do
+          access_token = Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: sub, reg_key: 'reg_key')
+          expect(Canvas::Security.decode_jwt(access_token.to_s)['reg_key']).to eq('reg_key')
+        end
+
       end
 
       describe ".from_jwt" do
