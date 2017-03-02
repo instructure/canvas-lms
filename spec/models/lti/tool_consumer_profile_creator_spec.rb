@@ -114,10 +114,6 @@ module Lti
           expect(tcp_creator.create.capability_offered).to include 'Canvas.placements.courseNavigation'
         end
 
-        it 'adds the Canvas.placements.similarityDetection capability' do
-          expect(tcp_creator.create.capability_offered).to include 'Canvas.placements.similarityDetection'
-        end
-
         it 'adds the ToolConsumerProfile.url capability' do
           expect(tcp_creator.create.capability_offered).to include 'ToolConsumerProfile.url'
         end
@@ -156,6 +152,10 @@ module Lti
 
         it 'does not add the OriginalityReport capability if developer_key is false' do
           expect(tcp_creator.create.capability_offered).not_to include 'vnd.Canvas.OriginalityReport.url'
+        end
+
+        it 'does not add the Canvas.placements.similarityDetection if developer key is false' do
+          expect(tcp_creator.create.capability_offered).not_to include 'Canvas.placements.similarityDetection'
         end
 
         it 'adds the ToolProxyReregistrationRequest capability if the feature flag is on' do
@@ -198,6 +198,7 @@ module Lti
 
           it 'includes capabilities from a custom TCP' do
             expect(tcp_creator.create.capability_offered).to include 'vnd.Canvas.OriginalityReport.url'
+            expect(tcp_creator.create.capability_offered).to include 'Canvas.placements.similarityDetection'
           end
 
           it 'looks up the custom TCP from the TCP url' do

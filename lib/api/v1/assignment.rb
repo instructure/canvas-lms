@@ -414,6 +414,9 @@ module Api::V1::Assignment
     end
   rescue ActiveRecord::RecordInvalid
     false
+  rescue Lti::AssignmentSubscriptionsHelper::AssignmentSubscriptionError => e
+    assignment.errors.add('plagiarism_tool_subscription', e)
+    false
   end
 
   def update_api_assignment(assignment, assignment_params, user, context = assignment.context)
@@ -429,6 +432,9 @@ module Api::V1::Assignment
       :success
     end
   rescue ActiveRecord::RecordInvalid
+    false
+  rescue Lti::AssignmentSubscriptionsHelper::AssignmentSubscriptionError => e
+    assignment.errors.add('plagiarism_tool_subscription', e)
     false
   end
 

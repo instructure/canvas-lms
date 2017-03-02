@@ -1263,7 +1263,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def tool_settings_tool=(tool)
-    self.tool_settings_tools = [tool]
+    self.tool_settings_tools = [tool] if tool_settings_tool != tool
   end
 
   def tool_settings_tools=(tools)

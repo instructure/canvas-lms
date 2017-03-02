@@ -383,6 +383,12 @@ define [
       @submit(event)
 
     onSaveFail: (xhr) =>
+      response_text = JSON.parse(xhr.responseText)
+      if response_text.errors
+        subscription_errors = response_text.errors.plagiarism_tool_subscription
+        if subscription_errors && subscription_errors.length > 0
+          $.flashError(subscription_errors[0].message)
+
       @shouldPublish = false
       @disableWhileLoadingOpts = {}
       super(xhr)

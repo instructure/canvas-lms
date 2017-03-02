@@ -40,7 +40,6 @@ module Lti
       Canvas.placements.assignmentSelection
       Canvas.placements.linkSelection
       Canvas.placements.postGrades
-      Canvas.placements.similarityDetection
       User.username
       Person.email.primary
       vnd.Canvas.Person.email.sis
@@ -56,6 +55,7 @@ module Lti
     ).concat(CapabilitiesHelper::SUPPORTED_CAPABILITIES).freeze
 
     RESTRICTED_CAPABILITIES = [
+      'Canvas.placements.similarityDetection',
       "#{Lti::OriginalityReportsApiController::ORIGINALITY_REPORT_SERVICE}.url",
       *WEBHOOK_SUBSCRIPTION_CAPABILITIES.values.flatten
     ].freeze
