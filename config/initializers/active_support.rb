@@ -7,13 +7,15 @@ end
 
 module ActiveSupport::Cache
   module RailsCacheShim
-    def namespaced_key(key, options)
-      result = super
-      if options && options.has_key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS4_2
-        result = "rails5:#{result}"
+    class_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def #{CANVAS_RAILS4_2 ? 'namespaced_key' : 'normalize_key'}(key, options)
+        result = super
+        if options && options.has_key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS4_2
+          result = "rails5:\#{result}"
+        end
+        result
       end
-      result
-    end
+RUBY
 
     def delete(key, options = nil)
       r1 = super(key, (options || {}).merge(use_new_rails: !CANVAS_RAILS4_2)) # prefer rails 3 if on rails 3 and vis versa
