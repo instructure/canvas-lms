@@ -242,7 +242,8 @@ module ActiveRecord
     describe "union" do
       shared_examples_for "query creation" do
         it "should include conditions after the union inside of the subquery" do
-          wheres = base.active.where(id:99).union(User.where(id:1)).where_values
+          scope = base.active.where(id:99).union(User.where(id:1))
+          wheres = CANVAS_RAILS4_2 ? scope.where_values : scope.where_clause.send(:predicates)
           expect(wheres.count).to eq 1
           sql_before_union, sql_after_union = wheres.first.split("UNION ALL")
           expect(sql_before_union.include?('"id" = 99')).to be_falsey
@@ -250,7 +251,8 @@ module ActiveRecord
         end
 
         it "should include conditions prior to the union outside of the subquery" do
-          wheres = base.active.union(User.where(id:1)).where(id:99).where_values
+          scope = base.active.union(User.where(id:1)).where(id:99)
+          wheres = CANVAS_RAILS4_2 ? scope.where_values : scope.where_clause.send(:predicates)
           expect(wheres.count).to eq 2
           union_where = wheres.detect{|w| w.is_a?(String) && w.include?("UNION ALL")}
           expect(union_where.include?('"id" = 99')).to be_falsey
