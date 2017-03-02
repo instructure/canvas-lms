@@ -4,7 +4,7 @@ describe OverrideTooltipPresenter do
   describe '#selector' do
     it 'returns a unique selector for the assignment' do
       assignment = Assignment.new
-      assignment.context = course
+      assignment.context = course_factory
       assignment.save
 
       presenter = OverrideTooltipPresenter.new(assignment)
