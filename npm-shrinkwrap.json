@@ -549,14 +549,12 @@
     "coffee-loader": {
       "version": "0.7.2",
       "from": "coffee-loader@0.7.2",
-      "resolved": "https://registry.npmjs.org/coffee-loader/-/coffee-loader-0.7.2.tgz",
-      "dependencies": {
-        "loader-utils": {
-          "version": "0.2.16",
-          "from": "loader-utils@0.2.16",
-          "resolved": "https://registry.npmjs.org/loader-utils/-/loader-utils-0.2.16.tgz"
-        }
-      }    
-    }
+      "resolved": "https://registry.npmjs.org/coffee-loader/-/coffee-loader-0.7.2.tgz"
+    },
+    "exports-loader": {
+      "version": "0.6.3",
+      "from": "exports-loader@0.6.3",
+      "resolved": "https://registry.npmjs.org/exports-loader/-/exports-loader-0.6.3.tgz"
+    } 
   }
 }
