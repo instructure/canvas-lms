@@ -3182,9 +3182,4 @@ describe User do
   end
 
   it { is_expected.to have_many(:submission_comment_participants) }
-  it do
-    is_expected.to have_many(:submission_comments).
-      conditions(-> { published }).
-        through(:submission_comment_participants)
-  end
 end
