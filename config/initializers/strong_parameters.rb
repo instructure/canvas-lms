@@ -33,7 +33,7 @@ module ArbitraryStrongishParams
       else
         # Declaration { user: :name } or { user: [:name, :age, { address: ... }] }.
         params[key] = each_element(value) do |element|
-          if element.is_a?(Hash)
+          if element.is_a?(Hash) || element.is_a?(ActionController::Parameters)
             element = self.class.new(element) unless element.respond_to?(:permit)
             element.permit(*Array.wrap(filter[key]))
           end
