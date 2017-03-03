@@ -408,6 +408,27 @@ module Lti
           expect(substitution_helper.email).to eq user.email
         end
 
+        let(:sis_email) {'sis@example.com'}
+
+        let(:sis_pseudonym) do
+          cc = user.communication_channels.email.create!(path: sis_email)
+          cc.user = user
+          cc.save!
+          pseudonym = cc.user.pseudonyms.build(:unique_id => cc.path, :account => Account.default)
+          pseudonym.sis_communication_channel_id=cc.id
+          pseudonym.communication_channel_id=cc.id
+          pseudonym.sis_user_id="some_sis_id"
+          pseudonym.save
+          pseudonym
+        end
+
+        it "returns the sis email if it's an LTI2 tool" do
+          tool = class_double("Lti::ToolProxy")
+          sub_helper = SubstitutionsHelper.new(course, root_account, user, tool)
+          sis_pseudonym
+          expect(sub_helper.email).to eq sis_email
+        end
+
         context "prefer_sis_email" do
           before(:each) do
             tool.settings[:prefer_sis_email] = "true"
@@ -415,22 +436,14 @@ module Lti
           end
 
           it "returns the sis_email" do
-            sis_email = 'sis@example.com'
-            cc = user.communication_channels.email.create!(path: sis_email)
-            cc.user = user
-            cc.save!
-            pseudonym = cc.user.pseudonyms.build(:unique_id => cc.path, :account => Account.default)
-            pseudonym.sis_communication_channel_id=cc.id
-            pseudonym.communication_channel_id=cc.id
-            pseudonym.sis_user_id="some_sis_id"
-            pseudonym.save
+            sis_pseudonym
             expect(substitution_helper.email).to eq sis_email
           end
 
           it "returns the users email if there isn't an sis email" do
             expect(substitution_helper.email).to eq user.email
           end
-          
+
         end
       end
 
