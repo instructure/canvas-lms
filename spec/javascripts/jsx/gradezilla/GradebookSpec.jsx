@@ -970,6 +970,118 @@ define([
     equal(componentExistedAtNode, false, 'the component was already unmounted');
   });
 
+  QUnit.module('Gradebook#renderStudentColumnHeader', {
+    setup () {
+      this.$mountPoint = document.createElement('div');
+      $fixtures.appendChild(this.$mountPoint);
+    },
+
+    teardown () {
+      ReactDOM.unmountComponentAtNode(this.$mountPoint);
+      $fixtures.innerHTML = '';
+    }
+  });
+
+  test('renders the StudentColumnHeader to the "student" column header node', function () {
+    const gradebook = createGradebook();
+    this.stub(gradebook, 'getColumnHeaderNode').withArgs('student').returns(this.$mountPoint);
+    gradebook.renderStudentColumnHeader();
+    ok(this.$mountPoint.innerText.includes('Student Name'), 'the "Student Name" header is rendered');
+  });
+
+  QUnit.module('Gradebook#renderAssignmentColumnHeader', {
+    setup () {
+      this.$mountPoint = document.createElement('div');
+      $fixtures.appendChild(this.$mountPoint);
+    },
+
+    createGradebook (options = {}) {
+      const gradebook = createGradebook(options);
+      gradebook.setAssignments({
+        201: {
+          course_id: '801',
+          id: '201',
+          html_url: '/assignments/201',
+          muted: false,
+          name: 'Math Assignment',
+          omit_from_final_grade: false,
+          submission_types: ['online_text_entry']
+        }
+      });
+      return gradebook;
+    },
+
+    teardown () {
+      ReactDOM.unmountComponentAtNode(this.$mountPoint);
+      $fixtures.innerHTML = '';
+    }
+  });
+
+  test('renders the AssignmentColumnHeader to the related assignment column header node', function () {
+    const gradebook = this.createGradebook();
+    this.stub(gradebook, 'getColumnHeaderNode').withArgs('assignment_201').returns(this.$mountPoint);
+    gradebook.renderAssignmentColumnHeader('201');
+    ok(this.$mountPoint.innerText.includes('Math Assignment'), 'the Assignment header is rendered');
+  });
+
+  QUnit.module('Gradebook#renderAssignmentGroupColumnHeader', {
+    setup () {
+      this.$mountPoint = document.createElement('div');
+      $fixtures.appendChild(this.$mountPoint);
+    },
+
+    createGradebook (options = {}) {
+      const gradebook = createGradebook({
+        group_weighting_scheme: 'percent',
+        ...options
+      });
+      gradebook.setAssignmentGroups({
+        301: { name: 'Assignments', group_weight: 40 }
+      });
+      return gradebook;
+    },
+
+    teardown () {
+      ReactDOM.unmountComponentAtNode(this.$mountPoint);
+      $fixtures.innerHTML = '';
+    }
+  });
+
+  test('renders the AssignmentGroupColumnHeader to the related assignment group column header node', function () {
+    const gradebook = this.createGradebook();
+    this.stub(gradebook, 'getColumnHeaderNode').withArgs('assignment_group_301').returns(this.$mountPoint);
+    gradebook.renderAssignmentGroupColumnHeader('301');
+    ok(this.$mountPoint.innerText.includes('Assignments'), 'the Assignment Group header is rendered');
+  });
+
+  QUnit.module('Gradebook#renderTotalGradeColumnHeader', {
+    setup () {
+      this.$mountPoint = document.createElement('div');
+      $fixtures.appendChild(this.$mountPoint);
+    },
+
+    teardown () {
+      ReactDOM.unmountComponentAtNode(this.$mountPoint);
+      $fixtures.innerHTML = '';
+    }
+  });
+
+  test('renders the TotalGradeColumnHeader to the "total_grade" column header node', function () {
+    const gradebook = createGradebook();
+    this.stub(gradebook, 'hideAggregateColumns').returns(false);
+    this.stub(gradebook, 'getColumnHeaderNode').withArgs('total_grade').returns(this.$mountPoint);
+    gradebook.renderTotalGradeColumnHeader();
+    ok(this.$mountPoint.innerText.includes('Total'), 'the "Total" header is rendered');
+  });
+
+  test('does not render when aggregate columns are hidden', function () {
+    const gradebook = createGradebook();
+    this.stub(gradebook, 'hideAggregateColumns').returns(true);
+    this.stub(gradebook, 'getColumnHeaderNode').withArgs('total_grade').returns(this.$mountPoint);
+    gradebook.renderTotalGradeColumnHeader();
+    equal(this.$mountPoint.children.length, 0, 'the mount point contains no elements');
+  });
+
   QUnit.module('Gradebook#getAssignmentColumnId');
 
   test('returns a unique key for the assignment column', function () {

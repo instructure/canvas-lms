@@ -1714,7 +1714,7 @@ define [
     # Total Grade Column Header
 
     renderTotalGradeColumnHeader: =>
-      return if @hideAggregateColumns
+      return if @hideAggregateColumns()
       mountPoint = @getColumnHeaderNode('total_grade')
       renderComponent(TotalGradeColumnHeader, mountPoint)
 
