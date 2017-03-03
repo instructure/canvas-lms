@@ -1834,7 +1834,7 @@ class Submission < ActiveRecord::Base
 
   def self.json_serialization_full_parameters(additional_parameters={})
     includes = { :quiz_submission => {} }
-    methods = [ :formatted_body, :submission_history, :attachments ]
+    methods = [ :submission_history, :attachments ]
     methods << (additional_parameters.delete(:comments) || :submission_comments)
     excepts = additional_parameters.delete :except
 

@@ -547,7 +547,7 @@ class ApplicationController < ActionController::Base
       }
       format.zip { redirect_to(url_for(path_params)) }
       format.json { render_json_unauthorized }
-      format.csv { render text: 'Unauthorized', status: :unauthorized }
+      format.all { render text: 'Unauthorized', status: :unauthorized }
     end
     set_no_cache_headers
   end
