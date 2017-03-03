@@ -37,12 +37,6 @@ describe GradebooksController do
     expect(controller).to be_an_instance_of(GradebooksController)
   end
 
-  describe "GET 'index'" do
-    before(:each) do
-      Course.expects(:find).returns(['a course'])
-    end
-  end
-
   describe "GET 'grade_summary'" do
     it "redirects to the login page if the user is logged out" do
       get 'grade_summary', :course_id => @course.id, :id => @student.id
