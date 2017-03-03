@@ -141,7 +141,7 @@ describe CoursesHelper do
       expect(readable_grade(submission)).to eq 'Unknown'
     end
 
-    it "should return nil if not graded" do
+    it "should return the score if graded" do
       submission = Submission.new(:grade => 1.33333333, :workflow_state => 'graded')
       submission.create_assignment(:points_possible => 5, :grading_type => 'points')
       expect(readable_grade(submission)).to eq '1.33 out of 5'

@@ -564,21 +564,6 @@ describe Submission do
         expect(@submission.messages_sent).not_to include('Submission Grade Changed')
       end
 
-      it "should create a message when the score is changed and the grades were already published" do
-        Notification.create(:name => 'Submission Grade Changed')
-        Notification.create(:name => 'Submission Graded')
-        @assignment.stubs(:score_to_grade).returns("10.0")
-        @assignment.stubs(:due_at).returns(Time.now  - 100)
-        submission_spec_model
-
-        @cc = @user.communication_channels.create(:path => "somewhere")
-        s = @assignment.grade_student(@user, grade: 10, grader: @teacher)[0] # @submission
-        @submission = @assignment.grade_student(@user, grade: 9, grader: @teacher)[0]
-        expect(@submission).to eql(s)
-        expect(@submission.messages_sent).not_to be_include('Submission Grade Changed')
-        expect(@submission.messages_sent).to be_include('Submission Graded')
-      end
-
       it "should not create a message when the score is changed and the grades were already published for a muted assignment" do
         Notification.create(:name => 'Submission Grade Changed')
         @assignment.mute!
@@ -1100,7 +1085,7 @@ describe Submission do
         expect(Delayed::Job.list_jobs(:future, 100).find_all { |j| j.tag == 'Submission#submit_to_turnitin' }.size).to eq 2
       end
 
-      it "should set status as failed if something fails after several attempts" do
+      it "should set status as failed if something fails on a retry" do
         init_turnitin_api
         @assignment.expects(:create_in_turnitin).returns(false)
         @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(stub(:success? => false, :error? => true, :error_hash => {}))

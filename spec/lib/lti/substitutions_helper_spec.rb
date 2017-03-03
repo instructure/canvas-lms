@@ -215,7 +215,7 @@ module Lti
         expect(subject.current_lis_roles).to eq 'urn:lti:sysrole:ims/lis/None'
       end
 
-      it 'returns none if the user has no roles' do
+      it "returns the user's roles" do
         set_up_persistance!
         student_in_course(user: user, course: course, active_enrollment: true)
         account.account_users.create!(:user => user)
@@ -257,7 +257,7 @@ module Lti
         expect(subject.concluded_lis_roles).to eq 'urn:lti:sysrole:ims/lis/None'
       end
 
-      it 'returns none if the user has no roles' do
+      it "returns the user's roles" do
         set_up_persistance!
         student_in_course(user: user, course: course, active_enrollment: true).conclude
         expect(subject.concluded_lis_roles).to eq 'Learner'

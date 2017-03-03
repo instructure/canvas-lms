@@ -645,7 +645,7 @@ describe CommunicationChannelsController do
         expect(@user.reload.pseudonyms.first.unique_id).to eq "jt@instructure.com"
       end
 
-      it "should accept an invitation when merging with the current user" do
+      it "should preview acceptance of an invitation when merging with the current user" do
         @user.update_attribute(:workflow_state, 'creation_pending')
         @old_cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @old_user = @user

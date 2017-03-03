@@ -330,7 +330,7 @@ describe "Roles API", type: :request do
       expect(override.locked).to be_truthy
     end
 
-    it "should set applies to self and applies to descendents" do
+    it "should set applies to descendents" do
       json = api_call_with_settings(enabled: '1', explicit: '1', applies_to_descendants: '0')
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
       expect(override).to_not be_nil
@@ -340,7 +340,7 @@ describe "Roles API", type: :request do
       expect(override.applies_to_descendants).to eq false
     end
 
-    it "should set applies to self and applies to descendents" do
+    it "should set applies to self" do
       json = api_call_with_settings(enabled: '1', explicit: '1', applies_to_self: '0')
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
       expect(override).to_not be_nil
@@ -350,7 +350,7 @@ describe "Roles API", type: :request do
       expect(override.applies_to_descendants).to eq true
     end
 
-    it "should set applies to self and applies to descendents" do
+    it "should require at least applies to self or applies to descendents" do
       options = {controller: 'role_overrides', action: 'add_role', format: 'json', account_id: @account.id.to_s}
       settings = {locked: '1', applies_to_descendants: '0', applies_to_self: '0'}
       parameters = {role: @role_name, permissions: {@permission => settings}}

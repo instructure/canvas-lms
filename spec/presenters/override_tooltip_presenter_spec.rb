@@ -12,7 +12,7 @@ describe OverrideTooltipPresenter do
       expect(presenter.selector).to eq "assignment_#{assignment.id}"
     end
 
-    it 'returns a unique selector for the assignment' do
+    it 'returns a unique selector for the quiz' do
       quiz = Quizzes::Quiz.new(title: 'some quiz')
       quiz.context = course_factory
       quiz.save

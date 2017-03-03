@@ -229,7 +229,7 @@ module Lti
                                                               "the Tool Proxy must be associated to a developer key"
         end
 
-        it "requires an associated developer_key on the product_family" do
+        it "requires an active developer_key" do
           dev_key.stubs(:active?).returns false
           expect { auth_validator.tool_proxy }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
                                                               "the Developer Key is not active"

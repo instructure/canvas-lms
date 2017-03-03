@@ -1004,53 +1004,53 @@ describe "Users API", type: :request do
                        )
         expect(json['name']).to eq 'Test User'
       end
-    end
 
-    it "should return a 400 error if the request doesn't include a unique id" do
-      @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
-      raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
-                   { :controller => 'users',
-                     :action => 'create_self_registered_user',
-                     :format => 'json',
-                     :account_id => @admin.account.id.to_s
-                   },
-                   {
-                       :user      => { :name => "Test User", :terms_of_use => "1"  },
-                       :pseudonym => { :password => "password123" }
-                   }
-                  )
-      assert_status(400)
-      errors = JSON.parse(response.body)['errors']
-      expect(errors['pseudonym']).to be_present
-      expect(errors['pseudonym']['unique_id']).to be_present
-    end
+      it "should return a 400 error if the request doesn't include a unique id" do
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+        raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+                     { :controller => 'users',
+                       :action => 'create_self_registered_user',
+                       :format => 'json',
+                       :account_id => @admin.account.id.to_s
+                     },
+                     {
+                         :user      => { :name => "Test User", :terms_of_use => "1"  },
+                         :pseudonym => { :password => "password123" }
+                     }
+                    )
+        assert_status(400)
+        errors = JSON.parse(response.body)['errors']
+        expect(errors['pseudonym']).to be_present
+        expect(errors['pseudonym']['unique_id']).to be_present
+      end
 
-    it "should set user's email address via communication_channel[address]" do
-      @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
-      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
-               { :controller => 'users',
-                 :action => 'create_self_registered_user',
-                 :format => 'json',
-                 :account_id => @admin.account.id.to_s
-               },
-               {
-                   :user      => { :name => "Test User", :terms_of_use => "1" },
-                   :pseudonym => {
-                       :unique_id         => "test@test.com",
-                       :password          => "password123"
-                   },
-                   :communication_channel => {
-                       :address           => "test@example.com"
-                   }
-               }
-              )
-      expect(response).to be_success
-      users = User.where(name: "Test User").to_a
-      expect(users.size).to eq 1
-      expect(users.first.pseudonyms.first.unique_id).to eq "test@test.com"
-      email = users.first.communication_channels.email.first
-      expect(email.path).to eq "test@example.com"
-      expect(email.path_type).to eq 'email'
+      it "should set user's email address via communication_channel[address]" do
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+        api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+                 { :controller => 'users',
+                   :action => 'create_self_registered_user',
+                   :format => 'json',
+                   :account_id => @admin.account.id.to_s
+                 },
+                 {
+                     :user      => { :name => "Test User", :terms_of_use => "1" },
+                     :pseudonym => {
+                         :unique_id         => "test@test.com",
+                         :password          => "password123"
+                     },
+                     :communication_channel => {
+                         :address           => "test@example.com"
+                     }
+                 }
+                )
+        expect(response).to be_success
+        users = User.where(name: "Test User").to_a
+        expect(users.size).to eq 1
+        expect(users.first.pseudonyms.first.unique_id).to eq "test@test.com"
+        email = users.first.communication_channels.email.first
+        expect(email.path).to eq "test@example.com"
+        expect(email.path_type).to eq 'email'
+      end
     end
   end
 

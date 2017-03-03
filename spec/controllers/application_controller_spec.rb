@@ -572,12 +572,6 @@ describe ApplicationController do
       expect(left_over_keys).to eq []
     end
 
-    it 'returns a hash' do
-      hash = controller.external_tool_display_hash(@tool, :account_navigation)
-      left_over_keys = hash.keys - [:base_url, :title, :icon_url, :canvas_icon_class]
-      expect(left_over_keys).to eq []
-    end
-
     it 'all settings are correct' do
       @tool_settings.each do |setting|
         hash = controller.external_tool_display_hash(@tool, setting)

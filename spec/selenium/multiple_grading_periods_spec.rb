@@ -186,7 +186,7 @@ describe "interaction with grading periods" do
       expect(fj("#submission_#{assignment2.id} th a")).to include_text('Assignment 2')
     end
 
-    it 'should update assignments when a different period is selected in grades page', priority: "1", test_id: 571756 do
+    it 'should update assignments when a all periods are selected in grades page', priority: "1", test_id: 571756 do
       fj(".grading_periods_selector option:nth-child(1)").click
       expect(fj("#submission_#{assignment1.id} th a")).to include_text('Assignment 1')
       expect(fj("#submission_#{assignment2.id} th a")).to include_text('Assignment 2')

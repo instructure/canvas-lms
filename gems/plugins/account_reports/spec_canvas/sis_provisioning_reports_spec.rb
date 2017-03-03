@@ -1009,7 +1009,7 @@ describe "Default Account Reports" do
         ])
       end
 
-      it "should run the provisioning report" do
+      it "should run the provisioning report for a subaccount" do
         parameters = {}
         parameters["group_membership"] = true
         parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: [1, 3]})

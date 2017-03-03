@@ -210,17 +210,17 @@ describe "GradeChangeAudit API", type: :request do
           @viewing_user = user_with_pseudonym(account: @new_root_account)
         end
 
-        it "should foo" do
+        it "should 404 if nothing matches the type" do
           fetch_for_context(@student, expected_status: 404, type: "student")
           fetch_for_context(@teacher, expected_status: 404, type: "grader")
         end
 
-        it "should foo" do
+        it "should work for teachers" do
           course_with_teacher(account: @new_root_account, user: @teacher)
           fetch_for_context(@teacher, expected_status: 200, type: "grader")
         end
 
-        it "should foo" do
+        it "should work for students" do
           course_with_student(account: @new_root_account, user: @student)
           fetch_for_context(@student, expected_status: 200, type: "student")
         end

@@ -151,21 +151,6 @@ describe "External Tools" do
     expect(tab['class'].split).to include("active")
   end
 
-  it "should highlight the navigation tab when using an external tool" do
-    course_with_teacher_logged_in(:active_all => true)
-
-    @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
-    @tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
-    @tool.save!
-
-    get "/courses/#{@course.id}/external_tools/#{@tool.id}"
-    expect(response).to be_success
-    doc = Nokogiri::HTML.parse(response.body)
-    tab = doc.at_css("a.#{@tool.asset_string}")
-    expect(tab).not_to be_nil
-    expect(tab['class'].split).to include("active")
-  end
-
   context 'global navigation' do
     before :once do
       Account.default.enable_feature!(:lor_for_account)

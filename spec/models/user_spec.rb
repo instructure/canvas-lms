@@ -2025,11 +2025,6 @@ describe User do
         assignment = create_course_with_assignment_needing_submitting({override: true, student: @student})
         expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_truthy
       end
-
-      it "should not return the assignments without an override" do
-        assignment = create_course_with_assignment_needing_submitting({override: false, student: @student})
-        expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
-      end
     end
 
     context "sharding" do

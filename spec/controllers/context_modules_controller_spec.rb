@@ -331,7 +331,7 @@ describe ContextModulesController do
       expect(@module.evaluate_for(@user).requirements_met).to be_blank
     end
 
-    it "should not mark a locked external url item read" do
+    it "should not mark an unpublished external url item read" do
       user_session(@student)
       @module = @course.context_modules.create!
       @module.unpublish

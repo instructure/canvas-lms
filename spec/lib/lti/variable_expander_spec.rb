@@ -335,7 +335,7 @@ module Lti
         expect(exp_hash[:test]).to eq 54321
       end
 
-      it 'has substitution for $Canvas.account.name' do
+      it 'has substitution for $Canvas.root_account.uuid' do
         allow(root_account).to receive(:uuid).and_return('123-123-123-123')
         exp_hash = {test: '$vnd.Canvas.root_account.uuid'}
         subject.expand_variables!(exp_hash)
@@ -903,7 +903,7 @@ module Lti
             expect(exp_hash[:test]).to eq '1234'
           end
 
-          it 'has substitution for $Canvas.file.media.id when a media object is present' do
+          it 'has substitution for $Canvas.file.media.id when a media entry is present' do
             exp_hash = {test: '$Canvas.file.media.id'}
             attachment.media_object = nil
             attachment.media_entry_id = '4567'

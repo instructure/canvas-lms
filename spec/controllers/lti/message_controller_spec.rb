@@ -177,7 +177,7 @@ module Lti
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end
 
-        it 'sends the correct tc_profile_url' do
+        it 'sends the correct launch_presentation_return_url' do
           course_with_teacher_logged_in(:active_all => true)
           course = @course
           get 'reregistration', course_id: course.id, tool_proxy_id: tool_proxy.id
