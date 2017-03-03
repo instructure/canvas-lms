@@ -64,8 +64,12 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
       i.className = "submit";
       i.innerHTML = "Insert";
       i.onclick = function() {
-            callback(name.value, type.options[type.selectedIndex].value, values.value.split("\n"));
-            dialog.parentNode.removeChild(dialog);
+            if(name.value.length == 0)
+              alert("You cannot use a magic field without a name. Please enter one.");
+            else {
+              callback(name.value, type.options[type.selectedIndex].value, values.value.split("\n"));
+              dialog.parentNode.removeChild(dialog);
+            }
       };
       div.appendChild(i);
 

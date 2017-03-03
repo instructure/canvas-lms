@@ -104,6 +104,13 @@ if(window != window.top) {
 
 
 function getInnerHtmlWithMagicFieldsReplaced(ele) {
+  // we need to copy the textarea values into the html
+  // text because otherwise cloneNode will discard it, and
+  // the info won't be copied to the submission
+  var ta = ele.querySelectorAll("textarea");
+  for(var i = 0; i < ta.length; i++)
+  	ta[i].textContent = ta[i].value;
+
   var html = ele.cloneNode(true);
   var magicFields = html.querySelectorAll("[data-bz-retained]");
   for(var i = 0; i < magicFields.length; i++) {
