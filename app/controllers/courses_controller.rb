@@ -2305,8 +2305,12 @@ class CoursesController < ApplicationController
 
       if params[:course].has_key?(:master_course)
         master_course = value_to_boolean(params[:course].delete(:master_course))
-        action = master_course ? "set" : "remove"
-        MasterCourses::MasterTemplate.send("#{action}_as_master_course", @course)
+        if master_course && @course.student_enrollments.not_fake.exists?
+           @course.errors.add(:master_course, t("Cannot have a blueprint course with students"))
+        else
+          action = master_course ? "set" : "remove"
+          MasterCourses::MasterTemplate.send("#{action}_as_master_course", @course)
+        end
       end
 
       @course.attributes = params_for_update

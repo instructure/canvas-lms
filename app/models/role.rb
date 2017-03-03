@@ -267,7 +267,7 @@ class Role < ActiveRecord::Base
 
   def self.manageable_roles_by_user(user, context)
     manageable = []
-    if context.grants_right?(user, :manage_students)
+    if context.grants_right?(user, :manage_students) && !(context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(context))
       manageable += ['StudentEnrollment', 'ObserverEnrollment']
       if context.is_a?(Course) && context.teacherless?
         manageable << 'TeacherEnrollment'

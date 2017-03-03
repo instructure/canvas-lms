@@ -2514,6 +2514,7 @@ class User < ActiveRecord::Base
   end
 
   def can_create_enrollment_for?(course, session, type)
+    return false if type == "StudentEnrollment" && MasterCourses::MasterTemplate.is_master_course?(course)
     if type != "StudentEnrollment" && course.grants_right?(self, session, :manage_admin_users)
       return true
     end

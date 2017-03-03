@@ -105,8 +105,11 @@
         <td class="form-label nobr"><%= f.blabel :blueprint_course, :en => "Blueprint Course" %></td>
         <td class="nobr">
           <% if can_manage_master_courses %>
-            <%= f.check_box :master_course, :checked => is_master_course %>
-            <%= f.label :master_course, :en => "Enable course as a Blueprint Course" %>
+            <% cannot_enable_mc = !is_master_course && @context.student_enrollments.not_fake.exists? %>
+            <span <% if cannot_enable_mc %>data-tooltip title="<%= t("Cannot have a blueprint course with students") %>"<% end %>>
+              <%= f.check_box :master_course, :checked => is_master_course, :disabled => cannot_enable_mc %>
+              <%= f.label :master_course, :en => "Enable course as a Blueprint Course" %>
+            </span>
           <% else %>
             <span id="course_master_course"><%= is_master_course ? t("Yes") : t("No") %></span>
           <% end %>
