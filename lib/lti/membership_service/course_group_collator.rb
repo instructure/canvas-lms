@@ -36,7 +36,7 @@ module Lti
       private
 
       def collate_memberships
-        groups.slice(0, @per_page).map do |user|
+        groups.to_a.slice(0, @per_page).map do |user|
           generate_membership(user)
         end
       end
