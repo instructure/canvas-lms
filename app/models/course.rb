@@ -730,7 +730,7 @@ class Course < ActiveRecord::Base
     RequestCache.cache('user_is_student', self, user, opts) do
       Rails.cache.fetch([self, user, "course_user_is_student", opts].cache_key) do
         enroll_types = ["StudentEnrollment"]
-        enroll_types << ["StudentViewEnrollment"] if opts[:include_fake_student]
+        enroll_types << "StudentViewEnrollment" if opts[:include_fake_student]
 
         enroll_scope = self.enrollments.for_user(user).where(:type => enroll_types)
         if opts[:include_future]

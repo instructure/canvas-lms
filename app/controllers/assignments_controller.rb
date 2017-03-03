@@ -543,6 +543,6 @@ class AssignmentsController < ApplicationController
   end
 
   def index_edit_params
-    params.slice(*[:title, :due_at, :points_possible, :assignment_group_id, :return_to])
+    params.permit(:title, :due_at, :points_possible, :assignment_group_id, :return_to)
   end
 end

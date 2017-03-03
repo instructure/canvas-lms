@@ -267,7 +267,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def assignment_group_params
-    params.require(:assignment_group).
+    result = params.require(:assignment_group).
       permit(:assignment_weighting_scheme,
              :default_assignment_name,
              :group_weight,
@@ -276,6 +276,8 @@ class AssignmentGroupsController < ApplicationController
              :rules,
              :sis_source_id,
              :integration_data => strong_anything)
+    result[:integration_data] = nil if result[:integration_data] == ''
+    result
   end
 
   def include_params

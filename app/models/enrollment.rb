@@ -1202,7 +1202,12 @@ class Enrollment < ActiveRecord::Base
   end
 
   def self.top_enrollment_by(key, rank_order = :default)
-    raise "top_enrollment_by_user must be scoped" unless all.where_values.present?
+    if CANVAS_RAILS4_2
+      raise "top_enrollment_by_user must be scoped" unless all.where_values.present?
+    else
+      raise "top_enrollment_by_user must be scoped" unless all.where_clause.present?
+    end
+
     key = key.to_s
     order("#{key}, #{type_rank_sql(rank_order)}").distinct_on(key)
   end

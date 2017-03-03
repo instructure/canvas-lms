@@ -523,7 +523,8 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def self.conversation_ids
-    raise "conversation_ids needs to be scoped to a user" unless all.where_values.any? do |v|
+    where_predicates = CANVAS_RAILS4_2 ? all.where_values : all.where_clause.instance_variable_get(:@predicates)
+    raise "conversation_ids needs to be scoped to a user" unless where_predicates.any? do |v|
       if v.is_a?(Arel::Nodes::Binary) && v.left.is_a?(Arel::Attributes::Attribute)
         v.left.name == 'user_id'
       else
