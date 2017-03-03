@@ -82,8 +82,6 @@ class EffectiveDueDates
     find_effective_due_date(student_id, assignment_id).fetch(:grading_period_id, nil)
   end
 
-  private
-
   def find_effective_due_date(student_id, assignment_id)
     find_effective_due_dates_for_assignment(assignment_id).fetch(student_id, {})
   end
@@ -91,6 +89,8 @@ class EffectiveDueDates
   def find_effective_due_dates_for_assignment(assignment_id)
     to_hash.fetch(assignment_id, {})
   end
+
+  private
 
   def usable_student_id?(student_id)
     return false unless student_id.present?
