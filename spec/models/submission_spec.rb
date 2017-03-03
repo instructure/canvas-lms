@@ -2485,6 +2485,19 @@ describe Submission do
     end
   end
 
+  describe "#resubmit_to_vericite" do
+    it "calls resubmit_to_plagiarism_later" do
+      plugin = Canvas::Plugin.find(:vericite)
+      PluginSetting.create!(name: plugin.id, settings: plugin.default_settings, disabled: false)
+
+      submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry',
+                                               body: 'whee')
+
+      submission.expects(:submit_to_plagiarism_later).once
+      submission.resubmit_to_vericite
+    end
+  end
+
 
   def submission_spec_model(opts={})
     @submission = Submission.new(@valid_attributes.merge(opts))

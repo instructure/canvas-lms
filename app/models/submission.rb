@@ -871,10 +871,9 @@ class Submission < ActiveRecord::Base
       # only set vericite provider flag if the hash isn't empty
       self.vericite_data_hash[:provider] = :vericite
     end
-    self.save
 
     @submit_to_vericite = true
-    submit_to_vericite_later
+    self.save
   end
 
   def vericiteable?
