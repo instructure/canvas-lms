@@ -175,7 +175,12 @@ class UsersController < ApplicationController
       add_crumb(@current_user.short_name, crumb_url)
       add_crumb(t('crumbs.grades', 'Grades'), grades_path)
 
-      current_active_enrollments = @user.enrollments.current.preload(:course, :enrollment_state).shard(@user).to_a
+      current_active_enrollments = @user.
+        enrollments.
+        current.
+        preload(:course, :enrollment_state, :scores).
+        shard(@user).
+        to_a
 
       @presenter = GradesPresenter.new(current_active_enrollments)
 
@@ -197,19 +202,11 @@ class UsersController < ApplicationController
     enrollment = Enrollment.active.find(params[:enrollment_id])
     return render_unauthorized_action unless enrollment.grants_right?(@current_user, session, :read_grades)
 
-    course = enrollment.course
-    grading_period_id = params[:grading_period_id].to_i
-    grading_period = GradingPeriod.for(course).find_by(id: grading_period_id)
-    grading_periods = {
-      course.id => {
-        periods: [grading_period],
-        selected_period_id: grading_period_id
-      }
+    grading_period_id = generate_grading_period_id(params[:grading_period_id])
+    render json: {
+      grade: enrollment.computed_current_score(grading_period_id: grading_period_id),
+      hide_final_grades: enrollment.course.hide_final_grades?
     }
-    calculator = grade_calculator([enrollment.user_id], course, grading_periods)
-    totals = calculator.compute_scores.first[:current]
-    totals[:hide_final_grades] = course.hide_final_grades?
-    render json: totals
   end
 
   def oauth
@@ -2119,6 +2116,12 @@ class UsersController < ApplicationController
 
   private
 
+  def generate_grading_period_id(period_id)
+    # nil and '' will get converted to 0 in the .to_i call
+    id = period_id.to_i
+    id == 0 ? nil : id
+  end
+
   def render_new_user_tutorial_statuses(user)
     render(json: { new_user_tutorial_statuses: { collapsed: user.new_user_tutorial_statuses }})
   end
@@ -2137,47 +2140,30 @@ class UsersController < ApplicationController
       presenter.observed_enrollments.group_by { |enrollment| enrollment[:course_id] }
 
     grouped_observed_enrollments.each do |course_id, enrollments|
+      grading_period_id = generate_grading_period_id(
+        grading_periods[course_id].try(:selected_period_id)
+      )
       grades[:observed_enrollments][course_id] = {}
-
-      if grading_periods[course_id].present?
-        user_ids = enrollments.map(&:user_id)
-        course = enrollments.first.course
-        grades[:observed_enrollments][course_id] = grades_from_grade_calculator(user_ids, course, grading_periods)
-      else
-        grades[:observed_enrollments][course_id] = grades_from_enrollments(enrollments)
-      end
+      grades[:observed_enrollments][course_id] = grades_from_enrollments(
+        enrollments,
+        grading_period_id: grading_period_id
+      )
     end
 
-    presenter.student_enrollments.each do |enrollment_course_pair|
-      course = enrollment_course_pair.first
-      enrollment = enrollment_course_pair.second
-
-      if grading_periods[course.id].present?
-        computed_score = grades_from_grade_calculator([enrollment.user_id], course, grading_periods)[enrollment.user_id]
-        grades[:student_enrollments][course.id] = computed_score
-      else
-        computed_score = enrollment.computed_current_score
-        grades[:student_enrollments][course.id] = computed_score
-      end
+    presenter.student_enrollments.each do |course, enrollment|
+      grading_period_id = generate_grading_period_id(
+        grading_periods[course.id].try(:[], :selected_period_id)
+      )
+      computed_score = enrollment.computed_current_score(grading_period_id: grading_period_id)
+      grades[:student_enrollments][course.id] = computed_score
     end
     grades
   end
 
-  def grades_from_grade_calculator(user_ids, course, grading_periods)
-    calculator = grade_calculator(user_ids, course, grading_periods)
-    grades = {}
-    calculator.compute_scores.each_with_index do |score, index|
-      computed_score = score[:current][:grade]
-      user_id = user_ids[index]
-      grades[user_id] = computed_score
-    end
-    grades
-  end
-
-  def grades_from_enrollments(enrollments)
+  def grades_from_enrollments(enrollments, grading_period_id: nil)
     grades = {}
     enrollments.each do |enrollment|
-      computed_score = enrollment.computed_current_score
+      computed_score = enrollment.computed_current_score(grading_period_id: grading_period_id)
       grades[enrollment.user_id] = computed_score
     end
     grades
@@ -2191,7 +2177,7 @@ class UsersController < ApplicationController
     grading_periods = {}
 
     courses.each do |course|
-      next unless course.feature_enabled?(:multiple_grading_periods)
+      next unless course.grading_periods?
 
       course_periods = GradingPeriod.for(course)
       grading_period_specified = grading_period_id &&
@@ -2210,19 +2196,6 @@ class UsersController < ApplicationController
       }
     end
     grading_periods
-  end
-
-  def grade_calculator(user_ids, course, grading_periods)
-    if course.feature_enabled?(:multiple_grading_periods) &&
-      grading_periods[course.id][:selected_period_id] != 0
-
-      grading_period = grading_periods[course.id][:periods].find do |period|
-        period.id == grading_periods[course.id][:selected_period_id]
-      end
-      GradeCalculator.new(user_ids, course, grading_period: grading_period)
-    else
-      GradeCalculator.new(user_ids, course)
-    end
   end
 
   def create_user

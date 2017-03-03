@@ -245,7 +245,7 @@ class SubmissionsApiController < ApplicationController
   #
   # @argument grading_period_id [Integer]
   #   The id of the grading period in which submissions are being requested
-  #   (Requires the Multiple Grading Periods account feature turned on)
+  #   (Requires grading periods to exist on the account)
   #
   # @argument order [String, "id"|"graded_at"]
   #   The order submissions will be returned in.  Defaults to "id".  Doesn't
@@ -330,7 +330,7 @@ class SubmissionsApiController < ApplicationController
       assignment_scope = assignment_scope.where(:id => requested_assignment_ids)
     end
 
-    if params[:grading_period_id].present? && multiple_grading_periods?
+    if params[:grading_period_id].present?
       assignments = GradingPeriod.active.find(params[:grading_period_id]).assignments(assignment_scope)
     else
       assignments = assignment_scope.to_a

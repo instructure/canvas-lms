@@ -1623,7 +1623,7 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
-    context "with multiple grading periods enabled" do
+    context "with grading periods" do
       def call_create(params, expected_status)
         api_call_as_user(
           @current_user,
@@ -1645,7 +1645,6 @@ describe AssignmentsApiController, type: :request do
       end
 
       before :once do
-        @course.root_account.enable_feature!(:multiple_grading_periods)
         grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
         term = @course.enrollment_term
         term.grading_period_group = grading_period_group
@@ -2508,7 +2507,7 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
-    context "with multiple grading periods enabled" do
+    context "with grading periods" do
       def create_assignment(attr)
         @course.assignments.create!({ name: "Example Assignment", submission_types: "points" }.merge(attr))
       end
@@ -2541,7 +2540,6 @@ describe AssignmentsApiController, type: :request do
       end
 
       before :once do
-        @course.root_account.enable_feature!(:multiple_grading_periods)
         grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
         term = @course.enrollment_term
         term.grading_period_group = grading_period_group

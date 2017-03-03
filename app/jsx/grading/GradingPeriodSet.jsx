@@ -33,9 +33,13 @@ define([
            !isNaN(date.getTime());
   };
 
-  const validatePeriods = function(periods) {
+  const validatePeriods = function(periods, weighted) {
     if (_.any(periods, (period) => { return !(period.title || "").trim() })) {
       return [I18n.t('All grading periods must have a title')];
+    }
+
+    if (weighted && _.any(periods, (period) => { return isNaN(period.weight) || period.weight < 0 })) {
+      return [I18n.t('All weights must be greater than or equal to 0')];
     }
 
     let validDates = _.all(periods, (period) => {
@@ -101,7 +105,8 @@ define([
 
       set: shape({
         id:    string.isRequired,
-        title: string.isRequired
+        title: string.isRequired,
+        weighted: bool
       }).isRequired,
 
       urls: shape({
@@ -121,6 +126,7 @@ define([
     getInitialState() {
       return {
         title: this.props.set.title,
+        weighted: this.props.set.weighted || false,
         gradingPeriods: sortPeriods(this.props.gradingPeriods),
         newPeriod: {
           period: null,
@@ -199,7 +205,7 @@ define([
 
     saveNewPeriod(period) {
       let periods = this.state.gradingPeriods.concat([period]);
-      let validations = validatePeriods(periods);
+      let validations = validatePeriods(periods, this.state.weighted);
       if (_.isEmpty(validations)) {
         this.setNewPeriod({saving: true});
         gradingPeriodsApi.batchUpdate(this.props.set.id, periods)
@@ -236,7 +242,7 @@ define([
       let periods = _.reject(this.state.gradingPeriods, function(_period) {
         return period.id === _period.id;
       }).concat([period]);
-      let validations = validatePeriods(periods);
+      let validations = validatePeriods(periods, this.state.weighted);
       if (_.isEmpty(validations)) {
         this.setEditPeriod({ saving: true });
         gradingPeriodsApi.batchUpdate(this.props.set.id, periods)
@@ -334,6 +340,7 @@ define([
                  className = 'GradingPeriodList__period--editing pad-box'>
               <GradingPeriodForm ref      = "editPeriodForm"
                                  period   = {period}
+                                 weighted = {this.state.weighted}
                                  disabled = {this.state.editPeriod.saving}
                                  onSave   = {this.updatePeriod}
                                  onCancel = {this.cancelEditPeriod} />
@@ -344,6 +351,7 @@ define([
             <GradingPeriod key={"show-grading-period-" + period.id}
                            ref={getShowGradingPeriodRef(period)}
                            period={period}
+                           weighted={this.state.weighted}
                            actionsDisabled={actionsDisabled}
                            onEdit={this.editPeriod}
                            readOnly={this.props.readOnly}
@@ -387,6 +395,7 @@ define([
         <div className='GradingPeriodList__new-period--editing border border-rbl border-round-b pad-box'>
           <GradingPeriodForm key      = 'new-grading-period'
                              ref      = 'newPeriodForm'
+                             weighted = {this.state.weighted}
                              disabled = {this.state.newPeriod.saving}
                              onSave   = {this.saveNewPeriod}
                              onCancel = {this.removeNewPeriodForm} />

@@ -44,7 +44,7 @@ define [
         defaultSectionId: @model.defaultDueDateSectionId,
         selectedGroupSetId: @model.assignment.get("group_category_id"),
         gradingPeriods: @gradingPeriods,
-        multipleGradingPeriodsEnabled: @multipleGradingPeriodsEnabled,
+        hasGradingPeriods: @hasGradingPeriods,
         isOnlyVisibleToOverrides: @model.assignment.isOnlyVisibleToOverrides(),
         dueAt: tz.parse(@model.assignment.get("due_at"))
       })
@@ -53,7 +53,7 @@ define [
 
     gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods)
 
-    multipleGradingPeriodsEnabled: !!ENV.MULTIPLE_GRADING_PERIODS_ENABLED
+    hasGradingPeriods: !!ENV.HAS_GRADING_PERIODS
 
     validateBeforeSave: (data, errors) =>
       return errors unless data
@@ -69,7 +69,7 @@ define [
         dateValidator = new DateValidator({
           date_range: _.extend({}, ENV.VALID_DATE_RANGE)
           data: override
-          multipleGradingPeriodsEnabled: @multipleGradingPeriodsEnabled
+          hasGradingPeriods: @hasGradingPeriods
           gradingPeriods: @gradingPeriods
           userIsAdmin: _.contains(ENV.current_user_roles, "admin"),
           postToSIS: @options.postToSIS || data.postToSIS == '1'

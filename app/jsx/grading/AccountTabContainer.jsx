@@ -9,7 +9,6 @@ define([
 
   class AccountTabContainer extends React.Component {
     static propTypes = {
-      multipleGradingPeriodsEnabled: bool.isRequired,
       readOnly: bool.isRequired,
       urls: shape({
         gradingPeriodSetsURL: string.isRequired,
@@ -20,11 +19,10 @@ define([
     }
 
     componentDidMount () {
-      if (!this.props.multipleGradingPeriodsEnabled) return;
       $(this.tabContainer).children('.ui-tabs-minimal').tabs();
     }
 
-    renderSetsAndStandards () {
+    render () {
       return (
         <div ref={(el) => { this.tabContainer = el; }}>
           <h1>{I18n.t('Grading')}</h1>
@@ -51,22 +49,6 @@ define([
           </div>
         </div>
       );
-    }
-
-    renderStandards () {
-      return (
-        <div ref={(el) => { this.gradingStandards = el; }}>
-          <h1>{I18n.t('Grading Schemes')}</h1>
-          <GradingStandardCollection />
-        </div>
-      );
-    }
-
-    render () {
-      if (this.props.multipleGradingPeriodsEnabled) {
-        return this.renderSetsAndStandards();
-      }
-      return this.renderStandards();
     }
   }
 

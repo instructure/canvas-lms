@@ -20,19 +20,19 @@ require_relative '../../common'
 require_relative '../page_objects/speedgrader_page'
 require_relative '../setup/gradebook_setup'
 
-describe "speedgrader - multiple grading periods" do
+describe "speedgrader with grading periods" do
   include_context "in-process server selenium tests"
   include GradebookSetup
 
   context 'with close and end dates' do
-    before(:each) do
+    before do
       term_name = "First Term"
-      create_multiple_grading_periods(term_name)
+      create_grading_periods(term_name)
       add_teacher_and_student
       associate_course_to_term(term_name)
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 

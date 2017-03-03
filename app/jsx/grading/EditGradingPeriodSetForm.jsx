@@ -4,16 +4,18 @@ define([
   'underscore',
   'jquery',
   'instructure-ui/Button',
+  'instructure-ui/Checkbox',
   'i18n!grading_periods',
   'jsx/grading/EnrollmentTermInput',
   'compiled/jquery.rails_flash_notifications'
-], function(React, ReactDOM, _, $, { default: Button }, I18n, EnrollmentTermInput) {
+], function(React, ReactDOM, _, $, { default: Button }, { default: Checkbox }, I18n, EnrollmentTermInput) {
   const { array, bool, func, shape, string } = React.PropTypes;
 
   const buildSet = function(attr = {}) {
     return {
       id:                attr.id,
       title:             attr.title || "",
+      weighted:          attr.weighted || false,
       enrollmentTermIDs: attr.enrollmentTermIDs || []
     };
   };
@@ -30,6 +32,7 @@ define([
       set: shape({
         id:                string,
         title:             string,
+        weighted:          bool,
         enrollmentTermIDs: array
       }).isRequired,
       enrollmentTerms: array.isRequired,
@@ -53,15 +56,18 @@ define([
     },
 
     changeTitle(e) {
-      let set = _.clone(this.state.set);
-      set.title = e.target.value;
-      this.setState({ set: set });
+      const set = { ...this.state.set, title: e.target.value };
+      this.setState({ set });
+    },
+
+    changeWeighted(e) {
+      const set = { ...this.state.set, weighted: e.target.checked };
+      this.setState({ set });
     },
 
     changeEnrollmentTermIDs(termIDs) {
-      let set = _.clone(this.state.set);
-      set.enrollmentTermIDs = termIDs;
-      this.setState({ set: set });
+      const set = { ...this.state.set, enrollmentTermIDs: termIDs };
+      this.setState({ set });
     },
 
     triggerSave: function(e) {
@@ -129,6 +135,16 @@ define([
                   enrollmentTerms              = {this.props.enrollmentTerms}
                   selectedIDs                  = {this.state.set.enrollmentTermIDs}
                   setSelectedEnrollmentTermIDs = {this.changeEnrollmentTermIDs} />
+
+                <div className="ic-Input">
+                  <Checkbox
+                    ref={(ref) => { this.weightedCheckbox = ref }}
+                    label={I18n.t('Weighted grading periods')}
+                    value="weighted"
+                    checked={this.state.set.weighted}
+                    onChange={this.changeWeighted}
+                  />
+                </div>
               </div>
             </div>
 

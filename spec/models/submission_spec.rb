@@ -37,14 +37,13 @@ describe Submission do
     }
   end
 
-  describe "Multiple Grading Periods" do
+  describe "with grading periods" do
     let(:in_closed_grading_period) { 9.days.ago }
     let(:in_open_grading_period) { 1.day.from_now }
     let(:outside_of_any_grading_period) { 10.days.from_now }
 
     before(:once) do
       @root_account = @context.root_account
-      @root_account.enable_feature!(:multiple_grading_periods)
       group = @root_account.grading_period_groups.create!
       @closed_period = group.grading_periods.create!(
         title: "Closed!",
@@ -664,7 +663,7 @@ describe Submission do
       }.from([nil]).to([50.0])
     end
 
-    context 'Multiple Grading Periods' do
+    context 'with grading periods' do
       before(:once) do
         @now = Time.zone.now
         course = @submission.context
@@ -675,7 +674,6 @@ describe Submission do
         assignment_outside_of_period.grade_student(@user, grade: 8, grader: @teacher)
         @assignment.update!(due_at: @now)
         @root_account = course.root_account
-        @root_account.enable_feature!(:multiple_grading_periods)
         group = @root_account.grading_period_groups.create!
         group.enrollment_terms << course.enrollment_term
         @grading_period = group.grading_periods.create!(
@@ -690,14 +688,6 @@ describe Submission do
         expect { @submission.update!(score: 5) }.to change {
           scores.pluck(:current_score)
         }.from([nil, 80.0]).to([50.0, 65.0])
-      end
-
-      it 'keeps grading period scores updated even if the feature flag is disabled' do
-        @submission.update!(score: 10)
-        @root_account.disable_feature!(:multiple_grading_periods)
-        expect { @submission.update!(score: 5) }.to change {
-          grading_period_scores.pluck(:current_score)
-        }.from([100.0]).to([50.0])
       end
 
       it 'only updates the course score (not the grading period score) if a submission ' \

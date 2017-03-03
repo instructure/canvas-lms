@@ -63,8 +63,7 @@ module AssignmentGroupsApiSpecHelper
     )
   end
 
-  def setup_multiple_grading_periods
-    @course.account.enable_feature!(:multiple_grading_periods)
+  def setup_grading_periods
     setup_groups
     @group1_assignment_today = @course.assignments.create!(assignment_group: @group1, due_at: Time.zone.now)
     @group1_assignment_future = @course.assignments.create!(assignment_group: @group1, due_at: 3.months.from_now)
@@ -297,9 +296,9 @@ describe AssignmentGroupsController, type: :request do
     end
   end
 
-  context "multiple grading periods" do
+  context "grading periods" do
     before :once do
-      setup_multiple_grading_periods
+      setup_grading_periods
     end
 
     describe "#index" do
@@ -613,7 +612,7 @@ describe AssignmentGroupsApiController, type: :request do
     end
 
     it 'should only return assignments in the given grading period with MGP on' do
-      setup_multiple_grading_periods
+      setup_grading_periods
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}?include[]=assignments&grading_period_id=#{@gp_future.id}",
         controller: 'assignment_groups_api',
@@ -627,10 +626,10 @@ describe AssignmentGroupsApiController, type: :request do
       expect(json['assignments'].length).to eq 1
     end
 
-    it 'should not return an error when Multiple Grading Periods is turned on and no grading_period_id is passed in' do
-      setup_multiple_grading_periods
+    it 'should not return an error when there are grading periods and no grading_period_id is passed in' do
+      setup_grading_periods
 
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}?include[]=assignments",
+      api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}?include[]=assignments",
         controller: 'assignment_groups_api',
         action: 'show',
         format: 'json',
@@ -898,7 +897,6 @@ describe AssignmentGroupsApiController, type: :request do
       end
 
       before :once do
-        @course.root_account.enable_feature!(:multiple_grading_periods)
         @grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
         @grading_period_group.enrollment_terms << @course.enrollment_term
         Factories::GradingPeriodHelper.new.create_for_group(@grading_period_group, {
@@ -946,12 +944,6 @@ describe AssignmentGroupsApiController, type: :request do
           rules_encoded = @assignment_group.rules
           call_update.call({ rules: rules_hash }, 200)
           expect(@assignment_group.reload.rules).to eq(rules_encoded)
-        end
-
-        it "succeeds when multiple grading periods is disabled" do
-          @course.root_account.disable_feature!(:multiple_grading_periods)
-          call_update.call({ group_weight: 75 }, 200)
-          expect(@assignment_group.reload.group_weight).to eq(75)
         end
 
         it "ignores deleted assignments" do

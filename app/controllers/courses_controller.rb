@@ -359,14 +359,14 @@ class CoursesController < ApplicationController
   #   - "current_grading_period_scores": Optional information to include with
   #     each Course. When current_grading_period_scores is given and total_scores
   #     is given, any student enrollments will also include the fields
-  #     'multiple_grading_periods_enabled',
+  #     'has_grading_periods',
   #     'totals_for_all_grading_periods_option', 'current_grading_period_title',
   #     'current_grading_period_id', current_period_computed_current_score',
   #     'current_period_computed_final_score',
   #     'current_period_computed_current_grade', and
   #     'current_period_computed_final_grade' (see Enrollment documentation for
   #     more information on these fields). In addition, when this argument is
-  #     passed, the course will have a 'multiple_grading_periods_enabled' attribute
+  #     passed, the course will have a 'has_grading_periods' attribute
   #     on it. This argument is ignored if the course is configured to hide final
   #     grades or if the total_scores argument is not included.
   #   - "term": Optional information to include with each Course. When
@@ -474,14 +474,14 @@ class CoursesController < ApplicationController
   #   - "current_grading_period_scores": Optional information to include with
   #     each Course. When current_grading_period_scores is given and total_scores
   #     is given, any student enrollments will also include the fields
-  #     'multiple_grading_periods_enabled',
+  #     'has_grading_periods',
   #     'totals_for_all_grading_periods_option', 'current_grading_period_title',
   #     'current_grading_period_id', current_period_computed_current_score',
   #     'current_period_computed_final_score',
   #     'current_period_computed_current_grade', and
   #     'current_period_computed_final_grade' (see Enrollment documentation for
   #     more information on these fields). In addition, when this argument is
-  #     passed, the course will have a 'multiple_grading_periods_enabled' attribute
+  #     passed, the course will have a 'has_grading_periods' attribute
   #     on it. This argument is ignored if the course is configured to hide final
   #     grades or if the total_scores argument is not included.
   #   - "term": Optional information to include with each Course. When
@@ -2474,9 +2474,9 @@ class CoursesController < ApplicationController
 
   # @API Get effective due dates
   # For each assignment in the course, returns each assigned student's ID
-  # and their corresponding due date along with some Multiple Grading Periods
-  # data. Returns a collection with keys representing assignment IDs and values
-  # as a collection containing keys representing student IDs and values representing
+  # and their corresponding due date along with some grading period data.
+  # Returns a collection with keys representing assignment IDs and values as a
+  # collection containing keys representing student IDs and values representing
   # the student's effective due_at, the grading_period_id of which the due_at falls
   # in, and whether or not the grading period is closed (in_closed_grading_period)
   #
@@ -2805,7 +2805,7 @@ class CoursesController < ApplicationController
   end
 
   def can_change_group_weighting_scheme?
-    return true unless @course.feature_enabled?(:multiple_grading_periods)
+    return true unless @course.grading_periods?
     return true if @course.account_membership_allows(@current_user)
     !@course.any_assignment_in_closed_grading_period?
   end

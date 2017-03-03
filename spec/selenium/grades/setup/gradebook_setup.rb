@@ -9,9 +9,7 @@ module GradebookSetup
     Factories::GradingPeriodHelper.new
   end
 
-  def create_multiple_grading_periods(term_name, now = Time.zone.now)
-    Account.default.enable_feature!(:multiple_grading_periods)
-
+  def create_grading_periods(term_name, now = Time.zone.now)
     set1 = backend_group_helper.create_for_account_with_term(Account.default, term_name, "Set 1")
     @gp_closed = backend_period_helper.create_for_group(set1, closed_attributes(now))
     @gp_ended = backend_period_helper.create_for_group(set1, ended_attributes(now))

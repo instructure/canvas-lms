@@ -424,7 +424,7 @@ describe AssignmentsController do
   end
 
   describe "GET 'edit'" do
-    include_context "multiple grading periods within controller" do
+    include_context "grading periods within controller" do
       let(:course) { @course }
       let(:teacher) { @teacher }
       let(:request_params) { [:edit, course_id: course, id: @assignment] }

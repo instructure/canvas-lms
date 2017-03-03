@@ -1705,19 +1705,15 @@ describe Assignment do
     end
 
     context "to delete" do
-      before(:each) do
-        @course.root_account.enable_feature!(:multiple_grading_periods)
-      end
-
-      context "when multiple grading periods is disabled" do
+      context "when there are no grading periods" do
         it "is true for admins" do
-          @course.root_account.disable_feature!(:multiple_grading_periods)
-          expect(@assignment.reload.grants_right?(@admin, :delete)).to eql(true)
+          @course.stubs(:grading_periods?).returns false
+          expect(@assignment.reload.grants_right?(@admin, :delete)).to be true
         end
 
         it "is false for teachers" do
-          @course.root_account.disable_feature!(:multiple_grading_periods)
-          expect(@assignment.reload.grants_right?(@teacher, :delete)).to eql(true)
+          @course.stubs(:grading_periods?).returns false
+          expect(@assignment.reload.grants_right?(@teacher, :delete)).to be true
         end
       end
 

@@ -235,11 +235,10 @@ class ApplicationController < ActionController::Base
   end
   helper_method :k12?
 
-  def multiple_grading_periods?
-    account_and_grading_periods_allowed? ||
-      context_grading_periods_enabled?
+  def grading_periods?
+    !!@context.try(:grading_periods?)
   end
-  helper_method :multiple_grading_periods?
+  helper_method :grading_periods?
 
   def master_courses?
     @domain_root_account && @domain_root_account.feature_enabled?(:master_courses)
@@ -276,18 +275,6 @@ class ApplicationController < ActionController::Base
     tool_dimensions
   end
   private :tool_dimensions
-
-  def account_and_grading_periods_allowed?
-    @context.is_a?(Account) &&
-      @context.feature_allowed?(:multiple_grading_periods)
-  end
-  private :account_and_grading_periods_allowed?
-
-  def context_grading_periods_enabled?
-    @context.present? &&
-      @context.feature_enabled?(:multiple_grading_periods)
-  end
-  private :context_grading_periods_enabled?
 
   # Reject the request by halting the execution of the current handler
   # and returning a helpful error message (and HTTP status code).
@@ -2050,7 +2037,7 @@ class ApplicationController < ActionController::Base
       },
       :POST_TO_SIS => Assignment.sis_grade_export_enabled?(@context),
       :PERMISSIONS => permissions,
-      :MULTIPLE_GRADING_PERIODS_ENABLED => @context.feature_enabled?(:multiple_grading_periods),
+      :HAS_GRADING_PERIODS => @context.grading_periods?,
       :VALID_DATE_RANGE => CourseDateRange.new(@context),
       :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
       :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
@@ -2061,7 +2048,7 @@ class ApplicationController < ActionController::Base
 
     conditional_release_js_env(includes: :active_rules)
 
-    if @context.feature_enabled?(:multiple_grading_periods)
+    if @context.grading_periods?
       js_env(:active_grading_periods => GradingPeriod.json_for(@context, @current_user))
     end
   end

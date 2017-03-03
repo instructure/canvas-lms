@@ -279,8 +279,7 @@ module Api::V1::User
     return opts[:grading_period] if opts[:grading_period]
     return nil unless opts[:current_grading_period_scores]
 
-    mgp_enabled = course.feature_enabled?(:multiple_grading_periods)
-    mgp_enabled ? GradingPeriod.current_period_for(course) : nil
+    GradingPeriod.current_period_for(course)
   end
 
   def grade_permissions?(user, enrollment)

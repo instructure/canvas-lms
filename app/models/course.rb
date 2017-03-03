@@ -1044,10 +1044,15 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def recompute_student_scores(student_ids = nil, grading_period_id: nil)
+  def recompute_student_scores(student_ids = nil, grading_period_id: nil, update_all_grading_period_scores: true)
     student_ids ||= self.student_ids
     Rails.logger.info "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
-    GradeCalculator.recompute_final_score(student_ids, self.id, grading_period_id: grading_period_id)
+    Enrollment.recompute_final_score(
+      student_ids,
+      self.id,
+      grading_period_id: grading_period_id,
+      update_all_grading_period_scores: update_all_grading_period_scores
+    )
   end
   handle_asynchronously_if_production :recompute_student_scores,
     :singleton => proc { |c| "recompute_student_scores:#{ c.global_id }" }
@@ -1665,7 +1670,6 @@ class Course < ActiveRecord::Base
                                             :last_publish_attempt_at => last_publish_attempt_at).
         update_all(:grade_publishing_status => 'error', :grade_publishing_message => "Timed out.")
   end
-
 
   def gradebook_to_csv_in_background(filename, user, options = {})
     progress = progresses.build(tag: 'gradebook_to_csv')
@@ -3090,6 +3094,18 @@ class Course < ActiveRecord::Base
 
   def any_assignment_in_closed_grading_period?
     effective_due_dates.any_in_closed_grading_period?
+  end
+
+  # Does this course have grading periods?
+  # checks for both legacy and account-level grading period groups
+  def grading_periods?
+    return @has_grading_periods unless @has_grading_periods.nil?
+
+    @has_grading_periods = shard.activate do
+      GradingPeriodGroup.active.
+        where("id = ? or course_id = ?", enrollment_term.grading_period_group_id, id).
+        exists?
+    end
   end
 
   def quiz_lti_tool

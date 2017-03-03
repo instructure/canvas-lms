@@ -8,11 +8,11 @@ define([
 ], (React, GradingStandardCollection, GradingPeriodCollection, $, I18n) => {
   class CourseTabContainer extends React.Component {
     static propTypes = {
-      multipleGradingPeriodsEnabled: React.PropTypes.bool.isRequired
+      hasGradingPeriods: React.PropTypes.bool.isRequired
     }
 
     componentDidMount () {
-      if (!this.props.multipleGradingPeriodsEnabled) return;
+      if (!this.props.hasGradingPeriods) return;
       $(this.tabContainer).children('.ui-tabs-minimal').tabs();
     }
 
@@ -52,7 +52,7 @@ define([
     }
 
     render () {
-      if (this.props.multipleGradingPeriodsEnabled) {
+      if (this.props.hasGradingPeriods) {
         return this.renderSetsAndStandards();
       }
       return this.renderStandards();

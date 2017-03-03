@@ -16,12 +16,14 @@ define([
 
   const defaultProps = {
     period: {
-      id: '1',
-      title: 'We did it! We did it! We did it! #dora #boots',
-      startDate: new Date('2015-01-01T20:11:00+00:00'),
-      endDate: new Date('2015-03-01T00:00:00+00:00'),
-      closeDate: new Date('2015-03-08T00:00:00+00:00')
+      id: "1",
+      title: "We did it! We did it! We did it! #dora #boots",
+      weight: 30,
+      startDate: new Date("2015-01-01T20:11:00+00:00"),
+      endDate: new Date("2015-03-01T00:00:00+00:00"),
+      closeDate: new Date("2015-03-08T00:00:00+00:00")
     },
+    weighted: true,
     readOnly: false,
     onEdit: () => {},
     readOnly: false,
@@ -70,28 +72,30 @@ define([
   test('displays the start date in a friendly format', function () {
     let period = this.renderComponent();
     const startDate = ReactDOM.findDOMNode(period.refs.startDate).textContent;
-    equal(startDate, 'Start Date: Jan 1, 2015 at 8:11pm');
+    equal(startDate, "Starts: Jan 1, 2015");
   });
 
   test('displays the end date in a friendly format', function () {
     let period = this.renderComponent();
     const endDate = ReactDOM.findDOMNode(period.refs.endDate).textContent;
-    equal(endDate, 'End Date: Mar 1, 2015 at 12am');
+    equal(endDate, "Ends: Mar 1, 2015");
   });
 
   test('displays the close date in a friendly format', function () {
     let period = this.renderComponent();
     const closeDate = ReactDOM.findDOMNode(period.refs.closeDate).textContent;
-    equal(closeDate, 'Close Date: Mar 8, 2015 at 12am');
+    equal(closeDate, "Closes: Mar 8, 2015");
   });
 
-  test('when the local timezone differs from the server timezone dates include the timezone', function () {
-    tz.preload('America/Chicago', chicago);
-    fakeENV.setup({TIMEZONE: 'America/Denver', CONTEXT_TIMEZONE: 'America/Chicago'});
+  test("displays the weight in a friendly format", function() {
     let period = this.renderComponent();
-    const closeDate = period.refs.closeDate.textContent;
-    equal(closeDate, 'Close Date: Mar 7, 2015 at 6pm UTC');
-    fakeENV.teardown();
+    const weight = ReactDOM.findDOMNode(period.refs.weight).textContent;
+    equal(weight, "Weight: 30%");
+  });
+
+  test("does not display the weight if weighted grading periods are turned off", function() {
+    let period = this.renderComponent({weighted: false});
+    equal(period.refs.weight, null);
   });
 
   test('calls the "onEdit" callback when the edit button is clicked', function () {

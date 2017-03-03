@@ -19,8 +19,6 @@
 require 'csv'
 
 class GradebookImporter
-  include GradebookTransformer
-
   ASSIGNMENT_PRELOADED_FIELDS = %i/
     id title points_possible grading_type updated_at context_id context_type group_category_id
     created_at due_at only_visible_to_overrides
@@ -321,7 +319,7 @@ class GradebookImporter
   end
 
   def prevent_new_assignment_creation?(periods, is_admin)
-    return false unless context.feature_enabled?(:multiple_grading_periods)
+    return false unless context.grading_periods?
     return false if is_admin
 
     GradingPeriod.date_in_closed_grading_period?(
@@ -502,7 +500,7 @@ class GradebookImporter
 
   def gradeable?(submission:, periods:, is_admin:)
     user_can_grade_submission = submission.grants_right?(@user, :grade)
-    return user_can_grade_submission unless @context.feature_enabled?(:multiple_grading_periods)
+    return user_can_grade_submission unless @context.grading_periods?
 
     user_can_grade_submission &&
       (is_admin || !GradingPeriod.date_in_closed_grading_period?(

@@ -45,7 +45,8 @@ module Api::V1
       @hash['course_format'] = @course.course_format if @course.course_format.present?
       @hash['restrict_enrollments_to_course_dates'] = !!@course.restrict_enrollments_to_course_dates
       if @includes.include?(:current_grading_period_scores)
-        @hash['multiple_grading_periods_enabled'] = @course.feature_enabled?(:multiple_grading_periods)
+        @hash['has_grading_periods'] = @course.grading_periods?
+        @hash['multiple_grading_periods_enabled'] = @hash['has_grading_periods'] # for backwards compatibility
       end
       clear_unneeded_fields(@hash)
     end
@@ -134,14 +135,14 @@ module Api::V1
     end
 
     def grading_period_scores(student_enrollments)
-      mgp_enabled = @course.feature_enabled?(:multiple_grading_periods)
-      totals_for_all_grading_periods_option = mgp_enabled &&
+      has_grading_periods = @course.grading_periods?
+      totals_for_all_grading_periods_option = has_grading_periods &&
         @course.feature_enabled?(:all_grading_periods_totals)
-      current_period = mgp_enabled && GradingPeriod.current_period_for(@course)
-      if mgp_enabled && current_period
+      current_period = has_grading_periods && GradingPeriod.current_period_for(@course)
+      if has_grading_periods && current_period
         calculated_grading_period_scores(student_enrollments, current_period, totals_for_all_grading_periods_option)
       else
-        nil_grading_period_scores(student_enrollments, mgp_enabled, totals_for_all_grading_periods_option)
+        nil_grading_period_scores(student_enrollments, has_grading_periods, totals_for_all_grading_periods_option)
       end
     end
 
@@ -157,7 +158,8 @@ module Api::V1
       scores = {}
       student_enrollments.each_with_index do |enrollment, index|
         scores[enrollment.id] = current_period_scores[index].merge({
-          multiple_grading_periods_enabled: true,
+          has_grading_periods: true,
+          multiple_grading_periods_enabled: true, # for backwards compatibility
           totals_for_all_grading_periods_option: totals_for_all_grading_periods_option,
           current_grading_period_title: current_period.title,
           current_grading_period_id: current_period.id
@@ -167,11 +169,12 @@ module Api::V1
     end
 
 
-    def nil_grading_period_scores(student_enrollments, mgp_enabled, totals_for_all_grading_periods_option)
+    def nil_grading_period_scores(student_enrollments, has_grading_periods, totals_for_all_grading_periods_option)
       scores = {}
       student_enrollments.each do |enrollment|
         scores[enrollment.id] = {
-          multiple_grading_periods_enabled: mgp_enabled,
+          has_grading_periods: has_grading_periods,
+          multiple_grading_periods_enabled: has_grading_periods, # for backwards compatibility
           totals_for_all_grading_periods_option: totals_for_all_grading_periods_option,
           current_grading_period_title: nil,
           current_grading_period_id: nil,

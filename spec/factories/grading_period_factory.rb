@@ -16,12 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# this factory creates an Account with the multiple_grading_periods feature flag enabled.
+# this factory creates an Account with n grading periods.
 # it also creates two grading periods for the account
 # the grading_periods both have a weight of 1
 module Factories
   def grading_periods(options = {})
-    Account.default.set_feature_flag! :multiple_grading_periods, 'on'
     course = options[:context] || @course || course_factory()
     count = options[:count] || 2
 
@@ -38,10 +37,7 @@ module Factories
   end
 
   def create_grading_periods_for(course, opts={})
-    opts = { mgp_flag_enabled: true }.merge(opts)
-    course.root_account = Account.default if !course.root_account
-    course.root_account.enable_feature!(:multiple_grading_periods) if opts[:mgp_flag_enabled]
-
+    course.root_account = Account.default unless course.root_account
     gp_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course)
     class_name = course.class.name.demodulize
     timeframes = opts[:grading_periods] || [:current]

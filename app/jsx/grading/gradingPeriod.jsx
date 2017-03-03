@@ -40,7 +40,7 @@ define([
         title: nextProps.title,
         startDate: nextProps.startDate,
         endDate: nextProps.endDate,
-        weight: nextProps.weight,
+        weight: nextProps.weight
       });
     },
 

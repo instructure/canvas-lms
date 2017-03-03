@@ -11,7 +11,7 @@ define([
       this.clock = sinon.useFakeTimers();
       this.stub($, 'publish')
       ENV.GRADEBOOK_OPTIONS = {
-        multiple_grading_periods_enabled: false
+        has_grading_periods: false
       };
       const assignment = {
         id: 1,

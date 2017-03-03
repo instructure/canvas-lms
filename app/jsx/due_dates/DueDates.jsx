@@ -26,7 +26,7 @@ define([
       syncWithBackbone: React.PropTypes.func.isRequired,
       sections: React.PropTypes.array.isRequired,
       defaultSectionId: React.PropTypes.string.isRequired,
-      multipleGradingPeriodsEnabled: React.PropTypes.bool.isRequired,
+      hasGradingPeriods: React.PropTypes.bool.isRequired,
       gradingPeriods: React.PropTypes.array.isRequired,
       isOnlyVisibleToOverrides: React.PropTypes.bool.isRequired,
       dueAt: function(props) {
@@ -350,7 +350,7 @@ define([
       let validGroups = this.valuesWithOmission({object: this.groupsForSelectedSet(), keysToOmit: this.chosenGroupIds()})
       let validSections = this.valuesWithOmission({object: this.state.sections, keysToOmit: this.chosenSectionIds()})
       let validNoops = this.valuesWithOmission({object: this.state.noops, keysToOmit: this.chosenNoops()})
-      if (this.props.multipleGradingPeriodsEnabled && !_.contains(ENV.current_user_roles, "admin")) {
+      if (this.props.hasGradingPeriods && !_.contains(ENV.current_user_roles, "admin")) {
         ({validStudents, validGroups, validSections} =
           this.filterDropdownOptionsForMultipleGradingPeriods(validStudents, validGroups, validSections))
       }
@@ -431,7 +431,7 @@ define([
 
     disableInputs(row) {
       const rowIsNewOrUserIsAdmin = !row.persisted || _.contains(ENV.current_user_roles, "admin")
-      if (!this.props.multipleGradingPeriodsEnabled || rowIsNewOrUserIsAdmin) {
+      if (!this.props.hasGradingPeriods || rowIsNewOrUserIsAdmin) {
         return false
       }
 

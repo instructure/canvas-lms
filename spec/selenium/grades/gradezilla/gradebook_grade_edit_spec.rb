@@ -234,10 +234,9 @@ describe "Gradezilla editing grades" do
     expect_flash_message :error, "refresh"
   end
 
-  context 'with multiple grading periods enabled' do
+  context 'with grading periods' do
     before(:once) do
       root_account = @course.root_account = Account.default
-      root_account.enable_feature!(:multiple_grading_periods)
 
       group = Factories::GradingPeriodGroupHelper.new.create_for_account(root_account)
       group.enrollment_terms << @course.enrollment_term

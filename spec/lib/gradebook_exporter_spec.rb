@@ -89,7 +89,10 @@ describe GradebookExporter do
 
       let(:assignments) { course.assignments }
 
-      let!(:group) { Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course) }
+      let!(:group) do
+        @course.instance_variable_set(:@has_grading_periods, nil)
+        Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course)
+      end
 
       let!(:first_period) do
         args = {
@@ -115,14 +118,10 @@ describe GradebookExporter do
       let(:rows)    { CSV.parse(csv, headers: true) }
       let(:headers) { rows.headers }
 
-      describe "when multiple grading periods is on" do
+      describe "with grading periods" do
         before { @grading_period_id = last_period.id }
 
         describe "assignments in the selected grading period are exported" do
-          let!(:enable_mgp) do
-            course.enable_feature!(:multiple_grading_periods)
-          end
-
           it "exports selected grading period's assignments" do
             expect(headers).to include @no_due_date_assignment.title_with_id,
                                        @current_assignment.title_with_id
@@ -158,24 +157,6 @@ describe GradebookExporter do
                                        @future_assignment.title_with_id,
                                        @no_due_date_assignment.title_with_id
             expect(headers).not_to include "Final Score"
-          end
-        end
-      end
-
-
-      describe "when multiple grading periods is off" do
-        describe "all assignments are exported" do
-          let!(:disable_mgp) do
-            course.disable_feature!(:multiple_grading_periods)
-          end
-
-          it "includes all assignments" do
-            expect(headers).to include @no_due_date_assignment.title_with_id,
-                                       @current_assignment.title_with_id,
-                                       @past_assignment.title_with_id,
-                                       @future_assignment.title_with_id
-            final_grade = rows[1]["Final Score"].try(:to_f)
-            expect(final_grade).to eq 25
           end
         end
       end
