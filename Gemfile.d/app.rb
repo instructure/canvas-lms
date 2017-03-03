@@ -4,7 +4,7 @@ if CANVAS_RAILS4_2
   gem 'activesupport-json_encoder', '1.1.0'
   gem 'oauth2', '1.0.0', require: false
 else
-  gem 'rails', '5.0.2rc1'
+  gem 'rails', '5.0.2'
   gem 'rack', '2.0.1'
   gem 'oauth2', '1.2.0', require: false
 end
