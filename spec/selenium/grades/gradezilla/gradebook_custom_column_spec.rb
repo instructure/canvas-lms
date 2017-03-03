@@ -31,7 +31,7 @@ describe "Gradezilla - custom columns" do
 
     gradezilla_page.visit(@course)
 
-    expect(header(3)).to include_text col.title
+    expect(header(2)).to include_text col.title
     expect(ff(".container_0 .slick-header-column").map(&:text).join).not_to include hidden.title
     expect(ff(".slick-cell.custom_column").count { |c| c.text == "123456" }).to eq 1
   end

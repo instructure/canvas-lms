@@ -50,11 +50,13 @@ define [
   'compiled/util/natcompare'
   'str/htmlEscape'
   'jsx/gradezilla/shared/AssignmentDetailsDialogManager',
-  'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
   'jsx/gradezilla/shared/SetDefaultGradeDialogManager'
+  'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
+  'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
+  'jsx/gradezilla/default_gradebook/components/StudentRowHeader'
   'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader'
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
@@ -65,13 +67,11 @@ define [
   'jsx/gradezilla/shared/DownloadSubmissionsDialogManager'
   'jsx/gradezilla/shared/ReuploadSubmissionsDialogManager'
   'jst/gradezilla/group_total_cell'
-  'jst/gradezilla/row_student_name'
   'compiled/views/gradezilla/SectionMenuView'
   'compiled/views/gradezilla/GradingPeriodMenuView'
   'compiled/gradezilla/GradebookKeyboardNav'
   'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
-  'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jqueryui/dialog'
@@ -91,11 +91,11 @@ define [
   GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, AssignmentMuter,
   SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
-  SubmissionCell, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, CurveGradesDialogManager,
-  SetDefaultGradeDialogManager, AssignmentColumnHeader, AssignmentGroupColumnHeader, StudentColumnHeader,
-  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp,
-  SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GroupTotalCellTemplate,
-  RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
+  SubmissionCell, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, SetDefaultGradeDialogManager,
+  CurveGradesDialogManager, StudentRowHeaderConstants, AssignmentColumnHeader, AssignmentGroupColumnHeader,
+  StudentColumnHeader, StudentRowHeader, TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu,
+  PostGradesStore, PostGradesApp, SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager,
+  GroupTotalCellTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
   assignmentHelper) ->
   IS_ADMIN = _.contains(ENV.current_user_roles, 'admin')
 
@@ -137,7 +137,7 @@ define [
       @showInactiveEnrollments =
         @options.settings['show_inactive_enrollments'] == "true"
       @totalColumnInFront = UserSettings.contextGet 'total_column_in_front'
-      @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
+      @numberOfFrozenCols = if @totalColumnInFront then 2 else 1
       @gradingPeriods = GradingPeriodsApi.deserializePeriods(@options.active_grading_periods)
       if @options.grading_period_set
         @gradingPeriodSet = GradingPeriodSetsApi.deserializeSet(@options.grading_period_set)
@@ -215,6 +215,9 @@ define [
       @checkForUploadComplete()
 
       @gotSections(@options.sections)
+      @hasSections.then () =>
+        if @sections_enabled && @getSelectedSecondaryInfo() == 'none'
+          @setSelectedSecondaryInfo 'section', true
 
       dataLoader.gotStudents.then () =>
         @contentLoadStates.studentsLoaded = true
@@ -395,36 +398,13 @@ define [
     addRow: (student) =>
       student.computed_current_score ||= 0
       student.computed_final_score ||= 0
-      student.secondary_identifier = student.sis_login_id || student.login_id
 
       student.isConcluded = _.all student.enrollments, (e) ->
         e.enrollment_state == 'completed'
       student.isInactive = _.all student.enrollments, (e) ->
         e.enrollment_state == 'inactive'
 
-      if @sections_enabled
-        mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
-        sectionNames = $.toSentence(mySections.sort())
-
-      displayName = if @options.list_students_by_sortable_name_enabled
-        student.sortable_name
-      else
-        student.name
-
-      enrollmentStatus = if student.isConcluded
-        I18n.t 'concluded'
-      else if student.isInactive
-        I18n.t 'inactive'
-
-      student.display_name = RowStudentNameTemplate
-        student_id: student.id
-        course_id: ENV.GRADEBOOK_OPTIONS.context_id
-        avatar_url: student.avatar_url
-        display_name: displayName
-        enrollment_status: enrollmentStatus
-        url: student.enrollments[0].grades.html_url+'#tab-assignments'
-        sectionNames: sectionNames
-        alreadyEscaped: true
+      @setStudentDisplay(student)
 
       if @rowFilter(student)
         student.row = @rowIndex
@@ -615,10 +595,25 @@ define [
             @rowIndex += 1
             @rows.push(student)
             @calculateStudentGrade(student) # TODO: this may not be necessary
+            @setStudentDisplay(student)
 
       @grid.updateRowCount(@rows.length)
 
       @sortRowsBy (a, b) => @localeSort(a.sortable_name, b.sortable_name)
+
+    setStudentDisplay: (student) =>
+      if @sections_enabled
+        mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
+        sectionNames = $.toSentence(mySections.sort())
+
+      options =
+        useSortableName: @options.list_students_by_sortable_name_enabled
+        selectedSecondaryInfo: @getSelectedSecondaryInfo()
+        sectionNames: sectionNames
+        courseId: ENV.GRADEBOOK_OPTIONS.context_id
+
+      cell = new StudentRowHeader(student, options)
+      student.display_name = cell.render()
 
     gotSubmissionsChunk: (student_submissions) =>
       for data in student_submissions
@@ -1281,13 +1276,9 @@ define [
       @setAssignmentWarnings()
 
       studentColumnWidth = 150
-      identifierColumnWidth = 100
       if @gradebookColumnSizeSettings
         if @gradebookColumnSizeSettings['student']
           studentColumnWidth = parseInt(@gradebookColumnSizeSettings['student'])
-
-        if @gradebookColumnSizeSettings['secondary_identifier']
-          identifierColumnWidth = parseInt(@gradebookColumnSizeSettings['secondary_identifier'])
 
       @parentColumns = [
         id: 'student'
@@ -1296,14 +1287,6 @@ define [
         cssClass: "meta-cell"
         resizable: true
         neverSort: true
-        formatter: @htmlContentFormatter
-      ,
-        id: 'secondary_identifier'
-        name: htmlEscape I18n.t('Secondary ID')
-        field: 'secondary_identifier'
-        width: identifierColumnWidth
-        cssClass: "meta-cell secondary_identifier_cell"
-        resizable: true
         formatter: @htmlContentFormatter
       ]
 
@@ -1422,7 +1405,6 @@ define [
 
       @grid.onSort.subscribe (event, data) =>
         if data.sortCol.field == "display_name" ||
-           data.sortCol.field == "secondary_identifier" ||
            data.sortCol.field.match /^custom_col/
           sortProp = if data.sortCol.field == "display_name"
             "sortable_name"
@@ -1719,9 +1701,15 @@ define [
 
     # Student Column Header
 
+    getStudentColumnHeaderProps: ->
+      selectedSecondaryInfo: @getSelectedSecondaryInfo()
+      onSelectSecondaryInfo: @setSelectedSecondaryInfo
+      sectionsEnabled: @sections_enabled
+
     renderStudentColumnHeader: =>
       mountPoint = @getColumnHeaderNode('student')
-      renderComponent(StudentColumnHeader, mountPoint)
+      props = @getStudentColumnHeaderProps()
+      renderComponent(StudentColumnHeader, mountPoint, props)
 
     # Total Grade Column Header
 
@@ -1846,6 +1834,20 @@ define [
       studentsLoaded: false
       submissionsLoaded: false
       assignmentsLoaded: false
+
+    ## Non-Persistent Gradebook Display Settings
+
+    gradebookDisplaySettings:
+      selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo
+
+    setSelectedSecondaryInfo: (secondaryInfo, skipRedraw) =>
+      @gradebookDisplaySettings.selectedSecondaryInfo = secondaryInfo
+      unless skipRedraw
+        @buildRows()
+        @renderStudentColumnHeader()
+
+    getSelectedSecondaryInfo: () =>
+      @gradebookDisplaySettings.selectedSecondaryInfo
 
     ## Gradebook Content Access Methods
 

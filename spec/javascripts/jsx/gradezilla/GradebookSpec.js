@@ -987,6 +987,16 @@ define([
     ok(this.$mountPoint.innerText.includes('Student Name'), 'the "Student Name" header is rendered');
   });
 
+  QUnit.module('Gradebook#getStudentColumnHeaderProps');
+
+  test('includes properties from gradebook', function () {
+    const gradebook = createGradebook();
+    const props = gradebook.getStudentColumnHeaderProps();
+    ok(props.selectedSecondaryInfo, 'selectedSecondaryInfo is present');
+    equal(typeof props.sectionsEnabled, 'boolean');
+    equal(typeof props.onSelectSecondaryInfo, 'function');
+  });
+
   QUnit.module('Gradebook#renderAssignmentColumnHeader', {
     setup () {
       fakeENV.setup({
@@ -1194,5 +1204,87 @@ define([
     const options = { group_weighting_scheme: 'equal' };
     const props = this.createGradebook(options).getAssignmentGroupColumnHeaderProps('301');
     equal(props.weightedGroups, false);
+  });
+
+  QUnit.module('Gradebook#setStudentDisplay', {
+    createGradebook (multipleSections = false) {
+      const options = {};
+
+      if (multipleSections) {
+        options.sections = [
+          { id: 1000, name: 'section1000' },
+          { id: 2000, name: 'section2000' }
+        ];
+      }
+
+      return createGradebook(options);
+    },
+
+    createStudent () {
+      return {
+        name: 'test student',
+        sections: [1000],
+        sis_user_id: 'sis_user_id',
+        login_id: 'canvas_login_id',
+        enrollments: [{grades: {html_url: 'http://example.url/'}}]
+      };
+    },
+
+    setup () {
+      ENV = ENV || {};
+      ENV.GRADEBOOK_OPTIONS = ENV.GRADEBOOK_OPTIONS || {};
+      ENV.GRADEBOOK_OPTIONS.context_id = ENV.GRADEBOOK_OPTIONS.context_id || 10;
+    }
+  });
+
+  test('sets a display_name prop on the given student with their name', function () {
+    const gradebook = this.createGradebook();
+    const student = this.createStudent();
+
+    gradebook.setStudentDisplay(student);
+
+    ok(student.display_name.includes(student.name));
+  });
+
+  test('when secondaryInfo is set as "section", sets display_name with sections', function () {
+    const gradebook = this.createGradebook(true);
+    const student = this.createStudent();
+
+    gradebook.setSelectedSecondaryInfo('section', true);
+    gradebook.setStudentDisplay(student);
+
+    ok(student.display_name.includes(student.sections[0]));
+  });
+
+  test('when secondaryInfo is set as "sis_id", sets display_name with sis id', function () {
+    const gradebook = this.createGradebook(true);
+    const student = this.createStudent();
+
+    gradebook.setSelectedSecondaryInfo('sis_id', true);
+    gradebook.setStudentDisplay(student);
+
+    ok(student.display_name.includes(student.sis_user_id));
+  });
+
+  test('when secondaryInfo is set as "login_id", sets display_name with login id', function () {
+    const gradebook = this.createGradebook(true);
+    const student = this.createStudent();
+
+    gradebook.setSelectedSecondaryInfo('login_id', true);
+    gradebook.setStudentDisplay(student);
+
+    ok(student.display_name.includes(student.login_id));
+  });
+
+  test('when secondaryInfo is set as "none", sets display_name without other values', function () {
+    const gradebook = this.createGradebook(true);
+    const student = this.createStudent();
+
+    gradebook.setSelectedSecondaryInfo('none', true);
+    gradebook.setStudentDisplay(student);
+
+    notOk(student.display_name.includes(student.sections[0]));
+    notOk(student.display_name.includes(student.sis_user_id));
+    notOk(student.display_name.includes(student.login_id));
   });
 });

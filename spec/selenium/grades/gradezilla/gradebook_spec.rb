@@ -101,10 +101,10 @@ describe "Gradezilla" do
     end
 
     it "should allow editing grades", priority: "1", test_id: 210026 do
-      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
+      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l1')
       expect(f('.gradebook-cell', cell)).to include_text '10'
       cell.click
-      expect(ff('.grade', cell)).to_not be_blank
+      expect(ff('.grade', cell)).not_to be_blank
     end
   end
 
@@ -320,7 +320,7 @@ describe "Gradezilla" do
       essay_quiz.save!
       essay_quiz
     end
-    #create quiz with file upload question
+    # create quiz with file upload question
     let(:file_upload_question) do
       {
         question_name: 'File Upload',
@@ -346,7 +346,7 @@ describe "Gradezilla" do
       user_session(teacher)
 
       gradezilla_page.visit(test_course)
-      expect(fj('#gradebook_grid .icon-quiz')).to be_truthy
+      expect(f('#gradebook_grid .icon-quiz')).to be_truthy
     end
 
     it 'should display the quiz icon for file_upload questions', priority: "1", test_id: 498844 do
@@ -359,7 +359,7 @@ describe "Gradezilla" do
       user_session(teacher)
 
       gradezilla_page.visit(test_course)
-      expect(fj('#gradebook_grid .icon-quiz')).to be_truthy
+      expect(f('#gradebook_grid .icon-quiz')).to be_truthy
     end
 
     it 'should remove the quiz icon when graded manually', priority: "1", test_id: 491040 do
