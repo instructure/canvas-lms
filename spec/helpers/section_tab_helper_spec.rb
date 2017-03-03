@@ -114,25 +114,6 @@ describe SectionTabHelper do
             expect(available_section_tabs.to_a.map { |tab| tab[:id] }).not_to include(Course::TAB_COLLABORATIONS_NEW)
           end
         end
-
-        context 'dashboard cards' do
-          let(:dashboard_available_section_tabs) do
-            SectionTabHelperSpec::AvailableSectionTabs.new(
-              course, current_user, domain_root_account, session, dashboard_cards: true
-            )
-          end
-
-          it 'includes just the tabs needed for cards' do
-            dtabs = SectionTabHelperSpec::AvailableSectionTabs::DASHBOARD_CARD_TABS
-            expect(dashboard_available_section_tabs.to_a.map { |tab| tab[:id] }.sort).to eq dtabs.sort
-          end
-
-          it 'does not process conferences/collaborations' do
-            Collaboration.expects(:any_collaborations_configured?).never
-            WebConference.expects(:config).never
-            expect(dashboard_available_section_tabs).to be_present
-          end
-        end
       end
     end
   end

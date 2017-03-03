@@ -75,7 +75,7 @@ describe "add_people" do
         expect(f(".addpeople")).to be_displayed
 
         # search for some gibberish
-        replace_content(f(".addpeople__peoplesearch textarea"), "jibberish")
+        replace_content(f(".addpeople__peoplesearch textarea"), "jibberish@example.com")
 
         # click next button
         f("#addpeople_next").click
@@ -131,6 +131,97 @@ describe "add_people" do
       f('label[for="limit_privileges_to_course_section"]').click
       expect(f('#limit_privileges_to_course_section')).to be_selected
 
+    end
+
+  end
+
+  context('as an admin') do
+    before(:each) do
+      course_with_admin_logged_in
+    end
+
+    # CNVS-35149
+    it "should include select all for missing users" do
+      get "/courses/#{@course.id}/users"
+
+      # open the add people modal dialog
+      f('a#addUsers').click
+      expect(f(".addpeople")).to be_displayed
+
+      # search for some emails
+      replace_content(f(".addpeople__peoplesearch textarea"),
+                      'Z User <zuser@example.com>, yuser@example.com, "User, X" <xuser@example.com>')
+
+      # click next button
+      f("#addpeople_next").click
+
+      # the validation issues panel is displayed
+      expect(f(".peoplevalidationissues__missing")).to be_displayed
+
+      # click the select all checkbox
+      f('label[for="missing_users_select_all"]').click
+
+      # all the checkboxes are checket
+      ff(".peoplevalidationissues__missing input[type='checkbox']").each do |checkbox|
+        expect(checkbox.attribute('checked')).to eq("true")
+      end
+
+      # uncheck the first name
+      f(".peoplevalidationissues__missing tbody label").click
+
+      # select all should be unchecked
+      expect(f("#missing_users_select_all").attribute('checked')).to eq(nil)
+
+      # re-check the first name
+      f(".peoplevalidationissues__missing tbody label").click
+
+      # select all is checked
+      expect(f("#missing_users_select_all").attribute('checked')).to eq("true")
+
+      # uncheck all
+      f('label[for="missing_users_select_all"]').click
+
+      # none of the name checkboxes are checked
+      ff(".peoplevalidationissues__missing input[type='checkbox']").each do |checkbox|
+        expect(checkbox.attribute('checked')).to eq(nil)
+      end
+    end
+
+    it "should include invite users without names" do
+      get "/courses/#{@course.id}/users"
+
+      # open the add people modal dialog
+      f('a#addUsers').click
+      expect(f(".addpeople")).to be_displayed
+
+      # search for some emails
+      replace_content(f(".addpeople__peoplesearch textarea"),
+                      'Z User <zuser@example.com>, yuser@example.com, "User, X" <xuser@example.com>')
+
+      # click next button
+      f("#addpeople_next").click
+
+      # the validation issues panel is displayed
+      expect(f(".peoplevalidationissues__missing")).to be_displayed
+
+      # click the select all checkbox
+      f('label[for="missing_users_select_all"]').click
+
+      # all the name textboxes should be displayed
+      expect(ff('.peoplevalidationissues__missing tbody input[type="text"][name="name"]')).to have_size(3)
+
+      # the Next button is enabled, click it
+      f("#addpeople_next").click
+
+      expect(f(".addpeople__peoplereadylist")).to be_displayed
+
+      names = ff(".addpeople__peoplereadylist tbody tr td:first-child")
+      expect(names).to have_size(3)
+
+      # Z and X have names, y has email copied to name
+      expect(names[0].text).to eq("Z User")
+      expect(names[1].text).to eq("yuser@example.com")
+      expect(names[2].text).to eq("User, X")
     end
   end
 end

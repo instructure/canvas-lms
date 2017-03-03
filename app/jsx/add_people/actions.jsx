@@ -1,8 +1,9 @@
 define([
   'redux-actions',
   './api_client',
-  './resolveValidationIssues'
-], ({ createActions }, api, resolveValidationIssues) => {
+  './resolveValidationIssues',
+  './helpers'
+], ({ createActions }, api, resolveValidationIssues, {parseNameList, findEmailInEntry}) => {
   const actionDefs = [
     'SET_INPUT_PARAMS',
 
@@ -28,6 +29,7 @@ define([
     'RESET'   // reset([array of state subsections to reset]) undefined or empty = reset everything
   ];
 
+
   const actionTypes = actionDefs.reduce((types, action) => {
     types[action] = action;   // eslint-disable-line no-param-reassign
     return types;
@@ -39,8 +41,21 @@ define([
     dispatch(actions.validateUsersStart());
     const state = getState();
     const courseId = state.courseParams.courseId;
-    // split on a newline or comma, stripping surrounding whitespace in the process
-    const users = state.inputParams.nameList.trim().split(/\s*[\n,]\s*/);
+    let users = parseNameList(state.inputParams.nameList);
+    if (state.inputParams.searchType === 'cc_path') {
+      // normalize the input to be "User Name <email address>"
+      // 1. include the email address w/in < ... >
+      // 2. if the user includes a name and email, be sure the name is first
+      users = users.map((u) => {
+        let email = findEmailInEntry(u);
+        let user = u.replace(email, '');
+        if (!/<.+>/.test(email)) {
+          email = `<${email}>`;
+        }
+        user = `${user.trim()} ${email}`;
+        return user;
+      });
+    }
     const searchType = state.inputParams.searchType;
     api.validateUsers({ courseId, users, searchType })
       .then((res) => {
@@ -71,7 +86,12 @@ define([
     // the list of users to be enrolled
     let usersToBeEnrolled = state.userValidationResult.validUsers.concat(newUsers.usersToBeEnrolled);
     // and the list of users to be created
-    const usersToBeCreated = newUsers.usersToBeCreated;
+    const usersToBeCreated = newUsers.usersToBeCreated.map((u) => {
+      if (!u.name) {
+        return Object.assign(u, {name: u.email});
+      }
+      return u;
+    });
 
     api.createUsers({ courseId, users: usersToBeCreated, inviteUsersURL })
       .then((res) => {

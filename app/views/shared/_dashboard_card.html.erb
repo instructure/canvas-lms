@@ -2,10 +2,7 @@
 <% css_bundle :dashboard_card %>
 
 <%
-dashboard_courses = map_courses_for_menu(
-  @current_user.menu_courses,
-  dashboard_cards: true
-)
+dashboard_courses = map_courses_for_menu(@current_user.menu_courses, :include_section_tabs => true)
 js_env({
   :DASHBOARD_COURSES => dashboard_courses,
   :DASHBOARD_REORDERING_ENABLED => @domain_root_account.feature_enabled?(:dashcard_reordering)

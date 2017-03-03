@@ -57,10 +57,11 @@ module Lti
 
     LIS_V2_ROLE_NONE = 'http://purl.imsglobal.org/vocab/lis/v2/person#None'
 
-    def initialize(context, root_account, user)
+    def initialize(context, root_account, user, tool = nil)
       @context = context
       @root_account = root_account
       @user = user
+      @tool = tool
     end
 
     def account
@@ -162,6 +163,19 @@ module Lti
 
     def section_sis_ids
       course_sections.map(&:sis_source_id).compact.uniq.sort.join(',')
+    end
+
+    def sis_email
+      if @user&.pseudonym&.sis_user_id
+        tablename = Pseudonym.quoted_table_name
+        query = "INNER JOIN #{tablename} ON communication_channels.id=pseudonyms.sis_communication_channel_id"
+        @user.communication_channels.joins(query).limit(1).pluck(:path).first
+      end
+    end
+
+    def email
+      prefer_sis_email = @tool&.extension_setting(nil, :prefer_sis_email)&.downcase == "true"
+      prefer_sis_email ? sis_email || @user.email : @user.email
     end
 
     private
