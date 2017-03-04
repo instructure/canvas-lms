@@ -9,6 +9,8 @@ define([
     return action.payload;
   },
   [actionTypes.RESET]: function resetReducer (state, action) {
-    return (!action.payload || action.payload.includes('inputParams')) ? defaultState.inputParams : state;
+    // reset to default state, except for canReadSIS, which has to persist across invocations
+    const resetState = Object.assign({}, defaultState.inputParams, {canReadSIS: state.canReadSIS});
+    return (!action.payload || action.payload.includes('inputParams')) ? resetState : state;
   }
 }, defaultState.inputParams));

@@ -1078,7 +1078,8 @@ describe "Users API", type: :request do
             :sortable_name => 'Funke, Tobias',
             :time_zone => 'Tijuana',
             :birthdate => birthday.iso8601,
-            :locale => 'en'
+            :locale => 'en',
+            :email => "somenewemail@example.com"
           }
         })
         user = User.find(json['id'])
@@ -1092,7 +1093,7 @@ describe "Users API", type: :request do
           'short_name' => 'Tobias',
           'integration_id' => nil,
           'login_id' => 'student@example.com',
-          'email' => 'student@example.com',
+          'email' => 'somenewemail@example.com',
           'sis_login_id' => 'student@example.com',
           'locale' => 'en',
           'time_zone' => "Tijuana"

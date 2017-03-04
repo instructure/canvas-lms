@@ -51,7 +51,7 @@ define [
       json
 
     contextCardJSON: (json) ->
-      if enrollment = _.find(json.enrollments, (e) -> e.role == "StudentEnrollment")
+      if enrollment = _.find(json.enrollments, (e) -> e.type == "StudentEnrollment")
         json.course_id = enrollment.course_id
 
     permissionsJSON: (json) ->
