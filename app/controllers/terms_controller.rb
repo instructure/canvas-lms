@@ -67,7 +67,27 @@ class TermsController < ApplicationController
   #
   # Update an existing enrollment term for the specified account.
   #
-  # See the {api:TermsController#create Create} endpoint for a list of accepted arguments.
+  # @argument enrollment_term[name] [String]
+  #   The name of the term.
+  #
+  # @argument enrollment_term[start_at] [DateTime]
+  #   The day/time the term starts.
+  #   Accepts times in ISO 8601 format, e.g. 2015-01-10T18:48:00Z.
+  #
+  # @argument enrollment_term[end_at] [DateTime]
+  #   The day/time the term ends.
+  #   Accepts times in ISO 8601 format, e.g. 2015-01-10T18:48:00Z.
+  #
+  # @argument enrollment_term[sis_term_id] [String]
+  #   The unique SIS identifier for the term.
+  #
+  # @argument enrollment_term[overrides][enrollment_type][start_at] [DateTime]
+  #   The day/time the term starts, overridden for the given enrollment type.
+  #   *enrollment_type* can be one of StudentEnrollment, TeacherEnrollment, TaEnrollment, or DesignerEnrollment
+  #
+  # @argument enrollment_term[overrides][enrollment_type][end_at] [DateTime]
+  #   The day/time the term ends, overridden for the given enrollment type.
+  #   *enrollment_type* can be one of StudentEnrollment, TeacherEnrollment, TaEnrollment, or DesignerEnrollment
   #
   # @returns EnrollmentTerm
   #
