@@ -149,6 +149,17 @@ describe TermsApiController, type: :request do
         account_admin_user(account: subaccount)
         expect_terms_index_401
       end
+
+      it "should require context to be root_account and error nicely" do
+        subaccount = @account.sub_accounts.create!(name: 'subaccount')
+        account_admin_user(account: @account)
+        json = api_call(:get, "/api/v1/accounts/#{subaccount.id}/terms",
+                        { controller: 'terms_api', action: 'index', format: 'json', account_id: subaccount.to_param },
+                        {},
+                        {},
+                        { expected_status: 400 })
+        expect(json['message']).to eq 'Terms only belong to root_accounts.'
+      end
     end
   end
 end
