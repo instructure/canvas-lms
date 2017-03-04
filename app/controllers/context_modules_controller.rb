@@ -18,6 +18,7 @@
 
 class ContextModulesController < ApplicationController
   include Api::V1::ContextModule
+  include WebZipExportHelper
 
   before_action :require_context
   add_crumb(proc { t('#crumbs.modules', "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_context_modules_url }
@@ -102,7 +103,8 @@ class ContextModulesController < ApplicationController
         session[:module_progressions_initialized] = true
       end
 
-      if @context.allow_web_export_download?
+      if allow_web_export_download?
+        @allow_web_export_download = true
         @last_web_export = @context.web_zip_exports.visible_to(@current_user).order('epub_exports.created_at').last
       end
     end

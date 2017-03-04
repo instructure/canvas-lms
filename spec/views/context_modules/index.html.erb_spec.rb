@@ -96,6 +96,7 @@ describe "/context_modules/index" do
     acct.save!
     view_context(@course, @user)
     assign(:modules, @course.context_modules.active)
+    assign(:allow_web_export_download, true)
     render 'context_modules/index'
     expect(response).not_to be_nil
     page = Nokogiri('<document>' + response.body + '</document>')

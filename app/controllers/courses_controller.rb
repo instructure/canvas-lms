@@ -304,6 +304,7 @@ class CoursesController < ApplicationController
   include ContextExternalToolsHelper
   include CustomSidebarLinksHelper
   include SyllabusHelper
+  include WebZipExportHelper
 
   before_action :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
   before_action :require_user_or_observer, :only=>[:user_index]
@@ -2820,7 +2821,7 @@ class CoursesController < ApplicationController
   end
 
   def offline_web_exports
-    return render status: 404, template: 'shared/errors/404_message' unless @context.allow_web_export_download?
+    return render status: 404, template: 'shared/errors/404_message' unless allow_web_export_download?
     if authorized_action(WebZipExport.new(course: @context), @current_user, :create)
       title = t('Exported Package History')
       @page_title = title
@@ -2832,7 +2833,7 @@ class CoursesController < ApplicationController
   end
 
   def start_offline_web_export
-    return render status: 404, template: 'shared/errors/404_message' unless @context.allow_web_export_download?
+    return render status: 404, template: 'shared/errors/404_message' unless allow_web_export_download?
     if authorized_action(WebZipExport.new(course: @context), @current_user, :create)
       @service = EpubExports::CreateService.new(@context, @current_user, :web_zip_export)
       @service.save

@@ -1478,10 +1478,6 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def allow_web_export_download?
-    root_account.enable_offline_web_export? && self.enable_offline_web_export?
-  end
-
   def grade_publishing_status_translation(status, message)
     status = "unpublished" if status.blank?
     case status

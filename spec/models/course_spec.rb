@@ -216,16 +216,6 @@ describe Course do
     end
   end
 
-  describe "#allow_web_export_download?" do
-    it "should return setting" do
-      expect(course_factory.allow_web_export_download?).to eq false
-      account = Account.default
-      account.settings[:enable_offline_web_export] = true
-      account.save
-      expect(@course.allow_web_export_download?).to eq true
-    end
-  end
-
   context "validation" do
     it "should create a new instance given valid attributes" do
       course_model
