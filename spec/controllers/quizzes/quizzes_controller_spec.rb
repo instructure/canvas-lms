@@ -123,6 +123,13 @@ describe Quizzes::QuizzesController do
       get 'index', :course_id => @course.id
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
+
+    it "js_env migrate_quiz_enabled is true when quizzes2_exporter is enabled" do
+      user_session(@teacher)
+      Account.default.enable_feature!(:quizzes2_exporter)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:FLAGS][:migrate_quiz_enabled]).to eq(true)
+    end
   end
 
   describe "GET 'new'" do

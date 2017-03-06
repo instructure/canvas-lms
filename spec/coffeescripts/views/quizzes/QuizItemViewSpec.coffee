@@ -30,6 +30,7 @@ define [
 
     ENV.FLAGS = {
       post_to_sis_enabled: options.post_to_sis
+      migrate_quiz_enabled: options.migrate_quiz_enabled
     }
 
     view = new QuizItemView(model: quiz, publishIconView: icon)
@@ -38,6 +39,7 @@ define [
 
   QUnit.module 'QuizItemView',
     setup: ->
+      @ajaxStub = @stub $, 'ajaxJSON'
       fakeENV.setup({
         CONDITIONAL_RELEASE_ENV: {
           active_rules: [{
@@ -64,6 +66,23 @@ define [
     quiz = createQuiz(id: 1, title: 'Foo', can_update: false)
     view = createView(quiz)
     equal view.$('.ig-admin').length, 0
+
+  test "renders Migrate Button if post to migrateQuizEnabled is true", ->
+    quiz = createQuiz(id: 1, title: 'Foo', can_update: true)
+    view = createView(quiz, canManage: true, migrate_quiz_enabled: true)
+    equal view.$('.migrate').length, 1
+
+  test "does not render Migrate Button if migrateQuizEnabled is false", ->
+    quiz = createQuiz(id: 1, title: 'Foo', can_update: true)
+    view = createView(quiz, canManage: true, migrate_quiz_enabled: false)
+    equal view.$('.migrate').length, 0
+
+  test "#migrateQuiz is called", ->
+    quiz = createQuiz(id: 1, title: 'Foo', can_update: true)
+    view = createView(quiz, canManage: true, migrate_quiz_enabled: false)
+    event = new jQuery.Event
+    view.migrateQuiz(event)
+    ok @ajaxStub.called
 
   test "initializes sis toggle if post to sis enabled", ->
     quiz = createQuiz(id: 1, title: 'Foo', can_update: true)
