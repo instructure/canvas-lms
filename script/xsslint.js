@@ -4,6 +4,7 @@ const globby       = require("gglobby");
 const fs           = require("fs");
 const CoffeeScript = require("coffee-script");
 const glob         = require("glob");
+const babylon      = require("babylon");
 
 XSSLint.configure({
   "xssable.receiver.whitelist": ["formData"],
@@ -97,10 +98,11 @@ allPaths.forEach(function({paths, glob, defaultIgnores = [], transform}) {
     console.log(`Checking ${path} (${files.length} files) for potential XSS vulnerabilities...`);
 
     files.forEach(function(file) {
-      let pathOrOptions = file;
-      if (transform) pathOrOptions = {source: transform(fs.readFileSync(file).toString())};
+      let source = fs.readFileSync(file).toString();
+      if (transform) source = transform(source);
+      source = babylon.parse(source, { plugins: ["jsx", "classProperties", "objectRestSpread"], sourceType: "module" });
 
-      const warnings = XSSLint.run(pathOrOptions);
+      const warnings = XSSLint.run({source});
       warningCount += warnings.length;
       warnings.forEach(({line, method}) => {
         console.error(`${path}/${file}:${line}: possibly XSS-able ${methodDescription(method)}`);
