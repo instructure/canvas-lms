@@ -31,7 +31,8 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
   && make \
   && cp sfnt2woff /usr/local/bin \
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
-  && gem install bundler --no-document -v 1.12.5 \
+  && gem install bundler --no-document -v 1.14.3 \
+  && gem update --system --no-document \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
 WORKDIR $APP_HOME
