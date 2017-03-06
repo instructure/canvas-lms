@@ -3,7 +3,8 @@ module SIS
     class Enrollment
       attr_accessor :course_id, :section_id, :user_id, :user_integration_id,
                     :role, :status, :associated_user_id, :root_account_id,
-                    :role_id, :start_date, :end_date, :sis_batch_id
+                    :role_id, :start_date, :end_date, :sis_batch_id,
+                    :limit_section_privileges
 
       def initialize(opts = {})
         self.course_id = opts[:course_id]
@@ -15,6 +16,7 @@ module SIS
         self.associated_user_id = opts[:associated_user_id]
         self.root_account_id = opts[:root_account_id]
         self.role_id = opts[:role_id]
+        self.limit_section_privileges = opts[:limit_section_privileges]
         self.start_date = opts[:start_date]
         self.end_date = opts[:end_date]
         # adding sis_batch_id here for plugins that are not going through

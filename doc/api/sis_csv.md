@@ -611,6 +611,14 @@ is specified the default section for the course will be used</td>
 in the same course that this observer should be able to see grades for.
 Ignored for any role other than observer</td>
 </tr>
+<tr>
+<td>limit_section_privileges</td>
+<td>boolean</td>
+<td></td>
+<td></td>
+<td>Defaults to false. When true, the enrollment will only allow the user to see
+ and interact with users enrolled in the section given by course_section_id. </td>
+</tr>
 </table>
 
 &#42; course_id or section_id is required, and role or role_id is required.

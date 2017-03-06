@@ -77,6 +77,7 @@ describe SIS::Models::Enrollment do
     subject.end_date = 'end_date'
     subject.associated_user_id = 'associated_user_id'
     subject.root_account_id = 'root_account_id'
+    subject.limit_section_privileges = 'limit_section_privileges'
     expect(subject.to_a).to eq ['course_id', 'section_id', 'user_id', 'role',
                                 'role_id', 'status', 'start_date', 'end_date',
                                 'associated_user_id', 'root_account_id']

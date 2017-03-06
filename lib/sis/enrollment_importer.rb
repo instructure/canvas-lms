@@ -246,6 +246,9 @@ module SIS
             enrollment.role = role
             enrollment.course = @course
             enrollment.course_section = @section
+            if enrollment_info.limit_section_privileges
+              enrollment.limit_privileges_to_course_section = Canvas::Plugin.value_to_boolean(enrollment_info.limit_section_privileges)
+            end
 
             if enrollment_info.status =~ /\Aactive/i
               if user.workflow_state != 'deleted' && pseudo.workflow_state != 'deleted'
