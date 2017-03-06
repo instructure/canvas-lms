@@ -278,7 +278,11 @@ class Attachment < ActiveRecord::Base
     if context.respond_to?(:log_merge_result)
       context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
     end
-    dup.updated_at = Time.now
+    if context.respond_to?(:root_account_id) && self.namespace != context.root_account.file_namespace
+      dup.make_rootless
+      dup.change_namespace(context.root_account.file_namespace)
+    end
+    dup.updated_at = Time.zone.now
     dup.clone_updated = true
     dup.set_publish_state_for_usage_rights unless self.locked?
     dup
@@ -1255,18 +1259,32 @@ class Attachment < ActiveRecord::Base
     raise "must be a child" unless child.root_attachment_id == id
     child.root_attachment_id = nil
     child.filename = filename if filename
+    copy_attachment_content(child)
+    Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child.id)
+  end
+
+  def copy_attachment_content(destination)
     if Attachment.s3_storage?
-      if filename && s3object.exists? && !child.s3object.exists?
-        s3object.copy_to(child.s3object)
+      if filename && s3object.exists? && !destination.s3object.exists?
+        s3object.copy_to(destination.s3object)
       end
     else
+      return if open == destination.open
       old_content_type = self.content_type
       Attachment.where(:id => self).update_all(:content_type => "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
-      child.uploaded_data = open
+      destination.uploaded_data = open
       Attachment.where(:id => self).update_all(:content_type => old_content_type)
     end
-    child.save!
-    Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child.id)
+    destination.save!
+  end
+
+  def make_rootless
+    return unless root_attachment_id
+    root = self.root_attachment
+    return unless root
+    self.root_attachment_id = nil
+    self.filename = root.filename if root.filename
+    root.copy_attachment_content(self)
   end
 
   def restore
