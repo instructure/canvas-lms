@@ -36,6 +36,19 @@ describe UserObserver do
     expect(re_observee.workflow_state).to eq 'active'
   end
 
+  it 'should restore deleted observer enrollments on "restore" (even if nothing about the observee changed)' do
+    # i'm like 66% sure someone will complain about this
+    student_enroll = student_in_course(:user => student)
+
+    observer = user_with_pseudonym
+    student.observers << observer
+    observer_enroll = observer.observer_enrollments.first
+    observer_enroll.destroy
+
+    student.user_observers.create_or_restore(observer_id: observer)
+    expect(observer_enroll.reload).to_not be_deleted
+  end
+
   it 'should create an observees when one does not exist' do
     observer = user_with_pseudonym
     re_observee = observer.user_observees.create_or_restore(user_id: student)

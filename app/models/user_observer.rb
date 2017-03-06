@@ -32,8 +32,8 @@ class UserObserver < ActiveRecord::Base
           user_observer.workflow_state = 'active'
           user_observer.sis_batch_id = nil
           user_observer.save!
-          user_observer.create_linked_enrollments
         end
+        user_observer.create_linked_enrollments
       else
         user_observer = create!(attributes)
       end
