@@ -110,7 +110,7 @@ module Api::V1::AssignmentOverride
 
   def interpret_assignment_override_data(assignment, data, set_type=nil)
     data ||= {}
-    return {}, ["invalid override data"] unless data.is_a?(Hash)
+    return {}, ["invalid override data"] unless data.is_a?(Hash) || data.is_a?(ActionController::Parameters)
 
     # validate structure of parameters
     override_data = {}

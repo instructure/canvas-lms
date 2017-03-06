@@ -1158,6 +1158,7 @@ describe Quizzes::QuizzesController do
 
         it "does not allow a nil override due date when the last grading period is closed" do
           override_params = [{ due_at: nil, course_section_id: section_id }]
+          request.content_type = 'application/json' unless CANVAS_RAILS4_2
           call_create(due_at: 7.days.from_now.iso8601, assignment_overrides: override_params)
           assert_forbidden
           expect(@course.quizzes.count).to eql 0

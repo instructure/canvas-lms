@@ -50,16 +50,18 @@ describe RubricsController do
 
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
+      request.content_type = 'application/json' unless CANVAS_RAILS4_2
       post 'create', :course_id => @course.id, :rubric => {}
       expect(assigns[:rubric]).not_to be_nil
       expect(assigns[:rubric]).not_to be_new_record
       expect(response).to be_success
-      
+
     end
 
     it "should create an association if specified" do
       course_with_teacher_logged_in(:active_all => true)
       association = @course.assignments.create!(assignment_valid_attributes)
+      request.content_type = 'application/json' unless CANVAS_RAILS4_2
       post 'create', :course_id => @course.id, :rubric => {}, :rubric_association => {:association_type => association.class.to_s, :association_id => association.id}
       expect(assigns[:rubric]).not_to be_nil
       expect(assigns[:rubric]).not_to be_new_record
@@ -128,12 +130,12 @@ describe RubricsController do
       }
 
       post 'create', create_params
-      
+
       expect(assignment.reload.learning_outcome_alignments.count).to eq 1
       expect(Rubric.last.learning_outcome_alignments.count).to eq 1
     end
   end
-  
+
   describe "PUT 'update'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -459,7 +461,7 @@ describe RubricsController do
       expect(@rubric.reload.learning_outcome_alignments.count).to eq 0
     end
   end
-  
+
   describe "DELETE 'destroy'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -499,7 +501,7 @@ describe RubricsController do
       RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark, :association_object => @course)
       RubricAssociation.create!(:rubric => @rubric, :context => Account.default, :purpose => :bookmark, :association_object => @course)
       expect(@course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).uniq(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric)).to eq [@rubric]
-      
+
       delete 'destroy', :course_id => @course.id, :id => @rubric.id
       expect(response).to be_success
       expect(@course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).uniq(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric)).to eq []
