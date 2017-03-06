@@ -286,6 +286,7 @@ class Assignment < ActiveRecord::Base
 
 
   after_save  :update_grades_if_details_changed,
+              :update_grading_period_grades,
               :touch_assignment_group,
               :touch_context,
               :update_grading_standard,
@@ -382,6 +383,20 @@ class Assignment < ActiveRecord::Base
     end
     true
   end
+
+  def update_grading_period_grades
+    return true unless due_at_changed? && !id_changed? && context.grading_periods?
+
+    grading_period_was = GradingPeriod.for_date_in_course(date: due_at_was, course: context)
+    grading_period = GradingPeriod.for_date_in_course(date: due_at, course: context)
+    return true if grading_period_was&.id == grading_period&.id
+
+    [grading_period_was, grading_period].compact.each do |gp|
+      context.recompute_student_scores(nil, grading_period_id: gp, update_all_grading_period_scores: false)
+    end
+    true
+  end
+  private :update_grading_period_grades
 
   def create_in_turnitin
     return false unless self.context.turnitin_settings

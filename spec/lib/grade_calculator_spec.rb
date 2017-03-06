@@ -47,6 +47,27 @@ describe GradeCalculator do
       }.not_to raise_error
     end
 
+    it "deletes irrelevant scores for inactive grading periods" do
+      grading_period_set = @course.root_account.grading_period_groups.create!
+      grading_period_set.enrollment_terms << @course.enrollment_term
+      period1 = grading_period_set.grading_periods.create!(
+        title: "A Grading Period",
+        start_date: 20.days.ago,
+        end_date: 10.days.ago
+      )
+      period2 = grading_period_set.grading_periods.create!(
+        title: "Another Grading Period",
+        start_date: 8.days.ago,
+        end_date: 7.days.from_now
+      )
+      stale_score = Score.find_by(enrollment: @user.enrollments.first, grading_period: period2)
+      period2.destroy
+      stale_score.reload.undestroy
+      expect {
+        GradeCalculator.recompute_final_score(@user.id, @course.id)
+      }.to change{stale_score.reload.workflow_state}.from('active').to('deleted')
+    end
+
     it "should recompute when an assignment's points_possible changes'" do
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 100)
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)

@@ -3840,6 +3840,60 @@ describe Assignment do
     end
   end
 
+  describe '#update_grading_period_grades with no grading periods' do
+    before :once do
+      assignment_model(course: @course)
+    end
+
+    it 'should not update grades when due_at changes' do
+      @assignment.context.expects(:recompute_student_scores).never
+      @assignment.due_at = 6.months.ago
+      @assignment.save!
+    end
+  end
+
+  describe '#update_grading_period_grades' do
+    before :once do
+      assignment_model(course: @course)
+      @grading_period_group = @course.root_account.grading_period_groups.create!(title: "Example Group")
+      @grading_period_group.enrollment_terms << @course.enrollment_term
+      @grading_period_group.grading_periods.create!(
+        title: 'GP1',
+        start_date: 9.months.ago,
+        end_date: 5.months.ago
+      )
+      @grading_period_group.grading_periods.create!(
+        title: 'GP2',
+        start_date: 4.months.ago,
+        end_date: 2.months.from_now
+      )
+      @course.enrollment_term.save!
+      @assignment.reload
+    end
+
+    it 'should update grades when due_at changes to a grading period' do
+      @assignment.context.expects(:recompute_student_scores).twice
+      @assignment.due_at = 6.months.ago
+      @assignment.save!
+    end
+
+    it 'should update grades twice when due_at changes to another grading period' do
+      @assignment.due_at = 1.month.ago
+      @assignment.save!
+      @assignment.context.expects(:recompute_student_scores).twice
+      @assignment.due_at = 6.months.ago
+      @assignment.save!
+    end
+
+    it 'should not update grades if grading period did not change' do
+      @assignment.due_at = 1.month.ago
+      @assignment.save!
+      @assignment.context.expects(:recompute_student_scores).never
+      @assignment.due_at = 2.months.ago
+      @assignment.save!
+    end
+  end
+
   describe '#update_grades_if_details_changed' do
     before :once do
       assignment_model(course: @course)
@@ -4256,10 +4310,8 @@ describe Assignment do
       end
 
       it "does not dispatch update for ungraded submissions" do
+        Submission.any_instance.expects(:assignment_muted_changed).never
         @assignment.unmute!
-        Submission.any_instance.stubs(:assignment_muted_changed).with() do
-          fail
-        end
       end
     end
   end

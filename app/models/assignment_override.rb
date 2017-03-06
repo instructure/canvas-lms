@@ -77,12 +77,33 @@ class AssignmentOverride < ActiveRecord::Base
 
   after_save :update_cached_due_dates
   after_save :touch_assignment, :if => :assignment
+  after_save :update_grading_period_grades
 
   def set_not_empty?
     overridable = assignment? ? assignment : quiz
     ['CourseSection', 'Group', 'Noop'].include?(self.set_type) ||
     (set.any? && overridable.context.current_enrollments.where(user_id: set).exists?)
   end
+
+  def update_grading_period_grades
+    return true unless due_at_overridden && due_at_changed? && !id_changed?
+
+    course = assignment&.context || quiz&.context || quiz&.assignment&.context
+    return true unless course&.grading_periods?
+
+    grading_period_was = GradingPeriod.for_date_in_course(date: due_at_was, course: course)
+    grading_period = GradingPeriod.for_date_in_course(date: due_at, course: course)
+    return true if grading_period_was&.id == grading_period&.id
+
+    students = applies_to_students.map(&:id)
+    return true if students.blank?
+
+    [grading_period_was, grading_period].compact.each do |gp|
+      course.recompute_student_scores(students, grading_period_id: gp, update_all_grading_period_scores: false)
+    end
+    true
+  end
+  private :update_grading_period_grades
 
   def update_cached_due_dates
     return unless assignment?

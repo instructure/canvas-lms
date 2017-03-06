@@ -1294,8 +1294,6 @@ describe Course do
       @test_course = Course.create!
       @student1 = student_in_course(course: @test_course, active_all: true).user
       @student2 = student_in_course(course: @test_course, active_all: true).user
-      @assignment1 = @test_course.assignments.create!(due_at: 2.weeks.from_now(@now))
-      @assignment2 = @test_course.assignments.create!
       @gp_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@test_course.account)
       @gp_group.enrollment_terms << @test_course.enrollment_term
       @grading_period = Factories::GradingPeriodHelper.new.create_for_group(
@@ -1304,6 +1302,8 @@ describe Course do
         end_date: 15.days.ago(@now),
         close_date: 10.days.ago(@now)
       )
+      @assignment1 = @test_course.assignments.create!(due_at: 2.weeks.from_now(@now))
+      @assignment2 = @test_course.assignments.create!
     end
 
     describe '#any_in_closed_grading_period?' do

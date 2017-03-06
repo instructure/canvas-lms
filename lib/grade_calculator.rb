@@ -207,6 +207,12 @@ class GradeCalculator
         grading_period: grading_period
       ).compute_and_save_scores
     end
+
+    # delete any grading period scores that are no longer relevant
+    Score.active.joins(:enrollment).
+      where(enrollments: {user_id: @user_ids, course_id: @course.id}).
+      where.not(grading_period_id: grading_periods_for_course.map(&:id)).
+      update_all(workflow_state: :deleted)
   end
 
   def calculate_course_score
