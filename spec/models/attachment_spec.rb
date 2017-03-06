@@ -518,6 +518,16 @@ describe Attachment do
       expect(new_a.root_attachment_id).to eql(a.id)
     end
 
+    it "should clone to another root_account" do
+      c = course_factory
+      a = attachment_model(filename: "blech.ppt", context: c)
+      new_account = Account.create
+      c2 = course_factory(account: new_account)
+      Attachment.any_instance.expects(:make_rootless).once
+      Attachment.any_instance.expects(:change_namespace).once
+      a.clone_for(c2)
+    end
+
     it "should link the thumbnail" do
       a = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')
       expect(a.thumbnail).not_to be_nil
@@ -562,25 +572,22 @@ describe Attachment do
       expect(new_b.root_attachment_id).to be_nil
     end
 
-    it "should maintain namespace across clones" do
-      a = attachment_model(uploaded_data: stub_png_data, content_type: 'image/png')
+    it "should set correct namespace across clones" do
+      s3_storage!
+      a = attachment_model
       expect(a.root_attachment_id).to be_nil
       coursea = @course
-      @context = courseb = course_factory
-
-      # emulate the situation where a namespace doesn't match what
-      # infer_namespace now returns
-      a.update_attribute(:namespace, "test_ns")
+      @context = courseb = course_factory(account: Account.create)
 
       b = a.clone_for(courseb, nil, overwrite: true)
       b.save
-      expect(b.root_attachment).to eq a
-      expect(b.namespace).to eq "test_ns"
+      expect(b.root_attachment_id).to eq nil
+      expect(b.namespace).to eq courseb.root_account.file_namespace
 
       new_a = b.clone_for(coursea, nil, overwrite: true)
       new_a.save
       expect(new_a).to eq a
-      expect(new_a.namespace).to eq "test_ns"
+      expect(new_a.namespace).to eq coursea.root_account.file_namespace
     end
   end
 
