@@ -59,6 +59,8 @@ RUN mkdir -p log \
             public/javascripts/compiled \
             public/dist \
             public/assets \
+            client_apps/canvas_quizzes/node_modules \
+            /home/docker/.cache/yarn/.tmp \
   && chown -R docker:docker ${APP_HOME} /home/docker
 
 USER docker
