@@ -52,7 +52,7 @@ describe MasterCourses::MasterContentTag do
       topic = @copy_from.discussion_topics.create!
       topic_master_tag = @template.create_content_tag_for!(topic)
       assmt = @copy_from.assignments.create!
-      restrictions = {:content => true, :settings => true}
+      restrictions = {:all => true}
       assmt_master_tag = @template.create_content_tag_for!(assmt, {:restrictions => restrictions})
 
       @copy_to = course_factory

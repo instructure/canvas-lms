@@ -92,7 +92,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     :ip_filter, :require_lockdown_browser, :require_lockdown_browser_for_results,
     :lock_at, :unlock_at
   ]
-  restrict_columns :settings, Assignment::RESTRICTED_SETTINGS
+  restrict_assignment_columns
 
   # override has_one relationship provided by simply_versioned
   def current_version_unidirectional

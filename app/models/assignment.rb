@@ -45,14 +45,7 @@ class Assignment < ActiveRecord::Base
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :description]
-
-  RESTRICTED_SETTINGS = [:points_possible, :assignment_group_id,
-    :grading_type, :omit_from_final_grade, :submission_types,
-    :group_category, :group_category_id,
-    :grade_group_students_individually, :peer_reviews,
-    :moderated_grading,
-    :due_at, :lock_at, :unlock_at, :peer_reviews_due_at].freeze
-  restrict_columns :settings, RESTRICTED_SETTINGS
+  restrict_assignment_columns
 
   has_many :submissions, :dependent => :destroy
   has_many :provisional_grades, :through => :submissions

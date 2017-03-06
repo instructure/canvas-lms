@@ -535,7 +535,7 @@ describe MasterCourses::MasterMigration do
       [quiz, topic].each do |c|
         mtag = @template.content_tag_for(c)
         Timecop.freeze(2.seconds.from_now) do
-          mtag.update_attribute(:restrictions, {:settings => true}) # lock the quiz/topic master tags
+          mtag.update_attribute(:restrictions, {:due_dates => true}) # lock the quiz/topic master tags
         end
       end
 
@@ -566,7 +566,7 @@ describe MasterCourses::MasterMigration do
         master_parent_folder = Folder.root_folders(@copy_from).first.sub_folders.create!(:name => "parent", :context => @copy_from)
         master_sub_folder = master_parent_folder.sub_folders.create!(:name => "child", :context => @copy_from)
         att = Attachment.create!(:filename => 'file.txt', :uploaded_data => StringIO.new('1'), :folder => master_sub_folder, :context => @copy_from)
-        att_tag = @template.create_content_tag_for!(att, :restrictions => {:content => true, :settings => true})
+        att_tag = @template.create_content_tag_for!(att, :restrictions => {:all => true})
 
         run_master_migration
 
