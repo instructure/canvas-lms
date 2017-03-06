@@ -57,4 +57,27 @@ define([
     input.node.value = '1'
     input.simulate('change')
   })
+
+  test('onActivate fires when filters are focussed', () => {
+    const props = defaultProps()
+    props.onActivate = sinon.spy()
+    const tree = enzyme.mount(<CourseFilter {...props} />)
+    const input = tree.find('TextInput input')
+    input.simulate('focus')
+    ok(props.onActivate.calledOnce)
+  })
+
+  test('onDeactivate fires when focus leaves filters without filtering', (assert) => {
+    const done = assert.async()
+    const props = defaultProps()
+    props.onDeactivate = sinon.spy()
+    const tree = enzyme.mount(<CourseFilter {...props} />)
+    const input = tree.find('TextInput input')
+    input.simulate('focus')
+    input.simulate('blur')
+    setTimeout(() => {
+      ok(props.onDeactivate.calledOnce)
+      done()
+    }, 0)
+  })
 })

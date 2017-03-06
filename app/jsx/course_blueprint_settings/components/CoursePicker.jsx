@@ -34,6 +34,7 @@ define([
       super(props)
       this.state = {
         isExpanded: props.isExpanded,
+        isManuallyExpanded: props.isExpanded,
         announceChanges: false,
       }
     }
@@ -54,6 +55,19 @@ define([
 
     reloadCourses () {
       this.props.loadCourses(this.state.filters)
+    }
+
+    onFilterActivate = () => {
+      this.setState({
+        isExpanded: true,
+        isManuallyExpanded: this.coursesToggle.state.isExpanded,
+      })
+    }
+
+    onFilterDeactivate = () => {
+      if (this.state.isExpanded && !this.state.isManuallyExpanded) {
+        this.setState({ isExpanded: false })
+      }
     }
 
     onSelectedChanged = (selected) => {
@@ -82,9 +96,15 @@ define([
             terms={this.props.terms}
             subAccounts={this.props.subAccounts}
             onChange={this.onFilterChange}
+            onActivate={this.onFilterActivate}
+            onDeactivate={this.onFilterDeactivate}
           />
           <div className="bps-course-details__wrapper">
-            <ToggleDetails isExpanded={this.state.isExpanded} summary={<Typography>{I18n.t('Courses')}</Typography>}>
+            <ToggleDetails
+              ref={(c) => { this.coursesToggle = c }}
+              isExpanded={this.state.isExpanded}
+              summary={<Typography>{I18n.t('Courses')}</Typography>}
+            >
               {this.props.isLoadingCourses && (<div className="bps-course-picker__loading">
                 <Spinner title={I18n.t('Loading Courses')} />
               </div>)}
