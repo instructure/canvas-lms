@@ -173,6 +173,11 @@ module Services
         Services::AddressBook.recipients(weak_checks: false)
       end
 
+      it "normalizes ignore_result to 1 if truthy" do
+        expect_request(with_param(:ignore_result, 1))
+        Services::AddressBook.recipients(ignore_result: true)
+      end
+
       it "reshapes results returned from service endpoint" do
         stub_response(anything, example_response)
         result = Services::AddressBook.recipients(@sender)
@@ -200,6 +205,26 @@ module Services
         expect(result.user_ids).to eq([])
         expect(result.common_contexts).to eq({})
         expect(result.cursors).to eq([])
+      end
+
+      it "reads separate timeout setting when ignoring result (for performance tapping)" do
+        allow(Canvas).to receive(:redis_enabled?).and_return(true)
+        allow(Canvas).to receive(:redis).and_return(double)
+        allow(Canvas.redis).to receive(:get).with("service:timeouts:address_book_performance_tap:error_count").and_return(4)
+        expect(Rails.logger).to receive(:error).with("Skipping service call due to error count: address_book_performance_tap 4")
+        result = nil
+        expect { result = Services::AddressBook.recipients(sender: @sender, ignore_result: true) }.not_to raise_error
+        expect(result.user_ids).to eq([])
+        expect(result.common_contexts).to eq({})
+        expect(result.cursors).to eq([])
+      end
+
+      it "returns empty response when ignoring result, regardless of what service returns" do
+        stub_response(anything, example_response)
+        result = Services::AddressBook.recipients(sender: @sender, ignore_result: true)
+        expect(result.user_ids).to eql([])
+        expect(result.common_contexts).to eql({})
+        expect(result.cursors).to eql([])
       end
 
       it "reports errors in service request but then returns sane value" do
@@ -355,7 +380,7 @@ module Services
     describe "search_users" do
       it "makes a recipient request" do
         expect_request(%r{/recipients\?})
-        Services::AddressBook.search_users(@sender, search: 'bob')
+        Services::AddressBook.search_users(@sender, {search: 'bob'}, {})
       end
 
       it "only has search parameter by default" do
@@ -363,37 +388,37 @@ module Services
         expect_request(with_param_present(:in_context)).never
         expect_request(with_param_present(:exclude_ids)).never
         expect_request(with_param_present(:weak_checks)).never
-        Services::AddressBook.search_users(@sender, search: 'bob')
+        Services::AddressBook.search_users(@sender, {search: 'bob'}, {})
       end
 
       it "passes context to recipients call" do
         expect_request(with_param_present(:in_context))
-        Services::AddressBook.search_users(@sender, search: 'bob', context: @course)
+        Services::AddressBook.search_users(@sender, {search: 'bob', context: @course}, {})
       end
 
       it "includes sender if is_admin but no context given" do
         expect_request(with_param_present(:for_sender))
-        Services::AddressBook.search_users(@sender, search: 'bob', is_admin: true)
+        Services::AddressBook.search_users(@sender, {search: 'bob', is_admin: true}, {})
       end
 
       it "omits sender if is_admin specified with context" do
         expect_request(not_match(with_param_present(:sender)))
-        Services::AddressBook.search_users(@sender, search: 'bob', context: @course, is_admin: true)
+        Services::AddressBook.search_users(@sender, {search: 'bob', context: @course, is_admin: true}, {})
       end
 
       it "passes exclude_ids to recipients call" do
         expect_request(with_param_present(:exclude_ids))
-        Services::AddressBook.search_users(@sender, search: 'bob', exclude_ids: [1, 2, 3])
+        Services::AddressBook.search_users(@sender, {search: 'bob', exclude_ids: [1, 2, 3]}, {})
       end
 
       it "passes weak_checks flag along to recipients" do
         expect_request(with_param_present(:weak_checks))
-        Services::AddressBook.search_users(@sender, search: 'bob', weak_checks: true)
+        Services::AddressBook.search_users(@sender, {search: 'bob', weak_checks: true}, {})
       end
 
       it "returns ids, contexts, and cursors" do
         stub_response(anything, example_response)
-        user_ids, common_contexts, cursors = Services::AddressBook.search_users(@sender, search: 'bob')
+        user_ids, common_contexts, cursors = Services::AddressBook.search_users(@sender, {search: 'bob'}, {})
         expect(user_ids).to eql([ 10000000000002, 10000000000005 ])
         expect(common_contexts).to eql({
           10000000000002 => {
