@@ -63,6 +63,14 @@ describe AssignmentsController do
       expect(assigns[:js_env][:WEIGHT_FINAL_GRADES]).to eq(@course.apply_group_weights?)
     end
 
+    it "js_env SIS_NAME is SIS when @context does not respond_to assignments" do
+      user_session(@teacher)
+      @course.stubs(:respond_to?).returns(false)
+      controller.stubs(:set_js_assignment_data).returns({:js_env => {}})
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:SIS_NAME]).to eq('SIS')
+    end
+
     it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
       user_session(@teacher)
       AssignmentUtil.stubs(:post_to_sis_friendly_name).returns('Foo Bar')
@@ -87,6 +95,27 @@ describe AssignmentsController do
       user_session @teacher
       get 'index', course_id: @course.id
       expect(assigns[:js_env][:QUIZ_LTI_ENABLED]).to be false
+    end  
+
+    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:name_length_required_for_account?).returns(true)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
+    end
+
+    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:name_length_required_for_account?).returns(false)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
+    end
+
+    it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:assignment_max_name_length).returns(15)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
     context "draft state" do

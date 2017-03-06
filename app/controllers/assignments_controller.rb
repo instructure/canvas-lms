@@ -40,7 +40,15 @@ class AssignmentsController < ApplicationController
       log_asset_access([ "assignments", @context ], 'assignments', 'other')
 
       add_crumb(t('#crumbs.assignments', "Assignments"), named_context_url(@context, :context_assignments_url))
-      sis_name = @context.respond_to?(:assignments) ? AssignmentUtil.post_to_sis_friendly_name(@context.assignments.first) : 'SIS'
+
+      sis_name = 'SIS'
+      if @context.respond_to?(:assignments)
+        assignment = @context.assignments.first
+        max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(assignment)
+        max_name_length = AssignmentUtil.assignment_max_name_length(assignment)
+        sis_name = AssignmentUtil.post_to_sis_friendly_name(assignment)
+      end
+
 
       # It'd be nice to do this as an after_create, but it's not that simple
       # because of course import/copy.
@@ -48,11 +56,15 @@ class AssignmentsController < ApplicationController
       set_js_assignment_data # in application_controller.rb, because the assignments page can be shared with the course home
 
       set_tutorial_js_env
-
-      js_env(WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
-             POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
-             SIS_NAME: sis_name,
-             QUIZ_LTI_ENABLED: @context.quiz_lti_tool.present?)
+      hash = {
+        WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
+        POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
+        SIS_NAME: sis_name,
+        MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT: max_name_length_required_for_account,
+        MAX_NAME_LENGTH: max_name_length,
+        QUIZ_LTI_ENABLED: @context.quiz_lti_tool.present?
+      }
+      js_env(hash)
 
       respond_to do |format|
         format.html do
