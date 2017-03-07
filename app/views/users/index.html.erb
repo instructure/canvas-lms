@@ -42,9 +42,9 @@
 
 <ul class="users">
   <% @users.each do |user| %>
-    <%= content_tag_for(:li, user) do %>
+    <li id="user_<%= user.id %>" class="user">
       <%= link_to(user.last_name_first_or_unnamed, context_url(@context, :context_user_url, user)) %>
-    <% end %>
+    </li>
   <% end %>
 </ul>
 
