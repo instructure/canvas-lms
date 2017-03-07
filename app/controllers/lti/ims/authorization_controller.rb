@@ -42,7 +42,7 @@ module Lti
     #
     class AuthorizationController < ApplicationController
 
-      skip_before_action :load_user, :require_user
+      skip_before_action :load_user
 
       SERVICE_DEFINITIONS = [
         {

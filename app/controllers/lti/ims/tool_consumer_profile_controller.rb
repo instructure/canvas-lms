@@ -24,7 +24,6 @@ module Lti
       TOOL_CONSUMER_PROFILE_SERVICE = 'ToolConsumerProfile'.freeze
 
       before_action :require_context
-      skip_before_action :require_user
       skip_before_action :load_user
 
       def show
