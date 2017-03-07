@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 describe "/courses/_recent_feedback" do
   before do
     course_with_student(active_all: true)
-    assigns[:current_user] = @user
+    assign(:current_user, @user)
     submission_model
   end
 

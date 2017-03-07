@@ -60,7 +60,7 @@ describe "/courses/_recent_event" do
     before do
       course_with_student(active_all: true)
       submission_model
-      assigns[:current_user] = @user
+      assign(:current_user, @user)
     end
 
     it 'shows points possible for an ungraded assignment' do

@@ -23,7 +23,7 @@ describe "/announcements/index" do
   it "should render" do
     course_with_teacher
     view_context(@course, @user)
-    assigns[:body_classes] = []
+    assign(:body_classes, [])
     render 'announcements/index'
     expect(response).not_to be_nil
   end

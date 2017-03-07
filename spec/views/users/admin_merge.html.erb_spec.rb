@@ -32,9 +32,9 @@ describe "/users/admin_merge" do
 
     expect(@user.associated_accounts.map(&:id).sort).to eq [@account.id, @account2.id, Account.default.id].sort
 
-    assigns[:current_user] = @user
+    assign(:current_user, @user)
     user_factory
-    assigns[:user] = @user
+    assign(:user, @user)
 
     render "users/admin_merge"
     expect(response).not_to be_nil

@@ -24,15 +24,15 @@ describe "/profile/profile" do
     course_with_student(:active_user => true)
     view_context
 
-    assigns[:user] = @user
-    assigns[:email_channels] = []
-    assigns[:other_channels] = []
-    assigns[:sms_channels] = []
-    assigns[:notification_categories] = Notification.dashboard_categories
-    assigns[:policies] = NotificationPolicy.for(@user)
-    assigns[:default_pseudonym] = @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaabb", :password_confirmation => "asdfaabb")
-    assigns[:pseudonyms] = @user.pseudonyms
-    assigns[:password_pseudonyms] = []
+    assign(:user, @user)
+    assign(:email_channels, [])
+    assign(:other_channels, [])
+    assign(:sms_channels, [])
+    assign(:notification_categories, Notification.dashboard_categories)
+    assign(:policies, NotificationPolicy.for(@user))
+    assign(:default_pseudonym, @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaabb", :password_confirmation => "asdfaabb"))
+    assign(:pseudonyms, @user.pseudonyms)
+    assign(:password_pseudonyms, [])
     render "profile/profile"
     expect(response).not_to be_nil
   end
@@ -41,16 +41,16 @@ describe "/profile/profile" do
     account_admin_user_with_role_changes(active_user: true, role_changes: {manage_sis: false})
     view_context
 
-    assigns[:user] = @user
-    assigns[:email_channels] = []
-    assigns[:other_channels] = []
-    assigns[:sms_channels] = []
-    assigns[:notification_categories] = Notification.dashboard_categories
-    assigns[:policies] = NotificationPolicy.for(@user)
-    default_pseudonym = assigns[:default_pseudonym] = @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaabb", :password_confirmation => "asdfaabb")
+    assign(:user, @user)
+    assign(:email_channels, [])
+    assign(:other_channels, [])
+    assign(:sms_channels, [])
+    assign(:notification_categories, Notification.dashboard_categories)
+    assign(:policies, NotificationPolicy.for(@user))
+    default_pseudonym = assign(:default_pseudonym, @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaabb", :password_confirmation => "asdfaabb"))
     sis_pseudonym = @user.pseudonyms.create!(:unique_id => 'sis_unique@example.com') { |p| p.sis_user_id = 'sis_id' }
-    assigns[:pseudonyms] = @user.pseudonyms
-    assigns[:password_pseudonyms] = []
+    assign(:pseudonyms, @user.pseudonyms)
+    assign(:password_pseudonyms, [])
     render "profile/profile"
     page = Nokogiri('<document>' + response.body + '</document>')
     expect(page.css("#pseudonym_#{default_pseudonym.id} .delete_pseudonym_link").first['style']).to eq ''
@@ -61,15 +61,15 @@ describe "/profile/profile" do
     course_with_student(:active_user => true)
     view_context
 
-    assigns[:user] = @user
-    assigns[:email_channels] = []
-    assigns[:other_channels] = []
-    assigns[:sms_channels] = []
-    assigns[:notification_categories] = Notification.dashboard_categories
-    assigns[:policies] = NotificationPolicy.for(@user)
-    default_pseudonym = assigns[:default_pseudonym] = @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaabb", :password_confirmation => "asdfaabb")
-    assigns[:pseudonyms] = @user.pseudonyms
-    assigns[:password_pseudonyms] = []
+    assign(:user, @user)
+    assign(:email_channels, [])
+    assign(:other_channels, [])
+    assign(:sms_channels, [])
+    assign(:notification_categories, Notification.dashboard_categories)
+    assign(:policies, NotificationPolicy.for(@user))
+    default_pseudonym = assign(:default_pseudonym, @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaabb", :password_confirmation => "asdfaabb"))
+    assign(:pseudonyms, @user.pseudonyms)
+    assign(:password_pseudonyms, [])
     render "profile/profile"
     page = Nokogiri('<document>' + response.body + '</document>')
     expect(page.css("#pseudonym_#{default_pseudonym.id} .delete_pseudonym_link").first['style']).to eq 'display: none;'

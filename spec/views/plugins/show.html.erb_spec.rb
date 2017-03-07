@@ -10,8 +10,8 @@ describe "plugins/show" do
     )
     plugin_setting = PluginSetting.new()
 
-    assigns[:plugin] = plugin
-    assigns[:plugin_setting] = plugin_setting
+    assign(:plugin, plugin)
+    assign(:plugin_setting, plugin_setting)
     view.stubs(:plugin_path).returns("/some/path")
     view.stubs(:params).returns({id: 'some_plugin'})
     render 'plugins/show'

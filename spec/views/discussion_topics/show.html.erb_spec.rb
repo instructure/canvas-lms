@@ -26,11 +26,11 @@ describe "/discussion_topics/show" do
     @topic = @course.discussion_topics.create!(:title => "some topic", :user => @user)
     @entry = @topic.discussion_entries.create!(:message => "some message")
     @topic.discussion_entries.create!(:message => "another message")
-    assigns[:topic] = @topic
-    assigns[:grouped_entries] = @topic.discussion_entries.group_by(&:parent_id)
-    assigns[:entries] = @topic.discussion_entries
-    assigns[:all_entries] = @topic.discussion_entries
-    assigns[:presenter] = DiscussionTopicPresenter.new(@topic, @user)
+    assign(:topic, @topic)
+    assign(:grouped_entries, @topic.discussion_entries.group_by(&:parent_id))
+    assign(:entries, @topic.discussion_entries)
+    assign(:all_entries, @topic.discussion_entries)
+    assign(:presenter, DiscussionTopicPresenter.new(@topic, @user))
     render "discussion_topics/show"
     expect(response).to have_tag("div#discussion_subentries")
   end
@@ -45,12 +45,12 @@ describe "/discussion_topics/show" do
     @topic.save!
     @entry = @topic.discussion_entries.create!(:message => "some message")
     @topic.discussion_entries.create!(:message => "another message")
-    assigns[:topic] = @topic
-    assigns[:grouped_entries] = @topic.discussion_entries.group_by(&:parent_id)
-    assigns[:entries] = @topic.discussion_entries
-    assigns[:all_entries] = @topic.discussion_entries
-    assigns[:assignment] = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @user)
-    assigns[:presenter] = DiscussionTopicPresenter.new(@topic, @user)
+    assign(:topic, @topic)
+    assign(:grouped_entries, @topic.discussion_entries.group_by(&:parent_id))
+    assign(:entries, @topic.discussion_entries)
+    assign(:all_entries, @topic.discussion_entries)
+    assign(:assignment, AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @user))
+    assign(:presenter, DiscussionTopicPresenter.new(@topic, @user))
     expect(@topic.for_assignment?).to be_truthy
     expect(@topic.assignment.rubric_association.rubric).not_to be_nil
     render "discussion_topics/show"

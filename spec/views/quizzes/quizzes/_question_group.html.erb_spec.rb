@@ -24,7 +24,7 @@ describe "/quizzes/quizzes/_question_group" do
   it "should render" do
     course_with_student
     view_context
-    assigns[:quiz] = @course.quizzes.create!
+    assign(:quiz, @course.quizzes.create!)
     group = {}
     group[:id] = 5
     group[:questions] = []

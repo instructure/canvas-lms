@@ -23,10 +23,10 @@ describe "/courses/index" do
   it "should render" do
     course_with_student
     view_context
-    assigns[:current_enrollments] = [@enrollment]
-    assigns[:past_enrollments] = []
-    assigns[:future_enrollments] = []
-    assigns[:visible_groups] = []
+    assign(:current_enrollments, [@enrollment])
+    assign(:past_enrollments, [])
+    assign(:future_enrollments, [])
+    assign(:visible_groups, [])
     render "courses/index"
     expect(response).not_to be_nil
   end
@@ -35,10 +35,10 @@ describe "/courses/index" do
     course_with_student
     group_with_user(:user => @user, :group_context => @course)
     view_context
-    assigns[:current_enrollments] = [@enrollment]
-    assigns[:past_enrollments] = []
-    assigns[:future_enrollments] = []
-    assigns[:visible_groups] = [@group]
+    assign(:current_enrollments, [@enrollment])
+    assign(:past_enrollments, [])
+    assign(:future_enrollments, [])
+    assign(:visible_groups, [@group])
     render "courses/index"
     doc = Nokogiri::HTML.parse(response.body)
     expect(doc.at_css('#my_groups_table td:nth-child(2) span.name').text).to eq @course.name
@@ -52,10 +52,10 @@ describe "/courses/index" do
 
     group_with_user(:user => @user, :group_context => @course)
     view_context
-    assigns[:current_enrollments] = []
-    assigns[:past_enrollments] = []
-    assigns[:future_enrollments] = [@enrollment]
-    assigns[:visible_groups] = []
+    assign(:current_enrollments, [])
+    assign(:past_enrollments, [])
+    assign(:future_enrollments, [@enrollment])
+    assign(:visible_groups, [])
     render "courses/index"
     doc = Nokogiri::HTML.parse(response.body)
     expect(doc.at_css('#my_groups_table')).to be_nil

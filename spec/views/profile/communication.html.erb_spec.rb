@@ -25,12 +25,12 @@ describe "/profile/communication" do
     communication_channel(@user)
     view_context
 
-    assigns[:email_channels] = []
-    assigns[:other_channels] = []
-    assigns[:sms_channels] = []
-    assigns[:notification_categories] = Notification.dashboard_categories
-    assigns[:policies] = NotificationPolicy.for(@user)
-    assigns[:user] = @user
+    assign(:email_channels, [])
+    assign(:other_channels, [])
+    assign(:sms_channels, [])
+    assign(:notification_categories, Notification.dashboard_categories)
+    assign(:policies, NotificationPolicy.for(@user))
+    assign(:user, @user)
     render "profile/communication"
     expect(response).not_to be_nil
   end
