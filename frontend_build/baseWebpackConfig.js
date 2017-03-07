@@ -71,7 +71,7 @@ module.exports = {
     path: path.join(__dirname, '../public', webpackPublicPath),
 
     // Add /* filename */ comments to generated require()s in the output.
-    pathinfo: process.env.NODE_ENV !== 'production',
+    pathinfo: true,
 
     filename: '[name].bundle-[chunkhash:10].js',
     chunkFilename: '[name].chunk-[chunkhash:10].js',
