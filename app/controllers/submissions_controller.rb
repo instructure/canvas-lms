@@ -103,13 +103,16 @@ class SubmissionsController < ApplicationController
     end
   end
 
-  rescue_from ActiveRecord::RecordNotFound, only: :show, with: :render_user_not_found
   def show
-    service = Submissions::SubmissionForShow.new(
-      @context, params.slice(:assignment_id, :id)
-    )
-    @assignment = service.assignment
-    @submission = service.submission
+    begin
+      service = Submissions::SubmissionForShow.new(
+        @context, params.slice(:assignment_id, :id)
+      )
+      @assignment = service.assignment
+      @submission = service.submission
+    rescue ActiveRecord::RecordNotFound
+      return render_user_not_found
+    end
 
     @rubric_association = @submission.rubric_association_with_assessing_user_id
     @visible_rubric_assessments = @submission.visible_rubric_assessments_for(@current_user)
