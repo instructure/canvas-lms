@@ -38,11 +38,9 @@ define([
   INST, I18n, $, _, CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, gradingPeriodSetsApi, round,
   htmlEscape
 ) {
-  /* eslint-disable vars-on-top */
-  /* eslint-disable newline-per-chained-call */
 
   var GradeSummary = {
-    getGradingPeriodIdFromUrl (url) {
+    getGradingPeriodIdFromUrl: function (url) {
       var matches = url.match(/grading_period_id=(\d*)/);
       if (matches && matches[1] !== '0') {
         return matches[1];
