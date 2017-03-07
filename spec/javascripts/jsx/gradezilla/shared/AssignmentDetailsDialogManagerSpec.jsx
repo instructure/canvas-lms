@@ -5,14 +5,14 @@ define([
   function createAssignmentProp () {
     return {
       id: '1',
-      htmlUrl: 'http://assignment_htmlUrl',
+      html_url: 'http://assignment_htmlUrl',
       invalid: false,
       muted: false,
       name: 'Assignment #1',
-      omitFromFinalGrade: false,
-      pointsPossible: 13,
-      submissionTypes: ['online_text_entry'],
-      courseId: '42'
+      omit_from_final_grade: false,
+      points_possible: 13,
+      submission_types: ['online_text_entry'],
+      course_id: '42'
     }
   }
 
@@ -21,28 +21,28 @@ define([
       {
         id: '11',
         name: 'Clark Kent',
-        isInactive: false,
+        is_inactive: false,
         submission: {
           score: 7,
-          submittedAt: null
+          submitted_at: null
         }
       },
       {
         id: '13',
         name: 'Barry Allen',
-        isInactive: false,
+        is_inactive: false,
         submission: {
           score: 8,
-          submittedAt: new Date('Thu Feb 02 2017 16:33:19 GMT-0500 (EST)')
+          submitted_at: new Date('Thu Feb 02 2017 16:33:19 GMT-0500 (EST)')
         }
       },
       {
         id: '15',
         name: 'Bruce Wayne',
-        isInactive: false,
+        is_inactive: false,
         submission: {
           score: undefined,
-          submittedAt: undefined
+          submitted_at: undefined
         }
       }
     ];
@@ -72,6 +72,22 @@ define([
     const stubbedShow = this.stub(AssignmentDetailsDialog.prototype, 'show');
     this.manager.showDialog();
 
-    ok(stubbedShow.called);
+    equal(stubbedShow.callCount, 1);
+  });
+
+  test('calls AssignmentDetailsDialog.show with the correct arguments', function () {
+    const stubbedShow = this.stub(AssignmentDetailsDialog, 'show');
+    const expectedArgs = {
+      assignment: createAssignmentProp(),
+      students: [
+        { assignment_1: { score: 7 } },
+        { assignment_1: { score: 8 } },
+        { assignment_1: { score: undefined } }
+      ]
+    };
+    this.manager.showDialog();
+
+    equal(stubbedShow.callCount, 1);
+    deepEqual(stubbedShow.getCall(0).args[0], expectedArgs);
   });
 });

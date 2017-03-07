@@ -8,6 +8,10 @@ define [
 ], (I18n, $, assignmentDetailsDialogTemplate, round) ->
 
   class AssignmentDetailsDialog
+    @show: (opts) ->
+      dialog = new AssignmentDetailsDialog(opts)
+      dialog.show()
+
     constructor: ({@assignment, @students}) ->
 
     show: () ->

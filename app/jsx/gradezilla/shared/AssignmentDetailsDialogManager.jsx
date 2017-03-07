@@ -1,14 +1,6 @@
 define([
   'compiled/AssignmentDetailsDialog'
 ], (AssignmentDetailsDialog) => {
-  function prepareAssignment (assignment) {
-    return {
-      id: assignment.id,
-      name: assignment.name,
-      points_possible: assignment.pointsPossible
-    };
-  }
-
   function prepareStudents (students, assignmentId) {
     return students.map((student) => {
       const processedStudent = {};
@@ -25,7 +17,7 @@ define([
 
   function getAssignmentDetailsDialogOptions (assignment, students) {
     return {
-      assignment: prepareAssignment(assignment),
+      assignment,
       students: prepareStudents(students, assignment.id)
     };
   }
@@ -41,9 +33,7 @@ define([
 
     showDialog () {
       const opts = getAssignmentDetailsDialogOptions(this.assignment, this.students);
-      const dialog = new AssignmentDetailsDialog(opts);
-
-      dialog.show();
+      AssignmentDetailsDialog.show(opts);
     }
 
     isDialogEnabled () {
