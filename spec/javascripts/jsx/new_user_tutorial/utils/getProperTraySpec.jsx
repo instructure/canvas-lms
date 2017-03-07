@@ -5,8 +5,13 @@ define([
   'jsx/new_user_tutorial/trays/PagesTray',
   'jsx/new_user_tutorial/trays/AssignmentsTray',
   'jsx/new_user_tutorial/trays/QuizzesTray',
-  'jsx/new_user_tutorial/trays/SettingsTray'
-], (getProperTray, HomeTray, ModulesTray, PagesTray, AssignmentsTray, QuizzesTray, SettingsTray) => {
+  'jsx/new_user_tutorial/trays/SettingsTray',
+  'jsx/new_user_tutorial/trays/FilesTray',
+  'jsx/new_user_tutorial/trays/PeopleTray',
+  'jsx/new_user_tutorial/trays/AnnouncementsTray',
+  'jsx/new_user_tutorial/trays/GradesTray'
+], (getProperTray, HomeTray, ModulesTray, PagesTray, AssignmentsTray, QuizzesTray,
+    SettingsTray, FilesTray, PeopleTray, AnnouncementsTray, GradesTray) => {
   QUnit.module('getProperTray test');
 
   test('if no match is in the path argument returns the HomeTray', () => {
@@ -48,5 +53,34 @@ define([
     equal(trayObj.component, SettingsTray, 'component matches');
 
     equal(trayObj.label, 'Settings Tutorial Tray', 'label matches');
+  });
+  
+  test('if files is in the path argument returns the FilesTray', () => {
+    const trayObj = getProperTray('/courses/3/files/');
+    equal(trayObj.component, FilesTray, 'component matches');
+
+    equal(trayObj.label, 'Files Tutorial Tray', 'label matches');
+  });
+
+  test('if users is in the path argument returns the PeopleTray', () => {
+    const trayObj = getProperTray('/courses/3/users/');
+    equal(trayObj.component, PeopleTray, 'component matches');
+
+    equal(trayObj.label, 'People Tutorial Tray', 'label matches');
+  });
+
+  test('if announcements is in the path argument returns the AnnouncementsTray', () => {
+    const trayObj = getProperTray('/courses/3/announcements/');
+    equal(trayObj.component, AnnouncementsTray, 'component matches');
+
+    equal(trayObj.label, 'Announcements Tutorial Tray', 'label matches');
+  });
+
+  test('if gradebook is in the path argument returns the GradesTray', () => {
+    const trayObj = getProperTray('/courses/3/gradebook/');
+    equal(trayObj.component, GradesTray, 'component matches');
+
+    equal(trayObj.label, 'Gradebook Tutorial Tray', 'label matches');
+
   });
 });
