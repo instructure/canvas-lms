@@ -172,6 +172,6 @@ class AssignmentGroupsApiController < ApplicationController
 
   def valid_integration_data?(params)
     integration_data = params['integration_data']
-    integration_data.is_a?(Hash) || integration_data.nil?
+    integration_data.is_a?(ActionController::Parameters) || integration_data.nil?
   end
 end

@@ -177,13 +177,13 @@ module PostgreSQLAdapterExtensions
     end
   end
 
-  if CANVAS_RAILS4_2
-    # Force things with (approximate) integer representations (Floats,
-    # BigDecimals, Times, etc.) into those representations. Raise
-    # ActiveRecord::StatementInvalid for any other non-integer things.
-    def quote(value, column = nil)
-      return value if value.is_a?(QuotedValue)
+  # Force things with (approximate) integer representations (Floats,
+  # BigDecimals, Times, etc.) into those representations. Raise
+  # ActiveRecord::StatementInvalid for any other non-integer things.
+  def quote(value, column = nil)
+    return value if value.is_a?(QuotedValue)
 
+    if CANVAS_RAILS4_2
       if column && column.type == :integer && !value.respond_to?(:quoted_id)
         case value
           when String, ActiveSupport::Multibyte::Chars, nil, true, false
@@ -203,6 +203,10 @@ module PostgreSQLAdapterExtensions
       else
         super
       end
+    else
+      # rails 5 doesn't have a column argument; when we remove rails 4.2 support, just a regular
+      # super call will work
+      super(value)
     end
   end
 
