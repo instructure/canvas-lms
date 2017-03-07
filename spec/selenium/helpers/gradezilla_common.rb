@@ -85,8 +85,7 @@ module GradezillaCommon
   end
 
   def set_default_grade(cell_index, points = "5")
-    open_assignment_options(cell_index)
-    f('[data-action="setDefaultGrade"]').click
+    f('[data-menu-item-id="set-default-grade"]').click
     dialog = find_with_jquery('.ui-dialog:visible')
     f('.grading_value').send_keys(points)
     submit_dialog(dialog, '.ui-button')

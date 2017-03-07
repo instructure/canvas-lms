@@ -1033,6 +1033,7 @@ define [
       @sectionToShow = section
       @postGradesStore.setSelectedSection @sectionToShow
       UserSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
+      @updateColumnHeaders()
       @buildRows() if @grid
 
     showSections: ->

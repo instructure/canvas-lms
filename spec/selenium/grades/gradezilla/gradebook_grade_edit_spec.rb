@@ -139,12 +139,12 @@ describe "Gradezilla editing grades" do
   end
 
   it "does not update default grades for users not in this section", priority: "1", test_id: 220314 do
-    pending('TODO: Refactor this and add it back as part of CNVS-35021')
     # create new user and section
 
     gradezilla_page.visit(@course)
     switch_to_section(@other_section)
 
+    gradezilla_page.open_assignment_options(2)
     set_default_grade(2, 13)
     @other_section.users.each { |u| expect(u.submissions.map(&:grade)).to include '13' }
     @course.default_section.users.each { |u| expect(u.submissions.map(&:grade)).not_to include '13' }
@@ -233,9 +233,9 @@ describe "Gradezilla editing grades" do
   end
 
   it "validates setting default grade for an assignment", priority: "1", test_id: 220383 do
-    pending('TODO: Refactor this and add it back as part of CNVS-35021')
     expected_grade = "45"
     gradezilla_page.visit(@course)
+    gradezilla_page.open_assignment_options(2)
     set_default_grade(2, expected_grade)
     grade_grid = f('#gradebook_grid .container_1')
     StudentEnrollment.count.times do |n|
