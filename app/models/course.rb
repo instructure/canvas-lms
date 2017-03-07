@@ -3104,6 +3104,13 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def display_totals_for_all_grading_periods?
+    return @display_totals_for_all_grading_periods if defined?(@display_totals_for_all_grading_periods)
+
+    @display_totals_for_all_grading_periods =
+      !!GradingPeriodGroup.for_course(self)&.display_totals_for_all_grading_periods?
+  end
+
   def quiz_lti_tool
     query = { tool_id: 'Quizzes 2' }
     context_external_tools.active.find_by(query) ||

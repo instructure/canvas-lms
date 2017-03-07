@@ -135,14 +135,15 @@ module Api::V1
     end
 
     def grading_period_scores(student_enrollments)
-      has_grading_periods = @course.grading_periods?
-      totals_for_all_grading_periods_option = has_grading_periods &&
-        @course.feature_enabled?(:all_grading_periods_totals)
-      current_period = has_grading_periods && GradingPeriod.current_period_for(@course)
-      if has_grading_periods && current_period
-        calculated_grading_period_scores(student_enrollments, current_period, totals_for_all_grading_periods_option)
+      current_period = @course.grading_periods? && GradingPeriod.current_period_for(@course)
+      if current_period
+        calculated_grading_period_scores(
+          student_enrollments,
+          current_period,
+          @course.display_totals_for_all_grading_periods?
+        )
       else
-        nil_grading_period_scores(student_enrollments, has_grading_periods, totals_for_all_grading_periods_option)
+        nil_grading_period_scores(student_enrollments, false, false)
       end
     end
 

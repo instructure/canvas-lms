@@ -120,10 +120,14 @@ define([
         map[grade.assignmentGroupId] = {
           ...previousGrade,
           current: {
+            submission_count: previousGrade.current.submission_count + grade.current.submission_count,
+            submissions: [...previousGrade.current.submissions, ...grade.current.submissions],
             score: previousGrade.current.score + grade.current.score,
             possible: previousGrade.current.possible + grade.current.possible
           },
           final: {
+            submission_count: previousGrade.final.submission_count + grade.final.submission_count,
+            submissions: [...previousGrade.final.submissions, ...grade.final.submissions],
             score: previousGrade.final.score + grade.final.score,
             possible: previousGrade.final.possible + grade.final.possible
           }

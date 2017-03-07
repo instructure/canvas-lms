@@ -214,7 +214,7 @@ define [
     setupThis: (options) ->
       customOptions = options || {}
       defaults =
-        hasGradingPeriods: true
+        gradingPeriodSet: { id: '1' }
         getGradingPeriodToShow: -> '1'
         options:
           all_grading_periods_totals: false
@@ -226,12 +226,12 @@ define [
     teardown: ->
 
   test 'returns false if there are no grading periods', ->
-    self = @setupThis(hasGradingPeriods: false, isAllGradingPeriods: -> false)
+    self = @setupThis(gradingPeriodSet: null, isAllGradingPeriods: -> false)
     notOk @hideAggregateColumns.call(self)
 
   test 'returns false if there are no grading periods, even if isAllGradingPeriods is true', ->
     self = @setupThis
-      hasGradingPeriods: false
+      gradingPeriodSet: null
       getGradingPeriodToShow: -> '0'
       isAllGradingPeriods: -> true
 
@@ -248,13 +248,13 @@ define [
 
     ok @hideAggregateColumns.call(self)
 
-  test 'returns false if "All Grading Periods" is selected and the feature' +
-  'flag is turned on for "Display Totals for All Grading Periods"', ->
+  test 'returns false if "All Grading Periods" is selected and "Display Totals ' +
+  'for All Grading Periods option" is not checked on the grading period set', ->
     self = @setupThis
       getGradingPeriodToShow: -> '0'
       isAllGradingPeriods: -> true
-      options:
-        all_grading_periods_totals: true
+      gradingPeriodSet:
+        displayTotalsForAllGradingPeriods: true
 
     notOk @hideAggregateColumns.call(self)
 
@@ -315,7 +315,7 @@ define [
       }
 
       defaults = {
-        hasGradingPeriods: false,
+        gradingPeriodSet: null,
         gradingPeriodToShow: null,
         isAllGradingPeriods: -> false,
         effectiveDueDates
@@ -336,7 +336,7 @@ define [
 
   test 'returns all submissions if "All Grading Periods" is selected', ->
     self = @setupThis(
-      hasGradingPeriods: true,
+      gradingPeriodSet: { id: '1' },
       gradingPeriodToShow: '0',
       isAllGradingPeriods: -> true
     )
@@ -345,7 +345,7 @@ define [
 
   test 'only returns submissions due for the student in the selected grading period', ->
     self = @setupThis(
-      hasGradingPeriods: true,
+      gradingPeriodSet: { id: '1' },
       gradingPeriodToShow: '2'
     )
     submissions = @submissionsForStudent.call(self, @student)

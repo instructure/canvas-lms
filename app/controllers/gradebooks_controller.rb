@@ -382,7 +382,6 @@ class GradebooksController < ApplicationController
       publish_to_sis_enabled: @context.allows_grade_publishing_by(@current_user) && @gradebook_is_editable,
       publish_to_sis_url: context_url(@context, :context_details_url, anchor: 'tab-grade-publishing'),
       speed_grader_enabled: @context.allows_speed_grader?,
-      has_grading_periods: grading_periods?,
       active_grading_periods: active_grading_periods_json,
       grading_period_set: grading_period_group_json,
       current_grading_period_id: @current_grading_period_id,
@@ -405,7 +404,6 @@ class GradebooksController < ApplicationController
       gradebook_column_size_settings_url: change_gradebook_column_size_course_gradebook_url,
       gradebook_column_order_settings: @current_user.preferences[:gradebook_column_order].try(:[], @context.id),
       gradebook_column_order_settings_url: save_gradebook_column_order_course_gradebook_url,
-      all_grading_periods_totals: @context.feature_enabled?(:all_grading_periods_totals),
       sections: sections_json(@context.active_course_sections, @current_user, session),
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
       settings: @current_user.preferences.fetch(:gradebook_settings, {}).fetch(@context.id, {}),
@@ -767,11 +765,9 @@ class GradebooksController < ApplicationController
 
   def exclude_total?(context)
     return true if context.hide_final_grades
+    return false unless grading_periods? && view_all_grading_periods?
 
-    all_grading_periods_selected =
-      grading_periods? && view_all_grading_periods?
-    hide_all_grading_periods_totals = !context.feature_enabled?(:all_grading_periods_totals)
-    all_grading_periods_selected && hide_all_grading_periods_totals
+    grading_period_group.present? && !grading_period_group.display_totals_for_all_grading_periods?
   end
 
   def submisions_attachment_crocodocable_in_firefox?(submissions)

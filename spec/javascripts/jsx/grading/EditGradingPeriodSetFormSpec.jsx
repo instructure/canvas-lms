@@ -17,7 +17,7 @@ define([
     notEqual($el.getAttribute('aria-disabled'), 'true');
   };
 
-  const exampleSet = { id: "1", title: "Fall 2015", weighted: true };
+  const exampleSet = { id: '1', title: 'Fall 2015', weighted: true, displayTotalsForAllGradingPeriods: false };
 
   QUnit.module('EditGradingPeriodSetForm', {
     renderComponent(opts={}) {
@@ -69,6 +69,36 @@ define([
     equal(form.state.set.weighted, true);
     form.weightedCheckbox.handleChange({ target: { checked: false } });
     equal(form.state.set.weighted, false);
+  });
+
+  test('defaults to unchecked for the "Display totals for All Grading Periods option" checkbox', function () {
+    const set = { id: '1', title: 'Fall 2015', weighted: true, displayTotalsForAllGradingPeriods: null };
+    const form = this.renderComponent({ set });
+    notOk(form.displayTotalsCheckbox._input.checked);
+  });
+
+  test('initializes to checked for the "Display totals for All Grading Periods option" checkbox if passed true', function () {
+    const set = { id: '1', title: 'Fall 2015', weighted: true, displayTotalsForAllGradingPeriods: true };
+    const form = this.renderComponent({ set });
+    ok(form.displayTotalsCheckbox._input.checked);
+  });
+
+  test('the "Display totals for All Grading Periods option" checkbox changes state when clicked', function () {
+    const form = this.renderComponent();
+    const beforeChecked = form.displayTotalsCheckbox._input.checked;
+    Simulate.change(form.displayTotalsCheckbox._input, { target: { checked: true } });
+    const afterChecked = form.displayTotalsCheckbox._input.checked;
+    notEqual(beforeChecked, afterChecked);
+  });
+
+  test('the "Display totals for All Grading Periods option" checkbox state is included when the set is saved', function () {
+    const saveStub = this.stub();
+    const form = this.renderComponent({ onSave: saveStub });
+    const saveButton = ReactDOM.findDOMNode(form.refs.saveButton);
+    Simulate.click(saveButton);
+    equal(saveStub.callCount, 1, 'onSave was called once');
+    const { displayTotalsForAllGradingPeriods } = saveStub.getCall(0).args[0];
+    equal(displayTotalsForAllGradingPeriods, false, 'includes displayTotalsForAllGradingPeriods');
   });
 
   test('uses associated enrollment terms to update set state', function() {

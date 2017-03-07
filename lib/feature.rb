@@ -390,7 +390,7 @@ END
       display_name: -> { I18n.t('Display Totals for "All Grading Periods"') },
       description: -> { I18n.t('Display total grades when the "All Grading Periods" dropdown option is selected (grading periods must exist).') },
       applies_to: 'Course',
-      state: 'allowed',
+      state: 'hidden',
       root_opt_in: true
     },
     'course_user_search' => {

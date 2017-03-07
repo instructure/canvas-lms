@@ -121,7 +121,7 @@ define [
 
     submissionsUrl: get(window, 'ENV.GRADEBOOK_OPTIONS.submissions_url')
 
-    has_grading_periods: get(window, 'ENV.GRADEBOOK_OPTIONS.has_grading_periods')
+    has_grading_periods: get(window, 'ENV.GRADEBOOK_OPTIONS.grading_period_set')?
 
     gradingPeriods:
       (->

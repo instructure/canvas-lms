@@ -70,7 +70,8 @@ define([
     set: {
       id: '1',
       title: 'Example Set',
-      weighted: true
+      weighted: true,
+      displayTotalsForAllGradingPeriods: false
     },
     terms: [],
     onEdit () {},

@@ -8,6 +8,7 @@ define [
       id: '1',
       title: 'Fall 2015',
       weighted: false,
+      displayTotalsForAllGradingPeriods: false,
       gradingPeriods: [
         {
           id: '1',
@@ -35,6 +36,7 @@ define [
       id: '2',
       title: 'Spring 2016',
       weighted: true,
+      displayTotalsForAllGradingPeriods: false,
       gradingPeriods: [],
       permissions: { read: true, create: true, update: true, delete: true },
       createdAt: new Date('2015-11-29T12:00:00Z')
@@ -47,6 +49,7 @@ define [
         id: '1',
         title: 'Fall 2015',
         weighted: false,
+        display_totals_for_all_grading_periods: false,
         grading_periods: [
           {
             id: '1',
@@ -75,6 +78,7 @@ define [
         id: '2',
         title: 'Spring 2016',
         weighted: true,
+        display_totals_for_all_grading_periods: false,
         grading_periods: [],
         permissions: { read: true, create: true, update: true, delete: true },
         created_at: '2015-11-29T12:00:00Z'
@@ -132,6 +136,7 @@ define [
   deserializedSetCreating = {
     title: 'Fall 2015',
     weighted: null,
+    displayTotalsForAllGradingPeriods: false,
     enrollmentTermIDs: ['1', '2']
   }
 
@@ -139,6 +144,7 @@ define [
     id: '1',
     title: 'Fall 2015',
     weighted: false,
+    displayTotalsForAllGradingPeriods: false,
     gradingPeriods: [],
     enrollmentTermIDs: ['1', '2'],
     permissions: { read: true, create: true, update: true, delete: true },
@@ -146,7 +152,7 @@ define [
   }
 
   serializedSetCreating = {
-    grading_period_set: { title: 'Fall 2015', weighted: null },
+    grading_period_set: { title: 'Fall 2015', weighted: null, display_totals_for_all_grading_periods: false },
     enrollment_term_ids: ['1', '2']
   }
 
@@ -155,6 +161,7 @@ define [
       id: '1',
       title: 'Fall 2015',
       weighted: false,
+      display_totals_for_all_grading_periods: false,
       enrollment_term_ids: ['1', '2'],
       grading_periods: [],
       permissions: { read: true, create: true, update: true, delete: true },
@@ -190,12 +197,13 @@ define [
     id: '1',
     title: 'Fall 2015',
     weighted: true,
+    displayTotalsForAllGradingPeriods: true,
     enrollmentTermIDs: ['1', '2'],
     permissions: { read: true, create: true, update: true, delete: true }
   }
 
   serializedSetUpdating = {
-    grading_period_set: { title: 'Fall 2015', weighted: true },
+    grading_period_set: { title: 'Fall 2015', weighted: true, display_totals_for_all_grading_periods: true },
     enrollment_term_ids: ['1', '2']
   }
 
@@ -204,6 +212,7 @@ define [
       id: '1',
       title: 'Fall 2015',
       weighted: true,
+      display_totals_for_all_grading_periods: true,
       enrollment_term_ids: ['1', '2'],
       grading_periods: [
         {

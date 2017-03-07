@@ -58,6 +58,44 @@ describe GradingPeriodGroup do
     end
   end
 
+  describe '.for_course' do
+    before(:once) do
+      @course = account.courses.create!
+    end
+
+    it 'returns the set associated with the course' do
+      set = account.grading_period_groups.create!(valid_attributes)
+      set.enrollment_terms << @course.enrollment_term
+      expect(GradingPeriodGroup.for_course(@course)).to eq(set)
+    end
+
+    it 'returns nil if no set is associated with the course' do
+      expect(GradingPeriodGroup.for_course(@course)).to be_nil
+    end
+
+    it 'returns nil if the associated set is soft-deleted' do
+      set = account.grading_period_groups.create!(valid_attributes)
+      set.enrollment_terms << @course.enrollment_term
+      set.destroy
+      expect(GradingPeriodGroup.for_course(@course)).to be_nil
+    end
+
+    context 'legacy grading periods support' do
+      before(:once) do
+        @set = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+      end
+
+      it 'returns the set associated with the course' do
+        expect(GradingPeriodGroup.for_course(@course)).to eq(@set)
+      end
+
+      it 'returns nil if the associated set is soft-deleted' do
+        @set.destroy
+        expect(GradingPeriodGroup.for_course(@course)).to be_nil
+      end
+    end
+  end
+
   describe "validation" do
     let(:group) { GradingPeriodGroup.new valid_attributes }
 

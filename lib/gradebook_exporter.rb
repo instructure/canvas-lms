@@ -210,7 +210,8 @@ class GradebookExporter
   def show_totals?
     return true unless @course.grading_periods?
     return true if @options[:grading_period_id].try(:to_i) != 0
-    @course.feature_enabled?(:all_grading_periods_totals)
+
+    @course.display_totals_for_all_grading_periods?
   end
 
   STARTS_WITH_EQUAL = /^\s*=/

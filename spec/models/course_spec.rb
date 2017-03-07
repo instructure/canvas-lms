@@ -201,6 +201,58 @@ describe Course do
     end
   end
 
+  describe '#display_totals_for_all_grading_periods?' do
+    before do
+      @course.save!
+    end
+
+    it 'returns false for a course without an associated grading period group' do
+      expect(@course).not_to be_display_totals_for_all_grading_periods
+    end
+
+    it 'returns false for a course with an associated grading period group that is soft-deleted' do
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group.enrollment_terms << @course.enrollment_term
+      group.update!(display_totals_for_all_grading_periods: true)
+      group.destroy
+      expect(@course).not_to be_display_totals_for_all_grading_periods
+    end
+
+    it 'returns true if the associated grading period group has the setting enabled' do
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group.enrollment_terms << @course.enrollment_term
+      group.update!(display_totals_for_all_grading_periods: true)
+      expect(@course).to be_display_totals_for_all_grading_periods
+    end
+
+    it 'returns false if the associated grading period group has the setting disabled' do
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group.enrollment_terms << @course.enrollment_term
+      expect(@course).not_to be_display_totals_for_all_grading_periods
+    end
+
+    context 'legacy grading periods support' do
+      before do
+        @group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+      end
+
+      it 'returns true if the associated grading period group has the setting enabled' do
+        @group.update!(display_totals_for_all_grading_periods: true)
+        expect(@course).to be_display_totals_for_all_grading_periods
+      end
+
+      it 'returns false if the associated grading period group has the setting disabled' do
+        expect(@course).not_to be_display_totals_for_all_grading_periods
+      end
+
+      it 'returns false for a course with an associated grading period group that is soft-deleted' do
+        @group.update!(display_totals_for_all_grading_periods: true)
+        @group.destroy
+        expect(@course).not_to be_display_totals_for_all_grading_periods
+      end
+    end
+  end
+
   describe "#time_zone" do
     it "should use provided value when set, regardless of root account setting" do
       @root_account = Account.default
