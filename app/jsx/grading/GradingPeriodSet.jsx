@@ -106,7 +106,8 @@ define([
       set: shape({
         id:    string.isRequired,
         title: string.isRequired,
-        weighted: bool
+        weighted: bool,
+        displayTotalsForAllGradingPeriods: bool.isRequired
       }).isRequired,
 
       urls: shape({
@@ -126,7 +127,8 @@ define([
     getInitialState() {
       return {
         title: this.props.set.title,
-        weighted: this.props.set.weighted || false,
+        weighted: !!this.props.set.weighted,
+        displayTotalsForAllGradingPeriods: this.props.set.displayTotalsForAllGradingPeriods,
         gradingPeriods: sortPeriods(this.props.gradingPeriods),
         newPeriod: {
           period: null,

@@ -2,9 +2,10 @@ class ClearAnyNewStylesFeatureFlags < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up
-    DataFixup::ClearAnyNewStylesFeatureFlags.send_later_if_production_enqueue_args(:run, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1)
+    DataFixup::ClearFeatureFlags.run_async('new_styles')
   end
 
   def self.down
+    raise ActiveRecord::IrreversibleMigration
   end
 end

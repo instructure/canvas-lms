@@ -351,7 +351,7 @@ define([
     setupThis (options = {}) {
       return {
         ...this.gradebookStubs(),
-        hasGradingPeriods: true,
+        gradingPeriodSet: { id: '1' },
         getGradingPeriodToShow () {
           return '1';
         },
@@ -369,7 +369,7 @@ define([
 
   test('returns false if there are no grading periods', function () {
     const self = this.setupThis({
-      hasGradingPeriods: false,
+      gradingPeriodSet: null,
       isAllGradingPeriods () {
         return false;
       }
@@ -379,7 +379,7 @@ define([
 
   test('returns false if there are no grading periods, even if isAllGradingPeriods is true', function () {
     const self = this.setupThis({
-      hasGradingPeriods: false,
+      gradingPeriodSet: null,
       getGradingPeriodToShow () {
         return '0';
       },
@@ -411,8 +411,8 @@ define([
     ok(this.hideAggregateColumns.call(self));
   });
 
-  test('returns false if "All Grading Periods" is selected and the feature' +
-    'flag is turned on for "Display Totals for All Grading Periods"', function () {
+  test('returns false if "All Grading Periods" is selected and the grading period set has' +
+    '"Display Totals for All Grading Periods option" enabled', function () {
     const self = this.setupThis({
       getGradingPeriodToShow () {
         return '0';
@@ -420,9 +420,7 @@ define([
       isAllGradingPeriods () {
         return true;
       },
-      options: {
-        all_grading_periods_totals: true
-      }
+      gradingPeriodSet: { displayTotalsForAllGradingPeriods: true }
     });
     notOk(this.hideAggregateColumns.call(self));
   });
@@ -519,7 +517,7 @@ define([
   QUnit.module('Gradebook#submissionsForStudent', {
     setupThis (options = {}) {
       return {
-        hasGradingPeriods: false,
+        gradingPeriodSet: null,
         gradingPeriodToShow: null,
         isAllGradingPeriods () {
           return false;
@@ -562,7 +560,7 @@ define([
 
   test('returns all submissions if "All Grading Periods" is selected', function () {
     const self = this.setupThis({
-      hasGradingPeriods: true,
+      gradingPeriodSet: { id: '1' },
       gradingPeriodToShow: '0',
       isAllGradingPeriods () {
         return true;
@@ -574,7 +572,7 @@ define([
 
   test('only returns submissions due for the student in the selected grading period', function () {
     const self = this.setupThis({
-      hasGradingPeriods: true,
+      gradingPeriodSet: { id: '1' },
       gradingPeriodToShow: '2'
     });
     const submissions = this.submissionsForStudent.call(self, this.student);

@@ -13,9 +13,10 @@ define([
 
   const buildSet = function(attr = {}) {
     return {
-      id:                attr.id,
-      title:             attr.title || "",
-      weighted:          attr.weighted || false,
+      id: attr.id,
+      title: attr.title || "",
+      weighted: !!attr.weighted,
+      displayTotalsForAllGradingPeriods: !!attr.displayTotalsForAllGradingPeriods,
       enrollmentTermIDs: attr.enrollmentTermIDs || []
     };
   };
@@ -27,18 +28,23 @@ define([
     return [];
   };
 
+  function replaceSetAttr (set, key, val) {
+    return { set: { ...set, [key]: val } };
+  }
+
   let GradingPeriodSetForm = React.createClass({
     propTypes: {
       set: shape({
-        id:                string,
-        title:             string,
-        weighted:          bool,
+        id: string,
+        title: string,
+        displayTotalsForAllGradingPeriods: bool,
+        weighted: bool,
         enrollmentTermIDs: array
       }).isRequired,
       enrollmentTerms: array.isRequired,
-      disabled:        bool,
-      onSave:          func.isRequired,
-      onCancel:        func.isRequired
+      disabled: bool,
+      onSave: func.isRequired,
+      onCancel: func.isRequired
     },
 
     getInitialState() {
@@ -56,13 +62,17 @@ define([
     },
 
     changeTitle(e) {
-      const set = { ...this.state.set, title: e.target.value };
-      this.setState({ set });
+      this.setState(replaceSetAttr(this.state.set, 'title', e.target.value));
     },
 
     changeWeighted(e) {
-      const set = { ...this.state.set, weighted: e.target.checked };
-      this.setState({ set });
+      this.setState(replaceSetAttr(this.state.set, 'weighted', e.target.checked));
+    },
+
+    changeDisplayTotals (e) {
+      this.setState(
+        replaceSetAttr(this.state.set, 'displayTotalsForAllGradingPeriods', e.target.checked)
+      );
     },
 
     changeEnrollmentTermIDs(termIDs) {
@@ -136,13 +146,22 @@ define([
                   selectedIDs                  = {this.state.set.enrollmentTermIDs}
                   setSelectedEnrollmentTermIDs = {this.changeEnrollmentTermIDs} />
 
-                <div className="ic-Input">
+                <div className="ic-Input pad-box top-only">
                   <Checkbox
                     ref={(ref) => { this.weightedCheckbox = ref }}
                     label={I18n.t('Weighted grading periods')}
                     value="weighted"
                     checked={this.state.set.weighted}
                     onChange={this.changeWeighted}
+                  />
+                </div>
+                <div className="ic-Input pad-box top-only">
+                  <Checkbox
+                    ref={(ref) => { this.displayTotalsCheckbox = ref; }}
+                    label={I18n.t('Display totals for All Grading Periods option')}
+                    value="totals"
+                    checked={this.state.set.displayTotalsForAllGradingPeriods}
+                    onChange={this.changeDisplayTotals}
                   />
                 </div>
               </div>

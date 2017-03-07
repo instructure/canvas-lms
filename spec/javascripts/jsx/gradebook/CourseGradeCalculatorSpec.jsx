@@ -892,6 +892,17 @@ define([
     equal(grades.assignmentGroups[301].final.possible, 20);
   });
 
+  test('recombines assignment group submissions of divided assignment groups', function () {
+    const grades = calculateWithGradingPeriods('percent');
+    const listSubmissionAssignmentIds = grade => (
+      _.pluck(grade.submissions, ({ submission }) => submission.assignment_id)
+    );
+    deepEqual(listSubmissionAssignmentIds(grades.assignmentGroups[301].current), [201, 202]);
+    deepEqual(listSubmissionAssignmentIds(grades.assignmentGroups[301].final), [201, 202]);
+    equal(grades.assignmentGroups[301].current.submission_count, 2);
+    equal(grades.assignmentGroups[301].final.submission_count, 2);
+  });
+
   test('divides assignment groups across related grading periods', function () {
     const grades = calculateWithGradingPeriods('percent');
     equal(grades.gradingPeriods[701].assignmentGroups[301].current.score, 10);

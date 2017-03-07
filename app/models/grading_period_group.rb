@@ -54,9 +54,17 @@ class GradingPeriodGroup < ActiveRecord::Base
   end
 
   def self.for(account)
-    raise ArgumentError.new("account is not an Account") unless account.is_a?(Account)
+    raise ArgumentError.new("argument is not an Account") unless account.is_a?(Account)
     root_account = account.root_account? ? account : account.root_account
     root_account.grading_period_groups.active
+  end
+
+  def self.for_course(context)
+    course_group = GradingPeriodGroup.find_by(course_id: context, workflow_state: :active)
+    return course_group if course_group.present?
+
+    account_group = context.enrollment_term.grading_period_group
+    account_group.nil? || account_group.deleted? ? nil : account_group
   end
 
   private
