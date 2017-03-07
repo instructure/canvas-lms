@@ -1,5 +1,6 @@
 define([
   'i18n!blueprint_config',
+  'jquery',
   'react',
   'instructure-ui/Typography',
   'instructure-ui/ScreenReaderContent',
@@ -7,7 +8,8 @@ define([
   'instructure-ui/Table',
   'instructure-ui/Checkbox',
   '../propTypes',
-], (I18n, React, {default: Typography}, {default: ScreenReaderContent}, {default: PresentationContent},
+  'compiled/jquery.rails_flash_notifications',
+], (I18n, $, React, {default: Typography}, {default: ScreenReaderContent}, {default: PresentationContent},
   {default: Table}, {default: Checkbox}, propTypes) => {
   const { func } = React.PropTypes
 
@@ -43,12 +45,21 @@ define([
     onSelectToggle = (e) => {
       const selected = this.state.selected
       selected[e.target.value] = e.target.checked
+      const course = this.props.courses.find(c => c.id === e.target.value)
+      const srMsg = e.target.checked
+                  ? I18n.t('Selected course %{course}', { course: course.name })
+                  : I18n.t('Unselected course %{course}', { course: course.name })
+      $.screenReaderFlashMessage(srMsg)
       this.setState({ selected, selectedAll: false }, () => {
         this.props.onSelectedChanged(this.state.selected)
       })
     }
 
     onSelectAllToggle = (e) => {
+      const srMsg = e.target.checked
+                  ? I18n.t('Selected all courses')
+                  : I18n.t('Unselected all courses')
+      $.screenReaderFlashMessage(srMsg)
       this.setState({
         selectedAll: e.target.checked,
         selected: e.target.checked ? this.props.courses
@@ -120,19 +131,7 @@ define([
 
     renderBodyContent () {
       if (this.props.courses.length > 0) {
-        return [(
-          <ScreenReaderContent key="select-all" as="tr">
-            <td>
-              <Checkbox
-                onChange={this.onSelectAllToggle}
-                value="all"
-                checked={this.state.selectedAll}
-                label={I18n.t({ one: 'Select (%{count}) Course', other: 'Select All (%{count}) Courses' },
-                { count: this.props.courses.length })}
-              />
-            </td>
-          </ScreenReaderContent>
-        )].concat(this.renderRows())
+        return this.renderRows()
       }
 
       return (
@@ -146,34 +145,30 @@ define([
       // in order to create a sticky table header, we'll create a separate table with
       // just the visual sticky headers, that will be hidden from screen readers
       return (
-        <PresentationContent as="div">
-          <div className="btps-table__header-wrapper">
+        <div className="btps-table__header-wrapper">
+          <PresentationContent as="div">
             <Table caption={<ScreenReaderContent>{I18n.t('Blueprint Courses')}</ScreenReaderContent>}>
               {this.renderColGroup()}
               <thead className="bps-table__head">
                 {this.renderHeaders()}
               </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <Checkbox
-                      onChange={this.onSelectAllToggle}
-                      value="all"
-                      checked={this.state.selectedAll}
-                      label={
-                        <ScreenReaderContent>
-                          {I18n.t({ one: 'Select (%{count}) Course', other: 'Select All (%{count}) Courses' },
-                          { count: this.props.courses.length })}
-                        </ScreenReaderContent>
-                      }
-                    />
-                  </td>
-                  <td colSpan="5">{I18n.t('Select All (%{count})', { count: this.props.courses.length })}</td>
-                </tr>
-              </tbody>
+              <tbody />
             </Table>
-          </div>
-        </PresentationContent>
+          </PresentationContent>
+          <p className="bps-table__select-all">
+            <Checkbox
+              onChange={this.onSelectAllToggle}
+              value="all"
+              checked={this.state.selectedAll}
+              label={
+                <Typography size="small">
+                  {I18n.t({ one: 'Select (%{count}) Course', other: 'Select All (%{count}) Courses' },
+                  { count: this.props.courses.length })}
+                </Typography>
+              }
+            />
+          </p>
+        </div>
       )
     }
 

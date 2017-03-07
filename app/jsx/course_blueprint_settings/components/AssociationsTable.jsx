@@ -15,6 +15,12 @@ define([
   {default: Table}, {default: Button}, {default: Spinner}, {default: RemoveIcon}, propTypes) => {
   const { func, arrayOf, string, bool } = React.PropTypes
 
+  function shortId () {
+    const prefix = String.fromCharCode(97 + Math.floor(Math.random() * 26))
+    const id = Math.random().toString(36).substring(2, 10)
+    return prefix + id
+  }
+
   return class CoursePickerTable extends React.Component {
     static propTypes = {
       existingAssociations: propTypes.courseList.isRequired,
@@ -47,7 +53,17 @@ define([
 
     onRemove = (e) => {
       e.preventDefault()
-      this.props.onRemoveAssociations([e.target.querySelector('input[name=course_id]').value])
+
+      const form = e.currentTarget
+      const courseId = form.getAttribute('data-course-id')
+      const courseName = form.getAttribute('data-course-name')
+      const focusToId = form.getAttribute('data-focus-target')
+
+      $.screenReaderFlashMessage(I18n.t('Removed course association %{course}', { course: courseName }))
+      this.props.onRemoveAssociations([courseId])
+
+      const focusTo = this.wrapper.querySelector(`#${focusToId}`)
+      focusTo.focus()
     }
 
     renderColGroup () {
@@ -82,35 +98,53 @@ define([
       return <Typography color="secondary" size="small">{text}</Typography>
     }
 
-    renderRows (associations) {
-      return associations.map(course =>
-        <tr key={course.id} className="bps-associations__course-row">
-          <td>{this.renderCellText(course.name)}</td>
-          <td>{this.renderCellText(course.course_code)}</td>
-          <td>{this.renderCellText(course.term.name)}</td>
-          <td>{this.renderCellText(course.sis_course_id)}</td>
-          <td>
-            {this.renderCellText(course.teachers.map(teacher => teacher.display_name).join(', '))}
-          </td>
-          <td>
-            <form onSubmit={this.onRemove}>
-              <input type="hidden" name="course_id" value={course.id} />
-              <Button size="small" type="submit" variant="icon">
-                <RemoveIcon title={I18n.t('Remove course association %{name}', { name: course.name })} />
-              </Button>
-            </form>
-          </td>
-        </tr>
-      )
+    renderRows (associations, headerFocus) {
+      // generate Ids first because we need to be able to point forward
+      const focusIds = associations.map(() => shortId())
+      return associations.map((course, courseIndex) => {
+        // try next item first, if not then previous, if not then the section header
+        const focusTo = focusIds[courseIndex + 1] || focusIds[courseIndex - 1] || headerFocus
+                // {/* onClick={this.onRemove} */}
+        return (
+          <tr key={course.id} className="bps-associations__course-row">
+            <td>{this.renderCellText(course.name)}</td>
+            <td>{this.renderCellText(course.course_code)}</td>
+            <td>{this.renderCellText(course.term.name)}</td>
+            <td>{this.renderCellText(course.sis_course_id)}</td>
+            <td>
+              {this.renderCellText(course.teachers.map(teacher => teacher.display_name).join(', '))}
+            </td>
+            <td>
+              <form
+                onSubmit={this.onRemove}
+                data-course-id={course.id}
+                data-course-name={course.name}
+                data-focus-target={focusTo}
+              >
+                <Button
+                  type="submit"
+                  size="small"
+                  variant="icon"
+                  id={focusIds[courseIndex]}
+                >
+                  <RemoveIcon />
+                  <ScreenReaderContent>{I18n.t('Remove course association %{name}', { name: course.name })}</ScreenReaderContent>
+                </Button>
+              </form>
+            </td>
+          </tr>
+        )
+      })
     }
 
     renderExistingAssociations () {
       if (this.state.visibleExisting.length) {
+        const id = shortId()
         return [(
-          <tr key="existing-heading">
-            <td colSpan={6}><Typography weight="bold" size="small">{I18n.t('Current')}</Typography></td>
+          <tr id={id} key="existing-heading">
+            <th scsope="rowgroup" colSpan={6}><Typography weight="bold" size="small">{I18n.t('Current')}</Typography></th>
           </tr>
-        )].concat(this.renderRows(this.state.visibleExisting))
+        )].concat(this.renderRows(this.state.visibleExisting, id))
       }
 
       return null
@@ -118,11 +152,12 @@ define([
 
     renderAddedAssociations () {
       if (this.props.addedAssociations.length) {
+        const id = shortId()
         return [(
-          <tr key="added-heading">
-            <td colSpan={6}><Typography weight="bold" size="small">{I18n.t('To be Added')}</Typography></td>
+          <tr id={id} key="added-heading">
+            <th scsope="rowgroup" colSpan={6}><Typography weight="bold" size="small">{I18n.t('To be Added')}</Typography></th>
           </tr>
-        )].concat(this.renderRows(this.props.addedAssociations))
+        )].concat(this.renderRows(this.props.addedAssociations, id))
       }
 
       return null
@@ -137,6 +172,8 @@ define([
           </thead>
           <tbody>
             {this.renderExistingAssociations()}
+          </tbody>
+          <tbody>
             {this.renderAddedAssociations()}
           </tbody>
         </Table>
@@ -150,7 +187,7 @@ define([
         return (
           <div className="bps__overlay">
             <Spinner title={title} />
-            <Typography tag="p">{title}</Typography>
+            <Typography as="p">{title}</Typography>
           </div>
         )
       }
@@ -161,11 +198,14 @@ define([
     render () {
       const { addedAssociations } = this.props
       return (
-        <div className="bps-associations-table">
+        <div
+          className="bps-associations-table"
+          ref={(c) => { this.wrapper = c }}
+        >
           {this.renderLoadingOverlay()}
           { this.state.visibleExisting.length || addedAssociations.length
             ? this.renderTable()
-            : <Typography color="secondary" tag="p">{I18n.t('There are currently no associated courses.')}</Typography>
+            : <Typography color="secondary" as="p">{I18n.t('There are currently no associated courses.')}</Typography>
           }
         </div>
       )

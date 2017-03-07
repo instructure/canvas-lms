@@ -89,9 +89,11 @@ define([
       if (this.props.isSavingAssociations) {
         const title = I18n.t('Saving Associations')
         return (
-          <div className="bps__overlay bps__overlay__save">
-            <Spinner title={title} />
-            <Typography tag="p">{title}</Typography>
+          <div className="bps__overlay">
+            <div className="bps__overlay__save-wrapper">
+              <Spinner title={title} />
+              <Typography as="p">{title}</Typography>
+            </div>
           </div>
         )
       }
