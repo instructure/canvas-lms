@@ -20,22 +20,30 @@
 # concept pulled from the comments of this page:
 # http://stackoverflow.com/questions/937429/activerecordbase-without-table-rails
 class Tableless < ActiveRecord::Base
-  def self.columns(&block)
-    if block
-      @columns_block = block
-    else
-      if @columns.nil? && !@columns_block.nil?
-        @columns = []
-        @columns_block.call
+  class << self
+    def columns(&block)
+      if block
+        @columns_block = block
+      else
+        if @columns.nil? && !@columns_block.nil?
+          @columns = []
+          @columns_block.call
+        end
+        @columns ||= []
       end
-      @columns ||= []
     end
-  end
 
-  def self.column(name, sql_type = nil, default = nil, null = true)
-    args = [name.to_s, default, connection.lookup_cast_type(sql_type.to_s),
-            sql_type.to_s, null]
-    columns << ActiveRecord::ConnectionAdapters::Column.new(*args)
+    unless CANVAS_RAILS4_2
+      def columns_hash
+        @columns_hash ||= Hash[columns.map { |c| [c.name, c] }]
+      end
+    end
+
+    def column(name, sql_type = nil, default = nil, null = true)
+      args = [name.to_s, default, connection.lookup_cast_type(sql_type.to_s),
+              sql_type.to_s, null]
+      columns << ActiveRecord::ConnectionAdapters::Column.new(*args)
+    end
   end
 
   # Override the save method to prevent exceptions.

@@ -12,5 +12,5 @@
   <h2><%= t('headings.page', %{Page Error}) %></h2>
   <p><%= t('description', %{Well, it looks like something broke unexpectedly.  Sorry you had to see that.  If you have a second, please let us know what you were doing when the error happened.}) %></p>
   <a href="#" style="font-size: 1.2em;" class="icon-discussion submit_error_link discussion-topic"><%= t('#links.errors.feedback', %{Click here to tell us what happened}) %></a>
-  <%= render :partial => "shared/errors/error_form", :locals => {:status => response.status, :error_category => '500'} %>
+  <%= render :partial => "shared/errors/error_form", :locals => {:error_category => '500'} %>
 </div>
