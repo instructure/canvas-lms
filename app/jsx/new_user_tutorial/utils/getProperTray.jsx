@@ -9,9 +9,10 @@ define([
   '../trays/FilesTray',
   '../trays/PeopleTray',
   '../trays/AnnouncementsTray',
-  '../trays/GradesTray'
+  '../trays/GradesTray',
+  '../trays/DiscussionsTray'
 ], (I18n, HomeTray, ModulesTray, PagesTray, AssignmentsTray, QuizzesTray, SettingsTray,
-  FilesTray, PeopleTray, AnnouncementsTray, GradesTray) => {
+  FilesTray, PeopleTray, AnnouncementsTray, GradesTray, DiscussionsTray) => {
   const generateObject = (component, label, pageName) => ({
     component,
     label,
@@ -37,6 +38,8 @@ define([
       return generateObject(AnnouncementsTray, I18n.t('Announcements Tutorial Tray'), 'announcements');
     } else if (path.includes('gradebook')) {
       return generateObject(GradesTray, I18n.t('Gradebook Tutorial Tray'), 'grades');
+    } else if (path.includes('discussion_topics')) {
+      return generateObject(DiscussionsTray, I18n.t('Discussions Tutorial Tray'), 'discussions');
     }
     return generateObject(HomeTray, I18n.t('Home Tutorial Tray'), 'home');
   }

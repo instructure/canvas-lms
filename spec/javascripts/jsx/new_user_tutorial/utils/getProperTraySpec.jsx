@@ -9,9 +9,10 @@ define([
   'jsx/new_user_tutorial/trays/FilesTray',
   'jsx/new_user_tutorial/trays/PeopleTray',
   'jsx/new_user_tutorial/trays/AnnouncementsTray',
-  'jsx/new_user_tutorial/trays/GradesTray'
+  'jsx/new_user_tutorial/trays/GradesTray',
+  'jsx/new_user_tutorial/trays/DiscussionsTray'
 ], (getProperTray, HomeTray, ModulesTray, PagesTray, AssignmentsTray, QuizzesTray,
-    SettingsTray, FilesTray, PeopleTray, AnnouncementsTray, GradesTray) => {
+    SettingsTray, FilesTray, PeopleTray, AnnouncementsTray, GradesTray, DiscussionsTray) => {
   QUnit.module('getProperTray test');
 
   test('if no match is in the path argument returns the HomeTray', () => {
@@ -82,5 +83,12 @@ define([
 
     equal(trayObj.label, 'Gradebook Tutorial Tray', 'label matches');
 
+  });
+
+  test('if discussion_topics is in the path argument returns the DiscussionsTray', () => {
+    const trayObj = getProperTray('/courses/3/discussion_topics/');
+    equal(trayObj.component, DiscussionsTray, 'component matches');
+
+    equal(trayObj.label, 'Discussions Tutorial Tray', 'label matches');
   });
 });
