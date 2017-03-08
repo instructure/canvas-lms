@@ -5,7 +5,7 @@ describe "new user tutorials" do
 
   before do
     @course = course_factory(active_all: true)
-    course_with_student_logged_in(active_all: true)
+    course_with_teacher_logged_in(active_all: true)
     @course.account.enable_feature!(:new_user_tutorial)
   end
 

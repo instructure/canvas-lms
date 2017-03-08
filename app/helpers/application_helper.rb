@@ -990,4 +990,14 @@ module ApplicationHelper
   def tutorials_enabled?
     @domain_root_account.try(:feature_enabled?, :new_user_tutorial)
   end
+
+  def set_tutorial_js_env
+    return if @js_env && @js_env[:NEW_USER_TUTORIALS]
+
+    is_enabled = @context.is_a?(Course) &&
+      @context.grants_right?(@current_user, session, :manage) &&
+      tutorials_enabled?
+
+    js_env NEW_USER_TUTORIALS: {is_enabled: is_enabled}
+  end
 end

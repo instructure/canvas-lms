@@ -1650,6 +1650,8 @@ class CoursesController < ApplicationController
       add_crumb(@context.nickname_for(@current_user, :short_name), url_for(@context), :id => "crumb_#{@context.asset_string}")
       set_badge_counts_for(@context, @current_user, @current_enrollment)
 
+      set_tutorial_js_env
+
       @course_home_view = "feed" if params[:view] == "feed"
       @course_home_view ||= @context.default_view || @context.default_home_page
 
