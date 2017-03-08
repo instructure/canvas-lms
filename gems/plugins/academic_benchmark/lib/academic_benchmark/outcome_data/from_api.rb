@@ -1,6 +1,6 @@
 module AcademicBenchmark
   module OutcomeData
-    class FromApi < Data
+    class FromApi < Base
       def initialize(options={})
         super(options.merge(AcademicBenchmark.config))
         unless partner_id.present? && partner_key.present?

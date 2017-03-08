@@ -1,11 +1,6 @@
 require 'net/http'
 require 'cgi'
 
-require 'academic_benchmark/api'
-require 'academic_benchmark/engine'
-require 'academic_benchmark/standard'
-require 'academic_benchmark/cli_tools'
-
 module AcademicBenchmarkV1
   def self.import(guid_or_guids, options={})
     if !AcademicBenchmark.config[:api_key] || AcademicBenchmark.config[:api_key].empty?
