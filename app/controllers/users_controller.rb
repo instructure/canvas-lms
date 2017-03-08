@@ -1962,7 +1962,7 @@ class UsersController < ApplicationController
   # To split a merged user, the caller must have permissions to manage all of
   # the users logins. If there are multiple users that have been merged into one
   # user it will split each merge into a separate user.
-  # A split can only happen within 90 days of a user merge. A user merge deletes
+  # A split can only happen within 180 days of a user merge. A user merge deletes
   # the previous user and may be permanently deleted. In this scenario we create
   # a new user object and proceed to move as much as possible to the new user.
   # The user object will not have preserved the name or settings from the
