@@ -141,7 +141,7 @@ class ContentExportsApiController < ApplicationController
       export.settings[:skip_notifications] = true if value_to_boolean(params[:skip_notifications])
 
       # ZipExporter accepts unhashed asset strings, to avoid having to instantiate all the files and folders
-      selected_content = ContentMigration.process_copy_params(params[:select], true, params[:export_type] == ContentExport::ZIP) if params[:select]
+      selected_content = ContentMigration.process_copy_params(params[:select]&.to_hash, true, params[:export_type] == ContentExport::ZIP) if params[:select]
       case params[:export_type]
       when 'qti'
         export.export_type = ContentExport::QTI

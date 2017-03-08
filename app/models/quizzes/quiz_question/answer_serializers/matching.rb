@@ -30,7 +30,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
       pairings.each_with_index do |entry, index|
         answer_id, match_id = nil, nil
 
-        unless entry.is_a?(Hash)
+        unless entry.is_a?(Hash) || entry.is_a?(ActionController::Parameters)
           return rc.reject :invalid_type, "answer[#{index}]", Hash
         end
 

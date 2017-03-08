@@ -60,7 +60,7 @@ module Api::V1::QuizGroup
   end
 
   def update_api_quiz_group(quiz_group, quiz_group_params)
-    return nil unless quiz_group.is_a?(Quizzes::QuizGroup) && quiz_group_params.is_a?(Hash)
+    return nil unless quiz_group.is_a?(Quizzes::QuizGroup) && quiz_group_params.is_a?(ActionController::Parameters)
 
     quiz_group.attributes = filter_params(quiz_group_params)
     quiz_group.save

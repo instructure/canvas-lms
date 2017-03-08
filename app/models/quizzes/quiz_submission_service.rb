@@ -166,7 +166,7 @@ class Quizzes::QuizSubmissionService
       legacy_params[:fudge_points] = scoring_data[:fudge_points].to_f
     end
 
-    if scoring_data[:questions].is_a?(Hash)
+    if scoring_data[:questions].is_a?(Hash) || scoring_data[:questions].is_a?(ActionController::Parameters)
       scoring_data[:questions].each_pair do |question_id, question_data|
         question_id = question_id.to_i
         score, comment = question_data[:score], question_data[:comment]
