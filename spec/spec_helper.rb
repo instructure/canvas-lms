@@ -765,25 +765,6 @@ RSpec.configure do |config|
     'Content-Type'
   end
 
-  def compare_json(actual, expected)
-    if actual.is_a?(Hash)
-      actual.each do |k, v|
-        expected_v = expected[k]
-        compare_json(v, expected_v)
-      end
-    elsif actual.is_a?(Array)
-      actual.zip(expected).each do |a, e|
-        compare_json(a, e)
-      end
-    else
-      if actual.is_a?(Integer) || actual.is_a?(Float)
-        expect(actual).to eq expected
-      else
-        expect(actual.to_json).to eq expected.to_json
-      end
-    end
-  end
-
   class FakeHttpResponse
     def initialize(code, body = nil, headers={})
       @code = code

@@ -135,10 +135,11 @@ describe "Module Items API", type: :request do
               "indent" => 1,
               "completion_requirement" => { "type" => "must_view" },
               "published" => true,
-              "module_id" => @module1.id
+              "module_id" => @module1.id,
+              "new_tab" => nil
           }
       ]
-      compare_json(json, expected)
+      expect(json).to eq expected
     end
 
     context 'index with content details' do

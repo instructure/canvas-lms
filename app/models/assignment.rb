@@ -228,6 +228,7 @@ class Assignment < ActiveRecord::Base
     moderated_grading
     grades_published_at
     omit_from_final_grade
+    grading_standard_id
   )
 
   def external_tool?
