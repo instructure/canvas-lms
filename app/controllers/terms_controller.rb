@@ -131,12 +131,26 @@ class TermsController < ApplicationController
       return render :json => {:message => "Invalid SIS ID"}, :status => :bad_request
     end
     handle_sis_id_param(sis_id)
-    if @term.update_attributes(params.require(:enrollment_term).permit(:name, :start_at, :end_at))
+
+    term_params = params.require(:enrollment_term).permit(:name, :start_at, :end_at)
+    if validate_dates(@term, term_params, overrides) && @term.update_attributes(term_params)
       @term.set_overrides(@context, overrides)
       render :json => serialized_term
     else
       render :json => @term.errors, :status => :bad_request
     end
+  end
+
+  def validate_dates(term, term_params, overrides)
+    hashes = [term_params]
+    hashes += overrides.values if overrides
+    invalid_dates = hashes.any? do |hash|
+      start_at = DateTime.parse(hash[:start_at]) rescue nil
+      end_at = DateTime.parse(hash[:end_at]) rescue nil
+      start_at && end_at && end_at < start_at
+    end
+    term.errors.add(:base, t("End dates cannot be before start dates")) if invalid_dates
+    !invalid_dates
   end
 
   def handle_sis_id_param(sis_id)
