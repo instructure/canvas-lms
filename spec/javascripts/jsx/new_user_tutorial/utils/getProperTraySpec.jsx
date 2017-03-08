@@ -10,9 +10,15 @@ define([
   'jsx/new_user_tutorial/trays/PeopleTray',
   'jsx/new_user_tutorial/trays/AnnouncementsTray',
   'jsx/new_user_tutorial/trays/GradesTray',
-  'jsx/new_user_tutorial/trays/DiscussionsTray'
+  'jsx/new_user_tutorial/trays/DiscussionsTray',
+  'jsx/new_user_tutorial/trays/SyllabusTray',
+  'jsx/new_user_tutorial/trays/CollaborationsTray',
+  'jsx/new_user_tutorial/trays/ImportTray',
+  'jsx/new_user_tutorial/trays/ConferencesTray'
 ], (getProperTray, HomeTray, ModulesTray, PagesTray, AssignmentsTray, QuizzesTray,
-    SettingsTray, FilesTray, PeopleTray, AnnouncementsTray, GradesTray, DiscussionsTray) => {
+    SettingsTray, FilesTray, PeopleTray, AnnouncementsTray,
+    GradesTray, DiscussionsTray, SyllabusTray, CollaborationsTray, ImportTray,
+    ConferencesTray) => {
   QUnit.module('getProperTray test');
 
   test('if no match is in the path argument returns the HomeTray', () => {
@@ -55,7 +61,7 @@ define([
 
     equal(trayObj.label, 'Settings Tutorial Tray', 'label matches');
   });
-  
+
   test('if files is in the path argument returns the FilesTray', () => {
     const trayObj = getProperTray('/courses/3/files/');
     equal(trayObj.component, FilesTray, 'component matches');
@@ -82,7 +88,6 @@ define([
     equal(trayObj.component, GradesTray, 'component matches');
 
     equal(trayObj.label, 'Gradebook Tutorial Tray', 'label matches');
-
   });
 
   test('if discussion_topics is in the path argument returns the DiscussionsTray', () => {
@@ -90,5 +95,40 @@ define([
     equal(trayObj.component, DiscussionsTray, 'component matches');
 
     equal(trayObj.label, 'Discussions Tutorial Tray', 'label matches');
+  });
+
+  test('if syllabus is in the path argument returns the SyllabusTray', () => {
+    const trayObj = getProperTray('/courses/3/assignments/syllabus/');
+    equal(trayObj.component, SyllabusTray, 'component matches');
+
+    equal(trayObj.label, 'Syllabus Tutorial Tray', 'label matches');
+  });
+
+  test('if lti_collaborations is in the path argument returns the CollaborationsTray', () => {
+    const trayObj = getProperTray('/courses/3/lti_collaborations/');
+    equal(trayObj.component, CollaborationsTray, 'component matches');
+
+    equal(trayObj.label, 'Collaborations Tutorial Tray', 'label matches');
+  });
+
+  test('if collaborations is in the path argument returns the CollaborationsTray', () => {
+    const trayObj = getProperTray('/courses/3/collaborations/');
+    equal(trayObj.component, CollaborationsTray, 'component matches');
+
+    equal(trayObj.label, 'Collaborations Tutorial Tray', 'label matches');
+  });
+
+  test('if content_migrations is in the path argument returns the ImportTray', () => {
+    const trayObj = getProperTray('/courses/3/content_migrations/');
+    equal(trayObj.component, ImportTray, 'component matches');
+
+    equal(trayObj.label, 'Import Tutorial Tray', 'label matches');
+  });
+
+  test('if conferences is in the path argument returns the ConferencesTray', () => {
+    const trayObj = getProperTray('/courses/3/conferences/');
+    equal(trayObj.component, ConferencesTray, 'component matches');
+
+    equal(trayObj.label, 'Conferences Tutorial Tray', 'label matches');
   });
 });
