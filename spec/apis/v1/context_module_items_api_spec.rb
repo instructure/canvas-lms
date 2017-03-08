@@ -501,6 +501,15 @@ describe "Module Items API", type: :request do
         expect(@assignment_tag.indent).to eq new_indent
       end
 
+      it "should update the user for a wiki page sync" do
+        expect(@wiki_page.user).to be_nil
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@wiki_page_tag.id}",
+          {:controller => "context_module_items_api", :action => "update", :format => "json",
+            :course_id => "#{@course.id}", :module_id => "#{@module2.id}", :id => "#{@wiki_page_tag.id}"},
+          {:module_item => {:title => 'New title'}})
+        expect(@wiki_page.reload.user).to eq(@user)
+      end
+
       it "should update new_tab" do
         tool = @course.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
         external_tool_tag = @module1.add_item(:type => 'context_external_tool', :id => tool.id, :url => tool.url, :new_tab => false)

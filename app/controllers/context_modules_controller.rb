@@ -542,7 +542,7 @@ class ContextModulesController < ApplicationController
         return render :json => @tag.errors, :status => :bad_request
       end
 
-      @tag.update_asset_name! if params[:content_tag][:title]
+      @tag.update_asset_name!(@current_user) if params[:content_tag][:title]
       render :json => @tag
     end
   end
