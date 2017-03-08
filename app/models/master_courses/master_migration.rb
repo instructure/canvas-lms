@@ -99,16 +99,27 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def export_to_child_courses(type, subscriptions, export_is_primary)
-    export = self.create_export(type, export_is_primary)
+    if type == :selective
+      @deletions = self.master_template.deletions_since_last_export
+      @creations = {} # will be populated during export
+      @updates = {}   # "
+    end
+    export = self.create_export(type, export_is_primary, :deletions => @deletions)
 
     if export.exported_for_course_copy?
+      self.export_results[type] = {:subscriptions => subscriptions.map(&:id), :content_export_id => export.id}
+      if type == :selective
+        self.export_results[type][:deleted] = @deletions
+        self.export_results[type][:created] = @creations
+        self.export_results[type][:updated] = @updates
+      end
       self.queue_imports(type, export, subscriptions)
     else
       self.fail_export_with_error!("#{type} content export #{export.id} failed")
     end
   end
 
-  def create_export(type, is_primary)
+  def create_export(type, is_primary, export_opts)
     # ideally we'll make this do more than just the usual CC::Exporter but we'll also do some stuff
     # in CC::Importer::Canvas to turn it into the big ol' "course_export.json" and we'll save that alone
     # and return it
@@ -118,19 +129,38 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     ce.settings[:master_migration_type] = type
     ce.settings[:master_migration_id] = self.id # so we can find on the import side when we copy attachments
     ce.settings[:primary_master_migration] = is_primary
-    ce.settings[:deletions] = self.master_template.deletions_since_last_export if type == :selective
     ce.user = self.user
     ce.save!
     ce.master_migration = self # don't need to reload
-    ce.export_course
-    self.master_template.ensure_attachment_tags_on_export if is_primary
+    ce.export_course(export_opts)
+    detect_updated_attachments(type) if ce.exported_for_course_copy? && is_primary
     ce
+  end
+
+  def last_export_at
+    self.master_template.last_export_started_at
   end
 
   def export_object?(obj)
     return false unless obj
-    last_export_at = self.master_template.last_export_started_at
     last_export_at.nil? || obj.updated_at >= last_export_at
+  end
+
+  def detect_updated_attachments(type)
+    # because attachments don't get "added" to the export
+    scope = self.master_template.course.attachments.not_deleted
+    scope = scope.where('updated_at>?', last_export_at) if type == :selective && last_export_at
+    scope.each do |att|
+      master_template.ensure_tag_on_export(att)
+      add_exported_asset(att)
+    end
+  end
+
+  def add_exported_asset(asset)
+    return unless last_export_at
+    set = asset.created_at >= last_export_at ? @creations : @updates
+    set[asset.class.name] ||= []
+    set[asset.class.name] << master_template.content_tag_for(asset).migration_id
   end
 
   class MigrationPluginStub # so we can (ab)use queue_migration
@@ -140,8 +170,6 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def queue_imports(type, export, subscriptions)
-    self.export_results[type] = {:subscriptions => subscriptions.map(&:id), :content_export_id => export.id}
-
     imports_expire_at = self.created_at + hours_until_expire.hours # tighten the limit until the import jobs expire
 
     cms = []
@@ -177,7 +205,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
           sub.update_attribute(:use_selective_copy, true) # mark subscription as up-to-date
         end
       end
-      res[:skipped_count] = import_migration.skipped_master_course_items&.count || 0
+      res[:skipped] = import_migration.skipped_master_course_items&.to_a || []
       if self.import_results.values.all?{|r| r[:state] != 'queued'}
         # all imports are done
         if self.import_results.values.all?{|r| r[:state] == 'completed'}

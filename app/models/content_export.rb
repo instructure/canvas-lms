@@ -236,10 +236,6 @@ class ContentExport < ActiveRecord::Base
     @master_migration ||= MasterCourses::MasterMigration.find(settings[:master_migration_id])
   end
 
-  def deletions
-    settings[:deletions]
-  end
-
   def common_cartridge?
     self.export_type == COMMON_CARTRIDGE
   end
@@ -353,6 +349,7 @@ class ContentExport < ActiveRecord::Base
   def add_exported_asset(obj)
     if for_master_migration? && settings[:primary_master_migration]
       master_migration.master_template.ensure_tag_on_export(obj)
+      master_migration.add_exported_asset(obj)
     end
     return unless selective_export?
     return if qti_export? || epub_export.present? || quizzes2_export?

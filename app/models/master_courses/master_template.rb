@@ -128,13 +128,6 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     # TODO: make a thing if we change the defaults at some point and want to force them on all the existing tags
   end
 
-  def ensure_attachment_tags_on_export
-    # because attachments don't get "added" to the export
-    self.course.attachments.where("file_state <> 'deleted'").each do |att|
-      ensure_tag_on_export(att)
-    end
-  end
-
   def preload_restrictions!
     @preloaded_restrictions ||= begin
       index = {}
@@ -150,6 +143,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def deletions_since_last_export
+    return {} unless last_export_started_at
     deletions_by_type = {}
     MasterCourses::ALLOWED_CONTENT_TYPES.each do |klass|
       item_scope = case klass

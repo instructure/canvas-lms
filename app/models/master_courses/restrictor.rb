@@ -133,8 +133,7 @@ module MasterCourses::Restrictor
       end
     end
     if columns_to_restore.any?
-      @importing_migration.skipped_master_course_items ||= Set.new
-      @importing_migration.skipped_master_course_items << self.asset_string
+      @importing_migration.add_skipped_item(child_tag)
       Rails.logger.debug("Undoing imported changes to #{self.class} #{self.id} because changed downstream - #{columns_to_restore.join(', ')}")
       self.restore_attributes(columns_to_restore)
     end

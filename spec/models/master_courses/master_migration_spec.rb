@@ -241,7 +241,17 @@ describe MasterCourses::MasterMigration do
       end
 
       Timecop.travel(20.minutes.from_now) do
-        run_master_migration
+        mm = run_master_migration
+
+        deletions = mm.export_results[:selective][:deleted]
+        expect(deletions.keys).to match_array(["AssessmentQuestionBank", "Assignment", "Attachment", "CalendarEvent", "DiscussionTopic", "ContextExternalTool", "Quizzes::Quiz", "WikiPage"])
+        expect(deletions['Assignment']).to match_array([mig_id(assmt)])
+        expect(deletions['Attachment']).to match_array([mig_id(file)])
+        expect(deletions['WikiPage']).to match_array([mig_id(page), mig_id(page2)])
+        expect(deletions['Quizzes::Quiz']).to match_array([mig_id(quiz), mig_id(quiz2)])
+
+        skips = mm.import_results[mm.import_results.keys.first][:skipped]
+        expect(skips).to match_array([mig_id(quiz2), mig_id(page2)])
 
         expect(assmt_to.reload).to be_deleted
         expect(topic_to.reload).to be_deleted
@@ -254,6 +264,31 @@ describe MasterCourses::MasterMigration do
         expect(file_to.reload).to be_deleted
         expect(event_to.reload).to be_deleted
         expect(tool_to.reload).to be_deleted
+      end
+    end
+
+    it "tracks creations and updates in selective migrations" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      assmt = @copy_from.assignments.create!
+      topic = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
+      page = nil
+      file = nil
+
+      run_master_migration
+
+      Timecop.freeze(10.minutes.from_now) do
+        assmt.update_attribute(:title, 'new title eh')
+        page = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+        file = @copy_from.attachments.create!(:filename => 'blah', :uploaded_data => default_uploaded_data)
+      end
+
+      Timecop.travel(20.minutes.from_now) do
+        mm = run_master_migration
+        expect(mm.export_results[:selective][:created]['WikiPage']).to eq([mig_id(page)])
+        expect(mm.export_results[:selective][:created]['Attachment']).to eq([mig_id(file)])
+        expect(mm.export_results[:selective][:updated]['Assignment']).to eq([mig_id(assmt)])
       end
     end
 
@@ -454,7 +489,7 @@ describe MasterCourses::MasterMigration do
       [page, assignment].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)}
 
       run_master_migration # re-copy all the content but don't actually overwrite the downstream change
-      expect(@migration.import_results.values.first[:skipped_count]).to eq 2 # keep track of the number of "exceptions"
+      expect(@migration.import_results.values.first[:skipped]).to match_array([mig_id(assignment), mig_id(page)])
 
       expect(copied_page.reload.body).to eq new_child_text # should have been left alone
       expect(copied_page.title).to eq old_title # even the title
@@ -470,7 +505,7 @@ describe MasterCourses::MasterMigration do
       end
 
       run_master_migration # re-copy all the content but this time overwrite the downstream change because we locked it
-      expect(@migration.import_results.values.first[:skipped_count]).to eq 0
+      expect(@migration.import_results.values.first[:skipped]).to be_empty
 
       expect(copied_assignment.reload.description).to eq new_master_text
       expect(copied_assignment.title).to eq new_master_title
