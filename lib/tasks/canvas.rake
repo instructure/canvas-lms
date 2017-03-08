@@ -42,22 +42,13 @@ namespace :canvas do
 
   desc "Compile javascript and css assets."
   task :compile_assets do |t, args|
-    require_relative "../../config/initializers/webpack"
 
     # opt out
     npm_install = ENV["COMPILE_ASSETS_NPM_INSTALL"] != "0"
     compile_css = ENV["COMPILE_ASSETS_CSS"] != "0"
     build_styleguide = ENV["COMPILE_ASSETS_STYLEGUIDE"] != "0"
-    build_js = ENV["COMPILE_ASSETS_BUILD_JS"] != "0"
+    build_webpack = ENV["COMPILE_ASSETS_BUILD_JS"] != "0"
     build_api_docs = ENV["COMPILE_ASSETS_API_DOCS"] != "0"
-
-    compile_js = !CANVAS_WEBPACK || ENV["COMPILE_ASSETS_WEBPACK_RJS_FALLBACK"] == "1"
-    # normally one or the other
-    build_requirejs = build_js && !CANVAS_WEBPACK
-    build_webpack = build_js && CANVAS_WEBPACK
-
-    # unless you opt-in to both
-    build_requirejs = true if ENV["COMPILE_ASSETS_WEBPACK_RJS_FALLBACK"] == "1"
 
     if npm_install
       log_time('Making sure node_modules are up to date') {
@@ -81,16 +72,12 @@ namespace :canvas do
       }
     end
 
-    # do this up front, since concurrent `i18n:generate_js` + `js:clean` = sadness
-    Rake::Task['js:clean'].invoke
     Rake::Task['js:build_client_apps'].invoke
 
     generate_tasks = []
-    generate_tasks << 'js:generate' if compile_js
-    generate_tasks << 'i18n:generate_js' if build_requirejs || build_webpack
+    generate_tasks << 'i18n:generate_js' if build_webpack
     build_tasks = []
     build_tasks << 'js:webpack' if build_webpack
-    build_tasks << 'js:build' if build_requirejs
 
     msg = "run " + (generate_tasks + build_tasks).join(", ")
     tasks[msg] = -> {

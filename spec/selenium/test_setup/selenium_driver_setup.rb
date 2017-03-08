@@ -406,7 +406,7 @@ module SeleniumDriverSetup
 
     def rack_app
       app = spec_safe_rack_app
-      asset_path = %r{\A/(dist|fonts|images|javascripts|optimized|webpack-dist|webpack-dist-optimized)/.*\.[a-z0-9]+\z}
+      asset_path = %r{\A/(dist|fonts|images|javascripts)/.*\.[a-z0-9]+\z}
 
       lambda do |env|
         # make legit asset 404s return more quickly

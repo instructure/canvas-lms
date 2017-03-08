@@ -231,14 +231,11 @@ module.exports = {
     // A lot of our files expect a global `I18n` variable, this will provide it if it is used
     new webpack.ProvidePlugin({I18n: 'vendor/i18n'}),
 
-    // sets these envirnment variables in compiled code.
+    // sets these environment variables in compiled code.
     // process.env.NODE_ENV will make it so react and others are much smaller and don't run their
-    // debug/proptype checking in prod.
-    // if you need to do something in webpack that you don't do in requireJS, you can do
-    // if (window.USE_WEBPACK) { // do something that will only happen in webpack}
+    // debug/propType checking in prod.
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-      'window.USE_WEBPACK': JSON.stringify(true)
     }),
 
     // handles our custom 18n stuff

@@ -3,7 +3,7 @@
   "license": "AGPL-3.0",
   "version": "0.0.0",
   "engines": {
-    "node": "0.12 || >=6.3"
+    "node": ">=6.9.5"
   },
   "dependencies": {
     "brandable_css": "0.0.68",
@@ -31,7 +31,6 @@
     "coffee-loader": "^0.7.2",
     "coffee-script": "1.6.2",
     "color-slicer": "0.8.0",
-    "compute-cluster": "0.0.9",
     "core-js-builder": "^2.4.1",
     "css-loader": "0.26.1",
     "d3": "3.4.1",
@@ -67,13 +66,11 @@
     "karma-firework-reporter": "~0.2.4",
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-qunit": "~1.1.0",
-    "karma-requirejs": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-verbose-reporter": "^0.0.5",
     "karma-webpack": "^2.0.2",
     "phantomjs-prebuilt": "^2.1.4",
     "qunitjs": "^1.14.0",
-    "requirejs": "~2.2.0",
     "script-loader": "^0.7.0",
     "sinon": "2.0.0-pre.5",
     "style-loader": "^0.13.1",
@@ -138,7 +135,6 @@
   "scripts": {
     "test": "karma start --single-run",
     "test-watch": "karma start",
-    "compress": "node script/compress.js",
     "preinstall": "script/gem_npm install",
     "preupdate": "script/gem_npm update",
     "webpack": "gulp rev & webpack --progress --color --watch",

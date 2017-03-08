@@ -3,9 +3,6 @@ RED="\033[0;31m"
 YELLOW="\033[0;33m"
 NC="\033[0m" # No Color
 
-# only the webapack version of the karma config works whith jspec
-export USE_WEBPACK=true
-
 export JSPEC_WD=$(pwd)
 
 # The "--silent" and "|| true" here are to supress the standard npm

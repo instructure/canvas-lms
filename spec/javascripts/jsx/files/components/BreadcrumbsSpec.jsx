@@ -5,7 +5,7 @@ define([
   'react-addons-test-utils',
   'jsx/files/Breadcrumbs',
   'compiled/models/Folder',
-  (window.USE_WEBPACK ? '../../../../coffeescripts/helpers/fakeENV.coffee' : 'helpers/fakeENV'),
+  '../../../../coffeescripts/helpers/fakeENV.coffee',
   'compiled/react_files/modules/filesEnv',
 ], ($, React, ReactDOM, TestUtils, Breadcrumbs, Folder, fakeENV, filesEnv) => {
 

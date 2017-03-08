@@ -224,20 +224,10 @@ module ApplicationHelper
 
   # See `js_base_url`
   def use_optimized_js?
-    if ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
-      # allows overriding by adding ?debug_assets=1 or ?debug_js=1 to the url
-      use_webpack? || !(params[:debug_assets] || params[:debug_js])
+    if params.key?(:optimized_js)
+      params[:optimized_js] == 'true' || params[:optimized_js] == '1'
     else
-      # allows overriding by adding ?optimized_js=1 to the url
-      params[:optimized_js] || false
-    end
-  end
-
-  def use_webpack?
-    if CANVAS_WEBPACK
-      !(params[:require_js])
-    else
-      params[:webpack]
+      ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
     end
   end
 
@@ -252,39 +242,26 @@ module ApplicationHelper
   #   * when ENV['USE_OPTIMIZED_JS'] is false
   #   * or when ?debug_assets=true is present in the url
   def js_base_url
-    if use_webpack?
-      use_optimized_js? ? '/dist/webpack-production' : '/dist/webpack-dev'
-    else
-      use_optimized_js? ? '/optimized' : '/javascripts'
-    end.freeze
+    (use_optimized_js? ? '/dist/webpack-production' : '/dist/webpack-dev').freeze
   end
 
   # Returns a <script> tag for each registered js_bundle
   def include_js_bundles
-    if use_webpack?
+    # This contains the webpack runtime, it needs to be loaded first
+    paths = ["#{js_base_url}/vendor"]
 
-      # This contains the webpack runtime, it needs to be loaded first
-      paths = ["#{js_base_url}/vendor"]
+    # We preemptive load these timezone/locale data files so they are ready
+    # by the time our app-code runs and so webpack doesn't need to know how to load them
+    paths << "/javascripts/vendor/timezone/#{js_env[:TIMEZONE]}.js" if js_env[:TIMEZONE]
+    paths << "/javascripts/vendor/timezone/#{js_env[:CONTEXT_TIMEZONE]}.js" if js_env[:CONTEXT_TIMEZONE]
+    paths << "/javascripts/vendor/timezone/#{js_env[:BIGEASY_LOCALE]}.js" if js_env[:BIGEASY_LOCALE]
+    paths << "#{js_base_url}/moment/locale/#{js_env[:MOMENT_LOCALE]}" if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != 'en'
 
-      # We preemptive load these timezone/locale data files so they are ready
-      # by the time our app-code runs and so webpack doesn't need to know how to load them
-      paths << "/javascripts/vendor/timezone/#{js_env[:TIMEZONE]}.js" if js_env[:TIMEZONE]
-      paths << "/javascripts/vendor/timezone/#{js_env[:CONTEXT_TIMEZONE]}.js" if js_env[:CONTEXT_TIMEZONE]
-      paths << "/javascripts/vendor/timezone/#{js_env[:BIGEASY_LOCALE]}.js" if js_env[:BIGEASY_LOCALE]
-      paths << "#{js_base_url}/moment/locale/#{js_env[:MOMENT_LOCALE]}" if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != 'en'
-
-      paths << "#{js_base_url}/appBootstrap"
-      paths << "#{js_base_url}/common"
-    else
-      paths = []
-    end
+    paths << "#{js_base_url}/appBootstrap"
+    paths << "#{js_base_url}/common"
 
     js_bundles.each do |(bundle, plugin)|
-      if use_webpack?
-        paths << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}"
-      else
-        paths << "#{js_base_url}#{plugin ? "/plugins/#{plugin}" : ''}/compiled/bundles/#{bundle}.js"
-      end
+      paths << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}"
     end
     javascript_include_tag(*paths, type: nil)
   end

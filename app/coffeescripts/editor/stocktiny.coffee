@@ -11,9 +11,6 @@ define [
   'tinymce/plugins/lists/plugin'
 ], (tinymce) ->
 
-  # because in the 'optimized' requireJS build, it gets injected as 'undefined'
-  tinymce = tinymce || window.tinymce
-
   # prevent tiny from loading any CSS assets
   tinymce.DOM.loadCSS = ->
 

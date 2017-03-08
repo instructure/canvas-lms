@@ -1,6 +1,6 @@
 define [
   'tinymce_plugins/instructure_external_tools/TinyMCEContentItem',
-  (if window.USE_WEBPACK then './ContentItems.coffee' else 'spec/javascripts/compiled/tinymce_plugins/instructure_external_tools/ContentItems')
+  './ContentItems.coffee'
 ], (TinyMCEContentItem, contentItems)->
 
   QUnit.module "TinyMCEContentItem LTI Link",

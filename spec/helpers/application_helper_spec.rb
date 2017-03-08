@@ -689,18 +689,8 @@ describe ApplicationHelper do
     before :each do
       helper.stubs(:js_bundles).returns([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
     end
-    it "creates the correct javascript tags" do
-      helper.stubs(:use_webpack?).returns(false)
-      base_url = helper.use_optimized_js? ? '/optimized' : '/javascripts'
-      expect(helper.include_js_bundles).to eq %{
-<script src="#{base_url}/compiled/bundles/some_bundle.js"></script>
-<script src="#{base_url}/plugins/some_plugin/compiled/bundles/some_plugin_bundle.js"></script>
-<script src="#{base_url}/compiled/bundles/another_bundle.js"></script>
-      }.strip
-    end
 
-    it "creates the correct javascript tags with webpack enabled" do
-      helper.stubs(:use_webpack?).returns(true)
+    it "creates the correct javascript tags" do
       helper.stubs(:js_env).returns({
         BIGEASY_LOCALE: 'nb_NO',
         MOMENT_LOCALE: 'nb',
