@@ -26,6 +26,14 @@ class CustomData < ActiveRecord::Base
       end
       super 'write conflict for custom_data hash'
     end
+
+    def as_json
+      {
+        conflict_scope: conflict_scope,
+        type_at_conflict: type_at_conflict,
+        value_at_conflict: value_at_conflict
+      }
+    end
   end
 
   self.table_name = 'custom_data'

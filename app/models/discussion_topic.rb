@@ -39,7 +39,7 @@ class DiscussionTopic < ActiveRecord::Base
                                :lock_at, :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating]
   restrict_assignment_columns
 
-  attr_accessor :user_has_posted, :saved_by
+  attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'

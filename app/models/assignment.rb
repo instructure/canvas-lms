@@ -201,6 +201,7 @@ class Assignment < ActiveRecord::Base
     unlock_at
     assignment_group_id
     peer_reviews
+    anonymous_peer_reviews
     automatic_peer_reviews
     peer_reviews_due_at
     peer_review_count

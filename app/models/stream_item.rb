@@ -58,6 +58,7 @@ class StreamItem < ActiveRecord::Base
       root_discussion_entries = root_discussion_entries.map { |entry| reconstitute_ar_object('DiscussionEntry', entry) }
       res.association(:root_discussion_entries).target = root_discussion_entries
       res.attachment = reconstitute_ar_object('Attachment', data.delete(:attachment))
+      res.total_root_discussion_entries = data.delete(:total_root_discussion_entries)
     when 'Submission'
       data['body'] = nil
     end
@@ -406,6 +407,7 @@ class StreamItem < ActiveRecord::Base
           res.id = original_res.id
           res.association(:root_discussion_entries).target = []
           res.user_has_posted = false
+          res.total_root_discussion_entries = original_res.total_root_discussion_entries
           res.readonly!
         end
       end
