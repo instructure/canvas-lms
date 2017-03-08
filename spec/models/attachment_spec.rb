@@ -426,6 +426,13 @@ describe Attachment do
       a.destroy
       expect(a).to be_deleted
     end
+
+    it "should replace uploaded data on destroy_content_and_replace" do
+      a = attachment_model(uploaded_data: default_uploaded_data)
+      expect(a.content_type).to eq 'application/msword'
+      a.destroy_content_and_replace
+      expect(a.content_type).to eq 'unknown/unknown'
+    end
   end
 
   context "restore" do

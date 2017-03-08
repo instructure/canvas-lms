@@ -1223,6 +1223,31 @@ class Attachment < ActiveRecord::Base
     true
   end
 
+  # this will delete the content of the attachment but not delete the attachment
+  # object. It will replace the attachment content with a file_removed file.
+  def destroy_content_and_replace
+    raise 'must be a root_attachment' if self.root_attachment_id
+    self.destroy_content
+    self.uploaded_data = File.open Rails.root.join('public/file_removed/file_removed.pdf')
+    CrocodocDocument.where(attachment_id: self).delete_all
+    Canvadoc.where(attachment_id: self).delete_all
+    self.save!
+  end
+
+  def dmca_file_removal
+    destroy_content_and_replace
+  end
+
+  def destroy_content
+    raise 'must be a root_attachment' if self.root_attachment_id
+    return unless self.filename
+    if Attachment.s3_storage?
+      self.s3object.delete
+    else
+      FileUtils.rm full_filename
+    end
+  end
+
   def make_childless(preferred_child = nil)
     return if root_attachment_id
     child = preferred_child || children.take
