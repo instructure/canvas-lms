@@ -221,7 +221,8 @@ describe LiveEventsObserver do
       quiz = course.quizzes.create!(:title => 'quiz1')
       ce = course.content_exports.create!(
         :export_type => ContentExport::QUIZZES2,
-        :selected_content => quiz.id
+        :selected_content => quiz.id,
+        :user => user_model
       )
       ce.export_without_send_later
     end

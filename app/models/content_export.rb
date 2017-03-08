@@ -192,9 +192,27 @@ class ContentExport < ActiveRecord::Base
     begin
       reset_and_start_job_progress
 
-      @quizzes2 = Exporters::Quizzes2Exporter.new(self)
-      if @quizzes2.export
-        self.settings[:quizzes2] = @quizzes2.build_assignment_payload
+      @quiz_exporter = Exporters::Quizzes2Exporter.new(self)
+
+      if @quiz_exporter.export
+        self.update(
+          export_type: QTI,
+          selected_content: {
+            quizzes: {
+              create_key(@quiz_exporter.quiz) => true
+            }
+          }
+        )
+        self.settings[:quizzes2] = @quiz_exporter.build_assignment_payload
+        @cc_exporter = CC::CCExporter.new(self)
+      end
+
+      if @cc_exporter && @cc_exporter.export
+        self.update(
+          export_type: QUIZZES2
+        )
+        self.settings[:quizzes2][:qti_export] = {}
+        self.settings[:quizzes2][:qti_export][:url] = self.attachment.download_url
         self.progress = 100
         mark_exported
       end

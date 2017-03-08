@@ -20,11 +20,11 @@ describe "Quizzes2 Exporter" do
         unlock_at: 7.days.ago,
         lock_at: 7.days.from_now
       )
-      ce = @course.content_exports.create!(
+      @ce = @course.content_exports.create!(
         export_type: ContentExport::QUIZZES2,
         selected_content: @quiz.id
       )
-      @quizzes2 = Exporters::Quizzes2Exporter.new(ce)
+      @quizzes2 = Exporters::Quizzes2Exporter.new(@ce)
     end
 
     it "should create a Quizzes2 assignment group if it doesn't exist" do
