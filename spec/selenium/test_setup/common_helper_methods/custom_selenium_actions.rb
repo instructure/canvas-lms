@@ -101,16 +101,6 @@ module CustomSeleniumActions
     f("#{selector} [#{attrib}='#{value}']")
   end
 
-  def exec_cs(script, *args)
-    driver.execute_script(CoffeeScript.compile(script), *args)
-  end
-
-  # a varable named `callback` is injected into your function for you, just call it to signal you are done.
-  def exec_async_cs(script, *args)
-    to_compile = "var callback = arguments[arguments.length - 1]; #{CoffeeScript.compile(script)}"
-    driver.execute_async_script(script, *args)
-  end
-
   def in_frame(id)
     f("[id=\"#{id}\"],[name=\"#{id}\"]") # ensure frame is loaded
     saved_window_handle = driver.window_handle
