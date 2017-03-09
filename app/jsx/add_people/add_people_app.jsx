@@ -8,7 +8,7 @@ define([
   './actions',
   './reducer',
   './components/add_people',
-], (React, ReactDOM, redux, { connect, Provider }, natcompare,
+], (React, ReactDOM, { bindActionCreators }, { connect, Provider }, natcompare,
     { createStore, defaultState }, { actions, actionTypes }, reducer, AddPeople) => {
   class AddPeopleApp {
     constructor (root, props) {
@@ -51,7 +51,7 @@ define([
 
 
       // when ConnectedApp is rendered, all the action dispatch functions are passed as props
-      const mapDispatchToProps = dispatch => redux.bindActionCreators(actions, dispatch)
+      const mapDispatchToProps = dispatch => bindActionCreators(actions, dispatch)
 
       // connect our top-level component to redux
       this.ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(AddPeople);
