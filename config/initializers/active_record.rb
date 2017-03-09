@@ -1311,7 +1311,7 @@ module UnscopeCallbacks
     end
   else
     def __run_callbacks__(*args)
-      scope = self.class.unscoped
+      scope = self.class.all.klass.unscoped
       scope.scoping { super }
     end
   end
