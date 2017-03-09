@@ -17,8 +17,8 @@ define([
                     prerequisites.`)
           }
       </Typography>
-      <div className="ModulesTutorialTray__ImageContainer">
-        <SVGWrapper url="/images/module_tutorial.svg" />
+      <div className="NewUserTutorialTray__ImageContainer" aria-hidden="true">
+        <SVGWrapper url="/images/tutorial-tray-images/module_tutorial.svg" />
       </div>
     </div>
   );

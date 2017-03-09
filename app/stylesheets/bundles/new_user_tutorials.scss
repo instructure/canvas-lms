@@ -18,9 +18,19 @@
   top: 14px;
 }
 
-.ModulesTutorialTray__ImageContainer {
-  margin-top: $ic-sp*6;
-  text-align: center;
+.NewUserTutorialTray__ImageContainer {
+  margin-top: $ic-sp*5;
+}
+
+.NewUserTutorialTraySVG {
+  fill: $ic-border-light;
+  display: block;
+  margin: 0 auto;
+}
+
+.NewUserTutorialTraySVG--Modules {
+  height: 19.5rem;
+  width: 5.25rem;
 }
 
 .NewUserTutorialTray__EndTutorialContainer {
