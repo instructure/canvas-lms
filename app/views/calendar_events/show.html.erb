@@ -11,7 +11,9 @@
           <% end %>
         </li>
         <% unless @event.new_record? %>
-          <li><a href="<%= context_url(@context, :context_calendar_event_url, @event.id) %>" class="delete_event_link"><i class="icon-trash" aria-hidden='true'></i>  <%= t 'links.delete', "Delete the Event" %></a></li>
+          <li><a href="<%= context_url(@context, :context_calendar_event_url, @event.id) %>" class="delete_event_link" data-method="delete" rel="nofollow" data-confirm="<%= t "Are you sure you want to delete this event?" %>">
+            <i class="icon-trash" aria-hidden='true'></i>  <%= t 'links.delete', "Delete the Event" %></a>
+          </li>
         <% end %>
       <% end %>
     </ul>
