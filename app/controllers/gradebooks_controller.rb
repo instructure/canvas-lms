@@ -442,7 +442,7 @@ class GradebooksController < ApplicationController
       end
 
       submissions = if params[:submissions]
-                      params[:submissions].map{|k, v| v} # apparently .values doesn't pass on the params
+                      params[:submissions].values.map { |s| ActionController::Parameters.new(s) }
                     else
                       [params[:submission]]
                     end
