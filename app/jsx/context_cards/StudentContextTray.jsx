@@ -223,7 +223,7 @@ define([
                 <div>
                   <header className="StudentContextTray-Header">
                     <Avatar user={this.state.user}
-                      canMasquerade={this.state.permissions.become_user}
+                      canMasquerade={!!this.state.permissions.become_user}
                       courseId={this.props.courseId}
                     />
 
@@ -235,6 +235,7 @@ define([
                               <span className="StudentContextTray-Header__NameLink">
                                 <Link
                                   href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
+                                  aria-label={I18n.t('Go to %{name}\'s profile', {name: this.state.user.short_name})}
                                 >
                                   {this.state.user.short_name}
                                 </Link>

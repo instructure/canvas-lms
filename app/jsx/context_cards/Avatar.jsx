@@ -2,7 +2,7 @@ define([
   'i18n!student_context_tray',
   'react',
   'instructure-ui',
-], (I18n, React, { Avatar: InstUIAvatar, Typography }) => {
+], (I18n, React, { Avatar: InstUIAvatar, Typography, Link }) => {
   class Avatar extends React.Component {
     static propTypes = {
       user: React.PropTypes.shape({
@@ -22,13 +22,16 @@ define([
       const {user, courseId, canMasquerade} = this.props
 
       if (Object.keys(user).includes('avatar_url')) {
+        const name = user.short_name || user.name || 'user';
         return (
           <div className="StudentContextTray__Avatar">
-            <InstUIAvatar
-              size="x-large"
-              userName={user.name}
-              userImgUrl={user.avatar_url}
-            />
+            <Link href={`/courses/${this.props.courseId}/users/${user.id}`} aria-label={I18n.t('Go to %{name}\'s profile', {name})}>
+              <InstUIAvatar
+                size="x-large"
+                userName={user.name}
+                userImgUrl={user.avatar_url}
+              />
+            </Link>
             {
               canMasquerade ? (
                 <Typography size="x-small" weight="bold" as="div">
