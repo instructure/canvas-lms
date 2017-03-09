@@ -59,22 +59,13 @@
 <% end %>
 
 <div class="item-group-container" id="context_modules_sortable_container">
-
-  <div id="no_context_modules_message" style="display:none; clear: both;">
+  <div id="no_context_modules_message" style="display:none;">
     <% if can_do(@context.context_modules.temp_record, @current_user, :create) %>
-      <%= mt 'help.create', <<TEXT, :button => t('#context_modules.buttons.add_module_first', 'Add a New Module')
-  Course modules let you organize your assignments, pages, files, etc. into smaller sections or units. Modules could be centered around a theme, focused on a specific topic, or even just grouped chronologically.
-
-  You can also sequence modules by defining criteria and prerequisites for each module. Students won't be able to access modules until they have unlocked all their prerequisites. That way you can prevent students from accessing certain content or files until they have, say, gotten at least 75% on a review quiz.
-
-  To start organizing your course into modules, click the "%{button}" button to the right.
-TEXT
-  %>
+      <div id="modules_homepage_user_create"></div>
     <% else %>
       <p><%= t('help.no_modules', %{No modules have been defined for this course.}) %></p>
     <% end %>
   </div>
-
   <div
     id="context_modules"
     aria-label="<%= t('headings.course_modules', %{Course Modules}) %>"
@@ -87,6 +78,7 @@ TEXT
       <% end %>
     <% end %>
   </div>
+
 </div>
 
 <%= render :partial => 'context_modules/context_module_next', :object => nil, :as => :context_module %>

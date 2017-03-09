@@ -73,6 +73,20 @@ define([
         return indent;
       },
 
+      addModule: function() {
+        var $module = $("#context_module_blank").clone(true).attr('id', 'context_module_new');
+        $("#context_modules").append($module);
+        var opts = modules.sortable_module_options;
+        opts['update'] = modules.updateModuleItemPositions;
+        $module.find(".context_module_items").sortable(opts);
+        $("#context_modules.ui-sortable").sortable('refresh');
+        $("#context_modules .context_module .context_module_items.ui-sortable").each(function() {
+          $(this).sortable('refresh');
+          $(this).sortable('option', 'connectWith', '.context_module_items');
+        });
+        modules.editModule($module);
+      },
+
       updateModulePositions: function() {
         var ids = []
         $("#context_modules .context_module").each(function() {
@@ -421,7 +435,7 @@ define([
           .find(".completion_entry .no_items_message").hide().end()
           .find(".add_completion_criterion_link").showIf(!no_items);
 
-        // Set no items or criteria message plus diasable elements if there are no items or no requirements
+        // Set no items or criteria message plus disable elements if there are no items or no requirements
         if (no_items) {
           $form.find(".completion_entry .no_items_message").show();
         }
@@ -453,6 +467,10 @@ define([
           close: function() {
             modules.hideEditModule(true);
             $toFocus.focus();
+            var $contextModules = $("#context_modules .context_module");
+            if ($contextModules.length) {
+              $('#context_modules_sortable_container').removeClass('item-group-container--is-empty');
+            }
           },
           open: function(){
             $(this).find('input[type=text],textarea,select').first().focus();
@@ -1305,17 +1323,7 @@ define([
 
     $(".add_module_link").live('click', function(event) {
       event.preventDefault();
-      var $module = $("#context_module_blank").clone(true).attr('id', 'context_module_new');
-      $("#context_modules").append($module);
-      var opts = modules.sortable_module_options;
-      opts['update'] = modules.updateModuleItemPositions;
-      $module.find(".context_module_items").sortable(opts);
-      $("#context_modules.ui-sortable").sortable('refresh');
-      $("#context_modules .context_module .context_module_items.ui-sortable").each(function() {
-        $(this).sortable('refresh');
-        $(this).sortable('option', 'connectWith', '.context_module_items');
-      });
-      modules.editModule($module);
+      modules.addModule();
     });
 
     $(".add_module_item_link").on('click', function(event) {
@@ -1961,6 +1969,7 @@ define([
     var $contextModules = $("#context_modules .context_module");
     if (!$contextModules.length) {
       $('#no_context_modules_message').show();
+      $('#context_modules_sortable_container').addClass('item-group-container--is-empty');
     }
     $contextModules.each(function() {
       modules.updateProgressionState($(this));

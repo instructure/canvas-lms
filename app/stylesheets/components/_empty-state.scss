@@ -1,0 +1,60 @@
+@import "base/environment.scss";
+
+.ic-EmptyStateList {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ic-EmptyStateList__Item {
+  padding: $ic-sp 0;
+  border-top: 1px dotted $ic-border-light;
+
+  &:first-of-type {
+    border-top: none;
+  }
+}
+
+.ic-EmptyStateList__BillboardWrapper {
+  margin: 0 auto;
+
+  @include breakpoint(tablet) {
+    max-width: 20rem;
+  }
+}
+
+.ic-EmptyStateButton {
+  appearance: none;
+  box-sizing: border-box;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: $ic-sp;
+  background: transparent;
+  border: 0.125rem dashed transparent;
+  border-radius: $ic-sp;
+  text-align: center;
+  color: $ic-border-light;
+  text-decoration: none;
+
+  &:focus,
+  &:hover {
+    outline: none;
+    color: $ic-link-color;
+    border-color: $ic-link-color;
+    text-decoration: none;
+  }
+}
+
+.ic-EmptyStateButton__SVG {
+  font-size: 13rem;
+}
+
+.ic-EmptyStateButton__Text {
+  @include fontSize($ic-font-size--medium);
+  display: block;
+  color: $ic-link-color;
+}
