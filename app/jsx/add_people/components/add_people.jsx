@@ -292,7 +292,7 @@ define([
           <ModalBody>
             <div
               className="addpeople"
-              tabIndex="0"
+              tabIndex="-1"
               ref={(elem) => { this.content = elem }}
               aria-label={panelLabel}
               aria-describedby="addpeople_panelDescription"
