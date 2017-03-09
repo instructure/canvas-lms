@@ -428,7 +428,8 @@ class CoursesController < ApplicationController
           end
 
           state = e.state_based_on_date
-          if [:completed, :rejected].include?(state)
+          if [:completed, :rejected].include?(state) ||
+              (e.course.conclude_at && e.course.conclude_at < Time.now) # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
             @past_enrollments << e unless e.workflow_state == "invited" || e.restrict_past_view?
           else
             start_at, end_at = e.enrollment_dates.first
