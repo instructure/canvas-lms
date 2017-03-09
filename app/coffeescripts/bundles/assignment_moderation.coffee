@@ -35,4 +35,8 @@ require [
     urls: window.ENV.URLS,
   })
 
-  ReactDOM.render(ModerationAppFactory(store: store), $('#assignment_moderation')[0])
+  permissions =
+    viewGrades: window.ENV.PERMISSIONS.view_grades
+    editGrades: window.ENV.PERMISSIONS.edit_grades
+
+  ReactDOM.render(ModerationAppFactory(store: store, permissions: permissions), $('#assignment_moderation')[0])

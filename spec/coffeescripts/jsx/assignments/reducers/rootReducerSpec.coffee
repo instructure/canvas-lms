@@ -102,14 +102,27 @@ define [
   test "concatenates students on GOT_STUDENTS", ->
     initialState =
       studentList: {
-        students: [{'one': 1}, {'two': 2}]
+        students: [{id: 1, one: 1}, {id: 2, two: 2}]
       }
     gotStudentsAction =
       type: 'GOT_STUDENTS'
       payload:
-        students: [{'three': 3}, {'four': 4}]
+        students: [{id: 3, three: 3}, {id: 4, four: 4}]
     newState = rootReducer(initialState, gotStudentsAction)
-    expected = [{'one': 1}, {'two': 2}, {'three': 3}, {'four': 4}]
+    expected = [{id: 1, one: 1}, {id: 2, two: 2}, {id: 3, three: 3}, {id: 4, four: 4}]
+    deepEqual newState.studentList.students, expected, 'successfully concatenates'
+
+  test "filters out duplicate students on GOT_STUDENTS", ->
+    initialState =
+      studentList: {
+        students: [{id: 1, one: 1}, {id: 2, two: 2}]
+      }
+    gotStudentsAction =
+      type: 'GOT_STUDENTS'
+      payload:
+        students: [{id: 3, three: 3}, {id: 3, three: 3}]
+    newState = rootReducer(initialState, gotStudentsAction)
+    expected = [{id: 1, one: 1}, {id: 2, two: 2}, {id: 3, three: 3}]
     deepEqual newState.studentList.students, expected, 'successfully concatenates'
 
   test "updates the moderation set handling UPDATED_MODERATION_SET", ->

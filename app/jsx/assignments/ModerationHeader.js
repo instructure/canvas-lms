@@ -12,6 +12,9 @@ import I18n from 'i18n!moderated_grading'
       inflightAction: React.PropTypes.shape({
         review: React.PropTypes.bool.isRequired,
         publish: React.PropTypes.bool.isRequired
+      }).isRequired,
+      permissions: React.PropTypes.shape({
+        editGrades: React.PropTypes.bool.isRequired
       }).isRequired
     },
 
@@ -47,6 +50,21 @@ import I18n from 'i18n!moderated_grading'
         );
       }
     },
+
+    renderPostButton () {
+      return this.props.permissions.editGrades && (
+        <button
+          ref={(p) => { this.publishBtn = p; }}
+          type="button"
+          className="ModeratedGrading__Header-PublishBtn Button Button--primary"
+          onClick={this.handlePublishClick}
+          disabled={this.props.published || this.props.inflightAction.publish}
+        >
+          {I18n.t('Post')}
+        </button>
+      );
+    },
+
     render () {
       return (
         <div>
@@ -75,15 +93,7 @@ import I18n from 'i18n!moderated_grading'
                   {I18n.t(' Reviewer')}
                 </span>
               </button>
-              <button
-                ref='publishBtn'
-                type='button'
-                className='ModeratedGrading__Header-PublishBtn Button Button--primary'
-                onClick={this.handlePublishClick}
-                disabled={this.props.published || this.props.inflightAction.publish}
-              >
-                {I18n.t('Post')}
-              </button>
+              {this.renderPostButton()}
             </div>
           </div>
       </div>

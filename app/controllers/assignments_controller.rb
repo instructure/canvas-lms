@@ -179,18 +179,23 @@ class AssignmentsController < ApplicationController
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       add_crumb(t('Moderate'))
 
+      can_edit_grades = @context.grants_right?(@current_user, :manage_grades)
       js_env({
-        :ASSIGNMENT_TITLE => @assignment.title,
-        :GRADES_PUBLISHED => @assignment.grades_published?,
-        :COURSE_ID => @context.id,
-        :STUDENT_CONTEXT_CARDS_ENABLED => @domain_root_account.feature_enabled?(:student_context_cards),
-        :URLS => {
-          :student_submissions_url => polymorphic_url([:api_v1, @context, @assignment, :submissions]) + "?include[]=user_summary&include[]=provisional_grades",
-          :publish_grades_url => api_v1_publish_provisional_grades_url({course_id: @context.id, assignment_id: @assignment.id}),
-          :list_gradeable_students => api_v1_course_assignment_gradeable_students_url({course_id: @context.id, assignment_id: @assignment.id}) + "?include[]=provisional_grades&per_page=50",
-          :add_moderated_students => api_v1_add_moderated_students_url({course_id: @context.id, assignment_id: @assignment.id}),
-          :assignment_speedgrader_url => speed_grader_course_gradebook_url({course_id: @context.id, assignment_id: @assignment.id}),
-          :provisional_grades_base_url => polymorphic_url([:api_v1, @context, @assignment]) + "/provisional_grades"
+        ASSIGNMENT_TITLE: @assignment.title,
+        GRADES_PUBLISHED: @assignment.grades_published?,
+        COURSE_ID: @context.id,
+        STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards),
+        PERMISSIONS: {
+          view_grades: can_edit_grades || @context.grants_right?(@current_user, :view_all_grades),
+          edit_grades: can_edit_grades
+        },
+        URLS: {
+          student_submissions_url: polymorphic_url([:api_v1, @context, @assignment, :submissions]) + "?include[]=user_summary&include[]=provisional_grades",
+          publish_grades_url: api_v1_publish_provisional_grades_url({course_id: @context.id, assignment_id: @assignment.id}),
+          list_gradeable_students: api_v1_course_assignment_gradeable_students_url({course_id: @context.id, assignment_id: @assignment.id}) + "?include[]=provisional_grades&per_page=50",
+          add_moderated_students: api_v1_add_moderated_students_url({course_id: @context.id, assignment_id: @assignment.id}),
+          assignment_speedgrader_url: speed_grader_course_gradebook_url({course_id: @context.id, assignment_id: @assignment.id}),
+          provisional_grades_base_url: polymorphic_url([:api_v1, @context, @assignment]) + "/provisional_grades"
         }})
 
       respond_to do |format|

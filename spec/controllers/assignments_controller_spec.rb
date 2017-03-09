@@ -140,7 +140,6 @@ describe AssignmentsController do
   end
 
   describe "GET 'show_moderate'" do
-
     it "should set the js_env for URLS" do
       user_session(@teacher)
       assignment = @course.assignments.create(:title => "some assignment")
@@ -162,6 +161,60 @@ describe AssignmentsController do
 
       get 'show_moderate', :course_id => @course.id, :assignment_id => assignment.id
       expect(assigns[:js_env][:ASSIGNMENT_TITLE]).to eq "some assignment"
+    end
+
+    describe 'permissions' do
+      before(:once) do
+        @user = User.create!
+        @custom_role = @course.root_account.roles.create!(name: 'CustomRole', base_role_type: 'TaEnrollment')
+        @course.root_account.role_overrides.create!(permission: :moderate_grades, role: @custom_role, enabled: true)
+        @course.root_account.role_overrides.create!(permission: :view_all_grades, role: @custom_role, enabled: false)
+        @course.root_account.role_overrides.create!(permission: :manage_grades, role: @custom_role, enabled: false)
+        @course.enroll_user(@user, 'TaEnrollment', role: @custom_role, active_all: true)
+        @assignment = @course.assignments.create!(workflow_state: 'published', moderated_grading: true)
+      end
+
+      before(:each) { user_session(@user) }
+      let(:permissions) { assigns[:js_env][:PERMISSIONS] }
+
+      let(:allow_editing) do
+        override = @course.root_account.role_overrides.find_by(permission: 'manage_grades')
+        override.update!(enabled: true)
+      end
+
+      let(:allow_viewing) do
+        override = @course.root_account.role_overrides.find_by(permission: 'view_all_grades')
+        override.update!(enabled: true)
+      end
+
+      it 'grants the user view permissions if they have "View all grades" permissions in the course' do
+        allow_viewing
+        get :show_moderate, course_id: @course, assignment_id: @assignment
+        expect(permissions[:view_grades]).to eq true
+      end
+
+      it 'grants the user view permissions if they have "Edit grades" permissions in the course' do
+        allow_editing
+        get :show_moderate, course_id: @course, assignment_id: @assignment
+        expect(permissions[:view_grades]).to eq true
+      end
+
+      it 'denies the user view permissions if they lack both "View all grades" and "Edit grades" \
+      permissions in the course' do
+        get :show_moderate, course_id: @course, assignment_id: @assignment
+        expect(permissions[:view_grades]).to eq false
+      end
+
+      it 'grants the user edit permissions if they have "Edit grades" permissions in the course' do
+        allow_editing
+        get :show_moderate, course_id: @course, assignment_id: @assignment
+        expect(permissions[:edit_grades]).to eq true
+      end
+
+      it 'denies the user edit permissions if they lack "Edit grades" permissions in the course' do
+        get :show_moderate, course_id: @course, assignment_id: @assignment
+        expect(permissions[:edit_grades]).to eq false
+      end
     end
   end
 

@@ -16,6 +16,8 @@ define [
           review: false,
           publish: false
         }
+        permissions:
+          editGrades: true
 
     teardown: ->
       @props = null
@@ -28,13 +30,28 @@ define [
     ok headerNode, 'the DOM node mounted'
     ReactDOM.unmountComponentAtNode(headerNode.parentNode)
 
+  test 'renders the publish button if the user has edit permissions', ->
+    HeaderElement = React.createElement(Header, @props)
+    header = TestUtils.renderIntoDocument(HeaderElement)
+    headerNode = ReactDOM.findDOMNode(header)
+    ok header.publishBtn
+    ReactDOM.unmountComponentAtNode(headerNode.parentNode)
+
+  test 'does not render the publish button if the user does not have edit permissions', ->
+    @props.permissions.editGrades = false
+    HeaderElement = React.createElement(Header, @props)
+    header = TestUtils.renderIntoDocument(HeaderElement)
+    headerNode = ReactDOM.findDOMNode(header)
+    notOk header.publishBtn
+    ReactDOM.unmountComponentAtNode(headerNode.parentNode)
+
   test 'sets buttons to disabled if published prop is true', ->
     @props.published = true
     HeaderElement = React.createElement(Header, @props)
     header = TestUtils.renderIntoDocument(HeaderElement)
     headerNode = ReactDOM.findDOMNode(header)
     addReviewerBtnNode = ReactDOM.findDOMNode(header.refs.addReviewerBtn)
-    publishBtnNode = ReactDOM.findDOMNode(header.refs.publishBtn)
+    publishBtnNode = header.publishBtn
 
     ok addReviewerBtnNode.disabled, 'add reviewers button is disabled'
     ok publishBtnNode.disabled, 'publish button is disabled'
@@ -45,7 +62,7 @@ define [
     HeaderElement = React.createElement(Header, @props)
     header = TestUtils.renderIntoDocument(HeaderElement)
     headerNode = ReactDOM.findDOMNode(header)
-    publishBtnNode = ReactDOM.findDOMNode(header.refs.publishBtn)
+    publishBtnNode = header.publishBtn
 
     ok publishBtnNode.disabled, 'publish button is disabled'
     ReactDOM.unmountComponentAtNode(headerNode.parentNode)

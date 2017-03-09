@@ -11,7 +11,11 @@ export default React.createClass({
     displayName: 'ModerationApp',
 
     propTypes: {
-      store: React.PropTypes.object.isRequired
+      store: React.PropTypes.object.isRequired,
+      permissions: React.PropTypes.shape({
+        viewGrades: React.PropTypes.bool.isRequired,
+        editGrades: React.PropTypes.bool.isRequired
+      }).isRequired
     },
 
     getInitialState () {
@@ -69,6 +73,7 @@ export default React.createClass({
             published={this.state.assignment.published}
             selectedStudentCount={this.state.studentList.selectedCount}
             inflightAction={this.state.inflightAction}
+            permissions={this.props.permissions}
           />
           <div className='grid-row' role="row">
             <div className='col-xs-12'>
@@ -82,6 +87,7 @@ export default React.createClass({
                 handleSortMark2={() => this.props.store.dispatch(Actions.sortMark2Column())}
                 handleSortMark3={() => this.props.store.dispatch(Actions.sortMark3Column())}
                 handleSelectAll={this.handleSelectAll}
+                permissions={this.props.permissions}
               />
             </div>
           </div>

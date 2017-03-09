@@ -12,7 +12,10 @@ import I18n from 'i18n!moderated_grading'
       handleSortMark1: React.PropTypes.func.isRequired,
       handleSortMark2: React.PropTypes.func.isRequired,
       handleSortMark3: React.PropTypes.func.isRequired,
-      handleSelectAll: React.PropTypes.func.isRequired
+      handleSelectAll: React.PropTypes.func.isRequired,
+      permissions: React.PropTypes.shape({
+        viewGrades: React.PropTypes.bool.isRequired
+      }).isRequired
     },
 
     renderLinkArrow (mark) {
@@ -35,13 +38,24 @@ import I18n from 'i18n!moderated_grading'
       }
     },
 
+    renderCheckbox () {
+      return this.props.permissions.viewGrades && (
+        <input
+          ref={(c) => { this.checkbox = c; }}
+          type="checkbox"
+          aria-label={I18n.t('Select all students')}
+          onChange={this.props.handleSelectAll}
+        />
+      );
+    },
+
     render () {
       if (this.props.includeModerationSetHeaders) {
         return (
           <div className='grid-row ModeratedColumnHeader' role="row">
             <div className='col-xs-4'>
               <div className='ModeratedColumnHeader__StudentName ColumnHeader__Item' role="columnheader">
-                <input type='checkbox' aria-label={I18n.t('Select all students')} onChange={this.props.handleSelectAll} />
+                {this.renderCheckbox()}
                 <span>{I18n.t('Student')}</span>
               </div>
             </div>
@@ -85,7 +99,7 @@ import I18n from 'i18n!moderated_grading'
           <div className='grid-row ColumnHeader' role="row">
             <div className='col-xs-4'>
               <div className='ColumnHeader__StudentName ColumnHeader__Item' role="columnheader">
-                <input type='checkbox' aria-label={I18n.t('Select all students')} onChange={this.props.handleSelectAll} />
+                {this.renderCheckbox()}
                 <span>{I18n.t('Student')}</span>
               </div>
             </div>

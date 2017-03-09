@@ -16,6 +16,8 @@ define [
         handleSortMark2: ->
         handleSortMark3: ->
         handleSelectAll: ->
+        permissions:
+          viewGrades: true
     teardown: ->
       @props = null
 
@@ -99,4 +101,28 @@ define [
     columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
     headers = TestUtils.scryRenderedDOMComponentsWithClass(columnHeader, 'ColumnHeader__Item')
     equal headers.length, 5, 'show all headers when true'
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(columnHeader).parentNode)
+
+  test 'includes the checkbox if the user has permission to view grades', ->
+    columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
+    ok columnHeader.checkbox
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(columnHeader).parentNode)
+
+  test 'does not include the checkbox if the user does not have permission to view grades', ->
+    @props.permissions.viewGrades = false
+    columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
+    notOk columnHeader.checkbox
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(columnHeader).parentNode)
+
+  test 'includes the checkbox if the user has permission to view grades without moderation set headers', ->
+    @props.includeModerationSetHeaders = false
+    columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
+    ok columnHeader.checkbox
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(columnHeader).parentNode)
+
+  test 'does not include the checkbox if the user does not have permission to view grades without moderation set headers', ->
+    @props.permissions.viewGrades = false
+    @props.includeModerationSetHeaders = false
+    columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
+    notOk columnHeader.checkbox
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(columnHeader).parentNode)

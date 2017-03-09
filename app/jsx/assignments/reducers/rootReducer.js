@@ -53,7 +53,8 @@ import Constants from './../constants'
   var studentHandlers = {};
   studentHandlers[ModerationActions.GOT_STUDENTS] = (state, action) => {
     var newState = _.extend({}, state);
-    newState.students = newState.students.concat(action.payload.students);
+    const students = newState.students.concat(action.payload.students);
+    newState.students = _.uniq(students, student => student.id);
     return newState;
   };
 
