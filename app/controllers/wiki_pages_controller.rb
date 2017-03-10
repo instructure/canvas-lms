@@ -75,6 +75,7 @@ class WikiPagesController < ApplicationController
       log_asset_access([ "pages", @context ], "pages", "other")
       js_env ConditionalRelease::Service.env_for @context
       js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
+      set_tutorial_js_env
       @padless = true
     end
   end

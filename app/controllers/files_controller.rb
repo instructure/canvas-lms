@@ -354,6 +354,8 @@ class FilesController < ApplicationController
       })
       log_asset_access([ "files", @context ], "files", "other")
 
+      set_tutorial_js_env
+
       render html: "".html_safe, layout: true
     end
   end

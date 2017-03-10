@@ -973,8 +973,8 @@ module ApplicationHelper
     return if @js_env && @js_env[:NEW_USER_TUTORIALS]
 
     is_enabled = @context.is_a?(Course) &&
-      @context.grants_right?(@current_user, session, :manage) &&
-      tutorials_enabled?
+      tutorials_enabled? &&
+      @context.grants_right?(@current_user, session, :manage)
 
     js_env NEW_USER_TUTORIALS: {is_enabled: is_enabled}
   end

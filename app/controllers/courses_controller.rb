@@ -1200,6 +1200,8 @@ class CoursesController < ApplicationController
         COURSE_IMAGES_ENABLED: @context.feature_enabled?(:course_card_images)
       })
 
+      set_tutorial_js_env
+
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
       unless @context.grants_right?(@current_user, session, :read_as_admin)
         @course_settings_sub_navigation_tools.reject! { |tool| tool.course_settings_sub_navigation(:visibility) == 'admins' }

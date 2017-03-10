@@ -132,6 +132,8 @@ class Quizzes::QuizzesController < ApplicationController
       :SIS_NAME => sis_name
     })
 
+    set_tutorial_js_env
+
     conditional_release_js_env(includes: :active_rules)
 
     if @current_user.present?

@@ -47,6 +47,8 @@ class AssignmentsController < ApplicationController
       @context.require_assignment_group
       set_js_assignment_data # in application_controller.rb, because the assignments page can be shared with the course home
 
+      set_tutorial_js_env
+
       js_env(WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
              POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
              SIS_NAME: sis_name,
@@ -315,6 +317,7 @@ class AssignmentsController < ApplicationController
       hash = { :CONTEXT_ACTION_SOURCE => :syllabus }
       append_sis_data(hash)
       js_env(hash)
+      set_tutorial_js_env
 
       log_asset_access([ "syllabus", @context ], "syllabus", 'other')
       respond_to do |format|

@@ -366,6 +366,7 @@ class DiscussionTopicsController < ApplicationController
         conditional_release_js_env(includes: :active_rules)
         append_sis_data(hash)
         js_env(hash)
+        set_tutorial_js_env
 
         if user_can_edit_course_settings?
           js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
