@@ -40,8 +40,12 @@ class RouteView < HashView
   end
 
   def verb
-    if raw_route.verb.source =~ /\^?(\w*)\$/
-      $1.upcase
+    if CANVAS_RAILS4_2
+      if raw_route.verb.source =~ /\^?(\w*)\$/
+        $1.upcase
+      end
+    else
+      raw_route.verb.upcase
     end
   end
 
