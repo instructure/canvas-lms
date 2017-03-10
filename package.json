@@ -30,7 +30,7 @@
     "backbone": "1.1.1",
     "classnames": "~2.2.5",
     "coffee-loader": "^0.7.2",
-    "coffee-script": "1.6.2",
+    "coffee-script": "1.12.2",
     "color-slicer": "0.8.0",
     "core-js-builder": "^2.4.1",
     "css-loader": "0.26.1",

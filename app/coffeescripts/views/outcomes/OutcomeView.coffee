@@ -143,10 +143,9 @@ define [
     # Update rating form field elements and the total.
     updateRatings: ->
       total = 0
-      for r in @$('.rating')
+      for r, index in @$('.rating')
         rating = $(r).find('.outcome_rating_points').val() or 0
         total = _.max [total, numberHelper.parse(rating)]
-        index = _i
         for i in $(r).find('input')
           # reset indices
           $(i).attr 'name', i.name.replace /\[[0-9]+\]/, "[#{index}]"
