@@ -128,10 +128,74 @@
 #     }
 #   }
 #
+# @model ChangeRecord
+#   {
+#     "id" : "ChangeRecord",
+#     "description" : "Describes a learning object change propagated to associated courses from a blueprint course",
+#     "properties": {
+#       "asset_id": {
+#         "description": "The ID of the learning object that was changed in the blueprint course.",
+#         "example": 2,
+#         "type": "integer",
+#         "format": "int64"
+#       },
+#       "asset_type": {
+#         "description": "The type of the learning object that was changed in the blueprint course.  One of 'assignment', 'attachment', 'discussion_topic', 'external_tool', 'quiz', or 'wiki_page'.",
+#         "example": "assignment",
+#         "type": "string"
+#       },
+#       "asset_name": {
+#         "description": "The name of the learning object that was changed in the blueprint course.",
+#         "example": "Some Assignment",
+#         "type": "string"
+#       },
+#       "change_type": {
+#         "description": "The type of change; one of 'created', 'updated', 'deleted'",
+#         "example": "created",
+#         "type": "string"
+#       },
+#       "html_url": {
+#         "description": "The URL of the changed object",
+#         "example": "https://canvas.example.com/courses/101/assignments/2",
+#         "type": "string"
+#       },
+#       "locked": {
+#         "description": "Whether the object is locked in the blueprint",
+#         "example": false,
+#         "type": "boolean"
+#       },
+#       "exceptions": {
+#         "description": "A list of ExceptionRecords for linked courses that did not receive this update.",
+#         "example": [{"course_id": 101, "conflicting_changes": ["points"]}],
+#         "type": "array",
+#         "items": {"type": "object"}
+#       }
+#     }
+#   }
+#
+# @model ExceptionRecord
+#   {
+#     "id" : "ExceptionRecord",
+#     "description" : "Lists associated courses that did not receive a change propagated from a blueprint",
+#     "properties": {
+#       "course_id": {
+#         "description": "The ID of the associated course",
+#         "example": 101,
+#         "type": "integer",
+#         "format": "int64"
+#       },
+#       "conflicting_changes" : {
+#         "description": "A list of change classes in the associated course's copy of the item that prevented a blueprint change from being applied. One or more of ['content', 'points', 'due_dates', 'availability_dates'].",
+#         "example": ["points"],
+#         "type": "array",
+#         "items": {"type": "object"}
+#       }
+#     }
+#   }
 class MasterCourses::MasterTemplatesController < ApplicationController
   before_action :require_master_courses
-  before_action :get_template
-  before_action :require_course_level_manage_rights
+  before_action :get_template, :except => :migration_details
+  before_action :require_course_level_manage_rights, :except => :migration_details
   before_action :require_account_level_manage_rights, :only => [:update_associations]
 
   include Api::V1::Course
@@ -357,6 +421,52 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     end
   end
 
+  # @API Get migration details
+  #
+  # Show the changes that were propagated in a blueprint migration. This endpoint can be called on a
+  # blueprint course or an associated course; when called on an associated course, the exceptions
+  # field will only include records for that course (and not other courses associated with the blueprint).
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/1/blueprint_templates/default/migrations/2/details \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns [ChangeRecord]
+  def migration_details
+    @course = api_find(Course, params[:course_id])
+    return unless authorized_action(@course, @current_user, :manage)
+    @mm = MasterCourses::MasterMigration.find(params[:id])
+
+    return render :json => [] unless @mm.export_results.has_key?(:selective)
+
+    subscriptions = @mm.master_template.child_subscriptions.where(:id => @mm.export_results[:selective][:subscriptions])
+    if @mm.master_template.course == @course
+      # enumerate objects in the blueprint
+      tag_association = @mm.master_template.content_tags
+    else
+      # enumerate objects in the target minion course
+      subscriptions = subscriptions.where(child_course_id: @course).to_a
+      raise ActiveRecord::RecordNotFound if subscriptions.empty?
+      tag_association = subscriptions.first.content_tags
+    end
+
+    changes = []
+    exceptions = get_exceptions_by_subscription(subscriptions)
+
+    [:created, :updated, :deleted].each do |action|
+      migration_ids = @mm.export_results[:selective][action].values.flatten
+      tags = tag_association.where(:migration_id => migration_ids).preload(:content).to_a
+      restricted_ids = find_restricted_ids(tags)
+      tags.each do |tag|
+        next if tag.content_type == 'AssignmentGroup' # these are noise, since they're touched with each assignment
+        changes << changed_asset_json(tag.content, action, tag.migration_id,
+                                      restricted_ids.include?(tag.migration_id), exceptions)
+      end
+    end
+
+    render :json => changes
+  end
+
   protected
   def require_master_courses
     render_unauthorized_action unless master_courses?
@@ -380,5 +490,46 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     else
       @template = mc_scope.find(template_id)
     end
+  end
+
+  def get_exceptions_by_subscription(subscriptions)
+    import_ids = @mm.import_results.keys
+    import_ids_by_course = ContentMigration.where(id: import_ids).pluck(:context_id, :id).to_h
+
+    exceptions = {}
+    subscriptions.each do |sub|
+      import_id = import_ids_by_course[sub.child_course_id]
+      next unless import_id
+      sub.content_tags.where(:migration_id => @mm.import_results[import_id][:skipped]).each do |child_tag|
+        exceptions[child_tag.migration_id] ||= []
+        exceptions[child_tag.migration_id] << { :course_id => sub.child_course_id,
+                                                :conflicting_changes => change_classes(
+                                                  child_tag.content_type.constantize, child_tag.downstream_changes) }
+      end
+    end
+    exceptions
+  end
+
+  def find_restricted_ids(tags)
+    master_tags = if tags.first.is_a?(MasterCourses::MasterContentTag)
+      tags
+    else
+      @mm.master_template.content_tags.where(:migration_id => tags.map(&:migration_id))
+    end
+
+    master_tags.inject(Set.new) do |ids, tag|
+      ids << tag.migration_id if tag.restrictions.values.any?
+      ids
+    end
+  end
+
+  def change_classes(klass, columns)
+    classes = []
+    columns.each do |col|
+      klass.restricted_column_settings.each do |k, v|
+        classes << k if v.include? col
+      end
+    end
+    classes.uniq
   end
 end

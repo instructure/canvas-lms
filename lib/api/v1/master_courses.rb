@@ -26,4 +26,40 @@ module Api::V1::MasterCourses
     hash['template_id'] = migration.master_template_id
     hash
   end
+
+  def changed_asset_json(asset, action, migration_id, locked, exceptions)
+    asset_type = asset.class_name.underscore.sub(/^.+\//, '')
+    url = case asset.class_name
+    when 'Attachment'
+      course_file_url(:course_id => asset.context.id, :id => asset.id)
+    when 'Quizzes::Quiz'
+      course_quiz_url(:course_id => asset.context.id, :id => asset.id)
+    when 'AssessmentQuestionBank'
+      course_question_bank_url(:course_id => asset.context.id, :id => asset.id)
+    when 'ContextExternalTool'
+      course_external_tool_url(:course_id => asset.context.id, :id => asset.id)
+    when 'LearningOutcome'
+      course_outcome_url(:course_id => asset.context.id, :id => asset.id)
+    else
+      polymorphic_url([asset.context, asset])
+    end
+
+    asset_name = if asset.respond_to?(:display_name)
+      asset.display_name
+    elsif asset.respond_to?(:title)
+      asset.title
+    else
+      asset.name
+    end
+
+    {
+      asset_id: asset.id,
+      asset_type: asset_type,
+      asset_name: asset_name,
+      change_type: action.to_s,
+      html_url: url,
+      locked: locked,
+      exceptions: exceptions[migration_id] || []
+    }
+  end
 end
