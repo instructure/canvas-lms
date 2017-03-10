@@ -27,7 +27,7 @@ RSpec.shared_context "lti2_api_spec_helper", :shared_context => :metadata do
     ims_tp.as_json
   end
   let(:tool_proxy) do
-    Lti::ToolProxy.create!(
+    tp = Lti::ToolProxy.create!(
       context: account,
       guid: SecureRandom.uuid,
       shared_secret: 'abc',
@@ -37,5 +37,8 @@ RSpec.shared_context "lti2_api_spec_helper", :shared_context => :metadata do
       raw_data: raw_data.as_json,
       lti_version: '1'
     )
+    Lti::ToolProxyBinding.where(context_id: account, context_type: account.class.to_s,
+                                tool_proxy_id: tp).first_or_create!
+    tp
   end
 end

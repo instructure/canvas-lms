@@ -1975,12 +1975,19 @@ CanvasRails::Application.routes.draw do
     get "courses/:course_id/membership_service", controller: "lti/membership_service", action: :course_index, as: :course_membership_service
     get "groups/:group_id/membership_service", controller: "lti/membership_service", action: :group_index, as: :group_membership_service
 
+    # Submissions Service
+    scope(controller: 'lti/submissions_api') do
+      get "assignments/:assignment_id/submissions/:submission_id", action: :show
+      get "assignments/:assignment_id/submissions/:submission_id/history", action: :history
+    end
+
     # Originality Report Service
     scope(controller: 'lti/originality_reports_api') do
       post "assignments/:assignment_id/submissions/:submission_id/originality_report", action: :create
       put "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :update
       get "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :show
     end
+
   end
 
   ApiRouteSet.draw(self, '/api/sis') do

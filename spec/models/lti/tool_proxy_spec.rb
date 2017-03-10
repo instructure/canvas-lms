@@ -274,5 +274,13 @@ module Lti
 
     end
 
+    describe "#enabled_capabilities" do
+      it 'returns the enabled capabilities' do
+        capabilities = ['a_capability']
+        subject.raw_data = {'enabled_capability' => capabilities}
+        expect(subject.enabled_capabilities).to eq capabilities
+      end
+    end
+
   end
 end

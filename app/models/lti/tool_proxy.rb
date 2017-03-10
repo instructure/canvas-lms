@@ -74,5 +74,10 @@ module Lti
       self.update_payload.present?
     end
 
+    def enabled_capabilities
+      ims_tool_proxy = IMS::LTI::Models::ToolProxy.from_json(raw_data)
+      ims_tool_proxy.enabled_capabilities
+    end
+
   end
 end
