@@ -38,7 +38,7 @@ function happify (id, loaders) {
       id,
       loaders,
       threadPool: getHappyThreadPool(),
-      tempDir: 'node_modules/.happypack_tmp/',
+      tempDir: (process.env.HAPPYPACK_TEMPDIR || 'node_modules/.happypack_tmp/'),
 
       // by default, we use the cache everywhere exept prod. but you can
       // set HAPPYPACK_CACHE environment variable to override
