@@ -120,7 +120,7 @@ end
 
 # temporary patch to keep things sane
 # TODO: actually fix the deprecation messages once we're on Rails 4 permanently and remove this
-ActiveSupport::Deprecation.silenced = true
+ActiveSupport::Deprecation.silenced = !CANVAS_RAILS4_2
 
 # we use ivars too extensively for factories; prevent them from
 # being propagated to views in view specs
