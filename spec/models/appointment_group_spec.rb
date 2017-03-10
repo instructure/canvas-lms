@@ -476,6 +476,19 @@ describe AppointmentGroup do
       enrollment.conclude
       expect(@ag.reload.available_slots).to eql 4
     end
+
+    it "should not cancel a slot for a user if they have another active enrollment" do
+      enrollment1 = student_in_course(:course => @course, :active_all => true)
+      cs = @course.course_sections.create!
+      enrollment2 = @course.enroll_student(@student, :section => cs, :allow_multiple_enrollments => true, :enrollment_state => 'active')
+
+      @appointment.reserve_for(@student, @teacher)
+      expect(@ag.reload.available_slots).to eql 3
+      enrollment1.conclude
+      expect(@ag.reload.available_slots).to eql 3
+      enrollment2.conclude
+      expect(@ag.reload.available_slots).to eql 4
+    end
   end
 
   context "possible_participants" do
