@@ -25,7 +25,7 @@ class BrandConfigsController < ApplicationController
       sharedBrandConfigs: visible_shared_brand_configs.as_json(include_root: false, include: 'brand_config'),
       activeBrandConfig: active_brand_config(ignore_parents: true).as_json(include_root: false)
     }
-    render text: '', layout: true
+    render html: '', layout: true
   end
 
   def new
@@ -39,7 +39,7 @@ class BrandConfigsController < ApplicationController
            variableSchema: default_schema,
            allowGlobalIncludes: @account.allow_global_includes?,
            account_id: @account.id
-    render text: '', layout: 'layouts/bare'
+    render html: '', layout: 'layouts/bare'
   end
 
   def show

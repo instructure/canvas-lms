@@ -22,7 +22,7 @@ module SupportHelpers
       if params[:id]
         run_fixer(SupportHelpers::Tii::AssignmentFixer, params[:id].to_i)
       else
-        render text: "Missing assignment `id` parameter", status: 400
+        render plain: "Missing assignment `id` parameter", status: 400
       end
     end
 

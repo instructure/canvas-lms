@@ -117,9 +117,9 @@ class Course < ActiveRecord::Base
 
   has_many :course_account_associations
   has_many :non_unique_associated_accounts, -> { order('course_account_associations.depth') }, source: :account, through: :course_account_associations
-  has_many :users, -> { uniq }, through: :enrollments, source: :user
-  has_many :current_users, -> { uniq }, through: :current_enrollments, source: :user
-  has_many :all_current_users, -> { uniq }, through: :all_current_enrollments, source: :user
+  has_many :users, -> { distinct }, through: :enrollments, source: :user
+  has_many :current_users, -> { distinct }, through: :current_enrollments, source: :user
+  has_many :all_current_users, -> { distinct }, through: :all_current_enrollments, source: :user
   has_many :group_categories, -> {where(deleted_at: nil) }, as: :context, inverse_of: :context
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context, :inverse_of => :context
   has_many :groups, :as => :context, :inverse_of => :context
@@ -2416,7 +2416,7 @@ class Course < ActiveRecord::Base
   def invited_count_visible_to(user)
     scope = users_visible_to(user).
       where("enrollments.workflow_state in ('invited', 'creation_pending') AND enrollments.type != 'StudentViewEnrollment'")
-    scope.select('users.id').uniq.count
+    scope.select('users.id').distinct.count
   end
 
   def published?

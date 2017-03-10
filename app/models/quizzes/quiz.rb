@@ -421,7 +421,7 @@ class Quizzes::Quiz < ActiveRecord::Base
           @notify_of_update ? a.save : a.save_without_broadcasting!
         end
         self.assignment_id = a.id
-        Quizzes::Quiz.where(:id => self).update_all(:assignment_id => a)
+        Quizzes::Quiz.where(id: self).update_all(assignment_id: a.id)
       end
     end
   end

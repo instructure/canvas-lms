@@ -615,9 +615,9 @@ class DiscussionTopic < ActiveRecord::Base
 
     student_ids = context.all_real_student_enrollments.select(:user_id)
     topic_ids_with_entries = DiscussionEntry.active.where(discussion_topic_id: topics).
-      where(:user_id => student_ids).uniq.pluck(:discussion_topic_id)
+      where(:user_id => student_ids).distinct.pluck(:discussion_topic_id)
     topic_ids_with_entries += DiscussionTopic.where("root_topic_id IS NOT NULL").
-      where(:id => topic_ids_with_entries).uniq.pluck(:root_topic_id)
+      where(:id => topic_ids_with_entries).distinct.pluck(:root_topic_id)
 
     topics.each do |topic|
       if topic.assignment_id

@@ -100,7 +100,7 @@ module Api::V1::Outcome
     #
     # Assumption:  All of the outcome links have the same context.
     #
-    opts[:assessed_outcomes] = LearningOutcomeResult.uniq.where(
+    opts[:assessed_outcomes] = LearningOutcomeResult.distinct.where(
       context_type: outcome_links.first.context_type,
       context_id: outcome_links.map(&:context_id),
       learning_outcome_id: outcome_links.map(&:content_id)

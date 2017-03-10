@@ -423,7 +423,7 @@ class ApplicationController < ActionController::Base
 
   def check_pending_otp
     if session[:pending_otp] && params[:controller] != 'login/otp'
-      return render text: "Please finish logging in", status: 403 if request.xhr?
+      return render plain: "Please finish logging in", status: 403 if request.xhr?
 
       reset_session
       redirect_to login_url
@@ -508,7 +508,7 @@ class ApplicationController < ActionController::Base
       # to a web browser - but you've lost your cookies! This breaks not only store_location,
       # but in the case of delegated authentication where the provider does an additional
       # redirect storing important information in session, makes it impossible to log in at all
-      render text: '', status: 200
+      render plain: '', status: 200
       return false
     end
     true
@@ -544,7 +544,7 @@ class ApplicationController < ActionController::Base
       }
       format.zip { redirect_to(url_for(path_params)) }
       format.json { render_json_unauthorized }
-      format.all { render text: 'Unauthorized', status: :unauthorized }
+      format.all { render plain: 'Unauthorized', status: :unauthorized }
     end
     set_no_cache_headers
   end

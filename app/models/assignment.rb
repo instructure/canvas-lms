@@ -1691,7 +1691,7 @@ class Assignment < ActiveRecord::Base
     @visible_students_for_speed_grader[[user.global_id, includes]] ||= (
       student_scope = user ? context.students_visible_to(user, include: includes) : context.participating_students
       students_with_visibility(student_scope)
-    ).order_by_sortable_name.uniq.to_a
+    ).order_by_sortable_name.distinct.to_a
   end
 
   def visible_rubric_assessments_for(user, opts={})
@@ -2257,7 +2257,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.assignment_ids_with_submissions(assignment_ids)
-    Submission.having_submission.where(:assignment_id => assignment_ids).uniq.pluck(:assignment_id)
+    Submission.having_submission.where(:assignment_id => assignment_ids).distinct.pluck(:assignment_id)
   end
 
   # override so validations are called

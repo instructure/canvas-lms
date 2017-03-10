@@ -1130,7 +1130,7 @@ class CoursesController < ApplicationController
         js_bundle :course_blueprint_settings
 
         @page_title = join_title(t('Blueprint Settings'), @context.name)
-        render text: '', layout: true
+        render html: '', layout: true
       else
        render status: 404, template: 'shared/errors/404_message'
       end
