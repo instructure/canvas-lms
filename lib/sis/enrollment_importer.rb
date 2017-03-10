@@ -89,29 +89,8 @@ module SIS
         @success_count = 0
       end
 
-      # This method signature is deprecated:
-      # add_enrollment(course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id=nil, root_account_id=nil, role_id=nil)
-      # Pass a single instance of SIS::Models::Enrollment instead
-      def add_enrollment(*enrollment_data)
-        if enrollment_data.length == 1
-          enrollment = enrollment_data.first
-        else
-          enrollment = SIS::Models::Enrollment.new(
-              {
-                  course_id: enrollment_data[0],
-                  section_id: enrollment_data[1],
-                  user_id: enrollment_data[2],
-                  role: enrollment_data[3],
-                  status: enrollment_data[4],
-                  start_date: enrollment_data[5],
-                  end_date: enrollment_data[6],
-                  associated_user_id: enrollment_data[7],
-                  root_account_id: enrollment_data[8],
-                  role_id: enrollment_data[9]
-              }
-          )
-        end
-
+      # Pass a single instance of SIS::Models::Enrollment
+      def add_enrollment(enrollment)
         raise ImportError, "No course_id or section_id given for an enrollment" unless enrollment.valid_context?
         raise ImportError, "No user_id given for an enrollment" unless enrollment.valid_user?
         raise ImportError, "Improper status \"#{enrollment.status}\" for an enrollment" unless enrollment.valid_status?
