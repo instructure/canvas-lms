@@ -1,5 +1,3 @@
-require 'lib/brandable_css'
-
 namespace :brand_configs do
   desc "Write _brand_variable.scss to disk so canvas_css can render stylesheets for that branding. " +
        "Set BRAND_CONFIG_MD5=<whatever> to save just that one, otherwise writes a file for each BrandConfig in db."
