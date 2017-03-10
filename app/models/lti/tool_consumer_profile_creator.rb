@@ -33,7 +33,7 @@ module Lti
       @tcp_url = tcp_url
       @root_account = context.root_account
       uri = URI.parse(@tcp_url)
-      @domain = (uri.port == "80" || uri.port == "443") ? uri.host : "#{uri.host}:#{uri.port}"
+      @domain = (uri.port == 80 || uri.port == 443) ? uri.host : "#{uri.host}:#{uri.port}"
       @scheme = uri.scheme
     end
 

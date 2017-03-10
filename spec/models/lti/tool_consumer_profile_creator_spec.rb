@@ -14,6 +14,8 @@ module Lti
     let(:account) { mock('account', id: 3, root_account: root_account) }
     let(:tcp_url) { "http://example.instructure.com/tcp/#{ToolConsumerProfile::DEFAULT_TCP_UUID}" }
     let(:tcp_creator) { ToolConsumerProfileCreator.new(account, tcp_url) }
+    let(:tcp_url_ssl) { "https://example.instructure.com/tcp/#{ToolConsumerProfile::DEFAULT_TCP_UUID}" }
+    let(:tcp_creator_ssl) { ToolConsumerProfileCreator.new(account, tcp_url_ssl) }
 
     describe '#create' do
 
@@ -85,25 +87,37 @@ module Lti
         expect(reg_srv).to be_nil
       end
 
+      it 'excludes port from service endpoint if uri port is 80' do
+        profile = tcp_creator.create
+        reg_srv = profile.service_offered.find { |srv| srv.id.include? 'ToolProxy.collection' }
+        expect(reg_srv.endpoint).to include 'example.instructure.com/api/lti'
+      end
+
+      it 'excludes port from service endpoint if uri port is 443' do
+        profile = tcp_creator_ssl.create
+        reg_srv = profile.service_offered.find { |srv| srv.id.include? 'ToolProxy.collection' }
+        expect(reg_srv.endpoint).to include 'example.instructure.com/api/lti'
+      end
+
       describe '#capabilities' do
         it 'add the basic_launch capability' do
-          expect(tcp_creator.create.capability_offered).to include('basic-lti-launch-request')
+          expect(tcp_creator.create.capability_offered).to include 'basic-lti-launch-request'
         end
 
         it 'adds the Canvas.api.domain capability' do
-          expect(tcp_creator.create.capability_offered).to include('Canvas.api.domain')
+          expect(tcp_creator.create.capability_offered).to include 'Canvas.api.domain'
         end
 
         it 'adds the LtiLink.custom.url capability' do
-          expect(tcp_creator.create.capability_offered).to include('LtiLink.custom.url')
+          expect(tcp_creator.create.capability_offered).to include 'LtiLink.custom.url'
         end
 
         it 'adds the ToolProxyBinding.custom.url capability' do
-          expect(tcp_creator.create.capability_offered).to include('ToolProxyBinding.custom.url')
+          expect(tcp_creator.create.capability_offered).to include 'ToolProxyBinding.custom.url'
         end
 
         it 'adds the ToolProxy.custom.url capability' do
-          expect(tcp_creator.create.capability_offered).to include('ToolProxy.custom.url')
+          expect(tcp_creator.create.capability_offered).to include 'ToolProxy.custom.url'
         end
 
         it 'adds the Canvas.placements.accountNavigation capability' do
