@@ -18,6 +18,8 @@ module CC::Exporter::WebZip
     attr_accessor :file_data
 
     ASSIGNMENT_TYPES = ['Assignment', 'Quizzes::Quiz', 'DiscussionTopic'].freeze
+    CONTENT_TYPES = [*ASSIGNMENT_TYPES, 'WikiPage'].freeze
+    CONTENT_TOKENS = [CC::CCHelper::OBJECT_TOKEN, CC::CCHelper::COURSE_TOKEN, CC::CCHelper::WIKI_TOKEN].freeze
 
     def force_timezone(time)
       time&.in_time_zone(user.time_zone)&.iso8601
@@ -25,7 +27,11 @@ module CC::Exporter::WebZip
 
     def convert_html_to_local(html)
       exported_html = @html_converter.html_content(html)
-      exported_html&.gsub(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN), @files_path_prefix)
+      exported_html&.gsub!(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN), 'viewer/files')
+      CONTENT_TOKENS.each do |token|
+        exported_html&.gsub!("#{CGI.escape(token)}/", '')
+      end
+      exported_html
     end
 
     def add_files
@@ -109,6 +115,7 @@ module CC::Exporter::WebZip
           prereqs: mod.prerequisites.map{|pre| pre[:id]},
           requirement: requirement_type(mod),
           sequential: mod.require_sequential_progress || false,
+          exportId: CC::CCHelper.create_key(mod),
           items: parse_module_item_data(mod)
         }
       end
@@ -152,6 +159,16 @@ module CC::Exporter::WebZip
       item_hash[:requiredPoints] = score if score
       item_hash[:completed] = item_completed?(item)
       item_hash[:content] = parse_content(item) unless item_hash[:locked]
+      item_hash[:exportId] = find_export_id(item) if CONTENT_TYPES.include?(item.content_type)
+    end
+
+    def find_export_id(item)
+      case item.content_type
+      when 'Assignment', 'DiscussionTopic', 'Quizzes::Quiz'
+        CC::CCHelper.create_key(item.content&.asset_string)
+      when 'WikiPage'
+        item.content&.url
+      end
     end
 
     def add_assignment_details(item, item_hash)
@@ -196,7 +213,7 @@ module CC::Exporter::WebZip
         item.url
       when 'Attachment'
         path = file_path(item)
-        "#{@files_path_prefix}#{path}#{item.content&.filename}"
+        "viewer/files#{path}#{item.content&.filename}"
       end
     end
 

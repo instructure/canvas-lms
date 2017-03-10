@@ -18,7 +18,8 @@ describe "ZipPackage" do
       zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
       module_data = zip_package.parse_module_data
       expect(module_data).to eq [{id: @module.id, name: 'first_module', status: 'completed',
-        unlockDate: nil, prereqs: [], requirement: nil, sequential: false, items: []}]
+        unlockDate: nil, prereqs: [], requirement: nil, sequential: false,
+        exportId: CC::CCHelper.create_key(@module), items: []}]
     end
 
     it "should show modules locked by prerequisites with status of locked" do
@@ -330,6 +331,18 @@ describe "ZipPackage" do
       expect(module_item_data[:requiredPoints]).to eq 7
     end
 
+    it "should parse export id for assignments, quizzes, discussions and wiki pages" do
+      assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10)
+      @module.content_tags.create!(content: assign, context: @course)
+      wiki = @course.wiki_pages.create!(title: 'Wiki Page 1', url: 'wiki-page-1', wiki: @course.wiki)
+      @module.content_tags.create!(content: wiki, context: @course)
+
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module)
+      expect(module_item_data[0][:exportId]).to eq CC::CCHelper.create_key(assign)
+      expect(module_item_data[1][:exportId]).to eq 'wiki-page-1'
+    end
+
     it "should parse content for assignments and quizzes" do
       assign = @course.assignments.create!(title: 'Assignment 1', description: '<p>Assignment</p>')
       @module.content_tags.create!(content: assign, context: @course)
@@ -379,8 +392,7 @@ describe "ZipPackage" do
 
       zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
       file_data = zip_package.parse_module_item_data(@module).first
-      filename_prefix = zip_package.instance_variable_get(:@filename_prefix)
-      expect(file_data[:content]).to eq "#{filename_prefix}/viewer/files/file1.jpg"
+      expect(file_data[:content]).to eq "viewer/files/file1.jpg"
     end
 
     it "should not export item content for items in locked modules" do
@@ -446,13 +458,22 @@ describe "ZipPackage" do
       @zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, 'key')
     end
 
-    it "should export html links as local content links" do
-      filename_prefix = @zip_package.instance_variable_get(:@filename_prefix)
+    it "should export html file links as local file links" do
       attachment_model(context: @course, display_name: 'file1.jpg', filename: 'file1.jpg')
       html = %(<a href="/courses/#{@course.id}/files/#{@attachment.id}/download") +
              %( data-api-returntype="File">file1.jpg</a>)
-      expected_html = %(<a href="#{filename_prefix}/viewer/files/file1.jpg?canvas_download=1") +
+      expected_html = %(<a href="viewer/files/file1.jpg?canvas_download=1") +
                       %( data-api-returntype="File">file1.jpg</a>)
+      converted_html = @zip_package.convert_html_to_local(html)
+      expect(converted_html).to eq expected_html
+    end
+
+    it "should export html content links as local content links" do
+      assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: '<p>Hi</p>')
+      html = %(<a title="Assignment 1" href="/courses/#{@course.id}/assignments/#{assign.id}") +
+             %( data-api-returntype="Assignment">Assignment 1</a>)
+      expected_html = %(<a title="Assignment 1" href="assignments/#{CC::CCHelper.create_key(assign)}") +
+                    %( data-api-returntype="Assignment">Assignment 1</a>)
       converted_html = @zip_package.convert_html_to_local(html)
       expect(converted_html).to eq expected_html
     end
