@@ -44,6 +44,9 @@ class GradebookExporter
       grading_period = GradingPeriod.for(@course).find_by(id: @options[:grading_period_id])
     end
 
+    # TODO: Stop using the grade calculator and instead use the scores table. This cannot be done until
+    # we start storing total scores that include muted assignments on the scores table, which will be
+    # implemented as part of CNVS-27558.
     calc = GradeCalculator.new(student_enrollments.map(&:user_id), @course,
                                ignore_muted: false,
                                grading_period: grading_period)

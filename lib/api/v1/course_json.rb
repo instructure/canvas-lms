@@ -88,8 +88,10 @@ module Api::V1
 
     def extract_enrollments(enrollments)
       return unless enrollments
-      current_period_scores = grading_period_scores_hash(enrollments)
-      enrollments.map { |e| enrollment_hash(e, current_period_scores) }
+      if include_total_scores?
+        ActiveRecord::Associations::Preloader.new.preload(enrollments, :scores)
+      end
+      enrollments.map { |e| enrollment_hash(e) }
     end
 
     INCLUDE_CHECKERS.each do |key, val|
@@ -99,19 +101,16 @@ module Api::V1
     end
 
     def include_total_scores?
-      @includes.include?(:total_scores) && !@course.hide_final_grades?
+      return @include_total_scores unless @include_total_scores.nil?
+      @include_total_scores = @includes.include?(:total_scores) && !@course.hide_final_grades?
     end
 
     private
 
-    def enrollment_hash(enrollment, grading_period_scores)
+    def enrollment_hash(enrollment)
       enrollment_hash = default_enrollment_attributes(enrollment)
       enrollment_hash[:associated_user_id] = enrollment.associated_user_id if enrollment.assigned_observer?
-
-      if include_total_scores? && enrollment.student?
-        enrollment_hash.merge!(total_scores(enrollment))
-        enrollment_hash.merge!(grading_period_scores[enrollment.id]) if include_current_grading_period_scores?
-      end
+      enrollment_hash.merge!(total_scores(enrollment)) if include_total_scores? && enrollment.student?
       enrollment_hash
     end
 
@@ -126,83 +125,54 @@ module Api::V1
     end
 
     def total_scores(student_enrollment)
-      {
+      scores = {
         :computed_current_score => student_enrollment.computed_current_score,
         :computed_final_score => student_enrollment.computed_final_score,
         :computed_current_grade => student_enrollment.computed_current_grade,
         :computed_final_grade => student_enrollment.computed_final_grade
       }
-    end
-
-    def grading_period_scores(student_enrollments)
-      current_period = @course.grading_periods? && GradingPeriod.current_period_for(@course)
-      if current_period
-        calculated_grading_period_scores(
-          student_enrollments,
-          current_period,
-          @course.display_totals_for_all_grading_periods?
-        )
-      else
-        nil_grading_period_scores(student_enrollments, false, false)
-      end
-    end
-
-    def grading_period_scores_hash(enrollments)
-      include_current_grading_period_scores? ? grading_period_scores(enrollments.select(&:student?)) : {}
-    end
-
-    def calculated_grading_period_scores(student_enrollments, current_period, totals_for_all_grading_periods_option)
-      calculator = GradeCalculator.new(
-        student_enrollments.map(&:user_id), @course, grading_period: current_period
-      )
-      current_period_scores = mgp_scores_from_calculator(calculator)
-      scores = {}
-      student_enrollments.each_with_index do |enrollment, index|
-        scores[enrollment.id] = current_period_scores[index].merge({
-          has_grading_periods: true,
-          multiple_grading_periods_enabled: true, # for backwards compatibility
-          totals_for_all_grading_periods_option: totals_for_all_grading_periods_option,
-          current_grading_period_title: current_period.title,
-          current_grading_period_id: current_period.id
-        })
+      if include_current_grading_period_scores?
+        scores.merge!(current_grading_period_scores(student_enrollment))
       end
       scores
     end
 
-
-    def nil_grading_period_scores(student_enrollments, has_grading_periods, totals_for_all_grading_periods_option)
-      scores = {}
-      student_enrollments.each do |enrollment|
-        scores[enrollment.id] = {
-          has_grading_periods: has_grading_periods,
-          multiple_grading_periods_enabled: has_grading_periods, # for backwards compatibility
-          totals_for_all_grading_periods_option: totals_for_all_grading_periods_option,
-          current_grading_period_title: nil,
-          current_grading_period_id: nil,
-          current_period_computed_current_score: nil,
-          current_period_computed_final_score: nil,
-          current_period_computed_current_grade: nil,
-          current_period_computed_final_grade: nil
-        }
-      end
-      scores
+    def current_grading_period_scores(student_enrollment)
+      {
+        has_grading_periods: @course.grading_periods?,
+        multiple_grading_periods_enabled: @course.grading_periods?, # for backwards compatibility
+        totals_for_all_grading_periods_option: @course.display_totals_for_all_grading_periods?,
+        current_grading_period_title: current_grading_period&.title,
+        current_grading_period_id: current_grading_period&.id,
+        current_period_computed_current_score: grading_period_score(student_enrollment, :current),
+        current_period_computed_final_score: grading_period_score(student_enrollment, :final),
+        current_period_computed_current_grade: grading_period_grade(student_enrollment, :current),
+        current_period_computed_final_grade: grading_period_grade(student_enrollment, :final)
+      }
     end
 
-    def mgp_scores_from_calculator(grade_calculator)
-      grade_calculator.compute_scores.map do |scores|
-        current_score = scores[:current][:grade]
-        final_score = scores[:final][:grade]
-        {
-          current_period_computed_current_score: current_score,
-          current_period_computed_final_score: final_score,
-          current_period_computed_current_grade: @course.score_to_grade(current_score),
-          current_period_computed_final_grade: @course.score_to_grade(final_score)
-        }
-      end
+    def grading_period_score(enrollment, current_or_final)
+      grading_period_score_or_grade(enrollment, current_or_final, :score)
+    end
+
+    def grading_period_grade(enrollment, current_or_final)
+      grading_period_score_or_grade(enrollment, current_or_final, :grade)
+    end
+
+    def grading_period_score_or_grade(enrollment, current_or_final, score_or_grade)
+      return nil unless current_grading_period
+      enrollment.send("computed_#{current_or_final}_#{score_or_grade}", grading_period_id: current_grading_period.id)
+    end
+
+    def current_grading_period
+      return @current_grading_period if defined?(@current_grading_period)
+      @current_grading_period = GradingPeriod.current_period_for(@course)
     end
 
     def include_current_grading_period_scores?
-      include_total_scores? && @includes.include?(:current_grading_period_scores)
+      return @include_current_grading_period_scores unless @include_current_grading_period_scores.nil?
+      @include_current_grading_period_scores =
+        include_total_scores? && @includes.include?(:current_grading_period_scores)
     end
   end
 end
