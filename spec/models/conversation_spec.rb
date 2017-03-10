@@ -108,7 +108,7 @@ describe Conversation do
   context "adding participants" do
     it "should not add participants to private conversations" do
       root_convo = Conversation.initiate([sender, recipient], true)
-      expect{ root_convo.add_participants(sender, [user_factory]) }.to raise_error
+      expect{ root_convo.add_participants(sender, [user_factory]) }.to raise_error("can't add participants to a private conversation")
     end
 
     it "should add new participants to group conversations and give them all messages" do

@@ -207,7 +207,7 @@ describe Account do
     end
 
     it "should allow settings services" do
-      expect {@a.enable_service(:completly_bogs)}.to raise_error
+      expect {@a.enable_service(:completly_bogs)}.to raise_error("Invalid Service")
 
       @a.disable_service(:twitter)
       expect(@a.service_enabled?(:twitter)).to be_falsey

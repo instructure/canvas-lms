@@ -85,7 +85,7 @@ describe Quizzes::QuizRegrader::Answer do
       question_regrade = stub(:quiz_question  => question,
                               :regrade_option => "be_a_jerk")
 
-      expect { Quizzes::QuizRegrader::Answer.new(answer, question_regrade) }.to raise_error
+      expect { Quizzes::QuizRegrader::Answer.new(answer, question_regrade) }.to raise_error("Regrade option not valid!")
     end
 
     it 'does not raise an error if question has recognized regrade_option' do

@@ -386,7 +386,7 @@ describe Assignment do
 
     it 'returns an exception for an unknown grading type' do
       set_type_and_save.call("totally_fake_grading")
-      expect{@assignment.grade_to_score("3")}.to raise_error
+      expect{@assignment.grade_to_score("3")}.to raise_error("oops, we need to interpret a new grading_type. get coding.")
     end
 
     context 'with a pass/fail assignment' do

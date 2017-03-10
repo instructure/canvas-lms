@@ -472,7 +472,7 @@ describe ApplicationHelper do
 
     it "should raise an error when a dialog with conflicting content is added" do
       hidden_dialog('dialog_id') { 'content' }
-      expect { hidden_dialog('dialog_id') { 'different content' } }.to raise_error
+      expect { hidden_dialog('dialog_id') { 'different content' } }.to raise_error("Attempted to capture a hidden dialog with dialog_id and different content!")
     end
 
     it "should only render a dialog once when it has been added multiple times" do

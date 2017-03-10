@@ -329,6 +329,8 @@ module Helpers
   end
 end
 
+RSpec::Expectations.configuration.on_potential_false_positives = :raise
+
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false

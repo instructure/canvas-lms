@@ -4,7 +4,7 @@ require 'return_view'
 describe ReturnView do
   context "with no type" do
     it "raises an exception" do
-      expect { ReturnView.new nil }.to raise_error
+      expect { ReturnView.new nil }.to raise_error("@return type required")
     end
   end
 

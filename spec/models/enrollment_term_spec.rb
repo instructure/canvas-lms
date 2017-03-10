@@ -141,7 +141,7 @@ describe EnrollmentTerm do
     end
 
     it "should not be able to delete a default term" do
-      expect { @account.default_enrollment_term.destroy }.to raise_error
+      expect { @account.default_enrollment_term.destroy }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it "should not be able to delete an enrollment term with active courses" do
@@ -150,7 +150,7 @@ describe EnrollmentTerm do
       @course.enrollment_term = @term
       @course.save!
 
-      expect { @term.destroy }.to raise_error
+      expect { @term.destroy }.to raise_error(ActiveRecord::RecordInvalid)
 
       @course.destroy
       @term.destroy

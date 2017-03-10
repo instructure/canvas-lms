@@ -950,7 +950,7 @@ describe "API Authentication", type: :request do
       expect(response).to be_success
       raw_json = response.body
       expect(raw_json).to match(%r{^while\(1\);})
-      expect { JSON.parse(raw_json) }.to raise_error
+      expect { JSON.parse(raw_json) }.to raise_error(JSON::ParserError)
       json = JSON.parse(raw_json.sub(%r{^while\(1\);}, ''))
       expect(json['id']).to eq @user.id
     end

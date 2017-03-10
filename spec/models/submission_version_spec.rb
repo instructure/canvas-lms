@@ -82,7 +82,7 @@ describe SubmissionVersion do
       it "should error on invalid yaml by default" do
         expect{
           SubmissionVersion.index_versions([@version])
-        }.to raise_error
+        }.to raise_error(Psych::SyntaxError)
       end
 
       it "should allow ignoring invalid yaml errors" do

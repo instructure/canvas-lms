@@ -310,7 +310,7 @@ describe ConversationParticipant do
 
       c.move_to_user @user2
 
-      expect{ c.reload }.to raise_error # deleted
+      expect{ c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
       rconvo.reload
       expect(rconvo.participants.size).to eql 3
@@ -347,8 +347,8 @@ describe ConversationParticipant do
 
       c.reload.move_to_user @user2
 
-      expect{ c.reload }.to raise_error # deleted
-      expect{ Conversation.find(c.conversation_id) }.to raise_error # deleted
+      expect{ c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
+      expect{ Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
       expect(c2.reload.messages.size).to eql 2
       expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
@@ -370,7 +370,7 @@ describe ConversationParticipant do
 
       c.reload.move_to_user @user2
 
-      expect{ c.reload }.to raise_error # deleted
+      expect{ c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
       rconvo.reload
       expect(rconvo.participants.size).to eql 1
       expect(rconvo.private_hash).not_to eql old_hash
@@ -388,8 +388,8 @@ describe ConversationParticipant do
 
       c.reload.move_to_user @user2
 
-      expect{ c.reload }.to raise_error # deleted
-      expect{ Conversation.find(c.conversation_id) }.to raise_error # deleted
+      expect{ c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
+      expect{ Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
       expect(c2.reload.messages.size).to eql 2
       expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
@@ -409,8 +409,8 @@ describe ConversationParticipant do
 
       c.reload.move_to_user @user2
 
-      expect{ c.reload }.to raise_error # deleted
-      expect{ Conversation.find(c.conversation_id) }.to raise_error # deleted
+      expect{ c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
+      expect{ Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
       expect(c2.reload.messages.size).to eql 2
       expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
@@ -434,8 +434,8 @@ describe ConversationParticipant do
         c.move_to_user @user2
       end
 
-      expect{ c.reload }.to raise_error # deleted
-      expect{ Conversation.find(c.conversation_id) }.to raise_error # deleted
+      expect{ c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
+      expect{ Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
       expect(c2.reload.messages.size).to eql 2
       expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
