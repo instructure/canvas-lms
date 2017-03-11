@@ -25,9 +25,9 @@ services:
       RAILS_ENV: development
       ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
 
-  guard:
+  webpack:
     <<: *BASE
-    command: bundle exec guard -i
+    command: yarn run webpack
 
   web:
     <<: *BASE
