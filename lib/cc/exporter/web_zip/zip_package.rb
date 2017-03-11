@@ -3,6 +3,10 @@ module CC::Exporter::WebZip
 
     def initialize(exporter, course, user, progress_key)
       @files = exporter.unsupported_files + exporter.cartridge_json[:files]
+      @pages = exporter.cartridge_json[:pages]
+      @assignments = exporter.cartridge_json[:assignments]
+      @topics = exporter.cartridge_json[:topics]
+      @quizzes = exporter.cartridge_json[:quizzes]
       @filename_prefix = exporter.filename_prefix
       @viewer_path_prefix = @filename_prefix + '/viewer'
       @files_path_prefix = @viewer_path_prefix + '/files'
@@ -68,7 +72,11 @@ module CC::Exporter::WebZip
         lastDownload: force_timezone(last_web_export_time),
         title: course.name,
         files: create_tree_data,
-        modules: parse_module_data
+        modules: parse_module_data,
+        pages: parse_non_module_items(:wiki_pages),
+        assignments: parse_non_module_items(:assignments),
+        discussion_topics: parse_non_module_items(:discussion_topics),
+        quizzes: parse_non_module_items(:quizzes)
       }
 
       f.write("window.COURSE_DATA = #{data.to_json}")
@@ -152,12 +160,13 @@ module CC::Exporter::WebZip
     end
 
     def parse_module_item_details(item, item_hash)
-      add_assignment_details(item, item_hash) if ASSIGNMENT_TYPES.include?(item.content_type)
+      add_assignment_details(item.content, item_hash) if ASSIGNMENT_TYPES.include?(item.content_type)
       requirement, score = parse_requirement(item)
       item_hash[:requirement] = requirement
       item_hash[:requiredPoints] = score if score
       item_hash[:completed] = item_completed?(item)
-      item_hash[:content] = parse_content(item) unless item_hash[:locked]
+      item_hash[:content] = parse_content(item.content) unless item_hash[:locked] || item.content_type == 'ExternalUrl'
+      item_hash[:content] = item.url if !item_hash[:locked] && item.content_type == 'ExternalUrl'
       item_hash[:exportId] = find_export_id(item) if CONTENT_TYPES.include?(item.content_type)
     end
 
@@ -170,24 +179,22 @@ module CC::Exporter::WebZip
       end
     end
 
-    def add_assignment_details(item, item_hash)
-      case item.content_type
-      when 'Assignment'
-        assignment = item.content
-        item_hash[:submissionTypes] = assignment.readable_submission_types
-        item_hash[:graded] = assignment.grading_type != 'not_graded'
-      when 'Quizzes::Quiz'
-        assignment = item.content
-        item_hash[:questionCount] = assignment.question_count
-        item_hash[:timeLimit] = assignment.time_limit
-        item_hash[:attempts] = assignment.allowed_attempts
-        item_hash[:graded] = assignment.quiz_type != 'survey'
-      when 'DiscussionTopic'
-        assignment = item.content&.assignment
-        item_hash[:graded] = assignment.present?
+    def add_assignment_details(item_content, item_hash)
+      case item_content
+      when Assignment
+        item_hash[:submissionTypes] = item_content.readable_submission_types
+        item_hash[:graded] = item_content.grading_type != 'not_graded'
+      when Quizzes::Quiz
+        item_hash[:questionCount] = item_content.question_count
+        item_hash[:timeLimit] = item_content.time_limit
+        item_hash[:attempts] = item_content.allowed_attempts
+        item_hash[:graded] = item_content.quiz_type != 'survey'
+      when DiscussionTopic
+        item_content = item_content.assignment
+        item_hash[:graded] = item_content.present?
       end
-      return unless assignment
-      assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, user, skip_clone: true)
+      return unless item_content
+      assignment = AssignmentOverrideApplicator.assignment_overridden_for(item_content, user, skip_clone: true)
       item_hash[:pointsPossible] = assignment&.points_possible if item_hash[:graded]
       item_hash[:dueAt] = force_timezone(assignment&.due_at)
       item_hash[:lockAt] = force_timezone(assignment&.lock_at)
@@ -202,24 +209,41 @@ module CC::Exporter::WebZip
       [reqs_for_item[:type], reqs_for_item[:min_score]]
     end
 
-    def parse_content(item)
-      case item.content_type
-      when 'Assignment', 'Quizzes::Quiz'
-        convert_html_to_local(item.content&.description)
-      when 'DiscussionTopic'
-        convert_html_to_local(item.content&.message)
-      when 'WikiPage'
-        convert_html_to_local(item.content&.body)
-      when 'ExternalUrl'
-        item.url
-      when 'Attachment'
-        path = file_path(item)
-        "viewer/files#{path}#{item.content&.display_name}"
+    def parse_content(item_content)
+      case item_content
+      when Assignment, Quizzes::Quiz
+        convert_html_to_local(item_content&.description)
+      when DiscussionTopic
+        convert_html_to_local(item_content&.message)
+      when WikiPage
+        convert_html_to_local(item_content&.body)
+      when Attachment
+        path = file_path(item_content)
+        "viewer/files#{path}#{item_content&.display_name}"
       end
     end
 
-    def file_path(item)
-      folder = item.content&.folder&.full_name || ''
+    def parse_non_module_items(type)
+      list = {wiki_pages: @pages, assignments: @assignments, discussion_topics: @topics, quizzes: @quizzes}[type]
+      canvas_items = {}
+      course.send(type).each do |item|
+        tag = (type == :wiki_pages ? item.url : CC::CCHelper.create_key(item))
+        canvas_items[tag] = item
+      end
+      list.map do |export_item|
+        item = canvas_items[export_item[:identifier]]
+        item_hash = {
+          exportId: export_item[:identifier],
+          title: export_item[:title],
+          content: parse_content(item) || export_item[:text]
+        }
+        add_assignment_details(item, item_hash) unless type == :wiki_pages
+        item_hash
+      end
+    end
+
+    def file_path(item_content)
+      folder = item_content&.folder&.full_name || ''
       local_folder = folder.sub(/\/?course files\/?/, '')
       local_folder.length > 0 ? "/#{local_folder}/" : '/'
     end
