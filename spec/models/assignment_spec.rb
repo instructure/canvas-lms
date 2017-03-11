@@ -4125,6 +4125,28 @@ describe Assignment do
     end
   end
 
+  describe "#ensure_post_to_sis_valid" do
+    let(:assignment) { assignment_model(course: @course, post_to_sis: true) }
+
+    it "sets post_to_sis to false if the assignment is not_graded" do
+      assignment.submission_types = 'not_graded'
+      assignment.save!
+
+      expect(assignment.post_to_sis).to eq false
+    end
+
+    it "sets post_to_sis to false if the assignment is a wiki_page" do
+      assignment.submission_types = 'wiki_page'
+      assignment.save!
+
+      expect(assignment.post_to_sis).to eq false
+    end
+
+    it "does not set post_to_sis to false for other assignments" do
+      expect(assignment.post_to_sis).to eq true
+    end
+  end
+
   describe "max_name_length" do
     let(:assignment) do
       @course.assignments.new(assignment_valid_attributes)

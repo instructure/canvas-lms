@@ -277,7 +277,8 @@ class Assignment < ActiveRecord::Base
     write_attribute(:allowed_extensions, new_value)
   end
 
-  before_save :infer_grading_type,
+  before_save :ensure_post_to_sis_valid,
+              :infer_grading_type,
               :process_if_quiz,
               :default_values,
               :update_submissions_if_details_changed,
@@ -494,6 +495,12 @@ class Assignment < ActiveRecord::Base
       return false, nil
     end
   end
+
+  def ensure_post_to_sis_valid
+    self.post_to_sis = false unless gradeable?
+    true
+  end
+  private :ensure_post_to_sis_valid
 
   def default_values
     raise "Assignments can only be assigned to Course records" if self.context_type && self.context_type != "Course"
