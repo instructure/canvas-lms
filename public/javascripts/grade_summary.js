@@ -215,6 +215,7 @@ define([
     var submission = _.find(ENV.submissions, function (s) {
       return ('' + s.assignment_id) === ('' + assignmentId);
     });
+
     if (submission) {
       submission.score = score;
     } else {
@@ -302,7 +303,7 @@ define([
             return;
           }
 
-          // Store the original score so that we can restore it after "What-If" calculations
+          // Store the original score so that it can be restored when the "What-If" score is reverted.
           if (!$(this).find('.grade').data('originalValue')) {
             $(this).find('.grade').data('originalValue', $(this).find('.grade').html());
           }
@@ -313,7 +314,8 @@ define([
           $(this).find('.score_value').hide();
           $ariaAnnouncer.text(I18n.t('Enter a What-If score.'));
 
-          // Get the current shown score (possibly a "What-If" score) and use it as the default value in the text entry field
+          // Get the current shown score (possibly a "What-If" score)
+          // and use it as the default value in the text entry field
           var val = $(this).parents('.student_assignment').find('.what_if_score').text();
           $('#grade_entry').val(parseFloat(val) || '0')
             .show()
@@ -340,11 +342,11 @@ define([
         }
       });
 
-      $('#grades_summary .student_assignment').bind('score_change', function (event, options) {
+      $('#grades_summary .student_assignment').bind('score_change', function (_event, options) {
         var $assignment = $(this);
         var originalScore = $assignment.find('.original_score').text();
         var originalVal = parseFloat(originalScore);
-        var val = parseFloat($assignment.find('#grade_entry').val() || $(this).find('.what_if_score').text());
+        var val = parseFloat($assignment.find('#grade_entry').val() || $assignment.find('.what_if_score').text());
         var isChanged;
         var shouldUpdate = options.update;
 
@@ -356,12 +358,17 @@ define([
         if (val == parseInt(val, 10)) { // eslint-disable-line eqeqeq
           val += '.0';
         }
+
+        // Update '.what_if_score' with the parsed value from '#grade_entry'
         $assignment.find('.what_if_score').text(val);
+
         if ($assignment.hasClass('dont_update')) {
           shouldUpdate = false;
           $assignment.removeClass('dont_update');
         }
+
         var assignmentId = $assignment.getTemplateData({ textValues: ['assignment_id'] }).assignment_id;
+
         if (shouldUpdate) {
           var url = $.replaceTags($('.update_submission_url').attr('href'), 'assignment_id', assignmentId);
           if (!isChanged) { val = null; }
@@ -374,7 +381,9 @@ define([
           );
           if (!isChanged) { val = originalVal; }
         }
+
         $('#grade_entry').hide().appendTo($('body'));
+
         if (isChanged) {
           $assignment.find('.assignment_score').attr('title', '')
             .find('.score_teaser').text(I18n.t('This is a What-If score')).end()
@@ -410,7 +419,7 @@ define([
           addWhatIfAssignment(assignmentId);
         }
 
-        updateScoreForAssignment(assignmentId, val);
+        GradeSummary.updateScoreForAssignment(assignmentId, val);
         updateStudentGrades();
       });
 
@@ -421,16 +430,19 @@ define([
 
       $('#grades_summary').delegate('.revert_score_link', 'click', function (event, options) {
         var opts = _.defaults(options || {}, { refocus: true, skipEval: false });
-        event.preventDefault();
-        event.stopPropagation();
         var $assignment = $(this).parents('.student_assignment');
         var val = $assignment.find('.original_score').text();
         var tooltip;
+
+        event.preventDefault();
+        event.stopPropagation();
+
         if ($assignment.data('muted')) {
           tooltip = I18n.t('Instructor is working on grades');
         } else {
           tooltip = I18n.t('Click to test a different score');
         }
+
         $assignment.find('.what_if_score').text(val);
         $assignment.find('.assignment_score').attr('title', I18n.t('Click to test a different score'))
           .find('.score_teaser').text(tooltip).end()
@@ -439,6 +451,7 @@ define([
         $assignment.find('.score_value').text(val);
 
         if (isNaN(parseFloat(val))) { val = null; }
+
         if ($assignment.data('muted')) {
           $assignment.find('.grade').html('<img alt="Muted" class="muted_icon" src="/images/sound_mute.png?1318436336">')
         } else {
@@ -447,7 +460,7 @@ define([
 
         var assignmentId = $assignment.getTemplateValue('assignment_id');
         removeWhatIfAssignment(assignmentId);
-        updateScoreForAssignment(assignmentId, val);
+        GradeSummary.updateScoreForAssignment(assignmentId, val);
         if (!opts.skipEval) {
           updateStudentGrades();
         }
@@ -475,7 +488,7 @@ define([
             var $assignment = $(this).parents('.student_assignment');
             $assignment.find('.what_if_score').text(val);
             $assignment.find('.score_value').hide();
-            $assignment.triggerHandler('score_change', { update: false, focus: false });
+            $assignment.triggerHandler('score_change', { update: false, refocus: false });
           }
         });
         $('.show_guess_grades').hide();
@@ -552,7 +565,8 @@ define([
     calculateGrades: calculateGrades,
     calculateTotals: calculateTotals,
     calculatePercentGrade: calculatePercentGrade,
-    formatPercentGrade: formatPercentGrade
+    formatPercentGrade: formatPercentGrade,
+    updateScoreForAssignment: updateScoreForAssignment
   });
 
   return GradeSummary;

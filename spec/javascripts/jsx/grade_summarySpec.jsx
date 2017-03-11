@@ -19,13 +19,13 @@
 define([
   'lodash',
   'jquery',
-  'helpers/fakeENV',
   'i18n!gradebook',
+  'helpers/fakeENV',
   'spec/jsx/gradebook/GradeCalculatorSpecHelper',
   'jsx/gradebook/CourseGradeCalculator',
   'grade_summary'
 ], (
-  _, $, fakeENV, I18n, GradeCalculatorSpecHelper, CourseGradeCalculator,
+  _, $, I18n, fakeENV, GradeCalculatorSpecHelper, CourseGradeCalculator,
   grade_summary // eslint-disable-line camelcase
 ) => {
   const $fixtures = $('#fixtures');
@@ -69,15 +69,31 @@ define([
         </div>
         <button id="show_all_details_button">Show All Details</button>
         <span id="aria-announcer"></span>
-        <table class="grades_summary">
-          <tr>
-            <td class="assignment_score">
-              <span class="grade"></span>
-              <span class="score_teaser"></span>
+        <table id="grades_summary" class="editable">
+          <tr class="student_assignment editable">
+            <td class="assignment_score" title="Click to test a different score">
+              <div class="score_holder">
+                <span class="tooltip">
+                  <span class="tooltip_wrap">
+                    <span class="tooltip_text score_teaser">Click to test a different score</span>
+                  </span>
+                  <span class="grade">
+                    <span class="screenreader-only">Click to test a different score</span>
+                  </span>
+                  <span class="score_value">A</span>
+                </span>
+                <span>
+                  <span class="what_if_score"></span>
+                  <span class="assignment_id">201</span>
+                  <span class="student_entered_score"></span>
+                </span>
+              </div>
             </td>
           </tr>
         </table>
-        <span id="aria-announcer"></span>
+        <input type="text" id="grade_entry" style="display: none;" />
+        <a id="revert_score_template" class="revert_score_link" >Revert Score</i></a>
+        <a href="/assignments/{{ assignment_id }}" class="update_submission_url">&nbsp;</a>
       </div>
     `);
   }
@@ -87,8 +103,18 @@ define([
     $fixtures.html('');
   }
 
+  function fullPageSetup () {
+    fakeENV.setup();
+    setPageHtmlFixture();
+    ENV.submissions = createSubmissions();
+    ENV.assignment_groups = createAssignmentGroups();
+    ENV.group_weighting_scheme = 'points';
+    grade_summary.setup();
+  }
+
   function commonTeardown () {
     fakeENV.teardown();
+    $fixtures.html('');
   }
 
   QUnit.module('grade_summary.getGradingPeriodSet', {
@@ -376,5 +402,200 @@ define([
   test('returns null when grading_period_id is not present in the url', function () {
     const url = 'example.com/course/1/grades';
     deepEqual(grade_summary.getGradingPeriodIdFromUrl(url), null);
+  });
+
+  QUnit.module('grade_summary - Editing a "What-If" Score', {
+    setup () {
+      fullPageSetup();
+      $fixtures.find('.assignment_score .grade').first().append('5');
+    },
+
+    onEditWhatIfScore () {
+      const $assignmentScore = $fixtures.find('.assignment_score').first();
+      $assignmentScore.trigger('click');
+    },
+
+    teardown () {
+      commonTeardown();
+    }
+  });
+
+  test('stores the original score when editing the the first time', function () {
+    const $grade = $fixtures.find('.assignment_score .grade').first();
+    const expectedHtml = $grade.html();
+    this.onEditWhatIfScore();
+    equal($grade.data('originalValue'), expectedHtml);
+  });
+
+  test('does not store the score when the original score is already stored', function () {
+    const $grade = $fixtures.find('.assignment_score .grade').first();
+    $grade.data('originalValue', '10');
+    this.onEditWhatIfScore();
+    equal($grade.data('originalValue'), '10');
+  });
+
+  test('attaches a screenreader-only element to the grade element as data', function () {
+    this.onEditWhatIfScore();
+    const $grade = $fixtures.find('.assignment_score .grade').first();
+    ok($grade.data('screenreader_link'), '"screenreader_link" is assigned as data');
+    ok($grade.data('screenreader_link').hasClass('screenreader-only'), '"screenreader_link" is screenreader-only');
+  });
+
+  test('hides the score value', function () {
+    this.onEditWhatIfScore();
+    const $scoreValue = $fixtures.find('.assignment_score .score_value').first();
+    ok($scoreValue.is(':hidden'), '.score_value is hidden');
+  });
+
+  test('replaces the grade element content with a grade entry field', function () {
+    this.onEditWhatIfScore();
+    const $gradeEntry = $fixtures.find('.assignment_score .grade > #grade_entry');
+    equal($gradeEntry.length, 1, '#grade_entry is attached to the .grade element');
+  });
+
+  test('sets the value of the grade entry to the existing "What-If" score', function () {
+    $fixtures.find('.assignment_score').first().find('.what_if_score').text('15');
+    this.onEditWhatIfScore();
+    const $gradeEntry = $fixtures.find('#grade_entry').first();
+    equal($gradeEntry.val(), '15', 'the previous "What-If" score is 15');
+  });
+
+  test('defaults the value of the grade entry to "0" when no score is present', function () {
+    this.onEditWhatIfScore();
+    const $gradeEntry = $fixtures.find('#grade_entry').first();
+    equal($gradeEntry.val(), '0', 'there is no previous "What-If" score');
+  });
+
+  test('shows the grade entry', function () {
+    this.onEditWhatIfScore();
+    const $gradeEntry = $fixtures.find('#grade_entry').first();
+    ok($gradeEntry.is(':visible'), '#grade_entry does not have "visibility: none"');
+  });
+
+  test('sets focus on the grade entry', function () {
+    this.onEditWhatIfScore();
+    const $gradeEntry = $fixtures.find('#grade_entry').first();
+    equal($gradeEntry.get(0), document.activeElement, '#grade_entry is the active element');
+  });
+
+  test('selects the grade entry', function () {
+    this.onEditWhatIfScore();
+    const $gradeEntry = $fixtures.find('#grade_entry').get(0);
+    equal($gradeEntry.selectionStart, 0, 'selection starts at beginning of score text');
+    equal($gradeEntry.selectionEnd, 1, 'selection ends at end of score text');
+  });
+
+  test('announces message for entering a "What-If" score', function () {
+    this.onEditWhatIfScore();
+    equal($('#aria-announcer').text(), 'Enter a What-If score.');
+  });
+
+  QUnit.module('grade_summary.onScoreChange', {
+    setup () {
+      fullPageSetup();
+      this.stub($, 'ajaxJSON');
+      this.$assignment = $fixtures.find('#grades_summary .student_assignment').first();
+      // reproduce the destructive part of .onEditWhatIfScore
+      this.$assignment.find('.assignment_score').find('.grade').empty().append($('#grade_entry'));
+    },
+
+    onScoreChange (score, options = {}) {
+      this.$assignment.find('#grade_entry').val(score);
+      this.$assignment.triggerHandler('score_change', { update: false, refocus: false, ...options });
+    },
+
+    teardown () {
+      commonTeardown();
+    }
+  });
+
+  test('updates .what_if_score with the parsed value from #grade_entry', function () {
+    this.onScoreChange('5');
+    equal(this.$assignment.find('.what_if_score').text(), '5.0');
+  });
+
+  test('removes the .dont_update class from the .student_assignment element when present', function () {
+    this.$assignment.addClass('dont_update');
+    this.onScoreChange('5');
+    notOk(this.$assignment.hasClass('dont_update'));
+  });
+
+  test('saves the "What-If" grade using the api', function () {
+    this.onScoreChange('5', { update: true });
+    equal($.ajaxJSON.callCount, 1, '$.ajaxJSON was called once');
+    const [url, method, params] = $.ajaxJSON.getCall(0).args;
+    equal(url, '/assignments/201', 'constructs the url from elements in the DOM');
+    equal(method, 'PUT', 'uses PUT for updates');
+    equal(params['submission[student_entered_score]'], 5);
+  });
+
+  test('updates the .student_entered_score element upon success api update', function () {
+    $.ajaxJSON.callsFake((_url, _method, args, onSuccess) => {
+      onSuccess({ submission: { student_entered_score: args['submission[student_entered_score]'] } });
+    });
+    this.onScoreChange('5', { update: true });
+    equal(this.$assignment.find('.student_entered_score').text(), '5.0');
+  });
+
+  test('does not save the "What-If" grade when .dont_update class is present', function () {
+    this.$assignment.addClass('dont_update');
+    this.onScoreChange('5', { update: true });
+    equal($.ajaxJSON.callCount, 0, '$.ajaxJSON was not called');
+  });
+
+  test('does not save the "What-If" grade when the "update" option is false', function () {
+    this.onScoreChange('5', { update: false });
+    equal($.ajaxJSON.callCount, 0, '$.ajaxJSON was not called');
+  });
+
+  test('hides the #grade_entry input', function () {
+    this.onScoreChange('5');
+    ok($('#grade_entry').is(':hidden'));
+  });
+
+  test('moves the #grade_entry to the body', function () {
+    this.onScoreChange('5');
+    ok($('#grade_entry').parent().is('body'));
+  });
+
+  test('sets the .assignment_score title to ""', function () {
+    this.onScoreChange('5');
+    equal(this.$assignment.find('.assignment_score').attr('title'), '');
+  });
+
+  test('sets the .assignment_score teaser text', function () {
+    this.onScoreChange('5');
+    equal(this.$assignment.find('.score_teaser').text(), 'This is a What-If score');
+  });
+
+  test('copies the "revert score" link into the .score_holder element', function () {
+    this.onScoreChange('5');
+    equal(this.$assignment.find('.score_holder .revert_score_link').length, 1, 'includes a "revert score" link');
+    equal(this.$assignment.find('.score_holder .revert_score_link').text(), 'Revert Score');
+  });
+
+  test('adds the "changed" class to the .grade element', function () {
+    this.onScoreChange('5');
+    ok(this.$assignment.find('.grade').hasClass('changed'));
+  });
+
+  test('sets the .grade element content to the updated score', function () {
+    this.onScoreChange('5');
+    equal(this.$assignment.find('.grade').html(), '5.0');
+  });
+
+  test('sets the .grade element content to the previous score when the updated score is falsy', function () {
+    this.$assignment.find('.grade').data('originalValue', '10.0');
+    this.onScoreChange('');
+    equal(this.$assignment.find('.grade').html(), '10.0');
+  });
+
+  test('updates the score for the given assignment', function () {
+    this.stub(grade_summary, 'updateScoreForAssignment');
+    this.onScoreChange('5');
+    equal(grade_summary.updateScoreForAssignment.callCount, 1);
+    const [assignmentId, score] = grade_summary.updateScoreForAssignment.getCall(0).args;
+    equal(assignmentId, '201', 'the assignment id is 201');
+    equal(score, 5, 'the parsed score is used to update the assignment score');
   });
 });
