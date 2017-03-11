@@ -3,7 +3,7 @@ define [
   'compiled/jquery.rails_flash_notifications'
 ], ($) ->
   fixtures = null
-  module 'FlashNotifications',
+  QUnit.module 'FlashNotifications',
     setup: ->
       fixtures = document.getElementById("fixtures")
       flashHtml = "<div id='flash_message_holder'/><div id='flash_screenreader_holder'/>"

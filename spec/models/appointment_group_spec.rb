@@ -567,4 +567,40 @@ describe AppointmentGroup do
       expect(ag).not_to be_all_appointments_filled
     end
   end
+
+  context "users_with_reservations_through_group" do
+    before :once do
+      course_with_teacher(:active_all => true)
+      @teacher = @user
+
+      @users = []
+      section = @course.course_sections.create!
+      2.times do
+        enrollment = student_in_course(:active_all => true)
+        @enrollment.course_section = section
+        @enrollment.save!
+        @users << @user
+      end
+      @not_group_enrollment = student_in_course(:active_all => true)
+      @not_group_enrollment.course_section = section
+      @not_group_enrollment.save!
+      @not_group_user = @user
+      @group1 = group(:name => "group1", :group_context => @course)
+      @group1.participating_users << @users
+      @group1.save!
+      @gc = @group1.group_category
+      @ag = AppointmentGroup.create!(:title => "test", :contexts => [@course],
+                                     :participants_per_appointment => 2,
+                                     :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+    end
+
+    it "returns the ids of any users who are in groups that have made appointments" do
+      @ag.appointment_group_sub_contexts.create! :sub_context => @gc, :sub_context_code => @gc.asset_string
+      @ag.appointments.first.reserve_for(@group1, @users.first)
+      expect(@ag.users_with_reservations_through_group).to include @users[0].id
+      expect(@ag.users_with_reservations_through_group).to include @users[1].id
+      expect(@ag.users_with_reservations_through_group).not_to include @not_group_user.id
+    end
+  end
+
 end

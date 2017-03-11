@@ -25,7 +25,11 @@ class AppointmentGroup < ActiveRecord::Base
   # has_many :through on the same table does not alias columns in condition
   # strings, just hashes. we create this helper association to ensure
   # appointments_participants conditions have the correct table alias
-  has_many :_appointments, -> { order(:start_at).preload(:child_events).where("_appointments_appointments_participants_join.workflow_state <> 'deleted'") }, opts
+  if CANVAS_RAILS4_2
+    has_many :_appointments, -> { order(:start_at).preload(:child_events).where("_appointments_appointments_participants_join.workflow_state <> 'deleted'") }, opts
+  else
+    has_many :_appointments, -> { order(:start_at).preload(:child_events).where("_appointments_appointments_participants.workflow_state <> 'deleted'") }, opts
+  end
   has_many :appointments_participants, -> { where("calendar_events.workflow_state <> 'deleted'").order(:start_at) }, through: :_appointments, source: :child_events
   has_many :appointment_group_contexts
   has_many :appointment_group_sub_contexts, -> { preload(:sub_context) }
@@ -484,4 +488,14 @@ class AppointmentGroup < ActiveRecord::Base
   def context_codes
     appointment_group_contexts.map(&:context_code)
   end
+
+  def users_with_reservations_through_group
+    appointments_participants
+      .joins("INNER JOIN #{GroupMembership.quoted_table_name} " \
+             "ON group_memberships.group_id = calendar_events.context_id " \
+             "and calendar_events.context_type = 'Group'")
+      .where("group_memberships.workflow_state <> 'deleted'")
+      .pluck("group_memberships.user_id")
+  end
+
 end

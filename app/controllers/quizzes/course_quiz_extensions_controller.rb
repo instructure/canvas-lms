@@ -59,7 +59,7 @@
 #     }
 class Quizzes::CourseQuizExtensionsController < ApplicationController
 
-  before_filter :require_user, :require_context
+  before_action :require_user, :require_context
 
   # @API Set extensions for student quiz submissions
   # @beta

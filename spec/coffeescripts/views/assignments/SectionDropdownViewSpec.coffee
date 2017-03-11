@@ -4,7 +4,7 @@ define [
   'compiled/models/Section'
 ], ( SectionDropdownView, AssignmentOverride, Section ) ->
 
-  module "SectionDropdownView",
+  QUnit.module "SectionDropdownView",
     setup: ->
       @override = new AssignmentOverride( course_section_id: '1' )
       @sections = [

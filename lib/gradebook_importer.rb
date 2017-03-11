@@ -75,8 +75,9 @@ class GradebookImporter
 
   def parse!
     # preload a ton of data that presumably we'll be querying
+    @context.preload_user_roles!
     @all_assignments = @context.assignments
-      .preload(:context)
+      .preload({ context: :account })
       .published
       .gradeable
       .select(ASSIGNMENT_PRELOADED_FIELDS)
@@ -116,8 +117,11 @@ class GradebookImporter
     periods = GradingPeriod.for(@context)
     # preload is_admin to avoid N+1
     is_admin = @context.account_membership_allows(@user)
+    # Preload effective due dates to avoid N+1s
+    effective_due_dates = EffectiveDueDates.for_course(@context, @all_assignments.values)
 
     @original_submissions = @context.submissions
+      .preload(assignment: { context: :account })
       .select(['submissions.id', :assignment_id, :user_id, :score, :excused, :cached_due_date, 'submissions.updated_at'])
       .where(assignment_id: assignment_ids, user_id: user_ids)
       .map do |submission|
@@ -154,7 +158,8 @@ class GradebookImporter
           new_submission = Submission.new
           new_submission.user = student
           new_submission.assignment = assignment
-          new_submission.cache_due_date
+          new_submission.cached_due_date =
+            effective_due_dates.find_effective_due_date(student.id, assignment.id).fetch(:due_at, nil)
           submission['gradeable'] = gradeable?(
             submission: new_submission,
             periods: periods,

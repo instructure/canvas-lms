@@ -20,6 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'assignment_changed' do
+  include MessagesCommon
+
   before :once do
     assignment_model(:title => "Quiz 1")
   end

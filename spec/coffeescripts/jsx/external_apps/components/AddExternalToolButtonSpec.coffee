@@ -26,7 +26,7 @@ define [
       configurationForm: component.refs.configurationForm?.getDOMNode()
     }
 
-  module 'ExternalApps.AddExternalToolButton',
+  QUnit.module 'ExternalApps.AddExternalToolButton',
     setup: ->
       wrapper = document.getElementById('fixtures')
       wrapper.innerHTML = ''

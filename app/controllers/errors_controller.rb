@@ -64,8 +64,8 @@
 class ErrorsController < ApplicationController
   PER_PAGE = 20
 
-  before_filter :require_view_error_reports, except: [:create]
-  skip_before_filter :verify_authenticity_token, only: [:create]
+  before_action :require_view_error_reports, except: [:create]
+  skip_before_action :verify_authenticity_token, only: [:create]
 
   def require_view_error_reports
     require_site_admin_with_permission(:view_error_reports)

@@ -29,7 +29,7 @@ define [
     modalNode = component.refs.modal?.getDOMNode()
     [ component, addToolButtonNode, modalNode ]
 
-  module 'ExternalApps.AddApp',
+  QUnit.module 'ExternalApps.AddApp',
     setup: ->
       @app = {
         "config_options": []

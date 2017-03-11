@@ -2,7 +2,7 @@ define [
   'compiled/gradebook/GradebookHelpers'
   'jsx/gradebook/shared/constants'
 ], (GradebookHelpers, GradebookConstants) ->
-  module "GradebookHelpers#noErrorsOnPage",
+  QUnit.module "GradebookHelpers#noErrorsOnPage",
     setup: ->
       @mockFind = @mock($, "find")
 
@@ -16,7 +16,7 @@ define [
 
     notOk GradebookHelpers.noErrorsOnPage()
 
-  module "GradebookHelpers#textareaIsGreaterThanMaxLength"
+  QUnit.module "GradebookHelpers#textareaIsGreaterThanMaxLength"
 
   test "textareaIsGreaterThanMaxLength is false at exactly the max allowed length", ->
     notOk GradebookHelpers.textareaIsGreaterThanMaxLength(GradebookConstants.MAX_NOTE_LENGTH)
@@ -24,7 +24,7 @@ define [
   test "textareaIsGreaterThanMaxLength is true at greater than the max allowed length", ->
     ok GradebookHelpers.textareaIsGreaterThanMaxLength(GradebookConstants.MAX_NOTE_LENGTH + 1)
 
-  module "GradebookHelpers#maxLengthErrorShouldBeShown",
+  QUnit.module "GradebookHelpers#maxLengthErrorShouldBeShown",
     setup: ->
       @mockFind = @mock($, "find")
 

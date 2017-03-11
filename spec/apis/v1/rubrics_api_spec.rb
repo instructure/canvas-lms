@@ -84,156 +84,297 @@ describe "Rubrics API", type: :request do
     hash
   end
 
-  def rubrics_api_call
+  def rubrics_api_call(context, params={}, type='course')
     api_call(
-      :get, "/api/v1/courses/#{@course.id}/rubrics",
-      controller: 'rubrics_api',
-      action: 'index',
-      course_id: @course.id.to_s,
-      format: 'json'
+      :get, "/api/v1/#{type}s/#{context.id}/rubrics", {
+        controller: 'rubrics_api',
+        action: 'index',
+        format: 'json',
+        "#{type}_id": context.id.to_s
+      }.merge(params)
     )
   end
 
-  def rubric_api_call(params={})
+  def rubric_api_call(context, params={}, type='course')
     api_call(
-      :get, "/api/v1/courses/#{@course.id}/rubrics/#{@rubric.id}",
-      controller: 'rubrics_api',
-      action: 'show',
-      course_id: @course.id.to_s,
-      id: @rubric.id.to_s,
-      format: 'json',
-      include: params[:include],
-      style: params[:style]
+      :get, "/api/v1/#{type}s/#{context.id}/rubrics/#{@rubric.id}", {
+        controller: 'rubrics_api',
+        action: 'show',
+        id: @rubric.id.to_s,
+        format: 'json',
+        "#{type}_id": context.id.to_s
+      }.merge(params)
     )
   end
 
-  def raw_rubric_call(params={})
-    raw_api_call(:get, "/api/v1/courses/#{@course.id}/rubrics/#{@rubric.id}",
-      { controller: 'rubrics_api',
+  def raw_rubric_call(context, params={}, type='course')
+    raw_api_call(
+      :get, "/api/v1/#{type}s/#{context.id}/rubrics/#{@rubric.id}", {
+        controller: 'rubrics_api',
         action: 'show',
         format: 'json',
-        course_id: @course.id.to_s,
         id: @rubric.id.to_s,
-        include: params[:include],
-        style: params[:style]
-      }
+        "#{type}_id": context.id.to_s
+      }.merge(params)
     )
   end
 
-  describe "index action" do
-    before :once do
-      course_with_teacher active_all: true
-      create_rubric(@course)
-    end
+  def paginate_call(context, type)
+    @user = account_admin_user
+    7.times { create_rubric(context) }
+    json = rubrics_api_call(context, {:per_page => '3'}, type)
 
-    it "returns an array of all rubrics in an account" do
-      create_rubric(@account)
-      response = rubrics_api_call
-      expect(response[0].keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
-      expect(response.length).to eq 1
-    end
+    expect(json.length).to eq 3
+    links = response.headers['Link'].split(",")
+    expect(links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/rubrics/ }).to be_truthy
+    expect(links.find{ |l| l.match(/rel="next"/)}).to match /page=2/
+    expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1/
+    expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3/
 
-    it "returns an array of all rubrics in a course" do
-      create_rubric(@course)
-      response = rubrics_api_call
-      expect(response[0].keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
-      expect(response.length).to eq 2
-    end
+    # get the last page
+    json = rubrics_api_call(context, {:per_page => '3', :page => '3'}, type)
 
-    it "requires the user to have permission to manage rubrics" do
-      @user = @student
-      raw_rubric_call
-
-      assert_status(401)
-    end
-
+    expect(json.length).to eq 2
+    links = response.headers['Link'].split(",")
+    expect(links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/rubrics/ }).to be_truthy
+    expect(links.find{ |l| l.match(/rel="prev"/)}).to match /page=2/
+    expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1/
+    expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3/
   end
 
-  describe "show action" do
-    before :once do
-      course_with_teacher active_all: true
-      create_rubric(@course)
-    end
-
-    it "returns a rubric" do
-      response = rubric_api_call
-      expect(response.keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
-    end
-
-    it "requires the user to have permission to manage rubrics" do
-      @user = @student
-      raw_rubric_call
-
-      assert_status(401)
-    end
-
-
-    context "include parameter" do
+  describe "in a course" do
+    describe "index action" do
       before :once do
-        course_with_student(user: @user, active_all: true)
         course_with_teacher active_all: true
         create_rubric(@course)
-        ['grading', 'peer_review'].each.with_index do |type, index|
-          create_rubric_assessment({type: type, comments: "comment #{index}"})
+      end
+
+      it "returns an array of all rubrics in a course" do
+        create_rubric(@course)
+        response = rubrics_api_call(@course)
+        expect(response[0].keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
+        expect(response.length).to eq 2
+      end
+
+      it "requires the user to have permission to manage rubrics" do
+        @user = @student
+        raw_rubric_call(@course)
+
+        assert_status(401)
+      end
+
+      it "should paginate" do
+        paginate_call(@course, 'course')
+      end
+    end
+
+    describe "show action" do
+      before :once do
+        course_with_teacher active_all: true
+        create_rubric(@course)
+      end
+
+      it "returns a rubric" do
+        response = rubric_api_call(@course)
+        expect(response.keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
+      end
+
+      it "requires the user to have permission to manage rubrics" do
+        @user = @student
+        raw_rubric_call(@course)
+
+        assert_status(401)
+      end
+
+
+      context "include parameter" do
+        before :once do
+          course_with_student(user: @user, active_all: true)
+          course_with_teacher active_all: true
+          create_rubric(@course)
+          ['grading', 'peer_review'].each.with_index do |type, index|
+            create_rubric_assessment({type: type, comments: "comment #{index}"})
+          end
         end
-      end
 
-      it "does not returns rubric assessments by default" do
-        response = rubric_api_call
-        expect(response).not_to have_key "assessmensdts"
-      end
-
-      it "returns rubric assessments when passed 'assessessments'" do
-        response = rubric_api_call({include: "assessments"})
-        expect(response).to have_key "assessments"
-        expect(response["assessments"].length).to eq 2
-      end
-
-      it "returns any rubric assessments used for grading when passed 'graded_assessessments'" do
-        response = rubric_api_call({include: "graded_assessments"})
-        expect(response["assessments"][0]["assessment_type"]).to eq "grading"
-        expect(response["assessments"].length).to eq 1
-      end
-
-      it "returns any peer review assessments when passed 'peer_assessessments'" do
-        response = rubric_api_call({include: "peer_assessments"})
-        expect(response["assessments"][0]["assessment_type"]).to eq "peer_review"
-        expect(response["assessments"].length).to eq 1
-      end
-
-      it "returns an error if passed an invalid argument" do
-        raw_rubric_call({include: "cheez"})
-
-        expect(response).not_to be_success
-        json = JSON.parse response.body
-        expect(json["errors"]["include"].first["message"]).to eq "invalid assessment type requested. Must be one of the following: assessments, graded_assessments, peer_assessments"
-      end
-
-      context "style argument" do
-        it "returns all data when passed 'full'" do
-          response = rubric_api_call({include: "assessments", style: "full"})
-          expect(response["assessments"][0]).to have_key 'data'
+        it "does not return rubric assessments by default" do
+          response = rubric_api_call(@course)
+          expect(response).not_to have_key "assessments"
         end
 
-        it "returns only comments when passed 'comments_only'" do
-          response = rubric_api_call({include: "assessments", style: "comments_only"})
-          expect(response["assessments"][0]).to have_key 'comments'
+        it "returns rubric assessments when passed 'assessments'" do
+          response = rubric_api_call(@course, {include: "assessments"})
+          expect(response).to have_key "assessments"
+          expect(response["assessments"].length).to eq 2
+        end
+
+        it "returns any rubric assessments used for grading when passed 'graded_assessments'" do
+          response = rubric_api_call(@course, {include: "graded_assessments"})
+          expect(response["assessments"][0]["assessment_type"]).to eq "grading"
+          expect(response["assessments"].length).to eq 1
+        end
+
+        it "returns any peer review assessments when passed 'peer_assessments'" do
+          response = rubric_api_call(@course, {include: "peer_assessments"})
+          expect(response["assessments"][0]["assessment_type"]).to eq "peer_review"
+          expect(response["assessments"].length).to eq 1
         end
 
         it "returns an error if passed an invalid argument" do
-          raw_rubric_call({include: "assessments", style: "BigMcLargeHuge"})
+          raw_rubric_call(@course, {include: "cheez"})
 
           expect(response).not_to be_success
           json = JSON.parse response.body
-          expect(json["errors"]["style"].first["message"]).to eq "invalid style requested. Must be one of the following: full, comments_only"
+          expect(json["errors"]["include"].first["message"]).to eq "invalid assessment type requested. Must be one of the following: assessments, graded_assessments, peer_assessments"
         end
 
-        it "returns an error if passed a style parameter without assessments" do
-          raw_rubric_call({style: "full"})
+        context "style argument" do
+          it "returns all data when passed 'full'" do
+            response = rubric_api_call(@course, {include: "assessments", style: "full"})
+            expect(response["assessments"][0]).to have_key 'data'
+          end
+
+          it "returns only comments when passed 'comments_only'" do
+            response = rubric_api_call(@course, {include: "assessments", style: "comments_only"})
+            expect(response["assessments"][0]).to have_key 'comments'
+          end
+
+          it "returns an error if passed an invalid argument" do
+            raw_rubric_call(@course, {include: "assessments", style: "BigMcLargeHuge"})
+
+            expect(response).not_to be_success
+            json = JSON.parse response.body
+            expect(json["errors"]["style"].first["message"]).to eq "invalid style requested. Must be one of the following: full, comments_only"
+          end
+
+          it "returns an error if passed a style parameter without assessments" do
+            raw_rubric_call(@course, {style: "full"})
+
+            expect(response).not_to be_success
+            json = JSON.parse response.body
+            expect(json["errors"]["style"].first["message"]).to eq "invalid parameters. Style parameter passed without requesting assessments"
+          end
+        end
+      end
+    end
+  end
+
+  describe "in an account" do
+    describe "index action" do
+      before :once do
+        @user = account_admin_user
+        create_rubric(@account)
+      end
+
+      it "requires the user to have permission to manage rubrics" do
+        @user = @student
+        raw_rubric_call(@account, {}, 'account')
+
+        assert_status(401)
+      end
+
+      it "should paginate" do
+        paginate_call(@account, 'account')
+      end
+
+      it "returns an array of all rubrics in an account" do
+        create_rubric(@account)
+        response = rubrics_api_call(@account, {}, 'account')
+        expect(response[0].keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
+        expect(response.length).to eq 2
+      end
+    end
+
+    describe "show action" do
+      before :once do
+        @user = account_admin_user
+        create_rubric(@account)
+      end
+
+      it "returns a rubric" do
+        response = rubric_api_call(@account, {}, 'account')
+        expect(response.keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
+      end
+
+      it "requires the user to have permission to manage rubrics" do
+        @user = @student
+        raw_rubric_call(@account, {}, 'account')
+
+        assert_status(401)
+      end
+
+      context "include parameter" do
+        before :once do
+          course_with_student(user: @user, active_all: true)
+          course_with_teacher active_all: true
+          create_rubric(@account)
+          ['grading', 'peer_review'].each.with_index do |type, index|
+            create_rubric_assessment({type: type, comments: "comment #{index}"})
+          end
+          @user = account_admin_user
+        end
+
+        it "does not return rubric assessments by default" do
+          response = rubric_api_call(@account, {}, 'account')
+          expect(response).not_to have_key "assessments"
+        end
+
+        it "returns rubric assessments when passed 'assessments'" do
+          response = rubric_api_call(@account, {include: "assessments"}, 'account')
+          expect(response).to have_key "assessments"
+          expect(response["assessments"].length).to eq 2
+        end
+
+        it "returns any rubric assessments used for grading when passed 'graded_assessments'" do
+          response = rubric_api_call(@account, {include: "graded_assessments"}, 'account')
+          expect(response["assessments"][0]["assessment_type"]).to eq "grading"
+          expect(response["assessments"].length).to eq 1
+        end
+
+        it "returns any peer review assessments when passed 'peer_assessments'" do
+          response = rubric_api_call(@account, {include: "peer_assessments"}, 'account')
+          expect(response["assessments"][0]["assessment_type"]).to eq "peer_review"
+          expect(response["assessments"].length).to eq 1
+        end
+
+        it "returns an error if passed an invalid argument" do
+          raw_rubric_call(@account, {include: "cheez"}, 'account')
 
           expect(response).not_to be_success
           json = JSON.parse response.body
-          expect(json["errors"]["style"].first["message"]).to eq "invalid parameters. Style parameter passed without requesting assessments"
+          expect(json["errors"]["include"].first["message"]).to eq "invalid assessment type requested. Must be one of the following: assessments, graded_assessments, peer_assessments"
+        end
+
+        context "style argument" do
+          before :once do
+            @user = account_admin_user
+          end
+
+          it "returns all data when passed 'full'" do
+            response = rubric_api_call(@account, {include: "assessments", style: "full"}, 'account')
+            expect(response["assessments"][0]).to have_key 'data'
+          end
+
+          it "returns only comments when passed 'comments_only'" do
+            response = rubric_api_call(@account, {include: "assessments", style: "comments_only"}, 'account')
+            expect(response["assessments"][0]).to have_key 'comments'
+          end
+
+          it "returns an error if passed an invalid argument" do
+            raw_rubric_call(@account, {include: "assessments", style: "BigMcLargeHuge"}, 'account')
+
+            expect(response).not_to be_success
+            json = JSON.parse response.body
+            expect(json["errors"]["style"].first["message"]).to eq "invalid style requested. Must be one of the following: full, comments_only"
+          end
+
+          it "returns an error if passed a style parameter without assessments" do
+            raw_rubric_call(@account, {style: "full"}, 'account')
+
+            expect(response).not_to be_success
+            json = JSON.parse response.body
+            expect(json["errors"]["style"].first["message"]).to eq "invalid parameters. Style parameter passed without requesting assessments"
+          end
         end
       end
     end

@@ -25,13 +25,13 @@ class GradebooksController < ApplicationController
   include Api::V1::CustomGradebookColumn
   include Api::V1::Section
 
-  before_filter :require_context
-  before_filter :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary]
+  before_action :require_context
+  before_action :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary]
 
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
 
   add_crumb(proc { t '#crumbs.grades', "Grades" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
-  before_filter { |c| c.active_tab = "grades" }
+  before_action { |c| c.active_tab = "grades" }
 
   MAX_POST_GRADES_TOOLS = 10
 
@@ -346,6 +346,8 @@ class GradebooksController < ApplicationController
       :course_is_concluded => @context.completed?,
       :course_name => @context.name,
       :gradebook_is_editable => @gradebook_is_editable,
+      :context_allows_gradebook_uploads => @context.allows_gradebook_uploads?,
+      :gradebook_import_url => new_course_gradebook_upload_path(@context),
       :setting_update_url => api_v1_course_settings_url(@context),
       :show_total_grade_as_points => @context.settings[:show_total_grade_as_points],
       :publish_to_sis_enabled => @context.allows_grade_publishing_by(@current_user) && @gradebook_is_editable,

@@ -90,5 +90,5 @@ require [
       @currentConferences.remove(conference)
       @concludedConferences.unshift(conference)
 
-  @router = new ConferencesRouter
+  window.router = new ConferencesRouter
   Backbone.history.start()

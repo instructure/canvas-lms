@@ -1,6 +1,6 @@
 define ['compiled/util/secondsToTime'], (secondsToTime) ->
 
-  module "secondsToTime"
+  QUnit.module "secondsToTime"
 
   test "less than one minute", ->
     equal secondsToTime(0), "00:00"

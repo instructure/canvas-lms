@@ -7,9 +7,9 @@ define [
   'jsx/dashboard_card/CourseActivitySummaryStore'
 ], (React, ReactDOM, TestUtils, _, DashboardCardBox, CourseActivitySummaryStore) ->
 
-  module 'DashboardCardBox',
+  QUnit.module 'DashboardCardBox',
     setup: ->
-      @stub(CourseActivitySummaryStore, 'getStateForCourse', -> {})
+      @stub(CourseActivitySummaryStore, 'getStateForCourse').returns({})
       @courseCards = [{
         id: 1,
         shortName: 'Bio 101'

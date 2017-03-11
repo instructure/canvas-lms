@@ -321,7 +321,6 @@ describe "Modules API", type: :request do
                        :course_id => @course.to_param }
         @test_modules = (1..4).map { |x| @course.context_modules.create! :name => "test module #{x}" }
         @test_modules[2..3].each { |m| m.update_attribute(:workflow_state , 'unpublished') }
-        expect(@test_modules.map { |tm| tm.workflow_state }).to eq %w(active active unpublished unpublished)
         @modules_to_update = [@test_modules[1], @test_modules[3]]
 
         @wiki_page = @course.wiki.wiki_pages.create(:title => 'Wiki Page Title')

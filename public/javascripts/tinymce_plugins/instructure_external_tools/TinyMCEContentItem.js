@@ -60,6 +60,9 @@ define(['jquery'], function ($){
     },
 
     link: function (tinyMCEContentItem) {
+      var editorSelection = window.tinyMCE && window.tinyMCE.activeEditor && window.tinyMCE.activeEditor.contentDocument.getSelection();
+      var selectedText = editorSelection && editorSelection.anchorNode && editorSelection.anchorNode.data;
+
       var $linkContainer = $("<div/>"),
         $link = $("<a/>", {
           href: tinyMCEContentItem.url,
@@ -80,7 +83,7 @@ define(['jquery'], function ($){
           alt: tinyMCEContentItem.text
         }))
       } else {
-        $link.text(tinyMCEContentItem.text);
+        $link.text(selectedText || tinyMCEContentItem.text);
       }
 
       return $linkContainer.html();

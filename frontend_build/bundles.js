@@ -24,9 +24,7 @@ appBundles.forEach((entryFilepath) => {
   }
 })
 
-// TODO: Include this from source rather than after the ember app compilation step.
-//      This whole "compiled" folder should eventually go away
-entries.screenreader_gradebook = './public/javascripts/compiled/bundles/screenreader_gradebook.js'
+entries.screenreader_gradebook = './app/jsx/bundles/screenreader_gradebook.js'
 
 pluginBundles.forEach((entryFilepath) => {
   const pluginName = pluginNameRegexp.exec(entryFilepath)[1]

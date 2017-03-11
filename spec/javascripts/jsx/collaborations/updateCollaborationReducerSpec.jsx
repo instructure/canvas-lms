@@ -3,7 +3,7 @@ define([
   'jsx/collaborations/actions/collaborationsActions'
 ], (reducer, actions) => {
 
-  module('updateCollaborationReducer');
+  QUnit.module('updateCollaborationReducer');
 
   let defaultState = reducer(undefined, {});
 

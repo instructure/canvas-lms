@@ -65,6 +65,8 @@ $ic-color-dark:              #2D3B45;
 $ic-color-medium-darker:     #394B58;
 $ic-color-medium:            #73818C;
 @if $use_high_contrast {     $ic-color-medium: #556572; }
+$ic-color-medium-lighter:    #8B969E;
+@if $use_high_contrast {     $ic-color-medium-lighter: #556572; }
 $ic-color-medium-light:      #F5F5F5;
 @if $use_high_contrast {     $ic-color-medium-light: #FFFFFF; }
 $ic-color-light:             #FFFFFF;

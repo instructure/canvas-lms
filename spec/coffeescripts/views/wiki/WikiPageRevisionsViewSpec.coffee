@@ -4,7 +4,7 @@ define [
   'compiled/views/wiki/WikiPageRevisionsView'
 ], ($, WikiPageRevisionsCollection, WikiPageRevisionsView) ->
 
-  module 'WikiPageRevisionsView',
+  QUnit.module 'WikiPageRevisionsView',
     setup: ->
     teardown: ->
       document.getElementById("fixtures").innerHTML = ""
@@ -46,13 +46,13 @@ define [
   test 'toJSON - CAN.FETCH_PREV', ->
     collection = new WikiPageRevisionsCollection
     view = new WikiPageRevisionsView collection: collection
-    @stub(collection, 'canFetch', (arg) -> arg == 'prev')
+    @stub(collection, 'canFetch').callsFake((arg) -> arg == 'prev')
 
     strictEqual view.toJSON().CAN?.FETCH_PREV, true, 'can fetch previous'
 
   test 'toJSON - CAN.FETCH_NEXT', ->
     collection = new WikiPageRevisionsCollection
     view = new WikiPageRevisionsView collection: collection
-    @stub(collection, 'canFetch', (arg) -> arg == 'next')
+    @stub(collection, 'canFetch').callsFake((arg) -> arg == 'next')
 
     strictEqual view.toJSON().CAN?.FETCH_NEXT, true, 'can fetch next'

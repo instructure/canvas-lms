@@ -78,6 +78,7 @@ module Importers
       # options[:skip_replies] = true unless options.importable_entries?
       [:migration_id, :title, :discussion_type, :position, :pinned,
        :require_initial_post, :allow_rating, :only_graders_can_rate, :sort_by_rating].each do |attr|
+        next if options[attr].nil? && item.class.columns_hash[attr.to_s].type == :boolean
         item.send("#{attr}=", options[attr])
       end
 
@@ -88,7 +89,6 @@ module Importers
         item.message = I18n.t('#discussion_topic.empty_message', 'No message')
       end
 
-      item.posted_at       = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:posted_at])
       item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options.delayed_post_at)
       item.lock_at         = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:lock_at])
       item.last_reply_at   = nil if item.new_record?

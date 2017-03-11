@@ -56,8 +56,6 @@ describe "login/canvas/new.html.erb" do
       config.save!
       account.change_password_url = "http://www.instructure.com"
       account.save!
-      expect(account.forgot_password_external_url).
-        to eq(account.change_password_url)
       assigns[:domain_root_account] = account
     end
 

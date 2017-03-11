@@ -4,9 +4,10 @@ define([
   'jsx/account_course_user_search/NewUserModal'
 ], (React, TestUtils, NewUserModal) => {
 
-  module('Account Course User Search NewUserModal View');
+  QUnit.module('Account Course User Search NewUserModal View');
 
   const props = {
+    contentLabel: 'label',
     userList: {
       errors: {}
     }

@@ -4,7 +4,7 @@ define([
 ], (addAriaDescription, fixtures) => {
   var $elem = null
 
-  module("Add aria descriptions", {
+  QUnit.module("Add aria descriptions", {
     setup() {
       $elem = $(
         '<div>' +

@@ -7,7 +7,7 @@ define [
   'jsx/files/ZipFileOptionsForm'
   ], ($, _, React, ReactDOM, TestUtils, ZipFileOptionsForm ) ->
 
-    module "ZipFileOptionsForm"
+    QUnit.module "ZipFileOptionsForm"
 
     test "creates a display message based on fileOptions ", ->
       props = {

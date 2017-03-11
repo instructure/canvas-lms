@@ -4,7 +4,7 @@ define([
   'jsx/course_settings/components/UploadArea',
 ], (React, TestUtils, UploadArea) => {
 
-  module('UploadArea Component');
+  QUnit.module('UploadArea Component');
 
   test('it renders', () => {
     const component = TestUtils.renderIntoDocument(

@@ -20,11 +20,11 @@
             <div class="ag-x-of-x-signed-up">
               {{#ifEqual participant_type "Group"}}
                 {{#t "x_groups_have_signed_up"}}
-                  {{participant_count}} groups have signed up
+                  {{n participant_count}} groups have signed up
                 {{/t}}
               {{else}}
                 {{#t "x_people_have_signed_up"}}
-                  {{participant_count}} people have signed up
+                  {{n participant_count}} people have signed up
                 {{/t}}
               {{/ifEqual}}
               {{#unless published}}(unpublished){{/unless}}

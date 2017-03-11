@@ -1,7 +1,7 @@
 define [
   'compiled/models/Topic'
 ], ( Topic ) ->
-  module "Topic"
+  QUnit.module "Topic"
 
 #  test "#parse should set author on view entries", ->
 #    topic = new Topic

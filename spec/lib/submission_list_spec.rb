@@ -140,32 +140,41 @@ describe SubmissionList do
       end
     end
 
-    it "should be able to loop on submissions" do
-      available_keys = [
-        :assignment_id, :assignment_name, :attachment_id, :attachment_ids,
-        :body, :course_id, :created_at, :current_grade, :current_graded_at,
-        :current_grader, :grade_matches_current_submission, :graded_at,
-        :graded_on, :grader, :grader_id, :group_id, :id, :new_grade,
-        :new_graded_at, :new_grader, :previous_grade, :previous_graded_at,
-        :previous_grader, :process_attempts, :processed, :published_grade,
-        :published_score, :safe_grader_id, :score, :student_entered_score,
-        :student_user_id, :submission_id, :student_name, :submission_type,
-        :updated_at, :url, :user_id, :workflow_state
-      ]
+    context "submissions" do
+      it "should be able to loop on submissions" do
+        available_keys = [
+          :assignment_id, :assignment_name, :attachment_id, :attachment_ids,
+          :body, :course_id, :created_at, :current_grade, :current_graded_at,
+          :current_grader, :grade_matches_current_submission, :graded_at,
+          :graded_on, :grader, :grader_id, :group_id, :id, :new_grade,
+          :new_graded_at, :new_grader, :previous_grade, :previous_graded_at,
+          :previous_grader, :process_attempts, :processed, :published_grade,
+          :published_score, :safe_grader_id, :score, :student_entered_score,
+          :student_user_id, :submission_id, :student_name, :submission_type,
+          :updated_at, :url, :user_id, :workflow_state
+        ]
 
-      SubmissionList.days(@course).each do |day|
-        day.graders.each do |grader|
-          grader.assignments.each do |assignment|
-            assignment.submissions.each do |submission|
-              expect(submission).to be_is_a(OpenStruct)
-              expect(submission.send(:table).keys.size).to eql(available_keys.size)
-              available_keys.each {|k| expect(submission.send(:table).keys).to be_include(k)}
+        SubmissionList.days(@course).each do |day|
+          day.graders.each do |grader|
+            grader.assignments.each do |assignment|
+              assignment.submissions.each do |submission|
+                expect(submission).to be_is_a(OpenStruct)
+                expect(submission.send(:table).keys.size).to eql(available_keys.size)
+                available_keys.each {|k| expect(submission.send(:table).keys).to be_include(k)}
+              end
             end
           end
         end
       end
-    end
 
+      it "sorts submissions alphabetically by student name" do
+        day = SubmissionList.days(@course)[0]
+        submissions = day.graders[0].assignments[0].submissions
+        expect(submissions[0].student_name).to eql('student')
+        expect(submissions[1].student_name).to eql('studeñt')
+        expect(submissions[2].student_name).to eql('studeЖt')
+      end
+    end
   end
 
   context "real data inspection" do
@@ -313,7 +322,7 @@ def interesting_submission_data(opts={})
 
   @grader = user_model({:name => 'some_grader'}.merge(opts[:grader]))
   @grader2 = user_model({:name => 'another_grader'}.merge(opts[:grader]))
-  @student = factory_with_protected_attributes(User, {:name => "some student", :workflow_state => "registered"}.merge(opts[:user]))
+  @student = factory_with_protected_attributes(User, {:name => "studeñt", :workflow_state => "registered"}.merge(opts[:user]))
   @course = factory_with_protected_attributes(Course, {:name => "some course", :workflow_state => "available"}.merge(opts[:course]))
   [@grader, @grader2].each do |grader|
     e = @course.enroll_teacher(grader)
@@ -329,11 +338,11 @@ def interesting_submission_data(opts={})
   @assignment.grade_student(@student, {:grade => 1.5, :grader => @grader}.merge(opts[:submission]))
   @assignment.grade_student(@student, {:grade => 3, :grader => @grader}.merge(opts[:submission]))
   @assignment.grade_student(@student, {:grade => 5, :grader => @grader2}.merge(opts[:submission]))
-  @student = user_model(:name => 'another student')
+  @student = user_model(:name => 'studeЖt')
   @course.enroll_student(@student)
   @assignment.reload
   @assignment.grade_student(@student, {:grade => 8, :grader => @grader}.merge(opts[:submission]))
-  @student = user_model(:name => 'smart student')
+  @student = user_model(:name => 'student')
   @course.enroll_student(@student)
   @assignment.reload
   @assignment.grade_student(@student, {:grade => 10, :grader => @grader}.merge(opts[:submission]))

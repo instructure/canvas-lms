@@ -126,7 +126,7 @@ module SchedulerCommon
 
   def click_appointment_link
     f('.view_calendar_link').click
-    expect(f('.agenda-wrapper.active')).to be_displayed
+    fj('.agenda-wrapper.active:visible')
     wait_for_ajaximations
   end
 

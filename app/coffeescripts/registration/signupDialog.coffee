@@ -65,7 +65,7 @@ define [
           $("input[name='#{htmlEscape data.error.input_name}']").
           next('.error_message').
           text(htmlEscape error_msg)
-          $.screenReaderFlashMessage(error_message)
+          $.screenReaderFlashMessage(error_msg)
 
     $node.dialog
       resizable: false

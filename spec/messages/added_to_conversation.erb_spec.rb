@@ -20,6 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'added_to_conversation' do
+  include MessagesCommon
+
   before :once do
     course_with_teacher
     student1 = student_in_course.user

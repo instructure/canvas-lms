@@ -31,7 +31,7 @@
       <div class="displaying">
         <span class="nobr x_out_of_x">
           <% ot(:out_of_points, "%{points}/%{total} pts", :points => capture { %>
-            <span class="criterion_points" style="<%= hidden if brief %>"><%= assessing ? (assessment_rating ? assessment_rating.points : "") : (criterion ? criterion.points : 5) %></span><% }, :total => capture { %>
+            <span class="criterion_points" style="<%= hidden if brief %>"><%= assessing ? (assessment_rating ? I18n.n(assessment_rating.points) : "") : (criterion ? I18n.n(criterion.points) : I18n.n(5)) %></span><% }, :total => capture { %>
             <span class="criterion_points_possible"><%= criterion ? I18n.n(criterion.points) : I18n.n(5) %></span><% }) %>
         </span>
       </div>

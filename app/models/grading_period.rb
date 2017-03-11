@@ -31,6 +31,7 @@ class GradingPeriod < ActiveRecord::Base
   before_validation :ensure_close_date
 
   after_save :recompute_scores, if: :dates_changed?
+  after_destroy :destroy_grading_period_set, if: :last_remaining_legacy_period?
   after_destroy :destroy_scores
 
   scope :current, -> do
@@ -162,6 +163,14 @@ class GradingPeriod < ActiveRecord::Base
     scores.find_ids_in_ranges do |min_id, max_id|
       scores.where(id: min_id..max_id).update_all(workflow_state: :deleted)
     end
+  end
+
+  def destroy_grading_period_set
+    grading_period_group.destroy
+  end
+
+  def last_remaining_legacy_period?
+    course_group? && grading_period_group.active? && siblings.active.empty?
   end
 
   def skip_not_overlapping_validator?

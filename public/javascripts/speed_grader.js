@@ -356,6 +356,9 @@ define([
         link: $('#mute_link'),
         modal: $('#mute_dialog')
       },
+      unmute: {
+        modal: $('#unmute_dialog')
+      },
       nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
       settings: {
         form: $('#settings_form'),
@@ -399,7 +402,7 @@ define([
           }, this)
         },{
           text: I18n.t('mute_assignment', 'Mute Assignment'),
-          'class': 'btn-primary',
+          class: 'btn-primary btn-mute',
           click: $.proxy(function(){
             this.toggleMute();
             this.elements.mute.modal.dialog('close');
@@ -408,6 +411,26 @@ define([
         modal: true,
         resizable: false,
         title: this.elements.mute.modal.data('title'),
+        width: 400
+      });
+      this.elements.unmute.modal.dialog({
+        autoOpen: false,
+        buttons: [{
+          text: I18n.t('Cancel'),
+          click: $.proxy(function () {
+            this.elements.unmute.modal.dialog('close');
+          }, this)
+        }, {
+          text: I18n.t('Unmute Assignment'),
+          class: 'btn-primary btn-unmute',
+          click: $.proxy(function () {
+            this.toggleMute();
+            this.elements.unmute.modal.dialog('close');
+          }, this)
+        }],
+        modal: true,
+        resizable: false,
+        title: this.elements.unmute.modal.data('title'),
         width: 400
       });
     },
@@ -451,7 +474,11 @@ define([
 
     onMuteClick: function(e){
       e.preventDefault();
-      this.muted ? this.toggleMute() : this.elements.mute.modal.dialog('open');
+      if (this.muted) {
+        this.elements.unmute.modal.dialog('open');
+      } else {
+        this.elements.mute.modal.dialog('open');
+      }
     },
 
     muteUrl: function(){
@@ -811,7 +838,7 @@ define([
     }
   });
 
-  function beforeLeavingSpeedgrader() {
+  function beforeLeavingSpeedgrader(e) {
     // Submit any draft comments that need submitting
     EG.addSubmissionComment(true);
 
@@ -822,20 +849,24 @@ define([
         return (snapshot == student) && student.name;
       })[0];
     })
-      hasPendingQuizSubmissions = (function(){
-        var ret = false;
-        if (userNamesWithPendingQuizSubmission.length){
-          for (var i = 0, max = userNamesWithPendingQuizSubmission.length; i < max; i++){
-            if (userNamesWithPendingQuizSubmission[i] !== false) { ret = true; }
-          }
+
+    var hasPendingQuizSubmissions = (function(){
+      var ret = false;
+      if (userNamesWithPendingQuizSubmission.length){
+        for (var i = 0, max = userNamesWithPendingQuizSubmission.length; i < max; i++){
+          if (userNamesWithPendingQuizSubmission[i] !== false) { ret = true; }
         }
-        return ret;
-      })();
+      }
+      return ret;
+    })();
+
     var hasUnsubmittedComments = $.trim($add_a_comment_textarea.val()) !== "";
     if (hasPendingQuizSubmissions) {
-      return I18n.t('confirms.unsaved_changes', "The following students have unsaved changes to their quiz submissions: \n\n %{users}\nContinue anyway?", {'users': userNamesWithPendingQuizSubmission.join('\n ')});
+      e.returnValue = I18n.t('confirms.unsaved_changes', "The following students have unsaved changes to their quiz submissions: \n\n %{users}\nContinue anyway?", {'users': userNamesWithPendingQuizSubmission.join('\n ')});
+      return e.returnValue;
     } else if (hasUnsubmittedComments) {
-      return I18n.t("If you would like to keep your unsubmitted comments, please save them before navigating away from this page.");
+      e.returnValue = I18n.t("If you would like to keep your unsubmitted comments, please save them before navigating away from this page.");
+      return e.returnValue;
     }
   }
 
@@ -963,7 +994,7 @@ define([
         e.preventDefault();
       });
 
-      window.onbeforeunload = beforeLeavingSpeedgrader;
+      window.addEventListener('beforeunload', beforeLeavingSpeedgrader);
     },
 
     jsonReady: function(){

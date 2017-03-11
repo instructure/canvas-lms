@@ -3,7 +3,7 @@ define [
   'compiled/behaviors/elementToggler'
 ], ($, elementToggler)->
 
-  module 'elementToggler',
+  QUnit.module 'elementToggler',
     teardown: ->
       el?.remove() for el in [@$trigger, @$otherTrigger, @$target, @$target1, @$target2]
       $("#fixtures").empty()

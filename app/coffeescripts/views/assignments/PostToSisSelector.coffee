@@ -22,5 +22,6 @@ define [
 
     toJSON: =>
       postToSIS: @parentModel.postToSIS()
+      postToSISName: @parentModel.postToSISName()
       nested: @nested
       prefix: 'assignment' if @nested

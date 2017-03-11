@@ -17,16 +17,10 @@ Selenium::WebDriver::Firefox::Launcher::SOCKET_LOCK_TIMEOUT = 90
 
 module SeleniumDriverSetup
   CONFIG = ConfigFile.load("selenium") || {}.freeze
-  SECONDS_UNTIL_GIVING_UP = 20
-  MAX_SERVER_START_TIME = 15
-
-  # Number of recent specs to show in failure pages
-  RECENT_SPEC_RUNS_LIMIT = 500
-  # Number of identical failures in a row before we abort this worker
-  RECENT_SPEC_FAILURE_LIMIT = 10
-  # Number of failures to record
-  MAX_FAILURES_TO_RECORD = 20
-  IMPLICIT_WAIT_TIMEOUT = 15
+  SECONDS_UNTIL_GIVING_UP = 10
+  MAX_SERVER_START_TIME = 5
+  IMPLICIT_WAIT_TIMEOUT = 5
+  SCRIPT_TIMEOUT = 5
 
   def driver
     SeleniumDriverSetup.driver
@@ -51,8 +45,6 @@ module SeleniumDriverSetup
     include CustomAlertActions
     extend Forwardable
 
-    attr_writer :number_of_failures,
-                :recent_spec_runs
     attr_accessor :browser_log,
                   :browser_process,
                   :headless,
@@ -120,7 +112,7 @@ module SeleniumDriverSetup
 
       @driver.manage.timeouts.implicit_wait = 0 # nothing should wait by default
       SeleniumExtensions::FinderWaiting.timeout = IMPLICIT_WAIT_TIMEOUT # except finding elements
-      @driver.manage.timeouts.script_timeout = 60
+      @driver.manage.timeouts.script_timeout = SCRIPT_TIMEOUT
 
       puts "Browser: #{browser_name} - #{browser_version}"
 
@@ -171,14 +163,6 @@ module SeleniumDriverSetup
 
     def run_headless?
       ENV.key?("TEST_ENV_NUMBER")
-    end
-
-    def capture_screenshots?
-      ENV["CAPTURE_SCREENSHOTS"]
-    end
-
-    def capture_video?
-      capture_screenshots? && run_headless?
     end
 
     HEADLESS_DEFAULTS = {
@@ -348,145 +332,10 @@ module SeleniumDriverSetup
             .instance_variable_get(:@capabilities)
     end
 
-    def recent_spec_runs
-      @recent_spec_runs ||= []
-    end
-
-    def number_of_failures
-      @number_of_failures ||= 0
-    end
-
-    def note_recent_spec_run(example, exception)
-      recent_spec_runs << {
-        location: example.metadata[:location],
-        exception: exception,
-        pending: example.pending
-      }
-      self.recent_spec_runs = recent_spec_runs.last(RECENT_SPEC_RUNS_LIMIT)
-
-      if ENV["ABORT_ON_CONSISTENT_BADNESS"]
-        recent_errors = recent_spec_runs.last(RECENT_SPEC_FAILURE_LIMIT).
-          map { |run| run[:exception] && run[:exception].to_s }.compact
-        if recent_errors.size >= RECENT_SPEC_FAILURE_LIMIT && recent_errors.uniq.size == 1
-          $stderr.puts "ERROR: got the same failure #{RECENT_SPEC_FAILURE_LIMIT} times in a row, aborting"
-          RSpec.world.wants_to_quit = true
-        end
-      end
-    end
-
-    def error_template
-      @error_template ||= begin
-        layout_path = Rails.root.join("spec/selenium/test_setup/selenium_error.html.erb")
-        ActionView::Template::Handlers::Erubis.new(File.read(layout_path))
-      end
-    end
-
-    def start_capturing_video
-      headless.video.start_capture if capture_video?
-    end
-
     def js_errors
-      js_errors = close_modal_if_present do
+      close_modal_if_present do
         driver.execute_script("return window.JSErrorCollector_errors && window.JSErrorCollector_errors.pump()") || []
       end
-
-      # ignore "mutating the [[Prototype]] of an object" js errors
-      mutating_prototype_error = "mutating the [[Prototype]] of an object"
-      js_errors.reject! do |error|
-        error["errorMessage"].start_with? mutating_prototype_error
-      end
-
-      js_errors
-    end
-
-    def errors_path
-      @errors_path ||= begin
-        errors_path = Rails.root.join("log/seleniumfailures")
-        FileUtils.mkdir_p(errors_path)
-        errors_path
-      end
-    end
-
-    def include_recordings?
-      number_of_failures <= MAX_FAILURES_TO_RECORD
-    end
-
-    def capture_screenshot(base_name)
-      return unless capture_screenshots? && include_recordings?
-
-      screenshot_name = base_name + ".png"
-      driver.save_screenshot(errors_path.join(screenshot_name))
-      screenshot_name
-    end
-
-    def capture_video(base_name)
-      return unless capture_video?
-
-      if include_recordings?
-        screen_capture_name = base_name + ".mp4"
-        headless.video.stop_and_save(errors_path.join(screen_capture_name))
-        screen_capture_name
-      else
-        headless.video.stop_and_discard
-        nil
-      end
-    end
-
-    def prepare_error_data(example, exception, log_messages)
-      self.number_of_failures += 1 if exception
-      summary_name = example.metadata[:location].sub(/\A[.\/]+/, "").gsub(/\//, ":")
-      headless.video.stop_and_discard if capture_video? && !exception
-
-      {
-        meta: example.metadata,
-        summary_name: summary_name,
-        exception: exception,
-        log_messages: log_messages,
-        js_errors: js_errors,
-        screenshot_name: exception && capture_screenshot(summary_name),
-        screen_capture_name: exception && capture_video(summary_name)
-      }
-    end
-
-    def log_spec_errors(data)
-      puts data[:meta][:location]
-
-      # always send js errors to stdout, even if the spec passed. we have to
-      # empty the JSErrorCollector anyway, so we might as well show it.
-      log_js_errors data[:js_errors]
-
-      return unless data[:exception] && (capture_screenshots? || capture_video?)
-
-      if include_recordings?
-        puts "  Screenshot: #{errors_path.join(data[:screenshot_name])}" if capture_screenshots?
-        puts "  Screen capture: #{errors_path.join(data[:screen_capture_name])}" if capture_video?
-      else
-        puts "  Screenshot skipped because we had more than #{MAX_FAILURES_TO_RECORD} failures" if capture_screenshots?
-        puts "  Screen capture skipped because we had more than #{MAX_FAILURES_TO_RECORD} failures" if capture_video?
-      end
-    end
-
-    def log_js_errors(errors)
-      errors.each do |error|
-        puts "  JS Error: #{error['errorMessage']} (#{error['sourceName']}:#{error['lineNumber']})"
-      end
-    end
-
-    def create_spec_error_page(data)
-      log_message_formatter = EscapeCode::HtmlFormatter.new(data[:log_messages].join("\n"))
-
-      # make a nice little html file for jenkins
-      File.open(errors_path.join(data[:summary_name] + ".html"), "w") do |file|
-        output_buffer = nil # Erubis wants this local var
-        file.write error_template.result(binding)
-      end
-    end
-
-    def record_errors(example, exception, log_messages)
-      error_data = prepare_error_data(example, exception, log_messages)
-
-      log_spec_errors error_data if error_data[:exception] || error_data[:js_errors].present?
-      create_spec_error_page error_data if error_data[:exception]
     end
 
     def app_host_and_port
@@ -557,13 +406,17 @@ module SeleniumDriverSetup
 
     def rack_app
       app = spec_safe_rack_app
+      asset_path = %r{\A/(dist|fonts|images|javascripts|optimized|webpack-dist|webpack-dist-optimized)/.*\.[a-z0-9]+\z}
 
       lambda do |env|
-        log_request = env["REQUEST_URI"] !~ %r{/(javascripts|dist)}
+        # make legit asset 404s return more quickly
+        asset_request = env["REQUEST_URI"] =~ asset_path
+        return [404, {}, [""]] if asset_request && !File.exist?("public/#{env["REQUEST_URI"]}")
+
         req = "#{env['REQUEST_METHOD']} #{env['REQUEST_URI']}"
-        Rails.logger.info "STARTING REQUEST #{req}" if log_request
+        Rails.logger.info "STARTING REQUEST #{req}" unless asset_request
         result = app.call(env)
-        Rails.logger.info "FINISHED REQUEST #{req}: #{result[0]}" if log_request
+        Rails.logger.info "FINISHED REQUEST #{req}: #{result[0]}" unless asset_request
         result
       end
     end

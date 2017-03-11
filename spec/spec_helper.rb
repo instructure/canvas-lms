@@ -38,6 +38,7 @@ require 'rspec/rails'
 require 'webmock'
 require 'webmock/rspec/matchers'
 WebMock.allow_net_connect!
+WebMock.enable!
 # unlike webmock/rspec, only reset in groups that actually do stubbing
 module WebMock::API
   include WebMock::Matchers
@@ -52,7 +53,9 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 # and then ensure people aren't creating records outside the rspec
 # lifecycle, e.g. inside a describe/context block rather than a
 # let/before/example
+BlankSlateProtection.truncate_all_tables! unless defined?(TestQueue::Runner::RSpec) # we do this in each runner
 BlankSlateProtection.install!
+GreatExpectations.install!
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 
@@ -119,57 +122,28 @@ end
 # TODO: actually fix the deprecation messages once we're on Rails 4 permanently and remove this
 ActiveSupport::Deprecation.silenced = true
 
+# we use ivars too extensively for factories; prevent them from
+# being propagated to views in view specs
+# yes, I'm overwriting the method in-place, rather than prepend,
+# because the ancestor chain for RSpec::Rails::ViewExampleGroup
+# has already been built, and I can't put myself between the two
+module ActionView::TestCase::Behavior
+  def view_assigns
+    if self.is_a?(RSpec::Rails::HelperExampleGroup)
+      # the original implementation. we can't call super because
+      # we replaced the whole original method
+      return Hash[_user_defined_ivars.map do |ivar|
+        [ivar[1..-1].to_sym, instance_variable_get(ivar)]
+      end]
+    end
+    {}
+  end
+end
+
 module RSpec::Rails
   module ViewExampleGroup
     module ExampleMethods
-      # normally in rspec 2, assigns returns a newly constructed hash
-      # which means that 'assigns[:key] = value' in view specs does nothing
-      def assigns
-        @assigns ||= super
-      end
-
-      alias :view_assigns :assigns
-
       delegate :content_for, :to => :view
-
-      def render_with_helpers(*args)
-        controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
-
-        controller_class.instance_variable_set(:@js_env, nil)
-        # this extends the controller's helper methods to the view
-        # however, these methods are delegated to the test controller
-        view.singleton_class.class_eval do
-          include controller_class._helpers unless included_modules.include?(controller_class._helpers)
-        end
-
-        # so create a "real_controller"
-        # and delegate the helper methods to it
-        @controller.singleton_class.class_eval do
-          attr_accessor :real_controller
-
-          controller_class._helper_methods.each do |helper|
-            class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            def #{helper}(*args, &block)
-              real_controller.send(:#{helper}, *args, &block)
-            end
-            RUBY
-          end
-        end
-
-        real_controller = controller_class.new
-        real_controller.instance_variable_set(:@_request, @controller.request)
-        real_controller.instance_variable_set(:@context, @controller.instance_variable_get(:@context))
-        @controller.real_controller = real_controller
-
-        # just calling "render 'path/to/view'" by default looks for a partial
-        if args.first && args.first.is_a?(String)
-          file = args.shift
-          args = [{:template => file}] + args
-        end
-        render_without_helpers(*args)
-      end
-
-      alias_method_chain :render, :helpers
     end
   end
 
@@ -179,6 +153,46 @@ module RSpec::Rails
     end
   end
 end
+
+module RenderWithHelpers
+  def render(*args)
+    controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
+
+    controller_class.instance_variable_set(:@js_env, nil)
+    # this extends the controller's helper methods to the view
+    # however, these methods are delegated to the test controller
+    view.singleton_class.class_eval do
+      include controller_class._helpers unless included_modules.include?(controller_class._helpers)
+    end
+
+    # so create a "real_controller"
+    # and delegate the helper methods to it
+    @controller.singleton_class.class_eval do
+      attr_accessor :real_controller
+
+      controller_class._helper_methods.each do |helper|
+        class_eval <<-RUBY, __FILE__, __LINE__ + 1
+            def #{helper}(*args, &block)
+              real_controller.send(:#{helper}, *args, &block)
+            end
+        RUBY
+      end
+    end
+
+    real_controller = controller_class.new
+    real_controller.instance_variable_set(:@_request, @controller.request)
+    real_controller.instance_variable_set(:@context, @controller.instance_variable_get(:@context))
+    @controller.real_controller = real_controller
+
+    # just calling "render 'path/to/view'" by default looks for a partial
+    if args.first && args.first.is_a?(String)
+      file = args.shift
+      args = [{:template => file}] + args
+    end
+    super(*args)
+  end
+end
+RSpec::Rails::ViewExampleGroup::ExampleMethods.prepend(RenderWithHelpers)
 
 require 'action_controller_test_process'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
@@ -225,7 +239,7 @@ end
 
 # Be sure to actually test serializing things to non-existent caches,
 # but give Mocks a pass, since they won't exist in dev/prod
-Mocha::Mock.class_eval do
+module MockSerialization
   def marshal_dump
     nil
   end
@@ -240,13 +254,12 @@ Mocha::Mock.class_eval do
     end
   end
 
-  def respond_to_with_marshalling?(symbol, include_private = false)
+  def respond_to?(symbol, include_private = false)
     return true if [:marshal_dump, :marshal_load].include?(symbol)
-    respond_to_without_marshalling?(symbol, include_private)
+    super
   end
-
-  alias_method_chain :respond_to?, :marshalling
 end
+Mocha::Mock.prepend(MockSerialization)
 
 RSpec::Matchers.define :encompass do |expected|
   match do |actual|
@@ -328,19 +341,13 @@ RSpec.configure do |config|
   config.include Helpers
   config.include Factories
   config.include Onceler::BasicHelpers
+  config.project_source_dirs << "gems" # so that failures here are reported properly
 
   config.around(:each) do |example|
-    record_spec_info(example) do
-      Rails.logger.info "STARTING SPEC #{example.full_description}"
-      SpecTimeLimit.enforce(example) do
-        example.run
-      end
+    Rails.logger.info "STARTING SPEC #{example.full_description}"
+    SpecTimeLimit.enforce(example) do
+      example.run
     end
-  end
-
-  # TODO: spec failure pages for everything, not just selenium
-  def record_spec_info(*)
-    yield
   end
 
   def reset_all_the_things!
@@ -396,7 +403,7 @@ RSpec.configure do |config|
   # this in a specific example group if you need to do something fancy/
   # crazy/slow. but you probably don't. seriously. just use once-ler
   def using_transactions_properly?
-    use_transactional_fixtures
+    CANVAS_RAILS4_2 ? use_transactional_fixtures : use_transactional_tests
   end
 
   config.before :suite do
@@ -447,17 +454,19 @@ RSpec.configure do |config|
 
   # flush redis before the first spec, and before each spec that comes after
   # one that used redis
-  class << Canvas
-    attr_accessor :redis_used
-
-    def redis_with_track_usage(*a, &b)
-      self.redis_used = true
-      redis_without_track_usage(*a, &b)
+  module TrackRedisUsage
+    def self.prepended(klass)
+      klass.send(:attr_accessor, :redis_used)
     end
 
-    alias_method_chain :redis, :track_usage
-    Canvas.redis_used = true
+    def redis(*)
+      self.redis_used = true
+      super
+    end
   end
+  Canvas.singleton_class.prepend(TrackRedisUsage)
+  Canvas.redis_used = true
+
   config.before :each do
     if Canvas.redis_enabled? && Canvas.redis_used
       # yes, we really mean to run this dangerous redis command
@@ -557,8 +566,8 @@ RSpec.configure do |config|
 
   def process_csv_data_cleanly(*lines_or_opts)
     importer = process_csv_data(*lines_or_opts)
-    expect(importer.errors).to eq []
-    expect(importer.warnings).to eq []
+    raise "csv errors" if importer.errors.present?
+    raise "csv warning" if importer.warnings.present?
   end
 
   def enable_cache(new_cache=:memory_store)
@@ -711,8 +720,6 @@ RSpec.configure do |config|
         skip "Please put valid S3 credentials in config/amazon_s3.yml"
       end
     end
-    expect(Attachment.s3_storage?).to be true
-    expect(Attachment.local_storage?).to be false
   end
 
   def local_storage!
@@ -723,9 +730,6 @@ RSpec.configure do |config|
       model.stubs(:s3_storage?).returns(false)
       model.stubs(:local_storage?).returns(true)
     end
-
-    expect(Attachment.local_storage?).to be true
-    expect(Attachment.s3_storage?).to be false
   end
 
   def run_job(job)

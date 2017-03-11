@@ -94,8 +94,8 @@
 class Quizzes::QuizAssignmentOverridesController < ApplicationController
   include ::Filters::Quizzes
 
-  before_filter :require_course, only: [ :index ]
-  skip_around_filter :set_locale, only: [ :index ]
+  before_action :require_course, only: [ :index ]
+  skip_around_action :set_locale, only: [ :index ]
 
   # @API Retrieve assignment-overridden dates for quizzes
   # @beta

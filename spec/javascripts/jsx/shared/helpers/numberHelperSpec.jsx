@@ -6,7 +6,7 @@ define([
 
   let input, output, delimiter, separator
 
-  module('Number Helper Parse and Validate', {
+  QUnit.module('Number Helper Parse and Validate', {
     setup () {
       delimiter = ' '
       separator = ','

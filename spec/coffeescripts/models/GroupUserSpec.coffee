@@ -6,7 +6,7 @@ define [
   'jquery'
 ], (Backbone, Group, GroupUser, GroupCategory, $) ->
 
-  module 'GroupUser',
+  QUnit.module 'GroupUser',
     setup: ->
       @groupUser = new GroupUser
         category: new GroupCategory

@@ -6,7 +6,7 @@ define [
   fakeEditor = undefined
   moveToBookmarkSpy = undefined
 
-  module "InsertUpdateImageView#update",
+  QUnit.module "InsertUpdateImageView#update",
     setup: ->
       moveToBookmarkSpy = sinon.spy()
       fakeEditor = {

@@ -5,7 +5,8 @@ define [
   'helpers/fakeENV'
   'compiled/models/Outcome'
   'compiled/views/outcomes/OutcomeView'
-], ($, _, Backbone, fakeENV, Outcome, OutcomeView) ->
+  'helpers/I18nStubber'
+], ($, _, Backbone, fakeENV, Outcome, OutcomeView, I18nStubber) ->
 
   newOutcome = (outcomeOptions, outcomeLinkOptions) ->
     new Outcome(buildOutcome(outcomeOptions, outcomeLinkOptions), { parse: true })
@@ -47,7 +48,7 @@ define [
     view.$el.appendTo($("#fixtures"))
     view.render()
 
-  module 'OutcomeView',
+  QUnit.module 'OutcomeView',
     setup: ->
       fakeENV.setup()
       ENV.PERMISSIONS = {manage_outcomes: true}
@@ -342,4 +343,14 @@ define [
     ok !view.isValid()
     ok view.errors.mastery_points
     view.remove()
+
+  test 'validates i18n mastery points', ->
+    view = createView(model: @outcome1, state: 'edit')
+    I18nStubber.pushFrame();
+    I18nStubber.setLocale('fr_FR');
+    I18nStubber.stub('fr_FR', {'number.format.delimiter': ' ', 'number.format.separator': ','})
+    view.$('input[name="mastery_points"]').val('1 234,5')
+    ok view.isValid()
+    view.remove()
+    I18nStubber.popFrame();
 

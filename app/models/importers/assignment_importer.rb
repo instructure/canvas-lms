@@ -150,7 +150,7 @@ module Importers
             key: [item.migration_id, override.set_type, override.set_id].join('/'))
         end
         if hash.has_key?(:only_visible_to_overrides)
-          item.only_visible_to_overrides = hash[:only_visible_to_overrides]          
+          item.only_visible_to_overrides = hash[:only_visible_to_overrides]
         end
       end
 
@@ -192,13 +192,19 @@ module Importers
         item.group_category ||= context.group_categories.active.where(:name => t("Project Groups")).first_or_create
       end
 
-      [:turnitin_enabled, :vericite_enabled, :peer_reviews,
+      [:peer_reviews,
        :automatic_peer_reviews, :anonymous_peer_reviews,
        :grade_group_students_individually, :allowed_extensions,
        :position, :peer_review_count, :muted, :moderated_grading,
        :omit_from_final_grade, :intra_group_peer_reviews
       ].each do |prop|
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
+      end
+
+      [:turnitin_enabled, :vericite_enabled].each do |prop|
+        if !hash[prop].nil? && context.send("#{prop}?")
+          item.send("#{prop}=", hash[prop])
+        end
       end
 
       if item.turnitin_enabled

@@ -315,7 +315,7 @@ describe UserObserveesController, type: :request do
         unique_id: student_pseudonym.unique_id,
         password: student_pseudonym.password,
       }
-      expect(create_call({observee: observee}, api_user: student, expected_status: 401))
+      create_call({observee: observee}, api_user: student, expected_status: 401)
 
       expect(student.reload.observed_users).to eq []
     end

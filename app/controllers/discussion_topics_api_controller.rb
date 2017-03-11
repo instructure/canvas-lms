@@ -22,12 +22,12 @@ class DiscussionTopicsApiController < ApplicationController
   include Api::V1::User
   include SubmittableHelper
 
-  before_filter :require_context_and_read_access
-  before_filter :require_topic
-  before_filter :require_initial_post, except: [:add_entry, :mark_topic_read,
+  before_action :require_context_and_read_access
+  before_action :require_topic
+  before_action :require_initial_post, except: [:add_entry, :mark_topic_read,
                                                 :mark_topic_unread, :show,
                                                 :unsubscribe_topic]
-  before_filter only: [:replies, :entries, :add_entry, :add_reply, :show,
+  before_action only: [:replies, :entries, :add_entry, :add_reply, :show,
                        :view, :entry_list, :subscribe_topic] do
     check_differentiated_assignments(@topic)
   end
@@ -119,6 +119,12 @@ class DiscussionTopicsApiController < ApplicationController
         StringifyIds.recursively_stringify_ids(entries, reverse: true) if !stringify_json_ids?
         DiscussionTopic::MaterializedView.include_mobile_overrides(entries, mobile_brand_config.css_and_js_overrides) if mobile_brand_config
         structure = entries.to_json
+      end
+
+      if new_entries
+        new_entries.each do |e|
+          e["message"] = resolve_placeholders(e["message"]) if e["message"]
+        end
       end
 
       participants = Shard.partition_by_shard(participant_ids) do |shard_ids|

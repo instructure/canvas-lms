@@ -1,0 +1,51 @@
+#!/usr/bin/env node
+
+const fs = require('fs')
+const path = require('path')
+const UglifyJS = require('uglify-js')
+const glob = require('glob')
+const mkdirp = require('mkdirp')
+
+const filesToIgnore = [
+  'loaded.js',
+  'locales.js',
+  'rfc822.js',
+  'synopsis.js',
+  'zones.js',
+]
+
+const wrapTimezone = (code, timezoneName) => `
+  !function(){
+    ${code.replace('module.exports', 'var timezoneData')}
+    if (typeof define === 'function' && define.amd) {
+      define(timezoneData);
+    } else {
+      if (typeof __PRELOADED_TIMEZONE_DATA__ === 'undefined') {
+        __PRELOADED_TIMEZONE_DATA__ = {};
+      }
+      __PRELOADED_TIMEZONE_DATA__['${timezoneName}'] = timezoneData;
+    }
+  }();
+`
+
+const processFile = (filename) => {
+  let code = fs.readFileSync(`node_modules/timezone/${filename}`).toString()
+
+  if (filename === 'index.js') {
+    // include the root index.js as-is
+  } else if (filename.match('/index.js')) {
+    return // skip the ones that are for entire regions
+  } else {
+    const timezoneName = filename.replace(/\.js$/, '')
+    code = UglifyJS.minify(wrapTimezone(code, timezoneName), {fromString: true}).code
+  }
+
+  const outputFileName = `public/javascripts/vendor/timezone/${filename}`
+  mkdirp.sync(path.dirname(outputFileName))
+  fs.writeFile(outputFileName, code)
+}
+
+glob
+  .sync('**/*.js', {cwd: 'node_modules/timezone'})
+  .filter(f => !filesToIgnore.includes(f))
+  .forEach(processFile)

@@ -40,8 +40,6 @@ shared_examples_for "course copy" do
     yield(export) if block_given?
     export.save
     export.export_course
-    expect(export.workflow_state).to eq 'exported'
-    expect(export.attachment_id).not_to be_nil
     export
   end
 

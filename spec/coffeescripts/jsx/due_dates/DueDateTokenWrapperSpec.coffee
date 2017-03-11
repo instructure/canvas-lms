@@ -8,7 +8,7 @@ define [
   'helpers/fakeENV'
 ], (React, ReactDOM, {Simulate, SimulateNative}, _, DueDateTokenWrapper, OverrideStudentStore, fakeENV) ->
 
-  module 'DueDateTokenWrapper',
+  QUnit.module 'DueDateTokenWrapper',
     setup: ->
       fakeENV.setup(context_asset_string = "course_1")
       @clock = sinon.useFakeTimers()
@@ -129,7 +129,7 @@ define [
   test 'overrideTokenAriaLabel method', ->
     equal @DueDateTokenWrapper.overrideTokenAriaLabel('group X'), "Currently assigned to group X, click to remove"
 
-  module 'disabled DueDateTokenWrapper',
+  QUnit.module 'disabled DueDateTokenWrapper',
     setup: ->
       fakeENV.setup(context_asset_string = "course_1")
       props =

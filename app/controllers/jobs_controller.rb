@@ -1,7 +1,7 @@
 class JobsController < ApplicationController
-  before_filter :require_manage_jobs, :only => [:batch_update]
-  before_filter :require_view_jobs, :only => [:index, :show]
-  before_filter :set_site_admin_context, :set_navigation, :only => [:index]
+  before_action :require_manage_jobs, :only => [:batch_update]
+  before_action :require_view_jobs, :only => [:index, :show]
+  before_action :set_site_admin_context, :set_navigation, :only => [:index]
   POPULAR_TAG_COUNTS = 12
   LIMIT = 100
 

@@ -187,8 +187,8 @@ class Quizzes::QuizQuestionsController < ApplicationController
   include ::Filters::Quizzes
   include ::Filters::QuizSubmissions
 
-  before_filter :require_context, :require_quiz
-  before_filter :require_question, :only => [:show]
+  before_action :require_context, :require_quiz
+  before_action :require_question, :only => [:show]
 
   # @API List questions in a quiz or a submission
   # @beta

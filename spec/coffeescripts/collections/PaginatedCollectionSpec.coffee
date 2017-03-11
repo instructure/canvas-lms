@@ -5,7 +5,7 @@ define [
   'helpers/getFakePage'
 ], ($, Backbone, PaginatedCollection, getFakePage) ->
 
-  module 'PaginatedCollection',
+  QUnit.module 'PaginatedCollection',
     setup: ->
       @server = sinon.fakeServer.create()
       @collection = new PaginatedCollection null,

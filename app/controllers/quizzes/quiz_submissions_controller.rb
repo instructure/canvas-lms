@@ -22,9 +22,9 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   include ::Filters::QuizSubmissions
 
   protect_from_forgery :except => [:create, :backup, :record_answer], with: :exception
-  before_filter :require_context
-  before_filter :require_quiz, :only => [ :index, :create, :extensions, :show, :update, :log ]
-  before_filter :require_quiz_submission, :only => [ :show, :log ]
+  before_action :require_context
+  before_action :require_quiz, :only => [ :index, :create, :extensions, :show, :update, :log ]
+  before_action :require_quiz_submission, :only => [ :show, :log ]
   batch_jobs_in_actions :only => [:update, :create], :batch => { :priority => Delayed::LOW_PRIORITY }
 
   def index

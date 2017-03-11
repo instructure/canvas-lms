@@ -1,4 +1,4 @@
-﻿require File.expand_path(File.dirname(__FILE__) + '/../common')
+require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common')
 
 describe "calendar2" do
@@ -15,16 +15,6 @@ describe "calendar2" do
   context "as a student" do
     before(:each) do
       @student = course_with_student_logged_in(:active_all => true).user
-    end
-
-    describe "contexts list" do
-      it "should not allow a student to create an assignment through the context list" do
-        get "/calendar2"
-
-        # first context is the user's calendar
-        driver.execute_script(%{$(".context_list_context:nth-child(2)").addClass('hovering')})
-        expect(f("ul#context-list > li:nth-child(2)")).not_to contain_css('button') # no button, can't add events
-      end
     end
 
     describe "main calendar" do

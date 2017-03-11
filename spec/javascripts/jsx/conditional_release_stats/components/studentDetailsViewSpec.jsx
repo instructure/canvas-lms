@@ -4,7 +4,7 @@ define([
   'jsx/conditional_release_stats/components/student-details-view',
 ], (React, TestUtils, StudentDetailsComponent) => {
 
-  module('Student Details View Component')
+  QUnit.module('Student Details View Component')
 
   const renderComponent = (props) => {
     return TestUtils.renderIntoDocument(

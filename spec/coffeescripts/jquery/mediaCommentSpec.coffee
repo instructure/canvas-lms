@@ -3,7 +3,7 @@ define [
   'compiled/jquery/mediaComment'
 ], ($, MediaUtils)->
 
-  module 'mediaComment',
+  QUnit.module 'mediaComment',
     setup: ->
       @server = sinon.fakeServer.create()
       window.INST.kalturaSettings = "settings set" # pretend kalturaSettings are set.
@@ -55,7 +55,7 @@ define [
     equal @$holder.find('source[type=mp4]').attr('src'),"http://some_mp4_url.com", "Video contains the mp4 source"
 
 
-  module "MediaCommentUtils functions",
+  QUnit.module "MediaCommentUtils functions",
     setup: ->
     teardown: ->
 

@@ -4,7 +4,7 @@ define [
   'jquery'
 ], (SpeedgraderLinkView, Assignment, $) ->
 
-  module "SpeedgraderLinkView",
+  QUnit.module "SpeedgraderLinkView",
     setup: ->
       @model = new Assignment published: false
       $('#fixtures').html """

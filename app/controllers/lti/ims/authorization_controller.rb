@@ -10,15 +10,10 @@ module Lti
     # @model AuthorizationJWT
     #     {
     #       "id": "AuthorizationJWT",
-    #       "description": "This is a JWT (https://tools.ietf.org/html/rfc7519), we highly recommend using a library to create these tokens. The token should be signed with the shared secret found in the Tool Proxy, which must be using the 'splitSecret' capability. You will also need to set the 'kid' (keyId) in the header of the JWT to equal the Tool Proxy GUID",
+    #       "description": "This is a JWT (https://tools.ietf.org/html/rfc7519), we highly recommend using a library to create these tokens. The token should be signed with the shared secret found in the Tool Proxy, which must be using the 'splitSecret' capability. If a tool proxy has not yet been created in Canvas a developer key may be used to sign the token. In this case the ‘sub’ claim of the token should be the developer key ID."
     #       "properties": {
-    #         "iss":{
-    #           "description": "The Tool Proxy Guid",
-    #           "example": "81c4fc5f-4931-4199-ae3b-2077de8f9325",
-    #           "type": "string"
-    #         },
     #         "sub":{
-    #           "description": "The Tool Proxy Guid",
+    #           "description": "The Tool Proxy Guid OR Developer key ID. A developer key ID should only be used if a tool proxy has not been created in Canvas. In this case the token should be signed with the developer key rather than the tool proxy shared secret.",
     #           "example": "81c4fc5f-4931-4199-ae3b-2077de8f9325",
     #           "type": "string"
     #         },
@@ -54,7 +49,7 @@ module Lti
                   JSON::JWT::InvalidFormat,
                   JSON::JWS::UnexpectedAlgorithm,
                   Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                  Lti::Oauth2::AuthorizationValidator::ToolProxyNotFound,
+                  Lti::Oauth2::AuthorizationValidator::SecretNotFound,
                   InvalidGrant do
         render json: {error: 'invalid_grant'}, status: :bad_request
       end
@@ -80,7 +75,7 @@ module Lti
         jwt_validator = Lti::Oauth2::AuthorizationValidator.new(jwt: params[:assertion], authorization_url: lti_oauth2_authorize_url)
         jwt_validator.validate!
         render json: {
-          access_token: Lti::Oauth2::AccessToken.create_jwt(aud: request.host, sub: jwt_validator.tool_proxy.guid).to_s,
+          access_token: Lti::Oauth2::AccessToken.create_jwt(aud: request.host, sub: jwt_validator.sub).to_s,
           token_type: 'bearer',
           expires_in: Setting.get('lti.oauth2.access_token.expiration', 1.hour.to_s)
         }

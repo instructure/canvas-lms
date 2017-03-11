@@ -25,11 +25,12 @@ class Attachments::S3Storage
       if !attachment.size
         attachment.size = bucket.object(old_full_filename).content_length
       end
-      bucket.object(old_full_filename).copy_to(attachment.full_filename, {
-        :acl => attachment.attachment_options[:s3_access],
-        :use_multipart_copy => (attachment.size >= 5.gigabytes),
-        :content_length => attachment.size
-      })
+      options = { acl: attachment.attachment_options[:s3_access] }
+      if attachment.size >= 5.gigabytes
+        options[:multipart_copy] = true
+        options[:content_length] = attachment.size
+      end
+      bucket.object(old_full_filename).copy_to(bucket.object(attachment.full_filename), options)
     end
   end
 

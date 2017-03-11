@@ -25,7 +25,7 @@ define([
     }];
   }
 
-  module('GradingPeriodsHelper#new');
+  QUnit.module('GradingPeriodsHelper#new');
 
   test('throws an error if any dates on the grading periods are Strings', function () {
     const gradingPeriods = generateGradingPeriods();
@@ -43,7 +43,7 @@ define([
     throws(() => { new GradingPeriodsHelper() });
   });
 
-  module('GradingPeriodsHelper.isAllGradingPeriods');
+  QUnit.module('GradingPeriodsHelper.isAllGradingPeriods');
 
   test('returns true if the ID is the string "0"', function () {
     equal(GradingPeriodsHelper.isAllGradingPeriods('0'), true);
@@ -57,7 +57,7 @@ define([
     throws(() => { GradingPeriodsHelper.isAllGradingPeriods(0) });
   });
 
-  module('GradingPeriodsHelper#gradingPeriodForDueAt', {
+  QUnit.module('GradingPeriodsHelper#gradingPeriodForDueAt', {
     setup() {
       this.gradingPeriods = generateGradingPeriods();
       this.helper = new GradingPeriodsHelper(this.gradingPeriods);
@@ -83,7 +83,7 @@ define([
     throws(() => { this.helper.gradingPeriodForDueAt('Jan 20, 2015') });
   });
 
-  module('GradingPeriodsHelper#isDateInGradingPeriod', {
+  QUnit.module('GradingPeriodsHelper#isDateInGradingPeriod', {
     setup() {
       const gradingPeriods = generateGradingPeriods();
       this.helper = new GradingPeriodsHelper(gradingPeriods);
@@ -126,7 +126,7 @@ define([
     throws(() => { this.helper.isDateInGradingPeriod(DATE_IN_FIRST_PERIOD, '222') });
   });
 
-  module('GradingPeriodsHelper#earliestValidDueDate', {
+  QUnit.module('GradingPeriodsHelper#earliestValidDueDate', {
     setup() {
       this.gradingPeriods = generateGradingPeriods();
       this.firstPeriod = this.gradingPeriods[0];
@@ -148,7 +148,7 @@ define([
     equal(earliestDate, null);
   });
 
-  module('GradingPeriodsHelper#isDateInClosedGradingPeriod', {
+  QUnit.module('GradingPeriodsHelper#isDateInClosedGradingPeriod', {
     setup () {
       const gradingPeriods = generateGradingPeriods();
       this.helper = new GradingPeriodsHelper(gradingPeriods);

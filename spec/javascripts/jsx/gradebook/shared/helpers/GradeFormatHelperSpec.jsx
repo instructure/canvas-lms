@@ -3,7 +3,7 @@ define([
   'i18n!gradebook',
   'jsx/shared/helpers/numberHelper'
 ], function (GradeFormatHelper, I18n, numberHelper) {
-  module('GradeFormatHelper#formatGrade', {
+  QUnit.module('GradeFormatHelper#formatGrade', {
     setup () {
       this.stub(numberHelper, 'parse').returns(42);
       this.stub(I18n, 'n').returns('42');
@@ -46,7 +46,38 @@ define([
     strictEqual(I18n.n.notCalled, true);
   });
 
-  module('GradeFormatHelper#delocalizeGrade');
+  test('should return input when input is undefined, null, or empty string', () => {
+    strictEqual(GradeFormatHelper.formatGrade(undefined), undefined);
+    strictEqual(GradeFormatHelper.formatGrade(null), null);
+    strictEqual(GradeFormatHelper.formatGrade(''), '');
+  });
+
+  test('providing gradingType in the options hash should override detected grade type', () => {
+    GradeFormatHelper.formatGrade(10, { gradingType: 'percent' });
+    ok(I18n.n.calledWith(42, { percentage: true }));
+
+    GradeFormatHelper.formatGrade('10%', { gradingType: 'points' });
+    ok(I18n.n.calledWith(42, { percentage: false }));
+
+    GradeFormatHelper.formatGrade('10%');
+    ok(I18n.n.calledWith(42, { percentage: true }));
+  });
+
+  test('providing precision overrides default rounding to two decimal places', () => {
+    numberHelper.parse.restore();
+    I18n.n.restore();
+
+    let formatted = GradeFormatHelper.formatGrade(10.321);
+    strictEqual(formatted, '10.32');
+
+    formatted = GradeFormatHelper.formatGrade(10.325);
+    strictEqual(formatted, '10.33');
+
+    formatted = GradeFormatHelper.formatGrade(10.321, { precision: 3 });
+    strictEqual(formatted, '10.321');
+  });
+
+  QUnit.module('GradeFormatHelper#delocalizeGrade');
 
   test('should return input value when input is not a string', () => {
     strictEqual(GradeFormatHelper.delocalizeGrade(1), 1);

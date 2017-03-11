@@ -3,7 +3,7 @@ define([
   'react',
   'react-addons-test-utils',
   'jsx/calendar/scheduler/components/appointment_groups/TimeBlockSelectRow',
-  'vendor/timezone/Europe/London',
+  'timezone/Europe/London',
   'timezone',
   'helpers/fakeENV',
   'jquery.instructure_date_and_time'
@@ -11,7 +11,7 @@ define([
   let props;
   let tzSnapshot;
 
-  module('TimeBlockSelectRow', {
+  QUnit.module('TimeBlockSelectRow', {
     setup() {
       tzSnapshot = tz.snapshot()
       // set local timezone to UTC

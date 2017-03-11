@@ -141,13 +141,13 @@ describe "varied due dates" do
       context "in the base section" do
         it "shows the course due date in 'todo'" do
           create_student_todo_assignment
-          login_as(@student1.pseudonym.login, 'asdfasdf')
+          user_session(@student1)
           get '/dashboard-sidebar'
           assert_todo_due_date wrap_partial(response), @student_todo_course_due_at
         end
 
         it "shows the course due date in 'coming up'" do
-          login_as(@student1.pseudonym.login, 'asdfasdf')
+          user_session(@student1)
           get '/dashboard-sidebar'
           assert_coming_up_due_date wrap_partial(response), @course_due_date
         end
@@ -156,13 +156,13 @@ describe "varied due dates" do
       context "in the overridden section" do
         it "shows the section due date in 'todo'" do
           create_student_todo_assignment
-          login_as(@student2.pseudonym.login, 'asdfasdf')
+          user_session(@student2)
           get '/dashboard-sidebar'
           assert_todo_due_date wrap_partial(response), @student_todo_section_due_at
         end
 
         it "shows the section due date in 'coming up" do
-          login_as(@student2.pseudonym.login, 'asdfasdf')
+          user_session(@student2)
           get '/dashboard-sidebar'
           assert_coming_up_due_date wrap_partial(response), @section_due_date
         end
@@ -171,14 +171,14 @@ describe "varied due dates" do
 
     context "as the teacher" do
       it "shows multiple due dates in 'coming up'" do
-        login_as(@teacher.pseudonym.login, 'asdfasdf')
+        user_session(@teacher)
         get '/dashboard-sidebar'
         assert_coming_up_due_date wrap_partial(response), multiple_due_dates
       end
 
       it "shows multiple due dates in 'todo'" do
         create_teacher_todo_assignment
-        login_as(@teacher.pseudonym.login, 'asdfasdf')
+        user_session(@teacher)
         get '/dashboard-sidebar'
         assert_todo_due_date wrap_partial(response), multiple_due_dates
       end

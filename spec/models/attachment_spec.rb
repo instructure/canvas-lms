@@ -1012,16 +1012,16 @@ describe Attachment do
       @root = attachment_model
       @child = attachment_model(:root_attachment => @root)
 
-      @old_object = mock('old object')
-      @new_object = mock('new object')
+      @old_object = double('old object')
+      @new_object = double('new object')
       new_full_filename = @root.full_filename.sub(@root.namespace, @new_account.file_namespace)
-      @root.bucket.stubs(:object).with(@root.full_filename).returns(@old_object)
-      @root.bucket.stubs(:object).with(new_full_filename).returns(@new_object)
+      allow(@root.bucket).to receive(:object).with(@root.full_filename).and_return(@old_object)
+      allow(@root.bucket).to receive(:object).with(new_full_filename).and_return(@new_object)
     end
 
     it "should fail for non-root attachments" do
       @old_object.expects(:copy_to).never
-      expect { @child.change_namespace(@new_account.file_namespace) }.to raise_error
+      expect { @child.change_namespace(@new_account.file_namespace) }.to raise_error('change_namespace must be called on a root attachment')
       expect(@root.reload.namespace).to eq @old_account.file_namespace
       expect(@child.reload.namespace).to eq @root.reload.namespace
     end
@@ -1036,7 +1036,7 @@ describe Attachment do
 
     it "should rename root attachments and update children" do
       expect(@new_object).to receive(:exists?).and_return(false)
-      expect(@old_object).to receive(:copy_to).with(@root.full_filename.sub(@old_account.id.to_s, @new_account.id.to_s), anything)
+      expect(@old_object).to receive(:copy_to).with(@new_object, anything)
       @root.change_namespace(@new_account.file_namespace)
       expect(@root.namespace).to eq @new_account.file_namespace
       expect(@child.reload.namespace).to eq @root.namespace
@@ -1044,9 +1044,9 @@ describe Attachment do
 
     it 'should allow making a root_attachment childess' do
       @child.update_attribute(:filename, 'invalid')
-      @root.s3object.stubs(:exists?).returns(true)
-      @child.stubs(:s3object).returns(@old_object)
-      @child.s3object.stubs(:exists?).returns(true)
+      expect(@root.s3object).to receive(:exists?).and_return(true)
+      expect(@child).to receive(:s3object).and_return(@old_object)
+      expect(@old_object).to receive(:exists?).and_return(true)
       @root.make_childless(@child)
       expect(@root.reload.children).to eq []
       expect(@child.reload.root_attachment_id).to eq nil

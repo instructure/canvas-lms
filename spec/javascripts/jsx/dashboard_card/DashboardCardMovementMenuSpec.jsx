@@ -3,7 +3,7 @@ define([
   'react-addons-test-utils',
   'jsx/dashboard_card/DashboardCardMovementMenu',
 ], (React, TestUtils, DashboardCardMovementMenu) => {
-  module('DashboardCardMovementMenu');
+  QUnit.module('DashboardCardMovementMenu');
 
   test('it calls handleMove properly', () => {
     const handleMoveSpy = sinon.spy();

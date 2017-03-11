@@ -6,7 +6,7 @@ define([
   'instructure-ui'
 ], (React, ReactDOM, TestUtils, Avatar, { Avatar: InstUIAvatar }) => {
 
-  module('StudentContextTray/Avatar', (hooks) => {
+  QUnit.module('StudentContextTray/Avatar', (hooks) => {
     let subject
 
     hooks.afterEach(() => {

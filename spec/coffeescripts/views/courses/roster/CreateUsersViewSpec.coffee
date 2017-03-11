@@ -10,7 +10,7 @@ define [
   view = null
   server = null
 
-  module 'CreateUsersView',
+  QUnit.module 'CreateUsersView',
     setup: ->
       server = sinon.fakeServer.create()
       server.respondWith("POST", "/read",

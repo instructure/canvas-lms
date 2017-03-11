@@ -1,9 +1,10 @@
 define [
+  'i18n!messages'
   'jquery'
   'underscore'
   'Backbone'
   'compiled/str/TextHelper'
-], ($, _, {Model, Collection}, TextHelper) ->
+], (I18n, $, _, {Model, Collection}, TextHelper) ->
 
   class Message extends Model
     initialize: ->
@@ -30,7 +31,7 @@ define [
         data.participants = _.uniq(_.map(data.submission_comments, (m) -> {name: m.author_name}), null, (u) -> u.name)
         data.last_authored_message_at = data.submission_comments[0].created_at
         data.last_message_at = data.submission_comments[0].created_at
-        data.message_count = data.submission_comments.length
+        data.message_count = I18n.n(data.submission_comments.length)
         data.last_message = data.submission_comments[0].comment
         data.read = data.read_state
         data.workflow_state = if data.read_state then 'read' else 'unread'

@@ -7,7 +7,7 @@ define([
   'jsx/context_cards/StudentContextTray',
   'jsx/context_cards/StudentCardStore'
 ], ($, React, ReactDOM, TestUtils, { Avatar, Tray }, StudentContextTray, StudentCardStore) => {
-  module('StudentContextTray', (hooks) => {
+  QUnit.module('StudentContextTray', (hooks) => {
     let store, subject
     const courseId = '1'
     const studentId = '1'
@@ -94,7 +94,7 @@ define([
       ok(document.activeElement === document.getElementById('someButton'))
     })
 
-    module('analytics button', () => {
+    QUnit.module('analytics button', () => {
       test('it renders with analytics data', () => {
         store.setState({
           analytics: {

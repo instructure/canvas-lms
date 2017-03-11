@@ -4,7 +4,7 @@ define([
   'enzyme',
   'jsx/webzip_export/components/ExportInProgress',
 ], (React, ReactDOM, enzyme, ExportInProgress) => {
-  module('ExportInProgress')
+  QUnit.module('ExportInProgress')
 
   test('renders the ExportInProgress component', () => {
     const webzip = {progressId: '117'}

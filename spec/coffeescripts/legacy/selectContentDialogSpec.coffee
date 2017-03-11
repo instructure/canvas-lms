@@ -1,7 +1,7 @@
 define [
   'select_content_dialog'
 ], (SelectContentDialog) ->
-  module "SelectContentDialog: Dialog options",
+  QUnit.module "SelectContentDialog: Dialog options",
     setup: ->
       @spy($.fn, 'dialog')
       $("#fixtures").html("<div id='select_context_content_dialog'></div>")

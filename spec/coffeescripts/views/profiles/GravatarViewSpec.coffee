@@ -2,7 +2,7 @@ define [
   'compiled/views/profiles/GravatarView'
 ], (GravatarView) ->
 
-  module 'GravatarView',
+  QUnit.module 'GravatarView',
     setup: ->
       @oldEnv = window.ENV
       window.ENV = { PROFILE: { primary_email: 'foo@example.com' }}

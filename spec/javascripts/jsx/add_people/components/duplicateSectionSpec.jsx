@@ -5,7 +5,7 @@ define([
   'react-addons-test-utils',
   'jsx/add_people/components/duplicate_section',
 ], (_, React, ReactDOM, TestUtils, DuplicateSection) => {
-  module('DuplicateSection')
+  QUnit.module('DuplicateSection')
 
   const duplicates = {
     address: 'addr1',

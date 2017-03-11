@@ -2,7 +2,8 @@ define [
   'underscore'
   'Backbone'
   'jst/outcomes/outcomeCalculationMethodForm'
-], (_, Backbone, template) ->
+  'jsx/shared/helpers/numberHelper'
+], (_, Backbone, template, numberHelper) ->
   class CalculationMethodFormView extends Backbone.View
     @optionProperty 'el'
     @optionProperty 'model'
@@ -29,7 +30,7 @@ define [
       @change(e)
 
     change: (e) ->
-      val = parseInt($(e.target).val())
+      val = parseInt(numberHelper.parse($(e.target).val()))
       return if _.isNaN(val)
       @model.set({
         calculation_int: val

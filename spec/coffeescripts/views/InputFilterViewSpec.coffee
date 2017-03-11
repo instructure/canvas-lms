@@ -8,7 +8,7 @@ define [
   view = null
   clock = null
 
-  module 'InputFilterView',
+  QUnit.module 'InputFilterView',
     setup: ->
       clock = sinon.useFakeTimers()
       view = new InputFilterView

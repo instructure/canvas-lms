@@ -13,5 +13,5 @@ module.exports = Object.assign({
     },
     "sourceType": "module"
   },
-  "parser": "babel-eslint"
+  "parser": "babel-eslint",
 }, require('./.eslintrc.common.js'))

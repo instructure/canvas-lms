@@ -8,7 +8,7 @@ define [
   'helpers/fixtures'
 ], (RichContentEditor, RceCommandShim, RCELoader, Sidebar, fakeENV, editorUtils, fixtures) ->
 
-  module 'RichContentEditor - helper function:'
+  QUnit.module 'RichContentEditor - helper function:'
 
   test 'ensureID gives the element an id when it is missing', ->
     $el = $('<div/>')
@@ -40,7 +40,7 @@ define [
     $fresh = RichContentEditor.freshNode($el)
     equal $el, $fresh
 
-  module 'RichContentEditor - preloading',
+  QUnit.module 'RichContentEditor - preloading',
     setup: ->
       fakeENV.setup()
       @preloadSpy = sinon.spy(RCELoader, "preload")
@@ -61,7 +61,7 @@ define [
     RichContentEditor.preloadRemoteModule()
     ok @preloadSpy.notCalled
 
-  module 'RichContentEditor - loading editor',
+  QUnit.module 'RichContentEditor - loading editor',
     setup: ->
       fakeENV.setup()
       ENV.RICH_CONTENT_SERVICE_ENABLED = true
@@ -132,7 +132,7 @@ define [
     onFocus(editor)
     ok options.onFocus.calledWith(editor)
 
-  module 'RichContentEditor - callOnRCE',
+  QUnit.module 'RichContentEditor - callOnRCE',
     setup: ->
       fakeENV.setup()
       fixtures.setup()
@@ -157,7 +157,7 @@ define [
     ok RceCommandShim.send.calledWith($freshTarget, 'methodName', 'methodArg')
     RichContentEditor.freshNode.restore()
 
-  module 'RichContentEditor - destroyRCE',
+  QUnit.module 'RichContentEditor - destroyRCE',
     setup: ->
       fakeENV.setup()
       ENV.RICH_CONTENT_SERVICE_ENABLED = false
@@ -182,7 +182,7 @@ define [
     ok Sidebar.hide.called
     Sidebar.hide.restore()
 
-  module 'RichContentEditor - clicking into editor (editor_box_focus)',
+  QUnit.module 'RichContentEditor - clicking into editor (editor_box_focus)',
     setup: ->
       fakeENV.setup()
       ENV.RICH_CONTENT_SERVICE_ENABLED = false

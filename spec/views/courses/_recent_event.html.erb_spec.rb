@@ -102,7 +102,6 @@ describe "/courses/_recent_event" do
       @quiz.workflow_state = 'available'
       @quiz.published_at = Time.zone.now
       @quiz.save
-      expect(@quiz.assignment).not_to be_nil
 
       @quiz_submission = @quiz.generate_submission(@user)
       Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission

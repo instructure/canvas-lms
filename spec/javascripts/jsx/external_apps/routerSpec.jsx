@@ -3,7 +3,7 @@ define([
   'jsx/external_apps/lib/regularizePathname',
 ], (React, regularizePathname) => {
 
-  module('External Apps Client-side Router', {
+  QUnit.module('External Apps Client-side Router', {
     before () {
       window.ENV = window.ENV || {};
       window.ENV.TESTING_PATH = '/settings/something';

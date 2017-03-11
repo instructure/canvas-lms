@@ -67,7 +67,7 @@
 #     }
 #
 class TermsApiController < ApplicationController
-  before_filter :require_context, :require_root_account_management
+  before_action :require_context, :require_root_account_management
 
   include Api::V1::EnrollmentTerm
 

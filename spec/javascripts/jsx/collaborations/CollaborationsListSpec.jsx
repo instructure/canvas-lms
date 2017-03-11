@@ -4,7 +4,7 @@ define([
   'jsx/collaborations/CollaborationsList'
 ], (React, TestUtils, CollaborationsList) => {
 
-  module('CollaborationsList');
+  QUnit.module('CollaborationsList');
 
   let collaborations = [{
     id: 1,

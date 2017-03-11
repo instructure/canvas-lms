@@ -28,16 +28,16 @@ define [
     new DeleteGroupView
       model: ag_group
 
-  module 'DeleteGroupView',
+  QUnit.module 'DeleteGroupView',
     setup: ->
     teardown: ->
       $("#fixtures").empty()
       $("form.dialogFormView").remove()
 
   test 'it should delete a group without assignments', ->
-    @stub(window, "confirm", -> true )
+    @stub(window, "confirm").returns(true)
     view = createView(false, true)
-    @stub(view, "destroyModel", -> )
+    @stub(view, "destroyModel")
     view.render()
     view.open()
 
@@ -68,7 +68,7 @@ define [
     view.close()
 
   test 'it should delete a group with assignments', ->
-    destroy_stub = @stub(DeleteGroupView.prototype, "destroy", -> )
+    destroy_stub = @stub(DeleteGroupView.prototype, "destroy")
     view = createView(true, true)
     view.render()
     view.open()
@@ -79,7 +79,7 @@ define [
     view.close()
 
   test 'it should not delete the last assignment group', ->
-    alert_stub = @stub(window, "alert", -> true )
+    alert_stub = @stub(window, "alert").returns(true)
     view = createView(true, false)
     destroy_spy = @spy(view, "destroyModel")
     view.render()

@@ -22,7 +22,7 @@ define([
 ], ($, instructure) => {
   let elem
 
-  module("Enhance User Content", {
+  QUnit.module("Enhance User Content", {
     setup () {
       elem = document.createElement('div')
       document.body.appendChild(elem)

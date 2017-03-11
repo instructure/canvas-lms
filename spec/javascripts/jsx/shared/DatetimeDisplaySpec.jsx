@@ -5,7 +5,7 @@ define([
   'timezone'
 ], (React, TestUtils, DatetimeDisplay, tz) => {
 
-  module('DatetimeDisplay');
+  QUnit.module('DatetimeDisplay');
 
   test('renders the formatted datetime using the provided format', () => {
     let datetime = (new Date()).toString();

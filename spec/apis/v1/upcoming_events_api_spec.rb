@@ -78,6 +78,26 @@ describe UsersController, type: :request do
           "Upcoming Assignment"
         ]
       end
+
+      it "doesn't gets the events if the course is unpublished and the user is a teacher" do
+        @course.claim!
+        json = api_call(:get, "/api/v1/users/self/upcoming_events",
+          :controller => "users", :action => "upcoming_events",
+          :format => "json")
+        expect(json.map{ |e| e['title'] }).to eq [
+          "Upcoming Course Event",
+          "Upcoming Assignment"
+        ]
+      end
+
+      it "doesn't gets the events if the course is unpublished and the user is a student" do
+        student_in_course(:active_all => true, :course => @course)
+        @course.claim!
+        json = api_call(:get, "/api/v1/users/self/upcoming_events",
+          :controller => "users", :action => "upcoming_events",
+          :format => "json")
+        expect(json).to be_blank
+      end
     end
   end
 end

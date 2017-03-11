@@ -20,7 +20,7 @@ require 'securerandom'
 
 class EportfolioEntriesController < ApplicationController
   include EportfolioPage
-  before_filter :rich_content_service_config
+  before_action :rich_content_service_config
 
   def create
     @portfolio = Eportfolio.find(params[:eportfolio_id])

@@ -4,7 +4,7 @@ define([
   'react-addons-test-utils',
   'jsx/add_people/components/missing_people_section',
 ], (React, ReactDOM, TestUtils, MissingPeopleSection) => {
-  module('MissingPeopleSection')
+  QUnit.module('MissingPeopleSection')
 
   const missingLogins = {
     addr1: {address: 'addr1', type: 'unique_id', createNew: false, newUserInfo: undefined},

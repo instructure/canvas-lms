@@ -153,3 +153,4 @@ class Converter < Canvas::Migration::Migrator
 
 end
 end
+SafeYAML.whitelist_class!(Qti::Converter)

@@ -53,8 +53,6 @@ module BrandableCSS
     "ic-brand-Login-Content-inner-body-border" => lambda { I18n.t("Form Border") },
     "ic-brand-Login-Content-label-text-color" => lambda { I18n.t("Login Label") },
     "ic-brand-Login-Content-password-text-color" => lambda { I18n.t("Login Link Color") },
-    "ic-brand-Login-Content-button-bgd" => lambda { I18n.t("Login Button") },
-    "ic-brand-Login-Content-button-text" => lambda { I18n.t("Login Button Text") },
     "ic-brand-Login-footer-link-color" => lambda { I18n.t("Login Footer Link") },
     "ic-brand-Login-footer-link-color-hover" => lambda { I18n.t("Login Footer Link Hover") },
     "ic-brand-Login-instructure-logo" => lambda { I18n.t("Login Instructure Logo") }
@@ -122,6 +120,10 @@ module BrandableCSS
       end
     end
 
+    def all_brand_variable_values_as_js(active_brand_config=nil)
+      "CANVAS_ACTIVE_BRAND_VARIABLES = #{all_brand_variable_values(active_brand_config).to_json};"
+    end
+
     def branded_scss_folder
       Pathname.new(CONFIG['paths']['branded_scss_folder'])
     end
@@ -138,8 +140,16 @@ module BrandableCSS
       default_brand_folder.join("variables-#{default_variables_md5}.json")
     end
 
+    def default_brand_js_file
+      default_brand_folder.join("variables-#{default_variables_md5}.js")
+    end
+
     def default_json
       all_brand_variable_values.to_json
+    end
+
+    def default_js
+      all_brand_variable_values_as_js
     end
 
     def save_default_json!
@@ -148,10 +158,28 @@ module BrandableCSS
       move_default_json_to_s3_if_enabled!
     end
 
+    def save_default_js!
+      default_brand_folder.mkpath
+      default_brand_js_file.write(default_js)
+      move_default_js_to_s3_if_enabled!
+    end
+
     def move_default_json_to_s3_if_enabled!
-      return unless Canvas::Cdn.enabled?
+      return unless defined?(Canvas) && Canvas::Cdn.enabled?
       s3_uploader.upload_file(public_default_json_path)
-      File.delete(default_brand_json_file)
+      begin
+        File.delete(default_brand_json_file)
+      rescue Errno::ENOENT # continue if something else deleted it in another process
+      end
+    end
+
+    def move_default_js_to_s3_if_enabled!
+      return unless defined?(Canvas) && Canvas::Cdn.enabled?
+      s3_uploader.upload_file(public_default_js_path)
+      begin
+        File.delete(default_brand_js_file)
+      rescue Errno::ENOENT # continue if something else deleted it in another process
+      end
     end
 
     def s3_uploader
@@ -160,6 +188,10 @@ module BrandableCSS
 
     def public_default_json_path
       "dist/brandable_css/default/variables-#{default_variables_md5}.json"
+    end
+
+    def public_default_js_path
+      "dist/brandable_css/default/variables-#{default_variables_md5}.js"
     end
 
     def variants

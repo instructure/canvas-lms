@@ -90,6 +90,11 @@ class ContextModule < ActiveRecord::Base
         # don't queue a job unless necessary
         send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{self.global_context_id}"})
       end
+      if @discussion_topics_to_recalculate
+        @discussion_topics_to_recalculate.each do |dt|
+          dt.send_later_if_production_enqueue_args(:recalculate_context_module_actions!, {:strand => "module_reeval_#{self.global_context_id}"})
+        end
+      end
     end
   end
 
@@ -338,7 +343,7 @@ class ContextModule < ActiveRecord::Base
     end
 
     tags = self.content_tags.not_deleted.index_by(&:id)
-    requirements.select do |req|
+    validated_reqs = requirements.select do |req|
       if req[:id] && (tag = tags[req[:id]])
         if %w(must_view must_mark_done must_contribute).include?(req[:type])
           true
@@ -347,6 +352,21 @@ class ContextModule < ActiveRecord::Base
         end
       end
     end
+
+    unless self.new_record?
+      old_requirements = self.completion_requirements || []
+      validated_reqs.each do |req|
+        if req[:type] == 'must_contribute' && !old_requirements.detect{|r| r[:id] == req[:id] && r[:type] == req[:type]} # new requirement
+          tag = tags[req[:id]]
+          if tag.content_type == "DiscussionTopic"
+            @discussion_topics_to_recalculate ||= []
+            @discussion_topics_to_recalculate << tag.content
+          end
+        end
+      end
+    end
+
+    validated_reqs
   end
 
   def completion_requirements_visible_to(user)

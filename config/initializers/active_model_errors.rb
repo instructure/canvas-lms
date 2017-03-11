@@ -121,6 +121,18 @@ module ActiveModel
   end
 end
 
+module Rails5Errors
+  def details
+    error_collection
+  end
+end
+
+module Rails5ErrorCollection
+  def each_key(&block)
+    @collection.each_key(&block)
+  end
+end
+
 # This is what sets the above reporter class as both the .to_hash and .to_json
 # responder for ActiveRecord::Errors objects (which with the better_errors gem
 # installed, is actually replaced by the ActiveModel::BetterErrors::Errors class)
@@ -134,3 +146,5 @@ ActiveModel::BetterErrors.formatter = ActiveModel::BetterErrors::InstructureForm
 
 # make better errors compatible with Rails 5
 ActiveRecord::Base.include(ActiveModel::BetterErrors::AutosaveAssociation) unless CANVAS_RAILS4_2
+ActiveModel::BetterErrors::Errors.include(Rails5Errors)
+ActiveModel::BetterErrors::ErrorCollection.include(Rails5ErrorCollection)

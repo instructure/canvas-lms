@@ -16,7 +16,7 @@ define [
       courseColors: TEST_COLORS
       usedDefaults: []
 
-  module 'DashboardCardBackgroundStore',
+  QUnit.module 'DashboardCardBackgroundStore',
     setup: ->
       DashboardCardBackgroundStore.reset()
       fakeENV.setup()

@@ -7,7 +7,7 @@ define [
   'jsx/epub_exports/CourseStore'
 ], (_, React, ReactDOM, TestUtils, App, CourseEpubExportStore) ->
 
-  module 'AppSpec',
+  QUnit.module 'AppSpec',
     setup: ->
       @props = {
         1: {
@@ -19,7 +19,7 @@ define [
           id: 2
         }
       }
-      sinon.stub(CourseEpubExportStore, 'getAll', -> true)
+      sinon.stub(CourseEpubExportStore, 'getAll').returns(true)
 
     teardown: ->
       CourseEpubExportStore.getAll.restore()

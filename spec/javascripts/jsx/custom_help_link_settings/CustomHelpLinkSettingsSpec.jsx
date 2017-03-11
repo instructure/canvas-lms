@@ -6,7 +6,7 @@ define([
 
   const container = document.getElementById('fixtures')
 
-  module('<CustomHelpLinkSettings/>', {
+  QUnit.module('<CustomHelpLinkSettings/>', {
     render(overrides={}) {
       const props = {
         name: 'Help',

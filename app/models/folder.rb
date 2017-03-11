@@ -368,20 +368,6 @@ class Folder < ActiveRecord::Base
     folder
   end
 
-  def self.find_folder(context, folder_id)
-    if folder_id
-      current_folder = context.folders.active.find(folder_id)
-    else
-      # TODO i18n
-      if context.is_a? Course
-        t :course_content_folder_name, 'course content'
-        current_folder = context.folders.active.where(full_name: "course content").first
-      elsif @context.is_a? User
-        current_folder = context.folders.active.where(full_name: MY_FILES_FOLDER_NAME).first
-      end
-    end
-  end
-
   def self.find_attachment_in_context_with_path(context, path)
     components = path.split('/')
     component = components.shift

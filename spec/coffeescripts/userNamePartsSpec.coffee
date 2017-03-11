@@ -1,6 +1,6 @@
 define [ 'user_utils' ], (userUtils) ->
 
-  module "UserNameParts"
+  QUnit.module "UserNameParts"
   test "should infer name parts", ->
     deepEqual userUtils.nameParts("Cody Cutrer"), [ "Cody", "Cutrer", null ]
     deepEqual userUtils.nameParts("  Cody  Cutrer   "), [ "Cody", "Cutrer", null ]

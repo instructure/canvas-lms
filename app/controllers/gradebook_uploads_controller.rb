@@ -20,7 +20,7 @@ class GradebookUploadsController < ApplicationController
   include GradebooksHelper
   include Api::V1::Progress
 
-  before_filter :require_context
+  before_action :require_context
 
   def new
     if authorized_action(@context, @current_user, :manage_grades)

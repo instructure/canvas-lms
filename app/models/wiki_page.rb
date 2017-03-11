@@ -345,7 +345,7 @@ class WikiPage < ActiveRecord::Base
       if !self.active?
         res += context.participating_admins
       else
-        res += context.participants
+        res += context.participants(by_date: true)
       end
     end
     res.flatten.uniq

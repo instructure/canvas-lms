@@ -67,6 +67,23 @@ module Api::V1::ContentMigration
         json['migration_type_title'] = plugin.meta[:name].call
       end
     end
+
+    # For easier auditing for support requests
+    if Account.site_admin.grants_right?(current_user, :manage_courses)
+      json[:audit_info] = migration.respond_to?(:slice) &&
+                          migration.slice(:id,
+                                          :user_id,
+                                          :migration_settings,
+                                          :started_at,
+                                          :finished_at,
+                                          :created_at,
+                                          :updated_at,
+                                          :progress,
+                                          :context_type,
+                                          :source_course_id,
+                                          :migration_type)
+    end
+
     json
   end
 

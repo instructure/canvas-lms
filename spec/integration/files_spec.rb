@@ -9,9 +9,8 @@ describe FilesController do
 
   context "should support Submission as a context" do
     before(:each) do
-      course_with_teacher(:active_all => true, :user => @user)
+      course_with_teacher_logged_in(:active_all => true, :user => @user)
       host!("test.host")
-      login_as
       @me = @user
       submission_model
       @submission.attachment = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')
@@ -29,7 +28,7 @@ describe FilesController do
       expect(@me.valid_access_verifier?(qs['ts'], qs['sf_verifier'])).to be_truthy
       expect(qs['verifier']).to eq @submission.attachment.uuid
       location = response['Location']
-      reset!
+      remove_user_session
 
       get location
       expect(response).to be_success
@@ -51,7 +50,7 @@ describe FilesController do
   context "should support User as a context" do
     before(:each) do
       host!("test.host")
-      login_as
+      user_session(@user)
       @me = @user
       @att = @me.attachments.create(:uploaded_data => stub_png_data('my-pic.png'))
     end
@@ -67,7 +66,7 @@ describe FilesController do
       expect(uri.path).to eq "/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/my-pic.png"
       expect(@me.valid_access_verifier?(qs['ts'], qs['sf_verifier'])).to be_truthy
       location = response['Location']
-      reset!
+      remove_user_session
 
       get location
       expect(response).to be_success
@@ -132,9 +131,8 @@ describe FilesController do
   end
 
   it "should use relative urls for safefiles in course context" do
-    course_with_teacher(:active_all => true, :user => @user)
+    course_with_teacher_logged_in(:active_all => true, :user => @user)
     host!("test.host")
-    login_as
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
     HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
     get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", :inline => '1'
@@ -146,7 +144,7 @@ describe FilesController do
     expect(@user.valid_access_verifier?(qs['ts'], qs['sf_verifier'])).to be_truthy
     expect(qs['verifier']).to be_nil
     location = response['Location']
-    reset!
+    remove_user_session
 
     get location
     expect(response).to be_success
@@ -156,15 +154,14 @@ describe FilesController do
   end
 
   it "logs user access with safefiles" do
-    course_with_teacher(:active_all => true, :user => @user)
+    course_with_teacher_logged_in(:active_all => true, :user => @user)
     host!("test.host")
-    login_as
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
 
     get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", :inline => '1'
     expect(response).to be_redirect
     location = response['Location']
-    reset!
+    remove_user_session
 
     Setting.set('enable_page_views', 'db')
     get location
@@ -188,7 +185,7 @@ describe FilesController do
     expect(uri.path).to eq "/courses/#{@course.id}/files/#{a1.id}/course%20files/test%20my%20file%3F%20hai!%26.png"
     expect(qs['verifier']).to eq a1.uuid
     location = response['Location']
-    reset!
+    remove_user_session
 
     get location
     expect(response).to be_success
@@ -210,7 +207,7 @@ describe FilesController do
     expect(uri.path).to eq "/courses/#{@course.id}/files/#{a1.id}/course%20files/test%20my%20file%3F%20hai!%26.png"
     expect(qs['verifier']).to eq a1.uuid
     location = response['Location']
-    reset!
+    remove_user_session
 
     get location
     expect(response).to be_success
@@ -221,9 +218,8 @@ describe FilesController do
 
   it "should update module progressions for html safefiles iframe" do
     HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
-    course_with_student(:active_all => true, :user => @user)
+    course_with_student_logged_in(:active_all => true, :user => @user)
     host!("test.host")
-    login_as
     @att = @course.attachments.create(:uploaded_data => stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"))
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({:type => 'attachment', :id => @att.id})
@@ -243,7 +239,7 @@ describe FilesController do
 
     # now reset the user session (simulating accessing via a separate domain), grab the document,
     # and verify the module progress was recorded
-    reset!
+    remove_user_session
     get location
     expect(response).to be_success
     expect(@module.evaluate_for(@user).state).to eql(:completed)
@@ -251,9 +247,8 @@ describe FilesController do
 
   context "should support AssessmentQuestion as a context" do
     before do
-      course_with_teacher(:active_all => true, :user => @user)
+      course_with_teacher_logged_in(:active_all => true, :user => @user)
       host!("test.host")
-      login_as
       bank = @course.assessment_question_banks.create!
       @aq = assessment_question_model(:bank => bank)
       @att = @aq.attachments.create!(:uploaded_data => stub_png_data)
@@ -270,7 +265,7 @@ describe FilesController do
       expect(@user.valid_access_verifier?(qs['ts'], qs['sf_verifier'])).to be_truthy
       expect(qs['verifier']).to eq @att.uuid
       location = response['Location']
-      reset!
+      remove_user_session
 
       get location
       expect(response).to be_success
@@ -323,7 +318,7 @@ describe FilesController do
     expect(uri.path).to eq "/files/#{@submission.attachment.id}/download"
     expect(qs['verifier']).to eq @submission.attachment.uuid
     location = response['Location']
-    reset!
+    remove_user_session
 
     get location
     expect(response).to be_success

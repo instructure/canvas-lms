@@ -32,7 +32,7 @@ module SeleniumExtensions
       yield
     rescue Selenium::WebDriver::Error::StaleElementReferenceError
       raise unless finder_proc
-      location = CallStackUtils.best_line_for($ERROR_INFO.backtrace, /test_setup/)
+      location = CallStackUtils.best_line_for($ERROR_INFO.backtrace)
       $stderr.puts "WARNING: StaleElementReferenceError at #{location}, attempting to recover..."
       @id = finder_proc.call.ref
       retry
@@ -60,7 +60,7 @@ module SeleniumExtensions
       ]
     ).each do |method|
       define_method(method) do |*args|
-        raise RuntimeError, 'need to do a `get` before you can interact with the page', CallStackUtils.useful_backtrace(method) unless ready_for_interaction
+        raise Error, 'need to do a `get` before you can interact with the page' unless ready_for_interaction
         super(*args)
       end
     end
@@ -70,19 +70,20 @@ module SeleniumExtensions
     def find_element(*args)
       FinderWaiting.wait_for method: :find_element do
         super
-      end or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{args.map(&:inspect).join(", ")}", CallStackUtils.useful_backtrace
+      end or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{args.map(&:inspect).join(", ")}"
     end
-    alias_method :first, :find_element
+    alias first find_element
 
-    def find_elements(*)
+    def find_elements(*args)
       result = []
       FinderWaiting.wait_for method: :find_elements do
         result = super
         result.present?
       end
+      result.present? or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{args.map(&:inspect).join(", ")}"
       result
     end
-    alias_method :all, :find_elements
+    alias all find_elements
 
     class << self
       attr_accessor :timeout
@@ -119,7 +120,7 @@ module SeleniumExtensions
       def prevent_nested_waiting!(method)
         return unless @outer_wait_method
         return if timeout == 0
-        raise NestedWaitError, "`#{method}` will wait for you; don't nest it in `#{@outer_wait_method}`", CallStackUtils.useful_backtrace(method)
+        raise NestedWaitError, "`#{method}` will wait for you; don't nest it in `#{@outer_wait_method}`"
       end
     end
   end

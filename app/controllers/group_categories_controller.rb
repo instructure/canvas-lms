@@ -83,9 +83,9 @@
 #     }
 #
 class GroupCategoriesController < ApplicationController
-  before_filter :get_context
-  before_filter :require_context, :only => [:create, :index]
-  before_filter :get_category_context, :only => [:show, :update, :destroy, :groups, :users, :assign_unassigned_members]
+  before_action :get_context
+  before_action :require_context, :only => [:create, :index]
+  before_action :get_category_context, :only => [:show, :update, :destroy, :groups, :users, :assign_unassigned_members]
 
   include Api::V1::Attachment
   include Api::V1::GroupCategory

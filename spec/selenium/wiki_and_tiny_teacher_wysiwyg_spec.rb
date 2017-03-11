@@ -63,7 +63,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       f(".mce-i-bullist").click
       in_frame wiki_page_body_ifr_id do
-        ff('#tinymce li').length == 3
+        expect(ff('#tinymce li').length).to eq 3
       end
     end
 
@@ -85,7 +85,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       f('.mce-i-numlist').click
       in_frame wiki_page_body_ifr_id do
-        ff('#tinymce li').length == 3
+        expect(ff('#tinymce li').length).to eq 3
       end
     end
 

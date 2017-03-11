@@ -1,5 +1,5 @@
 define ['jsx/context_modules/stores/ObjectStore'], (store) ->
-  module 'ObjectStore',
+  QUnit.module 'ObjectStore',
     setup: ->
       @testStore = new store('/api/v1/courses/2/folders')
       @server = sinon.fakeServer.create()

@@ -5,7 +5,7 @@ define([
   'react-addons-test-utils',
   'jsx/add_people/components/people_validation_issues',
 ], (_, React, ReactDOM, TestUtils, PeopleValidationIssues) => {
-  module('PeopleValidationIssues')
+  QUnit.module('PeopleValidationIssues')
 
   const duplicates = {
     addr1: {

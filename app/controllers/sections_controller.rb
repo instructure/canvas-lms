@@ -82,8 +82,8 @@
 #     }
 #
 class SectionsController < ApplicationController
-  before_filter :require_context
-  before_filter :require_section, :except => [:index, :create]
+  before_action :require_context
+  before_action :require_section, :except => [:index, :create]
 
   include Api::V1::Section
 

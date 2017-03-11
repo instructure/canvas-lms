@@ -1,4 +1,5 @@
 define [
+  'jquery'
   'i18n!conversations'
   'underscore'
   'Backbone'
@@ -7,7 +8,7 @@ define [
   'compiled/views/conversations/SearchView'
   'vendor/bootstrap/bootstrap-dropdown'
   'vendor/bootstrap-select/bootstrap-select'
-], (I18n, _, {View}, Spinner, CourseSelectionView, SearchView) ->
+], ($, I18n, _, {View}, Spinner, CourseSelectionView, SearchView) ->
 
   class InboxHeaderView extends View
 

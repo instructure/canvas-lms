@@ -101,7 +101,7 @@ define([
     readOnly: false,
   };
 
-  module("GradingPeriodSetCollection - API Data Load", {
+  QUnit.module("GradingPeriodSetCollection - API Data Load", {
     renderComponent() {
       const element = React.createElement(SetCollection, props);
       return ReactDOM.render(element, wrapper);
@@ -160,7 +160,7 @@ define([
     });
   });
 
-  module("GradingPeriodSetCollection", {
+  QUnit.module("GradingPeriodSetCollection", {
     setup() {
       const setsSuccess = new Promise(resolve => resolve(exampleSets));
       const termsSuccess = new Promise(resolve => resolve(exampleTerms));
@@ -263,7 +263,7 @@ define([
     });
   });
 
-  module("GradingPeriodSetCollection - Search", {
+  QUnit.module("GradingPeriodSetCollection - Search", {
     setup() {
       const setsSuccess = new Promise(resolve => resolve(exampleSets));
       const termsSuccess = new Promise(resolve => resolve(exampleTerms));
@@ -454,7 +454,7 @@ define([
     propEqual(filteredSets, expectedSets);
   });
 
-  module("GradingPeriodSetCollection - Add Set", {
+  QUnit.module("GradingPeriodSetCollection - Add Set", {
     setup() {
       const setsSuccess = new Promise(resolve => resolve([]));
       const termsSuccess = new Promise(resolve => resolve(exampleTerms));
@@ -492,7 +492,7 @@ define([
     });
   });
 
-  module("GradingPeriodSetCollection - Delete Set", {
+  QUnit.module("GradingPeriodSetCollection - Delete Set", {
     setup() {
       const setsSuccess = new Promise(resolve => resolve(exampleSets));
       const termsSuccess = new Promise(resolve => resolve(exampleTerms));
@@ -543,7 +543,7 @@ define([
     });
   });
 
-  module("GradingPeriodSetCollection - Update Set Periods", {
+  QUnit.module("GradingPeriodSetCollection - Update Set Periods", {
     setup() {
       const setsSuccess = new Promise(resolve => resolve(exampleSets));
       const termsSuccess = new Promise(resolve => resolve(exampleTerms));
@@ -571,7 +571,7 @@ define([
     });
   });
 
-  module("GradingPeriodSetCollection 'Edit Grading Period Set'", {
+  QUnit.module("GradingPeriodSetCollection 'Edit Grading Period Set'", {
     setup() {
       const setsSuccess = new Promise(resolve => resolve(exampleSets));
       const termsSuccess = new Promise(resolve => resolve(exampleTerms));
@@ -635,7 +635,7 @@ define([
     });
   });
 
-  module("GradingPeriodSetCollection 'Edit Grading Period Set - onSave'", {
+  QUnit.module("GradingPeriodSetCollection 'Edit Grading Period Set - onSave'", {
     setup() {
       this.stub(setsApi, 'list').returns(new Promise(() => {}));
       this.stub(termsApi, 'list').returns(new Promise(() => {}));

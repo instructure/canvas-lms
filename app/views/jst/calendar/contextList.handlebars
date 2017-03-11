@@ -9,11 +9,12 @@
       <label id="group_{{asset_string}}_checkbox_label">
         {{name}}
       </label>
-      <i role="button" tabindex="0" class="ContextList__MoreBtn icon-more">
+      <button type="button" tabindex="0" class="Button Button--icon-action ContextList__MoreBtn">
+        <i class="icon-more" aria-hidden="true"></i>
         <span class="screenreader-only">
           {{#t}}Open {{name}} Color Picker{{/t}}
         </span>
-      </i>
+      </button>
     </li>
   {{/each}}
 </ul>

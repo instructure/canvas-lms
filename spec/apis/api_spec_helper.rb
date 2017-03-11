@@ -52,23 +52,6 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   raw_api_call(method, path, params, body_params, headers, opts)
   if opts[:expected_status]
     assert_status(opts[:expected_status])
-  else
-    unless response.success?
-      error_message = response.body
-      begin
-        json = JSON.parse(response.body)
-        error_report_id = json['error_report_id']
-        error_report = ErrorReport.find_by(id: error_report_id) if error_report_id
-        if error_report
-          error_message << "\n"
-          error_message << error_report.message
-          error_message << "\n"
-          error_message << error_report.backtrace
-        end
-      rescue JSON::ParserError
-      end
-    end
-    expect(response).to be_success, error_message
   end
 
   if response.headers['Link']
@@ -76,14 +59,9 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
     Api.parse_pagination_links(response.headers['Link'])
   end
 
-  if jsonapi_call?(headers) && method == :delete
-    assert_status(204)
-    return
-  end
-
   case params[:format]
   when 'json'
-    expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
+    raise "got non-json" unless response.header[content_type_key] == 'application/json; charset=utf-8'
 
     body = response.body
     if body.respond_to?(:call)
@@ -133,7 +111,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
   enable_forgery_protection do
     route_params = params_from_with_nesting(method, path)
     route_params.each do |key, value|
-      expect(params[key].to_s).to eq(value.to_s), lambda{ "Expected value of params[\'#{key}\'] to equal #{value}, actual: #{params[key]}"}
+      raise "Expected value of params[\'#{key}\'] to equal #{value}, actual: #{params[key]}" unless params[key].to_s == value.to_s
     end
     if @use_basic_auth
       user_session(@user)

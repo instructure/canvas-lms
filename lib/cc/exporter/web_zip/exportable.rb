@@ -4,14 +4,14 @@ module CC::Exporter::WebZip
       self.attachment
     end
 
-    def create_zip(exporter)
-      CC::Exporter::WebZip::ZipPackage.new(exporter)
+    def create_zip(exporter, progress_key)
+      CC::Exporter::WebZip::ZipPackage.new(exporter, course, user, progress_key)
     end
 
-    def convert_to_offline_web_zip
-      exporter = CC::Exporter::WebZip::Exporter.new(content_cartridge.open, false)
-      zip = create_zip(exporter)
-      file_path = zip.create || zip.empty_zip_file
+    def convert_to_offline_web_zip(progress_key)
+      exporter = CC::Exporter::WebZip::Exporter.new(content_cartridge.open, false, :web_zip)
+      zip = create_zip(exporter, progress_key)
+      file_path = zip.create
 
       exporter.cleanup_files
       zip.cleanup_files

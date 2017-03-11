@@ -9,7 +9,7 @@ class ActiveRecord::Base
     delegate :distinct_on, :find_ids_in_batches, to: :all
 
     def find_ids_in_ranges(opts={}, &block)
-      opts.reverse_merge(:loose => true)
+      opts.reverse_merge!(:loose => true)
       all.find_ids_in_ranges(opts, &block)
     end
 
@@ -144,6 +144,10 @@ class ActiveRecord::Base
     send("#{field}_type").underscore + "_" + send("#{field}_id").to_s if send("#{field}_type")
   end
 
+  def self.asset_string_backcompat_module
+    @asset_string_backcompat_module ||= Module.new.tap { |m| prepend(m) }
+  end
+
   def self.define_asset_string_backcompat_method(string_version_name, association_version_name = string_version_name, method = nil)
     # just chain to the two methods
     unless method
@@ -159,19 +163,18 @@ class ActiveRecord::Base
       return
     end
 
-    self.class_eval <<-CODE
-      def #{association_version_name}_#{method}_with_backcompat
-        res = #{association_version_name}_#{method}_without_backcompat
+    asset_string_backcompat_module.class_eval <<-CODE, __FILE__, __LINE__ + 1
+      def #{association_version_name}_#{method}
+        res = super
         if !res && #{string_version_name}.present?
           type, id = ActiveRecord::Base.parse_asset_string(#{string_version_name})
           write_attribute(:#{association_version_name}_type, type)
           write_attribute(:#{association_version_name}_id, id)
-          res = #{association_version_name}_#{method}_without_backcompat
+          res = super
         end
         res
       end
     CODE
-    self.alias_method_chain "#{association_version_name}_#{method}".to_sym, :backcompat
   end
 
   def export_columns(format = nil)
@@ -591,6 +594,34 @@ class ActiveRecord::Base
   end
 end
 
+module UsefulFindInBatches
+  def find_in_batches(options = {}, &block)
+    # already in a transaction (or transactions don't matter); cursor is fine
+    if can_use_cursor? && !options[:start]
+      self.activate { find_in_batches_with_cursor(options, &block) }
+    elsif find_in_batches_needs_temp_table?
+      raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key") if options[:start]
+      self.activate { find_in_batches_with_temp_table(options, &block) }
+    else
+      super
+    end
+  end
+end
+ActiveRecord::Relation.prepend(UsefulFindInBatches)
+
+module LockForNoKeyUpdate
+  def lock(lock_type = true)
+    if lock_type == :no_key_update
+      postgres_9_3_or_above = connection.adapter_name == 'PostgreSQL' &&
+        connection.send(:postgresql_version) >= 90300
+      lock_type = true
+      lock_type = 'FOR NO KEY UPDATE' if postgres_9_3_or_above
+    end
+    super(lock_type)
+  end
+end
+ActiveRecord::Relation.prepend(LockForNoKeyUpdate)
+
 ActiveRecord::Relation.class_eval do
   def includes(*args)
     return super if args.empty? || args == [nil]
@@ -618,19 +649,6 @@ ActiveRecord::Relation.class_eval do
       select_values_necessitate_temp_table?
   end
   private :find_in_batches_needs_temp_table?
-
-  def find_in_batches_with_usefulness(options = {}, &block)
-    # already in a transaction (or transactions don't matter); cursor is fine
-    if can_use_cursor? && !options[:start]
-      self.activate { find_in_batches_with_cursor(options, &block) }
-    elsif find_in_batches_needs_temp_table?
-      raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key") if options[:start]
-      self.activate { find_in_batches_with_temp_table(options, &block) }
-    else
-      find_in_batches_without_usefulness(options, &block)
-    end
-  end
-  alias_method_chain :find_in_batches, :usefulness
 
   def can_use_cursor?
     (connection.adapter_name == 'PostgreSQL' &&
@@ -769,17 +787,6 @@ ActiveRecord::Relation.class_eval do
     end
   end
 
-  def lock_with_exclusive_smarts(lock_type = true)
-    if lock_type == :no_key_update
-      postgres_9_3_or_above = connection.adapter_name == 'PostgreSQL' &&
-        connection.send(:postgresql_version) >= 90300
-      lock_type = true
-      lock_type = 'FOR NO KEY UPDATE' if postgres_9_3_or_above
-    end
-    lock_without_exclusive_smarts(lock_type)
-  end
-  alias_method_chain :lock, :exclusive_smarts
-
   def polymorphic_where(args)
     raise ArgumentError unless args.length == 1
 
@@ -913,10 +920,10 @@ module UpdateAndDeleteWithJoins
   def update_all(updates, *args)
     return super if joins_values.empty?
 
-    stmt = Arel::UpdateManager.new(arel.engine)
+    stmt = CANVAS_RAILS4_2 ? Arel::UpdateManager.new(arel.engine) : Arel::UpdateManager.new
 
     stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
-    from = from_value.try(:first)
+    from = (CANVAS_RAILS4_2 ? from_value&.first : from_clause.value)
     stmt.table(from ? Arel::Nodes::SqlLiteral.new(from) : table)
     stmt.key = table[primary_key]
 
@@ -1217,8 +1224,8 @@ ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems', 'plug
 
 ActiveRecord::Tasks::DatabaseTasks.migrations_paths = ActiveRecord::Migrator.migrations_paths
 
-ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
-  def add_index_with_length_raise(table_name, column_name, options = {})
+module AddIndexWithLengthRaise
+  def add_index(table_name, column_name, options = {})
     unless options[:name].to_s =~ /^temp_/
       column_names = Array(column_name)
       index_name = index_name(table_name, :column => column_names)
@@ -1230,10 +1237,12 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
         raise(ArgumentError, "Index name '#{index_name}' on table '#{table_name}' already exists.")
       end
     end
-    add_index_without_length_raise(table_name, column_name, options)
+    super
   end
-  alias_method_chain :add_index, :length_raise
+end
+ActiveRecord::ConnectionAdapters::SchemaStatements.prepend(AddIndexWithLengthRaise)
 
+ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   # in anticipation of having to re-run migrations due to integrity violations or
   # killing stuff that is holding locks too long
   def add_foreign_key_if_not_exists(from_table, to_table, options = {})
@@ -1283,23 +1292,28 @@ ActiveRecord::Associations::CollectionAssociation.class_eval do
 end
 
 module UnscopeCallbacks
-  def __run_callbacks__(*args)
-    scope = self.class.base_class.unscoped
-    scope.scoping { super }
+  if CANVAS_RAILS4_2
+    def __run_callbacks__(*args)
+      scope = self.class.base_class.unscoped
+      scope.scoping { super }
+    end
+  else
+    def __run_callbacks__(*args)
+      scope = self.class.unscoped
+      scope.scoping { super }
+    end
   end
 end
 ActiveRecord::Base.send(:include, UnscopeCallbacks)
 
-ActiveRecord::DynamicMatchers::Method.class_eval do
-  class << self
-    def match_with_discard(model, name)
-      result = match_without_discard(model, name)
-      return nil if result && !result.is_a?(ActiveRecord::DynamicMatchers::FindBy)
-      result
-    end
-    alias_method_chain :match, :discard
+module MatchWithDiscard
+  def match(model, name)
+    result = super
+    return nil if result && !result.is_a?(ActiveRecord::DynamicMatchers::FindBy)
+    result
   end
 end
+ActiveRecord::DynamicMatchers::Method.singleton_class.prepend(MatchWithDiscard)
 
 # see https://github.com/rails/rails/issues/18659
 class AttributesDefiner

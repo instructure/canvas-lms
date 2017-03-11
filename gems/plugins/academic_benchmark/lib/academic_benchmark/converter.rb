@@ -73,3 +73,5 @@ module AcademicBenchmark
     end
   end
 end
+
+SafeYAML.whitelist_class!(AcademicBenchmark::Converter)

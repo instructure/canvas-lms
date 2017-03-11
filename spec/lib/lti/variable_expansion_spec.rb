@@ -40,6 +40,11 @@ module Lti
       expect(var_exp.expand(TestExpander.new)).to eq '$test'
     end
 
+    it 'accepts and sets default_name' do
+      var_exp = described_class.new('test', [], -> { 'test' }, -> { true }, default_name: 'test_name' )
+      expect(var_exp.default_name).to eq 'test_name'
+    end
+
     it 'expands variables' do
       var_exp = described_class.new('test', [], -> { @one + @two + @three } )
       expect(var_exp.expand(TestExpander.new)).to eq 6

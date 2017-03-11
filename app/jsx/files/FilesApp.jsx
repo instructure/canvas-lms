@@ -196,7 +196,7 @@ define([
           <ReactModal
             isOpen={this.state.showingModal}
             onRequestClose={this.closeModal}
-            closeTimeoutMS='10'
+            closeTimeoutMS={10}
             className='ReactModal__Content--canvas'
             overlayClassName='ReactModal__Overlay--canvas'
             style={modalOverrides}

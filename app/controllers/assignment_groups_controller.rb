@@ -92,7 +92,7 @@
 #     }
 #
 class AssignmentGroupsController < ApplicationController
-  before_filter :require_context
+  before_action :require_context
 
   include Api::V1::AssignmentGroup
 
@@ -330,6 +330,10 @@ class AssignmentGroupsController < ApplicationController
         EffectiveDueDates.for_course(context, assignments).to_hash([:in_closed_grading_period])
     end
 
+    if assignments.any? && context.grants_right?(current_user, session, :manage_assignments)
+      mc_status = setup_master_course_restrictions(assignments, context)
+    end
+
     groups.map do |group|
       group.context = context
       group_assignments = assignments_by_group[group.id] || []
@@ -343,7 +347,8 @@ class AssignmentGroupsController < ApplicationController
         exclude_response_fields: assignment_excludes,
         include_overrides: include_overrides,
         submissions: submissions,
-        closed_grading_period_hash: closed_grading_period_hash
+        closed_grading_period_hash: closed_grading_period_hash,
+        master_course_status: mc_status
       }
 
       assignment_group_json(group, current_user, session, params[:include], options)
@@ -404,10 +409,6 @@ class AssignmentGroupsController < ApplicationController
 
     if assignment_includes.include?(:assignment_overrides)
       assignments.each { |a| a.has_no_overrides = true if a.assignment_overrides.size == 0 }
-    end
-
-    if master_courses? && context.grants_right?(@current_user, session, :manage_assignments)
-      MasterCourses::Restrictor.preload_restrictions(assignments)
     end
 
     assignments

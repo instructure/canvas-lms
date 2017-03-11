@@ -16,7 +16,7 @@ define [
   class Assignments extends Backbone.Collection
     model: AssignmentStub
 
-  module "NeverDropCollectionView",
+  QUnit.module "NeverDropCollectionView",
     setup: ->
       @clock = sinon.useFakeTimers()
       util.useOldDebounce()

@@ -74,7 +74,7 @@ class Quizzes::QuizGroupsController < ApplicationController
   include Api::V1::QuizGroup
   include ::Filters::Quizzes
 
-  before_filter :require_context, :require_quiz
+  before_action :require_context, :require_quiz
 
   # @API Get a single quiz group
   # @beta

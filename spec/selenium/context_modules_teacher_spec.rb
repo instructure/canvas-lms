@@ -655,17 +655,15 @@ describe "context modules" do
     context "module item cog focus management", priority: "1" do
 
       before :each do
+        create_modules(1)[0].add_item({id: @assignment.id, type: 'assignment'})
         get "/courses/#{@course.id}/modules"
-        add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
         @tag = ContentTag.last
         f("#context_module_item_#{@tag.id} .al-trigger").click
       end
 
       it "should return focus to the cog menu when closing the edit dialog for an item" do
         hover_and_click("#context_module_item_#{@tag.id} .edit_item_link")
-        cancel_buttons = ff('.cancel_button.ui-button')
-        expect(cancel_buttons).to have_size(2)
-        cancel_buttons[1].click
+        f('.cancel_button.ui-button').click
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 

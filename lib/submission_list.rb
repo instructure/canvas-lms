@@ -182,10 +182,11 @@ class SubmissionList
         h
       end
 
-      hsh.each do |k, v|
+      hsh.each_value do |v|
+        v['submissions'] = Canvas::ICU.collate_by(v.submissions, &:student_name)
         v.submission_count = v.submissions.size
       end
-      # puts "-------------------------------Time Spent in assignments_for_grader_and_day: #{Time.now-start}-------------------------------"
+
       hsh.values
     end
 

@@ -6,7 +6,7 @@ define [
   'helpers/fakeENV'
 ], ($, Entry, EntryView, Reply, fakeENV) ->
 
-  module 'EntryView',
+  QUnit.module 'EntryView',
     setup: ->
       fakeENV.setup
         DISCUSSION:

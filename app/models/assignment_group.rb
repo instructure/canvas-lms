@@ -45,7 +45,7 @@ class AssignmentGroup < ActiveRecord::Base
     if self.name.blank?
       self.name = t 'default_title', "Assignments"
     end
-    if !self.group_weight
+    if !self.group_weight || self.group_weight.nan?
       self.group_weight = 0
     end
     self.default_assignment_name = self.name

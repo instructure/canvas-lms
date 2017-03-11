@@ -19,9 +19,9 @@
 class ContextModulesController < ApplicationController
   include Api::V1::ContextModule
 
-  before_filter :require_context
+  before_action :require_context
   add_crumb(proc { t('#crumbs.modules', "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_context_modules_url }
-  before_filter { |c| c.active_tab = "modules" }
+  before_action { |c| c.active_tab = "modules" }
 
   module ModuleIndexHelper
     include ContextModulesHelper
@@ -408,7 +408,7 @@ class ContextModulesController < ApplicationController
       else
         @progression.collapsed = !@progression.collapsed
       end
-      @progression.save
+      @progression.save unless @progression.new_record?
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_context_modules_url) }
         format.json { render :json => (@progression.collapsed ? @progression : @module.content_tags_visible_to(@current_user) )}

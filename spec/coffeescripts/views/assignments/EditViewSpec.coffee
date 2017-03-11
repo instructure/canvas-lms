@@ -14,12 +14,29 @@ define [
   'helpers/fakeENV'
   'compiled/userSettings'
   'helpers/jquery.simulate'
-], ($, _, SectionCollection, Assignment, DueDateList, Section,
-  AssignmentGroupSelector, DueDateOverrideView, EditView,
-  GradingTypeSelector, GroupCategorySelector, PeerReviewsSelector, fakeENV,
+], (
+  $,
+  _,
+  SectionCollection,
+  Assignment,
+  DueDateList,
+  Section,
+  AssignmentGroupSelector,
+  DueDateOverrideView,
+  EditView,
+  GradingTypeSelector,
+  GroupCategorySelector,
+  PeerReviewsSelector,
+  fakeENV,
   userSettings) ->
 
   s_params = 'some super secure params'
+
+  nameLengthHelper = (view, length, maxNameLengthRequiredForAccount, maxNameLength, postToSis) ->
+    name = 'a'.repeat(length)
+    ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = maxNameLengthRequiredForAccount
+    ENV.MAX_NAME_LENGTH = maxNameLength
+    return view.validateBeforeSave({name: name, post_to_sis: postToSis}, [])
 
   editView = (assignmentOpts = {}) ->
     defaultAssignmentOpts =
@@ -58,7 +75,7 @@ define [
 
     app.render()
 
-  module 'EditView',
+  QUnit.module 'EditView',
     setup: ->
       fakeENV.setup({
         current_user_roles: ['teacher'],
@@ -126,17 +143,39 @@ define [
     equal errors["name"].length, 1
     equal errors["name"][0]["message"], "Name is required!"
 
-  test "requires a name < 255 chars to save assignment", ->
+  test "has an error when a name > 255 chars", ->
     view = @editView()
-    l1 = 'aaaaaaaaaa'
-    l2 = l1 + l1 + l1 + l1 + l1 + l1
-    l3 = l2 + l2 + l2 + l2 + l2 + l2
-    ok l3.length > 255
-
-    errors = view.validateBeforeSave(name: l3, [])
+    errors = nameLengthHelper(view, 257, false, 30, '0')
     ok errors["name"]
     equal errors["name"].length, 1
-    equal errors["name"][0]["message"], "Name is too long"
+    equal errors["name"][0]["message"], "Name is too long, must be under 256 characters"
+
+  test "allows assignment to save when a name < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is true", ->
+    view = @editView()
+    errors = nameLengthHelper(view, 254, false, 30, '1')
+    equal errors.length, 0
+
+  test "allows assignment to save when a name < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is false", ->
+    view = @editView()
+    errors = nameLengthHelper(view, 254, false, 30, '0')
+    equal errors.length, 0
+
+  test "has an error when a name > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
+    view = @editView()
+    errors = nameLengthHelper(view, 35, true, 30, '1')
+    ok errors["name"]
+    equal errors["name"].length, 1
+    equal errors["name"][0]["message"], "Name is too long, must be under #{ENV.MAX_NAME_LENGTH + 1} characters"
+
+  test "allows assignment to save when name > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is false", ->
+    view = @editView()
+    errors = nameLengthHelper(view, 35, true, 30, '0')
+    equal errors.length, 0
+
+  test "allows assignment to save when name < MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
+    view = @editView()
+    errors = nameLengthHelper(view, 25, true, 30, '1')
+    equal errors.length, 0
 
   test "don't validate name if it is frozen", ->
     view = @editView()
@@ -316,7 +355,7 @@ define [
     notOk view.$el.find('#has_group_category').attr('readonly')
     notOk view.$el.find('#has_group_category').attr('aria-readonly')
 
-  module 'EditView: handleGroupCategoryChange',
+  QUnit.module 'EditView: handleGroupCategoryChange',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -337,7 +376,7 @@ define [
 
     ok spy.calledOnce
 
-  module 'EditView: group category inClosedGradingPeriod',
+  QUnit.module 'EditView: group category inClosedGradingPeriod',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -364,7 +403,7 @@ define [
     notOk view.$("#assignment_group_category_id").prop("disabled")
     notOk view.$("[type=checkbox][name=grade_group_students_individually]").prop("disabled")
 
-  module 'EditView: enableCheckbox',
+  QUnit.module 'EditView: enableCheckbox',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -396,7 +435,7 @@ define [
 
     ok view.$('#assignment_peer_reviews').prop('disabled')
 
-  module 'EditView: setDefaultsIfNew',
+  QUnit.module 'EditView: setDefaultsIfNew',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -437,7 +476,7 @@ define [
 
     equal view.assignment.get('submission_types'), "foo"
 
-  module 'EditView: setDefaultsIfNew: no localStorage',
+  QUnit.module 'EditView: setDefaultsIfNew: no localStorage',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -458,7 +497,7 @@ define [
 
     equal view.assignment.get('submission_type'), "online"
 
-  module 'EditView: cacheAssignmentSettings',
+  QUnit.module 'EditView: cacheAssignmentSettings',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -488,7 +527,7 @@ define [
 
     equal null, userSettings.contextGet("new_assignment_settings")["invalid_attribute_example"]
 
-  module 'EditView: Conditional Release',
+  QUnit.module 'EditView: Conditional Release',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -533,6 +572,7 @@ define [
 
   test 'validates conditional release', ->
     view = @editView()
+    ENV.ASSIGNMENT = view.assignment
     stub = @stub(view.conditionalReleaseEditor, 'validateBeforeSave').returns 'foo'
     errors = view.validateBeforeSave(view.getFormData(), {})
     ok errors['conditional_release'] == 'foo'
@@ -556,10 +596,10 @@ define [
   test 'focuses in conditional release editor if conditional save validation fails', ->
     view = @editView()
     focusOnError = @stub(view.conditionalReleaseEditor, 'focusOnError')
-    view.showErrors({ conditional_release: 'foo' })
+    view.showErrors({ conditional_release: {type:'foo'} })
     ok focusOnError.called
 
-  module 'Editview: Intra-Group Peer Review toggle',
+  QUnit.module 'Editview: Intra-Group Peer Review toggle',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
@@ -595,7 +635,7 @@ define [
     view.$el.appendTo $('#fixtures')
     notOk view.$('#intra_group_peer_reviews').is(":visible")
 
-  module 'EditView: Assignment Configuration Tools',
+  QUnit.module 'EditView: Assignment Configuration Tools',
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1

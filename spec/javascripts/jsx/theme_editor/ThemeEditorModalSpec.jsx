@@ -6,7 +6,7 @@ define([
 
   let elem, props
 
-  module('ThemeEditorModal Component', {
+  QUnit.module('ThemeEditorModal Component', {
     setup () {
       elem = document.createElement('div')
       props = {

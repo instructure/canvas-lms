@@ -1,5 +1,3 @@
-require_relative '../assignment'
-
 class Assignment
   class SpeedGrader
     include GradebookSettingsHelpers

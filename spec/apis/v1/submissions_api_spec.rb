@@ -605,9 +605,6 @@ describe 'Submissions API', type: :request do
     quiz_with_submission
     a1 = @quiz.assignment
     sub = @quiz.assignment.submissions.where(user_id: student1).first
-    sub.quiz_submission.with_versioning(true) do
-      sub.quiz_submission.update_attribute(:finished_at, 1.hour.ago)
-    end
 
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",

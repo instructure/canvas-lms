@@ -20,9 +20,9 @@ class GradingStandardsController < ApplicationController
   JSON_METHODS =
     [:display_name, :context_code, :assessed_assignment?, :context_name].freeze
 
-  before_filter :require_context
+  before_action :require_context
   add_crumb(proc { t '#crumbs.grading_standards', "Grading" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grading_standards_url }
-  before_filter { |c| c.active_tab = "grading_standards" }
+  before_action { |c| c.active_tab = "grading_standards" }
 
   def index
     if authorized_action(@context, @current_user, :manage_grades)

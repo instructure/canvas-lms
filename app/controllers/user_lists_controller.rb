@@ -17,8 +17,8 @@
 #
 
 class UserListsController < ApplicationController
-  skip_before_filter :verify_authenticity_token
-  before_filter :require_context
+  skip_before_action :verify_authenticity_token
+  before_action :require_context
 
   # POST /courses/:course_id/user_lists.json
   # POST /accounts/:account_id/user_lists.json

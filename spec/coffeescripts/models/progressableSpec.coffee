@@ -8,7 +8,7 @@ define ['compiled/models/progressable', 'Backbone'], (progressable, {Model}) ->
   class QuizCSV extends Model
     @mixin progressable
 
-  module 'progressable',
+  QUnit.module 'progressable',
     setup: ->
       clock = sinon.useFakeTimers()
       model = new QuizCSV

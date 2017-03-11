@@ -5,7 +5,7 @@ define([
   'jsx/context_cards/SectionInfo'
 ], (React, ReactDOM, TestUtils, SectionInfo) => {
 
-  module('StudentContextTray/SectionInfo', (hooks) => {
+  QUnit.module('StudentContextTray/SectionInfo', (hooks) => {
     let subject
 
     hooks.afterEach(() => {
@@ -18,7 +18,7 @@ define([
       subject = null
     })
 
-    module('sections', () => {
+    QUnit.module('sections', () => {
       test('should be empty array by default', () => {
         subject = TestUtils.renderIntoDocument(
           <SectionInfo />

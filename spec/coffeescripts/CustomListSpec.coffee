@@ -3,7 +3,7 @@ define [
   'compiled/widget/CustomList'
   'helpers/jquery.simulate'
 ], ($,CustomList)->
-  module 'CustomList',
+  QUnit.module 'CustomList',
     setup: ->
       @el = $("""<div>
         <style>

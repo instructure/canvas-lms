@@ -5,12 +5,14 @@ define([
   'react-addons-test-utils',
   'jsx/files/Breadcrumbs',
   'compiled/models/Folder',
-  'helpers/fakeENV'
-], ($, React, ReactDOM, TestUtils, Breadcrumbs, Folder, fakeENV) => {
+  (window.USE_WEBPACK ? '../../../../coffeescripts/helpers/fakeENV.coffee' : 'helpers/fakeENV'),
+  'compiled/react_files/modules/filesEnv',
+], ($, React, ReactDOM, TestUtils, Breadcrumbs, Folder, fakeENV, filesEnv) => {
 
-  module('Files Breadcrumbs Component', {
+  QUnit.module('Files Breadcrumbs Component', {
     setup () {
       fakeENV.setup({context_asset_string: 'course_1'});
+      filesEnv.baseUrl = '/courses/1/files';
     },
     teardown() {
       $('#fixtures').empty();

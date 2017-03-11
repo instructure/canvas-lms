@@ -5,7 +5,7 @@ define [
   'jsx/shared/ProgressBar'
 ], (React, ReactDOM, $, ProgressBar) ->
 
-  module 'ProgressBar',
+  QUnit.module 'ProgressBar',
     setup: ->
     teardown: ->
       $("#fixtures").empty()

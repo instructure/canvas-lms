@@ -6,7 +6,7 @@ define [
   'jsx/files/NoResults'
 ], (React, ReactDOM, TestUtils, $, NoResults) ->
 
-  module "NoResults"
+  QUnit.module "NoResults"
 
   test "displays search term in no results text", ->
     noResults = React.createFactory(NoResults)

@@ -4,7 +4,7 @@ define([
   'react-addons-test-utils',
   'jsx/add_people/components/add_people',
 ], (React, ReactDOM, TestUtils, AddPeople) => {
-  module('AddPeople')
+  QUnit.module('AddPeople')
 
   const props = {
     isOpen: true,

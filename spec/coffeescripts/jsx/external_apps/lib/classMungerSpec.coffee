@@ -1,5 +1,5 @@
 define ['jsx/external_apps/lib/classMunger'], (classMunger) ->
-  module 'ExternalApps.classMunger'
+  QUnit.module 'ExternalApps.classMunger'
 
   test 'conditionally joins classes', ->
     cls = classMunger('foo', { 'bar': true, 'baz': false })

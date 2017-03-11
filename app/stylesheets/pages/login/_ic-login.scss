@@ -21,8 +21,6 @@
 // ic-brand-Login-Content-inner-body-border
 // ic-brand-Login-Content-label-text-color
 // ic-brand-Login-Content-password-text-color
-// ic-brand-Login-Content-button-bgd
-// ic-brand-Login-Content-button-text
 // ic-brand-Login-footer-link-color
 // ic-brand-Login-footer-link-color-hover
 // ic-brand-Login-instructure-logo
@@ -92,6 +90,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 }
 .ic-Login__link {
   color: $ic-brand-Login-Content-password-text-color !important;
+  text-decoration: underline;
 }
 .ic-Login__body__error {
   display: block;
@@ -157,9 +156,36 @@ body.ic-Login-Body { // apply the background to the body element so that you don
   .ic-Form-control {
     margin-bottom: 0; // override to help vertical alignment
   }
-  button.Button--login {
+  // simulating a ghost button to work for default high contrast login screen
+  .Button--login {
     padding: $ic-sp/2 $ic-sp*3;
-    @include canvas-button($ic-brand-Login-Content-button-bgd,  $ic-brand-Login-Content-button-text);
+    background: transparent;
+    color: $ic-brand-Login-Content-password-text-color;
+    border: 1px solid $ic-brand-Login-Content-password-text-color;
+    overflow: visible;
+
+    &:hover {
+      background: rgba($ic-brand-Login-Content-password-text-color, 0.1);
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: -0.2857rem;
+      left: -0.2857rem;
+      right: -0.2857rem;
+      bottom: -0.2857rem;
+      border: 1px solid $ic-brand-Login-Content-password-text-color;
+      border-radius: 0.2857rem;
+      opacity: 0;
+    }
+
+    &:focus {
+      box-shadow: none;
+      &::before {
+        opacity: 1;
+      }
+    }
   }
 }
 //////////
@@ -211,10 +237,10 @@ body.ic-Login-Body #footer.ic-Login-footer {
       @include fontSize(11px);
       padding: 0 $ic-sp/2;
       white-space: nowrap;
+      text-decoration: underline;
       &:hover {
         background-color: none;
         color: $ic-brand-Login-footer-link-color-hover;
-        text-decoration: underline;
       }
     }
   }
@@ -268,7 +294,7 @@ body.ic-Login-Body #footer.ic-Login-footer {
 // Logout
 ////
 .Button--logout-confirm {
-  @include canvas-button($ic-brand-Login-Content-button-bgd,  $ic-brand-Login-Content-button-text);
+  @include canvas-button($ic-brand-Login-Content-password-text-color,  $ic-brand-Login-Content-password-text-color)
 }
 .Button--logout-link {
   color: $ic-brand-Login-footer-link-color;

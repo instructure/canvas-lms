@@ -74,8 +74,8 @@
 #     }
 class AccountNotificationsController < ApplicationController
   include Api::V1::AccountNotifications
-  before_filter :require_user
-  before_filter :require_account_admin, except: [:user_index, :user_close_notification, :show]
+  before_action :require_user
+  before_action :require_account_admin, except: [:user_index, :user_close_notification, :show]
 
   # @API Index of active global notification for the user
   # Returns a list of all global notifications in the account for this user

@@ -17,7 +17,7 @@
 module Submissions
   class DownloadsController < ApplicationController
     include Submissions::ShowHelper
-    before_filter :require_context
+    before_action :require_context
 
     def show
       service = Submissions::SubmissionForShow.new(

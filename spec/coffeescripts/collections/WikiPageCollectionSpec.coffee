@@ -3,7 +3,7 @@ define [
   'compiled/collections/WikiPageCollection'
 ], (WikiPage, WikiPageCollection) ->
 
-  module 'WikiPageCollection'
+  QUnit.module 'WikiPageCollection'
 
   checkFrontPage = (collection) ->
     total = collection.reduce ((i, model) -> i += if model.get('front_page') then 1 else 0), 0
@@ -25,7 +25,7 @@ define [
     collection.models[2].set('front_page', true)
     ok checkFrontPage(collection), 'set front_page thrice'
 
-  module 'WikiPageCollection:sorting',
+  QUnit.module 'WikiPageCollection:sorting',
     setup: ->
       @collection = new WikiPageCollection
 

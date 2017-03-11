@@ -2,7 +2,7 @@ define([
   'jsx/course_settings/helpers'
 ], (Helpers) => {
 
-  module('Course Settings Helpers');
+  QUnit.module('Course Settings Helpers');
 
   test('isValidImageType', () => {
     ok(Helpers.isValidImageType('image/jpeg'), 'accepts jpeg');

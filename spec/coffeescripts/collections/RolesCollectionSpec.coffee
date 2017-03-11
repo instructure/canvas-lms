@@ -5,7 +5,7 @@ define [
   'compiled/collections/RolesCollection'
   'compiled/util/BaseRoleTypes'
 ], (Backbone,_, Role, RolesCollection) ->
-  module 'RolesCollection',
+  QUnit.module 'RolesCollection',
     setup: ->
       @account_id = 2
     teardown: -> 

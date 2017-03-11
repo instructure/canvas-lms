@@ -222,7 +222,7 @@ define([
   const API_ENROLL_RESPONSE = [{}, {}];
 
   // the tests ---------------------
-  module('Course Enrollment Add Prople Reducer')
+  QUnit.module('Course Enrollment Add People Reducer')
 
   const reduce = (action, state = INITIAL_STATE) => reducer(state, action)
 

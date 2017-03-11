@@ -170,5 +170,5 @@ require [
       bucket.add(model)
 
   # Start up the page
-  @router = new DiscussionIndexRouter
+  router = new DiscussionIndexRouter
   Backbone.history.start()

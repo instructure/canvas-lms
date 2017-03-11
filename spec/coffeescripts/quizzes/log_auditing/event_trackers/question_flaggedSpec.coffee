@@ -3,7 +3,7 @@ define [
   'compiled/quizzes/log_auditing/constants'
   'jquery'
 ], (Subject, K, $) ->
-  module 'Quizzes::LogAuditing::EventTrackers::QuestionFlagged',
+  QUnit.module 'Quizzes::LogAuditing::EventTrackers::QuestionFlagged',
     setup: ->
     teardown: ->
       document.getElementById("fixtures").innerHTML = ""

@@ -11,7 +11,7 @@ define [
         type: type
         size: size
 
-  module 'FileUploader',
+  QUnit.module 'FileUploader',
     setup: ->
       folder = {id: 1}
       @uploader = new FileUploader(mockFileOptions('foo', 'bar', 1), folder)

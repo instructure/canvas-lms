@@ -175,8 +175,7 @@ define([
           <div className="peoplesearch__instructions">
             <i className="icon-user" />
             <Typography size="medium">
-              {I18n.t('Add user by Email Address, Login ID, or SIS ID.')}<br />
-              {I18n.t('Use a "," or new line between for adding multiple users.')}
+              {I18n.t('When adding multiple users, use a comma or line break to separate users.')}
             </Typography>
           </div>
         </div>

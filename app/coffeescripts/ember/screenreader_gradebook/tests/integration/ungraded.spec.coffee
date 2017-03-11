@@ -21,7 +21,7 @@ define [
       equal !controller.get('includeUngradedAssignments'), initial
 
 
-  module 'include ungraded assignments setting:false',
+  QUnit.module 'include ungraded assignments setting:false',
     setup: ->
       setup.call this, false
 
@@ -32,7 +32,7 @@ define [
     runTest()
 
 
-  module 'include ungraded assignments setting:true',
+  QUnit.module 'include ungraded assignments setting:true',
     setup: ->
       setup.call this, true
 

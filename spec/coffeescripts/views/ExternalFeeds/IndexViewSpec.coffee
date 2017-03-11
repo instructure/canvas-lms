@@ -6,7 +6,7 @@ define [
   'helpers/fakeENV'
 ], ($, ExternalFeedCollection, ExternalFeed, ExternalFeedsIndexView, fakeENV) ->
 
-  module 'IndexView',
+  QUnit.module 'IndexView',
     setup: ->
       fakeENV.setup(context_asset_string: 'courses_1')
       $('#fixtures').append($("<div>").attr('id', 'feed_container'))

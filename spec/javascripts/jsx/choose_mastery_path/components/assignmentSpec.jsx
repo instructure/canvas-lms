@@ -4,7 +4,7 @@ define([
   'jsx/choose_mastery_path/components/assignment',
 ], (React, TestUtils, Assignment) => {
 
-  module('Assignment')
+  QUnit.module('Assignment')
 
   const defaultProps = () => ({
     isSelected: false,

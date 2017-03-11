@@ -97,7 +97,7 @@ define [
       ]
 
 
-  module "students reducer"
+  QUnit.module "students reducer"
 
   test "concatenates students on GOT_STUDENTS", ->
     initialState =
@@ -219,7 +219,7 @@ define [
 
     deepEqual newState.studentList.students, expected, 'student received updated selected_provisional_grade_id property'
 
-  module "urls reducer"
+  QUnit.module "urls reducer"
 
   test "passes through whatever the current state is", ->
     initialState =
@@ -230,7 +230,7 @@ define [
     newState = rootReducer(initialState, someRandomAction)
     deepEqual newState.urls, initialState.urls, 'passes through unchanged'
 
-  module "assignments reducer"
+  QUnit.module "assignments reducer"
 
   test "sets to published on PUBLISHED_GRADES", ->
     initialState =
@@ -245,7 +245,7 @@ define [
     ok newState.assignment.published, 'successfully sets to publish'
 
 
-  module "flashMessage reducer"
+  QUnit.module "flashMessage reducer"
 
   test "sets success message on PUBLISHED_GRADES", ->
     initialState =
@@ -331,7 +331,7 @@ define [
       error: true
     deepEqual newState.flashMessage, expected, 'updates state'
 
-  module 'inflightAction reducer',
+  QUnit.module 'inflightAction reducer',
     setup: ->
       @initialState =
         inflightAction:
@@ -400,7 +400,7 @@ define [
     stateWithPublishLanded = rootReducer(@inflightInitialState, publishedGradesFailedAction)
     equal stateWithPublishLanded.inflightAction.publish, false
 
-  module "sorting mark1 column on SORT_MARK1_COLUMN"
+  QUnit.module "sorting mark1 column on SORT_MARK1_COLUMN"
 
   test 'default to descending order when clicking on a new column', ->
     initialState =
@@ -445,7 +445,7 @@ define [
     equal newState.studentList.sort.direction, Constants.sortDirections.ASCENDING, 'sets the right direction'
     deepEqual newState.studentList.students[0].id, 2, 'sorts the right student to the top'
 
-  module "sorting mark2 column on SORT_MARK2_COLUMN"
+  QUnit.module "sorting mark2 column on SORT_MARK2_COLUMN"
 
   test 'default to descending order when clicking on a new column', ->
     initialState =
@@ -490,7 +490,7 @@ define [
     equal newState.studentList.sort.direction, Constants.sortDirections.ASCENDING, 'sets the right direction'
     deepEqual newState.studentList.students[0].id, 2, 'sorts the right student to the top'
 
-  module "sorting mark3 column on SORT_MARK3_COLUMN"
+  QUnit.module "sorting mark3 column on SORT_MARK3_COLUMN"
 
   test 'default to descending order when clicking on a new column', ->
     initialState =

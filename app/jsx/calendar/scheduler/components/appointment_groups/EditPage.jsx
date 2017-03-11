@@ -147,6 +147,9 @@ define([
         }
         formValues.usersPerSlotLimit = value;
       }
+      else {
+        formValues.usersPerSlotLimit = null;
+      }
       if (formValues.limitSlotsPerUser) {
         const $element = $('.EditPage__Options-LimitSlotsPerUser', this.optionFields);
         const value = $element.val();
@@ -158,6 +161,9 @@ define([
           return;
         }
         formValues.slotsPerUserLimit = value;
+      }
+      else {
+        formValues.slotsPerUserLimit = null;
       }
       const url = `/api/v1/appointment_groups/${this.props.appointment_group_id}`;
 

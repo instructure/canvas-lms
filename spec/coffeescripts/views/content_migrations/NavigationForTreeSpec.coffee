@@ -4,7 +4,7 @@ define [
   'helpers/fakeENV'
   ], (NavigationForTree, $, fakeENV) ->
 
-    module "Navigation: Click Tests",
+    QUnit.module "Navigation: Click Tests",
       setup: ->
         $('#fixtures').html("<ul role='tree'>
           <li role='treeitem' id='42'>

@@ -10,8 +10,9 @@ define [
 
   scope = I18n.scoped('foo')
   t = (args...) -> scope.t(args...)
+  interpolate = (args...) -> I18n.interpolate(args...)
 
-  module "I18n",
+  QUnit.module "I18n",
     setup: ->
       I18nStubber.pushFrame()
 
@@ -77,10 +78,21 @@ define [
     equal t('bar', 'you need to *log in*', {wrapper: '<a href="%{url}">$1</a>', url: 'http://foo.bar'}),
       'you need to <a href="http://foo.bar">log in</a>'
 
+  test "interpolate: should format numbers", ->
+    equal interpolate("user count: %{foo}", {foo: 1500}), "user count: 1,500"
+
+  test "interpolate: should not format numbery strings", ->
+    equal interpolate("user count: %{foo}", {foo: "1500"}), "user count: 1500"
+
+  test "interpolate: should not mutate the options", ->
+    options = {foo: 1500}
+    interpolate("user count: %{foo}", options)
+    equal options.foo, 1500
+
   test "pluralize: should format the number", ->
     equal t({one: "1 thing", other: "%{count} things"}, {count: 1500}), '1,500 things'
 
-  module 'I18n localize number',
+  QUnit.module 'I18n localize number',
     setup: ->
       @delimiter = ' '
       @separator = ','
@@ -112,3 +124,9 @@ define [
 
   test 'formats as a percentage if set to true', ->
     equal I18n.localizeNumber(1.2, percentage: true), "1#{@separator}2%"
+
+  test 'allows stripping of 0s to be explicitly toggled along with precision', ->
+    equal I18n.localizeNumber(1.12000, {precision: 4, strip_insignificant_zeros: true}), "1#{@separator}12"
+
+  test 'does not have precision errors with large numbers', ->
+    equal I18n.localizeNumber(50000000.12), "50#{@delimiter}000#{@delimiter}000#{@separator}12"

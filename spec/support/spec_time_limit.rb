@@ -1,5 +1,15 @@
 module SpecTimeLimit
-  class Error < StandardError
+  class Error < ::Timeout::Error
+    # #initialize and #to_s are overwritten here to prevent Timeout.timeout
+    # overwriting the error message to "execution expired"
+    def initialize(message)
+      @message = message
+    end
+
+    def to_s
+      @message
+    end
+
     def self.message_for(type, timeout)
       case type
       when :target
@@ -15,13 +25,11 @@ module SpecTimeLimit
   class << self
     def enforce(example)
       type, timeout = timeout_for(example)
-      Timeout.timeout(timeout) do
+      Timeout.timeout(timeout, Error.new(Error.message_for(type, timeout))) do
         example.run
       end
-    rescue Timeout::Error
-      bt = $ERROR_INFO.backtrace
-      bt.shift while bt.first =~ /\/(gems|test_setup)\//
-      raise Error, Error.message_for(type, timeout), bt
+      # no error handling needed, since rspec will catch the error and
+      # perform set_exception(spec_time_limit_error) on the example
     end
 
     # find an appropriate timeout for this spec

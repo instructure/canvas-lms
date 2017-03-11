@@ -7,7 +7,7 @@ define [
   fixtures = null
   clickEvent = {}
 
-  module "SelectContentDialog",
+  QUnit.module "SelectContentDialog",
     setup: ->
       fixtures = document.getElementById('fixtures')
       fixtures.innerHTML = '<div id="context_external_tools_select">
@@ -33,7 +33,7 @@ define [
 
   test "it creates a confirm alert before closing the modal", ()->
     l = document.getElementById('test-tool')
-    @stub(window, "confirm", -> true )
+    @stub(window, "confirm").returns(true)
     SelectContentDialog.Events.onContextExternalToolSelect.bind(l)(clickEvent)
     $dialog = $("#resource_selection_dialog")
     $dialog.dialog('close')

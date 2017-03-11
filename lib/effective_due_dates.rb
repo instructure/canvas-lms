@@ -32,7 +32,7 @@ class EffectiveDueDates
         attributes[:grading_period_id] = row["grading_period_id"] && row["grading_period_id"].to_i
       end
       if include?(included, :in_closed_grading_period)
-        attributes[:in_closed_grading_period] = row["closed"] == "t"
+        attributes[:in_closed_grading_period] = (CANVAS_RAILS4_2 ? (row["closed"] == "t") : row["closed"])
       end
       if include?(included, :override_id)
         attributes[:override_id] = row["override_id"] && row["override_id"].to_i
@@ -82,8 +82,6 @@ class EffectiveDueDates
     find_effective_due_date(student_id, assignment_id).fetch(:grading_period_id, nil)
   end
 
-  private
-
   def find_effective_due_date(student_id, assignment_id)
     find_effective_due_dates_for_assignment(assignment_id).fetch(student_id, {})
   end
@@ -91,6 +89,8 @@ class EffectiveDueDates
   def find_effective_due_dates_for_assignment(assignment_id)
     to_hash.fetch(assignment_id, {})
   end
+
+  private
 
   def usable_student_id?(student_id)
     return false unless student_id.present?
@@ -221,7 +221,7 @@ class EffectiveDueDates
         WHERE
           o.set_type = 'CourseSection' AND
           s.workflow_state <> 'deleted' AND
-          e.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND
+          e.workflow_state NOT IN ('rejected', 'deleted') AND
           e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
       ),
 
@@ -241,7 +241,7 @@ class EffectiveDueDates
         INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = c.id
         INNER JOIN #{User.quoted_table_name} student ON e.user_id = student.id
         WHERE
-          e.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND
+          e.workflow_state NOT IN ('rejected', 'deleted') AND
           e.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND
           a.only_visible_to_overrides IS NOT TRUE
       ),

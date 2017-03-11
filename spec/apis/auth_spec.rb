@@ -588,7 +588,6 @@ describe "API Authentication", type: :request do
       user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
       course_with_teacher(:user => @user)
       @token = @user.access_tokens.create!
-      expect(@token.full_token).not_to be_nil
     end
 
     def check_used

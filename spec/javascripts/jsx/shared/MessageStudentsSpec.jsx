@@ -22,7 +22,7 @@ define([
     return ReactDOM.render(<MessageStudents { ...props } />, $domNode)
   }
 
-  module('MessageStudents', (hooks)  => {
+  QUnit.module('MessageStudents', (hooks)  => {
     hooks.afterEach(() => {
       ReactDOM.unmountComponentAtNode($domNode)
       $domNode = null
@@ -36,7 +36,7 @@ define([
       ok(subject)
     })
 
-    module('composeRequestData()', () => {
+    QUnit.module('composeRequestData()', () => {
       test('simplifies recipients to an array of ids', () => {
         subject = renderComponent({
           title: "Send a message",
@@ -53,7 +53,7 @@ define([
       })
     })
 
-    module('errorMessagesFor()', () => {
+    QUnit.module('errorMessagesFor()', () => {
       test('fetches error for a given field from state', () => {
         subject = renderComponent({
           contextCode: "course_1", title: "Send a message"
@@ -69,7 +69,7 @@ define([
       })
     })
 
-    module('sendMessage()', (hooks) => {
+    QUnit.module('sendMessage()', (hooks) => {
       let data
       const successPromise = new Promise((resolve) => resolve())
       const errorResponse = {
@@ -113,7 +113,7 @@ define([
         notOk(subject.state.hideAlert)
       })
 
-      module('on success', (hooks) => {
+      QUnit.module('on success', (hooks) => {
         hooks.beforeEach(() => {
           sinon.stub(axios, 'post').returns(successPromise)
         })
@@ -131,7 +131,7 @@ define([
         })
       })
 
-      module('on error', (hooks) => {
+      QUnit.module('on error', (hooks) => {
         hooks.beforeEach(() => {
           sinon.stub(axios, 'post').returns(errorPromise)
         })
@@ -150,7 +150,7 @@ define([
       })
     })
 
-    module('validationErrors()', (hooks) => {
+    QUnit.module('validationErrors()', (hooks) => {
       const fields = ['subject', 'body']
 
       hooks.beforeEach(() => {
@@ -183,7 +183,7 @@ define([
       })
     })
 
-    module('handleAlertClose()', (hooks) => {
+    QUnit.module('handleAlertClose()', (hooks) => {
       let closeButton
 
       hooks.beforeEach(() => {
@@ -203,7 +203,7 @@ define([
       })
     })
 
-    module('handleChange()', (hooks) => {
+    QUnit.module('handleChange()', (hooks) => {
       hooks.beforeEach(() => {
         subject = renderComponent({
           contextCode: "course_1", title: "Send a message"
@@ -231,7 +231,7 @@ define([
       })
     })
 
-    module('handleClose()', (hooks) => {
+    QUnit.module('handleClose()', (hooks) => {
       let closeButton
 
       hooks.beforeEach(() => {
@@ -249,7 +249,7 @@ define([
       })
     })
 
-    module('handleSubmit()', (hooks) => {
+    QUnit.module('handleSubmit()', (hooks) => {
       let submitButton
 
       hooks.beforeEach(() => {
@@ -289,7 +289,7 @@ define([
         notOk(subject.state.hideAlert)
       })
 
-      module('with valid data', (hooks) => {
+      QUnit.module('with valid data', (hooks) => {
         hooks.beforeEach(() => {
           subject.handleChange('subject', 'here is a subject')
           subject.handleChange('body', 'here is a body')
@@ -308,7 +308,7 @@ define([
       })
     })
 
-    module('handleResponseSuccess()', (hooks) => {
+    QUnit.module('handleResponseSuccess()', (hooks) => {
       let clocks
 
       hooks.beforeEach(() => {
@@ -354,7 +354,7 @@ define([
       })
     })
 
-    module('handleResponseError()', (hooks) => {
+    QUnit.module('handleResponseError()', (hooks) => {
       let errorResponse
 
       hooks.beforeEach(() => {
@@ -395,7 +395,7 @@ define([
       })
     })
 
-    module('renderAlert()', (hooks) => {
+    QUnit.module('renderAlert()', (hooks) => {
       hooks.beforeEach(() => {
         subject = renderComponent({
           title: "Send a message",

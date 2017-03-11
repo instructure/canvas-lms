@@ -17,8 +17,8 @@
 #
 
 class RubricsController < ApplicationController
-  before_filter :require_context
-  before_filter { |c| c.active_tab = "rubrics" }
+  before_action :require_context
+  before_action { |c| c.active_tab = "rubrics" }
 
   include Api::V1::Outcome
 

@@ -90,6 +90,7 @@ define [
       @colorizeContexts()
 
       @reservable_appointment_groups = {}
+      @hasAppointmentGroups = $.Deferred()
       if @options.showScheduler
         # Pre-load the appointment group list, for the badge
         @dataSource.getAppointmentGroups false, (data) =>
@@ -101,6 +102,9 @@ define [
               @reservable_appointment_groups[context_code].push "appointment_group_#{group.id}"
           @header.setSchedulerBadgeCount(required)
           @options.onLoadAppointmentGroups(@reservable_appointment_groups) if @options.onLoadAppointmentGroups
+          @hasAppointmentGroups.resolve()
+      else
+        @hasAppointmentGroups.resolve()
 
       @connectHeaderEvents()
       @connectSchedulerNavigatorEvents()
@@ -507,6 +511,14 @@ define [
       if parentEvent
         parentEvent.calendarEvent.reserved = false
         parentEvent.calendarEvent.available_slots += 1
+        # remove the unreserved event from the parent's children.
+        parentEvent.calendarEvent.child_events = parentEvent.calendarEvent.child_events.filter((obj) ->
+          obj.id != event.calendarEvent.id
+        )
+        # need to update the appointmentGroupEventStatus to make sure it
+        # correctly displays the new status in the calendar.
+        parentEvent.appointmentGroupEventStatus = parentEvent.calculateAppointmentGroupEventStatus()
+
         @refetchEvents()
 
     eventSaving: (event) =>
@@ -680,7 +692,8 @@ define [
 
     agendaViewFetch: (start) ->
       @setDateTitle(@formatDate(start, 'date.formats.medium'))
-      @agenda.fetch(@visibleContextList.concat(@findAppointmentModeGroups()), start)
+      $.when(@hasAppointmentGroups)
+        .then(=> @agenda.fetch(@visibleContextList.concat(@findAppointmentModeGroups()), start))
 
     renderDateRange: (start, end) =>
       @agendaStart = fcUtil.unwrap(start)

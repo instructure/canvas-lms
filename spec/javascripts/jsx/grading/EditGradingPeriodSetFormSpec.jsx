@@ -20,7 +20,7 @@ define([
 
   const exampleSet = { id: "1", title: "Fall 2015" };
 
-  module('EditGradingPeriodSetForm', {
+  QUnit.module('EditGradingPeriodSetForm', {
     renderComponent(opts={}) {
       const defaults = {
         set: exampleSet,

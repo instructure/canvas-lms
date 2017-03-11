@@ -6,7 +6,7 @@ define([
 
   let elem, props
 
-  module('ThemeEditorImageRow Component', {
+  QUnit.module('ThemeEditorImageRow Component', {
     setup () {
       elem = document.createElement('div')
       props = {

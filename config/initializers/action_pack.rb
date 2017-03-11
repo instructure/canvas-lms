@@ -23,16 +23,16 @@ end
 
 ActionView::Helpers::FormOptionsHelper.prepend(TimeZoneFormImprovements)
 
-ActionController::DataStreaming.class_eval do
-  def send_file_with_content_length(path, options = {})
+module DataStreamingContentLength
+  def send_file(path, _options = {})
     headers.merge!('Content-Length' => File.size(path).to_s)
-    send_file_without_content_length(path, options)
+    super
   end
-  alias_method_chain :send_file, :content_length
 
-  def send_data_with_content_length(data, options = {})
+  def send_data(data, _options = {})
     headers.merge!('Content-Length' => data.bytesize.to_s) if data.respond_to?(:bytesize)
-    send_data_without_content_length(data, options)
+    super
   end
-  alias_method_chain :send_data, :content_length
 end
+
+ActionController::Base.include(DataStreamingContentLength)

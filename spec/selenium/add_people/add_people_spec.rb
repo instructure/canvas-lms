@@ -91,8 +91,7 @@ describe "add_people" do
         expect(people_ready_panel).to be_displayed
 
         # no table
-        tables = find_all('.addpeople__peoplereadylist table')
-        expect(tables).to have_size(0)
+        expect(f('body')).not_to contain_css('.addpeople__peoplereadylist table')
 
         # the message_user_path
         msg = fj(".addpeople__peoplereadylist:contains('No users were selected to add to the course')")
@@ -118,7 +117,7 @@ describe "add_people" do
 
       # check the checkbox
       f('label[for="limit_privileges_to_course_section"]').click
-      expect(f('#limit_privileges_to_course_section').selected?)
+      expect(f('#limit_privileges_to_course_section')).to be_selected
 
       # cancel the dialog
       f('#addpeople_cancel').click
@@ -130,7 +129,7 @@ describe "add_people" do
 
       # check the checkbox again
       f('label[for="limit_privileges_to_course_section"]').click
-      expect(f('#limit_privileges_to_course_section').selected?)
+      expect(f('#limit_privileges_to_course_section')).to be_selected
 
     end
 

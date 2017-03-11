@@ -226,4 +226,3 @@ define [
 
     hasChildren: ->
       @get('replies').length > 0
-

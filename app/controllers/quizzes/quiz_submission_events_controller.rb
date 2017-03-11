@@ -20,9 +20,9 @@ class Quizzes::QuizSubmissionEventsController < ApplicationController
   include ::Filters::Quizzes
   include ::Filters::QuizSubmissions
 
-  before_filter :require_user, :require_context
-  before_filter :require_quiz, :only => [ :index ]
-  before_filter :require_quiz_submission, :only => [ :index ]
+  before_action :require_user, :require_context
+  before_action :require_quiz, :only => [ :index ]
+  before_action :require_quiz_submission, :only => [ :index ]
 
   protect_from_forgery :only => [ :index ], with: :exception
 

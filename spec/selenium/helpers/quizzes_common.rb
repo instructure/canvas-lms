@@ -101,18 +101,13 @@ module QuizzesCommon
 
   def add_quiz_question(points)
     click_questions_tab
-    @points_total += points.to_i
-    @question_count += 1
     click_new_question_button
     wait_for_ajaximations
     question = fj('.question_form:visible')
     replace_content(question.find_element(:css, "input[name='question_points']"), points)
     submit_form(question)
     wait_for_ajaximations
-    questions = ffj(".question_holder:visible")
-    expect(questions.length).to eq @question_count
     click_settings_tab
-    expect(f(".points_possible").text).to eq @points_total.to_s
   end
 
   def quiz_with_multiple_type_questions(goto_edit=true)
@@ -354,11 +349,11 @@ module QuizzesCommon
     end
 
     if access_code.nil?
-      expect_new_page_load { f('#take_quiz_link').click }
+      wait_for_new_page_load { f('#take_quiz_link').click }
     else
       f('#quiz_access_code').send_keys(access_code)
-      expect_new_page_load { fj('.btn', '#main').click }
-    end
+      wait_for_new_page_load { fj('.btn', '#main').click }
+    end or raise "unable to start quiz"
 
     wait_for_quiz_to_begin
   end
@@ -451,9 +446,6 @@ module QuizzesCommon
   end
 
   def select_different_correct_answer(index_of_new_correct_answer)
-    # wait for success flash_message to go away
-    expect_no_flash_message :success
-
     new_correct_answer = fj('.select_answer_link', question_answers[index_of_new_correct_answer])
     hover(new_correct_answer)
     new_correct_answer.click

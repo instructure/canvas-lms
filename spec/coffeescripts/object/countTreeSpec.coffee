@@ -2,7 +2,7 @@ define [
   'compiled/object/countTree'
 ], (countTree) ->
 
-  module 'countTree'
+  QUnit.module 'countTree'
 
   test 'counts a tree', ->
     obj = {a:[{a:[{a:[{}]}]}]}

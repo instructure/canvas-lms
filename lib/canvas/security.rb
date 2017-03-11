@@ -44,9 +44,9 @@ module Canvas::Security
 
   def self.encrypt_password(secret, key)
     require 'base64'
-    c = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
+    c = OpenSSL::Cipher.new('aes-256-cbc')
     c.encrypt
-    c.key = Digest::SHA1.hexdigest(key + "_" + encryption_key)
+    c.key = Digest::SHA1.hexdigest(key + "_" + encryption_key)[0...32]
     c.iv = iv = c.random_iv
     e = c.update(secret)
     e << c.final
@@ -58,9 +58,9 @@ module Canvas::Security
     encryption_keys = Array(encryption_key) + self.encryption_keys
     last_error = nil
     encryption_keys.each do |encryption_key|
-      c = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
+      c = OpenSSL::Cipher.new('aes-256-cbc')
       c.decrypt
-      c.key = Digest::SHA1.hexdigest(key + "_" + encryption_key)
+      c.key = Digest::SHA1.hexdigest(key + "_" + encryption_key)[0...32]
       c.iv = Base64.decode64(salt)
       d = c.update(Base64.decode64(secret))
       begin

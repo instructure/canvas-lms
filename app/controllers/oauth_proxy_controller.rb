@@ -17,8 +17,8 @@
 #
 
 class OauthProxyController < ApplicationController
-  skip_before_filter :require_user
-  skip_before_filter :load_user
+  skip_before_action :require_user
+  skip_before_action :load_user
 
   def redirect_proxy
     reject! t("The state parameter is required") and return unless params[:state]

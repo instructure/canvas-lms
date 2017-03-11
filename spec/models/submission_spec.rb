@@ -2456,7 +2456,6 @@ describe Submission do
       expect(Submission.needs_grading.count).to eq(0)
     end
   end
-end
 
   describe "#plagiarism_service_to_use" do
     it "returns nil when no service is configured" do
@@ -2496,11 +2495,9 @@ end
     end
   end
 
+
   def submission_spec_model(opts={})
     @submission = Submission.new(@valid_attributes.merge(opts))
-    expect(@submission.assignment).to eql(@assignment)
-    expect(@assignment.context).to eql(@context)
-    expect(@submission.assignment.context).to eql(@context)
     @submission.save!
   end
 

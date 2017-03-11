@@ -18,7 +18,7 @@ define [
     _.extend defaults, options
 
 
-  module 'WikiPage'
+  QUnit.module 'WikiPage'
   test 'latestRevision is only available when a url is provided', ->
     wikiPage = new WikiPage
     equal wikiPage.latestRevision(), null, 'not provided without url'
@@ -42,7 +42,7 @@ define [
     equal wikiPage.latestRevision().summary, true, 'defaulted to summary'
 
 
-  module 'WikiPage:Publishable'
+  QUnit.module 'WikiPage:Publishable'
   test 'publishable', ->
     wikiPage = new WikiPage
       front_page: false
@@ -62,7 +62,7 @@ define [
     strictEqual wikiPage.get('deletable'), false, 'deletable set when front_page changed'
 
 
-  module 'WikiPage:Sync'
+  QUnit.module 'WikiPage:Sync'
   test 'parse removes wiki_page namespace added by api', ->
     wikiPage = new WikiPage
     namespacedObj = {}

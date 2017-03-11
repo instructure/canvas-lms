@@ -32,6 +32,37 @@ Linter.prototype.isSafeString = function(node) {
   return (wrapperOption.length > 0)
 }
 
+// handle the way babel transforms es6 imports, eg:
+// import htmlEscape from 'htmlEscape'
+// "foo ${htmlEscape(bar)}"
+// which gets converted by babel into:
+// var _htmlEscape2 = _interopRequireDefault(_htmlEscape);
+// 'foo ' + (0, _htmlEscape2.default)(bar)
+const originalIsSafeString = Linter.prototype.isSafeString
+Linter.prototype.isSafeString = function isSafeStringWithES6ImportHandling (node) {
+  const result = originalIsSafeString.call(this, node)
+  if (result) return result
+
+  const callee = node.callee
+  if (
+    // look for something like (0, _htmlEscape2.default)(...)
+    callee && callee.type === 'SequenceExpression' &&
+    callee.expressions.length === 2 &&
+    callee.expressions[0].type === 'Literal' &&
+    callee.expressions[0].value === 0 &&
+    callee.expressions[1].type === 'MemberExpression' &&
+    callee.expressions[1].property.name === 'default'
+  ) {
+    const thingWeActuallyWantToCheck = callee.expressions[1].object
+    const babelizedFnName = thingWeActuallyWantToCheck.name // eg: "_htmlEscape2"
+    const originalFnName = babelizedFnName.replace(/^_/, '').replace(/\d$/, '') // eg: 'htmlEscape'
+
+    const copyOfNode = Object.assign({}, thingWeActuallyWantToCheck, {name: originalFnName})
+    if (this.identifierMatches(copyOfNode, 'safeString', '.function')) return true
+  }
+  return false
+}
+
 function getFilesAndDirs(root, files, dirs) {
   root = root === "." ? "" : root + "/";
   files = files || [];

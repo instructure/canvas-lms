@@ -3,7 +3,7 @@ define ['compiled/models/Publishable'], (Publishable) ->
   buildModule = (published)->
     new Publishable {published: published}, {url: '/api/1/2/3'}
 
-  module 'Publishable:',
+  QUnit.module 'Publishable:',
     setup: ->
     teardown: ->
 

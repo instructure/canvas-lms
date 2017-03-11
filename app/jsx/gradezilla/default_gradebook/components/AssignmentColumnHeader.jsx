@@ -7,25 +7,39 @@ define([
   'instructure-ui/Menu',
   'instructure-ui/PopoverMenu',
   'instructure-ui/Typography',
+  'message_students',
+  'jsx/gradezilla/shared/helpers/messageStudentsWhoHelper',
   'i18n!gradebook'
 ], (
   React, { default: IconMoreSolid }, { default: IconMutedSolid }, { default: IconWarningSolid },
-  { default: Link }, { MenuItem }, { default: PopoverMenu }, { default: Typography }, I18n
+  { default: Link }, { MenuItem }, { default: PopoverMenu }, { default: Typography },
+  messageStudents, MessageStudentsWhoHelper, I18n
 ) => {
-  // TODO: remove this rule when this component begins using internal state
-  /* eslint-disable react/prefer-stateless-function */
+  const { arrayOf, bool, instanceOf, number, shape, string } = React.PropTypes;
 
   class AssignmentColumnHeader extends React.Component {
     static propTypes = {
-      assignment: React.PropTypes.shape({
-        htmlUrl: React.PropTypes.string,
-        id: React.PropTypes.string,
-        invalid: React.PropTypes.bool,
-        muted: React.PropTypes.bool,
-        name: React.PropTypes.string,
-        omitFromFinalGrade: React.PropTypes.bool,
-        pointsPossible: React.PropTypes.number
-      })
+      assignment: shape({
+        htmlUrl: string.isRequired,
+        id: string.isRequired,
+        invalid: bool.isRequired,
+        muted: bool.isRequired,
+        name: string.isRequired,
+        omitFromFinalGrade: bool.isRequired,
+        pointsPossible: number,
+        submissionTypes: arrayOf(string).isRequired,
+        courseId: string.isRequired
+      }).isRequired,
+      students: arrayOf(shape({
+        isInactive: bool.isRequired,
+        id: string.isRequired,
+        name: string.isRequired,
+        submission: shape({
+          score: number,
+          submittedAt: instanceOf(Date)
+        }).isRequired,
+      })).isRequired,
+      submissionsLoaded: bool.isRequired
     };
 
     static renderMutedIcon (screenreaderText) {
@@ -41,6 +55,40 @@ define([
         <Typography weight="bold" style="normal" size="small" color="brand">
           <IconWarningSolid title={screenreaderText} />
         </Typography>
+      );
+    }
+
+    constructor (props) {
+      super(props);
+
+      this.showMessageStudentsWhoDialog = this.showMessageStudentsWhoDialog.bind(this);
+    }
+
+    activeStudentDetails () {
+      const activeStudents = this.props.students.filter(student => !student.isInactive);
+
+      return activeStudents.map((student) => {
+        const { score, submittedAt } = student.submission;
+
+        return {
+          id: student.id,
+          name: student.name,
+          score,
+          submittedAt
+        };
+      });
+    }
+
+    showMessageStudentsWhoDialog () {
+      const settings = MessageStudentsWhoHelper.settings(this.props.assignment, this.activeStudentDetails());
+      window.messageStudents(settings);
+    }
+
+    renderMessageStudentsWhoMenu () {
+      return (
+        <MenuItem disabled={!this.props.submissionsLoaded} onSelect={this.showMessageStudentsWhoDialog}>
+          <span data-menu-item-id="message-students-who">{I18n.t('Message Students Who')}</span>
+        </MenuItem>
       );
     }
 
@@ -77,7 +125,7 @@ define([
 
       return (
         <div className="assignment-points-possible">
-          { I18n.t('Out of %{pointsPossible}', { pointsPossible: assignment.pointsPossible }) }
+          { I18n.t('Out of %{pointsPossible}', { pointsPossible: I18n.n(assignment.pointsPossible) }) }
         </div>
       )
     }
@@ -104,9 +152,7 @@ define([
               </span>
             }
           >
-            <MenuItem>{`Assignment ${this.props.assignment.id} Item 1`}</MenuItem>
-            <MenuItem>{`Assignment ${this.props.assignment.id} Item 2`}</MenuItem>
-            <MenuItem>{`Assignment ${this.props.assignment.id} Item 3`}</MenuItem>
+            {this.renderMessageStudentsWhoMenu()}
           </PopoverMenu>
         </div>
       );

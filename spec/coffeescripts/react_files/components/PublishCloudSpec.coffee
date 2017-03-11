@@ -1,5 +1,5 @@
 define [
-  '../mockFilesENV'
+  '../mockFilesENV' + (if window.USE_WEBPACK then '.coffee' else '')
   'react'
   'react-dom'
   'react-addons-test-utils'
@@ -9,7 +9,7 @@ define [
 ], (mockFilesEnv, React, ReactDOM, {Simulate}, $, PublishCloud, FilesystemObject) ->
 
   # Integration Tests
-  module 'PublishCloud',
+  QUnit.module 'PublishCloud',
     setup: ->
       @model = new FilesystemObject(locked: true, hidden: false, id: 42)
       @model.url = -> "/api/v1/folders/#{@id}"
@@ -33,7 +33,7 @@ define [
 
     ok ReactDOM.render.calledOnce, 'renders a component inside the dialog'
 
-  module 'PublishCloud Student View',
+  QUnit.module 'PublishCloud Student View',
     setup: ->
       @model = new FilesystemObject(locked: false, hidden: true, lock_at: '2014-02-01', unlock_at: '2014-01-01', id: 42)
       @model.url = -> "/api/v1/folders/#{@id}"
@@ -52,7 +52,7 @@ define [
 
   # Unit Tests
 
-  module 'PublishCloud#togglePublishedState',
+  QUnit.module 'PublishCloud#togglePublishedState',
     setup: ->
       props =
         model: new FilesystemObject(hidden: false, id: 42)
@@ -80,7 +80,7 @@ define [
     equal @publishCloud.state.published, true, "published state should be true"
     equal @publishCloud.state.hidden, false, "hidden is false"
 
-  module 'PublishCloud#getInitialState'
+  QUnit.module 'PublishCloud#getInitialState'
 
   test "sets published initial state based on params model hidden property", ->
     model = new FilesystemObject(locked: false, id: 42)
@@ -103,7 +103,7 @@ define [
     equal @publishCloud.state.restricted, true, "restricted is true when lock_at/ulock_at is set"
     ReactDOM.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
 
-  module 'PublishCloud#extractStateFromModel'
+  QUnit.module 'PublishCloud#extractStateFromModel'
 
   test "returns object that can be used to set state", ->
     model = new FilesystemObject(locked: true, hidden: true, lock_at: '123', unlock_at: '123', id: 42)

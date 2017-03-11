@@ -11,7 +11,7 @@ define [
   wrapper = null
   sanbox = null
 
-  module 'GroupCategoriesView',
+  QUnit.module 'GroupCategoriesView',
     setup: ->
       fakeENV.setup()
       ENV.group_categories_url = '/api/v1/courses/1/group_categories'

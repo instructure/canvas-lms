@@ -21,9 +21,9 @@ module Lti
     class ToolConsumerProfileController < ApplicationController
       include Lti::ApiServiceHelper
 
-      before_filter :require_context
-      skip_before_filter :require_user
-      skip_before_filter :load_user
+      before_action :require_context
+      skip_before_action :require_user
+      skip_before_action :load_user
 
       def show
         tcp_url = polymorphic_url([@context, :tool_consumer_profile],

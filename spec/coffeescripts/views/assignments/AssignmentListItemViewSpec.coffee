@@ -5,8 +5,8 @@ define [
   'compiled/views/assignments/AssignmentListItemView'
   'jquery'
   'timezone'
-  'vendor/timezone/America/Juneau'
-  'vendor/timezone/fr_FR'
+  'timezone/America/Juneau'
+  'timezone/fr_FR'
   'helpers/I18nStubber'
   'helpers/fakeENV'
   'jsx/shared/conditional_release/CyoeHelper'
@@ -136,7 +136,7 @@ define [
     fakeENV.teardown()
     $('#fixtures').empty()
 
-  module 'AssignmentListItemViewSpec',
+  QUnit.module 'AssignmentListItemViewSpec',
     setup: ->
       fakeENV.setup({
         current_user_roles: ['teacher']
@@ -196,8 +196,8 @@ define [
   test 'asks for confirmation before deleting an assignment', ->
     view = createView(@model)
 
-    @stub(view, 'visibleAssignments', -> [])
-    @stub(window, "confirm", -> true )
+    @stub(view, 'visibleAssignments').returns([])
+    @stub(window, "confirm").returns(true)
     @spy view, "delete"
 
     view.$("#assignment_#{@model.id} .delete_assignment").click()
@@ -209,7 +209,7 @@ define [
     @model.set('in_closed_grading_period', true)
     view = createView(@model)
 
-    @stub(window, "confirm", -> true )
+    @stub(window, "confirm").returns(true)
     @spy view, "delete"
 
     view.$("#assignment_#{@model.id} .delete_assignment").click()
@@ -506,7 +506,7 @@ define [
     notOk json.canMove
     ok view.className().includes('sort-disabled')
 
-  module 'AssignmentListItemViewSpec—alternate grading type: percent',
+  QUnit.module 'AssignmentListItemViewSpec—alternate grading type: percent',
     setup: ->
       genSetup.call @, assignment_grade_percent()
 
@@ -531,7 +531,7 @@ define [
     ok screenreaderText().match('This assignment has been excused.')
     ok nonScreenreaderText().match('Excused')
 
-  module 'AssignmentListItemViewSpec—alternate grading type: pass_fail',
+  QUnit.module 'AssignmentListItemViewSpec—alternate grading type: pass_fail',
     setup: ->
       genSetup.call @, assignment_grade_pass_fail()
 
@@ -548,7 +548,7 @@ define [
     ok nonScreenreaderText().match('1.56/5 pts')[0], 'sets non-screenreader score text'
     ok nonScreenreaderText().match('Complete')[0], 'sets non-screenreader grade text'
 
-  module 'AssignmentListItemViewSpec—alternate grading type: letter_grade',
+  QUnit.module 'AssignmentListItemViewSpec—alternate grading type: letter_grade',
     setup: ->
       genSetup.call @, assignment_grade_letter_grade()
 
@@ -565,7 +565,7 @@ define [
     ok nonScreenreaderText().match('1.56/5 pts')[0], 'sets non-screenreader score text'
     ok nonScreenreaderText().match('B')[0], 'sets non-screenreader grade text'
 
-  module 'AssignmentListItemViewSpec—alternate grading type: not_graded',
+  QUnit.module 'AssignmentListItemViewSpec—alternate grading type: not_graded',
     setup: ->
       genSetup.call @, assignment_grade_not_graded()
 
@@ -580,7 +580,7 @@ define [
     equal screenreaderText(), 'This assignment will not be assigned a grade.', 'sets screenreader text'
     equal nonScreenreaderText(), '', 'sets non-screenreader text'
 
-  module 'AssignListItemViewSpec - mastery paths menu option',
+  QUnit.module 'AssignListItemViewSpec - mastery paths menu option',
     setup: ->
       fakeENV.setup({
         current_user_roles: ['teacher'],
@@ -655,7 +655,7 @@ define [
     view = createView(model)
     equal view.$('.ig-admin .al-options .icon-mastery-path').length, 0
 
-  module 'AssignListItemViewSpec - mastery paths link',
+  QUnit.module 'AssignListItemViewSpec - mastery paths link',
     setup: ->
       fakeENV.setup({
         current_user_roles: ['teacher'],
@@ -705,7 +705,7 @@ define [
     view = createView(model)
     equal view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 1
 
-  module 'AssignListItemViewSpec - mastery paths icon',
+  QUnit.module 'AssignListItemViewSpec - mastery paths icon',
     setup: ->
       fakeENV.setup({
         current_user_roles: ['teacher'],

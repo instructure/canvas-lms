@@ -1,5 +1,5 @@
 define ['compiled/util/processMigrationItemSelections'], (processMigrationItemSelections)->
-  module "processMigrationItemSelections"
+  QUnit.module "processMigrationItemSelections"
   data = {
             "authenticity_token": "QL/bXYKYG65JrbPhnzd5XXwNMmRw2kbsl+j02gY3Quc=",
             "copy[content_migration_id]": "219",

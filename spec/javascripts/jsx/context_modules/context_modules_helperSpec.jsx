@@ -1,7 +1,7 @@
 define([
   'context_modules_helper'
 ], (Helper) => {
-  module('ContextModulesHelper', {
+  QUnit.module('ContextModulesHelper', {
     setup() {
       sinon.stub(Helper, 'setWindowLocation')
     },

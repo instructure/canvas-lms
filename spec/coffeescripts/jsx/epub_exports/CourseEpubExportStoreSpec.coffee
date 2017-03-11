@@ -3,7 +3,7 @@ define [
   'jsx/epub_exports/CourseStore'
 ], (_, CourseStore) ->
 
-  module 'CourseEpubExportStoreSpec',
+  QUnit.module 'CourseEpubExportStoreSpec',
     setup: ->
       CourseStore.clearState()
       @courses = {

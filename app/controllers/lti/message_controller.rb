@@ -20,7 +20,7 @@ require 'ims/lti'
 module Lti
   class MessageController < ApplicationController
 
-    before_filter :require_context
+    before_action :require_context
 
     def registration
       if authorized_action(@context, @current_user, :update)
@@ -88,29 +88,31 @@ module Lti
             oauth_consumer_key: tool_proxy.guid,
             lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
             resource_link_id: build_resource_link_id(message_handler),
-            context_id: Lti::Asset.opaque_identifier_for(@context),
-            tool_consumer_instance_guid: @context.root_account.lti_guid,
-            launch_presentation_locale: I18n.locale || I18n.default_locale.to_s,
-            roles: Lti::SubstitutionsHelper.new(@context, @domain_root_account, @current_user).all_roles('lis2'),
-            launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
           }
+
           if params[:secure_params].present?
             secure_params = Canvas::Security.decode_jwt(params[:secure_params])
             launch_params.merge!({ext_lti_assignment_id: secure_params[:lti_assignment_id]}) if secure_params[:lti_assignment_id].present?
           end
+
+          @lti_launch = Launch.new
+          tag = find_tag
+          custom_param_opts = prep_tool_settings(message_handler.parameters, tool_proxy, launch_params[:resource_link_id])
+          custom_param_opts[:content_tag] = tag if tag
+
+          variable_expander = create_variable_expander(custom_param_opts.merge(tool: tool_proxy))
+          launch_params.merge! enabled_parameters(tool_proxy, message_handler, variable_expander)
+
           message = IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(launch_params)
           message.user_id = Lti::Asset.opaque_identifier_for(@current_user) if @current_user
           @active_tab = message_handler.asset_string
-          @lti_launch = Launch.new
           @lti_launch.resource_url = message.launch_url
           @lti_launch.link_text = resource_handler.name
           @lti_launch.launch_type = message.launch_presentation_document_target
 
-          tag = find_tag
           module_sequence(tag) if tag
-          custom_param_opts = prep_tool_settings(message_handler.parameters, tool_proxy, message.resource_link_id)
-          custom_param_opts[:content_tag] = tag if tag
-          message.add_custom_params(custom_params(message_handler.parameters, custom_param_opts.merge(tool: tool_proxy)))
+
+          message.add_custom_params(custom_params(message_handler.parameters, variable_expander))
           message.add_custom_params(ToolSetting.custom_settings(tool_proxy.id, @context, message.resource_link_id))
           @lti_launch.params = message.signed_post_params(tool_proxy.shared_secret)
 
@@ -135,6 +137,13 @@ module Lti
 
     private
 
+    def enabled_parameters(tp, mh, variable_expander)
+      tool_proxy = IMS::LTI::Models::ToolProxy.from_json(tp.raw_data)
+      enabled_capability = tool_proxy.enabled_capabilities
+      enabled_capability = enabled_capability.concat(mh.capabilities).uniq if mh.capabilities.present?
+      CapabilitiesHelper.capability_params_hash(enabled_capability, variable_expander)
+    end
+
     def module_sequence(tag)
       env_hash = {}
       tag = @context.context_module_tags.not_deleted.find(params[:module_item_id])
@@ -151,9 +160,9 @@ module Lti
       end
     end
 
-    def custom_params(parameters, opts = {})
+    def custom_params(parameters, variable_expander)
       params = IMS::LTI::Models::Parameter.from_json(parameters || [])
-      IMS::LTI::Models::Parameter.process_params(params, create_variable_expander(opts))
+      IMS::LTI::Models::Parameter.process_params(params, variable_expander)
     end
 
     def find_binding(tool_proxy)

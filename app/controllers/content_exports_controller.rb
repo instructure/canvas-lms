@@ -17,8 +17,8 @@
 #
 
 class ContentExportsController < ApplicationController
-  before_filter :require_permission, :except => :xml_schema
-  before_filter { |c| c.active_tab = "settings" }
+  before_action :require_permission, :except => :xml_schema
+  before_action { |c| c.active_tab = "settings" }
 
   def require_permission
     get_context

@@ -168,7 +168,7 @@ describe "users" do
       f('#manual_user_id').send_keys(@student_1.id)
       expect_new_page_load { f('button[type="submit"]').click }
       wait_for_ajaximations
-      expect_flash_message :error, /You can't merge an account with itself./
+      expect_flash_message :error, "You can't merge an account with itself."
     end
 
     it "should show an error if invalid text is entered in the id box" do
@@ -177,7 +177,7 @@ describe "users" do
       f('#manual_user_id').send_keys("azxcvbytre34567uijmm23456yhj")
       expect_new_page_load { f('button[type="submit"]').click }
       wait_for_ajaximations
-      expect_flash_message :error, /No active user with that ID was found./
+      expect_flash_message :error, "No active user with that ID was found."
     end
 
     it "should show an error if the user id doesnt exist" do
@@ -185,7 +185,7 @@ describe "users" do
       expect_no_flash_message :error
       f('#manual_user_id').send_keys(1234567809)
       expect_new_page_load { f('button[type="submit"]').click }
-      expect_flash_message :error, /No active user with that ID was found./
+      expect_flash_message :error, "No active user with that ID was found."
     end
   end
 

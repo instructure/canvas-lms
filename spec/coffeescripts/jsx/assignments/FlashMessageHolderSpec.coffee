@@ -6,7 +6,7 @@ define [
 ], (React, ReactDOM, FlashMessageHolder, configureStore) ->
 
 
-  module 'FlashMessageHolder',
+  QUnit.module 'FlashMessageHolder',
     setup: ->
       @props =
         time: 123
@@ -23,7 +23,7 @@ define [
 
 
   test 'renders nothing', ->
-    ok @flashMessageHolder.getDOMNode() == null, 'nothing was rendered'
+    ok ReactDOM.findDOMNode(@flashMessageHolder) == null, 'nothing was rendered'
 
   test 'calls proper function when state is an error', ->
     called = false

@@ -96,13 +96,10 @@ define [
       @$el.tooltip('open')
 
     setScreenreaderText: ->
-      @$srElement = @$srElement || @$el.find('.screenreader-only')
-      # Doing this here because for some reason, the handlebars template
-      # doesn't get called for a re-render like it should. :(
       if (@model.get('subscribed'))
-        @$srElement.text(I18n.t('You are subscribed to this topic. Click to unsubscribe.'))
+        @$el.attr('aria-label', I18n.t('You are subscribed to this topic. Click to unsubscribe.'))
       else
-        @$srElement.text(I18n.t('You are not subscribed to this topic. Click to subscribe.'))
+        @$el.attr('aria-label', I18n.t('You are not subscribed to this topic. Click to subscribe.'))
 
     afterRender: ->
       [newClass, tooltipText] = @classAndTextForTooltip()

@@ -125,8 +125,8 @@ class ContentMigrationsController < ApplicationController
   include Api::V1::ContentMigration
   include Api::V1::ExternalTools
 
-  before_filter :require_context
-  before_filter :require_auth
+  before_action :require_context
+  before_action :require_auth
 
   # @API List content migrations
   #

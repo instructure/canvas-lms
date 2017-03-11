@@ -1,7 +1,7 @@
 define([
   'jsx/shared/helpers/searchHelpers'
 ], (Helpers) => {
-  module('searchHelpers#exactMatchRegex', {
+  QUnit.module('searchHelpers#exactMatchRegex', {
     setup() {
       this.regex = Helpers.exactMatchRegex("hello!");
     }
@@ -23,7 +23,7 @@ define([
     equal(this.regex.test("cat"), false);
   });
 
-  module('searchHelpers#startOfStringRegex', {
+  QUnit.module('searchHelpers#startOfStringRegex', {
     setup() {
       this.regex = Helpers.startOfStringRegex("hello!");
     }
@@ -49,7 +49,7 @@ define([
     equal(this.regex.test("cat"), false);
   });
 
-  module('searchHelpers#substringMatchRegex', {
+  QUnit.module('searchHelpers#substringMatchRegex', {
     setup() {
       this.regex = Helpers.substringMatchRegex("hello!");
     }

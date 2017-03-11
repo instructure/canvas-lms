@@ -122,12 +122,12 @@
 #     }
 #
 class CollaborationsController < ApplicationController
-  before_filter :require_context, :except => [:members]
-  before_filter :require_collaboration_and_context, :only => [:members]
-  before_filter :require_collaborations_configured
-  before_filter :reject_student_view_student
+  before_action :require_context, :except => [:members]
+  before_action :require_collaboration_and_context, :only => [:members]
+  before_action :require_collaborations_configured
+  before_action :reject_student_view_student
 
-  before_filter { |c| c.active_tab = "collaborations" }
+  before_action { |c| c.active_tab = "collaborations" }
 
   include Api::V1::Collaborator
   include Api::V1::Collaboration

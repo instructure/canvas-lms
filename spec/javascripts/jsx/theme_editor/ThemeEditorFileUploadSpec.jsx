@@ -6,7 +6,7 @@ define([
 
   let elem, props
 
-  module('ThemeEditorFileUpload Component', {
+  QUnit.module('ThemeEditorFileUpload Component', {
     setup () {
       elem = document.createElement('div')
       props = {

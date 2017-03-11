@@ -452,10 +452,6 @@ describe ApplicationHelper do
   end
 
   describe "hidden dialogs" do
-    before do
-      expect(hidden_dialogs).to be_empty
-    end
-
     it "should generate empty string when there are no dialogs" do
       str = render_hidden_dialogs
       expect(str).to eq ''
@@ -713,9 +709,9 @@ describe ApplicationHelper do
       })
       base_url = helper.use_optimized_js? ? 'dist/webpack-production' : 'dist/webpack-dev'
       Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/vendor.js').returns('vendor_url')
-      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/vendor/timezone/America/La_Paz.js').returns('La_Paz_url')
-      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/vendor/timezone/America/Denver.js').returns('Denver_url')
-      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/vendor/timezone/nb_NO.js').returns('nb_NO_url')
+      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('javascripts/vendor/timezone/America/La_Paz.js').returns('La_Paz_url')
+      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('javascripts/vendor/timezone/America/Denver.js').returns('Denver_url')
+      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('javascripts/vendor/timezone/nb_NO.js').returns('nb_NO_url')
       Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/moment/locale/nb.js').returns('nb_url')
       Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/appBootstrap.js').returns('app_bootstrap_url')
       Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/common.js').returns('common_url')

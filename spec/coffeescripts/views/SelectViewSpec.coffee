@@ -7,7 +7,7 @@ define [
 
   view = null
 
-  module 'SelectView',
+  QUnit.module 'SelectView',
     setup: ->
       view = new SelectView
         template: ->

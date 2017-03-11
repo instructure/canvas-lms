@@ -14,7 +14,7 @@ define [
     React.render(createElement(data), wrapper)
 
 
-  module 'AssignmentConfigurationsTools',
+  QUnit.module 'AssignmentConfigurationsTools',
     setup: ->
       secureParams = "asdf234.lhadf234.adfasd23324"
       wrapper = document.getElementById('fixtures')
@@ -75,7 +75,7 @@ define [
             'title': 'Redirect Tool'
         }
       ]
-      @stub($, 'ajax', -> {status: 200, data: toolDefinitions})
+      @stub($, 'ajax').returns({status: 200, data: toolDefinitions})
 
     teardown: ->
       wrapper.innerHTML = ''

@@ -6,7 +6,7 @@ define([
 
   let elem, props
 
-  module('RangeInput Component', {
+  QUnit.module('RangeInput Component', {
     setup () {
       elem = document.createElement('div')
       props = {

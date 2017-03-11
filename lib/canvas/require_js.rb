@@ -94,6 +94,7 @@ module Canvas
           {name: 'redux-actions', location: 'symlink_to_node_modules/redux-actions', main: 'dist/redux-actions.min'},
           {name: 'redux-logger', location: 'symlink_to_node_modules/redux-logger', main: 'dist/index'},
           {name: 'redux-thunk', location: 'symlink_to_node_modules/redux-thunk', main: 'dist/redux-thunk'},
+          {name: 'timezone', location: 'vendor/timezone', main: 'initialize_timezone_requireJS_plugin'},
           {name: 'tinymce', location: 'symlink_to_node_modules/tinymce', main: 'tinymce'},
           {name: 'spin.js', location: 'symlink_to_node_modules/spin.js', main: 'spin' },
         ].to_json

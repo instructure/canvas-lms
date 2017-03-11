@@ -5,7 +5,7 @@ module Lti
     class AuthorizationValidator
       class InvalidSignature < StandardError
       end
-      class ToolProxyNotFound < StandardError
+      class SecretNotFound < StandardError
       end
       class InvalidAuthJwt < StandardError
       end
@@ -17,13 +17,8 @@ module Lti
 
       def jwt
         @_jwt ||= begin
-          validated_jwt = JSON::JWT.decode @raw_jwt, tool_proxy.shared_secret
+          validated_jwt = JSON::JWT.decode @raw_jwt, jwt_secret
           check_required_assertions(validated_jwt.keys)
-          %w(iss sub).each do |assertion|
-            if validated_jwt[assertion] != tool_proxy.guid
-              raise InvalidAuthJwt, "the '#{assertion}' must be a valid ToolProxy guid"
-            end
-          end
           if validated_jwt['aud'] != @authorization_url
             raise InvalidAuthJwt, "the 'aud' must be the LTI Authorization endpoint"
           end
@@ -38,12 +33,13 @@ module Lti
           validated_jwt
         end
       end
+
       alias_method :validate!, :jwt
 
       def tool_proxy
         @_tool_proxy ||= begin
-          tp = ToolProxy.where(guid: unverified_jwt.kid, workflow_state: 'active').first
-          raise ToolProxyNotFound if tp.blank?
+          tp = ToolProxy.where(guid: unverified_jwt[:sub], workflow_state: 'active').first
+          return nil unless tp.present?
           developer_key = tp.product_family.developer_key
           raise InvalidAuthJwt, "the Tool Proxy must be associated to a developer key" if developer_key.blank?
           raise InvalidAuthJwt, "the Developer Key is not active" unless developer_key.active?
@@ -55,11 +51,26 @@ module Lti
         end
       end
 
+      def developer_key
+        @_developer_key ||= DeveloperKey.find_cached(unverified_jwt[:sub])
+      rescue ActiveRecord::RecordNotFound
+        return nil
+      end
+
+      def sub
+        tool_proxy&.guid || developer_key&.global_id
+      end
 
       private
 
+      def jwt_secret
+        secret = tool_proxy&.shared_secret || developer_key&.api_key
+        return secret if secret.present?
+        raise SecretNotFound, "either the tool proxy or developer key were not found"
+      end
+
       def check_required_assertions(assertion_keys)
-        missing_assertions = (%w(iss sub aud exp iat jti) - assertion_keys)
+        missing_assertions = (%w(sub aud exp iat jti) - assertion_keys)
         if missing_assertions.present?
           raise InvalidAuthJwt, "the following assertions are missing: #{missing_assertions.join(',')}"
         end
@@ -68,7 +79,6 @@ module Lti
       def unverified_jwt
         @_unverified_jwt ||= begin
           decoded_jwt = JSON::JWT.decode(@raw_jwt, :skip_verification)
-          raise InvalidAuthJwt, "the 'kid' header is required" if decoded_jwt.kid.blank?
           decoded_jwt
         end
       end

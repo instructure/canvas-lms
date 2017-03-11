@@ -10,7 +10,8 @@ define([
   'jquery.instructure_date_and_time'
 ], (React, classnames, I18n, FriendlyDatetime, natcompare, { default: IconCalendarAddLine }, { default: IconCalendarReservedLine }, $) => {
   const renderAppointment = (appointment, participantList = '') => {
-    const timeLabel = I18n.t('%{start_time} to %{end_time}', {
+    const timeLabel = I18n.t('%{start_date}, %{start_time} to %{end_time}', {
+      start_date: $.dateString(appointment.start_at),
       start_time: $.timeString(appointment.start_at),
       end_time: $.timeString(appointment.end_at)
     })

@@ -163,6 +163,62 @@ define([
     }
   }
 
+  function isChangeMultiFuncBound ($questionContent) {
+    var ret = false;
+    var events = $._data($questionContent[0], 'events');
+    if (events && events.change) {
+      events.change.forEach(function (event) {
+        if (event.handler.origFuncNm === 'changeMultiFunc') {
+          ret = true;
+        }
+      });
+    }
+    return ret;
+  }
+
+  function getChangeMultiFunc ($questionContent, questionType, $select) {
+    var ret = function changeMultiFunc () {
+      if (questionType !== 'multiple_dropdowns_question' && questionType !== 'fill_in_multiple_blanks_question') {
+        return;
+      }
+      var text = RichContentEditor.callOnRCE($questionContent, 'get_code');
+      var matches = text.match(/\[[A-Za-z0-9_\-.]+\]/g);
+      $select.find('option.shown_when_no_other_options_available').remove();
+      $select.find('option').addClass('to_be_removed');
+      var matchHash = {};
+      if (matches) {
+        for (var idx = 0; idx < matches.length; idx++) {
+          if (matches[idx]) {
+            var variable = matches[idx].substring(1, matches[idx].length - 1);
+            if (!matchHash[variable]) {
+              var $option = $select.find('option').eq(idx);
+              if (!$option.length) {
+                $option = $('<option/>').appendTo($select);
+              }
+              $option
+                .removeClass('to_be_removed')
+                .val(variable)
+                .text(variable);
+              matchHash[variable] = true;
+            }
+          }
+        }
+      }
+      // if there are not any options besides the default:
+      // "<option class='shown_when_no_other_options_available' value='0'>[ Enter Answer Variables Above ]</option>"
+      if (!$select.find('option:not(.shown_when_no_other_options_available)').length) {
+        $select.append("<option class='shown_when_no_other_options_available' value='0'>" + htmlEscape(I18n.t('enter_answer_variable_above',
+                       '[ Enter Answer Variables Above ]')) + '</option>');
+      }
+      $select.find('option.to_be_removed').remove();
+      $select.change();
+    };
+    // doing the following because minifying will change the function name
+    // which we reference in isChangeMultiFuncBound()
+    ret.origFuncNm = 'changeMultiFunc';
+    return ret;
+  }
+
   // TODO: refactor this... it's not going to be horrible, but it will
   // take a little bit of work.  I just wrapped it in a closure for now
   // to not pollute the global namespace, but it could use more.
@@ -321,18 +377,36 @@ define([
 
     questionContentCounter: 0,
 
-    showFormQuestion: function($form) {
+    loadJQueryElemById: function (id) {
+      return $('#' + id);
+    },
+
+    rebindMultiChange: function (questionType, questionContentId, $select) {
+      var $questionContent = quiz.loadJQueryElemById(questionContentId);
+      if (questionType === 'multiple_dropdowns_question' || questionType === 'fill_in_multiple_blanks_question') {
+        if (!isChangeMultiFuncBound($questionContent)) {
+          $questionContent.bind('change', getChangeMultiFunc($questionContent, questionType, $select)).change();
+        }
+      }
+    },
+
+    showFormQuestion: function ($form) {
+      var $question = $form.find('.question');
+      var $questionContent = $question.find('.question_content');
+      var $select = $question.find('.blank_id_select');
+      var questionType = $question.find('.question_type').val();
       if (!$form.attr('id')) {
         // we show and then hide the form so that the layout for the editor is computed correctly
         $form.show();
-        $form.find(".question_content").attr('id', 'question_content_' + quiz.questionContentCounter++);
-        RichContentEditor.loadNewEditor($form.find(".question_content"), {
+        $form.find('.question_content').attr('id', 'question_content_' + quiz.questionContentCounter++);
+        RichContentEditor.loadNewEditor($questionContent, {
           tinyOptions: {
             aria_label: I18n.t('label.question.instructions', 'Question instructions, rich text area')
           }
-        })
-        $form.find(".text_after_answers").attr('id', 'text_after_answers_' + quiz.questionContentCounter++);
-        RichContentEditor.loadNewEditor($form.find(".text_after_answers"))
+        });
+        quiz.rebindMultiChange(questionType, $questionContent[0].id, $select);
+        $form.find('.text_after_answers').attr('id', 'text_after_answers_' + quiz.questionContentCounter++);
+        RichContentEditor.loadNewEditor($form.find('.text_after_answers'));
         $form.hide();
       }
       return $form.show();
@@ -1721,6 +1795,11 @@ define([
           $('html,body').scrollTo({top: offset.top, left:0});
           return false;
         }
+        if (quiz_title.length > ENV.MAX_NAME_LENGTH && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT && data['quiz[post_to_sis]'] == '1') {
+          var header_offset = $('#quiz_title').errorBox(I18n.t('The Quiz name must be under %{length} characters', {length: ENV.MAX_NAME_LENGTH + 1})).offset();
+          $('html,body').scrollTo({top: header_offset.top, left: 0});
+          return false;
+        }
         data['quiz[title]'] = quiz_title;
         data['quiz[description]'] = RichContentEditor.callOnRCE($("#quiz_description"), 'get_code');
         if ($("#quiz_notify_of_update").is(':checked')) {
@@ -1736,7 +1815,8 @@ define([
         var overrides = overrideView.getOverrides();
         data['quiz[only_visible_to_overrides]'] = overrideView.containsSectionsWithoutOverrides();
         var validationData = {
-          assignment_overrides: overrideView.getAllDates()
+          assignment_overrides: overrideView.getAllDates(),
+          postToSIS: data['quiz[post_to_sis]']
         };
         var errs = overrideView.validateBeforeSave(validationData,{});
         if (_.keys(errs).length > 0) {
@@ -2115,29 +2195,31 @@ define([
         var newAnswer = $form.find('.correct_answer')
         toggleAnswer($question, {regradeOption: regradeOption, newAnswer: newAnswer})
       }
-      toggleSelectAnswerAltText($(".form_answers .answer"), quiz.answerSelectionType(question.question_type))
-      togglePossibleCorrectAnswerLabel($(".form_answers .answer"));
+      toggleSelectAnswerAltText($('.form_answers .answer'), quiz.answerSelectionType(question.question_type))
+      togglePossibleCorrectAnswerLabel($('.form_answers .answer'));
     });
 
-    $(".question_form :input[name='question_type']").change(function() {
-      quiz.updateFormQuestion($(this).parents(".question_form"));
-
+    $(".question_form :input[name='question_type']").change(function () {
       // is this the initial loado of the question type
-      var loading = $(this).parents(".question.initialLoad").length > 0;
+      var loading = $(this).parents('.question.initialLoad').length > 0;
       var holder = $(this).parents('.question_holder');
-      var isNew = $(holder).find("#question_new").length > 0;
-      if ($("#student_submissions_warning").length > 0 && !loading && !isNew) {
+      var isNew = $(holder).find('#question_new').length > 0;
+
+      quiz.updateFormQuestion($(this).parents('.question_form'));
+
+      if ($('#student_submissions_warning').length > 0 && !loading && !isNew) {
         disableRegrade(holder);
       }
     });
 
-    $("#question_form_template .cancel_link").click(function(event) {
-      event.preventDefault();
-      var $displayQuestion = $(this).parents("form").prev();
-
+    $('#question_form_template .cancel_link').click(function (event) {
+      var $displayQuestion = $(this).parents('form').prev();
       var isNew = $displayQuestion.attr('id') == 'question_new';
+
+      event.preventDefault();
+
       if (!isNew) {
-        $(this).parents("form").remove();
+        $(this).parents('form').remove();
       }
       $displayQuestion.show();
       $("html,body").scrollTo({top: $displayQuestion.offset().top - 10, left: 0});
@@ -3806,80 +3888,49 @@ define([
           conditionalRelease.assignmentUpToDate = true;
         }
       });
-
     }
   });
 
-  $.fn.multipleAnswerSetsQuestion = function() {
-    var $question = $(this),
-        $question_content = $question.find(".question_content"),
-        $select = $question.find(".blank_id_select"),
-        $question_type = $question.find(".question_type");
+  $.fn.multipleAnswerSetsQuestion = function () {
+    var $question = $(this);
+    var $questionContent = $question.find('.question_content');
+    var $select = $question.find('.blank_id_select');
+    var questionType = $question.find('.question_type').val();
+
     if ($question.data('multiple_sets_question_bindings')) { return; }
     $question.data('multiple_sets_question_bindings', true);
-    $question_content.bind('keypress', function(event) {
-      setTimeout(function() {$(event.target).triggerHandler('change')}, 50);
+
+    $questionContent.bind('keypress', function (event) {
+      setTimeout(function () { $(event.target).triggerHandler('change'); }, 50);
     });
-    $question_content.bind('change', function() {
-      var question_type = $question_type.val();
-      if (question_type != 'multiple_dropdowns_question' && question_type != 'fill_in_multiple_blanks_question') {
+
+    if (!isChangeMultiFuncBound($questionContent)) {
+      $questionContent.bind('change', getChangeMultiFunc($questionContent, questionType, $select)).change();
+    }
+
+    $select.change(function () {
+      if (questionType !== 'multiple_dropdowns_question' && questionType !== 'fill_in_multiple_blanks_question') {
         return;
       }
-      var text = RichContentEditor.callOnRCE($(this), 'get_code');
-      var matches = text.match(/\[[A-Za-z0-9_\-.]+\]/g);
-      $select.find("option.shown_when_no_other_options_available").remove();
-      $select.find("option").addClass('to_be_removed');
-      var matchHash = {};
-      if (matches) {
-        for(var idx  = 0; idx < matches.length; idx++) {
-          if (matches[idx]) {
-            var variable = matches[idx].substring(1, matches[idx].length - 1);
-            if (!matchHash[variable]) {
-              var $option = $select.find("option").eq(idx); //." + variable);
-              if (!$option.length) {
-                $option = $("<option/>").appendTo($select);
-              }
-              $option
-                .removeClass('to_be_removed')
-                .val(variable)
-                .text(variable);
-              matchHash[variable] = true;
-            }
-          }
-        }
-      }
-      // if there are not any options besides the default "<option class="shown_when_no_other_options_available" value='0'>[ Enter Answer Variables Above ]</option>" one
-      if (!$select.find("option:not(.shown_when_no_other_options_available)").length) {
-        $select.append("<option class='shown_when_no_other_options_available' value='0'>" + htmlEscape(I18n.t('enter_answer_variable_above', "[ Enter Answer Variables Above ]")) + "</option>");
-      }
-      $select.find("option.to_be_removed").remove();
-      $select.change();
-    }).change();
-    $select.change(function() {
-      var question_type = $question_type.val();
-      if (question_type != 'multiple_dropdowns_question' && question_type != 'fill_in_multiple_blanks_question') {
-        return;
-      }
-      $question.find(".form_answers .answer").hide().addClass('hidden');
-      $select.find("option").each(function(i) {
-        var $option = $(this);
-        $question.find(".form_answers .answer_for_" + $(this).val()).each(function() {
-          $(this).attr('class', $(this).attr('class').replace(/answer_idx_\d+/g, ""));
+      $question.find('.form_answers .answer').hide().addClass('hidden');
+      $select.find('option').each(function (i) {
+        $question.find('.form_answers .answer_for_' + $(this).val()).each(function () {
+          $(this).attr('class', $(this).attr('class').replace(/answer_idx_\d+/g, ''));
         }).addClass('answer_idx_' + i);
       });
-      if ($select.val() !== "0") {
-        var variable = $select.val(),
-            variableIdx = $select[0].selectedIndex;
+      if ($select.val() !== '0') {
+        var variable = $select.val();
+        var variableIdx = $select[0].selectedIndex;
         if (variableIdx >= 0) {
-          $question.find(".form_answers .answer").each(function() {
+          $question.find('.form_answers .answer').each(function () {
             var $this = $(this);
             if (!$this.attr('class').match(/answer_idx_/)) {
               if ($this.attr('class').match(/answer_for_/)) {
-                var idx = null,
-                    blank_id = $this.attr('class').match(/answer_for_[^\s]+/);
-                if (blank_id && blank_id[0]) { blank_id = blank_id[0].substring(11); }
-                $select.find("option").each(function(i) {
-                  if ($(this).text() == blank_id) {
+                var idx = null;
+                var blankId = $this.attr('class').match(/answer_for_[^\s]+/);
+                if (blankId && blankId[0]) { blankId = blankId[0].substring(11); }
+                $select.find('option').each(function (i) {
+                  if ($(this).text() == blankId) {
                     idx = i;
                   }
                 });
@@ -4213,4 +4264,9 @@ define([
       }
     }).triggerHandler('change');
   });
+
+  return {
+    quiz: quiz,
+    isChangeMultiFuncBound: isChangeMultiFuncBound
+  }
 });

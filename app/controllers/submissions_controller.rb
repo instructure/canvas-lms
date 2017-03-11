@@ -86,8 +86,8 @@ require 'action_controller_test_process'
 #
 class SubmissionsController < ApplicationController
   include Submissions::ShowHelper
-  before_filter :get_course_from_section, :only => :create
-  before_filter :require_context
+  before_action :get_course_from_section, :only => :create
+  before_action :require_context
 
   include Api::V1::Submission
 

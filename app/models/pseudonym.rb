@@ -248,7 +248,9 @@ class Pseudonym < ActiveRecord::Base
     return true unless self.sis_user_id
     existing_pseudo = Pseudonym.where(account_id: self.account_id, sis_user_id: self.sis_user_id.to_s).first
     return true if !existing_pseudo || existing_pseudo.id == self.id
-    self.errors.add(:sis_user_id, t('#errors.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_user_id))
+    self.errors.add(:sis_user_id, :taken,
+      message: t('#errors.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_user_id)
+    )
     false
   end
 
@@ -498,9 +500,15 @@ class Pseudonym < ActiveRecord::Base
     return [] if credentials[:unique_id].blank? ||
                  credentials[:password].blank?
     too_many_attempts = false
-    associated_shards = associated_shards(credentials[:unique_id])
+    begin
+      associated_shards = associated_shards(credentials[:unique_id])
+    rescue => e
+      # global lookups is just an optimization anyway; log an error, but continue
+      # by searching all accounts the slow way
+      Canvas::Errors.capture(e)
+    end
     pseudonyms = Shard.partition_by_shard(account_ids) do |account_ids|
-      next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
+      next if GlobalLookups.enabled? && associated_shards && !associated_shards.include?(Shard.current)
       active.
         by_unique_id(credentials[:unique_id]).
         where(:account_id => account_ids).

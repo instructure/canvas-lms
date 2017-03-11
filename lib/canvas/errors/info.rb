@@ -28,10 +28,8 @@ module Canvas
         {
           tags: {
             account_id: @account.try(:global_id),
+            user_id: @user.try(:global_id),
             type: @type,
-          },
-          user: {
-            id: @user.try(:global_id),
           },
           extra: {
             request_context_id: @rci,

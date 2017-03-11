@@ -3,7 +3,7 @@ define([
   'jsx/modules/utils/setupContentIds'
 ], ($, setupContentIds) => {
 
-  module('Modules Utilities: setupContentIds');
+  QUnit.module('Modules Utilities: setupContentIds');
 
   test('It puts the proper attribute values in place when called', () => {
     const fakeModuleHtml = `<div>

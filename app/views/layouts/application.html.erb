@@ -85,7 +85,10 @@
     <% end %>
     <div id="main" class="ic-Layout-columns">
       <% if @show_left_side %>
-        <div id="left-side" class="ic-app-course-menu <% if !@no_left_side_list_view %>list-view<% end %>">
+        <div id="left-side"
+          class="ic-app-course-menu <% if !@no_left_side_list_view %>list-view<% end %>"
+          style="display: <%= @collapse_course_menu ? "none" : "block" %>"
+          >
           <% if left_side %>
             <%= left_side %>
           <% else %>

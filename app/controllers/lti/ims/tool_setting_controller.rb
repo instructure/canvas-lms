@@ -22,10 +22,10 @@ module Lti
     class ToolSettingController < ApplicationController
       include Lti::ApiServiceHelper
 
-      skip_before_filter :require_context
-      skip_before_filter :require_user
-      skip_before_filter :load_user
-      before_filter :authenticate_api_call
+      skip_before_action :require_context
+      skip_before_action :require_user
+      skip_before_action :load_user
+      before_action :authenticate_api_call
 
       def show
         render_bad_request and return unless valid_show_request?

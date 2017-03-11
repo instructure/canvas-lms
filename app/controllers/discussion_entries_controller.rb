@@ -20,7 +20,7 @@ require 'atom'
 
 # @API Discussion Topics
 class DiscussionEntriesController < ApplicationController
-  before_filter :require_context_and_read_access, :except => :public_feed
+  before_action :require_context_and_read_access, :except => :public_feed
 
   def show
     @entry = @context.discussion_entries.find(params[:id]).tap{|e| e.current_user = @current_user}
@@ -100,10 +100,10 @@ class DiscussionEntriesController < ApplicationController
 
     @entry = (@topic || @context).discussion_entries.find(params[:id])
     raise(ActiveRecord::RecordNotFound) if @entry.deleted?
-
     @topic ||= @entry.discussion_topic
     @entry.current_user = @current_user
-    @entry.attachment_id = nil if @remove_attachment == '1'
+    @entry.attachment_id = nil if @remove_attachment == '1' || params[:attachment].nil?
+
     if authorized_action(@entry, @current_user, :update)
       return if context_file_quota_exceeded?
       @entry.editor = @current_user

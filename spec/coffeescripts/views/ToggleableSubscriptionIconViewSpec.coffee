@@ -5,7 +5,7 @@ define [
   'compiled/views/ToggleableSubscriptionIconView'
 ], ($, _, DiscussionTopic, SubscriptionIconView) ->
 
-  module 'SubscriptionIconView',
+  QUnit.module 'SubscriptionIconView',
     setup: ->
       @model = new DiscussionTopic()
       @view = new SubscriptionIconView(model: @model)

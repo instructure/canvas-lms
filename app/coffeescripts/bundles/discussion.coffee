@@ -32,7 +32,7 @@ require [
   # create the objects ...
   router        = new Backbone.Router
 
-  @data         = if ENV.DISCUSSION.THREADED
+  data          = if ENV.DISCUSSION.THREADED
                     new MaterializedDiscussionTopic root_url: ENV.DISCUSSION.ROOT_URL
                   else
                     new SideCommentDiscussionTopic root_url: ENV.DISCUSSION.ROOT_URL
@@ -53,7 +53,7 @@ require [
                     model: new Backbone.Model
                     filterModel: filterModel
 
-  @entriesView   = new EntriesView
+  entriesView   = new EntriesView
                     el: '#discussion_subentries'
                     collection: entries
                     descendants: descendants

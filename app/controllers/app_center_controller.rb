@@ -17,7 +17,7 @@
 #
 
 class AppCenterController < ApplicationController
-  before_filter :require_context
+  before_action :require_context
 
   def map_tools_to_apps!(context, apps)
     return unless apps

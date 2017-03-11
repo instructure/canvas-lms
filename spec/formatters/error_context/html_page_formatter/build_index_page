@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+
+# rather than do this in the formatter via dump_summary, it's a separate
+# thing after the fact because:
+#
+# 1. test-queue splits up the suite across many servers
+# 2. we also have a rerun phase (see script/rspec-queue-with-retries)
+#
+# dumb little pure ruby thing so we don't incur an extra bundler/rails
+# startup tax
+
+require "fileutils"
+FileUtils.mkdir_p "log/spec_failures"
+Dir.chdir "log/spec_failures"
+all_failures=`find . -name index.html`
+  .split("\n")
+  .grep(/:/)
+  .sort_by do |path|
+    file, pos = path.split(":", 2)
+    [file, pos.to_i, pos]
+  end
+
+if ENV["partition_by_run"]
+  failures_by_category = {}
+  all_failures.each do |file|
+    _, category, = file.split("/", 3)
+    failures_by_category[category] ||= []
+    failures_by_category[category] << file
+  end
+else
+  failures_by_category = { "" => all_failures }
+end
+
+File.open("index.html", "w") do |file|
+  file.puts "<body style=\"font-family:sans-serif;line-height:1.25;font-size:14px\">"
+  if all_failures.empty?
+    file.puts "\\o/ yay good job, no failures"
+  else
+    require "cgi"
+
+    too_faily = false
+    failures_by_category.each do |category, failures|
+      file.puts "<h1>#{CGI.escapeHTML(category)} Failures</h1>"
+      failures.each do |failure_page|
+        failure = failure_page.sub("/#{category}/", "/").sub("/index.html", "")
+        if File.size?(failure_page)
+          file.puts "bin/rspec <a href=\"#{CGI.escapeHTML(failure_page)}\">#{CGI.escapeHTML(failure)}</a><br>"
+        else
+          file.puts "bin/rspec #{CGI.escapeHTML(failure)} * <br>"
+          too_faily = true
+        end
+      end
+    end
+
+    if too_faily
+      file.puts "<p>* Your build was so fail-y we stopped generating error pages :'(</p>"
+    end
+  end
+  file.puts "</body>"
+end

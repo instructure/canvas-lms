@@ -943,10 +943,9 @@ class Attachment < ActiveRecord::Base
     super(name)
   end
 
-  def thumbnail_with_root_attachment
-    self.thumbnail_without_root_attachment || self.root_attachment.try(:thumbnail)
+  def thumbnail
+    super || root_attachment.try(:thumbnail)
   end
-  alias_method_chain :thumbnail, :root_attachment
 
   def content_directory
     self.directory_name || Folder.root_folders(self.context).first.name

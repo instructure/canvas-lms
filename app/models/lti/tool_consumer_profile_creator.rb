@@ -9,7 +9,6 @@ module Lti
 
     CAPABILITIES = %w(
           basic-lti-launch-request
-          User.id
           Canvas.api.domain
           LtiLink.custom.url
           ToolProxyBinding.custom.url
@@ -21,18 +20,10 @@ module Lti
           Canvas.placements.postGrades
           Canvas.placements.similarityDetection
           User.username
-          Person.email.primary
           vnd.Canvas.Person.email.sis
-          Person.name.given
-          Person.name.family
-          Person.name.full
-          CourseSection.sourcedId
-          Person.sourcedId
-          Membership.role
           ToolConsumerProfile.url
-          OAuth.splitSecret
-          Context.id
-        ).freeze
+          Security.splitSecret
+        ).concat(CapabilitiesHelper.supported_capabilities).freeze
 
     RESTRICTED_CAPABILITIES = %W(
       #{ORIGINALITY_REPORT_SERVICE}.url

@@ -16,7 +16,7 @@ define([
   const mockAxios = (adapter) => {
     restoreAxios()
     sandbox = sinon.sandbox.create()
-    sandbox.stub(axios, 'post', adapter)
+    sandbox.stub(axios, 'post').callsFake(adapter)
   }
 
   const mockAxiosSuccess = (data = {}) => {
@@ -50,8 +50,8 @@ define([
     }
   })
 
-  module('Add People Actions', () => {
-    module('validateUsers', testConfig())
+  QUnit.module('Add People Actions', () => {
+    QUnit.module('validateUsers', testConfig())
 
     test('dispatches VALIDATE_USERS_START when called', () => {
       mockAxiosSuccess();
@@ -110,7 +110,7 @@ define([
       }, 1)
     })
 
-    module('resolveValidationIssues', testConfig())
+    QUnit.module('resolveValidationIssues', testConfig())
 
     test('dispatches CREATE_USERS_START when called', () => {
       mockAxiosSuccess();
@@ -146,7 +146,7 @@ define([
       }, 1)
     })
 
-    module('enrollUsers', testConfig())
+    QUnit.module('enrollUsers', testConfig())
 
     test('dispatches START when called', () => {
       mockAxiosSuccess();
@@ -179,7 +179,7 @@ define([
       }, 1)
     })
 
-    module('chooseDuplicate', testConfig())
+    QUnit.module('chooseDuplicate', testConfig())
 
     test('dispatches dependent actions', (/* assert */) => {
       runningState = INITIAL_STATE;
@@ -190,7 +190,7 @@ define([
       ok(storeSpy.withArgs({ type: actionTypes.CHOOSE_DUPLICATE, payload: {address: 'foo', user_id: 1} }).calledOnce, 'CHOOSE_DUPLICATE');
     })
 
-    module('skipDuplicate', testConfig())
+    QUnit.module('skipDuplicate', testConfig())
 
     test('dispatches dependent actions', (/* assert */) => {
       store.dispatch(actions.skipDuplicate({address: 'foo'}));
@@ -198,7 +198,7 @@ define([
       ok(storeSpy.withArgs({ type: actionTypes.SKIP_DUPLICATE, payload: {address: 'foo'} }).calledOnce, 'SKIP_DUPLICATE');
     })
 
-    module('enqueue new ', testConfig())
+    QUnit.module('enqueue new ', testConfig())
     test('for duplicate dispatches dependent action', (/* assert */) => {
       const newUser = {name: 'Foo Bar', email: 'foo@bar.com'};
 

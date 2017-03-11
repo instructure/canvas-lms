@@ -143,6 +143,16 @@
 #             "example": "StudentEnrollment",
 #             "type": "string"
 #           },
+#           "role_id": {
+#             "description": "The id of the enrollment role.",
+#             "example": 1,
+#             "type": "integer"
+#           },
+#           "created_at": {
+#             "description": "The created time of the enrollment, in ISO8601 format.",
+#             "example": "2012-04-18T23:08:51Z",
+#             "type": "datetime"
+#           },
 #           "updated_at": {
 #             "description": "The updated time of the enrollment, in ISO8601 format.",
 #             "example": "2012-04-18T23:08:51Z",
@@ -241,8 +251,8 @@
 #       }
 #
 class EnrollmentsApiController < ApplicationController
-  before_filter :get_course_from_section, :require_context
-  before_filter :require_user
+  before_action :get_course_from_section, :require_context
+  before_action :require_user
 
   @@errors = {
     :missing_parameters                => 'No parameters given',

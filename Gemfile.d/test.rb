@@ -1,11 +1,11 @@
 group :test do
   if CANVAS_RAILS4_2
-    gem 'rails-dom-testing', '1.0.7'
+    gem 'rails-dom-testing', '1.0.8'
   else
-    gem 'rails-dom-testing', '2.0.1'
+    gem 'rails-dom-testing', '2.0.2'
   end
 
-  gem 'gergich', '0.1.10', require: false
+  gem 'gergich', '0.1.11', require: false
   gem 'testingbot', require: false
   gem 'brakeman', require: false
   # simplecov 0.10.0 shows significantly less coverage.
@@ -26,11 +26,11 @@ group :test do
   gem 'shoulda-matchers', '3.1.1'
 
   gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
-    gem 'rubocop', '0.46.0', require: false
+    gem 'rubocop', '0.47.1', require: false
       gem 'rainbow', '2.2.1', require: false
-  gem 'rubocop-rspec', '1.8.0', require: false
+  gem 'rubocop-rspec', '1.10.0', require: false
 
-  gem 'once-ler', '0.1.0'
+  gem 'once-ler', '0.1.1'
 
   # Keep this gem synced with docker-compose/seleniumff/Dockerfile
   gem 'selenium-webdriver', '2.53.4'
@@ -41,12 +41,12 @@ group :test do
   gem 'test-queue', github: 'jenseng/test-queue', ref: '57d31b70d9d83de3b3534f4119c614155c68e290', require: false
   gem 'testrailtagging', '0.3.7', require: false
 
-  gem 'webmock', '1.22.3', require: false
-    gem 'addressable', '2.3.8', require: false
+  gem 'webmock', '2.3.2', require: false
+    gem 'addressable', '2.5.0', require: false
     gem 'crack', '0.4.3', require: false
   gem 'timecop', '0.8.1'
   gem 'jira_ref_parser', '1.0.1'
   gem 'headless', '2.3.1', require: false
-  gem 'escape_code', '0.2'
+  gem 'escape_code', '0.2', require: false
   gem 'hashdiff', '0.3.2'
 end

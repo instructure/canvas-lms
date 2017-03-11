@@ -8,9 +8,12 @@
 
   can_manage_courses = can_do(@context.account, @current_user, :manage_courses)
   can_rename_course = can_manage_courses || (can_manage && !@context.root_account.settings[:prevent_course_renaming_by_teachers])
+  can_manage_master_courses = can_manage_courses && can_do(@context.account, @current_user, :manage_master_courses)
   has_multiple_sections = @context.course_sections.active.count > 1
 
   can_see_users = can_do(@context, @current_user, :read_roster, :manage_students, :manage_admin_users)
+
+  is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
 %>
 
 <% content_for :right_side do %>
@@ -97,6 +100,19 @@
           <% end %>
         </td>
       </tr>
+      <% if @context.root_account.feature_enabled?(:master_courses) %>
+      <tr>
+        <td class="form-label nobr"><%= f.blabel :blueprint_course, :en => "Blueprint Course" %></td>
+        <td class="nobr">
+          <% if can_manage_master_courses %>
+            <%= f.check_box :master_course, :checked => is_master_course %>
+            <%= f.label :master_course, :en => "Enable course as a Blueprint Course" %>
+          <% else %>
+            <span id="course_master_course"><%= is_master_course ? t("Yes") : t("No") %></span>
+          <% end %>
+        </td>
+      </tr>
+      <% end %>
       <tr>
         <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
         <td>
@@ -414,7 +430,7 @@
             <%= f.check_box :hide_distribution_graphs, :disabled => !can_manage %>
             <%= f.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
             <%= f.check_box :lock_all_announcements, :disabled => !can_manage || @context.account.lock_all_announcements[:locked] %>
-            <%= label_tag :course_lock_all_announcements, :en => 'Disable comments on announcements' %><br />
+            <%= f.label :lock_all_announcements, :en => 'Disable comments on announcements' %><br />
             <%= f.select :default_wiki_editing_roles, [
               [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
               [t('#course.wiki_permissions.teachers_students', "Teacher and Students"), "teachers,students"],
@@ -541,7 +557,11 @@
               <a class="al-trigger al-trigger-gray" role="button" href="#">
                 <i class="icon-settings"></i>
                 <i class="icon-mini-arrow-down"></i>
-                <span class="screenreader-only">Settings</span>
+                <span class="screenreader-only">
+                  <span class="screenreader-only">
+                    <%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %>
+                  </span>
+                </span>
               </a>
 
               <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
@@ -578,7 +598,7 @@
                 <a class="al-trigger al-trigger-gray" role="button" href="#">
                   <i class="icon-settings"></i>
                   <i class="icon-mini-arrow-down"></i>
-                  <span class="screenreader-only">Settings</span>
+                  <span class="screenreader-only"><%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %></span>
                 </a>
 
                 <ul id="content-2" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-3">

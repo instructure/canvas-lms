@@ -2,11 +2,11 @@ require_relative "./call_stack_utils"
 
 module BlankSlateProtection
   module ActiveRecord
-    def create_or_update
+    def create_or_update(*)
       return super unless BlankSlateProtection.enabled?
       return super if caller.grep(BlankSlateProtection.exempt_patterns).present?
 
-      location = CallStackUtils.best_line_for(caller).sub(/:in .*/, '')
+      location = CallStackUtils.best_line_for(caller)
       if caller.grep(/_context_hooks/).present?
         $stderr.puts "\e[31mError: Don't create records inside `:all` hooks!"
         $stderr.puts "See: " + location + "\e[0m"
@@ -48,7 +48,6 @@ module BlankSlateProtection
     end
 
     def install!
-      truncate_all_tables!
       ::RSpec::Core::Example.prepend Example
       ::ActiveRecord::Base.include ActiveRecord
       @enabled = true

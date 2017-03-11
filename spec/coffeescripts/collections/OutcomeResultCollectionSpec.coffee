@@ -5,7 +5,7 @@ define [
   'helpers/fakeENV'
   'timezone'
 ], (Backbone, Outcome, OutcomeResultCollection, fakeENV, tz) ->
-  module 'OutcomeResultCollectionSpec',
+  QUnit.module 'OutcomeResultCollectionSpec',
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = 'course_1'

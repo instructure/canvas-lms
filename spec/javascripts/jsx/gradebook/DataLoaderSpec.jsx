@@ -1,5 +1,5 @@
 define(['jsx/gradebook/DataLoader', 'underscore'], (DataLoader, _) => {
-  module("Gradebook Data Loader", (hooks) => {
+  QUnit.module("Gradebook Data Loader", (hooks) => {
     let savedTrackEvent;
     let fakeXhr;
     let XHRS, XHR_HANDLERS, handlerIndex;
@@ -67,7 +67,7 @@ define(['jsx/gradebook/DataLoader', 'underscore'], (DataLoader, _) => {
       }
     };
 
-    module("Assignment Groups");
+    QUnit.module("Assignment Groups");
 
     test("resolves promise with data when all groups are loaded", (assert) => {
       XHR_HANDLERS = [
@@ -86,7 +86,7 @@ define(['jsx/gradebook/DataLoader', 'underscore'], (DataLoader, _) => {
       });
     });
 
-    module("Students and Submissions");
+    QUnit.module("Students and Submissions");
 
     test("resolves promise with data when all students are loaded", (assert) => {
       XHR_HANDLERS = [
@@ -200,7 +200,7 @@ define(['jsx/gradebook/DataLoader', 'underscore'], (DataLoader, _) => {
       });
     });
 
-    module("Custom Column Data");
+    QUnit.module("Custom Column Data");
 
     test("resolves promise with custom columns", (assert) => {
       XHR_HANDLERS = [

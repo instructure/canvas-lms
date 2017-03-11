@@ -7,7 +7,7 @@ define([
 ], ($, React, ReactDOM, TestUtils, TimeBlockSelector) => {
   let props;
 
-  module('TimeBlockSelector', {
+  QUnit.module('TimeBlockSelector', {
     setup () {
       props = {
         timeData: [],

@@ -4,7 +4,7 @@ define([
   'enzyme',
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
 ], (React, TestUtils, { mount }, AssignmentGroupColumnHeader) => {
-  module('AssignmentGroupColumnHeader - base behavior', {
+  QUnit.module('AssignmentGroupColumnHeader - base behavior', {
     setup () {
       this.assignmentGroup = {
         name: 'Assignment Group 1',
@@ -31,7 +31,7 @@ define([
     equal(actualElements.props().children, '42.50% of grade');
   });
 
-  module('AssignmentGroupColumnHeader - non-standard assignment group', {
+  QUnit.module('AssignmentGroupColumnHeader - non-standard assignment group', {
     setup () {
       this.assignmentGroup = {
         name: 'Assignment Group 1',

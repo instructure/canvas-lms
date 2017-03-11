@@ -32,7 +32,7 @@ define([
   // time this is being written a significant amount of work is needed
   // to be able to require javascript files that live in the spec directory
 
-  module('SubmissionStateMap with MGP disabled');
+  QUnit.module('SubmissionStateMap with MGP disabled');
 
   test('submission is locked for a student without assignment visibility', function() {
     const assignment = { id: '1', effectiveDueDates: {}, only_visible_to_overrides: true };
@@ -54,7 +54,7 @@ define([
     equal(state.locked, false);
   });
 
-  module('SubmissionStateMap with MGP enabled and all grading periods selected', {
+  QUnit.module('SubmissionStateMap with MGP enabled and all grading periods selected', {
     setup() {
       this.DATE_IN_CLOSED_PERIOD = '2015-07-15';
       this.DATE_NOT_IN_CLOSED_PERIOD = '2015-08-15';
@@ -109,7 +109,7 @@ define([
     equal(state.locked, false);
   });
 
-  module('SubmissionStateMap with MGP enabled and a non-closed grading period selected', {
+  QUnit.module('SubmissionStateMap with MGP enabled and a non-closed grading period selected', {
     setup() {
       this.DATE_IN_SELECTED_PERIOD = '2015-07-15';
       this.DATE_NOT_IN_SELECTED_PERIOD = '2015-08-15';
@@ -144,7 +144,7 @@ define([
     equal(state.locked, false);
   });
 
-  module('SubmissionStateMap with MGP enabled and a closed grading period selected', {
+  QUnit.module('SubmissionStateMap with MGP enabled and a closed grading period selected', {
     setup() {
       this.DATE_IN_SELECTED_PERIOD = '2015-07-15';
       this.DATE_NOT_IN_SELECTED_PERIOD = '2015-08-15';

@@ -1,8 +1,9 @@
 define [
+  'i18n!messages'
   'compiled/views/PaginatedCollectionView'
   'compiled/views/conversations/MessageView'
   'jst/conversations/messageList'
-], (PaginatedCollectionView, MessageView, template) ->
+], (I18n, PaginatedCollectionView, MessageView, template) ->
 
   class MessageListView extends PaginatedCollectionView
 
@@ -50,7 +51,7 @@ define [
       updatedThread.set
         last_message:  thread.last_message
         last_authored_message_at: new Date().toString()
-        message_count: updatedThread.get('messages').length
+        message_count: I18n.n(updatedThread.get('messages').length)
       @collection.sort()
       @render()
       selectedThread?.view.select()

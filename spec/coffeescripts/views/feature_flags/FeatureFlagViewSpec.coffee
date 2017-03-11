@@ -3,13 +3,13 @@ define [
   'compiled/models/FeatureFlag'
   'jquery'
   'timezone'
-  'vendor/timezone/America/Juneau'
-  'vendor/timezone/fr_FR'
+  'timezone/America/Juneau'
+  'timezone/fr_FR'
   'helpers/I18nStubber'
   'helpers/fakeENV'
 ], (FeatureFlagView, FeatureFlag, $, tz, juneau, french, I18nStubber, fakeENV) ->
 
-  module "FeatureFlagView",
+  QUnit.module "FeatureFlagView",
     setup: ->
       @container = $('<div />', id: 'feature-flags').appendTo('#fixtures')
       @snapshot = tz.snapshot()

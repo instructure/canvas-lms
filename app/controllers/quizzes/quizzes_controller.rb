@@ -28,12 +28,12 @@ class Quizzes::QuizzesController < ApplicationController
   # locked down.
   attr_reader :lock_results_if_needed
 
-  before_filter :require_context
-  before_filter :rich_content_service_config, only: [:show, :new, :edit]
+  before_action :require_context
+  before_action :rich_content_service_config, only: [:show, :new, :edit]
 
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
-  before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :require_quiz, :only => [
+  before_action { |c| c.active_tab = "quizzes" }
+  before_action :require_quiz, :only => [
     :statistics,
     :edit,
     :show,
@@ -47,8 +47,8 @@ class Quizzes::QuizzesController < ApplicationController
     :submission_html,
     :toggle_post_to_sis
   ]
-  before_filter :set_download_submission_dialog_title , only: [:show,:statistics]
-  after_filter :lock_results, only: [ :show, :submission_html ]
+  before_action :set_download_submission_dialog_title , only: [:show,:statistics]
+  after_action :lock_results, only: [ :show, :submission_html ]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
   QUIZ_QUESTIONS_DETAIL_LIMIT = 25
@@ -258,6 +258,17 @@ class Quizzes::QuizzesController < ApplicationController
       if authorized_action(@quiz, @current_user, :update)
         @assignment = @quiz.assignment
       end
+
+      max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@quiz)
+      max_name_length = AssignmentUtil.assignment_max_name_length(@quiz)
+
+      hash = {
+        :MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT => max_name_length_required_for_account,
+        :MAX_NAME_LENGTH => max_name_length,
+        :DUE_DATE_REQUIRED_FOR_ACCOUNT => AssignmentUtil.due_date_required_for_account?(@quiz),
+      }
+
+      js_env(hash)
       redirect_to(named_context_url(@context, :edit_context_quiz_url, @quiz))
     end
   end
@@ -267,7 +278,6 @@ class Quizzes::QuizzesController < ApplicationController
       return render_unauthorized_action if editing_restricted?(@quiz)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
       @assignment = @quiz.assignment
-
       @quiz.title = params[:title] if params[:title]
       @quiz.due_at = params[:due_at] if params[:due_at]
       @quiz.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
@@ -284,11 +294,15 @@ class Quizzes::QuizzesController < ApplicationController
       end]
       sections = @context.course_sections.active
 
+      max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@quiz)
+      max_name_length = AssignmentUtil.assignment_max_name_length(@quiz)
+
       hash = {
         :ASSIGNMENT_ID => @assignment.present? ? @assignment.id : nil,
         :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_for(@current_user,
                                                            ensure_set_not_empty: true),
                                                            @current_user),
+        :DUE_DATE_REQUIRED_FOR_ACCOUNT => AssignmentUtil.due_date_required_for_account?(@quiz),
         :QUIZ => quiz_json(@quiz, @context, @current_user, session),
         :SECTION_LIST => sections.map { |section|
           {
@@ -306,7 +320,9 @@ class Quizzes::QuizzesController < ApplicationController
         :quiz_max_combination_count => QUIZ_MAX_COMBINATION_COUNT,
         :SHOW_QUIZ_ALT_TEXT_WARNING => true,
         :VALID_DATE_RANGE => CourseDateRange.new(@context),
-        :MULTIPLE_GRADING_PERIODS_ENABLED => @context.feature_enabled?(:multiple_grading_periods)
+        :MULTIPLE_GRADING_PERIODS_ENABLED => @context.feature_enabled?(:multiple_grading_periods),
+        :MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT => max_name_length_required_for_account,
+        :MAX_NAME_LENGTH => max_name_length
       }
 
       if @context.feature_enabled?(:multiple_grading_periods)

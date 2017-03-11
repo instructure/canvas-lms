@@ -16,8 +16,8 @@
 #
 module Lti
   class LtiAppsController < ApplicationController
-    before_filter :require_context
-    before_filter :require_user
+    before_action :require_context
+    before_action :require_user
 
     def index
       if authorized_action(@context, @current_user, :update)
@@ -26,9 +26,9 @@ module Lti
 
         respond_to do |format|
           app_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_app_definitions_url, include_host: true))
-          check_for_restrictions = master_courses?
-          MasterCourses::Restrictor.preload_restrictions(app_defs.select{|o| o.is_a?(ContextExternalTool)}) if check_for_restrictions
-          format.json {render json: app_collator.app_definitions(app_defs, :include_master_course_restrictions => check_for_restrictions)}
+
+          mc_status = setup_master_course_restrictions(app_defs.select{|o| o.is_a?(ContextExternalTool)}, @context)
+          format.json {render json: app_collator.app_definitions(app_defs, :master_course_status => mc_status)}
         end
       end
     end

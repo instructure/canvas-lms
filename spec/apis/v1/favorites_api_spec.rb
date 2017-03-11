@@ -212,7 +212,7 @@ describe "Favorites API", type: :request do
       expect(@user.favorites.size).to eql(0)
       json = api_call(:get, "/api/v1/users/self/favorites/groups",
                       :controller=>"favorites", :action=>"list_favorite_groups", :format=>"json")
-      expect(json.any?)
+      expect(json.any?).to be
     end
   end
 

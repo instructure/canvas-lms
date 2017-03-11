@@ -28,6 +28,7 @@ define [
   'compiled/gradebook/SubmissionCell'
   'compiled/gradebook/GradebookHeaderMenu'
   'compiled/util/NumberCompare'
+  'compiled/util/natcompare'
   'str/htmlEscape'
   'jsx/gradebook/SISGradePassback/PostGradesStore'
   'jsx/gradebook/SISGradePassback/PostGradesApp'
@@ -60,8 +61,8 @@ define [
   $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   TotalColumnHeaderView, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS, CourseGradeCalculator,
   GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
-  GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, htmlEscape,
-  PostGradesStore, PostGradesApp, SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate,
+  GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, natcompare,
+  htmlEscape, PostGradesStore, PostGradesApp, SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate,
   RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper,
   GradingPeriodsAPI
 ) ->
@@ -326,11 +327,12 @@ define [
     setupGrading: (students) =>
       @submissionStateMap.setup(students, @assignments)
       for student in students
-        for assignment_id of @assignments
+        for assignment_id, assignment of @assignments
           student["assignment_#{assignment_id}"] ?=
             @submissionStateMap.getSubmission student.id, assignment_id
           submissionState = @submissionStateMap.getSubmissionState(student["assignment_#{assignment_id}"])
           student["assignment_#{assignment_id}"].gradeLocked = submissionState.locked
+          student["assignment_#{assignment_id}"].gradingType = assignment.grading_type
 
         student.initialized = true
         @calculateStudentGrade(student)
@@ -1265,6 +1267,7 @@ define [
     assignmentHeaderHtml: (assignment) ->
       ColumnHeaderTemplate
         assignment: assignment
+        pointsPossible: I18n.n(assignment.points_possible)
         href: assignment.html_url
         showPointsPossible: assignment.points_possible?
 
@@ -1506,9 +1509,7 @@ define [
       @grid.invalidate()
 
     localeSort: (a, b) ->
-      (a || "").localeCompare b || "",
-        i18nObj.locale,
-        sensitivity: 'accent', numeric: true
+      natcompare.strings(a || '', b || '')
 
     gradeSort: (a, b, field, asc) =>
       scoreForSorting = (obj) =>

@@ -1,3 +1,5 @@
+if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
+
 const glob = require('glob')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const path = require('path')
@@ -9,20 +11,49 @@ const CompiledReferencePlugin = require('./CompiledReferencePlugin')
 const I18nPlugin = require('./i18nPlugin')
 const WebpackHooks = require('./webpackHooks')
 const webpackPublicPath = require('./webpackPublicPath')
-
+const HappyPack = require('happypack')
 require('babel-polyfill')
 
-if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
+const root = path.resolve(__dirname, '..')
+const USE_BABEL_CACHE = process.env.NODE_ENV !== 'production' && process.env.DISABLE_HAPPYPACK === '1'
 
-const timezones = glob.sync('vendor/timezone/**/*.js', {cwd: 'public/javascripts'})
-const momentLocales = glob.sync('moment/locale/**/*.js', {cwd: 'node_modules'})
-const timezoneAndLocaleBundles = timezones.concat(momentLocales).reduce((memo, filename) =>
+const momentLocaleBundles = glob.sync('moment/locale/**/*.js', {cwd: 'node_modules'}).reduce((memo, filename) =>
   Object.assign(memo, {[filename.replace(/.js$/, '')]: filename})
 , {})
 
 // Put any custom moment locales here:
-timezoneAndLocaleBundles['moment/locale/mi-nz'] = 'custom_moment_locales/mi_nz.js'
-timezoneAndLocaleBundles['moment/locale/ht-ht'] = 'custom_moment_locales/ht_ht.js'
+momentLocaleBundles['moment/locale/mi-nz'] = 'custom_moment_locales/mi_nz.js'
+momentLocaleBundles['moment/locale/ht-ht'] = 'custom_moment_locales/ht_ht.js'
+
+
+const happypackPlugins = []
+const getHappyThreadPool = (() => {
+  let pool
+  return () => pool || (pool = new HappyPack.ThreadPool({ size: 4 }))
+})()
+
+function happify (id, loaders) {
+  if (process.env.DISABLE_HAPPYPACK !== '1') {
+    happypackPlugins.push(new HappyPack({
+      id,
+      loaders,
+      threadPool: getHappyThreadPool(),
+      tempDir: 'node_modules/.happypack_tmp/',
+
+      // by default, we use the cache everywhere exept prod. but you can
+      // set HAPPYPACK_CACHE environment variable to override
+      cache: (typeof process.env.HAPPYPACK_CACHE === 'undefined' ?
+        process.env.NODE_ENV !== 'production' :
+        process.env.HAPPYPACK_CACHE === '1'
+      ),
+      cacheContext: {
+        env: process.env.NODE_ENV
+      }
+    }))
+    return [`happypack/loader?id=${id}`]
+  }
+  return loaders
+}
 
 module.exports = {
   // In prod build, don't attempt to continue if there are any errors.
@@ -34,7 +65,7 @@ module.exports = {
   entry: Object.assign({
     vendor: require('./modulesToIncludeInVendorBundle'),
     appBootstrap: 'jsx/appBootstrap'
-  }, bundleEntries, timezoneAndLocaleBundles),
+  }, bundleEntries, momentLocaleBundles),
 
   output: {
     path: path.join(__dirname, '../public', webpackPublicPath),
@@ -44,7 +75,7 @@ module.exports = {
 
     filename: '[name].bundle-[chunkhash:10].js',
     chunkFilename: '[name].chunk-[chunkhash:10].js',
-    sourceMapFilename: '[file].[id]-[hash:10].sourcemap',
+    sourceMapFilename: '[file].[id]-[chunkhash:10].sourcemap',
     jsonpFunction: 'canvasWebpackJsonp'
   },
 
@@ -55,7 +86,6 @@ module.exports = {
   resolve: {
     alias: {
       d3: 'd3/d3',
-      old_version_of_react_used_by_canvas_quizzes_client_apps: path.resolve(__dirname, '../client_apps/canvas_quizzes/vendor/js/old_version_of_react_used_by_canvas_quizzes_client_apps'),
       handlebars: require.resolve('handlebars/dist/handlebars.runtime'),
       'node_modules-version-of-backbone': require.resolve('backbone'),
       'node_modules-version-of-react-modal': require.resolve('react-modal'),
@@ -64,32 +94,27 @@ module.exports = {
       // to instructure-ui compnentns to have the right path
       'instructure-ui': path.resolve(__dirname, '../node_modules/instructure-ui/lib/components'),
 
-      qtip: 'jquery.qtip',
       backbone: 'Backbone',
-      timezone: 'timezone_core',
+      timezone$: 'timezone_core',
+      jst: path.resolve(__dirname, '../app/views/jst'),
+      jqueryui: path.resolve(__dirname, '../public/javascripts/vendor/jqueryui'),
+      coffeescripts: path.resolve(__dirname, '../app/coffeescripts'),
+      jsx: path.resolve(__dirname, '../app/jsx'),
+
+      // stuff for canvas_quzzes client_apps
+      'canvas_quizzes/apps': path.resolve(__dirname, '../client_apps/canvas_quizzes/apps'),
+      qtip$: path.resolve(__dirname, '../client_apps/canvas_quizzes/vendor/js/jquery.qtip.js'),
+      old_version_of_react_used_by_canvas_quizzes_client_apps$: path.resolve(__dirname, '../client_apps/canvas_quizzes/vendor/js/old_version_of_react_used_by_canvas_quizzes_client_apps.js'),
+      'old_version_of_react-router_used_by_canvas_quizzes_client_apps$': path.resolve(__dirname, '../client_apps/canvas_quizzes/vendor/js/old_version_of_react-router_used_by_canvas_quizzes_client_apps.js')
     },
 
     modules: [
       path.resolve(__dirname, '../public/javascripts'),
-      path.resolve(__dirname, '../app'),
-      path.resolve(__dirname, '../app/views'),
-      path.resolve(__dirname, '../client_apps'),
       path.resolve(__dirname, '../gems/plugins'),
-      path.resolve(__dirname, '../public/javascripts/vendor'), // for jqueryUI
-      path.resolve(__dirname, '../client_apps/canvas_quizzes/vendor/js'),
-      path.resolve(__dirname, '../client_apps/canvas_quizzes/vendor/packages'),
       'node_modules'
     ],
 
-    extensions: [
-      '.webpack.js',
-      '.web.js',
-      '.js',
-      '.jsx',
-      '.coffee',
-      '.handlebars',
-      '.hbs'
-    ]
+    extensions: ['.js', '.jsx']
   },
 
   module: {
@@ -101,7 +126,6 @@ module.exports = {
       /tinymce\/tinymce/, // has 'require' and 'define' but they are from it's own internal closure
     ],
     rules: [
-
       // to get tinymce to work. see: https://github.com/tinymce/tinymce/issues/2836
       {
         test: require.resolve('tinymce/tinymce'),
@@ -120,34 +144,28 @@ module.exports = {
         loaders: ['exports-loader?I18n']
       },
 
-      {
-        test: /vendor\/timezone\//,
-        loaders: ['timezoneLoader']
-      },
-
 
       {
         test: /\.js$/,
         include: path.resolve(__dirname, '../public/javascripts'),
-        loaders: [
-          'jsHandlebarsHelpers',
-          'pluginsJstLoader',
-        ]
+        loaders: happify('js', [
+          path.join(root, 'frontend_build/jsHandlebarsHelpers'),
+          path.join(root, 'frontend_build/pluginsJstLoader'),
+        ])
       },
       {
-        test: /\.jsx$/,
+        test: /\.jsx?$/,
         include: [
           path.resolve(__dirname, '../app/jsx'),
           path.resolve(__dirname, '../spec/javascripts/jsx'),
           /gems\/plugins\/.*\/app\/jsx\//
         ],
-        loaders: [
-          // make sure we don't try to cache JSX assets when building for production
-          `babel-loader${process.env.NODE_ENV === 'production' ? '' : '?cacheDirectory=tmp'}`
-        ]
+        loaders: happify('jsx', [
+          `babel-loader?cacheDirectory=${USE_BABEL_CACHE}`
+        ])
       },
       {
-        test: /\.jsx$/,
+        test: /\.jsx?$/,
         include: [/client_apps\/canvas_quizzes\/apps\//],
         loaders: ['jsx-loader']
       },
@@ -156,14 +174,14 @@ module.exports = {
         include: [
           path.resolve(__dirname, '../app/coffeescript'),
           path.resolve(__dirname, '../spec/coffeescripts'),
-          /gems\/plugins\/.*\/app\/coffeescripts\//,
+          /app\/coffeescripts\//,
           /gems\/plugins\/.*\/spec_canvas\/coffeescripts\//
         ],
-        loaders: [
+        loaders: happify('coffee', [
           'coffee-loader',
-          'jsHandlebarsHelpers',
-          'pluginsJstLoader'
-        ]
+          path.join(root, 'frontend_build/jsHandlebarsHelpers'),
+          path.join(root, 'frontend_build/pluginsJstLoader')
+        ])
       },
       {
         test: /\.handlebars$/,
@@ -171,7 +189,9 @@ module.exports = {
           path.resolve(__dirname, '../app/views/jst'),
           /gems\/plugins\/.*\/app\/views\/jst\//
         ],
-        loaders: ['i18nLinerHandlebars']
+        loaders: happify('handlebars-i18n', [
+          'i18nLinerHandlebars'
+        ])
       },
       {
         test: /\.hbs$/,
@@ -179,7 +199,7 @@ module.exports = {
           /app\/coffeescripts\/ember\/screenreader_gradebook\/templates\//,
           /app\/coffeescripts\/ember\/shared\/templates\//
         ],
-        loaders: ['emberHandlebars']
+        loaders: happify('handlebars-ember', [path.join(root, 'frontend_build/emberHandlebars')]),
       },
       {
         test: /\.json$/,
@@ -235,14 +255,9 @@ module.exports = {
 
     new WebpackHooks(),
 
-  ].concat(process.env.NODE_ENV === 'test' ? [
-
-    // in test mode, we do include all possible timezones in vendor/timezone/* into
-    // the main bundle (see timezone_core.js). There are a few files in that dir
-    // that are not js files, tell webpack to ignore them.
-    new webpack.IgnorePlugin(/(CHANGELOG|LICENSE|README|\.md|package.json)$/, /vendor\/timezone/)
-
-  ] : [
+  ]
+  .concat(happypackPlugins)
+  .concat(process.env.NODE_ENV === 'test' ? [] : [
 
     // don't include any of the moment locales in the common bundle (otherwise it is huge!)
     // we load them explicitly onto the page in include_js_bundles from rails.
@@ -260,7 +275,7 @@ module.exports = {
       // ensures that no other module goes into the vendor chunk
       minChunks: Infinity
     }),
-    // gets moment and timezone setup before any app code runs
+    // gets moment locale setup before any app code runs
     new webpack.optimize.CommonsChunkPlugin({
       name: 'appBootstrap',
       children: true

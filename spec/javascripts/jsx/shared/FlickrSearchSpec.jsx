@@ -4,7 +4,7 @@ define([
   'jsx/shared/FlickrSearch'
 ], (React, TestUtils, FlickrSearch) => {
 
-  module('FlickrSearch View');
+  QUnit.module('FlickrSearch View');
 
   var getDummySearchResults = (pageCount) => {
     var photo = [{

@@ -3,7 +3,7 @@ define [
   'compiled/models/Module'
   'compiled/collections/ModuleItemCollection'
 ], (Backbone, Module, ModuleItemCollection) ->
-  module 'Module',
+  QUnit.module 'Module',
     setup: ->
       @server = sinon.fakeServer.create()
 
