@@ -1,0 +1,1022 @@
+/**
+ * Copyright (C) 2016 - 2017 Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+define([
+  'lodash',
+  'jquery',
+  'i18n!gradebook',
+  'helpers/fakeENV',
+  'spec/jsx/gradebook/GradeCalculatorSpecHelper',
+  'jsx/shared/helpers/numberHelper',
+  'jsx/gradebook/CourseGradeCalculator',
+  'jsx/grading/GradeSummary'
+], (_, $, I18n, fakeENV, GradeCalculatorSpecHelper, numberHelper, CourseGradeCalculator, GradeSummary) => {
+  const $fixtures = $('#fixtures');
+
+  let exampleGrades;
+
+  function createAssignmentGroups () {
+    return [
+      { id: '301', assignments: [{ id: '201', muted: false }, { id: '202', muted: true }] },
+      { id: '302', assignments: [{ id: '203', muted: true }] }
+    ];
+  }
+
+  function createSubmissions () {
+    return [
+      { assignment_id: '201', score: 10 },
+      { assignment_id: '203', score: 15 }
+    ];
+  }
+
+  function createExampleGrades () {
+    return {
+      assignmentGroups: {},
+      current: {
+        score: 0,
+        possible: 0
+      },
+      final: {
+        score: 0,
+        possible: 20
+      }
+    };
+  }
+
+  function setPageHtmlFixture () {
+    $fixtures.html(`
+      <div id="grade_summary_fixture">
+        <div id="student-grades-right-content">
+          <div class="student_assignment final_grade">
+            <span class="grade"></span>
+            <span class="score_teaser"></span>
+          </div>
+          <div id="student-grades-whatif" class="show_guess_grades" style="display: none;">
+            <button type="button" class="show_guess_grades_link">Show Saved "What-If" Scores</button>
+          </div>
+          <div id="student-grades-revert" class="revert_all_scores" style="display: none;">
+            *NOTE*: This is NOT your official score.<br/>
+            <button id="revert-all-to-actual-score" class="revert_all_scores_link">Revert to Actual Score</button>
+          </div>
+          <button id="show_all_details_button">Show All Details</button>
+        </div>
+        <span id="aria-announcer"></span>
+        <table id="grades_summary" class="editable">
+          <tr class="student_assignment editable">
+            <td class="assignment_score" title="Click to test a different score">
+              <div class="score_holder">
+                <span class="tooltip">
+                  <span class="tooltip_wrap">
+                    <span class="tooltip_text score_teaser">Click to test a different score</span>
+                  </span>
+                  <span class="grade">
+                    <span class="screenreader-only">Click to test a different score</span>
+                  </span>
+                  <span class="score_value">A</span>
+                </span>
+                <span style="display: none;">
+                  <span class="original_score">10</span>
+                  <span class="what_if_score"></span>
+                  <span class="assignment_id">201</span>
+                  <span class="student_entered_score">7</span>
+                </span>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <input type="text" id="grade_entry" style="display: none;" />
+        <a id="revert_score_template" class="revert_score_link" >Revert Score</i></a>
+        <a href="/assignments/{{ assignment_id }}" class="update_submission_url">&nbsp;</a>
+      </div>
+    `);
+  }
+
+  function commonSetup () {
+    fakeENV.setup();
+    $fixtures.html('');
+  }
+
+  function fullPageSetup () {
+    fakeENV.setup();
+    setPageHtmlFixture();
+    ENV.submissions = createSubmissions();
+    ENV.assignment_groups = createAssignmentGroups();
+    ENV.group_weighting_scheme = 'points';
+    GradeSummary.setup();
+  }
+
+  function commonTeardown () {
+    fakeENV.teardown();
+    $fixtures.html('');
+  }
+
+  QUnit.module('GradeSummary.getGradingPeriodSet', {
+    setup () {
+      commonSetup();
+    },
+
+    teardown () {
+      commonTeardown();
+    }
+  });
+
+  test('normalizes the grading period set from the env', function () {
+    ENV.grading_period_set = {
+      id: '1501',
+      grading_periods: [{ id: '701', weight: 50 }, { id: '702', weight: 50 }],
+      weighted: true
+    };
+    const gradingPeriodSet = GradeSummary.getGradingPeriodSet();
+    deepEqual(gradingPeriodSet.id, '1501');
+    equal(gradingPeriodSet.gradingPeriods.length, 2);
+    deepEqual(_.map(gradingPeriodSet.gradingPeriods, 'id'), ['701', '702']);
+  });
+
+  test('returns null when the grading period set is not defined in the env', function () {
+    ENV.grading_period_set = undefined;
+    const gradingPeriodSet = GradeSummary.getGradingPeriodSet();
+    deepEqual(gradingPeriodSet, null);
+  });
+
+  QUnit.module('GradeSummary.getAssignmentId', {
+    setup () {
+      commonSetup();
+      setPageHtmlFixture();
+    },
+
+    teardown () {
+      commonTeardown();
+    }
+  });
+
+  test('returns the assignment id for the given .student_assignment element', function () {
+    const $assignment = $fixtures.find('#grades_summary .student_assignment').first();
+    strictEqual(GradeSummary.getAssignmentId($assignment), '201');
+  });
+
+  QUnit.module('GradeSummary.parseScoreText');
+
+  test('sets "numericalValue" to the parsed value', function () {
+    const score = GradeSummary.parseScoreText('1,234');
+    strictEqual(score.numericalValue, 1234);
+  });
+
+  test('sets "formattedValue" to the formatted value', function () {
+    const score = GradeSummary.parseScoreText('1234');
+    strictEqual(score.formattedValue, '1,234');
+  });
+
+  test('sets "numericalValue" to null when given an empty string', function () {
+    const score = GradeSummary.parseScoreText('');
+    strictEqual(score.numericalValue, null);
+  });
+
+  test('sets "numericalValue" to null when given null', function () {
+    const score = GradeSummary.parseScoreText(null);
+    strictEqual(score.numericalValue, null);
+  });
+
+  test('sets "numericalValue" to null when given undefined', function () {
+    const score = GradeSummary.parseScoreText(undefined);
+    strictEqual(score.numericalValue, null);
+  });
+
+  test('sets "numericalValue" to the "numericalDefault" when "numericalDefault" is a number', function () {
+    const score = GradeSummary.parseScoreText(undefined, 5);
+    strictEqual(score.numericalValue, 5);
+  });
+
+  test('sets "numericalValue" to null when "numericalDefault" is a string', function () {
+    const score = GradeSummary.parseScoreText(undefined, '5');
+    strictEqual(score.numericalValue, null);
+  });
+
+  test('sets "numericalValue" to null when "numericalDefault" is null', function () {
+    const score = GradeSummary.parseScoreText(undefined, null);
+    strictEqual(score.numericalValue, null);
+  });
+
+  test('sets "numericalValue" to null when "numericalDefault" is undefined', function () {
+    const score = GradeSummary.parseScoreText(undefined, undefined);
+    strictEqual(score.numericalValue, null);
+  });
+
+  test('sets "formattedValue" to "-" when given an empty string', function () {
+    const score = GradeSummary.parseScoreText('');
+    strictEqual(score.formattedValue, '-');
+  });
+
+  test('sets "formattedValue" to "-" when given null', function () {
+    const score = GradeSummary.parseScoreText(null);
+    strictEqual(score.formattedValue, '-');
+  });
+
+  test('sets "formattedValue" to "-" when given undefined', function () {
+    const score = GradeSummary.parseScoreText(undefined);
+    strictEqual(score.formattedValue, '-');
+  });
+
+  test('sets "formattedValue" to the "formattedDefault" when "formattedDefault" is a string', function () {
+    const score = GradeSummary.parseScoreText(undefined, null, 'default');
+    strictEqual(score.formattedValue, 'default');
+  });
+
+  test('sets "formattedValue" to "-" when "formattedDefault" is a number', function () {
+    const score = GradeSummary.parseScoreText(undefined, null, 5);
+    strictEqual(score.formattedValue, '-');
+  });
+
+  test('sets "formattedValue" to "-" when "formattedDefault" is null', function () {
+    const score = GradeSummary.parseScoreText(undefined, null, null);
+    strictEqual(score.formattedValue, '-');
+  });
+
+  test('sets "formattedValue" to "-" when "formattedDefault" is undefined', function () {
+    const score = GradeSummary.parseScoreText(undefined, null, undefined);
+    strictEqual(score.formattedValue, '-');
+  });
+
+  QUnit.module('GradeSummary.getOriginalScore', {
+    setup () {
+      fullPageSetup();
+      this.$assignment = $fixtures.find('#grades_summary .student_assignment').first();
+    },
+
+    teardown () {
+      commonTeardown();
+    }
+  });
+
+  test('parses the text of the .original_score element', function () {
+    const score = GradeSummary.getOriginalScore(this.$assignment);
+    strictEqual(score.numericalValue, 10);
+    strictEqual(score.formattedValue, '10');
+  });
+
+  test('sets "numericalValue" to a default of null', function () {
+    this.$assignment.find('.original_score').text('invalid');
+    const score = GradeSummary.getOriginalScore(this.$assignment);
+    strictEqual(score.numericalValue, null);
+  });
+
+  test('sets "formattedValue" to a default of "-"', function () {
+    this.$assignment.find('.original_score').text('invalid');
+    const score = GradeSummary.getOriginalScore(this.$assignment);
+    equal(score.formattedValue, '-');
+  });
+
+  QUnit.module('GradeSummary.calculateTotals', {
+    setup () {
+      commonSetup();
+      ENV.assignment_groups = createAssignmentGroups();
+      this.stub($, 'screenReaderFlashMessageExclusive');
+      setPageHtmlFixture();
+    },
+
+    teardown () {
+      commonTeardown();
+    }
+  });
+
+  test('displays a screenreader-only alert when grades have been changed', function () {
+    $fixtures.find('.assignment_score .grade').addClass('changed');
+    GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent');
+    equal($.screenReaderFlashMessageExclusive.callCount, 1);
+    const messageText = $.screenReaderFlashMessageExclusive.getCall(0).args[0];
+    ok(messageText.includes('the new total is now'), 'flash message mentions new total');
+  });
+
+  test('does not display a screenreader-only alert when grades have not been changed', function () {
+    GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent');
+    equal($.screenReaderFlashMessageExclusive.callCount, 0);
+  });
+
+  test('localizes displayed grade', function () {
+    this.stub(I18n, 'n').returns('1,234');
+    GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent');
+    const $teaser = $fixtures.find('.student_assignment.final_grade .score_teaser');
+    ok($teaser.text().includes('1,234'), 'includes internationalized score');
+  });
+
+  QUnit.module('GradeSummary.canBeConvertedToGrade');
+
+  test('returns false when possible is nonpositive', function () {
+    notOk(GradeSummary.canBeConvertedToGrade(1, 0));
+  });
+
+  test('returns false when score is NaN', function () {
+    notOk(GradeSummary.canBeConvertedToGrade(NaN, 1));
+  });
+
+  test('returns true when score is a number and possible is positive', function () {
+    ok(GradeSummary.canBeConvertedToGrade(1, 1));
+  });
+
+  QUnit.module('GradeSummary.calculatePercentGrade');
+
+  test('returns properly computed and rounded value', function () {
+    const percentGrade = GradeSummary.calculatePercentGrade(1, 3);
+    ok(percentGrade === 33.33);
+  });
+
+  QUnit.module('GradeSummary.formatPercentGrade');
+
+  test('returns an internationalized number value', function () {
+    this.stub(I18n, 'n').withArgs(1234).returns('1,234%');
+    equal(GradeSummary.formatPercentGrade(1234), '1,234%');
+  });
+
+  QUnit.module('GradeSummary.calculateGrade');
+
+  test('returns an internationalized percentage when given a score and nonzero points possible', function () {
+    this.stub(I18n, 'n').callsFake(number => `${number}%`);
+    equal(GradeSummary.calculateGrade(97, 100), '97%');
+    equal(I18n.n.getCall(0).args[1].percentage, true);
+  });
+
+  test('returns "N/A" when given a numerical score and zero points possible', function () {
+    equal(GradeSummary.calculateGrade(1, 0), 'N/A');
+  });
+
+  test('returns "N/A" when given a non-numerical score and nonzero points possible', function () {
+    equal(GradeSummary.calculateGrade(undefined, 1), 'N/A');
+  });
+
+  QUnit.module('GradeSummary.calculateGrades', {
+    setup () {
+      commonSetup();
+      ENV.submissions = createSubmissions();
+      ENV.assignment_groups = createAssignmentGroups();
+      ENV.group_weighting_scheme = 'points';
+      ENV.grading_period_set = {
+        id: '1501',
+        grading_periods: [{ id: '701', weight: 50 }, { id: '702', weight: 50 }],
+        weighted: true
+      };
+      ENV.effective_due_dates = { 201: { 101: { grading_period_id: '701' } } };
+      ENV.student_id = '101';
+      exampleGrades = GradeCalculatorSpecHelper.createCourseGradesWithGradingPeriods();
+      this.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades);
+    },
+
+    teardown () {
+      commonTeardown();
+    }
+  });
+
+  test('calculates grades using data in the env', function () {
+    GradeSummary.calculateGrades();
+    const args = CourseGradeCalculator.calculate.getCall(0).args;
+    equal(args[0], ENV.submissions);
+    deepEqual(_.map(args[1], 'id'), ['301', '302']);
+    equal(args[2], ENV.group_weighting_scheme);
+  });
+
+  test('normalizes the grading period set before calculation', function () {
+    GradeSummary.calculateGrades();
+    const gradingPeriodSet = CourseGradeCalculator.calculate.getCall(0).args[3];
+    deepEqual(gradingPeriodSet.id, '1501');
+    equal(gradingPeriodSet.gradingPeriods.length, 2);
+    deepEqual(_.map(gradingPeriodSet.gradingPeriods, 'id'), ['701', '702']);
+  });
+
+  test('scopes effective due dates to the user', function () {
+    GradeSummary.calculateGrades();
+    const dueDates = CourseGradeCalculator.calculate.getCall(0).args[4];
+    deepEqual(dueDates, { 201: { grading_period_id: '701' } });
+  });
+
+  test('calculates grades without grading period data when the grading period set is not defined', function () {
+    delete ENV.grading_period_set;
+    GradeSummary.calculateGrades();
+    const args = CourseGradeCalculator.calculate.getCall(0).args;
+    equal(args[0], ENV.submissions);
+    equal(args[1], ENV.assignment_groups);
+    equal(args[2], ENV.group_weighting_scheme);
+    equal(typeof args[3], 'undefined');
+    equal(typeof args[4], 'undefined');
+  });
+
+  test('calculates grades without grading period data when effective due dates are not defined', function () {
+    delete ENV.effective_due_dates;
+    GradeSummary.calculateGrades();
+    const args = CourseGradeCalculator.calculate.getCall(0).args;
+    equal(args[0], ENV.submissions);
+    equal(args[1], ENV.assignment_groups);
+    equal(args[2], ENV.group_weighting_scheme);
+    equal(typeof args[3], 'undefined');
+    equal(typeof args[4], 'undefined');
+  });
+
+  test('returns course grades when no grading period id is provided', function () {
+    this.stub(GradeSummary, 'getGradingPeriodIdFromUrl').returns(null);
+    const grades = GradeSummary.calculateGrades();
+    equal(grades, exampleGrades);
+  });
+
+  test('scopes grades to the provided grading period id', function () {
+    this.stub(GradeSummary, 'getGradingPeriodIdFromUrl').returns('701');
+    const grades = GradeSummary.calculateGrades();
+    equal(grades, exampleGrades.gradingPeriods[701]);
+  });
+
+  QUnit.module('GradeSummary.setup', {
+    setup () {
+      fakeENV.setup();
+      setPageHtmlFixture();
+      ENV.submissions = createSubmissions();
+      ENV.assignment_groups = createAssignmentGroups();
+      ENV.group_weighting_scheme = 'points';
+      this.$showWhatIfScoresContainer = $fixtures.find('#student-grades-whatif');
+      this.$assignment = $fixtures.find('#grades_summary .student_assignment').first();
+    },
+
+    teardown () {
+      commonTeardown();
+    }
+  });
+
+  test('shows the "Show Saved What-If Scores" button when any assignment has a What-If score', function () {
+    GradeSummary.setup();
+    ok(this.$showWhatIfScoresContainer.is(':visible'), 'button container is visible');
+  });
+
+  test('uses I18n to parse the .student_entered_score value', function () {
+    this.spy(GradeSummary, 'parseScoreText');
+    this.$assignment.find('.student_entered_score').text('7');
+    GradeSummary.setup();
+    equal(GradeSummary.parseScoreText.callCount, 1, 'GradeSummary.parseScoreText was called once');
+    const [value] = GradeSummary.parseScoreText.getCall(0).args;
+    equal(value, '7', 'GradeSummary.parseScoreText was called with the .student_entered_score');
+  });
+
+  test('shows the "Show Saved What-If Scores" button for assignments with What-If scores of "0"', function () {
+    this.$assignment.find('.student_entered_score').text('0');
+    GradeSummary.setup();
+    ok(this.$showWhatIfScoresContainer.is(':visible'), 'button container is visible');
+  });
+
+  test('does not show the "Show Saved What-If Scores" button for assignments without What-If scores', function () {
+    this.$assignment.find('.student_entered_score').text('');
+    GradeSummary.setup();
+    ok(this.$showWhatIfScoresContainer.is(':hidden'), 'button container is hidden');
+  });
+
+  test('does not show the "Show Saved What-If Scores" button for assignments with What-If invalid scores', function () {
+    this.$assignment.find('.student_entered_score').text('null');
+    GradeSummary.setup();
+    ok(this.$showWhatIfScoresContainer.is(':hidden'), 'button container is hidden');
+  });
+
+  QUnit.module('Grade Summary "Show Saved What-If Scores" button', {
+    setup () {
+      fakeENV.setup();
+      setPageHtmlFixture();
+      ENV.submissions = createSubmissions();
+      ENV.assignment_groups = createAssignmentGroups();
+      ENV.group_weighting_scheme = 'points';
+      GradeSummary.setup();
+      this.$showWhatIfScoresButton = $fixtures.find('.show_guess_grades_link');
+      this.$assignment = $fixtures.find('#grades_summary .student_assignment').first();
+    },
+
+    teardown () {
+      commonTeardown();
+    }
+  });
+
+  test('reveals all What-If scores when clicked', function () {
+    this.$showWhatIfScoresButton.click();
+    equal(this.$assignment.find('.what_if_score').text(), '7', 'what_if_score is set to the .student_entered_score');
+  });
+
+  test('hides the assignment .score_value element', function () {
+    this.$showWhatIfScoresButton.click();
+    const $scoreValue = $fixtures.find('.assignment_score .score_value').first();
+    ok($scoreValue.is(':hidden'), '.score_value is hidden');
+  });
+
+  test('triggers onScoreChange for the assignment', function () {
+    this.stub(GradeSummary, 'onScoreChange');
+    this.$showWhatIfScoresButton.click();
+    equal(GradeSummary.onScoreChange.callCount, 1, 'called once for each assignment (only one in fixture)');
+    const [$assignment, options] = GradeSummary.onScoreChange.getCall(0).args;
+    equal($assignment.get(0), this.$assignment.get(0), 'first parameter is the assignment jquery object');
+    deepEqual(options, { update: false, refocus: false }, 'second parameter is the assignment jquery object');
+  });
+
+  test('uses I18n to parse the .student_entered_score value', function () {
+    this.stub(GradeSummary, 'onScoreChange');
+    this.spy(GradeSummary, 'parseScoreText');
+    this.$assignment.find('.student_entered_score').text('7');
+    this.$showWhatIfScoresButton.click();
+    equal(GradeSummary.parseScoreText.callCount, 1, 'GradeSummary.parseScoreText was called once');
+    const [value] = GradeSummary.parseScoreText.getCall(0).args;
+    equal(value, '7', 'GradeSummary.parseScoreText was called with the .student_entered_score');
+  });
+
+  test('includes assignments with What-If scores of "0"', function () {
+    this.$assignment.find('.student_entered_score').text('0');
+    this.$showWhatIfScoresButton.click();
+    equal(this.$assignment.find('.what_if_score').text(), '0', 'what_if_score is set to the .student_entered_score');
+  });
+
+  test('ignores assignments without What-If scores', function () {
+    this.stub(GradeSummary, 'onScoreChange');
+    this.$assignment.find('.student_entered_score').text('');
+    this.$showWhatIfScoresButton.click();
+    const $scoreValue = $fixtures.find('.assignment_score .score_value').first();
+    notOk($scoreValue.is(':hidden'), '.score_value is not hidden');
+    equal(GradeSummary.onScoreChange.callCount, 0, 'onScoreChange is not called');
+    equal(this.$assignment.find('.what_if_score').text(), '', 'what_if_score is not changed');
+  });
+
+  test('ignores assignments with invalid What-If score text', function () {
+    this.stub(GradeSummary, 'onScoreChange');
+    this.$assignment.find('.student_entered_score').text('null');
+    this.$showWhatIfScoresButton.click();
+    const $scoreValue = $fixtures.find('.assignment_score .score_value').first();
+    notOk($scoreValue.is(':hidden'), '.score_value is not hidden');
+    equal(GradeSummary.onScoreChange.callCount, 0, 'onScoreChange is not called');
+    equal(this.$assignment.find('.what_if_score').text(), '', 'what_if_score is not changed');
+  });
+
+  test('hides itself when clicked', function () {
+    this.$showWhatIfScoresButton.click();
+    ok(this.$showWhatIfScoresButton.is(':hidden'), 'button is hidden');
+  });
+
+  test('sets focus on the "revert all scores" button', function () {
+    this.$showWhatIfScoresButton.click();
+    equal(document.activeElement, $('#revert-all-to-actual-score').get(0), 'button is active element');
+  });
+
+  test('displays a screenreader message indicating visibility of What-If scores', function () {
+    this.stub(GradeSummary, 'onScoreChange');
+    this.stub($, 'screenReaderFlashMessageExclusive');
+    this.$showWhatIfScoresButton.click();
+    equal($.screenReaderFlashMessageExclusive.callCount, 1, 'screenReaderFlashMessageExclusive is called once');
+    const [message] = $.screenReaderFlashMessageExclusive.getCall(0).args;
+    equal(message, 'Grades are now showing what-if scores');
+  });
+
+  QUnit.module('Grade Summary "Show All Details" button', {
+    setup () {
+      fakeENV.setup();
+      setPageHtmlFixture();
+      ENV.submissions = createSubmissions();
+      ENV.assignment_groups = createAssignmentGroups();
+      ENV.group_weighting_scheme = 'points';
+      GradeSummary.setup();
+    },
+
+    teardown () {
+      commonTeardown();
+    }
+  });
+
+  test('announces "assignment details expanded" when clicked', function () {
+    $('#show_all_details_button').click();
+    equal($('#aria-announcer').text(), 'assignment details expanded');
+  });
+
+  test('changes text to "Hide All Details" when clicked', function () {
+    $('#show_all_details_button').click();
+    equal($('#show_all_details_button').text(), 'Hide All Details');
+  });
+
+  test('announces "assignment details collapsed" when clicked and already expanded', function () {
+    $('#show_all_details_button').click();
+    $('#show_all_details_button').click();
+    equal($('#aria-announcer').text(), 'assignment details collapsed');
+  });
+
+  test('changes text to "Show All Details" when clicked twice', function () {
+    $('#show_all_details_button').click();
+    $('#show_all_details_button').click();
+    equal($('#show_all_details_button').text(), 'Show All Details');
+  });
+
+  QUnit.module('GradeSummary.getGradingPeriodIdFromUrl');
+
+  test('returns the value for grading_period_id in the url', function () {
+    const url = 'example.com/course/1/grades?grading_period_id=701';
+    equal(GradeSummary.getGradingPeriodIdFromUrl(url), '701');
+  });
+
+  test('returns null when grading_period_id is set to "0"', function () {
+    const url = 'example.com/course/1/grades?grading_period_id=0';
+    deepEqual(GradeSummary.getGradingPeriodIdFromUrl(url), null);
+  });
+
+  test('returns null when grading_period_id is not present in the url', function () {
+    const url = 'example.com/course/1/grades';
+    deepEqual(GradeSummary.getGradingPeriodIdFromUrl(url), null);
+  });
+
+  QUnit.module('GradeSummary.onEditWhatIfScore', {
+    setup () {
+      fullPageSetup();
+      $fixtures.find('.assignment_score .grade').first().append('5');
+    },
+
+    onEditWhatIfScore () {
+      const $assignmentScore = $fixtures.find('.assignment_score').first();
+      GradeSummary.onEditWhatIfScore($assignmentScore, $('#aria-announcer'));
+    },
+
+    teardown () {
+      commonTeardown();
+    }
+  });
+
+  test('stores the original score when editing the the first time', function () {
+    const $grade = $fixtures.find('.assignment_score .grade').first();
+    const expectedHtml = $grade.html();
+    this.onEditWhatIfScore();
+    equal($grade.data('originalValue'), expectedHtml);
+  });
+
+  test('does not store the score when the original score is already stored', function () {
+    const $grade = $fixtures.find('.assignment_score .grade').first();
+    $grade.data('originalValue', '10');
+    this.onEditWhatIfScore();
+    equal($grade.data('originalValue'), '10');
+  });
+
+  test('attaches a screenreader-only element to the grade element as data', function () {
+    this.onEditWhatIfScore();
+    const $grade = $fixtures.find('.assignment_score .grade').first();
+    ok($grade.data('screenreader_link'), '"screenreader_link" is assigned as data');
+    ok($grade.data('screenreader_link').hasClass('screenreader-only'), '"screenreader_link" is screenreader-only');
+  });
+
+  test('hides the score value', function () {
+    this.onEditWhatIfScore();
+    const $scoreValue = $fixtures.find('.assignment_score .score_value').first();
+    ok($scoreValue.is(':hidden'), '.score_value is hidden');
+  });
+
+  test('replaces the grade element content with a grade entry field', function () {
+    this.onEditWhatIfScore();
+    const $gradeEntry = $fixtures.find('.assignment_score .grade > #grade_entry');
+    equal($gradeEntry.length, 1, '#grade_entry is attached to the .grade element');
+  });
+
+  test('sets the value of the grade entry to the existing "What-If" score', function () {
+    $fixtures.find('.assignment_score').first().find('.what_if_score').text('15');
+    this.onEditWhatIfScore();
+    const $gradeEntry = $fixtures.find('#grade_entry').first();
+    equal($gradeEntry.val(), '15', 'the previous "What-If" score is 15');
+  });
+
+  test('defaults the value of the grade entry to "0" when no score is present', function () {
+    this.onEditWhatIfScore();
+    const $gradeEntry = $fixtures.find('#grade_entry').first();
+    equal($gradeEntry.val(), '0', 'there is no previous "What-If" score');
+  });
+
+  test('uses I18n to parse the existing "What-If" score', function () {
+    $fixtures.find('.assignment_score').first().find('.what_if_score').text('1.234,56');
+    this.stub(numberHelper, 'parse').withArgs('1.234,56').returns('654321');
+    this.onEditWhatIfScore();
+    const $gradeEntry = $fixtures.find('#grade_entry').first();
+    equal($gradeEntry.val(), '654321', 'the previous "What-If" score might have been internationalized');
+  });
+
+  test('shows the grade entry', function () {
+    this.onEditWhatIfScore();
+    const $gradeEntry = $fixtures.find('#grade_entry').first();
+    ok($gradeEntry.is(':visible'), '#grade_entry does not have "visibility: none"');
+  });
+
+  test('sets focus on the grade entry', function () {
+    this.onEditWhatIfScore();
+    const $gradeEntry = $fixtures.find('#grade_entry').first();
+    equal($gradeEntry.get(0), document.activeElement, '#grade_entry is the active element');
+  });
+
+  test('selects the grade entry', function () {
+    this.onEditWhatIfScore();
+    const $gradeEntry = $fixtures.find('#grade_entry').get(0);
+    equal($gradeEntry.selectionStart, 0, 'selection starts at beginning of score text');
+    equal($gradeEntry.selectionEnd, 1, 'selection ends at end of score text');
+  });
+
+  test('announces message for entering a "What-If" score', function () {
+    this.onEditWhatIfScore();
+    equal($('#aria-announcer').text(), 'Enter a What-If score.');
+  });
+
+  QUnit.module('GradeSummary.onScoreChange', {
+    setup () {
+      fullPageSetup();
+      this.stub($, 'ajaxJSON');
+      this.$assignment = $fixtures.find('#grades_summary .student_assignment').first();
+      // reproduce the destructive part of .onEditWhatIfScore
+      this.$assignment.find('.assignment_score').find('.grade').empty().append($('#grade_entry'));
+    },
+
+    onScoreChange (score, options = {}) {
+      this.$assignment.find('#grade_entry').val(score);
+      GradeSummary.onScoreChange(this.$assignment, { update: false, refocus: false, ...options });
+    },
+
+    teardown () {
+      commonTeardown();
+    }
+  });
+
+  test('updates .what_if_score with the parsed value from #grade_entry', function () {
+    this.onScoreChange('5');
+    equal(this.$assignment.find('.what_if_score').text(), '5');
+  });
+
+  test('uses I18n to parse the #grade_entry score', function () {
+    this.stub(numberHelper, 'parse').withArgs('1.234,56').returns('654321');
+    this.onScoreChange('1.234,56');
+    equal(this.$assignment.find('.what_if_score').text(), '654321');
+  });
+
+  test('uses the previous .what_if_score value when #grade_entry is blank', function () {
+    this.$assignment.find('.what_if_score').text('9.0');
+    this.onScoreChange('');
+    equal(this.$assignment.find('.what_if_score').text(), '9');
+  });
+
+  test('uses I18n to parse the previous .what_if_score value', function () {
+    this.stub(numberHelper, 'parse').withArgs('9.0').returns('654321');
+    this.$assignment.find('.what_if_score').text('9.0');
+    this.onScoreChange('');
+    equal(this.$assignment.find('.what_if_score').text(), '654321');
+  });
+
+  test('removes the .dont_update class from the .student_assignment element when present', function () {
+    this.$assignment.addClass('dont_update');
+    this.onScoreChange('5');
+    notOk(this.$assignment.hasClass('dont_update'));
+  });
+
+  test('saves the "What-If" grade using the api', function () {
+    this.onScoreChange('5', { update: true });
+    equal($.ajaxJSON.callCount, 1, '$.ajaxJSON was called once');
+    const [url, method, params] = $.ajaxJSON.getCall(0).args;
+    equal(url, '/assignments/201', 'constructs the url from elements in the DOM');
+    equal(method, 'PUT', 'uses PUT for updates');
+    equal(params['submission[student_entered_score]'], 5);
+  });
+
+  test('updates the .student_entered_score element upon success api update', function () {
+    $.ajaxJSON.callsFake((_url, _method, args, onSuccess) => {
+      onSuccess({ submission: { student_entered_score: args['submission[student_entered_score]'] } });
+    });
+    this.onScoreChange('5', { update: true });
+    equal(this.$assignment.find('.student_entered_score').text(), '5');
+  });
+
+  test('does not save the "What-If" grade when .dont_update class is present', function () {
+    this.$assignment.addClass('dont_update');
+    this.onScoreChange('5', { update: true });
+    equal($.ajaxJSON.callCount, 0, '$.ajaxJSON was not called');
+  });
+
+  test('does not save the "What-If" grade when the "update" option is false', function () {
+    this.onScoreChange('5', { update: false });
+    equal($.ajaxJSON.callCount, 0, '$.ajaxJSON was not called');
+  });
+
+  test('hides the #grade_entry input', function () {
+    this.onScoreChange('5');
+    ok($('#grade_entry').is(':hidden'));
+  });
+
+  test('moves the #grade_entry to the body', function () {
+    this.onScoreChange('5');
+    ok($('#grade_entry').parent().is('body'));
+  });
+
+  test('sets the .assignment_score title to ""', function () {
+    this.onScoreChange('5');
+    equal(this.$assignment.find('.assignment_score').attr('title'), '');
+  });
+
+  test('sets the .assignment_score teaser text', function () {
+    this.onScoreChange('5');
+    equal(this.$assignment.find('.score_teaser').text(), 'This is a What-If score');
+  });
+
+  test('copies the "revert score" link into the .score_holder element', function () {
+    this.onScoreChange('5');
+    equal(this.$assignment.find('.score_holder .revert_score_link').length, 1, 'includes a "revert score" link');
+    equal(this.$assignment.find('.score_holder .revert_score_link').text(), 'Revert Score');
+  });
+
+  test('adds the "changed" class to the .grade element', function () {
+    this.onScoreChange('5');
+    ok(this.$assignment.find('.grade').hasClass('changed'));
+  });
+
+  test('sets the .grade element content to the updated score', function () {
+    this.onScoreChange('5');
+    equal(this.$assignment.find('.grade').html(), '5');
+  });
+
+  test('sets the .grade element content to the previous score when the updated score is falsy', function () {
+    this.$assignment.find('.grade').data('originalValue', '10.0');
+    this.onScoreChange('');
+    equal(this.$assignment.find('.grade').html(), '10');
+  });
+
+  test('updates the score for the given assignment', function () {
+    this.stub(GradeSummary, 'updateScoreForAssignment');
+    this.onScoreChange('5');
+    equal(GradeSummary.updateScoreForAssignment.callCount, 1);
+    const [assignmentId, score] = GradeSummary.updateScoreForAssignment.getCall(0).args;
+    equal(assignmentId, '201', 'the assignment id is 201');
+    equal(score, 5, 'the parsed score is used to update the assignment score');
+  });
+
+  QUnit.module('GradeSummary - Revert Score', {
+    setup () {
+      fullPageSetup();
+      this.$assignment = $fixtures.find('#grades_summary .student_assignment').first();
+      const $assignmentScore = this.$assignment.find('.assignment_score');
+      // reproduce the What-If setup from .onEditWhatIfScore
+      const $screenreaderLinkClone = $assignmentScore.find('.screenreader-only').clone(true);
+      $assignmentScore.find('.grade').data('screenreader_link', $screenreaderLinkClone);
+      // reproduce the What-If setup from .onScoreChange
+      const $scoreTeaser = $assignmentScore.find('.score_teaser');
+      const $grade = this.$assignment.find('.grade');
+      $assignmentScore.attr('title', '');
+      $scoreTeaser.text('This is a What-If score');
+      const $revertScore = $('#revert_score_template').clone(true).attr('id', '').show();
+      $assignmentScore.find('.score_holder').append($revertScore);
+      $grade.addClass('changed');
+      this.$assignment.find('.original_score').text('5');
+    },
+
+    onScoreRevert () {
+      GradeSummary.onScoreRevert(this.$assignment, { refocus: false, skipEval: false });
+    },
+
+    teardown () {
+      commonTeardown();
+    }
+  });
+
+  test('sets the .what_if_score text to the .original_score text', function () {
+    this.onScoreRevert();
+    equal(this.$assignment.find('.what_if_score').text(), '5');
+  });
+
+  test('uses I18n to parse the .original_score value', function () {
+    this.stub(numberHelper, 'parse').withArgs('1.234,56').returns('654321');
+    this.$assignment.find('.original_score').text('1.234,56');
+    this.onScoreRevert();
+    equal(this.$assignment.find('.what_if_score').text(), '654321');
+  });
+
+  test('sets the .assignment_score title to the "Click to test" message', function () {
+    this.onScoreRevert();
+    equal(this.$assignment.find('.assignment_score').attr('title'), 'Click to test a different score');
+  });
+
+  test('sets the .score_teaser text to the "Click to test" message when the assignment is not muted', function () {
+    this.onScoreRevert();
+    equal(this.$assignment.find('.score_teaser').text(), 'Click to test a different score');
+  });
+
+  test('sets the .score_teaser text to the "Instructor is working" message when the assignment is muted', function () {
+    this.$assignment.data('muted', true);
+    this.onScoreRevert();
+    equal(this.$assignment.find('.score_teaser').text(), 'Instructor is working on grades');
+  });
+
+  test('removes the "changed" class from the .grade element', function () {
+    this.onScoreRevert();
+    notOk(this.$assignment.find('.assignment_score .grade').hasClass('changed'), 'changed class is not present');
+  });
+
+  test('removes the .revert_score_link element', function () {
+    this.onScoreRevert();
+    equal(this.$assignment.find('.revert_score_link').length, 0)
+  });
+
+  test('sets the .score_value text to the .original_score text', function () {
+    this.onScoreRevert();
+    equal(this.$assignment.find('.score_value').text(), '5');
+  });
+
+  test('sets the .grade html to the "muted assignment" indicator when the assignment is muted', function () {
+    this.$assignment.data('muted', true);
+    this.onScoreRevert();
+    equal(this.$assignment.find('.grade img.muted_icon').length, 1);
+  });
+
+  test('sets the .grade text to .original_score when the assignment is not muted', function () {
+    this.onScoreRevert();
+    const $grade = this.$assignment.find('.grade');
+    $grade.children().remove(); // remove all content except score text
+    equal($grade.text(), '5');
+  });
+
+  test('sets the .grade text to "0" when the .original_score is "0"', function () {
+    this.$assignment.find('.original_score').text('0');
+    this.onScoreRevert();
+    const $grade = this.$assignment.find('.grade');
+    $grade.children().remove(); // remove all content except score text
+    equal($grade.text(), '0');
+  });
+
+  test('sets the .grade text to "-" when the .original_score is blank', function () {
+    this.$assignment.find('.original_score').text('');
+    this.onScoreRevert();
+    const $grade = this.$assignment.find('.grade');
+    $grade.children().remove(); // remove all content except score text
+    equal($grade.text(), '-');
+  });
+
+  test('sets the .grade text to "-" when the .original_score is not a number', function () {
+    this.$assignment.find('.original_score').text('null');
+    this.onScoreRevert();
+    const $grade = this.$assignment.find('.grade');
+    $grade.children().remove(); // remove all content except score text
+    equal($grade.text(), '-');
+  });
+
+  test('updates the score for the assignment', function () {
+    this.stub(GradeSummary, 'updateScoreForAssignment');
+    this.onScoreRevert();
+    equal(GradeSummary.updateScoreForAssignment.callCount, 1);
+    const [assignmentId, score] = GradeSummary.updateScoreForAssignment.getCall(0).args;
+    equal(assignmentId, '201', 'first argument is the assignment id 201');
+    strictEqual(score, 5, 'second argument is the numerical score 5');
+  });
+
+  test('updates the score for the assignment with null when the .original_score is blank', function () {
+    this.$assignment.find('.original_score').text('');
+    this.stub(GradeSummary, 'updateScoreForAssignment');
+    this.onScoreRevert();
+    const score = GradeSummary.updateScoreForAssignment.getCall(0).args[1];
+    strictEqual(score, null);
+  });
+
+  test('updates the student grades after updating the assignment score', function () {
+    this.stub(GradeSummary, 'updateScoreForAssignment');
+    this.stub(GradeSummary, 'updateStudentGrades').callsFake(() => {
+      equal(GradeSummary.updateScoreForAssignment.callCount, 1, 'updateScoreForAssignment is performed first');
+    });
+    this.onScoreRevert();
+    equal(GradeSummary.updateStudentGrades.callCount, 1, 'updateStudentGrades is called once');
+  });
+
+  test('attaches a "Click to test" .screenreader-only element to the grade element', function () {
+    const $grade = $fixtures.find('.assignment_score .grade').first();
+    this.onScoreRevert();
+    equal($grade.find('.screenreader-only').length, 1);
+    equal($grade.find('.screenreader-only').text(), 'Click to test a different score');
+  });
+
+  QUnit.module('GradeSummary.updateScoreForAssignment', {
+    setup () {
+      fakeENV.setup();
+      ENV.submissions = createSubmissions();
+    },
+
+    teardown () {
+      fakeENV.teardown();
+    }
+  });
+
+  test('updates the score for an existing submission', function () {
+    GradeSummary.updateScoreForAssignment('203', 20);
+    equal(ENV.submissions[1].score, 20, 'the second submission is for assignment 203');
+  });
+
+  test('ignores submissions not having the given assignment id', function () {
+    GradeSummary.updateScoreForAssignment('203', 20);
+    equal(ENV.submissions[0].score, 10, 'the first submission is for assignment 201');
+  });
+
+  test('adds a submission with the score when no submission matches the given assignment id', function () {
+    GradeSummary.updateScoreForAssignment('205', 30);
+    equal(ENV.submissions.length, 3, 'submission count has changed from 2 to 3');
+    deepEqual(_.map(ENV.submissions, 'assignment_id'), ['201', '203', '205']);
+    deepEqual(_.map(ENV.submissions, 'score'), [10, 15, 30]);
+  });
+});
