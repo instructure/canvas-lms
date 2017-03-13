@@ -68,11 +68,11 @@ class EffectiveDueDates
     # no need to check this one specifically
     return false if @any_in_closed_grading_period == false
 
-    assignment_due_dates = to_hash[assignment_id]
+    assignment_due_dates = find_effective_due_dates_for_assignment(assignment_id)
     student_id = student_or_student_id.try(:id) || student_or_student_id
 
-    if usable_student_id?(student_id)
-      assignment_due_dates[student_id][:in_closed_grading_period]
+    if student_id.to_i > 0
+      !!assignment_due_dates.dig(student_id, :in_closed_grading_period)
     else
       any_student_in_closed_grading_period?(assignment_due_dates)
     end
@@ -91,13 +91,6 @@ class EffectiveDueDates
   end
 
   private
-
-  def usable_student_id?(student_id)
-    return false unless student_id.present?
-    return false unless student_id.to_i.present?
-
-    true
-  end
 
   def any_student_in_closed_grading_period?(assignment_due_dates)
     return false unless assignment_due_dates
