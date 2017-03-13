@@ -123,7 +123,7 @@ class GradebookImporter
       .select(['submissions.id', :assignment_id, :user_id, :score, :excused, :cached_due_date, 'submissions.updated_at'])
       .where(assignment_id: assignment_ids, user_id: user_ids)
       .map do |submission|
-        is_gradeable = gradeable?(submission: submission, periods: periods, is_admin: is_admin)
+        is_gradeable = gradeable?(submission: submission, is_admin: is_admin)
         score = submission.excused? ? "EX" : submission.score.to_s
         {
           user_id: submission.user_id,
@@ -160,7 +160,6 @@ class GradebookImporter
             effective_due_dates.find_effective_due_date(student.id, assignment.id).fetch(:due_at, nil)
           submission['gradeable'] = gradeable?(
             submission: new_submission,
-            periods: periods,
             is_admin: is_admin
           )
         end
@@ -321,7 +320,7 @@ class GradebookImporter
   end
 
   def prevent_new_assignment_creation?(periods, is_admin)
-    return false unless context.grading_periods?
+    return false unless @context.grading_periods?
     return false if is_admin
 
     GradingPeriod.date_in_closed_grading_period?(
@@ -500,16 +499,10 @@ class GradebookImporter
 
   private
 
-  def gradeable?(submission:, periods:, is_admin:)
-    user_can_grade_submission = submission.grants_right?(@user, :grade)
-    return user_can_grade_submission unless @context.grading_periods?
-
-    user_can_grade_submission &&
-      (is_admin || !GradingPeriod.date_in_closed_grading_period?(
-        course: submission.context,
-        date: submission.cached_due_date,
-        periods: periods
-      ))
+  def gradeable?(submission:, is_admin: false)
+    # `submission#grants_right?` will check if the user
+    # is an admin, but if we've pre-loaded that value already
+    # to avoid an N+1, check that first.
+    is_admin || submission.grants_right?(@user, :grade)
   end
-
 end

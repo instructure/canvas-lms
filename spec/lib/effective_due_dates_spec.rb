@@ -1424,12 +1424,25 @@ describe Course do
           expect(@edd.in_closed_grading_period?(@assignment1)).to eq(false)
         end
 
+        it 'returns true if the specified student has a due date for this assignment' do
+          expect(@edd.in_closed_grading_period?(@assignment2, @student2)).to be true
+          expect(@edd.in_closed_grading_period?(@assignment2, @student2.id)).to be true
+        end
+
         it 'returns false if the specified student has a due date in an open grading period' do
           override = @assignment2.assignment_overrides.create!(due_at: 1.day.from_now(@now), due_at_overridden: true)
           override.assignment_override_students.create!(user: @student1)
 
-          expect(@edd.in_closed_grading_period?(@assignment2, @student1)).to be_falsey
-          expect(@edd.in_closed_grading_period?(@assignment2, @student1.id)).to be_falsey
+          expect(@edd.in_closed_grading_period?(@assignment2, @student1)).to be false
+          expect(@edd.in_closed_grading_period?(@assignment2, @student1.id)).to be false
+        end
+
+        it 'returns false if the specified student does not have a due date for this assignment' do
+          @other_course = Course.create!
+          @student_in_other_course = student_in_course(course: @other_course, active_all: true).user
+
+          expect(@edd.in_closed_grading_period?(@assignment2, @student_in_other_course)).to be false
+          expect(@edd.in_closed_grading_period?(@assignment2, @student_in_other_course.id)).to be false
         end
       end
     end
