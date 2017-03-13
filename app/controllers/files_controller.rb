@@ -354,7 +354,7 @@ class FilesController < ApplicationController
       })
       log_asset_access([ "files", @context ], "files", "other")
 
-      render :text => "".html_safe, :layout => true
+      render html: "".html_safe, layout: true
     end
   end
 

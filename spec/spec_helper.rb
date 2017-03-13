@@ -125,6 +125,7 @@ unless CANVAS_RAILS4_2
     def non_kwarg_request_warning; end
   end
   Rails::Controller::Testing::Integration.prepend(IgnoreActionControllerKWArgsWarning)
+  ActionDispatch::Integration::Session.prepend(IgnoreActionControllerKWArgsWarning)
 end
 
 # we use ivars too extensively for factories; prevent them from

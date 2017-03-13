@@ -55,7 +55,7 @@ module UserSearch
               User.of_account(context).active
             elsif context.is_a?(Course)
               context.users_visible_to(searcher, include_prior_enrollments,
-                enrollment_state: enrollment_states, include_inactive: include_inactive_enrollments).uniq
+                enrollment_state: enrollment_states, include_inactive: include_inactive_enrollments).distinct
             else
               context.users_visible_to(searcher).uniq
             end
