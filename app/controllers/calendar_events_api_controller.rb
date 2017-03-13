@@ -712,7 +712,7 @@ class CalendarEventsApiController < ApplicationController
           calendar.add_event(ics_event) if ics_event
         end
 
-        render :text => calendar.to_ical
+        render plain: calendar.to_ical
       end
       format.atom do
         feed = Atom::Feed.new do |f|

@@ -645,7 +645,7 @@ ActiveRecord::Relation.class_eval do
     order_values.any? ||
       group_values.any? ||
       select_values.to_s =~ /DISTINCT/i ||
-      uniq_value ||
+      distinct_value ||
       select_values_necessitate_temp_table?
   end
   private :find_in_batches_needs_temp_table?

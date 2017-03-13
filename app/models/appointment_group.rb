@@ -208,7 +208,7 @@ class AppointmentGroup < ActiveRecord::Base
       codes[:full] &= restrict_to_codes
       codes[:limited] &= restrict_to_codes
     end
-    uniq.
+    distinct.
         joins("JOIN #{AppointmentGroupContext.quoted_table_name} agc " \
               "ON appointment_groups.id = agc.appointment_group_id " \
               "LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc " \

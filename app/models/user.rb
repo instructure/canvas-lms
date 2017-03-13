@@ -1679,7 +1679,7 @@ class User < ActiveRecord::Base
       current_and_concluded.
       where(user_id: self).
       joins(:course).
-      uniq.
+      distinct.
       pluck(:account_id)
 
     longest_chain = [in_root_account]

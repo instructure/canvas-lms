@@ -80,7 +80,7 @@ class AccountNotification < ActiveRecord::Base
         end
       end
 
-      roles = user.enrollments.shard(user).active.uniq.pluck(:type)
+      roles = user.enrollments.shard(user).active.distinct.pluck(:type)
 
       if roles == ['StudentEnrollment'] && !account.include_students_in_global_survey?
         current.reject! { |announcement| announcement.required_account_service == 'account_survey_notifications' }
