@@ -279,6 +279,8 @@ class AppointmentGroup < ActiveRecord::Base
   def instructors
     if sub_context_type == "CourseSection"
       contexts.map { |c| c.participating_instructors.restrict_to_sections(sub_context_id) }.flatten.uniq
+    elsif participant_type == 'User' && sub_contexts.present?
+      contexts.map { |c| c.participating_instructors.restrict_to_sections(sub_contexts) }.flatten.uniq
     else
       contexts.map(&:participating_instructors).flatten.uniq
     end
