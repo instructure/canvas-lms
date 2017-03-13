@@ -25,16 +25,10 @@ define([
   class StudentContextTray extends React.Component {
 
     static propTypes = {
-      courseId: React.PropTypes.oneOfType([
-        React.PropTypes.string,
-        React.PropTypes.number
-      ]),
-      studentId: React.PropTypes.oneOfType([
-        React.PropTypes.string,
-        React.PropTypes.number
-      ]),
-      store: React.PropTypes.instanceOf(StudentCardStore),
-      onClose: React.PropTypes.func,
+      courseId: React.PropTypes.string.isRequired,
+      studentId: React.PropTypes.string.isRequired,
+      store: React.PropTypes.instanceOf(StudentCardStore).isRequired,
+      onClose: React.PropTypes.func.isRequired,
       returnFocusTo: React.PropTypes.func.isRequired
     }
 

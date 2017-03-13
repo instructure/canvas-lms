@@ -5,8 +5,9 @@ define([
   'jsx/context_cards/StudentContextTray',
   'jsx/context_cards/StudentCardStore'
 ], ($, React, ReactDOM, StudentContextTray, StudentCardStore) => {
-  $(document).on('click', '.student_context_card_trigger', (event) => {
-    const {student_id: studentId, course_id: courseId} = $(event.target).data();
+  const handleClickEvent = (event) => {
+    const studentId = $(event.target).attr('data-student_id');
+    const courseId = $(event.target).attr('data-course_id');
     if (ENV.STUDENT_CONTEXT_CARDS_ENABLED && studentId && courseId) {
       event.preventDefault();
       const container = document.getElementById('StudentContextTray__Container')
@@ -38,5 +39,9 @@ define([
         />, container
       )
     }
-  });
+  }
+
+  $(document).on('click', '.student_context_card_trigger', handleClickEvent);
+
+  return handleClickEvent;
 });
