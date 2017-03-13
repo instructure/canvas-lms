@@ -25,3 +25,28 @@ RUBY
   end
   Store.prepend(RailsCacheShim)
 end
+
+unless CANVAS_RAILS4_2
+  module IgnoreMonkeyPatchesInDeprecations
+    def extract_callstack(callstack)
+      return _extract_callstack(callstack) if callstack.first.is_a? String
+
+      offending_line = callstack.find { |frame|
+        # pass the whole frame to the filter function, so we can ignore specific methods
+        !ignored_callstack(frame)
+      } || callstack.first
+
+      [offending_line.path, offending_line.lineno, offending_line.label]
+    end
+
+    def ignored_callstack(frame)
+      return super if frame.is_a?(String)
+      return true if frame.absolute_path&.start_with?(File.dirname(__FILE__) + "/active_record.rb")
+      return true if frame.label == 'render' && frame.absolute_path&.end_with?("application_controller.rb")
+
+      return false unless frame.absolute_path
+      super(frame.absolute_path)
+    end
+  end
+  ActiveSupport::Deprecation.prepend(IgnoreMonkeyPatchesInDeprecations)
+end
