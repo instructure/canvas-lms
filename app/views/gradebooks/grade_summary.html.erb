@@ -272,6 +272,7 @@
         <a href="#"
           class="toggle_comments_link tooltip"
           aria-label="<%= t('Read comments') %>"
+          aria-describedby="comment_count_for_assignment_<%= assignment.id %>"
           <% if assignment_presenter.has_comments? && !assignment.muted? %>
             aria-expanded="false"
             aria-controls="comments_thread_<%= assignment.id %>"
@@ -282,7 +283,9 @@
             style='visibility: hidden;'
           <% end %>>
           <span class="tooltip_wrap right">
-            <span class="tooltip_text"><%= t("comment", count: n((submission.visible_submission_comments.size rescue 0))) %></span>
+            <span class="tooltip_text" id="comment_count_for_assignment_<%= assignment.id %>">
+              <%= t("comment", count: submission&.visible_submission_comments&.size || 0) %>
+            </span>
           </span>
           <i class="icon-discussion standalone-icon"></i>
         </a>
