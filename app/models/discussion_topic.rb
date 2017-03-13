@@ -922,8 +922,7 @@ class DiscussionTopic < ActiveRecord::Base
   def active_participants_include_tas_and_teachers(include_observers=false)
     participants = active_participants(include_observers)
     if self.context.is_a?(Group) && !self.context.course.nil?
-      participants += self.context.course.teachers
-      participants += self.context.course.tas
+      participants += self.context.course.participating_instructors_by_date
       participants = participants.compact.uniq
     end
     participants
