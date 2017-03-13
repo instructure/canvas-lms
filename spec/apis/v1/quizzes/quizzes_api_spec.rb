@@ -594,6 +594,13 @@ describe Quizzes::QuizzesApiController, type: :request do
       end
     end
 
+    context 'points_possible' do
+      it "updates points_possible for graded surveys" do
+        api_update_quiz({quiz_type: "graded_survey", points_possible: 123.0}, {points_possible: 321.0})
+        expect(updated_quiz.points_possible).to eq 321.0
+      end
+    end
+
     context 'lockdown_browser' do
       before :once do
         # require_lockdown_browser, require_lockdown_browser_for_results and
