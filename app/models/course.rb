@@ -1046,17 +1046,31 @@ class Course < ActiveRecord::Base
   end
 
   def recompute_student_scores(student_ids = nil, grading_period_id: nil, update_all_grading_period_scores: true)
+    inst_job_opts = {}
+    if student_ids.blank? && grading_period_id.nil? && update_all_grading_period_scores
+      # if we have all default args, let's queue this job in a singleton to avoid duplicates
+      inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}"
+    end
+
+    send_later_if_production_enqueue_args(
+      :recompute_student_scores_without_send_later,
+      inst_job_opts,
+      student_ids,
+      grading_period_id: grading_period_id,
+      update_all_grading_period_scores: update_all_grading_period_scores
+    )
+  end
+
+  def recompute_student_scores_without_send_later(student_ids = nil, opts = {})
     student_ids ||= self.student_ids
     Rails.logger.info "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
     Enrollment.recompute_final_score(
       student_ids,
       self.id,
-      grading_period_id: grading_period_id,
-      update_all_grading_period_scores: update_all_grading_period_scores
+      grading_period_id: opts[:grading_period_id],
+      update_all_grading_period_scores: opts.fetch(:update_all_grading_period_scores, true)
     )
   end
-  handle_asynchronously_if_production :recompute_student_scores,
-    :singleton => proc { |c| "recompute_student_scores:#{ c.global_id }" }
 
   def home_page
     self.wiki.front_page
