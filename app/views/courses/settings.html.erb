@@ -352,7 +352,7 @@
           <% end %>
         </td>
       </tr>
-      <% if @context.feature_enabled?(:epub_export) && !@context.root_account.enable_offline_web_export? %>
+      <% if @context.feature_enabled?(:epub_export) && !@context.account.enable_offline_web_export? %>
         <tr>
           <td class="form-label"><label for="course_epub_export"><%= before_label('course_epub_export', %{Epub Export}) %></label></td>
           <td colspan="3" id="epub_export">
@@ -363,7 +363,7 @@
           </td>
         </tr>
       <% end %>
-      <% if @context.root_account.enable_offline_web_export? %>
+      <% if @context.account.enable_offline_web_export? %>
         <tr>
           <td class="form-label"><label for="course_offline_export"><%= before_label('course_offline_export', %{Offline Course}) %></label></td>
           <td colspan="3" id="offline_web_export">

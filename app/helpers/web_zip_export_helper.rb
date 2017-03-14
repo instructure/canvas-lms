@@ -18,7 +18,7 @@
 
 module WebZipExportHelper
   def course_allow_web_export_download?
-    @context.root_account.enable_offline_web_export? && @context.enable_offline_web_export?
+    @context.account.enable_offline_web_export? && @context.enable_offline_web_export?
   end
 
   def allow_web_export_for_course_user?

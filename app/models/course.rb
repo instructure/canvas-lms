@@ -2778,7 +2778,7 @@ class Course < ActiveRecord::Base
   add_setting :image_id
   add_setting :image_url
   add_setting :organize_epub_by_content_type, :boolean => true, :default => false
-  add_setting :enable_offline_web_export, :boolean => true, :default => lambda { |c| c.root_account.enable_offline_web_export? }
+  add_setting :enable_offline_web_export, :boolean => true, :default => lambda { |c| c.account.enable_offline_web_export? }
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
 
   add_setting :restrict_student_future_view, :boolean => true, :inherited => true
