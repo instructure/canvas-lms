@@ -82,10 +82,3 @@ require [
   $('body').on 'click', '[data-pushstate]', (event) ->
     event.preventDefault()
     Backbone.history.navigate $(this).attr('href'), yes
-
-  # setup the inst-ui default theme
-  if ENV.use_high_contrast
-    ApplyTheme.setDefaultTheme('canvas-a11y')
-  else
-    brandvars = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
-    ApplyTheme.setDefaultTheme('canvas', brandvars)
