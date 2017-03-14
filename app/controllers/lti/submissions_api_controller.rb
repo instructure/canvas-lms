@@ -109,6 +109,7 @@ module Lti
   class SubmissionsApiController < ApplicationController
     include Lti::Ims::AccessTokenHelper
     include Api::V1::Submission
+    include AttachmentHelper
 
     SUBMISSION_SERVICE = 'vnd.Canvas.submission'
     SUBMISSION_HISTORY_SERVICE = 'vnd.Canvas.submission.history'
@@ -151,7 +152,30 @@ module Lti
       render json: submissions.map { |s| api_json(s) }
     end
 
+    def attachment
+      attachment = Attachment.find(params[:attachment_id])
+      render_unauthorized and return unless attachment_for_submission?(attachment)
+      render_or_redirect_to_stored_file(
+        attachment: attachment, redirect_to_s3: true)
+    end
+
+
+    def attachment_url(attachment_id)
+      account = @domain_root_account || Account.default
+      host, shard = HostUrl.file_host_with_shard(account, request.host_with_port)
+      res = "#{request.protocol}#{host}"
+      shard.activate do
+        res + lti_submission_attachment_download_path(params[:assignment_id], params[:submission_id], attachment_id)
+      end
+    end
+
     private
+
+    def attachment_for_submission?(attachment)
+      submissions = Submission.bulk_load_versioned_attachments(submission.submission_history + [submission])
+      attachments = submissions.map { |s| s.versioned_attachments }.flatten
+      attachments.include?(attachment)
+    end
 
     def submission
       @_submission ||= Submission.find(params[:submission_id])
@@ -165,12 +189,18 @@ module Lti
 
     def api_json(submission)
       submission_attributes = %w(id body url submitted_at assignment_id user_id submission_type workflow_state attempt attachments)
-      attachment_attributes = %w(id display_name filename content-type url size created_at updated_at)
       sub_hash = filtered_json(model: submission, whitelist: submission_attributes)
       sub_hash[:user_id] = Lti::Asset.opaque_identifier_for(User.find(sub_hash[:user_id]))
       attachments = submission.versioned_attachments
-      sub_hash[:attachments] = attachments.map { |a| filtered_json(model: a, whitelist: attachment_attributes) }
+      sub_hash[:attachments] = attachments.map { |a| attachment_json(a) }
       sub_hash
+    end
+
+    def attachment_json(attachment)
+      attachment_attributes = %w(id display_name filename content-type size created_at updated_at)
+      attach = filtered_json(model: attachment, whitelist: attachment_attributes)
+      attach[:url] = attachment_url(attachment.id)
+      attach
     end
 
     def filtered_json(model:, whitelist:)

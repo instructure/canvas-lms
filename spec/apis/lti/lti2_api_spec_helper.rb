@@ -10,6 +10,8 @@ RSpec.shared_context "lti2_api_spec_helper", :shared_context => :metadata do
   end
   let(:access_token) do
     aud = host rescue (@request || request).host
+    file_host, _ = HostUrl.file_host_with_shard(account)
+    aud = [aud, file_host]
     Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: tool_proxy.guid)
   end
   let(:request_headers) { {Authorization: "Bearer #{access_token}"} }

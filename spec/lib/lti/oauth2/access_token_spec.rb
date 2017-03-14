@@ -123,6 +123,11 @@ module Lti
           expect{ access_token.validate! }.to raise_error InvalidTokenError, 'invalid aud'
         end
 
+        it "handles an array for aud" do
+          body[:aud] = [aud, 'file_host']
+          expect{ access_token.validate!}.to_not raise_error
+        end
+
         it "raises an InvalidTokenError if the 'iat' is in the future" do
           body[:iat] = 1.hour.from_now
           expect{ access_token.validate! }.to raise_error InvalidTokenError, 'iat must be in the past'

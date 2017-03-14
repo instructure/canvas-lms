@@ -100,6 +100,13 @@ module Lti
           expect(response.body).to eq({error: 'invalid_grant'}.to_json)
         end
 
+        it "adds the file_host and the request host to the aud" do
+          post auth_endpoint, params
+          file_host, _ = HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
+          jwt = JSON::JWT.decode(JSON.parse(response.body)["access_token"], :skip_verification)
+          expect(jwt["aud"]).to match_array [request.host, request.protocol + file_host]
+        end
+
         context "developer credentials" do
 
           let(:raw_jwt) do

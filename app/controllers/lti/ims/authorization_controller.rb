@@ -100,8 +100,10 @@ module Lti
           code: code
         )
         jwt_validator.validate!
+        file_host, _ = HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
+        aud = [request.host, request.protocol + file_host]
         render json: {
-          access_token: Lti::Oauth2::AccessToken.create_jwt(aud: request.host, sub: jwt_validator.sub, reg_key: code).to_s,
+          access_token: Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: jwt_validator.sub, reg_key: code).to_s,
           token_type: 'bearer',
           expires_in: Setting.get('lti.oauth2.access_token.expiration', 1.hour.to_s)
         }

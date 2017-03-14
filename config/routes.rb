@@ -1980,6 +1980,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/submissions_api') do
       get "assignments/:assignment_id/submissions/:submission_id", action: :show
       get "assignments/:assignment_id/submissions/:submission_id/history", action: :history
+      get "assignments/:assignment_id/submissions/:submission_id/attachment/:attachment_id", action: :attachment, as: :lti_submission_attachment_download
     end
 
     # Originality Report Service
