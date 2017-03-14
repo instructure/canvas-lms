@@ -48,7 +48,7 @@ describe User do
     expect(@user.name).to eql('bill')
     @user.assert_name(nil)
     expect(@user.name).to eql('bill')
-    @user = User.find(@user)
+    @user = User.find(@user.id)
     expect(@user.name).to eql('bill')
   end
 
@@ -146,7 +146,7 @@ describe User do
     @a = @course.assignments.new(:title => "some assignment")
     @a.workflow_state = "available"
     @a.save
-    expect(@user.stream_item_instances(true)).not_to be_empty
+    expect(@user.stream_item_instances.reload).not_to be_empty
   end
 
   it "should ignore orphaned stream item instances" do
@@ -372,15 +372,15 @@ describe User do
       expect(enrollment).to be_invited
       expect(user.user_account_associations).to eq []
       Account.default.account_users.create!(user: user)
-      expect(user.user_account_associations(true)).to eq []
+      expect(user.user_account_associations.reload).to eq []
       user.pseudonyms.create!(:unique_id => 'test@example.com')
-      expect(user.user_account_associations(true)).to eq []
+      expect(user.user_account_associations.reload).to eq []
       user.update_account_associations
-      expect(user.user_account_associations(true)).to eq []
+      expect(user.user_account_associations.reload).to eq []
       user.register!
-      expect(user.user_account_associations(true).map(&:account)).to eq [Account.default]
+      expect(user.user_account_associations.reload.map(&:account)).to eq [Account.default]
       user.destroy
-      expect(user.user_account_associations(true)).to eq []
+      expect(user.user_account_associations.reload).to eq []
     end
 
     it "should not create/update account associations for student view student" do
@@ -1751,7 +1751,7 @@ describe User do
         expect(@user.upcoming_events).to include(event)
         Timecop.freeze(3.days.from_now) do
           EnrollmentState.recalculate_expired_states # runs periodically in background
-          expect(User.find(@user).upcoming_events).not_to include(event) # re-find user to clear cached_contexts
+          expect(User.find(@user.id).upcoming_events).not_to include(event) # re-find user to clear cached_contexts
         end
       end
 
@@ -2307,7 +2307,7 @@ describe User do
 
       Account.default.settings[:mfa_settings] = :optional
       Account.default.save!
-      user = User.find(user())
+      user = User.find(user().id)
       expect(user.mfa_settings).to eq :optional
     end
 
@@ -2317,23 +2317,23 @@ describe User do
       required_account = Account.create!(:settings => { :mfa_settings => :required })
 
       p1 = user.pseudonyms.create!(:account => disabled_account, :unique_id => 'user')
-      user = User.find(user())
+      user = User.find(user().id)
       expect(user.mfa_settings).to eq :disabled
 
       p2 = user.pseudonyms.create!(:account => optional_account, :unique_id => 'user')
-      user = User.find(user)
+      user = User.find(user.id)
       expect(user.mfa_settings).to eq :optional
 
       p3 = user.pseudonyms.create!(:account => required_account, :unique_id => 'user')
-      user = User.find(user)
+      user = User.find(user.id)
       expect(user.mfa_settings).to eq :required
 
       p1.destroy
-      user = User.find(user)
+      user = User.find(user.id)
       expect(user.mfa_settings).to eq :required
 
       p2.destroy
-      user = User.find(user)
+      user = User.find(user.id)
       expect(user.mfa_settings).to eq :required
     end
 
@@ -2531,7 +2531,7 @@ describe User do
         @shard1.activate do
           @assignment3.submit_homework @studentB, :submission_type => "online_text_entry", :body => "submission for B"
         end
-        @teacher = User.find(@teacher)
+        @teacher = User.find(@teacher.id)
         expect(@teacher.assignments_needing_grading.size).to eq 3
       end
 

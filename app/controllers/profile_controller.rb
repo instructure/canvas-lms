@@ -328,7 +328,7 @@ class ProfileController < ApplicationController
       @user.preferences[:read_notification_privacy_info] = Time.now.utc.to_s
       @user.save
 
-      return render(:nothing => true, :status => 208)
+      return head 208
     end
 
     respond_to do |format|

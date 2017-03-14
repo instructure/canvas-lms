@@ -31,16 +31,18 @@ describe "security" do
 
       https!
 
-      get_via_redirect "/login"
+      get "/login"
+      follow_redirect! while response.redirect?
       assert_response :success
       cookie = cookies['_normandy_session']
       expect(cookie).to be_present
       expect(path).to eq "/login/canvas"
 
-      post_via_redirect "/login/canvas", "pseudonym_session[unique_id]" => "nobody@example.com",
+      post "/login/canvas", "pseudonym_session[unique_id]" => "nobody@example.com",
                                   "pseudonym_session[password]" => "asdfasdf",
                                   "pseudonym_session[remember_me]" => "1",
                                   "redirect_to_ssl" => "1"
+      follow_redirect! while response.redirect?
       assert_response :success
       expect(request.fullpath).to eql("/?login_success=1")
       new_cookie = cookies['_normandy_session']
@@ -338,9 +340,10 @@ describe "security" do
       end
 
       def bad_login(ip)
-        post_via_redirect "/login",
+        post "/login",
           { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "failboat" },
           { "REMOTE_ADDR" => ip }
+        follow_redirect! while response.redirect?
       end
 
       it "should be limited for the same ip" do
@@ -349,9 +352,10 @@ describe "security" do
         bad_login("5.5.5.5")
         expect(response.body).to match(/Too many failed login attempts/)
         # should still fail
-        post_via_redirect "/login",
+        post "/login",
           { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
           { "REMOTE_ADDR" => "5.5.5.5" }
+        follow_redirect! while response.redirect?
         expect(response.body).to match(/Too many failed login attempts/)
       end
 
@@ -363,9 +367,10 @@ describe "security" do
         bad_login("5.5.5.7") # different IP, but too many total failures
         expect(response.body).to match(/Too many failed login attempts/)
         # should still fail
-        post_via_redirect "/login",
+        post "/login",
           { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
           { "REMOTE_ADDR" => "5.5.5.7" }
+        follow_redirect! while response.redirect?
         expect(response.body).to match(/Too many failed login attempts/)
       end
 
@@ -376,9 +381,10 @@ describe "security" do
         # schools like to NAT hundreds of people to the same IP, so we don't
         # ever block the IP address as a whole
         user_with_pseudonym(:active_user => true, :username => "second@example.com", :password => "12341234").save!
-        post_via_redirect "/login",
+        post "/login",
           { "pseudonym_session[unique_id]" => "second@example.com", "pseudonym_session[password]" => "12341234" },
           { "REMOTE_ADDR" => "5.5.5.5" }
+        follow_redirect! while response.redirect?
         expect(request.fullpath).to eql("/?login_success=1")
       end
 
@@ -394,9 +400,10 @@ describe "security" do
         bad_login("5.5.5.7") # different IP, but too many total failures
         expect(response.body).to match(/Too many failed login attempts/)
         # should still fail
-        post_via_redirect "/login",
+        post "/login",
           { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
           { "REMOTE_ADDR" => "5.5.5.5" }
+        follow_redirect! while response.redirect?
         expect(response.body).to match(/Too many failed login attempts/)
       end
     end

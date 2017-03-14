@@ -776,7 +776,7 @@ class FilesController < ApplicationController
   def api_create
     @policy, @attachment = Attachment.decode_policy(params[:Policy], params[:Signature])
     if !@policy
-      return render(:nothing => true, :status => :bad_request)
+      return head :bad_request
     end
     @context = @attachment.context
     @attachment.workflow_state = nil
@@ -785,22 +785,22 @@ class FilesController < ApplicationController
       # for consistency with the s3 upload client flow, we redirect to the success url here to finish up
       redirect_to api_v1_files_create_success_url(@attachment, :uuid => @attachment.uuid, :on_duplicate => params[:on_duplicate], :quota_exemption => params[:quota_exemption])
     else
-      render(:nothing => true, :status => :bad_request)
+      head :bad_request
     end
   end
 
   def api_create_success_cors
-    render nothing: true, status: :ok
+    head :ok
   end
 
   def api_create_success
     @attachment = Attachment.where(id: params[:id], uuid: params[:uuid]).first
-    return render(:nothing => true, :status => :bad_request) unless @attachment.try(:file_state) == 'deleted'
+    return head :bad_request unless @attachment.try(:file_state) == 'deleted'
     duplicate_handling = check_duplicate_handling_option(request.params)
     return unless duplicate_handling
     return unless check_quota_after_attachment(request)
     if Attachment.s3_storage?
-      return render(:nothing => true, :status => :bad_request) unless @attachment.state == :unattached
+      return head(:bad_request) unless @attachment.state == :unattached
       details = @attachment.s3object.data
       @attachment.process_s3_details!(details)
     else

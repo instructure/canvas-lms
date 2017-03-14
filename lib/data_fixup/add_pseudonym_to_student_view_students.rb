@@ -4,7 +4,7 @@ module DataFixup::AddPseudonymToStudentViewStudents
     enrollment_join = "INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=users.id AND enrollments.workflow_state='active' AND enrollments.type='StudentViewEnrollment'"
     begin
       fake_students = User.select("users.id, enrollments.root_account_id").
-          uniq.
+          distinct.
           joins("#{pseudonym_join} #{enrollment_join}").
           where(:pseudonyms => { :id => nil }).
           limit(1000).to_a

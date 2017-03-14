@@ -39,7 +39,7 @@ module SIS
       end
       @logger.debug("Raw enrollments took #{Time.now - start} seconds")
       i.enrollments_to_update_sis_batch_ids.in_groups_of(1000, false) do |batch|
-        Enrollment.where(:id => batch).update_all(:sis_batch_id => @batch)
+        Enrollment.where(:id => batch).update_all(:sis_batch_id => @batch.id)
       end if @batch
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)

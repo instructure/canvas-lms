@@ -59,7 +59,7 @@ describe 'MessageDispatcher' do
       @messages[0].cancel
 
       am_message = mock()
-      am_message.expects(:deliver).returns(true)
+      am_message.expects(:deliver_now).returns(true)
       Mailer.expects(:create_message).twice.raises(Timeout::Error).then.returns(am_message)
 
       track_jobs { Delayed::Worker.new.perform(job) }

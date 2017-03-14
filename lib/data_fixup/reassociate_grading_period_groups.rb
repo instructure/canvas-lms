@@ -7,7 +7,7 @@ module DataFixup::ReassociateGradingPeriodGroups
       groups.each do |group|
         EnrollmentTerm.
           where(id: term_ids, root_account_id: group.account_id).
-          update_all(grading_period_group_id: group)
+          update_all(grading_period_group_id: group.id)
       end
     end
   end

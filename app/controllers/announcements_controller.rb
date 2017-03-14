@@ -65,7 +65,7 @@ class AnnouncementsController < ApplicationController
         announcements.each do |e|
           feed.entries << e.to_atom
         end
-        render :text => feed.to_xml
+        render :plain => feed.to_xml
       }
       format.rss {
         @announcements = announcements
@@ -85,7 +85,7 @@ class AnnouncementsController < ApplicationController
           channel.items << item
         end
         rss.channel = channel
-        render :text => rss.to_s
+        render :plain => rss.to_s
       }
     end
   end

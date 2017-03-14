@@ -610,7 +610,7 @@ describe Quizzes::QuizzesController do
 
     it "should respect section privilege limitations" do
       section = @course.course_sections.create!(:name => 'section 2')
-      @student2.enrollments.update_all(course_section_id: section)
+      @student2.enrollments.update_all(course_section_id: section.id)
 
       ta1 = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
       @course.enroll_ta(ta1).update_attribute(:limit_privileges_to_course_section, true)

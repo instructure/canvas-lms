@@ -76,7 +76,7 @@ class ModerationSetController < ApplicationController
     current_selections = @assignment.moderated_grading_selections.pluck(:student_id)
     new_student_ids = student_ids - current_selections
 
-    new_students = visible_students.where(id: new_student_ids).uniq
+    new_students = visible_students.where(id: new_student_ids).distinct
 
     new_students.each do |student|
       @assignment.moderated_grading_selections.create! student: student
@@ -84,7 +84,7 @@ class ModerationSetController < ApplicationController
   end
 
   def visible_students
-    @visible_students ||= @context.students_visible_to(@current_user, include: :inactive).uniq
+    @visible_students ||= @context.students_visible_to(@current_user, include: :inactive).distinct
   end
 
   def load_assignment

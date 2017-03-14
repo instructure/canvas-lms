@@ -3740,7 +3740,7 @@ describe Course, "enrollments" do
 
     @course.root_account = a2
     @course.save!
-    expect(@course.student_enrollments(true).map(&:root_account_id)).to eq [a2.id]
+    expect(@course.student_enrollments.reload.map(&:root_account_id)).to eq [a2.id]
     expect(@course.course_sections.reload.map(&:root_account_id)).to eq [a2.id]
   end
 end
@@ -4776,7 +4776,7 @@ describe Course, "#apply_nickname_for!" do
     @course.apply_nickname_for!(@user)
     expect(@course.name).to eq 'nickname'
     @course.save!
-    expect(Course.find(@course).name).to eq 'some terrible name'
+    expect(Course.find(@course.id).name).to eq 'some terrible name'
   end
 
   it "undoes the change with nil user" do

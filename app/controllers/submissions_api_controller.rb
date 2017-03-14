@@ -788,7 +788,7 @@ class SubmissionsApiController < ApplicationController
                 :assignment_id => assignment_ids,
                 :course_id => @context.id
               }).
-        uniq.
+        distinct.
         order(:id)
 
       students = Api.paginate(student_scope, self, api_v1_multiple_assignments_gradeable_students_url(@context))
@@ -920,7 +920,7 @@ class SubmissionsApiController < ApplicationController
   # for failure with participant errors if there are any
   def render_state_change_result(result)
     if result == true || result.try(:errors).blank?
-      render :nothing => true, :status => :no_content
+      head :no_content
     else
       render :json => result.try(:errors) || {}, :status => :bad_request
     end

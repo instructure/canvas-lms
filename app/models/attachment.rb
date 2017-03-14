@@ -318,6 +318,7 @@ class Attachment < ActiveRecord::Base
   def assert_attachment
     if !self.to_be_zipped? && !self.zipping? && !self.errored? && !self.deleted? && (!filename || !content_type || !downloadable?)
       self.errors.add(:base, t('errors.not_found', "File data could not be found"))
+      throw :abort unless CANVAS_RAILS4_2
       return false
     end
   end
@@ -508,7 +509,7 @@ class Attachment < ActiveRecord::Base
           existing_attachment.write_attribute(:filename, nil)
           existing_attachment.save!
           Attachment.where(root_attachment_id: existing_attachment).update_all(
-            root_attachment_id: self,
+            root_attachment_id: id,
             filename: nil,
             updated_at: Time.zone.now)
         end
@@ -1240,7 +1241,7 @@ class Attachment < ActiveRecord::Base
       Attachment.where(:id => self).update_all(:content_type => old_content_type)
     end
     child.save!
-    Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child)
+    Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child.id)
   end
 
   def restore

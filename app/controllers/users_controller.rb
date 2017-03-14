@@ -1706,7 +1706,7 @@ class UsersController < ApplicationController
         render :json => { 'url' => url }
       end
     else
-      render :status => 404, :text => t('could_not_find_url', "Could not find download URL")
+      render :status => 404, :plain => t('could_not_find_url', "Could not find download URL")
     end
   end
 
@@ -1837,7 +1837,7 @@ class UsersController < ApplicationController
       feed.entries << entry.to_atom(:include_context => true, :context => @context)
     end
     respond_to do |format|
-      format.atom { render :text => feed.to_xml }
+      format.atom { render :plain => feed.to_xml }
     end
   end
 

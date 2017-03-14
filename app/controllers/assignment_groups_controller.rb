@@ -160,12 +160,12 @@ class AssignmentGroupsController < ApplicationController
     @group = @context.assignment_groups.find(params[:assignment_group_id])
     if authorized_action(@group, @current_user, :update)
       order = params[:order].split(',').map{|id| id.to_i }
-      group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.where(id: order).uniq.except(:order).pluck(:assignment_group_id)))
+      group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.where(id: order).distinct.except(:order).pluck(:assignment_group_id)))
       assignments = @context.active_assignments.where(id: order)
 
       return render_unauthorized_action unless can_reorder_assignments?(assignments, @group)
 
-      assignments.update_all(assignment_group_id: @group)
+      assignments.update_all(assignment_group_id: @group.id)
       @group.assignments.first.update_order(order) unless @group.assignments.empty?
       groups = AssignmentGroup.where(id: group_ids)
       groups.touch_all

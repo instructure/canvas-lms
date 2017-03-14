@@ -154,7 +154,7 @@ class Quizzes::QuizEligibility
   end
 
   def assignment_override_sections
-    AssignmentOverride.where(quiz_id: quiz.id, set_type: CourseSection).map(&:set) & student_sections
+    AssignmentOverride.where(quiz_id: quiz.id, set_type: 'CourseSection').map(&:set) & student_sections
   end
 
   def inactive_non_admin?

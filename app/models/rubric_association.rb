@@ -185,7 +185,7 @@ class RubricAssociation < ActiveRecord::Base
     if self.association_id && self.association_type == 'Assignment'
       self.association_object.submissions.each do |sub|
         sub.assessment_requests.incomplete.where(:rubric_association_id => nil).
-            update_all(:rubric_association_id => self)
+            update_all(:rubric_association_id => id)
       end
     end
   end

@@ -316,7 +316,7 @@ class ApplicationController < ActionController::Base
     include_host = opts[-1].delete(:include_host)
     if !include_host
       opts[-1][:host] = context.host_name rescue nil
-      opts[-1][:only_path] = true
+      opts[-1][:only_path] = true unless name.end_with?("_path")
     end
     self.send name, *opts
   end
@@ -1778,8 +1778,8 @@ class ApplicationController < ActionController::Base
       # fix for some browsers not properly handling json responses to multipart
       # file upload forms and s3 upload success redirects -- we'll respond with text instead.
       if options[:as_text] || json_as_text?
-        options[:text] = json
-        options[:content_type] = "text/html"
+        options[:html] = json.html_safe
+        options[:content_type] = "text/html" if CANVAS_RAILS4_2
       else
         options[:json] = json
       end

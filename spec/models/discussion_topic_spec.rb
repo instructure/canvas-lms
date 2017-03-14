@@ -1446,7 +1446,11 @@ describe DiscussionTopic do
     end
 
     it "should sync unread state with the stream item" do
-      @stream_item = @topic.stream_item(true)
+      if CANVAS_RAILS4_2
+        @stream_item = @topic.stream_item(true)
+      else
+        @stream_item = @topic.reload_stream_item
+      end
       expect(@stream_item.stream_item_instances.detect{|sii| sii.user_id == @teacher.id}).to be_read
       expect(@stream_item.stream_item_instances.detect{|sii| sii.user_id == @student.id}).to be_unread
 

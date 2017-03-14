@@ -46,7 +46,7 @@ module Api::V1::Group
 
     if includes.include?('users')
       users = group.grants_right?(@current_user, :read_as_admin) ?
-        group.users.order_by_sortable_name.uniq : group.participating_users_in_context(sort: true).uniq
+        group.users.order_by_sortable_name.distinct : group.participating_users_in_context(sort: true).distinct
 
       # TODO: this should be switched to user_display_json
       hash['users'] = users.map{ |u| user_json(u, user, session) }

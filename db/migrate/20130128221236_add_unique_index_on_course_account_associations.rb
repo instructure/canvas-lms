@@ -6,7 +6,7 @@ class AddUniqueIndexOnCourseAccountAssociations < ActiveRecord::Migration[4.2]
     # clean up any dups first
     course_ids = CourseAccountAssociation.
         select(:course_id).
-        uniq.
+        distinct.
         group(:course_id, :course_section_id, :account_id).
         having("COUNT(*)>1").
         map(&:course_id)

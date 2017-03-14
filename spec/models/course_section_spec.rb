@@ -257,19 +257,19 @@ describe CourseSection, "moving to new course" do
     course1 = account1.courses.create!
     course2 = account2.courses.create!
     cs1 = course1.course_sections.create!
-    expect(CourseAccountAssociation.where(course_id: course1).uniq.order(:account_id).pluck(:account_id)).to eq [account1.id]
-    expect(CourseAccountAssociation.where(course_id: course2).uniq.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id]
+    expect(CourseAccountAssociation.where(course_id: course1).distinct.order(:account_id).pluck(:account_id)).to eq [account1.id]
+    expect(CourseAccountAssociation.where(course_id: course2).distinct.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id]
     course1.account = account2
     course1.save
-    expect(CourseAccountAssociation.where(course_id: course1).uniq.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id].sort
-    expect(CourseAccountAssociation.where(course_id: course2).uniq.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id]
+    expect(CourseAccountAssociation.where(course_id: course1).distinct.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id].sort
+    expect(CourseAccountAssociation.where(course_id: course2).distinct.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id]
     course1.account = nil
     course1.save
-    expect(CourseAccountAssociation.where(course_id: course1).uniq.order(:account_id).pluck(:account_id)).to eq [account1.id]
-    expect(CourseAccountAssociation.where(course_id: course2).uniq.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id]
+    expect(CourseAccountAssociation.where(course_id: course1).distinct.order(:account_id).pluck(:account_id)).to eq [account1.id]
+    expect(CourseAccountAssociation.where(course_id: course2).distinct.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id]
     cs1.crosslist_to_course(course2)
-    expect(CourseAccountAssociation.where(course_id: course1).uniq.order(:account_id).pluck(:account_id)).to eq [account1.id]
-    expect(CourseAccountAssociation.where(course_id: course2).uniq.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id].sort
+    expect(CourseAccountAssociation.where(course_id: course1).distinct.order(:account_id).pluck(:account_id)).to eq [account1.id]
+    expect(CourseAccountAssociation.where(course_id: course2).distinct.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id].sort
   end
 
   describe 'validation' do

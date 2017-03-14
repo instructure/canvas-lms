@@ -260,5 +260,10 @@ module CanvasRails
       config.action_dispatch.rack_cache[:ignore_headers] =
         %w[Set-Cookie X-Request-Context-Id X-Canvas-User-Id X-Canvas-Meta]
     end
+
+    def validate_secret_key_config!
+      # no validation; we don't use Rails' CookieStore session middleware, so we
+      # don't care about secret_key_base
+    end
   end
 end

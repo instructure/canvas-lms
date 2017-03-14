@@ -369,6 +369,7 @@ class Account < ActiveRecord::Base
 
     if self.root_account?
       self.errors.add(:sis_source_id, t('#account.root_account_cant_have_sis_id', "SIS IDs cannot be set on root accounts"))
+      throw :abort unless CANVAS_RAILS4_2
       return false
     end
 
@@ -378,6 +379,7 @@ class Account < ActiveRecord::Base
     return true unless scope.exists?
 
     self.errors.add(:sis_source_id, t('#account.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
+    throw :abort unless CANVAS_RAILS4_2
     false
   end
 

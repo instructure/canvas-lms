@@ -756,7 +756,7 @@ describe AssignmentOverride do
       override = AssignmentOverride.new
       override.title = title
       override.due_at = due_at
-      override.all_day = due_at
+      override.all_day = !!due_at
       override.all_day_date = due_at.to_date
       override.lock_at = lock_at
       override.unlock_at = unlock_at

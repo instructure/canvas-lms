@@ -38,8 +38,8 @@ class AccountNotification < ActiveRecord::Base
       unless role_ids.empty? || user_role_ids.key?(announcement.account_id)
         # choose enrollments and account users to inspect
         if announcement.account.site_admin?
-          enrollments = user.enrollments.shard(user).active.uniq.select(:role_id)
-          account_users = user.account_users.shard(user).uniq.select(:role_id)
+          enrollments = user.enrollments.shard(user).active.distinct.select(:role_id)
+          account_users = user.account_users.shard(user).distinct.select(:role_id)
         else
           enrollments = user.enrollments_for_account_and_sub_accounts(account).select(:role_id)
           account_users = account.all_account_users_for(user)

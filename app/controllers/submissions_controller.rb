@@ -510,7 +510,7 @@ class SubmissionsController < ApplicationController
   private :legacy_plagiarism_report
 
   def plagiarism_report(type)
-    return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
+    return head(:bad_request) unless params_are_integers?(:assignment_id, :submission_id)
 
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
@@ -533,7 +533,7 @@ class SubmissionsController < ApplicationController
   private :plagiarism_report
 
   def resubmit_to_plagiarism(type)
-    return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
+    return head 400 unless params_are_integers?(:assignment_id, :submission_id)
 
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
@@ -553,7 +553,7 @@ class SubmissionsController < ApplicationController
           flash[:notice] = message
           redirect_to named_context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id)
         }
-        format.json { render :nothing => true, :status => :no_content }
+        format.json { head :no_content }
       end
     end
   end

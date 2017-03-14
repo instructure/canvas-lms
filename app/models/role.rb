@@ -83,6 +83,7 @@ class Role < ActiveRecord::Base
   def infer_root_account_id
     unless self.account
       self.errors.add(:account_id)
+      throw :abort unless CANVAS_RAILS4_2
       return false
     end
     self.root_account_id = self.account.root_account_id || self.account.id

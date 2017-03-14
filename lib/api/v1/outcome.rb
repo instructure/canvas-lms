@@ -25,7 +25,7 @@ module Api::V1::Outcome
   # context id and type, and description.
   def outcomes_json(outcomes, user, session, opts = {})
     outcome_ids = outcomes.map(&:id)
-    opts[:assessed_outcomes] = LearningOutcomeResult.uniq.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
+    opts[:assessed_outcomes] = LearningOutcomeResult.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
     outcomes.map { |o| outcome_json(o, user, session, opts) }
   end
 

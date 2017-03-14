@@ -311,7 +311,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def oauth_compliant=(val)
-    settings[:oauth_compliant] = val
+    settings[:oauth_compliant] = Canvas::Plugin.value_to_boolean(val)
   end
 
   def oauth_compliant

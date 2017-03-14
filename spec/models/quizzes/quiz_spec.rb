@@ -440,7 +440,7 @@ describe Quizzes::Quiz do
     q.save
     expect(q.active_quiz_questions.size).to eql(4)
     expect(q.quiz_groups.length).to eql(1)
-    expect(g.quiz_questions(true).active.size).to eql(2)
+    expect(g.quiz_questions.reload.active.size).to eql(2)
 
     entries = q.root_entries(true)
     expect(entries.length).to eql(3)

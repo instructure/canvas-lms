@@ -139,7 +139,6 @@ class User < ActiveRecord::Base
   has_many :gradebook_csvs, dependent: :destroy
 
   has_one :profile, :class_name => 'UserProfile'
-  alias :orig_profile :profile
 
   has_many :progresses, :as => :context, :inverse_of => :context
 
@@ -865,7 +864,7 @@ class User < ActiveRecord::Base
 
   # avoid extraneous callbacks when enrolled in multiple sections
   def delete_enrollments(enrollment_scope=self.enrollments)
-    courses_to_update = enrollment_scope.active.uniq.pluck(:course_id)
+    courses_to_update = enrollment_scope.active.distinct.pluck(:course_id)
     Enrollment.suspend_callbacks(:update_cached_due_dates) do
       enrollment_scope.each{ |e| e.destroy }
     end
@@ -891,8 +890,8 @@ class User < ActiveRecord::Base
         # student view user won't be cross shard, so that will still be the
         # right shard
         enrollment_scope = fake_student? ? self.enrollments : root_account.enrollments.where(user_id: self)
-        user_observer_scope = self.user_observers(self)
-        user_observee_scope = self.user_observees(self)
+        user_observer_scope = self.user_observers.shard(self)
+        user_observee_scope = self.user_observees.shard(self)
         pseudonym_scope = root_account.pseudonyms.active.where(user_id: self)
 
         account_users = root_account.account_users.where(user_id: self).to_a +
@@ -2612,7 +2611,11 @@ class User < ActiveRecord::Base
   end
 
   def profile(force_reload = false)
-    orig_profile(force_reload) || build_profile
+    if CANVAS_RAILS4_2
+      super(force_reload) || build_profile
+    else
+      (force_reload ? reload_profile : super) || build_profile
+    end
   end
 
   def parse_otp_remember_me_cookie(cookie)

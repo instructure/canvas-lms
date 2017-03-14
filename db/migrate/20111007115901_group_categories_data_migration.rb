@@ -30,12 +30,12 @@ class GroupCategoriesDataMigration < ActiveRecord::Migration[4.2]
   end
 
   def self.up
-    Group.select([:context_id, :context_type, :category]).uniq.
+    Group.select([:context_id, :context_type, :category]).distinct.
       where('context_id IS NOT NULL AND category IS NOT NULL AND group_category_id IS NULL').each do |record|
       update_records_for_record(record)
     end
 
-    Assignment.select([:context_id, :context_type, :group_category]).uniq.
+    Assignment.select([:context_id, :context_type, :group_category]).distinct.
       where('context_id IS NOT NULL AND group_category IS NOT NULL AND group_category_id IS NULL').each do |record|
       update_records_for_record(record)
     end

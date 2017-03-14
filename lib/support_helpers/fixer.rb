@@ -54,7 +54,7 @@ module SupportHelpers
         body: message,
         delay_for: 0
       )
-      Mailer.create_message(m).deliver rescue nil # omg! just ignore delivery failures
+      Mailer.create_message(m).deliver_now rescue nil # omg! just ignore delivery failures
     end
 
     def mail_from

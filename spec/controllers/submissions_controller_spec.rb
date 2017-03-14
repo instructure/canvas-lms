@@ -584,7 +584,7 @@ describe SubmissionsController do
     end
 
     it "renders json" do
-      request.accept = Mime::JSON.to_s
+      request.accept = Mime[:json].to_s
       get :show, course_id: @context.id, assignment_id: @assignment.id, id: @student.id, format: :json
       expect(JSON.parse(response.body)['submission']['id']).to eq @submission.id
     end

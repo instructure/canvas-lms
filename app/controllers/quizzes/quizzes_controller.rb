@@ -701,7 +701,7 @@ class Quizzes::QuizzesController < ApplicationController
     if authorized_action(@quiz, @current_user, :grade)
       @students = @context.students_visible_to(@current_user, include: :inactive)
       @students = @students.name_like(params[:search_term]) if params[:search_term].present?
-      @students = @students.uniq.order_by_sortable_name
+      @students = @students.distinct.order_by_sortable_name
       @students = @students.order(:uuid) if @quiz.survey? && @quiz.anonymous_submissions
       last_updated_at = Time.parse(params[:last_updated_at]) rescue nil
       respond_to do |format|
@@ -726,7 +726,7 @@ class Quizzes::QuizzesController < ApplicationController
       if @versions.size > 0 && !@quiz.muted?
         render :layout => false
       else
-        render :nothing => true
+        head :ok
       end
     end
   end
@@ -749,7 +749,7 @@ class Quizzes::QuizzesController < ApplicationController
       @lock_results_if_needed = true
       render layout: false
     else
-      render nothing: true
+      head :ok
     end
   end
 

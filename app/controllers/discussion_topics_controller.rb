@@ -851,7 +851,7 @@ class DiscussionTopicsController < ApplicationController
       feed.entries << entry.to_atom
     end
     respond_to do |format|
-      format.atom { render :text => feed.to_xml }
+      format.atom { render :plain => feed.to_xml }
     end
   end
 

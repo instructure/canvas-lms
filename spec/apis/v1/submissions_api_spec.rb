@@ -40,7 +40,7 @@ describe 'Submissions API', type: :request do
     sub.with_versioning(:explicit => true) do
       update_with_protected_attributes!(sub, { :submitted_at => @submit_homework_time, :created_at => @submit_homework_time }.merge(opts))
     end
-    sub.versions(true).each { |v| Version.where(:id => v).update_all(:created_at => v.model.created_at) }
+    sub.versions.reload.each { |v| Version.where(:id => v).update_all(:created_at => v.model.created_at) }
     sub
   end
 
@@ -615,7 +615,8 @@ describe 'Submissions API', type: :request do
 
     preview_url = json.first['preview_url']
     expect(Rack::Utils.parse_query(URI(preview_url).query)['version'].to_i).to eq sub.quiz_submission_version
-    get_via_redirect preview_url
+    get preview_url
+    follow_redirect! while response.redirect?
     expect(response).to be_success
     expect(response.body).to match(/#{@quiz.quiz_title} Results/)
   end
@@ -781,7 +782,8 @@ describe 'Submissions API', type: :request do
             :assignment_id => a1.id.to_s },
           { :include => %w(submission_history submission_comments rubric_assessment) })
     url = json[0]['attachments'][0]['url']
-    get_via_redirect(url)
+    get(url)
+    follow_redirect! while response.redirect?
     expect(response).to be_success
     expect(response[content_type_key]).to eq 'image/png'
   end

@@ -95,7 +95,7 @@ module SupportHelpers
           .where(updated_field.gt(@after_time))
           .where(updated_field.lt(@buffer_time))
           .where("submissions.#{like_error}")
-          .uniq.pluck(:id)
+          .distinct.pluck(:id)
       end
 
       def object_type

@@ -225,7 +225,7 @@ describe PseudonymsController, type: :request do
       @teacher.pseudonyms.create!(:unique_id => 'teacher@example.com')
       @path = "/api/v1/accounts/#{@account.id}/logins/#{@student.pseudonym.id}"
       @path_options = { :controller => 'pseudonyms', :format => 'json', :action => 'update', :account_id => @account.id.to_param, :id => @student.pseudonym.id.to_param }
-      a = Account.find(Account.default)
+      a = Account.find(Account.default.id)
       a.settings[:admins_can_change_passwords] = true
       a.save!
     end
@@ -276,7 +276,7 @@ describe PseudonymsController, type: :request do
       end
 
       it "should allow changing sis id even if password setting is disabled" do
-        a = Account.find(Account.default)
+        a = Account.find(Account.default.id)
         a.settings[:admins_can_change_passwords] = true
         a.save!
         json = api_call(:put, @path, @path_options, {
