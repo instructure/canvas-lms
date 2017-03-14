@@ -46,11 +46,20 @@ class AccountAuthorizationConfig::LinkedIn < AccountAuthorizationConfig::Oauth2
 
   def client_options
     {
-      site: 'https://api.linkedin.com'.freeze,
-      authorize_url: 'https://www.linkedin.com/uas/oauth2/authorization',
-      token_url: 'https://www.linkedin.com/uas/oauth2/accessToken'
+      site: 'https://www.linkedin.com'.freeze,
+      authorize_url: 'https://www.linkedin.com/oauth/v2/authorization',
+      token_url: 'https://www.linkedin.com/oauth/v2/accessToken'
     }
   end
+
+## Legacy URLs
+#  def client_options
+#    {
+#      site: 'https://api.linkedin.com'.freeze,
+#      authorize_url: 'https://www.linkedin.com/uas/oauth2/authorization',
+#      token_url: 'https://www.linkedin.com/uas/oauth2/accessToken'
+#    }
+#  end
 
   def authorize_options
     { scope: scope }
@@ -58,9 +67,18 @@ class AccountAuthorizationConfig::LinkedIn < AccountAuthorizationConfig::Oauth2
 
   def scope
     if login_attribute == 'emailAddress'.freeze
-      'r_basicprofile r_emailaddress'.freeze
+      'r_fullprofile r_emailaddress w_share'.freeze
     else
-      'r_basicprofile'.freeze
+      'r_fullprofile w_share'.freeze
     end
   end
+
+# Basic scopes
+#  def scope
+#    if login_attribute == 'emailAddress'.freeze
+#      'r_basicprofile r_emailaddress'.freeze
+#    else
+#      'r_basicprofile'.freeze
+#    end
+#  end
 end

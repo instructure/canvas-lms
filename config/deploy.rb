@@ -57,9 +57,10 @@ set :linked_dirs, %w{log tmp/pids public/system}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
 
 # Default value for keep_releases is 5
-# Set it to 2 to free up space (1.6GB per release on an 8GB server)
-# and realistically, we won't go back more than one release.
-set :keep_releases, 2
+# Set it to 1 to free up space (1.6GB per release, plus about 1GB overhead to compile npm assets on an 8GB server)
+# and realistically, we don't release until we're sure it's good.  If we mess up, we can just revert in src ctrl and do
+# a new release.
+set :keep_releases, 1
 
 # set the locations that we will look for changed assets to determine whether to precompile
 set :assets_dependencies, %w(app/stylesheets app/coffeescripts public/javascripts public/stylesheets app/views/jst spec/javascripts spec/coffeescripts Gemfile.lock config/routes.rb)
@@ -108,7 +109,11 @@ namespace :deploy do
   desc "Setup permissions on Canvas files in preparation for compile_assets, bundle install, and db:migrate"
   task :setup_permissions do
     on roles(:app) do
-      execute :sudo, 'chmod -R g+w', release_path.join('log') # Needed for rake canvas:compile_assets and db:migrate to work.  It tries to write to production.log
+      # Needed for rake canvas:compile_assets and db:migrate to work.  It tries to write to production.log
+      # and this process runs as the deploy user who is in the canvasadmin group whereas the apache
+      # application runs as canvasuser so when logs get rotated they are put in the canvasuser group
+      execute :sudo, 'chown -R canvasuser:canvasadmin', release_path.join('log/') 
+      execute :sudo, 'chmod -R g+w', release_path.join('log')
     end
   end
 
@@ -195,9 +200,9 @@ namespace :deploy do
             # "canvasadmin" group.
             info("Compiling assets because a file in #{fetch(:assets_dependencies)} changed.")
             execute :npm, 'cache clean' # Was getting "npm ERR! cb() never called!".
-            execute :npm, 'install', '--silent'
-            #execute :npm, '-d install' # print debug log of npm install
-            execute :rake, 'canvas:compile_assets'
+            #execute :npm, 'install', '--silent'
+            execute :npm, '-dd install' # print debug log of npm install
+            execute :rake, 'canvas:compile_assets --trace'
           end
         end
       end
