@@ -95,7 +95,7 @@ describe AssignmentsController do
       user_session @teacher
       get 'index', course_id: @course.id
       expect(assigns[:js_env][:QUIZ_LTI_ENABLED]).to be false
-    end  
+    end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
@@ -617,6 +617,7 @@ describe AssignmentsController do
         resource_handler: resource_handler
       )
 
+      AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
       Lti::ToolProxyBinding.create(context: @course, tool_proxy: tool_proxy)
       @assignment.tool_settings_tool = message_handler
 

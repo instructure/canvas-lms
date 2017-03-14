@@ -1153,6 +1153,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "sets the configuration LTI 2 tool in account context" do
+      AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
       account = @course.account
       product_family = Lti::ProductFamily.create(
         vendor_code: '123',
@@ -1199,6 +1200,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "sets the configuration an LTI 2 tool in course context" do
+      AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
       account = @course.account
       product_family = Lti::ProductFamily.create(
         vendor_code: '123',

@@ -21,6 +21,7 @@ module Lti
       tool_proxy.save!
       @assignment = course.assignments.new(:title => "some assignment")
       @assignment.workflow_state = "published"
+      AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
       @assignment.tool_settings_tool = message_handler
       @assignment.save
       @attachment = attachment_model(filename: "submission.doc", context: @user)

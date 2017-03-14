@@ -18,6 +18,8 @@ module Lti
         result = Services::LiveEventsSubscriptionService.create_tool_proxy_subscription(tool_proxy, subscription)
         raise AssignmentSubscriptionError, error_message unless result.ok?
         result.parsed_response['Id']
+      else
+        raise AssignmentSubscriptionError, I18n.t('Live events subscriptions service is not configured')
       end
     end
 
@@ -37,7 +39,7 @@ module Lti
     def error_message
       if submission_event_service.blank?
         I18n.t('Plagiarism review tool is missing submission event service')
-      elsif submission_event_service&.endpoint.blank?
+      elsif submission_event_service.endpoint.blank?
         I18n.t('Plagiarism review tool submission event service is missing endpoint')
       else
         I18n.t('Plagiarism review tool error')

@@ -132,6 +132,8 @@ describe Assignment do
       resource_handler: resource_handler
     )
 
+    AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
+
     @assignment.tool_settings_tool = message_handler
     @assignment.save
     expect(@assignment.tool_settings_tool).to eq(message_handler)

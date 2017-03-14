@@ -62,6 +62,18 @@ describe Lti::AssignmentSubscriptionsHelper do
       expect(subscription_helper.assignment_subscription(@assignment.id)[:TransportMetadata]).to eq({'Url' => submission_event_endpoint})
     end
 
+    context 'bad subscriptions service configuration' do
+      before(:each) do
+        ss = class_double(Services::LiveEventsSubscriptionService).as_stubbed_const
+        allow(ss).to receive_messages(create_tool_proxy_subscription: stub_bad_response)
+        allow(ss).to receive_messages(available?: false)
+      end
+
+      it "raises 'AssignmentSubscriptionError' with error message if subscriptions service is not configured" do
+        expect{subscription_helper.create_subscription}.to raise_exception(Lti::AssignmentSubscriptionsHelper::AssignmentSubscriptionError, 'Live events subscriptions service is not configured')
+      end
+    end
+
     context 'bad subscription request' do
       before(:each) do
         ss = class_double(Services::LiveEventsSubscriptionService).as_stubbed_const

@@ -15,6 +15,9 @@ describe Lti::PermissionChecker do
     end
 
     context "assignment" do
+      before :each do
+        AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
+      end
 
       let(:assignment) do
         a = course.assignments.new(:title => "some assignment")
@@ -23,7 +26,6 @@ describe Lti::PermissionChecker do
         a.save
         a
       end
-
 
       it "is false if the context is an assignment and the tool isn't associated" do
         assignment.tool_settings_tool = []
