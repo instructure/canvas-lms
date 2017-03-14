@@ -756,6 +756,11 @@ describe ContextExternalTool do
       expect(url).to eql('http://sub_underscore.google.com/?a=1&b=2')
     end
 
+    it 'should handle unicode whitespace' do
+      url = ContextExternalTool.standardize_url("\u00A0http://sub_underscore.go\u2005ogle.com?a=1\u2002&b=2")
+      expect(url).to eql('http://sub_underscore.google.com/?a=1&b=2')
+    end
+
     it 'handles underscores in the domain' do
       url = ContextExternalTool.standardize_url("http://sub_underscore.google.com?a=1&b=2")
       expect(url).to eql('http://sub_underscore.google.com/?a=1&b=2')
