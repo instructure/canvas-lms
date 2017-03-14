@@ -44,23 +44,23 @@ COPY config       ${APP_HOME}config
 COPY gems         ${APP_HOME}gems
 COPY script       ${APP_HOME}script
 COPY package.json ${APP_HOME}
+COPY yarn.lock    ${APP_HOME}
 RUN chown -R docker:docker ${APP_HOME} /home/docker
 
 # Install deps as docker to avoid sadness w/ npm lifecycle hooks
 USER docker
 RUN bundle install --jobs 8 \
-  && yarn install
+  && yarn install --pure-lockfile
 USER root
 
 COPY . $APP_HOME
 RUN mkdir -p log \
-            tmp \
-            public/javascripts/client_apps \
-            public/javascripts/compiled \
-            public/dist \
-            public/assets \
-            client_apps/canvas_quizzes/node_modules \
-            /home/docker/.cache/yarn/.tmp \
+             tmp \
+             public/javascripts/client_apps \
+             public/dist \
+             public/assets \
+             client_apps/canvas_quizzes/node_modules \
+             /home/docker/.cache/yarn/.tmp \
   && chown -R docker:docker ${APP_HOME} /home/docker
 
 USER docker

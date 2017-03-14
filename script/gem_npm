@@ -5,11 +5,10 @@ for path in $(ls -1 gems/*/package.json); do
   cd ${path:0:${#path}-13}
   if hash yarn 2>/dev/null; then
     echo "running yarn $1 for $path"
-    yarn $1 &
+    yarn $1
   else
     echo "npm is deprecated in canvas-lms. You should start using yarn instead. see https://yarnpkg.com. Running npm $1 for $path"
-    npm $1 &
+    npm $1
   fi
   cd ../..
 done
-wait
