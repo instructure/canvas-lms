@@ -324,6 +324,8 @@ class UsersController < ApplicationController
           access_token = linkedin_connection.get_access_token(token, secret, params[:oauth_verifier])
           service_user_id, service_user_name, service_user_url = linkedin_connection.get_service_user_info(access_token)
 
+          # Note: the service_user_id, service_user_name, and service_user_url are LinkedIn's data that we get
+          # by calling into their API.  E.g. service_user_url maybe something like: https://www.linkedin.com/in/somelinkedinusername
           if oauth_request.user
             UserService.register(
               :service => "linked_in",

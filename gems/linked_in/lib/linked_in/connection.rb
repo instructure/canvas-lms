@@ -30,6 +30,14 @@ module LinkedIn
       return service_user_id, service_user_name, service_user_url
     end
 
+    def get_service_user_data_export(access_token)
+      # #########
+      # TODO: here is where we call into the LInkedIn API. Change this to download all of their data
+      # #########
+      Rails.logger.debug("### get_service_user_data_export - begin")
+      return true
+    end
+
     def get_access_token(token, secret, oauth_verifier)
       consumer = self.class.consumer
       request_token = OAuth::RequestToken.new(consumer, token, secret)
@@ -46,12 +54,21 @@ module LinkedIn
       key ||= config['api_key']
       secret ||= config['secret_key']
       OAuth::Consumer.new(key, secret, {
-        :site => "https://api.linkedin.com",
-        :request_token_path => "/uas/oauth/requestToken",
-        :access_token_path => "/uas/oauth/accessToken",
-        :authorize_path => "/uas/oauth/authorize",
+        :site => "https://www.linkedin.com",
+        :request_token_path => "/oauth/v2/requestToken", # This is actually OAuth 1.0 and doesn't work with the new URLs.
+        :access_token_path => "/oauth/v2/accessToken",
+        :authorize_path => "/oauth/v2/authorization",
         :signature_method => "HMAC-SHA1"
       })
+      # TODO: these look like legacy URLS. Need to update to new ones.  e.g. /oauth/v2/accessToken
+      # See: https://developer.linkedin.com/docs/oauth2
+      #OAuth::Consumer.new(key, secret, {
+      #  :site => "https://api.linkedin.com",
+      #  :request_token_path => "/uas/oauth/requestToken",
+      #  :access_token_path => "/uas/oauth/accessToken",
+      #  :authorize_path => "/uas/oauth/authorize",
+      #  :signature_method => "HMAC-SHA1"
+      #})
     end
 
     def self.config_check(settings)
