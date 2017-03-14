@@ -1616,6 +1616,48 @@ describe CoursesController do
         expect(@course.settings[:image_url]).to eq ''
       end
     end
+
+    describe 'master courses' do
+      before :once do
+        Account.default.enable_feature! :master_courses
+        account_admin_user
+        course_factory
+      end
+
+      before :each do
+        user_session(@admin)
+      end
+
+      it 'should require :manage_blueprint_courses permission' do
+        ta_in_course
+        user_session @ta
+        put 'update', :id => @course.id, :format => 'json', :course => { :master_course => '1' }
+        expect(response).to be_unauthorized
+      end
+
+      it 'should set a course as a master course' do
+        put 'update', :id => @course.id, :format => 'json', :course => { :master_course => '1' }
+        expect(response).to be_success
+        expect(MasterCourses::MasterTemplate).to be_is_master_course @course
+      end
+
+      it 'should not allow a course with students to be set as a master course' do
+        student_in_course
+        put 'update', :id => @course.id, :format => 'json', :course => { :master_course => '1' }
+        expect(response.status).to eq 400
+        expect(response.body).to include 'Cannot have a blueprint course with students'
+      end
+
+      it 'should not allow a minion course to be set as a master course' do
+        c1 = @course
+        c2 = course_factory
+        template = MasterCourses::MasterTemplate.set_as_master_course(c1)
+        template.add_child_course!(c2)
+        put 'update', :id => c2.id, :format => 'json', :course => { :master_course => '1' }
+        expect(response.status).to eq 400
+        expect(response.body).to include 'Course is already associated'
+      end
+    end
   end
 
   describe "POST 'unconclude'" do

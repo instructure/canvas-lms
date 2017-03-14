@@ -305,6 +305,7 @@ class CoursesController < ApplicationController
   include CustomSidebarLinksHelper
   include SyllabusHelper
   include WebZipExportHelper
+  include CoursesHelper
 
   before_action :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
   before_action :require_user_or_observer, :only=>[:user_index]
@@ -2307,11 +2308,15 @@ class CoursesController < ApplicationController
 
       if params[:course].has_key?(:master_course)
         master_course = value_to_boolean(params[:course].delete(:master_course))
-        if master_course && @course.student_enrollments.not_fake.exists?
-           @course.errors.add(:master_course, t("Cannot have a blueprint course with students"))
-        else
-          action = master_course ? "set" : "remove"
-          MasterCourses::MasterTemplate.send("#{action}_as_master_course", @course)
+        if master_course != MasterCourses::MasterTemplate.is_master_course?(@course)
+          return unless authorized_action(@course.account, @current_user, :manage_master_courses)
+          message = master_course && why_cant_i_enable_master_course(@course)
+          if message
+            @course.errors.add(:master_course, message)
+          else
+            action = master_course ? "set" : "remove"
+            MasterCourses::MasterTemplate.send("#{action}_as_master_course", @course)
+          end
         end
       end
 
@@ -2326,7 +2331,7 @@ class CoursesController < ApplicationController
       @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
         { :priority => Delayed::LOW_PRIORITY }, changes)
 
-      if @course.save
+      if @course.errors.none? && @course.save
         Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
         @current_user.touch
         if params[:update_default_pages]
