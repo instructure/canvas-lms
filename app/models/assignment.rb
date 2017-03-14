@@ -140,7 +140,7 @@ class Assignment < ActiveRecord::Base
 
   def max_name_length
     if AssignmentUtil.assignment_name_length_required?(self)
-      return self.try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value).to_i
+      return AssignmentUtil.assignment_max_name_length(context)
     end
     Assignment.maximum_string_length
   end

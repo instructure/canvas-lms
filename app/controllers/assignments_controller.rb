@@ -41,14 +41,9 @@ class AssignmentsController < ApplicationController
 
       add_crumb(t('#crumbs.assignments', "Assignments"), named_context_url(@context, :context_assignments_url))
 
-      sis_name = 'SIS'
-      if @context.respond_to?(:assignments)
-        assignment = @context.assignments.first
-        max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(assignment)
-        max_name_length = AssignmentUtil.assignment_max_name_length(assignment)
-        sis_name = AssignmentUtil.post_to_sis_friendly_name(assignment)
-      end
-
+      max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)
+      max_name_length = AssignmentUtil.assignment_max_name_length(@context)
+      sis_name = AssignmentUtil.post_to_sis_friendly_name(@context)
 
       # It'd be nice to do this as an after_create, but it's not that simple
       # because of course import/copy.
@@ -469,7 +464,7 @@ class AssignmentsController < ApplicationController
         HAS_GRADING_PERIODS: @context.grading_periods?,
         PLAGIARISM_DETECTION_PLATFORM: @context.root_account.feature_enabled?(:plagiarism_detection_platform),
         POST_TO_SIS: post_to_sis,
-        SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@assignment),
+        SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@context),
         SECTION_LIST: @context.course_sections.active.map do |section|
           {
             id: section.id,
@@ -490,8 +485,8 @@ class AssignmentsController < ApplicationController
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
       hash[:CONTEXT_ID] = @context.id
       hash[:CONTEXT_ACTION_SOURCE] = :assignments
-      hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@assignment)
-      hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@assignment)
+      hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)
+      hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context)
       hash[:MAX_NAME_LENGTH] = self.try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value).to_i
 
       selected_tool = @assignment.tool_settings_tool

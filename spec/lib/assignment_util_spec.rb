@@ -53,40 +53,40 @@ describe AssignmentUtil do
   describe "due_date_required_for_account?" do
     it "returns true when all 3 are set to true" do
       account_stub_helper(assignment, true, true, true)
-      expect(described_class.due_date_required_for_account?(assignment)).to eq(true)
+      expect(described_class.due_date_required_for_account?(assignment.context)).to eq(true)
     end
 
     it "returns false when sis_require_assignment_due_date is false" do
       account_stub_helper(assignment, false, true, true)
-      expect(described_class.due_date_required_for_account?(assignment)).to eq(false)
+      expect(described_class.due_date_required_for_account?(assignment.context)).to eq(false)
     end
 
     it "returns false when sis_syncing is false" do
       account_stub_helper(assignment, true, false, true)
-      expect(described_class.due_date_required_for_account?(assignment)).to eq(false)
+      expect(described_class.due_date_required_for_account?(assignment.context)).to eq(false)
     end
 
     it "returns false when new_sis_integrations is false" do
       account_stub_helper(assignment, true, true, false)
-      expect(described_class.due_date_required_for_account?(assignment)).to eq(false)
+      expect(described_class.due_date_required_for_account?(assignment.context)).to eq(false)
     end
   end
 
   describe "assignment_max_name_length" do
     it "returns 15 when the account setting sis_assignment_name_length_input is 15" do
       assignment.context.account.stubs(:sis_assignment_name_length_input).returns({value: 15})
-      expect(described_class.assignment_max_name_length(assignment)).to eq(15)
+      expect(described_class.assignment_max_name_length(assignment.context)).to eq(15)
     end
   end
 
   describe "post_to_sis_friendly_name" do
     it "returns custom friendly name when the account setting sis_name is custom" do
       assignment.context.account.root_account.settings[:sis_name] = 'Foo Bar'
-      expect(described_class.post_to_sis_friendly_name(assignment)).to eq('Foo Bar')
+      expect(described_class.post_to_sis_friendly_name(assignment.context)).to eq('Foo Bar')
     end
 
     it "returns SIS when the account setting sis_name is not custom" do
-      expect(described_class.post_to_sis_friendly_name(assignment)).to eq('SIS')
+      expect(described_class.post_to_sis_friendly_name(assignment.context)).to eq('SIS')
     end
   end
 
