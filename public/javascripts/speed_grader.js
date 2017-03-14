@@ -1023,6 +1023,9 @@ define([
         initGroupAssignmentMode();
         EG.handleFragmentChange();
       }
+
+      if(window.onSpeedGraderLoaded)
+      	window.onSpeedGraderLoaded();
     },
 
     skipRelativeToCurrentIndex: function(offset){

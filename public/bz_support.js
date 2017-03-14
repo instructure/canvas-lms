@@ -167,15 +167,19 @@ function prepareAssignmentSubmitWithMagicFields() {
 
   // going to hide the UI
   var tab = document.querySelector("#submit_assignment_tabs li > a.submit_online_text_entry_option");
-  tab.parentNode.style.display = "none";
+  if(tab)
+    tab.parentNode.style.display = "none";
 
   var tabcontent = document.querySelector("#submit_assignment_online_text_form_holder");
-  tabcontent.style.display = "none";
+  if(tabcontent) {
+    tabcontent.style.display = "none";
 
-  copyAssignmentDescriptionIntoAssignmentSubmission(); // copy it initially
+    copyAssignmentDescriptionIntoAssignmentSubmission(); // copy it initially
+  }
 
   // and copy it again on submit in case it changed in the mean time...
   var form = document.getElementById("submit_online_text_entry_form");
+  if(form)
   form.addEventListener("submit", function() {
     copyAssignmentDescriptionIntoAssignmentSubmission();
   }, true);
