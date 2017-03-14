@@ -7,7 +7,7 @@ require [
   'compiled/views/DiscussionTopics/IndexView'
 ], (I18n, _, Backbone, DiscussionTopicsCollection, DiscussionListView, IndexView) ->
 
-  class DiscussionIndexRouter extends Backbone.Router
+  DiscussionIndexRouter = Backbone.Router.extend
 
     # Public: I18n strings.
     messages:
@@ -24,6 +24,7 @@ require [
       '': 'index'
 
     initialize: ->
+      ['moveModel', '_onPipelineEnd', '_onPipelineLoad'].forEach((method) => @[method] = @[method].bind(this))
       @discussions =
         open: @_createListView 'open',
           comparator: 'dateComparator'
@@ -107,7 +108,7 @@ require [
     # models - The models fetched from the server.
     #
     # Returns nothing.
-    _onPipelineLoad: (collection, models) =>
+    _onPipelineLoad: (collection, models) ->
       @_sortCollection(models)
       setTimeout((-> collection.fetch(page: 'next')), 0) if collection.urls.next
 
@@ -115,7 +116,7 @@ require [
     # the event down to all of the filtered collections.
     #
     # Returns nothing.
-    _onPipelineEnd: =>
+    _onPipelineEnd: ->
       view.collection.trigger('fetched:last') for key, view of @discussions
       unless @discussions.pinned.collection.length or ENV.permissions.moderate
         @discussions.pinned.$el.remove()
@@ -163,7 +164,7 @@ require [
     # model - The model to transition.
     #
     # Returns nothing.
-    moveModel: (model) =>
+    moveModel: (model) ->
       bucket = @discussions[@_modelBucket(model)].collection
       return if bucket == model.collection
       model.collection.remove(model)

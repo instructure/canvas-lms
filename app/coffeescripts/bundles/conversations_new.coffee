@@ -20,7 +20,7 @@ require [
 ], (I18n, $, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog, SubmissionCommentFormDialog,
  InboxHeaderView, deparam, CourseCollection, FavoriteCourseCollection, GroupCollection) ->
 
-  class ConversationsRouter extends Backbone.Router
+  ConversationsRouter = Backbone.Router.extend
 
     routes:
       '': 'index'
@@ -33,6 +33,10 @@ require [
     sendingCount: 0
 
     initialize: ->
+      ['onSelected', 'selectConversation', 'onSubmissionReply', 'onReply', 'onReplyAll', 'onArchive',
+      'onDelete', 'onCompose', 'onMarkUnread', 'onMarkRead', 'onForward', 'onStarToggle', 'onFilter',
+      'onCourse', '_replyFromRemote', '_initViews', 'onSubmit', 'onAddMessage', 'onSubmissionAddMessage',
+      'onSearch', 'onKeyDown'].forEach((method) => @[method] = @[method].bind(this))
       dfd = @_initCollections()
       @_initViews()
       @_attachEvents()
@@ -69,7 +73,7 @@ require [
 
     lastFetch: null
 
-    onSelected: (model) =>
+    onSelected: (model) ->
       @lastFetch.abort() if @lastFetch
       @header.onModelChange(null, @model)
       @detail.onModelChange(null, @model)
@@ -97,23 +101,23 @@ require [
           @lastFetch = model.fetch(data: {include_participant_contexts: false, include_private_conversation_enrollments: false}, success: @selectConversation)
           @detail.$el.disableWhileLoading(@lastFetch)
 
-    selectConversation: (model) =>
+    selectConversation: (model) ->
       if model
         model.set('canArchive', @filters.type != 'sent')
       @header.onModelChange(model, null)
       @detail.onModelChange(model, null)
       @detail.render()
 
-    onSubmissionReply: =>
+    onSubmissionReply: ->
       @submissionReply.show(@detail.model, trigger: $('#submission-reply-btn'))
 
-    onReply: (message) =>
+    onReply: (message) ->
       if @detail.model.get('for_submission')
         @onSubmissionReply()
       else
         @_delegateReply(message, 'reply')
 
-    onReplyAll: (message) =>
+    onReplyAll: (message) ->
       @_delegateReply(message, 'replyAll')
 
     _delegateReply: (message, type) ->
@@ -124,7 +128,7 @@ require [
         trigger = $("##{btn}")
       @compose.show(@detail.model, to: type, trigger: trigger, message: message)
 
-    onArchive: =>
+    onArchive: ->
       action = if @list.selectedMessage().get('workflow_state') == 'archived' then 'mark_as_read' else 'archive'
       messages = @batchUpdate(action, (m) ->
         newState = if action == 'mark_as_read' then 'read' else 'archived'
@@ -135,7 +139,7 @@ require [
         @list.collection.remove(messages)
         @selectConversation(null)
 
-    onDelete: =>
+    onDelete: ->
       return unless confirm(@messages.confirmDelete)
       messages = @batchUpdate('destroy')
       delete @detail.model
@@ -144,7 +148,7 @@ require [
       $.flashMessage(@messages.messageDeleted)
       @detail.render()
 
-    onCompose: (e) =>
+    onCompose: (e) ->
       @compose.show(null, trigger: $('#compose-btn'))
 
     index: ->
@@ -174,13 +178,13 @@ require [
       @list.collection.fetch()
       @compose.setDefaultCourse(filters.course)
 
-    onMarkUnread: =>
+    onMarkUnread: ->
       @batchUpdate('mark_as_unread', (m) -> m.toggleReadState(false))
 
-    onMarkRead: =>
+    onMarkRead: ->
       @batchUpdate('mark_as_read', (m) -> m.toggleReadState(true))
 
-    onForward: (message) =>
+    onForward: (message) ->
       model = if message
         model = @detail.model.clone()
         model.handleMessages()
@@ -193,21 +197,21 @@ require [
         @detail.model
       @compose.show(model, to: 'forward', trigger: trigger)
 
-    onStarToggle: =>
+    onStarToggle: ->
       event    = if @list.selectedMessage().get('starred') then 'unstar' else 'star'
       messages = @batchUpdate(event, (m) -> m.toggleStarred(event == 'star'))
       if @filters.type == 'starred'
         @selectConversation(null) if event == 'unstar'
         @list.collection.remove(messages)
 
-    onFilter: (filters) =>
+    onFilter: (filters) ->
       # Update the hash. Replace if there isn't already a hash - we're in the
       # process of loading the page if so, and we wouldn't want to create a
       # spurious history entry by not doing so.
       existingHash = window.location.hash && window.location.hash.substring(1)
       @navigate('filter='+$.param(filters), {trigger: true, replace: !existingHash})
 
-    onCourse: (course) =>
+    onCourse: (course) ->
       @list.updateCourse(course)
 
     # Internal: Determine if a reply was launched from another URL.
@@ -219,7 +223,7 @@ require [
     # Internal: Open and populate the new message dialog from a remote launch.
     #
     # Returns nothing.
-    _replyFromRemote: =>
+    _replyFromRemote: ->
       @compose.show null,
         user:
           id: @param('user_id')
@@ -277,12 +281,12 @@ require [
     onPageLoad: (e) ->
        $('#main').css(display: 'block')
 
-    onSubmit: (dfd) =>
+    onSubmit: (dfd) ->
       @_incrementSending(1)
       dfd.always =>
         @_incrementSending(-1)
 
-    onAddMessage: (message, conversation) =>
+    onAddMessage: (message, conversation) ->
       model = @list.collection.get(conversation.id)
       if model? && model.get('messages')
         message.context_name = model.messageCollection.last().get('context_name')
@@ -291,7 +295,7 @@ require [
         if model == @detail.model
           @detail.render()
 
-    onSubmissionAddMessage: (message, submission) =>
+    onSubmissionAddMessage: (message, submission) ->
       model = @list.collection.findWhere(submission_id: submission.id)
       if model? && model.get('messages')
         model.get('messages').unshift(message)
@@ -299,7 +303,7 @@ require [
         if model == @detail.model
           @detail.render()
 
-    onNewConversations: (conversations) =>
+    onNewConversations: (conversations) ->
 
     _incrementSending: (increment) ->
       @sendingCount += increment
@@ -310,7 +314,7 @@ require [
       filter = filter.concat(@filters.course) if @filters.course
       filter
 
-    onSearch: (tokens) =>
+    onSearch: (tokens) ->
       @list.collection.reset()
       @searchTokens = if tokens.length then tokens else null
       if @filters.type == 'submission_comments'
@@ -350,7 +354,7 @@ require [
     _initSubmissionCommentReplyDialog: ->
       @submissionReply = new SubmissionCommentFormDialog
 
-    onKeyDown: (e) =>
+    onKeyDown: (e) ->
       nodeName = e.target.nodeName.toLowerCase()
       return if nodeName == 'input' || nodeName == 'textarea'
       ctrl = e.ctrlKey || e.metaKey

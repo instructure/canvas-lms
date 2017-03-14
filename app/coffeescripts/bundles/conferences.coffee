@@ -20,7 +20,7 @@ require [
   'jquery.templateData' # fillTemplateData, getTemplateData
   'jquery.instructure_date_and_time' # date_field
 ], (INST, I18n, $, _, Backbone, CollectionView, ConferenceCollection, Conference, ConferenceView, ConcludedConferenceView, EditConferenceView) ->
-  class ConferencesRouter extends Backbone.Router
+  ConferencesRouter = Backbone.Router.extend
     routes:
       '': 'index'
       'conference_:id': 'edit'
@@ -30,6 +30,7 @@ require [
     concludedConferences: null
 
     initialize: ->
+      @close = @close.bind(this)
       # populate the conference list with inital set of data
       @editView = new EditConferenceView()
 
@@ -86,7 +87,7 @@ require [
         # to a specific conference's url directly
         $("#conf_#{conference.get('id')}")[0].scrollIntoView()
 
-    close: (conference) =>
+    close: (conference) ->
       @currentConferences.remove(conference)
       @concludedConferences.unshift(conference)
 

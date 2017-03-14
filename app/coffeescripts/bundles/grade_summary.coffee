@@ -39,7 +39,7 @@ require [
       else
         $('.outcome-toggles').hide()
 
-    activate: (event, ui) =>
+    activate: (event, ui) ->
       tab = ui.newPanel.attr('id')
       router.navigate("#tab-#{tab}", {trigger: true})
       userSettings.contextSet('grade_summary_tab', tab)

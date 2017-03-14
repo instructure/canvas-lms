@@ -26,10 +26,10 @@ require [
         gradebook: @views.assignment)
       book.render()
       @navigation = new NavigationPillView(el: $('.gradebook-navigation'))
-      @navigation.on 'pillchange', @handlePillChange
+      @navigation.on 'pillchange', @handlePillChange.bind(this)
       book
 
-    handlePillChange: (viewname) =>
+    handlePillChange: (viewname) ->
       @navigate('tab-'+viewname, trigger: true) if viewname
 
     tab: (viewName) ->
