@@ -213,7 +213,7 @@ module CC::Exporter::WebZip
         item.url
       when 'Attachment'
         path = file_path(item)
-        "viewer/files#{path}#{item.content&.filename}"
+        "viewer/files#{path}#{item.content&.display_name}"
       end
     end
 
