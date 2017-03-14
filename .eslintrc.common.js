@@ -23,7 +23,6 @@ module.exports = {
     "object-curly-spacing": [0],
     "semi": [0],
     "space-before-function-paren": [2, "always"],
-    "import/no-amd": [0],
 
     // allows 'i18n!webzip_exports' and 'compiled/foo/bar'
     "import/no-extraneous-dependencies": [0],
