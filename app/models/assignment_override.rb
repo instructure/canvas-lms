@@ -103,7 +103,7 @@ class AssignmentOverride < ActiveRecord::Base
     return true if students.blank?
 
     [grading_period_was, grading_period].compact.each do |gp|
-      course.recompute_student_scores(students, grading_period_id: gp, update_all_grading_period_scores: false)
+      course.recompute_student_scores(students, grading_period_id: gp)
     end
     true
   end
