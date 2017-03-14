@@ -61,6 +61,18 @@ define([
 
         equal(subject.grade, `${currentScore}%`)
       })
+
+      test('returns - if the enrollment is undefined', () => {
+        subject = TestUtils.renderIntoDocument(
+          <MetricsList
+            user={{
+              enrollments: []
+            }}
+          />
+        )
+
+        equal(subject.grade, '-')
+      })
     })
 
     QUnit.module('missingCount', (hooks) => {

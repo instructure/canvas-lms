@@ -18,14 +18,16 @@ import { MetricsList as InstUIMetricsList, MetricsListItem } from 'instructure-u
       }
 
       const enrollment = this.props.user.enrollments[0]
-      const grades = enrollment.grades
-      if (grades.current_grade) {
-        return grades.current_grade
-      } else if (grades.current_score) {
-        return `${grades.current_score}%`
-      } else {
+      if (enrollment) {
+        const grades = enrollment.grades
+        if (grades.current_grade) {
+          return grades.current_grade
+        } else if (grades.current_score) {
+          return `${grades.current_score}%`
+        }
         return '-'
       }
+      return '-'
     }
 
     get missingCount () {

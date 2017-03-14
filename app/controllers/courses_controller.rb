@@ -959,8 +959,11 @@ class CoursesController < ApplicationController
   def user
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      users = api_find_all(@context.users_visible_to(@current_user), [params[:id]])
       includes = Array(params[:include])
+      users = api_find_all(@context.users_visible_to(@current_user, {
+        :include_inactive => includes.include?('inactive_enrollments')
+      }), [params[:id]])
+
       user_json_preloads(users, includes.include?('email'))
       if includes.include?('enrollments')
         # not_ended_enrollments for enrollment_json

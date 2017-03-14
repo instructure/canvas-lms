@@ -34,6 +34,11 @@ define(['jsx/context_cards/StudentCardStore'], (StudentCardStore) => {
         /\/api\/v1\/courses\/\d+\/analytics/,
         JSON.stringify(['stuff'])
       );
+      this.server.respondWith(
+        // This will handle cases where we want to return nothing good
+        /\/api\/v1\/courses\/7331\/analytics\/student_summaries/,
+        JSON.stringify([])
+      );
       this.server.autoRespond = true
     },
 
@@ -70,6 +75,18 @@ define(['jsx/context_cards/StudentCardStore'], (StudentCardStore) => {
         equal(state.submissions.length, 1);
         equal(state.submissions[0].id, gradedSubmission.id);
         equal(state.analytics, 'stuff');
+        done();
+      }
+    }
+  });
+
+  test('loadAnalytics sets the analytics object to empty when results are empty', function (assert) {
+    const store = new StudentCardStore(1, 7331);
+    store.load()
+    const done = assert.async();
+    store.onChange = (state) => {
+      if (state.loading === false) {
+        deepEqual(state.analytics, {});
         done();
       }
     }

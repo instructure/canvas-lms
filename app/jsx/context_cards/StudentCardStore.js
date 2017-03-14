@@ -51,8 +51,15 @@ import axios from 'axios'
     }
 
     loadUser (studentId, courseId) {
+      const includes = [
+        'avatar_url',
+        'enrollements',
+        'inactive_enrollments',
+        'current_grading_period_scores'
+      ];
+      const includesQuery = includes.join('&include[]=');
       return axios.get(
-        `/api/v1/courses/${courseId}/users/${studentId}?include[]=avatar_url&include[]=enrollments&include[]=current_grading_period_scores`
+        `/api/v1/courses/${courseId}/users/${studentId}?include[]=${includesQuery}`
       ).then(response => this.setState({user: response.data}))
       .catch(() => {})
     }
@@ -60,7 +67,7 @@ import axios from 'axios'
     loadAnalytics (studentId, courseId) {
       return axios.get(
         `/api/v1/courses/${courseId}/analytics/student_summaries?student_id=${studentId}`
-      ).then(response => this.setState({analytics: response.data[0]}))
+      ).then(response => this.setState({ analytics: response.data[0] || {} }))
       .catch(() => {})
     }
 
