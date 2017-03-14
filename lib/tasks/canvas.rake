@@ -116,7 +116,6 @@ namespace :canvas do
   task :compile_assets_dev do
     ENV["COMPILE_ASSETS_NPM_INSTALL"] = "0"
     ENV["COMPILE_ASSETS_STYLEGUIDE"] = "0"
-    ENV["COMPILE_ASSETS_BUILD_JS"] = "0"
     ENV["COMPILE_ASSETS_API_DOCS"] = "0"
     Rake::Task['canvas:compile_assets'].invoke
   end
