@@ -9,6 +9,7 @@ const BundleExtensionsPlugin = require('./BundleExtensionsPlugin')
 const ClientAppsPlugin = require('./clientAppPlugin')
 const CompiledReferencePlugin = require('./CompiledReferencePlugin')
 const I18nPlugin = require('./i18nPlugin')
+const SelinimumManifestPlugin = require('./SelinimumManifestPlugin')
 const WebpackHooks = require('./webpackHooks')
 const webpackPublicPath = require('./webpackPublicPath')
 const HappyPack = require('happypack')
@@ -238,7 +239,7 @@ module.exports = {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }),
 
-    // handles our custom 18n stuff
+    // handles our custom i18n stuff
     new I18nPlugin(),
 
     // handles the the quiz stats and quiz log auditing client_apps
@@ -254,6 +255,11 @@ module.exports = {
     new WebpackHooks(),
 
   ]
+  .concat(process.env.SELINIMUM_RUN || process.env.SELINIMUM_CAPTURE ? [
+
+    new SelinimumManifestPlugin()
+
+  ] : [])
   .concat(happypackPlugins)
   .concat(process.env.NODE_ENV === 'test' ? [] : [
 

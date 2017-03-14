@@ -10,7 +10,7 @@ describe Selinimum::Detectors::JSDetector do
   describe "#dependents_for" do
     it "finds top-level bundle(s)" do
       expect(subject)
-        .to receive(:graph).and_return({"foo.js" => ["compiled/bundles/bar.js"]})
+        .to receive(:graph).and_return({"./public/javascripts/foo.js" => ["bar"]})
       expect(subject.dependents_for("public/javascripts/foo.js")).to eql(["js:bar"])
     end
 
@@ -22,7 +22,7 @@ describe Selinimum::Detectors::JSDetector do
 
     it "raises on the common bundle" do
       expect(subject)
-        .to receive(:graph).and_return({"foo.js" => ["compiled/bundles/common.js"]})
+        .to receive(:graph).and_return({"./public/javascripts/foo.js" => ["common"]})
       expect { subject.dependents_for("public/javascripts/foo.js") }.to raise_error(Selinimum::TooManyDependentsError)
     end
   end

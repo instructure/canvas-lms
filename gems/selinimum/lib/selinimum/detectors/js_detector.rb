@@ -8,37 +8,32 @@ module Selinimum
         file =~ %r{\Apublic/javascripts/.*\.js\z}
       end
 
+      # CommonsChunk entry point, plus the other two bundles on every page
+      GLOBAL_BUNDLES = %w[
+        js:vendor
+        js:common
+        js:appBootstrap
+      ].freeze
+
       def dependents_for(file)
-        mod = module_from(file)
-        bundles = find_js_bundles(mod)
+        bundles = find_js_bundles(file)
         raise UnknownDependentsError, file if bundles.empty?
-        raise TooManyDependentsError, file if bundles.include?("js:common") || bundles.include?("js:compiled/tinymce")
+        raise TooManyDependentsError, file if (GLOBAL_BUNDLES & bundles).any?
         bundles
       end
 
-      def module_from(file)
-        file.sub(%r{\Apublic/javascripts/(.*?)\.js}, "\\1")
-      end
-
       def find_js_bundles(mod)
-        (graph[mod + ".js"] || []).map do |bundle|
-          bundle.sub(%r{\A(compiled/bundles/)?(.*)\.js\z}, "js:\\2")
-        end
+        (graph["./" + mod] || []).map { |bundle| "js:#{bundle}" }
       end
 
       def graph
         @graph ||= begin
-          graph = {}
-          manifest = "public/optimized/build.txt"
-
-          File.read(manifest).strip.split(/\n\n/).each do |data|
-            bundle, files = data.split(/\n----------------\n/)
-            files.split.each do |file|
-              graph[file] ||= []
-              graph[file] << bundle
-            end
+          manifest = "public/dist/webpack-production/selinimum-manifest.json"
+          if File.exist?(manifest)
+            JSON.parse(File.read(manifest))
+          else
+            {}
           end
-          graph
         end
       end
     end
