@@ -3,7 +3,7 @@
 .NewUserTutorialTray {
   width: 18.75rem;
   box-sizing: border-box;
-  padding: $ic-sp*3 $ic-sp*1.5 $ic-sp;
+  padding: $ic-sp*4 $ic-sp*1.5 $ic-sp;
 
   @include breakpoint(tablet) {
     width: 21rem;
@@ -14,8 +14,8 @@
 
 .NewUserTutorialTray__ButtonContainer {
   position: absolute;
-  right: 24px;
-  top: 14px;
+  right: $ic-sp * 2;
+  top: $ic-sp + 2;
 }
 
 .NewUserTutorialTray__ImageContainer {
