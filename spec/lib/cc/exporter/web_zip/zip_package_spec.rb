@@ -387,7 +387,7 @@ describe "ZipPackage" do
     end
 
     it "should parse file data for attachments" do
-      file = attachment_model(context: @course, display_name: 'file1.jpg', filename: 'file1.jpg')
+      file = attachment_model(context: @course, display_name: 'file1.jpg', filename: '1234__file1.jpg')
       @module.content_tags.create!(content: file, context: @course)
 
       zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
