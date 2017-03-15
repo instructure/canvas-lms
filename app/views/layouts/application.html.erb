@@ -9,11 +9,19 @@
   wizard = (yield :wizard_box).presence
   top_nav = (yield :top_nav).presence
 
-  subnav_menu_text = t('Hide Navigation Menu')
-  subnav_menu_text = t('Hide Account Navigation Menu') if active_path?('/profile')
-  subnav_menu_text = t('Hide Admin Navigation Menu') if active_path?('/accounts')
-  subnav_menu_text = t('Hide Courses Navigation Menu') if active_path?('/courses')
-  subnav_menu_text = t('Hide Groups Navigation Menu') if active_path?('/groups')
+  if @collapse_course_menu
+    subnav_menu_text = t('Show Navigation Menu')
+    subnav_menu_text = t('Show Courses Navigation Menu') if active_path?('/courses')
+    subnav_menu_text = t('Show Account Navigation Menu') if active_path?('/profile')
+    subnav_menu_text = t('Show Admin Navigation Menu') if active_path?('/accounts')
+    subnav_menu_text = t('Show Groups Navigation Menu') if active_path?('/groups')
+  else
+    subnav_menu_text = t('Hide Navigation Menu')
+    subnav_menu_text = t('Hide Courses Navigation Menu') if active_path?('/courses')
+    subnav_menu_text = t('Hide Account Navigation Menu') if active_path?('/profile')
+    subnav_menu_text = t('Hide Admin Navigation Menu') if active_path?('/accounts')
+    subnav_menu_text = t('Hide Groups Navigation Menu') if active_path?('/groups')
+  end
 
   content_for :pre_html do
     @collapse_global_nav = @current_user.try(:collapse_global_nav?)
