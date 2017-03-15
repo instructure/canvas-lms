@@ -44,15 +44,46 @@
         <label class="checkbox" for="exclude_quoted">
           {{checkbox "exclude_quoted" checked=excludeQuoted}}
           Exclude Quoted Material
+          <a href="#"
+            class="icon-question"
+            title="{{#t "vericite_exclude_quoted_desc"}}Set the default for all reports submitted to this assignment. To reduce the number of false matches,
+            we recommend excluding quotes by default. You will still retain the ability to toggle this option for each individual report after submission.{{/t}}"
+            data-tooltip='{"tooltipClass":"popover popover-padded", "position":"right"}'></a>
         </label>
         <label class="checkbox" for="exclude_self_plag">
           {{checkbox "exclude_self_plag" checked=excludeSelfPlag}}
           Exclude Self Plagiarism
+          <a href="#"
+            class="icon-question"
+            title="{{#t "vericite_exclude_self_plag_desc"}}Set the default for all reports submitted to this assignment. To reduce the number of false matches,
+            we recommend excluding self plagiarism in the same course by default. You will still retain the ability to toggle this option for each individual
+            report after submission. Self plagiarism will always be checked against the user’s reports in other courses.{{/t}}"
+            data-tooltip='{"tooltipClass":"popover popover-padded", "position":"right"}'></a>
         </label>
         <label class="checkbox" for="store_in_index">
           {{checkbox "store_in_index" checked=storeInIndex}}
           Store submissions in Institutional Index
+          <a href="#"
+            class="icon-question"
+            title="{{#t "vericite_store_in_index_desc"}}Set the default for all reports submitted to this assignment. If you choose not to store reports in 
+            your institutional index, the reports will not be used to check for plagiarism against other student reports in your institution. Once a report has
+            been submitted, you cannot change this option for that report.{{/t}}"
+            data-tooltip='{"tooltipClass":"popover popover-padded", "position":"right"}'></a>
         </label>
+        {{#if instEnableStudentPreview}}
+          <label class="checkbox" for="enable_student_preview">
+            {{checkbox "enable_student_preview" checked=enableStudentPreview}}
+            Enable student preview
+            <a href="#"
+              class="icon-question"
+              title="{{#t "vericite_student_preview_desc"}}If you choose to enable student preview, user's will be able to review and resubmit their papers
+              until the due date. Instructors will only be able to see the final submission but a record of the scores for each paper will show in the report logs.
+              If the assignment has a due date, the student's most recent draft will automatically be submitted if there are no submissions from a student.
+              It is recommended that you set a due date for this assignment and allow the students to view their reports immediately.{{/t}}"
+              aria-label="{{#t "about_self_signup_groups"}}Enable Student Preview{{/t}}"
+              data-tooltip='{"tooltipClass":"popover popover-padded", "position":"right"}'></a>
+          </label>
+        {{/if}}
       </div>
     </div>
   </fieldset>

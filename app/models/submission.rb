@@ -713,6 +713,7 @@ class Submission < ActiveRecord::Base
             data[:similarity_score] = res[:similarity_score].to_i
             data[:state] = VeriCite.state_from_similarity_score data[:similarity_score]
             data[:status] = 'scored'
+            data[:draft] = res[:draft]
             # since we have a score, we know this report shouldn't have any errors, clear them out
             data = clear_vericite_errors(data)
           else

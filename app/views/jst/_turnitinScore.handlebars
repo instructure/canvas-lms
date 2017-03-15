@@ -3,6 +3,9 @@
   {{#if icon}}
     <img src="{{icon}}"></img>
   {{else}}
+    {{#ifEqual draft "true"}}
+      <i class="icon-edit" title="{{drafttooltip}}" style="border: 1px solid; height: 1.4em;"></i>
+    {{/ifEqual}}
     {{score}}
   {{/if}}
 </a>

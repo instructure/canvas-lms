@@ -368,6 +368,9 @@
           <span class="turnitin_score_container" style="<%= 'visibility: hidden;' if !vericite %>">
             <span class="vericite_score_container_caret <%= vericite && vericite[:state] %>_score"></span>
             <a title="<%= t('titles.vericite_score', "VeriCite similarity score -- more information") %>" href="<%= url %>" target="_blank" class="tooltip not_external turnitin_similarity_score <%= vericite && vericite[:state] %>_score">
+              <% if vericite && vericite[:draft] %>
+                <i class="icon-edit" title="<%= t(:tooltip_draft, "draft") %>" style="border: 1px solid; height: 1.2em;"></i>
+              <% end %>
               <%= vericite && vericite[:similarity_score] %>%
               <span class="tooltip_wrap right">
                 <span class="tooltip_text"><%= t(:see_vericite_results, "See VeriCite results") %></span>

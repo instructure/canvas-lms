@@ -344,9 +344,11 @@ module Api::V1::Assignment
 
   def vericite_settings_json(assignment)
     settings = assignment.vericite_settings.with_indifferent_access
-    [:exclude_quoted, :exclude_self_plag, :store_in_index].each do |key|
+    [:exclude_quoted, :exclude_self_plag, :store_in_index, :enable_student_preview].each do |key|
       settings[key] = value_to_boolean(settings[key])
     end
+    # pass the institutional plugin settings to control whether the settings dialog displays the option for student preview
+    settings[:inst_enable_student_preview] = value_to_boolean(Canvas::Plugin.find(:vericite).settings[:inst_enable_student_preview] || false)
 
     settings.slice(*API_ALLOWED_VERICITE_SETTINGS)
   end
@@ -396,6 +398,8 @@ module Api::V1::Assignment
     exclude_quoted
     exclude_self_plag
     store_in_index
+    enable_student_preview
+    inst_enable_student_preview
   )
 
   def create_api_assignment(assignment, assignment_params, user, context = assignment.context)
