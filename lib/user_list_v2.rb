@@ -96,8 +96,10 @@ class UserListV2
     grouped_results = @all_results.group_by{|r| @lowercase ? r[:address].downcase : r[:address]}
 
     grouped_results.each do |_a, results|
-      if results.uniq{|r| r[:user_id]}.count == 1
+      if results.count == 1
         @resolved_results << results.first
+      elsif results.uniq{|r| Shard.global_id_for(r[:user_id])}.count == 1
+        @resolved_results << results.detect{|r| r[:account_id] == @root_account.id} || results.first # prioritize local result first
       else
         @duplicate_results << results
       end

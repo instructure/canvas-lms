@@ -212,6 +212,24 @@ describe UserListV2 do
       expect(ul2.resolved_results).to eq [{:address => 'jt@instructure.com', :user_id => @user.id, :account_id => @account.id, :user_name => 'JT', :account_name => @account.name}]
     end
 
+    it "should not get confused when dealing with cross-shard duplicate results that actually point to the same user" do
+      user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
+      @shard1.activate do
+        @account = Account.create!(:name => "accountnaem")
+        ps = @account.pseudonyms.build(:user => @user, :unique_id => 'username', :password => 'password', :password_confirmation => 'password')
+        ps.save_without_session_maintenance
+        CommunicationChannel.create!(user: @user, pseudonym: ps, path_type: 'email', path: 'jt@instructure.com')
+      end
+
+      Account.default.stubs(:trusted_account_ids).returns([@account.id])
+
+      ul = UserListV2.new('jt@instructure.com', search_type: 'cc_path')
+      expect(ul.resolved_results.count).to eq 1
+      r = ul.resolved_results.first
+      expect(r[:user_id]).to eq @user.id
+      expect(r[:account_id]).to eq Account.default.id
+    end
+
     context "global lookups" do
       before do
         @shard1.activate do
