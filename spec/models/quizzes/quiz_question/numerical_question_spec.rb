@@ -22,6 +22,32 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
     let(:question_id)     { 1 }
     let(:points_possible) { 100 }
 
+    context "handles '' values without error" do
+      it 'handles "answer[:exact]"' do
+        answer_data = {
+          numerical_answer_type: "exact_answer"
+        }
+        user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
+        expect { question.correct_answer_parts(user_answer) }.not_to raise_error
+      end
+
+      it 'handles "answer[:margin]"' do
+        answer_data = {
+          numerical_answer_type: "exact_answer"
+        }
+        user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
+        expect { question.correct_answer_parts(user_answer) }.not_to raise_error
+      end
+
+      it 'handles "answer[:approximate]"' do
+        answer_data = {
+          numerical_answer_type: "precision_answer"
+        }
+        user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
+        expect { question.correct_answer_parts(user_answer) }.not_to raise_error
+      end
+    end
+
     it "should not calculate margin of tolerance for answers if answer text is nil" do
       answer_data = {:"question_#{question_id}" => nil}
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
