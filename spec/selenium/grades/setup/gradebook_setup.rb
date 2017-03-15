@@ -51,4 +51,27 @@ module GradebookSetup
         end_date: 2.weeks.from_now
     }
   end
+
+  def update_teacher_course_preferences(preferences)
+    @teacher.update preferences: {
+      gradebook_settings: {
+        @course.id => preferences
+      }
+    }
+  end
+
+  def update_display_preferences(concluded, inactive)
+    update_teacher_course_preferences({
+      'show_concluded_enrollments' => concluded.to_s,
+      'show_inactive_enrollments' => inactive.to_s
+    })
+  end
+
+  def display_concluded_enrollments
+    update_display_preferences(true, false)
+  end
+
+  def display_inactive_enrollments
+    update_display_preferences(false, true)
+  end
 end

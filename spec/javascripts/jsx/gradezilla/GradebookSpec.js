@@ -26,6 +26,7 @@ import GradeCalculatorSpecHelper from 'spec/jsx/gradebook/GradeCalculatorSpecHel
 import SubmissionDetailsDialog from 'compiled/SubmissionDetailsDialog';
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator';
 import DataLoader from 'jsx/gradezilla/DataLoader';
+import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants';
 import Gradebook from 'compiled/gradezilla/Gradebook';
 
 const $fixtures = document.getElementById('fixtures');
@@ -662,8 +663,7 @@ test('only returns submissions due for the student in the selected grading perio
 QUnit.module('Gradebook#studentsUrl', {
   setupThis (options = {}) {
     return {
-      showConcludedEnrollments: false,
-      showInactiveEnrollments: false,
+      getEnrollmentFilters: this.stub().returns({ concluded: false, inactive: false }),
       ...options
     }
   },
@@ -679,14 +679,14 @@ test('enrollmentUrl returns "students_url"', function () {
 
 test('when concluded only, enrollmentUrl returns "students_with_concluded_enrollments_url"', function () {
   const self = this.setupThis({
-    showConcludedEnrollments: true
+    getEnrollmentFilters: this.stub().returns({ concluded: true, inactive: false })
   });
   equal(this.studentsUrl.call(self), 'students_with_concluded_enrollments_url');
 });
 
 test('when inactive only, enrollmentUrl returns "students_with_inactive_enrollments_url"', function () {
   const self = this.setupThis({
-    showInactiveEnrollments: true
+    getEnrollmentFilters: this.stub().returns({ concluded: false, inactive: true })
   });
   equal(this.studentsUrl.call(self), 'students_with_inactive_enrollments_url');
 });
@@ -694,8 +694,7 @@ test('when inactive only, enrollmentUrl returns "students_with_inactive_enrollme
 test('when show concluded and hide inactive are true, enrollmentUrl returns ' +
   '"students_with_concluded_and_inactive_enrollments_url"', function () {
   const self = this.setupThis({
-    showConcludedEnrollments: true,
-    showInactiveEnrollments: true
+    getEnrollmentFilters: this.stub().returns({ concluded: true, inactive: true })
   });
   equal(this.studentsUrl.call(self), 'students_with_concluded_and_inactive_enrollments_url');
 });
@@ -2504,3 +2503,84 @@ test('when no submission is found, it is not late', function () {
   equal(firstRow.id, '4', 'when late is true, order first');
   equal(secondRow.id, '3', 'when no submission is found, order second');
 })
+
+QUnit.module('Gradebook#getSelectedEnrollmentFilters', {
+  setup () {
+    fakeENV.setup({
+      GRADEBOOK_OPTIONS: { context_id: 10 },
+    });
+  },
+
+  teardown () {
+    fakeENV.teardown();
+  }
+});
+
+test('returns empty array when all settings are off', function () {
+  const gradebook = createGradebook({
+    settings: {
+      show_concluded_enrollments: false,
+      show_inactive_enrollments: false
+    }
+  });
+  equal(gradebook.getSelectedEnrollmentFilters().length, 0);
+});
+
+test('returns array including "concluded" when setting is on', function () {
+  const gradebook = createGradebook({
+    settings: {
+      show_concluded_enrollments: true,
+      show_inactive_enrollments: false
+    }
+  });
+
+  ok(gradebook.getSelectedEnrollmentFilters().includes('concluded'));
+  notOk(gradebook.getSelectedEnrollmentFilters().includes('inactive'));
+});
+
+test('returns array including "inactive" when setting is on', function () {
+  const gradebook = createGradebook({
+    settings: {
+      show_concluded_enrollments: false,
+      show_inactive_enrollments: true
+    }
+  });
+  ok(gradebook.getSelectedEnrollmentFilters().includes('inactive'));
+  notOk(gradebook.getSelectedEnrollmentFilters().includes('concluded'));
+});
+
+test('returns array including multiple values when settings are on', function () {
+  const gradebook = createGradebook({
+    settings: {
+      show_concluded_enrollments: true,
+      show_inactive_enrollments: true
+    }
+  });
+  ok(gradebook.getSelectedEnrollmentFilters().includes('inactive'));
+  ok(gradebook.getSelectedEnrollmentFilters().includes('concluded'));
+});
+
+QUnit.module('Gradebook#toggleEnrollmentFilter', {
+  setup () {
+    fakeENV.setup({
+      GRADEBOOK_OPTIONS: { context_id: 10 },
+    });
+  },
+
+  teardown () {
+    fakeENV.teardown();
+  }
+});
+
+test('changes the value of @getSelectedEnrollmentFilters', function () {
+  const gradebook = createGradebook();
+
+  for (let i = 0; i < 2; i++) {
+    StudentRowHeaderConstants.enrollmentFilterKeys.forEach((key) => {
+      const previousValue = gradebook.getSelectedEnrollmentFilters().includes(key);
+      gradebook.toggleEnrollmentFilter(key, true);
+      const newValue = gradebook.getSelectedEnrollmentFilters().includes(key);
+      notEqual(previousValue, newValue);
+    });
+  }
+});

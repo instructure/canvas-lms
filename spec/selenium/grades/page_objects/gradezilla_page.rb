@@ -7,6 +7,12 @@ module Gradezilla
     ASSIGNMENT_HEADER_MENU_SELECTOR = '.gradebook-header-drop'.freeze
     ASSIGNMENT_HEADER_MENU_ITEM_SELECTOR = 'ul.gradebook-header-menu li.ui-menu-item'.freeze
 
+    # Student Headings
+    STUDENT_COLUMN_MENU_SELECTOR = '.container_0 .Gradebook__ColumnHeaderAction'.freeze
+
+    # Menu Items
+    MENU_ITEM_SELECTOR = '[data-menu-item-id="%s"]'.freeze
+
     def ungradable_selector
       ".cannot_edit"
     end
@@ -27,6 +33,14 @@ module Gradezilla
 
     def student_names
       ff('#gradebook_grid .student-name').map(&:text)
+    end
+
+    def student_column_menu
+      f(STUDENT_COLUMN_MENU_SELECTOR)
+    end
+
+    def menu_item(name)
+      f(MENU_ITEM_SELECTOR % name)
     end
 
     def visit(course)
@@ -77,6 +91,14 @@ module Gradezilla
       else
         return false
       end
+    end
+
+    def open_student_column_menu
+      student_column_menu.click
+    end
+
+    def select_menu_item(name)
+      menu_item(name).click
     end
 
     private

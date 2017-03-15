@@ -30,11 +30,13 @@ function mountAndOpenOptions (props) {
 QUnit.module('StudentColumnHeader - base behavior', {
   setup () {
     const props = {
+      onToggleEnrollmentFilter () {},
+      selectedEnrollmentFilters: [],
       selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo,
       sectionsEnabled: true,
-      onSelectSecondaryInfo: this.stub(),
       selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo,
-      onSelectPrimaryInfo: this.stub(),
+      onSelectPrimaryInfo () {},
+      onSelectSecondaryInfo () {},
       sortBySetting: {
         direction: 'ascending',
         disabled: false,
@@ -80,11 +82,13 @@ test('renders a title for the More icon', function () {
 QUnit.module('StudentColumnHeader - secondaryInfoMenuGroup', {
   setup () {
     this.props = {
+      onToggleEnrollmentFilter () {},
+      selectedEnrollmentFilters: [],
       sectionsEnabled: true,
       selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo,
       onSelectSecondaryInfo: this.stub(),
       selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo,
-      onSelectPrimaryInfo: this.stub(),
+      onSelectPrimaryInfo () {},
       sortBySetting: {
         direction: 'ascending',
         disabled: false,
@@ -139,6 +143,8 @@ test('omits section when sectionsEnabled prop is false', function () {
 QUnit.module('StudentColumnHeader - Sort by Settings', {
   setup () {
     this.props = {
+      onToggleEnrollmentFilter () {},
+      selectedEnrollmentFilters: [],
       sectionsEnabled: true,
       selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo,
       onSelectSecondaryInfo: this.stub(),
@@ -292,9 +298,11 @@ test('uses default label when loginHandleName prop is falsy', function () {
 QUnit.module('StudentColumnHeader - primaryInfoMenuGroup', {
   setup () {
     this.props = {
+      onToggleEnrollmentFilter () {},
+      selectedEnrollmentFilters: [],
       sectionsEnabled: true,
       selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo,
-      onSelectSecondaryInfo: this.stub(),
+      onSelectSecondaryInfo () {},
       selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo,
       onSelectPrimaryInfo: this.stub(),
       sortBySetting: {
@@ -332,7 +340,7 @@ test('renders a MenuItem for each primary info option', function () {
   });
 });
 
-test('invokes prop onSelectSecondaryInfo when MenuItem is clicked', function () {
+test('invokes prop onSelectPrimaryInfo when MenuItem is clicked', function () {
   this.renderOutput = mount(<StudentColumnHeader {...this.props} />);
 
   StudentRowHeaderConstants.primaryInfoKeys.forEach((key) => {
@@ -342,5 +350,64 @@ test('invokes prop onSelectSecondaryInfo when MenuItem is clicked', function () 
     menuItem.click();
 
     equal(this.props.onSelectPrimaryInfo.lastCall.args[0], key);
+  });
+});
+
+QUnit.module('StudentColumnHeader - enrollmentFilterGroup', {
+  setup () {
+    this.props = {
+      onToggleEnrollmentFilter: this.stub(),
+      selectedEnrollmentFilters: [],
+      sectionsEnabled: true,
+      selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo,
+      onSelectSecondaryInfo () {},
+      selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo,
+      onSelectPrimaryInfo: this.stub(),
+      sortBySetting: {
+        direction: 'ascending',
+        disabled: false,
+        isSortColumn: true,
+        onSortBySortableNameAscending () {},
+        onSortBySortableNameDescending () {},
+        settingKey: 'sortable_name'
+      }
+    };
+  },
+
+  teardown () {
+    this.renderOutput.unmount();
+  }
+});
+
+test('renders a MenuItemGroup for enrollment filter options', function () {
+  this.renderOutput = mount(<StudentColumnHeader {...this.props} />);
+  this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  const menuItemGroup = document.querySelector('[data-menu-item-group-id="enrollment-filter"]');
+
+  ok(menuItemGroup);
+});
+
+test('renders a MenuItem for each enrollment filter option', function () {
+  this.renderOutput = mount(<StudentColumnHeader {...this.props} />);
+  this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  StudentRowHeaderConstants.enrollmentFilterKeys.forEach((key) => {
+    const menuItem = document.querySelector(`[data-menu-item-id="${key}"]`);
+    ok(menuItem);
+  });
+});
+
+test('invokes prop onToggleEnrollmentFilter when MenuItem is clicked', function () {
+  this.renderOutput = mount(<StudentColumnHeader {...this.props} />);
+  const onToggle = this.props.onToggleEnrollmentFilter;
+
+  StudentRowHeaderConstants.enrollmentFilterKeys.forEach((key) => {
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+    const menuItem = document.querySelector(`[data-menu-item-id="${key}"]`);
+
+    menuItem.click();
+
+    equal(onToggle.lastCall.args[0], key, `invocation arg matches clicked menu item ${key}`);
   });
 });

@@ -113,6 +113,9 @@ define [
         columnId: 'student' # the column controlling the sort
         settingKey: 'sortable_name' # the key describing the sort criteria
         direction: 'ascending' # the direction of the sort
+      showEnrollments:
+        concluded: false
+        inactive: false
     }
 
   ## Gradebook Application State
@@ -154,10 +157,10 @@ define [
       @userFilterRemovedRows = []
       # preferences serialization causes these to always come
       # from the database as strings
-      @showConcludedEnrollments = @options.course_is_concluded ||
-        @options.settings['show_concluded_enrollments'] == "true"
-      @showInactiveEnrollments =
-        @options.settings['show_inactive_enrollments'] == "true"
+      if @options.course_is_concluded || @options.settings.show_concluded_enrollments == true
+        @toggleEnrollmentFilter('concluded', true)
+      if @options.settings.show_inactive_enrollments == true
+        @toggleEnrollmentFilter('inactive', true)
       @gradingPeriods = GradingPeriodsApi.deserializePeriods(@options.active_grading_periods)
       if @options.grading_period_set
         @gradingPeriodSet = GradingPeriodSetsApi.deserializeSet(@options.grading_period_set)
@@ -1081,15 +1084,6 @@ define [
       @drawGradingPeriodSelectButton() if @gradingPeriodSet?
 
       $settingsMenu = $('.gradebook_dropdown')
-      showConcludedEnrollmentsEl = $settingsMenu.find("#show_concluded_enrollments")
-      showConcludedEnrollmentsEl.prop('checked', @showConcludedEnrollments).change (event) =>
-        @showConcludedEnrollments  = showConcludedEnrollmentsEl.is(':checked')
-        @saveSettings(@showInactiveEnrollments, @showConcludedEnrollments, -> window.location.reload())
-
-      showInactiveEnrollmentsEl = $settingsMenu.find("#show_inactive_enrollments")
-      showInactiveEnrollmentsEl.prop('checked', @showInactiveEnrollments).change (event) =>
-        @showInactiveEnrollments = showInactiveEnrollmentsEl.is(':checked')
-        @saveSettings(@showInactiveEnrollments, @showConcludedEnrollments, -> window.location.reload())
 
       includeUngradedAssignmentsEl = $settingsMenu.find("#include_ungraded_assignments")
       includeUngradedAssignmentsEl.prop('checked', @include_ungraded_assignments).change (event) =>
@@ -1719,11 +1713,11 @@ define [
 
     studentsUrl: ->
       switch
-        when @showConcludedEnrollments && @showInactiveEnrollments
+        when @getEnrollmentFilters().inactive && @getEnrollmentFilters().concluded
           'students_with_concluded_and_inactive_enrollments_url'
-        when @showConcludedEnrollments
+        when @getEnrollmentFilters().concluded
           'students_with_concluded_enrollments_url'
-        when @showInactiveEnrollments
+        when @getEnrollmentFilters().inactive
           'students_with_inactive_enrollments_url'
         else 'students_url'
 
@@ -1780,6 +1774,8 @@ define [
       onSelectSecondaryInfo: @setSelectedSecondaryInfo
       sectionsEnabled: @sections_enabled
       sortBySetting: @getStudentColumnSortBySetting()
+      selectedEnrollmentFilters: @getSelectedEnrollmentFilters()
+      onToggleEnrollmentFilter: @toggleEnrollmentFilter
 
     renderStudentColumnHeader: =>
       mountPoint = @getColumnHeaderNode('student')
@@ -2027,6 +2023,25 @@ define [
 
     getSortRowsBySetting: =>
       @gridDisplaySettings.sortRowsBy
+
+    toggleEnrollmentFilter: (enrollmentFilter, skipApply) =>
+      @getEnrollmentFilters()[enrollmentFilter] = !@getEnrollmentFilters()[enrollmentFilter]
+      @applyEnrollmentFilter() unless skipApply
+
+    applyEnrollmentFilter: () =>
+      showInactive = @getEnrollmentFilters().inactive
+      showConcluded = @getEnrollmentFilters().concluded
+      @saveSettings(showInactive, showConcluded, -> window.location.reload())
+
+    getEnrollmentFilters: () =>
+      @gridDisplaySettings.showEnrollments
+
+    getSelectedEnrollmentFilters: () =>
+      filters = @getEnrollmentFilters()
+      selectedFilters = []
+      for filter of filters
+        selectedFilters.push filter if filters[filter]
+      selectedFilters
 
     ## Gradebook Content Access Methods
 
