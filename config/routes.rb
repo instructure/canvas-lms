@@ -1907,6 +1907,8 @@ CanvasRails::Application.routes.draw do
       post 'courses/:course_id/blueprint_templates/:template_id/migrations', action: :queue_migration
       get 'courses/:course_id/blueprint_templates/:template_id/migrations', action: :migrations_index, as: :course_blueprint_migrations
       get 'courses/:course_id/blueprint_templates/:template_id/migrations/:id', action: :migrations_show
+
+      put 'courses/:course_id/blueprint_templates/:template_id/restrict_item', action: :restrict_item
     end
   end
 

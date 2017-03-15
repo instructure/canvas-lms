@@ -39,7 +39,7 @@ describe MasterCourses::MasterContentTag do
     end
 
     it "should not touch when the tag has restrictions loosened" do
-      tag = @template.create_content_tag_for!(@topic, :restrictions => {:settings => true})
+      tag = @template.create_content_tag_for!(@topic, :restrictions => {:content => true, :settings => true})
       tag.update_attribute(:restrictions, {:lock_settings => false})
       expect(@topic.reload.updated_at.to_i).to eq @time.to_i
     end

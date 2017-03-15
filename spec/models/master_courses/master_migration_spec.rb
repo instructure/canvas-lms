@@ -292,56 +292,6 @@ describe MasterCourses::MasterMigration do
       end
     end
 
-    it "should create master content tags with default restrictions on export" do
-      @copy_to = course_factory
-      @sub = @template.add_child_course!(@copy_to)
-
-      restrictions = {:content => true, :settings => false}
-      @template.default_restrictions = restrictions
-      @template.save!
-
-      att = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
-      Attachment.where(:id => att).update_all(:updated_at => 5.seconds.ago)
-
-      run_master_migration
-
-      att_tag = @template.master_content_tags.polymorphic_where(:content => att).first
-      expect(att_tag.restrictions).to eq restrictions
-      att_tag.update_attribute(:restrictions, {}) # unset them
-
-      page = @copy_from.wiki.wiki_pages.create!(:title => "another title")
-
-      run_master_migration
-      page_tag = @template.master_content_tags.polymorphic_where(:content => page).first
-      expect(page_tag.restrictions).to eq restrictions
-      expect(att_tag.reload.restrictions).to be_blank # should have left the old one alone
-    end
-
-    it "should not overwrite with default restrictions on export" do
-      @copy_to = course_factory
-      @sub = @template.add_child_course!(@copy_to)
-
-      restrictions = {:content => true, :settings => false}
-      @template.default_restrictions = restrictions
-      @template.save!
-
-      att = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
-      Attachment.where(:id => att).update_all(:updated_at => 5.seconds.ago)
-
-      run_master_migration
-
-      att_tag = @template.master_content_tags.polymorphic_where(:content => att).first
-      expect(att_tag.restrictions).to eq restrictions
-      att_tag.update_attribute(:restrictions, {}) # unset them
-
-      page = @copy_from.wiki.wiki_pages.create!(:title => "another title")
-
-      run_master_migration
-      page_tag = @template.master_content_tags.polymorphic_where(:content => page).first
-      expect(page_tag.restrictions).to eq restrictions
-      expect(att_tag.reload.restrictions).to be_blank # should have left the old one alone
-    end
-
     it "should create two exports (one selective and one full) if needed" do
       @copy_to1 = course_factory
       @template.add_child_course!(@copy_to1)

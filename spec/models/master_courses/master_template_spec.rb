@@ -112,6 +112,21 @@ describe MasterCourses::MasterTemplate do
     end
   end
 
+  describe "default restriction syncing" do
+    it "should keep content tag restrictiosn up to date" do
+      @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      tag1 = @template.create_content_tag_for!(@course.discussion_topics.create!)
+      tag2 = @template.create_content_tag_for!(@course.discussion_topics.create!)
+      old_default = tag2.restrictions
+      tag2.update_attributes(:use_default_restrictions => false) # unlink
+
+      new_default = {:content => true, :points => true}
+      @template.update_attribute(:default_restrictions, new_default)
+      expect(tag1.reload.restrictions).to eq new_default
+      expect(tag2.reload.restrictions).to eq old_default
+    end
+  end
+
   describe "child subscriptions" do
     it "should be able to add other courses as 'child' courses" do
       template = MasterCourses::MasterTemplate.set_as_master_course(@course)

@@ -2146,6 +2146,13 @@ class CoursesController < ApplicationController
   #   If this option is set to true, the course image url and course image
   #   ID are both set to nil
   #
+  # @argument course[blueprint] [Boolean]
+  #   Sets the course as a blueprint course. NOTE: The Blueprint Courses feature is in beta
+  #
+  # @argument course[blueprint_restrictions] [BlueprintRestriction]
+  #   Sets a default set to apply to blueprint course objects when restricted.
+  #   See the {api:Blueprint_Templates:BlueprintRestriction Blueprint Restriction} documentation
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
   #     -X PUT \
@@ -2306,8 +2313,8 @@ class CoursesController < ApplicationController
       params_for_update[:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
 
-      if params[:course].has_key?(:master_course)
-        master_course = value_to_boolean(params[:course].delete(:master_course))
+      if params[:course].has_key?(:blueprint)
+        master_course = value_to_boolean(params[:course].delete(:blueprint))
         if master_course != MasterCourses::MasterTemplate.is_master_course?(@course)
           return unless authorized_action(@course.account, @current_user, :manage_master_courses)
           message = master_course && why_cant_i_enable_master_course(@course)
@@ -2316,6 +2323,20 @@ class CoursesController < ApplicationController
           else
             action = master_course ? "set" : "remove"
             MasterCourses::MasterTemplate.send("#{action}_as_master_course", @course)
+          end
+        end
+      end
+      if (mc_restrictions = params[:course][:blueprint_restrictions]) && MasterCourses::MasterTemplate.is_master_course?(@course)
+        return unless authorized_action(@course.account, @current_user, :manage_master_courses)
+        template = MasterCourses::MasterTemplate.full_template_for(@course)
+        restrictions = Hash[mc_restrictions.map{|k, v| [k.to_sym, value_to_boolean(v)]}]
+        if restrictions.has_key?(:content) && !restrictions[:content]
+          @course.errors.add(:master_course_restrictions, t("Content must be restricted"))
+        else
+          restrictions[:content] = true # just default it because whatevs
+          template.default_restrictions = restrictions
+          unless template.save
+            @course.errors.add(:master_course_restrictions, t("Invalid restrictions"))
           end
         end
       end

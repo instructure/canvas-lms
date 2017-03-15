@@ -78,6 +78,34 @@
 #     }
 #   }
 #
+# @model BlueprintRestriction
+#   {
+#     "id" : "BlueprintRestriction",
+#     "description" : "A set of restrictions on editing for copied objects in associated courses",
+#     "properties": {
+#       "content": {
+#         "description": "Restriction on main content (e.g. title, description). Required to be true",
+#         "example": true,
+#         "type": "boolean"
+#       },
+#       "points": {
+#         "description": "Restriction on points possible for assignments and graded learning objects",
+#         "example": true,
+#         "type": "boolean"
+#       },
+#       "due_dates": {
+#         "description": "Restriction on due dates for assignments and graded learning objects",
+#         "example": false,
+#         "type": "boolean"
+#       },
+#       "availability_dates": {
+#         "description": "Restriction on availability dates for an object",
+#         "example": true,
+#         "type": "boolean"
+#       }
+#     }
+#   }
+#
 class MasterCourses::MasterTemplatesController < ApplicationController
   before_action :require_master_courses
   before_action :get_template
@@ -231,6 +259,65 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def migrations_show
     migration = @template.master_migrations.find(params[:id])
     render :json => master_migration_json(migration, @current_user, session)
+  end
+
+  # @API Set or remove restrictions on a blueprint course object
+  #
+  # If a blueprint course object is restricted, editing will be limited for copies in associated courses.
+  #
+  # @argument content_type [String, "assignment"|"attachment"|"discussion_topic"|"external_tool"|"quiz"|"wiki_page"]
+  #   The type of the object.
+  #
+  # @argument content_id [Integer]
+  #   The ID of the object.
+  #
+  # @argument restricted [Boolean]
+  #   Whether to apply restrictions.
+  #
+  # @argument restrictions [BlueprintRestriction]
+  #   (Optional) If the object is restricted, this specifies a set of restrictions. If not specified,
+  #   the course-level restrictions will be used. See {api:CoursesController#update Course API update documentation}
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/1/blueprint_templates/default/restrict_item \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  def restrict_item
+    content_type = params[:content_type]
+    unless %w{assignment attachment discussion_topic external_tool quiz wiki_page}.include?(content_type)
+      return render :json => {:message => "Cannot queue a migration while one is currently running"}, :status => :bad_request
+    end
+    unless params.has_key?(:restricted)
+      return render :json => {:message => "Must set 'restricted'"}, :status => :bad_request
+    end
+
+    scope =
+      case content_type
+      when 'wiki_page'
+        @course.wiki.wiki_pages.not_deleted
+      when 'external_tool'
+        @course.context_external_tools.active
+      when 'attachment'
+        @course.attachments.not_deleted
+      else
+        @course.send(content_type.pluralize).where.not(:workflow_state => 'deleted')
+      end
+    item = scope.find(params[:content_id])
+    mc_tag = @template.content_tag_for(item)
+    if value_to_boolean(params[:restricted])
+      custom_restrictions = params[:restrictions] && Hash[params[:restrictions].map{|k, v| [k.to_sym, value_to_boolean(v)]}]
+      mc_tag.restrictions = custom_restrictions || @template.default_restrictions
+      mc_tag.use_default_restrictions = !custom_restrictions
+    else
+      mc_tag.restrictions = {}
+      mc_tag.use_default_restrictions = false
+    end
+    mc_tag.save if mc_tag.changed?
+    if mc_tag.valid?
+      render :json => {:success => true}
+    else
+      render :json => mc_tag.errors, :status => :bad_request
+    end
   end
 
   protected
