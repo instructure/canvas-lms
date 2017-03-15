@@ -29,6 +29,7 @@ module.exports = {
     "import/named": [2],
     "import/no-unresolved": [0],
     "import/no-webpack-loader-syntax": [0],
+    "import/no-commonjs": [2]
 
     "import/extensions": [1, { "js": "never", "jsx": "never", "json": "always" }],
     "promise/avoid-new": [0],
