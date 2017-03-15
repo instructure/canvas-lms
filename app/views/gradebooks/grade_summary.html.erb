@@ -186,27 +186,27 @@
       <td class="assignment_score" title="<%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>">
         <div style="position: relative; height: 100%;" class="score_holder">
           <span class="tooltip">
-            <span class="tooltip_wrap right">
-              <% if @presenter.editable? || assignment.special_class %>
-                <span class="tooltip_text score_teaser">
-                  <% if assignment.muted? %>
-                    <%= t(:student_mute_notification, "Instructor is working on grades") %>
-                  <% elsif submission.try :pending_review? %>
-                    <%= t(:grading_in_progress, "Instructor is working on grades") %>
-                  <% elsif assignment.special_class %>
-                    <%= t(:total, "Total") %>
-                  <% else %>
-                    <%= t(:click_to_change, "Click to test a different score") %>
-                  <% end %>
-                </span>
-              <% end %>
-            </span>
             <span
               class="grade"
               <% unless assignment_presenter.unchangeable? %>
                 tabindex="0"
               <% end %>
             >
+              <span class="tooltip_wrap right" aria-hidden="true">
+                <% if @presenter.editable? || assignment.special_class %>
+                  <span class="tooltip_text score_teaser">
+                    <% if assignment.muted? %>
+                      <%= t(:student_mute_notification, "Instructor is working on grades") %>
+                    <% elsif submission.try :pending_review? %>
+                      <%= t(:grading_in_progress, "Instructor is working on grades") %>
+                    <% elsif assignment.special_class %>
+                      <%= t(:total, "Total") %>
+                    <% else %>
+                      <%= t(:click_to_change, "Click to test a different score") %>
+                    <% end %>
+                  </span>
+                <% end %>
+              </span>
               <% if assignment.muted? %>
                 <i class="icon-muted" title="<%= t("#gradebooks.grade.muted", "Muted") %>"></i>
               <% else %>
