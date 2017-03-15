@@ -298,7 +298,7 @@
           tabindex='-1'
           style='visibility: hidden;'
         <% end %>
-          title="<%= t('View Scoring Details') %>">
+        >
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t("See scoring details") %></span>
           </span>
@@ -310,7 +310,6 @@
           aria-expanded='false'
           aria-controls="rubric_<%= assignment.id %>"
           tabindex='0'
-          title="<%= t('View Rubric Evaluation') %>"
           style="<%= 'visibility: hidden;' unless assignment_presenter.has_rubric_assessments? %>">
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t("See rubric results") %></span>
