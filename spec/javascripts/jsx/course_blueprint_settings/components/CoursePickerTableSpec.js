@@ -70,4 +70,41 @@ define([
     equal(props.onSelectedChanged.callCount, 1)
     deepEqual(props.onSelectedChanged.getCall(0).args[0], { 1: true, 2: true })
   })
+
+  test('handleFocusLoss focuses the next item', (assert) => {
+    const props = defaultProps()
+    const tree = enzyme.mount(<CoursePickerTable {...props} />)
+    const instance = tree.instance()
+
+    const check = tree.find('.bps-table__course-row input[type="checkbox"]').get(0)
+    check.focus = sinon.spy()
+
+    instance.handleFocusLoss(0)
+    equal(check.focus.callCount, 1)
+  })
+
+  test('handleFocusLoss focuses the previous item if called on the last item', () => {
+    const props = defaultProps()
+    const tree = enzyme.mount(<CoursePickerTable {...props} />)
+    const instance = tree.instance()
+
+    const check = tree.find('.bps-table__course-row input[type="checkbox"]').get(1)
+    check.focus = sinon.spy()
+
+    instance.handleFocusLoss(2)
+    equal(check.focus.callCount, 1)
+  })
+
+  test('handleFocusLoss focuses on select all if no items left', () => {
+    const props = defaultProps()
+    props.courses = []
+    const tree = enzyme.mount(<CoursePickerTable {...props} />)
+    const instance = tree.instance()
+
+    const check = tree.find('.bps-table__select-all input[type="checkbox"]').get(0)
+    check.focus = sinon.spy()
+
+    instance.handleFocusLoss(1)
+    equal(check.focus.callCount, 1)
+  })
 })

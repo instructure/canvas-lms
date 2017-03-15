@@ -41,7 +41,8 @@ export default class CoursePickerTable extends React.Component {
     onSelectToggle = (e) => {
       const selected = this.state.selected
       selected[e.target.value] = e.target.checked
-      const course = this.props.courses.find(c => c.id === e.target.value)
+      const index = this.props.courses.findIndex(c => c.id === e.target.value)
+      const course = this.props.courses[index]
       const srMsg = e.target.checked
                   ? I18n.t('Selected course %{course}', { course: course.name })
                   : I18n.t('Unselected course %{course}', { course: course.name })
@@ -49,6 +50,10 @@ export default class CoursePickerTable extends React.Component {
       this.setState({ selected, selectedAll: false }, () => {
         this.props.onSelectedChanged(this.state.selected)
       })
+
+      setTimeout(() => {
+        this.handleFocusLoss(index)
+      }, 0)
     }
 
     onSelectAllToggle = (e) => {
@@ -65,6 +70,16 @@ export default class CoursePickerTable extends React.Component {
       }, () => {
         this.props.onSelectedChanged(this.state.selected)
       })
+    }
+
+    handleFocusLoss (index) {
+      if (this.props.courses.length === 0) {
+        this.selectAllCheckbox.focus()
+      } else if (index >= this.props.courses.length) {
+        this.handleFocusLoss(index - 1)
+      } else {
+        this.tableBody.querySelectorAll('.bps-table__course-row input[type="checkbox"]')[index].focus()
+      }
     }
 
     renderColGroup () {
@@ -100,7 +115,7 @@ export default class CoursePickerTable extends React.Component {
     }
 
     renderRows () {
-      return this.props.courses.map(course =>
+      return this.props.courses.map((course, index) =>
         <tr key={course.id} className="bps-table__course-row">
           <td>
             <Checkbox
@@ -156,6 +171,7 @@ export default class CoursePickerTable extends React.Component {
               onChange={this.onSelectAllToggle}
               value="all"
               checked={this.state.selectedAll}
+              ref={(c) => { this.selectAllCheckbox = c }}
               label={
                 <Typography size="small">
                   {I18n.t({ one: 'Select (%{count}) Course', other: 'Select All (%{count}) Courses' },
@@ -179,7 +195,7 @@ export default class CoursePickerTable extends React.Component {
               <ScreenReaderContent as="thead">
                 {this.renderHeaders()}
               </ScreenReaderContent>
-              <tbody className="bps-table__body">
+              <tbody className="bps-table__body" ref={(c) => { this.tableBody = c }}>
                 {this.renderBodyContent()}
               </tbody>
             </Table>
