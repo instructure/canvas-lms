@@ -18,7 +18,7 @@
 
 import React from 'react'
 import IconMoreSolid from 'instructure-icons/react/Solid/IconMoreSolid'
-import { MenuItem, MenuItemGroup } from 'instructure-ui/Menu'
+import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/Menu'
 import PopoverMenu from 'instructure-ui/PopoverMenu'
 import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
 import Typography from 'instructure-ui/Typography'
@@ -29,6 +29,8 @@ const { bool, func, oneOf } = React.PropTypes;
 
 export default class StudentColumnHeader extends React.Component {
   static propTypes = {
+    selectedPrimaryInfo: oneOf(StudentRowHeaderConstants.primaryInfoKeys).isRequired,
+    onSelectPrimaryInfo: func.isRequired,
     selectedSecondaryInfo: oneOf(StudentRowHeaderConstants.secondaryInfoKeys).isRequired,
     sectionsEnabled: bool.isRequired,
     onSelectSecondaryInfo: func.isRequired
@@ -41,10 +43,18 @@ export default class StudentColumnHeader extends React.Component {
     this.onHideSecondaryInfo = this.onSelectSecondaryInfo.bind(this, 'none');
     this.onShowSisId = this.onSelectSecondaryInfo.bind(this, 'sis_id');
     this.onShowLoginId = this.onSelectSecondaryInfo.bind(this, 'login_id');
+
+    this.onShowFirstLastNames = this.onSelectPrimaryInfo.bind(this, 'first_last');
+    this.onShowLastFirstNames = this.onSelectPrimaryInfo.bind(this, 'last_first');
+    this.onHideStudentNames = this.onSelectPrimaryInfo.bind(this, 'anonymous');
   }
 
   onSelectSecondaryInfo (secondaryInfoKey) {
     this.props.onSelectSecondaryInfo(secondaryInfoKey);
+  }
+
+  onSelectPrimaryInfo (primaryInfoKey) {
+    this.props.onSelectPrimaryInfo(primaryInfoKey);
   }
 
   render () {
@@ -66,6 +76,34 @@ export default class StudentColumnHeader extends React.Component {
             </span>
           }
         >
+
+          <MenuItemGroup label={I18n.t('Display as')} data-menu-item-group-id="primary-info">
+            <MenuItem
+              key="first_last"
+              data-menu-item-id="first_last"
+              selected={this.props.selectedPrimaryInfo === 'first_last'}
+              onSelect={this.onShowFirstLastNames}
+            >
+              {StudentRowHeaderConstants.primaryInfoLabels.first_last}
+            </MenuItem>
+            <MenuItem
+              key="last_first"
+              data-menu-item-id="last_first"
+              selected={this.props.selectedPrimaryInfo === 'last_first'}
+              onSelect={this.onShowLastFirstNames}
+            >
+              {StudentRowHeaderConstants.primaryInfoLabels.last_first}
+            </MenuItem>
+            <MenuItem
+              key="anonymous"
+              data-menu-item-id="anonymous"
+              selected={this.props.selectedPrimaryInfo === 'anonymous'}
+              onSelect={this.onHideStudentNames}
+            >
+              {StudentRowHeaderConstants.primaryInfoLabels.anonymous}
+            </MenuItem>
+          </MenuItemGroup>
+          <MenuItemSeparator />
           <MenuItemGroup label={I18n.t('Secondary info')} data-menu-item-group-id="secondary-info">
             {
               this.props.sectionsEnabled &&

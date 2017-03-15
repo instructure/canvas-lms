@@ -1359,8 +1359,10 @@ test('includes properties from gradebook', function () {
   const gradebook = createGradebook();
   const props = gradebook.getStudentColumnHeaderProps();
   ok(props.selectedSecondaryInfo, 'selectedSecondaryInfo is present');
+  ok(props.selectedPrimaryInfo, 'selectedPrimaryInfo is present');
   equal(typeof props.sectionsEnabled, 'boolean');
   equal(typeof props.onSelectSecondaryInfo, 'function');
+  equal(typeof props.onSelectPrimaryInfo, 'function');
 });
 
 QUnit.module('Gradebook#renderAssignmentColumnHeader', {
@@ -1721,6 +1723,7 @@ QUnit.module('Gradebook#setStudentDisplay', {
   createStudent () {
     return {
       name: 'test student',
+      sortable_name: 'student, test',
       sections: ['1000'],
       sis_user_id: 'sis_user_id',
       login_id: 'canvas_login_id',
@@ -1788,6 +1791,37 @@ test('when secondaryInfo is set as "none", sets display_name without other value
   notOk(student.display_name.includes(student.sections[0]));
   notOk(student.display_name.includes(student.sis_user_id));
   notOk(student.display_name.includes(student.login_id));
+});
+
+test('when primaryInfo is set as "first_last", sets display_name with student name', function () {
+  const gradebook = this.createGradebook();
+  const student = this.createStudent();
+
+  gradebook.setSelectedPrimaryInfo('first_last', true);
+  gradebook.setStudentDisplay(student);
+
+  ok(student.display_name.includes(student.name));
+});
+
+test('when primaryInfo is set as "last_first", sets display_name with student sortable_name', function () {
+  const gradebook = this.createGradebook();
+  const student = this.createStudent();
+
+  gradebook.setSelectedPrimaryInfo('last_first', true);
+  gradebook.setStudentDisplay(student);
+
+  ok(student.display_name.includes(student.sortable_name));
+});
+
+test('when primaryInfo is set as "anonymous", sets display_name without other values', function () {
+  const gradebook = this.createGradebook();
+  const student = this.createStudent();
+
+  gradebook.setSelectedPrimaryInfo('anonymous', true);
+  gradebook.setStudentDisplay(student);
+
+  notOk(student.display_name.includes(student.name));
+  notOk(student.display_name.includes(student.sortable_name));
 });
 
 QUnit.module('Gradebook#setSortRowsBySetting');

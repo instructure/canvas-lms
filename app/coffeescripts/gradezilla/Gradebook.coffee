@@ -106,6 +106,7 @@ define [
   ## Non-Persistent Gradebook Display Settings
   getInitialGridDisplaySettings = ->
     {
+      selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo
       selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo
       sortRowsBy:
         columnId: 'student_name' # the column controlling the sort
@@ -620,7 +621,7 @@ define [
         sectionNames = $.toSentence(mySections.sort())
 
       options =
-        useSortableName: @options.list_students_by_sortable_name_enabled
+        selectedPrimaryInfo: @getSelectedPrimaryInfo()
         selectedSecondaryInfo: @getSelectedSecondaryInfo()
         sectionNames: sectionNames
         courseId: ENV.GRADEBOOK_OPTIONS.context_id
@@ -1722,6 +1723,8 @@ define [
     # Student Column Header
 
     getStudentColumnHeaderProps: ->
+      selectedPrimaryInfo: @getSelectedPrimaryInfo()
+      onSelectPrimaryInfo: @setSelectedPrimaryInfo
       selectedSecondaryInfo: @getSelectedSecondaryInfo()
       onSelectSecondaryInfo: @setSelectedSecondaryInfo
       sectionsEnabled: @sections_enabled
@@ -1887,7 +1890,14 @@ define [
     setSubmissionsLoaded: (loaded) =>
       @contentLoadStates.submissionsLoaded = loaded
 
-    ## Grid Display Setting Methods
+    setSelectedPrimaryInfo: (primaryInfo, skipRedraw) =>
+      @gridDisplaySettings.selectedPrimaryInfo = primaryInfo
+      unless skipRedraw
+        @buildRows()
+        @renderStudentColumnHeader()
+
+    getSelectedPrimaryInfo: () =>
+      @gridDisplaySettings.selectedPrimaryInfo
 
     setSelectedSecondaryInfo: (secondaryInfo, skipRedraw) =>
       @gridDisplaySettings.selectedSecondaryInfo = secondaryInfo

@@ -26,7 +26,9 @@ QUnit.module('StudentColumnHeader - base behavior', {
     const props = {
       selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo,
       sectionsEnabled: true,
-      onSelectSecondaryInfo: this.stub()
+      onSelectSecondaryInfo: this.stub(),
+      selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo,
+      onSelectPrimaryInfo: this.stub()
     };
 
     this.renderOutput = mount(<StudentColumnHeader {...props} />);
@@ -66,7 +68,9 @@ QUnit.module('StudentColumnHeader - secondaryInfoMenuGroup', {
     this.props = {
       sectionsEnabled: true,
       selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo,
-      onSelectSecondaryInfo: this.stub()
+      onSelectSecondaryInfo: this.stub(),
+      selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo,
+      onSelectPrimaryInfo: this.stub()
     };
   },
 
@@ -116,4 +120,52 @@ test('omits section when sectionsEnabled prop is false', function () {
   const menuItem = document.querySelector('[data-menu-item-id="section"]');
 
   notOk(menuItem);
+});
+
+QUnit.module('StudentColumnHeader - primaryInfoMenuGroup', {
+  setup () {
+    this.props = {
+      sectionsEnabled: true,
+      selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo,
+      onSelectSecondaryInfo: this.stub(),
+      selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo,
+      onSelectPrimaryInfo: this.stub()
+    };
+  },
+
+  teardown () {
+    this.renderOutput.unmount();
+  }
+});
+
+test('renders a MenuItemGroup for primary info options', function () {
+  this.renderOutput = mount(<StudentColumnHeader {...this.props} />);
+  this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  const menuItemGroup = document.querySelector('[data-menu-item-group-id="primary-info"]');
+
+  ok(menuItemGroup);
+});
+
+test('renders a MenuItem for each primary info option', function () {
+  this.renderOutput = mount(<StudentColumnHeader {...this.props} />);
+  this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  StudentRowHeaderConstants.primaryInfoKeys.forEach((key) => {
+    const menuItem = document.querySelector(`[data-menu-item-id="${key}"]`);
+    ok(menuItem, `menu item ${key} is present`);
+  });
+});
+
+test('invokes prop onSelectSecondaryInfo when MenuItem is clicked', function () {
+  this.renderOutput = mount(<StudentColumnHeader {...this.props} />);
+
+  StudentRowHeaderConstants.primaryInfoKeys.forEach((key) => {
+    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+    const menuItem = document.querySelector(`[data-menu-item-id="${key}"]`);
+
+    menuItem.click();
+
+    equal(this.props.onSelectPrimaryInfo.lastCall.args[0], key);
+  });
 });
