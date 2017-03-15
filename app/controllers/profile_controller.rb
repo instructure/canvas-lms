@@ -210,7 +210,10 @@ class ProfileController < ApplicationController
     @active_tab = "profile_settings"
     respond_to do |format|
       format.html do
+        show_tutorial_ff_to_user = @domain_root_account&.feature_enabled?(:new_user_tutorial) &&
+                                   @user.participating_instructor_course_ids.any?
         add_crumb(t(:crumb, "%{user}'s settings", :user => @user.short_name), settings_profile_path )
+        js_env(:NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT => show_tutorial_ff_to_user)
         render :profile
       end
       format.json do

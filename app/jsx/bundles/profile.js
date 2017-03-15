@@ -5,5 +5,10 @@ import 'user_sortable_name'
 import 'communication_channels'
 import 'compiled/profile/confirmEmail'
 
-const view = new FeatureFlagAdminView({el: '.feature-flag-wrapper'})
+const hiddenFlags = [];
+if (!ENV.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT) {
+  hiddenFlags.push('new_user_tutorial_on_off')
+}
+
+const view = new FeatureFlagAdminView({el: '.feature-flag-wrapper', hiddenFlags})
 view.collection.fetchAll()
