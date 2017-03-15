@@ -20,6 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!course_nickname_edit'
+import TextInput from 'instructure-ui/lib/components/TextInput'
 
   var CourseNicknameEdit = React.createClass({
 
@@ -87,22 +88,16 @@ import I18n from 'i18n!course_nickname_edit'
 
     render () {
       return (
-        <div className='ic-Form-control'>
-          <label htmlFor='NicknameInput' className='ic-Label'>
-            {I18n.t('Nickname:')}
-          </label>
-          <input
-            id="NicknameInput"
-            type="text"
-            ref={(c) => { this.nicknameInput = c; }}
-            className="ic-Input"
-            maxLength="59"
-            placeholder={this.props.nicknameInfo.originalName}
-            value={this.state.nickname}
-            onChange={this.handleChange}
-            onKeyPress={this.onKeyPress}
-          />
-        </div>
+        <TextInput
+          id="NicknameInput"
+          label={ I18n.t('Nickname') }
+          placeholder={this.props.nicknameInfo.originalName}
+          value={this.state.nickname}
+          onChange={this.handleChange}
+          onKeyPress={this.onKeyPress}
+          inputRef={(c) => { this.nicknameInput = c }}
+          size="small"
+        />
       );
     }
 

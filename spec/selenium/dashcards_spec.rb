@@ -198,7 +198,7 @@ describe 'dashcards' do
           wait_for_ajaximations
         end
 
-        f('.ColorPicker__Container .Button--primary').click
+        f('.ColorPicker__Container #ColorPicker__Apply').click
         rgb = convert_hex_to_rgb_color(new_color)
         get '/'
         hero = f('.ic-DashboardCard__header_hero')
@@ -213,7 +213,7 @@ describe 'dashcards' do
 
         hex = random_hex_color
         replace_content(f("#ColorPickerCustomInput-#{@course1.asset_string}"), hex)
-        f('.ColorPicker__Container .Button--primary').click
+        f('.ColorPicker__Container #ColorPicker__Apply').click
         wait_for_ajaximations
         get '/'
         expect(f('.ic-DashboardCard__header-title')).to include_text(@course1.name)
@@ -248,7 +248,7 @@ describe 'dashcards' do
           wait_for_ajaximations
         end
 
-        f('.ColorPicker__Container .Button--primary').click
+        f('.ColorPicker__Container #ColorPicker__Apply').click
         rgb = convert_hex_to_rgb_color(new_color)
         hero = f('.ic-DashboardCard__header_hero')
         expect(hero).to have_attribute("style", rgb)
@@ -264,7 +264,7 @@ describe 'dashcards' do
         hex = random_hex_color
         expect(f('.ColorPicker__Container')).to be_displayed
         replace_content(f("#ColorPickerCustomInput-#{@course.asset_string}"), hex)
-        f('.ColorPicker__Container .Button--primary').click
+        f('.ColorPicker__Container #ColorPicker__Apply').click
         hero = f('.ic-DashboardCard__header_hero')
         if hero.attribute(:style).include?('rgb')
           rgb = convert_hex_to_rgb_color(hex)
@@ -276,7 +276,7 @@ describe 'dashcards' do
 
       it 'sets course nickname' do
         replace_content(fj('#NicknameInput'), 'course nickname!')
-        f('.ColorPicker__Container .Button--primary').click
+        f('.ColorPicker__Container #ColorPicker__Apply').click
         wait_for_ajaximations
         expect(f('.ic-DashboardCard__header-title').text).to include 'course nickname!'
         expect(@student.reload.course_nickname(@course)).to eq 'course nickname!'
@@ -293,7 +293,7 @@ describe 'dashcards' do
       it 'sets both dashcard color and course nickname at once' do
         replace_content(fj('#NicknameInput'), 'course nickname frd!')
         replace_content(fj("#ColorPickerCustomInput-#{@course.asset_string}"), '#000000')
-        f('.ColorPicker__Container .Button--primary').click
+        f('.ColorPicker__Container #ColorPicker__Apply').click
         wait_for_ajaximations
         expect(@student.reload.course_nickname(@course)).to eq 'course nickname frd!'
         expect(@student.custom_colors[@course.asset_string]).to eq '#000000'

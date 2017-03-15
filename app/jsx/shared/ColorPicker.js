@@ -21,6 +21,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import ReactModal from 'react-modal'
+import Button from 'instructure-ui/lib/components/Button'
+import TextInput from 'instructure-ui/lib/components/TextInput'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import I18n from 'i18n!calendar_color_picker'
 import CourseNicknameEdit from 'jsx/shared/CourseNicknameEdit'
 import classnames from 'classnames'
@@ -72,11 +75,11 @@ import 'compiled/jquery.rails_flash_notifications'
       afterUpdateColor: PropTypes.func,
       afterClose: PropTypes.func,
       assetString: (props, propName, componentName) => {
-        if (props.parentComponent === 'DashboardColorPicker' && props[propName] == null) {
+        if (props.parentComponent === 'DashboardCardMenu' && props[propName] == null) {
           return new Error(
             `Invalid prop '${propName}' supplied to '${componentName}'. ` +
             `Prop '${propName}' must be present when 'parentComponent' ` +
-            "is 'DashboardColorPicker'. Vaidation failed."
+            "is 'DashboardCardMenu'. Vaidation failed."
           );
         }
         return undefined;
@@ -93,7 +96,8 @@ import 'compiled/jquery.rails_flash_notifications'
       withBoxShadow: PropTypes.bool,
       withDarkCheck: PropTypes.bool,
       setStatusColor: PropTypes.func,
-      allowWhite: PropTypes.bool
+      allowWhite: PropTypes.bool,
+      focusOnMount: PropTypes.bool
     },
 
     // ===============
@@ -119,12 +123,15 @@ import 'compiled/jquery.rails_flash_notifications'
         withDarkCheck: false,
         colors: PREDEFINED_COLORS,
         setStatusColor: () => {},
-        allowWhite: false
+        allowWhite: false,
+        focusOnMount: true
       }
     },
 
     componentDidMount () {
-      this.setFocus();
+      if (this.props.focusOnMount) {
+        this.setFocus();
+      }
 
       if (this.props.hideOnScroll) {
         $(window).on('scroll', this.closeModal);
@@ -294,8 +301,7 @@ import 'compiled/jquery.rails_flash_notifications'
         var ref = "colorSwatch" + idx;
         const colorBlockStyles = classnames({
           ColorPicker__ColorBlock: true,
-          'with-dark-check': this.props.withDarkCheck,
-          white: color.hexcode === '#FFFFFF'
+          'with-dark-check': this.props.withDarkCheck
         })
         return (
           <button className = {colorBlockStyles}
@@ -307,6 +313,11 @@ import 'compiled/jquery.rails_flash_notifications'
                   onClick = {this.setCurrentColor.bind(null, color.hexcode)}
                   key={color.hexcode}
           >
+            { color.hexcode === '#FFFFFF' &&
+              <svg className="ColorPicker__ColorBlock-line">
+                <line x1="100%" y1="0" x2="0" y2="100%" />
+              </svg>
+            }
             {this.checkMarkIfMatchingColor(color.hexcode)}
             <span className="screenreader-only">{title}</span>
           </button>
@@ -343,7 +354,6 @@ import 'compiled/jquery.rails_flash_notifications'
 
       var inputColorStyle = {
         color: previewColor,
-        borderColor: '#d6d6d6',
         backgroundColor: previewColor
       };
 
@@ -363,12 +373,6 @@ import 'compiled/jquery.rails_flash_notifications'
     },
 
     pickerBody () {
-      const inputClasses = classnames({
-        'ic-Input': true,
-        'ColorPicker__CustomInput': true,
-        'ic-Input--has-warning': !this.isValidHex(this.state.currentColor)
-      });
-
       const containerClasses = classnames({
         ColorPicker__Container: true,
         'with-animation': this.props.withAnimation,
@@ -389,34 +393,38 @@ import 'compiled/jquery.rails_flash_notifications'
             {this.renderColorRows()}
           </div>
 
-          <div className="ColorPicker__CustomInputContainer ic-Input-group">
-
+          <div className="ColorPicker__CustomInputContainer">
             {this.colorPreview()}
-
-            <label className="screenreader-only" htmlFor={inputId}>
-              {I18n.t('Enter a hexcode here to use a custom color.')}
-            </label>
-
-            <input className = {inputClasses}
-                   id = {inputId}
-                   value = {this.state.currentColor}
-                   type = 'text'
-                   maxLength = "7"
-                   minLength = "4"
-                   ref      = "hexInput"
-                   onChange = {this.setInputColor} />
+            <TextInput
+              label={
+                <ScreenReaderContent>
+                  {I18n.t('Enter a hexcode here to use a custom color.')}
+                </ScreenReaderContent>}
+              id={inputId}
+              value={this.state.currentColor}
+              onChange={this.setInputColor}
+              size="small"
+              margin="0 0 0 x-small"
+            />
           </div>
 
           <div className="ColorPicker__Actions">
-            <button className="Button" onClick={this.onCancel}>
+            <Button
+              size="small"
+              onClick={this.onCancel}
+            >
               {I18n.t('Cancel')}
-            </button>
-            <span>&nbsp;</span>
-            <button className="Button Button--primary"
+            </Button>
+            <Button
+              variant="primary"
+              id="ColorPicker__Apply"
+              size="small"
               onClick = {this.onApply.bind(null, this.state.currentColor)}
-              disabled = {this.state.saveInProgress}>
+              disabled = {this.state.saveInProgress}
+              margin="0 0 0 xxx-small"
+            >
               {I18n.t('Apply')}
-            </button>
+            </Button>
           </div>
         </div>
       );
@@ -428,8 +436,8 @@ import 'compiled/jquery.rails_flash_notifications'
       var styleObj = {
         content: {
           position: 'absolute',
-          left: this.props.positions.left - 254,
-          top: this.props.positions.top - 124,
+          left: this.props.positions.left - 174,
+          top: this.props.positions.top - 96,
           right: 0,
           bottom: 0,
           overflow: 'visible',

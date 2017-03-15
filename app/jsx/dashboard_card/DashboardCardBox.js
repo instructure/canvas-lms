@@ -60,22 +60,6 @@ import MovementUtils from './MovementUtils'
       };
     },
 
-    moveCard (assetString, atIndex) {
-      const cardIndex = this.state.courseCards.findIndex(card => card.assetString === assetString);
-      let newCards = this.state.courseCards.slice();
-      newCards.splice(atIndex, 0, newCards.splice(cardIndex, 1)[0]);
-      newCards = newCards.map((card, index) => {
-        const newCard = Object.assign({}, card);
-        newCard.position = index;
-        return newCard;
-      });
-      this.setState({
-        courseCards: newCards
-      }, () => {
-        MovementUtils.updatePositions(this.state.courseCards, window.ENV.current_user_id);
-      });
-    },
-
     colorsUpdated: function(){
       if(this.isMounted()){
         this.forceUpdate();
@@ -96,6 +80,25 @@ import MovementUtils from './MovementUtils'
 
     getOriginalIndex (assetString) {
       return this.state.courseCards.findIndex(c => c.assetString === assetString);
+    },
+
+    moveCard (assetString, atIndex, cb) {
+      const cardIndex = this.state.courseCards.findIndex(card => card.assetString === assetString);
+      let newCards = this.state.courseCards.slice();
+      newCards.splice(atIndex, 0, newCards.splice(cardIndex, 1)[0]);
+      newCards = newCards.map((card, index) => {
+        const newCard = Object.assign({}, card);
+        newCard.position = index;
+        return newCard;
+      });
+      this.setState({
+        courseCards: newCards
+      }, () => {
+        MovementUtils.updatePositions(this.state.courseCards, window.ENV.current_user_id);
+        if (typeof cb === 'function') {
+          cb()
+        }
+      });
     },
 
     render: function () {
