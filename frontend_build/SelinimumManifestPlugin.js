@@ -7,6 +7,7 @@
  */
 
 const fs = require('fs')
+const mkdirp = require('mkdirp')
 const path = require('path')
 
 class SelinimumManifestPlugin {
@@ -59,6 +60,7 @@ class SelinimumManifestPlugin {
     compiler.plugin('emit', (compilation, done) => {
       const stats = compilation.getStats().toJson({chunkModules: true})
       const entrypointsByBundle = this.getEntrypointsByModule(stats)
+      mkdirp.sync(compiler.options.output.path)
       const manifestPath = path.join(compiler.options.output.path, 'selinimum-manifest.json')
       fs.writeFileSync(manifestPath, JSON.stringify(entrypointsByBundle))
       done()
