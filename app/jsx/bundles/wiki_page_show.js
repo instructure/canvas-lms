@@ -8,7 +8,11 @@ import ReactDOM from 'react-dom'
 import axios from 'axios'
 import AnnouncementList from 'jsx/announcements/AnnouncementList'
 import Spinner from 'instructure-ui/Spinner'
+import LockManager from 'jsx/blueprint_courses/lockManager'
 import 'compiled/jquery/ModuleSequenceFooter'
+
+const lockManager = new LockManager()
+lockManager.init({ itemType: 'wiki_page', page: 'show' })
 
 $(() =>
   $('#content').on('click', '#mark-as-done-checkbox', function () {

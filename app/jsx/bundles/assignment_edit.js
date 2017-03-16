@@ -10,6 +10,10 @@ import GradingTypeSelector from 'compiled/views/assignments/GradingTypeSelector'
 import GroupCategorySelector from 'compiled/views/assignments/GroupCategorySelector'
 import PeerReviewsSelector from 'compiled/views/assignments/PeerReviewsSelector'
 import 'grading_standards'
+import LockManager from 'jsx/blueprint_courses/lockManager'
+
+const lockManager = new LockManager()
+lockManager.init({ itemType: 'assignment', page: 'edit' })
 
 ENV.ASSIGNMENT.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES
 

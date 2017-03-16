@@ -5,6 +5,10 @@ import 'quiz_rubric'
 import 'message_students'
 import 'jquery.disableWhileLoading'
 import 'compiled/jquery/ModuleSequenceFooter'
+import LockManager from 'jsx/blueprint_courses/lockManager'
+
+const lockManager = new LockManager()
+lockManager.init({ itemType: 'quiz', page: 'show' })
 
 $(() => {
   inputMethods.setWidths()

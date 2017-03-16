@@ -1,11 +1,10 @@
 define([
   'react',
   'react-dom',
-  'react-addons-test-utils',
   'enzyme',
   'jsx/course_blueprint_settings/components/CourseFilter',
   '../sampleData',
-], (React, ReactDOM, TestUtils, enzyme, CourseFilter, data) => {
+], (React, ReactDOM, enzyme, CourseFilter, data) => {
   QUnit.module('CourseFilter component')
 
   const defaultProps = () => ({

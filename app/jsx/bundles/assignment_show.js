@@ -9,6 +9,10 @@ import MarkAsDone from 'compiled/util/markAsDone'
 import CyoeStats from 'jsx/conditional_release_stats/index'
 import 'compiled/jquery/ModuleSequenceFooter'
 import 'jquery.instructure_forms'
+import LockManager from 'jsx/blueprint_courses/lockManager'
+
+const lockManager = new LockManager()
+lockManager.init({ itemType: 'assignment', page: 'show' })
 
 $(() =>
   $('#content').on('click', '#mark-as-done-checkbox', function () {

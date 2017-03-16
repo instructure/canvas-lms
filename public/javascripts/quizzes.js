@@ -45,6 +45,7 @@ define([
   'jsx/shared/conditional_release/ConditionalRelease',
   'compiled/util/deparam',
   'compiled/util/SisValidationHelper',
+  'jsx/blueprint_courses/lockManager',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
@@ -60,12 +61,14 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(regradeTemplate, I18n,_,$,calcCmd, htmlEscape, pluralize,
+], function (regradeTemplate, I18n, _, $, calcCmd, htmlEscape, pluralize,
             Handlebars, DueDateOverrideView, Quiz,
             DueDateList, QuizRegradeView, SectionList,
             MissingDateDialog,MultipleChoiceToggle,EditorToggle,TextHelper,
             RCEKeyboardShortcuts, INST, QuizFormulaSolution, addAriaDescription,
-            RichContentEditor, ConditionalRelease, deparam, SisValidationHelper){
+            RichContentEditor, ConditionalRelease, deparam, SisValidationHelper, LockManager) {
+  var lockManager = new LockManager()
+  lockManager.init({ itemType: 'quiz', page: 'edit' })
 
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
       scoreValidation;

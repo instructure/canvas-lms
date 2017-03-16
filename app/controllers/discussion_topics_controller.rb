@@ -624,6 +624,7 @@ class DiscussionTopicsController < ApplicationController
             end
 
             js_hash = {:DISCUSSION => env_hash}
+            js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
             js_hash[:STUDENT_CONTEXT_CARDS_ENABLED] = @context.is_a?(Course) &&
               @domain_root_account.feature_enabled?(:student_context_cards) &&
