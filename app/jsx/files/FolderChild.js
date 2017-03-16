@@ -42,7 +42,7 @@ import friendlyBytes from 'compiled/util/friendlyBytes'
     }
   }
   FolderChild.renderMasterCourseIcon = function (canManage) {
-    if (canManage && this.props.model.get('is_master_course_content')) {
+    if (canManage && this.props.model.get('is_master_course_child_content')) {
       if (this.props.model.get('restricted_by_master_course')) {
         return (
           <span className="master-course-cell">

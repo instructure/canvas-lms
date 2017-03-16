@@ -83,7 +83,7 @@ export default React.createClass({
                title={I18n.t('Installed by Admin')}></i>
           </span>
         );
-      } else if (this.props.tool.is_master_course_content) {
+      } else if (this.props.tool.is_master_course_child_content) {
         if (this.props.tool.restricted_by_master_course) {
           return (
             <span className="master-course-cell">

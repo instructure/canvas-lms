@@ -40,8 +40,8 @@ module MasterCourses::CollectionRestrictor
     owner_for_restrictions && owner_for_restrictions.is_child_content?
   end
 
-  def master_course_restrictions
-    self.owner_for_restrictions.master_course_restrictions
+  def child_content_restrictions
+    self.owner_for_restrictions.child_content_restrictions
   end
 
   def mark_downstream_changes

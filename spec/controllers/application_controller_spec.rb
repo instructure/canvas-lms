@@ -785,4 +785,55 @@ describe CoursesController do
       expect(controller.js_env[:ANNOUNCEMENT_LIMIT]).to eq(5)
     end
   end
+
+  describe "set_master_course_js_env_data" do
+    before :each do
+      Account.default.enable_feature!(:master_courses)
+      controller.instance_variable_set(:@domain_root_account, Account.default)
+
+      @master_course = course_factory
+      @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      @master_page = @course.wiki.wiki_pages.create!(:title => "blah", :body => "bloo")
+      @tag = @template.content_tag_for(@master_page)
+
+      @child_course = course_factory
+      @template.add_child_course!(@child_course)
+
+      @child_page = @child_course.wiki.wiki_pages.create!(:title => "bloo", :body => "bloo", :migration_id => @tag.migration_id)
+    end
+
+    it "should populate master-side data (unrestricted)" do
+      controller.set_master_course_js_env_data(@master_page, @master_course)
+      data = controller.js_env[:MASTER_COURSE_DATA]
+      expect(data['is_master_course_master_content']).to be_truthy
+      expect(data['restricted_by_master_course']).to be_falsey
+    end
+
+    it "should populate master-side data (restricted)" do
+      @tag.update_attribute(:restrictions, {:content => true})
+
+      controller.set_master_course_js_env_data(@master_page, @master_course)
+      data = controller.js_env[:MASTER_COURSE_DATA]
+      expect(data['is_master_course_master_content']).to be_truthy
+      expect(data['restricted_by_master_course']).to be_truthy
+      expect(data['master_course_restrictions']).to eq({:content => true})
+    end
+
+    it "should populate child-side data (unrestricted)" do
+      controller.set_master_course_js_env_data(@child_page, @child_course)
+      data = controller.js_env[:MASTER_COURSE_DATA]
+      expect(data['is_master_course_child_content']).to be_truthy
+      expect(data['restricted_by_master_course']).to be_falsey
+    end
+
+    it "should populate child-side data (restricted)" do
+      @tag.update_attribute(:restrictions, {:content => true})
+
+      controller.set_master_course_js_env_data(@child_page, @child_course)
+      data = controller.js_env[:MASTER_COURSE_DATA]
+      expect(data['is_master_course_child_content']).to be_truthy
+      expect(data['restricted_by_master_course']).to be_truthy
+      expect(data['master_course_restrictions']).to eq({:content => true})
+    end
+  end
 end

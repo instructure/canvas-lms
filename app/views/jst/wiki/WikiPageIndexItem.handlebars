@@ -6,7 +6,7 @@
 <td role="gridcell">{{tDateToString updated_at "medium"}}{{#if last_edited_by.display_name}} by {{last_edited_by.display_name}}{{/if}}</td>
 {{#if CAN.MANAGE}}
   <td role="gridcell" class="master-course-cell">
-    {{#if is_master_course_content}}
+    {{#if is_master_course_child_content}}
       {{#if restricted_by_master_course}}
         <i class="icon-lock"></i>
       {{else}}

@@ -249,11 +249,24 @@ class ApplicationController < ActionController::Base
       MasterCourses::Restrictor.preload_default_template_restrictions(objects, course)
       return :master # return master/child status
     elsif MasterCourses::ChildSubscription.is_child_course?(course)
-      MasterCourses::Restrictor.preload_restrictions(objects)
+      MasterCourses::Restrictor.preload_child_restrictions(objects)
       return :child
     end
   end
   helper_method :setup_master_course_restrictions
+
+  def set_master_course_js_env_data(object, course)
+    return unless object.respond_to?(:master_course_api_restriction_data)
+    status = setup_master_course_restrictions([object], course)
+    return unless status
+    # we might have to include more information about the object here to make it easier to plug a common component in
+    data = object.master_course_api_restriction_data(status)
+    if status == :master
+      data[:default_restrictions] = MasterCourses::MasterTemplate.full_template_for(course).default_restrictions
+    end
+    js_env(:MASTER_COURSE_DATA => data)
+  end
+  helper_method :set_master_course_js_env_data
 
   def editing_restricted?(content, edit_type=:all)
     return false unless master_courses? && content.respond_to?(:editing_restricted?)

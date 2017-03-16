@@ -393,7 +393,7 @@ define [
 
       hash =
         id: @get('id'),
-        is_master_course_content: @get('is_master_course_content'),
+        is_master_course_child_content: @get('is_master_course_child_content'),
         restricted_by_master_course: @get('restricted_by_master_course')
       for field in fields
         hash[field] = @[field]()
