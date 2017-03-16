@@ -21,6 +21,7 @@ define([
   'underscore',
   'course_settings_helper' /* tabIdFromElement */,
   'timezone',
+  'jsx/shared/helpers/forceScreenreaderToReparse',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* datetimeString, date_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */,
@@ -37,7 +38,7 @@ define([
   'jqueryui/autocomplete' /* /\.autocomplete/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, _, CourseSettingsHelper, tz) {
+], function(I18n, $, _, CourseSettingsHelper, tz, forceScreenReaderToReparse) {
 
   var GradePublishing = {
     status: null,
@@ -443,6 +444,14 @@ define([
 
     $("#course_show_announcements_on_home_page").change(function(event) {
       $("#course_home_page_announcement_limit").prop("disabled", !$(this).prop('checked'))
+    });
+
+    if ($('#course_blueprint').is(':checked')) {
+      $('#master_course_restrictions').show();
+    }
+    $('#course_blueprint').change(function(event) {
+      $('#master_course_restrictions').slideToggle();
+      forceScreenReaderToReparse($('#master_course_restrictions')[0]);
     });
   });
 });

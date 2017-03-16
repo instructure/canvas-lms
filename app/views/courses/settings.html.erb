@@ -107,11 +107,14 @@
           <% if can_manage_master_courses %>
             <% mc_message = !is_master_course && why_cant_i_enable_master_course(@context) %>
             <span <% if mc_message %>data-tooltip title="<%= mc_message %>"<% end %>>
-              <%= f.check_box :blueprint, :checked => is_master_course, :disabled => !!mc_message %>
-              <%= f.label :blueprint, :en => "Enable course as a Blueprint Course" %>
+              <div class="ic-Form-control ic-Form-control--checkbox">
+                <%= f.check_box :blueprint, :checked => is_master_course, :disabled => !!mc_message %>
+                <%= f.label :blueprint, :class => 'ic-Label', :en => "Enable course as a Blueprint Course" %>
+              </div>
             </span>
+            <%= render :partial => 'master_course_restrictions', :locals => {:form => f, :course => @context} %>
           <% else %>
-            <span id="course_master_course"><%= is_master_course ? t("Yes") : t("No") %></span>
+            <span id="course_blueprint"><%= is_master_course ? t("Yes") : t("No") %></span>
           <% end %>
         </td>
       </tr>
