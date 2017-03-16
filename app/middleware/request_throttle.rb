@@ -161,6 +161,7 @@ class RequestThrottle
 
   def self.reload!
     @whitelist = @blacklist = nil
+    LeakyBucket.reload!
   end
 
   def self.enabled?
@@ -236,8 +237,23 @@ class RequestThrottle
 
     SETTING_DEFAULTS.each do |(setting, default)|
       define_method(setting) do
-        Setting.get("request_throttle.#{setting}", default).to_f
+        (self.class.custom_settings_hash[client_identifier]&.[](setting.to_s) ||
+          Setting.get("request_throttle.#{setting}", default)).to_f
       end
+    end
+
+    def self.custom_settings_hash
+      @custom_settings_hash ||= begin
+        JSON.parse(
+          Setting.get('request_throttle.custom_settings', '{}')
+        )
+      rescue JSON::JSONError
+        {}
+      end
+    end
+
+    def self.reload!
+      @custom_settings_hash = nil
     end
 
     # up_front_cost is a placeholder cost. Essentially it adds some cost to
