@@ -451,6 +451,26 @@ describe "ZipPackage" do
       module_item_data = zip_package.parse_module_item_data(@module)
       expect(module_item_data.length).to eq 0
     end
+
+    it "should export correct dates for assignments with due date overrides" do
+      due = 1.hour.from_now
+      lock = 2.hours.from_now
+      unlock = 1.hour.ago
+      assign = @course.assignments.create!(title: 'Assignment 1', due_at: 1.day.from_now, lock_at: 2.days.from_now,
+        unlock_at: 1.day.ago)
+      @module.content_tags.create!(content: assign, context: @course, indent: 0)
+      assignment_override_model(assignment: assign, due_at: due, lock_at: lock, unlock_at: unlock)
+      @override.set_type = "ADHOC"
+      override_student = @override.assignment_override_students.build
+      override_student.user = @student
+      override_student.save!
+
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module).first
+      expect(module_item_data[:dueAt]).to eq due.iso8601
+      expect(module_item_data[:lockAt]).to eq lock.iso8601
+      expect(module_item_data[:unlockAt]).to eq unlock.iso8601
+    end
   end
 
   context "convert_html_to_local" do

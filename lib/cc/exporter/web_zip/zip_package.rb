@@ -187,6 +187,8 @@ module CC::Exporter::WebZip
         assignment = item.content&.assignment
         item_hash[:graded] = assignment.present?
       end
+      return unless assignment
+      assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, user, skip_clone: true)
       item_hash[:pointsPossible] = assignment&.points_possible if item_hash[:graded]
       item_hash[:dueAt] = force_timezone(assignment&.due_at)
       item_hash[:lockAt] = force_timezone(assignment&.lock_at)
