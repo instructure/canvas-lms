@@ -243,17 +243,6 @@ END
       applies_to: 'RootAccount',
       state: 'hidden'
     },
-    'multiple_grading_periods' =>
-    {
-      display_name: -> { I18n.t('features.multiple_grading_periods', 'Multiple Grading Periods') },
-      description: -> { I18n.t('enable_multiple_grading_periods', <<-END) },
-      Multiple Grading Periods allows teachers and admins to create grading periods with set
-      cutoff dates. Assignments can be filtered by these grading periods in the gradebook.
-END
-      applies_to: 'Course',
-      state: 'allowed',
-      root_opt_in: true
-    },
     'course_catalog' =>
     {
       display_name: -> { I18n.t("Public Course Index") },
@@ -390,9 +379,9 @@ END
     'all_grading_periods_totals' =>
     {
       display_name: -> { I18n.t('Display Totals for "All Grading Periods"') },
-      description: -> { I18n.t('Display total grades when the "All Grading Periods" dropdown option is selected (Multiple Grading Periods must be enabled).') },
+      description: -> { I18n.t('Display total grades when the "All Grading Periods" dropdown option is selected (grading periods must exist).') },
       applies_to: 'Course',
-      state: 'allowed',
+      state: 'hidden',
       root_opt_in: true
     },
     'course_user_search' => {
@@ -531,7 +520,16 @@ END
       state: "hidden",
       beta: true,
       development: true
-    }
+    },
+    'quizzes2_exporter' =>
+    {
+      display_name: -> { I18n.t('Export to Quizzes 2 format') },
+      description: -> { I18n.t('Export an existing quiz to new Quizzes 2 format') },
+      applies_to: "RootAccount",
+      state: "hidden",
+      beta: false,
+      development: true,
+    },
   )
 
   def self.definitions

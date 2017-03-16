@@ -2,16 +2,21 @@ define([
   'i18n!roster',
   'react',
   'react-dom',
-  'instructure-ui',
+  'instructure-ui/Modal',
+  'instructure-ui/Heading',
+  'instructure-ui/Button',
+  'instructure-ui/Spinner',
+  'instructure-ui/Alert',
+  'instructure-ui/ScreenReaderContent',
   './shapes',
   './people_search',
   './people_ready_list',
   './people_validation_issues',
   './api_error'
 ], (I18n, React, ReactDOM,
-      {Modal, ModalHeader, ModalBody, ModalFooter,
-        Heading, Button, Spinner, Alert,
-        ScreenReaderContent, ApplyTheme},
+      {default: Modal, ModalHeader, ModalBody, ModalFooter},
+      {default: Heading}, {default: Button}, {default: Spinner}, {default: Alert},
+      {default: ScreenReaderContent},
         {courseParamsShape, apiStateShape, inputParamsShape, validateResultShape, personReadyToEnrollShape},
         PeopleSearch, PeopleReadyList, PeopleValidationIssues, APIError) => {
   const PEOPLESEARCH = 'peoplesearch';
@@ -65,7 +70,9 @@ define([
       skipDuplicate: React.PropTypes.func,
       enqueueNewForMissing: React.PropTypes.func,
       resolveValidationIssues: React.PropTypes.func,
-      reset: React.PropTypes.func
+      reset: React.PropTypes.func,
+      usersEnrolled: React.PropTypes.bool // eslint-disable-line react/no-unused-prop-types
+                                          // it IS used in componentWillReceiveProps.
     };
     /* eslint-enable */
 
@@ -126,7 +133,7 @@ define([
         if (this.content) {
           this.content.focus();
         }
-        this.setState({focusTo: false});
+        this.setState({focusToTop: false});
       }
     }
 
@@ -134,12 +141,12 @@ define([
     // modal next and back handlers ---------------------
     // on next callback from PeopleSearch page
     searchNext = () => {
-      this.setState({currentPage: PEOPLEVALIDATIONISSUES});
+      this.setState({currentPage: PEOPLEVALIDATIONISSUES, focusToTop: true});
       this.props.validateUsers();
     }
     // on next callback from PeopleValidationIssues page
     validationIssuesNext = () => {
-      this.setState({currentPage: PEOPLEREADYLIST});
+      this.setState({currentPage: PEOPLEREADYLIST, focusToTop: true});
       this.props.resolveValidationIssues();
     }
     // on next callback from the ready list of users
@@ -150,7 +157,8 @@ define([
     // we're finished. close up shop.
     close = () => {
       this.setState({
-        currentPage: PEOPLESEARCH
+        currentPage: PEOPLESEARCH,
+        focusToTop: true
       });
       if (typeof this.props.onClose === 'function') {
         this.props.onClose();
@@ -165,7 +173,7 @@ define([
     //                      undefined implies all
     goBack (pagename, stateResets) {
       this.props.reset(stateResets);
-      this.setState({currentPage: pagename});
+      this.setState({currentPage: pagename, focusToTop: true});
     }
     // different panels go back slightly differently
     apiErrorOnBack = () => {
@@ -205,17 +213,18 @@ define([
       let onBack = null;                // callback on the back button
       let backLabel = I18n.t('Back');  // label on eh Back button
       const cancelLabel = I18n.t('Cancel');  // label on the cancel button
-      let panelDescription = '';        // tell SR user what this panel is for
+      let panelLabel = '';              // tell SR user what this panel is for
+      let panelDescription = '';        // tell SR user more info
 
       switch (currentPage) {
         case RESULTPENDING:
           currentPanel = <Spinner size="medium" title={I18n.t('Loading')} />;
-          panelDescription = I18n.t('loading');
+          panelLabel = I18n.t('loading');
           break;
         case APIERROR:
           currentPanel = <APIError error={this.props.apiState.error} />
           onBack = this.apiErrorOnBack;
-          panelDescription = I18n.t('error')
+          panelLabel = I18n.t('error')
           break;
         case PEOPLESEARCH:
         default:
@@ -228,6 +237,7 @@ define([
           );
           onNext = this.searchNext;
           readyForNext = this.props.inputParams.nameList.length > 0;
+          panelLabel = I18n.t('User search panel');
           panelDescription = I18n.t('Use this panel to search for people you wish to add to this course.');
           break;
         case PEOPLEVALIDATIONISSUES:
@@ -243,7 +253,8 @@ define([
           onNext = this.validationIssuesNext;
           onBack = this.peopleValidationIssuesOnBack;
           readyForNext = arePeopleValidationIssuesResolved(this.props);
-          panelDescription = I18n.t('Use this panel to resolve duplicates or people not found with your search.');
+          panelLabel = I18n.t('User vaildation issues panel');
+          panelDescription = I18n.t('Use this panel to resolve duplicate results or people not found with your search.');
           break;
         case PEOPLEREADYLIST:
           currentPanel = (
@@ -258,6 +269,7 @@ define([
           backLabel = I18n.t('Start Over');
           nextLabel = I18n.t('Add Users');
           readyForNext = this.props.usersToBeEnrolled.length > 0;
+          panelLabel = I18n.t('Ready to enroll panel');
           panelDescription = I18n.t('This panel lists the users ready to be added to this course.');
           break;
       }
@@ -282,8 +294,10 @@ define([
               className="addpeople"
               tabIndex="-1"
               ref={(elem) => { this.content = elem }}
+              aria-label={panelLabel}
+              aria-describedby="addpeople_panelDescription"
             >
-              <ScreenReaderContent>{panelDescription}</ScreenReaderContent>
+              <ScreenReaderContent id="addpeople_panelDescription">{panelDescription}</ScreenReaderContent>
               {currentPanel}
             </div>
           </ModalBody>
@@ -298,13 +312,5 @@ define([
       );
     }
   }
-
-  const DeleteMe = props => (
-    <ApplyTheme theme={ApplyTheme.generateTheme('a11y')}>
-      <AddPeople {...props} />
-    </ApplyTheme>
-  )
-
-  /* TODO: after instui gets updated, just return AddPeople */
-  return ENV.use_high_contrast ? DeleteMe : AddPeople;
+  return AddPeople;
 });

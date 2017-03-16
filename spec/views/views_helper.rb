@@ -19,31 +19,13 @@
 require 'nokogiri'
 
 def view_context(context=@course, current_user=@user, real_current_user=nil)
-  assigns[:context] = context
-  assigns[:current_user] = current_user
-  assigns[:real_current_user] = real_current_user
-  assigns[:domain_root_account] = Account.default
+  assign(:context, context)
+  assign(:current_user, current_user)
+  assign(:real_current_user, real_current_user)
+  assign(:domain_root_account, Account.default)
 end
 
 def view_portfolio(portfolio=@portfolio, current_user=@user)
-  assigns[:portfolio] = portfolio
-  assigns[:current_user] = current_user
+  assign(:portfolio, portfolio)
+  assign(:current_user, current_user)
 end
-
-class ShimAssignsHash
-  def initialize(example_group)
-    @example_group = example_group
-  end
-
-  def []=(k, v)
-    @example_group.assign(k, v)
-  end
-end
-
-module ShimAssigns
-  def assigns
-    @assigns_hash ||= ShimAssignsHash.new(self)
-  end
-end
-
-RSpec::Rails::ViewExampleGroup.include(ShimAssigns)

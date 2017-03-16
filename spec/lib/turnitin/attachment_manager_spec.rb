@@ -4,7 +4,7 @@ module Turnitin
   describe AttachmentManager do
     include_context "shared_tii_lti"
     before(:each) do
-      TiiClient.stubs(:new).returns(tii_client)
+      TiiClient.stubs(:new).with(lti_student, lti_assignment, tool, outcome_response_json).returns(tii_client)
     end
 
     describe '.create_attachment' do
@@ -28,16 +28,26 @@ module Turnitin
 
     describe '.update_attachment' do
       let(:submission) do
-        lti_assignment.submit_homework(
+        sub = lti_assignment.submit_homework(
           lti_student,
           attachments: [attachment],
-          submission_type: 'online_upload'
+          submission_type: 'online_upload',
         )
+        sub.turnitin_data = {attachment.asset_string => {outcome_response: outcome_response_json}}
+        sub.save!
+        sub
       end
 
       it 'updates the submission' do
-        submission.turnitin_data[attachment.asset_string] = {outcome_response: {}}
-        updated_attachment = subject.class.update_attachment(submission, attachment)
+        updated_attachment = Turnitin::AttachmentManager.update_attachment(submission, attachment)
+        expect(updated_attachment.display_name).to eq filename
+      end
+
+      it 'works when there is only a url in the content_tag' do
+        tag = lti_assignment.external_tool_tag
+        tag.content_id = nil
+        tag.save!
+        updated_attachment = Turnitin::AttachmentManager.update_attachment(submission, attachment)
         expect(updated_attachment.display_name).to eq filename
       end
 

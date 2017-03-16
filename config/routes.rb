@@ -656,7 +656,6 @@ CanvasRails::Application.routes.draw do
   get 'images/thumbnails/show/:id/:uuid' => 'files#show_thumbnail', as: :show_thumbnail_image
   post 'images/users/:user_id/report' => 'users#report_avatar_image', as: :report_avatar_image
   put 'images/users/:user_id' => 'users#update_avatar_image', as: :update_avatar_image
-  get 'all_menu_courses' => 'users#all_menu_courses'
   get 'grades' => 'users#grades'
   get 'grades_for_student' => 'users#grades_for_student'
 
@@ -1218,6 +1217,9 @@ CanvasRails::Application.routes.draw do
       get 'users/:id/colors', controller: 'users', action: 'get_custom_colors'
       get 'users/:id/colors/:asset_string', controller: 'users', action: 'get_custom_color'
       put 'users/:id/colors/:asset_string', controller: 'users', action: 'set_custom_color'
+
+      get 'users/:id/new_user_tutorial_statuses', action: 'get_new_user_tutorial_statuses'
+      put 'users/:id/new_user_tutorial_statuses/:page_name', action: 'set_new_user_tutorial_status'
 
       get 'users/:id/dashboard_positions', controller: 'users', action: 'get_dashboard_positions'
       put 'users/:id/dashboard_positions', controller: 'users', action: 'set_dashboard_positions'
@@ -1900,6 +1902,10 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/blueprint_templates/:template_id', action: :show
       get 'courses/:course_id/blueprint_templates/:template_id/associated_courses', action: :associated_courses, as: :course_blueprint_associated_courses
       put 'courses/:course_id/blueprint_templates/:template_id/update_associations', action: :update_associations
+
+      post 'courses/:course_id/blueprint_templates/:template_id/migrations', action: :queue_migration
+      get 'courses/:course_id/blueprint_templates/:template_id/migrations', action: :migrations_index, as: :course_blueprint_migrations
+      get 'courses/:course_id/blueprint_templates/:template_id/migrations/:id', action: :migrations_show
     end
   end
 
@@ -1939,9 +1945,18 @@ CanvasRails::Application.routes.draw do
 
   ApiRouteSet.draw(self, "/api/lti") do
     post "authorize", controller: 'lti/ims/authorization', action: :authorize, as: 'lti_oauth2_authorize'
+
+    scope(controller: 'lti/subscriptions_api') do
+      post "subscriptions", action: :create
+      delete "subscriptions/:id", action: :destroy
+      get "subscriptions/:id", action: :show
+      put "subscriptions/:id", action: :update
+      get "subscriptions", action: :index
+    end
+
     %w(course account).each do |context|
       prefix = "#{context}s/:#{context}_id"
-      get  "#{prefix}/tool_consumer_profile/:tool_consumer_profile_id", controller: 'lti/ims/tool_consumer_profile',
+      get  "#{prefix}/tool_consumer_profile(/:tool_consumer_profile_id)", controller: 'lti/ims/tool_consumer_profile',
            action: 'show', as: "#{context}_tool_consumer_profile"
       post "#{prefix}/tool_proxy", controller: 'lti/ims/tool_proxy', action: :re_reg,
            as: "re_reg_#{context}_lti_tool_proxy", constraints: Lti::ReRegConstraint.new

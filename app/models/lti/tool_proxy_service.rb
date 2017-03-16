@@ -39,11 +39,13 @@ module Lti
 
     def process_tool_proxy_json(json:, context:, guid:, tool_proxy_to_update: nil, tc_half_shared_secret: nil, developer_key: nil)
       @tc_half_secret = tc_half_shared_secret
-
       tp = IMS::LTI::Models::ToolProxy.new.from_json(json)
       tp.tool_proxy_guid = guid
+      tcp_uuid = tp.tool_consumer_profile&.match(/tool_consumer_profile\/([a-fA-f0-9\-]+)/)&.captures&.first
+      tcp_uuid ||= developer_key&.tool_consumer_profile&.uuid
+      tcp_uuid ||= Lti::ToolConsumerProfile::DEFAULT_TCP_UUID
       begin
-        validate_proxy!(tp, context, developer_key)
+        validate_proxy!(tp, context, developer_key, tcp_uuid)
       rescue Lti::ToolProxyService::InvalidToolProxyError
         raise unless depricated_split_secret?(tp)
       end
@@ -203,12 +205,17 @@ module Lti
     end
 
     def create_json(obj)
-      obj.kind_of?(Array) ? obj.map(&:as_json) : obj.as_json
+      obj.is_a?(Array) ? obj.map(&:as_json) : obj.as_json
     end
 
-    def validate_proxy!(tp, context, developer_key = nil)
+    def validate_proxy!(tp, context, developer_key = nil, tcp_uuid)
 
-      profile = Lti::ToolConsumerProfileCreator.new(context, tp.tool_consumer_profile).create(developer_key.present?)
+      profile = Lti::ToolConsumerProfileCreator.new(
+        context,
+        tp.tool_consumer_profile,
+        developer_key: developer_key,
+        tcp_uuid: tcp_uuid
+      ).create
       tp_validator = IMS::LTI::Services::ToolProxyValidator.new(tp)
       tp_validator.tool_consumer_profile = profile
 

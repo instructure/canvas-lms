@@ -32,7 +32,7 @@ module Lti
       end
 
       def memberships
-        @memberships ||= users.slice(0, @per_page).map do |user|
+        @memberships ||= users.to_a.slice(0, @per_page).map do |user|
           generate_membership(user)
         end
       end

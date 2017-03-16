@@ -10,7 +10,7 @@ define [
   'compiled/collections/DateGroupCollection'
   'i18n!assignments'
   'jsx/grading/helpers/GradingPeriodsHelper'
-  'timezone',
+  'timezone'
   'jsx/shared/helpers/numberHelper'
 ], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, VeriCiteSettings, DateGroup, AssignmentOverrideCollection,
     DateGroupCollection, I18n, GradingPeriodsHelper, tz, numberHelper) ->
@@ -101,7 +101,7 @@ define [
       @set 'assignment_group_id', assignment_group_id
 
     canFreeze: =>
-      @get('frozen_attributes')? && !@frozen()
+      @get('frozen_attributes')? && !@frozen() && !@isQuizLTIAssignment()
 
     canDelete: =>
       not @inClosedGradingPeriod() and not @frozen()
@@ -361,6 +361,9 @@ define [
     is_quiz_assignment: =>
       @get('is_quiz_assignment')
 
+    isQuizLTIAssignment: =>
+      @get('is_quiz_lti_assignment')
+
     toView: =>
       fields = [
         'name', 'dueAt', 'description', 'pointsPossible', 'lockAt', 'unlockAt',
@@ -378,8 +381,8 @@ define [
         'labelId', 'position', 'postToSIS', 'multipleDueDates', 'nonBaseDates',
         'allDates', 'hasDueDate', 'hasPointsPossible', 'singleSectionDueDate',
         'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides',
-        'omitFromFinalGrade', 'is_quiz_assignment', 'secureParams',
-        'inClosedGradingPeriod', 'dueDateRequired'
+        'omitFromFinalGrade', 'is_quiz_assignment', 'isQuizLTIAssignment',
+        'secureParams', 'inClosedGradingPeriod', 'dueDateRequired'
       ]
 
       hash =

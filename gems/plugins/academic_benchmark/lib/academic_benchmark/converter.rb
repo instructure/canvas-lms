@@ -1,9 +1,5 @@
 require 'academic_benchmarks'
 
-require 'academic_benchmark/ab_gem_extensions/standard'
-require 'academic_benchmark/ab_gem_extensions/authority'
-require 'academic_benchmark/ab_gem_extensions/document'
-
 module AcademicBenchmark
   class Converter < Canvas::Migration::Migrator
     def initialize(settings={})
@@ -60,7 +56,7 @@ module AcademicBenchmark
           if !@archive_file.nil? && settings[:archive_file].nil?
             settings[:archive_file] = @archive_file
           end
-          fetcher = Data.load_data(settings)
+          fetcher = OutcomeData.load_data(settings)
           @_outcome_data = fetcher.data
         rescue EOFError, APIError => e
           add_error(

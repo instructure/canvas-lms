@@ -5,13 +5,13 @@
     {{/t}}
   </caption>
   <tr>
-    <th scope="col">Date</th>
-    <th scope="col">Score</th>
+    <th scope="col">{{#t}}Date{{/t}}</th>
+    <th scope="col">{{#t}}Score{{/t}}</th>
   </tr>
   {{#each data}}
     <tr>
       <td scope="row">{{ tTimeToString (fudge date) "medium" }}</td>
-      <td>{{ y }}</td>
+      <td>{{nf y format="outcomeScore"}}</td>
     </tr>
   {{/each}}
 </table>

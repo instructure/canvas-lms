@@ -227,6 +227,11 @@ describe "Api::V1::Assignment" do
           expect(api).to be_assignment_editable_fields_valid(assignment, user)
         end
 
+        it "is valid if time_zone_edited changed" do
+          assignment.time_zone_edited = 'Some New Time Zone'
+          expect(api).to be_assignment_editable_fields_valid(assignment, user)
+        end
+
         it "is valid if anonymous_peer_reviews changed" do
           assignment.toggle(:anonymous_peer_reviews)
           expect(api).to be_assignment_editable_fields_valid(assignment, user)

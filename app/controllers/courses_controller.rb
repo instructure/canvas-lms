@@ -304,6 +304,7 @@ class CoursesController < ApplicationController
   include ContextExternalToolsHelper
   include CustomSidebarLinksHelper
   include SyllabusHelper
+  include WebZipExportHelper
 
   before_action :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
   before_action :require_user_or_observer, :only=>[:user_index]
@@ -359,14 +360,14 @@ class CoursesController < ApplicationController
   #   - "current_grading_period_scores": Optional information to include with
   #     each Course. When current_grading_period_scores is given and total_scores
   #     is given, any student enrollments will also include the fields
-  #     'multiple_grading_periods_enabled',
+  #     'has_grading_periods',
   #     'totals_for_all_grading_periods_option', 'current_grading_period_title',
   #     'current_grading_period_id', current_period_computed_current_score',
   #     'current_period_computed_final_score',
   #     'current_period_computed_current_grade', and
   #     'current_period_computed_final_grade' (see Enrollment documentation for
   #     more information on these fields). In addition, when this argument is
-  #     passed, the course will have a 'multiple_grading_periods_enabled' attribute
+  #     passed, the course will have a 'has_grading_periods' attribute
   #     on it. This argument is ignored if the course is configured to hide final
   #     grades or if the total_scores argument is not included.
   #   - "term": Optional information to include with each Course. When
@@ -428,7 +429,8 @@ class CoursesController < ApplicationController
           end
 
           state = e.state_based_on_date
-          if [:completed, :rejected].include?(state)
+          if [:completed, :rejected].include?(state) ||
+              (e.course.conclude_at && e.course.conclude_at < Time.now) # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
             @past_enrollments << e unless e.workflow_state == "invited" || e.restrict_past_view?
           else
             start_at, end_at = e.enrollment_dates.first
@@ -474,14 +476,14 @@ class CoursesController < ApplicationController
   #   - "current_grading_period_scores": Optional information to include with
   #     each Course. When current_grading_period_scores is given and total_scores
   #     is given, any student enrollments will also include the fields
-  #     'multiple_grading_periods_enabled',
+  #     'has_grading_periods',
   #     'totals_for_all_grading_periods_option', 'current_grading_period_title',
   #     'current_grading_period_id', current_period_computed_current_score',
   #     'current_period_computed_final_score',
   #     'current_period_computed_current_grade', and
   #     'current_period_computed_final_grade' (see Enrollment documentation for
   #     more information on these fields). In addition, when this argument is
-  #     passed, the course will have a 'multiple_grading_periods_enabled' attribute
+  #     passed, the course will have a 'has_grading_periods' attribute
   #     on it. This argument is ignored if the course is configured to hide final
   #     grades or if the total_scores argument is not included.
   #   - "term": Optional information to include with each Course. When
@@ -1115,12 +1117,23 @@ class CoursesController < ApplicationController
 
   def blueprint_settings
     get_context
-    if master_courses? && authorized_action(@context.account, @current_user, :manage_master_courses)
-      css_bundle :course_blueprint_settings
-      js_bundle :course_blueprint_settings
-      render :text => '', :layout => true
-    else
-     render status: 404, template: 'shared/errors/404_message'
+    if authorized_action(@context.account, @current_user, :manage_master_courses)
+      if master_courses? && MasterCourses::MasterTemplate.is_master_course?(@context)
+        js_env({
+          accountId: @context.account.id,
+          course: @context.slice(:id, :name),
+          subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
+          terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}}
+        })
+
+        css_bundle :course_blueprint_settings
+        js_bundle :course_blueprint_settings
+
+        @page_title = join_title(t('Blueprint Settings'), @context.name)
+        render text: '', layout: true
+      else
+       render status: 404, template: 'shared/errors/404_message'
+      end
     end
   end
 
@@ -1639,6 +1652,8 @@ class CoursesController < ApplicationController
       add_crumb(@context.nickname_for(@current_user, :short_name), url_for(@context), :id => "crumb_#{@context.asset_string}")
       set_badge_counts_for(@context, @current_user, @current_enrollment)
 
+      set_tutorial_js_env
+
       @course_home_view = "feed" if params[:view] == "feed"
       @course_home_view ||= @context.default_view || @context.default_home_page
 
@@ -1653,7 +1668,8 @@ class CoursesController < ApplicationController
         @wiki = @context.wiki
         @page = @wiki.front_page
         set_js_rights [:wiki, :page]
-        set_js_wiki_data :course_home => true, :show_announcements => @context.show_announcements_on_home_page?
+        show_announcements = @context.show_announcements_on_home_page? && @context.grants_right?(@current_user, session, :read_announcements)
+        set_js_wiki_data :course_home => true, :show_announcements => show_announcements
         @padless = true
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
@@ -2289,8 +2305,12 @@ class CoursesController < ApplicationController
 
       if params[:course].has_key?(:master_course)
         master_course = value_to_boolean(params[:course].delete(:master_course))
-        action = master_course ? "set" : "remove"
-        MasterCourses::MasterTemplate.send("#{action}_as_master_course", @course)
+        if master_course && @course.student_enrollments.not_fake.exists?
+           @course.errors.add(:master_course, t("Cannot have a blueprint course with students"))
+        else
+          action = master_course ? "set" : "remove"
+          MasterCourses::MasterTemplate.send("#{action}_as_master_course", @course)
+        end
       end
 
       @course.attributes = params_for_update
@@ -2468,9 +2488,9 @@ class CoursesController < ApplicationController
 
   # @API Get effective due dates
   # For each assignment in the course, returns each assigned student's ID
-  # and their corresponding due date along with some Multiple Grading Periods
-  # data. Returns a collection with keys representing assignment IDs and values
-  # as a collection containing keys representing student IDs and values representing
+  # and their corresponding due date along with some grading period data.
+  # Returns a collection with keys representing assignment IDs and values as a
+  # collection containing keys representing student IDs and values representing
   # the student's effective due_at, the grading_period_id of which the due_at falls
   # in, and whether or not the grading period is closed (in_closed_grading_period)
   #
@@ -2799,13 +2819,13 @@ class CoursesController < ApplicationController
   end
 
   def can_change_group_weighting_scheme?
-    return true unless @course.feature_enabled?(:multiple_grading_periods)
+    return true unless @course.grading_periods?
     return true if @course.account_membership_allows(@current_user)
     !@course.any_assignment_in_closed_grading_period?
   end
 
   def offline_web_exports
-    return render status: 404, template: 'shared/errors/404_message' unless @context.allow_web_export_download?
+    return render status: 404, template: 'shared/errors/404_message' unless allow_web_export_download?
     if authorized_action(WebZipExport.new(course: @context), @current_user, :create)
       title = t('Exported Package History')
       @page_title = title
@@ -2817,7 +2837,7 @@ class CoursesController < ApplicationController
   end
 
   def start_offline_web_export
-    return render status: 404, template: 'shared/errors/404_message' unless @context.allow_web_export_download?
+    return render status: 404, template: 'shared/errors/404_message' unless allow_web_export_download?
     if authorized_action(WebZipExport.new(course: @context), @current_user, :create)
       @service = EpubExports::CreateService.new(@context, @current_user, :web_zip_export)
       @service.save

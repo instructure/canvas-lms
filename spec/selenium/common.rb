@@ -19,7 +19,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require "selenium-webdriver"
 require "socket"
 require "timeout"
-require 'coffee-script'
 require_relative 'test_setup/custom_selenium_rspec_matchers'
 require_relative 'test_setup/selenium_driver_setup'
 require_relative 'test_setup/selenium_extensions'
@@ -143,7 +142,7 @@ shared_context "in-process server selenium tests" do
   end
 
   before do
-    raise "all specs need to use transactional fixtures" unless self.use_transactional_fixtures
+    raise "all specs need to use transactional fixtures" unless (CANVAS_RAILS4_2 ? use_transactional_fixtures : use_transactional_tests)
 
     HostUrl.stubs(:default_host).returns(app_host_and_port)
     HostUrl.stubs(:file_host).returns(app_host_and_port)

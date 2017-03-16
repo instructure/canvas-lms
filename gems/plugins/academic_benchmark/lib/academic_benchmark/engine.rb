@@ -1,9 +1,8 @@
 module AcademicBenchmark
   class Engine < ::Rails::Engine
-    initializer "academic_benchmark.canvas_plugin" do
-      require_dependency 'academic_benchmark/converter'
-      require_dependency 'academic_benchmark/converter_v1'
+    config.autoload_paths << File.expand_path(File.join(__FILE__, "../.."))
 
+    config.to_prepare do
       Canvas::Plugin.register :academic_benchmark_importer, :export_system, {
               :name => proc { I18n.t(:name, 'Academic Benchmark Importer') },
               :author => 'Instructure',

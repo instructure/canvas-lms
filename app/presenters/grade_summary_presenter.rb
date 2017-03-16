@@ -154,9 +154,9 @@ class GradeSummaryPresenter
   def sorted_assignments(assignments)
     case @assignment_order
     when :due_at
-      assignments.sort_by { |a| [a.due_at || CanvasSort::Last, a.title.downcase] }
+      assignments.sort_by { |a| [a.due_at || CanvasSort::Last, Canvas::ICU.collation_key(a.title)] }
     when :title
-      assignments.sort_by { |a| a.title.downcase }
+      Canvas::ICU.collate_by(assignments, &:title)
     when :module
       sorted_by_modules(assignments)
     when :assignment_group

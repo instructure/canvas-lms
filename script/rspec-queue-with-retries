@@ -3,6 +3,7 @@
 set -e
 
 export TEST_QUEUE_REPLACE_STATS=1
+export TEST_QUEUE_NUM_LAZY_LOADERS=4
 export ERROR_CONTEXT_BASE_PATH="`pwd`/log/spec_failures/Initial"
 
 max_failures=${RERUNS:=200}
@@ -93,6 +94,8 @@ while true; do
     reruns_started=1
     echo "[rspec-queue:reruns] STARTING"
     unset TEST_QUEUE_REPLACE_STATS # ensure the rerun stats merge into the main ones
+    # not many files, and we want to maximize cores for actual workers on this node (since we won't relay)
+    export TEST_QUEUE_NUM_LAZY_LOADERS=1
   fi
 done
 

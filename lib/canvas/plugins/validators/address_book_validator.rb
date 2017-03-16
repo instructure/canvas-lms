@@ -20,7 +20,7 @@ module Canvas::Plugins::Validators::AddressBookValidator
   def self.validate(settings, plugin_setting)
     strategy = settings[:strategy]
     if AddressBook::STRATEGIES.has_key?(strategy)
-      settings
+      settings.to_hash.with_indifferent_access
     else
       plugin_setting.errors.add(:base, I18n.t('Invalid address book strategy.'))
       false

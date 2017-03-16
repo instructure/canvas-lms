@@ -3,7 +3,9 @@ require_relative '../../spec_helper.rb'
 describe Canvas::RequestForgeryProtection do
   before :each do
     # default setup is a protected non-GET non-API session-authenticated request with bogus tokens
-    headers = ActionDispatch::Http::Headers.new('X-CSRF-Token' => "bogus")
+    raw_headers = { 'X-CSRF-Token' => "bogus" }
+    raw_headers = ActionDispatch::Request.new(raw_headers) unless CANVAS_RAILS4_2
+    headers = ActionDispatch::Http::Headers.new(raw_headers)
     cookies = ActionDispatch::Cookies::CookieJar.new(nil)
     request = stub("request",
       host_with_port: "example.com:80",

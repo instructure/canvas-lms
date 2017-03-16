@@ -472,7 +472,7 @@ describe ApplicationHelper do
 
     it "should raise an error when a dialog with conflicting content is added" do
       hidden_dialog('dialog_id') { 'content' }
-      expect { hidden_dialog('dialog_id') { 'different content' } }.to raise_error
+      expect { hidden_dialog('dialog_id') { 'different content' } }.to raise_error("Attempted to capture a hidden dialog with dialog_id and different content!")
     end
 
     it "should only render a dialog once when it has been added multiple times" do
@@ -758,6 +758,27 @@ describe ApplicationHelper do
         @current_user = user
         mapped_courses = map_courses_for_menu(courses)
         expect(mapped_courses.map {|h| h[:id]}).to eq [course3.id, course2.id, course1.id]
+      end
+    end
+  end
+
+  describe "tutorials_enabled?" do
+    before(:each) do
+      @domain_root_account = Account.default
+    end
+    context "with new_users_tutorial feature flag enabled" do
+      before(:each) do
+        @domain_root_account.enable_feature! :new_user_tutorial
+      end
+
+      it "returns true" do
+        expect(tutorials_enabled?).to be true
+      end
+    end
+
+    context "with new_users_tutorial feature flag disabled" do
+      it "returns false" do
+        expect(tutorials_enabled?).to be false
       end
     end
   end

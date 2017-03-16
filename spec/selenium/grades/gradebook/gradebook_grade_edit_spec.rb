@@ -222,16 +222,16 @@ describe "editing grades" do
   end
 
   it "should display an error on failed updates", priority: "1", test_id: 220384 do
-    SubmissionsApiController.any_instance.expects(:update).returns('bad response')
+    # forces a 400
+    SubmissionsApiController.any_instance.expects(:get_user_considering_section).returns(nil)
     get "/courses/#{@course.id}/gradebook"
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
     expect_flash_message :error, "refresh"
   end
 
-  context 'with multiple grading periods enabled' do
+  context 'with grading periods' do
     before(:once) do
       root_account = @course.root_account = Account.default
-      root_account.enable_feature!(:multiple_grading_periods)
 
       group = Factories::GradingPeriodGroupHelper.new.create_for_account(root_account)
       group.enrollment_terms << @course.enrollment_term

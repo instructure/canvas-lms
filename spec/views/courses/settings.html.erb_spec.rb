@@ -25,16 +25,16 @@ describe "courses/settings.html.erb" do
     @course.sis_source_id = "so_special_sis_id"
     @course.workflow_state = 'claimed'
     @course.save!
-    assigns[:context] = @course
-    assigns[:user_counts] = {}
-    assigns[:all_roles] = Role.custom_roles_and_counts_for_course(@course, @user)
-    assigns[:course_settings_sub_navigation_tools] = []
+    assign(:context, @course)
+    assign(:user_counts, {})
+    assign(:all_roles, Role.custom_roles_and_counts_for_course(@course, @user))
+    assign(:course_settings_sub_navigation_tools, [])
   end
 
   describe "sis_source_id edit box" do
     it "should not show to teacher" do
       view_context(@course, @user)
-      assigns[:current_user] = @user
+      assign(:current_user, @user)
       render
       expect(response).to have_tag("span#course_sis_source_id", @course.sis_source_id)
       expect(response).not_to have_tag("input#course_sis_source_id")
@@ -43,7 +43,7 @@ describe "courses/settings.html.erb" do
     it "should show to sis admin" do
       admin = account_admin_user(:account => @course.root_account)
       view_context(@course, admin)
-      assigns[:current_user] = admin
+      assign(:current_user, admin)
       render
       expect(response).to have_tag("input#course_sis_source_id")
     end
@@ -52,7 +52,7 @@ describe "courses/settings.html.erb" do
       role = custom_account_role('NoSissy', :account => @course.root_account)
       admin = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => {'manage_sis' => false}, :role => role)
       view_context(@course, admin)
-      assigns[:current_user] = admin
+      assign(:current_user, admin)
       render
       expect(response).not_to have_tag("input#course_sis_source_id")
     end
@@ -60,8 +60,8 @@ describe "courses/settings.html.erb" do
     it "should show grade export when enabled" do
       admin = account_admin_user(:account => @course.root_account)
       view_context(@course, admin)
-      assigns[:current_user] = admin
-      assigns[:publishing_enabled] = true
+      assign(:current_user, admin)
+      assign(:publishing_enabled, true)
       render
       expect(response.body).to match /<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/
       expect(response.body).to match /<div id="tab-grade-publishing">/
@@ -70,8 +70,8 @@ describe "courses/settings.html.erb" do
     it "should not show grade export when disabled" do
       admin = account_admin_user(:account => @course.root_account)
       view_context(@course, admin)
-      assigns[:current_user] = admin
-      assigns[:publishing_enabled] = false
+      assign(:current_user, admin)
+      assign(:publishing_enabled, false)
       render
       expect(response.body).not_to match /<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/
       expect(response.body).not_to match /<div id="tab-grade-publishing">/
@@ -83,7 +83,7 @@ describe "courses/settings.html.erb" do
       before do
         admin = account_admin_user
         view_context(@course, admin)
-        assigns[:current_user] = admin
+        assign(:current_user, admin)
       end
 
       it "should show quota input box" do
@@ -95,7 +95,7 @@ describe "courses/settings.html.erb" do
     context "as teacher" do
       before do
         view_context(@course, @teacher)
-        assigns[:current_user] = @teacher
+        assign(:current_user, @teacher)
         @user = @teacher
       end
 

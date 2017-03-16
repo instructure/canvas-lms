@@ -245,14 +245,14 @@ describe Api::V1::User do
 
     context "computed scores" do
       before :once do
-        @enrollment.computed_current_score = 95.0;
-        @enrollment.computed_final_score = 85.0;
+        @enrollment.scores.create!(current_score: 95.0, final_score: 85.0)
         @student1_enrollment = @enrollment
         @student2 = course_with_student(:course => @course).user
       end
 
       before :each do
-        def @course.grading_standard_enabled?; true; end
+        @course.grading_standard_enabled = true
+        @course.save!
       end
 
       it "should return scores as admin" do
@@ -1004,53 +1004,53 @@ describe "Users API", type: :request do
                        )
         expect(json['name']).to eq 'Test User'
       end
-    end
 
-    it "should return a 400 error if the request doesn't include a unique id" do
-      @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
-      raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
-                   { :controller => 'users',
-                     :action => 'create_self_registered_user',
-                     :format => 'json',
-                     :account_id => @admin.account.id.to_s
-                   },
-                   {
-                       :user      => { :name => "Test User", :terms_of_use => "1"  },
-                       :pseudonym => { :password => "password123" }
-                   }
-                  )
-      assert_status(400)
-      errors = JSON.parse(response.body)['errors']
-      expect(errors['pseudonym']).to be_present
-      expect(errors['pseudonym']['unique_id']).to be_present
-    end
+      it "should return a 400 error if the request doesn't include a unique id" do
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+        raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+                     { :controller => 'users',
+                       :action => 'create_self_registered_user',
+                       :format => 'json',
+                       :account_id => @admin.account.id.to_s
+                     },
+                     {
+                         :user      => { :name => "Test User", :terms_of_use => "1"  },
+                         :pseudonym => { :password => "password123" }
+                     }
+                    )
+        assert_status(400)
+        errors = JSON.parse(response.body)['errors']
+        expect(errors['pseudonym']).to be_present
+        expect(errors['pseudonym']['unique_id']).to be_present
+      end
 
-    it "should set user's email address via communication_channel[address]" do
-      @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
-      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
-               { :controller => 'users',
-                 :action => 'create_self_registered_user',
-                 :format => 'json',
-                 :account_id => @admin.account.id.to_s
-               },
-               {
-                   :user      => { :name => "Test User", :terms_of_use => "1" },
-                   :pseudonym => {
-                       :unique_id         => "test@test.com",
-                       :password          => "password123"
-                   },
-                   :communication_channel => {
-                       :address           => "test@example.com"
-                   }
-               }
-              )
-      expect(response).to be_success
-      users = User.where(name: "Test User").to_a
-      expect(users.size).to eq 1
-      expect(users.first.pseudonyms.first.unique_id).to eq "test@test.com"
-      email = users.first.communication_channels.email.first
-      expect(email.path).to eq "test@example.com"
-      expect(email.path_type).to eq 'email'
+      it "should set user's email address via communication_channel[address]" do
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+        api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+                 { :controller => 'users',
+                   :action => 'create_self_registered_user',
+                   :format => 'json',
+                   :account_id => @admin.account.id.to_s
+                 },
+                 {
+                     :user      => { :name => "Test User", :terms_of_use => "1" },
+                     :pseudonym => {
+                         :unique_id         => "test@test.com",
+                         :password          => "password123"
+                     },
+                     :communication_channel => {
+                         :address           => "test@example.com"
+                     }
+                 }
+                )
+        expect(response).to be_success
+        users = User.where(name: "Test User").to_a
+        expect(users.size).to eq 1
+        expect(users.first.pseudonyms.first.unique_id).to eq "test@test.com"
+        email = users.first.communication_channels.email.first
+        expect(email.path).to eq "test@example.com"
+        expect(email.path_type).to eq 'email'
+      end
     end
   end
 
@@ -1098,7 +1098,8 @@ describe "Users API", type: :request do
           'locale' => 'en',
           'time_zone' => "Tijuana"
         })
-        expect(user.birthdate.to_date).to eq birthday.to_date
+
+        expect(user.birthdate.to_date).to eq birthday.getutc.to_date
         expect(user.time_zone.name).to eql 'Tijuana'
       end
 
@@ -1803,6 +1804,78 @@ describe "Users API", type: :request do
               "course_#{course2.id}" => 1,
             }
           },
+          {},
+          {:expected_status => 400}
+        )
+      end
+
+    end
+  end
+
+  describe "New User Tutorial Collapsed Status" do
+    before :once do
+      @a = Account.default
+      @u = user_factory(active_all: true)
+      @a.account_users.create!(user: @u)
+    end
+
+    describe "GET new user tutorial statuses" do
+      before :once do
+        @user.preferences[:new_user_tutorial_statuses] = {
+          "home" => true,
+          "modules" => false,
+        }
+        @user.save!
+      end
+
+      it "should return new user tutorial collapsed statuses for a user" do
+        json = api_call(
+          :get,
+          "/api/v1/users/#{@user.id}/new_user_tutorial_statuses",
+          { controller: "users", action: "get_new_user_tutorial_statuses", format: "json",
+            id: @user.to_param }
+        )
+        expect(json).to eq({"new_user_tutorial_statuses" => {"collapsed" => {"home" => true, "modules" => false}}})
+      end
+
+      it "should return empty if the user has no preference set" do
+        @user.preferences.delete(:new_user_tutorial_statuses)
+        @user.save!
+
+        json = api_call(
+          :get,
+          "/api/v1/users/#{@user.id}/new_user_tutorial_statuses",
+          { controller: "users", action: "get_new_user_tutorial_statuses", format: "json",
+            id: @user.to_param }
+        )
+        expect(json).to eq({"new_user_tutorial_statuses" => {"collapsed" => {}}})
+      end
+    end
+
+    describe "PUT new user tutorial status" do
+      it "should allow setting new user tutorial status" do
+        page_name = "modules"
+        json = api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/new_user_tutorial_statuses/#{page_name}",
+          { controller: "users", action: "set_new_user_tutorial_status", format: "json",
+            id: @user.to_param, page_name: page_name },
+          {
+            collapsed: true
+          },
+          {}
+        )
+        expect(json["new_user_tutorial_statuses"]["collapsed"]["modules"]).to eq true
+      end
+
+      it "should reject setting status for pages that are not whitelisted" do
+        page_name = "some_random_page"
+        api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/new_user_tutorial_statuses/#{page_name}",
+          { controller: "users", action: "set_new_user_tutorial_status", format: "json",
+            id: @user.to_param, page_name: page_name },
+          {},
           {},
           {:expected_status => 400}
         )

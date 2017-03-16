@@ -39,12 +39,12 @@ describe Setting do
 
   context "setting" do
 
-    it 'should set values as strings' do
+    it 'should set boolean values as strings' do
       Setting.set('my_new_setting', true)
       expect(Setting.get('my_new_setting', '1')).to eq 'true'
     end
 
-    it 'should set values as strings' do
+    it 'should set time values as strings' do
       time = Time.now.utc
       Setting.set('my_new_setting', time)
       expect(Setting.get('my_new_setting', '1')).to eq time.to_s

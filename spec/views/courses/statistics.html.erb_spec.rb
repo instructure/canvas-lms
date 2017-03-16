@@ -22,8 +22,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 describe "courses/statistics.html.erb" do
   before do
     course_with_teacher(:active_all => true)
-    assigns[:range_start] = Date.parse("Jan 1 2000")
-    assigns[:range_end] = 3.days.from_now
+    assign(:range_start, Date.parse("Jan 1 2000"))
+    assign(:range_end, 3.days.from_now)
   end
 
   it "only lists active quiz objects, questions, and submissions" do

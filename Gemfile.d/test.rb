@@ -3,9 +3,10 @@ group :test do
     gem 'rails-dom-testing', '1.0.8'
   else
     gem 'rails-dom-testing', '2.0.2'
+    gem 'rails-controller-testing', '1.0.1'
   end
 
-  gem 'gergich', '0.1.11', require: false
+  gem 'gergich', '0.1.13', require: false
   gem 'testingbot', require: false
   gem 'brakeman', require: false
   # simplecov 0.10.0 shows significantly less coverage.
@@ -38,7 +39,7 @@ group :test do
     gem 'websocket', '1.2.3', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test_after_commit', '1.1.0' if CANVAS_RAILS4_2
-  gem 'test-queue', github: 'jenseng/test-queue', ref: '57d31b70d9d83de3b3534f4119c614155c68e290', require: false
+  gem 'test-queue', github: 'jenseng/test-queue', ref: '1b92ebbca70705599c78a1bad5b16d6a37f741f2', require: false
   gem 'testrailtagging', '0.3.7', require: false
 
   gem 'webmock', '2.3.2', require: false

@@ -37,14 +37,13 @@ describe Submission do
     }
   end
 
-  describe "Multiple Grading Periods" do
+  describe "with grading periods" do
     let(:in_closed_grading_period) { 9.days.ago }
     let(:in_open_grading_period) { 1.day.from_now }
     let(:outside_of_any_grading_period) { 10.days.from_now }
 
     before(:once) do
       @root_account = @context.root_account
-      @root_account.enable_feature!(:multiple_grading_periods)
       group = @root_account.grading_period_groups.create!
       @closed_period = group.grading_periods.create!(
         title: "Closed!",
@@ -565,21 +564,6 @@ describe Submission do
         expect(@submission.messages_sent).not_to include('Submission Grade Changed')
       end
 
-      it "should create a message when the score is changed and the grades were already published" do
-        Notification.create(:name => 'Submission Grade Changed')
-        Notification.create(:name => 'Submission Graded')
-        @assignment.stubs(:score_to_grade).returns("10.0")
-        @assignment.stubs(:due_at).returns(Time.now  - 100)
-        submission_spec_model
-
-        @cc = @user.communication_channels.create(:path => "somewhere")
-        s = @assignment.grade_student(@user, grade: 10, grader: @teacher)[0] # @submission
-        @submission = @assignment.grade_student(@user, grade: 9, grader: @teacher)[0]
-        expect(@submission).to eql(s)
-        expect(@submission.messages_sent).not_to be_include('Submission Grade Changed')
-        expect(@submission.messages_sent).to be_include('Submission Graded')
-      end
-
       it "should not create a message when the score is changed and the grades were already published for a muted assignment" do
         Notification.create(:name => 'Submission Grade Changed')
         @assignment.mute!
@@ -664,7 +648,7 @@ describe Submission do
       }.from([nil]).to([50.0])
     end
 
-    context 'Multiple Grading Periods' do
+    context 'with grading periods' do
       before(:once) do
         @now = Time.zone.now
         course = @submission.context
@@ -675,7 +659,6 @@ describe Submission do
         assignment_outside_of_period.grade_student(@user, grade: 8, grader: @teacher)
         @assignment.update!(due_at: @now)
         @root_account = course.root_account
-        @root_account.enable_feature!(:multiple_grading_periods)
         group = @root_account.grading_period_groups.create!
         group.enrollment_terms << course.enrollment_term
         @grading_period = group.grading_periods.create!(
@@ -690,14 +673,6 @@ describe Submission do
         expect { @submission.update!(score: 5) }.to change {
           scores.pluck(:current_score)
         }.from([nil, 80.0]).to([50.0, 65.0])
-      end
-
-      it 'keeps grading period scores updated even if the feature flag is disabled' do
-        @submission.update!(score: 10)
-        @root_account.disable_feature!(:multiple_grading_periods)
-        expect { @submission.update!(score: 5) }.to change {
-          grading_period_scores.pluck(:current_score)
-        }.from([100.0]).to([50.0])
       end
 
       it 'only updates the course score (not the grading period score) if a submission ' \
@@ -1110,7 +1085,7 @@ describe Submission do
         expect(Delayed::Job.list_jobs(:future, 100).find_all { |j| j.tag == 'Submission#submit_to_turnitin' }.size).to eq 2
       end
 
-      it "should set status as failed if something fails after several attempts" do
+      it "should set status as failed if something fails on a retry" do
         init_turnitin_api
         @assignment.expects(:create_in_turnitin).returns(false)
         @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(stub(:success? => false, :error? => true, :error_hash => {}))
@@ -1727,7 +1702,7 @@ describe Submission do
       sub = @assignment.submit_homework @student, attachments: [old_attachment_1, old_attachment_2]
       attachment_model context: @student
       sub = @assignment.submit_homework @student, attachments: [@attachment]
-      expect(sub.attachments).to eq([@attachment])
+      expect(sub.attachments.to_a).to eq([@attachment])
       expect(sub.includes_attachment?(old_attachment_1)).to eq true
       expect(sub.includes_attachment?(old_attachment_2)).to eq true
     end
@@ -2492,6 +2467,19 @@ describe Submission do
                                                body: 'whee')
 
       expect(submission.plagiarism_service_to_use).to eq(:vericite)
+    end
+  end
+
+  describe "#resubmit_to_vericite" do
+    it "calls resubmit_to_plagiarism_later" do
+      plugin = Canvas::Plugin.find(:vericite)
+      PluginSetting.create!(name: plugin.id, settings: plugin.default_settings, disabled: false)
+
+      submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry',
+                                               body: 'whee')
+
+      submission.expects(:submit_to_plagiarism_later).once
+      submission.resubmit_to_vericite
     end
   end
 

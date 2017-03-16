@@ -24,7 +24,13 @@ module ArbitraryStrongishParams
 
       if filter[key] == ActionController::Parameters::EMPTY_ARRAY
         # Declaration { comment_ids: [] }.
-        array_of_permitted_scalars_filter(params, key)
+        if CANVAS_RAILS4_2
+          array_of_permitted_scalars_filter(params, key)
+        else
+          array_of_permitted_scalars?(self[key]) do |val|
+            params[key] = val
+          end
+        end
       elsif filter[key] == ANYTHING
         if filtered = recursive_arbitrary_filter(value)
           params[key] = filtered
@@ -33,7 +39,7 @@ module ArbitraryStrongishParams
       else
         # Declaration { user: :name } or { user: [:name, :age, { address: ... }] }.
         params[key] = each_element(value) do |element|
-          if element.is_a?(Hash)
+          if element.is_a?(Hash) || element.is_a?(ActionController::Parameters)
             element = self.class.new(element) unless element.respond_to?(:permit)
             element.permit(*Array.wrap(filter[key]))
           end
@@ -43,7 +49,7 @@ module ArbitraryStrongishParams
   end
 
   def recursive_arbitrary_filter(value)
-    if value.is_a?(Hash)
+    if value.is_a?(Hash) || value.is_a?(ActionController::Parameters)
       hash = {}
       value.each do |k, v|
         hash[k] = recursive_arbitrary_filter(v) if permitted_scalar?(k)

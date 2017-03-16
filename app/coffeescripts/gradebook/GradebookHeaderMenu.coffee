@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2011 - 2017 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 define [
   'i18n!gradebook'
   'jquery'
@@ -5,7 +23,7 @@ define [
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
   'compiled/gradebook/SetDefaultGradeDialog'
-  'compiled/gradebook/CurveGradesDialog'
+  'compiled/shared/CurveGradesDialog'
   'jst/gradebook/GradebookHeaderMenu'
   'jst/re_upload_submissions_form'
   'underscore'
@@ -101,7 +119,8 @@ define [
       assignment:@assignment,
       students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment)
     })=>
-      new AssignmentDetailsDialog(opts)
+      dialog = new AssignmentDetailsDialog(opts)
+      dialog.show()
 
     messageStudentsWho: (opts={
       assignment:@assignment,
@@ -125,10 +144,9 @@ define [
       students: @gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment),
       context_id: @gradebook.options.context_id
       selected_section: @gradebook.sectionToShow
-      isAdmin: isAdmin()
     }) =>
       if isAdmin() or not opts.assignment.inClosedGradingPeriod
-        new SetDefaultGradeDialog(opts)
+        new SetDefaultGradeDialog(opts).show()
       else
         $.flashError(I18n.t("Unable to set default grade because this " +
           "assignment is due in a closed grading period for at least one student"))
@@ -137,10 +155,10 @@ define [
       assignment: @assignment,
       students: @gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment),
       context_url: @gradebook.options.context_url
-      isAdmin: isAdmin()
     }) =>
       if isAdmin() or not opts.assignment.inClosedGradingPeriod
-        new CurveGradesDialog(opts)
+        dialog = new CurveGradesDialog(opts)
+        dialog.show()
       else
         $.flashError(I18n.t("Unable to curve grades because this " +
           "assignment is due in a closed grading period for at least " +

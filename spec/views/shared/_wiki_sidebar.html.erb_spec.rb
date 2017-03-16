@@ -26,7 +26,7 @@ describe "/shared/_wiki_sidebar" do
     render :partial => "shared/wiki_sidebar"
     expect(response).not_to be_nil
   end
-  
+
   it "should render in user context" do
     user_factory
     view_context(@user, @user)
@@ -45,7 +45,7 @@ describe "/shared/_wiki_sidebar" do
   it "should differenticate discussions/announcements" do
     course_with_teacher
     view_context
-    assigns[:wiki_sidebar_data] = {
+    assign(:wiki_sidebar_data, {
       active_assignments: [],
       active_discussion_topics: [
         @course.discussion_topics.create!(title: "please chat", message: "DD"),
@@ -56,7 +56,7 @@ describe "/shared/_wiki_sidebar" do
       wiki_pages: [],
       wiki: nil,
       root_folders: []
-    }
+    })
     render :partial => "shared/wiki_sidebar"
     doc = Nokogiri::HTML.parse(response.body)
     expect(doc.at_css("#announcements_panel").text).to match(/listen up/)

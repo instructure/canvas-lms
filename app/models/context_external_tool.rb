@@ -34,14 +34,8 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.context.grants_right?(user, session, :update) }
-    can :read and can :update and can :delete
-
-    given do |user, session|
-      self.grants_right?(user, session, :update) &&
-      self.context.grants_right?(user, session, :lti_add_edit)
-    end
-    can :update_manually
+    given { |user, session| self.context.grants_right?(user, session, :lti_add_edit) }
+    can :read and can :update and can :delete and can :update_manually
   end
 
   CUSTOM_EXTENSION_KEYS = {:file_menu => [:accept_media_types].freeze}.freeze
@@ -415,6 +409,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   def self.standardize_url(url)
     return "" if url.blank?
+    url = url.gsub(/[[:space:]]/, '')
     url = "http://" + url unless url.match(/:\/\//)
     res = Addressable::URI.parse(url).normalize
     res.query = res.query.split(/&/).sort.join('&') if !res.query.blank?

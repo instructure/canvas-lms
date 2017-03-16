@@ -1,11 +1,12 @@
 define [
   'underscore'
   'Backbone'
+  'i18n!outcomes'
   'compiled/collections/OutcomeResultCollection'
   'd3'
   'jst/outcomes/accessibleLineGraph'
   'compiled/underscore-ext/sum'
-], (_, Backbone, OutcomeResultCollection, d3, accessibleTemplate) ->
+], (_, Backbone, I18n, OutcomeResultCollection, d3, accessibleTemplate) ->
   # Trend class based on formulae found here:
   # http://classroom.synonym.com/calculate-trendline-2709.html
   class Trend
@@ -204,11 +205,11 @@ define [
           _.first(@data()).date
           _.last(@data()).date
         ])
-        .tickFormat((d) -> d3.time.format("%m/%d")(d))
+        .tickFormat((d) -> Intl.DateTimeFormat(I18n.currentLocale(), { day: 'numeric', month: 'numeric'}).format(d))
       @yAxis = d3.svg.axis()
         .scale(@y)
         .orient("left")
-        .tickFormat((d) -> "#{d}%" )
+        .tickFormat((d) -> I18n.n(d, { percentage: true }))
         .tickValues([0, 50, 100])
       @yGuides = d3.svg.axis()
         .scale(@y)
@@ -260,4 +261,3 @@ define [
         (@width() / (@limit - 1)) *
         (@limit - @data().length)
       ))
-

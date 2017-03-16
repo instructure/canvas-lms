@@ -97,6 +97,29 @@ describe AssignmentOverride do
     expect(@override2.set).to eq [@student]
   end
 
+  context '#mastery_paths?' do
+    let(:override) do
+      described_class.new({
+        set_type: AssignmentOverride::SET_TYPE_NOOP,
+        set_id: AssignmentOverride::NOOP_MASTERY_PATHS
+      })
+    end
+
+    it "returns true when it is a mastery_paths override" do
+      expect(override.mastery_paths?).to eq true
+    end
+
+    it "returns false when it is not a mastery_paths noop" do
+      override.set_id = 999
+      expect(override.mastery_paths?).to eq false
+    end
+
+    it "returns false when it is not a noop override" do
+      override.set_type = 'EvilType'
+      expect(override.mastery_paths?).to eq false
+    end
+  end
+
   describe 'versioning' do
     before :once do
       @override = assignment_override_model
@@ -581,6 +604,71 @@ describe AssignmentOverride do
           expect(override.quiz).to be_nil
         end
       end
+    end
+  end
+
+  describe '#update_grading_period_grades with no grading periods' do
+    it 'should not update grades when due_at changes' do
+      assignment_model
+      Course.any_instance.expects(:recompute_student_scores).never
+      override = AssignmentOverride.new
+      override.assignment = @assignment
+      override.due_at = 6.months.ago
+      override.save!
+    end
+  end
+
+  describe '#update_grading_period_grades' do
+    before :once do
+      @override = AssignmentOverride.new(set_type: 'ADHOC', due_at_overridden: true)
+      student_in_course
+      @assignment = assignment_model(course: @course)
+      @grading_period_group = @course.root_account.grading_period_groups.create!(title: "Example Group")
+      @grading_period_group.enrollment_terms << @course.enrollment_term
+      @grading_period_group.grading_periods.create!(
+        title: 'GP1',
+        start_date: 9.months.ago,
+        end_date: 5.months.ago
+      )
+      @grading_period_group.grading_periods.create!(
+        title: 'GP2',
+        start_date: 4.months.ago,
+        end_date: 2.months.from_now
+      )
+      @course.enrollment_term.save!
+      @assignment.reload
+      @override.assignment = @assignment
+      @override.save!
+      @override.assignment_override_students.create(user: @student)
+    end
+
+    it 'should not update grades if there are no students on this override' do
+      @override.assignment_override_students.clear
+      Course.any_instance.expects(:recompute_student_scores).never
+      @override.due_at = 6.months.ago
+      @override.save!
+    end
+
+    it 'should update grades when due_at changes to a grading period' do
+      Course.any_instance.expects(:recompute_student_scores).twice
+      @override.due_at = 6.months.ago
+      @override.save!
+    end
+
+    it 'should update grades twice when due_at changes to another grading period' do
+      @override.due_at = 1.month.ago
+      @override.save!
+      Course.any_instance.expects(:recompute_student_scores).twice
+      @override.due_at = 6.months.ago
+      @override.save!
+    end
+
+    it 'should not update grades if grading period did not change' do
+      @override.due_at = 1.month.ago
+      @override.save!
+      Course.any_instance.expects(:recompute_student_scores).never
+      @override.due_at = 2.months.ago
+      @override.save!
     end
   end
 

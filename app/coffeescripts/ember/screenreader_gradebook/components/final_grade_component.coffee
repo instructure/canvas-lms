@@ -17,7 +17,7 @@ define [
 
     pointRatio: ( ->
       "#{I18n.n @get('student.total_grade.score')} / #{I18n.n @get('student.total_grade.possible')}"
-    ).property("weighted_groups", "student.total_grade.score", "student.total_grade.possible")
+    ).property("weighted_grades", "student.total_grade.score", "student.total_grade.possible")
 
     letterGrade:(->
       GradingSchemeHelper.scoreToGrade(@get('percent'), @get('gradingStandard'))
@@ -26,7 +26,7 @@ define [
     showGrade: Ember.computed.bool('student.total_grade.possible')
 
     showPoints:(->
-      !!(!@get("weighted_groups") && @get("student.total_grade"))
-    ).property("weighted_groups","student.total_grade")
+      !!(!@get("weighted_grades") && @get("student.total_grade"))
+    ).property("weighted_grades","student.total_grade")
 
     showLetterGrade: Ember.computed.bool("gradingStandard")

@@ -289,7 +289,7 @@ input.move-module-label-spacer {
   margin-left: 20px;
 }
 
-.offline_web_export_view {
+.header-bar__module-layout {
   display: inline-flex;
   flex-direction: column;
   align-items: flex-end;
@@ -297,6 +297,7 @@ input.move-module-label-spacer {
     padding-top: 6px;
   }
   form {
+    display: inline;
     margin: 0;
   }
 }

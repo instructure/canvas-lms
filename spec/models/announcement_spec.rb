@@ -114,14 +114,6 @@ describe Announcement do
       end
 
       it "should sanitize objects in a message" do
-        @a.message = "<object data=\"http://www.youtube.com/test\"></object>"
-        @a.save!
-        dom = Nokogiri(@a.message)
-        expect(dom.css('object').length).to eql(1)
-        expect(dom.css('object')[0]['data']).to eql("http://www.youtube.com/test")
-      end
-
-      it "should sanitize objects in a message" do
         @a.message = "<object data=\"http://www.youtuube.com/test\" othertag=\"bob\"></object>"
         @a.save!
         dom = Nokogiri(@a.message)

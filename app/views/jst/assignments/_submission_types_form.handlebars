@@ -195,13 +195,17 @@
                  type="text"
                  style="display: none"/>
         </div>
-        <label for="assignment_external_tool_tag_attributes_new_tab" class="checkbox">
-          {{checkbox "externalToolNewTab"
-            id="assignment_external_tool_tag_attributes_new_tab"
-            name="external_tool_tag_attributes[new_tab]"
-            disabled=submissionTypesFrozen}}
-          {{#t "label.external_tool_new_tab"}}Load This Tool In A New Tab{{/t}}
-        </label>
+
+        {{#unless isQuizLTIAssignment}}
+          <label for="assignment_external_tool_tag_attributes_new_tab" class="checkbox">
+            {{checkbox "externalToolNewTab"
+              id="assignment_external_tool_tag_attributes_new_tab"
+              name="external_tool_tag_attributes[new_tab]"
+              disabled=submissionTypesFrozen}}
+            {{#t "label.external_tool_new_tab"}}Load This Tool In A New Tab{{/t}}
+          </label>
+        {{/unless}}
+
         {{#if groupCategoryId}}
           <div class="alert assignment-edit-external-tool-alert">
             {{#t "external_tool_group_warning"}}

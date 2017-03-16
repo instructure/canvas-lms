@@ -89,7 +89,7 @@ class RubricsController < ApplicationController
       end
       json_res = {}
       json_res[:rubric] = @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => {:user => @current_user, :session => session}) if @rubric
-      json_res[:rubric_association] = @association.as_json(:include_root => false, :include => [:assessment_requests], :methods => :assessor_name, :permissions => {:user => @current_user, :session => session}) if @association
+      json_res[:rubric_association] = @association.as_json(:include_root => false, :include => [:assessment_requests], :permissions => {:user => @current_user, :session => session}) if @association
       json_res[:rubric_association][:skip_updating_points_possible] = skip_points_update if json_res && json_res[:rubric_association]
       render :json => json_res
     end

@@ -83,4 +83,17 @@ describe PluginSetting do
       expect(settings).to eq({:food => "bar"})
     end
   end
+
+  it "should cache in process" do
+    RequestCache.enable do
+      enable_cache do
+        name = "plugin_setting_test"
+        ps = PluginSetting.new(:name => name, :settings => {:bar => "qwerty"})
+        s.save!
+        MultiCache.expects(:fetch).once.returns(s)
+        PluginSetting.cached_plugin_setting(name) # sets the cache
+        PluginSetting.cached_plugin_setting(name) # 2nd lookup
+      end
+    end
+  end
 end

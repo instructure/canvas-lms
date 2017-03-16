@@ -779,9 +779,8 @@ describe Course do
         expect(result).to eq expected
       end
 
-      context 'with multiple grading periods' do
+      context 'with grading periods' do
         before(:once) do
-          @test_course.enable_feature! :multiple_grading_periods
           @gp_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@test_course.account)
           @gp_group.enrollment_terms << @test_course.enrollment_term
         end
@@ -1295,8 +1294,6 @@ describe Course do
       @test_course = Course.create!
       @student1 = student_in_course(course: @test_course, active_all: true).user
       @student2 = student_in_course(course: @test_course, active_all: true).user
-      @assignment1 = @test_course.assignments.create!(due_at: 2.weeks.from_now(@now))
-      @assignment2 = @test_course.assignments.create!
       @gp_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@test_course.account)
       @gp_group.enrollment_terms << @test_course.enrollment_term
       @grading_period = Factories::GradingPeriodHelper.new.create_for_group(
@@ -1305,25 +1302,23 @@ describe Course do
         end_date: 15.days.ago(@now),
         close_date: 10.days.ago(@now)
       )
+      @assignment1 = @test_course.assignments.create!(due_at: 2.weeks.from_now(@now))
+      @assignment2 = @test_course.assignments.create!
     end
 
     describe '#any_in_closed_grading_period?' do
-      it 'returns false if multiple grading periods is disabled' do
+      it 'returns false if there are no grading periods' do
         @assignment2.due_at = 17.days.ago(@now)
         @assignment2.only_visible_to_overrides = false
         @assignment2.save!
 
-        @test_course.disable_feature! :multiple_grading_periods
+        @test_course.expects(:grading_periods?).returns false
         edd = EffectiveDueDates.for_course(@test_course)
         edd.expects(:to_hash).never
         expect(edd.any_in_closed_grading_period?).to eq(false)
       end
 
-      context 'with multiple grading periods' do
-        before(:once) do
-          @test_course.enable_feature! :multiple_grading_periods
-        end
-
+      context 'with grading periods' do
         it 'returns true if any students in any assignments have a due date in a closed grading period' do
           @assignment2.due_at = 1.day.ago(@now)
           @assignment2.only_visible_to_overrides = false
@@ -1389,12 +1384,12 @@ describe Course do
     end
 
     describe '#in_closed_grading_period?' do
-      it 'returns false if multiple grading periods is disabled' do
+      it 'returns false if there are no grading periods' do
         @assignment2.due_at = 17.days.ago(@now)
         @assignment2.only_visible_to_overrides = false
         @assignment2.save!
 
-        @test_course.disable_feature! :multiple_grading_periods
+        @test_course.expects(:grading_periods?).returns false
         edd = EffectiveDueDates.for_course(@test_course)
         edd.expects(:to_hash).never
         expect(edd.in_closed_grading_period?(@assignment2)).to eq(false)
@@ -1406,12 +1401,8 @@ describe Course do
         expect(edd.in_closed_grading_period?(nil)).to eq(false)
       end
 
-      context 'with multiple grading periods' do
-        before(:once) do
-          @test_course.enable_feature! :multiple_grading_periods
-        end
-
-        before(:each) do
+      context 'with grading periods' do
+        before do
           @assignment2.due_at = 1.day.ago(@now)
           @assignment2.only_visible_to_overrides = false
           @assignment2.save!
@@ -1433,12 +1424,25 @@ describe Course do
           expect(@edd.in_closed_grading_period?(@assignment1)).to eq(false)
         end
 
+        it 'returns true if the specified student has a due date for this assignment' do
+          expect(@edd.in_closed_grading_period?(@assignment2, @student2)).to be true
+          expect(@edd.in_closed_grading_period?(@assignment2, @student2.id)).to be true
+        end
+
         it 'returns false if the specified student has a due date in an open grading period' do
           override = @assignment2.assignment_overrides.create!(due_at: 1.day.from_now(@now), due_at_overridden: true)
           override.assignment_override_students.create!(user: @student1)
 
-          expect(@edd.in_closed_grading_period?(@assignment2, @student1)).to be_falsey
-          expect(@edd.in_closed_grading_period?(@assignment2, @student1.id)).to be_falsey
+          expect(@edd.in_closed_grading_period?(@assignment2, @student1)).to be false
+          expect(@edd.in_closed_grading_period?(@assignment2, @student1.id)).to be false
+        end
+
+        it 'returns false if the specified student does not have a due date for this assignment' do
+          @other_course = Course.create!
+          @student_in_other_course = student_in_course(course: @other_course, active_all: true).user
+
+          expect(@edd.in_closed_grading_period?(@assignment2, @student_in_other_course)).to be false
+          expect(@edd.in_closed_grading_period?(@assignment2, @student_in_other_course.id)).to be false
         end
       end
     end

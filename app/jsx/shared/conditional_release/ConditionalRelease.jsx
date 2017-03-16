@@ -5,9 +5,9 @@ define([
   'react-modal',
   'classnames',
   'i18n!conditional_release',
-  'jquery.instructure_forms',
-], ($, React, ReactDOM, Modal, classNames, I18n) => {
-
+  'jsx/shared/helpers/numberHelper',
+  'jquery.instructure_forms'
+], ($, React, ReactDOM, Modal, classNames, I18n, numberHelper) => {
   const SAVE_TIMEOUT = 15000
 
   const Editor = React.createClass({
@@ -96,7 +96,11 @@ define([
         jwt: env['jwt'],
         assignment: env['assignment'],
         courseId: env['context_id'],
-        locale: env['locale'],
+        locale: {
+          locale: env.locale,
+          parseNumber: numberHelper.parse,
+          formatNumber: I18n.n
+        },
         gradingType: env['grading_type'],
         baseUrl: env['base_url']
       })

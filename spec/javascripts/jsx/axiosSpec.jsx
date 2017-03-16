@@ -23,4 +23,20 @@ define(['axios', 'moxios'], (axios, moxios) => {
 
     moxios.wait();
   });
+
+  test('passes X-Requested-With header', (assert) => {
+    const done = assert.async();
+
+    moxios.stubRequest('/some/url', {
+      status: 200,
+      responseText: 'hello'
+    });
+
+    axios.get('/some/url').then((response) => {
+      ok(response.config.headers['X-Requested-With'] === 'XMLHttpRequest');
+      done();
+    });
+
+    moxios.wait();
+  });
 });

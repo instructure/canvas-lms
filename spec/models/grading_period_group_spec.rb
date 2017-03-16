@@ -58,6 +58,44 @@ describe GradingPeriodGroup do
     end
   end
 
+  describe '.for_course' do
+    before(:once) do
+      @course = account.courses.create!
+    end
+
+    it 'returns the set associated with the course' do
+      set = account.grading_period_groups.create!(valid_attributes)
+      set.enrollment_terms << @course.enrollment_term
+      expect(GradingPeriodGroup.for_course(@course)).to eq(set)
+    end
+
+    it 'returns nil if no set is associated with the course' do
+      expect(GradingPeriodGroup.for_course(@course)).to be_nil
+    end
+
+    it 'returns nil if the associated set is soft-deleted' do
+      set = account.grading_period_groups.create!(valid_attributes)
+      set.enrollment_terms << @course.enrollment_term
+      set.destroy
+      expect(GradingPeriodGroup.for_course(@course)).to be_nil
+    end
+
+    context 'legacy grading periods support' do
+      before(:once) do
+        @set = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+      end
+
+      it 'returns the set associated with the course' do
+        expect(GradingPeriodGroup.for_course(@course)).to eq(@set)
+      end
+
+      it 'returns nil if the associated set is soft-deleted' do
+        @set.destroy
+        expect(GradingPeriodGroup.for_course(@course)).to be_nil
+      end
+    end
+  end
+
   describe "validation" do
     let(:group) { GradingPeriodGroup.new valid_attributes }
 
@@ -120,36 +158,6 @@ describe GradingPeriodGroup do
     end
   end
 
-  describe "#multiple_grading_periods_enabled?" do
-    context "when associated with an account" do
-      let(:term) { account.enrollment_terms.create! }
-      let(:group) { group_helper.create_for_account(account) }
-
-      it "returns false if the multiple grading periods feature flag has not been enabled" do
-        expect(group.multiple_grading_periods_enabled?).to eq(false)
-      end
-
-      it "returns true if the multiple grading periods feature flag has been enabled" do
-        account.enable_feature!(:multiple_grading_periods)
-        expect(group.multiple_grading_periods_enabled?).to eq(true)
-      end
-    end
-
-    context "when associated with a course" do
-      let(:course) { Course.create!(account: account) }
-      let(:group) { group_helper.legacy_create_for_course(course) }
-
-      it "returns false if the multiple grading periods feature flag has not been enabled" do
-        expect(group.multiple_grading_periods_enabled?).to eq(false)
-      end
-
-      it "returns true if the multiple grading periods feature flag has been enabled" do
-        course.root_account.enable_feature!(:multiple_grading_periods)
-        expect(group.multiple_grading_periods_enabled?).to eq(true)
-      end
-    end
-  end
-
   it_behaves_like "soft deletion" do
     let(:course) { Course.create!(account: account) }
     let(:creation_arguments) { {title: "A title"} }
@@ -188,7 +196,6 @@ describe GradingPeriodGroup do
     context "course belonging to root account" do
       before :once do
         @root_account = Account.default
-        @root_account.enable_feature!(:multiple_grading_periods)
         @sub_account = @root_account.sub_accounts.create!
         course_with_teacher(account: @root_account, active_all: true)
         course_with_student(course: @course, active_all: true)
@@ -297,30 +304,11 @@ describe GradingPeriodGroup do
           })
         end
       end
-
-      context "multiple grading periods feature flag turned off" do
-        before(:once) do
-          account_admin_user(account: @root_account)
-          @root_account_admin = @admin
-          @root_account.disable_feature! :multiple_grading_periods
-        end
-
-        it "cannot do anything with grading period groups" do
-          expect(@course_group.
-            rights_status(@root_account_admin, *permissions)).to eq({
-            read:   false,
-            create: false,
-            update: false,
-            delete: false
-          })
-        end
-      end
     end
 
     context "course belonging to sub-account" do
       before(:once) do
         @root_account = Account.default
-        @root_account.enable_feature!(:multiple_grading_periods)
         @sub_account = @root_account.sub_accounts.create!
         course_with_teacher(account: @sub_account, active_all: true)
         course_with_student(course: @course, active_all: true)
@@ -429,24 +417,25 @@ describe GradingPeriodGroup do
           })
         end
       end
+    end
+  end
 
-      context "multiple grading periods feature flag turned off" do
-        before(:once) do
-          account_admin_user(account: @sub_account)
-          @sub_account_admin = @admin
-          @root_account.disable_feature! :multiple_grading_periods
-        end
+  describe 'computation of course scores' do
+    before(:once) do
+      @grading_period_set = account.grading_period_groups.create!(valid_attributes)
+      term = account.enrollment_terms.create!
+      @grading_period_set.enrollment_terms << term
+      account.courses.create!(enrollment_term: term)
+    end
 
-        it "cannot do anything with course grading period groups" do
-          expect(@course_group.
-            rights_status(@sub_account_admin, *permissions)).to eq({
-            read:   false,
-            create: false,
-            update: false,
-            delete: false
-          })
-        end
-      end
+    it 'recomputes course scores when the weighted attribute is changed' do
+      Enrollment.expects(:recompute_final_score).once
+      @grading_period_set.update!(weighted: true)
+    end
+
+    it 'does not recompute course scores when the weighted attribute is not changed' do
+      Enrollment.expects(:recompute_final_score).never
+      @grading_period_set.update!(title: 'The Best Set')
     end
   end
 end

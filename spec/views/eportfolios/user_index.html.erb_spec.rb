@@ -23,7 +23,7 @@ describe "/eportfolios/index" do
   it "should render" do
     eportfolio_with_user
     view_portfolio
-    assigns[:portfolios] = [@portfolio]
+    assign(:portfolios, [@portfolio])
     render "eportfolios/user_index"
     expect(response).not_to be_nil
   end

@@ -337,7 +337,13 @@ body.primary-nav-expanded {
 
   .ic-app-header__menu-list-item.ic-app-header__menu-list-item--active {
     .menu-item__text {
-      color: $ic-brand-global-nav-menu-item__text-color--active;
+
+      @if $use_high_contrast {
+        color: $ic-link-color;
+      }
+      @else {
+        color: $ic-brand-global-nav-menu-item__text-color--active;
+      }
     }
   }
 

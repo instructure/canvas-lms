@@ -99,13 +99,31 @@
       <div class="controls">
         <input
           id="{{uniqLabel}}_assignment_points"
-          class="input-small"
+          class="input-small points_possible"
           type="text"
           name="points_possible"
-          value="{{pointsPossible}}"
+          value="{{n pointsPossible}}"
           {{disabledIfIncludes frozenAttributes "points_possible"}}/>
       </div>
     </div>
+    {{/if}}
+
+    {{#if postToSISEnabled}}
+      <fieldset>
+        <div class="control-group">
+          <label class="control-label" id="post_to_sis_label">
+            {{#t}}Sync to {{postToSISName}}:{{/t}}
+          </label>
+          <label>
+            {{checkbox "postToSIS"
+              id="assignment_post_to_sis"
+              name="post_to_sis"
+              aria-labelledby="post_to_sis_label"
+              class="post_to_sis_checkbox"
+            }}
+          </label>
+        </div>
+      </fieldset>
     {{/if}}
   </div>
 </div>

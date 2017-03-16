@@ -207,7 +207,7 @@ module AuthenticationMethods
         params_without_become = params.dup
         params_without_become.delete_if {|k,v| [ 'become_user_id', 'become_teacher', 'become_student', 'me' ].include? k }
         params_without_become[:only_path] = true
-        session[:masquerade_return_to] = url_for(params_without_become)
+        session[:masquerade_return_to] = url_for(params_without_become.to_hash)
         return redirect_to user_masquerade_url(request_become_user.id)
       end
     end

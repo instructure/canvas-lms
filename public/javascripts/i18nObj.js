@@ -326,7 +326,8 @@ I18n.scope.prototype = {
   toCurrency:   I18n.toCurrency.bind(I18n),
   toHumanSize:  I18n.toHumanSize.bind(I18n),
   toPercentage: I18n.toPercentage.bind(I18n),
-  localizeNumber: I18n.n.bind(I18n)
+  localizeNumber: I18n.n.bind(I18n),
+  currentLocale: I18n.currentLocale.bind(I18n)
 };
 I18n.scope.prototype.t = I18n.scope.prototype.translate;
 I18n.scope.prototype.l = I18n.scope.prototype.localize;

@@ -89,29 +89,8 @@ module SIS
         @success_count = 0
       end
 
-      # This method signature is deprecated:
-      # add_enrollment(course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id=nil, root_account_id=nil, role_id=nil)
-      # Pass a single instance of SIS::Models::Enrollment instead
-      def add_enrollment(*enrollment_data)
-        if enrollment_data.length == 1
-          enrollment = enrollment_data.first
-        else
-          enrollment = SIS::Models::Enrollment.new(
-              {
-                  course_id: enrollment_data[0],
-                  section_id: enrollment_data[1],
-                  user_id: enrollment_data[2],
-                  role: enrollment_data[3],
-                  status: enrollment_data[4],
-                  start_date: enrollment_data[5],
-                  end_date: enrollment_data[6],
-                  associated_user_id: enrollment_data[7],
-                  root_account_id: enrollment_data[8],
-                  role_id: enrollment_data[9]
-              }
-          )
-        end
-
+      # Pass a single instance of SIS::Models::Enrollment
+      def add_enrollment(enrollment)
         raise ImportError, "No course_id or section_id given for an enrollment" unless enrollment.valid_context?
         raise ImportError, "No user_id given for an enrollment" unless enrollment.valid_user?
         raise ImportError, "Improper status \"#{enrollment.status}\" for an enrollment" unless enrollment.valid_status?
@@ -130,39 +109,37 @@ module SIS
         transaction_timeout = Setting.get('sis_transaction_seconds', '1').to_i.seconds
         Enrollment.transaction do
           tx_end_time = Time.now + transaction_timeout
-          enrollment = nil
+          enrollment_info = nil
           while !@enrollment_batch.empty? && tx_end_time > Time.now
-            enrollment = @enrollment_batch.shift
-            enrollment_array = enrollment.to_a
-            @logger.debug("Processing Enrollment #{enrollment_array.inspect}")
-            course_id, section_id, user_id, role_name, role_id, status, start_date, end_date, associated_sis_user_id, root_account_sis_id = enrollment_array
+            enrollment_info = @enrollment_batch.shift
+            @logger.debug("Processing Enrollment #{enrollment_info.to_a.inspect}")
 
             last_section = @section
             # reset the cached course/section if they don't match this row
-            if @course && course_id.present? && @course.sis_source_id != course_id
+            if @course && enrollment_info.course_id.present? && @course.sis_source_id != enrollment_info.course_id
               @course = nil
               @section = nil
             end
-            if @section && section_id.present? && @section.sis_source_id != section_id
+            if @section && enrollment_info.section_id.present? && @section.sis_source_id != enrollment_info.section_id
               @section = nil
             end
 
-            if root_account_sis_id.present?
-              root_account = root_account_from_id(root_account_sis_id)
+            if enrollment_info.root_account_id.present?
+              root_account = root_account_from_id(enrollment_info.root_account_id)
               next unless root_account
             else
               root_account = @root_account
             end
 
-            if !enrollment.user_integration_id.blank?
-              pseudo = root_account.pseudonyms.where(integration_id: enrollment.user_integration_id).take
+            if !enrollment_info.user_integration_id.blank?
+              pseudo = root_account.pseudonyms.where(integration_id: enrollment_info.user_integration_id).take
             else
-              pseudo = root_account.pseudonyms.where(sis_user_id: user_id).take
+              pseudo = root_account.pseudonyms.where(sis_user_id: enrollment_info.user_id).take
             end
 
             unless pseudo
               err = "User not found for enrollment "
-              err << "(User ID: #{user_id}, Course ID: #{course_id}, Section ID: #{section_id})"
+              err << "(User ID: #{enrollment_info.user_id}, Course ID: #{enrollment_info.course_id}, Section ID: #{enrollment_info.section_id})"
               @messages << err
               next
             end
@@ -170,38 +147,38 @@ module SIS
             user = pseudo.user
             if root_account != @root_account
               if !user.find_pseudonym_for_account(@root_account, true)
-                @messages << "User #{root_account_sis_id}:#{user_id} does not have a usable login for this account"
+                @messages << "User #{enrollment_info.root_account_id}:#{enrollment_info.user_id} does not have a usable login for this account"
                 next
               end
             end
 
-            @course ||= @root_account.all_courses.where(sis_source_id: course_id).take unless course_id.blank?
-            @section ||= @root_account.course_sections.where(sis_source_id: section_id).take unless section_id.blank?
+            @course ||= @root_account.all_courses.where(sis_source_id: enrollment_info.course_id).take unless enrollment_info.course_id.blank?
+            @section ||= @root_account.course_sections.where(sis_source_id: enrollment_info.section_id).take unless enrollment_info.section_id.blank?
             if @course.nil? && @section.nil?
               message = "Neither course nor section existed for user enrollment "
-              message << "(Course ID: #{course_id}, Section ID: #{section_id}, User ID: #{user_id})"
+              message << "(Course ID: #{enrollment_info.course_id}, Section ID: #{enrollment_info.section_id}, User ID: #{enrollment_info.user_id})"
               @messages << message
               next
             end
 
-            if section_id.present? && !@section
-              @messages << "An enrollment referenced a non-existent section #{section_id}"
+            if enrollment_info.section_id.present? && !@section
+              @messages << "An enrollment referenced a non-existent section #{enrollment_info.section_id}"
               next
             end
-            if course_id.present? && !@course
-              @messages << "An enrollment referenced a non-existent course #{course_id}"
+            if enrollment_info.course_id.present? && !@course
+              @messages << "An enrollment referenced a non-existent course #{enrollment_info.course_id}"
               next
             end
 
             # reset cached/inferred course and section if they don't match with the opposite piece that was
             # explicitly provided
-            @section = @course.default_section(:include_xlists => true) if @section.nil? || section_id.blank? && !@section.default_section
-            @course = @section.course if @course.nil? || (course_id.blank? && @course.id != @section.course_id) || (@course.id != @section.course_id && @section.nonxlist_course_id == @course.id)
+            @section = @course.default_section(:include_xlists => true) if @section.nil? || enrollment_info.section_id.blank? && !@section.default_section
+            @course = @section.course if @course.nil? || (enrollment_info.course_id.blank? && @course.id != @section.course_id) || (@course.id != @section.course_id && @section.nonxlist_course_id == @course.id)
 
             if @course.id != @section.course_id
-              message = "An enrollment listed a section (#{section_id}) "
-              message << "and a course (#{course_id}) that are unrelated "
-              message << "for user (#{user_id})"
+              message = "An enrollment listed a section (#{enrollment_info.section_id}) "
+              message << "and a course (#{enrollment_info.course_id}) that are unrelated "
+              message << "for user (#{enrollment_info.user_id})"
               @messages << message
               next
             end
@@ -219,37 +196,37 @@ module SIS
             associated_user_id = nil
 
             role = nil
-            role = @course_roles_by_account_id[@course.account_id].detect{|r| r.global_id == Shard.global_id_for(role_id, @course.shard)} if role_id
-            role ||= @course_roles_by_account_id[@course.account_id].detect{|r| r.name == role_name}
+            role = @course_roles_by_account_id[@course.account_id].detect{|r| r.global_id == Shard.global_id_for(enrollment_info.role_id, @course.shard)} if enrollment_info.role_id
+            role ||= @course_roles_by_account_id[@course.account_id].detect{|r| r.name == enrollment_info.role}
 
             type = if role
               role.base_role_type
             else
-              if role_name =~ /\Ateacher\z/i
+              if enrollment_info.role =~ /\Ateacher\z/i
                 'TeacherEnrollment'
-              elsif role_name =~ /\Astudent/i
+              elsif enrollment_info.role =~ /\Astudent/i
                 'StudentEnrollment'
-              elsif role_name =~ /\Ata\z/i
+              elsif enrollment_info.role =~ /\Ata\z/i
                 'TaEnrollment'
-              elsif role_name =~ /\Aobserver\z/i
+              elsif enrollment_info.role =~ /\Aobserver\z/i
                 'ObserverEnrollment'
-              elsif role_name =~ /\Adesigner\z/i
+              elsif enrollment_info.role =~ /\Adesigner\z/i
                 'DesignerEnrollment'
               end
             end
             unless type
-              @messages << "Improper role \"#{role_name}\" for an enrollment"
+              @messages << "Improper role \"#{enrollment_info.role}\" for an enrollment"
               next
             end
 
             role ||= Role.get_built_in_role(type)
 
-            if associated_sis_user_id && type == 'ObserverEnrollment'
-              a_pseudo = root_account.pseudonyms.where(sis_user_id: associated_sis_user_id).take
+            if enrollment_info.associated_user_id && type == 'ObserverEnrollment'
+              a_pseudo = root_account.pseudonyms.where(sis_user_id: enrollment_info.associated_user_id).take
               if a_pseudo
                 associated_user_id = a_pseudo.user_id
               else
-                @messages << "An enrollment referenced a non-existent associated user #{associated_sis_user_id}"
+                @messages << "An enrollment referenced a non-existent associated user #{enrollment_info.associated_user_id}"
                 next
               end
             end
@@ -269,26 +246,29 @@ module SIS
             enrollment.role = role
             enrollment.course = @course
             enrollment.course_section = @section
+            if enrollment_info.limit_section_privileges
+              enrollment.limit_privileges_to_course_section = Canvas::Plugin.value_to_boolean(enrollment_info.limit_section_privileges)
+            end
 
-            if status =~ /\Aactive/i
+            if enrollment_info.status =~ /\Aactive/i
               if user.workflow_state != 'deleted' && pseudo.workflow_state != 'deleted'
                 enrollment.workflow_state = 'active'
               else
                 enrollment.workflow_state = 'deleted'
-                @messages << "Attempted enrolling of deleted user #{user_id} in course #{course_id}"
+                @messages << "Attempted enrolling of deleted user #{enrollment_info.user_id} in course #{enrollment_info.course_id}"
               end
-            elsif status =~ /\Adeleted/i
+            elsif enrollment_info.status =~ /\Adeleted/i
               enrollment.workflow_state = 'deleted'
-            elsif status =~ /\Acompleted/i
+            elsif enrollment_info.status =~ /\Acompleted/i
               enrollment.workflow_state = 'completed'
               enrollment.completed_at ||= Time.now
-            elsif status =~ /\Ainactive/i
+            elsif enrollment_info.status =~ /\Ainactive/i
               enrollment.workflow_state = 'inactive'
             end
 
             if (enrollment.stuck_sis_fields & [:start_at, :end_at]).empty?
-              enrollment.start_at = start_date
-              enrollment.end_at = end_date
+              enrollment.start_at = enrollment_info.start_date
+              enrollment.end_at = enrollment_info.end_date
             end
 
             @courses_to_touch_ids.add(enrollment.course_id)
@@ -302,22 +282,23 @@ module SIS
             if enrollment.changed?
               @users_to_touch_ids.add(user.id)
               courses_to_recache_due_dates << enrollment.course_id if enrollment.workflow_state_changed?
+              enrollment.sis_batch_id = enrollment_info.sis_batch_id if enrollment_info.sis_batch_id
               enrollment.sis_batch_id = @batch.id if @batch
               enrollment.skip_touch_user = true
               begin
                 enrollment.save_without_broadcasting!
               rescue ActiveRecord::RecordInvalid
                 msg = "An enrollment did not pass validation "
-                msg += "(" + "course: #{course_id}, section: #{section_id}, "
-                msg += "user: #{user_id}, role: #{role_name}, error: " +
+                msg += "(" + "course: #{enrollment_info.course_id}, section: #{enrollment_info.section_id}, "
+                msg += "user: #{enrollment_info.user_id}, role: #{enrollment_info.role}, error: " +
                 msg += enrollment.errors.full_messages.join(",") + ")"
                 @messages << msg
                 next
               rescue ActiveRecord::RecordNotUnique
                 if @retry == true
                   msg = "An enrollment failed to save "
-                  msg += "(course: #{course_id}, section: #{section_id}, "
-                  msg += "user: #{user_id}, role: #{role_name}, error: " +
+                  msg += "(course: #{enrollment_info.course_id}, section: #{enrollment_info.section_id}, "
+                  msg += "user: #{enrollment_info.user_id}, role: #{enrollment_info.role}, error: " +
                     msg += enrollment.errors.full_messages.join(",") + ")"
                   @messages << msg
                   @retry = false

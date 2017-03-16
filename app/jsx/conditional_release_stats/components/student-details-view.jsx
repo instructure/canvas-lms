@@ -5,7 +5,8 @@ define([
   'i18n!cyoe_assignment_sidebar',
   './student-assignment-item',
   '../shapes/index',
-], (React, classNames, { default: Spinner }, I18n, StudentAssignmentItem, { assignmentShape, studentShape }) => {
+  'jsx/shared/conditional_release/score'
+], (React, classNames, { default: Spinner }, I18n, StudentAssignmentItem, { assignmentShape, studentShape }, { i18nGrade }) => {
   const { shape, string, number, arrayOf, func, bool } = React.PropTypes
 
   return class StudentDetailsView extends React.Component {
@@ -72,13 +73,22 @@ define([
       const { assignment, submission } = triggerAssignment || {}
 
       const submissionUrl = `/courses/${assignment.course_id}/assignments/${assignment.id}/submissions/${student.id}`
-      const submissionDate = (submission && I18n.l('date.formats.long', new Date(submission.submitted_at))) || I18n.t('Not Submitted')
+      let submissionDate = null
+      if (submission) {
+        submissionDate = submission.submitted_at ? I18n.l('date.formats.long', new Date(submission.submitted_at)) : null
+      } else {
+        submissionDate = I18n.t('Not Submitted')
+      }
 
       return (
         <section className='crs-student-details__score-content'>
-          <h3 className='crs-student-details__score-number'>{submission.grade}</h3>
+          <h3 className='crs-student-details__score-number'>{i18nGrade(submission.grade, assignment)}</h3>
           <div className='crs-student-details__score-title'>{assignment.name}</div>
-          <div className='crs-student-details__score-date'>{I18n.t('Submitted: %{submitDate}', { submitDate: submissionDate })}</div>
+          {
+            submissionDate ? (
+              <div className="crs-student-details__score-date">{I18n.t('Submitted: %{submitDate}', { submitDate: submissionDate })}</div>
+            ) : null
+          }
           <a title={I18n.t('View Student Submission')} target='_blank' href={submissionUrl} className='crs-breakdown__link'>{I18n.t('View Submission')}</a>
         </section>
       )

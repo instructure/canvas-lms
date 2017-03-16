@@ -84,6 +84,11 @@
             <a id="ui-id-{{id}}-3" class="delete-item icon-trash disabled" aria-disabled="true" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
           {{/if}}
           </li>
+          {{#if migrateQuizEnabled}}
+            <li role="presentation">
+              <a href="#" id="ui-id-{{id}}-4" class="icon-export migrate" tabindex="-1" role="menuitem" title='{{#t}}Migrate Quiz{{/t}}'>{{#t}}Migrate{{/t}}</a>
+            </li>
+          {{/if}}
           {{>ExternalTools/external_tools_menu quiz_menu_tools}}
         </ul>
         {{/if}}

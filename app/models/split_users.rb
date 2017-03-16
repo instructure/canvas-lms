@@ -159,11 +159,11 @@ class SplitUsers
 
     def update_grades(users, records)
       users.each do |user|
-        e_ids =records.where(previous_user_id: user, context_type: 'Enrollment').pluck(:context_id)
+        e_ids = records.where(previous_user_id: user, context_type: 'Enrollment').pluck(:context_id)
         user.enrollments.where(id: e_ids).joins(:course).
           where.not(courses: {workflow_state: 'deleted'}).
           select(&:student?).uniq { |e| [e.user_id, e.course_id] }.
-          each { |e| Enrollment.recompute_final_score(e.user_id, e.course_id) }
+          each { |e| Enrollment.recompute_final_score_in_singleton(e.user_id, e.course_id) }
       end
     end
 

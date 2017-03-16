@@ -1,23 +1,37 @@
 module CC::Exporter::WebZip
   class ZipPackage < CC::Exporter::Epub::FilesDirectory
+
     def initialize(exporter, course, user, progress_key)
       @files = exporter.unsupported_files + exporter.cartridge_json[:files]
       @filename_prefix = exporter.filename_prefix
       @viewer_path_prefix = @filename_prefix + '/viewer'
-      @files_path_prefix = @viewer_path_prefix + '/files/'
+      @files_path_prefix = @viewer_path_prefix + '/files'
       @path_to_files = nil
       @course_data_filename = 'course-data.js'
       @course = course
       @user = user
       @current_progress = Rails.cache.fetch(progress_key)
+      @current_progress ||= MustViewModuleProgressor.new(user, course).current_progress
+      @html_converter = CC::CCHelper::HtmlContentExporter.new(course, user)
     end
     attr_reader :files, :course, :user, :current_progress
     attr_accessor :file_data
 
     ASSIGNMENT_TYPES = ['Assignment', 'Quizzes::Quiz', 'DiscussionTopic'].freeze
+    CONTENT_TYPES = [*ASSIGNMENT_TYPES, 'WikiPage'].freeze
+    CONTENT_TOKENS = [CC::CCHelper::OBJECT_TOKEN, CC::CCHelper::COURSE_TOKEN, CC::CCHelper::WIKI_TOKEN].freeze
 
     def force_timezone(time)
       time&.in_time_zone(user.time_zone)&.iso8601
+    end
+
+    def convert_html_to_local(html)
+      exported_html = @html_converter.html_content(html)
+      exported_html&.gsub!(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN), 'viewer/files')
+      CONTENT_TOKENS.each do |token|
+        exported_html&.gsub!("#{CGI.escape(token)}/", '')
+      end
+      exported_html
     end
 
     def add_files
@@ -28,7 +42,7 @@ module CC::Exporter::WebZip
           @path_to_files = match.to_s
         end
         File.open(file_data[:path_to_file]) do |file|
-          file_path = file_data[:local_path].sub(%r{^media/}, @files_path_prefix)
+          file_path = file_data[:local_path].sub(%r{^media/}, @files_path_prefix + '/')
           zip_file.add(file_path, file) { add_clone(file_path, file) }
         end
       end
@@ -92,32 +106,30 @@ module CC::Exporter::WebZip
 
     def parse_module_data
       course.context_modules.active.map do |mod|
+        unlock_date = force_timezone(mod.unlock_at) if mod.unlock_at &.> Time.now
         {
           id: mod.id,
           name: mod.name,
           status: user_module_status(mod),
-          unlockDate: force_timezone(mod.unlock_at),
+          unlockDate: unlock_date,
           prereqs: mod.prerequisites.map{|pre| pre[:id]},
           requirement: requirement_type(mod),
           sequential: mod.require_sequential_progress || false,
+          exportId: CC::CCHelper.create_key(mod),
           items: parse_module_item_data(mod)
         }
       end
     end
 
     def user_module_status(modul)
-      progress = current_progress&.dig(modul.id, :status)
-      return progress unless progress.nil?
-      progression = modul.context_module_progressions.find_or_create_by(user: user).evaluate
-      progression.workflow_state
+      return 'locked' if modul.locked_for?(user, deep_check_if_needed: true)
+      status = current_progress&.dig(modul.id, :status) || 'unlocked'
+      status == 'locked' ? 'unlocked' : status
     end
 
     def item_completed?(item)
       modul = item.context_module
-      progress = current_progress&.dig(modul.id, :items, item.id)
-      return progress unless progress.nil?
-      progression = modul.context_module_progressions.find_or_create_by(user: user).evaluate
-      progression.finished_item?(item)
+      current_progress&.dig(modul.id, :items, item.id) || false
     end
 
     def requirement_type(modul)
@@ -132,7 +144,8 @@ module CC::Exporter::WebZip
           id: item.id,
           title: item.title,
           type: item.content_type,
-          indent: item.indent
+          indent: item.indent,
+          locked: !item.available_for?(user, deep_check_if_needed: true)
         }
         parse_module_item_details(item, item_hash) if item.content_type != 'ContextModuleSubHeader'
         item_hash
@@ -144,9 +157,18 @@ module CC::Exporter::WebZip
       requirement, score = parse_requirement(item)
       item_hash[:requirement] = requirement
       item_hash[:requiredPoints] = score if score
-      item_hash[:locked] = !item.available_for?(user, deep_check_if_needed: true)
       item_hash[:completed] = item_completed?(item)
       item_hash[:content] = parse_content(item) unless item_hash[:locked]
+      item_hash[:exportId] = find_export_id(item) if CONTENT_TYPES.include?(item.content_type)
+    end
+
+    def find_export_id(item)
+      case item.content_type
+      when 'Assignment', 'DiscussionTopic', 'Quizzes::Quiz'
+        CC::CCHelper.create_key(item.content&.asset_string)
+      when 'WikiPage'
+        item.content&.url
+      end
     end
 
     def add_assignment_details(item, item_hash)
@@ -182,23 +204,23 @@ module CC::Exporter::WebZip
     def parse_content(item)
       case item.content_type
       when 'Assignment', 'Quizzes::Quiz'
-        item.content&.description
+        convert_html_to_local(item.content&.description)
       when 'DiscussionTopic'
-        item.content&.message
+        convert_html_to_local(item.content&.message)
       when 'WikiPage'
-        item.content&.body
+        convert_html_to_local(item.content&.body)
       when 'ExternalUrl'
         item.url
       when 'Attachment'
         path = file_path(item)
-        "#{@files_path_prefix}#{path}#{item.content&.filename}"
+        "viewer/files#{path}#{item.content&.filename}"
       end
     end
 
     def file_path(item)
       folder = item.content&.folder&.full_name || ''
       local_folder = folder.sub(/\/?course files\/?/, '')
-      local_folder.length > 0 ? "/#{local_folder}/" : local_folder
+      local_folder.length > 0 ? "/#{local_folder}/" : '/'
     end
 
     def dist_package_path

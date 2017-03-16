@@ -26,6 +26,7 @@ module Gradezilla
     end
 
     def visit(course)
+      Account.default.enable_feature!(:gradezilla)
       get "/courses/#{course.id}/gradebook/change_gradebook_version?version=gradezilla"
     end
 
@@ -37,9 +38,11 @@ module Gradezilla
     end
 
     def grading_cell(x=0, y=0)
-      cell = f(".container_1")
-      cell = f(".slick-row:nth-child(#{y+1})", cell)
-      f(".slick-cell:nth-child(#{x+1})", cell)
+      row_idx, col_idx = y + 1, x + 1
+
+      cell = f('.container_1')
+      cell = f(".slick-row:nth-child(#{row_idx})", cell)
+      f(".slick-cell:nth-child(#{col_idx})", cell)
     end
 
     def select_grading_period(grading_period_id)

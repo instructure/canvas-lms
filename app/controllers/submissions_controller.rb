@@ -103,13 +103,16 @@ class SubmissionsController < ApplicationController
     end
   end
 
-  rescue_from ActiveRecord::RecordNotFound, only: :show, with: :render_user_not_found
   def show
-    service = Submissions::SubmissionForShow.new(
-      @context, params.slice(:assignment_id, :id)
-    )
-    @assignment = service.assignment
-    @submission = service.submission
+    begin
+      service = Submissions::SubmissionForShow.new(
+        @context, params.slice(:assignment_id, :id)
+      )
+      @assignment = service.assignment
+      @submission = service.submission
+    rescue ActiveRecord::RecordNotFound
+      return render_user_not_found
+    end
 
     @rubric_association = @submission.rubric_association_with_assessing_user_id
     @visible_rubric_assessments = @submission.visible_rubric_assessments_for(@current_user)
@@ -642,12 +645,10 @@ class SubmissionsController < ApplicationController
   protected
 
   def update_student_entered_score(score)
-    if score.present? && score != "null"
-      @submission.student_entered_score = score.to_f.round(2)
-    else
-      @submission.student_entered_score = nil
-    end
-    @submission.save
+    new_score = score.present? && score != "null" ? score.to_f.round(2) : nil
+    # intentionally skipping callbacks here to fix a bug where entering a
+    # what-if grade for a quiz can put the submission back in a 'pending review' state
+    @submission.update_column(:student_entered_score, new_score)
   end
 
   def generate_submission_zip(assignment, context)

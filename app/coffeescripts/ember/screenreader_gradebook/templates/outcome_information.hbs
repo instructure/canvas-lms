@@ -34,7 +34,7 @@
         {{/if}}
         <div class="pad-box no-sides">
           <p><strong>
-            {{#t 'result_sub_count'}}Total results: {{/t}} {{outcomeDetails.cnt}}
+            {{#t}}Total results: {{outcomeDetails.cnt}}{{/t}}
           </strong></p>
         </div>
 
@@ -58,9 +58,9 @@
                 {{#if outcomeDetails}}
                   {{#with outcomeDetails }}
                     {{#if cnt}}
-                      <td>{{average}}</td>
-                      <td>{{max}}</td>
-                      <td>{{min}}</td>
+                      <td>{{nf average format="outcomeScore"}}</td>
+                      <td>{{nf max format="outcomeScore"}}</td>
+                      <td>{{nf min format="outcomeScore"}}</td>
                     {{/if}}
                   {{/with}}
                 {{/if}}

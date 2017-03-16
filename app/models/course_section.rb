@@ -39,6 +39,7 @@ class CourseSection < ActiveRecord::Base
   validates_presence_of :course_id, :root_account_id, :workflow_state
   validates_length_of :sis_source_id, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => false
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false
+  validate :validate_section_dates
 
   has_many :sis_post_grades_statuses
 
@@ -49,6 +50,15 @@ class CourseSection < ActiveRecord::Base
 
   include StickySisFields
   are_sis_sticky :course_id, :name, :start_at, :end_at, :restrict_enrollments_to_section_dates
+
+  def validate_section_dates
+    if start_at.present? && end_at.present? && end_at < start_at
+      self.errors.add(:end_at, t("End date cannot be before start date"))
+      false
+    else
+      true
+    end
+  end
 
   def maybe_touch_all_enrollments
     self.touch_all_enrollments if self.start_at_changed? || self.end_at_changed? || self.restrict_enrollments_to_section_dates_changed? || self.course_id_changed?
@@ -232,7 +242,8 @@ class CourseSection < ActiveRecord::Base
     if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
       old_course.send_later_if_production(:update_account_associations) unless Course.skip_updating_account_associations?
     end
-    Enrollment.send_now_or_later(opts.include?(:run_jobs_immediately) ? :now : :later, :recompute_final_score, user_ids, course.id)
+    recompute_method = opts.include?(:run_jobs_immediately) ? :recompute_final_score : :recompute_final_score_in_singleton
+    Enrollment.send(recompute_method, user_ids, course.id)
   end
 
   def crosslist_to_course(course, *opts)

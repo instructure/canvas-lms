@@ -23,8 +23,13 @@ describe UsersController, type: :request do
   include Api
   include Api::V1::Assignment
   def update_assignment_json
-    @a1_json['assignment'] = controller.assignment_json(@a1,@user,session)
-    @a2_json['assignment'] = controller.assignment_json(@a2,@user,session)
+    @a1_json['assignment'] = controller.assignment_json(@a1,@user,session).as_json
+    @a2_json['assignment'] = controller.assignment_json(@a2,@user,session).as_json
+  end
+
+  def strip_secure_params(json)
+    json['assignment'].delete('secure_params')
+    json
   end
 
   before :once do
@@ -95,8 +100,8 @@ describe UsersController, type: :request do
                     :controller => "users", :action => "todo_items", :format => "json")
     update_assignment_json
     json = json.sort_by { |t| t['assignment']['id'] }
-    compare_json json.first, @a1_json
-    compare_json json.second, @a2_json
+    expect(strip_secure_params(json.first)).to eq strip_secure_params(@a1_json)
+    expect(strip_secure_params(json.second)).to eq strip_secure_params(@a2_json)
   end
 
   it "returns a course-specific todo list for a student" do
@@ -106,7 +111,7 @@ describe UsersController, type: :request do
                     .first
 
     update_assignment_json
-    compare_json(json, @a1_json)
+    expect(strip_secure_params(json)).to eq strip_secure_params(@a1_json)
   end
 
   it "returns a course-specific todo list for a teacher" do
@@ -115,7 +120,7 @@ describe UsersController, type: :request do
                     :format => "json", :course_id => @teacher_course.to_param)
                     .first
     update_assignment_json
-    compare_json(json, @a2_json)
+    expect(strip_secure_params(json)).to eq strip_secure_params(@a2_json)
   end
 
   it "should return a list for users who are both teachers and students" do
@@ -126,8 +131,8 @@ describe UsersController, type: :request do
     @a1_json.deep_merge!({ 'assignment' => { 'needs_grading_count' => 0 } })
     json = json.sort_by { |t| t['assignment']['id'] }
     update_assignment_json
-    compare_json(json.first, @a1_json)
-    compare_json(json.second, @a2_json)
+    expect(strip_secure_params(json.first)).to eq strip_secure_params(@a1_json)
+    expect(strip_secure_params(json.second)).to eq strip_secure_params(@a2_json)
   end
 
   it "should ignore a todo item permanently" do
@@ -165,7 +170,7 @@ describe UsersController, type: :request do
     @a2_json['needs_grading_count'] = 2
     @a2_json['assignment']['needs_grading_count'] = 2
     update_assignment_json
-    compare_json(json.first, @a2_json)
+    expect(strip_secure_params(json.first)).to eq strip_secure_params(@a2_json)
   end
 
   it "should ignore excused assignments for students" do

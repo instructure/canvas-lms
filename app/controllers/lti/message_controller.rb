@@ -28,10 +28,7 @@ module Lti
         @lti_launch.resource_url = params[:tool_consumer_url]
         message = RegistrationRequestService.create_request(
           @context,
-          polymorphic_url(
-            [@context, :tool_consumer_profile],
-            tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID
-          ),
+          polymorphic_url([@context, :tool_consumer_profile]),
           -> { polymorphic_url([@context, :registration_return]) }
         )
 
@@ -68,8 +65,7 @@ module Lti
         launch_url: mh.launch_path,
         oauth_consumer_key: tp.guid,
         lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P1,
-        tc_profile_url: polymorphic_url([@context, :tool_consumer_profile],
-                                        tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID),
+        tc_profile_url: polymorphic_url([@context, :tool_consumer_profile]),
         launch_presentation_return_url: polymorphic_url([@context, :registration_return]),
         launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
       )

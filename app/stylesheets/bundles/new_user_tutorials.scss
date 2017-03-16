@@ -1,0 +1,24 @@
+@import "base/environment";
+
+.NewUserTutorialTray {
+  width: 18.75rem;
+  box-sizing: border-box;
+  padding: $ic-sp*3 $ic-sp*1.5 $ic-sp;
+
+  @include breakpoint(tablet) {
+    width: 21rem;
+    padding-left: $ic-sp*2;
+    padding-right: $ic-sp*2;
+  }
+}
+
+.NewUserTutorialTray__ButtonContainer {
+  position: absolute;
+  right: 24px;
+  top: 14px;
+}
+
+.ModulesTutorialTray__ImageContainer {
+  margin-top: $ic-sp*6;
+  text-align: center;
+}

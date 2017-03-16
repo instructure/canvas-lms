@@ -116,6 +116,20 @@ describe Quizzes::QuizzesController do
 
       get 'index', :course_id => @course.id
     end
+
+    it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:post_to_sis_friendly_name).returns('Foo Bar')
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
+    end
+
+    it "js_env migrate_quiz_enabled is true when quizzes2_exporter is enabled" do
+      user_session(@teacher)
+      Account.default.enable_feature!(:quizzes2_exporter)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:FLAGS][:migrate_quiz_enabled]).to eq(true)
+    end
   end
 
   describe "GET 'new'" do
@@ -186,7 +200,7 @@ describe Quizzes::QuizzesController do
   describe "GET 'edit'" do
     before(:once) { course_quiz }
 
-    include_context "multiple grading periods within controller" do
+    include_context "grading periods within controller" do
       let(:course) { @course }
       let(:teacher) { @teacher }
       let(:request_params) { [:edit, course_id: course, id: @quiz] }
@@ -1066,7 +1080,7 @@ describe Quizzes::QuizzesController do
       expect(@student.recent_stream_items.map {|item| item.data['notification_id']}).not_to include notification.id
     end
 
-    context "with multiple grading periods enabled" do
+    context "with grading periods" do
       def call_create(params)
         post('create', course_id: @course.id, quiz: {
           title: "Example Quiz", quiz_type: "assignment"
@@ -1077,7 +1091,6 @@ describe Quizzes::QuizzesController do
 
       before :once do
         teacher_in_course(active_all: true)
-        @course.root_account.enable_feature!(:multiple_grading_periods)
         grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
         term = @course.enrollment_term
         term.grading_period_group = grading_period_group
@@ -1152,6 +1165,7 @@ describe Quizzes::QuizzesController do
 
         it "does not allow a nil override due date when the last grading period is closed" do
           override_params = [{ due_at: nil, course_section_id: section_id }]
+          request.content_type = 'application/json' unless CANVAS_RAILS4_2
           call_create(due_at: 7.days.from_now.iso8601, assignment_overrides: override_params)
           assert_forbidden
           expect(@course.quizzes.count).to eql 0
@@ -1235,14 +1249,14 @@ describe Quizzes::QuizzesController do
       it "should set post_to_sis quizzes" do
         user_session(@teacher)
         course_quiz
-        post 'update', :course_id => @course.id, :id => @quiz.id, :quiz => {:title => "some quiz"}, :assignment => {post_to_sis: true}
+        post 'update', :course_id => @course.id, :id => @quiz.id, :quiz => {:title => "some quiz"}, :post_to_sis => '1'
         expect(assigns[:quiz].assignment.post_to_sis).to eq true
       end
 
       it "doesn't blow up for surveys" do
         user_session(@teacher)
         survey = @course.quizzes.create! quiz_type: "survey", title: "survey"
-        post 'update', :course_id => @course.id, :id => survey.id, :quiz => {:title => "changed"}, :assignment => {post_to_sis: true}
+        post 'update', :course_id => @course.id, :id => survey.id, :quiz => {:title => "changed"}, :post_to_sis => '1'
         expect(assigns[:quiz].title).to eq "changed"
       end
     end
@@ -1420,7 +1434,7 @@ describe Quizzes::QuizzesController do
       end
     end
 
-    context "with multiple grading periods enabled" do
+    context "with grading periods" do
       def create_quiz(attr)
         @course.quizzes.create!({ title: "Example Quiz", quiz_type: "assignment" }.merge(attr))
       end
@@ -1443,7 +1457,6 @@ describe Quizzes::QuizzesController do
 
       before :once do
         teacher_in_course(active_all: true)
-        @course.root_account.enable_feature!(:multiple_grading_periods)
         grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
         term = @course.enrollment_term
         term.grading_period_group = grading_period_group

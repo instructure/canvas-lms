@@ -30,7 +30,7 @@ module Canvas::Plugins::Validators::DiigoValidator
           plugin_setting.errors.add(:base, res)
           false
         else
-          settings.slice(:api_key)
+          settings.permit(:api_key).to_h.with_indifferent_access
         end
       end
     end

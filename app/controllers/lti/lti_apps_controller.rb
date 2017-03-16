@@ -20,7 +20,7 @@ module Lti
     before_action :require_user
 
     def index
-      if authorized_action(@context, @current_user, :update)
+      if authorized_action(@context, @current_user, :lti_add_edit)
         app_collator = AppCollator.new(@context, method(:reregistration_url_builder))
         collection = app_collator.bookmarked_collection
 
@@ -34,7 +34,7 @@ module Lti
     end
 
     def launch_definitions
-      if authorized_action(@context, @current_user, :update)
+      if authorized_action(@context, @current_user, :lti_add_edit)
         placements = params['placements'] || []
         collection = AppLaunchCollator.bookmarked_collection(@context, placements)
         pagination_args = {max_per_page: 100}

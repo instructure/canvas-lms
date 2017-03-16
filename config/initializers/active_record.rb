@@ -849,7 +849,7 @@ ActiveRecord::Relation.class_eval do
     uniq_identifier = "#{table_name}.#{primary_key}"
     scopes << self
     sub_query = (scopes).map {|s| s.except(:select, :order).select(uniq_identifier).to_sql}.join(" UNION ALL ")
-    engine.where("#{uniq_identifier} IN (#{sub_query})")
+    unscoped.where("#{uniq_identifier} IN (#{sub_query})")
   end
 
   # returns batch_size ids at a time, working through the primary key from
@@ -929,11 +929,22 @@ module UpdateAndDeleteWithJoins
 
     sql = stmt.to_sql
 
-    collector = Arel::Collectors::Bind.new
-    arel.join_sources.each do |node|
-      connection.visitor.accept(node, collector)
+    if CANVAS_RAILS4_2
+      collector = Arel::Collectors::Bind.new
+      arel.join_sources.each do |node|
+        connection.visitor.accept(node, collector)
+      end
+      join_sql = collector.compile(arel.bind_values.map{|bvs| connection.quote(*bvs.reverse)})
+    else
+      binds = connection.prepare_binds_for_database(bound_attributes)
+      binds.map! { |value| connection.quote(value) }
+      collector = Arel::Collectors::Bind.new
+      arel.join_sources.each do |node|
+        connection.visitor.accept(node, collector)
+      end
+      binds_in_join = collector.value.count { |x| x.is_a?(Arel::Nodes::BindParam) }
+      join_sql = collector.substitute_binds(binds).join
     end
-    join_sql = collector.compile(arel.bind_values.map{|bvs| connection.quote(*bvs.reverse)})
     tables, join_conditions = deconstruct_joins(join_sql)
 
     unless tables.empty?
@@ -953,7 +964,8 @@ module UpdateAndDeleteWithJoins
       end
       sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
     else
-      binds = scope.bound_attributes
+      # skip any binds that are used in the join
+      binds = scope.bound_attributes[binds_in_join..-1]
       binds = connection.prepare_binds_for_database(binds)
       binds.map! { |value| connection.quote(value) }
       sql_string = Arel::Collectors::Bind.new
@@ -1299,7 +1311,7 @@ module UnscopeCallbacks
     end
   else
     def __run_callbacks__(*args)
-      scope = self.class.unscoped
+      scope = self.class.all.klass.unscoped
       scope.scoping { super }
     end
   end

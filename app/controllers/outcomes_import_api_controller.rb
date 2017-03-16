@@ -127,7 +127,7 @@ class OutcomesImportApiController < ApplicationController
   end
 
   def parse_rating(rating)
-    if rating.nil? || !rating.is_a?(Hash)
+    if rating.nil? || !rating.is_a?(ActionController::Parameters)
       raise "invalid ratings value: #{rating}"
     end
     if rating[:description].nil? || !rating[:description].is_a?(String)

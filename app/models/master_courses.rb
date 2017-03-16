@@ -11,5 +11,5 @@ module MasterCourses
 
   MIGRATION_ID_PREFIX = "mastercourse_".freeze
 
-  LOCK_TYPES = [:content, :settings].freeze
+  LOCK_TYPES = [:content, :settings, :points, :due_dates, :availability_dates].freeze
 end

@@ -2,7 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper.rb')
 
 RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
 
-  let(:account) { Account.new }
+  let(:account) { Account.create! }
+  let(:course) { Course.create!(account: account) }
   let(:developer_key) {DeveloperKey.create!(redirect_uri: 'http://www.example.com/redirect')}
   let(:product_family) do
     Lti::ProductFamily.create!(

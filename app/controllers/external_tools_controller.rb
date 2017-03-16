@@ -975,17 +975,15 @@ class ExternalToolsController < ApplicationController
         external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
       end
       set_tool_attributes(@tool, external_tool_params)
-      respond_to do |format|
-        if @tool.save
-          invalidate_nav_tabs_cache(@tool)
-          if api_request?
-            format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
-          else
-            format.json { render :json => @tool.as_json(:methods => [:readable_state, :custom_fields_string, :vendor_help_link], :include_root => false) }
-          end
+      if @tool.save
+        invalidate_nav_tabs_cache(@tool)
+        if api_request?
+          render :json => external_tool_json(@tool, @context, @current_user, session)
         else
-          format.json { render :json => @tool.errors, :status => :bad_request }
+          render :json => @tool.as_json(:methods => [:readable_state, :custom_fields_string, :vendor_help_link], :include_root => false)
         end
+      else
+        render :json => @tool.errors, :status => :bad_request
       end
     end
   end

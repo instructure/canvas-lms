@@ -37,9 +37,28 @@ module Services
         Canvas::DynamicSettings.unstub(:find)
       end
 
+      let(:developer_key) do
+        developer_key = mock
+        developer_key.stubs(:global_id).returns(10000000000003)
+        developer_key
+      end
+
+      let(:non_root_account_context) do
+        non_root_account = mock()
+        non_root_account.stubs(:global_root_account_id).returns(10000000000007)
+        non_root_account
+      end
+
+      let(:root_account_context) do
+        root_account = mock()
+        root_account.stubs(:global_root_account_id).returns(nil)
+        root_account.stubs(:global_id).returns(10000000000004)
+        root_account
+      end
+
       let(:product_family) do
         product_family = mock()
-        product_family.stubs(:developer_key).returns(10000000000003)
+        product_family.stubs(:developer_key).returns(developer_key)
         product_family
       end
 
@@ -58,11 +77,13 @@ module Services
 
       describe '.destroy_tool_proxy_subscription' do
         it 'makes the expected request' do
+          tool_proxy.stubs(:context).returns(root_account_context)
           HTTParty.expects(:send).with do |method, endpoint, options|
             expect(method).to eq(:delete)
             expect(endpoint).to eq('http://example.com/api/subscriptions/subscription_id')
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
-            expect(jwt["developerKey"]).to eq('10000000000003')
+            expect(jwt["DeveloperKey"]).to eq('10000000000003')
+            expect(jwt["RootAccountId"]).to eq('10000000000004')
             expect(jwt["sub"]).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
           end
           LiveEventsSubscriptionService.destroy_tool_proxy_subscription(tool_proxy, 'subscription_id')
@@ -71,11 +92,13 @@ module Services
 
       describe '.tool_proxy_subscription' do
         it 'makes the expected request' do
+          tool_proxy.stubs(:context).returns(non_root_account_context)
           HTTParty.expects(:send).with do |method, endpoint, options|
             expect(method).to eq(:get)
             expect(endpoint).to eq('http://example.com/api/subscriptions/subscription_id')
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
-            expect(jwt["developerKey"]).to eq('10000000000003')
+            expect(jwt["DeveloperKey"]).to eq('10000000000003')
+            expect(jwt["RootAccountId"]).to eq('10000000000007')
             expect(jwt["sub"]).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
           end
           LiveEventsSubscriptionService.tool_proxy_subscription(tool_proxy, 'subscription_id')
@@ -84,11 +107,13 @@ module Services
 
       describe '.tool_proxy_subscriptions' do
         it 'makes the expected request' do
+          tool_proxy.stubs(:context).returns(non_root_account_context)
           HTTParty.expects(:send).with do |method, endpoint, options|
             expect(method).to eq(:get)
             expect(endpoint).to eq('http://example.com/api/subscriptions')
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
-            expect(jwt["developerKey"]).to eq('10000000000003')
+            expect(jwt["DeveloperKey"]).to eq('10000000000003')
+            expect(jwt["RootAccountId"]).to eq('10000000000007')
             expect(jwt["sub"]).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
           end
           LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy)
@@ -97,6 +122,7 @@ module Services
 
       describe '.create_tool_proxy_subscription' do
         it 'makes the expected request' do
+          tool_proxy.stubs(:context).returns(root_account_context)
           subscription = { 'my' => 'subscription' }
 
           HTTParty.expects(:send).with do |method, endpoint, options|
@@ -104,7 +130,8 @@ module Services
             expect(endpoint).to eq('http://example.com/api/subscriptions')
             expect(options[:headers]['Content-Type']).to eq('application/json')
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
-            expect(jwt['developerKey']).to eq('10000000000003')
+            expect(jwt['DeveloperKey']).to eq('10000000000003')
+            expect(jwt["RootAccountId"]).to eq('10000000000004')
             expect(jwt['sub']).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
             expect(JSON.parse(options[:body])).to eq(subscription)
           end
@@ -115,6 +142,7 @@ module Services
 
       describe '.update_tool_proxy_subscription' do
         it 'makes the expected request' do
+          tool_proxy.stubs(:context).returns(root_account_context)
           subscription = { 'my' => 'subscription' }
 
           HTTParty.expects(:send).with do |method, endpoint, options|
@@ -122,7 +150,8 @@ module Services
             expect(endpoint).to eq('http://example.com/api/subscriptions/subscription_id')
             expect(options[:headers]['Content-Type']).to eq('application/json')
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
-            expect(jwt['developerKey']).to eq('10000000000003')
+            expect(jwt['DeveloperKey']).to eq('10000000000003')
+            expect(jwt["RootAccountId"]).to eq('10000000000004')
             expect(jwt['sub']).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
             expect(JSON.parse(options[:body])).to eq(subscription)
           end
@@ -133,6 +162,7 @@ module Services
 
       context 'timeout protection' do
         it 'throws an exception for .tool_proxy_subscriptions' do
+          tool_proxy.stubs(:context).returns(root_account_context)
           Timeout.expects(:timeout).raises(Timeout::Error)
           expect { LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy) }.to raise_error(Timeout::Error)
         end

@@ -3,20 +3,16 @@ define [
   'jquery'
   'underscore'
   'timezone'
+  'jsx/shared/helpers/datePickerFormat'
   'jquery.instructure_date_and_time' # for $input.datepicker
   'compiled/jquery.rails_flash_notifications' # for $.screenReaderFlashMessageExclusive
-], (I18n, $, {debounce}, tz) ->
-
-  # translate a strftime style format string (guaranteed to only use %d, %-d,
-  # %b, and %Y, though in dynamic order) into a datepicker style format string
-  datepickerFormat = (format) ->
-    format.replace(/%Y/, 'yy').replace(/%b/, 'M').replace(/%-?d/, 'd')
+], (I18n, $, {debounce}, tz, datePickerFormat) ->
 
   # adds datepicker and suggest functionality to the specified $field
   class DatetimeField
     datepickerDefaults:
       constrainInput: false
-      dateFormat: datepickerFormat(I18n.t('#date.formats.medium'))
+      dateFormat: datePickerFormat(I18n.t('#date.formats.medium'))
       showOn: 'button'
       buttonText: '<i class="icon-calendar-month"></i>'
       buttonImageOnly: false

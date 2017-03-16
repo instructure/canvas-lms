@@ -34,6 +34,7 @@ module Api::V1::Quiz
       one_question_at_a_time
       one_time_results
       only_visible_to_overrides
+      points_possible
       published
       quiz_type
       require_lockdown_browser
@@ -120,7 +121,7 @@ module Api::V1::Quiz
 
   def update_api_quiz(quiz, params, save = true)
     quiz_params = accepts_jsonapi? ? Array(params[:quizzes]).first : params[:quiz]
-    return nil unless quiz.is_a?(Quizzes::Quiz) && quiz_params.is_a?(Hash)
+    return nil unless quiz.is_a?(Quizzes::Quiz) && quiz_params.is_a?(ActionController::Parameters)
     update_params = filter_params(quiz_params)
 
     # make sure assignment_group_id belongs to context

@@ -97,6 +97,7 @@ define [
 
     $calendarFeedModalContent.on('dialogclose', ->
       forceScreenreaderToReparse($('#application')[0])
+      $('#calendar-feed .dialog_opener').focus()
     )
 
 

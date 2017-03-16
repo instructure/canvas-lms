@@ -22,10 +22,38 @@ module Lti
     class ToolSettingController < ApplicationController
       include Lti::ApiServiceHelper
 
-      skip_before_action :require_context
-      skip_before_action :require_user
       skip_before_action :load_user
       before_action :authenticate_api_call
+
+      SERVICE_DEFINITIONS = [
+        {
+          id: 'ToolProxySettings',
+          endpoint: 'api/lti/tool_settings/tool_proxy/{tool_proxy_id}',
+          format: %w(
+            application/vnd.ims.lti.v2.toolsettings+json
+            application/vnd.ims.lti.v2.toolsettings.simple+json
+          ).freeze,
+          action: %w(GET PUT).freeze
+        }.freeze,
+        {
+          id: 'ToolProxyBindingSettings',
+          endpoint: 'api/lti/tool_settings/bindings/{binding_id}',
+          format: %w(
+            application/vnd.ims.lti.v2.toolsettings+json'
+            application/vnd.ims.lti.v2.toolsettings.simple+json
+          ).freeze,
+          action: %w(GET PUT).freeze
+        }.freeze,
+        {
+          id: 'LtiLinkSettings',
+          endpoint: 'api/lti/tool_settings/links/{tool_proxy_id}',
+          format: %w(
+            application/vnd.ims.lti.v2.toolsettings+json
+            application/vnd.ims.lti.v2.toolsettings.simple+json
+          ).freeze,
+          action: %w(GET PUT).freeze
+        }.freeze
+      ].freeze
 
       def show
         render_bad_request and return unless valid_show_request?

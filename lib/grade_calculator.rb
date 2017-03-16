@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2017 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -65,33 +65,18 @@ class GradeCalculator
 
   def compute_scores
     @submissions = @course.submissions.
-        except(:order, :select).
-        for_user(@user_ids).
-        where(assignment_id: @assignments).
-        select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state")
-    submissions_by_user = @submissions.group_by(&:user_id)
-
-    result = []
+      except(:order, :select).
+      for_user(@user_ids).
+      where(assignment_id: @assignments).
+      select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state")
+    scores_and_group_sums = []
     @user_ids.each_slice(100) do |batched_ids|
       load_assignment_visibilities_for_users(batched_ids)
-      batched_ids.each do |user_id|
-        user_submissions = submissions_by_user[user_id] || []
-        user_submissions.select!{|s| assignment_ids_visible_to_user(user_id).include?(s.assignment_id)}
-        current, current_groups = calculate_current_score(user_id, user_submissions)
-        final, final_groups = calculate_final_score(user_id, user_submissions)
-
-        scores = {
-          current: current,
-          current_groups: current_groups,
-          final: final,
-          final_groups: final_groups
-        }
-
-        result << scores
-      end
+      scores_and_group_sums_batch = compute_scores_and_group_sums_for_batch(batched_ids)
+      scores_and_group_sums.concat(scores_and_group_sums_batch)
       clear_assignment_visibilities_cache
     end
-    result
+    scores_and_group_sums
   end
 
   def compute_and_save_scores
@@ -103,8 +88,114 @@ class GradeCalculator
 
   private
 
+  def compute_scores_and_group_sums_for_batch(user_ids)
+    user_ids.map do |user_id|
+      group_sums = compute_group_sums_for_user(user_id)
+      scores = compute_scores_for_user(user_id, group_sums)
+      update_changes_hash_for_user(user_id, scores)
+      {
+        current: scores[:current],
+        current_groups: group_sums[:current].index_by { |group| group[:id] },
+        final: scores[:final],
+        final_groups: group_sums[:final].index_by { |group| group[:id] }
+      }
+    end
+  end
+
+  def compute_group_sums_for_user(user_id)
+    user_submissions = submissions_by_user.fetch(user_id, []).select do |submission|
+      assignment_ids_visible_to_user(user_id).include?(submission.assignment_id)
+    end
+    {
+      current: create_group_sums(user_submissions, user_id, ignore_ungraded: true),
+      final: create_group_sums(user_submissions, user_id, ignore_ungraded: false)
+    }
+  end
+
+  def compute_scores_for_user(user_id, group_sums)
+    if compute_course_scores_from_weighted_grading_periods?
+      scores = calculate_total_from_weighted_grading_periods(user_id)
+    else
+      scores = {
+        current: calculate_total_from_group_scores(group_sums[:current]),
+        final: calculate_total_from_group_scores(group_sums[:final])
+      }
+    end
+    Rails.logger.info "GRADES: calculated: #{scores.inspect}"
+    scores
+  end
+
+  def update_changes_hash_for_user(user_id, scores)
+    @current_updates[user_id] = scores[:current][:grade]
+    @final_updates[user_id] = scores[:final][:grade]
+  end
+
+  def calculate_total_from_weighted_grading_periods(user_id)
+    enrollment = enrollments_by_user[user_id].first
+    grading_period_ids = grading_periods_for_course.map(&:id)
+    # using Enumberable#select because the scores are preloaded
+    grading_period_scores = enrollment.scores.select do |score|
+      grading_period_ids.include?(score.grading_period_id)
+    end
+    scores = apply_grading_period_weights_to_scores(grading_period_scores)
+    scale_and_round_scores(scores, grading_period_scores)
+  end
+
+  def apply_grading_period_weights_to_scores(grading_period_scores)
+    grading_period_scores.each_with_object(
+      { current: { full_weight: 0.0, grade: 0.0 }, final: { full_weight: 0.0, grade: 0.0 } }
+    ) do |score, scores|
+      weight = grading_period_weights[score.grading_period_id] || 0.0
+      scores[:final][:full_weight] += weight
+      scores[:current][:full_weight] += weight if score.current_score
+      scores[:current][:grade] += (score.current_score || 0.0) * (weight / 100.0)
+      scores[:final][:grade] += (score.final_score || 0.0) * (weight / 100.0)
+    end
+  end
+
+  def scale_and_round_scores(scores, grading_period_scores)
+    [:current, :final].each_with_object({ current: {}, final: {} }) do |score_type, adjusted_scores|
+      score = scores[score_type][:grade]
+      full_weight = scores[score_type][:full_weight]
+      score = scale_score_up(score, full_weight) if full_weight < 100
+      if score == 0.0 && score_type == :current && grading_period_scores.none?(&:current_score)
+        score = nil
+      end
+      adjusted_scores[score_type][:grade] = score ? score.round(2) : score
+    end
+  end
+
+  def scale_score_up(score, weight)
+    return 0.0 if weight.zero?
+    (score * 100.0) / weight
+  end
+
+  def compute_course_scores_from_weighted_grading_periods?
+    return @compute_from_weighted_periods if @compute_from_weighted_periods.present?
+
+    if @grading_period || grading_periods_for_course.empty?
+      @compute_from_weighted_periods = false
+    else
+      @compute_from_weighted_periods = grading_periods_for_course.first.grading_period_group.weighted?
+    end
+  end
+
+  def grading_periods_for_course
+    @periods ||= GradingPeriod.for(@course)
+  end
+
+  def grading_period_weights
+    @grading_period_weights ||= grading_periods_for_course.each_with_object({}) do |period, weights|
+        weights[period.id] = period.weight
+    end
+  end
+
+  def submissions_by_user
+    @submissions_by_user ||= @submissions.group_by(&:user_id)
+  end
+
   def calculate_grading_period_scores
-    GradingPeriod.for(@course).each do |grading_period|
+    grading_periods_for_course.each do |grading_period|
       # update this grading period score, and do not
       # update any other scores (grading period or course)
       # after this one
@@ -116,6 +207,12 @@ class GradeCalculator
         grading_period: grading_period
       ).compute_and_save_scores
     end
+
+    # delete any grading period scores that are no longer relevant
+    Score.active.joins(:enrollment).
+      where(enrollments: {user_id: @user_ids, course_id: @course.id}).
+      where.not(grading_period_id: grading_periods_for_course.map(&:id)).
+      update_all(workflow_state: :deleted)
   end
 
   def calculate_course_score
@@ -132,7 +229,7 @@ class GradeCalculator
   def enrollments
     @enrollments ||= Enrollment.shard(@course).active.
       where(user_id: @user_ids, course_id: @course.id).
-      select(:id, :user_id)
+      select(:id, :user_id).preload(:scores)
   end
 
   def joined_enrollment_ids
@@ -225,27 +322,6 @@ class GradeCalculator
     end
   end
 
-  # The score ignoring unsubmitted assignments
-  def calculate_current_score(user_id, submissions)
-    calculate_score(submissions, user_id, true)
-  end
-
-  # The final score for the class, so unsubmitted assignments count as zeros
-  def calculate_final_score(user_id, submissions)
-    calculate_score(submissions, user_id, false)
-  end
-
-  def calculate_score(submissions, user_id, ignore_ungraded)
-    group_sums = create_group_sums(submissions, user_id, ignore_ungraded)
-    info = calculate_total_from_group_scores(group_sums)
-    Rails.logger.info "GRADES: calculated: #{info.inspect}"
-
-    updates_hash = ignore_ungraded ? @current_updates : @final_updates
-    updates_hash[user_id] = info[:grade]
-
-    [info, group_sums.index_by { |s| s[:id] }]
-  end
-
   # returns information about assignments groups in the form:
   # [
   #   {
@@ -256,7 +332,7 @@ class GradeCalculator
   #    :weight   => 50},
   #   ...]
   # each group
-  def create_group_sums(submissions, user_id, ignore_ungraded=true)
+  def create_group_sums(submissions, user_id, ignore_ungraded: true)
     visible_assignments = @assignments
     visible_assignments = visible_assignments.select{|a| assignment_ids_visible_to_user(user_id).include?(a.id)}
 

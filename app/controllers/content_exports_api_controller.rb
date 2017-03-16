@@ -133,7 +133,7 @@ class ContentExportsApiController < ApplicationController
   def create
     if authorized_action(@context, @current_user, :read)
       valid_types = %w(zip)
-      valid_types += %w(qti common_cartridge) if @context.is_a?(Course)
+      valid_types += %w(qti common_cartridge quizzes2) if @context.is_a?(Course)
       return render json: { message: 'invalid export_type' }, status: :bad_request unless valid_types.include?(params[:export_type])
       export = @context.content_exports.build
       export.user = @current_user
@@ -141,7 +141,7 @@ class ContentExportsApiController < ApplicationController
       export.settings[:skip_notifications] = true if value_to_boolean(params[:skip_notifications])
 
       # ZipExporter accepts unhashed asset strings, to avoid having to instantiate all the files and folders
-      selected_content = ContentMigration.process_copy_params(params[:select], true, params[:export_type] == ContentExport::ZIP) if params[:select]
+      selected_content = ContentMigration.process_copy_params(params[:select]&.to_hash, true, params[:export_type] == ContentExport::ZIP) if params[:select]
       case params[:export_type]
       when 'qti'
         export.export_type = ContentExport::QTI
@@ -149,6 +149,17 @@ class ContentExportsApiController < ApplicationController
       when 'zip'
         export.export_type = ContentExport::ZIP
         export.selected_content = selected_content || { all_attachments: true }
+      when 'quizzes2'
+        if params[:quiz_id].nil? || params[:quiz_id] !~ Api::ID_REGEX
+          return render json: { message: 'quiz_id required and must be a valid ID' },
+            status: :bad_request
+        elsif !@context.quizzes.exists?(params[:quiz_id])
+          return render json: { message: 'Quiz could not be found' }, status: :bad_request
+        else
+          export.export_type = ContentExport::QUIZZES2
+          # we pass the quiz_id of the quiz we want to clone here
+          export.selected_content = params[:quiz_id]
+        end
       else
         export.export_type = ContentExport::COMMON_CARTRIDGE
         export.selected_content = selected_content || { everything: true }

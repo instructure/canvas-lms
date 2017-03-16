@@ -15,7 +15,7 @@ define([
       return shouldFormatGradingType(gradingType);
     }
 
-    return /^\d+\.?\d*%?$/.test(grade);
+    return numberHelper.validate(grade.replace('%', ''));
   }
 
   function isPercent (grade, gradeType) {
@@ -39,6 +39,7 @@ define([
      *    format given grade. A value of 'points' or 'percent' will result in the grade
      *    being formatted. Any other value will result in the grade not being formatted.
      *  precision {number} - If present grade will be rounded to given precision. Default is two decimals.
+     *  defaultValue - If present will be the return value when the grade is undefined, null, or empty string.
      *
      * @return {string} Given grade rounded to two decimal places and formatted with I18n
      * if it is a point or percent grade.
@@ -47,12 +48,12 @@ define([
       let formattedGrade;
 
       if (grade === undefined || grade === null || grade === '') {
-        return grade;
+        return Object.prototype.hasOwnProperty.call(opts, 'defaultValue') ? opts.defaultValue : grade;
       }
 
       formattedGrade = grade.toString();
 
-      if (shouldFormatGrade(grade, opts.gradingType)) {
+      if (shouldFormatGrade(formattedGrade, opts.gradingType)) {
         formattedGrade = formattedGrade.replace(/%/g, '');
         formattedGrade = round(numberHelper.parse(formattedGrade), opts.precision || 2);
         formattedGrade = I18n.n(formattedGrade, { percentage: isPercent(grade, opts.gradingType) });

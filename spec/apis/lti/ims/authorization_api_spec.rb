@@ -35,7 +35,6 @@ module Lti
       let(:raw_jwt) do
         raw_jwt = JSON::JWT.new(
           {
-            iss: tool_proxy.guid,
             sub: tool_proxy.guid,
             aud: lti_oauth2_authorize_url,
             exp: 1.minute.from_now,
@@ -43,21 +42,21 @@ module Lti
             jti: SecureRandom.uuid
           }
         )
-        raw_jwt.kid = tool_proxy.guid
         raw_jwt
       end
 
+      let(:auth_endpoint) { '/api/lti/authorize' }
+      let(:jwt_string) do
+        raw_jwt.sign(tool_proxy.shared_secret, :HS256).to_s
+      end
+      let(:params) do
+        {
+          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          assertion: jwt_string
+        }
+      end
+
       describe "POST 'authorize'" do
-        let(:auth_endpoint) { '/api/lti/authorize' }
-        let(:assertion) do
-          raw_jwt.sign(tool_proxy.shared_secret, :HS256).to_s
-        end
-        let(:params) do
-          {
-            grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-            assertion: assertion
-          }
-        end
 
         it 'responds with 200' do
           post auth_endpoint, params
@@ -99,6 +98,46 @@ module Lti
           params[:assertion] = '12ad3.4fgs56'
           post auth_endpoint, params
           expect(response.body).to eq({error: 'invalid_grant'}.to_json)
+        end
+
+        context "developer credentials" do
+
+          let(:raw_jwt) do
+            raw_jwt = JSON::JWT.new(
+              {
+                sub: developer_key.global_id,
+                aud: lti_oauth2_authorize_url,
+                exp: 1.minute.from_now,
+                iat: Time.zone.now.to_i,
+                jti: SecureRandom.uuid,
+              }
+            )
+            raw_jwt
+          end
+
+          let(:jwt_string) do
+            raw_jwt.sign(developer_key.api_key, :HS256).to_s
+          end
+
+          let(:params) do
+            {
+              grant_type: 'authorization_code',
+              assertion: jwt_string,
+              code: 'reg_key'
+            }
+          end
+
+          it "rejects the request if a reg_key isn't provided and grant_type is auth code" do
+            post auth_endpoint, params.delete(:code)
+            expect(response.code).to eq '400'
+          end
+
+          it "accepts a developer key with a reg key" do
+            post auth_endpoint, params
+            expect(response.code).to eq '200'
+          end
+
+
         end
 
       end

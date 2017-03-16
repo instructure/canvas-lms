@@ -6,7 +6,7 @@ describe "Converting Blackboard 8 qti" do
     expect(get_question_hash(bb8_question_dir, 'multiple_choice')).to eq BB8Expected::MULTIPLE_CHOICE
   end
 
-  it "should convert multiple choice" do
+  it "should convert multiple choice with blanke answers" do
     expect(get_question_hash(bb8_question_dir, 'multiple_choice_blank_answers')).to eq BB8Expected::MULTIPLE_CHOICE_BLANK_ANSWERS
   end
 

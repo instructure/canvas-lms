@@ -21,7 +21,13 @@ if skip_locale_loading
   load_path = load_path.map(&:existent).flatten unless CANVAS_RAILS4_2
   load_path.replace(load_path.grep(%r{/(locales|en)\.yml\z}))
 else
-  load_path << (Rails.root + "config/locales/locales.yml").to_s # add it at the end, to trump any weird/invalid stuff in locale-specific files
+  # add the definition file at the end, to trump any weird/invalid stuff in locale-specific files
+  if CANVAS_RAILS4_2
+    load_path << (Rails.root + "config/locales/locales.yml").to_s
+  else
+    yml = "config/locales/locales.yml"
+    load_path << Rails::Paths::Path.new(CanvasRails::Application.instance.paths, yml, [yml])
+  end
 end
 
 Rails.application.config.i18n.enforce_available_locales = true
@@ -34,16 +40,20 @@ module DontTrustI18nPluralizations
     Rails.logger.error("#{e.message} in locale #{locale.inspect}")
     ""
   end
-
-  # make sure count special values get formatted
-  def interpolate(locale, string, values = {})
-    if values[:count] && values[:count].is_a?(Numeric)
-      values[:count] = ActiveSupport::NumberHelper.number_to_delimited(values[:count])
-    end
-    super
-  end
 end
 I18n::Backend::Simple.include(DontTrustI18nPluralizations)
+
+module FormatInterpolatedNumbers
+  def interpolate_hash(string, values)
+    values = values.dup
+    values.each do |key, value|
+      next unless value.is_a?(Numeric)
+      values[key] = ActiveSupport::NumberHelper.number_to_delimited(value)
+    end
+    super(string, values)
+  end
+end
+I18n.singleton_class.prepend(FormatInterpolatedNumbers)
 
 module CalculateDeprecatedFallbacks
   def reload!

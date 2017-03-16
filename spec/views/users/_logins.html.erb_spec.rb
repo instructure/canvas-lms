@@ -30,27 +30,27 @@ describe "users/_logins.html.erb" do
       @pseudo.integration_id = "and_this_one_even_lamer"
       @pseudo.save
       @pseudo2 = @user.pseudonyms.create!(:unique_id => 'someone@somewhere.com') { |p| p.sis_user_id = 'more' }
-      assigns[:context] = @account
-      assigns[:context_account] = @account
-      assigns[:account] = @account
-      assigns[:root_account] = @account
-      assigns[:user] = @student
-      assigns[:current_enrollments] = []
-      assigns[:completed_enrollments] = []
-      assigns[:student_enrollments] = []
-      assigns[:pending_enrollments] = []
-      assigns[:enrollments] = []
-      assigns[:courses] = []
-      assigns[:page_views] = []
-      assigns[:group_memberships] = []
-      assigns[:context_groups] = []
-      assigns[:contexts] = []
+      assign(:context, @account)
+      assign(:context_account, @account)
+      assign(:account, @account)
+      assign(:root_account, @account)
+      assign(:user, @student)
+      assign(:current_enrollments, [])
+      assign(:completed_enrollments, [])
+      assign(:student_enrollments, [])
+      assign(:pending_enrollments, [])
+      assign(:enrollments, [])
+      assign(:courses, [])
+      assign(:page_views, [])
+      assign(:group_memberships, [])
+      assign(:context_groups, [])
+      assign(:contexts, [])
     end
 
     it "should show to sis admin" do
       admin = account_admin_user
       view_context(@account, admin)
-      assigns[:current_user] = admin
+      assign(:current_user, admin)
       render
       expect(response).to have_tag("span#sis_user_id_#{@pseudo.id}", @pseudo.sis_user_id)
       expect(response).to have_tag("span#integration_id_#{@pseudo.id}", @pseudo.integration_id)
@@ -62,7 +62,7 @@ describe "users/_logins.html.erb" do
     it "should not show to non-sis admin" do
       admin = account_admin_user_with_role_changes(:role_changes => {'manage_sis' => false}, :account => @account)
       view_context(@account, admin)
-      assigns[:current_user] = admin
+      assign(:current_user, admin)
       render
       expect(response).to have_tag("span#sis_user_id_#{@pseudo.id}", @pseudo.sis_user_id)
       expect(response).to have_tag("span#integration_id_#{@pseudo.id}", @pseudo.integration_id)
@@ -78,17 +78,17 @@ describe "users/_logins.html.erb" do
     let(:bob) { student_in_course(account: account).user }
 
     it "should display when user has permission to create pseudonym" do
-      assigns[:domain_root_account] = account
-      assigns[:current_user] = sally
-      assigns[:user] = bob
+      assign(:domain_root_account, account)
+      assign(:current_user, sally)
+      assign(:user, bob)
       render
       expect(response).to have_tag("a.add_pseudonym_link")
     end
 
     it "should not display when user lacks permission to create pseudonym" do
-      assigns[:domain_root_account] = account
-      assigns[:current_user] = bob
-      assigns[:user] = sally
+      assign(:domain_root_account, account)
+      assign(:current_user, bob)
+      assign(:user, sally)
       render
       expect(response).not_to have_tag("a.add_pseudonym_link")
     end
@@ -103,9 +103,9 @@ describe "users/_logins.html.erb" do
       pseudonym(bob, account: account)
       bob.otp_secret_key = 'secret'
 
-      assigns[:domain_root_account] = account
-      assigns[:current_user] = sally
-      assigns[:user] = bob
+      assign(:domain_root_account, account)
+      assign(:current_user, sally)
+      assign(:user, bob)
       render
       expect(response).to have_tag("a.reset_mfa_link")
     end
@@ -114,9 +114,9 @@ describe "users/_logins.html.erb" do
       pseudonym(sally, account: account)
       sally.otp_secret_key = 'secret'
 
-      assigns[:domain_root_account] = account
-      assigns[:current_user] = bob
-      assigns[:user] = sally
+      assign(:domain_root_account, account)
+      assign(:current_user, bob)
+      assign(:user, sally)
       render
       expect(response).not_to have_tag("a.reset_mfa_link")
     end
@@ -131,9 +131,9 @@ describe "users/_logins.html.erb" do
       pseudonym(bob, account: account)
       bob.otp_secret_key = 'secret'
 
-      assigns[:domain_root_account] = account
-      assigns[:current_user] = bob
-      assigns[:user] = bob
+      assign(:domain_root_account, account)
+      assign(:current_user, bob)
+      assign(:user, bob)
       render
       expect(response).to have_tag(".add_holder")
     end
@@ -144,9 +144,9 @@ describe "users/_logins.html.erb" do
       account.settings[:mfa_settings] = :required
       account.save!
 
-      assigns[:domain_root_account] = account
-      assigns[:current_user] = sally
-      assigns[:user] = sally
+      assign(:domain_root_account, account)
+      assign(:current_user, sally)
+      assign(:user, sally)
       render
       expect(response).to have_tag(".add_holder")
     end
@@ -157,9 +157,9 @@ describe "users/_logins.html.erb" do
       account.settings[:mfa_settings] = :required
       account.save!
 
-      assigns[:domain_root_account] = Account.default
-      assigns[:current_user] = bob
-      assigns[:user] = bob
+      assign(:domain_root_account, Account.default)
+      assign(:current_user, bob)
+      assign(:user, bob)
       render
       expect(response).not_to have_tag(".add_holder")
     end
@@ -173,9 +173,9 @@ describe "users/_logins.html.erb" do
       @pseudonym.authentication_provider = ap
       @pseudonym.save!
 
-      assigns[:domain_root_account] = @account
-      assigns[:current_user] = @user
-      assigns[:user] = @user
+      assign(:domain_root_account, @account)
+      assign(:current_user, @user)
+      assign(:user, @user)
       render
 
       doc = Nokogiri::HTML(response)

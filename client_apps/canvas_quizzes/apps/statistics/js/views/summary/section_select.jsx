@@ -26,6 +26,7 @@ define(function(require) {
     componentDidMount: function() {
       $.ajax({
         url:  config.courseSectionsUrl,
+        data: { all: true },
         dataType: 'json',
         cache: false,
         success: function(data) {
@@ -54,7 +55,16 @@ define(function(require) {
              <i className="icon-mini-arrow-down" aria-hidden="true"></i>
              <span className="screenreader-only">{I18n.t('Section Filter')}</span>
            </a>
-           <ul id="toolbar-1" className="al-options" role="menu" tabIndex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+          <ul
+            id="toolbar-1"
+            className="al-options"
+            style={{maxHeight: '375px', overflowY: 'scroll'}}
+            role="menu"
+            tabIndex="0"
+            aria-hidden="true"
+            aria-expanded="false"
+            aria-activedescendant="toolbar-2"
+          >
             <SectionLink key={'all'} sectionId={'all'} name={'All Sections'} />
               {sectionNodes}
            </ul>

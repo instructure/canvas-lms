@@ -13,14 +13,14 @@ module Services
 
     # which of the users does the sender know, and what contexts do they and
     # the sender have in common?
-    def self.common_contexts(sender, users)
-      recipients(sender: sender, user_ids: users).common_contexts
+    def self.common_contexts(sender, users, ignore_result=false)
+      recipients(sender: sender, user_ids: users, ignore_result: ignore_result).common_contexts
     end
 
     # which of the users have roles in the context and what are those roles?
-    def self.roles_in_context(context, users)
+    def self.roles_in_context(context, users, ignore_result=false)
       context = context.course if context.is_a?(CourseSection)
-      recipients(context: context, user_ids: users).common_contexts
+      recipients(context: context, user_ids: users, ignore_result: ignore_result).common_contexts
     end
 
     # which users:
@@ -32,16 +32,16 @@ module Services
     #
     #  - have roles in the context and what are those roles? (is_admin=true)
     #
-    def self.known_in_context(sender, context, is_admin=false)
-      params = { context: context }
+    def self.known_in_context(sender, context, is_admin=false, ignore_result=false)
+      params = { context: context, ignore_result: ignore_result }
       params[:sender] = sender unless is_admin
       response = recipients(params)
       [response.user_ids, response.common_contexts]
     end
 
     # how many users does the sender know in the context?
-    def self.count_in_context(sender, context)
-      count_recipients(sender: sender, context: context)
+    def self.count_in_context(sender, context, ignore_result=false)
+      count_recipients(sender: sender, context: context, ignore_result: ignore_result)
     end
 
     # of the users who are not in `exclude_ids` and whose name matches the
@@ -58,8 +58,9 @@ module Services
     #  - have roles in the context and what are those roles? (context provided
     #    and is_admin true)
     #
-    def self.search_users(sender, options, service_options={})
+    def self.search_users(sender, options, service_options, ignore_result=false)
       params = options.slice(:search, :context, :exclude_ids, :weak_checks)
+      params[:ignore_result] = ignore_result
 
       # include sender only if not admin
       params[:sender] = sender unless options[:context] && options[:is_admin]
@@ -115,16 +116,21 @@ module Services
         url = app_host + path
         url += '?' + params.to_query unless params.empty?
         fallback = { "records" => [] }
-        Canvas.timeout_protection("address_book") do
+        timeout_service_name = params[:ignore_result] == 1 ?
+          "address_book_performance_tap" :
+          "address_book"
+        Canvas.timeout_protection(timeout_service_name) do
           response = CanvasHttp.get(url, 'Authorization' => "Bearer #{jwt}")
-          if response.code.to_i == 200
-            return JSON.parse(response.body)
-          else
+          if ![200, 202].include?(response.code.to_i)
             Canvas::Errors.capture(CanvasHttp::InvalidResponseCodeError.new(response.code.to_i), {
               extra: { url: url, response: response.body },
               tags: { type: 'address_book_fault' }
             })
             return fallback
+          elsif params[:ignore_result] == 1
+            return fallback
+          else
+            return JSON.parse(response.body)
           end
         end || fallback
       end
@@ -148,6 +154,7 @@ module Services
         query_params[:user_ids] = serialize_list(params[:user_ids]) if params[:user_ids]
         query_params[:exclude_ids] = serialize_list(params[:exclude_ids]) if params[:exclude_ids]
         query_params[:weak_checks] = 1 if params[:weak_checks]
+        query_params[:ignore_result] = 1 if params[:ignore_result]
         query_params
       end
 

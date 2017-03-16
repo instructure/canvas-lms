@@ -62,7 +62,8 @@ module Services
       def tool_proxy_jwt_body(tool_proxy, options = {})
         options.merge({
           sub: "ltiToolProxy:#{tool_proxy.guid}",
-          developerKey: tool_proxy.product_family.developer_key.to_s
+          DeveloperKey: tool_proxy.product_family.developer_key.global_id.to_s,
+          RootAccountId: (tool_proxy.context.global_root_account_id || tool_proxy.context.global_id).to_s
         })
       end
     end

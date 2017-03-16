@@ -30,12 +30,7 @@ module BroadcastPolicies
       end
     end
     let(:submission_time) do
-      Time.now
-    end
-    let(:prior_version) do
-      stub("PriorVersion").tap do |v|
-        v.stubs(:submitted_at).returns(submission_time)
-      end
+      Time.zone.now
     end
     let(:submission) do
       stub("Submission").tap do |s|
@@ -44,13 +39,14 @@ module BroadcastPolicies
         s.stubs(:just_created).returns(true)
         s.stubs(:submitted?).returns(true)
         s.stubs(:changed_state_to).returns(false)
-        s.stubs(:prior_version).returns(prior_version)
         s.stubs(:submitted_at).returns(submission_time)
         s.stubs(:has_submission?).returns(true)
         s.stubs(:late?).returns(false)
         s.stubs(:quiz_submission).returns(nil)
         s.stubs(:user).returns(user)
         s.stubs(:context).returns(course)
+        s.stubs(:submitted_at_was).returns(nil)
+        s.stubs(:submitted_at_changed?).returns(false)
       end
     end
 
@@ -104,7 +100,8 @@ module BroadcastPolicies
 
     describe '#should_dispatch_assignment_resubmitted' do
       before do
-        prior_version.stubs(:submitted_at).returns (Time.now - 100)
+        submission.stubs(:submitted_at_was).returns(1.day.ago)
+        submission.stubs(:submitted_at_changed?).returns(true)
       end
 
       def wont_send_when
@@ -117,7 +114,6 @@ module BroadcastPolicies
       end
       specify { wont_send_when { course.stubs(:available?).returns false}}
       specify { wont_send_when { submission.stubs(:submitted?).returns false }}
-      specify { wont_send_when { prior_version.stubs(:submitted_at).returns nil }}
       specify { wont_send_when { submission.stubs(:has_submission?).returns false }}
       specify { wont_send_when { submission.stubs(:late?).returns true }}
     end

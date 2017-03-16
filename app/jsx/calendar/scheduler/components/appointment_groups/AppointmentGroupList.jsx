@@ -68,7 +68,9 @@ define([
 
         if (!appointment.reserved) {
           if (appointment.child_events.length) {
-            const names = appointment.child_events.map(event => event.user.sortable_name)
+            const names = appointment.child_events.map(event =>
+              (event.user ? event.user.sortable_name : event.group.name)
+            )
             const sorted = names.sort((a, b) => natcompare.strings(a, b))
             const maxParticipants = appointmentGroup.participants_per_appointment
 

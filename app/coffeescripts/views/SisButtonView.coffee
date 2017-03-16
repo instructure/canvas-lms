@@ -12,19 +12,9 @@ define [
     events:
       'click': 'togglePostToSIS'
 
-    SIS_ATTRIBUTES = {
-      enabled: {
-        src: '/images/svg-icons/svg_icon_sis_synced.svg',
-        description: I18n.t('Post grade to SIS enabled. Click to toggle.'),
-        label: I18n.t('The grade for this assignment will sync to the student information system.'),
-
-      },
-      disabled: {
-        src: '/images/svg-icons/svg_icon_sis_not_synced.svg',
-        description: I18n.t('Post grade to SIS disabled. Click to toggle.'),
-        label: I18n.t('The grade for this assignment will not sync to the student information system.')
-      }
-    }
+    # {string}
+    # text used to describe the SIS NAME
+    @optionProperty 'sisName'
 
     setAttributes: ->
       newSisAttributes = @sisAttributes()
@@ -41,21 +31,32 @@ define [
       c = @model.postToSIS()
       @model.postToSIS(!c)
       if sisUrl
-        @model.save({}, {
+        @model.save({ override_dates: false }, {
           type: 'POST',
           url: sisUrl,
           success: =>
             @setAttributes()
         })
       else
-        @model.save({}, {
+        @model.save({ override_dates: false }, {
           success: =>
             @setAttributes()
         })
 
     sisAttributes: =>
-      sisStatus = if @model.postToSIS() then "enabled" else "disabled"
-      SIS_ATTRIBUTES[sisStatus]
+      if @model.postToSIS()
+        {
+          src: '/images/svg-icons/svg_icon_sis_synced.svg',
+          description: I18n.t('Sync to %{name} enabled. Click to toggle.', name: @sisName),
+          label: I18n.t('The grade for this assignment will sync to the student information system.'),
+        }
+      else
+        {
+          src: '/images/svg-icons/svg_icon_sis_not_synced.svg',
+          description: I18n.t('Sync to %{name} disabled. Click to toggle.', name: @sisName),
+          label: I18n.t('The grade for this assignment will not sync to the student information system.')
+        }
+
 
     render: ->
       super

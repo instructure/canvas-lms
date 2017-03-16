@@ -50,7 +50,7 @@ class EffectiveDueDates
   def any_in_closed_grading_period?
     return @any_in_closed_grading_period unless @any_in_closed_grading_period.nil?
 
-    @any_in_closed_grading_period = grading_periods_enabled? &&
+    @any_in_closed_grading_period = @context.grading_periods? &&
         to_hash.any? do |_, assignment_due_dates|
           any_student_in_closed_grading_period?(assignment_due_dates)
         end
@@ -62,17 +62,17 @@ class EffectiveDueDates
     assignment_id = assignment_id.id if assignment_id.is_a?(Assignment)
     return false if assignment_id.nil?
 
-    # false if MGP isn't even enabled
-    return false unless grading_periods_enabled?
+    # false if there aren't even grading periods set up
+    return false unless @context.grading_periods?
     # if we've already checked all assignments and it was false,
     # no need to check this one specifically
     return false if @any_in_closed_grading_period == false
 
-    assignment_due_dates = to_hash[assignment_id]
+    assignment_due_dates = find_effective_due_dates_for_assignment(assignment_id)
     student_id = student_or_student_id.try(:id) || student_or_student_id
 
-    if usable_student_id?(student_id)
-      assignment_due_dates[student_id][:in_closed_grading_period]
+    if student_id.to_i > 0
+      !!assignment_due_dates.dig(student_id, :in_closed_grading_period)
     else
       any_student_in_closed_grading_period?(assignment_due_dates)
     end
@@ -82,8 +82,6 @@ class EffectiveDueDates
     find_effective_due_date(student_id, assignment_id).fetch(:grading_period_id, nil)
   end
 
-  private
-
   def find_effective_due_date(student_id, assignment_id)
     find_effective_due_dates_for_assignment(assignment_id).fetch(student_id, {})
   end
@@ -92,17 +90,7 @@ class EffectiveDueDates
     to_hash.fetch(assignment_id, {})
   end
 
-  def usable_student_id?(student_id)
-    return false unless student_id.present?
-    return false unless student_id.to_i.present?
-
-    true
-  end
-
-  def grading_periods_enabled?
-    return @grading_periods_enabled unless @grading_periods_enabled.nil?
-    @grading_periods_enabled = @context.feature_enabled?(:multiple_grading_periods)
-  end
+  private
 
   def any_student_in_closed_grading_period?(assignment_due_dates)
     return false unless assignment_due_dates
@@ -114,11 +102,11 @@ class EffectiveDueDates
   end
 
   # This beauty of a method brings together assignment overrides,
-  # due dates, multiple grading periods, course/group enrollments,
-  # etc to calculate each student's effective due date and whether
-  # or not that due date is in a closed grading period. If a
-  # student is not included in this hash, that student cannot see
-  # this assignment. The format of the returned hash is:
+  # due dates, grading periods, course/group enrollments, etc
+  # to calculate each student's effective due date and whether or
+  # not that due date is in a closed grading period. If a student
+  # is not included in this hash, that student cannot see this
+  # assignment. The format of the returned hash is:
   # {
   #   assignment_id => {
   #     student_id => {

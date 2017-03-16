@@ -3,10 +3,11 @@ define [
   'underscore'
   'i18n!grading_periods'
   'jsx/shared/helpers/dateHelper'
+  'compiled/api/gradingPeriodsApi'
   'axios'
   'jsx/shared/CheatDepaginator'
   'jquery.instructure_misc_helpers'
-], ($, _, I18n, DateHelper, axios, Depaginate) ->
+], ($, _, I18n, DateHelper, gradingPeriodsApi, axios, Depaginate) ->
   listUrl = () =>
     ENV.GRADING_PERIOD_SETS_URL
 
@@ -17,26 +18,20 @@ define [
     $.replaceTags(ENV.GRADING_PERIOD_SET_UPDATE_URL, 'id', id)
 
   serializeSet = (set) =>
-    grading_period_set: { title: set.title },
+    gradingPeriodSetAttrs =
+      title: set.title
+      weighted: set.weighted
+      display_totals_for_all_grading_periods: set.displayTotalsForAllGradingPeriods
+    grading_period_set: gradingPeriodSetAttrs
     enrollment_term_ids: set.enrollmentTermIDs
-
-  deserializePeriods = (periods) =>
-    _.map periods, (period) ->
-      {
-        id: period.id.toString()
-        title: period.title
-        startDate: new Date(period.start_date)
-        endDate: new Date(period.end_date)
-        # TODO: After the close_date data fixup has run, this can become:
-        # `closeDate: new Date(period.close_date)`
-        closeDate: new Date(period.close_date || period.end_date)
-      }
 
   baseDeserializeSet = (set) ->
     {
       id: set.id.toString()
       title: gradingPeriodSetTitle(set)
-      gradingPeriods: deserializePeriods(set.grading_periods)
+      weighted: !!set.weighted
+      displayTotalsForAllGradingPeriods: set.display_totals_for_all_grading_periods
+      gradingPeriods: gradingPeriodsApi.deserializePeriods(set.grading_periods)
       permissions: set.permissions
       createdAt: new Date(set.created_at)
     }
@@ -46,7 +41,7 @@ define [
       set.title.trim()
     else
       createdAt = DateHelper.formatDateForDisplay(new Date(set.created_at))
-      I18n.t("Set created %{createdAt}", { createdAt: createdAt });
+      I18n.t('Set created %{createdAt}', { createdAt })
 
   deserializeSet = (set) ->
     newSet = baseDeserializeSet(set)
@@ -57,29 +52,23 @@ define [
     _.flatten _.map setGroups, (group) ->
       _.map group.grading_period_sets, (set) -> baseDeserializeSet(set)
 
+  deserializeSet: deserializeSet
+
   list: () ->
     promise = new Promise (resolve, reject) =>
       Depaginate(listUrl())
-           .then (response) ->
-             resolve(deserializeSets(response))
-           .fail (error) ->
-             reject(error)
+        .then (response) ->
+          resolve(deserializeSets(response))
+        .fail (error) ->
+          reject(error)
     promise
 
   create: (set) ->
-    promise = new Promise (resolve, reject) =>
-      axios.post(createUrl(), serializeSet(set))
-           .then (response) ->
-             resolve(deserializeSet(response.data.grading_period_set))
-           .catch (error) ->
-             reject(error)
-    promise
+    axios.post(createUrl(), serializeSet(set))
+      .then (response) ->
+        deserializeSet(response.data.grading_period_set)
 
   update: (set) ->
-    promise = new Promise (resolve, reject) =>
-      axios.patch(updateUrl(set.id), serializeSet(set))
-           .then (response) ->
-             resolve(set)
-           .catch (error) ->
-             reject(error)
-    promise
+    axios.patch(updateUrl(set.id), serializeSet(set))
+      .then (response) ->
+        set

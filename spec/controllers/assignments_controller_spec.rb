@@ -63,6 +63,32 @@ describe AssignmentsController do
       expect(assigns[:js_env][:WEIGHT_FINAL_GRADES]).to eq(@course.apply_group_weights?)
     end
 
+    it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:post_to_sis_friendly_name).returns('Foo Bar')
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
+    end
+
+    it "should set QUIZ_LTI_ENABLED in js_env if quizzes 2 is available" do
+      user_session @teacher
+      @course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+      get 'index', course_id: @course.id
+      expect(assigns[:js_env][:QUIZ_LTI_ENABLED]).to be true
+    end
+
+    it "should not set QUIZ_LTI_ENABLED in js_env if quizzes 2 is not available" do
+      user_session @teacher
+      get 'index', course_id: @course.id
+      expect(assigns[:js_env][:QUIZ_LTI_ENABLED]).to be false
+    end
+
     context "draft state" do
       it "should create a default group if none exist" do
         user_session(@student)
@@ -326,6 +352,29 @@ describe AssignmentsController do
       get 'new', :course_id => @course.id, :id => @assignment.id
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
+
+    context "with ?quiz_lti query param" do
+      it "uses quizzes 2 if available" do
+        tool = @course.context_external_tools.create!(
+          :name => 'Quizzes.Next',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'Quizzes 2',
+          :url => 'http://example.com/launch'
+        )
+        user_session(@teacher)
+        get 'new', :course_id => @course.id, :quiz_lti => true
+        expect(assigns[:assignment].quiz_lti?).to be true
+        expect(assigns[:assignment].external_tool_tag.content).to eq tool
+        expect(assigns[:assignment].external_tool_tag.url).to eq tool.url
+      end
+
+      it "falls back to normal behaviour if quizzes 2 is not set up" do
+        user_session(@teacher)
+        get 'new', :course_id => @course.id, :quiz => true
+        expect(assigns[:assignment].quiz_lti?).to be false
+      end
+    end
   end
 
   describe "POST 'create'" do
@@ -401,7 +450,7 @@ describe AssignmentsController do
   end
 
   describe "GET 'edit'" do
-    include_context "multiple grading periods within controller" do
+    include_context "grading periods within controller" do
       let(:course) { @course }
       let(:teacher) { @teacher }
       let(:request_params) { [:edit, course_id: course, id: @assignment] }
@@ -511,7 +560,7 @@ describe AssignmentsController do
       end
 
       it "to wiki page" do
-        Course.any_instance.stubs(:feature_enabled?).with(:conditional_release).returns(true)
+        @course.enable_feature!(:conditional_release)
         wiki_page_assignment_model course: @course
         get 'edit', :course_id => @course.id, :id => @page.assignment.id
         expect(response).to redirect_to controller.edit_course_wiki_page_path(@course, @page)
@@ -542,23 +591,6 @@ describe AssignmentsController do
         get 'edit', :course_id => @course.id, :id => @assignment.id
         expect(assigns[:js_env][:dummy]).to be nil
       end
-    end
-  end
-
-  describe "PUT 'update'" do
-    it "should require authorization" do
-      #controller.use_rails_error_handling!
-      put 'update', :course_id => @course.id, :id => @assignment.id
-      assert_unauthorized
-    end
-
-    it "should update attributes" do
-      user_session(@teacher)
-      put 'update', :course_id => @course.id, :id => @assignment.id,
-        :assignment_type => "attendance", :assignment => { :title => "test title" }
-      expect(assigns[:assignment]).to eql(@assignment)
-      expect(assigns[:assignment].title).to eql("test title")
-      expect(assigns[:assignment].submission_types).to eql("attendance")
     end
   end
 

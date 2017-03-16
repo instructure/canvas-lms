@@ -125,7 +125,7 @@ describe ApplicationController do
 
     it "should not allow overwriting a key" do
       controller.js_env :REAL_SLIM_SHADY => 'please stand up'
-      expect { controller.js_env(:REAL_SLIM_SHADY => 'poser') }.to raise_error
+      expect { controller.js_env(:REAL_SLIM_SHADY => 'poser') }.to raise_error("js_env key REAL_SLIM_SHADY is already taken")
     end
 
     it 'gets appropriate settings from the root account' do
@@ -314,7 +314,7 @@ describe ApplicationController do
       expect(controller.send(:require_account_context)).to be_truthy
       course_model
       controller.instance_variable_set(:@context, @course)
-      expect{controller.send(:require_account_context)}.to raise_error
+      expect{controller.send(:require_account_context)}.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "properly requires course context" do
@@ -322,7 +322,7 @@ describe ApplicationController do
       controller.instance_variable_set(:@context, @course)
       expect(controller.send(:require_course_context)).to be_truthy
       controller.instance_variable_set(:@context, Account.default)
-      expect{controller.send(:require_course_context)}.to raise_error
+      expect{controller.send(:require_course_context)}.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 
@@ -562,14 +562,8 @@ describe ApplicationController do
     end
 
     before :each do
-      controller.stubs(:request).returns(ActionDispatch::TestRequest.new)
+      controller.stubs(:request).returns(CANVAS_RAILS4_2 ? ActionDispatch::TestRequest.new : ActionDispatch::TestRequest.create)
       controller.instance_variable_set(:@context, @course)
-    end
-
-    it 'returns a hash' do
-      hash = controller.external_tool_display_hash(@tool, :account_navigation)
-      left_over_keys = hash.keys - [:base_url, :title, :icon_url, :canvas_icon_class]
-      expect(left_over_keys).to eq []
     end
 
     it 'returns a hash' do

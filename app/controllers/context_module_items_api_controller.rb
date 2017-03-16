@@ -463,7 +463,7 @@ class ContextModuleItemsApiController < ApplicationController
       end
 
       if @tag.save && set_position && set_completion_requirement
-        @tag.update_asset_name! if params[:module_item][:title]
+        @tag.update_asset_name!(@current_user) if params[:module_item][:title]
         render :json => module_item_json(@tag, @current_user, session, @tag.context_module, nil)
       else
         render :json => @tag.errors, :status => :bad_request

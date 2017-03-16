@@ -4,10 +4,12 @@ module Turnitin
     def self.update_attachment(submission, attachment)
       assignment = submission.assignment
       user = submission.user
-      tii_client = TiiClient.new(
+      tool = assignment.external_tool_tag.content
+      tool ||= ContextExternalTool.find_external_tool(assignment.external_tool_tag.url, assignment.context)
+        tii_client = TiiClient.new(
         user,
         assignment,
-        assignment.external_tool_tag.content,
+        tool,
         submission.turnitin_data[attachment.asset_string][:outcome_response]
       )
       save_attachment( tii_client, user, attachment)

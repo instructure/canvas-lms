@@ -42,7 +42,7 @@ module Canvas::Plugins::Validators::GoogleDriveValidator
           :client_secret_json => ""
          }
       else
-         to_return = settings
+         to_return = settings.to_hash.with_indifferent_access
       end
       to_return
     end

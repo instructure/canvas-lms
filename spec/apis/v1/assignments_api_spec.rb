@@ -1623,7 +1623,7 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
-    context "with multiple grading periods enabled" do
+    context "with grading periods" do
       def call_create(params, expected_status)
         api_call_as_user(
           @current_user,
@@ -1645,7 +1645,6 @@ describe AssignmentsApiController, type: :request do
       end
 
       before :once do
-        @course.root_account.enable_feature!(:multiple_grading_periods)
         grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
         term = @course.enrollment_term
         term.grading_period_group = grading_period_group
@@ -2085,7 +2084,7 @@ describe AssignmentsApiController, type: :request do
           @user = @teacher
         end
 
-        before :each do
+        let(:update_assignment) do
           api_update_assignment_call(@course,@assignment,{
             'name' => 'Assignment With Overrides',
             'assignment_overrides' => {
@@ -2108,6 +2107,7 @@ describe AssignmentsApiController, type: :request do
         end
 
         it "updates any ADHOC overrides" do
+          update_assignment
           expect(@assignment.assignment_overrides.count).to eq 3
           @adhoc_override = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
           expect(@adhoc_override).not_to be_nil
@@ -2117,6 +2117,7 @@ describe AssignmentsApiController, type: :request do
         end
 
         it "updates any CourseSection overrides" do
+          update_assignment
           @section_override = @assignment.assignment_overrides.where(set_type: 'CourseSection').first
           expect(@section_override).not_to be_nil
           expect(@section_override.set).to eq @course.default_section
@@ -2125,6 +2126,7 @@ describe AssignmentsApiController, type: :request do
         end
 
         it "updates any Noop overrides" do
+          update_assignment
           @noop_override = @assignment.assignment_overrides.where(set_type: 'Noop').first
           expect(@noop_override).not_to be_nil
           expect(@noop_override.set).to be_nil
@@ -2132,6 +2134,33 @@ describe AssignmentsApiController, type: :request do
           expect(@noop_override.set_id).to eq 999
           expect(@noop_override.title).to eq 'Helpful Tag'
           expect(@noop_override.due_at_overridden).to be_falsey
+        end
+
+        it 'overrides the assignment for the user' do
+          @assignment.update!(due_at: 1.day.from_now)
+          response = api_update_assignment_call(@course, @assignment,
+            assignment_overrides: {
+              0 => {
+                course_section_id: @course.default_section.id,
+                due_at: @section_due_at.iso8601
+              }
+            }
+          )
+          expect(response['due_at']).to eq(@section_due_at.iso8601)
+        end
+
+        it 'does not override the assignment for the user if passed false for override_dates' do
+          @assignment.update!(due_at: 1.day.from_now)
+          response = api_update_assignment_call(@course, @assignment,
+            override_dates: false,
+            assignment_overrides: {
+              0 => {
+                course_section_id: @course.default_section.id,
+                due_at: @section_due_at.iso8601
+              }
+            }
+          )
+          expect(response['due_at']).to eq(@assignment.due_at.iso8601)
         end
       end
 
@@ -2478,7 +2507,7 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
-    context "with multiple grading periods enabled" do
+    context "with grading periods" do
       def create_assignment(attr)
         @course.assignments.create!({ name: "Example Assignment", submission_types: "points" }.merge(attr))
       end
@@ -2511,7 +2540,6 @@ describe AssignmentsApiController, type: :request do
       end
 
       before :once do
-        @course.root_account.enable_feature!(:multiple_grading_periods)
         grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
         term = @course.enrollment_term
         term.grading_period_group = grading_period_group
@@ -2964,7 +2992,7 @@ describe AssignmentsApiController, type: :request do
           'locked_for_user' => false,
           'root_topic_id' => @topic.root_topic_id,
           'podcast_url' => nil,
-          'podcast_has_student_posts' => nil,
+          'podcast_has_student_posts' => false,
           'read_state' => 'unread',
           'unread_count' => 0,
           'user_can_see_posts' => @topic.user_can_see_posts?(@user),
@@ -2980,9 +3008,9 @@ describe AssignmentsApiController, type: :request do
           'discussion_type' => 'side_comment',
           'group_category_id' => nil,
           'can_group' => true,
-          'allow_rating' => nil,
-          'only_graders_can_rate' => nil,
-          'sort_by_rating' => nil,
+          'allow_rating' => false,
+          'only_graders_can_rate' => false,
+          'sort_by_rating' => false,
         })
       end
 

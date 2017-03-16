@@ -290,7 +290,7 @@ module ConditionalRelease
       def submissions_for(student, context, force: false)
         return [] unless student.present?
         Rails.cache.fetch(submissions_cache_key(student), force: force) do
-          keys = [:id, :assignment_id, :score, :"assignments.points_possible"]
+          keys = [:id, :assignment_id, :score, "assignments.points_possible"]
           context.submissions
                   .for_user(student)
                   .in_workflow_state(:graded)
@@ -299,7 +299,7 @@ module ConditionalRelease
                   .pluck(*keys)
                   .map do |values|
             submission = Hash[keys.zip(values)]
-            submission[:points_possible] = submission.delete(:"assignments.points_possible")
+            submission[:points_possible] = submission.delete("assignments.points_possible")
             submission
           end
         end

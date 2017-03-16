@@ -109,7 +109,7 @@ describe AssignmentUtil do
       expect(described_class.due_date_ok?(assignment)).to eq(true)
     end
 
-    it "returns true when due_at is present and due_date_required? is false" do
+    it "returns true when due_at is not present and due_date_required? is false" do
       assignment.due_at = nil
       described_class.stubs(:due_date_required?).with(assignment).returns(false)
       expect(described_class.due_date_ok?(assignment)).to eq(true)

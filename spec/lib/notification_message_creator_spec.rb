@@ -220,7 +220,7 @@ describe NotificationMessageCreator do
 
     it "should make a delayed message for the default channel based on the notification's default frequency when there is no policy on any channel for the notification" do
       notification_set # we get one channel here
-      communication_channel_model(:path => 'this one gets a delayed policy').confirm! # this gives us a total of two channels
+      communication_channel_model(path: 'yes@example.com').confirm! # this gives us a total of two channels
       NotificationPolicy.delete_all
 
       @notification = @notification.dup
@@ -329,21 +329,21 @@ describe NotificationMessageCreator do
       @communication_channel.bounce_count = CommunicationChannel::RETIRE_THRESHOLD - 1
       @communication_channel.save!
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      expect(messages.select{|m| m.to == 'value for path'}.size).to eq 1
+      expect(messages.select{|m| m.to == 'valid@example.com'}.size).to eq 1
 
       @communication_channel.bounce_count = CommunicationChannel::RETIRE_THRESHOLD
       @communication_channel.save!
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      expect(messages.select{|m| m.to == 'value for path'}.size).to eq 0
+      expect(messages.select{|m| m.to == 'valid@example.com'}.size).to eq 0
     end
 
     it "should not use notification policies for unconfirmed communication channels" do
       notification_set
-      cc = communication_channel_model(:workflow_state => 'unconfirmed', :path => "nope")
-      notification_policy_model(:communication_channel_id => cc.id, :notification_id => @notification.id)
-      messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
+      cc = communication_channel_model(workflow_state: 'unconfirmed', path: 'nope@example.com')
+      notification_policy_model(communication_channel_id: cc.id, notification_id: @notification.id)
+      messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user).create_message
       expect(messages.size).to eq 2
-      expect(messages.map(&:to).sort).to eq ['dashboard', 'value for path']
+      expect(messages.map(&:to).sort).to eq ['dashboard', 'valid@example.com']
     end
 
     it "should not use notification policies for unconfirmed communication channels even if that's all the user has" do

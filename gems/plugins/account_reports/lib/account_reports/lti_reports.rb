@@ -33,21 +33,25 @@ module AccountReports
                  'tool_type_id', 'tool_created_at', 'privacy_level', 'launch_url', 'custom_fields']
 
       write_report headers do |csv|
+        courses = add_course_sub_account_scope(root_account.all_courses.active)
+        courses = courses.joins(:account).where.not(accounts: {workflow_state: 'deleted'}).select(:id)
 
         tools = ContextExternalTool.active.
           where("context_type = 'Account' OR context_type = 'Course'").
-          joins("LEFT OUTER JOIN #{Course.quoted_table_name} ON context_id=courses.id AND context_type='Course'",
-                "LEFT OUTER JOIN #{Account.quoted_table_name} ON context_id=accounts.id AND context_type='Account'").
+          joins("LEFT OUTER JOIN #{Course.quoted_table_name} ON context_id=courses.id
+                                                             AND context_type='Course'
+                                                             AND courses.workflow_state<>'deleted'",
+                "LEFT OUTER JOIN #{Account.quoted_table_name} ON context_id=accounts.id
+                                                              AND context_type='Account'
+                                                              AND accounts.workflow_state<>'deleted'").
           select("context_external_tools.*, courses.name AS course_name, accounts.name AS account_name")
         if account.root_account?
-          tools.where!("courses.root_account_id= :root OR
-                        accounts.root_account_id = :root OR accounts.id = :root", {root: root_account})
+          tools.where!("courses.id IN (:courses) OR
+                        accounts.root_account_id = :root OR accounts.id = :root", {root: root_account, courses: courses})
         else
           tools.where!("accounts.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
                         OR accounts.id=?
-                        OR EXISTS (?)",
-                       account,
-                       CourseAccountAssociation.where("course_id=courses.id").where(account_id: account))
+                        OR courses.id IN (?)", account, courses)
         end
 
         tools.find_each do |t|

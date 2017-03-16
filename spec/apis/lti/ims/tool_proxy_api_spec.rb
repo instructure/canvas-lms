@@ -63,7 +63,9 @@ module Lti
       describe "POST #create" do
 
         before(:each) do
-          OAuth::Signature.stubs(:build).returns(mock(verify: true))
+          mock_oauth_sig = mock('oauth_signature')
+          mock_oauth_sig.stubs(:verify).returns(true)
+          OAuth::Signature.stubs(:build).returns(mock_oauth_sig)
           OAuth::Helper.stubs(:parse_header).returns({'oauth_consumer_key' => 'key'})
           Lti::RegistrationRequestService.stubs(:retrieve_registration_password).returns('password')
         end
@@ -111,18 +113,73 @@ module Lti
           expect(response).to eq 201
           expect(JSON.parse(body).keys).to match_array ["@context", "@type", "@id", "tool_proxy_guid", "tc_half_shared_secret"]
         end
+
+        context "custom tool consumer profile" do
+          let(:account) {Account.create!}
+          let(:dev_key) do
+            dev_key = DeveloperKey.create(api_key: 'test-api-key')
+            DeveloperKey.stubs(:find_cached).returns(dev_key)
+            dev_key
+          end
+          let!(:tcp) do
+            dev_key.create_tool_consumer_profile!(
+              services: Lti::ToolConsumerProfile::RESTRICTED_SERVICES,
+              capabilities: Lti::ToolConsumerProfile::RESTRICTED_CAPABILITIES,
+              uuid: SecureRandom.uuid,
+              developer_key: dev_key
+            )
+          end
+          let(:tcp_url) {polymorphic_url([account, :tool_consumer_profile], tool_consumer_profile_id: tcp.uuid)}
+          let(:access_token) do
+            aud = host rescue (@request || request).host
+            Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: developer_key.global_id, reg_key: 'reg_key')
+          end
+          let(:request_headers) { {Authorization: "Bearer #{access_token}"} }
+          it 'supports using a specified custom TCP' do
+            course_with_teacher_logged_in(:active_all => true)
+            tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
+            tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+            message = tp.tool_profile.resource_handlers.first.messages.first
+            tp.tool_consumer_profile = tcp_url
+            message.enabled_capability = *Lti::ToolConsumerProfile::RESTRICTED_CAPABILITIES
+            headers = {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+            headers.merge!(request_headers)
+            response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tp.to_json, headers
+            expect(response).to eq 201
+          end
+        end
+
       end
 
       describe "POST #create with JWT access token" do
+        let(:access_token) do
+          aud = host rescue (@request || request).host
+          Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: developer_key.global_id, reg_key: 'reg_key')
+        end
+        let(:request_headers) { {Authorization: "Bearer #{access_token}"} }
+
         it 'accepts valid JWT access tokens' do
+          course_with_teacher_logged_in(:active_all => true)
+          Lti::RegistrationRequestService.
+            stubs(:retrieve_registration_password).with(@course.account, 'reg_key').returns('password')
+          tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
+          json = JSON.parse(tool_proxy_fixture)
+          json[:format] = 'json'
+          json[:account_id] = @course.account.id
+          response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture, request_headers
+          expect(response).to eq 201
+        end
+
+        it 'returns a 401 if the reg_key is not valid' do
           course_with_teacher_logged_in(:active_all => true)
           tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
           json = JSON.parse(tool_proxy_fixture)
           json[:format] = 'json'
           json[:account_id] = @course.account.id
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture, dev_key_request_headers
-          expect(response).to eq 201
+          expect(response).to eq 401
         end
+
       end
 
       describe "POST #reregistration" do
@@ -173,7 +230,7 @@ module Lti
           tool_proxy_fixture = JSON.parse(File.read(fixture_file))
 
           tcp_url = polymorphic_url([@course.account, :tool_consumer_profile],
-                                    tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID)
+                                    tool_consumer_profile_id: Lti::ToolConsumerProfile::DEFAULT_TCP_UUID)
           tool_proxy_fixture["tool_consumer_profile"] = tcp_url
 
           headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(auth_header)

@@ -57,7 +57,7 @@ describe OverrideListPresenter do
       end
 
       it "returns a shortened version with just the date if time is 11:59" do
-        fancy_midnight = CanvasTime.fancy_midnight Time.now
+        fancy_midnight = CanvasTime.fancy_midnight Time.zone.now
         due_date_hash = {:due_at => fancy_midnight }
         expect(presenter.formatted_date_string(:due_at, due_date_hash)).to eq(
           date_string(fancy_midnight, :no_words)

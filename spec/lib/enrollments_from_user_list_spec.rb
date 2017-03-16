@@ -34,12 +34,12 @@ describe EnrollmentsFromUserList do
       e = EnrollmentsFromUserList.new(@course)
       expect(e.course).to eql(@course)
     end
-    
+
     it "should process with an user list" do
       enrollments = EnrollmentsFromUserList.process(@el, @course)
       enrollments.all? {|e| expect(e).to be_is_a(StudentEnrollment)}
     end
-    
+
     it "should process repeat addresses without creating new users" do
       @el = UserList.new(list_to_parse_with_repeats)
       enrollments = EnrollmentsFromUserList.process(@el, @course)
@@ -56,7 +56,7 @@ describe EnrollmentsFromUserList do
     end
 
   end
-  
+
   context "EnrollmentsFromUserList.process" do
     it "should be able to process from the class" do
       enrollments = EnrollmentsFromUserList.process(@el, @course)
@@ -75,12 +75,12 @@ describe EnrollmentsFromUserList do
       expect(@david_jr.reload.updated_at).to be < cutoff
     end
   end
-  
+
 end
 
 
 def list_to_parse
-  %{david@example.com, "Richards, David" <david_richards@example.com>, David Richards <david_richards_jr@example.com}
+  %{david@example.com, "Richards, David" <david_richards@example.com>, David Richards <david_richards_jr@example.com>}
 end
 
 def list_to_parse_with_repeats

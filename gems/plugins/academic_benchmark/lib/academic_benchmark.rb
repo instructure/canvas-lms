@@ -2,19 +2,11 @@ require 'net/http'
 
 require 'cgi'
 
-require 'academic_benchmark_v1'
-
 require 'academic_benchmark/engine'
-require 'academic_benchmark/cli_tools'
 
 require 'academic_benchmark/ab_gem_extensions/standard'
 require 'academic_benchmark/ab_gem_extensions/authority'
 require 'academic_benchmark/ab_gem_extensions/document'
-
-require 'academic_benchmark/outcome_data'
-require 'academic_benchmark/outcome_data/from_api'
-require 'academic_benchmark/outcome_data/from_file'
-
 
 module AcademicBenchmark
   NATIONAL_STANDARDS_TITLE = "National Standards".freeze

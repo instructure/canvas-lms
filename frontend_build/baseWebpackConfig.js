@@ -38,7 +38,7 @@ function happify (id, loaders) {
       id,
       loaders,
       threadPool: getHappyThreadPool(),
-      tempDir: 'node_modules/.happypack_tmp/',
+      tempDir: (process.env.HAPPYPACK_TEMPDIR || 'node_modules/.happypack_tmp/'),
 
       // by default, we use the cache everywhere exept prod. but you can
       // set HAPPYPACK_CACHE environment variable to override
@@ -71,7 +71,7 @@ module.exports = {
     path: path.join(__dirname, '../public', webpackPublicPath),
 
     // Add /* filename */ comments to generated require()s in the output.
-    pathinfo: process.env.NODE_ENV !== 'production',
+    pathinfo: true,
 
     filename: '[name].bundle-[chunkhash:10].js',
     chunkFilename: '[name].chunk-[chunkhash:10].js',
@@ -93,6 +93,7 @@ module.exports = {
       // once we are all-webpack we should remove this line and just change all the 'require's
       // to instructure-ui compnentns to have the right path
       'instructure-ui': path.resolve(__dirname, '../node_modules/instructure-ui/lib/components'),
+      'instructure-ui-themes': path.resolve(__dirname, '../node_modules/instructure-ui/lib/themes'),
 
       backbone: 'Backbone',
       timezone$: 'timezone_core',

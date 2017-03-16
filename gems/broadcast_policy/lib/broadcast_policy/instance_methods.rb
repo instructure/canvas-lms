@@ -1,5 +1,7 @@
+require "active_support/hash_with_indifferent_access"
+
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2017 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,8 +20,11 @@
 module BroadcastPolicy
   module InstanceMethods
 
-    # Some generic flags for inside the policy
-    attr_accessor :just_created, :prior_version
+    # either we're in an after_save of a new record, or we just
+    # finished saving one
+    def just_created
+      changed? ? id_was.nil? : previous_changes.key?(:id) && previous_changes[:id].first.nil?
+    end
 
     # Some flags for auditing policy matching
     def messages_sent
@@ -36,73 +41,69 @@ module BroadcastPolicy
       @messages_failed ||= {}
     end
 
-    # This is called before_save
-    def set_broadcast_flags
-      @broadcasted = false
-      unless @skip_broadcasts
-        self.just_created = self.new_record?
-        self.prior_version = generate_prior_version
+    def with_changed_attributes_from(other)
+      return yield unless other
+      begin
+        frd_changed_attributes = @changed_attributes
+        @changed_attributes = ActiveSupport::HashWithIndifferentAccess.new
+        other.attributes.each do |key, value|
+          @changed_attributes[key] = value if value != attributes[key]
+        end
+        yield
+      ensure
+        @changed_attributes = frd_changed_attributes
       end
     end
 
-    def generate_prior_version
-      obj = self.class.new
-      self.attributes.each do |attr, value|
-        next unless obj.has_attribute?(attr)
-        value = changed_attributes[attr] if changed_attributes.key?(attr)
-        obj.write_attribute(attr, value)
-      end
-      obj
-    end
-
-    # This is called after_save
-    def broadcast_notifications
-      return if @broadcasted
-      @broadcasted = true
+    # This is called after_save, but you can call it manually to trigger
+    # notifications. If you pass in a prior_version of self, its
+    # attributes will be used to fake out the various _was/_changed?
+    # helpers
+    def broadcast_notifications(prior_version = nil)
       raise ArgumentError, "Broadcast Policy block not supplied for #{self.class}" unless self.class.broadcast_policy_list
-      self.class.broadcast_policy_list.broadcast(self)
+      if prior_version
+        with_changed_attributes_from(prior_version) do
+          self.class.broadcast_policy_list.broadcast(self)
+        end
+      else
+        self.class.broadcast_policy_list.broadcast(self)
+      end
     end
 
     attr_accessor :skip_broadcasts
 
     def save_without_broadcasting
-      begin
-        @skip_broadcasts = true
-        self.save
-      ensure
-        @skip_broadcasts = false
-      end
+      @skip_broadcasts = true
+      self.save
+    ensure
+      @skip_broadcasts = false
     end
 
     def save_without_broadcasting!
-      begin
-        @skip_broadcasts = true
-        self.save!
-      ensure
-        @skip_broadcasts = false
-      end
+      @skip_broadcasts = true
+      self.save!
+    ensure
+      @skip_broadcasts = false
     end
 
     # The rest of the methods here should just be helper methods to make
     # writing a condition that much easier.
-    def changed_in_state(state, opts={})
-      fields  = opts[:fields] || []
-      fields = [fields] unless fields.is_a?(Array)
-
-      fields.map {|field| self.prior_version.send(field) != self.send(field) }.include?(true) &&
-        self.workflow_state == state.to_s &&
-        self.prior_version.workflow_state == state.to_s
+    def changed_in_state(state, fields: [])
+      fields = Array(fields)
+      fields.any? { |field| attribute_changed?(field) } &&
+        workflow_state == state.to_s &&
+        workflow_state_was == state.to_s
     end
 
     def changed_state(new_state=nil, old_state=nil)
       if new_state && old_state
-        self.workflow_state == new_state.to_s &&
-          self.prior_version.workflow_state == old_state.to_s
+        workflow_state == new_state.to_s &&
+          workflow_state_was == old_state.to_s
       elsif new_state
-        self.workflow_state.to_s == new_state.to_s &&
-          self.prior_version.workflow_state != self.workflow_state
+        workflow_state.to_s == new_state.to_s &&
+          workflow_state_changed?
       else
-        self.workflow_state != self.prior_version.workflow_state
+        workflow_state_changed?
       end
     end
     alias :changed_state_to :changed_state

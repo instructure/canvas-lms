@@ -135,10 +135,11 @@ describe "Module Items API", type: :request do
               "indent" => 1,
               "completion_requirement" => { "type" => "must_view" },
               "published" => true,
-              "module_id" => @module1.id
+              "module_id" => @module1.id,
+              "new_tab" => nil
           }
       ]
-      compare_json(json, expected)
+      expect(json).to eq expected
     end
 
     context 'index with content details' do
@@ -498,6 +499,15 @@ describe "Module Items API", type: :request do
         expect(@assignment_tag.title).to eq new_title
         expect(@assignment.reload.title).to eq new_title
         expect(@assignment_tag.indent).to eq new_indent
+      end
+
+      it "should update the user for a wiki page sync" do
+        expect(@wiki_page.user).to be_nil
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@wiki_page_tag.id}",
+          {:controller => "context_module_items_api", :action => "update", :format => "json",
+            :course_id => "#{@course.id}", :module_id => "#{@module2.id}", :id => "#{@wiki_page_tag.id}"},
+          {:module_item => {:title => 'New title'}})
+        expect(@wiki_page.reload.user).to eq(@user)
       end
 
       it "should update new_tab" do

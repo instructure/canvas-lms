@@ -8,7 +8,7 @@ module Lti::Ims::AccessTokenHelper
 
   def validate_access_token!
     access_token.validate!
-    raise Lti::Oauth2::InvalidTokenError 'Developer Key is not active' unless developer_key(access_token)&.active?
+    raise Lti::Oauth2::InvalidTokenError 'Developer Key is not active' unless developer_key&.active?
   rescue Lti::Oauth2::InvalidTokenError
     raise
   rescue StandardError => e
@@ -24,8 +24,12 @@ module Lti::Ims::AccessTokenHelper
 
   def oauth2_request?
     pattern = /^Bearer /
-    header  = request.headers["Authorization"]
+    header = request.headers["Authorization"]
     header && header.match(pattern)
+  end
+
+  def tool_proxy
+    @_tool_proxy ||= Lti::ToolProxy.find_by(guid: access_token.sub)
   end
 
   def validate_services!(tool_proxy)
@@ -44,21 +48,27 @@ module Lti::Ims::AccessTokenHelper
 
   end
 
+  def developer_key
+    @_developer_key ||= begin
+      tp = Lti::ToolProxy.find_by(guid: access_token.sub)
+      if tp.present?
+        raise Lti::Oauth2::InvalidTokenError, 'Tool Proxy is not active' if tp.workflow_state != 'active'
+        validate_services!(tp)
+        tp.product_family.developer_key
+      else
+        DeveloperKey.find_cached(access_token.sub)
+      end
+    rescue ActiveRecord::RecordNotFound
+      return nil
+    end
+  end
+
   def lti2_service_name
     raise 'the method #lti2_service_name must be defined in the class'
   end
 
-  def developer_key(access_token)
-    tp = Lti::ToolProxy.find_by(guid: access_token.sub)
-    if tp.present?
-      raise Lti::Oauth2::InvalidTokenError, 'Tool Proxy is not active' if tp.workflow_state != 'active'
-      validate_services!(tp)
-      tp.product_family.developer_key
-    else
-      DeveloperKey.find_cached(access_token.sub)
-    end
-  rescue ActiveRecord::RecordNotFound
-    return nil
+  def render_unauthorized
+    render json: {error: 'unauthorized'}, status: :unauthorized
   end
 
 end

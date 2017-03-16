@@ -3,8 +3,7 @@ define([
   'i18n!student_context_tray',
   'classnames',
   'instructure-ui'
-], (React, I18n, classnames, { Heading, Progress, Typography }) => {
-
+], (React, I18n, classnames, { Heading, Progress, Tooltip, Typography, Link }) => {
   class SubmissionProgressBars extends React.Component {
     static propTypes = {
       submissions: React.PropTypes.array.isRequired
@@ -71,25 +70,32 @@ define([
         return (
           <section
             className="StudentContextTray__Section StudentContextTray-Progress">
-            <Heading level="h4" tag="h3" border="bottom">
+            <Heading level="h4" as="h3" border="bottom">
               {I18n.t("Last %{length} Graded Items", {length: submissions.length})}
             </Heading>
             {submissions.map((submission) => {
               return (
                 <div key={submission.id} className="StudentContextTray-Progress__Bar">
-                  <Progress
-                    size="small"
-                    successColor={false}
-                    label={I18n.t('Grade')}
-                    valueMax={submission.assignment.points_possible}
-                    valueNow={submission.score || 0}
-                    formatValueText={() => SubmissionProgressBars.displayScreenreaderGrade(submission)}
-                    formatDisplayedValue={() => (
-                      <Typography size="x-small" color="secondary">
-                        {SubmissionProgressBars.displayGrade(submission)}
-                      </Typography>
-                    )}
-                  />
+                  <Tooltip
+                    tip={submission.assignment.name}
+                    as={Link}
+                    href={`${submission.assignment.html_url}/submissions/${submission.user_id}`}
+                    placement="left"
+                  >
+                    <Progress
+                      size="small"
+                      successColor={false}
+                      label={I18n.t('Grade')}
+                      valueMax={submission.assignment.points_possible}
+                      valueNow={submission.score || 0}
+                      formatValueText={() => SubmissionProgressBars.displayScreenreaderGrade(submission)}
+                      formatDisplayedValue={() => (
+                        <Typography size="x-small" color="secondary">
+                          {SubmissionProgressBars.displayGrade(submission)}
+                        </Typography>
+                      )}
+                    />
+                  </Tooltip>
                 </div>
               )
             })}

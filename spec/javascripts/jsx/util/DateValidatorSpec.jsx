@@ -52,7 +52,7 @@ define([
     data,
     gradingPeriods,
     userIsAdmin,
-    multipleGradingPeriodsEnabled = true,
+    hasGradingPeriods = true,
     postToSIS = null,
     dueDateRequiredForAccount = false
   }) {
@@ -69,7 +69,7 @@ define([
           date_context: 'term'
         }
       },
-      multipleGradingPeriodsEnabled,
+      hasGradingPeriods: true,
       userIsAdmin,
       data,
       gradingPeriods,
@@ -84,7 +84,7 @@ define([
     return Object.keys(errors).length === 0;
   }
 
-  QUnit.module('#DateValidator -- Multiple Grading Periods');
+  QUnit.module('#DateValidator with grading periods');
 
   test('it is invalid to add a new override with a date in a closed grading period', function () {
     const data = generateData({ due_at: DATE_IN_CLOSED_PERIOD, persisted: false });
@@ -169,7 +169,7 @@ define([
       data,
       gradingPeriods: null,
       userIsAdmin: false,
-      multipleGradingPeriodsEnabled: false,
+      hasGradingPeriods: false,
       postToSIS: false,
       dueDateRequiredForAccount: true });
     ok(isValid(validator));
@@ -181,7 +181,7 @@ define([
       data,
       gradingPeriods: null,
       userIsAdmin: false,
-      multipleGradingPeriodsEnabled: false,
+      hasGradingPeriods: false,
       postToSIS: true,
       dueDateRequiredForAccount: true });
     notOk(isValid(validator));
@@ -193,7 +193,7 @@ define([
       data,
       gradingPeriods: null,
       userIsAdmin: false,
-      multipleGradingPeriodsEnabled: false,
+      hasGradingPeriods: false,
       postToSIS: true,
       dueDateRequiredForAccount: false });
     ok(isValid(validator));

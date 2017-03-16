@@ -3,11 +3,12 @@ define([
   'underscore',
   'jquery',
   'instructure-ui/Button',
+  'instructure-ui/Checkbox',
   'i18n!grading_periods',
   'compiled/api/gradingPeriodSetsApi',
   'jsx/grading/EnrollmentTermInput',
   'compiled/jquery.rails_flash_notifications'
-], function(React, _, $, { default: Button }, I18n, setsApi, EnrollmentTermInput) {
+], function(React, _, $, { default: Button }, { default: Checkbox }, I18n, setsApi, EnrollmentTermInput) {
 
   let NewGradingPeriodSetForm = React.createClass({
     propTypes: {
@@ -24,6 +25,8 @@ define([
       return {
         buttonsDisabled: false,
         title: "",
+        weighted: false,
+        displayTotalsForAllGradingPeriods: false,
         selectedEnrollmentTermIDs: []
       };
     },
@@ -48,15 +51,19 @@ define([
     },
 
     isValid() {
-      return this.isTitlePresent()
+      return this.isTitlePresent();
     },
 
     submit(event) {
       event.preventDefault();
       this.setState({ buttonsDisabled: true }, () => {
         if(this.isValid()) {
-          let set = { title: this.state.title.trim() };
-          set.enrollmentTermIDs = this.state.selectedEnrollmentTermIDs;
+          const set = {
+            title: this.state.title.trim(),
+            weighted: this.state.weighted,
+            displayTotalsForAllGradingPeriods: this.state.displayTotalsForAllGradingPeriods,
+            enrollmentTermIDs: this.state.selectedEnrollmentTermIDs
+          };
           setsApi.create(set)
                  .then(this.submitSucceeded)
                  .catch(this.submitFailed);
@@ -80,6 +87,14 @@ define([
       this.setState({ title: event.target.value });
     },
 
+    onSetWeightedChange(event) {
+      this.setState({ weighted: event.target.checked });
+    },
+
+    onSetDisplayTotalsChanged (event) {
+      this.setState({ displayTotalsForAllGradingPeriods: event.target.checked });
+    },
+
     render() {
       return (
         <div className="GradingPeriodSetForm pad-box">
@@ -100,6 +115,24 @@ define([
                   selectedIDs                  = {this.state.selectedEnrollmentTermIDs}
                   setSelectedEnrollmentTermIDs = {this.setSelectedEnrollmentTermIDs}
                 />
+                <div className="ic-Input pad-box top-only">
+                  <Checkbox
+                    ref={(ref) => { this.weightedCheckbox = ref }}
+                    label={I18n.t('Weighted grading periods')}
+                    value="weighted"
+                    checked={this.state.weighted}
+                    onChange={this.onSetWeightedChange}
+                  />
+                </div>
+                <div className="ic-Input pad-box top-only">
+                  <Checkbox
+                    ref={(ref) => { this.displayTotalsCheckbox = ref; }}
+                    label={I18n.t('Display totals for All Grading Periods option')}
+                    value="totals"
+                    checked={this.state.displayTotalsForAllGradingPeriods}
+                    onChange={this.onSetDisplayTotalsChanged}
+                  />
+                </div>
               </div>
             </div>
             <div className="grid-row">

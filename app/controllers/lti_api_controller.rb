@@ -21,7 +21,6 @@ require 'oauth/client/action_pack'
 require 'nokogiri'
 
 class LtiApiController < ApplicationController
-  skip_before_action :require_user
   skip_before_action :load_user
   skip_before_action :verify_authenticity_token
 

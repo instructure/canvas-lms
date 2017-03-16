@@ -7,8 +7,9 @@ define([
   'compiled/userSettings',
   'jsx/speed_grader/gradingPeriod',
   'jsx/shared/helpers/numberHelper',
+  'compiled/util/natcompare',
   'jquery.ajaxJSON'
-], ($, SpeedGrader, SpeedgraderHelpers, fakeENV, OutlierScoreHelper, userSettings, MGP, numberHelper) => {
+], ($, SpeedGrader, SpeedgraderHelpers, fakeENV, OutlierScoreHelper, userSettings, MGP, numberHelper, natcompare) => {
   QUnit.module('SpeedGrader#showDiscussion', {
     setup () {
       fakeENV.setup();
@@ -695,5 +696,65 @@ define([
     const result = SpeedGrader.EG.formatGradeForSubmission('A');
     ok(numberHelper.parse.notCalled);
     equal(result, 'A');
+  });
+
+  QUnit.module('Function returned by SpeedGrader#compareStudentsBy', {
+    setup () {
+      this.spy(natcompare, 'strings');
+    }
+  });
+
+  test('returns 1 when the given function returns false for the first student and non-false for the second', () => {
+    const studentA = { sortable_name: 'b' };
+    const studentB = { sortable_name: 'a' };
+    const stub = sinon.stub().returns(false, 'foo');
+    const compare = SpeedGrader.EG.compareStudentsBy(stub);
+    strictEqual(compare(studentA, studentB), 1);
+  });
+
+  test('returns 1 when the given function returns a greater value for the first student than the second', () => {
+    const studentA = { sortable_name: 'b' };
+    const studentB = { sortable_name: 'a' };
+    const stub = sinon.stub();
+    stub.onFirstCall().returns(2);
+    stub.onSecondCall().returns(1);
+    const compare = SpeedGrader.EG.compareStudentsBy(stub);
+    strictEqual(compare(studentA, studentB), 1);
+  });
+
+  test('returns -1 when the given function returns a lesser value for the first student than the second', () => {
+    const studentA = { sortable_name: 'b' };
+    const studentB = { sortable_name: 'a' };
+    const stub = sinon.stub();
+    stub.onFirstCall().returns(1);
+    stub.onSecondCall().returns(2);
+    const compare = SpeedGrader.EG.compareStudentsBy(stub);
+    strictEqual(compare(studentA, studentB), -1);
+  });
+
+  test('compares student sortable names when given function returns falsey for both students', () => {
+    const studentA = { sortable_name: 'b' };
+    const studentB = { sortable_name: 'a' };
+    const compare = SpeedGrader.EG.compareStudentsBy(() => false);
+    const order = compare(studentA, studentB);
+    equal(natcompare.strings.callCount, 1);
+    ok(natcompare.strings.calledWith(studentA.sortable_name, studentB.sortable_name));
+    equal(order, 1);
+  });
+
+  test('compares student sortable names when given function returns equal values for both students', () => {
+    const studentA = { sortable_name: 'b' };
+    const studentB = { sortable_name: 'a' };
+    let compare = SpeedGrader.EG.compareStudentsBy(() => 42);
+    let order = compare(studentA, studentB);
+    equal(natcompare.strings.callCount, 1);
+    ok(natcompare.strings.calledWith(studentA.sortable_name, studentB.sortable_name));
+    equal(order, 1);
+
+    compare = SpeedGrader.EG.compareStudentsBy(() => 'foo');
+    order = compare(studentA, studentB);
+    equal(natcompare.strings.callCount, 2);
+    ok(natcompare.strings.calledWith(studentA.sortable_name, studentB.sortable_name));
+    equal(order, 1);
   });
 });

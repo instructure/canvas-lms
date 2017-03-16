@@ -25,17 +25,17 @@ describe "courses/_settings_sidebar.html.erb" do
     @course.sis_source_id = "so_special_sis_id"
     @course.workflow_state = 'claimed'
     @course.save!
-    assigns[:context] = @course
-    assigns[:user_counts] = {}
-    assigns[:all_roles] = Role.custom_roles_and_counts_for_course(@course, @user)
-    assigns[:course_settings_sub_navigation_tools] = []
+    assign(:context, @course)
+    assign(:user_counts, {})
+    assign(:all_roles, Role.custom_roles_and_counts_for_course(@course, @user))
+    assign(:course_settings_sub_navigation_tools, [])
   end
 
   describe "End this course button" do
     it "should not display if the course or term end date has passed" do
       @course.stubs(:soft_concluded?).returns(true)
       view_context(@course, @user)
-      assigns[:current_user] = @user
+      assign(:current_user, @user)
       render
       expect(response.body).not_to match(/Conclude this Course/)
     end
@@ -43,7 +43,7 @@ describe "courses/_settings_sidebar.html.erb" do
     it "should display if the course and its term haven't ended" do
       @course.stubs(:soft_concluded?).returns(false)
       view_context(@course, @user)
-      assigns[:current_user] = @user
+      assign(:current_user, @user)
       render
       expect(response.body).to match(/Conclude this Course/)
     end
@@ -52,7 +52,7 @@ describe "courses/_settings_sidebar.html.erb" do
   describe "Reset course content" do
     it "should not display the dialog contents under the button" do
       view_context(@course, @user)
-      assigns[:current_user] = @user
+      assign(:current_user, @user)
       render
       doc = Nokogiri::HTML.parse(response.body)
       expect(doc.at_css('#reset_course_content_dialog')['style']).to eq 'display:none;'
@@ -62,7 +62,7 @@ describe "courses/_settings_sidebar.html.erb" do
   describe "course settings sub navigation" do
     before do
       view_context(@course, @user)
-      assigns[:current_user] = @user
+      assign(:current_user, @user)
       @controller.instance_variable_set(:@context, @course)
     end
 
@@ -84,7 +84,7 @@ describe "courses/_settings_sidebar.html.erb" do
         (1..num_tools).each do |n|
           create_course_settings_sub_navigation_tool(name: "tool #{n}")
         end
-        assigns[:course_settings_sub_navigation_tools] = @course.context_external_tools.to_a
+        assign(:course_settings_sub_navigation_tools, @course.context_external_tools.to_a)
         render
         doc = Nokogiri::HTML.parse(response.body)
         expect(doc.css('.course-settings-sub-navigation-lti').size).to eq num_tools
@@ -92,7 +92,7 @@ describe "courses/_settings_sidebar.html.erb" do
 
       it "should include the launch type parameter" do
         create_course_settings_sub_navigation_tool
-        assigns[:course_settings_sub_navigation_tools] = @course.context_external_tools.to_a
+        assign(:course_settings_sub_navigation_tools, @course.context_external_tools.to_a)
         render
         doc = Nokogiri::HTML.parse(response.body)
         tool_link = doc.at_css('.course-settings-sub-navigation-lti')

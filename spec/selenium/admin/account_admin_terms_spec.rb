@@ -16,12 +16,12 @@ describe "account admin terms" do
     #expect(term_header).to include_text("#{user_count} User")
   end
 
-  before (:each) do
+  before do
     course_with_admin_logged_in
   end
 
   context "default term" do
-    before (:each) do
+    before do
       get "/accounts/#{Account.default.id}/terms"
       @default_term = ff('.term')[0]
     end
@@ -103,19 +103,18 @@ describe "account admin terms" do
     end
   end
 
-  context "with mgp enabled" do
+  context "with grading periods" do
     let(:account) { Account.default }
 
-    before(:each) do
+    before do
       admin_logged_in
-      account.enable_feature!(:multiple_grading_periods)
     end
 
     context "with grading period set associated to a new term" do
       let(:term) { account.enrollment_terms.create! }
       let(:group) { Factories::GradingPeriodGroupHelper.new.create_for_account(account) }
 
-      before(:each) do
+      before do
         group.enrollment_terms = [ term ]
       end
 

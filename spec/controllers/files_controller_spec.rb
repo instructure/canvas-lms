@@ -408,14 +408,6 @@ describe FilesController do
         expect(@module.evaluate_for(@student).state).to eql(:completed)
       end
 
-      it "should mark files as viewed for module progressions if the file is previewed inline" do
-        file_in_a_module
-        get 'show', :course_id => @course.id, :id => @file.id, :inline => 1
-        expect(json_parse).to eq({'ok' => true})
-        @module.reload
-        expect(@module.evaluate_for(@student).state).to eql(:completed)
-      end
-
       it "should mark files as viewed for module progressions if the file data is requested and is canvadocable" do
         file_in_a_module
         Attachment.any_instance.stubs(:canvadocable?).returns true

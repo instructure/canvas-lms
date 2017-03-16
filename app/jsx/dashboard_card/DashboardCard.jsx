@@ -175,13 +175,14 @@ define([
     linksForCard: function(){
       return this.props.links.map((link) => {
         if (!link.hidden) {
+          const screenReaderLabel = `${link.screenreader} - ${this.state.nicknameInfo.nickname}`;
           return (
             <DashboardCardAction
               unreadCount       = {this.unreadCount(link.icon, this.state.stream)}
               iconClass         = {link.icon}
               linkClass         = {link.css_class}
               path              = {link.path}
-              screenReaderLabel = {link.screenreader}
+              screenReaderLabel = {screenReaderLabel}
               key               = {link.path}
             />
           );

@@ -399,9 +399,7 @@ class Submission < ActiveRecord::Base
             student_id: self.user_id,
             assignment_id: self.assignment_id
           )
-          Enrollment.send_later_if_production_enqueue_args(
-            :recompute_final_score,
-            { run_at: 3.seconds.from_now },
+          Enrollment.recompute_final_score_in_singleton(
             self.user_id,
             self.context.id,
             grading_period_id: grading_period_id,
@@ -873,10 +871,9 @@ class Submission < ActiveRecord::Base
       # only set vericite provider flag if the hash isn't empty
       self.vericite_data_hash[:provider] = :vericite
     end
-    self.save
 
     @submit_to_vericite = true
-    submit_to_vericite_later
+    self.save
   end
 
   def vericiteable?
@@ -1002,14 +999,13 @@ class Submission < ActiveRecord::Base
 
   def update_attachment_associations
     return if @assignment_changed_not_sub
-    associations = self.attachment_associations
-    association_ids = associations.map(&:attachment_id)
-    ids = (Array(self.attachment_ids || "").join(',')).split(",").map{|id| id.to_i}
+    association_ids = attachment_associations.pluck(:attachment_id)
+    ids = (self.attachment_ids || "").split(",").map(&:to_i)
     ids << self.attachment_id if self.attachment_id
     ids.uniq!
-    existing_associations = associations.select{|a| ids.include?(a.attachment_id) }
-    (associations - existing_associations).each{|a| a.destroy }
-    unassociated_ids = ids.reject{|id| association_ids.include?(id) }
+    associations_to_delete = association_ids - ids
+    attachment_associations.where(attachment_id: associations_to_delete).delete_all unless associations_to_delete.empty?
+    unassociated_ids = ids - association_ids
     return if unassociated_ids.empty?
     attachments = Attachment.where(id: unassociated_ids)
     attachments.each do |a|
@@ -1017,8 +1013,7 @@ class Submission < ActiveRecord::Base
          (a.context_type == 'Group' && a.context_id == group_id) ||
          (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?) ||
          attachment_fake_belongs_to_group(a)
-        aa = self.attachment_associations.where(attachment_id: a).first
-        aa ||= self.attachment_associations.create(:attachment => a)
+        attachment_associations.where(attachment: a).first_or_create
       end
     end
   end
@@ -1391,7 +1386,7 @@ class Submission < ActiveRecord::Base
   end
 
   def assignment_graded_in_the_last_hour?
-    self.prior_version && self.prior_version.graded_at && self.prior_version.graded_at > 1.hour.ago
+    graded_at_was && graded_at_was > 1.hour.ago
   end
 
   def teacher
@@ -1839,7 +1834,7 @@ class Submission < ActiveRecord::Base
 
   def self.json_serialization_full_parameters(additional_parameters={})
     includes = { :quiz_submission => {} }
-    methods = [ :formatted_body, :submission_history, :attachments ]
+    methods = [ :submission_history, :attachments ]
     methods << (additional_parameters.delete(:comments) || :submission_comments)
     excepts = additional_parameters.delete :except
 

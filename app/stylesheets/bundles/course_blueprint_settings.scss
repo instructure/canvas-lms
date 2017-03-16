@@ -1,2 +1,127 @@
-.bpc__wrapper {
+@import "base/environment";
+
+.bps__wrapper {
+  max-width: 850px;
+  position: relative;
+}
+
+.bps__overlay {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,.85);
+  text-align: center;
+}
+
+.bps__overlay__save {
+  padding-top: 100px;
+}
+
+.bps__footer {
+  display: flex; justify-content: flex-end; flex: 0 0 auto;
+}
+
+.bps-course-filter {
+  border: 1px solid $ic-border-color;
+  border-radius: $ic-border-radius;
+
+  input, select {
+    // overwrite instui borders to match design
+    border: none !important;
+  }
+
+  select {
+    // use box shadow magic to create fancy border effect, overwriting instui
+    box-shadow: inset -10px 0 0 7px $ic-color-light, inset 1px 0 0 0 $ic-border-color !important;
+  }
+}
+
+.bps-course-details__wrapper {
+  margin-top: 1em;
+  position: relative;
+
+  &> div > div {
+    // overwrite instui padding to match design
+    padding-left: 0 !important;
+  }
+}
+
+.bps-course-picker__loading {
+  position: absolute;
+  z-index: 10;
+  top: 43px;
+  left: 1px;
+  right: 1px;
+  bottom: 1px;
+  background: rgba(255,255,255,.65);
+  text-align: center;
+  padding-top: 100px;
+  border-radius: $ic-border-radius;
+}
+
+.bps-table__wrapper {
+  border: 1px solid $ic-border-color;
+  border-radius: $ic-border-radius;
+  padding: 77px 0 0;
+  position: relative;
+  overflow: hidden;
+
+  .btps-table__header-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    .bps-table__head {
+      background: $ic-color-medium-light;
+
+      th {
+        line-height: 180%;
+      }
+    }
+  }
+
+  .bps-table__content-wrapper {
+    height: 270px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 30px;
+
+    .bps-table__body {
+      tr {
+        // overwrite instui borders to match design
+        border-left: none !important;
+
+        td:first-child {
+          // overwrite instui borders to match design
+          border-bottom: none !important;
+
+          // recreate the borders using box shadow
+          box-shadow: -42px 1px 0 0 $ic-color-light, 0 1px 0 0 $ic-border-color;
+        }
+
+        &.bps-table__no-results {
+          td {
+           box-shadow: none;
+         }
+        }
+      }
+    }
+  }
+}
+
+.bps-associations-table {
+  padding-left: 10px;
+  margin-bottom: 40px;
+  position: relative;
+  min-height: 75px;
+
+  .bps-associations__course-row {
+    form {
+      margin: 0;
+    }
+  }
 }

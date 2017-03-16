@@ -3,6 +3,7 @@ define [
   'i18n!assignments'
   'jquery'
   'underscore'
+  'jsx/shared/helpers/numberHelper'
   'compiled/models/AssignmentGroup'
   'compiled/collections/NeverDropCollection'
   'compiled/views/assignments/NeverDropCollectionView'
@@ -10,7 +11,7 @@ define [
   'jst/assignments/CreateGroup'
   'jst/EmptyDialogFormWrapper'
   'compiled/jquery.rails_flash_notifications'
-], (round, I18n, $, _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
+], (round, I18n, $, _, numberHelper, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
 
   SHORT_HEIGHT = 250
 
@@ -72,6 +73,7 @@ define [
         delete data.rules.drop_lowest if _.contains(["", "0"], data.rules.drop_lowest)
         delete data.rules.drop_highest if _.contains(["", "0"], data.rules.drop_highest)
         delete data.rules.never_drop if data.rules.never_drop?.length == 0
+      data.group_weight = round(numberHelper.parse(data.group_weight), 2)
       data
 
     validateFormData: (data) ->
@@ -84,12 +86,12 @@ define [
         errors["name"] = [{type: 'name_too_long_error', message: @messages.name_too_long_error}]
       if data.name == ""
         errors["name"] = [{type: 'no_name_error', message: @messages.no_name_error}]
-      if (data.group_weight && isNaN(parseFloat(data.group_weight)))
+      if (data.group_weight && isNaN(numberHelper.parse(data.group_weight)))
         errors["group_weight"] = [{type: 'number', message: @messages.non_number}]
       _.each data.rules, (value, name) =>
         # don't want to validate the never_drop field
         return if name is 'never_drop'
-        val = parseInt(value)
+        val = Math.floor(numberHelper.parse(value))
         field = "rules[#{name}]"
         if isNaN(val)
           errors[field] = [{type: 'number', message: @messages.non_number}]
@@ -130,11 +132,11 @@ define [
 
     roundWeight: (e) ->
       value = $(e.target).val()
-      rounded_value = round(parseFloat(value), 2)
+      rounded_value = round(numberHelper.parse(value), 2)
       if isNaN(rounded_value)
         return
       else
-        $(e.target).val(rounded_value)
+        $(e.target).val(I18n.n(rounded_value))
 
     toJSON: ->
       data = @model.toJSON()

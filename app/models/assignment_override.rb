@@ -20,6 +20,10 @@ class AssignmentOverride < ActiveRecord::Base
   include Workflow
   include TextHelper
 
+  NOOP_MASTERY_PATHS = 1
+
+  SET_TYPE_NOOP = 'Noop'.freeze
+
   simply_versioned :keep => 10
 
   attr_accessor :dont_touch_assignment, :preloaded_student_ids, :changed_student_ids
@@ -30,7 +34,7 @@ class AssignmentOverride < ActiveRecord::Base
   has_many :assignment_override_students, :dependent => :destroy, :validate => false
   validates_presence_of :assignment_version, :if => :assignment
   validates_presence_of :title, :workflow_state
-  validates :set_type, inclusion: %w(CourseSection Group ADHOC Noop)
+  validates :set_type, inclusion: ['CourseSection', 'Group', 'ADHOC', SET_TYPE_NOOP]
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
 
   concrete_set = lambda{ |override| ['CourseSection', 'Group'].include?(override.set_type) }
@@ -77,12 +81,33 @@ class AssignmentOverride < ActiveRecord::Base
 
   after_save :update_cached_due_dates
   after_save :touch_assignment, :if => :assignment
+  after_save :update_grading_period_grades
 
   def set_not_empty?
     overridable = assignment? ? assignment : quiz
-    ['CourseSection', 'Group', 'Noop'].include?(self.set_type) ||
+    ['CourseSection', 'Group', SET_TYPE_NOOP].include?(self.set_type) ||
     (set.any? && overridable.context.current_enrollments.where(user_id: set).exists?)
   end
+
+  def update_grading_period_grades
+    return true unless due_at_overridden && due_at_changed? && !id_changed?
+
+    course = assignment&.context || quiz&.context || quiz&.assignment&.context
+    return true unless course&.grading_periods?
+
+    grading_period_was = GradingPeriod.for_date_in_course(date: due_at_was, course: course)
+    grading_period = GradingPeriod.for_date_in_course(date: due_at, course: course)
+    return true if grading_period_was&.id == grading_period&.id
+
+    students = applies_to_students.map(&:id)
+    return true if students.blank?
+
+    [grading_period_was, grading_period].compact.each do |gp|
+      course.recompute_student_scores(students, grading_period_id: gp, update_all_grading_period_scores: false)
+    end
+    true
+  end
+  private :update_grading_period_grades
 
   def update_cached_due_dates
     return unless assignment?
@@ -129,7 +154,7 @@ class AssignmentOverride < ActiveRecord::Base
       scope = scope.primary_shard.activate {
         scope.joins("INNER JOIN #{visible_ids.klass.quoted_table_name} ON assignment_override_students.user_id=#{visible_ids.klass.table_name}.#{column}")
       }
-      return scope.merge(visible_ids.except(:select))
+      next scope.merge(visible_ids.except(:select))
     end
 
     scope.where(
@@ -154,6 +179,10 @@ class AssignmentOverride < ActiveRecord::Base
   end
   protected :default_values
 
+  def mastery_paths?
+    set_type == SET_TYPE_NOOP && set_id == NOOP_MASTERY_PATHS
+  end
+
   # override set read accessor and set_id read/write accessors so that reading
   # set/set_id or setting set_id while set_type=ADHOC doesn't try and find the
   # ADHOC model
@@ -164,7 +193,7 @@ class AssignmentOverride < ActiveRecord::Base
   def set
     if self.set_type == 'ADHOC'
       assignment_override_students.preload(:user).map(&:user)
-    elsif self.set_type == 'Noop'
+    elsif self.set_type == SET_TYPE_NOOP
       nil
     else
       super
@@ -172,7 +201,7 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set_id=(id)
-    if %w(ADHOC Noop).include? self.set_type
+    if ['ADHOC', SET_TYPE_NOOP].include? self.set_type
       write_attribute(:set_id, id)
     else
       super
@@ -285,10 +314,9 @@ class AssignmentOverride < ActiveRecord::Base
     self.assignment.context.available? &&
     self.assignment.published? &&
     self.assignment.created_at < 3.hours.ago &&
-    (!self.prior_version ||
-      self.workflow_state != self.prior_version.workflow_state ||
-      self.due_at_overridden != self.prior_version.due_at_overridden ||
-      self.due_at_overridden && !Assignment.due_dates_equal?(self.due_at, self.prior_version.due_at))
+    (workflow_state_changed? ||
+      due_at_overridden_changed? ||
+      due_at_overridden && !Assignment.due_dates_equal?(due_at, due_at_was))
   end
 
   def set_title_if_needed

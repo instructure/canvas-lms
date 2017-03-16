@@ -66,6 +66,7 @@ describe "Gradezilla - total points toggle" do
   end
 
   it "should warn the teacher that studens will see a change" do
+    pending("Fix with CNVS-34243")
     gradezilla_page.visit(@course)
     open_display_dialog
     dialog = fj('.ui-dialog:visible')
@@ -73,6 +74,7 @@ describe "Gradezilla - total points toggle" do
   end
 
   it 'should allow toggling display by points or percent', priority: "1", test_id: 164012 do
+    pending("Fix with CNVS-34243")
     gradezilla_page.visit(@course)
     should_show_percentages
     toggle_grade_display
@@ -86,6 +88,7 @@ describe "Gradezilla - total points toggle" do
   end
 
   it 'should change the text on the toggle option when toggling' do
+    pending("Fix with CNVS-34243")
     gradezilla_page.visit(@course)
     dropdown_text = []
     f("#total_dropdown").click
@@ -101,6 +104,7 @@ describe "Gradezilla - total points toggle" do
   end
 
   it 'should not show the warning once dont show is checked' do
+    pending("Fix with CNVS-34243")
     gradezilla_page.visit(@course)
     open_display_dialog
     close_dialog_and_dont_show_again

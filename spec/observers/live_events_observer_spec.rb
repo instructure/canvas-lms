@@ -205,4 +205,32 @@ describe LiveEventsObserver do
       account_notification
     end
   end
+
+  describe "quiz_export_complete" do
+    it "posts update events for quizzes2" do
+      Canvas::LiveEvents.expects(:quiz_export_complete).once
+      Account.default.enable_feature!(:quizzes2_exporter)
+      course = Account.default.courses.create!
+      Account.default.context_external_tools.create!(
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
+      )
+      quiz = course.quizzes.create!(:title => 'quiz1')
+      ce = course.content_exports.create!(
+        :export_type => ContentExport::QUIZZES2,
+        :selected_content => quiz.id
+      )
+      ce.export_without_send_later
+    end
+
+    it "does not post for other ContentExport types" do
+      Canvas::LiveEvents.expects(:quiz_export_complete).never
+      course = Account.default.courses.create!
+      ce = course.content_exports.create!
+      ce.export_without_send_later
+    end
+  end
 end

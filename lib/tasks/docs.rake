@@ -14,6 +14,7 @@ namespace :doc do
   YARD::Tags::Library.define_tag("A Data Model", :model)
   YARD::Rake::YardocTask.new(:api) do |t|
     t.before = proc { FileUtils.rm_rf(API_DOC_DIR) }
+    t.before = proc { `script/generate_lti_variable_substitution_markdown` }
     t.files = %w[
       app/controllers/**/*.rb
       {gems,vendor}/plugins/*/app/controllers/*.rb

@@ -110,7 +110,7 @@ module Api::V1::AssignmentOverride
 
   def interpret_assignment_override_data(assignment, data, set_type=nil)
     data ||= {}
-    return {}, ["invalid override data"] unless data.is_a?(Hash)
+    return {}, ["invalid override data"] unless data.is_a?(Hash) || data.is_a?(ActionController::Parameters)
 
     # validate structure of parameters
     override_data = {}
@@ -456,7 +456,7 @@ module Api::V1::AssignmentOverride
   private :get_override_from_params
 
   def deserialize_overrides(overrides)
-    if overrides.is_a?(Hash)
+    if overrides.is_a?(Hash) || overrides.is_a?(ActionController::Parameters)
       return unless overrides.keys.all?{ |k| k.to_i.to_s == k.to_s }
       indices = overrides.keys.sort_by(&:to_i)
       return unless indices.map(&:to_i) == (0...indices.size).to_a

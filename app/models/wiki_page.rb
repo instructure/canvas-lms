@@ -37,7 +37,7 @@ class WikiPage < ActiveRecord::Base
   include MasterCourses::Restrictor
   restrict_columns :content, [:body, :title]
   restrict_columns :settings, [:editing_roles]
-  restrict_columns :settings, Assignment::RESTRICTED_SETTINGS
+  restrict_assignment_columns
 
   after_update :post_to_pandapub_when_revised
 

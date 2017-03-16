@@ -131,6 +131,20 @@ describe SectionsController, type: :request do
       expect(json.first["name"]).to eq @course.default_section.name
       expect(json.first.keys.include?("students")).to be_falsey
     end
+
+    it "should return all sections if :all are specified" do
+      12.times { @course2.course_sections.create!(:name => 'Section #{i}') }
+
+      endpoint = "/api/v1/courses/#{@course2.id}/sections.json"
+      params = { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }
+
+      json = api_call(:get, endpoint, params, {})
+      expect(json.size).to eq 10
+
+      params[:all] = true
+      json = api_call(:get, endpoint, params, {})
+      expect(json.size).to eq @course2.course_sections.count
+    end
   end
 
   describe "#show" do

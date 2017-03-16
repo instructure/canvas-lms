@@ -263,9 +263,10 @@ module BrandableCSS
 
       percent_complete = 0
       Open3.popen2e(command) do |_stdin, stdout_and_stderr, wait_thr|
+        error_output = []
         stdout_and_stderr.each do |line|
           Rails.logger.try(:debug, line.chomp!) if defined?(Rails)
-
+          error_output.push(line)
           # This is a good-enough-for-now approximation to show the progress
           # bar in the UI.  Since we don't know exactly how many files there are,
           # it will progress towards 100% but never quite hit it until it is complete.
@@ -276,7 +277,10 @@ module BrandableCSS
             opts[:on_progress].call(percent_complete)
           end
         end
-        raise("Error #{msg}") unless wait_thr.value.success?
+        unless wait_thr.value.success?
+          STDERR.puts error_output.join("\n")
+          raise("Error #{msg}")
+        end
       end
     end
   end

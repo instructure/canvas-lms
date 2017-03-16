@@ -191,3 +191,10 @@
     vertical-align: middle;
   }
 }
+
+.new_quiz_lti_wrapper {
+  display: inline-block;
+  margin-right: 6px;
+  padding-right: 10px;
+  border-right: 1px solid $ic-color-medium-lighter;
+}

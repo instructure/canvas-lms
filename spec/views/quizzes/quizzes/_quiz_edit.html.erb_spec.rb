@@ -23,8 +23,8 @@ describe "/quizzes/quizzes/_quiz_edit" do
   before do
     course_with_student
     view_context
-    assigns[:quiz] = @course.quizzes.create!
-    assigns[:js_env] = {quiz_max_combination_count: 200}
+    assign(:quiz, @course.quizzes.create!)
+    assign(:js_env, {quiz_max_combination_count: 200})
   end
 
   it "should render" do
@@ -55,13 +55,13 @@ describe "/quizzes/quizzes/_quiz_edit" do
   end
 
   it 'should warn about existing submission data' do
-    assigns[:has_student_submissions] = true
+    assign(:has_student_submissions, true)
     render :partial => "quizzes/quizzes/quiz_edit"
     expect(response.body).to match /student_submissions_warning/
   end
 
   it 'should not warn if no existing data' do
-    assigns[:has_student_submissions] = false
+    assign(:has_student_submissions, false)
     render :partial => "quizzes/quizzes/quiz_edit"
     expect(response.body).not_to match /student_submissions_warning/
   end

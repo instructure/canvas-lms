@@ -23,7 +23,7 @@ describe "/quizzes/quizzes/show" do
   it "should render" do
     course_with_student
     view_context
-    assigns[:quiz] = @course.quizzes.create!
+    assign(:quiz, @course.quizzes.create!)
     render "quizzes/quizzes/show"
     expect(response).not_to be_nil
   end
@@ -42,8 +42,8 @@ describe "/quizzes/quizzes/show" do
     submission.attempt = 1
     submission.workflow_state = "complete"
     submission.save
-    assigns[:quiz] = quiz
-    assigns[:submission] = submission
+    assign(:quiz, quiz)
+    assign(:submission, submission)
     view_context
     render "quizzes/quizzes/show"
     expect(response).to have_tag ".muted-notice"
@@ -54,7 +54,7 @@ describe "/quizzes/quizzes/show" do
     course_with_student(:active_all => true)
     quiz = @course.quizzes.build
     quiz.publish!
-    assigns[:quiz] = quiz
+    assign(:quiz, quiz)
     view_context
     render "quizzes/quizzes/show"
     expect(response).not_to have_tag ".unpublished_warning"
@@ -62,7 +62,7 @@ describe "/quizzes/quizzes/show" do
 
   it "should show header bar and publish button" do
     course_with_teacher(:active_all => true)
-    assigns[:quiz] = @course.quizzes.create!
+    assign(:quiz, @course.quizzes.create!)
 
     view_context
     render "quizzes/quizzes/show"
@@ -79,7 +79,7 @@ describe "/quizzes/quizzes/show" do
     @quiz.publish!
     Quizzes::Quiz.mark_quiz_edited(@quiz.id)
     @quiz.reload
-    assigns[:quiz] = @quiz
+    assign(:quiz, @quiz)
 
     view_context
     render "quizzes/quizzes/show"
@@ -94,7 +94,7 @@ describe "/quizzes/quizzes/show" do
     course_with_teacher(active_all: true)
     @quiz = @course.quizzes.create!(quiz_type: "survey", points_possible: points)
 
-    assigns[:quiz] = @quiz
+    assign(:quiz, @quiz)
     view_context
     render "quizzes/quizzes/show"
 
@@ -107,7 +107,7 @@ describe "/quizzes/quizzes/show" do
   it 'should render teacher partial for teachers' do
     course_with_teacher(active_all: true)
     view_context
-    assigns[:quiz] = @course.quizzes.create!
+    assign(:quiz, @course.quizzes.create!)
     render 'quizzes/quizzes/show'
     expect(view).to have_rendered '/quizzes/quizzes/_quiz_show_teacher'
     expect(view).not_to have_rendered '/quizzes/quizzes/_quiz_show_student'
@@ -117,7 +117,7 @@ describe "/quizzes/quizzes/show" do
     course_with_student(active_all: true)
     quiz = @course.quizzes.build
     quiz.publish!
-    assigns[:quiz] = quiz
+    assign(:quiz, quiz)
     view_context
     render 'quizzes/quizzes/show'
     expect(view).to have_rendered '/quizzes/quizzes/_quiz_show_student'
@@ -138,8 +138,8 @@ describe "/quizzes/quizzes/show" do
     submission.attempt = 1
     submission.workflow_state = 'complete'
     submission.save
-    assigns[:quiz] = quiz
-    assigns[:submission] = submission
+    assign(:quiz, quiz)
+    assign(:submission, submission)
     params[:preview] = true
     view_context
     render 'quizzes/quizzes/show'

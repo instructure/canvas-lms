@@ -115,14 +115,14 @@ class AssignmentGroupsController < ApplicationController
   #
   # @argument grading_period_id [Integer]
   #   The id of the grading period in which assignment groups are being requested
-  #   (Requires the Multiple Grading Periods feature turned on.)
+  #   (Requires grading periods to exist.)
   #
   # @argument scope_assignments_to_student [Boolean]
   #   If true, all assignments returned will apply to the current user in the
   #   specified grading period. If assignments apply to other students in the
   #   specified grading period, but not the current user, they will not be
-  #   returned. (Requires the grading_period_id argument and the Multiple Grading
-  #   Periods feature turned on. In addition, the current user must be a student.)
+  #   returned. (Requires the grading_period_id argument and grading periods to
+  #   exist. In addition, the current user must be a student.)
   #
   # @returns [AssignmentGroup]
   def index
@@ -267,7 +267,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def assignment_group_params
-    params.require(:assignment_group).
+    result = params.require(:assignment_group).
       permit(:assignment_weighting_scheme,
              :default_assignment_name,
              :group_weight,
@@ -276,6 +276,8 @@ class AssignmentGroupsController < ApplicationController
              :rules,
              :sis_source_id,
              :integration_data => strong_anything)
+    result[:integration_data] = nil if result[:integration_data] == ''
+    result
   end
 
   def include_params
@@ -295,8 +297,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def filter_by_grading_period?
-    return false if all_grading_periods_selected?
-    params[:grading_period_id].present? && multiple_grading_periods?
+    params[:grading_period_id].present? && !all_grading_periods_selected?
   end
 
   def all_grading_periods_selected?
@@ -390,7 +391,7 @@ class AssignmentGroupsController < ApplicationController
 
     assignments = assignments.with_student_submission_count.all
 
-    if params[:grading_period_id].present? && multiple_grading_periods?
+    if filter_by_grading_period?
       assignments = filter_assignments_by_grading_period(assignments, context)
     end
 
@@ -427,7 +428,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def can_reorder_assignments?(assignments, group)
-    return true unless @context.feature_enabled?(:multiple_grading_periods)
+    return true unless @context.grading_periods?
     return true if @context.account_membership_allows(@current_user)
 
     effective_due_dates = EffectiveDueDates.for_course(@context, assignments)

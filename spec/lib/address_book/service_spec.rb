@@ -42,6 +42,7 @@ describe AddressBook::Service do
   end
 
   def stub_common_contexts(args, returns={})
+    args << false # ignore_result
     returns = expand_common_contexts(returns)
     allow(Services::AddressBook).to receive(:common_contexts).with(*args).and_return(returns)
   end
@@ -94,6 +95,7 @@ describe AddressBook::Service do
 
     describe "with optional :include_context" do
       def stub_roles_in_context(args, returns={})
+        args << false # ignore_result
         returns = expand_common_contexts(returns)
         allow(Services::AddressBook).to receive(:roles_in_context).with(*args).and_return(returns)
       end
@@ -232,6 +234,7 @@ describe AddressBook::Service do
 
   describe "known_in_context" do
     def stub_known_in_context(args, compact_returns={})
+      args << false # ignore_result
       user_ids = expand_user_ids(compact_returns)
       common_contexts = expand_common_contexts(compact_returns)
       allow(Services::AddressBook).to receive(:known_in_context).with(*args).and_return([user_ids, common_contexts])
@@ -311,7 +314,7 @@ describe AddressBook::Service do
     before do
       @course = course_model
       allow(Services::AddressBook).to receive(:count_in_context).
-        with(@sender, @course.global_asset_string).
+        with(@sender, @course.global_asset_string, false).
         and_return(3)
     end
 
@@ -322,6 +325,7 @@ describe AddressBook::Service do
 
   describe "search_users" do
     def stub_search_users(args, compact_returns={})
+      args << false # ignore_result
       user_ids = expand_user_ids(compact_returns)
       common_contexts = expand_common_contexts(compact_returns)
       cursors = expand_cursors(compact_returns)

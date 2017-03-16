@@ -1,4 +1,21 @@
 <%
+# Copyright (C) 2014 - 2017 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
   content_for :page_title, "Gradebook - #{@context.name}"
   @body_classes << "gradebook full-width"
   @show_left_side = true
@@ -67,14 +84,6 @@
         id="change_gradebook_version_link_holder"
         type="button"
       ><%= t("Individual View") %></a>
-      <% if @context.root_account.feature_enabled?(:gradezilla) %>
-        <a
-          href="<%= context_url(@context, :change_gradebook_version_context_gradebook_url, version: "gradezilla") %>"
-          class="Button individual-view-button"
-          id="change_gradebook_version_gradezilla"
-          type="button"
-        ><%= t("Gradezilla") %></a>
-      <% end %>
       <div class="section-button-placeholder"></div>
     </div>
   </div>
@@ -82,7 +91,7 @@
   <div class="assignment-gradebook-container hidden">
     <div id="gradebook-toolbar" class="toolbar">
       <div class="gradebook_dropdowns">
-        <% if multiple_grading_periods? %>
+        <% if grading_periods? %>
           <span class="multiple-grading-periods-selector-placeholder"></span>
         <% end %>
       </div>

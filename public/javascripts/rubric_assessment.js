@@ -112,7 +112,7 @@ window.rubricAssessment = {
             }
             total += criterionPoints;
           });
-          total = I18n.n(round(total, round.DEFAULT))
+          total = window.rubricAssessment.roundAndFormat(total);
           $obj.parents(".rubric").find(".rubric_total").text(total);
         }
       });
@@ -272,11 +272,11 @@ window.rubricAssessment = {
           .find(".custom_rating_field").val(comments).end()
           .find(".custom_rating_comments").html(comments_html).end()
           .find('.criterion_points')
-          .val(I18n.n(rating.points))
+          .val(window.rubricAssessment.roundAndFormat(rating.points))
           .change()
           .end()
           .find(".criterion_rating_points_holder").showIf(rating.points || rating.points === 0).end()
-          .find(".criterion_rating_points").text(rating.points).end()
+          .find(".criterion_rating_points").text(window.rubricAssessment.roundAndFormat(rating.points)).end()
           .find(".custom_rating").text(comments).end()
           .find(".criterion_comments").toggleClass('empty', !comments).end()
           .find(".save_custom_rating").attr('checked', false);
@@ -290,7 +290,7 @@ window.rubricAssessment = {
           total += rating.points;
         }
       }
-      total = I18n.n(round(total, round.DEFAULT));
+      total = window.rubricAssessment.roundAndFormat(total);
       $rubric.find(".rubric_total").text(total);
     }
   },
@@ -308,7 +308,7 @@ window.rubricAssessment = {
           .find(".rating").hide().end()
           .find(".rating_" + rating.id).show().end()
           .find('.criterion_points')
-          .text(I18n.n(rating.points))
+          .text(window.rubricAssessment.roundAndFormat(rating.points))
           .end()
           .find(".ignore_for_scoring").showIf(rating.ignore_for_scoring);
         if(ratingHasScore(rating) && !$rubricSummary.hasClass('free_form')){
@@ -322,13 +322,25 @@ window.rubricAssessment = {
           total += rating.points;
         }
       }
-      total = I18n.n(round(total, round.DEFAULT));
+      total = window.rubricAssessment.roundAndFormat(total, round.DEFAULT);
       $rubricSummary.show().find(".rubric_total").text(total);
       $rubricSummary.closest(".edit").show();
     }
     else {
       $rubricSummary.hide();
     }
+  },
+
+  /**
+   * Returns n rounded and formatted with I18n.n.
+   * If n is null, undefined or empty string, empty string is returned.
+   */
+  roundAndFormat: function (n) {
+    if (n == null || n === '') {
+      return '';
+    }
+
+    return I18n.n(round(n, round.DEFAULT));
   }
 };
 

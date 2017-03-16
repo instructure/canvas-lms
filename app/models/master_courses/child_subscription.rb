@@ -14,7 +14,9 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
     end
   end
 
-  after_create :invalidate_course_cache
+  before_save :check_migration_id_deactivation
+
+  after_save :invalidate_course_cache
 
   include Canvas::SoftDeletable
 
@@ -34,7 +36,57 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   def self.is_child_course?(course_id)
     Rails.cache.fetch(course_cache_key(course_id)) do
       course_id = course_id.id if course_id.is_a?(Course)
-      self.where(:child_course_id => course_id).exists? # restrictions should still apply even if subscription is deleted
+      self.where(:child_course_id => course_id).active.exists?
     end
+  end
+
+  def check_migration_id_deactivation
+    # mess up the migration ids so restrictions no longer get applied
+    if workflow_state_changed?
+      if deleted? && workflow_state_was == 'active'
+        self.add_deactivation_prefix!
+      elsif active? && workflow_state_was == 'deleted'
+        self.use_selective_copy = false # require a full import next time
+        self.remove_deactivation_prefix!
+      end
+    end
+  end
+
+  def deactivation_prefix
+    # a silly string to prepend onto all the bc object migration ids when we deactivate
+    "deletedsub_#{self.id}_"
+  end
+
+  def add_deactivation_prefix!
+    where_clause = ["migration_id LIKE ?", "#{MasterCourses::MasterTemplate.migration_id_prefix(self.shard.id, self.master_template_id)}%"]
+    update_query = ["migration_id = concat(?, migration_id)", self.deactivation_prefix]
+    update_content_in_child_course(where_clause, update_query)
+  end
+
+  def remove_deactivation_prefix!
+    where_clause = ["migration_id LIKE ?", "#{deactivation_prefix}%"]
+    update_query = ["migration_id = substr(migration_id, ?)", self.deactivation_prefix.length + 1]
+    update_content_in_child_course(where_clause, update_query)
+  end
+
+  def update_content_in_child_course(where_clause, update_query)
+    if self.child_content_tags.where(where_clause).update_all(update_query) > 0 # don't run all the rest of it if there's no reason to
+      self.content_scopes_for_deactivation.each do |scope|
+        scope.where(where_clause).update_all(update_query)
+      end
+    end
+  end
+
+  def content_scopes_for_deactivation
+    # there are more things we've added the restrictor module to, but we may not bother actually restricting them in the end
+    c = self.child_course
+    [
+      c.assignments,
+      c.attachments,
+      c.context_external_tools,
+      c.discussion_topics,
+      c.quizzes,
+      c.wiki.wiki_pages
+    ]
   end
 end

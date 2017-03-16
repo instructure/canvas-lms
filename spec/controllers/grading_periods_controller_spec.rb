@@ -61,7 +61,6 @@ describe GradingPeriodsController do
   before do
     account_admin_user(account: root_account)
     user_session(@admin)
-    root_account.enable_feature!(:multiple_grading_periods)
     request.accept = 'application/json'
   end
 
@@ -76,65 +75,16 @@ describe GradingPeriodsController do
 
     describe 'with root account admins' do
       it 'disallows creating grading periods' do
-        root_account.enable_feature!(:multiple_grading_periods)
         get :index, { course_id: course.id }
-        expect(json_parse['can_create_grading_periods']).to eql(false)
-      end
-
-      it 'allows toggling grading periods when multiple grading periods are enabled' do
-        root_account.enable_feature!(:multiple_grading_periods)
-        get :index, { course_id: course.id }
-        expect(json_parse['can_toggle_grading_periods']).to eql(true)
-      end
-
-      it "returns 'not found' when multiple grading periods are allowed" do
-        root_account.allow_feature!(:multiple_grading_periods)
-        get :index, { course_id: course.id }
-        expect(response).to be_not_found
-      end
-
-      it "returns 'not found' when multiple grading periods are disabled" do
-        root_account.disable_feature!(:multiple_grading_periods)
-        get :index, { course_id: course.id }
-        expect(response).to be_not_found
+        expect(json_parse['can_create_grading_periods']).to be false
       end
     end
 
     describe 'with sub account admins' do
       it 'disallows creating grading periods' do
-        root_account.enable_feature!(:multiple_grading_periods)
         login_sub_account
         get :index, { course_id: course.id }
-        expect(json_parse['can_create_grading_periods']).to eql(false)
-      end
-
-      it 'disallows toggling grading periods when multiple grading periods are root account enabled' do
-        root_account.enable_feature!(:multiple_grading_periods)
-        login_sub_account
-        get :index, { course_id: course.id }
-        expect(json_parse['can_toggle_grading_periods']).to eql(false)
-      end
-
-      it "returns 'not found' when multiple grading periods are root account disabled" do
-        root_account.disable_feature!(:multiple_grading_periods)
-        login_sub_account
-        get :index, { course_id: course.id }
-        expect(response).to be_not_found
-      end
-
-      it "returns 'not found' when multiple grading periods are allowed" do
-        root_account.allow_feature!(:multiple_grading_periods)
-        login_sub_account
-        get :index, { course_id: course.id }
-        expect(response).to be_not_found
-      end
-
-      it "returns 'not found' when multiple grading periods are sub account disabled" do
-        root_account.allow_feature!(:multiple_grading_periods)
-        sub_account.disable_feature!(:multiple_grading_periods)
-        login_sub_account
-        get :index, { course_id: course.id }
-        expect(response).to be_not_found
+        expect(json_parse['can_create_grading_periods']).to be false
       end
     end
 
@@ -475,6 +425,7 @@ describe GradingPeriodsController do
         end
 
         it "responds with json upon success" do
+          request.content_type = 'application/json' unless CANVAS_RAILS4_2
           patch :batch_update, { course_id: course.id, grading_periods: [] }
           expect(response).to be_ok
           json = JSON.parse(response.body)

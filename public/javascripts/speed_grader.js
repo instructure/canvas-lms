@@ -29,6 +29,7 @@ define([
   'underscore',
   'INST' /* INST */,
   'i18n!gradebook',
+  'compiled/util/natcompare',
   'jquery' /* $ */,
   'timezone',
   'compiled/userSettings',
@@ -61,7 +62,7 @@ define([
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
 ], function (MGP, OutlierScoreHelper, quizzesNextSpeedGrading, numberHelper,
   GradeFormatHelper, studentViewedAtTemplate, submissionsDropdownTemplate,
-  speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape,
+  speechRecognitionTemplate, round, _, INST, I18n, natcompare, $, tz, userSettings, htmlEscape,
   rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate,
   turnitinScoreTemplate, vericiteInfoTemplate, vericiteScoreTemplate) {
   // PRIVATE VARIABLES AND FUNCTIONS
@@ -224,34 +225,15 @@ define([
     //by defaut the list is sorted alphbetically by student last name so we dont have to do any more work here,
     // if the cookie to sort it by submitted_at is set we need to sort by submitted_at.
     var hideStudentNames = utils.shouldHideStudentNames();
-    var compareStudentsBy = function(f) {
-      return function(studentA, studentB) {
-        var a = f(studentA);
-        var b = f(studentB);
 
-        if ((!a && !b) || a === b) {
-          // chrome / safari sort isn't stable, so we need to sort by name in
-          // case of tie
-          if (studentA.name > studentB.name) {
-            return -1;
-          } else if (studentB.name > studentA.name) {
-            return 1;
-          } else {
-            return 0;
-          }
-        }
-        else if (!a || a > b) { return 1; }
-        else { return -1; }
-      };
-    };
     if(hideStudentNames) {
-      jsonData.studentsWithSubmissions.sort(compareStudentsBy(function(student) {
+      window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(function (student) {
         return student &&
           student.submission &&
           student.submission.id;
       }));
     } else if (userSettings.get("eg_sort_by") == "submitted_at") {
-      jsonData.studentsWithSubmissions.sort(compareStudentsBy(function(student){
+      window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(function (student) {
         var submittedAt = student &&
                           student.submission &&
                           student.submission.submitted_at;
@@ -270,7 +252,7 @@ define([
         "graded": 4,
         "not_gradeable": 5
       };
-      jsonData.studentsWithSubmissions.sort(compareStudentsBy(function(student){
+      window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(function (student) {
         return student &&
           states[SpeedgraderHelpers.submissionState(student, ENV.grading_role)];
       }));
@@ -2555,6 +2537,23 @@ define([
         }
         return false; // so that it doesn't hit the $("a.instructure_inline_media_comment").live('click' event handler
       });
+    },
+
+    compareStudentsBy: function (f) {
+      return function (studentA, studentB) {
+        var a = f(studentA);
+        var b = f(studentB);
+
+        if ((!a && !b) || a === b) {
+          // chrome / safari sort isn't stable, so we need to sort by name in
+          // case of tie
+          return natcompare.strings(studentA.sortable_name, studentB.sortable_name);
+        } else if (!a || a > b) {
+          return 1;
+        }
+
+        return -1;
+      };
     }
   };
 

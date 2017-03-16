@@ -245,7 +245,7 @@ class ContentTag < ActiveRecord::Base
     self.content && self.content.respond_to?(:context) && self.content.context == context
   end
 
-  def update_asset_name!
+  def update_asset_name!(user=nil)
     return unless self.sync_title_to_asset_title?
     return unless self.asset_context_matches?
 
@@ -257,7 +257,10 @@ class ContentTag < ActiveRecord::Base
     elsif content.respond_to?("display_name=")
       content.display_name = asset_safe_title('display_name')
     end
-    content.save if content.changed?
+    if content.changed?
+      content.user = user if user && content.is_a?(WikiPage)
+      content.save
+    end
   end
 
   def update_asset_workflow_state!

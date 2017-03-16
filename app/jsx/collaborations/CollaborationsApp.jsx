@@ -12,7 +12,7 @@ define([
       super(props);
     }
 
-    static propTypes: {
+    static propTypes = {
       applicationState: React.PropTypes.object,
       actions: React.PropTypes.object
     }

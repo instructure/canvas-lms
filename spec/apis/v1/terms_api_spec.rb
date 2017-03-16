@@ -149,6 +149,17 @@ describe TermsApiController, type: :request do
         account_admin_user(account: subaccount)
         expect_terms_index_401
       end
+
+      it "should require context to be root_account and error nicely" do
+        subaccount = @account.sub_accounts.create!(name: 'subaccount')
+        account_admin_user(account: @account)
+        json = api_call(:get, "/api/v1/accounts/#{subaccount.id}/terms",
+                        { controller: 'terms_api', action: 'index', format: 'json', account_id: subaccount.to_param },
+                        {},
+                        {},
+                        { expected_status: 400 })
+        expect(json['message']).to eq 'Terms only belong to root_accounts.'
+      end
     end
   end
 end
@@ -253,6 +264,13 @@ describe TermsController, type: :request do
       expect(@term1.end_at.to_i).to eq end_at.to_i
     end
 
+    it "requires valid dates" do
+      json = api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
+        { controller: 'terms', action: 'update', format: 'json', account_id: @account.to_param, id: @term1.to_param },
+        { enrollment_term: { name: 'Term 2', start_at: 3.days.ago.iso8601, end_at: 5.days.ago.iso8601 } }, {}, {:expected_status => 400})
+      expect(json['errors']['base'].first['message']).to eq "End dates cannot be before start dates"
+    end
+
     describe "sis_term_id" do
       it "allows specifying sis_term_id with :manage_sis permission" do
         expect(@account.grants_right?(@user, :manage_sis)).to be_truthy
@@ -305,6 +323,15 @@ describe TermsController, type: :request do
         student_override = @term1.enrollment_dates_overrides.where(enrollment_type: 'StudentEnrollment').first
         expect(student_override.start_at.iso8601).to eq "2017-01-20T20:00:00Z"
         expect(student_override.end_at.iso8601).to eq "2017-03-20T20:00:00Z"
+      end
+
+      it "requires valid dates for overrides" do
+        overrides_hash = {'StudentEnrollment' => {'start_at' => '2017-04-20T20:00:00Z', 'end_at' => '2017-03-20T20:00:00Z'}, }
+        json = api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
+          { controller: 'terms', action: 'update', format: 'json', account_id: @account.to_param, id: @term1.to_param },
+          { enrollment_term: {overrides: overrides_hash} }, {}, {:expected_status => 400}
+        )
+        expect(json['errors']['base'].first['message']).to eq "End dates cannot be before start dates"
       end
 
       it "rejects override for invalid enrollment type", priority: "1", test_id: 3046399 do

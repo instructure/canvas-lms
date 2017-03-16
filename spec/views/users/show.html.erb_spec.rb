@@ -23,13 +23,13 @@ describe "/users/show" do
   it "should render" do
     course_with_student
     view_context
-    assigns[:user] = @user
-    assigns[:courses] = [@course]
-    assigns[:topics] = []
-    assigns[:upcoming_events] = []
-    assigns[:enrollments] = []
-    assigns[:group_memberships] = []
-    assigns[:page_views] = PageView.paginate(:page => 1, :per_page => 20)
+    assign(:user, @user)
+    assign(:courses, [@course])
+    assign(:topics, [])
+    assign(:upcoming_events, [])
+    assign(:enrollments, [])
+    assign(:group_memberships, [])
+    assign(:page_views, PageView.paginate(:page => 1, :per_page => 20))
 
     render "users/show"
     expect(response).not_to be_nil

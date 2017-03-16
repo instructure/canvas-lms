@@ -1,20 +1,27 @@
 <% title = join_title t("Upload Gradebook"), @context.name %>
 <% content_for :page_title, title %>
 
-<h1><%= title %></h1>
+<div class="grid-row">
+  <div class="col-xs-12 col-md-8">
 
-<%= form_for [@context, GradebookUpload.new], html: {multipart: true, title: t("Choose a CSV file to upload:")} do |f| %>
-  <p aria-hidden="true">
-    <a class="icon-question"
-      target="_blank"
-      href="https://community.canvaslms.com/docs/DOC-2850">
-      <%= t "What should the CSV file look like?" %>
-    </a>
-  </p>
-  <p style="font-size: 1.2em;">
-    <%= f.label :uploaded_data, t("Choose a CSV file to upload:") %>
-    <%= f.file_field :uploaded_data %>
-  </p>
+    <div class="ic-Action-header">
+      <div class="ic-Action-header__Primary">
+        <h1 class="ic-Action-header__Heading"><%= title %></h1>
+      </div>
+    </div>
 
-  <%= f.submit t("Upload Data"), class: "btn btn-primary" %>
-<% end %>
+    <%= form_for [@context, GradebookUpload.new], html: { class: 'ic-Form-group', multipart: true, title: t("Choose a CSV file to upload:") } do |f| %>
+      <p>
+        <a class="icon-question" target="_blank" href="https://community.canvaslms.com/docs/DOC-2850"><%= t "What should the CSV file look like?" %></a>
+      </p>
+      <div class="ic-Form-control">
+        <%= f.label :uploaded_data, t("Choose a CSV file to upload:"), class: 'ic-Label' %>
+        <%= f.file_field :uploaded_data, class: 'ic-Input' %>
+      </div>
+
+      <div class="ic-Form-actions">
+        <%= f.submit t("Upload Data"), class: "Button Button--primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

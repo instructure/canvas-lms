@@ -24,10 +24,9 @@ describe 'Course Grading Periods' do
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
   let(:period_helper) { Factories::GradingPeriodHelper.new }
 
-  context 'with Multiple Grading Periods feature on,' do
-    before(:each) do
+  context 'with grading periods' do
+    before do
       course_with_teacher_logged_in
-      @course.root_account.enable_feature!(:multiple_grading_periods)
     end
 
     it 'shows grading periods created at the course-level', priority: "1", test_id: 239998 do
@@ -68,23 +67,20 @@ describe 'Course Grading Periods Inheritance' do
   let(:start_date) { format_date_for_view(3.months.from_now) }
   let(:end_date) { format_date_for_view(4.months.from_now - 1.day) }
 
-  before(:each) do
+  before do
     course_with_admin_logged_in
     @account = @course.root_account
-    @account.enable_feature!(:multiple_grading_periods)
 
     course_with_teacher(course: @course, name: 'teacher', active_enrollment: true)
     @account_course = @course
     @account_teacher = @teacher
   end
 
-  context 'with Multiple Grading Periods feature on,' do
-    it 'reads course grading periods', priority: "1", test_id: 202318 do
-      user_session @account_teacher
-      course_grading_period = Factories::GradingPeriodHelper.new.create_with_group_for_course(@course)
-      get "/courses/#{@account_course.id}/grading_standards"
-      expect(ff('.grading-period').length).to be(1)
-      expect(f("#period_title_#{course_grading_period.id}")).to have_value(course_grading_period.title)
-    end
+  it 'reads course grading periods', priority: "1", test_id: 202318 do
+    user_session @account_teacher
+    course_grading_period = Factories::GradingPeriodHelper.new.create_with_group_for_course(@course)
+    get "/courses/#{@account_course.id}/grading_standards"
+    expect(ff('.grading-period').length).to be(1)
+    expect(f("#period_title_#{course_grading_period.id}")).to have_value(course_grading_period.title)
   end
 end

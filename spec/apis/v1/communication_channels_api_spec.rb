@@ -211,6 +211,21 @@ describe 'CommunicationChannels API', type: :request do
           expect(json['workflow_state']).to eq 'active'
           expect(@user.notification_endpoints.first.arn).to eq 'endpointarn'
         end
+
+        it "shouldn't create two push channels regardless of case" do
+          client = mock()
+          DeveloperKey.stubs(:sns).returns(client)
+          dk = DeveloperKey.default
+          dk.sns_arn = 'apparn'
+          dk.save!
+          $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk).full_token
+          client.expects(:create_platform_endpoint).once.returns(endpoint_arn: 'endpointarn')
+          @post_params[:communication_channel][:token].upcase!
+          api_call(:post, @path, @path_options, @post_params)
+          @post_params[:communication_channel][:token].downcase!
+          api_call(:post, @path, @path_options, @post_params)
+          expect(@user.notification_endpoints.count).to eq 1
+        end
       end
     end
   end

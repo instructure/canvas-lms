@@ -552,7 +552,7 @@ describe "admin_tools" do
       expect(fj('.ui-dialog dl dd:last').text).to eq @reset_course.name
     end
 
-    it "should show copied_from event details" do
+    it "should show reset_from event details" do
       @course, @reset_course = @course, course_factory(active_course: true, course_name: "Reset Course")
       @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
 

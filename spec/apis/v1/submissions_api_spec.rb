@@ -1795,7 +1795,7 @@ describe 'Submissions API', type: :request do
     expect(json.detect { |u| u['user_id'] == student2.id }['submissions'].size).to eq 0
   end
 
-  context "Multiple Grading Periods" do
+  context "with grading periods" do
     before :once do
       @student1 = user_factory(active_all: true)
       @student2 = user_with_pseudonym(:active_all => true)
@@ -1805,7 +1805,6 @@ describe 'Submissions API', type: :request do
       @course.enroll_student(@student1).accept!
       @course.enroll_student(@student2).accept!
 
-      @course.account.enable_feature!(:multiple_grading_periods)
       gpg = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
       @gp1 = gpg.grading_periods.create!(
         title: 'first',

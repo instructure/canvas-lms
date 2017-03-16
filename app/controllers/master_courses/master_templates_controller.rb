@@ -27,12 +27,63 @@
 #     }
 #   }
 #
+# @model BlueprintMigration
+#   {
+#     "id" : "BlueprintMigration",
+#     "description" : "",
+#     "properties": {
+#       "id": {
+#         "description": "The ID of the migration.",
+#         "example": 1,
+#         "type": "integer",
+#         "format": "int64"
+#       },
+#       "template_id": {
+#         "description": "The ID of the template the migration belongs to.",
+#         "example": 2,
+#         "type": "integer",
+#         "format": "int64"
+#       },
+#       "user_id": {
+#         "description": "The ID of the user who queued the migration.",
+#         "example": 3,
+#         "type": "integer",
+#         "format": "int64"
+#       },
+#       "workflow_state": {
+#         "description": "Current state of the content migration: queued, exporting, imports_queued, completed, exports_failed, imports_failed",
+#         "example": "running",
+#         "type": "string"
+#       },
+#       "created_at": {
+#         "description": "Time when the migration was queued",
+#         "example": "2013-08-28T23:59:00-06:00",
+#         "type": "datetime"
+#       },
+#       "exports_started_at": {
+#         "description": "Time when the exports begun",
+#         "example": "2013-08-28T23:59:00-06:00",
+#         "type": "datetime"
+#       },
+#       "imports_queued_at": {
+#         "description": "Time when the exports were completed and imports were queued",
+#         "example": "2013-08-28T23:59:00-06:00",
+#         "type": "datetime"
+#       },
+#       "imports_completed_at": {
+#         "description": "Time when the imports were completed",
+#         "example": "2013-08-28T23:59:00-06:00",
+#         "type": "datetime"
+#       }
+#     }
+#   }
+#
 class MasterCourses::MasterTemplatesController < ApplicationController
   before_action :require_master_courses
   before_action :get_template
 
   include Api::V1::Course
-  include Api::V1::MasterTemplate
+  include Api::V1::MasterCourses
 
   # @API Get blueprint information
   #
@@ -124,11 +175,62 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       end
 
       if ids_to_remove.any?
-        @template.child_subscriptions.active.where(:child_course_id => ids_to_remove).update_all(:workflow_state => 'deleted')
+        @template.child_subscriptions.active.where(:child_course_id => ids_to_remove).preload(:child_course => :wiki).each(&:destroy)
       end
 
       render :json => {:success => true}
     end
+  end
+
+  # @API Begin a migration to push to associated courses
+  #
+  # Begins a migration to push recently updated content to all associated courses.
+  # Only one migration can be running at a time.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/1/blueprint_templates/default/migrations \
+  #     -X POST \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns BlueprintMigration
+  def queue_migration
+    if @template.active_migration_running?
+      return render :json => {:message => "Cannot queue a migration while one is currently running"}, :status => :bad_request
+    elsif !@template.child_subscriptions.active.exists?
+      return render :json => {:message => "No associated courses to migrate to"}, :status => :bad_request
+    end
+
+    migration = MasterCourses::MasterMigration.start_new_migration!(@template, @current_user)
+    render :json => master_migration_json(migration, @current_user, session)
+  end
+
+  # @API List blueprint migrations
+  #
+  # Shows migrations for the template, starting with the most recent
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/1/blueprint_templates/default/migrations \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns [BlueprintMigration]
+  def migrations_index
+    # sort id desc
+    migrations = Api.paginate(@template.master_migrations.order("id DESC"), self, api_v1_course_blueprint_migrations_url)
+    render :json => migrations.map{|migration| master_migration_json(migration, @current_user, session) }
+  end
+
+  # @API Show a blueprint migration
+  #
+  # Shows the status of a migration
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/1/blueprint_templates/default/migrations/:id \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns BlueprintMigration
+  def migrations_show
+    migration = @template.master_migrations.find(params[:id])
+    render :json => master_migration_json(migration, @current_user, session)
   end
 
   protected

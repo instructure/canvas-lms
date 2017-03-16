@@ -23,8 +23,8 @@ describe "/assignments/text_entry_page" do
   it "should render" do
     course_with_student
     view_context(@course, @user)
-    assigns[:assignment] = ass = @course.assignments.create!(:title => "some assignment")
-    assigns[:submission] = ass.submit_homework(@user)
+    ass = assign(:assignment, @course.assignments.create!(:title => "some assignment"))
+    assign(:submission, ass.submit_homework(@user))
     render 'assignments/text_entry_page'
     expect(response).not_to be_nil
   end

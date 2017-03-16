@@ -104,6 +104,7 @@ class Quizzes::QuizzesController < ApplicationController
       skip_date_overrides: true,
       skip_lock_tests: true
     }]
+    sis_name = @context.respond_to?(:assignments) ? AssignmentUtil.post_to_sis_friendly_name(@context.assignments.first) : 'SIS'
 
     js_env({
       :QUIZZES => {
@@ -124,9 +125,11 @@ class Quizzes::QuizzesController < ApplicationController
       },
       :FLAGS => {
         question_banks: feature_enabled?(:question_banks),
-        post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context)
+        post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context),
+        migrate_quiz_enabled:  @domain_root_account.feature_enabled?(:quizzes2_exporter)
       },
       :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
+      :SIS_NAME => sis_name
     })
 
     conditional_release_js_env(includes: :active_rules)
@@ -320,12 +323,12 @@ class Quizzes::QuizzesController < ApplicationController
         :quiz_max_combination_count => QUIZ_MAX_COMBINATION_COUNT,
         :SHOW_QUIZ_ALT_TEXT_WARNING => true,
         :VALID_DATE_RANGE => CourseDateRange.new(@context),
-        :MULTIPLE_GRADING_PERIODS_ENABLED => @context.feature_enabled?(:multiple_grading_periods),
+        :HAS_GRADING_PERIODS => @context.grading_periods?,
         :MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT => max_name_length_required_for_account,
         :MAX_NAME_LENGTH => max_name_length
       }
 
-      if @context.feature_enabled?(:multiple_grading_periods)
+      if @context.grading_periods?
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
       end
 
@@ -376,13 +379,12 @@ class Quizzes::QuizzesController < ApplicationController
         @quiz.update_attributes!(quiz_params)
         batch_update_assignment_overrides(@quiz, overrides, @current_user) unless overrides.nil?
       end
-      if Assignment.sis_grade_export_enabled?(@context) && @quiz.assignment
-        post_to_sis = nil
-        post_to_sis = params[:assignment][:post_to_sis] if params[:assignment].present?
-        post_to_sis = @context.account.sis_default_grade_export[:value] if post_to_sis.nil?
-        @quiz.assignment.post_to_sis = post_to_sis
-        @quiz.assignment.save
+
+      if params[:post_to_sis]
+        @quiz.assignment.post_to_sis = params[:post_to_sis] == '1' ? true : false
       end
+
+
       @quiz.did_edit if @quiz.created?
       @quiz.reload
       render :json => @quiz.as_json(:include => {:assignment => {:include => :assignment_group}})
@@ -439,9 +441,7 @@ class Quizzes::QuizzesController < ApplicationController
             old_assignment = @quiz.assignment.clone
             old_assignment.id = @quiz.assignment.id
 
-            if params[:assignment] && Assignment.sis_grade_export_enabled?(@context)
-              @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
-            end
+            @quiz.assignment.post_to_sis = params[:post_to_sis] == '1' ? true : false
           end
 
           auto_publish = @quiz.published?

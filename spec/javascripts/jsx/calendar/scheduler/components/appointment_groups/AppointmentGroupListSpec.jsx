@@ -80,6 +80,32 @@ define([
     equal(appointmentGroupNames[1].textContent, 'test2')
   })
 
+  test('renders correct group names', () => {
+    const appointmentGroup = {
+      appointments: [{
+        child_events: [{
+          group: { name: 'test1' }
+        }],
+        start_at: '2016-10-18T19:00:00Z',
+        end_at: '2016-10-18T110:00:00Z'
+      }, {
+        child_events: [{
+          group: { name: 'test2' }
+        }],
+        start_at: '2016-10-18T16:00:00Z',
+        end_at: '2016-10-18T17:00:00Z'
+      }],
+      appointments_count: 2,
+      participants_per_appointment: 1
+    }
+
+    const component = TestUtils.renderIntoDocument(<AppointmentGroupList appointmentGroup={appointmentGroup} />)
+    const appointmentGroupNames = TestUtils.scryRenderedDOMComponentsWithClass(component, 'AppointmentGroupList__Appointment-label')
+    equal(appointmentGroupNames.length, 2)
+    equal(appointmentGroupNames[0].textContent, 'test1')
+    equal(appointmentGroupNames[1].textContent, 'test2')
+  })
+
   test('renders "Available" at the end of the user list if more appointments are available for the slot', () => {
     const appointmentGroup = {
       appointments: [{

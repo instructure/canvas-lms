@@ -746,6 +746,21 @@ describe ContextExternalTool do
       expect(url).to eql(ContextExternalTool.standardize_url("www.google.com/?b=2&a=1"))
     end
 
+    it 'should handle spaces in front of url' do
+      url = ContextExternalTool.standardize_url(" http://sub_underscore.google.com?a=1&b=2")
+      expect(url).to eql('http://sub_underscore.google.com/?a=1&b=2')
+    end
+
+    it 'should handle tabs in front of url' do
+      url = ContextExternalTool.standardize_url("\thttp://sub_underscore.google.com?a=1&b=2")
+      expect(url).to eql('http://sub_underscore.google.com/?a=1&b=2')
+    end
+
+    it 'should handle unicode whitespace' do
+      url = ContextExternalTool.standardize_url("\u00A0http://sub_underscore.go\u2005ogle.com?a=1\u2002&b=2")
+      expect(url).to eql('http://sub_underscore.google.com/?a=1&b=2')
+    end
+
     it 'handles underscores in the domain' do
       url = ContextExternalTool.standardize_url("http://sub_underscore.google.com?a=1&b=2")
       expect(url).to eql('http://sub_underscore.google.com/?a=1&b=2')

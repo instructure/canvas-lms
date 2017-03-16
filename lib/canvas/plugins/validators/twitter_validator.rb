@@ -30,7 +30,7 @@ module Canvas::Plugins::Validators::TwitterValidator
           plugin_setting.errors.add(:base, res)
           false
         else
-          settings.slice(:consumer_key, :consumer_secret)
+          settings.permit(:consumer_key, :consumer_secret).to_h.with_indifferent_access
         end
       end
     end

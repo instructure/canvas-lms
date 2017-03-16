@@ -42,14 +42,28 @@ module Lti
     #
     class AuthorizationController < ApplicationController
 
+      skip_before_action :load_user
+
+      SERVICE_DEFINITIONS = [
+        {
+          id: 'vnd.Canvas.authorization',
+          endpoint: "api/lti/authorize",
+          format: ['application/json'].freeze,
+          action: ['POST'].freeze
+        }.freeze
+      ].freeze
+
       class InvalidGrant < RuntimeError; end
       JWT_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:jwt-bearer'.freeze
+      AUTHORIZATION_CODE_GRANT_TYPE = 'authorization_code'.freeze
+      GRANT_TYPES = [JWT_GRANT_TYPE, AUTHORIZATION_CODE_GRANT_TYPE].freeze
 
       rescue_from JSON::JWS::VerificationFailed,
                   JSON::JWT::InvalidFormat,
                   JSON::JWS::UnexpectedAlgorithm,
                   Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
                   Lti::Oauth2::AuthorizationValidator::SecretNotFound,
+                  Lti::Oauth2::AuthorizationValidator::MissingAuthorizationCode,
                   InvalidGrant do
         render json: {error: 'invalid_grant'}, status: :bad_request
       end
@@ -58,7 +72,14 @@ module Lti
       # Returns an access token that can be used to access other LTI services
       #
       # @argument grant_type [Required, String]
-      #  should contain the exact value of: "urn:ietf:params:oauth:grant-type:jwt-bearer"
+      #  When using registration provided credentials it should contain the exact value of:
+      #  "urn:ietf:params:oauth:grant-type:jwt-bearer" once a tool proxy is created
+      #  When using developer credentials it should have the value of: "authorization_code" and pass
+      #  the optional argument `code` defined below
+      #
+      # @argument code [optional, String]
+      #   Only used in conjunction with a grant type of "authorization_code".  Should contain the "reg_key" from the
+      #   registration message
       #
       # @argument assertion [Required, AuthorizationJWT]
       #   The AuthorizationJWT here should be the JWT in a string format
@@ -70,12 +91,17 @@ module Lti
       #
       # @returns [AccessToken]
       def authorize
-        raise InvalidGrant if params[:grant_type] != JWT_GRANT_TYPE
+        raise InvalidGrant unless GRANT_TYPES.include?(params[:grant_type])
         raise InvalidGrant if params[:assertion].blank?
-        jwt_validator = Lti::Oauth2::AuthorizationValidator.new(jwt: params[:assertion], authorization_url: lti_oauth2_authorize_url)
+        code = params[:code]
+        jwt_validator = Lti::Oauth2::AuthorizationValidator.new(
+          jwt: params[:assertion],
+          authorization_url: lti_oauth2_authorize_url,
+          code: code
+        )
         jwt_validator.validate!
         render json: {
-          access_token: Lti::Oauth2::AccessToken.create_jwt(aud: request.host, sub: jwt_validator.sub).to_s,
+          access_token: Lti::Oauth2::AccessToken.create_jwt(aud: request.host, sub: jwt_validator.sub, reg_key: code).to_s,
           token_type: 'bearer',
           expires_in: Setting.get('lti.oauth2.access_token.expiration', 1.hour.to_s)
         }

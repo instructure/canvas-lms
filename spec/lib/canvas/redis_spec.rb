@@ -227,14 +227,14 @@ describe "Canvas::Redis" do
             end
             outer_message = json_logline(:pop)
             expect(outer_message["command"]).to eq("set")
-            expect(outer_message["key"]).to eq(key)
+            expect(outer_message["key"]).to be_ends_with(key)
             expect(outer_message["request_time_ms"]).to be_a(Float)
             # 3000 (3s) == 2s outer fetch + 1s inner fetch
             expect(outer_message["generate_time_ms"]).to be_within(500).of(3000)
 
             inner_message = json_logline(:pop)
             expect(inner_message["command"]).to eq("set")
-            expect(inner_message["key"]).to eq(key2)
+            expect(inner_message["key"]).to be_ends_with(key2)
             expect(inner_message["request_time_ms"]).to be_a(Float)
             expect(inner_message["generate_time_ms"]).to be_within(500).of(1000)
           end

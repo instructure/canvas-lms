@@ -4,7 +4,7 @@ define([
 ], (React, i18n) => {
   class LoadMore extends React.Component {
 
-    static propTypes: {
+    static propTypes = {
       hasMore: React.PropTypes.bool.isRequired,
       loadMore: React.PropTypes.func.isRequired,
       isLoading: React.PropTypes.bool,

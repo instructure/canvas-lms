@@ -67,7 +67,27 @@ class TermsController < ApplicationController
   #
   # Update an existing enrollment term for the specified account.
   #
-  # See the {api:TermsController#create Create} endpoint for a list of accepted arguments.
+  # @argument enrollment_term[name] [String]
+  #   The name of the term.
+  #
+  # @argument enrollment_term[start_at] [DateTime]
+  #   The day/time the term starts.
+  #   Accepts times in ISO 8601 format, e.g. 2015-01-10T18:48:00Z.
+  #
+  # @argument enrollment_term[end_at] [DateTime]
+  #   The day/time the term ends.
+  #   Accepts times in ISO 8601 format, e.g. 2015-01-10T18:48:00Z.
+  #
+  # @argument enrollment_term[sis_term_id] [String]
+  #   The unique SIS identifier for the term.
+  #
+  # @argument enrollment_term[overrides][enrollment_type][start_at] [DateTime]
+  #   The day/time the term starts, overridden for the given enrollment type.
+  #   *enrollment_type* can be one of StudentEnrollment, TeacherEnrollment, TaEnrollment, or DesignerEnrollment
+  #
+  # @argument enrollment_term[overrides][enrollment_type][end_at] [DateTime]
+  #   The day/time the term ends, overridden for the given enrollment type.
+  #   *enrollment_type* can be one of StudentEnrollment, TeacherEnrollment, TaEnrollment, or DesignerEnrollment
   #
   # @returns EnrollmentTerm
   #
@@ -111,12 +131,26 @@ class TermsController < ApplicationController
       return render :json => {:message => "Invalid SIS ID"}, :status => :bad_request
     end
     handle_sis_id_param(sis_id)
-    if @term.update_attributes(params.require(:enrollment_term).permit(:name, :start_at, :end_at))
+
+    term_params = params.require(:enrollment_term).permit(:name, :start_at, :end_at)
+    if validate_dates(@term, term_params, overrides) && @term.update_attributes(term_params)
       @term.set_overrides(@context, overrides)
       render :json => serialized_term
     else
       render :json => @term.errors, :status => :bad_request
     end
+  end
+
+  def validate_dates(term, term_params, overrides)
+    hashes = [term_params]
+    hashes += overrides.values if overrides
+    invalid_dates = hashes.any? do |hash|
+      start_at = DateTime.parse(hash[:start_at]) rescue nil
+      end_at = DateTime.parse(hash[:end_at]) rescue nil
+      start_at && end_at && end_at < start_at
+    end
+    term.errors.add(:base, t("End dates cannot be before start dates")) if invalid_dates
+    !invalid_dates
   end
 
   def handle_sis_id_param(sis_id)

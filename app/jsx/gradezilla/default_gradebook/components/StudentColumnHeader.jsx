@@ -20,7 +20,7 @@ define([
       return (
         <div className="Gradebook__ColumnHeaderContent">
           <span className="Gradebook__ColumnHeaderDetail">
-            <Typography weight="normal" style="normal" size="small">
+            <Typography weight="normal" fontStyle="normal" size="small">
               { I18n.t('Student Name') }
             </Typography>
           </span>
@@ -29,7 +29,7 @@ define([
             zIndex="9999"
             trigger={
               <span className="Gradebook__ColumnHeaderAction">
-                <Typography weight="bold" style="normal" size="large" color="brand">
+                <Typography weight="bold" fontStyle="normal" size="large" color="brand">
                   <IconMoreSolid title={I18n.t('Student Name Options')} />
                 </Typography>
               </span>

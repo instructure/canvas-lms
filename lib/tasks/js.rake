@@ -6,12 +6,7 @@ namespace :js do
   # (add functionality as a separate task below)
 
   desc "Generates compiled coffeescript, handlebars templates and plugin extensions"
-  task :generate do
-    require 'config/initializers/client_app_symlinks'
-    require 'config/initializers/plugin_symlinks'
-
-    Rake::Task['js:clean'].invoke
-    Rake::Task['js:build_client_apps'].invoke
+  task generate: %i[clean build_client_apps] do
 
     threads = []
     threads << Thread.new do
@@ -37,11 +32,6 @@ namespace :js do
       ember_handlebars_time = Benchmark.realtime { Rake::Task['jst:ember'].invoke }
       puts "--> Pre-compiling ember handlebars templates finished in #{ember_handlebars_time}"
     end
-
-    # can't be in own thread, needs to happen before coffeescript
-    puts "--> Creating ember app bundles"
-    bundle_time = Benchmark.realtime { Rake::Task['js:bundle_ember_apps'].invoke }
-    puts "--> Creating ember app bundles finished in #{bundle_time}"
 
     threads << Thread.new do
       coffee_time = Benchmark.realtime do
@@ -87,7 +77,7 @@ namespace :js do
         puts "Building client app '#{app_name}'"
 
         if File.exists?('./package.json')
-          output = `npm install` rescue `npm cache clean && npm install`
+          output = `yarn install || npm install` rescue `npm cache clean && npm install`
           unless $?.exitstatus == 0
             puts "INSTALL FAILURE:\n#{output}"
             raise "Package installation failure for client app #{app_name}"
@@ -110,7 +100,6 @@ namespace :js do
 
   desc "Cleans build javascript files"
   task :clean do
-    require 'config/initializers/client_app_symlinks'
     require 'config/initializers/plugin_symlinks'
 
     paths_to_remove = [
@@ -161,6 +150,7 @@ namespace :js do
 
   desc "Build webpack js"
   task :webpack do
+    puts "this webpack rake task is going away. just run `yarn run webpack-production` or `yarn run webpack-development` directly."
     if CANVAS_WEBPACK
       if ENV['RAILS_ENV'] == 'production' || ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
         puts "--> Building PRODUCTION webpack bundles"
@@ -217,18 +207,10 @@ namespace :js do
     end
   end
 
-  desc "Creates ember app bundles"
-  task :bundle_ember_apps do
-    require 'lib/ember_bundle'
-    Dir.entries('app/coffeescripts/ember').reject { |d| d.match(/^\./) || d == 'shared' }.each do |app|
-      EmberBundle.new(app).build
-    end
-  end
-
   desc "Ensure up-to-date node environment"
   task :npm_install do
     puts "node is: #{`node -v`.strip} (#{`which node`.strip})"
-    raise 'error running npm install' unless `npm install`
+    raise 'error running yarn install' unless `yarn install || npm install`
   end
 
   desc "Run Gulp Rev, for fingerprinting assets"

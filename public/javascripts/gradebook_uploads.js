@@ -20,19 +20,26 @@ define([
   'jquery',
   'underscore',
   'str/htmlEscape',
+  'jsx/shared/helpers/numberHelper',
   'jsx/gradebook/uploads/wait_for_processing',
   'jsx/gradebook/uploads/process_gradebook_upload',
-  'vendor/slickgrid',
-  'vendor/slickgrid/slick.editors',
+  'jsx/gradebook/shared/helpers/GradeFormatHelper',
+  'vendor/slickgrid' /* global.Slick */,
+  'vendor/slickgrid/slick.editors' /* global.Slick.Editors */,
   'jquery.instructure_forms' /* errorBox */,
   'jquery.instructure_misc_helpers' /* /\.detect/ */,
   'jquery.templateData' /* fillTemplateData */
-], function(I18n, $, _, htmlEscape, waitForProcessing, ProcessGradebookUpload, SlickGrid) {
-
+], function (I18n, $, _, htmlEscape, numberHelper, waitForProcessing, ProcessGradebookUpload, GradeFormatHelper) {
   var GradebookUploader = {
-    createGeneralFormatter: function(attribute) {
-      return function(row, cell, value) {
-        return value ? value[attribute] : "";
+    createGeneralFormatter: function (attribute) {
+      return function (row, cell, value) {
+        return value ? value[attribute] : '';
+      }
+    },
+
+    createNumberFormatter: function (attribute) {
+      return function (row, cell, value) {
+        return value ? GradeFormatHelper.formatGrade(value[attribute]) : '';
       }
     },
 
@@ -89,16 +96,23 @@ define([
             field: this.id,
             width: 125,
             editor: Slick.Editors.UploadGradeCellEditor,
-            formatter: self.createGeneralFormatter('grade'),
+            formatter: self.createNumberFormatter('grade'),
             active: true,
             previous_id: this.previous_id,
             cssClass: "new-grade"
           };
 
+          if (this.grading_type !== 'letter_grade') {
+            newGrade.editorFormatter = function (grade) {
+              return GradeFormatHelper.formatGrade(grade, {defaultValue: ''});
+            };
+            newGrade.editorParser = GradeFormatHelper.delocalizeGrade;
+          }
+
           var conflictingGrade = {
             id: this.id + "_conflicting",
             width: 125,
-            formatter: self.createGeneralFormatter('original_grade'),
+            formatter: self.createNumberFormatter('original_grade'),
             field: this.id + "_conflicting",
             name: htmlEscape(I18n.t('From')),
             cssClass: 'conflicting-grade'
@@ -244,14 +258,16 @@ define([
                   data: {
                     name: record.name,
                     title: record.title,
-                    points_possible: record.points_possible
+                    points_possible: I18n.n(record.points_possible)
                   }
                 })
                 .appendTo("#gradebook_importer_resolution_section ." + thing + "_section table tbody")
                 .show()
                 .find("input.points_possible")
                 .change(function(){
-                  record.points_possible = $(this).val();
+                  var $this = $(this);
+                  record.points_possible = numberHelper.parse($this.val());
+                  $this.val(I18n.n(record.points_possible));
                 });
             });
             $("#gradebook_importer_resolution_section, #gradebook_importer_resolution_section ." + thing + "_section").show();
@@ -313,7 +329,7 @@ define([
                       return sub.user_id == student.id && sub.assignment_id == val;
                     });
                     if (original_submission) {
-                      submission.original_grade = original_submission.score;
+                      submission.original_grade = I18n.n(original_submission.score);
                     }
                   });
                 } else if (thing === 'student') {
@@ -324,7 +340,7 @@ define([
                       return sub.user_id == obj.id && sub.assignment_id == submission.assignment_id;
                     });
                     if (original_submission) {
-                      submission.original_grade = original_submission.score;
+                      submission.original_grade = I18n.n(original_submission.score);
                     }
                   });
                 }

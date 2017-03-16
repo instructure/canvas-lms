@@ -223,7 +223,7 @@ class Account < ActiveRecord::Base
   add_setting :lock_all_announcements, default: false, boolean: true, inheritable: true
 
   def settings=(hash)
-    if hash.is_a?(Hash)
+    if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|
         if account_settings_options && account_settings_options[key.to_sym]
           opts = account_settings_options[key.to_sym]
@@ -231,7 +231,7 @@ class Account < ActiveRecord::Base
             settings.delete key.to_sym
           elsif opts[:hash]
             new_hash = {}
-            if val.is_a?(Hash)
+            if val.is_a?(Hash) || val.is_a?(ActionController::Parameters)
               val.each do |inner_key, inner_val|
                 inner_key = inner_key.to_sym
                 if opts[:values].include?(inner_key)

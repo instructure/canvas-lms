@@ -19,7 +19,7 @@
 module Canvas::Plugins::Validators::TicketingSystemValidator
   def self.validate(settings, plugin_setting)
     if Canvas::Plugin.find(settings[:type])
-      settings.slice(:type)
+      settings.permit(:type).to_h.with_indifferent_access
     else
       raise("could not find plugin for #{settings[:type]}")
     end

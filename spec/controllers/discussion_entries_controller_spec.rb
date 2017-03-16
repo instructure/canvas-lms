@@ -133,7 +133,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entry].attachment).not_to be_nil
     end
     
-    it "should replace the file to the entry" do
+    it "should replace the file on the entry" do
       user_session(@teacher)
       @a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
       @entry.attachment = @a
@@ -146,7 +146,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entry].attachment).not_to eql(@a)
     end
     
-    it "should replace the file to the entry" do
+    it "should remove the file from the entry" do
       user_session(@teacher)
       @a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
       @entry.attachment = @a

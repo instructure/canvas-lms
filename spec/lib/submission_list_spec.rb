@@ -177,23 +177,6 @@ describe SubmissionList do
     end
   end
 
-  context "real data inspection" do
-    before do
-      course_model
-      sl = SubmissionList.new(@course)
-      @full_hash_list = YAML.load_file(
-        File.expand_path(
-          File.join(
-            File.dirname(__FILE__),
-            "..",
-            "fixtures",
-            "submission_list_full_hash_list.yml"
-            )
-          )
-        )
-    end
-  end
-
   context "regrading" do
     it 'should include regrade events in the final data' do
       # Figure out how to manually regrade a test piece of data

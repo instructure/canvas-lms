@@ -5,11 +5,13 @@ define [
   'compiled/util/DateValidator'
   'jst/assignments/CreateAssignment'
   'jst/EmptyDialogFormWrapper'
+  'jsx/shared/helpers/numberHelper'
   'i18n!assignments'
+  'compiled/util/round'
   'jquery'
   'compiled/api/gradingPeriodsApi'
   'jquery.instructure_date_and_time'
-], (_, Assignment, DialogFormView, DateValidator, template, wrapper, I18n, $, GradingPeriodsAPI) ->
+], (_, Assignment, DialogFormView, DateValidator, template, wrapper, numberHelper, I18n, round, $, GradingPeriodsAPI) ->
 
   class CreateAssignmentView extends DialogFormView
     defaults:
@@ -20,6 +22,7 @@ define [
       'click .dialog_closer': 'close'
       'click .save_and_publish': 'saveAndPublish'
       'click .more_options': 'moreOptions'
+      'blur .points_possible': 'roundPointsPossible'
 
     template: template
     wrapperTemplate: wrapper
@@ -42,6 +45,7 @@ define [
       unfudged = $.unfudgeDateForProfileTimezone(data.due_at)
       data.due_at = unfudged.toISOString() if unfudged?
       data.published = true if @shouldPublish
+      data.points_possible = numberHelper.parse(data.points_possible)
       return data
 
     saveAndPublish: (event) ->
@@ -123,7 +127,7 @@ define [
 
       max_name_length = 256
       if data.post_to_sis == '1' && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT == true
-        max_name_length = ENV.MAX_NAME_LENGTH + 1
+        max_name_length = ENV.MAX_NAME_LENGTH
 
       if !data.name or $.trim(data.name.toString()).length == 0
         errors["name"] = [
@@ -131,14 +135,14 @@ define [
         ]
       else if $.trim(data.name.toString()).length > max_name_length
         errors["name"] = [
-          message: I18n.t "Name is too long, must be under %{length} characters", length: max_name_length
+          message: I18n.t("Name is too long, must be under %{length} characters", length: max_name_length + 1)
         ]
       errors
 
     _validatePointsPossible: (data, errors) =>
       return errors if _.contains(@model.frozenAttributes(), "points_possible")
 
-      if data.points_possible and isNaN(parseFloat(data.points_possible))
+      if data.points_possible and isNaN(data.points_possible)
         errors["points_possible"] = [
           message: I18n.t 'points_possible_number', 'Points possible must be a number'
         ]
@@ -159,7 +163,7 @@ define [
       dateValidator = new DateValidator(
         date_range: _.extend({}, validRange)
         data: data
-        multipleGradingPeriodsEnabled: !!ENV.MULTIPLE_GRADING_PERIODS_ENABLED
+        hasGradingPeriods: !!ENV.HAS_GRADING_PERIODS
         gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods)
         userIsAdmin: @currentUserIsAdmin(),
         data
@@ -176,3 +180,11 @@ define [
 
       errors["due_at"] = [message: errs["due_at"]]
       errors
+
+    roundPointsPossible: (e) ->
+      value = $(e.target).val()
+      rounded_value = round(numberHelper.parse(value), 2)
+      if isNaN(rounded_value)
+        return
+      else
+        $(e.target).val(I18n.n(rounded_value))

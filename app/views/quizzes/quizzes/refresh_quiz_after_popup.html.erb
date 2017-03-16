@@ -3,5 +3,5 @@
 </h1>
 <script type="text/javascript">
   // open the quiz in a popup window with the plugin's given query param hash
-  window.location = <%= raw url_for(params.merge(quiz_redirect_params)).to_json %>;
+  window.location = <%= raw url_for(request.path_parameters.merge(quiz_redirect_params)).to_json %>;
 </script>

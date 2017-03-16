@@ -245,7 +245,7 @@ class SubmissionsApiController < ApplicationController
   #
   # @argument grading_period_id [Integer]
   #   The id of the grading period in which submissions are being requested
-  #   (Requires the Multiple Grading Periods account feature turned on)
+  #   (Requires grading periods to exist on the account)
   #
   # @argument order [String, "id"|"graded_at"]
   #   The order submissions will be returned in.  Defaults to "id".  Doesn't
@@ -330,7 +330,7 @@ class SubmissionsApiController < ApplicationController
       assignment_scope = assignment_scope.where(:id => requested_assignment_ids)
     end
 
-    if params[:grading_period_id].present? && multiple_grading_periods?
+    if params[:grading_period_id].present?
       assignments = GradingPeriod.active.find(params[:grading_period_id]).assignments(assignment_scope)
     else
       assignments = assignment_scope.to_a
@@ -620,7 +620,7 @@ class SubmissionsApiController < ApplicationController
 
     if authorized
       submission = { grader: @current_user }
-      if params[:submission].is_a?(Hash)
+      if params[:submission].is_a?(ActionController::Parameters)
         submission[:grade] = params[:submission].delete(:posted_grade)
         submission[:excuse] = params[:submission].delete(:excuse)
         submission[:provisional] = value_to_boolean(params[:submission][:provisional])
@@ -644,7 +644,7 @@ class SubmissionsApiController < ApplicationController
       end
 
       assessment = params[:rubric_assessment]
-      if assessment.is_a?(Hash) && @assignment.rubric_association
+      if assessment.is_a?(ActionController::Parameters) && @assignment.rubric_association
         # prepend each key with "criterion_", which is required by the current
         # RubricAssociation#assess code.
         assessment.keys.each do |crit_name|
@@ -659,7 +659,7 @@ class SubmissionsApiController < ApplicationController
       end
 
       comment = params[:comment]
-      if comment.is_a?(Hash)
+      if comment.is_a?(ActionController::Parameters)
         admin_in_context = !@context_enrollment || @context_enrollment.admin?
         comment = {
           comment: comment[:text_comment],

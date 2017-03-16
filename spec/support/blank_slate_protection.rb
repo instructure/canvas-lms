@@ -87,16 +87,21 @@ module BlankSlateProtection
       # persistent ones that already exist
       ::Switchman::TestHelper.recreate_persistent_test_shards(dont_create: true)
 
-      puts "truncating all tables..."
-      Shard.with_each_shard do
-        model_connections = ::ActiveRecord::Base.descendants.map(&:connection).uniq
-        model_connections.each do |connection|
-          table_names = get_table_names(connection)
-          next if table_names.empty?
-          connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
+      unless ENV['SKIP_TRUNCATE']
+        puts "truncating all tables..."
+        Shard.with_each_shard do
+          model_connections = ::ActiveRecord::Base.descendants.map(&:connection).uniq
+          model_connections.each do |connection|
+            table_names = get_table_names(connection)
+            next if table_names.empty?
+            connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
+          end
         end
       end
       randomize_sequences!
+      # now delete any shard objects we created
+      Shard.delete_all
+      Shard.default(reload: true)
     end
 
     def get_sequences(connection)
@@ -114,13 +119,19 @@ module BlankSlateProtection
       puts "randomizing db sequences..."
       seed = ::RSpec.configuration.seed
       i = 0
-      Shard.with_each_shard do
+      Shard.with_each_shard(Shard.categories) do
         i += 1
-        model_connections = ::ActiveRecord::Base.descendants.map(&:connection).uniq
+        models = ::ActiveRecord::Base.descendants
+        models.reject! { |m| m.shard_category == :unsharded } unless Shard.current.default?
+        model_connections = models.map(&:connection).uniq
         model_connections.each do |connection|
-          get_sequences(connection).each do |sequence|
+          sequences = get_sequences(connection)
+          # the sequences are probably already randomized; but if we sent a seed we really want the same run
+          next if ::RSpec.configuration.ordering_manager.instance_variable_get(:@order_forced) == false &&
+            connection.select_value("SELECT nextval('#{connection.quote_table_name(sequences.first)}')").to_i > 50_000
+          sequences.each do |sequence|
             # stable random-ish number <= 2**20 so that we don't overflow pre-migrated Version partitions
-            new_val = Digest::MD5.hexdigest("#{seed}#{i}#{sequence}")[0...5].to_i(16) + 1
+            new_val = Digest::MD5.hexdigest("#{seed}#{i}#{sequence}")[0...5].to_i(16) + 50_000
             connection.execute("ALTER SEQUENCE #{connection.quote_table_name(sequence)} RESTART WITH #{new_val}")
           end
         end

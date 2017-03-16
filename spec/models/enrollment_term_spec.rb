@@ -51,6 +51,25 @@ describe EnrollmentTerm do
     end
   end
 
+  describe 'computation of course scores' do
+    before(:once) do
+      @root_account = Account.create!
+      @term = @root_account.enrollment_terms.create!
+      @root_account.courses.create!(enrollment_term: @term)
+    end
+
+    it 'recomputes course scores if the grading period set is changed' do
+      grading_period_set = @root_account.grading_period_groups.create!
+      Enrollment.expects(:recompute_final_score).once
+      @term.update!(grading_period_group_id: grading_period_set)
+    end
+
+    it 'does not recompute course scores if the grading period set is not changed' do
+      Enrollment.expects(:recompute_final_score).never
+      @term.update!(name: 'The Best Term')
+    end
+  end
+
   it "should handle the translated Default Term names correctly" do
     begin
       account_model
@@ -122,7 +141,7 @@ describe EnrollmentTerm do
     end
 
     it "should not be able to delete a default term" do
-      expect { @account.default_enrollment_term.destroy }.to raise_error
+      expect { @account.default_enrollment_term.destroy }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it "should not be able to delete an enrollment term with active courses" do
@@ -131,7 +150,7 @@ describe EnrollmentTerm do
       @course.enrollment_term = @term
       @course.save!
 
-      expect { @term.destroy }.to raise_error
+      expect { @term.destroy }.to raise_error(ActiveRecord::RecordInvalid)
 
       @course.destroy
       @term.destroy

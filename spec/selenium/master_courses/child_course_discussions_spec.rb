@@ -24,7 +24,7 @@ describe "master courses - child courses - discussion locking" do
   end
 
   it "should not show the cog-menu options on the index when locked" do
-    @tag.update_attribute(:restrictions, {:content => true, :settings => true})
+    @tag.update_attribute(:restrictions, {:all => true})
 
     get "/courses/#{@copy_to.id}/discussion_topics"
 
@@ -42,7 +42,7 @@ describe "master courses - child courses - discussion locking" do
   end
 
   it "should not show the edit/delete options on the show page when locked" do
-    @tag.update_attribute(:restrictions, {:content => true, :settings => true})
+    @tag.update_attribute(:restrictions, {:all => true})
 
     get "/courses/#{@copy_to.id}/discussion_topics/#{@topic_copy.id}"
 
@@ -66,7 +66,7 @@ describe "master courses - child courses - discussion locking" do
     end
 
     it "should not show the cog-menu options on the index when locked" do
-      @tag.update_attribute(:restrictions, {:content => true, :settings => true})
+      @tag.update_attribute(:restrictions, {:all => true})
 
       get "/courses/#{@copy_to.id}/announcements"
 
@@ -84,7 +84,7 @@ describe "master courses - child courses - discussion locking" do
     end
 
     it "should not show the edit/delete options on the show page when locked" do
-      @tag.update_attribute(:restrictions, {:content => true, :settings => true})
+      @tag.update_attribute(:restrictions, {:all => true})
 
       get "/courses/#{@copy_to.id}/discussion_topics/#{@topic_copy.id}"
 

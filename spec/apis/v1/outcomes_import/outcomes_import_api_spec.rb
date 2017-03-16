@@ -162,7 +162,7 @@ describe "Outcomes Import API", type: :request do
         end
       end
 
-      it "requires the AcademicBenchmark config to be set" do
+      it "requires the AcademicBenchmark partner id to be set" do
         stub_ab_config_with({ partner_key: "dont_fear_the_reaper" })
         expect(request.call(type: request_type)["error"]).to match(/needs partner_id/i)
       end

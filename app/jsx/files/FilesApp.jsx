@@ -95,6 +95,7 @@ define([
               contextAssetString={this.props.contextAssetString}
             />
           </div>
+          <div className="TutorialToggleHolder" />
         </div>
         <Toolbar
           currentFolder={this.state.currentFolder}
