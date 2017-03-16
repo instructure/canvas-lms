@@ -522,6 +522,15 @@ END
       beta: true,
       development: true
     },
+    'student_planner' =>
+    {
+      display_name: -> { I18n.t('Student Planner')},
+      description: -> { I18n.t('Provides users with a planner dashboard option.')},
+      applies_to: "RootAccount",
+      state: "hidden",
+      beta: true,
+      development: true
+    },
     'quizzes2_exporter' =>
     {
       display_name: -> { I18n.t('Export to Quizzes 2 format') },
