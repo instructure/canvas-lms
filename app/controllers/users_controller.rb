@@ -484,8 +484,10 @@ class UsersController < ApplicationController
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
         :recent_activity_dashboard => @current_user.preferences[:recent_activity_dashboard],
-        :custom_colors => @current_user.custom_colors
-      }
+        :custom_colors => @current_user.custom_colors,
+        :show_planner => show_planner?
+      },
+      :STUDENT_PLANNER_ENABLED => planner_enabled?
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
@@ -540,6 +542,24 @@ class UsersController < ApplicationController
       !@current_user.preferences[:recent_activity_dashboard]
     @current_user.save!
     render json: {}
+  end
+
+  def dashboard_view
+    if request.get?
+      render json: {
+        dashboard_view: @current_user.preferences[:dashboard_view]
+      }
+    elsif request.put?
+      valid_options = ['activity', 'cards', 'planner']
+
+      unless valid_options.include?(params[:dashboard_view])
+        return render(json: { :message => "Invalid Dashboard View Option" }, status: :bad_request)
+      end
+
+      @current_user.preferences[:dashboard_view] = params[:dashboard_view]
+      @current_user.save!
+      render json: {}
+    end
   end
 
   include Api::V1::StreamItem

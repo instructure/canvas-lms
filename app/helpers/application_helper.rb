@@ -953,4 +953,13 @@ module ApplicationHelper
 
     js_env NEW_USER_TUTORIALS: {is_enabled: is_enabled}
   end
+
+  def planner_enabled?
+    @domain_root_account&.feature_enabled?(:student_planner)
+  end
+
+  def show_planner?
+    @current_user.preferences[:dashboard_view] == 'planner'
+  end
+
 end

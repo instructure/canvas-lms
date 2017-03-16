@@ -802,6 +802,7 @@ CanvasRails::Application.routes.draw do
   end
 
   scope '/dashboard' do
+    put 'view' => 'users#dashboard_view'
     delete 'account_notifications/:id' => 'users#close_notification', as: :dashboard_close_notification
     get 'eportfolios' => 'eportfolios#user_index', as: :dashboard_eportfolios
     post 'comment_session' => 'services_api#start_kaltura_session', as: :dashboard_comment_session

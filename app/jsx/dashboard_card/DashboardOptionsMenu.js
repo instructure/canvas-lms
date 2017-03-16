@@ -9,15 +9,27 @@ import IconSettings2Solid from 'instructure-icons/react/Solid/IconSettings2Solid
 
 export default class DashboardOptionsMenu extends React.Component {
   static propTypes = {
-    recent_activity_dashboard: React.PropTypes.bool.isRequired
+    recent_activity_dashboard: React.PropTypes.bool.isRequired,
+    planner_enabled: React.PropTypes.bool,
+    planner_selected: React.PropTypes.bool
+  }
+
+  static defaultProps = {
+    planner_enabled: false,
+    planner_selected: false,
   }
 
   constructor (props) {
     super(props)
 
-    this.state = {
-      view: props.recent_activity_dashboard ? ['activity'] : ['cards']
+    let view;
+    if (props.planner_enabled) {
+      view = props.planner_selected ? ['planner'] : ['cards']
+    } else {
+      view = props.recent_activity_dashboard ? ['activity'] : ['cards']
     }
+
+    this.state = { view }
   }
 
   handleViewOptionSelect = (e, newSelected) => {
@@ -31,15 +43,26 @@ export default class DashboardOptionsMenu extends React.Component {
   }
 
   toggleDashboardView () {
-    const dashboardActivity = document.getElementById('dashboard-activity')
-    const dashboardCards = document.getElementById('DashboardCard_Container')
+    if (this.props.planner_enabled) {
+      const dashboardPlanner = document.getElementById('dashboard-planner')
+      dashboardPlanner.style.display = (dashboardPlanner.style.display === 'none') ? 'block' : 'none'
+    } else {
+      const dashboardActivity = document.getElementById('dashboard-activity')
+      dashboardActivity.style.display = (dashboardActivity.style.display === 'none') ? 'block' : 'none'
+    }
 
-    dashboardActivity.style.display = (dashboardActivity.style.display === 'none') ? 'block' : 'none'
+    const dashboardCards = document.getElementById('DashboardCard_Container')
     dashboardCards.style.display = (dashboardCards.style.display === 'none') ? 'block' : 'none'
   }
 
   postDashboardToggle () {
-    axios.post('/users/toggle_recent_activity_dashboard')
+    if (this.props.planner_enabled) {
+      axios.put('/dashboard/view', {
+        dashboard_view: this.state.view[0]
+      })
+    } else {
+      axios.post('/users/toggle_recent_activity_dashboard')
+    }
   }
 
   render () {
@@ -51,15 +74,18 @@ export default class DashboardOptionsMenu extends React.Component {
             <IconSettings2Solid />
           </Button>
         }
+        contentRef={(el) => { this.menuContentRef = el; }}
       >
         <MenuItemGroup
           label={I18n.t('Dashboard View')}
           onSelect={this.handleViewOptionSelect}
           selected={this.state.view}
         >
-          <MenuItem value="activity">
-            {I18n.t('Recent Activity')}
-          </MenuItem>
+          {
+            (this.props.planner_enabled) ?
+              <MenuItem value="planner">{I18n.t('Planner')}</MenuItem> :
+              <MenuItem value="activity">{I18n.t('Recent Activity')}</MenuItem>
+          }
           <MenuItem value="cards">
             {I18n.t('Course Cards')}
           </MenuItem>

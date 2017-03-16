@@ -26,8 +26,14 @@
     </div>
     </div>
   </div>
-  <div id="dashboard-activity" class="ic-Dashboard-Activity" style="display: <%= show_recent_activity? ? 'block' : 'none' %>">
-    <%= render :partial => 'shared/recent_activity' %>
-  </div>
+  <% if planner_enabled? %>
+    <% js_bundle :student_planner %>
+    <div id="dashboard-planner" class="StudentPlanner__Container" style="display: <%= show_planner? ? 'block' : 'none' %>"></div>
+  <% else %>
+    <div id="dashboard-activity" class="ic-Dashboard-Activity" style="display: <%= show_recent_activity? ? 'block' : 'none' %>">
+      <%= render :partial => 'shared/recent_activity' %>
+    </div>
+  <% end %>
+
   <%= render :partial => 'shared/dashboard_card' %>
 </div>

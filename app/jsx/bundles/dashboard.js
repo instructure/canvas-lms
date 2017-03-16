@@ -20,7 +20,11 @@ if (ENV.DASHBOARD_SIDEBAR_URL) {
 const dashboardOptionsMenuContainer = document.getElementById('DashboardOptionsMenu_Container')
 if (dashboardOptionsMenuContainer) {
   ReactDOM.render(
-    <DashboardOptionsMenu recent_activity_dashboard={ENV.PREFERENCES.recent_activity_dashboard} />,
+    <DashboardOptionsMenu
+      recent_activity_dashboard={ENV.PREFERENCES.recent_activity_dashboard}
+      planner_enabled={ENV.STUDENT_PLANNER_ENABLED}
+      planner_selected={ENV.PREFERENCES.show_planner}
+    />,
     dashboardOptionsMenuContainer
   )
 }
