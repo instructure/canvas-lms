@@ -281,12 +281,16 @@ module AttachmentFu # :nodoc:
         def save_to_storage
           if save_attachment?
             options = {
-              body: (temp_path ? File.open(temp_path, 'rb') : temp_data),
               content_type: content_type,
               acl: attachment_options[:s3_access]
             }
             options.merge!(attachment_options.slice(:cache_control, :expires, :metadata))
-            s3object.put(options)
+            if temp_path
+              s3object.upload_file(temp_path, options)
+            else
+              options[:body] = temp_data
+              s3object.put(options)
+            end
           end
 
           @old_filename = nil
