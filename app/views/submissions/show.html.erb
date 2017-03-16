@@ -1,6 +1,6 @@
 <%
   currently_peer_reviewing = @assessment_request.try(:assigned?)
-  js_bundle :rubric_assessment, :submissions
+  js_bundle :submissions
   css_bundle :submission
   js_env({
     :RUBRIC_ASSESSMENT => {

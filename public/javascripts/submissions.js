@@ -29,7 +29,8 @@ define([
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'media_comments' /* mediaComment */,
   'compiled/jquery/mediaCommentThumbnail',
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+  'vendor/jquery.scrollTo', /* /\.scrollTo/ */
+  'rubric_assessment'
 ], function (round, I18n, $, GradeFormatHelper) {
   $("#content").addClass('padless');
   var fileIndex = 1;
