@@ -122,4 +122,9 @@ describe DeveloperKey do
       include_examples "authorized_for_account?"
     end
   end
+
+  it "doesn't allow the default key to be deleted" do
+    expect { DeveloperKey.default.destroy }.to raise_error "Please never delete the default developer key"
+    expect { DeveloperKey.default.deactivate }.to raise_error "Please never delete the default developer key"
+  end
 end
