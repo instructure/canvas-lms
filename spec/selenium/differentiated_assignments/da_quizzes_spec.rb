@@ -64,7 +64,7 @@ describe "interaction with differentiated quizzes" do
         create_section_override_for_assignment(@da_quiz)
         submit_quiz(@da_quiz)
         # destroy the override and automatically generated grade providing visibility to the current student
-        AssignmentOverride.find(@da_quiz.assignment_overrides.first!).destroy
+        AssignmentOverride.find(@da_quiz.assignment_overrides.first!.id).destroy
         @da_quiz.assignment.grade_student(@user, grade: nil, grader: @teacher)
         create_section_override_for_assignment(@da_quiz, course_section: @section1)
         # assure we get the no longer counted banner on the quiz page
@@ -79,7 +79,7 @@ describe "interaction with differentiated quizzes" do
         @course.enroll_teacher(@teacher)
         create_section_override_for_assignment(@da_quiz)
         submit_quiz(@da_quiz)
-        AssignmentOverride.find(@da_quiz.assignment_overrides.first!).destroy
+        AssignmentOverride.find(@da_quiz.assignment_overrides.first!.id).destroy
         @da_quiz.assignment.grade_student(@user, grade: nil, grader: @teacher)
         create_section_override_for_assignment(@da_quiz, course_section: @section1)
         get "/courses/#{@course.id}/quizzes/#{@da_quiz.id}"
@@ -165,7 +165,7 @@ describe "interaction with differentiated quizzes" do
         create_section_override_for_assignment(@da_quiz)
         submit_quiz(@da_quiz)
         # destroy the override and automatically generated grade providing visibility to the current student
-        AssignmentOverride.find(@da_quiz.assignment_overrides.first!).destroy
+        AssignmentOverride.find(@da_quiz.assignment_overrides.first!.id).destroy
         @da_quiz.assignment.grade_student(@user, grade: nil, grader: @teacher)
         create_section_override_for_assignment(@da_quiz, course_section: @section1)
         # assure we get the no longer counted banner on the quiz page

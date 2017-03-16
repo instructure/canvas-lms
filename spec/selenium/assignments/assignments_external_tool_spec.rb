@@ -23,7 +23,7 @@ describe "external tool assignments" do
     f('.create_assignment').click
     wait_for_ajaximations
 
-    a = @course.assignments(true).last
+    a = @course.assignments.reload.last
     expect(a).to be_present
     expect(a.submission_types).to eq 'external_tool'
   end
@@ -52,10 +52,10 @@ describe "external tool assignments" do
     f("#edit_assignment_form button[type='submit']").click
 
     keep_trying_until do # timing issues require waiting
-      expect(@course.assignments(true).last).to be_present
+      expect(@course.assignments.reload.last).to be_present
     end
 
-    a = @course.assignments(true).last
+    a = @course.assignments.reload.last
     expect(a).to be_present
     expect(a.submission_types).to eq 'external_tool'
     expect(a.external_tool_tag).to be_present
