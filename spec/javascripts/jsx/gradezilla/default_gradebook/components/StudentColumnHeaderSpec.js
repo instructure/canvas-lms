@@ -269,6 +269,26 @@ test('clicking "Z–A" when disabled does not call onSortBySortableNameDescendin
   equal(this.props.sortBySetting.onSortBySortableNameDescending.callCount, 0);
 });
 
+test('uses prop loginHandleName for "login_id" menu item label', function () {
+  this.props.loginHandleName = 'custom login handle name';
+
+  this.wrapper = mountAndOpenOptions(this.props);
+
+  const menuItem = document.querySelector('[data-menu-item-id="login_id"]');
+
+  ok(menuItem.textContent.includes(this.props.loginHandleName));
+});
+
+test('uses default label when loginHandleName prop is falsy', function () {
+  this.props.loginHandleName = '';
+
+  this.wrapper = mountAndOpenOptions(this.props);
+
+  const menuItem = document.querySelector('[data-menu-item-id="login_id"]');
+
+  ok(menuItem.textContent.includes(StudentRowHeaderConstants.secondaryInfoLabels.login_id));
+});
+
 QUnit.module('StudentColumnHeader - primaryInfoMenuGroup', {
   setup () {
     this.props = {

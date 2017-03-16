@@ -411,6 +411,7 @@ class GradebooksController < ApplicationController
       sections: sections_json(@context.active_course_sections, @current_user, session),
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
       settings: @current_user.preferences.fetch(:gradebook_settings, {}).fetch(@context.id, {}),
+      login_handle_name: @context.root_account.settings[:login_handle_name],
       version: params.fetch(:version, nil)
     }
   end

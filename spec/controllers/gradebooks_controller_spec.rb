@@ -591,6 +591,20 @@ describe GradebooksController do
       end
     end
 
+    context "includes relevant account settings in ENV" do
+      before { user_session(@teacher) }
+      let(:custom_login_id) { 'FOOBAR' }
+
+      it 'includes login_handle_name' do
+        @course.account.update!(login_handle_name: custom_login_id)
+        get :show, course_id: @course.id
+
+        login_handle_name = assigns[:js_env][:GRADEBOOK_OPTIONS][:login_handle_name]
+
+        expect(login_handle_name).to eq(custom_login_id)
+      end
+    end
+
     context "with grading periods" do
       let(:group_helper)  { Factories::GradingPeriodGroupHelper.new }
       let(:period_helper) { Factories::GradingPeriodHelper.new }

@@ -1408,10 +1408,16 @@ QUnit.module('Gradebook#onBeforeHeaderCellDestroy', {
   setup () {
     this.$mountPoint = document.createElement('div');
     $fixtures.appendChild(this.$mountPoint);
+    fakeENV.setup({
+      GRADEBOOK_OPTIONS: {
+        login_handle_name: ''
+      }
+    });
   },
 
   teardown () {
     $fixtures.innerHTML = '';
+    fakeENV.teardown();
   }
 });
 
@@ -1427,11 +1433,17 @@ QUnit.module('Gradebook#renderStudentColumnHeader', {
   setup () {
     this.$mountPoint = document.createElement('div');
     $fixtures.appendChild(this.$mountPoint);
+    fakeENV.setup({
+      GRADEBOOK_OPTIONS: {
+        login_handle_name: 'foo'
+      }
+    });
   },
 
   teardown () {
     ReactDOM.unmountComponentAtNode(this.$mountPoint);
     $fixtures.innerHTML = '';
+    fakeENV.teardown();
   }
 });
 
@@ -1442,7 +1454,19 @@ test('renders the StudentColumnHeader to the "student" column header node', func
   ok(this.$mountPoint.innerText.includes('Student Name'), 'the "Student Name" header is rendered');
 });
 
-QUnit.module('Gradebook#getStudentColumnHeaderProps');
+QUnit.module('Gradebook#getStudentColumnHeaderProps', {
+  setup () {
+    fakeENV.setup({
+      GRADEBOOK_OPTIONS: {
+        login_handle_name: 'foo'
+      }
+    });
+  },
+
+  teardown () {
+    fakeENV.teardown();
+  }
+});
 
 test('includes properties from gradebook', function () {
   const gradebook = createGradebook();
@@ -1452,6 +1476,7 @@ test('includes properties from gradebook', function () {
   equal(typeof props.sectionsEnabled, 'boolean');
   equal(typeof props.onSelectSecondaryInfo, 'function');
   equal(typeof props.onSelectPrimaryInfo, 'function');
+  equal(props.loginHandleName, 'foo');
 });
 
 test('includes props for the "Sort by" settings', function () {

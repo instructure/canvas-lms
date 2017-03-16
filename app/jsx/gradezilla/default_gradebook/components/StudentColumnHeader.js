@@ -31,6 +31,7 @@ export default class StudentColumnHeader extends React.Component {
   static propTypes = {
     selectedPrimaryInfo: oneOf(StudentRowHeaderConstants.primaryInfoKeys).isRequired,
     onSelectPrimaryInfo: func.isRequired,
+    loginHandleName: string,
     selectedSecondaryInfo: oneOf(StudentRowHeaderConstants.secondaryInfoKeys).isRequired,
     sectionsEnabled: bool.isRequired,
     onSelectSecondaryInfo: func.isRequired,
@@ -42,6 +43,10 @@ export default class StudentColumnHeader extends React.Component {
       onSortBySortableNameDescending: func.isRequired,
       settingKey: string.isRequired
     }).isRequired,
+  };
+
+  static defaultProps = {
+    loginHandleName: null
   };
 
   constructor (props) {
@@ -171,7 +176,7 @@ export default class StudentColumnHeader extends React.Component {
               selected={this.props.selectedSecondaryInfo === 'login_id'}
               onSelect={this.onShowLoginId}
             >
-              {StudentRowHeaderConstants.secondaryInfoLabels.login_id}
+              {this.props.loginHandleName || StudentRowHeaderConstants.secondaryInfoLabels.login_id}
             </MenuItem>
 
             <MenuItem
