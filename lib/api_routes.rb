@@ -16,20 +16,31 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'lib/api_route_set'
 require 'bundler'
 Bundler.setup
 require 'action_controller'
 
-CanvasRails::Application.routes.disable_clear_and_finalize = true
 
-# we need this for a route contstraint
-require 'lib/lti/re_reg_constraint'
+# load the routes
+if CanvasRails::Application.routes_reloader.paths.empty?
+  require 'lib/api_route_set'
+  # we need this for a route constraint
+  require 'lib/lti/re_reg_constraint'
 
-# load routing files, including those in plugins
-require 'config/routes'
-Dir.glob('{gems,vendor}/plugins/*/config/routes.rb').each do |plugin_routes|
-  require plugin_routes.gsub(/\.rb$/, '')
+  routes_files = CanvasRails::Application.paths["config/routes.rb"].existent +
+    CanvasRails::Application.railties.map do |railtie|
+      next unless railtie.is_a?(Rails::Engine)
+      railtie.paths["config/routes.rb"].existent
+    end.flatten
+
+  CanvasRails::Application.routes.disable_clear_and_finalize = true
+  CanvasRails::Application.routes.clear!
+
+  routes_files.compact.each { |path| load(path) }
+else
+  # we're probably running in spring, and Rails has already loaded them; make
+  # sure they're up to date
+  CanvasRails::Application.routes_reloader.reload!
 end
 
 # Extend YARD to generate our API documentation
