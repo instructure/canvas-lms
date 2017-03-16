@@ -5,7 +5,7 @@ module Lti
     class AssignmentSubscriptionError < StandardError
     end
 
-    SUBMISSION_EVENT_ID = 'SubmissionEvent'.freeze
+    SUBMISSION_EVENT_ID = 'vnd.Canvas.SubmissionEvent'.freeze
 
     def initialize(assignment, tool_proxy)
       @assignment = assignment

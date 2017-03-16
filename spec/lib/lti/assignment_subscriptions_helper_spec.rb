@@ -13,7 +13,7 @@ describe Lti::AssignmentSubscriptionsHelper do
       'endpoint' => submission_event_endpoint,
       'format' => ['application/json'],
       'action' => ['POST'],
-      '@id' => 'http://test.service.com/service#SubmissionEvent',
+      '@id' => 'http://test.service.com/service#vnd.Canvas.SubmissionEvent',
       '@type' => 'RestService'
     }
   end
@@ -21,7 +21,7 @@ describe Lti::AssignmentSubscriptionsHelper do
     {
       'format' => ['application/json'],
       'action' => ['POST'],
-      '@id' => 'http://test.service.com/service#SubmissionEvent',
+      '@id' => 'http://test.service.com/service#vnd.Canvas.SubmissionEvent',
       '@type' => 'RestService'
     }
   end
