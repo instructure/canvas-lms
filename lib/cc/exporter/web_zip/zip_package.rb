@@ -63,9 +63,8 @@ module CC::Exporter::WebZip
     def add_course_data
       f = File.new(@course_data_filename, 'w+')
       last_web_export_time = course.web_zip_exports.where(user: user).last&.created_at
-
       data = {
-        language: course.locale || 'en',
+        language: course.locale || user.locale || course.account.default_locale(true) || 'en',
         lastDownload: force_timezone(last_web_export_time),
         title: course.name,
         files: create_tree_data,
