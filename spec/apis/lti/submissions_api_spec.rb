@@ -34,7 +34,9 @@ module Lti
 
 
     before do
-      mock_sub_helper = instance_double("Lti::AssignmentSubscriptionsHelper", create_subscription: "123")
+      mock_sub_helper = instance_double("Lti::AssignmentSubscriptionsHelper",
+                                        create_subscription: "123",
+                                        destroy_subscription: nil)
       allow(Lti::AssignmentSubscriptionsHelper).to receive(:new).and_return(mock_sub_helper)
       tool_proxy.raw_data['enabled_capability'] << ResourcePlacement::SIMILARITY_DETECTION_LTI2
       tool_proxy.save!

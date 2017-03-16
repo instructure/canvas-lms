@@ -7,13 +7,13 @@ module Lti
 
     SUBMISSION_EVENT_ID = 'vnd.Canvas.SubmissionEvent'.freeze
 
-    def initialize(assignment, tool_proxy)
+    def initialize(tool_proxy, assignment = nil)
       @assignment = assignment
       @tool_proxy = tool_proxy
     end
 
     def create_subscription
-      if Services::LiveEventsSubscriptionService.available?
+      if Services::LiveEventsSubscriptionService.available? && assignment.present?
         subscription = assignment_subscription(assignment.global_id)
         result = Services::LiveEventsSubscriptionService.create_tool_proxy_subscription(tool_proxy, subscription)
         raise AssignmentSubscriptionError, error_message unless result.ok?
@@ -32,6 +32,12 @@ module Lti
         TransportType: transport_type,
         TransportMetadata: transport_metadata
       }.with_indifferent_access
+    end
+
+    def destroy_subscription(subscription_id)
+      if Services::LiveEventsSubscriptionService.available?
+        Services::LiveEventsSubscriptionService.destroy_tool_proxy_subscription(tool_proxy, subscription_id)
+      end
     end
 
     private

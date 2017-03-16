@@ -18,8 +18,11 @@
 
 require_relative '../sharding_spec_helper'
 require_relative '../selenium/helpers/groups_common'
+require_relative '../lti2_spec_helper'
 
 describe Assignment do
+  include_context 'lti2_spec_helper'
+
   before :once do
     course_with_teacher(active_all: true)
     @initial_student = student_in_course(active_all: true, user_name: 'a student').user
@@ -93,50 +96,76 @@ describe Assignment do
     expect(@assignment.errors[:grading_type]).not_to be_nil
   end
 
-  it "should allow ContextExternalTools through polymorphic association" do
-    setup_assignment_with_homework
+  describe '#tool_settings_tool=' do
+    let(:stub_response){ double(code: 200, body: {}.to_json, parsed_response: {'Id' => 'test-id'}, ok?: true) }
+    let(:subscription_helper){ class_double(Lti::AssignmentSubscriptionsHelper).as_stubbed_const }
+    let(:subscription_helper_instance){ double(destroy_subscription: true, create_subscription: true) }
 
-    tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
-    @assignment.tool_settings_tool = tool
-    @assignment.save
-    expect(@assignment.tool_settings_tool).to eq(tool)
-  end
+    before(:each) do
+      allow(subscription_helper).to receive_messages(new: subscription_helper_instance)
+    end
 
-  it "should have Lti::MessageHandler through polymorphic association" do
-    setup_assignment_with_homework
-    account = @assignment.context.account
-    product_family = Lti::ProductFamily.create(
-      vendor_code: '123',
-      product_code: 'abc',
-      vendor_name: 'acme',
-      root_account: account
-    )
-    tool_proxy = Lti::ToolProxy.create!(
-      context: account,
-      guid: SecureRandom.uuid,
-      shared_secret: 'abc',
-      product_family: product_family,
-      product_version: '1',
-      workflow_state: 'disabled',
-      raw_data: {'proxy' => 'value'},
-      lti_version: '1'
-    )
-    resource_handler = Lti::ResourceHandler.create(
-      resource_type_code: 'code',
-      name: 'resource name',
-      tool_proxy: tool_proxy
-    )
-    message_handler = Lti::MessageHandler.create(
-      message_type: 'message_type',
-      launch_path: 'https://samplelaunch/blti',
-      resource_handler: resource_handler
-    )
+    it "should allow ContextExternalTools through polymorphic association" do
+      setup_assignment_with_homework
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      @assignment.tool_settings_tool = tool
+      @assignment.save
+      expect(@assignment.tool_settings_tool).to eq(tool)
+    end
 
-    AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
+    it "should have Lti::MessageHandler through polymorphic association" do
+      setup_assignment_with_homework
+      account = @assignment.context.account
+      product_family = Lti::ProductFamily.create(
+        vendor_code: '123',
+        product_code: 'abc',
+        vendor_name: 'acme',
+        root_account: account
+      )
+      tool_proxy = Lti::ToolProxy.create!(
+        context: account,
+        guid: SecureRandom.uuid,
+        shared_secret: 'abc',
+        product_family: product_family,
+        product_version: '1',
+        workflow_state: 'disabled',
+        raw_data: {'proxy' => 'value'},
+        lti_version: '1'
+      )
+      resource_handler = Lti::ResourceHandler.create(
+        resource_type_code: 'code',
+        name: 'resource name',
+        tool_proxy: tool_proxy
+      )
+      message_handler = Lti::MessageHandler.create(
+        message_type: 'message_type',
+        launch_path: 'https://samplelaunch/blti',
+        resource_handler: resource_handler
+      )
 
-    @assignment.tool_settings_tool = message_handler
-    @assignment.save
-    expect(@assignment.tool_settings_tool).to eq(message_handler)
+      @assignment.tool_settings_tool = message_handler
+      @assignment.save
+      expect(@assignment.tool_settings_tool).to eq(message_handler)
+    end
+
+    it 'destroys subscriptions when they exist' do
+      setup_assignment_with_homework
+      expect(subscription_helper_instance).to receive(:destroy_subscription)
+      @assignment.tool_settings_tool = message_handler
+      @assignment.save!
+      @assignment.tool_settings_tool = nil
+      @assignment.save!
+    end
+
+    it "destroys tool unless tool is 'ContextExternalTool'" do
+      setup_assignment_with_homework
+      expect(subscription_helper_instance).not_to receive(:destroy_subscription)
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      @assignment.tool_settings_tool = tool
+      @assignment.save!
+      @assignment.tool_settings_tool = nil
+      @assignment.save!
+    end
   end
 
   describe "#representatives" do

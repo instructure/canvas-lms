@@ -1278,8 +1278,12 @@ class Assignment < ActiveRecord::Base
   end
 
   def tool_settings_tools=(tools)
+    lookup = AssignmentConfigurationToolLookup.find_by(tool: tool_settings_tool, assignment: self)
+    lookup&.destroy_subscription
+
     tool_settings_context_external_tools.clear
     tool_settings_tool_proxies.clear
+
     tools.each do |t|
       if t.instance_of? ContextExternalTool
         tool_settings_context_external_tools << t
