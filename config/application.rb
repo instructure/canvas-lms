@@ -20,10 +20,9 @@ Bundler.require(*Rails.groups)
 
 module CanvasRails
   class Application < Rails::Application
-    config.autoload_paths += [config.root.join('lib').to_s]
     $LOAD_PATH << config.root.to_s
     config.encoding = 'utf-8'
-    require_dependency 'logging_filter'
+    require 'logging_filter'
     config.filter_parameters.concat LoggingFilter.filtered_parameters
     config.action_dispatch.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
     config.action_dispatch.rescue_responses['AuthenticationMethods::LoggedOutError'] = 401
@@ -89,14 +88,8 @@ module CanvasRails
 
     config.active_support.encode_big_decimal_as_string = false
 
-    config.autoload_paths += %W(#{Rails.root}/app/middleware
-                            #{Rails.root}/app/observers
-                            #{Rails.root}/app/presenters
-                            #{Rails.root}/app/services
-                            #{Rails.root}/app/serializers
-                            #{Rails.root}/app/presenters)
-
-    config.autoload_once_paths << Rails.root.join("app/middleware")
+    config.paths['lib'].eager_load!
+    config.paths.add('app/middleware', eager_load: true, autoload_once: true)
 
     # prevent directory->module inference in these directories from wreaking
     # havoc on the app (e.g. stylesheets/base -> ::Base)

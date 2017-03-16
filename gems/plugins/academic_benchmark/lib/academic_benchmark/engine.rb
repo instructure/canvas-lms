@@ -1,6 +1,6 @@
 module AcademicBenchmark
   class Engine < ::Rails::Engine
-    config.autoload_paths << File.expand_path(File.join(__FILE__, "../.."))
+    config.paths['lib'].eager_load!
 
     config.to_prepare do
       Canvas::Plugin.register :academic_benchmark_importer, :export_system, {
