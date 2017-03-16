@@ -1,1 +1,1 @@
-require ['vendor/slickgrid']
+import 'vendor/slickgrid'

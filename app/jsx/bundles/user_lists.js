@@ -1,1 +1,1 @@
-require ['compiled/user_lists']
+import 'compiled/user_lists'

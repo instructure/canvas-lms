@@ -1,2 +1,1 @@
-require ['eportfolio']
-
+import 'eportfolio'

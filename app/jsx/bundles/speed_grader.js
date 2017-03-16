@@ -1,5 +1,3 @@
-require [
-  'speed_grader'
-], (speedGrader) ->
+import speedGrader from 'speed_grader'
 
-  speedGrader.setup()
+speedGrader.setup()

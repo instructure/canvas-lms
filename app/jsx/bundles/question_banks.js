@@ -1,2 +1,1 @@
-require ['question_banks']
-
+import 'question_banks'

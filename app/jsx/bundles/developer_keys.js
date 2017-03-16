@@ -1,1 +1,1 @@
-require ['compiled/developer_keys']
+import 'compiled/developer_keys'

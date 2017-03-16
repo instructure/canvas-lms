@@ -1,2 +1,1 @@
-require ['rubric_assessment']
-
+import 'rubric_assessment'

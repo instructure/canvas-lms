@@ -1,5 +1,3 @@
-require [
-  'submissions'
-], (submissions) ->
+import submissions from 'submissions'
 
-  submissions.setup()
+submissions.setup()

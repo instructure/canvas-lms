@@ -1,1 +1,1 @@
-require ['oauth2_confirm']
+import 'oauth2_confirm'

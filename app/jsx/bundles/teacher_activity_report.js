@@ -1,3 +1,1 @@
-require [
-  'compiled/teacher_activity_report'
-]
+import 'compiled/teacher_activity_report'

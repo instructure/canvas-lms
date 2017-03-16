@@ -1,6 +1,4 @@
-require [
-  'react-dom'
-  'jsx/groups/StudentView'
-], (ReactDOM, StudentView) ->
+import ReactDOM from 'react-dom'
+import StudentView from 'jsx/groups/StudentView'
 
-  ReactDOM.render(StudentView, document.getElementById('content'))
+ReactDOM.render(StudentView, document.getElementById('content'))

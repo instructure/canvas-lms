@@ -1,20 +1,22 @@
-require [
-  'jquery'
-  'compiled/util/Popover'
-], ($, Popover) ->
-  $ ->
-    $select = $('select.locale')
+import $ from 'jquery'
+import Popover from 'compiled/util/Popover'
 
-    $warningLink = $('i.locale-warning')
-    $warningLink.hide()
+$(() => {
+  const $select = $('select.locale')
 
-    checkWarningIcon = ->
-      if $select.val() in ENV.crowdsourced_locales
-        $warningLink.show()
-      else
-        $warningLink.hide()
+  const $warningLink = $('i.locale-warning')
+  $warningLink.hide()
 
-    $select.change ->
-      checkWarningIcon()
+  function checkWarningIcon () {
+    if (Array.from(ENV.crowdsourced_locales).includes($select.val())) {
+      $warningLink.show()
+    } else {
+      $warningLink.hide()
+    }
+  }
 
-    checkWarningIcon()
+  $select.change(() => checkWarningIcon())
+
+  return checkWarningIcon()
+})
+

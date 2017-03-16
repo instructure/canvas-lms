@@ -1,2 +1,1 @@
-require ['sis_import']
-
+import 'sis_import'

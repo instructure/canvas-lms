@@ -1,2 +1,1 @@
-require ['gradebook-history']
-
+import 'gradebook-history'

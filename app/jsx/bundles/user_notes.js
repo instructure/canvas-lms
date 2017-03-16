@@ -1,2 +1,1 @@
-require ['user_notes']
-
+import 'user_notes'

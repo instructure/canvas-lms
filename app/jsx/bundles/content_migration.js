@@ -1,3 +1,1 @@
-require [
-  'compiled/bundles/modules/content_migration_setup'
-], () ->
+import 'compiled/bundles/modules/content_migration_setup'

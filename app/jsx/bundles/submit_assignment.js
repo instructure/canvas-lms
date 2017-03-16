@@ -1,1 +1,1 @@
-require ['submit_assignment']
+import 'submit_assignment'

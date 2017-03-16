@@ -1,12 +1,9 @@
-require [
-  'jquery'
-  'INST'
-  'compiled/notifications/NotificationPreferences'
-  'compiled/notifications/privacyNotice'
-  'compiled/profile/confirmEmail'
-], ($, INST, NotificationPreferences, initPrivacyNotice) ->
-  new NotificationPreferences(ENV.NOTIFICATION_PREFERENCES_OPTIONS)
+import $ from 'jquery'
+import INST from 'INST'
+import NotificationPreferences from 'compiled/notifications/NotificationPreferences'
+import initPrivacyNotice from 'compiled/notifications/privacyNotice'
+import 'compiled/profile/confirmEmail'
 
-  $ ->
-    initPrivacyNotice()
+new NotificationPreferences(ENV.NOTIFICATION_PREFERENCES_OPTIONS)
 
+$(() => initPrivacyNotice())

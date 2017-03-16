@@ -1,1 +1,1 @@
-require ['link_enrollment']
+import 'link_enrollment'

@@ -1,75 +1,68 @@
-# manage groups is for the add_group_category dialog
-require [
-  'compiled/models/Section'
-  'compiled/models/Assignment'
-  'compiled/views/assignments/EditHeaderView'
-  'compiled/views/assignments/EditView'
-  'compiled/collections/SectionCollection'
-  'compiled/models/DueDateList'
-  'compiled/views/assignments/DueDateOverride'
-  'compiled/views/assignments/AssignmentGroupSelector'
-  'compiled/views/assignments/GradingTypeSelector'
-  'compiled/views/assignments/GroupCategorySelector'
-  'compiled/views/assignments/PeerReviewsSelector'
-  'grading_standards'
-], (
-  Section,
-  Assignment,
-  EditHeaderView,
-  EditView,
-  SectionCollection,
-  DueDateList,
-  DueDateOverride,
-  AssignmentGroupSelector,
-  GradingTypeSelector,
-  GroupCategorySelector,
-  PeerReviewsSelector) ->
+// manage groups is for the add_group_category dialog
+import Section from 'compiled/models/Section'
+import Assignment from 'compiled/models/Assignment'
+import EditHeaderView from 'compiled/views/assignments/EditHeaderView'
+import EditView from 'compiled/views/assignments/EditView'
+import SectionCollection from 'compiled/collections/SectionCollection'
+import DueDateList from 'compiled/models/DueDateList'
+import DueDateOverride from 'compiled/views/assignments/DueDateOverride'
+import AssignmentGroupSelector from 'compiled/views/assignments/AssignmentGroupSelector'
+import GradingTypeSelector from 'compiled/views/assignments/GradingTypeSelector'
+import GroupCategorySelector from 'compiled/views/assignments/GroupCategorySelector'
+import PeerReviewsSelector from 'compiled/views/assignments/PeerReviewsSelector'
+import 'grading_standards'
 
-  ENV.ASSIGNMENT.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES
+ENV.ASSIGNMENT.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES
 
-  userIsAdmin = ENV.current_user_roles.includes('admin')
+const userIsAdmin = ENV.current_user_roles.includes('admin')
 
-  assignment = new Assignment ENV.ASSIGNMENT
-  assignment.urlRoot = ENV.URL_ROOT
+const assignment = new Assignment(ENV.ASSIGNMENT)
+assignment.urlRoot = ENV.URL_ROOT
 
-  sectionList = new SectionCollection ENV.SECTION_LIST
-  dueDateList = new DueDateList assignment.get('assignment_overrides'), sectionList, assignment
+const sectionList = new SectionCollection(ENV.SECTION_LIST)
+const dueDateList = new DueDateList(assignment.get('assignment_overrides'), sectionList, assignment)
 
-  assignmentGroupSelector = new AssignmentGroupSelector
-    parentModel: assignment
-    assignmentGroups: ENV?.ASSIGNMENT_GROUPS || []
-  gradingTypeSelector = new GradingTypeSelector
-    parentModel: assignment
-  groupCategorySelector = new GroupCategorySelector
-    parentModel: assignment
-    groupCategories: ENV?.GROUP_CATEGORIES || []
-    inClosedGradingPeriod: assignment.inClosedGradingPeriod()
-  peerReviewsSelector = new PeerReviewsSelector
-    parentModel: assignment
+const assignmentGroupSelector = new AssignmentGroupSelector({
+  parentModel: assignment,
+  assignmentGroups: (typeof ENV !== 'undefined' && ENV !== null ? ENV.ASSIGNMENT_GROUPS : undefined) || []
+})
+const gradingTypeSelector = new GradingTypeSelector({
+  parentModel: assignment
+})
+const groupCategorySelector = new GroupCategorySelector({
+  parentModel: assignment,
+  groupCategories: (typeof ENV !== 'undefined' && ENV !== null ? ENV.GROUP_CATEGORIES : undefined) || [],
+  inClosedGradingPeriod: assignment.inClosedGradingPeriod()
+})
+const peerReviewsSelector = new PeerReviewsSelector({
+  parentModel: assignment
+})
 
-  headerEl = if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
-      '#edit_assignment_header-cr'
-    else
-      '#edit_assignment_header'
+const headerEl = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED ? '#edit_assignment_header-cr' : '#edit_assignment_header'
 
-  editView = new EditView
-    el: '#edit_assignment_form'
-    model: assignment
-    assignmentGroupSelector: assignmentGroupSelector
-    gradingTypeSelector: gradingTypeSelector
-    groupCategorySelector: groupCategorySelector
-    peerReviewsSelector: peerReviewsSelector
-    views:
-      'js-assignment-overrides': new DueDateOverride
-        model: dueDateList
-        views: {}
-        postToSIS: assignment.postToSIS()
+const editView = new EditView({
+  el: '#edit_assignment_form',
+  model: assignment,
+  assignmentGroupSelector,
+  gradingTypeSelector,
+  groupCategorySelector,
+  peerReviewsSelector,
+  views: {
+    'js-assignment-overrides': new DueDateOverride({
+      model: dueDateList,
+      views: {},
+      postToSIS: assignment.postToSIS()
+    })
+  }
+})
 
-  editHeaderView = new EditHeaderView
-    el: headerEl
-    model: assignment
-    userIsAdmin: userIsAdmin
-    views:
-      'edit_assignment_form': editView
+const editHeaderView = new EditHeaderView({
+  el: headerEl,
+  model: assignment,
+  userIsAdmin,
+  views: {
+    edit_assignment_form: editView
+  }
+})
 
-  editHeaderView.render()
+editHeaderView.render()

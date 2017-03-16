@@ -1,1 +1,1 @@
-require [ 'quiz_statistics_cqs' ]
+import 'quiz_statistics_cqs'

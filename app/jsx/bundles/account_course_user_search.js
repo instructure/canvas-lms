@@ -1,33 +1,32 @@
-require [
-  'react'
-  'react-dom'
-  'jsx/account_course_user_search/index'
-  'jsx/account_course_user_search/router'
-  'jsx/account_course_user_search/store/configureStore'
-  'jsx/account_course_user_search/store/initialState'
-], (React, ReactDOM, App, router, configureStore, initialState) ->
+import React from 'react'
+import ReactDOM from 'react-dom'
+import App from 'jsx/account_course_user_search/index'
+import router from 'jsx/account_course_user_search/router'
+import configureStore from 'jsx/account_course_user_search/store/configureStore'
+import initialState from 'jsx/account_course_user_search/store/initialState'
 
-  if (location.pathname.indexOf(ENV.BASE_PATH) == -1)
-    return location.replace(ENV.BASE_PATH)
-
+if (location.pathname.indexOf(ENV.BASE_PATH) === -1) {
+  location.replace(ENV.BASE_PATH)
+} else {
   initialState.tabList.basePath = ENV.BASE_PATH
 
-  content = document.getElementById('content')
-  AccountCourseUserSearchApp = React.createFactory App
+  const content = document.getElementById('content')
 
-  # Note. Only the UsersPane/Tab is using a redux store. The courses tab is
-  # still using the old store model. That is why this might seem kind of weird.
-  store = configureStore(initialState)
+  // Note. Only the UsersPane/Tab is using a redux store. The courses tab is
+  // still using the old store model. That is why this might seem kind of weird.
+  const store = configureStore(initialState)
 
-  options =
+  const options = {
     permissions: ENV.PERMISSIONS,
-    accountId: ENV.ACCOUNT_ID.toString()
-    roles: Array.prototype.slice.call(ENV.COURSE_ROLES)
-    addUserUrls: ENV.URLS
-    store: store
+    accountId: ENV.ACCOUNT_ID.toString(),
+    roles: Array.prototype.slice.call(ENV.COURSE_ROLES),
+    addUserUrls: ENV.URLS,
+    store
+  }
 
-  store.subscribe(
-    -> ReactDOM.render( AccountCourseUserSearchApp(options), content )
-  )
+  store.subscribe(() => {
+    ReactDOM.render(<App {...options} />, content)
+  })
 
   router.start(store)
+}

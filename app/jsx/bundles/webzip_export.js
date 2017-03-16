@@ -1,8 +1,6 @@
-require [
-  'jquery'
-  'react'
-  'react-dom'
-  'jsx/webzip_export/App'
-], ($, React, ReactDOM, WebZipExportApp) ->
-    component = React.createElement(WebZipExportApp)
-    ReactDOM.render(component, $('#course-webzip-export-app')[0])
+import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import WebZipExportApp from 'jsx/webzip_export/App'
+
+ReactDOM.render(<WebZipExportApp />, $('#course-webzip-export-app')[0])

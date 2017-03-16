@@ -1,7 +1,6 @@
-require [
-  'react'
-  'jsx/course_blueprint_settings/index'
-], (React, App) ->
-  root = document.getElementById('content')
-  app = new App(ENV, root)
-  app.render()
+import React from 'react'
+import App from 'jsx/course_blueprint_settings/index'
+
+const root = document.getElementById('content')
+const app = new App(ENV, root)
+app.render()

@@ -1,1 +1,1 @@
-require ['user_grades']
+import 'user_grades'

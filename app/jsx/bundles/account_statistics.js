@@ -1,1 +1,1 @@
-require ['account_statistics']
+import 'account_statistics'

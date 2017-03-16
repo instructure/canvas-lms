@@ -1,2 +1,1 @@
-require ['user_logins']
-
+import 'user_logins'

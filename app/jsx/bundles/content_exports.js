@@ -1,2 +1,1 @@
-require ['content_exports']
-
+import 'content_exports'

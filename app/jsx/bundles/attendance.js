@@ -1,2 +1,2 @@
-require ['datagrid', 'attendance']
-
+import 'datagrid'
+import 'attendance'

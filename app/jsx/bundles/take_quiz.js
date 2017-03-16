@@ -1,3 +1,1 @@
-require [
-  'take_quiz'
-]
+import 'take_quiz'

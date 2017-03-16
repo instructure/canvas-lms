@@ -1,11 +1,11 @@
-require [
-  'jquery'
-  'quiz_arrows'
-  'quiz_inputs'
-  'quiz_history'
-], ($, QuizArrowApplicator, inputMethods) ->
-  $ ->
-    arrowApplicator = new QuizArrowApplicator()
-    arrowApplicator.applyArrows()
-    inputMethods.disableInputs('[type=radio], [type=checkbox]')
-    inputMethods.setWidths()
+import $ from 'jquery'
+import QuizArrowApplicator from 'quiz_arrows'
+import inputMethods from 'quiz_inputs'
+import 'quiz_history'
+
+$(() => {
+  const arrowApplicator = new QuizArrowApplicator()
+  arrowApplicator.applyArrows()
+  inputMethods.disableInputs('[type=radio], [type=checkbox]')
+  inputMethods.setWidths()
+})

@@ -1,11 +1,13 @@
-require [
-  'jquery'
-  'compiled/util/deparam'
-], ($, deparam) ->
-  $(document).ready ->
-    params = deparam()
-    if params.focus
-      el = $("##{params.focus}")
-      if el
-        el.select() if el.attr('type') == 'text'
-        el.focus()
+import $ from 'jquery'
+import deparam from 'compiled/util/deparam'
+
+$(document).ready(() => {
+  const params = deparam()
+  if (params.focus) {
+    const el = $(`#${params.focus}`)
+    if (el) {
+      if (el.attr('type') === 'text') { el.select() }
+      el.focus()
+    }
+  }
+})

@@ -1,17 +1,18 @@
-require [
-  'jquery'
-  'compiled/registration/registrationErrors'
-  'jquery.instructure_forms'
-], ($, registrationErrors) ->
+import $ from 'jquery'
+import registrationErrors from 'compiled/registration/registrationErrors'
+import 'jquery.instructure_forms'
 
-  $form = $('#change_password_form')
-  $form.formSubmit
-    disableWhileLoading: 'spin_on_success'
-    errorFormatter: (errors) ->
-      pseudonymId = $form.find("#pseudonym_id_select").val()
-      registrationErrors(errors, ENV.PASSWORD_POLICIES[pseudonymId] ? ENV.PASSWORD_POLICY)
-    success: ->
-      location.href = '/'
-    error: (errors) ->
-      location.href = '/login' if errors.nonce
-
+const $form = $('#change_password_form')
+$form.formSubmit({
+  disableWhileLoading: 'spin_on_success',
+  errorFormatter (errors) {
+    const pseudonymId = $form.find('#pseudonym_id_select').val()
+    return registrationErrors(errors, ENV.PASSWORD_POLICIES[pseudonymId] != null ? ENV.PASSWORD_POLICIES[pseudonymId] : ENV.PASSWORD_POLICY)
+  },
+  success () {
+    return location.href = '/'
+  },
+  error (errors) {
+    if (errors.nonce) { return location.href = '/login' }
+  }
+})

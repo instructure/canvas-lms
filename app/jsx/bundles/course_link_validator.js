@@ -1,12 +1,8 @@
-require [
-  'jquery'
-  'react'
-  'react-dom'
-  'jsx/course_link_validator/LinkValidator'
-  'i18n!link_validator'
-], ($, React, ReactDOM, LinkValidator, I18n) ->
+import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import LinkValidator from 'jsx/course_link_validator/LinkValidator'
+import I18n from 'i18n!link_validator'
 
-  element = React.createElement(LinkValidator)
-
-  linkValidatorWrapper = document.getElementById('link_validator_wrapper')
-  ReactDOM.render(element, linkValidatorWrapper)
+const linkValidatorWrapper = document.getElementById('link_validator_wrapper')
+ReactDOM.render(<LinkValidator />, linkValidatorWrapper)

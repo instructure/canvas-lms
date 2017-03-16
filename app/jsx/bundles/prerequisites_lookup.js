@@ -1,2 +1,1 @@
-require ['prerequisites_lookup']
-
+import 'prerequisites_lookup'

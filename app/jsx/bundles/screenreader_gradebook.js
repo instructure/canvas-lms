@@ -1,2 +1,3 @@
-require ['compiled/ember/screenreader_gradebook/main'], (App) ->
-  window.App = App.create()
+import App from 'compiled/ember/screenreader_gradebook/main'
+
+window.App = App.create()

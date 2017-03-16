@@ -1,7 +1,5 @@
-require [
-  'react'
-  'jsx/choose_mastery_path/index'
-], (React, App) ->
+import React from 'react'
+import App from 'jsx/choose_mastery_path/index'
 
-  root = document.getElementById('content')
-  app = App.init(ENV.CHOOSE_MASTERY_PATH_DATA, root)
+const root = document.getElementById('content')
+App.init(ENV.CHOOSE_MASTERY_PATH_DATA, root)

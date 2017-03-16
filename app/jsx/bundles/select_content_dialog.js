@@ -1,2 +1,1 @@
-require ['select_content_dialog']
-
+import 'select_content_dialog'

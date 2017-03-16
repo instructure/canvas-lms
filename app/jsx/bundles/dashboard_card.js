@@ -1,19 +1,16 @@
-require [
-  'jquery'
-  'underscore'
-  'react'
-  'react-dom'
-  'jsx/dashboard_card/DashboardCardBox',
-  'jsx/dashboard_card/getDroppableDashboardCardBox'
-], ($, _, React, ReactDOM, DashboardCardBox, getDroppableDashboardCardBox, StudentContextTray, StudentCardStore) ->
+import $ from 'jquery'
+import _ from 'underscore'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import DashboardCardBox from 'jsx/dashboard_card/DashboardCardBox'
+import getDroppableDashboardCardBox from 'jsx/dashboard_card/getDroppableDashboardCardBox'
 
-  component = if ENV.DASHBOARD_REORDERING_ENABLED then getDroppableDashboardCardBox() else DashboardCardBox
+const component = ENV.DASHBOARD_REORDERING_ENABLED ? getDroppableDashboardCardBox() : DashboardCardBox
 
-  element = React.createElement(component, {
-    courseCards: ENV.DASHBOARD_COURSES,
-    reorderingEnabled: ENV.DASHBOARD_REORDERING_ENABLED
-  })
+const element = React.createElement(component, {
+  courseCards: ENV.DASHBOARD_COURSES,
+  reorderingEnabled: ENV.DASHBOARD_REORDERING_ENABLED
+})
 
-  dashboardContainer = document.getElementById('DashboardCard_Container')
-  ReactDOM.render(element, dashboardContainer)
-
+const dashboardContainer = document.getElementById('DashboardCard_Container')
+ReactDOM.render(element, dashboardContainer)

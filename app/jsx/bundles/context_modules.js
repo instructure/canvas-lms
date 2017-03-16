@@ -1,7 +1,6 @@
-require [
-  'jquery'
-  'context_modules'
-], ($) ->
+import $ from 'jquery'
+import 'context_modules'
 
-  if ENV.NO_MODULE_PROGRESSIONS
-    $('.module_progressions_link').remove()
+if (ENV.NO_MODULE_PROGRESSIONS) {
+  $('.module_progressions_link').remove()
+}

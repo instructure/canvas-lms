@@ -1,71 +1,82 @@
-#
-# Copyright (C) 2012 Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
-#
+//
+// Copyright (C) 2012 Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
+//
 
-require [
-  'i18n!outcomes'
-  'jquery'
-  'underscore'
-  'compiled/models/OutcomeGroup'
-  'compiled/views/outcomes/FindDialog'
-  'compiled/views/outcomes/FindDirectoryView'
-  'question_bank'
-  'jst/quiz/move_question'
-], (I18n, $, {map}, OutcomeGroup, FindDialog, FindDirectoryView, {updateAlignments, attachPageEvents}) ->
-  class QuestionBankPage
-    $els: {}
+import I18n from 'i18n!outcomes'
+import $ from 'jquery'
+import {map} from 'underscore'
+import OutcomeGroup from 'compiled/models/OutcomeGroup'
+import FindDialog from 'compiled/views/outcomes/FindDialog'
+import FindDirectoryView from 'compiled/views/outcomes/FindDirectoryView'
+import {updateAlignments, attachPageEvents} from 'question_bank'
+import 'jst/quiz/move_question'
 
-    translations:
-      findOutcome: I18n.t('titles.find_outcomes', 'Find Outcomes')
+class QuestionBankPage {
+  static initClass () {
+    this.prototype.$els = {}
 
-    constructor: ->
-      @rootOutcomeGroup = new OutcomeGroup(ENV.ROOT_OUTCOME_GROUP)
-      @cacheElements()
-      @attachEvents()
+    this.prototype.translations =
+        {findOutcome: I18n.t('titles.find_outcomes', 'Find Outcomes')}
+  }
 
-    cacheElements: ->
-      @$els.addOutcome = $('.add_outcome_link')
-      @$els.dialog = new FindDialog
-        title: @translations.findOutcome
-        selectedGroup: @rootOutcomeGroup
-        setQuizMastery: true
-        shouldImport: false
-        disableGroupImport: true
-        rootOutcomeGroup: @rootOutcomeGroup
+  constructor () {
+    this.onAddOutcome = this.onAddOutcome.bind(this)
+    this.rootOutcomeGroup = new OutcomeGroup(ENV.ROOT_OUTCOME_GROUP)
+    this.cacheElements()
+    this.attachEvents()
+  }
 
-    attachEvents: ->
-      @$els.addOutcome.on('click', @onAddOutcome)
-      @$els.dialog.on('import', @onOutcomeImport)
+  cacheElements () {
+    this.$els.addOutcome = $('.add_outcome_link')
+    return this.$els.dialog = new FindDialog({
+      title: this.translations.findOutcome,
+      selectedGroup: this.rootOutcomeGroup,
+      setQuizMastery: true,
+      shouldImport: false,
+      disableGroupImport: true,
+      rootOutcomeGroup: this.rootOutcomeGroup
+    })
+  }
 
-    onAddOutcome: (e) =>
-      e.preventDefault()
-      @$els.dialog.show()
+  attachEvents () {
+    this.$els.addOutcome.on('click', this.onAddOutcome)
+    return this.$els.dialog.on('import', this.onOutcomeImport)
+  }
 
-    onOutcomeImport: (outcome) ->
-      mastery = (outcome.quizMasteryLevel / 100.0) or 1.0
-      alignments = map $('#aligned_outcomes_list .outcome:not(.blank)'), (o) ->
-        $outcome = $(o)
-        [id, percent] = [$outcome.data('id'), ($outcome.getTemplateData(textValues: ['mastery_threshold']).mastery_threshold) / 100.0]
-        if id isnt outcome.get('id') then [id, percent] else null
-      alignments.push([outcome.get('id'), mastery])
-      updateAlignments(alignments)
+  onAddOutcome (e) {
+    e.preventDefault()
+    return this.$els.dialog.show()
+  }
+
+  onOutcomeImport (outcome) {
+    const mastery = (outcome.quizMasteryLevel / 100.0) || 1.0
+    const alignments = map($('#aligned_outcomes_list .outcome:not(.blank)'), (o) => {
+      const $outcome = $(o)
+      const [id, percent] = Array.from([$outcome.data('id'), ($outcome.getTemplateData({textValues: ['mastery_threshold']}).mastery_threshold) / 100.0])
+      if (id !== outcome.get('id')) { return [id, percent] } return null
+    })
+    alignments.push([outcome.get('id'), mastery])
+    return updateAlignments(alignments)
+  }
+  }
+QuestionBankPage.initClass()
 
 
-  $(document).ready ->
-    new QuestionBankPage
-    attachPageEvents()
-
+$(document).ready(() => {
+  new QuestionBankPage()
+  attachPageEvents()
+})

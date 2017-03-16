@@ -1,2 +1,1 @@
-require ['file_inline']
-
+import 'file_inline'

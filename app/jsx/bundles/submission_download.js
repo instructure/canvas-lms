@@ -1,1 +1,1 @@
-require ['submission_download']
+import 'submission_download'

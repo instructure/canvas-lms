@@ -1,2 +1,1 @@
-require ['ldap_settings_test']
-
+import 'ldap_settings_test'

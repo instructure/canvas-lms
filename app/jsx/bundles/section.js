@@ -1,2 +1,1 @@
-require ['section']
-
+import 'section'

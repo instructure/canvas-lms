@@ -1,13 +1,9 @@
-require [
-  'jquery'
-  'compiled/views/groups/manage/GroupCategoriesView'
-  'compiled/collections/GroupCategoryCollection'
-], ($, GroupCategoriesView, GroupCategoryCollection) ->
+import $ from 'jquery'
+import GroupCategoriesView from 'compiled/views/groups/manage/GroupCategoriesView'
+import GroupCategoryCollection from 'compiled/collections/GroupCategoryCollection'
 
-  groupCategories = new GroupCategoryCollection(ENV.group_categories)
+const groupCategories = new GroupCategoryCollection(ENV.group_categories)
 
-  app = new GroupCategoriesView
-    collection: groupCategories
-  app.render()
-  $('#content').html app.$el
-
+const app = new GroupCategoriesView({collection: groupCategories})
+app.render()
+$('#content').html(app.$el)

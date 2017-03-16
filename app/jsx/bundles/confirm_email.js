@@ -1,1 +1,1 @@
-require ['compiled/profile/confirmEmail']
+import 'compiled/profile/confirmEmail'

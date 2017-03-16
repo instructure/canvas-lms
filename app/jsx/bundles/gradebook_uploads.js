@@ -1,2 +1,4 @@
-require [ 'jquery', 'gradebook_uploads'], ($, GradebookUploader) ->
-  $(GradebookUploader.handleThingsNeedingToBeResolved)
+import $ from 'jquery'
+import GradebookUploader from 'gradebook_uploads'
+
+$(GradebookUploader.handleThingsNeedingToBeResolved)

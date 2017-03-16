@@ -1,1 +1,1 @@
-require ['compiled/registration/main']
+import 'compiled/registration/main'

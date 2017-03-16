@@ -1,5 +1,3 @@
-require [
-  'jsx/collaborations/router'
-], (router) ->
+import router from 'jsx/collaborations/router'
 
-  router.start()
+router.start()

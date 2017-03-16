@@ -1,2 +1,1 @@
-require ['datagrid']
-
+import 'datagrid'

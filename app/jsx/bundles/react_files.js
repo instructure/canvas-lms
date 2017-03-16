@@ -1,5 +1,3 @@
-require [
-  'jsx/files/router'
-], (router) ->
+import router from 'jsx/files/router'
 
-  router.start()
+router.start()

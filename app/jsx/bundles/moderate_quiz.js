@@ -1,1 +1,2 @@
-require ['quiz_timing', 'moderate_quiz']
+import 'quiz_timing'
+import 'moderate_quiz'

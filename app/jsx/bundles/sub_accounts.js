@@ -1,2 +1,1 @@
-require ['sub_accounts']
-
+import 'sub_accounts'

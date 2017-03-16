@@ -1,15 +1,16 @@
-require [
-  'jquery'
-  'react'
-  'react-dom'
-  'jsx/outcomes/OutcomeAlignmentDeleteLink'
-], ($, React, ReactDOM, OutcomeAlignmentDeleteLink) ->
-  $('li.alignment').each (_, li) ->
-    $div = $(li).find('div.links')[0]
+import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import OutcomeAlignmentDeleteLink from 'jsx/outcomes/OutcomeAlignmentDeleteLink'
 
-    OutcomeLink = React.createElement(OutcomeAlignmentDeleteLink, {
-      has_rubric_association: $(li).data('has-rubric-association'),
-      url: $(li).data('url')
-    })
+$('li.alignment').each((_, li) => {
+  const $div = $(li).find('div.links')[0]
 
-    ReactDOM.render(OutcomeLink, $div)
+  ReactDOM.render(
+    <OutcomeAlignmentDeleteLink
+      has_rubric_association={$(li).data('has-rubric-association')}
+      url={$(li).data('url')}
+    />,
+    $div
+  )
+})

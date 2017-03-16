@@ -1,8 +1,8 @@
-require [
-  'react'
-  'react-dom'
-  'jsx/theme_editor/CollectionView'
-], (React, ReactDOM, CollectionView) ->
+import React from 'react'
+import ReactDOM from 'react-dom'
+import CollectionView from 'jsx/theme_editor/CollectionView'
 
-  el = React.createElement(CollectionView, window.ENV.brandConfigStuff)
-  ReactDOM.render(el, document.getElementById('content'))
+ReactDOM.render(
+  <CollectionView {...window.ENV.brandConfigStuff} />,
+  document.getElementById('content')
+)

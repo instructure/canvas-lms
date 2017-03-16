@@ -1,1 +1,1 @@
-require ['compiled/jquery/ModuleSequenceFooter']
+import 'compiled/jquery/ModuleSequenceFooter'

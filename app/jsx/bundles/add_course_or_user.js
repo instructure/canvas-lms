@@ -1,4 +1,2 @@
-require [
-  'account_add_user'
-  'account_add_course'
-]
+import 'account_add_user'
+import 'account_add_course'

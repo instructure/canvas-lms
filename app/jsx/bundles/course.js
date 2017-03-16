@@ -1,2 +1,1 @@
-require ['course']
-
+import 'course'

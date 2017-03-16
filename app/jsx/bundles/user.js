@@ -1,2 +1,1 @@
-require ['user']
-
+import 'user'
