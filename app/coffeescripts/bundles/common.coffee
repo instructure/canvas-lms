@@ -1,4 +1,4 @@
-require [
+define [
   # true modules that we use in this file
   'jquery'
   'underscore'
