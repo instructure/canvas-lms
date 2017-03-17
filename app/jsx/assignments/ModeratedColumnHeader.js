@@ -2,120 +2,152 @@ import React from 'react'
 import Constants from './constants'
 import I18n from 'i18n!moderated_grading'
 
-  var ModeratedColumnHeader = React.createClass({
-    displayName: 'ModeratedColumnHeader',
+const ModeratedColumnHeader = React.createClass({
+  displayName: 'ModeratedColumnHeader',
 
-    propTypes: {
-      markColumn: React.PropTypes.string,
-      sortDirection: React.PropTypes.string,
-      includeModerationSetHeaders: React.PropTypes.bool,
-      handleSortMark1: React.PropTypes.func.isRequired,
-      handleSortMark2: React.PropTypes.func.isRequired,
-      handleSortMark3: React.PropTypes.func.isRequired,
-      handleSelectAll: React.PropTypes.func.isRequired,
-      permissions: React.PropTypes.shape({
-        viewGrades: React.PropTypes.bool.isRequired
-      }).isRequired
-    },
+  propTypes: {
+    markColumn: React.PropTypes.string.isRequired,
+    sortDirection: React.PropTypes.string,
+    includeModerationSetHeaders: React.PropTypes.bool.isRequired,
+    handleSortMark1: React.PropTypes.func.isRequired,
+    handleSortMark2: React.PropTypes.func.isRequired,
+    handleSortMark3: React.PropTypes.func.isRequired,
+    handleSelectAll: React.PropTypes.func.isRequired,
+    permissions: React.PropTypes.shape({
+      viewGrades: React.PropTypes.bool.isRequired
+    }).isRequired
+  },
 
-    renderLinkArrow (mark) {
-      if (mark === this.props.markColumn){
-        if (this.props.sortDirection === Constants.sortDirections.DESCENDING){
-          return (<i className='icon-mini-arrow-down'></i>);
-        } else {
-          return (<i className='icon-mini-arrow-up'></i>);
-        }
-      }
-    },
+  onSelectAllBlurred () {
+    this.checkbox.setAttribute('aria-label', '');
+  },
 
-    labelSortOrder(mark) {
-      if (mark === this.props.markColumn){
-        if (this.props.sortDirection === Constants.sortDirections.DESCENDING){
-          return I18n.t('Sorted descending.');
-        } else {
-          return I18n.t('Sorted ascending.');
-        }
-      }
-    },
+  onSelectAllFocused () {
+    this.checkbox.setAttribute('aria-label', I18n.t('Select all students'));
+  },
 
-    renderCheckbox () {
-      return this.props.permissions.viewGrades && (
+  labelSortOrder (mark) {
+    if (mark !== this.props.markColumn) {
+      return '';
+    }
+
+    switch (this.props.sortDirection) {
+      case Constants.sortDirections.DESCENDING:
+        return I18n.t('sorted descending');
+      case Constants.sortDirections.ASCENDING:
+        return I18n.t('sorted ascending');
+      default:
+        return '';
+    }
+  },
+
+  renderLinkArrow (mark) {
+    if (mark !== this.props.markColumn) {
+      return null;
+    }
+
+    if (this.props.sortDirection === Constants.sortDirections.DESCENDING) {
+      return (<i className="icon-mini-arrow-down" />);
+    }
+
+    return (<i className="icon-mini-arrow-up" />);
+  },
+
+  renderCheckbox () {
+    if (!this.props.permissions.viewGrades) {
+      return (
+        <th scope="col" className="ColumnHeader__Selector">&nbsp;</th>
+      );
+    }
+
+    return (
+      <th
+        scope="col"
+        className="ColumnHeader__Selector"
+        onBlur={this.onSelectAllBlurred}
+        onFocus={this.onSelectAllFocused}
+      >
         <input
           ref={(c) => { this.checkbox = c; }}
           type="checkbox"
-          aria-label={I18n.t('Select all students')}
           onChange={this.props.handleSelectAll}
         />
+      </th>
+    );
+  },
+
+  renderStudentColumnHeader () {
+    return (
+      <th scope="col" className="ModeratedColumnHeader__StudentName ColumnHeader__Item">
+        <span>{I18n.t('Student')}</span>
+      </th>
+    );
+  },
+
+  renderFirstReviewerColumnHeader () {
+    return (
+      <th scope="col" className="ModeratedColumnHeader__Mark ColumnHeader__Item">
+        <a
+          href="#"
+          onClick={this.props.handleSortMark1}
+        >
+          <span aria-label={I18n.t('First reviewer %{sortOrder}', { sortOrder: this.labelSortOrder(Constants.markColumnNames.MARK_ONE) })}>
+            {I18n.t('1st Reviewer')}&nbsp;{this.renderLinkArrow(Constants.markColumnNames.MARK_ONE)}
+          </span>
+        </a>
+      </th>
+    );
+  },
+
+  render () {
+    if (this.props.includeModerationSetHeaders) {
+      return (
+        <thead>
+          <tr className="ModeratedColumnHeader">
+            {this.renderCheckbox()}
+            {this.renderStudentColumnHeader()}
+            {this.renderFirstReviewerColumnHeader()}
+
+            <th scope="col" className="ModeratedColumnHeader__Mark ColumnHeader__Item">
+              <a
+                href="#"
+                onClick={this.props.handleSortMark2}
+              >
+                <span aria-label={`${I18n.t('Second reviewer')} ${this.labelSortOrder(Constants.markColumnNames.MARK_TWO)}`}>
+                  {I18n.t('2nd Reviewer')}&nbsp;{this.renderLinkArrow(Constants.markColumnNames.MARK_TWO)}
+                </span>
+              </a>
+            </th>
+
+            <th scope="col" className="ModeratedColumnHeader__Mark ColumnHeader__Item">
+              <a
+                href="#"
+                onClick={this.props.handleSortMark3}
+              >
+                <span aria-label={I18n.t('Moderator %{sortOrder}', { sortOrder: this.labelSortOrder(Constants.markColumnNames.MARK_THREE) })}>
+                  {I18n.t('Moderator')}&nbsp;{this.renderLinkArrow(Constants.markColumnNames.MARK_THREE)}
+                </span>
+              </a>
+            </th>
+
+            <th scope="col" className="ColumnHeader__FinalGrade ColumnHeader__Item">
+              {I18n.t('Grade')}
+            </th>
+          </tr>
+        </thead>
       );
-    },
-
-    render () {
-      if (this.props.includeModerationSetHeaders) {
-        return (
-          <div className='grid-row ModeratedColumnHeader' role="row">
-            <div className='col-xs-4'>
-              <div className='ModeratedColumnHeader__StudentName ColumnHeader__Item' role="columnheader">
-                {this.renderCheckbox()}
-                <span>{I18n.t('Student')}</span>
-              </div>
-            </div>
-
-            <div className='col-xs-2'>
-              <div className='ModeratedColumnHeader__Mark ColumnHeader__Item' role="columnheader">
-                <a href='#' onClick={this.props.handleSortMark1}>
-                  <span className='screenreader-only'>{I18n.t('First reviewer')} {this.labelSortOrder(Constants.markColumnNames.MARK_ONE)}</span>
-                  <span aria-hidden='true'>{I18n.t('1st Reviewer')} {this.renderLinkArrow(Constants.markColumnNames.MARK_ONE)}</span>
-                </a>
-              </div>
-            </div>
-
-            <div className='col-xs-2'>
-              <div className='ColumnHeader__Mark ColumnHeader__Item' role="columnheader">
-                <a href='#' onClick={this.props.handleSortMark2}>
-                  <span className='screenreader-only'>{I18n.t('Second reviewer')} {this.labelSortOrder(Constants.markColumnNames.MARK_TWO)}</span>
-                  <span aria-hidden='true'>{I18n.t('2nd Reviewer')} {this.renderLinkArrow(Constants.markColumnNames.MARK_TWO)}</span>
-                </a>
-              </div>
-            </div>
-
-            <div className='col-xs-2'>
-              <div className='ColumnHeader__Mark ColumnHeader__Item' role="columnheader">
-                <a href='#' onClick={this.props.handleSortMark3}>
-                  <span className='screenreader-only'>{I18n.t('Moderator')} {this.labelSortOrder(Constants.markColumnNames.MARK_THREE)}</span>
-                  <span aria-hidden='true'>{I18n.t('Moderator')} {this.renderLinkArrow(Constants.markColumnNames.MARK_THREE)}</span>
-                </a>
-              </div>
-            </div>
-
-            <div className='col-xs-2'>
-              <div className='ColumnHeader__FinalGrade ColumnHeader__Item' role="columnheader">
-                <span>{I18n.t('Grade')}</span>
-              </div>
-            </div>
-          </div>
-        );
-      } else {
-        return (
-          <div className='grid-row ColumnHeader' role="row">
-            <div className='col-xs-4'>
-              <div className='ColumnHeader__StudentName ColumnHeader__Item' role="columnheader">
-                {this.renderCheckbox()}
-                <span>{I18n.t('Student')}</span>
-              </div>
-            </div>
-
-            <div className='col-xs-2'>
-              <div className='ColumnHeader__Mark ColumnHeader__Item' role="columnheader">
-                <a href='#' onClick={this.props.handleSortMark1}>
-                  <span className='screenreader-only'>{I18n.t('First reviewer')} {this.labelSortOrder(Constants.markColumnNames.MARK_ONE)}</span>
-                  <span aria-hidden='true'>{I18n.t('1st Reviewer')} {this.renderLinkArrow(Constants.markColumnNames.MARK_ONE)}</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        );
-      }
     }
-  });
+
+    return (
+      <thead>
+        <tr className="ModeratedColumnHeader">
+          {this.renderCheckbox()}
+          {this.renderStudentColumnHeader()}
+          {this.renderFirstReviewerColumnHeader()}
+        </tr>
+      </thead>
+    );
+  }
+});
 
 export default ModeratedColumnHeader
