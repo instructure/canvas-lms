@@ -436,7 +436,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def turnitin_settings=(settings)
-    settings = Turnitin::Client.normalize_assignment_turnitin_settings(settings)
+    if vericite_enabled?
+      settings = VeriCite::Client.normalize_assignment_vericite_settings(settings)
+    else
+      settings = Turnitin::Client.normalize_assignment_turnitin_settings(settings)
+    end
     unless settings.blank?
       [:created, :error].each do |key|
         settings[key] = self.turnitin_settings[key] if self.turnitin_settings[key]
