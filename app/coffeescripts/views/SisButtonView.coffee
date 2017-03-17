@@ -16,6 +16,11 @@ define [
     # text used to describe the SIS NAME
     @optionProperty 'sisName'
 
+    # {boolean}
+    # boolean used to determine if due date
+    # is required
+    @optionProperty 'dueDateRequired'
+
     setAttributes: ->
       newSisAttributes = @sisAttributes()
       @$input.attr({
@@ -29,8 +34,11 @@ define [
       e.preventDefault()
       sisUrl = @model.get('toggle_post_to_sis_url')
       c = @model.postToSIS()
-      @model.postToSIS(!c)
-      if sisUrl
+      errors = @errorsExist()
+      if !c == true && errors['has_error'] == true
+        $.flashWarning(errors['message'])
+      else if sisUrl
+        @model.postToSIS(!c)
         @model.save({ override_dates: false }, {
           type: 'POST',
           url: sisUrl,
@@ -38,10 +46,44 @@ define [
             @setAttributes()
         })
       else
+        @model.postToSIS(!c)
         @model.save({ override_dates: false }, {
           success: =>
             @setAttributes()
         })
+
+    errorsExist: =>
+      errors = {}
+      name = @modelName()
+      base_message = "Unable to sync with #{@sisName}."
+      if @dueDateErrorExists() && @nameLengthErrorExists()
+        errors['has_error'] = true
+        errors['message'] = I18n.t("%{base_message} Please make sure %{name} has a due date and name is not too long.", name: name, base_message: base_message)
+      else if @dueDateErrorExists()
+        errors['has_error'] = true
+        errors['message'] = I18n.t("%{base_message} Please make sure %{name} has a due date.", name: name, base_message: base_message)
+      else if @nameLengthErrorExists()
+        errors['has_error'] = true
+        errors['message'] = I18n.t("%{base_message} Please make sure %{name} name is not too long.", name: name, base_message: base_message)
+      errors
+
+    modelName: =>
+      if @model.constructor.name == 'Assignment'
+        @model.name()
+      else if @model.constructor.name == 'Quiz'
+        @model.attributes.title
+
+    dueDateErrorExists: =>
+      if @model.constructor.name == 'Assignment'
+        @dueDateRequired && @model.dueAt() == null
+      else if @model.constructor.name == 'Quiz'
+        @dueDateRequired && @model.attributes.due_at == undefined
+
+    nameLengthErrorExists: =>
+      if @model.constructor.name == 'Assignment'
+        @model.name().length > @model.maxNameLength()
+      else if @model.constructor.name == 'Quiz'
+        @model.attributes.title.length > @model.maxNameLength()
 
     sisAttributes: =>
       if @model.postToSIS()

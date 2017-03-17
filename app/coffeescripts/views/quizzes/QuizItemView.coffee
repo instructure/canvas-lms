@@ -47,7 +47,7 @@ define [
       if @canManage()
         @publishIconView = new PublishIconView(model: @model)
         if @model.postToSISEnabled()
-          @sisButtonView = new SisButtonView(model: @model, sisName: @model.postToSISName())
+          @sisButtonView = new SisButtonView(model: @model, sisName: @model.postToSISName(), dueDateRequired: @model.dueDateRequiredForAccount())
 
       @dateDueColumnView       = new DateDueColumnView(model: @model)
       @dateAvailableColumnView = new DateAvailableColumnView(model: @model)

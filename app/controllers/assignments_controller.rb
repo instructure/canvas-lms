@@ -44,6 +44,7 @@ class AssignmentsController < ApplicationController
       max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)
       max_name_length = AssignmentUtil.assignment_max_name_length(@context)
       sis_name = AssignmentUtil.post_to_sis_friendly_name(@context)
+      due_date_required_for_account = AssignmentUtil.due_date_required_for_account?(@context)
 
       # It'd be nice to do this as an after_create, but it's not that simple
       # because of course import/copy.
@@ -57,7 +58,8 @@ class AssignmentsController < ApplicationController
         SIS_NAME: sis_name,
         MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT: max_name_length_required_for_account,
         MAX_NAME_LENGTH: max_name_length,
-        QUIZ_LTI_ENABLED: @context.quiz_lti_tool.present?
+        QUIZ_LTI_ENABLED: @context.quiz_lti_tool.present?,
+        DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account
       }
       js_env(hash)
 

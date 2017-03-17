@@ -316,6 +316,12 @@ define [
     postToSISName: =>
       return ENV.SIS_NAME
 
+    maxNameLength: =>
+      return ENV.MAX_NAME_LENGTH
+
+    dueDateRequiredForAccount: =>
+      return ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
+
     defaultDates: =>
       group = new DateGroup
         due_at:    @get("due_at")

@@ -147,6 +147,12 @@ define [
     postToSISName: =>
       return ENV.SIS_NAME
 
+    maxNameLength: =>
+      return ENV.MAX_NAME_LENGTH
+
+    dueDateRequiredForAccount: =>
+      return ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
+
     toView: =>
       fields = [
         'htmlUrl', 'multipleDueDates', 'nonBaseDates', 'allDates', 'dueAt', 'lockAt', 'unlockAt', 'singleSectionDueDate'
