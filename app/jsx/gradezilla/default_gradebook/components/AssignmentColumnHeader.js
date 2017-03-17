@@ -21,10 +21,10 @@ import IconMoreSolid from 'instructure-icons/react/Solid/IconMoreSolid'
 import IconMutedSolid from 'instructure-icons/react/Solid/IconMutedSolid'
 import IconWarningSolid from 'instructure-icons/react/Solid/IconWarningSolid'
 import Link from 'instructure-ui/Link'
-import { MenuItem } from 'instructure-ui/Menu'
+import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/Menu'
 import PopoverMenu from 'instructure-ui/PopoverMenu'
 import Typography from 'instructure-ui/Typography'
-import messageStudents from 'message_students'
+import 'message_students'
 import MessageStudentsWhoHelper from 'jsx/gradezilla/shared/helpers/messageStudentsWhoHelper'
 import I18n from 'i18n!gradebook'
 
@@ -46,6 +46,17 @@ class AssignmentColumnHeader extends React.Component {
     curveGradesAction: shape({
       isDisabled: bool.isRequired,
       onSelect: func.isRequired
+    }).isRequired,
+    sortBySetting: shape({
+      direction: string.isRequired,
+      disabled: bool.isRequired,
+      isSortColumn: bool.isRequired,
+      onSortByGradeAscending: func.isRequired,
+      onSortByGradeDescending: func.isRequired,
+      onSortByLate: func.isRequired,
+      onSortByMissing: func.isRequired,
+      onSortByUnposted: func.isRequired,
+      settingKey: string.isRequired
     }).isRequired,
     students: arrayOf(shape({
       isInactive: bool.isRequired,
@@ -98,6 +109,7 @@ class AssignmentColumnHeader extends React.Component {
   constructor (props) {
     super(props);
 
+    this.bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref };
     this.showMessageStudentsWhoDialog = this.showMessageStudentsWhoDialog.bind(this);
   }
 
@@ -167,6 +179,9 @@ class AssignmentColumnHeader extends React.Component {
   }
 
   render () {
+    const { sortBySetting } = this.props;
+    const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey;
+
     return (
       <div className="Gradebook__ColumnHeaderContent">
         <span className="Gradebook__ColumnHeaderDetail">
@@ -176,7 +191,55 @@ class AssignmentColumnHeader extends React.Component {
           </Typography>
         </span>
 
-        <PopoverMenu zIndex="9999" trigger={this.renderTrigger()}>
+        <PopoverMenu
+          contentRef={this.bindOptionsMenuContent}
+          trigger={this.renderTrigger()}
+          zIndex="9999"
+        >
+          <MenuItemGroup label={I18n.t('Sort by')}>
+            <MenuItem
+              selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'ascending'}
+              disabled={sortBySetting.disabled}
+              onSelect={sortBySetting.onSortByGradeAscending}
+            >
+              <span>{I18n.t('Grade - Low to High')}</span>
+            </MenuItem>
+
+            <MenuItem
+              selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'descending'}
+              disabled={sortBySetting.disabled}
+              onSelect={sortBySetting.onSortByGradeDescending}
+            >
+              <span>{I18n.t('Grade - High to Low')}</span>
+            </MenuItem>
+
+            <MenuItem
+              selected={selectedSortSetting === 'missing'}
+              disabled={sortBySetting.disabled}
+              onSelect={sortBySetting.onSortByMissing}
+            >
+              <span>{I18n.t('Missing')}</span>
+            </MenuItem>
+
+            <MenuItem
+              selected={selectedSortSetting === 'late'}
+              disabled={sortBySetting.disabled}
+              onSelect={sortBySetting.onSortByLate}
+            >
+              <span>{I18n.t('Late')}</span>
+            </MenuItem>
+
+            <MenuItem
+              selected={selectedSortSetting === 'unposted'}
+              disabled={sortBySetting.disabled}
+              onSelect={sortBySetting.onSortByUnposted}
+            >
+              <span>{I18n.t('Unposted')}</span>
+            </MenuItem>
+          </MenuItemGroup>
+
+          <MenuItemSeparator />
+
           <MenuItem
             disabled={this.props.assignmentDetailsAction.disabled}
             onSelect={this.props.assignmentDetailsAction.onSelect}

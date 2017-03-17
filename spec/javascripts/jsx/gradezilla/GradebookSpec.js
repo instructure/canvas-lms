@@ -815,11 +815,18 @@ test('when editable, calls SubmissionDetailsDialog', function () {
 QUnit.module('Menus', {
   setup () {
     this.fixtures = document.getElementById('fixtures');
+    fakeENV.setup({
+      current_user_id: '1',
+      GRADEBOOK_OPTIONS: {
+        context_url: 'http://someUrl/',
+        outcome_gradebook_enabled: true
+      }
+    });
   },
 
   teardown () {
     this.fixtures.innerHTML = '';
-    window.ENV = {};
+    fakeENV.teardown();
   }
 });
 
@@ -832,9 +839,6 @@ test('ViewOptionsMenu is rendered on renderViewOptionsMenu', function () {
 
 test('ActionMenu is rendered on renderActionMenu', function () {
   this.fixtures.innerHTML = '<span data-component="ActionMenu"></span>';
-  window.ENV = {
-    current_user_id: '1'
-  };
   const self = {
     options: {
       gradebook_is_editable: true,
@@ -850,12 +854,6 @@ test('ActionMenu is rendered on renderActionMenu', function () {
 
 test('GradebookMenu is rendered on renderGradebookMenu', function () {
   this.fixtures.innerHTML = '<span data-component="GradebookMenu" data-variant="DefaultGradebook"></span>';
-  window.ENV = {
-    GRADEBOOK_OPTIONS: {
-      context_url: 'http://someUrl/',
-      outcome_gradebook_enabled: true
-    }
-  };
   const self = {
     options: {
       assignmentOrOutcome: 'assignment',
@@ -879,15 +877,10 @@ QUnit.module('addRow', {
   }
 });
 
-test('does not add filtered out users', () => {
-  const gb = {
-    sections_enabled: true,
-    sections: {1: {name: 'Section 1'}, 2: {name: 'Section 2'}},
-    options: {},
-    rows: [],
-    sectionToShow: '2', // this is the filter
-    ...Gradebook.prototype
-  };
+test('does not add filtered out users', function () {
+  const gradebook = createGradebook({ sections: { 1: { name: 'Section 1' }, 2: { name: 'Section 2' }} });
+  gradebook.sections_enabled = true;
+  gradebook.sectionToShow = '2';
 
   const student1 = {
     enrollments: [{grades: {}}],
@@ -896,13 +889,306 @@ test('does not add filtered out users', () => {
   };
   const student2 = {...student1, sections: ['2']};
   const student3 = {...student1, sections: ['2']};
-  [student1, student2, student3].forEach(s => gb.addRow(s));
+  [student1, student2, student3].forEach((student) => { gradebook.addRow(student) });
 
   ok(student1.row == null, 'filtered out students get no row number');
   ok(student2.row === 0, 'other students do get a row number');
   ok(student3.row === 1, 'row number increments');
-  ok(_.isEqual(gb.rows, [student2, student3]));
+  ok(_.isEqual(gradebook.rows, [student2, student3]));
 });
+
+QUnit.module('sortByStudentColumn', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.studentA = { sortable_name: 'Ford, Betty' };
+    this.studentB = { sortable_name: 'Jones, Adam' };
+    this.stub(this.gradebook, 'sortRowsBy').callsFake(sortFn => sortFn(this.studentA, this.studentB));
+    this.stub(this.gradebook, 'localeSort');
+  }
+});
+
+test('sorts the gradebook rows', function () {
+  this.gradebook.sortByCustomColumn('sortable_name', 'ascending');
+  equal(this.gradebook.sortRowsBy.callCount, 1);
+});
+
+test('sorts using localeSort when the settingKey is "sortable_name"', function () {
+  this.gradebook.sortByCustomColumn('sortable_name', 'ascending');
+  equal(this.gradebook.localeSort.callCount, 1);
+});
+
+test('sorts by sortable_name using the "sortable_name" field on students', function () {
+  this.gradebook.sortByCustomColumn('sortable_name', 'ascending');
+  const [studentA, studentB] = this.gradebook.localeSort.getCall(0).args;
+  equal(studentA, 'Ford, Betty', 'studentA sortable_name is in first position');
+  equal(studentB, 'Jones, Adam', 'studentB sortable_name is in second position');
+});
+
+test('optionally sorts in descending order', function () {
+  this.gradebook.sortByCustomColumn('sortable_name', 'descending');
+  const [studentA, studentB] = this.gradebook.localeSort.getCall(0).args;
+  equal(studentA, 'Jones, Adam', 'studentB sortable_name is in first position');
+  equal(studentB, 'Ford, Betty', 'studentA sortable_name is in second position');
+});
+
+QUnit.module('sortByCustomColumn', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.studentA = { custom_col_501: 'Great at math' };
+    this.studentB = { custom_col_501: 'Tutors English' };
+    this.stub(this.gradebook, 'sortRowsBy').callsFake(sortFn => sortFn(this.studentA, this.studentB));
+    this.stub(this.gradebook, 'localeSort');
+  }
+});
+
+test('sorts the gradebook rows', function () {
+  this.gradebook.sortByCustomColumn('custom_col_501', 'ascending');
+  equal(this.gradebook.sortRowsBy.callCount, 1);
+});
+
+test('sorts using localeSort', function () {
+  this.gradebook.sortByCustomColumn('custom_col_501', 'ascending');
+  equal(this.gradebook.localeSort.callCount, 1);
+});
+
+test('sorts using student data stored with the columnId', function () {
+  this.gradebook.sortByCustomColumn('custom_col_501', 'ascending');
+  const [studentNoteA, studentNoteB] = this.gradebook.localeSort.getCall(0).args;
+  equal(studentNoteA, 'Great at math', 'studentA data is in first position');
+  equal(studentNoteB, 'Tutors English', 'studentB data is in second position');
+});
+
+test('optionally sorts in descending order', function () {
+  this.gradebook.sortByCustomColumn('custom_col_501', 'descending');
+  const [studentNoteA, studentNoteB] = this.gradebook.localeSort.getCall(0).args;
+  equal(studentNoteA, 'Tutors English', 'studentB data is in first position');
+  equal(studentNoteB, 'Great at math', 'studentA data is in second position');
+});
+
+QUnit.module('sortByAssignmentColumn', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.studentA = { name: 'Adam Jones' };
+    this.studentB = { name: 'Betty Ford' };
+    this.stub(this.gradebook, 'sortRowsBy').callsFake(sortFn => sortFn(this.studentA, this.studentB));
+    this.stub(this.gradebook, 'gradeSort');
+  }
+});
+
+test('sorts the gradebook rows', function () {
+  this.gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'ascending');
+  equal(this.gradebook.sortRowsBy.callCount, 1);
+});
+
+test('sorts using gradeSort when the settingKey is "grade"', function () {
+  this.gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'ascending');
+  equal(this.gradebook.gradeSort.callCount, 1);
+});
+
+test('sorts by grade using the columnId', function () {
+  this.gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'ascending');
+  const field = this.gradebook.gradeSort.getCall(0).args[2];
+  equal(field, 'assignment_201');
+});
+
+test('optionally sorts by grade in ascending order', function () {
+  this.gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'ascending');
+  const [studentA, studentB, /* field */, ascending] = this.gradebook.gradeSort.getCall(0).args;
+  equal(studentA, this.studentA, 'student A is in first position');
+  equal(studentB, this.studentB, 'student B is in second position');
+  equal(ascending, true, 'ascending is explicitly true');
+});
+
+test('optionally sorts by grade in descending order', function () {
+  this.gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'descending');
+  const [studentA, studentB, /* field */, ascending] = this.gradebook.gradeSort.getCall(0).args;
+  equal(studentA, this.studentA, 'student A is in first position');
+  equal(studentB, this.studentB, 'student B is in second position');
+  equal(ascending, false, 'ascending is explicitly false');
+});
+
+QUnit.module('sortByAssignmentGroupColumn', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.studentA = { name: 'Adam Jones' };
+    this.studentB = { name: 'Betty Ford' };
+    this.stub(this.gradebook, 'sortRowsBy').callsFake(sortFn => sortFn(this.studentA, this.studentB));
+    this.stub(this.gradebook, 'gradeSort');
+  }
+});
+
+test('sorts the gradebook rows', function () {
+  this.gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'ascending');
+  equal(this.gradebook.sortRowsBy.callCount, 1);
+});
+
+test('sorts by grade using gradeSort', function () {
+  this.gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'ascending');
+  equal(this.gradebook.gradeSort.callCount, 1);
+});
+
+test('sorts by grade using the columnId', function () {
+  this.gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'ascending');
+  const field = this.gradebook.gradeSort.getCall(0).args[2];
+  equal(field, 'assignment_group_301');
+});
+
+test('optionally sorts by grade in ascending order', function () {
+  this.gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'ascending');
+  const [studentA, studentB, /* field */, ascending] = this.gradebook.gradeSort.getCall(0).args;
+  equal(studentA, this.studentA, 'student A is in first position');
+  equal(studentB, this.studentB, 'student B is in second position');
+  equal(ascending, true, 'ascending is explicitly true');
+});
+
+test('optionally sorts by grade in descending order', function () {
+  this.gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'descending');
+  const [studentA, studentB, /* field */, ascending] = this.gradebook.gradeSort.getCall(0).args;
+  equal(studentA, this.studentA, 'student A is in first position');
+  equal(studentB, this.studentB, 'student B is in second position');
+  equal(ascending, false, 'ascending is explicitly false');
+});
+
+QUnit.module('sortByTotalGradeColumn', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.studentA = { name: 'Adam Jones' };
+    this.studentB = { name: 'Betty Ford' };
+    this.stub(this.gradebook, 'sortRowsBy').callsFake(sortFn => sortFn(this.studentA, this.studentB));
+    this.stub(this.gradebook, 'gradeSort');
+  }
+});
+
+test('sorts the gradebook rows', function () {
+  this.gradebook.sortByTotalGradeColumn('ascending');
+  equal(this.gradebook.sortRowsBy.callCount, 1);
+});
+
+test('sorts by grade using gradeSort', function () {
+  this.gradebook.sortByTotalGradeColumn('ascending');
+  equal(this.gradebook.gradeSort.callCount, 1);
+});
+
+test('sorts by "total_grade"', function () {
+  this.gradebook.sortByTotalGradeColumn('ascending');
+  const field = this.gradebook.gradeSort.getCall(0).args[2];
+  equal(field, 'total_grade');
+});
+
+test('optionally sorts by grade in ascending order', function () {
+  this.gradebook.sortByTotalGradeColumn('ascending');
+  const [studentA, studentB, /* field */, ascending] = this.gradebook.gradeSort.getCall(0).args;
+  equal(studentA, this.studentA, 'student A is in first position');
+  equal(studentB, this.studentB, 'student B is in second position');
+  equal(ascending, true, 'ascending is explicitly true');
+});
+
+test('optionally sorts by grade in descending order', function () {
+  this.gradebook.sortByTotalGradeColumn('descending');
+  const [studentA, studentB, /* field */, ascending] = this.gradebook.gradeSort.getCall(0).args;
+  equal(studentA, this.studentA, 'student A is in first position');
+  equal(studentB, this.studentB, 'student B is in second position');
+  equal(ascending, false, 'ascending is explicitly false');
+});
+
+QUnit.module('Gradebook#sortGridRows', {
+  setup () {
+    this.gradebook = createGradebook();
+  }
+});
+
+test('sorts by the student column by default', function () {
+  this.stub(this.gradebook, 'sortByStudentColumn');
+  this.gradebook.sortGridRows();
+  equal(this.gradebook.sortByStudentColumn.callCount, 1);
+});
+
+test('uses the saved sort setting for student column sorting', function () {
+  this.gradebook.setSortRowsBySetting('student_name', 'sortable_name', 'ascending');
+  this.stub(this.gradebook, 'sortByStudentColumn');
+  this.gradebook.sortGridRows();
+
+  const [settingKey, direction] = this.gradebook.sortByStudentColumn.getCall(0).args;
+  equal(settingKey, 'sortable_name', 'parameter 1 is the sort settingKey');
+  equal(direction, 'ascending', 'parameter 2 is the sort direction');
+});
+
+test('optionally sorts by a custom column', function () {
+  this.gradebook.setSortRowsBySetting('custom_col_501', null, 'ascending');
+  this.stub(this.gradebook, 'sortByCustomColumn');
+  this.gradebook.sortGridRows();
+  equal(this.gradebook.sortByCustomColumn.callCount, 1);
+});
+
+test('uses the saved sort setting for custom column sorting', function () {
+  this.gradebook.setSortRowsBySetting('custom_col_501', null, 'ascending');
+  this.stub(this.gradebook, 'sortByCustomColumn');
+  this.gradebook.sortGridRows();
+
+  const [columnId, direction] = this.gradebook.sortByCustomColumn.getCall(0).args;
+  equal(columnId, 'custom_col_501', 'parameter 1 is the sort columnId');
+  equal(direction, 'ascending', 'parameter 2 is the sort direction');
+});
+
+test('optionally sorts by an assignment column', function () {
+  this.gradebook.setSortRowsBySetting('assignment_201', 'grade', 'ascending');
+  this.stub(this.gradebook, 'sortByAssignmentColumn');
+  this.gradebook.sortGridRows();
+  equal(this.gradebook.sortByAssignmentColumn.callCount, 1);
+});
+
+test('uses the saved sort setting for assignment sorting', function () {
+  this.gradebook.setSortRowsBySetting('assignment_201', 'grade', 'ascending');
+  this.stub(this.gradebook, 'sortByAssignmentColumn');
+  this.gradebook.sortGridRows();
+
+  const [columnId, settingKey, direction] = this.gradebook.sortByAssignmentColumn.getCall(0).args;
+  equal(columnId, 'assignment_201', 'parameter 1 is the sort columnId');
+  equal(settingKey, 'grade', 'parameter 2 is the sort settingKey');
+  equal(direction, 'ascending', 'parameter 3 is the sort direction');
+});
+
+test('optionally sorts by an assignment group column', function () {
+  this.gradebook.setSortRowsBySetting('assignment_group_301', 'grade', 'ascending');
+  this.stub(this.gradebook, 'sortByAssignmentGroupColumn');
+  this.gradebook.sortGridRows();
+  equal(this.gradebook.sortByAssignmentGroupColumn.callCount, 1);
+});
+
+test('uses the saved sort setting for assignment group sorting', function () {
+  this.gradebook.setSortRowsBySetting('assignment_group_301', 'grade', 'ascending');
+  this.stub(this.gradebook, 'sortByAssignmentGroupColumn');
+  this.gradebook.sortGridRows();
+
+  const [columnId, settingKey, direction] = this.gradebook.sortByAssignmentGroupColumn.getCall(0).args;
+  equal(columnId, 'assignment_group_301', 'parameter 1 is the sort columnId');
+  equal(settingKey, 'grade', 'parameter 2 is the sort settingKey');
+  equal(direction, 'ascending', 'parameter 3 is the sort direction');
+});
+
+test('optionally sorts by the total grade column', function () {
+  this.gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending');
+  this.stub(this.gradebook, 'sortByTotalGradeColumn');
+  this.gradebook.sortGridRows();
+  equal(this.gradebook.sortByTotalGradeColumn.callCount, 1);
+});
+
+test('uses the saved sort setting for total grade sorting', function () {
+  this.gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending');
+  this.stub(this.gradebook, 'sortByTotalGradeColumn');
+  this.gradebook.sortGridRows();
+
+  const [direction] = this.gradebook.sortByTotalGradeColumn.getCall(0).args;
+  equal(direction, 'ascending', 'the only parameter is the sort direction');
+});
+
+test('updates the column headers after sorting', function () {
+  this.stub(this.gradebook, 'sortByStudentColumn');
+  this.stub(this.gradebook, 'updateColumnHeaders').callsFake(() => {
+    equal(this.gradebook.sortByStudentColumn.callCount, 1, 'sorting method was called first');
+  });
+  this.gradebook.sortGridRows();
+})
 
 QUnit.module('Gradebook#groupTotalFormatter', {
   setup () {
@@ -1105,6 +1391,131 @@ test('returns a unique key for the assignment group column', function () {
   equal(Gradebook.prototype.getAssignmentGroupColumnId('301'), 'assignment_group_301');
 });
 
+QUnit.module('Gradebook#getAssignmentColumnSortBySetting', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.setAssignmentsLoaded(true);
+    this.gradebook.setStudentsLoaded(true);
+    this.gradebook.setSubmissionsLoaded(true);
+  }
+});
+
+test('includes the sort direction', function () {
+  const columnId = this.gradebook.getAssignmentColumnId('202');
+  this.gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending');
+  const props = this.gradebook.getAssignmentColumnSortBySetting('201');
+  equal(props.direction, 'ascending');
+});
+
+test('is not disabled when assignments, students, and submissions are loaded', function () {
+  const props = this.gradebook.getAssignmentColumnSortBySetting('201');
+  equal(props.disabled, false);
+});
+
+test('is disabled when assignments are not loaded', function () {
+  this.gradebook.setAssignmentsLoaded(false);
+  const props = this.gradebook.getAssignmentColumnSortBySetting('201');
+  equal(props.disabled, true);
+});
+
+test('is disabled when students are not loaded', function () {
+  this.gradebook.setStudentsLoaded(false);
+  const props = this.gradebook.getAssignmentColumnSortBySetting('201');
+  equal(props.disabled, true);
+});
+
+test('is disabled when submissions are not loaded', function () {
+  this.gradebook.setSubmissionsLoaded(false);
+  const props = this.gradebook.getAssignmentColumnSortBySetting('201');
+  equal(props.disabled, true);
+});
+
+test('sets isSortColumn to true when sorting by the given assignment', function () {
+  const columnId = this.gradebook.getAssignmentColumnId('201');
+  this.gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending');
+  const props = this.gradebook.getAssignmentColumnSortBySetting('201');
+  equal(props.isSortColumn, true);
+});
+
+test('sets isSortColumn to false when not sorting by the given assignment', function () {
+  const columnId = this.gradebook.getAssignmentColumnId('202');
+  this.gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending');
+  const props = this.gradebook.getAssignmentColumnSortBySetting('201');
+  equal(props.isSortColumn, false);
+});
+
+test('sets the onSortByGradeAscending function', function () {
+  this.stub(this.gradebook, 'setSortRowsBySetting');
+  const props = this.gradebook.getAssignmentColumnSortBySetting('201');
+
+  props.onSortByGradeAscending();
+  equal(this.gradebook.setSortRowsBySetting.callCount, 1);
+
+  const [columnId, settingKey, direction] = this.gradebook.setSortRowsBySetting.getCall(0).args;
+  equal(columnId, this.gradebook.getAssignmentColumnId('201'), 'parameter 1 is the sort columnId');
+  equal(settingKey, 'grade', 'parameter 2 is the sort settingKey');
+  equal(direction, 'ascending', 'parameter 3 is the sort direction');
+});
+
+test('sets the onSortByGradeDescending function', function () {
+  this.stub(this.gradebook, 'setSortRowsBySetting');
+  const props = this.gradebook.getAssignmentColumnSortBySetting('201');
+
+  props.onSortByGradeDescending();
+  equal(this.gradebook.setSortRowsBySetting.callCount, 1);
+
+  const [columnId, settingKey, direction] = this.gradebook.setSortRowsBySetting.getCall(0).args;
+  equal(columnId, this.gradebook.getAssignmentColumnId('201'), 'parameter 1 is the sort columnId');
+  equal(settingKey, 'grade', 'parameter 2 is the sort settingKey');
+  equal(direction, 'descending', 'parameter 3 is the sort direction');
+});
+
+test('sets the onSortByLate function', function () {
+  this.stub(this.gradebook, 'setSortRowsBySetting');
+  const props = this.gradebook.getAssignmentColumnSortBySetting('201');
+
+  props.onSortByLate();
+  equal(this.gradebook.setSortRowsBySetting.callCount, 1);
+
+  const [columnId, settingKey, direction] = this.gradebook.setSortRowsBySetting.getCall(0).args;
+  equal(columnId, this.gradebook.getAssignmentColumnId('201'), 'parameter 1 is the sort columnId');
+  equal(settingKey, 'late', 'parameter 2 is the sort settingKey');
+  equal(direction, 'ascending', 'parameter 3 is the sort direction');
+});
+
+test('sets the onSortByMissing function', function () {
+  this.stub(this.gradebook, 'setSortRowsBySetting');
+  const props = this.gradebook.getAssignmentColumnSortBySetting('201');
+
+  props.onSortByMissing();
+  equal(this.gradebook.setSortRowsBySetting.callCount, 1);
+
+  const [columnId, settingKey, direction] = this.gradebook.setSortRowsBySetting.getCall(0).args;
+  equal(columnId, this.gradebook.getAssignmentColumnId('201'), 'parameter 1 is the sort columnId');
+  equal(settingKey, 'missing', 'parameter 2 is the sort settingKey');
+  equal(direction, 'ascending', 'parameter 3 is the sort direction');
+});
+
+test('sets the onSortByUnposted function', function () {
+  this.stub(this.gradebook, 'setSortRowsBySetting');
+  const props = this.gradebook.getAssignmentColumnSortBySetting('201');
+
+  props.onSortByUnposted();
+  equal(this.gradebook.setSortRowsBySetting.callCount, 1);
+
+  const [columnId, settingKey, direction] = this.gradebook.setSortRowsBySetting.getCall(0).args;
+  equal(columnId, this.gradebook.getAssignmentColumnId('201'), 'parameter 1 is the sort columnId');
+  equal(settingKey, 'unposted', 'parameter 2 is the sort settingKey');
+  equal(direction, 'ascending', 'parameter 3 is the sort direction');
+});
+
+test('includes the sort settingKey', function () {
+  const columnId = this.gradebook.getAssignmentColumnId('202');
+  this.gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending');
+  const props = this.gradebook.getAssignmentColumnSortBySetting('201');
+  equal(props.settingKey, 'grade');
+});
+
 QUnit.module('Gradebook#getAssignmentColumnHeaderProps', {
   setup () {
     fakeENV.setup({
@@ -1133,6 +1544,13 @@ test('includes properties from the assignment', function () {
   const props = this.createGradebook().getAssignmentColumnHeaderProps('201');
   ok(props.assignment, 'assignment is present');
   equal(props.assignment.name, 'Math Assignment');
+});
+
+test('includes props for the "Sort by" settings', function () {
+  const props = this.createGradebook().getAssignmentColumnHeaderProps('201');
+  ok(props.sortBySetting, 'Assignment Details action config is present');
+  equal(typeof props.sortBySetting.disabled, 'boolean', 'props include "disabled"');
+  equal(typeof props.sortBySetting.onSortByGradeAscending, 'function', 'props include "onSortByGradeAscending"');
 });
 
 test('includes props for the Assignment Details action', function () {
@@ -1208,8 +1626,8 @@ QUnit.module('Gradebook#setStudentDisplay', {
 
     if (multipleSections) {
       options.sections = [
-        { id: 1000, name: 'section1000' },
-        { id: 2000, name: 'section2000' }
+        { id: '1000', name: 'section1000' },
+        { id: '2000', name: 'section2000' }
       ];
     }
 
@@ -1219,7 +1637,7 @@ QUnit.module('Gradebook#setStudentDisplay', {
   createStudent () {
     return {
       name: 'test student',
-      sections: [1000],
+      sections: ['1000'],
       sis_user_id: 'sis_user_id',
       login_id: 'canvas_login_id',
       enrollments: [{grades: {html_url: 'http://example.url/'}}]
@@ -1286,4 +1704,26 @@ test('when secondaryInfo is set as "none", sets display_name without other value
   notOk(student.display_name.includes(student.sections[0]));
   notOk(student.display_name.includes(student.sis_user_id));
   notOk(student.display_name.includes(student.login_id));
+});
+
+QUnit.module('Gradebook#setSortRowsBySetting');
+
+test('sets the "sort rows by" setting', function () {
+  const gradebook = createGradebook();
+  gradebook.setSortRowsBySetting('assignment_201', 'grade', 'descending');
+  const sortRowsBySetting = gradebook.getSortRowsBySetting();
+  equal(sortRowsBySetting.columnId, 'assignment_201');
+  equal(sortRowsBySetting.settingKey, 'grade');
+  equal(sortRowsBySetting.direction, 'descending');
+});
+
+test('sorts the grid rows after updating the setting', function () {
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'sortGridRows').callsFake(() => {
+    const sortRowsBySetting = gradebook.getSortRowsBySetting();
+    equal(sortRowsBySetting.columnId, 'assignment_201', 'sortRowsBySetting.columnId was set beforehand');
+    equal(sortRowsBySetting.settingKey, 'grade', 'sortRowsBySetting.settingKey was set beforehand');
+    equal(sortRowsBySetting.direction, 'descending', 'sortRowsBySetting.direction was set beforehand');
+  });
+  gradebook.setSortRowsBySetting('assignment_201', 'grade', 'descending');
 });
