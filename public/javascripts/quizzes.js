@@ -2374,7 +2374,7 @@ define([
     function setAnswerText(answer, text) {
       $(answer)
         .attr('title', text)
-        .find('img').attr('alt', text)
+        .find('.answer_image').attr('alt', text)
     }
 
     function setQuestionID(question){

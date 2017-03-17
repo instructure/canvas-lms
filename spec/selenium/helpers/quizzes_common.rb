@@ -206,14 +206,14 @@ module QuizzesCommon
     @quiz
   end
 
-  def quiz_with_new_questions(goto_edit=true)
+  def quiz_with_new_questions(goto_edit=true, *answers)
     @context = @course
     bank = @context.assessment_question_banks.create!(title: 'Test Bank')
     @quiz = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
 
-    answers = [ {id: 1}, {id: 2}, {id: 3} ]
+    answers = [ {id: 1}, {id: 2}, {id: 3} ] if answers.empty?
 
     @quest1 = @quiz.quiz_questions.create!(
       question_data: {
