@@ -53,7 +53,8 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   live_events_ctx = {
     :root_account_id => job.respond_to?(:global_account_id) ? job.global_account_id : nil,
     :job_id => job.global_id,
-    :job_tag => job.tag
+    :job_tag => job.tag,
+    :producer => 'canvas'
   }
   StringifyIds.recursively_stringify_ids(live_events_ctx)
   LiveEvents.set_context(live_events_ctx)

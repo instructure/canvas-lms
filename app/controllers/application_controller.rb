@@ -2146,8 +2146,6 @@ class ApplicationController < ActionController::Base
     ctx[:user_id] = @current_user.global_id if @current_user
     ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
     ctx[:user_login] = @current_pseudonym.unique_id if @current_pseudonym
-    ctx[:hostname] = request.host
-    ctx[:user_agent] = request.headers['User-Agent']
     ctx[:context_type] = @context.class.to_s if @context
     ctx[:context_id] = @context.global_id if @context
     if @context_membership
@@ -2165,6 +2163,10 @@ class ApplicationController < ActionController::Base
       ctx[:request_id] = tctx[:request_id]
       ctx[:session_id] = tctx[:session_id]
     end
+
+    ctx[:hostname] = request.host
+    ctx[:user_agent] = request.headers['User-Agent']
+    ctx[:producer] = 'canvas'
 
     StringifyIds.recursively_stringify_ids(ctx)
     LiveEvents.set_context(ctx)
