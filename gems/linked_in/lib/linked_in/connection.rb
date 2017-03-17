@@ -21,8 +21,24 @@ require 'oauth'
 
 module LinkedIn
   class Connection
+
+    def get_request(path, access_token)
+      config = self.class.config
+
+      http = Net::HTTP.new("api.linkedin.com", 443)
+      http.use_ssl = true
+      #http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http
+
+      request = Net::HTTP::Get.new(path)
+      request['Authorization'] = "Bearer #{access_token}"
+      response = http.request(request)
+
+      response
+    end
+
     def get_service_user_info(access_token)
-      body = access_token.get('/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)').body
+      body = get_request('/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)', access_token).body
       data = Nokogiri::XML(body)
       service_user_id = data.css("id")[0].content
       service_user_name = data.css("first-name")[0].content + " " + data.css("last-name")[0].content
@@ -38,43 +54,36 @@ module LinkedIn
       return true
     end
 
-    def get_access_token(token, secret, oauth_verifier)
-      consumer = self.class.consumer
-      request_token = OAuth::RequestToken.new(consumer, token, secret)
-      request_token.get_access_token(:oauth_verifier => oauth_verifier)
+    def authorize_url(return_to, nonce)
+      config = self.class.config
+      "https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=#{config['api_key']}&state=#{nonce}&redirect_uri=#{CGI.escape(return_to)}"
     end
 
-    def request_token(oauth_callback)
-      consumer = self.class.consumer
-      consumer.get_request_token(:oauth_callback => oauth_callback)
-    end
+    def exchange_code_for_token(code, redirect_uri)
+      config = self.class.config
 
-    def self.consumer(key=nil, secret=nil)
-      config = self.config
-      key ||= config['api_key']
-      secret ||= config['secret_key']
-      OAuth::Consumer.new(key, secret, {
-        :site => "https://www.linkedin.com",
-        :request_token_path => "/oauth/v2/requestToken", # This is actually OAuth 1.0 and doesn't work with the new URLs.
-        :access_token_path => "/oauth/v2/accessToken",
-        :authorize_path => "/oauth/v2/authorization",
-        :signature_method => "HMAC-SHA1"
-      })
-      # TODO: these look like legacy URLS. Need to update to new ones.  e.g. /oauth/v2/accessToken
-      # See: https://developer.linkedin.com/docs/oauth2
-      #OAuth::Consumer.new(key, secret, {
-      #  :site => "https://api.linkedin.com",
-      #  :request_token_path => "/uas/oauth/requestToken",
-      #  :access_token_path => "/uas/oauth/accessToken",
-      #  :authorize_path => "/uas/oauth/authorize",
-      #  :signature_method => "HMAC-SHA1"
-      #})
+      http = Net::HTTP.new("www.linkedin.com", 443)
+      http.use_ssl = true
+      #http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http
+
+      request = Net::HTTP::Post.new("/oauth/v2/accessToken")
+      request.set_form_data(
+        'grant_type' => 'authorization_code',
+        'code' => code,
+        'redirect_uri' => redirect_uri,
+        'client_id' => config['api_key'],
+        'client_secret' => config['secret_key']
+      )
+      response = http.request(request)
+
+      info = JSON.parse response.body
+
+      info['access_token']
     end
 
     def self.config_check(settings)
-      consumer = self.consumer(settings[:api_key], settings[:secret_key])
-      token = consumer.get_request_token rescue nil
-      token ? nil : "Configuration check failed, please check your settings"
+      true # we don't confirm it here with oauth 2, instead go in as a user and try to auth manually
     end
 
     def self.config=(config)
