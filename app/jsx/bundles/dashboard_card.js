@@ -1,5 +1,3 @@
-import $ from 'jquery'
-import _ from 'underscore'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import DashboardCardBox from 'jsx/dashboard_card/DashboardCardBox'

@@ -10,9 +10,9 @@ $form.formSubmit({
     return registrationErrors(errors, ENV.PASSWORD_POLICIES[pseudonymId] != null ? ENV.PASSWORD_POLICIES[pseudonymId] : ENV.PASSWORD_POLICY)
   },
   success () {
-    return location.href = '/'
+    location.href = '/'
   },
   error (errors) {
-    if (errors.nonce) { return location.href = '/login' }
+    if (errors.nonce) location.href = '/login'
   }
 })

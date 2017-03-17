@@ -1,5 +1,4 @@
 import $ from 'jquery'
-import _ from 'underscore'
 import I18n from 'i18n!common'
 import React from 'react'
 import ReactDOM from 'react-dom'

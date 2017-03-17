@@ -1,5 +1,4 @@
 // manage groups is for the add_group_category dialog
-import Section from 'compiled/models/Section'
 import Assignment from 'compiled/models/Assignment'
 import EditHeaderView from 'compiled/views/assignments/EditHeaderView'
 import EditView from 'compiled/views/assignments/EditView'

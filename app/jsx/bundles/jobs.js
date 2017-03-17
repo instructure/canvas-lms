@@ -1,4 +1,3 @@
-import $ from 'jquery'
 import jobs from 'compiled/jobs'
 
 // TODO: get this stuff off window, need to move the domready stuff out of

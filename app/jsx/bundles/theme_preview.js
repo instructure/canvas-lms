@@ -1,5 +1,4 @@
 import $ from 'jquery'
-import _ from 'underscore'
 import 'jqueryui/accordion'
 import 'jqueryui/tabs'
 import 'jqueryui/button'

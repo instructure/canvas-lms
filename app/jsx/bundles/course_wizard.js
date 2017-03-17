@@ -1,7 +1,6 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import userSettings from 'compiled/userSettings'
 import CourseWizard from 'jsx/course_wizard/CourseWizard'
 
 /*
@@ -10,8 +9,6 @@ import CourseWizard from 'jsx/course_wizard/CourseWizard'
   */
 
 const $wizard_box = $('#wizard_box')
-
-const { pathname } = window.location
 
 $('.wizard_popup_link').click((event) => {
   ReactDOM.render(

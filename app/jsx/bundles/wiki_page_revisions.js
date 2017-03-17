@@ -3,7 +3,6 @@ import WikiPage from 'compiled/models/WikiPage'
 import WikiPageRevisionsCollection from 'compiled/collections/WikiPageRevisionsCollection'
 import WikiPageContentView from 'compiled/views/wiki/WikiPageContentView'
 import WikiPageRevisionsView from 'compiled/views/wiki/WikiPageRevisionsView'
-import I18n from 'i18n!pages'
 
 $('body').addClass('show revisions')
 

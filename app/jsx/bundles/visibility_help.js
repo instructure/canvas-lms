@@ -25,7 +25,11 @@ $('.visibility_help_link').live('click', (event) => {
   event.preventDefault()
   let $dialog = $('#visibility_help_dialog')
   if ($dialog.length === 0) {
-    $dialog = $('<div/>').attr('id', 'visibility_help_dialog').hide().loadingImage().appendTo('body')
+    $dialog = $('<div/>')
+      .attr('id', 'visibility_help_dialog')
+      .hide()
+      .loadingImage()
+      .appendTo('body')
       .dialog({
         autoOpen: false,
         title: '',

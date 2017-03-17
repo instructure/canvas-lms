@@ -1,5 +1,4 @@
 import $ from 'jquery'
-import Popover from 'compiled/util/Popover'
 
 $(() => {
   const $select = $('select.locale')

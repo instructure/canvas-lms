@@ -7,7 +7,7 @@ $('#login_form').find(':text:first').select()
 const $select_phone_form = $('#select_phone_form')
 const $new_phone_form = $('#new_phone_form')
 const $phone_select = $select_phone_form.find('select')
-$phone_select.change((event) => {
+$phone_select.change(() => {
   if ($phone_select.val() === '{{id}}') {
     $select_phone_form.hide()
     $new_phone_form.show()

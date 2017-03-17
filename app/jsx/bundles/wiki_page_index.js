@@ -1,6 +1,5 @@
 import $ from 'jquery'
 import I18n from 'i18n!pages'
-import htmlEscape from 'str/htmlEscape'
 import WikiPageCollection from 'compiled/collections/WikiPageCollection'
 import WikiPageIndexView from 'compiled/views/wiki/WikiPageIndexView'
 import 'vendor/jquery.cookie'

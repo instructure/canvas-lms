@@ -21,7 +21,6 @@ import $ from 'jquery'
 import {map} from 'underscore'
 import OutcomeGroup from 'compiled/models/OutcomeGroup'
 import FindDialog from 'compiled/views/outcomes/FindDialog'
-import FindDirectoryView from 'compiled/views/outcomes/FindDirectoryView'
 import {updateAlignments, attachPageEvents} from 'question_bank'
 import 'jst/quiz/move_question'
 
