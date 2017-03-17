@@ -25,6 +25,29 @@ describe Canvas::LiveEvents do
     expect(LiveEvents).to receive(:post_event).with(event_name, event_body, anything, event_context)
   end
 
+  describe '.amended_context' do
+    it 'pulls the context from the canvas context' do
+      course = course_model
+      amended_context = Canvas::LiveEvents.amended_context(course)
+
+      context_id = course.global_id
+      context_type = course.class.to_s
+      root_account_id = course.root_account.global_id
+      root_account_uuid = course.root_account.uuid
+      root_account_lti_guid = course.root_account.lti_guid
+
+      expect(amended_context).to eq(
+        {
+          :context_id => context_id,
+          :context_type => context_type,
+          :root_account_id => root_account_id,
+          :root_account_uuid => root_account_uuid,
+          :root_account_lti_guid => root_account_lti_guid
+        }
+      )
+    end
+  end
+
   describe ".enrollment_updated" do
     it "should not include associated_user_id for non-observer enrollments" do
       enrollment = course_with_student
@@ -154,6 +177,7 @@ describe Canvas::LiveEvents do
   describe ".grade_changed" do
     let(:course_context) do
       hash_including(
+        root_account_uuid: @course.root_account.uuid,
         root_account_id: @course.root_account.global_id,
         root_account_lti_guid: @course.root_account.lti_guid,
         context_id: @course.global_id,
@@ -237,6 +261,7 @@ describe Canvas::LiveEvents do
 
     it "includes course context even when global course context unset" do
       allow(LiveEvents).to receive(:get_context).and_return({
+        root_account_uuid: nil,
         root_account_id: nil,
         root_account_lti_guid: nil,
         context_id: nil,

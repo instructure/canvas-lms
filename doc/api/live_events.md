@@ -39,6 +39,7 @@ event originated as part of a web request:
 | `real_user_id` | String | If the current user is being masqueraded, this is the Canvas id of the masquerading user. |
 | `user_login` | String | The login of the current user. |
 | `user_agent` | String | The User-Agent sent by the browser making the request. |
+| `root_account_uuid` | String | The Canvas uuid of the root account associated with the current user. |
 | `root_account_id` | String | The Canvas id of the root account associated with the current user. |
 | `root_account_lti_guid` | String | The Canvas lti_guid of the root account associated with the current user. |
 | `context_type` | String | The type of context where the event happened. |
