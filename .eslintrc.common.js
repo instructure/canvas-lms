@@ -30,7 +30,7 @@ module.exports = {
     "import/no-unresolved": [0],
     "import/no-webpack-loader-syntax": [0],
     "import/no-commonjs": [2],
-
+    "react/jsx-filename-extension": [0],
     "import/extensions": [1, { "js": "never", "jsx": "never", "json": "always" }],
     "promise/avoid-new": [0],
   }
