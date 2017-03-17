@@ -1,71 +1,79 @@
-# this is responsible for gluing all the calendar parts together into a complete page
-# the only thing on the erb page should be `calendarApp.init(<contexts>, <manageContexts>);`
-require [
-  'jquery',
-  'compiled/calendar/Calendar'
-  'react-dom'
-  'react'
-  'compiled/calendar/MiniCalendar'
-  'jsx/calendar/scheduler/components/FindAppointment'
-  'compiled/views/calendar/CalendarHeader'
-  'compiled/calendar/sidebar'
-  'compiled/calendar/EventDataSource'
-  'compiled/calendar/UndatedEventsList'
-  'jsx/calendar/scheduler/store/configureStore'
-  'compiled/jquery.kylemenu'
-], ($, Calendar, ReactDOM, React, MiniCalendar, FindAppointment, CalendarHeader, drawSidebar, EventDataSource, UndatedEventsList, configureSchedulerStore) ->
-  eventDataSource = new EventDataSource(ENV.CALENDAR.CONTEXTS)
+// this is responsible for gluing all the calendar parts together into a complete page
+// the only thing on the erb page should be `calendarApp.init(<contexts>, <manageContexts>);`
+import $ from 'jquery'
+import Calendar from 'compiled/calendar/Calendar'
+import ReactDOM from 'react-dom'
+import React from 'react'
+import MiniCalendar from 'compiled/calendar/MiniCalendar'
+import FindAppointment from 'jsx/calendar/scheduler/components/FindAppointment'
+import CalendarHeader from 'compiled/views/calendar/CalendarHeader'
+import drawSidebar from 'compiled/calendar/sidebar'
+import EventDataSource from 'compiled/calendar/EventDataSource'
+import UndatedEventsList from 'compiled/calendar/UndatedEventsList'
+import configureSchedulerStore from 'jsx/calendar/scheduler/store/configureStore'
+import 'compiled/jquery.kylemenu'
 
-  schedulerStore = if ENV.CALENDAR.BETTER_SCHEDULER then configureSchedulerStore() else null
+const eventDataSource = new EventDataSource(ENV.CALENDAR.CONTEXTS)
 
-  header = new CalendarHeader(
-    el: "#calendar_header"
-    calendar2Only: ENV.CALENDAR.CAL2_ONLY
-    showScheduler: ENV.CALENDAR.SHOW_SCHEDULER and !ENV.CALENDAR.BETTER_SCHEDULER
-    )
-  calendar = new Calendar(
-    "#calendar-app", ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.MANAGE_CONTEXTS, eventDataSource,
-    activateEvent: ENV.CALENDAR.ACTIVE_EVENT
-    viewStart:     ENV.CALENDAR.VIEW_START
-    showScheduler: ENV.CALENDAR.SHOW_SCHEDULER
-    header:        header
-    userId:        ENV.current_user_id
-    schedulerStore: schedulerStore
-    onLoadAppointmentGroups: (ag_map) =>
-      if ENV.CALENDAR.BETTER_SCHEDULER
-        courses = eventDataSource.contexts.filter (context) ->
-          ag_map.hasOwnProperty(context.asset_string)
-        if courses.length > 0
-          ReactDOM.render(
-            React.createElement(
-              FindAppointment,
-                courses: courses
-                store: schedulerStore
-            ), $('#select-course-component')[0])
-    )
-  new MiniCalendar("#minical", calendar)
-  new UndatedEventsList("#undated-events", eventDataSource, calendar)
-  drawSidebar(ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.SELECTED_CONTEXTS, eventDataSource)
+const schedulerStore = ENV.CALENDAR.BETTER_SCHEDULER ? configureSchedulerStore() : null
 
-  keyboardUser = true
+const header = new CalendarHeader({
+  el: '#calendar_header',
+  calendar2Only: ENV.CALENDAR.CAL2_ONLY,
+  showScheduler: ENV.CALENDAR.SHOW_SCHEDULER && !ENV.CALENDAR.BETTER_SCHEDULER
+})
 
-  $(".calendar-button").on 'mousedown', (e) =>
-    keyboardUser = false
-    $(e.target).find(".accessibility-warning").addClass("screenreader-only")
+const calendar = new Calendar('#calendar-app', ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.MANAGE_CONTEXTS, eventDataSource, {
+  activateEvent: ENV.CALENDAR.ACTIVE_EVENT,
+  viewStart: ENV.CALENDAR.VIEW_START,
+  showScheduler: ENV.CALENDAR.SHOW_SCHEDULER,
+  header,
+  userId: ENV.current_user_id,
+  schedulerStore,
+  onLoadAppointmentGroups: (agMap) => {
+    if (ENV.CALENDAR.BETTER_SCHEDULER) {
+      const courses = eventDataSource.contexts.filter(context => agMap.hasOwnProperty(context.asset_string))
+      if (courses.length > 0) {
+        ReactDOM.render(
+          <FindAppointment courses={courses} store={schedulerStore} />,
+          $('#select-course-component')[0]
+        )
+      }
+    }
+  }
+})
 
-  $(document).on 'keydown', (e) =>
-    if e.which == 9 #checking for tab press
-      keyboardUser = true
+new MiniCalendar('#minical', calendar)
+new UndatedEventsList('#undated-events', eventDataSource, calendar)
+drawSidebar(ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.SELECTED_CONTEXTS, eventDataSource)
 
-  $(".calendar-button").on "focus", (e) =>
-    if keyboardUser
-      $(e.target).find(".accessibility-warning").removeClass("screenreader-only")
+let keyboardUser = true
 
-  $(".calendar-button").on "focusout", (e) =>
-    $(e.target).find(".accessibility-warning").addClass("screenreader-only")
+$('.calendar-button').on('mousedown', (e) => {
+  keyboardUser = false
+  $(e.target).find('.accessibility-warning').addClass('screenreader-only')
+})
 
-  $(".rs-section .accessibility-warning").on "focus", (e) =>
-    $(e.target).removeClass("screenreader-only")
+$(document).on('keydown', (e) => {
+  if (e.which === 9) { // checking for tab press
+    keyboardUser = true
+  }
+})
 
-  $(".rs-section .accessibility-warning").on "focusout", (e) =>
-    $(e.target).addClass("screenreader-only")
+$('.calendar-button').on('focus', (e) => {
+  if (keyboardUser) {
+    $(e.target).find('.accessibility-warning').removeClass('screenreader-only')
+  }
+})
+
+$('.calendar-button').on('focusout', e =>
+  $(e.target).find('.accessibility-warning').addClass('screenreader-only')
+)
+
+$('.rs-section .accessibility-warning').on('focus', e =>
+  $(e.target).removeClass('screenreader-only')
+)
+
+$('.rs-section .accessibility-warning').on('focusout', e =>
+  $(e.target).addClass('screenreader-only')
+)

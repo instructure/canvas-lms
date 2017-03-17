@@ -1,367 +1,441 @@
-require [
-  'i18n!conversations'
-  'jquery'
-  'underscore'
-  'Backbone'
-  'compiled/models/Message'
-  'compiled/collections/MessageCollection'
-  'compiled/views/conversations/MessageView'
-  'compiled/views/conversations/MessageListView'
-  'compiled/views/conversations/MessageDetailView'
-  'compiled/views/conversations/MessageFormDialog'
-  'compiled/views/conversations/SubmissionCommentFormDialog'
-  'compiled/views/conversations/InboxHeaderView'
-  'compiled/util/deparam'
-  'compiled/collections/CourseCollection'
-  'compiled/collections/FavoriteCourseCollection'
-  'compiled/collections/GroupCollection'
-  'compiled/behaviors/unread_conversations'
-  'jquery.disableWhileLoading'
-], (I18n, $, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog, SubmissionCommentFormDialog,
- InboxHeaderView, deparam, CourseCollection, FavoriteCourseCollection, GroupCollection) ->
+import I18n from 'i18n!conversations'
+import $ from 'jquery'
+import _ from 'underscore'
+import Backbone from 'Backbone'
+import MessageCollection from 'compiled/collections/MessageCollection'
+import MessageListView from 'compiled/views/conversations/MessageListView'
+import MessageDetailView from 'compiled/views/conversations/MessageDetailView'
+import MessageFormDialog from 'compiled/views/conversations/MessageFormDialog'
+import SubmissionCommentFormDialog from 'compiled/views/conversations/SubmissionCommentFormDialog'
+import InboxHeaderView from 'compiled/views/conversations/InboxHeaderView'
+import deparam from 'compiled/util/deparam'
+import CourseCollection from 'compiled/collections/CourseCollection'
+import FavoriteCourseCollection from 'compiled/collections/FavoriteCourseCollection'
+import GroupCollection from 'compiled/collections/GroupCollection'
+import 'compiled/behaviors/unread_conversations'
+import 'jquery.disableWhileLoading'
 
-  ConversationsRouter = Backbone.Router.extend
+const ConversationsRouter = Backbone.Router.extend({
 
-    routes:
-      '': 'index'
-      'filter=:state': 'filter'
+  routes: {
+    '': 'index',
+    'filter=:state': 'filter'
+  },
 
-    messages:
-      confirmDelete: I18n.t('confirm.delete_conversation', 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.')
-      messageDeleted: I18n.t('message_deleted', 'Message Deleted!')
+  messages: {
+    confirmDelete: I18n.t('confirm.delete_conversation', 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.'),
+    messageDeleted: I18n.t('message_deleted', 'Message Deleted!')
+  },
 
-    sendingCount: 0
+  sendingCount: 0,
 
-    initialize: ->
-      ['onSelected', 'selectConversation', 'onSubmissionReply', 'onReply', 'onReplyAll', 'onArchive',
+  initialize () {
+    ['onSelected', 'selectConversation', 'onSubmissionReply', 'onReply', 'onReplyAll', 'onArchive',
       'onDelete', 'onCompose', 'onMarkUnread', 'onMarkRead', 'onForward', 'onStarToggle', 'onFilter',
       'onCourse', '_replyFromRemote', '_initViews', 'onSubmit', 'onAddMessage', 'onSubmissionAddMessage',
-      'onSearch', 'onKeyDown'].forEach((method) => @[method] = @[method].bind(this))
-      dfd = @_initCollections()
-      @_initViews()
-      @_attachEvents()
-      dfd.then(@_replyFromRemote) if @_isRemoteLaunch()
+      'onSearch', 'onKeyDown'].forEach(method => this[method] = this[method].bind(this))
+    const dfd = this._initCollections()
+    this._initViews()
+    this._attachEvents()
+    if (this._isRemoteLaunch()) return dfd.then(this._replyFromRemote)
+  },
 
-    # Public: Pull a value from the query string.
-    #
-    # name - The name of the query string param.
-    #
-    # Returns a string value or null.
-    param: (name) ->
-      regex = new RegExp("#{name}=([^&]+)")
-      value = window.location.search.match(regex)
-      if value then decodeURIComponent(value[1]) else null
+  // Public: Pull a value from the query string.
+  //
+  // name - The name of the query string param.
+  //
+  // Returns a string value or null.
+  param (name) {
+    const regex = new RegExp(`${name}=([^&]+)`)
+    const value = window.location.search.match(regex)
+    if (value) return decodeURIComponent(value[1])
+    return null
+  },
 
-    # Internal: Perform a batch update of all selected messages.
-    #
-    # event - The event to batch (e.g. 'star' or 'destroy').
-    # fn - A function called with each selected message. Used for side-effecting.
-    #
-    # Returns an array of impacted message IDs.
-    batchUpdate: (event, fn = $.noop) ->
-      messages = _.map @list.selectedMessages, (message) =>
-        fn.call(this, message)
-        message.get('id')
-      $.ajaxJSON '/api/v1/conversations', 'PUT',
-        'conversation_ids[]': messages
-        event: event
-      @list.selectedMessages = [] if event == 'destroy'
-      @list.selectedMessages = [] if event == 'archive'      && @filters.type != 'sent'
-      @list.selectedMessages = [] if event == 'mark_as_read' && @filters.type == 'archived'
-      @list.selectedMessages = [] if event == 'unstar'       && @filters.type == 'starred'
-      messages
+  // Internal: Perform a batch update of all selected messages.
+  //
+  // event - The event to batch (e.g. 'star' or 'destroy').
+  // fn - A function called with each selected message. Used for side-effecting.
+  //
+  // Returns an array of impacted message IDs.
+  batchUpdate (event, fn = $.noop) {
+    const messages = _.map(this.list.selectedMessages, (message) => {
+      fn.call(this, message)
+      return message.get('id')
+    })
+    $.ajaxJSON('/api/v1/conversations', 'PUT', {
+      'conversation_ids[]': messages,
+      event
+    })
+    if (event === 'destroy') this.list.selectedMessages = []
+    if (event === 'archive' && this.filters.type !== 'sent') this.list.selectedMessages = []
+    if (event === 'mark_as_read' && this.filters.type === 'archived') this.list.selectedMessages = []
+    if (event === 'unstar' && this.filters.type === 'starred') this.list.selectedMessages = []
+    return messages
+  },
 
-    lastFetch: null
+  lastFetch: null,
 
-    onSelected: (model) ->
-      @lastFetch.abort() if @lastFetch
-      @header.onModelChange(null, @model)
-      @detail.onModelChange(null, @model)
-      @model = model
-      messages = @list.selectedMessages
-      if messages.length == 0
-        delete @detail.model
-        return @detail.render()
-      else if messages.length > 1
-        delete @detail.model
+  onSelected (model) {
+    if (this.lastFetch) this.lastFetch.abort()
+    this.header.onModelChange(null, this.model)
+    this.detail.onModelChange(null, this.model)
+    this.model = model
+    const messages = this.list.selectedMessages
+    if (messages.length === 0) {
+      delete this.detail.model
+      return this.detail.render()
+    } else if (messages.length > 1) {
+      delete this.detail.model
 
-        messages[0].set('canArchive', @filters.type != 'sent')
-        @detail.onModelChange(messages[0], null)
-        @detail.render(batch: true)
-        @header.onModelChange(messages[0], null)
-        @header.toggleReplyBtn(true)
-        @header.toggleReplyAllBtn(true)
-        @header.hideForwardBtn(true)
-        return
-      else
-        model = @list.selectedMessage()
-        if model.get('messages')
-          @selectConversation(model)
-        else
-          @lastFetch = model.fetch(data: {include_participant_contexts: false, include_private_conversation_enrollments: false}, success: @selectConversation)
-          @detail.$el.disableWhileLoading(@lastFetch)
+      messages[0].set('canArchive', this.filters.type !== 'sent')
+      this.detail.onModelChange(messages[0], null)
+      this.detail.render({batch: true})
+      this.header.onModelChange(messages[0], null)
+      this.header.toggleReplyBtn(true)
+      this.header.toggleReplyAllBtn(true)
+      this.header.hideForwardBtn(true)
+      return
+    } else {
+      model = this.list.selectedMessage()
+      if (model.get('messages')) {
+        this.selectConversation(model)
+      } else {
+        this.lastFetch = model.fetch({
+          data: {
+            include_participant_contexts: false,
+            include_private_conversation_enrollments: false
+          },
+          success: this.selectConversation
+        })
+        this.detail.$el.disableWhileLoading(this.lastFetch)
+      }
+    }
+  },
 
-    selectConversation: (model) ->
-      if model
-        model.set('canArchive', @filters.type != 'sent')
-      @header.onModelChange(model, null)
-      @detail.onModelChange(model, null)
-      @detail.render()
+  selectConversation (model) {
+    if (model) model.set('canArchive', this.filters.type !== 'sent')
 
-    onSubmissionReply: ->
-      @submissionReply.show(@detail.model, trigger: $('#submission-reply-btn'))
+    this.header.onModelChange(model, null)
+    this.detail.onModelChange(model, null)
+    this.detail.render()
+  },
 
-    onReply: (message) ->
-      if @detail.model.get('for_submission')
-        @onSubmissionReply()
-      else
-        @_delegateReply(message, 'reply')
+  onSubmissionReply () {
+    this.submissionReply.show(this.detail.model, {trigger: $('#submission-reply-btn')})
+  },
 
-    onReplyAll: (message) ->
-      @_delegateReply(message, 'replyAll')
+  onReply (message) {
+    if (this.detail.model.get('for_submission')) {
+      this.onSubmissionReply()
+    } else {
+      this._delegateReply(message, 'reply')
+    }
+  },
 
-    _delegateReply: (message, type) ->
-      btn = if type == 'reply' then 'reply-btn' else 'reply-all-btn'
-      if message
-        trigger = $(".message-item-view[data-id=#{message.id}] .#{btn}")
-      else
-        trigger = $("##{btn}")
-      @compose.show(@detail.model, to: type, trigger: trigger, message: message)
+  onReplyAll (message) {
+    this._delegateReply(message, 'replyAll')
+  },
 
-    onArchive: ->
-      action = if @list.selectedMessage().get('workflow_state') == 'archived' then 'mark_as_read' else 'archive'
-      messages = @batchUpdate(action, (m) ->
-        newState = if action == 'mark_as_read' then 'read' else 'archived'
-        m.set('workflow_state', newState)
-        @header.onArchivedStateChange(m)
+  _delegateReply (message, type) {
+    const btn = type === 'reply' ? 'reply-btn' : 'reply-all-btn'
+    const trigger = message ? $(`.message-item-view[data-id=${message.id}] .${btn}`) : $(`#${btn}`)
+
+    this.compose.show(this.detail.model, {to: type, trigger, message})
+  },
+
+  onArchive () {
+    const action = this.list.selectedMessage().get('workflow_state') === 'archived' ? 'mark_as_read' : 'archive'
+    const messages = this.batchUpdate(action, function (m) {
+      const newState = action === 'mark_as_read' ? 'read' : 'archived'
+      m.set('workflow_state', newState)
+      this.header.onArchivedStateChange(m)
+    })
+    if (_.include(['inbox', 'archived'], this.filters.type)) {
+      this.list.collection.remove(messages)
+      this.selectConversation(null)
+    }
+  },
+
+  onDelete () {
+    if (!confirm(this.messages.confirmDelete)) return
+    const messages = this.batchUpdate('destroy')
+    delete this.detail.model
+    this.list.collection.remove(messages)
+    this.header.updateUi(null)
+    $.flashMessage(this.messages.messageDeleted)
+    this.detail.render()
+  },
+
+  onCompose (e) {
+    this.compose.show(null, {trigger: $('#compose-btn')})
+  },
+
+  index () {
+    return this.filter('')
+  },
+
+  filter (state) {
+    const filters = this.filters = deparam(state)
+    this.header.displayState(filters)
+    this.selectConversation(null)
+    this.list.selectedMessages = []
+    this.list.collection.reset()
+    if (filters.type === 'submission_comments') {
+      _.each(
+        ['scope', 'filter', 'filter_mode', 'include_private_conversation_enrollments'], 
+        this.list.collection.deleteParam,
+        this.list.collection
       )
-      if _.include(['inbox', 'archived'], @filters.type)
-        @list.collection.remove(messages)
-        @selectConversation(null)
+      this.list.collection.url = '/api/v1/users/self/activity_stream'
+      this.list.collection.setParam('asset_type', 'Submission')
+      if (filters.course) {
+        this.list.collection.setParam('context_code', filters.course)
+      } else {
+        this.list.collection.deleteParam('context_code')
+      }
+    } else {
+      _.each(
+        ['context_code', 'asset_type', 'submission_user_id'],
+        this.list.collection.deleteParam,
+        this.list.collection
+      )
+      this.list.collection.url = '/api/v1/conversations'
+      this.list.collection.setParam('scope', filters.type)
+      this.list.collection.setParam('filter', this._currentFilter())
+      this.list.collection.setParam('filter_mode', 'and')
+      this.list.collection.setParam('include_private_conversation_enrollments', false)
+    }
+    this.list.collection.fetch()
+    this.compose.setDefaultCourse(filters.course)
+  },
 
-    onDelete: ->
-      return unless confirm(@messages.confirmDelete)
-      messages = @batchUpdate('destroy')
-      delete @detail.model
-      @list.collection.remove(messages)
-      @header.updateUi(null)
-      $.flashMessage(@messages.messageDeleted)
-      @detail.render()
+  onMarkUnread () {
+    return this.batchUpdate('mark_as_unread', m => m.toggleReadState(false))
+  },
 
-    onCompose: (e) ->
-      @compose.show(null, trigger: $('#compose-btn'))
+  onMarkRead () {
+    return this.batchUpdate('mark_as_read', m => m.toggleReadState(true))
+  },
 
-    index: ->
-      @filter('')
+  onForward (message) {
+    let trigger
+    let model
+    if (message) {
+      model = this.detail.model.clone()
+      model.handleMessages()
+      model.set('messages', _.filter(model.get('messages'), m =>
+        m.id === message.id ||
+        (_.include(m.participating_user_ids, message.author_id) && m.created_at < message.created_at)
+      ))
+      trigger = $(`.message-item-view[data-id=${message.id}] .al-trigger`)
+    } else {
+      trigger = $('#admin-btn')
+      model = this.detail.model
+    }
+    this.compose.show(model, {to: 'forward', trigger})
+  },
 
-    filter: (state) ->
-      filters = @filters = deparam(state)
-      @header.displayState(filters)
-      @selectConversation(null)
-      @list.selectedMessages = []
-      @list.collection.reset()
-      if filters.type == 'submission_comments'
-        _.each(['scope', 'filter', 'filter_mode', 'include_private_conversation_enrollments'], @list.collection.deleteParam, @list.collection)
-        @list.collection.url = '/api/v1/users/self/activity_stream'
-        @list.collection.setParam('asset_type', 'Submission')
-        if filters.course
-          @list.collection.setParam('context_code', filters.course)
-        else
-          @list.collection.deleteParam('context_code')
-      else
-        _.each(['context_code', 'asset_type', 'submission_user_id'], @list.collection.deleteParam, @list.collection)
-        @list.collection.url = '/api/v1/conversations'
-        @list.collection.setParam('scope', filters.type)
-        @list.collection.setParam('filter', @_currentFilter())
-        @list.collection.setParam('filter_mode', 'and')
-        @list.collection.setParam('include_private_conversation_enrollments', false)
-      @list.collection.fetch()
-      @compose.setDefaultCourse(filters.course)
+  onStarToggle () {
+    const event = this.list.selectedMessage().get('starred') ? 'unstar' : 'star'
+    const messages = this.batchUpdate(event, m => m.toggleStarred(event === 'star'))
+    if (this.filters.type === 'starred') {
+      if (event === 'unstar') this.selectConversation(null)
+      return this.list.collection.remove(messages)
+    }
+  },
 
-    onMarkUnread: ->
-      @batchUpdate('mark_as_unread', (m) -> m.toggleReadState(false))
+  onFilter (filters) {
+    // Update the hash. Replace if there isn't already a hash - we're in the
+    // process of loading the page if so, and we wouldn't want to create a
+    // spurious history entry by not doing so.
+    const existingHash = window.location.hash && window.location.hash.substring(1)
+    return this.navigate(`filter=${$.param(filters)}`, {trigger: true, replace: !existingHash})
+  },
 
-    onMarkRead: ->
-      @batchUpdate('mark_as_read', (m) -> m.toggleReadState(true))
+  onCourse (course) {
+    return this.list.updateCourse(course)
+  },
 
-    onForward: (message) ->
-      model = if message
-        model = @detail.model.clone()
-        model.handleMessages()
-        model.set 'messages', _.filter model.get('messages'), (m) ->
-          m.id == message.id or (_.include(m.participating_user_ids, message.author_id) and m.created_at < message.created_at)
-        trigger = $(".message-item-view[data-id=#{message.id}] .al-trigger")
-        model
-      else
-        trigger = $('#admin-btn')
-        @detail.model
-      @compose.show(model, to: 'forward', trigger: trigger)
+    // Internal: Determine if a reply was launched from another URL.
+    //
+    // Returns a boolean.
+  _isRemoteLaunch () {
+    return !!window.location.search.match(/user_id/)
+  },
 
-    onStarToggle: ->
-      event    = if @list.selectedMessage().get('starred') then 'unstar' else 'star'
-      messages = @batchUpdate(event, (m) -> m.toggleStarred(event == 'star'))
-      if @filters.type == 'starred'
-        @selectConversation(null) if event == 'unstar'
-        @list.collection.remove(messages)
+    // Internal: Open and populate the new message dialog from a remote launch.
+    //
+    // Returns nothing.
+  _replyFromRemote () {
+    this.compose.show(null, {
+      user: {
+        id: this.param('user_id'),
+        name: this.param('user_name')
+      },
+      context: this.param('context_id'),
+      remoteLaunch: true
+    })
+  },
 
-    onFilter: (filters) ->
-      # Update the hash. Replace if there isn't already a hash - we're in the
-      # process of loading the page if so, and we wouldn't want to create a
-      # spurious history entry by not doing so.
-      existingHash = window.location.hash && window.location.hash.substring(1)
-      @navigate('filter='+$.param(filters), {trigger: true, replace: !existingHash})
+  _initCollections () {
+    const gc = new GroupCollection()
+    gc.setParam('include[]', 'can_message')
+    this.courses = {
+      favorites: new FavoriteCourseCollection(),
+      all: new CourseCollection(),
+      groups: gc
+    }
+    return this.courses.favorites.fetch()
+  },
 
-    onCourse: (course) ->
-      @list.updateCourse(course)
+  _initViews () {
+    this._initListView()
+    this._initDetailView()
+    this._initHeaderView()
+    this._initComposeDialog()
+    this._initSubmissionCommentReplyDialog()
+  },
 
-    # Internal: Determine if a reply was launched from another URL.
-    #
-    # Returns a boolean.
-    _isRemoteLaunch: ->
-      !!window.location.search.match(/user_id/)
+  _attachEvents () {
+    this.list.collection.on('change:selected', this.onSelected)
+    this.header.on('compose', this.onCompose)
+    this.header.on('reply', this.onReply)
+    this.header.on('reply-all', this.onReplyAll)
+    this.header.on('archive', this.onArchive)
+    this.header.on('delete', this.onDelete)
+    this.header.on('filter', this.onFilter)
+    this.header.on('course', this.onCourse)
+    this.header.on('mark-unread', this.onMarkUnread)
+    this.header.on('mark-read', this.onMarkRead)
+    this.header.on('forward', this.onForward)
+    this.header.on('star-toggle', this.onStarToggle)
+    this.header.on('search', this.onSearch)
+    this.header.on('submission-reply', this.onReply)
+    this.compose.on('close', this.onCloseCompose)
+    this.compose.on('addMessage', this.onAddMessage)
+    this.compose.on('addMessage', this.list.updateMessage)
+    this.compose.on('newConversations', this.onNewConversations)
+    this.compose.on('submitting', this.onSubmit)
+    this.submissionReply.on('addMessage', this.onSubmissionAddMessage)
+    this.submissionReply.on('submitting', this.onSubmit)
+    this.detail.on('reply', this.onReply)
+    this.detail.on('reply-all', this.onReplyAll)
+    this.detail.on('forward', this.onForward)
+    this.detail.on('star-toggle', this.onStarToggle)
+    this.detail.on('delete', this.onDelete)
+    this.detail.on('archive', this.onArchive)
+    $(document).ready(this.onPageLoad)
+    $(window).keydown(this.onKeyDown)
+  },
 
-    # Internal: Open and populate the new message dialog from a remote launch.
-    #
-    # Returns nothing.
-    _replyFromRemote: ->
-      @compose.show null,
-        user:
-          id: @param('user_id')
-          name: @param('user_name')
-        context  : @param('context_id')
-        remoteLaunch: true
+  onPageLoad (e) {
+    $('#main').css({display: 'block'})
+  },
 
-    _initCollections: () ->
-      gc = new GroupCollection()
-      gc.setParam('include[]', 'can_message')
-      @courses =
-        favorites: new FavoriteCourseCollection()
-        all: new CourseCollection()
-        groups: gc
-      @courses.favorites.fetch()
+  onSubmit (dfd) {
+    this._incrementSending(1)
+    return dfd.always(() => this._incrementSending(-1))
+  },
 
-    _initViews: ->
-      @_initListView()
-      @_initDetailView()
-      @_initHeaderView()
-      @_initComposeDialog()
-      @_initSubmissionCommentReplyDialog()
+  onAddMessage (message, conversation) {
+    const model = this.list.collection.get(conversation.id)
+    if (model && model.get('messages')) {
+      message.context_name = model.messageCollection.last().get('context_name')
+      model.get('messages').unshift(message)
+      model.trigger('change:messages')
+      if (model === this.detail.model) {
+        return this.detail.render()
+      }
+    }
+  },
 
-    _attachEvents: ->
-      @list.collection.on('change:selected', @onSelected)
-      @header.on('compose',     @onCompose)
-      @header.on('reply',       @onReply)
-      @header.on('reply-all',   @onReplyAll)
-      @header.on('archive',     @onArchive)
-      @header.on('delete',      @onDelete)
-      @header.on('filter',      @onFilter)
-      @header.on('course',      @onCourse)
-      @header.on('mark-unread', @onMarkUnread)
-      @header.on('mark-read', @onMarkRead)
-      @header.on('forward',     @onForward)
-      @header.on('star-toggle', @onStarToggle)
-      @header.on('search',      @onSearch)
-      @header.on('submission-reply', @onReply)
-      @compose.on('close',      @onCloseCompose)
-      @compose.on('addMessage', @onAddMessage)
-      @compose.on('addMessage', @list.updateMessage)
-      @compose.on('newConversations', @onNewConversations)
-      @compose.on('submitting', @onSubmit)
-      @submissionReply.on('addMessage', @onSubmissionAddMessage)
-      @submissionReply.on('submitting', @onSubmit)
-      @detail.on('reply',       @onReply)
-      @detail.on('reply-all',   @onReplyAll)
-      @detail.on('forward',     @onForward)
-      @detail.on('star-toggle', @onStarToggle)
-      @detail.on('delete',      @onDelete)
-      @detail.on('archive',     @onArchive)
-      $(document).ready(@onPageLoad)
-      $(window).keydown(@onKeyDown)
+  onSubmissionAddMessage (message, submission) {
+    const model = this.list.collection.findWhere({submission_id: submission.id})
+    if (model && model.get('messages')) {
+      model.get('messages').unshift(message)
+      model.trigger('change:messages')
+      if (model === this.detail.model) {
+        return this.detail.render()
+      }
+    }
+  },
 
-    onPageLoad: (e) ->
-       $('#main').css(display: 'block')
+  onNewConversations (conversations) {},
 
-    onSubmit: (dfd) ->
-      @_incrementSending(1)
-      dfd.always =>
-        @_incrementSending(-1)
+  _incrementSending (increment) {
+    this.sendingCount += increment
+    return this.header.toggleSending(this.sendingCount > 0)
+  },
 
-    onAddMessage: (message, conversation) ->
-      model = @list.collection.get(conversation.id)
-      if model? && model.get('messages')
-        message.context_name = model.messageCollection.last().get('context_name')
-        model.get('messages').unshift(message)
-        model.trigger('change:messages')
-        if model == @detail.model
-          @detail.render()
+  _currentFilter () {
+    let filter = this.searchTokens || []
+    if (this.filters.course) filter = filter.concat(this.filters.course)
+    return filter
+  },
 
-    onSubmissionAddMessage: (message, submission) ->
-      model = @list.collection.findWhere(submission_id: submission.id)
-      if model? && model.get('messages')
-        model.get('messages').unshift(message)
-        model.trigger('change:messages')
-        if model == @detail.model
-          @detail.render()
+  onSearch (tokens) {
+    this.list.collection.reset()
+    this.searchTokens = tokens.length ? tokens : null
+    if (this.filters.type === 'submission_comments') {
+      let match
+      if (this.searchTokens && (match = this.searchTokens[0].match(/^user_(\d+)$/))) {
+        this.list.collection.setParam('submission_user_id', match[1])
+      } else {
+        this.list.collection.deleteParam('submission_user_id')
+      }
+    } else {
+      this.list.collection.setParam('filter', this._currentFilter())
+    }
+    delete this.detail.model
+    this.list.selectedMessages = []
+    this.detail.render()
+    return this.list.collection.fetch()
+  },
 
-    onNewConversations: (conversations) ->
+  _initListView () {
+    this.list = new MessageListView({
+      collection: new MessageCollection(),
+      el: $('.message-list'),
+      scrollContainer: $('.message-list-scroller'),
+      buffer: 50
+    })
+    this.list.render()
+  },
 
-    _incrementSending: (increment) ->
-      @sendingCount += increment
-      @header.toggleSending(@sendingCount > 0)
+  _initDetailView () {
+    this.detail = new MessageDetailView({el: $('.message-detail')})
+    this.detail.render()
+  },
 
-    _currentFilter: ->
-      filter = @searchTokens || []
-      filter = filter.concat(@filters.course) if @filters.course
-      filter
+  _initHeaderView () {
+    this.header = new InboxHeaderView({el: $('header.panel'), courses: this.courses})
+    this.header.render()
+  },
 
-    onSearch: (tokens) ->
-      @list.collection.reset()
-      @searchTokens = if tokens.length then tokens else null
-      if @filters.type == 'submission_comments'
-        if @searchTokens and match = @searchTokens[0].match(/^user_(\d+)$/)
-          @list.collection.setParam('submission_user_id', match[1])
-        else
-          @list.collection.deleteParam('submission_user_id')
-      else
-        @list.collection.setParam('filter', @_currentFilter())
-      delete @detail.model
-      @list.selectedMessages = []
-      @detail.render()
-      @list.collection.fetch()
+  _initComposeDialog () {
+    this.compose = new MessageFormDialog({
+      courses: this.courses,
+      folderId: ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID,
+      account_context_code: ENV.CONVERSATIONS.ACCOUNT_CONTEXT_CODE
+    })
+  },
 
-    _initListView: ->
-      @list = new MessageListView
-        collection: new MessageCollection
-        el: $('.message-list')
-        scrollContainer: $('.message-list-scroller')
-        buffer: 50
-      @list.render()
+  _initSubmissionCommentReplyDialog () {
+    this.submissionReply = new SubmissionCommentFormDialog()
+  },
 
-    _initDetailView: ->
-      @detail = new MessageDetailView(el: $('.message-detail'))
-      @detail.render()
+  onKeyDown (e) {
+    const nodeName = e.target.nodeName.toLowerCase()
+    if (nodeName === 'input' || nodeName === 'textarea') return
+    const ctrl = e.ctrlKey || e.metaKey
+    if ((e.which === 65) && ctrl) { // ctrl-a
+      e.preventDefault()
+      this.list.selectAll()
+    }
+  }
+})
 
-    _initHeaderView: ->
-      @header = new InboxHeaderView(el: $('header.panel'), courses: @courses)
-      @header.render()
+window.conversationsRouter = new ConversationsRouter()
+Backbone.history.start()
 
-    _initComposeDialog: ->
-      @compose = new MessageFormDialog
-        courses: @courses
-        folderId: ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID
-        account_context_code: ENV.CONVERSATIONS.ACCOUNT_CONTEXT_CODE
-
-    _initSubmissionCommentReplyDialog: ->
-      @submissionReply = new SubmissionCommentFormDialog
-
-    onKeyDown: (e) ->
-      nodeName = e.target.nodeName.toLowerCase()
-      return if nodeName == 'input' || nodeName == 'textarea'
-      ctrl = e.ctrlKey || e.metaKey
-      if e.which == 65 && ctrl # ctrl-a
-        e.preventDefault()
-        @list.selectAll()
-        return
-
-  window.conversationsRouter = new ConversationsRouter
-  Backbone.history.start()

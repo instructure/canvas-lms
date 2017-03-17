@@ -1,95 +1,105 @@
-require [
-  'INST' # INST
-  'i18n!conferences'
-  'jquery' # $
-  'underscore'
-  'Backbone'
-  'compiled/views/CollectionView'
-  'compiled/collections/ConferenceCollection'
-  'compiled/models/Conference'
-  'compiled/views/conferences/ConferenceView'
-  'compiled/views/conferences/ConcludedConferenceView'
-  'compiled/views/conferences/EditConferenceView'
-  'jquery.ajaxJSON' # ajaxJSON
-  'jquery.instructure_forms' # formSubmit, fillFormData
-  'jqueryui/dialog'
-  'jquery.instructure_misc_helpers' # replaceTags
-  'jquery.keycodes' # keycodes
-  'jquery.loadingImg' # loadingImage
-  'compiled/jquery.rails_flash_notifications'
-  'jquery.templateData' # fillTemplateData, getTemplateData
-  'jquery.instructure_date_and_time' # date_field
-], (INST, I18n, $, _, Backbone, CollectionView, ConferenceCollection, Conference, ConferenceView, ConcludedConferenceView, EditConferenceView) ->
-  ConferencesRouter = Backbone.Router.extend
-    routes:
-      '': 'index'
-      'conference_:id': 'edit'
+import I18n from 'i18n!conferences'
+import $ from 'jquery'
+import _ from 'underscore'
+import Backbone from 'Backbone'
+import CollectionView from 'compiled/views/CollectionView'
+import ConferenceCollection from 'compiled/collections/ConferenceCollection'
+import Conference from 'compiled/models/Conference'
+import ConferenceView from 'compiled/views/conferences/ConferenceView'
+import ConcludedConferenceView from 'compiled/views/conferences/ConcludedConferenceView'
+import EditConferenceView from 'compiled/views/conferences/EditConferenceView'
+import 'jquery.ajaxJSON'
+import 'jquery.instructure_forms'
+import 'jqueryui/dialog'
+import 'jquery.instructure_misc_helpers'
+import 'jquery.keycodes'
+import 'jquery.loadingImg'
+import 'compiled/jquery.rails_flash_notifications'
+import 'jquery.templateData'
+import 'jquery.instructure_date_and_time'
 
-    editView: null
-    currentConferences: null
-    concludedConferences: null
+const ConferencesRouter = Backbone.Router.extend({
+  routes: {
+    '': 'index',
+    'conference_:id': 'edit'
+  },
 
-    initialize: ->
-      @close = @close.bind(this)
-      # populate the conference list with inital set of data
-      @editView = new EditConferenceView()
+  editView: null,
+  currentConferences: null,
+  concludedConferences: null,
 
-      @currentConferences = new ConferenceCollection(ENV.current_conferences)
-      @currentConferences.on('change', (event) =>
-        # focus if edit finalized (element is redrawn so we find by id)
-        if @editConferenceId
-          $("#new-conference-list div[data-id=" + @editConferenceId + "] .al-trigger").focus()
-      )
-      view = @currentView = new CollectionView
-        el: $("#new-conference-list")
-        itemView: ConferenceView
-        collection: @currentConferences
-        emptyMessage: I18n.t('no_new_conferences', 'There are no new conferences')
-        listClassName: 'ig-list'
-      view.render()
+  initialize () {
+    this.close = this.close.bind(this)
+    // populate the conference list with inital set of data
+    this.editView = new EditConferenceView()
 
-      @concludedConferences = new ConferenceCollection(ENV.concluded_conferences)
-      view = @concludedView = new CollectionView
-        el: $("#concluded-conference-list")
-        itemView: ConcludedConferenceView
-        collection: @concludedConferences
-        emptyMessage: I18n.t('no_concluded_conferences', 'There are no concluded conferences')
-        listClassName: 'ig-list'
-      view.render()
+    this.currentConferences = new ConferenceCollection(ENV.current_conferences)
+    this.currentConferences.on('change', () => {
+      // focus if edit finalized (element is redrawn so we find by id)
+      if (this.editConferenceId) {
+        $(`#new-conference-list div[data-id=${this.editConferenceId}] .al-trigger`).focus()
+      }
+    })
+    let view = this.currentView = new CollectionView({
+      el: $('#new-conference-list'),
+      itemView: ConferenceView,
+      collection: this.currentConferences,
+      emptyMessage: I18n.t('no_new_conferences', 'There are no new conferences'),
+      listClassName: 'ig-list'
+    })
+    view.render()
 
-      $.screenReaderFlashMessage(
-        I18n.t('notifications.inaccessible',
-               'Warning: This page contains third-party content which is not accessible ' +
-               'to screen readers.'),
-        20000
-      )
+    this.concludedConferences = new ConferenceCollection(ENV.concluded_conferences)
+    view = this.concludedView = new CollectionView({
+      el: $('#concluded-conference-list'),
+      itemView: ConcludedConferenceView,
+      collection: this.concludedConferences,
+      emptyMessage: I18n.t('no_concluded_conferences', 'There are no concluded conferences'),
+      listClassName: 'ig-list'
+    })
+    view.render()
 
-      $('.new-conference-btn').on('click', (event) => @create())
+    $.screenReaderFlashMessage(
+      I18n.t(
+        'notifications.inaccessible',
+        'Warning: This page contains third-party content which is not accessible to screen readers.'
+      ),
+      20000
+    )
 
-    index: ->
-      @editView.close()
+    $('.new-conference-btn').on('click', () => this.create())
+  },
 
-    create: ->
-      conference = new Conference(_.clone(ENV.default_conference))
-      conference.once('startSync', => @currentConferences.unshift(conference))
-      if conference.get('permissions').create
-        @editView.show(conference)
+  index () {
+    this.editView.close()
+  },
 
-    edit: (conference) ->
-      conference = @currentConferences.get(conference) || @concludedConferences.get(conference)
-      return unless conference
+  create () {
+    const conference = new Conference(_.clone(ENV.default_conference))
+    conference.once('startSync', () => this.currentConferences.unshift(conference))
+    if (conference.get('permissions').create) {
+      this.editView.show(conference)
+    }
+  },
 
-      if conference.get('permissions').update
-        @editConferenceId = conference.get('id')
-        @editView.show(conference, isEditing: true)
-      else
-        # reached when a user without edit permissions navigates
-        # to a specific conference's url directly
-        $("#conf_#{conference.get('id')}")[0].scrollIntoView()
+  edit (conference) {
+    conference = this.currentConferences.get(conference) || this.concludedConferences.get(conference)
+    if (!conference) return
 
-    close: (conference) ->
-      @currentConferences.remove(conference)
-      @concludedConferences.unshift(conference)
+    if (conference.get('permissions').update) {
+      this.editConferenceId = conference.get('id')
+      this.editView.show(conference, {isEditing: true})
+    }
+    // reached when a user without edit permissions navigates
+    // to a specific conference's url directly
+    $(`#conf_${conference.get('id')}`)[0].scrollIntoView()
+  },
 
-  window.router = new ConferencesRouter
-  Backbone.history.start()
+  close (conference) {
+    this.currentConferences.remove(conference)
+    this.concludedConferences.unshift(conference)
+  }
+})
+
+window.router = new ConferencesRouter()
+Backbone.history.start()
