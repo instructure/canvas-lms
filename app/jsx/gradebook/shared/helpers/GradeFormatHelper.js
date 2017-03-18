@@ -43,7 +43,7 @@ function isPercent (grade, gradeType) {
   return /%/g.test(grade);
 }
 
-class GradeFormatHelper {
+const GradeFormatHelper = {
   /**
    * Returns given grade rounded to two decimal places and formatted with I18n
    * if it is a point or percent grade.
@@ -77,7 +77,7 @@ class GradeFormatHelper {
     }
 
     return formattedGrade;
-  }
+  },
 
   /**
    * Given a localized point or percentage grade string,
@@ -99,6 +99,6 @@ class GradeFormatHelper {
 
     return delocalizedGrade + (/%/g.test(localizedGrade) ? '%' : '');
   }
-}
+};
 
-export default new GradeFormatHelper()
+export default GradeFormatHelper

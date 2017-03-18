@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Instructure, Inc.
+ * Copyright (C) 2016 - 2017 Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,15 +18,18 @@
 
 import _ from 'underscore'
 
-  export function scoreToGrade (score, gradingScheme) {
-    const scoreWithLowerBound = Math.max(score, 0);
-    const letter = _.find(gradingScheme, (row, i) => {
-      const schemeScore = (row[1] * 100).toPrecision(4);
-      // The precision of the lower bound (* 100) must be limited to eliminate
-      // floating-point errors.
-      // e.g. 0.545 * 100 returns 54.50000000000001 in JavaScript.
-      return scoreWithLowerBound >= schemeScore || i === (gradingScheme.length - 1);
-    });
-    return letter[0];
-  }
+export function scoreToGrade (score, gradingScheme) {
+  const scoreWithLowerBound = Math.max(score, 0);
+  const letter = _.find(gradingScheme, (row, i) => {
+    const schemeScore = (row[1] * 100).toPrecision(4);
+    // The precision of the lower bound (* 100) must be limited to eliminate
+    // floating-point errors.
+    // e.g. 0.545 * 100 returns 54.50000000000001 in JavaScript.
+    return scoreWithLowerBound >= schemeScore || i === (gradingScheme.length - 1);
+  });
+  return letter[0];
+}
 
+export default {
+  scoreToGrade
+}
