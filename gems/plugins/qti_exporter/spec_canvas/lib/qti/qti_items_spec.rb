@@ -44,5 +44,12 @@ describe "Converting QTI items" do
     expect(hash[:question_text]).to include("I have a [RESPONSE]")
     expect(hash[:question_text]).to include("I have an [RESPONSE_1]")
   end
+
+  it "should get feedback with accents correctly even when people write gross xml" do
+    file_path = File.join(BASE_FIXTURE_DIR, 'qti')
+    manifest_node=get_manifest_node('weird_html')
+    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>file_path)
+    expect(hash[:neutral_comments]).to eq "viva la molé"
+  end
 end
 end
