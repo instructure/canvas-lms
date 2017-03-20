@@ -1,5 +1,5 @@
 <div class="ic-Form-control">
-  <%= f.label :auth_base, t('CAS URL'), class: 'ic-Label' %>
-  <%= f.text_field :auth_base, class: 'ic-Input' %>
+  <%= f.label :auth_base, t('CAS URL'), class: 'ic-Label', for: "auth_base_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :auth_base, class: 'ic-Input', id: "auth_base_#{presenter.id_suffix(aac)}" %>
 </div>
-<%= render partial: 'jit_provisioning_field', locals: { f: f, aac: aac } %>
+<%= render partial: 'jit_provisioning_field', locals: { aac: aac, presenter: presenter, f: f } %>

@@ -49,22 +49,26 @@ define([
     var $provider_attribute = $template.find("input[type!='checkbox']").add($template.find("select"));
     var $canvas_attribute_select = $federated_attributes.find('.add_attribute .canvas_attribute');
     var $selected_canvas_attribute = $canvas_attribute_select.find("option:selected");
+    var id_suffix = $template.data("idsuffix");
     var canvas_attribute_html = $selected_canvas_attribute.text();
     var checkbox_name = "authentication_provider[federated_attributes][" + canvas_attribute_html + "][provisioning_only]"
-    $template.find(".provisioning_only_column label").attr('for', checkbox_name);
+    var checkbox_id = "aacfa_" + canvas_attribute_html + "_provisioning_only_" + id_suffix;
+    $template.find(".provisioning_only_column label").attr('for', checkbox_id);
     $template.find("input[type='checkbox']").attr('name', checkbox_name);
-    $template.find("input[type='checkbox']").attr('id', checkbox_name);
+    $template.find("input[type='checkbox']").attr('id', checkbox_id);
     $template.find('.canvas_attribute_name').append($selected_canvas_attribute.text());
     var provider_attribute_name = "authentication_provider[federated_attributes][" + canvas_attribute_html + "][attribute]";
-    $template.find('.provider_attribute_column label').attr('for', provider_attribute_name);
+    var provider_attribute_id = "aacfa_" + canvas_attribute_html + "_attribute_" + id_suffix;
+    $template.find('.provider_attribute_column label').attr('for', provider_attribute_id);
     $provider_attribute.attr('name', provider_attribute_name);
-    $provider_attribute.attr('id', provider_attribute_name);
+    $provider_attribute.attr('id', provider_attribute_id);
     $federated_attributes.find('tbody').append($template);
     $selected_canvas_attribute.remove();
     $template.show();
     $provider_attribute.focus();
 
     $federated_attributes.find('.no_federated_attributes').remove();
+    $federated_attributes.find('table').show();
     if ($canvas_attribute_select.find('option').length === 0) {
       $federated_attributes.find('.add_attribute').hide();
     }
@@ -81,6 +85,7 @@ define([
     $attribute_row.remove();
     $federated_attributes.find('.add_attribute').show();
     if ($federated_attributes.find('tbody tr:visible').length === 0) {
+      $federated_attributes.find('table').hide();
       $federated_attributes.append("<input type='hidden' name='authentication_provider[federated_attributes]' value='' class='no_federated_attributes'>")
     }
     if ($next.length === 0) {

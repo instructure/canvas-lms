@@ -126,15 +126,22 @@ class AccountAuthorizationConfigsPresenter
 
   def federated_provider_attribute(aac, canvas_attribute = nil, selected = nil)
     name = "authentication_provider[federated_attributes][#{canvas_attribute}][attribute]" if selected
+    id = "aacfa_#{canvas_attribute}_attribute_#{id_suffix(aac)}"
     if aac.class.recognized_federated_attributes.nil?
       if selected
-        text_field_tag(name, selected, id: name)
+        text_field_tag(name, selected, id: id)
       else
         text_field_tag(nil)
       end
     else
-      select_tag(name, options_for_select(aac.class.recognized_federated_attributes, selected), class: 'ic-Input', id: name)
+      select_tag(name, options_for_select(aac.class.recognized_federated_attributes, selected), class: 'ic-Input', id: id)
     end
+  end
+
+  def id_suffix(aac)
+    suf = aac.class.sti_name
+    suf += "_#{aac.id}" unless aac.new_record?
+    suf
   end
 
   private

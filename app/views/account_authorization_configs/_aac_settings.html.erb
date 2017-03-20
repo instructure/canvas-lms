@@ -10,11 +10,11 @@
                    as: :authentication_provider,
                    url: url,
                    html: {
-                           id: "#{aac.new_record? ? 'new' : 'edit'}_#{aac.class.sti_name}#{aac.id unless aac.new_record?}",
+                           id: "#{aac.new_record? ? 'new' : 'edit'}_#{presenter.id_suffix(aac)}",
                            class: "ic-Form-group ic-Form-group--horizontal authentication_provider_form"
                    }) do |f| %>
-      <%= f.hidden_field :auth_type, value: aac.auth_type %>
-      <%= f.hidden_field :id %>
+      <%= f.hidden_field :auth_type, value: aac.auth_type, id: nil %>
+      <%= f.hidden_field :id, id: nil %>
         <h3><%= aac.class.display_name %></h3>
         <% if !aac.new_record? %>
           <p><%= mt "You can log in directly with this provider by going to %{url}",
@@ -30,11 +30,15 @@
 
         <% if presenter.configs.length > 1 %>
           <div class="ic-Form-control">
-            <%= f.label :position, t('Position'), class: 'ic-Label' %>
+            <%= f.label(:position,
+                        t('Position'),
+                        class: 'ic-Label',
+                        for: "aac_position_#{presenter.id_suffix(aac)}") %>
             <%= f.select(:position,
                          presenter.position_options(aac),
                          {},
-                         class: "ic-Input") %>
+                         class: "ic-Input",
+                         id: "aac_position_#{presenter.id_suffix(aac)}") %>
           </div>
         <% end %>
 

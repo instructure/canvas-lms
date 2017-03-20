@@ -5,7 +5,7 @@ You should configure %{callback_url} as the Redirect URL.
 After you create your app, make a note of the Client ID and Client Secret, and enter them here.
 TEXT
           %></p>
-  <%= render partial: 'oauth2_fields', locals: { f: f } %>
+  <%= render partial: 'oauth2_fields', locals: { aac: aac, presenter: presenter, f: f } %>
 <% end %>
 <p><%= t(<<-TEXT)
 To restrict to users from a specific Clever district, enter the district's Clever ID here.
@@ -13,12 +13,12 @@ This is required for Clever Instant Login to work in a multi-tenant environment.
 TEXT
 %></p>
 <div class="ic-Form-control">
-  <%= f.label :district_id, t('District ID'), class: 'ic-Label' %>
-  <%= f.text_field :district_id, class: 'ic-Input' %>
+  <%= f.label :district_id, t('District ID'), class: 'ic-Label', for: "district_id_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :district_id, class: 'ic-Input', id: "district_id_#{presenter.id_suffix(aac)}" %>
 </div>
 <p><%= t <<-TEXT
 Note that some attributes may not be populated for all users at Clever.
 TEXT
 %></p>
-<%= render partial: 'login_attribute_dropdown', locals: { f: f, aac: aac } %>
-<%= render partial: 'jit_provisioning_field', locals: { f: f, aac: aac } %>
+<%= render partial: 'login_attribute_dropdown', locals: { aac: aac, presenter: presenter, f: f } %>
+<%= render partial: 'jit_provisioning_field', locals: { aac: aac, presenter: presenter, f: f } %>

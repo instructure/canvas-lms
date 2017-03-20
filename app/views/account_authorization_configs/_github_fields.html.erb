@@ -6,10 +6,10 @@ After you create your app, make a note of the Client ID and Client Secret, and e
 TEXT
           %></p>
   <div class="ic-Form-control">
-    <%= f.label :domain, t('Domain'), class: 'ic-Label' %>
-    <%= f.text_field :domain, placeholder: 'github.com', class: 'ic-Input' %>
+    <%= f.label :domain, t('Domain'), class: 'ic-Label', for: "domain_#{presenter.id_suffix(aac)}" %>
+    <%= f.text_field :domain, placeholder: 'github.com', class: 'ic-Input', id: "domain_#{presenter.id_suffix(aac)}" %>
   </div>
-  <%= render partial: 'oauth2_fields', locals: { f: f } %>
+  <%= render partial: 'oauth2_fields', locals: { aac: aac, presenter: presenter, f: f } %>
 <% end %>
-<%= render partial: 'login_attribute_dropdown', locals: { f: f, aac: aac } %>
-<%= render partial: 'jit_provisioning_field', locals: { f: f, aac: aac } %>
+<%= render partial: 'login_attribute_dropdown', locals: { aac: aac, presenter: presenter, f: f } %>
+<%= render partial: 'jit_provisioning_field', locals: { aac: aac, presenter: presenter, f: f } %>

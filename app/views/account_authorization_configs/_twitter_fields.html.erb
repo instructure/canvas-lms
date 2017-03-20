@@ -6,13 +6,13 @@ After you create your application, make a note of the Consumer Key and Consumer 
 TEXT
       %></p>
   <div class="ic-Form-control">
-    <%= f.label :consumer_key, 'Consumer Key', class: 'ic-Label' %>
-    <%= f.text_field :consumer_key, class: 'ic-Input' %>
+    <%= f.label :consumer_key, 'Consumer Key', class: 'ic-Label', for: "consumer_key_#{presenter.id_suffix(aac)}" %>
+    <%= f.text_field :consumer_key, class: 'ic-Input', id: "consumer_key_#{presenter.id_suffix(aac)}" %>
   </div>
   <div class="ic-Form-control">
-    <%= f.label :consumer_secret, 'Consumer Secret', class: 'ic-Label' %>
-    <%= f.password_field :consumer_secret, class: 'ic-Input' %>
+    <%= f.label :consumer_secret, 'Consumer Secret', class: 'ic-Label', for: "consumer_secret_#{presenter.id_suffix(aac)}" %>
+    <%= f.password_field :consumer_secret, class: 'ic-Input', id: "consumer_secret_#{presenter.id_suffix(aac)}" %>
   </div>
 <% end %>
-<%= render partial: 'login_attribute_dropdown', locals: { f: f, aac: aac } %>
-<%= render partial: 'jit_provisioning_field', locals: { f: f, aac: aac } %>
+<%= render partial: 'login_attribute_dropdown', locals: { aac: aac, presenter: presenter, f: f } %>
+<%= render partial: 'jit_provisioning_field', locals: { aac: aac, presenter: presenter, f: f } %>
