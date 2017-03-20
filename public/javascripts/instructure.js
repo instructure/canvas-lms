@@ -444,8 +444,10 @@ define([
 
 
     $(document).bind('user_content_change', enhanceUserContent);
-    setInterval(enhanceUserContent, 15000);
-    setTimeout(enhanceUserContent, 1000);
+    $(function () {
+      setInterval(enhanceUserContent, 15000);
+      setTimeout(enhanceUserContent, 15);
+    })
 
     $(".zone_cached_datetime").each(function() {
       if($(this).attr('title')) {
