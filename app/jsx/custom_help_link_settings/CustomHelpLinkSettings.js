@@ -1,6 +1,6 @@
 import React from 'react'
 import I18n from 'i18n!custom_help_link'
-import jquery from 'jquery'
+import $ from 'jquery'
 import CustomHelpLinkIcons from './CustomHelpLinkIcons'
 import CustomHelpLink from './CustomHelpLink'
 import CustomHelpLinkForm from './CustomHelpLinkForm'
