@@ -173,22 +173,12 @@ define([
       }
     };
 
-    var focusOnCutoffScore = function() {
-      var idx = parseInt($message_students_dialog.find("select").val(), 10) || 0;
-      var option = currentSettings.options[idx];
-      if (option.cutoff) {
-        $(".cutoff_score").focus();
-      }
-    };
-
     var closeDialog = function() {
       $message_students_dialog.dialog('close');
     };
 
     $message_students_dialog.find(".cancel_button").click(closeDialog);
-    $message_students_dialog.find("select").change(showStudentsMessageSentTo)
-      .change(focusOnCutoffScore)
-      .change(checkSendable);
+    $message_students_dialog.find("select").change(showStudentsMessageSentTo).change(checkSendable);
     $message_students_dialog.find(".cutoff_score").bind('change blur keyup', showStudentsMessageSentTo)
       .bind('change blur keyup', checkSendable);
     $message_students_dialog.find("#body").bind('change blur keyup', checkSendable);
