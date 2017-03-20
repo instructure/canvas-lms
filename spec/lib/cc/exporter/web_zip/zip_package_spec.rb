@@ -559,5 +559,16 @@ describe "ZipPackage" do
       converted_html = @zip_package.convert_html_to_local(html)
       expect(converted_html).to eq expected_html
     end
+
+    it "should convert html content links that are locked" do
+      assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10,
+        description: '<p>Hi</p>', unlock_at: 5.days.from_now)
+      html = %(<a title="Assignment 1" href="/courses/#{@course.id}/assignments/#{assign.id}") +
+             %( data-api-returntype="Assignment">Assignment 1</a>)
+      expected_html = %(<a title="Assignment 1" href="assignments/#{CC::CCHelper.create_key(assign)}") +
+                    %( data-api-returntype="Assignment">Assignment 1</a>)
+      converted_html = @zip_package.convert_html_to_local(html)
+      expect(converted_html).to eq expected_html
+    end
   end
 end

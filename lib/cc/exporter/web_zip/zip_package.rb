@@ -16,7 +16,7 @@ module CC::Exporter::WebZip
       @user = user
       @current_progress = Rails.cache.fetch(progress_key)
       @current_progress ||= MustViewModuleProgressor.new(user, course).current_progress
-      @html_converter = CC::CCHelper::HtmlContentExporter.new(course, user)
+      @html_converter = CC::CCHelper::HtmlContentExporter.new(course, user, for_epub_export: true)
     end
     attr_reader :files, :course, :user, :current_progress
     attr_accessor :file_data

@@ -25,6 +25,8 @@ module CC
       scope = @course.wiki.wiki_pages.not_deleted
       WikiPages::ScopedToUser.new(@course, @user, scope).scope.each do |page|
         next unless export_object?(page)
+        next if @user && page.locked_for?(@user)
+
         begin
           add_exported_asset(page)
 

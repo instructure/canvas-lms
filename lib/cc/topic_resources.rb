@@ -22,6 +22,7 @@ module CC
       scope = @course.discussion_topics.active
       DiscussionTopic::ScopedToUser.new(@course, @user, scope).scope.each do |topic|
         next unless export_object?(topic) || export_object?(topic.assignment)
+        next if @user && topic.locked_for?(@user, check_policies: true)
 
         title = topic.title || I18n.t('course_exports.unknown_titles.topic', "Unknown topic")
 
