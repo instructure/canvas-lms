@@ -88,9 +88,11 @@ class AnnouncementsApiController < ApplicationController
 
     @topics = Api.paginate(scope, self, api_v1_announcements_url)
 
+    text_only = value_to_boolean(params[:text_only])
     render :json => @topics.map { |topic|
              discussion_topic_api_json(topic, topic.context, @current_user, session,
-               { :user_can_moderate => false, :include_assignment => false, :include_context_code => true })
+               { :user_can_moderate => false, :include_assignment => false,
+                 :include_context_code => true, :text_only => text_only})
            }
   end
 
