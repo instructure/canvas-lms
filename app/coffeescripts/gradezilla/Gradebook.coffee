@@ -1860,12 +1860,32 @@ define [
 
     # Assignment Group Column Header
 
+    getAssignmentGroupColumnSortBySetting: (assignmentGroupId) =>
+      columnId = @getAssignmentGroupColumnId(assignmentGroupId)
+      gradeSortDataLoaded =
+        @contentLoadStates.assignmentsLoaded and
+        @contentLoadStates.studentsLoaded and
+        @contentLoadStates.submissionsLoaded
+      sortRowsBySetting = @getSortRowsBySetting()
+
+      {
+        direction: sortRowsBySetting.direction
+        disabled: !gradeSortDataLoaded
+        isSortColumn: sortRowsBySetting.columnId == columnId
+        onSortByGradeAscending: () =>
+          @setSortRowsBySetting(columnId, 'grade', 'ascending')
+        onSortByGradeDescending: () =>
+          @setSortRowsBySetting(columnId, 'grade', 'descending')
+        settingKey: sortRowsBySetting.settingKey
+      }
+
     getAssignmentGroupColumnHeaderProps: (assignmentGroupId) =>
       assignmentGroup = @getAssignmentGroup(assignmentGroupId)
       {
         assignmentGroup:
           name: assignmentGroup.name
           groupWeight: assignmentGroup.group_weight
+        sortBySetting: @getAssignmentGroupColumnSortBySetting(assignmentGroupId)
         weightedGroups: @weightedGroups()
       }
 

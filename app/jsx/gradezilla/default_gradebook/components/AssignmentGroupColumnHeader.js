@@ -18,15 +18,12 @@
 
 import React from 'react'
 import IconMoreSolid from 'instructure-icons/react/Solid/IconMoreSolid'
-import { MenuItem } from 'instructure-ui/Menu'
+import { MenuItem, MenuItemGroup } from 'instructure-ui/Menu'
 import PopoverMenu from 'instructure-ui/PopoverMenu'
 import Typography from 'instructure-ui/Typography'
 import I18n from 'i18n!gradebook'
 
-const { bool, number, shape, string } = React.PropTypes;
-
-// TODO: remove this rule when this component begins using internal state
-/* eslint-disable react/prefer-stateless-function */
+const { bool, func, number, shape, string } = React.PropTypes;
 
 function renderTrigger (assignmentGroup) {
   return (
@@ -59,11 +56,26 @@ class AssignmentGroupColumnHeader extends React.Component {
       name: string.isRequired,
       groupWeight: number
     }).isRequired,
+    sortBySetting: shape({
+      direction: string.isRequired,
+      disabled: bool.isRequired,
+      isSortColumn: bool.isRequired,
+      onSortByGradeAscending: func.isRequired,
+      onSortByGradeDescending: func.isRequired,
+      settingKey: string.isRequired
+    }).isRequired,
     weightedGroups: bool.isRequired
   };
 
+  constructor (props) {
+    super(props);
+
+    this.bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref };
+  }
+
   render () {
-    const { assignmentGroup, weightedGroups } = this.props;
+    const { assignmentGroup, sortBySetting, weightedGroups } = this.props;
+    const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey;
 
     return (
       <div className="Gradebook__ColumnHeaderContent">
@@ -73,12 +85,27 @@ class AssignmentGroupColumnHeader extends React.Component {
         </span>
 
         <PopoverMenu
-          zIndex="9999"
+          contentRef={this.bindOptionsMenuContent}
           trigger={renderTrigger(this.props.assignmentGroup)}
+          zIndex="9999"
         >
-          <MenuItem>Placeholder Item 1</MenuItem>
-          <MenuItem>Placeholder Item 2</MenuItem>
-          <MenuItem>Placeholder Item 3</MenuItem>
+          <MenuItemGroup label={I18n.t('Sort by')}>
+            <MenuItem
+              selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'ascending'}
+              disabled={sortBySetting.disabled}
+              onSelect={sortBySetting.onSortByGradeAscending}
+            >
+              <span>{I18n.t('Grade - Low to High')}</span>
+            </MenuItem>
+
+            <MenuItem
+              selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'descending'}
+              disabled={sortBySetting.disabled}
+              onSelect={sortBySetting.onSortByGradeDescending}
+            >
+              <span>{I18n.t('Grade - High to Low')}</span>
+            </MenuItem>
+          </MenuItemGroup>
         </PopoverMenu>
       </div>
     );
