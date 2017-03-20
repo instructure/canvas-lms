@@ -3,7 +3,7 @@
   <td class="app_name"><%= access_token.try(:app_name) || t(:default_app_name, "No App") %></td>
   <td class="purpose"><%= access_token.try(:purpose) || nbsp %></td>
   <td class="dates">
-    <table class="subtable">
+    <table class="subtable" role="presentation">
       <tr>
         <td><%= before_label(:token_expires, "Expires") %></td>
         <td class="expires nobr"><%= datetime_string(access_token.try(:expires_at)) || t('profile.token_never_expires', 'never') %></td>

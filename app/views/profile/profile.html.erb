@@ -1,4 +1,4 @@
-<% content_for :page_title do %>
+<% content_for(:page_title) do %>
   <%= join_title t("User Settings"), @user.name %>
 <% end %>
 
@@ -480,8 +480,8 @@ TEXT
           <th scope="col"><%= t('headers.application_abbrev', "App") %></th>
           <th scope="col"><%= t('headers.purpose', "Purpose") %></th>
           <th scope="col"><%= t('headers.dates', "Dates") %></th>
-          <th>&nbsp;</th>
-          <th>&nbsp;</th>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
         </tr>
       </thead>
       <tbody>
@@ -563,11 +563,7 @@ TEXT
         </tr>
         <tr>
           <td>
-            <%= f.blabel :expires_at, en: "Expires" %>
-            <label class="screenreader-only" id="token_expires_at_accessible_label">
-              <%= t("Access token is valid until") %>
-              <%= datepicker_screenreader_prompt %>
-            </label>
+            <%= f.blabel :expires_at, en: "Expires", id: "token_expires_at_accessible_label" %>
           </td>
           <td>
             <div>
@@ -575,10 +571,11 @@ TEXT
                                class: "expires_field datetime_field",
                                style: "width: 120px;",
                                "aria-labelledby" => "token_expires_at_accessible_label",
+                               "aria-describedby" => "leave_blank_for_no_expiration",
                                "data-tooltip" => "{\"position\":\"top\",\"force_position\":\"true\"}",
                                title: accessible_date_format %>
             </div>
-            <div style="font-size: 0.8em;" class="hint">
+            <div style="font-size: 0.8em;" class="hint" id="leave_blank_for_no_expiration">
               <%= t('hints.expires_at', "leave blank for no expiration") %>
             </div>
           </td>
