@@ -20,6 +20,7 @@ import _ from 'underscore'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import natcompare from 'compiled/util/natcompare'
+import round from 'compiled/util/round'
 import fakeENV from 'helpers/fakeENV'
 import GradeCalculatorSpecHelper from 'spec/jsx/gradebook/GradeCalculatorSpecHelper'
 import SubmissionDetailsDialog from 'compiled/SubmissionDetailsDialog'
@@ -264,6 +265,43 @@ test('does not calculate when the student is not initialized', function () {
   notOk(CourseGradeCalculator.calculate.called);
 });
 
+QUnit.module('Gradebook#getStudentGradeForColumn');
+
+test('returns the grade stored on the student for the column id', function () {
+  const student = { total_grade: { score: 5, possible: 10 } };
+  const grade = createGradebook().getStudentGradeForColumn(student, 'total_grade');
+  equal(grade, student.total_grade);
+});
+
+test('returns an empty grade when the student has no grade for the column id', function () {
+  const student = { total_grade: undefined };
+  const grade = createGradebook().getStudentGradeForColumn(student, 'total_grade');
+  strictEqual(grade.score, null, 'grade has a null score');
+  strictEqual(grade.possible, 0, 'grade has no points possible');
+});
+
+QUnit.module('Gradebook#getGradeAsPercent');
+
+test('returns a percent for a grade with points possible', function () {
+  const percent = createGradebook().getGradeAsPercent({ score: 5, possible: 10 });
+  equal(percent, 0.5);
+});
+
+test('returns null for a grade with no points possible', function () {
+  const percent = createGradebook().getGradeAsPercent({ score: 5, possible: 0 });
+  strictEqual(percent, null);
+});
+
+test('returns 0 for a grade with a null score', function () {
+  const percent = createGradebook().getGradeAsPercent({ score: null, possible: 10 });
+  strictEqual(percent, 0);
+});
+
+test('returns 0 for a grade with an undefined score', function () {
+  const percent = createGradebook().getGradeAsPercent({ score: undefined, possible: 10 });
+  strictEqual(percent, 0);
+});
+
 QUnit.module('Gradebook#localeSort');
 
 test('delegates to natcompare.strings', function () {
@@ -280,60 +318,106 @@ test('substitutes falsy args with empty string', function () {
   deepEqual(natcompare.strings.getCall(0).args, ['', '']);
 });
 
-QUnit.module('Gradebook#gradeSort');
+QUnit.module('Gradebook#gradeSort by an assignment', {
+  setup () {
+    this.studentA = { assignment_201: { score: 10, possible: 20 } };
+    this.studentB = { assignment_201: { score: 6, possible: 10 } };
+  }
+});
 
-test('gradeSort - total_grade', function () {
-  const gradeSort = function (showTotalGradeAsPoints, a, b, field, asc = true) {
-    return Gradebook.prototype.gradeSort.call({
-      options: {
-        show_total_grade_as_points: showTotalGradeAsPoints
-      }
-    }, a, b, field, asc);
-  };
-  ok(gradeSort(false, {
-    total_grade: {
-      score: 10,
-      possible: 20
-    }
-  }, {
-    total_grade: {
-      score: 5,
-      possible: 10
-    }
-  }, 'total_grade') === 0, 'total_grade sorts by percent (normally)');
-  ok(gradeSort(true, {
-    total_grade: {
-      score: 10,
-      possible: 20
-    }
-  }, {
-    total_grade: {
-      score: 5,
-      possible: 10
-    }
-  }, 'total_grade') > 0, 'total_grade sorts by score when if show_total_grade_as_points');
-  ok(gradeSort(true, {
-    assignment_group_1: {
-      score: 10,
-      possible: 20
-    }
-  }, {
-    assignment_group_1: {
-      score: 5,
-      possible: 10
-    }
-  }, 'assignment_group_1') === 0, 'assignment groups are always sorted by percent');
-  ok(gradeSort(false, {
-    assignment1: {
-      score: 5,
-      possible: 10
-    }
-  }, {
-    assignment1: {
-      score: 10,
-      possible: 20
-    }
-  }, 'assignment1') < 0, 'other fields are sorted by score');
+test('always sorts by score', function () {
+  const gradebook = createGradebook({ show_total_grade_as_points: true });
+  const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'assignment_201', true);
+  // a positive value indicates reversing the order of inputs
+  equal(comparison, 4, 'studentA with the higher score is ordered second');
+});
+
+test('optionally sorts in descending order', function () {
+  const gradebook = createGradebook({ show_total_grade_as_points: true });
+  const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'assignment_201', false);
+  // a negative value indicates preserving the order of inputs
+  equal(comparison, -4, 'studentA with the higher score is ordered first');
+});
+
+QUnit.module('Gradebook#gradeSort by an assignment group', {
+  setup () {
+    this.studentA = { assignment_group_301: { score: 10, possible: 20 } };
+    this.studentB = { assignment_group_301: { score: 6, possible: 10 } };
+  }
+});
+
+test('always sorts by percent', function () {
+  const gradebook = createGradebook({ show_total_grade_as_points: false });
+  const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'assignment_group_301', true);
+  // a negative value indicates preserving the order of inputs
+  equal(round(comparison, 1), -0.1, 'studentB with the higher percent is ordered second');
+});
+
+test('optionally sorts in descending order', function () {
+  const gradebook = createGradebook({ show_total_grade_as_points: true });
+  const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'assignment_group_301', false);
+  // a positive value indicates reversing the order of inputs
+  equal(round(comparison, 1), 0.1, 'studentB with the higher percent is ordered first');
+});
+
+test('sorts grades with no points possible at lowest priority', function () {
+  this.studentA.assignment_group_301.possible = 0;
+  const gradebook = createGradebook({ show_total_grade_as_points: false });
+  const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'assignment_group_301', true);
+  // a value of 1 indicates reversing the order of inputs
+  equal(comparison, 1, 'studentA with no points possible is ordered second');
+});
+
+test('sorts grades with no points possible at lowest priority in descending order', function () {
+  this.studentA.assignment_group_301.possible = 0;
+  const gradebook = createGradebook({ show_total_grade_as_points: false });
+  const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'assignment_group_301', false);
+  // a value of 1 indicates reversing the order of inputs
+  equal(comparison, 1, 'studentA with no points possible is ordered second');
+});
+
+QUnit.module('Gradebook#gradeSort by "total_grade"', {
+  setup () {
+    this.studentA = { total_grade: { score: 10, possible: 20 } };
+    this.studentB = { total_grade: { score: 6, possible: 10 } };
+  }
+});
+
+test('sorts by percent when not showing total grade as points', function () {
+  const gradebook = createGradebook({ show_total_grade_as_points: false });
+  const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'total_grade', true);
+  // a negative value indicates preserving the order of inputs
+  equal(round(comparison, 1), -0.1, 'studentB with the higher percent is ordered second');
+});
+
+test('sorts percent grades with no points possible at lowest priority', function () {
+  this.studentA.total_grade.possible = 0;
+  const gradebook = createGradebook({ show_total_grade_as_points: false });
+  const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'total_grade', true);
+  // a value of 1 indicates reversing the order of inputs
+  equal(comparison, 1, 'studentA with no points possible is ordered second');
+});
+
+test('sorts percent grades with no points possible at lowest priority in descending order', function () {
+  this.studentA.total_grade.possible = 0;
+  const gradebook = createGradebook({ show_total_grade_as_points: false });
+  const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'total_grade', false);
+  // a value of 1 indicates reversing the order of inputs
+  equal(comparison, 1, 'studentA with no points possible is ordered second');
+});
+
+test('sorts by score when showing total grade as points', function () {
+  const gradebook = createGradebook({ show_total_grade_as_points: true });
+  const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'total_grade', true);
+  // a positive value indicates reversing the order of inputs
+  equal(comparison, 4, 'studentA with the higher score is ordered second');
+});
+
+test('optionally sorts in descending order', function () {
+  const gradebook = createGradebook({ show_total_grade_as_points: true });
+  const comparison = gradebook.gradeSort(this.studentA, this.studentB, 'total_grade', false);
+  // a negative value indicates preserving the order of inputs
+  equal(comparison, -4, 'studentA with the higher score is ordered first');
 });
 
 QUnit.module('Gradebook#hideAggregateColumns', {

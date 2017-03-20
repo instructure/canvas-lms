@@ -1508,28 +1508,32 @@ define [
         @addDroppedClass(student)
       @grid?.invalidate()
 
+    getStudentGradeForColumn: (student, field) =>
+      student[field] || { score: null, possible: 0 }
+
+    getGradeAsPercent: (grade) =>
+      if grade.possible > 0
+        (grade.score || 0) / grade.possible
+      else
+        null
+
     localeSort: (a, b) ->
       natcompare.strings(a || '', b || '')
 
     gradeSort: (a, b, field, asc) =>
-      scoreForSorting = (obj) =>
-        percent = (obj) ->
-          if obj[field].possible > 0
-            obj[field].score / obj[field].possible
-          else
-            null
-
+      scoreForSorting = (student) =>
+        grade = @getStudentGradeForColumn(student, field)
         switch
           when field == "total_grade"
             if @options.show_total_grade_as_points
-              obj[field].score
+              grade.score
             else
-              percent(obj)
+              @getGradeAsPercent(grade)
           when field.match /^assignment_group/
-            percent(obj)
+            @getGradeAsPercent(grade)
           else
             # TODO: support assignment grading types
-            obj[field].score
+            grade.score
 
       NumberCompare(scoreForSorting(a), scoreForSorting(b), descending: !asc)
 
