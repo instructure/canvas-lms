@@ -34,6 +34,7 @@ module Api::V1::Quiz
       one_question_at_a_time
       one_time_results
       only_visible_to_overrides
+      points_possible
       published
       quiz_type
       require_lockdown_browser
