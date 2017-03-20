@@ -86,9 +86,6 @@
         </span>
         <span class="publish-icon" data-view="publish-icon"></span>
         <div class="inline-block">
-          {{#if restricted_by_master_course}}
-            <div class="options-spacer"></div>
-          {{else}}
           <a
             class="al-trigger al-trigger-gray"
             id="assign_{{id}}_manage_link"
@@ -164,7 +161,6 @@
             {{/if}}
             {{>ExternalTools/external_tools_menu menu_tools}}
           </ul>
-          {{/if}}
         </div>
       </div>
     </div>

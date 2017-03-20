@@ -411,7 +411,6 @@ class AssignmentsController < ApplicationController
     rce_js_env(:highrisk)
     @assignment ||= @context.assignments.active.find(params[:id])
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
-      return render_unauthorized_action if !@assignment.new_record? && editing_restricted?(@assignment)
       @assignment.title = params[:title] if params[:title]
       @assignment.due_at = params[:due_at] if params[:due_at]
       @assignment.points_possible = params[:points_possible] if params[:points_possible]
@@ -505,6 +504,7 @@ class AssignmentsController < ApplicationController
       end
       js_env(hash)
       conditional_release_js_env(@assignment)
+      set_master_course_js_env_data(@assignment, @context)
       render :edit
     end
   end

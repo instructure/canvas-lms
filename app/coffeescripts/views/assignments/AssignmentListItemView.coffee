@@ -213,7 +213,7 @@ define [
       @$el.remove()
 
     canDelete: ->
-      @userIsAdmin or @model.canDelete()
+      (@userIsAdmin or @model.canDelete()) && !@model.isRestrictedByMasterCourse()
 
     canMove: ->
       @userIsAdmin or (@canManage() and @model.canMove())

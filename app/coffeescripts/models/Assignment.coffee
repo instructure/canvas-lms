@@ -493,3 +493,6 @@ define [
     isOnlyVisibleToOverrides: (override_flag) ->
       return @get('only_visible_to_overrides') || false unless arguments.length > 0
       @set 'only_visible_to_overrides', override_flag
+
+    isRestrictedByMasterCourse: ->
+      @get('is_master_course_child_content') && @get('restricted_by_master_course')

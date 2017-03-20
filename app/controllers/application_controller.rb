@@ -268,7 +268,7 @@ class ApplicationController < ActionController::Base
   end
   helper_method :set_master_course_js_env_data
 
-  def editing_restricted?(content, edit_type=:all)
+  def editing_restricted?(content, edit_type=:any)
     return false unless master_courses? && content.respond_to?(:editing_restricted?)
     content.editing_restricted?(edit_type)
   end
