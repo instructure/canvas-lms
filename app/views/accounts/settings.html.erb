@@ -726,7 +726,7 @@ acknowledge that you have read and agreed to the
         <h2><%= t(:add_admin_title, "Add Account Admins") %></h2>
         <div style="margin-top: 5px;">
           <div>
-            <%= label_tag :role_id, :en => "Add More" %>
+            <%= label_tag :role_id, t("Add More") %>
             <select name="role_id" id="admin_role_id">
             <% available_roles.each do |role| %>
               <option value="<%= role.id %>"><%= AccountUser.readable_type(role.name) %></option>
