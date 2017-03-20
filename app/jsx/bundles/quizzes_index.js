@@ -1,79 +1,82 @@
-require [
-  'i18n!quizzes'
-  'jquery'
-  'underscore'
-  'Backbone'
-  'compiled/views/quizzes/QuizItemGroupView'
-  'compiled/views/quizzes/NoQuizzesView'
-  'compiled/views/quizzes/IndexView'
-  'compiled/collections/QuizCollection'
-  'compiled/models/QuizOverrideLoader'
-  'compiled/util/vddTooltip'
-], (I18n, $, _, Backbone, QuizItemGroupView, NoQuizzesView, IndexView, QuizCollection, QuizOverrideLoader, vddTooltip) ->
+import I18n from 'i18n!quizzes'
+import $ from 'jquery'
+import _ from 'underscore'
+import Backbone from 'Backbone'
+import QuizItemGroupView from 'compiled/views/quizzes/QuizItemGroupView'
+import NoQuizzesView from 'compiled/views/quizzes/NoQuizzesView'
+import IndexView from 'compiled/views/quizzes/IndexView'
+import QuizCollection from 'compiled/collections/QuizCollection'
+import QuizOverrideLoader from 'compiled/models/QuizOverrideLoader'
+import vddTooltip from 'compiled/util/vddTooltip'
 
-  class QuizzesIndexRouter extends Backbone.Router
-    routes:
-      '': 'index'
+const QuizzesIndexRouter = Backbone.Router.extend({
 
-    translations:
-      assignmentQuizzes: I18n.t('headers.assignment_quizzes', 'Assignment Quizzes')
-      practiceQuizzes:   I18n.t('headers.practice_quizzes', 'Practice Quizzes')
-      surveys:           I18n.t('headers.surveys', 'Surveys')
-      toggleMessage:     I18n.t('toggle_message', 'toggle quiz visibility')
+  routes: {
+    '': 'index'
+  },
 
-    initialize: ->
-      @allQuizzes = ENV.QUIZZES
+  translations: {
+    assignmentQuizzes: I18n.t('headers.assignment_quizzes', 'Assignment Quizzes'),
+    practiceQuizzes: I18n.t('headers.practice_quizzes', 'Practice Quizzes'),
+    surveys: I18n.t('headers.surveys', 'Surveys'),
+    toggleMessage: I18n.t('toggle_message', 'toggle quiz visibility')
+  },
 
-      @quizzes =
-        assignment: @createQuizItemGroupView(
-          @allQuizzes.assignment, @translations.assignmentQuizzes, 'assignment'
-        )
-        open: @createQuizItemGroupView(
-          @allQuizzes.open, @translations.practiceQuizzes, 'open'
-        )
-        surveys: @createQuizItemGroupView(
-          @allQuizzes.surveys, @translations.surveys, 'surveys'
-        )
-        noQuizzes:
-          new NoQuizzesView
+  initialize () {
+    this.allQuizzes = ENV.QUIZZES
 
-    index: ->
-      @view = new IndexView
-        assignmentView:  @quizzes.assignment
-        openView:        @quizzes.open
-        surveyView:      @quizzes.surveys
-        noQuizzesView:   @quizzes.noQuizzes
-        permissions:     ENV.PERMISSIONS
-        flags:           ENV.FLAGS
-        urls:            ENV.URLS
-      @view.render()
-      @loadOverrides() if @shouldLoadOverrides()
+    this.quizzes = {
+      assignment: this.createQuizItemGroupView(this.allQuizzes.assignment, this.translations.assignmentQuizzes, 'assignment'),
+      open: this.createQuizItemGroupView(this.allQuizzes.open, this.translations.practiceQuizzes, 'open'),
+      surveys: this.createQuizItemGroupView(this.allQuizzes.surveys, this.translations.surveys, 'surveys'),
+      noQuizzes: new NoQuizzesView()
+    }
+  },
 
-    loadOverrides: ->
-      quizModels = [ 'assignment', 'open', 'surveys' ].reduce (out, quizType) =>
-        out.concat(@quizzes[quizType].collection.models)
-      , []
+  index () {
+    this.view = new IndexView({
+      assignmentView: this.quizzes.assignment,
+      openView: this.quizzes.open,
+      surveyView: this.quizzes.surveys,
+      noQuizzesView: this.quizzes.noQuizzes,
+      permissions: ENV.PERMISSIONS,
+      flags: ENV.FLAGS,
+      urls: ENV.URLS
+    })
+    this.view.render()
+    if (this.shouldLoadOverrides()) this.loadOverrides()
+  },
 
-      QuizOverrideLoader.loadQuizOverrides(quizModels, ENV.URLS.assignment_overrides)
+  loadOverrides () {
+    const quizModels = ['assignment', 'open', 'surveys'].reduce((out, quizType) =>
+      out.concat(this.quizzes[quizType].collection.models)
+    , [])
 
-    createQuizItemGroupView: (collection, title, type) ->
-      options = @allQuizzes.options
+    return QuizOverrideLoader.loadQuizOverrides(quizModels, ENV.URLS.assignment_overrides)
+  },
 
-      # get quiz attributes from root container and add options
-      new QuizItemGroupView
-        collection: new QuizCollection(_.map(collection, (quiz) ->
-          $.extend(quiz, options[quiz.id])
-        ))
-        isSurvey: type is 'surveys'
-        listId: "#{type}-quizzes"
-        title: title
-        toggleMessage: @translations.toggleMessage
+  createQuizItemGroupView (collection, title, type) {
+    const { options } = this.allQuizzes
 
-    shouldLoadOverrides: ->
-      true
+    // get quiz attributes from root container and add options
+    return new QuizItemGroupView({
+      collection: new QuizCollection(_.map(collection, quiz =>
+        $.extend(quiz, options[quiz.id]))
+      ),
+      isSurvey: type === 'surveys',
+      listId: `${type}-quizzes`,
+      title,
+      toggleMessage: this.translations.toggleMessage
+    })
+  },
 
-  # Start up the page
-  router = new QuizzesIndexRouter
-  Backbone.history.start()
+  shouldLoadOverrides () {
+    return true
+  }
+})
 
-  vddTooltip()
+// Start up the page
+const router = new QuizzesIndexRouter()
+Backbone.history.start()
+
+vddTooltip()
