@@ -900,6 +900,9 @@ define([
     // the external link look and behavior (force them to open in a new tab)
     setTimeout(function() {
       $("#content a:external,#content a.explicit_external_link").each(function(){
+        var indicatorText = I18n.t('titles.external_link', 'Links to an external site.');
+        var $linkIndicator = $('<span class="ui-icon ui-icon-extlink ui-icon-inline"/>').attr('title', indicatorText);
+        $linkIndicator.append($('<span class="screenreader-only"/>').text(indicatorText));
         $(this)
           .not(".open_in_a_new_tab")
           .not(":has(img)")
@@ -910,7 +913,7 @@ define([
           .html('<span>' + $(this).html() + '</span>')
           .attr('target', '_blank')
           .attr('rel', 'noreferrer')
-          .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="' + htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')) + '"/>');
+          .append($linkIndicator);
       });
     }, 2000);
   });

@@ -738,9 +738,8 @@ define([
   })();
 
   var addIcon = function($icon_container, css_class, message) {
-    var $icon = $("<i data-tooltip><span class='screenreader-only'></span></i>");
+    var $icon = $("<i data-tooltip></i>");
     $icon.attr('class', css_class).attr('title', message).attr('aria-label', message);
-    $icon.find('span').html(htmlEscape(message));
     $icon_container.empty().append($icon);
   }
 
