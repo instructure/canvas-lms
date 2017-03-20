@@ -210,8 +210,7 @@
 <div style="display: none;">
   <a href="<%= context_url(@context, :progressions_context_context_modules_url) %>" class="progression_list_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_context_modules_assignment_info_url) %>" class="assignment_info_url">&nbsp;</a>
-  <label class="screenreader-only" for="module_list"><%= t('Select prerequisite module') %></label>
-  <select id="module_list">
+  <select id="module_list" aria-label="<%= t('Select prerequisite module') %>">
     <option value="">[ <%= t('select_module.instructions', %{Select Module}) %> ]</option>
     <% @modules.each do |m| %>
       <option value="<%= m.id %>" class="context_module_option context_module_<%= m.id %>"><%= t 'select_module.name', '%{module}', :module => m.name %></option>
@@ -226,13 +225,11 @@
   <div id="completion_criterion_option" class="completion_criterion_option">
     <% ot 'criterion_for_assignment', '%{assignment} %{select_criterion}', :assignment => capture { %>
     <span style="padding: 0 4px;">
-      <label class="screenreader-only" for="criterion_assignment_picker"><%= t('Requirement subject') %></label>
-      <select id="criterion_assignment_picker" class="id assignment_picker" tabindex="0"></select>
+      <select class="id assignment_picker" tabindex="0" aria-label="<%= t('Requirement subject') %>"></select>
     </span>
     <% }, :select_criterion => capture { %>
     <span style="padding: 0 4px;">
-      <label class="screenreader-only" for="criterion_requirement_picker"><%= t('Requirement') %></label>
-      <select id="criterion_requirement_picker" class="type assignment_requirement_picker" tabindex="0">
+      <select class="type assignment_requirement_picker" tabindex="0" aria-label="<%= t('Requirement') %>">
         <option class="any" value="must_view"><%= t('requirements.must_view', %{view the item}) %></option>
         <option class="assignment wiki_page" value="must_mark_done"><%= t(%{mark as done}) %></option>
         <option class="wiki_page discussion_topic" value="must_contribute"><%= t('requirements.must_contribute', %{contribute to the page}) %></option>
