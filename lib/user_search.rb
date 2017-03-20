@@ -29,7 +29,7 @@ module UserSearch
     conditions = []
 
     if complex_search_enabled? && !options[:restrict_search]
-      conditions << complex_sql << pattern << pattern << CommunicationChannel::TYPE_EMAIL << pattern
+      conditions << complex_sql << pattern << pattern << pattern << CommunicationChannel::TYPE_EMAIL << pattern
     else
       conditions << like_condition('users.name') << pattern
     end
@@ -99,7 +99,8 @@ module UserSearch
   def self.complex_sql
     <<-SQL
       (EXISTS (SELECT 1 FROM #{Pseudonym.quoted_table_name}
-         WHERE #{like_condition('pseudonyms.sis_user_id')}
+         WHERE (#{like_condition('pseudonyms.sis_user_id')} OR
+             #{like_condition('pseudonyms.unique_id')})
            AND pseudonyms.user_id = users.id
            AND pseudonyms.workflow_state='active')
        OR (#{like_condition('users.name')})

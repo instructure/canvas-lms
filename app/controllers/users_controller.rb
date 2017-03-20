@@ -375,8 +375,8 @@ class UsersController < ApplicationController
   #   Note that the API will prefer matching on canonical user ID if the ID has
   #   a numeric form. It will only search against other fields if non-numeric
   #   in form, or if the numeric value doesn't yield any matches. Queries by
-  #   administrative users will search on SIS ID, name, or email address; non-
-  #   administrative queries will only be compared against name.
+  #   administrative users will search on SIS ID, login ID, name, or email
+  #   address; non-administrative queries will only be compared against name.
   #
   #  @example_request
   #    curl https://<canvas>/api/v1/accounts/self/users?search_term=<search value> \
