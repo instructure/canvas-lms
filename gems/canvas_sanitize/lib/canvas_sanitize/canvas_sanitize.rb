@@ -156,7 +156,7 @@ module CanvasSanitize #:nodoc:
           'source' => ['src', 'type'].freeze,
           'embed' => ['name', 'src', 'type', 'allowfullscreen', 'pluginspage', 'wmode',
                       'allowscriptaccess', 'width', 'height'].freeze,
-          'video' => ['name', 'src', 'allowfullscreen', 'muted', 'poster', 'width', 'height', 'controls'].freeze,
+          'video' => ['name', 'src', 'allowfullscreen', 'muted', 'poster', 'width', 'height', 'controls', 'playsinline'].freeze,
           'track' => ['default', 'kind', 'label', 'src', 'srclang'].freeze,
           'audio' => ['name', 'src', 'muted'].freeze,
           'font' => ['face', 'color', 'size'].freeze,
