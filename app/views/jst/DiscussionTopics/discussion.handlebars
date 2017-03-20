@@ -104,7 +104,6 @@
     </div>
 
     <div class="discussion-actions">
-      {{#unless restricted_by_master_course}}
       {{#if permissions.delete}}
         <a href="#" class="al-trigger al-trigger-gray" role="button" id="manage_link">
           <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
@@ -150,15 +149,16 @@
             <a href="discussion_topics/{{id}}/edit?return_to={{return_to}}#mastery-paths-editor" class="icon-mastery-path" title="{{#t}}Edit Mastery Paths for {{title}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
           </li>
           {{/if}}
-          <li>
-            <a href="#" class="icon-trash" title="{{#t}}Delete{{/t}}">{{#t}}Delete{{/t}}</a>
-          </li>
+          {{#unless cannot_delete_by_master_course}}
+            <li>
+              <a href="#" class="icon-trash" title="{{#t}}Delete{{/t}}">{{#t}}Delete{{/t}}</a>
+            </li>
+          {{/unless}}
           {{#if ENV.permissions.manage_content}}
             {{>ExternalTools/external_tools_menu discussion_topic_menu_tools}}
           {{/if}}
         </ul>
       {{/if}}
-      {{/unless}}
     </div>
   </div>
 </div>

@@ -405,7 +405,6 @@ class DiscussionTopicsController < ApplicationController
   def edit
     @topic ||= @context.all_discussion_topics.find(params[:id])
     if authorized_action(@topic, @current_user, (@topic.new_record? ? :create : :update))
-      return render_unauthorized_action if !@topic.new_record? && editing_restricted?(@topic)
       hash =  {
         URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
         PERMISSIONS: {
