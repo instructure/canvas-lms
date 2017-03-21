@@ -141,7 +141,7 @@ describe "courses" do
         f("#wizard_home_page").click
         f(".ic-wizard-box__message-button a").click
         wait_for_ajaximations
-        modal = f("#edit_course_home_content_form")
+        modal = fj("h3:contains('Choose Home Page')")
         expect(modal).to be_displayed
       end
 

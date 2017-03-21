@@ -20,7 +20,7 @@
           <%= t('headers.course_status', %{Course Status}) %>
         </h3>
         <div id='course_status_actions' class="ui-buttonset">
-          <%= form_for @context do |f| %>
+          <%= form_for @context, html: {id: "course_status_form"} do |f| %>
             <% if @context.created? || @context.claimed? %>
               <button type="button" class='ui-button btn-unpublish disabled'>
                 <i class="icon-unpublish"></i>
@@ -51,10 +51,8 @@
       <div class="course-options">
         <%= external_tools_menu_items(@course_home_sub_navigation_tools, {link_class: "btn button-sidebar-wide course-home-sub-navigation-lti", settings_key: :course_home_sub_navigation}) %>
         <% if @can_manage %>
-          <a class="btn button-sidebar-wide element_toggler choose_home_page_link" aria-controls="edit_course_home_content_form" href="<%= context_url(@context, :context_details_url) %>">
-            <i class="icon-target"></i>
-            <%= t('links.choose_home_page', %{Choose Home Page}) %>
-          </a>
+          <div id="choose_home_page"></div>
+          <div id="choose_home_page_not_modules"></div>
         <% end %>
 
         <% if @course_home_view != 'feed' %>
@@ -150,37 +148,7 @@
   <%= render :partial => 'shared/dashboard_invitation', :object => @pending_enrollment %>
 <% end %>
 
-<% has_front_page = @context.wiki && @context.wiki.front_page %>
-<% content_for :right_side do %>
-  <div id="edit_course_home_content" style="display: none;">
-    <h2><%= t('draft_state.headings.set_layout', %{Set Home Page Layout}) %></h2>
-    <%= form_for :course, :url => context_url(@context, :context_url), :html => {:tabindex=>"0", :'data-turn-into-dialog'=>'{"height": 300, "width":500,"modal":true}', :title=>t('headings.choose_home_page_title', %{Choose Home Page}), :style => "display:none", :id => "edit_course_home_content_form", :method => :put} do |f| %>
-      <label for="edit_course_home_content_select"><%= t('draft_state.labels.select_content', %{Select what you'd like to display on the home page.}) %></label>
-
-      <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="feed" <%= 'checked' if @context.default_view == 'feed' || (!has_front_page && @context.default_view == 'wiki') %>><%= t('draft_state.options.course_activity_stream', %{Course Activity Stream}) %></label></div>
-      <div class="form_group">
-        <label class="radio"><input type="radio" name="course[default_view]" value="wiki" <%= 'checked' if has_front_page && @context.default_view == 'wiki' %><%= 'disabled' unless has_front_page %>>
-          <span class="<%= 'ui-state-disabled' unless has_front_page %>"><%= t('draft_state.options.custom_page', %{Pages Front Page}) %></span></label>
-        <% if has_front_page %>
-          <small>&emsp;<%= @context.wiki.front_page.title %>&emsp;[ <%= link_to t('change_home_page', 'Change'), polymorphic_url([@context, :wiki_pages]) %> ]</small>
-        <% else %>
-          <small>&emsp;[ <%= link_to t('front_page_not_set', 'Front page must be set first'), polymorphic_url([@context, :wiki_pages]) %> ]</small>
-        <% end %>
-      </div>
-      <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="modules" <%= 'checked' if @context.default_view == 'modules' %>><%= t('draft_state.options.modules', %{Course Modules}) %></label></div>
-      <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="assignments" <%= 'checked' if @context.default_view == 'assignments' %>><%= t('draft_state.options.assignments', %{Assignments List}) %></label></div>
-      <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="syllabus" <%= 'checked' if @context.default_view == 'syllabus' %>><%= t('draft_state.options.syllabus', %{Syllabus}) %></label></div>
-
-      <div class="button-container">
-        <a type="button" class="btn button-secondary dialog_closer"><%= t('draft_state.buttons.cancel', %{Cancel}) %></a>
-        <button type="submit" class="btn btn-primary"><%= t('draft_state.buttons.update_layout', %{Save}) %></button>
-      </div>
-    <% end %>
-  </div>
-<% end %>
-
 <div id="course_home_content">
-
   <% if @course_home_view == 'wiki' %>
     <% js_bundle :wiki_page_show %>
     <% if @context.show_announcements_on_home_page? %>
