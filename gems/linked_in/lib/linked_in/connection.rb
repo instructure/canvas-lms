@@ -56,7 +56,7 @@ module LinkedIn
 
     def authorize_url(return_to, nonce)
       config = self.class.config
-      "https://www.linkedin.com/oauth/v2/authorization?response_type=code&scope=r_fullprofile&client_id=#{config['api_key']}&state=#{nonce}&redirect_uri=#{CGI.escape(return_to)}"
+      "https://www.linkedin.com/oauth/v2/authorization?response_type=code&scope=r_emailaddress%20r_fullprofile&client_id=#{config['api_key']}&state=#{nonce}&redirect_uri=#{CGI.escape(return_to)}"
     end
 
     def exchange_code_for_token(code, redirect_uri)
