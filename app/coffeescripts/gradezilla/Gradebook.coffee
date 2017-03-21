@@ -156,8 +156,7 @@ define [
         @options.settings['show_concluded_enrollments'] == "true"
       @showInactiveEnrollments =
         @options.settings['show_inactive_enrollments'] == "true"
-      @totalColumnInFront = UserSettings.contextGet 'total_column_in_front'
-      @numberOfFrozenCols = if @totalColumnInFront then 2 else 1
+      @numberOfFrozenCols = 1
       @gradingPeriods = GradingPeriodsApi.deserializePeriods(@options.active_grading_periods)
       if @options.grading_period_set
         @gradingPeriodSet = GradingPeriodSetsApi.deserializeSet(@options.grading_period_set)
@@ -479,8 +478,6 @@ define [
       else
         @storeCustomColumnOrder()
 
-      @fixColumnReordering()
-
     reorderCustomColumns: (ids) ->
       $.ajaxJSON(@options.reorder_custom_columns_url, "POST", order: ids)
 
@@ -506,8 +503,6 @@ define [
       columns.sort @makeColumnSortFn(newSortOrder)
       columns.splice(0, 0, frozen...)
       @grid.setColumns(columns)
-
-      @fixColumnReordering()
 
     makeColumnSortFn: (sortOrder) =>
       fn = switch sortOrder.sortType
@@ -574,7 +569,6 @@ define [
     handleAssignmentMutingChange: (assignment) =>
       @renderAssignmentColumnHeader(assignment.id)
       @setAssignmentWarnings()
-      @fixColumnReordering()
       @buildRows()
 
     handleAssignmentGroupWeightChange: (assignment_group_options) =>
@@ -590,11 +584,6 @@ define [
     handleSubmissionsDownloading: (assignmentId) =>
       @getAssignment(assignmentId).hasDownloadedSubmissions = true
       @renderAssignmentColumnHeader(assignmentId)
-
-    moveTotalColumn: =>
-      @totalColumnInFront = not @totalColumnInFront
-      UserSettings.contextSet 'total_column_in_front', @totalColumnInFront
-      window.location.reload()
 
     # filter, sort, and build the dataset for slickgrid to read from, then
     # force a full redraw
@@ -837,30 +826,6 @@ define [
 
     unhighlightColumns: () =>
       @$grid.find('.hovered-column').removeClass('hovered-column')
-
-    # this is a workaroud to make it so only assignments are sortable but at the same time
-    # so that the total and final grade columns don't dissapear after reordering columns
-    fixColumnReordering: =>
-      $headers = $('#gradebook_grid .container_1').find('.slick-header-columns')
-      originalItemsSelector = $headers.sortable 'option', 'items'
-      onlyAssignmentColsSelector = '> *:not([id*="assignment_group"]):not([id*="total_grade"]):not([id*=student])'
-      (makeOnlyAssignmentsSortable = ->
-        $headers.sortable 'option', 'items', onlyAssignmentColsSelector
-        $notAssignments = $(originalItemsSelector, $headers).not($(onlyAssignmentColsSelector, $headers))
-        $notAssignments.data('sortable-item', null)
-      )()
-      originalStopFn = $headers.sortable 'option', 'stop'
-      (fixupStopCallback = ->
-        $headers.sortable 'option', 'stop', (event, ui) ->
-          # we need to set the items selector back to the default because slickgrid's 'stop'
-          # function relies on it to re-render correctly.  if not it will render without the
-          # assignment group and final grade columns
-          $headers.sortable 'option', 'items', originalItemsSelector
-          returnVal = originalStopFn.apply(this, arguments)
-          makeOnlyAssignmentsSortable() # set it back
-          fixupStopCallback() # originalStopFn re-creates sortable widget so we need to re-fix
-          returnVal
-      )()
 
     minimizeColumn: ($columnHeader) =>
       columnDef = $columnHeader.data('column')
@@ -1392,14 +1357,11 @@ define [
           minWidth: columnWidths.total.min
           maxWidth: columnWidths.total.max
           width: totalWidth
-          cssClass: if @totalColumnInFront then 'meta-cell' else 'total-cell'
+          cssClass: 'total-cell'
           type: 'total_grade'
           neverSort: true
 
-        if @totalColumnInFront
-          @parentColumns.push total_column
-        else
-          @aggregateColumns.push total_column
+        @aggregateColumns.push total_column
 
       $widthTester.remove()
 
