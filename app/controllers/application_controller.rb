@@ -42,6 +42,7 @@ class ApplicationController < ActionController::Base
   include LegalInformationHelper
   around_action :set_locale
   around_action :enable_request_cache
+  around_action :batch_statsd
 
   helper :all
 
@@ -372,10 +373,12 @@ class ApplicationController < ActionController::Base
     I18n.localizer = nil
   end
 
-  def enable_request_cache
-    RequestCache.enable do
-      yield
-    end
+  def enable_request_cache(&block)
+    RequestCache.enable(&block)
+  end
+
+  def batch_statsd(&block)
+    CanvasStatsd::Statsd.batch(&block)
   end
 
   def store_session_locale
