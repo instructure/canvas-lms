@@ -284,7 +284,6 @@ class Quizzes::QuizzesController < ApplicationController
 
   def edit
     if authorized_action(@quiz, @current_user, :update)
-      return render_unauthorized_action if editing_restricted?(@quiz)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
       @assignment = @quiz.assignment
       @quiz.title = params[:title] if params[:title]

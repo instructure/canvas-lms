@@ -59,9 +59,6 @@
       <span data-view="publish-icon" class="publish-icon"></span>
 
       <div class="inline-block">
-        {{#if restricted_by_master_course}}
-          <div class="options-spacer"></div>
-        {{else}}
         <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="ui-id-{{id}}-1" href="#">
           <i class="icon-settings"></i>
           <i class="icon-mini-arrow-down"></i>
@@ -91,7 +88,6 @@
           {{/if}}
           {{>ExternalTools/external_tools_menu quiz_menu_tools}}
         </ul>
-        {{/if}}
       </div>
     </div>
     {{/if}}
