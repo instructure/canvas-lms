@@ -212,6 +212,137 @@ class BzController < ApplicationController
     end
   end
 
+  def linked_in_export
+    Rails.logger.debug("### linkedin_data_export - begin")
+
+    connection = LinkedIn::Connection.new
+
+    course = Course.find(params[:course])
+    all_fields = {}
+    items = []
+    course.enrollments.each do |enrollment|
+      u = User.find(enrollment.user_id)
+      item = {}
+      item["Name"] = u.name
+      item["Email"] = u.email
+
+      # TODO: loop over users and save the linkedIn data per user
+
+      Rails.logger.debug("### user_services = #{u.user_services.inspect}")
+      u.user_services.select{|s| !UserService.configured_service?(s.service) || feature_and_service_enabled?(s.service) }.each do |service|
+        if service.service == "linked_in"
+          Rails.logger.debug("### Found registered LinkedIn service for #{u.name}: #{service.service_user_link}")
+          item["LinkedIn URL"] = service.service_user_link
+
+          # See: https://developer.linkedin.com/docs/fields/full-profile
+
+          request = connection.get_request("/v1/people/~:(first-name,last-name,summary)?format=json", service.token)
+
+          info = JSON.parse(request.body)
+
+          item["First Name"] = info["firstName"]
+          item["Last Name"] = info["lastName"]
+
+
+          #create a table that only stores the most up to date snapshot.  so, a column for each target field
+          # follow the pattern that the registration uses.  e.g.:
+          #   app/views/profile/profile.html.erb: oauth_url(:service => "linked_in", :return_to => settings_profile_url)
+          #   app/controllers/users_controller.rb: def outh ... calls linkedin_connection.request_token(oauth_success_url(:service => 'linked_in'))
+          #   which then calls  def oauth_success ...  linkedin_connection.get_service_user_info(access_token)
+          # Proposal: create new method called linkedin_connection.get_service_user_data(access_token) which does the data export.
+          # Fields to pull:
+          # BASIC PROFILE
+          # id
+          # first-name
+          # last-name
+          # maiden-name
+          # location
+          # industry
+          # current-share*
+          # num-connections
+          # num-connections-capped
+          # summary
+          # specialties
+          # picture-urls::(original)*
+          # public-profile-url
+          # email-address
+          #
+          # FULL PROFILE
+          # last-modified-timestamp
+          # associations
+          # interests
+          # publications (all fields)*
+          # patents (all fields)*
+          # languages (all fields)
+          # skills (all fields)
+          # certifications (all fields)
+          # educations (all fields)
+          # courses (all fields)
+          # volunteer (all fields)
+          # three-current-positions
+          # three-past-positions
+          # num-recommenders
+          # recommendations-received (all fields)*
+          # following
+          # job-bookmarks
+          # suggestions
+          # honors-awards
+
+        else
+          Rails.logger.debug("### LinkedIn service not registered for #{u.name}")
+        end
+      end
+      items.push(item)
+    end
+
+    csv_result = CSV.generate do |csv|
+      header = []
+      header << "Name"
+      header << "Email"
+      header << "LinkedIn URL"
+      header << "First"
+      header << "Last"
+      csv << header
+      items.each do |item|
+        row = []
+        row << item["Name"]
+        row << item["Email"]
+        row << item["LinkedIn URL"]
+        row << item["First Name"]
+        row << item["Last Name"]
+    #    all_fields.each do |k, v|
+    #      row << item[v]
+    #    end
+        csv << row
+      end
+    end
+
+    respond_to do |format|
+      format.csv { render text: csv_result }
+    end
+  end
+
+  def linked_in_export_oauth_success
+    Rails.logger.debug("### linked_in_export_oauth_success - begin oauth_token = #{params[:oauth_token].inspect}.")
+    oauth_request = nil
+    if params[:oauth_token]
+      oauth_request = OauthRequest.where(token: params[:oauth_token], service: params[:service]).first
+    end
+    if !oauth_request
+      Rails.logger.error("OAuth Request failed. Couldn't find valid request")
+    elsif request.host_with_port != oauth_request.original_host_with_port
+      url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
+      redirect_to url
+    else
+      begin
+        linked_in_oauth_success(oauth_request, session)
+      rescue => e
+        Canvas::Errors.capture_exception(:oauth, e)
+        Rails.logger.error("LinkedIn authorization failed for oauth_request = #{oauth_request.inspect}. Please try again")
+      end
+    end
+  end
+
   def last_user_url
     @current_user.last_url = params[:last_url]
     @current_user.last_url_title = params[:last_url_title]
