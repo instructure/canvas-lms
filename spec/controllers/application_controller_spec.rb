@@ -790,6 +790,8 @@ describe CoursesController do
     before :each do
       Account.default.enable_feature!(:master_courses)
       controller.instance_variable_set(:@domain_root_account, Account.default)
+      account_admin_user(:active_all => true)
+      controller.instance_variable_set(:@current_user, @user)
 
       @master_course = course_factory
       @template = MasterCourses::MasterTemplate.set_as_master_course(@course)

@@ -486,6 +486,7 @@ class DiscussionTopicsController < ApplicationController
       end
       js_env(js_hash)
 
+      set_master_course_js_env_data(@topic, @context)
       conditional_release_js_env(@topic.assignment)
 
       render :edit
@@ -630,6 +631,7 @@ class DiscussionTopicsController < ApplicationController
 
             append_sis_data(js_hash)
             js_env(js_hash)
+            set_master_course_js_env_data(@topic, @context)
             conditional_release_js_env(@topic.assignment, includes: [:rule])
           end
         end

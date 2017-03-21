@@ -103,6 +103,7 @@ class WikiPagesController < ApplicationController
         add_crumb(@page.title)
         log_asset_access(@page, 'wiki', @wiki)
         wiki_page_jsenv(@context)
+        set_master_course_js_env_data(@page, @context)
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
         @padless = true
       end
@@ -112,6 +113,7 @@ class WikiPagesController < ApplicationController
   def edit
     if @page.grants_any_right?(@current_user, session, :update, :update_content)
       return render_unauthorized_action if editing_restricted?(@page)
+      set_master_course_js_env_data(@page, @context)
 
       js_env ConditionalRelease::Service.env_for @context
       if !ConditionalRelease::Service.enabled_in_context?(@context) ||

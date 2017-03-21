@@ -243,7 +243,7 @@ class ApplicationController < ActionController::Base
   helper_method :master_courses?
 
   def setup_master_course_restrictions(objects, course)
-    return unless master_courses? && course.is_a?(Course)
+    return unless master_courses? && course.is_a?(Course) && course.grants_right?(@current_user, session, :read_as_admin)
 
     if MasterCourses::MasterTemplate.is_master_course?(course)
       MasterCourses::Restrictor.preload_default_template_restrictions(objects, course)

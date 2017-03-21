@@ -235,6 +235,8 @@ class Quizzes::QuizzesController < ApplicationController
       js_env(hash)
       conditional_release_js_env(@quiz.assignment, includes: [:rule])
 
+      set_master_course_js_env_data(@quiz, @context)
+
       @quiz_menu_tools = external_tools_display_hashes(:quiz_menu)
       @can_take = can_take_quiz?
       if params[:take] && @can_take
@@ -341,6 +343,7 @@ class Quizzes::QuizzesController < ApplicationController
       js_env(hash)
 
       conditional_release_js_env(@quiz.assignment)
+      set_master_course_js_env_data(@quiz, @context)
 
       render :new
     end

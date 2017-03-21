@@ -141,7 +141,7 @@ class AssignmentsController < ApplicationController
         :ASSIGNMENT_ID => @assignment.id,
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session)
       })
-
+      set_master_course_js_env_data(@assignment, @context)
       conditional_release_js_env(@assignment, includes: :rule)
 
       @can_view_grades = @context.grants_right?(@current_user, session, :view_all_grades)
