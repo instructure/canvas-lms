@@ -10,7 +10,7 @@
     "canvas_offline_course_viewer": "https://github.com/instructure/canvas_offline_course_viewer.git#0.3.0",
     "fullcalendar": "https://github.com/ryankshaw/fullcalendar.git#aa686b36d10cee1e1e3ec7c7784145e46667d47d",
     "instructure-icons": "1.2.1",
-    "instructure-ui": "1.0.2",
+    "instructure-ui": "1.2.0",
     "tinymce": "4.1.9"
   },
   "devDependencies": {

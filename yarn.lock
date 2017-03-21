@@ -2141,9 +2141,9 @@ doiuse@^2.4.1:
     through2 "^0.6.3"
     yargs "^3.5.4"
 
-dom-helpers@3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/dom-helpers/-/dom-helpers-3.2.0.tgz#70af056e6b1507a71084abc1aac0f93a23f7ea1c"
+dom-helpers@3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/dom-helpers/-/dom-helpers-3.2.1.tgz#3203e07fed217bd1f424b019735582fc37b2825a"
 
 dom-serialize@^2.2.0:
   version "2.2.1"
@@ -3067,9 +3067,9 @@ gglobby@0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/gglobby/-/gglobby-0.0.3.tgz#c7d686c1ff2ca4e882a58adf38a7de2691ba7f99"
 
-glamor@2.20.22:
-  version "2.20.22"
-  resolved "https://registry.yarnpkg.com/glamor/-/glamor-2.20.22.tgz#86c11a143deee7d4c051de50d69387d8b4e700ba"
+glamor@2.20.24:
+  version "2.20.24"
+  resolved "https://registry.yarnpkg.com/glamor/-/glamor-2.20.24.tgz#a299af2eec687322634ba38e4a0854d8743d2041"
   dependencies:
     babel-runtime "^6.18.0"
     fbjs "^0.8.8"
@@ -3662,20 +3662,26 @@ instructure-icons@1.2.1:
   dependencies:
     shortid "2.2.6"
 
-instructure-ui@1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-1.0.2.tgz#931c2a9863f47f62ad02cf1ca356055cf7b9b04a"
+instructure-icons@1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/instructure-icons/-/instructure-icons-1.2.2.tgz#6d7fc7ad90dca2427a895a529b299a1cf9f8a630"
+  dependencies:
+    shortid "2.2.6"
+
+instructure-ui@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-1.2.0.tgz#cf094fa8edf46012757ef5b529eca5c462b790e1"
   dependencies:
     classnames "2.2.5"
     deep-equal "1.0.1"
-    dom-helpers "3.2.0"
-    glamor "2.20.22"
-    instructure-icons "1.2.1"
+    dom-helpers "3.2.1"
+    glamor "2.20.24"
+    instructure-icons "1.2.2"
     invariant "2.2.2"
     keycode "2.1.8"
     object.omit "2.0.1"
     object.pick "1.2.0"
-    shortid "2.2.6"
+    shortid "2.2.8"
     tinycolor2 "1.4.1"
 
 interpret@^0.6.4:
@@ -6378,6 +6384,10 @@ shelljs@^0.7.5:
 shortid@2.2.6:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/shortid/-/shortid-2.2.6.tgz#3abbefc6c51074cf2c1f1e72f6216a1b45876d72"
+
+shortid@2.2.8:
+  version "2.2.8"
+  resolved "https://registry.yarnpkg.com/shortid/-/shortid-2.2.8.tgz#033b117d6a2e975804f6f0969dbe7d3d0b355131"
 
 sigmund@~1.0.0:
   version "1.0.1"
