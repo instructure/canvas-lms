@@ -234,11 +234,15 @@ class BzController < ApplicationController
           Rails.logger.debug("### Found registered LinkedIn service for #{u.name}: #{service.service_user_link}")
           item["LinkedIn URL"] = service.service_user_link
 
-          request = connection.get_request("/v1/people/~?format=json", service.token)
+          # See: https://developer.linkedin.com/docs/fields/full-profile
+
+          request = connection.get_request("/v1/people/~:(first-name,last-name,summary)?format=json", service.token)
+
           info = JSON.parse(request.body)
 
           item["First Name"] = info["firstName"]
           item["Last Name"] = info["lastName"]
+
 
           #create a table that only stores the most up to date snapshot.  so, a column for each target field
           # follow the pattern that the registration uses.  e.g.:
