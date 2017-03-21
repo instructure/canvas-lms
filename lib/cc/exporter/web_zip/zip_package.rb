@@ -185,12 +185,14 @@ module CC::Exporter::WebZip
         item_hash[:submissionTypes] = item_content.readable_submission_types
         item_hash[:graded] = item_content.grading_type != 'not_graded'
       when Quizzes::Quiz
+        item_hash[:assignmentExportId] = CC::CCHelper.create_key(item_content.assignment)
         item_hash[:questionCount] = item_content.question_count
         item_hash[:timeLimit] = item_content.time_limit
         item_hash[:attempts] = item_content.allowed_attempts
         item_hash[:graded] = item_content.quiz_type != 'survey'
       when DiscussionTopic
         item_content = item_content.assignment
+        item_hash[:assignmentExportId] = CC::CCHelper.create_key(item_content) if item_content.present?
         item_hash[:graded] = item_content.present?
       end
       return unless item_content
@@ -235,6 +237,7 @@ module CC::Exporter::WebZip
         item_hash = {
           exportId: export_item[:identifier],
           title: export_item[:title],
+          type: item.class.name,
           content: parse_content(item) || export_item[:text]
         }
         item_hash[:frontPage] = export_item[:front_page] if type == :wiki_pages

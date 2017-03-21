@@ -253,6 +253,26 @@ describe "ZipPackage" do
       expect(module_item_data[2][:graded]).to be true
     end
 
+    it "should parse assignmentExportId for quizzes and graded discussions" do
+      graded_discussion = @course.discussion_topics.build(title: 'Disc 2')
+      graded_discussion_assignment = @course.assignments.build({
+        submission_types: 'discussion_topic',
+        title: graded_discussion.title,
+      })
+      graded_discussion.assignment = graded_discussion_assignment
+      graded_discussion.save!
+
+      @module.content_tags.create!(content: graded_discussion, context: @course)
+      quiz = @course.quizzes.create!(title: 'Quiz 1')
+      @module.content_tags.create!(content: quiz, context: @course, indent: 1)
+
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module)
+
+      expect(module_item_data[0][:assignmentExportId]).to eq CC::CCHelper.create_key(graded_discussion_assignment)
+      expect(module_item_data[1][:assignmentExportId]).to eq CC::CCHelper.create_key(quiz.assignment)
+    end
+
     it "should parse graded status for not graded assignments, quizzes and discussions" do
       assign = @course.assignments.create!(title: 'Assignment 1', grading_type: 'not_graded')
       @module.content_tags.create!(content: assign, context: @course)
@@ -493,18 +513,21 @@ describe "ZipPackage" do
         unlock_at: unlock)
       zip_package = create_zip_package
       assignment_data = zip_package.parse_non_module_items(:assignments)
-      expect(assignment_data).to eq [{exportId: CC::CCHelper.create_key(assign), title: 'Assignment 1',
+      expect(assignment_data).to eq [{
+        exportId: CC::CCHelper.create_key(assign), title: 'Assignment 1', type: 'Assignment',
         content: '<p>Hi</p>', submissionTypes: "a text entry box or a file upload", graded: true,
         pointsPossible: 10.0, dueAt: due.in_time_zone(@student.time_zone).iso8601,
         lockAt: lock.in_time_zone(@student.time_zone).iso8601,
-        unlockAt: unlock.in_time_zone(@student.time_zone).iso8601}]
+        unlockAt: unlock.in_time_zone(@student.time_zone).iso8601
+      }]
     end
 
     it "should parse non-module discussions" do
       disc = @course.discussion_topics.create!(title: 'Discussion 1', message: "<h1>Discussion</h1>")
       zip_package = create_zip_package
       disc_data = zip_package.parse_non_module_items(:discussion_topics)
-      expect(disc_data).to eq [{exportId: CC::CCHelper.create_key(disc), title: 'Discussion 1',
+      expect(disc_data).to eq [{
+        exportId: CC::CCHelper.create_key(disc), title: 'Discussion 1', type: 'DiscussionTopic',
         graded: false, content: "<h1>Discussion</h1>"}]
     end
 
@@ -513,16 +536,17 @@ describe "ZipPackage" do
       quiz.publish!
       zip_package = create_zip_package
       quiz_data = zip_package.parse_non_module_items(:quizzes)
-      expect(quiz_data).to eq [{exportId: CC::CCHelper.create_key(quiz), title: 'Quiz 1', questionCount: 0,
+      expect(quiz_data).to eq [{
+        exportId: CC::CCHelper.create_key(quiz), title: 'Quiz 1', type: 'Quizzes::Quiz', questionCount: 0,
         timeLimit: 5, attempts: 2, graded: true, pointsPossible: 0.0, dueAt: nil, lockAt: nil,
-        unlockAt: nil, content: nil}]
+        unlockAt: nil, content: nil, assignmentExportId: CC::CCHelper.create_key(quiz.assignment)}]
     end
 
     it "should parse non-module wiki pages" do
       @course.wiki_pages.create!(title: 'Wiki Page 1', url: 'wiki-page-1', wiki: @course.wiki)
       zip_package = create_zip_package
       wiki_data = zip_package.parse_non_module_items(:wiki_pages)
-      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: '', frontPage: false}]
+      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', type: 'WikiPage', content: '', frontPage: false}]
     end
 
     it "should parse front page" do
@@ -530,7 +554,7 @@ describe "ZipPackage" do
       @course.wiki.set_front_page_url!(wiki_page.url)
       zip_package = create_zip_package
       wiki_data = zip_package.parse_non_module_items(:wiki_pages)
-      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: '', frontPage: true}]
+      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', type: 'WikiPage', content: '', frontPage: true}]
     end
 
     it "should not fail on missing items" do
@@ -539,7 +563,7 @@ describe "ZipPackage" do
       wiki.title = 'Wiki Page 2'
       wiki.save!
       wiki_data = zip_package.parse_non_module_items(:wiki_pages)
-      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: '<p>Hi</p>', frontPage: false}]
+      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', type: 'NilClass', content: '<p>Hi</p>', frontPage: false}]
     end
   end
 
