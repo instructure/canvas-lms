@@ -25,11 +25,11 @@ module Lti
     attr_readonly :created_at
 
     belongs_to :resource_handler, class_name: "Lti::ResourceHandler", :foreign_key => :resource_handler_id
+    belongs_to :tool_proxy, class_name: 'Lti::ToolProxy', foreign_key: :tool_proxy_id
 
     has_many :placements, class_name: 'Lti::ResourcePlacement', dependent: :destroy
-
     has_many :context_module_tags, -> { where("content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'").preload(context_module: :content_tags) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
-    delegate :tool_proxy, to: :resource_handler
+
     serialize :capabilities
     serialize :parameters
 

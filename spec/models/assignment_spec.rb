@@ -140,7 +140,8 @@ describe Assignment do
       message_handler = Lti::MessageHandler.create(
         message_type: 'message_type',
         launch_path: 'https://samplelaunch/blti',
-        resource_handler: resource_handler
+        resource_handler: resource_handler,
+        tool_proxy: tool_proxy
       )
 
       @assignment.tool_settings_tool = message_handler

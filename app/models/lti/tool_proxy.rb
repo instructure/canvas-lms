@@ -22,8 +22,9 @@ module Lti
     has_many :bindings, class_name: 'Lti::ToolProxyBinding', dependent: :destroy
     has_many :resources, class_name: 'Lti::ResourceHandler', dependent: :destroy
     has_many :tool_settings, class_name: 'Lti::ToolSetting', dependent: :destroy
-    belongs_to :context, polymorphic: [:course, :account]
+    has_many :message_handlers, class_name: 'Lti::MessageHandler'
 
+    belongs_to :context, polymorphic: [:course, :account]
     belongs_to :product_family, class_name: 'Lti::ProductFamily'
 
     serialize :raw_data
