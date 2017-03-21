@@ -29,6 +29,41 @@ module VeriCite
     'failure'
   end
 
+  def self.enabled_for_account?(account_id)
+    # VeriCite is considered active for this account if:
+    # 1) The plugin is enabled
+    # 2) The default account_id is set or the sub-account id has been set and matches
+    Canvas::Plugin.find(:vericite).try(:enabled?) &&
+              ((!Canvas::Plugin.find(:vericite).settings[:account_id].nil? &&
+                !Canvas::Plugin.find(:vericite).settings[:account_id].empty?) ||
+              get_sub_account_credentials(account_id).length > 0)
+  end
+
+  def self.get_sub_account_credentials(account_id)
+    account_id.nil? ? [] : sub_account_credentials.select{ |a| a[:canvas_account_id].to_s == account_id.to_s }
+  end
+
+  def self.sub_account_credentials
+    # format will look like:
+    # canvasaccount_id1:vericite_account_id1:vericite_shared_secret1\n
+    # canvasaccount_id2:vericite_account_id2:vericite_shared_secret2\n
+    sub_account_credentials = []
+    sub_account_credentials_str = Canvas::Plugin.find(:vericite).settings[:subaccount_credentials]
+    if !sub_account_credentials_str.nil?
+      sub_account_credentials_str.split("\n").each do |sub_account|
+        sub_account_split = sub_account.split(":")
+        if sub_account_split.length == 3
+          sub_account_cred = {}
+          sub_account_cred[:canvas_account_id] = sub_account_split[0].strip
+          sub_account_cred[:vericite_account_id] = sub_account_split[1].strip
+          sub_account_cred[:vericite_shared_secret] = sub_account_split[2].strip
+          sub_account_credentials.push(sub_account_cred)
+        end
+      end
+    end
+    sub_account_credentials
+  end
+
   class Client
     attr_accessor :account_id, :shared_secret, :host, :testing, :show_preliminary_score
 
@@ -88,7 +123,7 @@ module VeriCite
       settings
     end
 
-    def createOrUpdateAssignment(assignment, settings)
+    def createOrUpdateAssignment(assignment, settings, account_id)
       course = assignment.context
       today = course.time_zone.today
       settings = VeriCite::Client.normalize_assignment_vericite_settings(settings)
@@ -102,14 +137,15 @@ module VeriCite
         :dtdue => "#{today.strftime} 00:00:00",
         :dtpost => "#{today.strftime} 00:00:00",
         :late_accept_flag => '1',
-        :post => true
+        :post => true,
+        :account_id => account_id
       }))
 
       is_response_success?(response) ? { assignment_id: response[:assignment_id] } : response_error_hash(response)
     end
 
     # if asset_string is passed in, only submit that attachment
-    def submitPaper(submission, asset_string=nil)
+    def submitPaper(submission, asset_string=nil, account_id=nil)
       student = submission.user
       assignment = submission.assignment
       course = assignment.context
@@ -136,7 +172,7 @@ module VeriCite
               paper_ext = ""
             end
             paper_size = 100 # File.size(
-            responses[a.asset_string] = sendRequest(:submit_paper, { :pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => a.open() }.merge!(opts))
+            responses[a.asset_string] = sendRequest(:submit_paper, { :pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => a.open(), :account_id => account_id }.merge!(opts))
           end
         end
       elsif submission.submission_type == 'online_text_entry' && (asset_string.nil? || submission.asset_string == asset_string)
@@ -147,7 +183,7 @@ module VeriCite
         paper_type = "text/html"
         paper_size = plain_text.bytesize
 
-        responses[submission.asset_string] = sendRequest(:submit_paper, {:pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => plain_text }.merge!(opts))
+        responses[submission.asset_string] = sendRequest(:submit_paper, {:pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => plain_text, :account_id => account_id }.merge!(opts))
       else
         raise "Unsupported submission type for VeriCite integration: #{submission.submission_type}"
       end
@@ -160,13 +196,13 @@ module VeriCite
       responses
     end
 
-    def generateReport(submission, asset_string)
+    def generateReport(submission, asset_string, account_id)
       user = submission.user
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
       res = nil
-      res = sendRequest(:get_scores, :oid => object_id, :utp => '2', :user => user, :course => course, :assignment => assignment) if object_id
+      res = sendRequest(:get_scores, :oid => object_id, :utp => '2', :user => user, :course => course, :assignment => assignment, :account_id => account_id) if object_id
       data = {}
       if res
         data[:similarity_score] = res[:similarity_score]
@@ -174,12 +210,12 @@ module VeriCite
       data
     end
 
-    def submissionReportUrl(submission, current_user, asset_string)
+    def submissionReportUrl(submission, current_user, asset_string, account_id)
       user = submission.user
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
-      response = sendRequest(:generate_report, :oid => object_id, :utp => '2', :current_user => current_user, :user => user, :course => course, :assignment => assignment)
+      response = sendRequest(:generate_report, :oid => object_id, :utp => '2', :current_user => current_user, :user => user, :course => course, :assignment => assignment, :account_id => account_id)
       if response != nil
         response[:report_url]
       else
@@ -187,12 +223,12 @@ module VeriCite
       end
     end
 
-    def submissionStudentReportUrl(submission, current_user, asset_string)
+    def submissionStudentReportUrl(submission, current_user, asset_string, account_id)
       user = submission.user
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
-      response = sendRequest(:generate_report, :oid => object_id, :utp => '1', :current_user => current_user, :user => user, :course => course, :assignment => assignment, :tem => email(course))
+      response = sendRequest(:generate_report, :oid => object_id, :utp => '1', :current_user => current_user, :user => user, :course => course, :assignment => assignment, :tem => email(course), :account_id => account_id)
       if response != nil
         response[:report_url]
       else
@@ -216,6 +252,18 @@ module VeriCite
 
         consumer = @account_id
         consumer_secret = @shared_secret
+        # override default key and secret for any specific account credentials
+        VeriCite.get_sub_account_credentials(args[:account_id]).each do |a|
+          consumer = a[:vericite_account_id]
+          consumer_secret = a[:vericite_shared_secret]
+        end
+        if consumer.nil? || consumer.empty?
+          # No consumer key found for this account
+          response[:return_message] = "VeriCite: no consumer key found for account #{args[:account_id]}"
+          response[:public_error_message] = response[:return_message]
+          Rails.logger.error(response[:return_message])
+          return response
+        end
         if command == :create_assignment
           context_id = course.id
           assignment_id = assignment.id

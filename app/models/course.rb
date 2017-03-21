@@ -2007,7 +2007,7 @@ class Course < ActiveRecord::Base
   end
 
   def vericite_enabled?
-    Canvas::Plugin.find(:vericite).try(:enabled?)
+    VeriCite.enabled_for_account?(self.account_id)
   end
 
   def vericite_pledge
