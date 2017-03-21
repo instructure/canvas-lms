@@ -8,7 +8,6 @@ require 'google/api_client/auth/storages/file_store'
 require 'csv'
 
 class BzController < ApplicationController
-  include LinkedInExport
 
   before_filter :require_user
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user]
@@ -215,6 +214,9 @@ class BzController < ApplicationController
 
   def linked_in_export
     Rails.logger.debug("### linkedin_data_export - begin")
+
+    connection = LinkedIn::Connection.new
+
     course = Course.find(params[:course])
     all_fields = {}
     items = []
@@ -231,14 +233,13 @@ class BzController < ApplicationController
         if service.service == "linked_in"
           Rails.logger.debug("### Found registered LinkedIn service for #{u.name}: #{service.service_user_link}")
           item["LinkedIn URL"] = service.service_user_link
-          #TODO: i'm going to copy/paste a lot of the code from users_controller where it calls the linkedIn API.  
-          #      once I get it working, i should refactor the shared stuff into a Concern or Module. 
-          #      Modules example: http://stackoverflow.com/questions/8225518/calling-a-method-from-another-controller
-          #      Concern example: http://stackoverflow.com/questions/19230379/rails-how-should-i-share-logic-between-controllers
-          #
-          #oauth_url(:service => "linked_in", :action => 'export')
-          linked_in_oauth(service, u, session)
-          #
+
+          request = connection.get_request("/v1/people/~?format=json", service.token)
+          info = JSON.parse(request.body)
+
+          item["First Name"] = info["firstName"]
+          item["Last Name"] = info["lastName"]
+
           #create a table that only stores the most up to date snapshot.  so, a column for each target field
           # follow the pattern that the registration uses.  e.g.:
           #   app/views/profile/profile.html.erb: oauth_url(:service => "linked_in", :return_to => settings_profile_url)
@@ -295,12 +296,16 @@ class BzController < ApplicationController
       header << "Name"
       header << "Email"
       header << "LinkedIn URL"
+      header << "First"
+      header << "Last"
       csv << header
       items.each do |item|
         row = []
         row << item["Name"]
         row << item["Email"]
         row << item["LinkedIn URL"]
+        row << item["First Name"]
+        row << item["Last Name"]
     #    all_fields.each do |k, v|
     #      row << item[v]
     #    end
