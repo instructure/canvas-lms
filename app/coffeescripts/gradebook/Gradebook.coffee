@@ -1130,8 +1130,7 @@ define [
         cols = @grid.getColumns()
         col.sortable = true for col in cols
         @grid.setColumns(cols)
-        @renderTotalHeader()
-        @initHeaderDropMenus()
+        @fixColumnReordering()
 
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
