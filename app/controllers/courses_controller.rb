@@ -918,10 +918,16 @@ class CoursesController < ApplicationController
           enrollment_scope = include_inactive ? enrollment_scope.all_active_or_pending : enrollment_scope.active_or_pending
         end
         enrollments_by_user = enrollment_scope.group_by(&:user_id)
+      else
+        confirmed_user_ids = @context.enrollments.where.not(:workflow_state => %w{invited creation_pending rejected}).
+          where(:user_id => users).distinct.pluck(:user_id)
       end
+
       render :json => users.map { |u|
         enrollments = enrollments_by_user[u.id] || [] if includes.include?('enrollments')
-        user_json(u, @current_user, session, includes, @context, enrollments)
+        user_unconfirmed = enrollments ? enrollments.all?{|e| %w{invited creation_pending rejected}.include?(e.workflow_state)} : !confirmed_user_ids.include?(u.id)
+        excludes = user_unconfirmed ? %w{pseudonym personal_info} : []
+        user_json(u, @current_user, session, includes, @context, enrollments, excludes)
       }
     end
   end

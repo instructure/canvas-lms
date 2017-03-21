@@ -2260,6 +2260,7 @@ describe CoursesController, type: :request do
         @user = @course1.teachers.first
         @ta.profile.bio = 'hey'
         @ta.save!
+        @ta_enroll1.accept!
         @course1.root_account.settings[:enable_profiles] = true
         @course1.root_account.save!
 
@@ -2382,12 +2383,26 @@ describe CoursesController, type: :request do
         expect(json.map{ |s| s["name"] }).to include("Test Student")
       end
 
-      it "returns a list of users with emails" do
+      it "returns a list of users with emails (unless unconfirmed)" do
+        secretstudent = user_with_pseudonym(:username => 'secretuser@example.com', :active_all => true)
+        @course1.enroll_student(secretstudent) #don't accept
         @user = @course1.teachers.first
-        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+        json1 = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
                         :include => ['email'])
-        json.each { |u| expect(u.keys).to include('email') }
+
+        json2 = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+          { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+          :include => ['email', 'enrollments']) # should work either way
+
+        [json1, json2].each do |json|
+          normal = json.detect{|h| h['id'] == @user.id}
+          expect(normal['email']).to eq @user.email
+          expect(normal['login_id']).to eq @user.pseudonym.unique_id
+
+          secret = json.detect{|h| h['id'] == secretstudent.id}
+          expect(secret.keys & %w{email login_id}).to be_empty
+        end
       end
 
       it "returns a list of users and enrollments with enrollments option" do
