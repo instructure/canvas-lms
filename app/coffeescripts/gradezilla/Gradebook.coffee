@@ -478,6 +478,8 @@ define [
       else
         @storeCustomColumnOrder()
 
+      @updateColumnHeaders()
+
     reorderCustomColumns: (ids) ->
       $.ajaxJSON(@options.reorder_custom_columns_url, "POST", order: ids)
 
@@ -503,6 +505,8 @@ define [
       columns.sort @makeColumnSortFn(newSortOrder)
       columns.splice(0, 0, frozen...)
       @grid.setColumns(columns)
+
+      @updateColumnHeaders()
 
     makeColumnSortFn: (sortOrder) =>
       fn = switch sortOrder.sortType
