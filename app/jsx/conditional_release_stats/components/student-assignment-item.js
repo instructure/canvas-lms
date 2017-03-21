@@ -1,7 +1,7 @@
 import React from 'react'
 import classNames from 'classnames'
 import categoryHelper from 'jsx/shared/helpers/assignment-categories'
-import scoreHelpers from 'jsx/shared/conditional_release/score'
+import {transformScore} from 'jsx/shared/conditional_release/score'
 import assignmentShape from '../shapes/assignment'
   const { object, number } = React.PropTypes
 
@@ -30,7 +30,7 @@ export default class StudentAssignmentItem extends React.Component {
           <i className={`icon-${category} crs-student-details__assignment-icon crs-icon-${category}`}></i>
           <div className='crs-student-details__assignment-name'>{this.props.assignment.name}</div>
           <div className='crs-student-details__assignment-score'>
-            <div>{scoreHelpers.transformScore(this.props.assignment.score, this.props.assignment, true)}</div>
+            <div>{transformScore(this.props.assignment.score, this.props.assignment, true)}</div>
             {showTrend && (<span className={trendClasses}></span>)}
           </div>
         </div>

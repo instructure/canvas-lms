@@ -2,7 +2,7 @@ import React from 'react'
 import TabList, { TabPanel, Tab } from 'instructure-ui/lib/components/TabList'
 import ApplyTheme from 'instructure-ui/lib/components/ApplyTheme'
 import I18n from 'i18n!cyoe_assignment_sidebar'
-import scoreHelpers from 'jsx/shared/conditional_release/score'
+import {transformScore} from 'jsx/shared/conditional_release/score'
 import StudentRange from './student-range'
 
   const { array, func, object } = React.PropTypes
@@ -37,8 +37,8 @@ export default class StudentRangesView extends React.Component {
 
     renderTabs () {
       return this.props.ranges.map((range, i) => {
-        const lower = scoreHelpers.transformScore(range.scoring_range.lower_bound, this.props.assignment, false)
-        const upper = scoreHelpers.transformScore(range.scoring_range.upper_bound, this.props.assignment, true)
+        const lower = transformScore(range.scoring_range.lower_bound, this.props.assignment, false)
+        const upper = transformScore(range.scoring_range.upper_bound, this.props.assignment, true)
         const rangeTitle = `> ${lower} - ${upper}`
         return (
           <TabPanel key={i} title={rangeTitle}>

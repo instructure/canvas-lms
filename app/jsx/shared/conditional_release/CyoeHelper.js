@@ -1,5 +1,6 @@
 import I18n from 'i18n!format_range'
-import scoreHelper from './score'
+import { transformScore } from './score'
+
   const isEnabled = () => ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED || false
   const parseEnvData = () => {
     const activeRules = ENV.CONDITIONAL_RELEASE_ENV && ENV.CONDITIONAL_RELEASE_ENV.active_rules || []
@@ -38,8 +39,8 @@ import scoreHelper from './score'
     } else if (ranges.length > 0) {
       const range = ranges[0]
       return I18n.t('%{upper} - %{lower}', {
-        upper: scoreHelper.transformScore(range.upper_bound, range.assignment, true),
-        lower: scoreHelper.transformScore(range.lower_bound, range.assignment, false),
+        upper: transformScore(range.upper_bound, range.assignment, true),
+        lower: transformScore(range.lower_bound, range.assignment, false),
       })
     } else {
       return null

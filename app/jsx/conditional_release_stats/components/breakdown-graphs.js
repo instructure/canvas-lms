@@ -1,7 +1,7 @@
 import React from 'react'
 import Spinner from 'instructure-ui/lib/components/Spinner'
 import I18n from 'i18n!cyoe_assignment_sidebar'
-import scoreHelpers from 'jsx/shared/conditional_release/score'
+import {transformScore} from 'jsx/shared/conditional_release/score'
 import BarGraph from './breakdown-graph-bar'
   const { object, array, func, number, bool } = React.PropTypes
 
@@ -36,8 +36,8 @@ import BarGraph from './breakdown-graph-bar'
           rangeIndex={i}
           rangeStudents={bucket.size}
           totalStudents={this.props.enrolled}
-          upperBound={scoreHelpers.transformScore(bucket.scoring_range.upper_bound, this.props.assignment, true)}
-          lowerBound={scoreHelpers.transformScore(bucket.scoring_range.lower_bound, this.props.assignment, false)}
+          upperBound={transformScore(bucket.scoring_range.upper_bound, this.props.assignment, true)}
+          lowerBound={transformScore(bucket.scoring_range.lower_bound, this.props.assignment, false)}
           selectRange={this.props.selectRange}
         />
       ))

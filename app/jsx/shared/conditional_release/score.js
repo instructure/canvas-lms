@@ -29,8 +29,8 @@ const percentToScore = (score, assignment) => {
   }
 }
 
-const transformScore = (score, assignment, isUpperBound) => {
-    // The backend stores nil for the upper and lowerbound scoring types
+export const transformScore = (score, assignment, isUpperBound) => {
+  // The backend stores nil for the upper and lowerbound scoring types
   if (!score) {
     if (isUpperBound) {
       score = '1'
@@ -81,7 +81,7 @@ const percentToExternalPercent = (score) => {
   return Math.floor(score * 100)
 }
 
-const i18nGrade = (grade, assignment) => {
+export const i18nGrade = (grade, assignment) => {
   if (typeof grade === 'string' &&
         assignment.grading_type !== GradingTypes.letter_grade.key &&
         assignment.grading_type !== GradingTypes.gpa_scale.key) {
@@ -92,10 +92,3 @@ const i18nGrade = (grade, assignment) => {
   }
   return grade
 }
-
-const scoreHelpers = {
-  transformScore,
-  i18nGrade,
-}
-
-export default scoreHelpers
