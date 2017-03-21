@@ -83,7 +83,7 @@ module LinkedIn
     end
 
     def self.config_check(settings)
-      true # we don't confirm it here with oauth 2, instead go in as a user and try to auth manually
+      nil # we don't confirm it here with oauth 2, instead go in as a user and try to auth manually
     end
 
     def self.config=(config)
