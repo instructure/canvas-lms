@@ -38,6 +38,13 @@
       font-weight: bold;
       @include fontSize(14px);
     }
+    &.notes {
+      width: 15%;
+      > div {
+        max-height: 100px;
+        overflow-x: auto
+      }
+    }
     &.links i {
       opacity: 0.4;
     }

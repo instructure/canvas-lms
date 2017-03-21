@@ -106,6 +106,10 @@ class DeveloperKey < ActiveRecord::Base
     account.try(:name)
   end
 
+  def last_used_at
+    self.access_tokens.maximum(:last_used_at)
+  end
+
   class << self
     def find_cached(id)
       global_id = Shard.global_id_for(id)

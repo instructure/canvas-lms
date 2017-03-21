@@ -1,7 +1,7 @@
 class AccessToken < ActiveRecord::Base
   attr_reader :full_token
   attr_reader :plaintext_refresh_token
-  belongs_to :developer_key
+  belongs_to :developer_key, counter_cache: :access_token_count
   belongs_to :user
   has_one :account, through: :developer_key
 
