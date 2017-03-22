@@ -10,6 +10,8 @@ import DateHelper from 'jsx/shared/helpers/dateHelper'
   var GradingPeriod = React.createClass({
     propTypes: {
       title: Types.string.isRequired,
+      weight: Types.number,
+      weighted: Types.bool.isRequired,
       startDate: Types.instanceOf(Date).isRequired,
       endDate: Types.instanceOf(Date).isRequired,
       closeDate: Types.instanceOf(Date).isRequired,
@@ -22,6 +24,12 @@ import DateHelper from 'jsx/shared/helpers/dateHelper'
         update: Types.bool.isRequired,
         delete: Types.bool.isRequired,
       }).isRequired
+    },
+
+    getDefaultProps () {
+      return {
+        weight: null
+      };
     },
 
     getInitialState: function(){
@@ -79,6 +87,8 @@ import DateHelper from 'jsx/shared/helpers/dateHelper'
                                ref="template"
                                id={this.props.id}
                                title={this.props.title}
+                               weight={this.props.weight}
+                               weighted={this.props.weighted}
                                startDate={this.props.startDate}
                                endDate={this.props.endDate}
                                closeDate={this.props.closeDate || this.props.endDate}

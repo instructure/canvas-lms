@@ -228,6 +228,7 @@ import 'jquery.instructure_misc_plugins'
             readOnly={this.state.readOnly}
             disabled={this.state.disabled}
             weight={period.weight}
+            weighted={ENV.GRADING_PERIODS_WEIGHTED}
             updateGradingPeriodCollection={this.updateGradingPeriodCollection}
             onDeleteGradingPeriod={this.deleteGradingPeriod}
           />

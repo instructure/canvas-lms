@@ -41,7 +41,8 @@ define [
         startDate: new Date("2015-03-01T00:00:00Z")
         endDate: new Date("2015-05-31T00:00:00Z")
         closeDate: new Date("2015-06-07T00:00:00Z")
-        weight: null
+        weight: 50
+        weighted: true
         disabled: false
         readOnly: false
         permissions: { read: true, update: true, create: true, delete: true }
@@ -62,7 +63,7 @@ define [
     equal gradingPeriod.state.title, "Spring"
     deepEqual gradingPeriod.state.startDate, new Date("2015-03-01T00:00:00Z")
     deepEqual gradingPeriod.state.endDate, new Date("2015-05-31T00:00:00Z")
-    equal gradingPeriod.state.weight, null
+    equal gradingPeriod.state.weight, 50
 
   test 'onDateChange calls replaceInputWithDate', ->
     gradingPeriod = @renderComponent()
@@ -101,6 +102,16 @@ define [
   test "assigns the 'readOnly' property on the template when true", ->
     gradingPeriod = @renderComponent(readOnly: true)
     equal gradingPeriod.refs.template.props.readOnly, true
+
+  test "assigns the 'weight' and 'weighted' properties", ->
+    gradingPeriod = @renderComponent()
+    equal gradingPeriod.refs.template.props.weight, 50
+    equal gradingPeriod.refs.template.props.weighted, true
+
+  test "assigns the 'weight' and 'weighted' properties when weighted is false", ->
+    gradingPeriod = @renderComponent(weighted: false)
+    equal gradingPeriod.refs.template.props.weight, 50
+    equal gradingPeriod.refs.template.props.weighted, false
 
   test "assigns the 'closeDate' property", ->
     gradingPeriod = @renderComponent()

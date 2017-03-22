@@ -3126,6 +3126,17 @@ class Course < ActiveRecord::Base
       !!GradingPeriodGroup.for_course(self)&.display_totals_for_all_grading_periods?
   end
 
+  def weighted_grading_periods?
+    return @has_weighted_grading_periods unless @has_weighted_grading_periods.nil?
+
+    @has_weighted_grading_periods = shard.activate do
+      grading_period_groups.active.none? &&
+      GradingPeriodGroup.active.
+        where(id: enrollment_term.grading_period_group_id, weighted: true).
+        exists?
+    end
+  end
+
   def quiz_lti_tool
     query = { tool_id: 'Quizzes 2' }
     context_external_tools.active.find_by(query) ||

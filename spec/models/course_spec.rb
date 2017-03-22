@@ -201,6 +201,44 @@ describe Course do
     end
   end
 
+  describe "#weighted_grading_periods?" do
+    it "returns false if course has legacy grading periods" do
+      @course.save!
+      account_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      account_group.enrollment_terms << @course.enrollment_term
+      group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+      group.weighted = true
+      group.save!
+      expect(@course.weighted_grading_periods?).to be false
+    end
+
+    it "returns false if account has unweighted grading periods for course term" do
+      @course.save!
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group.enrollment_terms << @course.enrollment_term
+      expect(@course.weighted_grading_periods?).to be false
+    end
+
+    it "returns false if account has weighted grading periods without course term" do
+      @course.save!
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group.weighted = true
+      group.save!
+      expect(@course.weighted_grading_periods?).to be false
+    end
+
+    it "returns true if account has weighted grading periods for course term" do
+      @course.save!
+      legacy_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+      legacy_group.destroy
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group.enrollment_terms << @course.enrollment_term
+      group.weighted = true
+      group.save!
+      expect(@course.weighted_grading_periods?).to be true
+    end
+  end
+
   describe '#display_totals_for_all_grading_periods?' do
     before do
       @course.save!
