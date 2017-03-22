@@ -98,7 +98,7 @@ app.render()
 assignmentGroups.fetch({reset: true}).then(() => {
   if (ENV.HAS_GRADING_PERIODS) { app.filterResults() }
   if (ENV.PERMISSIONS.manage) {
-    assignmentGroups.loadModuleNames()
+    return assignmentGroups.loadModuleNames()
   }
-  assignmentGroups.getGrades()
+  return assignmentGroups.getGrades()
 })
