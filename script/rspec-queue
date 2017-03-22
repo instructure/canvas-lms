@@ -35,9 +35,8 @@ class CanvasSpecRunner < TestQueue::Runner::RSpec
     # for the runtime logger
     ENV["TEST_ENV_NUMBER"] = num > 1 ? num.to_s : ""
     ENV["SELINIMUM_BATCH_NAME"] = "#{ENV["SERVER_NUMBER"]}.#{ENV["TEST_ENV_NUMBER"]}"
-    CanvasTestDatabase.reconnect!
-    BlankSlateProtection.truncate_all_tables!
-    CanvasTestDatabase.prepare_test_shards
+    TestDatabaseUtils.reconnect!
+    TestDatabaseUtils.reset_database!
     Canvas.reconnect_redis
   end
 
@@ -115,32 +114,6 @@ class CanvasSpecRunner < TestQueue::Runner::RSpec
       worker.output.sub!(profile_output, "") if ENV['TEST_QUEUE_VERBOSE'] || worker.status.exitstatus != 0
     end
     super
-  end
-end
-
-class CanvasTestDatabase
-  class << self
-    # for when we fork
-    def reconnect!
-      ActiveRecord::Base.configurations['test']['database'] = "canvas_test_#{ENV["TEST_ENV_NUMBER"]}"
-      Switchman::DatabaseServer.remove_instance_variable(:@database_servers)
-      ActiveRecord::Base.establish_connection(:test)
-    end
-
-    # this is the key stuff from the root-level before(:all) in switchman's
-    # RSpecHelper... need to run it before :allthethings:
-    def prepare_test_shards
-      BlankSlateProtection.disable do
-        shard1, shard2 = Switchman::TestHelper.recreate_persistent_test_shards
-        Switchman::RSpecHelper.class_variable_set :@@shard1, shard1
-        Switchman::RSpecHelper.class_variable_set :@@shard2, shard2
-        Switchman::RSpecHelper.class_variable_set :@@shard3, nil
-        Switchman::RSpecHelper.class_variable_set :@@default_shard, Shard.default
-        Switchman::RSpecHelper.class_variable_set :@@keep_the_shards, true
-        Switchman::Shard.delete_all
-        Switchman::Shard.default(true)
-      end
-    end
   end
 end
 
