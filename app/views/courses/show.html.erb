@@ -146,27 +146,6 @@
 %>
 
 <% js_bundle 'legacy/courses_show' %>
-<% if @context.created? || @context.claimed? %>
-  <% css_bundle("reminder_course_setup") %>
-  <div class="reminder Reminder__course-setup">
-    <h2 class="Reminder__course-setup-title">
-      <%= t('headings.unpublished', %{This Course is Unpublished}) %>
-
-      <span class="Reminder__course-setup-subttitle">
-        <%= t "Only teachers can see this course until it is published" %>
-      </span>
-    </h2>
-    <div class="body Reminder__course-setup-body">
-      <p><%= t('Need help setting up your course?') %></p>
-      <br/>
-      <% if !@domain_root_account.try(:feature_enabled?, :new_user_tutorial) %>
-        <a href="#" class="btn btn-primary wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
-          <%= t("Setup Checklist") %>
-        </a>
-      <% end %>
-    </div>
-  </div>
-<% end %>
 <% if @pending_enrollment %>
   <%= render :partial => 'shared/dashboard_invitation', :object => @pending_enrollment %>
 <% end %>
