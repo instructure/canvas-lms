@@ -30,7 +30,7 @@
 //
 // then: $(".field-with-fancyplaceholder input").fancyPlaceholder();
 
-define(['jquery'], function($) {
+import $ from 'jquery'
 	$.fn.fancyPlaceholder = function() {
 	  var pollingInterval,
 	  	  foundInputsAndLables = [];
@@ -74,4 +74,3 @@ define(['jquery'], function($) {
       }
  	  });
 	};
-});

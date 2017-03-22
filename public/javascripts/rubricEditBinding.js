@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(['edit_rubric', 'compiled/views/rubrics/EditRubricPage'], function(rubricEditing, EditRubricPage){
+import rubricEditing from 'edit_rubric'
+import EditRubricPage from 'compiled/views/rubrics/EditRubricPage'
+
   document.addEventListener("rubricEditDataReady", function(e){
     new EditRubricPage
     rubricEditing.init()
   });
-});

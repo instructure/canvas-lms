@@ -160,6 +160,7 @@ module.exports = {
         loaders: ['imports-loader?this=>window']
       },
 
+      // vendor/i18n.js does not export or define anything, it just creates a global
       {
         test: /vendor\/i18n/,
         loaders: ['exports-loader?I18n']

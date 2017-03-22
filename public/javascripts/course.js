@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!courses',
-  'jquery' /* $ */
-], function(I18n, $) {
+import I18n from 'i18n!courses'
+import $ from 'jquery'
+
   $(document).ready(function() {
     $(".reject_button").click(function(event) {
       var result = confirm(I18n.t('confirm_reject_invitation', "Are you sure you want to reject the invitation to participate in this course?"));
@@ -29,5 +28,3 @@ define([
       }
     });
   });
-});
-

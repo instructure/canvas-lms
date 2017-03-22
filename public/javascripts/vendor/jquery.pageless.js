@@ -47,9 +47,7 @@
 //  * famspam.com/facebox
 // =======================================================================
 
-define([
-  'jquery' /* jQuery, $ */
-], function($) {
+import $ from 'jquery'
 
   var FALSE = !1
     , TRUE = !FALSE
@@ -216,4 +214,3 @@ define([
     return this;
   };
   
-});

@@ -1,7 +1,6 @@
-define([
-  'jquery',
-  'vendor/slickgrid/slick.core',
-  'vendor/slickgrid/lib/jquery.event.drag-2.2'],function(jQuery) {
+import jQuery from 'jquery'
+import 'vendor/slickgrid/slick.core'
+import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
 
 /**
  * @license
@@ -3878,5 +3877,3 @@ if (typeof Slick === "undefined") {
     init();
   }
 }(jQuery));
-
-});

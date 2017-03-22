@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery' // $
-], function($) {
+import $ from 'jquery'
 
   $(document).ready(function() {
     $("#oauth2_accept_form").submit(function(){
@@ -27,5 +25,3 @@ define([
       $btn.attr('disabled', true);
     });
   });
-
-});

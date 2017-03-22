@@ -1,4 +1,5 @@
-define(['jquery','vendor/slickgrid/slick.core'],function(jQuery) {
+import jQuery from 'jquery'
+import 'vendor/slickgrid/slick.core'
 
 (function ($) {
   // register namespace
@@ -187,5 +188,3 @@ define(['jquery','vendor/slickgrid/slick.core'],function(jQuery) {
     });
   }
 })(jQuery);
-
-});

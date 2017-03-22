@@ -20,7 +20,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
 import axios from 'axios'
-import ConvertCase from 'convert_case'
 import I18n from 'i18n!grading_periods'
 import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
 

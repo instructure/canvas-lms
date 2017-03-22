@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery' /* jQuery, $ */,
-  'user_utils' /* userUtils */
-], function($, userUtils) {
+import $ from 'jquery'
+import userUtils from 'user_utils'
 
 $(function () {
   var $short_name = $('input[name="user[short_name]"]')
@@ -43,5 +41,3 @@ $(function () {
     prior_name = $(this).attr('value');
   });
 });
-});
-

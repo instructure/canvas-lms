@@ -7,7 +7,7 @@
  * @website: http://www.datejs.com/
  */
  
-define(['vendor/date-js/sugarpak'], function() {
+import 'vendor/date-js/sugarpak'
 (function () {
     Date.Parsing = {
         Exception: function (s) {
@@ -1118,4 +1118,3 @@ define(['vendor/date-js/sugarpak'], function() {
         return $D.getParseFunction(fx)(s); 
     };	
 }());
-});

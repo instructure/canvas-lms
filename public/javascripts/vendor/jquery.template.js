@@ -23,7 +23,7 @@
 // 
 
 
-define(['jquery'], function($) {
+import $ from 'jquery'
   $.extend({
     template : function(template, values) {
       // handle a blank template or replacement value object correctly
@@ -38,4 +38,3 @@ define(['jquery'], function($) {
 			return template.replace(regexMatchingPattern, replacementFunction);
 		}
 	});
-});

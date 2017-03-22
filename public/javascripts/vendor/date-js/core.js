@@ -7,7 +7,7 @@
  * @website: http://www.datejs.com/
  */
  
-define(['vendor/date-js/globalization/en-US'], function() {
+import 'vendor/date-js/globalization/en-US'
 (function () {
     var _originalDateDotPrototypeDotToString = Date.prototype.toString;
     var $D = Date, 
@@ -870,4 +870,3 @@ define(['vendor/date-js/globalization/en-US'], function() {
         ) : _originalDateDotPrototypeDotToString.apply(this, arguments);
     };
 }());    
-});
