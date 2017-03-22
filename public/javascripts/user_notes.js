@@ -63,6 +63,14 @@ define([
         .fillTemplateData({data:user_note})
         .find('.delete_user_note_link')
           .attr('href', action)
+          .attr('title', function (i, oldTitle) {
+            return oldTitle.replace('{{ title }}', user_note.title)
+          })
+          .find('.screenreader-only')
+            .text(function (i, oldText) {
+              return oldText.replace('{{ title }}', user_note.title)
+            })
+            .end()
           .end()
         .find('.formatted_note')
           .html($.raw(user_note.formatted_note))
@@ -97,4 +105,3 @@ define([
     });
   });
 });
-
