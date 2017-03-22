@@ -1,6 +1,8 @@
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import store from 'jsx/external_apps/lib/AppCenterStore'
+import $ from 'jquery'
+import 'compiled/jquery.rails_flash_notifications'
 
 export default React.createClass({
     displayName: 'AppFilters',
@@ -23,12 +25,19 @@ export default React.createClass({
 
     handleFilterClick(filter, e) {
       e.preventDefault();
-      store.setState({ filter: filter });
+      store.setState({ filter });
+      this.announceFilterResults()
     },
 
     applyFilter() {
-      var filterText = this.refs.filterText.getDOMNode().value;
-      store.setState({ filterText: filterText });
+      const filterText = this.filterText.value;
+      store.setState({ filterText });
+      this.announceFilterResults()
+    },
+
+    announceFilterResults () {
+      const apps = store.filteredApps()
+      $.screenReaderFlashMessageExclusive(I18n.t('%{count} apps found', { count: apps.length }))
     },
 
     render() {
@@ -54,7 +63,7 @@ export default React.createClass({
                 <label htmlFor="filterText" className="screenreader-only">{I18n.t('Filter by name')}</label>
                 <input type="text"
                   id="filterText"
-                  ref="filterText"
+                  ref={(c) => { this.filterText = c }}
                   defaultValue={this.state.filterText}
                   className="input-block-level search-query"
                   placeholder={I18n.t('Filter by name')}

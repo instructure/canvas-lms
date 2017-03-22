@@ -14,17 +14,17 @@ export default React.createClass({
 
     showDetails() {
       if (this.state.isHidingDetails) {
-        $(this.refs.details.getDOMNode()).fadeTo(200, 0.85);
+        $(this.details).fadeTo(200, 0.85);
         this.setState({isHidingDetails: false});
       }
     },
 
     hideDetails() {
-      $(this.refs.details.getDOMNode()).fadeOut(200, function () {
+      $(this.details).fadeOut(200, () => {
         if (this.isMounted()) {
           this.setState({isHidingDetails: true});
         }
-      }.bind(this));
+      })
     },
 
     handleKeyDown(e) {
@@ -54,7 +54,7 @@ export default React.createClass({
             {this.installedRibbon()}
 
             <img className="banner_image" alt={this.props.app.name} src={this.props.app.banner_image_url} />
-            <div ref="details" className="details">
+            <div ref={(c) => { this.details = c }} className="details">
               <div className="content">
                 <span className="name">{this.props.app.name}</span>
                 <div id={appId + "-desc"} className="desc">{this.props.app.short_description}</div>
