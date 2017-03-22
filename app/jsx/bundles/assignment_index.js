@@ -27,7 +27,7 @@ import _ from 'underscore'
 
 const course = new Course()
 course.url = ENV.URLS.course_url
-course.fetch()
+const courseFetch = course.fetch()
 
 const includes = ['assignments', 'discussion_topic']
 if (ENV.PERMISSIONS.manage) {
@@ -94,11 +94,15 @@ const app = new IndexView({
 
 app.render()
 
-  // kick it all off
-assignmentGroups.fetch({reset: true}).then(() => {
+// kick it all off
+Promise.all([
+  courseFetch,
+  assignmentGroups.fetch({reset: true})
+]).then(() => {
   if (ENV.HAS_GRADING_PERIODS) { app.filterResults() }
   if (ENV.PERMISSIONS.manage) {
-    return assignmentGroups.loadModuleNames()
+    assignmentGroups.loadModuleNames()
+  } else {
+    assignmentGroups.getGrades()
   }
-  return assignmentGroups.getGrades()
 })
