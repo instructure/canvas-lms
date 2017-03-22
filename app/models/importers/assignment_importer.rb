@@ -211,10 +211,14 @@ module Importers
         end
       end
 
-      if item.turnitin_enabled
+      if item.turnitin_enabled || item.vericite_enabled
         settings = JSON.parse(hash[:turnitin_settings]).with_indifferent_access
         settings[:created] = false if settings[:created]
-        item.turnitin_settings = settings
+        if item.vericite_enabled
+          item.vericite_settings = settings
+        else
+          item.turnitin_settings = settings
+        end
       end
 
       migration.add_imported_item(item)
