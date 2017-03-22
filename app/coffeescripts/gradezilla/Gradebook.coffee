@@ -109,7 +109,7 @@ define [
       selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo
       selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo
       sortRowsBy:
-        columnId: 'student_name' # the column controlling the sort
+        columnId: 'student' # the column controlling the sort
         settingKey: 'sortable_name' # the key describing the sort criteria
         direction: 'ascending' # the direction of the sort
     }
@@ -1721,6 +1721,20 @@ define [
       @renderTotalGradeColumnHeader()
 
     # Student Column Header
+    getStudentColumnSortBySetting: =>
+      columnId = 'student'
+      sortRowsBySetting = @getSortRowsBySetting()
+
+      {
+        direction: sortRowsBySetting.direction
+        disabled: !@contentLoadStates.studentsLoaded
+        isSortColumn: sortRowsBySetting.columnId == columnId
+        onSortBySortableNameAscending: () =>
+          @setSortRowsBySetting(columnId, 'sortable_name', 'ascending')
+        onSortBySortableNameDescending: () =>
+          @setSortRowsBySetting(columnId, 'sortable_name', 'descending')
+        settingKey: sortRowsBySetting.settingKey
+      }
 
     getStudentColumnHeaderProps: ->
       selectedPrimaryInfo: @getSelectedPrimaryInfo()
@@ -1728,6 +1742,7 @@ define [
       selectedSecondaryInfo: @getSelectedSecondaryInfo()
       onSelectSecondaryInfo: @setSelectedSecondaryInfo
       sectionsEnabled: @sections_enabled
+      sortBySetting: @getStudentColumnSortBySetting()
 
     renderStudentColumnHeader: =>
       mountPoint = @getColumnHeaderNode('student')

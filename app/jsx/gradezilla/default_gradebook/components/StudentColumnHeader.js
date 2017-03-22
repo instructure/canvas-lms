@@ -25,7 +25,7 @@ import Typography from 'instructure-ui/Typography'
 import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
 import I18n from 'i18n!gradebook'
 
-const { bool, func, oneOf } = React.PropTypes;
+const { bool, func, oneOf, shape, string } = React.PropTypes;
 
 export default class StudentColumnHeader extends React.Component {
   static propTypes = {
@@ -33,12 +33,21 @@ export default class StudentColumnHeader extends React.Component {
     onSelectPrimaryInfo: func.isRequired,
     selectedSecondaryInfo: oneOf(StudentRowHeaderConstants.secondaryInfoKeys).isRequired,
     sectionsEnabled: bool.isRequired,
-    onSelectSecondaryInfo: func.isRequired
+    onSelectSecondaryInfo: func.isRequired,
+    sortBySetting: shape({
+      direction: string.isRequired,
+      disabled: bool.isRequired,
+      isSortColumn: bool.isRequired,
+      onSortBySortableNameAscending: func.isRequired,
+      onSortBySortableNameDescending: func.isRequired,
+      settingKey: string.isRequired
+    }).isRequired,
   };
 
   constructor (props) {
     super(props);
 
+    this.bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref };
     this.onShowSectionNames = this.onSelectSecondaryInfo.bind(this, 'section');
     this.onHideSecondaryInfo = this.onSelectSecondaryInfo.bind(this, 'none');
     this.onShowSisId = this.onSelectSecondaryInfo.bind(this, 'sis_id');
@@ -58,6 +67,18 @@ export default class StudentColumnHeader extends React.Component {
   }
 
   render () {
+    const {
+      sortBySetting: {
+        isSortColumn,
+        settingKey,
+        direction,
+        disabled,
+        onSortBySortableNameAscending,
+        onSortBySortableNameDescending
+      }
+    } = this.props;
+    const selectedSortSetting = isSortColumn && settingKey;
+
     return (
       <div className="Gradebook__ColumnHeaderContent">
         <span className="Gradebook__ColumnHeaderDetail">
@@ -67,6 +88,7 @@ export default class StudentColumnHeader extends React.Component {
         </span>
 
         <PopoverMenu
+          contentRef={this.bindOptionsMenuContent}
           zIndex="9999"
           trigger={
             <span className="Gradebook__ColumnHeaderAction">
@@ -76,7 +98,24 @@ export default class StudentColumnHeader extends React.Component {
             </span>
           }
         >
+          <MenuItemGroup label={I18n.t('Sort by')}>
+            <MenuItem
+              selected={selectedSortSetting === 'sortable_name' && direction === 'ascending'}
+              disabled={disabled}
+              onSelect={onSortBySortableNameAscending}
+            >
+              <span>{I18n.t('A–Z')}</span>
+            </MenuItem>
 
+            <MenuItem
+              selected={selectedSortSetting === 'sortable_name' && direction === 'descending'}
+              disabled={disabled}
+              onSelect={onSortBySortableNameDescending}
+            >
+              <span>{I18n.t('Z–A')}</span>
+            </MenuItem>
+          </MenuItemGroup>
+          <MenuItemSeparator />
           <MenuItemGroup label={I18n.t('Display as')} data-menu-item-group-id="primary-info">
             <MenuItem
               key="first_last"
