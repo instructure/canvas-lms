@@ -120,6 +120,13 @@ $(document).ready(function() {
         data: bank,
         hrefValues: ['id']
       })
+      // if you can convince fillTemplateData to do this, please be my guest
+      $bank.find('.links a').each(function(_, link) {
+        link.setAttribute('title', link.getAttribute('title').replace('{{ title }}', bank.title));
+      });
+      $bank.find('.links a span').each(function(_, span) {
+        span.textContent = span.textContent.replace('{{ title }}', bank.title);
+      });
       $bank.find('a.title')[0].focus()
     },
     error: function(data, $bank) {
