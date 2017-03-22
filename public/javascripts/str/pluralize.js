@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(['jquery'], function($) {
+import $ from 'jquery'
     // ported pluralizations from active_support/inflections.rb
   // (except for cow -> kine, because nobody does that) 
   var skip = ['equipment', 'information', 'rice', 'money', 'species', 'series', 'fish', 'sheep', 'jeans'];
@@ -62,5 +62,5 @@ define(['jquery'], function($) {
     return "" + count + " " + (count == 1 ? string : pluralize(string));
   };
 
-  return pluralize;
-});
+  export default pluralize;
+

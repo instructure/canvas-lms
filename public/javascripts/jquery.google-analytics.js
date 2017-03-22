@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  './INST' /* INST */,
-  'jquery' /* $ */
-], function(INST, $) {
+import INST from 'INST'
+import $ from 'jquery'
 
   // requires INST global
   window._gaq = window._gaq || [];
@@ -105,11 +103,11 @@ define([
     });
   }
 
-  return {
+  export default {
     trackPage: $.trackPage,
     setTrackingVar: $.setTrackingVar,
     trackEvent: $.trackEvent,
     trackPageView: $.trackPageView
   };
 
-});
+

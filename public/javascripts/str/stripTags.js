@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(["jquery"], function($) {
+import "jquery"
 
   /* Make an html snippet plain text.
    *
@@ -31,8 +31,8 @@ define(["jquery"], function($) {
    */
   var $stripDiv = $("<div />");
 
-  return function(html) {
+  export default function(html) {
     return $stripDiv.html(html).text();
   }
-});
+
 

@@ -15,12 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-define(['jquery', 'jquery.cookie'], function ($) {
+
+import $ from 'jquery'
+import 'jquery.cookie'
+
   // monkey patch jquery's JSON parsing so we can have all of our ajax responses return with
   // 'while(1);' prepended to them to protect against a CSRF attack vector.
   var _parseJSON = $.parseJSON;
   $.parseJSON = function() {
-    "use strict";
+
     if (arguments[0]) {
       try {
         var newData = arguments[0].replace(/^while\(1\);/, '');
@@ -92,5 +95,5 @@ define(['jquery', 'jquery.cookie'], function ($) {
     });
   });
 
-  return window.jQuery = window.$ = $;
-});
+export default $;
+

@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(['node_modules-version-of-react-modal'], function(ReactModal) {
+import ReactModal from 'node_modules-version-of-react-modal'
+
   var appElement = document.getElementById('application');
 
   // In general this will be present, but in the case that it's not present,
@@ -26,5 +27,4 @@ define(['node_modules-version-of-react-modal'], function(ReactModal) {
     ReactModal.setAppElement(document.getElementById('application'));
   }
 
-  return ReactModal;
-});
+export default ReactModal

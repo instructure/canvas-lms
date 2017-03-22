@@ -17,18 +17,16 @@
  */
 
 /////
-// if you want Backbone, require 'Backbone' (this file). It will give you
+// if you want Backbone, import 'Backbone' (this file). It will give you
 // back a Backbone with all of our instructure specific patches to it.
 
-define([
-  // Get the unpatched Backbone
-  'node_modules-version-of-backbone',
+// Get the unpatched Backbone
+import Backbone from 'node_modules-version-of-backbone'
 
-  // Apply all of our patches
-  'compiled/backbone-ext/Backbone.syncWithMultipart',
-  'compiled/backbone-ext/Model',
-  'compiled/backbone-ext/View',
-  'compiled/backbone-ext/Collection'
-], function (Backbone) {
-  return Backbone;
-});
+// Apply all of our patches
+import 'compiled/backbone-ext/Backbone.syncWithMultipart'
+import 'compiled/backbone-ext/Model'
+import 'compiled/backbone-ext/View'
+import 'compiled/backbone-ext/Collection'
+
+export default Backbone

@@ -22,7 +22,8 @@
  * has already been assigned to the cache with the same ID, then
  * that object will be overridden.
  */
-define(['Backbone', 'underscore'], function(Backbone, _) {
+import Backbone from 'Backbone'
+import _ from 'underscore'
 
   // Stores cached models:
   // key: (unique identifier per class) + ':' + (model id)
@@ -84,6 +85,6 @@ define(['Backbone', 'underscore'], function(Backbone, _) {
     cache = {};
   };
 
-  return IdentityMap
+  export default IdentityMap
 
-});
+
