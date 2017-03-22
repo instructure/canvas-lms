@@ -10,10 +10,8 @@
  * Depends:
  *	jquery.ui.widget.js
  */
-define([
-  'jquery',
-  'jqueryui/widget'
-], function( $ ) {
+import $ from 'jquery'
+import 'jqueryui/widget'
 
 var mouseHandled = false;
 $( document ).mouseup( function( e ) {
@@ -166,4 +164,4 @@ $.widget("ui.mouse", {
 	_mouseCapture: function(event) { return true; }
 });
 
-});
+

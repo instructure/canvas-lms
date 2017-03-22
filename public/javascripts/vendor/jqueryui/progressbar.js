@@ -11,11 +11,9 @@
  *   jquery.ui.core.js
  *   jquery.ui.widget.js
  */
-define([
-  'jquery',
-  'jqueryui/core',
-  'jqueryui/widget'
-], function( $ ) {
+import $ from 'jquery'
+import 'jqueryui/core'
+import 'jqueryui/widget'
 
 $.widget( "ui.progressbar", {
 	version: "@VERSION",
@@ -105,4 +103,4 @@ $.widget( "ui.progressbar", {
 	}
 });
 
-});
+

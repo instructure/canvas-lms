@@ -13,13 +13,11 @@
  *	jquery.ui.position.js
  *	jquery.ui.menu.js
  */
-define([
-	'jquery',
-	'jqueryui/core',
-	'jqueryui/widget',
-	'jqueryui/position',
-	'jqueryui/menu'
-], function( $ ) {
+import $ from 'jquery'
+import 'jqueryui/core'
+import 'jqueryui/widget'
+import 'jqueryui/position'
+import 'jqueryui/menu'
 
 // used to prevent race conditions with remote data sources
 var requestIndex = 0;
@@ -610,4 +608,4 @@ $.widget( "ui.autocomplete", $.ui.autocomplete, {
 });
 
 
-});
+

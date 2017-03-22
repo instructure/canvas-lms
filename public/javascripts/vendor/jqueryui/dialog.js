@@ -1,4 +1,6 @@
-define(['jquery', 'str/htmlEscape', 'jqueryui/dialog-unpatched'], function($, h, returnValOfUnpatchedDialog) {
+import $ from 'jquery'
+import h from 'str/htmlEscape'
+import returnValOfUnpatchedDialog from 'jqueryui/dialog-unpatched'
   
   // have UI dialogs default to modal:true
   $.ui.dialog.prototype.options.modal = true
@@ -40,6 +42,6 @@ define(['jquery', 'str/htmlEscape', 'jqueryui/dialog-unpatched'], function($, h,
     }
   });
 
-  return returnValOfUnpatchedDialog;
+  export default returnValOfUnpatchedDialog;
 
-});
+

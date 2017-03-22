@@ -7,7 +7,9 @@
  *
  * http://docs.jquery.com/UI
  */
-define(['jquery'], function( $ ) {
+import $ from 'jquery'
+
+(function (){
 
 var uuid = 0,
 	runiqueId = /^ui-id-\d+$/;
@@ -323,4 +325,4 @@ $.extend( $.ui, {
 	}
 });
 
-});
+}());

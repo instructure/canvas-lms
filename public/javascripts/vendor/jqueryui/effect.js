@@ -7,7 +7,9 @@
  *
  * http://docs.jquery.com/UI/Effects/
  */
-define(['jquery'], function($) {
+import $ from 'jquery'
+
+(function (){
 
 if ($.effects) return $.effects;
 
@@ -1268,4 +1270,4 @@ $.each( baseEasings, function( name, easeIn ) {
 
 })();
 
-});
+}());

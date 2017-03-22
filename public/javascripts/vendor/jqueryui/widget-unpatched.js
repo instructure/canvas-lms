@@ -7,7 +7,7 @@
  *
  * http://docs.jquery.com/UI/Widget
  */
-define(['jquery'], function( $ ) {
+import $ from 'jquery'
 
 var uuid = 0,
 	slice = Array.prototype.slice,
@@ -500,4 +500,4 @@ if ( $.uiBackCompat !== false ) {
 	};
 }
 
-});
+

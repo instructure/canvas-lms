@@ -16,16 +16,14 @@
  *	jquery.ui.position.js
  *	jquery.ui.resizable.js
  */
-define([
- 'jquery',
- 'jqueryui/core',
- 'jqueryui/widget',
- 'jqueryui/button',
- 'jqueryui/draggable',
- 'jqueryui/mouse',
- 'jqueryui/position',
- 'jqueryui/resizable'
-], function( $ ) {
+import $ from 'jquery'
+import 'jqueryui/core'
+import 'jqueryui/widget'
+import 'jqueryui/button'
+import 'jqueryui/draggable'
+import 'jqueryui/mouse'
+import 'jqueryui/position'
+import 'jqueryui/resizable'
 
 var uiDialogClasses = "ui-dialog ui-widget ui-widget-content ui-corner-all ",
 	sizeRelatedOptions = {
@@ -895,4 +893,4 @@ $.extend( $.ui.dialog.overlay.prototype, {
 	}
 });
 
-});
+

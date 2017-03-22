@@ -12,12 +12,10 @@
  *	jquery.ui.mouse.js
  *	jquery.ui.widget.js
  */
-define([
-  'jquery',
-  'jqueryui/core',
-  'jqueryui/mouse',
-  'jqueryui/widget'
-], function( $ ) {
+import $ from 'jquery'
+import 'jqueryui/core'
+import 'jqueryui/mouse'
+import 'jqueryui/widget'
 
 $.widget("ui.sortable", $.ui.mouse, {
 	version: "@VERSION",
@@ -1075,4 +1073,4 @@ $.widget("ui.sortable", $.ui.mouse, {
 
 });
 
-});
+
