@@ -19,6 +19,7 @@ define [
       fakeENV.setup()
       ENV.current_user_roles = ["admin"]
       ENV.GRADING_PERIODS_URL = "/api/v1/accounts/1/grading_periods"
+      ENV.GRADING_PERIODS_WEIGHTED = true
       @indexData =
         "grading_periods":[
           {
@@ -101,6 +102,10 @@ define [
   test "renders grading periods with 'readOnly' set to the returned value (false)", ->
     equal @gradingPeriodCollection.refs.grading_period_1.props.readOnly, false
     equal @gradingPeriodCollection.refs.grading_period_2.props.readOnly, false
+
+  test "renders grading periods with 'weighted' set to the ENV variable (true)", ->
+    equal @gradingPeriodCollection.refs.grading_period_1.props.weighted, true
+    equal @gradingPeriodCollection.refs.grading_period_2.props.weighted, true
 
   test "renders grading periods with their individual 'closeDate'", ->
     deepEqual @gradingPeriodCollection.refs.grading_period_1.props.closeDate, new Date("2015-06-07T05:00:00Z")
@@ -264,6 +269,7 @@ define [
       fakeENV.setup()
       ENV.current_user_roles = ["admin"]
       ENV.GRADING_PERIODS_URL = "/api/v1/accounts/1/grading_periods"
+      ENV.GRADING_PERIODS_WEIGHTED = false
       @indexData =
         "grading_periods":[
           {
@@ -286,3 +292,6 @@ define [
 
   test "renders grading periods with 'readOnly' set to true", ->
     equal @gradingPeriodCollection.refs.grading_period_1.props.readOnly, true
+
+  test "renders grading periods with 'weighted' set to the ENV variable (false)", ->
+    equal @gradingPeriodCollection.refs.grading_period_1.props.weighted, false

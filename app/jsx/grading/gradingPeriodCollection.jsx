@@ -231,6 +231,7 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
             readOnly={this.state.readOnly}
             disabled={this.state.disabled}
             weight={period.weight}
+            weighted={ENV.GRADING_PERIODS_WEIGHTED}
             updateGradingPeriodCollection={this.updateGradingPeriodCollection}
             onDeleteGradingPeriod={this.deleteGradingPeriod}
           />
