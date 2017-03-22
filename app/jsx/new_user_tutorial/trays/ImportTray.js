@@ -1,23 +1,21 @@
-define([
-  'react',
-  'i18n!new_user_tutorial',
-  'instructure-ui/lib/components/Typography',
-  'instructure-ui/lib/components/Heading',
-], (React, I18n, Typography, Heading) => {
-  const ImportTray = () => (
-    <div>
-      <Heading as="h2" level="h1" >{I18n.t('Import')}</Heading>
-      <Typography size="large" as="p">
-        {I18n.t('Bring your content into your course')}
-      </Typography>
-      <Typography as="p">
-        {
-          I18n.t(`Bring existing content from another course or course
-            management system into your Canvas course.`)
-        }
-      </Typography>
-    </div>
-  );
+import React from 'react'
+import I18n from 'i18n!new_user_tutorial'
+import Typography from 'instructure-ui/lib/components/Typography'
+import TutorialTrayContent from './TutorialTrayContent'
 
-  return ImportTray;
-});
+const ImportTray = () => (
+  <TutorialTrayContent
+    heading={I18n.t('Import')}
+    subheading={I18n.t('Bring your content into your course')}
+    image="/images/tutorial-tray-images/import.svg"
+  >
+    <Typography as="p">
+      {
+        I18n.t(`Bring existing content from another course or course
+          management system into your Canvas course.`)
+      }
+    </Typography>
+  </TutorialTrayContent>
+);
+
+export default ImportTray;
