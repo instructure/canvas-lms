@@ -415,7 +415,7 @@ import 'jquery.instructure_misc_helpers'
               <div className="ItemGroup__header__title">
                 <button className={"Button Button--icon-action GradingPeriodSet__toggle"}
                         aria-expanded={this.props.expanded}
-                        aria-label="Toggle grading period visibility">
+                        aria-label={I18n.t('Toggle %{title} grading period visibility', { title: this.props.set.title })}>
                   <i className={"icon-mini-arrow-" + arrow}/>
                 </button>
                 <h2 ref="title" className="GradingPeriodSet__title">
