@@ -140,8 +140,6 @@ export default React.createClass({
                 <button
                   ref="btnClose" type="button" className="btn btn-default"
                   id={ 'close' + this.state.tool.name }
-                  aria-describedby={ this.state.tool.name.replace(/\s/g,'') + 'Placements' }
-                  aria-labelledby={ this.state.tool.name.replace(/\s/g,'') + 'Placements' }
                   onClick={this.closeModal}>
                   {I18n.t('Close')}
                 </button>
