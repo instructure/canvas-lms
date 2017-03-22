@@ -764,6 +764,12 @@ acknowledge that you have read and agreed to the
             <div class="notification_account_content">
               <div class="ic-notification__content">
                 <div class="ic-notification__message">
+                  <h4 class="ic-notification__title notification_subject">
+                    <%= announcement.subject %>
+                  </h4>
+                  <span class="notification_message">
+                    <%= user_content(announcement.message) %>
+                  </span>
                   <% if can_do(@account, @current_user, :manage_alerts) %>
                     <div class="ic-notification__admin-actions">
                       <button
@@ -772,21 +778,15 @@ acknowledge that you have read and agreed to the
                         aria-controls="<%= "edit_notification_form_#{announcement.id}" %>"
                         data-edit-toggle-id="<%= announcement.id %>"
                       >
-                        <span class="screenreader-only"><%= t("Edit this Announcement") %></span>
+                        <span class="screenreader-only"><%= t("Edit announcement %{title}", :title => announcement.subject) %></span>
                         <i class="icon-edit"></i>
                       </button>
-                      <a href="#" rel="<%= context_url(@account, :context_account_notification_url, announcement) %>" class="Button Button--icon-action delete_notification_link" title="<%= t("Delete this Announcement") %>">
-                        <span class="screenreader-only"><%= t("Delete this Announcement") %></span>
+                      <a href="#" rel="<%= context_url(@account, :context_account_notification_url, announcement) %>" class="Button Button--icon-action delete_notification_link" title="<%= t("Delete announcement %{title}", :title => announcement.subject) %>">
+                        <span class="screenreader-only"><%= t("Delete announcement %{title}", :title => announcement.subject) %></span>
                         <i class="icon-trash"></i>
                       </a>
                     </div>
                   <% end %>
-                  <h4 class="ic-notification__title notification_subject">
-                    <%= announcement.subject %>
-                  </h4>
-                  <span class="notification_message">
-                    <%= user_content(announcement.message) %>
-                  </span>
                 </div>
               </div>
               <span class="notification_account_content_text">
