@@ -34,7 +34,7 @@ import I18n from 'i18n!cyoe_assignment_sidebar'
     }
 
     render () {
-
+      const { rangeStudents, totalStudents } = this.props
       return (
         <div className='crs-bar__container'>
           <div className='crs-bar__horizontal-outside'>
@@ -50,12 +50,16 @@ import I18n from 'i18n!cyoe_assignment_sidebar'
             <button
               className='crs-link-button'
               onClick={this.selectRange}
-              aria-label={I18n.t('View range student details')}
+              aria-label={I18n.t(
+                '%{rangeStudents} out of %{totalStudents} students, click to view range student details',
+                { rangeStudents, totalStudents }
+              )}
+              title={I18n.t('View range student details')}
             >
-              {I18n.t('%{rangeStudents} out of %{totalStudents} students', {
-                rangeStudents: this.props.rangeStudents,
-                totalStudents: this.props.totalStudents,
-              })}
+              {I18n.t(
+                '%{rangeStudents} out of %{totalStudents} students',
+                { rangeStudents, totalStudents }
+              )}
             </button>
           </div>
         </div>
