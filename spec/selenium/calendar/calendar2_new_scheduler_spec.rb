@@ -35,6 +35,7 @@ describe "scheduler" do
     end
 
     it 'shows appointment slots on calendar in Find Appointment mode', priority: "1", test_id: 2925320 do
+      skip_if_chrome('Needs research: passes locally, but fails on Jenkins with stale element reference error ')
       open_select_courses_modal(@course1.name)
       # the order they come back could vary depending on whether they split
       # days, but we expect them all to be rendered
