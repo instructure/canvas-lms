@@ -134,7 +134,7 @@ describe "course rubrics" do
     course_with_student(:course => @course, :active_all => true)
     @course.offer!
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
-    comment = "Hi, please see www.example.com.\n\nThanks."
+    comment = "Hi, please see www.example.com\n.\n\nThanks."
     @assessment = @association.assess({
                                           :user => @student,
                                           :assessor => @teacher,
@@ -151,14 +151,12 @@ describe "course rubrics" do
 
     get "/courses/#{@course.id}/grades"
     f('.toggle_rubric_assessments_link').click
-    wait_for_ajaximations
-    expect(f('.rubric .criterion .custom_rating_comments').text).to eq comment
+    expect(f('.rubric .criterion .custom_rating_comments')).to include_text comment
     expect(f('.rubric .criterion .custom_rating_comments a')).to have_attribute('href', 'http://www.example.com/')
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     f('.assess_submission_link').click
-    wait_for_ajaximations
-    expect(f('.rubric .criterion .custom_rating_comments').text).to eq comment
+    expect(f('.rubric .criterion .custom_rating_comments')).to include_text comment
     expect(f('.rubric .criterion .custom_rating_comments a')).to have_attribute('href', 'http://www.example.com/')
   end
 
