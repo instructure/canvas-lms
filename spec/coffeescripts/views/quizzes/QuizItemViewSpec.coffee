@@ -86,17 +86,26 @@ define [
 
   test "initializes sis toggle if post to sis enabled", ->
     quiz = createQuiz(id: 1, title: 'Foo', can_update: true)
-    view = createView(quiz, canManage: true, post_to_sis: true)
+    quiz.set('post_to_sis', true)
+    view = createView(quiz, canManage: true)
     ok view.sisButtonView
 
-  test "does not initialize sis toggle if post to sis disabled", ->
+  test "initializes sis toggle if post to sis disabled", ->
     quiz = createQuiz(id: 1, title: 'Foo', can_update: true)
-    view = createView(quiz, canManage: true, post_to_sis: false)
+    quiz.set('post_to_sis', false)
+    view = createView(quiz, canManage: true)
+    ok view.sisButtonView
+
+  test "does not initialize sis toggle if post to sis is null", ->
+    quiz = createQuiz(id: 1, title: 'Foo', can_update: true)
+    quiz.set('post_to_sis', null)
+    view = createView(quiz, canManage: true)
     ok !view.sisButtonView
 
   test "does not initialize sis toggle if sis enabled but can't manage", ->
     quiz = createQuiz(id: 1, title: 'Foo', can_update: false)
-    view = createView(quiz, canManage: false, post_to_sis: false)
+    quiz.set('post_to_sis', false)
+    view = createView(quiz, canManage: false)
     ok !view.sisButtonView
 
   test 'udpates publish status when model changes', ->
