@@ -151,6 +151,7 @@ describe "threaded discussions" do
   end
 
   it "should display editor name and timestamp after edit", priority: "2", test_id: 222522 do
+    skip_if_chrome('needs research: passes locally fails on Jenkins ')
     edit_text = 'edit message'
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
