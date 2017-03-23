@@ -854,9 +854,6 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
-  def public_topic_feed
-  end
-
   # @API Reorder pinned topics
   #
   # Puts the pinned discussion topics in the specified order.

@@ -987,13 +987,6 @@ class ApplicationController < ActionController::Base
     @page_before_render = Time.now.utc
   end
 
-  def generate_new_page_view
-    return true if !page_views_enabled?
-
-    generate_page_view
-    @page_view.generated_by_hand = true
-  end
-
   def disable_page_views
     @log_page_views = false
     true
@@ -1331,10 +1324,6 @@ class ApplicationController < ActionController::Base
     params[:controller] == 'files' && params[:action] == 'show' && params[:verifier].present?
   end
 
-  def session_loaded?
-    session.send(:loaded?) rescue false
-  end
-
   # Retrieving wiki pages needs to search either using the id or
   # the page title.
   def get_wiki_page
@@ -1619,10 +1608,6 @@ class ApplicationController < ActionController::Base
     feature_enabled?(feature) && service_enabled?(feature)
   end
   helper_method :feature_and_service_enabled?
-
-  def show_new_dashboard?
-    @current_user && @current_user.preferences[:new_dashboard]
-  end
 
   def temporary_user_code(generate=true)
     if generate

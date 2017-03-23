@@ -44,7 +44,6 @@ class Pseudonym < ActiveRecord::Base
 
   before_save :set_password_changed
   before_validation :infer_defaults, :verify_unique_sis_user_id
-  after_save :update_passwords_on_related_pseudonyms
   after_save :update_account_associations_if_account_changed
   has_a_broadcast_policy
 
@@ -175,10 +174,6 @@ class Pseudonym < ActiveRecord::Base
     self.sis_user_id = nil if self.sis_user_id.blank?
   end
 
-  def update_passwords_on_related_pseudonyms
-    return if @dont_update_passwords_on_related_pseudonyms || !self.user || self.password_auto_generated
-  end
-
   def login_assertions_for_user
     if !self.persistence_token || self.persistence_token == ''
       # Some pseudonyms can end up without a persistence token if they were created
@@ -207,12 +202,6 @@ class Pseudonym < ActiveRecord::Base
 
   def works_for_account?(account, allow_implicit = false)
     true
-  end
-
-  def save_without_updating_passwords_on_related_pseudonyms
-    @dont_update_passwords_on_related_pseudonyms = true
-    self.save
-    @dont_update_passwords_on_related_pseudonyms = false
   end
 
   def <=>(other)
