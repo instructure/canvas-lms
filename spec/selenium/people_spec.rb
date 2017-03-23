@@ -393,6 +393,22 @@ describe "people" do
      expect(ff(".StudentEnrollment")[0]).not_to include_text("section2")
     end
 
+    it "removes students linked to an observer" do
+      @student1 = user_factory; @course.enroll_student(@student1, enrollment_state: :active)
+      @student2 = user_factory; @course.enroll_student(@student2, enrollment_state: :active)
+      @observer = user_factory
+      @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: :active, associated_user_id: @student1.id, allow_multiple_enrollments: true)
+      @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: :active, associated_user_id: @student2.id, allow_multiple_enrollments: true)
+      get "/courses/#{@course.id}/users"
+      f(".ObserverEnrollment .icon-settings").click
+      fln("Link to Students").click
+      fln("Remove linked student #{@student1.name}", f("#token_#{@student1.id}")).click
+      f('.ui-dialog-buttonset .btn-primary').click
+      wait_for_ajax_requests
+      expect(@observer.enrollments.not_deleted.map(&:associated_user_id)).not_to include @student1.id
+      expect(@observer.enrollments.not_deleted.map(&:associated_user_id)).to include @student2.id
+    end
+
     it "should gray out sections the user doesn't have permission to remove" do
       @student = user_with_managed_pseudonym
       e = @course.enroll_student(@student, allow_multiple_enrollments: true)
