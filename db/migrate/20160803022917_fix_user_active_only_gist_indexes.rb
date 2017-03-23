@@ -23,8 +23,11 @@ class FixUserActiveOnlyGistIndexes < ActiveRecord::Migration[4.2]
     if schema = connection.extension_installed?(:pg_trgm)
       remove_index :users, name: 'index_trgm_users_name_active_only' if index_name_exists?(:users, 'index_trgm_users_name_active_only', false)
 
-      concurrently = " CONCURRENTLY" if connection.open_transactions == 0
-      execute("CREATE INDEX#{concurrently} index_trgm_users_name_active_only ON #{User.quoted_table_name} USING gist(LOWER(name) #{schema}.gist_trgm_ops) WHERE workflow_state IN ('registered', 'pre_registered')")
+      add_index :users, "LOWER(name) #{schema}.gist_trgm_ops",
+                name: "index_trgm_users_name_active_only",
+                using: :gist,
+                algorithm: :concurrently,
+                where: "workflow_state IN ('registered', 'pre_registered')"
     end
   end
 
@@ -32,8 +35,11 @@ class FixUserActiveOnlyGistIndexes < ActiveRecord::Migration[4.2]
     if schema = connection.extension_installed?(:pg_trgm)
       remove_index :users, name: 'index_trgm_users_name_active_only' if index_name_exists?(:users, 'index_trgm_users_name_active_only', false)
 
-      concurrently = " CONCURRENTLY" if connection.open_transactions == 0
-      execute("CREATE INDEX#{concurrently} index_trgm_users_name_active_only ON #{User.quoted_table_name} USING gist(LOWER(short_name) #{schema}.gist_trgm_ops) WHERE workflow_state IN ('registered', 'pre_registered')")
+      add_index :users, "LOWER(short_name) #{schema}.gist_trgm_ops",
+                name: "index_trgm_users_short_name_active_only",
+                using: :gist,
+                algorithm: :concurrently,
+                where: "workflow_state IN ('registered', 'pre_registered')"
     end
   end
 end
