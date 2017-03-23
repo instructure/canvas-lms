@@ -250,6 +250,8 @@ define [
         @contentLoadStates.submissionsLoaded = true
         @updateColumnHeaders()
 
+    # End of constructor
+
     loadOverridesForSIS: ->
       return unless $('.post-grades-placeholder').length > 0
 
@@ -1502,31 +1504,54 @@ define [
 
       NumberCompare(scoreForSorting(a), scoreForSorting(b), descending: !asc)
 
+    # when fn is true, those rows get a -1 so they go to the top of the sort
+    sortRowsWithFunction: (fn, { asc = true } = {}) ->
+      @sortRowsBy((a, b) =>
+        [b, a] = [a, b] unless asc
+        [rowA, rowB] = [fn(a), fn(b)]
+        return -1 if rowA > rowB
+        return 1 if rowA < rowB
+        @localeSort a.sortable_name, b.sortable_name
+      )
+
+    missingSort: (columnId) =>
+      @sortRowsWithFunction((row) =>
+        submission = row[columnId]
+        # if there are no submissions the usual case here is that workflow_state is undefined
+        submission.workflow_state == undefined || submission.workflow_state == 'unsubmitted'
+      )
+
+    lateSort: (columnId) =>
+      @sortRowsWithFunction((row) => row[columnId].late)
+
     sortByStudentColumn: (settingKey, direction) =>
-      @sortRowsBy (a, b) =>
+      @sortRowsBy((a, b) =>
         [b, a] = [a, b] unless direction == 'ascending'
         @localeSort(a[settingKey], b[settingKey])
+      )
 
     sortByCustomColumn: (columnId, direction) =>
-      @sortRowsBy (a, b) =>
+      @sortRowsBy((a, b) =>
         [b, a] = [a, b] unless direction == 'ascending'
         @localeSort(a[columnId], b[columnId])
+      )
 
     sortByAssignmentColumn: (columnId, settingKey, direction) =>
-      if settingKey == 'grade'
-        @sortRowsBy (a, b) =>
-          @gradeSort(a, b, columnId, direction == 'ascending')
-      else
-        # TODO: sort by missing, late, or unposted in CNVS-32446
+      switch settingKey
+        when 'grade'
+          @sortRowsBy((a, b) => @gradeSort(a, b, columnId, direction == 'ascending'))
+        when 'late'
+          @lateSort(columnId)
+        when 'missing'
+          @missingSort(columnId)
+        # when 'unposted' # TODO: in a future milestone, unposted will be added
 
     sortByAssignmentGroupColumn: (columnId, settingKey, direction) =>
       if settingKey == 'grade'
-        @sortRowsBy (a, b) =>
-          @gradeSort(a, b, columnId, direction == 'ascending')
+        @sortRowsBy((a, b) => @gradeSort(a, b, columnId, direction == 'ascending'))
 
     sortByTotalGradeColumn: (direction) =>
-      @sortRowsBy (a, b) =>
-        @gradeSort(a, b, 'total_grade', direction == 'ascending')
+      @sortRowsBy((a, b) => @gradeSort(a, b, 'total_grade', direction == 'ascending'))
 
     sortGridRows: =>
       { columnId, settingKey, direction } = @getSortRowsBySetting()

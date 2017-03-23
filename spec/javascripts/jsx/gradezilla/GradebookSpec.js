@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
-import React from 'react'
-import ReactDOM from 'react-dom'
-import natcompare from 'compiled/util/natcompare'
-import round from 'compiled/util/round'
-import fakeENV from 'helpers/fakeENV'
-import GradeCalculatorSpecHelper from 'spec/jsx/gradebook/GradeCalculatorSpecHelper'
-import SubmissionDetailsDialog from 'compiled/SubmissionDetailsDialog'
-import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
-import DataLoader from 'jsx/gradezilla/DataLoader'
-import Gradebook from 'compiled/gradezilla/Gradebook'
+import _ from 'underscore';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import natcompare from 'compiled/util/natcompare';
+import round from 'compiled/util/round';
+import fakeENV from 'helpers/fakeENV';
+import GradeCalculatorSpecHelper from 'spec/jsx/gradebook/GradeCalculatorSpecHelper';
+import SubmissionDetailsDialog from 'compiled/SubmissionDetailsDialog';
+import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator';
+import DataLoader from 'jsx/gradezilla/DataLoader';
+import Gradebook from 'compiled/gradezilla/Gradebook';
 
 const $fixtures = document.getElementById('fixtures');
 
@@ -1056,6 +1056,8 @@ QUnit.module('sortByAssignmentColumn', {
     this.studentB = { name: 'Betty Ford' };
     this.stub(this.gradebook, 'sortRowsBy').callsFake(sortFn => sortFn(this.studentA, this.studentB));
     this.stub(this.gradebook, 'gradeSort');
+    this.stub(this.gradebook, 'missingSort');
+    this.stub(this.gradebook, 'lateSort');
   }
 });
 
@@ -1089,6 +1091,18 @@ test('optionally sorts by grade in descending order', function () {
   equal(studentA, this.studentA, 'student A is in first position');
   equal(studentB, this.studentB, 'student B is in second position');
   equal(ascending, false, 'ascending is explicitly false');
+});
+
+test('optionally sorts by missing in ascending order', function () {
+  this.gradebook.sortByAssignmentColumn('assignment_201', 'missing', 'ascending');
+  const columnId = this.gradebook.missingSort.getCall(0).args;
+  equal(columnId, 'assignment_201');
+});
+
+test('optionally sorts by late in ascending order', function () {
+  this.gradebook.sortByAssignmentColumn('assignment_201', 'late', 'ascending');
+  const columnId = this.gradebook.lateSort.getCall(0).args;
+  equal(columnId, 'assignment_201');
 });
 
 QUnit.module('sortByAssignmentGroupColumn', {
@@ -1264,6 +1278,20 @@ test('uses the saved sort setting for total grade sorting', function () {
 
   const [direction] = this.gradebook.sortByTotalGradeColumn.getCall(0).args;
   equal(direction, 'ascending', 'the only parameter is the sort direction');
+});
+
+test('optionally sorts by missing', function () {
+  this.gradebook.setSortRowsBySetting('assignment_201', 'missing', 'ascending');
+  this.stub(this.gradebook, 'sortByAssignmentColumn');
+  this.gradebook.sortGridRows();
+  equal(this.gradebook.sortByAssignmentColumn.callCount, 1);
+});
+
+test('optionally sorts by late', function () {
+  this.gradebook.setSortRowsBySetting('assignment_201', 'late', 'ascending');
+  this.stub(this.gradebook, 'sortByAssignmentColumn');
+  this.gradebook.sortGridRows();
+  equal(this.gradebook.sortByAssignmentColumn.callCount, 1);
 });
 
 test('updates the column headers after sorting', function () {
@@ -2127,3 +2155,157 @@ test('returns number of columns in frozen section', function () {
   gradebook.customColumns = [{ id: 'custom_col_1' }];
   equal(gradebook.getFrozenColumnCount(), 3);
 });
+
+QUnit.module('Gradebook#sortRowsWithFunction', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.rows = [
+      { id: '3', sortable_name: 'Z Lastington', someProperty: false },
+      { id: '4', sortable_name: 'A Firstington', someProperty: true }
+    ];
+    this.gradebook.grid = { // stubs for slickgrid
+      removeCellCssStyles () {},
+      addCellCssStyles () {},
+      invalidate () {}
+    };
+  },
+  sortFn (row) { return !!row.someProperty; }
+});
+
+test('returns two objects in the rows collection', function () {
+  this.gradebook.sortRowsWithFunction(this.sortFn);
+
+  equal(this.gradebook.rows.length, 2);
+});
+
+test('sorts with a passed in function', function () {
+  this.gradebook.sortRowsWithFunction(this.sortFn);
+  const [firstRow, secondRow] = this.gradebook.rows;
+
+  equal(firstRow.id, '4', 'when fn is true, order first');
+  equal(secondRow.id, '3', 'when fn is false, order second');
+});
+
+test('sorts by descending when asc is false', function () {
+  this.gradebook.sortRowsWithFunction(this.sortFn, { asc: false });
+  const [firstRow, secondRow] = this.gradebook.rows;
+
+  equal(firstRow.id, '3', 'when fn is false, order first');
+  equal(secondRow.id, '4', 'when fn is true, order second');
+});
+
+test('relies on localeSort when rows have equal sorting criteria results', function () {
+  this.gradebook.sortRowsWithFunction(this.sortFn);
+  const [firstRow, secondRow] = this.gradebook.rows;
+
+  equal(firstRow.sortable_name, 'A Firstington', 'A Firstington sorts first');
+  equal(secondRow.sortable_name, 'Z Lastington', 'Z Lastington sorts second');
+});
+
+QUnit.module('Gradebook#missingSort', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.rows = [
+      { id: '3', sortable_name: 'Z Lastington', assignment_201: { workflow_state: 'graded' }},
+      { id: '4', sortable_name: 'A Firstington', assignment_201: { workflow_state: 'unsubmitted' }}
+    ];
+    this.gradebook.grid = { // stubs for slickgrid
+      removeCellCssStyles () {},
+      addCellCssStyles () {},
+      invalidate () {}
+    };
+  }
+});
+
+test('sorts by missing', function () {
+  this.gradebook.missingSort('assignment_201');
+  const [firstRow, secondRow] = this.gradebook.rows;
+
+  equal(firstRow.id, '4', 'when missing is true, order first');
+  equal(secondRow.id, '3', 'when missing is false, order second');
+});
+
+test('relies on localeSort when rows have equal sorting criteria results', function () {
+  this.gradebook.rows = [
+    { id: '1', sortable_name: 'Z Last Graded', assignment_201: { workflow_state: 'graded' }},
+    { id: '3', sortable_name: 'Z Last Missing', assignment_201: { workflow_state: 'unsubmitted' }},
+    { id: '2', sortable_name: 'A First Graded', assignment_201: { workflow_state: 'graded' }},
+    { id: '4', sortable_name: 'A First Missing', assignment_201: { workflow_state: 'unsubmitted' }}
+  ];
+  this.gradebook.missingSort('assignment_201');
+  const [firstRow, secondRow, thirdRow, fourthRow] = this.gradebook.rows;
+
+  equal(firstRow.sortable_name, 'A First Missing', 'A First Missing sorts first');
+  equal(secondRow.sortable_name, 'Z Last Missing', 'Z Last Missing sorts second');
+  equal(thirdRow.sortable_name, 'A First Graded', 'A First Graded sorts third');
+  equal(fourthRow.sortable_name, 'Z Last Graded', 'Z Last Graded sorts fourth');
+});
+
+test('when no submission is found, it is missing', function () {
+  // Since SubmissionStateMap always creates an assignment key even when there
+  // is no corresponding submission, the correct way to test this is to have a
+  // key for the assignment with a missing criteria key (e.g. `workflow_state`)
+  this.gradebook.rows = [
+    { id: '3', sortable_name: 'Z Lastington', assignment_201: { workflow_state: 'graded'}},
+    { id: '4', sortable_name: 'A Firstington', assignment_201: {} }
+  ];
+  this.gradebook.lateSort('assignment_201');
+  const [firstRow, secondRow] = this.gradebook.rows;
+
+  equal(firstRow.id, '4', 'missing assignment sorts first');
+  equal(secondRow.id, '3', 'graded assignment sorts second');
+})
+
+QUnit.module('Gradebook#lateSort', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.rows = [
+      { id: '3', sortable_name: 'Z Lastington', assignment_201: { late: false }},
+      { id: '4', sortable_name: 'A Firstington', assignment_201: { late: true }}
+    ];
+    this.gradebook.grid = { // stubs for slickgrid
+      removeCellCssStyles () {},
+      addCellCssStyles () {},
+      invalidate () {}
+    };
+  }
+});
+
+test('sorts by late', function () {
+  this.gradebook.lateSort('assignment_201');
+  const [firstRow, secondRow] = this.gradebook.rows;
+
+  equal(firstRow.id, '4', 'when late is true, order first');
+  equal(secondRow.id, '3', 'when late is false, order second');
+});
+
+test('relies on localeSort when rows have equal sorting criteria results', function () {
+  this.gradebook.rows = [
+    { id: '1', sortable_name: 'Z Last Not Late', assignment_201: { late: false }},
+    { id: '3', sortable_name: 'Z Last Late', assignment_201: { late: true }},
+    { id: '2', sortable_name: 'A First Not Late', assignment_201: { late: false }},
+    { id: '4', sortable_name: 'A First Late', assignment_201: { late: true }}
+  ];
+  this.gradebook.lateSort('assignment_201');
+  const [firstRow, secondRow, thirdRow, fourthRow] = this.gradebook.rows;
+
+  equal(firstRow.sortable_name, 'A First Late', 'A First Late sorts first');
+  equal(secondRow.sortable_name, 'Z Last Late', 'Z Last Late sorts second');
+  equal(thirdRow.sortable_name, 'A First Not Late', 'A First Not Late sorts third');
+  equal(fourthRow.sortable_name, 'Z Last Not Late', 'Z Last Not Late sorts fourth');
+});
+
+test('when no submission is found, it is not late', function () {
+  // Since SubmissionStateMap always creates an assignment key even when there
+  // is no corresponding submission, the correct way to test this is to have a
+  // key for the assignment with a missing criteria key (e.g. `late`)
+  this.gradebook.rows = [
+    { id: '3', sortable_name: 'Z Lastington', assignment_201: {}},
+    { id: '4', sortable_name: 'A Firstington', assignment_201: { late: true }}
+  ];
+  this.gradebook.lateSort('assignment_201');
+  const [firstRow, secondRow] = this.gradebook.rows;
+
+  equal(firstRow.id, '4', 'when late is true, order first');
+  equal(secondRow.id, '3', 'when no submission is found, order second');
+})

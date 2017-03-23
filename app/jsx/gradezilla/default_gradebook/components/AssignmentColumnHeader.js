@@ -218,7 +218,7 @@ class AssignmentColumnHeader extends React.Component {
               disabled={sortBySetting.disabled}
               onSelect={sortBySetting.onSortByMissing}
             >
-              <span>{I18n.t('Missing')}</span>
+              <span data-menu-item-id="sort-by-missing">{I18n.t('Missing')}</span>
             </MenuItem>
 
             <MenuItem
@@ -226,7 +226,7 @@ class AssignmentColumnHeader extends React.Component {
               disabled={sortBySetting.disabled}
               onSelect={sortBySetting.onSortByLate}
             >
-              <span>{I18n.t('Late')}</span>
+              <span data-menu-item-id="sort-by-late">{I18n.t('Late')}</span>
             </MenuItem>
 
             <MenuItem
