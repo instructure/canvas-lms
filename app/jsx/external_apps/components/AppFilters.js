@@ -40,13 +40,13 @@ export default React.createClass({
               <div className="col-xs-7">
                 <ul className="nav nav-pills" role="tablist">
                   <li className={activeFilter === 'all' ? 'active' : ''}>
-                    <a ref="tabAll" onClick={this.handleFilterClick.bind(this, 'all')} href="#" role="tab" aria-selected="false">{I18n.t('All')}</a>
+                    <a ref="tabAll" onClick={this.handleFilterClick.bind(this, 'all')} href="#" role="tab" aria-selected={activeFilter === 'all' ? 'true' : 'false'}>{I18n.t('All')}</a>
                   </li>
                   <li className={activeFilter === 'not_installed' ? 'active' : ''}>
-                    <a ref="tabNotInstalled" onClick={this.handleFilterClick.bind(this, 'not_installed')} href="#" role="tab" aria-selected="false">{I18n.t('Not Installed')}</a>
+                    <a ref="tabNotInstalled" onClick={this.handleFilterClick.bind(this, 'not_installed')} href="#" role="tab" aria-selected={activeFilter === 'not_installed' ? 'true' : 'false'}>{I18n.t('Not Installed')}</a>
                   </li>
                   <li className={activeFilter === 'installed' ? 'active' : ''}>
-                    <a ref="tabInstalled" onClick={this.handleFilterClick.bind(this, 'installed')} href="#" role="tab" aria-selected="false">{I18n.t('Installed')}</a>
+                    <a ref="tabInstalled" onClick={this.handleFilterClick.bind(this, 'installed')} href="#" role="tab" aria-selected={activeFilter === 'installed' ? 'true' : 'false'}>{I18n.t('Installed')}</a>
                   </li>
                 </ul>
               </div>
