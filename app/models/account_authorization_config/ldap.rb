@@ -138,14 +138,19 @@ class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
   end
 
   def test_ldap_search
-    conn = self.ldap_connection
-    filter = self.ldap_filter("canvas_ldap_test_user")
-    Net::LDAP::Filter.construct(filter)
-    unless (res = conn.search {|s| break s})
-      error = conn.get_operation_result
-      self.errors.add(:ldap_search_test, "Error #{error.code}: #{error.message}")
+    timeout(Setting.get('test_ldap_search_timeout', '60').to_i) do
+      conn = self.ldap_connection
+      filter = self.ldap_filter("canvas_ldap_test_user")
+      Net::LDAP::Filter.construct(filter)
+      unless (res = conn.search {|s| break s})
+        error = conn.get_operation_result
+        self.errors.add(:ldap_search_test, "Error #{error.code}: #{error.message}")
+      end
+      return res.present?
     end
-    return res.present?
+  rescue Timeout::Error
+    self.errors.add(:ldap_bind_test, t("Timeout when searching"))
+    return false
   rescue
     self.errors.add(
       :ldap_search_test,
