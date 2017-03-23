@@ -2,8 +2,9 @@ define [
   'i18n!assignments',
   'Backbone',
   'jquery',
-  'jst/_sisButton'
-], (I18n, Backbone, $, template) ->
+  'jst/_sisButton',
+  'compiled/util/SisValidationHelper'
+], (I18n, Backbone, $, template, SisValidationHelper) ->
 
   class SisButtonView extends Backbone.View
     template: template
@@ -33,12 +34,19 @@ define [
     togglePostToSIS: (e) =>
       e.preventDefault()
       sisUrl = @model.get('toggle_post_to_sis_url')
-      c = @model.postToSIS()
-      errors = @errorsExist()
-      if !c == true && errors['has_error'] == true
+      post_to_sis = @model.postToSIS()
+      validationHelper = new SisValidationHelper({
+        postToSIS: !post_to_sis
+        dueDateRequired: @dueDateRequired
+        dueDate: @model.dueAt()
+        name: @model.name()
+        maxNameLength: @model.maxNameLength()
+      })
+      errors = @errorsExist(validationHelper)
+      if errors['has_error'] == true
         $.flashWarning(errors['message'])
       else if sisUrl
-        @model.postToSIS(!c)
+        @model.postToSIS(!post_to_sis)
         @model.save({ override_dates: false }, {
           type: 'POST',
           url: sisUrl,
@@ -46,44 +54,25 @@ define [
             @setAttributes()
         })
       else
-        @model.postToSIS(!c)
+        @model.postToSIS(!post_to_sis)
         @model.save({ override_dates: false }, {
           success: =>
             @setAttributes()
         })
 
-    errorsExist: =>
+    errorsExist: (validationHelper) =>
       errors = {}
-      name = @modelName()
       base_message = "Unable to sync with #{@sisName}."
-      if @dueDateErrorExists() && @nameLengthErrorExists()
+      if validationHelper.dueDateMissing() && validationHelper.nameTooLong()
         errors['has_error'] = true
-        errors['message'] = I18n.t("%{base_message} Please make sure %{name} has a due date and name is not too long.", name: name, base_message: base_message)
-      else if @dueDateErrorExists()
+        errors['message'] = I18n.t("%{base_message} Please make sure %{name} has a due date and name is not too long.", name: @model.name(), base_message: base_message)
+      else if validationHelper.dueDateMissing()
         errors['has_error'] = true
-        errors['message'] = I18n.t("%{base_message} Please make sure %{name} has a due date.", name: name, base_message: base_message)
-      else if @nameLengthErrorExists()
+        errors['message'] = I18n.t("%{base_message} Please make sure %{name} has a due date.", name: @model.name(), base_message: base_message)
+      else if validationHelper.nameTooLong()
         errors['has_error'] = true
-        errors['message'] = I18n.t("%{base_message} Please make sure %{name} name is not too long.", name: name, base_message: base_message)
+        errors['message'] = I18n.t("%{base_message} Please make sure %{name} name is not too long.", name: @model.name(), base_message: base_message)
       errors
-
-    modelName: =>
-      if @model.constructor.name == 'Assignment'
-        @model.name()
-      else if @model.constructor.name == 'Quiz'
-        @model.attributes.title
-
-    dueDateErrorExists: =>
-      if @model.constructor.name == 'Assignment'
-        @dueDateRequired && @model.dueAt() == null
-      else if @model.constructor.name == 'Quiz'
-        @dueDateRequired && @model.attributes.due_at == undefined
-
-    nameLengthErrorExists: =>
-      if @model.constructor.name == 'Assignment'
-        @model.name().length > @model.maxNameLength()
-      else if @model.constructor.name == 'Quiz'
-        @model.attributes.title.length > @model.maxNameLength()
 
     sisAttributes: =>
       if @model.postToSIS()

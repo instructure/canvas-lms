@@ -44,6 +44,7 @@ define([
   'jsx/shared/rce/RichContentEditor',
   'jsx/shared/conditional_release/ConditionalRelease',
   'compiled/util/deparam',
+  'compiled/util/SisValidationHelper',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
@@ -64,7 +65,7 @@ define([
             DueDateList, QuizRegradeView, SectionList,
             MissingDateDialog,MultipleChoiceToggle,EditorToggle,TextHelper,
             RCEKeyboardShortcuts, INST, QuizFormulaSolution, addAriaDescription,
-            RichContentEditor, ConditionalRelease, deparam){
+            RichContentEditor, ConditionalRelease, deparam, SisValidationHelper){
 
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
       scoreValidation;
@@ -1790,13 +1791,26 @@ define([
       processData: function(data) {
         $(this).attr('method', 'PUT');
         var quiz_title = $("#quiz_title").val();
+        var postToSis = data['quiz[post_to_sis]'] === '1'
+        var maxNameLength = 256;
+
+        if (postToSis && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT === true){
+          maxNameLength = ENV.MAX_NAME_LENGTH
+        }
+
+        var validationHelper = new SisValidationHelper({
+          postToSIS: postToSis,
+          maxNameLength: maxNameLength,
+          name: quiz_title
+        })
+
         if (quiz_title.length == 0) {
           var offset = $("#quiz_title").errorBox(I18n.t('errors.field_is_required', "This field is required")).offset();
           $('html,body').scrollTo({top: offset.top, left:0});
           return false;
         }
-        if (quiz_title.length > ENV.MAX_NAME_LENGTH && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT && data['quiz[post_to_sis]'] == '1') {
-          var header_offset = $('#quiz_title').errorBox(I18n.t('The Quiz name must be under %{length} characters', {length: ENV.MAX_NAME_LENGTH + 1})).offset();
+        if (validationHelper.nameTooLong()) {
+          var header_offset = $('#quiz_title').errorBox(I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1})).offset();
           $('html,body').scrollTo({top: header_offset.top, left: 0});
           return false;
         }

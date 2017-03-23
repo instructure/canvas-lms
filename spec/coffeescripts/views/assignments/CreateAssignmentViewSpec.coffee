@@ -356,7 +356,7 @@ define [
 
   test "has an error when a name has 257 chars", ->
     view = createView(@assignment3)
-    errors = nameLengthHelper(view, 257, false, 30, '0')
+    errors = nameLengthHelper(view, 257, false, 30, '1')
     ok errors["name"]
     equal errors["name"].length, 1
     equal errors["name"][0]["message"], "Name is too long, must be under 257 characters"

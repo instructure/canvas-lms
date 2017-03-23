@@ -21,6 +21,7 @@ define [
   'compiled/util/deparam'
   'compiled/jquery.rails_flash_notifications' #flashMessage
   'jsx/shared/helpers/numberHelper'
+  'compiled/util/SisValidationHelper'
 ], (
     I18n,
     ValidatedFormView,
@@ -43,7 +44,8 @@ define [
     ConditionalRelease,
     deparam,
     flashMessage,
-    numberHelper) ->
+    numberHelper,
+    SisValidationHelper) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -380,10 +382,18 @@ define [
       errors
 
     _validateTitle: (data, errors) =>
+      post_to_sis = data.assignment.attributes.post_to_sis == '1'
       max_name_length = 256
-      if data.assignment.attributes.post_to_sis == '1' && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT == true
+      if post_to_sis && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT == true
         max_name_length = ENV.MAX_NAME_LENGTH
-      if $.trim(data.title.toString()).length > max_name_length
+
+      validationHelper = new SisValidationHelper({
+        postToSIS: post_to_sis
+        maxNameLength: max_name_length
+        name: data.title
+      })
+
+      if validationHelper.nameTooLong()
         errors["title"] = [
           message: I18n.t("Title is too long, must be under %{length} characters", length: (max_name_length + 1))
         ]

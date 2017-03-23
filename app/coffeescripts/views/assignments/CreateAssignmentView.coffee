@@ -10,8 +10,10 @@ define [
   'compiled/util/round'
   'jquery'
   'compiled/api/gradingPeriodsApi'
+  'compiled/util/SisValidationHelper'
   'jquery.instructure_date_and_time'
-], (_, Assignment, DialogFormView, DateValidator, template, wrapper, numberHelper, I18n, round, $, GradingPeriodsAPI) ->
+], (_, Assignment, DialogFormView, DateValidator, template, wrapper,
+  numberHelper, I18n, round, $, GradingPeriodsAPI, SisValidationHelper) ->
 
   class CreateAssignmentView extends DialogFormView
     defaults:
@@ -125,15 +127,22 @@ define [
     _validateTitle: (data, errors) ->
       return errors if _.contains(@model.frozenAttributes(), "title")
 
+      post_to_sis = data.post_to_sis == '1'
       max_name_length = 256
-      if data.post_to_sis == '1' && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT == true
+      if post_to_sis && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT == true
         max_name_length = ENV.MAX_NAME_LENGTH
+
+      validationHelper = new SisValidationHelper({
+        postToSIS: post_to_sis
+        maxNameLength: max_name_length
+        name: data.name
+      })
 
       if !data.name or $.trim(data.name.toString()).length == 0
         errors["name"] = [
           message: I18n.t 'name_is_required', 'Name is required!'
         ]
-      else if $.trim(data.name.toString()).length > max_name_length
+      else if validationHelper.nameTooLong()
         errors["name"] = [
           message: I18n.t("Name is too long, must be under %{length} characters", length: max_name_length + 1)
         ]
