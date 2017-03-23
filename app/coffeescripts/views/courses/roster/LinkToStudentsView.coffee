@@ -27,6 +27,7 @@ define [
         placeholder: I18n.t 'link_students_placeholder', 'Enter a student name'
         change: (tokens) =>
           @students = tokens
+        onNewToken: @onNewToken
         selector:
           baseData:
             type: 'user'
@@ -49,6 +50,14 @@ define [
             data: e.observed_user
 
       this
+
+    onNewToken: ($token) =>
+      $link = $token.find('a')
+      $link.attr('href', '#')
+      $link.attr('title', I18n.t("Remove linked student %{name}", name: $token.find('div').attr('title')))
+      $screenreader_span = $('<span class="screenreader-only"></span>').text(
+        I18n.t("Remove linked student %{name}", name: $token.find('div').attr('title')))
+      $link.append($screenreader_span)
 
     getUserData: (id) ->
       $.getJSON("/api/v1/courses/#{ENV.course.id}/users/#{id}", include:['enrollments'])
