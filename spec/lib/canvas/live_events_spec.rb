@@ -246,6 +246,19 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe '.plagiarism_resubmit' do
+    it "should include the user_id and assignment_id" do
+      course_with_student_submissions
+      submission = @course.assignments.first.submissions.first
+      expect_event('plagiarism_resubmit',
+        hash_including(
+          user_id: @student.global_id.to_s,
+          assignment_id: submission.global_assignment_id.to_s
+        ))
+      Canvas::LiveEvents.plagiarism_resubmit(submission)
+    end
+  end
+
   describe ".asset_access" do
     it "should trigger a live event without an asset subtype" do
       course_factory

@@ -6,6 +6,7 @@ module Lti
     end
 
     SUBMISSION_EVENT_ID = 'vnd.Canvas.SubmissionEvent'.freeze
+    EVENT_TYPES = %w(submission_created plagiarism_resubmit).freeze
 
     def initialize(tool_proxy, assignment = nil)
       @assignment = assignment
@@ -25,7 +26,7 @@ module Lti
 
     def assignment_subscription(context_id)
       {
-        EventTypes: ['submission_created'],
+        EventTypes: EVENT_TYPES,
         ContextType: 'assignment',
         ContextId: context_id.to_s,
         Format: format,

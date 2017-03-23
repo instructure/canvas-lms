@@ -40,7 +40,9 @@ describe Lti::AssignmentSubscriptionsHelper do
   end
 
   describe '#create_subscription' do
-    let(:subscription_helper){ Lti::AssignmentSubscriptionsHelper.new(tool_proxy, @assignment) }
+    let(:subscription_helper) { Lti::AssignmentSubscriptionsHelper.new(tool_proxy, @assignment) }
+    let(:event_types) { %w(submission_created plagiarism_resubmit).freeze }
+
     before(:each) do
       @assignment.tool_settings_tool = message_handler
       @assignment.save!
@@ -50,7 +52,11 @@ describe Lti::AssignmentSubscriptionsHelper do
       expect(subscription_helper.create_subscription).to eq 'test-id'
     end
 
-    it 'uses the live-event format' do
+    it "includes all required event types" do
+      expect(subscription_helper.assignment_subscription(@assignment.id)[:EventTypes]).to match_array event_types
+    end
+
+    it 'uses the caliper format' do
       expect(subscription_helper.assignment_subscription(@assignment.id)[:Format]).to eq 'caliper'
     end
 

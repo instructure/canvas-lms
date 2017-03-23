@@ -1468,7 +1468,7 @@ define([
         var defaultInfoMessage = I18n.t('turnitin.info_message',
                                         'This file is still being processed by turnitin. Please check back later to see the score'),
             defaultErrorMessage = I18n.t('turnitin.error_message',
-                                         'There was an error submitting to turnitin. Please try resubmitting the file before contacting support');
+                                         'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.');
         var $turnitinInfo = $(turnitinInfoTemplate({
           assetString: assetString,
           message: (turnitinAsset.status == 'error' ? (turnitinAsset.public_error_message || defaultErrorMessage) : defaultInfoMessage),

@@ -538,6 +538,7 @@ class SubmissionsController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
       @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
+      Canvas::LiveEvents.plagiarism_resubmit(@submission)
 
       if type == 'vericite'
         # VeriCite

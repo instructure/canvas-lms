@@ -631,33 +631,34 @@ describe SubmissionsController do
     end
   end
 
+ context 'originality report' do
+  let(:test_course) do
+    test_course = course_factory(active_course: true)
+    test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
+    test_course.enroll_student(test_student, enrollment_state: 'active')
+    test_course
+  end
+
+  let(:test_teacher) { User.create }
+  let(:test_student) { User.create }
+  let(:assignment) { Assignment.create!(title: 'test assignment', context: test_course) }
+  let(:attachment) { attachment_model(filename: "submission.doc", context: test_student) }
+  let(:submission) { assignment.submit_homework(test_student, attachments: [attachment]) }
+  let!(:originality_report) do
+    OriginalityReport.create!(attachment: attachment,
+                              submission: submission,
+                              originality_score: 0.5,
+                              originality_report_url: 'http://www.instructure.com')
+  end
+
+
+  before :each do
+    user_session(test_teacher)
+  end
+
+
   describe 'GET originality_report' do
-    let_once(:test_course) do
-      test_course = course_factory(active_course: true)
-      test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
-      test_course.enroll_student(test_student, enrollment_state: 'active')
-      test_course
-    end
-
-    let_once(:test_teacher) { User.create }
-    let_once(:test_student) { User.create }
-    let_once(:assignment) { Assignment.create!(title: 'test assignment', context: test_course) }
-    let_once(:attachment) { attachment_model(filename: "submission.doc", context: test_student) }
-    let_once(:submission) { assignment.submit_homework(test_student, attachments: [attachment]) }
-    let!(:originality_report) {
-      OriginalityReport.create!(attachment: attachment,
-                                submission: submission,
-                                originality_score: 0.5,
-                                originality_report_url: 'http://www.instructure.com')
-    }
-
-
-    before :each do
-      user_session(test_teacher)
-    end
-
     it 'redirects to the originality report URL if it exists' do
-
       get 'originality_report', course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id, asset_string: attachment.asset_string
       expect(response).to redirect_to originality_report.originality_report_url
     end
@@ -682,18 +683,43 @@ describe SubmissionsController do
     end
   end
 
-  describe 'GET turnitin_report' do
-    it 'returns 400 if submission_id is not integer' do
-      assignment = assignment_model
-      get 'turnitin_report', :course_id => assignment.context_id, :assignment_id => assignment.id, :submission_id => '{{ user_id }}', :asset_string => '123'
-      expect(response.response_code).to eq 400
-    end
-  end
-
   describe 'POST resubmit_to_turnitin' do
     it 'returns 400 if submission_id is not integer' do
       assignment = assignment_model
       post 'resubmit_to_turnitin', :course_id => assignment.context_id, :assignment_id => assignment.id, :submission_id => '{{ user_id }}'
+      expect(response.response_code).to eq 400
+    end
+
+    it "emits a 'plagiarism_resubmit' live event if originality report exists" do
+      submission.attachments << attachment
+      submission.save!
+      expect(Canvas::LiveEvents).to receive(:plagiarism_resubmit)
+      post 'resubmit_to_turnitin', course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id
+    end
+
+    it "emits a 'plagiarism_resubmit' live event if originality report does not exists" do
+      originality_report.destroy
+      submission.attachments << attachment
+      submission.save!
+      expect(Canvas::LiveEvents).to receive(:plagiarism_resubmit)
+      post 'resubmit_to_turnitin', course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id
+    end
+  end
+
+  describe 'POST resubmit_to_vericite' do
+    it "emits a 'plagiarism_resubmit' live event" do
+      submission.attachments << attachment
+      submission.save!
+      expect(Canvas::LiveEvents).to receive(:plagiarism_resubmit)
+      post 'resubmit_to_vericite', course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id
+    end
+  end
+ end
+
+  describe 'GET turnitin_report' do
+    it 'returns 400 if submission_id is not integer' do
+      assignment = assignment_model
+      get 'turnitin_report', :course_id => assignment.context_id, :assignment_id => assignment.id, :submission_id => '{{ user_id }}', :asset_string => '123'
       expect(response.response_code).to eq 400
     end
   end

@@ -317,6 +317,22 @@ by `asset_type` and `asset_id`.
 | `attempt` | This is the submission attempt number. |
 
 
+#### `plagiarism_resubmit`
+
+| Field | Description |
+| ----- | ----------- |
+| `submission_id` | The Canvas id of the new submission. |
+| `assignment_id` | The Canvas id of the assignment being submitted. |
+| `user_id` | The Canvas id of the user associated with the submission. |
+| `submitted_at` | The timestamp when the assignment was submitted. |
+| `updated_at` | The time at which this assignment was last modified in any way |
+| `score` | The raw score |
+| `grade` | The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example)|
+| `submission_type` | The types of submission ex: ('online_text_entry'\|'online_url'\|'online_upload'\|'media_recording') |
+| `body` | The content of the submission, if it was submitted directly in a text field. (possibly truncated) |
+| `url` | The URL of the submission (for 'online_url' submissions) |
+| `attempt` | This is the submission attempt number. |
+
 #### `user_created`
 
 | Field | Description |

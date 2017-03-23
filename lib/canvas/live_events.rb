@@ -170,6 +170,10 @@ module Canvas::LiveEvents
     post_event_stringified('submission_updated', get_submission_data(submission))
   end
 
+  def self.plagiarism_resubmit(submission)
+    post_event_stringified('plagiarism_resubmit', get_submission_data(submission))
+  end
+
   def self.get_user_data(user)
     {
       user_id: user.global_id,

@@ -25,7 +25,9 @@ module Lti
       attachment_created: %w(vnd.instructure.webhooks.root_account.attachment_created
                              vnd.instructure.webhooks.assignment.attachment_created).freeze,
       submission_created: %w(vnd.instructure.webhooks.root_account.submission_created
-                             vnd.instructure.webhooks.assignment.submission_created).freeze
+                             vnd.instructure.webhooks.assignment.submission_created).freeze,
+      plagiarism_resubmit: %w(vnd.instructure.webhooks.root_account.plagiarism_resubmit
+                              vnd.instructure.webhooks.assignment.plagiarism_resubmit).freeze
     }.freeze
 
     DEFAULT_CAPABILITIES = %w(
