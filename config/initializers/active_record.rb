@@ -14,6 +14,17 @@ class ActiveRecord::Base
     end
 
     attr_accessor :in_migration
+
+    # determines if someone started a transaction in addition to the spec fixture transaction
+    # impossible to just count open transactions, cause by default it won't nest a transaction
+    # unless specifically requested
+    def in_transaction_in_test?
+      return false unless Rails.env.test?
+      transaction_method = ActiveRecord::ConnectionAdapters::DatabaseStatements.instance_method(:transaction).source_location.first
+      transaction_regex = /\A#{Regexp.escape(transaction_method)}:\d+:in `transaction'\z/.freeze
+      # transactions due to spec fixtures are _not_in the callstack, so we only need to find 1
+      !!caller.find { |s| s =~ transaction_regex && !s.include?('spec_helper.rb') }
+    end
   end
 
   def read_or_initialize_attribute(attr_name, default_value)
@@ -683,19 +694,8 @@ ActiveRecord::Relation.class_eval do
     end
   end
 
-  # determines if someone started a transaction in addition to the spec fixture transaction
-  # impossible to just count open transactions, cause by default it won't nest a transaction
-  # unless specifically requested
-  def in_transaction_in_test?
-    return false unless Rails.env.test?
-    transaction_method = ActiveRecord::ConnectionAdapters::DatabaseStatements.instance_method(:transaction).source_location.first
-    transaction_regex = /\A#{Regexp.escape(transaction_method)}:\d+:in `transaction'\z/.freeze
-    # transactions due to spec fixtures are _not_in the callstack, so we only need to find 1
-    !!caller.find { |s| s =~ transaction_regex && !s.include?('spec_helper.rb') }
-  end
-
   def find_in_batches_with_temp_table(options = {})
-    can_do_it = Rails.env.production? || ActiveRecord::Base.in_migration || in_transaction_in_test?
+    can_do_it = Rails.env.production? || ActiveRecord::Base.in_migration || ActiveRecord::Base.in_transaction_in_test?
     raise "find_in_batches_with_temp_table probably won't work outside a migration
            and outside a transaction. Unfortunately, it's impossible to automatically
            determine a better way to do it that will work correctly. You can try

@@ -3,7 +3,7 @@ class AddIndexOnDelayedMessagesNotificationPolicy < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
 
   def self.up
-    add_index :delayed_messages, :notification_policy_id, concurrently: true
+    add_index :delayed_messages, :notification_policy_id, algorithm: :concurrently
   end
 
   def self.down
