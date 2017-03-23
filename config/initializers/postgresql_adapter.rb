@@ -143,6 +143,12 @@ module PostgreSQLAdapterExtensions
     end
   end
 
+  def index_exists?(_table_name, columns, _options = {})
+    raise ArgumentError.new("if you're identifying an index by name only, you should use index_name_exists?") if columns.is_a?(Hash) && columns[:name]
+    raise ArgumentError.new("columns should be a string, a symbol, or an array of those ") unless columns.is_a?(String) || columns.is_a?(Symbol) || columns.is_a?(Array)
+    super
+  end
+
   # some migration specs test migrations that add concurrent indexes; detect that, and strip the concurrent
   # but _only_ if there isn't another transaction in the stack
   def add_index_options(_table_name, _column_name, _options = {})

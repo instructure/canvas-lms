@@ -16,7 +16,7 @@ class AddNeedNotifyColumnToAttachments < ActiveRecord::Migration[4.2]
   def self.down
     if connection.adapter_name =~ /\Apostgresql/i
       # this may exist if the source gets upated between migrate and rollback
-      execute('DROP INDEX IF EXISTS index_attachments_on_need_notify')
+      execute("DROP INDEX IF EXISTS #{connection.quote_table_name('index_attachments_on_need_notify')}")
     else
       remove_index :attachments, :name => "index_attachments_on_need_notify"
     end
