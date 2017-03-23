@@ -47,6 +47,7 @@ define([
       });
 
       // google dependencies declared in views/acccounts/statistics since google.load uses document.write :(
+      /*global google*/
       var data = new google.visualization.DataTable();
       data.addColumn('date', I18n.t('heading_date', 'Date'));
       data.addColumn('number', axis || I18n.t('heading_value', "Value"));

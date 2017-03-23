@@ -373,7 +373,7 @@ define([
             case 13: //enter this allows for an onEnter function
               e.preventDefault();
               e.stopPropagation();
-              node = $currentSelected;
+              var node = $currentSelected;
 
               if (typeof(it.opts.onEnter) == 'function'){
                 it.opts.onEnter.call(this, e, node);

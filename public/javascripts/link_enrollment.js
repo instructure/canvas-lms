@@ -8,6 +8,7 @@ define([
   'jquery.templateData' /* fillTemplateData */
 ], function(I18n, $) {
 
+  /*global link_enrollment*/
   window.link_enrollment = (function() {
     return {
       choose: function(user_name, enrollment_id, current_user_id, callback) {

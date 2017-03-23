@@ -53,7 +53,7 @@ define([
       $("#no_user_notes_message").hide();
       $(this).find('.title').val('');
       $(this).find('.note').val('');
-      user_note = data.user_note;
+      var user_note = data.user_note;
       user_note.created_at = $.datetimeString(user_note.updated_at);
       var action = $("#add_entry_form").attr('action') + '/' + user_note.id;
       $('#proccessing').loadingImage('remove');

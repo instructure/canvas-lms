@@ -781,7 +781,7 @@ define([
 
       if(found = (original_name.indexOf(object_name + "[") === 0)) {
         short_name = original_name.replace(object_name + "[", "");
-        closing = short_name.indexOf("]");
+        var closing = short_name.indexOf("]");
         short_name = short_name.substring(0, closing) + short_name.substring(closing + 1);
         if(data instanceof Array) {
           new_result.push(short_name);
@@ -1120,7 +1120,7 @@ define([
         if($oldBox) {
           $oldBox.remove();
           $obj.data('associated_error_box', null);
-          srError = _.find($screenReaderErrors, function(node){
+          var srError = _.find($screenReaderErrors, function(node){
             return $(node).text() == $oldBox.text();
           });
           if(srError){
@@ -1147,7 +1147,7 @@ define([
       // field.attr({required: true});
       field.each(function() {
         if (!this.id) {return;}
-        label = $('label[for="'+this.id+'"]');
+        var label = $('label[for="'+this.id+'"]');
         if (!label.length) {return;}
         // Added the if statement to prevent the JS from adding the asterisk to the forgot password placeholder.
         if (this.id != 'pseudonym_session_unique_id_forgot') {label.append($('<span aria-hidden="true" />').text('*').attr('title', I18n.t('errors.field_is_required', "This field is required")));}
@@ -1158,7 +1158,7 @@ define([
   $.fn.getFieldLabelString = function(name) {
     var field = $(this).find('[name="'+name+'"]');
     if (!field.length || !field[0].id) {return;}
-    label = $('label[for="'+field[0].id+'"]');
+    var label = $('label[for="'+field[0].id+'"]');
     if (!label.length) {return;}
     return label[0].firstChild.textContent;
   };

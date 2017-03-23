@@ -347,7 +347,7 @@ define([
       datagrid.rows = newRows;
     },
     moveColumn: function(from_index, to_index) {
-      new_order = [];
+      var new_order = [];
       if(from_index == 0 || to_index == 0 || from_index == to_index) { return; }
       for(var col = 0; col < datagrid.columns.length; col++) {
         if(col == to_index) {

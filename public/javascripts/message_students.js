@@ -34,6 +34,7 @@ define([
     );
   }
 
+  /*global messageStudents*/
   window.messageStudents = function(settings) {
     currentSettings = settings;
     $message_students_dialog.find(".message_types").empty();

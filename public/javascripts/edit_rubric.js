@@ -392,7 +392,7 @@ define([
       $rubric.find(".edit_rubric").remove();
       if(remove) {
         if($rubric.attr('id') != 'rubric_new') {
-          $display_rubric = $rubric.prev(".rubric");
+          var $display_rubric = $rubric.prev(".rubric");
           $display_rubric.show();
           $display_rubric.find('.rubric_title .title').focus();
         } else {
@@ -822,7 +822,7 @@ define([
         rubricEditing.updateRubric($rubric, rubric);
         if (data.rubric_association && data.rubric_association.use_for_grading && !data.rubric_association.skip_updating_points_possible) {
           $("#assignment_show .points_possible").text(rubric.points_possible);
-          discussion_points_text = I18n.t('discussion_points_possible',
+          var discussion_points_text = I18n.t('discussion_points_possible',
                                           {one: '%{count} point possible', other: '%{count} points possible' },
                                           {count: rubric.points_possible || 0})
           $(".discussion-title .discussion-points").text(discussion_points_text);
@@ -877,7 +877,7 @@ define([
       rubricEditing.editRating($(this).parents(".rating"));
       return false;
     }).bind('mouseover', function(event) {
-      $target = $(event.target);
+      var $target = $(event.target);
       if(!$target.closest('.ratings').length) {
         rubricEditing.hideCriterionAdd($target.parents('.rubric'));
       }

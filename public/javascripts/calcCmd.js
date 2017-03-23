@@ -303,7 +303,7 @@ define([
       var result = {};
       command = command.toString();
       result.command = command;
-      tree = cached_trees[command];
+      var tree = cached_trees[command];
       if(tree) {
         result.syntax = tree.syntax;
         result.tree = tree.tree;

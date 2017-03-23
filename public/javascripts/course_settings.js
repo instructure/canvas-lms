@@ -32,7 +32,7 @@ define([
   'jquery.loadingImg' /* loadingImage */,
   'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'link_enrollment' /* link_enrollment */,
+  'link_enrollment' /* global link_enrollment */,
   'vendor/jquery.ba-tinypubsub' /* /\.publish/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/autocomplete' /* /\.autocomplete/ */,
@@ -72,7 +72,7 @@ define([
         $publish_grades_link.text(I18n.t('links.republish', "Republish grades to SIS"));
         $publish_grades_link.removeClass("disabled");
       }
-      $messages = $("#publish_grades_messages");
+      var $messages = $("#publish_grades_messages");
       $messages.empty();
       $.each(messages, function(message, users) {
         var $message = $("<span/>");
@@ -210,7 +210,7 @@ define([
       return false;
     });
     $("#nav_form").submit(function(){
-      tab_id_regex = /(\d+)$/;
+      var tab_id_regex = /(\d+)$/;
 
       var tabs = [];
       $("#nav_enabled_list li").each(function() {

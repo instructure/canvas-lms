@@ -54,6 +54,7 @@ define([
 ], function(_, ModuleFile, PublishCloud, React, ReactDOM, PublishableModuleItem, PublishIconView, INST, I18n, $, Helper, CyoeHelper, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds) {
 
   // TODO: AMD don't export global, use as module
+  /*global modules*/
   window.modules = (function() {
     return {
       updateTaggedItems: function() {
@@ -62,7 +63,7 @@ define([
       currentIndent: function($item) {
         var classes = $item.attr('class').split(/\s/);
         var indent = 0;
-        for (idx = 0; idx < classes.length; idx++) {
+        for (var idx = 0; idx < classes.length; idx++) {
           if(classes[idx].match(/^indent_/)) {
             var new_indent = parseInt(classes[idx].substring(7), 10);
             if(!isNaN(new_indent)) {
@@ -196,7 +197,7 @@ define([
       updateAssignmentData: function(callback) {
         return $.ajaxJSON($(".assignment_info_url").attr('href'), 'GET', {}, function(data) {
           $.each(data, function(id, info) {
-            $context_module_item = $("#context_module_item_" + id);
+            var $context_module_item = $("#context_module_item_" + id);
             var data = {};
             if (info["points_possible"] != null) {
               data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', {'points': I18n.n(info["points_possible"])});
@@ -256,7 +257,7 @@ define([
 
       updateAllItemInstances: function(content_tag) {
         $(".context_module_item."+modules.itemClass(content_tag)+" .title").each(function() {
-          $this = $(this);
+          var $this = $(this);
           $this.text(content_tag.title);
           $this.attr('title', content_tag.title);
         });
@@ -601,7 +602,7 @@ define([
       refreshModuleList: function() {
         $("#module_list").find(".context_module_option").remove();
         $("#context_modules .context_module").each(function() {
-          $this = $(this);
+          var $this = $(this);
           var data = $this.find(".header").getTemplateData({textValues: ['name']});
           data.id = $this.find(".header").attr('id');
           $this.find('.name').attr('title', data.name);
@@ -826,7 +827,7 @@ define([
     var $context_module_unlocked_at = $("#context_module_unlock_at");
     var valCache = '';
     $("#unlock_module_at").change(function() {
-      $this = $(this);
+      var $this = $(this);
       var $unlock_module_at_details = $(".unlock_module_at_details");
       $unlock_module_at_details.showIf($this.attr('checked'));
 
@@ -953,7 +954,7 @@ define([
         // new module, setup publish icon and other stuff
         if (!$publishIcon.data('id')) {
           var fixLink = function(locator, attribute) {
-              el = $module.find(locator);
+              var el = $module.find(locator);
               el.attr(attribute, el.attr(attribute).replace('{{ id }}', data.context_module.id));
           }
           fixLink('span.collapse_module_link', 'href');
@@ -1016,6 +1017,7 @@ define([
       var prereqs = modules.prerequisites();
       var $optgroups = {};
       $module.find(".content .context_module_item").not('.context_module_sub_header').each(function() {
+        var displayType;
         var data = $(this).getTemplateData({textValues: ['id', 'title', 'type']});
         if (data.type == 'assignment') {
           displayType = I18n.t('optgroup.assignments', "Assignments");
@@ -1740,6 +1742,7 @@ define([
     // This will also return the element that is now in focus
     var selectItem = function (options) {
       options = options || {};
+      var $elem;
 
       if (!$currentElem) {
         $elem = $('.context_module:first');
@@ -1802,8 +1805,8 @@ define([
     $document.keycodes('e d space', function(event) {
       if (!$currentElem) return;
 
-      $elem = getClosestModuleOrItem($currentElem);
-      $hasClassItemHover = $elem.hasClass('context_module_item_hover');
+      var $elem = getClosestModuleOrItem($currentElem);
+      var $hasClassItemHover = $elem.hasClass('context_module_item_hover');
 
       if(event.keyString == 'e') {
         $hasClassItemHover ? $currentElem.find(".edit_item_link:first").click() : $currentElem.find(".edit_module_link:first").click();

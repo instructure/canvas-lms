@@ -517,7 +517,7 @@ define([
 
     updateDisplayQuestion: function($question, question, escaped) {
 
-      fillArgs = {
+      var fillArgs = {
         data: question,
         except: ['answers'],
         htmlValues: ['correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
@@ -725,7 +725,7 @@ define([
             $(answerEl).text(answers[index].id);
           });
         }
-      };
+      }
     },
 
     // Updates the question's form when the type changes
@@ -1047,13 +1047,13 @@ define([
 
       if (value && isNaN(numVal)) {
         $("input#quiz_points_possible").trigger("invalid:not_a_number");
-        valid = false;
+        // valid = false;
       } else if (numVal > 2000000000) {
         $("input#quiz_points_possible").trigger("invalid:less_than");
-        valid = false;
+        // valid = false;
       } else if (numVal < 0) {
         $("input#quiz_points_possible").trigger("invalid:greater_than");
-        valid = false;
+        // valid = false;
       }
     },
 
@@ -1068,7 +1068,7 @@ define([
     }
   }
 
-  ipFilterValidation = {
+  var ipFilterValidation = {
     init: function() {
       this.initValidators.apply(this);
       $('#quiz_options_form').on('xhrError', this.onFormError);
@@ -1504,7 +1504,7 @@ define([
   }
 
   function addHTMLFeedback($container, question_data, name) {
-    html = question_data[name+'_html'];
+    var html = question_data[name+'_html'];
     if (!html || html.length == 0) {
       html = htmlEscape(question_data[name]);
       question_data[name+'_html'] = html;
@@ -1823,7 +1823,7 @@ define([
           return false;
         }
         if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
-          sections = overrideView.sectionsWithoutOverrides();
+          var sections = overrideView.sectionsWithoutOverrides();
           var missingDateView = new MissingDateDialog({
             validationFn: function(){ return sections },
             labelFn: function( section ) { return section.get('name')},
@@ -2092,7 +2092,7 @@ define([
 
       if ($question.hasClass('missing_word_question') || question.question_type == 'missing_word_question') {
         question = $question.getTemplateData({textValues: ['text_before_answers', 'text_after_answers']});
-        answer_data = $question.find(".original_question_text").getFormData();
+        var answer_data = $question.find(".original_question_text").getFormData();
         question.text_before_answers = answer_data.question_text;
         question.text_after_answers = answer_data.text_after_answers;
         question.question_text = question.text_before_answers;
@@ -2317,15 +2317,15 @@ define([
           multipleAnswer: questionType === "multiple_answers_question"
         });
         regradeOptions.on('update', function(regradeOption){
-          newAnswerData = {regradeOption: regradeOption, newAnswer: newAnswer}
+          var newAnswerData = {regradeOption: regradeOption, newAnswer: newAnswer}
           toggleAnswer($question, newAnswerData)
         })
       }
     }
 
     function toggleAnswer($question, newAnswerData) {
-      $answer = $(newAnswerData.newAnswer);
-      $answers = $answer.parent().find(".answer");
+      var $answer = $(newAnswerData.newAnswer);
+      var $answers = $answer.parent().find(".answer");
 
       if ($question.find(":input[name='question_type']").val() != "multiple_answers_question") {
         $question.find(".answer:visible").removeClass('correct_answer')
@@ -2489,7 +2489,7 @@ define([
       var $question = makeQuestion();
       if ($(this).parents(".group_top").length > 0) {
 
-        groupID = $(this).parents(".group_top")[0].id.replace("group_top_","")
+        var groupID = $(this).parents(".group_top")[0].id.replace("group_top_","")
         $($question[0]).attr("data-group-id", groupID)
 
         var $bottom = $(this).parents(".group_top").next();
@@ -2537,7 +2537,7 @@ define([
           $dialog.find(".message").hide();
           $dialog.find(".find_banks").show();
           $dialog.addClass('loaded');
-          for(idx in banks) {
+          for(var idx in banks) {
             var bank = banks[idx].assessment_question_bank;
             var $bank = $dialog.find(".bank.blank:first").clone(true).removeClass('blank');
             $bank.fillTemplateData({data: bank, dataValues: ['id', 'context_type', 'context_id']});
@@ -2594,7 +2594,7 @@ define([
           $dialog.find(".message").hide();
           $dialog.find(".side_tabs_table").show();
           $dialog.addClass('loaded');
-          for(idx in banks) {
+          for(var idx in banks) {
             var bank = banks[idx].assessment_question_bank;
             bank.title = TextHelper.truncateText(bank.title)
             var $bank = $dialog.find(".bank.blank:first").clone(true).removeClass('blank');
@@ -2923,7 +2923,7 @@ define([
         answer.question_type = question_type;
         answer.blank_id = $question.find(".blank_id_select").val();
         answer.blank_index = $question.find(".blank_id_select")[0].selectedIndex;
-        $answer = makeFormAnswer(answer);
+        var $answer = makeFormAnswer(answer);
         if (answer_selection_type == "any_answer") {
           $answer.addClass('correct_answer');
         } else if (answer_selection_type == "blanks") {
@@ -3702,7 +3702,7 @@ define([
         var items = [];
         if (quiz.findContainerGroup(ui.item)) {
           $container = quiz.findContainerGroup(ui.item);
-          $list = [];
+          var $list = [];
           url = $container.find(".reorder_group_questions_url").attr('href');
           var $obj = $container.next();
           while($obj.length > 0 && !$obj.hasClass('group_bottom')) {
@@ -3865,7 +3865,7 @@ define([
     });
 
     if (ENV['CONDITIONAL_RELEASE_SERVICE_ENABLED']) {
-      window.conditionalRelease = window.conditionalRelease || {};
+      var conditionalRelease = window.conditionalRelease = window.conditionalRelease || {};
       conditionalRelease.editor = ConditionalRelease.attach(
         $('#conditional_release_target').get(0),
         I18n.t('quiz'),
@@ -4257,7 +4257,7 @@ define([
       }
 
       // Only allow students to see answers on last attempt if the quiz has more than one attempt
-      showCorrectAnswersLastAttempt = parseInt($('#quiz_allowed_attempts').val()) > 0;
+      var showCorrectAnswersLastAttempt = parseInt($('#quiz_allowed_attempts').val()) > 0;
       $('#quiz_show_correct_answers_last_attempt_container').toggle(showCorrectAnswersLastAttempt);
       if(!showCorrectAnswersLastAttempt) {
         $('#quiz_show_correct_answers_last_attempt').prop('checked', false);

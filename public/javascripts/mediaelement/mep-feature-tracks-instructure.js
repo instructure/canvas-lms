@@ -8,6 +8,7 @@
 //     <(curl -s "${upstream_url}") \
 //     public/javascripts/mediaelement/mep-feature-tracks-instructure.js
 //
+/*global mejs, MediaElementPlayer*/
 (function($) {
 
 	// add extra default options
@@ -95,7 +96,7 @@
 
 				// handle clicks to the language radio buttons
 				.on('click','input[type=radio]',function() {
-					lang = this.value;
+					var lang = this.value;
 					player.setTrack(lang);
 				});
 
@@ -347,7 +348,7 @@
 
 			// check if any subtitles
 			if (t.options.hideCaptionsButtonWhenEmpty) {
-				for (i=0; i<t.tracks.length; i++) {
+				for (var i=0; i<t.tracks.length; i++) {
 					if (t.tracks[i].kind == 'subtitles') {
 						hasSubtitles = true;
 						break;
@@ -530,7 +531,6 @@
 			nl:'Dutch',
 			en:'English',
 			et:'Estonian',
-			tl:'Filipino',
 			fi:'Finnish',
 			fr:'French',
 			gl:'Galician',

@@ -182,12 +182,12 @@ define([
     if (window._earlyClick) {
 
       // unset the onclick handler we were using to capture the events
-      document.removeEventListener('click', _earlyClick);
+      document.removeEventListener('click', window._earlyClick);
 
-      if (_earlyClick.clicks) {
+      if (window._earlyClick.clicks) {
         // wait to fire the "click" events till after all of the event hanlders loaded at dom ready are initialized
         setTimeout(function(){
-          $.each(_.uniq(_earlyClick.clicks), function() {
+          $.each(_.uniq(window._earlyClick.clicks), function() {
             // cant use .triggerHandler because it will not bubble,
             // but we do want to preventDefault, so this is what we have to do
             var event = $.Event('click');
@@ -552,7 +552,7 @@ define([
         var $conversation = $message.parents(".communication_message");
 
         // fill out this message, display the new info, and remove the form
-        message_data = data.messages[0];
+        var message_data = data.messages[0];
         $message.fillTemplateData({
           data: {
             post_date: $.datetimeString(message_data.created_at),

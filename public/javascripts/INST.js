@@ -10,7 +10,7 @@ define(['jquery'], function($) {
 
   // for backwards compat, this might be defined already but we expose
   // it as a module here
-  if (typeof INST === 'undefined') INST = {};
+  if (!('INST' in window)) window.INST = {};
 
   // ============================================================================================
   // = Try to figure out what browser they are using and set INST.broswer.theirbrowser to true  =

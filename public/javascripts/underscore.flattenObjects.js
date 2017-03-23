@@ -8,7 +8,7 @@ define([
     _.each(array, function(object) {
       output.push(object);
       if (object[key]) {
-        children = object[key]
+        var children = object[key]
         if (backward) {
           children = _.clone(children)
           children.reverse()

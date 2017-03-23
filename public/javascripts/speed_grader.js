@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*global jsonData*/
 define([
   'jsx/speed_grader/gradingPeriod',
   'jsx/grading/helpers/OutlierScoreHelper',
@@ -1101,7 +1102,7 @@ define([
         if (student.avatar_path && !hideStudentNames) {
           // If there's any kind of delay in loading the user's avatar, it's
           // better to show a blank image than the previous student's image.
-          $new_image = $avatar_image.clone().show();
+          var $new_image = $avatar_image.clone().show();
           $avatar_image.after($new_image.attr('src', student.avatar_path)).remove();
           $avatar_image = $new_image;
         } else {
@@ -1625,7 +1626,7 @@ define([
         if (browserableCssClasses.test(attachment.mime_class)) {
           browserableAttachments.push(attachment);
         }
-        $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
+        var $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
           data: {
             submissionId: submission.user_id,
             attachmentId: attachment.id,
@@ -2431,9 +2432,9 @@ define([
           .removeClass(submissionStates)
           .addClass(className.raw)
 
-        $status = $(".ui-selectmenu-status");
-        $statusIcon = $status.find(".speedgrader-selectmenu-icon");
-        $queryIcon = $query.find(".speedgrader-selectmenu-icon");
+        var $status = $(".ui-selectmenu-status");
+        var $statusIcon = $status.find(".speedgrader-selectmenu-icon");
+        var $queryIcon = $query.find(".speedgrader-selectmenu-icon");
 
         if(this == EG.currentStudent && (className.raw == "graded" || className.raw == "not_gradeable")){
           var studentInfo = EG.getStudentNameAndGrade()

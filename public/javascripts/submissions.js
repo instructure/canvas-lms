@@ -30,7 +30,7 @@ define([
   'media_comments' /* mediaComment */,
   'compiled/jquery/mediaCommentThumbnail',
   'vendor/jquery.scrollTo', /* /\.scrollTo/ */
-  'rubric_assessment'
+  'rubric_assessment' /*global rubricAssessment*/
 ], function (round, I18n, $, GradeFormatHelper) {
 
   var rubricAssessments = ENV.rubricAssessments;
@@ -58,7 +58,7 @@ define([
           id: 'submission_comment_' + comment.id
         });
         if(comment.media_comment_id) {
-          $media_comment_link = $("#comment_media_blank").clone(true).removeAttr('id');
+          var $media_comment_link = $("#comment_media_blank").clone(true).removeAttr('id');
           $media_comment_link.fillTemplateData({
             data: comment
           });
@@ -154,7 +154,7 @@ define([
     });
   }
   function toggleRubric ($rubric) {
-    ariaSetting = $rubric.is(":visible");
+    var ariaSetting = $rubric.is(":visible");
     $("#application").find("[data-hide_from_rubric]").attr("aria-hidden", ariaSetting)
   }
   function windowResize () {
@@ -290,7 +290,7 @@ define([
           $("#new_rubric_assessment_option").remove();
           $("#rubric_assessments_list").show();
           rubricAssessment.populateRubric($rubric, assessment);
-          submission = assessment.artifact;
+          var submission = assessment.artifact;
           if (submission) {
             showGrade(submission);
           }
@@ -325,7 +325,7 @@ define([
         event.preventDefault();
         $("#add_comment_form").hide();
         $("#media_media_recording").show();
-        $recording = $("#media_media_recording").find(".media_recording");
+        var $recording = $("#media_media_recording").find(".media_recording");
         $recording.mediaComment('create', 'any', function(id, type) {
           $("#media_media_recording").data('comment_id', id).data('comment_type', type);
           $(document).triggerHandler('comment_change');

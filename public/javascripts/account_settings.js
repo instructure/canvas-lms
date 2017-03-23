@@ -35,14 +35,13 @@ define([
   }
 
   $(document).ready(function() {
-    checkFutureListingSetting = function() {
-
+    function checkFutureListingSetting () {
       if ($('#account_settings_restrict_student_future_view_value').is(':checked')) {
         $('.future_listing').show();
       } else {
         $('.future_listing').hide();
       }
-    };
+    }
     checkFutureListingSetting();
     $('#account_settings_restrict_student_future_view_value').change(checkFutureListingSetting);
 

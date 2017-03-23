@@ -118,7 +118,7 @@ define([
         }
         var month_number = month < 9 ? "0" + (month + 1) : (month + 1);
         var day_number = day < 10 ? "0" + day : day;
-        id = "day_" + year + "_" + month_number + "_" + day_number
+        var id = "day_" + year + "_" + month_number + "_" + day_number;
         if($month.hasClass('mini_month')) {
           id = "mini_" + id;
         }
