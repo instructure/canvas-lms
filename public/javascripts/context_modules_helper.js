@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-], function () {
   var Helper = {}
 
   Helper.setWindowLocation = function (url) {
@@ -29,5 +27,4 @@ define([
     this.setWindowLocation($elt.attr('data-item-href'))
   }.bind(Helper)
 
-  return Helper
-})
+export default Helper

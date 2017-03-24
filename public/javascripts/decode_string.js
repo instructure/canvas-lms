@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define( function(){
   // based on this solution:
   // http://stackoverflow.com/questions/7394748/whats-the-right-way-to-decode-a-string-that-has-special-html-entities-in-it
 
@@ -24,9 +23,8 @@ define( function(){
   // round trip through a textarea to do it. this seems to be a best practice,
   // as far as we can tell.
 
-  return function(encodedString){
+export default function(encodedString){
     var textArea = document.createElement('textarea');
     textArea.innerHTML = encodedString;
     return textArea.value;
   }
-});

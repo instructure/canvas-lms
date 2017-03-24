@@ -16,47 +16,43 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'underscore',
-  'compiled/models/ModuleFile',
-  'jsx/shared/PublishCloud',
-  'react',
-  'react-dom',
-  'compiled/models/PublishableModuleItem',
-  'compiled/views/PublishIconView',
-  'compiled/views/LockIconView',
-  'jsx/blueprint_courses/apps/MasterCourseModuleLock',
-  'INST' /* INST */,
-  'i18n!context_modules',
-  'jquery' /* $ */,
-  'context_modules_helper', /* Helper */
-  'jsx/shared/conditional_release/CyoeHelper',
-  'compiled/views/context_modules/context_modules' /* handles the publish/unpublish state */,
-  'compiled/views/modules/RelockModulesDialog',
-  'compiled/util/vddTooltip',
-  'jst/_vddTooltip',
-  'compiled/models/Publishable',
-  'compiled/views/PublishButtonView',
-  'str/htmlEscape',
-  'jsx/modules/utils/setupContentIds',
-  'jsx/shared/dig',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* dateString, datetimeString, time_field, datetime_field */,
-  'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */,
-  'jqueryui/dialog',
-  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
-  'jquery.instructure_misc_helpers' /* /\$\.underscore/ */,
-  'jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */,
-  'jquery.keycodes' /* keycodes */,
-  'jquery.loadingImg' /* loadingImage */,
-  'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'vendor/date' /* Date.parse */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'jqueryui/sortable' /* /\.sortable/ */,
-  'compiled/jquery.rails_flash_notifications'
-], function (_, ModuleFile, PublishCloud, React, ReactDOM, PublishableModuleItem, PublishIconView,
-  LockIconView, MasterCourseModuleLock, INST, I18n, $, Helper, CyoeHelper, ContextModulesView, RelockModulesDialog,
-  vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds, dig) {
+import _ from 'underscore'
+import ModuleFile from 'compiled/models/ModuleFile'
+import PublishCloud from 'jsx/shared/PublishCloud'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import PublishableModuleItem from 'compiled/models/PublishableModuleItem'
+import PublishIconView from 'compiled/views/PublishIconView'
+import LockIconView from 'compiled/views/LockIconView'
+import MasterCourseModuleLock from 'jsx/blueprint_courses/apps/MasterCourseModuleLock'
+import INST from './INST'
+import I18n from 'i18n!context_modules'
+import $ from 'jquery'
+import Helper from './context_modules_helper'
+import CyoeHelper from 'jsx/shared/conditional_release/CyoeHelper'
+import ContextModulesView from 'compiled/views/context_modules/context_modules' /* handles the publish/unpublish state */
+import RelockModulesDialog from 'compiled/views/modules/RelockModulesDialog'
+import vddTooltip from 'compiled/util/vddTooltip'
+import vddTooltipView from 'jst/_vddTooltip'
+import Publishable from 'compiled/models/Publishable'
+import PublishButtonView from 'compiled/views/PublishButtonView'
+import htmlEscape from './str/htmlEscape'
+import setupContentIds from 'jsx/modules/utils/setupContentIds'
+import dig from 'jsx/shared/dig'
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time' /* dateString, datetimeString, time_field, datetime_field */
+import './jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */
+import 'jqueryui/dialog'
+import 'compiled/jquery/fixDialogButtons'
+import './jquery.instructure_misc_helpers' /* /\$\.underscore/ */
+import './jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */
+import './jquery.keycodes'
+import './jquery.loadingImg'
+import './jquery.templateData' /* fillTemplateData, getTemplateData */
+import './vendor/date' /* Date.parse */
+import './vendor/jquery.scrollTo'
+import 'jqueryui/sortable'
+import 'compiled/jquery.rails_flash_notifications'
 
   // TODO: AMD don't export global, use as module
   /*global modules*/
@@ -2026,5 +2022,4 @@ define([
 
   });
 
-  return modules;
-});
+export default modules;

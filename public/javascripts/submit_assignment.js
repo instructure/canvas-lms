@@ -16,29 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!assignments' /* I18n.t */,
-  'jquery' /* $ */,
-  'underscore' /* _ */,
-  'compiled/views/GoogleDocsTreeView',
-  'jst/assignments/homework_submission_tool',
-  'compiled/external_tools/HomeworkSubmissionLtiContainer',
-  'compiled/views/editor/KeyboardShortcuts' /* TinyMCE Keyboard Shortcuts for a11y */,
-  'jsx/shared/rce/RichContentEditor',
-  'submit_assignment_helper',
-  'compiled/jquery.rails_flash_notifications',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.inst_tree' /* instTree */,
-  'jquery.instructure_forms' /* ajaxJSONPreparedFiles, getFormData */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_plugins' /* fragmentChange, showIf, /\.log\(/ */,
-  'jquery.templateData' /* getTemplateData */,
-  'media_comments' /* mediaComment */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, _, GoogleDocsTreeView, homework_submission_tool,
-            HomeworkSubmissionLtiContainer, RCEKeyboardShortcuts,
-            RichContentEditor, SubmitAssignmentHelper) {
+
+import I18n from 'i18n!assignments'
+import $ from 'jquery'
+import _ from 'underscore'
+import GoogleDocsTreeView from 'compiled/views/GoogleDocsTreeView'
+import homework_submission_tool from 'jst/assignments/homework_submission_tool'
+import HomeworkSubmissionLtiContainer from 'compiled/external_tools/HomeworkSubmissionLtiContainer'
+import RCEKeyboardShortcuts from 'compiled/views/editor/KeyboardShortcuts' /* TinyMCE Keyboard Shortcuts for a11y */
+import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import {submitContentItem} from './submit_assignment_helper'
+import 'compiled/jquery.rails_flash_notifications'
+import './jquery.ajaxJSON'
+import './jquery.inst_tree'
+import './jquery.instructure_forms' /* ajaxJSONPreparedFiles, getFormData */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_plugins' /* fragmentChange, showIf, /\.log\(/ */
+import './jquery.templateData'
+import './media_comments'
+import './vendor/jquery.scrollTo'
+import 'jqueryui/tabs'
 
   var SubmitAssignment = {
     toolDropDownClickHandler: function(event) {
@@ -59,7 +56,7 @@ define([
         tabindex: '0'
       }).css({width: width, height: height}))
         .bind('selection', function(event, data) {
-          SubmitAssignmentHelper.submitContentItem(event.contentItems[0]);
+          submitContentItem(event.contentItems[0]);
           $div.off('dialogbeforeclose', SubmitAssignment.dialogCancelHandler)
           $div.dialog('close');
         })
@@ -513,5 +510,5 @@ define([
   };
 
   $("#submit_from_external_tool_form .tools li").live('click', SubmitAssignment.toolDropDownClickHandler);
-  return SubmitAssignment;
-});
+
+export default SubmitAssignment;

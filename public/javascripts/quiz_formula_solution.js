@@ -16,38 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([], function(){
-
-  function QuizFormulaSolution(result){
-    this.result = result;
+export default class QuizFormulaSolution {
+  constructor (result) {
+    this.result = result
   }
 
-  QuizFormulaSolution.prototype.rawValue = function(){
-    return parseFloat(this.rawText(), 10);
-  };
+  rawValue () {
+    return parseFloat(this.rawText(), 10)
+  }
 
-  QuizFormulaSolution.prototype.rawText = function(){
-    if(this.result === null || this.result === undefined){
-      return "NaN";
+  rawText () {
+    if (this.result === null || this.result === undefined) {
+      return 'NaN'
     }
-    return this.result.substring(1).trim();
-  };
+    return this.result.substring(1).trim()
+  }
 
-  QuizFormulaSolution.prototype.isValid = function(){
+  isValid () {
     return !!(this._wellFormedString() && this._appropriateSolutionValue())
-  };
+  }
 
-  //private
-  QuizFormulaSolution.prototype._wellFormedString = function(){
-    var result = this.result;
-    return !!(result.match(/^=/) && result != "= NaN" && result != "= Infinity")
-  };
+  _wellFormedString () {
+    const result = this.result
+    return !!(result.match(/^=/) && result != '= NaN' && result != '= Infinity')
+  }
 
-  QuizFormulaSolution.prototype._appropriateSolutionValue = function(){
-    var rawVal = this.rawValue();
-    return !!(rawVal == 0 || rawVal);
-  };
-
-  return QuizFormulaSolution;
-
-})
+  _appropriateSolutionValue () {
+    const rawVal = this.rawValue()
+    return !!(rawVal == 0 || rawVal)
+  }
+}

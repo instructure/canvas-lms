@@ -15,20 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import I18n from 'i18n!rubric_assessment'
+import $ from 'jquery'
+import htmlEscape from './str/htmlEscape'
+import TextHelper from 'compiled/str/TextHelper'
+import round from 'compiled/util/round'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
+import './jquery.instructure_forms' /* fillFormData */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_plugins' /* showIf */
+import './jquery.templateData'
+import './vendor/jquery.scrollTo'
 
-define([
-  'i18n!rubric_assessment',
-  'jquery' /* $ */,
-  'str/htmlEscape',
-  'compiled/str/TextHelper',
-  'compiled/util/round',
-  'jsx/shared/helpers/numberHelper',
-  'jquery.instructure_forms' /* fillFormData */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_plugins' /* showIf */,
-  'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function (I18n, $, htmlEscape, TextHelper, round, numberHelper) {
 // TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
 /*global rubricAssessment*/
 window.rubricAssessment = {
@@ -352,5 +350,4 @@ function ratingHasScore(rating) {
 
 $(rubricAssessment.init);
 
-return rubricAssessment;
-});
+export default rubricAssessment;

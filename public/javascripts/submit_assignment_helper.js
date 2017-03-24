@@ -15,13 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-define([
-  'jquery',
-  'i18n!assignments',
-  'jquery.instructure_misc_plugins',
-  'compiled/jquery.rails_flash_notifications'
-  ], function($, I18n) {
+import $ from 'jquery'
+import I18n from 'i18n!assignments'
+import './jquery.instructure_misc_plugins'
+import 'compiled/jquery.rails_flash_notifications'
 
   var validFileSubmission = function(ext, contentItem) {
     return !ENV.SUBMIT_ASSIGNMENT ||
@@ -36,7 +33,7 @@ define([
       return false;
   };
 
-  var submitContentItem = function(contentItem) {
+export function submitContentItem (contentItem) {
     if (!contentItem) {
       return false;
     }
@@ -74,8 +71,3 @@ define([
 
     return true;
   };
-
-  return {
-    'submitContentItem': submitContentItem
-  };
-});

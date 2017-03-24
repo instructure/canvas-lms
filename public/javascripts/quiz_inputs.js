@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(['jquery'], function($) {
+import $ from 'jquery'
   var inputMethods = {
     disableInputs: function(inputs) {
       var $body       = $('body'),
@@ -49,5 +49,4 @@ define(['jquery'], function($) {
     }
   };
 
-  return inputMethods;
-});
+export default inputMethods;

@@ -16,25 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'INST' /* INST */,
-  'i18n!select_content_dialog',
-  'jquery' /* $ */,
-  'react',
-  'react-dom',
-  'jsx/context_modules/FileSelectBox',
-  'underscore',
-  'jquery.instructure_date_and_time' /* datetime_field */,
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */,
-  'jqueryui/dialog',
-  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
-  'jquery.instructure_misc_helpers' /* replaceTags, getUserServices, findLinkForService */,
-  'jquery.instructure_misc_plugins' /* showIf */,
-  'jquery.keycodes' /* keycodes */,
-  'jquery.loadingImg' /* loadingImage */,
-  'jquery.templateData' /* fillTemplateData */
-], function(INST, I18n, $, React, ReactDOM, FileSelectBox, _) {
+import INST from './INST'
+import I18n from 'i18n!select_content_dialog'
+import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import FileSelectBox from 'jsx/context_modules/FileSelectBox'
+import _ from 'underscore'
+import './jquery.instructure_date_and_time' /* datetime_field */
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */
+import 'jqueryui/dialog'
+import 'compiled/jquery/fixDialogButtons'
+import './jquery.instructure_misc_helpers' /* replaceTags, getUserServices, findLinkForService */
+import './jquery.instructure_misc_plugins' /* showIf */
+import './jquery.keycodes'
+import './jquery.loadingImg'
+import './jquery.templateData'
 
   var SelectContentDialog = {};
 
@@ -170,7 +168,6 @@ define([
   $(document).ready(function() {
     var external_services = null;
     var $dialog = $("#select_context_content_dialog");
-    INST = INST || {};
     INST.selectContentDialog = function(options) {
       var options = options || {};
       var for_modules = options.for_modules;
@@ -440,5 +437,4 @@ define([
     });
   });
 
-  return SelectContentDialog;
-});
+export default SelectContentDialog;

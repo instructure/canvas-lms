@@ -16,26 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!edit_rubric',
-  'jst/changePointsPossibleToMatchRubricDialog',
-  'jquery' /* $ */,
-  'underscore' /* _ */,
-  'str/htmlEscape',
-  'jsx/shared/helpers/numberHelper',
-  'find_outcome',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags */,
-  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
-  'jquery.loadingImg' /* loadingImage */,
-  'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'compiled/jquery.rails_flash_notifications',
-  'vendor/jquery.ba-tinypubsub',
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'compiled/jquery/fixDialogButtons'
-], function(I18n, changePointsPossibleToMatchRubricDialog, $, _, htmlEscape, numberHelper) {
+import I18n from 'i18n!edit_rubric'
+import changePointsPossibleToMatchRubricDialog from 'jst/changePointsPossibleToMatchRubricDialog'
+import $ from 'jquery'
+import _ from 'underscore'
+import htmlEscape from './str/htmlEscape'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
+import 'find_outcome'
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_helpers' /* replaceTags */
+import './jquery.instructure_misc_plugins'  /* confirmDelete, showIf */
+import './jquery.loadingImg'
+import './jquery.templateData' /* fillTemplateData, getTemplateData */
+import 'compiled/jquery.rails_flash_notifications'
+import 'vendor/jquery.ba-tinypubsub'
+import './vendor/jquery.scrollTo'
+import 'compiled/jquery/fixDialogButtons'
 
   var rubricEditing = {
     htmlBody: null,
@@ -1024,5 +1022,4 @@ define([
     $.publish('edit_rubric/initted')
   };
 
-  return rubricEditing;
-});
+export default rubricEditing;

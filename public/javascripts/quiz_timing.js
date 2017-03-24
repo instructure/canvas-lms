@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!quizzes.timing',
-  'jquery' /* $ */,
-  'vendor/date' /* Date.parse */
-], function(I18n, $) {
+import I18n from 'i18n!quizzes.timing'
+import $ from 'jquery'
+import './vendor/date' /* Date.parse */
 
 var timing = {
   initialTime: new Date(),
@@ -47,5 +45,4 @@ var timing = {
   }
 };
 
-return timing;
-});
+export default timing;

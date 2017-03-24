@@ -16,24 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!wiki.sidebar',
-  'jquery' /* $ */,
-  'str/htmlEscape',
-  'compiled/util/UsageRights' /* Usage Rights for File Uploading */,
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.inst_tree' /* instTree */,
-  'jquery.instructure_forms' /* formSubmit, handlesHTML5Files, ajaxFileUpload, fileData */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags */,
-  'jquery.instructure_misc_plugins' /* /\.log\(/ */,
-  'compiled/jquery.rails_flash_notifications',
-  'jquery.templateData' /* fillTemplateData */,
-  // 'tinymce.editor_box', // required, but not loaded here so that all of tinymce doesn't end up in the common bundle
-  'vendor/jquery.pageless' /* pageless */,
-  'jqueryui/accordion' /* /\.accordion\(/ */,
-  'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, htmlEscape, UsageRights) {
+import I18n from 'i18n!wiki.sidebar'
+import $ from 'jquery'
+import htmlEscape from './str/htmlEscape'
+import UsageRights from 'compiled/util/UsageRights'
+import './jquery.ajaxJSON'
+import './jquery.inst_tree'
+import './jquery.instructure_forms' /* formSubmit, handlesHTML5Files, ajaxFileUpload, fileData */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_helpers' /* replaceTags */
+import './jquery.instructure_misc_plugins' /* /\.log\(/ */
+import 'compiled/jquery.rails_flash_notifications'
+import './jquery.templateData' /* fillTemplateData */
+// 'tinymce.editor_box', // required, but not loaded here so that all of tinymce doesn't end up in the common bundle
+import 'vendor/jquery.pageless'
+import 'jqueryui/accordion'
+import 'jqueryui/tabs'
 
   var $editor_tabs,
       $tree1,
@@ -658,6 +656,4 @@ define([
     }
   };
 
-  return wikiSidebar;
-});
-
+export default wikiSidebar;

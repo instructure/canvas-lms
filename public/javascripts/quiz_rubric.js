@@ -16,12 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!quizzes.rubric',
-  'jquery' /* $ */,
-  'jqueryui/dialog',
-  'rubricEditBinding' // event handler for rubricEditDataReady
-], function(I18n, $) {
+import I18n from 'i18n!quizzes.rubric'
+import $ from 'jquery'
+import 'jqueryui/dialog'
+import 'rubricEditBinding' // event handler for rubricEditDataReady
 
   var quizRubric = {
     ready: function() {
@@ -76,6 +74,4 @@ define([
     });
   });
 
-  return quizRubric;
-
-});
+export default quizRubric;

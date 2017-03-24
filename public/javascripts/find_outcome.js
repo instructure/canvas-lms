@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!find_outcome',
-  'jquery' /* $ */,
-  'compiled/str/TextHelper',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jqueryui/dialog',
-  'jquery.templateData' /* fillTemplateData, getTemplateData */
-], function(I18n, $, TextHelper) {
+import I18n from 'i18n!find_outcome'
+import $ from 'jquery'
+import TextHelper from 'compiled/str/TextHelper'
+import './jquery.ajaxJSON'
+import 'jqueryui/dialog'
+import './jquery.templateData' /* fillTemplateData, getTemplateData */
 
 var find_outcome = (function() {
   return {
@@ -120,6 +118,4 @@ $(document).ready(function() {
   });
 });
 
-return find_outcome;
-});
-
+export default find_outcome;

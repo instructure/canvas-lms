@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([], function() {
-  var tabIdFromElement = function(el) {
+export function tabIdFromElement (el) {
     var tabIdStr = el.id;
     if (tabIdStr) {
       var tabId = tabIdStr.replace(/^nav_edit_tab_id_/, '');
@@ -30,8 +29,3 @@ define([], function() {
     }
     return null;
   }
-
-  return {
-    'tabIdFromElement': tabIdFromElement
-  };
-});

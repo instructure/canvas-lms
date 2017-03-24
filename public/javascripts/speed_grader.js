@@ -17,54 +17,49 @@
  */
 
 /*global jsonData*/
-define([
-  'jsx/speed_grader/gradingPeriod',
-  'jsx/grading/helpers/OutlierScoreHelper',
-  'jsx/grading/quizzesNextSpeedGrading',
-  'jsx/shared/helpers/numberHelper',
-  'jsx/gradebook/shared/helpers/GradeFormatHelper',
-  'jst/speed_grader/student_viewed_at',
-  'jst/speed_grader/submissions_dropdown',
-  'jst/speed_grader/speech_recognition',
-  'compiled/util/round',
-  'underscore',
-  'INST' /* INST */,
-  'i18n!gradebook',
-  'compiled/util/natcompare',
-  'jquery' /* $ */,
-  'timezone',
-  'compiled/userSettings',
-  'str/htmlEscape',
-  'rubric_assessment',
-  'speed_grader_select_menu',
-  'speed_grader_helpers',
-  'jst/_turnitinInfo',
-  'jst/_turnitinScore',
-  'jst/_vericiteInfo',
-  'jst/_vericiteScore',
-  'jqueryui/draggable' /* /\.draggable/ */,
-  'jquery.ajaxJSON' /* getJSON, ajaxJSON */,
-  'jquery.instructure_forms' /* ajaxJSONFiles */,
-  'jquery.doc_previews' /* loadDocPreview */,
-  'jquery.instructure_date_and_time' /* datetimeString */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags */,
-  'jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */,
-  'jquery.keycodes' /* keycodes */,
-  'jquery.loadingImg' /* loadingImg, loadingImage */,
-  'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'media_comments' /* mediaComment */,
-  'compiled/jquery/mediaCommentThumbnail',
-  'compiled/jquery.rails_flash_notifications',
-  'jquery.elastic' /* elastic */,
-  'jquery-getscrollbarwidth',
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function (MGP, OutlierScoreHelper, quizzesNextSpeedGrading, numberHelper,
-  GradeFormatHelper, studentViewedAtTemplate, submissionsDropdownTemplate,
-  speechRecognitionTemplate, round, _, INST, I18n, natcompare, $, tz, userSettings, htmlEscape,
-  rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate,
-  turnitinScoreTemplate, vericiteInfoTemplate, vericiteScoreTemplate) {
+import MGP from 'jsx/speed_grader/gradingPeriod'
+import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
+import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
+import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
+import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
+import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown'
+import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition'
+import round from 'compiled/util/round'
+import _ from 'underscore'
+import INST from './INST'
+import I18n from 'i18n!gradebook'
+import natcompare from 'compiled/util/natcompare'
+import $ from 'jquery'
+import tz from 'timezone'
+import userSettings from 'compiled/userSettings'
+import htmlEscape from './str/htmlEscape'
+import rubricAssessment from './rubric_assessment'
+import SpeedgraderSelectMenu from './speed_grader_select_menu'
+import SpeedgraderHelpers from './speed_grader_helpers'
+import turnitinInfoTemplate from 'jst/_turnitinInfo'
+import turnitinScoreTemplate from 'jst/_turnitinScore'
+import vericiteInfoTemplate from 'jst/_vericiteInfo'
+import vericiteScoreTemplate from 'jst/_vericiteScore'
+import 'jqueryui/draggable'
+import './jquery.ajaxJSON' /* getJSON, ajaxJSON */
+import './jquery.instructure_forms' /* ajaxJSONFiles */
+import './jquery.doc_previews' /* loadDocPreview */
+import './jquery.instructure_date_and_time' /* datetimeString */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_helpers' /* replaceTags */
+import './jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */
+import './jquery.keycodes'
+import './jquery.loadingImg'
+import './jquery.templateData'
+import './media_comments'
+import 'compiled/jquery/mediaCommentThumbnail'
+import 'compiled/jquery.rails_flash_notifications'
+import 'jquery.elastic'
+import 'jquery-getscrollbarwidth'
+import './vendor/jquery.scrollTo'
+import './vendor/ui.selectmenu'
+
   // PRIVATE VARIABLES AND FUNCTIONS
   // all of the $ variables here are to speed up access to dom nodes,
   // so that the jquery selector does not have to be run every time.
@@ -2617,7 +2612,7 @@ define([
     EG.jsonReady();
   }
 
-  return {
+export default {
     setup: function() {
       function registerQuizzesNext (overriddenShowSubmission) {
         showSubmissionOverride = overriddenShowSubmission;
@@ -2637,4 +2632,3 @@ define([
     },
     EG: EG
   };
-});

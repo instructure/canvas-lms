@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(['jquery', 'i18n!LongTextEditor', 'str/htmlEscape'], function($, I18n, htmlEscape) {
+import $ from 'jquery'
+import I18n from 'i18n!LongTextEditor'
+import htmlEscape from './str/htmlEscape'
 
   /*
    * this is just LongTextEditor from slick.editors.js but with i18n and a
@@ -122,5 +124,4 @@ define(['jquery', 'i18n!LongTextEditor', 'str/htmlEscape'], function($, I18n, ht
     this.init();
   }
 
-  return LongTextEditor;
-});
+export default LongTextEditor;

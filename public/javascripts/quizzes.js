@@ -19,60 +19,52 @@
 // xsslint jqueryObject.function makeFormAnswer makeDisplayAnswer
 // xsslint jqueryObject.property sortable placeholder
 // xsslint safeString.property question_text
-define([
-  'jst/quiz/regrade',
-  'i18n!quizzes',
-  'underscore',
-  'jquery' /* $ */,
-  'calcCmd',
-  'str/htmlEscape',
-  'str/pluralize',
-  'compiled/handlebars_helpers',
-  'compiled/views/assignments/DueDateOverride',
-  'compiled/models/Quiz',
-  'compiled/models/DueDateList',
-  'compiled/views/quizzes/QuizRegradeView',
-  'compiled/collections/SectionCollection',
-  'compiled/views/calendar/MissingDateDialogView',
-  'compiled/editor/MultipleChoiceToggle',
-  'compiled/editor/EditorToggle',
-  'compiled/str/TextHelper',
-  'compiled/views/editor/KeyboardShortcuts',
-  'INST', // safari sniffing for VO workarounds
-  'quiz_formula_solution',
-  'quiz_labels',
-  'jsx/shared/rce/RichContentEditor',
-  'jsx/shared/conditional_release/ConditionalRelease',
-  'compiled/util/deparam',
-  'compiled/util/SisValidationHelper',
-  'jsx/blueprint_courses/apps/LockManager',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* time_field, datetime_field */,
-  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */,
-  'jquery.instructure_misc_plugins' /* .dim, confirmDelete, showIf */,
-  'jquery.keycodes' /* keycodes */,
-  'jquery.loadingImg' /* loadingImage */,
-  'compiled/jquery.rails_flash_notifications',
-  'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'supercalc' /* superCalc */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'jqueryui/sortable' /* /\.sortable/ */,
-  'jqueryui/tabs' /* /\.tabs/ */
-], function (regradeTemplate, I18n, _, $, calcCmd, htmlEscape, pluralize,
-            Handlebars, DueDateOverrideView, Quiz,
-            DueDateList, QuizRegradeView, SectionList,
-            MissingDateDialog,MultipleChoiceToggle,EditorToggle,TextHelper,
-            RCEKeyboardShortcuts, INST, QuizFormulaSolution, addAriaDescription,
-            RichContentEditor, ConditionalRelease, deparam, SisValidationHelper, LockManager) {
-  var lockManager = new LockManager()
-  lockManager.init({ itemType: 'quiz', page: 'edit' })
+import regradeTemplate from 'jst/quiz/regrade'
+import I18n from 'i18n!quizzes'
+import _ from 'underscore'
+import $ from 'jquery'
+import calcCmd from './calcCmd'
+import htmlEscape from './str/htmlEscape'
+import pluralize from './str/pluralize'
+import Handlebars from 'compiled/handlebars_helpers'
+import DueDateOverrideView from 'compiled/views/assignments/DueDateOverride'
+import Quiz from 'compiled/models/Quiz'
+import DueDateList from 'compiled/models/DueDateList'
+import QuizRegradeView from 'compiled/views/quizzes/QuizRegradeView'
+import SectionList from 'compiled/collections/SectionCollection'
+import MissingDateDialog from 'compiled/views/calendar/MissingDateDialogView'
+import MultipleChoiceToggle from 'compiled/editor/MultipleChoiceToggle'
+import EditorToggle from 'compiled/editor/EditorToggle'
+import TextHelper from 'compiled/str/TextHelper'
+import RCEKeyboardShortcuts from 'compiled/views/editor/KeyboardShortcuts'
+import INST from './INST' // safari sniffing for VO workarounds
+import QuizFormulaSolution from './quiz_formula_solution'
+import addAriaDescription from './quiz_labels'
+import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import ConditionalRelease from 'jsx/shared/conditional_release/ConditionalRelease'
+import deparam from 'compiled/util/deparam'
+import SisValidationHelper from 'compiled/util/SisValidationHelper'
+import LockManager from 'jsx/blueprint_courses/apps/LockManager'
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time' /* time_field, datetime_field */
+import './jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */
+import './jquery.instructure_misc_plugins' /* .dim, confirmDelete, showIf */
+import './jquery.keycodes'
+import './jquery.loadingImg'
+import 'compiled/jquery.rails_flash_notifications'
+import './jquery.templateData'
+import './supercalc'
+import './vendor/jquery.scrollTo'
+import 'jqueryui/sortable'
+import 'jqueryui/tabs'
 
-  var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
-      scoreValidation;
+var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility, scoreValidation;
 
-  const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
+var lockManager = new LockManager()
+lockManager.init({ itemType: 'quiz', page: 'edit' })
+const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
 
 
   RichContentEditor.preloadRemoteModule();
@@ -171,7 +163,7 @@ define([
     }
   }
 
-  function isChangeMultiFuncBound ($questionContent) {
+  export function isChangeMultiFuncBound ($questionContent) {
     var ret = false;
     var events = $._data($questionContent[0], 'events');
     if (events && events.change) {
@@ -230,8 +222,7 @@ define([
   // TODO: refactor this... it's not going to be horrible, but it will
   // take a little bit of work.  I just wrapped it in a closure for now
   // to not pollute the global namespace, but it could use more.
-  var quiz = window.quiz = {};
-  quiz = {
+  export const quiz = window.quiz = {
     uniqueLocalIDStore: {},
 
     // Should cache any elements used throughout the object here
@@ -4292,8 +4283,3 @@ define([
     }).triggerHandler('change');
   });
 
-  return {
-    quiz: quiz,
-    isChangeMultiFuncBound: isChangeMultiFuncBound
-  }
-});

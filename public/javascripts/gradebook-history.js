@@ -16,13 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!gradebook',
-  'jquery' /* $ */,
-  'jsx/gradebook/shared/helpers/GradeFormatHelper',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* datetimeString */
-], function (I18n, $, GradeFormatHelper) {
+import I18n from 'i18n!gradebook'
+import $ from 'jquery'
+import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time'  /* datetimeString */
+
   function announceUpdatedCurrentGrade (currentGrade) {
     var noGrade = '--';
     var flashMessage;
@@ -96,5 +95,4 @@ define([
     }
   };
 
-  return GradebookHistory;
-});
+  export default GradebookHistory;

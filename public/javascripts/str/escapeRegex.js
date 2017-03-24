@@ -16,9 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(function() {
-  return function(string) {
-    return string.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-  }
-});
-
+export default function escapeRegex(string) {
+  return string.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}

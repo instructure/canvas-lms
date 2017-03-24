@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -16,10 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([], function() {
-
-  return {
-    fetchContent: function($section, section_type, name){
+export function fetchContent ($section, section_type, name){
       var data = {}
       if(section_type == "rich_text") {
         data[name + '[section_type]'] = "rich_text";
@@ -37,6 +35,3 @@ define([], function() {
       }
       return data
     }
-  }
-
-})

@@ -16,24 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!account_settings',
-  'jquery', // $
-  'tinymce.config',
-  'global_announcements',
-  'jquery.ajaxJSON', // ajaxJSON
-  'jquery.instructure_date_and_time', // date_field, time_field, datetime_field, /\$\.datetime/
-  'jquery.instructure_forms', // formSubmit, getFormData, validateForm
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers', // replaceTags
-  'jquery.instructure_misc_plugins', // confirmDelete, showIf, /\.log/
-  'jquery.loadingImg', // loadingImg, loadingImage
-  'vendor/date', // Date.parse
-  'vendor/jquery.scrollTo', // /\.scrollTo/
-  'jqueryui/tabs' // /\.tabs/
-], function(I18n, $, EditorConfig, globalAnnouncements) {
+import I18n from 'i18n!account_settings'
+import $ from 'jquery'
+import EditorConfig from './tinymce.config'
+import globalAnnouncements from './global_announcements'
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time' // date_field, time_field, datetime_field, /\$\.datetime/
+import './jquery.instructure_forms' // formSubmit, getFormData, validateForm
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_helpers' // replaceTags
+import './jquery.instructure_misc_plugins' // confirmDelete, showIf, /\.log/
+import './jquery.loadingImg'
+import './vendor/date' // Date.parse
+import './vendor/jquery.scrollTo'
+import 'jqueryui/tabs'
 
-  function openReportDescriptionLink (event) {
+  export function openReportDescriptionLink (event) {
     event.preventDefault();
     var title = $(this).parents('.title').find('span.title').text();
     var $desc = $(this).parent('.reports').find('.report_description');
@@ -43,7 +41,7 @@ define([
     });
   }
 
-  function addUsersLink (event) {
+  export function addUsersLink (event) {
     event.preventDefault();
     var $enroll_users_form = $('#enroll_users_form');
     $(this).hide();
@@ -326,10 +324,3 @@ define([
       $('#global_includes_warning_message_wrapper').toggleClass('alert', this.checked);
     }).trigger('change');
   });
-
-  return {
-    addUsersLink: addUsersLink,
-    openReportDescriptionLink: openReportDescriptionLink
-  }
-
-});

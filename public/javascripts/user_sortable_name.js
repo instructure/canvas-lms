@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import userUtils from 'user_utils'
+import {firstNameFirst, lastNameFirst, nameParts} from './user_utils'
 
 $(function () {
   var $short_name = $('input[name="user[short_name]"]')
@@ -29,10 +29,10 @@ $(function () {
   $name.keyup(function() {
     var name = $name.attr('value');
     var sortable_name = $sortable_name.attr('value');
-    var sortable_name_parts = userUtils.nameParts(sortable_name);
-    if (jQuery.trim(sortable_name) === '' || userUtils.firstNameFirst(sortable_name_parts) === jQuery.trim(prior_name)) {
-      var parts = userUtils.nameParts(name, sortable_name_parts[1]);
-      $sortable_name.attr('value', userUtils.lastNameFirst(parts));
+    var sortable_name_parts = nameParts(sortable_name);
+    if (jQuery.trim(sortable_name) === '' || firstNameFirst(sortable_name_parts) === $.trim(prior_name)) {
+      var parts = nameParts(name, sortable_name_parts[1]);
+      $sortable_name.attr('value', lastNameFirst(parts));
     }
     var short_name = $short_name.attr('value');
     if (jQuery.trim(short_name) === '' || short_name === prior_name) {
