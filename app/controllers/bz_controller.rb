@@ -223,96 +223,139 @@ class BzController < ApplicationController
     course.enrollments.each do |enrollment|
       u = User.find(enrollment.user_id)
       item = {}
-      item["Name"] = u.name
-      item["Email"] = u.email
+      item["braven-id"] = u.id
 
-      # TODO: loop over users and save the linkedIn data per user
-
-      Rails.logger.debug("### user_services = #{u.user_services.inspect}")
       u.user_services.select{|s| !UserService.configured_service?(s.service) || feature_and_service_enabled?(s.service) }.each do |service|
         if service.service == "linked_in"
           Rails.logger.debug("### Found registered LinkedIn service for #{u.name}: #{service.service_user_link}")
-          item["LinkedIn URL"] = service.service_user_link
 
           # See: https://developer.linkedin.com/docs/fields/full-profile
+          request = connection.get_request("/v1/people/~:(id,first-name,last-name,maiden-name,email-address,location,industry,num-connections,num-connections-capped,summary,specialties,public-profile-url,last-modified-timestamp,associations,interests,publications,patents,languages,skills,certifications,educations,courses,volunteer,three-current-positions,three-past-positions,num-recommenders,recommendations-received,following,job-bookmarks,honors-awards)?format=json", service.token)
 
-          request = connection.get_request("/v1/people/~:(first-name,last-name,summary)?format=json", service.token)
+          # TODO: The 'suggestions' field was causing this error, so we're not fetching it:
+          # {"errorCode"=>0, "message"=>"Internal API server error", "requestId"=>"Y4175L15PK", "status"=>500, "timestamp"=>1490298963387}
+          # Also, I decided not to fetch picture-urls::(original)
 
           info = JSON.parse(request.body)
 
-          item["First Name"] = info["firstName"]
-          item["Last Name"] = info["lastName"]
+          Rails.logger.debug("### info = #{info.inspect}")
 
+          result = LinkedinExport.where(:user_id => u.id)
+          linkedin_data = nil
+          if result.empty?
+            linkedin_data = LinkedinExport.new()
+            linkedin_data.user_id = u.id
+          else
+            linkedin_data = result.first
+          end
 
-          #create a table that only stores the most up to date snapshot.  so, a column for each target field
-          # follow the pattern that the registration uses.  e.g.:
-          #   app/views/profile/profile.html.erb: oauth_url(:service => "linked_in", :return_to => settings_profile_url)
-          #   app/controllers/users_controller.rb: def outh ... calls linkedin_connection.request_token(oauth_success_url(:service => 'linked_in'))
-          #   which then calls  def oauth_success ...  linkedin_connection.get_service_user_info(access_token)
-          # Proposal: create new method called linkedin_connection.get_service_user_data(access_token) which does the data export.
-          # Fields to pull:
-          # BASIC PROFILE
-          # id
-          # first-name
-          # last-name
-          # maiden-name
-          # location
-          # industry
-          # current-share*
-          # num-connections
-          # num-connections-capped
-          # summary
-          # specialties
-          # picture-urls::(original)*
-          # public-profile-url
-          # email-address
-          #
-          # FULL PROFILE
-          # last-modified-timestamp
-          # associations
-          # interests
-          # publications (all fields)*
-          # patents (all fields)*
-          # languages (all fields)
-          # skills (all fields)
-          # certifications (all fields)
-          # educations (all fields)
-          # courses (all fields)
-          # volunteer (all fields)
-          # three-current-positions
-          # three-past-positions
-          # num-recommenders
-          # recommendations-received (all fields)*
-          # following
-          # job-bookmarks
-          # suggestions
-          # honors-awards
+          linkedin_data.linkedin_id = item["id"] = info["id"]
+          linkedin_data.first_name = item["first-name"] = info["firstName"]
+          linkedin_data.last_name = item["last-name"] = info["lastName"]
+          linkedin_data.maiden_name = item["maiden-name"] = info["maidenName"]
+          linkedin_data.email_address = item["email-address"] = info["emailAddress"]
+          linkedin_data.location = item["location"] = info["location"]
+          linkedin_data.industry = item["industry"] = info["industry"]
+          linkedin_data.num_connections = item["num-connections"] = info["numConnections"]
+          linkedin_data.num_connections_capped = item["num-connections-capped"] = info["numConnectionsCapped"]
+          linkedin_data.summary = item["summary"] = info["summary"]
+          linkedin_data.specialties = item["specialties"] = info["specialties"]
+          linkedin_data.public_profile_url = item["public-profile-url"] = info["publicProfileUrl"]
+          linkedin_data.last_modified_timestamp = item["last-modified-timestamp"] = Time.strptime(info["lastModifiedTimestamp"].to_s, '%Q')
+          linkedin_data.associations = item["associations"] = info["associations"]
+          linkedin_data.interests = item["interests"] = info["interests"]
+          linkedin_data.publications = item["publications"] = info["publications"]
+          linkedin_data.patents = item["patents"] = info["patents"]
+          linkedin_data.languages = item["languages"] = info["languages"]
+          linkedin_data.skills = item["skills"] = info["skills"]
+          linkedin_data.certifications = item["certifications"] = info["certifications"]
+          linkedin_data.educations = item["educations"] = info["educations"]
+          linkedin_data.courses = item["courses"] = info["courses"]
+          linkedin_data.volunteer = item["volunteer"] = info["volunteer"]
+          linkedin_data.three_current_positions = item["three-current-positions"] = info["threeCurrentPositions"]
+          linkedin_data.three_past_positions = item["three-past-positions"] = info["threePastPositions"]
+          linkedin_data.num_recommenders = item["num-recommenders"] = info["numRecommenders"]
+          linkedin_data.recommendations_received = item["recommendations-received"] = info["recommendationsReceived"]
+          linkedin_data.following = item["following"] = info["following"]
+          linkedin_data.job_bookmarks = item["job-bookmarks"] = info["jobBookmarks"]
+          linkedin_data.honors_awards = item["honors-awards"] = info["honorsAwards"]
+
+          items.push(item)
+          linkedin_data.save
 
         else
           Rails.logger.debug("### LinkedIn service not registered for #{u.name}")
         end
       end
-      items.push(item)
     end
 
     csv_result = CSV.generate do |csv|
       header = []
-      header << "Name"
-      header << "Email"
-      header << "LinkedIn URL"
-      header << "First"
-      header << "Last"
+      header << "braven-id"
+      header << "id"
+      header << "first-name"
+      header << "last-name"
+      header << "maiden-name"
+      header << "email-address"
+      header << "location"
+      header << "industry"
+      header << "num-connections"
+      header << "num-connections-capped"
+      header << "summary"
+      header << "specialties"
+      header << "public-profile-url"
+      header << "last-modified-timestamp"
+      header << "associations"
+      header << "interests"
+      header << "publications"
+      header << "patents"
+      header << "languages"
+      header << "skills"
+      header << "certifications"
+      header << "educations"
+      header << "courses"
+      header << "volunteer"
+      header << "three-current-positions"
+      header << "three-past-positions"
+      header << "num-recommenders"
+      header << "recommendations-received"
+      header << "following"
+      header << "job-bookmarks"
+      header << "honors-awards"
       csv << header
       items.each do |item|
         row = []
-        row << item["Name"]
-        row << item["Email"]
-        row << item["LinkedIn URL"]
-        row << item["First Name"]
-        row << item["Last Name"]
-    #    all_fields.each do |k, v|
-    #      row << item[v]
-    #    end
+        row << item["braven-id"]
+        row << item["id"]
+        row << item["first-name"]
+        row << item["last-name"]
+        row << item["maiden-name"]
+        row << item["email-address"]
+        row << item["location"]
+        row << item["industry"]
+        row << item["num-connections"]
+        row << item["num-connections-capped"]
+        row << item["summary"]
+        row << item["specialties"]
+        row << item["public-profile-url"]
+        row << item["last-modified-timestamp"]
+        row << item["associations"]
+        row << item["interests"]
+        row << item["publications"]
+        row << item["patents"]
+        row << item["languages"]
+        row << item["skills"]
+        row << item["certifications"]
+        row << item["educations"]
+        row << item["courses"]
+        row << item["volunteer"]
+        row << item["three-current-positions"]
+        row << item["three-past-positions"]
+        row << item["num-recommenders"]
+        row << item["recommendations-received"]
+        row << item["following"]
+        row << item["job-bookmarks"]
+        row << item["honors-awards"]
         csv << row
       end
     end
