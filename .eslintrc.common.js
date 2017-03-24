@@ -5,10 +5,12 @@
 
 module.exports = {
   globals: {
-    "ENV": true
+    ENV: true,
+    INST: true,
   },
   plugins: [
-    "promise"
+    "promise",
+    "import"
   ],
   // 0 - off, 1 - warning, 2 - error
   rules: {
