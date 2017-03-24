@@ -118,7 +118,7 @@ describe "courses" do
         get "/courses/#{@course.id}"
         f(".wizard_popup_link").click()
         expect(f(".ic-wizard-box")).to be_displayed
-        wait_for_ajaximations(500)
+        wait_for_ajaximations
       end
 
       def check_if_item_complete(item)
