@@ -1876,6 +1876,109 @@ test('includes props for the "Sort by" setting', function () {
   equal(typeof props.sortBySetting.onSortByGradeAscending, 'function', 'props include "onSortByGradeAscending"');
 });
 
+QUnit.module('Gradebook#getTotalGradeColumnSortBySetting', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.setAssignmentsLoaded(true);
+    this.gradebook.setStudentsLoaded(true);
+    this.gradebook.setSubmissionsLoaded(true);
+  }
+});
+
+test('includes the sort direction', function () {
+  this.gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending');
+  const props = this.gradebook.getTotalGradeColumnSortBySetting();
+  equal(props.direction, 'ascending');
+});
+
+test('is not disabled when assignments, students, and submissions are loaded', function () {
+  const props = this.gradebook.getTotalGradeColumnSortBySetting();
+  equal(props.disabled, false);
+});
+
+test('is disabled when assignments are not loaded', function () {
+  this.gradebook.setAssignmentsLoaded(false);
+  const props = this.gradebook.getTotalGradeColumnSortBySetting();
+  equal(props.disabled, true);
+});
+
+test('is disabled when students are not loaded', function () {
+  this.gradebook.setStudentsLoaded(false);
+  const props = this.gradebook.getTotalGradeColumnSortBySetting();
+  equal(props.disabled, true);
+});
+
+test('is disabled when submissions are not loaded', function () {
+  this.gradebook.setSubmissionsLoaded(false);
+  const props = this.gradebook.getTotalGradeColumnSortBySetting();
+  equal(props.disabled, true);
+});
+
+test('sets isSortColumn to true when sorting by the total grade', function () {
+  this.gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending');
+  const props = this.gradebook.getTotalGradeColumnSortBySetting();
+  equal(props.isSortColumn, true);
+});
+
+test('sets isSortColumn to false when not sorting by the total grade', function () {
+  this.gradebook.setSortRowsBySetting('student', 'grade', 'ascending');
+  const props = this.gradebook.getTotalGradeColumnSortBySetting();
+  equal(props.isSortColumn, false);
+});
+
+test('sets the onSortByGradeAscending function', function () {
+  this.stub(this.gradebook, 'setSortRowsBySetting');
+  const props = this.gradebook.getTotalGradeColumnSortBySetting();
+
+  props.onSortByGradeAscending();
+  equal(this.gradebook.setSortRowsBySetting.callCount, 1);
+
+  const [columnId, settingKey, direction] = this.gradebook.setSortRowsBySetting.getCall(0).args;
+  equal(columnId, 'total_grade', 'parameter 1 is the sort columnId');
+  equal(settingKey, 'grade', 'parameter 2 is the sort settingKey');
+  equal(direction, 'ascending', 'parameter 3 is the sort direction');
+});
+
+test('sets the onSortByGradeDescending function', function () {
+  this.stub(this.gradebook, 'setSortRowsBySetting');
+  const props = this.gradebook.getTotalGradeColumnSortBySetting();
+
+  props.onSortByGradeDescending();
+  equal(this.gradebook.setSortRowsBySetting.callCount, 1);
+
+  const [columnId, settingKey, direction] = this.gradebook.setSortRowsBySetting.getCall(0).args;
+  equal(columnId, 'total_grade', 'parameter 1 is the sort columnId');
+  equal(settingKey, 'grade', 'parameter 2 is the sort settingKey');
+  equal(direction, 'descending', 'parameter 3 is the sort direction');
+});
+
+test('includes the sort settingKey', function () {
+  this.gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending');
+  const props = this.gradebook.getTotalGradeColumnSortBySetting();
+  equal(props.settingKey, 'grade');
+});
+
+QUnit.module('Gradebook#getTotalGradeColumnHeaderProps', {
+  createGradebook (options = {}) {
+    const gradebook = createGradebook({
+      group_weighting_scheme: 'percent',
+      ...options
+    });
+    gradebook.setAssignmentGroups({
+      301: { name: 'Assignments', group_weight: 40 },
+      302: { name: 'Homework', group_weight: 60 }
+    });
+    return gradebook;
+  }
+});
+
+test('includes props for the "Sort by" setting', function () {
+  const props = this.createGradebook().getTotalGradeColumnHeaderProps('301');
+  ok(props.sortBySetting, 'Sort by setting is present');
+  equal(typeof props.sortBySetting.disabled, 'boolean', 'props include "disabled"');
+  equal(typeof props.sortBySetting.onSortByGradeAscending, 'function', 'props include "onSortByGradeAscending"');
+});
+
 QUnit.module('Gradebook#setStudentDisplay', {
   createGradebook (multipleSections = false) {
     const options = {};

@@ -1751,10 +1751,35 @@ define [
 
     # Total Grade Column Header
 
+    getTotalGradeColumnSortBySetting: (assignmentId) =>
+      columnId = 'total_grade'
+      gradeSortDataLoaded =
+        @contentLoadStates.assignmentsLoaded and
+        @contentLoadStates.studentsLoaded and
+        @contentLoadStates.submissionsLoaded
+      sortRowsBySetting = @getSortRowsBySetting()
+
+      {
+        direction: sortRowsBySetting.direction
+        disabled: !gradeSortDataLoaded
+        isSortColumn: sortRowsBySetting.columnId == columnId
+        onSortByGradeAscending: () =>
+          @setSortRowsBySetting(columnId, 'grade', 'ascending')
+        onSortByGradeDescending: () =>
+          @setSortRowsBySetting(columnId, 'grade', 'descending')
+        settingKey: sortRowsBySetting.settingKey
+      }
+
+    getTotalGradeColumnHeaderProps: ->
+      {
+        sortBySetting: @getTotalGradeColumnSortBySetting()
+      }
+
     renderTotalGradeColumnHeader: =>
       return if @hideAggregateColumns()
       mountPoint = @getColumnHeaderNode('total_grade')
-      renderComponent(TotalGradeColumnHeader, mountPoint)
+      props = @getTotalGradeColumnHeaderProps()
+      renderComponent(TotalGradeColumnHeader, mountPoint, props)
 
     # Assignment Column Header
 
