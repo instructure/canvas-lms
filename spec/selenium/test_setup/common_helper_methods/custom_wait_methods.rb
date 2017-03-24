@@ -40,11 +40,20 @@ module CustomWaitMethods
       } else {
         var fallbackCallback = window.setTimeout(function() {
           callback(-2);
-        }, #{SeleniumDriverSetup::SCRIPT_TIMEOUT * 1000 - 500});
+        }, #{SeleniumDriverSetup.timeouts[:script] * 1000 - 500});
         $(document).bind('ajaxStop.canvasTestAjaxWait', function() {
-          $(document).unbind('ajaxStop.canvasTestAjaxWait');
-          window.clearTimeout(fallbackCallback);
-          callback(0);
+          // while there are no outstanding requests, a new one could be
+          // chained immediately afterwards in this thread of execution,
+          // e.g. $.get(url).then(() => $.get(otherUrl))
+          //
+          // so wait a tick just to be sure we're done
+          setTimeout(function() {
+            if ($.active == 0) {
+              $(document).unbind('ajaxStop.canvasTestAjaxWait');
+              window.clearTimeout(fallbackCallback);
+              callback(0);
+            }
+          }, 0);
         });
       }
     JS

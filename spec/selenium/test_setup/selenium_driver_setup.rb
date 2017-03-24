@@ -19,8 +19,24 @@ module SeleniumDriverSetup
   CONFIG = ConfigFile.load("selenium") || {}.freeze
   SECONDS_UNTIL_GIVING_UP = 10
   MAX_SERVER_START_TIME = 5
-  IMPLICIT_WAIT_TIMEOUT = 5
-  SCRIPT_TIMEOUT = 5
+
+  TIMEOUTS = {
+    # nothing should wait by default
+    implicit_wait: 0,
+    # except finding elements
+    finder: 5,
+    script: 5
+  }.freeze
+
+  # If you have some really slow UI, you can temporarily override
+  # the various TIMEOUTs above. use this sparingly -- fix the UI
+  # instead :P
+  def with_timeouts(timeouts)
+    SeleniumDriverSetup.set_timeouts(timeouts)
+    yield
+  ensure
+    SeleniumDriverSetup.set_timeouts(TIMEOUTS.slice(*timeouts.keys))
+  end
 
   def driver
     SeleniumDriverSetup.driver
@@ -110,13 +126,29 @@ module SeleniumDriverSetup
 
       focus_viewport if run_headless?
 
-      @driver.manage.timeouts.implicit_wait = 0 # nothing should wait by default
-      SeleniumExtensions::FinderWaiting.timeout = IMPLICIT_WAIT_TIMEOUT # except finding elements
-      @driver.manage.timeouts.script_timeout = SCRIPT_TIMEOUT
+      set_timeouts(TIMEOUTS)
 
       puts "Browser: #{browser_name} - #{browser_version}"
 
       @driver
+    end
+
+    def timeouts
+      @timeouts ||= {}
+    end
+
+    def set_timeouts(timeouts)
+      self.timeouts.merge!(timeouts)
+      timeouts.each do |key, value|
+        case key
+        when :implicit_wait
+          @driver.manage.timeouts.implicit_wait = value
+        when :finder
+          SeleniumExtensions::FinderWaiting.timeout = value
+        when :script
+          @driver.manage.timeouts.script_timeout = value
+        end
+      end
     end
 
     def webdriver_failure_proc
