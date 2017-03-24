@@ -316,7 +316,6 @@ module QuizzesCommon
 
   def answer_question(question_answer_id)
     fj("input[type=radio][value=#{question_answer_id}]").click
-    wait_for_js
   end
 
   def take_quiz
@@ -408,12 +407,10 @@ module QuizzesCommon
      case quiz.stored_questions[o][:question_type]
      when "multiple_choice_question"
        fj("input[type=radio][name= 'question_#{question}']").click
-       wait_for_js
      when "essay_question"
        type_in_tiny ".question:visible textarea[name = 'question_#{question}']", 'This is an essay question.'
      when "numerical_question"
        fj("input[type=text][name= 'question_#{question}']").send_keys('10')
-       wait_for_js
      end
     end
 

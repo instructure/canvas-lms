@@ -140,12 +140,10 @@ describe "context modules" do
       f('.add_completion_criterion_link').click
       wait_for_animations
       fj(".assignment_picker:visible option[value='#{content_tag_1.id}']").click
-      wait_for_js # the action above might be changing the element underneath between finding and clicking
       fj('.assignment_requirement_picker:visible option[value="min_score"]').click
       expect(f("body")).to contain_jqcss(".points_possible_parent:visible")
 
       fj(".assignment_picker:visible option[value='#{content_tag_2.id}']").click
-      wait_for_js # the action above might be changing the element underneath between finding and clicking
       fj('.assignment_requirement_picker:visible option[value="min_score"]').click
       expect(f("body")).not_to contain_jqcss(".points_possible_parent:visible")
     end

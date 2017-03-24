@@ -1,16 +1,4 @@
 module CustomWaitMethods
-  ##
-  # waits for JavaScript to evaluate, occasionally when you click an element
-  # a bunch of JS needs to run, this basically puts the rest of your test later
-  # in the JS thread
-  def wait_for_js
-    driver.execute_script <<-JS
-      window.selenium_wait_for_js = false;
-      setTimeout(function() { window.selenium_wait_for_js = true; });
-    JS
-    keep_trying_until { driver.execute_script('return window.selenium_wait_for_js') == true }
-  end
-
   def wait_for_dom_ready
     result = driver.execute_async_script(<<-JS)
       var callback = arguments[arguments.length - 1];
@@ -60,7 +48,6 @@ module CustomWaitMethods
     if result == -2
       raise "Timed out waiting for ajax requests to finish. (This might mean there was a js error in an ajax callback.)"
     end
-    wait_for_js
     result
   end
 
@@ -80,7 +67,6 @@ module CustomWaitMethods
         }
       }
     JS
-    wait_for_js
   end
 
   def wait_for_ajaximations

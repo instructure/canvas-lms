@@ -67,14 +67,12 @@ describe "quiz taking" do
     # answer just one question
     question = @quiz.stored_questions[0][:id]
     fj("input[type=radio][name= 'question_#{question}']").click
-    wait_for_js
     f('#submit_quiz_button').click
     # expect alert prompt to show, dismiss and answer the remaining questions
     expect(driver.switch_to.alert.text).to be_present
     dismiss_alert
     question = @quiz.stored_questions[1][:id]
     fj("input[type=radio][name= 'question_#{question}']").click
-    wait_for_js
     expect_new_page_load { f('#submit_quiz_button').click }
     expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
   end
