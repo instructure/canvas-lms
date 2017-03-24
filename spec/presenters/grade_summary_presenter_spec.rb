@@ -18,7 +18,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe GradeSummaryPresenter do
-  describe '#selectable_courses' do
+  describe '#courses_with_grades' do
 
     describe 'all on one shard' do
       let(:course) { Course.create! }
@@ -33,7 +33,7 @@ describe GradeSummaryPresenter do
       end
 
       it 'includes courses where the user is enrolled' do
-        expect(presenter.selectable_courses).to include(course)
+        expect(presenter.courses_with_grades).to include(course)
       end
     end
 
@@ -52,7 +52,7 @@ describe GradeSummaryPresenter do
         end
 
         presenter = GradeSummaryPresenter.new(course, user, user.id)
-        expect(presenter.selectable_courses).to include(course)
+        expect(presenter.courses_with_grades).to include(course)
       end
 
       it 'can find courses when the user and course are on different shards' do
@@ -70,7 +70,23 @@ describe GradeSummaryPresenter do
         end
 
         presenter = GradeSummaryPresenter.new(course, user, user.id)
-        expect(presenter.selectable_courses).to include(course)
+        expect(presenter.courses_with_grades).to include(course)
+      end
+
+      it 'can find courses for an observer across shards' do
+        course_with_student(:active_all => true)
+        @observer = user_factory(:active_all => true)
+        @course.observer_enrollments.create!(:user_id => @observer, :associated_user_id => @student)
+
+        @shard1.activate do
+          account = Account.create!
+          @course2 = account.courses.create!(:workflow_state => "available")
+          enrollment = StudentEnrollment.create!(:course => @course2, :user => @student, :workflow_state => 'active')
+          @course2.observer_enrollments.create!(:user_id => @observer, :associated_user_id => @student)
+        end
+
+        presenter = GradeSummaryPresenter.new(@course, @observer, @student.id)
+        expect(presenter.courses_with_grades).to match_array([@course, @course2])
       end
     end
   end

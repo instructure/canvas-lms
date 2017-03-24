@@ -980,10 +980,6 @@ class User < ActiveRecord::Base
     self.courses
   end
 
-  def courses_with_grades
-    @courses_with_grades ||= self.available_courses.shard(self).select{|c| c.grants_right?(self, :participate_as_student)}
-  end
-
   def check_courses_right?(user, sought_right)
     # Look through the currently enrolled courses first.  This should
     # catch most of the calls.  If none of the current courses grant

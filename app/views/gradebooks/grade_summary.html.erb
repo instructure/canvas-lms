@@ -108,15 +108,8 @@
     <div id="course-selector-dropdown" style="margin-left: 10px; float: left;" class="course_selector">
     <label for="course_url"><%= t(:for_course, "For the course") %></label>
     <select id="course_url">
-      <% @presenter.selectable_courses.each do |course| %>
-        <%
-           url = if course.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
-             context_url(course, :context_student_grades_url, @presenter.student_id)
-           else
-             context_url(course, :context_grades_url)
-           end
-        %>
-        <option value="<%= url %>" <%= 'selected' if course == @context %>><%= course.nickname_for(@current_user) %></option>
+      <% @presenter.courses_with_grades.each do |course| %>
+        <option value="<%= context_url(course, :context_grades_url) %>" <%= 'selected' if course == @context %>><%= course.nickname_for(@current_user) %></option>
       <% end %>
     </select>
     </div>
