@@ -102,11 +102,10 @@ define([
         var $option = $("<div class='option minimal' style='cursor: pointer; padding: 2px 5px; overflow: hidden; white-space: nowrap;'>" +
                         "  <span tabindex='-1'>" + optionHtml + "</span>" +
                         "</div>").appendTo($list);
-
+        function unhoverOtherOptions () {
+          $option.parent().find("div.option").removeClass('ui-state-hover ui-state-active').addClass('minimal');
+        }
         if($.isFunction(callback)) {
-          function unhoverOtherOptions(){
-            $option.parent().find("div.option").removeClass('ui-state-hover ui-state-active').addClass('minimal');
-          }
           $option.addClass('ui-state-default').bind({
             mouseenter: function() {
               unhoverOtherOptions();

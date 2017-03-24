@@ -2981,7 +2981,7 @@ define([
           error_text = I18n.t('errors.no_correct_answer', "Please choose a correct answer");
         }
       } else if (questionData.question_type == "fill_in_multiple_blanks_question" || questionData.question_type == "short_answer_question") {
-        function checkForNotBlanks(elements) {
+        var checkForNotBlanks = function (elements) {
           return elements.filter(function(i,element) {
             return !!element.value;
           }).length;

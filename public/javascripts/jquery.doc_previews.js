@@ -119,7 +119,7 @@ define([
         });
       } else if (!INST.disableGooglePreviews && (!opts.mimeType || $.isPreviewable(opts.mimeType, 'google')) && opts.attachment_id || opts.public_url){
         // else if it's something google docs preview can handle and we can get a public url to this document.
-        function loadGooglePreview(){
+        var loadGooglePreview = function () {
           // this handles both ssl and plain http.
           var googleDocPreviewUrl = '//docs.google.com/viewer?' + $.param({
             embedded: true,

@@ -569,7 +569,7 @@ define([
         // show the div that contains the button because it is hidden from browsers that dont support speech
       $(".speech_recognition_link").closest('div.speech-recognition').show();
 
-      function processSpeech($this){
+      var processSpeech = function ($this){
         if ($('#record_button').attr("recording") == "true"){
           recognition.stop();
           var current_comment = $('#final_results').html() + $('#interim_results').html()
@@ -582,11 +582,11 @@ define([
         }
       }
 
-      function formatComment(current_comment){
+      var formatComment = function (current_comment){
         return current_comment.replace(/<p><\/p>/g, '\n\n').replace(/<br>/g, '\n');
       }
 
-      function configureRecognition(recognition){
+      var configureRecognition = function (recognition){
         recognition.continuous = true;
         recognition.interimResults = true;
         var final_transcript = '';
@@ -1787,14 +1787,14 @@ define([
 
       if (scores.length) { //if there are some submissions that have been graded.
         $average_score_wrapper.show();
-        function avg(arr) {
+        var avg = function (arr) {
           var sum = 0;
           for (var i = 0, j = arr.length; i < j; i++) {
             sum += arr[i];
           }
           return sum / arr.length;
         }
-        function roundWithPrecision(number, precision) {
+        var roundWithPrecision = function (number, precision) {
           precision = Math.abs(parseInt(precision, 10)) || 0;
           var coefficient = Math.pow(10, precision);
           return Math.round(number*coefficient)/coefficient;

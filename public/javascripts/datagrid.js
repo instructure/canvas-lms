@@ -168,7 +168,7 @@ define([
                 $topRow = $datagrid_top.find('.row'),
                 $all_rows = $topRow.add('#datagrid_data .row');
 
-            function fixForDifferentZoomLevelInFirefox(){
+            var fixForDifferentZoomLevelInFirefox = function () {
               var existingDatagridTopWidth = $datagrid_top.width();
 
               // make styles so the .row can be as wide as it needs to fit all the .cell's in it without wrapping

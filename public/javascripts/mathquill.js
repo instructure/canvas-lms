@@ -422,11 +422,11 @@ define([
         .prepend('<span class="selectable">$'+htmlEscape(root.latex())+'$</span>');
       textarea.blur(function() {
         cursor.clearSelection();
-        setTimeout(detach); //detaching during blur explodes in WebKit
+        setTimeout(function detach() {
+          textareaSpan.detach();
+        }); //detaching during blur explodes in WebKit
       });
-      function detach() {
-        textareaSpan.detach();
-      }
+
       return;
     }
 

@@ -862,7 +862,7 @@ define(['jquery'], function ($) {
             };
             this.clearTableBody = function (table) {
                 if ($.browser.msie) {
-                    function empty() {
+                    var empty = function () {
                         while (this.firstChild)
                         this.removeChild(this.firstChild);
                     }

@@ -563,12 +563,12 @@ define([
         for(var jdx in value) {
           fileList.push(value);
         }
-        function finishedFiles() {
+        var finishedFiles = function () {
           body += "--" + innerBoundary + "--\r\n" +
                   "--" + boundary + "\r\n";
           nextParam();
         }
-        function nextFile() {
+        var nextFile = function () {
           if(fileList.length === 0) {
             finishedFiles();
             return;

@@ -260,7 +260,7 @@ define([
                 $img.css('cursor', 'pointer');
                 var img = new Image();
                 img.src = val;
-                function checkCompletion() {
+                var checkCompletion = function () {
                   if(img.complete) {
                     if(img.height < 100 || (img.height > 100 && img.height < 200)) {
                       $img.height(img.height);
