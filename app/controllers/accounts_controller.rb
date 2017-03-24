@@ -433,6 +433,20 @@ class AccountsController < ApplicationController
       includes = Array(params[:includes]) || []
       unauthorized = false
 
+      if params[:account].key?(:sis_account_id)
+        sis_id = params[:account].delete(:sis_account_id)
+        if @account.root_account.grants_right?(@current_user, session, :manage_sis) && !@account.root_account?
+          @account.sis_source_id = sis_id.presence
+        else
+          if @account.root_account?
+            @account.errors.add(:unauthorized, t('Cannot set sis_account_id on a root_account.'))
+          else
+            @account.errors.add(:unauthorized, t('To change sis_account_id the user must have manage_sis permission.'))
+          end
+          unauthorized = true
+        end
+      end
+
       if params[:account][:services]
         if authorized_action(@account, @current_user, :manage_account_settings)
           params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user, @account).keys).each do |key, value|
@@ -516,6 +530,10 @@ class AccountsController < ApplicationController
   #
   # @argument account[name] [String]
   #   Updates the account name
+  #
+  # @argument account[sis_account_id] [String]
+  #   Updates the account sis_account_id
+  #   Must have manage_sis permission and must not be a root_account.
   #
   # @argument account[default_time_zone] [String]
   #   The default time zone of the account. Allowed time zones are

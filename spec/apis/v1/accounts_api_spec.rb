@@ -337,6 +337,23 @@ describe "Accounts API", type: :request do
       expect(Account.find(@a1.id).service_enabled?(:avatars)).to be_truthy
     end
 
+    it "should update sis_id" do
+      json = api_call(:put, "/api/v1/accounts/#{@a2.id}",
+        { controller: 'accounts', action: 'update', id: @a2.to_param, format: 'json' },
+        { account: {sis_account_id: 'subsis'}})
+
+      expect(json['sis_account_id']).to eq 'subsis'
+      expect(Account.find(@a2.id).sis_source_id).to eq 'subsis'
+    end
+
+    it "should not update sis_id for root_accounts" do
+      json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+        { controller: 'accounts', action: 'update', id: @a1.to_param, format: 'json' },
+        { account: {sis_account_id: 'subsis'}}, {}, expected_status: 401)
+      expect(json["errors"]["unauthorized"].first["message"]).to eq 'Cannot set sis_account_id on a root_account.'
+      expect(Account.find(@a1.id).sis_source_id).to be_nil
+    end
+
     # These following tests focus on testing the sis_assignment_name_length_input account setting
     # through the API. This setting is used to enforce assignment name length for assignments.
     # Valid values for this setting are integers/strings between 0-255. If a value is set greater
