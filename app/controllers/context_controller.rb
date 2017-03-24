@@ -321,7 +321,7 @@ class ContextController < ApplicationController
       end
       user_id = Shard.relative_id_for(params[:id], Shard.current, @context.shard)
       if @context.is_a?(Course)
-        scope = @context.enrollments.where(user_id: user_id)
+        scope = @context.enrollments_visible_to(@current_user).where(user_id: user_id)
         scope = @context.grants_right?(@current_user, session, :read_as_admin) ? scope.active : scope.active_or_pending
         @membership = scope.first
 
@@ -341,7 +341,7 @@ class ContextController < ApplicationController
         return
       end
 
-      @enrollments = @context.enrollments.for_user(@user) rescue []
+      @enrollments = @context.enrollments_visible_to(@current_user).for_user(@user) rescue []
 
       if @domain_root_account.enable_profiles?
         @user_data = profile_data(
