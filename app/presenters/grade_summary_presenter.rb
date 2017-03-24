@@ -171,12 +171,12 @@ class GradeSummaryPresenter
   end
 
   def sort_options
-    options = [["Due Date", "due_at"], ["Title", "title"]]
+    options = [[I18n.t('Due Date'), 'due_at'], [I18n.t('Title'), 'title']]
     if @context.active_record_types[:assignments] && assignments.uniq(&:assignment_group_id).length > 1
-      options << ["Assignment Group", "assignment_group"]
+      options << [I18n.t('Assignment Group'), 'assignment_group']
     end
-    options << ["Module", "module"] if @context.active_record_types[:modules]
-    options.map { |option| [I18n.t('%{option_name}', option_name: option.first), option.last] }.sort_by(&:first)
+    options << [I18n.t('Module'), 'module'] if @context.active_record_types[:modules]
+    Canvas::ICU.collate_by(options, &:first)
   end
 
   def submissions

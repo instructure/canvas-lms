@@ -247,6 +247,25 @@ describe GradeSummaryPresenter do
       @course.context_modules.create!(name: "I <3 Modules")
       expect(presenter.sort_options).to include module_option
     end
+
+    it 'localizes menu text' do
+      @course.assignments.create!(title: 'Math Assignment')
+      science_group = @course.assignment_groups.create!(name: 'Science Assignments')
+      @course.assignments.create!(title: 'Science Assignment', assignment_group: science_group)
+      @course.context_modules.create!(name: 'I <3 Modules')
+
+      expect(I18n).to receive(:t).with('Due Date')
+      expect(I18n).to receive(:t).with('Title')
+      expect(I18n).to receive(:t).with('Assignment Group')
+      expect(I18n).to receive(:t).with('Module')
+
+      presenter.sort_options
+    end
+
+    it 'sorts menu items in a locale-aware way' do
+      expect(Canvas::ICU).to receive(:collate_by).with([['Due Date', 'due_at'], ['Title', 'title']], &:first)
+      presenter.sort_options
+    end
   end
 
   describe '#sorted_assignments' do
