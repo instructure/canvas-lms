@@ -37,6 +37,22 @@ describe "page views" do
     expect(pv.action).to eq 'add_entry'
   end
 
+  it "should record get request for api request" do
+    course_with_teacher(active_all: 1, user: user_with_pseudonym)
+    @topic = @course.discussion_topics.create!
+    get "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries", access_token: @user.access_tokens.create!.full_token
+    pv = PageView.last
+    expect(pv.http_method).to eq 'get'
+  end
+
+  it "should not record gets for api request when setting disabled" do
+    Setting.set('create_get_api_page_views', 'false')
+    course_with_teacher(active_all: 1, user: user_with_pseudonym)
+    @topic = @course.discussion_topics.create!
+    PageView.any_instance.expects(:store).never
+    get "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries", access_token: @user.access_tokens.create!.full_token
+  end
+
   it "records the developer key when an access token was used" do
     user_with_pseudonym(active_all: 1)
     course_with_teacher(active_all: 1, user: @user)
