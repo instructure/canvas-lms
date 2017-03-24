@@ -423,6 +423,7 @@ class SubmissionsApiController < ApplicationController
 
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
       Submission.bulk_load_versioned_attachments(submissions)
+      Version.preload_version_number(submissions)
       result = submissions.select{ |s|
         assignment_visibilities.fetch(s.assignment_id, []).include?(s.user_id) || can_view_all
       }.map { |s|
@@ -701,6 +702,7 @@ class SubmissionsApiController < ApplicationController
       json = submission_json(@submission, @assignment, @current_user, session, @context, includes)
 
       includes.delete("submission_comments")
+      Version.preload_version_number(@submissions)
       json[:all_submissions] = @submissions.map { |submission|
 
         if visiblity_included
@@ -943,6 +945,7 @@ class SubmissionsApiController < ApplicationController
     attachments = submissions.flat_map &:versioned_attachments
     ActiveRecord::Associations::Preloader.new.preload(attachments,
       [:canvadoc, :crocodoc_document])
+    Version.preload_version_number(submissions)
   end
 
   def bulk_process_submissions_for_visibility(submissions_scope, includes)
