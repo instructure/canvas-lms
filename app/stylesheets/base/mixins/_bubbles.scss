@@ -10,11 +10,15 @@
     vertical-align: middle;
     display: inline-block;
   }
-  a {
+  a, button {
     color: $ic-font-color-dark;
     padding-right: $contentBoxPadding;
     cursor: pointer;
-    vertical-align: middle;
+    background-color: transparent;
+    border: 1px solid transparent;
+    &:hover {
+      border: 1px solid $ic-font-color-dark;
+    }
   }
   white-space: nowrap;
   float: left;
