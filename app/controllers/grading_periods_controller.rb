@@ -252,7 +252,7 @@ class GradingPeriodsController < ApplicationController
       # skip not_overlapping model validation in model level
       first_period.skip_not_overlapping_validator
       second_period.skip_not_overlapping_validator
-      if second_period.start_date < first_period.end_date
+      if second_period.start_date.change(sec: 0) < first_period.end_date.change(sec: 0)
         second_period.errors.add(:start_date, 'Start Date overlaps with another period')
       end
     end

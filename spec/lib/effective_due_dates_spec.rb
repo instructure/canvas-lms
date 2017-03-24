@@ -22,7 +22,7 @@ describe Course do
 
   describe '#to_hash' do
     before(:once) do
-      @now = Time.zone.now
+      @now = Time.zone.now.change(sec: 0)
       @student1_enrollment = student_in_course(course: @test_course, active_all: true)
       @student1 = @student1_enrollment.user
       @student2 = student_in_course(course: @test_course, active_all: true).user
@@ -252,7 +252,6 @@ describe Course do
 
     context 'when only visible to overrides' do
       before(:once) do
-        @now = Time.zone.now
         @assignment1.only_visible_to_overrides = true
         @assignment1.save!
       end
@@ -957,6 +956,25 @@ describe Course do
           expect(result).to eq expected
         end
 
+        it 'truncates seconds when comparing override due dates to grading period dates' do
+          end_date = 15.days.ago(@now)
+          grading_period = Factories::GradingPeriodHelper.new.create_for_group(
+            @gp_group,
+            start_date: 20.days.ago(@now),
+            end_date: end_date,
+            close_date: 10.days.ago(@now)
+          )
+          override = @assignment2.assignment_overrides.create!(
+            due_at: 59.seconds.from_now(end_date),
+            due_at_overridden: true
+          )
+          override.assignment_override_students.create!(user: @student3)
+
+          effective_due_dates = EffectiveDueDates.for_course(@test_course, @assignment2).to_hash
+          submission_grading_period_id = effective_due_dates[@assignment2.id][@student3.id][:grading_period_id]
+          expect(submission_grading_period_id).to eq grading_period.id
+        end
+
         it 'ignores soft-deleted grading period groups' do
           Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
             start_date: 20.days.ago(@now),
@@ -1290,7 +1308,7 @@ describe Course do
 
   context 'grading periods' do
     before(:once) do
-      @now = Time.zone.now
+      @now = Time.zone.now.change(sec: 0)
       @test_course = Course.create!
       @student1 = student_in_course(course: @test_course, active_all: true).user
       @student2 = student_in_course(course: @test_course, active_all: true).user

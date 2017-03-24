@@ -73,7 +73,7 @@ require(["jsx/speed_grader/gradingPeriod"], ({
   });
 
   test("assignmentClosedForStudent", () => {
-    const dueAt = closedGradingPeriod.start_date + 1;
+    const dueAt = new Date(1999, 3, 1).toISOString();
     ok(!assignmentClosedForStudent(student, {
       due_at: dueAt,
       gradingPeriods: gradingPeriods,

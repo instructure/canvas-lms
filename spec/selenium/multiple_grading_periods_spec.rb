@@ -25,6 +25,7 @@ describe "interaction with grading periods" do
 
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
   let(:get_gradebook) { get "/courses/#{@course.id}/gradebook" }
+  let(:now) { Time.zone.now }
 
   context "gradebook" do
     before :once do
@@ -116,18 +117,18 @@ describe "interaction with grading periods" do
       let!(:course_grading_period_current) do
         grading_period_group.grading_periods.create!(
           title: 'Course Grading Period 1',
-          start_date: Time.zone.now,
-          end_date: 4.weeks.from_now
+          start_date: 1.day.ago(now),
+          end_date: 4.weeks.from_now(now)
         )
       end
       let!(:course_grading_period_past) do
         grading_period_group.grading_periods.create!(
           title: 'Course Grading Period 2',
-          start_date: 4.weeks.ago,
-          end_date: 1.day.ago
+          start_date: 4.weeks.ago(now),
+          end_date: 1.day.ago(now)
         )
       end
-      let!(:assignment) { test_course.assignments.create!(title: 'Assignment 1', due_at: 1.day.ago, points_possible: 10) }
+      let!(:assignment) { test_course.assignments.create!(title: 'Assignment 1', due_at: 1.day.ago(now), points_possible: 10) }
 
       it 'should list an assignment from a previous grading period', priority: "2", test_course: 381145 do
         user_session(teacher)
@@ -136,7 +137,7 @@ describe "interaction with grading periods" do
       end
 
       it 'should list an assignment from a current grading period when due date is updated', priority: "2", test_course: 576764 do
-        assignment.update_attributes(due_at: 3.days.from_now)
+        assignment.update_attributes(due_at: 3.days.from_now(now))
         user_session(teacher)
         get "/courses/#{test_course.id}/assignments"
         expect(fj("#assignment_#{assignment.id} a.ig-title")).to include_text('Assignment 1')
@@ -155,19 +156,19 @@ describe "interaction with grading periods" do
     let!(:course_grading_period_1) do
       grading_period_group.grading_periods.create!(
         title: 'Course Grading Period 1',
-        start_date: Time.zone.now,
-        end_date: 3.weeks.from_now
+        start_date: 1.day.ago(now),
+        end_date: 3.weeks.from_now(now)
       )
     end
     let!(:course_grading_period_2) do
       grading_period_group.grading_periods.create!(
         title: 'Course Grading Period 2',
-        start_date: 4.weeks.from_now,
-        end_date: 7.weeks.from_now
+        start_date: 4.weeks.from_now(now),
+        end_date: 7.weeks.from_now(now)
       )
     end
-    let!(:assignment1) { test_course.assignments.create!(title: 'Assignment 1', due_at: 3.days.from_now, points_possible: 10) }
-    let!(:assignment2) { test_course.assignments.create!(title: 'Assignment 2', due_at: 6.weeks.from_now, points_possible: 10) }
+    let!(:assignment1) { test_course.assignments.create!(title: 'Assignment 1', due_at: 3.days.from_now(now), points_possible: 10) }
+    let!(:assignment2) { test_course.assignments.create!(title: 'Assignment 2', due_at: 6.weeks.from_now(now), points_possible: 10) }
     let!(:grade_assignment1) { assignment1.grade_student(student, grade: 8, grader: teacher) }
 
     before(:each) do

@@ -164,7 +164,7 @@ class EffectiveDueDates
           os.user_id AS student_id,
           o.assignment_id,
           o.id AS override_id,
-          o.due_at,
+          date_trunc('minute', o.due_at) AS due_at,
           o.set_type AS override_type,
           1 AS priority
         FROM
@@ -180,7 +180,7 @@ class EffectiveDueDates
           gm.user_id AS student_id,
           o.assignment_id,
           o.id AS override_id,
-          o.due_at,
+          date_trunc('minute', o.due_at) AS due_at,
           o.set_type AS override_type,
           1 AS priority
         FROM
@@ -199,7 +199,7 @@ class EffectiveDueDates
           e.user_id AS student_id,
           o.assignment_id,
           o.id AS override_id,
-          o.due_at,
+          date_trunc('minute', o.due_at) AS due_at,
           o.set_type AS override_type,
           1 AS priority
         FROM
@@ -220,7 +220,7 @@ class EffectiveDueDates
           student.id AS student_id,
           a.id as assignment_id,
           NULL::integer AS override_id,
-          a.due_at,
+          date_trunc('minute', a.due_at) AS due_at,
           'Everyone Else'::varchar AS override_type,
           2 AS priority
         FROM
@@ -276,7 +276,10 @@ class EffectiveDueDates
       -- legacy course periods and newer account-level periods
       course_and_account_grading_periods AS (
           SELECT DISTINCT ON (gp.id)
-            gp.*,
+            gp.id,
+            date_trunc('minute', gp.start_date) AS start_date,
+            date_trunc('minute', gp.end_date) AS end_date,
+            date_trunc('minute', gp.close_date) AS close_date,
             gpg.course_id,
             gpg.account_id
           FROM
