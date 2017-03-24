@@ -8,7 +8,8 @@ define [
   FinalGradeGradesComponent = Ember.Component.extend
 
     percent: (->
-      @get("student.total_percent")
+      percent = @get("student.total_percent")
+      I18n.n(percent, percentage: true)
     ).property('student.total_percent','student')
 
     pointRatioDisplay:(->
@@ -20,7 +21,8 @@ define [
     ).property("weighted_grades", "student.total_grade.score", "student.total_grade.possible")
 
     letterGrade:(->
-      GradingSchemeHelper.scoreToGrade(@get('percent'), @get('gradingStandard'))
+      percent = @get("student.total_percent")
+      GradingSchemeHelper.scoreToGrade(percent, @get('gradingStandard'))
     ).property('gradingStandard', 'percent')
 
     showGrade: Ember.computed.bool('student.total_grade.possible')

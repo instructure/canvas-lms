@@ -480,7 +480,7 @@ define [
 
   asyncTest 'calculates final grade', ->
     workAroundRaceCondition().then =>
-      equal @srgb.get('students.firstObject.total_percent'), '79.55%'
+      equal @srgb.get('students.firstObject.total_percent'), 79.55
       start()
 
   QUnit.module 'grade calc with 0s',
@@ -489,7 +489,7 @@ define [
 
   asyncTest 'calculates final grade', ->
     workAroundRaceCondition().then =>
-      equal @srgb.get('students.firstObject.total_percent'), '0%'
+      equal @srgb.get('students.firstObject.total_percent'), 0
       start()
 
   QUnit.module 'screenreader_gradebook_controller: calculate',
