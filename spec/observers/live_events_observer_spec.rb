@@ -105,21 +105,46 @@ describe LiveEventsObserver do
   end
 
   describe "group" do
-    it "posts create events for groups, group_categories, and group_memberships" do
-      course_model
-      student1 = @course.enroll_student(user_model).user
-      student2 = @course.enroll_student(user_model).user
-
+    it "posts create events for group_categories" do
+      course = course_model
       Canvas::LiveEvents.expects(:group_category_created).once
-      category = @course.group_categories.create!(name: "project A", create_group_count: 2)
+      course.group_categories.create!(name: "project A", create_group_count: 2)
+    end
 
+    it "posts create events for groups" do
+      course = course_model
       Canvas::LiveEvents.expects(:group_created).twice
-      group1 = category.groups.create!(name: "Group 1", context: @course)
-      group2 = category.groups.create!(name: "Group 2", context: @course)
+      course.groups.create!(name: "Group 1")
+      course.groups.create!(name: "Group 2")
+    end
 
+    it "posts update events for groups" do
+      course = course_model
+      group = course.groups.create!(name: "Group 1")
+      Canvas::LiveEvents.expects(:group_updated).once
+      group.name = "New Group Name"
+      group.save
+    end
+
+    it "posts create events for group_memberships" do
+      course = course_model
+      student1 = course.enroll_student(user_model).user
+      student2 = course.enroll_student(user_model).user
+      group1 = course.groups.create!(name: "Group 1")
+      group2 = course.groups.create!(name: "Group 2")
       Canvas::LiveEvents.expects(:group_membership_created).twice
       group1.add_user(student1)
       group2.add_user(student2)
+    end
+
+    it "posts update events for group_memberships" do
+      course = course_model
+      student = course.enroll_student(user_model).user
+      group = course.groups.create!(name: "Group 1")
+      membership = group.add_user(student, 'invited')
+      Canvas::LiveEvents.expects(:group_membership_updated).once
+      membership.accept
+      membership.save
     end
   end
 

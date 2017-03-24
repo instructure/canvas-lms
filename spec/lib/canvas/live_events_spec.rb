@@ -25,6 +25,85 @@ describe Canvas::LiveEvents do
     expect(LiveEvents).to receive(:post_event).with(event_name, event_body, anything, event_context)
   end
 
+  describe ".enrollment_updated" do
+    it "should not include associated_user_id for non-observer enrollments" do
+      enrollment = course_with_student
+      expect_event('enrollment_updated', hash_excluding(:associated_user_id))
+      Canvas::LiveEvents.enrollment_updated(enrollment)
+    end
+
+    it "should include nil associated_user_id for unassigned observer enrollment" do
+      enrollment = course_with_observer
+      expect_event('enrollment_updated',
+        hash_including(
+          associated_user_id: nil
+        ))
+      Canvas::LiveEvents.enrollment_updated(enrollment)
+    end
+
+    it "should include non-nil associated_user_id for assigned observer enrollment" do
+      observee = user_model
+      enrollment = course_with_observer
+      enrollment.associated_user = observee
+      expect_event('enrollment_updated',
+        hash_including(
+          associated_user_id: observee.global_id.to_s
+        ))
+      Canvas::LiveEvents.enrollment_updated(enrollment)
+    end
+  end
+
+  describe ".group_updated" do
+    it "should include the context" do
+      course = course_model
+      group = group_model(context: course)
+      expect_event('group_updated',
+        hash_including(
+          group_id: group.global_id.to_s,
+          context_type: 'Course',
+          context_id: course.global_id.to_s
+        ))
+      Canvas::LiveEvents.group_updated(group)
+    end
+
+    it "should include the account" do
+      account = account_model
+      course = course_model(account: account)
+      group = group_model(context: course)
+      expect_event('group_updated',
+        hash_including(
+          group_id: group.global_id.to_s,
+          account_id: account.global_id.to_s
+        ))
+      Canvas::LiveEvents.group_updated(group)
+    end
+
+    it "should include the workflow_state" do
+      group = group_model
+      expect_event('group_updated',
+        hash_including(
+          group_id: group.global_id.to_s,
+          workflow_state: group.workflow_state
+        ))
+      Canvas::LiveEvents.group_updated(group)
+    end
+  end
+
+  describe ".group_membership_updated" do
+    it "should include the workflow_state" do
+      user = user_model
+      group = group_model
+      membership = group_membership_model(group: group, user: user)
+
+      expect_event('group_membership_updated',
+        hash_including(
+          group_membership_id: membership.global_id.to_s,
+          workflow_state: membership.workflow_state
+        ))
+      Canvas::LiveEvents.group_membership_updated(membership)
+    end
+  end
+
   describe ".wiki_page_updated" do
     before(:each) do
       course_with_teacher

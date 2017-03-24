@@ -78,15 +78,24 @@ module Canvas::LiveEvents
     })
   end
 
-  def self.group_membership_created(membership)
-    post_event_stringified('group_membership_created', {
+  def self.get_group_membership_data(membership)
+    {
       group_membership_id: membership.global_id,
       user_id: membership.global_user_id,
       group_id: membership.global_group_id,
       group_name: membership.group.name,
       group_category_id: membership.group.global_group_category_id,
-      group_category_name: membership.group.group_category.try(:name)
-    })
+      group_category_name: membership.group.group_category.try(:name),
+      workflow_state: membership.workflow_state
+    }
+  end
+
+  def self.group_membership_created(membership)
+    post_event_stringified('group_membership_created', get_group_membership_data(membership))
+  end
+
+  def self.group_membership_updated(membership)
+    post_event_stringified('group_membership_updated', get_group_membership_data(membership))
   end
 
   def self.group_category_created(group_category)
@@ -96,13 +105,25 @@ module Canvas::LiveEvents
     })
   end
 
-  def self.group_created(group)
-    post_event_stringified('group_created', {
+  def self.get_group_data(group)
+    {
       group_category_id: group.global_group_category_id,
       group_category_name: group.group_category.try(:name),
       group_id: group.global_id,
-      group_name: group.name
-    })
+      group_name: group.name,
+      context_type: group.context_type,
+      context_id: group.global_context_id,
+      account_id: group.global_account_id,
+      workflow_state: group.workflow_state
+    }
+  end
+
+  def self.group_created(group)
+    post_event_stringified('group_created', get_group_data(group))
+  end
+
+  def self.group_updated(group)
+    post_event_stringified('group_updated', get_group_data(group))
   end
 
   def self.get_assignment_data(assignment)
@@ -194,8 +215,7 @@ module Canvas::LiveEvents
   end
 
   def self.get_enrollment_data(enrollment)
-    {
-
+    data = {
       enrollment_id: enrollment.global_id,
       course_id: enrollment.global_course_id,
       user_id: enrollment.global_user_id,
@@ -207,6 +227,8 @@ module Canvas::LiveEvents
       course_section_id: enrollment.global_course_section_id,
       workflow_state: enrollment.workflow_state
     }
+    data[:associated_user_id] = enrollment.global_associated_user_id if enrollment.observer?
+    data
   end
 
   def self.enrollment_created(enrollment)
