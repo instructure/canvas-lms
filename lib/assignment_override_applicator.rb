@@ -81,6 +81,7 @@ module AssignmentOverrideApplicator
   def self.overrides_for_assignment_and_user(assignment_or_quiz, user)
     cache_key = [user, assignment_or_quiz, 'overrides'].cache_key
     Rails.cache.delete(cache_key) if assignment_or_quiz.reload_overrides_cache?
+    RequestCache.cache("overrides_for_assignment_and_user", cache_key) do
     Rails.cache.fetch(cache_key) do
       next [] if self.has_invalid_args?(assignment_or_quiz, user)
       context = assignment_or_quiz.context
@@ -135,6 +136,7 @@ module AssignmentOverrideApplicator
       end
 
       overrides.compact.select(&:active?)
+    end
     end
   end
 

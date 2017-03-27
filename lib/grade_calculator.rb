@@ -31,6 +31,7 @@ class GradeCalculator
     Rails.logger.info("GRADES: calc args: opts=#{opts.inspect}")
 
     @course = course.is_a?(Course) ? course : Course.find(course)
+
     @groups = @course.assignment_groups.active
     @grading_period = opts[:grading_period]
     # if we're updating an overall course score (no grading period specified), we
@@ -39,7 +40,8 @@ class GradeCalculator
     # if we're updating a grading period score, we also need to update the
     # overall course score
     @update_course_score = @grading_period.present? && opts[:update_course_score]
-    @assignments = @course.assignments.published.gradeable.to_a
+    @assignments = opts[:assignments] || @course.assignments.published.gradeable.to_a
+
     @user_ids = Array(user_ids).map { |id| Shard.relative_id_for(id, Shard.current, @course.shard) }
     @current_updates = {}
     @final_updates = {}
@@ -80,8 +82,10 @@ class GradeCalculator
   end
 
   def compute_and_save_scores
-    calculate_grading_period_scores if @update_all_grading_period_scores
-    compute_scores
+    RequestCache.enable do
+      calculate_grading_period_scores if @update_all_grading_period_scores
+      compute_scores
+    end
     save_scores
     calculate_course_score if @update_course_score
   end
@@ -195,6 +199,10 @@ class GradeCalculator
   end
 
   def calculate_grading_period_scores
+    @course.preload_user_roles!
+    ActiveRecord::Associations::Preloader.new.preload(@assignments, [:assignment_overrides, :context])
+    @assignments.select{ |a| a.assignment_overrides.size == 0 }.each { |a| a.has_no_overrides = true }
+
     grading_periods_for_course.each do |grading_period|
       # update this grading period score, and do not
       # update any other scores (grading period or course)
@@ -204,7 +212,8 @@ class GradeCalculator
         @course,
         update_all_grading_period_scores: false,
         update_course_score: false,
-        grading_period: grading_period
+        grading_period: grading_period,
+        assignments: @assignments
       ).compute_and_save_scores
     end
 
