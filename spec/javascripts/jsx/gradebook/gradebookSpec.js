@@ -75,4 +75,13 @@ define(['compiled/gradebook/Gradebook',
     ok(groupTotalOutput.includes('9 / 0'));
     ok(groupTotalOutput.includes('-'));
   });
+
+  QUnit.module('Gradebook#getFrozenColumnCount');
+
+  test('returns number of columns in frozen section', function () {
+    const gradebook = new Gradebook({ settings: {}, sections: {} });
+    gradebook.parentColumns = [{ id: 'student' }, { id: 'secondary_identifier' }];
+    gradebook.customColumns = [{ id: 'custom_col_1' }];
+    equal(gradebook.getFrozenColumnCount(), 3);
+  });
 });

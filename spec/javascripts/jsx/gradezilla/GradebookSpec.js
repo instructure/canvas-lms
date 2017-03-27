@@ -2118,3 +2118,12 @@ test('sorts the grid rows after updating the setting', function () {
   });
   gradebook.setSortRowsBySetting('assignment_201', 'grade', 'descending');
 });
+
+QUnit.module('Gradebook#getFrozenColumnCount');
+
+test('returns number of columns in frozen section', function () {
+  const gradebook = createGradebook();
+  gradebook.parentColumns = [{ id: 'student' }, { id: 'secondary_identifier' }];
+  gradebook.customColumns = [{ id: 'custom_col_1' }];
+  equal(gradebook.getFrozenColumnCount(), 3);
+});
