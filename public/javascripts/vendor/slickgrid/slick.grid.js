@@ -2587,7 +2587,7 @@ if (typeof Slick === "undefined") {
       if (rowsCache[row]) {
         var $cell = $(getCellNode(row, cell));
 
-        function toggleCellClass(times) {
+        var toggleCellClass = function (times) {
           if (!times) {
             return;
           }
