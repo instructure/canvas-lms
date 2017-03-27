@@ -23,6 +23,10 @@ class Assignment::FilterWithOverridesByDueAtForStudent
     @assignments = assignments
     @grading_period = grading_period
     @student = student
+
+    if AssignmentOverrideApplicator.should_preload_override_students?(@assignments, @student, "filter_with_overrides")
+      AssignmentOverrideApplicator.preload_assignment_override_students(@assignments, @student)
+    end
   end
 
   private
