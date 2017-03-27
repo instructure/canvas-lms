@@ -270,7 +270,51 @@ module Lti
         end
       end
 
-      context "SUBMISSION_CREATED" do
+      context "SUBMISSION_UPDATED" do
+        let(:subscription) do
+          {
+            RootAccountId: account.id,
+            EventTypes:["submission_updated"],
+            ContextType: "account",
+            ContextId: account.id,
+            Format: "live-event",
+            TransportType: "sqs",
+            TransportMetadata: { Url: "http://sqs.docker"},
+            UserId: "2"
+          }
+        end
+        let(:tool_proxy) do
+          Lti::ToolProxy.create!(
+            context: account,
+            guid: SecureRandom.uuid,
+            shared_secret: 'abc',
+            product_family: product_family,
+            product_version: '1',
+            workflow_state: 'active',
+            raw_data: {'enabled_capability' => ['vnd.instructure.webhooks.root_account.submission_updated']},
+            lti_version: '1'
+          )
+        end
+
+        it 'allows subscription if vnd.instructure.webhooks.root_account.submission_updated' do
+          validator = SubscriptionsValidator.new(subscription, tool_proxy)
+          expect { validator.check_required_capabilities! }.not_to raise_error
+        end
+
+        it 'allows subscription if vnd.instructure.webhooks.assignment.submission_updated' do
+          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.submission_updated)
+          validator = SubscriptionsValidator.new(subscription, tool_proxy)
+          expect { validator.check_required_capabilities! }.not_to raise_error
+        end
+
+        it 'raises MissingCapability if missing capaiblities' do
+          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
+          validator = SubscriptionsValidator.new(subscription, tool_proxy)
+          expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
+        end
+      end
+
+      context "PLAGIARISM_RESUBMIT" do
         let(:subscription) do
           {
             RootAccountId: account.id,
