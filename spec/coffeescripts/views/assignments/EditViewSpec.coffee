@@ -32,11 +32,11 @@ define [
 
   s_params = 'some super secure params'
 
-  nameLengthHelper = (view, length, maxNameLengthRequiredForAccount, maxNameLength, postToSis) ->
+  nameLengthHelper = (view, length, maxNameLengthRequiredForAccount, maxNameLength, postToSis, gradingType) ->
     name = 'a'.repeat(length)
     ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = maxNameLengthRequiredForAccount
     ENV.MAX_NAME_LENGTH = maxNameLength
-    return view.validateBeforeSave({name: name, post_to_sis: postToSis}, [])
+    return view.validateBeforeSave({name: name, post_to_sis: postToSis, grading_type: gradingType}, [])
 
   editView = (assignmentOpts = {}) ->
     defaultAssignmentOpts =
@@ -145,31 +145,36 @@ define [
 
   test "has an error when a name has 257 chars", ->
     view = @editView()
-    errors = nameLengthHelper(view, 257, false, 30, '1')
+    errors = nameLengthHelper(view, 257, false, 30, '1', 'points')
     ok errors["name"]
     equal errors["name"].length, 1
     equal errors["name"][0]["message"], "Name is too long, must be under 257 characters"
 
   test "allows assignment to save when a name has 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true", ->
     view = @editView()
-    errors = nameLengthHelper(view, 256, false, 30, '1')
+    errors = nameLengthHelper(view, 256, false, 30, '1', 'points')
+    equal errors.length, 0
+
+  test "allows assignment to save when a name has 15 chars, MAX_NAME_LENGTH is 10 and is required, post_to_sis is true and grading_type is not_graded", ->
+    view = @editView()
+    errors = nameLengthHelper(view, 15, true, 10, '1', 'not_graded')
     equal errors.length, 0
 
   test "has an error when a name has 11 chars, MAX_NAME_LENGTH is 10 and required and post_to_sis is true", ->
     view = @editView()
-    errors = nameLengthHelper(view, 11, true, 10, '1')
+    errors = nameLengthHelper(view, 11, true, 10, '1', 'points')
     ok errors["name"]
     equal errors["name"].length, 1
     equal errors["name"][0]["message"], "Name is too long, must be under 11 characters"
 
   test "allows assignment to save when name has 11 chars, MAX_NAME_LENGTH is 10 and required, but post_to_sis is false", ->
     view = @editView()
-    errors = nameLengthHelper(view, 11, true, 10, '0')
+    errors = nameLengthHelper(view, 11, true, 10, '0', 'points')
     equal errors.length, 0
 
   test "allows assignment to save when name has 10 chars, MAX_NAME_LENGTH is 10 and required, and post_to_sis is true", ->
     view = @editView()
-    errors = nameLengthHelper(view, 10, true, 10, '1')
+    errors = nameLengthHelper(view, 10, true, 10, '1', 'points')
     equal errors.length, 0
 
   test "don't validate name if it is frozen", ->

@@ -2397,7 +2397,7 @@ class Assignment < ActiveRecord::Base
     # to just one single check
     return if self.nil? || self.title.nil?
 
-    if self.title.to_s.length > name_length
+    if self.title.to_s.length > name_length && self.grading_type != 'not_graded'
       errors.add(:title, I18n.t('The title cannot be longer than %{length} characters', length: name_length))
     end
   end

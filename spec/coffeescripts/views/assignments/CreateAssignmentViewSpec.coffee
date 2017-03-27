@@ -366,6 +366,12 @@ define [
     errors = nameLengthHelper(view, 256, false, 30, '1')
     equal errors.length, 0
 
+  test "allows assignment to save when a name has 15 chars, MAX_NAME_LENGTH is 10 and is required, post_to_sis is true and grading_type is not_graded", ->
+    @assignment3.grading_type = 'not_graded'
+    view = createView(@assignment3)
+    errors = nameLengthHelper(view, 15, true, 10, '1')
+    equal errors.length, 0
+
   test "has an error when a name has 11 chars, MAX_NAME_LENGTH is 10 and is required, and post_to_sis is true", ->
     view = createView(@assignment3)
     errors = nameLengthHelper(view, 11, true, 10, '1')

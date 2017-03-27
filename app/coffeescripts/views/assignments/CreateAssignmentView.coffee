@@ -129,7 +129,7 @@ define [
 
       post_to_sis = data.post_to_sis == '1'
       max_name_length = 256
-      if post_to_sis && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT == true
+      if post_to_sis && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT && data.grading_type != 'not_graded'
         max_name_length = ENV.MAX_NAME_LENGTH
 
       validationHelper = new SisValidationHelper({

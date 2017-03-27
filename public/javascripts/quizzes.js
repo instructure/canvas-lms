@@ -1792,9 +1792,10 @@ define([
         $(this).attr('method', 'PUT');
         var quiz_title = $("#quiz_title").val();
         var postToSis = data['quiz[post_to_sis]'] === '1'
+        var vaildQuizType = data['quiz[quiz_type]'] != 'survey' && data['quiz[quiz_type]'] != 'practice_quiz'
         var maxNameLength = 256;
 
-        if (postToSis && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT === true){
+        if (postToSis && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT && vaildQuizType){
           maxNameLength = ENV.MAX_NAME_LENGTH
         }
 
