@@ -85,13 +85,13 @@ define [
     ok @ajaxStub.called
 
   test "initializes sis toggle if post to sis enabled", ->
-    quiz = createQuiz(id: 1, title: 'Foo', can_update: true)
+    quiz = createQuiz(id: 1, title: 'Foo', can_update: true, published: true)
     quiz.set('post_to_sis', true)
     view = createView(quiz, canManage: true)
     ok view.sisButtonView
 
   test "initializes sis toggle if post to sis disabled", ->
-    quiz = createQuiz(id: 1, title: 'Foo', can_update: true)
+    quiz = createQuiz(id: 1, title: 'Foo', can_update: true, published: true)
     quiz.set('post_to_sis', false)
     view = createView(quiz, canManage: true)
     ok view.sisButtonView
@@ -106,6 +106,30 @@ define [
     quiz = createQuiz(id: 1, title: 'Foo', can_update: false)
     quiz.set('post_to_sis', false)
     view = createView(quiz, canManage: false)
+    ok !view.sisButtonView
+
+  test "does not initialize sis toggle if sis enabled, can't manage and is unpublished", ->
+    quiz = createQuiz(id: 1, title: 'Foo', can_update: false, published: false)
+    quiz.set('post_to_sis', true)
+    view = createView(quiz, canManage: false)
+    ok !view.sisButtonView
+
+  test "does not initialize sis toggle if sis disabled, can't manage and is unpublished", ->
+    quiz = createQuiz(id: 1, title: 'Foo', can_update: false, published: false)
+    quiz.set('post_to_sis', false)
+    view = createView(quiz, canManage: false)
+    ok !view.sisButtonView
+
+  test "does not initialize sis toggle if sis enabled, can manage and is unpublished", ->
+    quiz = createQuiz(id: 1, title: 'Foo', can_update: false, published: false)
+    quiz.set('post_to_sis', true)
+    view = createView(quiz, canManage: true)
+    ok !view.sisButtonView
+
+  test "does not initialize sis toggle if sis disabled, can manage and is unpublished", ->
+    quiz = createQuiz(id: 1, title: 'Foo', can_update: false, published: false)
+    quiz.set('post_to_sis', false)
+    view = createView(quiz, canManage: true)
     ok !view.sisButtonView
 
   test 'udpates publish status when model changes', ->

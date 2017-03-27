@@ -92,7 +92,7 @@ define [
           closeTarget: @$el.find('a[id*=manage_link]')
           saveURL: -> "#{ENV.URLS.assignment_sort_base_url}/#{@parentListView.value()}/reorder"
 
-        if @isGraded() && @model.postToSISEnabled()
+        if @isGraded() && @model.postToSISEnabled() && @model.published()
           @sisButtonView = new SisButtonView(model: @model, sisName: @model.postToSISName(), dueDateRequired: @model.dueDateRequiredForAccount())
 
       @dateDueColumnView       = new DateDueColumnView(model: @model)

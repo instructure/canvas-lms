@@ -166,10 +166,12 @@ define [
     ok !view.editAssignmentView
 
   test "initializes sis toggle if post to sis enabled", ->
+    @model.set('published', true)
     view = createView(@model, canManage: true, post_to_sis: true)
     ok view.sisButtonView
 
   test "does not initialize sis toggle if post to sis disabled", ->
+    @model.set('published', true)
     view = createView(@model, canManage: true, post_to_sis: false)
     ok !view.sisButtonView
 
@@ -179,11 +181,33 @@ define [
     ok !view.sisButtonView
 
   test "does not initialize sis toggle if post to sis disabled but can't manage", ->
+    @model.set('published', true)
     view = createView(@model, canManage: false, post_to_sis: false)
     ok !view.sisButtonView
 
   test "does not initialize sis toggle if sis enabled but can't manage", ->
+    @model.set('published', true)
     view = createView(@model, canManage: false, post_to_sis: true)
+    ok !view.sisButtonView
+
+  test "does not initialize sis toggle if post to sis disabled, can't manage and is unpublished", ->
+    @model.set('published', false)
+    view = createView(@model, canManage: false, post_to_sis: false)
+    ok !view.sisButtonView
+
+  test "does not initialize sis toggle if sis enabled, can't manage and is unpublished", ->
+    @model.set('published', false)
+    view = createView(@model, canManage: false, post_to_sis: true)
+    ok !view.sisButtonView
+
+  test "does not initialize sis toggle if post to sis disabled, can manage and is unpublished", ->
+    @model.set('published', false)
+    view = createView(@model, canManage: true, post_to_sis: false)
+    ok !view.sisButtonView
+
+  test "does not initialize sis toggle if sis enabled, can manage and is unpublished", ->
+    @model.set('published', false)
+    view = createView(@model, canManage: true, post_to_sis: true)
     ok !view.sisButtonView
 
   test "upatePublishState toggles ig-published", ->
