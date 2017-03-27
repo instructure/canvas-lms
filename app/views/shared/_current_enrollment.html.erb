@@ -10,7 +10,7 @@
     </div>
   </div>
 <% else %>
-  <% show_link = current_enrollment.course.grants_right?(@current_user, session, :read) %>
+  <% show_link = [:active, :invited, :accepted, :completed].include?(current_enrollment.state_based_on_date) %>
       <% if @show_star_column %>
       <td class="course-list-star-column">
       <% favorite_course = @favorite_course_ids.include?(current_enrollment.course_id) %>
