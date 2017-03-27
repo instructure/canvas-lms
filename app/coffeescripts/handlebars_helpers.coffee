@@ -1,7 +1,7 @@
 define [
   'timezone'
   'compiled/util/enrollmentName'
-  'handlebars'
+  'handlebars/runtime'
   'i18nObj'
   'jquery'
   'underscore'
@@ -16,7 +16,7 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'translations/_core_en'
-], (tz, enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, apiUserContent, textHelper, numberFormat) ->
+], (tz, enrollmentName, {default: Handlebars}, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, apiUserContent, textHelper, numberFormat) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (args..., options) ->

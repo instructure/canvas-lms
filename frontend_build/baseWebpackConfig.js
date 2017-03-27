@@ -87,7 +87,6 @@ module.exports = {
   resolve: {
     alias: {
       d3: 'd3/d3',
-      handlebars: require.resolve('handlebars/dist/handlebars.runtime'),
       'node_modules-version-of-backbone': require.resolve('backbone'),
       'node_modules-version-of-react-modal': require.resolve('react-modal'),
 
@@ -211,10 +210,6 @@ module.exports = {
       {
         test: require.resolve('../public/javascripts/vendor/jquery-1.7.2'),
         loader: 'exports-loader?window.jQuery'
-      },
-      {
-        test: /node_modules\/handlebars\/dist\/handlebars\.runtime/,
-        loader: 'exports-loader?Handlebars'
       },
       {
         test: /vendor\/md5/,

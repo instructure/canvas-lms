@@ -7,8 +7,8 @@
 define [
   'timezone'
   'compiled/util/fcUtil'
-  'handlebars'
-], (tz, fcUtil, Handlebars) ->
+  'handlebars/runtime'
+], (tz, fcUtil, {default: Handlebars}) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
 
