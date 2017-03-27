@@ -1,4 +1,4 @@
-define ['tinymce.editor_box_list'], (EditorBoxList)->
+define ['tinymce.editor_box_list', 'jquery'], (EditorBoxList, $)->
   list = null
   QUnit.module "EditorBoxList",
     setup: ->

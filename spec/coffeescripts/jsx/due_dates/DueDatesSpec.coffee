@@ -1,4 +1,5 @@
 define [
+  'jquery'
   'react'
   'react-dom'
   'react-addons-test-utils'
@@ -8,7 +9,7 @@ define [
   'jsx/due_dates/StudentGroupStore'
   'compiled/models/AssignmentOverride'
   'helpers/fakeENV'
-], (React, ReactDOM, TestUtils, _, DueDates, OverrideStudentStore, StudentGroupStore, AssignmentOverride, fakeENV) ->
+], ($, React, ReactDOM, TestUtils, _, DueDates, OverrideStudentStore, StudentGroupStore, AssignmentOverride, fakeENV) ->
 
   findAllByTag = TestUtils.scryRenderedDOMComponentsWithTag
   findAllByClass = TestUtils.scryRenderedDOMComponentsWithClass

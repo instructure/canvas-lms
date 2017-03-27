@@ -1,4 +1,4 @@
-define(["jquery"], function() {
+define(["jquery"], function($) {
 
   /* Make an html snippet plain text.
    *

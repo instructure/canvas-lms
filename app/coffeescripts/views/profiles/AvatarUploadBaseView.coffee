@@ -1,4 +1,4 @@
-define ['Backbone'], (Backbone) ->
+define ['jquery', 'Backbone'], ($, Backbone) ->
 
   class AvatarUploadBaseView extends Backbone.View
 
