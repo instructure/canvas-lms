@@ -27,7 +27,7 @@ describe "student interactions report" do
         expect(ths[2]).to have_class("header")
         expect(ths[3]).to have_class("header")
         expect(ths[4]).to have_class("header")
-        expect(ths[5]).not_to have_class("header")
+        expect(ths[5]).to have_class("sorter-false")
     end
 
     it "should allow sorting by columns" do
@@ -35,37 +35,37 @@ describe "student interactions report" do
         trs = ff(".report tbody tr")
         ths[0].click
         wait_for_ajaximations
-        expect(ths[0]).to have_class("headerSortDown")
+        expect(ths[0]).to have_class("tablesorter-headerAsc")
         expect(ff(".report tbody tr")).to eq [trs[0], trs[1]]
 
         ths[0].click
         wait_for_ajaximations
-        expect(ths[0]).to have_class("headerSortUp")
+        expect(ths[0]).to have_class("tablesorter-headerDesc")
         expect(ff(".report tbody tr")).to eq [trs[1], trs[0]]
 
         ths[2].click
         wait_for_ajaximations
-        expect(ths[2]).to have_class("headerSortDown")
+        expect(ths[2]).to have_class("tablesorter-headerAsc")
         expect(ff(".report tbody tr")).to eq [trs[0], trs[1]]
 
         ths[2].click
         wait_for_ajaximations
-        expect(ths[2]).to have_class("headerSortUp")
+        expect(ths[2]).to have_class("tablesorter-headerDesc")
         expect(ff(".report tbody tr")).to eq [trs[1], trs[0]]
 
         ths[3].click
         wait_for_ajaximations
-        expect(ths[3]).to have_class("headerSortDown")
+        expect(ths[3]).to have_class("tablesorter-headerAsc")
         expect(ff(".report tbody tr")).to eq [trs[0], trs[1]]
 
         ths[3].click
         wait_for_ajaximations
-        expect(ths[3]).to have_class("headerSortUp")
+        expect(ths[3]).to have_class("tablesorter-headerDesc")
         expect(ff(".report tbody tr")).to eq [trs[1], trs[0]]
 
         ths[5].click
         wait_for_ajaximations
-        expect(ths[5]).not_to have_class("header")
+        expect(ths[5]).to have_class("sorter-false")
     end
   end
 end

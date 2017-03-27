@@ -3968,7 +3968,7 @@ jodid25519@^1.0.0:
   dependencies:
     jsbn "~0.1.0"
 
-jquery@>=1.7.1:
+jquery@>=1.2.6, jquery@>=1.7.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.1.1.tgz#347c1c21c7e004115e0a4da32cece041fad3c8a3"
 
@@ -6821,6 +6821,12 @@ table@^4.0.1:
     lodash "^4.0.0"
     slice-ansi "0.0.4"
     string-width "^2.0.0"
+
+tablesorter@^2.28.5:
+  version "2.28.5"
+  resolved "https://registry.yarnpkg.com/tablesorter/-/tablesorter-2.28.5.tgz#94b6f8326e9ff8b001ae7cf57804476caf8b3437"
+  dependencies:
+    jquery ">=1.2.6"
 
 tapable@^0.1.8, tapable@~0.1.8:
   version "0.1.10"
