@@ -22,7 +22,7 @@ var subject = function(path) {
 describe("I18nliner", function() {
   describe("handlebars", function() {
     it("extracts default translations", function() {
-      expect(subject("test/fixtures/hbs")).toEqual({
+      expect(subject("spec/fixtures/hbs")).toEqual({
         absolute_key: "Absolute key",
         inferred_key_c49e3743: "Inferred key",
         inline_with_absolute_key: "Inline with absolute key",
@@ -39,7 +39,7 @@ describe("I18nliner", function() {
 
   describe("javascript", function() {
     it("extracts default translations", function() {
-      expect(subject("test/fixtures/js")).toEqual({
+      expect(subject("spec/fixtures/js")).toEqual({
         absolute_key: "Absolute key",
         inferred_key_c49e3743: "Inferred key",
         foo: {
