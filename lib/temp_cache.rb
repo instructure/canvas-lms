@@ -2,12 +2,18 @@ class TempCache
   # tl;dr wrap code around an `enable` block
   # and then cache pieces that would otherwise get called over and over again
   def self.enable
-    clear
-    @enabled = true
-    yield
-  ensure
-    @enabled = false
-    clear
+    if @enabled
+      yield
+    else
+      begin
+        clear
+        @enabled = true
+        yield
+      ensure
+        @enabled = false
+        clear
+      end
+    end
   end
 
   def self.clear
