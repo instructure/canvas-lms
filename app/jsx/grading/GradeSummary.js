@@ -39,12 +39,9 @@ define([
   GradeFormatHelper, gradingPeriodSetsApi
 ) => {
   const GradeSummary = {
-    getGradingPeriodIdFromUrl (url) {
-      const matches = url.match(/grading_period_id=(\d*)/);
-      if (matches && matches[1] !== '0') {
-        return matches[1];
-      }
-      return null;
+    getSelectedGradingPeriodId () {
+      const $select = document.querySelector('.grading_periods_selector');
+      return ($select && $select.value !== '0') ? $select.value : null;
     },
 
     getAssignmentId ($assignment) {
@@ -246,7 +243,7 @@ define([
       );
     }
 
-    const selectedGradingPeriodId = GradeSummary.getGradingPeriodIdFromUrl(location.href);
+    const selectedGradingPeriodId = GradeSummary.getSelectedGradingPeriodId();
     if (selectedGradingPeriodId) {
       return grades.gradingPeriods[selectedGradingPeriodId];
     }
