@@ -1,7 +1,6 @@
 requirejs.config({
   map: {
     '*': {
-      'jquery': 'canvas/vendor/jquery-1.7.2',
       'jqueryui': 'canvas/vendor/jqueryui',
     },
 

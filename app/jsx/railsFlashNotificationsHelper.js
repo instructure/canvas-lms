@@ -22,7 +22,7 @@ import _ from 'underscore'
 import preventDefault from 'compiled/fn/preventDefault'
 import htmlEscape from 'str/htmlEscape'
 import 'jqueryui/effects/drop'
-import 'vendor/jquery.cookie'
+import 'jquery.cookie'
 
   class RailsFlashNotificationsHelper {
     constructor() {

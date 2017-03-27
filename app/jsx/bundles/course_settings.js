@@ -24,7 +24,7 @@ import FeatureFlagAdminView from 'compiled/views/feature_flags/FeatureFlagAdminV
 import CourseImageSelector from 'jsx/course_settings/components/CourseImageSelector'
 import configureStore from 'jsx/course_settings/store/configureStore'
 import initialState from 'jsx/course_settings/store/initialState'
-import 'vendor/jquery.cookie'
+import 'jquery.cookie'
 import 'course_settings'
 import 'grading_standards'
 

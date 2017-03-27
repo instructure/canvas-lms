@@ -18,6 +18,7 @@
 
 module.exports = [
   'setWebpackCdnHost',
+  'jquery.instructure_jquery_patches', // this needs to be before anything else that requires jQuery
   'Backbone',
   'compiled/tinymce',
   'classnames',
@@ -41,10 +42,8 @@ module.exports = [
   'vendor/date',
   'vendor/i18n',
   'vendor/i18n_js_extension',
-  'vendor/jquery-1.7.2',
   'vendor/jquery.ba-hashchange',
   'vendor/jquery.ba-tinypubsub',
-  'vendor/jquery.cookie',
   'vendor/jquery.pageless',
   'vendor/jquery.scrollTo',
   'vendor/jqueryui/dialog',

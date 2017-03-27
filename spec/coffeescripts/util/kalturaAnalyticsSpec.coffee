@@ -19,7 +19,7 @@ define [
   'jquery'
   'compiled/util/kalturaAnalytics'
   'vendor/mediaelement-and-player'
-  'vendor/jquery.cookie'
+  'jquery.cookie'
 ], ($, kalturaAnalytics, mejs) ->
   QUnit.module 'kaltura analytics helper',
     setup: ->

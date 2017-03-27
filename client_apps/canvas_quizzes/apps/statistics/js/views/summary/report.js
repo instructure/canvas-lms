@@ -19,7 +19,7 @@
 
 define(function(require) {
   var React = require('../../ext/react');
-  var $ = require('canvas_packages/jquery');
+  var $ = require('jquery');
   var Status = require('jsx!./report/status');
   var Popup = require('jsx!canvas_quizzes/components/popup');
   var ScreenReaderContent = require('jsx!canvas_quizzes/components/screen_reader_content');

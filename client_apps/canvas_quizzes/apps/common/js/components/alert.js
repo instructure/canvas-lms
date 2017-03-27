@@ -20,7 +20,7 @@
 define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var classSet = require('../util/class_set');
-  var $ = require('canvas_packages/jquery');
+  var $ = require('jquery');
 
   // TODO: use $.fn.is(':in_viewport') when it becomes available
   var isInViewport = function(el) {

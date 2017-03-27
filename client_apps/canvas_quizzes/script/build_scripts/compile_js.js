@@ -73,6 +73,7 @@ module.exports = function(onSuccess, onError) {
     // defer the resolution of config files until an app's bundle is loaded:
     'config': 'empty:',
     'app/config/environments/production': 'empty:',
+    'jquery': 'empty:',
   }, devConfig.paths, canvasPackageStubs);
 
   config.onBuildWrite = function(moduleName, modulePath, contents) {

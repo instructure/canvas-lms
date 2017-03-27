@@ -17,7 +17,7 @@
  */
 
 define(function(require) {
-  var $ = require('canvas_packages/jquery');
+  var $ = require('jquery');
 
   // We're already logging errors in config/initializers/rsvp.js
   if(typeof(jasmine) !== "undefined" && typeof(jasmine !== undefined)){

@@ -17,7 +17,7 @@
 
 define [
   'jquery'
-  'vendor/jquery.cookie'
+  'jquery.cookie'
 ], ($) ->
 
   authenticity_token = ->

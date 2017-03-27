@@ -18,7 +18,7 @@
 define [
   'jquery'
   'underscore'
-  'vendor/jquery.cookie'
+  'jquery.cookie'
 ], ($, _) ->
 
   # A class to setup kaltura analytics listeners on a mediaElement player

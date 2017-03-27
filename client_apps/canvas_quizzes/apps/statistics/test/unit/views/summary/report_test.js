@@ -18,7 +18,7 @@
 
 define(function(require) {
   var Subject = require('jsx!views/summary/report');
-  var $ = require('canvas_packages/jquery');
+  var $ = require('jquery');
 
   describe('Views.Summary.Report', function() {
     this.reactSuite({

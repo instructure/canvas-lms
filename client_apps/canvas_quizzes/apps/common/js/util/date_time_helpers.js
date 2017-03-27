@@ -17,7 +17,7 @@
  */
 
 define(function(require) {
-  var $ = require('canvas_packages/jquery');
+  var $ = require('jquery');
   var Void = require('canvas_packages/jquery/instructure_date_and_time');
 
   var exports = {};

@@ -19,15 +19,13 @@
 /* global requirejs: false, jasmine: false */
 requirejs.config({
   map: {
-    'jasmine_react': {
-      'jquery': '../../../vendor/packages/jquery'
-    },
 
     'canvas_quizzes/config': {
       'app': '../js'
     },
 
     '*': {
+      'jquery': 'canvas/symlink_to_node_modules/jquery/jquery',
       'react': '../../../vendor/js/alias_to_old_version_of_react',
       'str': 'canvas/str',
       'node_modules-version-of-backbone': 'canvas/symlink_to_node_modules/backbone/backbone',

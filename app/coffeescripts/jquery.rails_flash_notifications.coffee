@@ -23,7 +23,7 @@ define [
   'str/htmlEscape'
   'jsx/railsFlashNotificationsHelper'
   'jqueryui/effects/drop'
-  'vendor/jquery.cookie'
+  'jquery.cookie'
 ], ($, _, preventDefault, htmlEscape, NotificationsHelper) ->
 
   helper = new NotificationsHelper

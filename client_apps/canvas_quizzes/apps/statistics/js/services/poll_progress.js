@@ -18,7 +18,7 @@
 
 define(function(require) {
   var RSVP = require('rsvp');
-  var $ = require('canvas_packages/jquery');
+  var $ = require('jquery');
   var CoreAdapter = require('canvas_quizzes/core/adapter');
   var K = require('../constants');
   var config = require('../config');

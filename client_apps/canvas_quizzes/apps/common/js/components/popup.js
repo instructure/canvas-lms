@@ -19,7 +19,7 @@
 
 define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var $ = require('canvas_packages/jquery');
+  var $ = require('jquery');
   var _ = require('lodash');
   var jQuery_qTip = require('qtip');
   var ScreenReaderContent = require('jsx!./screen_reader_content');

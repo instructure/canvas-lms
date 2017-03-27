@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([ 'canvas_packages/jquery', 'lodash' ], function($, _) {
+define([ 'jquery', 'lodash' ], function($, _) {
   var extend = _.extend;
 
   /**

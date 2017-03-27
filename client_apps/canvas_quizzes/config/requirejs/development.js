@@ -21,10 +21,6 @@ requirejs.config({
     '*': {
       'underscore': 'lodash',
       'canvas_packages': '../../../vendor/packages',
-    },
-
-    'qtip': {
-      'jquery': '../../../vendor/packages/jquery'
     }
   },
 

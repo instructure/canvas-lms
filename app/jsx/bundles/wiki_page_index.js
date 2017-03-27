@@ -20,7 +20,7 @@ import $ from 'jquery'
 import I18n from 'i18n!pages'
 import WikiPageCollection from 'compiled/collections/WikiPageCollection'
 import WikiPageIndexView from 'compiled/views/wiki/WikiPageIndexView'
-import 'vendor/jquery.cookie'
+import 'jquery.cookie'
 
 const deleted_page_title = $.cookie('deleted_page_title')
 if (deleted_page_title) {

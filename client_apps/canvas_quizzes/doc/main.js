@@ -25,7 +25,7 @@ requirejs.config({
 
 require([ 'config/requirejs/development' ], function() {
   require([
-    'canvas_packages/jquery',
+    'jquery',
     'old_version_of_react_used_by_canvas_quizzes_client_apps',
     'canvas_quizzes/util/inflections',
   ], function($, React, Inflection) {

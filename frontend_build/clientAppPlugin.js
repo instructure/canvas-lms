@@ -35,6 +35,14 @@ class clientAppPlugin {
           if (request === 'lodash') {
             request = 'underscore'
           }
+
+          // Without this, whenever something in canvas_quizzes requires 'jquery' it will get the
+          // jquery 2.0 that is in client_apps/canvas_quizzes/node_modules/jquery (that gets put
+          // there because its a dep of jasmine_react), instead of
+          // the jquery 1.7.2 from canvas' node_modules dir
+          if (request === 'jquery') {
+            request = require.resolve('jquery')
+          }
         }
 
         // client apps are using a jsx plugin for require js; we have a JSX

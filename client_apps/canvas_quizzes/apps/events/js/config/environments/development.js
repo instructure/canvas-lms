@@ -17,7 +17,7 @@
  */
 
 define(function(require) {
-  var $ = require('canvas_packages/jquery');
+  var $ = require('jquery');
 
   return {
     xhr: {

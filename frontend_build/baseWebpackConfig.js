@@ -142,6 +142,7 @@ module.exports = {
     // The files are expected to have no call to require, define or similar.
     // They are allowed to use exports and module.exports.
     noParse: [
+      /node_modules\/jquery\//,
       /vendor\/md5/,
       /tinymce\/tinymce/, // has 'require' and 'define' but they are from it's own internal closure
     ],
@@ -213,10 +214,6 @@ module.exports = {
         test: /\.json$/,
         exclude: /public\/javascripts\/vendor/,
         loader: 'json-loader'
-      },
-      {
-        test: require.resolve('../public/javascripts/vendor/jquery-1.7.2'),
-        loader: 'exports-loader?window.jQuery'
       },
       {
         test: /vendor\/md5/,
