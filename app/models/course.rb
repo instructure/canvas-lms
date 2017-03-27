@@ -3111,6 +3111,7 @@ class Course < ActiveRecord::Base
   # checks for both legacy and account-level grading period groups
   def grading_periods?
     return @has_grading_periods unless @has_grading_periods.nil?
+    return @has_grading_periods = true if @has_weighted_grading_periods
 
     @has_grading_periods = shard.activate do
       GradingPeriodGroup.active.
@@ -3128,6 +3129,7 @@ class Course < ActiveRecord::Base
 
   def weighted_grading_periods?
     return @has_weighted_grading_periods unless @has_weighted_grading_periods.nil?
+    return @has_weighted_grading_periods = false if @has_grading_periods == false
 
     @has_weighted_grading_periods = shard.activate do
       grading_period_groups.active.none? &&
