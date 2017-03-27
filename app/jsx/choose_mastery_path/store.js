@@ -10,4 +10,4 @@ function configStore (initialState) {
   return createStoreWithMiddleware(rootReducer, initialState)
 }
 
-export default configureStore
+export default configStore
