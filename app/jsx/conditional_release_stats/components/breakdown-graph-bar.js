@@ -9,6 +9,7 @@ import I18n from 'i18n!cyoe_assignment_sidebar'
       lowerBound: string.isRequired,
       upperBound: string.isRequired,
       rangeIndex: number.isRequired,
+      openSidebar: func.isRequired,
       selectRange: func.isRequired,
     }
 
@@ -17,7 +18,8 @@ import I18n from 'i18n!cyoe_assignment_sidebar'
       this.selectRange = this.selectRange.bind(this)
     }
 
-    selectRange () {
+    selectRange (e) {
+      this.props.openSidebar(e.target)
       this.props.selectRange(this.props.rangeIndex)
     }
 

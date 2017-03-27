@@ -20,6 +20,7 @@ define([
       totalStudents: 100,
       rangeIndex: 0,
       selectRange: () => {},
+      openSidebar: () => {}
     }
   }
 

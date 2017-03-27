@@ -2,7 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { connect, Provider } from 'react-redux'
 import BreakdownGraphs from './components/breakdown-graphs'
-import StickySidebar from './components/sticky-sidebar'
 import BreakdownDetails from './components/breakdown-details'
 
   const Graphs = connect((state) => ({
@@ -12,16 +11,13 @@ import BreakdownDetails from './components/breakdown-details'
     isLoading: state.isInitialDataLoading,
   }))(BreakdownGraphs)
 
-  const Sidebar = connect((state) => ({
-    isHidden: !state.showDetails,
-  }))(StickySidebar)
-
   const Details = connect((state) => ({
     isStudentDetailsLoading: state.isStudentDetailsLoading,
     selectedPath: state.selectedPath,
     assignment: state.assignment,
     ranges: state.ranges,
     students: state.studentCache,
+    showDetails: state.showDetails,
   }))(BreakdownDetails)
 
 export default class CRSApp {
@@ -32,6 +28,7 @@ export default class CRSApp {
 
     renderGraphs (root) {
       const actions = {
+        openSidebar: this.actions.openSidebar,
         selectRange: this.actions.selectRange,
       }
 
@@ -47,15 +44,12 @@ export default class CRSApp {
       const detailActions = {
         selectRange: this.actions.selectRange,
         selectStudent: this.actions.selectStudent,
+        closeSidebar: this.actions.closeSidebar
       }
 
       ReactDOM.render(
         <Provider store={this.store}>
-          <Sidebar
-            closeSidebar={this.actions.closeSidebar}
-          >
-            <Details {...detailActions} />
-          </Sidebar>
+          <Details {...detailActions} />
         </Provider>,
         root
       )

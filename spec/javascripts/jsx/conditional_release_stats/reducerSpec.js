@@ -36,8 +36,10 @@ define([
   })
 
   test('open sidebar correctly', () => {
-    const newState = reduce(actions.openSidebar())
+    const element = sinon.spy()
+    const newState = reduce(actions.openSidebar(element))
     equal(newState.showDetails, true, 'opens sidebar')
+    equal(newState.sidebarTrigger, element, 'stores trigger element')
   })
 
   test('open sidebar on select range', () => {
