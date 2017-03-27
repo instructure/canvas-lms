@@ -97,6 +97,13 @@ describe AssignmentUtil do
       expect(described_class.due_date_ok?(assignment)).to eq(false)
     end
 
+    it "returns true when due_at is blank, due_date_required? is true and grading_type is not_graded" do
+      assignment.due_at = nil
+      assignment.grading_type = 'not_graded'
+      described_class.stubs(:due_date_required?).with(assignment).returns(true)
+      expect(described_class.due_date_ok?(assignment)).to eq(true)
+    end
+
     it "returns true when due_at is present and due_date_required? is true" do
       assignment.due_at = Time.zone.now
       described_class.stubs(:due_date_required?).with(assignment).returns(true)

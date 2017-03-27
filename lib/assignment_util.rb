@@ -4,7 +4,9 @@ module AssignmentUtil
   end
 
   def self.due_date_ok?(assignment)
-    !due_date_required?(assignment) || assignment.due_at.present?
+    !due_date_required?(assignment) ||
+    assignment.due_at.present? ||
+    assignment.grading_type == 'not_graded'
   end
 
   def self.assignment_name_length_required?(assignment)
