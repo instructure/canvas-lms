@@ -112,7 +112,7 @@
   },
   "repository": "instructure/canvas-lms",
   "scripts": {
-    "test": "karma start --single-run",
+    "test": "node -r ./karma.debugging.js node_modules/.bin/karma start --single-run",
     "test-watch": "karma start",
     "preinstall": "script/gem_npm install",
     "preupdate": "script/gem_npm update",
