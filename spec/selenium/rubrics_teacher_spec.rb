@@ -134,7 +134,7 @@ describe "course rubrics" do
     course_with_student(:course => @course, :active_all => true)
     @course.offer!
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
-    comment = "Hi, please see www.example.com\n.\n\nThanks."
+    comment = "Hi, please see www.example.com"
     @assessment = @association.assess({
                                           :user => @student,
                                           :assessor => @teacher,
