@@ -69,6 +69,14 @@ class Login::SamlController < ApplicationController
 
     settings = aac.saml_settings(request.host_with_port)
     response.process(settings)
+    if response.used_key
+      Rails.logger.info("Used SAML key #{response.used_key} to decrypt message from #{response.issuer}")
+      if Setting.get("log_saml_private_key_usage", "false") != "false"
+        key_hash = Digest::MD5.hexdigest(response.used_key)[0...6]
+        idp_hash = Digest::MD5.hexdigest(response.issuer)[0...6]
+        Canvas.redis.incr("saml_private_key_usage_#{idp_hash}_#{key_hash}")
+      end
+    end
 
     unique_id = nil
     if aac.login_attribute == 'nameid'
