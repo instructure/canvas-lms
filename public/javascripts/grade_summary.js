@@ -40,12 +40,9 @@ define([
 ) {
 
   var GradeSummary = {
-    getGradingPeriodIdFromUrl: function (url) {
-      var matches = url.match(/grading_period_id=(\d*)/);
-      if (matches && matches[1] !== '0') {
-        return matches[1];
-      }
-      return null;
+    getSelectedGradingPeriodId: function () {
+      var $select = document.querySelector('.grading_periods_selector');
+      return ($select && $select.value !== '0') ? $select.value : null;
     }
   };
 
@@ -75,7 +72,7 @@ define([
       );
     }
 
-    var selectedGradingPeriodId = GradeSummary.getGradingPeriodIdFromUrl(location.href);
+    var selectedGradingPeriodId = GradeSummary.getSelectedGradingPeriodId();
     if (selectedGradingPeriodId) {
       return grades.gradingPeriods[selectedGradingPeriodId];
     }
