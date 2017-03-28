@@ -109,6 +109,8 @@
 class MasterCourses::MasterTemplatesController < ApplicationController
   before_action :require_master_courses
   before_action :get_template
+  before_action :require_course_level_manage_rights
+  before_action :require_account_level_manage_rights, :only => [:update_associations]
 
   include Api::V1::Course
   include Api::V1::MasterCourses
@@ -329,19 +331,23 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     render_unauthorized_action unless master_courses?
   end
 
+  def require_account_level_manage_rights
+    !!authorized_action(@course.account, @current_user, :manage_master_courses)
+  end
+
+  def require_course_level_manage_rights
+    !!authorized_action(@course, @current_user, :manage)
+  end
+
   def get_template
     @course = api_find(Course, params[:course_id])
-    if authorized_action(@course.account, @current_user, :manage_master_courses)
-      mc_scope = @course.master_course_templates.active
-      template_id = params[:template_id]
-      if template_id == 'default'
-        @template = mc_scope.for_full_course.first
-        raise ActiveRecord::RecordNotFound unless @template
-      else
-        @template = mc_scope.find(template_id)
-      end
+    mc_scope = @course.master_course_templates.active
+    template_id = params[:template_id]
+    if template_id == 'default'
+      @template = mc_scope.for_full_course.first
+      raise ActiveRecord::RecordNotFound unless @template
     else
-      false
+      @template = mc_scope.find(template_id)
     end
   end
 end

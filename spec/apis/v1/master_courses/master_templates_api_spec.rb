@@ -23,8 +23,14 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it "should require authorization" do
-      Account.default.role_overrides.create!(:role => admin_role, :permission => "manage_master_courses", :enabled => false)
+      Account.default.role_overrides.create!(:role => admin_role, :permission => "manage_courses", :enabled => false)
       api_call(:get, @url, @params, {}, {}, {:expected_status => 401})
+    end
+
+    it "should let teachers in the master course view details" do
+      course_with_teacher(:course => @course, :active_all => true)
+      json = api_call(:get, @url, @params)
+      expect(json['id']).to eq @template.id
     end
 
     it "should require am active template" do
@@ -84,6 +90,16 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
       json = api_call(:put, @url, @params, {:course_ids_to_add => [other_course.id]}, {}, {:expected_status => 400})
       expect(json['message']).to include("invalid courses")
+    end
+
+    it "should require account-level authorization" do
+      course_with_teacher(:course => @course, :active_all => true)
+      json = api_call(:put, @url, @params, {}, {}, {:expected_status => 401})
+    end
+
+    it "should require account-level blueprint permissions" do
+      Account.default.role_overrides.create!(:role => admin_role, :permission => "manage_master_courses", :enabled => false)
+      json = api_call(:put, @url, @params, {}, {}, {:expected_status => 401})
     end
 
     it "should not try to add other blueprint courses" do
