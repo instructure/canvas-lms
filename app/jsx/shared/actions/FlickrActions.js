@@ -53,7 +53,7 @@ import $ from 'jquery'
       // Ideally this key should be rotated and stored securely elsewhere.
       const apiKey = '734839aadcaa224c4e043eaf74391e50';
       const sort = 'relevance';
-      const licenses = '1,2,3,4,5,6';
+      const licenses = '9';
       const per_page = '20';
       const imageSize = 'url_m';
 
