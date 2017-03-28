@@ -280,7 +280,11 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/1/blueprint_templates/default/restrict_item \
-  #     -H 'Authorization: Bearer <token>'
+  #     -X PUT \
+  #     -H 'Authorization: Bearer <token>' \
+  #     -d 'content_type=assignment' \
+  #     -d 'content_id=2' \
+  #     -d 'restricted=true'
   #
   def restrict_item
     content_type = params[:content_type]
