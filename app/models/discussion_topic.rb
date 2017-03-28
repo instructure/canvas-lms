@@ -120,6 +120,12 @@ class DiscussionTopic < ActiveRecord::Base
     if self.has_group_category?
       self.subtopics_refreshed_at ||= Time.parse("Jan 1 2000")
     end
+
+    [
+      :could_be_locked, :podcast_enabled, :podcast_has_student_posts,
+      :require_initial_post, :pinned, :locked, :allow_rating,
+      :only_graders_can_rate, :sort_by_rating
+    ].each { |attr| self[attr] = false if self[attr].nil? }
   end
   protected :default_values
 

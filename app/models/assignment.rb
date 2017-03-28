@@ -521,6 +521,13 @@ class Assignment < ActiveRecord::Base
     # have to use peer_reviews_due_at here because it's the column name
     self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
     self.points_possible = nil unless self.graded?
+    [
+      :all_day, :could_be_locked, :grade_group_students_individually,
+      :anonymous_peer_reviews, :turnitin_enabled, :vericite_enabled,
+      :moderated_grading, :omit_from_final_grade, :freeze_on_copy,
+      :copied, :only_visible_to_overrides, :post_to_sis, :peer_reviews_assigned,
+      :peer_reviews, :automatic_peer_reviews, :muted, :intra_group_peer_reviews
+    ].each { |attr| self[attr] = false if self[attr].nil? }
   end
   protected :default_values
 

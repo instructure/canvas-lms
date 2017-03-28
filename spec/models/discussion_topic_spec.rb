@@ -24,6 +24,74 @@ describe DiscussionTopic do
     student_in_course(:active_all => true)
   end
 
+  describe "default values for boolean attributes" do
+    before(:once) do
+      @topic = @course.discussion_topics.create!
+    end
+
+    let(:values) do
+      DiscussionTopic.where(id: @topic).pluck(
+        :could_be_locked,
+        :podcast_enabled,
+        :podcast_has_student_posts,
+        :require_initial_post,
+        :pinned,
+        :locked,
+        :allow_rating,
+        :only_graders_can_rate,
+        :sort_by_rating
+      ).first
+    end
+
+    it "saves boolean attributes as false if they are set to nil" do
+      @topic.update!(
+        could_be_locked: nil,
+        podcast_enabled: nil,
+        podcast_has_student_posts: nil,
+        require_initial_post: nil,
+        pinned: nil,
+        locked: nil,
+        allow_rating: nil,
+        only_graders_can_rate: nil,
+        sort_by_rating: nil
+      )
+
+      expect(values).to eq([false] * values.length)
+    end
+
+    it "saves boolean attributes as false if they are set to false" do
+      @topic.update!(
+        could_be_locked: false,
+        podcast_enabled: false,
+        podcast_has_student_posts: false,
+        require_initial_post: false,
+        pinned: false,
+        locked: false,
+        allow_rating: false,
+        only_graders_can_rate: false,
+        sort_by_rating: false
+      )
+
+      expect(values).to eq([false] * values.length)
+    end
+
+    it "saves boolean attributes as true if they are set to true" do
+      @topic.update!(
+        could_be_locked: true,
+        podcast_enabled: true,
+        podcast_has_student_posts: true,
+        require_initial_post: true,
+        pinned: true,
+        locked: true,
+        allow_rating: true,
+        only_graders_can_rate: true,
+        sort_by_rating: true
+      )
+
+      expect(values).to eq([true] * values.length)
+    end
+  end
+
   it "should santize message" do
     @course.discussion_topics.create!(:message => "<a href='#' onclick='alert(12);'>only this should stay</a>")
     expect(@course.discussion_topics.first.message).to eql("<a href=\"#\">only this should stay</a>")
