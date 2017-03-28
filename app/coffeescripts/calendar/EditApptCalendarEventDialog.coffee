@@ -44,7 +44,10 @@ define [
       max_participants = formData.max_participants
 
       if limit_participants and max_participants <= 0
-        @$maxParticipants.errorBox(I18n.t 'invalid_participants', 'You must allow at least one user to attend')
+        if @event.calendarEvent.participant_type is 'Group'
+          @$maxParticipants.errorBox(I18n.t 'You must allow at least one group to attend')
+        else
+          @$maxParticipants.errorBox(I18n.t 'invalid_participants', 'You must allow at least one user to attend')
         return false
 
       @event.calendarEvent.description = formData.description

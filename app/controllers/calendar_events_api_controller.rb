@@ -152,6 +152,11 @@ require 'atom'
 #           "example": false,
 #           "type": "boolean"
 #         },
+#         "participant_type": {
+#           "description": "The type of participant to sign up for a slot: 'User' or 'Group'",
+#           "example": "User",
+#           "type": "string"
+#         },
 #         "participants_per_appointment": {
 #           "description": "If the event is a time slot, this is the participant limit",
 #           "type": "integer"
