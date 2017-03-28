@@ -5880,9 +5880,9 @@ react-tabs@0.8.2:
     classnames "^2.2.0"
     js-stylesheet "^0.0.1"
 
-react-tokeninput@2.2.2:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/react-tokeninput/-/react-tokeninput-2.2.2.tgz#a05388cde00308de927728c12633933a7f4ecc74"
+react-tokeninput@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/react-tokeninput/-/react-tokeninput-2.3.0.tgz#206443cc47c453ebe86910aa028ba6589e4be2db"
   dependencies:
     classnames "^2.2.1"
 

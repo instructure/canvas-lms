@@ -59,7 +59,6 @@ import 'compiled/jquery.rails_flash_notifications'
       }, this.fetchAdhocStudents)
 
       OverrideStudentStore.addChangeListener(this.handleStudentStoreChange)
-      OverrideStudentStore.fetchStudentsForCourse()
 
       StudentGroupStore.setGroupSetIfNone(this.props.selectedGroupSetId)
       StudentGroupStore.addChangeListener(this.handleStudentGroupStoreChange)
@@ -262,6 +261,10 @@ import 'compiled/jquery.rails_flash_notifications'
       )
 
       this.replaceRow(rowKey, newOverridesForRow, row["dates"])
+    },
+
+    handleInteractionStart() {
+      OverrideStudentStore.fetchStudentsForCourse()
     },
 
     handleTokenAdd(rowKey, newToken){
@@ -478,7 +481,7 @@ import 'compiled/jquery.rails_flash_notifications'
     render() {
       var rowsToRender = this.rowsToRender()
       return (
-        <div className="ContainerDueDate">
+        <div className="ContainerDueDate" onMouseEnter={this.handleInteractionStart}>
           <div id="bordered-wrapper" className="Container__DueDateRow">
             {rowsToRender}
           </div>

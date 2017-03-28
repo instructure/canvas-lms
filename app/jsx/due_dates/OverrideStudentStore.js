@@ -13,7 +13,8 @@ import parseLinkHeader from 'compiled/fn/parseLinkHeader'
     students: {},
     searchedNames: {},
     currentlySearching: false,
-    allStudentsFetched: false
+    allStudentsFetched: false,
+    requestedStudentsForCourse: false
   }
 
   var OverrideStudentStore = createStore($.extend(true, {}, initialStoreState))
@@ -52,6 +53,11 @@ import parseLinkHeader from 'compiled/fn/parseLinkHeader'
 
   OverrideStudentStore._fetchStudentsByIDSuccessHandler = function(opts, items, status, xhr){
     this.addStudents(items)
+
+    const links = parseLinkHeader(xhr)
+    if (links.next) {
+      $.getJSON(links.next, {}, this._fetchStudentsByIDSuccessHandler.bind(this, {}))
+    }
   }
 
   // ---- by name ----
@@ -96,26 +102,28 @@ import parseLinkHeader from 'compiled/fn/parseLinkHeader'
   var STUDENTS_FETCHED_PER_PAGE = 50
 
   OverrideStudentStore.fetchStudentsForCourse = function(){
-    _.times(PAGES_OF_STUDENTS_TO_FETCH,(i) => {
-      var pageNumber = i + 1
-      this.fetchPageOfStudents(pageNumber)
-    })
-  },
+    if (this.getState().requestedStudentsForCourse) {
+      return
+    }
+    this.setState({requestedStudentsForCourse: true})
 
-  OverrideStudentStore.fetchPageOfStudents = function(pageNumber) {
     var path = this.getContextPath() + "/users"
 
     $.getJSON(path,
-      {per_page: STUDENTS_FETCHED_PER_PAGE, page: pageNumber, enrollment_type: "student", include_inactive: false, include: ["enrollments", "group_ids"]},
-      this._fetchStudentsForCourseSuccessHandler.bind(this, {})
+      {per_page: STUDENTS_FETCHED_PER_PAGE, enrollment_type: "student", include_inactive: false, include: ["enrollments", "group_ids"]},
+      this._fetchStudentsForCourseSuccessHandler.bind(this, {pageNumber: 1})
     )
   }
 
-  OverrideStudentStore._fetchStudentsForCourseSuccessHandler = function(opts, items, status, xhr){
+  OverrideStudentStore._fetchStudentsForCourseSuccessHandler = function({pageNumber}, items, status, xhr){
     this.addStudents(items)
 
-    var links = parseLinkHeader(xhr)
-    if(!links.next){
+    const links = parseLinkHeader(xhr)
+    if (links.next) {
+      if (pageNumber < PAGES_OF_STUDENTS_TO_FETCH) {
+        $.getJSON(links.next, {}, this._fetchStudentsForCourseSuccessHandler.bind(this, {pageNumber: pageNumber + 1}))
+      }
+    } else {
       this.setState({allStudentsFetched: true})
     }
   }

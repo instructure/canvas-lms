@@ -58,6 +58,12 @@ import DisabledTokenInput from 'jsx/due_dates/DisabledTokenInput'
     //       Actions
     // -------------------
 
+    handleFocus() {
+      // TODO: once react supports onFocusIn, remove this stuff and just
+      // do it on DueDates' top-level <div /> like we do for onMouseEnter
+      OverrideStudentStore.fetchStudentsForCourse()
+    },
+
     handleInput(userInput) {
       if (this.props.disabled) return;
 
@@ -323,6 +329,7 @@ import DisabledTokenInput from 'jsx/due_dates/DisabledTokenInput'
           <TokenInput
             menuContent         = {this.optionsForMenu()}
             selected            = {this.props.tokens}
+            onFocus             = {this.handleFocus}
             onInput             = {this.handleInput}
             onSelect            = {this.handleTokenAdd}
             tokenAriaFunc       = {this.overrideTokenAriaLabel}
