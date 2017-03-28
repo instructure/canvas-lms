@@ -54,12 +54,11 @@ module Lti
 
       def create
         if oauth2_request?
-          dev_key = DeveloperKey.find_cached(access_token.sub)
           begin
             validate_access_token!
             reg_key = access_token.reg_key
             reg_secret = RegistrationRequestService.retrieve_registration_password(context, reg_key) if reg_key
-            render_new_tool_proxy(context, reg_key, dev_key) and return if reg_secret.present?
+            render_new_tool_proxy(context, reg_key, developer_key) and return if reg_secret.present?
           rescue Lti::Oauth2::InvalidTokenError
             render_unauthorized and return
           end

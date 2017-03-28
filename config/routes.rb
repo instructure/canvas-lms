@@ -1947,7 +1947,6 @@ CanvasRails::Application.routes.draw do
   end
 
   ApiRouteSet.draw(self, "/api/lti") do
-    post "authorize", controller: 'lti/ims/authorization', action: :authorize, as: 'lti_oauth2_authorize'
 
     scope(controller: 'lti/subscriptions_api') do
       post "subscriptions", action: :create
@@ -1959,6 +1958,7 @@ CanvasRails::Application.routes.draw do
 
     %w(course account).each do |context|
       prefix = "#{context}s/:#{context}_id"
+      post "#{prefix}/authorize", controller: 'lti/ims/authorization', action: :authorize, as: "#{context}_lti_oauth2_authorize"
       get  "#{prefix}/tool_consumer_profile(/:tool_consumer_profile_id)", controller: 'lti/ims/tool_consumer_profile',
            action: 'show', as: "#{context}_tool_consumer_profile"
       post "#{prefix}/tool_proxy", controller: 'lti/ims/tool_proxy', action: :re_reg,

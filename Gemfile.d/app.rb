@@ -49,7 +49,7 @@ gem 'i18nliner', '0.0.12'
   gem 'ruby2ruby', '2.3.1', require: false
   gem 'ruby_parser', '3.8.4', require: false
 gem 'icalendar', '1.5.4', require: false
-gem 'ims-lti', '2.1.0.beta.4', require: 'ims'
+gem 'ims-lti', '2.1.2', require: 'ims'
 gem 'json', '2.0.3'
 gem 'oj', '2.17.1'
 gem 'jwt', '1.2.1', require: false

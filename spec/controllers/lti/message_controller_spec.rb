@@ -104,7 +104,9 @@ module Lti
           get 'registration', course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
-          expect(launch_params['oauth2_access_token_url']).to eq lti_oauth2_authorize_url
+          expect(launch_params['oauth2_access_token_url']).to(
+            eq controller.polymorphic_url([@course, :lti_oauth2_authorize])
+          )
         end
 
       end

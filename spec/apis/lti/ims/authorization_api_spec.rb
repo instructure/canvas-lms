@@ -6,9 +6,9 @@ module Lti
   module Ims
     describe AuthorizationController, type: :request do
 
-      let(:account) { Account.new }
+      let(:account) { Account.create! }
 
-      let (:developer_key) { DeveloperKey.create!(redirect_uri: 'http://example.com/redirect') }
+      let(:developer_key) { DeveloperKey.create!(redirect_uri: 'http://example.com/redirect') }
 
       let(:product_family) do
         ProductFamily.create(
@@ -36,7 +36,7 @@ module Lti
         raw_jwt = JSON::JWT.new(
           {
             sub: tool_proxy.guid,
-            aud: lti_oauth2_authorize_url,
+            aud: polymorphic_url([account, :lti_oauth2_authorize]),
             exp: 1.minute.from_now,
             iat: Time.zone.now.to_i,
             jti: SecureRandom.uuid
@@ -45,7 +45,7 @@ module Lti
         raw_jwt
       end
 
-      let(:auth_endpoint) { '/api/lti/authorize' }
+      let(:auth_endpoint) { polymorphic_url([account, :lti_oauth2_authorize]) }
       let(:jwt_string) do
         raw_jwt.sign(tool_proxy.shared_secret, :HS256).to_s
       end
@@ -77,7 +77,7 @@ module Lti
         it 'returns an access_token' do
           post auth_endpoint, params
           access_token = Lti::Oauth2::AccessToken.create_jwt(aud: @request.host, sub: tool_proxy.guid)
-          expect{access_token.validate!}.not_to raise_error
+          expect { access_token.validate! }.not_to raise_error
         end
 
         it "allows the use of the 'OAuth.splitSecret'" do
@@ -107,13 +107,52 @@ module Lti
           expect(jwt["aud"]).to match_array [request.host, request.protocol + file_host]
         end
 
+        context "reg_key" do
+
+          let(:reg_key) { SecureRandom.uuid }
+
+          let(:reg_password) { SecureRandom.uuid }
+
+          let(:raw_jwt) do
+            RegistrationRequestService.cache_registration(account, reg_key, reg_password)
+            raw_jwt = JSON::JWT.new(
+              {
+                sub: reg_key,
+                aud: polymorphic_url([account, :lti_oauth2_authorize]),
+                exp: 1.minute.from_now,
+                iat: Time.zone.now.to_i,
+                jti: SecureRandom.uuid,
+              }
+            )
+            raw_jwt
+          end
+
+          let(:jwt_string) do
+            raw_jwt.sign(reg_password, :HS256).to_s
+          end
+
+          let(:params) do
+            {
+              grant_type: 'authorization_code',
+              assertion: jwt_string,
+            }
+          end
+
+          it 'accepts a valid reg_key' do
+            enable_cache do
+              post auth_endpoint, params
+              expect(response.code).to eq '200'
+            end
+          end
+        end
+
         context "developer credentials" do
 
           let(:raw_jwt) do
             raw_jwt = JSON::JWT.new(
               {
                 sub: developer_key.global_id,
-                aud: lti_oauth2_authorize_url,
+                aud: polymorphic_url([account, :lti_oauth2_authorize]),
                 exp: 1.minute.from_now,
                 iat: Time.zone.now.to_i,
                 jti: SecureRandom.uuid,
@@ -134,7 +173,7 @@ module Lti
             }
           end
 
-          it "rejects the request if a reg_key isn't provided and grant_type is auth code" do
+          it "rejects the request if a valid reg_key isn't provided and grant_type is auth code" do
             post auth_endpoint, params.delete(:code)
             expect(response.code).to eq '400'
           end

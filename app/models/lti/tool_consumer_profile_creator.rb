@@ -47,6 +47,7 @@ module Lti
       profile.service_offered = services
       profile.capability_offered = capabilities
       profile.guid = (tool_consumer_profile && tool_consumer_profile.uuid) || Lti::ToolConsumerProfile::DEFAULT_TCP_UUID
+      profile.security_profile = security_profiles
 
       # TODO: Extract this
       if @root_account.feature_enabled?(:lti2_rereg)
@@ -91,6 +92,19 @@ module Lti
         reg_srv.action = service[:action]
         reg_srv
       end
+    end
+
+    def security_profiles
+      [
+        IMS::LTI::Models::SecurityProfile.new(
+          security_profile_name: 'lti_oauth_hash_message_security',
+          digest_algorithm: 'HMAC-SHA1'
+        ),
+        IMS::LTI::Models::SecurityProfile.new(
+          security_profile_name: 'oauth2_access_token_ws_security',
+          digest_algorithm: 'HS256'
+        )
+      ]
     end
 
   end

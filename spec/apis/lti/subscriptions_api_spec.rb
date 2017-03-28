@@ -47,14 +47,6 @@ module Lti
         expect(response).to be_success
       end
 
-      it 'checks that the tool proxy has an active developer key' do
-        product_family.update_attributes(developer_key: nil)
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
-        tool_proxy.save!
-        post create_endpoint, { subscription: subscription }, request_headers
-        expect(response).to be_unauthorized
-      end
-
       it 'checks that the tool proxy has the correct enabled capabilities' do
         post create_endpoint, { subscription: subscription }, request_headers
         expect(response).to be_unauthorized
@@ -124,15 +116,6 @@ module Lti
         expect(response).not_to be_success
       end
 
-      it 'checks that the tool proxy has an active developer key' do
-        product_family.update_attributes(developer_key: nil)
-        allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
-        tool_proxy.save!
-        delete delete_endpoint, {}, request_headers
-        expect(response).to be_unauthorized
-      end
-
       it 'requires JWT Access token' do
         delete delete_endpoint, {}
         expect(response).to be_unauthorized
@@ -169,15 +152,6 @@ module Lti
         allow(subscription_service).to receive_messages(destroy_tool_proxy_subscription: not_found_response)
         get show_endpoint, {}, request_headers
         expect(response).not_to be_success
-      end
-
-      it 'checks that the tool proxy has an active developer key' do
-        product_family.update_attributes(developer_key: nil)
-        allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
-        tool_proxy.save!
-        get show_endpoint, {}, request_headers
-        expect(response).to be_unauthorized
       end
 
       it 'requires JWT Access token' do
@@ -248,15 +222,6 @@ module Lti
         expect(JSON.parse(response.body)['error']).to eq 'Unauthorized subscription'
       end
 
-      it 'checks that the tool proxy has an active developer key' do
-        product_family.update_attributes(developer_key: nil)
-        allow(subscription_service).to receive_messages(update_tool_proxy_subscription: ok_response)
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
-        tool_proxy.save!
-        put update_endpoint, {subscription: subscription}, request_headers
-        expect(response).to be_unauthorized
-      end
-
       it 'requires JWT Access token' do
         put update_endpoint, {subscription: subscription}
         expect(response).to be_unauthorized
@@ -286,15 +251,6 @@ module Lti
         allow(subscription_service).to receive_messages(tool_proxy_subscriptions: ok_response)
         get index_endpoint, {}, request_headers
         expect(response).to be_success
-      end
-
-      it 'checks that the tool proxy has an active developer key' do
-        product_family.update_attributes(developer_key: nil)
-        allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
-        tool_proxy.save!
-        get index_endpoint, {}, request_headers
-        expect(response).to be_unauthorized
       end
 
       it 'requires JWT Access token' do
