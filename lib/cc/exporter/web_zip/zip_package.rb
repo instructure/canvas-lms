@@ -237,6 +237,7 @@ module CC::Exporter::WebZip
           title: export_item[:title],
           content: parse_content(item) || export_item[:text]
         }
+        item_hash[:frontPage] = export_item[:front_page] if type == :wiki_pages
         add_assignment_details(item, item_hash) unless type == :wiki_pages
         item_hash
       end

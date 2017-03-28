@@ -522,7 +522,15 @@ describe "ZipPackage" do
       @course.wiki_pages.create!(title: 'Wiki Page 1', url: 'wiki-page-1', wiki: @course.wiki)
       zip_package = create_zip_package
       wiki_data = zip_package.parse_non_module_items(:wiki_pages)
-      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: ''}]
+      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: '', frontPage: false}]
+    end
+
+    it "should parse front page" do
+      wiki_page = @course.wiki_pages.create!(title: 'Wiki Page 1', url: 'wiki-page-1', wiki: @course.wiki)
+      @course.wiki.set_front_page_url!(wiki_page.url)
+      zip_package = create_zip_package
+      wiki_data = zip_package.parse_non_module_items(:wiki_pages)
+      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: '', frontPage: true}]
     end
 
     it "should not fail on missing items" do
@@ -531,7 +539,7 @@ describe "ZipPackage" do
       wiki.title = 'Wiki Page 2'
       wiki.save!
       wiki_data = zip_package.parse_non_module_items(:wiki_pages)
-      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: '<p>Hi</p>'}]
+      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: '<p>Hi</p>', frontPage: false}]
     end
   end
 
