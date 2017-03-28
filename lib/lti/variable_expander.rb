@@ -169,7 +169,9 @@ module Lti
                        -> { "#{@request.scheme}://#{HostUrl.context_host(@root_account, @request.host)}" },
                        CONTROLLER_GUARD
 
-    # returns the URL for the membership service associated with the current context
+    # returns the URL for the membership service associated with the current context.
+    #
+    # This variable is for future use only. Complete support for the IMS Membership Service has not been added to Canvas. This will be updated when we fully support and certify the IMS Membership Service.
     # @example
     #   ```
     #   https://canvas.instructure.com/api/lti/courses/1/membership_service
