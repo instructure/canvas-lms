@@ -95,11 +95,179 @@ describe Assignment do
 
   it "should allow ContextExternalTools through polymorphic association" do
     setup_assignment_with_homework
-
     tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
     @assignment.tool_settings_tool = tool
     @assignment.save
     expect(@assignment.tool_settings_tool).to eq(tool)
+  end
+
+  describe "default values for boolean attributes" do
+    before(:once) do
+      @assignment = @course.assignments.create!
+    end
+
+    let(:values) do
+      Assignment.where(id: @assignment).pluck(
+        :could_be_locked,
+        :grade_group_students_individually,
+        :anonymous_peer_reviews,
+        :turnitin_enabled,
+        :vericite_enabled,
+        :moderated_grading,
+        :omit_from_final_grade,
+        :freeze_on_copy,
+        :copied,
+        :only_visible_to_overrides,
+        :post_to_sis,
+        :peer_reviews_assigned,
+        :peer_reviews,
+        :automatic_peer_reviews,
+        :muted,
+        :intra_group_peer_reviews
+      ).first
+    end
+
+    it "saves boolean attributes as false if they are set to nil" do
+      @assignment.update!(
+        could_be_locked: nil,
+        grade_group_students_individually: nil,
+        anonymous_peer_reviews: nil,
+        turnitin_enabled: nil,
+        vericite_enabled: nil,
+        moderated_grading: nil,
+        omit_from_final_grade: nil,
+        freeze_on_copy: nil,
+        copied: nil,
+        only_visible_to_overrides: nil,
+        post_to_sis: nil,
+        peer_reviews_assigned: nil,
+        peer_reviews: nil,
+        automatic_peer_reviews: nil,
+        muted: nil,
+        intra_group_peer_reviews: nil
+      )
+
+      expect(values).to eq([false] * values.length)
+    end
+
+    it "saves boolean attributes as false if they are set to false" do
+      @assignment.update!(
+        could_be_locked: false,
+        grade_group_students_individually: false,
+        anonymous_peer_reviews: false,
+        turnitin_enabled: false,
+        vericite_enabled: false,
+        moderated_grading: false,
+        omit_from_final_grade: false,
+        freeze_on_copy: false,
+        copied: false,
+        only_visible_to_overrides: false,
+        post_to_sis: false,
+        peer_reviews_assigned: false,
+        peer_reviews: false,
+        automatic_peer_reviews: false,
+        muted: false,
+        intra_group_peer_reviews: false
+      )
+
+      expect(values).to eq([false] * values.length)
+    end
+
+    it "saves boolean attributes as true if they are set to true" do
+      # exluding the moderated_grading attribute because it cannot be
+      # true when peer_reviews is true
+      @assignment.update!(
+        could_be_locked: true,
+        grade_group_students_individually: true,
+        anonymous_peer_reviews: true,
+        turnitin_enabled: true,
+        vericite_enabled: true,
+        omit_from_final_grade: true,
+        freeze_on_copy: true,
+        copied: true,
+        only_visible_to_overrides: true,
+        post_to_sis: true,
+        peer_reviews_assigned: true,
+        peer_reviews: true,
+        automatic_peer_reviews: true,
+        muted: true,
+        intra_group_peer_reviews: true
+      )
+
+      values = Assignment.where(id: @assignment).pluck(
+        :could_be_locked,
+        :grade_group_students_individually,
+        :anonymous_peer_reviews,
+        :turnitin_enabled,
+        :vericite_enabled,
+        :omit_from_final_grade,
+        :freeze_on_copy,
+        :copied,
+        :only_visible_to_overrides,
+        :post_to_sis,
+        :peer_reviews_assigned,
+        :peer_reviews,
+        :automatic_peer_reviews,
+        :muted,
+        :intra_group_peer_reviews
+      ).first
+
+      expect(values).to eq([true] * values.length)
+    end
+  end
+
+  describe '#tool_settings_tool=' do
+    let(:stub_response){ double(code: 200, body: {}.to_json, parsed_response: {'Id' => 'test-id'}, ok?: true) }
+    let(:subscription_helper){ class_double(Lti::AssignmentSubscriptionsHelper).as_stubbed_const }
+    let(:subscription_helper_instance){ double(destroy_subscription: true, create_subscription: true) }
+
+    before(:each) do
+      allow(subscription_helper).to receive_messages(new: subscription_helper_instance)
+    end
+
+    it "should allow ContextExternalTools through polymorphic association" do
+      setup_assignment_with_homework
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      @assignment.tool_settings_tool = tool
+      @assignment.save
+      expect(@assignment.tool_settings_tool).to eq(tool)
+    end
+
+    it "should have Lti::MessageHandler through polymorphic association" do
+      setup_assignment_with_homework
+      account = @assignment.context.account
+      product_family = Lti::ProductFamily.create(
+        vendor_code: '123',
+        product_code: 'abc',
+        vendor_name: 'acme',
+        root_account: account
+      )
+      tool_proxy = Lti::ToolProxy.create!(
+        context: account,
+        guid: SecureRandom.uuid,
+        shared_secret: 'abc',
+        product_family: product_family,
+        product_version: '1',
+        workflow_state: 'disabled',
+        raw_data: {'proxy' => 'value'},
+        lti_version: '1'
+      )
+      resource_handler = Lti::ResourceHandler.create(
+        resource_type_code: 'code',
+        name: 'resource name',
+        tool_proxy: tool_proxy
+      )
+      message_handler = Lti::MessageHandler.create(
+        message_type: 'message_type',
+        launch_path: 'https://samplelaunch/blti',
+        resource_handler: resource_handler,
+        tool_proxy: tool_proxy
+      )
+
+      @assignment.tool_settings_tool = message_handler
+      @assignment.save
+      expect(@assignment.tool_settings_tool).to eq(message_handler)
+    end
   end
 
   it "should have Lti::MessageHandler through polymorphic association" do
