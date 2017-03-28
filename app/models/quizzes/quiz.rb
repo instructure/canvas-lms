@@ -139,6 +139,14 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.question_count = self.question_count(true)
     @update_existing_submissions = true if self.for_assignment? && self.quiz_type_changed?
     @stored_questions = nil
+
+    [
+      :shuffle_answers, :could_be_locked, :anonymous_submissions,
+      :require_lockdown_browser, :require_lockdown_browser_for_results,
+      :one_question_at_a_time, :cant_go_back, :require_lockdown_browser_monitor,
+      :only_visible_to_overrides, :one_time_results, :show_correct_answers_last_attempt
+    ].each { |attr| self[attr] = false if self[attr].nil? }
+    self[:show_correct_answers] = true if self[:show_correct_answers].nil?
   end
 
   # quizzes differ from other publishable objects in that they require we

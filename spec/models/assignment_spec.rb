@@ -92,8 +92,320 @@ describe Assignment do
     expect(@assignment.errors[:grading_type]).not_to be_nil
   end
 
-  it "should allow ContextExternalTools through polymorphic association" do
-    setup_assignment_with_homework
+  describe "default values for boolean attributes" do
+    before(:once) do
+      @assignment = @course.assignments.create!
+    end
+
+    let(:values) do
+      Assignment.where(id: @assignment).pluck(
+        :could_be_locked,
+        :grade_group_students_individually,
+        :anonymous_peer_reviews,
+        :turnitin_enabled,
+        :vericite_enabled,
+        :moderated_grading,
+        :omit_from_final_grade,
+        :freeze_on_copy,
+        :copied,
+        :only_visible_to_overrides,
+        :post_to_sis,
+        :peer_reviews_assigned,
+        :peer_reviews,
+        :automatic_peer_reviews,
+        :muted,
+        :intra_group_peer_reviews
+      ).first
+    end
+
+    it "saves boolean attributes as false if they are set to nil" do
+      @assignment.update!(
+        could_be_locked: nil,
+        grade_group_students_individually: nil,
+        anonymous_peer_reviews: nil,
+        turnitin_enabled: nil,
+        vericite_enabled: nil,
+        moderated_grading: nil,
+        omit_from_final_grade: nil,
+        freeze_on_copy: nil,
+        copied: nil,
+        only_visible_to_overrides: nil,
+        post_to_sis: nil,
+        peer_reviews_assigned: nil,
+        peer_reviews: nil,
+        automatic_peer_reviews: nil,
+        muted: nil,
+        intra_group_peer_reviews: nil
+      )
+
+      expect(values).to eq([false] * values.length)
+    end
+
+    it "saves boolean attributes as false if they are set to false" do
+      @assignment.update!(
+        could_be_locked: false,
+        grade_group_students_individually: false,
+        anonymous_peer_reviews: false,
+        turnitin_enabled: false,
+        vericite_enabled: false,
+        moderated_grading: false,
+        omit_from_final_grade: false,
+        freeze_on_copy: false,
+        copied: false,
+        only_visible_to_overrides: false,
+        post_to_sis: false,
+        peer_reviews_assigned: false,
+        peer_reviews: false,
+        automatic_peer_reviews: false,
+        muted: false,
+        intra_group_peer_reviews: false
+      )
+
+      expect(values).to eq([false] * values.length)
+    end
+
+    it "saves boolean attributes as true if they are set to true" do
+      # exluding the moderated_grading attribute because it cannot be
+      # true when peer_reviews is true
+      @assignment.update!(
+        could_be_locked: true,
+        grade_group_students_individually: true,
+        anonymous_peer_reviews: true,
+        turnitin_enabled: true,
+        vericite_enabled: true,
+        omit_from_final_grade: true,
+        freeze_on_copy: true,
+        copied: true,
+        only_visible_to_overrides: true,
+        post_to_sis: true,
+        peer_reviews_assigned: true,
+        peer_reviews: true,
+        automatic_peer_reviews: true,
+        muted: true,
+        intra_group_peer_reviews: true
+      )
+
+      values = Assignment.where(id: @assignment).pluck(
+        :could_be_locked,
+        :grade_group_students_individually,
+        :anonymous_peer_reviews,
+        :turnitin_enabled,
+        :vericite_enabled,
+        :omit_from_final_grade,
+        :freeze_on_copy,
+        :copied,
+        :only_visible_to_overrides,
+        :post_to_sis,
+        :peer_reviews_assigned,
+        :peer_reviews,
+        :automatic_peer_reviews,
+        :muted,
+        :intra_group_peer_reviews
+      ).first
+
+      expect(values).to eq([true] * values.length)
+    end
+  end
+
+  describe '#tool_settings_tool=' do
+    let(:stub_response){ double(code: 200, body: {}.to_json, parsed_response: {'Id' => 'test-id'}, ok?: true) }
+    let(:subscription_helper){ class_double(Lti::AssignmentSubscriptionsHelper).as_stubbed_const }
+    let(:subscription_helper_instance){ double(destroy_subscription: true, create_subscription: true) }
+
+    before(:each) do
+      allow(subscription_helper).to receive_messages(new: subscription_helper_instance)
+    end
+
+    it "should allow ContextExternalTools through polymorphic association" do
+      setup_assignment_with_homework
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      @assignment.tool_settings_tool = tool
+      @assignment.save
+      expect(@assignment.tool_settings_tool).to eq(tool)
+    end
+
+    it "should have Lti::MessageHandler through polymorphic association" do
+      setup_assignment_with_homework
+      account = @assignment.context.account
+      product_family = Lti::ProductFamily.create(
+        vendor_code: '123',
+        product_code: 'abc',
+        vendor_name: 'acme',
+        root_account: account
+      )
+      tool_proxy = Lti::ToolProxy.create!(
+        context: account,
+        guid: SecureRandom.uuid,
+        shared_secret: 'abc',
+        product_family: product_family,
+        product_version: '1',
+        workflow_state: 'disabled',
+        raw_data: {'proxy' => 'value'},
+        lti_version: '1'
+      )
+      resource_handler = Lti::ResourceHandler.create(
+        resource_type_code: 'code',
+        name: 'resource name',
+        tool_proxy: tool_proxy
+      )
+      message_handler = Lti::MessageHandler.create(
+        message_type: 'message_type',
+        launch_path: 'https://samplelaunch/blti',
+        resource_handler: resource_handler,
+        tool_proxy: tool_proxy
+      )
+
+      @assignment.tool_settings_tool = message_handler
+      @assignment.save
+      expect(@assignment.tool_settings_tool).to eq(message_handler)
+    end
+
+    it 'destroys subscriptions when they exist' do
+      setup_assignment_with_homework
+      expect(subscription_helper_instance).to receive(:destroy_subscription)
+      @assignment.tool_settings_tool = message_handler
+      @assignment.save!
+      @assignment.tool_settings_tool = nil
+      @assignment.save!
+    end
+
+    it "destroys tool unless tool is 'ContextExternalTool'" do
+      setup_assignment_with_homework
+      expect(subscription_helper_instance).not_to receive(:destroy_subscription)
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      @assignment.tool_settings_tool = tool
+      @assignment.save!
+      @assignment.tool_settings_tool = nil
+      @assignment.save!
+    end
+  end
+
+  describe "#representatives" do
+    context "individual students" do
+      it "sorts by sortable_name" do
+        student_one = student_in_course(
+          active_all: true, name: 'Frodo Bravo', sortable_name: 'Bravo, Frodo'
+        ).user
+        student_two = student_in_course(
+          active_all: true, name: 'Alfred Charlie', sortable_name: 'Charlie, Alfred'
+        ).user
+        student_three = student_in_course(
+          active_all: true, name: 'Beauregard Alpha', sortable_name: 'Alpha, Beauregard'
+        ).user
+
+        expect(User).to receive(:best_unicode_collation_key).with('sortable_name').and_call_original
+
+        assignment = @course.assignments.create!(assignment_valid_attributes)
+        representatives = assignment.representatives(@teacher)
+
+        expect(representatives[0].name).to eql(student_three.name)
+        expect(representatives[1].name).to eql(student_one.name)
+        expect(representatives[2].name).to eql(student_two.name)
+      end
+    end
+
+    context "group assignments with all students assigned to a group" do
+      include GroupsCommon
+      it "sorts by group name" do
+        student_one = student_in_course(
+          active_all: true, name: 'Frodo Bravo', sortable_name: 'Bravo, Frodo'
+        ).user
+        student_two = student_in_course(
+          active_all: true, name: 'Alfred Charlie', sortable_name: 'Charlie, Alfred'
+        ).user
+        student_three = student_in_course(
+          active_all: true, name: 'Beauregard Alpha', sortable_name: 'Alpha, Beauregard'
+        ).user
+
+        group_category = @course.group_categories.create!(name: "Test Group Set")
+        group_one = @course.groups.create!(name: "Group B", group_category: group_category)
+        group_two = @course.groups.create!(name: "Group A", group_category: group_category)
+        group_three = @course.groups.create!(name: "Group C", group_category: group_category)
+
+        add_user_to_group(student_one, group_one, true)
+        add_user_to_group(student_two, group_two, true)
+        add_user_to_group(student_three, group_three, true)
+        add_user_to_group(@initial_student, group_three, true)
+
+        assignment = @course.assignments.create!(
+          assignment_valid_attributes.merge(
+            group_category: group_category,
+            grade_group_students_individually: false
+          )
+        )
+
+        expect(Canvas::ICU).to receive(:collate_by).and_call_original
+
+        representatives = assignment.representatives(@teacher)
+
+        expect(representatives[0].name).to eql(group_two.name)
+        expect(representatives[1].name).to eql(group_one.name)
+        expect(representatives[2].name).to eql(group_three.name)
+      end
+    end
+
+    context "group assignments with no students assigned to a group" do
+      it "sorts by sortable_name" do
+        student_one = student_in_course(
+          active_all: true, name: 'Frodo Bravo', sortable_name: 'Bravo, Frodo'
+        ).user
+        student_two = student_in_course(
+          active_all: true, name: 'Alfred Charlie', sortable_name: 'Charlie, Alfred'
+        ).user
+        student_three = student_in_course(
+          active_all: true, name: 'Beauregard Alpha', sortable_name: 'Alpha, Beauregard'
+        ).user
+
+        group_category = @course.group_categories.create!(name: "Test Group Set")
+
+        assignment = @course.assignments.create!(
+          assignment_valid_attributes.merge(
+            group_category: group_category,
+            grade_group_students_individually: false
+          )
+        )
+
+        expect(Canvas::ICU).to receive(:collate_by).and_call_original
+
+        representatives = assignment.representatives(@teacher)
+
+        expect(representatives[0].name).to eql(student_three.name)
+        expect(representatives[1].name).to eql(student_one.name)
+        expect(representatives[2].name).to eql(student_two.name)
+        expect(representatives[3].name).to eql(@initial_student.name)
+      end
+    end
+
+    context "group assignments with some students assigned to a group and some not" do
+      include GroupsCommon
+      it "sorts by student name and group name" do
+        student_one = student_in_course(
+          active_all: true, name: 'Frodo Bravo', sortable_name: 'Bravo, Frodo'
+        ).user
+        student_two = student_in_course(
+          active_all: true, name: 'Alfred Charlie', sortable_name: 'Charlie, Alfred'
+        ).user
+        student_three = student_in_course(
+          active_all: true, name: 'Beauregard Alpha', sortable_name: 'Alpha, Beauregard'
+        ).user
+
+        group_category = @course.group_categories.create!(name: "Test Group Set")
+        group_one = @course.groups.create!(name: "Group B", group_category: group_category)
+        group_two = @course.groups.create!(name: "Group A", group_category: group_category)
+
+        add_user_to_group(student_one, group_one, true)
+        add_user_to_group(student_two, group_two, true)
+
+        assignment = @course.assignments.create!(
+          assignment_valid_attributes.merge(
+            group_category: group_category,
+            grade_group_students_individually: false
+          )
+        )
+
+        expect(Canvas::ICU).to receive(:collate_by).and_call_original
+
+        representatives = assignment.representatives(@teacher)
 
     tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
     @assignment.tool_settings_tool = tool
