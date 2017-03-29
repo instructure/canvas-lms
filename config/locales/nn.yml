@@ -3105,6 +3105,7 @@ nn:
   click_here_it_s_free_eeccb9cb: "Klikk her. Det er gratis."
   click_here_to_see_the_file_79e2b366: "Klikk her og vis fila."
   click_here_to_view_ec8cb2fd: "klikk her for å vise"
+  click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Klikk på eit snapshot for å gå tilbake til forsøket ditt slik det var når snapshotet blei tatt. Merk! Du vil mista alt arbeidet du har gjort i tida etter at snapshotet blei tatt og det kan ikkje gjerast om! "
   click_to_add_a_name_6cf551b0: "Klikk for å legge til eit namn"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Klikk for å endre profilbilde for %{display_name}"
   click_to_create_a_new_user_for_address_325f6683: "Klikk for å opprette ein ny brukar for %{address}"
@@ -8117,6 +8118,10 @@ nn:
   information_icon_8a514faa: Informasjonsikon
   inner_box_background_6f9092f: "Bakgrunn for inste boks"
   inner_box_border_d0524b03: "Kantlinje rundt inste boks"
+  input_and_distribute_grades_for_students_display_g_95b9b6ee: |-
+      Tilfør og fordel karakterar for studentar. Presenter karakterane som
+      poeng, prosent, fullført eller ikkje fullført, godkjent eller ikkje godkjent, GPA-skala
+      og bokstavkarakterar. Gruppeoppgåver for karaktervekting.
   insert_math_equation_57c6e767: "Set inn mattelikning"
   insert_row_below_25187f89: "Set inn rad nedanfor"
   installed_7b284a91: Installert
