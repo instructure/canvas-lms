@@ -86,6 +86,7 @@ class AssignmentGroupColumnHeader extends React.Component {
 
         <PopoverMenu
           contentRef={this.bindOptionsMenuContent}
+          focusTriggerOnClose={false}
           trigger={renderTrigger(this.props.assignmentGroup)}
           zIndex="9999"
         >

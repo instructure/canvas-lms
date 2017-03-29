@@ -16,9 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import { mount, ReactWrapper } from 'enzyme'
-import AssignmentColumnHeader from 'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
+import React from 'react';
+import { mount, ReactWrapper } from 'enzyme';
+import AssignmentColumnHeader from 'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader';
+import CurveGradesDialogManager from 'jsx/gradezilla/default_gradebook/CurveGradesDialogManager';
+import AssignmentMuterDialogManager from 'jsx/gradezilla/shared/AssignmentMuterDialogManager';
+import SetDefaultGradeDialogManager from 'jsx/gradezilla/shared/SetDefaultGradeDialogManager';
 
 function createAssignmentProp () {
   return {
@@ -109,12 +112,12 @@ function createExampleProps () {
   };
 }
 
-function mountComponent (props) {
-  return mount(<AssignmentColumnHeader {...props} />);
+function mountComponent (props, mountOptions = {}) {
+  return mount(<AssignmentColumnHeader {...props} />, mountOptions);
 }
 
-function mountAndOpenOptions (props) {
-  const wrapper = mountComponent(props);
+function mountAndOpenOptions (props, mountOptions = {}) {
+  const wrapper = mountComponent(props, mountOptions);
   wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
   return wrapper;
 }
@@ -443,16 +446,6 @@ test('disables the menu item when the disabled prop is true', function () {
   equal(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
 });
 
-test('clicking the menu item invokes the Assignment Details dialog', function () {
-  this.props.assignmentDetailsAction.onSelect = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-
-  const specificMenuItem = document.querySelector('[data-menu-item-id="show-assignment-details"]');
-  specificMenuItem.click();
-
-  equal(this.props.assignmentDetailsAction.onSelect.callCount, 1);
-});
-
 QUnit.module('AssignmentColumnHeader - Curve Grades Dialog', {
   setup () {
     this.props = createExampleProps();
@@ -489,6 +482,30 @@ test('onSelect is called when menu item is clicked', function () {
   const menuItem = document.querySelector('[data-menu-item-id="curve-grades"]');
   menuItem.click();
   equal(this.props.curveGradesAction.onSelect.callCount, 1);
+});
+
+test('the Curve Grades dialog has focus when it is invoked', function () {
+  const curveGradesActionOptions = {
+    isAdmin: true,
+    contextUrl: 'http://contextUrl',
+    submissionsLoaded: true
+  };
+  const curveGradesProps = CurveGradesDialogManager.createCurveGradesAction(
+    this.props.assignment, this.props.students, curveGradesActionOptions
+  )
+
+  this.props.curveGradesAction.onSelect = curveGradesProps.onSelect
+  this.wrapper = mountAndOpenOptions(this.props, { attachTo: document.querySelector('#fixtures') });
+
+  const specificMenuItem = document.querySelector('[data-menu-item-id="curve-grades"]');
+  specificMenuItem.click();
+
+  const allDialogCloseButtons = document.querySelectorAll('.ui-dialog-titlebar-close.ui-state-focus');
+  const dialogCloseButton = allDialogCloseButtons[allDialogCloseButtons.length - 1];
+
+  equal(document.activeElement, dialogCloseButton);
+
+  dialogCloseButton.click();
 });
 
 QUnit.module('AssignmentColumnHeader - Message Students Who Action', {
@@ -575,6 +592,23 @@ test('clicking the option invokes prop muteAssignmentAction.onSelect', function 
   specificMenuItem.click();
 
   equal(this.props.muteAssignmentAction.onSelect.callCount, 1);
+});
+
+test('the Assignment Muting dialog has focus when it is invoked', function () {
+  const dialogManager = new AssignmentMuterDialogManager(this.props.assignment, 'http://url', true);
+
+  this.props.muteAssignmentAction.onSelect = dialogManager.showDialog
+  this.wrapper = mountAndOpenOptions(this.props, { attachTo: document.querySelector('#fixtures') });
+
+  const specificMenuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
+  specificMenuItem.click();
+
+  const allDialogCloseButtons = document.querySelectorAll('.ui-dialog-titlebar-close.ui-state-focus');
+  const dialogCloseButton = allDialogCloseButtons[allDialogCloseButtons.length - 1];
+
+  equal(document.activeElement, dialogCloseButton);
+
+  dialogCloseButton.click();
 });
 
 QUnit.module('AssignmentColumnHeader - non-standard assignment', {
@@ -667,6 +701,23 @@ test('clicking the menu item invokes the onSelect handler', function () {
   specificMenuItem.click();
 
   equal(this.props.setDefaultGradeAction.onSelect.callCount, 1);
+});
+
+test('the Set Default Grade dialog has focus when it is invoked', function () {
+  const dialogManager = new SetDefaultGradeDialogManager(this.props.assignment, this.props.students, 1, '1', true, true);
+
+  this.props.setDefaultGradeAction.onSelect = dialogManager.showDialog
+  this.wrapper = mountAndOpenOptions(this.props, { attachTo: document.querySelector('#fixtures') });
+
+  const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
+  specificMenuItem.click();
+
+  const allDialogCloseButtons = document.querySelectorAll('.ui-dialog-titlebar-close.ui-state-focus');
+  const dialogCloseButton = allDialogCloseButtons[allDialogCloseButtons.length - 1];
+
+  equal(document.activeElement, dialogCloseButton);
+
+  dialogCloseButton.click();
 });
 
 QUnit.module('AssignmentColumnHeader - Download Submissions Action', {

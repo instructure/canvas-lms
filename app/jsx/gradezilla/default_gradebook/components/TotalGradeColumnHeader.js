@@ -67,6 +67,7 @@ class TotalGradeColumnHeader extends React.Component {
 
         <PopoverMenu
           contentRef={this.bindOptionsMenuContent}
+          focusTriggerOnClose={false}
           trigger={renderTrigger()}
           zIndex="9999"
         >
