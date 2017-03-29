@@ -1236,24 +1236,6 @@ ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems', 'plug
 
 ActiveRecord::Tasks::DatabaseTasks.migrations_paths = ActiveRecord::Migrator.migrations_paths
 
-module AddIndexWithLengthRaise
-  def add_index(table_name, column_name, options = {})
-    unless options[:name].to_s =~ /^temp_/
-      column_names = Array(column_name)
-      index_name = index_name(table_name, :column => column_names)
-      index_name = options[:name].to_s if options[:name]
-      if index_name.length > index_name_length
-        raise(ArgumentError, "Index name '#{index_name}' on table '#{table_name}' is too long; the limit is #{index_name_length} characters.")
-      end
-      if index_exists?(table_name, column_names, :name => index_name)
-        raise(ArgumentError, "Index name '#{index_name}' on table '#{table_name}' already exists.")
-      end
-    end
-    super
-  end
-end
-ActiveRecord::ConnectionAdapters::SchemaStatements.prepend(AddIndexWithLengthRaise)
-
 ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   # in anticipation of having to re-run migrations due to integrity violations or
   # killing stuff that is holding locks too long
