@@ -248,7 +248,7 @@ TEXT
                   <% disabled = hash[:locked] && hash[:inherited] %>
                   <tr>
                     <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
-                      <%= r.label :lock_all_announcements, :en => "Disable comments on announcements" %>
+                      <%= r.label :value, :en => "Disable comments on announcements" %>
                     </td>
                   </tr>
                   <% unless disabled %>
@@ -259,6 +259,17 @@ TEXT
                       </td>
                     </tr>
                   <% end %>
+                <% end %>
+
+                <%= settings.fields_for :enable_offline_web_export do |r| %>
+                  <% hash = @account.enable_offline_web_export %>
+                  <% disabled = hash[:locked] && hash[:inherited] %>
+                  <tr>
+                    <td colspan="2">
+                      <%= r.check_box :value, checked: hash[:value], disabled: disabled %>
+                      <%= r.label :value, t("Allow students to download course content and view offline") %>
+                    </td>
+                  </tr>
                 <% end %>
               <% end %>
             <% end %>
