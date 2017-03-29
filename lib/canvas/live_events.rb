@@ -299,16 +299,16 @@ module Canvas::LiveEvents
   def self.wiki_page_updated(page, old_title, old_body)
     payload = {
       wiki_page_id: page.global_id,
-      title: page.title,
-      body: page.body
+      title: LiveEvents.truncate(page.title),
+      body: LiveEvents.truncate(page.body)
     }
 
     if old_title
-      payload[:old_title] = old_title
+      payload[:old_title] = LiveEvents.truncate(old_title)
     end
 
     if old_body
-      payload[:old_body] = old_body
+      payload[:old_body] = LiveEvents.truncate(old_body)
     end
 
     post_event_stringified('wiki_page_updated', payload)
