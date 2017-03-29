@@ -3,7 +3,7 @@ class MakeNotificationPolicyFrequencyNotNull < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up
-    change_column_null_with_less_locking :notification_policies, :frequency
+    change_column_null :notification_policies, :frequency, false
     change_column_default :notification_policies, :frequency, 'immediately'
   end
 

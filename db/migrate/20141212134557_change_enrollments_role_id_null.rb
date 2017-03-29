@@ -5,7 +5,7 @@ class ChangeEnrollmentsRoleIdNull < ActiveRecord::Migration[4.2]
   def up
     cleanup_enrollments(Role.get_built_in_role("ObserverEnrollment"), "ObserverEnrollment")
     cleanup_enrollments(Role.get_built_in_role("StudentEnrollment"), "StudentViewEnrollment")
-    change_column_null_with_less_locking :enrollments, :role_id
+    change_column_null :enrollments, :role_id, false
   end
 
   def cleanup_enrollments(role, type)

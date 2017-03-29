@@ -1287,12 +1287,6 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
       raise unless e.message =~ /PG(?:::)?Error: ERROR:.+does not exist/
     end
   end
-
-  # does a query first to make the actual constraint adding fast
-  def change_column_null_with_less_locking(table, column)
-    execute("SELECT COUNT(*) FROM #{quote_table_name(table)} WHERE #{column} IS NULL") if open_transactions == 0
-    change_column_null table, column, false
-  end
 end
 
 ActiveRecord::Associations::CollectionAssociation.class_eval do

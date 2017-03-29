@@ -255,6 +255,14 @@ module PostgreSQLAdapterExtensions
     execute("DROP TRIGGER IF EXISTS #{name} ON #{quote_table_name(table)};\nDROP FUNCTION IF EXISTS #{quote_table_name(name)}();\n")
   end
 
+  # does a query first to warm the db cache, to make the actual constraint adding fast
+  def change_column_null(table, column, nullness, default = nil)
+    # no point in pre-warming the cache to avoid locking if we're already in a transaction
+    return super if nullness != false || default || open_transactions != 0
+    execute("SELECT COUNT(*) FROM #{quote_table_name(table)} WHERE #{column} IS NULL")
+    super
+  end
+
   private
 
   OID = ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID
