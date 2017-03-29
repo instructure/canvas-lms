@@ -3,6 +3,7 @@ require_relative '../page_objects/gradezilla_page'
 
 describe "Gradezilla - custom columns" do
   include_context "in-process server selenium tests"
+  include_context "gradebook_components"
   include GradezillaCommon
 
   let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
@@ -38,31 +39,19 @@ describe "Gradezilla - custom columns" do
 
   it "lets you show and hide the teacher notes column", priority: "1", test_id: 164008 do
     gradezilla_page.visit(@course)
+    # create the notes column
+    gradebook_view_options_menu.click
+    notes_option.click
+    expect(f("#content")).to contain_css('.custom_column')
 
-    has_notes_column = lambda do
-      ff(".container_0 .slick-header-column").any? { |h| h.text == "Notes" }
-    end
-    expect(has_notes_column.call).to be_falsey
+    # hide the notes column
+    gradebook_view_options_menu.click
+    notes_option.click
+    expect(f("#content")).not_to contain_css('.custom_column')
 
-    dropdown_link = f("#gradebook_settings")
-    click_dropdown_option = ->(option) do
-      dropdown_link.click
-      ff(".gradebook_dropdown a").find { |a| a.text == option }.click
-      wait_for_ajaximations
-    end
-    show_notes = -> { click_dropdown_option.call("Show Notes Column") }
-    hide_notes = -> { click_dropdown_option.call("Hide Notes Column") }
-
-    # create the column
-    show_notes.call
-    expect(has_notes_column.call).to be_truthy
-
-    # hide the column
-    hide_notes.call
-    expect(has_notes_column.call).to be_falsey
-
-    # un-hide the column
-    show_notes.call
-    expect(has_notes_column.call).to be_truthy
+    # show the notes column
+    gradebook_view_options_menu.click
+    notes_option.click
+    expect(f("#content")).to contain_css('.custom_column')
   end
 end

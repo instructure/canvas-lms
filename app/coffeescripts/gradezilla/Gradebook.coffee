@@ -49,9 +49,10 @@ define [
   'compiled/util/NumberCompare'
   'compiled/util/natcompare'
   'str/htmlEscape'
-  'jsx/gradezilla/shared/AssignmentDetailsDialogManager',
+  'jsx/gradezilla/shared/AssignmentDetailsDialogManager'
   'jsx/gradezilla/shared/SetDefaultGradeDialogManager'
   'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
+  'jsx/gradezilla/default_gradebook/GradebookApi'
   'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
@@ -93,10 +94,11 @@ define [
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, AssignmentMuter,
   SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, SetDefaultGradeDialogManager,
-  CurveGradesDialogManager, StudentRowHeaderConstants, AssignmentColumnHeader, AssignmentGroupColumnHeader, CustomColumnHeader
-  StudentColumnHeader, StudentRowHeader, TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu,
-  PostGradesStore, PostGradesApp, SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager,
-  GroupTotalCellTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
+  CurveGradesDialogManager, GradebookApi, StudentRowHeaderConstants, AssignmentColumnHeader,
+  AssignmentGroupColumnHeader, CustomColumnHeader, StudentColumnHeader, StudentRowHeader, TotalGradeColumnHeader,
+  GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp, SubmissionStateMap,
+  DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, SectionMenuView,
+  GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
   assignmentHelper) ->
   IS_ADMIN = _.contains(ENV.current_user_roles, 'admin')
 
@@ -124,6 +126,7 @@ define [
       assignmentsLoaded: false
       studentsLoaded: false
       submissionsLoaded: false
+      teacherNotesColumnUpdating: false
     }
 
   class Gradebook
@@ -232,7 +235,6 @@ define [
       @studentsLoaded = dataLoader.gotStudents
       @allSubmissionsLoaded = dataLoader.gotSubmissions
 
-      @showCustomColumnDropdownOption()
       @initPostGradesStore()
       @showPostGradesButton()
       @checkForUploadComplete()
@@ -1153,9 +1155,26 @@ define [
         props.variant = mountPoint.getAttribute('data-variant')
         renderComponent(GradebookMenu, mountPoint, props)
 
+    getViewOptionsMenuProps: ->
+      teacherNotes = @options.teacher_notes
+      showingNotes = teacherNotes? and not teacherNotes.hidden
+      if showingNotes
+        onSelect = => @setTeacherNotesHidden(true)
+      else if teacherNotes
+        onSelect = => @setTeacherNotesHidden(false)
+      else
+        onSelect = @createTeacherNotes
+      {
+        teacherNotes:
+          disabled: @contentLoadStates.teacherNotesColumnUpdating
+          onSelect: onSelect
+          selected: showingNotes
+      }
+
     renderViewOptionsMenu: =>
       mountPoint = document.querySelector("[data-component='ViewOptionsMenu']")
-      renderComponent(ViewOptionsMenu, mountPoint)
+      props = @getViewOptionsMenuProps()
+      renderComponent(ViewOptionsMenu, mountPoint, props)
 
     renderActionMenu: =>
       actionMenuProps =
@@ -1622,66 +1641,6 @@ define [
             @totalGradeWarning =
               warningText: text
               icon: "icon-warning final-warning"
-    ###
-    xsslint jqueryObject.identifier createLink
-    xsslint jqueryObject.function showLink hideLink
-    ###
-    showCustomColumnDropdownOption: ->
-      linkContainer = $("<li>").appendTo(".gradebook_dropdown")
-
-      showLabel = I18n.t("show_notes", "Show Notes Column")
-      hideLabel = I18n.t("hide_notes", "Hide Notes Column")
-      teacherNotesUrl = =>
-        @options.custom_column_url.replace(/:id/, @options.teacher_notes.id)
-      createLink = $ "<a>",
-        href: @options.custom_columns_url, "class": "create", text: showLabel
-      showLink = -> $ "<a>",
-        href: teacherNotesUrl(), "class": "show", text: showLabel
-      hideLink = -> $ "<a>",
-        href: teacherNotesUrl(), "class": "hide", text: hideLabel
-
-      handleClick = (e, method, params) ->
-        $.ajaxJSON(e.target.href, method, params)
-
-      teacherNotesDataLoaded = false
-      hideNotesColumn = =>
-        @toggleNotesColumn =>
-          for c, i in @customColumns
-            if c.teacher_notes
-              @customColumns.splice i, 1
-              break
-          @grid.setNumberOfColumnsToFreeze @getFrozenColumnCount()
-        linkContainer.html(showLink())
-
-      linkContainer.click (e) =>
-        e.preventDefault()
-        $target = $(e.target)
-        if $target.hasClass("show")
-          handleClick(e, "PUT", "column[hidden]": false)
-          .then =>
-            @showNotesColumn()
-            linkContainer.html(hideLink())
-            @reorderCustomColumns(@customColumns.map (c) -> c.id)
-        if $target.hasClass("hide")
-          handleClick(e, "PUT", "column[hidden]": true)
-          .then hideNotesColumn()
-        if $target.hasClass("create")
-          handleClick(e, "POST",
-            "column[title]": I18n.t("notes", "Notes")
-            "column[position]": 1
-            "column[teacher_notes]": true)
-          .then (data) =>
-            @options.teacher_notes = data
-            @showNotesColumn()
-            linkContainer.html(hideLink())
-
-      notes = @options.teacher_notes
-      if !notes
-        linkContainer.html(createLink)
-      else if notes.hidden
-        linkContainer.html(showLink())
-      else
-        linkContainer.html(hideLink())
 
     toggleNotesColumn: (callback) =>
       columnsToReplace = @getFrozenColumnCount()
@@ -1703,6 +1662,14 @@ define [
 
     getFrozenColumnCount: ->
       @parentColumns.length + @customColumns.length
+
+    hideNotesColumn: =>
+      @toggleNotesColumn =>
+        for c, i in @customColumns
+          if c.teacher_notes
+            @customColumns.splice i, 1
+            break
+        @grid.setNumberOfColumnsToFreeze @getFrozenColumnCount()
 
     isAllGradingPeriods: (currentPeriodId) ->
       currentPeriodId == "0"
@@ -1755,6 +1722,7 @@ define [
       @renderTotalGradeColumnHeader()
 
     # Student Column Header
+
     getStudentColumnSortBySetting: =>
       columnId = 'student'
       sortRowsBySetting = @getSortRowsBySetting()
@@ -2006,6 +1974,9 @@ define [
     setSubmissionsLoaded: (loaded) =>
       @contentLoadStates.submissionsLoaded = loaded
 
+    setTeacherNotesColumnUpdating: (updating) =>
+      @contentLoadStates.teacherNotesColumnUpdating = updating
+
     setSelectedPrimaryInfo: (primaryInfo, skipRedraw) =>
       @gridDisplaySettings.selectedPrimaryInfo = primaryInfo
       unless skipRedraw
@@ -2065,3 +2036,40 @@ define [
 
     getAssignmentGroup: (assignmentGroupId) =>
       @assignmentGroups[assignmentGroupId]
+
+    ## Gradebook Content Api Methods
+
+    createTeacherNotes: =>
+      @setTeacherNotesColumnUpdating(true)
+      @renderViewOptionsMenu()
+      GradebookApi.createTeacherNotesColumn(@options.context_id)
+        .then (response) =>
+          @options.teacher_notes = response.data
+          @showNotesColumn()
+          @setTeacherNotesColumnUpdating(false)
+          @renderViewOptionsMenu()
+        .catch (error) =>
+          $.flashError I18n.t('There was a problem creating the teacher notes column.')
+          @setTeacherNotesColumnUpdating(false)
+          @renderViewOptionsMenu()
+
+    setTeacherNotesHidden: (hidden) =>
+      @setTeacherNotesColumnUpdating(true)
+      @renderViewOptionsMenu()
+      GradebookApi.updateTeacherNotesColumn(@options.context_id, @options.teacher_notes.id, { hidden })
+        .then =>
+          @options.teacher_notes.hidden = hidden
+          if hidden
+            @hideNotesColumn()
+          else
+            @showNotesColumn()
+            @reorderCustomColumns(@customColumns.map (c) -> c.id)
+          @setTeacherNotesColumnUpdating(false)
+          @renderViewOptionsMenu()
+        .catch (error) =>
+          if hidden
+            $.flashError I18n.t('There was a problem hiding the teacher notes column.')
+          else
+            $.flashError I18n.t('There was a problem showing the teacher notes column.')
+          @setTeacherNotesColumnUpdating(false)
+          @renderViewOptionsMenu()

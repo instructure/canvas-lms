@@ -222,20 +222,6 @@ describe "Gradezilla" do
     expect(f("#content")).not_to contain_jqcss('.student-placeholder:visible')
   end
 
-  it "should hide and show notes", priority: "2", test_id: 164224 do
-    gradezilla_page.visit(@course)
-
-    # show notes column
-    gradebook_settings_cog.click
-    show_notes.click
-    expect(f("#content")).to contain_jqcss('.custom_column:visible')
-
-    # hide notes column
-    gradebook_settings_cog.click
-    hide_notes.click
-    expect(f("#content")).not_to contain_jqcss('.custom_column:visible')
-  end
-
   context "downloading and uploading submissions" do
     it "updates the dropdown menu after downloading and processes submission uploads" do
       # Given I have a student with an uploaded submission

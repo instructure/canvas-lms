@@ -17,6 +17,7 @@
  */
 
 import _ from 'underscore';
+import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import natcompare from 'compiled/util/natcompare';
@@ -29,7 +30,7 @@ import DataLoader from 'jsx/gradezilla/DataLoader';
 import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants';
 import Gradebook from 'compiled/gradezilla/Gradebook';
 import UserSettings from 'compiled/userSettings';
-import $ from 'jquery';
+import GradebookApi from 'jsx/gradezilla/default_gradebook/GradebookApi';
 
 const $fixtures = document.getElementById('fixtures');
 
@@ -39,6 +40,7 @@ function createGradebook (options = {}) {
       show_concluded_enrollments: false,
       show_inactive_enrollments: false
     },
+    context_id: '1',
     sections: {},
     ...options
   });
@@ -1119,9 +1121,354 @@ test('when editable, calls SubmissionDetailsDialog', function () {
   deepEqual(this.submissionDialogArgs, expectedArguments);
 });
 
+QUnit.module('getViewOptionsMenuProps');
+
+test('includes teacherNotes', function () {
+  const gradebook = createGradebook();
+  const props = gradebook.getViewOptionsMenuProps();
+  equal(typeof props.teacherNotes.disabled, 'boolean', 'props include "disabled"');
+  equal(typeof props.teacherNotes.onSelect, 'function', 'props include "onSelect"');
+  equal(typeof props.teacherNotes.selected, 'boolean', 'props include "selected"');
+});
+
+test('disabled defaults to false', function () {
+  const gradebook = createGradebook();
+  const props = gradebook.getViewOptionsMenuProps();
+  equal(props.teacherNotes.disabled, false);
+});
+
+test('disabled is true if the teacher notes column is updating', function () {
+  const gradebook = createGradebook();
+  gradebook.setTeacherNotesColumnUpdating(true);
+  const props = gradebook.getViewOptionsMenuProps();
+  equal(props.teacherNotes.disabled, true);
+});
+
+test('disabled is false if the teacher notes column is not updating', function () {
+  const gradebook = createGradebook();
+  gradebook.setTeacherNotesColumnUpdating(false);
+  const props = gradebook.getViewOptionsMenuProps();
+  equal(props.teacherNotes.disabled, false);
+});
+
+test('onSelect calls createTeacherNotes if there are no teacher notes', function () {
+  const gradebook = createGradebook({ teacher_notes: null });
+  this.stub(gradebook, 'createTeacherNotes');
+  const props = gradebook.getViewOptionsMenuProps();
+  props.teacherNotes.onSelect();
+  equal(gradebook.createTeacherNotes.callCount, 1);
+});
+
+test('onSelect calls setTeacherNotesHidden with false if teacher notes are hidden', function () {
+  const gradebook = createGradebook({ teacher_notes: { hidden: true } });
+  this.stub(gradebook, 'setTeacherNotesHidden');
+  const props = gradebook.getViewOptionsMenuProps();
+  props.teacherNotes.onSelect();
+  equal(gradebook.setTeacherNotesHidden.callCount, 1);
+  equal(gradebook.setTeacherNotesHidden.getCall(0).args[0], false)
+});
+
+test('onSelect calls setTeacherNotesHidden with true if teacher notes are visible', function () {
+  const gradebook = createGradebook({ teacher_notes: { hidden: false } });
+  this.stub(gradebook, 'setTeacherNotesHidden');
+  const props = gradebook.getViewOptionsMenuProps();
+  props.teacherNotes.onSelect();
+  equal(gradebook.setTeacherNotesHidden.callCount, 1);
+  equal(gradebook.setTeacherNotesHidden.getCall(0).args[0], true)
+});
+
+test('selected is false if there are no teacher notes', function () {
+  const gradebook = createGradebook({ teacher_notes: null });
+  const props = gradebook.getViewOptionsMenuProps();
+  equal(props.teacherNotes.selected, false);
+});
+
+test('selected is false if teacher notes are hidden', function () {
+  const gradebook = createGradebook({ teacher_notes: { hidden: true } });
+  const props = gradebook.getViewOptionsMenuProps();
+  equal(props.teacherNotes.selected, false);
+});
+
+test('selected is true if teacher notes are visible', function () {
+  const gradebook = createGradebook({ teacher_notes: { hidden: false } });
+  const props = gradebook.getViewOptionsMenuProps();
+  equal(props.teacherNotes.selected, true);
+});
+
+QUnit.module('Gradebook#createTeacherNotes', {
+  setup () {
+    this.promise = {
+      then (thenFn) {
+        this.thenFn = thenFn;
+        return this;
+      },
+
+      catch (catchFn) {
+        this.catchFn = catchFn;
+        return this;
+      }
+    };
+    this.stub(GradebookApi, 'createTeacherNotesColumn').returns(this.promise);
+    this.gradebook = createGradebook({ context_id: '1201' });
+    this.stub(this.gradebook, 'showNotesColumn');
+    this.stub(this.gradebook, 'renderViewOptionsMenu');
+  }
+});
+
+test('sets teacherNotesUpdating to true before sending the api request', function () {
+  this.gradebook.createTeacherNotes();
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true);
+});
+
+test('re-renders the view options menu after setting teacherNotesUpdating', function () {
+  this.gradebook.renderViewOptionsMenu.callsFake(() => {
+    equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true);
+  });
+  this.gradebook.createTeacherNotes();
+});
+
+test('calls GradebookApi.createTeacherNotesColumn', function () {
+  this.gradebook.createTeacherNotes();
+  equal(GradebookApi.createTeacherNotesColumn.callCount, 1);
+  const [courseId] = GradebookApi.createTeacherNotesColumn.getCall(0).args;
+  equal(courseId, '1201', 'the only parameter is the course id');
+});
+
+test('updates teacher notes with response data after request resolves', function () {
+  const column = { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false };
+  this.gradebook.createTeacherNotes();
+  this.promise.thenFn({ data: column });
+  equal(this.gradebook.options.teacher_notes, column);
+});
+
+test('shows the notes column after request resolves', function () {
+  this.gradebook.createTeacherNotes();
+  equal(this.gradebook.showNotesColumn.callCount, 0);
+  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false } });
+  equal(this.gradebook.showNotesColumn.callCount, 1);
+});
+
+test('sets teacherNotesUpdating to false after request resolves', function () {
+  this.gradebook.createTeacherNotes();
+  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false } });
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false);
+});
+
+test('re-renders the view options menu after request resolves', function () {
+  this.gradebook.createTeacherNotes();
+  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false } });
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false);
+});
+
+test('displays a flash error after request rejects', function () {
+  this.stub($, 'flashError');
+  this.gradebook.createTeacherNotes();
+  this.promise.catchFn(new Error('FAIL'));
+  equal($.flashError.callCount, 1);
+});
+
+test('sets teacherNotesUpdating to false after request rejects', function () {
+  this.gradebook.createTeacherNotes();
+  this.promise.catchFn(new Error('FAIL'));
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false);
+});
+
+test('re-renders the view options menu after request rejects', function () {
+  this.gradebook.createTeacherNotes();
+  this.promise.catchFn(new Error('FAIL'));
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false);
+});
+
+QUnit.module('Gradebook#setTeacherNotesHidden - showing teacher notes', {
+  setup () {
+    this.promise = {
+      then (thenFn) {
+        this.thenFn = thenFn;
+        return this;
+      },
+
+      catch (catchFn) {
+        this.catchFn = catchFn;
+        return this;
+      }
+    };
+    this.stub(GradebookApi, 'updateTeacherNotesColumn').returns(this.promise);
+    this.gradebook = createGradebook({ context_id: '1201', teacher_notes: { id: '2401', hidden: true } });
+    this.gradebook.customColumns = [{ id: '2401' }, { id: '2402' }];
+    this.stub(this.gradebook, 'showNotesColumn');
+    this.stub(this.gradebook, 'reorderCustomColumns');
+    this.stub(this.gradebook, 'renderViewOptionsMenu');
+  }
+});
+
+test('sets teacherNotesUpdating to true before sending the api request', function () {
+  this.gradebook.setTeacherNotesHidden(false);
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true);
+});
+
+test('re-renders the view options menu after setting teacherNotesUpdating', function () {
+  this.gradebook.renderViewOptionsMenu.callsFake(() => {
+    equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true);
+  });
+  this.gradebook.setTeacherNotesHidden(false);
+});
+
+test('calls GradebookApi.updateTeacherNotesColumn', function () {
+  this.gradebook.setTeacherNotesHidden(false);
+  equal(GradebookApi.updateTeacherNotesColumn.callCount, 1);
+  const [courseId, columnId, attr] = GradebookApi.updateTeacherNotesColumn.getCall(0).args;
+  equal(courseId, '1201', 'parameter 1 is the course id');
+  equal(columnId, '2401', 'parameter 2 is the column id');
+  equal(attr.hidden, false, 'attr.hidden is true');
+});
+
+test('updates teacher notes as not hidden after request resolves', function () {
+  this.gradebook.setTeacherNotesHidden(false);
+  equal(this.gradebook.options.teacher_notes.hidden, true);
+  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false } });
+  equal(this.gradebook.options.teacher_notes.hidden, false);
+});
+
+test('shows the notes column after request resolves', function () {
+  this.gradebook.setTeacherNotesHidden(false);
+  equal(this.gradebook.showNotesColumn.callCount, 0);
+  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false } });
+  equal(this.gradebook.showNotesColumn.callCount, 1);
+});
+
+test('reorders custom columns after request resolves', function () {
+  this.gradebook.setTeacherNotesHidden(false);
+  equal(this.gradebook.reorderCustomColumns.callCount, 0);
+  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false } });
+  equal(this.gradebook.reorderCustomColumns.callCount, 1);
+});
+
+test('reorders custom columns using the column ids', function () {
+  this.gradebook.setTeacherNotesHidden(false);
+  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false } });
+  const [columnIds] = this.gradebook.reorderCustomColumns.getCall(0).args;
+  deepEqual(columnIds, ['2401', '2402']);
+});
+
+test('sets teacherNotesUpdating to false after request resolves', function () {
+  this.gradebook.setTeacherNotesHidden(false);
+  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false } });
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false);
+});
+
+test('re-renders the view options menu after request resolves', function () {
+  this.gradebook.setTeacherNotesHidden(false);
+  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false } });
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false);
+});
+
+test('displays a flash message after request rejects', function () {
+  this.stub($, 'flashError');
+  this.gradebook.setTeacherNotesHidden(false);
+  this.promise.catchFn(new Error('FAIL'));
+  equal($.flashError.callCount, 1);
+});
+
+test('sets teacherNotesUpdating to false after request rejects', function () {
+  this.gradebook.setTeacherNotesHidden(false);
+  this.promise.catchFn(new Error('FAIL'));
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false);
+});
+
+test('re-renders the view options menu after request rejects', function () {
+  this.gradebook.setTeacherNotesHidden(false);
+  this.promise.catchFn(new Error('FAIL'));
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false);
+});
+
+QUnit.module('Gradebook#setTeacherNotesHidden - hiding teacher notes', {
+  setup () {
+    this.promise = {
+      then (thenFn) {
+        this.thenFn = thenFn;
+        return this;
+      },
+
+      catch (catchFn) {
+        this.catchFn = catchFn;
+        return this;
+      }
+    };
+    this.stub(GradebookApi, 'updateTeacherNotesColumn').returns(this.promise);
+    this.gradebook = createGradebook({ context_id: '1201', teacher_notes: { id: '2401', hidden: false } });
+    this.stub(this.gradebook, 'hideNotesColumn');
+    this.stub(this.gradebook, 'renderViewOptionsMenu');
+  }
+});
+
+test('sets teacherNotesUpdating to true before sending the api request', function () {
+  this.gradebook.setTeacherNotesHidden(true);
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true);
+});
+
+test('re-renders the view options menu after setting teacherNotesUpdating', function () {
+  this.gradebook.renderViewOptionsMenu.callsFake(() => {
+    equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true);
+  });
+  this.gradebook.setTeacherNotesHidden(true);
+});
+
+test('calls GradebookApi.updateTeacherNotesColumn', function () {
+  this.gradebook.setTeacherNotesHidden(true);
+  equal(GradebookApi.updateTeacherNotesColumn.callCount, 1);
+  const [courseId, columnId, attr] = GradebookApi.updateTeacherNotesColumn.getCall(0).args;
+  equal(courseId, '1201', 'parameter 1 is the course id');
+  equal(columnId, '2401', 'parameter 2 is the column id');
+  equal(attr.hidden, true, 'attr.hidden is true');
+});
+
+test('updates teacher notes as hidden after request resolves', function () {
+  this.gradebook.setTeacherNotesHidden(true);
+  equal(this.gradebook.options.teacher_notes.hidden, false);
+  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true } });
+  equal(this.gradebook.options.teacher_notes.hidden, true);
+});
+
+test('hides the notes column after request resolves', function () {
+  this.gradebook.setTeacherNotesHidden(true);
+  equal(this.gradebook.hideNotesColumn.callCount, 0);
+  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true } });
+  equal(this.gradebook.hideNotesColumn.callCount, 1);
+});
+
+test('sets teacherNotesUpdating to false after request resolves', function () {
+  this.gradebook.setTeacherNotesHidden(true);
+  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true } });
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false);
+});
+
+test('re-renders the view options menu after request resolves', function () {
+  this.gradebook.setTeacherNotesHidden(true);
+  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true } });
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false);
+});
+
+test('displays a flash message after request rejects', function () {
+  this.stub($, 'flashError');
+  this.gradebook.setTeacherNotesHidden(true);
+  this.promise.catchFn(new Error('FAIL'));
+  equal($.flashError.callCount, 1);
+});
+
+test('sets teacherNotesUpdating to false after request rejects', function () {
+  this.gradebook.setTeacherNotesHidden(true);
+  this.promise.catchFn(new Error('FAIL'));
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false);
+});
+
+test('re-renders the view options menu after request rejects', function () {
+  this.gradebook.setTeacherNotesHidden(true);
+  this.promise.catchFn(new Error('FAIL'));
+  equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false);
+});
+
 QUnit.module('Menus', {
   setup () {
-    this.fixtures = document.getElementById('fixtures');
     fakeENV.setup({
       current_user_id: '1',
       GRADEBOOK_OPTIONS: {
@@ -1132,20 +1479,20 @@ QUnit.module('Menus', {
   },
 
   teardown () {
-    this.fixtures.innerHTML = '';
+    $fixtures.innerHTML = '';
     fakeENV.teardown();
   }
 });
 
 test('ViewOptionsMenu is rendered on renderViewOptionsMenu', function () {
-  this.fixtures.innerHTML = '<span data-component="ViewOptionsMenu"></span>';
-  Gradebook.prototype.renderViewOptionsMenu.call();
+  ReactDOM.render(<span data-component="ViewOptionsMenu" />, $fixtures);
+  createGradebook().renderViewOptionsMenu();
   const buttonText = document.querySelector('[data-component="ViewOptionsMenu"] Button').innerText.trim();
   equal(buttonText, 'View');
 });
 
 test('ActionMenu is rendered on renderActionMenu', function () {
-  this.fixtures.innerHTML = '<span data-component="ActionMenu"></span>';
+  ReactDOM.render(<span data-component="ActionMenu" />, $fixtures);
   const self = {
     options: {
       gradebook_is_editable: true,
@@ -1160,7 +1507,7 @@ test('ActionMenu is rendered on renderActionMenu', function () {
 });
 
 test('GradebookMenu is rendered on renderGradebookMenu', function () {
-  this.fixtures.innerHTML = '<span data-component="GradebookMenu" data-variant="DefaultGradebook"></span>';
+  ReactDOM.render(<span data-component="GradebookMenu" data-variant="DefaultGradebook" />, $fixtures);
   const self = {
     options: {
       assignmentOrOutcome: 'assignment',
