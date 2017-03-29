@@ -25,19 +25,21 @@ class ViewOptionsMenu extends React.Component {
       disabled: bool.isRequired,
       onSelect: func.isRequired,
       selected: bool.isRequired
-    }).isRequired
+    }).isRequired,
+    showUnpublishedAssignments: React.PropTypes.bool.isRequired,
+    onSelectShowUnpublishedAssignments: React.PropTypes.func.isRequired
   };
 
   constructor (props) {
     super(props);
-    this.bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref };
+    this.bindMenuContent = (ref) => { this.menuContent = ref };
   }
 
   render () {
     return (
       <PopoverMenu
         trigger={renderTriggerButton()}
-        contentRef={this.bindOptionsMenuContent}
+        contentRef={this.bindMenuContent}
       >
         <MenuItemGroup label={I18n.t('Arrange By')}>
           <MenuItem defaultSelected>
@@ -55,7 +57,7 @@ class ViewOptionsMenu extends React.Component {
 
         <MenuItemSeparator />
 
-        <MenuItemGroup label={I18n.t('Columns')}>
+        <MenuItemGroup allowMultiple label={I18n.t('Columns')}>
           <MenuItem
             disabled={this.props.teacherNotes.disabled}
             onSelect={this.props.teacherNotes.onSelect}
@@ -64,8 +66,11 @@ class ViewOptionsMenu extends React.Component {
             <span data-menu-item-id="show-notes-column">{I18n.t('Notes')}</span>
           </MenuItem>
 
-          <MenuItem>
-            { I18n.t('Unpublished Assignments') }
+          <MenuItem
+            selected={this.props.showUnpublishedAssignments}
+            onSelect={this.props.onSelectShowUnpublishedAssignments}
+          >
+            {I18n.t('Unpublished Assignments')}
           </MenuItem>
         </MenuItemGroup>
       </PopoverMenu>

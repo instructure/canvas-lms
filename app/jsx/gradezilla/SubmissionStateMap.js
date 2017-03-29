@@ -4,9 +4,10 @@ import I18n from 'i18n!gradebook'
 import GradingPeriodsHelper from 'jsx/grading/helpers/GradingPeriodsHelper'
 
   const TOOLTIP_KEYS = {
-    NOT_IN_ANY_GP: "not_in_any_grading_period",
-    IN_ANOTHER_GP: "in_another_grading_period",
-    IN_CLOSED_GP: "in_closed_grading_period",
+    UNPUBLISHED_ASSIGNMENT: 'unpublished_assignment',
+    NOT_IN_ANY_GP: 'not_in_any_grading_period',
+    IN_ANOTHER_GP: 'in_another_grading_period',
+    IN_CLOSED_GP: 'in_closed_grading_period',
     NONE: null
   };
 
@@ -16,7 +17,9 @@ import GradingPeriodsHelper from 'jsx/grading/helpers/GradingPeriodsHelper'
   }
 
   function cellMapForSubmission(assignment, student, hasGradingPeriods, selectedGradingPeriodID, isAdmin) {
-    if (!visibleToStudent(assignment, student)) {
+    if (!assignment.published) {
+      return { locked: true, hideGrade: true, tooltip: TOOLTIP_KEYS.UNPUBLISHED_ASSIGNMENT };
+    } else if (!visibleToStudent(assignment, student)) {
       return { locked: true, hideGrade: true, tooltip: TOOLTIP_KEYS.NONE };
     } else if (hasGradingPeriods) {
       return cellMappingsForMultipleGradingPeriods(assignment, student, selectedGradingPeriodID, isAdmin);

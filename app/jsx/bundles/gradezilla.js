@@ -39,17 +39,11 @@ class GradebookRouter extends Backbone.Router {
   initialize () {
     this.isLoaded = false
     this.views = {}
-    const options = ENV.GRADEBOOK_OPTIONS
-    options.assignmentOrOutcome = getGradebookTab()
-    options.navigate = this.navigate.bind(this)
-    options.settings = options.settings || {}
-    options.settings.show_concluded_enrollments = options.settings.show_concluded_enrollments === 'true'
-    options.settings.show_inactive_enrollments = options.settings.show_inactive_enrollments === 'true'
-    this.views.assignment = new Gradebook(options)
+    ENV.GRADEBOOK_OPTIONS.assignmentOrOutcome = getGradebookTab()
+    ENV.GRADEBOOK_OPTIONS.navigate = this.navigate.bind(this)
+    this.views.assignment = new Gradebook(ENV.GRADEBOOK_OPTIONS)
+    if (ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled) { this.views.outcome = this.initOutcomes() }
 
-    if (options.outcome_gradebook_enabled) {
-      this.views.outcome = this.initOutcomes()
-    }
     return this
   }
 

@@ -37,8 +37,8 @@ const $fixtures = document.getElementById('fixtures');
 function createGradebook (options = {}) {
   return new Gradebook({
     settings: {
-      show_concluded_enrollments: false,
-      show_inactive_enrollments: false
+      show_concluded_enrollments: 'false',
+      show_inactive_enrollments: 'false'
     },
     context_id: '1',
     sections: {},
@@ -643,19 +643,33 @@ QUnit.module('Gradebook#getVisibleGradeGridColumns', {
         object: {
           assignment_group: { position: 1 },
           position: 1,
-          name: 'first'
+          name: 'published graded',
+          published: true,
+          submission_types: ['online_text_entry']
         }
       }, {
         object: {
           assignment_group: { position: 1 },
           position: 2,
-          name: 'second'
+          name: 'unpublished',
+          published: false,
+          submission_types: ['online_text_entry']
         }
       }, {
         object: {
           assignment_group: { position: 1 },
           position: 3,
-          name: 'third'
+          name: 'not graded',
+          published: true,
+          submission_types: ['not_graded']
+        }
+      }, {
+        object: {
+          assignment_group: { position: 1 },
+          position: 4,
+          name: 'attendance',
+          published: true,
+          submission_types: ['attendance']
         }
       }
     ];
@@ -664,11 +678,11 @@ QUnit.module('Gradebook#getVisibleGradeGridColumns', {
     this.customColumnDefinitions = function () {
       return [];
     };
-    this.spy(this, 'makeColumnSortFn');
   }
 });
 
 test('sorts columns when there is a valid sortType', function () {
+  this.spy(this, 'makeColumnSortFn');
   this.isInvalidCustomSort = function () {
     return false;
   };
@@ -685,6 +699,7 @@ test('sorts columns when there is a valid sortType', function () {
 });
 
 test('falls back to the default sort type if the custom sort type does not have a customOrder property', function () {
+  this.spy(this, 'makeColumnSortFn');
   this.isInvalidCustomSort = function () {
     return true;
   };
@@ -699,9 +714,43 @@ test('falls back to the default sort type if the custom sort type does not have 
 });
 
 test('does not sort columns when gradebookColumnOrderSettings is undefined', function () {
+  this.spy(this, 'makeColumnSortFn');
   this.gradebookColumnOrderSettings = undefined;
   this.getVisibleGradeGridColumns();
   notOk(this.makeColumnSortFn.called);
+});
+
+test('only contains published and graded assignments', function () {
+  const columns = this.getVisibleGradeGridColumns();
+  const objectNames = columns.map(c => c.object.name);
+  deepEqual(objectNames, ['published graded']);
+});
+
+test('when showUnpublishedAssignments is true, include published assignments', function () {
+  this.showUnpublishedAssignments = true;
+  const columns = this.getVisibleGradeGridColumns();
+  const objectNames = columns.map(c => c.object.name);
+  deepEqual(objectNames, ['published graded', 'unpublished']);
+});
+
+test('does not include ungraded assignments', function () {
+  this.showUnpublishedAssignments = true;
+  const columns = this.getVisibleGradeGridColumns();
+  const objectNames = columns.map(c => c.object.name);
+  notOk(objectNames.includes('not graded'));
+});
+
+test('does not include attendance assignments when show_attendence is false', function () {
+  const columns = this.getVisibleGradeGridColumns();
+  const objectNames = columns.map(c => c.object.name);
+  notOk(objectNames.includes('attendance'));
+});
+
+test('includes attendance assignments when show_attendence is true', function () {
+  this.show_attendance = true;
+  const columns = this.getVisibleGradeGridColumns();
+  const objectNames = columns.map(c => c.object.name);
+  ok(objectNames.includes('attendance'));
 });
 
 QUnit.module('Gradebook#fieldsToExcludeFromAssignments', {
@@ -1485,8 +1534,9 @@ QUnit.module('Menus', {
 });
 
 test('ViewOptionsMenu is rendered on renderViewOptionsMenu', function () {
-  ReactDOM.render(<span data-component="ViewOptionsMenu" />, $fixtures);
-  createGradebook().renderViewOptionsMenu();
+  $fixtures.innerHTML = '<span data-component="ViewOptionsMenu"></span>';
+  const gradebook = createGradebook();
+  gradebook.renderViewOptionsMenu();
   const buttonText = document.querySelector('[data-component="ViewOptionsMenu"] Button').innerText.trim();
   equal(buttonText, 'View');
 });
@@ -2177,6 +2227,7 @@ QUnit.module('Gradebook#renderAssignmentColumnHeader', {
         muted: false,
         name: 'Math Assignment',
         omit_from_final_grade: false,
+        published: true,
         submission_types: ['online_text_entry']
       }
     });
@@ -2487,8 +2538,8 @@ QUnit.module('Gradebook#getAssignmentColumnHeaderProps', {
   createGradebook (options = {}) {
     const gradebook = createGradebook(options);
     gradebook.setAssignments({
-      201: { name: 'Math Assignment' },
-      202: { name: 'English Assignment' }
+      201: { name: 'Math Assignment', published: true },
+      202: { name: 'English Assignment', published: false }
     });
     return gradebook;
   },
@@ -2498,10 +2549,20 @@ QUnit.module('Gradebook#getAssignmentColumnHeaderProps', {
   }
 });
 
-test('includes properties from the assignment', function () {
+test('includes name from the assignment', function () {
   const props = this.createGradebook().getAssignmentColumnHeaderProps('201');
   ok(props.assignment, 'assignment is present');
   equal(props.assignment.name, 'Math Assignment');
+});
+
+test('includes published status for a published assignment', function () {
+  const { assignment: { published } } = this.createGradebook().getAssignmentColumnHeaderProps('201');
+  strictEqual(published, true);
+});
+
+test('includes published status for an unpublished assignment', function () {
+  const { assignment: { published } } = this.createGradebook().getAssignmentColumnHeaderProps('202');
+  strictEqual(published, false);
 });
 
 test('includes props for the "Sort by" setting', function () {
@@ -3664,8 +3725,8 @@ QUnit.module('Gradebook#getSelectedEnrollmentFilters', {
 test('returns empty array when all settings are off', function () {
   const gradebook = createGradebook({
     settings: {
-      show_concluded_enrollments: false,
-      show_inactive_enrollments: false
+      show_concluded_enrollments: 'false',
+      show_inactive_enrollments: 'false'
     }
   });
   equal(gradebook.getSelectedEnrollmentFilters().length, 0);
@@ -3674,8 +3735,8 @@ test('returns empty array when all settings are off', function () {
 test('returns array including "concluded" when setting is on', function () {
   const gradebook = createGradebook({
     settings: {
-      show_concluded_enrollments: true,
-      show_inactive_enrollments: false
+      show_concluded_enrollments: 'true',
+      show_inactive_enrollments: 'false'
     }
   });
 
@@ -3686,8 +3747,8 @@ test('returns array including "concluded" when setting is on', function () {
 test('returns array including "inactive" when setting is on', function () {
   const gradebook = createGradebook({
     settings: {
-      show_concluded_enrollments: false,
-      show_inactive_enrollments: true
+      show_concluded_enrollments: 'false',
+      show_inactive_enrollments: 'true'
     }
   });
   ok(gradebook.getSelectedEnrollmentFilters().includes('inactive'));
@@ -3697,8 +3758,8 @@ test('returns array including "inactive" when setting is on', function () {
 test('returns array including multiple values when settings are on', function () {
   const gradebook = createGradebook({
     settings: {
-      show_concluded_enrollments: true,
-      show_inactive_enrollments: true
+      show_concluded_enrollments: 'true',
+      show_inactive_enrollments: 'true'
     }
   });
   ok(gradebook.getSelectedEnrollmentFilters().includes('inactive'));
@@ -3728,4 +3789,285 @@ test('changes the value of @getSelectedEnrollmentFilters', function () {
       notEqual(previousValue, newValue);
     });
   }
+});
+
+QUnit.module('Gradebook#saveSettings', {
+  setup () {
+    this.server = sinon.fakeServer.create({ respondImmediately: true });
+    this.options = { settings_update_url: '/course/1/gradebook_settings' };
+  },
+
+  teardown () {
+    this.server.restore();
+  }
+});
+
+test('calls ajaxJSON with the settings_update_url', function () {
+  const options = { settings_update_url: 'http://someUrl/' };
+  const gradebook = createGradebook({ ...options });
+  const ajaxJSONStub = this.stub($, 'ajaxJSON');
+  gradebook.saveSettings();
+  equal(ajaxJSONStub.firstCall.args[0], options.settings_update_url);
+});
+
+test('calls ajaxJSON as a PUT request', function () {
+  const gradebook = createGradebook();
+  const ajaxJSONStub = this.stub($, 'ajaxJSON');
+  gradebook.saveSettings();
+  equal(ajaxJSONStub.firstCall.args[1], 'PUT');
+});
+
+test('calls ajaxJSON with default gradebook_settings', function () {
+  const expectedSettings = {
+    show_concluded_enrollments: true,
+    show_inactive_enrollments: true,
+    show_unpublished_assignments: true
+  };
+  const gradebook = createGradebook({
+    settings: {
+      show_concluded_enrollments: 'true',
+      show_inactive_enrollments: 'true',
+      show_unpublished_assignments: 'true'
+    }
+  });
+  const ajaxJSONStub = this.stub($, 'ajaxJSON');
+  gradebook.saveSettings();
+  deepEqual(ajaxJSONStub.firstCall.args[2], { gradebook_settings: { ...expectedSettings }});
+});
+
+test('calls ajaxJSON with parameters', function () {
+  const gradebook = createGradebook({
+    settings: {
+      show_concluded_enrollments: 'true',
+      show_inactive_enrollments: 'true',
+      show_unpublished_assignments: 'true'
+    }
+  });
+  const ajaxJSONStub = this.stub($, 'ajaxJSON');
+  gradebook.saveSettings({
+    showConcludedEnrollments: false,
+    showInactiveEnrollments: false,
+    showUnpublishedAssignments: false
+  });
+
+  deepEqual(ajaxJSONStub.firstCall.args[2], {
+    gradebook_settings: {
+      show_concluded_enrollments: false,
+      show_inactive_enrollments: false,
+      show_unpublished_assignments: false
+    }
+  });
+});
+
+test('calls successFn when response is successful', function () {
+  // The requests is sent as a PUT but ajaxJSON does not play nice with
+  // sinon.fakeServer's fakeHTTPMethods setting.
+  this.server.respondWith('POST', this.options.settings_update_url, [
+    200, { 'Content-Type': 'application/json' }, '{}'
+  ]);
+  const successFn = this.stub();
+  const saveSettings = Gradebook.prototype.saveSettings;
+  const self = {
+    options: this.options,
+    getEnrollmentFilters () { return {}; }
+  };
+  saveSettings.call(self, {}, successFn, null);
+
+  strictEqual(successFn.callCount, 1);
+});
+
+test('calls errorFn when response is not successful', function () {
+  // The requests is sent as a PUT but ajaxJSON does not play nice with
+  // sinon.fakeServer's fakeHTTPMethods setting.
+  this.server.respondWith('POST', this.options.settings_update_url, [
+    401, { 'Content-Type': 'application/json' }, '{}'
+  ]);
+  const errorFn = this.stub();
+  const saveSettings = Gradebook.prototype.saveSettings;
+  const self = {
+    options: this.options,
+    getEnrollmentFilters () { return {}; }
+  };
+  saveSettings.call(self, {}, null, errorFn);
+
+  strictEqual(errorFn.callCount, 1);
+});
+
+QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu');
+
+test('calls setColumns with getVisibleGradeGridColumns as arguments', function () {
+  const gradebook = createGradebook();
+  const setColumnsStub = this.stub();
+  gradebook.rows = [
+    { id: '3', sortable_name: 'Z Lastington', someProperty: false },
+    { id: '4', sortable_name: 'A Firstington', someProperty: true }
+  ];
+  gradebook.grid = { // stubs for slickgrid
+    setColumns: setColumnsStub,
+    getColumns: () => gradebook.rows
+  };
+  this.stub(gradebook, 'getVisibleGradeGridColumns').returns(gradebook.rows);
+  this.stub(gradebook, 'updateColumnHeaders');
+  this.stub(gradebook, 'renderViewOptionsMenu');
+  gradebook.updateColumnsAndRenderViewOptionsMenu();
+
+  strictEqual(setColumnsStub.callCount, 1);
+  strictEqual(setColumnsStub.firstCall.args[0], gradebook.rows);
+});
+
+test('calls updateColumnHeaders', function () {
+  const gradebook = createGradebook();
+  gradebook.grid = { setColumns: () => {} };
+  this.stub(gradebook, 'getVisibleGradeGridColumns');
+  this.stub(gradebook, 'renderViewOptionsMenu');
+  const updateColumnHeadersStub = this.stub(gradebook, 'updateColumnHeaders');
+  gradebook.updateColumnsAndRenderViewOptionsMenu();
+
+  strictEqual(updateColumnHeadersStub.callCount, 1);
+});
+
+test('calls renderViewOptionsMenu', function () {
+  const gradebook = createGradebook();
+  gradebook.grid = { setColumns: () => {} };
+  this.stub(gradebook, 'getVisibleGradeGridColumns');
+  this.stub(gradebook, 'updateColumnHeaders');
+  const renderViewOptionsMenuStub = this.stub(gradebook, 'renderViewOptionsMenu');
+  gradebook.updateColumnsAndRenderViewOptionsMenu();
+
+  strictEqual(renderViewOptionsMenuStub.callCount, 1);
+});
+
+QUnit.module('Gradebook#initShowUnpublishedAssignments');
+
+test('if unset, default to true', function () {
+  const gradebook = createGradebook();
+  gradebook.initShowUnpublishedAssignments(undefined);
+
+  strictEqual(gradebook.showUnpublishedAssignments, true);
+});
+
+test('sets to true if passed "true"', function () {
+  const gradebook = createGradebook();
+  gradebook.initShowUnpublishedAssignments('true');
+
+  strictEqual(gradebook.showUnpublishedAssignments, true);
+});
+
+test('sets to false if passed "false"', function () {
+  const gradebook = createGradebook();
+  gradebook.initShowUnpublishedAssignments('false');
+
+  strictEqual(gradebook.showUnpublishedAssignments, false);
+});
+
+QUnit.module('Gradebook#toggleUnpublishedAssignments');
+
+test('toggles showUnpublishedAssignments to true when currently false', function () {
+  const gradebook = createGradebook();
+  gradebook.showUnpublishedAssignments = false;
+  this.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  this.stub(gradebook, 'saveSettings');
+  gradebook.toggleUnpublishedAssignments();
+
+  strictEqual(gradebook.showUnpublishedAssignments, true);
+});
+
+test('toggles showUnpublishedAssignments to false when currently true', function () {
+  const gradebook = createGradebook();
+  gradebook.showUnpublishedAssignments = true;
+  this.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  this.stub(gradebook, 'saveSettings');
+  gradebook.toggleUnpublishedAssignments();
+
+  strictEqual(gradebook.showUnpublishedAssignments, false);
+});
+
+test('calls updateColumnsAndRenderViewOptionsMenu after toggling', function () {
+  const gradebook = createGradebook();
+  gradebook.showUnpublishedAssignments = true;
+  const stubFn = this.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu').callsFake(function () {
+    strictEqual(gradebook.showUnpublishedAssignments, false);
+  });
+  this.stub(gradebook, 'saveSettings');
+  gradebook.toggleUnpublishedAssignments();
+
+  strictEqual(stubFn.callCount, 1);
+});
+
+test('calls saveSettings after updateColumnsAndRenderViewOptionsMenu', function () {
+  const gradebook = createGradebook();
+  const updateColumnsAndRenderViewOptionsMenuStub = this.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  const saveSettingsStub = this.stub(gradebook, 'saveSettings');
+  gradebook.toggleUnpublishedAssignments();
+
+  sinon.assert.callOrder(updateColumnsAndRenderViewOptionsMenuStub, saveSettingsStub);
+});
+
+test('calls saveSettings with showUnpublishedAssignments', function () {
+  const gradebook = createGradebook();
+  gradebook.showUnpublishedAssignments = true;
+  this.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  const saveSettingsStub = this.stub(gradebook, 'saveSettings');
+  gradebook.toggleUnpublishedAssignments();
+
+  const { showUnpublishedAssignments } = gradebook;
+  deepEqual(saveSettingsStub.firstCall.args[0], { showUnpublishedAssignments });
+});
+
+test('calls saveSettings successfully', function () {
+  const server = sinon.fakeServer.create({ respondImmediately: true });
+  const options = { settings_update_url: '/course/1/gradebook_settings' };
+  server.respondWith('POST', options.settings_update_url, [
+    200, { 'Content-Type': 'application/json' }, '{}'
+  ]);
+
+  const gradebook = createGradebook({ options });
+  gradebook.showUnpublishedAssignments = true;
+  this.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  const saveSettingsStub = this.spy(gradebook, 'saveSettings');
+  gradebook.toggleUnpublishedAssignments();
+
+  strictEqual(saveSettingsStub.callCount, 1);
+});
+
+test('calls saveSettings and rollsback on failure', function () {
+  const server = sinon.fakeServer.create({ respondImmediately: true });
+  const options = { settings_update_url: '/course/1/gradebook_settings' };
+  server.respondWith('POST', options.settings_update_url, [
+    401, { 'Content-Type': 'application/json' }, '{}'
+  ]);
+
+  const gradebook = createGradebook({ options });
+  gradebook.showUnpublishedAssignments = true;
+  const stubFn = this.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  stubFn.onFirstCall().callsFake(function () {
+    strictEqual(gradebook.showUnpublishedAssignments, false);
+  });
+  stubFn.onSecondCall().callsFake(function () {
+    strictEqual(gradebook.showUnpublishedAssignments, true);
+  });
+  gradebook.toggleUnpublishedAssignments();
+  strictEqual(stubFn.callCount, 2);
+});
+
+QUnit.module('Gradebook#renderViewOptionsMenu');
+
+test('passes showUnpublishedAssignments to props', function () {
+  const gradebook = createGradebook();
+  gradebook.showUnpublishedAssignments = true;
+  const createElementStub = this.stub(React, 'createElement');
+  this.stub(ReactDOM, 'render');
+  gradebook.renderViewOptionsMenu();
+
+  strictEqual(createElementStub.firstCall.args[1].showUnpublishedAssignments, gradebook.showUnpublishedAssignments);
+});
+
+test('passes toggleUnpublishedAssignments as onSelectShowUnpublishedAssignments to props', function () {
+  const gradebook = createGradebook();
+  gradebook.toggleUnpublishedAssignments = () => {};
+  const createElementStub = this.stub(React, 'createElement');
+  this.stub(ReactDOM, 'render');
+  gradebook.renderViewOptionsMenu();
+
+  strictEqual(createElementStub.firstCall.args[1].toggleUnpublishedAssignments, gradebook.onSelectShowUnpublishedAssignments);
 });

@@ -118,6 +118,7 @@ define [
       showEnrollments:
         concluded: false
         inactive: false
+      showUnpublishedDisplayed: false
     }
 
   ## Gradebook Application State
@@ -160,10 +161,11 @@ define [
       @userFilterRemovedRows = []
       # preferences serialization causes these to always come
       # from the database as strings
-      if @options.course_is_concluded || @options.settings.show_concluded_enrollments == true
+      if @options.course_is_concluded || @options.settings.show_concluded_enrollments == 'true'
         @toggleEnrollmentFilter('concluded', true)
-      if @options.settings.show_inactive_enrollments == true
+      if @options.settings.show_inactive_enrollments == 'true'
         @toggleEnrollmentFilter('inactive', true)
+      @initShowUnpublishedAssignments(@options.settings.show_unpublished_assignments)
       @gradingPeriods = GradingPeriodsApi.deserializePeriods(@options.active_grading_periods)
       if @options.grading_period_set
         @gradingPeriodSet = GradingPeriodSetsApi.deserializeSet(@options.grading_period_set)
@@ -273,7 +275,6 @@ define [
 
     addOverridesToPostGradesStore: (assignmentGroups) =>
       for group in assignmentGroups
-        group.assignments = _.select group.assignments, (a) -> a.published
         for assignment in group.assignments
           @assignments[assignment.id].overrides = assignment.overrides if @assignments[assignment.id]
       @postGradesStore.setGradeBookAssignments @assignments
@@ -363,7 +364,6 @@ define [
       new AssignmentGroupWeightsDialog context: @options, assignmentGroups: assignmentGroups
       for group in assignmentGroups
         @assignmentGroups[group.id] = group
-        group.assignments = _.select group.assignments, (a) -> a.published
         for assignment in group.assignments
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
@@ -1164,17 +1164,16 @@ define [
         onSelect = => @setTeacherNotesHidden(false)
       else
         onSelect = @createTeacherNotes
-      {
-        teacherNotes:
-          disabled: @contentLoadStates.teacherNotesColumnUpdating
-          onSelect: onSelect
-          selected: showingNotes
-      }
+      teacherNotes:
+        disabled: @contentLoadStates.teacherNotesColumnUpdating
+        onSelect: onSelect
+        selected: showingNotes
+      showUnpublishedAssignments: @showUnpublishedAssignments
+      onSelectShowUnpublishedAssignments: @toggleUnpublishedAssignments
 
     renderViewOptionsMenu: =>
       mountPoint = document.querySelector("[data-component='ViewOptionsMenu']")
-      props = @getViewOptionsMenuProps()
-      renderComponent(ViewOptionsMenu, mountPoint, props)
+      renderComponent(ViewOptionsMenu, mountPoint, @getViewOptionsMenuProps())
 
     renderActionMenu: =>
       actionMenuProps =
@@ -1253,9 +1252,10 @@ define [
       for column in @allAssignmentColumns
         if @disabledAssignments && @disabledAssignments.indexOf(column.object.id) != -1
           column.cssClass = "cannot_edit"
-        submissionType = ''+ column.object.submission_types
-        columns.push(column) unless submissionType is "not_graded" or
-                                submissionType is "attendance" and not @show_attendance
+        submissionType = '' + column.object.submission_types
+        columns.push(column) if submissionType isnt 'not_graded' and
+          (submissionType isnt 'attendance' or @show_attendance) and
+          (column.object.published or @showUnpublishedAssignments)
 
       if @gradebookColumnOrderSettings?.sortType
         columns.sort @makeColumnSortFn(@getStoredSortOrder())
@@ -1454,13 +1454,17 @@ define [
       url = @options.gradebook_column_size_settings_url
       $.ajaxJSON(url, 'POST', {column_id: id, column_size: newWidth})
 
-    saveSettings: (showInactive, showConcluded, callback) =>
-      url = @options.settings_update_url
-      $.ajaxJSON(url, 'PUT', gradebook_settings: {
-        show_inactive_enrollments: showInactive
-        show_concluded_enrollments: showConcluded
-      }).done =>
-        callback()
+    saveSettings: ({
+      showConcludedEnrollments = @getEnrollmentFilters().concluded,
+      showInactiveEnrollments = @getEnrollmentFilters().inactive,
+      showUnpublishedAssignments = @showUnpublishedAssignments
+    } = {}, successFn, errorFn) =>
+      data =
+        gradebook_settings:
+          show_concluded_enrollments: showConcludedEnrollments
+          show_inactive_enrollments: showInactiveEnrollments
+          show_unpublished_assignments: showUnpublishedAssignments
+      $.ajaxJSON(@options.settings_update_url, 'PUT', data, successFn, errorFn)
 
     onBeforeEditCell: (event, {row, cell}) =>
       $cell = @grid.getCellNode(row, cell)
@@ -1740,6 +1744,11 @@ define [
       @renderStudentColumnHeader()
       @renderTotalGradeColumnHeader()
 
+    updateColumnsAndRenderViewOptionsMenu: =>
+      @grid.setColumns(@getVisibleGradeGridColumns())
+      @updateColumnHeaders()
+      @renderViewOptionsMenu()
+
     # Student Column Header
 
     getStudentColumnSortBySetting: =>
@@ -1968,6 +1977,7 @@ define [
           name: assignment.name
           omitFromFinalGrade: assignment.omit_from_final_grade
           pointsPossible: assignment.points_possible
+          published: assignment.published
           submissionTypes: assignment.submission_types
           courseId: assignment.course_id
           inClosedGradingPeriod: assignment.in_closed_grading_period
@@ -2045,6 +2055,21 @@ define [
 
     ## Gradebook Application State Methods
 
+    initShowUnpublishedAssignments: (show_unpublished_assignments = 'true') =>
+      @showUnpublishedAssignments = show_unpublished_assignments == 'true'
+
+    toggleUnpublishedAssignments: =>
+      @showUnpublishedAssignments = !@showUnpublishedAssignments
+      @updateColumnsAndRenderViewOptionsMenu()
+
+      @saveSettings(
+        { @showUnpublishedAssignments },
+        () =>, # on success, do nothing since the render happened earlier
+        () => # on failure, undo
+          @showUnpublishedAssignments = !@showUnpublishedAssignments
+          @updateColumnsAndRenderViewOptionsMenu()
+      )
+
     setAssignmentsLoaded: (loaded) =>
       @contentLoadStates.assignmentsLoaded = loaded
 
@@ -2091,7 +2116,7 @@ define [
     applyEnrollmentFilter: () =>
       showInactive = @getEnrollmentFilters().inactive
       showConcluded = @getEnrollmentFilters().concluded
-      @saveSettings(showInactive, showConcluded, -> window.location.reload())
+      @saveSettings({ showInactive, showConcluded }, -> window.location.reload())
 
     getEnrollmentFilters: () =>
       @gridDisplaySettings.showEnrollments

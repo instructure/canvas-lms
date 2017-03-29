@@ -17,11 +17,7 @@ describe "Gradezilla" do
     assignment = @course.assignments.create! title: 'unpublished'
     assignment.unpublish
     gradezilla_page.visit(@course)
-    expect(f('#gradebook_grid .container_1 .slick-header')).not_to include_text(assignment.title)
-
-    @first_assignment.publish
-    gradezilla_page.visit(@course)
-    expect(f('#gradebook_grid .container_1 .slick-header')).to include_text(@first_assignment.title)
+    expect(f('#gradebook_grid .container_1 .slick-header')).to include_text(assignment.title)
   end
 
   it "should not show 'not-graded' assignments", priority: "1", test_id: 210017 do
@@ -30,20 +26,13 @@ describe "Gradezilla" do
     expect(f('.slick-header-columns')).not_to include_text(@ungraded_assignment.title)
   end
 
-  def filter_student(text)
-    f('.gradebook_filter input').send_keys text
-    sleep 1 # InputFilter has a delay
-  end
-
-  def visible_students
-    ff('.student-name')
-  end
-
-  it 'should filter students', priority: "1", test_id: 210018 do
+  it 'filters students', priority: "1", test_id: 210018 do
+    visible_students = -> { ff('.student-name') }
     gradezilla_page.visit(@course)
-    expect(visible_students).to have_size @all_students.size
-    filter_student 'student 1'
-    visible_after_filtering = visible_students
+    expect(visible_students.call).to have_size @all_students.size
+    f('.gradebook_filter input').send_keys 'student 1'
+    sleep 1 # InputFilter has a delay
+    visible_after_filtering = visible_students.call
     expect(visible_after_filtering).to have_size 1
     expect(visible_after_filtering[0]).to include_text 'student 1'
   end
@@ -238,7 +227,9 @@ describe "Gradezilla" do
       f(".slick-header-column[id*='assignment_#{@first_assignment.id}'] .Gradebook__ColumnHeaderAction").click
 
       # And I click the download submissions button
-      f('[data-menu-item-id="download-submissions"]').click
+      download_submissions_menu_item = -> { f('[data-menu-item-id="download-submissions"]') }
+      scroll_to(download_submissions_menu_item.call)
+      download_submissions_menu_item.call.click
 
       # And I close the download submissions dialog
       fj("div:contains('Download Assignment Submissions'):first .ui-dialog-titlebar-close").click

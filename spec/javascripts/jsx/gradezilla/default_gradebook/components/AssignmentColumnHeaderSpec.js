@@ -33,6 +33,7 @@ function createAssignmentProp () {
     name: 'Assignment #1',
     omitFromFinalGrade: false,
     pointsPossible: 13,
+    published: true,
     submissionTypes: ['online_text_entry']
   };
 }
@@ -152,6 +153,14 @@ test('renders a PopoverMenu', function () {
   const optionsMenu = this.wrapper.find('PopoverMenu');
 
   equal(optionsMenu.length, 1);
+});
+
+test('does not render a PopoverMenu if assignment is not published', function () {
+  const props = createExampleProps();
+  props.assignment.published = false;
+  const wrapper = mountComponent(props);
+  const optionsMenu = wrapper.find('PopoverMenu');
+  equal(optionsMenu.length, 0);
 });
 
 test('renders an IconMoreSolid inside the PopoverMenu', function () {

@@ -1,5 +1,6 @@
 define ['i18n!gradezilla'], (I18n) ->
  GRADEBOOK_TRANSLATIONS =
+    submission_tooltip_unpublished_assignment: I18n.t('This assignment is unpublished')
     submission_tooltip_dropped: I18n.t('Dropped for grading purposes')
     submission_tooltip_late: I18n.t('Submitted late')
     submission_tooltip_muted: I18n.t('Assignment muted')

@@ -11,48 +11,10 @@ describe "Gradezilla - concluded courses and enrollments" do
 
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
-  before(:each) { @teacher.update preferences: {} }
   let(:conclude_student_1) { @student_1.enrollments.where(course_id: @course).first.conclude }
   let(:deactivate_student_1) { @student_1.enrollments.where(course_id: @course).first.deactivate }
 
   context "active course" do
-    let(:gradebook_settings_for_course) do
-      -> (teacher, course) do
-        teacher.reload
-          .preferences.fetch(:gradebook_settings, {})[course.id]
-      end
-    end
-
-    it "persists settings for displaying inactive enrollments", priority: "2", test_id: 1372593 do
-      gradezilla_page.visit(@course)
-      gradezilla_page.open_student_column_menu
-      expect do
-        gradezilla_page.select_menu_item 'inactive'
-        wait_for_ajax_requests
-      end
-        .to change { gradebook_settings_for_course.call(@teacher, @course)}
-        .from(nil)
-        .to({
-          "show_inactive_enrollments" => "true",
-          "show_concluded_enrollments" => "false",
-        })
-    end
-
-    it "persists settings for displaying concluded enrollments", priority: "2", test_id: 1372592 do
-      gradezilla_page.visit(@course)
-      gradezilla_page.open_student_column_menu
-      expect do
-        gradezilla_page.select_menu_item 'concluded'
-        wait_for_ajax_requests
-      end
-        .to change { gradebook_settings_for_course.call(@teacher, @course)}
-        .from(nil)
-        .to({
-          "show_inactive_enrollments" => "false",
-          "show_concluded_enrollments" => "true",
-        })
-    end
-
     it "does not show concluded enrollments by default", priority: "1", test_id: 210020 do
       conclude_student_1
       expect(@course.students.count).to eq @all_students.size - 1

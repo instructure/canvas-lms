@@ -15,7 +15,8 @@ RSpec.describe GradebookSettingsController, type: :controller do
       let(:show_settings) do
         {
           "show_inactive_enrollments" => "true", # values must be strings
-          "show_concluded_enrollments" => "false"
+          "show_concluded_enrollments" => "false",
+          "show_unpublished_assignments" => "true"
         }
       end
       let(:valid_params) do

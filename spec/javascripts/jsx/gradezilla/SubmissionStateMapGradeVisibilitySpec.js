@@ -34,15 +34,29 @@ define([
 
   QUnit.module('SubmissionStateMap without grading periods');
 
+  test('submission in an unpublished assignment is hidden', function () {
+    const assignment = { id: '1', published: false, effectiveDueDates: {} };
+    const map = createAndSetupMap(assignment, { hasGradingPeriods: false });
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    strictEqual(state.hideGrade, true);
+  });
+
+  test('submission in a published assignment is not hidden', function () {
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
+    const map = createAndSetupMap(assignment, { hasGradingPeriods: false });
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    strictEqual(state.hideGrade, false);
+  });
+
   test('submission has grade hidden for a student without assignment visibility', function() {
-    const assignment = { id: '1', effectiveDueDates: {}, only_visible_to_overrides: true };
+    const assignment = { id: '1', published: true, effectiveDueDates: {}, only_visible_to_overrides: true };
     const map = createAndSetupMap(assignment, { hasGradingPeriods: false });
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
     equal(state.hideGrade, true);
   });
 
   test('submission has grade visible for a student with assignment visibility', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: null,
       grading_period_id: null,
@@ -63,14 +77,14 @@ define([
   });
 
   test('submission has grade hidden for a student without assignment visibility', function() {
-    const assignment = { id: '1', effectiveDueDates: {}, only_visible_to_overrides: true };
+    const assignment = { id: '1', published: true, effectiveDueDates: {}, only_visible_to_overrides: true };
     const map = createAndSetupMap(assignment, this.mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
     equal(state.hideGrade, true);
   });
 
   test('submission has grade visible for an assigned student with assignment due in a closed grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_IN_CLOSED_PERIOD,
       grading_period_id: '1',
@@ -83,7 +97,7 @@ define([
   });
 
   test('submission has grade visible for an assigned student with assignment due outside of a closed grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_NOT_IN_CLOSED_PERIOD,
       grading_period_id: '2',
@@ -105,14 +119,14 @@ define([
   });
 
   test('submission has grade hidden for a student without assignment visibility', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     const map = createAndSetupMap(assignment, this.mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
     equal(state.hideGrade, true);
   });
 
   test('submission has grade hidden for an assigned student with assignment due outside of the selected grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_NOT_IN_SELECTED_PERIOD,
       grading_period_id: '2',
@@ -125,7 +139,7 @@ define([
   });
 
   test('submission has grade visible for an assigned student with assignment due in the selected grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_IN_SELECTED_PERIOD,
       grading_period_id: this.SELECTED_PERIOD_ID,
@@ -147,14 +161,14 @@ define([
   });
 
   test('submission has grade hidden for a student without assignment visibility', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     const map = createAndSetupMap(assignment, this.mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
     equal(state.hideGrade, true);
   });
 
   test('submission has grade hidden for an assigned student with assignment due outside of the selected grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_NOT_IN_SELECTED_PERIOD,
       grading_period_id: '2',
@@ -167,7 +181,7 @@ define([
   });
 
   test('submission has grade visible for an assigned student with assignment due in the selected grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_IN_SELECTED_PERIOD,
       grading_period_id: this.SELECTED_PERIOD_ID,

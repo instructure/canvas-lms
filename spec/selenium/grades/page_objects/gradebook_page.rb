@@ -45,8 +45,9 @@ module Gradebook
         f('a', parent_element)
       end
 
-      def visit_gradebook(course)
-        get "/courses/#{course.id}/gradebook/change_gradebook_version?version=2"
+      def visit_gradebook(user, course)
+        user.preferences[:gradebook_version] = '2'
+        get "/courses/#{course.id}/gradebook"
       end
 
       def grading_cell(x=0, y=0)

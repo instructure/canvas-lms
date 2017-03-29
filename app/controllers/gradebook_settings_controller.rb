@@ -21,7 +21,11 @@ class GradebookSettingsController < ApplicationController
   private
 
   def gradebook_settings_params
-    params.require(:gradebook_settings).permit(:show_inactive_enrollments, :show_concluded_enrollments)
+    params.require(:gradebook_settings).permit(
+      :show_concluded_enrollments,
+      :show_inactive_enrollments,
+      :show_unpublished_assignments
+    )
   end
 
   def authorize

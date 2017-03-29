@@ -10,6 +10,10 @@ class SRGB
       due_date: 'By Due Date'
     }.freeze
 
+    def switch_to_default_gradebook_link
+      f('#switch_to_default_gradebook')
+    end
+
     def assignment_arrangement_dropdown
       f(assignment_sort_order_selector)
     end

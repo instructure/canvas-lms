@@ -9,10 +9,11 @@ define([
     sections: ['1']
   };
 
-  const tooltipKeys = {
-    NOT_IN_ANY_GP: "not_in_any_grading_period",
-    IN_ANOTHER_GP: "in_another_grading_period",
-    IN_CLOSED_GP: "in_closed_grading_period",
+  const TOOLTIP_KEYS = {
+    UNPUBLISHED_ASSIGNMENT: 'unpublished_assignment',
+    NOT_IN_ANY_GP: 'not_in_any_grading_period',
+    IN_ANOTHER_GP: 'in_another_grading_period',
+    IN_CLOSED_GP: 'in_closed_grading_period',
     NONE: null
   };
 
@@ -42,15 +43,29 @@ define([
 
   QUnit.module('SubmissionStateMap without grading periods');
 
-  test('submission has no tooltip for a student without assignment visibility', function() {
-    const assignment = { id: '1', effectiveDueDates: {}, only_visible_to_overrides: true };
+  test('submission in an unpublished assignment has "unpublished assignment" tooltip', function () {
+    const assignment = { id: '1', published: false, effectiveDueDates: {} };
     const map = createAndSetupMap(assignment, { hasGradingPeriods: false });
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.NONE);
+    equal(state.tooltip, TOOLTIP_KEYS.UNPUBLISHED_ASSIGNMENT);
+  });
+
+  test('submission in a published assignment has no tooltip', function () {
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
+    const map = createAndSetupMap(assignment, { hasGradingPeriods: false });
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    equal(state.tooltip, TOOLTIP_KEYS.NONE);
+  });
+
+  test('submission has no tooltip for a student without assignment visibility', function() {
+    const assignment = { id: '1', published: true, effectiveDueDates: {}, only_visible_to_overrides: true };
+    const map = createAndSetupMap(assignment, { hasGradingPeriods: false });
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    equal(state.tooltip, TOOLTIP_KEYS.NONE);
   });
 
   test('submission has no tooltip for a student with visibility', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: null,
       grading_period_id: null,
@@ -59,7 +74,7 @@ define([
 
     const map = createAndSetupMap(assignment, { hasGradingPeriods: false });
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.NONE);
+    equal(state.tooltip, TOOLTIP_KEYS.NONE);
   });
 
   QUnit.module('SubmissionStateMap with grading periods and all grading periods selected', {
@@ -71,14 +86,14 @@ define([
   });
 
   test('submission has no tooltip for a student without assignment visibility', function() {
-    const assignment = { id: '1', effectiveDueDates: {}, only_visible_to_overrides: true };
+    const assignment = { id: '1', published: true, effectiveDueDates: {}, only_visible_to_overrides: true };
     const map = createAndSetupMap(assignment, this.mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.NONE);
+    equal(state.tooltip, TOOLTIP_KEYS.NONE);
   });
 
   test('submission shows "in closed period" tooltip for an assigned student with assignment due in a closed grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_IN_CLOSED_PERIOD,
       grading_period_id: '1',
@@ -87,11 +102,11 @@ define([
 
     const map = createAndSetupMap(assignment, this.mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.IN_CLOSED_GP);
+    equal(state.tooltip, TOOLTIP_KEYS.IN_CLOSED_GP);
   });
 
   test('user is admin: submission has no tooltip for an assigned student with assignment due in a closed grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_IN_CLOSED_PERIOD,
       grading_period_id: '1',
@@ -101,11 +116,11 @@ define([
     const mapOptions = Object.assign(this.mapOptions, { isAdmin: true });
     const map = createAndSetupMap(assignment, mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.NONE);
+    equal(state.tooltip, TOOLTIP_KEYS.NONE);
   });
 
   test('submission has no tooltip for an assigned student with assignment due outside of a closed grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_NOT_IN_CLOSED_PERIOD,
       grading_period_id: '2',
@@ -114,7 +129,7 @@ define([
 
     const map = createAndSetupMap(assignment, this.mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.NONE);
+    equal(state.tooltip, TOOLTIP_KEYS.NONE);
   });
 
   QUnit.module('SubmissionStateMap with grading periods and a non-closed grading period selected', {
@@ -127,7 +142,7 @@ define([
   });
 
   test('submission has no tooltip for an assigned student with assignment due in the selected grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_IN_SELECTED_PERIOD,
       grading_period_id: this.SELECTED_PERIOD_ID,
@@ -136,18 +151,18 @@ define([
 
     const map = createAndSetupMap(assignment, this.mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.NONE);
+    equal(state.tooltip, TOOLTIP_KEYS.NONE);
   });
 
   test('submission has no tooltip for a student without assignment visibility', function() {
-    const assignment = { id: '1', effectiveDueDates: {}, only_visible_to_overrides: true };
+    const assignment = { id: '1', published: true, effectiveDueDates: {}, only_visible_to_overrides: true };
     const map = createAndSetupMap(assignment, this.mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.NONE);
+    equal(state.tooltip, TOOLTIP_KEYS.NONE);
   });
 
   test('submission shows "not in any period" tooltip for an assigned student with a submission not in any grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_NOT_IN_SELECTED_PERIOD,
       grading_period_id: null,
@@ -156,11 +171,11 @@ define([
 
     const map = createAndSetupMap(assignment, this.mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.NOT_IN_ANY_GP);
+    equal(state.tooltip, TOOLTIP_KEYS.NOT_IN_ANY_GP);
   });
 
   test('submission shows "in another period" tooltip for an assigned student with assignment due in a non-selected grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_NOT_IN_SELECTED_PERIOD,
       grading_period_id: '2',
@@ -169,7 +184,7 @@ define([
 
     const map = createAndSetupMap(assignment, this.mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.IN_ANOTHER_GP);
+    equal(state.tooltip, TOOLTIP_KEYS.IN_ANOTHER_GP);
   });
 
   QUnit.module('SubmissionStateMap with grading periods and a closed grading period selected', {
@@ -182,14 +197,14 @@ define([
   });
 
   test('submission has no tooltip for a student without assignment visibility', function() {
-    const assignment = { id: '1', effectiveDueDates: {}, only_visible_to_overrides: true };
+    const assignment = { id: '1', published: true, effectiveDueDates: {}, only_visible_to_overrides: true };
     const map = createAndSetupMap(assignment, this.mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.NONE);
+    equal(state.tooltip, TOOLTIP_KEYS.NONE);
   });
 
   test('submission shows "in another period" tooltip for an assigned student with assignment due in a non-selected grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_NOT_IN_SELECTED_PERIOD,
       grading_period_id: '2',
@@ -198,11 +213,11 @@ define([
 
     const map = createAndSetupMap(assignment, this.mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.IN_ANOTHER_GP);
+    equal(state.tooltip, TOOLTIP_KEYS.IN_ANOTHER_GP);
   });
 
   test('submission shows "not in any period" tooltip for an assigned student with assignment due in no grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_NOT_IN_SELECTED_PERIOD,
       grading_period_id: null,
@@ -211,11 +226,11 @@ define([
 
     const map = createAndSetupMap(assignment, this.mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.NOT_IN_ANY_GP);
+    equal(state.tooltip, TOOLTIP_KEYS.NOT_IN_ANY_GP);
   });
 
   test('submission shows "in closed period" tooltip for an assigned student with assignment due in the selected grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_IN_SELECTED_PERIOD,
       grading_period_id: this.SELECTED_PERIOD_ID,
@@ -224,11 +239,11 @@ define([
 
     const map = createAndSetupMap(assignment, this.mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.IN_CLOSED_GP);
+    equal(state.tooltip, TOOLTIP_KEYS.IN_CLOSED_GP);
   });
 
   test('user is admin: submission has no tooltip for an assigned student with assignment due in the selected grading period', function() {
-    const assignment = { id: '1', effectiveDueDates: {} };
+    const assignment = { id: '1', published: true, effectiveDueDates: {} };
     assignment.effectiveDueDates[student.id] = {
       due_at: this.DATE_IN_SELECTED_PERIOD,
       grading_period_id: this.SELECTED_PERIOD_ID,
@@ -238,6 +253,6 @@ define([
     const mapOptions = { ...this.mapOptions, isAdmin: true };
     const map = createAndSetupMap(assignment, mapOptions);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
-    equal(state.tooltip, tooltipKeys.NONE);
+    equal(state.tooltip, TOOLTIP_KEYS.NONE);
   });
 });
