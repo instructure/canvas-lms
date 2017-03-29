@@ -698,7 +698,7 @@ class AccountsController < ApplicationController
       @available_reports = AccountReport.available_reports if @account.grants_right?(@current_user, @session, :read_reports)
       if @available_reports
         @account.shard.activate do
-          scope = @account.account_reports.where("report_type=name").most_recent
+          scope = @account.account_reports.active.where("report_type=name").most_recent
           @last_complete_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
                 LATERAL (#{scope.complete.to_sql}) account_reports ").
               order("report_types.name").

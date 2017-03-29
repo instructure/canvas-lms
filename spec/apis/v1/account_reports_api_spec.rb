@@ -118,13 +118,13 @@ describe 'Account Reports API', type: :request do
                       { :report=> @report.report_type, :controller => 'account_reports', :action => 'destroy', :format => 'json', :account_id => @admin.account.id.to_s, :id => @report.id.to_s })
 
       expect(json['id']).to eq @report.id
-      expect(json['status']).to eq @report.workflow_state
+      expect(json['status']).to eq @report.reload.workflow_state
       expect(json['progress']).to eq @report.progress
       expect(json['file_url']).to eq "http://www.example.com/accounts/#{@admin.account.id}/files/#{@report.attachment.id}/download"
       @report.parameters.each do |key, value|
         expect(json['parameters'][key]).to eq value
       end
-      expect(AccountReport.exists?(@report.id)).not_to be_truthy
+      expect(AccountReport.active.exists?(@report.id)).not_to be_truthy
     end
   end
 end
