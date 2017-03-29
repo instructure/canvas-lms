@@ -62,7 +62,7 @@ gem 'mime-types', '1.25.1', require: 'mime/types'
 gem 'mini_magick', '4.2.7'
 gem 'multi_json', '1.12.1'
 gem 'netaddr', '1.5.1', require: false
-gem 'nokogiri', '1.7.0.1', require: false
+gem 'nokogiri', '1.7.1', require: false
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', require: false
 gem 'parallel', '1.10.0', require: false
