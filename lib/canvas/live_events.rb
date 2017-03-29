@@ -385,6 +385,6 @@ module Canvas::LiveEvents
 
   def self.quiz_export_complete(content_export)
     payload = content_export.settings[:quizzes2]
-    post_event_stringified('quiz_export_complete', payload)
+    post_event_stringified('quiz_export_complete', payload, amended_context(content_export.context))
   end
 end
