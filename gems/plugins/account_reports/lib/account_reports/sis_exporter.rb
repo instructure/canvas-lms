@@ -383,7 +383,7 @@ module AccountReports
     def enrollments
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['course_id', 'user_id', 'role', 'role_id', 'section_id', 'status', 'associated_user_id']
+        headers = ['course_id', 'user_id', 'role', 'role_id', 'section_id', 'status', 'associated_user_id', 'limit_section_privileges']
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
@@ -399,6 +399,7 @@ module AccountReports
         headers << I18n.t('#account_reports.report_header_associated_user_id', 'associated_user_id')
         headers << I18n.t('created_by_sis')
         headers << I18n.t('base_role_type')
+        headers << I18n.t('limit_section_privileges')
       end
       enrol = root_account.enrollments.
         select("enrollments.*, courses.sis_source_id AS course_sis_id,
@@ -472,6 +473,7 @@ module AccountReports
           row << e.ob_sis_id
           row << e.sis_batch_id? unless @sis_format
           row << e.type unless @sis_format
+          row << e.limit_privileges_to_course_section
           csv << row
         end
       end
