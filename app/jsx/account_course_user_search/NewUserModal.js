@@ -11,7 +11,7 @@ import IcInput from './IcInput'
 import IcCheckbox from './IcCheckbox'
 import 'compiled/jquery.rails_flash_notifications'
 
-  var { object } = React.PropTypes;
+  const { object, string } = React.PropTypes
 
   const modalOverrides = {
     overlay : {
@@ -107,11 +107,10 @@ import 'compiled/jquery.rails_flash_notifications'
       return (
         <Modal
           className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
-          ref="canvasModal"
           isOpen={isOpen}
           style={modalOverrides}
-          title={I18n.t("Add a New User")}
-          contentLabel={this.props.contentLabel}
+          title={I18n.t('Add a New User')}
+          contentLabel={I18n.t('Add a New User')}
           onRequestClose={this.closeModal}
           onSubmit={this.onSubmit}
         >

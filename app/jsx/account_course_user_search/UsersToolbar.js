@@ -23,7 +23,7 @@ import IcInput from './IcInput'
     },
 
     addUser() {
-      this.refs.addUser.openModal();
+      this.addUserModal.openModal();
     },
 
     render () {
@@ -99,7 +99,7 @@ import IcInput from './IcInput'
               </div>
             </div>
           </form>
-          <NewUserModal ref="addUser" userList={this.props.userList} handlers={this.props.handlers} />
+          <NewUserModal ref={(c) => { this.addUserModal = c }} userList={this.props.userList} handlers={this.props.handlers} />
         </div>
       );
     }

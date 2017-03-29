@@ -61,7 +61,7 @@ import ModalButtons from './modal-buttons'
     },
     onSubmit(){
       const promise = this.props.onSubmit();
-      $(this.refs.modal.getDOMNode()).disableWhileLoading(promise);
+      $(this.modal).disableWhileLoading(promise);
     },
     getAppElement () {
       // Need to wait for the dom to load before we can get the default #application dom element
@@ -112,7 +112,7 @@ import ModalButtons from './modal-buttons'
             overlayClassName={this.props.overlayClassName}
             contentLabel={this.props.contentLabel}
             appElement={this.getAppElement()}>
-            <div ref="modal"
+            <div ref={(c) => { this.modal = c }}
               className="ReactModal__Layout"
               style={this.props.style}
             >
@@ -121,7 +121,7 @@ import ModalButtons from './modal-buttons'
                   <h4>{this.props.title}</h4>
                 </div>
                 <div className="ReactModal__Header-Actions">
-                  <button ref="closeWithX" className="Button Button--icon-action" type="button" onClick={this.closeWithX}>
+                  <button ref={(c) => { this.closeBtn = c }} className="Button Button--icon-action" type="button" onClick={this.closeWithX}>
                     <i className="icon-x"></i>
                     <span className="screenreader-only">Close</span>
                   </button>

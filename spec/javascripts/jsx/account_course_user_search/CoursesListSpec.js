@@ -22,6 +22,7 @@ define([
       ENROLL_USERS_URL: 'http://courses/{{id}}/users/enroll'
     },
     roles: [{
+      id: '1',
       course_id: '1',
       roles: [{
         base_role_type: 'StudentEnrollment'

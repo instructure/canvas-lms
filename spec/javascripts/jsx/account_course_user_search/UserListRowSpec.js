@@ -7,6 +7,8 @@ define([
   QUnit.module('Account Course User Search UsersListRow View');
 
   const user = {
+    id: '1',
+    name: 'foo',
     avatar_url: 'http://someurl'
   };
 

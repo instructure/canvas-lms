@@ -12,7 +12,7 @@ import IcInput from './IcInput'
 import IcSelect from './IcSelect'
 import 'compiled/jquery.rails_flash_notifications'
 
-  var { arrayOf } = React.PropTypes;
+  const { arrayOf, string } = React.PropTypes
 
   const modalOverrides = {
     overlay : {
@@ -117,12 +117,12 @@ import 'compiled/jquery.rails_flash_notifications'
       return (
         <Modal
           className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
-          ref="canvasModal"
           style={modalOverrides}
           isOpen={isOpen}
-          title={I18n.t("Add a New Course")}
+          title={I18n.t('Add a New Course')}
           onRequestClose={this.closeModal}
           onSubmit={this.onSubmit}
+          contentLabel={I18n.t('Add a New Course')}
         >
           <ModalContent>
             <IcInput

@@ -37,7 +37,7 @@ const { string, bool, func, arrayOf, shape } = React.PropTypes
     }
 
     addCourse = () => {
-      this.addCourse.openModal()
+      this.addCourseModal.openModal()
     }
 
     renderTerms () {
