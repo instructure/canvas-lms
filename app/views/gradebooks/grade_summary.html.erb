@@ -230,6 +230,10 @@
             <% end %>
           </span>
           <div style="display: none;">
+            <!-- Store the original points so we don't need to parse and guess at locale -->
+            <span class="original_points">
+              <%= submission&.published_score %>
+            </span>
             <!-- Store the original score so that we can retrieve it after any "What-If" calculations -->
             <span class="original_score">
               <%= assignment_presenter.display_score %>

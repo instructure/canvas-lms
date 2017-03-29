@@ -28,11 +28,15 @@ function shouldFormatGradingType (gradingType) {
 }
 
 function shouldFormatGrade (grade, gradingType) {
+  if (typeof grade !== 'number') {
+    return false;
+  }
+
   if (gradingType) {
     return shouldFormatGradingType(gradingType);
   }
 
-  return numberHelper.validate(grade.replace('%', ''));
+  return true;
 }
 
 function isPercent (grade, gradeType) {
@@ -48,10 +52,9 @@ const GradeFormatHelper = {
    * Returns given grade rounded to two decimal places and formatted with I18n
    * if it is a point or percent grade.
    * If grade is undefined, null, or empty string, the grade is returned as is.
-   * Other grades are returned as given after calling grade.toString().
    *
    * @param {string|number|undefined|null} grade - Grade to be formatted.
-   * @param {object} opts - An optional hash of arguments. The following optional arguments are supported:
+   * @param {object} options - An optional hash of arguments. The following optional arguments are supported:
    *  gradingType {string} - If present will be used to determine whether or not to
    *    format given grade. A value of 'points' or 'percent' will result in the grade
    *    being formatted. Any other value will result in the grade not being formatted.
@@ -61,19 +64,18 @@ const GradeFormatHelper = {
    * @return {string} Given grade rounded to two decimal places and formatted with I18n
    * if it is a point or percent grade.
    */
-  formatGrade (grade, opts = {}) {
-    let formattedGrade;
+  formatGrade (grade, options = {}) {
+    let formattedGrade = grade;
 
-    if (grade === undefined || grade === null || grade === '') {
-      return Object.prototype.hasOwnProperty.call(opts, 'defaultValue') ? opts.defaultValue : grade;
+    if (grade == null || grade === '') {
+      return ('defaultValue' in options) ? options.defaultValue : grade;
     }
 
-    formattedGrade = grade.toString();
+    const parsedGrade = GradeFormatHelper.parseGrade(grade, options);
 
-    if (shouldFormatGrade(formattedGrade, opts.gradingType)) {
-      formattedGrade = formattedGrade.replace(/%/g, '');
-      formattedGrade = round(numberHelper.parse(formattedGrade), opts.precision || 2);
-      formattedGrade = I18n.n(formattedGrade, { percentage: isPercent(grade, opts.gradingType) });
+    if (shouldFormatGrade(parsedGrade, options.gradingType)) {
+      const roundedGrade = round(parsedGrade, options.precision || 2);
+      formattedGrade = I18n.n(roundedGrade, { percentage: isPercent(grade, options.gradingType) });
     }
 
     return formattedGrade;
@@ -98,6 +100,26 @@ const GradeFormatHelper = {
     }
 
     return delocalizedGrade + (/%/g.test(localizedGrade) ? '%' : '');
+  },
+
+  parseGrade (grade, options = {}) {
+    let parsedGrade;
+
+    if (grade == null || grade === '' || typeof grade === 'number') {
+      return grade;
+    }
+
+    if ('delocalize' in options && !options.delocalize) {
+      parsedGrade = parseFloat(grade.replace('%', ''));
+    } else {
+      parsedGrade = numberHelper.parse(grade.replace('%', ''));
+    }
+
+    if (isNaN(parsedGrade)) {
+      return grade;
+    }
+
+    return parsedGrade;
   }
 };
 

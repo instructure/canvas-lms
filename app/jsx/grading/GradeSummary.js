@@ -60,7 +60,12 @@ define([
     },
 
     getOriginalScore ($assignment) {
-      return GradeSummary.parseScoreText($assignment.find('.original_score').text());
+      let numericalValue = parseFloat($assignment.find('.original_points').text());
+      numericalValue = isNaN(numericalValue) ? null : numericalValue;
+      return {
+        numericalValue,
+        formattedValue: $assignment.find('.original_score').text()
+      }
     },
 
     onEditWhatIfScore ($assignmentScore, $ariaAnnouncer) {

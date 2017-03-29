@@ -26,6 +26,7 @@ import fakeENV from 'helpers/fakeENV';
 import GradeCalculatorSpecHelper from 'spec/jsx/gradebook/GradeCalculatorSpecHelper';
 import SubmissionDetailsDialog from 'compiled/SubmissionDetailsDialog';
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator';
+import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
 import DataLoader from 'jsx/gradezilla/DataLoader';
 import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants';
 import Gradebook from 'compiled/gradezilla/Gradebook';
@@ -4070,4 +4071,39 @@ test('passes toggleUnpublishedAssignments as onSelectShowUnpublishedAssignments 
   gradebook.renderViewOptionsMenu();
 
   strictEqual(createElementStub.firstCall.args[1].toggleUnpublishedAssignments, gradebook.onSelectShowUnpublishedAssignments);
+});
+
+QUnit.module('Gradebook#updateSubmission', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.students = { 1101: { id: '1101' } };
+    this.submission = {
+      assignment_id: '201',
+      grade: '123.45',
+      gradingType: 'percent',
+      submitted_at: '2015-05-04T12:00:00Z',
+      user_id: '1101'
+    };
+  }
+});
+
+test('formats the grade for the submission', function () {
+  this.spy(GradeFormatHelper, 'formatGrade');
+  this.gradebook.updateSubmission(this.submission);
+  equal(GradeFormatHelper.formatGrade.callCount, 1);
+});
+
+test('includes submission attributes when formatting the grade', function () {
+  this.spy(GradeFormatHelper, 'formatGrade');
+  this.gradebook.updateSubmission(this.submission);
+  const [grade, options] = GradeFormatHelper.formatGrade.getCall(0).args;
+  equal(grade, '123.45', 'parameter 1 is the submission grade');
+  equal(options.gradingType, 'percent', 'options.gradingType is the submission gradingType');
+  strictEqual(options.delocalize, false, 'submission grades from the server are not localized');
+});
+
+test('sets the formatted grade on submission', function () {
+  this.stub(GradeFormatHelper, 'formatGrade').returns('123.45%');
+  this.gradebook.updateSubmission(this.submission);
+  equal(this.submission.grade, '123.45%');
 });

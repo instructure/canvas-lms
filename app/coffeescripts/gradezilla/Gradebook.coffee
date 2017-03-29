@@ -38,6 +38,7 @@ define [
   'jsx/gradebook/CourseGradeCalculator'
   'jsx/gradebook/EffectiveDueDates'
   'jsx/gradebook/GradingSchemeHelper'
+  'jsx/gradebook/shared/helpers/GradeFormatHelper'
   'compiled/userSettings'
   'spin.js'
   'compiled/AssignmentMuter'
@@ -91,7 +92,7 @@ define [
   'jsx/context_cards/StudentContextCardTrigger'
 ], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
-  CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, AssignmentMuter,
+  CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, StudentRowHeaderConstants, AssignmentColumnHeader,
@@ -674,6 +675,9 @@ define [
     updateSubmission: (submission) =>
       student = @student(submission.user_id)
       submission.submitted_at = tz.parse(submission.submitted_at)
+      submission.grade = GradeFormatHelper.formatGrade(submission.grade, {
+        gradingType: submission.gradingType, delocalize: false
+      })
       cell = student["assignment_#{submission.assignment_id}"] ||= {}
       _.extend(cell, submission)
 

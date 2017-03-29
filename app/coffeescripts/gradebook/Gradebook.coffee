@@ -37,6 +37,7 @@ define [
   'jsx/gradebook/CourseGradeCalculator'
   'jsx/gradebook/EffectiveDueDates'
   'jsx/gradebook/GradingSchemeHelper'
+  'jsx/gradebook/shared/helpers/GradeFormatHelper'
   'compiled/userSettings'
   'spin.js'
   'compiled/SubmissionDetailsDialog'
@@ -79,7 +80,7 @@ define [
 ], (
   $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   TotalColumnHeaderView, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS, CourseGradeCalculator,
-  EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog,
+  EffectiveDueDates, GradingSchemeHelper, GradeFormatHelper, UserSettings, Spinner, SubmissionDetailsDialog,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
   GradebookHeaderMenu, NumberCompare, natcompare, htmlEscape, PostGradesStore, PostGradesApp, SubmissionStateMap,
   ColumnHeaderTemplate, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView,
@@ -646,6 +647,7 @@ define [
     updateSubmission: (submission) =>
       student = @student(submission.user_id)
       submission.submitted_at = tz.parse(submission.submitted_at)
+      submission.grade = GradeFormatHelper.formatGrade(submission.grade, { gradingType: submission.gradingType, delocalize: false })
       cell = student["assignment_#{submission.assignment_id}"] ||= {}
       _.extend(cell, submission)
 
