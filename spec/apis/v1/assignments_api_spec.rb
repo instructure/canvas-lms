@@ -2164,6 +2164,33 @@ describe AssignmentsApiController, type: :request do
           )
           expect(response['due_at']).to eq(@assignment.due_at.iso8601)
         end
+
+        it 'does not override the assignment if restricted by master course' do
+          other_course = Account.default.courses.create!
+          template = MasterCourses::MasterTemplate.set_as_master_course(other_course)
+          original_assmt = other_course.assignments.create!(:title => "blah", :description => "bloo")
+          tag = template.create_content_tag_for!(original_assmt, :restrictions => {:content => true, :due_dates => true})
+
+          @assignment.update_attribute(:migration_id, tag.migration_id)
+
+          api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+            {
+              :controller => 'assignments_api',
+              :action => 'update',
+              :format => 'json',
+              :course_id => @course.id.to_s,
+              :id => @assignment.id.to_s
+            },
+            { :assignment => {assignment_overrides: {0 => {course_section_id: @course.default_section.id, due_at: @section_due_at.iso8601}}} },
+            {}, {:expected_status => 403})
+          expect(@assignment.assignment_overrides).to_not be_exists
+
+          tag.update_attribute(:restrictions, {:content => true}) # unrestrict due_dates
+
+          api_update_assignment_call(@course, @assignment,
+            assignment_overrides: {0 => {course_section_id: @course.default_section.id, due_at: @section_due_at.iso8601}})
+          expect(@assignment.assignment_overrides).to be_exists
+        end
       end
 
       describe "deleting all CourseSection overrides from assignment" do

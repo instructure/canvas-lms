@@ -114,6 +114,11 @@ module Importers
         item.points_possible = 0
       end
 
+      if !item.new_record? && item.is_child_content? && (item.editing_restricted?(:due_dates) || item.editing_restricted?(:availability_dates))
+        # is a date-restricted master course item - clear their old overrides because we're mean
+        item.assignment_overrides.where.not(:set_type => AssignmentOverride::SET_TYPE_NOOP).destroy_all
+      end
+
       item.save_without_broadcasting!
       # somewhere in the callstack, save! will call Quiz#update_assignment, and Rails will have helpfully
       # reloaded the quiz's assignment, so we won't know about the changes to the object (in particular,

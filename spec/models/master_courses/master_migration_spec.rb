@@ -4,6 +4,7 @@ describe MasterCourses::MasterMigration do
   before :once do
     course_factory
     @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+    user_factory
   end
 
   before :each do
@@ -12,7 +13,6 @@ describe MasterCourses::MasterMigration do
 
   describe "start_new_migration!" do
     it "should queue a migration" do
-      user_factory
       MasterCourses::MasterMigration.any_instance.expects(:queue_export_job).once
       mig = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
       expect(mig.id).to be_present
@@ -28,7 +28,7 @@ describe MasterCourses::MasterMigration do
 
       MasterCourses::MasterMigration.any_instance.expects(:queue_export_job).never
       expect {
-        MasterCourses::MasterMigration.start_new_migration!(@template)
+        MasterCourses::MasterMigration.start_new_migration!(@template, @user)
       }.to raise_error("cannot start new migration while another one is running")
     end
 
@@ -39,12 +39,12 @@ describe MasterCourses::MasterMigration do
 
       Timecop.freeze(2.days.from_now) do
         MasterCourses::MasterMigration.any_instance.expects(:queue_export_job).once
-        MasterCourses::MasterMigration.start_new_migration!(@template)
+        MasterCourses::MasterMigration.start_new_migration!(@template, @user)
       end
     end
 
     it "should queue a job" do
-      expect { MasterCourses::MasterMigration.start_new_migration!(@template) }.to change(Delayed::Job, :count).by(1)
+      expect { MasterCourses::MasterMigration.start_new_migration!(@template, @user) }.to change(Delayed::Job, :count).by(1)
       MasterCourses::MasterMigration.any_instance.expects(:perform_exports).once
       run_jobs
     end
@@ -628,6 +628,47 @@ describe MasterCourses::MasterMigration do
         Folder.connection.expects(:select_values).never # should have already been cached in migration
         expect(MasterCourses::FolderLockingHelper.locked_folder_ids_for_course(@copy_to)).to match_array(expected_ids)
       end
+    end
+
+    it "should baleet assignment overrides when an admin pulls a bait-n-switch with date restrictions" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      topic = @copy_from.discussion_topics.new
+      topic.assignment = @copy_from.assignments.build
+      topic.save!
+      topic_assmt = topic.assignment
+      normal_assmt = @copy_from.assignments.create!
+
+      run_master_migration
+
+      copied_topic = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
+      copied_topic_assmt = copied_topic.assignment
+      copied_normal_assmt = @copy_to.assignments.where(:migration_id => mig_id(normal_assmt)).first
+
+      topic_override = create_section_override_for_assignment(copied_topic_assmt)
+      normal_override = create_section_override_for_assignment(copied_normal_assmt)
+
+      new_title = "new master title"
+      topic.update_attribute(:title, new_title)
+      normal_assmt.update_attribute(:title, new_title)
+      [topic, normal_assmt].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets copied
+
+      run_master_migration
+
+      expect(copied_topic_assmt.reload.title).to eq new_title
+      expect(copied_normal_assmt.reload.title).to eq new_title
+      [topic_override, normal_override].each { |ao| expect(ao.reload).to be_active } # leave the overrides alone
+
+      [topic, normal_assmt].each do |c|
+        Timecop.freeze(3.seconds.from_now) do
+          @template.content_tag_for(c).update_attributes(:restrictions => {:content => true, :availability_dates => true}) # tightening the restrictions should touch it by default
+        end
+      end
+
+      run_master_migration
+
+      [topic_override, normal_override].each { |ao| expect(ao.reload).to be_deleted }
     end
 
     context "master courses + external migrations" do

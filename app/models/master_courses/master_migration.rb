@@ -18,7 +18,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   # create a new migration and queue it up (if we can)
-  def self.start_new_migration!(master_template, user=nil)
+  def self.start_new_migration!(master_template, user)
     master_template.class.transaction do
       master_template.lock!
       if master_template.active_migration_running?
@@ -90,9 +90,11 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     export_to_child_courses(:selective, up_to_date_subs, true) if up_to_date_subs.any?
     export_to_child_courses(:full, new_subs, !up_to_date_subs.any?) if new_subs.any?
 
-    self.workflow_state = 'imports_queued'
-    self.imports_queued_at = Time.now
-    self.save!
+    unless self.workflow_state == 'exports_failed'
+      self.workflow_state = 'imports_queued'
+      self.imports_queued_at = Time.now
+      self.save!
+    end
   rescue => e
     self.fail_export_with_error!(e)
     raise e
