@@ -1321,9 +1321,9 @@ caniuse-db@^1.0.30000153, caniuse-db@^1.0.30000187, caniuse-db@^1.0.30000214, ca
   version "1.0.30000632"
   resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000632.tgz#12e3f5c114d19de58e74dec478a327fb2eeb6bcb"
 
-"canvas_offline_course_viewer@https://github.com/instructure/canvas_offline_course_viewer.git#0.3.0":
-  version "0.3.0"
-  resolved "https://github.com/instructure/canvas_offline_course_viewer.git#b204e1946338db92eb0b1802db16703b51d6db4b"
+"canvas_offline_course_viewer@https://github.com/instructure/canvas_offline_course_viewer.git#1.0.0":
+  version "1.0.0"
+  resolved "https://github.com/instructure/canvas_offline_course_viewer.git#36ebfb0085a94a760ff705661708902db85d0f72"
 
 caseless@~0.11.0:
   version "0.11.0"
