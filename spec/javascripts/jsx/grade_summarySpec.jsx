@@ -62,6 +62,11 @@ define([
 
   function setPageHtmlFixture () {
     $fixtures.html(`
+      <select class="grading_periods_selector">
+        <option value="0" selected>All Grading Periods</option>
+        <option value="701">Grading Period 1</option>
+        <option value="702">Grading Period 2</option>
+      </select>
       <div id="grade_summary_fixture">
         <div class="student_assignment final_grade">
           <span class="grade"></span>
@@ -313,13 +318,13 @@ define([
   });
 
   test('returns course grades when no grading period id is provided', function () {
-    this.stub(grade_summary, 'getGradingPeriodIdFromUrl').returns(null);
+    this.stub(grade_summary, 'getSelectedGradingPeriodId').returns(null);
     const grades = grade_summary.calculateGrades();
     equal(grades, exampleGrades);
   });
 
   test('scopes grades to the provided grading period id', function () {
-    this.stub(grade_summary, 'getGradingPeriodIdFromUrl').returns('701');
+    this.stub(grade_summary, 'getSelectedGradingPeriodId').returns('701');
     const grades = grade_summary.calculateGrades();
     equal(grades, exampleGrades.gradingPeriods[701]);
   });
@@ -361,20 +366,24 @@ define([
     equal($('#show_all_details_button').text(), 'Show All Details');
   });
 
-  QUnit.module('grade_summary.getGradingPeriodIdFromUrl');
-
-  test('returns the value for grading_period_id in the url', function () {
-    const url = 'example.com/course/1/grades?grading_period_id=701';
-    equal(grade_summary.getGradingPeriodIdFromUrl(url), '701');
+  QUnit.module('grade_summary.getSelectedGradingPeriodId', {
+    setup () {
+      this.$select = document.querySelector('.grading_periods_selector');
+    }
   });
 
-  test('returns null when grading_period_id is set to "0"', function () {
-    const url = 'example.com/course/1/grades?grading_period_id=0';
-    deepEqual(grade_summary.getGradingPeriodIdFromUrl(url), null);
+  test('returns the value of the selected grading period', function () {
+    this.$select.value = '701';
+    equal(grade_summary.getSelectedGradingPeriodId(), '701');
   });
 
-  test('returns null when grading_period_id is not present in the url', function () {
-    const url = 'example.com/course/1/grades';
-    deepEqual(grade_summary.getGradingPeriodIdFromUrl(url), null);
+  test('returns null when "All Grading Periods" is selected', function () {
+    this.$select.value = '0';
+    deepEqual(grade_summary.getSelectedGradingPeriodId(), null);
+  });
+
+  test('returns null when the grading periods selector is not present in the DOM', function () {
+    this.$select.parentNode.removeChild(this.$select);
+    deepEqual(grade_summary.getSelectedGradingPeriodId(), null);
   });
 });

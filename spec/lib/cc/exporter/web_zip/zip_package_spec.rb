@@ -387,7 +387,7 @@ describe "ZipPackage" do
     end
 
     it "should parse file data for attachments" do
-      file = attachment_model(context: @course, display_name: 'file1.jpg', filename: 'file1.jpg')
+      file = attachment_model(context: @course, display_name: 'file1.jpg', filename: '1234__file1.jpg')
       @module.content_tags.create!(content: file, context: @course)
 
       zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
@@ -450,6 +450,88 @@ describe "ZipPackage" do
       zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
       module_item_data = zip_package.parse_module_item_data(@module)
       expect(module_item_data.length).to eq 0
+    end
+
+    it "should export correct dates for assignments with due date overrides" do
+      due = 1.hour.from_now
+      lock = 2.hours.from_now
+      unlock = 1.hour.ago
+      assign = @course.assignments.create!(title: 'Assignment 1', due_at: 1.day.from_now, lock_at: 2.days.from_now,
+        unlock_at: 1.day.ago)
+      @module.content_tags.create!(content: assign, context: @course, indent: 0)
+      assignment_override_model(assignment: assign, due_at: due, lock_at: lock, unlock_at: unlock)
+      @override.set_type = "ADHOC"
+      override_student = @override.assignment_override_students.build
+      override_student.user = @student
+      override_student.save!
+
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module).first
+      expect(module_item_data[:dueAt]).to eq due.iso8601
+      expect(module_item_data[:lockAt]).to eq lock.iso8601
+      expect(module_item_data[:unlockAt]).to eq unlock.iso8601
+    end
+  end
+
+  context "parse_non_module_items" do
+    def create_zip_package
+      export = @course.content_exports.build
+      export.export_type = ContentExport::COMMON_CARTRIDGE
+      export.user = @student
+      export.save
+      export.export_course
+      exporter = CC::Exporter::WebZip::Exporter.new(export.attachment.open, false, :web_zip)
+      CC::Exporter::WebZip::ZipPackage.new(exporter, @course, @student, @cache_key)
+    end
+
+    it "should parse non-module assignments" do
+      due = 1.day.from_now
+      lock = 2.days.from_now
+      unlock = 1.day.ago
+      assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: '<p>Hi</p>',
+        submission_types: 'online_text_entry,online_upload', due_at: due, lock_at: lock,
+        unlock_at: unlock)
+      zip_package = create_zip_package
+      assignment_data = zip_package.parse_non_module_items(:assignments)
+      expect(assignment_data).to eq [{exportId: CC::CCHelper.create_key(assign), title: 'Assignment 1',
+        content: '<p>Hi</p>', submissionTypes: "a text entry box or a file upload", graded: true,
+        pointsPossible: 10.0, dueAt: due.in_time_zone(@student.time_zone).iso8601,
+        lockAt: lock.in_time_zone(@student.time_zone).iso8601,
+        unlockAt: unlock.in_time_zone(@student.time_zone).iso8601}]
+    end
+
+    it "should parse non-module discussions" do
+      disc = @course.discussion_topics.create!(title: 'Discussion 1', message: "<h1>Discussion</h1>")
+      zip_package = create_zip_package
+      disc_data = zip_package.parse_non_module_items(:discussion_topics)
+      expect(disc_data).to eq [{exportId: CC::CCHelper.create_key(disc), title: 'Discussion 1',
+        graded: false, content: "<h1>Discussion</h1>"}]
+    end
+
+    it "should parse non-module quizzes" do
+      quiz = @course.quizzes.create!(title: 'Quiz 1', time_limit: 5, allowed_attempts: 2)
+      quiz.publish!
+      zip_package = create_zip_package
+      quiz_data = zip_package.parse_non_module_items(:quizzes)
+      expect(quiz_data).to eq [{exportId: CC::CCHelper.create_key(quiz), title: 'Quiz 1', questionCount: 0,
+        timeLimit: 5, attempts: 2, graded: true, pointsPossible: 0.0, dueAt: nil, lockAt: nil,
+        unlockAt: nil, content: nil}]
+    end
+
+    it "should parse non-module wiki pages" do
+      @course.wiki_pages.create!(title: 'Wiki Page 1', url: 'wiki-page-1', wiki: @course.wiki)
+      zip_package = create_zip_package
+      wiki_data = zip_package.parse_non_module_items(:wiki_pages)
+      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: ''}]
+    end
+
+    it "should not fail on missing items" do
+      wiki = @course.wiki_pages.create!(title: 'Wiki Page 1', url: 'wiki-page-1', wiki: @course.wiki, body: '<p>Hi</p>')
+      zip_package = create_zip_package
+      wiki.title = 'Wiki Page 2'
+      wiki.save!
+      wiki_data = zip_package.parse_non_module_items(:wiki_pages)
+      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: '<p>Hi</p>'}]
     end
   end
 

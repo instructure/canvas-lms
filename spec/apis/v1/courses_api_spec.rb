@@ -1672,18 +1672,20 @@ describe CoursesController, type: :request do
         expect(enrollment_json['multiple_grading_periods_enabled']).to be true
       end
 
-      it "returns a 'has_grading_periods' key at the course-level " \
+      it "returns 'has_grading_periods' and 'has_weighted_grading_periods' keys at the course-level " \
       "on the JSON response if 'current_grading_period_scores' are requested" do
         course_json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores']).first
         expect(course_json_response).to have_key 'has_grading_periods'
         expect(course_json_response).to have_key 'multiple_grading_periods_enabled'
+        expect(course_json_response).to have_key 'has_weighted_grading_periods'
       end
 
-      it "does not return a 'has_grading_periods' key at the course-level " \
+      it "does not return 'has_grading_periods' and 'has_weighted_grading_periods' keys at the course-level " \
       "on the JSON response if 'current_grading_period_scores' are not requested" do
         course_json_response = courses_api_index_call.first
         expect(course_json_response).not_to have_key 'has_grading_periods'
         expect(course_json_response).not_to have_key 'multiple_grading_periods_enabled'
+        expect(course_json_response).not_to have_key 'has_weighted_grading_periods'
       end
 
       context "computed scores" do

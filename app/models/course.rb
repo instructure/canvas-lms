@@ -2763,7 +2763,7 @@ class Course < ActiveRecord::Base
   add_setting :image_id
   add_setting :image_url
   add_setting :organize_epub_by_content_type, :boolean => true, :default => false
-  add_setting :enable_offline_web_export, :boolean => true, :default => lambda { |c| c.root_account.enable_offline_web_export? }
+  add_setting :enable_offline_web_export, :boolean => true, :default => lambda { |c| c.account.enable_offline_web_export? }
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
 
   add_setting :restrict_student_future_view, :boolean => true, :inherited => true
@@ -3096,6 +3096,7 @@ class Course < ActiveRecord::Base
   # checks for both legacy and account-level grading period groups
   def grading_periods?
     return @has_grading_periods unless @has_grading_periods.nil?
+    return @has_grading_periods = true if @has_weighted_grading_periods
 
     @has_grading_periods = shard.activate do
       GradingPeriodGroup.active.
@@ -3109,6 +3110,18 @@ class Course < ActiveRecord::Base
 
     @display_totals_for_all_grading_periods =
       !!GradingPeriodGroup.for_course(self)&.display_totals_for_all_grading_periods?
+  end
+
+  def weighted_grading_periods?
+    return @has_weighted_grading_periods unless @has_weighted_grading_periods.nil?
+    return @has_weighted_grading_periods = false if @has_grading_periods == false
+
+    @has_weighted_grading_periods = shard.activate do
+      grading_period_groups.active.none? &&
+      GradingPeriodGroup.active.
+        where(id: enrollment_term.grading_period_group_id, weighted: true).
+        exists?
+    end
   end
 
   def quiz_lti_tool

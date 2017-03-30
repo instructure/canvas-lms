@@ -47,6 +47,7 @@ module Api::V1
       if @includes.include?(:current_grading_period_scores)
         @hash['has_grading_periods'] = @course.grading_periods?
         @hash['multiple_grading_periods_enabled'] = @hash['has_grading_periods'] # for backwards compatibility
+        @hash['has_weighted_grading_periods'] = @course.weighted_grading_periods?
       end
       clear_unneeded_fields(@hash)
     end

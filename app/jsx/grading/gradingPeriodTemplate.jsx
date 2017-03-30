@@ -19,7 +19,7 @@ define([
   };
 
   const tabbableDate = (ref, date) => {
-    let formattedDate = DateHelper.formatDatetimeForDisplay(date);
+    const formattedDate = DateHelper.formatDateForDisplay(date);
     return <span ref={ref} className="GradingPeriod__Action">{ formattedDate }</span>;
   };
 
@@ -45,6 +45,8 @@ define([
   let GradingPeriodTemplate = React.createClass({
     propTypes: {
       title: Types.string.isRequired,
+      weight: Types.number,
+      weighted: Types.bool.isRequired,
       startDate: Types.instanceOf(Date).isRequired,
       endDate: Types.instanceOf(Date).isRequired,
       closeDate: Types.instanceOf(Date).isRequired,
@@ -123,6 +125,22 @@ define([
       }
     },
 
+    renderWeight: function () {
+      if (this.props.weighted) {
+        return (
+          <div className="col-xs-12 col-md-8 col-lg-2">
+            <label className="ic-Label" htmlFor={postfixId('period_title_', this)}>
+              {I18n.t('Weight')}
+            </label>
+            <div>
+              <span className="screenreader-only">{I18n.t('Grading Period Weight')}</span>
+              <span ref="weight">{I18n.n(this.props.weight, {percentage: true})}</span>
+            </div>
+          </div>
+        );
+      }
+    },
+
     renderStartDate: function() {
       if (isEditable(this)) {
         return (
@@ -131,7 +149,7 @@ define([
                  ref="startDate"
                  name="startDate"
                  className="GradingPeriod__Detail ic-Input input-grading-period-date date_field"
-                 defaultValue={DateHelper.formatDatetimeForDisplay(this.props.startDate)}
+                 defaultValue={DateHelper.formatDateForDisplay(this.props.startDate)}
                  disabled={this.props.disabled}/>
         );
       } else {
@@ -151,7 +169,7 @@ define([
                  className="GradingPeriod__Detail ic-Input input-grading-period-date date_field"
                  ref="endDate"
                  name="endDate"
-                 defaultValue={DateHelper.formatDatetimeForDisplay(this.props.endDate)}
+                 defaultValue={DateHelper.formatDateForDisplay(this.props.endDate)}
                  disabled={this.props.disabled}/>
         );
       } else {
@@ -179,30 +197,31 @@ define([
         <div id={postfixId("grading-period-", this)} className="grading-period pad-box-mini border border-trbl border-round">
           <div className="GradingPeriod__Details pad-box-micro">
             <div className="grid-row">
-              <div className="col-xs-12 col-sm-6 col-lg-3">
+              <div className="col-xs-12 col-md-8 col-lg-4">
                 <label className="ic-Label" htmlFor={postfixId("period_title_", this)}>
                   {I18n.t("Grading Period Name")}
                 </label>
                 {this.renderTitle()}
               </div>
-              <div className="col-xs-12 col-sm-6 col-lg-3">
+              <div className="col-xs-12 col-md-8 col-lg-2">
                 <label className="ic-Label" htmlFor={postfixId("period_start_date_", this)}>
                   {I18n.t("Start Date")}
                 </label>
                 {this.renderStartDate()}
               </div>
-              <div className="col-xs-12 col-sm-6 col-lg-3">
+              <div className="col-xs-12 col-md-8 col-lg-2">
                 <label className="ic-Label" htmlFor={postfixId("period_end_date_", this)}>
                   {I18n.t("End Date")}
                 </label>
                 {this.renderEndDate()}
               </div>
-              <div className="col-xs-12 col-sm-6 col-lg-3">
+              <div className="col-xs-12 col-md-8 col-lg-2">
                 <label className="ic-Label" id={postfixId("period_close_date_", this)}>
                   {I18n.t("Close Date")}
                 </label>
                 {this.renderCloseDate()}
               </div>
+              {this.renderWeight()}
             </div>
           </div>
 
