@@ -581,6 +581,7 @@ describe Attachment do
 
       b = a.clone_for(courseb, nil, overwrite: true)
       expect(b.id).not_to be_nil
+      expect(b.filename).to eq a.filename
       b.save
       expect(b.root_attachment_id).to eq nil
       expect(b.namespace).to eq courseb.root_account.file_namespace
