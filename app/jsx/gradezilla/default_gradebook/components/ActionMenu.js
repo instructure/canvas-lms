@@ -6,17 +6,19 @@ import { MenuItem, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
 import Typography from 'instructure-ui/lib/components/Typography'
 import GradebookExportManager from 'jsx/gradezilla/shared/GradebookExportManager'
+import { AppLaunch } from 'jsx/gradezilla/SISGradePassback/PostGradesApp'
 import tz from 'timezone'
 import DateHelper from 'jsx/shared/helpers/dateHelper'
 import I18n from 'i18n!gradebook'
 import 'compiled/jquery.rails_flash_notifications'
 
-  const { bool, shape, string } = React.PropTypes;
+const { arrayOf, bool, func, object, shape, string } = React.PropTypes;
 
   class ActionMenu extends React.Component {
     static defaultProps = {
       lastExport: undefined,
-      attachment: undefined
+      attachment: undefined,
+      postGradesLtis: []
     };
 
     static propTypes = {
@@ -36,7 +38,19 @@ import 'compiled/jquery.rails_flash_notifications'
         id: string.isRequired,
         downloadUrl: string.isRequired,
         updatedAt: string.isRequired
-      })
+      }),
+
+      postGradesLtis: arrayOf(shape({
+        id: string.isRequired,
+        name: string.isRequired,
+        onSelect: func.isRequired
+      })),
+
+      postGradesFeature: shape({
+        enabled: bool.isRequired,
+        store: object.isRequired,
+        returnFocusTo: object
+      }).isRequired
     };
 
     static downloadableLink (url) {
@@ -55,6 +69,7 @@ import 'compiled/jquery.rails_flash_notifications'
       super(props);
 
       this.state = ActionMenu.initialState;
+      this.launchPostGrades = this.launchPostGrades.bind(this);
     }
 
     componentWillMount () {
@@ -150,6 +165,49 @@ import 'compiled/jquery.rails_flash_notifications'
       return this.state.exportInProgress;
     }
 
+    launchPostGrades () {
+      const { store, returnFocusTo } = this.props.postGradesFeature;
+      setTimeout(() => AppLaunch(store, returnFocusTo), 10);
+    }
+
+    renderPostGradesTools () {
+      const tools = this.renderPostGradesLtis();
+
+      if (this.props.postGradesFeature.enabled) {
+        tools.push(this.renderPostGradesFeature());
+      }
+
+      if (tools.length) {
+        tools.push(<MenuItemSeparator key="postGradesSeparator" />);
+      }
+
+      return tools;
+    }
+
+    renderPostGradesLtis () {
+      return this.props.postGradesLtis.map((tool) => {
+        const key = `post_grades_lti_${tool.id}`;
+        return (
+          <MenuItem onSelect={tool.onSelect} key={key}>
+            <span data-menu-id={key}>
+              {I18n.t('Sync to %{name}', {name: tool.name})}
+            </span>
+          </MenuItem>
+        );
+      });
+    }
+
+    renderPostGradesFeature () {
+      const sisName = this.props.postGradesFeature.label || I18n.t('SIS');
+      return (
+        <MenuItem onSelect={this.launchPostGrades} key="post_grades_feature_tool">
+          <span data-menu-id="post_grades_feature_tool">
+            {I18n.t('Sync to %{sisName}', {sisName})}
+          </span>
+        </MenuItem>
+      );
+    }
+
     renderPreviousExports () {
       const previousExport = this.previousExport();
 
@@ -188,14 +246,18 @@ import 'compiled/jquery.rails_flash_notifications'
             </Button>
           }
         >
+          { this.renderPostGradesTools() }
+
           <MenuItem disabled={this.disableImports()} onSelect={() => { this.handleImport() }}>
             <span data-menu-id="import">{ I18n.t('Import') }</span>
           </MenuItem>
+
           <MenuItem disabled={this.exportInProgress()} onSelect={() => { this.handleExport() }}>
             <span data-menu-id="export">
               { this.exportInProgress() ? I18n.t('Export in progress') : I18n.t('Export') }
             </span>
           </MenuItem>
+
           { [...this.renderPreviousExports()] }
         </PopoverMenu>
       );

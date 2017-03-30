@@ -12,8 +12,16 @@ module Gradezilla
     # Student Headings
     STUDENT_COLUMN_MENU_SELECTOR = '.container_0 .Gradebook__ColumnHeaderAction'.freeze
 
+    # Gradebook Menu
+    GRADEBOOK_MENU_SELECTOR = '[data-component="GradebookMenu"]'.freeze
+
+    # Action Menu
+    ACTION_MENU_SELECTOR = '[data-component="ActionMenu"]'.freeze
+    ACTION_MENU_ITEM_SELECTOR = '[data-menu-id="%s"]'.freeze
+
     # Menu Items
     MENU_ITEM_SELECTOR = 'span [data-menu-item-id="%s"]'.freeze
+
 
     def ungradable_selector
       ".cannot_edit"
@@ -43,6 +51,22 @@ module Gradezilla
 
     def menu_item(name)
       f(MENU_ITEM_SELECTOR % name)
+    end
+
+    def action_menu_item(name)
+      f(action_menu_item_selector(name))
+    end
+
+    def action_menu_item_selector(name)
+      ACTION_MENU_ITEM_SELECTOR % name
+    end
+
+    def action_menu
+      f(ACTION_MENU_SELECTOR)
+    end
+
+    def gradebook_dropdown_menu
+      fj(GRADEBOOK_MENU_SELECTOR + ':visible')
     end
 
     def visit(course)
@@ -119,8 +143,20 @@ module Gradezilla
       student_column_menu.click
     end
 
+    def open_action_menu
+      action_menu.click
+    end
+
+    def open_gradebook_dropdown_menu
+      gradebook_dropdown_menu.click
+    end
+
     def select_menu_item(name)
       menu_item(name).click
+    end
+
+    def select_action_menu_item(name)
+      action_menu_item(name).click
     end
 
     # Semantic Methods for Gradebook Menus
@@ -179,11 +215,17 @@ module Gradezilla
 
     private
 
-    def gp_dropdown() f(".grading-period-select-button") end
+    def gp_dropdown
+      f(".grading-period-select-button")
+    end
 
-    def gp_menu_list() ff("#grading-period-to-show-menu li") end
+    def gp_menu_list
+      ff("#grading-period-to-show-menu li")
+    end
 
-    def grade_input(cell) f(".grade", cell) end
+    def grade_input(cell)
+      f(".grade", cell)
+    end
 
     def assignment_header_selector(name)
       return ASSIGNMENT_HEADER_SELECTOR unless name

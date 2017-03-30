@@ -37,28 +37,6 @@
           <span class="screenreader-only"><%= t('Keyboard Shortcuts') %></span>
           <i class="icon-keyboard-shortcuts"></i>
         </button>
-        <% if @post_grades_tools.count > 1 %>
-          <button id="post_grades" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><%= t('Post Grades') %></button>
-          <ul style="display: none;" class="post-grades-menu ui-kyle-menu">
-            <% @post_grades_tools.each do |tool| %>
-              <% case tool[:type] %>
-              <% when :lti %>
-                <li class="external-tools-dialog"><a aria-controls="post_grades_frame_dialog" role="button" data-url="<%= tool[:data_url]%>"><%= tool[:name]%></a></li>
-              <% when :post_grades %>
-                <li class="post-grades-placeholder in-menu"></li>
-              <% when :ellip %>
-                <li class="external-tools-dialog ellip"><a>&hellip;</a></li>
-              <% end %>
-            <% end %>
-          </ul>
-        <% elsif @post_grades_tools.count == 1 %>
-          <% case @post_grades_tools[0][:type] %>
-          <% when :lti %>
-          <button class="external-tools-dialog ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" data-url="<%= @post_grades_tools[0][:data_url]%>"><%= @post_grades_tools[0][:name]%></button>
-          <% when :post_grades %>
-          <span class="post-grades-placeholder"></span>
-          <% end %>
-        <% end %>
       </div>
       <div class="section-button-placeholder"></div>
     </div>
@@ -84,12 +62,6 @@
           <span class="screenreader-only"><%= t('Gradebook Settings') %></span>
         </button>
         <ul style="display: none;" class="gradebook_dropdown ui-kyle-menu">
-          <% if @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades) %>
-          <li><a id="publish_to_sis" href="<%= context_url(@context, :context_details_url,
-                                                           :anchor => 'tab-grade-publishing') %>">
-            <%= t('Publish grades to SIS') %>
-          </a></li>
-          <% end %>
           <li><a class="student_names_toggle" href="#" role="button"><%= t('Hide Student Names') %></a></li>
           <li><a href="#"><label><%= t('Show Attendance Columns') %> <input type="checkbox" id="show_attendance" /></label></a></li>
           <li id="include-ungraded-list-item"><a href="#"><label><%= t("Treat Ungraded as 0") %><input type="checkbox" id="include_ungraded_assignments" /></label></a></li>

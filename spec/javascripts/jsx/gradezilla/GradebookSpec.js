@@ -32,6 +32,7 @@ import DataLoader from 'jsx/gradezilla/DataLoader';
 import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants';
 import Gradebook from 'compiled/gradezilla/Gradebook';
 import UserSettings from 'compiled/userSettings';
+import ActionMenu from 'jsx/gradezilla/default_gradebook/components/ActionMenu';
 import GradebookApi from 'jsx/gradezilla/default_gradebook/GradebookApi';
 
 const $fixtures = document.getElementById('fixtures');
@@ -44,6 +45,8 @@ function createGradebook (options = {}) {
     },
     context_id: '1',
     sections: {},
+    post_grades_ltis: [],
+    post_grades_feature: { enabled: false, store: {}, returnFocusTo: {} },
     ...options
   });
 }
@@ -1900,7 +1903,10 @@ test('ActionMenu is rendered on renderActionMenu', function () {
       context_allows_gradebook_uploads: true,
       gradebook_import_url: 'http://someUrl',
       export_gradebook_csv_url: 'http://someUrl'
-    }
+    },
+    postGradesLtis: [],
+    postGradesStore: {},
+    getActionMenuProps: Gradebook.prototype.getActionMenuProps
   };
   Gradebook.prototype.renderActionMenu.call(self);
   const buttonText = document.querySelector('[data-component="ActionMenu"] Button').innerText.trim();
@@ -4501,4 +4507,73 @@ test('re-renders all column headers', function () {
   this.gradebook.onColumnsReordered();
 
   strictEqual(this.gradebook.updateColumnHeaders.callCount, 1);
+});
+
+QUnit.module('Gradebook#initPostGradesLtis');
+
+test('sets postGradesLtis as an array', function () {
+  const self = {
+    options: {
+      post_grades_ltis: []
+    }
+  };
+  Gradebook.prototype.initPostGradesLtis.apply(self);
+
+  deepEqual(self.postGradesLtis, []);
+});
+
+test('sets postGradesLtis to conform to ActionMenu.propTypes.postGradesLtis', function () {
+  const self = {
+    options: {
+      post_grades_ltis: [{
+        id: '1',
+        name: 'Pinnacle',
+        onSelect () {}
+      }, {
+        id: '2',
+        name: 'Kimono',
+        onSelect () {}
+      }]
+    }
+  };
+  Gradebook.prototype.initPostGradesLtis.apply(self);
+
+  strictEqual(ActionMenu.propTypes.postGradesLtis(self.postGradesLtis), null);
+});
+
+QUnit.module('Gradebook#getActionMenuProps', {
+  setup () {
+    fakeENV.setup({
+      current_user_id: '1',
+    });
+  },
+
+  teardown () {
+    $fixtures.innerHTML = '';
+    fakeENV.teardown();
+  }
+});
+
+test('generates props that conform to ActionMenu.propTypes', function () {
+  ReactDOM.render(<span data-component="ActionMenu"><button /></span>, $fixtures);
+  const self = {
+    options: {
+      gradebook_is_editable: true,
+      context_allows_gradebook_uploads: true,
+      gradebook_import_url: 'http://example.com/import',
+      currentUserId: '123',
+      export_gradebook_csv_url: 'http://example.com/export',
+      post_grades_feature: false,
+    },
+    postGradesLtis: [],
+    postGradesStore: {}
+  };
+
+  const props = Gradebook.prototype.getActionMenuProps.apply(self);
+
+  Object.keys(ActionMenu.propTypes).forEach((propKey) => {
+    const validator = ActionMenu.propTypes[propKey];
+
+    strictEqual(validator(props, propKey, 'ActionMenu'), null);
+  });
 });

@@ -2,9 +2,10 @@ define([
   'react',
   'enzyme',
   'instructure-ui/lib/components/PopoverMenu',
+  'jsx/gradezilla/SISGradePassback/PostGradesApp',
   'jsx/gradezilla/shared/GradebookExportManager',
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
-], (React, { mount }, { default: PopoverMenu }, GradebookExportManager, ActionMenu) => {
+], (React, { mount }, { default: PopoverMenu }, PostGradesApp, GradebookExportManager, ActionMenu) => {
   const workingMenuProps = () => (
     {
       gradebookIsEditable: true,
@@ -12,7 +13,20 @@ define([
       gradebookImportUrl: 'http://gradebookImportUrl',
 
       currentUserId: '42',
-      gradebookExportUrl: 'http://gradebookExportUrl'
+      gradebookExportUrl: 'http://gradebookExportUrl',
+
+      postGradesLtis: [{
+        id: '1',
+        name: 'Pinnacle',
+        onSelect () {}
+      }],
+
+      postGradesFeature: {
+        enabled: false,
+        label: '',
+        store: {},
+        returnFocusTo: { focus () {} }
+      }
     }
   );
   const previousExportProps = () => (
@@ -44,12 +58,6 @@ define([
     }
   });
 
-  test('renders three menu items', function () {
-    const menuItems = document.querySelectorAll('[role="menuitem"]');
-
-    equal(menuItems.length, 3);
-  });
-
   test('renders the Import menu item', function () {
     const specificMenuItem = document.querySelector('[role="menuitem"] [data-menu-id="import"]');
 
@@ -68,6 +76,43 @@ define([
 
     equal(specificMenuItem.textContent, 'Previous Export (Jan 20, 2009 at 5pm)');
   });
+
+  test('renders the Sync Grades LTI menu items', function () {
+    const specificMenuItem = document.querySelector('[role="menuitem"] [data-menu-id="post_grades_lti_1"]');
+
+    equal(specificMenuItem.textContent, 'Sync to Pinnacle');
+  });
+
+  test('renders no Post Grades feature menu item when disabled', function () {
+    const specificMenuItem = document.querySelector('[role="menuitem"] [data-menu-id="post_grades_feature_tool"]');
+
+    strictEqual(specificMenuItem, null);
+  })
+
+  test('renders the Post Grades feature menu item when enabled', function () {
+    this.wrapper.unmount();
+    const props = workingMenuProps();
+    props.postGradesFeature.enabled = true;
+
+    this.wrapper = mount(<ActionMenu {...props} />);
+    this.wrapper.find('button').simulate('click');
+
+    const specificMenuItem = document.querySelector('[role="menuitem"] [data-menu-id="post_grades_feature_tool"]');
+    equal(specificMenuItem.textContent, 'Sync to SIS');
+  })
+
+  test('renders the Post Grades feature menu item with label when sis handle is set', function () {
+    this.wrapper.unmount();
+    const props = workingMenuProps();
+    props.postGradesFeature.enabled = true;
+    props.postGradesFeature.label = 'Powerschool';
+
+    this.wrapper = mount(<ActionMenu {...props} />);
+    this.wrapper.find('button').simulate('click');
+
+    const specificMenuItem = document.querySelector('[role="menuitem"] [data-menu-id="post_grades_feature_tool"]');
+    equal(specificMenuItem.textContent, 'Sync to Powerschool');
+  })
 
   QUnit.module('ActionMenu - getExistingExport', {
     setup () {
@@ -347,7 +392,7 @@ define([
   });
 
   test('returns false when gradebook is editable and context allows gradebook uploads', function () {
-    notOk(this.wrapper.instance().disableImports())
+    strictEqual(this.wrapper.instance().disableImports(), false)
   });
 
   test('returns true when gradebook is not editable and context allows gradebook uploads', function () {
@@ -357,7 +402,7 @@ define([
     };
 
     this.wrapper.setProps(newImportProps, () => {
-      ok(this.wrapper.instance().disableImports())
+      strictEqual(this.wrapper.instance().disableImports(), true)
     });
   });
 
@@ -368,7 +413,7 @@ define([
     };
 
     this.wrapper.setProps(newImportProps, () => {
-      ok(this.wrapper.instance().disableImports())
+      strictEqual(this.wrapper.instance().disableImports(), true)
     });
   });
 
@@ -504,12 +549,64 @@ define([
   test('returns true if exportInProgress is set', function () {
     this.wrapper.instance().setExportInProgress(true);
 
-    ok(this.wrapper.instance().exportInProgress());
+    strictEqual(this.wrapper.instance().exportInProgress(), true);
   });
 
   test('returns false if exportInProgress is set to false', function () {
     this.wrapper.instance().setExportInProgress(false);
 
-    notOk(this.wrapper.instance().exportInProgress());
+    strictEqual(this.wrapper.instance().exportInProgress(), false);
+  });
+
+  QUnit.module('ActionMenu - Post Grade Ltis', {
+    setup () {
+      this.props = workingMenuProps();
+      this.props.postGradesLtis[0].onSelect = this.stub();
+
+      this.wrapper = mount(<ActionMenu {...this.props} />);
+      this.wrapper.find('button').simulate('click');
+    },
+
+    teardown () {
+      this.wrapper.unmount();
+    }
+  });
+
+  test('Invokes the onSelect prop when selected', function () {
+    document.querySelector('[data-menu-id="post_grades_lti_1"]').click();
+
+    strictEqual(this.props.postGradesLtis[0].onSelect.called, true);
+  });
+
+  test('Draws with "Sync to" label', function () {
+    const label = document.querySelector('[data-menu-id="post_grades_lti_1"]').textContent;
+
+    strictEqual(label.includes('Sync to Pinnacle'), true);
+  });
+
+  QUnit.module('ActionMenu - Post Grade Feature', {
+    setup () {
+      this.props = workingMenuProps();
+      this.props.postGradesFeature.enabled = true;
+
+      this.wrapper = mount(<ActionMenu {...this.props} />);
+      this.wrapper.find('button').simulate('click');
+    },
+
+    teardown () {
+      this.wrapper.unmount();
+    }
+  });
+
+  test('launches the PostGrades App when selected', function (assert) {
+    const done = assert.async();
+    this.stub(PostGradesApp, 'AppLaunch');
+
+    document.querySelector('[data-menu-id="post_grades_feature_tool"]').click();
+
+    setTimeout(function () {
+      strictEqual(PostGradesApp.AppLaunch.called, true);
+      done();
+    }, 15);
   });
 });

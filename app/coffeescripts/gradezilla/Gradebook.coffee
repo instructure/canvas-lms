@@ -191,13 +191,6 @@ define [
       if @gradingPeriodSet? && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
         $.extend(assignmentGroupsParams, {grading_period_id: @gradingPeriodToShow})
 
-      $('li.external-tools-dialog > a[data-url], button.external-tools-dialog').on 'click keyclick', (event) ->
-        postGradesDialog = new PostGradesFrameDialog({
-          returnFocusTo: $('#post_grades'),
-          baseUrl: $(event.target).attr('data-url')
-        })
-        postGradesDialog.open()
-
       submissionParams =
         response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'workflow_state', 'excused']
         exclude_response_fields: ['preview_url']
@@ -239,7 +232,7 @@ define [
       @allSubmissionsLoaded = dataLoader.gotSubmissions
 
       @initPostGradesStore()
-      @showPostGradesButton()
+      @initPostGradesLtis()
       @checkForUploadComplete()
 
       @gotSections(@options.sections)
@@ -263,7 +256,7 @@ define [
     # End of constructor
 
     loadOverridesForSIS: ->
-      return unless $('.post-grades-placeholder').length > 0
+      return unless @options.post_grades_feature
 
       assignmentGroupsURL = @options.assignment_groups_url.replace('&include%5B%5D=assignment_visibility', '')
       overrideDataLoader = DataLoader.loadGradebookData(
@@ -1081,24 +1074,31 @@ define [
         course:
           id:     @options.context_id
           sis_id: @options.context_sis_id
-      @postGradesStore.addChangeListener(@updatePowerschoolPostGradesButton)
+      @postGradesStore.addChangeListener(@updatePostGradesFeatureButton)
 
       @postGradesStore.setSelectedSection @sectionToShow
 
-    showPostGradesButton: ->
-      $placeholder = $('.post-grades-placeholder')
-      if $placeholder.length > 0
-        app = React.createElement(PostGradesApp, {
-          store: @postGradesStore
-          renderAsButton: !$placeholder.hasClass('in-menu')
-          labelText: if $placeholder.hasClass('in-menu') then I18n.t 'PowerSchool' else I18n.t 'Post Grades',
-          returnFocusTo: $('#post_grades')
-        })
-        ReactDOM.render(app, $placeholder[0])
+    delayedCall: (delay, fn) =>
+      setTimeout fn, delay
 
-    updatePowerschoolPostGradesButton: =>
-      showButton = @postGradesStore.hasAssignments() && !!@postGradesStore.getState().selected.sis_id
-      $('.post-grades-placeholder').toggle(showButton)
+    initPostGradesLtis: =>
+      @postGradesLtis = @options.post_grades_ltis.map (lti) =>
+        postGradesLti =
+          id: lti.id
+          name: lti.name
+          onSelect: =>
+            postGradesDialog = new PostGradesFrameDialog
+              returnFocusTo: document.querySelector("[data-component='ActionMenu'] button")
+              baseUrl: lti.data_url
+            @delayedCall 10, => postGradesDialog.open()
+            window.external_tool_redirect =
+              ready: postGradesDialog.close
+              cancel: postGradesDialog.close
+
+    updatePostGradesFeatureButton: =>
+      @disablePostGradesFeature = !@postGradesStore.hasAssignments() || !@postGradesStore.selectedSISId()
+      @gridReady.then =>
+        @renderActionMenu()
 
     initHeader: =>
       @renderGradebookMenus()
@@ -1215,13 +1215,20 @@ define [
       mountPoint = document.querySelector("[data-component='ViewOptionsMenu']")
       renderComponent(ViewOptionsMenu, mountPoint, @getViewOptionsMenuProps())
 
-    renderActionMenu: =>
+    getActionMenuProps: =>
+      focusReturnPoint = document.querySelector("[data-component='ActionMenu'] button")
       actionMenuProps =
         gradebookIsEditable: @options.gradebook_is_editable
         contextAllowsGradebookUploads: @options.context_allows_gradebook_uploads
         gradebookImportUrl: @options.gradebook_import_url
         currentUserId: ENV.current_user_id
         gradebookExportUrl: @options.export_gradebook_csv_url
+        postGradesLtis: @postGradesLtis
+        postGradesFeature:
+          enabled: @options.post_grades_feature && !@disablePostGradesFeature
+          returnFocusTo: focusReturnPoint
+          label: @options.sis_name
+          store: @postGradesStore
 
       progressData = @options.gradebook_csv_progress
 
@@ -1236,9 +1243,12 @@ define [
             id: "#{attachmentData.attachment.id}"
             downloadUrl: @options.attachment_url
             updatedAt: attachmentData.attachment.updated_at
+      actionMenuProps
 
+    renderActionMenu: =>
       mountPoint = document.querySelector("[data-component='ActionMenu']")
-      renderComponent(ActionMenu, mountPoint, actionMenuProps)
+      props = @getActionMenuProps()
+      renderComponent(ActionMenu, mountPoint, props)
 
     checkForUploadComplete: () ->
       if UserSettings.contextGet('gradebookUploadComplete')

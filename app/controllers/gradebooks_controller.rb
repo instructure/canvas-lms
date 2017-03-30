@@ -229,11 +229,13 @@ class GradebooksController < ApplicationController
     end
   end
 
+  def post_grades_ltis
+    @post_grades_ltis ||= self.external_tools.map { |tool| external_tool_detail(tool) }
+  end
+
   def post_grades_tools
     tool_limit = @context.feature_enabled?(:post_grades) ? MAX_POST_GRADES_TOOLS - 1 : MAX_POST_GRADES_TOOLS
-    external_tools = self.external_tools.map { |tool| external_tool_detail(tool) }
-
-    tools = external_tools[0...tool_limit]
+    tools = post_grades_ltis[0...tool_limit]
     tools.push(type: :post_grades) if @context.feature_enabled?(:post_grades)
     tools
   end
@@ -241,6 +243,7 @@ class GradebooksController < ApplicationController
   def external_tool_detail(tool)
     post_grades_placement = tool[:placements][:post_grades]
     {
+      id: tool[:definition_id],
       data_url: post_grades_placement[:canvas_launch_url],
       name: tool[:name],
       type: :lti,
@@ -407,6 +410,8 @@ class GradebooksController < ApplicationController
       gradebook_column_size_settings_url: change_gradebook_column_size_course_gradebook_url,
       gradebook_column_order_settings: @current_user.preferences[:gradebook_column_order].try(:[], @context.id),
       gradebook_column_order_settings_url: save_gradebook_column_order_course_gradebook_url,
+      post_grades_ltis: post_grades_ltis,
+      post_grades_feature: post_grades_feature?,
       sections: sections_json(@context.active_course_sections, @current_user, session),
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
       settings: @current_user.preferences.fetch(:gradebook_settings, {}).fetch(@context.id, {}),
@@ -414,6 +419,12 @@ class GradebooksController < ApplicationController
       sis_name: @context.root_account.settings[:sis_name],
       version: params.fetch(:version, nil)
     }
+  end
+
+  def post_grades_feature?
+    @context.feature_enabled?(:post_grades) &&
+    @context.allows_grade_publishing_by(@current_user) &&
+    can_do(@context, @current_user, :manage_grades)
   end
 
   def history

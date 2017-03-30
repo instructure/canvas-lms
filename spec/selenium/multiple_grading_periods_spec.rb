@@ -128,7 +128,14 @@ describe "interaction with grading periods" do
           end_date: 1.day.ago(now)
         )
       end
-      let!(:assignment) { test_course.assignments.create!(title: 'Assignment 1', due_at: 1.day.ago(now), points_possible: 10) }
+      let!(:assignment) do
+        test_course.assignments.create!(
+          title: 'Assignment 1',
+          due_at: 1.day.ago(now),
+          points_possible: 10,
+          workflow_state: 'published'
+        )
+      end
 
       it 'should list an assignment from a previous grading period', priority: "2", test_course: 381145 do
         user_session(teacher)

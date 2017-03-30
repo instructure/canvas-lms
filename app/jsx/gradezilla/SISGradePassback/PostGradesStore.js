@@ -51,6 +51,10 @@ import assignmentUtils from 'jsx/gradezilla/SISGradePassback/assignmentUtils'
         return section_for_everyone
       },
 
+      selectedSISId () {
+        return this.getState().selected.sis_id
+      },
+
       setGradeBookAssignments (gradebookAssignments) {
         var assignments = []
         for (var id in gradebookAssignments) {
