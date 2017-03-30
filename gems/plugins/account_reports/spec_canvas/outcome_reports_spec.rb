@@ -207,6 +207,7 @@ describe "Outcome Reports" do
       param = {}
       param["include_deleted"] = true
       report = run_report(@type, {params: param})
+      expect(report.current_line).to eq 3
       expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects;"
       parsed = parse_report(report, {order: 0})
 
