@@ -25,9 +25,10 @@ define [
     setup: ->
       @courseRestore = new CourseRestore account_id: 6
       @courseSearchResultsView = new CourseSearchResultsView model: @courseRestore
+      $('#fixtures').append $('<div id="flash_screenreader_holder" />')
       $('#fixtures').append @courseSearchResultsView.render().el
     teardown: ->
-      @courseSearchResultsView.remove()
+      $('#fixtures').empty()
 
   test "restored is set to false when initialized", ->
     ok !@courseRestore.get('restored')
@@ -49,13 +50,32 @@ define [
   test "not found message is displayed when model has no id and a status", ->
     @courseRestore.clear silent: yes
     @courseRestore.set errorMessageJSON
-
     ok @courseSearchResultsView.$el.find('.alert-error').length > 0, "Error message is displayed"
 
   test "options to restore a course and its details should be displayed when a deleted course is found", ->
     @courseRestore.set courseJSON
-    
+
     ok @courseSearchResultsView.$el.find('#restoreCourseBtn').length > 0, "Restore course button displayed"
+
+  test "show screenreader text when course not found", ->
+    $.initFlashContainer()
+    @courseRestore.clear silent: yes
+    @courseRestore.set errorMessageJSON
+    @courseSearchResultsView.resultsFound()
+    debugger
+    ok $('#flash_screenreader_holder').text().match('Course not found')
+
+  test "show screenreader text on finding deleted course", ->
+    $.initFlashContainer()
+    @courseRestore.set courseJSON
+    @courseSearchResultsView.resultsFound()
+    ok $('#flash_screenreader_holder').text().match('Course found')
+
+  test "show screenreader text on finding non-deleted course", ->
+    $.initFlashContainer()
+    @courseRestore.set Object.assign {}, courseJSON, {workflow_state: 'active'}
+    @courseSearchResultsView.resultsFound()
+    ok $('#flash_screenreader_holder').text().match(/Course found \(not deleted\)/)
 
   test "shows options to view a course or add enrollments if a course was restored", ->
     @courseRestore.set courseJSON, silent: yes

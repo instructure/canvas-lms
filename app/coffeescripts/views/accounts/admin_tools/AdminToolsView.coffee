@@ -3,7 +3,7 @@ define [
   'jquery'
   'jst/accounts/admin_tools/AdminTools'
   'jqueryui/tabs'
-], (Backbone,$, template) -> 
+], (Backbone, $, template) ->
   # This is the main container view that holds 
   # all of the tabs on the admin tools page.
   # It allows you to give it a tab property that should
