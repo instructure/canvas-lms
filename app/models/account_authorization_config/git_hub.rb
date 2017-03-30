@@ -44,13 +44,7 @@ class AccountAuthorizationConfig::GitHub < AccountAuthorizationConfig::Oauth2
   end
 
   # Rename db field
-  def domain=(val)
-    self.auth_host = val
-  end
-
-  def domain
-    auth_host
-  end
+  alias_attribute :domain, :auth_host
 
   def unique_id(token)
     user(token)[login_attribute].to_s

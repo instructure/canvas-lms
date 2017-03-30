@@ -39,13 +39,7 @@ class AccountAuthorizationConfig::Clever < AccountAuthorizationConfig::Oauth2
   end
 
   # Rename db field
-  def district_id=(val)
-    self.auth_filter = val.presence
-  end
-
-  def district_id
-    auth_filter
-  end
+  alias_attribute :district_id, :auth_filter
 
   def login_attribute
     super || 'id'.freeze

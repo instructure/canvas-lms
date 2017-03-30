@@ -26,20 +26,10 @@ class AccountAuthorizationConfig::Oauth2 < AccountAuthorizationConfig::Delegated
   # rename DB fields to something that makes sense for OAuth2
   alias_method :client_secret=, :auth_password=
   alias_method :client_secret, :auth_decrypted_password
-  { client_id: :entity_id,
-    authorize_url: :log_in_url,
-    token_url: :auth_base,
-    scope: :requested_authn_context }.each do |(new_name, old_name)|
-    class_eval <<-RUBY, __FILE__, __LINE__ + 1
-      def #{new_name}=(val)
-        self.#{old_name} = val
-      end
-
-      def #{new_name}
-        #{old_name}
-      end
-    RUBY
-  end
+  alias_attribute :client_id, :entity_id
+  alias_attribute :authorize_url, :log_in_url
+  alias_attribute :token_url, :auth_base
+  alias_attribute :scope, :requested_authn_context
 
   def client
     @client ||= OAuth2::Client.new(client_id, client_secret, client_options)

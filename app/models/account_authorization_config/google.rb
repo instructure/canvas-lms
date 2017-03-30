@@ -30,13 +30,7 @@ class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDCon
   end
 
   # Rename db field
-  def hosted_domain=(val)
-    self.auth_filter = val.presence
-  end
-
-  def hosted_domain
-    auth_filter
-  end
+  alias_attribute :hosted_domain, :auth_filter
 
   def self.login_attributes
     ['sub'.freeze, 'email'.freeze].freeze
