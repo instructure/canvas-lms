@@ -1283,7 +1283,7 @@ class Attachment < ActiveRecord::Base
     root = self.root_attachment
     return unless root
     self.root_attachment_id = nil
-    self.filename = root.filename if root.filename
+    self.write_attribute(:filename, root.filename) if root.filename
     root.copy_attachment_content(self)
   end
 
