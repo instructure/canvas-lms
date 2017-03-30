@@ -32,6 +32,7 @@ class AccountReport < ActiveRecord::Base
     state :running
     state :complete
     state :error
+    state :aborted
     state :deleted
   end
 
