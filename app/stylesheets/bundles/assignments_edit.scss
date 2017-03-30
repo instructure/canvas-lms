@@ -1,4 +1,6 @@
 @import "base/environment";
+@import "base/mixins/misc";
+
 /* header */
 
 #edit_assignment_header-cr {
@@ -120,4 +122,45 @@ div.form-column-right, div.overrides-column-right {
 
 .assignment-edit-group-alert, .assignment-edit-external-tool-alert{
   margin: 15px 20px 0;
+}
+
+
+/* support for master class locked input fields */
+#edit_assignment_form {
+   h1.title {
+     clear: both;
+   }
+
+   div.assignment_description {
+     background-color: $ic-color-light;
+   }
+
+   @include readonly-input;
+
+   #assignment_points_possible[readonly] { // points possible
+     margin-top: -3px;   // because it sits too low
+   }
+
+   .to .ic-Form-control.readonly,
+   .from .ic-Form-control.readonly {  // locked availability dates
+     margin-bottom: 0;                // removes white space at bottom of assign box
+   }
+
+  .ContainerDueDate { // date inputs
+    .Available-from-to {
+      .from, .to {  // or the from and to collapse on each other in ie11
+        width: 50%;
+      }
+    }
+    // make the box of dates layout look right
+    .ic-Form-control.readonly {
+      input[type="text"].ic-Input[readonly] { // all that to override existing css selectors
+        height: 1.4em;
+        padding: 0;
+      }
+      label {                             // tighten it up
+        margin-bottom: 0;
+      }
+    }
+  }
 }

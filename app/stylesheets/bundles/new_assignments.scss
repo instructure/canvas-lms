@@ -1,5 +1,6 @@
 @import "base/environment";
 @import "pages/shared/move_dialog";
+@import "base/mixins/misc";
 
 .accessibility-warning {
   @include accessibility-prompt;
@@ -197,4 +198,27 @@
   margin-right: 6px;
   padding-right: 10px;
   border-right: 1px solid $ic-color-medium-lighter;
+}
+
+/* support for master class locked input fields */
+form[data-view='edit-assignment'] {
+  h3 {
+    margin: 5px 8px;
+    font-weight: bold;
+    font-size: 1em;
+  }
+  @include readonly-input;
+
+  .date_field_container.readonly {
+    input.datetime_field {
+      margin-top: -3px;
+    }
+    button.ui-datepicker-trigger, .datetime_suggest {
+      display: none;
+    }
+  }
+
+  input[name='points_possible'][readonly] {
+    margin-top: -3px;
+  }
 }

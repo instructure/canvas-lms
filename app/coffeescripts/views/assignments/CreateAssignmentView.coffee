@@ -31,8 +31,11 @@ define [
 
     @optionProperty 'assignmentGroup'
 
-    initialize: ->
-      super
+    initialize: (options) ->
+      super(
+        assignmentGroup: options.assignmentGroup,
+        title: if @model? then I18n.t("Edit Assignment") else null    # let title come from trigger (see DialogForm.getDialogTitle)
+      )
       @model ?= @generateNewAssignment()
       @on "close", -> @$el[0].reset()
 
@@ -96,6 +99,15 @@ define [
         disableDueAt: @disableDueAt()
         postToSISName: ENV.SIS_NAME
         isInClosedPeriod: @model.inClosedGradingPeriod()
+
+      # master_course_restrictions only apply if this is a child course
+      # and is restricted by a master course.
+      # the handlebars template doesn't do logical combinations conditions,
+      # so summarize here
+      doRestrictionsApply = !!json.is_master_course_child_content && !!json.restricted_by_master_course
+      for k, v of json.master_course_restrictions
+        json.master_course_restrictions[k] =  doRestrictionsApply && v
+      json
 
     currentUserIsAdmin: ->
       _.contains(ENV.current_user_roles, "admin")

@@ -182,6 +182,8 @@ import $ from 'jquery'
             overrides   = {this.props.overrides}
             replaceDate = {this.props.replaceDate}
             sections    = {this.props.sections}
+            dueDatesReadonly = {this.props.dueDatesReadonly}
+            availabilityDatesReadonly = {this.props.availabilityDatesReadonly}
           />
           {this.renderClosedGradingPeriodNotification()}
         </div>

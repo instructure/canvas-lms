@@ -3,8 +3,9 @@ import React from 'react'
 import accessibleDateFormat from 'jsx/shared/helpers/accessibleDateFormat'
 import tz from 'timezone'
 import 'jquery.instructure_forms'
+import cx from 'classnames'
 
-  const { string, func, bool, instanceOf } = React.PropTypes;
+const { string, func, bool, instanceOf, oneOfType } = React.PropTypes;
 
   var DueDateCalendarPicker = React.createClass({
 
@@ -16,7 +17,15 @@ import 'jquery.instructure_forms'
       inputClasses: string.isRequired,
       disabled: bool.isRequired,
       isFancyMidnight: bool.isRequired,
-      dateValue: instanceOf(Date).isRequired,
+      dateValue: oneOfType([instanceOf(Date), string]).isRequired,
+      labelText: string.isRequired,
+      readonly: bool
+    },
+
+    getDefaultProps () {
+      return {
+        readonly: false
+      };
     },
 
     // ---------------
@@ -65,9 +74,10 @@ import 'jquery.instructure_forms'
     },
 
     render() {
-      if (this.props.disabled) {
+      if (this.props.disabled || this.props.readonly) {
+        const className = cx('ic-Form-control', {readonly: this.props.readonly});
         return (
-          <div className="ic-Form-control">
+          <div className={className}>
             <label className="ic-Label" htmlFor={this.props.dateType}>{this.props.labelText}</label>
             <div className="ic-Input-group">
               <input
@@ -77,11 +87,14 @@ import 'jquery.instructure_forms'
                 className={`ic-Input ${this.props.inputClasses}`}
                 defaultValue={this.formattedDate()}
               />
-              <div className="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabIndex="-1">
-                <button className="Button Button--icon-action disabled" aria-disabled="true" type="button">
-                  <i className="icon-calendar-month" role="presentation"/>
-                </button>
-              </div>
+              {
+                this.props.readonly ? null :
+                <div className="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabIndex="-1">
+                  <button className="Button Button--icon-action disabled" aria-disabled="true" type="button">
+                    <i className="icon-calendar-month" role="presentation" />
+                  </button>
+                </div>
+              }
             </div>
           </div>
         );

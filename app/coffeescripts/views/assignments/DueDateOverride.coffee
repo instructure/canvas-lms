@@ -46,7 +46,9 @@ define [
         gradingPeriods: @gradingPeriods,
         hasGradingPeriods: @hasGradingPeriods,
         isOnlyVisibleToOverrides: @model.assignment.isOnlyVisibleToOverrides(),
-        dueAt: tz.parse(@model.assignment.get("due_at"))
+        dueAt: tz.parse(@model.assignment.get("due_at")),
+        dueDatesReadonly: @options.dueDatesReadonly,
+        availabilityDatesReadonly: @options.availabilityDatesReadonly
       })
 
       ReactDOM.render(DueDatesElement, div)

@@ -62,3 +62,18 @@
     }
   }
 }
+
+// make <input readonly> look like plain text
+@mixin readonly-input {
+  input[readonly] {
+     background-color: transparent;
+     border-color: transparent;
+     box-shadow: none;
+     font-weight: bold;
+     cursor: default;
+     &:focus {
+       border-color: transparent;
+       outline-style: none;
+     }
+   }
+}

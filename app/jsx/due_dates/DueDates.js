@@ -29,6 +29,15 @@ import 'compiled/jquery.rails_flash_notifications'
         if (!isDate && props['dueAt'] !== null) {
           return new Error('Invalid prop `dueAt` supplied to `DueDates`. Validation failed.')
         }
+      },
+      dueDatesReadonly: React.PropTypes.bool,
+      availabilityDatesReadonly: React.PropTypes.bool
+    },
+
+    getDefaultProps () {
+      return {
+        dueDatesReadonly: false,
+        availabilityDatesReadonly: false
       }
     },
 
@@ -473,6 +482,8 @@ import 'compiled/jquery.rails_flash_notifications'
             replaceDate          = {this.replaceDate.bind(this, rowKey)}
             currentlySearching   = {this.state.currentlySearching}
             allStudentsFetched   = {this.state.allStudentsFetched}
+            dueDatesReadonly     = {this.props.dueDatesReadonly}
+            availabilityDatesReadonly = {this.props.availabilityDatesReadonly}
           />
         )
       })
@@ -485,7 +496,11 @@ import 'compiled/jquery.rails_flash_notifications'
           <div id="bordered-wrapper" className="Container__DueDateRow">
             {rowsToRender}
           </div>
-          <DueDateAddRowButton handleAdd={this.addRow} display={true}/>
+          {
+            this.props.dueDatesReadonly || this.props.availabilityDatesReadonly
+            ? null
+            : <DueDateAddRowButton handleAdd={this.addRow} display={true} />
+          }
         </div>
       )
     }
