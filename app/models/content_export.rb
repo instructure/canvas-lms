@@ -375,6 +375,9 @@ class ContentExport < ActiveRecord::Base
     # for integrating selective exports with external content
     if (type = Canvas::Migration::ExternalContent::Translator::CLASSES_TO_TYPES[obj.class])
       exported_assets << "#{type}_#{obj.id}"
+      if obj.respond_to?(:for_assignment?) && obj.for_assignment?
+        exported_assets << "assignment_#{obj.assignment_id}"
+      end
     end
   end
 

@@ -115,8 +115,14 @@ describe ContentMigration do
     it "should send a list of exported assets to the external service when selectively exporting" do
       assmt = @copy_from.assignments.create!
       other_assmt = @copy_from.assignments.create!
+      graded_quiz = @copy_from.quizzes.create!
+      graded_quiz.generate_quiz_data
+      graded_quiz.workflow_state = 'available'
+      graded_quiz.save!
+
       cm = @copy_from.context_modules.create!(:name => "some module")
       item = cm.add_item(:id => assmt.id, :type => 'assignment')
+      item2 = cm.add_item(:id => graded_quiz.id, :type => 'quiz')
 
       TestExternalContentService.stubs(:applies_to_course?).returns(true)
       TestExternalContentService.stubs(:export_completed?).returns(true)
@@ -126,7 +132,8 @@ describe ContentMigration do
       @cm.save!
 
       TestExternalContentService.expects(:begin_export).with(@copy_from,
-        {:selective => true, :exported_assets => ["context_module_#{cm.id}", "assignment_#{assmt.id}"]})
+        {:selective => true, :exported_assets =>
+          ["context_module_#{cm.id}", "assignment_#{assmt.id}", "quiz_#{graded_quiz.id}", "assignment_#{graded_quiz.assignment.id}"]})
 
       run_course_copy
     end
