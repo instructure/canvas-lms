@@ -10,8 +10,8 @@ module AddressBook
       super
     end
 
-    def known_in_context(context, is_admin=false)
-      @service_tap.known_in_context(context, is_admin)
+    def known_in_context(context)
+      @service_tap.known_in_context(context)
       super
     end
 

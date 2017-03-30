@@ -317,14 +317,16 @@ module Services
         Services::AddressBook.known_in_context(@sender, @course.asset_string)
       end
 
-      it "passes the sender to the recipients call if not is_admin" do
+      it "passes the sender to the recipients call" do
         expect_request(with_param(:for_sender, @sender.global_id))
         Services::AddressBook.known_in_context(@sender, @course.asset_string)
       end
 
-      it "omits the sender form the recipients call if is_admin" do
-        expect_request(not_match(with_param_present(:for_sender)))
-        Services::AddressBook.known_in_context(@sender, @course.asset_string, true)
+      it "passes the user_ids, if any, to the recipients call" do
+        recipient1 = user_model
+        recipient2 = user_model
+        expect_request(with_param(:user_ids, [recipient1.global_id, recipient2.global_id]))
+        Services::AddressBook.known_in_context(@sender, @course.asset_string, [recipient1, recipient2])
       end
 
       it "passes the context to the recipients call" do
@@ -394,16 +396,6 @@ module Services
       it "passes context to recipients call" do
         expect_request(with_param_present(:in_context))
         Services::AddressBook.search_users(@sender, {search: 'bob', context: @course}, {})
-      end
-
-      it "includes sender if is_admin but no context given" do
-        expect_request(with_param_present(:for_sender))
-        Services::AddressBook.search_users(@sender, {search: 'bob', is_admin: true}, {})
-      end
-
-      it "omits sender if is_admin specified with context" do
-        expect_request(not_match(with_param_present(:sender)))
-        Services::AddressBook.search_users(@sender, {search: 'bob', context: @course, is_admin: true}, {})
       end
 
       it "passes exclude_ids to recipients call" do

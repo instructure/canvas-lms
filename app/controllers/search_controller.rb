@@ -110,10 +110,14 @@ class SearchController < ApplicationController
         params[:user_id] = api_find(User, params[:user_id]).id
       end
 
+      # null out the context param if it's invalid, but leave it as is
+      # otherwise (to preserve e.g. `_students` suffix)
+      search_context = AddressBook.load_context(params[:context])
+      params[:context] = nil unless search_context
+
       permissions = params[:permissions] || []
       permissions << :send_messages if params[:messageable_only]
-      load_all_contexts :context => get_admin_search_context(params[:context]),
-                        :permissions => permissions
+      load_all_contexts :context => search_context, :permissions => permissions
 
       types = (params[:types] || [] + [params[:type]]).compact
       types |= [:course, :section, :group] if types.delete('context')
@@ -132,7 +136,7 @@ class SearchController < ApplicationController
       if params[:user_id]
         known = @current_user.address_book.known_user(
           params[:user_id],
-          include_context: @admin_context,
+          context: params[:context],
           conversation_id: params[:from_conversation_id])
         recipients << known if known
       elsif params[:context] || params[:search]
@@ -157,7 +161,6 @@ class SearchController < ApplicationController
             search: params[:search],
             exclude_ids: exclude_users,
             context: params[:context],
-            is_admin: @admin_context.present?,
             weak_checks: params[:skip_visibility_checks]
           )]
         end
@@ -385,25 +388,6 @@ class SearchController < ApplicationController
     result << synthetic_context.merge({:id => "#{context}_students", :name => t(:enrollments_students, "Students"), :user_count => enrollment_counts['StudentEnrollment']}) if enrollment_counts['StudentEnrollment'].to_i > 0
     result << synthetic_context.merge({:id => "#{context}_observers", :name => t(:enrollments_observers, "Observers"), :user_count => enrollment_counts['ObserverEnrollment']}) if enrollment_counts['ObserverEnrollment'].to_i > 0
     result
-  end
-
-  def get_admin_search_context(asset_string)
-    return unless asset_string
-    return unless asset_string =~ (/\A((\w+)_(\d+))/)
-    asset_string = $1
-    asset_type = $2.to_sym
-    asset_id = $3
-    context = nil
-    case asset_type
-    when :course, :group
-      return unless context = Context.find_by_asset_string(asset_string)
-    when :section
-      return unless context = CourseSection.find(asset_id)
-    else
-      return
-    end
-    return unless context.grants_right?(@current_user, :read_as_admin)
-    @admin_context = context
   end
 
   def context_state_ranks

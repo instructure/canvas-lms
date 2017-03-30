@@ -47,6 +47,14 @@ describe AddressBook::Service do
     allow(Services::AddressBook).to receive(:common_contexts).with(*args).and_return(returns)
   end
 
+  def stub_known_in_context(args, compact_returns={})
+    args << nil if args.length < 3 # user_ids
+    args << false if args.length < 4 # ignore_result
+    user_ids = expand_user_ids(compact_returns)
+    common_contexts = expand_common_contexts(compact_returns)
+    allow(Services::AddressBook).to receive(:known_in_context).with(*args).and_return([user_ids, common_contexts])
+  end
+
   describe "known_users" do
     it "includes only known users" do
       other_recipient = user_model
@@ -93,7 +101,7 @@ describe AddressBook::Service do
       expect(known_users).to include(other_recipient)
     end
 
-    describe "with optional :include_context" do
+    describe "with optional :context" do
       def stub_roles_in_context(args, returns={})
         args << false # ignore_result
         returns = expand_common_contexts(returns)
@@ -101,53 +109,65 @@ describe AddressBook::Service do
       end
 
       before do
-        stub_common_contexts([@sender, [@recipient.global_id]])
+        # recipient participates in three courses, (visible without a sender)
+        @course1 = course_model
+        @course2 = course_model
+        @course3 = course_model
+        stub_roles_in_context([@course1, [@recipient.global_id]], { @recipient => @course1 })
+        stub_roles_in_context([@course2, [@recipient.global_id]], { @recipient => @course2 })
+        stub_roles_in_context([@course3, [@recipient.global_id]], { @recipient => @course3 })
 
-        @course = course_model
-        stub_roles_in_context(
-          [@course, [@recipient.global_id]],
-          { @recipient => @course }
-        )
-
-        @group = group_model
-        stub_roles_in_context(
-          [@group, [@recipient.global_id]],
-          { @recipient => @group }
-        )
+        # but only two are shared with sender (visible with the sender)
+        stub_known_in_context([@sender, @course1, [@recipient.global_id]], { @recipient => @course1 })
+        stub_known_in_context([@sender, @course2, [@recipient.global_id]], { @recipient => @course2 })
+        stub_known_in_context([@sender, @course3, [@recipient.global_id]], {})
+        stub_common_contexts([@sender, [@recipient.global_id]], { @recipient => {
+          courses: {
+            @course1.global_id => ['StudentEnrollment'],
+            @course2.global_id => ['StudentEnrollment']
+          },
+          groups: {}
+        }})
       end
 
-      it "skips course roles in unshared courses when absent" do
-        expect(Services::AddressBook).to receive(:roles_in_context).never
-        @address_book.known_users([@recipient])
-        expect(@address_book.common_courses(@recipient)).not_to include(@course.id)
+      it "includes all known contexts when absent" do
+        expect(@address_book.known_users([@recipient])).to include(@recipient)
+        expect(@address_book.common_courses(@recipient)).to include(@course1.id)
+        expect(@address_book.common_courses(@recipient)).to include(@course2.id)
       end
 
-      it "skips group memberships in unshared groups when absent" do
-        expect(Services::AddressBook).to receive(:roles_in_context).never
-        @address_book.known_users([@recipient])
-        expect(@address_book.common_groups(@recipient)).not_to include(@group.id)
+      it "excludes unknown contexts when absent, even if admin" do
+        account_admin_user(user: @sender, account: @course3.account)
+        expect(@address_book.known_users([@recipient])).to include(@recipient)
+        expect(@address_book.common_courses(@recipient)).not_to include(@course3.id)
       end
 
-      it "includes otherwise skipped course role in common courses when course specified" do
-        @address_book.known_users([@recipient], include_context: @course)
-        expect(@address_book.common_courses(@recipient)).to include(@course.id)
+      it "excludes other known contexts when specified" do
+        expect(@address_book.known_users([@recipient], context: @course1)).to include(@recipient)
+        expect(@address_book.common_courses(@recipient)).to include(@course1.id)
+        expect(@address_book.common_courses(@recipient)).not_to include(@course2.id)
       end
 
-      it "includes otherwise skipped groups memberships in common groups when group specified" do
-        @address_book.known_users([@recipient], include_context: @group)
-        expect(@address_book.common_groups(@recipient)).to include(@group.id)
+      it "excludes specified unknown context when sender is non-admin" do
+        expect(@address_book.known_users([@recipient], context: @course3)).not_to include(@recipient)
+        expect(@address_book.common_courses(@recipient)).not_to include(@course3.id)
       end
 
-      it "no effect if no role in the course exists" do
-        stub_roles_in_context([@course, [@recipient.global_id]])
-        @address_book.known_users([@recipient], include_context: @course)
-        expect(@address_book.common_courses(@recipient)).not_to include(@course.id)
+      it "excludes specified unknown course when sender is a participant admin" do
+        # i.e. the sender does partipate in the course, at a level that
+        # nominally gives them read_as_admin (e.g. teacher, usually), but still
+        # doesn't know of recipient's participation, likely because of section
+        # limited enrollment.
+        section = @course3.course_sections.create!
+        teacher_in_course(user: @sender, course: @course3, active_all: true, section: section, limit_privileges_to_course_section: true)
+        expect(@address_book.known_users([@recipient], context: @course3)).not_to include(@recipient)
+        expect(@address_book.common_courses(@recipient)).not_to include(@course3.id)
       end
 
-      it "no effect if no membership in the group exists" do
-        stub_roles_in_context([@group, [@recipient.global_id]])
-        @address_book.known_users([@recipient], include_context: @group)
-        expect(@address_book.common_courses(@recipient)).not_to include(@group.id)
+      it "includes specified unknown context when sender is non-participant admin" do
+        account_admin_user(user: @sender, account: @course3.account)
+        expect(@address_book.known_users([@recipient], context: @course3)).to include(@recipient)
+        expect(@address_book.common_courses(@recipient)).to include(@course3.id)
       end
     end
 
@@ -173,13 +193,22 @@ describe AddressBook::Service do
     describe "sharding" do
       specs_require_sharding
 
-      it "finds cross-shard known users" do
-        xshard_recipient = @shard2.activate{ user_model }
+      let(:xshard_recipient) { @shard2.activate{ user_model } }
+
+      before do
         stub_common_contexts(
           [@sender, [xshard_recipient.global_id]],
           { xshard_recipient => :student }
         )
+      end
+
+      it "finds cross-shard known users" do
         known_users = @address_book.known_users([xshard_recipient])
+        expect(known_users).to include(xshard_recipient)
+      end
+
+      it "works when given local ids" do
+        known_users = @shard2.activate{ @address_book.known_users([xshard_recipient.id]) }
         expect(known_users).to include(xshard_recipient)
       end
     end
@@ -233,19 +262,9 @@ describe AddressBook::Service do
   end
 
   describe "known_in_context" do
-    def stub_known_in_context(args, compact_returns={})
-      args << false # ignore_result
-      user_ids = expand_user_ids(compact_returns)
-      common_contexts = expand_common_contexts(compact_returns)
-      allow(Services::AddressBook).to receive(:known_in_context).with(*args).and_return([user_ids, common_contexts])
-    end
-
     before do
       @course = course_model
-      stub_known_in_context(
-        [@sender, @course.global_asset_string, false],
-        { @recipient => @course }
-      )
+      stub_known_in_context([@sender, @course.global_asset_string], { @recipient => @course })
     end
 
     it "limits to users in context" do
@@ -253,20 +272,6 @@ describe AddressBook::Service do
       known_users = @address_book.known_in_context(@course.asset_string)
       expect(known_users.map(&:id)).to include(@recipient.id)
       expect(known_users.map(&:id)).not_to include(other_recipient.id)
-    end
-
-    it "passes :is_admin flag to service" do
-      stub_known_in_context([@sender, @course.global_asset_string, false])
-      stub_known_in_context(
-        [@sender, @course.global_asset_string, true],
-        { @recipient => @course }
-      )
-
-      known_users = @address_book.known_in_context(@course.asset_string)
-      expect(known_users.map(&:id)).not_to include(@recipient.id)
-
-      known_users = @address_book.known_in_context(@course.asset_string, true)
-      expect(known_users.map(&:id)).to include(@recipient.id)
     end
 
     it "caches the results for known users" do
@@ -286,16 +291,8 @@ describe AddressBook::Service do
       before do
         @xshard_recipient = @shard2.activate{ user_model }
         @xshard_course = @shard2.activate{ course_model(account: Account.create) }
-
-        stub_known_in_context(
-          [@sender, @course.global_asset_string, false],
-          { @xshard_recipient => @course }
-        )
-
-        stub_known_in_context(
-          [@sender, @xshard_course.global_asset_string, false],
-          { @xshard_recipient => @xshard_course }
-        )
+        stub_known_in_context([@sender, @course.global_asset_string], { @xshard_recipient => @course })
+        stub_known_in_context([@sender, @xshard_course.global_asset_string], { @xshard_recipient => @xshard_course })
       end
 
       it "works for cross-shard courses" do
@@ -380,14 +377,28 @@ describe AddressBook::Service do
       expect(page.map(&:id)).to include(@recipient.id)
     end
 
-    it "passes optional :is_admin parameter with :context to service" do
+    it "omits sender in service call if sender is a non-participating admin over :context" do
       course = course_model
+      account_admin_user(user: @sender, account: course.account)
       stub_search_users(
-        [@sender, { search: 'Bob', context: course.global_asset_string, is_admin: true }, { per_page: 10 }],
+        [nil, { search: 'Bob', context: course.global_asset_string }, { per_page: 10 }],
         { @recipient => :student }
       )
 
-      known_users = @address_book.search_users(search: 'Bob', context: course.global_asset_string, is_admin: true)
+      known_users = @address_book.search_users(search: 'Bob', context: course.global_asset_string)
+      page = known_users.paginate(per_page: 10)
+      expect(page.map(&:id)).to include(@recipient.id)
+    end
+
+    it "retains sender in service call if sender is a participating admin over :context" do
+      course = course_model
+      teacher_in_course(user: @sender, course: course, active_all: true)
+      stub_search_users(
+        [@sender, { search: 'Bob', context: course.global_asset_string }, { per_page: 10 }],
+        { @recipient => :student }
+      )
+
+      known_users = @address_book.search_users(search: 'Bob', context: course.global_asset_string)
       page = known_users.paginate(per_page: 10)
       expect(page.map(&:id)).to include(@recipient.id)
     end
