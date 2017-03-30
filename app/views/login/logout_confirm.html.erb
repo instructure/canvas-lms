@@ -20,9 +20,11 @@
           </p>
           <%= form_tag logout_path, method: :delete do %>
             <div class="ic-Login__actions">
-              <%= link_to(t(:cancel, "Cancel"), '/', :class => "Button Button--link Button--logout-link") %>
+              <%= link_to(t(:cancel, "Cancel"), '/', :class => "ic-Login__link") %>
               <div class="ic-Login__actions--right">
-                <%= submit_tag(t("Log Out"), :class => "Button Button--primary Button--logout-confirm") %>
+                <button type="submit" class="Button Button--login" id="Button--logout-confirm">
+                  <%= t("Log Out") %>
+                </button>
               </div>
             </div>
           <% end %>
