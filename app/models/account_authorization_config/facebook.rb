@@ -95,10 +95,4 @@ class AccountAuthorizationConfig::Facebook < AccountAuthorizationConfig::Oauth2
       token_url: 'oauth/access_token'.freeze
     }
   end
-
-  def token_options
-    {
-      parse: :query
-    }
-  end
 end
