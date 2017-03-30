@@ -1343,6 +1343,67 @@ test('displays percentage as "-" when group total score is not a number', functi
   ok(groupTotalOutput.includes('-'));
 });
 
+QUnit.module('Gradebook#onHeaderCellRendered');
+
+test('renders the student column header for the "student" column type', function () {
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'renderStudentColumnHeader');
+  gradebook.onHeaderCellRendered(null, { column: { type: 'student' } });
+  equal(gradebook.renderStudentColumnHeader.callCount, 1);
+});
+
+test('renders the total grade column header for the "total_grade" column type', function () {
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'renderTotalGradeColumnHeader');
+  gradebook.onHeaderCellRendered(null, { column: { type: 'total_grade' } });
+  equal(gradebook.renderTotalGradeColumnHeader.callCount, 1);
+});
+
+test('renders the custom column header for the "custom_column" column type', function () {
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'renderCustomColumnHeader');
+  gradebook.onHeaderCellRendered(null, { column: { type: 'custom_column', customColumnId: '2401' } });
+  equal(gradebook.renderCustomColumnHeader.callCount, 1);
+});
+
+test('uses the column "customColumnId" when rendering a custom column header', function () {
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'renderCustomColumnHeader');
+  gradebook.onHeaderCellRendered(null, { column: { type: 'custom_column', customColumnId: '2401' } });
+  const [customColumnId] = gradebook.renderCustomColumnHeader.getCall(0).args;
+  equal(customColumnId, '2401');
+});
+
+test('renders the assignment column header for the "assignment" column type', function () {
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'renderAssignmentColumnHeader');
+  gradebook.onHeaderCellRendered(null, { column: { type: 'assignment', assignmentId: '2301' } });
+  equal(gradebook.renderAssignmentColumnHeader.callCount, 1);
+});
+
+test('uses the column "assignmentId" when rendering an assignment column header', function () {
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'renderAssignmentColumnHeader');
+  gradebook.onHeaderCellRendered(null, { column: { type: 'assignment', assignmentId: '2301' } });
+  const [assignmentId] = gradebook.renderAssignmentColumnHeader.getCall(0).args;
+  equal(assignmentId, '2301');
+});
+
+test('renders the assignment group column header for the "assignment_group" column type', function () {
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'renderAssignmentGroupColumnHeader');
+  gradebook.onHeaderCellRendered(null, { column: { type: 'assignment_group', assignmentGroupId: '2201' } });
+  equal(gradebook.renderAssignmentGroupColumnHeader.callCount, 1);
+});
+
+test('uses the column "assignmentGroupId" when rendering an assignment group column header', function () {
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'renderAssignmentGroupColumnHeader');
+  gradebook.onHeaderCellRendered(null, { column: { type: 'assignment_group', assignmentGroupId: '2201' } });
+  const [assignmentGroupId] = gradebook.renderAssignmentGroupColumnHeader.getCall(0).args;
+  equal(assignmentGroupId, '2201');
+});
+
 QUnit.module('Gradebook#onBeforeHeaderCellDestroy', {
   setup () {
     this.$mountPoint = document.createElement('div');
@@ -1470,6 +1531,35 @@ test('includes the sort settingKey', function () {
   equal(props.settingKey, 'sortable_name');
 });
 
+QUnit.module('Gradebook#getCustomColumnHeaderProps');
+
+test('includes the custom column title', function () {
+  const gradebook = createGradebook();
+  gradebook.customColumns = [{ id: '2401', title: 'Notes' }, { id: '2402', title: 'Other Notes' }];
+  const props = gradebook.getCustomColumnHeaderProps('2401');
+  equal(props.title, 'Notes');
+});
+
+QUnit.module('Gradebook#renderCustomColumnHeader', {
+  setup () {
+    this.$mountPoint = document.createElement('div');
+    $fixtures.appendChild(this.$mountPoint);
+  },
+
+  teardown () {
+    ReactDOM.unmountComponentAtNode(this.$mountPoint);
+    $fixtures.innerHTML = '';
+  }
+});
+
+test('renders the CustomColumnHeader to the related custom column header node', function () {
+  const gradebook = createGradebook();
+  gradebook.customColumns = [{ id: '2401', title: 'Notes' }, { id: '2402', title: 'Other Notes' }];
+  this.stub(gradebook, 'getColumnHeaderNode').withArgs('custom_col_2401').returns(this.$mountPoint);
+  gradebook.renderCustomColumnHeader('2401');
+  ok(this.$mountPoint.innerText.includes('Notes'), 'the "Notes" header is rendered');
+});
+
 QUnit.module('Gradebook#renderAssignmentColumnHeader', {
   setup () {
     fakeENV.setup({
@@ -1570,6 +1660,12 @@ test('does not render when aggregate columns are hidden', function () {
   equal(this.$mountPoint.children.length, 0, 'the mount point contains no elements');
 });
 
+QUnit.module('Gradebook#getCustomColumnId');
+
+test('returns a unique key for the custom column', function () {
+  equal(Gradebook.prototype.getCustomColumnId('2401'), 'custom_col_2401');
+});
+
 QUnit.module('Gradebook#getAssignmentColumnId');
 
 test('returns a unique key for the assignment column', function () {
@@ -1580,6 +1676,80 @@ QUnit.module('Gradebook#getAssignmentGroupColumnId');
 
 test('returns a unique key for the assignment group column', function () {
   equal(Gradebook.prototype.getAssignmentGroupColumnId('301'), 'assignment_group_301');
+});
+
+QUnit.module('Gradebook#updateColumnHeaders', {
+  setup () {
+    const columns = [
+      { type: 'assignment_group', assignmentGroupId: '2201' },
+      { type: 'assignment', assignmentId: '2301' },
+      { type: 'custom_column', customColumnId: '2401' }
+    ];
+    this.gradebook = createGradebook();
+    this.gradebook.grid = {
+      getColumns () {
+        return columns;
+      }
+    };
+    this.stub(this.gradebook, 'renderStudentColumnHeader');
+    this.stub(this.gradebook, 'renderTotalGradeColumnHeader');
+    this.stub(this.gradebook, 'renderCustomColumnHeader');
+    this.stub(this.gradebook, 'renderAssignmentColumnHeader');
+    this.stub(this.gradebook, 'renderAssignmentGroupColumnHeader');
+  }
+});
+
+test('renders the student column header', function () {
+  this.gradebook.updateColumnHeaders();
+  equal(this.gradebook.renderStudentColumnHeader.callCount, 1);
+});
+
+test('renders the total grade column header', function () {
+  this.gradebook.updateColumnHeaders();
+  equal(this.gradebook.renderTotalGradeColumnHeader.callCount, 1);
+});
+
+test('renders a custom column header for each "custom_column" column type', function () {
+  this.gradebook.updateColumnHeaders();
+  equal(this.gradebook.renderCustomColumnHeader.callCount, 1);
+});
+
+test('uses the column "customColumnId" when rendering a custom column header', function () {
+  this.gradebook.updateColumnHeaders();
+  const [customColumnId] = this.gradebook.renderCustomColumnHeader.getCall(0).args;
+  equal(customColumnId, '2401');
+});
+
+test('renders the assignment column header for each "assignment" column type', function () {
+  this.gradebook.updateColumnHeaders();
+  equal(this.gradebook.renderAssignmentColumnHeader.callCount, 1);
+});
+
+test('uses the column "assignmentId" when rendering an assignment column header', function () {
+  this.gradebook.updateColumnHeaders();
+  const [assignmentId] = this.gradebook.renderAssignmentColumnHeader.getCall(0).args;
+  equal(assignmentId, '2301');
+});
+
+test('renders the assignment group column header for each "assignment_group" column type', function () {
+  this.gradebook.updateColumnHeaders();
+  equal(this.gradebook.renderAssignmentGroupColumnHeader.callCount, 1);
+});
+
+test('uses the column "assignmentGroupId" when rendering an assignment group column header', function () {
+  this.gradebook.updateColumnHeaders();
+  const [assignmentGroupId] = this.gradebook.renderAssignmentGroupColumnHeader.getCall(0).args;
+  equal(assignmentGroupId, '2201');
+});
+
+test('does not render column headers when the grid has not been created', function () {
+  this.gradebook.grid = undefined;
+  this.gradebook.updateColumnHeaders();
+  equal(this.gradebook.renderStudentColumnHeader.callCount, 0);
+  equal(this.gradebook.renderTotalGradeColumnHeader.callCount, 0);
+  equal(this.gradebook.renderCustomColumnHeader.callCount, 0);
+  equal(this.gradebook.renderAssignmentColumnHeader.callCount, 0);
+  equal(this.gradebook.renderAssignmentGroupColumnHeader.callCount, 0);
 });
 
 QUnit.module('Gradebook#getAssignmentColumnSortBySetting', {

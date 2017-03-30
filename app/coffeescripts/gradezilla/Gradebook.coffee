@@ -55,6 +55,7 @@ define [
   'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
+  'jsx/gradezilla/default_gradebook/components/CustomColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentRowHeader'
   'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader'
@@ -92,7 +93,7 @@ define [
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, AssignmentMuter,
   SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, SetDefaultGradeDialogManager,
-  CurveGradesDialogManager, StudentRowHeaderConstants, AssignmentColumnHeader, AssignmentGroupColumnHeader,
+  CurveGradesDialogManager, StudentRowHeaderConstants, AssignmentColumnHeader, AssignmentGroupColumnHeader, CustomColumnHeader
   StudentColumnHeader, StudentRowHeader, TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu,
   PostGradesStore, PostGradesApp, SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager,
   GroupTotalCellTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
@@ -1246,15 +1247,17 @@ define [
       headers = @parentColumns.concat(@customColumnDefinitions())
       headers.concat(columns)
 
-    customColumnDefinitions: ->
-      @customColumns.map (c) ->
-        id: "custom_col_#{c.id}"
+    customColumnDefinitions: =>
+      @customColumns.map (c) =>
+        id: @getCustomColumnId(c.id)
+        type: 'custom_column'
         name: htmlEscape c.title
         field: "custom_col_#{c.id}"
         width: 100
         cssClass: "meta-cell custom_column"
         resizable: true
         editor: LongTextEditor
+        customColumnId: c.id
         autoEdit: false
         maxLength: 255
 
@@ -1274,6 +1277,7 @@ define [
 
       @parentColumns = [
         id: 'student'
+        type: 'student'
         field: 'display_name'
         width: studentColumnWidth
         cssClass: "meta-cell"
@@ -1409,6 +1413,8 @@ define [
         @renderStudentColumnHeader()
       else if obj.column.type == 'total_grade'
         @renderTotalGradeColumnHeader()
+      else if obj.column.type == 'custom_column'
+        @renderCustomColumnHeader(obj.column.customColumnId)
       else if obj.column.type == 'assignment'
         @renderAssignmentColumnHeader(obj.column.assignmentId)
       else if obj.column.type == 'assignment_group'
@@ -1723,6 +1729,9 @@ define [
 
     ## Grid DOM Access/Reference Methods
 
+    getCustomColumnId: (customColumnId) =>
+      "custom_col_#{customColumnId}"
+
     getAssignmentColumnId: (assignmentId) =>
       "assignment_#{assignmentId}"
 
@@ -1738,6 +1747,8 @@ define [
       return unless @grid
 
       for column in @grid.getColumns()
+        if column.type == 'custom_column'
+          @renderCustomColumnHeader(column.customColumnId)
         if column.type == 'assignment'
           @renderAssignmentColumnHeader(column.assignmentId)
         else if column.type == 'assignment_group'
@@ -1805,6 +1816,20 @@ define [
       mountPoint = @getColumnHeaderNode('total_grade')
       props = @getTotalGradeColumnHeaderProps()
       renderComponent(TotalGradeColumnHeader, mountPoint, props)
+
+    # Custom Column Header
+
+    getCustomColumnHeaderProps: (customColumnId) =>
+      customColumn = _.find(@customColumns, id: customColumnId)
+      {
+        title: customColumn.title
+      }
+
+    renderCustomColumnHeader: (customColumnId) =>
+      columnId = @getCustomColumnId(customColumnId)
+      mountPoint = @getColumnHeaderNode(columnId)
+      props = @getCustomColumnHeaderProps(customColumnId)
+      renderComponent(CustomColumnHeader, mountPoint, props)
 
     # Assignment Column Header
 
