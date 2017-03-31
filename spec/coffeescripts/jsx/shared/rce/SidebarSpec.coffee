@@ -27,10 +27,10 @@ define [
   test 'loads remote sidebar when feature flag on', ->
     ENV.RICH_CONTENT_SERVICE_ENABLED = true
     remoteSidebar = {is_a: 'remote_sidebar'}
-    sinon.stub(RCELoader, "loadSidebarOnTarget").callsArgWith(1, remoteSidebar)
+    @stub(RCELoader, "loadSidebarOnTarget").callsArgWith(1, remoteSidebar)
+    Sidebar.pendingShow = false
     Sidebar.init()
     equal Sidebar.instance, remoteSidebar
-    RCELoader.loadSidebarOnTarget.restore()
 
   test 'repeated calls only init instance once', ->
     ENV.RICH_CONTENT_SERVICE_ENABLED = false

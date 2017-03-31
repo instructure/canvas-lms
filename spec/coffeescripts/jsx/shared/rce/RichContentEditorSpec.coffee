@@ -43,23 +43,22 @@ define [
   QUnit.module 'RichContentEditor - preloading',
     setup: ->
       fakeENV.setup()
-      @preloadSpy = sinon.spy(RCELoader, "preload")
+      @stub(RCELoader, "preload")
 
     teardown: ->
       fakeENV.teardown()
-      RCELoader.preload.restore()
       editorUtils.resetRCE()
 
   test 'loads via RCELoader.preload when service enabled', ->
     ENV.RICH_CONTENT_SERVICE_ENABLED = true
     ENV.RICH_CONTENT_APP_HOST = 'app-host'
     RichContentEditor.preloadRemoteModule()
-    ok @preloadSpy.called
+    ok RCELoader.preload.called
 
   test 'does nothing when service disabled', ->
     ENV.RICH_CONTENT_SERVICE_ENABLED = undefined
     RichContentEditor.preloadRemoteModule()
-    ok @preloadSpy.notCalled
+    ok RCELoader.preload.notCalled
 
   QUnit.module 'RichContentEditor - loading editor',
     setup: ->

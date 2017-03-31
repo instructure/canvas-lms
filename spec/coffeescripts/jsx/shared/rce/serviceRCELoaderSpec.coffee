@@ -8,69 +8,50 @@ define [
 ], ($, RCELoader, jwt, editorUtils, fakeENV, fixtures) ->
   QUnit.module 'loadRCE',
     setup: ->
+      @originalTinymce = window.tinymce
+      @originalTinyMCE = window.tinyMCE
       fakeENV.setup()
       ENV.RICH_CONTENT_APP_HOST = 'app-host'
-      # make sure we don't get a cached thing from other tests
-      RCELoader.cachedModule = null
-      @getScriptSpy = sinon.stub $, "getScript", (__host__, callback)=>
-        window.RceModule = 'fakeModule'
-        callback()
 
     teardown: ->
+      # until canvas and canvas-rce are on the same version, restore globals to
+      # the canvas version of tinymce
+      window.tinymce = @originalTinymce
+      window.tinyMCE = @originalTinyMCE
       fakeENV.teardown()
-      $.getScript.restore()
       editorUtils.resetRCE()
 
   # loading RCE
 
-  test 'calls getScript with ENV.RICH_CONTENT_APP_HOST and /get_module if no CDN host', ->
-    RCELoader.loadRCE(()->)
-    ok @getScriptSpy.calledWith("//app-host/get_module")
-
-  test 'prefers ENV.RICH_CONTENT_APP_HOST with /latest over app host for getScript call', ->
-    ENV.RICH_CONTENT_CDN_HOST = 'cdn-host'
-    RCELoader.loadRCE(()->)
-    ok @getScriptSpy.calledWith("//cdn-host/latest")
-
-  test 'caches the response of get_module when called', ->
-    RCELoader.cachedModule = null
-    RCELoader.loadRCE(()->)
-    equal RCELoader.cachedModule, 'fakeModule'
-
-  test 'does not call get_module once a response has been cached', ->
-    RCELoader.cachedModule = "foo"
-    RCELoader.loadRCE(()->)
-    ok @getScriptSpy.notCalled
-
-  test 'executes a callback when RCE is loaded', ->
-    cb = sinon.spy()
-    RCELoader.loadRCE(cb)
-    ok cb.called
-
-  test 'only tries to load the module once', ->
-    RCELoader.preload()
-    RCELoader.preload()
-    RCELoader.preload()
-    ok(@getScriptSpy.calledOnce)
-
-  asyncTest 'handles callbacks once module is loaded', ->
-    expect(1)
-    resolveGetScript = null
-    $.getScript.restore()
-    sinon.stub $, "getScript", (__host__, callback)=>
-      resolveGetScript = ()->
-        window.RceModule = 'fakeModule'
-        callback()
-    # first make sure all the state is fixed so test call isn't
-    # making it's own getScript call
-    RCELoader.preload()
-    RCELoader.loadRCE(()->)
-
-    # now setup while-in-flight load request to check
+  test 'caches the response of get_module when called', (assert) ->
+    done = assert.async()
+    RCELoader.RCE = null
     RCELoader.loadRCE (module) =>
-      start()
-      equal(module, "fakeModule")
-    resolveGetScript()
+      equal RCELoader.RCE, module
+      done()
+
+  test 'loads event listeners on first load', (assert) ->
+    done = assert.async()
+    @stub(RCELoader, 'loadEventListeners')
+    RCELoader.RCE = null
+    RCELoader.loadRCE () =>
+      ok RCELoader.loadEventListeners.called
+      done()
+
+  test 'does not load event listeners once loaded', (assert) ->
+    done = assert.async()
+    @stub(RCELoader, 'loadEventListeners')
+    RCELoader.RCE = {}
+    RCELoader.loadRCE () =>
+      ok !RCELoader.loadEventListeners.called
+      done()
+
+  test 'handles callbacks once module is loaded', (assert) ->
+    done = assert.async()
+    RCELoader.loadRCE(()->)
+    RCELoader.loadRCE (module) =>
+      ok(module.renderIntoDiv)
+      done()
 
   QUnit.module 'loadOnTarget',
     setup: ->

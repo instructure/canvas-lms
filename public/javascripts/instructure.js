@@ -54,8 +54,6 @@ define([
   'vendor/jquery.placeholder'
 ], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, RichContentEditor) {
 
-  RichContentEditor.preloadRemoteModule()
-
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
 

@@ -47,9 +47,10 @@ import splitAssetString from 'compiled/str/splitAssetString'
     *
     * @private
     */
-    cachedModule: null,
     loadingFlag: false,
     loadingCallbacks: [],
+    RCE: null,
+    loadEventListeners,
 
     /**
     * handle accepting new load requests depending on the current state
@@ -58,19 +59,19 @@ import splitAssetString from 'compiled/str/splitAssetString'
     * @private
     */
     loadRCE(cb) {
-      if(this.cachedModule !== null){
-        cb(this.cachedModule)
-      } else {
-        this.loadingCallbacks.push(cb)
-        if(!this.loadingFlag){
-          // we need to make sure we don't make this kinda expensive request
-          // multiple times, so anybody who wants the module can queue up
-          // a callback, but first one to this point performs the load
-          this.loadingFlag = true
-          let moduleUrl = this.buildModuleUrl()
-          $.getScript(moduleUrl, (res) => { this.onRemoteLoad() })
+      require.ensure(['canvas-rce/lib/async'], (require) => {
+        const first = !this.RCE
+        this.RCE = require('canvas-rce/lib/async')
+        if (first) {
+          this.loadEventListeners()
+          this.loadingFlag = false
         }
-      }
+        this.loadingCallbacks.forEach((loadingCallback) => {
+          loadingCallback(this.RCE)
+        })
+        this.loadingCallbacks = []
+        cb(this.RCE)
+      }, 'CanvasRCEAsyncChunk')
     },
 
     /**
@@ -176,25 +177,6 @@ import splitAssetString from 'compiled/str/splitAssetString'
       // trim trailing slash if there is one, as we're going to add one below
       host = host.replace(/\/$/, "")
       return '//' + host + path
-    },
-
-    /**
-     * called when remote module has finished loading
-     * so we can set the cache appropriately, un-set the loading
-     * flag, and deal with any callbacks that have been queueing up that
-     * need the module to execute.  Anything outside of this file using
-     * this function could damage state and make the remote module loading fail.
-     *
-     * @private
-     */
-    onRemoteLoad() {
-      loadEventListeners()
-      if(!this.cachedModule){ this.cachedModule = RceModule }
-      this.loadingFlag = false
-      this.loadingCallbacks.forEach((loadingCallback)=>{
-        loadingCallback(this.cachedModule)
-      })
-      this.loadingCallbacks = []
     }
   }
 

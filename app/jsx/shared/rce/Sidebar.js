@@ -21,6 +21,7 @@ import wikiSidebar from 'wikiSidebar'
      * @private
      */
     instance: undefined,
+    pendingShow: false,
     initializing: false,
     subscriptions: {},
 
@@ -38,6 +39,9 @@ import wikiSidebar from 'wikiSidebar'
         let callback = (sidebar) => {
           this.initializing = false
           this.instance = sidebar
+          if (this.pendingShow) {
+            this.show()
+          }
         }
         if (featureFlag()) {
           loadServiceSidebar(callback)
@@ -61,6 +65,8 @@ import wikiSidebar from 'wikiSidebar'
         if (this.subscriptions.show) {
           this.subscriptions.show()
         }
+      } else {
+        this.pendingShow = true
       }
     },
 
@@ -77,6 +83,8 @@ import wikiSidebar from 'wikiSidebar'
         if (this.subscriptions.hide) {
           this.subscriptions.hide()
         }
+      } else {
+        this.pendingShow = false
       }
     },
 
