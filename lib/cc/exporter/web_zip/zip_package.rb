@@ -255,7 +255,7 @@ module CC::Exporter::WebZip
 
     def pull_dist_package
       path = dist_package_path
-      config = ConfigFile.load('offline_web', Rails.env)
+      config = ConfigFile.load('offline_web')
       if config&.fetch('local')
         path = config['path_to_dist']
       end

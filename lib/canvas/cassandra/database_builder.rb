@@ -1,7 +1,7 @@
 module Canvas
   module Cassandra
     module DatabaseBuilder
-      def self.configured?(config_name, environment = :current)
+      def self.configured?(config_name, environment = ::Rails.env)
         raise ArgumentError, "config name required" if config_name.blank?
         config = ConfigFile.load('cassandra', environment)
         config = config && config[config_name]

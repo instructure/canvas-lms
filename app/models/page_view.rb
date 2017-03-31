@@ -289,19 +289,9 @@ class PageView < ActiveRecord::Base
   scope :for_users, lambda { |users| where(:user_id => users) }
 
   def self.pv4_client
-    @pv4_client ||= begin
-      config = ConfigFile.load('pv4')
-      raise "Page Views v4 not configured!" unless config
+    ConfigFile.cache_object('pv4') do |config|
       Pv4Client.new(config['uri'], config['access_token'])
     end
-  end
-
-  def self.reset_pv4_client
-    @pv4_client = nil
-  end
-
-  Canvas::Reloader.on_reload do
-    reset_pv4_client
   end
 
   # returns a collection with very limited functionality
