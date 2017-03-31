@@ -362,7 +362,7 @@
         <%= hidden_field :submission, :content_type, :id => 'external_tool_content_type' %>
         <a href="<%= context_url(@context, :homework_submissions_context_external_tools_url) %>" id="external_tools_url"></a>
         <a href="/api/v1/courses/<%= @context.id %>/assignments/<%= @assignment.id %>/submissions/<%= @current_user.id %>/files" id="homework_file_url"></a>
-        <table class="formtable" style="width: 100%;">
+        <table role="presentation" class="formtable" style="width: 100%;">
           <tr>
             <td colspan="2">
               <%= t 'instructions.from_external_tool', "Select a tool from the list below to load and submit a resource provided by that tool." %>
