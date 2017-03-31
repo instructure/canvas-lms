@@ -202,12 +202,21 @@
   overflow-y: auto;
   label {
     margin-bottom: 0;
+    width: 170px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
 .ag_sections {
   @include reset_list;
   padding-left: 35px;
+  li {
+    label {
+      width: 150px;
+    }
+  }
 }
 
 .ag_sections_toggle {
