@@ -786,7 +786,7 @@ class UsersController < ApplicationController
     }
     if Array(params[:include]).include? 'ungraded_quizzes'
       submitting += @current_user.ungraded_quizzes_needing_submitting.map { |q| todo_item_json(q, @current_user, session, 'submitting') }
-      submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] }
+      submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] || CanvasSort::Last }
     end
     render :json => (grading + submitting)
   end

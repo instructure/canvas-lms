@@ -1497,9 +1497,8 @@ class User < ActiveRecord::Base
       due_after = options[:due_after] || 4.weeks.ago
       due_before = options[:due_before] || 1.week.from_now
 
-      courses = Course.find(options[:shard_course_ids])
       assignments = assignment_scope.
-        filter_by_visibilities_in_given_courses(id, courses.map(&:id)).
+        filter_by_visibilities_in_given_courses(id, options[:shard_course_ids]).
         published.
         due_between_with_overrides(due_after, due_before).
         need_submitting_info(id, options[:limit]).
@@ -1515,6 +1514,7 @@ class User < ActiveRecord::Base
       due_before = options[:due_before] || 1.week.from_now
 
       quizzes = quiz_scope.
+        visible_to_students_in_course_with_da(self.id, options[:shard_course_ids]).
         available.
         due_between_with_overrides(due_after, due_before).
         need_submitting_info(id, options[:limit]).
