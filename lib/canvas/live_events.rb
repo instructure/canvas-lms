@@ -139,7 +139,8 @@ module Canvas::LiveEvents
       unlock_at: assignment.unlock_at,
       lock_at: assignment.lock_at,
       updated_at: assignment.updated_at,
-      points_possible: assignment.points_possible
+      points_possible: assignment.points_possible,
+      lti_assignment_id: assignment.lti_context_id
     }
   end
 
@@ -164,7 +165,8 @@ module Canvas::LiveEvents
       submission_type: submission.submission_type,
       body: LiveEvents.truncate(submission.body),
       url: submission.url,
-      attempt: submission.attempt
+      attempt: submission.attempt,
+      lti_assignment_id: submission.assignment.lti_context_id
     }
   end
 

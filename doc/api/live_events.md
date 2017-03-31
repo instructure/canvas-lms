@@ -300,6 +300,7 @@ by `asset_type` and `asset_id`.
 | `lock_at` | The lock date (assignment is locked after this date) |
 | `updated_at` | The time at which this assignment was last modified in any way |
 | `points_possible` | The maximum points possible for the assignment |
+| `lti_assignment_id` | The LTI assignment guid for the assignment |
 
 
 #### `assignment_updated`
@@ -314,6 +315,7 @@ by `asset_type` and `asset_id`.
 | `lock_at` | The lock date (assignment is locked after this date) |
 | `updated_at` | The time at which this assignment was last modified in any way |
 | `points_possible` | The maximum points possible for the assignment |
+| `lti_assignment_id` | The LTI assignment guid for the assignment |
 
 
 #### `submission_created`
@@ -331,6 +333,7 @@ by `asset_type` and `asset_id`.
 | `body` | The content of the submission, if it was submitted directly in a text field. (possibly truncated) |
 | `url` | The URL of the submission (for 'online_url' submissions) |
 | `attempt` | This is the submission attempt number. |
+| `lti_assignment_id` | The LTI assignment guid of the submission's assignment |
 
 
 #### `submission_updated`
@@ -348,6 +351,7 @@ by `asset_type` and `asset_id`.
 | `body` | The content of the submission, if it was submitted directly in a text field. (possibly truncated) |
 | `url` | The URL of the submission (for 'online_url' submissions) |
 | `attempt` | This is the submission attempt number. |
+| `lti_assignment_id` | The LTI assignment guid of the submission's assignment |
 
 
 #### `plagiarism_resubmit`
@@ -365,6 +369,7 @@ by `asset_type` and `asset_id`.
 | `body` | The content of the submission, if it was submitted directly in a text field. (possibly truncated) |
 | `url` | The URL of the submission (for 'online_url' submissions) |
 | `attempt` | This is the submission attempt number. |
+| `lti_assignment_id` | The LTI assignment guid of the submission's assignment |
 
 #### `user_created`
 
