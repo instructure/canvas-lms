@@ -336,6 +336,21 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".submission_created" do
+    it "should include the user_id and assignment_id" do
+      course_with_student_submissions
+      submission = @course.assignments.first.submissions.first
+
+      expect_event('submission_created',
+        hash_including(
+          user_id: @student.global_id.to_s,
+          assignment_id: submission.global_assignment_id.to_s,
+          lti_assignment_id: submission.assignment.lti_context_id
+        ))
+      Canvas::LiveEvents.submission_created(submission)
+    end
+  end
+
   describe ".submission_updated" do
     it "should include the user_id and assignment_id" do
       course_with_student_submissions
@@ -344,7 +359,8 @@ describe Canvas::LiveEvents do
       expect_event('submission_updated',
         hash_including(
           user_id: @student.global_id.to_s,
-          assignment_id: submission.global_assignment_id.to_s
+          assignment_id: submission.global_assignment_id.to_s,
+          lti_assignment_id: submission.assignment.lti_context_id
         ))
       Canvas::LiveEvents.submission_updated(submission)
     end
@@ -357,7 +373,8 @@ describe Canvas::LiveEvents do
       expect_event('plagiarism_resubmit',
         hash_including(
           user_id: @student.global_id.to_s,
-          assignment_id: submission.global_assignment_id.to_s
+          assignment_id: submission.global_assignment_id.to_s,
+          lti_assignment_id: submission.assignment.lti_context_id
         ))
       Canvas::LiveEvents.plagiarism_resubmit(submission)
     end
@@ -395,6 +412,30 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe '.assignment_created' do
+    it 'triggers a live event with assignment details' do
+      course_with_student_submissions
+      assignment = @course.assignments.first
+
+      expect_event('assignment_created',
+        hash_including({
+          assignment_id: assignment.global_id.to_s,
+          context_id: @course.global_id.to_s,
+          context_type: 'Course',
+          workflow_state: assignment.workflow_state,
+          title: assignment.title,
+          description: assignment.description,
+          due_at: assignment.due_at,
+          unlock_at: assignment.unlock_at,
+          lock_at: assignment.lock_at,
+          points_possible: assignment.points_possible,
+          lti_assignment_id: assignment.lti_context_id
+        })).once
+
+      Canvas::LiveEvents.assignment_created(assignment)
+    end
+  end
+
   describe '.assignment_updated' do
     it 'triggers a live event with assignment details' do
       course_with_student_submissions
@@ -411,9 +452,9 @@ describe Canvas::LiveEvents do
           due_at: assignment.due_at,
           unlock_at: assignment.unlock_at,
           lock_at: assignment.lock_at,
-          points_possible: assignment.points_possible
-        })
-      ).once
+          points_possible: assignment.points_possible,
+          lti_assignment_id: assignment.lti_context_id
+        })).once
 
       Canvas::LiveEvents.assignment_updated(assignment)
     end
