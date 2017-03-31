@@ -341,6 +341,9 @@ class CoursesController < ApplicationController
   #   When set, only return courses where the user has an enrollment with the given state.
   #   This will respect section/course/term date overrides.
   #
+  # @argument exclude_blueprint_courses [Boolean]
+  #   When set, only return courses that are not configured as blueprint courses.
+  #
   # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"course_image"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
@@ -2813,6 +2816,11 @@ class CoursesController < ApplicationController
     includes.delete 'permissions'
 
     hash = []
+
+    if enrollments.any? && value_to_boolean(params[:exclude_blueprint_courses])
+      mc_ids = MasterCourses::MasterTemplate.active.where(:course_id => enrollments.map(&:course_id)).pluck(:course_id)
+      enrollments.reject!{|e| mc_ids.include?(e.course_id)}
+    end
 
     Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values

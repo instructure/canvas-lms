@@ -385,6 +385,19 @@ describe CoursesController, type: :request do
     expect(json.map { |course| course['name'] }).to eq %w(abc def ghi jkl)
   end
 
+  it "should exclude master courses if requested" do
+    c1 = course_with_teacher(active_all: true).course
+    MasterCourses::MasterTemplate.set_as_master_course(c1)
+    c2 = course_with_teacher(user: @teacher, active_all: true).course
+
+    json = api_call(:get, "/api/v1/courses.json", controller: 'courses', action: 'index', format: 'json')
+    expect(json.map { |course| course['id'] }).to match_array([c1.id, c2.id])
+
+    json = api_call(:get, "/api/v1/courses.json?exclude_blueprint_courses=1",
+      controller: 'courses', action: 'index', format: 'json', exclude_blueprint_courses: '1')
+    expect(json.map { |course| course['id'] }).to eq([c2.id])
+  end
+
   describe "user index" do
     specs_require_sharding
     before :once do
