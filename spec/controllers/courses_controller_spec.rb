@@ -164,8 +164,8 @@ describe CoursesController do
         user_session(@student)
         get 'index'
         expect(response).to be_success
-        expect(assigns[:past_enrollments]).to match_array([enrollment3, enrollment2, enrollment1])
-        expect(assigns[:current_enrollments]).to eq [enrollment4]
+        expect(assigns[:past_enrollments]).to match_array([enrollment3, enrollment2])
+        expect(assigns[:current_enrollments]).to eq [enrollment4, enrollment1]
         expect(assigns[:future_enrollments]).to be_empty
       end
 
