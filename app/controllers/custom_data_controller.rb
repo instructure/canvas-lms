@@ -211,7 +211,7 @@ class CustomDataController < ApplicationController
     begin
       overwrite = cd.set_data(@scope, data)
     rescue CustomData::WriteConflict => wc
-      render(json: wc.as_json.merge({message: wc.message}), status: :conflict) and return
+      render(json: wc.as_json.merge(message: wc.message), status: :conflict) and return
     end
     if cd.save
       render(json: {data: cd.get_data(@scope)},

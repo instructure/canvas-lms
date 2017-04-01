@@ -40,6 +40,7 @@ define([
           can take awhile for large courses. You can leave the
           page and you'll get a notification when the download
           is complete.`)}</p>
+          <hr />
         </div>
       )
     }

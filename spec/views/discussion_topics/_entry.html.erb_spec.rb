@@ -25,11 +25,11 @@ describe "/discussion_topics/_entry" do
     view_context(@course, @user)
     @topic = @course.discussion_topics.create!(:title => "some title")
     @topic.context
-    assigns[:entries] = []
-    assigns[:topic] = @topic
+    assign(:entries, [])
+    assign(:topic, @topic)
     render :partial => "discussion_topics/entry", :object => nil, :locals => {:topic => @topic}
   end
-  
+
   it "should render with data" do
     course_with_teacher
     view_context(@course, @user)
@@ -37,9 +37,9 @@ describe "/discussion_topics/_entry" do
     @topic.context
     @entry = @topic.discussion_entries.create!(:message => "some message")
     @entry.context
-    assigns[:entries] = [@entry]
-    assigns[:grouped_entries] = [@entry].group_by(&:parent_id)
-    assigns[:topic] = @topic
+    assign(:entries, [@entry])
+    assign(:grouped_entries, [@entry].group_by(&:parent_id))
+    assign(:topic, @topic)
     render :partial => "discussion_topics/entry", :object => @entry, :locals => {:topic => @topic}
   end
 end

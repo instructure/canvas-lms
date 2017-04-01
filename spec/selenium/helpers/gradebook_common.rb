@@ -257,7 +257,7 @@ module GradebookCommon
     @assignment.grade_student(@student_1, grade: 10, grader: @teacher)
 
     # second student submission for assignment 1
-    student_2_submission = @assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 1')
+    @assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 1')
     @assignment.grade_student(@student_2, grade: 5, grader: @teacher)
 
     # third student submission for assignment 1

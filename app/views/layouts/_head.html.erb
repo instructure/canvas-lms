@@ -49,11 +49,13 @@
   <%= yield :stylesheets %>
   <%= include_account_css %>
   <script>
-    // listen for any clicks on links that have href="#" and queue them to be fired on dom ready.
+    // listen for any clicks on links that have href="#" or data-method set and queue them to be fired on dom ready.
+    // note: the events targeted for a[data-method] elems don't get properly replayed, but
+    // at least we can gobble them up here to prevent errors.
       function _earlyClick(e){
-        var cur = e.target || e.srcElement;
+        var cur = e.target;
         while ( cur && cur.ownerDocument ) {
-          if ( cur.getAttribute('href') == '#' ) {
+          if ( cur.getAttribute('href') === '#' || cur.getAttribute('data-method') ) {
             e.preventDefault();
             _earlyClick.clicks = _earlyClick.clicks || [];
             _earlyClick.clicks.push(cur);

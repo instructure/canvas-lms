@@ -715,6 +715,10 @@ class Group < ActiveRecord::Base
     context.feature_enabled?(feature)
   end
 
+  def grading_periods?
+    !!context.try(:grading_periods?)
+  end
+
   def serialize_permissions(permissions_hash, user, session)
     permissions_hash.merge(
       create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session),

@@ -26,7 +26,7 @@ when you run create, you may want to increase the system resources you give the
 VM, like so:
 
 ```
-$ dinghy create --memory=4096 --cpus=4 --provider=vmware_fusion
+$ dinghy create --memory=4096 --disk=50000 --cpus=4 --provider=vmware_fusion
 ```
 
 Type `docker ps` in your terminal to make sure your Docker environment

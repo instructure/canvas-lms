@@ -10,7 +10,7 @@ describe "master courses - child courses - module item locking" do
     @copy_from = course_factory(:active_all => true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
     @original_page = @copy_from.wiki.wiki_pages.create!(:title => "blah", :body => "bloo")
-    @page_mc_tag = @template.create_content_tag_for!(@original_page, :restrictions => {:content => true, :settings => true})
+    @page_mc_tag = @template.create_content_tag_for!(@original_page, :restrictions => {:all => true})
 
     @original_topic = @copy_from.discussion_topics.create!(:title => "blah", :message => "bloo")
     @topic_mc_tag = @template.create_content_tag_for!(@original_topic)
@@ -61,7 +61,7 @@ describe "master courses - child courses - module item locking" do
   it "loads new restriction info as needed when adding an item" do
     title = "new quiz"
     original_quiz = @copy_from.quizzes.create!(:title => title)
-    quiz_mc_tag = @template.create_content_tag_for!(original_quiz, :restrictions => {:content => true, :settings => true})
+    quiz_mc_tag = @template.create_content_tag_for!(original_quiz, :restrictions => {:all => true})
 
     quiz_copy = @copy_to.quizzes.create!(:title => title, :migration_id => quiz_mc_tag.migration_id)
     @sub.create_content_tag_for!(quiz_copy)

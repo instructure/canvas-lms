@@ -35,6 +35,7 @@ class CommunicationChannel < ActiveRecord::Base
   before_save :consider_building_pseudonym
   validates_presence_of :path, :path_type, :user, :workflow_state
   validate :uniqueness_of_path
+  validate :validate_email, if: lambda { |cc| cc.path_type == TYPE_EMAIL && cc.new_record? }
   validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
   after_commit :check_if_bouncing_changed
 
@@ -187,6 +188,12 @@ class CommunicationChannel < ActiveRecord::Base
     if scope.exists?
       self.errors.add(:path, :taken, :value => path)
     end
+  end
+
+  def validate_email
+    # this is not perfect and will allow for invalid emails, but it mostly works.
+    # This pretty much allows anything with an "@"
+    self.errors.add(:email, :invalid, value: path) unless EmailAddressValidator.valid?(path)
   end
 
   def not_otp_communication_channel

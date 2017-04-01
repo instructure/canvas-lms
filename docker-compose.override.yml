@@ -12,6 +12,7 @@ services:
       - canvas-docker-gems:/home/docker/.gem/
       - generated_1:/usr/src/app/public/javascripts/client_apps
       - generated_2:/usr/src/app/public/dist
+      - generated_3:/usr/src/app/public/javascripts/compiled
       - i18nliner_node_modules:/usr/src/app/gems/canvas_i18nliner/node_modules
       - log:/usr/src/app/log
       - node_modules:/usr/src/app/node_modules
@@ -19,6 +20,7 @@ services:
       - selinimum_node_modules:/usr/src/app/gems/selinimum/node_modules
       - tmp:/usr/src/app/tmp
       - yardoc:/usr/src/app/.yardoc
+      - yarn-cache:/home/docker/.cache/yarn
     environment: &BASE-ENV
       RAILS_ENV: development
       ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
@@ -45,6 +47,7 @@ volumes:
   canvas-docker-gems: {}
   generated_1: {}
   generated_2: {}
+  generated_3: {}
   i18nliner_node_modules: {}
   log: {}
   node_modules: {}
@@ -53,3 +56,4 @@ volumes:
   selinimum_node_modules: {}
   tmp: {}
   yardoc: {}
+  yarn-cache: {}

@@ -17,7 +17,7 @@ shared_examples_for "statistics basic tests" do
       admin_logged_in
     end
 
-    it "should validate recently started courses display" do
+    it "should validate recently created courses display" do
       skip('list is not available on sub account level') if account != Account.default
       get url
       validate_item_list(list_css[:created], @course.name)

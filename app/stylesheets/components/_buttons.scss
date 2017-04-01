@@ -355,3 +355,26 @@ input[type="button"] {
 .Button--theme-editor-apply {
   text-decoration: none;
 }
+
+
+// "Beta" buttons
+// --------------------------------------------------
+
+// Adds a 'Beta' background image to the button
+
+.btn-beta,
+.Button--beta {
+  @mixin beta-tag {
+    background-image: url(/images/beta-tag.png);
+    background-repeat: no-repeat;
+    background-position: bottom right;
+    background-size: auto 80%;
+  }
+  @include beta-tag;
+  padding-right: 20px;
+
+  // Prevent the beta background image from disappearing on hover
+  &:hover {
+    @include beta-tag;
+  }
+}

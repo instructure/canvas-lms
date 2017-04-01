@@ -465,7 +465,7 @@ class GroupCategoriesController < ApplicationController
   end
 
   def populate_group_category_from_params
-    args = api_request? ? params : params[:category]
+    args = api_request? ? params : (params[:category] || {})
     @group_category = GroupCategories::ParamsPolicy.new(@group_category, @context).populate_with(args)
     unless @group_category.save
       render :json => @group_category.errors, :status => :bad_request

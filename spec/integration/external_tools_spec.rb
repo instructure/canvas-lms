@@ -109,7 +109,7 @@ describe "External Tools" do
       expect(response).to redirect_to(course_url(@course))
       expect(flash[:error]).to be_present
     end
-    
+
     it "should render inline external tool links with a full return url" do
       student_in_course(:active_all => true)
       user_session(@user)
@@ -119,12 +119,12 @@ describe "External Tools" do
       expect(doc.at_css('#tool_form')).not_to be_nil
       expect(doc.at_css("input[name='launch_presentation_return_url']")['value']).to match(/^http/)
     end
-    
+
     it "should render user navigation tools with a full return url" do
       tool = @course.root_account.context_external_tools.build(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com', :privacy_level => 'public')
       tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
-      
+
       student_in_course(:active_all => true)
       user_session(@user)
       get "/users/#{@user.id}/external_tools/#{tool.id}"
@@ -133,22 +133,7 @@ describe "External Tools" do
       expect(doc.at_css('#tool_form')).not_to be_nil
       expect(doc.at_css("input[name='launch_presentation_return_url']")['value']).to match(/^http/)
     end
-    
-  end
 
-  it "should highlight the navigation tab when using an external tool" do
-    course_with_teacher_logged_in(:active_all => true)
-
-    @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
-    @tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
-    @tool.save!
-
-    get "/courses/#{@course.id}/external_tools/#{@tool.id}"
-    expect(response).to be_success
-    doc = Nokogiri::HTML.parse(response.body)
-    tab = doc.at_css("a.#{@tool.asset_string}")
-    expect(tab).not_to be_nil
-    expect(tab['class'].split).to include("active")
   end
 
   it "should highlight the navigation tab when using an external tool" do
@@ -208,5 +193,21 @@ describe "External Tools" do
       expect(menu_link2['href']).to eq account_external_tool_path(Account.default, @member_tool, :launch_type => 'global_navigation')
       expect(menu_link2.text).to match_ignoring_whitespace(@member_tool.label_for(:global_navigation))
     end
+  end
+
+  it "should include the apps tab on account settings even without account settings management rights" do
+    account_admin_user_with_role_changes(:role_changes => {:manage_account_settings => false})
+    user_session(@admin)
+
+    get "/accounts/#{Account.default.id}/settings"
+    expect(response.body).to include("tab-tools-link")
+  end
+
+  it "should not include the apps tab on account settings without lti rights" do
+    account_admin_user_with_role_changes(:role_changes => {:lti_add_edit => false})
+    user_session(@admin)
+
+    get "/accounts/#{Account.default.id}/settings"
+    expect(response.body).to_not include("tab-tools-link")
   end
 end

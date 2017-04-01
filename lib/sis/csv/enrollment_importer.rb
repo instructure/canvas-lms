@@ -60,7 +60,8 @@ module SIS
                 status: row['status'],
                 associated_user_id: row['associated_user_id'],
                 root_account_id: row['root_account'],
-                role_id: row['role_id']
+                role_id: row['role_id'],
+                limit_section_privileges: row['limit_section_privileges']
             }
         )
 

@@ -4,7 +4,7 @@ const gulpPlugins = require('gulp-load-plugins')()
 const DIST = 'public/dist'
 
 const STUFF_TO_REV = [
-  'public/fonts/**/*',
+  'public/fonts/**/*.{eot,otf,svg,ttf,woff,woff2}',
   'public/images/**/*',
 
   // These are things we javascript_include_tag(...) directly from rails
@@ -32,7 +32,8 @@ const STUFF_TO_REV = [
 
   // Include *everything* from plugins & client_apps
   // so we don't have to worry about their internals
-  'public/plugins/**/*',
+  // TODO: do we need these if we are all-webpack?
+  'public/plugins/**/*.*',
   'public/javascripts/client_apps**/*',
 ]
 

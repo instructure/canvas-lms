@@ -530,8 +530,6 @@ describe 'Speedgrader' do
       student_in_course(active_all: true)
 
       account = @course.root_account
-      account.enable_feature! :multiple_grading_periods
-
       gpg = GradingPeriodGroup.new
       gpg.account_id = account
       gpg.save!

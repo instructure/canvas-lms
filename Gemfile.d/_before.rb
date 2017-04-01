@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-gem 'bundler', '>= 1.10.3', '<= 1.14.3'
+gem 'bundler', '>= 1.13.3', '<= 1.14.3'
 
 if Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.14.0') &&
   Gem::Version.new(Gem::VERSION) < Gem::Version.new('2.6.9')

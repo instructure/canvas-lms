@@ -18,6 +18,7 @@
 
 class ContextModulesController < ApplicationController
   include Api::V1::ContextModule
+  include WebZipExportHelper
 
   before_action :require_context
   add_crumb(proc { t('#crumbs.modules', "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_context_modules_url }
@@ -95,12 +96,15 @@ class ContextModulesController < ApplicationController
       log_asset_access([ "modules", @context ], "modules", "other")
       load_modules
 
+      set_tutorial_js_env
+
       if @is_student && tab_enabled?(@context.class::TAB_MODULES)
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end
 
-      if @context.allow_web_export_download?
+      if allow_web_export_download?
+        @allow_web_export_download = true
         @last_web_export = @context.web_zip_exports.visible_to(@current_user).order('epub_exports.created_at').last
       end
     end
@@ -540,7 +544,7 @@ class ContextModulesController < ApplicationController
         return render :json => @tag.errors, :status => :bad_request
       end
 
-      @tag.update_asset_name! if params[:content_tag][:title]
+      @tag.update_asset_name!(@current_user) if params[:content_tag][:title]
       render :json => @tag
     end
   end

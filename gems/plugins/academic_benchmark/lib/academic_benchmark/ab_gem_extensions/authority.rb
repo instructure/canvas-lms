@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative 'common'
 
 module AcademicBenchmarks
   module Standards

@@ -92,15 +92,16 @@
 
 class WebZipExportsController < ApplicationController
   include Api::V1::WebZipExport
+  include WebZipExportHelper
 
   before_action :require_user
   before_action :require_context
   before_action :check_feature_enabled
 
   def check_feature_enabled
-    unless @context.allow_web_export_download?
+    unless course_allow_web_export_download?
       render status: 404, template: 'shared/errors/404_message'
-      return false
+      false
     end
   end
 
@@ -116,7 +117,7 @@ class WebZipExportsController < ApplicationController
   #
   # @returns [WebZipExport]
   def index
-    return unless authorized_action(@context, @current_user, :read)
+    return render_unauthorized_action unless allow_web_export_for_course_user?
 
     user_web_zips = @context.web_zip_exports.visible_to(@current_user).order("created_at DESC")
     web_zips_json = Api.paginate(user_web_zips, self, api_v1_web_zip_exports_url).map do |web_zip|

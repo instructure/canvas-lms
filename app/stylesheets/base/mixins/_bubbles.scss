@@ -1,52 +1,32 @@
 @mixin name_bubbles {
   div {
-    background-color: #dee7fa;
-    border-radius: 10px;
-    padding: 0 14px 0 11px;
+    padding: $contentBoxPadding;
     display: inline-block;
     overflow: hidden;
+    vertical-align: middle;
   }
   span {
-    color: #fff;
-    font-size: 0.8em;
-    vertical-align: top;
+    color: $ic-font-color-dark;
+    vertical-align: middle;
     display: inline-block;
   }
   a {
-    position: absolute;
-    right: 1px;
-    top: 1px;
-    width: 13px;
-    height: 100%;
-    color: #c4cbcf;
-    vertical-align: top;
+    color: $ic-font-color-dark;
+    padding-right: $contentBoxPadding;
     cursor: pointer;
-    background: transparent url(/images/messages/token-delete.png) 12px center no-repeat;
+    vertical-align: middle;
   }
   white-space: nowrap;
   float: left;
-  margin: 1px 2px 1px 4px;
-  color: #000;
-  background-color: #85ace0;
-  border: 1px solid #a5bcf0;
-  border-radius: 10px;
+  color: $ic-font-color-dark;
+  background-color: $ic-color-medium-light;
+  border: 1px solid $ic-border-color;
+  border-radius: $borderRadius;
   cursor: default;
   position: relative;
   &.cannot_remove, &.cannot_remove:hover {
-    background-color: $gray-light;
-    border-color: $gray-lighter;
     div {
-      background-color: $gray-lighter;
-      color: $gray;
-    }
-  }
-  &:hover {
-    div {
-      background-color: #bccef4;
-    }
-    border-color: #6f94e6;
-    a {
-      background-position: 1px center;
+      padding-right: $contentBoxPadding;
     }
   }
 }

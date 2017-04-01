@@ -41,7 +41,7 @@ describe 'FixUserMergeConversations' do
 
       expect(c1.reload.conversation_participants.size).to eql 2
       expect(c1.private_hash).not_to eql 'no longer valid'
-      expect { c2.reload }.to raise_error
+      expect { c2.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 end

@@ -1227,7 +1227,7 @@ class CalendarEventsApiController < ApplicationController
 
     if options[:child_event_data].present?
       event_attributes[:child_event_data] = options[:child_event_data].map do |child_event|
-        new_child_event = child_event.dup
+        new_child_event = child_event.permit(:start_at, :end_at, :context_code)
         new_child_event[:start_at] = Time.zone.parse(child_event[:start_at]) + offset unless child_event[:start_at].blank?
         new_child_event[:end_at] = Time.zone.parse(child_event[:end_at]) + offset unless child_event[:end_at].blank?
         new_child_event

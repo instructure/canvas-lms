@@ -25,18 +25,18 @@ describe "sections/show.html.erb" do
       course_with_teacher(:active_all => true)
       @section = @course.course_sections.first
       @section.sis_source_id = "section_sissy_id"
-      assigns[:context] = @course
-      assigns[:section] = @section
-      assigns[:enrollments_count] = 1
-      assigns[:student_enrollments_count] = 1
-      assigns[:pending_enrollments_count] = 1
-      assigns[:completed_enrollments_count] = 1
-      assigns[:permission_classes] = 'manage-permissions'
+      assign(:context, @course)
+      assign(:section, @section)
+      assign(:enrollments_count, 1)
+      assign(:student_enrollments_count, 1)
+      assign(:pending_enrollments_count, 1)
+      assign(:completed_enrollments_count, 1)
+      assign(:permission_classes, 'manage-permissions')
     end
 
     it "should not show to teacher" do
       view_context(@course, @user)
-      assigns[:current_user] = @user
+      assign(:current_user, @user)
       render
       expect(response).to have_tag("span.sis_source_id", @section.sis_source_id)
       expect(response).not_to have_tag("input#course_section_sis_source_id")
@@ -45,7 +45,7 @@ describe "sections/show.html.erb" do
     it "should show to sis admin" do
       admin = account_admin_user(:account => @course.root_account)
       view_context(@course, admin)
-      assigns[:current_user] = admin
+      assign(:current_user, admin)
       render
       expect(response).to have_tag("input#course_section_sis_source_id")
     end
@@ -53,7 +53,7 @@ describe "sections/show.html.erb" do
     it "should not show to non-sis admin" do
       admin = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => {'manage_sis' => false})
       view_context(@course, admin)
-      assigns[:current_user] = admin
+      assign(:current_user, admin)
       render
       expect(response).not_to have_tag("input#course_section_sis_source_id")
       expect(response).to have_tag("span.sis_source_id", @section.sis_source_id)

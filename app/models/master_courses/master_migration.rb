@@ -118,6 +118,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     ce.settings[:master_migration_type] = type
     ce.settings[:master_migration_id] = self.id # so we can find on the import side when we copy attachments
     ce.settings[:primary_master_migration] = is_primary
+    ce.settings[:deletions] = self.master_template.deletions_since_last_export if type == :selective
     ce.user = self.user
     ce.save!
     ce.master_migration = self # don't need to reload

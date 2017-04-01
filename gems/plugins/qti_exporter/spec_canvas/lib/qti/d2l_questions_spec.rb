@@ -64,7 +64,7 @@ describe "Converting D2L QTI" do
     expect(get_quiz_data(d2l_question_dir, 'assessment', @opts).last.first).to eq D2LExpected::ASSESSMENT
   end
 
-  it "should convert the assessment into a quiz" do
+  it "should convert the assessment references into a quiz" do
     expect(get_quiz_data(d2l_question_dir, 'assessment_references', @opts).last.first).to eq D2LExpected::ASSESSMENT_REFS
   end
 

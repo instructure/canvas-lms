@@ -502,6 +502,10 @@ describe "courses" do
 
     expect(element_exists?('#announcements_on_home_page')).to be_falsey
 
+    text = "here's some html or whatever"
+    html = "<p>#{text}</p>"
+    @course.announcements.create!(:title => "something", :message => html)
+
     @course.default_view = "wiki"
     @course.show_announcements_on_home_page = true
     @course.home_page_announcement_limit = 5
@@ -511,5 +515,10 @@ describe "courses" do
     get "/courses/#{@course.id}"
 
     expect(f('#announcements_on_home_page')).to be_displayed
+    expect(f('#announcements_on_home_page')).to contain_css("button")
+    f('#announcements_on_home_page button').click
+
+    expect(f('#announcements_on_home_page')).to include_text(text)
+    expect(f('#announcements_on_home_page')).to_not include_text(html)
   end
 end

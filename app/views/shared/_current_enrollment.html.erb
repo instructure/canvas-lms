@@ -66,20 +66,7 @@
       </td>
 
       <td class="course-list-no-left-border course-list-enrolled-as-column">
-        <%
-           message = t('enrolled_as_student', "Student")
-           case current_enrollment.type
-           when 'TeacherEnrollment'
-             message = t('enrolled_as_teacher', "Teacher")
-           when 'TaEnrollment'
-             message = t('enrolled_as_ta', "TA")
-           when 'ObserverEnrollment'
-             message = t('enrolled_as_observer', "Observer")
-           when 'DesignerEnrollment'
-             message = t('enrolled_as_designer', "Designer")
-           end
-        %>
-        <%= message %>
+        <%= current_enrollment.readable_role_name %>
       </td>
 
       <td class="course-list-no-left-border course-list-published-column ">

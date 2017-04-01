@@ -102,7 +102,7 @@ require 'securerandom'
 #         },
 #         "preview_url": {
 #           "type": "string",
-#           "description": "optional: url to the document preview (only included in submission endpoints)"
+#           "description": "optional: url to the document preview. This url is specific to the user making the api call. Only included in submission endpoints."
 #         }
 #       }
 #     }

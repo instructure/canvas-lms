@@ -22,8 +22,8 @@ describe DataFixup::FixRootOutcomeGroupTitles do
   it 'should replace old ROOT names of outcome groups' do
     # set up data
     course_factory(active_all: true, :name => 'Test course')
-    @course.learning_outcome_groups.create!(:title => 'ROOT')
-    @course.account.learning_outcome_groups.create!(:title => 'ROOT')
+    course_group = @course.learning_outcome_groups.create!(:title => 'ROOT')
+    account_group = @course.account.learning_outcome_groups.create!(:title => 'ROOT')
 
     # run the fix
     DataFixup::FixRootOutcomeGroupTitles.run
@@ -31,7 +31,7 @@ describe DataFixup::FixRootOutcomeGroupTitles do
     @course.account.reload
 
     # verify the results
-    expect(@course.learning_outcome_groups.first.title).to eq @course.name
-    expect(@course.account.learning_outcome_groups.first.title).to eq 'ROOT'
+    expect(course_group.reload.title).to eq @course.name
+    expect(account_group.reload.title).to eq 'ROOT'
   end
 end

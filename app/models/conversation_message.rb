@@ -109,9 +109,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def after_participants_created_broadcast
     conversation_message_participants(true) # reload this association so we get latest data
-    skip_broadcasts = false
     @re_send_message = true
-    set_broadcast_flags
     broadcast_notifications
     queue_create_stream_items
     generate_user_note!

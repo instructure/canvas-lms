@@ -62,16 +62,7 @@ namespace :js do
     reporter = args[:reporter]
     if CANVAS_WEBPACK
       Rake::Task['i18n:generate_js'].invoke
-      webpack_test_dir = Rails.root + "spec/javascripts/webpack"
-      FileUtils.rm_rf(webpack_test_dir)
-      puts "--> Bundling tests for ember apps"
-      `npm run webpack-test-ember`
-      puts "--> Running tests for ember apps"
-      test_suite(reporter)
-      FileUtils.rm_rf(webpack_test_dir)
-      puts "--> Bundling tests for canvas proper"
-      `npm run webpack-test`
-      puts "--> Running tests for canvas proper"
+      puts "--> Running karma tests for canvas"
       test_suite(reporter)
     else
       require 'canvas/require_js'

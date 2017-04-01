@@ -36,7 +36,7 @@ define([
         ...previousExportProps()
       };
       this.wrapper = mount(<ActionMenu {...propsWithPreviousExport} />);
-      this.wrapper.find('PopoverMenu').simulate('click');
+      this.wrapper.find('button').simulate('click');
     },
 
     teardown () {
@@ -163,7 +163,7 @@ define([
 
       this.wrapper = mount(<ActionMenu {...workingMenuProps()} />, { attachTo: document.querySelector('#fixture')});
 
-      this.trigger = this.wrapper.find('PopoverMenu');
+      this.trigger = this.wrapper.find('button');
       this.trigger.simulate('click');
 
       this.menuItem = document.querySelector('[role="menuitem"] [data-menu-id="export"]');
@@ -211,7 +211,7 @@ define([
     this.menuItem = document.querySelector('[role="menuitem"] [data-menu-id="export"]');
 
     equal(this.menuItem.textContent, 'Export in progress');
-    equal(this.menuItem.parentElement.getAttribute('aria-disabled'), 'true');
+    equal(this.menuItem.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
 
     return exportResult;
   });
@@ -303,7 +303,7 @@ define([
       this.spies.gotoUrl = this.stub(ActionMenu, 'gotoUrl');
 
       this.wrapper = mount(<ActionMenu {...workingMenuProps()} />);
-      this.wrapper.find('PopoverMenu').simulate('click');
+      this.wrapper.find('button').simulate('click');
 
       this.menuItem = document.querySelectorAll('[role="menuitem"] [data-menu-id="import"]')[0];
     },

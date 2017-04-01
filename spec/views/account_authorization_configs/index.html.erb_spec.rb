@@ -23,13 +23,13 @@ describe "account_authorization_configs/index" do
   let(:account){ Account.default }
 
   before do
-    assigns[:context] = assigns[:account] = account
-    assigns[:current_user] = user_with_pseudonym
-    assigns[:current_pseudonym] = @pseudonym
-    assigns[:saml_identifiers] = []
-    assigns[:saml_authn_contexts] = []
-    assigns[:saml_login_attributes] = {}
-    @presenter = assigns[:presenter] = AccountAuthorizationConfigsPresenter.new(account)
+    assign(:context, assign(:account, account))
+    assign(:current_user, user_with_pseudonym)
+    assign(:current_pseudonym, @pseudonym)
+    assign(:saml_identifiers, [])
+    assign(:saml_authn_contexts, [])
+    assign(:saml_login_attributes, {})
+    @presenter = assign(:presenter, AccountAuthorizationConfigsPresenter.new(account))
   end
 
   it "should list the auth ips" do

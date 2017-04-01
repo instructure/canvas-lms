@@ -51,20 +51,42 @@ describe MasterCourses::Restrictor do
     it "should return false by default" do
       expect(@page_copy.editing_restricted?(:any)).to be_falsey
       expect(@page_copy.editing_restricted?(:content)).to be_falsey
+      expect(@page_copy.editing_restricted?(:settings)).to be_falsey
+      expect(@page_copy.editing_restricted?(:availability_dates)).to be_falsey
+      expect(@page_copy.editing_restricted?(:due_dates)).to be_falsey
+      expect(@page_copy.editing_restricted?(:points)).to be_falsey
+      expect(@page_copy.editing_restricted?(:all)).to be_falsey
     end
 
     it "should return what you would expect" do
       @tag.update_attribute(:restrictions, {:content => true})
       expect(@page_copy.editing_restricted?(:content)).to be_truthy
       expect(@page_copy.editing_restricted?(:settings)).to be_falsey
+      expect(@page_copy.editing_restricted?(:availability_dates)).to be_falsey
+      expect(@page_copy.editing_restricted?(:due_dates)).to be_falsey
+      expect(@page_copy.editing_restricted?(:points)).to be_falsey
       expect(@page_copy.editing_restricted?(:any)).to be_truthy
       expect(@page_copy.editing_restricted?(:all)).to be_falsey
     end
 
-    it "should return true if fully locked" do
-      @tag.update_attribute(:restrictions, {:content => true, :settings => true})
+    it "should return true if fully/individually locked" do
+      @tag.update_attribute(:restrictions, {:content => true, :settings => true, :points => true, :availability_dates => true, :due_dates => true})
       expect(@page_copy.editing_restricted?(:content)).to be_truthy
       expect(@page_copy.editing_restricted?(:settings)).to be_truthy
+      expect(@page_copy.editing_restricted?(:points)).to be_truthy
+      expect(@page_copy.editing_restricted?(:availability_dates)).to be_truthy
+      expect(@page_copy.editing_restricted?(:due_dates)).to be_truthy
+      expect(@page_copy.editing_restricted?(:any)).to be_truthy
+      expect(@page_copy.editing_restricted?(:all)).to be_truthy
+    end
+
+    it "should return true if locked via :all" do
+      @tag.update_attribute(:restrictions, {:all => true})
+      expect(@page_copy.editing_restricted?(:content)).to be_truthy
+      expect(@page_copy.editing_restricted?(:settings)).to be_truthy
+      expect(@page_copy.editing_restricted?(:points)).to be_truthy
+      expect(@page_copy.editing_restricted?(:availability_dates)).to be_truthy
+      expect(@page_copy.editing_restricted?(:due_dates)).to be_truthy
       expect(@page_copy.editing_restricted?(:any)).to be_truthy
       expect(@page_copy.editing_restricted?(:all)).to be_truthy
     end
@@ -95,7 +117,7 @@ describe MasterCourses::Restrictor do
       # should also work for associated assignments (since they share a master content tag)
       quiz = @copy_from.quizzes.create!(:title => "quiz", :quiz_type => "assignment")
       assignment = quiz.assignment
-      tag3 = @template.create_content_tag_for!(quiz, {:restrictions => {:content => true, :settings => true}})
+      tag3 = @template.create_content_tag_for!(quiz, {:restrictions => {:all => true}})
 
       MasterCourses::Restrictor.preload_default_template_restrictions([@original_page, page2, assignment], @copy_from)
 

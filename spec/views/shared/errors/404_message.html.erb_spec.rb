@@ -26,7 +26,7 @@ describe "/shared/errors/404_message" do
     begin
       nil.bad_method
     rescue => e
-      assigns[:exception] = exception = e
+      exception = assign(:exception, e)
     end
     render "shared/errors/404_message", :locals => {:exception => exception, :status => ""}
     expect(response).not_to be_nil

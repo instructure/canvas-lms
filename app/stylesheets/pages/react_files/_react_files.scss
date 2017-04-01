@@ -24,7 +24,7 @@ body.files {
 }
 
 // hides the course menu hamburger in the personal files breadcrumb
-body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
+body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   > .ic-app-course-nav-toggle {
     display: none;
   }

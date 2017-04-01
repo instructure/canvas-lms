@@ -176,6 +176,121 @@ describe Course do
     end
   end
 
+  describe "#grading_periods?" do
+    it "should return true if course has grading periods" do
+      @course.save!
+      Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+      expect(@course.grading_periods?).to be true
+    end
+
+    it "should return true if account has grading periods for course term" do
+      @course.save!
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group.enrollment_terms << @course.enrollment_term
+      expect(@course.grading_periods?).to be true
+    end
+
+    it "should return false if account has grading periods without course term" do
+      @course.save!
+      Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      expect(@course.grading_periods?).to be false
+    end
+
+    it "should return false if neither course nor account have grading periods" do
+      expect(@course.grading_periods?).to be false
+    end
+  end
+
+  describe "#weighted_grading_periods?" do
+    it "returns false if course has legacy grading periods" do
+      @course.save!
+      account_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      account_group.enrollment_terms << @course.enrollment_term
+      group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+      group.weighted = true
+      group.save!
+      expect(@course.weighted_grading_periods?).to be false
+    end
+
+    it "returns false if account has unweighted grading periods for course term" do
+      @course.save!
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group.enrollment_terms << @course.enrollment_term
+      expect(@course.weighted_grading_periods?).to be false
+    end
+
+    it "returns false if account has weighted grading periods without course term" do
+      @course.save!
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group.weighted = true
+      group.save!
+      expect(@course.weighted_grading_periods?).to be false
+    end
+
+    it "returns true if account has weighted grading periods for course term" do
+      @course.save!
+      legacy_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+      legacy_group.destroy
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group.enrollment_terms << @course.enrollment_term
+      group.weighted = true
+      group.save!
+      expect(@course.weighted_grading_periods?).to be true
+    end
+  end
+
+  describe '#display_totals_for_all_grading_periods?' do
+    before do
+      @course.save!
+    end
+
+    it 'returns false for a course without an associated grading period group' do
+      expect(@course).not_to be_display_totals_for_all_grading_periods
+    end
+
+    it 'returns false for a course with an associated grading period group that is soft-deleted' do
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group.enrollment_terms << @course.enrollment_term
+      group.update!(display_totals_for_all_grading_periods: true)
+      group.destroy
+      expect(@course).not_to be_display_totals_for_all_grading_periods
+    end
+
+    it 'returns true if the associated grading period group has the setting enabled' do
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group.enrollment_terms << @course.enrollment_term
+      group.update!(display_totals_for_all_grading_periods: true)
+      expect(@course).to be_display_totals_for_all_grading_periods
+    end
+
+    it 'returns false if the associated grading period group has the setting disabled' do
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group.enrollment_terms << @course.enrollment_term
+      expect(@course).not_to be_display_totals_for_all_grading_periods
+    end
+
+    context 'legacy grading periods support' do
+      before do
+        @group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+      end
+
+      it 'returns true if the associated grading period group has the setting enabled' do
+        @group.update!(display_totals_for_all_grading_periods: true)
+        expect(@course).to be_display_totals_for_all_grading_periods
+      end
+
+      it 'returns false if the associated grading period group has the setting disabled' do
+        expect(@course).not_to be_display_totals_for_all_grading_periods
+      end
+
+      it 'returns false for a course with an associated grading period group that is soft-deleted' do
+        @group.update!(display_totals_for_all_grading_periods: true)
+        @group.destroy
+        expect(@course).not_to be_display_totals_for_all_grading_periods
+      end
+    end
+  end
+
   describe "#time_zone" do
     it "should use provided value when set, regardless of root account setting" do
       @root_account = Account.default
@@ -188,16 +303,6 @@ describe Course do
       @root_account = Account.default
       @root_account.default_time_zone = 'America/Chicago'
       expect(@course.time_zone).to eq ActiveSupport::TimeZone['Central Time (US & Canada)']
-    end
-  end
-
-  describe "#allow_web_export_download?" do
-    it "should return setting" do
-      expect(course_factory.allow_web_export_download?).to eq false
-      account = Account.default
-      account.settings[:enable_offline_web_export] = true
-      account.save
-      expect(@course.allow_web_export_download?).to eq true
     end
   end
 
@@ -799,6 +904,33 @@ describe Course do
       expect(@course.turnitin_originality).to eq("after_grading")
     end
   end
+
+  describe '#quiz_lti_tool' do
+    before do
+      @course.save!
+      @tool = ContextExternalTool.new(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+    end
+
+    it 'returns the quiz LTI tool for the course' do
+      @course.context_external_tools << @tool
+      expect(@course.quiz_lti_tool).to eq @tool
+    end
+
+    it 'returns the quiz LTI tool for the account if not set up on the course' do
+      @course.account.context_external_tools << @tool
+      expect(@course.quiz_lti_tool).to eq @tool
+    end
+
+    it 'returns nil if no quiz LTI tool is configured' do
+      expect(@course.quiz_lti_tool).to be nil
+    end
+  end
 end
 
 describe Course do
@@ -1044,6 +1176,39 @@ describe Course, "enroll" do
     scope = account.associated_courses.active.select([:id, :name]).eager_load(:teachers).joins(:teachers).where(:enrollments => { :workflow_state => 'active' })
     sql = scope.to_sql
     expect(sql).to match(/"enrollments"\."type" IN \('TeacherEnrollment'\)/)
+  end
+end
+
+describe Course, '#assignment_groups' do
+  it 'orders groups by position' do
+    course_model
+    @course.assignment_groups.create!(:name => 'B Group', position: 3)
+    @course.assignment_groups.create!(:name => 'A Group', position: 2)
+    @course.assignment_groups.create!(:name => 'C Group', position: 1)
+
+    groups = @course.assignment_groups
+
+    expect(groups[0].name).to eq('C Group')
+    expect(groups[1].name).to eq('A Group')
+    expect(groups[2].name).to eq('B Group')
+  end
+
+  it 'orders groups by name when positions are equal' do
+    course_model
+
+    @course.assignment_groups.create!(:name => 'B Group', position: 1)
+    @course.assignment_groups.create!(:name => 'A Group', position: 2)
+    @course.assignment_groups.create!(:name => 'D Group', position: 3)
+    @course.assignment_groups.create!(:name => 'C Group', position: 3)
+
+    @course.reload
+    expect(AssignmentGroup).to receive(:best_unicode_collation_key).with('assignment_groups.name').and_call_original
+    groups = @course.assignment_groups
+
+    expect(groups[0].name).to eq('B Group')
+    expect(groups[1].name).to eq('A Group')
+    expect(groups[2].name).to eq('C Group')
+    expect(groups[3].name).to eq('D Group')
   end
 end
 
@@ -4552,18 +4717,6 @@ describe Course, 'touch_root_folder_if_necessary' do
       expect(@course.restrict_student_future_view?).to be_truthy
     end
   end
-
-  describe "notificiations" do
-    it "doesnt blow up when trying to send notifications just because there's no prior_version" do
-      course = course_factory(account: Account.default, name: "SOME COURSE NAME")
-      course.prior_version=nil
-      course.stubs(just_created: false)
-      course.instance_variable_set(:@broadcasted, false)
-      expect { course.broadcast_notifications }.to_not raise_error
-    end
-  end
-
-  it { is_expected.to have_many(:submission_comments).conditions(-> { published }) }
 end
 
 describe Course, 'invited_count_visible_to' do

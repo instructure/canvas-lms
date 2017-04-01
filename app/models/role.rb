@@ -256,7 +256,9 @@ class Role < ActiveRecord::Base
     @enrollment_types.each do |base_type|
       base_type[:count] = base_counts[base_type[:name]] || 0
       base_type[:custom_roles].each do |custom_role|
-        custom_role[:count] = role_counts[custom_role[:id].to_s] || 0
+        id = custom_role[:id]
+        id = id.to_s if CANVAS_RAILS4_2
+        custom_role[:count] = role_counts[id] || 0
       end
     end
 
@@ -265,7 +267,7 @@ class Role < ActiveRecord::Base
 
   def self.manageable_roles_by_user(user, context)
     manageable = []
-    if context.grants_right?(user, :manage_students)
+    if context.grants_right?(user, :manage_students) && !(context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(context))
       manageable += ['StudentEnrollment', 'ObserverEnrollment']
       if context.is_a?(Course) && context.teacherless?
         manageable << 'TeacherEnrollment'

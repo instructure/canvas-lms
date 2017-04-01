@@ -120,6 +120,12 @@ RSpec/MessageSpies:
 RSpec/HookArgument:
   Enabled: false
 
+# RSpec cops we care extra about
+RSpec/EmptyExampleGroup:
+  Severity: error
+RSpec/RepeatedDescription:
+  Severity: error
+
 # this isn't good for us because of how we pin dependencies
 Bundler/OrderedGems:
   Enabled: false

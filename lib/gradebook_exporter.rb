@@ -17,7 +17,6 @@
 #
 
 class GradebookExporter
-  include GradebookTransformer
   include GradebookSettingsHelpers
 
   def initialize(course, user, options = {})
@@ -29,7 +28,7 @@ class GradebookExporter
   def to_csv
     enrollment_scope = @course.apply_enrollment_visibility(gradebook_enrollment_scope, @user, nil,
                                                            include: gradebook_includes)
-    student_enrollments = enrollments_for_csv(enrollment_scope, @options)
+    student_enrollments = enrollments_for_csv(enrollment_scope)
 
     student_section_names = {}
     student_enrollments.each do |enrollment|
@@ -53,7 +52,7 @@ class GradebookExporter
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
 
-    assignments = select_in_grading_period calc.assignments, @course, grading_period
+    assignments = select_in_grading_period calc.assignments, grading_period
 
     assignments = assignments.sort_by do |a|
       [a.assignment_group_id, a.position || 0, a.due_at || CanvasSort::Last, a.title]
@@ -168,7 +167,8 @@ class GradebookExporter
   end
 
   private
-  def enrollments_for_csv(scope, options={})
+
+  def enrollments_for_csv(scope)
     # user: used for name in csv output
     # course_section: used for display_name in csv output
     # user > pseudonyms: used for sis_user_id/unique_id if options[:include_sis_id]
@@ -208,9 +208,10 @@ class GradebookExporter
   end
 
   def show_totals?
-    return true if !@course.feature_enabled?(:multiple_grading_periods)
+    return true unless @course.grading_periods?
     return true if @options[:grading_period_id].try(:to_i) != 0
-    @course.feature_enabled?(:all_grading_periods_totals)
+
+    @course.display_totals_for_all_grading_periods?
   end
 
   STARTS_WITH_EQUAL = /^\s*=/
@@ -222,5 +223,13 @@ class GradebookExporter
     name = @course.list_students_by_sortable_name? ? student.sortable_name : student.name
     name = "=\"#{name}\"" if name =~ STARTS_WITH_EQUAL
     name
+  end
+
+  def select_in_grading_period(assignments, grading_period)
+    if grading_period
+      grading_period.assignments(assignments)
+    else
+      assignments
+    end
   end
 end

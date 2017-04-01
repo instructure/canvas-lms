@@ -34,3 +34,12 @@ requirejs.config({
   deps: thingsToLoadWithRequireJS, // dynamically load all test files
   callback: window.__karma__.start
 });
+
+require(['instructure-ui/ApplyTheme', 'instructure-ui-themes/canvas'],
+  function(ApplyTheme) {
+    if (ENV.use_high_contrast) {
+      ApplyTheme.defualt.setDefaultTheme('canvas-a11y')
+    } else {
+      ApplyTheme.default.setDefaultTheme('canvas')
+    }
+});

@@ -30,7 +30,7 @@ class GradingStandardsController < ApplicationController
         GRADING_STANDARDS_URL: context_url(@context, :context_grading_standards_url),
         GRADING_PERIOD_SETS_URL: api_v1_account_grading_period_sets_url(@context),
         ENROLLMENT_TERMS_URL: api_v1_enrollment_terms_url(@context),
-        MULTIPLE_GRADING_PERIODS: multiple_grading_periods?,
+        HAS_GRADING_PERIODS: grading_periods?,
         DEFAULT_GRADING_STANDARD_DATA: GradingStandard.default_grading_standard,
         CONTEXT_SETTINGS_URL: context_url(@context, :context_settings_url)
       }
@@ -44,6 +44,7 @@ class GradingStandardsController < ApplicationController
         view_path = 'account_index'
       else
         client_env[:GRADING_PERIODS_URL] = api_v1_course_grading_periods_url(@context)
+        client_env[:GRADING_PERIODS_WEIGHTED] = @context.weighted_grading_periods?
         view_path = 'course_index'
       end
 

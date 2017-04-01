@@ -34,10 +34,6 @@ shared_examples_for "permission tests" do
     select_permission_option(permission_name, role, 4) # 3 is Disabled and locked
   end
 
-  def select_default_and_lock(permission_name, role)
-    select_permission_option(permission_name, role, 5) # 3 is Disabled and locked
-  end
-
   def add_new_account_role(role_name)
     role = account.roles.build({:name => role_name})
     role.base_role_type = "AccountMembership"
@@ -229,16 +225,6 @@ shared_examples_for "permission tests" do
           expect(role_override.nil?).to be_truthy
         end
       end
-
-      it "sets a permission to default and locked" do
-        select_default_and_lock(permission_name, role)
-
-        keep_trying_until do
-          role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.enabled).to eq true
-          expect(role_override.locked).to eq true
-        end
-      end
     end
 
     context "when managing course roles" do
@@ -304,16 +290,6 @@ shared_examples_for "permission tests" do
         keep_trying_until do
           role_override = RoleOverride.where(:role_id => role.id).first
           expect(role_override.nil?).to be_truthy
-        end
-      end
-
-      it "sets a permission to default and locked" do
-        select_default_and_lock(permission_name, role)
-
-        keep_trying_until do
-          role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.enabled).to eq true
-          expect(role_override.locked).to eq true
         end
       end
 

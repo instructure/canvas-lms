@@ -23,7 +23,7 @@ describe "/quizzes/quizzes/_single_answer" do
   it "should render" do
     course_with_student
     view_context
-    assigns[:quiz] = @course.quizzes.create!
+    assign(:quiz, @course.quizzes.create!)
     answer = OpenObject.new
     answer.id = 5
     answer.weight = 100

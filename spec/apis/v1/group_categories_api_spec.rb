@@ -275,13 +275,6 @@ describe "Group Categories API", type: :request do
           expect(json.first['id']).to eq @study_group.id
         end
 
-        it "should list all groups in category for a teacher" do
-          json = api_call(:get, "/api/v1/group_categories/#{@category.id}/groups",
-                          @category_path_options.merge(:action => 'groups',
-                                                       :group_category_id => @category.to_param))
-          expect(json.first['id']).to eq @study_group.id
-        end
-
         it "should allow a teacher to update a category for a course" do
           api_call :put, "/api/v1/group_categories/#{@category.id}",
                    @category_path_options.merge(:action => 'update',

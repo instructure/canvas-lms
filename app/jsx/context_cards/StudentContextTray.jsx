@@ -20,7 +20,7 @@ define([
    SectionInfo,
    SubmissionProgressBars,
    MessageStudents,
-   {Heading, Button, Link, Typography, ScreenReaderContent, Spinner, Tray, ApplyTheme}) {
+   {Heading, Button, Link, Typography, ScreenReaderContent, Spinner, Tray}) {
 
   class StudentContextTray extends React.Component {
 
@@ -231,7 +231,7 @@ define([
                       <div className="StudentContextTray-Header__Content">
                         {this.state.user.short_name  ? (
                           <div className="StudentContextTray-Header__Name">
-                            <Heading level="h3" tag="h2">
+                            <Heading level="h3" as="h2">
                               <span className="StudentContextTray-Header__NameLink">
                                 <Link
                                   href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
@@ -243,14 +243,14 @@ define([
                           </div>
                         ) : null}
                         <div className="StudentContextTray-Header__CourseName">
-                          <Typography size="medium" tag="div" lineHeight="condensed">
+                          <Typography size="medium" as="div" lineHeight="condensed">
                             {this.state.course.name}
                           </Typography>
                         </div>
-                        <Typography size="x-small" color="secondary" tag="div">
+                        <Typography size="x-small" color="secondary" as="div">
                           <SectionInfo course={this.state.course} user={this.state.user} />
                         </Typography>
-                        <Typography size="x-small" color="secondary" tag="div">
+                        <Typography size="x-small" color="secondary" as="div">
                           <LastActivity user={this.state.user} />
                         </Typography>
                       </div>
@@ -280,7 +280,7 @@ define([
                   {Object.keys(this.state.analytics).length > 0 ? (
                     <section
                       className="StudentContextTray__Section StudentContextTray-Ratings">
-                      <Heading level="h4" tag="h3" border="bottom">
+                      <Heading level="h4" as="h3" border="bottom">
                         {I18n.t("Activity Compared to Class")}
                       </Heading>
                       <div className="StudentContextTray-Ratings__Layout">
@@ -301,13 +301,5 @@ define([
       )
     }
   }
-
-  const DeleteMe = (props) => (
-    <ApplyTheme theme={ApplyTheme.generateTheme('a11y')}>
-      <StudentContextTray {...props}/>
-    </ApplyTheme>
-  )
-
-  /* TODO: after instui gets updated, just return StudentContextTray */
-  return ENV.use_high_contrast ? DeleteMe : StudentContextTray
+  return StudentContextTray;
 })

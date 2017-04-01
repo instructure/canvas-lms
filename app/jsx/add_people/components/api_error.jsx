@@ -1,8 +1,8 @@
 define([
   'i18n!roster',
   'react',
-  'instructure-ui'
-], (I18n, React, {Alert}) => {
+  'instructure-ui/Alert'
+], (I18n, React, {default: Alert}) => {
   class ApiError extends React.Component {
     static propTypes = {
       error: React.PropTypes.oneOfType([
@@ -17,7 +17,7 @@ define([
           {I18n.t('The following users could not be created.')}
           <ul className="apierror__error_list">
             {
-              this.props.error.map((e, i) => <li key={i}>{e}</li>)
+              this.props.error.map(e => <li key={Date.now()}>{e}</li>)
             }
           </ul>
         </div>

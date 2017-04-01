@@ -147,51 +147,54 @@ $ic-token-padding: 3px 15px;
 /// Legacy Token Input
 ///////////
 .token_input {
-  line-height: 1.1em;
-  min-height: 20px;
-  display: inline-block;
-  border: 1px solid #999999;
-  border-top-color: #737373;
-  padding: 0;
-  background: #fff;
-  box-sizing: border-box;
-  cursor: text;
-  position: relative;
+    position: relative;
+    min-height: 0;
+    height: 38px;
+    box-sizing: border-box;
+    background:$ic-color-light;
+    border: 1px solid $ic-border-light;
+    border-radius: $borderRadius;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    cursor: text;
+    overflow: hidden;
+    vertical-align: middle;
+    padding: $contentBoxPadding/4;
+    transition: border linear 0.2s, box-shadow linear 0.2s;
+
   a.browser {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: $ic-sp/2;
+    right: $ic-sp/2;
     cursor: pointer;
-    overflow: hidden;
-    height: 18px;
-    width: 18px;
-    text-indent: -9999em;
-    background: transparent url(/images/messages/address-book-icon-sprite.png) 0 0 no-repeat;
+    text-align: right;
   }
-  a.browser:hover {
-    background-position: 0 -18px;
-  }
+
   > span {
     float: left;
-    color: #888;
-    margin: 2px 1px 0;
+    color: $ic-color-medium-lighter;
+    padding: $contentBoxPadding/2;
   }
+
   > div {
     overflow: auto;
     max-height: 90px;
   }
+
   &.browsable > div {
     padding-right: 20px;
   }
+
   ul {
     list-style: none;
     margin: 0;
     padding: 0;
   }
+
   li {
     @include name_bubbles;
     line-height: 1.1em;
   }
+
   li.selected {
     background-color: #5b89f3;
     border-color: #5b89f3;
@@ -200,6 +203,7 @@ $ic-token-padding: 3px 15px;
       background-position: (-10px) center;
     }
   }
+
   li.details {
     div {
       padding: 0 11px;
@@ -208,12 +212,13 @@ $ic-token-padding: 3px 15px;
       padding: 0 15px 0 4px;
     }
   }
+
   input {
     box-shadow: none;
     float: left;
     border: 0;
     outline: none;
-    padding: 0;
+    padding: $contentBoxPadding;
     margin: 1px 0;
     line-height: 1.1em;
   }

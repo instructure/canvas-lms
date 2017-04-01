@@ -4,17 +4,13 @@ module Lti
   module Oauth2
     describe AuthorizationValidator do
 
-      let(:developer_key) do
-        developer_key_mock = mock("developer_key")
-        developer_key_mock.stubs(:active?).returns(true)
-        developer_key_mock
-      end
-
       let(:product_family) do
         product_family_mock = mock("product_family")
-        product_family_mock.stubs(:developer_key).returns(developer_key)
+        product_family_mock.stubs(:developer_key).returns(dev_key)
         product_family_mock
       end
+
+      let(:account) { Account.create! }
 
       let(:tool_proxy) do
         tool_proxy_mock = mock("tool_proxy")
@@ -40,7 +36,7 @@ module Lti
         )
         raw_jwt
       end
-      let(:dev_key){ DeveloperKey.create! }
+      let(:dev_key) { DeveloperKey.create! }
       let(:raw_jwt_dev_key) do
         raw_jwt = JSON::JWT.new(
           {
@@ -54,7 +50,7 @@ module Lti
         raw_jwt
       end
 
-      let(:authValidator) do
+      let(:auth_validator) do
         AuthorizationValidator.new(
           jwt: raw_jwt.sign(tool_proxy.shared_secret, :HS256).to_s,
           authorization_url: auth_url
@@ -69,13 +65,13 @@ module Lti
       describe "#jwt" do
 
         it "returns the decoded JWT" do
-          expect(authValidator.jwt.signature).to eq raw_jwt.sign(tool_proxy.shared_secret, :HS256).signature
+          expect(auth_validator.jwt.signature).to eq raw_jwt.sign(tool_proxy.shared_secret, :HS256).signature
         end
 
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if any of the assertions are missing" do
           raw_jwt.delete 'exp'
-          expect { authValidator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                                                "the following assertions are missing: exp"
+          expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
+                                                       "the following assertions are missing: exp"
         end
 
         it 'raises JSON::JWT:InvalidFormat if the JWT format is invalid' do
@@ -97,32 +93,32 @@ module Lti
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'exp' is to far in the future" do
           raw_jwt['exp'] = 5.minutes.from_now.to_i
           Setting.set('lti.oauth2.authorize.max.expiration', 1.minute.to_i)
-          expect { authValidator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                                                "the 'exp' must not be any further than #{60.seconds} seconds in the future"
+          expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
+                                                       "the 'exp' must not be any further than #{60.seconds} seconds in the future"
         end
 
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'exp' is in the past" do
           raw_jwt['exp'] = 5.minutes.ago.to_i
-          expect { authValidator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt, "the JWT has expired"
+          expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt, "the JWT has expired"
         end
 
 
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'iat' to old" do
           raw_jwt['iat'] = 10.minutes.ago.to_i
           Setting.set('lti.oauth2.authorize.max_iat_age', 5.minutes.to_s)
-          expect { authValidator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                                                "the 'iat' must be less than #{5.minutes} seconds old"
+          expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
+                                                       "the 'iat' must be less than #{5.minutes} seconds old"
         end
 
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'iat' is in the future" do
           raw_jwt['iat'] = 10.minutes.from_now.to_i
-          expect { authValidator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                                                "the 'iat' must not be in the future"
+          expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
+                                                       "the 'iat' must not be in the future"
         end
 
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'jti' has already been used" do
           enable_cache do
-            authValidator.jwt
+            auth_validator.jwt
             duplicate_jwt = AuthorizationValidator.new(
               jwt: raw_jwt.sign(tool_proxy.shared_secret, :HS256).to_s,
               authorization_url: auth_url
@@ -134,8 +130,8 @@ module Lti
 
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'aud' is not the authorization endpoint" do
           raw_jwt['aud'] = 'http://google.com/invalid'
-          expect { authValidator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                                                "the 'aud' must be the LTI Authorization endpoint"
+          expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
+                                                       "the 'aud' must be the LTI Authorization endpoint"
         end
 
         it "raises Lti::Oauth2::AuthorizationValidator::SecretNotFound if no ToolProxy or developer key" do
@@ -148,30 +144,38 @@ module Lti
         end
 
         context "JWT signed with dev key" do
-          let(:authValidator) do
-            AuthorizationValidator.new(
-              jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
-              authorization_url: auth_url
-            )
-          end
+            let(:auth_validator) do
+              AuthorizationValidator.new(
+                jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
+                authorization_url: auth_url,
+                code: 'reg_key'
+              )
+            end
 
-          it "returns the decoded JWT" do
-            expect(authValidator.jwt.signature).to eq raw_jwt_dev_key.sign(dev_key.api_key, :HS256).signature
-          end
+            it 'throws an exception if no code is provided' do
+              auth_validator = AuthorizationValidator.new(
+                jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
+                authorization_url: auth_url)
+              expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::MissingAuthorizationCode
+            end
+
+            it "returns the decoded JWT" do
+              expect(auth_validator.jwt.signature).to eq raw_jwt_dev_key.sign(dev_key.api_key, :HS256).signature
+            end
         end
-
       end
 
       describe "#developer_key" do
-        let(:authValidator) do
+        let(:auth_validator) do
           AuthorizationValidator.new(
             jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
-            authorization_url: auth_url
+            authorization_url: auth_url,
+            code: '123'
           )
         end
 
         it 'gets the correct developer key' do
-          expect(authValidator.developer_key).to eq dev_key
+          expect(auth_validator.developer_key).to eq dev_key
         end
 
         it 'returns nil if developer key not found' do
@@ -195,7 +199,8 @@ module Lti
         it 'returns the developer key global id if dev key is present' do
           validator = AuthorizationValidator.new(
             jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
-            authorization_url: auth_url
+            authorization_url: auth_url,
+            code: '123'
           )
           expect(validator.sub).to eq dev_key.global_id
         end
@@ -204,30 +209,30 @@ module Lti
       describe "#tool_proxy" do
 
         it 'returns the tool_proxy from the uuid specified in the sub' do
-          expect(authValidator.tool_proxy).to eq tool_proxy
+          expect(auth_validator.tool_proxy).to eq tool_proxy
         end
 
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the Tool Proxy is not using a split secret" do
           tool_proxy.stubs(:raw_data).returns({'enabled_capability' => []})
-          expect { authValidator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                                                "the Tool Proxy must be using a split secret"
+          expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
+                                                       "the Tool Proxy must be using a split secret"
         end
 
         it "accepts OAuth.splitSecret capability for backwards compatability" do
           tool_proxy.stubs(:raw_data).returns({'enabled_capability' => ['OAuth.splitSecret']})
-          expect(authValidator.tool_proxy).to eq tool_proxy
+          expect(auth_validator.tool_proxy).to eq tool_proxy
         end
 
         it "requires an associated developer_key on the product_family" do
           product_family.stubs(:developer_key).returns nil
-          expect{authValidator.tool_proxy}.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                                                    "the Tool Proxy must be associated to a developer key"
+          expect { auth_validator.tool_proxy }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
+                                                              "the Tool Proxy must be associated to a developer key"
         end
 
-        it "requires an associated developer_key on the product_family" do
-          developer_key.stubs(:active?).returns false
-          expect{authValidator.tool_proxy}.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                                                    "the Developer Key is not active"
+        it "requires an active developer_key" do
+          dev_key.stubs(:active?).returns false
+          expect { auth_validator.tool_proxy }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
+                                                              "the Developer Key is not active"
         end
 
       end

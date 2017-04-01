@@ -40,6 +40,7 @@ class AssignmentsController < ApplicationController
       log_asset_access([ "assignments", @context ], 'assignments', 'other')
 
       add_crumb(t('#crumbs.assignments', "Assignments"), named_context_url(@context, :context_assignments_url))
+      sis_name = @context.respond_to?(:assignments) ? AssignmentUtil.post_to_sis_friendly_name(@context.assignments.first) : 'SIS'
 
       # It'd be nice to do this as an after_create, but it's not that simple
       # because of course import/copy.
@@ -47,7 +48,9 @@ class AssignmentsController < ApplicationController
       set_js_assignment_data # in application_controller.rb, because the assignments page can be shared with the course home
 
       js_env(WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
-             POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value])
+             POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
+             SIS_NAME: sis_name,
+             QUIZ_LTI_ENABLED: @context.quiz_lti_tool.present?)
 
       respond_to do |format|
         format.html do
@@ -348,6 +351,8 @@ class AssignmentsController < ApplicationController
       @assignment.lti_context_id = secure_params[:lti_context_id]
     end
 
+    @assignment.quiz_lti! if params.key?(:quiz_lti)
+
     @assignment.workflow_state ||= "unpublished"
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
@@ -380,6 +385,7 @@ class AssignmentsController < ApplicationController
     elsif @context.feature_enabled?(:conditional_release) && params[:submission_types] == 'wiki_page'
       redirect_to new_polymorphic_url([@context, :wiki_page], index_edit_params)
     else
+      @assignment.quiz_lti! if params.key?(:quiz_lti)
       edit
     end
   end
@@ -440,7 +446,7 @@ class AssignmentsController < ApplicationController
         GROUP_CATEGORIES: group_categories,
         HAS_GRADED_SUBMISSIONS: @assignment.graded_submissions_exist?,
         KALTURA_ENABLED: !!feature_enabled?(:kaltura),
-        MULTIPLE_GRADING_PERIODS_ENABLED: @context.feature_enabled?(:multiple_grading_periods),
+        HAS_GRADING_PERIODS: @context.grading_periods?,
         PLAGIARISM_DETECTION_PLATFORM: @context.root_account.feature_enabled?(:plagiarism_detection_platform),
         POST_TO_SIS: post_to_sis,
         SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@assignment),
@@ -472,7 +478,7 @@ class AssignmentsController < ApplicationController
       hash[:SELECTED_CONFIG_TOOL_ID] = selected_tool ? selected_tool.id : nil
       hash[:SELECTED_CONFIG_TOOL_TYPE] = selected_tool ? selected_tool.class.to_s : nil
 
-      if @context.feature_enabled?(:multiple_grading_periods)
+      if @context.grading_periods?
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
       end
       append_sis_data(hash)
@@ -483,52 +489,6 @@ class AssignmentsController < ApplicationController
       js_env(hash)
       conditional_release_js_env(@assignment)
       render :edit
-    end
-  end
-
-  def update
-    @assignment = @context.assignments.find(params[:id])
-    if authorized_action(@assignment, @current_user, :update)
-      assignment_params = params[:assignment] ? strong_assignment_params : []
-      assignment_params[:time_zone_edited] = Time.zone.name
-
-      @assignment.post_to_sis = assignment_params[:post_to_sis] if assignment_params.has_key?(:post_to_sis)
-      @assignment.updating_user = @current_user
-      if params[:assignment][:default_grade]
-        params[:assignment][:overwrite_existing_grades] = (params[:assignment][:overwrite_existing_grades] == "1")
-        @assignment.set_default_grade(params[:assignment])
-        render :json => @assignment.submissions.map{ |s| s.as_json(:include => :quiz_submission) }
-        return
-      end
-      params[:assignment].delete :default_grade
-      params[:assignment].delete :overwrite_existing_grades
-      if params[:publish]
-        @assignment.workflow_state = 'published'
-      end
-      if Assignment.assignment_type?(params[:assignment_type])
-        assignment_params[:submission_types] = Assignment.get_submission_type(params[:assignment_type])
-      end
-      respond_to do |format|
-        @assignment.content_being_saved_by(@current_user)
-        group = get_assignment_group(params[:assignment])
-        @assignment.assignment_group = group if group
-        if @assignment.update_attributes(assignment_params)
-          log_asset_access(@assignment, "assignments", @assignment_group, 'participate')
-          @assignment.context_module_action(@current_user, :contributed)
-          @assignment.reload
-          flash[:notice] = t 'notices.updated', "Assignment was successfully updated."
-          format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment) }
-          format.json do
-            render json: @assignment.as_json(
-              permissions: { user: @current_user, session: session },
-              include: [:quiz, :discussion_topic, :wiki_page]
-            ), status: :ok
-          end
-        else
-          format.html { render :edit }
-          format.json { render :json => @assignment.errors, :status => :bad_request }
-        end
-      end
     end
   end
 
@@ -584,6 +544,6 @@ class AssignmentsController < ApplicationController
   end
 
   def index_edit_params
-    params.slice(*[:title, :due_at, :points_possible, :assignment_group_id, :return_to])
+    params.permit(:title, :due_at, :points_possible, :assignment_group_id, :return_to)
   end
 end

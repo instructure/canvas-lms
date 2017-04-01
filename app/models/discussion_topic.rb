@@ -37,9 +37,9 @@ class DiscussionTopic < ActiveRecord::Base
   restrict_columns :content, [:title, :message]
   restrict_columns :settings, [:delayed_post_at, :require_initial_post, :discussion_type,
                                :lock_at, :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating]
-  restrict_columns :settings, Assignment::RESTRICTED_SETTINGS
+  restrict_assignment_columns
 
-  attr_accessor :user_has_posted, :saved_by
+  attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'
@@ -120,6 +120,12 @@ class DiscussionTopic < ActiveRecord::Base
     if self.has_group_category?
       self.subtopics_refreshed_at ||= Time.parse("Jan 1 2000")
     end
+
+    [
+      :could_be_locked, :podcast_enabled, :podcast_has_student_posts,
+      :require_initial_post, :pinned, :locked, :allow_rating,
+      :only_graders_can_rate, :sort_by_rating
+    ].each { |attr| self[attr] = false if self[attr].nil? }
   end
   protected :default_values
 
@@ -584,12 +590,6 @@ class DiscussionTopic < ActiveRecord::Base
     save! unless opts[:without_save]
   end
   alias_method :unlock!, :unlock
-
-  # deprecated with draft state: use publish+available_[from|until] machinery instead
-  # you probably want available?
-  def locked?
-    locked.nil? ? workflow_state == 'locked' : locked
-  end
 
   def published?
     return false if workflow_state == 'unpublished'

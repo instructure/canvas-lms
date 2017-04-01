@@ -24,7 +24,7 @@ describe "/gradebooks/grade_summary" do
     course_with_student
     view_context
     a = @course.assignments.create!(:title => "some assignment")
-    assigns[:presenter] = GradeSummaryPresenter.new(@course, @user, nil)
+    assign(:presenter, GradeSummaryPresenter.new(@course, @user, nil))
     render "gradebooks/grade_summary"
     expect(response).not_to be_nil
   end
@@ -34,7 +34,7 @@ describe "/gradebooks/grade_summary" do
     @course.hide_final_grades = true
     view_context
     a = @course.assignments.create!(:title => "some assignment")
-    assigns[:presenter] = GradeSummaryPresenter.new(@course, @user, nil)
+    assign(:presenter, GradeSummaryPresenter.new(@course, @user, nil))
     render "gradebooks/grade_summary"
     expect(response).not_to be_nil
     page = Nokogiri('<document>' + response.body + '</document>')
@@ -48,7 +48,7 @@ describe "/gradebooks/grade_summary" do
     @user = @teacher
     view_context
     a = @course.assignments.create!(:title => "some assignment")
-    assigns[:presenter] = presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+    presenter = assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
     expect(presenter.student_enrollment).not_to be_nil
     render "gradebooks/grade_summary"
     expect(response).not_to be_nil
@@ -64,7 +64,7 @@ describe "/gradebooks/grade_summary" do
     sub = a.submit_homework @student, :submission_type => "online_text_entry", :body => "o hai"
     sub.add_comment :author => @teacher, :media_comment_id => '0_abcdefgh', :media_comment_type => 'audio'
     sub.add_comment :author => @teacher, :media_comment_id => '0_ijklmnop', :media_comment_type => 'video'
-    assigns[:presenter] = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+    assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
     render "gradebooks/grade_summary"
     doc = Nokogiri::HTML::DocumentFragment.parse response.body
     expect(doc.at_css('.audio_comment ~ span.media_comment_id').text).to eql '0_abcdefgh'
@@ -78,7 +78,7 @@ describe "/gradebooks/grade_summary" do
     view_context
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 10)
     a.grade_student(@student, grade: "10", grader: @teacher)
-    assigns[:presenter] = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+    assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
     render "gradebooks/grade_summary"
     expect(response).not_to be_nil
     expect(response.body).to match(/Test Student scores are not included in grade statistics./)

@@ -113,11 +113,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns a class or nil.
   def self.collaboration_class(type)
-    config_exists = Collaboration.collaboration_types.map { |collaboration|
-      collaboration['type'].titleize.gsub(/\s/, '')
-    }.include?(type)
-
-    if config_exists && klass = "#{type}Collaboration".constantize
+    if klass = "#{type}Collaboration".constantize
       klass.ancestors.include?(Collaboration) && klass.config ? klass : nil
     end
   rescue NameError

@@ -669,7 +669,7 @@ describe LearningOutcome do
         expect(@outcome.grants_right?(@user, :update)).to be_truthy
       end
 
-      it "should not grant :read to users without :read_outcomes on the context" do
+      it "should not grant :update to users without :read_outcomes on the context" do
         student_in_course(:active_enrollment => 1)
         expect(@outcome.grants_right?(User.new, :update)).to be_falsey
       end

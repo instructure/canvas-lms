@@ -134,9 +134,10 @@ describe CoursesController do
         @student = user_factory
 
         # by course date, unrestricted
-        course1 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago,
-                                                  restrict_enrollments_to_course_dates: false,
-                                                  name: 'One'
+        course1 = Account.default.courses.create! start_at: 2.months.ago,
+          conclude_at: 1.month.ago, # oh hey this already "ended" (not really because it's unrestricted) but whatever
+          restrict_enrollments_to_course_dates: false,
+          name: 'One'
         course1.offer!
         enrollment1 = course_with_student course: course1, user: @student, active_all: true
 
@@ -153,11 +154,18 @@ describe CoursesController do
         enrollment3.course.enrollment_term = past_term
         enrollment3.course.save!
 
+        # by course date, unrestricted but the course dates aren't over yet
+        course4 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.from_now,
+          restrict_enrollments_to_course_dates: false,
+          name: 'Fore'
+        course4.offer!
+        enrollment4 = course_with_student course: course4, user: @student, active_all: true
+
         user_session(@student)
         get 'index'
         expect(response).to be_success
-        expect(assigns[:past_enrollments]).to eq [enrollment3, enrollment2]
-        expect(assigns[:current_enrollments]).to eq [enrollment1]
+        expect(assigns[:past_enrollments]).to match_array([enrollment3, enrollment2, enrollment1])
+        expect(assigns[:current_enrollments]).to eq [enrollment4]
         expect(assigns[:future_enrollments]).to be_empty
       end
 
@@ -228,8 +236,7 @@ describe CoursesController do
         # no dates at all
         enrollment1 = student_in_course active_all: true, course_name: 'A'
 
-        # past date that doesn't count
-        course2 = Account.default.courses.create! start_at: 2.weeks.ago, conclude_at: 1.week.ago,
+        course2 = Account.default.courses.create! start_at: 2.weeks.ago, conclude_at: 1.week.from_now,
                                                   restrict_enrollments_to_course_dates: false,
                                                   name: 'B'
         course2.offer!
@@ -816,6 +823,20 @@ describe CoursesController do
         expect(controller.js_env[:COURSE_HOME]).to be_truthy
         expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_truthy
         expect(controller.js_env[:ANNOUNCEMENT_LIMIT]).to eq(3)
+      end
+
+      it "should not show announcements for public users" do
+        @course1.default_view = "wiki"
+        @course1.show_announcements_on_home_page = true
+        @course1.home_page_announcement_limit = 3
+        @course1.is_public = true
+        @course1.save!
+        @course1.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
+        remove_user_session
+        get 'show', :id => @course1.id
+        expect(response).to be_success
+        expect(controller.js_env[:COURSE_HOME]).to be_truthy
+        expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_falsey
       end
 
       it "should work for syllabus view" do

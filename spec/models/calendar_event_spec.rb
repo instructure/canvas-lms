@@ -529,7 +529,7 @@ describe CalendarEvent do
 
       expect(appointment.reserve_for(@student1, @student1)).not_to be_nil
       expect(appointment.reserve_for(@other_student, @other_student)).not_to be_nil
-      expect { appointment.reserve_for(@unlucky_student, @unlucky_student) }.to raise_error
+      expect { appointment.reserve_for(@unlucky_student, @unlucky_student) }.to raise_error(CalendarEvent::ReservationError)
     end
 
     it "should give preference to the calendar's appointment limit" do
@@ -552,7 +552,7 @@ describe CalendarEvent do
       expect(appointment.reserve_for(@student1, @student1)).not_to be_nil
       expect(appointment.reserve_for(s1, s1)).not_to be_nil
       expect(appointment.reserve_for(s2, s2)).not_to be_nil
-      expect { expect(appointment.reserve_for(s3, s3)).not_to be_nil }.to raise_error
+      expect { appointment.reserve_for(s3, s3) }.to raise_error(CalendarEvent::ReservationError)
 
       # should be able to unset the participant limit too
       appointment.participants_per_appointment = nil
@@ -590,7 +590,7 @@ describe CalendarEvent do
       appointment2 = ag.appointments.last
 
       appointment.reserve_for(@student1, @student1)
-      expect { appointment2.reserve_for(@student1, @student1) }.to raise_error
+      expect { appointment2.reserve_for(@student1, @student1) }.to raise_error(CalendarEvent::ReservationError)
     end
 
     it "should cancel existing reservations if cancel_existing = true" do
@@ -629,7 +629,7 @@ describe CalendarEvent do
       ag.publish!
       appointment = ag.appointments.first
 
-      expect { appointment.reserve_for(@student1, @student1) }.to raise_error
+      expect { appointment.reserve_for(@student1, @student1) }.to raise_error(CalendarEvent::ReservationError)
     end
 
     it "should enforce the group category" do
@@ -646,7 +646,7 @@ describe CalendarEvent do
       appointment = ag.appointments.first
       ag.publish!
 
-      expect { appointment.reserve_for(g2, teacher) }.to raise_error
+      expect { appointment.reserve_for(g2, teacher) }.to raise_error(CalendarEvent::ReservationError)
       expect { appointment.reserve_for(g1, teacher) }.not_to raise_error
     end
 
@@ -664,7 +664,7 @@ describe CalendarEvent do
       user_factory(active_all: true)
       @course.enroll_teacher(@user).accept!
       expect(@ag.eligible_participant?(@user)).to be_falsey
-      expect { @appointment.reserve_for(@user, @user) }.to raise_error
+      expect { @appointment.reserve_for(@user, @user) }.to raise_error(CalendarEvent::ReservationError)
     end
 
     it "should lock the appointment once it is reserved" do

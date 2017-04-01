@@ -566,6 +566,20 @@ describe User do
       expect(user2.courses_with_primary_enrollment.map(&:id)).to eq [c1.id, c2.id]
     end
 
+    it 'filters out enrollments for deleted courses' do
+      student_in_course(active_course: true)
+      expect(@user.current_and_invited_courses.count).to eq 1
+      Course.where(id: @course).update_all(workflow_state: 'deleted')
+      expect(@user.current_and_invited_courses.count).to eq 0
+    end
+
+    it 'excludes deleted courses in cached_invitations' do
+      student_in_course(active_course: true)
+      expect(@user.cached_invitations.count).to eq 1
+      Course.where(id: @course).update_all(workflow_state: 'deleted')
+      expect(@user.cached_invitations.count).to eq 0
+    end
+
     describe 'with cross sharding' do
       specs_require_sharding
 
@@ -1659,7 +1673,7 @@ describe User do
 
     it "doesn't create channels with empty paths" do
       @user = User.create!
-      expect(-> {@user.email = ''}).to raise_error("Validation failed: Path can't be blank")
+      expect(-> {@user.email = ''}).to raise_error("Validation failed: Path can't be blank, Email is invalid")
       expect(@user.communication_channels.any?).to be_falsey
     end
   end
@@ -2010,11 +2024,6 @@ describe User do
       it "should return the assignments with an override" do
         assignment = create_course_with_assignment_needing_submitting({override: true, student: @student})
         expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_truthy
-      end
-
-      it "should not return the assignments without an override" do
-        assignment = create_course_with_assignment_needing_submitting({override: false, student: @student})
-        expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
       end
     end
 
@@ -3168,9 +3177,4 @@ describe User do
   end
 
   it { is_expected.to have_many(:submission_comment_participants) }
-  it do
-    is_expected.to have_many(:submission_comments).
-      conditions(-> { published }).
-        through(:submission_comment_participants)
-  end
 end

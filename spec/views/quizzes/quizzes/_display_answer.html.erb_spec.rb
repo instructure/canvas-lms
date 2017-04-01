@@ -24,7 +24,7 @@ describe "/quizzes/quizzes/_display_answer" do
   it "should render" do
     course_with_student
     view_context
-    assigns[:quiz] = @course.quizzes.create!
+    assign(:quiz, @course.quizzes.create!)
     answer = {}
     answer[:id] = 5
     answer[:weight] = 100

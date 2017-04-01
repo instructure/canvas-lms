@@ -8,6 +8,8 @@ define [
 
   defaultProps =
     title: "Spring"
+    weight: 50
+    weighted: false
     startDate: new Date("2015-03-01T00:00:00Z")
     endDate: new Date("2015-05-31T00:00:00Z")
     closeDate: new Date("2015-06-07T00:00:00Z")
@@ -60,16 +62,21 @@ define [
   test 'displays the correct attributes', ->
     gradingPeriod = @renderComponent()
     equal gradingPeriod.refs.title.textContent, "Spring"
-    equal gradingPeriod.refs.startDate.textContent, "Mar 1, 2015 at 12am"
-    equal gradingPeriod.refs.endDate.textContent, "May 31, 2015 at 12am"
+    equal gradingPeriod.refs.startDate.textContent, "Mar 1, 2015"
+    equal gradingPeriod.refs.endDate.textContent, "May 31, 2015"
+    equal gradingPeriod.refs.weight, null
 
   test 'displays the assigned close date', ->
     gradingPeriod = @renderComponent()
-    equal gradingPeriod.refs.closeDate.textContent, "Jun 7, 2015 at 12am"
+    equal gradingPeriod.refs.closeDate.textContent, "Jun 7, 2015"
 
   test 'uses the end date when close date is not defined', ->
     gradingPeriod = @renderComponent(closeDate: null)
-    equal gradingPeriod.refs.closeDate.textContent, "May 31, 2015 at 12am"
+    equal gradingPeriod.refs.closeDate.textContent, "May 31, 2015"
+
+  test 'displays weight only when weighted is true', ->
+    gradingPeriod = @renderComponent(weighted: true)
+    equal gradingPeriod.refs.weight.textContent, "50%"
 
   QUnit.module "GradingPeriod with 'readOnly' set to true",
     renderComponent: (opts = {}) ->
@@ -100,20 +107,22 @@ define [
     notEqual gradingPeriod.refs.title.type, "INPUT"
     notEqual gradingPeriod.refs.startDate.type, "INPUT"
     notEqual gradingPeriod.refs.endDate.type, "INPUT"
+    equal gradingPeriod.refs.weight, null
 
   test 'displays the correct attributes', ->
     gradingPeriod = @renderComponent()
     equal gradingPeriod.refs.title.textContent, "Spring"
-    equal gradingPeriod.refs.startDate.textContent, "Mar 1, 2015 at 12am"
-    equal gradingPeriod.refs.endDate.textContent, "May 31, 2015 at 12am"
+    equal gradingPeriod.refs.startDate.textContent, "Mar 1, 2015"
+    equal gradingPeriod.refs.endDate.textContent, "May 31, 2015"
+    equal gradingPeriod.refs.weight, null
 
   test 'displays the assigned close date', ->
     gradingPeriod = @renderComponent()
-    equal gradingPeriod.refs.closeDate.textContent, "Jun 7, 2015 at 12am"
+    equal gradingPeriod.refs.closeDate.textContent, "Jun 7, 2015"
 
   test 'uses the end date when close date is not defined', ->
     gradingPeriod = @renderComponent(closeDate: null)
-    equal gradingPeriod.refs.closeDate.textContent, "May 31, 2015 at 12am"
+    equal gradingPeriod.refs.closeDate.textContent, "May 31, 2015"
 
   QUnit.module 'editable GradingPeriod',
     renderComponent: (opts = {}) ->
@@ -133,16 +142,18 @@ define [
     equal gradingPeriod.refs.title.tagName, "INPUT"
     equal gradingPeriod.refs.startDate.tagName, "INPUT"
     equal gradingPeriod.refs.endDate.tagName, "INPUT"
+    equal gradingPeriod.refs.weight, null
 
   test 'displays the correct attributes', ->
     gradingPeriod = @renderComponent()
     equal gradingPeriod.refs.title.value, "Spring"
-    equal gradingPeriod.refs.startDate.value, "Mar 1, 2015 at 12am"
-    equal gradingPeriod.refs.endDate.value, "May 31, 2015 at 12am"
+    equal gradingPeriod.refs.startDate.value, "Mar 1, 2015"
+    equal gradingPeriod.refs.endDate.value, "May 31, 2015"
+    equal gradingPeriod.refs.weight, null
 
   test 'uses the end date for close date', ->
     gradingPeriod = @renderComponent()
-    equal gradingPeriod.refs.closeDate.textContent, "May 31, 2015 at 12am"
+    equal gradingPeriod.refs.closeDate.textContent, "May 31, 2015"
 
   test "calls onClick handler for clicks on 'delete grading period'", ->
     deleteSpy = sinon.spy()

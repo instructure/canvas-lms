@@ -26,14 +26,14 @@ describe "accounts/_add_course_or_user.html.erb" do
       @account.allow_sis_import = true
       @account.save
 
-      assigns[:account] = @account
-      assigns[:root_account] = @account
+      assign(:account, @account)
+      assign(:root_account, @account)
     end
 
     it "should show to sis admin" do
       admin = account_admin_user
       view_context(@account, admin)
-      assigns[:current_user] = admin
+      assign(:current_user, admin)
       render
       expect(response).to have_tag("input#pseudonym_sis_user_id")
     end
@@ -41,7 +41,7 @@ describe "accounts/_add_course_or_user.html.erb" do
     it "should not show to non-sis admin" do
       admin = account_admin_user_with_role_changes(:role_changes => {'manage_sis' => false})
       view_context(@account, admin)
-      assigns[:current_user] = admin
+      assign(:current_user, admin)
       render
       expect(response).not_to have_tag("input#pseudonym_sis_source_id")
     end
@@ -53,14 +53,14 @@ describe "accounts/_add_course_or_user.html.erb" do
       @account.allow_sis_import = false
       @account.save
 
-      assigns[:account] = @account
-      assigns[:root_account] = @account
+      assign(:account, @account)
+      assign(:root_account, @account)
     end
 
     it "should not show to sis admin, because there are no sis batches" do
       admin = account_admin_user
       view_context(@account, admin)
-      assigns[:current_user] = admin
+      assign(:current_user, admin)
       render
       expect(response).not_to have_tag("input#pseudonym_sis_user_id")
     end
@@ -68,7 +68,7 @@ describe "accounts/_add_course_or_user.html.erb" do
     it "should not show to non-sis admin" do
       admin = account_admin_user_with_role_changes(:role_changes => {'manage_sis' => false})
       view_context(@account, admin)
-      assigns[:current_user] = admin
+      assign(:current_user, admin)
       render
       expect(response).not_to have_tag("input#pseudonym_sis_source_id")
     end

@@ -21,10 +21,16 @@ define([
   'jquery',
   'helpers/fakeENV',
   'i18n!gradebook',
+  'spec/jsx/gradebook/GradeCalculatorSpecHelper',
   'jsx/gradebook/CourseGradeCalculator',
   'grade_summary'
-], (_, $, fakeENV, I18n, CourseGradeCalculator, grade_summary) => { // eslint-disable-line camelcase
+], (
+  _, $, fakeENV, I18n, GradeCalculatorSpecHelper, CourseGradeCalculator,
+  grade_summary // eslint-disable-line camelcase
+) => {
   const $fixtures = $('#fixtures');
+
+  let exampleGrades;
 
   function createAssignmentGroups () {
     return [
@@ -42,29 +48,7 @@ define([
 
   function createExampleGrades () {
     return {
-      group_sums: [
-        {
-          group: {
-            id: '1',
-          },
-          current: {
-            possible: 0,
-            score: 0,
-            submissions: [
-              { submission: { assignment_id: '4', drop: false } },
-              { submission: { assignment_id: '3', drop: false } }
-            ]
-          },
-          final: {
-            possible: 20,
-            score: 0,
-            submissions: [
-              { submission: { assignment_id: '4', drop: false } },
-              { submission: { assignment_id: '3', drop: false } }
-            ]
-          }
-        }
-      ],
+      assignmentGroups: {},
       current: {
         score: 0,
         possible: 0
@@ -78,6 +62,11 @@ define([
 
   function setPageHtmlFixture () {
     $fixtures.html(`
+      <select class="grading_periods_selector">
+        <option value="0" selected>All Grading Periods</option>
+        <option value="701">Grading Period 1</option>
+        <option value="702">Grading Period 2</option>
+      </select>
       <div id="grade_summary_fixture">
         <div class="student_assignment final_grade">
           <span class="grade"></span>
@@ -107,9 +96,38 @@ define([
     fakeENV.teardown();
   }
 
+  QUnit.module('grade_summary.getGradingPeriodSet', {
+    setup () {
+      commonSetup();
+    },
+
+    teardown () {
+      commonTeardown();
+    }
+  });
+
+  test('normalizes the grading period set from the env', function () {
+    ENV.grading_period_set = {
+      id: '1501',
+      grading_periods: [{ id: '701', weight: 50 }, { id: '702', weight: 50 }],
+      weighted: true
+    };
+    const gradingPeriodSet = grade_summary.getGradingPeriodSet();
+    deepEqual(gradingPeriodSet.id, '1501');
+    equal(gradingPeriodSet.gradingPeriods.length, 2);
+    deepEqual(_.map(gradingPeriodSet.gradingPeriods, 'id'), ['701', '702']);
+  });
+
+  test('returns null when the grading period set is not defined in the env', function () {
+    ENV.grading_period_set = undefined;
+    const gradingPeriodSet = grade_summary.getGradingPeriodSet();
+    deepEqual(gradingPeriodSet, null);
+  });
+
   QUnit.module('grade_summary.calculateTotals', {
     setup () {
       commonSetup();
+      ENV.assignment_groups = createAssignmentGroups();
       this.stub($, 'screenReaderFlashMessageExclusive');
       setPageHtmlFixture();
     },
@@ -230,7 +248,15 @@ define([
       ENV.submissions = createSubmissions();
       ENV.assignment_groups = createAssignmentGroups();
       ENV.group_weighting_scheme = 'points';
-      this.stub(CourseGradeCalculator, 'calculate').returns('expected');
+      ENV.grading_period_set = {
+        id: '1501',
+        grading_periods: [{ id: '701', weight: 50 }, { id: '702', weight: 50 }],
+        weighted: true
+      };
+      ENV.effective_due_dates = { 201: { 101: { grading_period_id: '701' } } };
+      ENV.student_id = '101';
+      exampleGrades = GradeCalculatorSpecHelper.createCourseGradesWithGradingPeriods();
+      this.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades);
     },
 
     teardown () {
@@ -246,9 +272,40 @@ define([
     equal(args[2], ENV.group_weighting_scheme);
   });
 
-  test('returns the result of grade calculation from the grade calculator', function () {
-    const grades = grade_summary.calculateGrades();
-    equal(grades, 'expected');
+  test('normalizes the grading period set before calculation', function () {
+    grade_summary.calculateGrades();
+    const gradingPeriodSet = CourseGradeCalculator.calculate.getCall(0).args[3];
+    deepEqual(gradingPeriodSet.id, '1501');
+    equal(gradingPeriodSet.gradingPeriods.length, 2);
+    deepEqual(_.map(gradingPeriodSet.gradingPeriods, 'id'), ['701', '702']);
+  });
+
+  test('scopes effective due dates to the user', function () {
+    grade_summary.calculateGrades();
+    const dueDates = CourseGradeCalculator.calculate.getCall(0).args[4];
+    deepEqual(dueDates, { 201: { grading_period_id: '701' } });
+  });
+
+  test('calculates grades without grading period data when the grading period set is not defined', function () {
+    delete ENV.grading_period_set;
+    grade_summary.calculateGrades();
+    const args = CourseGradeCalculator.calculate.getCall(0).args;
+    equal(args[0], ENV.submissions);
+    equal(args[1], ENV.assignment_groups);
+    equal(args[2], ENV.group_weighting_scheme);
+    equal(typeof args[3], 'undefined');
+    equal(typeof args[4], 'undefined');
+  });
+
+  test('calculates grades without grading period data when effective due dates are not defined', function () {
+    delete ENV.effective_due_dates;
+    grade_summary.calculateGrades();
+    const args = CourseGradeCalculator.calculate.getCall(0).args;
+    equal(args[0], ENV.submissions);
+    equal(args[1], ENV.assignment_groups);
+    equal(args[2], ENV.group_weighting_scheme);
+    equal(typeof args[3], 'undefined');
+    equal(typeof args[4], 'undefined');
   });
 
   test('includes muted assignments where "What-If" grades exist', function () {
@@ -258,6 +315,18 @@ define([
     const assignmentGroups = CourseGradeCalculator.calculate.getCall(0).args[1];
     equal(assignmentGroups[0].assignments.length, 2);
     equal(assignmentGroups[1].assignments.length, 1);
+  });
+
+  test('returns course grades when no grading period id is provided', function () {
+    this.stub(grade_summary, 'getSelectedGradingPeriodId').returns(null);
+    const grades = grade_summary.calculateGrades();
+    equal(grades, exampleGrades);
+  });
+
+  test('scopes grades to the provided grading period id', function () {
+    this.stub(grade_summary, 'getSelectedGradingPeriodId').returns('701');
+    const grades = grade_summary.calculateGrades();
+    equal(grades, exampleGrades.gradingPeriods[701]);
   });
 
   QUnit.module('Grade Summary "Show All Details" button', {
@@ -295,5 +364,26 @@ define([
     $('#show_all_details_button').click();
     $('#show_all_details_button').click();
     equal($('#show_all_details_button').text(), 'Show All Details');
+  });
+
+  QUnit.module('grade_summary.getSelectedGradingPeriodId', {
+    setup () {
+      this.$select = document.querySelector('.grading_periods_selector');
+    }
+  });
+
+  test('returns the value of the selected grading period', function () {
+    this.$select.value = '701';
+    equal(grade_summary.getSelectedGradingPeriodId(), '701');
+  });
+
+  test('returns null when "All Grading Periods" is selected', function () {
+    this.$select.value = '0';
+    deepEqual(grade_summary.getSelectedGradingPeriodId(), null);
+  });
+
+  test('returns null when the grading periods selector is not present in the DOM', function () {
+    this.$select.parentNode.removeChild(this.$select);
+    deepEqual(grade_summary.getSelectedGradingPeriodId(), null);
   });
 });

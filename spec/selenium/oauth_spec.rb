@@ -59,10 +59,6 @@ describe "oauth2 flow" do
       course_with_student_logged_in(:active_all => true)
     end
 
-    it "should show remember authorization checkbox for scoped token requests" do
-      get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fwww.example.com&scopes=%2Fauth%2Fuserinfo"
-    end
-
     it "should show no icon if icon_url is not set on the developer key" do
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
       expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})

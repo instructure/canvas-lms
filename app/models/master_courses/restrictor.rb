@@ -28,10 +28,19 @@ module MasterCourses::Restrictor
         current = self.restricted_column_settings[edit_type] || []
         self.restricted_column_settings[edit_type] = (current + columns).uniq
       end
+
+      def restrict_assignment_columns
+        restrict_columns :settings, [:assignment_group_id, :grading_type, :omit_from_final_grade, :submission_types,
+                                     :group_category, :group_category_id, :grade_group_students_individually,
+                                     :peer_reviews, :moderated_grading, :peer_reviews_due_at]
+        restrict_columns :due_dates, [:due_at]
+        restrict_columns :availability_dates, [:lock_at, :unlock_at]
+        restrict_columns :points, [:points_possible]
+      end
     end
 
     def mark_as_importing!(cm)
-      @importing_migration = cm
+      @importing_migration = cm if cm && cm.master_course_subscription
     end
 
     def check_for_restricted_column_changes
@@ -51,11 +60,12 @@ module MasterCourses::Restrictor
       end
     end
 
-    def editing_restricted?(edit_type=:all) # edit_type can be :all, :any, or a specific type: :content, :settings
+   def editing_restricted?(edit_type=:all) # edit_type can be :all, :any, or a specific type: :content, :settings, :due_dates, :availability_dates, :points
       return false unless is_child_content?
 
       restrictions = self.master_course_restrictions
       return false unless restrictions.present?
+      return true if restrictions[:all]
 
       case edit_type
       when :all

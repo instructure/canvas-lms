@@ -6,52 +6,28 @@ define([
   'instructure-ui/Button',
   'i18n!external_tools',
   'jsx/due_dates/DueDateCalendarPicker',
-  'jsx/shared/helpers/accessibleDateFormat'
+  'jsx/shared/helpers/accessibleDateFormat',
+  'jsx/shared/helpers/numberHelper',
+  'compiled/util/round'
 ], function(React, ReactDOM, update, _, { default: Button }, I18n,
-  DueDateCalendarPicker, accessibleDateFormat) {
+  DueDateCalendarPicker, accessibleDateFormat, numberHelper, round) {
 
   const Types = React.PropTypes;
 
-  const buildPeriod = function(attr) {
+  function roundWeight (val) {
+    const value = numberHelper.parse(val);
+    return isNaN(value) ? null : round(value, 2);
+  };
+
+  function buildPeriod (attr) {
     return {
       id:        attr.id,
       title:     attr.title,
+      weight:    roundWeight(attr.weight),
       startDate: attr.startDate,
       endDate:   attr.endDate,
       closeDate: attr.closeDate
     };
-  };
-
-  const hasDistinctCloseDate = ({ endDate, closeDate }) => {
-    return closeDate && !_.isEqual(endDate, closeDate);
-  };
-
-  const mergePeriod = (form, attr) => {
-    return update(form.state.period, {$merge: attr});
-  }
-
-  const changeTitle = function(e) {
-    let period = mergePeriod(this, {title: e.target.value});
-    this.setState({period: period});
-  };
-
-  const changeStartDate = function(date) {
-    let period = mergePeriod(this, {startDate: date});
-    this.setState({period: period});
-  };
-
-  const changeEndDate = function(date) {
-    let attr = {endDate: date};
-    if (!this.state.preserveCloseDate && !hasDistinctCloseDate(this.state.period)) {
-      attr.closeDate = date;
-    }
-    let period = mergePeriod(this, attr);
-    this.setState({period: period});
-  };
-
-  const changeCloseDate = function(date) {
-    let period = mergePeriod(this, {closeDate: date});
-    this.setState({period: period, preserveCloseDate: !!date});
   };
 
   let GradingPeriodForm = React.createClass({
@@ -59,10 +35,12 @@ define([
       period:   Types.shape({
         id:        Types.string.isRequired,
         title:     Types.string.isRequired,
+        weight:    Types.number,
         startDate: Types.instanceOf(Date).isRequired,
         endDate:   Types.instanceOf(Date).isRequired,
         closeDate: Types.instanceOf(Date)
       }),
+      weighted: Types.bool.isRequired,
       disabled: Types.bool.isRequired,
       onSave:   Types.func.isRequired,
       onCancel: Types.func.isRequired
@@ -72,7 +50,7 @@ define([
       let period = buildPeriod(this.props.period || {});
       return {
         period: period,
-        preserveCloseDate: hasDistinctCloseDate(period)
+        preserveCloseDate: this.hasDistinctCloseDate(period)
       };
     },
 
@@ -91,6 +69,43 @@ define([
       if (this.props.onCancel) {
         this.setState({period: buildPeriod({})}, this.props.onCancel);
       }
+    },
+
+    hasDistinctCloseDate: function ({ endDate, closeDate }) {
+      return closeDate && !_.isEqual(endDate, closeDate);
+    },
+
+    mergePeriod: function (attr) {
+      return update(this.state.period, {$merge: attr});
+    },
+
+    changeTitle: function (e) {
+      const period = this.mergePeriod({title: e.target.value});
+      this.setState({period});
+    },
+
+    changeWeight: function (e) {
+      const period = this.mergePeriod({weight: roundWeight(e.target.value)});
+      this.setState({period});
+    },
+
+    changeStartDate: function (date) {
+      const period = this.mergePeriod({startDate: date});
+      this.setState({period});
+    },
+
+    changeEndDate: function (date) {
+      let attr = {endDate: date};
+      if (!this.state.preserveCloseDate && !this.hasDistinctCloseDate(this.state.period)) {
+        attr.closeDate = date;
+      }
+      const period = this.mergePeriod(attr);
+      this.setState({period});
+    },
+
+    changeCloseDate: function (date) {
+      const period = this.mergePeriod({closeDate: date});
+      this.setState({period: period, preserveCloseDate: !!date});
     },
 
     hackTheDatepickers: function() {
@@ -147,6 +162,28 @@ define([
       );
     },
 
+    renderWeightInput: function () {
+      if (!this.props.weighted) return null;
+      return (
+        <div className="ic-Form-control">
+          <label className="ic-Label" htmlFor="weight">
+            {I18n.t('Grading Period Weight')}
+          </label>
+          <div className="input-append">
+            <input
+              id="weight"
+              ref={(ref) => { this.weightInput = ref }}
+              type="text"
+              className="span1"
+              defaultValue={I18n.n(this.state.period.weight)}
+              onChange={this.changeWeight}
+            />
+            <span className="add-on">%</span>
+          </div>
+        </div>
+      );
+    },
+
     render: function() {
       return (
         <div className='GradingPeriodForm'>
@@ -163,7 +200,7 @@ define([
                     className='ic-Input'
                     title={I18n.t('Grading Period Title')}
                     defaultValue={this.state.period.title}
-                    onChange={changeTitle.bind(this)}
+                    onChange={this.changeTitle}
                     type='text'
                   />
                 </div>
@@ -178,7 +215,7 @@ define([
                     dateValue            = {this.state.period.startDate}
                     ref                  = "startDate"
                     dateType             = "due_at"
-                    handleUpdate         = {changeStartDate.bind(this)}
+                    handleUpdate         = {this.changeStartDate}
                     rowKey               = "start-date"
                     labelledBy           = "start-date-label"
                     isFancyMidnight      = {false}
@@ -195,7 +232,7 @@ define([
                     dateValue            = {this.state.period.endDate}
                     ref                  = "endDate"
                     dateType             = "due_at"
-                    handleUpdate         = {changeEndDate.bind(this)}
+                    handleUpdate         = {this.changeEndDate}
                     rowKey               = "end-date"
                     labelledBy           = "end-date-label"
                     isFancyMidnight      = {true}
@@ -212,12 +249,14 @@ define([
                     dateValue            = {this.state.period.closeDate}
                     ref                  = "closeDate"
                     dateType             = "due_at"
-                    handleUpdate         = {changeCloseDate.bind(this)}
+                    handleUpdate         = {this.changeCloseDate}
                     rowKey               = "close-date"
                     labelledBy           = "close-date-label"
                     isFancyMidnight      = {true}
                   />
                 </div>
+
+                {this.renderWeightInput()}
               </div>
             </div>
           </div>

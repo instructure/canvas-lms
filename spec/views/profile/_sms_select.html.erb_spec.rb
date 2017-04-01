@@ -24,8 +24,8 @@ describe "/profile/_sms_select" do
     course_with_student
     view_context
     cc = @user.communication_channels.create!(:path => 'user@example.com')
-    assigns[:other_channels] = [cc]
-    assigns[:sms_channels] = []
+    assign(:other_channels, [cc])
+    assign(:sms_channels, [])
 
     render :partial => "profile/sms_select", :object => cc
     expect(response).not_to be_nil

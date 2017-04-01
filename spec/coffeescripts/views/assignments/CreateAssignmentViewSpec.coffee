@@ -304,7 +304,7 @@ define [
     equal errors["name"][0]["message"], "Name is required!"
 
   test "requires due_at to be in an open grading period if it is being changed and the user is a teacher", ->
-    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
+    ENV.HAS_GRADING_PERIODS = true
     ENV.active_grading_periods = [{
       id: "1"
       start_date: "2103-07-01T06:00:00Z"
@@ -354,38 +354,33 @@ define [
     equal errors["name"].length, 1
     equal errors["name"][0]["message"], "Name is required!"
 
-  test "has an error when a name > 256 chars", ->
+  test "has an error when a name has 257 chars", ->
     view = createView(@assignment3)
     errors = nameLengthHelper(view, 257, false, 30, '0')
     ok errors["name"]
     equal errors["name"].length, 1
-    equal errors["name"][0]["message"], "Name is too long, must be under 256 characters"
+    equal errors["name"][0]["message"], "Name is too long, must be under 257 characters"
 
-  test "allows assignment to save when a name < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is true", ->
+  test "allows assignment to save when a name has 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true", ->
     view = createView(@assignment3)
-    errors = nameLengthHelper(view, 254, false, 30, '1')
+    errors = nameLengthHelper(view, 256, false, 30, '1')
     equal errors.length, 0
 
-  test "allows assignment to save when a name < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is false", ->
+  test "has an error when a name has 11 chars, MAX_NAME_LENGTH is 10 and is required, and post_to_sis is true", ->
     view = createView(@assignment3)
-    errors = nameLengthHelper(view, 254, false, 30, '0')
-    equal errors.length, 0
-
-  test "has an error when a name > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
-    view = createView(@assignment3)
-    errors = nameLengthHelper(view, 7, true, 5, '1')
+    errors = nameLengthHelper(view, 11, true, 10, '1')
     ok errors["name"]
     equal errors["name"].length, 1
     equal errors["name"][0]["message"], "Name is too long, must be under #{ENV.MAX_NAME_LENGTH + 1} characters"
 
-  test "allows assignment to save when name > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is false", ->
+  test "allows assignment to save when name has 11 chars, MAX_NAME_LENGTH is 10 and required, but post_to_sis is false", ->
     view = createView(@assignment3)
-    errors = nameLengthHelper(view, 7, true, 5, '0')
+    errors = nameLengthHelper(view, 11, true, 10, '0')
     equal errors.length, 0
 
-  test "allows assignment to save when name < MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
+  test "allows assignment to save when name has 10 chars, MAX_NAME_LENGTH is 10 and required, and post_to_sis is true", ->
     view = createView(@assignment3)
-    errors = nameLengthHelper(view, 30, true, 30, '1')
+    errors = nameLengthHelper(view, 10, true, 10, '1')
     equal errors.length, 0
 
   test "don't validate name if it is frozen", ->

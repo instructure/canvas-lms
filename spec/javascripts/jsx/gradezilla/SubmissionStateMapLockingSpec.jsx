@@ -11,7 +11,7 @@ define([
 
   function createMap(opts={}) {
     const defaults = {
-      gradingPeriodsEnabled: false,
+      hasGradingPeriods: false,
       selectedGradingPeriodID: '0',
       isAdmin: false
     };
@@ -32,11 +32,11 @@ define([
   // time this is being written a significant amount of work is needed
   // to be able to require javascript files that live in the spec directory
 
-  QUnit.module('SubmissionStateMap with MGP disabled');
+  QUnit.module('SubmissionStateMap without grading periods');
 
   test('submission is locked for a student without assignment visibility', function() {
     const assignment = { id: '1', effectiveDueDates: {}, only_visible_to_overrides: true };
-    const map = createAndSetupMap(assignment, { gradingPeriodsEnabled: false });
+    const map = createAndSetupMap(assignment, { hasGradingPeriods: false });
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
     equal(state.locked, true);
   });
@@ -49,16 +49,16 @@ define([
       in_closed_grading_period: false
     };
 
-    const map = createAndSetupMap(assignment, { gradingPeriodsEnabled: false });
+    const map = createAndSetupMap(assignment, { hasGradingPeriods: false });
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
     equal(state.locked, false);
   });
 
-  QUnit.module('SubmissionStateMap with MGP enabled and all grading periods selected', {
+  QUnit.module('SubmissionStateMap with grading periods and all grading periods selected', {
     setup() {
       this.DATE_IN_CLOSED_PERIOD = '2015-07-15';
       this.DATE_NOT_IN_CLOSED_PERIOD = '2015-08-15';
-      this.mapOptions = { gradingPeriodsEnabled: true, selectedGradingPeriodID: '0' };
+      this.mapOptions = { hasGradingPeriods: true, selectedGradingPeriodID: '0' };
     }
   });
 
@@ -109,12 +109,12 @@ define([
     equal(state.locked, false);
   });
 
-  QUnit.module('SubmissionStateMap with MGP enabled and a non-closed grading period selected', {
+  QUnit.module('SubmissionStateMap with grading periods and a non-closed grading period selected', {
     setup() {
       this.DATE_IN_SELECTED_PERIOD = '2015-07-15';
       this.DATE_NOT_IN_SELECTED_PERIOD = '2015-08-15';
       this.SELECTED_PERIOD_ID = '1';
-      this.mapOptions = { gradingPeriodsEnabled: true, selectedGradingPeriodID: this.SELECTED_PERIOD_ID };
+      this.mapOptions = { hasGradingPeriods: true, selectedGradingPeriodID: this.SELECTED_PERIOD_ID };
     }
   });
 
@@ -144,12 +144,12 @@ define([
     equal(state.locked, false);
   });
 
-  QUnit.module('SubmissionStateMap with MGP enabled and a closed grading period selected', {
+  QUnit.module('SubmissionStateMap with grading periods and a closed grading period selected', {
     setup() {
       this.DATE_IN_SELECTED_PERIOD = '2015-07-15';
       this.DATE_NOT_IN_SELECTED_PERIOD = '2015-08-15';
       this.SELECTED_PERIOD_ID = '1';
-      this.mapOptions = { gradingPeriodsEnabled: true, selectedGradingPeriodID: this.SELECTED_PERIOD_ID };
+      this.mapOptions = { hasGradingPeriods: true, selectedGradingPeriodID: this.SELECTED_PERIOD_ID };
     }
   });
 

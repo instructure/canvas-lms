@@ -38,15 +38,14 @@ define([
       />)
     const missingPeopleSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist')
 
-    const rows = missingPeopleSection.querySelectorAll('tr');
-    equal(rows.length, 3, 'three rows')
-    const headings = rows[0].querySelectorAll('th');
+    const headings = missingPeopleSection.querySelectorAll('thead tr th');
     equal(headings.length, 4, 'four column headings');
-    const createUserBtn = rows[1].querySelectorAll('td')[1].firstChild;
-    equal(createUserBtn.tagName, 'BUTTON', 'create new user button');
-    const nameInput = rows[2].querySelector('input[type="text"]');
+    const rows = missingPeopleSection.querySelectorAll('tbody tr');
+    const createUserBtn = rows[0].querySelectorAll('td')[1].querySelector('button')
+    equal(createUserBtn.innerHTML, 'Click to add a name', 'create new user button');
+    const nameInput = rows[1].querySelector('input[type="text"]');
     ok(nameInput, 'name input');
-    const emailInput = rows[2].querySelector('input[type="email"]');
+    const emailInput = rows[1].querySelector('input[type="email"]');
     ok(emailInput, 'email input');
   });
   test('cannot create users because we don\'t have the URL', () => {

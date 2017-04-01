@@ -18,6 +18,7 @@
 
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
+# NOTE: To update the VariableExpansion docs run `script/generate_lti_variable_substitution_markdown`
 
 module Lti
   class VariableExpander
@@ -101,7 +102,8 @@ module Lti
       end
     end
 
-    # an opaque identifier that uniquely identifies the context that contains the link being launched
+    # an opaque identifier that uniquely identifies the context of the tool launch
+    # @launch_parameter context_id
     # @example
     #   ```
     #   cdca1fe2c392a208bd8a657f8865ddb9ca359534
@@ -111,17 +113,17 @@ module Lti
                        default_name: 'context_id'
 
     # communicates the kind of browser window/frame where the Canvas has launched a tool
-    # associated launch param name: launch_presentation_document_target
+    # @launch_parameter launch_presentation_document_target
     # @example
     #   ```
-    #   ifame
+    #   iframe
     #   ```
     register_expansion 'Message.documentTarget', [],
                        -> { IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME },
                        default_name: 'launch_presentation_document_target'
 
     # returns the current locale
-    # associated launch param name: launch_presentation_locale
+    # @launch_parameter launch_presentation_locale
     # @example
     #   ```
     #   de
@@ -131,7 +133,7 @@ module Lti
                        default_name: 'launch_presentation_locale'
 
     # returns a unique identifier for the Tool Consumer (Canvas)
-    # associated launch param name: 'tool_consumer_instance_guid'
+    # @launch_parameter tool_consumer_instance_guid
     # @example
     #   ```
     #   0dWtgJjjFWRNT41WdQMvrleejGgv7AynCVm3lmZ2:canvas-lms
@@ -193,7 +195,7 @@ module Lti
     register_expansion 'Canvas.account.name', [],
                        -> { lti_helper.account.name }
 
-    # returns the account's sis source id for the current context. Only available if sis_account_id is specified.
+    # returns the account's sis source id for the current context.
     # @example
     #   ```
     #   sis_account_id_1234
@@ -209,7 +211,7 @@ module Lti
     register_expansion 'Canvas.rootAccount.id', [],
                        -> { @root_account.id }
 
-    # returns the root account's sis source id for the current context. Only available if sis_account_id is specified.
+    # returns the root account's sis source id for the current context.
     # @example
     #   ```
     #   sis_account_id_1234
@@ -217,7 +219,7 @@ module Lti
     register_expansion 'Canvas.rootAccount.sisSourceId', [],
                        -> { @root_account.sis_source_id }
 
-    # returns the API URL for the external tool that was launched. Only available for LTI 1.
+    # returns the URL for the external tool that was launched. Only available for LTI 1.
     # @example
     #   ```
     #   http://example.url/path
@@ -228,7 +230,7 @@ module Lti
                        CONTROLLER_GUARD,
                        LTI1_GUARD
 
-    # returns the URL for the common css file. Should always be available.
+    # returns the URL for the common css file.
     # @example
     #   ```
     #   http://example.url/path.css
@@ -247,6 +249,7 @@ module Lti
                        -> { Shard.current.id }
 
     # returns the root account's global id for the current context.
+    # @duplicates Canvas.user.globalId
     # @example
     #   ```
     #   123400000000123
@@ -338,7 +341,7 @@ module Lti
 
     # returns the current course sis source id
     # to return the section source id use Canvas.course.sectionIds
-    # associated launch param name: 'lis_course_section_sourcedid'
+    # @launch_parameter lis_course_section_sourcedid
     # @example
     #   ```
     #   1234
@@ -375,8 +378,8 @@ module Lti
                        -> { lti_helper.concluded_lis_roles },
                        COURSE_GUARD
 
-    # Returns the context ids from the course that the current course was copied from.
-    # Only available when launched in a course that was copied (excludes cartridge imports).
+    # Returns the context ids from the course that the current course was copied from (excludes cartridge imports).
+    #
     # @example
     #   ```
     #   1234
@@ -385,8 +388,8 @@ module Lti
                        -> { lti_helper.previous_lti_context_ids },
                        COURSE_GUARD
 
-    # Returns the course ids of the course that the current course was copied from.
-    # Only available when launched in a course that was copied (excludes cartridge imports).
+    # Returns the course ids of the course that the current course was copied from (excludes cartridge imports).
+    #
     # @example
     #   ```
     #   1234
@@ -395,8 +398,8 @@ module Lti
                        -> { lti_helper.previous_course_ids },
                        COURSE_GUARD
 
-    # Returns the full name of the launching user. Only available when launched by a logged in user.
-    # associated launch param name: lis_person_name_full
+    # Returns the full name of the launching user.
+    # @launch_parameter lis_person_name_full
     # @example
     #   ```
     #   John Doe
@@ -406,8 +409,8 @@ module Lti
                        USER_GUARD,
                        default_name: 'lis_person_name_full'
 
-    # Returns the last name of the launching user. Only available when launched by a logged in user.
-    # associated launch param name: 'lis_person_name_family'
+    # Returns the last name of the launching user.
+    # @launch_parameter lis_person_name_family
     # @example
     #   ```
     #   Doe
@@ -417,8 +420,8 @@ module Lti
                        USER_GUARD,
                        default_name: 'lis_person_name_family'
 
-    # Returns the first name of the launching user. Only available when launched by a logged in user.
-    # associated launch param name: 'lis_person_name_given'
+    # Returns the first name of the launching user.
+    # @launch_parameter lis_person_name_given
     # @example
     #   ```
     #   John
@@ -428,8 +431,8 @@ module Lti
                        USER_GUARD,
                        default_name: 'lis_person_name_given'
 
-    # Returns the primary email of the launching user. Only available when launched by a logged in user.
-    # associated launch param name: 'lis_person_contact_email_primary'
+    # Returns the primary email of the launching user.
+    # @launch_parameter lis_person_contact_email_primary
     # @example
     #   ```
     #   john.doe@example.com
@@ -440,7 +443,7 @@ module Lti
                        default_name: 'lis_person_contact_email_primary'
 
 
-    # Returns the institution assigned email of the launching user. Only available when launched by a logged in user that was added via SIS.
+    # Returns the institution assigned email of the launching user.
     # @example
     #   ```
     #   john.doe@example.com
@@ -448,7 +451,7 @@ module Lti
     register_expansion 'vnd.Canvas.Person.email.sis', [],
                        -> {lti_helper.sis_email}, SIS_USER_GUARD
 
-    # Returns the name of the timezone of the launching user. Only available when launched by a logged in user.
+    # Returns the name of the timezone of the launching user.
     # @example
     #   ```
     #   America/Denver
@@ -457,8 +460,8 @@ module Lti
                        -> { Time.zone.tzinfo.name },
                        USER_GUARD
 
-    # Returns the profile picture URL of the launching user. Only available when launched by a logged in user.
-    # associated launch param name: 'user_image'
+    # Returns the profile picture URL of the launching user.
+    # @launch_parameter user_image
     # @example
     #   ```
     #   https://example.com/picture.jpg
@@ -468,8 +471,9 @@ module Lti
                        USER_GUARD,
                        default_name: 'user_image'
 
-    # Returns the Canvas user_id of the launching user. Only available when launched by a logged in user.
-    # associated launch param name: 'user_id'
+    # Returns the Canvas user_id of the launching user.
+    # @duplicates Canvas.user.id
+    # @launch_parameter user_id
     # @example
     #   ```
     #   420000000000042
@@ -479,7 +483,8 @@ module Lti
                        USER_GUARD,
                        default_name: 'user_id'
 
-    # Returns the Canvas user_id of the launching user. Only available when launched by a logged in user.
+    # Returns the Canvas user_id of the launching user.
+    # @duplicates User.id
     # @example
     #   ```
     #   420000000000042
@@ -488,7 +493,7 @@ module Lti
                        -> { @current_user.id },
                        USER_GUARD
 
-    # Returns the users preference for high contrast colors (an accessibility feature). Only available when launched by a logged in user.
+    # Returns the users preference for high contrast colors (an accessibility feature).
     # @example
     #   ```
     #   false
@@ -508,9 +513,8 @@ module Lti
                             end.join(',') },
                        -> { @current_user && @context.is_a?(Course) }
 
-    # Returns the <a href="https://www.imsglobal.org/specs/ltimemv1p0/specification-3">IMS LTI membership service</a> roles for filtering via query parameters.
-    # Only available when launched by a logged in user.
-    # associated launch param name: 'roles'
+    # Returns the [IMS LTI membership service](https://www.imsglobal.org/specs/ltimemv1p0/specification-3) roles for filtering via query parameters.
+    # @launch_parameter roles
     # @example
     #   ```
     #   http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator
@@ -520,16 +524,17 @@ module Lti
                        USER_GUARD,
                        default_name: 'roles'
 
-    # Returns list of <a href="https://www.imsglobal.org/specs/ltiv1p0/implementation-guide#toc-16" target ="_blank">LIS role full URNs</a>.
-    # Should always be available.
+    # Returns list of [LIS role full URNs](https://www.imsglobal.org/specs/ltiv1p0/implementation-guide#toc-16).
+    # @duplicates ext_roles which is sent by default
     # @example
     #   ```
-    #   http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator
+    #   urn:lti:instrole:ims/lis/Administrator,urn:lti:instrole:ims/lis/Instructor,urn:lti:sysrole:ims/lis/SysAdmin,urn:lti:sysrole:ims/lis/User
     #   ```
     register_expansion 'Canvas.xuser.allRoles', [],
                        -> { lti_helper.all_roles }
 
-    # Returns the Canvas user_id of the launching user. Only available when launched by a logged in user.
+    # Returns the Canvas global user_id of the launching user.
+    # @duplicates Canvas.root_account.global_id
     # @example
     #   ```
     #   420000000000042
@@ -538,7 +543,7 @@ module Lti
                        -> { @current_user.global_id},
                        USER_GUARD
 
-    # Returns true for root account admins and false for all other roles. Only available when launched by a logged in user.
+    # Returns true for root account admins and false for all other roles.
     # @example
     #   ```
     #   true
@@ -547,8 +552,10 @@ module Lti
                       -> { @current_user.roles(@root_account).include? 'root_admin' },
                       USER_GUARD
 
-    # Returns the username/Login ID for the primary pseudonym for the user for the account
-    # This may not be the pseudonym the user is actually logged in with. Only available when pseudonym is in use.
+    # Username/Login ID for the primary pseudonym for the user for the account.
+    # This may not be the pseudonym the user is actually logged in with.
+    # @duplicates Canvas.user.loginId
+    # @example
     #   ```
     #   jdoe
     #   ```
@@ -556,8 +563,10 @@ module Lti
                        -> { sis_pseudonym.unique_id },
                        PSEUDONYM_GUARD
 
-    # Returns the username/Login ID for the primary pseudonym for the user for the account
-    # This may not be the pseudonym the user is actually logged in with. Only available when pseudonym is in use.
+    # Username/Login ID for the primary pseudonym for the user for the account.
+    # This may not be the pseudonym the user is actually logged in with.
+    # @duplicates User.username
+    # @example
     #   ```
     #   jdoe
     #   ```
@@ -566,7 +575,9 @@ module Lti
                        PSEUDONYM_GUARD
 
     # Returns the sis source id for the primary pseudonym for the user for the account
-    # This may not be the pseudonym the user is actually logged in with. Only available when pseudonym is in use.
+    # This may not be the pseudonym the user is actually logged in with.
+    # @duplicates Person.sourcedId
+    # @example
     #   ```
     #   sis_user_42
     #   ```
@@ -575,7 +586,8 @@ module Lti
                        PSEUDONYM_GUARD
 
     # Returns the integration id for the primary pseudonym for the user for the account
-    # This may not be the pseudonym the user is actually logged in with. Only available when pseudonym is in use.
+    # This may not be the pseudonym the user is actually logged in with.
+    # @example
     #   ```
     #   integration_user_42
     #   ```
@@ -584,7 +596,9 @@ module Lti
                        PSEUDONYM_GUARD
 
     # Returns the sis source id for the primary pseudonym for the user for the account
-    # This may not be the pseudonym the user is actually logged in with. Only available when pseudonym is in use.
+    # This may not be the pseudonym the user is actually logged in with.
+    # @duplicates Canvas.user.sisSourceId
+    # @example
     #   ```
     #   sis_user_42
     #   ```
@@ -596,8 +610,9 @@ module Lti
     # Returns the logout service url for the user.
     # This is the pseudonym the user is actually logged in as.
     # It may not hold all the sis info needed in other launch substitutions.
+    # @example
     #   ```
-    #   https://<domain>.instructure.com/api/lti/v1/logout_service/<external_tool_id>-<user_id>-<current_unix_timestamp>-<opaque_id>
+    #   https://<domain>.instructure.com/api/lti/v1/logout_service/<external_tool_id>-<user_id>-<current_unix_timestamp>-<opaque_string>
     #   ```
     register_expansion 'Canvas.logoutService.url', [],
                        -> { @controller.lti_logout_service_url(Lti::LogoutService.create_token(@tool, @current_pseudonym)) },
@@ -607,7 +622,8 @@ module Lti
     # Returns the Canvas user_id for the masquerading user.
     # This is the pseudonym the user is actually logged in as.
     # It may not hold all the sis info needed in other launch substitutions.
-    # Only available when the user is being masqueraded.
+    #
+    # @example
     #   ```
     #   420000000000042
     #   ```
@@ -618,7 +634,8 @@ module Lti
     # Returns the 40 character opaque user_id for masquerading user.
     # This is the pseudonym the user is actually logged in as.
     # It may not hold all the sis info needed in other launch substitutions.
-    # Only available when the user is being masqueraded.
+    #
+    # @example
     #   ```
     #   da12345678cb37ba1e522fc7c5ef086b7704eff9
     #   ```
@@ -627,6 +644,7 @@ module Lti
                        MASQUERADING_GUARD
 
     # Returns the xapi url for the user.
+    # @example
     #   ```
     #   https://<domain>.instructure.com/api/lti/v1/xapi/<external_tool_id>-<user_id>-<course_id>-<current_unix_timestamp>-<opaque_id>
     #   ```
@@ -635,6 +653,7 @@ module Lti
                        -> { @current_user && @context.is_a?(Course) && @tool }
 
     # Returns the caliper url for the user.
+    # @example
     #   ```
     #   https://<domain>.instructure.com/api/lti/v1/caliper/<external_tool_id>-<user_id>-<course_id>-<current_unix_timestamp>-<opaque_id>
     #   ```
@@ -644,7 +663,8 @@ module Lti
                        -> { @current_user && @context.is_a?(Course) && @tool }
 
     # Returns a comma separated list of section_id's that the user is enrolled in.
-    # Only available when launched from a course as an enrolled user.
+    #
+    # @example
     #   ```
     #   42, 43
     #   ```
@@ -653,7 +673,8 @@ module Lti
                        ENROLLMENT_GUARD
 
     # Returns a comma separated list of section sis_id's that the user is enrolled in.
-    # Only available when launched from a course as an enrolled user.
+    #
+    # @example
     #   ```
     #   section_sis_id_1, section_sis_id_2
     #   ```
@@ -662,7 +683,8 @@ module Lti
                        ENROLLMENT_GUARD
 
     # Returns the module_id that the module item was launched from.
-    # Only available when content tag is present.
+    #
+    # @example
     #   ```
     #   1234
     #   ```
@@ -673,7 +695,8 @@ module Lti
                        CONTENT_TAG_GUARD
 
     # Returns the module_item_id of the module item that was launched.
-    # Only available when content tag is present.
+    #
+    # @example
     #   ```
     #   1234
     #   ```
@@ -684,7 +707,8 @@ module Lti
                        CONTENT_TAG_GUARD
 
     # Returns the assignment_id of the assignment that was launched.
-    # Only available when launched as an assignment.
+    #
+    # @example
     #   ```
     #   1234
     #   ```
@@ -693,7 +717,8 @@ module Lti
                        ASSIGNMENT_GUARD
 
     # Returns the title of the assignment that was launched.
-    # Only available when launched as an assignment.
+    #
+    # @example
     #   ```
     #   Deep thought experiment
     #   ```
@@ -702,7 +727,8 @@ module Lti
                        ASSIGNMENT_GUARD
 
     # Returns the points possible of the assignment that was launched.
-    # Only available when launched as an assignment.
+    #
+    # @example
     #   ```
     #   100
     #   ```
@@ -725,8 +751,9 @@ module Lti
                        -> { @assignment.due_at },
                        ASSIGNMENT_GUARD
 
-    # Returns the unlock_at date of the assignment that was launched.
-    # Only available when launched as an assignment.
+    # Returns the `unlock_at` date of the assignment that was launched.
+    # Only available when launched as an assignment with an `unlock_at` set.
+    # @example
     #   ```
     #   YYYY-MM-DDT07:00:00Z
     #   ```
@@ -734,8 +761,10 @@ module Lti
                        -> { @assignment.unlock_at.utc.iso8601 },
                        -> {@assignment && @assignment.unlock_at.present?}
 
-    # Returns the lock_at date of the assignment that was launched.
-    # Only available when launched as an assignment.
+    # Returns the `lock_at` date of the assignment that was launched.
+    # Only available when launched as an assignment with a `lock_at` set.
+    #
+    # @example
     #   ```
     #   YYYY-MM-DDT07:00:00Z
     #   ```
@@ -743,8 +772,10 @@ module Lti
                        -> { @assignment.lock_at.utc.iso8601 },
                        -> {@assignment && @assignment.lock_at.present?}
 
-    # Returns the due_at date of the assignment that was launched.
-    # Only available when launched as an assignment.
+    # Returns the `due_at` date of the assignment that was launched.
+    # Only available when launched as an assignment with a `due_at` set.
+    #
+    # @example
     #   ```
     #   YYYY-MM-DDT07:00:00Z
     #   ```
@@ -752,8 +783,9 @@ module Lti
                        -> { @assignment.due_at.utc.iso8601 },
                        -> {@assignment && @assignment.due_at.present?}
 
-    # Returns the true if the assignment that was launched is published.
+    # Returns true if the assignment that was launched is published.
     # Only available when launched as an assignment.
+    # @example
     #   ```
     #   true
     #   ```
@@ -763,6 +795,7 @@ module Lti
 
     # Returns the endpoint url for accessing link-level tool settings
     # Only available for LTI 2.0
+    # @example
     #   ```
     #   https://<domain>.instructure.com/api/lti/tool_settings/<link_id>
     #   ```
@@ -773,6 +806,7 @@ module Lti
 
     # Returns the endpoint url for accessing context-level tool settings
     # Only available for LTI 2.0
+    # @example
     #   ```
     #   https://<domain>.instructure.com/api/lti/tool_settings/<binding_id>
     #   ```
@@ -783,6 +817,7 @@ module Lti
 
     # Returns the endpoint url for accessing system-wide tool settings
     # Only available for LTI 2.0
+    # @example
     #   ```
     #   https://<domain>.instructure.com/api/lti/tool_settings/<proxy_id>
     #   ```
@@ -790,14 +825,15 @@ module Lti
                        -> { @controller.show_lti_tool_settings_url(@tool_setting_proxy_id) },
                        -> { !!@controller && @tool_setting_proxy_id }
 
-    # Returns the <a href="https://www.imsglobal.org/specs/ltiv2p0/implementation-guide#toc-46" target="_blank">Tool Consumer Profile</a> url for the tool.
+    # Returns the [Tool Consumer Profile](https://www.imsglobal.org/specs/ltiv2p0/implementation-guide#toc-46) url for the tool.
     # Only available for LTI 2.0
+    # @example
     #   ```
     #   https://<domain>.instructure.com/api/lti/courses/<course_id>/tool_consumer_profile/<opaque_id>
     #   https://<domain>.instructure.com/api/lti/accounts/<account_id>/tool_consumer_profile/<opaque_id>
     #   ```
     register_expansion 'ToolConsumerProfile.url', [],
-                       -> { @controller.polymorphic_url([@tool.context, :tool_consumer_profile], tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID)},
+                       -> { @controller.polymorphic_url([@tool.context, :tool_consumer_profile], tool_consumer_profile_id: Lti::ToolConsumerProfile::DEFAULT_TCP_UUID)},
                        CONTROLLER_GUARD,
                        -> { @tool && @tool.is_a?(Lti::ToolProxy) }
 

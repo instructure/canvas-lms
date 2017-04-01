@@ -259,7 +259,7 @@ describe ActiveRecord::Base do
           tries += 1
           Submission.create!(:user => @user, :assignment => @assignment)
         end
-      }.to raise_error # we don't catch the error the last time
+      }.to raise_error(ActiveRecord::RecordNotUnique) # we don't catch the error the last time
       expect(tries).to eql 3
       expect(Submission.count).to eql 1
     end
@@ -298,7 +298,7 @@ describe ActiveRecord::Base do
           tries += 1
           raise "oh crap"
         }
-      }.to raise_error
+      }.to raise_error("oh crap")
       expect(tries).to eql 1
     end
   end
@@ -533,7 +533,7 @@ describe ActiveRecord::Base do
   describe "add_index" do
     it "should raise an error on too long of name" do
       name = 'some_really_long_name_' * 10
-      expect { User.connection.add_index :users, [:id], name: name }.to raise_error
+      expect { User.connection.add_index :users, [:id], name: name }.to raise_error(/Index name .+ is too long/)
     end
   end
 

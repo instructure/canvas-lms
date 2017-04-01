@@ -1,4 +1,5 @@
 public/javascripts/vendor/**/*
 public/javascripts/enzyme_requireJS.js
 
+gems/canvas_i18nliner
 doc/

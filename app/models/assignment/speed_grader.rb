@@ -62,7 +62,7 @@ class Assignment
       res[:context][:students] = students.map do |u|
         json = u.as_json(:include_root => false,
                   :methods => submission_comment_methods,
-                  :only => [:name, :id])
+                  :only => [:name, :id, :sortable_name])
 
         if preloaded_pg_counts
           json[:needs_provisional_grade] = @assignment.student_needs_provisional_grade?(u, preloaded_pg_counts)

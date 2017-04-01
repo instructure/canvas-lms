@@ -159,23 +159,6 @@ describe "discussions" do
         end
       end
 
-      it "should have working unread button", priority: "1", test_id: 150506 do
-        disc1 = @course.discussion_topics.create!(user: teacher, title: 'Philip', message: 'teacher topic message')
-        disc2 = @course.discussion_topics.create!(user: teacher, title: 'Fry', message: 'teacher topic message')
-        disc1.discussion_entries.create(message: "first entry", user: @user)
-        get url
-
-        # verify that both discussions are present as well as the other 2 empty sections
-        expect(ffj('.discussion:visible').size).to eq 3
-
-        # going to this page once will let it be filtered as unread
-        get "/courses/#{course.id}/discussion_topics/#{disc2.id}"
-        get url
-
-        fj('label.ui-button.ui-widget.ui-state-default.ui-button-text-only.ui-corner-left').click
-        expect(ffj('.discussion:visible').size).to eq 2
-      end
-
       it "should have working unread button", priority: "1", test_id: 150505 do
         @course.discussion_topics.create!(user: teacher, title: 'Philip J. Fry', message: 'teacher topic message')
         assignment = @course.assignments.create(title: "discussion assignment", points_possible: 20)
@@ -184,7 +167,6 @@ describe "discussions" do
 
         # verify that both discussions are present as well as the other empty section
         expect(ffj('.discussion:visible').size).to eq 3
-
         fj('label.ui-button.ui-widget.ui-state-default.ui-button-text-only.ui-corner-right:').click
         expect(ffj('.discussion:visible').size).to eq 2
       end

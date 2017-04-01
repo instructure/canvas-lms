@@ -99,10 +99,8 @@ module CoursesHelper
          submission.assignment.respond_to?(:points_possible)
          score_out_of_points_possible(submission.grade, submission.assignment.points_possible)
       else
-        submission.grade.to_s.capitalize
+        i18n_grade(submission.grade, submission.grading_type).to_s.capitalize
       end
-    else
-      nil
     end
   end
 

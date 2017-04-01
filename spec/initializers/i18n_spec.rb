@@ -44,6 +44,26 @@ describe I18n do
     end
   end
 
+  describe "numbers" do
+    it "formats count" do
+      expect(I18n.t({one: "1 thing", other: "%{count} things"}, {count: 1500})).to eq '1,500 things'
+    end
+
+    it "formats interpolated numbers" do
+      expect(I18n.t("user count: %{foo}", {foo: 1500})).to eq "user count: 1,500"
+    end
+
+    it "does not format numbery strings" do
+      expect(I18n.t("user count: %{foo}", {foo: "1500"})).to eq "user count: 1500"
+    end
+
+    it "does not mutate the options" do
+      options = {foo: 1500}
+      I18n.t("user count: %{foo}", options)
+      expect(options[:foo]).to eq 1500
+    end
+  end
+
   describe ".n" do
     before do
       format = {

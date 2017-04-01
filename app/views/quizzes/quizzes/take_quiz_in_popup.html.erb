@@ -3,7 +3,7 @@
 </h1>
 <script type="text/javascript">
   // open the quiz in a popup window with the plugin's given query param hash
-  window.open(<%= raw url_for(params.merge(@query_params).merge(:escape => false, :refresh_ldb => true)).to_json %>);
+  window.open(<%= raw url_for(request.path_parameters.merge(@query_params).merge(:escape => false, :refresh_ldb => true)).to_json %>);
 </script>
 
 <p>

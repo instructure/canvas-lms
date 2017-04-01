@@ -39,9 +39,12 @@
     @body_classes << 'is-masquerading-or-student-view' if @real_current_user && @real_current_user != @current_user
     @body_classes << 'primary-nav-expanded' unless @collapse_global_nav
     @body_classes << 'primary-nav-transitions' if @collapse_global_nav
+    # We probably want to consider doing this everywhere, all the time.
+    @body_classes << 'full-width' if @domain_root_account.try(:feature_enabled?, :new_user_tutorial)
   end
 
   css_bundle(:instructure_eportfolio) if @eportfolio_view === true
+  css_bundle(:new_user_tutorials) if tutorials_enabled?
 
   content_for :head, include_common_stylesheets
 
@@ -81,6 +84,9 @@
         <% end %>
         <%= render_crumbs %>
         <% if @show_left_side %></div><% end %>
+        <% if tutorials_enabled? %>
+          <div class="TutorialToggleHolder"></div>
+        <% end %>
       </div>
     <% end %>
     <div id="main" class="ic-Layout-columns">
@@ -180,6 +186,9 @@
   <% end %>
   <div id='aria_alerts' class='hide-text affix' role="alert" aria-live="assertive"></div>
   <div id='StudentContextTray__Container'></div>
+  <% if tutorials_enabled? %>
+    <div class="NewUserTutorialTray__Container"></div>
+  <% end %>
   <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
 
 </div> <!-- #application -->

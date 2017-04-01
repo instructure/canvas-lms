@@ -23,9 +23,10 @@ describe AccountAuthorizationConfig::Google do
     ap = AccountAuthorizationConfig::Google.new
     ap.hosted_domain = 'instructure.com'
     Canvas::Security.expects(:decode_jwt).returns({'hd' => 'school.edu', 'sub' => '123'})
-    token = stub('token', params: {}, options: {})
+    userinfo = stub('userinfo', parsed: {})
+    token = stub('token', params: {}, options: {}, get: userinfo)
 
-    expect { ap.unique_id(token) }.to raise_error
+    expect { ap.unique_id(token) }.to raise_error('Non-matching hosted domain: "school.edu"')
   end
 
   it 'rejects missing hd' do
@@ -34,7 +35,7 @@ describe AccountAuthorizationConfig::Google do
     Canvas::Security.expects(:decode_jwt).returns({'sub' => '123'})
     token = stub('token', params: {}, options: {})
 
-    expect { ap.unique_id(token) }.to raise_error
+    expect { ap.unique_id(token) }.to raise_error('Non-matching hosted domain: nil')
   end
 
   it "accepts when hosted domain isn't required" do

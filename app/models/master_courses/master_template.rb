@@ -77,22 +77,22 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     end
   end
 
+  def self.migration_id_prefix(shard_id, id)
+    "#{MasterCourses::MIGRATION_ID_PREFIX}#{shard_id}_#{id}_"
+  end
+
   def migration_id_for(obj, prepend="")
     if obj.is_a?(Assignment) && submittable = obj.submittable_object
       obj = submittable # i.e. use the same migration id as the topic on a graded topic's assignment - same restrictions
     end
     key = obj.is_a?(ActiveRecord::Base) ? obj.global_asset_string : obj.to_s
-    "#{MasterCourses::MIGRATION_ID_PREFIX}#{self.shard.id}_#{self.id}_#{Digest::MD5.hexdigest(prepend + key)}"
+    "#{self.class.migration_id_prefix(self.shard.id, self.id)}#{Digest::MD5.hexdigest(prepend + key)}"
   end
 
   def add_child_course!(child_course_or_id)
     MasterCourses::ChildSubscription.unique_constraint_retry do |retry_count|
-      child_sub = nil
-      child_sub = self.child_subscriptions.active.where(:child_course_id => child_course_or_id).first if retry_count > 0
-      child_sub ||= begin
-        key = child_course_or_id.is_a?(Course) ? :child_course : :child_course_id
-        self.child_subscriptions.create!(key => child_course_or_id)
-      end
+      child_sub = self.child_subscriptions.where(:child_course_id => child_course_or_id).first_or_create!
+      child_sub.undestroy if child_sub.deleted?
       child_sub
     end
   end
@@ -147,5 +147,23 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def find_preloaded_restriction(migration_id)
     @preloaded_restrictions[migration_id]
+  end
+
+  def deletions_since_last_export
+    deletions_by_type = {}
+    MasterCourses::ALLOWED_CONTENT_TYPES.each do |klass|
+      item_scope = case klass
+      when 'Attachment'
+        course.attachments.where(:file_state => 'deleted')
+      when 'WikiPage'
+        course.wiki.wiki_pages.where(:workflow_state => 'deleted')
+      else
+        klass.constantize.where(:context_id => course, :context_type => 'Course', :workflow_state => 'deleted')
+      end
+      item_scope = item_scope.where('updated_at>?', last_export_started_at).select(:id)
+      deleted_mig_ids = content_tags.where(content_type: klass, content_id: item_scope).pluck(:migration_id)
+      deletions_by_type[klass] = deleted_mig_ids if deleted_mig_ids.any?
+    end
+    deletions_by_type
   end
 end

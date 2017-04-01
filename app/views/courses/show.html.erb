@@ -64,7 +64,7 @@
           </a>
         <% end %>
 
-        <% if @can_manage %>
+        <% if @can_manage && !@domain_root_account.try(:feature_enabled?, :new_user_tutorial) %>
           <% set_js_course_wizard_data %>
           <% js_bundle :course_wizard %>
           <% css_bundle :course_wizard %>
@@ -159,10 +159,11 @@
     <div class="body Reminder__course-setup-body">
       <p><%= t('Need help setting up your course?') %></p>
       <br/>
-      <a href="#" class="btn btn-primary wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
-        <%= t("Setup Checklist") %>
-      </a>
-      <!-- <button class="btn btn-primary">Setup Checklist</button> -->
+      <% if !@domain_root_account.try(:feature_enabled?, :new_user_tutorial) %>
+        <a href="#" class="btn btn-primary wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
+          <%= t("Setup Checklist") %>
+        </a>
+      <% end %>
     </div>
   </div>
 <% end %>

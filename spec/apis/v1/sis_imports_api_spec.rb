@@ -216,7 +216,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.batch_mode_term).to eq @account.default_enrollment_term
   end
 
-  it "should enable batch mode and require selecting a valid term" do
+  it "should enable batch with sis stickyness" do
     json = api_call(:post,
       "/api/v1/accounts/#{@account.id}/sis_imports.json",
       { controller: 'sis_imports_api', action: 'create',

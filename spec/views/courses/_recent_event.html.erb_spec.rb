@@ -60,7 +60,7 @@ describe "/courses/_recent_event" do
     before do
       course_with_student(active_all: true)
       submission_model
-      assigns[:current_user] = @user
+      assign(:current_user, @user)
     end
 
     it 'shows points possible for an ungraded assignment' do
@@ -111,14 +111,18 @@ describe "/courses/_recent_event" do
     end
 
     it "should show the grade for a non-muted assignment" do
-      render :partial => "courses/recent_event", :object => @quiz.assignment, :locals => { :is_hidden => false, :submissions => [ @submission ] }
-      expect(response.body).to match /#{@submission.grade}/
+      render :partial => "courses/recent_event",
+        :object => @quiz.assignment,
+        :locals => { :is_hidden => false, :submissions => [ @submission ] }
+      expect(response.body).to match(/1,234,567,890/)
     end
 
     it "should not show the grade for a muted assignment" do
       @quiz.assignment.mute!
-      render :partial => "courses/recent_event", :object => @quiz.assignment, :locals => { :is_hidden => false, :submissions => [ @submission ] }
-      expect(response.body).not_to match /#{@submission.grade}/
+      render :partial => "courses/recent_event",
+        :object => @quiz.assignment,
+        :locals => { :is_hidden => false, :submissions => [ @submission ] }
+      expect(response.body).not_to match(/1,234,567,890/)
     end
   end
 end

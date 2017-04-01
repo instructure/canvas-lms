@@ -2,9 +2,13 @@ define([
   'i18n!roster',
   'react',
   './shapes',
-  'instructure-ui'
-], (I18n, React, shapes, {Table, ScreenReaderContent,
-      TextInput, Checkbox, Link}) => {
+  'instructure-ui/Table',
+  'instructure-ui/ScreenReaderContent',
+  'instructure-ui/TextInput',
+  'instructure-ui/Checkbox',
+  'instructure-ui/Link'
+], (I18n, React, shapes, {default: Table}, {default: ScreenReaderContent},
+    {default: TextInput}, {default: Checkbox}, {default: Link}) => {
   const namePrompt = I18n.t('Click to add a name');
   const nameLabel = I18n.t("New user's name");
   const emailLabel = I18n.t('Required Email Address');
@@ -31,6 +35,7 @@ define([
       this.state = {
         selectAll: false
       };
+      this.tbodyNode = null;
     }
 
     componentWillReceiveProps (nextProps) {
@@ -44,11 +49,14 @@ define([
       eatEvent(event);
 
       // user may have clicked on the link. if so, put focus on the adjacent checkbox
-      if (!(event.target.tagName === 'input' && event.target.getAttribute('type') === 'checkbox')) {
-        const checkbox = event.target.parentElement.parentElement.querySelector('input[type="checkbox"]');
-        checkbox.focus();
+      if (!(event.target.tagName === 'INPUT' && event.target.getAttribute('type') === 'checkbox')) {
+        // The link was rendered with the attribute data-address=address for this row.
+        // Use it to find the checkbox with the matching value.
+        const checkbox = this.tbodyNode.querySelector(`input[type="checkbox"][value="${event.target.getAttribute('data-address')}"]`);
+        if (checkbox) {
+          checkbox.focus();
+        }
       }
-
       const address = event.target.value || event.target.getAttribute('data-address');
       this.onSelectNewForMissingByAddress(address);
     }
@@ -288,7 +296,7 @@ define([
         <div className="addpeople__missing namelist">
           <Table caption={<ScreenReaderContent>{I18n.t('Unmatched login list')}</ScreenReaderContent>}>
             {this.renderTableHead()}
-            <tbody>
+            <tbody ref={(n) => { this.tbodyNode = n; }} >
               {this.props.searchType === 'cc_path' ? this.renderMissingEmail() : this.renderMissingIds()}
             </tbody>
           </Table>

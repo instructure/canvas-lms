@@ -28,7 +28,7 @@
     <% if can_do @context, @current_user, :update %>
       <li id="navigation_tab"><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
     <% end %>
-    <% if can_do @context, @current_user, :update %>
+    <% if can_do @context, @current_user, :lti_add_edit %>
       <li id="external_tools_tab"><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{Apps}) %></a></li>
     <% end %>
     <% if @publishing_enabled %>
@@ -105,8 +105,11 @@
         <td class="form-label nobr"><%= f.blabel :blueprint_course, :en => "Blueprint Course" %></td>
         <td class="nobr">
           <% if can_manage_master_courses %>
-            <%= f.check_box :master_course, :checked => is_master_course %>
-            <%= f.label :master_course, :en => "Enable course as a Blueprint Course" %>
+            <% cannot_enable_mc = !is_master_course && @context.student_enrollments.not_fake.exists? %>
+            <span <% if cannot_enable_mc %>data-tooltip title="<%= t("Cannot have a blueprint course with students") %>"<% end %>>
+              <%= f.check_box :master_course, :checked => is_master_course, :disabled => cannot_enable_mc %>
+              <%= f.label :master_course, :en => "Enable course as a Blueprint Course" %>
+            </span>
           <% else %>
             <span id="course_master_course"><%= is_master_course ? t("Yes") : t("No") %></span>
           <% end %>
@@ -349,7 +352,7 @@
           <% end %>
         </td>
       </tr>
-      <% if @context.feature_enabled?(:epub_export) && !@context.root_account.enable_offline_web_export? %>
+      <% if @context.feature_enabled?(:epub_export) && !@context.account.enable_offline_web_export? %>
         <tr>
           <td class="form-label"><label for="course_epub_export"><%= before_label('course_epub_export', %{Epub Export}) %></label></td>
           <td colspan="3" id="epub_export">
@@ -360,7 +363,7 @@
           </td>
         </tr>
       <% end %>
-      <% if @context.root_account.enable_offline_web_export? %>
+      <% if @context.account.enable_offline_web_export? %>
         <tr>
           <td class="form-label"><label for="course_offline_export"><%= before_label('course_offline_export', %{Offline Course}) %></label></td>
           <td colspan="3" id="offline_web_export">
@@ -643,7 +646,7 @@
 
   <% end %>
 
-  <% if can_do @context, @current_user, :update %>
+  <% if can_do @context, @current_user, :lti_add_edit %>
     <div id="tab-tools">
       <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
     </div>

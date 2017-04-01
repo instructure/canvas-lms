@@ -23,11 +23,11 @@ describe "/groups/index" do
   it "should render" do
     course_with_student
     view_context
-    assigns[:categories] = []
-    assigns[:students] = [@user]
-    assigns[:memberships] = []
-    assigns[:current_groups] = []
-    assigns[:previous_groups] = []
+    assign(:categories, [])
+    assign(:students, [@user])
+    assign(:memberships, [])
+    assign(:current_groups, [])
+    assign(:previous_groups, [])
     render "groups/index"
     expect(response).not_to be_nil
   end
@@ -36,11 +36,11 @@ describe "/groups/index" do
     course_with_student
     group_with_user(:user => @user, :group_context => @course)
     view_context
-    assigns[:categories] = []
-    assigns[:students] = [@user]
-    assigns[:memberships] = []
-    assigns[:current_groups] = [@group]
-    assigns[:previous_groups] = []
+    assign(:categories, [])
+    assign(:students, [@user])
+    assign(:memberships, [])
+    assign(:current_groups, [@group])
+    assign(:previous_groups, [])
     render "groups/index"
     doc = Nokogiri::HTML.parse(response.body)
     expect(doc.at_css('#my_groups_table td:nth-child(2) span.group-course-name').text).to eq @course.name

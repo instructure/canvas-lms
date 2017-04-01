@@ -6,6 +6,8 @@ require [
   'Backbone'
   'compiled/helpDialog'
   'jsx/subnav_menu/updateSubnavMenuToggle'
+  'jsx/new_user_tutorial/initializeNewUserTutorials'
+  'instructure-ui/ApplyTheme'
 
   # modules that do their own thing on every page that simply need to
   # be required
@@ -29,6 +31,7 @@ require [
   'compiled/behaviors/ping'
   'LtiThumbnailLauncher'
   'compiled/badge_counts'
+  'instructure-ui-themes/canvas'
 
   # Other stuff several bundles use.
   # If any of these really arn't used on most pages,
@@ -40,9 +43,11 @@ require [
   'jqueryui/tabs'
   'compiled/registration/incompleteRegistrationWarning'
   'moment'
-], ($, _, I18n, Backbone, helpDialog, updateSubnavMenuToggle) ->
+], ($, _, I18n, Backbone, helpDialog, updateSubnavMenuToggle, initializeNewUserTutorials, ApplyTheme) ->
 
   helpDialog.initTriggers()
+
+  initializeNewUserTutorials()
 
   $('#skip_navigation_link').on 'click', (event) ->
     # preventDefault so we dont change the hash
@@ -77,3 +82,9 @@ require [
   $('body').on 'click', '[data-pushstate]', (event) ->
     event.preventDefault()
     Backbone.history.navigate $(this).attr('href'), yes
+
+  # setup the inst-ui default theme
+  if ENV.use_high_contrast
+    ApplyTheme.default.setDefaultTheme('canvas-a11y')
+  else
+    ApplyTheme.default.setDefaultTheme('canvas')

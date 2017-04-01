@@ -60,8 +60,9 @@ describe Api do
     end
 
     it 'properly quotes login ids' do
-      @user = user_with_pseudonym :username => "user 'a'"
-      expect(@api.api_find(User, "sis_login_id:user 'a'")).to eq @user
+      user = user_factory
+      user.pseudonyms.create(unique_id: "user 'a'", account: Account.default)
+      expect(@api.api_find(User, "sis_login_id:user 'a'")).to eq user
     end
 
     it 'should not find record from other account' do

@@ -13,12 +13,8 @@ namespace :i18n do
     end
 
     puts "\nJS/HBS..."
-    system "./gems/canvas_i18nliner/bin/i18nliner export"
-    if $?.exitstatus > 0
-      $stderr.puts "Error extracting JS/HBS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner export` works"
-      exit $?.exitstatus
-    end
-    js_translations = JSON.parse(File.read("config/locales/generated/en.json"))["en"].flatten_keys
+    js_pid = spawn "./gems/canvas_i18nliner/bin/i18nliner export"
+    
 
     puts "\nRuby..."
     require 'i18nliner/commands/check'
@@ -29,6 +25,12 @@ namespace :i18n do
     @translations = @command.translations
     remove_unwanted_translations(@translations)
 
+    Process.wait js_pid
+    if $?.exitstatus > 0
+      $stderr.puts "Error extracting JS/HBS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner export` works"
+      exit $?.exitstatus
+    end
+    js_translations = JSON.parse(File.read("config/locales/generated/en.json"))["en"].flatten_keys
     # merge js in
     js_translations.each do |key, value|
       @translations[key] = value

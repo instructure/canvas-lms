@@ -256,7 +256,7 @@ describe "discussions" do
           topic.delayed_post_at = 5.days.from_now
           topic.lock_at         = 10.days.from_now
           topic.workflow_state  = 'active'
-          topic.locked          = nil
+          topic.locked          = false
           topic.save!
 
           get url

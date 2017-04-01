@@ -99,9 +99,10 @@ module Api::V1::AssignmentGroup
   def update_assignment_group(assignment_group, params)
     return nil unless params.is_a?(ActionController::Parameters)
 
-    integration_data_keys = params["integration_data"].nil? ? {} : params["integration_data"].keys
     update_params = params.permit(*API_ALLOWED_ASSIGNMENT_GROUP_INPUT_FIELDS,
-                                   "integration_data": integration_data_keys)
+                                   integration_data: strong_anything)
+    update_params.delete(:integration_data) if update_params[:integration_data] == ''
+
     rules = params.delete('rules')
     if rules
       assignment_group.rules_hash = rules

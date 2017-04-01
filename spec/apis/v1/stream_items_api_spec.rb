@@ -256,7 +256,7 @@ describe UsersController, type: :request do
       'context_type' => "Course",
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
-      'require_initial_post' => nil,
+      'require_initial_post' => false,
       'user_has_posted' => nil,
       'html_url' => "http://www.example.com/courses/#{@context.id}/announcements/#{@a.id}",
 

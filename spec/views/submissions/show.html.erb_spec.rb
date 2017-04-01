@@ -27,8 +27,8 @@ describe "/submissions/show" do
   it "should render" do
     view_context
     a = @course.assignments.create!(:title => "some assignment")
-    assigns[:assignment] = a
-    assigns[:submission] = a.submit_homework(@user)
+    assign(:assignment, a)
+    assign(:submission, a.submit_homework(@user))
     render "submissions/show"
     expect(response).not_to be_nil
   end
@@ -43,8 +43,8 @@ describe "/submissions/show" do
     context 'when current_user is submission user' do
       it 'does not add assessing class to rendered rubric_container' do
         view_context(@course, @student)
-        assigns[:assignment] = @assignment
-        assigns[:submission] = @submission
+        assign(:assignment, @assignment)
+        assign(:submission, @submission)
         render 'submissions/show'
         html = Nokogiri::HTML.fragment(response.body)
         classes = html.css('div.rubric_container').attribute('class').value.split(' ')
@@ -55,8 +55,8 @@ describe "/submissions/show" do
     context 'when current_user is teacher' do
       it 'adds assessing class to rubric_container' do
         view_context(@course, @teacher)
-        assigns[:assignment] = @assignment
-        assigns[:submission] = @submission
+        assign(:assignment, @assignment)
+        assign(:submission, @submission)
         render 'submissions/show'
         html = Nokogiri::HTML.fragment(response.body)
         classes = html.css('div.rubric_container').attribute('class').value.split(' ')
@@ -71,8 +71,8 @@ describe "/submissions/show" do
 
       it 'does not add assessing class to the rendered rubric_container' do
         view_context(@course, @observer)
-        assigns[:assignment] = @assignment
-        assigns[:submission] = @submission
+        assign(:assignment, @assignment)
+        assign(:submission, @submission)
         render 'submissions/show'
         html = Nokogiri::HTML.fragment(response.body)
         classes = html.css('div.rubric_container').attribute('class').value.split(' ')
@@ -96,9 +96,9 @@ describe "/submissions/show" do
         @assessment_request.complete!
 
         view_context(@course, @student)
-        assigns[:assignment] = @assignment
-        assigns[:submission] = @submission
-        assigns[:rubric_association] = @submission.rubric_association_with_assessing_user_id
+        assign(:assignment, @assignment)
+        assign(:submission, @submission)
+        assign(:rubric_association, @submission.rubric_association_with_assessing_user_id)
 
         render 'submissions/show'
         html = Nokogiri::HTML.fragment(response.body)
@@ -108,9 +108,9 @@ describe "/submissions/show" do
 
       it 'adds assessing class to rubric_container' do
         view_context(@course, @student)
-        assigns[:assignment] = @assignment
-        assigns[:submission] = @submission
-        assigns[:assessment_request] = @assessment_request
+        assign(:assignment, @assignment)
+        assign(:submission, @submission)
+        assign(:assessment_request, @assessment_request)
         render 'submissions/show'
         html = Nokogiri::HTML.fragment(response.body)
         classes = html.css('div.rubric_container').attribute('class').value.split(' ')

@@ -30,17 +30,17 @@ describe "outcome gradezilla" do
         Account.default.set_feature_flag!('outcome_gradebook', 'on')
       end
 
-      it "should be visible" do
+      it "is visible" do
         gradezilla_page.visit(@course)
-        expect(ff('.gradebook-navigation')).to have_size 1
-
-        f('a[data-id=outcome]').click
+        f('.assignment-gradebook-container .gradebook-menus button').click
+        f('span[data-menu-item-id="learning-mastery"]').click
         expect(f('.outcome-gradebook-container')).not_to be_nil
       end
 
-      it "should allow showing only a certain section" do
+      it "allows showing only a certain section" do
         gradezilla_page.visit(@course)
-        f('a[data-id=outcome]').click
+        f('.assignment-gradebook-container .gradebook-menus button').click
+        f('span[data-menu-item-id="learning-mastery"]').click
 
         expect(ff('.outcome-student-cell-content')).to have_size 3
 

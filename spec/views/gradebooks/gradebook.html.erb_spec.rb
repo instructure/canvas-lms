@@ -25,14 +25,14 @@ describe "/gradebooks/gradebook" do
     course_with_student
     view_context
     a = @course.assignments.create!(:title => "some assignment")
-    assigns[:assignments] = [a]
-    assigns[:students] = [@user]
-    assigns[:submissions] = []
-    assigns[:gradebook_upload] = ''
-    assigns[:body_classes] = []
-    assigns[:post_grades_tools] = []
+    assign(:assignments, [a])
+    assign(:students, [@user])
+    assign(:submissions, [])
+    assign(:gradebook_upload, '')
+    assign(:body_classes, [])
+    assign(:post_grades_tools, [])
     if course_allows && permissions_allow
-      assigns[:post_grades_tools] = [{type: :post_grades}]
+      assign(:post_grades_tools, [{type: :post_grades}])
     end
     @course.expects(:allows_grade_publishing_by).with(@user).returns(course_allows)
     @course.expects(:grants_any_right?).returns(permissions_allow) if course_allows
@@ -61,13 +61,13 @@ describe "/gradebooks/gradebook" do
     before :each do
       course_with_teacher(:active_all => true)
       view_context
-      assigns[:gradebook_is_editable] = true
-      assigns[:assignments] = []
-      assigns[:students] = []
-      assigns[:submissions] = []
-      assigns[:gradebook_upload] = ''
-      assigns[:body_classes] = []
-      assigns[:post_grades_tools] = []
+      assign(:gradebook_is_editable, true)
+      assign(:assignments, [])
+      assign(:students, [])
+      assign(:submissions, [])
+      assign(:gradebook_upload, '')
+      assign(:body_classes, [])
+      assign(:post_grades_tools, [])
     end
 
     it "should allow uploading scores for courses" do

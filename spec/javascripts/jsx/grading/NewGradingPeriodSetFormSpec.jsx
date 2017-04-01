@@ -20,21 +20,21 @@ define([
   };
 
   const exampleSet = {
-    grading_period_set: {
-      id: "81",
-      title: "Example Set!",
-      grading_periods: [],
-      permissions: { read: true, update: true, delete: true, create: true },
-      created_at: "2013-06-03T02:57:42Z"
-    }
+    id: '81',
+    title: 'Example Set!',
+    weighted: false,
+    displayTotalsForAllGradingPeriods: false,
+    gradingPeriods: [],
+    permissions: { read: true, update: true, delete: true, create: true },
+    createdAt: '2013-06-03T02:57:42Z'
   };
 
   QUnit.module('NewGradingPeriodSetForm', {
     renderComponent(props={}) {
       const defaultProps = {
         enrollmentTerms: [],
-        closeForm(){},
-        addGradingPeriodSet: this.stub(),
+        closeForm () {},
+        addGradingPeriodSet () {},
         urls: {
           gradingPeriodSetsURL: "api/v1/accounts/1/grading_period_sets",
           enrollmentTermsURL: "api/v1/accounts/1/enrollment_terms"
@@ -46,13 +46,13 @@ define([
     },
 
     stubCreateSuccess(){
-      const success = new Promise(resolve => resolve(exampleSet));
+      const success = Promise.resolve(exampleSet);
       this.stub(setsApi, 'create').returns(success);
       return success;
     },
 
     stubCreateFailure(){
-      const failure = new Promise((_, reject) => reject("FAIL"));
+      const failure = Promise.reject(new Error('FAIL'));
       this.stub(setsApi, 'create').returns(failure);
       return failure;
     },
@@ -72,41 +72,77 @@ define([
     assertEnabled(form.refs.cancelButton);
   });
 
+  test('initially renders with the "Display totals for All Grading Periods option" checkbox unchecked', function () {
+    const form = this.renderComponent();
+    notOk(form.displayTotalsCheckbox._input.checked)
+  });
+
   test('disables the create button when it is clicked', function() {
-    this.stubCreateSuccess();
+    const promise = this.stubCreateSuccess();
     let form = this.renderComponent();
-    this.stub(form, 'isValid').returns(true);
+    Simulate.change(form.refs.titleInput, { target: { value: 'Cash me ousside' } });
     Simulate.click(ReactDOM.findDOMNode(form.refs.createButton));
-    assertDisabled(form.refs.createButton);
+    return promise.then(() => { assertDisabled(form.refs.createButton); });
+  });
+
+  test('the "Display totals for All Grading Periods option" checkbox state is included when the set is created', function () {
+    const promise = this.stubCreateSuccess();
+    const addSetStub = this.stub();
+    const form = this.renderComponent({ addGradingPeriodSet: addSetStub });
+    Simulate.change(form.refs.titleInput, { target: { value: 'Howbow dah' } });
+    Simulate.click(ReactDOM.findDOMNode(form.refs.createButton));
+    return promise.then(() => {
+      equal(addSetStub.callCount, 1, 'addGradingPeriodSet was called once');
+      const { displayTotalsForAllGradingPeriods } = addSetStub.getCall(0).args[0];
+      equal(displayTotalsForAllGradingPeriods, false, 'includes displayTotalsForAllGradingPeriods');
+    });
   });
 
   test('disables the cancel button when the create button is clicked', function() {
-    this.stubCreateSuccess();
-    let form = this.renderComponent();
+    const promise = this.stubCreateSuccess();
+    const form = this.renderComponent();
+    Simulate.change(form.refs.titleInput, { target: { value: 'Watch me whip' } });
     this.stub(form, 'isValid').returns(true);
     Simulate.click(ReactDOM.findDOMNode(form.refs.createButton));
-    assertDisabled(form.refs.cancelButton);
+    return promise.then(() => { assertDisabled(form.refs.cancelButton); });
   });
 
-  asyncTest('re-enables the cancel button when the ajax call fails', function() {
-    this.stubCreateFailure();
-    let form = this.renderComponent();
-    this.stub(form, 'isValid').returns(true);
+  test('updates weighted state when checkbox is clicked', function() {
+    const form = this.renderComponent();
+    equal(form.state.weighted, false);
+    form.weightedCheckbox.handleChange({ target: { checked: true } });
+    equal(form.state.weighted, true);
+  });
+
+  test('re-enables the cancel button when the ajax call fails', function () {
+    const fakePromise = {
+      then () {
+        return fakePromise;
+      },
+      catch (handler) {
+        handler(new Error('FAIL'));
+      }
+    };
+    this.stub(setsApi, 'create').returns(fakePromise);
+    const form = this.renderComponent();
+    Simulate.change(form.refs.titleInput, { target: { value: 'Watch me nay nay' } });
     Simulate.click(ReactDOM.findDOMNode(form.refs.cancelButton));
-    requestAnimationFrame(function() {
-      assertEnabled(form.refs.cancelButton);
-      start();
-    });
+    assertEnabled(form.refs.cancelButton);
   });
 
-  asyncTest('re-enables the create button when the ajax call fails', function() {
-    this.stubCreateFailure();
-    let form = this.renderComponent();
-    this.stub(form, 'isValid').returns(true);
+  test('re-enables the create button when the ajax call fails', function () {
+    const fakePromise = {
+      then () {
+        return fakePromise;
+      },
+      catch (handler) {
+        handler(new Error('FAIL'));
+      }
+    };
+    this.stub(setsApi, 'create').returns(fakePromise);
+    const form = this.renderComponent();
+    Simulate.change(form.refs.titleInput, { target: { value: ':D' } });
     Simulate.click(ReactDOM.findDOMNode(form.refs.createButton));
-    requestAnimationFrame(function() {
-      assertEnabled(form.refs.createButton);
-      start();
-    });
+    assertEnabled(form.refs.createButton);
   });
 });

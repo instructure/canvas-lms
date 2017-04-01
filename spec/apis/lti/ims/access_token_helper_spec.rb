@@ -98,6 +98,14 @@ module Lti
         end
       end
 
+      describe "#tool_proxy" do
+        let(:access_token_helper){ subject }
+        it 'returns the bearer token for auth header' do
+          @request.headers.merge!(request_headers)
+          expect(access_token_helper.tool_proxy).to be_truthy
+        end
+      end
+
     end
   end
 end

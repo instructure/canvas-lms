@@ -68,7 +68,18 @@ module Lti
   class OriginalityReportsApiController < ApplicationController
     include Lti::Ims::AccessTokenHelper
 
-    skip_before_action :require_user, :load_user
+    ORIGINALITY_REPORT_SERVICE = 'vnd.Canvas.OriginalityReport'.freeze
+
+    SERVICE_DEFINITIONS = [
+      {
+        id: ORIGINALITY_REPORT_SERVICE,
+        endpoint: 'api/v1/assignments/{assignment_id}/submissions/{submission_id}/originality_report',
+        format: ['application/json'].freeze,
+        action: ['POST', 'PUT', 'GET'].freeze
+      }.freeze
+    ].freeze
+
+    skip_before_action :load_user
     before_action :authorized_lti2_tool, :plagiarism_feature_flag_enabled
     before_action :attachment_in_context, only: [:create]
     before_action :report_in_context, only: [:update, :show]
@@ -156,7 +167,7 @@ module Lti
     end
 
     def lti2_service_name
-      ToolConsumerProfileCreator::ORIGINALITY_REPORT_SERVICE
+      ORIGINALITY_REPORT_SERVICE
     end
 
     private

@@ -143,11 +143,6 @@ describe LtiApiController, type: :request do
       expect(response.body).to match(/expired/i)
       check_error_response("Timestamp too old or too far in the future, request has expired")
     end
-
-    context "Error reports" do
-      context "Oauth 1" do
-      end
-    end
   end
 
   def replace_result(opts={})

@@ -189,7 +189,7 @@ describe Quizzes::QuizSubmission do
       it "should not allow updating scores on an uncompleted submission" do
         qs = @quiz.generate_submission(@student)
         expect(qs).to be_untaken
-        expect { qs.update_scores }.to raise_error
+        expect { qs.update_scores({}) }.to raise_error("Can't update submission scores unless it's completed")
       end
 
       it "should update scores for a previous submission" do
@@ -222,7 +222,7 @@ describe Quizzes::QuizSubmission do
         qs.backup_submission_data({ "question_1" => "" }) # simulate k/v pairs we store for quizzes in progress
         expect(qs.reload.attempt).to eq 2
 
-        expect { qs.update_scores }.to raise_error
+        expect { qs.update_scores({}) }.to raise_error("Can't update submission scores unless it's completed")
         expect { qs.update_scores(:submission_version_number => 1, :fudge_points => 1, :question_score_1 => 0) }.not_to raise_error
 
         expect(qs).to be_untaken

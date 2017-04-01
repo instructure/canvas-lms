@@ -9,6 +9,7 @@ define [
   'compiled/views/assignments/DateAvailableColumnView'
   'compiled/views/SisButtonView'
   'jst/quizzes/QuizItemView'
+  'jquery.disableWhileLoading'
 ], (I18n, $, _, Backbone, CyoeHelper, PublishIconView, DateDueColumnView, DateAvailableColumnView, SisButtonView, template) ->
 
   class ItemView extends Backbone.View
@@ -26,6 +27,7 @@ define [
     events:
       'click': 'clickRow'
       'click .delete-item': 'onDelete'
+      'click .migrate': 'migrateQuiz'
 
     messages:
       confirm: I18n.t('confirms.delete_quiz', 'Are you sure you want to delete this quiz?')
@@ -45,7 +47,7 @@ define [
       if @canManage()
         @publishIconView = new PublishIconView(model: @model)
         if @model.postToSISEnabled()
-          @sisButtonView = new SisButtonView(model: @model)
+          @sisButtonView = new SisButtonView(model: @model, sisName: @model.postToSISName())
 
       @dateDueColumnView       = new DateDueColumnView(model: @model)
       @dateAvailableColumnView = new DateAvailableColumnView(model: @model)
@@ -64,6 +66,22 @@ define [
 
     redirectTo: (path) ->
       location.href = path
+
+    migrateQuizEnabled: =>
+      return ENV.FLAGS && ENV.FLAGS.migrate_quiz_enabled
+
+    migrateQuiz: (e) =>
+      e.preventDefault()
+      courseId = ENV.context_asset_string.split('_')[1]
+      quizId = @options.model.id
+      url = "/api/v1/courses/#{courseId}/content_exports?export_type=quizzes2&quiz_id=#{quizId}"
+      dfd = $.ajaxJSON url, 'POST'
+      @$el.disableWhileLoading dfd
+      $.when(dfd)
+        .done (response, status, deferred) =>
+          $.flashMessage I18n.t('Migration successful')
+        .fail =>
+          $.flashError I18n.t("An error occurred while migrating.")
 
     canDelete: ->
       @model.get('permissions').delete
@@ -108,6 +126,7 @@ define [
         base.link_text = @messages.multipleDates
         base.link_href = @model.get("url")
 
+      base.migrateQuizEnabled = @migrateQuizEnabled
       base.showAvailability = @model.multipleDueDates() or not @model.defaultDates().available()
       base.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
       base

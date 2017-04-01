@@ -21,7 +21,7 @@ require_dependency "lti/ims/access_token_helper"
 module Lti
   describe 'Originality Reports API', type: :request do
     include_context 'lti2_api_spec_helper'
-    let(:service_name) { ToolConsumerProfileCreator::ORIGINALITY_REPORT_SERVICE }
+    let(:service_name) { OriginalityReportsApiController::ORIGINALITY_REPORT_SERVICE }
     before :each do
       attachment_model
 

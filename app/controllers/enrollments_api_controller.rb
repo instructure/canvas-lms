@@ -207,8 +207,8 @@
 #             "example": "B-",
 #             "type": "string"
 #           },
-#           "multiple_grading_periods_enabled": {
-#             "description": "optional: Indicates whether the course the enrollment belongs to has the Multiple Grading Periods feature enabled. (applies only to student enrollments, and only available in course endpoints)",
+#           "has_grading_periods": {
+#             "description": "optional: Indicates whether the course the enrollment belongs to has grading periods set up. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": true,
 #             "type": "boolean"
 #           },
@@ -218,32 +218,32 @@
 #             "type": "boolean"
 #           },
 #           "current_grading_period_title": {
-#             "description": "optional: The name of the currently active grading period, if one exists. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
+#             "description": "optional: The name of the currently active grading period, if one exists. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": "Fall Grading Period",
 #             "type": "string"
 #           },
 #           "current_grading_period_id": {
-#             "description": "optional: The id of the currently active grading period, if one exists. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
+#             "description": "optional: The id of the currently active grading period, if one exists. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": 5,
 #             "type": "integer"
 #           },
 #           "current_period_computed_current_score": {
-#             "description": "optional: The student's score in the course for the current grading period, ignoring ungraded assignments. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
+#             "description": "optional: The student's score in the course for the current grading period, ignoring ungraded assignments. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": 95.80,
 #             "type": "number"
 #           },
 #           "current_period_computed_final_score": {
-#             "description": "optional: The student's score in the course for the current grading period, including ungraded assignments with a score of 0. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
+#             "description": "optional: The student's score in the course for the current grading period, including ungraded assignments with a score of 0. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": 85.25,
 #             "type": "number"
 #           },
 #           "current_period_computed_current_grade": {
-#             "description": "optional: The letter grade equivalent of current_period_computed_current_score, if available. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
+#             "description": "optional: The letter grade equivalent of current_period_computed_current_score, if available. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": "A",
 #             "type": "string"
 #           },
 #           "current_period_computed_final_grade": {
-#             "description": "optional: The letter grade equivalent of current_period_computed_final_score, if available. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
+#             "description": "optional: The letter grade equivalent of current_period_computed_final_score, if available. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": "B",
 #             "type": "string"
 #           }
@@ -262,7 +262,6 @@ class EnrollmentsApiController < ApplicationController
     :inactive_role                     => 'Cannot create an enrollment with this role because it is inactive.',
     :base_type_mismatch                => 'The specified type must match the base type for the role',
     :concluded_course                  => 'Can\'t add an enrollment to a concluded course.',
-    :multiple_grading_periods_disabled => 'Multiple Grading Periods feature is disabled. Cannot filter by grading_period_id with this feature disabled',
     :insufficient_sis_permissions      => 'Insufficient permissions to filter by SIS fields'
   }
 
@@ -338,7 +337,8 @@ class EnrollmentsApiController < ApplicationController
     enrollments = enrollments.joins(:user).select("enrollments.*").
       order("enrollments.type, #{User.sortable_name_order_by_clause("users")}, enrollments.id")
 
-    has_courses = enrollments.where_values.any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
+    has_courses = (CANVAS_RAILS4_2 ? enrollments.where_values : enrollments.where_clause.instance_variable_get(:@predicates)).
+      any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
     enrollments = enrollments.joins(:course) if has_courses
     enrollments = enrollments.shard(@shard_scope) if @shard_scope
 
@@ -371,20 +371,10 @@ class EnrollmentsApiController < ApplicationController
 
     if params[:grading_period_id].present?
       if @context.is_a? User
-        unless @context.account.feature_enabled?(:multiple_grading_periods)
-          render_create_errors([@@errors[:multiple_grading_periods_disabled]])
-          return false
-        end
-
         grading_period = @context.courses.lazy.map do |course|
           GradingPeriod.for(course).find_by(id: params[:grading_period_id])
         end.detect(&:present?)
       else
-        unless multiple_grading_periods?
-          render_create_errors([@@errors[:multiple_grading_periods_disabled]])
-          return false
-        end
-
         grading_period = GradingPeriod.for(@context).find_by(id: params[:grading_period_id])
       end
 

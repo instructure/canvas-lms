@@ -25,7 +25,7 @@ describe "master courses - child courses - file locking" do
   end
 
   it "should not show the manageable cog-menu options when a file is locked" do
-    @tag.update_attribute(:restrictions, {:content => true, :settings => true})
+    @tag.update_attribute(:restrictions, {:all => true})
 
     get "/courses/#{@copy_to.id}/files"
 
@@ -42,7 +42,7 @@ describe "master courses - child courses - file locking" do
     subfolder = Folder.root_folders(@copy_to).first.sub_folders.create!(:name => "subfolder", :context => @copy_to)
     @file_copy.folder = subfolder
     @file_copy.save!
-    @tag.update_attribute(:restrictions, {:content => true, :settings => true})
+    @tag.update_attribute(:restrictions, {:all => true})
 
     get "/courses/#{@copy_to.id}/files"
 

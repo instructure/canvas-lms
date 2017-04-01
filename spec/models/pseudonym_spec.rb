@@ -339,14 +339,14 @@ describe Pseudonym do
       specs_require_sharding
       let_once(:account2) { @shard1.activate { Account.create! } }
 
-      it "should only query pertinent shards" do
+      it "should only query the pertinent shard" do
         Pseudonym.expects(:associated_shards).with('abc').returns([@shard1])
         Pseudonym.expects(:active).once.returns(Pseudonym.none)
         GlobalLookups.stubs(:enabled?).returns(true)
         Pseudonym.authenticate({ unique_id: 'abc', password: 'def' }, [Account.default.id, account2])
       end
 
-      it "should only query pertinent shards" do
+      it "should query all pertinent shards" do
         Pseudonym.expects(:associated_shards).with('abc').returns([Shard.default, @shard1])
         Pseudonym.expects(:active).twice.returns(Pseudonym.none)
         GlobalLookups.stubs(:enabled?).returns(true)

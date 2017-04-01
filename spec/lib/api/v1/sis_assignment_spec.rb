@@ -161,6 +161,46 @@ describe Api::V1::SisAssignment do
       expect(result[0]['sections'][0]['override'].key?('lock_at')).to eq(true)
     end
 
+    it "can return an empty due_at" do
+      assignment_1.due_at = nil
+      assignment_1.save!
+
+      assignments = Assignment.where(id: assignment_1.id)
+
+      result = generator.sis_assignments_json(assignments)
+
+      expect(result[0]['due_at']).to eq nil
+    end
+
+    context "mastery paths overrides" do
+      it "uses a mastery paths due date as the course due date" do
+        due_at = Time.zone.parse('2017-02-08 22:11:10')
+        assignment_1.update_attributes(due_at: nil)
+        create_mastery_paths_override_for_assignment(assignment_1, due_at: due_at)
+        assignments = Assignment.where(id: assignment_1.id).
+          preload(:active_assignment_overrides)
+
+        result = generator.sis_assignments_json(assignments)
+
+        expect(result[0]['due_at']).to eq due_at
+      end
+
+      it "prefers the assignment due_at over an override" do
+        assignment_due_at = Time.zone.parse('2017-03-08 22:11:10')
+        assignment_1.update_attributes(due_at: assignment_due_at)
+
+        override_due_at = Time.zone.parse('2017-02-08 22:11:10')
+        create_mastery_paths_override_for_assignment(assignment_1, due_at: override_due_at)
+
+        assignments = Assignment.where(id: assignment_1.id).
+          preload(:active_assignment_overrides)
+
+        result = generator.sis_assignments_json(assignments)
+
+        expect(result[0]['due_at']).to eq assignment_due_at
+      end
+    end
+
     context "student_overrides: true" do
       let(:course) {assignment_1.course}
 

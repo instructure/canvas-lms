@@ -7,5 +7,8 @@ define(['../../node_modules/axios'], function (axios) {
   var originalDefaults = axios.defaults.headers.common['Accept'];
   axios.defaults.headers.common['Accept'] = 'application/json+canvas-string-ids, ' + originalDefaults;
 
+  // Rails checks this header to decide if a request is an xhr request
+  axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
   return axios;
 });

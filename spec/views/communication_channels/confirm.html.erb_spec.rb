@@ -22,17 +22,17 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 describe "communication_channels/confirm.html.erb" do
   before do
     user_factory
-    assigns[:user] = @user
-    assigns[:communication_channel] = @cc = @communication_channel = @user.communication_channels.create!(:path => 'johndoe@example.com')
-    assigns[:nonce] = @cc.confirmation_code
-    assigns[:body_classes] = []
-    assigns[:domain_root_account] = assigns[:root_account] = Account.default
+    assign(:user, @user)
+    @cc = @communication_channel = assign(:communication_channel, @user.communication_channels.create!(:path => 'johndoe@example.com'))
+    assign(:nonce, @cc.confirmation_code)
+    assign(:body_classes, [])
+    assign(:domain_root_account, assign(:root_account, Account.default))
     view.stubs(:require_terms?).returns(nil) # since controller-defined helper methods don't get plumbed down here
   end
 
   shared_examples_for "user registration" do
     it "should only show the registration form if no merge opportunities" do
-      assigns[:merge_opportunities] = []
+      assign(:merge_opportunities, [])
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
@@ -50,7 +50,7 @@ describe "communication_channels/confirm.html.erb" do
 
     it "should follow the simple path for not logged in" do
       user_with_pseudonym(:active_all => 1)
-      assigns[:merge_opportunities] = [[@user, [@user.pseudonym]]]
+      assign(:merge_opportunities, [[@user, [@user.pseudonym]]])
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
@@ -67,8 +67,8 @@ describe "communication_channels/confirm.html.erb" do
     it "should follow the simple path for logged in as a matching user" do
       user_with_pseudonym(:active_all => 1)
       @user.communication_channels.create!(:path => 'johndoe@example.com') { |cc| cc.workflow_state = 'active' }
-      assigns[:merge_opportunities] = [[@user, [@user.pseudonym]]]
-      assigns[:current_user] = @user
+      assign(:merge_opportunities, [[@user, [@user.pseudonym]]])
+      assign(:current_user, @user)
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
@@ -85,8 +85,8 @@ describe "communication_channels/confirm.html.erb" do
 
     it "should follow the simple path for logged in as a non-matching user" do
       user_with_pseudonym(:active_all => 1)
-      assigns[:merge_opportunities] = [[@user, [@user.pseudonym]]]
-      assigns[:current_user] = @user
+      assign(:merge_opportunities, [[@user, [@user.pseudonym]]])
+      assign(:current_user, @user)
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
@@ -104,7 +104,7 @@ describe "communication_channels/confirm.html.erb" do
     it "should follow the mostly-simple-path for not-logged in with multiple pseudonyms" do
       user_with_pseudonym(:active_all => 1)
       account2 = Account.create!
-      assigns[:merge_opportunities] = [[@user, [@user.pseudonym, @user.pseudonyms.create!(:unique_id => 'johndoe', :account => account2)]]]
+      assign(:merge_opportunities, [[@user, [@user.pseudonym, @user.pseudonyms.create!(:unique_id => 'johndoe', :account => account2)]]])
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
@@ -125,13 +125,13 @@ describe "communication_channels/confirm.html.erb" do
       account2 = Account.create!
       @user3.pseudonyms.create!(:unique_id => 'johndoe', :account => account2)
       @user4 = user_with_pseudonym(:active_all => 1, :username => 'georgedoe@example.com', :account => account2)
-      assigns[:merge_opportunities] = [
+      assign(:merge_opportunities, [
           [@user1, [@user1.pseudonym]],
           [@user2, [@user2.pseudonym]],
           [@user3, @user3.pseudonyms],
           [@user4, [@user4.pseudonym]]
-      ]
-      assigns[:current_user] = @user1
+      ])
+      assign(:current_user, @user1)
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
@@ -149,16 +149,16 @@ describe "communication_channels/confirm.html.erb" do
   context "invitations" do
     before do
       course_factory(active_all: true)
-      assigns[:course] = @course
-      assigns[:enrollment] = @enrollment = @course.enroll_user(@user)
+      assign(:course, @course)
+      @enrollment = assign(:enrollment, @course.enroll_user(@user))
     end
 
     it "should render transfer enrollment form" do
-      assigns[:merge_opportunities] = []
+      assign(:merge_opportunities, [])
       @user.register
       @pseudonym1 = @user.pseudonyms.create!(:unique_id => 'jt@instructure.com')
       user_with_pseudonym(:active_all => 1)
-      assigns[:current_user] = @user
+      assign(:current_user, @user)
 
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
@@ -174,7 +174,7 @@ describe "communication_channels/confirm.html.erb" do
     context "open registration" do
       before do
         @user.update_attribute(:workflow_state, 'creation_pending')
-        assigns[:pseudonym] = @user.pseudonyms.build(:account => Account.default)
+        assign(:pseudonym, @user.pseudonyms.build(:account => Account.default))
       end
       include_examples "user registration"
     end
@@ -187,8 +187,8 @@ describe "communication_channels/confirm.html.erb" do
 
     it "should render to merge with the current user" do
       user_with_pseudonym(:active_all => 1)
-      assigns[:current_user] = @user
-      assigns[:merge_opportunities] = [[@user, [@pseudonym]]]
+      assign(:current_user, @user)
+      assign(:merge_opportunities, [[@user, [@pseudonym]]])
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       expect(page.css('input[type="radio"][name="pseudonym_select"]')).to be_empty
@@ -203,8 +203,8 @@ describe "communication_channels/confirm.html.erb" do
     it "should render to merge with the current user that doesn't have a pseudonym in the default account" do
       account = Account.create!
       user_with_pseudonym(:active_all => 1, :account => account)
-      assigns[:current_user] = @user
-      assigns[:merge_opportunities] = [[@user, [@pseudonym]]]
+      assign(:current_user, @user)
+      assign(:merge_opportunities, [[@user, [@pseudonym]]])
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       expect(page.css('input[type="radio"][name="pseudonym_select"]')).to be_empty
@@ -222,7 +222,7 @@ describe "communication_channels/confirm.html.erb" do
       @pseudonym1 = @pseudonym
       user_with_pseudonym(:active_all => 1, :username => 'georgedoe@example.com')
       @user2 = @user
-      assigns[:merge_opportunities] = [[@user1, [@user1.pseudonym]], [@user2, [@user2.pseudonym]]]
+      assign(:merge_opportunities, [[@user1, [@user1.pseudonym]], [@user2, [@user2.pseudonym]]])
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       expect(page.css('input[type="radio"][name="pseudonym_select"]').length).to eq 2
@@ -237,7 +237,7 @@ describe "communication_channels/confirm.html.erb" do
 
   context "self-registration" do
     before do
-      assigns[:pseudonym] = @user.pseudonyms.create!(:unique_id => 'johndoe@example.com')
+      assign(:pseudonym, @user.pseudonyms.create!(:unique_id => 'johndoe@example.com'))
     end
 
     include_examples "user registration"

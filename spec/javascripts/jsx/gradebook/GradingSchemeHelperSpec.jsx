@@ -19,15 +19,15 @@
 define([
   'underscore',
   'jsx/gradebook/GradingSchemeHelper'
-], function (_, GradingSchemeHelper) {
+], (_, GradingSchemeHelper) => {
   QUnit.module('GradingSchemeHelper.scoreToGrade');
 
-  test('returns the lowest grade to below-scale scores', function () {
+  test('returns the lowest grade to below-scale scores', () => {
     const gradingScheme = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['E', 0.50]];
     equal(GradingSchemeHelper.scoreToGrade(40, gradingScheme), 'E');
   });
 
-  test('accounts for floating-point rounding errors', function () {
+  test('accounts for floating-point rounding errors', () => {
     // Keep this spec close to identical to the ruby GradeCalculator specs to ensure they both do the same thing.
     const gradingScheme = [
       ['A', 0.90], ['B+', 0.886], ['B', 0.80], ['C', 0.695], ['D', 0.555], ['E', 0.545], ['M', 0.00]

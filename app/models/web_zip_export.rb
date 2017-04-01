@@ -10,9 +10,7 @@ class WebZipExport < EpubExport
   # but ends up being later in the lookup chain for this class.
   def export(synchronous: false)
     module_progressor = MustViewModuleProgressor.new(user, course)
-    Rails.cache.fetch(cache_key, expires_in: 4.hours) do
-      module_progressor.current_progress
-    end
+    Rails.cache.write(cache_key, module_progressor.current_progress, expires_in: 4.hours)
     module_progressor.make_progress
     super
   end

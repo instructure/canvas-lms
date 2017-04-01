@@ -1,9 +1,6 @@
 class GradingPeriodSetsController < ApplicationController
-  include ::Filters::GradingPeriods
-
   before_action :require_user
   before_action :get_context
-  before_action :check_feature_flag
   before_action :check_manage_rights, except: [:index]
   before_action :check_read_rights, except: [:update, :create, :destroy]
 
@@ -42,7 +39,11 @@ class GradingPeriodSetsController < ApplicationController
   end
 
   def update
+    old_term_ids = grading_period_set.enrollment_terms.pluck(:id)
     grading_period_set.enrollment_terms = enrollment_terms
+    # we need to recompute scores for enrollment terms that were removed since the line above
+    # will not run callbacks for the removed enrollment terms
+    EnrollmentTerm.where(id: old_term_ids - enrollment_terms.map(&:id)).each(&:recompute_course_scores)
 
     respond_to do |format|
       if grading_period_set.update(set_params)
@@ -74,7 +75,7 @@ class GradingPeriodSetsController < ApplicationController
   end
 
   def set_params
-    params.require(:grading_period_set).permit(:title)
+    params.require(:grading_period_set).permit(:title, :weighted, :display_totals_for_all_grading_periods)
   end
 
   def check_read_rights

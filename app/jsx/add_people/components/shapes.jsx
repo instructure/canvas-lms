@@ -10,7 +10,7 @@ define([
 
   const apiStateShape = {
     pendingCount: PropTypes.number,  // number of api calls in-flight
-    error: PropTypes.string       // error message or undefined
+    error: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])       // error message or undefined
   };
 
   const inputParamsShape = {

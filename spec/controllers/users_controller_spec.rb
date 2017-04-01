@@ -607,7 +607,6 @@ describe UsersController do
   describe "GET 'grades_for_student'" do
     let(:test_course) do
       test_course = course_factory(active_all: true)
-      test_course.root_account.enable_feature!(:multiple_grading_periods)
       test_course
     end
     let(:student) { user_factory(active_all: true) }
@@ -632,13 +631,13 @@ describe UsersController do
     end
 
     context "as a student" do
-      it "returns the grade and the total for the student, filtered by the grading period" do
+      it "returns the grade for the student, filtered by the grading period" do
         user_session(student)
         get('grades_for_student', grading_period_id: grading_period.id,
           enrollment_id: student_enrollment.id)
 
         expect(response).to be_ok
-        expected_response = {'grade' => 40, 'total' => 4, 'possible' => 10, 'hide_final_grades' => false}
+        expected_response = {'grade' => 40.0, 'hide_final_grades' => false}
         expect(json_parse(response.body)).to eq expected_response
 
         grading_period.end_date = 4.months.from_now
@@ -648,7 +647,7 @@ describe UsersController do
           enrollment_id: student_enrollment.id)
 
         expect(response).to be_ok
-        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expected_response = {'grade' => 94.55, 'hide_final_grades' => false}
         expect(json_parse(response.body)).to eq expected_response
       end
 
@@ -660,7 +659,7 @@ describe UsersController do
           enrollment_id: student_enrollment.id)
 
         expect(response).to be_ok
-        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expected_response = {'grade' => 94.55, 'hide_final_grades' => false}
         expect(json_parse(response.body)).to eq expected_response
       end
 
@@ -686,7 +685,7 @@ describe UsersController do
           grading_period_id: grading_period.id)
 
         expect(response).to be_ok
-        expected_response = {'grade' => 40, 'total' => 4, 'possible' => 10, 'hide_final_grades' => false}
+        expected_response = {'grade' => 40.0, 'hide_final_grades' => false}
         expect(json_parse(response.body)).to eq expected_response
 
         grading_period.end_date = 4.months.from_now
@@ -696,7 +695,7 @@ describe UsersController do
           enrollment_id: student_enrollment.id)
 
         expect(response).to be_ok
-        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expected_response = {'grade' => 94.55, 'hide_final_grades' => false}
         expect(json_parse(response.body)).to eq expected_response
       end
 
@@ -709,7 +708,7 @@ describe UsersController do
           enrollment_id: student_enrollment.id)
 
         expect(response).to be_ok
-        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expected_response = {'grade' => 94.55, 'hide_final_grades' => false}
         expect(json_parse(response.body)).to eq expected_response
       end
 
@@ -746,29 +745,7 @@ describe UsersController do
           observer
         end
 
-        context "with Multiple Grading periods disabled" do
-          it "returns grades of observees" do
-            user_session(observer)
-            get 'grades'
-
-            grades = assigns[:grades][:observed_enrollments][test_course.id]
-            expect(grades.length).to eq 2
-            expect(grades.key?(student1.id)).to eq true
-            expect(grades.key?(student2.id)).to eq true
-          end
-
-          it "returns an empty hash for grading periods" do
-            user_session(observer)
-            get 'grades'
-
-            grading_periods = assigns[:grading_periods]
-            expect(grading_periods).to be_empty
-          end
-        end
-
-        context "with Multiple Grading Periods enabled" do
-          before(:once) { course_factory.root_account.enable_feature!(:multiple_grading_periods) }
-
+        context "with grading periods" do
           it "returns the grading periods" do
             user_session(observer)
             get 'grades'
@@ -817,30 +794,8 @@ describe UsersController do
           course_with_user('StudentEnrollment', course: another_test_course, user: student, active_all: true)
           student
         end
-        context "with Multiple Grading periods disabled" do
-          it "returns grades" do
-            user_session(test_student)
-            get 'grades'
 
-            grades = assigns[:grades][:student_enrollments]
-
-            expect(grades.length).to eq 2
-            expect(grades.key?(test_course.id)).to eq true
-            expect(grades.key?(another_test_course.id)).to eq true
-          end
-
-          it "returns an empty hash for grading periods" do
-            user_session(test_student)
-            get 'grades'
-
-            grading_periods = assigns[:grading_periods]
-            expect(grading_periods).to be_empty
-          end
-        end
-
-        context "with Multiple Grading Periods enabled" do
-          before(:once) { course_factory.root_account.enable_feature!(:multiple_grading_periods) }
-
+        context "with grading periods" do
           it "returns the grading periods" do
             user_session(test_student)
             get 'grades'
@@ -859,6 +814,18 @@ describe UsersController do
               expect(selected_period_id).to eq grading_period.global_id
             end
 
+            it "returns the grade for the current grading period, if one exists " \
+              "and no grading period is passed in" do
+              assignment = test_course.assignments.create!(
+                due_at: 3.days.from_now(grading_period.end_date),
+                points_possible: 10
+              )
+              assignment.grade_student(test_student, grader: test_course.teachers.first, grade: 10)
+              user_session(test_student)
+              get :grades
+              expect(assigns[:grades][:student_enrollments][test_course.id]).to be_nil
+            end
+
             it "returns 0 (signifying 'All Grading Periods') if no current " \
             "grading period exists and no grading period parameter is passed in" do
               grading_period.start_date = 1.month.from_now
@@ -868,6 +835,19 @@ describe UsersController do
 
               selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
               expect(selected_period_id).to eq 0
+            end
+
+            it "returns the grade for 'All Grading Periods' if no current " \
+              "grading period exists and no grading period is passed in" do
+              grading_period.update!(start_date: 1.month.from_now)
+              assignment = test_course.assignments.create!(
+                due_at: 3.days.from_now(grading_period.end_date),
+                points_possible: 10
+              )
+              assignment.grade_student(test_student, grader: test_course.teachers.first, grade: 10)
+              user_session(test_student)
+              get :grades
+              expect(assigns[:grades][:student_enrollments][test_course.id]).to eq(100.0)
             end
 
             it "returns the grading_period_id passed in, if one is provided along with a course_id" do
@@ -885,7 +865,6 @@ describe UsersController do
                 course_with_user('StudentEnrollment', course: test_course, user: student1, active_all: true)
                 @shard1.activate do
                   account = Account.create!
-                  account.enable_feature!(:multiple_grading_periods)
                   @course2 = course_factory(active_all: true, account: account)
                   course_with_user('StudentEnrollment', course: @course2, user: student1, active_all: true)
                   grading_period_group2 = group_helper.legacy_create_for_course(@course2)

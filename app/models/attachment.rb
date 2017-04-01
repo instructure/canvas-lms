@@ -278,7 +278,12 @@ class Attachment < ActiveRecord::Base
     if context.respond_to?(:log_merge_result)
       context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
     end
-    dup.updated_at = Time.now
+    if context.respond_to?(:root_account_id) && self.namespace != context.root_account.file_namespace
+      dup.save_without_broadcasting!
+      dup.make_rootless
+      dup.change_namespace(context.root_account.file_namespace)
+    end
+    dup.updated_at = Time.zone.now
     dup.clone_updated = true
     dup.set_publish_state_for_usage_rights unless self.locked?
     dup
@@ -1222,6 +1227,31 @@ class Attachment < ActiveRecord::Base
     true
   end
 
+  # this will delete the content of the attachment but not delete the attachment
+  # object. It will replace the attachment content with a file_removed file.
+  def destroy_content_and_replace
+    raise 'must be a root_attachment' if self.root_attachment_id
+    self.destroy_content
+    self.uploaded_data = File.open Rails.root.join('public/file_removed/file_removed.pdf')
+    CrocodocDocument.where(attachment_id: self).delete_all
+    Canvadoc.where(attachment_id: self).delete_all
+    self.save!
+  end
+
+  def dmca_file_removal
+    destroy_content_and_replace
+  end
+
+  def destroy_content
+    raise 'must be a root_attachment' if self.root_attachment_id
+    return unless self.filename
+    if Attachment.s3_storage?
+      self.s3object.delete
+    else
+      FileUtils.rm full_filename
+    end
+  end
+
   def make_childless(preferred_child = nil)
     return if root_attachment_id
     child = preferred_child || children.take
@@ -1229,18 +1259,32 @@ class Attachment < ActiveRecord::Base
     raise "must be a child" unless child.root_attachment_id == id
     child.root_attachment_id = nil
     child.filename = filename if filename
+    copy_attachment_content(child)
+    Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child.id)
+  end
+
+  def copy_attachment_content(destination)
     if Attachment.s3_storage?
-      if filename && s3object.exists? && !child.s3object.exists?
-        s3object.copy_to(child.s3object)
+      if filename && s3object.exists? && !destination.s3object.exists?
+        s3object.copy_to(destination.s3object)
       end
     else
+      return if open == destination.open
       old_content_type = self.content_type
       Attachment.where(:id => self).update_all(:content_type => "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
-      child.uploaded_data = open
+      destination.uploaded_data = open
       Attachment.where(:id => self).update_all(:content_type => old_content_type)
     end
-    child.save!
-    Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child)
+    destination.save!
+  end
+
+  def make_rootless
+    return unless root_attachment_id
+    root = self.root_attachment
+    return unless root
+    self.root_attachment_id = nil
+    self.write_attribute(:filename, root.filename) if root.filename
+    root.copy_attachment_content(self)
   end
 
   def restore
@@ -1602,7 +1646,12 @@ class Attachment < ActiveRecord::Base
         attachment.filename ||= File.basename(uri.path)
         attachment.uploaded_data = tmpfile
         if attachment.content_type.blank? || attachment.content_type == "unknown/unknown"
-          attachment.content_type = http_response.content_type
+          # uploaded_data= clobbers the content_type set in preflight; if it was given, prefer it to the HTTP response
+          attachment.content_type = if attachment.content_type_was.present? && attachment.content_type_was != 'unknown/unknown'
+            attachment.content_type_was
+          else
+            http_response.content_type
+          end
         end
         return attachment
       else

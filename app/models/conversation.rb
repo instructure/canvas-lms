@@ -554,14 +554,14 @@ class Conversation < ActiveRecord::Base
           if new_cp = new_participants[cp.user_id]
             new_cp.update_attribute(:workflow_state, cp.workflow_state) if cp.unread? || new_cp.archived?
             # backcompat
-            cp.conversation_message_participants.update_all(:conversation_participant_id => new_cp)
+            cp.conversation_message_participants.update_all(conversation_participant_id: new_cp.id)
             # remove the duplicate participant
             cp.destroy
 
             if cp.user.shard != self.shard
               # remove the duplicate secondary CP on the user's shard
               cp.user.shard.activate do
-                ConversationParticipant.where(:conversation_id => self, :user_id => cp.user_id).delete_all
+                ConversationParticipant.where(conversation_id: self, :user_id => cp.user_id).delete_all
               end
             end
           else
@@ -578,7 +578,7 @@ class Conversation < ActiveRecord::Base
             if cp.user.shard != self.shard
               cp.user.shard.activate do
                 ConversationParticipant.where(:conversation_id => self, :user_id => cp.user_id).
-                  update_all(:conversation_id => other)
+                  update_all(conversation_id: other.id)
               end
             end
             # create a new duplicate cp on the target conversation's shard
@@ -725,7 +725,8 @@ class Conversation < ActiveRecord::Base
   protected
 
   def maybe_update_timestamp(col, val, additional_conditions=[])
-    condition = self.class.where(["(#{col} IS NULL OR #{col} < ?)", val]).where(additional_conditions).where_values.join(' AND ')
+    scope = self.class.where(["(#{col} IS NULL OR #{col} < ?)", val]).where(additional_conditions)
+    condition = (CANVAS_RAILS4_2 ? scope.where_values : scope.where_clause.send(:predicates)).join(' AND ')
     sanitize_sql ["#{col} = CASE WHEN #{condition} THEN ? ELSE #{col} END", val]
   end
 end

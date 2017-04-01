@@ -80,6 +80,14 @@ Specs/NoBeforeOnceStubs:
     - "**/spec/**/*.rb"
     - "**/spec_canvas/**/*.rb"
 
+Specs/NoDisableImplicitWait:
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"
+  Exclude:
+    - "**/spec/selenium/test_setup/**/*.rb"
+
 Specs/NoExecuteScript:
   Enabled: true
   Include:
@@ -94,11 +102,27 @@ Specs/NoNoSuchElementError:
     - "**/spec/**/*.rb"
     - "**/spec_canvas/**/*.rb"
 
+Specs/NoSeleniumWebDriverWait:
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"
+  Exclude:
+    - "**/spec/selenium/test_setup/**/*.rb"
+
 Specs/NoStrftime:
   Enabled: true
   Include:
     - "**/spec/**/*.rb"
     - "**/spec_canvas/**/*.rb"
+
+Specs/NoWaitForNoSuchElement:
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"
+  Exclude:
+    - "**/spec/selenium/test_setup/**/*.rb"
 
 Specs/PreferFOverFj:
   Enabled: true

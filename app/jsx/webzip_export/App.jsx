@@ -102,6 +102,11 @@ define([
         <div>
           <h1>{I18n.t('Exported Package History')}</h1>
           {app}
+          <p><strong>{I18n.t(`You may not reproduce or communicate any of the content on
+            this course, including files exported from this course without the prior written
+            permission of your institution.  Check with your institution for specific online
+            user agreement guidelines.`)}</strong></p>
+          <hr />
           <ExportInProgress webzip={webzipInProgress} loadExports={this.getExports} />
         </div>
       )

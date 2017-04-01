@@ -69,6 +69,9 @@ module CC::Importer::Canvas
 
       read_external_content
 
+      # for master course sync
+      @course[:deletions] = @settings[:deletions] if @settings[:deletions].present?
+
       #close up shop
       save_to_file
       set_progress(90)

@@ -52,7 +52,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     def serialize(answer_hash)
       rc = SerializedAnswer.new
 
-      unless answer_hash.is_a?(Hash)
+      unless answer_hash.is_a?(Hash) || answer_hash.is_a?(ActionController::Parameters)
         return rc.reject :invalid_type, 'answer', Hash
       end
 
@@ -81,7 +81,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     #   {
     #     "color": "red"
     #   }
-    # 
+    #
     # @example output for leaving the blank "color" empty, and filling in the
     #          blank "size" with "XL":
     #   {

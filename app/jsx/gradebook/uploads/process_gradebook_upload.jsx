@@ -114,7 +114,7 @@ define([
 
       gradeData[assignmentId] = gradeData[assignmentId] || {}; // eslint-disable-line no-param-reassign
 
-      if ((submission.grade || '').toUpperCase() === 'EX') {
+      if (String(submission.grade || '').toUpperCase() === 'EX') {
         gradeData[assignmentId][studentId] = { excuse: true }; // eslint-disable-line no-param-reassign
       } else {
         gradeData[assignmentId][studentId] = { // eslint-disable-line no-param-reassign

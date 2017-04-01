@@ -109,7 +109,7 @@ describe 'Canvas::Twilio' do
     it 'raises an exception when attempting to deliver without a config file' do
       allow(Canvas::Twilio).to receive(:config).and_return({})
 
-      expect { Canvas::Twilio.deliver('+18015550100', 'message text') }.to raise_exception
+      expect { Canvas::Twilio.deliver('+18015550100', 'message text') }.to raise_error("Twilio is not configured")
     end
 
     it "delivers to a phone number in the recipient's country if such a phone number exists" do

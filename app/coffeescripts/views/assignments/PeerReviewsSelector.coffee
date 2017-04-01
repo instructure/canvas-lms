@@ -2,9 +2,10 @@ define [
   'Backbone'
   'underscore'
   'jquery'
+  'jsx/shared/helpers/numberHelper'
   'jst/assignments/PeerReviewsSelector'
   'compiled/jquery/toggleAccessibly'
-], (Backbone, _, $, template, toggleAccessibly) ->
+], (Backbone, _, $, numberHelper, template, toggleAccessibly) ->
 
   class PeerReviewsSelector extends Backbone.View
 
@@ -62,3 +63,8 @@ define [
       hideAnonymousPeerReview: @hideAnonymousPeerReview
       hasGroupCategory: @parentModel.groupCategoryId()
       intraGroupPeerReviews: @parentModel.intraGroupPeerReviews()
+
+    getFormData: =>
+      data = super
+      data.peerReviewCount = numberHelper.parse(data.peerReviewCount)
+      data

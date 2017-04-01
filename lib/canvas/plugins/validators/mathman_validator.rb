@@ -20,7 +20,7 @@ module Canvas::Plugins::Validators::MathmanValidator
   def self.validate(settings, plugin_setting)
     base_url = settings[:base_url]
     if base_url.match(URI.regexp)
-      settings
+      settings.to_hash.with_indifferent_access
     else
       plugin_setting.errors.add(:base, I18n.t('Must provide a valid url.'))
       false

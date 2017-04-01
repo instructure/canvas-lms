@@ -23,6 +23,8 @@ module Api::V1::DiscussionTopics
   include Api::V1::Locked
   include Api::V1::Assignment
 
+  include HtmlTextHelper
+
   # Public: DiscussionTopic fields to serialize.
   ALLOWED_TOPIC_FIELDS  = %w{
     id title assignment_id delayed_post_at lock_at
@@ -70,6 +72,7 @@ module Api::V1::DiscussionTopics
 
     opts[:user_can_moderate] = context.grants_right?(user, session, :moderate_forum) if opts[:user_can_moderate].nil?
     json = api_json(topic, user, session, { only: ALLOWED_TOPIC_FIELDS, methods: ALLOWED_TOPIC_METHODS }, [:attach, :update, :reply, :delete])
+
     json.merge!(serialize_additional_topic_fields(topic, context, user, opts))
 
     if hold = topic.subscription_hold(user, @context_enrollment, session)
@@ -120,11 +123,16 @@ module Api::V1::DiscussionTopics
     locked_json(fields, topic, user, 'topic', check_policies: true, deep_check_if_needed: true)
     can_view = !fields[:lock_info].is_a?(Hash) || fields[:lock_info][:can_view]
     unless opts[:exclude_messages]
-      if opts[:plain_messages]
-        fields[:message] = can_view ? topic.message : lock_explanation(fields[:lock_info], 'topic', context) # used for searching by body on index
-      else
-        fields[:message] = can_view ? api_user_content(topic.message, context) : lock_explanation(fields[:lock_info], 'topic', context)
-      end
+      fields[:message] =
+        if !can_view
+          lock_explanation(fields[:lock_info], 'topic', context)
+        elsif opts[:plain_messages]
+          topic.message # used for searching by body on index
+        elsif opts[:text_only]
+          html_to_text(topic.message)
+        else
+          api_user_content(topic.message, context)
+        end
     end
 
     if opts[:master_course_status]

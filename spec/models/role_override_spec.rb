@@ -261,13 +261,6 @@ describe RoleOverride do
         expect(permission_data[:explicit]).to be_falsey
       end
 
-      it "should be enabled for account if not specified" do
-        permission_data = RoleOverride.permission_for(@account, :view_grade_changes, admin_role)
-        expect(permission_data[:account_allows]).to be_truthy
-        expect(permission_data[:enabled]).to be_truthy
-        expect(permission_data[:explicit]).to be_falsey
-      end
-
       it "should be enabled for account if specified" do
         root_account = @account.root_account
         root_account.settings[:admins_can_view_notifications] = true

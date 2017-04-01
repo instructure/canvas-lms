@@ -12,6 +12,8 @@ define([
   var GradingPeriod = React.createClass({
     propTypes: {
       title: Types.string.isRequired,
+      weight: Types.number,
+      weighted: Types.bool.isRequired,
       startDate: Types.instanceOf(Date).isRequired,
       endDate: Types.instanceOf(Date).isRequired,
       closeDate: Types.instanceOf(Date).isRequired,
@@ -24,6 +26,12 @@ define([
         update: Types.bool.isRequired,
         delete: Types.bool.isRequired,
       }).isRequired
+    },
+
+    getDefaultProps () {
+      return {
+        weight: null
+      };
     },
 
     getInitialState: function(){
@@ -40,7 +48,7 @@ define([
         title: nextProps.title,
         startDate: nextProps.startDate,
         endDate: nextProps.endDate,
-        weight: nextProps.weight,
+        weight: nextProps.weight
       });
     },
 
@@ -81,6 +89,8 @@ define([
                                ref="template"
                                id={this.props.id}
                                title={this.props.title}
+                               weight={this.props.weight}
+                               weighted={this.props.weighted}
                                startDate={this.props.startDate}
                                endDate={this.props.endDate}
                                closeDate={this.props.closeDate || this.props.endDate}

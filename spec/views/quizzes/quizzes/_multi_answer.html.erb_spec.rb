@@ -24,7 +24,7 @@ describe "/quizzes/quizzes/_multi_answer" do
   it "should render" do
     course_with_student
     view_context
-    assigns[:quiz] = @course.quizzes.create!
+    assign(:quiz, @course.quizzes.create!)
     answer = {
       id: 5,
       weight: 100,

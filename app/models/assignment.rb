@@ -45,14 +45,7 @@ class Assignment < ActiveRecord::Base
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :description]
-
-  RESTRICTED_SETTINGS = [:points_possible, :assignment_group_id,
-    :grading_type, :omit_from_final_grade, :submission_types,
-    :group_category, :group_category_id,
-    :grade_group_students_individually, :peer_reviews,
-    :moderated_grading,
-    :due_at, :lock_at, :unlock_at, :peer_reviews_due_at].freeze
-  restrict_columns :settings, RESTRICTED_SETTINGS
+  restrict_assignment_columns
 
   has_many :submissions, :dependent => :destroy
   has_many :provisional_grades, :through => :submissions
@@ -177,15 +170,11 @@ class Assignment < ActiveRecord::Base
     (graded_count > 0) || provisional_grades_exist?
   end
 
-  def moderated_grading_setting_changed?
-    moderated_grading_changed? && moderated_grading.presence != moderated_grading_was.presence
-  end
-
   def moderation_setting_ok?
-    if moderated_grading_setting_changed? && graded_submissions_exist?
+    if moderated_grading_changed? && graded_submissions_exist?
       errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be changed if graded submissions exist")
     end
-    if (moderated_grading_setting_changed? || new_record?) && moderated_grading?
+    if (moderated_grading_changed? || new_record?) && moderated_grading?
       if !graded?
         errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be enabled for ungraded assignments")
       end
@@ -212,6 +201,7 @@ class Assignment < ActiveRecord::Base
     unlock_at
     assignment_group_id
     peer_reviews
+    anonymous_peer_reviews
     automatic_peer_reviews
     peer_reviews_due_at
     peer_review_count
@@ -238,6 +228,7 @@ class Assignment < ActiveRecord::Base
     moderated_grading
     grades_published_at
     omit_from_final_grade
+    grading_standard_id
   )
 
   def external_tool?
@@ -295,6 +286,7 @@ class Assignment < ActiveRecord::Base
 
 
   after_save  :update_grades_if_details_changed,
+              :update_grading_period_grades,
               :touch_assignment_group,
               :touch_context,
               :update_grading_standard,
@@ -391,6 +383,20 @@ class Assignment < ActiveRecord::Base
     end
     true
   end
+
+  def update_grading_period_grades
+    return true unless due_at_changed? && !id_changed? && context.grading_periods?
+
+    grading_period_was = GradingPeriod.for_date_in_course(date: due_at_was, course: context)
+    grading_period = GradingPeriod.for_date_in_course(date: due_at, course: context)
+    return true if grading_period_was&.id == grading_period&.id
+
+    [grading_period_was, grading_period].compact.each do |gp|
+      context.recompute_student_scores(nil, grading_period_id: gp, update_all_grading_period_scores: false)
+    end
+    true
+  end
+  private :update_grading_period_grades
 
   def create_in_turnitin
     return false unless self.context.turnitin_settings
@@ -504,6 +510,13 @@ class Assignment < ActiveRecord::Base
     # have to use peer_reviews_due_at here because it's the column name
     self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
     self.points_possible = nil unless self.graded?
+    [
+      :all_day, :could_be_locked, :grade_group_students_individually,
+      :anonymous_peer_reviews, :turnitin_enabled, :vericite_enabled,
+      :moderated_grading, :omit_from_final_grade, :freeze_on_copy,
+      :copied, :only_visible_to_overrides, :post_to_sis, :peer_reviews_assigned,
+      :peer_reviews, :automatic_peer_reviews, :muted, :intra_group_peer_reviews
+    ].each { |attr| self[attr] = false if self[attr].nil? }
   end
   protected :default_values
 
@@ -625,15 +638,12 @@ class Assignment < ActiveRecord::Base
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)
   def do_notifications!(prior_version=nil, notify=false)
-    self.prior_version = prior_version
-    @broadcasted = false
     # TODO: this will blow up if the group_category string is set on the
     # previous version, because it gets confused between the db string field
     # and the association.  one more reason to drop the db column
-    self.prior_version ||= self.versions.previous(self.current_version.number).try(:model)
-    self.just_created = self.prior_version.nil?
+    prior_version ||= self.versions.previous(self.current_version.number).try(:model)
     self.notify_of_update = notify || false
-    broadcast_notifications
+    broadcast_notifications(prior_version || dup)
     remove_assignment_updated_flag
   end
 
@@ -1260,7 +1270,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def tool_settings_tool=(tool)
-    self.tool_settings_tools = [tool]
+    self.tool_settings_tools = [tool] if tool_settings_tool != tool
   end
 
   def tool_settings_tools=(tools)
@@ -1553,7 +1563,7 @@ class Assignment < ActiveRecord::Base
 
   def student_needs_provisional_grade?(student, preloaded_counts=nil)
     pg_count = if preloaded_counts
-      preloaded_counts[student.id.to_s] || 0
+      preloaded_counts[CANVAS_RAILS4_2 ? student.id.to_s : student.id] || 0
     else
       self.provisional_grades.not_final.where(:submissions => {:user_id => student}).count
     end
@@ -1636,7 +1646,8 @@ class Assignment < ActiveRecord::Base
     enrollment_priority = { 'active' => 1, 'inactive' => 2 }
     enrollment_priority.default = 100
 
-    reps_and_others = groups_and_ungrouped(user, includes: includes).map do |group_name, group_students|
+    reps_and_others = groups_and_ungrouped(user, includes: includes).map do |group_name, group_info|
+      group_students = group_info[:users]
       visible_group_students =
         group_students & visible_students_for_speed_grader(user, includes: includes)
 
@@ -1652,7 +1663,7 @@ class Assignment < ActiveRecord::Base
 
       representative.readonly!
       representative.name = group_name
-      representative.sortable_name = group_name
+      representative.sortable_name = group_info[:sortable_name]
       representative.short_name = group_name
 
       [representative, others]
@@ -1663,16 +1674,19 @@ class Assignment < ActiveRecord::Base
     if block_given?
       sorted_reps_with_others.each { |r,o| yield r, o }
     end
-    sorted_reps_with_others.map &:first
+    sorted_reps_with_others.map(&:first)
   end
 
   def groups_and_ungrouped(user, includes: [])
     groups_and_users = group_category.
       groups.active.preload(group_memberships: :user).
-      map { |g| [g.name, g.users] }
-    users_in_group = groups_and_users.flat_map { |_,users| users }
+      map { |g| [g.name, { sortable_name: g.name, users: g.users}] }
+    users_in_group = groups_and_users.flat_map { |_, group_info| group_info[:users] }
     groupless_users = visible_students_for_speed_grader(user, includes: includes) - users_in_group
-    phony_groups = groupless_users.map { |u| [u.name, [u]] }
+    phony_groups = groupless_users.map do |u|
+      sortable_name = users_in_group.empty? ? u.sortable_name : u.name
+      [u.name, { sortable_name: sortable_name, users: [u] }]
+    end
     groups_and_users + phony_groups
   end
   private :groups_and_ungrouped
@@ -2295,6 +2309,20 @@ class Assignment < ActiveRecord::Base
 
   def quiz?
     submission_types == 'online_quiz' && quiz.present?
+  end
+
+  def quiz_lti?
+    external_tool? &&
+      external_tool_tag.present? &&
+      external_tool_tag.content.present? &&
+      external_tool_tag.content.tool_id == 'Quizzes 2'
+  end
+
+  def quiz_lti!
+    tool = context.present? && context.quiz_lti_tool
+    return unless tool
+    self.submission_types = 'external_tool'
+    self.external_tool_tag_attributes = { content: tool, url: tool.url }
   end
 
   def discussion_topic?

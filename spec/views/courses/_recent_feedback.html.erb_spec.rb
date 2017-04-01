@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 describe "/courses/_recent_feedback" do
   before do
     course_with_student(active_all: true)
-    assigns[:current_user] = @user
+    assign(:current_user, @user)
     submission_model
   end
 
@@ -41,7 +41,7 @@ describe "/courses/_recent_feedback" do
 
     render :partial => "courses/recent_feedback", object: @submission, locals: {is_hidden: false}
 
-    expect(response.body).to include("5782394 out of #{@assignment.points_possible}")
+    expect(response.body).to include("5,782,394 out of #{@assignment.points_possible}")
   end
 
   it 'shows the grade and the comment' do
@@ -51,7 +51,7 @@ describe "/courses/_recent_feedback" do
 
     render :partial => "courses/recent_feedback", object: @submission, locals: {is_hidden: false}
 
-    expect(response.body).to include("25734 out of #{@assignment.points_possible}")
+    expect(response.body).to include("25,734 out of #{@assignment.points_possible}")
     expect(response.body).to include('something different')
   end
 end

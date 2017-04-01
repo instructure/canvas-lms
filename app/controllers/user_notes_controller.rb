@@ -60,14 +60,14 @@ class UserNotesController < ApplicationController
   def create
     user_note_params = params[:user_note] ? params[:user_note].permit(:note, :title, :creator, :user_id) : {}
 
-    user_note_params[:user] = User.where(id: user_note_params.delete(:user_id)).first if user_note_params[:user_id]
-    user_note_params[:user] ||= User.where(id: params[:user_id]).first
+    user = User.where(id: user_note_params.delete(:user_id)).first if user_note_params[:user_id]
+    user ||= User.where(id: params[:user_id]).first
     # We want notes to be an html field, but we're only using a plaintext box for now. That's why we're
     # doing the trip to html now, instead of on the way out. This should be removed once the user notes
     # entry form is replaced with the rich text editor.
     self.extend TextHelper
     user_note_params[:note] = format_message(user_note_params[:note]).first if user_note_params[:note]
-    @user_note = UserNote.new(user_note_params)
+    @user_note = user.user_notes.new(user_note_params)
     @user_note.creator = @current_user
 
     if authorized_action(@user_note.user, @current_user, :create_user_notes)

@@ -83,7 +83,7 @@ module Context
 
   def rubric_contexts(user)
     context_codes = [self.asset_string]
-    context_codes << ([user] + user.management_contexts).uniq.map(&:asset_string) if user
+    context_codes.concat(([user] + user.management_contexts).uniq.map(&:asset_string)) if user
     context = self
     while context && context.respond_to?(:account) || context.respond_to?(:parent_account)
       context = context.respond_to?(:account) ? context.account : context.parent_account

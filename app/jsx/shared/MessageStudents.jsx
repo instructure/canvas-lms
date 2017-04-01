@@ -223,13 +223,8 @@ define([
         return null
       }
 
-      const onTextInputChange = (field) => {
-        return (e) => this.handleChange(field, e.target.value)
-      }
-
-      const onTextAreaChange = (field) => {
-        return (value) => this.handleChange(field, value)
-      }
+      const onTextChange = field =>
+        e => this.handleChange(field, e.target.value)
 
       const tokens = this.state.data.recipients.map((recipient) => {
         const displayName = recipient.displayName || recipient.email
@@ -277,7 +272,7 @@ define([
                   <TextInput
                     label={I18n.t("Subject")}
                     defaultValue={this.props.subject}
-                    onChange={onTextInputChange('subject')}
+                    onChange={onTextChange('subject')}
                     messages={this.errorMessagesFor('subject')}
                     disabled={this.state.sending || this.state.success}
                   />
@@ -286,7 +281,7 @@ define([
                   <TextArea
                     label={I18n.t("Body")}
                     defaultValue={this.props.body}
-                    onChange={onTextAreaChange('body')}
+                    onChange={onTextChange('body')}
                     messages={this.errorMessagesFor('body')}
                     disabled={this.state.sending || this.state.success}
                   />

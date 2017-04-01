@@ -4,20 +4,21 @@
   overflow: hidden;
   margin-left: -12px;
   padding: 0 12px 12px;
+  display: block;
   > div {
-    background: #ebebeb;
-    border: 1px solid #999999;
-    border-radius: 0 0 10px 10px;
-    box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.15);
+    background: $ic-color-light;
+    border: 1px solid $ic-border-light;
+    border-radius: $borderRadius;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
     overflow: hidden;
-    width: 341px;
+    width: 390px;
     // gets shifted left/right as menu slides
     > div {
       position: relative;
       // each menu level (contains two uls)
       > div {
         float: left;
-        width: 341px;
+        width: 390px;
       }
     }
   }
@@ -31,11 +32,11 @@
     margin: 0 0 10px;
     overflow: auto;
     li, li.active.no-results {
-      background: transparent;
+      background: $ic-color-light;
       position: relative;
       overflow: hidden;
-      border-top: 1px solid #fff;
-      border-bottom: 1px solid #d4d5d7;
+      border-top: 1px solid $ic-color-light;
+      border-bottom: 1px dashed $ic-border-dark;
       padding: 5px;
     }
     li.active.no-results {
@@ -60,15 +61,11 @@
       border-bottom: none;
     }
     li.active, li:focus {
-      border-top-color: #d7eefb;
-      border-bottom-color: #297fd1;
-      background: #2da5f0 url(/images/messages/finder-active.png) repeat-x 0 0;
+      background: $ic-brand-primary;
       outline: none;
     }
     li.active.expanded {
-      background: #f4fbff;
-      border-top-color: #fff;
-      border-bottom-color: #d4d5d7;
+      background: $ic-color-medium-light;
     }
   }
 }

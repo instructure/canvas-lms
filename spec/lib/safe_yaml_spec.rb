@@ -82,13 +82,13 @@ oo: !ruby/object:OpenObject
 --- !ruby/object:ActionController::Base
 real_format:
 YAML
-    expect { YAML.load yaml }.to raise_error
+    expect { YAML.load yaml }.to raise_error("Unknown YAML tag '!ruby/object:ActionController::Base'")
     result = YAML.unsafe_load yaml
     expect(result.class).to eq ActionController::Base
   end
 
   it "doesn't allow deserialization of arbitrary classes" do
-    expect { YAML.load(YAML.dump(ActionController::Base)) }.to raise_error
+    expect { YAML.load(YAML.dump(ActionController::Base)) }.to raise_error("YAML deserialization of constant not allowed: ActionController::Base")
   end
 
   it "allows deserialization of arbitrary classes when unsafe_loading" do

@@ -19,13 +19,13 @@ of files. Inside your `.env` file, add the phantomjs-tests override in your
 
 The `jspec` npm script allows you to build and run specific JavaScript specs as follows:
 
-1) `npm run jspec path/to/specs`
+1) `yarn run jspec path/to/specs`
   This will build the specified specs using webpack and run them locally using Chrome.
 
   You can specify a directory or a single spec file to build and run. If no path
   is provided, all javascript specs are built and ran.
 
-2) `npm run jspec-watch path/to/specs`
+2) `yarn run jspec-watch path/to/specs`
   This will get webpack building the specified specs in watch mode, making it so your
   changes are instantly (or close to instantly) reflected in the test bundle.
 
@@ -33,13 +33,13 @@ The `jspec` npm script allows you to build and run specific JavaScript specs as 
   is provided, all javascript specs are watched and built.
 
   Using `jspec` in this way assumes you will run the specs yourself using PhantomJS
-  (see below) or by using `npm run test` to run them locally in Chrome.
+  (see below) or by using `yarn test` to run them locally in Chrome.
 
 ### PhantomJS
 
 To run javascript specs using PhantomJS you can do so as follow:
 
-1) `npm run jspec-watch path/to/specs`
+1) `yarn run jspec-watch path/to/specs`
    This will get webpack building the test bundle in watch mode, making it so your
    changes are instantly (or close to instantly) reflected in the test bundle.
 
@@ -63,8 +63,8 @@ specs currently run in Chrome so make sure that your tests pass there.
 
 ## Javascript Test Coverage
 
-You can generate code coverage locally by first running `npm install` having webpack
-set up( `touch config/WEBPACK`) then running `bundle exec rake js:test` or `npm run webpack-test`.
+You can generate code coverage locally by having webpack
+set up( `touch config/WEBPACK`) then running `COVERAGE=1 yarn test`.
 You should then have a folder in your root directory called `coverage-js`
 in which contains an `index.html` which if you open it will show you
 the test coverage for all javascript (js, coffee, jsx)

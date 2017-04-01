@@ -1,12 +1,22 @@
 define([
   'i18n!roster',
   'react',
-  'instructure-ui',
+  'instructure-ui/Button',
+  'instructure-ui/Typography',
+  'instructure-ui/RadioInputGroup',
+  'instructure-ui/RadioInput',
+  'instructure-ui/Select',
+  'instructure-ui/TextArea',
+  'instructure-ui/ScreenReaderContent',
+  'instructure-ui/Checkbox',
+  'instructure-ui/Alert',
+  'instructure-icons/react/Solid/IconUserSolid',
   './shapes',
   '../helpers'
-], (I18n, React, {Button, Typography, RadioInputGroup,
-    RadioInput, Select, TextArea, ScreenReaderContent,
-    Checkbox, Alert}, {courseParamsShape, inputParamsShape},
+], (I18n, React, {default: Button}, {default: Typography}, {default: RadioInputGroup},
+    {default: RadioInput}, {default: Select}, {default: TextArea}, {default: ScreenReaderContent},
+    {default: Checkbox}, {default: Alert}, {default: IconUserSolid},
+    {courseParamsShape, inputParamsShape},
     {parseNameList, findEmailInEntry, emailValidator}) => {
   class PeopleSearch extends React.Component {
     static propTypes = Object.assign({}, inputParamsShape, courseParamsShape);
@@ -38,8 +48,8 @@ define([
     onChangeSearchType = (newValue) => {
       this.props.onChange({searchType: newValue});
     }
-    onChangeNameList = (newValue) => {
-      this.props.onChange({nameList: newValue});
+    onChangeNameList = (event) => {
+      this.props.onChange({nameList: event.target.value});
     }
 
     onChangeSection = (event) => {
@@ -79,16 +89,16 @@ define([
       switch (this.props.searchType) {
         case 'sis_user_id':
           exampleText = 'student_2708, student_3693';
-          labelText = I18n.t('Enter the SIS IDs of the users you would like to add, separated by commas');
+          labelText = I18n.t('Enter the SIS IDs of the users you would like to add, separated by commas or line breaks');
           break;
         case 'unique_id':
           exampleText = 'lsmith, mfoster';
-          labelText = I18n.t('Enter the login IDs of the users you would like to add, separated by commas');
+          labelText = I18n.t('Enter the login IDs of the users you would like to add, separated by commas or line breaks');
           break;
         case 'cc_path':
         default:
           exampleText = 'lsmith@myschool.edu, mfoster@myschool.edu';
-          labelText = I18n.t('Enter the Email addresses of the users you would like to add, separated by commas');
+          labelText = I18n.t('Enter the email addresses of the users you would like to add, separated by commas or line breaks');
       }
 
       return (
@@ -98,17 +108,16 @@ define([
             defaultValue={this.props.searchType}
             description={I18n.t('Add user(s) by')}
             onChange={this.onChangeSearchType}
+            layout="columns"
           >
             <RadioInput
               id="peoplesearch_radio_cc_path"
-              isBlock={false}
               key="cc_path"
               value="cc_path"
               label={I18n.t('Email Address')}
             />
             <RadioInput
               id="peoplesearch_radio_unique_id"
-              isBlock={false}
               key="unique_id"
               value="unique_id"
               label={I18n.t('Login ID')}
@@ -116,7 +125,6 @@ define([
             {this.props.canReadSIS
               ? <RadioInput
                 id="peoplesearch_radio_sis_user_id"
-                isBlock={false}
                 key="sis_user_id"
                 value="sis_user_id"
                 label={I18n.t('SIS ID')}
@@ -173,7 +181,9 @@ define([
             </div>
           </fieldset>
           <div className="peoplesearch__instructions">
-            <i className="icon-user" />
+            <div className="usericon" aria-hidden>
+              <IconUserSolid />
+            </div>
             <Typography size="medium">
               {I18n.t('When adding multiple users, use a comma or line break to separate users.')}
             </Typography>

@@ -49,7 +49,7 @@ module Canvas::Plugins::Validators::LiveEventsValidator
 
       return false if err
 
-      settings = settings.slice(:kinesis_stream_name, :aws_access_key_id, :aws_secret_access_key, :aws_region, :aws_endpoint)
+      settings = settings.permit(:kinesis_stream_name, :aws_access_key_id, :aws_secret_access_key, :aws_region, :aws_endpoint).to_h.with_indifferent_access
       temp_settings = settings.dup
       temp_settings[:aws_secret_access_key_dec] = temp_settings.delete(:aws_secret_access_key)
       unless LiveEvents::Client.new(temp_settings).valid?

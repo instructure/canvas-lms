@@ -7,7 +7,6 @@ require [
 
   ReactDOM.render(
     TabContainerFactory(
-      multipleGradingPeriodsEnabled: ENV.MULTIPLE_GRADING_PERIODS
       readOnly: ENV.GRADING_PERIODS_READ_ONLY
       urls:
         enrollmentTermsURL:      ENV.ENROLLMENT_TERMS_URL

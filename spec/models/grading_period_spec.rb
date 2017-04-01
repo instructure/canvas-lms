@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2016 Instructure, Inc.
+# Copyright (C) 2014 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -61,6 +61,8 @@ describe GradingPeriod do
     grading_period = GradingPeriod.new(params.except(:title))
     expect(grading_period).not_to be_valid
   end
+
+  it { is_expected.to validate_numericality_of(:weight) }
 
   describe ".in_closed_grading_period?" do
     let(:in_closed_grading_period) { closed_period.start_date + 1.day }
@@ -198,6 +200,11 @@ describe GradingPeriod do
     it "includes the close_date in the returned object" do
       json = grading_period.as_json_with_user_permissions(User.new)
       expect(json).to have_key("close_date")
+    end
+
+    it "includes the weight in the returned object" do
+      json = grading_period.as_json_with_user_permissions(User.new)
+      expect(json).to have_key("weight")
     end
   end
 
@@ -755,6 +762,41 @@ describe GradingPeriod do
       expect{ grading_period.update!(start_date: 1.day.ago(@assignment.due_at)) }.to change{
         Score.where(grading_period_id: grading_period).first.current_score
       }.from(nil).to(80.0)
+    end
+
+    it 'updates course score when the grading period weight is changed' do
+      grading_period.save!
+      grading_period_group.update!(weighted: true)
+      expect{ grading_period.update!(weight: 50) }.to change{
+        Score.where(grading_period_id: nil).first.updated_at
+      }
+    end
+
+    it 'does not update grading period score when the grading period weight is changed' do
+      grading_period.save!
+      grading_period_group.update!(weighted: true)
+      expect{ grading_period.update!(weight: 20) }.not_to change{
+        Score.where(grading_period_id: grading_period).first.updated_at
+      }
+    end
+
+    it 'does not update course score when weight is changed but weighted grading periods are disabled' do
+      grading_period.save!
+      grading_period_group.update!(weighted: false)
+      expect{ grading_period.update!(weight: 50) }.not_to change{
+        Score.where(grading_period_id: nil).first.updated_at
+      }
+      expect{ grading_period.update!(weight: 20) }.not_to change{
+        Score.where(grading_period_id: grading_period).first.updated_at
+      }
+    end
+
+    it 'does not update grading period score when weight is changed but weighted grading periods are disabled' do
+      grading_period.save!
+      grading_period_group.update!(weighted: false)
+      expect{ grading_period.update!(weight: 20) }.not_to change{
+        Score.where(grading_period_id: grading_period).first.updated_at
+      }
     end
   end
 end

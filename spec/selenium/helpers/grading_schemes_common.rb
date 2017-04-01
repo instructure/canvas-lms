@@ -32,6 +32,7 @@ module GradingSchemesCommon
     simple_grading_standard(context)
     grading_standard = GradingStandard.last
     get url
+    f('#react_grading_tabs a[href="#grading-standards-tab"]').click if context.is_a?(Account)
     f('.edit_grading_standard_button').click
     replace_content(f('.scheme_name'), edit_name)
     save_and_reload_changes(grading_standard)
@@ -42,6 +43,7 @@ module GradingSchemesCommon
   def should_delete_a_grading_scheme(context, url)
     simple_grading_standard(context)
     get url
+    f('#react_grading_tabs a[href="#grading-standards-tab"]').click if context.is_a?(Account)
     f('.delete_grading_standard_button').click
     driver.switch_to.alert.accept
     wait_for_ajaximations
@@ -52,6 +54,7 @@ module GradingSchemesCommon
     simple_grading_standard(context)
     @grading_standard = GradingStandard.last
     get url
+    f('#react_grading_tabs a[href="#grading-standards-tab"]').click if context.is_a?(Account)
     f('.edit_grading_standard_button').click
   end
 

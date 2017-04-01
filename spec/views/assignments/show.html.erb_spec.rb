@@ -27,9 +27,9 @@ describe "/assignments/show" do
     a = @course.assignments.create!(:title => "some assignment")
     a.assignment_group_id = g.id
     a.save!
-    assigns[:assignment] = a
-    assigns[:assignment_groups] = [g]
-    assigns[:current_user_rubrics] = []
+    assign(:assignment, a)
+    assign(:assignment_groups, [g])
+    assign(:current_user_rubrics, [])
     render 'assignments/show'
     expect(response).not_to be_nil # have_tag()
   end

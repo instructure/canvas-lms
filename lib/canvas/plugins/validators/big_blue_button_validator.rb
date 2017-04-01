@@ -26,7 +26,7 @@ module Canvas::Plugins::Validators::BigBlueButtonValidator
         plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
         false
       else
-        settings.slice!(*expected_settings)
+        settings = settings.permit(*expected_settings).to_h.with_indifferent_access
         settings[:recording_enabled] = Canvas::Plugin.value_to_boolean(settings[:recording_enabled])
         settings
       end

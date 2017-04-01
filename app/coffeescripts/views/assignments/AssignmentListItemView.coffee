@@ -93,7 +93,7 @@ define [
           saveURL: -> "#{ENV.URLS.assignment_sort_base_url}/#{@parentListView.value()}/reorder"
 
         if @isGraded() && @model.postToSISEnabled()
-          @sisButtonView = new SisButtonView(model: @model)
+          @sisButtonView = new SisButtonView(model: @model, sisName: @model.postToSISName())
 
       @dateDueColumnView       = new DateDueColumnView(model: @model)
       @dateAvailableColumnView = new DateAvailableColumnView(model: @model)

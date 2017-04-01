@@ -183,24 +183,30 @@ module PostgreSQLAdapterExtensions
   def quote(value, column = nil)
     return value if value.is_a?(QuotedValue)
 
-    if column && column.type == :integer && !value.respond_to?(:quoted_id)
-      case value
-        when String, ActiveSupport::Multibyte::Chars, nil, true, false
-          # these already have branches for column.type == :integer (or don't
-          # need one)
-          super(value, column)
-        else
-          if value.respond_to?(:to_i)
-            # quote the value in its integer representation
-            value.to_i.to_s
+    if CANVAS_RAILS4_2
+      if column && column.type == :integer && !value.respond_to?(:quoted_id)
+        case value
+          when String, ActiveSupport::Multibyte::Chars, nil, true, false
+            # these already have branches for column.type == :integer (or don't
+            # need one)
+            super(value, column)
           else
-            # doesn't have a (known) integer representation, can't quote it
-            # for an integer column
-            raise ActiveRecord::StatementInvalid, "#{value.inspect} cannot be interpreted as an integer"
-          end
+            if value.respond_to?(:to_i)
+              # quote the value in its integer representation
+              value.to_i.to_s
+            else
+              # doesn't have a (known) integer representation, can't quote it
+              # for an integer column
+              raise ActiveRecord::StatementInvalid, "#{value.inspect} cannot be interpreted as an integer"
+            end
+        end
+      else
+        super
       end
     else
-      super
+      # rails 5 doesn't have a column argument; when we remove rails 4.2 support, just a regular
+      # super call will work
+      super(value)
     end
   end
 

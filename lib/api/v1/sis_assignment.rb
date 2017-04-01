@@ -55,6 +55,7 @@ module Api::V1::SisAssignment
 
   def sis_assignment_json(assignment, includes)
     json = api_json(assignment, nil, nil, API_SIS_ASSIGNMENT_JSON_OPTS)
+    json[:due_at] = default_due_date(assignment)
     json[:course_id] = assignment.context_id if assignment.context_type == 'Course'
     json[:submission_types] = json.delete(:submission_types_array)
     json[:include_in_final_grade] = include_in_final_grade(assignment)
@@ -63,6 +64,14 @@ module Api::V1::SisAssignment
 
     json[:user_overrides] = assignment_user_overrides_json(assignment) if includes[:student_overrides]
     json
+  end
+
+  def default_due_date(assignment)
+    return assignment.due_at if assignment.due_at
+
+    overrides = active_assignment_overrides_for(assignment) || []
+    mastery_path_override = overrides.find(&:mastery_paths?)
+    mastery_path_override.try(:due_at)
   end
 
   def add_sis_assignment_group_json(assignment, json)

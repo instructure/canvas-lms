@@ -143,38 +143,33 @@ define [
     equal errors["name"].length, 1
     equal errors["name"][0]["message"], "Name is required!"
 
-  test "has an error when a name > 255 chars", ->
+  test "has an error when a name has 257 chars", ->
     view = @editView()
     errors = nameLengthHelper(view, 257, false, 30, '0')
     ok errors["name"]
     equal errors["name"].length, 1
-    equal errors["name"][0]["message"], "Name is too long, must be under 256 characters"
+    equal errors["name"][0]["message"], "Name is too long, must be under 257 characters"
 
-  test "allows assignment to save when a name < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is true", ->
+  test "allows assignment to save when a name has 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true", ->
     view = @editView()
-    errors = nameLengthHelper(view, 254, false, 30, '1')
+    errors = nameLengthHelper(view, 256, false, 30, '1')
     equal errors.length, 0
 
-  test "allows assignment to save when a name < 255 chars, MAX_NAME_LENGTH is not required and post_to_sis is false", ->
+  test "has an error when a name has 11 chars, MAX_NAME_LENGTH is 10 and required and post_to_sis is true", ->
     view = @editView()
-    errors = nameLengthHelper(view, 254, false, 30, '0')
-    equal errors.length, 0
-
-  test "has an error when a name > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
-    view = @editView()
-    errors = nameLengthHelper(view, 35, true, 30, '1')
+    errors = nameLengthHelper(view, 11, true, 10, '1')
     ok errors["name"]
     equal errors["name"].length, 1
-    equal errors["name"][0]["message"], "Name is too long, must be under #{ENV.MAX_NAME_LENGTH + 1} characters"
+    equal errors["name"][0]["message"], "Name is too long, must be under 11 characters"
 
-  test "allows assignment to save when name > MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is false", ->
+  test "allows assignment to save when name has 11 chars, MAX_NAME_LENGTH is 10 and required, but post_to_sis is false", ->
     view = @editView()
-    errors = nameLengthHelper(view, 35, true, 30, '0')
+    errors = nameLengthHelper(view, 11, true, 10, '0')
     equal errors.length, 0
 
-  test "allows assignment to save when name < MAX_NAME_LENGTH chars if MAX_NAME_LENGTH is custom, required and post_to_sis is true", ->
+  test "allows assignment to save when name has 10 chars, MAX_NAME_LENGTH is 10 and required, and post_to_sis is true", ->
     view = @editView()
-    errors = nameLengthHelper(view, 25, true, 30, '1')
+    errors = nameLengthHelper(view, 10, true, 10, '1')
     equal errors.length, 0
 
   test "don't validate name if it is frozen", ->
@@ -355,6 +350,12 @@ define [
     notOk view.$el.find('#has_group_category').attr('readonly')
     notOk view.$el.find('#has_group_category').attr('aria-readonly')
 
+  test 'rounds points_possible', ->
+    view = @editView()
+    view.$assignmentPointsPossible.val('1.234')
+    data = view.getFormData()
+    equal data.points_possible, 1.23
+
   QUnit.module 'EditView: handleGroupCategoryChange',
     setup: ->
       fakeENV.setup()
@@ -439,7 +440,6 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
-      @stub(userSettings, 'contextGet').returns {submission_types: "foo", peer_reviews: "1", assignment_group_id: 99}
       @server = sinon.fakeServer.create()
 
     teardown: ->
@@ -451,30 +451,47 @@ define [
       editView.apply(this, arguments)
 
   test 'returns values from localstorage', ->
+    @stub(userSettings, 'contextGet').returns {submission_types: ['foo']}
     view = @editView()
     view.setDefaultsIfNew()
 
-    equal view.assignment.get('submission_types'), "foo"
+    deepEqual view.assignment.get('submission_types'), ['foo']
 
   test 'returns string booleans as integers', ->
+    @stub(userSettings, 'contextGet').returns {peer_reviews: '1'}
     view = @editView()
     view.setDefaultsIfNew()
 
     equal view.assignment.get('peer_reviews'), 1
 
   test 'doesnt overwrite existing assignment settings', ->
+    @stub(userSettings, 'contextGet').returns {assignment_group_id: 99}
     view = @editView()
     view.assignment.set('assignment_group_id', 22)
     view.setDefaultsIfNew()
 
     equal view.assignment.get('assignment_group_id'), 22
 
+  test 'sets assignment submission type to online if not already set', ->
+    view = @editView()
+    view.setDefaultsIfNew()
+
+    deepEqual view.assignment.get('submission_types'), ['online']
+
+  test 'doesnt overwrite assignment submission type', ->
+    view = @editView()
+    view.assignment.set('submission_types', ['external_tool'])
+    view.setDefaultsIfNew()
+
+    deepEqual view.assignment.get('submission_types'), ['external_tool']
+
   test 'will overwrite empty arrays', ->
+    @stub(userSettings, 'contextGet').returns {submission_types: ['foo']}
     view = @editView()
     view.assignment.set('submission_types', [])
     view.setDefaultsIfNew()
 
-    equal view.assignment.get('submission_types'), "foo"
+    deepEqual view.assignment.get('submission_types'), ['foo']
 
   QUnit.module 'EditView: setDefaultsIfNew: no localStorage',
     setup: ->
@@ -495,7 +512,7 @@ define [
     view = @editView()
     view.setDefaultsIfNew()
 
-    equal view.assignment.get('submission_type'), "online"
+    deepEqual view.assignment.get('submission_types'), ['online']
 
   QUnit.module 'EditView: cacheAssignmentSettings',
     setup: ->
@@ -684,3 +701,24 @@ define [
     view.$('#assignment_online_upload').attr('checked', true)
     view.handleSubmissionTypeChange()
     equal view.$('#similarity_detection_tools').css('display'), 'none'
+
+  QUnit.module 'EditView: Quizzes 2',
+    setup: ->
+      fakeENV.setup()
+      ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
+      @view = editView submission_types: ['external_tool'], is_quiz_lti_assignment: true
+
+    teardown: ->
+      @server.restore()
+      fakeENV.teardown()
+      document.getElementById('fixtures').innerHTML = ''
+
+  test 'does not show the description textarea', ->
+    equal @view.$description.length, 0
+
+  test 'does not show the moderated grading checkbox', ->
+    equal @view.$moderatedGradingBox.length, 0
+
+  test 'does not show the load in new tab checkbox', ->
+    equal @view.$externalToolsNewTab.length, 0

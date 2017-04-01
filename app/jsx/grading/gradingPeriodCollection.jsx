@@ -25,8 +25,7 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
         periods: null,
         readOnly: false,
         disabled: false,
-        saveDisabled: true,
-        canChangeGradingPeriodsSetting: false
+        saveDisabled: true
       };
     },
 
@@ -41,7 +40,6 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
           self.setState({
             periods: self.deserializePeriods(periods),
             readOnly: periods.grading_periods_read_only,
-            canChangeGradingPeriodsSetting: periods.can_toggle_grading_periods,
             disabled: false,
             saveDisabled: _.isEmpty(periods.grading_periods)
           });
@@ -200,22 +198,8 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
       });
     },
 
-    renderLinkToSettingsPage: function () {
-      if (this.state.canChangeGradingPeriodsSetting && this.state.periods && this.state.periods.length <= 1) {
-        return (
-          <span id='disable-feature-message' ref='linkToSettings'>
-            {I18n.t('You can disable this feature ')}
-            <a
-              href={ENV.CONTEXT_SETTINGS_URL + '#tab-features'}
-              aria-label={I18n.t('Feature Options')}
-            > {I18n.t('here.')} </a>
-          </span>);
-      }
-    },
-
     renderSaveButton: function () {
       if (periodsAreLoaded(this.state) && !this.state.readOnly && _.all(this.state.periods, period => period.permissions.update)) {
-        let buttonText = this.state.disabled ? I18n.t('Updating') : I18n.t('Save');
         return (
           <div className='form-actions'>
             <button
@@ -224,7 +208,7 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
               disabled={this.state.disabled || this.state.saveDisabled}
               onClick={this.batchUpdatePeriods}
             >
-              {buttonText}
+              {this.state.disabled ? I18n.t('Updating') : I18n.t('Save')}
             </button>
           </div>
         );
@@ -247,6 +231,7 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
             readOnly={this.state.readOnly}
             disabled={this.state.disabled}
             weight={period.weight}
+            weighted={ENV.GRADING_PERIODS_WEIGHTED}
             updateGradingPeriodCollection={this.updateGradingPeriodCollection}
             onDeleteGradingPeriod={this.deleteGradingPeriod}
           />
@@ -257,9 +242,6 @@ function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
     render: function () {
       return (
         <div>
-          <div id='messages'>
-            {this.renderLinkToSettingsPage()}
-          </div>
           <div id='grading_periods' className='content-box'>
             {this.renderGradingPeriods()}
           </div>

@@ -153,6 +153,12 @@ describe ContentMigration do
       assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
       @assignment.turnitin_enabled = true
       @assignment.vericite_enabled = true
+      @assignment.vericite_settings = {
+          :originality_report_visibility => "after_grading",
+          :exclude_quoted => '1',
+          :exclude_self_plag => '0',
+          :store_in_index => '1'
+      }
       @assignment.peer_reviews = true
       @assignment.peer_review_count = 2
       @assignment.automatic_peer_reviews = true
@@ -168,7 +174,7 @@ describe ContentMigration do
       @copy_to.any_instantiation.expects(:turnitin_enabled?).at_least(1).returns(true)
       @copy_to.any_instantiation.expects(:vericite_enabled?).at_least(1).returns(true)
 
-      attrs = [:turnitin_enabled, :vericite_enabled, :peer_reviews,
+      attrs = [:turnitin_enabled, :vericite_enabled, :turnitin_settings, :peer_reviews,
           :automatic_peer_reviews, :anonymous_peer_reviews,
           :grade_group_students_individually, :allowed_extensions,
           :position, :peer_review_count, :muted, :omit_from_final_grade]
@@ -177,7 +183,11 @@ describe ContentMigration do
 
       new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       attrs.each do |attr|
-        expect(@assignment[attr]).to eq new_assignment[attr]
+        if @assignment[attr].class == Hash
+          expect(@assignment[attr].stringify_keys).to eq new_assignment[attr].stringify_keys
+        else
+          expect(@assignment[attr]).to eq new_assignment[attr]
+        end
       end
       expect(new_assignment.only_visible_to_overrides).to be_falsey
     end
@@ -404,8 +414,8 @@ describe ContentMigration do
         run_course_copy(warnings)
 
         asmnt_2 = @copy_to.assignments.where(migration_id: mig_id(@asmnt)).first
-        expect(asmnt_2.freeze_on_copy).to be_nil
-        expect(asmnt_2.copied).to be_nil
+        expect(asmnt_2.freeze_on_copy).to be false
+        expect(asmnt_2.copied).to be false
       end
     end
 

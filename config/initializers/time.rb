@@ -20,6 +20,14 @@ class ActiveSupport::TimeWithZone
   end
 end
 
+module TimeZoneAsJson
+  def as_json(_options = {})
+    tzinfo.name
+  end
+end
+
+ActiveSupport::TimeZone.include(TimeZoneAsJson)
+
 # Add Paraguay (Asuncion) as a friendly time zone
 ActiveSupport::TimeZone::MAPPING['Asuncion'] = 'America/Asuncion'
 ActiveSupport::TimeZone.instance_variable_set(:@zones, nil)

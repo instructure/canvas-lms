@@ -120,7 +120,7 @@ end
 
 # temporary patch to keep things sane
 # TODO: actually fix the deprecation messages once we're on Rails 4 permanently and remove this
-ActiveSupport::Deprecation.silenced = true
+ActiveSupport::Deprecation.silenced = !CANVAS_RAILS4_2
 
 # we use ivars too extensively for factories; prevent them from
 # being propagated to views in view specs
@@ -328,6 +328,8 @@ module Helpers
     expect(flash[:warning]).to eq "You must be logged in to access this page"
   end
 end
+
+RSpec::Expectations.configuration.on_potential_false_positives = :raise
 
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
@@ -763,25 +765,6 @@ RSpec.configure do |config|
 
   def content_type_key
     'Content-Type'
-  end
-
-  def compare_json(actual, expected)
-    if actual.is_a?(Hash)
-      actual.each do |k, v|
-        expected_v = expected[k]
-        compare_json(v, expected_v)
-      end
-    elsif actual.is_a?(Array)
-      actual.zip(expected).each do |a, e|
-        compare_json(a, e)
-      end
-    else
-      if actual.is_a?(Integer) || actual.is_a?(Float)
-        expect(actual).to eq expected
-      else
-        expect(actual.to_json).to eq expected.to_json
-      end
-    end
   end
 
   class FakeHttpResponse

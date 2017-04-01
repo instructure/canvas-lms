@@ -1,6 +1,6 @@
 module AcademicBenchmark
   module OutcomeData
-    class FromFile < Data
+    class FromFile < Base
       delegate :archive_file, to: :@options
 
       def data

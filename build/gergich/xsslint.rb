@@ -5,7 +5,7 @@ class Gergich::XSSLint
     pattern = /^([^:\n]+):(\d+): (.*)$/
 
     output.scan(pattern).map { |file, line, error|
-      { path: "public/javascripts/#{file}", message: "[xsslint] #{error}", position: line.to_i, severity: "error" }
+      { path: file, message: "[xsslint] #{error}", position: line.to_i, severity: "error" }
     }.compact
   end
 end

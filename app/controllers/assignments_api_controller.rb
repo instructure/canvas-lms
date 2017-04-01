@@ -865,6 +865,12 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[omit_from_final_grade] [Boolean]
   #   Whether this assignment is counted towards a student's final grade.
   #
+  # @argument assignment[quiz_lti] [Boolean]
+  #   Whether this assignment should use the Quizzes 2 LTI tool. Sets the
+  #   submission type to 'external_tool' and configures the external tool
+  #   attributes to use the Quizzes 2 LTI tool configured for this course.
+  #   Has no effect if no Quizzes 2 LTI tool is configured.
+  #
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
@@ -1026,16 +1032,25 @@ class AssignmentsApiController < ApplicationController
     @assignment = @context.active_assignments.api_id(params[:id])
     if authorized_action(@assignment, @current_user, :update)
       @assignment.content_being_saved_by(@current_user)
+      # update_api_assignment mutates params so this has to be done here
+      opts = assignment_json_opts
       result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context)
-      render_create_or_update_result(result)
+      render_create_or_update_result(result, opts)
     end
   end
 
   private
 
-  def render_create_or_update_result(result)
+  def assignment_json_opts
+    return {} unless params[:assignment]&.key?(:override_dates)
+    {
+      override_dates: value_to_boolean(params[:assignment][:override_dates])
+    }
+  end
+
+  def render_create_or_update_result(result, opts = {})
     if result == :success
-      render json: assignment_json(@assignment, @current_user, session), status: :created
+      render json: assignment_json(@assignment, @current_user, session, opts), status: :created
     else
       status = result == :forbidden ? :forbidden : :bad_request
       errors = @assignment.errors.as_json[:errors]

@@ -110,7 +110,7 @@ class UsageRightsController < ApplicationController
   def set_usage_rights
     if authorized_action(@context, @current_user, :manage_files)
       return render json: { message: I18n.t("Must supply 'file_ids' and/or 'folder_ids' parameter") }, status: :bad_request unless params[:file_ids].present? || params[:folder_ids].present?
-      return render json: { message: I18n.t("No 'usage_rights' object supplied") }, status: :bad_request unless params[:usage_rights].is_a?(Hash)
+      return render json: { message: I18n.t("No 'usage_rights' object supplied") }, status: :bad_request unless params[:usage_rights].is_a?(ActionController::Parameters)
 
       usage_rights_params = params.require(:usage_rights).permit(:use_justification, :legal_copyright, :license)
       usage_rights = @context.usage_rights.where(usage_rights_params).first

@@ -44,10 +44,10 @@ module Canvas::Plugins::Validators::KalturaValidator
       settings[:do_analytics] = Canvas::Plugin.value_to_boolean(settings[:do_analytics])
       settings[:hide_rte_button] = Canvas::Plugin.value_to_boolean(settings[:hide_rte_button])
       settings[:js_uploader] = Canvas::Plugin.value_to_boolean(settings[:js_uploader])
-      settings.slice(:domain, :resource_domain, :rtmp_domain, :partner_id,
+      settings.permit(:domain, :resource_domain, :rtmp_domain, :partner_id,
                      :subpartner_id, :secret_key, :user_secret_key,
                      :player_ui_conf, :kcw_ui_conf, :upload_ui_conf, :cache_play_list_seconds,
-                     :kaltura_sis, :do_analytics, :hide_rte_button, :js_uploader)
+                     :kaltura_sis, :do_analytics, :hide_rte_button, :js_uploader).to_h.with_indifferent_access
     end
   end
 end

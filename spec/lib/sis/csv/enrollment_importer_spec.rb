@@ -384,6 +384,37 @@ describe SIS::CSV::EnrollmentImporter do
     expect(@course.enrollments.map(&:user)).to eq [@user, @user]
   end
 
+  it "should set limit_section_privileges" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active",
+      "user_2,user2,User,Uno,user2@example.com,active",
+      "user_3,user3,User,Uno,user@example.com,active"
+    )
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,limit_section_privileges",
+      "test_1,user_1,student,,active,true",
+      "test_1,user_2,teacher,,active,false",
+      "test_1,user_3,student,,active,"
+    )
+    course = Course.where(sis_source_id: 'test_1').first
+    user1 = Pseudonym.where(sis_user_id: 'user_1').first.user
+    user2 = Pseudonym.where(sis_user_id: 'user_2').first.user
+    user3 = Pseudonym.where(sis_user_id: 'user_3').first.user
+    expect(course.enrollments.where(user_id: user1).first.limit_privileges_to_course_section).to eq true
+    expect(course.enrollments.where(user_id: user2).first.limit_privileges_to_course_section).to eq false
+    expect(course.enrollments.where(user_id: user3).first.limit_privileges_to_course_section).to eq false
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,limit_section_privileges",
+      "test_1,user_1,student,,active,"
+    )
+    expect(course.enrollments.where(user_id: user1).first.limit_privileges_to_course_section).to eq true
+  end
+
   it "should allow one user to observe multiple students" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",

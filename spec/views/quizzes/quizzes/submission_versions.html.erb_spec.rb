@@ -25,8 +25,8 @@ describe "/quizzes/quizzes/submission_versions" do
     course_quiz
 
     view_context
-    assigns[:quiz] = @quiz
-    assigns[:versions] = []
+    assign(:quiz, @quiz)
+    assign(:versions, [])
 
     render "quizzes/quizzes/submission_versions"
     expect(response).not_to be_nil

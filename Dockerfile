@@ -8,15 +8,19 @@ ENV NGINX_MAX_UPLOAD_SIZE 10g
 USER root
 WORKDIR /root
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -\
+  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -\
+  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list \
   && apt-get update -qq \
   && apt-get install -qqy \
        nodejs \
+       yarn \
        postgresql-client \
        libxmlsec1-dev \
        unzip \
        fontforge \
        python-lxml \
-  && npm install -g gulp \
+       libicu-dev \
+  && yarn global add gulp \
   && rm -rf /var/lib/apt/lists/*\
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 
@@ -27,7 +31,8 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
   && make \
   && cp sfnt2woff /usr/local/bin \
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
-  && gem install bundler --no-document -v 1.12.5 \
+  && gem install bundler --no-document -v 1.14.3 \
+  && gem update --system --no-document \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
 WORKDIR $APP_HOME
@@ -43,16 +48,19 @@ RUN chown -R docker:docker ${APP_HOME} /home/docker
 
 # Install deps as docker to avoid sadness w/ npm lifecycle hooks
 USER docker
-RUN bundle install --jobs 8
-RUN npm install
+RUN bundle install --jobs 8 \
+  && yarn install
 USER root
 
 COPY . $APP_HOME
 RUN mkdir -p log \
             tmp \
             public/javascripts/client_apps \
+            public/javascripts/compiled \
             public/dist \
             public/assets \
+            client_apps/canvas_quizzes/node_modules \
+            /home/docker/.cache/yarn/.tmp \
   && chown -R docker:docker ${APP_HOME} /home/docker
 
 USER docker

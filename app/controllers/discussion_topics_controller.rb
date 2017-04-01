@@ -448,16 +448,21 @@ class DiscussionTopicsController < ApplicationController
         GROUP_CATEGORIES: categories.
            reject(&:student_organized?).
            map { |category| { id: category.id, name: category.name } },
-        MULTIPLE_GRADING_PERIODS_ENABLED: @context.feature_enabled?(:multiple_grading_periods),
+        HAS_GRADING_PERIODS: @context.grading_periods?,
         SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } }
       }
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
       js_hash[:POST_TO_SIS] = post_to_sis
       js_hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @topic.new_record?
-      js_hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context.assignments.first) if @context.respond_to?(:assignments)
-      js_hash[:MAX_NAME_LENGTH] = AssignmentUtil.assignment_max_name_length(@context.assignments.first) if @context.respond_to?(:assignments)
-      js_hash[:SIS_NAME] = AssignmentUtil.post_to_sis_friendly_name(@context.assignments.first) if @context.respond_to?(:assignments)
+
+      if @context.respond_to?(:assignments)
+        assignment = @context.assignments.first
+        js_hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(assignment)
+        js_hash[:MAX_NAME_LENGTH] = AssignmentUtil.assignment_max_name_length(assignment)
+        js_hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(assignment)
+        js_hash[:SIS_NAME] = AssignmentUtil.post_to_sis_friendly_name(assignment)
+      end
 
       if @context.is_a?(Course)
         js_hash['SECTION_LIST'] = sections.map { |section|
@@ -474,7 +479,7 @@ class DiscussionTopicsController < ApplicationController
       js_hash[:CANCEL_TO] = cancel_redirect_url
       append_sis_data(js_hash)
 
-      if @context.feature_enabled?(:multiple_grading_periods)
+      if @context.grading_periods?
         gp_context = @context.is_a?(Group) ? @context.context : @context
         js_hash[:active_grading_periods] = GradingPeriod.json_for(gp_context, @current_user)
       end
@@ -916,8 +921,10 @@ class DiscussionTopicsController < ApplicationController
     model_type = value_to_boolean(params[:is_announcement]) && @context.announcements.temp_record.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
     if is_new
       @topic = @context.send(model_type).build
+      prior_version = @topic.dup
     else
       @topic = @context.send(model_type).active.find(params[:id] || params[:topic_id])
+      prior_version = DiscussionTopic.find(@topic.id)
     end
 
     return unless authorized_action(@topic, @current_user, (is_new ? :create : :update))
@@ -925,7 +932,6 @@ class DiscussionTopicsController < ApplicationController
     allowed_fields = @context.is_a?(Group) ? API_ALLOWED_TOPIC_FIELDS_FOR_GROUP : API_ALLOWED_TOPIC_FIELDS
     discussion_topic_hash = params.permit(*allowed_fields)
 
-    prior_version = @topic.generate_prior_version
     process_podcast_parameters(discussion_topic_hash)
 
     if is_new
@@ -977,9 +983,7 @@ class DiscussionTopicsController < ApplicationController
         end
 
         @topic = DiscussionTopic.find(@topic.id)
-        @topic.just_created = is_new
-        @topic.prior_version = prior_version
-        @topic.broadcast_notifications
+        @topic.broadcast_notifications(prior_version)
 
         render :json => discussion_topic_api_json(@topic, @context, @current_user, session)
       else

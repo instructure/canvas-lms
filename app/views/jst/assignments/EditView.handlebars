@@ -28,30 +28,31 @@
     </div>
   </div>
 
-  <div class="control-group">
-    {{#ifIncludes frozenAttributes "description"}}
-      <div class="frozen-description user_content">
-        {{convertApiUserContent description}}
-      </div>
-    {{else}}
-      <div style="float: right;">
-        <a href="#" class="rte_switch_views_link">
-          {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
-        </a>
-        <a href="#" class="rte_switch_views_link" style="display:none;">
-          {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
-        </a>
-      </div>
-      <div style="clear:both;"></div>
-      <textarea id="assignment_description"
-        name="description"
-        aria-label="{{#t "description"}}Description{{/t}}"
-        {{disabledIfIncludes frozenAttributes "description"}}>
-        {{convertApiUserContent description forEditing=1}}
-      </textarea>
-    {{/ifIncludes}}
-
-  </div>
+  {{#unless isQuizLTIAssignment}}
+    <div class="control-group">
+      {{#ifIncludes frozenAttributes "description"}}
+        <div class="frozen-description user_content">
+          {{convertApiUserContent description}}
+        </div>
+      {{else}}
+        <div style="float: right;">
+          <a href="#" class="rte_switch_views_link">
+            {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+          </a>
+          <a href="#" class="rte_switch_views_link" style="display:none;">
+            {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
+          </a>
+        </div>
+        <div style="clear:both;"></div>
+        <textarea id="assignment_description"
+          name="description"
+          aria-label="{{#t "description"}}Description{{/t}}"
+          {{disabledIfIncludes frozenAttributes "description"}}>
+          {{convertApiUserContent description forEditing=1}}
+        </textarea>
+      {{/ifIncludes}}
+    </div>
+  {{/unless}}
 
   <div class="control-group">
 
@@ -64,7 +65,7 @@
     <div class="form-column-right">
       <input id="assignment_points_possible"
         name="points_possible"
-        value="{{pointsPossible}}"
+        value="{{n pointsPossible}}"
         type="text"
         {{#if inClosedGradingPeriod}}
           readonly
@@ -131,7 +132,7 @@
 
     {{#if postToSISEnabled}}
       <fieldset>
-        <div class="form-column-left">{{#t}}Post Grades to {{postToSISName}}{{/t}}</div>
+        <div class="form-column-left">{{#t}}Sync to {{postToSISName}}{{/t}}</div>
           <div class="form-column-right" style="margin-top: 14px;">
             <label class="checkbox">
               {{checkbox "postToSIS"
@@ -144,18 +145,20 @@
       </fieldset>
     {{/if}}
 
-    <fieldset>
-      <div class="form-column-left">{{#t}}Moderated Grading{{/t}}</div>
-      <div class="form-column-right" style="margin-top: 14px;">
-        <label class="checkbox">
-          {{checkbox "moderatedGrading"
-            id="assignment_moderated_grading"
-            name="moderated_grading"
-          }}
-          {{#t}}Allow a moderator to review multiple independent grades for selected submissions{{/t}}
-        </label>
-      </div>
-    </fieldset>
+    {{#unless isQuizLTIAssignment}}
+      <fieldset>
+        <div class="form-column-left">{{#t}}Moderated Grading{{/t}}</div>
+        <div class="form-column-right" style="margin-top: 14px;">
+          <label class="checkbox">
+            {{checkbox "moderatedGrading"
+              id="assignment_moderated_grading"
+              name="moderated_grading"
+            }}
+            {{#t}}Allow a moderator to review multiple independent grades for selected submissions{{/t}}
+          </label>
+        </div>
+      </fieldset>
+    {{/unless}}
 
   </div>
 
@@ -186,6 +189,10 @@
 <div id="mastery-paths-editor" style="display: none">
   <div id="conditional_release_target" />
 </div>
+{{/if}}
+
+{{#if isQuizLTIAssignment}}
+  <input type="hidden" name="quiz_lti" value="1" />
 {{/if}}
 
 <input type='hidden' id="secure_params" name="secure_params" value="{{secureParams}}" />

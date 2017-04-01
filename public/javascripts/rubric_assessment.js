@@ -276,7 +276,7 @@ window.rubricAssessment = {
           .change()
           .end()
           .find(".criterion_rating_points_holder").showIf(rating.points || rating.points === 0).end()
-          .find(".criterion_rating_points").text(rating.points).end()
+          .find(".criterion_rating_points").text(window.rubricAssessment.roundAndFormat(rating.points)).end()
           .find(".custom_rating").text(comments).end()
           .find(".criterion_comments").toggleClass('empty', !comments).end()
           .find(".save_custom_rating").attr('checked', false);

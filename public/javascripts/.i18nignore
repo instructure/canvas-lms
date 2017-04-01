@@ -1,8 +1,9 @@
 /bower
 /symlink_to_node_modules
-/compiled/handlebars_helpers.js
+/compiled
 /i18n.js
 /i18nObj.js
-/jsx/.module-cache
+/jsx
+/plugins
 /translations
 /vendor

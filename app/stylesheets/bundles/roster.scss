@@ -44,12 +44,7 @@
   li {
     @include name_bubbles;
     clear: left;
-  }
-}
-
-#edit_sections {
-  a.browser {
-    background: transparent url(/images/messages/context-search-sprite.png) 0 0 no-repeat;
+    margin-top: $ic-sp/2;
   }
 }
 
@@ -74,20 +69,11 @@
     .peoplesearch__instructions {
       margin: 1.5em 0;
       text-align: center;
-      i.icon-user {
-        display:block;
-        height: 50px;
+      .usericon {
         margin: 0 auto;
-      }
-      i.icon-user::before {
         font-size: 48px;
+        line-height: 50px;
       }
-    }
-
-
-    /* need a little space between inline inst-ui <RadioInput>s */
-    label[for^='peoplesearch_radio'] {
-        margin-right: 1em;
     }
   }
   .namelist {

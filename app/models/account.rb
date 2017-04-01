@@ -217,13 +217,13 @@ class Account < ActiveRecord::Base
   add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: false
   add_setting :trusted_referers, root_only: true
   add_setting :app_center_access_token
-  add_setting :enable_offline_web_export, boolean: true, root_only: true, default: false
+  add_setting :enable_offline_web_export, boolean: true, default: false, inheritable: true
 
   add_setting :strict_sis_check, :boolean => true, :root_only => true, :default => false
   add_setting :lock_all_announcements, default: false, boolean: true, inheritable: true
 
   def settings=(hash)
-    if hash.is_a?(Hash)
+    if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|
         if account_settings_options && account_settings_options[key.to_sym]
           opts = account_settings_options[key.to_sym]
@@ -231,7 +231,7 @@ class Account < ActiveRecord::Base
             settings.delete key.to_sym
           elsif opts[:hash]
             new_hash = {}
-            if val.is_a?(Hash)
+            if val.is_a?(Hash) || val.is_a?(ActionController::Parameters)
               val.each do |inner_key, inner_val|
                 inner_key = inner_key.to_sym
                 if opts[:values].include?(inner_key)
@@ -291,6 +291,10 @@ class Account < ActiveRecord::Base
     return unless AccountAuthorizationConfig::Canvas.columns_hash.key?('workflow_state')
     return if authentication_providers.active.where(auth_type: 'canvas').exists?
     authentication_providers.create!(auth_type: 'canvas')
+  end
+
+  def enable_offline_web_export?
+    enable_offline_web_export[:value]
   end
 
   def open_registration?

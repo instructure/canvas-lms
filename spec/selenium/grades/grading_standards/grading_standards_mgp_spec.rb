@@ -1,17 +1,16 @@
 require_relative '../../common'
 require_relative '../page_objects/mgp_page'
 
-describe "multiple grading periods account page" do
+describe "grading periods account page" do
   include_context "in-process server selenium tests"
 
-  context 'with mgp enabled' do
+  context 'with grading periods' do
     let(:grading_standards_page) { GradingStandards::MultipleGradingPeriods.new }
     let(:backend_group_helper) { Factories::GradingPeriodGroupHelper.new }
     let(:backend_period_helper) { Factories::GradingPeriodHelper.new }
 
-    before(:each) do
+    before do
       admin_logged_in
-      Account.default.enable_feature!(:multiple_grading_periods)
     end
 
     it "adds grading period set", test_id: 2528622, priority: "1" do

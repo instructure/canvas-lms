@@ -37,7 +37,7 @@ class AssignmentGroupsApiController < ApplicationController
   #
   # @argument grading_period_id [Integer]
   #   The id of the grading period in which assignment groups are being requested
-  #   (Requires the Multiple Grading Periods account feature turned on)
+  #   (Requires grading periods to exist on the account)
   #
   # @returns AssignmentGroup
   def show
@@ -45,7 +45,7 @@ class AssignmentGroupsApiController < ApplicationController
       includes = Array(params[:include])
       override_dates = value_to_boolean(params[:override_assignment_dates] || true)
       assignments = @assignment_group.visible_assignments(@current_user)
-      if params[:grading_period_id].present? && multiple_grading_periods?
+      if params[:grading_period_id].present?
         assignments = GradingPeriod.for(@context).find_by(id: params[:grading_period_id]).assignments(assignments)
       end
       if assignments.any? && includes.include?('submission')
@@ -172,6 +172,6 @@ class AssignmentGroupsApiController < ApplicationController
 
   def valid_integration_data?(params)
     integration_data = params['integration_data']
-    integration_data.is_a?(Hash) || integration_data.nil?
+    integration_data.is_a?(ActionController::Parameters) || integration_data.nil?
   end
 end

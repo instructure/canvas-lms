@@ -3,13 +3,14 @@ define [
   'i18n!gradebook'
   'jquery'
   'underscore'
+  'compiled/util/natcompare'
   'compiled/views/gradebook/HeaderFilterView'
   'compiled/views/gradebook/OutcomeColumnView'
   'compiled/util/NumberCompare'
   'jst/gradebook/outcome_gradebook_cell'
   'jst/gradebook/outcome_gradebook_student_cell'
   'jsx/context_cards/StudentContextCardTrigger'
-], (i18nObj, I18n, $, _, HeaderFilterView, OutcomeColumnView, numberCompare, cellTemplate, studentCellTemplate) ->
+], (i18nObj, I18n, $, _, natcompare, HeaderFilterView, OutcomeColumnView, numberCompare, cellTemplate, studentCellTemplate) ->
 
   ###
   xsslint safeString.method cellHtml
@@ -94,7 +95,7 @@ define [
           nameA = a.student.sortable_name
           nameB = b.student.sortable_name
           n     = if sortAsc then 1 else -1
-          nameA.localeCompare(nameB, i18nObj.locale or 'en', sensitivity: 'accent', ignorePunctuation: true, numeric: true) * n
+          natcompare.strings(nameA, nameB) * n
         else
           nameA = a.student.sortable_name.toLowerCase()
           nameB = b.student.sortable_name.toLowerCase()

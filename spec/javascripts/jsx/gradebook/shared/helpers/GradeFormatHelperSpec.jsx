@@ -6,6 +6,9 @@ define([
   QUnit.module('GradeFormatHelper#formatGrade', {
     setup () {
       this.stub(numberHelper, 'parse').returns(42);
+      this.stub(numberHelper, 'validate', function (val) {
+        return !isNaN(parseFloat(val));
+      });
       this.stub(I18n, 'n').returns('42');
     }
   });
@@ -46,10 +49,26 @@ define([
     strictEqual(I18n.n.notCalled, true);
   });
 
-  test('should return input when input is undefined, null, or empty string', () => {
+  test('should return input when input is undefined, null, or empty string and no defaultValue is given', () => {
     strictEqual(GradeFormatHelper.formatGrade(undefined), undefined);
     strictEqual(GradeFormatHelper.formatGrade(null), null);
     strictEqual(GradeFormatHelper.formatGrade(''), '');
+  });
+
+  test('should return opts.defaultValue when input is undefined, null or empty string', () => {
+    const defaultValue = 'use this value when empty';
+    strictEqual(GradeFormatHelper.formatGrade(undefined, {defaultValue}), defaultValue);
+    strictEqual(GradeFormatHelper.formatGrade(null, {defaultValue}), defaultValue);
+    strictEqual(GradeFormatHelper.formatGrade('', {defaultValue}), defaultValue);
+  });
+
+  test('should not return opts.defaultValue when input is not undefined, null, or empty', () => {
+    const defaultValue = 'use this value when empty';
+    notEqual(GradeFormatHelper.formatGrade('123', {defaultValue}), defaultValue);
+    notEqual(GradeFormatHelper.formatGrade('12.34', {defaultValue}), defaultValue);
+    notEqual(GradeFormatHelper.formatGrade('A', {defaultValue}), defaultValue);
+    notEqual(GradeFormatHelper.formatGrade('foo', {defaultValue}), defaultValue);
+    notEqual(GradeFormatHelper.formatGrade(' ', {defaultValue}), defaultValue);
   });
 
   test('providing gradingType in the options hash should override detected grade type', () => {

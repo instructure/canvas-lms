@@ -26,47 +26,54 @@ class GradingPeriodGroup < ActiveRecord::Base
 
   validate :associated_with_course_or_root_account, if: :active?
 
+  after_save :recompute_course_scores, if: :weighted_changed?
   after_destroy :dissociate_enrollment_terms
 
   set_policy do
     given do |user|
-      multiple_grading_periods_enabled? &&
       (course || root_account).grants_right?(user, :read)
     end
     can :read
 
     given do |user|
       root_account &&
-      multiple_grading_periods_enabled? &&
       root_account.associated_user?(user)
     end
     can :read
 
     given do |user|
-      multiple_grading_periods_enabled? &&
       (course || root_account).grants_right?(user, :manage)
     end
     can :update and can :delete
 
     given do |user|
       root_account &&
-      multiple_grading_periods_enabled? &&
       root_account.grants_right?(user, :manage)
     end
     can :create
   end
 
   def self.for(account)
-    raise ArgumentError.new("account is not an Account") unless account.is_a?(Account)
+    raise ArgumentError.new("argument is not an Account") unless account.is_a?(Account)
     root_account = account.root_account? ? account : account.root_account
     root_account.grading_period_groups.active
   end
 
-  def multiple_grading_periods_enabled?
-    multiple_grading_periods_on_course? || multiple_grading_periods_on_account?
+  def self.for_course(context)
+    course_group = GradingPeriodGroup.find_by(course_id: context, workflow_state: :active)
+    return course_group if course_group.present?
+
+    account_group = context.enrollment_term.grading_period_group
+    account_group.nil? || account_group.deleted? ? nil : account_group
   end
 
   private
+
+  def recompute_course_scores
+    return course.recompute_student_scores(update_all_grading_period_scores: false) if course_id.present?
+
+    enrollment_terms.each { |term| term.recompute_course_scores(update_all_grading_period_scores: false) }
+  end
 
   def associated_with_course_or_root_account
     if course_id.blank? && account_id.blank?
@@ -82,17 +89,6 @@ class GradingPeriodGroup < ActiveRecord::Base
     elsif course && course.deleted?
       errors.add(:course_id, t("must belong to an active course"))
     end
-  end
-
-  def multiple_grading_periods_on_account?
-    root_account.present? && (
-      root_account.feature_enabled?(:multiple_grading_periods) ||
-      root_account.feature_allowed?(:multiple_grading_periods)
-    )
-  end
-
-  def multiple_grading_periods_on_course?
-    course.present? && course.feature_enabled?(:multiple_grading_periods)
   end
 
   def dissociate_enrollment_terms

@@ -16,6 +16,7 @@ define [
 
   test '#gradeIsExcused returns true if grade is EX', ->
     dialog = new SetDefaultGradeDialog({ @assignment })
+    dialog.show()
     deepEqual dialog.gradeIsExcused('EX'), true
     deepEqual dialog.gradeIsExcused('ex'), true
     deepEqual dialog.gradeIsExcused('eX'), true
@@ -23,6 +24,7 @@ define [
 
   test '#gradeIsExcused returns false if grade is not EX', ->
     dialog = new SetDefaultGradeDialog({ @assignment })
+    dialog.show()
     deepEqual dialog.gradeIsExcused('14'), false
     deepEqual dialog.gradeIsExcused('F'), false
     #this test documents that we do not consider 'excused' to return true

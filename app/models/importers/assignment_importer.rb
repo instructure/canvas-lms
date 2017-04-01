@@ -115,6 +115,10 @@ module Importers
       end
 
       item.save_without_broadcasting!
+      # somewhere in the callstack, save! will call Quiz#update_assignment, and Rails will have helpfully
+      # reloaded the quiz's assignment, so we won't know about the changes to the object (in particular,
+      # workflow_state) that it did
+      item.reload
 
       rubric = nil
       rubric = context.rubrics.where(migration_id: hash[:rubric_migration_id]).first if hash[:rubric_migration_id]
@@ -207,10 +211,14 @@ module Importers
         end
       end
 
-      if item.turnitin_enabled
+      if item.turnitin_enabled || item.vericite_enabled
         settings = JSON.parse(hash[:turnitin_settings]).with_indifferent_access
         settings[:created] = false if settings[:created]
-        item.turnitin_settings = settings
+        if item.vericite_enabled
+          item.vericite_settings = settings
+        else
+          item.turnitin_settings = settings
+        end
       end
 
       migration.add_imported_item(item)

@@ -49,11 +49,9 @@ define [
       json['disableChecked'] = @isDisabled()
       json['disableAndLockChecked'] = @isDisabledAndLocked()
       json['systemDefaultChecked'] = @isDefault()
-      json['systemDefaultLockedChecked'] = @isDefaultAndLocked()
       json['readOnly'] = @isReadOnly()
-      json['default'] = @isDefault() || @isDefaultAndLocked() # Any kind of default. Used for setting a css class
-      json['addDefaultTitle'] = @isDefault() || @isDefaultAndLocked() && !@isReadOnly()
-
+      json['default'] = @isDefault()
+      json['addDefaultTitle'] = @isDefault() && !@isReadOnly()
       json
 
     # Method Summary
@@ -100,7 +98,6 @@ define [
       else if @isDisabled() then @setDisabledIcon()
       else if @isDisabledAndLocked() then @setDisabledLockedIcon()
       else if @isDefault() then @setDefaultIcon()
-      else if @isDefaultAndLocked() then @setDefaultAndLockedIcon()
 
     # Method Summary:
     #   We are checking the ides of each changed radio element because we
@@ -134,10 +131,6 @@ define [
         when "button-#{@cid}-4"
           @$el.find('a.btn').addClass 'default_permission'
           @setSystemDefault()
-          break
-        when "button-#{@cid}-5"
-          @$el.find('a.btn').addClass 'default_permission'
-          @setSystemDefaultAndLocked()
           break
 
     handleKeydown: (event) ->
@@ -224,13 +217,6 @@ define [
       @model.get('permissions')[@permission_name].explicit = false
 
     # Method Summary
-    #   Same as systemDefault except locked is true.
-    # @api private
-    setSystemDefaultAndLocked: ->
-      @model.get('permissions')[@permission_name].locked = true
-      @model.get('permissions')[@permission_name].explicit = false
-
-    # Method Summary
     #   Check to see if this role is enabled.
     #
     #   This means
@@ -297,20 +283,7 @@ define [
     #
     # @api private
     isDefault: ->
-      !@isExplicit() && !@isLocked()
-
-    # Method Summary
-    #   Default and lock does is make sure explicit is set to false and lock is true
-    #
-    #   This means
-    #
-    #     enabled : 'don't care about this value :/'
-    #     locked : true
-    #     explicit : false
-    #
-    # @api private
-    isDefaultAndLocked: ->
-      !@isExplicit() && @isLocked()
+      !@isExplicit()
 
     # Method Summary
     #   Read only attribute is set means you cannot change this permission.

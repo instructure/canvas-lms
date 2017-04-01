@@ -8,7 +8,7 @@ define([
     setup () {
       this.assignmentGroup = {
         name: 'Assignment Group 1',
-        weight: 42.5
+        groupWeight: 42.5
       };
 
       this.renderOutput = mount(<AssignmentGroupColumnHeader assignmentGroup={this.assignmentGroup} weightedGroups />);
@@ -25,7 +25,7 @@ define([
     equal(actualElements.props().children[0], 'Assignment Group 1');
   });
 
-  test('renders the assignment weight percentage', function () {
+  test('renders the assignment groupWeight percentage', function () {
     const actualElements = this.renderOutput.find('.Gradebook__ColumnHeaderDetail Typography');
 
     equal(actualElements.props().children, '42.50% of grade');
@@ -35,13 +35,13 @@ define([
     setup () {
       this.assignmentGroup = {
         name: 'Assignment Group 1',
-        weight: 42.5
+        groupWeight: 42.5
       };
     },
   });
 
-  test('renders 0% as the weight percentage when weightedGroups is true but weight is 0', function () {
-    this.assignmentGroup.weight = 0;
+  test('renders 0% as the groupWeight percentage when weightedGroups is true but groupWeight is 0', function () {
+    this.assignmentGroup.groupWeight = 0;
 
     const renderOutput = mount(<AssignmentGroupColumnHeader assignmentGroup={this.assignmentGroup} weightedGroups />);
     const actualElements = renderOutput.find('.Gradebook__ColumnHeaderDetail Typography');
@@ -49,8 +49,8 @@ define([
     equal(actualElements.props().children, '0.00% of grade');
   });
 
-  test('does not render the weight percentage when weightedGroups is false', function () {
-    const renderOutput = mount(<AssignmentGroupColumnHeader assignmentGroup={this.assignmentGroup} />);
+  test('does not render the groupWeight percentage when weightedGroups is false', function () {
+    const renderOutput = mount(<AssignmentGroupColumnHeader assignmentGroup={this.assignmentGroup} weightedGroups={false} />);
     const actualElements = renderOutput.find('.Gradebook__ColumnHeaderDetail Typography');
 
     equal(actualElements.length, 0);

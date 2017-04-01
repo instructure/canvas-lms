@@ -92,7 +92,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     :ip_filter, :require_lockdown_browser, :require_lockdown_browser_for_results,
     :lock_at, :unlock_at
   ]
-  restrict_columns :settings, Assignment::RESTRICTED_SETTINGS
+  restrict_assignment_columns
 
   # override has_one relationship provided by simply_versioned
   def current_version_unidirectional
@@ -106,10 +106,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def set_defaults
-    self.one_question_at_a_time = false if self.one_question_at_a_time == nil
-    self.cant_go_back = false if self.cant_go_back == nil || self.one_question_at_a_time == false
-    self.shuffle_answers = false if self.shuffle_answers == nil
-    self.show_correct_answers = true if self.show_correct_answers == nil
+    self.cant_go_back = false unless self.one_question_at_a_time
     if !self.show_correct_answers
       self.show_correct_answers_last_attempt = false
       self.show_correct_answers_at = nil
@@ -142,6 +139,14 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.question_count = self.question_count(true)
     @update_existing_submissions = true if self.for_assignment? && self.quiz_type_changed?
     @stored_questions = nil
+
+    [
+      :shuffle_answers, :could_be_locked, :anonymous_submissions,
+      :require_lockdown_browser, :require_lockdown_browser_for_results,
+      :one_question_at_a_time, :cant_go_back, :require_lockdown_browser_monitor,
+      :only_visible_to_overrides, :one_time_results, :show_correct_answers_last_attempt
+    ].each { |attr| self[attr] = false if self[attr].nil? }
+    self[:show_correct_answers] = true if self[:show_correct_answers].nil?
   end
 
   # quizzes differ from other publishable objects in that they require we

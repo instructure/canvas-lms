@@ -57,7 +57,9 @@
                 {{#each reservations}}
                   <li data-url="{{event_url}}">
                     <div class="ellipsis">{{name}}</div>
-                    <a href="javascript:void(0)" class="cancel_appointment_link"></a>
+                    <a href="javascript:void(0)" class="cancel_appointment_link">
+                      <i class="icon-x" aria-hidden="true"></i>
+                    </a>
                   </li>
                 {{/each}}
               </ul>

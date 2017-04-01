@@ -25,6 +25,101 @@ describe Quizzes::Quiz do
     course_factory
   end
 
+  describe "default values for boolean attributes" do
+    before(:once) do
+      @quiz = @course.quizzes.create!(title: "hello")
+    end
+
+    let(:default_false_values) do
+      Quizzes::Quiz.where(id: @quiz).pluck(
+        :shuffle_answers,
+        :could_be_locked,
+        :anonymous_submissions,
+        :require_lockdown_browser,
+        :require_lockdown_browser_for_results,
+        :one_question_at_a_time,
+        :cant_go_back,
+        :require_lockdown_browser_monitor,
+        :only_visible_to_overrides,
+        :one_time_results,
+        :show_correct_answers_last_attempt
+      ).first
+    end
+
+    it "saves boolean attributes as false if they are set to nil" do
+      @quiz.update!(
+        shuffle_answers: nil,
+        could_be_locked: nil,
+        anonymous_submissions: nil,
+        require_lockdown_browser: nil,
+        require_lockdown_browser_for_results: nil,
+        one_question_at_a_time: nil,
+        cant_go_back: nil,
+        require_lockdown_browser_monitor: nil,
+        only_visible_to_overrides: nil,
+        one_time_results: nil,
+        show_correct_answers_last_attempt: nil
+      )
+
+      expect(default_false_values).to eq([false] * default_false_values.length)
+    end
+
+    it "saves show_correct_answers as true if it is set to nil" do
+      @quiz.update!(show_correct_answers: nil)
+      expect(@quiz.show_correct_answers).to eq(true)
+    end
+
+    it "saves boolean attributes as false if they are set to false" do
+      @quiz.update!(
+        shuffle_answers: false,
+        could_be_locked: false,
+        anonymous_submissions: false,
+        require_lockdown_browser: false,
+        require_lockdown_browser_for_results: false,
+        one_question_at_a_time: false,
+        cant_go_back: false,
+        require_lockdown_browser_monitor: false,
+        only_visible_to_overrides: false,
+        one_time_results: false,
+        show_correct_answers_last_attempt: false
+      )
+
+      expect(default_false_values).to eq([false] * default_false_values.length)
+    end
+
+    it "saves show_correct_answers as false if it is set to false" do
+      @quiz.update!(show_correct_answers: false)
+      expect(@quiz.show_correct_answers).to eq(false)
+    end
+
+    it "saves boolean attributes as true if they are set to true" do
+      Quizzes::Quiz.stubs(:lockdown_browser_plugin_enabled?).returns(true)
+      @quiz.update!(
+        shuffle_answers: true,
+        could_be_locked: true,
+        anonymous_submissions: true,
+        require_lockdown_browser: true,
+        require_lockdown_browser_for_results: true,
+        one_question_at_a_time: true,
+        cant_go_back: true,
+        require_lockdown_browser_monitor: true,
+        only_visible_to_overrides: true,
+        one_time_results: true,
+        show_correct_answers_last_attempt: true,
+        # if allowed_attempts is <= 1, show_correct_answers_last_attempt
+        # cannot be set to true
+        allowed_attempts: 2
+      )
+
+      expect(default_false_values).to eq([true] * default_false_values.length)
+    end
+
+    it "saves show_correct_answers as true if it is set to true" do
+      @quiz.update!(show_correct_answers: true)
+      expect(@quiz.show_correct_answers).to eq(true)
+    end
+  end
+
   describe ".mark_quiz_edited" do
     it "should mark a quiz as having unpublished changes" do
       quiz = nil
@@ -1745,19 +1840,15 @@ describe Quizzes::Quiz do
     end
 
     context "to delete" do
-      before(:each) do
-        @course.root_account.enable_feature!(:multiple_grading_periods)
-      end
-
-      context "when multiple grading periods is disabled" do
+      context "when there are no grading periods" do
         it "is true for admins" do
-          @course.root_account.disable_feature!(:multiple_grading_periods)
-          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+          @course.stubs(:grading_periods?).returns false
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to be true
         end
 
         it "is false for teachers" do
-          @course.root_account.disable_feature!(:multiple_grading_periods)
-          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+          @course.stubs(:grading_periods?).returns false
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to be true
         end
       end
 

@@ -61,6 +61,7 @@ module Canvas::Twilio
   # string to send. This method will take care of deciding what number to send the message from and all of the other
   # assorted magic that goes into delivering text messages via Twilio.
   def self.deliver(recipient_number, body, from_recipient_country: true)
+    raise "Twilio is not configured" unless enabled?
     # Figure out what country the recipient number is in
     country = from_recipient_country ? lookup_country(recipient_number) : DEFAULT_COUNTRY
 

@@ -22,12 +22,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 describe "context/undelete_index.html.erb" do
   before do
     course_with_teacher(:active_all => true)
-    assigns[:context] = @course
+    assign(:context, @course)
   end
 
   it "should render the undelete link correctly for quizzes" do
     quiz = @course.quizzes.create!
-    assigns[:deleted_items] = [quiz]
+    assign(:deleted_items, [quiz])
     render
     expect(response.body).not_to match /quizzes:quiz/
     expect(response.body).to match /quiz_#{quiz.id}/

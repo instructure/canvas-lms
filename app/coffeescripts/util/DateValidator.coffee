@@ -30,7 +30,7 @@ define [
     constructor: (params) ->
       @dateRange = params['date_range']
       @data = params['data']
-      @multipleGradingPeriodsEnabled = params.multipleGradingPeriodsEnabled
+      @hasGradingPeriods = params.hasGradingPeriods
       @gradingPeriods = params.gradingPeriods
       @userIsAdmin = params.userIsAdmin
       @dueDateRequired = params.postToSIS && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
@@ -79,7 +79,7 @@ define [
           dueDateRequired: @dueDateRequired,
         }
 
-      if @multipleGradingPeriodsEnabled && !@userIsAdmin && @data.persisted == false
+      if @hasGradingPeriods && !@userIsAdmin && @data.persisted == false
         datetimesToValidate.push {
           date: dueAt,
           range: "grading_period_range",

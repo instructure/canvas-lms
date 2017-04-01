@@ -486,7 +486,7 @@ class RoleOverridesController < ApplicationController
         RoleOverride.permissions.keys.each do |key|
           if params[:permissions][key]
             roles.each do |role|
-              if settings = params[:permissions][key][role.id]
+              if (settings = params[:permissions][key][role.id.to_s] || params[:permissions][key][role.id])
                 override = settings[:override] == 'checked' if ['checked', 'unchecked'].include?(settings[:override])
                 locked = settings[:locked] == 'true' if settings[:locked]
                 RoleOverride.manage_role_override(@context, role, key.to_s, :override => override, :locked => locked)

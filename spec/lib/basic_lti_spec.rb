@@ -39,7 +39,7 @@ describe BasicLTI do
       </cartridge_basiclti_link>
     XML
     lti = CC::Importer::BLTIConverter.new
-    expect {lti.convert_blti_xml(xml)}.to raise_error
+    expect {lti.convert_blti_xml(xml)}.to raise_error(CC::Importer::BLTIConverter::CCImportError)
   end
 
   it "xml converter should raise an error when given html" do
@@ -51,7 +51,7 @@ describe BasicLTI do
       </html>
     XML
     lti = CC::Importer::BLTIConverter.new
-    expect {lti.convert_blti_xml(xml)}.to raise_error
+    expect {lti.convert_blti_xml(xml)}.to raise_error(CC::Importer::BLTIConverter::CCImportError)
   end
 
   it "xml converter should raise an error when given xml not using lti xmlns" do
@@ -64,7 +64,7 @@ describe BasicLTI do
       </cartridge_basiclti_link>
     XML
     lti = CC::Importer::BLTIConverter.new
-    expect {lti.convert_blti_xml(xml)}.to raise_error
+    expect {lti.convert_blti_xml(xml)}.to raise_error(CC::Importer::BLTIConverter::CCImportError)
   end
 
   it "xml converter should use raise an error when unescaped ampersands are used in custom url properties" do
@@ -94,7 +94,7 @@ describe BasicLTI do
       </cartridge_basiclti_link>
     XML
     lti = CC::Importer::BLTIConverter.new
-    expect {lti.convert_blti_xml(xml)}.to raise_error
+    expect {lti.convert_blti_xml(xml)}.to raise_error(CC::Importer::BLTIConverter::CCImportError)
   end
 
   context 'whitespace stripping' do

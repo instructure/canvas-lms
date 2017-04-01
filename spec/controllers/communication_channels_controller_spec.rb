@@ -113,9 +113,10 @@ describe CommunicationChannelsController do
       end
 
       it "does not confirm invalid email addresses" do
-        user_with_pseudonym(:active_user => 1, :username => 'not-an-email')
+        user_with_pseudonym(active_user: 1, username: 'not-an-email@example.com')
+        CommunicationChannel.where(id: @cc).update_all(path: 'not-an-email')
         user_session(@user, @pseudonym)
-        get 'confirm', :nonce => @cc.confirmation_code
+        get 'confirm', nonce: @cc.confirmation_code
         expect(response).not_to be_success
         expect(response).to render_template("confirm_failed")
       end
@@ -645,7 +646,7 @@ describe CommunicationChannelsController do
         expect(@user.reload.pseudonyms.first.unique_id).to eq "jt@instructure.com"
       end
 
-      it "should accept an invitation when merging with the current user" do
+      it "should preview acceptance of an invitation when merging with the current user" do
         @user.update_attribute(:workflow_state, 'creation_pending')
         @old_cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @old_user = @user
@@ -1090,9 +1091,10 @@ describe CommunicationChannelsController do
           @c3 = @user.communication_channels.create!(path: 'baz@example.com', path_type: 'email') do |cc|
             cc.workflow_state = 'active'
           end
-          @c4 = @user.communication_channels.create!(path: 'qux@.', path_type: 'email') do |cc|
+          @c4 = @user.communication_channels.create!(path: 'qux@example.com', path_type: 'email') do |cc|
             cc.workflow_state = 'unconfirmed'
           end
+          CommunicationChannel.where(id: @c4).update_all(path: 'qux@.')
           @c5 = @user.communication_channels.create!(path: '+18015550100', path_type: 'sms') do |cc|
             cc.workflow_state = 'unconfirmed'
           end

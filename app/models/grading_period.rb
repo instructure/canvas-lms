@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015-2016 Instructure, Inc.
+# Copyright (C) 2015 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -23,6 +23,7 @@ class GradingPeriod < ActiveRecord::Base
   has_many :scores, -> { active }
 
   validates :title, :start_date, :end_date, :close_date, :grading_period_group_id, presence: true
+  validates :weight, numericality: true, allow_nil: true
   validate :start_date_is_before_end_date
   validate :close_date_is_on_or_after_end_date
   validate :not_overlapping, unless: :skip_not_overlapping_validator?
@@ -30,7 +31,7 @@ class GradingPeriod < ActiveRecord::Base
   before_validation :adjust_close_date_for_course_period
   before_validation :ensure_close_date
 
-  after_save :recompute_scores, if: :dates_changed?
+  after_save :recompute_scores, if: :dates_or_weight_changed?
   after_destroy :destroy_grading_period_set, if: :last_remaining_legacy_period?
   after_destroy :destroy_scores
 
@@ -151,7 +152,7 @@ class GradingPeriod < ActiveRecord::Base
 
   def as_json_with_user_permissions(user)
     as_json(
-      only: [:id, :title, :start_date, :end_date, :close_date],
+      only: [:id, :title, :start_date, :end_date, :close_date, :weight],
       permissions: { user: user },
       methods: [:is_last, :is_closed],
     ).fetch(:grading_period)
@@ -230,13 +231,31 @@ class GradingPeriod < ActiveRecord::Base
       courses = [grading_period_group.course]
     else
       term_ids = grading_period_group.enrollment_terms.pluck(:id)
-      courses = Course.where(enrollment_term_id: term_ids)
+      courses = Course.active.where(enrollment_term_id: term_ids)
     end
-    # Course#recompute_student_scores is asynchronous
-    courses.each { |course| course.recompute_student_scores(grading_period_id: self.id) }
+
+    courses.each do |course|
+      course.recompute_student_scores(
+        # different assignments could fall in this period if time
+        # boundaries changed so we need to recalculate scores.
+        # otherwise, weight must have changed, in which case we
+        # do not need to recompute the grading period scores (we
+        # only need to recompute the overall course score)
+        grading_period_id: time_boundaries_changed? ? id : nil,
+        update_all_grading_period_scores: false
+      )
+    end
   end
 
-  def dates_changed?
+  def weight_actually_changed?
+    grading_period_group.weighted && weight_changed?
+  end
+
+  def time_boundaries_changed?
     start_date_changed? || end_date_changed?
+  end
+
+  def dates_or_weight_changed?
+    time_boundaries_changed? || weight_actually_changed?
   end
 end

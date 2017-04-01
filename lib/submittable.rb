@@ -5,16 +5,16 @@ module Submittable
     klass.has_many :assignment_student_visibilities, :through => :assignment
 
     klass.scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-      klass.without_assignment_in_course(course_ids)
-        .union(klass.joins_assignment_student_visibilities(user_ids, course_ids))
+      (CANVAS_RAILS4_2 ? klass : self).without_assignment_in_course(course_ids)
+        .union((CANVAS_RAILS4_2 ? klass : self).joins_assignment_student_visibilities(user_ids, course_ids))
     }
 
     klass.scope :without_assignment_in_course, lambda { |course_ids|
-      klass.where(context_id: course_ids, context_type: "Course").where(assignment_id: nil)
+      (CANVAS_RAILS4_2 ? klass : self).where(context_id: course_ids, context_type: "Course").where(assignment_id: nil)
     }
 
     klass.scope :joins_assignment_student_visibilities, lambda { |user_ids, course_ids|
-      klass.joins(:assignment_student_visibilities)
+      (CANVAS_RAILS4_2 ? klass : self).joins(:assignment_student_visibilities)
         .where(assignment_student_visibilities: { user_id: user_ids, course_id: course_ids })
     }
 

@@ -914,6 +914,8 @@ class AccountAuthorizationConfigsController < ApplicationController
     auth_type = data.delete(:auth_type)
     klass = AccountAuthorizationConfig.find_sti_class(auth_type)
     federated_attributes = data[:federated_attributes]
+    federated_attributes = {} if federated_attributes == ""
+    federated_attributes = federated_attributes&.to_hash
     data = data.permit(klass.recognized_params)
     data[:federated_attributes] = federated_attributes if federated_attributes
     data[:auth_type] = auth_type

@@ -53,7 +53,7 @@
     <% if !@available_reports.blank? %>
       <li><a href="#tab-reports" id="tab-reports-link"><%= t(:tab_reports, "Reports") %></a></li>
     <% end %>
-    <% if can_do(@context, @current_user, :manage_account_settings) %>
+    <% if can_do(@context, @current_user, :lti_add_edit) %>
       <li><a href="#tab-tools" id="tab-tools-link"><%= t(:tab_external_tools, "Apps") %></a></li>
     <% end %>
     <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
@@ -726,7 +726,7 @@ acknowledge that you have read and agreed to the
         <h2><%= t(:add_admin_title, "Add Account Admins") %></h2>
         <div style="margin-top: 5px;">
           <div>
-            <%= label_tag :role_id, :en => "Add More" %>
+            <%= label_tag :role_id, t("Add More") %>
             <select name="role_id" id="admin_role_id">
             <% available_roles.each do |role| %>
               <option value="<%= role.id %>"><%= AccountUser.readable_type(role.name) %></option>
@@ -1090,7 +1090,7 @@ acknowledge that you have read and agreed to the
       </table>
     </div>
   <% end %>
-  <% if can_do(@context, @current_user, :manage_account_settings) %>
+  <% if can_do(@context, @current_user, :lti_add_edit) %>
       <div id="tab-tools">
         <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
       </div>

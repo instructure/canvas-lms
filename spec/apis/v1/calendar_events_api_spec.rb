@@ -582,8 +582,8 @@ describe CalendarEventsApiController, type: :request do
             @teacher = @course.admins.first
             student_in_course :course => @course, :user => @me, :active_all => true
 
-            channel = @teacher.communication_channels.create! :path => "test_channel_email_#{@teacher.id}", :path_type => "email"
-            channel.confirm
+            cc = @teacher.communication_channels.create!(path: "test_#{@teacher.id}@example.com", path_type: "email")
+            cc.confirm
           end
 
           student_in_course(:course => @course, :user => (@other_guy = user_factory), :active_all => true)
@@ -703,8 +703,8 @@ describe CalendarEventsApiController, type: :request do
 
             message = Message.last
             expect(message.notification_name).to eq 'Appointment Canceled By User'
-            expect(message.to).to eq "test_channel_email_#{@teacher.id}"
-            expect(message.body).to match /Too busy/
+            expect(message.to).to eq "test_#{@teacher.id}@example.com"
+            expect(message.body).to match(/Too busy/)
           end
         end
 

@@ -156,10 +156,22 @@ describe RubricAssociation do
           }
         }
       })
-      
+
       expect(assess).not_to be_nil
       ra.destroy
       expect(assess.reload).not_to be_nil
+    end
+
+    it "should let account admins without manage_courses do things" do
+      @rubric = @course.rubrics.create! { |r| r.user = @teacher }
+      ra_params = rubric_association_params_for_assignment(@assignment)
+      ra = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
+
+      admin = account_admin_user_with_role_changes(:active_all => true, :role_changes => {:manage_courses => false})
+
+      [:manage, :delete, :assess].each do |permission|
+        expect(ra.grants_right?(admin, permission)).to be_truthy
+      end
     end
   end
 

@@ -58,7 +58,7 @@
           </label>
           <input id="assignment_peer_review_count"
             name="{{#if nested}}assignment[peer_review_count]{{else}}peer_review_count{{/if}}"
-            value="{{peerReviewCount}}"
+            value="{{n peerReviewCount}}"
             type="text"
             {{disabledIfIncludes frozenAttributes "peer_reviews"}}/>
 
@@ -127,5 +127,3 @@
     </div>
   </div>
 </div>
-
-

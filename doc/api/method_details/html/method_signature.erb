@@ -1,9 +1,13 @@
 <% @routes.each do |route| %>
   <% route_path = route.path.spec.to_s.sub("(.:format)", "")
-     if route.verb.source =~ /\^?(\w*)\$/
-       verb = $1.upcase
+     if CANVAS_RAILS4_2
+       if route.verb.source =~ /\^?(\w*)\$/
+         verb = $1.upcase
+       else
+         verb = route.verb.source
+       end
      else
-       verb = route.verb.source
+       verb = route.verb
      end
      next if route_path =~ /\.json$/ %>
   <h3 class='endpoint'>

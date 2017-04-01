@@ -18,7 +18,11 @@
     <div class="discussion-title">
       <h3 class="inline-block discussion-title-block">
         {{#if assignment}}
-          <span class="screenreader-only">{{#t}}Graded discussion: {{/t}}</span>
+          {{#if assignment.peer_reviews}}
+            <span class="screenreader-only">{{#t}}Peer-reviewed graded discussion: {{/t}}</span>
+          {{else}}
+            <span class="screenreader-only">{{#t}}Graded discussion: {{/t}}</span>
+          {{/if}}
         {{/if}}
         <a href="{{html_url}}" class="title">{{title}}</a>
       </h3>

@@ -241,7 +241,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def backup_submission_data(params)
-    raise "Only a hash value is accepted for backup_submission_data calls" unless params.is_a?(Hash)
+    raise "Only a hash value is accepted for backup_submission_data calls" unless params.is_a?(Hash) || params.is_a?(ActionController::Parameters)
 
     params = sanitize_params(params)
 

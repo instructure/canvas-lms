@@ -21,7 +21,7 @@ require_relative '../../views_helper'
 
 describe "login/canvas/new.html.erb" do
   before do
-    assigns[:domain_root_account] = Account.default
+    assign(:domain_root_account, Account.default)
   end
 
   it "uses canvas route by default" do
@@ -56,7 +56,7 @@ describe "login/canvas/new.html.erb" do
       config.save!
       account.change_password_url = "http://www.instructure.com"
       account.save!
-      assigns[:domain_root_account] = account
+      assign(:domain_root_account, account)
     end
 
     it "should use external forgot password mechanism" do

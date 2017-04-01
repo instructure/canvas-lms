@@ -67,7 +67,7 @@
 #     }
 #
 class TermsApiController < ApplicationController
-  before_action :require_context, :require_root_account_management
+  before_action :require_context, :require_account_management
 
   include Api::V1::EnrollmentTerm
 
@@ -116,6 +116,10 @@ class TermsApiController < ApplicationController
   #
   # @returns [EnrollmentTerm]
   def index
+    unless @context.root_account?
+      return render json: {message: 'Terms only belong to root_accounts.'}, status: :bad_request
+    end
+
     terms = @context.enrollment_terms.order('start_at DESC, end_at DESC, id ASC')
 
     state = Array(params[:workflow_state])&['all', 'active', 'deleted']

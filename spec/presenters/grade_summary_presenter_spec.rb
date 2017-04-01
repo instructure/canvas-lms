@@ -255,9 +255,9 @@ describe GradeSummaryPresenter do
       student_in_course
     end
 
-    let!(:assignment1) { @course.assignments.create!(title: 'Apple', due_at: 2.days.ago, position: 1) }
-    let!(:assignment2) { @course.assignments.create!(title: 'Banana', due_at: 2.days.from_now, position: 2) }
-    let!(:assignment3) { @course.assignments.create!(title: 'Carrot', due_at: 5.days.ago, position: 3) }
+    let!(:assignment1) { @course.assignments.create!(title: 'Jalapeno', due_at: 2.days.ago, position: 1) }
+    let!(:assignment2) { @course.assignments.create!(title: 'Jalapeño', due_at: 2.days.from_now, position: 2) }
+    let!(:assignment3) { @course.assignments.create!(title: 'Jalapezo', due_at: 5.days.ago, position: 3) }
     let(:ordered_assignment_ids) { presenter.assignments.map(&:id) }
 
     it "assignment order defaults to due_at" do
@@ -321,7 +321,7 @@ describe GradeSummaryPresenter do
         it "sorts alphabetically for assignments not belonging to modules (ignoring case)" do
           assignment3.title = "apricot"
           assignment3.save!
-          expected_id_order = [assignment1.id, assignment3.id, assignment2.id]
+          expected_id_order = [assignment3.id, assignment1.id, assignment2.id]
           expect(ordered_assignment_ids).to eq(expected_id_order)
         end
       end
