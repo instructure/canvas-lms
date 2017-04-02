@@ -161,11 +161,27 @@ describe CoursesController do
         course4.offer!
         enrollment4 = course_with_student course: course4, user: @student, active_all: true
 
+        # by course date, unrestricted past view
+        course5 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago,
+                                                  restrict_enrollments_to_course_dates: false,
+                                                  name: 'Phive',
+                                                  restrict_student_past_view: false
+        course5.offer!
+        enrollment5 = course_with_student course: course5, user: @student, active_all: true
+
+        # by course date, restricted past view & enrollment dates
+        course6 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago,
+                                                  restrict_enrollments_to_course_dates: true,
+                                                  name: 'Styx',
+                                                  restrict_student_past_view: true
+        course6.offer!
+        enrollment6 = course_with_student course: course6, user: @student, active_all: true
+
         user_session(@student)
         get 'index'
         expect(response).to be_success
-        expect(assigns[:past_enrollments]).to match_array([enrollment3, enrollment2])
-        expect(assigns[:current_enrollments]).to eq [enrollment4, enrollment1]
+        expect(assigns[:past_enrollments]).to match_array([enrollment6, enrollment5, enrollment3, enrollment2, enrollment1])
+        expect(assigns[:current_enrollments]).to eq [enrollment4]
         expect(assigns[:future_enrollments]).to be_empty
       end
 
@@ -209,7 +225,7 @@ describe CoursesController do
         user_session(@student)
         get 'index'
         expect(response).to be_success
-        expect(assigns[:past_enrollments]).to be_empty
+        expect(assigns[:past_enrollments]).to match_array([enrollment])
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
 
@@ -218,7 +234,7 @@ describe CoursesController do
         user_session(observer)
         get 'index'
         expect(response).to be_success
-        expect(assigns[:past_enrollments]).to be_empty
+        expect(assigns[:past_enrollments]).to match_array([o.observer.enrollments.first])
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
 
