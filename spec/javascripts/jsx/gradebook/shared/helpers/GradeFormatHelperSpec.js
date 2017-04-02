@@ -23,9 +23,7 @@ import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 QUnit.module('GradeFormatHelper#formatGrade', {
   setup () {
     this.stub(numberHelper, 'parse').returns(42);
-    this.stub(numberHelper, 'validate', function (val) {
-      return !isNaN(parseFloat(val));
-    });
+    this.stub(numberHelper, 'validate').callsFake(val => !isNaN(parseFloat(val)));
     this.stub(I18n, 'n').returns('42');
   }
 });

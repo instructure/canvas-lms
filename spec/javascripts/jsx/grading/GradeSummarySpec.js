@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2016 - 2017 Instructure, Inc.
  *
  * This file is part of Canvas.
