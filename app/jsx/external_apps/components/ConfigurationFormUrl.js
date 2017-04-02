@@ -68,7 +68,7 @@ export default React.createClass({
                 ref="consumerKey"
                 id="consumerKey"
                 defaultValue={this.props.consumerKey}
-                label={I18n.t('Consumer key')}
+                label={I18n.t('Consumer Key')}
                 errors={this.state.errors} />
             </div>
             <div className="col-xs-6">
