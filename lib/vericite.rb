@@ -273,7 +273,7 @@ module VeriCite
           end
           data.each do |externalContentUploadInfo|
             #API will return an upload URL to store the submission (throws an exception if it fails)
-            res = api_client.uploadfile(externalContentUploadInfo.url_post, args[:pdata])
+            api_client.uploadfile(externalContentUploadInfo.url_post, args[:pdata], externalContentUploadInfo.headers)
           end
           # this is a flag to signal success
           response[:returned_object_id] = external_content_data.external_content_id
