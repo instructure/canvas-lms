@@ -272,6 +272,40 @@ describe CourseSection, "moving to new course" do
     expect(CourseAccountAssociation.where(course_id: course2).distinct.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id].sort
   end
 
+  it 'should call course#recompute_student_scores_without_send_later if :run_jobs_immediately' do
+    account1 = Account.create!(:name => "1")
+    account2 = Account.create!(:name => "2")
+    course1 = account1.courses.create!
+    course2 = account2.courses.create!
+    cs = course1.course_sections.create!
+    u = User.create!
+    u.register!
+    e = course1.enroll_user(u, 'StudentEnrollment', :section => cs)
+    e.workflow_state = 'active'
+    e.save!
+    course1.reload
+
+    expect(course2).to receive(:recompute_student_scores_without_send_later)
+    cs.move_to_course(course2, run_jobs_immediately: true)
+  end
+
+  it 'should call course##recompute_student_scores later without :run_jobs_immediately' do
+    account1 = Account.create!(:name => "1")
+    account2 = Account.create!(:name => "2")
+    course1 = account1.courses.create!
+    course2 = account2.courses.create!
+    cs = course1.course_sections.create!
+    u = User.create!
+    u.register!
+    e = course1.enroll_user(u, 'StudentEnrollment', :section => cs)
+    e.workflow_state = 'active'
+    e.save!
+    course1.reload
+
+    expect(course2).to receive(:recompute_student_scores)
+    cs.move_to_course(course2)
+  end
+
   describe 'validation' do
     before :once do
       course = Course.create_unique
