@@ -744,6 +744,25 @@ describe Enrollment do
     end
   end
 
+  context "recompute_final_score_in_singleton" do
+    before(:once) { course_with_student }
+
+    it "should raise an exception if called with more than one user" do
+      expect { Enrollment.recompute_final_score_in_singleton([@user.id, 5], @course.id) }.
+        to raise_error(ArgumentError)
+    end
+
+    it "sends later for a single student" do
+      expect(Enrollment).to receive(:send_later_if_production_enqueue_args).with(
+        :recompute_final_score,
+        hash_including(singleton: "Enrollment.recompute_final_score:#{@user.id}:#{@course.id}:"),
+        @user.id, @course.id, {}
+      )
+
+      Enrollment.recompute_final_score_in_singleton(@user.id, @course.id)
+    end
+  end
+
   context "recompute_final_scores" do
     it "should only recompute once per student, per course" do
       course_with_student(:active_all => true)
