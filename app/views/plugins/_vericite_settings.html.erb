@@ -66,6 +66,14 @@
       <td><%= f.check_box :show_preliminary_score %></td>
     </tr>
     <tr>
+      <td><%= f.blabel :inst_enable_student_preview, :en => "Show Student Preview" %></td>
+      <td>
+          <%= f.check_box :inst_enable_student_preview %>
+          <br/>
+          <%= mt :inst_enable_student_preview_description, "*Student preview is a premium feature, please contact VeriCite support to upgrade.*" %>
+      </td>
+    </tr>
+    <tr>
       <td><%= mt :default_assignment_settings, "**Default Assignment Settings**" %>:</td>
       <td></td>
     </tr>
@@ -84,6 +92,10 @@
     <tr>
       <td><%= f.blabel :store_in_index, :en => "Store in Index" %></td>
       <td><%= f.check_box :store_in_index %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :enable_student_preview, :en => "Enable Student Preview" %></td>
+      <td><%= f.check_box :enable_student_preview %><br/> (<%= mt :enable_student_preview_description, "*Only visible if 'Show Student Preview' is set.*" %>)</td>
     </tr>
   </table>
 <% end %>

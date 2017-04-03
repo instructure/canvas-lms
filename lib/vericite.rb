@@ -30,19 +30,21 @@ module VeriCite
   end
 
   class Client
-    attr_accessor :account_id, :shared_secret, :host, :testing, :show_preliminary_score
+    attr_accessor :account_id, :shared_secret, :host, :testing, :show_preliminary_score, :inst_enable_student_preview
 
     def initialize(testing=false)
       @host = Canvas::Plugin.find(:vericite).settings[:host] || "api.vericite.com"
       account_id = Canvas::Plugin.find(:vericite).settings[:account_id]
       shared_secret = Canvas::Plugin.find(:vericite).settings[:shared_secret]
       show_preliminary_score = Canvas::Plugin.find(:vericite).settings[:show_preliminary_score] || false
+      inst_enable_student_preview = Canvas::Plugin.find(:vericite).settings[:inst_enable_student_preview] || false
       raise "Account ID required" unless account_id
       raise "Shared secret required" unless shared_secret
 
       @account_id = account_id
       @shared_secret = shared_secret
       @show_preliminary_score = show_preliminary_score
+      @inst_enable_student_preview = inst_enable_student_preview
       @testing = testing
     end
 
@@ -68,6 +70,7 @@ module VeriCite
         :exclude_quoted =>  Canvas::Plugin.find(:vericite).settings[:exclude_quotes],
         :exclude_self_plag => Canvas::Plugin.find(:vericite).settings[:exclude_self_plag],
         :store_in_index => Canvas::Plugin.find(:vericite).settings[:store_in_index],
+        :enable_student_preview => Canvas::Plugin.find(:vericite).settings[:enable_student_preview],
         :vericite => true
       }
     end
@@ -80,7 +83,7 @@ module VeriCite
 
         settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date', 'never'].include?(settings[:originality_report_visibility])
 
-        [:exclude_quoted, :exclude_self_plag, :store_in_index].each do |key|
+        [:exclude_quoted, :exclude_self_plag, :store_in_index, :enable_student_preview].each do |key|
           bool = Canvas::Plugin.value_to_boolean(settings[key])
           settings[key] = bool ? '1' : '0'
         end
@@ -170,6 +173,7 @@ module VeriCite
       data = {}
       if res
         data[:similarity_score] = res[:similarity_score]
+        data[:draft] = res[:draft]
       end
       data
     end
@@ -225,6 +229,9 @@ module VeriCite
           assignment_data.assignment_exclude_quotes = args["exclude_quoted"] != nil && args["exclude_quoted"] == '1' ? true : false
           assignment_data.assignment_exclude_self_plag = args["exclude_self_plag"] != nil && args["exclude_self_plag"] == '1' ? true : false
           assignment_data.assignment_store_in_index = args["store_in_index"] != nil && args["store_in_index"] == '1' ? true : false
+          if @inst_enable_student_preview
+            assignment_data.assignment_enable_student_preview = args["enable_student_preview"] != nil && args["enable_student_preview"] == '1' ? true : false
+          end
           assignment_data.assignment_due_date = 0
           if assignment.due_at != nil
             # convert to epoch time in milli
@@ -301,7 +308,9 @@ module VeriCite
               if reportScoreReponse.score.is_a?(Integer) && reportScoreReponse.score >= 0 &&
                 (@show_preliminary_score || reportScoreReponse.preliminary.nil? || !reportScoreReponse.preliminary)
                 # since external content id's are unique, we can store it as the key
-                user_score_map[reportScoreReponse.external_content_id] = Float(reportScoreReponse.score)
+                user_score_map[reportScoreReponse.external_content_id] = {}
+                user_score_map[reportScoreReponse.external_content_id][:score] = Float(reportScoreReponse.score)
+                user_score_map[reportScoreReponse.external_content_id][:draft] = reportScoreReponse.draft
               end
             end
             # cache the user score map for a short period of time
@@ -315,9 +324,10 @@ module VeriCite
 
           # the user score map shouldn't be empty now (either grabbed from the cache or VeriCite)
           if user_score_map != nil
-            user_score_map.each do |key, score|
-              if key ==  args[:oid] && score >= 0
-                response[:similarity_score] = score
+            user_score_map.each do |key, scoreMap|
+              if key ==  args[:oid] && !scoreMap[:score].blank? && scoreMap[:score] >= 0
+                response[:similarity_score] = scoreMap[:score]
+                response[:draft] = scoreMap[:draft]
               end
             end
           end

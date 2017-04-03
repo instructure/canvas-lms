@@ -1499,7 +1499,9 @@ define([
           state: (vericiteAsset.state || 'no') + '_score',
           reportUrl: $.replaceTags($assignment_submission_vericite_report_url.attr('href'), { user_id: submission.user_id, asset_string: assetString }),
           tooltip: I18n.t('vericite.tooltip.score', 'VeriCite Similarity Score - See detailed report'),
-          score: vericiteAsset.similarity_score + '%'
+          score: vericiteAsset.similarity_score + '%',
+          drafttooltip: I18n.t('tooltip.draft', 'draft'),
+          draft: vericiteAsset.draft
         }));
       } else if (vericiteAsset.status) {
         // status == 'error' or status == 'pending'
@@ -1509,7 +1511,8 @@ define([
           state: 'submission_' + vericiteAsset.status,
           reportUrl: '#',
           tooltip: (vericiteAsset.status == 'error' ? errorTooltip : pendingTooltip),
-          icon: '/images/turnitin_submission_' + vericiteAsset.status + '.png'
+          icon: '/images/turnitin_submission_' + vericiteAsset.status + '.png',
+          draft: false
         }));
         $vericiteScoreContainer.append($vericiteSimilarityScore);
         $vericiteSimilarityScore.click(function(event) {

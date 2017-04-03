@@ -1,3 +1,15 @@
+<%- if @assignment.vericite_enabled? && @assignment.vericite_settings.present? and @assignment.vericite_settings['enable_student_preview'] == '1'%>
+  <tr>
+    <td colspan="2" class='vericite-comments'>
+      <%= t :vericite_student_preview_submit_enabled, "VeriCite student preview feature is enabled" %>
+      <a href="#"
+        class="icon-question"
+        title="<%= t :vericite_student_preview_submit_info, "This assignment has enabled student preview which allows students to submit as many papers as a draft as they wish. A draft paper report is only visible to the owner of the paper, however instructors will be able to see the number of draft submissions and the report scores of each draft. Also, if there is a due date, the most recent draft will automatically be submitted if the student has no other submissions. Students can submit a draft paper as their final submission at any time within the VeriCite report." %>"
+        aria-label="<%= t :vericite_student_preview_submit_info_label, "VeriCite student preview information" %>"
+        data-tooltip='{"tooltipClass":"popover popover-padded", "position":"right"}'></a>
+    </td>
+  </tr>
+<%- end %>
 <%- if @context.vericite_comments.present? %>
   <tr>
     <td colspan="2" class='vericite-comments'>

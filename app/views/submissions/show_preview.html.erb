@@ -108,6 +108,9 @@
             <span class="turnitin_score_container">
               <span class="vericite_score_container_caret <%= vericite_score[:state] %>_score"></span>
               <a href="<%= context_url(@context, :context_assignment_submission_vericite_report_url, @submission.assignment_id, @submission.user_id, attachment.asset_string) %>" target="_blank" title="Similarity score -- more information" class="tooltip not_external turnitin_similarity_score <%= vericite_score[:state] %>_score">
+                <% if vericite_score[:draft] %>
+                  <i class="icon-edit" title="<%= t(:tooltip_draft, "draft") %>" style="border: 1px solid; height: 1.2em;"></i>
+                <% end %>
                 <%= vericite_score[:similarity_score] %>%
                 <span class="tooltip_wrap right">
                   <span class="tooltip_text"><%= t(:see_vericite_results, "See VeriCite results") %></span>

@@ -370,6 +370,8 @@ Canvas::Plugin.register('vericite', nil, {
     :exclude_self_plag => true,
     :store_in_index => true,
     :show_preliminary_score => false,
+    :inst_enable_student_preview => false,
+    :enable_student_preview => false,
   },
   :settings_partial => 'plugins/vericite_settings'
 })

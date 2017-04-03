@@ -42,4 +42,6 @@ define [
       data.score = "#{data.similarity_score}%"
       data.reportUrl = "#{urlPrefix}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/#{type}/#{key}"
       data.tooltip = I18n.t('tooltip.score', 'Similarity Score - See detailed report')
+      data.drafttooltip = I18n.t('tooltip.draft', 'draft')
+      data.draft = "#{data.draft}"
       data

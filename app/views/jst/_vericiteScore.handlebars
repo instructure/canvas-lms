@@ -1,8 +1,11 @@
 <span class="vericite_score_container_caret {{state}}"></span>
-<a class="turnitin_similarity_score {{state}}" href="{{reportUrl}}" title="{{tooltip}}" target="_blank">
+<a class="turnitin_similarity_score {{state}}" href="{{reportUrl}}" title="{{tooltip}}" target="_blank" style="width: auto">
   {{#if icon}}
     <img src="{{icon}}"></img>
   {{else}}
+    {{#if draft}}
+      <i class="icon-edit" title="{{drafttooltip}}" style="border: 1px solid; height: 1.2em;"></i>
+    {{/if}}
     {{score}}
   {{/if}}
 </a>
