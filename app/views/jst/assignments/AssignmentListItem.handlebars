@@ -1,6 +1,6 @@
 <div
   id="assignment_{{id}}"
-  class="ig-row {{#ifAll canManage published}}ig-published{{/ifAll}}"
+  class="ig-row {{#ifAll canManage published}}ig-published{{/ifAll}} {{#if is_master_course_master_content}}is-master{{/if}}"
   data-item-id="{{labelId}}"
 >
   <div class="ig-row__layout">
@@ -75,15 +75,7 @@
         <span class="screenreader-only">{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}</span>
         {{/if}}
         <span class="sis-button" data-view="sis-button"></span>
-        <span class="master-course-cell">
-          {{#if is_master_course_child_content}}
-            {{#if restricted_by_master_course}}
-              <i class="icon-lock"></i>
-            {{else}}
-              <i class="icon-unlock icon-Line"></i>
-            {{/if}}
-          {{/if}}
-        </span>
+        <span class="lock-icon" data-view="lock-icon"></span>
         <span class="publish-icon" data-view="publish-icon"></span>
         <div class="inline-block">
           <a
