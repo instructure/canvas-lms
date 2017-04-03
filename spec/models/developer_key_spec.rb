@@ -75,13 +75,13 @@ describe DeveloperKey do
 
     it "does not allow subdomains when it matches in redirect_uris" do
       key = DeveloperKey.create!(redirect_uris: "http://example.com/a/b")
-      expect(key.redirect_domain_matches?("http://example.com/a/b")).to eq true
+      expect(key.redirect_domain_matches?("http://example.com/a/b")).to be_truthy
       # other paths on the same domain are NOT ok
-      expect(key.redirect_domain_matches?("http://example.com/other")).to eq false
+      expect(key.redirect_domain_matches?("http://example.com/other")).to be_falsey
       # sub-domains are not ok either
-      expect(key.redirect_domain_matches?("http://www.example.com/a/b")).to eq false
-      expect(key.redirect_domain_matches?("http://a.b.example.com/a/b")).to eq false
-      expect(key.redirect_domain_matches?("http://a.b.example.com/other")).to eq false
+      expect(key.redirect_domain_matches?("http://www.example.com/a/b")).to be_falsey
+      expect(key.redirect_domain_matches?("http://a.b.example.com/a/b")).to be_falsey
+      expect(key.redirect_domain_matches?("http://a.b.example.com/other")).to be_falsey
     end
   end
 
@@ -90,11 +90,11 @@ describe DeveloperKey do
     shared_examples "authorized_for_account?" do
 
       it "should allow allow access to its own account" do
-        expect(@key.authorized_for_account?(Account.find(@account.id))).to be true
+        expect(@key.authorized_for_account?(Account.find(@account.id))).to be_truthy
       end
 
       it "shouldn't allow allow access to a foreign account" do
-        expect(@key.authorized_for_account?(@not_sub_account)).to be false
+        expect(@key.authorized_for_account?(@not_sub_account)).to be_falsey
       end
     end
 
