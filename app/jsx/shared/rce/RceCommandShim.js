@@ -21,6 +21,12 @@ export function send ($target, methodName, ...args) {
     if (methodName === 'get_code' && remoteEditor.isHidden()) {
       return $target.val()
     }
+    if (methodName === 'create_link') {
+      // correct for link insertion api difference between editor_box and
+      // canvas-rce
+      methodName = 'insertLink'
+      args[0].href = args[0].url
+    }
     return remoteEditor.call(methodName, ...args)
   } else if ($target.data('rich_text')) {
     return $target.editorBox(methodName, ...args)

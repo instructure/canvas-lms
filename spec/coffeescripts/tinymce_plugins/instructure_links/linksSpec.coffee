@@ -1,6 +1,6 @@
 define [
   'jquery',
-  'tinymce_plugins/instructure_links/plugin',
+  'tinymce_plugins/instructure_links/links',
   'tinymce_plugins/instructure_links/linkable_editor',
 ], ($, EditorLinks, LinkableEditor)->
 

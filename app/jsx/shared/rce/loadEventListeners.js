@@ -1,3 +1,5 @@
+import EquationEditorView from 'compiled/views/tinymce/EquationEditorView'
+import * as Links from 'tinymce_plugins/instructure_links/links'
 import InsertUpdateImageView from 'compiled/views/tinymce/InsertUpdateImageView'
 import initializeEquella from 'tinymce_plugins/instructure_equella/initializeEquella'
 import initializeExternalTools from 'tinymce_plugins/instructure_external_tools/initializeExternalTools'
@@ -6,6 +8,8 @@ import INST from 'INST'
 
   function loadEventListeners (callbacks={}) {
     const validCallbacks = [
+      'equationCB',
+      'linksCB',
       "imagePickerCB",
       "equellaCB",
       "externalToolCB",
@@ -17,6 +21,17 @@ import INST from 'INST'
         callbacks[cbName] = function(){ /* no-op*/ }
       }
     })
+
+    document.addEventListener('tinyRCE/initEquation', ({detail}) => {
+      const view = new EquationEditorView(detail.ed)
+      callbacks.equationCB(view)
+    });
+
+    document.addEventListener('tinyRCE/initLinks', ({detail}) => {
+      Links.initEditor(detail.ed)
+      Links.renderDialog(detail.ed)
+      callbacks.linksCB()
+    });
 
     document.addEventListener('tinyRCE/initImagePicker', function(e){
       let view = new InsertUpdateImageView(e.detail.ed, e.detail.selectedNode);
