@@ -51,7 +51,7 @@ import APIError from './api_error'
       validateUsers: React.PropTypes.func.isRequired,
       enrollUsers: React.PropTypes.func.isRequired,
       onClose: React.PropTypes.func,
-      // these props are generate from store state
+      // these props are generated from store state
       courseParams: React.PropTypes.shape(courseParamsShape),
       apiState: React.PropTypes.shape(apiStateShape),
       inputParams: React.PropTypes.shape(inputParamsShape),
@@ -270,15 +270,16 @@ import APIError from './api_error'
 
       return (
         <Modal
+          closeButtonLabel={cancelLabel}
           id="add_people_modal"
           isOpen={this.props.isOpen}
           label={I18n.t('Modal Dialog: Add People')}
-          closeButtonLabel={cancelLabel}
+          onRequestClose={this.close}
+          ref={(node) => { this.node = node; }}
           shouldCloseOnOverlayClick={false}
           size="medium"
-          zIndex="9999"
-          onRequestClose={this.close}
           tabindex="-1"
+          zIndex="9999"
         >
           <ModalHeader>
             <Heading tabIndex="-1">{I18n.t('Add People')}</Heading>
