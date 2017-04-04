@@ -269,6 +269,11 @@ class ApplicationController < ActionController::Base
   end
   helper_method :set_master_course_js_env_data
 
+  def should_load_master_course_sidebar?
+    @context && @context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(@context) && @context.grants_right?(@current_user, :manage)
+  end
+  helper_method :should_load_master_course_sidebar?
+
   def editing_restricted?(content, edit_type=:any)
     return false unless master_courses? && content.respond_to?(:editing_restricted?)
     content.editing_restricted?(edit_type)
