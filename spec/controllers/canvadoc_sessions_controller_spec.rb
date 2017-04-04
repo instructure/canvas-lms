@@ -67,7 +67,7 @@ describe CanvadocSessionsController do
       assert_status(401)
     end
 
-    it "should send o365 preferred plugin" do
+    it "should send o365 as a preferred plugin when the 'Prefer Office 365 file viewer' account setting is enabled" do
       Account.default.settings[:canvadocs_prefer_office_online] = true
       Account.default.save!
 
@@ -80,7 +80,7 @@ describe CanvadocSessionsController do
       get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
     end
 
-    it "should not send o365 preferred plugin" do
+    it "should not send o365 as a preferred plugin when the 'Prefer Office 365 file viewer' account setting is not enabled" do
       Account.default.settings[:canvadocs_prefer_office_online] = false
       Account.default.save!
 
@@ -92,6 +92,45 @@ describe CanvadocSessionsController do
 
       get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
     end
+
+    it "should send PDFjs as a preferred plugin when the 'New Annotations' feature is enabled" do
+      Account.default.enable_feature!(:new_annotations)
+
+      Attachment.stubs(:find).returns(@attachment1)
+      @attachment1.expects(:submit_to_canvadocs).with do |arg1, arg2|
+        arg1 == 1 &&
+        arg2[:preferred_plugins] == [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
+      end
+
+      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+    end
+
+    it "should not send PDFjs as a preferred plugin when the 'New Annotations' feature is not enabled" do
+      Account.default.disable_feature!(:new_annotations)
+
+      Attachment.stubs(:find).returns(@attachment1)
+      @attachment1.expects(:submit_to_canvadocs).with do |arg1, arg2|
+        arg1 == 1 &&
+        arg2[:preferred_plugins] == [Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
+      end
+
+      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+    end
+
+    it "should send Office365 and PDFjs as preferred plugins when the 'New Annotations' feature is enabled and the 'Prefer Office 365 file viewer' account setting is enabled" do
+      Account.default.enable_feature!(:new_annotations)
+      Account.default.settings[:canvadocs_prefer_office_online] = true
+      Account.default.save!
+
+      Attachment.stubs(:find).returns(@attachment1)
+      @attachment1.expects(:submit_to_canvadocs).with do |arg1, arg2|
+        arg1 == 1 &&
+        arg2[:preferred_plugins] == [Canvadocs::RENDER_O365, Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
+      end
+
+      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+    end
+
     it "needs to be run by the blob user" do
       @blob[:user_id] = @student.global_id
       blob = @blob.to_json

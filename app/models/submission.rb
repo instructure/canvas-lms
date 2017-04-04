@@ -1041,7 +1041,7 @@ class Submission < ActiveRecord::Base
         # associate previewable-document and submission for permission checks
         if a.canvadocable? && Canvadocs.annotations_supported? && !dont_submit_to_canvadocs
           submit_to_canvadocs = true
-          a.create_canvadoc!(canvadoc_params) unless a.canvadoc
+          a.create_canvadoc! unless a.canvadoc
           a.shard.activate do
             CanvadocsSubmission.find_or_create_by(submission: self, canvadoc: a.canvadoc)
           end
@@ -1054,11 +1054,26 @@ class Submission < ActiveRecord::Base
         end
 
         if submit_to_canvadocs
+          opts = {
+            preferred_plugins: [Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
+            wants_annotation: true,
+            force_crocodoc: dont_submit_to_canvadocs
+          }
+
+          if context.account.feature_enabled?(:new_annotations)
+            opts[:preferred_plugins].unshift Canvadocs::RENDER_PDFJS
+          end
+
+          if context.root_account.settings[:canvadocs_prefer_office_online]
+            # Office 365 should take priority over pdfjs
+            opts[:preferred_plugins].unshift Canvadocs::RENDER_O365
+          end
+
           a.send_later_enqueue_args :submit_to_canvadocs, {
             :n_strand     => 'canvadocs',
             :max_attempts => 1,
             :priority => Delayed::LOW_PRIORITY
-          }, 1, wants_annotation: true, force_crocodoc: dont_submit_to_canvadocs
+          }, 1, opts
         end
       end
     end
@@ -1436,20 +1451,6 @@ class Submission < ActiveRecord::Base
     true
   end
   private :validate_single_submission
-
-  def canvadoc_params
-    { preferred_plugin_course_id: preferred_plugin_course_id }
-  end
-  private :canvadoc_params
-
-  def preferred_plugin_course_id
-    if self.context && self.context.is_a?(Course)
-      self.context.id
-    else
-      nil
-    end
-  end
-  private :preferred_plugin_course_id
 
   def grade_change_audit(force_audit = self.assignment_changed_not_sub)
     newly_graded = self.workflow_state_changed? && self.workflow_state == 'graded'
