@@ -3,13 +3,13 @@ import ReduxThunk from 'redux-thunk'
 import ReduxLogger from 'redux-logger'
 import rootReducer from './reducer'
 
-  const logger = ReduxLogger()
+const logger = ReduxLogger()
 
-  const createStoreWithMiddleware = applyMiddleware(
-    ReduxThunk,
-    logger
-  )(createStore)
+const createStoreWithMiddleware = applyMiddleware(
+  ReduxThunk,
+  logger
+)(createStore)
 
-  export default function configStore (initialState) {
-    return createStoreWithMiddleware(rootReducer, initialState)
-  }
+export default function configStore (initialState) {
+  return createStoreWithMiddleware(rootReducer, initialState)
+}

@@ -1,10 +1,9 @@
 define([
   'react',
-  'react-dom',
   'enzyme',
   'jsx/course_blueprint_settings/components/AssociationsTable',
   '../sampleData',
-], (React, ReactDOM, enzyme, AssociationsTable, data) => {
+], (React, enzyme, AssociationsTable, data) => {
   QUnit.module('AssociationsTable component')
 
   const defaultProps = () => ({
