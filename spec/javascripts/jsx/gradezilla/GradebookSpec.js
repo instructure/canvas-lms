@@ -508,6 +508,125 @@ test('returns false if "All Grading Periods" is selected and the grading period 
   notOk(this.hideAggregateColumns.call(self));
 });
 
+QUnit.module('Gradebook#wrapColumnSortFn');
+
+test('returns -1 if second argument is of type total_grade', function () {
+  const sortFn = createGradebook().wrapColumnSortFn(this.stub());
+  equal(sortFn({}, { type: 'total_grade' }), -1);
+});
+
+test('returns 1 if first argument is of type total_grade', function () {
+  const sortFn = createGradebook().wrapColumnSortFn(this.stub());
+  equal(sortFn({ type: 'total_grade' }, {}), 1);
+});
+
+test('returns -1 if second argument is an assignment_group and the first is not', function () {
+  const sortFn = createGradebook().wrapColumnSortFn(this.stub());
+  equal(sortFn({}, { type: 'assignment_group' }), -1);
+});
+
+test('returns 1 if first arg is an assignment_group and second arg is not', function () {
+  const sortFn = createGradebook().wrapColumnSortFn(this.stub());
+  equal(sortFn({type: 'assignment_group'}, {}), 1);
+});
+
+test('returns difference in object.positions if both args are assignement_groups', function () {
+  const sortFn = createGradebook().wrapColumnSortFn(this.stub());
+  const a = { type: 'assignment_group', object: { position: 10 }};
+  const b = { type: 'assignment_group', object: { position: 5 }};
+
+  equal(sortFn(a, b), 5);
+});
+
+test('calls wrapped function when either column is not total_grade nor assignment_group', function () {
+  const wrappedFn = this.stub();
+  const sortFn = createGradebook().wrapColumnSortFn(wrappedFn);
+  sortFn({}, {});
+  ok(wrappedFn.called);
+});
+
+QUnit.module('Gradebook#makeCompareAssignmentCustomOrderFn');
+
+test('returns position difference if both are defined in the index', function () {
+  const sortOrder = { customOrder: ['foo', 'bar'] };
+  const gradeBook = createGradebook();
+  this.stub(gradeBook, 'compareAssignmentPositions');
+  const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder);
+
+  const a = { id: 'foo' };
+  const b = { id: 'bar' };
+  equal(sortFn(a, b), -1);
+});
+
+test('returns -1 if the first arg is in the order and the second one is not', function () {
+  const sortOrder = { customOrder: ['foo', 'bar'] };
+  const gradeBook = createGradebook();
+  this.stub(gradeBook, 'compareAssignmentPositions');
+  const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder);
+
+  const a = { id: 'foo' };
+  const b = { id: 'NO' };
+  equal(sortFn(a, b), -1);
+});
+
+test('returns 1 if the second arg is in the order and the first one is not', function () {
+  const sortOrder = { customOrder: ['foo', 'bar'] };
+  const gradeBook = createGradebook();
+  this.stub(gradeBook, 'compareAssignmentPositions');
+  const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder);
+
+  const a = { id: 'NO' };
+  const b = { id: 'bar' };
+  equal(sortFn(a, b), 1);
+});
+
+test('calls wrapped compareAssignmentPositions otherwise', function () {
+  const sortOrder = { customOrder: ['foo', 'bar'] };
+  const gradeBook = createGradebook();
+  this.stub(gradeBook, 'compareAssignmentPositions');
+  const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder);
+
+  const a = { id: 'taco' };
+  const b = { id: 'cat' };
+  sortFn(a, b);
+  ok(gradeBook.compareAssignmentPositions.called);
+});
+
+test('falls back to object id for the indexes if field is not in the map', function () {
+  const sortOrder = { customOrder: ['5', '11'] };
+  const gradeBook = createGradebook();
+  this.stub(gradeBook, 'compareAssignmentPositions');
+  const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder);
+
+  const a = { id: 'NO', object: { id: 5 }};
+  const b = { id: 'NOPE', object: { id: 11 }};
+  equal(sortFn(a, b), -1);
+});
+
+QUnit.module('Gradebook#storeCustomColumnOrder');
+
+test('stores the custom column order (ignoring frozen columns)', function () {
+  const columns = [
+    { id: 'student' },
+    { id: 'assignment_232' },
+    { id: 'total_grade' },
+    { id: 'assignment_group_12' }
+  ];
+  const gradeBook = createGradebook();
+  this.stub(gradeBook, 'setStoredSortOrder');
+  gradeBook.grid = { getColumns: this.stub().returns(columns) };
+  gradeBook.parentColumns = [{ id: 'student' }];
+  gradeBook.customColumns = [];
+
+  const expectedSortOrder = {
+    sortType: 'custom',
+    customOrder: ['assignment_232', 'total_grade', 'assignment_group_12']
+  };
+
+  gradeBook.storeCustomColumnOrder();
+  ok(gradeBook.setStoredSortOrder.calledWith(expectedSortOrder));
+});
+
 QUnit.module('Gradebook#getVisibleGradeGridColumns', {
   setup () {
     this.getVisibleGradeGridColumns = Gradebook.prototype.getVisibleGradeGridColumns;

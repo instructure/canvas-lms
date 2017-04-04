@@ -493,8 +493,8 @@ define [
         sortType: 'custom'
         customOrder: []
       columns = @grid.getColumns()
-      assignment_columns = _.filter(columns, (c) -> c.type is 'assignment')
-      newSortOrder.customOrder = _.map(assignment_columns, (a) -> a.object.id)
+      scrollable_columns = columns.slice(@getFrozenColumnCount())
+      newSortOrder.customOrder = _.pluck(scrollable_columns, 'id')
       @setStoredSortOrder(newSortOrder)
 
     setArrangementTogglersVisibility: (newSortOrder) =>
@@ -514,12 +514,11 @@ define [
       @updateColumnHeaders()
 
     makeColumnSortFn: (sortOrder) =>
-      fn = switch sortOrder.sortType
-        when 'assignment_group', 'alpha' then @compareAssignmentPositions
-        when 'due_date' then @compareAssignmentDueDates
+      switch sortOrder.sortType
+        when 'assignment_group', 'alpha' then @wrapColumnSortFn(@compareAssignmentPositions)
+        when 'due_date' then @wrapColumnSortFn(@compareAssignmentDueDates)
         when 'custom' then @makeCompareAssignmentCustomOrderFn(sortOrder)
         else throw "unhandled column sort condition"
-      @wrapColumnSortFn(fn)
 
     compareAssignmentPositions: (a, b) ->
       diffOfAssignmentGroupPosition = a.object.assignment_group.position - b.object.assignment_group.position
@@ -541,17 +540,23 @@ define [
         sortMap[String(assignmentId)] = indexCounter
         indexCounter += 1
       return (a, b) =>
-        aIndex = sortMap[String(a.object.id)]
-        bIndex = sortMap[String(b.object.id)]
+        # The second lookup for each index is to maintain backwards
+        # compatibility with old gradebook sorting on load which only
+        # considered assignment ids.
+        aIndex = sortMap[a.id]
+        aIndex ?= sortMap[String(a.object.id)] if a.object?
+        bIndex = sortMap[b.id]
+        bIndex ?= sortMap[String(b.object.id)] if b.object?
         if aIndex? and bIndex?
           return aIndex - bIndex
-        # if there's a new assignment and its order has not been stored, it should come at the end
+        # if there's a new assignment or assignment group and its
+        # order has not been stored, it should come at the end
         else if aIndex? and not bIndex?
           return -1
         else if bIndex?
           return 1
         else
-          return @compareAssignmentPositions(a, b)
+          return @wrapColumnSortFn(@compareAssignmentPositions)(a, b)
 
     wrapColumnSortFn: (wrappedFn) ->
       (a, b) ->
