@@ -1,6 +1,6 @@
 import React from 'react'
 import I18n from 'i18n!student_context_tray'
-import { MetricsList as InstUIMetricsList, MetricsListItem } from 'instructure-ui'
+import InstUIMetricsList, { MetricsListItem } from 'instructure-ui/lib/components/MetricsList'
   class MetricsList extends React.Component {
     static propTypes = {
       analytics: React.PropTypes.object,

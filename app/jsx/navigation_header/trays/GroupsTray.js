@@ -1,7 +1,7 @@
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import SVGWrapper from 'jsx/shared/SVGWrapper'
-import Spinner from 'instructure-ui/Spinner'
+import Spinner from 'instructure-ui/lib/components/Spinner'
 
   var GroupsTray = React.createClass({
     propTypes: {

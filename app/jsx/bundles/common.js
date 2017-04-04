@@ -6,7 +6,6 @@ import Backbone from 'Backbone'
 import helpDialog from 'compiled/helpDialog'
 import updateSubnavMenuToggle from 'jsx/subnav_menu/updateSubnavMenuToggle'
 import initializeNewUserTutorials from 'jsx/new_user_tutorial/initializeNewUserTutorials'
-import ApplyTheme from 'instructure-ui/ApplyTheme'
 
 // modules that do their own thing on every page that simply need to be required
 import 'translations/_core_en'
@@ -29,7 +28,7 @@ import 'compiled/behaviors/instructure_inline_media_comment'
 import 'compiled/behaviors/ping'
 import 'LtiThumbnailLauncher'
 import 'compiled/badge_counts'
-import 'instructure-ui-themes/canvas'
+import 'instructure-ui/lib/themes/canvas'
 
 // Other stuff several bundles use.
 // If any of these really arn't used on most pages,

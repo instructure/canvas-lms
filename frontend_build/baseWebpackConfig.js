@@ -90,10 +90,10 @@ module.exports = {
       'node_modules-version-of-backbone': require.resolve('backbone'),
       'node_modules-version-of-react-modal': require.resolve('react-modal'),
 
-      // once we are all-webpack we should remove this line and just change all the 'require's
-      // to instructure-ui compnentns to have the right path
-      'instructure-ui': path.resolve(__dirname, '../node_modules/instructure-ui/lib/components'),
-      'instructure-ui-themes': path.resolve(__dirname, '../node_modules/instructure-ui/lib/themes'),
+      // don't let people import these top-level modules, because then you
+      // get :allthethings: ... you need to import particular components
+      'instructure-icons$': 'invalid',
+      'instructure-ui$': 'invalid',
 
       backbone: 'Backbone',
       timezone$: 'timezone_core',

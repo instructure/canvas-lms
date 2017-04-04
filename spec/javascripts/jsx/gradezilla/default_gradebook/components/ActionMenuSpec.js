@@ -1,7 +1,7 @@
 define([
   'react',
   'enzyme',
-  'instructure-ui/PopoverMenu',
+  'instructure-ui/lib/components/PopoverMenu',
   'jsx/gradezilla/shared/GradebookExportManager',
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
 ], (React, { mount }, { default: PopoverMenu }, GradebookExportManager, ActionMenu) => {

@@ -1,6 +1,7 @@
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import { Typography, Heading } from 'instructure-ui'
+import Typography from 'instructure-ui/lib/components/Typography'
+import Heading from 'instructure-ui/lib/components/Heading'
 
   const GradesTray = () => (
     <div>

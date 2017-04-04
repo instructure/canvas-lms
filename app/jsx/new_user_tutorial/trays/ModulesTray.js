@@ -1,6 +1,7 @@
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import { Heading, Typography } from 'instructure-ui'
+import Heading from 'instructure-ui/lib/components/Heading'
+import Typography from 'instructure-ui/lib/components/Typography'
 import SVGWrapper from 'jsx/shared/SVGWrapper'
 
   const ModulesTray = () => (

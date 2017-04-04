@@ -4,10 +4,10 @@ define([
   'react-addons-test-utils',
   'axios',
   'jsx/shared/MessageStudents',
-  'instructure-ui/Button',
-  'instructure-ui/Portal',
-  'instructure-ui/Alert',
-  'instructure-ui/Modal'
+  'instructure-ui/lib/components/Button',
+  'instructure-ui/lib/components/Portal',
+  'instructure-ui/lib/components/Alert',
+  'instructure-ui/lib/components/Modal'
 ], (React, ReactDOM, TestUtils, axios, MessageStudents,
     { default: Button },
     { default: Portal },

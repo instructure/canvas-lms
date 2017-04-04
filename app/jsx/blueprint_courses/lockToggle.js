@@ -1,7 +1,10 @@
 import I18n from 'i18n!blueprint_courses'
 import React, { PropTypes, Component } from 'react'
-import { Button, Typography, ScreenReaderContent, PresentationContent } from 'instructure-ui'
-import { IconLockSolid, IconUnlockSolid } from 'instructure-icons'
+import Button from 'instructure-ui/lib/components/Button'
+import Typography from 'instructure-ui/lib/components/Typography'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import IconLockSolid from 'instructure-icons/react/Solid/IconLockSolid'
+import IconUnlockSolid from 'instructure-icons/react/Solid/IconUnlockSolid'
 
 export default class LockToggle extends Component {
   static propTypes = {

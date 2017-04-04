@@ -1,9 +1,9 @@
 import I18n from 'i18n!blueprint_config'
 import React from 'react'
-import TextInput from 'instructure-ui/TextInput'
-import Select from 'instructure-ui/Select'
-import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
-import Grid, {GridCol, GridRow} from 'instructure-ui/Grid'
+import TextInput from 'instructure-ui/lib/components/TextInput'
+import Select from 'instructure-ui/lib/components/Select'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import Grid, {GridCol, GridRow} from 'instructure-ui/lib/components/Grid'
 import propTypes from '../propTypes'
 
 const { func } = React.PropTypes

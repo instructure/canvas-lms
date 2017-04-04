@@ -7,7 +7,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
 import AnnouncementList from 'jsx/announcements/AnnouncementList'
-import Spinner from 'instructure-ui/Spinner'
+import Spinner from 'instructure-ui/lib/components/Spinner'
 import LockManager from 'jsx/blueprint_courses/lockManager'
 import 'compiled/jquery/ModuleSequenceFooter'
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Button from 'instructure-ui/Button'
+import Button from 'instructure-ui/lib/components/Button'
 import IconMoveLeftLine from 'instructure-icons/react/Line/IconMoveLeftLine'
 import IconMoveRightLine from 'instructure-icons/react/Line/IconMoveRightLine'
 import plainStoreShape from 'jsx/shared/proptypes/plainStoreShape'

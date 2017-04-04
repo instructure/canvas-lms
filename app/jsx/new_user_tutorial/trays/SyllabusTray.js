@@ -1,8 +1,9 @@
 define([
   'react',
   'i18n!new_user_tutorial',
-  'instructure-ui',
-], (React, I18n, { Typography, Heading }) => {
+  'instructure-ui/lib/components/Typography',
+  'instructure-ui/lib/components/Heading',
+], (React, I18n, Typography, Heading) => {
   const SyllabusTray = () => (
     <div>
       <Heading as="h2" level="h1" >{I18n.t('Syllabus')}</Heading>

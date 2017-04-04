@@ -1,5 +1,5 @@
 import React from 'react'
-import Spinner from 'instructure-ui/Spinner'
+import Spinner from 'instructure-ui/lib/components/Spinner'
 import I18n from 'i18n!cyoe_assignment_sidebar'
 import scoreHelpers from 'jsx/shared/conditional_release/score'
 import BarGraph from './breakdown-graph-bar'

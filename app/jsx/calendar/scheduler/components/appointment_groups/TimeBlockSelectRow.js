@@ -1,8 +1,8 @@
 import $ from 'jquery'
 import React from 'react'
 import I18n from 'i18n!appointment_groups'
-import Button from 'instructure-ui/Button'
-import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import Button from 'instructure-ui/lib/components/Button'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import coupleTimeFields from 'compiled/util/coupleTimeFields'
 import 'jquery.instructure_date_and_time'
 

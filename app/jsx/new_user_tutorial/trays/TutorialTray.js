@@ -1,6 +1,7 @@
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import { Tray, Button } from 'instructure-ui'
+import Tray from 'instructure-ui/lib/components/Tray'
+import Button from 'instructure-ui/lib/components/Button'
 import NewUserTutorialToggleButton from '../NewUserTutorialToggleButton'
 import ConfirmEndTutorialDialog from '../ConfirmEndTutorialDialog'
 import plainStoreShape from 'jsx/shared/proptypes/plainStoreShape'

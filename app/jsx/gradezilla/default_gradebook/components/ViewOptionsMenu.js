@@ -1,10 +1,10 @@
 import React from 'react'
 import _ from 'underscore'
 import IconMiniArrowDownSolid from 'instructure-icons/react/Solid/IconMiniArrowDownSolid'
-import Button from 'instructure-ui/Button'
-import { MenuItem, MenuItemSeparator } from 'instructure-ui/Menu'
-import PopoverMenu from 'instructure-ui/PopoverMenu'
-import Typography from 'instructure-ui/Typography'
+import Button from 'instructure-ui/lib/components/Button'
+import { MenuItem } from 'instructure-ui/lib/components/Menu'
+import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
+import Typography from 'instructure-ui/lib/components/Typography'
 import I18n from 'i18n!gradebook'
 
   function renderTriggerButton () {

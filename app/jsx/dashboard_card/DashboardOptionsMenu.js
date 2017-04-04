@@ -1,10 +1,10 @@
 import React from 'react'
 import I18n from 'i18n!dashboard'
 import axios from 'axios'
-import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
-import PopoverMenu from 'instructure-ui/PopoverMenu'
-import { MenuItem, MenuItemGroup } from 'instructure-ui/Menu'
-import Button from 'instructure-ui/Button'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
+import { MenuItem, MenuItemGroup } from 'instructure-ui/lib/components/Menu'
+import Button from 'instructure-ui/lib/components/Button'
 import IconSettings2Solid from 'instructure-icons/react/Solid/IconSettings2Solid'
 
 export default class DashboardOptionsMenu extends React.Component {

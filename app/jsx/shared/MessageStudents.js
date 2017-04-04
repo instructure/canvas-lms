@@ -1,14 +1,13 @@
 import React from 'react'
 import I18n from 'i18n!message_students'
 import axios from 'axios'
-import Button from 'instructure-ui/Button'
-import Select from 'instructure-ui/Select'
-import TextInput from 'instructure-ui/TextInput'
-import TextArea from 'instructure-ui/TextArea'
-import Modal, { ModalHeader, ModalBody, ModalFooter } from 'instructure-ui/Modal'
-import Heading from 'instructure-ui/Heading'
-import FormField from 'instructure-ui/FormField'
-import Alert from 'instructure-ui/Alert'
+import Button from 'instructure-ui/lib/components/Button'
+import TextInput from 'instructure-ui/lib/components/TextInput'
+import TextArea from 'instructure-ui/lib/components/TextArea'
+import Modal, { ModalHeader, ModalBody, ModalFooter } from 'instructure-ui/lib/components/Modal'
+import Heading from 'instructure-ui/lib/components/Heading'
+import FormField from 'instructure-ui/lib/components/FormField'
+import Alert from 'instructure-ui/lib/components/Alert'
 
   class MessageStudents extends React.Component {
     static propTypes = {

@@ -1,9 +1,9 @@
 import React from 'react'
 import I18n from 'i18n!dashcards'
-import PopoverMenu from 'instructure-ui/PopoverMenu'
-import { MenuItem, MenuItemSeparator } from 'instructure-ui/Menu'
-import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
-import Button from 'instructure-ui/Button'
+import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
+import { MenuItem, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import Button from 'instructure-ui/lib/components/Button'
 
   class DashboardCardMovementMenu extends React.Component {
 

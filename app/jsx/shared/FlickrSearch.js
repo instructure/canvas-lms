@@ -4,7 +4,7 @@ import FlickrActions from './actions/FlickrActions'
 import FlickrStore from './stores/FlickrStore'
 import FlickrImage from './FlickrImage'
 import SVGWrapper from './SVGWrapper'
-import Spinner from 'instructure-ui/Spinner'
+import Spinner from 'instructure-ui/lib/components/Spinner'
 
   class FlickrSearch extends React.Component {
 

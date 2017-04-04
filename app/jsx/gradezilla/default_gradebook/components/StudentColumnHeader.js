@@ -18,10 +18,9 @@
 
 import React from 'react'
 import IconMoreSolid from 'instructure-icons/react/Solid/IconMoreSolid'
-import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/Menu'
-import PopoverMenu from 'instructure-ui/PopoverMenu'
-import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
-import Typography from 'instructure-ui/Typography'
+import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
+import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
+import Typography from 'instructure-ui/lib/components/Typography'
 import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
 import I18n from 'i18n!gradebook'
 

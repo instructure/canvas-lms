@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import Typography from 'instructure-ui/Typography'
+import Typography from 'instructure-ui/lib/components/Typography'
 
 const { string } = React.PropTypes;
 

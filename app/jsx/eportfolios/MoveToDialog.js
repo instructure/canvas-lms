@@ -1,11 +1,10 @@
 import React from 'react'
 import $ from 'jquery'
 import I18n from 'i18n!eportfolio'
-import Modal, {ModalHeader, ModalBody, ModalFooter } from 'instructure-ui/Modal'
-import Button from 'instructure-ui/Button'
-import Heading from 'instructure-ui/Heading'
-import Typography from 'instructure-ui/Typography'
-import Select from 'instructure-ui/Select'
+import Modal, {ModalHeader, ModalBody, ModalFooter } from 'instructure-ui/lib/components/Modal'
+import Button from 'instructure-ui/lib/components/Button'
+import Heading from 'instructure-ui/lib/components/Heading'
+import Select from 'instructure-ui/lib/components/Select'
 
   var MoveToDialog = React.createClass({
     propTypes: {

@@ -19,9 +19,9 @@
 import { head, tail } from 'underscore'
 import React from 'react'
 import IconMiniArrowDownSolid from 'instructure-icons/react/Solid/IconMiniArrowDownSolid'
-import Select from 'instructure-ui/Select'
-import Typography from 'instructure-ui/Typography'
-import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import Select from 'instructure-ui/lib/components/Select'
+import Typography from 'instructure-ui/lib/components/Typography'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import I18n from 'i18n!gradebook'
 
   const INDIVIDUAL_GRADEBOOK = 'IndividualGradebook';

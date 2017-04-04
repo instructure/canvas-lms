@@ -1,6 +1,6 @@
 import React from 'react'
-import TabList, { TabPanel, Tab } from 'instructure-ui/TabList'
-import ApplyTheme from 'instructure-ui/ApplyTheme'
+import TabList, { TabPanel, Tab } from 'instructure-ui/lib/components/TabList'
+import ApplyTheme from 'instructure-ui/lib/components/ApplyTheme'
 import I18n from 'i18n!cyoe_assignment_sidebar'
 import scoreHelpers from 'jsx/shared/conditional_release/score'
 import StudentRange from './student-range'

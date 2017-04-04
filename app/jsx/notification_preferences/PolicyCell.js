@@ -1,9 +1,9 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import RadioInput from 'instructure-ui/RadioInput'
-import RadioInputGroup from 'instructure-ui/RadioInputGroup'
-import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import RadioInput from 'instructure-ui/lib/components/RadioInput'
+import RadioInputGroup from 'instructure-ui/lib/components/RadioInputGroup'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 
 const PropTypes = React.PropTypes
 

@@ -3,8 +3,8 @@ define([
   'react-dom',
   'react-addons-test-utils',
   'jsx/context_cards/Avatar',
-  'instructure-ui'
-], (React, ReactDOM, TestUtils, Avatar, { Avatar: InstUIAvatar }) => {
+  'instructure-ui/lib/components/Avatar'
+], (React, ReactDOM, TestUtils, Avatar, { default: InstUIAvatar }) => {
   QUnit.module('StudentContextTray/Avatar', (hooks) => {
     let subject
 

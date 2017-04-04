@@ -1,6 +1,7 @@
 import I18n from 'i18n!blueprint_courses'
 import React, { PropTypes, Component } from 'react'
-import { Alert, Typography } from 'instructure-ui'
+import Alert from 'instructure-ui/lib/components/Alert'
+import Typography from 'instructure-ui/lib/components/Typography'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 

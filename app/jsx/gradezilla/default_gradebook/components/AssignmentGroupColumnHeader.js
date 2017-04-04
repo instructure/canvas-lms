@@ -18,9 +18,9 @@
 
 import React from 'react'
 import IconMoreSolid from 'instructure-icons/react/Solid/IconMoreSolid'
-import { MenuItem, MenuItemGroup } from 'instructure-ui/Menu'
-import PopoverMenu from 'instructure-ui/PopoverMenu'
-import Typography from 'instructure-ui/Typography'
+import { MenuItem, MenuItemGroup } from 'instructure-ui/lib/components/Menu'
+import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
+import Typography from 'instructure-ui/lib/components/Typography'
 import I18n from 'i18n!gradebook'
 
 const { bool, func, number, shape, string } = React.PropTypes;

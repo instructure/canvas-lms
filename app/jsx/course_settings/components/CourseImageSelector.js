@@ -3,7 +3,7 @@ import Modal from 'react-modal'
 import I18n from 'i18n!course_images'
 import Actions from '../actions'
 import CourseImagePicker from './CourseImagePicker'
-import Spinner from 'instructure-ui/Spinner'
+import Spinner from 'instructure-ui/lib/components/Spinner'
 
   const modalOverrides = {
     content : {

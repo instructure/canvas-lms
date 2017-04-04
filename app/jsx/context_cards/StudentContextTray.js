@@ -9,7 +9,13 @@ import Rating from './Rating'
 import SectionInfo from './SectionInfo'
 import SubmissionProgressBars from './SubmissionProgressBars'
 import MessageStudents from 'jsx/shared/MessageStudents'
-import {Heading, Button, Link, Typography, ScreenReaderContent, Spinner, Tray} from 'instructure-ui'
+import Heading from 'instructure-ui/lib/components/Heading'
+import Button from 'instructure-ui/lib/components/Button'
+import Link from 'instructure-ui/lib/components/Link'
+import Typography from 'instructure-ui/lib/components/Typography'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import Spinner from 'instructure-ui/lib/components/Spinner'
+import Tray from 'instructure-ui/lib/components/Tray'
 
 export default class StudentContextTray extends React.Component {
 

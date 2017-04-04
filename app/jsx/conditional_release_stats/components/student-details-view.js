@@ -1,6 +1,6 @@
 import React from 'react'
 import classNames from 'classnames'
-import Spinner from 'instructure-ui/Spinner'
+import Spinner from 'instructure-ui/lib/components/Spinner'
 import I18n from 'i18n!cyoe_assignment_sidebar'
 import StudentAssignmentItem from './student-assignment-item'
 import { assignmentShape, studentShape } from '../shapes/index'
