@@ -195,7 +195,7 @@ class GradeCalculator
   end
 
   def submissions_by_user
-    @submissions_by_user ||= @submissions.group_by(&:user_id)
+    @submissions_by_user ||= @submissions.group_by {|s| Shard.relative_id_for(s.user_id, Shard.current, @course.shard) }
   end
 
   def calculate_grading_period_scores
@@ -218,10 +218,13 @@ class GradeCalculator
     end
 
     # delete any grading period scores that are no longer relevant
-    Score.active.joins(:enrollment).
-      where(enrollments: {user_id: @user_ids, course_id: @course.id}).
-      where.not(grading_period_id: grading_periods_for_course.map(&:id)).
-      update_all(workflow_state: :deleted)
+    grading_period_ids = grading_periods_for_course.empty? ? nil : grading_periods_for_course.map(&:id)
+    @course.shard.activate do
+      Score.active.joins(:enrollment).
+        where(enrollments: {user_id: @user_ids, course_id: @course.id}).
+        where.not(grading_period_id: grading_period_ids).
+        update_all(workflow_state: :deleted)
+    end
   end
 
   def calculate_course_score
@@ -236,13 +239,14 @@ class GradeCalculator
   end
 
   def enrollments
-    @enrollments ||= Enrollment.shard(@course).active.
+    @enrollments ||= Enrollment.shard(@course.shard).active.
       where(user_id: @user_ids, course_id: @course.id).
       select(:id, :user_id).preload(:scores)
   end
 
   def joined_enrollment_ids
-    @joined_enrollment_ids ||= enrollments.map(&:id).join(',')
+    # use local_id because we'll exec the query on the enrollment's shard
+    @joined_enrollment_ids ||= enrollments.map(&:local_id).join(',')
   end
 
   def enrollments_by_user
@@ -271,63 +275,65 @@ class GradeCalculator
     updated_at = Score.sanitize(Time.now.utc)
 
     Score.transaction do
-      # Construct upsert statement to update existing Scores or create them if needed.
-      Score.connection.execute("
-        UPDATE #{Score.quoted_table_name}
-            SET
-              current_score = CASE enrollment_id
-                #{@current_updates.map do |user_id, score|
-                  enrollments_by_user[user_id].map do |enrollment|
-                    "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
-                  end.join(' ')
-                end.join(' ')}
-                ELSE current_score
-              END,
-              final_score = CASE enrollment_id
-                #{@final_updates.map do |user_id, score|
-                  enrollments_by_user[user_id].map do |enrollment|
-                    "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
-                  end.join(' ')
-                end.join(' ')}
-                ELSE final_score
-              END,
-              updated_at = #{updated_at},
-              -- if workflow_state was previously deleted for some reason, update it to active
-              workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), 'active')
-            WHERE
-              enrollment_id IN (#{joined_enrollment_ids}) AND
-              grading_period_id #{@grading_period ? "= #{@grading_period.id}" : 'IS NULL'};
-        INSERT INTO #{Score.quoted_table_name}
-            (enrollment_id, grading_period_id, current_score, final_score, created_at, updated_at)
-            SELECT
-              enrollments.id as enrollment_id,
-              #{@grading_period.try(:id) || 'NULL'} as grading_period_id,
-              CASE enrollments.id
-                #{@current_updates.map do |user_id, score|
-                  enrollments_by_user[user_id].map do |enrollment|
-                    "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
-                  end.join(' ')
-                end.join(' ')}
-                ELSE NULL
-              END :: float AS current_score,
-              CASE enrollments.id
-                #{@final_updates.map do |user_id, score|
-                  enrollments_by_user[user_id].map do |enrollment|
-                    "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
-                  end.join(' ')
-                end.join(' ')}
-                ELSE NULL
-              END :: float AS final_score,
-              #{updated_at} as created_at,
-              #{updated_at} as updated_at
-            FROM #{Enrollment.quoted_table_name} enrollments
-            LEFT OUTER JOIN #{Score.quoted_table_name} scores on
-              scores.enrollment_id = enrollments.id AND
-              scores.grading_period_id #{@grading_period ? "= #{@grading_period.id}" : 'IS NULL'}
-            WHERE
-              enrollments.id IN (#{joined_enrollment_ids}) AND
-              scores.id IS NULL;
-      ")
+      @course.shard.activate do
+        # Construct upsert statement to update existing Scores or create them if needed.
+        Score.connection.execute("
+          UPDATE #{Score.quoted_table_name}
+              SET
+                current_score = CASE enrollment_id
+                  #{@current_updates.map do |user_id, score|
+                    enrollments_by_user[user_id].map do |enrollment|
+                      "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
+                    end.join(' ')
+                  end.join(' ')}
+                  ELSE current_score
+                END,
+                final_score = CASE enrollment_id
+                  #{@final_updates.map do |user_id, score|
+                    enrollments_by_user[user_id].map do |enrollment|
+                      "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
+                    end.join(' ')
+                  end.join(' ')}
+                  ELSE final_score
+                END,
+                updated_at = #{updated_at},
+                -- if workflow_state was previously deleted for some reason, update it to active
+                workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), 'active')
+              WHERE
+                enrollment_id IN (#{joined_enrollment_ids}) AND
+                grading_period_id #{@grading_period ? "= #{@grading_period.id}" : 'IS NULL'};
+          INSERT INTO #{Score.quoted_table_name}
+              (enrollment_id, grading_period_id, current_score, final_score, created_at, updated_at)
+              SELECT
+                enrollments.id as enrollment_id,
+                #{@grading_period.try(:id) || 'NULL'} as grading_period_id,
+                CASE enrollments.id
+                  #{@current_updates.map do |user_id, score|
+                    enrollments_by_user[user_id].map do |enrollment|
+                      "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
+                    end.join(' ')
+                  end.join(' ')}
+                  ELSE NULL
+                END :: float AS current_score,
+                CASE enrollments.id
+                  #{@final_updates.map do |user_id, score|
+                    enrollments_by_user[user_id].map do |enrollment|
+                      "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
+                    end.join(' ')
+                  end.join(' ')}
+                  ELSE NULL
+                END :: float AS final_score,
+                #{updated_at} as created_at,
+                #{updated_at} as updated_at
+              FROM #{Enrollment.quoted_table_name} enrollments
+              LEFT OUTER JOIN #{Score.quoted_table_name} scores on
+                scores.enrollment_id = enrollments.id AND
+                scores.grading_period_id #{@grading_period ? "= #{@grading_period.id}" : 'IS NULL'}
+              WHERE
+                enrollments.id IN (#{joined_enrollment_ids}) AND
+                scores.id IS NULL;
+        ")
+      end
     end
   end
 
@@ -405,7 +411,7 @@ class GradeCalculator
 
   def load_assignment_visibilities_for_users(user_ids)
     @assignment_ids_visible_to_user ||= begin
-      AssignmentStudentVisibility.shard(@course)
+      AssignmentStudentVisibility.shard(@course.shard)
         .visible_assignment_ids_in_course_by_user(
           course_id: @course.id,
           user_id: user_ids.map { |u| Shard.global_id_for(u) }, # hack to always find cross-shard enrollments
