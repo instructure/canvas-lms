@@ -51,18 +51,16 @@ module SIS
       private
       def create_enrollment(row, messages)
         enrollment = SIS::Models::Enrollment.new(
-            {
-                course_id: row['course_id'],
-                section_id: row['section_id'],
-                user_id: row['user_id'],
-                user_integration_id: row['user_integration_id'],
-                role: row['role'],
-                status: row['status'],
-                associated_user_id: row['associated_user_id'],
-                root_account_id: row['root_account'],
-                role_id: row['role_id'],
-                limit_section_privileges: row['limit_section_privileges']
-            }
+          course_id: row['course_id'],
+          section_id: row['section_id'],
+          user_id: row['user_id'],
+          user_integration_id: row['user_integration_id'],
+          role: row['role'],
+          status: row['status'],
+          associated_user_id: row['associated_user_id'],
+          root_account_id: row['root_account'],
+          role_id: row['role_id'],
+          limit_section_privileges: row['limit_section_privileges']
         )
 
         begin
