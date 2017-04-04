@@ -41,7 +41,7 @@ define [
   'spin.js'
   'compiled/SubmissionDetailsDialog'
   'compiled/gradebook/AssignmentGroupWeightsDialog'
-  'compiled/gradebook/GradeDisplayWarningDialog'
+  'compiled/shared/GradeDisplayWarningDialog'
   'compiled/gradebook/PostGradesFrameDialog'
   'compiled/gradebook/SubmissionCell'
   'compiled/gradebook/GradebookHeaderMenu'

@@ -43,7 +43,7 @@ define [
   'compiled/AssignmentMuter'
   'compiled/SubmissionDetailsDialog'
   'compiled/gradezilla/AssignmentGroupWeightsDialog'
-  'compiled/gradezilla/GradeDisplayWarningDialog'
+  'compiled/shared/GradeDisplayWarningDialog'
   'compiled/gradezilla/PostGradesFrameDialog'
   'compiled/gradezilla/SubmissionCell'
   'compiled/util/NumberCompare'
