@@ -425,6 +425,8 @@ class CoursesController < ApplicationController
         @current_enrollments = []
         @future_enrollments  = []
         Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
+        ActiveRecord::Associations::Preloader.new.preload(all_enrollments, :course_section)
+
         all_enrollments.group_by{|e| [e.course_id, e.type]}.values.each do |enrollments|
           e = enrollments.sort_by{|e| e.state_with_date_sortable}.first
           if enrollments.count > 1
@@ -433,8 +435,7 @@ class CoursesController < ApplicationController
           end
 
           state = e.state_based_on_date
-          if [:completed, :rejected].include?(state) ||
-              (e.course.conclude_at && e.course.conclude_at < Time.now) # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
+          if [:completed, :rejected].include?(state) || e.section_or_course_date_in_past? # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
             @past_enrollments << e unless e.workflow_state == "invited"
           else
             start_at, end_at = e.enrollment_dates.first

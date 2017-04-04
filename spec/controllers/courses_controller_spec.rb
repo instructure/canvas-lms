@@ -185,6 +185,29 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to be_empty
       end
 
+      it "should do other terrible date logic based on sections" do
+        @student = user_factory
+
+        # section date in past
+        course1 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.from_now
+        course1.default_section.update_attributes(:end_at => 1.month.ago)
+        course1.offer!
+        enrollment1 = course_with_student course: course1, user: @student, active_all: true
+
+        # by section date, in future
+        course2 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago
+        course2.default_section.update_attributes(:end_at => 1.month.from_now)
+        course2.offer!
+        enrollment2 = course_with_student course: course2, user: @student, active_all: true
+
+        user_session(@student)
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:past_enrollments]).to eq [enrollment1]
+        expect(assigns[:current_enrollments]).to eq [enrollment2]
+        expect(assigns[:future_enrollments]).to be_empty
+      end
+
       it "should not include 'invited' enrollments whose term is past" do
         @student = user_factory
 

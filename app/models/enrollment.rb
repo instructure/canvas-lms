@@ -1311,6 +1311,14 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
+  def section_or_course_date_in_past?
+    if self.course_section && self.course_section.end_at
+      self.course_section.end_at < Time.now
+    elsif self.course.conclude_at
+      self.course.conclude_at < Time.now
+    end
+  end
+
   private
 
   def copy_scores_from_existing_enrollment
