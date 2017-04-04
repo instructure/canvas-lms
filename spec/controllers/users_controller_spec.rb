@@ -734,6 +734,19 @@ describe UsersController do
           start_date: 3.months.ago,
           end_date: 2.months.from_now)
       end
+      let(:assignment_due_in_grading_period) do
+        test_course.assignments.create!(
+          due_at: 10.days.from_now(grading_period.start_date),
+          points_possible: 10
+        )
+      end
+      let(:assignment_due_outside_of_grading_period) do
+        test_course.assignments.create!(
+          due_at: 10.days.ago(grading_period.start_date),
+          points_possible: 10
+        )
+      end
+      let(:teacher) { test_course.teachers.active.first }
 
       context "as an observer" do
         let(:observer) do
@@ -752,6 +765,29 @@ describe UsersController do
 
             grading_periods = assigns[:grading_periods][test_course.id][:periods]
             expect(grading_periods).to include grading_period
+          end
+
+          it "returns the grade for the current grading period for observed students" do
+            user_session(observer)
+            assignment_due_in_grading_period.grade_student(student1, grade: 5, grader: teacher)
+            assignment_due_outside_of_grading_period.grade_student(student1, grade: 10, grader: teacher)
+            get 'grades'
+
+            grade = assigns[:grades][:observed_enrollments][test_course.id][student1.id]
+            # 5/10 on assignment in grading period -> 50%
+            expect(grade).to eq(50.0)
+          end
+
+          it "returns the course grade for observed students if there is no current grading period" do
+            user_session(observer)
+            assignment_due_in_grading_period.grade_student(student1, grade: 5, grader: teacher)
+            assignment_due_outside_of_grading_period.grade_student(student1, grade: 10, grader: teacher)
+            grading_period.update!(end_date: 1.month.ago)
+            get 'grades'
+
+            grade = assigns[:grades][:observed_enrollments][test_course.id][student1.id]
+            # 5/10 on assignment in grading period + 10/10 on assignment outside of grading period -> 15/20 -> 75%
+            expect(grade).to eq(75.0)
           end
 
           context "selected_period_id" do

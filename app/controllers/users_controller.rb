@@ -2160,7 +2160,7 @@ class UsersController < ApplicationController
 
     grouped_observed_enrollments.each do |course_id, enrollments|
       grading_period_id = generate_grading_period_id(
-        grading_periods[course_id].try(:selected_period_id)
+        grading_periods.dig(course_id, :selected_period_id)
       )
       grades[:observed_enrollments][course_id] = {}
       grades[:observed_enrollments][course_id] = grades_from_enrollments(
@@ -2171,7 +2171,7 @@ class UsersController < ApplicationController
 
     presenter.student_enrollments.each do |course, enrollment|
       grading_period_id = generate_grading_period_id(
-        grading_periods[course.id].try(:[], :selected_period_id)
+        grading_periods.dig(course.id, :selected_period_id)
       )
       computed_score = enrollment.computed_current_score(grading_period_id: grading_period_id)
       grades[:student_enrollments][course.id] = computed_score
