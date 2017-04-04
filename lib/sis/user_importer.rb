@@ -63,14 +63,34 @@ module SIS
         @authentication_providers = {}
       end
 
-      def add_user(user_id, login_id, status, first_name, last_name, email=nil, password=nil, ssha_password=nil, integration_id=nil, short_name=nil, full_name=nil, sortable_name=nil, authentication_provider_id=nil)
-        @logger.debug("Processing User #{[user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name].inspect}")
+      # Pass a single instance of SIS::Models::User
+      def add_user(*user_data)
+        if user_data.length == 1
+          user = user_data.first
+        else
+          user = SIS::Models::User.new(
+            user_id: user_data[0],
+            login_id: user_data[1],
+            status: user_data[2],
+            first_name: user_data[3],
+            last_name: user_data[4],
+            email: user_data[5],
+            password: user_data[6],
+            ssha_password: user_data[7],
+            integration_id: user_data[8],
+            short_name: user_data[9],
+            full_name: user_data[10],
+            sortable_name: user_data[11]
+          )
+        end
 
-        raise ImportError, "No user_id given for a user" if user_id.blank?
-        raise ImportError, "No login_id given for user #{user_id}" if login_id.blank?
-        raise ImportError, "Improper status for user #{user_id}" unless status =~ /\A(active|deleted)/i
+        @logger.debug("Processing User #{user.to_a.inspect}")
 
-        @batched_users << [user_id.to_s, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name, authentication_provider_id]
+        raise ImportError, "No user_id given for a user" if user.user_id.blank?
+        raise ImportError, "No login_id given for user #{user.user_id}" if user.login_id.blank?
+        raise ImportError, "Improper status for user #{user.user_id}" unless user.status =~ /\A(active|deleted)/i
+
+        @batched_users << user
         process_batch if @batched_users.size >= @updates_every
       end
 
@@ -87,46 +107,45 @@ module SIS
           while !@batched_users.empty? && tx_end_time > Time.now
             user_row = @batched_users.shift
             @logger.debug("Processing User #{user_row.inspect}")
-            user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name, authentication_provider_id = user_row
 
-            pseudo = @root_account.pseudonyms.where(sis_user_id: user_id.to_s).take
-            pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(login_id).take
+            pseudo = @root_account.pseudonyms.where(sis_user_id: user_row.user_id.to_s).take
+            pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).take
             pseudo ||= pseudo_by_login
-            pseudo ||= @root_account.pseudonyms.active.by_unique_id(email).take if email.present?
+            pseudo ||= @root_account.pseudonyms.active.by_unique_id(user_row.email).take if user_row.email.present?
 
-            status_is_active = !(status =~ /\Adeleted/i)
+            status_is_active = !(user_row.status =~ /\Adeleted/i)
             if pseudo
-              if pseudo.sis_user_id && pseudo.sis_user_id != user_id
-                @messages << "user #{pseudo.sis_user_id} has already claimed #{user_id}'s requested login information, skipping"
+              if pseudo.sis_user_id && pseudo.sis_user_id != user_row.user_id
+                @messages << "user #{pseudo.sis_user_id} has already claimed #{user_row.user_id}'s requested login information, skipping"
                 next
               end
               if pseudo_by_login && (pseudo != pseudo_by_login && status_is_active ||
-                !(ActiveRecord::Base.connection.select_value("SELECT 1 FROM #{Pseudonym.quoted_table_name} WHERE #{Pseudonym.to_lower_column(Pseudonym.sanitize(pseudo.unique_id))}=#{Pseudonym.to_lower_column(Pseudonym.sanitize(login_id))} LIMIT 1")))
-                @messages << "user #{pseudo_by_login.sis_user_id || pseudo_by_login.user_id} has already claimed #{user_id}'s requested login information, skipping"
+                !(ActiveRecord::Base.connection.select_value("SELECT 1 FROM #{Pseudonym.quoted_table_name} WHERE #{Pseudonym.to_lower_column(Pseudonym.sanitize(pseudo.unique_id))}=#{Pseudonym.to_lower_column(Pseudonym.sanitize(user_row.login_id))} LIMIT 1")))
+                @messages << "user #{pseudo_by_login.sis_user_id || pseudo_by_login.user_id} has already claimed #{user_row.user_id}'s requested login information, skipping"
                 next
               end
 
               user = pseudo.user
               unless user.stuck_sis_fields.include?(:name)
-                user.name = "#{first_name} #{last_name}"
-                user.name = full_name if full_name.present?
+                user.name = "#{user_row.first_name} #{user_row.last_name}"
+                user.name = user_row.full_name if user_row.full_name.present?
               end
               unless user.stuck_sis_fields.include?(:sortable_name)
-                user.sortable_name = last_name.present? && first_name.present? ? "#{last_name}, #{first_name}" : "#{first_name}#{last_name}"
-                user.sortable_name = nil if full_name.present? # force User model to infer sortable name from the full name
-                user.sortable_name = sortable_name if sortable_name.present?
+                user.sortable_name = user_row.last_name.present? && user_row.first_name.present? ? "#{user_row.last_name}, #{user_row.first_name}" : "#{user_row.first_name}#{user_row.last_name}"
+                user.sortable_name = nil if user_row.full_name.present? # force User model to infer sortable name from the full name
+                user.sortable_name = user_row.sortable_name if user_row.sortable_name.present?
               end
               unless user.stuck_sis_fields.include?(:short_name)
-                user.short_name = short_name if short_name.present?
+                user.short_name = user_row.short_name if user_row.short_name.present?
               end
             else
               user = User.new
-              user.name = "#{first_name} #{last_name}"
-              user.name = full_name if full_name.present?
-              user.sortable_name = last_name.present? && first_name.present? ? "#{last_name}, #{first_name}" : "#{first_name}#{last_name}"
-              user.sortable_name = nil if full_name.present? # force User model to infer sortable name from the full name
-              user.sortable_name = sortable_name if sortable_name.present?
-              user.short_name = short_name if short_name.present?
+              user.name = "#{user_row.first_name} #{user_row.last_name}"
+              user.name = user_row.full_name if user_row.full_name.present?
+              user.sortable_name = user_row.last_name.present? && user_row.first_name.present? ? "#{user_row.last_name}, #{user_row.first_name}" : "#{user_row.first_name}#{user_row.last_name}"
+              user.sortable_name = nil if user_row.full_name.present? # force User model to infer sortable name from the full name
+              user.sortable_name = user_row.sortable_name if user_row.sortable_name.present?
+              user.short_name = user_row.short_name if user_row.short_name.present?
             end
 
             # we just leave all users registered now
@@ -156,25 +175,25 @@ module SIS
             end
 
             pseudo ||= Pseudonym.new
-            pseudo.unique_id = login_id unless pseudo.stuck_sis_fields.include?(:unique_id)
-            if authentication_provider_id.present?
-              unless @authentication_providers.key?(authentication_provider_id)
+            pseudo.unique_id = user_row.login_id unless pseudo.stuck_sis_fields.include?(:unique_id)
+            if user_row.authentication_provider_id.present?
+              unless @authentication_providers.key?(user_row.authentication_provider_id)
                 begin
-                  @authentication_providers[authentication_provider_id] =
-                    @root_account.authentication_providers.active.find(authentication_provider_id)
+                  @authentication_providers[user_row.authentication_provider_id] =
+                    @root_account.authentication_providers.active.find(user_row.authentication_provider_id)
                 rescue ActiveRecord::RecordNotFound
-                  @authentication_providers[authentication_provider_id] = nil
+                  @authentication_providers[user_row.authentication_provider_id] = nil
                 end
               end
-              unless (pseudo.authentication_provider = @authentication_providers[authentication_provider_id])
-                @messages << "unrecognized authentication provider #{authentication_provider_id} for #{user_id}, skipping"
+              unless (pseudo.authentication_provider = @authentication_providers[user_row.authentication_provider_id])
+                @messages << "unrecognized authentication provider #{user_row.authentication_provider_id} for #{user_row.user_id}, skipping"
                 next
               end
             else
               pseudo.authentication_provider = nil
             end
-            pseudo.sis_user_id = user_id
-            pseudo.integration_id = integration_id
+            pseudo.sis_user_id = user_row.user_id
+            pseudo.integration_id = user_row.integration_id
             pseudo.account = @root_account
             pseudo.workflow_state = status_is_active ? 'active' : 'deleted'
             if pseudo.new_record? && status_is_active
@@ -189,12 +208,12 @@ module SIS
 
             # if a password is provided, use it only if this is a new user, or the user hasn't changed the password in canvas *AND* the incoming password has changed
             # otherwise the persistence_token will change even though we're setting to the same password, logging the user out
-            if !password.blank? && (pseudo.new_record? || pseudo.password_auto_generated && !pseudo.valid_password?(password))
-              pseudo.password = password
-              pseudo.password_confirmation = password
+            if !user_row.password.blank? && (pseudo.new_record? || pseudo.password_auto_generated && !pseudo.valid_password?(user_row.password))
+              pseudo.password = user_row.password
+              pseudo.password_confirmation = user_row.password
               pseudo.password_auto_generated = true
             end
-            pseudo.sis_ssha = ssha_password if !ssha_password.blank?
+            pseudo.sis_ssha = user_row.ssha_password if !user_row.ssha_password.blank?
             pseudo.reset_persistence_token if pseudo.sis_ssha_changed? && pseudo.password_auto_generated
             user_touched = false
 
@@ -203,7 +222,7 @@ module SIS
                 if user.changed?
                   user_touched = true
                   if !user.save && user.errors.size > 0
-                    add_user_warning(user.errors.first.join(" "), user_id, login_id)
+                    add_user_warning(user.errors.first.join(" "), user_row.user_id, user_row.login_id)
                     raise ImportError, user.errors.first.join(" ")
                   end
                 elsif @batch
@@ -213,7 +232,7 @@ module SIS
                 if pseudo.changed?
                   pseudo.sis_batch_id = @batch.id if @batch
                   if !pseudo.save_without_broadcasting && pseudo.errors.size > 0
-                    add_user_warning(pseudo.errors.first.join(" "), user_id, login_id)
+                    add_user_warning(pseudo.errors.first.join(" "), user_row.user_id, user_row.login_id)
                     raise ImportError, pseudo.errors.first.join(" ")
                   end
                 end
@@ -226,7 +245,7 @@ module SIS
             @users_to_add_account_associations << user.id if should_add_account_associations
             @users_to_update_account_associations << user.id if should_update_account_associations
 
-            if email.present? && EmailAddressValidator.valid?(email)
+            if user_row.email.present? && EmailAddressValidator.valid?(user_row.email)
               # find all CCs for this user, and active conflicting CCs for all users
               # unless we're deleting this user, then only find CCs for this user
               if status_is_active
@@ -234,7 +253,7 @@ module SIS
               else
                 ccs = user.communication_channels
               end
-              ccs = ccs.email.by_path(email).to_a
+              ccs = ccs.email.by_path(user_row.email).to_a
 
               # sis_cc could be set from the previous user, if we're not on a transaction boundary,
               # and the previous user had an sis communication channel, and this user doesn't have one
@@ -254,7 +273,7 @@ module SIS
               cc = sis_cc || other_cc || CommunicationChannel.new
               cc.user_id = user.id
               cc.pseudonym_id = pseudo.id
-              cc.path = email
+              cc.path = user_row.email
               cc.workflow_state = status_is_active ? 'active' : 'retired'
               newly_active = cc.path_changed? || (cc.active? && cc.workflow_state_changed?)
               if cc.changed?
@@ -262,7 +281,7 @@ module SIS
                   cc.save_without_broadcasting
                 else
                   msg = "An email did not pass validation "
-                  msg += "(" + "#{email}, error: "
+                  msg += "(" + "#{user_row.email}, error: "
                   msg += cc.errors.full_messages.join(", ") + ")"
                   raise ImportError, msg
                 end
@@ -288,8 +307,8 @@ module SIS
                   cc.send_merge_notification!
                 end
               end
-            elsif email.present? && EmailAddressValidator.valid?(email) == false
-              @messages << "The email address associated with user '#{user_id}' is invalid (email: '#{email}')"
+            elsif user_row.email.present? && EmailAddressValidator.valid?(user_row.email) == false
+              @messages << "The email address associated with user '#{user_row.user_id}' is invalid (email: '#{user_row.email}')"
             end
 
             if pseudo.changed?
@@ -298,7 +317,7 @@ module SIS
                 pseudo.save_without_broadcasting
               else
                 msg = "A user did not pass validation "
-                msg += "(" + "user: #{user_id}, error: "
+                msg += "(" + "user: #{user_row.user_id}, error: "
                 msg += pseudo.errors.full_messages.join(", ") + ")"
                 raise ImportError, msg
               end
