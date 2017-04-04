@@ -19,10 +19,10 @@ describe "master courses - assignment locking" do
   it "should show unlocked button on index page for unlocked assignment" do
    get "/courses/#{@course.id}/assignments"
    expect(f('[data-view="lock-icon"] i.icon-unlock')).to be_displayed
- end
+  end
 
- it "should show locked button on index page for locked assignment" do
-   # restrict something
+  it "should show locked button on index page for locked assignment" do
+    # restrict something
     @tag.update_attribute(:restrictions, {:content => true})
 
     get "/courses/#{@course.id}/assignments"

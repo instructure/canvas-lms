@@ -28,17 +28,17 @@ describe "master courses - child courses - wiki page locking" do
 
     get "/courses/#{@copy_to.id}/pages"
 
-    expect(f('.master-course-cell')).to contain_css('.icon-lock')
+    expect(f('.master-content-lock-cell .icon-lock')).to be_displayed
 
     f('.al-trigger').click
-    expect(f('.al-options')).to_not contain_css('.edit-menu-item')
-    expect(f('.al-options')).to_not contain_css('.delete-menu-item')
+    expect(f('.al-options')).not_to contain_css('.edit-menu-item')
+    expect(f('.al-options')).not_to contain_css('.delete-menu-item')
   end
 
   it "should show the edit/delete cog-menu options on the index when not locked" do
     get "/courses/#{@copy_to.id}/pages"
 
-    expect(f('.master-course-cell')).to contain_css('.icon-unlock')
+    expect(f('.master-content-lock-cell .icon-unlock')).to be_displayed
 
     f('.al-trigger').click
     expect(f('.al-options')).to contain_css('.edit-menu-item')
@@ -50,9 +50,9 @@ describe "master courses - child courses - wiki page locking" do
 
     get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
 
-    expect(f('#content')).to_not contain_css('.edit-wiki')
+    expect(f('#content')).not_to contain_css('.edit-wiki')
     f('.al-trigger').click
-    expect(f('.al-options')).to_not contain_css('.delete_page')
+    expect(f('.al-options')).not_to contain_css('.delete_page')
   end
 
   it "should show the edit/delete cog-menu options on the show page when not locked" do

@@ -16,12 +16,15 @@ define [
 
     # These values allow the default text to be overridden if necessary
     @optionProperty 'lockedText'
-    @optionProperty 'unlockedText'
+    @optionProperty 'unlockedText',
+    @optionProperty 'course_id',
+    @optionProperty 'content_id'
+    @optionProperty 'content_type'
 
     tagName:   'button'
     className: 'btn'
 
-    events: {'click', 'hover'}
+    events: {'click', 'hover', 'focus', 'blur'}
 
     els:
       'i': '$icon'
@@ -30,7 +33,7 @@ define [
     initialize: ->
       super
       # button is enabled only for master courses
-      @disabled = !@model.get('is_master_course_master_content')
+      @disabled = !@isMasterCourseMasterContent()
       @disabledClass = if @disabled then 'disabled' else ''
 
       @lockedText = @lockedText || I18n.t 'Locked. Click to unlock.'
@@ -43,16 +46,36 @@ define [
     # events
 
     hover: ({type}) ->
+      return if @disabled
       if type is 'mouseenter'
         if @isLocked()
-          @renderUnlocked()
+          @renderWillUnlock()
         else
-          @renderLocked()
+          @renderWillLock()
       else if type is 'mouseleave'
         if @isLocked()
           @renderLocked()
         else
           @renderUnlocked()
+
+    focus: () ->
+      @focusblur()
+
+    blur: () ->
+      @focusblur()
+
+    # this causes the button to re-render as it is which seems dumb,
+    # but if you don't, the tooltip gets stuck forever with the hover text
+    # after mouseenter/leave. Even now,
+    # focus-blur-mouseenter-mouseleave-focus and the tooltip is left from hover
+    # follow with blur-focus and it's corrected
+    # I believe this is a but in jquery's tooltip.
+    focusblur: () ->
+      return if @disabled
+      if @isLocked()
+        @renderLocked()
+      else
+        @renderUnlocked()
 
     click: (event) ->
       event.preventDefault()
@@ -76,10 +99,10 @@ define [
 
     setLockState: (locked) ->
       $.ajaxJSON(
-        "/api/v1/courses/#{@model.get('course_id')}/blueprint_templates/default/restrict_item",
+        "/api/v1/courses/#{@course_id}/blueprint_templates/default/restrict_item",
         "PUT", {
-          content_type: @options.type,
-          content_id: @model.get('id'),
+          content_type: @content_type,
+          content_id: @content_id,
           restricted: locked
         },
         (response) =>
@@ -98,6 +121,15 @@ define [
     isLocked: ->
       @model.get('restricted_by_master_course')
 
+    isMasterCourseMasterContent: ->
+      !!@model.get('is_master_course_master_content')
+
+    isMasterCourseChildContent: ->
+      !!@model.get('is_master_course_child_content')
+
+    isMasterCourseContent: ->
+      @isMasterCourseMasterContent() || @isMasterCourseChildContent()
+
     reset: ->
       @$el.removeClass "#{@lockedClass} #{@unlockedClass} #{@disabledClass}"
       @$icon.removeClass 'icon-lock icon-unlock icon-unlocked'
@@ -110,6 +142,8 @@ define [
     # render
 
     render: ->
+      return unless @isMasterCourseContent()
+
       if(!@disabled)
         @$el.attr 'role', 'button'
         @$el.attr 'tabindex', '0'
@@ -122,17 +156,39 @@ define [
       else
         @renderUnlocked()
 
+    # when locked can...
+    renderLocked: () ->
+      @renderState
+        hint:        I18n.t 'Locked'
+        label:       @lockedText
+        buttonClass: "#{@lockedClass} #{@disabledClass}"
+        iconClass:   'icon-lock'
+
+    renderWillUnlock: () ->
+      @renderState
+        hint:        I18n.t 'UnLock'
+        label:       @lockedText
+        buttonClass: "#{@unlockedClass} #{@disabledClass}"
+        iconClass:   'icon-unlock'
+
+    renderUnlocking: () ->
+      @renderState
+        hint:        I18n.t 'Unlocking...'
+        buttonClass: "#{@lockedClass} #{@disabledClass}"
+        iconClass:   'icon-lock'
+
+    # when unlocked can..
     renderUnlocked: () ->
       @renderState
-        hint:        I18n.t 'Lock'
+        hint:        I18n.t 'Unlocked'
         label:       @unlockedText
         buttonClass: "#{@unlockedClass} #{@disabledClass}"
         iconClass:   'icon-unlock'
 
-    renderLocked: () ->
+    renderWillLock: () ->
       @renderState
-        hint:        I18n.t 'Unlock'
-        label:       @lockedText
+        hint:        I18n.t 'Lock'
+        label:       @unlockedText
         buttonClass: "#{@lockedClass} #{@disabledClass}"
         iconClass:   'icon-lock'
 
@@ -142,11 +198,7 @@ define [
         buttonClass: "#{@unlockedClass} #{@disabledClass}"
         iconClass:   'icon-unlock'
 
-    renderUnlocking: () ->
-      @renderState
-        hint:        I18n.t 'Unlocking...'
-        buttonClass: "#{@lockedClass} #{@disabledClass}"
-        iconClass:   'icon-lock'
+
 
     renderState: (options) ->
       @reset()

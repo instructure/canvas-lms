@@ -5,12 +5,13 @@ define [
   'Backbone'
   'jsx/shared/conditional_release/CyoeHelper'
   'compiled/views/PublishIconView'
+  'compiled/views/LockIconView'
   'compiled/views/assignments/DateDueColumnView'
   'compiled/views/assignments/DateAvailableColumnView'
   'compiled/views/SisButtonView'
   'jst/quizzes/QuizItemView'
   'jquery.disableWhileLoading'
-], (I18n, $, _, Backbone, CyoeHelper, PublishIconView, DateDueColumnView, DateAvailableColumnView, SisButtonView, template) ->
+], (I18n, $, _, Backbone, CyoeHelper, PublishIconView, LockIconView, DateDueColumnView, DateAvailableColumnView, SisButtonView, template) ->
 
   class ItemView extends Backbone.View
 
@@ -20,6 +21,7 @@ define [
     className: 'quiz'
 
     @child 'publishIconView',         '[data-view=publish-icon]'
+    @child 'lockIconView',            '[data-view=lock-icon]'
     @child 'dateDueColumnView',       '[data-view=date-due]'
     @child 'dateAvailableColumnView', '[data-view=date-available]'
     @child 'sisButtonView',           '[data-view=sis-button]'
@@ -42,10 +44,19 @@ define [
 
     initializeChildViews: ->
       @publishIconView = false
+      @lockIconView = false
       @sisButtonView = false
 
       if @canManage()
         @publishIconView = new PublishIconView(model: @model)
+        @lockIconView = new LockIconView({
+          model: @model,
+          unlockedText: I18n.t("%{name} is unlocked. Click to lock.", name: @model.get('title')),
+          lockedText: I18n.t("%{name} is locked. Click to unlock", name: @model.get('title')),
+          course_id: ENV.COURSE_ID,
+          content_id: @model.get('id'),
+          content_type: 'quiz'
+        })
         if @model.postToSIS() != null && @model.attributes.published
           @sisButtonView = new SisButtonView(model: @model, sisName: @model.postToSISName(), dueDateRequired: @model.dueDateRequiredForAccount())
 

@@ -74,7 +74,7 @@ define [
 
     initializeChildViews: ->
       @publishIconView = false
-      @LockIconView = false
+      @lockIconView = false
       @sisButtonView = false
       @editAssignmentView = false
       @dateAvailableColumnView = false
@@ -90,7 +90,9 @@ define [
           model: @model,
           unlockedText: I18n.t("%{name} is unlocked. Click to lock.", name: @model.get('name')),
           lockedText: I18n.t("%{name} is locked. Click to unlock", name: @model.get('name')),
-          type: 'assignment'
+          course_id: @model.get('course_id'),
+          content_id: @model.get('id'),
+          content_type: 'assignment'
         })
         @editAssignmentView = new CreateAssignmentView(model: @model)
         @moveAssignmentView = new MoveDialogView

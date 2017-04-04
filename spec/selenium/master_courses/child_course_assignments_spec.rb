@@ -46,7 +46,7 @@ describe "master courses - child courses - assignment locking" do
     expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-unlock')
 
     f('.al-trigger').click
-    expect(f('.assignment')).to_not contain_css('a.delete_assignment.disabled')
+    expect(f('.assignment')).not_to contain_css('a.delete_assignment.disabled')
     expect(f('.assignment')).to contain_css('a.delete_assignment')
   end
 

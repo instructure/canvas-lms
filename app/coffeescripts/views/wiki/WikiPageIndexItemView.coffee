@@ -1,12 +1,14 @@
 define [
   'Backbone'
   'underscore'
+  'i18n!pages'
   'compiled/views/wiki/WikiPageIndexEditDialog'
   'compiled/views/wiki/WikiPageDeleteDialog'
   'compiled/views/PublishIconView'
+  'compiled/views/LockIconView'
   'jst/wiki/WikiPageIndexItem'
   'compiled/jquery/redirectClickTo'
-], (Backbone, _, WikiPageIndexEditDialog, WikiPageDeleteDialog, PublishIconView, template) ->
+], (Backbone, _, I18n, WikiPageIndexEditDialog, WikiPageDeleteDialog, PublishIconView, LockIconView, template) ->
 
   class WikiPageIndexItemView extends Backbone.View
     template: template
@@ -17,6 +19,7 @@ define [
     els:
       '.wiki-page-link': '$wikiPageLink'
       '.publish-cell': '$publishCell'
+      '.master-content-lock-cell': '$lockCell'
     events:
       'click a.al-trigger': 'settingsMenu'
       'click .edit-menu-item': 'editPage'
@@ -48,17 +51,31 @@ define [
       json
 
     render: ->
-      # detach the publish icon to preserve data/events
+      # detach the icons to preserve data/events
       @publishIconView?.$el.detach()
+      @lockIconView?.$el.detach()
 
       super
 
-      # attach/re-attach the publish icon
+      # attach/re-attach the icons
       unless @publishIconView
         @publishIconView = new PublishIconView model: @model
         @model.view = @
       @publishIconView.$el.appendTo(@$publishCell)
       @publishIconView.render()
+
+      unless @lockIconView
+        @lockIconView = new LockIconView({
+          model: @model,
+          unlockedText: I18n.t("%{name} is unlocked. Click to lock.", name: @model.get('title')),
+          lockedText: I18n.t("%{name} is locked. Click to unlock.", name: @model.get('title')),
+          course_id: ENV.COURSE_ID
+          content_id: @model.get('page_id'),
+          content_type: 'wiki_page'
+        })
+        @model.view = @
+      @lockIconView.$el.appendTo(@$lockCell)
+      @lockIconView.render()
 
     afterRender: ->
       @$el.find('td:first').redirectClickTo(@$wikiPageLink)
