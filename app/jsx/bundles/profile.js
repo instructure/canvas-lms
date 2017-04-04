@@ -3,7 +3,6 @@ import 'compiled/util/BackoffPoller'
 import 'profile'
 import 'user_sortable_name'
 import 'communication_channels'
-import 'compiled/profile/confirmEmail'
 
 const hiddenFlags = [];
 if (!ENV.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT) {
