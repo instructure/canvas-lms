@@ -267,11 +267,11 @@ class Attachment < ActiveRecord::Base
     excluded_atts += ["locked", "hidden"] if dup == existing
     dup.assign_attributes(self.attributes.except(*excluded_atts))
 
-    dup.write_attribute(:filename, self.filename)
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
     if dup.new_record? || ![self.id, self.root_attachment_id].include?(dup.id)
       dup.root_attachment_id = self.root_attachment_id || self.id
     end
+    dup.write_attribute(:filename, self.filename) unless dup.root_attachment_id?
     dup.context = context
     dup.migration_id = options[:migration_id] || CC::CCHelper.create_key(self)
     dup.mark_as_importing!(options[:migration]) if options[:migration]
