@@ -109,7 +109,7 @@
 #             "type": "string"
 #           },
 #           "limit_privileges_to_course_section": {
-#             "description": "User can only access his or her own course section. Applies to Teacher and TA enrollments.",
+#             "description": "User can only access his or her own course section.",
 #             "example": true,
 #             "type": "boolean"
 #           },
