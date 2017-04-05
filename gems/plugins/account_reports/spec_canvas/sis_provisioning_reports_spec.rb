@@ -1111,6 +1111,40 @@ describe "Default Account Reports" do
       end
     end
 
+    describe "user_observers" do
+      before(:once) do
+        create_an_account
+        create_some_users_with_pseudonyms
+        uo1 = @user2.user_observees.create_or_restore(user_id: @user1)
+        uo2 = @user4.user_observees.create_or_restore(user_id: @user3)
+        @user7.user_observees.create_or_restore(user_id: @user6)
+        UserObserver.where(id: [uo1.id, uo2.id]).update_all(sis_batch_id: @sis)
+      end
+
+      it 'should run user_observer provisioning report' do
+        parameters = {}
+        parameters["user_observers"] = true
+        parsed = read_report("provisioning_csv", {params: parameters, order: 0})
+        expect(parsed[0]).to eq [@user1.id.to_s, "user_sis_id_01",
+                                 @user2.id.to_s, "user_sis_id_02", "active", 'true']
+        expect(parsed[1]).to eq [@user3.id.to_s, "user_sis_id_03",
+                                 @user4.id.to_s, "user_sis_id_04", "active", 'true']
+        expect(parsed[2]).to eq [@user6.id.to_s, nil,
+                                 @user7.id.to_s, nil, "active", 'false']
+        expect(parsed.length).to eq 3
+      end
+
+      it 'should run user_observer sis_export report' do
+        parameters = {}
+        parameters["user_observers"] = true
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        expect(parsed[0]).to eq ["user_sis_id_01", "user_sis_id_02", "active"]
+        expect(parsed[1]).to eq ["user_sis_id_03", "user_sis_id_04", "active"]
+        expect(parsed.length).to eq 2
+      end
+
+    end
+
     it "should run multiple SIS Export reports" do
       create_some_users_with_pseudonyms
       create_some_accounts

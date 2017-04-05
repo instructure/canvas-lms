@@ -147,6 +147,9 @@ module AccountReports
             :xlist => {
               :description => 'Get the Provisioning file for cross listed courses'
             },
+            :user_observers => {
+              :description => 'Get the Provisioning file for user_observers'
+            },
             :created_by_sis => {
               :description => 'Only include objects that were created by sis'
             },
@@ -201,6 +204,9 @@ module AccountReports
             },
             :xlist => {
               :description => 'Get the SIS file for cross listed courses'
+            },
+            :user_observers => {
+              :description => 'Get the SIS file for user_observers'
             },
             :created_by_sis => {
               :description => 'Only include objects that were created by sis'

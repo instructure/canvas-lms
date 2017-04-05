@@ -22,7 +22,9 @@ module AccountReports
   class SisExporter
     include ReportHelper
 
-    SIS_CSV_REPORTS = ["users", "accounts", "terms", "courses", "sections", "enrollments", "groups", "group_membership", "group_categories", "xlist"].freeze
+    SIS_CSV_REPORTS = ["users", "accounts", "terms", "courses", "sections",
+                       "enrollments", "groups", "group_membership",
+                       "group_categories", "xlist", "user_observers"].freeze
 
     def initialize(account_report, params = {})
       @account_report = account_report
@@ -685,6 +687,47 @@ module AccountReports
           row << x.workflow_state
           row << x.nonxlist_course_id unless @sis_format
           row << x.nxc_sis_id unless @sis_format
+          csv << row
+        end
+      end
+    end
+
+    def user_observers
+      if @sis_format
+        # headers are not translated on sis_export to maintain import compatibility
+        headers = ['observer_id', 'student_id', 'status']
+      else
+        headers = []
+        headers << I18n.t('canvas_observer_id')
+        headers << I18n.t('observer_id')
+        headers << I18n.t('canvas_student_id')
+        headers << I18n.t('student_id')
+        headers << I18n.t('status')
+        headers << I18n.t('created_by_sis')
+      end
+
+      observers = root_account.pseudonyms.
+        select("pseudonyms.*,
+                p2.sis_user_id AS observer_sis_id,
+                p2.user_id AS observer_id,
+                user_observers.workflow_state AS state,
+                user_observers.sis_batch_id AS o_batch_id").
+        joins("INNER JOIN #{UserObserver.quoted_table_name} ON pseudonyms.user_id=user_observers.user_id
+               INNER JOIN #{Pseudonym.quoted_table_name} AS p2 ON p2.user_id=user_observers.observer_id").
+        where("p2.account_id=pseudonyms.account_id")
+
+      observers = observers.where.not(user_observers: {sis_batch_id: nil}) if @created_by_sis || @sis_format
+      observers = observers.active unless @include_deleted
+
+      generate_and_run_report headers do |csv|
+        observers.find_each do |observer|
+          row = []
+          row << observer.user_id unless @sis_format
+          row << observer.sis_user_id
+          row << observer.observer_id unless @sis_format
+          row << observer.observer_sis_id
+          row << observer.state
+          row << observer.o_batch_id? unless @sis_format
           csv << row
         end
       end
