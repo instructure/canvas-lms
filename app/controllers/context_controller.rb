@@ -155,13 +155,13 @@ class ContextController < ApplicationController
   # views.
   def object_snippet
     if HostUrl.has_file_host? && !HostUrl.is_file_host?(request.host_with_port)
-      return render(:nothing => true, :status => 400)
+      return head 400
     end
 
     @snippet = params[:object_data] || ""
 
     unless Canvas::Security.verify_hmac_sha1(params[:s], @snippet)
-      return render :nothing => true, :status => 400
+      return head 400
     end
 
     # http://blogs.msdn.com/b/ieinternals/archive/2011/01/31/controlling-the-internet-explorer-xss-filter-with-the-x-xss-protection-http-header.aspx
@@ -222,6 +222,9 @@ class ContextController < ApplicationController
           :pendingInvitationsCount => @context.invited_count_visible_to(@current_user)
         }
       })
+
+      set_tutorial_js_env
+
       if manage_students || manage_admins
         js_env :ROOT_ACCOUNT_NAME => @domain_root_account.name
         if @context.root_account.open_registration? || @context.root_account.grants_right?(@current_user, session, :manage_user_logins)
@@ -235,11 +238,11 @@ class ContextController < ApplicationController
       if @context.grants_right?(@current_user, :read_as_admin)
         @users = @context.participating_users.uniq.order_by_sortable_name
       else
-        @users = @context.participating_users_in_context(sort: true).uniq.order_by_sortable_name
+        @users = @context.participating_users_in_context(sort: true).distinct.order_by_sortable_name
       end
       @primary_users = { t('roster.group_members', 'Group Members') => @users }
       if course = @context.context.try(:is_a?, Course) && @context.context
-        @secondary_users = { t('roster.teachers_and_tas', 'Teachers & TAs') => course.participating_instructors.order_by_sortable_name.uniq }
+        @secondary_users = { t('roster.teachers_and_tas', 'Teachers & TAs') => course.participating_instructors.order_by_sortable_name.distinct }
       end
     end
 
@@ -318,7 +321,7 @@ class ContextController < ApplicationController
       end
       user_id = Shard.relative_id_for(params[:id], Shard.current, @context.shard)
       if @context.is_a?(Course)
-        scope = @context.enrollments.where(user_id: user_id)
+        scope = @context.enrollments_visible_to(@current_user).where(user_id: user_id)
         scope = @context.grants_right?(@current_user, session, :read_as_admin) ? scope.active : scope.active_or_pending
         @membership = scope.first
 
@@ -338,7 +341,7 @@ class ContextController < ApplicationController
         return
       end
 
-      @enrollments = @context.enrollments.for_user(@user) rescue []
+      @enrollments = @context.enrollments_visible_to(@current_user).for_user(@user) rescue []
 
       if @domain_root_account.enable_profiles?
         @user_data = profile_data(

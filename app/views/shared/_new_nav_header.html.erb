@@ -118,23 +118,21 @@
           <% end %>
         </ul>
       </div>
-      <div role="region" aria-label="<%= t('Secondary Navigation') %>" class="ic-app-header__secondary-navigation">
+      <div class="ic-app-header__secondary-navigation">
         <ul class="ic-app-header__menu-list">
           <li class="menu-item ic-app-header__menu-list-item">
-            <span aria-live="polite">
-              <button
-                id="primaryNavToggle"
-                class="ic-app-header__menu-list-link ic-app-header__menu-list-link--nav-toggle"
-                aria-label="
-                  <% if @current_user.try(:collapse_global_nav?) %><%= t('Expand global navigation') %>
-                  <% else %><%= t('Minimize global navigation') %><% end %>"
-                title="
-                  <% if @current_user.try(:collapse_global_nav?) %><%= t('Expand global navigation') %>
-                  <% else %><%= t('Minimize global navigation') %><% end %>"
-              >
-                <%= svg_icon :navtoggle %>
-              </button>
-            </span>
+            <button
+              id="primaryNavToggle"
+              class="ic-app-header__menu-list-link ic-app-header__menu-list-link--nav-toggle"
+              aria-label="
+                <% if @current_user.try(:collapse_global_nav?) %><%= t('Expand global navigation') %>
+                <% else %><%= t('Minimize global navigation') %><% end %>"
+              title="
+                <% if @current_user.try(:collapse_global_nav?) %><%= t('Expand global navigation') %>
+                <% else %><%= t('Minimize global navigation') %><% end %>"
+            >
+              <%= svg_icon :navtoggle %>
+            </button>
           </li>
         </ul>
       </div>

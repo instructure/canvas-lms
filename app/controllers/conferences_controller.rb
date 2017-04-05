@@ -199,6 +199,7 @@ class ConferencesController < ApplicationController
       conference_type_details: conference_types_json(WebConference.conference_types),
       users: @users.map { |u| {:id => u.id, :name => u.last_name_first} },
     )
+    set_tutorial_js_env
     flash[:error] = t('Some conferences on this page are hidden because of errors while retrieving their status') if @errors
   end
   protected :web_index
@@ -231,7 +232,7 @@ class ConferencesController < ApplicationController
           end
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
-          format.json { render :json => WebConference.find(@conference).as_json(:permissions => {:user => @current_user, :session => session},
+          format.json { render :json => WebConference.find(@conference.id).as_json(:permissions => {:user => @current_user, :session => session},
                                                                                 :url => named_context_url(@context, :context_conference_url, @conference)) }
         else
           format.html { render :index }

@@ -3,9 +3,9 @@ module Gradezilla
     include SeleniumDependencies
 
     # Assignment Headings
-    ASSIGNMENT_HEADER_SELECTOR = '.slick-header-column'
-    ASSIGNMENT_HEADER_MENU_SELECTOR = '.gradebook-header-drop'
-    ASSIGNMENT_HEADER_MENU_ITEM_SELECTOR = 'ul.gradebook-header-menu li.ui-menu-item'
+    ASSIGNMENT_HEADER_SELECTOR = '.slick-header-column'.freeze
+    ASSIGNMENT_HEADER_MENU_SELECTOR = '.gradebook-header-drop'.freeze
+    ASSIGNMENT_HEADER_MENU_ITEM_SELECTOR = 'ul.gradebook-header-menu li.ui-menu-item'.freeze
 
     def ungradable_selector
       ".cannot_edit"
@@ -25,9 +25,19 @@ module Gradezilla
       f('a', parent_element)
     end
 
+    def student_names
+      ff('#gradebook_grid .student-name').map(&:text)
+    end
+
     def visit(course)
       Account.default.enable_feature!(:gradezilla)
       get "/courses/#{course.id}/gradebook/change_gradebook_version?version=gradezilla"
+    end
+
+    def open_assignment_options_and_select_by(assignment_id:, menu_item_id:)
+      column_header = f("#gradebook_grid .slick-header-column[id*='assignment_#{assignment_id}']")
+      column_header.find_element(:css, '.Gradebook__ColumnHeaderAction').click
+      f("[data-menu-item-id='#{menu_item_id}']").click
     end
 
     def open_assignment_options(cell_index)

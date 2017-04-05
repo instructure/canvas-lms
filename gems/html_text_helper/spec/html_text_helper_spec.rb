@@ -251,6 +251,13 @@ EOS
 
       expect(html).to match(%r{http://example.com/relative/link})
     end
+
+    it "should resolve doubleslashes" do
+      original_html = %q{ <a href="/relative/link">Relative link</a> }
+      html          = th.html_to_simple_html(original_html, base_url: 'http://example.com/')
+
+      expect(html).to match(%r{http://example.com/relative/link})
+    end
   end
 
   context "banner" do

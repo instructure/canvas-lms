@@ -228,6 +228,7 @@ define [
       $course_syllabus_details.showIf not text
       RichContentEditor.destroyRCE($course_syllabus_body)
       resetToggleLinks()
+      $edit_syllabus_link.focus()
 
     $edit_syllabus_link.on 'click', (ev) ->
       ev.preventDefault()

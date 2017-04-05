@@ -523,7 +523,7 @@ describe Account do
       account.role_overrides.create!(:permission => 'reset_any_mfa', :role => @sa_role, :enabled => true)
       # clear caches
       account.tap{|a| a.settings[:mfa_settings] = :optional; a.save!}
-      v[:account] = Account.find(account)
+      v[:account] = Account.find(account.id)
     end
     RoleOverride.clear_cached_contexts
     AdheresToPolicy::Cache.clear
@@ -1087,12 +1087,12 @@ describe Account do
         au = sa.account_users.create!(user: @user)
         # out-of-proc cache should clear, but we have to manually clear
         # the in-proc cache
-        sa = Account.find(sa)
+        sa = Account.find(sa.id)
         expect(sa.account_users_for(@user)).to eq [au]
 
         au.destroy
         #ditto
-        sa = Account.find(sa)
+        sa = Account.find(sa.id)
         expect(sa.account_users_for(@user)).to eq []
       end
     end
@@ -1110,12 +1110,12 @@ describe Account do
             au = sa.account_users.create!(user: @user)
             # out-of-proc cache should clear, but we have to manually clear
             # the in-proc cache
-            sa = Account.find(sa)
+            sa = Account.find(sa.id)
             expect(sa.account_users_for(@user)).to eq [au]
 
             au.destroy
             #ditto
-            sa = Account.find(sa)
+            sa = Account.find(sa.id)
             expect(sa.account_users_for(@user)).to eq []
           end
         end
@@ -1376,7 +1376,7 @@ describe Account do
         account = Account.find(account.id)
         expect(account.default_storage_quota).to eq 20.megabytes
 
-        subaccount = Account.find(subaccount)
+        subaccount = Account.find(subaccount.id)
         expect(subaccount.default_storage_quota).to eq 20.megabytes
       end
     end

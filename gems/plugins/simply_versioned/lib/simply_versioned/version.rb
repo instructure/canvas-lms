@@ -18,7 +18,7 @@ class Version < ActiveRecord::Base #:nodoc:
   validates_presence_of :versionable_id, :versionable_type
 
   before_create :initialize_number
-  
+
   # Return an instance of the versioned ActiveRecord model with the attribute
   # values of this version.
   def model
@@ -60,6 +60,15 @@ class Version < ActiveRecord::Base #:nodoc:
       return nil
     else
       super
+    end
+  end
+
+  def self.preload_version_number(versionables)
+    versionables = Array(versionables)
+    data = self.all.polymorphic_where(:versionable => versionables).group(:versionable_type, :versionable_id).maximum(:number)
+    versionables.each do |v|
+      count = data[[v.class.base_class.name, v.id]] || 0
+      v.instance_variable_set(:@preloaded_current_version_number, count)
     end
   end
 

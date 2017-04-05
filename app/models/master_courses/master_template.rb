@@ -22,7 +22,16 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   scope :for_full_course, -> { where(:full_course => true) }
 
+  before_create :set_defaults
+
   after_save :invalidate_course_cache
+  after_update :sync_default_restrictions
+
+  def set_defaults
+    unless self.default_restrictions.present?
+      self.default_restrictions = {:content => true}
+    end
+  end
 
   def invalidate_course_cache
     if self.workflow_state_changed?
@@ -30,9 +39,19 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     end
   end
 
+  def sync_default_restrictions
+    if self.default_restrictions_changed?
+      self.master_content_tags.where(:use_default_restrictions => true).update_all(:restrictions => self.default_restrictions)
+    end
+  end
+
   def require_valid_restrictions
-    if self.default_restrictions_changed? && (self.default_restrictions.keys - MasterCourses::LOCK_TYPES).any?
-      self.errors.add(:default_restrictions, "Invalid settings")
+    if self.default_restrictions_changed?
+      if (self.default_restrictions.keys - MasterCourses::LOCK_TYPES).any?
+        self.errors.add(:default_restrictions, "Invalid settings")
+      elsif !self.default_restrictions[:content]
+        self.errors.add(:default_restrictions, "Content must be restricted")
+      end
     end
   end
 
@@ -124,15 +143,8 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   def ensure_tag_on_export(obj)
     # even if there are no default restrictions we should still create the tags initially so know to touch the content if we lock it later
     load_tags! # does nothing if already loaded
-    content_tag_for(obj, {:restrictions => self.default_restrictions}) # set the restrictions on create if a new tag
+    content_tag_for(obj)
     # TODO: make a thing if we change the defaults at some point and want to force them on all the existing tags
-  end
-
-  def ensure_attachment_tags_on_export
-    # because attachments don't get "added" to the export
-    self.course.attachments.where("file_state <> 'deleted'").each do |att|
-      ensure_tag_on_export(att)
-    end
   end
 
   def preload_restrictions!
@@ -150,6 +162,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def deletions_since_last_export
+    return {} unless last_export_started_at
     deletions_by_type = {}
     MasterCourses::ALLOWED_CONTENT_TYPES.each do |klass|
       item_scope = case klass

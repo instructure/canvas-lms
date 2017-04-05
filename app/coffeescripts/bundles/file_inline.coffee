@@ -1,2 +1,0 @@
-require ['file_inline']
-

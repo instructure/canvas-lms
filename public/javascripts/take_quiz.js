@@ -103,7 +103,7 @@ define([
         var data = $("#submit_quiz_form").getFormData();
 
         $(".question_holder .question").each(function() {
-          value = ($(this).hasClass("marked")) ? "1" : "";
+          var value = ($(this).hasClass("marked")) ? "1" : "";
           data[$(this).attr('id') + "_marked"] = value;
         });
 
@@ -652,7 +652,7 @@ define([
         quizSubmission.finalSubmitButtonClicked = false; // reset in case user cancels
 
         if(quizSubmission.cantGoBack) {
-          unseen = $("#question_list .list_question:not(.seen)").length;
+          var unseen = $("#question_list .list_question:not(.seen)").length;
           if(unseen > 0) {
             warningMessage = I18n.t('confirms.unseen_questions',
               {'one': "There is still 1 question you haven't seen yet.  Submit anyway?",

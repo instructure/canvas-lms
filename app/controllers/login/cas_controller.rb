@@ -86,14 +86,14 @@ class Login::CasController < ApplicationController
   def destroy
     if !Canvas.redis_enabled?
       # NOT SUPPORTED without redis
-      return render text: "NOT SUPPORTED", status: :method_not_allowed
+      return render plain: "NOT SUPPORTED", status: :method_not_allowed
     elsif params['logoutRequest'] &&
         (match = params['logoutRequest'].match(CAS_SAML_LOGOUT_REQUEST))
       # we *could* validate the timestamp here, but the whole request is easily spoofed anyway, so there's no
       # point. all the security is in the ticket being secret and non-predictable
-      return render text: "OK", status: :ok if Pseudonym.expire_cas_ticket(match[:session_index])
+      return render plain: "OK", status: :ok if Pseudonym.expire_cas_ticket(match[:session_index])
     end
-    render text: "NO SESSION FOUND", status: :not_found
+    render plain: "NO SESSION FOUND", status: :not_found
   end
 
   protected

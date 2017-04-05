@@ -12,7 +12,7 @@ module SupportHelpers
       fixer = fixer_klass.new(@current_user.email, params[:after_time], *args)
       fixer.send_later_if_production(:monitor_and_fix)
 
-      render text: "Enqueued #{fixer.fixer_name}..."
+      render plain: "Enqueued #{fixer.fixer_name}..."
     end
   end
 end

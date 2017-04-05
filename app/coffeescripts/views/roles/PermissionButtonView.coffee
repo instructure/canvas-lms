@@ -283,7 +283,7 @@ define [
     #
     # @api private
     isDefault: ->
-      !@isExplicit() && !@isLocked()
+      !@isExplicit()
 
     # Method Summary
     #   Read only attribute is set means you cannot change this permission.

@@ -338,6 +338,7 @@ $ic-notification-border-thickness: 2px;
   padding: $ic-sp;
   box-sizing: border-box;
   background: $ic-color-light;
+  position: relative;
 }
 
 .ic-notification__message {
@@ -350,9 +351,9 @@ $ic-notification-border-thickness: 2px;
 }
 
 .ic-notification__admin-actions {
-  float: right;
-  margin-left: $ic-sp;
-  margin-bottom: $ic-sp/2;
+  position: absolute;
+  right: $ic-sp;
+  top: $ic-sp;
 }
 
 .notification_account_content {

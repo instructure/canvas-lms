@@ -27,6 +27,8 @@ module Lti
     RESOURCE_SELECTION = 'resource_selection'
     SIMILARITY_DETECTION = 'similarity_detection'
 
+    SIMILARITY_DETECTION_LTI2 = 'Canvas.placements.similarityDetection'
+
     DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
 
     PLACEMENTS = [:account_navigation,
@@ -59,7 +61,7 @@ module Lti
       'Canvas.placements.courseNavigation' => COURSE_NAVIGATION,
       'Canvas.placements.linkSelection' => LINK_SELECTION,
       'Canvas.placements.postGrades' => POST_GRADES,
-      'Canvas.placements.similarityDetection' => SIMILARITY_DETECTION,
+      SIMILARITY_DETECTION_LTI2 => SIMILARITY_DETECTION,
     }.freeze
 
     belongs_to :message_handler, class_name: 'Lti::MessageHandler'

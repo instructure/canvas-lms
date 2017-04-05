@@ -53,7 +53,8 @@ module Lti
       let(:auth_validator) do
         AuthorizationValidator.new(
           jwt: raw_jwt.sign(tool_proxy.shared_secret, :HS256).to_s,
-          authorization_url: auth_url
+          authorization_url: auth_url,
+          context: account
         )
       end
 
@@ -75,18 +76,18 @@ module Lti
         end
 
         it 'raises JSON::JWT:InvalidFormat if the JWT format is invalid' do
-          validator = AuthorizationValidator.new(jwt: 'f3afae3', authorization_url: auth_url)
+          validator = AuthorizationValidator.new(jwt: 'f3afae3', authorization_url: auth_url, context: account)
           expect { validator.jwt }.to raise_error(JSON::JWT::InvalidFormat)
         end
 
         it 'raises JSON::JWS::VerificationFailed if the signature is invalid' do
           bad_sig_jwt = raw_jwt.sign('invalid', :HS256).to_s
-          validator = AuthorizationValidator.new(jwt: bad_sig_jwt, authorization_url: auth_url)
+          validator = AuthorizationValidator.new(jwt: bad_sig_jwt, authorization_url: auth_url, context: account)
           expect { validator.jwt }.to raise_error(JSON::JWS::VerificationFailed)
         end
 
         it 'raises JSON::JWS::UnexpectedAlgorithm if the signature type is :none' do
-          validator = AuthorizationValidator.new(jwt: raw_jwt.to_s, authorization_url: auth_url)
+          validator = AuthorizationValidator.new(jwt: raw_jwt.to_s, authorization_url: auth_url, context: account)
           expect { validator.jwt }.to raise_error(JSON::JWS::UnexpectedAlgorithm)
         end
 
@@ -121,7 +122,8 @@ module Lti
             auth_validator.jwt
             duplicate_jwt = AuthorizationValidator.new(
               jwt: raw_jwt.sign(tool_proxy.shared_secret, :HS256).to_s,
-              authorization_url: auth_url
+              authorization_url: auth_url,
+              context: account
             )
             expect { duplicate_jwt.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt, "the 'jti' is invalid"
           end
@@ -138,7 +140,8 @@ module Lti
           raw_jwt[:sub] = 'invalid'
           validator = AuthorizationValidator.new(
             jwt: raw_jwt.sign(tool_proxy.shared_secret, :HS256).to_s,
-            authorization_url: auth_url
+            authorization_url: auth_url,
+            context: account
           )
           expect { validator.validate! }.to raise_error Lti::Oauth2::AuthorizationValidator::SecretNotFound
         end
@@ -148,14 +151,17 @@ module Lti
               AuthorizationValidator.new(
                 jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
                 authorization_url: auth_url,
-                code: 'reg_key'
+                code: 'reg_key',
+                context: account
               )
             end
 
             it 'throws an exception if no code is provided' do
               auth_validator = AuthorizationValidator.new(
                 jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
-                authorization_url: auth_url)
+                authorization_url: auth_url,
+                context: account
+              )
               expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::MissingAuthorizationCode
             end
 
@@ -170,7 +176,8 @@ module Lti
           AuthorizationValidator.new(
             jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
             authorization_url: auth_url,
-            code: '123'
+            code: '123',
+            context: account
           )
         end
 
@@ -181,7 +188,8 @@ module Lti
         it 'returns nil if developer key not found' do
           validator = AuthorizationValidator.new(
             jwt: raw_jwt.sign(tool_proxy.shared_secret, :HS256).to_s,
-            authorization_url: auth_url
+            authorization_url: auth_url,
+            context: account
           )
           expect(validator.developer_key).to be_nil
         end
@@ -191,7 +199,8 @@ module Lti
         it 'returns the tool proxy guid if tool proxy is present' do
           validator = AuthorizationValidator.new(
             jwt: raw_jwt.sign(tool_proxy.shared_secret, :HS256).to_s,
-            authorization_url: auth_url
+            authorization_url: auth_url,
+            context: account
           )
           expect(validator.sub).to eq tool_proxy.guid
         end
@@ -200,7 +209,8 @@ module Lti
           validator = AuthorizationValidator.new(
             jwt: raw_jwt_dev_key.sign(dev_key.api_key, :HS256).to_s,
             authorization_url: auth_url,
-            code: '123'
+            code: '123',
+            context: account
           )
           expect(validator.sub).to eq dev_key.global_id
         end

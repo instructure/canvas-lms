@@ -80,7 +80,7 @@ class UserMerge
           scope = scope.where("#{unique_id} NOT IN (?)", subscope)
           model.transaction do
             update_versions(from_user, target_user, scope, table, :user_id)
-            scope.update_all(:user_id => target_user)
+            scope.update_all(user_id: target_user.id)
           end
         rescue => e
           Rails.logger.error "migrating #{table} column user_id failed: #{e}"
@@ -101,7 +101,7 @@ class UserMerge
 
       account_users = AccountUser.where(user_id: from_user)
       user_merge_data.add_more_data(account_users)
-      account_users.update_all(user_id: target_user)
+      account_users.update_all(user_id: target_user.id)
 
       attachments = Attachment.where(user_id: from_user)
       user_merge_data.add_more_data(attachments)
@@ -268,10 +268,10 @@ class UserMerge
     from_user.user_observees.where(user_id: target_user).destroy_all
     user_merge_data.add_more_data(target_user.user_observees.where(user_id: from_user), user: target_user)
     target_user.user_observees.where(user_id: from_user).destroy_all
-    from_user.user_observees.active.update_all(observer_id: target_user)
-    xor_observer_ids = UserObserver.where(user_id: [from_user, target_user]).uniq.pluck(:observer_id)
+    from_user.user_observees.active.update_all(observer_id: target_user.id)
+    xor_observer_ids = UserObserver.where(user_id: [from_user, target_user]).distinct.pluck(:observer_id)
     from_user.user_observers.where(observer_id: target_user.user_observers.map(&:observer_id)).destroy_all
-    from_user.user_observers.active.update_all(user_id: target_user)
+    from_user.user_observers.active.update_all(user_id: target_user.id)
     # for any observers not already watching both users, make sure they have
     # any missing observer enrollments added
     target_user.user_observers.where(observer_id: xor_observer_ids).each(&:create_linked_enrollments)
@@ -396,7 +396,7 @@ class UserMerge
           # move all the enrollments that have not been marked as deleted to the target user
           to_move = Enrollment.active.where(column => from_user)
           user_merge_data.add_more_data(to_move)
-          to_move.update_all(column => target_user)
+          to_move.update_all(column => target_user.id)
         end
       end
     end

@@ -205,7 +205,7 @@ class EportfoliosController < ApplicationController
         feed.entries << e.to_atom(:private => params[:verifier] == @portfolio.uuid)
       end
       respond_to do |format|
-        format.atom { render :text => feed.to_xml }
+        format.atom { render :plain => feed.to_xml }
       end
     else
       authorized_action(nil, nil, :bad_permission)

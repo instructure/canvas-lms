@@ -35,7 +35,7 @@ class LtiApiController < ApplicationController
     @xml = Nokogiri::XML.parse(request.body)
 
     lti_response = check_outcome BasicLTI::BasicOutcomes.process_request(@tool, @xml)
-    render :text => lti_response.to_xml, :content_type => 'application/xml'
+    render :body => lti_response.to_xml, :content_type => 'application/xml'
   end
 
   # this similar API implements the older work-in-process BLTI 0.0.4 outcome
@@ -45,7 +45,7 @@ class LtiApiController < ApplicationController
     verify_oauth
 
     lti_response = check_outcome BasicLTI::BasicOutcomes.process_legacy_request(@tool, params)
-    render :text => lti_response.to_xml, :content_type => 'application/xml'
+    render :body => lti_response.to_xml, :content_type => 'application/xml'
   end
 
   # examples: https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md#AppendixA
@@ -79,12 +79,12 @@ class LtiApiController < ApplicationController
     verify_oauth(token.tool)
 
     if request.content_type != "application/json"
-      return render :text => '', :status => 415
+      return head 415
     end
 
     Lti::XapiService.log_page_view(token, params)
 
-    return render :text => '', :status => 200
+    head :ok
   end
 
   #
@@ -120,14 +120,14 @@ class LtiApiController < ApplicationController
 
     Lti::CaliperService.log_page_view(token, params)
 
-    return render :text => '', :status => 200
+    head :ok
   end
 
   def logout_service
     token = Lti::LogoutService::Token.parse_and_validate(params[:token])
     verify_oauth(token.tool)
     Lti::LogoutService.register_logout_callback(token, params[:callback])
-    return render :text => '', :status => 200
+    head :ok
   end
 
   def turnitin_outcomes_placement

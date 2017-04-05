@@ -33,6 +33,7 @@ class DeveloperKey < ActiveRecord::Base
   before_create :generate_api_key
   before_create :set_auto_expire_tokens
   before_save :nullify_empty_icon_url
+  before_save :protect_default_key
   after_save :clear_cache
 
   validates_as_url :redirect_uri, allowed_schemes: nil
@@ -68,6 +69,10 @@ class DeveloperKey < ActiveRecord::Base
     self.redirect_uris = uris unless uris == redirect_uris
   rescue URI::Error, ArgumentError
     errors.add :redirect_uris, 'is not a valid URI'
+  end
+
+  def protect_default_key
+    raise "Please never delete the default developer key" if workflow_state != 'active' && self == self.class.default
   end
 
   alias_method :destroy_permanently!, :destroy

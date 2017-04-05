@@ -6,10 +6,6 @@ module Selinimum
       def can_process?(file, _)
         file =~ %r{\Aapp/jsx/.*\.jsx\z}
       end
-
-      def module_from(file)
-        "jsx/" + file.sub(%r{\Aapp/jsx/(.*?)\.jsx}, "\\1")
-      end
     end
   end
 end

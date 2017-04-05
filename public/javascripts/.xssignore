@@ -3,9 +3,7 @@ jst
 vendor
 
 /bower
-/compiled
 /custom_moment_locales
-/jsx
 /mediaelement
 /plugins
 /tinymce/jscripts/tiny_mce/langs
@@ -18,8 +16,6 @@ vendor
 
 # vendor package in analytics
 /plugins/analytics/react-bootstrap-table.js
-# vendor package for enzyme
-enzyme_requireJS.js
 
 # need better hinting, skipping this atm due to false positives in vendor code
 /client_apps

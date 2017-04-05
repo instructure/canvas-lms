@@ -62,7 +62,7 @@ describe "Gradezilla editing grades" do
     q.reload
 
     gradezilla_page.visit(@course)
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l5', points.to_s)
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l4', points.to_s)
 
     get "/courses/#{@course.id}/quizzes/#{q.id}/history?quiz_submission_id=#{qs.id}"
     expect(f('.score_value')).to include_text points.to_s
@@ -114,24 +114,24 @@ describe "Gradezilla editing grades" do
     expected_edited_total = "33.33%"
     gradezilla_page.visit(@course)
 
-    #editing grade for first row, first cell
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
+    # editing grade for first row, first cell
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l1', 0)
 
-    #editing grade for second row, first cell
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', 0)
+    # editing grade for second row, first cell
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l1', 0)
 
-    #refresh page and make sure the grade sticks
+    # refresh page and make sure the grade sticks
     gradezilla_page.visit(@course)
     expect(final_score_for_row(0)).to eq expected_edited_total
     expect(final_score_for_row(1)).to eq expected_edited_total
   end
 
   it "allows setting a letter grade on a no-points assignment", priority: "1", test_id: 220313 do
-    assignment_model(:course => @course, :grading_type => 'letter_grade', :points_possible => nil, :title => 'no-points')
+    assignment_model(course: @course, grading_type: 'letter_grade', points_possible: nil, title: 'no-points')
     gradezilla_page.visit(@course)
 
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l5', 'A-')
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l5')).to include_text('A-')
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l4', 'A-')
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l4')).to include_text('A-')
     expect(@assignment.reload.submissions.size).to eq 1
     sub = @assignment.submissions.first
     expect(sub.grade).to eq 'A-'
@@ -165,8 +165,8 @@ describe "Gradezilla editing grades" do
     @course.assignment_groups.first.update_attribute :rules, 'drop_lowest:1'
     gradezilla_page.visit(@course)
 
-    assignment_1_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l3'
-    assignment_2_sel= '#gradebook_grid .container_1 .slick-row:nth-child(1) .l4'
+    assignment_1_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'
+    assignment_2_sel= '#gradebook_grid .container_1 .slick-row:nth-child(1) .l3'
     a1 = f(assignment_1_sel)
     a2 = f(assignment_2_sel)
     expect(a1).to have_class 'dropped'
@@ -209,7 +209,7 @@ describe "Gradezilla editing grades" do
   it "assigns zeroes to unsubmitted assignments during curving", priority: "1", test_id: 220321 do
     gradezilla_page.visit(@course)
 
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', '')
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l1', '')
 
     gradezilla_page.open_assignment_options(0)
     f('[data-menu-item-id="curve-grades"]').click

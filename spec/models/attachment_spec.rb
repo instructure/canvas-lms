@@ -580,6 +580,8 @@ describe Attachment do
       @context = courseb = course_factory(account: Account.create)
 
       b = a.clone_for(courseb, nil, overwrite: true)
+      expect(b.id).not_to be_nil
+      expect(b.filename).to eq a.filename
       b.save
       expect(b.root_attachment_id).to eq nil
       expect(b.namespace).to eq courseb.root_account.file_namespace
@@ -1585,7 +1587,7 @@ describe Attachment do
       expect(@attachment.grants_right?(@student, :download)).to eq false # prime cache
       Timecop.freeze(@attachment.unlock_at + 1.second) do
         run_jobs
-        expect(Attachment.find(@attachment).grants_right?(@student, :download)).to eq true
+        expect(Attachment.find(@attachment.id).grants_right?(@student, :download)).to eq true
       end
     end
   end

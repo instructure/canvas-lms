@@ -62,7 +62,7 @@ define([
       });
 
       $("#account_notification_required_account_service").click(function(event) {
-        $this = $(this);
+        var $this = $(this);
         $("#confirm_global_announcement_field").showIf(!$this.is(":checked"));
         $("#account_notification_months_in_display_cycle").prop("disabled", !$this.is(":checked"));
       });

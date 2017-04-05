@@ -3,7 +3,7 @@ module.exports = [
   'Backbone',
   'compiled/tinymce',
   'classnames',
-  'handlebars',
+  'handlebars/runtime',
   'jquery',
   'jquery.ajaxJSON',
   'jquery.google-analytics',

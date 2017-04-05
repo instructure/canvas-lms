@@ -11,7 +11,7 @@ class CleanUpUserAccountAssociations < ActiveRecord::Migration[4.2]
     # clean up dups by recalculating
     user_ids = UserAccountAssociation.
         select(:user_id).
-        uniq.
+        distinct.
         group(:user_id, :account_id).
         having("COUNT(*)>1").
         map(&:user_id)

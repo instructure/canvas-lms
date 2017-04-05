@@ -286,11 +286,11 @@ describe "assignment rubrics" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
       f('.assess_submission_link').click
+      wait_for_animations
       expect(f('.total_points_holder .assessing')).to include_text "out of 5"
       f("#rubric_#{@rubric.id} tbody tr:nth-child(2) .ratings td:nth-child(1)").click
       expect(f('.rubric_total')).to include_text "5"
       f('.save_rubric_button').click
-      wait_for_ajaximations
       expect(f('.grading_value')).to have_attribute(:value, '5')
     end
 

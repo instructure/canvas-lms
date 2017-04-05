@@ -15,9 +15,21 @@ describe "grading periods account page" do
 
     it "adds grading period set", test_id: 2528622, priority: "1" do
       grading_standards_page.visit(Account.default.id)
-      grading_standards_page.add_grading_period_set("Set Name!", "Default Term")
+      grading_standards_page.add_grading_period_set(name: "Set Name!", term: "Default Term")
       expect(grading_standards_page.grading_period_set_displayed?("Set Name!")).to eq(true)
       expect(grading_standards_page.add_grading_period_link_displayed?).to eq(true)
+    end
+
+    it "enable wieghted grading on grading period set", test_id: 3035964, priority: "1" do
+      grading_standards_page.visit(Account.default.id)
+      grading_standards_page.add_grading_period_set(name: "Set Name!", term: "Default Term", weighted: true)
+      expect(grading_standards_page.weight_field_in_grading_period?).to eq(true)
+    end
+
+    it "enable show total column on grading period set", test_id: 3104470, priority: "1" do
+      grading_standards_page.visit(Account.default.id)
+      grading_standards_page.add_grading_period_set(name: "Set Name!", show_total: true)
+      expect(grading_standards_page.show_total_checked?).to eq("true")
     end
 
     it "deletes grading period set", test_id: 2528621, priority: "1" do

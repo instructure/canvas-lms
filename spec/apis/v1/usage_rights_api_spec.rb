@@ -181,7 +181,7 @@ describe UsageRightsController, type: :request do
 
       it "should remove usage rights" do
         usage_rights = @course.usage_rights.create! use_justification: 'creative_commons', legal_copyright: '(C) 2014 XYZ Corp', license: 'cc_by_nd'
-        @course.attachments.update_all(usage_rights_id: usage_rights)
+        @course.attachments.update_all(usage_rights_id: usage_rights.id)
         json = api_call(:delete, "/api/v1/courses/#{@course.id}/usage_rights",
                  { controller: 'usage_rights', action: 'remove_usage_rights', course_id: @course.to_param, format: 'json'},
                  { folder_ids: [@folderA.id] })

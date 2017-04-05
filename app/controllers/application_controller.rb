@@ -42,6 +42,7 @@ class ApplicationController < ActionController::Base
   include LegalInformationHelper
   around_action :set_locale
   around_action :enable_request_cache
+  around_action :batch_statsd
 
   helper :all
 
@@ -243,19 +244,32 @@ class ApplicationController < ActionController::Base
   helper_method :master_courses?
 
   def setup_master_course_restrictions(objects, course)
-    return unless master_courses? && course.is_a?(Course)
+    return unless master_courses? && course.is_a?(Course) && course.grants_right?(@current_user, session, :read_as_admin)
 
     if MasterCourses::MasterTemplate.is_master_course?(course)
       MasterCourses::Restrictor.preload_default_template_restrictions(objects, course)
       return :master # return master/child status
     elsif MasterCourses::ChildSubscription.is_child_course?(course)
-      MasterCourses::Restrictor.preload_restrictions(objects)
+      MasterCourses::Restrictor.preload_child_restrictions(objects)
       return :child
     end
   end
   helper_method :setup_master_course_restrictions
 
-  def editing_restricted?(content, edit_type=:all)
+  def set_master_course_js_env_data(object, course)
+    return unless object.respond_to?(:master_course_api_restriction_data)
+    status = setup_master_course_restrictions([object], course)
+    return unless status
+    # we might have to include more information about the object here to make it easier to plug a common component in
+    data = object.master_course_api_restriction_data(status)
+    if status == :master
+      data[:default_restrictions] = MasterCourses::MasterTemplate.full_template_for(course).default_restrictions
+    end
+    js_env(:MASTER_COURSE_DATA => data)
+  end
+  helper_method :set_master_course_js_env_data
+
+  def editing_restricted?(content, edit_type=:any)
     return false unless master_courses? && content.respond_to?(:editing_restricted?)
     content.editing_restricted?(edit_type)
   end
@@ -316,7 +330,7 @@ class ApplicationController < ActionController::Base
     include_host = opts[-1].delete(:include_host)
     if !include_host
       opts[-1][:host] = context.host_name rescue nil
-      opts[-1][:only_path] = true
+      opts[-1][:only_path] = true unless name.end_with?("_path")
     end
     self.send name, *opts
   end
@@ -359,10 +373,12 @@ class ApplicationController < ActionController::Base
     I18n.localizer = nil
   end
 
-  def enable_request_cache
-    RequestCache.enable do
-      yield
-    end
+  def enable_request_cache(&block)
+    RequestCache.enable(&block)
+  end
+
+  def batch_statsd(&block)
+    CanvasStatsd::Statsd.batch(&block)
   end
 
   def store_session_locale
@@ -423,7 +439,7 @@ class ApplicationController < ActionController::Base
 
   def check_pending_otp
     if session[:pending_otp] && params[:controller] != 'login/otp'
-      return render text: "Please finish logging in", status: 403 if request.xhr?
+      return render plain: "Please finish logging in", status: 403 if request.xhr?
 
       reset_session
       redirect_to login_url
@@ -508,7 +524,7 @@ class ApplicationController < ActionController::Base
       # to a web browser - but you've lost your cookies! This breaks not only store_location,
       # but in the case of delegated authentication where the provider does an additional
       # redirect storing important information in session, makes it impossible to log in at all
-      render text: '', status: 200
+      render plain: '', status: 200
       return false
     end
     true
@@ -544,7 +560,7 @@ class ApplicationController < ActionController::Base
       }
       format.zip { redirect_to(url_for(path_params)) }
       format.json { render_json_unauthorized }
-      format.all { render text: 'Unauthorized', status: :unauthorized }
+      format.all { render plain: 'Unauthorized', status: :unauthorized }
     end
     set_no_cache_headers
   end
@@ -1039,61 +1055,77 @@ class ApplicationController < ActionController::Base
 
     user = @current_user || (@accessed_asset && @accessed_asset[:user])
     if user && @log_page_views != false
-      updated_fields = params.slice(:interaction_seconds)
-      if request.xhr? && params[:page_view_token] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
-        RequestContextGenerator.store_interaction_seconds_update(params[:page_view_token], updated_fields[:interaction_seconds])
-
-        page_view_info = PageView.decode_token(params[:page_view_token])
-        @page_view = PageView.find_for_update(page_view_info[:request_id])
-        if @page_view
-          if @page_view.id
-            response.headers["X-Canvas-Page-View-Update-Url"] = page_view_path(
-              @page_view.id, page_view_token: @page_view.token)
-          end
-          @page_view.do_update(updated_fields)
-          @page_view_update = true
-        end
-      end
-      # If we're logging the asset access, and it's either a participatory action
-      # or it's not an update to an already-existing page_view.  We check to make sure
-      # it's not an update because if the page_view already existed, we don't want to
-      # double-count it as multiple views when it's really just a single view.
-
-      if @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
-        @access = AssetUserAccess.where(user_id: user.id, asset_code: @accessed_asset[:code]).first_or_initialize
-        @accessed_asset[:level] ||= 'view'
-        @access.log @context, @accessed_asset
-
-        if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
-          generate_page_view(user)
-        end
-
-        if @page_view
-          @page_view.participated = %w{participate submit}.include?(@accessed_asset[:level])
-          @page_view.asset_user_access = @access
-        end
-
-        @page_view_update = true
-      end
-      if @page_view && !request.xhr? && request.get? && (response.content_type || "").to_s.match(/html/)
-        @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
-        @page_view_update = true
-      end
-      if @page_view && @page_view_update
-        @page_view.context = @context if !@page_view.context_id && PageView::CONTEXT_TYPES.include?(@context.class.name)
-        @page_view.account_id = @domain_root_account.id
-        @page_view.developer_key_id = @access_token.try(:developer_key_id)
-        @page_view.store
-        RequestContextGenerator.store_page_view_meta(@page_view)
-      end
+      add_interaction_seconds
+      log_participation(user)
+      log_gets
+      finalize_page_view
     else
       @page_view.destroy if @page_view && !@page_view.new_record?
     end
+
   rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
     Canvas::Errors.capture_exception(:page_view, e)
     logger.error "Pageview error!"
     raise e if Rails.env.development?
     true
+  end
+
+  def add_interaction_seconds
+    updated_fields = params.slice(:interaction_seconds)
+    if request.xhr? && params[:page_view_token] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
+      RequestContextGenerator.store_interaction_seconds_update(params[:page_view_token], updated_fields[:interaction_seconds])
+
+      page_view_info = PageView.decode_token(params[:page_view_token])
+      @page_view = PageView.find_for_update(page_view_info[:request_id])
+      if @page_view
+        if @page_view.id
+          response.headers["X-Canvas-Page-View-Update-Url"] = page_view_path(
+            @page_view.id, page_view_token: @page_view.token)
+        end
+        @page_view.do_update(updated_fields)
+        @page_view_update = true
+      end
+    end
+  end
+
+  def log_participation(user)
+    # If we're logging the asset access, and it's either a participatory action
+    # or it's not an update to an already-existing page_view.  We check to make sure
+    # it's not an update because if the page_view already existed, we don't want to
+    # double-count it as multiple views when it's really just a single view.
+    if @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
+      @access = AssetUserAccess.where(user_id: user.id, asset_code: @accessed_asset[:code]).first_or_initialize
+      @accessed_asset[:level] ||= 'view'
+      @access.log @context, @accessed_asset
+
+      if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
+        generate_page_view(user)
+      end
+
+      if @page_view
+        @page_view.participated = %w{participate submit}.include?(@accessed_asset[:level])
+        @page_view.asset_user_access = @access
+      end
+
+      @page_view_update = true
+    end
+  end
+
+  def log_gets
+    if @page_view && !request.xhr? && request.get? && ((response.content_type || "").to_s.match(/html/))
+      @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
+      @page_view_update = true
+    end
+  end
+
+  def finalize_page_view
+    if @page_view && @page_view_update
+      @page_view.context = @context if !@page_view.context_id && PageView::CONTEXT_TYPES.include?(@context.class.name)
+      @page_view.account_id = @domain_root_account.id
+      @page_view.developer_key_id = @access_token.try(:developer_key_id)
+      @page_view.store
+      RequestContextGenerator.store_page_view_meta(@page_view)
+    end
   end
 
   rescue_from Exception, :with => :rescue_exception
@@ -1778,8 +1810,8 @@ class ApplicationController < ActionController::Base
       # fix for some browsers not properly handling json responses to multipart
       # file upload forms and s3 upload success redirects -- we'll respond with text instead.
       if options[:as_text] || json_as_text?
-        options[:text] = json
-        options[:content_type] = "text/html"
+        options[:html] = json.html_safe
+        options[:content_type] = "text/html" if CANVAS_RAILS4_2
       else
         options[:json] = json
       end
@@ -2104,8 +2136,13 @@ class ApplicationController < ActionController::Base
 
   def setup_live_events_context
     ctx = {}
-    ctx[:root_account_id] = @domain_root_account.global_id if @domain_root_account
-    ctx[:root_account_lti_guid] = @domain_root_account.lti_guid if @domain_root_account
+
+    if @domain_root_account
+      ctx[:root_account_uuid] = @domain_root_account.uuid
+      ctx[:root_account_id] = @domain_root_account.global_id
+      ctx[:root_account_lti_guid] = @domain_root_account.lti_guid
+    end
+
     ctx[:user_id] = @current_user.global_id if @current_user
     ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
     ctx[:user_login] = @current_pseudonym.unique_id if @current_pseudonym

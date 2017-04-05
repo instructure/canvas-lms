@@ -196,7 +196,7 @@ RSpec::Matchers.define :contain_link do |text|
 end
 
 # assert whether or not an element is displayed. will wait up to
-# IMPLICIT_WAIT_TIMEOUT seconds
+# TIMEOUTS[:finder] seconds
 RSpec::Matchers.define :be_displayed do
   match do |element|
     wait_for(method: :be_displayed) { element.displayed? }
@@ -207,7 +207,7 @@ RSpec::Matchers.define :be_displayed do
   end
 end
 
-# assert the size of the collection. will wait up to IMPLICIT_WAIT_TIMEOUT
+# assert the size of the collection. will wait up to TIMEOUTS[:finder]
 # seconds, and will reload the collection if it can (i.e. if it's the
 # result of a ff/ffj call)
 RSpec::Matchers.define :have_size do |size|

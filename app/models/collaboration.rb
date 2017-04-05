@@ -264,7 +264,7 @@ class Collaboration < ActiveRecord::Base
     update_group_collaborators(group_ids)
     if respond_to?(:add_users_to_document)
       group_users_to_add = User.
-          uniq.
+          distinct.
           joins(:group_memberships).
           where('group_memberships.group_id' => group_ids).to_a
       add_users_to_document((users + group_users_to_add).uniq)

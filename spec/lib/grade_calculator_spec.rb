@@ -1039,7 +1039,7 @@ describe GradeCalculator do
         student_in_course active_all: true
         @gp1, @gp2 = grading_periods count: 2
         @a1, @a2 = [@gp1, @gp2].map { |gp|
-          @course.assignments.create! due_at: gp.start_date + 1,
+          @course.assignments.create! due_at: 1.minute.from_now(gp.start_date),
             points_possible: 100
         }
         @a1.grade_student(@student, grade: 25, grader: @teacher)

@@ -742,6 +742,194 @@ describe ApplicationController do
       expect(discard).to be_empty
     end
   end
+
+  describe '#setup_live_events_context' do
+    let(:non_conditional_values) do
+      {
+        hostname: 'test.host',
+        user_agent: 'Rails Testing'
+      }
+    end
+
+    before(:each) do
+      Thread.current[:context] = nil
+    end
+
+    it 'stringifies the non-strings in the context attributes' do
+      current_user_attributes = { global_id: 12345 }
+
+      current_user = stub(current_user_attributes)
+      controller.instance_variable_set(:@current_user, current_user)
+      controller.send(:setup_live_events_context)
+      expect(LiveEvents.get_context).to eq({user_id: '12345'}.merge(non_conditional_values))
+    end
+
+    context 'when a domain_root_account exists' do
+      let(:root_account_attributes) do
+        {
+          uuid: 'account_uuid1',
+          global_id: 'account_global1',
+          lti_guid: 'lti1'
+        }
+      end
+
+      let(:expected_context_attributes) do
+        {
+          root_account_uuid: 'account_uuid1',
+          root_account_id: 'account_global1',
+          root_account_lti_guid: 'lti1'
+        }.merge(non_conditional_values)
+      end
+
+      it 'adds root account values to the LiveEvent context' do
+        root_account = stub(root_account_attributes)
+        controller.instance_variable_set(:@domain_root_account, root_account)
+        controller.send(:setup_live_events_context)
+        expect(LiveEvents.get_context).to eq(expected_context_attributes)
+      end
+    end
+
+    context 'when a current_user exists' do
+      let(:current_user_attributes) do
+        {
+          global_id: 'user_global_id'
+        }
+      end
+
+      let(:expected_context_attributes) do
+        {
+          user_id: 'user_global_id'
+        }.merge(non_conditional_values)
+      end
+
+      it 'sets the correct attributes on the LiveEvent context' do
+        current_user = stub(current_user_attributes)
+        controller.instance_variable_set(:@current_user, current_user)
+        controller.send(:setup_live_events_context)
+        expect(LiveEvents.get_context).to eq(expected_context_attributes)
+      end
+    end
+
+    context 'when a real current_user exists' do
+      let(:real_current_user_attributes) do
+        {
+          global_id: 'real_user_global_id'
+        }
+      end
+
+      let(:expected_context_attributes) do
+        {
+          real_user_id: 'real_user_global_id'
+        }.merge(non_conditional_values)
+      end
+
+      it 'sets the correct attributes on the LiveEvent context' do
+        real_current_user = stub(real_current_user_attributes)
+        controller.instance_variable_set(:@real_current_user, real_current_user)
+        controller.send(:setup_live_events_context)
+        expect(LiveEvents.get_context).to eq(expected_context_attributes)
+      end
+    end
+
+    context 'when a real current_pseudonym exists' do
+      let(:current_pseudonym_attributes) do
+        {
+          unique_id: 'unique_id'
+        }
+      end
+
+      let(:expected_context_attributes) do
+        {
+          user_login: 'unique_id'
+        }.merge(non_conditional_values)
+      end
+
+      it 'sets the correct attributes on the LiveEvent context' do
+        current_pseudonym = stub(current_pseudonym_attributes)
+        controller.instance_variable_set(:@current_pseudonym, current_pseudonym)
+        controller.send(:setup_live_events_context)
+        expect(LiveEvents.get_context).to eq(expected_context_attributes)
+      end
+    end
+
+    context 'when a canvas context exists' do
+      let(:canvas_context_attributes) do
+        {
+          class: Class,
+          global_id: 'context_global_id'
+        }
+      end
+
+      let(:expected_context_attributes) do
+        {
+          context_type: 'Class',
+          context_id: 'context_global_id'
+        }.merge(non_conditional_values)
+      end
+
+      it 'sets the correct attributes on the LiveEvent context' do
+        canvas_context = stub(canvas_context_attributes)
+        controller.instance_variable_set(:@context, canvas_context)
+        controller.send(:setup_live_events_context)
+        expect(LiveEvents.get_context).to eq(expected_context_attributes)
+      end
+    end
+
+    context 'when a context_membership exists' do
+      context 'when the context has a role' do
+        it 'sets the correct attributes on the LiveEvent context' do
+          stubbed_role = stub({ name: 'name' })
+          context_membership = stub({role: stubbed_role})
+
+          controller.instance_variable_set(:@context_membership, context_membership)
+          controller.send(:setup_live_events_context)
+          expect(LiveEvents.get_context).to eq({ context_role: 'name' }.merge(non_conditional_values))
+        end
+      end
+
+      context 'when the context has a type' do
+        it 'sets the correct attributes on the LiveEvent context' do
+          context_membership = stub({ type: 'type' })
+
+          controller.instance_variable_set(:@context_membership, context_membership)
+          controller.send(:setup_live_events_context)
+          expect(LiveEvents.get_context).to eq({ context_role: 'type' }.merge(non_conditional_values))
+        end
+      end
+
+      context 'when the context has neither a role or type' do
+        it 'sets the correct attributes on the LiveEvent context' do
+          context_membership = stub({ class: Class })
+
+          controller.instance_variable_set(:@context_membership, context_membership)
+          controller.send(:setup_live_events_context)
+          expect(LiveEvents.get_context).to eq({ context_role: 'Class' }.merge(non_conditional_values))
+        end
+      end
+    end
+
+    context 'when the current thread has a context key' do
+      let(:thread_attributes) do
+        {
+          request_id: 'request_id',
+          session_id: 'session_id'
+        }
+      end
+
+      let(:expected_context_attributes) do
+        {
+          request_id: 'request_id',
+          session_id: 'session_id'
+        }.merge(non_conditional_values)
+      end
+
+      it 'sets the correct attributes on the LiveEvent context' do
+        Thread.current[:context] = thread_attributes
+        controller.send(:setup_live_events_context)
+        expect(LiveEvents.get_context).to eq(expected_context_attributes)
+      end
+    end
+  end
 end
 
 describe WikiPagesController do
@@ -783,6 +971,59 @@ describe CoursesController do
       expect(controller.js_env).to include(:SHOW_ANNOUNCEMENTS, :ANNOUNCEMENT_LIMIT)
       expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_truthy
       expect(controller.js_env[:ANNOUNCEMENT_LIMIT]).to eq(5)
+    end
+  end
+
+  describe "set_master_course_js_env_data" do
+    before :each do
+      Account.default.enable_feature!(:master_courses)
+      controller.instance_variable_set(:@domain_root_account, Account.default)
+      account_admin_user(:active_all => true)
+      controller.instance_variable_set(:@current_user, @user)
+
+      @master_course = course_factory
+      @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      @master_page = @course.wiki.wiki_pages.create!(:title => "blah", :body => "bloo")
+      @tag = @template.content_tag_for(@master_page)
+
+      @child_course = course_factory
+      @template.add_child_course!(@child_course)
+
+      @child_page = @child_course.wiki.wiki_pages.create!(:title => "bloo", :body => "bloo", :migration_id => @tag.migration_id)
+    end
+
+    it "should populate master-side data (unrestricted)" do
+      controller.set_master_course_js_env_data(@master_page, @master_course)
+      data = controller.js_env[:MASTER_COURSE_DATA]
+      expect(data['is_master_course_master_content']).to be_truthy
+      expect(data['restricted_by_master_course']).to be_falsey
+    end
+
+    it "should populate master-side data (restricted)" do
+      @tag.update_attribute(:restrictions, {:content => true})
+
+      controller.set_master_course_js_env_data(@master_page, @master_course)
+      data = controller.js_env[:MASTER_COURSE_DATA]
+      expect(data['is_master_course_master_content']).to be_truthy
+      expect(data['restricted_by_master_course']).to be_truthy
+      expect(data['master_course_restrictions']).to eq({:content => true})
+    end
+
+    it "should populate child-side data (unrestricted)" do
+      controller.set_master_course_js_env_data(@child_page, @child_course)
+      data = controller.js_env[:MASTER_COURSE_DATA]
+      expect(data['is_master_course_child_content']).to be_truthy
+      expect(data['restricted_by_master_course']).to be_falsey
+    end
+
+    it "should populate child-side data (restricted)" do
+      @tag.update_attribute(:restrictions, {:content => true})
+
+      controller.set_master_course_js_env_data(@child_page, @child_course)
+      data = controller.js_env[:MASTER_COURSE_DATA]
+      expect(data['is_master_course_child_content']).to be_truthy
+      expect(data['restricted_by_master_course']).to be_truthy
+      expect(data['master_course_restrictions']).to eq({:content => true})
     end
   end
 end

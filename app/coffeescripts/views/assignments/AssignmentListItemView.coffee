@@ -92,8 +92,8 @@ define [
           closeTarget: @$el.find('a[id*=manage_link]')
           saveURL: -> "#{ENV.URLS.assignment_sort_base_url}/#{@parentListView.value()}/reorder"
 
-        if @isGraded() && @model.postToSISEnabled()
-          @sisButtonView = new SisButtonView(model: @model, sisName: @model.postToSISName())
+        if @isGraded() && @model.postToSISEnabled() && @model.published()
+          @sisButtonView = new SisButtonView(model: @model, sisName: @model.postToSISName(), dueDateRequired: @model.dueDateRequiredForAccount())
 
       @dateDueColumnView       = new DateDueColumnView(model: @model)
       @dateAvailableColumnView = new DateAvailableColumnView(model: @model)
@@ -213,7 +213,7 @@ define [
       @$el.remove()
 
     canDelete: ->
-      @userIsAdmin or @model.canDelete()
+      (@userIsAdmin or @model.canDelete()) && !@model.isRestrictedByMasterCourse()
 
     canMove: ->
       @userIsAdmin or (@canManage() and @model.canMove())

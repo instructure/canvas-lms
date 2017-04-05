@@ -252,7 +252,7 @@
   @if $use_high_contrast {
     text-decoration: none;
   }
-  &:hover, &:focus {
+  .grade:hover, .grade:focus {
     text-decoration: none;
     .tooltip_wrap, .tooltip_text {
       visibility: visible;

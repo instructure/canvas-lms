@@ -253,7 +253,7 @@ describe Message do
         path_type: 'email'
       })
       message.workflow_state = "staged"
-      allow(Mailer).to receive(:create_message).and_return(double(deliver: "Response!"))
+      allow(Mailer).to receive(:create_message).and_return(double(deliver_now: "Response!"))
       expect(message.workflow_state).to eq("staged")
       expect{ message.deliver }.not_to raise_error
     end

@@ -394,7 +394,7 @@ class AppointmentGroupsController < ApplicationController
         })
         js_bundle :calendar_appointment_group_edit
         css_bundle :calendar_appointment_group_edit
-        render :text => "".html_safe, :layout => true
+        render :html => "".html_safe, :layout => true
       end
     end
   end

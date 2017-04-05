@@ -248,7 +248,7 @@ TEXT
                   <% disabled = hash[:locked] && hash[:inherited] %>
                   <tr>
                     <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
-                      <%= r.label :lock_all_announcements, :en => "Disable comments on announcements" %>
+                      <%= r.label :value, :en => "Disable comments on announcements" %>
                     </td>
                   </tr>
                   <% unless disabled %>
@@ -259,6 +259,17 @@ TEXT
                       </td>
                     </tr>
                   <% end %>
+                <% end %>
+
+                <%= settings.fields_for :enable_offline_web_export do |r| %>
+                  <% hash = @account.enable_offline_web_export %>
+                  <% disabled = hash[:locked] && hash[:inherited] %>
+                  <tr>
+                    <td colspan="2">
+                      <%= r.check_box :value, checked: hash[:value], disabled: disabled %>
+                      <%= r.label :value, t("Allow students to download course content and view offline") %>
+                    </td>
+                  </tr>
                 <% end %>
               <% end %>
             <% end %>
@@ -764,6 +775,12 @@ acknowledge that you have read and agreed to the
             <div class="notification_account_content">
               <div class="ic-notification__content">
                 <div class="ic-notification__message">
+                  <h4 class="ic-notification__title notification_subject">
+                    <%= announcement.subject %>
+                  </h4>
+                  <span class="notification_message">
+                    <%= user_content(announcement.message) %>
+                  </span>
                   <% if can_do(@account, @current_user, :manage_alerts) %>
                     <div class="ic-notification__admin-actions">
                       <button
@@ -772,21 +789,15 @@ acknowledge that you have read and agreed to the
                         aria-controls="<%= "edit_notification_form_#{announcement.id}" %>"
                         data-edit-toggle-id="<%= announcement.id %>"
                       >
-                        <span class="screenreader-only"><%= t("Edit this Announcement") %></span>
+                        <span class="screenreader-only"><%= t("Edit announcement %{title}", :title => announcement.subject) %></span>
                         <i class="icon-edit"></i>
                       </button>
-                      <a href="#" rel="<%= context_url(@account, :context_account_notification_url, announcement) %>" class="Button Button--icon-action delete_notification_link" title="<%= t("Delete this Announcement") %>">
-                        <span class="screenreader-only"><%= t("Delete this Announcement") %></span>
+                      <a href="#" rel="<%= context_url(@account, :context_account_notification_url, announcement) %>" class="Button Button--icon-action delete_notification_link" title="<%= t("Delete announcement %{title}", :title => announcement.subject) %>">
+                        <span class="screenreader-only"><%= t("Delete announcement %{title}", :title => announcement.subject) %></span>
                         <i class="icon-trash"></i>
                       </a>
                     </div>
                   <% end %>
-                  <h4 class="ic-notification__title notification_subject">
-                    <%= announcement.subject %>
-                  </h4>
-                  <span class="notification_message">
-                    <%= user_content(announcement.message) %>
-                  </span>
                 </div>
               </div>
               <span class="notification_account_content_text">

@@ -160,8 +160,11 @@ module HtmlTextHelper
     tags = output.css('*[href]')
 
     tags.each do |tag|
-      next if tag.attributes['href'].value.match(/^https?|mailto|ftp/)
-      tag.attributes['href'].value = "#{base}#{tag.attributes['href']}"
+      url = tag.attributes['href'].value
+      next if url.match(/^https?|mailto|ftp/)
+
+      url.sub!("/", "") if url.start_with?("/") && base.end_with?("/")
+      tag.attributes['href'].value = "#{base}#{url}"
     end
 
     output.to_s

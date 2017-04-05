@@ -10,7 +10,7 @@ class SetDefaultValuesForDiscussionTopics < ActiveRecord::Migration[4.2]
     ]
     fields.each { |field| change_column_default(:discussion_topics, field, false) }
     DataFixup::BackfillNulls.run(DiscussionTopic, fields, default_value: false)
-    fields.each { |field| change_column_null_with_less_locking(:discussion_topics, field) }
+    fields.each { |field| change_column_null(:discussion_topics, field, false) }
   end
 
   def down

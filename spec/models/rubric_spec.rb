@@ -59,14 +59,14 @@ describe Rubric do
     it "should allow learning outcome rows in the rubric" do
       create_rubric([rubric_data_hash])
       expect(@rubric).not_to be_new_record
-      expect(@rubric.learning_outcome_alignments(true)).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
     end
 
     it "should delete learning outcome tags when they no longer exist" do
       create_rubric([rubric_data_hash])
       expect(@rubric).not_to be_new_record
-      expect(@rubric.learning_outcome_alignments(true)).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
       @rubric.data = [rubric_data_hash(nil)]
       @rubric.save!
@@ -77,7 +77,7 @@ describe Rubric do
       @outcome2 = @course.created_learning_outcomes.create!(:title => 'outcome2')
       create_rubric([rubric_data_hash, rubric_data_hash(@outcome2)])
       expect(@rubric).not_to be_new_record
-      expect(@rubric.learning_outcome_alignments(true)).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
       expect(@rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eql([@outcome.id, @outcome2.id].sort)
     end
 
@@ -85,7 +85,7 @@ describe Rubric do
       create_rubric([rubric_data_hash])
       @rubric.save!
       expect(@rubric).not_to be_new_record
-      expect(@rubric.learning_outcome_alignments(true)).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
       @user = user_factory(active_all: true)
       @e = @course.enroll_student(@user)

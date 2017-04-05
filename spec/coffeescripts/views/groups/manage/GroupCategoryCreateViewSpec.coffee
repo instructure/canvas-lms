@@ -22,19 +22,11 @@ define [
       document.getElementById("fixtures").innerHTML = ""
 
   test 'toggling auto group leader enables and disables accompanying controls', ->
-    if window.USE_WEBPACK
-      $(".auto-group-leader-toggle").click()
-    else
-      $('.auto-group-leader-toggle').prop( "checked", true )
-      $(".auto-group-leader-toggle").trigger('click')
+    $(".auto-group-leader-toggle").click()
 
     view.$autoGroupLeaderControls.find('label.radio').each ->
       equal $(this).css('opacity'), "1"
-    if window.USE_WEBPACK
-      $(".auto-group-leader-toggle").click()
-    else
-      $('.auto-group-leader-toggle').prop( "checked", false )
-      $(".auto-group-leader-toggle").trigger('click')
+    $(".auto-group-leader-toggle").click()
 
     view.$autoGroupLeaderControls.find('label.radio').each ->
       equal $(this).css('opacity'), "0.5"

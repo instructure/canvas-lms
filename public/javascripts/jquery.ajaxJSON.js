@@ -38,7 +38,12 @@ define([
       return;
     }
     url = url || ".";
-    if(submit_type != "GET") {
+    if(
+      submit_type != "GET" &&
+      // if it's a json request and has already been JSON.stringify'ed,
+      //  then we can't attach properties to `data` since it's already a string
+      typeof data !== 'string'
+    ) {
       data._method = submit_type;
       submit_type = "POST";
       data.authenticity_token = authenticity_token();

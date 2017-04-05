@@ -12,10 +12,11 @@ module Lti
       class MissingAuthorizationCode < StandardError
       end
 
-      def initialize(jwt:, authorization_url:, code: nil)
+      def initialize(jwt:, authorization_url:, code: nil, context:)
         @raw_jwt = jwt
         @authorization_url = authorization_url
         @code = code
+        @context = context
       end
 
       def jwt
@@ -65,13 +66,15 @@ module Lti
       end
 
       def sub
-        tool_proxy&.guid || developer_key&.global_id
+        tool_proxy&.guid || developer_key&.global_id || unverified_jwt[:sub]
       end
 
       private
 
       def jwt_secret
-        secret = tool_proxy&.shared_secret || developer_key&.api_key
+        secret = tool_proxy&.shared_secret
+        secret ||= developer_key&.api_key
+        secret ||= RegistrationRequestService.retrieve_registration_password(@context, unverified_jwt[:sub])
         return secret if secret.present?
         raise SecretNotFound, "either the tool proxy or developer key were not found"
       end

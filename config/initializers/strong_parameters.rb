@@ -80,6 +80,19 @@ module ArbitraryStrongishParams
       duplicate.instance_variable_set(:@anythings, @anythings.dup)
     end
   end
+
+  # when dropping Rails 4.2, remove this block so that we can start addressing these
+  # deprecation warnings
+  unless CANVAS_RAILS4_2
+    def method_missing(method_sym, *args, &block)
+      if @parameters.respond_to?(method_sym)
+        # DON'T warn about params not inheriting from Hash anymore
+        @parameters.public_send(method_sym, *args, &block)
+      else
+        super
+      end
+    end
+  end
 end
 ActionController::Parameters.prepend(ArbitraryStrongishParams)
 

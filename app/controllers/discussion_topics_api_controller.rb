@@ -191,7 +191,7 @@ class DiscussionTopicsApiController < ApplicationController
       fragments = fragments.map { |k, v| %("#{k}": #{v}) }
       render :json => "{ #{fragments.join(', ')} }"
     else
-      render :nothing => true, :status => 503
+      head 503
     end
   end
 
@@ -698,7 +698,7 @@ class DiscussionTopicsApiController < ApplicationController
   # for failure with participant errors if there are any
   def render_state_change_result(result)
     if result == true || result.try(:errors).blank?
-      render :nothing => true, :status => :no_content
+      head :no_content
     else
       render :json => result.try(:errors) || {}, :status => :bad_request
     end

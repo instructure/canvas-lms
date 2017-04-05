@@ -194,7 +194,7 @@ define(['jquery'], function($){
         }
       });
     }, _callback: function(options) {
-      for (i in options) {
+      for (var i in options) {
         if (typeof this.opt[options[i]] === 'function') {
           this.opt[options[i]] = this.opt[options[i]].call(this);
         }

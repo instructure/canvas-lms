@@ -802,6 +802,7 @@ CanvasRails::Application.routes.draw do
   end
 
   scope '/dashboard' do
+    put 'view' => 'users#dashboard_view'
     delete 'account_notifications/:id' => 'users#close_notification', as: :dashboard_close_notification
     get 'eportfolios' => 'eportfolios#user_index', as: :dashboard_eportfolios
     post 'comment_session' => 'services_api#start_kaltura_session', as: :dashboard_comment_session
@@ -1881,6 +1882,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :jwts) do
       post 'jwts', action: :create
+      post 'jwts/refresh', action: :refresh
     end
 
     scope(controller: :gradebook_settings) do
@@ -1906,6 +1908,8 @@ CanvasRails::Application.routes.draw do
       post 'courses/:course_id/blueprint_templates/:template_id/migrations', action: :queue_migration
       get 'courses/:course_id/blueprint_templates/:template_id/migrations', action: :migrations_index, as: :course_blueprint_migrations
       get 'courses/:course_id/blueprint_templates/:template_id/migrations/:id', action: :migrations_show
+
+      put 'courses/:course_id/blueprint_templates/:template_id/restrict_item', action: :restrict_item
     end
   end
 
@@ -1944,7 +1948,6 @@ CanvasRails::Application.routes.draw do
   end
 
   ApiRouteSet.draw(self, "/api/lti") do
-    post "authorize", controller: 'lti/ims/authorization', action: :authorize, as: 'lti_oauth2_authorize'
 
     scope(controller: 'lti/subscriptions_api') do
       post "subscriptions", action: :create
@@ -1956,6 +1959,7 @@ CanvasRails::Application.routes.draw do
 
     %w(course account).each do |context|
       prefix = "#{context}s/:#{context}_id"
+      post "#{prefix}/authorize", controller: 'lti/ims/authorization', action: :authorize, as: "#{context}_lti_oauth2_authorize"
       get  "#{prefix}/tool_consumer_profile(/:tool_consumer_profile_id)", controller: 'lti/ims/tool_consumer_profile',
            action: 'show', as: "#{context}_tool_consumer_profile"
       post "#{prefix}/tool_proxy", controller: 'lti/ims/tool_proxy', action: :re_reg,
@@ -1975,12 +1979,20 @@ CanvasRails::Application.routes.draw do
     get "courses/:course_id/membership_service", controller: "lti/membership_service", action: :course_index, as: :course_membership_service
     get "groups/:group_id/membership_service", controller: "lti/membership_service", action: :group_index, as: :group_membership_service
 
+    # Submissions Service
+    scope(controller: 'lti/submissions_api') do
+      get "assignments/:assignment_id/submissions/:submission_id", action: :show
+      get "assignments/:assignment_id/submissions/:submission_id/history", action: :history
+      get "assignments/:assignment_id/submissions/:submission_id/attachment/:attachment_id", action: :attachment, as: :lti_submission_attachment_download
+    end
+
     # Originality Report Service
     scope(controller: 'lti/originality_reports_api') do
       post "assignments/:assignment_id/submissions/:submission_id/originality_report", action: :create
       put "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :update
       get "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :show
     end
+
   end
 
   ApiRouteSet.draw(self, '/api/sis') do

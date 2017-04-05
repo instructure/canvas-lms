@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe DashboardHelper do
   include DashboardHelper
-  
+
   context "show_welcome_message?" do
     it "should be true if the user has no current enrollments" do
       user_model

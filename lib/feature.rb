@@ -155,6 +155,15 @@ END
       state: 'allowed',
       beta: true
     },
+    'new_user_tutorial_on_off' =>
+    {
+      display_name: -> { I18n.t('Course Set-up Tutorial') },
+      description: -> { I18n.t('Course set-up tutorial provides tips on how to leverage the feature opportunities on each page in Canvas. It is especially useful when you are new to Canvas or are setting up a new course for the first time in a long time.') },
+      applies_to: 'User',
+      state: 'allowed',
+      beta: true
+    },
+
     'outcome_gradebook' =>
     {
       display_name: -> { I18n.t('features.learning_mastery_gradebook', 'Learning Mastery Gradebook') },
@@ -376,14 +385,6 @@ END
       state: 'hidden',
       root_opt_in: true
     },
-    'all_grading_periods_totals' =>
-    {
-      display_name: -> { I18n.t('Display Totals for "All Grading Periods"') },
-      description: -> { I18n.t('Display total grades when the "All Grading Periods" dropdown option is selected (grading periods must exist).') },
-      applies_to: 'Course',
-      state: 'hidden',
-      root_opt_in: true
-    },
     'course_user_search' => {
       display_name: -> { I18n.t('Account Course and User Search') },
       description: -> { I18n.t('Updated UI for searching and displaying users and courses within an account.') },
@@ -521,6 +522,15 @@ END
       beta: true,
       development: true
     },
+    'student_planner' =>
+    {
+      display_name: -> { I18n.t('Student Planner')},
+      description: -> { I18n.t('Provides users with a planner dashboard option.')},
+      applies_to: "RootAccount",
+      state: "hidden",
+      beta: true,
+      development: true
+    },
     'quizzes2_exporter' =>
     {
       display_name: -> { I18n.t('Export to Quizzes 2 format') },
@@ -529,6 +539,15 @@ END
       state: "hidden",
       beta: false,
       development: true,
+    },
+    'lti_2_auth_url_registration' =>
+    {
+      display_name: -> { I18n.t('Send Authorization URL in LTI2 Registration') },
+      description: -> { I18n.t("If enabled, 'oauth2_access_token_url' will be sent in LTI2 registration launch") },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: false,
+      root_opt_in: true
     },
   )
 

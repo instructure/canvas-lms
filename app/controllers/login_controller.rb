@@ -123,6 +123,6 @@ class LoginController < ApplicationController
     session.delete('file_access_expiration')
     session[:permissions_key] = SecureRandom.uuid
 
-    render :text => "ok"
+    render :plain => "ok"
   end
 end

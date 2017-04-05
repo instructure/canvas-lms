@@ -158,6 +158,38 @@ describe ContextController do
         expect(response).to be_success
       end
     end
+
+    describe 'section visibility' do
+      before :once do
+        @other_section = @course.course_sections.create! :name => 'Other Section FRD'
+        @course.enroll_teacher(@teacher, :section => @other_section, :allow_multiple_enrollments => true).accept!
+        @other_student = user_factory
+        @course.enroll_student(@other_student, :section => @other_section, :limit_privileges_to_course_section => true).accept!
+      end
+
+      it 'prevents section-limited users from seeing users in other sections' do
+        user_session(@student)
+        get 'roster_user', :course_id => @course.id, :id => @other_student.id
+        expect(response).to be_success
+
+        user_session(@other_student)
+        get 'roster_user', :course_id => @course.id, :id => @student.id
+        expect(response).to be_redirect
+        expect(flash[:error]).to be_present
+      end
+
+      it 'limits enrollments by visibility' do
+        user_session(@student)
+        get 'roster_user', :course_id => @course.id, :id => @teacher.id
+        expect(response).to be_success
+        expect(assigns[:enrollments].map(&:course_section_id)).to match_array([@course.default_section.id, @other_section.id])
+
+        user_session(@other_student)
+        get 'roster_user', :course_id => @course.id, :id => @teacher.id
+        expect(response).to be_success
+        expect(assigns[:enrollments].map(&:course_section_id)).to match_array([@other_section.id])
+      end
+    end
   end
 
   describe "POST 'object_snippet'" do

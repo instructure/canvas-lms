@@ -30,18 +30,25 @@ define [
           enrollments: [{ id: "8", course_section_id: "4", type: "StudentEnrollment" }]
         }
       ]
+      @response2 = [
+        {
+          id: "7",
+          name: "Publius Varus",
+          sortable_name: "Varus, Publius",
+          short_name: "Publius"
+        }
+      ]
       # by id
       @server.respondWith "GET", "/api/v1/courses/1/users?user_ids%5B%5D=2&user_ids%5B%5D=5&enrollment_type=student&include%5B%5D=enrollments&include%5B%5D=group_ids", [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]
+      # by id paginated
+      @server.respondWith "GET", "/api/v1/courses/1/users?user_ids%5B%5D=2&user_ids%5B%5D=5&user_ids%5B%5D=7&enrollment_type=student&include%5B%5D=enrollments&include%5B%5D=group_ids", [200, {"Content-Type":"application/json", "Link":'<http://page2>; rel="next"'}, JSON.stringify(@response)]
+      @server.respondWith "GET", "http://page2", [200, {"Content-Type":"application/json"}, JSON.stringify(@response2)]
       # by name
       @server.respondWith "GET", "/api/v1/courses/1/search_users", [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]
       @server.respondWith "GET", "/api/v1/courses/1/search_users?search_term=publiu&enrollment_type=student&include_inactive=false&include%5B%5D=enrollments&include%5B%5D=group_ids", [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]
       @server.respondWith "GET", "/api/v1/courses/1/search_users?search_term=publiu", [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]
       # by course
-      url = (page) -> "/api/v1/courses/1/users?per_page=50&page=" + page + "&enrollment_type=student&include_inactive=false&include%5B%5D=enrollments&include%5B%5D=group_ids"
-      @server.respondWith "GET", url(1), [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]
-      @server.respondWith "GET", url(2), [200, {"Content-Type":"application/json"}, JSON.stringify([])]
-      @server.respondWith "GET", url(3), [200, {"Content-Type":"application/json"}, JSON.stringify([])]
-      @server.respondWith "GET", url(4), [200, {"Content-Type":"application/json"}, JSON.stringify([])]
+      @server.respondWith "GET", "/api/v1/courses/1/users?per_page=50&enrollment_type=student&include_inactive=false&include%5B%5D=enrollments&include%5B%5D=group_ids", [200, {"Content-Type":"application/json", "Link":'<http://coursepage2>; rel="next"'}, JSON.stringify(@response)]
 
     teardown: ->
       @server.restore()
@@ -86,6 +93,27 @@ define [
     @server.respond()
     groups = _.map(OverrideStudentStore.getStudents(), (student) -> student.group_ids)
     propEqual groups, [['1', '9'], ['3']]
+
+  test 'fetching by id: fetches multiple pages if necessary', ->
+    OverrideStudentStore.fetchStudentsByID([2,5,7])
+
+    # respond to first page
+    @server.respond()
+
+    # 2 requests made by here: initial, and followup that's still pending in the queue
+    equal @server.requests.length, 2
+    equal @server.queue.length, 1
+
+    # respond to second page
+    @server.respond()
+
+    # should not have a third request pending
+    equal @server.requests.length, 2
+    equal @server.queue.length, 0
+
+    # should have combined the results
+    results = _.map(OverrideStudentStore.getStudents(), (student) -> student.id)
+    deepEqual results, ['2','5','7']
 
   # ==================
   #  FETCHING BY NAME
@@ -134,14 +162,34 @@ define [
 
   test 'can properly fetch by course', ->
     OverrideStudentStore.fetchStudentsForCourse()
-    equal 4, @server.requests.length
+    equal @server.requests.length, 1
     @server.respond()
     # matches one of the responses defined in setup
     equal @server.requests[0].status, 200
 
-  test 'if all users returned, will set allStudentsFetched to true', ->
+  test 'fetching by course: follows pagination up to the limit', ->
+    OverrideStudentStore.fetchStudentsForCourse()
+    @server.respond()
+    for i in [2..10]
+      @server.respondWith "GET", "http://coursepage#{i}", [200, {"Content-Type":"application/json", "Link":"<http://coursepage#{i + 1}>; rel=\"next\""}, "[]"]
+      @server.respond()
+    equal @server.requests.length, 4
+    equal OverrideStudentStore.allStudentsFetched(), false
+
+  test 'fetching by course: saves results from all pages', ->
+    @server.respondWith "GET", "http://coursepage2", [200, {"Content-Type":"application/json"}, JSON.stringify(@response2)]
+    OverrideStudentStore.fetchStudentsForCourse()
+    @server.respond()
+    @server.respond()
+    # should have combined the results
+    results = _.map(OverrideStudentStore.getStudents(), (student) -> student.id)
+    deepEqual results, ['2','5','7']
+
+  test 'fetching by course: if all users returned, sets allStudentsFetched to true', ->
+    @server.respondWith "GET", "http://coursepage2", [200, {"Content-Type":"application/json"}, "[]"]
     equal OverrideStudentStore.allStudentsFetched(), false
     OverrideStudentStore.fetchStudentsForCourse()
+    @server.respond()
     @server.respond()
     # server returned no links.next in headers
     equal OverrideStudentStore.allStudentsFetched(), true

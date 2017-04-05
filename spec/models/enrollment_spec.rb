@@ -750,7 +750,7 @@ describe Enrollment do
       @c1 = @course
       @s2 = @course.course_sections.create!(:name => 's2')
       @course.enroll_student(@user, :section => @s2, :allow_multiple_enrollments => true)
-      expect(@user.student_enrollments(true).count).to eq 2
+      expect(@user.student_enrollments.reload.count).to eq 2
       course_with_student(:user => @user)
       @c2 = @course
       Enrollment.expects(:recompute_final_score).with(@user.id, @c1.id, {})
@@ -1964,7 +1964,7 @@ describe Enrollment do
       course_with_teacher(:active_all => 1)
       expect(@user.associated_accounts).to eq [Account.default]
       @enrollment.destroy
-      expect(@user.associated_accounts(true)).to eq []
+      expect(@user.associated_accounts.reload).to eq []
     end
 
     it "should remove assignment overrides if they are only linked to this enrollment" do

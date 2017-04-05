@@ -5,25 +5,28 @@ module Lti
     class AssignmentSubscriptionError < StandardError
     end
 
-    SUBMISSION_EVENT_ID = 'SubmissionEvent'.freeze
+    SUBMISSION_EVENT_ID = 'vnd.Canvas.SubmissionEvent'.freeze
+    EVENT_TYPES = %w(submission_created plagiarism_resubmit submission_updated).freeze
 
-    def initialize(assignment, tool_proxy)
+    def initialize(tool_proxy, assignment = nil)
       @assignment = assignment
       @tool_proxy = tool_proxy
     end
 
     def create_subscription
-      if Services::LiveEventsSubscriptionService.available?
+      if Services::LiveEventsSubscriptionService.available? && assignment.present?
         subscription = assignment_subscription(assignment.global_id)
         result = Services::LiveEventsSubscriptionService.create_tool_proxy_subscription(tool_proxy, subscription)
         raise AssignmentSubscriptionError, error_message unless result.ok?
         result.parsed_response['Id']
+      else
+        raise AssignmentSubscriptionError, I18n.t('Live events subscriptions service is not configured')
       end
     end
 
     def assignment_subscription(context_id)
       {
-        EventTypes: ['submission_created'],
+        EventTypes: EVENT_TYPES,
         ContextType: 'assignment',
         ContextId: context_id.to_s,
         Format: format,
@@ -32,12 +35,18 @@ module Lti
       }.with_indifferent_access
     end
 
+    def destroy_subscription(subscription_id)
+      if Services::LiveEventsSubscriptionService.available?
+        Services::LiveEventsSubscriptionService.destroy_tool_proxy_subscription(tool_proxy, subscription_id)
+      end
+    end
+
     private
 
     def error_message
       if submission_event_service.blank?
         I18n.t('Plagiarism review tool is missing submission event service')
-      elsif submission_event_service&.endpoint.blank?
+      elsif submission_event_service.endpoint.blank?
         I18n.t('Plagiarism review tool submission event service is missing endpoint')
       else
         I18n.t('Plagiarism review tool error')

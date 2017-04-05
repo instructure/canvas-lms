@@ -54,7 +54,7 @@ describe "interaction with differentiated assignments" do
         create_section_override_for_assignment(@da_assignment)
         @da_assignment.find_or_create_submission(@student)
         # destroy the override providing visibility to the current student
-        AssignmentOverride.find(@da_assignment.assignment_overrides.first!).destroy
+        AssignmentOverride.find(@da_assignment.assignment_overrides.first!.id).destroy
         get "/courses/#{@course.id}/assignments/#{@da_assignment.id}/submissions/#{@student.id}"
         # check the preview frame for the success banner and for your submission text
         in_frame('preview_frame') do
@@ -130,7 +130,7 @@ describe "interaction with differentiated assignments" do
         create_section_override_for_assignment(@da_assignment)
         @da_assignment.find_or_create_submission(@student)
         # destroy the override providing visibility to the current student
-        AssignmentOverride.find(@da_assignment.assignment_overrides.first!).destroy
+        AssignmentOverride.find(@da_assignment.assignment_overrides.first!.id).destroy
         get "/courses/#{@course.id}/assignments/#{@da_assignment.id}/submissions/#{@student.id}"
         # check the preview frame for the success banner and for your submission text
         in_frame('preview_frame') do

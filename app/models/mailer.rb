@@ -37,8 +37,8 @@ class Mailer < ActionMailer::Base
     params[:reply_to] = reply_to if reply_to
 
     mail(params) do |format|
-      format.text{ render text: m.body }
-      format.html{ render text: m.html_body } if m.html_body
+      format.text{ render plain: m.body }
+      format.html{ render html: m.html_body } if m.html_body
     end
   end
 

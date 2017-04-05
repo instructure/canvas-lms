@@ -39,6 +39,8 @@ class AnnouncementsController < ApplicationController
         }
         js_env :is_showing_announcements => true
         js_env :atom_feed_url => feeds_announcements_format_path((@context_enrollment || @context).feed_code, :atom)
+
+        set_tutorial_js_env
       end
     end
   end
@@ -63,7 +65,7 @@ class AnnouncementsController < ApplicationController
         announcements.each do |e|
           feed.entries << e.to_atom
         end
-        render :text => feed.to_xml
+        render :plain => feed.to_xml
       }
       format.rss {
         @announcements = announcements
@@ -83,7 +85,7 @@ class AnnouncementsController < ApplicationController
           channel.items << item
         end
         rss.channel = channel
-        render :text => rss.to_s
+        render :plain => rss.to_s
       }
     end
   end

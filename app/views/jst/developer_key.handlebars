@@ -47,12 +47,12 @@
         <!-- TODO: Add some better stats here, like token count, last usage, etc. -->
     </td>
     <td class='links'>
-        <a href="#" class="edit_link" title="{{#t "edit_key"}}Edit this key{{/t}}"><i class="icon-edit standalone-icon"></i></a>
+        <a href="#" class="edit_link" aria-label="{{#t}}Edit key {{name}}{{/t}}" title="{{#t "edit_key"}}Edit this key{{/t}}"><i class="icon-edit standalone-icon"></i></a>
         {{#if inactive}}
-          <a href="#" class="activate_link" title="{{#t}}Activate this key{{/t}}"><i class="icon-unlock standalone-icon"></i></a>
+          <a href="#" role="checkbox" aria-checked="false" aria-label="{{#t}}Activate key {{name}}{{/t}}" class="activate_link" title="{{#t}}Activate this key{{/t}}"><i class="icon-unlock standalone-icon"></i></a>
         {{else}}
-          <a href="#" class="deactivate_link" title="{{#t}}Deactivate this key{{/t}}"><i class="icon-lock standalone-icon"></i></a>
+          <a href="#" role="checkbox" aria-checked="true" aria-label="{{#t}}Activate key {{name}}{{/t}}" class="deactivate_link" title="{{#t}}Deactivate this key{{/t}}"><i class="icon-lock standalone-icon"></i></a>
         {{/if}}
-        <a href="#" class="delete_link" title="{{#t "delete_key"}}Delete this key{{/t}}"><i class="icon-trash standalone-icon"></i></a>
+        <a href="#" class="delete_link" aria-label="{{#t}}Delete key {{name}}{{/t}}" title="{{#t "delete_key"}}Delete this key{{/t}}"><i class="icon-trash standalone-icon"></i></a>
     </td>
 </tr>

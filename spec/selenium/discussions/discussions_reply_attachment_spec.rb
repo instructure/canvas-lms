@@ -30,6 +30,7 @@ describe "reply attachment" do
   end
 
   it "should delete the attachment from the reply" do
+    skip_if_chrome('Cancel button click does not reliably happen')
     file_attachment = "graded.png"
     entry_text = 'new entry'
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
@@ -47,7 +48,6 @@ describe "reply attachment" do
 
     # click Done
     @last_entry.find_element(:css, '.edit_html_done').click
-
     # attachment is gone
     expect(@last_entry).not_to contain_css('.comment_attachments')
   end

@@ -1,8 +1,9 @@
 define [
+  'jquery'
   '../start_app'
   'ember'
   '../shared_ajax_fixtures'
-], (startApp, Ember, fixtures) ->
+], ($, startApp, Ember, fixtures) ->
 
   App = null
 

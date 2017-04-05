@@ -40,16 +40,18 @@ define [
           $orig.after($key).remove()
         else
           $("#keys tbody").prepend($key)
+        $key.find('.edit_link')[0].focus()
       error: ->
         $("#edit_dialog button.submit").text(I18n.t('button.saving_failed', "Saving Key Failed"))
     })
     return $form
 
-  sendEvent = (event, $orig) ->
+  sendEvent = (event, $orig, focus_selector) ->
     $.ajaxJSON(rawEndpoint() + '/' + $orig.data('key').id, 'PUT', { developer_key: { event: event }},
       (data) ->
         $key = buildKey(data)
         $orig.after($key).remove()
+        $key.find(focus_selector)[0].focus() if focus_selector
     )
 
   rawEndpoint = ->
@@ -76,12 +78,15 @@ define [
   nextPage()
   $("#keys").on('click', '.delete_link', preventDefault ->
     $key = $(this).closest(".key")
+    $prevKey = $key.prev()
+    $toFocus = if $prevKey.length then $prevKey.find('.delete_link')[0] else $('.add_key')[0]
     key = $key.data('key')
     $key.confirmDelete({
       url: "/api/v1/developer_keys/" + key.id,
       message: I18n.t('messages.confirm_delete', 'Are you sure you want to delete this developer key?'),
       success: ->
         $key.remove()
+        $toFocus.focus()
     })
   ).on('click', '.edit_link', preventDefault ->
     $key = $(this).closest(".key")
@@ -90,10 +95,10 @@ define [
     $("#edit_dialog").empty().append($form).dialog('open')
   ).on('click', '.deactivate_link', preventDefault ->
     $key = $(this).closest(".key")
-    sendEvent('deactivate', $key)
+    sendEvent('deactivate', $key, '.activate_link')
   ).on('click', '.activate_link', preventDefault ->
     $key = $(this).closest(".key")
-    sendEvent('activate', $key)
+    sendEvent('activate', $key, '.deactivate_link')
   )
   $(".add_key").click((event) ->
     event.preventDefault()

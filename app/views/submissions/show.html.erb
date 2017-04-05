@@ -1,6 +1,6 @@
 <%
   currently_peer_reviewing = @assessment_request.try(:assigned?)
-  js_bundle :rubric_assessment, :submissions
+  js_bundle :submissions
   css_bundle :submission
   js_env({
     :RUBRIC_ASSESSMENT => {
@@ -294,9 +294,4 @@
       </div>
     </div>
   </div>
-<% js_block do %>
-<script>
-var rubricAssessments = <%= raw @visible_rubric_assessments.to_json(:include => :assessor, :permissions => {:user => @current_user, :session => session}) %>;
-//rubricAssessment.populateRubric($("#rubric_holder"), rubricAssessments.rubric_assessment);
-</script>
-<% end %>
+<% js_env :rubricAssessments => @visible_rubric_assessments.as_json(:include => :assessor, :permissions => {:user => @current_user, :session => session}) %>

@@ -64,7 +64,7 @@ module Lti
         json = JSON.parse(request.body.read)
         render_bad_request and return unless valid_update_request?(json)
         @tool_setting.update_attribute(:custom, custom_settings(tool_setting_type(@tool_setting), json))
-        render nothing: true
+        head :ok
       end
 
       private

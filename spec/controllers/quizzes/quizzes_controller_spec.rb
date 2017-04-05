@@ -130,6 +130,20 @@ describe Quizzes::QuizzesController do
       get 'index', :course_id => @course.id
       expect(assigns[:js_env][:FLAGS][:migrate_quiz_enabled]).to eq(true)
     end
+
+    it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:due_date_required_for_account?).returns(true)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
+    end
+
+    it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:due_date_required_for_account?).returns(false)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
+    end
   end
 
   describe "GET 'new'" do
@@ -610,7 +624,7 @@ describe Quizzes::QuizzesController do
 
     it "should respect section privilege limitations" do
       section = @course.course_sections.create!(:name => 'section 2')
-      @student2.enrollments.update_all(course_section_id: section)
+      @student2.enrollments.update_all(course_section_id: section.id)
 
       ta1 = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
       @course.enroll_ta(ta1).update_attribute(:limit_privileges_to_course_section, true)

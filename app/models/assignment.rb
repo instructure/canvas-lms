@@ -140,7 +140,7 @@ class Assignment < ActiveRecord::Base
 
   def max_name_length
     if AssignmentUtil.assignment_name_length_required?(self)
-      return self.try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value).to_i
+      return AssignmentUtil.assignment_max_name_length(context)
     end
     Assignment.maximum_string_length
   end
@@ -277,7 +277,8 @@ class Assignment < ActiveRecord::Base
     write_attribute(:allowed_extensions, new_value)
   end
 
-  before_save :infer_grading_type,
+  before_save :ensure_post_to_sis_valid,
+              :infer_grading_type,
               :process_if_quiz,
               :default_values,
               :update_submissions_if_details_changed,
@@ -392,7 +393,7 @@ class Assignment < ActiveRecord::Base
     return true if grading_period_was&.id == grading_period&.id
 
     [grading_period_was, grading_period].compact.each do |gp|
-      context.recompute_student_scores(nil, grading_period_id: gp, update_all_grading_period_scores: false)
+      context.recompute_student_scores(grading_period_id: gp)
     end
     true
   end
@@ -435,7 +436,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def turnitin_settings=(settings)
-    settings = Turnitin::Client.normalize_assignment_turnitin_settings(settings)
+    if vericite_enabled?
+      settings = VeriCite::Client.normalize_assignment_vericite_settings(settings)
+    else
+      settings = Turnitin::Client.normalize_assignment_turnitin_settings(settings)
+    end
     unless settings.blank?
       [:created, :error].each do |key|
         settings[key] = self.turnitin_settings[key] if self.turnitin_settings[key]
@@ -494,6 +499,12 @@ class Assignment < ActiveRecord::Base
       return false, nil
     end
   end
+
+  def ensure_post_to_sis_valid
+    self.post_to_sis = false unless gradeable?
+    true
+  end
+  private :ensure_post_to_sis_valid
 
   def default_values
     raise "Assignments can only be assigned to Course records" if self.context_type && self.context_type != "Course"
@@ -1198,7 +1209,7 @@ class Assignment < ActiveRecord::Base
         .where(:enrollments => { :course_id => self.context})
         .merge(Course.instance_exec(&Course.reflections['admin_visible_student_enrollments'].scope).only(:where))
         .order("users.id") # this helps with preventing deadlock with other things that touch lots of users
-        .uniq
+        .distinct
         .to_a
     else
       [student]
@@ -1274,8 +1285,12 @@ class Assignment < ActiveRecord::Base
   end
 
   def tool_settings_tools=(tools)
+    lookup = AssignmentConfigurationToolLookup.find_by(tool: tool_settings_tool, assignment: self)
+    lookup&.destroy_subscription
+
     tool_settings_context_external_tools.clear
     tool_settings_tool_proxies.clear
+
     tools.each do |t|
       if t.instance_of? ContextExternalTool
         tool_settings_context_external_tools << t
@@ -1580,7 +1595,7 @@ class Assignment < ActiveRecord::Base
 
     visible_student_ids = visible_students_for_speed_grader(user).map(&:id)
     context.active_course_sections.joins(:student_enrollments).
-      where(:enrollments => {:user_id => visible_student_ids, :type => "StudentEnrollment"}).uniq.reorder("name")
+      where(:enrollments => {:user_id => visible_student_ids, :type => "StudentEnrollment"}).distinct.reorder("name")
   end
 
   # quiz submission versions are too expensive to de-serialize so we have to
@@ -1698,7 +1713,7 @@ class Assignment < ActiveRecord::Base
     @visible_students_for_speed_grader[[user.global_id, includes]] ||= (
       student_scope = user ? context.students_visible_to(user, include: includes) : context.participating_students
       students_with_visibility(student_scope)
-    ).order_by_sortable_name.uniq.to_a
+    ).order_by_sortable_name.distinct.to_a
   end
 
   def visible_rubric_assessments_for(user, opts={})
@@ -2264,7 +2279,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.assignment_ids_with_submissions(assignment_ids)
-    Submission.having_submission.where(:assignment_id => assignment_ids).uniq.pluck(:assignment_id)
+    Submission.having_submission.where(:assignment_id => assignment_ids).distinct.pluck(:assignment_id)
   end
 
   # override so validations are called
@@ -2382,7 +2397,7 @@ class Assignment < ActiveRecord::Base
     # to just one single check
     return if self.nil? || self.title.nil?
 
-    if self.title.to_s.length > name_length
+    if self.title.to_s.length > name_length && self.grading_type != 'not_graded'
       errors.add(:title, I18n.t('The title cannot be longer than %{length} characters', length: name_length))
     end
   end

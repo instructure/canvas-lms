@@ -153,6 +153,8 @@ class CollaborationsController < ApplicationController
            :CAN_MANAGE_GROUPS => @context.grants_right?(@current_user, session, :manage_groups),
            :collaboration_types => Collaboration.collaboration_types,
            :POTENTIAL_COLLABORATORS_URL => polymorphic_url([:api_v1, @context, :potential_collaborators])
+
+    set_tutorial_js_env
   end
 
   # @API List collaborations
@@ -240,6 +242,8 @@ class CollaborationsController < ApplicationController
         :context_asset_string => parent_context.try(:asset_string)
       }
     end
+
+    set_tutorial_js_env
 
     render :text => "".html_safe, :layout => true
   end

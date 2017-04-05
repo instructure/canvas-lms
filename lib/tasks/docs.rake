@@ -22,7 +22,7 @@ namespace :doc do
     ]
 
     t.options = %W[
-      -e lib/api_routes.rb
+      -e doc/api/api_routes.rb
       --title "Canvas REST API"
       -p doc
       -t api

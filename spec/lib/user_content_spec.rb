@@ -135,16 +135,16 @@ describe UserContent do
 
   describe ".escape" do
     it "stuffs mathml into a data attribute on equation images" do
-      string = "<div><ul><li><img class='equation_image' alt='\int f(x)/g(x)'/></li>"\
-             "<li><img class='equation_image' alt='\\sum 1..n'/></li>"\
+      string = "<div><ul><li><img class='equation_image' data-equation-content='\int f(x)/g(x)'/></li>"\
+             "<li><img class='equation_image' data-equation-content='\\sum 1..n'/></li>"\
              "<li><img class='nothing_special'></li></ul></div>"
       html = UserContent.escape(string)
       expected = "<div><ul>\n"\
         "<li>\n"\
-        "<img class=\"equation_image\" alt=\"int f(x)/g(x)\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo><mo>/</mo><mi>g</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo></math></span>\n"\
+        "<img class=\"equation_image\" data-equation-content=\"int f(x)/g(x)\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo><mo>/</mo><mi>g</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo></math></span>\n"\
         "</li>\n"\
         "<li>\n"\
-        "<img class=\"equation_image\" alt=\"\\sum 1..n\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mo lspace=\"thinmathspace\" rspace=\"thinmathspace\">&amp;Sum;</mo><mn>1</mn><mo>.</mo><mo>.</mo><mi>n</mi></math></span>\n"\
+        "<img class=\"equation_image\" data-equation-content=\"\\sum 1..n\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mo lspace=\"thinmathspace\" rspace=\"thinmathspace\">&amp;Sum;</mo><mn>1</mn><mo>.</mo><mo>.</mo><mi>n</mi></math></span>\n"\
         "</li>\n"\
         "<li><img class=\"nothing_special\"></li>\n"\
         "</ul></div>"
@@ -152,4 +152,3 @@ describe UserContent do
     end
   end
 end
-

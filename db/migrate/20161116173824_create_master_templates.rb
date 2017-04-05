@@ -11,6 +11,5 @@ class CreateMasterTemplates < ActiveRecord::Migration[4.2]
 
     add_foreign_key :master_courses_master_templates, :courses
     add_index :master_courses_master_templates, :course_id
-    add_index :master_courses_master_templates, :course_id, :unique => true, :where => "full_course AND workflow_state <> 'deleted'" # should probably only have one of these
   end
 end

@@ -9,6 +9,7 @@ const BundleExtensionsPlugin = require('./BundleExtensionsPlugin')
 const ClientAppsPlugin = require('./clientAppPlugin')
 const CompiledReferencePlugin = require('./CompiledReferencePlugin')
 const I18nPlugin = require('./i18nPlugin')
+const SelinimumManifestPlugin = require('./SelinimumManifestPlugin')
 const WebpackHooks = require('./webpackHooks')
 const webpackPublicPath = require('./webpackPublicPath')
 const HappyPack = require('happypack')
@@ -86,7 +87,6 @@ module.exports = {
   resolve: {
     alias: {
       d3: 'd3/d3',
-      handlebars: require.resolve('handlebars/dist/handlebars.runtime'),
       'node_modules-version-of-backbone': require.resolve('backbone'),
       'node_modules-version-of-react-modal': require.resolve('react-modal'),
 
@@ -115,7 +115,7 @@ module.exports = {
       'node_modules'
     ],
 
-    extensions: ['.js', '.jsx']
+    extensions: ['.js']
   },
 
   module: {
@@ -155,7 +155,7 @@ module.exports = {
         ])
       },
       {
-        test: /\.jsx?$/,
+        test: /\.js$/,
         include: [
           path.resolve(__dirname, '../app/jsx'),
           path.resolve(__dirname, '../spec/javascripts/jsx'),
@@ -166,7 +166,7 @@ module.exports = {
         ])
       },
       {
-        test: /\.jsx?$/,
+        test: /\.js$/,
         include: [/client_apps\/canvas_quizzes\/apps\//],
         loaders: ['jsx-loader']
       },
@@ -212,10 +212,6 @@ module.exports = {
         loader: 'exports-loader?window.jQuery'
       },
       {
-        test: /node_modules\/handlebars\/dist\/handlebars\.runtime/,
-        loader: 'exports-loader?Handlebars'
-      },
-      {
         test: /vendor\/md5/,
         loader: 'exports-loader?CryptoJS'
       },
@@ -231,17 +227,14 @@ module.exports = {
     // A lot of our files expect a global `I18n` variable, this will provide it if it is used
     new webpack.ProvidePlugin({I18n: 'vendor/i18n'}),
 
-    // sets these envirnment variables in compiled code.
+    // sets these environment variables in compiled code.
     // process.env.NODE_ENV will make it so react and others are much smaller and don't run their
-    // debug/proptype checking in prod.
-    // if you need to do something in webpack that you don't do in requireJS, you can do
-    // if (window.USE_WEBPACK) { // do something that will only happen in webpack}
+    // debug/propType checking in prod.
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-      'window.USE_WEBPACK': JSON.stringify(true)
     }),
 
-    // handles our custom 18n stuff
+    // handles our custom i18n stuff
     new I18nPlugin(),
 
     // handles the the quiz stats and quiz log auditing client_apps
@@ -257,6 +250,11 @@ module.exports = {
     new WebpackHooks(),
 
   ]
+  .concat(process.env.SELINIMUM_RUN || process.env.SELINIMUM_CAPTURE ? [
+
+    new SelinimumManifestPlugin()
+
+  ] : [])
   .concat(happypackPlugins)
   .concat(process.env.NODE_ENV === 'test' ? [] : [
 

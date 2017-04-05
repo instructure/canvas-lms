@@ -2,11 +2,6 @@ require 'pathname'
 require 'yaml'
 require 'open3'
 
-# Some of the functionality for fingerprint lookup here is mirrored in
-# frontend_build/brandableCss.js, because shelling out to run this
-# stuff take FOREVER in the webpack build.  That means for the time being,
-# changes here if they happen may need to be mirrored in that file.
-
 module BrandableCSS
   APP_ROOT = defined?(Rails) && Rails.root || Pathname.pwd
   CONFIG = YAML.load_file(APP_ROOT.join('config/brandable_css.yml')).freeze

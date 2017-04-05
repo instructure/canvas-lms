@@ -39,8 +39,4 @@ requirejs.config({
   shim: {
     qtip: [ 'jquery' ]
   },
-
-  jsx: {
-    fileExtension: '.jsx'
-  },
 });

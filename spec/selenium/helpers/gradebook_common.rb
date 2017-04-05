@@ -7,6 +7,7 @@ module GradebookCommon
     let(:save_button) { fj('button span:contains("Save")') }
     let(:hide_notes) { f(".hide") }
   end
+
   shared_context 'reusable_course' do
     let(:test_course)       { course_factory(active_course: true) }
     let(:teacher)           { user_factory(active_all: true) }
@@ -72,13 +73,11 @@ module GradebookCommon
 
     @students = []
     (1..num).each do |i|
-      student = User.create!(:name => "Student_#{i}")
+      student = User.create!(name: "Student_#{i}")
       student.register!
 
       e1 = @course.enroll_student(student)
-      e1.workflow_state = 'active'
-      e1.save!
-      @course.reload
+      e1.update!(workflow_state: 'active')
 
       @students.push student
     end
@@ -159,14 +158,10 @@ module GradebookCommon
   def conclude_and_unconclude_course
     # conclude course
     @course.complete!
-    @user.reload
     @user.cached_current_enrollments
-    @enrollment.reload
 
     # un-conclude course
-    @enrollment.workflow_state = 'active'
-    @enrollment.save!
-    @course.reload
+    @enrollment.update!(workflow_state: 'active')
   end
 
   def gradebook_data_setup(opts={})
@@ -203,111 +198,103 @@ module GradebookCommon
   end
 
   def assignment_setup(opts={})
-    course_with_teacher({active_all: true}.merge(opts))
+    course_with_teacher({ active_all: true }.merge(opts))
     @course.grading_standard_enabled = true
     @course.save!
-    @course.reload
 
     # add first student
-    @student_1 = User.create!(:name => @student_name_1)
+    @student_1 = User.create!(name: @student_name_1)
     @student_1.register!
-    @student_1.pseudonyms.create!(:unique_id => "nobody1@example.com", :password => @default_password, :password_confirmation => @default_password)
+    @student_1.pseudonyms.create!(unique_id: "nobody1@example.com", password: @default_password, password_confirmation: @default_password)
 
     e1 = @course.enroll_student(@student_1)
-    e1.workflow_state = 'active'
-    e1.save!
-    @course.reload
+    e1.update!(workflow_state: 'active')
 
     # add second student
-    @other_section = @course.course_sections.create(:name => "the other section")
-    @student_2 = User.create!(:name => @student_name_2)
+    @other_section = @course.course_sections.create(name: "the other section")
+    @student_2 = User.create!(name: @student_name_2)
     @student_2.register!
-    @student_2.pseudonyms.create!(:unique_id => "nobody2@example.com", :password => @default_password, :password_confirmation => @default_password)
-    e2 = @course.enroll_student(@student_2, :section => @other_section)
+    @student_2.pseudonyms.create!(unique_id: "nobody2@example.com", password: @default_password, password_confirmation: @default_password)
+    e2 = @course.enroll_student(@student_2, section: @other_section)
 
-    e2.workflow_state = 'active'
-    e2.save!
-    @course.reload
+    e2.update!(workflow_state: 'active')
 
     # add third student
-    @student_3 = User.create!(:name => @student_name_3)
+    @student_3 = User.create!(name: @student_name_3)
     @student_3.register!
-    @student_3.pseudonyms.create!(:unique_id => "nobody3@example.com", :password => @default_password, :password_confirmation => @default_password)
+    @student_3.pseudonyms.create!(unique_id: "nobody3@example.com", password: @default_password, password_confirmation: @default_password)
     e3 = @course.enroll_student(@student_3)
-    e3.workflow_state = 'active'
-    e3.save!
-    @course.reload
+    e3.update!(workflow_state: 'active')
 
     @all_students = [@student_1, @student_2, @student_3]
 
     # first assignment data
-    @group = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 100)
+    @group = @course.assignment_groups.create!(name: 'first assignment group', group_weight: 100)
     @first_assignment = assignment_model({
-                                             :course => @course,
-                                             :name => 'A name that would not reasonably fit in the header cell which should have some limit set',
-                                             :due_at => nil,
-                                             :points_possible => @assignment_1_points,
-                                             :submission_types => 'online_text_entry,online_upload',
-                                             :assignment_group => @group
-                                         })
+      course: @course,
+      name: 'A name that would not reasonably fit in the header cell which should have some limit set',
+      due_at: nil,
+      points_possible: @assignment_1_points,
+      submission_types: 'online_text_entry,online_upload',
+      assignment_group: @group
+    })
     rubric_model
-    @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
-    @assignment.reload
-    @assignment.submit_homework(@student_1, :body => 'student 1 submission assignment 1')
+    @association = @rubric.associate_with(@assignment, @course, purpose: 'grading')
+    @assignment.submit_homework(@student_1, body: 'student 1 submission assignment 1')
     @assignment.grade_student(@student_1, grade: 10, grader: @teacher)
 
     # second student submission for assignment 1
-    @assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 1')
+    @assignment.submit_homework(@student_2, body: 'student 2 submission assignment 1')
     @assignment.grade_student(@student_2, grade: 5, grader: @teacher)
 
     # third student submission for assignment 1
-    @student_3_submission = @assignment.submit_homework(@student_3, :body => 'student 3 submission assignment 1')
+    @student_3_submission = @assignment.submit_homework(@student_3, body: 'student 3 submission assignment 1')
     @assignment.grade_student(@student_3, grade: 5, grader: @teacher)
 
     # second assignment data
     @second_assignment = assignment_model({
-                                              :course => @course,
-                                              :name => 'second assignment',
-                                              :due_at => nil,
-                                              :points_possible => @assignment_2_points,
-                                              :submission_types => 'online_text_entry',
-                                              :assignment_group => @group
-                                          })
-    @second_association = @rubric.associate_with(@second_assignment, @course, :purpose => 'grading')
+      course: @course,
+      name: 'second assignment',
+      due_at: nil,
+      points_possible: @assignment_2_points,
+      submission_types: 'online_text_entry',
+      assignment_group: @group
+    })
+    @second_association = @rubric.associate_with(@second_assignment, @course, purpose: 'grading')
 
     # all students get a 5 on assignment 2
     @all_students.each do |s|
-      @second_assignment.submit_homework(s, :body => "#{s.name} submission assignment 2")
+      @second_assignment.submit_homework(s, body: "#{s.name} submission assignment 2")
       @second_assignment.grade_student(s, grade: 5, grader: @teacher)
     end
 
     # third assignment data
     due_date = Time.zone.now + 1.day
     @third_assignment = assignment_model({
-                                             :course => @course,
-                                             :name => 'assignment three',
-                                             :due_at => due_date,
-                                             :points_possible => @assignment_3_points,
-                                             :submission_types => 'online_text_entry',
-                                             :assignment_group => @group
-                                         })
-    @third_association = @rubric.associate_with(@third_assignment, @course, :purpose => 'grading')
+      course: @course,
+      name: 'assignment three',
+      due_at: due_date,
+      points_possible: @assignment_3_points,
+      submission_types: 'online_text_entry',
+      assignment_group: @group
+    })
+    @third_association = @rubric.associate_with(@third_assignment, @course, purpose: 'grading')
 
     # attendance assignment
     @attendance_assignment = assignment_model({
-                                                  :course => @course,
-                                                  :name => 'attendance assignment',
-                                                  :title => 'attendance assignment',
-                                                  :due_at => nil,
-                                                  :points_possible => @attendance_points,
-                                                  :submission_types => 'attendance',
-                                                  :assignment_group => @group,
-                                              })
+      course: @course,
+      name: 'attendance assignment',
+      title: 'attendance assignment',
+      due_at: nil,
+      points_possible: @attendance_points,
+      submission_types: 'attendance',
+      assignment_group: @group,
+    })
 
     @ungraded_assignment = @course.assignments.create!(
-      :title => 'not-graded assignment',
-      :submission_types => 'not_graded',
-      :assignment_group => @group
+      title: 'not-graded assignment',
+      submission_types: 'not_graded',
+      assignment_group: @group
     )
   end
 

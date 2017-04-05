@@ -83,6 +83,7 @@ class Role < ActiveRecord::Base
   def infer_root_account_id
     unless self.account
       self.errors.add(:account_id)
+      throw :abort unless CANVAS_RAILS4_2
       return false
     end
     self.root_account_id = self.account.root_account_id || self.account.id
@@ -248,9 +249,9 @@ class Role < ActiveRecord::Base
   def self.custom_roles_and_counts_for_course(course, user, include_inactive=false)
     users_scope = course.users_visible_to(user)
     base_counts = users_scope.where('enrollments.role_id IS NULL OR enrollments.role_id IN (?)',
-                                    Role.built_in_course_roles.map(&:id)).group('enrollments.type').select('users.id').uniq.count
+                                    Role.built_in_course_roles.map(&:id)).group('enrollments.type').select('users.id').distinct.count
     role_counts = users_scope.where('enrollments.role_id IS NOT NULL AND enrollments.role_id NOT IN (?)',
-                                    Role.built_in_course_roles.map(&:id)).group('enrollments.role_id').select('users.id').uniq.count
+                                    Role.built_in_course_roles.map(&:id)).group('enrollments.role_id').select('users.id').distinct.count
 
     @enrollment_types = Role.all_enrollment_roles_for_account(course.account, include_inactive)
     @enrollment_types.each do |base_type|

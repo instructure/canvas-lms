@@ -1,3 +1,0 @@
-require [
-  'take_quiz'
-]

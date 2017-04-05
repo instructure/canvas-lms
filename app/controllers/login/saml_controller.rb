@@ -186,7 +186,7 @@ class Login::SamlController < ApplicationController
 
   def destroy
     unless params[:SAMLResponse] || params[:SAMLRequest]
-      return render status: :bad_request, text: "SAMLRequest or SAMLResponse required"
+      return render status: :bad_request, plain: "SAMLRequest or SAMLResponse required"
     end
 
     if params[:SAMLResponse]
@@ -194,7 +194,7 @@ class Login::SamlController < ApplicationController
       saml_response = Onelogin::Saml::LogoutResponse.parse(params[:SAMLResponse])
 
       aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: saml_response.issuer).first
-      return render status: :bad_request, text: "Could not find SAML Entity" unless aac
+      return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
 
       settings = aac.saml_settings(request.host_with_port)
       saml_response.process(settings)
@@ -253,7 +253,7 @@ class Login::SamlController < ApplicationController
       increment_saml_stat("logout_request_received")
       saml_request = Onelogin::Saml::LogoutRequest.parse(params[:SAMLRequest])
       aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: saml_request.issuer).first
-      return render status: :bad_request, text: "Could not find SAML Entity" unless aac
+      return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
 
       settings = aac.saml_settings(request.host_with_port)
       saml_request.process(settings)

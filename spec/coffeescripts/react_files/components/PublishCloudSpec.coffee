@@ -1,5 +1,5 @@
 define [
-  '../mockFilesENV' + (if window.USE_WEBPACK then '.coffee' else '')
+  '../mockFilesENV.coffee'
   'react'
   'react-dom'
   'react-addons-test-utils'

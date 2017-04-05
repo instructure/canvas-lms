@@ -273,18 +273,11 @@ define([
       } else if (_preloadedData[name]) {
         return _preloadedData[name];
       } else {
-        return new Promise(function(resolve, reject){
-          if (window.USE_WEBPACK) {
-            return reject(
-              new Error('In webpack, loading timezones on-demand is not supported. "' +
-                        name + '" should already be script tagged onto the page from Rails.')
-            )
-          } else {
-            require(['timezone/' + name], function (timezoneData){
-              _preloadedData[name] = timezoneData;
-              resolve(timezoneData);
-            });
-          }
+        return new Promise(function (resolve, reject) {
+          return reject(new Error(
+            'In webpack, loading timezones on-demand is not supported. ' +
+            name + '" should already be script-tagged onto the page from Rails.'
+          ))
         });
       }
     },

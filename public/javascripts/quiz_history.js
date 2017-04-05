@@ -47,7 +47,7 @@ define([
     $quizBody: null,
 
     jumpPosition: function(question_id) {
-      $question = $("#question_" + question_id);
+      var $question = $("#question_" + question_id);
       if($question.length > 0) {
         return $question.offset().top - 110;
       } else {
@@ -295,9 +295,9 @@ define([
       var qNum = 1;
       var qArray = gradingForm.questions();
       var docScroll = $(document).scrollTop();
-      $questions = $('.question')
+      var $questions = $('.question')
       for(var t = 0; t <= qArray.length; t++) {
-        $question = $($questions[t])
+        var $question = $($questions[t])
         var currentQuestionNum = t + 1;
         if ( (docScroll > qArray[t] && docScroll < qArray[t+1])  || ( t == (qArray.length - 1) && docScroll > qArray[t])) {
           qNum = currentQuestionNum;
@@ -347,7 +347,7 @@ define([
           quizNavBar.index = maxStartingIndex + quizNavBar.windowScrollLength();
         }
 
-        endingIndex = startingIndex + quizNavBar.windowSize - 1;
+        var endingIndex = startingIndex + quizNavBar.windowSize - 1;
         quizNavBar.showQuestionsInWindow(startingIndex, endingIndex);
       }
     },

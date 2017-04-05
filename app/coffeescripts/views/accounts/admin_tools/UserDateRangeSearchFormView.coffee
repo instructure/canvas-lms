@@ -46,9 +46,13 @@ define [
       @inputFilterView.collection.on 'setParam deleteParam', @fetchUsers
       @usersView.collection.on 'selectedModelChange', @selectUser
       @usersView.collection.on 'sync', @resultsFound
+      @collection.on 'sync', @notificationsFound
 
     resultsFound: =>
       $.screenReaderFlashMessage(I18n.t('results_found', "%{length} results found", { length: @usersView.collection.length }))
+
+    notificationsFound: =>
+      $.screenReaderFlashMessage(I18n.t('%{length} notifications found', { length: @collection.length }))
 
     fetchUsers: =>
       @selectUser null

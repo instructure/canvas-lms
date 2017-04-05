@@ -25,6 +25,108 @@ describe Canvas::LiveEvents do
     expect(LiveEvents).to receive(:post_event).with(event_name, event_body, anything, event_context)
   end
 
+  describe '.amended_context' do
+    it 'pulls the context from the canvas context' do
+      course = course_model
+      amended_context = Canvas::LiveEvents.amended_context(course)
+
+      context_id = course.global_id
+      context_type = course.class.to_s
+      root_account_id = course.root_account.global_id
+      root_account_uuid = course.root_account.uuid
+      root_account_lti_guid = course.root_account.lti_guid
+
+      expect(amended_context).to eq(
+        {
+          :context_id => context_id,
+          :context_type => context_type,
+          :root_account_id => root_account_id,
+          :root_account_uuid => root_account_uuid,
+          :root_account_lti_guid => root_account_lti_guid
+        }
+      )
+    end
+  end
+
+  describe ".enrollment_updated" do
+    it "should not include associated_user_id for non-observer enrollments" do
+      enrollment = course_with_student
+      expect_event('enrollment_updated', hash_excluding(:associated_user_id))
+      Canvas::LiveEvents.enrollment_updated(enrollment)
+    end
+
+    it "should include nil associated_user_id for unassigned observer enrollment" do
+      enrollment = course_with_observer
+      expect_event('enrollment_updated',
+        hash_including(
+          associated_user_id: nil
+        ))
+      Canvas::LiveEvents.enrollment_updated(enrollment)
+    end
+
+    it "should include non-nil associated_user_id for assigned observer enrollment" do
+      observee = user_model
+      enrollment = course_with_observer
+      enrollment.associated_user = observee
+      expect_event('enrollment_updated',
+        hash_including(
+          associated_user_id: observee.global_id.to_s
+        ))
+      Canvas::LiveEvents.enrollment_updated(enrollment)
+    end
+  end
+
+  describe ".group_updated" do
+    it "should include the context" do
+      course = course_model
+      group = group_model(context: course)
+      expect_event('group_updated',
+        hash_including(
+          group_id: group.global_id.to_s,
+          context_type: 'Course',
+          context_id: course.global_id.to_s
+        ))
+      Canvas::LiveEvents.group_updated(group)
+    end
+
+    it "should include the account" do
+      account = account_model
+      course = course_model(account: account)
+      group = group_model(context: course)
+      expect_event('group_updated',
+        hash_including(
+          group_id: group.global_id.to_s,
+          account_id: account.global_id.to_s
+        ))
+      Canvas::LiveEvents.group_updated(group)
+    end
+
+    it "should include the workflow_state" do
+      group = group_model
+      expect_event('group_updated',
+        hash_including(
+          group_id: group.global_id.to_s,
+          workflow_state: group.workflow_state
+        ))
+      Canvas::LiveEvents.group_updated(group)
+    end
+  end
+
+  describe ".group_membership_updated" do
+    it "should include the workflow_state" do
+      user = user_model
+      group = group_model
+      membership = group_membership_model(group: group, user: user)
+
+      expect_event('group_membership_updated',
+        hash_including(
+          group_membership_id: membership.global_id.to_s,
+          workflow_state: membership.workflow_state
+        ))
+      Canvas::LiveEvents.group_membership_updated(membership)
+    end
+  end
+
   describe ".wiki_page_updated" do
     before(:each) do
       course_with_teacher
@@ -75,6 +177,7 @@ describe Canvas::LiveEvents do
   describe ".grade_changed" do
     let(:course_context) do
       hash_including(
+        root_account_uuid: @course.root_account.uuid,
         root_account_id: @course.root_account.global_id,
         root_account_lti_guid: @course.root_account.lti_guid,
         context_id: @course.global_id,
@@ -158,6 +261,7 @@ describe Canvas::LiveEvents do
 
     it "includes course context even when global course context unset" do
       allow(LiveEvents).to receive(:get_context).and_return({
+        root_account_uuid: nil,
         root_account_id: nil,
         root_account_lti_guid: nil,
         context_id: nil,
@@ -232,6 +336,21 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".submission_created" do
+    it "should include the user_id and assignment_id" do
+      course_with_student_submissions
+      submission = @course.assignments.first.submissions.first
+
+      expect_event('submission_created',
+        hash_including(
+          user_id: @student.global_id.to_s,
+          assignment_id: submission.global_assignment_id.to_s,
+          lti_assignment_id: submission.assignment.lti_context_id
+        ))
+      Canvas::LiveEvents.submission_created(submission)
+    end
+  end
+
   describe ".submission_updated" do
     it "should include the user_id and assignment_id" do
       course_with_student_submissions
@@ -240,9 +359,24 @@ describe Canvas::LiveEvents do
       expect_event('submission_updated',
         hash_including(
           user_id: @student.global_id.to_s,
-          assignment_id: submission.global_assignment_id.to_s
+          assignment_id: submission.global_assignment_id.to_s,
+          lti_assignment_id: submission.assignment.lti_context_id
         ))
       Canvas::LiveEvents.submission_updated(submission)
+    end
+  end
+
+  describe '.plagiarism_resubmit' do
+    it "should include the user_id and assignment_id" do
+      course_with_student_submissions
+      submission = @course.assignments.first.submissions.first
+      expect_event('plagiarism_resubmit',
+        hash_including(
+          user_id: @student.global_id.to_s,
+          assignment_id: submission.global_assignment_id.to_s,
+          lti_assignment_id: submission.assignment.lti_context_id
+        ))
+      Canvas::LiveEvents.plagiarism_resubmit(submission)
     end
   end
 
@@ -278,6 +412,30 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe '.assignment_created' do
+    it 'triggers a live event with assignment details' do
+      course_with_student_submissions
+      assignment = @course.assignments.first
+
+      expect_event('assignment_created',
+        hash_including({
+          assignment_id: assignment.global_id.to_s,
+          context_id: @course.global_id.to_s,
+          context_type: 'Course',
+          workflow_state: assignment.workflow_state,
+          title: assignment.title,
+          description: assignment.description,
+          due_at: assignment.due_at,
+          unlock_at: assignment.unlock_at,
+          lock_at: assignment.lock_at,
+          points_possible: assignment.points_possible,
+          lti_assignment_id: assignment.lti_context_id
+        })).once
+
+      Canvas::LiveEvents.assignment_created(assignment)
+    end
+  end
+
   describe '.assignment_updated' do
     it 'triggers a live event with assignment details' do
       course_with_student_submissions
@@ -294,9 +452,9 @@ describe Canvas::LiveEvents do
           due_at: assignment.due_at,
           unlock_at: assignment.unlock_at,
           lock_at: assignment.lock_at,
-          points_possible: assignment.points_possible
-        })
-      ).once
+          points_possible: assignment.points_possible,
+          lti_assignment_id: assignment.lti_context_id
+        })).once
 
       Canvas::LiveEvents.assignment_updated(assignment)
     end

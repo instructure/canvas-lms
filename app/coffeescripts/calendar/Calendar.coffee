@@ -40,7 +40,7 @@ define [
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
-      @contextCodes = (context.asset_string for context in contexts)
+      @contextCodes = (context.asset_string for context in @contexts)
       @visibleContextList = []
       # Display appointment slots for the specified appointment group
       @displayAppointmentEvents = null

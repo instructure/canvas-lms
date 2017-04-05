@@ -85,7 +85,7 @@ module GradezillaCommon
   end
 
   def set_default_grade(cell_index, points = "5")
-    f('[data-menu-item-id="set-default-grade"]').click
+    move_to_click('[data-menu-item-id="set-default-grade"]')
     dialog = find_with_jquery('.ui-dialog:visible')
     f('.grading_value').send_keys(points)
     submit_dialog(dialog, '.ui-button')
@@ -93,8 +93,8 @@ module GradezillaCommon
   end
 
   def toggle_muting(assignment)
-    find_with_jquery(".gradebook-header-drop[data-assignment-id='#{assignment.id}']").click
-    find_with_jquery('[data-action="toggleMuting"]').click
+    find_with_jquery(".slick-header-column[id*='assignment_#{assignment.id}'] .Gradebook__ColumnHeaderAction").click
+    find_with_jquery('[data-menu-item-id="assignment-muter"]').click
     find_with_jquery('.ui-dialog-buttonpane [data-action$="mute"]:visible').click
     wait_for_ajaximations
   end

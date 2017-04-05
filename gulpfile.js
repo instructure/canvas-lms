@@ -16,13 +16,6 @@ const STUFF_TO_REV = [
   // when using webpack, we put a script tag for these directly on the page out-of-band from webpack
   'public/javascripts/vendor/timezone/**/*',
 
-  // But for all other javascript, we only load stuff using js_bundle.
-  // Meaning that we only include stuff in the "bundles" dir from rails.
-  // In prod, the 'optimized' versions of these bundles will include all their deps
-  'public/javascripts/compiled/bundles/**/*',
-  'public/optimized/compiled/bundles/**/*',
-  'public/javascripts/plugins/*/compiled/bundles/**/*',
-  'public/optimized/plugins/*/compiled/bundles/**/*',
 
   // Special Cases:
 

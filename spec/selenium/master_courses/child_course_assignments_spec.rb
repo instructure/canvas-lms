@@ -23,35 +23,41 @@ describe "master courses - child courses - assignment locking" do
     user_session(@teacher)
   end
 
-  it "should not show the cog-menu options on the index when locked" do
-    @tag.update_attribute(:restrictions, {:all => true})
+  it "should not allow the delete cog-menu option on the index when locked" do
+    @tag.update_attribute(:restrictions, {:content => true})
 
     get "/courses/#{@copy_to.id}/assignments"
 
     expect(f('.master-course-cell')).to contain_css('.icon-lock')
 
-    expect(f('.assignment')).to_not contain_css('.al-trigger')
+    f('.al-trigger').click
+    expect(f('.assignment')).to contain_css('a.delete_assignment.disabled')
   end
 
-  it "should show the cog-menu options on the index when not locked" do
+  it "should show the delete cog-menu option on the index when not locked" do
     get "/courses/#{@copy_to.id}/assignments"
 
     expect(f('.master-course-cell')).to contain_css('.icon-unlock')
 
-    expect(f('.assignment')).to contain_css('.al-trigger')
+    f('.al-trigger').click
+    expect(f('.assignment')).to_not contain_css('a.delete_assignment.disabled')
+    expect(f('.assignment')).to contain_css('a.delete_assignment')
   end
 
-  it "should not show the edit/delete options on the show page when locked" do
-    @tag.update_attribute(:restrictions, {:all => true})
+  it "should not allow the delete options on the edit page when locked" do
+    @tag.update_attribute(:restrictions, {:content => true})
 
-    get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}"
+    get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
-    expect(f('#content')).to_not contain_css('.edit_assignment_link')
+    f('.al-trigger').click
+    expect(f('#edit_assignment_header')).to contain_css('a.delete_assignment_link.disabled')
   end
 
-  it "should show the edit/delete cog-menu options on the show when not locked" do
-    get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}"
+  it "should show the delete cog-menu options on the edit when not locked" do
+    get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
-    expect(f('#content')).to contain_css('.edit_assignment_link')
+    f('.al-trigger').click
+    expect(f('#edit_assignment_header')).to_not contain_css('a.delete_assignment_link.disabled')
+    expect(f('#edit_assignment_header')).to contain_css('a.delete_assignment_link')
   end
 end

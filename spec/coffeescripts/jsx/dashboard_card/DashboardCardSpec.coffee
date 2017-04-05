@@ -1,4 +1,5 @@
 define [
+  'jquery'
   'react'
   'react-dom'
   'react-addons-test-utils'
@@ -6,7 +7,7 @@ define [
   'jsx/dashboard_card/DashboardCard'
   'jsx/dashboard_card/CourseActivitySummaryStore',
   'helpers/assertions'
-], (React, ReactDOM, TestUtils, _, DashboardCard, CourseActivitySummaryStore, assertions) ->
+], ($, React, ReactDOM, TestUtils, _, DashboardCard, CourseActivitySummaryStore, assertions) ->
 
   QUnit.module 'DashboardCard',
     setup: ->

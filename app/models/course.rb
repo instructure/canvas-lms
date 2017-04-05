@@ -53,7 +53,7 @@ class Course < ActiveRecord::Base
 
   has_many :course_sections
   has_many :active_course_sections, -> { where(workflow_state: 'active') }, class_name: 'CourseSection'
-  has_many :enrollments, -> { preload(:user).where("enrollments.workflow_state<>'deleted'") }, dependent: :destroy, inverse_of: :course
+  has_many :enrollments, -> { where("enrollments.workflow_state<>'deleted'") }, dependent: :destroy, inverse_of: :course
 
   has_many :all_enrollments, :class_name => 'Enrollment'
   has_many :current_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").preload(:user) }, class_name: 'Enrollment'
@@ -117,9 +117,9 @@ class Course < ActiveRecord::Base
 
   has_many :course_account_associations
   has_many :non_unique_associated_accounts, -> { order('course_account_associations.depth') }, source: :account, through: :course_account_associations
-  has_many :users, -> { uniq }, through: :enrollments, source: :user
-  has_many :current_users, -> { uniq }, through: :current_enrollments, source: :user
-  has_many :all_current_users, -> { uniq }, through: :all_current_enrollments, source: :user
+  has_many :users, -> { distinct }, through: :enrollments, source: :user
+  has_many :current_users, -> { distinct }, through: :current_enrollments, source: :user
+  has_many :all_current_users, -> { distinct }, through: :all_current_enrollments, source: :user
   has_many :group_categories, -> {where(deleted_at: nil) }, as: :context, inverse_of: :context
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context, :inverse_of => :context
   has_many :groups, :as => :context, :inverse_of => :context
@@ -352,6 +352,7 @@ class Course < ActiveRecord::Base
       end
     end
 
+    throw :abort if !is_unique && !CANVAS_RAILS4_2
     is_unique
   end
 
@@ -608,7 +609,7 @@ class Course < ActiveRecord::Base
     # enrollments as well as active enrollments
     user_id = args[0]
     workflow_states = (args[1].present? ? %w{'active' 'completed'} : %w{'active'}).join(', ')
-    uniq.joins("INNER JOIN (
+    distinct.joins("INNER JOIN (
          SELECT caa.course_id, au.user_id FROM #{CourseAccountAssociation.quoted_table_name} AS caa
          INNER JOIN #{Account.quoted_table_name} AS a ON a.id = caa.account_id AND a.workflow_state = 'active'
          INNER JOIN #{AccountUser.quoted_table_name} AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i}
@@ -693,7 +694,7 @@ class Course < ActiveRecord::Base
     scope = User.joins(:not_ended_enrollments).
       where(enrollments: {course_id: self, type: 'StudentEnrollment'}).
       where(Group.not_in_group_sql_fragment(groups.map(&:id))).
-      select("users.id, users.name, users.updated_at").uniq
+      select("users.id, users.name, users.updated_at").distinct
     scope = scope.select(opts[:order]).order(opts[:order]) if opts[:order]
     scope
   end
@@ -702,7 +703,7 @@ class Course < ActiveRecord::Base
     scope = current_enrollments.
       where(:course_id => self, :user_id => user_id).
       where("course_section_id IS NOT NULL")
-    section_ids = scope.uniq.pluck(:course_section_id)
+    section_ids = scope.distinct.pluck(:course_section_id)
     participating_instructors.restrict_to_sections(section_ids)
   end
 
@@ -1045,17 +1046,31 @@ class Course < ActiveRecord::Base
   end
 
   def recompute_student_scores(student_ids = nil, grading_period_id: nil, update_all_grading_period_scores: true)
+    inst_job_opts = {}
+    if student_ids.blank? && grading_period_id.nil? && update_all_grading_period_scores
+      # if we have all default args, let's queue this job in a singleton to avoid duplicates
+      inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}"
+    end
+
+    send_later_if_production_enqueue_args(
+      :recompute_student_scores_without_send_later,
+      inst_job_opts,
+      student_ids,
+      grading_period_id: grading_period_id,
+      update_all_grading_period_scores: update_all_grading_period_scores
+    )
+  end
+
+  def recompute_student_scores_without_send_later(student_ids = nil, opts = {})
     student_ids ||= self.student_ids
     Rails.logger.info "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
     Enrollment.recompute_final_score(
       student_ids,
       self.id,
-      grading_period_id: grading_period_id,
-      update_all_grading_period_scores: update_all_grading_period_scores
+      grading_period_id: opts[:grading_period_id],
+      update_all_grading_period_scores: opts.fetch(:update_all_grading_period_scores, true)
     )
   end
-  handle_asynchronously_if_production :recompute_student_scores,
-    :singleton => proc { |c| "recompute_student_scores:#{ c.global_id }" }
 
   def home_page
     self.wiki.front_page
@@ -2416,7 +2431,7 @@ class Course < ActiveRecord::Base
   def invited_count_visible_to(user)
     scope = users_visible_to(user).
       where("enrollments.workflow_state in ('invited', 'creation_pending') AND enrollments.type != 'StudentViewEnrollment'")
-    scope.select('users.id').uniq.count
+    scope.select('users.id').distinct.count
   end
 
   def published?
@@ -2821,10 +2836,10 @@ class Course < ActiveRecord::Base
       self.uuid = self.sis_source_id = self.sis_batch_id = self.integration_id = nil;
       self.save!
       Course.process_as_sis { new_course.save! }
-      self.course_sections.update_all(:course_id => new_course)
+      self.course_sections.update_all(:course_id => new_course.id)
       # we also want to bring along prior enrollments, so don't use the enrollments
       # association
-      Enrollment.where(:course_id => self).update_all(:course_id => new_course, :updated_at => Time.now.utc)
+      Enrollment.where(:course_id => self).update_all(:course_id => new_course.id, :updated_at => Time.now.utc)
       User.where(id: new_course.all_enrollments.select(:user_id)).
           update_all(updated_at: Time.now.utc)
       self.replacement_course_id = new_course.id

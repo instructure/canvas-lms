@@ -187,8 +187,8 @@ define([
         var $services = $("#content_tag_services").empty();
         $.getUserServices('BookmarkService', function(data) {
           for(var idx in data) {
-            service = data[idx].user_service;
-            $service = $("<a href='#' class='bookmark_service no-hover'/>");
+            var service = data[idx].user_service;
+            var $service = $("<a href='#' class='bookmark_service no-hover'/>");
             $service.addClass(service.service);
             $service.data('service', service);
             $service.attr('title', I18n.t('titles.find_links_using_service', 'Find links using %{service}', {service: service.service}));

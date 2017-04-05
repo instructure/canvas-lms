@@ -279,6 +279,7 @@ class Attachment < ActiveRecord::Base
       context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
     end
     if context.respond_to?(:root_account_id) && self.namespace != context.root_account.file_namespace
+      dup.save_without_broadcasting!
       dup.make_rootless
       dup.change_namespace(context.root_account.file_namespace)
     end
@@ -322,6 +323,7 @@ class Attachment < ActiveRecord::Base
   def assert_attachment
     if !self.to_be_zipped? && !self.zipping? && !self.errored? && !self.deleted? && (!filename || !content_type || !downloadable?)
       self.errors.add(:base, t('errors.not_found', "File data could not be found"))
+      throw :abort unless CANVAS_RAILS4_2
       return false
     end
   end
@@ -512,7 +514,7 @@ class Attachment < ActiveRecord::Base
           existing_attachment.write_attribute(:filename, nil)
           existing_attachment.save!
           Attachment.where(root_attachment_id: existing_attachment).update_all(
-            root_attachment_id: self,
+            root_attachment_id: id,
             filename: nil,
             updated_at: Time.zone.now)
         end
@@ -683,13 +685,13 @@ class Attachment < ActiveRecord::Base
         end
       end
     elsif method == :overwrite
-      atts.update_all(:replacement_attachment_id => self) # so we can find the new file in content links
+      atts.update_all(replacement_attachment_id: self.id) # so we can find the new file in content links
       copy_access_attributes!(atts) unless atts.empty?
       atts.each do |a|
         # update content tags to refer to the new file
-        ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(:content_id => self)
+        ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(content_id: self.id)
         # update replacement pointers pointing at the overwritten file
-        context.attachments.where(:replacement_attachment_id => a).update_all(:replacement_attachment_id => self)
+        context.attachments.where(:replacement_attachment_id => a).update_all(replacement_attachment_id: self.id)
         # delete the overwritten file (unless the caller is queueing them up)
         a.destroy unless opts[:caller_will_destroy]
         deleted_attachments << a
@@ -1282,7 +1284,7 @@ class Attachment < ActiveRecord::Base
     root = self.root_attachment
     return unless root
     self.root_attachment_id = nil
-    self.filename = root.filename if root.filename
+    self.write_attribute(:filename, root.filename) if root.filename
     root.copy_attachment_content(self)
   end
 

@@ -138,7 +138,10 @@
         </span>
         <iframe id="csv_download" style="display:none"></iframe>
 
-        <button id="gradebook_settings"><i class="icon-settings"></i></button>
+        <button id="gradebook_settings">
+          <i class="icon-settings" aria-hidden="true"></i>
+          <span class="screenreader-only"><%= t('Gradebook Settings') %></span>
+        </button>
         <ul style="display: none;" class="gradebook_dropdown ui-kyle-menu">
           <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= t('View Grading History') %></a></li>
           <% if @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades) %>

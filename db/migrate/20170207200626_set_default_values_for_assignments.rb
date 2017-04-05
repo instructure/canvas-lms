@@ -12,7 +12,7 @@ class SetDefaultValuesForAssignments < ActiveRecord::Migration[4.2]
     fields.each { |field| change_column_default(:assignments, field, false) }
     fields += [:peer_reviews_assigned, :peer_reviews, :automatic_peer_reviews, :muted, :intra_group_peer_reviews]
     DataFixup::BackfillNulls.run(Assignment, fields, default_value: false)
-    fields.each { |field| change_column_null_with_less_locking(:assignments, field) }
+    fields.each { |field| change_column_null(:assignments, field, false) }
   end
 
   def down

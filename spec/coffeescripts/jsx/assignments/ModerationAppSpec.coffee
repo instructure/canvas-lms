@@ -30,8 +30,13 @@ define [
           },
           urls: {}
         }
+      permissions =
+        viewGrades: true
+        editGrades: true
 
-      @moderationApp = TestUtils.renderIntoDocument(React.createElement(ModerationApp, store: @store))
+      @moderationApp = TestUtils.renderIntoDocument(
+        React.createElement(ModerationApp, store: @store, permissions: permissions)
+      )
 
 
     teardown: ->

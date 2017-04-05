@@ -270,8 +270,8 @@ define([
     var mediaCommentReady = function() {
       var ks, uid;
       if (INST.kalturaSettings.js_uploader) {
-        ks = jsUploader.getKs()
-        uid = jsUploader.getUid();
+        ks = JsUploader.getKs()
+        uid = JsUploader.getUid();
       } else {
         ks = $dialog.data('ks');
         uid = $dialog.data('uid') || "ANONYMOUS"

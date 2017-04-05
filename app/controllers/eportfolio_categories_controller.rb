@@ -34,7 +34,7 @@ class EportfolioCategoriesController < ApplicationController
       @category = @portfolio.eportfolio_categories.build(eportfolio_category_params)
       respond_to do |format|
         if @category.save
-          @portfolio.eportfolio_entries.create(:eportfolio_category => @category, :name => t(:default_name, "New Page"), :allow_comments => true, :show_comments => :true)
+          @portfolio.eportfolio_entries.create(:eportfolio_category => @category, :name => t(:default_name, "New Page"), :allow_comments => true, :show_comments => true)
           format.html { redirect_to eportfolio_category_url(@portfolio, @category) }
           format.json { render :json => @category }
         else

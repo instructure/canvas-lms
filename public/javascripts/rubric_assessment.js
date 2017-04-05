@@ -29,6 +29,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function (I18n, $, htmlEscape, TextHelper, round, numberHelper) {
 // TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
+/*global rubricAssessment*/
 window.rubricAssessment = {
   init: function(){
     var $rubric_criterion_comments_dialog = $("#rubric_criterion_comments_dialog");
@@ -204,7 +205,7 @@ window.rubricAssessment = {
 
   findRubric: function($rubric) {
     if(!$rubric.hasClass('rubric')) {
-      $new_rubric = $rubric.closest('.rubric');
+      var $new_rubric = $rubric.closest('.rubric');
       if($new_rubric.length === 0) {
         $new_rubric = $rubric.find('.rubric:first');
       }

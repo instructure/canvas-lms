@@ -108,7 +108,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def after_participants_created_broadcast
-    conversation_message_participants(true) # reload this association so we get latest data
+    CANVAS_RAILS4_2 ? conversation_message_participants(true) : conversation_message_participants.reload # reload this association so we get latest data
     @re_send_message = true
     broadcast_notifications
     queue_create_stream_items

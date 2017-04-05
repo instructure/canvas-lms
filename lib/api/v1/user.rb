@@ -81,11 +81,11 @@ module Api::V1::User
       end
       # include a permissions check here to only allow teachers and admins
       # to see user email addresses.
-      if includes.include?('email') && context.grants_right?(current_user, session, :read_roster)
+      if includes.include?('email') && !excludes.include?('personal_info') && context.grants_right?(current_user, session, :read_roster)
         json[:email] = user.email
       end
 
-      if includes.include?('bio') && @domain_root_account.enable_profiles? && user.profile
+      if includes.include?('bio') && !excludes.include?('personal_info') && @domain_root_account.enable_profiles? && user.profile
         json[:bio] = user.profile.bio
       end
 

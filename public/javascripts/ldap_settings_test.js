@@ -50,7 +50,7 @@ define([
         } else {
           $("#ldap_" + test.test_type + "_result").html("<h4 style='color:red'>" + h(I18n.t('test_ldap_result_failed', 'Failed')) + "</h4>");
           $("#ldap_" + test.test_type + "_help").show();
-          $server_error = $('<p></p>').addClass("server_error").css("color", "red").text(server_error);
+          var $server_error = $('<p></p>').addClass("server_error").css("color", "red").text(server_error);
           $("#ldap_" + test.test_type + "_help").append($server_error);
 
           $.each(ENV.LDAP_TESTS.slice(i + 1), function(i, next_test) {

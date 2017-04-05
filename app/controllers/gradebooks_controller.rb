@@ -119,7 +119,11 @@ class GradebooksController < ApplicationController
       @current_user.preferences[:course_grades_assignment_order] ||= {}
       @current_user.preferences[:course_grades_assignment_order][@context.id] = assignment_order
       @current_user.save!
-      redirect_to :back
+      if CANVAS_RAILS4_2
+        redirect_to :back
+      else
+        redirect_back(fallback_location: course_grades_url(@context))
+      end
     end
   end
 
@@ -198,6 +202,7 @@ class GradebooksController < ApplicationController
       @last_exported_gradebook_csv = GradebookCsv.last_successful_export(course: @context, user: @current_user)
       set_current_grading_period if grading_periods?
       set_js_env
+      set_tutorial_js_env
       @course_is_concluded = @context.completed?
       @post_grades_tools = post_grades_tools
 
@@ -643,7 +648,7 @@ class GradebooksController < ApplicationController
     grade_by_question = value_to_boolean(params[:enable_speedgrader_grade_by_question])
     @current_user.preferences[:enable_speedgrader_grade_by_question] = grade_by_question
     @current_user.save!
-    render nothing: true
+    head :ok
   end
 
   def blank_submission

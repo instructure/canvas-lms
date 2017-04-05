@@ -1303,6 +1303,24 @@ describe UsersController do
     end
   end
 
+  describe '#dashboard_view' do
+    before(:each) do
+      course_factory
+      user_factory(active_all: true)
+      user_session(@user)
+    end
+
+    it 'sets the proper user preference on PUT requests' do
+      put :dashboard_view, :dashboard_view => 'cards'
+      expect(@user.preferences[:dashboard_view]).to eql('cards')
+    end
+
+    it 'does not allow arbitrary values to be set' do
+      put :dashboard_view, :dashboard_view => 'a non-whitelisted value'
+      assert_status(400)
+    end
+  end
+
   describe "#invite_users" do
     it 'does not work without ability to manage students or admins on course' do
       Account.default.tap{|a| a.settings[:open_registration] = true; a.save!}

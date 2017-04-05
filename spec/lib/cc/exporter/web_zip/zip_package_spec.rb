@@ -522,7 +522,15 @@ describe "ZipPackage" do
       @course.wiki_pages.create!(title: 'Wiki Page 1', url: 'wiki-page-1', wiki: @course.wiki)
       zip_package = create_zip_package
       wiki_data = zip_package.parse_non_module_items(:wiki_pages)
-      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: ''}]
+      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: '', frontPage: false}]
+    end
+
+    it "should parse front page" do
+      wiki_page = @course.wiki_pages.create!(title: 'Wiki Page 1', url: 'wiki-page-1', wiki: @course.wiki)
+      @course.wiki.set_front_page_url!(wiki_page.url)
+      zip_package = create_zip_package
+      wiki_data = zip_package.parse_non_module_items(:wiki_pages)
+      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: '', frontPage: true}]
     end
 
     it "should not fail on missing items" do
@@ -531,7 +539,7 @@ describe "ZipPackage" do
       wiki.title = 'Wiki Page 2'
       wiki.save!
       wiki_data = zip_package.parse_non_module_items(:wiki_pages)
-      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: '<p>Hi</p>'}]
+      expect(wiki_data).to eq [{exportId: 'wiki-page-1', title: 'Wiki Page 1', content: '<p>Hi</p>', frontPage: false}]
     end
   end
 
@@ -552,6 +560,17 @@ describe "ZipPackage" do
 
     it "should export html content links as local content links" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: '<p>Hi</p>')
+      html = %(<a title="Assignment 1" href="/courses/#{@course.id}/assignments/#{assign.id}") +
+             %( data-api-returntype="Assignment">Assignment 1</a>)
+      expected_html = %(<a title="Assignment 1" href="assignments/#{CC::CCHelper.create_key(assign)}") +
+                    %( data-api-returntype="Assignment">Assignment 1</a>)
+      converted_html = @zip_package.convert_html_to_local(html)
+      expect(converted_html).to eq expected_html
+    end
+
+    it "should convert html content links that are locked" do
+      assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10,
+        description: '<p>Hi</p>', unlock_at: 5.days.from_now)
       html = %(<a title="Assignment 1" href="/courses/#{@course.id}/assignments/#{assign.id}") +
              %( data-api-returntype="Assignment">Assignment 1</a>)
       expected_html = %(<a title="Assignment 1" href="assignments/#{CC::CCHelper.create_key(assign)}") +

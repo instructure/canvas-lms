@@ -101,6 +101,7 @@ module Api::V1::CalendarEvent
     if appointment_group
       hash['appointment_group_id'] = appointment_group.id
       hash['appointment_group_url'] = api_v1_appointment_group_url(appointment_group)
+      hash['participant_type'] = appointment_group.participant_type
       if options[:current_participant] && event.has_asset?(options[:current_participant])
         hash['own_reservation'] = true
       end

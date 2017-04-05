@@ -1,7 +1,4 @@
-const useWebpack = (/true/i).test(process.env.USE_WEBPACK) || require('fs').existsSync(`${__dirname}/config/WEBPACK`)
-console.log('using webpack?', useWebpack)
-
-const karmaConfig = Object.assign({
+const karmaConfig = {
   basePath: '',
 
   frameworks: ['qunit'],
@@ -54,8 +51,7 @@ const karmaConfig = Object.assign({
   // by default we keep the browser open so it refreshes with any changes
   // but in `npm test` (which is what jenkins CI runs) we override it so
   // it just runs once and then exits.
-  singleRun: false
-}, useWebpack ? {
+  singleRun: false,
 
   files: [
     {pattern: 'spec/javascripts/webpack_spec_index.js', included: true, served: true},
@@ -68,28 +64,10 @@ const karmaConfig = Object.assign({
   },
 
   webpack: require('./webpack.test.config'),
-
-} : {
-  files: [
-    'node_modules/sinon/pkg/sinon.js',
-    'spec/javascripts/requirejs_config.js',
-    'public/javascripts/vendor/require.js',
-    'node_modules/karma-requirejs/lib/adapter.js',
-    'spec/javascripts/support/sinon/sinon-qunit-1.0.0.js',
-    {pattern: 'public/javascripts/*.js', included: false, served: true},
-    {pattern: 'spec/javascripts/fixtures/*.html', included: false, served: true},
-    {pattern: 'spec/javascripts/compiled/*.js', included: false, served: true},
-    {pattern: 'spec/javascripts/compiled/**/*.js', included: false, served: true},
-    {pattern: 'spec/**/javascripts/compiled/**/*.js', included: false, served: true},
-    {pattern: 'spec/javascripts/fixtures/*', included: false, served: true},
-    {pattern: 'public/javascripts/**/*.js', included: false, served: true},
-    {pattern: 'public/dist/brandable_css/**/*.css', included: false, served: true},
-    'spec/javascripts/load_tests.js'
-  ]
-})
+}
 
 module.exports = function (config) {
   // config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-  karmaConfig.logLevel = config.LOG_INFO,
+  karmaConfig.logLevel = config.LOG_INFO
   config.set(karmaConfig)
 }

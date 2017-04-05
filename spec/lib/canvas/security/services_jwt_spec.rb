@@ -18,6 +18,13 @@ module Canvas::Security
       Canvas::Security.base64_encode(wrapper_token)
     end
 
+    let(:translate_token) do
+      ->(jwt){
+        decoded_crypted_token = Canvas::Security.base64_decode(jwt)
+        return Canvas::Security.decrypt_services_jwt(decoded_crypted_token)
+      }
+    end
+
     it "has secrets accessors" do
       expect(ServicesJwt.encryption_secret).to eq(fake_encryption_secret)
       expect(ServicesJwt.signing_secret).to eq(fake_signing_secret)
@@ -114,12 +121,6 @@ module Canvas::Security
         let(:ctx){ stub(id: 47) }
         let(:host){ "example.instructure.com" }
         let(:masq_user){ stub(global_id: 24) }
-        let(:translate_token) do
-          ->(jwt){
-            decoded_crypted_token = Canvas::Security.base64_decode(jwt)
-            return Canvas::Security.decrypt_services_jwt(decoded_crypted_token)
-          }
-        end
 
         it "can build from a user and host" do
           jwt = ServicesJwt.for_user(host, user)
@@ -195,6 +196,92 @@ module Canvas::Security
         it "errors without a user" do
           expect{ ServicesJwt.for_user(host, nil) }.
             to raise_error(ArgumentError)
+        end
+      end
+
+      describe "refresh_for_user" do
+        let(:user1){ stub(global_id: 42) }
+        let(:user2){ stub(global_id: 43) }
+        let(:host) { 'testhost' }
+        
+        it 'is invalid if jwt cannot be decoded' do
+          expect{ ServicesJwt.refresh_for_user('invalidjwt', host, user1) }
+            .to raise_error(ServicesJwt::InvalidRefresh)
+        end
+
+        it 'is invlaid if user id is different' do
+          jwt = ServicesJwt.for_user(host, user1)
+          expect{ ServicesJwt.refresh_for_user(jwt, host, user2) }
+            .to raise_error(ServicesJwt::InvalidRefresh)
+        end
+
+        it 'is invlaid if host is different' do
+          jwt = ServicesJwt.for_user('differenthost', user1)
+          expect{ ServicesJwt.refresh_for_user(jwt, host, user1) }
+            .to raise_error(ServicesJwt::InvalidRefresh)
+        end
+
+        it 'is invlaid masquerading user is different' do
+          masq_user = stub(global_id: 44)
+          jwt = ServicesJwt.for_user(host, user1, real_user: masq_user)
+          expect{ ServicesJwt.refresh_for_user(jwt, host, user1, real_user: user2) }
+            .to raise_error(ServicesJwt::InvalidRefresh)
+        end
+
+        it 'is invalid if masquerading and token does not have masq_sub' do
+          jwt = ServicesJwt.for_user(host, user1)
+          expect{ ServicesJwt.refresh_for_user(jwt, host, user1, real_user: user2) }
+            .to raise_error(ServicesJwt::InvalidRefresh)
+        end
+
+        it 'is invalid if more than 6 hours past token expiration' do
+          jwt = ServicesJwt.for_user(host, user1)
+          Timecop.freeze(7.hours.from_now) do
+            expect{ ServicesJwt.refresh_for_user(jwt, host, user1) }
+              .to raise_error(ServicesJwt::InvalidRefresh)
+          end
+        end
+
+        it 'generates a token with the same user id and host' do
+          jwt = ServicesJwt.for_user(host, user1)
+          refreshed = ServicesJwt.refresh_for_user(jwt, host, user1)
+          payload = translate_token.call(refreshed)
+          expect(payload[:sub]).to eq(user1.global_id)
+          expect(payload[:domain]).to eq(host)
+          expect(payload[:masq_sub]).to be_nil
+        end
+
+        it 'generates a token with masq_sub for masquerading users' do
+          jwt = ServicesJwt.for_user(host, user1, real_user: user2)
+          refreshed = ServicesJwt.refresh_for_user(jwt, host, user1, real_user: user2)
+          payload = translate_token.call(refreshed)
+          expect(payload[:masq_sub]).to eq(user2.global_id)
+        end
+
+        it 'generates a token with same workflows as original' do
+          workflows = ['rich_content', 'ui']
+          jwt = ServicesJwt.for_user(host, user1, workflows: workflows)
+          refreshed = ServicesJwt.refresh_for_user(jwt, host, user1)
+          payload = translate_token.call(refreshed)
+          expect(payload[:workflows]).to eq(workflows)
+        end
+
+        it 'generates a token with same context as original' do
+          context = course_factory
+          jwt = ServicesJwt.for_user(host, user1, context: context)
+          refreshed = ServicesJwt.refresh_for_user(jwt, host, user1)
+          payload = translate_token.call(refreshed)
+          expect(payload[:context_type]).to eq(context.class.name)
+          expect(payload[:context_id]).to eq(context.id.to_s)
+        end
+
+        it 'generates a new token even if the original token has expired' do
+          jwt = ServicesJwt.for_user(host, user1)
+          Timecop.freeze(61.minutes.from_now) do
+            refreshed = ServicesJwt.refresh_for_user(jwt, host, user1)
+            payload = translate_token.call(refreshed)
+            expect(payload[:sub]).to eq(user1.global_id)
+          end
         end
       end
     end

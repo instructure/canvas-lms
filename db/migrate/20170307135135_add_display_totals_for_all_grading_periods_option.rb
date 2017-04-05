@@ -21,7 +21,7 @@ class AddDisplayTotalsForAllGradingPeriodsOption < ActiveRecord::Migration[4.2]
       )
     end
 
-    change_column_null_with_less_locking :grading_period_groups, :display_totals_for_all_grading_periods
+    change_column_null :grading_period_groups, :display_totals_for_all_grading_periods, false
   end
 
   def down

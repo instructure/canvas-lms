@@ -1,8 +1,4 @@
 group :development do
-  gem 'guard', '2.14.0'
-    gem 'listen', '3.1.5', require: false
-      gem 'rb-inotify', '0.9.7', require: false
-      gem 'rb-fsevent', '0.9.8', require: false
   gem 'colorize', '0.8.1', require: false
   gem 'letter_opener', '1.4.1'
   gem 'spring', '2.0.0'

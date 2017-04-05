@@ -22,36 +22,24 @@ require_dependency "api/html/url_proxy"
 module Api
   module Html
     class StubUrlHelper
-      def media_object_thumbnail_url(id, attrs={})
-        as_url(id, attrs)
-      end
-
-      def polymorphic_url(context=[], attrs={})
-        as_url(context[1], attrs)
-      end
-
-      def method_missing(name, *args)
-        as_url(name, args[0])
-      end
-
-      private
-      def as_url(base, options={})
-        base_url = "#{options.delete(:protocol)}://#{options.delete(:host)}/#{base}"
-        "#{base_url}?#{options.map{|k,v| "#{k}=#{v}"}.join("&")}"
-      end
+      include Rails.application.routes.url_helpers
     end
 
     describe UrlProxy do
-      let(:context){ stub('context') }
+      let(:context) do
+        c = Course.new
+        c.id = 1
+        c
+      end
       let(:proxy){ UrlProxy.new(StubUrlHelper.new, context, "example.com", "http") }
 
       describe "url helpers" do
         it "passes through object thumbnails" do
-          expect(proxy.media_object_thumbnail_url("123")).to eq("http://example.com/123?width=550&height=448&type=3")
+          expect(proxy.media_object_thumbnail_url("123")).to eq("http://example.com/media_objects/123/thumbnail?height=448&type=3&width=550")
         end
 
         it "passes through polymorphic urls" do
-          expect(proxy.media_redirect_url("123", "video")).to eq("http://example.com/media_download?entryId=123&media_type=video&redirect=1")
+          expect(proxy.media_redirect_url("123", "video")).to eq("http://example.com/courses/1/media_download?entryId=123&media_type=video&redirect=1")
         end
       end
 
@@ -59,7 +47,13 @@ module Api
         it "maps good paths through to endpoints with return types" do
           endpoint_info = proxy.api_endpoint_info("/courses/42/quizzes/24")
           expect(endpoint_info['data-api-returntype']).to eq("Quiz")
-          expect(endpoint_info['data-api-endpoint']).to eq("http://example.com/api_v1_course_quiz_url?course_id=42&id=24")
+          expect(endpoint_info['data-api-endpoint']).to eq("http://example.com/api/v1/courses/42/quizzes/24")
+        end
+
+        it 'unescapes urls for sessionless launch endpoints' do
+          endpoint_info = proxy.api_endpoint_info('/courses/2/external_tools/retrieve?url=https%3A%2F%2Flti-tool-provider.herokuapp.com%2Flti_tool')
+          expect(endpoint_info['data-api-returntype']).to eq('SessionlessLaunchUrl')
+          expect(endpoint_info['data-api-endpoint']).to eq('http://example.com/api/v1/courses/2/external_tools/sessionless_launch?url=https%3A%2F%2Flti-tool-provider.herokuapp.com%2Flti_tool')
         end
       end
     end

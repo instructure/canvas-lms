@@ -22,6 +22,7 @@ module CC
       Assignments::ScopedToUser.new(@course, @user).scope.
         no_submittables.each do |assignment|
         next unless export_object?(assignment)
+        next if @user && assignment.locked_for?(@user, check_policies: true)
 
         title = assignment.title || I18n.t('course_exports.unknown_titles.assignment', "Unknown assignment")
 

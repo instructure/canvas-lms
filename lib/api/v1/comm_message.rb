@@ -21,6 +21,7 @@ module Api::V1::CommMessage
 
   def comm_message_json(message, options = {})
     result = message.as_json(options)
+    result['from'] ||= HostUrl.outgoing_email_default_name
     result
   end
 

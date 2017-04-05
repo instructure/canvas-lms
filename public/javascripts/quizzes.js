@@ -44,6 +44,7 @@ define([
   'jsx/shared/rce/RichContentEditor',
   'jsx/shared/conditional_release/ConditionalRelease',
   'compiled/util/deparam',
+  'compiled/util/SisValidationHelper',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
@@ -64,7 +65,7 @@ define([
             DueDateList, QuizRegradeView, SectionList,
             MissingDateDialog,MultipleChoiceToggle,EditorToggle,TextHelper,
             RCEKeyboardShortcuts, INST, QuizFormulaSolution, addAriaDescription,
-            RichContentEditor, ConditionalRelease, deparam){
+            RichContentEditor, ConditionalRelease, deparam, SisValidationHelper){
 
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
       scoreValidation;
@@ -517,7 +518,7 @@ define([
 
     updateDisplayQuestion: function($question, question, escaped) {
 
-      fillArgs = {
+      var fillArgs = {
         data: question,
         except: ['answers'],
         htmlValues: ['correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
@@ -725,7 +726,7 @@ define([
             $(answerEl).text(answers[index].id);
           });
         }
-      };
+      }
     },
 
     // Updates the question's form when the type changes
@@ -1047,13 +1048,13 @@ define([
 
       if (value && isNaN(numVal)) {
         $("input#quiz_points_possible").trigger("invalid:not_a_number");
-        valid = false;
+        // valid = false;
       } else if (numVal > 2000000000) {
         $("input#quiz_points_possible").trigger("invalid:less_than");
-        valid = false;
+        // valid = false;
       } else if (numVal < 0) {
         $("input#quiz_points_possible").trigger("invalid:greater_than");
-        valid = false;
+        // valid = false;
       }
     },
 
@@ -1068,7 +1069,7 @@ define([
     }
   }
 
-  ipFilterValidation = {
+  var ipFilterValidation = {
     init: function() {
       this.initValidators.apply(this);
       $('#quiz_options_form').on('xhrError', this.onFormError);
@@ -1504,7 +1505,7 @@ define([
   }
 
   function addHTMLFeedback($container, question_data, name) {
-    html = question_data[name+'_html'];
+    var html = question_data[name+'_html'];
     if (!html || html.length == 0) {
       html = htmlEscape(question_data[name]);
       question_data[name+'_html'] = html;
@@ -1790,13 +1791,27 @@ define([
       processData: function(data) {
         $(this).attr('method', 'PUT');
         var quiz_title = $("#quiz_title").val();
+        var postToSis = data['quiz[post_to_sis]'] === '1'
+        var vaildQuizType = data['quiz[quiz_type]'] != 'survey' && data['quiz[quiz_type]'] != 'practice_quiz'
+        var maxNameLength = 256;
+
+        if (postToSis && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT && vaildQuizType){
+          maxNameLength = ENV.MAX_NAME_LENGTH
+        }
+
+        var validationHelper = new SisValidationHelper({
+          postToSIS: postToSis,
+          maxNameLength: maxNameLength,
+          name: quiz_title
+        })
+
         if (quiz_title.length == 0) {
           var offset = $("#quiz_title").errorBox(I18n.t('errors.field_is_required', "This field is required")).offset();
           $('html,body').scrollTo({top: offset.top, left:0});
           return false;
         }
-        if (quiz_title.length > ENV.MAX_NAME_LENGTH && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT && data['quiz[post_to_sis]'] == '1') {
-          var header_offset = $('#quiz_title').errorBox(I18n.t('The Quiz name must be under %{length} characters', {length: ENV.MAX_NAME_LENGTH + 1})).offset();
+        if (validationHelper.nameTooLong()) {
+          var header_offset = $('#quiz_title').errorBox(I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1})).offset();
           $('html,body').scrollTo({top: header_offset.top, left: 0});
           return false;
         }
@@ -1823,7 +1838,7 @@ define([
           return false;
         }
         if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
-          sections = overrideView.sectionsWithoutOverrides();
+          var sections = overrideView.sectionsWithoutOverrides();
           var missingDateView = new MissingDateDialog({
             validationFn: function(){ return sections },
             labelFn: function( section ) { return section.get('name')},
@@ -2092,7 +2107,7 @@ define([
 
       if ($question.hasClass('missing_word_question') || question.question_type == 'missing_word_question') {
         question = $question.getTemplateData({textValues: ['text_before_answers', 'text_after_answers']});
-        answer_data = $question.find(".original_question_text").getFormData();
+        var answer_data = $question.find(".original_question_text").getFormData();
         question.text_before_answers = answer_data.question_text;
         question.text_after_answers = answer_data.text_after_answers;
         question.question_text = question.text_before_answers;
@@ -2317,15 +2332,15 @@ define([
           multipleAnswer: questionType === "multiple_answers_question"
         });
         regradeOptions.on('update', function(regradeOption){
-          newAnswerData = {regradeOption: regradeOption, newAnswer: newAnswer}
+          var newAnswerData = {regradeOption: regradeOption, newAnswer: newAnswer}
           toggleAnswer($question, newAnswerData)
         })
       }
     }
 
     function toggleAnswer($question, newAnswerData) {
-      $answer = $(newAnswerData.newAnswer);
-      $answers = $answer.parent().find(".answer");
+      var $answer = $(newAnswerData.newAnswer);
+      var $answers = $answer.parent().find(".answer");
 
       if ($question.find(":input[name='question_type']").val() != "multiple_answers_question") {
         $question.find(".answer:visible").removeClass('correct_answer')
@@ -2359,7 +2374,7 @@ define([
     function setAnswerText(answer, text) {
       $(answer)
         .attr('title', text)
-        .find('img').attr('alt', text)
+        .find('.answer_image').attr('alt', text)
     }
 
     function setQuestionID(question){
@@ -2489,7 +2504,7 @@ define([
       var $question = makeQuestion();
       if ($(this).parents(".group_top").length > 0) {
 
-        groupID = $(this).parents(".group_top")[0].id.replace("group_top_","")
+        var groupID = $(this).parents(".group_top")[0].id.replace("group_top_","")
         $($question[0]).attr("data-group-id", groupID)
 
         var $bottom = $(this).parents(".group_top").next();
@@ -2537,7 +2552,7 @@ define([
           $dialog.find(".message").hide();
           $dialog.find(".find_banks").show();
           $dialog.addClass('loaded');
-          for(idx in banks) {
+          for(var idx in banks) {
             var bank = banks[idx].assessment_question_bank;
             var $bank = $dialog.find(".bank.blank:first").clone(true).removeClass('blank');
             $bank.fillTemplateData({data: bank, dataValues: ['id', 'context_type', 'context_id']});
@@ -2594,7 +2609,7 @@ define([
           $dialog.find(".message").hide();
           $dialog.find(".side_tabs_table").show();
           $dialog.addClass('loaded');
-          for(idx in banks) {
+          for(var idx in banks) {
             var bank = banks[idx].assessment_question_bank;
             bank.title = TextHelper.truncateText(bank.title)
             var $bank = $dialog.find(".bank.blank:first").clone(true).removeClass('blank');
@@ -2923,7 +2938,7 @@ define([
         answer.question_type = question_type;
         answer.blank_id = $question.find(".blank_id_select").val();
         answer.blank_index = $question.find(".blank_id_select")[0].selectedIndex;
-        $answer = makeFormAnswer(answer);
+        var $answer = makeFormAnswer(answer);
         if (answer_selection_type == "any_answer") {
           $answer.addClass('correct_answer');
         } else if (answer_selection_type == "blanks") {
@@ -2981,7 +2996,7 @@ define([
           error_text = I18n.t('errors.no_correct_answer', "Please choose a correct answer");
         }
       } else if (questionData.question_type == "fill_in_multiple_blanks_question" || questionData.question_type == "short_answer_question") {
-        function checkForNotBlanks(elements) {
+        var checkForNotBlanks = function (elements) {
           return elements.filter(function(i,element) {
             return !!element.value;
           }).length;
@@ -3702,7 +3717,7 @@ define([
         var items = [];
         if (quiz.findContainerGroup(ui.item)) {
           $container = quiz.findContainerGroup(ui.item);
-          $list = [];
+          var $list = [];
           url = $container.find(".reorder_group_questions_url").attr('href');
           var $obj = $container.next();
           while($obj.length > 0 && !$obj.hasClass('group_bottom')) {
@@ -3865,7 +3880,7 @@ define([
     });
 
     if (ENV['CONDITIONAL_RELEASE_SERVICE_ENABLED']) {
-      window.conditionalRelease = window.conditionalRelease || {};
+      var conditionalRelease = window.conditionalRelease = window.conditionalRelease || {};
       conditionalRelease.editor = ConditionalRelease.attach(
         $('#conditional_release_target').get(0),
         I18n.t('quiz'),
@@ -4257,7 +4272,7 @@ define([
       }
 
       // Only allow students to see answers on last attempt if the quiz has more than one attempt
-      showCorrectAnswersLastAttempt = parseInt($('#quiz_allowed_attempts').val()) > 0;
+      var showCorrectAnswersLastAttempt = parseInt($('#quiz_allowed_attempts').val()) > 0;
       $('#quiz_show_correct_answers_last_attempt_container').toggle(showCorrectAnswersLastAttempt);
       if(!showCorrectAnswersLastAttempt) {
         $('#quiz_show_correct_answers_last_attempt').prop('checked', false);

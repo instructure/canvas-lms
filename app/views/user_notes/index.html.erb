@@ -47,8 +47,6 @@
 <div id="user_note_list" class="user_note_list">
   <%= render :partial => 'user_note', :collection => @user_notes %>
   <%= will_paginate(@user_notes, :style=>"margin-bottom: 1em;") %>
-  <% js_block do %>
-    <%= pageless(@user_notes.total_pages, user_user_notes_path) %>
-  <% end %>
+  <% pageless(@user_notes.total_pages, user_user_notes_path) %>
   <%= render :partial => 'user_note', :locals => {:user_note => @user_note}%>
 </div>

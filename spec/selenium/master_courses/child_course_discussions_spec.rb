@@ -23,38 +23,39 @@ describe "master courses - child courses - discussion locking" do
     user_session(@teacher)
   end
 
-  it "should not show the cog-menu options on the index when locked" do
-    @tag.update_attribute(:restrictions, {:all => true})
+  it "should not show the deletion cog-menu option on the index when locked" do
+    @tag.update_attribute(:restrictions, {:content => true})
 
     get "/courses/#{@copy_to.id}/discussion_topics"
 
     expect(f('.master-course-cell')).to contain_css('.icon-lock')
 
-    expect(f('.discussion-row')).to_not contain_css('.al-trigger')
+    f('.discussion-row .al-trigger').click
+    expect(f('.discussion-row')).to_not include_text('Delete')
   end
 
-  it "should show the cog-menu options on the index when not locked" do
+  it "should show all the cog-menu options on the index when not locked" do
     get "/courses/#{@copy_to.id}/discussion_topics"
 
     expect(f('.master-course-cell')).to contain_css('.icon-unlock')
 
-    expect(f('.discussion-row')).to contain_css('.al-trigger')
+    f('.discussion-row .al-trigger').click
+    expect(f('.discussion-row')).to include_text('Delete')
   end
 
-  it "should not show the edit/delete options on the show page when locked" do
-    @tag.update_attribute(:restrictions, {:all => true})
+  it "should not show the delete options on the show page when locked" do
+    @tag.update_attribute(:restrictions, {:content => true})
 
     get "/courses/#{@copy_to.id}/discussion_topics/#{@topic_copy.id}"
 
-    expect(f('#content')).to_not contain_css('.edit-btn')
+    expect(f('#content')).to contain_css('.edit-btn')
     f('.al-trigger').click
     expect(f('.al-options')).to_not contain_css('.delete_discussion')
   end
 
-  it "should show the edit/delete cog-menu options on the show when not locked" do
+  it "should show the delete cog-menu options on the show when not locked" do
     get "/courses/#{@copy_to.id}/discussion_topics/#{@topic_copy.id}"
 
-    expect(f('#content')).to contain_css('.edit-btn')
     f('.al-trigger').click
     expect(f('.al-options')).to contain_css('.delete_discussion')
   end
@@ -66,7 +67,7 @@ describe "master courses - child courses - discussion locking" do
     end
 
     it "should not show the cog-menu options on the index when locked" do
-      @tag.update_attribute(:restrictions, {:all => true})
+      @tag.update_attribute(:restrictions, {:content => true})
 
       get "/courses/#{@copy_to.id}/announcements"
 
@@ -84,11 +85,11 @@ describe "master courses - child courses - discussion locking" do
     end
 
     it "should not show the edit/delete options on the show page when locked" do
-      @tag.update_attribute(:restrictions, {:all => true})
+      @tag.update_attribute(:restrictions, {:content => true})
 
       get "/courses/#{@copy_to.id}/discussion_topics/#{@topic_copy.id}"
 
-      expect(f('#content')).to_not contain_css('.edit-btn')
+      expect(f('#content')).to contain_css('.edit-btn')
       f('.al-trigger').click
       expect(f('.al-options')).to_not contain_css('.delete_discussion')
     end

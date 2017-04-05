@@ -37,7 +37,7 @@ define [
         @toggleConditionalReleaseTab(@model.gradingType())
 
     canDelete: ->
-      @userIsAdmin or @model.canDelete()
+      (@userIsAdmin or @model.canDelete()) && !(ENV.MASTER_COURSE_DATA?.is_master_course_child_content && ENV.MASTER_COURSE_DATA.restricted_by_master_course)
 
     onDelete: (e) =>
       e.preventDefault()

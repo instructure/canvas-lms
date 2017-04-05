@@ -172,6 +172,15 @@ describe 'Provisional Grades API', type: :request do
         api_call_as_user(@ta, :post, @path, @params, {}, {}, { :expected_status => 401 })
       end
 
+      it "requires manage_grades permissions" do
+        @course.root_account.role_overrides.create!(
+          permission: :manage_grades,
+          role: Role.find_by(name: 'TeacherEnrollment'),
+          enabled: false
+        )
+        api_call_as_user(@teacher, :post, @path, @params, {}, {}, expected_status: 401)
+      end
+
       it "fails if grades were already published" do
         @assignment.update_attribute :grades_published_at, Time.now.utc
         json = api_call_as_user(@teacher, :post, @path, @params, {}, {}, { :expected_status => 400 })

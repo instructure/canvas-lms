@@ -316,6 +316,12 @@ define [
     postToSISName: =>
       return ENV.SIS_NAME
 
+    maxNameLength: =>
+      return ENV.MAX_NAME_LENGTH
+
+    dueDateRequiredForAccount: =>
+      return ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
+
     defaultDates: =>
       group = new DateGroup
         due_at:    @get("due_at")
@@ -387,7 +393,7 @@ define [
 
       hash =
         id: @get('id'),
-        is_master_course_content: @get('is_master_course_content'),
+        is_master_course_child_content: @get('is_master_course_child_content'),
         restricted_by_master_course: @get('restricted_by_master_course')
       for field in fields
         hash[field] = @[field]()
@@ -487,3 +493,6 @@ define [
     isOnlyVisibleToOverrides: (override_flag) ->
       return @get('only_visible_to_overrides') || false unless arguments.length > 0
       @set 'only_visible_to_overrides', override_flag
+
+    isRestrictedByMasterCourse: ->
+      @get('is_master_course_child_content') && @get('restricted_by_master_course')

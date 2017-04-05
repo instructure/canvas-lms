@@ -484,8 +484,10 @@ class UsersController < ApplicationController
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
         :recent_activity_dashboard => @current_user.preferences[:recent_activity_dashboard],
-        :custom_colors => @current_user.custom_colors
-      }
+        :custom_colors => @current_user.custom_colors,
+        :show_planner => show_planner?
+      },
+      :STUDENT_PLANNER_ENABLED => planner_enabled?
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
@@ -540,6 +542,24 @@ class UsersController < ApplicationController
       !@current_user.preferences[:recent_activity_dashboard]
     @current_user.save!
     render json: {}
+  end
+
+  def dashboard_view
+    if request.get?
+      render json: {
+        dashboard_view: @current_user.preferences[:dashboard_view]
+      }
+    elsif request.put?
+      valid_options = ['activity', 'cards', 'planner']
+
+      unless valid_options.include?(params[:dashboard_view])
+        return render(json: { :message => "Invalid Dashboard View Option" }, status: :bad_request)
+      end
+
+      @current_user.preferences[:dashboard_view] = params[:dashboard_view]
+      @current_user.save!
+      render json: {}
+    end
   end
 
   include Api::V1::StreamItem
@@ -1343,7 +1363,8 @@ class UsersController < ApplicationController
       return render(json: { :message => "This endpoint only works against the current user" }, status: :unauthorized)
     end
 
-    valid_names = %w{home modules pages assignments quizzes settings files people announcements grades}
+    valid_names = %w{home modules pages assignments quizzes settings files people announcements
+                      grades discussions syllabus collaborations import conferences}
 
     # Check if the page_name is valid
     unless valid_names.include?(params[:page_name])
@@ -1671,7 +1692,11 @@ class UsersController < ApplicationController
           session.delete(:require_terms)
           flash[:notice] = t('user_updated', 'User was successfully updated.')
           unless params[:redirect_to_previous].blank?
-            return redirect_to :back
+            if CANVAS_RAILS4_2
+              return redirect_to :back
+            else
+              return redirect_back fallback_location: user_url(@user)
+            end
           end
           format.html { redirect_to user_url(@user) }
           format.json {
@@ -1705,7 +1730,7 @@ class UsersController < ApplicationController
         render :json => { 'url' => url }
       end
     else
-      render :status => 404, :text => t('could_not_find_url', "Could not find download URL")
+      render :status => 404, :plain => t('could_not_find_url', "Could not find download URL")
     end
   end
 
@@ -1836,7 +1861,7 @@ class UsersController < ApplicationController
       feed.entries << entry.to_atom(:include_context => true, :context => @context)
     end
     respond_to do |format|
-      format.atom { render :text => feed.to_xml }
+      format.atom { render :plain => feed.to_xml }
     end
   end
 

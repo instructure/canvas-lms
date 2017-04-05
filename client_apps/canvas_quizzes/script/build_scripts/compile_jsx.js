@@ -13,13 +13,13 @@ module.exports = function(srcDir, destDir) {
     destDir = srcDir;
   }
 
-  glob.sync('**/*.jsx', { cwd: srcDir }).forEach(function(file) {
+  glob.sync('**/*.js', { cwd: srcDir }).forEach(function(file) {
     var compiled, outfile;
 
     console.log('Compiling JSX:', file);
 
     compiled = processJSX(fs.readFileSync(path.join(srcDir, file), 'utf8'));
-    outfile = path.join(destDir, file.replace(/\.jsx$/, '.js'));
+    outfile = path.join(destDir, file.replace(/\.js$/, '.js'));
 
     fs.ensureDirSync(path.dirname(outfile));
     fs.writeFileSync(outfile, compiled);

@@ -84,7 +84,7 @@ define([
     $(".delete_quiz_link").click(function(event) {
       event.preventDefault();
       var deleteConfirmMessage = I18n.t('confirms.delete_quiz', "Are you sure you want to delete this quiz?");
-      submittedCount = parseInt($('#quiz_details_wrapper').data('submitted-count'));
+      var submittedCount = parseInt($('#quiz_details_wrapper').data('submitted-count'));
       if (submittedCount > 0) {
         deleteConfirmMessage += "\n\n" + I18n.t('confirms.delete_quiz_submissions_warning',
           {'one': "Warning: 1 student has already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook.",

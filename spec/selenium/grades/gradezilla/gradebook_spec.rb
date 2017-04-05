@@ -101,10 +101,10 @@ describe "Gradezilla" do
     end
 
     it "should allow editing grades", priority: "1", test_id: 210026 do
-      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
+      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l1')
       expect(f('.gradebook-cell', cell)).to include_text '10'
       cell.click
-      expect(ff('.grade', cell)).to_not be_blank
+      expect(ff('.grade', cell)).not_to be_blank
     end
   end
 
@@ -238,7 +238,6 @@ describe "Gradezilla" do
 
   context "downloading and uploading submissions" do
     it "updates the dropdown menu after downloading and processes submission uploads" do
-      pending('TODO: Refactor this and add it back as part of CNVS-35119')
       # Given I have a student with an uploaded submission
       a = attachment_model(:context => @student_2, :content_type => 'text/plain')
       @first_assignment.submit_homework(@student_2, :submission_type => 'online_upload', :attachments => [a])
@@ -247,22 +246,22 @@ describe "Gradezilla" do
       gradezilla_page.visit(@course)
 
       # And I click the dropdown menu on the assignment
-      f('.Gradebook__ColumnHeaderAction').click
+      f(".slick-header-column[id*='assignment_#{@first_assignment.id}'] .Gradebook__ColumnHeaderAction").click
 
       # And I click the download submissions button
-      f('[data-action="downloadSubmissions"]').click
+      f('[data-menu-item-id="download-submissions"]').click
 
       # And I close the download submissions dialog
       fj("div:contains('Download Assignment Submissions'):first .ui-dialog-titlebar-close").click
 
       # And I click the dropdown menu on the assignment again
-      f('.Gradebook__ColumnHeaderAction').click
+      f(".slick-header-column[id*='assignment_#{@first_assignment.id}'] .Gradebook__ColumnHeaderAction").click
 
       # And I click the re-upload submissions link
-      f('[data-action="reuploadSubmissions"]').click
+      f('[data-menu-item-id="reupload-submissions"]').click
 
       # When I attach a submissions zip file
-      fixture_file = Rails.root.join('spec/fixtures/files/submissions.zip')
+      fixture_file = Rails.root.join('spec', 'fixtures', 'files', 'submissions.zip')
       f('input[name=submissions_zip]').send_keys(fixture_file)
 
       # And I upload it
@@ -321,7 +320,7 @@ describe "Gradezilla" do
       essay_quiz.save!
       essay_quiz
     end
-    #create quiz with file upload question
+    # create quiz with file upload question
     let(:file_upload_question) do
       {
         question_name: 'File Upload',
@@ -347,7 +346,7 @@ describe "Gradezilla" do
       user_session(teacher)
 
       gradezilla_page.visit(test_course)
-      expect(fj('#gradebook_grid .icon-quiz')).to be_truthy
+      expect(f('#gradebook_grid .icon-quiz')).to be_truthy
     end
 
     it 'should display the quiz icon for file_upload questions', priority: "1", test_id: 498844 do
@@ -360,7 +359,7 @@ describe "Gradezilla" do
       user_session(teacher)
 
       gradezilla_page.visit(test_course)
-      expect(fj('#gradebook_grid .icon-quiz')).to be_truthy
+      expect(f('#gradebook_grid .icon-quiz')).to be_truthy
     end
 
     it 'should remove the quiz icon when graded manually', priority: "1", test_id: 491040 do

@@ -370,7 +370,12 @@ class Submission < ActiveRecord::Base
 
   def user_can_read_grade?(user, session=nil)
     # improves performance by checking permissions on the assignment before the submission
-    self.assignment.user_can_read_grades?(user, session) || self.grants_right?(user, session, :read_grade)
+    return true if self.assignment.user_can_read_grades?(user, session)
+
+    return false if self.assignment.muted? # if you don't have manage rights from the assignment you can't read if it's muted
+    return true if user && user.id == self.user_id # this is fast, so skip the policy cache check if possible
+
+    self.grants_right?(user, session, :read_grade)
   end
 
   on_update_send_to_streams do

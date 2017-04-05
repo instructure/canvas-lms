@@ -143,11 +143,5 @@
   <a href="<%= context_url(@context, :context_statistics_graph_url, '{{ attribute }}') %>" class="over_time_url" style="display: none;">&nbsp;</a>
 </div>
 
-<!--Load the GOOGLE AJAX API: -->
-<!-- google.load uses document.write so we have to do this here  -->
 <script type="text/javascript" src="//www.google.com/jsapi"></script>
-<% js_block do %>
-  <script>
-    google.load('visualization', '1', {'packages':['annotatedtimeline']});
-  </script>
-<% end %>
+<script> google.load('visualization', '1', {'packages':['annotatedtimeline']}); </script>

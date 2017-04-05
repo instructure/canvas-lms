@@ -14,6 +14,17 @@ class ActiveRecord::Base
     end
 
     attr_accessor :in_migration
+
+    # determines if someone started a transaction in addition to the spec fixture transaction
+    # impossible to just count open transactions, cause by default it won't nest a transaction
+    # unless specifically requested
+    def in_transaction_in_test?
+      return false unless Rails.env.test?
+      transaction_method = ActiveRecord::ConnectionAdapters::DatabaseStatements.instance_method(:transaction).source_location.first
+      transaction_regex = /\A#{Regexp.escape(transaction_method)}:\d+:in `transaction'\z/.freeze
+      # transactions due to spec fixtures are _not_in the callstack, so we only need to find 1
+      !!caller.find { |s| s =~ transaction_regex && !s.include?('spec_helper.rb') }
+    end
   end
 
   def read_or_initialize_attribute(attr_name, default_value)
@@ -645,7 +656,7 @@ ActiveRecord::Relation.class_eval do
     order_values.any? ||
       group_values.any? ||
       select_values.to_s =~ /DISTINCT/i ||
-      uniq_value ||
+      distinct_value ||
       select_values_necessitate_temp_table?
   end
   private :find_in_batches_needs_temp_table?
@@ -683,19 +694,8 @@ ActiveRecord::Relation.class_eval do
     end
   end
 
-  # determines if someone started a transaction in addition to the spec fixture transaction
-  # impossible to just count open transactions, cause by default it won't nest a transaction
-  # unless specifically requested
-  def in_transaction_in_test?
-    return false unless Rails.env.test?
-    transaction_method = ActiveRecord::ConnectionAdapters::DatabaseStatements.instance_method(:transaction).source_location.first
-    transaction_regex = /\A#{Regexp.escape(transaction_method)}:\d+:in `transaction'\z/.freeze
-    # transactions due to spec fixtures are _not_in the callstack, so we only need to find 1
-    !!caller.find { |s| s =~ transaction_regex && !s.include?('spec_helper.rb') }
-  end
-
   def find_in_batches_with_temp_table(options = {})
-    can_do_it = Rails.env.production? || ActiveRecord::Base.in_migration || in_transaction_in_test?
+    can_do_it = Rails.env.production? || ActiveRecord::Base.in_migration || ActiveRecord::Base.in_transaction_in_test?
     raise "find_in_batches_with_temp_table probably won't work outside a migration
            and outside a transaction. Unfortunately, it's impossible to automatically
            determine a better way to do it that will work correctly. You can try
@@ -1236,24 +1236,6 @@ ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems', 'plug
 
 ActiveRecord::Tasks::DatabaseTasks.migrations_paths = ActiveRecord::Migrator.migrations_paths
 
-module AddIndexWithLengthRaise
-  def add_index(table_name, column_name, options = {})
-    unless options[:name].to_s =~ /^temp_/
-      column_names = Array(column_name)
-      index_name = index_name(table_name, :column => column_names)
-      index_name = options[:name].to_s if options[:name]
-      if index_name.length > index_name_length
-        raise(ArgumentError, "Index name '#{index_name}' on table '#{table_name}' is too long; the limit is #{index_name_length} characters.")
-      end
-      if index_exists?(table_name, column_names, :name => index_name)
-        raise(ArgumentError, "Index name '#{index_name}' on table '#{table_name}' already exists.")
-      end
-    end
-    super
-  end
-end
-ActiveRecord::ConnectionAdapters::SchemaStatements.prepend(AddIndexWithLengthRaise)
-
 ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   # in anticipation of having to re-run migrations due to integrity violations or
   # killing stuff that is holding locks too long
@@ -1286,12 +1268,6 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     rescue ActiveRecord::StatementInvalid => e
       raise unless e.message =~ /PG(?:::)?Error: ERROR:.+does not exist/
     end
-  end
-
-  # does a query first to make the actual constraint adding fast
-  def change_column_null_with_less_locking(table, column)
-    execute("SELECT COUNT(*) FROM #{quote_table_name(table)} WHERE #{column} IS NULL") if open_transactions == 0
-    change_column_null table, column, false
   end
 end
 

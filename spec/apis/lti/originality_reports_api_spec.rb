@@ -39,6 +39,9 @@ module Lti
                                                 assignment_group: @group,
                                                 points_possible: 12,
                                                 tool_settings_tool: @tool)
+
+      AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
+
       @assignment.tool_settings_tool = message_handler
       @assignment.save!
       @attachment.context = @student

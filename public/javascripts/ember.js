@@ -1,6 +1,6 @@
 var jQuery = require("jquery");
 // this gets the full handlebars.js file, instead of just handlebars.runtime that we alias 'handlebars' to in baseWebpackConfig.js
-var Handlebars = require("exports-loader?Handlebars!handlebars/../handlebars");
+var Handlebars = require("handlebars/dist/cjs/handlebars").default;
 
 window.Ember = {
   imports: {

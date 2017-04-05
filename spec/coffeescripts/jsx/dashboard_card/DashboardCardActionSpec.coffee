@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'react'
   'react-dom'
   'react-addons-test-utils'
   'underscore'
   'jsx/dashboard_card/DashboardCardAction'
-], (React, ReactDOM, TestUtils, _, DashboardCardAction) ->
+], ($, React, ReactDOM, TestUtils, _, DashboardCardAction) ->
 
   QUnit.module 'DashboardCardAction',
     setup: ->

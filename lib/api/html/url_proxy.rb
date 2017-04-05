@@ -138,6 +138,7 @@ module Api
           helper = api_route[1]
           args = { :protocol => protocol, :host => host }
           args.merge! Hash[api_route.slice(2, match.captures.size).zip match.captures]
+          args[:url] = URI.unescape(args[:url]) if args[:url] && return_type == 'SessionlessLaunchUrl'
           api_route.slice(match.captures.size + 2, 1).each { |opts| args.merge!(opts) }
           return { 'data-api-endpoint' => proxy.send(helper, args), 'data-api-returntype' => return_type }
         end

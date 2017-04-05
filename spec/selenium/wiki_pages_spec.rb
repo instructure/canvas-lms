@@ -49,13 +49,7 @@ describe "Wiki Pages" do
     it "should have correct front page UI elements when set as home page", priority: "1", test_id: 126848 do
       front = @course.wiki.wiki_pages.create!(title: 'Front')
       front.set_as_front_page!
-      front.save!
-      get "/courses/#{@course.id}/wiki"
-      fln('Home').click
-      # setting front-page as home page
-      fj('.btn.button-sidebar-wide:contains("Choose Home Page")').click
-      fj('input[type=radio][value=wiki]').click
-      fj('button.btn.btn-primary.button_type_submit.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click
+      @course.update_attribute :default_view, "wiki"
       get "/courses/#{@course.id}"
       wait_for_ajaximations
       # validations

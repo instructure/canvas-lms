@@ -1,4 +1,4 @@
-define ['collaborations'], (collaborations) ->
+define ['collaborations', 'jquery', 'jquery.ajaxJSON'], (collaborations, $) ->
 
   oldAjaxJSON = null
   QUnit.module "Collaborations",

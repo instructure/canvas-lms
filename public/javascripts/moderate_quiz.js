@@ -53,6 +53,7 @@ define([
     $extraTime.toggle(extraTime > 0);
   };
 
+  /*global moderation*/
   window.moderation = {
     updateTimes: function() {
       var now = new Date();
@@ -424,7 +425,7 @@ define([
       },
       buildResultList: function(data) {
         $.each(data["quiz_submissions"], function (index, qs) {
-          clone = $(".example_autosubmit_row").clone()
+          var clone = $(".example_autosubmit_row").clone()
             .removeClass("example_autosubmit_row")
             .appendTo(".outstanding_submissions_list").show();
           clone.children("input").val(qs.id);

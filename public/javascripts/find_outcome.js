@@ -16,7 +16,7 @@ var find_outcome = (function() {
       if(!$dialog.hasClass('loaded')) {
         $dialog.find(".loading_message").text(I18n.t('messages.loading_outcomes', "Loading Outcomes..."));
         $.ajaxJSON($dialog.find(".outcomes_list_url").attr('href'), 'GET', {}, function(data) {
-          valids = [];
+          var valids = [];
           for(var idx in data) {
             var outcome = data[idx].learning_outcome;
             if(!options.for_rubric || (outcome.data && outcome.data.rubric_criterion)) {

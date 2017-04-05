@@ -550,7 +550,7 @@ class Conversation < ActiveRecord::Base
     transaction do
       new_participants = other.conversation_participants.index_by(&:user_id)
       ConversationParticipant.suspend_callbacks(:destroy_conversation_message_participants) do
-        conversation_participants(true).each do |cp|
+        conversation_participants.reload.each do |cp|
           if new_cp = new_participants[cp.user_id]
             new_cp.update_attribute(:workflow_state, cp.workflow_state) if cp.unread? || new_cp.archived?
             # backcompat
@@ -594,7 +594,7 @@ class Conversation < ActiveRecord::Base
         end
       end
       if other.shard == self.shard
-        conversation_messages.update_all(:conversation_id => other)
+        conversation_messages.update_all(conversation_id: other.id)
       else
         # move messages and participants over to new shard
         conversation_messages.find_each do |message|
@@ -618,7 +618,7 @@ class Conversation < ActiveRecord::Base
       end
 
       conversation_participants.reload # now empty ... need to make sure callbacks don't double-delete
-      other.conversation_participants(true).each do |cp|
+      other.conversation_participants.reload.each do |cp|
         cp.update_cached_data! :recalculate_count => true, :set_last_message_at => false, :regenerate_tags => false
       end
       destroy

@@ -11,7 +11,7 @@ class AddMoreGistIndexesForUserSearch < ActiveRecord::Migration[4.2]
 
   def self.down
     if is_postgres?
-      execute('drop index if exists index_trgm_pseudonyms_unique_id;')
+      execute("DROP INDEX IF EXISTS #{connection.quote_table_name('index_trgm_pseudonyms_unique_id')}")
     end
   end
 

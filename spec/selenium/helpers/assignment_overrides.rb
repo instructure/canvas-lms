@@ -80,19 +80,15 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def select_last_override_section(override_name)
-    driver.switch_to.default_content
     fj('.ic-tokeninput-input:last').send_keys(override_name)
-    wait_for_ajaximations
     fj(".ic-tokeninput-option:visible:last").click
-    wait_for_ajaximations
+    driver.action.send_keys(:tab).perform # hide the menu so it doesn't interfere with later actions
   end
 
   def select_first_override_section(override_name)
-    driver.switch_to.default_content
     fj('.ic-tokeninput-input:first').send_keys(override_name)
-    wait_for_ajaximations
     fj(".ic-tokeninput-option:visible:first").click
-    wait_for_ajaximations
+    driver.action.send_keys(:tab).perform # hide the menu so it doesn't interfere with later actions
   end
 
   def select_first_override_header(override_name)

@@ -3,7 +3,7 @@
 .NewUserTutorialTray {
   width: 18.75rem;
   box-sizing: border-box;
-  padding: $ic-sp*3 $ic-sp*1.5 $ic-sp;
+  padding: $ic-sp*4 $ic-sp*1.5 $ic-sp;
 
   @include breakpoint(tablet) {
     width: 21rem;
@@ -14,11 +14,27 @@
 
 .NewUserTutorialTray__ButtonContainer {
   position: absolute;
-  right: 24px;
-  top: 14px;
+  right: $ic-sp * 2;
+  top: $ic-sp + 2;
 }
 
-.ModulesTutorialTray__ImageContainer {
-  margin-top: $ic-sp*6;
-  text-align: center;
+.NewUserTutorialTray__ImageContainer {
+  margin-top: $ic-sp*5;
+}
+
+.NewUserTutorialTraySVG {
+  fill: $ic-border-light;
+  display: block;
+  margin: 0 auto;
+}
+
+.NewUserTutorialTraySVG--Modules {
+  height: 19.5rem;
+  width: 5.25rem;
+}
+
+.NewUserTutorialTray__EndTutorialContainer {
+  position: absolute;
+  bottom: $ic-sp;
+  right: $ic-sp;
 }

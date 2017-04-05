@@ -13,7 +13,7 @@ describe Lti::AssignmentSubscriptionsHelper do
       'endpoint' => submission_event_endpoint,
       'format' => ['application/json'],
       'action' => ['POST'],
-      '@id' => 'http://test.service.com/service#SubmissionEvent',
+      '@id' => 'http://test.service.com/service#vnd.Canvas.SubmissionEvent',
       '@type' => 'RestService'
     }
   end
@@ -21,16 +21,16 @@ describe Lti::AssignmentSubscriptionsHelper do
     {
       'format' => ['application/json'],
       'action' => ['POST'],
-      '@id' => 'http://test.service.com/service#SubmissionEvent',
+      '@id' => 'http://test.service.com/service#vnd.Canvas.SubmissionEvent',
       '@type' => 'RestService'
     }
   end
+  let(:subscription_service){ class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
 
   before(:each) do
     course_with_teacher(active_all: true)
-    ss = class_double(Services::LiveEventsSubscriptionService).as_stubbed_const
-    allow(ss).to receive_messages(create_tool_proxy_subscription: stub_response)
-    allow(ss).to receive_messages(available?: true)
+    allow(subscription_service).to receive_messages(create_tool_proxy_subscription: stub_response)
+    allow(subscription_service).to receive_messages(available?: true)
 
     tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.Canvas.webhooks.root_account.all)
     tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
@@ -40,7 +40,8 @@ describe Lti::AssignmentSubscriptionsHelper do
   end
 
   describe '#create_subscription' do
-    let(:subscription_helper){ Lti::AssignmentSubscriptionsHelper.new(@assignment, tool_proxy) }
+    let(:subscription_helper) { Lti::AssignmentSubscriptionsHelper.new(tool_proxy, @assignment) }
+    let(:event_types) { %w(submission_created plagiarism_resubmit submission_updated).freeze }
     before(:each) do
       @assignment.tool_settings_tool = message_handler
       @assignment.save!
@@ -50,7 +51,11 @@ describe Lti::AssignmentSubscriptionsHelper do
       expect(subscription_helper.create_subscription).to eq 'test-id'
     end
 
-    it 'uses the live-event format' do
+    it "includes all required event types" do
+      expect(subscription_helper.assignment_subscription(@assignment.id)[:EventTypes]).to match_array event_types
+    end
+
+    it 'uses the caliper format' do
       expect(subscription_helper.assignment_subscription(@assignment.id)[:Format]).to eq 'caliper'
     end
 
@@ -62,11 +67,21 @@ describe Lti::AssignmentSubscriptionsHelper do
       expect(subscription_helper.assignment_subscription(@assignment.id)[:TransportMetadata]).to eq({'Url' => submission_event_endpoint})
     end
 
-    context 'bad subscription request' do
+    context 'bad subscriptions service configuration' do
       before(:each) do
         ss = class_double(Services::LiveEventsSubscriptionService).as_stubbed_const
         allow(ss).to receive_messages(create_tool_proxy_subscription: stub_bad_response)
-        allow(ss).to receive_messages(available?: true)
+        allow(ss).to receive_messages(available?: false)
+      end
+
+      it "raises 'AssignmentSubscriptionError' with error message if subscriptions service is not configured" do
+        expect{subscription_helper.create_subscription}.to raise_exception(Lti::AssignmentSubscriptionsHelper::AssignmentSubscriptionError, 'Live events subscriptions service is not configured')
+      end
+    end
+
+    context 'bad subscription request' do
+      before(:each) do
+        allow(subscription_service).to receive_messages(create_tool_proxy_subscription: stub_bad_response)
       end
 
       it "raises 'AssignmentSubscriptionError' if subscription service response is not ok" do
@@ -84,5 +99,31 @@ describe Lti::AssignmentSubscriptionsHelper do
       end
     end
 
+  end
+
+  describe '#destroy_description' do
+    let(:subscription_helper){ Lti::AssignmentSubscriptionsHelper.new(tool_proxy) }
+
+    before(:each) do
+      allow(subscription_service).to receive_messages(destroy_tool_proxy_subscription: stub_response)
+      @assignment.tool_settings_tool = message_handler
+      @assignment.save!
+    end
+
+    it 'deletes a subscription' do
+      lookup = AssignmentConfigurationToolLookup.where(assignment: @assignment).last
+      expect(subscription_service).to receive(:destroy_tool_proxy_subscription).with(tool_proxy, lookup.subscription_id)
+      subscription_helper.destroy_subscription(lookup.subscription_id)
+    end
+
+    it 'does not raise exception if subscription service is not configured' do
+      allow(subscription_service).to receive_messages(available?: false)
+      expect {subscription_helper.destroy_subscription('test')}.not_to raise_exception
+    end
+
+    it 'does not raise exception if delete fails' do
+      allow(subscription_service).to receive_messages(create_tool_proxy_subscription: stub_bad_response)
+      expect {subscription_helper.destroy_subscription('test')}.not_to raise_exception
+    end
   end
 end

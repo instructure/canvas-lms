@@ -170,6 +170,8 @@ define [
       _.each base.discussion_topic_menu_tools, (tool) =>
         tool.url = tool.base_url + "&discussion_topics[]=#{@model.get("id")}"
 
+      base.cannot_delete_by_master_course = @model.get('is_master_course_child_content') && @model.get('restricted_by_master_course')
+
       base.cyoe = CyoeHelper.getItemData(base.assignment_id)
       base.return_to = encodeURIComponent window.location.pathname
       base

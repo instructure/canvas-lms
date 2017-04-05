@@ -44,6 +44,7 @@ const emitTemplate = (path, name, result, dependencies, cssRegistration, partial
   const moduleName = `jst/${path.replace(/.*\/\jst\//, '').replace(/\.handlebars/, '')}`
   return `
     define('${moduleName}', ${JSON.stringify(dependencies)}, function(Handlebars){
+      Handlebars = Handlebars.default
       var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
       var name = '${name}';
       templates[name] = template(${result['template']});
@@ -131,7 +132,7 @@ const buildPartialRequirements = (partialPaths) => {
 module.exports = function i18nLinerHandlebarsLoader (source) {
   this.cacheable()
   const name = resourceName(this.resourcePath)
-  const dependencies = ['handlebars']
+  const dependencies = ['handlebars/runtime']
 
   const partialRegistration = emitPartialRegistration(this.resourcePath, name)
 

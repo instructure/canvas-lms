@@ -39,7 +39,7 @@ describe "discussions" do
                                   title: "Discussion Topic #{n}")
         end
 
-        get url
+        with_timeouts(script: 10) { get url }
 
         #Validate: Makes sure each topic is listed.
         #Since topics are displayed in reverse order from creation (i.e. 100 is listed first), we use the topic index [100-n]
@@ -154,7 +154,7 @@ describe "discussions" do
           end
           topic = DiscussionTopic.where(context_id: course.id).order('id DESC').last
           expect(topic).not_to be_pinned
-          get(url)
+          with_timeouts(script: 10) { get(url) }
           fj("[data-id=#{topic.id}] .al-trigger").click
           fj('.icon-pin:visible').click
           wait_for_ajaximations

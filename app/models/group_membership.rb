@@ -127,6 +127,7 @@ class GroupMembership < ActiveRecord::Base
   def verify_section_homogeneity_if_necessary
     if new_record? && restricted_self_signup? && !has_common_section_with_me?
       errors.add(:user_id, t('errors.not_in_group_section', "%{student} does not share a section with the other members of %{group}.", :student => self.user.name, :group => self.group.name))
+      throw :abort unless CANVAS_RAILS4_2
       false
     else
       true

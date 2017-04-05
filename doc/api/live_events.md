@@ -39,6 +39,7 @@ event originated as part of a web request:
 | `real_user_id` | String | If the current user is being masqueraded, this is the Canvas id of the masquerading user. |
 | `user_login` | String | The login of the current user. |
 | `user_agent` | String | The User-Agent sent by the browser making the request. |
+| `root_account_uuid` | String | The Canvas uuid of the root account associated with the current user. |
 | `root_account_id` | String | The Canvas id of the root account associated with the current user. |
 | `root_account_lti_guid` | String | The Canvas lti_guid of the root account associated with the current user. |
 | `context_type` | String | The type of context where the event happened. |
@@ -87,7 +88,7 @@ what's described in this document. Those fields are subject to change.
 | Field | Description |
 | ----- | ----------- |
 | `course_id` | The Canvas id of the updated course. |
-| `account_id` | The Account id of the created course. |
+| `account_id` | The Account id of the updated course. |
 | `name` | The name the updated course. |
 | `created_at` | The time at which this course was created. |
 | `updated_at` | The time at which this course was last modified in any way. |
@@ -129,17 +130,35 @@ what's described in this document. Those fields are subject to change.
 | Field | Description |
 | ----- | ----------- |
 | `group_category_id` | The Canvas id of the newly created group category. |
-| `group_category_name` | The name of the newly created group. |
+| `group_category_name` | The name of the newly created group category. |
 
 
 #### `group_created`
 
 | Field | Description |
 | ----- | ----------- |
-| `group_id` | The Canvas id of the group the user is assigned to. |
-| `group_name` | The name of the group the user is being assigned to. |
+| `group_id` | The Canvas id of the group. |
+| `group_name` | The name of the group. |
 | `group_category_id` | The Canvas id of the group category. |
 | `group_category_name` | The name of the group category. |
+| `context_type` | The type of the group's context ('Account' or 'Course'). |
+| `context_id` | The Canvas id of the group's context. |
+| `account_id` | The Canvas id of the group's account. |
+| `workflow_state` | The state of the group. |
+
+
+#### `group_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `group_id` | The Canvas id of the group. |
+| `group_name` | The name of the group. |
+| `group_category_id` | The Canvas id of the group category. |
+| `group_category_name` | The name of the group category. |
+| `context_type` | The type of the group's context ('Account' or 'Course'). |
+| `context_id` | The Canvas id of the group's context. |
+| `account_id` | The Canvas id of the group's account. |
+| `workflow_state` | The state of the group. |
 
 
 #### `group_membership_created`
@@ -156,6 +175,20 @@ events.
 | `group_name` | The name of the group the user is being assigned to. |
 | `group_category_id` | The Canvas id of the group category. |
 | `group_category_name` | The name of the group category. |
+| `workflow_state` | The state of the group membership. |
+
+
+#### `group_membership_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `group_membership_id` | The Canvas id of the group membership. |
+| `user_id` | The Canvas id of the user assigned to a group. |
+| `group_id` | The Canvas id of the group the user is assigned to. |
+| `group_name` | The name of the group the user is assigned to. |
+| `group_category_id` | The Canvas id of the group category. |
+| `group_category_name` | The name of the group category. |
+| `workflow_state` | The state of the group membership. |
 
 
 #### `logged_in`
@@ -267,6 +300,7 @@ by `asset_type` and `asset_id`.
 | `lock_at` | The lock date (assignment is locked after this date) |
 | `updated_at` | The time at which this assignment was last modified in any way |
 | `points_possible` | The maximum points possible for the assignment |
+| `lti_assignment_id` | The LTI assignment guid for the assignment |
 
 
 #### `assignment_updated`
@@ -281,6 +315,7 @@ by `asset_type` and `asset_id`.
 | `lock_at` | The lock date (assignment is locked after this date) |
 | `updated_at` | The time at which this assignment was last modified in any way |
 | `points_possible` | The maximum points possible for the assignment |
+| `lti_assignment_id` | The LTI assignment guid for the assignment |
 
 
 #### `submission_created`
@@ -298,6 +333,7 @@ by `asset_type` and `asset_id`.
 | `body` | The content of the submission, if it was submitted directly in a text field. (possibly truncated) |
 | `url` | The URL of the submission (for 'online_url' submissions) |
 | `attempt` | This is the submission attempt number. |
+| `lti_assignment_id` | The LTI assignment guid of the submission's assignment |
 
 
 #### `submission_updated`
@@ -315,7 +351,25 @@ by `asset_type` and `asset_id`.
 | `body` | The content of the submission, if it was submitted directly in a text field. (possibly truncated) |
 | `url` | The URL of the submission (for 'online_url' submissions) |
 | `attempt` | This is the submission attempt number. |
+| `lti_assignment_id` | The LTI assignment guid of the submission's assignment |
 
+
+#### `plagiarism_resubmit`
+
+| Field | Description |
+| ----- | ----------- |
+| `submission_id` | The Canvas id of the new submission. |
+| `assignment_id` | The Canvas id of the assignment being submitted. |
+| `user_id` | The Canvas id of the user associated with the submission. |
+| `submitted_at` | The timestamp when the assignment was submitted. |
+| `updated_at` | The time at which this assignment was last modified in any way |
+| `score` | The raw score |
+| `grade` | The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example)|
+| `submission_type` | The types of submission ex: ('online_text_entry'\|'online_url'\|'online_upload'\|'media_recording') |
+| `body` | The content of the submission, if it was submitted directly in a text field. (possibly truncated) |
+| `url` | The URL of the submission (for 'online_url' submissions) |
+| `attempt` | This is the submission attempt number. |
+| `lti_assignment_id` | The LTI assignment guid of the submission's assignment |
 
 #### `user_created`
 
@@ -352,8 +406,9 @@ by `asset_type` and `asset_id`.
 | `type` | The type of enrollment; e.g. 'StudentEnrollment', 'TeacherEnrollment', etc. |
 | `created_at` | The time at which this enrollment was created. |
 | `updated_at` | The time at which this enrollment was last modified in any way. |
-| `limit_privileges_to_course_section ` | Whether students can only talk to students withing their course section. |
-| `course_section_id ` | The id of the section of the course for the new enrollment. |
+| `limit_privileges_to_course_section` | Whether students can only talk to students within their course section. |
+| `course_section_id` | The id of the section of the course for the new enrollment. |
+| `associated_user_id` | The id of the user observed by an observer's enrollment. Omitted from non-observer enrollments. |
 | `workflow_state` | The state of the enrollment. |
 
 #### `enrollment_updated`
@@ -367,8 +422,9 @@ by `asset_type` and `asset_id`.
 | `type` | The type of enrollment; e.g. 'StudentEnrollment', 'TeacherEnrollment', etc. |
 | `created_at` | The time at which this enrollment was created. |
 | `updated_at` | The time at which this enrollment was last modified in any way. |
-| `limit_privileges_to_course_section ` | Whether students can only talk to students withing their course section. |
-| `course_section_id ` | The id of the section of the course for the new enrollment. |
+| `limit_privileges_to_course_section` | Whether students can only talk to students within their course section. |
+| `course_section_id` | The id of the section of the course for the new enrollment. |
+| `associated_user_id` | The id of the user observed by an observer's enrollment. Omitted from non-observer enrollments. |
 | `workflow_state` | The state of the enrollment. |
 
 #### `enrollment_state_created`

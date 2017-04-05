@@ -89,7 +89,7 @@ module DatesOverridable
     Shard.partition_by_shard(assignments) do |shard_assignments|
       Enrollment.where(course_id: shard_assignments.map(&:context), user_id: user).
           active.
-          uniq.
+          distinct.
           # duplicate the subquery logic of ObserverEnrollment.observed_users, where it verifies the observee exists
           where("associated_user_id IS NULL OR EXISTS (
             SELECT 1 FROM #{Enrollment.quoted_table_name} e2

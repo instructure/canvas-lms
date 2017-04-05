@@ -356,7 +356,7 @@ define [
 
   test "has an error when a name has 257 chars", ->
     view = createView(@assignment3)
-    errors = nameLengthHelper(view, 257, false, 30, '0')
+    errors = nameLengthHelper(view, 257, false, 30, '1')
     ok errors["name"]
     equal errors["name"].length, 1
     equal errors["name"][0]["message"], "Name is too long, must be under 257 characters"
@@ -364,6 +364,12 @@ define [
   test "allows assignment to save when a name has 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true", ->
     view = createView(@assignment3)
     errors = nameLengthHelper(view, 256, false, 30, '1')
+    equal errors.length, 0
+
+  test "allows assignment to save when a name has 15 chars, MAX_NAME_LENGTH is 10 and is required, post_to_sis is true and grading_type is not_graded", ->
+    @assignment3.grading_type = 'not_graded'
+    view = createView(@assignment3)
+    errors = nameLengthHelper(view, 15, true, 10, '1')
     equal errors.length, 0
 
   test "has an error when a name has 11 chars, MAX_NAME_LENGTH is 10 and is required, and post_to_sis is true", ->

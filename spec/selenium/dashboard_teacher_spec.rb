@@ -81,7 +81,8 @@ describe "dashboard" do
       it 'shows an assignment stream item under Recent Activity in dashboard', priority: "1", test_id: 108723 do
         assignment_model({:submission_types => ['online_text_entry'], :course => @course})
         get "/"
-        f('#dashboardToggleButton').click
+        f('#DashboardOptionsMenu_Container button').click
+        fj('span[role="menuitemradio"]:contains("Recent Activity")').click
         find('.toggle-details').click
         expect(fj('.fake-link:contains("Unnamed")')).to be_present
       end

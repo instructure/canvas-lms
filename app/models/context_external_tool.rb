@@ -310,6 +310,14 @@ class ContextExternalTool < ActiveRecord::Base
     settings[:text]
   end
 
+  def oauth_compliant=(val)
+    settings[:oauth_compliant] = Canvas::Plugin.value_to_boolean(val)
+  end
+
+  def oauth_compliant
+    settings[:oauth_compliant]
+  end
+
   def not_selectable
     !!read_attribute(:not_selectable)
   end

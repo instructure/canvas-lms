@@ -164,8 +164,8 @@ describe CoursesController do
         user_session(@student)
         get 'index'
         expect(response).to be_success
-        expect(assigns[:past_enrollments]).to match_array([enrollment3, enrollment2, enrollment1])
-        expect(assigns[:current_enrollments]).to eq [enrollment4]
+        expect(assigns[:past_enrollments]).to match_array([enrollment3, enrollment2])
+        expect(assigns[:current_enrollments]).to eq [enrollment4, enrollment1]
         expect(assigns[:future_enrollments]).to be_empty
       end
 
@@ -1614,6 +1614,63 @@ describe CoursesController do
         @course.reload
         expect(@course.settings[:image_id]).to eq ''
         expect(@course.settings[:image_url]).to eq ''
+      end
+    end
+
+    describe 'master courses' do
+      before :once do
+        Account.default.enable_feature! :master_courses
+        account_admin_user
+        course_factory
+      end
+
+      before :each do
+        user_session(@admin)
+      end
+
+      it 'should require :manage_master_courses permission' do
+        ta_in_course
+        user_session @ta
+        put 'update', :id => @course.id, :format => 'json', :course => { :blueprint => '1' }
+        expect(response).to be_unauthorized
+      end
+
+      it 'should set a course as a master course' do
+        put 'update', :id => @course.id, :format => 'json', :course => { :blueprint => '1' }
+        expect(response).to be_success
+        expect(MasterCourses::MasterTemplate).to be_is_master_course @course
+      end
+
+      it 'should not allow a course with students to be set as a master course' do
+        student_in_course
+        put 'update', :id => @course.id, :format => 'json', :course => { :blueprint => '1' }
+        expect(response.status).to eq 400
+        expect(response.body).to include 'Cannot have a blueprint course with students'
+      end
+
+      it 'should not allow a minion course to be set as a master course' do
+        c1 = @course
+        c2 = course_factory
+        template = MasterCourses::MasterTemplate.set_as_master_course(c1)
+        template.add_child_course!(c2)
+        put 'update', :id => c2.id, :format => 'json', :course => { :blueprint => '1' }
+        expect(response.status).to eq 400
+        expect(response.body).to include 'Course is already associated'
+      end
+
+      it "should allow setting of default template restrictions" do
+        put 'update', :id => @course.id, :format => 'json', :course => { :blueprint => '1',
+          :blueprint_restrictions => {'content' => '1', 'due_dates' => '1'}}
+        expect(response).to be_success
+        template = MasterCourses::MasterTemplate.full_template_for(@course)
+        expect(template.default_restrictions).to eq({:content => true, :due_dates => true})
+      end
+
+      it "should validate template restrictions" do
+        put 'update', :id => @course.id, :format => 'json', :course => { :blueprint => '1',
+          :blueprint_restrictions => {'content' => '1', 'doo_dates' => '1'}}
+        expect(response).to_not be_success
+        expect(response.body).to include 'Invalid restrictions'
       end
     end
   end

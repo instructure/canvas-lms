@@ -49,22 +49,6 @@ change things your updates will get compiled quickly.
 
 This uglifies the resulting bundles, and takes longer.  Don't use for development.
 
-Webpack's output goes to "public/dist/webpack-<dist or production>/".
-
-### Using webpack javascript in canvas
-
-The environment variable USE_WEBPACK is useful for trying out the assets
-that webpack builds locally.  If set to 'true', when you start your server
-you'll load JS from webpack rather than public/js.  You
-can do the same thing by touching the file "config/WEBPACK" (if present, it's
-like having the USE_WEBPACK env var set).
-
-At any time you can use the url parameter "require_js=1" to get the requirejs
-version of the js instead so you can compare them side by side.
-
-While running _without_ USE_WEBACK set, you can use the url parameter "webpack=1"
-to see webpack's js instead of the default requirejs loaded assets.
-
 ### Running js tests with webpack
 
 Lets say you are working on the “dashboard_cards” feature, just run:
@@ -147,9 +131,6 @@ it duplicates from prepare_hbs to a function both can use.
 
 ## After we're on webpack in production:
 
-[ ] remove all the require-js build artifacts, re-write `compile_assets` to not build the require branch (still need to generate translations)
-
-[ ] sweep for the `use_webpack` var and remove it
 
 [ ] re-work js.rake to do away with requirejs stuff
 

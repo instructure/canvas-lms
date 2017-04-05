@@ -10,7 +10,7 @@ module Lti
     # @model AuthorizationJWT
     #     {
     #       "id": "AuthorizationJWT",
-    #       "description": "This is a JWT (https://tools.ietf.org/html/rfc7519), we highly recommend using a library to create these tokens. The token should be signed with the shared secret found in the Tool Proxy, which must be using the 'splitSecret' capability. If a tool proxy has not yet been created in Canvas a developer key may be used to sign the token. In this case the ‘sub’ claim of the token should be the developer key ID."
+    #       "description": "This is a JWT (https://tools.ietf.org/html/rfc7519), we highly recommend using a library to create these tokens. The token should be signed with the shared secret found in the Tool Proxy, which must be using the 'splitSecret' capability. If a tool proxy has not yet been created in Canvas a developer key may be used to sign the token. In this case the ‘sub’ claim of the token should be the developer key ID.",
     #       "properties": {
     #         "sub":{
     #           "description": "The Tool Proxy Guid OR Developer key ID. A developer key ID should only be used if a tool proxy has not been created in Canvas. In this case the token should be signed with the developer key rather than the tool proxy shared secret.",
@@ -43,11 +43,12 @@ module Lti
     class AuthorizationController < ApplicationController
 
       skip_before_action :load_user
+      before_action :require_context
 
       SERVICE_DEFINITIONS = [
         {
           id: 'vnd.Canvas.authorization',
-          endpoint: "api/lti/authorize",
+          endpoint: -> (context) {"api/lti/#{context.class.name.downcase}s/#{context.id}/authorize"},
           format: ['application/json'].freeze,
           action: ['POST'].freeze
         }.freeze
@@ -96,12 +97,16 @@ module Lti
         code = params[:code]
         jwt_validator = Lti::Oauth2::AuthorizationValidator.new(
           jwt: params[:assertion],
-          authorization_url: lti_oauth2_authorize_url,
-          code: code
+          authorization_url: polymorphic_url([@context, :lti_oauth2_authorize]),
+          code: code,
+          context: @context
         )
         jwt_validator.validate!
+        file_host, _ = HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
+        aud = [request.host, request.protocol + file_host]
+        reg_key = code || jwt_validator.sub
         render json: {
-          access_token: Lti::Oauth2::AccessToken.create_jwt(aud: request.host, sub: jwt_validator.sub, reg_key: code).to_s,
+          access_token: Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: jwt_validator.sub, reg_key: reg_key).to_s,
           token_type: 'bearer',
           expires_in: Setting.get('lti.oauth2.access_token.expiration', 1.hour.to_s)
         }

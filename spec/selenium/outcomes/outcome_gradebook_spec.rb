@@ -44,7 +44,6 @@ describe "outcome gradebook" do
         choose_section = ->(name) do
           fj('.section-select-button:visible').click
           fj(".section-select-menu:visible a:contains('#{name}')").click
-          wait_for_js
         end
 
         choose_section.call "All Sections"

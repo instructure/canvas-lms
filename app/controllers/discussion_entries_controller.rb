@@ -143,7 +143,7 @@ class DiscussionEntriesController < ApplicationController
 
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id) }
-        format.json { render :nothing => true, :status => :no_content }
+        format.json { head :no_content }
       end
     end
   end
@@ -186,7 +186,7 @@ class DiscussionEntriesController < ApplicationController
             channel.items << item
           end
           rss.channel = channel
-          render :text => rss.to_s
+          render :plain => rss.to_s
         }
       end
     end

@@ -18,11 +18,11 @@ module Lti
 
     def check_required_capabilities!
       capabilities_hash = ToolConsumerProfile.webhook_subscription_capabilities
-      return if tool_webhook_capabilities.include?(ToolConsumerProfile.webhook_grant_all_capability)
+      return if tool_proxy.enabled_capabilities.include?(ToolConsumerProfile.webhook_grant_all_capability)
 
       subscription[:EventTypes].each do |event_type|
         raise MissingCapability, "EventType #{event_type} is invalid" unless capabilities_hash.keys.include?(event_type.to_sym)
-        if (tool_webhook_capabilities & capabilities_hash[event_type.to_sym]).blank?
+        if (tool_proxy.enabled_capabilities & capabilities_hash[event_type.to_sym]).blank?
           raise MissingCapability, 'Missing required capability'
         end
       end
@@ -40,11 +40,6 @@ module Lti
     end
 
     private
-
-    def tool_webhook_capabilities
-      ims_tool_proxy = IMS::LTI::Models::ToolProxy.from_json(tool_proxy.raw_data)
-      ims_tool_proxy.enabled_capabilities
-    end
 
     def subscription_context
       @_subscription_context ||= begin

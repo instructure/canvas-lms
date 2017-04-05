@@ -107,6 +107,10 @@ define [
       return @get 'lock_at' unless arguments.length > 0
       @set 'lock_at', date
 
+    name: (newName) =>
+      return @get 'title' unless arguments.length > 0
+      @set 'title', newName
+
     htmlUrl: =>
       @get 'url'
 
@@ -146,6 +150,12 @@ define [
 
     postToSISName: =>
       return ENV.SIS_NAME
+
+    maxNameLength: =>
+      return ENV.MAX_NAME_LENGTH
+
+    dueDateRequiredForAccount: =>
+      return ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
 
     toView: =>
       fields = [

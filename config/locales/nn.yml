@@ -11086,7 +11086,12 @@ nn:
   orbis_report_header_student_name: studentnamn
   orbis_report_header_student_sis_id: brukar-SIS
   orbis_report_header_submission_score: "resultat innlevering"
+  organize_and_segment_your_course_by_topic_unit_cha_6ac2de91: |-
+      Organiser og del emnet inn i tema, eining, kapittel
+      eller veke. Sekvensier valde modular ved å definere kriterium og
+      føresetnader.
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Organiser EPUB etter innhaldstype (standard er etter modul)."
+  organize_your_course_content_c3c7ed03: "Organiser emneinnhaldet"
   originality_report_5d461681: Originalitetsrapport
   other_1c6d9c79: Anna
   other_carrier_45531207: "Annan operatør"

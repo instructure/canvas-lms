@@ -152,6 +152,11 @@ require 'atom'
 #           "example": false,
 #           "type": "boolean"
 #         },
+#         "participant_type": {
+#           "description": "The type of participant to sign up for a slot: 'User' or 'Group'",
+#           "example": "User",
+#           "type": "string"
+#         },
 #         "participants_per_appointment": {
 #           "description": "If the event is a time slot, this is the participant limit",
 #           "type": "integer"
@@ -351,7 +356,7 @@ class CalendarEventsApiController < ApplicationController
       Shard.partition_by_shard(events) do |shard_events|
         having_submission = Submission.having_submission.
             where(assignment_id: shard_events).
-            uniq.
+            distinct.
             pluck(:assignment_id).to_set
         shard_events.each do |event|
           event.has_submitted_submissions = having_submission.include?(event.id)
@@ -360,7 +365,7 @@ class CalendarEventsApiController < ApplicationController
         having_student_submission = Submission.having_submission.
             where(assignment_id: shard_events).
             where.not(user_id: nil).
-            uniq.
+            distinct.
             pluck(:assignment_id).to_set
         shard_events.each do |event|
           event.has_student_submissions = having_student_submission.include?(event.id)
@@ -712,7 +717,7 @@ class CalendarEventsApiController < ApplicationController
           calendar.add_event(ics_event) if ics_event
         end
 
-        render :text => calendar.to_ical
+        render plain: calendar.to_ical
       end
       format.atom do
         feed = Atom::Feed.new do |f|
@@ -724,7 +729,7 @@ class CalendarEventsApiController < ApplicationController
         @events.each do |e|
           feed.entries << e.to_atom
         end
-        render :text => feed.to_xml
+        render :plain => feed.to_xml
       end
     end
   end

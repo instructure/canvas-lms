@@ -689,18 +689,8 @@ describe ApplicationHelper do
     before :each do
       helper.stubs(:js_bundles).returns([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
     end
-    it "creates the correct javascript tags" do
-      helper.stubs(:use_webpack?).returns(false)
-      base_url = helper.use_optimized_js? ? '/optimized' : '/javascripts'
-      expect(helper.include_js_bundles).to eq %{
-<script src="#{base_url}/compiled/bundles/some_bundle.js"></script>
-<script src="#{base_url}/plugins/some_plugin/compiled/bundles/some_plugin_bundle.js"></script>
-<script src="#{base_url}/compiled/bundles/another_bundle.js"></script>
-      }.strip
-    end
 
-    it "creates the correct javascript tags with webpack enabled" do
-      helper.stubs(:use_webpack?).returns(true)
+    it "creates the correct javascript tags" do
       helper.stubs(:js_env).returns({
         BIGEASY_LOCALE: 'nb_NO',
         MOMENT_LOCALE: 'nb',
@@ -769,10 +759,17 @@ describe ApplicationHelper do
     context "with new_users_tutorial feature flag enabled" do
       before(:each) do
         @domain_root_account.enable_feature! :new_user_tutorial
+        @current_user = User.create!
       end
 
-      it "returns true" do
+      it "returns true if the user has the flag enabled" do
+        @current_user.enable_feature!(:new_user_tutorial_on_off)
         expect(tutorials_enabled?).to be true
+      end
+
+      it "returns false if the user has the flag disabled" do
+        @current_user.disable_feature!(:new_user_tutorial_on_off)
+        expect(tutorials_enabled?).to be false
       end
     end
 
@@ -780,6 +777,44 @@ describe ApplicationHelper do
       it "returns false" do
         expect(tutorials_enabled?).to be false
       end
+    end
+  end
+
+  describe "planner_enabled?" do
+    before(:each) do
+      @domain_root_account = Account.default
+    end
+
+    context "with student_planner feature flag enabled" do
+      before(:each) do
+        @domain_root_account.enable_feature! :student_planner
+      end
+
+      it "return true" do
+        expect(planner_enabled?).to be true
+      end
+    end
+
+    context "with student_planner feature flag disabled" do
+      it "returns false" do
+        expect(planner_enabled?).to be false
+      end
+    end
+  end
+
+  describe "show_planner?" do
+    before(:each) do
+      @current_user = User.create!
+    end
+
+    it "returns true when the dashboard view is set to planner" do
+      @current_user.preferences[:dashboard_view] = 'planner'
+      expect(show_planner?).to be true
+    end
+
+    it "returns false when the dashboard view is not set to planner" do
+      @current_user.preferences[:dashboard_view] = 'cards'
+      expect(show_planner?).to be false
     end
   end
 

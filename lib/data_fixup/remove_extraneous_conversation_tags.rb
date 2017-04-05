@@ -21,7 +21,7 @@ module DataFixup::RemoveExtraneousConversationTags
     Conversation.transaction do
       c.lock!
       c.update_attribute :tags, c.tags & allowed_tags
-      c.conversation_participants(:include => :user).each do |cp|
+      c.conversation_participants.preload(:user).each do |cp|
         next unless cp.user
         tags_to_remove = cp.tags - c.tags
         next if tags_to_remove.empty?

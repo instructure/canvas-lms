@@ -1,11 +1,12 @@
 define [
+  'jquery'
   'react'
   'react-dom'
   'react-addons-test-utils'
   'underscore'
   'jsx/due_dates/DueDateRow'
   'helpers/fakeENV'
-], (React, ReactDOM, {Simulate, SimulateNative}, _, DueDateRow, fakeENV) ->
+], ($, React, ReactDOM, {Simulate, SimulateNative}, _, DueDateRow, fakeENV) ->
 
   QUnit.module 'DueDateRow with empty props and canDelete true',
     setup: ->

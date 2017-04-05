@@ -63,7 +63,7 @@ class MediaTracksController < ApplicationController
   def show
     @media_track = MediaTrack.find params[:id]
     if stale? :etag => @media_track, :last_modified => @media_track.updated_at.utc
-      render :text => @media_track.content
+      render :plain => @media_track.content
     end
   end
 

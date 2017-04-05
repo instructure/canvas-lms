@@ -62,6 +62,18 @@ define [
       errors = @validateGroupOverrides(data,errors)
       errors
 
+    postToSIS: (data) =>
+      object_type = @model.assignment.constructor.name
+      data_post_to_sis = @options.postToSIS || data.postToSIS == '1'
+      post_to_sis = false
+      if object_type == 'Assignment'
+        post_to_sis = @model.assignment._getAssignmentType() != 'not_graded' && data_post_to_sis
+      else if object_type == 'Quiz'
+        grading_type = $('#quiz_assignment_id').find(":selected").val()
+        valid_grading_type = grading_type != 'practice_quiz' && grading_type != 'survey'
+        post_to_sis = valid_grading_type && data_post_to_sis
+      post_to_sis
+
     validateDatetimes: (data, errors) =>
       checkedRows = []
       for override in data.assignment_overrides
@@ -72,7 +84,7 @@ define [
           hasGradingPeriods: @hasGradingPeriods
           gradingPeriods: @gradingPeriods
           userIsAdmin: _.contains(ENV.current_user_roles, "admin"),
-          postToSIS: @options.postToSIS || data.postToSIS == '1'
+          postToSIS: @postToSIS(data)
         })
         rowErrors = dateValidator.validateDatetimes()
         errors = _.extend(errors, rowErrors)

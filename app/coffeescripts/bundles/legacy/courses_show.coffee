@@ -2,6 +2,7 @@ require [
   "jquery",
   "i18n!courses.show",
   "str/htmlEscape",
+  "jsx/courses/show",
   "jquery.ajaxJSON",
   "jqueryui/dialog",
   "compiled/jquery/fixDialogButtons",
@@ -60,6 +61,3 @@ require [
       else
         $("#wizard_box").slideDown "slow", ->
           $(this).find(".option.publish_step").click()
-
-
-

@@ -141,6 +141,8 @@ define [
         else
           $.datetimeString(json.lock_info.unlock_at)
 
+      json.cannot_edit_by_master_course = json.is_master_course_child_content && json.restricted_by_master_course
+
       json.wiki_page_menu_tools = ENV.wiki_page_menu_tools
       _.each json.wiki_page_menu_tools, (tool) =>
         tool.url = tool.base_url + "&pages[]=#{@model.get("page_id")}"

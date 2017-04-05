@@ -13,7 +13,7 @@ class AddUserActiveOnlyGistIndexes < ActiveRecord::Migration[4.2]
   end
 
   def self.down
-    remove_index :users, name: 'index_trgm_users_name_active_only' if index_exists?(:users, :name, name: 'index_trgm_users_name_active_only')
+    remove_index :users, name: 'index_trgm_users_name_active_only' if index_name_exists?(:users, 'index_trgm_users_name_active_only', false)
     remove_index :users, name: 'index_trgm_users_short_name_active_only'
   end
 end
