@@ -515,6 +515,7 @@ describe Attachment do
       new_a = a.clone_for(@course)
       expect(new_a.context).not_to eql(a.context)
       expect(new_a.filename).to eql(a.filename)
+      expect(new_a.read_attribute(:filename)).to be_nil
       expect(new_a.root_attachment_id).to eql(a.id)
     end
 
