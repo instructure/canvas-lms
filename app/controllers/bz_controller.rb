@@ -273,7 +273,7 @@ class BzController < ApplicationController
         item = {}
         item["braven-id"] = u.id
 
-        u.user_services.select{|s| !UserService.configured_service?(s.service) || feature_and_service_enabled?(s.service) }.each do |service|
+        u.user_services.each do |service|
           if service.service == "linked_in"
             Rails.logger.debug("### Found registered LinkedIn service for #{u.name}: #{service.service_user_link}")
 
