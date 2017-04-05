@@ -312,6 +312,7 @@ module SIS
             end
 
             if pseudo.changed?
+              pseudo.sis_batch_id = user_row.sis_batch_id if user_row.sis_batch_id
               pseudo.sis_batch_id = @batch.id if @batch
               if pseudo.valid?
                 pseudo.save_without_broadcasting
