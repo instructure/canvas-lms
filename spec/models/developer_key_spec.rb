@@ -83,6 +83,17 @@ describe DeveloperKey do
       expect(key.redirect_domain_matches?("http://a.b.example.com/a/b")).to be_falsey
       expect(key.redirect_domain_matches?("http://a.b.example.com/other")).to be_falsey
     end
+
+    it "should ignore query parameters" do
+      key = DeveloperKey.create!(redirect_uris: ["http://example.com/a/b", "http://example.com/a/c"])
+      expect(key.redirect_domain_matches?("http://example.com/a/b?code=foobar")).to be_truthy
+      expect(key.redirect_domain_matches?("http://example.com/a/c?code=yay")).to be_truthy
+      # other paths on the same domain are NOT ok
+      expect(key.redirect_domain_matches?("http://example.com/other?code=foobar")).to be_falsey
+      # It should not raise error on nil or empty
+      expect(key.redirect_domain_matches?(nil)).to be_falsey
+      expect(key.redirect_domain_matches?('')).to be_falsey
+    end
   end
 
   context "Account scoped keys" do
