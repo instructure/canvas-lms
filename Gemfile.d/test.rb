@@ -40,7 +40,6 @@ group :test do
   gem 'testrailtagging', '0.3.7', require: false
 
   gem 'webmock', '2.3.2', require: false
-    gem 'addressable', '2.5.0', require: false
     gem 'crack', '0.4.3', require: false
   gem 'timecop', '0.8.1'
   gem 'jira_ref_parser', '1.0.1'

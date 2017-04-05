@@ -29,6 +29,7 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.1.5', require: false
 
+gem 'addressable', '2.5.0', require: false
 gem "after_transaction_commit", '1.1.1'
 gem "aws-sdk", '2.6.7', require: false
 gem 'barby', '0.6.5', require: false
