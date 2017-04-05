@@ -180,7 +180,6 @@ import 'compiled/jquery.rails_flash_notifications'
 
       return (
         <PopoverMenu
-          zIndex="9999"
           trigger={
             <Button variant="link">
               <Typography {...buttonTypographyProps}>

@@ -278,7 +278,6 @@ import APIError from './api_error'
           shouldCloseOnOverlayClick={false}
           size="medium"
           tabindex="-1"
-          zIndex="9999"
         >
           <ModalHeader>
             <Heading tabIndex="-1">{I18n.t('Add People')}</Heading>

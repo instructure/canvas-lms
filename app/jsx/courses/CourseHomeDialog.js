@@ -111,7 +111,6 @@ class CourseHomeDialog extends React.Component {
     return (<Modal
       isOpen={this.props.open}
       transition="fade"
-      zIndex={99999}
       label={I18n.t('Choose Course Home Page')}
       closeButtonLabel={I18n.t("Close")}
       onReady={this.onReady}

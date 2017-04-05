@@ -88,7 +88,6 @@ class AssignmentGroupColumnHeader extends React.Component {
           contentRef={this.bindOptionsMenuContent}
           focusTriggerOnClose={false}
           trigger={renderTrigger(this.props.assignmentGroup)}
-          zIndex="9999"
         >
           <MenuItemGroup label={I18n.t('Sort by')}>
             <MenuItem

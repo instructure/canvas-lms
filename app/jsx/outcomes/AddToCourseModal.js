@@ -25,7 +25,6 @@ export default React.createClass({
           size="auto"
           label={I18n.t("Modal Dialog: Add to course")}
           closeButtonLabel={I18n.t("Close")}
-          zIndex="9999"
           ref={this._saveModal}
           onEntering={this._fixFocus}
           onClose={this.props.onClose}

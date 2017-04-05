@@ -103,7 +103,6 @@ export default class StudentColumnHeader extends React.Component {
         <PopoverMenu
           contentRef={this.bindOptionsMenuContent}
           focusTriggerOnClose={false}
-          zIndex="9999"
           trigger={
             <span className="Gradebook__ColumnHeaderAction">
               <Typography weight="bold" fontStyle="normal" size="large" color="brand">

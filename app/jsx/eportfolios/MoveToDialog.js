@@ -84,7 +84,7 @@ import Select from 'instructure-ui/lib/components/Select'
           onReady={this.handleReady}
           onRequestClose={this.handleRequestClose}
           onClose={this.handleClose}
-          zIndex='9999'>
+        >
           <ModalHeader>
             <Heading>{ this.props.header }</Heading>
           </ModalHeader>

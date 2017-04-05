@@ -69,7 +69,6 @@ class TotalGradeColumnHeader extends React.Component {
           contentRef={this.bindOptionsMenuContent}
           focusTriggerOnClose={false}
           trigger={renderTrigger()}
-          zIndex="9999"
         >
           <MenuItemGroup label={I18n.t('Sort by')}>
             <MenuItem

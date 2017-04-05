@@ -230,7 +230,6 @@ import Alert from 'instructure-ui/lib/components/Alert'
             label={this.props.title}
             onRequestClose={this.props.onRequestClose}
             closeButtonLabel={I18n.t('Close')}
-            zIndex="9999"
             size='medium'
             onExited={this.props.onExited}
           >
