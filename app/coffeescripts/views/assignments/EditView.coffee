@@ -458,7 +458,8 @@ define [
       errors = @_validatePointsRequired(data, errors)
       errors = @_validateExternalTool(data, errors)
       data2 =
-        assignment_overrides: @dueDateOverrideView.getAllDates()
+        assignment_overrides: @dueDateOverrideView.getAllDates(),
+        postToSIS: data.post_to_sis == '1'
       errors = @dueDateOverrideView.validateBeforeSave(data2,errors)
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         crErrors = @conditionalReleaseEditor.validateBeforeSave()

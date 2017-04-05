@@ -171,3 +171,6 @@ define [
 
     postToSISEnabled: =>
       return ENV.FLAGS && ENV.FLAGS.post_to_sis_enabled
+
+    objectType: =>
+      return 'Quiz'
