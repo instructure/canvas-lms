@@ -64,26 +64,7 @@ module SIS
       end
 
       # Pass a single instance of SIS::Models::User
-      def add_user(*user_data)
-        if user_data.length == 1
-          user = user_data.first
-        else
-          user = SIS::Models::User.new(
-            user_id: user_data[0],
-            login_id: user_data[1],
-            status: user_data[2],
-            first_name: user_data[3],
-            last_name: user_data[4],
-            email: user_data[5],
-            password: user_data[6],
-            ssha_password: user_data[7],
-            integration_id: user_data[8],
-            short_name: user_data[9],
-            full_name: user_data[10],
-            sortable_name: user_data[11]
-          )
-        end
-
+      def add_user(user)
         @logger.debug("Processing User #{user.to_a.inspect}")
 
         raise ImportError, "No user_id given for a user" if user.user_id.blank?
