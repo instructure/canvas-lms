@@ -1017,7 +1017,7 @@ describe Attachment do
     before :each do
       s3_storage!
       Attachment.domain_namespace = @old_account.file_namespace
-      @root = attachment_model
+      @root = attachment_model(filename: 'unknown 2.loser')
       @child = attachment_model(:root_attachment => @root)
 
       @old_object = double('old object')
@@ -1050,7 +1050,7 @@ describe Attachment do
       expect(@child.reload.namespace).to eq @root.namespace
     end
 
-    it 'should allow making a root_attachment childess' do
+    it 'should allow making a root_attachment childless' do
       @child.update_attribute(:filename, 'invalid')
       expect(@root.s3object).to receive(:exists?).and_return(true)
       expect(@child).to receive(:s3object).and_return(@old_object)

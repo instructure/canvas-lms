@@ -1259,12 +1259,12 @@ class Attachment < ActiveRecord::Base
     return unless child
     raise "must be a child" unless child.root_attachment_id == id
     child.root_attachment_id = nil
-    child.filename = filename if filename
     copy_attachment_content(child)
     Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child.id)
   end
 
   def copy_attachment_content(destination)
+    destination.write_attribute(:filename, filename) if filename
     if Attachment.s3_storage?
       if filename && s3object.exists? && !destination.s3object.exists?
         s3object.copy_to(destination.s3object)
@@ -1284,7 +1284,6 @@ class Attachment < ActiveRecord::Base
     root = self.root_attachment
     return unless root
     self.root_attachment_id = nil
-    self.write_attribute(:filename, root.filename) if root.filename
     root.copy_attachment_content(self)
   end
 
