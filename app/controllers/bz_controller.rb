@@ -252,7 +252,12 @@ class BzController < ApplicationController
 
     def perform
       csv = linked_in_export_guts
-      Mailer.debug_message("Export Success", csv)
+      mail.Mailer.debug_message("Export Success", "Attached is your export data")
+      mail.attachments["linkedin.csv"] = {
+        mime_type: "text/csv",
+        content: csv
+      }
+      mail.deliver
       # super
       csv
     end
@@ -260,7 +265,7 @@ class BzController < ApplicationController
     def on_permanent_failure(error)
       er_id = Canvas::Errors.capture_exception("BzController::ExportWork", error)[:error_report]
       # email us?
-      Mailer.debug_message("Export FAIL", error.to_s)
+      Mailer.debug_message("Export FAIL", error.to_s).deliver
     end
 
     def linked_in_export_guts
