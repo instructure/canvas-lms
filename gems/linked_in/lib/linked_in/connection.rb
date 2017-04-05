@@ -40,6 +40,7 @@ module LinkedIn
     def get_service_user_info(access_token)
       body = get_request('/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)', access_token).body
       data = Nokogiri::XML(body)
+      Rails.logger.debug("### Registering LinkedIn service.  Data returned from LinkedIn API: #{data.css.inspect}")
       service_user_id = data.css("id")[0].content
       service_user_name = data.css("first-name")[0].content + " " + data.css("last-name")[0].content
       service_user_url = data.css("public-profile-url")[0].content
