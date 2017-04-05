@@ -36,12 +36,22 @@ module Lti
       end
 
       it 'returns a list of launch definitions for a context and placements' do
+        resource_tool = new_valid_external_tool(account, true)
         course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
         json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                  {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json',
-                  placements: %w(module_item resource_selection), course_id: @course.id.to_s})
-        expect(json.select {|j| j['definition_type'] == @mh.class.name && j['definition_id'] == @mh.id.to_s}).not_to be_nil
-        expect(json.select {|j| j['definition_type'] == @external_tool.class.name && j['definition_id'] == @external_tool.id.to_s}).not_to be_nil
+                  placements: %w(resource_selection), course_id: @course.id.to_s})
+        expect(json.detect {|j| j['definition_type'] == resource_tool.class.name && j['definition_id'] == resource_tool.id}).to_not be_nil
+        expect(json.detect {|j| j['definition_type'] == @external_tool.class.name && j['definition_id'] == @external_tool.id}).to be_nil
+      end
+
+      it 'works for a teacher even without lti_add_edit permissions' do
+        course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
+        account.role_overrides.create!(:permission => "lti_add_edit", :enabled => false, :role => teacher_role)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+          {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', course_id: @course.id.to_s})
+        expect(json.count).to eq 1
+        expect(json.detect {|j| j['definition_type'] == @external_tool.class.name && j['definition_id'] == @external_tool.id}).to_not be_nil
       end
 
       it 'paginates the launch definitions' do
@@ -61,8 +71,6 @@ module Lti
         expect(json_next.count).to eq 3
         json
       end
-
-      
     end
 
     describe '#index' do
