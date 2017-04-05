@@ -2,20 +2,22 @@ define [
   'compiled/gradebook/SubmissionCell'
   'str/htmlEscape'
   'jquery'
-], (SubmissionCell, htmlEscape, $) ->
+  'jsx/shared/helpers/numberHelper'
+], (SubmissionCell, htmlEscape, $, numberHelper) ->
 
   dangerousHTML= '"><img src=/ onerror=alert(document.cookie);>'
   escapedDangerousHTML = htmlEscape dangerousHTML
 
   QUnit.module "SubmissionCell",
     setup: ->
+      @pointsPossible = 100
       @opts =
         item:
-            'whatever': {}
+          'whatever': {}
         column:
-            field: 'whatever'
-            object:
-              points_possible: 100
+          field: 'whatever'
+          object:
+            points_possible: @pointsPossible
         container: $('#fixtures')[0]
       @cell = new SubmissionCell @opts
     teardown: -> $('#fixtures').empty()
@@ -32,6 +34,21 @@ define [
     flashWarningStub = @stub $, 'flashWarning'
     @cell.applyValue(@opts.item, '150')
     ok flashWarningStub.calledOnce
+
+  test "#applyValue calls numberHelper with points possible", ->
+    numberHelperStub = @stub(numberHelper, 'parse').withArgs(@pointsPossible)
+    @stub @cell, 'postValue'
+    @cell.applyValue(@opts.item, '10')
+
+    strictEqual numberHelperStub.callCount, 1
+
+  test "#applyValue calls numberHelper with state", ->
+    state = '10'
+    numberHelperStub = @stub(numberHelper, 'parse').withArgs(state)
+    @stub @cell, 'postValue'
+    @cell.applyValue(@opts.item, state)
+
+    strictEqual numberHelperStub.callCount, 1
 
   test "#loadValue escapes html", ->
     @opts.item.whatever.grade = dangerousHTML

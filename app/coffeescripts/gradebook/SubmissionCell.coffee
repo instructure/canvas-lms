@@ -2,6 +2,7 @@ define [
   'jquery'
   'underscore'
   'i18n!gradebook'
+  'jsx/shared/helpers/numberHelper'
   'jsx/gradebook/shared/helpers/GradeFormatHelper'
   'compiled/gradebook/GradebookTranslations'
   'jsx/grading/helpers/OutlierScoreHelper'
@@ -10,7 +11,8 @@ define [
   'compiled/util/round'
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers' # raw
-], ($, _, I18n, GradeFormatHelper, GRADEBOOK_TRANSLATIONS, OutlierScoreHelper, htmlEscape, {extractDataTurnitin}, round) ->
+], ($, _, I18n, numberHelper, GradeFormatHelper, GRADEBOOK_TRANSLATIONS,
+  OutlierScoreHelper, htmlEscape, {extractDataTurnitin}, round) ->
 
   class SubmissionCell
 
@@ -49,8 +51,9 @@ define [
         submission.excused = true
       else
         submission.grade = htmlEscape state
-        pointsPossible = @opts.column.object.points_possible
-        outlierScoreHelper = new OutlierScoreHelper(state, pointsPossible)
+        pointsPossible = numberHelper.parse(@opts.column.object.points_possible)
+        score = numberHelper.parse(state)
+        outlierScoreHelper = new OutlierScoreHelper(score, pointsPossible)
         $.flashWarning(outlierScoreHelper.warningMessage()) if outlierScoreHelper.hasWarning()
       @wrapper?.remove()
       @postValue(item, state)
