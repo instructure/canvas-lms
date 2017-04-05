@@ -362,7 +362,7 @@ define [
           errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
         validateBeforeSaveData =
           assignment_overrides: @dueDateOverrideView.getAllDates(),
-          postToSIS: data.assignment.postToSIS()
+          postToSIS: data.assignment.attributes.post_to_sis == '1'
         errors = @dueDateOverrideView.validateBeforeSave(validateBeforeSaveData, errors)
         errors = @_validatePointsPossible(data, errors)
         errors = @_validateTitle(data, errors)

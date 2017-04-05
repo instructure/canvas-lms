@@ -63,11 +63,12 @@ define [
       errors
 
     postToSIS: (data) =>
-      object_type = @model.assignment.constructor.name
-      data_post_to_sis = @options.postToSIS || data.postToSIS == '1'
+      object_type = @model.assignment.objectType()
+      data_post_to_sis = data.postToSIS
       post_to_sis = false
       if object_type == 'Assignment'
-        post_to_sis = @model.assignment._getAssignmentType() != 'not_graded' && data_post_to_sis
+        grading_type = $('#assignment_grading_type').find(":selected").val()
+        post_to_sis = grading_type != 'not_graded' && data_post_to_sis
       else if object_type == 'Quiz'
         grading_type = $('#quiz_assignment_id').find(":selected").val()
         valid_grading_type = grading_type != 'practice_quiz' && grading_type != 'survey'
