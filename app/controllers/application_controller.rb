@@ -269,10 +269,20 @@ class ApplicationController < ActionController::Base
   end
   helper_method :set_master_course_js_env_data
 
-  def should_load_master_course_sidebar?
-    @context && @context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(@context) && @context.grants_right?(@current_user, :manage)
+  def load_master_course_sidebar
+    return unless @context && @context.is_a?(Course) && master_courses? && MasterCourses::MasterTemplate.is_master_course?(@context) && @context.grants_right?(@current_user, :manage)
+    js_bundle :blueprint_course_settings
+    css_bundle :blueprint_course_settings
+    js_env({
+      BLUEPRINT_SETTINGS_DATA: {
+        accountId: @context.account.id,
+        course: @context.slice(:id, :name),
+        subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
+        terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}}
+      }
+    })
   end
-  helper_method :should_load_master_course_sidebar?
+  helper_method :load_master_course_sidebar
 
   def editing_restricted?(content, edit_type=:any)
     return false unless master_courses? && content.respond_to?(:editing_restricted?)

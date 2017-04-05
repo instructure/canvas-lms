@@ -1,4 +1,4 @@
-import I18n from 'i18n!blueprint_config'
+import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
 import React from 'react'
 import Typography from 'instructure-ui/lib/components/Typography'
@@ -79,7 +79,7 @@ export default class CoursePickerTable extends React.Component {
     } else if (index >= this.props.courses.length) {
       this.handleFocusLoss(index - 1)
     } else {
-      this.tableBody.querySelectorAll('.bps-table__course-row input[type="checkbox"]')[index].focus()
+      this.tableBody.querySelectorAll('.bca-table__course-row input[type="checkbox"]')[index].focus()
     }
   }
 
@@ -116,8 +116,8 @@ export default class CoursePickerTable extends React.Component {
   }
 
   renderRows () {
-    return this.props.courses.map((course, index) =>
-      <tr key={course.id} className="bps-table__course-row">
+    return this.props.courses.map(course =>
+      <tr key={course.id} className="bca-table__course-row">
         <td>
           <Checkbox
             onChange={this.onSelectToggle}
@@ -147,7 +147,7 @@ export default class CoursePickerTable extends React.Component {
     }
 
     return (
-      <tr key="no-results" className="bps-table__no-results">
+      <tr key="no-results" className="bca-table__no-results">
         <td>{this.renderCellText(I18n.t('No results'))}</td>
       </tr>
     )
@@ -161,13 +161,13 @@ export default class CoursePickerTable extends React.Component {
         <PresentationContent as="div">
           <Table caption={<ScreenReaderContent>{I18n.t('Blueprint Courses')}</ScreenReaderContent>}>
             {this.renderColGroup()}
-            <thead className="bps-table__head">
+            <thead className="bca-table__head">
               {this.renderHeaders()}
             </thead>
             <tbody />
           </Table>
         </PresentationContent>
-        <p className="bps-table__select-all">
+        <p className="bca-table__select-all">
           <Checkbox
             onChange={this.onSelectAllToggle}
             value="all"
@@ -187,16 +187,16 @@ export default class CoursePickerTable extends React.Component {
 
   render () {
     return (
-      <div className="bps-table__wrapper">
+      <div className="bca-table__wrapper">
         {this.renderStickyHeaders()}
-        <div className="bps-table__content-wrapper">
+        <div className="bca-table__content-wrapper">
           <Table caption={<ScreenReaderContent>{I18n.t('Blueprint Courses')}</ScreenReaderContent>}>
             {this.renderColGroup()}
             {/* on the real table, we'll include the headers again, but make them screen reader only */}
             <ScreenReaderContent as="thead">
               {this.renderHeaders()}
             </ScreenReaderContent>
-            <tbody className="bps-table__body" ref={(c) => { this.tableBody = c }}>
+            <tbody className="bca-table__body" ref={(c) => { this.tableBody = c }}>
               {this.renderBodyContent()}
             </tbody>
           </Table>

@@ -1,5 +1,5 @@
-import actions from 'jsx/course_blueprint_settings/actions'
-import reducer from 'jsx/course_blueprint_settings/reducer'
+import actions from 'jsx/blueprint_course_settings/actions'
+import reducer from 'jsx/blueprint_course_settings/reducer'
 import sampleData from './sampleData'
 
 QUnit.module('Course Blueprint Settings reducer')
@@ -33,6 +33,11 @@ test('resets addedAssociations on SAVE_ASSOCIATIONS_SUCCESS', () => {
   deepEqual(newState.addedAssociations, [])
 })
 
+test('resets addedAssociations on CLEAR_ASSOCIATIONS', () => {
+  const newState = reduce(actions.clearAssociations())
+  deepEqual(newState.addedAssociations, [])
+})
+
 test('adds associations to addedAssociations on ADD_COURSE_ASSOCIATIONS', () => {
   const existing = [sampleData.courses[0]]
   const added = [sampleData.courses[1]]
@@ -43,6 +48,11 @@ test('adds associations to addedAssociations on ADD_COURSE_ASSOCIATIONS', () => 
 test('removes associations from addedAssociations on UNDO_ADD_COURSE_ASSOCIATIONS', () => {
   const newState = reduce(actions.undoAddCourseAssociations(['1']), { addedAssociations: sampleData.courses })
   deepEqual(newState.addedAssociations, [sampleData.courses[1]])
+})
+
+test('resets removedAssociations on CLEAR_ASSOCIATIONS', () => {
+  const newState = reduce(actions.clearAssociations())
+  deepEqual(newState.removedAssociations, [])
 })
 
 test('resets removedAssociations on SAVE_ASSOCIATIONS_SUCCESS', () => {
@@ -60,6 +70,11 @@ test('removes associations from removedAssociations on UNDO_REMOVE_COURSE_ASSOCI
   deepEqual(newState.removedAssociations, ['2'])
 })
 
+test('sets hasLoadedCourses to true on on LOAD_COURSES_SUCCESS', () => {
+  const newState = reduce(actions.loadCoursesSuccess({}))
+  equal(newState.hasLoadedCourses, true)
+})
+
 test('sets isLoadingCourses to true on on LOAD_COURSES_START', () => {
   const newState = reduce(actions.loadCoursesStart())
   equal(newState.isLoadingCourses, true)
@@ -73,6 +88,11 @@ test('sets isLoadingCourses to false on on LOAD_COURSES_SUCCESS', () => {
 test('sets isLoadingCourses to false on on LOAD_COURSES_FAIL', () => {
   const newState = reduce(actions.loadCoursesFail())
   equal(newState.isLoadingCourses, false)
+})
+
+test('sets hasLoadedAssociations to true on on LOAD_ASSOCIATIONS_SUCCESS', () => {
+  const newState = reduce(actions.loadAssociationsSuccess([]))
+  equal(newState.hasLoadedAssociations, true)
 })
 
 test('sets isLoadingAssociations to true on on LOAD_ASSOCIATIONS_START', () => {

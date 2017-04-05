@@ -1,11 +1,64 @@
 @import "base/environment";
 
-.bps__wrapper {
+.bcs__trigger {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 10px 3px;
+  border-bottom-left-radius: 5px;
+  background-color: $ic-brand-primary;
+  box-shadow: -1px 1px 2px 0 rgba(0,0,0,.2);
+
+  &:after {
+    content: '';
+    display: block;
+    position: fixed;
+    top: 58px;
+    right: 0;
+    bottom: 0;
+    width: 8px;
+    background-color: $ic-brand-primary;
+    box-shadow: -1px 0 1px 0 rgba(0,0,0,.2)
+  }
+}
+
+.bcs__content {
+  width: 270px;
+}
+
+.bcs__row {
+  margin: 0.5em 1.5em;
+  border-bottom: 1px solid $ic-border-color;
+
+  .bcs__row-right-content {
+    float: right;
+    line-height: 2.5em;
+    vertical-align: middle;
+    margin-right: 0.5em;
+  }
+}
+
+.bcs__header {
+  background: $ic-brand-primary;
+  position: relative;
+  text-align: center;
+  padding: 1.2em 0;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .2)
+}
+
+.bcs__close-wrapper {
+  position: absolute;
+  top: 0.5em;
+  left: 0.5em;
+}
+
+.bca__wrapper {
+  margin: 0 auto;
   max-width: 850px;
   position: relative;
 }
 
-.bps__overlay {
+.bca__overlay {
   position: absolute;
   z-index: 10;
   top: 0;
@@ -16,17 +69,17 @@
   text-align: center;
 }
 
-.bps__overlay__save-wrapper {
+.bca__overlay__save-wrapper {
   position: relative;
   top: 50%;
   transform: translateY(-50%);
 }
 
-.bps__footer {
+.bca__footer {
   display: flex; justify-content: flex-end; flex: 0 0 auto;
 }
 
-.bps-course-filter {
+.bca-course-filter {
   border: 1px solid $ic-border-color;
   border-radius: $ic-border-radius;
 
@@ -41,7 +94,7 @@
   }
 }
 
-.bps-course-details__wrapper {
+.bca-course-details__wrapper {
   margin-top: 1em;
   position: relative;
 
@@ -51,10 +104,10 @@
   }
 }
 
-.bps-course-picker__loading {
+.bca-course-picker__loading {
   position: absolute;
   z-index: 10;
-  top: 43px;
+  top: 28px;
   left: 1px;
   right: 1px;
   bottom: 1px;
@@ -64,7 +117,7 @@
   border-radius: $ic-border-radius;
 }
 
-.bps-table__wrapper {
+.bca-table__wrapper {
   border: 1px solid $ic-border-color;
   border-radius: $ic-border-radius;
   padding: 78px 0 0;
@@ -77,7 +130,7 @@
     left: 0;
     right: 0;
 
-    .bps-table__head {
+    .bca-table__head {
       background: $ic-color-medium-light;
 
       th {
@@ -86,7 +139,7 @@
     }
   }
 
-  .bps-table__select-all {
+  .bca-table__select-all {
     padding: 8px 2px;
     border-bottom: 1px solid $ic-border-color;
     margin: 0 10px;
@@ -96,13 +149,13 @@
     }
   }
 
-  .bps-table__content-wrapper {
+  .bca-table__content-wrapper {
     height: 270px;
     overflow-y: auto;
     overflow-x: hidden;
     padding-bottom: 30px;
 
-    .bps-table__body {
+    .bca-table__body {
       tr {
         // overwrite instui borders to match design
         border-left: none !important;
@@ -115,7 +168,7 @@
           box-shadow: -42px 1px 0 0 $ic-color-light, 0 1px 0 0 $ic-border-color;
         }
 
-        &.bps-table__no-results {
+        &.bca-table__no-results {
           td {
            box-shadow: none;
          }
@@ -125,13 +178,13 @@
   }
 }
 
-.bps-associations-table {
+.bca-associations-table {
   padding-left: 10px;
   margin-bottom: 40px;
   position: relative;
   min-height: 75px;
 
-  .bps-associations__course-row {
+  .bca-associations__course-row {
     form {
       margin: 0;
     }

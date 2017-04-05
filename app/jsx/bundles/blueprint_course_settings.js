@@ -1,4 +1,4 @@
-import App from 'jsx/course_blueprint_settings/sidebar'
+import App from 'jsx/blueprint_course_settings/index'
 
 const wrapper = document.getElementById('wrapper')
 const root = document.createElement('div')

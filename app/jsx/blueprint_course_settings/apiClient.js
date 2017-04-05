@@ -12,7 +12,7 @@ const ApiClient = {
             return this._depaginate(links.next, results)
           }
         }
-        res.data = results
+        res.data = results // eslint-disable-line
         return res
       })
   },

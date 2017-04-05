@@ -1,4 +1,4 @@
-import I18n from 'i18n!blueprint_config'
+import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
 import React from 'react'
 import Typography from 'instructure-ui/lib/components/Typography'
@@ -104,7 +104,7 @@ export default class CoursePickerTable extends React.Component {
       const focusTo = focusIds[courseIndex + 1] || focusIds[courseIndex - 1] || headerFocus
               // {/* onClick={this.onRemove} */}
       return (
-        <tr key={course.id} className="bps-associations__course-row">
+        <tr key={course.id} className="bca-associations__course-row">
           <td>{this.renderCellText(course.name)}</td>
           <td>{this.renderCellText(course.course_code)}</td>
           <td>{this.renderCellText(course.term.name)}</td>
@@ -183,7 +183,7 @@ export default class CoursePickerTable extends React.Component {
     if (isLoadingAssociations) {
       const title = I18n.t('Loading Associations')
       return (
-        <div className="bps__overlay">
+        <div className="bca__overlay">
           <Spinner title={title} />
           <Typography as="p">{title}</Typography>
         </div>
@@ -197,7 +197,7 @@ export default class CoursePickerTable extends React.Component {
     const { addedAssociations } = this.props
     return (
       <div
-        className="bps-associations-table"
+        className="bca-associations-table"
         ref={(c) => { this.wrapper = c }}
       >
         {this.renderLoadingOverlay()}

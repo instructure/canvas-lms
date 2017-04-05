@@ -11,9 +11,15 @@ export default combineReducers({
   course: identity(),
   terms: identity([]),
   subAccounts: identity([]),
+  hasLoadedCourses: handleActions({
+    [actionTypes.LOAD_COURSES_SUCCESS]: () => true,
+  }, false),
   courses: handleActions({
     [actionTypes.LOAD_COURSES_SUCCESS]: (state, action) => action.payload,
   }, []),
+  hasLoadedAssociations: handleActions({
+    [actionTypes.LOAD_ASSOCIATIONS_SUCCESS]: () => true,
+  }, false),
   existingAssociations: handleActions({
     [actionTypes.LOAD_ASSOCIATIONS_SUCCESS]: (state, action) => action.payload,
     [actionTypes.SAVE_ASSOCIATIONS_SUCCESS]: (state, action) => {
@@ -22,11 +28,13 @@ export default combineReducers({
     },
   }, []),
   addedAssociations: handleActions({
+    [actionTypes.CLEAR_ASSOCIATIONS]: () => [],
     [actionTypes.SAVE_ASSOCIATIONS_SUCCESS]: () => [],
     [actionTypes.ADD_COURSE_ASSOCIATIONS]: (state, action) => state.concat(action.payload),
     [actionTypes.UNDO_ADD_COURSE_ASSOCIATIONS]: (state, action) => state.filter(course => !action.payload.includes(course.id)),
   }, []),
   removedAssociations: handleActions({
+    [actionTypes.CLEAR_ASSOCIATIONS]: () => [],
     [actionTypes.SAVE_ASSOCIATIONS_SUCCESS]: () => [],
     [actionTypes.REMOVE_COURSE_ASSOCIATIONS]: (state, action) => state.concat(action.payload),
     [actionTypes.UNDO_REMOVE_COURSE_ASSOCIATIONS]: (state, action) => state.filter(courseId => !action.payload.includes(courseId)),

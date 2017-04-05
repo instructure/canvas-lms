@@ -7,17 +7,9 @@ const types = [
   'SAVE_ASSOCIATIONS_START', 'SAVE_ASSOCIATIONS_SUCCESS', 'SAVE_ASSOCIATIONS_FAIL',
   'ADD_COURSE_ASSOCIATIONS', 'UNDO_ADD_COURSE_ASSOCIATIONS',
   'REMOVE_COURSE_ASSOCIATIONS', 'UNDO_REMOVE_COURSE_ASSOCIATIONS',
+  'CLEAR_ASSOCIATIONS',
 ]
 const actions = createActions(...types)
-
-actions.cancel = () => (dispatch, getState) => {
-  const referrer = document.referrer
-  if (referrer.split('/')[2] !== location.host || referrer.includes('/login')) {
-    location.replace(`/courses/${getState().course.id}`)
-  } else {
-    location.replace(referrer)
-  }
-}
 
 actions.addAssociations = associations => (dispatch, getState) => {
   const state = getState()

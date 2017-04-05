@@ -1,4 +1,4 @@
-import I18n from 'i18n!blueprint_config'
+import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
 import React from 'react'
 import ToggleDetails from 'instructure-ui/lib/components/ToggleDetails'
@@ -52,10 +52,6 @@ export default class CoursePicker extends React.Component {
     }
   }
 
-  reloadCourses () {
-    this.props.loadCourses(this.state.filters)
-  }
-
   onFilterActivate = () => {
     this.setState({
       isExpanded: true,
@@ -85,11 +81,15 @@ export default class CoursePicker extends React.Component {
     })
   }
 
+  reloadCourses () {
+    this.props.loadCourses(this.state.filters)
+  }
+
   render () {
     const courses = this.props.courses.filter(course => !this.props.excludeCourses.includes(course.id))
 
     return (
-      <div className="bps-course-picker">
+      <div className="bca-course-picker">
         <CourseFilter
           ref={(c) => { this.filter = c }}
           terms={this.props.terms}
@@ -98,13 +98,13 @@ export default class CoursePicker extends React.Component {
           onActivate={this.onFilterActivate}
           onDeactivate={this.onFilterDeactivate}
         />
-        <div className="bps-course-details__wrapper">
+        <div className="bca-course-details__wrapper">
           <ToggleDetails
             ref={(c) => { this.coursesToggle = c }}
             isExpanded={this.state.isExpanded}
             summary={<Typography>{I18n.t('Courses')}</Typography>}
           >
-            {this.props.isLoadingCourses && (<div className="bps-course-picker__loading">
+            {this.props.isLoadingCourses && (<div className="bca-course-picker__loading">
               <Spinner title={I18n.t('Loading Courses')} />
             </div>)}
             <CoursePickerTable

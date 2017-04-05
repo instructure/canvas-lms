@@ -1,25 +1,27 @@
-import I18n from 'i18n!blueprint_config'
+import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
 import React from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import 'compiled/jquery.rails_flash_notifications'
+
 import Heading from 'instructure-ui/lib/components/Heading'
 import Alert from 'instructure-ui/lib/components/Alert'
-import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Spinner from 'instructure-ui/lib/components/Spinner'
-import 'compiled/jquery.rails_flash_notifications'
+
+import actions from '../actions'
 import propTypes from '../propTypes'
 import CoursePicker from './CoursePicker'
 import AssociationsTable from './AssociationsTable'
 
 const { string, arrayOf, func, bool } = React.PropTypes
 
-export default class BlueprintSettings extends React.Component {
+export default class BlueprintAssociations extends React.Component {
   static propTypes = {
     loadCourses: func.isRequired,
     addAssociations: func.isRequired,
     removeAssociations: func.isRequired,
-    saveAssociations: func.isRequired,
-    cancel: func.isRequired,
 
     terms: propTypes.termList.isRequired,
     subAccounts: propTypes.accountList.isRequired,
@@ -61,34 +63,12 @@ export default class BlueprintSettings extends React.Component {
     this.props.addAssociations(courseIds)
   }
 
-  renderHeader () {
-    return (
-      <header>
-        <Heading level="h2">{I18n.t('Blueprint Settings')}</Heading>
-        <br />
-        <Heading level="h3">{I18n.t('Associated Courses')}</Heading>
-        <hr />
-        <Heading level="h3">{I18n.t('Search Courses')}</Heading>
-      </header>
-    )
-  }
-
-  renderFooter () {
-    return (
-      <footer className="bps__footer">
-        <Button onClick={this.props.cancel}>{I18n.t('Cancel')}</Button>
-        &nbsp;&nbsp;
-        <Button variant="primary" onClick={this.props.saveAssociations}>{I18n.t('Save')}</Button>
-      </footer>
-    )
-  }
-
   renderLoadingOverlay () {
     if (this.props.isSavingAssociations) {
       const title = I18n.t('Saving Associations')
       return (
-        <div className="bps__overlay">
-          <div className="bps__overlay__save-wrapper">
+        <div className="bca__overlay">
+          <div className="bca__overlay__save-wrapper">
             <Spinner title={title} />
             <Typography as="p">{title}</Typography>
           </div>
@@ -101,13 +81,13 @@ export default class BlueprintSettings extends React.Component {
 
   render () {
     return (
-      <div className="bps__wrapper">
+      <div className="bca__wrapper">
         {this.renderLoadingOverlay()}
         {this.props.errors.map(err => <Alert key={err} variant="warning">Error: {err}</Alert>)}
         {this.props.errors.length ? <br /> : null}
-        {this.renderHeader()}
+        <Heading level="h3">{I18n.t('Search Courses')}</Heading>
         <br />
-        <div className="bps-course-associations">
+        <div className="bca-course-associations">
           <CoursePicker
             ref={(c) => { this.coursePicker = c }}
             courses={this.props.courses}
@@ -129,9 +109,24 @@ export default class BlueprintSettings extends React.Component {
             isLoadingAssociations={this.props.isLoadingAssociations}
           />
         </div>
-        <hr />
-        {this.renderFooter()}
       </div>
     )
   }
 }
+
+const connectState = state =>
+  [
+    'existingAssociations',
+    'addedAssociations',
+    'removedAssociations',
+    'courses',
+    'terms',
+    'subAccounts',
+    'errors',
+    'isLoadingCourses',
+    'isLoadingAssociations',
+    'isSavingAssociations',
+  ].reduce((propSet, prop) => Object.assign(propSet, { [prop]: state[prop] }), {})
+const connectActions = dispatch => bindActionCreators(actions, dispatch)
+
+export const ConnectedBlueprintAssociations = connect(connectState, connectActions)(BlueprintAssociations)

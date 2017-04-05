@@ -1,4 +1,4 @@
-import I18n from 'i18n!blueprint_config'
+import I18n from 'i18n!blueprint_settings'
 import React from 'react'
 import TextInput from 'instructure-ui/lib/components/TextInput'
 import Select from 'instructure-ui/lib/components/Select'
@@ -81,7 +81,7 @@ export default class CourseFilter extends React.Component {
 
   render () {
     return (
-      <div className="bps-course-filter" ref={(c) => { this.wrapper = c }}>
+      <div className="bca-course-filter" ref={(c) => { this.wrapper = c }}>
         <Grid colSpacing="none">
           <GridRow>
             <GridCol width={7}>

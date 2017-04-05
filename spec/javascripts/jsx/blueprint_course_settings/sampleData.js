@@ -1,4 +1,4 @@
-define([], () => ({
+export default {
   terms: [
     { id: '1', name: 'Term One' },
     { id: '2', name: 'Term Two' },
@@ -35,4 +35,4 @@ define([], () => ({
       sis_course_id: '1001',
     }
   ],
-}))
+}

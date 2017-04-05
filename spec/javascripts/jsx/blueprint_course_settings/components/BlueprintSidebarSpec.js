@@ -1,6 +1,6 @@
 import React from 'react'
 import * as enzyme from 'enzyme'
-import BlueprintCourseSidebar from 'jsx/course_blueprint_settings/components/BlueprintCourseSidebar'
+import BlueprintCourseSidebar from 'jsx/blueprint_course_settings/components/BlueprintSidebar'
 
 QUnit.module('BlueprintCourseSidebar component')
 
