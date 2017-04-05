@@ -44,7 +44,7 @@ import axios from 'axios'
       return (
         <Modal
           isOpen={this.props.isOpen}
-          zIndex={1000}
+          size="small"
           onReady={this.handleModalReady}
           onClose={this.handleModalClose}
           onRequestClose={this.props.handleRequestClose}
