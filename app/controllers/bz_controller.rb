@@ -252,12 +252,7 @@ class BzController < ApplicationController
 
     def perform
       csv = linked_in_export_guts
-      mail = Mailer.debug_message("Export Success", "Attached is your export data")
-      mail.attachments["linkedin.csv"] = {
-        mime_type: "text/csv",
-        content: csv
-      }
-      mail.deliver
+      Mailer.debug_message("Export Success", "Attached is your export data", "linkedin.csv" => csv).deliver
       # super
       csv
     end
