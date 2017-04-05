@@ -22,9 +22,9 @@ define [
 
     save: () =>
       if @$dialog.find('#hide_warning').prop('checked')
-        @options.checked_save()
+        @options.save({ dontWarnAgain: true })
       else
-        @options.unchecked_save()
+        @options.save({ dontWarnAgain: false })
       @$dialog.remove()
 
     cancel: () =>

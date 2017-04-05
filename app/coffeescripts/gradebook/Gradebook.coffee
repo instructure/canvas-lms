@@ -1251,15 +1251,14 @@ define [
     displayPointTotals: =>
       @options.show_total_grade_as_points and not @weightedGrades()
 
-    switchTotalDisplay: =>
+    switchTotalDisplay: ({ dontWarnAgain = false } = {}) =>
+      if dontWarnAgain
+        UserSettings.contextSet('warned_about_totals_display', true)
+
       @options.show_total_grade_as_points = not @options.show_total_grade_as_points
       $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @displayPointTotals()
       @grid.invalidate()
       @totalHeader.switchTotalDisplay(@options.show_total_grade_as_points)
-
-    switchTotalDisplayAndMarkUserAsWarned: =>
-      UserSettings.contextSet('warned_about_totals_display', true)
-      @switchTotalDisplay()
 
     togglePointsOrPercentTotals: =>
       if UserSettings.contextGet('warned_about_totals_display')
@@ -1267,8 +1266,7 @@ define [
       else
         dialog_options =
           showing_points: @options.show_total_grade_as_points
-          unchecked_save: @switchTotalDisplay
-          checked_save: @switchTotalDisplayAndMarkUserAsWarned
+          save: @switchTotalDisplay
         new GradeDisplayWarningDialog(dialog_options)
 
     onUserFilterInput: (term) =>

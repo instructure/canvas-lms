@@ -44,7 +44,13 @@ class TotalGradeColumnHeader extends React.Component {
       onSortByGradeAscending: func.isRequired,
       onSortByGradeDescending: func.isRequired,
       settingKey: string.isRequired
-    }).isRequired
+    }).isRequired,
+    gradeDisplay: shape({
+      currentDisplay: string.isRequired,
+      onSelect: func.isRequired,
+      disabled: bool.isRequired,
+      hidden: bool.isRequired
+    }).isRequired,
   };
 
   constructor (props) {
@@ -54,8 +60,10 @@ class TotalGradeColumnHeader extends React.Component {
   }
 
   render () {
-    const { sortBySetting } = this.props;
+    const { sortBySetting, gradeDisplay } = this.props;
     const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey;
+    const displayAsPoints = gradeDisplay.currentDisplay === 'points';
+    const showSeparator = !gradeDisplay.hidden;
 
     return (
       <div className="Gradebook__ColumnHeaderContent">
@@ -88,12 +96,21 @@ class TotalGradeColumnHeader extends React.Component {
             </MenuItem>
           </MenuItemGroup>
 
-          <MenuItemSeparator />
-
-          <MenuItem>{ I18n.t('Message Students Who...') }</MenuItem>
-          <MenuItem>{ I18n.t('Display as Points') }</MenuItem>
-          <MenuItem>{ I18n.t('Move to End') }</MenuItem>
-          <MenuItem>{ I18n.t('Adjust Final Grade') }</MenuItem>
+          {
+            showSeparator &&
+            <MenuItemSeparator />
+          }
+          {
+            !gradeDisplay.hidden &&
+            <MenuItem
+              disabled={this.props.gradeDisplay.disabled}
+              onSelect={this.props.gradeDisplay.onSelect}
+            >
+              <span data-menu-item-id="grade-display-switcher">
+                {displayAsPoints ? I18n.t('Display as Percentage') : I18n.t('Display as Points')}
+              </span>
+            </MenuItem>
+          }
         </PopoverMenu>
       </div>
     );

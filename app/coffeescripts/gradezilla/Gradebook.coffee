@@ -1201,14 +1201,14 @@ define [
     displayPointTotals: =>
       @options.show_total_grade_as_points and not @weightedGrades()
 
-    switchTotalDisplay: =>
+    switchTotalDisplay: ({ dontWarnAgain = false } = {}) =>
+      if dontWarnAgain
+        UserSettings.contextSet('warned_about_totals_display', true)
+
       @options.show_total_grade_as_points = not @options.show_total_grade_as_points
       $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @displayPointTotals()
       @grid.invalidate()
-
-    switchTotalDisplayAndMarkUserAsWarned: =>
-      UserSettings.contextSet('warned_about_totals_display', true)
-      @switchTotalDisplay()
+      @renderTotalGradeColumnHeader()
 
     togglePointsOrPercentTotals: =>
       if UserSettings.contextGet('warned_about_totals_display')
@@ -1216,8 +1216,7 @@ define [
       else
         dialog_options =
           showing_points: @options.show_total_grade_as_points
-          unchecked_save: @switchTotalDisplay
-          checked_save: @switchTotalDisplayAndMarkUserAsWarned
+          save: @switchTotalDisplay
         new GradeDisplayWarningDialog(dialog_options)
 
     onUserFilterInput: (term) =>
@@ -1803,10 +1802,15 @@ define [
         settingKey: sortRowsBySetting.settingKey
       }
 
+    getTotalGradeColumnGradeDisplayProps: =>
+      currentDisplay: if @options.show_total_grade_as_points then 'points' else 'percentage'
+      onSelect: @togglePointsOrPercentTotals
+      disabled: !@contentLoadStates.submissionsLoaded
+      hidden: @weightedGroups()
+
     getTotalGradeColumnHeaderProps: ->
-      {
-        sortBySetting: @getTotalGradeColumnSortBySetting()
-      }
+      sortBySetting: @getTotalGradeColumnSortBySetting()
+      gradeDisplay: @getTotalGradeColumnGradeDisplayProps()
 
     renderTotalGradeColumnHeader: =>
       return if @hideAggregateColumns()

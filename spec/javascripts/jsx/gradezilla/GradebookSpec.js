@@ -28,6 +28,8 @@ import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator';
 import DataLoader from 'jsx/gradezilla/DataLoader';
 import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants';
 import Gradebook from 'compiled/gradezilla/Gradebook';
+import UserSettings from 'compiled/userSettings';
+import $ from 'jquery';
 
 const $fixtures = document.getElementById('fixtures');
 
@@ -797,6 +799,109 @@ test('returns false when grades are weighted', function () {
 test('returns false when show_total_grade_as_points is false', function () {
   const self = this.setupThis(false, false);
   equal(this.displayPointTotals.call(self), false);
+});
+
+QUnit.module('Gradebook#switchTotalDisplay', {
+  setup () {
+    this.gradebook = createGradebook({
+      show_total_grade_as_points: true,
+      setting_update_url: 'http://settingUpdateUrl'
+    });
+    this.gradebook.grid = {
+      invalidate: this.stub()
+    }
+    this.stub(this.gradebook, 'renderTotalGradeColumnHeader');
+
+    // Stub this here so the AJAX calls in Dataloader don't get stubbed too
+    this.stub($, 'ajaxJSON');
+  },
+
+  teardown () {
+    UserSettings.contextRemove('warned_about_totals_display');
+  }
+});
+
+test('sets the warned_about_totals_display setting when called with true', function () {
+  notOk(UserSettings.contextGet('warned_about_totals_display'));
+
+  this.gradebook.switchTotalDisplay({ dontWarnAgain: true });
+
+  ok(UserSettings.contextGet('warned_about_totals_display'));
+});
+
+test('flips the show_total_grade_as_points property', function () {
+  this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
+
+  equal(this.gradebook.options.show_total_grade_as_points, false);
+
+  this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
+
+  equal(this.gradebook.options.show_total_grade_as_points, true);
+});
+
+test('updates the total display preferences for the current user', function () {
+  this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
+
+  equal($.ajaxJSON.callCount, 1);
+  equal($.ajaxJSON.getCall(0).args[0], 'http://settingUpdateUrl');
+  equal($.ajaxJSON.getCall(0).args[1], 'PUT');
+  equal($.ajaxJSON.getCall(0).args[2].show_total_grade_as_points, false);
+});
+
+test('invalidates the grid so it re-renders it', function () {
+  this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
+
+  equal(this.gradebook.grid.invalidate.callCount, 1);
+});
+
+test('re-renders the total grade column header', function () {
+  this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
+
+  equal(this.gradebook.renderTotalGradeColumnHeader.callCount, 1);
+});
+
+QUnit.module('Gradebook#togglePointsOrPercentTotals', {
+  setup () {
+    this.gradebook = createGradebook({
+      show_total_grade_as_points: true,
+      setting_update_url: 'http://settingUpdateUrl'
+    });
+    this.stub(this.gradebook, 'switchTotalDisplay');
+
+    // Stub this here so the AJAX calls in Dataloader don't get stubbed too
+    this.stub($, 'ajaxJSON');
+  },
+
+  teardown () {
+    UserSettings.contextRemove('warned_about_totals_display');
+  }
+});
+
+test('when user is ignoring warnings, immediately toggles the total grade display', function () {
+  UserSettings.contextSet('warned_about_totals_display', true);
+
+  this.gradebook.togglePointsOrPercentTotals();
+
+  equal(this.gradebook.switchTotalDisplay.callCount, 1, 'toggles the total grade display');
+});
+
+test('when user is not ignoring warnings, return a dialog', function () {
+  UserSettings.contextSet('warned_about_totals_display', false);
+
+  const dialog = this.gradebook.togglePointsOrPercentTotals();
+
+  equal(dialog.constructor.name, 'GradeDisplayWarningDialog', 'returns a grade display warning dialog');
+
+  dialog.cancel();
+});
+
+test('when user is not ignoring warnings, the dialog has a save property which is the switchTotalDisplay function', function () {
+  this.stub(UserSettings, 'contextGet').withArgs('warned_about_totals_display').returns(false);
+  const dialog = this.gradebook.togglePointsOrPercentTotals();
+
+  equal(dialog.options.save, this.gradebook.switchTotalDisplay);
+
+  dialog.cancel();
 });
 
 QUnit.module('Gradebook#showNotesColumn', {
@@ -2180,6 +2285,54 @@ test('includes the sort settingKey', function () {
   equal(props.settingKey, 'grade');
 });
 
+QUnit.module('Gradebook#getTotalGradeColumnGradeDisplayProps', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.togglePointsOrPercentTotals = () => {}
+  }
+});
+
+test('currentDisplay is set to percentage when show_total_grade_as_points is undefined or false', function () {
+  equal(this.gradebook.options.show_total_grade_as_points, undefined);
+  equal(this.gradebook.getTotalGradeColumnGradeDisplayProps().currentDisplay, 'percentage');
+
+  this.gradebook.options.show_total_grade_as_points = false;
+
+  equal(this.gradebook.getTotalGradeColumnGradeDisplayProps().currentDisplay, 'percentage');
+});
+
+test('currentDisplay is set to percentage when show_total_grade_as_points is true', function () {
+  this.gradebook.options.show_total_grade_as_points = true;
+
+  equal(this.gradebook.getTotalGradeColumnGradeDisplayProps().currentDisplay, 'points');
+});
+
+test('onSelect is set to the togglePointsOrPercentTotals function', function () {
+  equal(this.gradebook.getTotalGradeColumnGradeDisplayProps().onSelect, this.gradebook.togglePointsOrPercentTotals);
+});
+
+test('disabled is true when submissions have not loaded yet', function () {
+  this.gradebook.setSubmissionsLoaded(false);
+
+  ok(this.gradebook.getTotalGradeColumnGradeDisplayProps().disabled);
+});
+
+test('disabled is true when submissions have not loaded yet', function () {
+  this.gradebook.setSubmissionsLoaded(true);
+
+  notOk(this.gradebook.getTotalGradeColumnGradeDisplayProps().disabled);
+});
+
+test('hidden is false when weightedGroups returns false', function () {
+  notOk(this.gradebook.getTotalGradeColumnGradeDisplayProps().hidden);
+});
+
+test('hidden is true when weightedGroups returns true', function () {
+  this.gradebook.options.group_weighting_scheme = 'percent';
+
+  ok(this.gradebook.getTotalGradeColumnGradeDisplayProps().hidden);
+});
+
 QUnit.module('Gradebook#getTotalGradeColumnHeaderProps', {
   createGradebook (options = {}) {
     const gradebook = createGradebook({
@@ -2195,10 +2348,19 @@ QUnit.module('Gradebook#getTotalGradeColumnHeaderProps', {
 });
 
 test('includes props for the "Sort by" setting', function () {
-  const props = this.createGradebook().getTotalGradeColumnHeaderProps('301');
+  const props = this.createGradebook().getTotalGradeColumnHeaderProps();
   ok(props.sortBySetting, 'Sort by setting is present');
   equal(typeof props.sortBySetting.disabled, 'boolean', 'props include "disabled"');
   equal(typeof props.sortBySetting.onSortByGradeAscending, 'function', 'props include "onSortByGradeAscending"');
+});
+
+test('includes props for the "Grade Display" settings', function () {
+  const props = this.createGradebook().getTotalGradeColumnHeaderProps();
+  ok(props.gradeDisplay, 'Grade Display setting is present');
+  equal(typeof props.gradeDisplay.disabled, 'boolean', 'props include "disabled"');
+  equal(typeof props.gradeDisplay.hidden, 'boolean', 'props include "hidden"');
+  equal(typeof props.gradeDisplay.currentDisplay, 'string', 'props include "currentDisplay"');
+  equal(typeof props.gradeDisplay.onSelect, 'function', 'props include "onSelect"');
 });
 
 QUnit.module('Gradebook#setStudentDisplay', {

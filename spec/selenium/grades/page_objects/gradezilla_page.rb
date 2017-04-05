@@ -54,6 +54,17 @@ module Gradezilla
       f("[data-menu-item-id='#{menu_item_id}']").click
     end
 
+    def select_total_column_option(menu_item_id = nil, already_open: false)
+      unless already_open
+        total_grade_column_header = f("#gradebook_grid .slick-header-column[id*='total_grade']")
+        total_grade_column_header.find_element(:css, '.Gradebook__ColumnHeaderAction').click
+      end
+
+      if menu_item_id
+        f("[data-menu-item-id='#{menu_item_id}']").click
+      end
+    end
+
     def open_assignment_options(cell_index)
       assignment_cell = ff('#gradebook_grid .container_1 .slick-header-column')[cell_index]
       driver.action.move_to(assignment_cell).perform

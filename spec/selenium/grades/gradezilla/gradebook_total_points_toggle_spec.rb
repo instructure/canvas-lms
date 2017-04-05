@@ -24,8 +24,7 @@ describe "Gradezilla - total points toggle" do
   end
 
   def open_display_dialog
-    f("#total_dropdown").click
-    f(".toggle_percent").click
+    gradezilla_page.select_total_column_option('grade-display-switcher')
   end
 
   def close_display_dialog
@@ -66,7 +65,6 @@ describe "Gradezilla - total points toggle" do
   end
 
   it "should warn the teacher that studens will see a change" do
-    pending("Fix with CNVS-34243")
     gradezilla_page.visit(@course)
     open_display_dialog
     dialog = fj('.ui-dialog:visible')
@@ -74,7 +72,6 @@ describe "Gradezilla - total points toggle" do
   end
 
   it 'should allow toggling display by points or percent', priority: "1", test_id: 164012 do
-    pending("Fix with CNVS-34243")
     gradezilla_page.visit(@course)
     should_show_percentages
     toggle_grade_display
@@ -88,23 +85,27 @@ describe "Gradezilla - total points toggle" do
   end
 
   it 'should change the text on the toggle option when toggling' do
-    pending("Fix with CNVS-34243")
     gradezilla_page.visit(@course)
     dropdown_text = []
-    f("#total_dropdown").click
-    dropdown_text << f(".toggle_percent").text
-    f(".toggle_percent").click
+
+    gradezilla_page.select_total_column_option()
+    dropdown_text << f('[data-menu-item-id="grade-display-switcher"]').text
+
+    gradezilla_page.select_total_column_option('grade-display-switcher', already_open: true)
     close_dialog_and_dont_show_again
-    f("#total_dropdown").click
-    dropdown_text << f(".toggle_percent").text
-    f(".toggle_percent").click
-    f("#total_dropdown").click
-    dropdown_text << f(".toggle_percent").text
-    expect(dropdown_text).to eq ["Switch to points", "Switch to percent", "Switch to points"]
+
+    gradezilla_page.select_total_column_option()
+    dropdown_text << f('[data-menu-item-id="grade-display-switcher"]').text
+
+    gradezilla_page.select_total_column_option('grade-display-switcher', already_open: true)
+
+    gradezilla_page.select_total_column_option()
+    dropdown_text << f('[data-menu-item-id="grade-display-switcher"]').text
+
+    expect(dropdown_text).to eq ['Display as Points', 'Display as Percentage', 'Display as Points']
   end
 
   it 'should not show the warning once dont show is checked' do
-    pending("Fix with CNVS-34243")
     gradezilla_page.visit(@course)
     open_display_dialog
     close_dialog_and_dont_show_again

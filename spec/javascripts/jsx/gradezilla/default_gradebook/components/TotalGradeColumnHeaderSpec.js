@@ -29,6 +29,12 @@ function createExampleProps () {
       onSortByGradeAscending () {},
       onSortByGradeDescending () {},
       settingKey: 'grade'
+    },
+    gradeDisplay: {
+      currentDisplay: 'points',
+      onSelect () {},
+      disabled: false,
+      hidden: false
     }
   };
 }
@@ -36,8 +42,44 @@ function createExampleProps () {
 function mountAndOpenOptions (props) {
   const wrapper = mount(<TotalGradeColumnHeader {...props} />);
   wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
   return wrapper;
 }
+
+QUnit.module('TotalGradeColumnHeader - base behavior', {
+  setup () {
+    this.props = createExampleProps();
+    this.wrapper = mount(<TotalGradeColumnHeader {...this.props} />);
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('renders the label Total', function () {
+  const label = this.wrapper.find('.Gradebook__ColumnHeaderDetail');
+
+  equal(label.text(), 'Total');
+});
+
+test('renders a PopoverMenu', function () {
+  const optionsMenu = this.wrapper.find('PopoverMenu');
+
+  equal(optionsMenu.length, 1);
+});
+
+test('renders an IconMoreSolid inside the PopoverMenu', function () {
+  const optionsMenuTrigger = this.wrapper.find('PopoverMenu IconMoreSolid');
+
+  equal(optionsMenuTrigger.length, 1);
+});
+
+test('renders a title for the More icon based on the assignment name', function () {
+  const optionsMenuTrigger = this.wrapper.find('PopoverMenu IconMoreSolid');
+
+  equal(optionsMenuTrigger.props().title, 'Total Options');
+});
 
 QUnit.module('TotalGradeColumnHeader - Sort by Settings', {
   setup () {
@@ -157,4 +199,94 @@ test('clicking "Grade - High to Low" when disabled does not call onSortByGradeDe
   this.wrapper = mountAndOpenOptions(this.props);
   this.getMenuItem(1).simulate('click');
   equal(this.props.sortBySetting.onSortByGradeDescending.callCount, 0);
+});
+
+QUnit.module('TotalGradeColumnHeader - Display as Points', {
+  mountAndGetMenuItem () {
+    this.wrapper = mountAndOpenOptions(this.props);
+    this.menuItem = document.querySelector('[data-menu-item-id="grade-display-switcher"]');
+  },
+
+  setup () {
+    this.props = createExampleProps();
+    this.props.gradeDisplay.currentDisplay = 'percentage';
+    this.props.gradeDisplay.onSelect = this.stub();
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('the grade display switcher option does not show when hidden is true', function () {
+  this.props.gradeDisplay.hidden = true;
+  this.mountAndGetMenuItem();
+
+  notOk(this.menuItem);
+});
+
+test('the grade display switcher option is disabled when disabled is true', function () {
+  this.props.gradeDisplay.disabled = true;
+  this.mountAndGetMenuItem();
+  this.menuItem.click();
+
+  equal(this.props.gradeDisplay.onSelect.callCount, 0);
+});
+
+test('the grade display switcher option reads "Display as Points"', function () {
+  this.mountAndGetMenuItem();
+
+  equal(this.menuItem.textContent, 'Display as Points');
+});
+
+test('clicking the "Display as Points" option calls the gradeDisplay onSelect callback', function () {
+  this.mountAndGetMenuItem();
+  this.menuItem.click();
+
+  equal(this.props.gradeDisplay.onSelect.callCount, 1);
+});
+
+QUnit.module('TotalGradeColumnHeader - Display as Percentage', {
+  mountAndGetMenuItem () {
+    this.wrapper = mountAndOpenOptions(this.props);
+    this.menuItem = document.querySelector('[data-menu-item-id="grade-display-switcher"]');
+  },
+
+  setup () {
+    this.props = createExampleProps();
+    this.props.gradeDisplay.currentDisplay = 'points';
+    this.props.gradeDisplay.onSelect = this.stub();
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('the grade display switcher option does not show when hidden is true', function () {
+  this.props.gradeDisplay.hidden = true;
+  this.mountAndGetMenuItem();
+
+  notOk(this.menuItem);
+});
+
+test('the grade display switcher option is disabled when disabled is true', function () {
+  this.props.gradeDisplay.disabled = true;
+  this.mountAndGetMenuItem();
+  this.menuItem.click();
+
+  equal(this.props.gradeDisplay.onSelect.callCount, 0);
+});
+
+test('the grade display switcher option reads "Display as Percentage"', function () {
+  this.mountAndGetMenuItem();
+
+  equal(this.menuItem.textContent, 'Display as Percentage');
+});
+
+test('clicking the "Display as Percentage" option calls the gradeDisplay onSelect callback', function () {
+  this.mountAndGetMenuItem();
+  this.menuItem.click();
+
+  equal(this.props.gradeDisplay.onSelect.callCount, 1);
 });

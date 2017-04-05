@@ -1,6 +1,8 @@
 import Gradebook from 'compiled/gradebook/Gradebook';
 import _ from 'underscore';
 import fakeENV from 'helpers/fakeENV';
+import UserSettings from 'compiled/userSettings';
+import $ from 'jquery';
 
 QUnit.module('addRow', {
   setup () {
@@ -83,4 +85,132 @@ test('returns number of columns in frozen section', function () {
   gradebook.parentColumns = [{ id: 'student' }, { id: 'secondary_identifier' }];
   gradebook.customColumns = [{ id: 'custom_col_1' }];
   equal(gradebook.getFrozenColumnCount(), 3);
+});
+
+QUnit.module('Gradebook#switchTotalDisplay', {
+  setupThis ({ showTotalGradeAsPoints = true } = {}) {
+    return {
+      options: {
+        show_total_grade_as_points: showTotalGradeAsPoints,
+        setting_update_url: 'http://settingUpdateUrl'
+      },
+      displayPointTotals () {
+        return true;
+      },
+      grid: {
+        invalidate: this.stub()
+      },
+      totalHeader: {
+        switchTotalDisplay: this.stub()
+      }
+    }
+  },
+
+  setup () {
+    this.stub($, 'ajaxJSON');
+    this.switchTotalDisplay = Gradebook.prototype.switchTotalDisplay;
+  },
+
+  teardown () {
+    UserSettings.contextRemove('warned_about_totals_display');
+  }
+});
+
+test('sets the warned_about_totals_display setting when called with true', function () {
+  notOk(UserSettings.contextGet('warned_about_totals_display'));
+
+  const self = this.setupThis();
+  this.switchTotalDisplay.call(self, { dontWarnAgain: true });
+
+  ok(UserSettings.contextGet('warned_about_totals_display'));
+});
+
+test('flips the show_total_grade_as_points property', function () {
+  const self = this.setupThis();
+  this.switchTotalDisplay.call(self, { dontWarnAgain: false });
+
+  equal(self.options.show_total_grade_as_points, false);
+
+  this.switchTotalDisplay.call(self, { dontWarnAgain: false });
+
+  equal(self.options.show_total_grade_as_points, true);
+});
+
+test('updates the total display preferences for the current user', function () {
+  const self = this.setupThis();
+  this.switchTotalDisplay.call(self, { dontWarnAgain: false });
+
+  equal($.ajaxJSON.callCount, 1);
+  equal($.ajaxJSON.getCall(0).args[0], 'http://settingUpdateUrl');
+  equal($.ajaxJSON.getCall(0).args[1], 'PUT');
+  equal($.ajaxJSON.getCall(0).args[2].show_total_grade_as_points, true);
+});
+
+test('invalidates the grid so it re-renders it', function () {
+  const self = this.setupThis();
+  this.switchTotalDisplay.call(self, { dontWarnAgain: false });
+
+  equal(self.grid.invalidate.callCount, 1);
+});
+
+test('updates the total grade column header with the new value of the show_total_grade_as_points property', function () {
+  const self = this.setupThis();
+  this.switchTotalDisplay.call(self, false);
+  this.switchTotalDisplay.call(self, false)
+
+  equal(self.totalHeader.switchTotalDisplay.callCount, 2);
+  equal(self.totalHeader.switchTotalDisplay.getCall(0).args[0], false);
+  equal(self.totalHeader.switchTotalDisplay.getCall(1).args[0], true);
+});
+
+QUnit.module('Gradebook#togglePointsOrPercentTotals', {
+  setupThis () {
+    return {
+      options: {
+        show_total_grade_as_points: true,
+        setting_update_url: 'http://settingUpdateUrl'
+      },
+      switchTotalDisplay: this.stub()
+    }
+  },
+
+  setup () {
+    this.stub($, 'ajaxJSON');
+    this.togglePointsOrPercentTotals = Gradebook.prototype.togglePointsOrPercentTotals;
+  },
+
+  teardown () {
+    UserSettings.contextRemove('warned_about_totals_display');
+  }
+});
+
+test('when user is ignoring warnings, immediately toggles the total grade display', function () {
+  UserSettings.contextSet('warned_about_totals_display', true);
+
+  const self = this.setupThis(true);
+
+  this.togglePointsOrPercentTotals.call(self);
+
+  equal(self.switchTotalDisplay.callCount, 1, 'toggles the total grade display');
+});
+
+test('when user is not ignoring warnings, return a dialog', function () {
+  UserSettings.contextSet('warned_about_totals_display', false);
+
+  const self = this.setupThis(true);
+  const dialog = this.togglePointsOrPercentTotals.call(self);
+
+  equal(dialog.constructor.name, 'GradeDisplayWarningDialog', 'returns a grade display warning dialog');
+
+  dialog.cancel();
+});
+
+test('when user is not ignoring warnings, the dialog has a save property which is the switchTotalDisplay function', function () {
+  this.stub(UserSettings, 'contextGet').withArgs('warned_about_totals_display').returns(false);
+  const self = this.setupThis(true);
+  const dialog = this.togglePointsOrPercentTotals.call(self);
+
+  equal(dialog.options.save, self.switchTotalDisplay);
+
+  dialog.cancel();
 });
