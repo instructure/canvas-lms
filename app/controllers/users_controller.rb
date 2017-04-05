@@ -237,13 +237,14 @@ class UsersController < ApplicationController
       redirect_to request_token.authorize_url
     elsif params[:service] == "linked_in"
       linkedin_connection = LinkedIn::Connection.new
-
       nonce = session[:oauth_linked_nonce] = SecureRandom.hex
+      session[:oauth_linkedin_return_to_url] = return_to_url
       redirect_to linkedin_connection.authorize_url(oauth_success_url(:service => 'linked_in'), nonce)
     end
   end
 
   def oauth_success
+    Rails.logger.debug("### users_controller::oauth_success - begin.  params = #{params.inspect}")
     oauth_request = nil
     if params[:oauth_token]
       oauth_request = OauthRequest.where(token: params[:oauth_token], service: params[:service]).first
@@ -301,22 +302,21 @@ class UsersController < ApplicationController
       begin
         linkedin_connection = LinkedIn::Connection.new
         nonce = session.delete(:oauth_linked_nonce)
-
-        if(nonce != params[:state])
-          raise Exception.new "Wrong nonce, likely CSRF"
-        end
+        render_unauthorized_action and return unless nonce == params[:state]
 
         if params[:error]
           raise Exception.new params[:error_description]
         end
 
-        access_token = linkedin_connection.exchange_code_for_token(params[:code], oauth_success_url(:service => 'linked_in'))
+        return_to_url = session.delete(:oauth_linkedin_return_to_url) || user_profile_url(@current_user)
 
-        service_user_id, service_user_name, service_user_url = linkedin_connection.get_service_user_info(access_token)
+        access_token = linkedin_connection.exchange_code_for_token(params[:code], oauth_success_url(:service => 'linked_in'))
 
         # Note: the service_user_id, service_user_name, and service_user_url are LinkedIn's data that we get
         # by calling into their API.  E.g. service_user_url maybe something like: https://www.linkedin.com/in/somelinkedinusername
         if access_token
+          service_user_id, service_user_name, service_user_url = linkedin_connection.get_service_user_info(access_token)
+
           UserService.register(
             :service => "linked_in",
             :token => access_token,
@@ -327,11 +327,13 @@ class UsersController < ApplicationController
             :service_user_url => service_user_url
           )
         else
-          # FIXME: what to do on error?
+          Rails.logger.error("Error registering LinkedIn service for #{@current_user.email}.  The access_token couldn't be retrieved using the code sent from LinkedIn")
+          raise Exception.new "Failed getting access token for LinkedIn"
         end
 
         flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
-        redirect_to ('/profile/settings')
+        Rails.logger.debug("### Done registering LinkedIn service.  Redirecting to: #{return_to_url}")
+        redirect_to(return_to_url)
       rescue => e
         Canvas::Errors.capture_exception(:oauth, e)
         flash[:error] = t('linkedin_fail', "LinkedIn authorization failed. Please try again")
