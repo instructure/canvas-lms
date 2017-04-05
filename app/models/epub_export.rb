@@ -11,6 +11,8 @@ class EpubExport < ActiveRecord::Base
   has_one :zip_attachment, -> { where(content_type: 'application/zip').order('created_at DESC') }, as: :context, inverse_of: :context, class_name: 'Attachment'
   has_one :job_progress, as: :context, inverse_of: :context, class_name: 'Progress'
   validates :course_id, :workflow_state, presence: true
+  has_a_broadcast_policy
+  alias_attribute :context, :course # context is needed for the content export notification
 
   PERCENTAGE_COMPLETE = {
     created: 0,
@@ -33,6 +35,20 @@ class EpubExport < ActiveRecord::Base
     state :generated
     state :failed
     state :deleted
+  end
+
+  set_broadcast_policy do |p|
+    p.dispatch :content_export_finished
+    p.to { [user] }
+    p.whenever do |record|
+      record.changed_state(:generated)
+    end
+
+    p.dispatch :content_export_failed
+    p.to { [user] }
+    p.whenever do |record|
+      record.changed_state(:failed)
+    end
   end
 
   after_create do

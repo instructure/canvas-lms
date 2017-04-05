@@ -55,7 +55,8 @@ class ContentExport < ActiveRecord::Base
     context_type == 'Course' &&
             export_type != ZIP &&
             content_migration.blank? &&
-            !settings[:skip_notifications]
+            !settings[:skip_notifications] &&
+            !epub_export
   end
 
   set_broadcast_policy do |p|
