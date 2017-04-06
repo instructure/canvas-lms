@@ -15,42 +15,44 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import tinymce from 'compiled/editor/stocktiny';
-import * as Links from './links.js';
+define([
+  'compiled/editor/stocktiny',
+  'tinymce_plugins/instructure_links/links'
+], function (tinymce, Links) {
+  tinymce.create('tinymce.plugins.InstructureLinks', {
+    init : function(ed, url) {
+      ed.addCommand('instructureLinks', Links.renderDialog.bind(null, ed));
 
-tinymce.create('tinymce.plugins.InstructureLinks', {
-  init : function(ed, url) {
-    ed.addCommand('instructureLinks', Links.renderDialog.bind(null, ed));
+      ed.addButton('instructure_links', {
+        title: 'Link to URL',
+        cmd: 'instructureLinks',
+        icon: 'link',
+        onPostRender: function(){
+          var btn = this;
+          ed.on('NodeChange', function(event) {
+            while(event.nodeName != 'A' && event.nodeName != 'BODY' && event.parentNode) {
+              event = event.parentNode;
+            }
+            btn.active(event.nodeName == 'A');
+          });
+        }
+      });
 
-    ed.addButton('instructure_links', {
-      title: 'Link to URL',
-      cmd: 'instructureLinks',
-      icon: 'link',
-      onPostRender: function(){
-        var btn = this;
-        ed.on('NodeChange', function(event) {
-          while(event.nodeName != 'A' && event.nodeName != 'BODY' && event.parentNode) {
-            event = event.parentNode;
-          }
-          btn.active(event.nodeName == 'A');
-        });
-      }
-    });
+      Links.initEditor(ed)
+    },
 
-    Links.initEditor(ed)
-  },
+    getInfo : function() {
+      return {
+        longname : 'InstructureLinks',
+        author : 'Brian Whitmer',
+        authorurl : 'http://www.instructure.com',
+        infourl : 'http://www.instructure.com',
+        version : tinymce.majorVersion + "." + tinymce.minorVersion
+      };
+    }
+  });
 
-  getInfo : function() {
-    return {
-      longname : 'InstructureLinks',
-      author : 'Brian Whitmer',
-      authorurl : 'http://www.instructure.com',
-      infourl : 'http://www.instructure.com',
-      version : tinymce.majorVersion + "." + tinymce.minorVersion
-    };
-  }
-});
-
-// Register plugin
-tinymce.PluginManager.add('instructure_links', tinymce.plugins.InstructureLinks);
+  // Register plugin
+  tinymce.PluginManager.add('instructure_links', tinymce.plugins.InstructureLinks);
+})
 

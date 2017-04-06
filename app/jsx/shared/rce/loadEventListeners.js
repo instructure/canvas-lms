@@ -1,5 +1,5 @@
 import EquationEditorView from 'compiled/views/tinymce/EquationEditorView'
-import * as Links from 'tinymce_plugins/instructure_links/links'
+import Links from 'tinymce_plugins/instructure_links/links'
 import InsertUpdateImageView from 'compiled/views/tinymce/InsertUpdateImageView'
 import initializeEquella from 'tinymce_plugins/instructure_equella/initializeEquella'
 import initializeExternalTools from 'tinymce_plugins/instructure_external_tools/initializeExternalTools'
