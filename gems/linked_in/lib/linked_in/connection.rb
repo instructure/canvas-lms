@@ -43,16 +43,8 @@ module LinkedIn
       Rails.logger.debug("### Registering LinkedIn service.  Data returned from LinkedIn API: id = #{data.css("id")[0].inspect}, first-name = #{data.css("first-name")[0].inspect}, public-profile-url = #{data.css("public-profile-url")[0].inspect}")
       service_user_id = data.css("id")[0].content
       service_user_name = data.css("first-name")[0].content + " " + data.css("last-name")[0].content
-      service_user_url = data.css("public-profile-url")[0].content
+      service_user_url = data.css("public-profile-url")[0].content unless data.css("public-profile-url")[0].nil? # Not sure what causes this, but sometimes its empty
       return service_user_id, service_user_name, service_user_url
-    end
-
-    def get_service_user_data_export(access_token)
-      # #########
-      # TODO: here is where we call into the LInkedIn API. Change this to download all of their data
-      # #########
-      Rails.logger.debug("### get_service_user_data_export - begin")
-      return true
     end
 
     def authorize_url(return_to, nonce)
