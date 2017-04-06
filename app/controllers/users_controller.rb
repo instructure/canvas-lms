@@ -303,12 +303,14 @@ class UsersController < ApplicationController
         linkedin_connection = LinkedIn::Connection.new
         nonce = session.delete(:oauth_linked_nonce)
         render_unauthorized_action and return unless nonce == params[:state]
+        return_to_url = session.delete(:oauth_linkedin_return_to_url) || user_profile_url(@current_user)
 
         if params[:error]
-          raise Exception.new params[:error_description]
+          # Note: if user cancels, then params[:error] == 'user_cancelled_authorize'
+          flash[:error] = t('linkedin_fail', "LinkedIn authorization failed. Please try again")
+          Rails.logger.error("LinkedIn authorization failed. error = #{params[:error]}, error_description = #{params[:error_description]}")
+          return redirect_to(return_to_url)
         end
-
-        return_to_url = session.delete(:oauth_linkedin_return_to_url) || user_profile_url(@current_user)
 
         access_token = linkedin_connection.exchange_code_for_token(params[:code], oauth_success_url(:service => 'linked_in'))
 
