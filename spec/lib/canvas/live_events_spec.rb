@@ -489,7 +489,7 @@ describe Canvas::LiveEvents do
         fake_export_context,
         hash_including({
           :context_type => "Course",
-          :context_id => content_export.context.id,
+          :context_id => content_export.context.global_id,
           :root_account_id => content_export.context.root_account.global_id,
           :root_account_uuid => content_export.context.root_account.uuid,
           :root_account_lti_guid => content_export.context.root_account.lti_guid,
