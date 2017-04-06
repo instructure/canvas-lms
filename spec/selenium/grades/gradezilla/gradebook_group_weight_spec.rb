@@ -102,7 +102,7 @@ describe "Gradezilla - group weights" do
 
     it 'should display a warning icon for assignments with 0 points possible', priority: '1', test_id: 164013 do
       gradezilla_page.visit(@course)
-      expect(ff('svg[name="IconWarningSolid"] > g').size).to be > 0
+      expect(ff('.Gradebook__ColumnHeaderDetail svg[aria-labelledby^="IconWarningSolid"]').size).to eq(1)
     end
 
     it 'should display a warning icon in the total column', priority: '1', test_id: 164013 do
@@ -121,8 +121,9 @@ describe "Gradezilla - group weights" do
       header_mute_icon_selector = [
         ".container_1",
         ".slick-header-column[id*='assignment_#{@assignment2.id}']",
-        "svg[name=\"IconMutedSolid\"]"
+        "svg[aria-labelledby^=IconMutedSolid]"
       ].join(' ')
+
       gradezilla_page.visit(@course)
       toggle_muting(@assignment2)
       expect(f("#content")).to contain_jqcss('.total-cell .icon-muted')
@@ -136,7 +137,7 @@ describe "Gradezilla - group weights" do
       header_mute_icon_selector = [
         ".container_1",
         ".slick-header-column[id*='assignment_#{@assignment2.id}']",
-        "svg[name=\"IconMutedSolid\"]"
+        "svg[aria-labelledby^=IconMutedSolid]"
       ].join(' ')
 
       gradezilla_page.visit(@course)
