@@ -1969,7 +1969,7 @@ nb:
     buttons: 
       add_group: "Legg til gruppe"
       delete_group: "Slett gruppe"
-      submit_assignment: "Legg til oppgave"
+      submit_assignment: "Lever oppgave"
     cannot_delete_group: "Du må ha minst én oppgavegruppe"
     cant_unpublish_when_students_submit: "Kan ikke fjerne publisering om det finnes studentinnleveringer"
     complete: Ferdig
@@ -2071,12 +2071,12 @@ nb:
     external_content_homework_file_submission_view: 
       additional_comments: Tileggskommentarer
       buttons: 
-        submit_assignment: "Legg til oppgave"
+        submit_assignment: "Lever oppgave"
       group_assignment_header: Kommentarer...
     external_content_homework_url_submission_view: 
       additional_comments: Tileggskommentarer
       buttons: 
-        submit_assignment: "Legg til oppgave"
+        submit_assignment: "Lever oppgave"
       group_assignment_header: Kommentarer...
     external_grader_sidebar: 
       edit_assignment_settings: "Rediger oppgaveinnstillinger"
@@ -2368,7 +2368,7 @@ nb:
       additional_comments: Tileggskommentarer
       buttons: 
         record_media: "Gjør opptak/Last opp medie"
-        submit_assignment: "Legg til oppgave"
+        submit_assignment: "Lever oppgave"
       comments_placeholder: Kommentarer...
       errors: 
         unacceptable_file_type: "Denne filtypen er ikke tillatt. Aksepterte filtyper er: %{allowed_extensions_list}"
@@ -2695,7 +2695,7 @@ nb:
     messages: 
       uploading_button: "Laster opp CSV-fil ..."
   button: 
-    submit_assignment: "Legg til oppgave"
+    submit_assignment: "Lever oppgave"
   buttons: 
     add_item: "Legg til punkt"
     apply: Bruk
@@ -16569,7 +16569,7 @@ nb:
       late_submission: "(for sen)"
       links: 
         resubmit: "Lever oppgave på nytt"
-        submit: "Legg til oppgave"
+        submit: "Lever oppgave"
       media_comment: Mediekommentar
       media_comment_link: "Dette er en mediekommentar, *klikk her for å vise*."
       only_see_your_own_comments_muted: "Du kan ikke se alle kommentarene akkurat nå fordi oppgaven er i ferd med å bli rettet"
@@ -16626,7 +16626,7 @@ nb:
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "innleveringsmappen må være opprettet i bruker- eller gruppekontekst"
   submit_a3cc6859: "Send inn"
   submit_a_feature_idea_2d4baa3d: "Send inn din idé"
-  submit_assignment_5799b4e3: "Legg til oppgave"
+  submit_assignment_5799b4e3: "Lever oppgave"
   submit_comment_commenttext_8e5638d7: "Send inn kommentar: %{commentText}"
   submit_media_file_f334c1ba: "Lever mediefil"
   submit_ticket_5515ffd: "Send inn feilmelding"
