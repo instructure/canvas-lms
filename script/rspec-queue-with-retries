@@ -13,7 +13,7 @@ spec_list=${SPEC_FILES:=spec}
 
 rerun_line="adding spec to rerun (\./.*:[0-9]+)"
 exempt_from_rerun_threshold_line="exceptions are exempt from rerun thresholds"
-failed_relevant_spec_line="\[(.*) is not eligible for rerunning"
+failed_relevant_spec_line="not adding modified spec to rerun (\./.*:[0-9]+)"
 
 pipe=/tmp/rspec-queue-pipe
 rm -f $pipe

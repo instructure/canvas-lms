@@ -19,16 +19,16 @@ module RSpec
       path_without_line_number = path.gsub(/(\.\/|\:\d+)/, "")
 
       if modified_specs.include?(path_without_line_number)
-        puts "[#{path_without_line_number} is not eligible for rerunning because it was modified in this commit]"
+        puts "not adding modified spec to rerun #{path}"
         return
       end
 
-      msg = "[SPOTBOT] adding spec to rerun #{path}"
+      msg = "adding spec to rerun #{path}"
 
       exempt_exception_classes = [ SpecTimeLimit::Error ] # sometimes things are just a bit slow. we won't hold it against you the first time
       exempt_exception_classes << SeleniumErrorRecovery::RecoverableException if defined?(SeleniumErrorRecovery)
       if exempt_exception_classes.any? { |klass| klass === example_data[:exception] }
-        msg += " [#{example_data[:exception].class} exceptions are exempt from rerun thresholds]"
+        msg += " (#{example_data[:exception].class} exceptions are exempt from rerun thresholds)"
       end
 
       puts msg
