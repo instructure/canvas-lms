@@ -145,12 +145,10 @@ class UserListV2
         user = user_map[dup_hash[:user_id]]
 
         dup_hash[:email] = user.email
-        pseudnoym = nil
+        pseudonym = SisPseudonym.for(user, @root_account, type: :trusted, require_sis: false)
         if @can_read_sis
-          pseudonym = SisPseudonym.for(user, @root_account, @root_account.trust_exists?)
           dup_hash[:sis_user_id] = pseudonym.sis_user_id if pseudonym
         end
-        pseudonym ||= user.find_pseudonym_for_account(@root_account, true)
         dup_hash[:login_id] = pseudonym.unique_id if pseudonym
       end
     end

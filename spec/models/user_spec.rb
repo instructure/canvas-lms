@@ -1451,7 +1451,7 @@ describe User do
     end
   end
 
-  describe "pseudonym_for_account" do
+  describe "#find_or_initialize_pseudonym_for_account" do
     before :once do
       @account1 = Account.create!
       @account2 = Account.create!
@@ -1461,45 +1461,6 @@ describe User do
     before :each do
       Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
       Pseudonym.any_instance.stubs(:works_for_account?).with(Account.default, false).returns(true)
-    end
-
-    it "should return an active pseudonym" do
-      user_with_pseudonym(:active_all => 1)
-      expect(@user.find_pseudonym_for_account(Account.default)).to eq @pseudonym
-    end
-
-    it "should return a trusted pseudonym" do
-      user_with_pseudonym(:active_all => 1, :account => @account2)
-      expect(@user.find_pseudonym_for_account(Account.default)).to eq @pseudonym
-    end
-
-    it "should return nil if none work" do
-      user_with_pseudonym(:active_all => 1)
-      expect(@user.find_pseudonym_for_account(@account2)).to eq nil
-    end
-
-    describe 'with cross-sharding' do
-      specs_require_sharding
-      it "should only search trusted shards" do
-        @user = user_factory(active_all: true, :account => @account1)
-        @shard1.activate do
-          @account2 = Account.create!
-          @pseudonym1 = pseudonym(@user, :account => @account2)
-        end
-
-        @shard2.activate do
-          @account3 = Account.create!
-          @pseudonym2 = pseudonym(@user, :account => @account3)
-        end
-
-        @account1.stubs(:trusted_account_ids).returns([@account3.id])
-
-        @shard1.expects(:activate).never
-        @shard2.expects(:activate).once
-
-        pseudonym = @user.find_pseudonym_for_account(@account1)
-        expect(pseudonym).to eq @psuedonym2
-      end
     end
 
     it "should create a copy of an existing pseudonym" do
@@ -1519,12 +1480,14 @@ describe User do
       expect(new_pseudonym.unique_id).to eq 'default@example.com'
 
       # from site admin account
-      @user.pseudonyms.create!(:account => Account.site_admin, :unique_id => 'siteadmin@example.com', :password => 'abcdefgh', :password_confirmation => 'abcdefgh')
+      site_admin_pseudo = @user.pseudonyms.create!(:account => Account.site_admin, :unique_id => 'siteadmin@example.com', :password => 'abcdefgh', :password_confirmation => 'abcdefgh')
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1)
       expect(new_pseudonym).not_to be_nil
       expect(new_pseudonym).to be_new_record
       expect(new_pseudonym.unique_id).to eq 'siteadmin@example.com'
 
+      site_admin_pseudo.destroy
+      @user.reload
       # from preferred account
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1, @account3)
       expect(new_pseudonym).not_to be_nil
@@ -1578,12 +1541,6 @@ describe User do
         end
       end
 
-      it "should find a pseudonym in another shard" do
-        @p2 = Account.site_admin.pseudonyms.create!(:user => @user, :unique_id => 'user')
-        @p2.any_instantiation.stubs(:works_for_account?).with(Account.site_admin, false).returns(true)
-        expect(@user.find_pseudonym_for_account(Account.site_admin)).to eq @p2
-      end
-
       it "should copy a pseudonym from another shard" do
         p = @user.find_or_initialize_pseudonym_for_account(Account.site_admin)
         expect(p).to be_new_record
@@ -1628,18 +1585,6 @@ describe User do
       expect(u.email_channel).to be_nil
       active = u.communication_channels.create!(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
       expect(u.email_channel).to eq active
-    end
-  end
-
-  describe "sis_pseudonym_for" do
-    it "should find the right root account for a course" do
-      account = account_model
-      user = User.create!
-      account_course = course_factory(active_all: true, account: account)
-      pseudonym = account.pseudonyms.create!(user: user, unique_id: 'user') do |p|
-        p.sis_user_id = 'abc'
-      end
-      expect(user.sis_pseudonym_for(account_course, false, true)).to eq(pseudonym)
     end
   end
 

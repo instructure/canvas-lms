@@ -842,7 +842,7 @@ module Lti
           let(:pseudonym) { Pseudonym.new }
 
           before :each do
-            user.stubs(:find_pseudonym_for_account).returns(pseudonym)
+            allow(SisPseudonym).to receive(:for).with(user, anything, anything).and_return(pseudonym)
           end
 
           it 'has substitution for $Canvas.user.sisSourceId' do

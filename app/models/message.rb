@@ -271,8 +271,7 @@ class Message < ActiveRecord::Base
       context = context.account if context.respond_to?(:account)
       context = context.root_account if context.respond_to?(:root_account)
       if context
-        p = SisPseudonym.for(user, context)
-        p ||= user.find_pseudonym_for_account(context, true)
+        p = SisPseudonym.for(user, context, type: :implicit, require_sis: false)
         context = p.account if p
       else
         # nothing? okay, just something the user can log in to

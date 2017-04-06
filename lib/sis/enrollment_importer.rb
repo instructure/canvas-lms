@@ -146,7 +146,7 @@ module SIS
 
             user = pseudo.user
             if root_account != @root_account
-              if !user.find_pseudonym_for_account(@root_account, true)
+              unless SisPseudonym.for(user, @root_account, type: :implicit, require_sis: false)
                 @messages << "User #{enrollment_info.root_account_id}:#{enrollment_info.user_id} does not have a usable login for this account"
                 next
               end

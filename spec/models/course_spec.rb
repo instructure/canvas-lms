@@ -1516,6 +1516,7 @@ describe Course, "gradebook_to_csv" do
     @course.reload
     @course.root_account.stubs(:trust_exists?).returns(true)
     @course.root_account.any_instantiation.stubs(:trusted_account_ids).returns([account2.id])
+    allow(@user2.pseudonyms.first.any_instantiation).to receive(:works_for_account?).and_return(true)
     HostUrl.expects(:context_host).with(@course.root_account).returns('school1')
     HostUrl.expects(:context_host).with(account2).returns('school2')
 

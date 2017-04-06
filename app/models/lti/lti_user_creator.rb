@@ -34,7 +34,6 @@ module Lti
       @canvas_tool = canvas_tool
       @canvas_context = canvas_context
       @opaque_identifier = @canvas_tool.opaque_identifier_for(@canvas_user)
-      @pseudonym = false
     end
 
     def convert
@@ -61,8 +60,8 @@ module Lti
 
     private
     def pseudonym
-      if @pseudonym === false
-        @pseudonym ||= @canvas_user.find_pseudonym_for_account(@canvas_root_account)
+      unless instance_variable_defined?(:@pseudonym)
+        @pseudonym = SisPseudonym.for(@canvas_user, @canvas_root_account, type: :trusted, require_sis: false)
       end
       @pseudonym
     end

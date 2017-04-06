@@ -225,6 +225,11 @@ class User < ActiveRecord::Base
     end
   }
 
+  def reload(*)
+    @all_active_pseudonyms = nil
+    super
+  end
+
   def assignment_and_quiz_visibilities(context)
     RequestCache.cache("assignment_and_quiz_visibilities", self, context) do
       {assignment_ids: DifferentiableAssignment.scope_filter(context.assignments, self, context).pluck(:id),
@@ -978,14 +983,6 @@ class User < ActiveRecord::Base
     @courses_with_grades ||= self.available_courses.shard(self).select{|c| c.grants_right?(self, :participate_as_student)}
   end
 
-  def sis_pseudonym_for(context, include_trusted = false, override_deprecation = false)
-    if Rails.env.production? || override_deprecation
-      SisPseudonym.for(self, context, include_trusted)
-    else
-      raise "User#sis_pseudonym_for is deprecated. Use SisPseudonym.for"
-    end
-  end
-
   def check_courses_right?(user, sought_right)
     # Look through the currently enrolled courses first.  This should
     # catch most of the calls.  If none of the current courses grant
@@ -1090,7 +1087,7 @@ class User < ActiveRecord::Base
     # student view should only ever have enrollments in a single course
     return true if self.fake_student? && self.courses.any?{ |c| c.grants_right?(masquerader, :use_student_view) }
     return false unless
-        account.grants_right?(masquerader, nil, :become_user) && self.find_pseudonym_for_account(account, true)
+        account.grants_right?(masquerader, nil, :become_user) && SisPseudonym.for(self, account, type: :implicit, require_sis: false)
     has_subset_of_account_permissions?(masquerader, account)
   end
 
@@ -2517,7 +2514,7 @@ class User < ActiveRecord::Base
   end
 
   def can_be_enrolled_in_course?(course)
-    !!find_pseudonym_for_account(course.root_account, true) ||
+    !!SisPseudonym.for(self, course, type: :implicit, require_sis: false) ||
         (self.creation_pending? && self.enrollments.where(course_id: course).exists?)
   end
 
@@ -2532,42 +2529,15 @@ class User < ActiveRecord::Base
     h
   end
 
-  def find_pseudonym_for_account(account, allow_implicit = false)
-    # try to find one that's already loaded if possible
-    if self.pseudonyms.loaded?
-      result = self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
-      return result if result || self.associated_shards.length == 1
-    end
-    if @all_active_pseudonyms
-      return @all_active_pseudonyms.detect { |p| p.works_for_account?(account, allow_implicit) }
-    else
-      shards = self.associated_shards
-      unless allow_implicit
-        # only search the shards with trusted accounts
-        trusted_shards = account.root_account.trusted_account_ids.map{|id| Shard.shard_for(id) }
-        trusted_shards << account.root_account.shard
-
-        shards = self.associated_shards & trusted_shards
-      end
-
-      Shard.with_each_shard(shards) do
-        pseudonym = Pseudonym.where(:user_id => self).active.to_a.detect{|p| p.works_for_account?(account, allow_implicit) }
-        return pseudonym if pseudonym
-      end
-
-      nil
-    end
-  end
-
   # account = the account that you want a pseudonym for
   # preferred_template_account = pass in an actual account if you have a preference for which account the new pseudonym gets copied from
   # this may not be able to find a suitable pseudonym to copy, so would still return nil
   # if a pseudonym is created, it is *not* saved, and *not* added to the pseudonyms collection
   def find_or_initialize_pseudonym_for_account(account, preferred_template_account = nil)
-    pseudonym = find_pseudonym_for_account(account)
-    if !pseudonym
+    pseudonym = SisPseudonym.for(self, account, type: :trusted, require_sis: false)
+    unless pseudonym
       # list of copyable pseudonyms
-      active_pseudonyms = self.all_active_pseudonyms(:reload).select { |p|!p.password_auto_generated? && !p.account.delegated_authentication? }
+      active_pseudonyms = self.all_active_pseudonyms(:reload).select { |p| !p.password_auto_generated? && !p.account.delegated_authentication? }
       templates = []
       # re-arrange in the order we prefer
       templates.concat active_pseudonyms.select { |p| p.account_id == preferred_template_account.id } if preferred_template_account
@@ -2778,6 +2748,10 @@ class User < ActiveRecord::Base
 
   def all_pseudonyms
     @all_pseudonyms ||= self.pseudonyms.shard(self).to_a
+  end
+
+  def all_active_pseudonyms_loaded?
+    !!@all_active_pseudonyms
   end
 
   def all_active_pseudonyms(reload=false)
