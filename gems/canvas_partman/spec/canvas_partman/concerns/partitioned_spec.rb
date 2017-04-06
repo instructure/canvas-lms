@@ -153,8 +153,6 @@ describe CanvasPartman::Concerns::Partitioned do
           subject.create_partition(zoo.id)
           subject.create_partition(zoo.id + 5)
 
-          zoo = Zoo.create!
-
           south = zoo.trails.create!
 
           expect(count_records("partman_trails")).to eq 1
