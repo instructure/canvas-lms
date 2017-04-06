@@ -189,6 +189,7 @@ class Course < ActiveRecord::Base
 
   has_many :master_course_templates, :class_name => "MasterCourses::MasterTemplate"
   has_many :master_course_subscriptions, :class_name => "MasterCourses::ChildSubscription", :foreign_key => 'child_course_id'
+  has_one :late_policy, dependent: :destroy, inverse_of: :course
 
   prepend Profile::Association
 

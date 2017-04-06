@@ -1367,3 +1367,22 @@ module ReadonlyCloning
   end
 end
 ActiveRecord::Base.prepend(ReadonlyCloning)
+
+if CANVAS_RAILS4_2
+  # https://github.com/rails/rails/commit/696f1766148453160e1f6f21e4d7d7aac1356c7d
+  # the fix was backported into rails 5-0-stable
+  module DecimalCastRescueRuby24
+    def cast_value(value)
+      if value.is_a?(::String)
+        begin
+          super(value)
+        rescue ArgumentError
+          BigDecimal(0)
+        end
+      else
+        super(value)
+      end
+    end
+  end
+  ActiveRecord::Type::Decimal.prepend DecimalCastRescueRuby24
+end

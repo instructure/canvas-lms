@@ -21,6 +21,12 @@ require 'csv'
 require 'socket'
 
 describe Course do
+  describe 'relationships' do
+    it { is_expected.to have_one(:late_policy).dependent(:destroy).inverse_of(:course) }
+  end
+end
+
+describe Course do
   before :once do
     Account.default
     Account.default.default_enrollment_term
