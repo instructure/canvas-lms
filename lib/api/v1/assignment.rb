@@ -735,7 +735,7 @@ module Api::V1::Assignment
     assignment = prepared_update[:assignment]
     overrides = prepared_update[:overrides]
 
-    return :forbidden if assignment.is_child_content? && (assignment.editing_restricted?(:due_dates) || assignment.editing_restricted?(:availability_dates))
+    return :forbidden if overrides.any? && assignment.is_child_content? && (assignment.editing_restricted?(:due_dates) || assignment.editing_restricted?(:availability_dates))
 
     prepared_batch = prepare_assignment_overrides_for_batch_update(assignment, overrides, user)
 
