@@ -68,6 +68,11 @@ GIT
       activemodel (>= 3.2)
 
 PATH
+  remote: gems
+  specs:
+    autoextend (1.0.0)
+
+PATH
   remote: gems/activesupport-suspend_callbacks
   specs:
     activesupport-suspend_callbacks (0.0.1)

@@ -233,26 +233,25 @@ class BzController < ApplicationController
     end
   end
 
-  # FIXME
   def linked_in_export
-    work = BzController::ExportWork.new
-    Delayed::Job.enqueue(work, max_attempts: 1)
+    # renders a view to fetch the email address
+    @email = @current_user.email
   end
 
-  def linked_in_export_async
-
+  def do_linked_in_export
+    work = BzController::ExportWork.new(params[:email])
+    Delayed::Job.enqueue(work, max_attempts: 1)
   end
 
   # (private)
   class ExportWork # < Delayed::PerformableMethod
-    def initialize()
-      # target, method, method args
-      #super(controller, :linked_in_export_async, nil)
+    def initialize(email)
+      @email = email
     end
 
     def perform
       csv = linked_in_export_guts
-      Mailer.debug_message("Export Success", "Attached is your export data", "linkedin.csv" => csv).deliver
+      Mailer.bz_message(@email, "Export Success", "Attached is your export data", "linkedin.csv" => csv).deliver
       # super
       csv
     end
@@ -261,6 +260,7 @@ class BzController < ApplicationController
       er_id = Canvas::Errors.capture_exception("BzController::ExportWork", error)[:error_report]
       # email us?
       Mailer.debug_message("Export FAIL", error.to_s).deliver
+      Mailer.bz_message(@email, "Export Failed :(", "Your linked in export didn't work. The tech team was also emailed to look into why.")
     end
 
     def linked_in_export_guts
