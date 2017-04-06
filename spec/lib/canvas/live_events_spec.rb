@@ -27,6 +27,7 @@ describe Canvas::LiveEvents do
 
   describe '.amended_context' do
     it 'pulls the context from the canvas context' do
+      LiveEvents.set_context(nil)
       course = course_model
       amended_context = Canvas::LiveEvents.amended_context(course)
 
