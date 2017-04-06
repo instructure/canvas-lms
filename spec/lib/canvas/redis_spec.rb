@@ -162,10 +162,13 @@ describe "Canvas::Redis" do
     end
   end
 
-  describe "logging" do
+  describe "json logging" do
     let(:key) { 'mykey' }
     let(:key2) { 'mykey2' }
     let(:val) { 'myvalue' }
+    before(:once) { Setting.set('redis_log_style', 'json') }
+    # cache to avoid capturing a log line for db lookup
+    before(:each) { Canvas::Redis.log_style }
 
     def json_logline(get = :shift)
       # drop the non-json logging at the start of the line
@@ -253,6 +256,26 @@ describe "Canvas::Redis" do
           expect(message["response_size"]).to eq(0)
         end
       end
+    end
+  end
+
+  it "should log compactly by default on the redis request" do
+    # cache to avoid capturing a log line for db lookup
+    Canvas::Redis.log_style
+    Rails.logger.capture_messages do
+      Canvas.redis.set('mykey', 'myvalue')
+      msg = Rails.logger.captured_messages.first
+      expect(msg).to match(/Redis \(\d+\.\d+ms\) set mykey \[.*\]/)
+    end
+  end
+
+  it "should allow disabling redis logging" do
+    Setting.set('redis_log_style', 'off')
+    # cache to avoid capturing a log line for db lookup
+    Canvas::Redis.log_style
+    Rails.logger.capture_messages do
+      Canvas.redis.set('mykey', 'myvalue')
+      expect(Rails.logger.captured_messages).to be_empty
     end
   end
 
