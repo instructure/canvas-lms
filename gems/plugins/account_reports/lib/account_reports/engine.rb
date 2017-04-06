@@ -322,7 +322,12 @@ module AccountReports
         'user_access_tokens_csv' => {
           :title => proc { I18n.t(:user_access_tokens_title, 'User Access Tokens') },
           :description_partial => true,
+          :parameters_partial => 'include_only_deleted_parameter',
           :parameters => {
+            :include_deleted => {
+              :required => false,
+              :description => 'Include deleted objects'
+            }
           }
         },
         'lti_report_csv' => {

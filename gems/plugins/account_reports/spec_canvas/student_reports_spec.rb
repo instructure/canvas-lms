@@ -611,6 +611,7 @@ describe 'Student reports' do
         :developer_key => DeveloperKey.default,
         :expires_at => 2.hours.ago
       )
+      @user1.destroy
 
       @at2 = AccessToken.create!(
         :user => @user2,
@@ -627,8 +628,8 @@ describe 'Student reports' do
       )
     end
 
-    it 'should run the user access tokens report' do
-      parsed = read_report(@type, {order: 1})
+    it 'should run and include deleted users' do
+      parsed = read_report(@type, {params: {"include_deleted" => true}, order: 1})
       expect(parsed.length).to eq 3
       expect(parsed[0]).to eq([
         @user3.id.to_s,
@@ -659,6 +660,11 @@ describe 'Student reports' do
         DeveloperKey.default.id.to_s,
         "User-Generated"
       ])
+    end
+
+    it 'should run and exclude deleted users' do
+      parsed = read_report(@type, {order: 1})
+      expect(parsed.length).to eq 2
     end
   end
 end
