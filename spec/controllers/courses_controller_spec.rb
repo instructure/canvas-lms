@@ -2199,6 +2199,7 @@ describe CoursesController do
       assignment.grade_student test_student, { :grade => 1, :grader => @teacher, :provisional => true }
       file = assignment.attachments.create! uploaded_data: default_uploaded_data
       assignment.submissions.first.add_comment(commenter: @teacher, message: 'blah', provisional: true, attachments: [file])
+      assignment.moderated_grading_selections.create!(:student => test_student, :provisional_grade => ModeratedGrading::ProvisionalGrade.last)
 
       expect(test_student.submissions.size).not_to be_zero
       delete 'reset_test_student', course_id: @course.id
