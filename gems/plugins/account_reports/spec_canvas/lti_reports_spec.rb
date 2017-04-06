@@ -108,4 +108,11 @@ describe 'lti report' do
     parsed = read_report(@type, {order: 4})
     expect(parsed.length).to eq 2
   end
+
+  it 'should include tools from deleted courses for include deleted objects' do
+    @sub_account2.destroy
+    @course.destroy
+    parsed = read_report(@type, {params: {"include_deleted" => true}, order: 4})
+    expect(parsed.length).to eq 3
+  end
 end

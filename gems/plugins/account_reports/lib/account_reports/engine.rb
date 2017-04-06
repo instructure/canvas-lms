@@ -332,7 +332,14 @@ module AccountReports
         },
         'lti_report_csv' => {
           :title => proc { I18n.t('LTI Report') },
-          :description_partial => true
+          :description_partial => true,
+          :parameters_partial => 'include_only_deleted_parameter',
+          :parameters => {
+            :include_deleted => {
+              :required => false,
+              :description => 'Include deleted objects'
+            }
+          }
         }
       }
     end

@@ -26,6 +26,7 @@ module AccountReports
     def initialize(account_report)
       @account_report = account_report
       @account_report.parameters ||= {}
+      include_deleted_objects
     end
 
     def lti_report
@@ -33,18 +34,27 @@ module AccountReports
                  'tool_type_id', 'tool_created_at', 'privacy_level', 'launch_url', 'custom_fields']
 
       write_report headers do |csv|
-        courses = add_course_sub_account_scope(root_account.all_courses.active)
-        courses = courses.joins(:account).where.not(accounts: {workflow_state: 'deleted'}).select(:id)
+        courses = add_course_sub_account_scope(root_account.all_courses).joins(:account).select(:id)
 
-        tools = ContextExternalTool.active.
+        if @include_deleted
+          course_join_condition = account_join_condition = ''
+        else
+          courses = courses.active.where.not(accounts: {workflow_state: 'deleted'})
+          course_join_condition = "AND courses.workflow_state<>'deleted'"
+          account_join_condition = "AND accounts.workflow_state<>'deleted'"
+        end
+
+        tools = ContextExternalTool.
           where("context_type = 'Account' OR context_type = 'Course'").
           joins("LEFT OUTER JOIN #{Course.quoted_table_name} ON context_id=courses.id
                                                              AND context_type='Course'
-                                                             AND courses.workflow_state<>'deleted'",
+                                                             #{course_join_condition}",
                 "LEFT OUTER JOIN #{Account.quoted_table_name} ON context_id=accounts.id
                                                               AND context_type='Account'
-                                                              AND accounts.workflow_state<>'deleted'").
+                                                              #{account_join_condition}").
           select("context_external_tools.*, courses.name AS course_name, accounts.name AS account_name")
+        tools = tools.active unless @include_deleted
+
         if account.root_account?
           tools.where!("courses.id IN (:courses) OR
                         accounts.root_account_id = :root OR accounts.id = :root", {root: root_account, courses: courses})
