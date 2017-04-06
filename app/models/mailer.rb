@@ -69,7 +69,11 @@ class Mailer < ActionMailer::Base
 
     if !to_attach.nil?
       to_attach.each do |key, value|
-        attachments[key] = value
+        attachments[key] = {
+          mime_type: "text/csv",
+          encoding: "base64",
+          content: Base64.encode64(value)
+        }
       end
     end
 
