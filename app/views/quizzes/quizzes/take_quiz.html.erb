@@ -52,27 +52,10 @@
 
   <% js_bundle :take_quiz %>
 
-<div id="questions" class="assessing">
-  <input type="hidden" name="attempt" value="<%= @submission.attempt %>"/>
-  <% if @submission.validation_token.present? %>
-    <input type="hidden" name="validation_token" value="<%= @submission.validation_token %>"/>
-  <% end %>
-  <% if @submission.preview? %>
-    <input type="hidden" name="preview" value="1"/>
-  <% end %>
-  <div style="display: none;" id="quiz_urls">
-    <a href="<%= context_url(@context, :backup_context_quiz_quiz_submissions_url, @quiz.id) %>?user_id=<%= @current_user && @current_user.id %><%= "&preview=1" if @submission.preview? %>" class="backup_quiz_submission_url">&nbsp;</a>
-    <span class="started_at"><%= @submission.started_at.iso8601 %></span>
-    <span class="now"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone).iso8601 %></span>
-    <span class="end_at"><%= @submission.end_at && @submission.end_at.iso8601 %></span>
-    <span class="due_at"><%= @quiz.due_at && @quiz.due_at.iso8601 %></span>
-    <span class="time_limit"><%= @quiz.time_limit || nbsp %></span>
-    <span class="time_left"><%= @submission.time_left %></span>
-  </div>
   <%= form_tag @quiz_presenter.form_action(session, @current_user), :id => "submit_quiz_form", :class => @quiz_presenter.form_class, :method => "post" do %>
-    <% if params[:module_item_id] %>
-      <input type="hidden" name="module_item_id" value="<%= params[:module_item_id] %>" />
-    <% end %>
+  <% if params[:module_item_id] %>		
+    <input type="hidden" name="module_item_id" value="<%= params[:module_item_id] %>" />		
+  <% end %>
 
   <div id="questions" class="assessing">
     <input type="hidden" name="attempt" value="<%= @submission.attempt %>"/>

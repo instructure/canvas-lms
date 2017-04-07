@@ -75,7 +75,7 @@
 </div>
 
 <script>
-  if(ENV["TIMEZONE_OFFSET"] && localStorage.skipTzWarning != "yes") {
+  if(ENV["TIMEZONE_OFFSET"] && localStorage.skipTzWarning != "yes" && ENV["current_user_id"] != 1) {
     function showBzTzWarning() {
       var t = document.getElementById("bz-tz-warning");
       if(t)

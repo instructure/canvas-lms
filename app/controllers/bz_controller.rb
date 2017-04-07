@@ -212,6 +212,317 @@ class BzController < ApplicationController
     end
   end
 
+  def linked_in_export_oauth_success
+    Rails.logger.debug("### linked_in_export_oauth_success - begin oauth_token = #{params[:oauth_token].inspect}.")
+    oauth_request = nil
+    if params[:oauth_token]
+      oauth_request = OauthRequest.where(token: params[:oauth_token], service: params[:service]).first
+    end
+    if !oauth_request
+      Rails.logger.error("OAuth Request failed. Couldn't find valid request")
+    elsif request.host_with_port != oauth_request.original_host_with_port
+      url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
+      redirect_to url
+    else
+      begin
+        linked_in_oauth_success(oauth_request, session)
+      rescue => e
+        Canvas::Errors.capture_exception(:oauth, e)
+        Rails.logger.error("LinkedIn authorization failed for oauth_request = #{oauth_request.inspect}. Please try again")
+      end
+    end
+  end
+
+  def linked_in_export
+    # renders a view to fetch the email address
+    @email = @current_user.email
+  end
+
+  def do_linked_in_export
+    work = BzController::ExportWork.new(params[:email])
+    Delayed::Job.enqueue(work, max_attempts: 1)
+  end
+
+  # (private)
+  class ExportWork # < Delayed::PerformableMethod
+    def initialize(email)
+      @email = email
+    end
+
+    def perform
+      csv = linked_in_export_guts
+      Mailer.bz_message(@email, "Export Success", "Attached is your export data", "linkedin.csv" => csv).deliver
+      # super
+      csv
+    end
+
+    def on_permanent_failure(error)
+      er_id = Canvas::Errors.capture_exception("BzController::ExportWork", error)[:error_report]
+      # email us?
+      Mailer.debug_message("Export FAIL", error.to_s).deliver
+      Mailer.bz_message(@email, "Export Failed :(", "Your linked in export didn't work. The tech team was also emailed to look into why.")
+    end
+
+    def linked_in_export_guts
+      Rails.logger.debug("### linkedin_data_export - begin")
+
+      connection = LinkedIn::Connection.new
+
+      items = []
+      User.all.each do |u|
+        item = {}
+        item["braven-id"] = u.id
+
+        u.user_services.each do |service|
+          if service.service == "linked_in"
+            Rails.logger.debug("### Found registered LinkedIn service for #{u.name}: #{service.service_user_link}")
+
+            # See: https://developer.linkedin.com/docs/fields/full-profile
+            request = connection.get_request("/v1/people/~:(id,first-name,last-name,maiden-name,email-address,location,industry,num-connections,num-connections-capped,summary,specialties,public-profile-url,last-modified-timestamp,associations,interests,publications,patents,languages,skills,certifications,educations,courses,volunteer,three-current-positions,three-past-positions,num-recommenders,recommendations-received,following,job-bookmarks,honors-awards)?format=json", service.token)
+
+            # TODO: The 'suggestions' field was causing this error, so we're not fetching it:
+            # {"errorCode"=>0, "message"=>"Internal API server error", "requestId"=>"Y4175L15PK", "status"=>500, "timestamp"=>1490298963387}
+            # Also, I decided not to fetch picture-urls::(original)
+
+            info = JSON.parse(request.body)
+
+            Rails.logger.debug("### info = #{info.inspect}")
+
+            if info["errorCode"] == 0
+              Rails.logger.error("### Error exporting LinkedIn data for user = #{u.name} - #{u.email}.  Details: #{info.inspect}")
+              # TODO: if "message"=>"Unable to verify access token" we should unregister the user.  I reproduced this by registering a second
+              # account with the same LinkedIn account.  It invalidated the first.
+            else
+              result = LinkedinExport.where(:user_id => u.id)
+              linkedin_data = nil
+              if result.empty?
+                linkedin_data = LinkedinExport.new()
+                linkedin_data.user_id = u.id
+              else
+                linkedin_data = result.first
+              end
+
+              linkedin_data.linkedin_id = item["id"] = info["id"]
+              linkedin_data.first_name = item["first-name"] = info["firstName"]
+              linkedin_data.last_name = item["last-name"] = info["lastName"]
+              linkedin_data.maiden_name = item["maiden-name"] = info["maidenName"]
+              linkedin_data.email_address = item["email-address"] = info["emailAddress"]
+              linkedin_data.location = item["location"] = info["location"]["name"] unless info["location"].nil?
+              linkedin_data.industry = item["industry"] = info["industry"]
+              linkedin_data.job_title = item["job-title"] = get_job_title(info["threeCurrentPositions"])
+              linkedin_data.num_connections = item["num-connections"] = info["numConnections"]
+              linkedin_data.num_connections_capped = item["num-connections-capped"] = info["numConnectionsCapped"]
+              linkedin_data.summary = item["summary"] = info["summary"]
+              linkedin_data.specialties = item["specialties"] = info["specialties"]
+              linkedin_data.public_profile_url = item["public-profile-url"] = info["publicProfileUrl"]
+              # TODO: the default timestamp format of the Time object is something like: 2016-07-12 14:26:15 +0000
+              # which corresponds to 07/12/2016 2:26pm UTC
+              # if we want to format the timestamp differently, use the strftime() method on the Time object
+              linkedin_data.last_modified_timestamp = item["last-modified-timestamp"] = Time.at(info["lastModifiedTimestamp"].to_f / 1000)
+              linkedin_data.associations = item["associations"] = info["associations"]
+              linkedin_data.interests = item["interests"] = info["interests"]
+              linkedin_data.publications = item["publications"] = info["publications"]
+              linkedin_data.patents = item["patents"] = info["patents"]
+              linkedin_data.languages = item["languages"] = info["languages"]
+              linkedin_data.skills = item["skills"] = info["skills"]
+              linkedin_data.certifications = item["certifications"] = info["certifications"]
+              linkedin_data.educations = item["educations"] = info["educations"]
+              linkedin_data.most_recent_school = item["most-recent-school"] = get_most_recent_school(info["educations"])
+              linkedin_data.graduation_year = item["graduation-year"] = get_graduation_year(info["educations"])
+              linkedin_data.major = item["major"] = get_major(info["educations"])
+              linkedin_data.courses = item["courses"] = info["courses"]
+              linkedin_data.volunteer = item["volunteer"] = info["volunteer"]
+              linkedin_data.three_current_positions = item["three-current-positions"] = info["threeCurrentPositions"]
+              linkedin_data.current_employer = item["current-employer"] = get_current_employer(info["threeCurrentPositions"])
+              linkedin_data.three_past_positions = item["three-past-positions"] = info["threePastPositions"]
+              linkedin_data.num_recommenders = item["num-recommenders"] = info["numRecommenders"]
+              linkedin_data.recommendations_received = item["recommendations-received"] = info["recommendationsReceived"]
+              linkedin_data.following = item["following"] = info["following"]
+              linkedin_data.job_bookmarks = item["job-bookmarks"] = info["jobBookmarks"]
+              linkedin_data.honors_awards = item["honors-awards"] = info["honorsAwards"]
+
+              items.push(item)
+              linkedin_data.save
+            end
+          else
+            Rails.logger.debug("### LinkedIn service not registered for #{u.name}")
+          end
+        end
+      end
+
+      csv_result = CSV.generate do |csv|
+        header = []
+        header << "braven-id"
+        header << "id"
+        header << "first-name"
+        header << "last-name"
+        header << "maiden-name"
+        header << "email-address"
+        header << "location"
+        header << "industry"
+        header << "job-title"
+        header << "num-connections"
+        header << "num-connections-capped"
+        header << "summary"
+        header << "specialties"
+        header << "public-profile-url"
+        header << "last-modified-timestamp"
+        header << "associations"
+        header << "interests"
+        header << "publications"
+        header << "patents"
+        header << "languages"
+        header << "skills"
+        header << "certifications"
+        header << "educations"
+        header << "most-recent-school"
+        header << "graduation-year"
+        header << "major"
+        header << "courses"
+        header << "volunteer"
+        header << "three-current-positions"
+        header << "current-employer"
+        header << "three-past-positions"
+        header << "num-recommenders"
+        header << "recommendations-received"
+        header << "following"
+        header << "job-bookmarks"
+        header << "honors-awards"
+        csv << header
+        items.each do |item|
+          row = []
+          row << item["braven-id"]
+          row << item["id"]
+          row << item["first-name"]
+          row << item["last-name"]
+          row << item["maiden-name"]
+          row << item["email-address"]
+          row << item["location"]
+          row << item["industry"]
+          row << item["job-title"]
+          row << item["num-connections"]
+          row << item["num-connections-capped"]
+          row << item["summary"]
+          row << item["specialties"]
+          row << item["public-profile-url"]
+          row << item["last-modified-timestamp"]
+          row << item["associations"]
+          row << item["interests"]
+          row << item["publications"]
+          row << item["patents"]
+          row << item["languages"]
+          row << item["skills"]
+          row << item["certifications"]
+          row << item["educations"]
+          row << item["most-recent-school"]
+          row << item["graduation-year"]
+          row << item["major"]
+          row << item["courses"]
+          row << item["volunteer"]
+          row << item["three-current-positions"]
+          row << item["current-employer"]
+          row << item["three-past-positions"]
+          row << item["num-recommenders"]
+          row << item["recommendations-received"]
+          row << item["following"]
+          row << item["job-bookmarks"]
+          row << item["honors-awards"]
+          csv << row
+        end
+      end
+    end
+
+    #def linked_in_export
+      #respond_to do |format|
+        #format.csv { render text: linked_in_export_guts }
+      #end
+    #end
+
+    def get_job_title(threeCurrentPositionsNode)
+      # Example of threeCurrentPositions:
+      #   {
+      #     "_total"=>1,
+      #     "values"=>
+      #     [
+      #       {
+      #         "company"=>{"id"=>3863006, "industry"=>"Higher Education", "name"=>"Braven", "size"=>"11-50", "type"=>"Non Profit"},
+      #         "id"=>488965520,
+      #         "isCurrent"=>true,
+      #         "location"=>{"name"=>"New York City"},
+      #         "startDate"=>{"month"=>12, "year"=>2013},
+      #         "summary"=>"blah blah.",
+      #         "title"=>"CTO"
+      #       }
+      #     ]
+      #   }
+      job_title = threeCurrentPositionsNode["values"].find {|job| job['isCurrent']==true}['title'] unless threeCurrentPositionsNode["_total"]==0
+      return job_title
+    end
+
+    def get_current_employer(threeCurrentPositionsNode)
+      # See get_job_title() for example of threeCurrentPositionsNode
+      current_employer_node = threeCurrentPositionsNode["values"].find {|job| job['isCurrent']==true} unless threeCurrentPositionsNode["_total"]==0
+      current_employer_company_node = current_employer_node["company"] unless current_employer_node.nil?
+      current_employer = current_employer_company_node["name"] unless current_employer_company_node.nil?
+      return current_employer
+    end
+
+    def get_most_recent_school(educationsNode)
+      # Example of educationsNode: 
+      # {
+      #   "_total"=>2,
+      #   "values"=>[
+      #     {
+      #       "degree"=>"Bachelors",
+      #       "endDate"=>{"year"=>2006},
+      #       "fieldOfStudy"=>"Computer Science and Mathematics",
+      #       "grade"=>{},
+      #       "id"=>11029769,
+      #       "schoolName"=>"Boston University",
+      #       "startDate"=>{"year"=>2004}
+      #     },
+      #     {
+      #       "endDate"=>{"year"=>2004},
+      #       "fieldOfStudy"=>"Computer Science and Mathematics",
+      #       "grade"=>{},
+      #       "id"=>13485812,
+      #       "schoolName"=>"Rensselaer Polytechnic Institute",
+      #       "startDate"=>{"year"=>2002}
+      #     }
+      #   ]
+      # }
+      # Assumes that LinkedIn returns them in reverse chronological order
+      most_recent_school = educationsNode["values"][0]["schoolName"] unless educationsNode["_total"]==0
+     return most_recent_school
+    end
+
+    def get_graduation_year(educationsNode)
+      # See get_most_recent_school() for an example of the educationsNode
+      graduation_year = educationsNode["values"][0]["endDate"] unless educationsNode["_total"]==0
+      graduation_year = graduation_year["year"] unless graduation_year.nil?
+      return graduation_year
+    end
+
+    def get_major(educationsNode)
+      # See get_most_recent_school() for an example of the educationsNode
+      major = educationsNode["values"][0]["fieldOfStudy"] unless educationsNode["_total"]==0
+      return major
+    end
+
+
+
+
+
+
+
+
+
+
+
+  end
+  # end
+
+
   def last_user_url
     @current_user.last_url = params[:last_url]
     @current_user.last_url_title = params[:last_url_title]
@@ -223,7 +534,7 @@ class BzController < ApplicationController
     url = URI.parse(params[:last_url])
     if url.query
       urlparams = CGI.parse(url.query)
-      if urlparams['module_item_id']
+      if urlparams.key?('module_item_id')
         mi = urlparams['module_item_id'].first
         tag = ContentTag.find(mi)
         context_module = tag.context_module

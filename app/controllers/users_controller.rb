@@ -237,25 +237,14 @@ class UsersController < ApplicationController
       redirect_to request_token.authorize_url
     elsif params[:service] == "linked_in"
       linkedin_connection = LinkedIn::Connection.new
-
-      request_token = linkedin_connection.request_token(oauth_success_url(:service => 'linked_in'))
-
-      session[:oauth_linked_in_request_token_token] = request_token.token
-      session[:oauth_linked_in_request_token_secret] = request_token.secret
-      OauthRequest.create(
-        :service => 'linked_in',
-        :token => request_token.token,
-        :secret => request_token.secret,
-        :return_url => return_to_url,
-        :user => @current_user,
-        :original_host_with_port => request.host_with_port
-      )
-
-      redirect_to request_token.authorize_url
+      nonce = session[:oauth_linked_nonce] = SecureRandom.hex
+      session[:oauth_linkedin_return_to_url] = return_to_url
+      redirect_to linkedin_connection.authorize_url(oauth_success_url(:service => 'linked_in'), nonce)
     end
   end
 
   def oauth_success
+    Rails.logger.debug("### users_controller::oauth_success - begin.  params = #{params.inspect}")
     oauth_request = nil
     if params[:oauth_token]
       oauth_request = OauthRequest.where(token: params[:oauth_token], service: params[:service]).first
@@ -309,66 +298,78 @@ class UsersController < ApplicationController
       return redirect_to(user_profile_url(@current_user))
     end
 
-    if !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)
+    if params[:service] == "linked_in"
+      begin
+        linkedin_connection = LinkedIn::Connection.new
+        nonce = session.delete(:oauth_linked_nonce)
+        render_unauthorized_action and return unless nonce == params[:state]
+        return_to_url = session.delete(:oauth_linkedin_return_to_url) || user_profile_url(@current_user)
+
+        if params[:error]
+          # Note: if user cancels, then params[:error] == 'user_cancelled_authorize'
+          flash[:error] = t('linkedin_fail', "LinkedIn authorization failed. Please try again")
+          Rails.logger.error("LinkedIn authorization failed. error = #{params[:error]}, error_description = #{params[:error_description]}")
+          return redirect_to(return_to_url)
+        end
+
+        access_token = linkedin_connection.exchange_code_for_token(params[:code], oauth_success_url(:service => 'linked_in'))
+
+        # Note: the service_user_id, service_user_name, and service_user_url are LinkedIn's data that we get
+        # by calling into their API.  E.g. service_user_url maybe something like: https://www.linkedin.com/in/somelinkedinusername
+        if access_token
+          service_user_id, service_user_name, service_user_url = linkedin_connection.get_service_user_info(access_token)
+
+          UserService.register(
+            :service => "linked_in",
+            :token => access_token,
+            :user => @current_user,
+            :service_domain => "linkedin.com",
+            :service_user_id => service_user_id,
+            :service_user_name => service_user_name,
+            :service_user_url => service_user_url
+          )
+        else
+          Rails.logger.error("Error registering LinkedIn service for #{@current_user.email}.  The access_token couldn't be retrieved using the code sent from LinkedIn")
+          raise Exception.new "Failed getting access token for LinkedIn"
+        end
+
+        flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
+        Rails.logger.debug("### Done registering LinkedIn service.  Redirecting to: #{return_to_url}")
+        redirect_to(return_to_url)
+      rescue => e
+        Canvas::Errors.capture_exception(:oauth, e)
+        flash[:error] = t('linkedin_fail', "LinkedIn authorization failed. Please try again")
+      end
+    elsif !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)
       flash[:error] = t('oauth_fail', "OAuth Request failed. Couldn't find valid request")
       redirect_to (@current_user ? user_profile_url(@current_user) : root_url)
     elsif request.host_with_port != oauth_request.original_host_with_port
       url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
       redirect_to url
     else
-     if params[:service] == "linked_in"
-        begin
-          linkedin_connection = LinkedIn::Connection.new
-          token = session.delete(:oauth_linked_in_request_token_token)
-          secret = session.delete(:oauth_linked_in_request_token_secret)
-          access_token = linkedin_connection.get_access_token(token, secret, params[:oauth_verifier])
-          service_user_id, service_user_name, service_user_url = linkedin_connection.get_service_user_info(access_token)
-
-          if oauth_request.user
-            UserService.register(
-              :service => "linked_in",
-              :access_token => access_token,
-              :user => oauth_request.user,
-              :service_domain => "linked_in.com",
-              :service_user_id => service_user_id,
-              :service_user_name => service_user_name,
-              :service_user_url => service_user_url
-            )
-          else
-            session[:oauth_linked_in_access_token_token] = access_token.token
-            session[:oauth_linked_in_access_token_secret] = access_token.secret
-          end
-
-          flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
-        rescue => e
-          Canvas::Errors.capture_exception(:oauth, e)
-          flash[:error] = t('linkedin_fail', "LinkedIn authorization failed. Please try again")
+      begin
+        twitter = Twitter::Connection.new(oauth_request.token, oauth_request.secret)
+        access_token = twitter.get_access_token(oauth_request.token, oauth_request.secret, params[:oauth_verifier])
+        service_user_id, service_user_name = twitter.get_service_user(access_token)
+        if oauth_request.user
+          UserService.register(
+            :service => "twitter",
+            :access_token => access_token,
+            :user => oauth_request.user,
+            :service_domain => "twitter.com",
+            :service_user_id => service_user_id,
+            :service_user_name => service_user_name
+          )
+          oauth_request.destroy
+        else
+          session[:oauth_twitter_access_token_token] = access_token.token
+          session[:oauth_twitter_access_token_secret] = access_token.secret
         end
-      else
-        begin
-          twitter = Twitter::Connection.new(oauth_request.token, oauth_request.secret)
-          access_token = twitter.get_access_token(oauth_request.token, oauth_request.secret, params[:oauth_verifier])
-          service_user_id, service_user_name = twitter.get_service_user(access_token)
-          if oauth_request.user
-            UserService.register(
-              :service => "twitter",
-              :access_token => access_token,
-              :user => oauth_request.user,
-              :service_domain => "twitter.com",
-              :service_user_id => service_user_id,
-              :service_user_name => service_user_name
-            )
-            oauth_request.destroy
-          else
-            session[:oauth_twitter_access_token_token] = access_token.token
-            session[:oauth_twitter_access_token_secret] = access_token.secret
-          end
 
-          flash[:notice] = t('twitter_added', "Twitter access authorized!")
-        rescue => e
-          Canvas::Errors.capture_exception(:oauth, e)
-          flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
-        end
+        flash[:notice] = t('twitter_added', "Twitter access authorized!")
+      rescue => e
+        Canvas::Errors.capture_exception(:oauth, e)
+        flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
       end
       return_to(oauth_request.return_url, user_profile_url(@current_user))
     end

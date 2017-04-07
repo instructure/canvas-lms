@@ -141,6 +141,7 @@ class User < ActiveRecord::Base
   alias :orig_profile :profile
 
   has_many :progresses, :as => :context
+  has_one :linkedin_export, dependent: :destroy
 
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 

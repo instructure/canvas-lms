@@ -42,17 +42,46 @@ class Mailer < ActionMailer::Base
     end
   end
 
-  def debug_message(subj, txt)
+  def debug_message(subj, txt, to_attach = nil)
     params = {
       from: quoted_address(HostUrl.outgoing_email_default_name, HostUrl.outgoing_email_address),
       to: 'tech@bebraven.org',
       subject: subj
     }
 
+    if !to_attach.nil?
+      to_attach.each do |key, value|
+        attachments[key] = value
+      end
+    end
+
     mail(params) do |format|
       format.text{ render text: txt }
     end
   end
+
+  def bz_message(to, subj, txt, to_attach = nil)
+    params = {
+      from: quoted_address(HostUrl.outgoing_email_default_name, HostUrl.outgoing_email_address),
+      to: to,
+      subject: subj
+    }
+
+    if !to_attach.nil?
+      to_attach.each do |key, value|
+        attachments[key] = {
+          mime_type: "text/csv",
+          encoding: "base64",
+          content: Base64.encode64(value)
+        }
+      end
+    end
+
+    mail(params) do |format|
+      format.text{ render text: txt }
+    end
+  end
+
 
   private
   def quoted_address(display_name, address)

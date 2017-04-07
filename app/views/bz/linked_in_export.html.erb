@@ -1,0 +1,9 @@
+<h1>LinkedIn Data Export</h1>
+
+<%= form_tag do |f| %>
+  What is your email (the export spreadsheet will be emailed to you when it is ready)?
+  <br />
+  <%= text_field_tag :email, @email %>
+  <br />
+  <%= submit_tag 'Request export' %>
+<% end %>

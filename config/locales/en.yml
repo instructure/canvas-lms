@@ -1,4 +1,8 @@
 en:
+  activerecord:
+    errors:
+      template:
+        body: ""
   date:
     datepicker:
       column_headings:

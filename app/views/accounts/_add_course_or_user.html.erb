@@ -11,6 +11,11 @@
   <% if show_user %>
     <a href="#" role="button" class="add_user_link btn button-sidebar-wide"><i class="icon-user-add"></i> <%= t(:add_user_link, "Add a New User") %></a>
   <% end %>
+
+  <% if feature_and_service_enabled?(:linked_in) %>
+    <a class="btn button-sidebar-wide" href="/bz/linked_in_export?type=linked_in">Export LinkedIn Data</a>
+  <% end %>
+
   <% account_custom_links.each do |link| %>
     <a href="<%= link[:url] %>" role="button" class="btn button-sidebar-wide"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
   <% end %>
