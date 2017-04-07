@@ -202,7 +202,7 @@ namespace :deploy do
             execute :npm, 'cache clean' # Was getting "npm ERR! cb() never called!".
             #execute :npm, 'install', '--silent'
             execute :npm, '-dd install' # print debug log of npm install
-            execute :rake, 'canvas:compile_assets --trace'
+            execute :rake, 'canvas:compile_assets', '--trace'
           end
         end
       end
