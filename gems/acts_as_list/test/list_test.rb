@@ -1,9 +1,6 @@
 require 'test/unit'
-
-require 'rubygems'
 require 'active_record'
-
-require_relative "../lib/acts_as_list"
+require 'acts_as_list'
 
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
 
