@@ -48,8 +48,8 @@ export default React.createClass({
                 <ManageUpdateExternalToolButton tool={this.props.tool} />
                 <EditExternalToolButton ref="editExternalToolButton" tool={this.props.tool} canAddEdit={this.props.canAddEdit}/>
                 <ExternalToolPlacementButton ref="externalToolPlacementButton" tool={this.props.tool} />
-                <ReregisterExternalToolButton ref="reregisterExternalToolButton" tool={this.props.tool}/>
-                <DeleteExternalToolButton ref="deleteExternalToolButton" tool={this.props.tool} />
+                <ReregisterExternalToolButton ref="reregisterExternalToolButton" tool={this.props.tool} canAddEdit={this.props.canAddEdit}/>
+                <DeleteExternalToolButton ref="deleteExternalToolButton" tool={this.props.tool} canAddEdit={this.props.canAddEdit} />
               </ul>
             </div>
           </td>

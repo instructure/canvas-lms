@@ -27,7 +27,7 @@ export default React.createClass({
       return (
         <div className="Configurations">
           <Header>
-            <AddExternalToolButton canAddEdit={this.canAddEdit()} />
+            {this.canAddEdit() && (<AddExternalToolButton/>)}
             {appCenterLink()}
           </Header>
           <ExternalToolsTable canAddEdit={this.canAddEdit()}/>

@@ -115,64 +115,51 @@ export default React.createClass({
     },
 
     form() {
-      if (this.props.canAddEdit) {
-        if (this.state.tool.app_type === 'ContextExternalTool') {
-          return (
-            <ConfigurationForm ref="configurationForm" tool={this.state.tool} configurationType="manual" handleSubmit={this.saveChanges} showConfigurationSelector={false}>
-              <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Cancel')}</button>
-            </ConfigurationForm>
-          );
-        } else { // Lti::ToolProxy
-          return <Lti2Edit ref="lti2Edit" tool={this.state.tool} handleActivateLti2={this.handleActivateLti2} handleDeactivateLti2={this.handleDeactivateLti2} handleCancel={this.closeModal} />
-        }
-      } else {
-        return(
-          <div ref="configurationForm">
-            <div className="ReactModal__Body">
-              <div className="formFields">
-                <p>{I18n.t('This action has been disabled by your admin.')}</p>
-              </div>
-            </div>
-            <div className="ReactModal__Footer">
-              <div className="ReactModal__Footer-Actions">
-                <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Cancel')}</button>
-              </div>
-            </div>
-          </div>
+      if (this.state.tool.app_type === 'ContextExternalTool') {
+        return (
+          <ConfigurationForm ref="configurationForm" tool={this.state.tool} configurationType="manual" handleSubmit={this.saveChanges} showConfigurationSelector={false}>
+            <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Cancel')}</button>
+          </ConfigurationForm>
         );
+      } else { // Lti::ToolProxy
+        return <Lti2Edit ref="lti2Edit" tool={this.state.tool} handleActivateLti2={this.handleActivateLti2} handleDeactivateLti2={this.handleDeactivateLti2} handleCancel={this.closeModal} />
       }
     },
 
     render() {
-      var editAriaLabel = I18n.t('Edit %{toolName} App', { toolName: this.state.tool.name });
+      if (this.props.canAddEdit) {
+        var editAriaLabel = I18n.t('Edit %{toolName} App', {toolName: this.state.tool.name});
 
-      return (
-        <li role="presentation" className="EditExternalToolButton">
-          <a href="#" ref="editButton" tabIndex="-1" role="menuitem" aria-label={editAriaLabel} className="icon-edit" onClick={this.openModal}>
-            {I18n.t('Edit')}
-          </a>
-          <Modal className="ReactModal__Content--canvas"
-            overlayClassName="ReactModal__Overlay--canvas"
-            style={modalOverrides}
-            isOpen={this.state.modalIsOpen}
-            onRequestClose={this.closeModal}>
-            <div className="ReactModal__Layout">
-              <div className="ReactModal__Header">
-                <div className="ReactModal__Header-Title">
-                  <h4>{I18n.t('Edit App')}</h4>
+        return (
+          <li role="presentation" className="EditExternalToolButton">
+            <a href="#" ref="editButton" tabIndex="-1" role="menuitem" aria-label={editAriaLabel} className="icon-edit"
+               onClick={this.openModal}>
+              {I18n.t('Edit')}
+            </a>
+            <Modal className="ReactModal__Content--canvas"
+                   overlayClassName="ReactModal__Overlay--canvas"
+                   style={modalOverrides}
+                   isOpen={this.state.modalIsOpen}
+                   onRequestClose={this.closeModal}>
+              <div className="ReactModal__Layout">
+                <div className="ReactModal__Header">
+                  <div className="ReactModal__Header-Title">
+                    <h4>{I18n.t('Edit App')}</h4>
+                  </div>
+                  <div className="ReactModal__Header-Actions">
+                    <button className="Button Button--icon-action" type="button" onClick={this.closeModal}>
+                      <i className="icon-x"></i>
+                      <span className="screenreader-only">Close</span>
+                    </button>
+                  </div>
                 </div>
-                <div className="ReactModal__Header-Actions">
-                  <button className="Button Button--icon-action" type="button" onClick={this.closeModal}>
-                    <i className="icon-x"></i>
-                    <span className="screenreader-only">Close</span>
-                  </button>
-                </div>
+
+                {this.form()}
               </div>
-
-              {this.form()}
-            </div>
-          </Modal>
-        </li>
-      )
+            </Modal>
+          </li>
+        )
+      }
+      return false;
     }
   });

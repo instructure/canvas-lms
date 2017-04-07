@@ -141,15 +141,4 @@ define [
         })
         equal addToolButton._errorHandler(xhr), 'We were unable to add the app.'
 
-      test 'gives access error message when permission not granted', ->
-        component = renderComponent({'canAddEdit': false})
-        accessDeniedMessage = 'This action has been disabled by your admin.'
-        form = JSON.stringify(component.renderForm())
-        ok form.indexOf(accessDeniedMessage) >= 0
-
-      test 'gives no access error message when permission is granted', ->
-        component = renderComponent({'canAddEdit': true})
-        accessDeniedMessage = 'This action has been disabled by your admin.'
-        form = JSON.stringify(component.renderForm())
-        notOk form.indexOf(accessDeniedMessage) >= 0
 

@@ -14,7 +14,8 @@ define [
 
   createElement = (data) ->
     React.createElement(DeleteExternalToolButton, {
-      tool: data.tool
+      tool: data.tool,
+      canAddEdit: true
     })
 
   renderComponent = (data) ->
