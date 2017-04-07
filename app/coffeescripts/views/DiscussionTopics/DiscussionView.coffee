@@ -6,10 +6,11 @@ define [
   'jsx/shared/conditional_release/CyoeHelper'
   'jst/DiscussionTopics/discussion'
   'compiled/views/PublishIconView'
+  'compiled/views/LockIconView'
   'compiled/views/ToggleableSubscriptionIconView'
   'compiled/views/assignments/DateDueColumnView'
   'compiled/views/MoveDialogView'
-], (I18n, $, _, {View}, CyoeHelper, template, PublishIconView, ToggleableSubscriptionIconView, DateDueColumnView, MoveDialogView) ->
+], (I18n, $, _, {View}, CyoeHelper, template, PublishIconView, LockIconView, ToggleableSubscriptionIconView, DateDueColumnView, MoveDialogView) ->
 
   class DiscussionView extends View
     # Public: View template (discussion).
@@ -54,12 +55,24 @@ define [
 
     @child 'publishIcon', '[data-view=publishIcon]' if ENV.permissions.publish
 
+    @child 'lockIconView', '[data-view=lock-icon]'
+
     @child 'toggleableSubscriptionIcon', '[data-view=toggleableSubscriptionIcon]'
 
     @child 'dateDueColumnView', '[data-view=date-due]'
 
     initialize: (options) ->
       @attachModel()
+      @lockIconView = false
+      if ENV.permissions.manage_content
+        @lockIconView = new LockIconView({
+          model: @model,
+          unlockedText: I18n.t("%{name} is unlocked. Click to lock.", name: @model.get('title')),
+          lockedText: I18n.t("%{name} is locked. Click to unlock", name: @model.get('title')),
+          course_id: ENV.COURSE_ID,
+          content_id: @model.get('id'),
+          content_type: 'discussion_topic'
+        })
       options.publishIcon = new PublishIconView(model: @model) if ENV.permissions.publish
       options.toggleableSubscriptionIcon = new ToggleableSubscriptionIconView(model: @model)
       if @model.get('assignment')
@@ -145,7 +158,7 @@ define [
       # Workaround a behavior of FF 15+ where it fires a click
       # after dropping a sortable item.
       return if @model.get('preventClick')
-      return if _.contains(['A', 'I'], e.target.nodeName)
+      return if ['A', 'I'].includes(e.target.nodeName)
       window.location = @model.get('html_url')
 
     # Public: Toggle the view model's "hidden" attribute.
@@ -158,7 +171,7 @@ define [
     #
     # Returns an object.
     toJSON: ->
-      base = _.extend(@model.toJSON(), @options)
+      base = Object.assign(@model.toJSON(), @options)
       # handle a student locking their own discussion (they should lose permissions).
       if @model.get('locked') and !_.intersection(ENV.current_user_roles, ['teacher', 'ta', 'admin']).length
         base.permissions.delete = false
@@ -167,7 +180,7 @@ define [
         base.display_last_reply_at = I18n.l "#date.formats.medium", base.last_reply_at
       base.ENV = ENV
       base.discussion_topic_menu_tools = ENV.discussion_topic_menu_tools
-      _.each base.discussion_topic_menu_tools, (tool) =>
+      base.discussion_topic_menu_tools.forEach (tool) =>
         tool.url = tool.base_url + "&discussion_topics[]=#{@model.get("id")}"
 
       base.cannot_delete_by_master_course = @model.get('is_master_course_child_content') && @model.get('restricted_by_master_course')

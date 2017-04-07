@@ -28,16 +28,16 @@ describe "master courses - child courses - discussion locking" do
 
     get "/courses/#{@copy_to.id}/discussion_topics"
 
-    expect(f('.master-course-cell')).to contain_css('.icon-lock')
+    expect(f('.discussion-row')).to contain_css('.icon-lock')
 
     f('.discussion-row .al-trigger').click
-    expect(f('.discussion-row')).to_not include_text('Delete')
+    expect(f('.discussion-row')).not_to include_text('Delete')
   end
 
   it "should show all the cog-menu options on the index when not locked" do
     get "/courses/#{@copy_to.id}/discussion_topics"
 
-    expect(f('.master-course-cell')).to contain_css('.icon-unlock')
+    expect(f('.discussion-row')).to contain_css('.icon-unlock')
 
     f('.discussion-row .al-trigger').click
     expect(f('.discussion-row')).to include_text('Delete')
@@ -50,7 +50,7 @@ describe "master courses - child courses - discussion locking" do
 
     expect(f('#content')).to contain_css('.edit-btn')
     f('.al-trigger').click
-    expect(f('.al-options')).to_not contain_css('.delete_discussion')
+    expect(f('.al-options')).not_to contain_css('.delete_discussion')
   end
 
   it "should show the delete cog-menu options on the show when not locked" do
@@ -71,15 +71,15 @@ describe "master courses - child courses - discussion locking" do
 
       get "/courses/#{@copy_to.id}/announcements"
 
-      expect(f('.master-course-cell')).to contain_css('.icon-lock')
+      expect(f('.discussion-topic')).to contain_css('.lock-icon')
 
-      expect(f('.discussion-topic')).to_not contain_css('.al-trigger')
+      expect(f('.discussion-topic')).not_to contain_css('.al-trigger')
     end
 
     it "should show the cog-menu options on the index when not locked" do
       get "/courses/#{@copy_to.id}/announcements"
 
-      expect(f('.master-course-cell')).to contain_css('.icon-unlock')
+      expect(f('.discussion-topic')).to contain_css('.icon-unlock')
 
       expect(f('.discussion-topic')).to contain_css('.al-trigger')
     end
@@ -91,7 +91,7 @@ describe "master courses - child courses - discussion locking" do
 
       expect(f('#content')).to contain_css('.edit-btn')
       f('.al-trigger').click
-      expect(f('.al-options')).to_not contain_css('.delete_discussion')
+      expect(f('.al-options')).not_to contain_css('.delete_discussion')
     end
 
     it "should show the edit/delete cog-menu options on the show when not locked" do

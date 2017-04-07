@@ -350,19 +350,23 @@ class DiscussionTopicsController < ApplicationController
           locked.is_a?(Hash) ? locked[:can_view] : locked
         end
 
-        hash = {USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
-                openTopics: open_topics,
-                lockedTopics: locked_topics,
-                newTopicURL: named_context_url(@context, :new_context_discussion_topic_url),
-                permissions: {
-                    create: @context.discussion_topics.temp_record.grants_right?(@current_user, session, :create),
-                    moderate: user_can_moderate,
-                    change_settings: user_can_edit_course_settings?,
-                    manage_content: @context.grants_right?(@current_user, session, :manage_content),
-                    publish: user_can_moderate
-                },
-                :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu)
+        hash = {
+          USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
+          openTopics: open_topics,
+          lockedTopics: locked_topics,
+          newTopicURL: named_context_url(@context, :new_context_discussion_topic_url),
+          permissions: {
+            create: @context.discussion_topics.temp_record.grants_right?(@current_user, session, :create),
+            moderate: user_can_moderate,
+            change_settings: user_can_edit_course_settings?,
+            manage_content: @context.grants_right?(@current_user, session, :manage_content),
+            publish: user_can_moderate
+          },
+          discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
         }
+        if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read) && !@js_env[:COURSE_ID].present?
+          hash[:COURSE_ID] = @context.id.to_s
+        end
         conditional_release_js_env(includes: :active_rules)
         append_sis_data(hash)
         js_env(hash)
