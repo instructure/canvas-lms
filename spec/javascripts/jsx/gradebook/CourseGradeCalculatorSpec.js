@@ -753,12 +753,17 @@ test('weights grading periods with unequal grading period weights', function () 
   equal(grades.final.score, 56.25);
 });
 
-test('uses full weight for grading periods with no assignments groups', function () {
+test('current score excludes grading periods with no assignments groups', function () {
   assignmentGroups = [assignmentGroups[0]];
   const grades = calculateWithGradingPeriods('percent');
-  equal(grades.current.score, 37.5, 'the grading period with a score is weighted as half of the overall score');
+  equal(grades.current.score, 75.0, 'the grading period with a score is weighted as 100% of the overall score');
   equal(grades.current.possible, 100);
-  equal(grades.final.score, 37.5, 'the grading period with a score is weighted as half of the overall score');
+});
+
+test('final score includes grading periods with no assignments groups', function () {
+  assignmentGroups = [assignmentGroups[0]];
+  const grades = calculateWithGradingPeriods('percent');
+  equal(grades.final.score, 37.5, 'the grading period with a score is weighted as 50% of the overall score');
   equal(grades.final.possible, 100);
 });
 
