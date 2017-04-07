@@ -45,6 +45,7 @@ class AssignmentsController < ApplicationController
       max_name_length = AssignmentUtil.assignment_max_name_length(@context)
       sis_name = AssignmentUtil.post_to_sis_friendly_name(@context)
       due_date_required_for_account = AssignmentUtil.due_date_required_for_account?(@context)
+      sis_integration_settings_enabled = AssignmentUtil.sis_integration_settings_enabled?(@context)
 
       # It'd be nice to do this as an after_create, but it's not that simple
       # because of course import/copy.
@@ -55,6 +56,7 @@ class AssignmentsController < ApplicationController
       hash = {
         WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
         POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
+        SIS_INTEGRATION_SETTINGS_ENABLED: sis_integration_settings_enabled,
         SIS_NAME: sis_name,
         MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT: max_name_length_required_for_account,
         MAX_NAME_LENGTH: max_name_length,

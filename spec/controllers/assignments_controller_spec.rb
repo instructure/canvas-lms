@@ -70,6 +70,20 @@ describe AssignmentsController do
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
+    it "js_env SIS_INTEGRATION_SETTINGS_ENABLED is true when AssignmentUtil.sis_integration_settings_enabled? == true" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:sis_integration_settings_enabled?).returns(true)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to eq(true)
+    end
+
+    it "js_env SIS_INTEGRATION_SETTINGS_ENABLED is false when AssignmentUtil.sis_integration_settings_enabled? == false" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:sis_integration_settings_enabled?).returns(false)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to eq(false)
+    end
+
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
       AssignmentUtil.stubs(:due_date_required_for_account?).returns(false)

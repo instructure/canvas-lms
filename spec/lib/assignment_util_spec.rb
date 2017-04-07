@@ -123,6 +123,18 @@ describe AssignmentUtil do
     end
   end
 
+  describe "sis_integration_settings_enabled?" do
+    it "returns true when new_sis_integrations fetaure enabled" do
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+      expect(described_class.sis_integration_settings_enabled?(assignment.context)).to eq(true)
+    end
+
+    it "returns false when new_sis_integrations fetaure enabled" do
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(false)
+      expect(described_class.sis_integration_settings_enabled?(assignment.context)).to eq(false)
+    end
+  end
+
   describe "assignment_name_length_required?" do
     it "returns true when all 4 are set to true" do
       assignment.post_to_sis = true

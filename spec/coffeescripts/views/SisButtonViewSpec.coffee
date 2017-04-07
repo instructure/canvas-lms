@@ -21,6 +21,9 @@ define [
       return @get 'due_at' unless arguments.length > 0
       @set 'due_at', date
 
+    sisIntegrationSettingsEnabled: =>
+      return ENV.SIS_INTEGRATION_SETTINGS_ENABLED
+
   class QuizStub extends Backbone.Model
     url: '/fake'
     postToSIS: (postToSisBoolean) =>
@@ -37,6 +40,9 @@ define [
     dueAt: (date) =>
       return @get 'due_at' unless arguments.length > 0
       @set 'due_at', date
+
+    sisIntegrationSettingsEnabled: =>
+      return ENV.SIS_INTEGRATION_SETTINGS_ENABLED
 
   QUnit.module 'SisButtonView',
     setup: ->
@@ -75,8 +81,9 @@ define [
     @view.$el.click()
     ok !@assignment.postToSIS()
 
-  test 'model does not save if there are name length errors for assignment', ->
+  test 'model does not save if there are name length errors for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
     ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
     @assignment.set('post_to_sis', false)
     @assignment.set('name', 'Too Much Tuna')
     @view = new SisButtonView(model: @assignment)
@@ -84,8 +91,19 @@ define [
     @view.$el.click()
     ok !@assignment.postToSIS()
 
-  test 'model does not save if there are name length errors for quiz', ->
+  test 'model saves if there are name length errors for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is false', ->
     ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
+    @assignment.set('post_to_sis', false)
+    @assignment.set('name', 'Too Much Tuna')
+    @view = new SisButtonView(model: @assignment)
+    @view.render()
+    @view.$el.click()
+    ok @assignment.postToSIS()
+
+  test 'model does not save if there are name length errors for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
+    ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
     @quiz.set('post_to_sis', false)
     @quiz.set('title', 'Too Much Tuna')
     @view = new SisButtonView(model: @quiz)
@@ -93,8 +111,19 @@ define [
     @view.$el.click()
     ok !@quiz.postToSIS()
 
-  test 'model does not save if there are due date errors for assignment', ->
+  test 'model saves if there are name length errors for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is false', ->
     ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
+    @quiz.set('post_to_sis', false)
+    @quiz.set('title', 'Too Much Tuna')
+    @view = new SisButtonView(model: @quiz)
+    @view.render()
+    @view.$el.click()
+    ok @quiz.postToSIS()
+
+  test 'model does not save if there are due date errors for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
+    ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
     @assignment.set('post_to_sis', false)
     @assignment.set('name', 'Too Much Tuna')
     @view = new SisButtonView(model: @assignment, dueDateRequired: true)
@@ -102,14 +131,35 @@ define [
     @view.$el.click()
     ok !@assignment.postToSIS()
 
-  test 'model does not save if there are due date errors for quiz', ->
+  test 'model saves if there are due date errors for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is false', ->
     ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
+    @assignment.set('post_to_sis', false)
+    @assignment.set('name', 'Too Much Tuna')
+    @view = new SisButtonView(model: @assignment, dueDateRequired: true)
+    @view.render()
+    @view.$el.click()
+    ok @assignment.postToSIS()
+
+  test 'model does not save if there are due date errors for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
+    ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
     @quiz.set('post_to_sis', false)
     @quiz.set('title', 'Too Much Tuna')
     @view = new SisButtonView(model: @quiz, dueDateRequired: true)
     @view.render()
     @view.$el.click()
     ok !@quiz.postToSIS()
+
+  test 'model saves if there are due date errors for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is false', ->
+    ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
+    @quiz.set('post_to_sis', false)
+    @quiz.set('title', 'Too Much Tuna')
+    @view = new SisButtonView(model: @quiz, dueDateRequired: true)
+    @view.render()
+    @view.$el.click()
+    ok @quiz.postToSIS()
 
   test 'does not override dates', ->
     ENV.MAX_NAME_LENGTH = 256
