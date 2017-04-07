@@ -392,7 +392,7 @@ class Assignment < ActiveRecord::Base
     return true if grading_period_was&.id == grading_period&.id
 
     [grading_period_was, grading_period].compact.each do |gp|
-      context.recompute_student_scores(nil, grading_period_id: gp, update_all_grading_period_scores: false)
+      context.recompute_student_scores(grading_period_id: gp)
     end
     true
   end
