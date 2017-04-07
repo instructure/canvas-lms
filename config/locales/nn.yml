@@ -60,6 +60,7 @@ nn:
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "Ein tabell som inneheld namnet på karakterskjemaet og knappar for redigering eller sletting av skjemaet."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Ein tabell med svar og overordna statistikk om studentars svaralternativer."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Ein tabell som inneheld data frå graderingsskjemaet. Kvar rad inneheld eit namn, ein maksimum prosentverdi og ein minimum prosentverdi. Kvar rad inneheld også ein knapp for å legge til ei ny rad nedanfor, og ein knapp for å slette gjeldande rad."
+  a_z_243c3301: A–Å
   a_z_29d8e67c: "A - Å"
   academic_benchmark: 
     no_api_key: "Ein API-nøkkel er nødvendig for å bruke Academic Benchmarks"
@@ -239,6 +240,7 @@ nn:
   account_name_analytics_62bf60ae: "%{account.name} Analytics"
   account_name_bff54ed5: Kontonamn
   account_navigation_80bbefd4: Kontonavigering
+  account_navigation_menu_10c05bf9: "Meny for kontonavigasjon"
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Sluttidspunkt for kontovarsling kjem ikkje før starttidspunkt"
@@ -1304,6 +1306,7 @@ nn:
   actions_efcde10d: Handlingar
   actions_for_course_312ff446: "Alternativ for %{course}"
   actions_taken_6fb20fd0: Gjennomført
+  activate_key_name_a99df672: "Aktiver nøkkel %{name}"
   activate_this_key_6cd98f4b: "Aktiver denne nøkkelen"
   active_d7e32718: Aktiv
   active_terms_83df727e: "Aktive semester"
@@ -1348,6 +1351,7 @@ nn:
   add_criterion_eb9587ef: "Legg til kriterium"
   add_custom_link_22059c0: "Legg til eigendefinert lenke"
   add_email_address_aef3b61: "Legg til e-postadresse"
+  add_existing_content_7e36da66: "Legg til eksisterande innhald"
   add_files_to_the_course_da6ffd32: "Legg filer til emnet"
   add_folder_ba50d107: "Legg til mappe"
   add_grading_period_6f774dc3: "Legg til periode for karaktersetjing"
@@ -1358,6 +1362,7 @@ nn:
   add_moderator_review_copy_1st_a484c813: "Legg til gjennomgang frå sensuransvarleg (første eksemplar)"
   add_moderator_review_copy_2nd_e80d458f: "Legg til gjennomgang frå sensuransvarleg (andre eksemplar)"
   add_moderator_review_new_3c183cea: "Legg til gjennomgang frå sensuransvarleg (ny)"
+  add_more_e1ffaa65: "Legg til meir"
   add_new_announcement_ddacd624: "Legg til ei ny kunngjering"
   add_new_group_7ac49f31: "Legg til ny gruppe"
   add_new_set_of_due_dates_e8e240f: "Legg til nye forfallsdatoar"
@@ -1373,6 +1378,7 @@ nn:
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Legg til studentar ved å søkje på namn, emneklasse eller gruppe. Etter å ha skrive inn tekst, kan du navigere i resultatet ved å bruke ned-piltasten på  tastaturet. Vel resultat ved å trykkje Enter-tasten. "
   add_students_tas_and_observers_to_your_course_e84692dd: "Legg til studentar, undervisingsassistentar og observatørar på emnet"
   add_students_to_the_course_874be8fb: "Legg til studentar på emnet "
+  add_sub_account_to_account_name_b104db90: "Legg underkonto til %{account_name}"
   add_tas_to_the_course_2aac6e02: "Legg til undervisingsassistentar på emnet"
   add_theme_32fa3d50: "Legg til tema"
   add_to_course_481a51c4: "Legg til emnet..."
@@ -1391,6 +1397,7 @@ nn:
   addressbook_microservice_a4940422: "Mikroservice for adressebok"
   adjust_final_grade_fa45e7e0: "Juster sluttkarakter"
   admin_4d3ba42f: Admin
+  admin_navigation_menu_77b801a2: Admin-navigeringsmeny
   admins_3e1dce15: Administratorar
   after_date_981cd41b: "Etter %{date}"
   after_last_attempt_c9168da2: "Etter siste forsøk"
@@ -1488,6 +1495,7 @@ nn:
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Last alltid RCE og sidestolpe fra Canvas sin rikt innhald-teneste"
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "Ein API-nøkkel er nødvendig for å bruke Academic Benchmarks"
   an_assignment_name_dc624e70: "Eit oppgåvenamn"
+  an_auto_generated_chronological_summary_of_your_co_eeafee13: "Ein auto-generert kronologisk oppsummering av emnet ditt"
   an_error_occured_please_try_again_e59b65b: "Det oppstod ein feil. Prøv på nytt seinare."
   an_error_occured_while_deleting_the_grading_period_81bb16e5: "Det oppstod eit problem under sletting av settet med karaktersetjingsperiodar"
   an_error_occured_while_deleting_the_grading_period_c8343484: "Det oppstod eit problem under sletting av karaktersetjingsperioden"
@@ -2346,6 +2354,7 @@ nn:
     invalid_submission_types: "Ugyldige innleveringstypar"
   assignments_in_this_group_have_no_points_possible__3cd35922: "Oppgåver i denne gruppa har ikkje moglege poeng og kan ikkje inkluderast i karakterutrekninga"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "Oppgåver i denne gruppa har ikkje moglege poeng og kan ikkje inkluderast i karakterutrekninga."
+  assignments_list_fe3e54be: Oppgåveliste
   assignments_settings_30613d0c: Oppgåveinnstillingar
   associated_74756cc4: Tilknytte
   associated_account_course_id_d87a01c5: "Tilknytte konto-/emne-ID"
@@ -2424,6 +2433,9 @@ nn:
   background_color_b92b52ac: Bakgrunnsfarge
   background_image_1a401e1a: Bakgrunnsbilde
   base_847aca7c: Grunnlag
+  base_message_please_make_sure_name_has_a_due_date_928ae7ab: "%{base_message} Sjekk at %{name} har ein frist."
+  base_message_please_make_sure_name_has_a_due_date__9e9b0cfd: "%{base_message} Sjekk at %{name} har ein frist og at namnet ikkje er for langt. "
+  base_message_please_make_sure_name_name_is_not_too_d0c9454f: "%{base_message} Sjekk at %{name} namn ikkje er for langt."
   base_role_type_a9cc892d: base_role_type
   base_url_for_mathman_service_bdd4b10b: "Base-URL for MathMan-teneste"
   based_on_what_if_scores_the_new_total_is_now_grade_d223be10: "Basert på kva-skjer-dersom-resultata, er den nye totalen no %{grade}"
@@ -2435,6 +2447,8 @@ nn:
   before_implementing_custom_css_or_javascript_pleas_65423572: "Før implementering av custom CSS eller Javascript, sjå i *dokumentasjonen vår*."
   before_publishing_this_file_you_must_specify_usage_2229d20b: "Før du publiserer fila, må du oppgi bruksrettane."
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "Før du publiserer, må du oppgi bruksrettar for filene."
+  before_publishing_your_course_you_must_either_publ_cdfdc78c: "Innan du publiserar emnet ditt må du enten publisere ein modul eller velje ein annan heimeside. "
+  before_publishing_your_course_you_must_either_publ_cf84cad9: "Før du publiserer emnet ditt må du enten publisere ein modul frå modulsida, eller velje ein annan heimeside."
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "Før du kan redigere profilen, må du stadfeste e-postadressa di (%{email}) ved å klikke på lenka i e-posten vi har sendt deg. Dersom du ikkje har motteke e-posten, kan du *klikke for å sende e-post på nytt*, men du må også sjå etter i søppelpost."
   beginning_date_2d2a29ac: Startdato
   belgium_32_e5f5b598: "Belgia (+32)"
@@ -2459,6 +2473,7 @@ nn:
   body_9f663faf: Brødtekst
   body_shadow_d36e8c2e: "Body Shadow"
   bolivia_591_9b8a7a5c: "Bolivia (+591)"
+  bookmark_bank_46d729be: "Bokmerk %{bank}"
   bookmark_service: 
     default_title: "Ingen tittel"
   bookmark_this_question_bank_dc414a82: "Bokmerk denne spørsmålsbanken"
@@ -2468,6 +2483,10 @@ nn:
   brazil_c1d6e73a: Brasil
   breadcrumb_1_cb3c504: "Breadcrumb 1"
   breadcrumb_2_95ba94be: "Breadcrumb 2"
+  bring_existing_content_from_another_course_or_cour_9dc6453d: |-
+      Hent innhald frå eit anna emne eller
+      emnehandteringssystem inn i Canvasemnet ditt.
+  bring_your_content_into_your_course_c0f3df7e: "Hent innhaldet ditt inn i emnet"
   broken_file_link_found_in_your_course_7cc24395: "Broten fillenke på emnet"
   browse_your_computer_9a735a4: "Bla gjennom innhald på datamaskinen"
   browse_your_computer_for_a_course_image_d7db2376: "Bla gjennom innhald på datamaskinen etter eit emnebilde"
@@ -3000,6 +3019,7 @@ nn:
   cannot_restrict_by_section_unless_groups_are_empty_662d3144: "Kan ikkje avgrense klassevis med mindre gruppene er tomme og ikkje har storleiksgrense"
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: "Kan ikkje setje kun synleg for overstyring når fristen er innanfor ein lukka karaktersetjingsperiode"
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Kan ikkje setje overstyrt innleveringsfrist til ein dato innanfor ein lukka karaktersetjingsperiode"
+  cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Kan ikkje setje sis_account_id på ein root_accout."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Kan ikkje setje innleveringsfrist til ein dato innanfor ein lukka karaktersetjingsperiode"
   canvas: 
     migration: 
@@ -3090,11 +3110,14 @@ nn:
   choose_a_csv_file_to_upload_9644480c: "Vel ei CSV-fil å laste opp:"
   choose_a_timezone_d9c52998: "Vel tidssone"
   choose_an_authentication_service_47dc8875: "Vel ei godkjenningsteneste"
+  choose_and_publish_980812cb: "Vel og publiser"
   choose_assignment_b0132c5e: "-- Vel oppgåve --"
   choose_assignment_group_9e7de13c: "Vel oppgåvegruppe"
   choose_assignment_path_8ea55f3a: "Vel oppgåvesti"
   choose_assignment_set_415f1b3: "Vel oppgåvesett"
   choose_attribute_to_add_866e128d: "Vel attributt du vil leggje til"
+  choose_course_home_page_d8642f9e: "Vel heimeside for emnet"
+  choose_home_page_80cef4ee: "Vel heimeside"
   choose_image_e5ee5d7a: "Vel eit bilde"
   choose_student_1513fcd1: "-- Vel student -- "
   choose_usage_rights_33683854: "Vel bruksrett..."
@@ -3247,6 +3270,7 @@ nn:
       resolution: "Ta kontakt med opprettar og informer."
     titles: 
       delete: "Vil du slette samarbeidet?"
+  collaborations_5c56c15f: Samarbeid
   collaborations_are_web_based_tools_to_work_collabo_6e9f7b3f: "Samarbeid er nettbaserte verkty som tillet studentar t.d. å ta felles notater eller arbeide med gruppeoppgåver. Start ved å klikke på \"+ Samarbeid\"-knappen."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Samarbeid er nettbaserte verkty som tillet studentar t.d. å ta felles notater eller arbeide med gruppeoppgåver. Start ved å legge til ein samarbeids-app."
   collapse_group_c2af7cad: "Skjul gruppe"

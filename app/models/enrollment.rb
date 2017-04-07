@@ -992,7 +992,11 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
+  # This method is intended to not duplicate work for a single user.
   def self.recompute_final_score_in_singleton(user_id, course_id, opts = {})
+    # Guard against getting more than one user_id
+    raise ArgumentError, "Cannot call with more than one user" if Array(user_id).size > 1
+
     send_later_if_production_enqueue_args(
       :recompute_final_score,
       {

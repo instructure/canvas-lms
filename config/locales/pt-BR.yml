@@ -6208,7 +6208,7 @@ pt-BR:
   due_by_c263dc10: "vencido em"
   due_date_5d0a953c: "Prazo de Entrega:"
   due_date_6a281fe3: "Vencimento: %{date}"
-  due_date_822625d8: "Data de entrega"
+  due_date_822625d8: "Prazo de entrega"
   due_date_cannot_be_after_course_end_fd128a14: "A data de entrega não pode ser após o fim do curso"
   due_date_cannot_be_after_lock_date_675b30aa: "Prazo de entrega não pode ser após a data de fechamento"
   due_date_cannot_be_after_section_end_b0f54388: "A data de entrega não pode ser após o fim da seção section end"
