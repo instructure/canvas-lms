@@ -50,7 +50,11 @@ namespace :js do
   desc "Ensure up-to-date node environment"
   task :npm_install do
     puts "node is: #{`node -v`.strip} (#{`which node`.strip})"
-    raise 'error running yarn install' unless `yarn install || npm install`
+    output = `yarn install || npm install`
+    unless $?.success?
+      puts output
+      raise 'error running yarn install'
+    end
   end
 
   desc "Run Gulp Rev, for fingerprinting assets"
