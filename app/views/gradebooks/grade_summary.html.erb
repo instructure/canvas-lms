@@ -36,7 +36,11 @@
       <button type="button" class="Button" id="show_all_details_button"><%= t("Show All Details") %></button>
     </div>
     <div id="assignments-not-weighted">
-      <%= render :partial => "courses/sidebar_weighting", :object => @presenter.groups %>
+      <% if @current_grading_period_id == 0 && @context.weighted_grading_periods? %>
+        <%= render :partial => "courses/sidebar_periods_weighting", :object => @presenter.grading_periods %>
+      <% else %>
+        <%= render :partial => "courses/sidebar_weighting", :object => @presenter.groups %>
+      <% end %>
       <% unless @presenter.no_calculations? %>
         <div id="only_consider_graded_assignments_wrapper" class="ic-Form-control ic-Form-control--checkbox">
           <input type="checkbox" id="only_consider_graded_assignments" checked="true"/>

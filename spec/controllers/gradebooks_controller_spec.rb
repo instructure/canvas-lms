@@ -166,7 +166,7 @@ describe GradebooksController do
       expect(assigns[:courses_with_grades]).to be_nil
     end
 
-    it "assigns values for grade calculator to ENV" do
+    it "assigns assignment group values for grade calculator to ENV" do
       user_session(@teacher)
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       expect(assigns[:js_env][:submissions]).not_to be_nil
@@ -314,7 +314,7 @@ describe GradebooksController do
       let(:period_helper) { Factories::GradingPeriodHelper.new }
 
       before :once do
-        @grading_period_group = group_helper.create_for_account(@course.root_account)
+        @grading_period_group = group_helper.create_for_account(@course.root_account, weighted: true)
         term = @course.enrollment_term
         term.grading_period_group = @grading_period_group
         term.save!
@@ -326,6 +326,14 @@ describe GradebooksController do
         all_grading_periods_id = 0
         get 'grade_summary', :course_id => @course.id, :id => @student.id, grading_period_id: all_grading_periods_id
         expect(assigns[:exclude_total]).to eq true
+      end
+
+      it "assigns grading period values for grade calculator to ENV" do
+        user_session(@teacher)
+        all_grading_periods_id = 0
+        get 'grade_summary', :course_id => @course.id, :id => @student.id, grading_period_id: all_grading_periods_id
+        expect(assigns[:js_env][:submissions]).not_to be_nil
+        expect(assigns[:js_env][:grading_periods]).not_to be_nil
       end
 
       it "displays totals if any grading period other than 'All Grading Periods' is selected" do

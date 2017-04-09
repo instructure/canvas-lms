@@ -1,0 +1,26 @@
+<div role="complementary" aria-label="<%= t('Grading Period Weights') %>">
+  <h2><%= t('Grading periods are weighted') %></h2>
+
+  <table class="summary">
+    <thead>
+    <tr>
+      <th scope='col'><%= t('Grading Period') %></th>
+      <th scope='col'><%= t('Weight') %></th>
+    </tr>
+    </thead>
+    <tbody>
+      <% if sidebar_periods_weighting.empty? %>
+        <tr>
+          <th scope='row' colspan="2"><%= t('No Grading Periods Set Up') %></th>
+        </tr>
+      <% else %>
+        <% sidebar_periods_weighting.each do |period| %>
+          <tr>
+            <th scope='row'><%= period.title || t('Grading Period') %></th>
+            <td><%= period.weight ? n(period.weight, percentage: true) : t('none') %></td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>
