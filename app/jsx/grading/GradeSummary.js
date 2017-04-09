@@ -271,24 +271,58 @@ define([
     return I18n.t('N/A');
   }
 
+  function subtotalByGradingPeriod () {
+    const gpset = ENV.grading_period_set;
+    const gpselected = GradeSummary.getSelectedGradingPeriodId();
+    return ((!gpselected || gpselected === 0) && gpset && gpset.weighted);
+  }
+
+  function calculateSubtotals (byGradingPeriod, calculatedGrades, currentOrFinal) {
+    const subtotals = [];
+    let params;
+    if (byGradingPeriod) {
+      params = {
+        bins: ENV.grading_periods,
+        grades: calculatedGrades.gradingPeriods,
+        elementIdPrefix: '#submission_period'
+      };
+    } else {
+      params = {
+        bins: ENV.assignment_groups,
+        grades: calculatedGrades.assignmentGroups,
+        elementIdPrefix: '#submission_group'
+      };
+    }
+    if (params.grades) {
+      for (let i = 0; i < params.bins.length; i++) {
+        const binId = params.bins[i].id;
+        let grade = params.grades[binId];
+        if (grade) {
+          grade = grade[currentOrFinal];
+        } else {
+          grade = {score: 0, possible: 0};
+        }
+        const scoreText = I18n.n(grade.score, {precision: round.DEFAULT});
+        const possibleText = I18n.n(grade.possible, {precision: round.DEFAULT});
+        const subtotal = {
+          teaserText: `${scoreText} / ${possibleText}`,
+          gradeText: calculateGrade(grade.score, grade.possible),
+          rowElementId: `${params.elementIdPrefix}-${binId}`
+        };
+        subtotals.push(subtotal);
+      }
+    }
+    return subtotals;
+  }
+
   function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme) {
     const showTotalGradeAsPoints = ENV.show_total_grade_as_points;
 
-    for (let i = 0; i < ENV.assignment_groups.length; i++) {
-      const assignmentGroupId = ENV.assignment_groups[i].id;
-      let grade = calculatedGrades.assignmentGroups[assignmentGroupId];
-      const $groupRow = $(`#submission_group-${assignmentGroupId}`);
-      if (grade) {
-        grade = grade[currentOrFinal];
-      } else {
-        grade = { score: 0, possible: 0 };
-      }
-      $groupRow.find('.grade').text(
-        calculateGrade(grade.score, grade.possible)
-      );
-      $groupRow.find('.score_teaser').text(
-        `${I18n.n(grade.score, {precision: round.DEFAULT})} / ${I18n.n(grade.possible, {precision: round.DEFAULT})}`
-      );
+    const subtotals = calculateSubtotals(subtotalByGradingPeriod(), calculatedGrades, currentOrFinal);
+    for (let i = 0; i < subtotals.length; i++) {
+      const $row = $(subtotals[i].rowElementId);
+      $row.find('.grade').text(subtotals[i].gradeText);
+      $row.find('.score_teaser').text(subtotals[i].teaserText);
     }
 
     const finalScore = calculatedGrades[currentOrFinal].score;
@@ -576,6 +610,7 @@ define([
     calculateGrade,
     calculateGrades,
     calculateTotals,
+    calculateSubtotals,
     calculatePercentGrade,
     formatPercentGrade,
     updateScoreForAssignment,

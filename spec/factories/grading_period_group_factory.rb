@@ -8,8 +8,8 @@ module Factories
       }.merge(attr)
     end
 
-    def create_for_account(account)
-      account.grading_period_groups.create!(title: TITLE)
+    def create_for_account(account, options={})
+      account.grading_period_groups.create!(title: TITLE, **options)
     end
 
     def create_for_account_with_term(account, term_name, group_title = TITLE)

@@ -21,7 +21,7 @@
       <% groups.each do |group| %>
         <tr>
           <th scope='row'><%= group.name || t('default_name', "Group") %></th>
-          <td><%= group.group_weight ? n(group.group_weight, percentage: true) : "none" %></td>
+          <td><%= group.group_weight ? n(group.group_weight, percentage: true) : t('none') %></td>
           <% tally += group.group_weight || 0 %>
         </tr>
       <% end %>

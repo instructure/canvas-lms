@@ -58,6 +58,32 @@ define([
     };
   }
 
+  function createSubtotalsByAssignmentGroup () {
+    ENV.assignment_groups = [{id: 1}, {id: 2}];
+    ENV.grading_periods = [];
+    const calculatedGrades = {
+      assignmentGroups: {
+        1: {current: {score: 6, possible: 10}},
+        2: {current: {score: 7, possible: 10}}
+      }
+    }
+    const byGradingPeriod = false
+    return GradeSummary.calculateSubtotals(byGradingPeriod, calculatedGrades, 'current');
+  }
+
+  function createSubtotalsByGradingPeriod () {
+    ENV.assignment_groups = [];
+    ENV.grading_periods = [{id: 1}, {id: 2}];
+    const calculatedGrades = {
+      gradingPeriods: {
+        1: {final: {score: 8, possible: 10}},
+        2: {final: {score: 9, possible: 10}}
+      }
+    }
+    const byGradingPeriod = true
+    return GradeSummary.calculateSubtotals(byGradingPeriod, calculatedGrades, 'final');
+  }
+
   function setPageHtmlFixture () {
     $fixtures.html(`
       <div id="grade_summary_fixture">
@@ -316,6 +342,56 @@ define([
     GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent');
     const $teaser = $fixtures.find('.student_assignment.final_grade .score_teaser');
     ok($teaser.text().includes('1,234'), 'includes internationalized score');
+  });
+
+  QUnit.module('GradeSummary.calculateSubtotalsByGradingPeriod', {
+    setup () {
+      this.subtotals = createSubtotalsByGradingPeriod();
+    }
+  });
+
+  test('calculates subtotals by grading period', function () {
+    equal(this.subtotals.length, 2, 'calculates a subtotal for each period');
+  });
+
+  test('creates teaser text for subtotals by grading period', function () {
+    equal(this.subtotals[0].teaserText, '8.00 / 10.00', 'builds teaser text for first period');
+    equal(this.subtotals[1].teaserText, '9.00 / 10.00', 'builds teaser text for second period');
+  });
+
+  test('creates grade text for subtotals by grading period', function () {
+    equal(this.subtotals[0].gradeText, '80%', 'builds grade text for first period');
+    equal(this.subtotals[1].gradeText, '90%', 'builds grade text for second period');
+  });
+
+  test('assigns row element ids for subtotals by grading period', function () {
+    equal(this.subtotals[0].rowElementId, '#submission_period-1', 'builds row element id for first period');
+    equal(this.subtotals[1].rowElementId, '#submission_period-2', 'builds row element id for second period');
+  });
+
+  QUnit.module('GradeSummary.calculateSubtotalsByAssignmentGroup', {
+    setup () {
+      this.subtotals = createSubtotalsByAssignmentGroup();
+    }
+  });
+
+  test('calculates subtotals by assignment group', function () {
+    equal(this.subtotals.length, 2, 'calculates a subtotal for each group');
+  });
+
+  test('calculates teaser text for subtotals by assignment group', function () {
+    equal(this.subtotals[0].teaserText, '6.00 / 10.00', 'builds teaser text for first group');
+    equal(this.subtotals[1].teaserText, '7.00 / 10.00', 'builds teaser text for second group');
+  });
+
+  test('calculates grade text for subtotals by assignment group', function () {
+    equal(this.subtotals[0].gradeText, '60%', 'builds grade text for first group');
+    equal(this.subtotals[1].gradeText, '70%', 'builds grade text for second group');
+  });
+
+  test('calculates row element ids for subtotals by assignment group', function () {
+    equal(this.subtotals[0].rowElementId, '#submission_group-1', 'builds row element id for first group');
+    equal(this.subtotals[1].rowElementId, '#submission_group-2', 'builds row element id for second group');
   });
 
   QUnit.module('GradeSummary.canBeConvertedToGrade');

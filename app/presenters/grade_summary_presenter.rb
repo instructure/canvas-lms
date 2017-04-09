@@ -294,6 +294,15 @@ class GradeSummaryPresenter
     assignments.concat(value)
   end
 
+  def periods_assignments=(value)
+    @periods_assignments = value
+    assignments.concat(value)
+  end
+
+  def grading_periods
+    @all_grading_periods ||= GradingPeriod.for(@context).to_a
+  end
+
   private
 
   def all_groups
