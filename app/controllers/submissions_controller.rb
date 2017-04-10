@@ -123,11 +123,9 @@ class SubmissionsController < ApplicationController
         format.html
         format.json do
           @submission.limit_comments(@current_user, session)
-          excludes = @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score] : []
           render :json => @submission.as_json(
             Submission.json_serialization_full_parameters(
-              exclude: excludes,
-              except: %w(quiz_submission submission_history)
+              except: %i(quiz_submission submission_history)
             ).merge(permissions: {
               user: @current_user,
               session: session,
@@ -568,7 +566,12 @@ class SubmissionsController < ApplicationController
 
     if params[:submission][:student_entered_score] && @submission.grants_right?(@current_user, session, :comment)
       update_student_entered_score(params[:submission][:student_entered_score])
-      render :json => @submission
+
+      render json: @submission.as_json(permissions: {
+        user: @current_user,
+        session: session,
+        include_permissions: false
+      })
       return
     end
 
@@ -621,7 +624,6 @@ class SubmissionsController < ApplicationController
           format.html { redirect_to course_assignment_url(@context, @assignment) }
 
           json_args = Submission.json_serialization_full_parameters({
-            :exclude => @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score, :turnitin_data] : [],
             :except => [:quiz_submission,:submission_history],
             :comments => admin_in_context ? :submission_comments : :visible_submission_comments
           }).merge(:permissions => { :user => @current_user, :session => session, :include_permissions => false })
