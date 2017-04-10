@@ -38,7 +38,7 @@ class Mailer < ActionMailer::Base
 
     mail(params) do |format|
       format.text{ render plain: m.body }
-      format.html{ render html: m.html_body } if m.html_body
+      format.html{ render plain: m.html_body } if m.html_body
     end
   end
 
