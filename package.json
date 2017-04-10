@@ -99,7 +99,7 @@
     "redux-thunk": "2.1.0",
     "requirejs": "~2.2.0",
     "script-loader": "^0.7.0",
-    "sinon": "2.0.0-pre.5",
+    "sinon": "2.1.0",
     "spin.js": "2.3.2",
     "style-loader": "^0.13.1",
     "stylelint": "7.8.0",
