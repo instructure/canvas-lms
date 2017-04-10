@@ -145,15 +145,6 @@ module.exports = {
         test: /vendor\/i18n/,
         loaders: ['exports-loader?I18n']
       },
-
-
-      {
-        test: /\.js$/,
-        include: path.resolve(__dirname, '../public/javascripts'),
-        loaders: happify('js', [
-          path.join(root, 'frontend_build/pluginsJstLoader'),
-        ])
-      },
       {
         test: /\.js$/,
         include: [
@@ -179,8 +170,7 @@ module.exports = {
           /gems\/plugins\/.*\/spec_canvas\/coffeescripts\//
         ],
         loaders: happify('coffee', [
-          'coffee-loader',
-          path.join(root, 'frontend_build/pluginsJstLoader')
+          'coffee-loader'
         ])
       },
       {
