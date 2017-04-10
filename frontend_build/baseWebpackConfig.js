@@ -150,7 +150,6 @@ module.exports = {
         test: /\.js$/,
         include: path.resolve(__dirname, '../public/javascripts'),
         loaders: happify('js', [
-          path.join(root, 'frontend_build/jsHandlebarsHelpers'),
           path.join(root, 'frontend_build/pluginsJstLoader'),
         ])
       },
@@ -180,7 +179,6 @@ module.exports = {
         ],
         loaders: happify('coffee', [
           'coffee-loader',
-          path.join(root, 'frontend_build/jsHandlebarsHelpers'),
           path.join(root, 'frontend_build/pluginsJstLoader')
         ])
       },
