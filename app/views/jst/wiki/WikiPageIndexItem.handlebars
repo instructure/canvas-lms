@@ -1,6 +1,8 @@
 <td role="gridcell">
   <a href="{{html_url}}" class="wiki-page-link{{#if CAN.PUBLISH}} {{#unless published}}un{{/unless}}published{{/if}}">{{title}}</a>
-  {{#if front_page}} <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>{{/if}}
+  {{#if front_page}}
+    <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>
+  {{/if}}
 </td>
 <td role="gridcell">{{tDateToString created_at "medium"}}</td>
 <td role="gridcell">{{tDateToString updated_at "medium"}}{{#if last_edited_by.display_name}} by {{last_edited_by.display_name}}{{/if}}</td>
