@@ -4,6 +4,16 @@ require File.expand_path(File.dirname(__FILE__) + '/cc_spec_helper')
 require 'nokogiri'
 
 describe CC::CCHelper do
+  context 'map_linked_objects' do
+    it 'should find linked canvas items in exported html content' do
+      content = '<a href="%24CANVAS_OBJECT_REFERENCE%24/assignments/123456789">Link</a>' \
+                '<img src="%24IMS-CC-FILEBASE%24/media/folder%201/file.jpg" />'
+      linked_objects = CC::CCHelper.map_linked_objects(content)
+      expect(linked_objects[0]).to eq({identifier: '123456789', type: 'assignments'})
+      expect(linked_objects[1]).to eq({local_path: '/media/folder 1/file.jpg', type: 'Attachment'})
+    end
+  end
+
   describe CC::CCHelper::HtmlContentExporter do
     before do
       @kaltura = mock('CanvasKaltura::ClientV3')
