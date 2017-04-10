@@ -18,17 +18,18 @@ function success (target) {
     }
 
     target.attr('title', nonfavorite_tooltip)
-      // The tooltip wouldn't update with just changing the title so
-      // it's forced to do so here. Same below in the else case.
+    // The tooltip wouldn't update with just changing the title so
+    // it's forced to do so here. Same below in the else case.
     target.data('ui-tooltip-title', nonfavorite_tooltip)
     target.children('.screenreader-only').text(nonfavorite_tooltip)
     target.children('.course-list-favorite-icon').toggleClass('icon-star icon-star-light')
+  } else {
+    target.addClass('course-list-favorite-course')
+    target.attr('title', favorited_tooltip)
+    target.data('ui-tooltip-title', favorited_tooltip)
+    target.children('.screenreader-only').text(favorited_tooltip)
+    target.children('.course-list-favorite-icon').toggleClass('icon-star icon-star-light')
   }
-  target.addClass('course-list-favorite-course')
-  target.attr('title', favorited_tooltip)
-  target.data('ui-tooltip-title', favorited_tooltip)
-  target.children('.screenreader-only').text(favorited_tooltip)
-  target.children('.course-list-favorite-icon').toggleClass('icon-star icon-star-light')
 }
 
 $('[data-favorite-url]').on('click keyclick', function (event) {
