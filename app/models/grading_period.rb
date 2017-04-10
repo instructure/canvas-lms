@@ -171,6 +171,7 @@ class GradingPeriod < ActiveRecord::Base
     scores.find_ids_in_ranges do |min_id, max_id|
       scores.where(id: min_id..max_id).update_all(workflow_state: :deleted)
     end
+    recompute_scores if grading_period_group.weighted
   end
 
   def destroy_grading_period_set
