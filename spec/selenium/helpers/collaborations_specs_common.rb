@@ -15,7 +15,7 @@ module CollaborationsSpecsCommon
     validate_collaborations(%W{/courses/#{@course.id}/collaborations}, false)
 
     new_title = 'Edited collaboration'
-    f('.edit_collaboration_link').click
+    move_to_click('.edit_collaboration_link')
     replace_content(fj('input[name="collaboration[title]"]:visible'), new_title)
     expect_new_page_load do
       submit_form('.edit_collaboration')
