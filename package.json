@@ -107,6 +107,7 @@
     "timezone": "1.0.5",
     "uglify-js": "~2.7.0",
     "webpack": "2.2.1",
+    "webpack-cleanup-plugin": "^0.5.1",
     "webpack-manifest-plugin": "^1.0.1",
     "webpack-parallel-uglify-plugin": "0.2.0",
     "xsslint": "0.1.4"
