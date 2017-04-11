@@ -315,9 +315,9 @@ describe "Default Account Reports" do
         parameters["users"] = true
         parsed = read_report("sis_export_csv", {params: parameters, header: true, order: 0})
         headers = parsed.shift
-        expect(headers).to eq ['user_id', 'login_id', 'password', 'first_name',
-                               'last_name', 'full_name', 'sortable_name',
-                               'short_name', 'email', 'status']
+        expect(headers).to eq ['user_id', 'integration_id','authentication_provider_id',
+                               'login_id', 'password', 'first_name', 'last_name',
+                               'full_name', 'sortable_name', 'short_name', 'email', 'status']
         expect(parsed.length).to eq 4
 
         expect(parsed[0]).to eq ["user_sis_id_01", "john@stclair.com", nil,
@@ -384,9 +384,11 @@ describe "Default Account Reports" do
         parsed = read_report("provisioning_csv", {params: parameters, order: [1, 2], header: true})
 
         headers = parsed.shift
-        expect(headers).to eq ["canvas_user_id", "user_id", "login_id",
+        expect(headers).to eq ["user_id", "integration_id",
+                               "authentication_provider_id", "login_id", "password",
                                "first_name", "last_name", "full_name",
-                               "sortable_name", "short_name", "email", "status", "created_by_sis"]
+                               "sortable_name", "short_name", "email", "status",
+                               "canvas_user_id", "created_by_sis"]
         expect(parsed.length).to eq 6
 
         expect(parsed[0]).to eq [@user6.id.to_s, nil, "john@smith.com", "John",
@@ -1055,7 +1057,7 @@ describe "Default Account Reports" do
         expect(report.parameters['extra_text']).to eq "Term: Default Term; Reports: xlist "
         parsed = parse_report(report, {header: true})
         headers = parsed.shift
-        expect(headers).to eq ['xlist_course_id', 'section_id', 'status']
+        expect(headers).to eq ['xlist_course_id', 'section_id', 'status', 'nonxlist_course_id']
         expect(parsed[0]).to eq ["SIS_COURSE_ID_2","english_section_1","active"]
         expect(parsed.length).to eq 1
       end
@@ -1195,18 +1197,20 @@ describe "Default Account Reports" do
 
       expect(parsed["accounts.csv"]).to eq [["account_id", "parent_account_id", "name", "status"]]
       expect(parsed["terms.csv"]).to eq [["term_id", "name", "status", "start_date", "end_date"]]
-      expect(parsed["users.csv"]).to eq [['user_id', 'login_id', 'password', 'first_name',
-                                          'last_name', 'full_name', 'sortable_name',
-                                          'short_name', 'email', 'status']]
-      expect(parsed["courses.csv"]).to eq [["course_id", "short_name", "long_name", "account_id",
-                                            "term_id", "status", "start_date", "end_date"]]
-      expect(parsed["sections.csv"]).to eq [["section_id", "course_id", "name", "status",
-                                             "start_date", "end_date"]]
+      expect(parsed["users.csv"]).to eq [['user_id', 'integration_id', 'authentication_provider_id',
+                                          'login_id', 'password', 'first_name', 'last_name',
+                                          'full_name', 'sortable_name', 'short_name', 'email', 'status']]
+      expect(parsed["courses.csv"]).to eq [["course_id", "integration_id", "short_name", "long_name",
+                                            "account_id", "term_id", "status", "start_date", "end_date"]]
+      expect(parsed["sections.csv"]).to eq [["section_id", "course_id", "integration_id", "name", "status",
+                                             "start_date", "end_date", "account_id"]]
       expect(parsed["enrollments.csv"]).to eq [["course_id", "user_id", "role", "role_id", "section_id",
-                                                "status", "associated_user_id", "limit_section_privileges"]]
-      expect(parsed["groups.csv"]).to eq [["group_id", "account_id", "name", "status"]]
+                                                "status", "associated_user_id", "base_role_type",
+                                                "limit_section_privileges"]]
+      expect(parsed["groups.csv"]).to eq [["group_id", "account_id", "name", "status", "context_id",
+                                           "context_type", "group_category_id"]]
       expect(parsed["group_membership.csv"]).to eq [["group_id", "user_id", "status"]]
-      expect(parsed["xlist.csv"]).to eq [["xlist_course_id", "section_id", "status"]]
+      expect(parsed["xlist.csv"]).to eq [["xlist_course_id", "section_id", "status", "nonxlist_course_id"]]
     end
 
     it "should not return reports passed as false" do
@@ -1224,15 +1228,16 @@ describe "Default Account Reports" do
 
       expect(parsed["accounts.csv"]).to eq nil
       expect(parsed["terms.csv"]).to eq [["term_id", "name", "status", "start_date", "end_date"]]
-      expect(parsed["users.csv"]).to eq [['user_id', 'login_id', 'password', 'first_name',
-                                          'last_name', 'full_name', 'sortable_name',
-                                          'short_name', 'email', 'status']]
+      expect(parsed["users.csv"]).to eq [['user_id', 'integration_id', 'authentication_provider_id',
+                                          'login_id', 'password', 'first_name', 'last_name',
+                                          'full_name', 'sortable_name', 'short_name', 'email', 'status']]
       expect(parsed["courses.csv"]).to eq nil
       expect(parsed["sections.csv"]).to eq nil
       expect(parsed["enrollments.csv"]).to eq nil
-      expect(parsed["groups.csv"]).to eq [["group_id", "account_id", "name", "status"]]
+      expect(parsed["groups.csv"]).to eq [["group_id", "account_id", "name",
+                                           "status", "context_id", "context_type", "group_category_id"]]
       expect(parsed["group_membership.csv"]).to eq [["group_id", "user_id", "status"]]
-      expect(parsed["xlist.csv"]).to eq [["xlist_course_id", "section_id", "status"]]
+      expect(parsed["xlist.csv"]).to eq [["xlist_course_id", "section_id", "status", "nonxlist_course_id"]]
     end
   end
 end
