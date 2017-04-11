@@ -51,6 +51,12 @@ class TotalGradeColumnHeader extends React.Component {
       disabled: bool.isRequired,
       hidden: bool.isRequired
     }).isRequired,
+    position: shape({
+      isInFront: bool.isRequired,
+      isInBack: bool.isRequired,
+      onMoveToFront: func.isRequired,
+      onMoveToBack: func.isRequired
+    }).isRequired,
   };
 
   constructor (props) {
@@ -60,10 +66,13 @@ class TotalGradeColumnHeader extends React.Component {
   }
 
   render () {
-    const { sortBySetting, gradeDisplay } = this.props;
+    const { sortBySetting, gradeDisplay, position } = this.props;
     const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey;
     const displayAsPoints = gradeDisplay.currentDisplay === 'points';
     const showSeparator = !gradeDisplay.hidden;
+    const nowrapStyle = {
+      whiteSpace: 'nowrap'
+    };
 
     return (
       <div className="Gradebook__ColumnHeaderContent">
@@ -106,8 +115,26 @@ class TotalGradeColumnHeader extends React.Component {
               disabled={this.props.gradeDisplay.disabled}
               onSelect={this.props.gradeDisplay.onSelect}
             >
-              <span data-menu-item-id="grade-display-switcher">
+              <span data-menu-item-id="grade-display-switcher" style={nowrapStyle}>
                 {displayAsPoints ? I18n.t('Display as Percentage') : I18n.t('Display as Points')}
+              </span>
+            </MenuItem>
+          }
+
+          {
+            !position.isInFront &&
+            <MenuItem onSelect={position.onMoveToFront}>
+              <span data-menu-item-id="total-grade-move-to-front">
+                {I18n.t('Move to Front')}
+              </span>
+            </MenuItem>
+          }
+
+          {
+            !position.isInBack &&
+            <MenuItem onSelect={position.onMoveToBack}>
+              <span data-menu-item-id="total-grade-move-to-back">
+                {I18n.t('Move to End')}
               </span>
             </MenuItem>
           }

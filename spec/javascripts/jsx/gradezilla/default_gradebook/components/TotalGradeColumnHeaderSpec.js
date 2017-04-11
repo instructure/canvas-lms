@@ -35,6 +35,12 @@ function createExampleProps () {
       onSelect () {},
       disabled: false,
       hidden: false
+    },
+    position: {
+      isInFront: false,
+      isInBack: false,
+      onMoveToFront () {},
+      onMoveToBack () {}
     }
   };
 }
@@ -289,4 +295,96 @@ test('clicking the "Display as Percentage" option calls the gradeDisplay onSelec
   this.menuItem.click();
 
   equal(this.props.gradeDisplay.onSelect.callCount, 1);
+});
+
+QUnit.module('TotalGradeColumnHeader - Move to Front', {
+  setup () {
+    this.props = createExampleProps();
+    this.props.position.isInFront = false;
+    this.props.position.onMoveToFront = this.stub();
+  },
+
+  getMenuItem () {
+    return document.querySelector('[data-menu-item-id="total-grade-move-to-front"]');
+  }
+});
+
+test('the "Move to Front" option does not appear when isInFront is true', function () {
+  this.props.position.isInFront = true;
+  const wrapper = mountAndOpenOptions(this.props);
+
+  notOk(this.getMenuItem());
+
+  wrapper.unmount();
+});
+
+test('the "Move to Front" option shows up when ths isInFront property is false', function () {
+  const wrapper = mountAndOpenOptions(this.props);
+
+  ok(this.getMenuItem());
+
+  wrapper.unmount();
+});
+
+test('the "Move to Front" option reads "Move to Front"', function () {
+  const wrapper = mountAndOpenOptions(this.props);
+
+  strictEqual(this.getMenuItem().textContent, 'Move to Front');
+
+  wrapper.unmount();
+});
+
+test('clicking the "Move to Front" option calls the onMoveToFront callback', function () {
+  const wrapper = mountAndOpenOptions(this.props);
+  this.getMenuItem().click();
+
+  strictEqual(this.props.position.onMoveToFront.callCount, 1);
+
+  wrapper.unmount();
+});
+
+QUnit.module('TotalGradeColumnHeader - Move to Back', {
+  setup () {
+    this.props = createExampleProps();
+    this.props.position.isInBack = false;
+    this.props.position.onMoveToBack = this.stub();
+  },
+
+  getMenuItem () {
+    return document.querySelector('[data-menu-item-id="total-grade-move-to-back"]');
+  }
+});
+
+test('the "Move to Back" option does not appear when isInBack is true', function () {
+  this.props.position.isInBack = true;
+  const wrapper = mountAndOpenOptions(this.props);
+
+  notOk(this.getMenuItem());
+
+  wrapper.unmount();
+});
+
+test('the "Move to Back" option shows up when ths isInBack property is false', function () {
+  const wrapper = mountAndOpenOptions(this.props);
+
+  ok(this.getMenuItem());
+
+  wrapper.unmount();
+});
+
+test('the "Move to Back" option reads "Move to End"', function () {
+  const wrapper = mountAndOpenOptions(this.props);
+
+  strictEqual(this.getMenuItem().textContent, 'Move to End');
+
+  wrapper.unmount();
+});
+
+test('clicking the "Move to Back" option calls the onMoveToBack callback', function () {
+  const wrapper = mountAndOpenOptions(this.props);
+  this.getMenuItem().click();
+
+  strictEqual(this.props.position.onMoveToBack.callCount, 1);
+
+  wrapper.unmount();
 });

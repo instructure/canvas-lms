@@ -1706,7 +1706,26 @@ define [
     getColumnHeaderNode: (columnId) =>
       document.getElementById(@grid.getUID() + columnId)
 
+    getColumnPositionById: (colId, columnGroup = @grid.getColumns()) ->
+      position = null;
+
+      columnGroup.forEach (col, idx) ->
+        if col.id == colId
+          position = idx
+
+      position
+
+    isColumnFrozen: (colId) =>
+      columnPosition = @getColumnPositionById(colId, @parentColumns)
+      return columnPosition != null
+
     ## React Grid Component Rendering Methods
+
+    updateFrozenColumnsAndRenderGrid: (newColumns = @getVisibleGradeGridColumns()) ->
+      @grid.setNumberOfColumnsToFreeze(@getFrozenColumnCount())
+      @grid.setColumns(newColumns)
+      @grid.invalidate()
+      @updateColumnHeaders()
 
     updateColumnHeaders: ->
       return unless @grid
@@ -1756,6 +1775,50 @@ define [
 
     # Total Grade Column Header
 
+    freezeTotalGradeColumn: =>
+      allColumns = @grid.getColumns()
+
+      # Remove total_grade column from aggregate section
+      totalColumnPosition = @getColumnPositionById('total_grade', @aggregateColumns)
+      totalColumn = @aggregateColumns.splice(totalColumnPosition, 1)
+
+      # Remove total_grade column from the current order of displayed columns in the grid
+      totalColumnPositionOverall = @getColumnPositionById('total_grade', allColumns)
+      allColumns.splice(totalColumnPositionOverall, 1)
+
+      # Add total_grade column next to the position of the student column in the current column order
+      studentColumnPositionOverall = @getColumnPositionById('student', allColumns)
+      allColumns = allColumns.splice(0, studentColumnPositionOverall + 1).concat(totalColumn).concat(allColumns)
+
+      # Add total_grade column next to the position of the student column in the frozen section
+      studentColumnPosition = @getColumnPositionById('student', @parentColumns)
+      @parentColumns = @parentColumns.splice(0, studentColumnPosition + 1).concat(totalColumn).concat(@parentColumns)
+
+      @updateFrozenColumnsAndRenderGrid(allColumns)
+
+    moveTotalGradeColumnToEnd: =>
+      allColumns = @grid.getColumns()
+
+      # Remove total_grade column from aggregate or frozen section as needed
+      if @isColumnFrozen('total_grade')
+        totalColumnPosition = @getColumnPositionById('total_grade', @parentColumns)
+        totalColumn = @parentColumns.splice(totalColumnPosition, 1)
+      else
+        totalColumnPosition = @getColumnPositionById('total_grade', @aggregateColumns)
+        totalColumn = @aggregateColumns.splice(totalColumnPosition, 1)
+
+      # Remove total_grade column from the current order of displayed columns in the grid
+      totalColumnPositionOverall = @getColumnPositionById('total_grade', allColumns)
+      allColumns.splice(totalColumnPositionOverall, 1)
+
+      # Add total_grade column next to the position of the student column in the current column order
+      allColumns = allColumns.concat(totalColumn);
+
+      # Add total_grade column to the end of the aggregate section
+      @aggregateColumns = @aggregateColumns.concat(totalColumn)
+
+      @updateFrozenColumnsAndRenderGrid(allColumns)
+
     getTotalGradeColumnSortBySetting: (assignmentId) =>
       columnId = 'total_grade'
       gradeSortDataLoaded =
@@ -1781,9 +1844,26 @@ define [
       disabled: !@contentLoadStates.submissionsLoaded
       hidden: @weightedGroups()
 
+    getTotalGradeColumnPositionProps: =>
+      totalColumnPosition = @getColumnPositionById('total_grade')
+      totalIsFrozen = @isColumnFrozen('total_grade')
+      backPosition = @grid.getColumns().length - 1
+
+      isInFront: totalIsFrozen
+      isInBack: totalColumnPosition == backPosition
+      onMoveToFront: =>
+        setTimeout(=>
+          @freezeTotalGradeColumn()
+        , 10)
+      onMoveToBack: =>
+        setTimeout(=>
+          @moveTotalGradeColumnToEnd()
+        , 10)
+
     getTotalGradeColumnHeaderProps: ->
       sortBySetting: @getTotalGradeColumnSortBySetting()
       gradeDisplay: @getTotalGradeColumnGradeDisplayProps()
+      position: @getTotalGradeColumnPositionProps()
 
     renderTotalGradeColumnHeader: =>
       return if @hideAggregateColumns()
