@@ -52,7 +52,8 @@ module SupportHelpers
         if submission
           attachments = submission.attachments.select do |a|
             BAD_STATES.include?(a.crocodoc_document.process_state) ||
-            a.crocodoc_document.process_state == "QUEUED"
+            a.crocodoc_document.process_state == "QUEUED" ||
+            (a.crocodoc_document.process_state == "PROCESSING" && a.crocodoc_document.updated_at < 1.day.ago)
           end
           attachments.each { |a| resubmit_attachment(a) }
         end
