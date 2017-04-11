@@ -854,8 +854,7 @@ CanvasRails::Application.routes.draw do
   get 'browserconfig.xml', to: 'info#browserconfig', defaults: { format: 'xml' }
 
   post 'object_snippet' => 'context#object_snippet'
-  get 'saml2' => 'accounts#saml_meta_data'
-  get 'saml_meta_data' => 'accounts#saml_meta_data'
+  get 'saml2' => 'login/saml#metadata'
 
   # Routes for course exports
   get 'xsd/:version.xsd' => 'content_exports#xml_schema'

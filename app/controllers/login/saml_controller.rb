@@ -294,6 +294,15 @@ class Login::SamlController < ApplicationController
     end
   end
 
+  def metadata
+    # This needs to be publicly available since external SAML
+    # servers need to be able to access it without being authenticated.
+    # It is used to disclose our SAML configuration settings.
+    metadata = AccountAuthorizationConfig::SAML.sp_metadata_for_account(@domain_root_account, request.host_with_port)
+    render xml: metadata.to_xml
+  end
+
+
   def observee_validation
     auth_redirect(@domain_root_account.parent_registration_aac)
   end

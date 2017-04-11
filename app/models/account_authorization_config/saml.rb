@@ -166,7 +166,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     return nil unless self.auth_type == 'saml'
 
     unless @saml_settings
-      @saml_settings = self.class.saml_settings_for_account(self.account, current_host)
+      @saml_settings = self.class.onelogin_saml_settings_for_account(self.account, current_host)
 
       @saml_settings.idp_sso_target_url = self.log_in_url
       @saml_settings.idp_slo_target_url = self.log_out_url
@@ -179,7 +179,46 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     @saml_settings
   end
 
-  def self.saml_settings_for_account(account, current_host=nil)
+  def self.sp_metadata(entity_id, hosts)
+    app_config = ConfigFile.load('saml') || {}
+
+    entity = SAML2::Entity.new
+    entity.entity_id = entity_id
+
+    contact = SAML2::Contact.new(SAML2::Contact::Type::TECHNICAL)
+    contact.surname = app_config[:tech_contact_name] || 'Webmaster'
+    contact.email_addresses = Array.wrap(app_config[:tech_contact_email])
+    entity.contacts << contact
+
+    sp = SAML2::ServiceProvider.new
+    sp.single_logout_services << SAML2::Endpoint.new("#{HostUrl.protocol}://#{hosts.first}/login/saml/logout",
+                                                     SAML2::Endpoint::Bindings::HTTP_REDIRECT)
+
+    hosts.each_with_index do |host, i|
+      sp.assertion_consumer_services << SAML2::Endpoint::Indexed.new("#{HostUrl.protocol}://#{host}/login/saml",
+                          i,
+                          i == 0)
+    end
+
+    encryption = app_config[:encryption]
+
+    if encryption.is_a?(Hash) &&
+      (cert_path = resolve_saml_key_path(encryption[:certificate]))
+
+      cert = File.read(cert_path)
+      sp.keys << SAML2::Key.new(cert, SAML2::Key::Type::ENCRYPTION, [SAML2::Key::EncryptionMethod.new])
+      sp.keys << SAML2::Key.new(cert, SAML2::Key::Type::SIGNING)
+    end
+
+    entity.roles << sp
+    entity
+  end
+
+  def self.sp_metadata_for_account(account, current_host = nil)
+    sp_metadata(saml_default_entity_id_for_account(account),HostUrl.context_hosts(account, current_host))
+  end
+
+  def self.onelogin_saml_settings_for_account(account, current_host=nil)
     app_config = ConfigFile.load('saml') || {}
     domains = HostUrl.context_hosts(account, current_host)
 
