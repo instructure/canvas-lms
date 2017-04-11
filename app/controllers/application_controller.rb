@@ -2026,11 +2026,6 @@ class ApplicationController < ActionController::Base
       hash[:COURSE_TITLE] = @context.name
     end
 
-    if opts[:show_announcements]
-      hash[:SHOW_ANNOUNCEMENTS] = true
-      hash[:ANNOUNCEMENT_LIMIT] = @context.home_page_announcement_limit
-    end
-
     if @page
       if @context.wiki.grants_right?(@current_user, :manage)
         mc_status = setup_master_course_restrictions(@page, @context)

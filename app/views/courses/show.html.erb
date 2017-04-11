@@ -148,12 +148,13 @@
   <%= render :partial => 'shared/dashboard_invitation', :object => @pending_enrollment %>
 <% end %>
 
+<% if @context.show_announcements_on_home_page? %>
+  <div id="announcements_on_home_page"></div>
+  <% js_bundle :announcements_on_home_page %>
+<% end %>
 <div id="course_home_content">
   <% if @course_home_view == 'wiki' %>
     <% js_bundle :wiki_page_show %>
-    <% if @context.show_announcements_on_home_page? %>
-      <div id="announcements_on_home_page"></div>
-    <% end %>
     <div id="wiki_page_show"></div>
   <% elsif @course_home_view == 'modules' %>
     <%= render :partial => 'context_modules/content_next', :locals => {:course_home => true} %>
