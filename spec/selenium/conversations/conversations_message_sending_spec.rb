@@ -17,7 +17,7 @@ describe "conversations new" do
   describe "message sending" do
     it "should show error messages when no recipient is entered", priority: "1", test_id: 351236 do
       get '/conversations'
-      f('.icon-compose').click
+      move_to_click('.icon-compose')
       click_send
       errors = ff('.error_text')
       expect(errors[2].text).to include('Invalid recipient name.')
@@ -156,7 +156,7 @@ describe "conversations new" do
         @course.save!
 
         get '/conversations'
-        f('.icon-compose').click
+        move_to_click('.icon-compose')
         expect(fj("#compose-message-course option:contains('#{@course.name}')")).to be
       end
 
@@ -166,7 +166,7 @@ describe "conversations new" do
         @course.save!
 
         get '/conversations'
-        f('.icon-compose').click
+        move_to_click('.icon-compose')
         expect(f("#compose-message-course")).not_to contain_jqcss("option:contains('#{@course.name}')")
       end
 
@@ -176,7 +176,7 @@ describe "conversations new" do
         @course.save!
 
         get '/conversations'
-        f('.icon-compose').click
+        move_to_click('.icon-compose')
         expect(f("#compose-message-course")).not_to contain_jqcss("option:contains('#{@course.name}')")
       end
     end
@@ -322,7 +322,7 @@ describe "conversations new" do
   def goto_compose_modal
     fln('Inbox').click
     wait_for_ajaximations
-    f('.icon-compose').click
+    move_to_click('.icon-compose')
     wait_for_ajaximations
     f("#compose-new-message")
   end
