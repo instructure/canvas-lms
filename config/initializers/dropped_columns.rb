@@ -65,6 +65,7 @@ ActiveRecord::Base::DROPPED_COLUMNS = {
                         last_inline_view
                         local_filename).freeze,
     'calendar_events' => %w(calendar_event_repeat_id for_repeat_on).freeze,
+    'canvadocs' => %w(preferred_plugin_course_id).freeze,
     'communication_channels' => %w(access_token_id internal_path).freeze,
     'content_exports' => %w(course_id).freeze,
     'content_migrations' => %w{error_count error_data}.freeze,
