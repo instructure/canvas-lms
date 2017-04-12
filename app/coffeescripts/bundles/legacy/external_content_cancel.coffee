@@ -1,4 +1,4 @@
-require [
+define [
   "jquery",
   "i18n!external_content.cancel"
 ], ($, I18n) ->

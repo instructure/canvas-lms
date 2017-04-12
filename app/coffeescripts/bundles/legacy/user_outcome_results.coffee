@@ -1,4 +1,4 @@
-require [
+define [
   "jquery",
   "i18n!outcomes.user_outcome_results"
 ], ($, I18n) ->

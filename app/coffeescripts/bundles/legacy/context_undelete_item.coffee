@@ -1,4 +1,4 @@
-require [
+define [
   "jquery",
   "i18n!context.undelete_index",
   "jquery.ajaxJSON",

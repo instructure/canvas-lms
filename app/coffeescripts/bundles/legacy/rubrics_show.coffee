@@ -1,4 +1,4 @@
-require [
+define [
   "i18n!rubrics.show",
   "jquery",
   "jquery.instructure_misc_plugins"

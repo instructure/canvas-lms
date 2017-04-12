@@ -1,4 +1,4 @@
-require [
+define [
   "i18n!terms.index",
   "jquery",
   "jquery.instructure_date_and_time", # $.dateString, date_field

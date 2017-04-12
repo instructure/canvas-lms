@@ -1,4 +1,4 @@
-require [
+define [
   "i18n!shared.error_form",
   "jquery",
   "str/htmlEscape",

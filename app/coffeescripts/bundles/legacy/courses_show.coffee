@@ -1,4 +1,4 @@
-require [
+define [
   "jquery",
   "i18n!courses.show",
   "str/htmlEscape",

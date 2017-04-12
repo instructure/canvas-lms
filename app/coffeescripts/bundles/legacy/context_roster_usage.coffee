@@ -1,4 +1,4 @@
-require [
+define [
   "jquery",
   "i18n!context.roster_user_usage",
   "jquery.instructure_date_and_time", # $.datetimeString

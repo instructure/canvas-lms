@@ -1,4 +1,4 @@
-require [
+define [
   "i18n!quizzes.quiz_submission",
   "jquery",
   "compiled/behaviors/quiz_selectmenu"

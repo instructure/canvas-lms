@@ -1,4 +1,4 @@
-require [
+define [
   "jquery",
   "jquery.instructure_misc_helpers",
   "jquery.instructure_misc_plugins",

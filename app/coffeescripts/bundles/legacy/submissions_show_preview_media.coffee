@@ -1,4 +1,4 @@
-require [
+define [
   "jquery",
   "media_comments"
 ], ($, _mediaComments) ->
