@@ -519,6 +519,12 @@ describe UsersController do
           expect(p.user).to be_pre_registered
         end
 
+        it "should create users with non-email pseudonyms and an email" do
+          post 'create', format: 'json', account_id: account.id, pseudonym: { unique_id: 'testid', path: 'testemail@example.com' }, user: { name: 'test' }
+          expect(response).to be_success
+          p = Pseudonym.where(unique_id: 'testid').first
+          expect(p.user.email).to eq "testemail@example.com"
+        end
 
         it "should not require acceptance of the terms" do
           post 'create', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }

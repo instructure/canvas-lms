@@ -2285,9 +2285,10 @@ class UsersController < ApplicationController
         includes << 'confirmation_url' if value_to_boolean(cc_params[:confirmation_url])
       end
 
-    elsif EmailAddressValidator.valid?(params[:pseudonym][:unique_id])
+    else
       cc_type = CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
+      cc_addr = nil unless EmailAddressValidator.valid?(cc_addr)
     end
 
     if params[:user]
