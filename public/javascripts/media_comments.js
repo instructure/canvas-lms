@@ -32,6 +32,9 @@ define([
   'jqueryui/tabs' /* /\.tabs/ */
 ], function(I18n, _, pubsub, $, htmlEscape, mediaCommentsTemplate, JsUploader) {
 
+  "use strict"
+  var jsUploader
+
   $.mediaComment = function(command, arg1, arg2) {
     var $container = $("<div/>")
     $("body").append($container.hide());
@@ -270,8 +273,8 @@ define([
     var mediaCommentReady = function() {
       var ks, uid;
       if (INST.kalturaSettings.js_uploader) {
-        ks = JsUploader.getKs()
-        uid = JsUploader.getUid();
+        ks = jsUploader.getKs();
+        uid = jsUploader.getUid();
       } else {
         ks = $dialog.data('ks');
         uid = $dialog.data('uid') || "ANONYMOUS"
@@ -479,8 +482,8 @@ define([
     // Do JS uploader is appropriate
     if (INST.kalturaSettings.js_uploader) {
       jsUploader = new JsUploader(mediaType, opts);
-      jsUploader.onReady = mediaCommentReady
-      jsUploader.addEntry = addEntry
+      jsUploader.onReady = mediaCommentReady;
+      jsUploader.addEntry = addEntry;
     }
 
     var now = new Date();
