@@ -31,7 +31,7 @@ module DiscussionsCommon
     click_entry_option(entry, '.al-options:visible li:eq(1) a')
     wait_for_ajaximations
     type_in_tiny 'textarea', text
-    f('.edit_html_done').click
+    f('.edit_html_done_wrapper .edit_html_done').click
     wait_for_ajaximations
     validate_entry_text(entry, text)
   end
@@ -80,7 +80,7 @@ module DiscussionsCommon
   end
 
   def validate_entry_text(discussion_entry, text)
-    expect(f("#entry-#{discussion_entry.id}")).to include_text(text)
+    expect(f("#entry-#{discussion_entry.id}").text).to include(text)
   end
 
   def check_entry_option(discussion_entry, menu_item_selector)

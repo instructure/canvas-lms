@@ -4,11 +4,15 @@ describe "threaded discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
 
-  before(:each) do
+  before :once do
+    course_with_teacher(active_course: true, active_all: true, name: 'teacher')
     @topic_title = 'threaded discussion topic'
-    course_with_teacher_logged_in
     @topic = create_discussion(@topic_title, 'threaded')
-    @student = student_in_course.user
+    @student = student_in_course(course: @course, name: 'student', active_all: true).user
+  end
+
+  before(:each) do
+    user_session(@teacher)
   end
 
   it "should create a threaded discussion", priority: "1", test_id: 150511 do
