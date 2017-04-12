@@ -260,7 +260,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
         wait_for_ajaximations
 
         in_frame wiki_page_body_ifr_id do
-          f("#tinymce img").click
+          move_to_click("#tinymce img")
         end
 
         f(".mce-i-align#{setting}").click
