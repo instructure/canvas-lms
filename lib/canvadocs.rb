@@ -20,6 +20,7 @@ require 'net/http'
 require 'net/https'
 require 'json'
 
+require_dependency 'canvadocs/session'
 module Canvadocs
   RENDER_O365     = 'office_365'
   RENDER_BOX      = 'box_view'
@@ -201,5 +202,10 @@ module Canvadocs
 
   def self.annotations_supported?
     enabled? && Canvas::Plugin.value_to_boolean(config["annotations_supported"])
+  end
+
+  # annotations_supported? calls enabled?
+  def self.hijack_crocodoc_sessions?
+    annotations_supported? && Canvas::Plugin.value_to_boolean(config["hijack_crocodoc_sessions"])
   end
 end

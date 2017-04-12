@@ -107,4 +107,29 @@ describe CrocodocSessionsController do
     get :show, blob: @blob, hmac: @hmac
     assert_status(404)
   end
+
+  context "Migrate to Canvadocs" do
+    before do
+      @attachment.submit_to_crocodoc
+      Account.default.enable_feature!(:new_annotations)
+      Canvadocs.stubs(:enabled?).returns true
+      Canvadocs.stubs(:annotations_supported?).returns true
+      Canvadocs.stubs(:hijack_crocodoc_sessions?).returns false
+
+      Canvadocs::API.any_instance.stubs(:session).returns 'id' => 'SESSION'
+      PluginSetting.create! :name => 'canvadocs',
+                            :settings => { "base_url" => "https://canvadocs.instructure.docker" }
+    end
+
+    it "should redirect to a canvadocs session instead of crocodoc when enabled" do
+      Canvadocs.stubs(:hijack_crocodoc_sessions?).returns true
+      get :show, blob: @blob, hmac: @hmac
+      expect(response.body).to include 'https://canvadocs.instructure.docker/sessions/SESSION/view'
+    end
+
+    it "should not redirect to a canvadocs session instead of crocodoc when disabled" do
+      get :show, blob: @blob, hmac: @hmac
+      expect(response.body).to_not include 'https://canvadocs.instructure.docker/sessions/SESSION/view'
+    end
+  end
 end
