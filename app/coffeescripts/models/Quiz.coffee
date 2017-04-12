@@ -151,6 +151,9 @@ define [
     postToSISName: =>
       return ENV.SIS_NAME
 
+    sisIntegrationSettingsEnabled: =>
+      return ENV.SIS_INTEGRATION_SETTINGS_ENABLED
+
     maxNameLength: =>
       return ENV.MAX_NAME_LENGTH
 
@@ -168,3 +171,6 @@ define [
 
     postToSISEnabled: =>
       return ENV.FLAGS && ENV.FLAGS.post_to_sis_enabled
+
+    objectType: =>
+      return 'Quiz'

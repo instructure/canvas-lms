@@ -27,13 +27,18 @@ module AssignmentUtil
     account = Context.get_account(context)
     account.try(:sis_syncing).try(:[], :value) &&
     account.try(:sis_assignment_name_length).try(:[], :value) &&
-    account.try(:feature_enabled?, 'new_sis_integrations').present?
+    sis_integration_settings_enabled?(context)
   end
 
   def self.due_date_required_for_account?(context)
     account = Context.get_account(context)
     account.try(:sis_syncing).try(:[], :value).present? &&
     account.try(:sis_require_assignment_due_date).try(:[], :value) &&
+    sis_integration_settings_enabled?(context)
+  end
+
+  def self.sis_integration_settings_enabled?(context)
+    account = Context.get_account(context)
     account.try(:feature_enabled?, 'new_sis_integrations').present?
   end
 end

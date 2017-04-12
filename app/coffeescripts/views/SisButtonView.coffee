@@ -43,7 +43,7 @@ define [
         maxNameLength: @model.maxNameLength()
       })
       errors = @errorsExist(validationHelper)
-      if errors['has_error'] == true
+      if errors['has_error'] == true && @model.sisIntegrationSettingsEnabled()
         $.flashWarning(errors['message'])
       else if sisUrl
         @model.postToSIS(!post_to_sis)

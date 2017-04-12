@@ -586,7 +586,7 @@ define([
         return current_comment.replace(/<p><\/p>/g, '\n\n').replace(/<br>/g, '\n');
       }
 
-      var configureRecognition = function (recognition){
+      function configureRecognition (recognition) {
         recognition.continuous = true;
         recognition.interimResults = true;
         var final_transcript = '';

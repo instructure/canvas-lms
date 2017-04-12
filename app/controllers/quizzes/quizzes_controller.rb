@@ -107,6 +107,7 @@ class Quizzes::QuizzesController < ApplicationController
     max_name_length = AssignmentUtil.assignment_max_name_length(@context)
     sis_name = AssignmentUtil.post_to_sis_friendly_name(@context)
     due_date_required_for_account = AssignmentUtil.due_date_required_for_account?(@context)
+    sis_integration_settings_enabled = AssignmentUtil.sis_integration_settings_enabled?(@context)
 
     js_env({
       :QUIZZES => {
@@ -133,7 +134,8 @@ class Quizzes::QuizzesController < ApplicationController
       :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
       :SIS_NAME => sis_name,
       :MAX_NAME_LENGTH => max_name_length,
-      :DUE_DATE_REQUIRED_FOR_ACCOUNT => due_date_required_for_account
+      :DUE_DATE_REQUIRED_FOR_ACCOUNT => due_date_required_for_account,
+      :SIS_INTEGRATION_SETTINGS_ENABLED => sis_integration_settings_enabled
     })
 
     set_tutorial_js_env

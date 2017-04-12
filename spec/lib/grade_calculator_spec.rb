@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require_relative '../sharding_spec_helper'
 
 describe GradeCalculator do
   before :once do
@@ -66,6 +66,57 @@ describe GradeCalculator do
       expect {
         GradeCalculator.recompute_final_score(@user.id, @course.id)
       }.to change{stale_score.reload.workflow_state}.from('active').to('deleted')
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should delete irrelevant cross-shard scores" do
+        @user = User.create!
+
+        @shard1.activate do
+          account = Account.create!
+          course_with_student(active_all: true, account: account, user: @user)
+          grading_period_set = account.grading_period_groups.create!
+          grading_period_set.enrollment_terms << @course.enrollment_term
+          period1 = grading_period_set.grading_periods.create!(
+            title: "A Grading Period",
+            start_date: 20.days.ago,
+            end_date: 10.days.ago
+          )
+          period2 = grading_period_set.grading_periods.create!(
+            title: "Another Grading Period",
+            start_date: 8.days.ago,
+            end_date: 7.days.from_now
+          )
+          @stale_score = Score.find_by(enrollment: @enrollment, grading_period: period2)
+          period2.destroy
+          @stale_score.reload.undestroy
+        end
+
+        expect {
+          GradeCalculator.recompute_final_score(@user.id, @course.id)
+        }.to change{@stale_score.reload.workflow_state}.from('active').to('deleted')
+      end
+
+      it "should update cross-shard scores" do
+        @user = User.create!
+
+        @shard1.activate do
+          account = Account.create!
+          course_with_student(active_all: true, account: account, user: @user)
+          @group = @course.assignment_groups.create!(name: "some group", group_weight: 100)
+          @assignment = @course.assignments.create!(title: "Some Assignment", points_possible: 10, assignment_group: @group)
+          @assignment2 = @course.assignments.create!(title: "Some Assignment2", points_possible: 10, assignment_group: @group)
+          @submission = @assignment2.submissions.create!(user: @user)
+        end
+
+        @submission.update_column(:score, 5)
+        GradeCalculator.recompute_final_score(@user.id, @course.id)
+
+        expect(Enrollment.shard(@course.shard).where(user_id: @user.global_id).first.computed_current_score).to eql(50.0)
+        expect(Enrollment.shard(@course.shard).where(user_id: @user.global_id).first.computed_final_score).to eql(25.0)
+      end
     end
 
     it "should recompute when an assignment's points_possible changes'" do
