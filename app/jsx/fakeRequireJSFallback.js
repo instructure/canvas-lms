@@ -23,9 +23,13 @@ if (!('require' in window)) {
   const thingsWeStillAllowThemToRequire = {
     jquery: () => jQuery,
     // load these asynchronously so they are not downloaded unless asked for
-    i18nObj: () => System.import('i18nObj'),
-    underscore: () => System.import('underscore'),
-    'jsx/course_wizard/ListItems': () => System.import('jsx/course_wizard/ListItems')
+    i18nObj: () => import('i18nObj'),
+    underscore: () => import('underscore'),
+    'jsx/course_wizard/ListItems': () => new Promise(resolve => {
+      require.ensure([], require => {
+        resolve(require('jsx/course_wizard/ListItems'))
+      }, 'course_wizardListItemsAsyncChunk')
+    })
   }
 
   const getModule = (module) => {
