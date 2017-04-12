@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,33 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
+import React from 'react'
+import ReactDOM from 'react-dom'
+import ActAsModal from 'jsx/actAs/ActAsModal'
 
-.avatar {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-fieldset {
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  padding: 5px 10px;
-  margin-bottom: 5px;
-  legend {
-    font-weight: bold;
-    border: none;
-    width: auto;
-    margin-left: 20px;
-    font-size: 1.2em;
-    margin-bottom: 0;
-  }
-}
-
-table.details {
-  td {
-    padding: 1px 5px;
-  }
-  th {
-    text-align: left;
-  }
-}
+ReactDOM.render((
+  <ActAsModal user={ENV.act_as_user_data.user} />
+), document.getElementById('act_as_modal'))
