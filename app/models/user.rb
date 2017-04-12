@@ -1880,26 +1880,15 @@ class User < ActiveRecord::Base
             order('submissions.created_at DESC').
             limit(opts[:limit]).to_a
 
-          # THIS IS SLOW, it takes ~230ms for mike
-          submissions += Submission.for_context_codes(context_codes).
-            select(["submissions.*, last_updated_at_from_db"]).
-            joins(self.class.send(:sanitize_sql_array, [<<-SQL, opts[:start_at], 'submitter', self.id, self.id])).
-              INNER JOIN (
-                SELECT MAX(submission_comments.created_at) AS last_updated_at_from_db, submission_id
-                FROM #{SubmissionComment.quoted_table_name}, #{SubmissionCommentParticipant.quoted_table_name}
-                WHERE submission_comments.id = submission_comment_id
-                  AND (submission_comments.created_at > ?)
-                  AND (submission_comment_participants.participation_type = ?)
-                  AND (submission_comment_participants.user_id = ?)
-                  AND (submission_comments.author_id <> ?)
-                  AND (submission_comments.draft IS NOT TRUE)
-                GROUP BY submission_id
-              ) AS relevant_submission_comments ON submissions.id = submission_id
-              INNER JOIN #{Assignment.quoted_table_name} ON assignments.id = submissions.assignment_id
-            SQL
+          subs_with_comment_scope = Submission.where(:user_id => self).for_context_codes(context_codes).
+            joins(:submission_comments, :assignment).
             where(assignments: {muted: false, workflow_state: 'published'}).
-            order('last_updated_at_from_db DESC').
-            limit(opts[:limit]).to_a
+            where.not(:submission_comments => {:author_id => self, :draft => true}).
+            distinct_on("submissions.id").
+            order("submissions.id, submission_comments.created_at DESC"). # get the last created comment
+            select("submissions.*, submission_comments.created_at AS last_updated_at_from_db")
+          # have to order by last_updated_at_from_db in another query because of distinct_on in the first one
+          submissions += Submission.from(subs_with_comment_scope).limit(opts[:limit]).order("last_updated_at_from_db").select("*").to_a
 
           submissions = submissions.sort_by{|t| t['last_updated_at_from_db'] || t.created_at}.reverse
           submissions = submissions.uniq
