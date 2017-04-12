@@ -1,9 +1,10 @@
-define [
-  'jquery'
-  'i18n!registration'
-  'jst/registration/incompleteRegistrationWarning'
-], ($, I18n, template) ->
-  if ENV.INCOMPLETE_REGISTRATION
+if ENV.INCOMPLETE_REGISTRATION
+  require [
+    'jquery', 
+    'i18n!registration', 
+    'jst/registration/incompleteRegistrationWarning'
+  ], ($, I18n, template) ->
+
     $(template(email: ENV.USER_EMAIL)).
       appendTo($('body')).
       dialog
