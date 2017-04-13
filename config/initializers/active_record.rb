@@ -794,6 +794,7 @@ ActiveRecord::Relation.class_eval do
     values = Array(args.first.last)
     original_length = values.length
     values = values.compact
+    raise ArgumentError, "need to call polymorphic_where with at least one object" if values.empty?
 
     sql = (["(#{column}_id=? AND #{column}_type=?)"] * values.length).join(" OR ")
     sql << " OR (#{column}_id IS NULL AND #{column}_type IS NULL)" if values.length < original_length
