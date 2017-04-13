@@ -192,31 +192,31 @@ class Login::SamlController < ApplicationController
     end
   end
 
+  rescue_from SAML2::InvalidMessage, with: :saml_error
+  def saml_error(error)
+    Canvas::Errors.capture_exception(:saml, error)
+    render status: :bad_request, plain: error.to_s
+  end
+
   def destroy
-    unless params[:SAMLResponse] || params[:SAMLRequest]
-      return render status: :bad_request, plain: "SAMLRequest or SAMLResponse required"
-    end
-
-    if params[:SAMLResponse]
+    message, relay_state = SAML2::Bindings::HTTPRedirect.decode(request.url)
+    case message
+    when SAML2::LogoutResponse
       increment_saml_stat("logout_response_received")
-      saml_response = Onelogin::Saml::LogoutResponse.parse(params[:SAMLResponse])
 
-      aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: saml_response.issuer).first
+      aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
       return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
 
-      settings = aac.saml_settings(request.host_with_port)
-      saml_response.process(settings)
-
-      if aac.debugging? && aac.debug_get(:logout_request_id) == saml_response.in_response_to
+      if aac.debugging? && aac.debug_get(:logout_request_id) == message.in_response_to
         aac.debug_set(:idp_logout_response_encoded, params[:SAMLResponse])
-        aac.debug_set(:idp_logout_response_xml_encrypted, saml_response.xml)
-        aac.debug_set(:idp_logout_response_in_response_to, saml_response.in_response_to)
-        aac.debug_set(:idp_logout_response_destination, saml_response.destination)
+        aac.debug_set(:idp_logout_response_xml_encrypted, message.xml.to_xml)
+        aac.debug_set(:idp_logout_response_in_response_to, message.in_response_to)
+        aac.debug_set(:idp_logout_response_destination, message.destination)
         aac.debug_set(:debugging, t('debug.logout_response_redirect_from_idp', "Received LogoutResponse from IdP"))
       end
 
-      unless saml_response.success_status?
-        logger.error "Failed SAML LogoutResponse: #{saml_response.status_code}: #{saml_response.status_message}"
+      unless message.status.code == SAML2::Status::SUCCESS
+        logger.error "Failed SAML LogoutResponse: #{message.status.code}: #{message.status.message}"
         flash[:delegated_message] = t("There was a failure logging out at your IdP")
         return redirect_to login_url
       end
@@ -256,41 +256,41 @@ class Login::SamlController < ApplicationController
         return
       end
 
-      redirect_to saml_login_url(id: aac.id)
-    else
+      return redirect_to saml_login_url(id: aac.id)
+    when SAML2::LogoutRequest
       increment_saml_stat("logout_request_received")
-      saml_request = Onelogin::Saml::LogoutRequest.parse(params[:SAMLRequest])
-      aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: saml_request.issuer).first
+      aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
       return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
-
-      settings = aac.saml_settings(request.host_with_port)
-      saml_request.process(settings)
 
       if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
         aac.debug_set(:idp_logout_request_encoded, params[:SAMLRequest])
-        aac.debug_set(:idp_logout_request_xml_encrypted, saml_request.request_xml)
-        aac.debug_set(:idp_logout_request_name_id, saml_request.name_id)
-        aac.debug_set(:idp_logout_request_session_index, saml_request.session_index)
-        aac.debug_set(:idp_logout_request_destination, saml_request.destination)
+        aac.debug_set(:idp_logout_request_xml_encrypted, message.xml.to_xml)
+        aac.debug_set(:idp_logout_request_name_id, message.name_id.id)
+        aac.debug_set(:idp_logout_request_session_index, message.session_index)
+        aac.debug_set(:idp_logout_request_destination, message.destination)
         aac.debug_set(:debugging, t('debug.logout_request_redirect_from_idp', "Received LogoutRequest from IdP"))
       end
 
-      settings.relay_state = params[:RelayState]
-      saml_response = Onelogin::Saml::LogoutResponse.generate(saml_request.id, settings)
+      logout_response = SAML2::LogoutResponse.respond_to(message,
+                                                         aac.idp_metadata.identity_providers.first,
+                                                         SAML2::NameID.new(aac.entity_id))
 
       # Seperate the debugging out because we want it to log the request even if the response dies.
       if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
-        aac.debug_set(:idp_logout_request_encoded, saml_response.base64_assertion)
-        aac.debug_set(:idp_logout_response_xml_encrypted, saml_response.xml)
-        aac.debug_set(:idp_logout_response_status_code, saml_response.status_code)
-        aac.debug_set(:idp_logout_response_status_message, saml_response.status_message)
-        aac.debug_set(:idp_logout_response_destination, saml_response.destination)
-        aac.debug_set(:idp_logout_response_in_response_to, saml_response.in_response_to)
+        aac.debug_set(:idp_logout_response_xml_encrypted, logout_response.to_s)
+        aac.debug_set(:idp_logout_response_status_code, logout_response.status.code)
+        aac.debug_set(:idp_logout_response_destination, logout_response.destination)
+        aac.debug_set(:idp_logout_response_in_response_to, logout_response.in_response_to)
         aac.debug_set(:debugging, t('debug.logout_response_redirect_to_idp', "Sending LogoutResponse to IdP"))
       end
 
       logout_current_user
-      redirect_to(saml_response.forward_url)
+
+      return redirect_to(SAML2::Bindings::HTTPRedirect.encode(logout_response, relay_state: relay_state))
+    else
+      error = "Unexpected SAML message: #{message.class}"
+      Canvas::Errors.capture_exception(:saml, error)
+      return render status: :bad_request, plain: error
     end
   end
 
