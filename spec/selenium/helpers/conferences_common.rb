@@ -63,7 +63,6 @@ module ConferencesCommon
     cog_menu_item = opts.fetch(:cog_menu_item, f('.icon-settings'))
     cancel_transaction = opts.fetch(:cancel, false)
 
-    hover(cog_menu_item) # helps make this action less fragile in chrome
     cog_menu_item.click
     wait_for_ajaximations
 
