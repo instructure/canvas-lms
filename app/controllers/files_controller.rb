@@ -1031,8 +1031,26 @@ class FilesController < ApplicationController
   #
   #   curl -X DELETE 'https://<canvas>/api/v1/files/<file_id>' \
   #        -H 'Authorization: Bearer <token>'
+  #
+  #  @argument replace [boolean]
+  #    This action is irreversible.
+  #    If replace is set to true the file contents will be replaced with a
+  #    generic "file has been removed" file. This also destroys any previews
+  #    that have been generated for the file.
+  #    Must have manage files and become other users permissions
+  #
   def destroy
     @attachment = Attachment.find(params[:id])
+    if value_to_boolean(params[:replace])
+      @context = @attachment.context
+      if @context.grants_right?(@current_user, nil, :manage_files) &&
+        @domain_root_account.grants_right?(@current_user, nil, :become_user)
+        @attachment.destroy_content_and_replace(@current_user)
+        return format.json { render json: attachment_json(@attachment, @current_user, {}, {omit_verifier_in_app: true}) }
+      else
+        return render_unauthorized_action
+      end
+    end
     if can_do(@attachment, @current_user, :delete)
       return render_unauthorized_action if master_courses? && editing_restricted?(@attachment)
       @attachment.destroy

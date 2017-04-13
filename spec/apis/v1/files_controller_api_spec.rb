@@ -779,6 +779,19 @@ describe "Files API", type: :request do
       expect(@att.file_state).to eq 'deleted'
     end
 
+    it "should delete/replace a file" do
+      account_admin_user
+      Attachment.any_instance.expects(:destroy_content_and_replace).once
+      @file_path_options[:replace] = true
+      api_call(:delete, @file_path, @file_path_options)
+    end
+
+    it "should not be authorized to delete/replace a file" do
+      course_with_teacher(active_all: true, user: user_with_pseudonym)
+      @file_path_options[:replace] = true
+      api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 401)
+    end
+
     it "should return 404" do
       api_call(:delete, "/api/v1/files/0", @file_path_options.merge(:id => '0'), {}, {}, :expected_status => 404)
     end
