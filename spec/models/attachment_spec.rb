@@ -446,6 +446,30 @@ describe Attachment do
       a.destroy_content_and_replace
       expect(a.content_type).to eq 'unknown/unknown'
     end
+
+    shared_examples_for "purgatory" do
+      it 'should save file in purgatory and then restore and back again' do
+        a = attachment_model(uploaded_data: default_uploaded_data)
+        filename = a.filename
+        a.destroy_content_and_replace
+        purgatory = Purgatory.where(attachment_id: a).take
+        expect(purgatory.old_filename).to eq filename
+        a.resurrect_from_purgatory
+        expect(purgatory.reload.workflow_state).to eq 'restored'
+        a.destroy_content_and_replace
+        expect(purgatory.reload.workflow_state).to eq 'active'
+      end
+    end
+
+    context "s3" do
+      include_examples "purgatory"
+      before { s3_storage! }
+    end
+
+    context "s3" do
+      include_examples "purgatory"
+      before { local_storage! }
+    end
   end
 
   context "restore" do
