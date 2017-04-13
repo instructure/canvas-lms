@@ -31,7 +31,7 @@ module DiscussionsCommon
     click_entry_option(entry, '.al-options:visible li:eq(1) a')
     wait_for_ajaximations
     type_in_tiny 'textarea', text
-    f('.edit_html_done_wrapper .edit_html_done').click
+    move_to_click('.edit_html_done')
     wait_for_ajaximations
     validate_entry_text(entry, text)
   end
