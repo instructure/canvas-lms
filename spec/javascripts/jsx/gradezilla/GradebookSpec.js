@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore';
 import $ from 'jquery';
+import _ from 'underscore';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import natcompare from 'compiled/util/natcompare';
 import round from 'compiled/util/round';
 import fakeENV from 'helpers/fakeENV';
-import GradeCalculatorSpecHelper from 'spec/jsx/gradebook/GradeCalculatorSpecHelper';
+import { createCourseGradesWithGradingPeriods as createGrades } from 'spec/jsx/gradebook/GradeCalculatorSpecHelper';
+
 import SubmissionDetailsDialog from 'compiled/SubmissionDetailsDialog';
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
@@ -46,8 +47,6 @@ function createGradebook (options = {}) {
     ...options
   });
 }
-
-const createExampleGrades = GradeCalculatorSpecHelper.createCourseGradesWithGradingPeriods;
 
 QUnit.module('Gradebook');
 
@@ -122,7 +121,7 @@ QUnit.module('Gradebook#calculateStudentGrade', {
 
 test('calculates grades using properties from the gradebook', function () {
   const self = this.setupThis();
-  this.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades());
+  this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
   this.calculate.call(self, {
     id: '101',
     loaded: true,
@@ -137,7 +136,7 @@ test('calculates grades using properties from the gradebook', function () {
 
 test('scopes effective due dates to the user', function () {
   const self = this.setupThis();
-  this.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades());
+  this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
   this.calculate.call(self, {
     id: '101',
     loaded: true,
@@ -155,7 +154,7 @@ test('calculates grades without grading period data when grading period set is n
   const self = this.setupThis({
     gradingPeriodSet: null
   });
-  this.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades());
+  this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
   this.calculate.call(self, {
     id: '101',
     loaded: true,
@@ -173,7 +172,7 @@ test('calculates grades without grading period data when effective due dates are
   const self = this.setupThis({
     effectiveDueDates: null
   });
-  this.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades());
+  this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
   this.calculate.call(self, {
     id: '101',
     loaded: true,
@@ -188,7 +187,7 @@ test('calculates grades without grading period data when effective due dates are
 });
 
 test('stores the current grade on the student when not including ungraded assignments', function () {
-  const exampleGrades = createExampleGrades();
+  const exampleGrades = createGrades();
   const self = this.setupThis({
     include_ungraded_assignments: false
   });
@@ -203,7 +202,7 @@ test('stores the current grade on the student when not including ungraded assign
 });
 
 test('stores the final grade on the student when including ungraded assignments', function () {
-  const exampleGrades = createExampleGrades();
+  const exampleGrades = createGrades();
   const self = this.setupThis({
     include_ungraded_assignments: true
   });
@@ -218,7 +217,7 @@ test('stores the final grade on the student when including ungraded assignments'
 });
 
 test('stores the current grade from the selected grading period when not including ungraded assignments', function () {
-  const exampleGrades = createExampleGrades();
+  const exampleGrades = createGrades();
   const self = this.setupThis({
     gradingPeriodToShow: 701,
     include_ungraded_assignments: false
@@ -234,7 +233,7 @@ test('stores the current grade from the selected grading period when not includi
 });
 
 test('stores the final grade from the selected grading period when including ungraded assignments', function () {
-  const exampleGrades = createExampleGrades();
+  const exampleGrades = createGrades();
   const self = this.setupThis({
     gradingPeriodToShow: 701,
     include_ungraded_assignments: true
@@ -251,7 +250,7 @@ test('stores the final grade from the selected grading period when including ung
 
 test('does not calculate when the student is not loaded', function () {
   const self = this.setupThis();
-  this.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades());
+  this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
   this.calculate.call(self, {
     id: '101',
     loaded: false,
@@ -262,7 +261,7 @@ test('does not calculate when the student is not loaded', function () {
 
 test('does not calculate when the student is not initialized', function () {
   const self = this.setupThis();
-  this.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades());
+  this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
   this.calculate.call(self, {
     id: '101',
     loaded: true,
@@ -1552,7 +1551,7 @@ test('ActionMenu is rendered on renderActionMenu', function () {
       export_gradebook_csv_url: 'http://someUrl'
     }
   };
-  Gradebook.prototype.renderActionMenu.apply(self);
+  Gradebook.prototype.renderActionMenu.call(self);
   const buttonText = document.querySelector('[data-component="ActionMenu"] Button').innerText.trim();
   equal(buttonText, 'Actions');
 });
@@ -1565,7 +1564,7 @@ test('GradebookMenu is rendered on renderGradebookMenu', function () {
       navigate () {}
     }
   };
-  Gradebook.prototype.renderGradebookMenu.apply(self);
+  Gradebook.prototype.renderGradebookMenu.call(self);
   const buttonText = document.querySelector('[data-component="GradebookMenu"] Button').innerText.trim();
   equal(buttonText, 'Gradebook');
 });
@@ -3709,7 +3708,7 @@ test('when no submission is found, it is not late', function () {
 
   equal(firstRow.id, '4', 'when late is true, order first');
   equal(secondRow.id, '3', 'when no submission is found, order second');
-})
+});
 
 QUnit.module('Gradebook#getSelectedEnrollmentFilters', {
   setup () {
