@@ -11,7 +11,7 @@ module Gradezilla
     STUDENT_COLUMN_MENU_SELECTOR = '.container_0 .Gradebook__ColumnHeaderAction'.freeze
 
     # Menu Items
-    MENU_ITEM_SELECTOR = '[data-menu-item-id="%s"]'.freeze
+    MENU_ITEM_SELECTOR = 'span [data-menu-item-id="%s"]'.freeze
 
     def ungradable_selector
       ".cannot_edit"
@@ -46,6 +46,8 @@ module Gradezilla
     def visit(course)
       Account.default.enable_feature!(:gradezilla)
       get "/courses/#{course.id}/gradebook/change_gradebook_version?version=gradezilla"
+      # the pop over menus is too lengthy so make screen bigger
+      make_full_screen
     end
 
     def open_assignment_options_and_select_by(assignment_id:, menu_item_id:)
