@@ -76,6 +76,9 @@ define [
   'compiled/gradezilla/GradebookKeyboardNav'
   'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
+  'jsx/gradezilla/GradebookSettingsModal'
+  'instructure-ui/lib/components/Button'
+  'instructure-icons/lib/Solid/IconSettingsSolid'
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jqueryui/dialog'
@@ -101,7 +104,7 @@ define [
   GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp, SubmissionStateMap,
   DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, SectionMenuView,
   GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
-  assignmentHelper) ->
+  assignmentHelper, GradebookSettingsModal, Button, IconSettingsSolid) ->
   IS_ADMIN = _.contains(ENV.current_user_roles, 'admin')
 
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
@@ -1142,6 +1145,21 @@ define [
       $('#gradebook_settings').kyleMenu(returnFocusTo: $('#gradebook_settings'))
       $('#download_csv').kyleMenu(returnFocusTo: $('#download_csv'))
       $('#post_grades').kyleMenu()
+
+      gradebookSettingsModalMountPoint = document.querySelector("[data-component='GrabebookSettingsModal']")
+      @gradebookSettingsModal = renderComponent(
+        GradebookSettingsModal, gradebookSettingsModalMountPoint, {
+          onClose: => @gradebookSettingsModalButton.focus()
+        }
+      )
+
+      gradebookSettingsModalButtonMountPoint = document.getElementById('gradebook-settings-modal-button-container')
+      @gradebookSettingsModalButton = renderComponent(
+        Button.default, gradebookSettingsModalButtonMountPoint, {
+          id: 'gradebook-settings-button', variant: 'icon', onClick: @gradebookSettingsModal.open
+        },
+        React.createElement(IconSettingsSolid.default, { title: I18n.t('Gradebook Settings') })
+      )
 
       $settingsMenu.find('.student_names_toggle').click(@studentNamesToggle)
       $('#keyboard-shortcuts').click ->

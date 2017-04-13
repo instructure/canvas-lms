@@ -131,6 +131,34 @@ describe "Gradezilla" do
     expect(driver.current_url).to include("/courses/#{@course.id}/gradebook/history")
   end
 
+  it 'gradebook settings modal is displayed when gradebook settings button is clicked',
+    priority: '1', test_id: 164219 do
+    gradezilla_page.visit(@course)
+
+    f('#gradebook-settings-button').click
+    expect(f('[aria-label="Gradebook Settings"]')).to be_displayed
+  end
+
+  it 'late policies tab is selected by default',
+    priority: '1', test_id: 164220 do
+    gradezilla_page.visit(@course)
+
+    f('#gradebook-settings-button').click
+    expect(f('[aria-label="Gradebook Settings"]')).to be_displayed
+    late_policies_tab = fj('[aria-label="Gradebook Settings"] [role="tablist"] [role="tab"]:first')
+    expect(late_policies_tab.attribute('aria-selected')).to eq('true')
+  end
+
+  it 'focus is returned to gradebook settings button when modal is closed', priority: '1', test_id: 164221 do
+    gradezilla_page.visit(@course)
+
+    f('#gradebook-settings-button').click
+    expect(f('[aria-label="Gradebook Settings"]')).to be_displayed
+
+    f('#gradebook-settings-cancel-button').click
+    expect(check_element_has_focus(f('#gradebook-settings-button'))).to be
+  end
+
   it "validates assignment details", priority: "1", test_id: 210048 do
     submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
 
