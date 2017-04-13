@@ -22,10 +22,6 @@ import Sidebar from 'jsx/shared/rce/Sidebar'
 import featureFlag from 'jsx/shared/rce/featureFlag'
 import $ from 'jquery'
 
-// for legacy pathways
-import 'tinymce.editor_box'
-import 'compiled/tinymce'
-
 function loadServiceRCE (target, tinyMCEInitOptions, callback) {
   serviceRCELoader.loadOnTarget(target, tinyMCEInitOptions, (textarea, remoteEditor) => {
     const $textarea = freshNode($(textarea))
@@ -36,13 +32,42 @@ function loadServiceRCE (target, tinyMCEInitOptions, callback) {
   })
 }
 
+let legacyTinyMCELoaded = false
+function loadLegacyTinyMCE (callback) {
+  if (legacyTinyMCELoaded) {
+    callback()
+    return
+  }
+
+  require.ensure([], (require) => {
+    legacyTinyMCELoaded = true
+    require('tinymce.editor_box')
+    require('compiled/tinymce')
+    callback()
+  }, 'legacyTinymceAsyncChunk')
+}
+
+function hideTextareaWhileLoadingLegacyRCE (target, callback) {
+  if (legacyTinyMCELoaded) {
+    callback()
+    return
+  }
+
+  const previousOpacity = target[0].style.opacity
+  target.css('opacity', 0)
+  loadLegacyTinyMCE(() => {
+    target.css('opacity', previousOpacity)
+    callback()
+  })
+}
+
 function loadLegacyRCE (target, tinyMCEInitOptions, callback) {
-  tinyMCEInitOptions.defaultContent ?
+  hideTextareaWhileLoadingLegacyRCE(target, () => {
+    tinyMCEInitOptions.defaultContent ?
       target.editorBox(tinyMCEInitOptions).editorBox('set_code', tinyMCEInitOptions.defaultContent) :
       target.editorBox(tinyMCEInitOptions)
-  if (callback) {
-    callback()
-  }
+    if (callback) callback()
+  })
 }
 
 function establishParentNode (target) {

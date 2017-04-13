@@ -17,10 +17,9 @@
  */
 
 import $ from 'jquery'
-import serviceRCELoader from 'jsx/shared/rce/serviceRCELoader'
-import featureFlag from 'jsx/shared/rce/featureFlag'
-
 // for legacy pathways
+import serviceRCELoader from './serviceRCELoader'
+import featureFlag from './featureFlag'
 import wikiSidebar from 'wikiSidebar'
 
 function loadServiceSidebar (callback) {

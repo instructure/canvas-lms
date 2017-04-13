@@ -46,7 +46,7 @@ describe "submissions" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       f(".submit_assignment_link").click
-      driver.execute_script "tinyMCE.activeEditor.setContent('text')"
+      type_in_tiny("#submission_body", 'text')
       f('button[type="submit"]').click
 
       expect(f("#sidebar_content")).to include_text("Turned In!")
@@ -249,8 +249,8 @@ describe "submissions" do
       @assignment.update_attributes(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
-      assignment_form = f('#submit_online_text_entry_form')
-      replace_content(assignment_form.find_element(:id, 'submission_comment'), 'this should not be able to be submitted for grading')
+      expect(f('#submission_body_ifr')).to be_displayed
+      replace_content(f('#submit_online_text_entry_form').find_element(:id, 'submission_comment'), 'this should not be able to be submitted for grading')
       submit_form("#submit_online_text_entry_form")
 
       # it should not actually submit and pop up an error message

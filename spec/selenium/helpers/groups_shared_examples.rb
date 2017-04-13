@@ -99,6 +99,7 @@ shared_examples 'announcements_page' do |context|
 
     get announcements_page
     expect_new_page_load { f('.btn-primary').click }
+    expect(f('#editor_tabs')).to be_displayed
     fj(".ui-accordion-header a:contains('Announcements')").click
     expect(fln('Group Announcement')).to be_displayed
     expect(f("#content")).not_to contain_link('Course Announcement')
@@ -146,6 +147,7 @@ shared_examples 'pages_page' do |context|
     get pages_page
     f('.btn-primary').click
     wait_for_ajaximations
+    expect(f("#pages_accordion")).to be_displayed
     fj(".ui-accordion-header a:contains('Wiki Pages')").click
     expect(fln("#{group_page.title}")).to be_displayed
     expect(f("#content")).not_to contain_link("#{course_page.title}")
@@ -191,6 +193,7 @@ shared_examples 'discussions_page' do |context|
 
     get discussions_page
     expect_new_page_load { f('.btn-primary').click }
+    expect(f('#editor_tabs')).to be_displayed
     fj(".ui-accordion-header a:contains('Discussions')").click
     expect(fln("#{group_dt.title}")).to be_displayed
     expect(f("#content")).not_to contain_link("#{course_dt.title}")

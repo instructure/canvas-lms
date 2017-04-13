@@ -20,7 +20,6 @@ module.exports = [
   'setWebpackCdnHost',
   'jquery.instructure_jquery_patches', // this needs to be before anything else that requires jQuery
   'Backbone',
-  'compiled/tinymce',
   'classnames',
 
   // This needs to be loaded before all our handlebars templates so they

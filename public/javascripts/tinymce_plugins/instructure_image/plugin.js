@@ -33,9 +33,10 @@ define([
         // Internal image object like a flash placeholder
         if (ed.dom.getAttrib(selectedNode, 'class', '').indexOf('mceItem') != -1) return;
 
-        require(['compiled/views/tinymce/InsertUpdateImageView'], function(InsertUpdateImageView){
-          new InsertUpdateImageView(ed, selectedNode);
-        });
+        require.ensure([], function (require) {
+          var InsertUpdateImageView = require('compiled/views/tinymce/InsertUpdateImageView')
+          new InsertUpdateImageView(ed, selectedNode)
+        }, 'initImagePickerAsyncChunk')
       });
 
       // Register buttons

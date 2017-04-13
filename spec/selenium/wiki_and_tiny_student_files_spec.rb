@@ -57,6 +57,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @root_folder.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(f("#content")).not_to contain_css('li.folder')
     end
@@ -66,6 +67,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @root_folder.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(f("#content")).not_to contain_css('li.folder')
     end
@@ -75,6 +77,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @course.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(f("#content")).not_to contain_css('li.folder')
     end
@@ -83,6 +86,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @root_folder.sub_folders.create!(:name => "subfolder", :context => @course, :locked => true)
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(f('li.folder')).not_to be_nil
       f('li.folder span.plus').click
@@ -95,6 +99,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @root_folder.sub_folders.create!(:name => "subfolder", :context => @course, :workflow_state => 'hidden')
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(f('li.folder')).not_to be_nil
       f('li.folder span.plus').click
@@ -111,6 +116,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       attachment.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       f('li.folder span.plus').click
       wait_for_ajaximations
@@ -126,6 +132,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       attachment.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       f('li.folder span.plus').click
       expect(ff('li.folder li.file')).to have_size(1)
@@ -156,6 +163,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @sub_folder.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
       expect(ff('.image_list img.img').count).to eq 1
@@ -167,6 +175,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @sub_folder.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
       expect(ff('.image_list img.img').count).to eq 1
@@ -179,6 +188,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @course.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       images_link = f('#editor_tabs .ui-tabs-nav li:nth-child(2) a')
       expect(images_link.text).to match(/Images/i) #files tab should be missingp
       images_link.click
@@ -191,6 +201,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @attachment.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
       expect(ff('.image_list img.img').count).to eq 1
@@ -202,6 +213,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @attachment.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
       expect(ff('.image_list img.img').count).to eq 1

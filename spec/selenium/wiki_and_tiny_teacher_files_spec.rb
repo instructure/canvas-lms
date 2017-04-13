@@ -269,6 +269,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @root_folder.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(ff('li.folder').count).to eq 1
     end
@@ -278,6 +279,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @root_folder.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(ff('li.folder').count).to eq 1
     end
@@ -286,6 +288,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @root_folder.sub_folders.create!(:name => "subfolder", :context => @course, :locked => true)
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(f('li.folder')).not_to be_nil
       expand_root_folder
@@ -298,6 +301,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @root_folder.sub_folders.create!(:name => "subfolder", :context => @course, :workflow_state => 'hidden')
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(f('li.folder')).not_to be_nil
       expand_root_folder
@@ -313,6 +317,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       attachment.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       wait_for_ajaximations
       expand_root_folder
@@ -327,6 +332,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       attachment.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       wait_for_ajaximations
       expand_root_folder
@@ -354,6 +360,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @sub_folder.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
       expect(ff('.image_list img.img').count).to eq 2
@@ -364,6 +371,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @sub_folder.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
       expect(ff('.image_list img.img').count).to eq 2
@@ -374,6 +382,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @course.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
       expect(ff('.image_list img.img').count).to eq 2
@@ -384,6 +393,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @attachment.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
       expect(ff('.image_list img.img').count).to eq 2
@@ -394,6 +404,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @attachment.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
       expect(ff('.image_list img.img').count).to eq 2

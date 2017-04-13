@@ -100,33 +100,42 @@ define [
     ok RCELoader.loadOnTarget.calledWith(@$target, sinon.match(options))
     RichContentEditor.freshNode.restore()
 
-  test 'calls editorBox and set_code when feature flag off', ->
+  test 'calls editorBox and set_code when feature flag off', (assert) ->
+    done = assert.async()
     ENV.RICH_CONTENT_SERVICE_ENABLED = false
     sinon.stub(@$target, 'editorBox')
     @$target.editorBox.onCall(0).returns(@$target)
     RichContentEditor.loadNewEditor(@$target, {defaultContent: "content"})
-    ok @$target.editorBox.calledTwice
-    ok @$target.editorBox.firstCall.calledWith()
-    ok @$target.editorBox.secondCall.calledWith('set_code', "content")
+    Promise.resolve().then =>
+      ok @$target.editorBox.calledTwice
+      ok @$target.editorBox.firstCall.calledWith()
+      ok @$target.editorBox.secondCall.calledWith('set_code', "content")
+      done()
 
   test 'skips instantiation when called with empty target', ->
     RichContentEditor.loadNewEditor($("#fixtures .invalidTarget"), {})
     ok RCELoader.loadOnTarget.notCalled
 
-  test 'with focus:true calls focus on RceCommandShim after load', ->
+  test 'with focus:true calls focus on RceCommandShim after load', (assert) ->
+    done = assert.async()
     # false so we don't have to stub out freshNode or RCELoader.loadOnTarget
     ENV.RICH_CONTENT_SERVICE_ENABLED = false
     sinon.stub(RceCommandShim, 'focus')
     RichContentEditor.loadNewEditor(@$target, {focus: true})
-    ok RceCommandShim.focus.calledWith(@$target)
-    RceCommandShim.focus.restore()
+    Promise.resolve().then =>
+      ok RceCommandShim.focus.calledWith(@$target)
+      RceCommandShim.focus.restore()
+      done()
 
-  test 'with focus:true tries to show sidebar', ->
+  test 'with focus:true tries to show sidebar', (assert) ->
+    done = assert.async()
     # false so we don't have to stub out RCELoader.loadOnTarget
     ENV.RICH_CONTENT_SERVICE_ENABLED = false
     RichContentEditor.initSidebar()
     RichContentEditor.loadNewEditor(@$target, {focus: true})
-    ok Sidebar.show.called
+    Promise.resolve().then =>
+      ok Sidebar.show.called
+      done()
 
   test 'hides resize handle when called', ->
     $resize = fixtures.create('<div class="mce-resizehandle"></div>')

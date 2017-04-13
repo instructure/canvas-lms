@@ -17,7 +17,6 @@
  */
 
 define([
-  'compiled/editor/stocktiny',
   'i18n!editor',
   'jquery',
   'str/htmlEscape',
@@ -27,8 +26,7 @@ define([
   'jquery.instructure_misc_helpers',
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins'
-], function(tinymce, I18n, $, htmlEscape,
-            TinyMCEContentItem, ExternalToolsHelper, RceCommandShim) {
+], function (I18n, $, htmlEscape, TinyMCEContentItem, ExternalToolsHelper, RceCommandShim) {
 
   var TRANSLATIONS = {
     embed_from_external_tool: I18n.t('embed_from_external_tool', '"Embed content from External Tool"'),

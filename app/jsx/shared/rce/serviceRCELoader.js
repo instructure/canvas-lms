@@ -77,7 +77,7 @@ import splitAssetString from 'compiled/str/splitAssetString'
     * @private
     */
     loadRCE(cb) {
-      require.ensure(['canvas-rce/lib/async'], (require) => {
+      require.ensure([], (require) => {
         const first = !this.RCE
         this.RCE = require('canvas-rce/lib/async')
         if (first) {

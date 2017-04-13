@@ -17,15 +17,13 @@
  */
 
 define([
-  'compiled/editor/stocktiny',
   'i18n!editor',
   'jquery',
   'str/htmlEscape',
   'jquery.dropdownList',
   'jquery.instructure_misc_helpers',
   'underscore'
-], function(tinymce, I18n, $, htmlEscape) {
-
+], function (I18n, $, htmlEscape) {
   /**
    * A module for holding helper functions pulled out of the instructure_external_tools/plugin.
    *

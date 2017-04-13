@@ -509,8 +509,7 @@ describe "calendar2" do
 
         get "/courses/#{@course.id}/discussion_topics/#{@pub_graded_discussion_due.id}"
         find('.discussion-reply-action').click
-        wait_for_ajaximations
-        driver.execute_script "tinyMCE.activeEditor.setContent('#{reply}')"
+        type_in_tiny(".reply-textarea", reply)
         find('.btn.btn-primary').click
         wait_for_ajaximations
         get '/calendar2'

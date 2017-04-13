@@ -182,6 +182,8 @@ module FilesCommon
     if insert_into == :quiz
       ff(".ui-tabs-anchor")[6].click
     else
+      file_tab = ff(".ui-tabs-anchor")[1]
+      expect(file_tab).to be_displayed
       ff(".ui-tabs-anchor")[1].click
     end
     ff(".name.text")[0].click

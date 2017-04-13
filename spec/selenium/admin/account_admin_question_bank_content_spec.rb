@@ -89,7 +89,7 @@ describe "account admin question bank" do
     f(".add_question_link").click
     wait_for_ajaximations
     question_form = f(".question_form")
-    question_form.find_element(:css, "[name='question_name']").send_keys(name)
+    replace_content(question_form.find_element(:css, "[name='question_name']"), name)
     replace_content(question_form.find_element(:css, "[name='question_points']"), points)
     wait_for_ajaximations
     click_option(".header .question_type", multiple_choice_value, :value)
