@@ -3,8 +3,8 @@ require_relative '../page_objects/gradezilla_page'
 
 describe "Gradezilla - custom columns" do
   include_context "in-process server selenium tests"
-  include_context "gradebook_components"
   include GradezillaCommon
+  include_context "gradebook_components"
 
   let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
 
