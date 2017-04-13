@@ -3,7 +3,6 @@ import $ from 'jquery'
 import _ from 'underscore'
 import I18n from 'i18n!common'
 import Backbone from 'Backbone'
-import helpDialog from 'compiled/helpDialog'
 import updateSubnavMenuToggle from 'jsx/subnav_menu/updateSubnavMenuToggle'
 import splitAssetString from 'compiled/str/splitAssetString'
 
@@ -41,8 +40,13 @@ import 'jqueryui/tabs'
 import 'compiled/registration/incompleteRegistrationWarning'
 import 'moment'
 
-
-helpDialog.initTriggers()
+$('.help_dialog_trigger').click((event) => {
+  event.preventDefault()
+  require.ensure([], (require) => {
+    const helpDialog = require('compiled/helpDialog')
+    helpDialog.open()
+  }, 'helpDialogAsyncChunk')
+})
 
 $('#skip_navigation_link').on('click', function (event) {
   // preventDefault so we dont change the hash
