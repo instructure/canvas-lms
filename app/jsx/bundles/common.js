@@ -5,7 +5,7 @@ import I18n from 'i18n!common'
 import Backbone from 'Backbone'
 import helpDialog from 'compiled/helpDialog'
 import updateSubnavMenuToggle from 'jsx/subnav_menu/updateSubnavMenuToggle'
-import initializeNewUserTutorials from 'jsx/new_user_tutorial/initializeNewUserTutorials'
+import splitAssetString from 'compiled/str/splitAssetString'
 
 // modules that do their own thing on every page that simply need to be required
 import 'translations/_core_en'
@@ -43,8 +43,6 @@ import 'moment'
 
 
 helpDialog.initTriggers()
-
-initializeNewUserTutorials()
 
 $('#skip_navigation_link').on('click', function (event) {
   // preventDefault so we dont change the hash
@@ -84,3 +82,14 @@ $('body').on('click', '[data-pushstate]', function (event) {
   event.preventDefault()
   Backbone.history.navigate($(this).attr('href'), true)
 })
+
+if (
+  window.ENV.NEW_USER_TUTORIALS &&
+  window.ENV.NEW_USER_TUTORIALS.is_enabled &&
+  (window.ENV.context_asset_string && (splitAssetString(window.ENV.context_asset_string)[0] === 'courses'))
+) {
+  require.ensure([], (require) => {
+    const initializeNewUserTutorials = require('jsx/new_user_tutorial/initializeNewUserTutorials')
+    initializeNewUserTutorials()
+  }, 'NewUserTutorialsAsyncChunk')
+}
