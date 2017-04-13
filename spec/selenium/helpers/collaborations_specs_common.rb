@@ -37,7 +37,7 @@ module CollaborationsSpecsCommon
     create_collaboration!(type, title)
     validate_collaborations(%W{/courses/#{@course.id}/collaborations}, false)
 
-    f('.delete_collaboration_link').click
+    move_to_click('.delete_collaboration_link')
 
     if type == 'google_docs'
       f('#delete_collaboration_dialog .delete_button').click
