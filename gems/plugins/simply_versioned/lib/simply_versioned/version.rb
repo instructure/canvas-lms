@@ -65,6 +65,7 @@ class Version < ActiveRecord::Base #:nodoc:
 
   def self.preload_version_number(versionables)
     versionables = Array(versionables)
+    return unless versionables.any?
     data = self.all.polymorphic_where(:versionable => versionables).group(:versionable_type, :versionable_id).maximum(:number)
     versionables.each do |v|
       count = data[[v.class.base_class.name, v.id]] || 0
