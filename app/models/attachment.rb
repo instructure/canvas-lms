@@ -660,7 +660,7 @@ class Attachment < ActiveRecord::Base
     end
 
     if method == :overwrite
-      atts = self.shard.activate { self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id) }
+      atts = self.shard.activate { self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id).to_a }
       method = :rename if atts.any? { |att| att.editing_restricted?(:any) }
     end
 
@@ -684,9 +684,9 @@ class Attachment < ActiveRecord::Base
           end
         end
       end
-    elsif method == :overwrite
-      atts.update_all(replacement_attachment_id: self.id) # so we can find the new file in content links
-      copy_access_attributes!(atts) unless atts.empty?
+    elsif method == :overwrite && atts.any?
+      Attachment.where(:id => atts).update_all(replacement_attachment_id: self.id) # so we can find the new file in content links
+      copy_access_attributes!(atts)
       atts.each do |a|
         # update content tags to refer to the new file
         ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(content_id: self.id)
