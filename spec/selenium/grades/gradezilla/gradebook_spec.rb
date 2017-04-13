@@ -231,6 +231,9 @@ describe "Gradezilla" do
       # When I go to the gradebook
       gradezilla_page.visit(@course)
 
+      # chrome fails to find the download submissions link because it does not fit normal screen
+      make_full_screen
+
       # And I click the dropdown menu on the assignment
       f(".slick-header-column[id*='assignment_#{@first_assignment.id}'] .Gradebook__ColumnHeaderAction").click
 
