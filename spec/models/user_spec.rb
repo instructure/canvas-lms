@@ -3182,6 +3182,4 @@ describe User do
       expect(u.feature_enabled?(:new_user_tutorial_on_off)).to be true
     end
   end
-
-  it { is_expected.to have_many(:submission_comment_participants) }
 end
