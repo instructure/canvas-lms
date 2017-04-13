@@ -39,7 +39,7 @@ gem 'bcrypt', '3.1.11'
 gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.5', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.12.1'
+gem 'inst-jobs', '0.12.2'
   gem 'rufus-scheduler', '3.3.3', require: false
 gem 'ffi', '1.9.14', require: false
 gem 'hashery', '2.1.2', require: false
