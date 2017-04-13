@@ -21,7 +21,7 @@ module DataFixup
         updates = fields.map { |f| "#{f}=COALESCE(#{f},#{klass.connection.quote(default_value)})" }.join(', ')
       end
 
-      scope.find_ids_in_ranges(batch_size: batch_size) do |start_id, end_id|
+      klass.find_ids_in_ranges(batch_size: batch_size) do |start_id, end_id|
         scope.where(id: start_id..end_id).update_all(updates)
         sleep(sleep_interval_per_batch) if sleep_interval_per_batch
       end

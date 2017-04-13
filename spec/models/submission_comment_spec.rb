@@ -395,19 +395,12 @@ This text has a http://www.google.com link in it...
 
   describe 'scope: published' do
     before(:once) do
-      @standard_comment = SubmissionComment.create!(@valid_attributes)
       @published_comment = SubmissionComment.create!(@valid_attributes.merge({ draft: false }))
       @draft_comment = SubmissionComment.create!(@valid_attributes.merge({ draft: true }))
-
-      @standard_comment.update_attribute(:draft, nil)
     end
 
     it 'does not return the draft comment' do
       expect(SubmissionComment.published.pluck(:id)).not_to include(@draft_comment.id)
-    end
-
-    it 'returns the standard comment' do
-      expect(SubmissionComment.published.pluck(:id)).to include(@standard_comment.id)
     end
 
     it 'returns the published comment' do
