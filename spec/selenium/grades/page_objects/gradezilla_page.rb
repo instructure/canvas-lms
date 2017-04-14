@@ -53,7 +53,7 @@ module Gradezilla
     def open_assignment_options_and_select_by(assignment_id:, menu_item_id:)
       column_header = f("#gradebook_grid .slick-header-column[id*='assignment_#{assignment_id}']")
       column_header.find_element(:css, '.Gradebook__ColumnHeaderAction').click
-      f("[data-menu-item-id='#{menu_item_id}']").click
+      f("span[data-menu-item-id='#{menu_item_id}']").click
     end
 
     def select_total_column_option(menu_item_id = nil, already_open: false)
@@ -63,7 +63,7 @@ module Gradezilla
       end
 
       if menu_item_id
-        f("[data-menu-item-id='#{menu_item_id}']").click
+        f("span[data-menu-item-id='#{menu_item_id}']").click
       end
     end
 
