@@ -122,6 +122,7 @@ describe "threaded discussions" do
   end
 
   it "should show a reply time that is different from the creation time", priority: "2", test_id: 113813 do
+    skip_if_chrome('Type in tiny fails in chrome')
     @enrollment.workflow_state = 'active'
     @enrollment.save!
 

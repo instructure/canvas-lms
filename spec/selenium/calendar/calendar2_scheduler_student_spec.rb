@@ -65,7 +65,7 @@ describe "scheduler" do
       f('.fc-event.scheduler-event').click
       f('.reserve_event_link').click
       wait_for_ajaximations
-      f('#FindAppointmentButton').click
+      move_to_click('#FindAppointmentButton')
       expect(f('.fc-event.scheduler-event')).to include_text 'new appointment group'
     end
 
