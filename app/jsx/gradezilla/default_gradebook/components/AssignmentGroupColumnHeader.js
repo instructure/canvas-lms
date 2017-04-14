@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import IconMoreSolid from 'instructure-icons/react/Solid/IconMoreSolid'
+import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
 import { MenuItem, MenuItemGroup } from 'instructure-ui/lib/components/Menu'
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
 import Typography from 'instructure-ui/lib/components/Typography'

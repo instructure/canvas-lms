@@ -1,6 +1,6 @@
 import React from 'react'
-import IconModuleSolid from 'instructure-icons/react/Solid/IconModuleSolid'
-import IconUploadLine from 'instructure-icons/react/Line/IconUploadLine'
+import IconModuleSolid from 'instructure-icons/lib/Solid/IconModuleSolid'
+import IconUploadLine from 'instructure-icons/lib/Line/IconUploadLine'
 import I18n from 'i18n!modules_home_page'
 
 export default class ModulesHomePage extends React.Component {

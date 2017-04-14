@@ -20,20 +20,12 @@ import _ from 'underscore';
 import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Simulate } from 'react-addons-test-utils';
+import { Simulate, findRenderedDOMComponentWithTag } from 'react-addons-test-utils';
 import gradingPeriodSetsApi from 'compiled/api/gradingPeriodSetsApi';
 import enrollmentTermsApi from 'compiled/api/enrollmentTermsApi';
 import GradingPeriodSetCollection from 'jsx/grading/GradingPeriodSetCollection';
 
 const wrapper = document.getElementById('fixtures');
-
-const assertDisabled = function (component) {
-  equal(component._button.getAttribute('aria-disabled'), 'true');
-};
-
-const assertEnabled = function (component) {
-  notEqual(component._button.getAttribute('aria-disabled'), 'true');
-};
 
 const assertCollapsed = function (component, setId) {
   const message = `set with id: ${setId} is 'collapsed'`;
@@ -238,22 +230,28 @@ test('does not show the new set form on initial load', function () {
 test('has the add new set button enabled on initial load', function () {
   const collection = renderComponent();
   return Promise.all([this.terms, this.sets]).then(() => {
-    assertEnabled(collection.refs.addSetFormButton);
+    const component = collection.refs.addSetFormButton;
+    const button = findRenderedDOMComponentWithTag(component, 'button');
+    notEqual(button.getAttribute('aria-disabled'), 'true');
   });
 });
 
 test('disables the add new set button after it is clicked', function () {
   const collection = renderComponent();
   return Promise.all([this.terms, this.sets]).then(() => {
-    Simulate.click(collection.refs.addSetFormButton._button);
-    assertDisabled(collection.refs.addSetFormButton);
+    const component = collection.refs.addSetFormButton;
+    const button = findRenderedDOMComponentWithTag(component, 'button');
+    Simulate.click(button);
+    equal(button.getAttribute('aria-disabled'), 'true');
   });
 });
 
 test('shows the new set form when the add new set button is clicked', function () {
   const collection = renderComponent();
   return Promise.all([this.terms, this.sets]).then(() => {
-    Simulate.click(collection.refs.addSetFormButton._button);
+    const component = collection.refs.addSetFormButton;
+    const button = findRenderedDOMComponentWithTag(component, 'button');
+    Simulate.click(button);
     ok(collection.refs.newSetForm);
   });
 });
@@ -607,7 +605,9 @@ test('renders the "edit grading period set" when "edit grading period set" is cl
   const set = renderComponent();
   return Promise.all([this.sets, this.terms]).then(() => {
     notOk(!!set.refs['edit-grading-period-set-1'], 'the edit grading period set form is not visible');
-    Simulate.click(set.refs['show-grading-period-set-1'].refs.editButton._button);
+    const { editButton } = set.refs['show-grading-period-set-1'].refs;
+    const button = findRenderedDOMComponentWithTag(editButton, 'button');
+    Simulate.click(button);
     ok(set.refs['edit-grading-period-set-1'], 'the edit form is visible');
   });
 });
@@ -615,8 +615,10 @@ test('renders the "edit grading period set" when "edit grading period set" is cl
 test('disables other "grading period set" actions while open', function () {
   const set = renderComponent();
   return Promise.all([this.sets, this.terms]).then(() => {
-    Simulate.click(set.refs['show-grading-period-set-1'].refs.editButton._button);
-    assertDisabled(set.refs.addSetFormButton);
+    const { editButton } = set.refs['show-grading-period-set-1'].refs;
+    const button = findRenderedDOMComponentWithTag(editButton, 'button');
+    Simulate.click(button);
+    notEqual(button.getAttribute('aria-disabled'), 'true');
     ok(set.refs['show-grading-period-set-2'].props.actionsDisabled);
   });
 });
@@ -624,7 +626,9 @@ test('disables other "grading period set" actions while open', function () {
 test('"onCancel" removes the "edit grading period set" form', function () {
   const set = renderComponent();
   return Promise.all([this.sets, this.terms]).then(() => {
-    Simulate.click(set.refs['show-grading-period-set-1'].refs.editButton._button);
+    const { editButton } = set.refs['show-grading-period-set-1'].refs;
+    const button = findRenderedDOMComponentWithTag(editButton, 'button');
+    Simulate.click(button);
     set.refs['edit-grading-period-set-1'].props.onCancel();
     notOk(!!set.refs['edit-grading-period-set-1']);
   });
@@ -633,18 +637,22 @@ test('"onCancel" removes the "edit grading period set" form', function () {
 test('"onCancel" focuses on the "edit grading period set" button', function () {
   const set = renderComponent();
   return Promise.all([this.sets, this.terms]).then(() => {
-    Simulate.click(set.refs['show-grading-period-set-1'].refs.editButton._button);
+    const { editButton } = set.refs['show-grading-period-set-1'].refs;
+    const button = findRenderedDOMComponentWithTag(editButton, 'button');
+    Simulate.click(button);
     set.refs['edit-grading-period-set-1'].props.onCancel();
-    equal(document.activeElement, set.refs['show-grading-period-set-1'].refs.editButton._button);
+    equal(document.activeElement.title, `Edit ${exampleSets[0].title}`);
   });
 });
 
 test('"onCancel" re-enables all grading period set actions', function () {
   const set = renderComponent();
   return Promise.all([this.sets, this.terms]).then(() => {
-    Simulate.click(set.refs['show-grading-period-set-1'].refs.editButton._button);
+    const { editButton } = set.refs['show-grading-period-set-1'].refs;
+    const button = findRenderedDOMComponentWithTag(editButton, 'button');
+    Simulate.click(button);
     set.refs['edit-grading-period-set-1'].props.onCancel();
-    assertEnabled(set.refs.addSetFormButton);
+    notEqual(button.getAttribute('aria-disabled'), 'true');
     notOk(set.refs['show-grading-period-set-2'].props.actionsDisabled);
   });
 });
@@ -659,12 +667,16 @@ QUnit.module('GradingPeriodSetCollection "Edit Grading Period Set - onSave"', {
     const component = renderComponent();
     component.onTermsLoaded(exampleTerms);
     component.onSetsLoaded(exampleSets);
-    Simulate.click(component.refs['show-grading-period-set-1'].refs.editButton._button);
+    const { editButton } = component.refs['show-grading-period-set-1'].refs;
+    const button = findRenderedDOMComponentWithTag(editButton, 'button');
+    Simulate.click(button);
     return component;
   },
 
   callOnSave (collection) {
-    Simulate.click(collection.refs['edit-grading-period-set-1'].refs.saveButton._button);
+    const { saveButton } = collection.refs['edit-grading-period-set-1'].refs;
+    const button = findRenderedDOMComponentWithTag(saveButton, 'button');
+    Simulate.click(button);
   },
 
   teardown () {
@@ -703,7 +715,9 @@ test('re-enables all grading period set actions', function () {
   const collection = this.renderComponent();
   this.callOnSave(collection);
   return success.then(() => {
-    assertEnabled(collection.refs.addSetFormButton);
+    const component = collection.refs.addSetFormButton;
+    const button = findRenderedDOMComponentWithTag(component, 'button');
+    notEqual(button.getAttribute('aria-disabled'), 'true');
     notOk(collection.refs['show-grading-period-set-1'].props.actionsDisabled);
     notOk(collection.refs['show-grading-period-set-2'].props.actionsDisabled);
   });

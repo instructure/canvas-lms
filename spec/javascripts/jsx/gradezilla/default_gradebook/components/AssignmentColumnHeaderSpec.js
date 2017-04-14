@@ -138,7 +138,7 @@ test('renders the assignment name in a link', function () {
   const link = this.wrapper.find('.assignment-name Link');
 
   equal(link.length, 1);
-  equal(link.text(), 'Assignment #1');
+  equal(link.text().trim(), 'Assignment #1');
   equal(link.props().href, 'http://assignment_htmlUrl');
 });
 
@@ -146,7 +146,7 @@ test('renders the points possible', function () {
   const pointsPossible = this.wrapper.find('.assignment-points-possible');
 
   equal(pointsPossible.length, 1);
-  equal(pointsPossible.text(), 'Out of 13');
+  equal(pointsPossible.text().trim(), 'Out of 13');
 });
 
 test('renders a PopoverMenu', function () {
@@ -206,7 +206,7 @@ test('includes the "Sort by" group', function () {
 test('includes "Grade - Low to High" sort setting', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getMenuItem(0);
-  equal(menuItem.text(), 'Grade - Low to High');
+  equal(menuItem.text().trim(), 'Grade - Low to High');
 });
 
 test('selects "Grade - Low to High" when sorting by grade ascending', function () {
@@ -215,7 +215,7 @@ test('selects "Grade - Low to High" when sorting by grade ascending', function (
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getSelectedMenuItem();
   equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text(), 'Grade - Low to High', '"Grade - Low to High" is selected');
+  equal(menuItem.text().trim(), 'Grade - Low to High', '"Grade - Low to High" is selected');
 });
 
 test('does not select "Grade - Low to High" when isSortColumn is false', function () {
@@ -252,7 +252,7 @@ test('clicking "Grade - Low to High" when disabled does not call onSortByGradeAs
 test('includes "Grade - High to Low" sort setting', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getMenuItem(1);
-  equal(menuItem.text(), 'Grade - High to Low');
+  equal(menuItem.text().trim(), 'Grade - High to Low');
 });
 
 test('selects "Grade - High to Low" when sorting by grade descending', function () {
@@ -261,7 +261,7 @@ test('selects "Grade - High to Low" when sorting by grade descending', function 
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getSelectedMenuItem();
   equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text(), 'Grade - High to Low', '"Grade - High to Low" is selected');
+  equal(menuItem.text().trim(), 'Grade - High to Low', '"Grade - High to Low" is selected');
 });
 
 test('does not select "Grade - High to Low" when isSortColumn is false', function () {
@@ -298,7 +298,7 @@ test('clicking "Grade - High to Low" when disabled does not call onSortByGradeDe
 test('includes "Missing" sort setting', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getMenuItem(2);
-  equal(menuItem.text(), 'Missing');
+  equal(menuItem.text().trim(), 'Missing');
 });
 
 test('selects "Missing" when sorting by missing', function () {
@@ -306,7 +306,7 @@ test('selects "Missing" when sorting by missing', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getSelectedMenuItem();
   equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text(), 'Missing', '"Missing" is selected');
+  equal(menuItem.text().trim(), 'Missing', '"Missing" is selected');
 });
 
 test('does not select "Missing" when isSortColumn is false', function () {
@@ -342,7 +342,7 @@ test('clicking "Missing" when disabled does not call onSortByMissing', function 
 test('includes "Late" sort setting', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getMenuItem(3);
-  equal(menuItem.text(), 'Late');
+  equal(menuItem.text().trim(), 'Late');
 });
 
 test('selects "Late" when sorting by late', function () {
@@ -350,7 +350,7 @@ test('selects "Late" when sorting by late', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getSelectedMenuItem();
   equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text(), 'Late', '"Late" is selected');
+  equal(menuItem.text().trim(), 'Late', '"Late" is selected');
 });
 
 test('does not select "Late" when isSortColumn is false', function () {
@@ -386,7 +386,7 @@ test('clicking "Late" when disabled does not call onSortByLate', function () {
 test('includes "Unposted" sort setting', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getMenuItem(4);
-  equal(menuItem.text(), 'Unposted');
+  equal(menuItem.text().trim(), 'Unposted');
 });
 
 test('selects "Unposted" when sorting by unposted', function () {
@@ -394,7 +394,7 @@ test('selects "Unposted" when sorting by unposted', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getSelectedMenuItem();
   equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text(), 'Unposted', '"Unposted" is selected');
+  equal(menuItem.text().trim(), 'Unposted', '"Unposted" is selected');
 });
 
 test('does not select "Unposted" when isSortColumn is false', function () {
@@ -632,7 +632,7 @@ test('renders 0 points possible when the assignment has no possible points', fun
   const pointsPossible = this.wrapper.find('.assignment-points-possible');
 
   equal(pointsPossible.length, 1);
-  equal(pointsPossible.text(), 'Out of 0');
+  equal(pointsPossible.text().trim(), 'Out of 0');
 });
 
 test('renders a muted icon when the assignment is muted', function () {

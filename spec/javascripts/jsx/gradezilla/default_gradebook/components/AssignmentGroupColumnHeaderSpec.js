@@ -61,12 +61,12 @@ QUnit.module('AssignmentGroupColumnHeader - base behavior', {
 
 test('renders the assignment group name', function () {
   const assignmentGroupName = this.wrapper.find('.Gradebook__ColumnHeaderDetail').childAt(0);
-  equal(assignmentGroupName.text(), 'Assignment Group 1');
+  equal(assignmentGroupName.text().trim(), 'Assignment Group 1');
 });
 
 test('renders the assignment groupWeight percentage', function () {
   const groupWeight = this.wrapper.find('.Gradebook__ColumnHeaderDetail').childAt(1);
-  equal(groupWeight.text(), '42.50% of grade');
+  equal(groupWeight.text().trim(), '42.50% of grade');
 });
 
 QUnit.module('AssignmentGroupColumnHeader - non-standard assignment group', {
@@ -81,7 +81,7 @@ test('renders 0% as the groupWeight percentage when weightedGroups is true but g
   const wrapper = mountComponent(this.props);
 
   const groupWeight = wrapper.find('.Gradebook__ColumnHeaderDetail').childAt(1);
-  equal(groupWeight.text(), '0.00% of grade');
+  equal(groupWeight.text().trim(), '0.00% of grade');
 });
 
 test('does not render the groupWeight percentage when weightedGroups is false', function () {
@@ -91,7 +91,7 @@ test('does not render the groupWeight percentage when weightedGroups is false', 
 
   const headerDetails = wrapper.find('.Gradebook__ColumnHeaderDetail').children();
   equal(headerDetails.length, 1, 'only the assignment group name is visible');
-  equal(headerDetails.text(), 'Assignment Group 1');
+  equal(headerDetails.text().trim(), 'Assignment Group 1');
 });
 
 QUnit.module('AssignmentColumnHeader - Sort by Settings', {
@@ -125,7 +125,7 @@ test('includes the "Sort by" group', function () {
 test('includes "Grade - Low to High" sort setting', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getMenuItem(0);
-  equal(menuItem.text(), 'Grade - Low to High');
+  equal(menuItem.text().trim(), 'Grade - Low to High');
 });
 
 test('selects "Grade - Low to High" when sorting by grade ascending', function () {
@@ -134,7 +134,7 @@ test('selects "Grade - Low to High" when sorting by grade ascending', function (
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getSelectedMenuItem();
   equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text(), 'Grade - Low to High', '"Grade - Low to High" is selected');
+  equal(menuItem.text().trim(), 'Grade - Low to High', '"Grade - Low to High" is selected');
 });
 
 test('does not select "Grade - Low to High" when isSortColumn is false', function () {
@@ -171,7 +171,7 @@ test('clicking "Grade - Low to High" when disabled does not call onSortByGradeAs
 test('includes "Grade - High to Low" sort setting', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getMenuItem(1);
-  equal(menuItem.text(), 'Grade - High to Low');
+  equal(menuItem.text().trim(), 'Grade - High to Low');
 });
 
 test('selects "Grade - High to Low" when sorting by grade descending', function () {
@@ -180,7 +180,7 @@ test('selects "Grade - High to Low" when sorting by grade descending', function 
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getSelectedMenuItem();
   equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text(), 'Grade - High to Low', '"Grade - High to Low" is selected');
+  equal(menuItem.text().trim(), 'Grade - High to Low', '"Grade - High to Low" is selected');
 });
 
 test('does not select "Grade - High to Low" when isSortColumn is false', function () {

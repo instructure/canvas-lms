@@ -192,14 +192,14 @@ test('includes the "Sort by" group', function () {
 test('includes "A–Z" sort setting', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getMenuItem(0);
-  equal(menuItem.text(), 'A–Z');
+  equal(menuItem.text().trim(), 'A–Z');
 });
 
 test('selects "A–Z" when sorting by sortable name ascending', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getSelectedMenuItem();
   equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text(), 'A–Z', '"A–Z" is selected');
+  equal(menuItem.text().trim(), 'A–Z', '"A–Z" is selected');
 });
 
 test('does not select "A–Z" when isSortColumn is false', function () {
@@ -234,7 +234,7 @@ test('clicking "A–Z" when disabled does not call onSortBySortableNameAscending
 test('includes "Z–A" sort setting', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getMenuItem(1);
-  equal(menuItem.text(), 'Z–A');
+  equal(menuItem.text().trim(), 'Z–A');
 });
 
 test('selects "Z–A" when sorting by sortable name descending', function () {
@@ -242,7 +242,7 @@ test('selects "Z–A" when sorting by sortable name descending', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getSelectedMenuItem();
   equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text(), 'Z–A', '"Z–A" is selected');
+  equal(menuItem.text().trim(), 'Z–A', '"Z–A" is selected');
 });
 
 test('does not select "Z–A" when isSortColumn is false', function () {

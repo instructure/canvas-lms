@@ -84,7 +84,7 @@ test('it should not call toggleDashboardView when correct view is already set', 
 
   const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
   const recentActivity = menuItems.filter(function (menuItem) {
-    return menuItem.textContent === 'Recent Activity'
+    return menuItem.textContent.trim() === 'Recent Activity'
   })[0]
   recentActivity.click()
 
@@ -143,5 +143,5 @@ test('it should include a planner menu item when Student Planner is enabled', fu
   )
   wrapper.find('button').simulate('click')
   const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
-  ok(menuItems.some(menuItem => menuItem.textContent === 'Planner'))
+  ok(menuItems.some(menuItem => menuItem.textContent.trim() === 'Planner'))
 });

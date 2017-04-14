@@ -66,7 +66,7 @@ QUnit.module('TotalGradeColumnHeader - base behavior', {
 test('renders the label Total', function () {
   const label = this.wrapper.find('.Gradebook__ColumnHeaderDetail');
 
-  equal(label.text(), 'Total');
+  equal(label.text().trim(), 'Total');
 });
 
 test('renders a PopoverMenu', function () {
@@ -118,7 +118,7 @@ test('includes the "Sort by" group', function () {
 test('includes "Grade - Low to High" sort setting', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getMenuItem(0);
-  equal(menuItem.text(), 'Grade - Low to High');
+  equal(menuItem.text().trim(), 'Grade - Low to High');
 });
 
 test('selects "Grade - Low to High" when sorting by grade ascending', function () {
@@ -127,7 +127,7 @@ test('selects "Grade - Low to High" when sorting by grade ascending', function (
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getSelectedMenuItem();
   equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text(), 'Grade - Low to High', '"Grade - Low to High" is selected');
+  equal(menuItem.text().trim(), 'Grade - Low to High', '"Grade - Low to High" is selected');
 });
 
 test('does not select "Grade - Low to High" when isSortColumn is false', function () {
@@ -164,7 +164,8 @@ test('clicking "Grade - Low to High" when disabled does not call onSortByGradeAs
 test('includes "Grade - High to Low" sort setting', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getMenuItem(1);
-  equal(menuItem.text(), 'Grade - High to Low');
+
+  equal(menuItem.text().trim(), 'Grade - High to Low');
 });
 
 test('selects "Grade - High to Low" when sorting by grade descending', function () {
@@ -173,7 +174,8 @@ test('selects "Grade - High to Low" when sorting by grade descending', function 
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getSelectedMenuItem();
   equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text(), 'Grade - High to Low', '"Grade - High to Low" is selected');
+
+  equal(menuItem.text().trim(), 'Grade - High to Low', '"Grade - High to Low" is selected');
 });
 
 test('does not select "Grade - High to Low" when isSortColumn is false', function () {

@@ -6,7 +6,7 @@ import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderConte
 import Table from 'instructure-ui/lib/components/Table'
 import Button from 'instructure-ui/lib/components/Button'
 import Spinner from 'instructure-ui/lib/components/Spinner'
-import RemoveIcon from 'instructure-icons/react/Solid/IconXSolid'
+import RemoveIcon from 'instructure-icons/lib/Solid/IconXSolid'
 import 'compiled/jquery.rails_flash_notifications'
 
 import propTypes from '../propTypes'

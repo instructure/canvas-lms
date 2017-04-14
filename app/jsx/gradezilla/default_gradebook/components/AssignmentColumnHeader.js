@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import IconMoreSolid from 'instructure-icons/react/Solid/IconMoreSolid'
-import IconMutedSolid from 'instructure-icons/react/Solid/IconMutedSolid'
-import IconWarningSolid from 'instructure-icons/react/Solid/IconWarningSolid'
+import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
+import IconMutedSolid from 'instructure-icons/lib/Solid/IconMutedSolid'
+import IconWarningSolid from 'instructure-icons/lib/Solid/IconWarningSolid'
 import Link from 'instructure-ui/lib/components/Link'
 import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'

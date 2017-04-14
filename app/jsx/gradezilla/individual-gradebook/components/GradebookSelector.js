@@ -18,7 +18,6 @@
 
 import { head, tail } from 'underscore'
 import React from 'react'
-import IconMiniArrowDownSolid from 'instructure-icons/react/Solid/IconMiniArrowDownSolid'
 import Select from 'instructure-ui/lib/components/Select'
 import Typography from 'instructure-ui/lib/components/Typography'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'

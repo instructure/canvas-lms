@@ -5,8 +5,8 @@ import Tray from 'instructure-ui/lib/components/Tray'
 import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Heading from 'instructure-ui/lib/components/Heading'
-import IconCopyLine from 'instructure-icons/react/Line/IconCopyLine'
-import IconXSolid from 'instructure-icons/react/Solid/IconXSolid'
+import IconCopyLine from 'instructure-icons/lib/Line/IconCopyLine'
+import IconXSolid from 'instructure-icons/lib/Solid/IconXSolid'
 
 export default class BlueprintCourseSidebar extends Component {
   static propTypes = {

@@ -17,7 +17,7 @@
 //
 
 import React from 'react'
-import IconMiniArrowDownSolid from 'instructure-icons/react/Solid/IconMiniArrowDownSolid'
+import IconMiniArrowDownSolid from 'instructure-icons/lib/Solid/IconMiniArrowDownSolid'
 import Button from 'instructure-ui/lib/components/Button'
 import { MenuItem, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'

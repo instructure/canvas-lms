@@ -3,8 +3,8 @@ import React, { PropTypes, Component } from 'react'
 import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import IconLockSolid from 'instructure-icons/react/Solid/IconLockSolid'
-import IconUnlockSolid from 'instructure-icons/react/Solid/IconUnlockSolid'
+import IconLockSolid from 'instructure-icons/lib/Solid/IconLockSolid'
+import IconUnlockSolid from 'instructure-icons/lib/Solid/IconUnlockSolid'
 
 export default class LockToggle extends Component {
   static propTypes = {

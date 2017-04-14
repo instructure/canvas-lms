@@ -3,8 +3,8 @@ define([
   'react',
   'enzyme',
   'jsx/new_user_tutorial/NewUserTutorialToggleButton',
-  'instructure-icons/react/Line/IconMoveLeftLine',
-  'instructure-icons/react/Line/IconMoveRightLine',
+  'instructure-icons/lib/Line/IconMoveLeftLine',
+  'instructure-icons/lib/Line/IconMoveRightLine',
   'jsx/new_user_tutorial/utils/createTutorialStore'
 ], (React, { shallow }, NewUserTutorialToggleButton, { default: IconMoveLeftLine }, { default: IconMoveRightLine }, createTutorialStore) => {
   QUnit.module('NewUserTutorialToggleButton Spec');
