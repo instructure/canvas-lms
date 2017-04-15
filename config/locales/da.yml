@@ -92,7 +92,7 @@ da:
   access_report_80d28095: Adgangsrapport
   access_token_3be22221: Adgangs-token
   access_token_is_valid_until_d2f048cf: "Adgangs-token er gyldigt indtil"
-  access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Adgangs-tokens kan bruges til at give andre programmer tilladelse til at foretage API-opkald på dine vegne. Du kan også generere adgangs-tokens og *bruge Canvas Open API* til at finde på dine egne integrationer."
+  access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Adgangstokens kan bruges til at give andre programmer tilladelse til at foretage API-opkald på dine vegne. Du kan også generere adgangstokens og *bruge Canvas Open API* til at finde på dine egne integrationer."
   accordion_section_1_7888782d: "Harmonika sektion 1"
   accordion_section_2_e1812997: "Harmonika sektion 2"
   accordion_section_3_96861901: "Harmonika sektion 3"
@@ -117,7 +117,7 @@ da:
     tab_faculty_journal: Fakultetsjournal
     tab_grading_standards: Karakter
     tab_jobs: Jobs
-    tab_outcomes: Resultater
+    tab_outcomes: Læringsmål
     tab_permissions: Tilladelser
     tab_plugins: Plugins
     tab_question_banks: Spørgsmålsbanker
@@ -781,7 +781,7 @@ da:
           order: 
             label: Rækkefølge
           outcome: 
-            radio: Resultater
+            radio: Læringsmål
           user: 
             radio: Brugere
     ph_student_grades_csv_parameters: 
@@ -2535,7 +2535,7 @@ da:
   auth_logging: 
     corrupted: "Detaljer ikke tilgængelige"
     login: LOGIN
-    logout: LOGOUT
+    logout: "LOG UD"
   authentication_with_provider_was_successful_but_no_6a194137: "Godkendelse med %{provider} var vellykket, men der blev ikke oplyst noget unikt id til at logge ind på Canvas med."
   author_s_name_b35e905a: "Forfatterens navn"
   authorize_e3f25bb4: Bemyndig
@@ -2718,7 +2718,7 @@ da:
     apply: Tildel
     authorize_google_docs: "Autoriser Google Docs adgang"
     authorize_google_drive: "Bemyndig Google Drive-adgang"
-    back_to_outcomes: "Tilbage til resultater"
+    back_to_outcomes: "Tilbage til læringsmål"
     cancel: Annuller
     choose_a_file: "Vælg en fil"
     delete: Slet
@@ -2741,7 +2741,7 @@ da:
     send_message: "Send besked"
     sending: "Sender ..."
     sent: Sendt!
-    show_all_artifacts: "Vis alle artefakter"
+    show_all_artifacts: "Vis alle genstande"
     submit: Indsend
     unmasquerade: "Stop maskering"
     unpublish: "Annuller offentliggørelse"
@@ -3446,7 +3446,7 @@ da:
     titles: 
       delete: "Slette samarbejde?"
   collaborations_5c56c15f: Samarbejde
-  collaborations_are_web_based_tools_to_work_collabo_6e9f7b3f: "Samarbejde er web-baserede værktøjer for  "
+  collaborations_are_web_based_tools_to_work_collabo_6e9f7b3f: "Samarbejde er web-baserede værktøjer for at arbejde kollektivt på ogaver som f.eks. at tage notater eller gruppere dokumenter."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Samarbejder er web-baserede værktøjer for at arbejde kollektivt på ogaver som f.eks. at tage notater eller gruppere dokumenter. Start ved at tilføje en samarbejds-app."
   collaborations_tutorial_tray_9219d9d: "Selvstudiumområde for samarbejder"
   collapse_group_c2af7cad: "Skjul gruppe"
@@ -4848,7 +4848,7 @@ da:
       details: 
         conclude_alt_text: "Hvis du gerne vil bevare muligheden for at ændre karakterer og samtidig begrænse de studerendes adgang til faget, skal du bruge indstillingerne til fagets datoer. Du kan læse om indstillinger til fagets datoer i vores vejledninger *her*."
         confirm_conclude: "Advarsel: Afslutning af faget arkiverer alt fagindhold og forhindrer dig i at ændre karakterer."
-        confirm_delete: "Er du sikker på, at du vil slette dette fag? Når det er slettet, har de studerende og lærerne ikke længere adgang til det. Hvis du blot vil fjerne det fra dropdpwn-menuen med fag, skal du i stedet *afslutte faget*."
+        confirm_delete: "Er du sikker på, at du vil slette dette fag? Når det er slettet, har de studerende og lærerne ikke længere adgang til det. Hvis du blot vil fjerne det fra dropdown-menuen med fag, skal du i stedet *afslutte faget*."
         confirm_delete_addendum: "Hvis du ikke har tilladelse til at afslutte faget, kan du *ændre fagets slutdato* eller bede din administrator om at afslutte faget."
       headings: 
         confirm_conclude: "Bekræft fagets afslutning"
@@ -5411,7 +5411,7 @@ da:
     media: Medier
     messages: Beskeder
     modules: Moduler
-    outcomes: Resultater
+    outcomes: Læringsmål
     people: Folk
     plugins: Plugins
     prior_users: "Forrige brugere"
@@ -6787,13 +6787,13 @@ da:
         body3: "Indholdet er inddelt i undersektioner, som hver har en prikket kant. Du kan slette eller redigere en undersektions kommentarer ved at klikke på ikonerne %{edit_icon} eller %{delete_icon} i undersektionens øverste hjørne til højre."
         body4: "Opret nye undersektioner ved at klikke på den ønskede type indhold i listen til højre (%{showme})."
       pages: 
-        body1: "Sektioner består af flere sider. Du kan se listen over sider i den aktuelle sektion på højre side af vinduet (%{showme1}). Klik på \"%{manage_pages}\" linket (%{showme2}) for at organisere eller oprette sider."
+        body1: "Sektioner består af flere sider. Du kan se listen over sider i den aktuelle sektion på højre side af vinduet (%{showme1}). Klik på \"%{manage_pages}\" linket (%{showme2}) for at organisere eller oprette sektioner."
         body2: "Du kan omdøbe enhver side ved at klikke på det viste ikon %{edit_icon}, slette en side ved at klikke på ikonet %{delete_icon}, eller omorganisere siderækkefølgen ved at klikke på og trække dem."
       sections: 
         body1: "Sektioner angives langs vinduets venstre side (%{showme1}). Hver sektion kan indeholde flere sider internt. Klik på \"%{manage_sections}\" linket (%{showme2}) for at organisere eller opret sektioner."
         body2: "Du kan omdøbe enhver sektion ved at klikke på det viste ikon %{edit_icon}, omorganisere sektioner ved at klikke på og trække dem, eller slette en sektion ved at klikke på ikonet %{delete_icon}."
       settings: 
-        body: "Klik på \"ePortfolio indstillnger\" linket (%{showme} for at ændre din ePortfolios indstillinger. Du kan omdøbe ePortfolio og også ændre, om den er offentlig eller privat. Private ePortfolier kan kun ses af personer med din tilladelse."
+        body: "Klik på \"Indstillinger ePortfolio\" linket (%{showme}) for at ændre din ePortfolios indstillinger. Du kan omdøbe ePortfolio og også ændre, om den er offentlig eller privat. Private ePortfolier kan kun ses af personer med din tilladelse."
       submissions: 
         body1: "Du har muligvis lagt mærke til, at der vises en liste over nylige afleveringer fra dine klasser (%{showme}). Du kan hurtigt føje afleveringer til nye sider i din ePortfolio fra denne side. Du skal blot klikke på den aflevering, som du vil tilføje. Klik så på den aflevering, som du vil tilføje fra boksen."
         body2: "Fantastisk! For at afslutte tilføjelsen af afleveringen, skal du nu vælge sektionen, som du vil føje den til, og give siden et navn. Når du har klikket på \"Tilføj side\", bringes du til en ny side, så du kan redigere den yderligere, hvis du har lyst."
@@ -7254,11 +7254,11 @@ da:
   find_ip_address_filter_96ec70bb: "Find filter til IP-adresse"
   find_outcome: 
     errors: 
-      outcome_retrieval_failed: "Hentning af resultater mislykkedes. Prøv igen."
+      outcome_retrieval_failed: "Hentning af læringsmål mislykkedes. Prøv igen."
     messages: 
-      loading_outcomes: "Indlæser resultater ..."
-      no_outcomes_found: "Der er ikke fundet resultater"
-      no_rubric_outcomes_found: "Der er ikke fundet rubrik-konfigurerede resultater"
+      loading_outcomes: "Indlæser læringsmål ..."
+      no_outcomes_found: "Der er ikke fundet læringsmål"
+      no_rubric_outcomes_found: "Der er ikke fundet rubrik-konfigurerede læringsmål"
     titles: 
       find_outcome: "Find resultat"
   find_questions_4930b38f: "Find spørgsmål"
@@ -8754,10 +8754,10 @@ da:
     due_dates_warning: "Kunne ikke justere afleveringsdatoer."
     file_import_warning: "Filen %{file} kunne ikke findes"
   importers/learning_outcome_group_importer: 
-    no_global_permission: "Du har ikke tilladelse til at styre globale resultater, kan ikke tilføje \"%{title}\""
+    no_global_permission: "Du har ikke tilladelse til at styre globale læringsmål, kan ikke tilføje \"%{title}\""
   importers/learning_outcome_importer: 
     no_context_found: "Det eksterne læringsudbytte kunne ikke findes for \"%{title}\", opretter kopi."
-    no_global_permission: "Du har ikke tilladelse til at styre globale resultater, kan ikke tilføje \"%{title}\""
+    no_global_permission: "Du har ikke tilladelse til at styre globale læringsmål, kan ikke tilføje \"%{title}\""
   importers/rubric_importer: 
     no_context_found: "Den eksterne Rubric kunne ikke findes for \"%{title}\", opretter kopi."
   importers/wiki_page_importer: 
@@ -9069,7 +9069,7 @@ da:
   learning_mastery_6ed4fd63: "Læringsbeherskelse ..."
   learning_mastery_gradebook_description: |-
       Med læringsbeherskelse-karakterbogen kan lærerne hurtigt se de studerendes fremgang
-      i forhold til læringsudbyttet. Resultater vises som i karakterbog-format
+      i forhold til læringsudbyttet. Læringsudbytte vises som i karakterbog-format
       og den studerendes fremgang vises både som et numerisk resultat og behersket/næsten behersket/udbedrende
   learning_outcome: 
     no_comment: "Ingen kommentar"
@@ -9371,7 +9371,7 @@ da:
   login_screen_83518c07: Login-skærm
   login_with_auth_type_a0aaa52a: "Login med *%{auth_type}*"
   login_with_provider_3fd3998e: "Login med %{provider}"
-  logout_a9312e35: Logout
+  logout_a9312e35: "Log ud"
   looks_great_e4d883ed: "Det ser godt ud!"
   low_eab1cadd: Lav
   low_score_4eeb95b2: "Lav: %{score}"
@@ -11812,9 +11812,9 @@ da:
     grading_description: |-
         Inkluderer:
         
-        * Opgver / indtastet/ændret indsendelseskarakter
+        * Opgaver / indtastet/ændret indsendelseskarakter
         * Karakterer for opgave med besked til de studerende
-        * Ændrede karaktervægt
+        * Ændret karaktervægt
     grading_display: Karakter
     grading_notify_include_grade: "Inkluder scorer når der alarmeres om karakterændringer."
     grading_policies_description: "Ændring i fagets karakterbestemmelse"
@@ -11915,7 +11915,7 @@ da:
     other_description: |-
         *Kun instruktør og administrator:*
         
-        * TYilmelding til fag
+        * Tilmelding til fag
         * Rapport genereret
         * Eksport af indhold
         * Migrationsrapport
@@ -12149,7 +12149,7 @@ da:
   outcome_path_mastery_points: "%{path} beherskelsespoint"
   outcome_path_result: "%{path} resultat"
   outcome_results: 
-    outcomes_filename: Resultater
+    outcomes_filename: Læringsmål
   outcome_results_title: Læringsmålsresultater
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Resultat: %{title} har en status for %{statusTooltip}"
   outcomes: 
@@ -12188,8 +12188,8 @@ da:
     find_instructions: 
       instructions: 
         find: 
-          description: "*Her kan du få adgang til resultater, oprettet af din institution eller region. Præcis som i dit fag giver panelet til venstre dig mulighed for at navigere mellem eksisterende resultater. Når du har fundet resultatet eller resultatgruppen, som du vil bruge, klikker du på importknappen nedenfor for at føje det eller den til dit fag.*"
-          title: "Sådan finder du resultater"
+          description: "*Her kan du få adgang til læringsmål, oprettet af din institution eller region. Præcis som i dit fag giver panelet til venstre dig mulighed for at navigere mellem eksisterende resultater. Når du har fundet resultatet eller resultatgruppen, som du vil bruge, klikker du på importknappen nedenfor for at føje det eller den til dit fag.*"
+          title: "Sådan finder du læringsmål"
     flash: 
       addSuccess: "Vellykket oprettelse"
       deleteError: "Noget gik galt. Kan ikke slette på nuværende tidspunkt."
@@ -12204,8 +12204,8 @@ da:
       instructions: 
         main: 
           manage: 
-            description: "*Resultater oprettes her for at følge beherskelse i et fag. For at komme igang skal du klikke på knappen Ny for at oprette et nyt resultat eller knappen Ny gruppe for at oprette en ny gruppe til at organisere dine resultater i. Knappen Find giver dig mulighed for at bruge resultater, der allerede er blevet oprettet af din region eller institution. Når du opretter og bruger resultater, kan du bruge panelet til venstre til at navigere gennem dine resultater. Du kan trække og slippe resultater mellem forskellige niveauer for at skabe struktur.* *Desuden giver Canvas dig mulighed for at føje resultater til dine vurderings-rubrikker, så du kan vurdere beherskelse, mens du bedømmer opgaver. Når du har konfigureret resultater, klikker du på Styring af rubrikker for at begynde at bruge dine resultater til bedømmelse.*"
-            title: "Konfiguration af resultater"
+            description: "*Læringsudbytte oprettes her for at følge beherskelse i et fag. For at komme igang skal du klikke på knappen Resultat for at oprette et nyt resultat eller knappen Gruppe for at oprette en ny gruppe til at organisere dine resultater i. Knappen Find giver dig mulighed for at bruge resultater, der allerede er blevet oprettet af din region eller institution. Når du opretter og bruger resultater, kan du bruge panelet til venstre til at navigere gennem dine resultater. Du kan trække og slippe resultater mellem forskellige niveauer for at skabe struktur.* *Desuden giver Canvas dig mulighed for at føje resultater til dine vurderings-rubrikker, så du kan vurdere beherskelse, mens du bedømmer opgaver. Når du har konfigureret resultater, klikker du på Styring af rubrikker for at begynde at bruge dine resultater til bedømmelse.*"
+            title: "Konfiguration af læringsmål"
     mastery_error: "Skal være større end eller lig med 0"
     missing_outcome: "Kunne ikke finde det pågældende læringsudbytte"
     new_outcome_group: "Ny læringsmålsgruppe"
@@ -12257,7 +12257,7 @@ da:
     successful_outcome_removal: "Resultat blev fjernet"
     successful_outcome_update: "Resultat blev opdateret!"
     titles: 
-      find_outcomes: "Find resultater"
+      find_outcomes: "Find læringsmål"
     top_level: "%{context} højeste niveau"
     user_outcome_results: 
       artifacts: 
@@ -12271,14 +12271,14 @@ da:
         see_results: "Se %{user_name}s resultater for"
       mastery: "Beherskelse ved seneste forsøg"
       no_mastery: "Ingen beherskelse ved seneste forsøg"
-      outcomes_for: "Resultater for %{user_name}"
+      outcomes_for: "Læringsmål for %{user_name}"
       score_out_of_possible: "%{score}* ud af %{possible}*"
       short_title: 
         attempts: Forsøg
         average_percent: "Gennemsnit i procent"
         latest_score: "Seneste resultat"
         outcome: Resultat
-  outcomes_report_8887bd49: Resultat-rapport
+  outcomes_report_8887bd49: Læringsmål-rapport
   overrides: 
     blank_override: "Du skal have valgt studerende eller sektion"
     everyone: Alle
@@ -13364,7 +13364,7 @@ da:
   question_9121487: Spørgsmål
   question_answered: Besvaret
   question_bank: 
-    align_outcomes: "Tilpas resultater"
+    align_outcomes: "Tilpas læringsmål"
     already_bookmarked: "Allerede i bogmærker"
     bookmark_failed: "Bogmærket mislykkedes"
     bookmarking: "Forsyner med bogmærke ..."
@@ -13397,8 +13397,8 @@ da:
     remove_outcome_from_bank: "Er du sikker på, at du vil slette dette resultat fra banken?"
     title: 
       move_copy_questions: "Flyt/Kopiér spørgsmål"
-    update_outcomes_fail: "Opdatering af resultater mislykkedes"
-    updating_outcomes: "Opdaterer resultater ..."
+    update_outcomes_fail: "Opdatering af læringsmål mislykkedes"
+    updating_outcomes: "Opdaterer læringsmål ..."
   question_banks: 
     bank_fail: "Spørgsmålsbank blev ikke oprettet."
     bank_success: "Spørgsmålsbank blev oprettet!"
@@ -13442,7 +13442,7 @@ da:
         move_questions: "Flyt flere spørgsmål"
       edit_warning: "Husk på, at ændringer til spørgsmålsskabeloner ikke automatisk opdaterer quizzer, som allerede bruger de pågældende spørgsmål."
       headings: 
-        aligned_outcomes: "Tilpassede resultater"
+        aligned_outcomes: "Tilpassede læringsmål"
       labels: 
         keep_copy: "Behold også en kopi i denne spørgsmålsbank"
         new_bank_name: "Nyt banknavn"
@@ -16139,7 +16139,7 @@ da:
       titles: 
         log_in: "Log på"
         unauthorized_action: Uautoriseret
-      unauthorized_1: "Det lader til, at du ikke har tilladt til at gå ind på denne side. Sørg for, at du har tilladelse til at vise dette indhold."
+      unauthorized_1: "Det lader til, at du ikke har tilladelse til at gå ind på denne side. Sørg for, at du har tilladelse til at vise dette indhold."
       unauthorized_2: "Hvis du mener, at du burde have lov til se denne side, skal du bruge linket \"Hjælp\" for at informere support om problemet."
       unauthorized_user_is_other: "%{current_user}, du er ikke autoriseret til at se denne side. Linket du fulgte for at nå hertil, var for **%{unauthorized_user} (%{unauthorized_user_email})**. Hvis det er dig, skal du eventuelt logge ud og logge på igen med den pågældende e-mailadresse for at opnå adgang til denne side."
     unauthorized_feed: 
@@ -16270,7 +16270,7 @@ da:
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "skal være selvindlysende, den rapporterende brugers canvas-id"
   show_account_navigation_menu_d97270a9: "Vis kontonavigationsmenu"
   show_admin_navigation_menu_92fb579f: "Vis admin-navigationsmenu"
-  show_all_artifacts_34b91a83: "Vis alle artefakter"
+  show_all_artifacts_34b91a83: "Vis alle genstande"
   show_all_details_9879980c: "Vis alle detaljer"
   show_and_hide_courses_menu_9e09d1d0: "Vis og skjul fagets menu"
   show_attendance_columns_4d160e16: "Vis deltagelseskolonner"
@@ -16379,7 +16379,7 @@ da:
     institution_suspended: 
       body: "Din skoles Canvas-konto er midlertidigt afbrudt. Kontakt din Canvas-administrator."
       links: 
-        logout: Logout
+        logout: "Log ud"
         stop_masquerading: "[Stop maskering]"
       page_title: "Institution suspenderet"
     links: 
@@ -16850,7 +16850,7 @@ da:
     logout: Logout
     modules: Moduler
     observees: Observerer
-    outcomes: Resultater
+    outcomes: Læringsmål
     pages: Sider
     people: Folk
     profile: Profil
@@ -17625,7 +17625,7 @@ da:
   user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: "Bruger-id eller SIS-ID(SIS-ID skal indsættes som præfiks med sis_user_id:)"
   user_id_user_id_69a9e865: "Bruger-id: %{user_id}"
   user_is_now_group_leader_60ec9b98: "%{user} er nu gruppeleder"
-  user_isn_t_allowed_to_edit_global_outcomes_a7eb4a87: "Brugeren har ikke tilladelse til at redigere globale resultater"
+  user_isn_t_allowed_to_edit_global_outcomes_a7eb4a87: "Brugeren har ikke tilladelse til at redigere globale læringsmål"
   user_just_accepted_their_invitation_to_participate_7a4b2ce4: "%{user} har lige accepteret invitationen til at deltage i faget, %{course}. Fag-rolle: %{role_type}"
   user_just_updated_title_88074ab2: "%{user} har lige opdateret %{title}"
   user_list_66428346: Brugerliste
@@ -18378,8 +18378,8 @@ da:
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har foretaget ændringer til spørgsmålene i denne quiz.* Disse ændringer vises ikke for de studerende, før du gemmer quizzen."
   you_have_no_collaboration_apps_configured_talk_to__6733123a: "Du har ikke konfigureret nogen samarbejds-apps. Spørg din lærer om at sætte dem op. "
   you_have_no_ltis_configured_to_create_collaboratio_5cad28dd: "Du har ingen LTI'er konfigureret til at oprette samarbejder. Tal til din lærer om opsætning af dem."
-  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har ingen resultater. *Klik her* for at oprette et."
-  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har ikke nogen resultater. Klik her for at gå til læringsmålssiden."
+  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har ingen læringsmål. *Klik her* for at oprette et."
+  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har ikke nogen læringsmål. Klik her for at gå til læringsmålssiden."
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Du har nået maks. antal webhooks pr. kontogrænse (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Du har nået maks. antal webhooks pr. brugergrænse (%{max})"
   you_have_submitted_the_assignment_7ef8a51a: "Du har indsendt opgaven"
