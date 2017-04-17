@@ -295,6 +295,26 @@ test('uses default label when loginHandleName prop is falsy', function () {
   ok(menuItem.textContent.includes(StudentRowHeaderConstants.secondaryInfoLabels.login_id));
 });
 
+test('uses prop sisName for "sis_id" menu item label', function () {
+  this.props.sisName = 'custom sis name';
+
+  this.wrapper = mountAndOpenOptions(this.props);
+
+  const menuItem = document.querySelector('[data-menu-item-id="sis_id"]');
+
+  ok(menuItem.textContent.includes(this.props.sisName));
+});
+
+test('uses default label when sisName prop is falsy', function () {
+  this.props.sisName = '';
+
+  this.wrapper = mountAndOpenOptions(this.props);
+
+  const menuItem = document.querySelector('[data-menu-item-id="sis_id"]');
+
+  ok(menuItem.textContent.includes(StudentRowHeaderConstants.secondaryInfoLabels.sis_id));
+});
+
 QUnit.module('StudentColumnHeader - primaryInfoMenuGroup', {
   setup () {
     this.props = {

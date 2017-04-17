@@ -2074,22 +2074,13 @@ test('renders the StudentColumnHeader to the "student" column header node', func
   ok(this.$mountPoint.innerText.includes('Student Name'), 'the "Student Name" header is rendered');
 });
 
-QUnit.module('Gradebook#getStudentColumnHeaderProps', {
-  setup () {
-    fakeENV.setup({
-      GRADEBOOK_OPTIONS: {
-        login_handle_name: 'foo'
-      }
-    });
-  },
-
-  teardown () {
-    fakeENV.teardown();
-  }
-});
+QUnit.module('Gradebook#getStudentColumnHeaderProps');
 
 test('includes properties from gradebook', function () {
-  const gradebook = createGradebook();
+  const gradebook = createGradebook({
+    login_handle_name: 'foo',
+    sis_name: 'bar'
+  });
   const props = gradebook.getStudentColumnHeaderProps();
   ok(props.selectedSecondaryInfo, 'selectedSecondaryInfo is present');
   ok(props.selectedPrimaryInfo, 'selectedPrimaryInfo is present');
@@ -2097,6 +2088,7 @@ test('includes properties from gradebook', function () {
   equal(typeof props.onSelectSecondaryInfo, 'function');
   equal(typeof props.onSelectPrimaryInfo, 'function');
   equal(props.loginHandleName, 'foo');
+  equal(props.sisName, 'bar');
 });
 
 test('includes props for the "Sort by" settings', function () {

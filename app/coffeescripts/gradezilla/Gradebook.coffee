@@ -1773,7 +1773,8 @@ define [
     getStudentColumnHeaderProps: ->
       selectedPrimaryInfo: @getSelectedPrimaryInfo()
       onSelectPrimaryInfo: @setSelectedPrimaryInfo
-      loginHandleName: ENV.GRADEBOOK_OPTIONS.login_handle_name
+      loginHandleName: @options.login_handle_name
+      sisName: @options.sis_name
       selectedSecondaryInfo: @getSelectedSecondaryInfo()
       onSelectSecondaryInfo: @setSelectedSecondaryInfo
       sectionsEnabled: @sections_enabled
