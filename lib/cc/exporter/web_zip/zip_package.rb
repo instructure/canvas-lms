@@ -193,6 +193,8 @@ module CC::Exporter::WebZip
         item_hash[:attempts] = item_content.allowed_attempts
         item_hash[:graded] = item_content.quiz_type != 'survey'
       when DiscussionTopic
+        item_hash[:lockAt] = force_timezone(item_content.lock_at)
+        item_hash[:unlockAt] = force_timezone(item_content.unlock_at)
         item_content = item_content.assignment
         item_hash[:assignmentExportId] = CC::CCHelper.create_key(item_content) if item_content.present?
         item_hash[:graded] = item_content.present?

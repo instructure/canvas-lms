@@ -303,6 +303,18 @@ describe "ZipPackage" do
       expect(module_item_data[:lockAt]).to eq lock.iso8601
     end
 
+    it "should parse lock dates for ungraded discussions" do
+      unlock = 1.day.ago
+      lock = 2.days.from_now
+      dt = @course.discussion_topics.create!(title: 'DT', lock_at: lock, unlock_at: unlock)
+      @module.content_tags.create!(content: dt, context: @course)
+
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module).first
+      expect(module_item_data[:unlockAt]).to eq unlock.iso8601
+      expect(module_item_data[:lockAt]).to eq lock.iso8601
+    end
+
     it "should parse submission types for assignments" do
       assign = @course.assignments.create!(title: 'Assignment 1',
         submission_types: 'online_text_entry,online_upload')
@@ -543,7 +555,7 @@ describe "ZipPackage" do
       disc_data = zip_package.parse_non_module_items(:discussion_topics)
       expect(disc_data).to eq [{
         exportId: CC::CCHelper.create_key(disc), title: 'Discussion 1', type: 'DiscussionTopic',
-        graded: false, content: "<h1>Discussion</h1>"}]
+        graded: false, content: "<h1>Discussion</h1>", lockAt: nil, unlockAt: nil}]
     end
 
     it "should parse non-module quizzes" do
