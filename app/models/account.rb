@@ -1535,8 +1535,6 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def self.serialization_excludes; [:uuid]; end
-
   def find_child(child_id)
     return all_accounts.find(child_id) if root_account?
 
