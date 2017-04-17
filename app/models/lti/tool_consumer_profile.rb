@@ -73,7 +73,8 @@ module Lti
 
     RESTRICTED_SERVICES = [
       *Lti::OriginalityReportsApiController::SERVICE_DEFINITIONS,
-      *Lti::SubscriptionsApiController::SERVICE_DEFINITIONS
+      *Lti::SubscriptionsApiController::SERVICE_DEFINITIONS,
+      *Lti::SubmissionsApiController::SERVICE_DEFINITIONS
     ].freeze
 
     class << self
