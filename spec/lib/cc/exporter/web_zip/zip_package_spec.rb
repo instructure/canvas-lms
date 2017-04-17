@@ -431,7 +431,7 @@ describe "ZipPackage" do
       expect(module_item_data.first.values.include?('<p>Hi</p>')).to be false
     end
 
-    it "should not export item content for locked items" do
+    it "should not export item content for items locked by prerequisites" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: '<p>Hi</p>')
       assign_item = @module.content_tags.create!(content: assign, context: @course, indent: 0)
       @module.content_tags.create!(content: assign, context: @course, indent: 0)
@@ -446,6 +446,21 @@ describe "ZipPackage" do
       expect(module_item_data.first[:content]).to eq '<p>Hi</p>'
       expect(module_item_data.last[:locked]).to be true
       expect(module_item_data.last.values.include?('<p>Yo</p>')).to be false
+    end
+
+    it "should not export items contents for items locked by content dates" do
+      assign = @course.assignments.create!(title: 'Assignment 1', description: '<p>Hi</p>', lock_at: 1.day.ago)
+      @module.content_tags.create!(content: assign, context: @course, indent: 0)
+      @module.content_tags.create!(content: assign, context: @course, indent: 0)
+      file = attachment_model(context: @course, filename: '1234__file1.jpg', lock_at: 1.day.ago)
+      @module.content_tags.create!(content: file, context: @course)
+
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module)
+      expect(module_item_data[0][:content]).to be nil
+      expect(module_item_data[0][:locked]).to be true
+      expect(module_item_data[1][:content]).to be nil
+      expect(module_item_data[1][:locked]).to be true
     end
 
     it "should not export unpublished module items" do

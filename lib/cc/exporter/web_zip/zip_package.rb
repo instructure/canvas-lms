@@ -147,12 +147,14 @@ module CC::Exporter::WebZip
     def parse_module_item_data(modul)
       items = modul.content_tags.active.select{ |item| item.visible_to_user?(user) }
       items.map do |item|
+        locked = item.locked_for?(user, deep_check_if_needed: true) 
+        locked ||= item.content.locked_for?(user) if item.content
         item_hash = {
           id: item.id,
           title: item.title,
           type: item.content_type,
           indent: item.indent,
-          locked: !item.available_for?(user, deep_check_if_needed: true)
+          locked: !!locked
         }
         parse_module_item_details(item, item_hash) if item.content_type != 'ContextModuleSubHeader'
         item_hash
