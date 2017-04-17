@@ -983,6 +983,26 @@ describe FilesController do
       expect(assigns[:attachment].folder).to be_for_submissions
     end
 
+    it "does not require usage rights for group submissions to be visible to students" do
+      @course.root_account.enable_feature! :submissions_folder
+      @course.root_account.enable_feature! :usage_rights_required
+      user_session(@student)
+      category = group_category
+      assignment = @course.assignments.create(:group_category => category, :submission_types => 'online_upload')
+      group = category.groups.create(:context => @course)
+      group.add_user(@student)
+      user_session(@student)
+      post 'create_pending', {:attachment => {
+        :context_code => @course.asset_string,
+        :asset_string => assignment.asset_string,
+        :intent => 'submit',
+        :filename => "bob.txt"
+      }}
+      expect(response).to be_success
+      expect(assigns[:attachment]).not_to be_nil
+      expect(assigns[:attachment]).not_to be_locked
+    end
+
     context "sharding" do
       specs_require_sharding
 
