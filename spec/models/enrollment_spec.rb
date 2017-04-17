@@ -683,6 +683,17 @@ describe Enrollment do
       expect(Message.last.notification).to eql(n)
       expect(Message.last.to).to eql(@user.email)
     end
+
+    it "should send out notifications for enrollment acceptance correctly" do
+      teacher = user_with_pseudonym(:active_all => true)
+      n = Notification.create!(:name => "Enrollment Accepted")
+      NotificationPolicy.create!(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
+      course_with_teacher(:active_all => true, :user => teacher)
+      student = user_factory
+      e = @course.enroll_student(student)
+      e.accept!
+      expect(teacher.messages).to be_exists
+    end
   end
 
   context "atom" do
