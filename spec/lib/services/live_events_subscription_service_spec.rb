@@ -81,6 +81,21 @@ module Services
         end
       end
 
+      describe '.destroy_all_tool_proxy_subscriptions' do
+        it 'makes the expected request' do
+          tool_proxy.stubs(:context).returns(root_account_context)
+          HTTParty.expects(:send).with do |method, endpoint, options|
+            expect(method).to eq(:delete)
+            expect(endpoint).to eq('http://example.com/api/subscriptions')
+            jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
+            expect(jwt["DeveloperKey"]).to eq('10000000000003')
+            expect(jwt["RootAccountId"]).to eq('10000000000004')
+            expect(jwt["sub"]).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
+          end
+          LiveEventsSubscriptionService.destroy_all_tool_proxy_subscriptions(tool_proxy)
+        end
+      end
+
       describe '.destroy_tool_proxy_subscription' do
         it 'makes the expected request' do
           tool_proxy.stubs(:context).returns(root_account_context)

@@ -36,6 +36,11 @@ module Services
         request(:delete, "/api/subscriptions/#{subscription_id}", options)
       end
 
+      def destroy_all_tool_proxy_subscriptions(tool_proxy)
+        options = { headers: headers(tool_proxy_jwt_body(tool_proxy)) }
+        request(:delete, "/api/subscriptions", options)
+      end
+
       private
       def request(method, endpoint, options = {})
         Canvas.timeout_protection("live-events-subscription-service-session", raise_on_timeout: true) do
