@@ -1,4 +1,3 @@
-#
 # Copyright (C) 2017 Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -16,15 +15,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class LatePolicy < ActiveRecord::Base
-  belongs_to :course, inverse_of: :late_policy
+class LatePolicySerializer < Canvas::APISerializer
+  root :late_policy
 
-  validates :course_id,
-    presence: true
-  validates :late_submission_minimum_percent, :missing_submission_deduction, :late_submission_deduction,
-    presence: true,
-    numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
-  validates :late_submission_interval,
-    presence: true,
-    inclusion: { in: %w(day hour) }
+  attributes :id,
+    :missing_submission_deduction_enabled,
+    :missing_submission_deduction,
+    :late_submission_deduction_enabled,
+    :late_submission_deduction,
+    :late_submission_interval,
+    :late_submission_minimum_percent_enabled,
+    :late_submission_minimum_percent
 end

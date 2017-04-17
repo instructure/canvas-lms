@@ -1916,6 +1916,12 @@ CanvasRails::Application.routes.draw do
 
       put 'courses/:course_id/blueprint_templates/:template_id/restrict_item', action: :restrict_item
     end
+
+    scope(controller: :late_policy) do
+      get 'courses/:id/late_policy', action: :show
+      post 'courses/:id/late_policy', action: :create
+      patch 'courses/:id/late_policy', action: :update
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
