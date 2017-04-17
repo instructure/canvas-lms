@@ -4859,3 +4859,47 @@ test('saves the new grid display settings', function () {
 test('re-sorts the grid rows', function () {
   strictEqual(this.gradebook.sortGridRows.callCount, 1);
 });
+
+QUnit.module('Gradebook#onGridBlur', {
+  setup () {
+    this.editorLock = {
+      commitCurrentEdit () {}
+    };
+    this.gradebook = createGradebook();
+    this.gradebook.grid = {
+      getActiveCell () {
+        return { row: 0, cell: 0 };
+      },
+      getEditorLock: () => this.editorLock
+    }
+
+    $fixtures.innerHTML = `
+      <div class="slick-cell active">
+        <div class="example-target"></div>
+      </div>
+    `;
+  },
+
+  teardown () {
+    $fixtures.innerHTML = '';
+    this.fixture = null;
+  }
+});
+
+test('commits the current edit when clicking off the active cell', function () {
+  this.spy(this.editorLock, 'commitCurrentEdit');
+  this.gradebook.onGridBlur({ target: document.querySelector('body') });
+  equal(this.editorLock.commitCurrentEdit.callCount, 1);
+});
+
+test('commits the current edit when clicking within the active cell', function () {
+  this.spy(this.editorLock, 'commitCurrentEdit');
+  this.gradebook.onGridBlur({ target: $fixtures.querySelector('.example-target') });
+  equal(this.editorLock.commitCurrentEdit.callCount, 0);
+});
+
+test('does not prevent default when clicking within the active cell', function () {
+  this.spy(this.editorLock, 'commitCurrentEdit');
+  const returnValue = this.gradebook.onGridBlur({ target: $fixtures.querySelector('.example-target') });
+  equal(typeof returnValue, 'undefined', 'jQuery event handlers prevent default when returning false');
+});

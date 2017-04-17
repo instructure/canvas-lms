@@ -307,7 +307,6 @@ define [
       @$input
         .removeClass('gradebook-checkbox-pass gradebook-checkbox-fail')
         .addClass('gradebook-checkbox-' + classFromSubmission(grade: newValue))
-        .addClass('dontblur')
         .attr('aria-label', passFailMessage(newValue))
         .data('value', newValue)
       @$input.find('i')

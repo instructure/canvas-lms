@@ -226,10 +226,6 @@ define [
       @cell.$input = $("<button><i></i></button>")
     teardown: -> $('#fixtures').empty()
 
-  test "#pass_fail#transitionValue adds the 'dontblur' class so the user can continue toggling pass/fail state", ->
-    @cell.transitionValue("pass")
-    ok @cell.$input.hasClass('dontblur')
-
   test "#pass_fail#transitionValue changes the aria-label to match the currently selected option", ->
     @cell.transitionValue('fail')
     equal @cell.$input.attr('aria-label'), 'fail'

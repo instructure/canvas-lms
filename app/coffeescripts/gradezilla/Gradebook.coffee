@@ -54,6 +54,7 @@ define [
   'jsx/gradezilla/shared/SetDefaultGradeDialogManager'
   'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
   'jsx/gradezilla/default_gradebook/GradebookApi'
+  'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory'
   'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
@@ -95,7 +96,7 @@ define [
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, SetDefaultGradeDialogManager,
-  CurveGradesDialogManager, GradebookApi, StudentRowHeaderConstants, AssignmentColumnHeader,
+  CurveGradesDialogManager, GradebookApi, CellEditorFactory, StudentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, CustomColumnHeader, StudentColumnHeader, StudentRowHeader, TotalGradeColumnHeader,
   GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp, SubmissionStateMap,
   DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, SectionMenuView,
@@ -940,6 +941,10 @@ define [
     # conjunction with a click listener on <body />. When we 'blur' the grid
     # by clicking outside of it, save the current field.
     onGridBlur: (e) =>
+      # Prevent exiting the cell editor when clicking in the cell being edited
+      activeCell = document.querySelector('.slick-cell.active')
+      return if activeCell and $.contains(activeCell, e.target)
+
       className = e.target.className
 
       # PopoverMenu's trigger sends an event with a target whose className is a SVGAnimatedString
@@ -950,16 +955,8 @@ define [
         else
           className = ''
 
-      if className.match(/cell|slick/) or !@grid.getActiveCell
-        return
-
-      if className is 'grade' and @grid.getCellEditor() instanceof SubmissionCell.out_of
-        # We can assume that a user clicked the up or down arrows on the
-        # number input, we want to allow them to keep doing that.
-        return
-
-      if $(e.target).is(".dontblur,.dontblur *")
-        return
+      # This allows single-click-to-edit in editable cells
+      return if className.match(/cell|slick/) or !@grid.getActiveCell()
 
       @grid.getEditorLock().commitCurrentEdit()
 
@@ -1358,6 +1355,8 @@ define [
         if @gradebookColumnSizeSettings['student']
           studentColumnWidth = parseInt(@gradebookColumnSizeSettings['student'])
 
+      # Student Column Definition
+
       @parentColumns = [
         id: 'student'
         type: 'student'
@@ -1369,12 +1368,12 @@ define [
         formatter: @htmlContentFormatter
       ]
 
+      # Assignment Column Definitions
+
       @allAssignmentColumns = for id, assignment of @assignments
-        outOfFormatter = assignment &&
-                         assignment.grading_type == 'points' &&
-                         assignment.points_possible? &&
-                         SubmissionCell.out_of
-        minWidth = if outOfFormatter then 70 else 90
+        shrinkForOutOfText = assignment && assignment.grading_type == 'points' && assignment.points_possible?
+        minWidth = if shrinkForOutOfText then 70 else 90
+
         fieldName = @getAssignmentColumnId(id)
 
         assignmentWidth = testWidth(assignment.name, minWidth, columnWidths.assignment.default_max)
@@ -1387,9 +1386,6 @@ define [
           name: assignment.name
           object: assignment
           formatter: this.cellFormatter
-          editor: outOfFormatter ||
-                  SubmissionCell[assignment.grading_type] ||
-                  SubmissionCell
           minWidth: columnWidths.assignment.min,
           maxWidth: columnWidths.assignment.max,
           width: assignmentWidth
@@ -1412,6 +1408,8 @@ define [
       if @hideAggregateColumns()
         @aggregateColumns = []
       else
+        # Assignment Group Column Definitions
+
         @aggregateColumns = for id, group of @assignmentGroups
           fieldName = "assignment_group_#{id}"
 
@@ -1441,6 +1439,8 @@ define [
         if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings['total_grade']
           totalWidth = parseInt(@gradebookColumnSizeSettings['total_grade'])
 
+        # Total Grade Column Definition
+
         total_column =
           id: "total_grade"
           field: "total_grade"
@@ -1460,10 +1460,9 @@ define [
       options = $.extend({
         enableCellNavigation: true
         enableColumnReorder: true
-        enableAsyncPostRender: true
-        asyncPostRenderDelay: 1
         autoEdit: true # whether to go into edit-mode as soon as you tab to a cell
         editable: @options.gradebook_is_editable
+        editorFactory: new CellEditorFactory()
         syncColumnCellResize: true
         rowHeight: 35
         headerHeight: 38
@@ -1472,12 +1471,9 @@ define [
 
       @grid = new Slick.Grid('#gradebook_grid', @rows, @getVisibleGradeGridColumns(), options)
       @grid.setSortColumn('student')
-      # this is the magic that actually updates group and final grades when you edit a cell
-
-      @grid.onCellChange.subscribe @onCellChange
 
       # this is a faux blur event for SlickGrid.
-      $('body').on('click', @onGridBlur)
+      $('#application').on('click', @onGridBlur)
 
       @grid.onKeyDown.subscribe ->
         # TODO: start editing automatically when a number or letter is typed
@@ -1486,10 +1482,15 @@ define [
       @grid.onHeaderCellRendered.subscribe @onHeaderCellRendered
       @grid.onBeforeHeaderCellDestroy.subscribe @onBeforeHeaderCellDestroy
       @grid.onColumnsReordered.subscribe @onColumnsReordered
-      @grid.onBeforeEditCell.subscribe @onBeforeEditCell
       @grid.onColumnsResized.subscribe @onColumnsResized
 
+      # Grid Body Cell Events
+      @grid.onBeforeEditCell.subscribe @onBeforeEditCell
+      @grid.onCellChange.subscribe @onCellChange
+
       @onGridInit()
+
+    # Column Header Cell Event Handlers
 
     onHeaderCellRendered: (event, obj) =>
       if obj.column.type == 'student'
@@ -1506,7 +1507,27 @@ define [
     onBeforeHeaderCellDestroy: (event, obj) =>
       ReactDOM.unmountComponentAtNode(obj.node)
 
-    # TODO: destructive cell events will need appropriate React cleanup
+    ## Column Event Handlers
+
+    # The target cell will enter editing mode
+    onBeforeEditCell: (event, obj) =>
+      { row, cell } = obj
+      $cell = @grid.getCellNode(row, cell)
+      return false if $($cell).hasClass("cannot_edit") || $($cell).find(".gradebook-cell").hasClass("cannot_edit")
+
+    # The current cell editor has been changed and is valid
+    onCellChange: (event, obj) =>
+      { item, column } = obj
+      if col_id = column.field.match /^custom_col_(\d+)/
+        url = @options.custom_column_datum_url
+          .replace(/:id/, col_id[1])
+          .replace(/:user_id/, item.id)
+
+        $.ajaxJSON url, "PUT", "column_data[content]": item[column.field]
+      else
+        # this is the magic that actually updates group and final grades when you edit a cell
+        @calculateStudentGrade(item)
+        @grid.invalidate()
 
     onColumnsResized: (event, obj) =>
       grid = obj.grid
@@ -1515,6 +1536,8 @@ define [
       _.each columns, (column) =>
         if column.previousWidth && column.width != column.previousWidth
           @saveColumnWidthPreference(column.id, column.width)
+
+    # Persisted Gradebook Settings
 
     saveColumnWidthPreference: (id, newWidth) ->
       url = @options.gradebook_column_size_settings_url
@@ -1540,21 +1563,6 @@ define [
           sort_rows_by_direction: sortRowsBy.direction
 
       $.ajaxJSON(@options.settings_update_url, 'PUT', data, successFn, errorFn)
-
-    onBeforeEditCell: (event, {row, cell}) =>
-      $cell = @grid.getCellNode(row, cell)
-      return false if $($cell).hasClass("cannot_edit") || $($cell).find(".gradebook-cell").hasClass("cannot_edit")
-
-    onCellChange: (event, {item, column}) =>
-      if col_id = column.field.match /^custom_col_(\d+)/
-        url = @options.custom_column_datum_url
-          .replace(/:id/, col_id[1])
-          .replace(/:user_id/, item.id)
-
-        $.ajaxJSON url, "PUT", "column_data[content]": item[column.field]
-      else
-        @calculateStudentGrade(item)
-        @grid.invalidate()
 
     ## Grid Sorting Methods
 

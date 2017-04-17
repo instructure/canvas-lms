@@ -47,8 +47,12 @@ describe "Gradezilla editing grades" do
       expect(grade_box).to have_value @assignment_1_points
       set_value(grade_box, 7)
       f("form.submission_details_grade_form button").click
-      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .slick-cell:nth-child(1)')
-      expect(cell).to include_text '7'
+
+      # wait for the request to complete and the dialog to close
+      wait_for_ajax_requests
+
+      input = f('#gradebook_grid .container_1 .slick-cell.active input')
+      expect(input.attribute("value")).to eql "7"
       expect(final_score_for_row(0)).to eq "80%"
     end
   end
