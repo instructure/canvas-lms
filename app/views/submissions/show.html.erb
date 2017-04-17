@@ -69,15 +69,15 @@
         <br/>
 
         <% if can_do(@submission, @current_user, :view_turnitin_report) %>
-          <% if (turnitin_score = @submission.turnitin_data[@submission.asset_string]) && @submission.turnitin_data[:provider] == nil && turnitin_score[:similarity_score] %>
+          <% if (turnitin_score = @submission.turnitin_data[@submission.asset_string]) &&
+            @submission.turnitin_data[:provider] == nil && turnitin_score[:similarity_score] %>
             <span class="turnitin_score_container">
               <span class="turnitin_score_container_caret <%= turnitin_score[:state] %>_score"></span>
               <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %>%</a>
             </span>
           <% end %>
         <% end %>
-      <% end %>
-      <% if @submission.can_view_plagiarism_report('vericite', @current_user, session) && !@assignment.muted? %>
+      <% elsif @submission.can_view_plagiarism_report('vericite', @current_user, session) && !@assignment.muted? %>
         <% if (vericite_score = @submission.vericite_data(true)[@submission.asset_string]) && @submission.turnitin_data[:provider] == :vericite && vericite_score[:similarity_score] %>
           <span class="turnitin_score_container">
             <span class="vericite_score_container_caret <%= vericite_score[:state] %>_score"></span>
