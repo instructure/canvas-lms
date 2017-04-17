@@ -835,13 +835,17 @@ describe ApplicationController do
     context 'when a real current_pseudonym exists' do
       let(:current_pseudonym_attributes) do
         {
-          unique_id: 'unique_id'
+          unique_id: 'unique_id',
+          global_account_id: 'global_account_id',
+          sis_user_id: 'sis_user_id'
         }
       end
 
       let(:expected_context_attributes) do
         {
-          user_login: 'unique_id'
+          user_login: 'unique_id',
+          user_account_id: 'global_account_id',
+          user_sis_id: 'sis_user_id'
         }.merge(non_conditional_values)
       end
 

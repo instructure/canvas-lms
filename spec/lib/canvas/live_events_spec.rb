@@ -499,4 +499,26 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.quiz_export_complete(content_export)
     end
   end
+
+  describe '.logged_in' do
+    it 'triggers a live event with user details' do
+      user_with_pseudonym
+
+      session = { return_to: 'http://www.canvaslms.com/' }
+      context = {
+        user_id: @user.global_id.to_s,
+        user_login: @pseudonym.unique_id,
+        user_account_id: @pseudonym.global_account_id.to_s,
+        user_sis_id: @pseudonym.sis_user_id
+      }
+
+      expect_event(
+        'logged_in',
+        { :redirect_url => 'http://www.canvaslms.com/' },
+        hash_including(context)
+      ).once
+
+      Canvas::LiveEvents.logged_in(session, @user, @pseudonym)
+    end
+  end
 end

@@ -2151,9 +2151,14 @@ class ApplicationController < ActionController::Base
       ctx[:root_account_lti_guid] = @domain_root_account.lti_guid
     end
 
+    if @current_pseudonym
+      ctx[:user_login] = @current_pseudonym.unique_id
+      ctx[:user_account_id] = @current_pseudonym.global_account_id
+      ctx[:user_sis_id] = @current_pseudonym.sis_user_id
+    end
+
     ctx[:user_id] = @current_user.global_id if @current_user
     ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
-    ctx[:user_login] = @current_pseudonym.unique_id if @current_pseudonym
     ctx[:context_type] = @context.class.to_s if @context
     ctx[:context_id] = @context.global_id if @context
     if @context_membership
