@@ -43,7 +43,7 @@ define [
         
       $('#mathjax-view .mathquill-tab-bar li:first-child').addClass('mathquill-tab-selected')
 
-      $.getScript("//cdn.mathjax.org/mathjax/2.1-latest/MathJax.js?config=TeX-AMS_HTML.js", @addMathJaxEvents)
+      $.getScript("//cdnjs.cloudflare.com/ajax/libs/mathjax/2.1/MathJax.js?config=TeX-AMS_HTML.js", @addMathJaxEvents)
 
     addMathJaxEvents: =>
       renderPreview = ->
