@@ -1894,6 +1894,48 @@ class Assignment < ActiveRecord::Base
   def has_peer_reviews?
     self.peer_reviews
   end
+  
+  # Generate peer reviews csv for a given assignment
+  def peer_reviews_to_csv
+    # Don't generate it if the assignment has no peer reviews
+    return unless self.has_peer_reviews?
+    peer_reviews = self.rubric_association.rubric_assessments.includes(:user).order("users.sortable_name ASC, score ASC")
+    # TODO: it would be better to eager load the artifact, but it can't seem possible to eager load a polymorphic association.
+    # So I used the same method as the one used in the peer_reviews.html.erb view to prevent a N+1 request.
+    submissions  = self.submissions.select([:id, :user_id, :score]).to_a
+    
+    # Get the max number of reviews for a student to create proper headers
+    max_reviews = peer_reviews.group(:user_id).count.values.max
+    
+    res = CSV.generate do |csv|
+      # Header
+      row = ["Student", "Student ID", "Submission ID", "Current grade"]
+      for i in 1..max_reviews
+        row << "Grade #{i}"
+        row << "Peer ID"
+      end
+      csv << row
+      
+      user_row = []
+      reviews_number = peer_reviews.length
+      
+      # Grouping peer reviews by user id will ease the generation of the CSV
+      peer_reviews.group_by{|pr| pr.user_id}.each do |user_id, reviews|
+        # Get the student, his submission and current score
+        student     = reviews.first.user
+        submission  = submissions.find{|s| s.user_id == user_id}
+        current_score = submission.score || "-"
+        # Fill in the first columns of the csv row
+        user_row    = [student.last_name_first.gsub(",", ""), user_id, submission.id, current_score]
+        # Go through all reviews for each user to grab his scores and assessors' id 
+        reviews.each do |review|
+          user_row << review.score
+          user_row << review.assessor_id
+        end
+        csv << user_row
+      end
+    end
+  end
 
   def self.percent_considered_graded
     0.5
