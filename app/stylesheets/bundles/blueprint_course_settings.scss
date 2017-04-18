@@ -24,17 +24,49 @@
 
 .bcs__content {
   width: 270px;
+
+  .bcs__body {
+    margin: 0 1.5em;
+  }
+}
+
+@keyframes spinning {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.bcs__sync-btn-icon {
+  line-height: 2.5em;
+  vertical-align: text-top;
+
+  &.bcs__sync-btn-icon__active svg {
+    animation: spinning 1.5s infinite linear;
+  }
+}
+
+.bcs__sync-btn-text {
+  line-height: 2.5em;
+  vertical-align: sub;
+  margin-left: 7px;
+  margin-right: 7px;
 }
 
 .bcs__row {
-  margin: 0.5em 1.5em;
+  margin: 0.75em 0 1em;
   border-bottom: 1px solid $ic-border-color;
+
+  & > button:first-child {
+    padding: 0 !important;
+  }
+
+  &:last-of-type {
+    border: none;
+  }
 
   .bcs__row-right-content {
     float: right;
     line-height: 2.5em;
     vertical-align: middle;
-    margin-right: 0.5em;
   }
 }
 

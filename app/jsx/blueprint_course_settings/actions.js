@@ -5,11 +5,27 @@ const types = [
   'LOAD_COURSES_START', 'LOAD_COURSES_SUCCESS', 'LOAD_COURSES_FAIL',
   'LOAD_ASSOCIATIONS_START', 'LOAD_ASSOCIATIONS_SUCCESS', 'LOAD_ASSOCIATIONS_FAIL',
   'SAVE_ASSOCIATIONS_START', 'SAVE_ASSOCIATIONS_SUCCESS', 'SAVE_ASSOCIATIONS_FAIL',
+  'CHECK_MIGRATION_START', 'CHECK_MIGRATION_SUCCESS', 'CHECK_MIGRATION_FAIL',
+  'BEGIN_MIGRATION_START', 'BEGIN_MIGRATION_SUCCESS', 'BEGIN_MIGRATION_FAIL',
   'ADD_COURSE_ASSOCIATIONS', 'UNDO_ADD_COURSE_ASSOCIATIONS',
   'REMOVE_COURSE_ASSOCIATIONS', 'UNDO_REMOVE_COURSE_ASSOCIATIONS',
   'CLEAR_ASSOCIATIONS',
 ]
 const actions = createActions(...types)
+
+actions.checkMigration = () => (dispatch, getState) => {
+  dispatch(actions.checkMigrationStart())
+  api.checkMigration(getState())
+    .then(res => dispatch(actions.checkMigrationSuccess(res.data)))
+    .catch(err => dispatch(actions.checkMigrationFail(err)))
+}
+
+actions.beginMigration = () => (dispatch, getState) => {
+  dispatch(actions.beginMigrationStart())
+  api.beginMigration(getState())
+    .then(res => dispatch(actions.beginMigrationSuccess(res.data)))
+    .catch(err => dispatch(actions.beginMigrationFail(err)))
+}
 
 actions.addAssociations = associations => (dispatch, getState) => {
   const state = getState()

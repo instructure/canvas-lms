@@ -139,3 +139,53 @@ test('sets error on SAVE_ASSOCIATIONS_FAIL', () => {
   const newState = reduce(actions.saveAssociationsFail(new Error('Uh oh! Error Happened!')))
   deepEqual(newState.errors, ['Uh oh! Error Happened!'])
 })
+
+test('sets isLoadingBeginMigration to true on on BEGIN_MIGRATION_START', () => {
+  const newState = reduce(actions.beginMigrationStart())
+  equal(newState.isLoadingBeginMigration, true)
+})
+
+test('sets isLoadingBeginMigration to false on on BEGIN_MIGRATION_SUCCESS', () => {
+  const newState = reduce(actions.beginMigrationSuccess({ workflow_state: 'queued' }))
+  equal(newState.isLoadingBeginMigration, false)
+})
+
+test('sets isLoadingBeginMigration to false on on BEGIN_MIGRATION_FAIL', () => {
+  const newState = reduce(actions.beginMigrationFail())
+  equal(newState.isLoadingBeginMigration, false)
+})
+
+test('sets hasCheckedMigration to true on on CHECK_MIGRATION_SUCCESS', () => {
+  const newState = reduce(actions.checkMigrationSuccess('queued'))
+  equal(newState.hasCheckedMigration, true)
+})
+
+test('sets hasCheckedMigration to true on on BEGIN_MIGRATION_SUCCESS', () => {
+  const newState = reduce(actions.beginMigrationSuccess({ workflow_state: 'queued' }))
+  equal(newState.hasCheckedMigration, true)
+})
+
+test('sets isCheckinMigration to true on on CHECK_MIGRATION_START', () => {
+  const newState = reduce(actions.checkMigrationStart())
+  equal(newState.isCheckinMigration, true)
+})
+
+test('sets isCheckinMigration to false on on CHECK_MIGRATION_SUCCESS', () => {
+  const newState = reduce(actions.checkMigrationSuccess('queued'))
+  equal(newState.isCheckinMigration, false)
+})
+
+test('sets isCheckinMigration to false on on CHECK_MIGRATION_FAIL', () => {
+  const newState = reduce(actions.checkMigrationFail())
+  equal(newState.isCheckinMigration, false)
+})
+
+test('sets migrationStatus to true on on BEGIN_MIGRATION_SUCCESS', () => {
+  const newState = reduce(actions.beginMigrationSuccess({ workflow_state: 'queued' }))
+  equal(newState.migrationStatus, 'queued')
+})
+
+test('sets migrationStatus to true on on CHECK_MIGRATION_SUCCESS', () => {
+  const newState = reduce(actions.checkMigrationSuccess('queued'))
+  equal(newState.migrationStatus, 'queued')
+})

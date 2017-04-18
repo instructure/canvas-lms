@@ -10,6 +10,7 @@ import propTypes from '../propTypes'
 import actions from '../actions'
 import BlueprintSidebar from './BlueprintSidebar'
 import BlueprintModal from './BlueprintModal'
+import { ConnectedMigrationSync as MigrationSync } from './MigrationSync'
 import { ConnectedBlueprintAssociations } from './BlueprintAssociations'
 
 export default class CourseSidebar extends Component {
@@ -79,16 +80,27 @@ export default class CourseSidebar extends Component {
           </Button>
           <Typography><span className="bcs__row-right-content">{this.props.associations.length}</span></Typography>
         </div>
+        <MigrationSync />
         {this.renderModal()}
       </BlueprintSidebar>
     )
   }
 }
 
-const connectState = state => ({
-  associations: state.existingAssociations,
-  hasLoadedAssociations: state.hasLoadedAssociations,
-  hasLoadedCourses: state.hasLoadedCourses,
+const connectState = ({
+  existingAssociations,
+  hasLoadedAssociations,
+  hasLoadedCourses,
+  migrationStatus,
+  isLoadingBeginMigration,
+  hasCheckedMigration,
+}) => ({
+  associations: existingAssociations,
+  hasLoadedAssociations,
+  hasLoadedCourses,
+  migrationStatus,
+  isLoadingBeginMigration,
+  hasCheckedMigration,
 })
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 

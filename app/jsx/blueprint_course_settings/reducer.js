@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { actionTypes } from './actions'
+import MigrationStates from './migrationStates'
 
 const identity = (defaultState = null) => {
   return state => state === undefined ? defaultState : state
@@ -11,6 +12,19 @@ export default combineReducers({
   course: identity(),
   terms: identity([]),
   subAccounts: identity([]),
+  migrationStatus: handleActions({
+    [actionTypes.CHECK_MIGRATION_SUCCESS]: (state, action) => action.payload,
+    [actionTypes.BEGIN_MIGRATION_SUCCESS]: (state, action) => action.payload.workflow_state,
+  }, MigrationStates.unknown),
+  hasCheckedMigration: handleActions({
+    [actionTypes.CHECK_MIGRATION_SUCCESS]: () => true,
+    [actionTypes.BEGIN_MIGRATION_SUCCESS]: () => true,
+  }, false),
+  isCheckinMigration: handleActions({
+    [actionTypes.CHECK_MIGRATION_START]: () => true,
+    [actionTypes.CHECK_MIGRATION_SUCCESS]: () => false,
+    [actionTypes.CHECK_MIGRATION_FAIL]: () => false,
+  }, false),
   hasLoadedCourses: handleActions({
     [actionTypes.LOAD_COURSES_SUCCESS]: () => true,
   }, false),
@@ -39,6 +53,11 @@ export default combineReducers({
     [actionTypes.REMOVE_COURSE_ASSOCIATIONS]: (state, action) => state.concat(action.payload),
     [actionTypes.UNDO_REMOVE_COURSE_ASSOCIATIONS]: (state, action) => state.filter(courseId => !action.payload.includes(courseId)),
   }, []),
+  isLoadingBeginMigration: handleActions({
+    [actionTypes.BEGIN_MIGRATION_START]: () => true,
+    [actionTypes.BEGIN_MIGRATION_SUCCESS]: () => false,
+    [actionTypes.BEGIN_MIGRATION_FAIL]: () => false,
+  }, false),
   isLoadingCourses: handleActions({
     [actionTypes.LOAD_COURSES_START]: () => true,
     [actionTypes.LOAD_COURSES_SUCCESS]: () => false,

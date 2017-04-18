@@ -1,5 +1,6 @@
 import axios from 'axios'
 import parseLinkHeader from 'jsx/shared/helpers/parseLinkHeader'
+import MigrationStates from './migrationStates'
 
 const ApiClient = {
   _depaginate (url, allResults = []) {
@@ -52,7 +53,30 @@ const ApiClient = {
       course_ids_to_add: addedAssociations.map(c => c.id),
       course_ids_to_remove: removedAssociations,
     })
-  }
+  },
+
+  getMigrations ({ course }) {
+    return axios.get(`/api/v1/courses/${course.id}/blueprint_templates/default/migrations`)
+  },
+
+  beginMigration ({ course }) {
+    return axios.post(`/api/v1/courses/${course.id}/blueprint_templates/default/migrations`)
+  },
+
+  checkMigration (state) {
+    return this.getMigrations(state)
+      .then((res) => {
+        let status = MigrationStates.void
+
+        if (res.data[0]) {
+          status = res.data[0].workflow_state
+        }
+
+        res.data = status // eslint-disable-line
+        return res
+      })
+  },
+
 }
 
 export default ApiClient
