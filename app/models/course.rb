@@ -944,7 +944,7 @@ class Course < ActiveRecord::Base
           enrollment_ids = Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).pluck(:id)
           if enrollment_ids.any?
             Enrollment.where(:id => enrollment_ids).update_all(:workflow_state => 'completed', :completed_at => Time.now.utc)
-            EnrollmentState.where(:enrollment_id => enrollment_ids).update_all(:state => 'completed', :state_is_current => true, :access_is_current => false)
+            EnrollmentState.where(:enrollment_id => enrollment_ids).update_all(["state = ?, state_is_current = ?, access_is_current = ?, lock_version = lock_version + 1", 'completed', true, false])
             EnrollmentState.send_later_if_production(:process_states_for_ids, enrollment_ids) # recalculate access
           end
 
@@ -958,7 +958,7 @@ class Course < ActiveRecord::Base
             enrollment_ids = enroll_scope.pluck(:id)
             if enrollment_ids.any?
               Enrollment.where(:id => enrollment_ids).update_all(:workflow_state => 'deleted')
-              EnrollmentState.where(:enrollment_id => enrollment_ids).update_all(:state => 'deleted', :state_is_current => true)
+              EnrollmentState.where(:enrollment_id => enrollment_ids).update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1", 'deleted', true])
             end
             User.send_later_if_production(:update_account_associations, user_ids)
           end
