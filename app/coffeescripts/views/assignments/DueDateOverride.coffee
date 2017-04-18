@@ -68,7 +68,7 @@ define [
       object_type = @model.assignment.objectType()
       data_post_to_sis = data.postToSIS
       post_to_sis = false
-      if object_type == 'Assignment'
+      if object_type == 'Assignment' || object_type == 'Discussion'
         grading_type = $('#assignment_grading_type').find(":selected").val()
         post_to_sis = grading_type != 'not_graded' && data_post_to_sis
       else if object_type == 'Quiz'
