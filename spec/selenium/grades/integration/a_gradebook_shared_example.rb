@@ -27,6 +27,12 @@ shared_examples_for 'a gradebook' do
       'grading period two': ["50%", "50%"]
     },
 
+    'grading period weights with ungraded assignment': {
+      'all grading periods': ["55.17%", "55.17%"],
+      'grading period one': ["75%", "75%"],
+      'grading period two': ["46.67%", "46.67%"]
+    },
+
     'assign outside of weighted grading period': {
       'all grading periods': ["50%", "50%"],
       'grading period one': ["50%", "50%"],

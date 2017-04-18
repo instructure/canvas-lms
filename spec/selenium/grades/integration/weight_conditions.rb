@@ -38,6 +38,26 @@ shared_context 'both grading period and assignment group weights' do
   end
 end
 
+shared_context 'grading period weights with ungraded assignment' do
+  before(:each) do
+    # C 47.67%"
+
+    @gpg.update_attributes(weighted: true)
+    @gp1.update_attributes(weight: 30)
+    @gp2.update_attributes(weight: 70)
+    # assignment weighting: 'percent' is on, 'points' is off
+    @course.update_attributes(group_weighting_scheme: "points")
+
+    @a5 = @course.assignments.create!(
+      title: 'assignment five',
+      grading_type: 'points',
+      points_possible: 10,
+      assignment_group: @ag3,
+      due_at: 1.week.from_now
+    )
+  end
+end
+
 shared_context 'assign outside of weighted grading period' do
   before(:each) do
     # C3058164
