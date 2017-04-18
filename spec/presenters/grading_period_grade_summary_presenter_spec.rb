@@ -37,6 +37,26 @@ describe GradingPeriodGradeSummaryPresenter do
     )
   end
 
+  describe '#no_calculations?' do
+    it 'calculates subtotals when summarizing by grading period' do
+      presenter.periods_assignments = ['dummy']
+      presenter.groups_assignments = []
+      expect(presenter.no_calculations?).to be(false)
+    end
+
+    it 'calculates subtotals when summarizing by assignment group' do
+      presenter.periods_assignments = []
+      presenter.groups_assignments = ['dummy']
+      expect(presenter.no_calculations?).to be(false)
+    end
+
+    it 'no subtotals with no assignment groups nor grading periods' do
+      presenter.periods_assignments = []
+      presenter.groups_assignments = []
+      expect(presenter.no_calculations?).to be(true)
+    end
+  end
+
   describe "#assignments_visible_to_student" do
     it "excludes assignments that are not due for the student in the given grading period" do
       expect(presenter.assignments_visible_to_student).not_to include(@assignment_not_due_in_period)

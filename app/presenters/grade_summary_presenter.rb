@@ -25,6 +25,7 @@ class GradeSummaryPresenter
     @current_user = current_user
     @id_param = id_param
     @groups_assignments = []
+    @periods_assignments = []
     @assignment_order = assignment_order
   end
 
@@ -276,7 +277,7 @@ class GradeSummaryPresenter
   end
 
   def no_calculations?
-    @groups_assignments.empty?
+    @groups_assignments.empty? && @periods_assignments.empty?
   end
 
   def total_weight
