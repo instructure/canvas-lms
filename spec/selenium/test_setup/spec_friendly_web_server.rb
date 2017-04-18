@@ -1,20 +1,13 @@
-require 'thin'
+require 'puma'
 require 'httparty'
 
-class SpecFriendlyThinServer
-  class NoAcceptorError
-    def self.===(exception)
-      exception.message =~ /no acceptor/
-    end
-  end
-
+class SpecFriendlyWebServer
   class << self
     def bind_address
       '0.0.0.0'
     end
 
     def run(app, port:, timeout: 15)
-      @port_ok = true
       BlankSlateProtection.disable do
         start_server(app, port)
         wait_for_server(port, timeout)
@@ -22,24 +15,24 @@ class SpecFriendlyThinServer
     end
 
     def start_server(app, port)
-      @server = Thin::Server.new(bind_address, port, app, signals: false)
-      Thin::Logging.logger = Rails.logger
+      @server = Puma::Server.new(app, Puma::Events.stdio)
+      @server.add_tcp_listener(bind_address, port)
       Thread.new do
         begin
-          SeleniumDriverSetup.with_retries error_class: NoAcceptorError, failure_proc: -> { @port_ok = false } do
-            @server.start
-          end
-        rescue StandardError # anything else just bail w/o retrying
-          $stderr.puts "Unexpected thin server error: #{$ERROR_INFO.message}"
+          @server.run
+        rescue
+          $stderr.puts "Unexpected server error: #{$ERROR_INFO.message}"
           exit! 1
         end
       end
+    rescue Errno::EADDRINUSE, Errno::EACCES
+      raise SeleniumDriverSetup::ServerStartupError, $ERROR_INFO.message
     end
 
     def wait_for_server(port, timeout)
-      print "Starting thin server..."
+      print "Starting web server..."
       max_time = Time.zone.now + timeout
-      while Time.zone.now < max_time && @port_ok
+      while Time.zone.now < max_time
         response = HTTParty.get("http://#{bind_address}:#{port}/health_check") rescue nil
         if response && response.success?
           SeleniumDriverSetup.disallow_requests!
@@ -50,7 +43,7 @@ class SpecFriendlyThinServer
         sleep 1
       end
       puts "Failed!"
-      $stderr.puts "unable to start thin server within #{timeout} seconds!"
+      $stderr.puts "unable to start web server within #{timeout} seconds!"
       raise SeleniumDriverSetup::ServerStartupError # we'll rescue and retry on a new port
     end
 

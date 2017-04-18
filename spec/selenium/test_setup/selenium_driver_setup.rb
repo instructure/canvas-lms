@@ -409,12 +409,19 @@ module SeleniumDriverSetup
       end.to_app
     end
 
+    ASSET_PATH = %r{\A/(dist|fonts|images|javascripts)/.*\.[a-z0-9]+\z}
+    def asset_request?(url)
+      url =~ ASSET_PATH
+    end
+
     def spec_safe_rack_app
       app = base_rack_app
 
       lambda do |env|
         nope = [503, {}, [""]]
         return nope unless allow_requests?
+
+        return app.call(env) if asset_request?(env["REQUEST_URI"])
 
         # wrap request in a mutex so we can ensure it doesn't span spec
         # boundaries (see clear_requests!). we also use this mutex to
@@ -438,11 +445,10 @@ module SeleniumDriverSetup
 
     def rack_app
       app = spec_safe_rack_app
-      asset_path = %r{\A/(dist|fonts|images|javascripts)/.*\.[a-z0-9]+\z}
 
       lambda do |env|
         # make legit asset 404s return more quickly
-        asset_request = env["REQUEST_URI"] =~ asset_path
+        asset_request = asset_request?(env["REQUEST_URI"])
         return [404, {}, [""]] if asset_request && !File.exist?("public/#{env["REQUEST_URI"]}")
 
         req = "#{env['REQUEST_METHOD']} #{env['REQUEST_URI']}"
@@ -476,8 +482,8 @@ module SeleniumDriverSetup
     end
 
     def start_in_process_thin_server
-      require File.expand_path(File.dirname(__FILE__) + '/servers/thin_server')
-      self.server = SpecFriendlyThinServer
+      require_relative "spec_friendly_web_server"
+      self.server = SpecFriendlyWebServer
       server.run(rack_app, port: server_port)
     end
   end
