@@ -180,6 +180,7 @@ define [
         toggleMessage: @messages.toggleMessage
         hasFrozenAssignments: @model.hasFrozenAssignments? and @model.hasFrozenAssignments()
         hasIntegrationData: @model.hasIntegrationData? and @model.hasIntegrationData()
+        postToSISName: ENV.SIS_NAME
         ENV: ENV
       })
 

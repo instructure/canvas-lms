@@ -122,12 +122,19 @@ define [
     assignmentGroupsView.$el.appendTo $('#fixtures')
     assignmentGroupsView.render()
     assignmentGroupsView
-    
+
   test "shows imported icon when integration_data is not empty", ->
     model = createAssignmentGroup()
     model.set('integration_data', { property: 'value' })
     view = createView(model)
     ok view.$("#assignment_group_#{model.id} .ig-header-title .icon-sis-imported").length
+
+  test "shows imported icon with custom SIS_NAME when integration_data is not empty", ->
+    ENV.SIS_NAME = 'PowerSchool'
+    model = createAssignmentGroup()
+    model.set('integration_data', { property: 'value' })
+    view = createView(model)
+    equal view.$("#assignment_group_#{model.id} .ig-header-title .icon-sis-imported")[0].title, 'Imported from PowerSchool'
 
   test "does not show imported icon when integration_data is not set", ->
     model = createAssignmentGroup()
