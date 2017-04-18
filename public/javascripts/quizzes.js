@@ -1834,7 +1834,7 @@ define([
         data['quiz[only_visible_to_overrides]'] = overrideView.containsSectionsWithoutOverrides();
         var validationData = {
           assignment_overrides: overrideView.getAllDates(),
-          postToSIS: data['quiz[post_to_sis]']
+          postToSIS: data['quiz[post_to_sis]'] == '1'
         };
         var errs = overrideView.validateBeforeSave(validationData,{});
         if (_.keys(errs).length > 0) {
