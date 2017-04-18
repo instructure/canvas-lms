@@ -123,6 +123,60 @@ module Gradezilla
       menu_item(name).click
     end
 
+    # Semantic Methods for Gradebook Menus
+
+    def open_gradebook_menu(name)
+      trigger = f('button', gradebook_menu(name))
+      trigger.click
+
+      # return the id of the popover menu for use elsewhere if needed
+      menu_container(trigger.attribute('id'))
+    end
+
+    def select_gradebook_menu_option(name, container: nil)
+      gradebook_menu_option(name, container: container).click
+    end
+
+    def gradebook_menu_option(name = nil, container: nil)
+      menu_item_name = name
+      menu_container = container
+
+      if name =~ /(.+?) > (.+)/
+        menu_item_group_name, menu_item_name = Regexp.last_match[1], Regexp.last_match[2]
+
+        menu_container = gradebook_menu_group(menu_item_group_name, container: container)
+      end
+
+      gradebook_menu_options(menu_container).find { |el| el.text =~ /#{menu_item_name}/ }
+    end
+
+    # private
+
+    def gradebook_menu_options(container)
+      ff('[role*=menuitem]', container)
+    end
+
+    def gradebook_menu(name)
+      ff(".gradebook-menus [data-component]").find { |el| el.text.strip =~ /#{name}/ }
+    end
+
+    def menu_container(container_id)
+      selector = '[aria-expanded=true][role=menu]'
+      selector += "[aria-labelledby=#{container_id}]" if container_id
+
+      f(selector)
+    end
+
+    def gradebook_menu_group(name, container: nil)
+      menu_group = ff('[id*=MenuItemGroup]', container).find { |el| el.text.strip =~ /#{name}/ }
+      return unless menu_group
+
+      menu_group_id = menu_group.attribute('id')
+      f("[role=group][aria-labelledby=#{menu_group_id}]", container)
+    end
+
+    # End Methods for Gradebook Menus
+
     private
 
     def gp_dropdown() f(".grading-period-select-button") end

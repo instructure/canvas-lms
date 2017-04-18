@@ -510,6 +510,64 @@ test('returns false if "All Grading Periods" is selected and the grading period 
   notOk(this.hideAggregateColumns.call(self));
 });
 
+QUnit.module('Gradebook#makeColumnSortFn', {
+  sortOrder (sortType, direction) {
+    return {
+      sortType,
+      direction
+    }
+  },
+
+  setup () {
+    this.gradebook = createGradebook();
+    this.stub(this.gradebook, 'wrapColumnSortFn');
+    this.stub(this.gradebook, 'compareAssignmentPositions');
+    this.stub(this.gradebook, 'compareAssignmentDueDates');
+    this.stub(this.gradebook, 'compareAssignmentNames');
+    this.stub(this.gradebook, 'compareAssignmentPointsPossible');
+  }
+});
+
+test('wraps compareAssignmentPositions when called with a sortType of assignment_group', function () {
+  this.gradebook.makeColumnSortFn(this.sortOrder('assignment_group', 'ascending'));
+  const expectedArgs = [this.gradebook.compareAssignmentPositions, 'ascending'];
+
+  strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1);
+  deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs);
+});
+
+test('wraps compareAssignmentPositions when called with a sortType of alpha', function () {
+  this.gradebook.makeColumnSortFn(this.sortOrder('alpha', 'descending'));
+  const expectedArgs = [this.gradebook.compareAssignmentPositions, 'descending'];
+
+  strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1);
+  deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs);
+});
+
+test('wraps compareAssignmentNames when called with a sortType of name', function () {
+  this.gradebook.makeColumnSortFn(this.sortOrder('name', 'ascending'));
+  const expectedArgs = [this.gradebook.compareAssignmentNames, 'ascending'];
+
+  strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1);
+  deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs);
+});
+
+test('wraps compareAssignmentDueDates when called with a sortType of due_date', function () {
+  this.gradebook.makeColumnSortFn(this.sortOrder('due_date', 'descending'));
+  const expectedArgs = [this.gradebook.compareAssignmentDueDates, 'descending'];
+
+  strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1);
+  deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs);
+});
+
+test('wraps compareAssignmentPointsPossible when called with a sortType of points', function () {
+  this.gradebook.makeColumnSortFn(this.sortOrder('points', 'ascending'));
+  const expectedArgs = [this.gradebook.compareAssignmentPointsPossible, 'ascending'];
+
+  strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1);
+  deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs);
+});
+
 QUnit.module('Gradebook#wrapColumnSortFn');
 
 test('returns -1 if second argument is of type total_grade', function () {
@@ -545,6 +603,45 @@ test('calls wrapped function when either column is not total_grade nor assignmen
   const sortFn = createGradebook().wrapColumnSortFn(wrappedFn);
   sortFn({}, {});
   ok(wrappedFn.called);
+});
+
+test('calls wrapped function with arguments in given order when no direction is given', function () {
+  const wrappedFn = this.stub();
+  const sortFn = createGradebook().wrapColumnSortFn(wrappedFn);
+  const first = { field: 1 };
+  const second = { field: 2 };
+  const expectedArgs = [first, second];
+
+  sortFn(first, second);
+
+  strictEqual(wrappedFn.callCount, 1);
+  deepEqual(wrappedFn.firstCall.args, expectedArgs);
+});
+
+test('calls wrapped function with arguments in given order when direction is ascending', function () {
+  const wrappedFn = this.stub();
+  const sortFn = createGradebook().wrapColumnSortFn(wrappedFn, 'ascending');
+  const first = { field: 1 };
+  const second = { field: 2 };
+  const expectedArgs = [first, second];
+
+  sortFn(first, second);
+
+  strictEqual(wrappedFn.callCount, 1);
+  deepEqual(wrappedFn.firstCall.args, expectedArgs);
+});
+
+test('calls wrapped function with arguments in reverse order when direction is descending', function () {
+  const wrappedFn = this.stub();
+  const sortFn = createGradebook().wrapColumnSortFn(wrappedFn, 'descending');
+  const first = { field: 1 };
+  const second = { field: 2 };
+  const expectedArgs = [second, first];
+
+  sortFn(first, second);
+
+  strictEqual(wrappedFn.callCount, 1);
+  deepEqual(wrappedFn.firstCall.args, expectedArgs);
 });
 
 QUnit.module('Gradebook#makeCompareAssignmentCustomOrderFn');
@@ -605,6 +702,69 @@ test('falls back to object id for the indexes if field is not in the map', funct
   equal(sortFn(a, b), -1);
 });
 
+QUnit.module('Gradebook#compareAssignmentNames', {
+  getRecord (name) {
+    return {
+      object: {
+        name
+      }
+    };
+  },
+
+  setup () {
+    this.gradebook = createGradebook();
+
+    this.firstRecord = this.getRecord('alpha');
+    this.secondRecord = this.getRecord('omega');
+  }
+});
+
+test('returns -1 if the name field comes first alphabetically in the first record', function () {
+  strictEqual(this.gradebook.compareAssignmentNames(this.firstRecord, this.secondRecord), -1);
+});
+
+test('returns 0 if the name field is the same in both records', function () {
+  strictEqual(this.gradebook.compareAssignmentNames(this.firstRecord, this.firstRecord), 0);
+});
+
+test('returns 1 if the name field comes later alphabetically in the first record', function () {
+  strictEqual(this.gradebook.compareAssignmentNames(this.secondRecord, this.firstRecord), 1);
+});
+
+test('comparison is case-insensitive', function () {
+  const thirdRecord = this.getRecord('Alpha');
+
+  strictEqual(this.gradebook.compareAssignmentNames(thirdRecord, this.firstRecord), 0);
+});
+
+QUnit.module('Gradebook#compareAssignmentPointsPossible', {
+  getRecord (pointsPossible) {
+    return {
+      object: {
+        points_possible: pointsPossible
+      }
+    };
+  },
+
+  setup () {
+    this.compareAssignmentPointsPossible = Gradebook.prototype.compareAssignmentPointsPossible;
+    this.firstRecord = this.getRecord(1);
+    this.secondRecord = this.getRecord(2);
+  }
+});
+
+test('returns a negative number if the points_possible field is smaller in the first record', function () {
+  strictEqual(this.compareAssignmentPointsPossible(this.firstRecord, this.secondRecord), -1);
+});
+
+test('returns 0 if the points_possible field is the same in both records', function () {
+  strictEqual(this.compareAssignmentPointsPossible(this.firstRecord, this.firstRecord), 0);
+});
+
+test('returns a positive number if the points_possible field is greater in the first record', function () {
+  strictEqual(this.compareAssignmentPointsPossible(this.secondRecord, this.firstRecord), 1);
+});
+
 QUnit.module('Gradebook#storeCustomColumnOrder');
 
 test('stores the custom column order (ignoring frozen columns)', function () {
@@ -627,6 +787,69 @@ test('stores the custom column order (ignoring frozen columns)', function () {
 
   gradeBook.storeCustomColumnOrder();
   ok(gradeBook.setStoredSortOrder.calledWith(expectedSortOrder));
+});
+
+QUnit.module('Gradebook#getStoredSortOrder', {
+  setup () {
+    this.gradebookColumnOrderSettings = {
+      sortType: 'due_date',
+      direction: 'descending'
+    };
+    this.defaultColumnOrderSettings = {
+      sortType: 'assignment_group',
+      direction: 'ascending'
+    };
+    this.invalidColumnOrderSettings = {
+      sortType: 'custom'
+    };
+
+    this.gradebook = createGradebook({
+      gradebook_column_order_settings: this.gradebookColumnOrderSettings
+    });
+  }
+});
+
+test('returns the saved column order settings if they are valid', function () {
+  deepEqual(this.gradebook.getStoredSortOrder(), this.gradebookColumnOrderSettings);
+});
+
+test('returns the default column order settings if the stored settings are invalid', function () {
+  this.gradebook.gradebookColumnOrderSettings = this.invalidColumnOrderSettings;
+
+  deepEqual(this.gradebook.getStoredSortOrder(), this.defaultColumnOrderSettings);
+});
+
+test('returns the default column order settings if the column order has never been saved', function () {
+  this.gradebook.gradebookColumnOrderSettings = undefined
+
+  deepEqual(this.gradebook.getStoredSortOrder(), this.defaultColumnOrderSettings);
+});
+
+QUnit.module('Gradebook#isDefaultSortOrder', {
+  setup () {
+    this.isDefaultSortOrder = Gradebook.prototype.isDefaultSortOrder;
+  }
+});
+
+test('returns false if called with due_date', function () {
+  strictEqual(this.isDefaultSortOrder('due_date'), false);
+});
+
+test('returns false if called with name', function () {
+  strictEqual(this.isDefaultSortOrder('name'), false);
+});
+
+test('returns false if called with points', function () {
+  strictEqual(this.isDefaultSortOrder('points'), false);
+});
+
+test('returns false if called with points', function () {
+  strictEqual(this.isDefaultSortOrder('custom'), false);
+});
+
+test('returns true if called with anything else', function () {
+  strictEqual(this.isDefaultSortOrder('alpha'), true);
+  strictEqual(this.isDefaultSortOrder('assignment_group'), true);
 });
 
 QUnit.module('Gradebook#getVisibleGradeGridColumns', {
@@ -709,7 +932,8 @@ test('falls back to the default sort type if the custom sort type does not have 
   this.makeCompareAssignmentCustomOrderFn = Gradebook.prototype.makeCompareAssignmentCustomOrderFn;
   this.getVisibleGradeGridColumns();
   ok(this.makeColumnSortFn.calledWith({
-    sortType: 'assignment_group'
+    sortType: 'assignment_group',
+    direction: 'ascending'
   }));
 });
 
@@ -1170,49 +1394,49 @@ test('when editable, calls SubmissionDetailsDialog', function () {
   deepEqual(this.submissionDialogArgs, expectedArguments);
 });
 
-QUnit.module('getViewOptionsMenuProps');
+QUnit.module('Gradebook#getTeacherNotesViewOptionsMenuProps');
 
 test('includes teacherNotes', function () {
   const gradebook = createGradebook();
-  const props = gradebook.getViewOptionsMenuProps();
-  equal(typeof props.teacherNotes.disabled, 'boolean', 'props include "disabled"');
-  equal(typeof props.teacherNotes.onSelect, 'function', 'props include "onSelect"');
-  equal(typeof props.teacherNotes.selected, 'boolean', 'props include "selected"');
+  const props = gradebook.getTeacherNotesViewOptionsMenuProps();
+  equal(typeof props.disabled, 'boolean', 'props include "disabled"');
+  equal(typeof props.onSelect, 'function', 'props include "onSelect"');
+  equal(typeof props.selected, 'boolean', 'props include "selected"');
 });
 
 test('disabled defaults to false', function () {
   const gradebook = createGradebook();
-  const props = gradebook.getViewOptionsMenuProps();
-  equal(props.teacherNotes.disabled, false);
+  const props = gradebook.getTeacherNotesViewOptionsMenuProps();
+  equal(props.disabled, false);
 });
 
 test('disabled is true if the teacher notes column is updating', function () {
   const gradebook = createGradebook();
   gradebook.setTeacherNotesColumnUpdating(true);
-  const props = gradebook.getViewOptionsMenuProps();
-  equal(props.teacherNotes.disabled, true);
+  const props = gradebook.getTeacherNotesViewOptionsMenuProps();
+  equal(props.disabled, true);
 });
 
 test('disabled is false if the teacher notes column is not updating', function () {
   const gradebook = createGradebook();
   gradebook.setTeacherNotesColumnUpdating(false);
-  const props = gradebook.getViewOptionsMenuProps();
-  equal(props.teacherNotes.disabled, false);
+  const props = gradebook.getTeacherNotesViewOptionsMenuProps();
+  equal(props.disabled, false);
 });
 
 test('onSelect calls createTeacherNotes if there are no teacher notes', function () {
   const gradebook = createGradebook({ teacher_notes: null });
   this.stub(gradebook, 'createTeacherNotes');
-  const props = gradebook.getViewOptionsMenuProps();
-  props.teacherNotes.onSelect();
+  const props = gradebook.getTeacherNotesViewOptionsMenuProps();
+  props.onSelect();
   equal(gradebook.createTeacherNotes.callCount, 1);
 });
 
 test('onSelect calls setTeacherNotesHidden with false if teacher notes are hidden', function () {
   const gradebook = createGradebook({ teacher_notes: { hidden: true } });
   this.stub(gradebook, 'setTeacherNotesHidden');
-  const props = gradebook.getViewOptionsMenuProps();
-  props.teacherNotes.onSelect();
+  const props = gradebook.getTeacherNotesViewOptionsMenuProps();
+  props.onSelect();
   equal(gradebook.setTeacherNotesHidden.callCount, 1);
   equal(gradebook.setTeacherNotesHidden.getCall(0).args[0], false)
 });
@@ -1220,28 +1444,155 @@ test('onSelect calls setTeacherNotesHidden with false if teacher notes are hidde
 test('onSelect calls setTeacherNotesHidden with true if teacher notes are visible', function () {
   const gradebook = createGradebook({ teacher_notes: { hidden: false } });
   this.stub(gradebook, 'setTeacherNotesHidden');
-  const props = gradebook.getViewOptionsMenuProps();
-  props.teacherNotes.onSelect();
+  const props = gradebook.getTeacherNotesViewOptionsMenuProps();
+  props.onSelect();
   equal(gradebook.setTeacherNotesHidden.callCount, 1);
   equal(gradebook.setTeacherNotesHidden.getCall(0).args[0], true)
 });
 
 test('selected is false if there are no teacher notes', function () {
   const gradebook = createGradebook({ teacher_notes: null });
-  const props = gradebook.getViewOptionsMenuProps();
-  equal(props.teacherNotes.selected, false);
+  const props = gradebook.getTeacherNotesViewOptionsMenuProps();
+  equal(props.selected, false);
 });
 
 test('selected is false if teacher notes are hidden', function () {
   const gradebook = createGradebook({ teacher_notes: { hidden: true } });
-  const props = gradebook.getViewOptionsMenuProps();
-  equal(props.teacherNotes.selected, false);
+  const props = gradebook.getTeacherNotesViewOptionsMenuProps();
+  equal(props.selected, false);
 });
 
 test('selected is true if teacher notes are visible', function () {
   const gradebook = createGradebook({ teacher_notes: { hidden: false } });
-  const props = gradebook.getViewOptionsMenuProps();
-  equal(props.teacherNotes.selected, true);
+  const props = gradebook.getTeacherNotesViewOptionsMenuProps();
+  equal(props.selected, true);
+});
+
+QUnit.module('Gradebook#getColumnSortSettingsViewOptionsMenuProps', {
+  getProps (sortType = 'due_date', direction = 'ascending') {
+    const storedSortOrder = { sortType, direction };
+
+    this.stub(this.gradebook, 'getStoredSortOrder').returns(storedSortOrder);
+    const props = this.gradebook.getColumnSortSettingsViewOptionsMenuProps();
+    this.gradebook.getStoredSortOrder.restore();
+
+    return props;
+  },
+
+  expectedArgs (sortType, direction) {
+    return [
+      { sortType, direction },
+      false
+    ];
+  },
+
+  setup () {
+    this.gradebook = createGradebook();
+    this.stub(this.gradebook, 'arrangeColumnsBy');
+  }
+});
+
+test('includes all required properties', function () {
+  const props = this.getProps();
+
+  equal(typeof props.criterion, 'string', 'props include "criterion"');
+  equal(typeof props.direction, 'string', 'props include "direction"');
+  equal(typeof props.disabled, 'boolean', 'props include "disabled"');
+  equal(typeof props.onSortByDefault, 'function', 'props include "onSortByDefault"');
+  equal(typeof props.onSortByNameAscending, 'function', 'props include "onSortByNameAscending"');
+  equal(typeof props.onSortByNameDescending, 'function', 'props include "onSortByNameDescending"');
+  equal(typeof props.onSortByDueDateAscending, 'function', 'props include "onSortByDueDateAscending"');
+  equal(typeof props.onSortByDueDateDescending, 'function', 'props include "onSortByDueDateDescending"');
+  equal(typeof props.onSortByPointsAscending, 'function', 'props include "onSortByPointsAscending"');
+  equal(typeof props.onSortByPointsDescending, 'function', 'props include "onSortByPointsDescending"');
+});
+
+test('sets criterion to the sort field', function () {
+  strictEqual(this.getProps().criterion, 'due_date');
+  strictEqual(this.getProps('name').criterion, 'name');
+});
+
+test('sets criterion to "default" when isDefaultSortOrder returns true', function () {
+  strictEqual(this.getProps('assignment_group').criterion, 'default');
+});
+
+test('sets the direction', function () {
+  strictEqual(this.getProps(undefined, 'ascending').direction, 'ascending');
+  strictEqual(this.getProps(undefined, 'descending').direction, 'descending');
+});
+
+test('sets disabled to true when assignments have not been loaded yet', function () {
+  this.gradebook.setAssignmentsLoaded(false);
+
+  strictEqual(this.getProps().disabled, true);
+});
+
+test('sets disabled to false when assignments have been loaded', function () {
+  this.gradebook.setAssignmentsLoaded(true);
+
+  strictEqual(this.getProps().disabled, false);
+});
+
+test('sets onSortByNameAscending to a function that sorts columns by name ascending', function () {
+  this.getProps().onSortByNameAscending();
+
+  strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1);
+  deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('name', 'ascending'));
+});
+
+test('sets onSortByNameAscending to a function that sorts columns by name descending', function () {
+  this.getProps().onSortByNameDescending();
+
+  strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1);
+  deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('name', 'descending'));
+});
+
+test('sets onSortByDueDateAscending to a function that sorts columns by due date ascending', function () {
+  this.getProps().onSortByDueDateAscending();
+
+  strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1);
+  deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('due_date', 'ascending'));
+});
+
+test('sets onSortByDueDateAscending to a function that sorts columns by due date descending', function () {
+  this.getProps().onSortByDueDateDescending();
+
+  strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1);
+  deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('due_date', 'descending'));
+});
+
+test('sets onSortByPointsAscending to a function that sorts columns by points ascending', function () {
+  this.getProps().onSortByPointsAscending();
+
+  strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1);
+  deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('points', 'ascending'));
+});
+
+test('sets onSortByPointsAscending to a function that sorts columns by points descending', function () {
+  this.getProps().onSortByPointsDescending();
+
+  strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1);
+  deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('points', 'descending'));
+});
+
+QUnit.module('Gradebook#getViewOptionsMenuProps', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.teacherNotesProps = { propsFor: 'teacherNotes' };
+    this.columnSortSettingProps = { propsFor: 'columnSortSettings' };
+    this.stub(this.gradebook, 'getTeacherNotesViewOptionsMenuProps').returns(this.teacherNotesProps);
+    this.stub(this.gradebook, 'getColumnSortSettingsViewOptionsMenuProps').returns(this.columnSortSettingProps);
+
+    this.props = this.gradebook.getViewOptionsMenuProps();
+  }
+});
+
+test('includes teacher notes properties', function () {
+  strictEqual(this.props.teacherNotes, this.teacherNotesProps);
+});
+
+test('includes column sort properties', function () {
+  strictEqual(this.props.columnSortSettings, this.columnSortSettingProps);
 });
 
 QUnit.module('Gradebook#createTeacherNotes', {
@@ -4097,4 +4448,57 @@ test('sets the formatted grade on submission', function () {
   this.stub(GradeFormatHelper, 'formatGrade').returns('123.45%');
   this.gradebook.updateSubmission(this.submission);
   equal(this.submission.grade, '123.45%');
+});
+
+QUnit.module('Gradebook#arrangeColumnsBy', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.parentColumns = [];
+    this.gradebook.customColumns = [];
+    this.gradebook.makeColumnSortFn = () => () => 1;
+    this.gradebook.grid = {
+      getColumns () { return []; },
+      setColumns () {}
+    }
+  }
+});
+
+test('renders the view options menu', function () {
+  this.stub(this.gradebook, 'renderViewOptionsMenu');
+  this.stub(this.gradebook, 'updateColumnHeaders');
+  this.stub(this.gradebook.grid, 'setColumns');
+
+  this.gradebook.arrangeColumnsBy({ sortBy: 'due_date', direction: 'ascending' }, false);
+
+  strictEqual(this.gradebook.renderViewOptionsMenu.callCount, 1);
+});
+
+QUnit.module('Gradebook#onColumnsReordered', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.customColumns = [];
+    this.gradebook.grid = {
+      getColumns () { return []; },
+      setColumns () {}
+    }
+
+    this.stub(this.gradebook, 'renderViewOptionsMenu');
+    this.stub(this.gradebook, 'updateColumnHeaders');
+  }
+});
+
+test('re-renders the View options menu', function () {
+  this.stub(this.gradebook, 'storeCustomColumnOrder');
+
+  this.gradebook.onColumnsReordered();
+
+  strictEqual(this.gradebook.renderViewOptionsMenu.callCount, 1);
+});
+
+test('re-renders all column headers', function () {
+  this.stub(this.gradebook, 'storeCustomColumnOrder');
+
+  this.gradebook.onColumnsReordered();
+
+  strictEqual(this.gradebook.updateColumnHeaders.callCount, 1);
 });

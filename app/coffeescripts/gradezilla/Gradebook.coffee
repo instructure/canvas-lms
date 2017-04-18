@@ -253,6 +253,7 @@ define [
 
       dataLoader.gotAssignmentGroups.then () =>
         @contentLoadStates.assignmentsLoaded = true
+        @renderViewOptionsMenu()
         @updateColumnHeaders()
 
       dataLoader.gotSubmissions.then () =>
@@ -458,9 +459,13 @@ define [
     columnOrderHasNotBeenSaved: =>
       !@gradebookColumnOrderSettings
 
+    isDefaultSortOrder: (sortOrder) =>
+      not (['due_date', 'name', 'points', 'custom'].includes(sortOrder))
+
     getStoredSortOrder: =>
       if @isInvalidCustomSort() || @columnOrderHasNotBeenSaved()
-        {sortType: @defaultSortType}
+        sortType: @defaultSortType
+        direction: 'ascending'
       else
         @gradebookColumnOrderSettings
 
@@ -486,6 +491,7 @@ define [
       else
         @storeCustomColumnOrder()
 
+      @renderViewOptionsMenu()
       @updateColumnHeaders()
 
     reorderCustomColumns: (ids) ->
@@ -500,12 +506,7 @@ define [
       newSortOrder.customOrder = _.pluck(scrollable_columns, 'id')
       @setStoredSortOrder(newSortOrder)
 
-    setArrangementTogglersVisibility: (newSortOrder) =>
-      @$columnArrangementTogglers.each ->
-        $(this).closest('li').showIf $(this).data('arrangeColumnsBy') isnt newSortOrder.sortType
-
     arrangeColumnsBy: (newSortOrder, isFirstArrangement) =>
-      @setArrangementTogglersVisibility(newSortOrder)
       @setStoredSortOrder(newSortOrder) unless isFirstArrangement
 
       columns = @grid.getColumns()
@@ -514,14 +515,16 @@ define [
       columns.splice(0, 0, frozen...)
       @grid.setColumns(columns)
 
+      @renderViewOptionsMenu()
       @updateColumnHeaders()
 
     makeColumnSortFn: (sortOrder) =>
       switch sortOrder.sortType
-        when 'assignment_group', 'alpha' then @wrapColumnSortFn(@compareAssignmentPositions)
-        when 'due_date' then @wrapColumnSortFn(@compareAssignmentDueDates)
+        when 'due_date' then @wrapColumnSortFn(@compareAssignmentDueDates, sortOrder.direction)
+        when 'name' then @wrapColumnSortFn(@compareAssignmentNames, sortOrder.direction)
+        when 'points' then @wrapColumnSortFn(@compareAssignmentPointsPossible, sortOrder.direction)
         when 'custom' then @makeCompareAssignmentCustomOrderFn(sortOrder)
-        else throw "unhandled column sort condition"
+        else @wrapColumnSortFn(@compareAssignmentPositions, sortOrder.direction)
 
     compareAssignmentPositions: (a, b) ->
       diffOfAssignmentGroupPosition = a.object.assignment_group.position - b.object.assignment_group.position
@@ -535,6 +538,12 @@ define [
       firstAssignment = a.object
       secondAssignment = b.object
       assignmentHelper.compareByDueDate(firstAssignment, secondAssignment)
+
+    compareAssignmentNames: (a, b) =>
+      @localeSort(a.object.name, b.object.name);
+
+    compareAssignmentPointsPossible: (a, b) ->
+      a.object.points_possible - b.object.points_possible
 
     makeCompareAssignmentCustomOrderFn: (sortOrder) =>
       sortMap = {}
@@ -561,7 +570,7 @@ define [
         else
           return @wrapColumnSortFn(@compareAssignmentPositions)(a, b)
 
-    wrapColumnSortFn: (wrappedFn) ->
+    wrapColumnSortFn: (wrappedFn, direction = 'ascending') ->
       (a, b) ->
         return -1 if b.type is 'total_grade'
         return  1 if a.type is 'total_grade'
@@ -569,7 +578,9 @@ define [
         return  1 if a.type is 'assignment_group' and b.type isnt 'assignment_group'
         if a.type is 'assignment_group' and b.type is 'assignment_group'
           return a.object.position - b.object.position
-        return wrappedFn(a, b)
+
+        [a, b] = [b, a] if direction == 'descending'
+        wrappedFn(a, b)
 
     rowFilter: (student) =>
       matchingSection = !@sectionToShow || (@sectionToShow in student.sections)
@@ -1116,10 +1127,6 @@ define [
       if @hideAggregateColumns()
         $settingsMenu.find('#include-ungraded-list-item').hide()
 
-      @$columnArrangementTogglers = $('#gradebook-toolbar [data-arrange-columns-by]').bind 'click', (event) =>
-        event.preventDefault()
-        newSortOrder = { sortType: $(event.currentTarget).data('arrangeColumnsBy') }
-        @arrangeColumnsBy(newSortOrder, false)
       @arrangeColumnsBy(@getStoredSortOrder(), true)
 
       $('#gradebook_settings').kyleMenu(returnFocusTo: $('#gradebook_settings'))
@@ -1159,7 +1166,7 @@ define [
         props.variant = mountPoint.getAttribute('data-variant')
         renderComponent(GradebookMenu, mountPoint, props)
 
-    getViewOptionsMenuProps: ->
+    getTeacherNotesViewOptionsMenuProps: ->
       teacherNotes = @options.teacher_notes
       showingNotes = teacherNotes? and not teacherNotes.hidden
       if showingNotes
@@ -1168,10 +1175,39 @@ define [
         onSelect = => @setTeacherNotesHidden(false)
       else
         onSelect = @createTeacherNotes
-      teacherNotes:
-        disabled: @contentLoadStates.teacherNotesColumnUpdating
-        onSelect: onSelect
-        selected: showingNotes
+
+      disabled: @contentLoadStates.teacherNotesColumnUpdating
+      onSelect: onSelect
+      selected: showingNotes
+
+    getColumnSortSettingsViewOptionsMenuProps: ->
+      storedSortOrder = @getStoredSortOrder()
+      criterion = if @isDefaultSortOrder(storedSortOrder.sortType)
+        'default'
+      else
+        storedSortOrder.sortType
+
+      criterion: criterion
+      direction: storedSortOrder.direction || 'ascending'
+      disabled: not @contentLoadStates.assignmentsLoaded
+      onSortByDefault: =>
+        @arrangeColumnsBy({ sortType: 'default', direction: 'ascending' }, false)
+      onSortByNameAscending: =>
+        @arrangeColumnsBy({ sortType: 'name', direction: 'ascending' }, false)
+      onSortByNameDescending: =>
+        @arrangeColumnsBy({ sortType: 'name', direction: 'descending' }, false)
+      onSortByDueDateAscending: =>
+        @arrangeColumnsBy({ sortType: 'due_date', direction: 'ascending' }, false)
+      onSortByDueDateDescending: =>
+        @arrangeColumnsBy({ sortType: 'due_date', direction: 'descending' }, false)
+      onSortByPointsAscending: =>
+        @arrangeColumnsBy({ sortType: 'points', direction: 'ascending' }, false)
+      onSortByPointsDescending: =>
+        @arrangeColumnsBy({ sortType: 'points', direction: 'descending' }, false)
+
+    getViewOptionsMenuProps: ->
+      teacherNotes: @getTeacherNotesViewOptionsMenuProps()
+      columnSortSettings: @getColumnSortSettingsViewOptionsMenuProps()
       showUnpublishedAssignments: @showUnpublishedAssignments
       onSelectShowUnpublishedAssignments: @toggleUnpublishedAssignments
 
