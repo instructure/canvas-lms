@@ -33,11 +33,13 @@ describe AuditorApiController do
 
   context 'check_configured' do
     it 'should return not_found if database is not configured' do
-      Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).returns(false)
-      audits_controller.expects(:not_found).once
+      allow(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).and_return(false)
+      expect(audits_controller).to receive(:render).with(hash_including(status: :not_found))
       audits_controller.check_configured
+    end
 
-      Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).returns(true)
+    it 'should not block when database is configured' do
+      allow(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).and_return(true)
       expect(audits_controller.check_configured).to be_nil
     end
   end
