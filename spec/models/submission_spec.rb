@@ -116,8 +116,253 @@ describe Submission do
     end
   end
 
-  it "should create a new instance given valid attributes" do
-    Submission.create!(@valid_attributes)
+  describe 'cached_due_date' do
+    before(:once) do
+      @now = Time.zone.local(2013, 10, 18)
+    end
+
+    let(:submission) { @assignment.submissions.find_by(user_id: @student) }
+
+    it "should get initialized during submission creation" do
+      # create an invited user, so that the submission is not automatically
+      # created by the DueDateCacher
+      student_in_course
+      @assignment.update_attribute(:due_at, Time.zone.now - 1.day)
+
+      override = @assignment.assignment_overrides.build
+      override.title = "Some Title"
+      override.set = @course.default_section
+      override.override_due_at(Time.zone.now + 1.day)
+      override.save!
+      # mysql just truncated the timestamp
+      override.reload
+
+      submission = @assignment.submissions.create(:user => @user)
+      expect(submission.cached_due_date).to eq override.due_at
+    end
+
+    context 'due date changes after student submits' do
+      before(:once) do
+        Timecop.freeze(@now) do
+          @assignment.update!(due_at: 20.minutes.ago, submission_types: 'online_text_entry')
+          @assignment.submit_homework(@student, body: 'how is babby formed')
+        end
+      end
+
+      it 'changes if the assignment due date changes' do
+        expect { @assignment.update!(due_at: 15.minutes.ago(@now)) }.to change {
+          submission.reload.cached_due_date
+        }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
+      end
+
+      context 'student overrides' do
+        before(:once) do
+          @override = @assignment.assignment_overrides.create!(due_at: 15.minutes.ago(@now), due_at_overridden: true)
+        end
+
+        it 'changes if an override is added for the student' do
+          expect { @override.assignment_override_students.create!(user: @student) }.to change {
+            submission.reload.cached_due_date
+          }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
+        end
+
+        it 'changes if an override is removed for the student' do
+          other_student = User.create!
+          @course.enroll_student(other_student, active_all: true)
+          @override.assignment_override_students.create!(user: @student)
+          # need two students for this spec. if there's only one student and we remove the
+          # assignment_override_student, the entire assignment_override gets wiped out and
+          # we're testing something completely different.
+          @override.assignment_override_students.create!(user: other_student)
+          expect { @override.assignment_override_students.find_by(user_id: @student).destroy }.to change {
+            submission.reload.cached_due_date
+          }.from(15.minutes.ago(@now)).to(20.minutes.ago(@now))
+        end
+
+        it 'changes if the due date for the override is changed' do
+          @override.assignment_override_students.create!(user: @student)
+          expect { @override.update!(due_at: 14.minutes.ago(@now)) }.to change {
+            submission.reload.cached_due_date
+          }.from(15.minutes.ago(@now)).to(14.minutes.ago(@now))
+        end
+      end
+
+      context 'section overrides' do
+        before(:once) do
+          @section = @course.course_sections.create!(name: 'My Awesome Section')
+        end
+
+        it 'changes if an override is added for the section the student is in' do
+          student_in_section(@section, user: @student)
+          expect do
+            @assignment.assignment_overrides.create!(
+              due_at: 15.minutes.ago(@now),
+              due_at_overridden: true,
+              set: @section
+            )
+          end.to change {
+            submission.reload.cached_due_date
+          }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
+        end
+
+        it 'changes if a student is added to the section after the override is added for the section' do
+          @assignment.assignment_overrides.create!(
+            due_at: 15.minutes.ago(@now),
+            due_at_overridden: true,
+            set: @section
+          )
+
+          expect { student_in_section(@section, user: @student) }.to change {
+            submission.reload.cached_due_date
+          }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
+        end
+
+        it 'changes if a student is removed from a section with a due date for the assignment' do
+          @assignment.assignment_overrides.create!(
+            due_at: 15.minutes.ago(@now),
+            due_at_overridden: true,
+            set: @section
+          )
+
+          @course.enroll_student(@student, section: @section, allow_multiple_enrollments: true).accept!
+          expect { @student.enrollments.find_by(course_section_id: @section).destroy }.to change {
+            submission.reload.cached_due_date
+          }.from(15.minutes.ago(@now)).to(20.minutes.ago(@now))
+        end
+
+        it 'changes if the due date for the override is changed' do
+          student_in_section(@section, user: @student)
+          override = @assignment.assignment_overrides.create!(
+            due_at: 15.minutes.ago(@now),
+            due_at_overridden: true,
+            set: @section
+          )
+          expect { override.update!(due_at: 14.minutes.ago(@now)) }.to change {
+            submission.reload.cached_due_date
+          }.from(15.minutes.ago(@now)).to(14.minutes.ago(@now))
+        end
+      end
+
+      context 'group overrides' do
+        before(:once) do
+          category = @course.group_categories.create!(name: 'New Group Category')
+          @group = @course.groups.create!(group_category: category)
+          @assignment = @course.assignments.create!(group_category: category, due_at: 20.minutes.ago(@now))
+          @assignment.submit_homework(@student, body: 'how is babby formed')
+        end
+
+        it 'changes if an override is added for the group the student is in' do
+          @group.add_user(@student, 'active')
+
+          expect do
+            @assignment.assignment_overrides.create!(
+              due_at: 15.minutes.ago(@now),
+              due_at_overridden: true,
+              set: @group
+            )
+          end.to change {
+            submission.reload.cached_due_date
+          }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
+        end
+
+        it 'changes if a student is added to the group after the override is added for the group' do
+          @assignment.assignment_overrides.create!(
+            due_at: 15.minutes.ago(@now),
+            due_at_overridden: true,
+            set: @group
+          )
+
+          expect { @group.add_user(@student, 'active') }.to change {
+            submission.reload.cached_due_date
+          }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
+        end
+
+        it 'changes if a student is removed from a group with a due date for the assignment' do
+          @group.add_user(@student, 'active')
+          @assignment.assignment_overrides.create!(
+            due_at: 15.minutes.ago(@now),
+            due_at_overridden: true,
+            set: @group
+          )
+
+          expect { @group.group_memberships.find_by(user_id: @student).destroy }.to change {
+            submission.reload.cached_due_date
+          }.from(15.minutes.ago(@now)).to(20.minutes.ago(@now))
+        end
+
+        it 'changes if the due date for the override is changed' do
+          @group.add_user(@student, 'active')
+          override = @assignment.assignment_overrides.create!(
+            due_at: 15.minutes.ago(@now),
+            due_at_overridden: true,
+            set: @group
+          )
+
+          expect { override.update!(due_at: 14.minutes.ago(@now)) }.to change {
+            submission.reload.cached_due_date
+          }.from(15.minutes.ago(@now)).to(14.minutes.ago(@now))
+        end
+      end
+
+      it 'uses the most lenient due date if there are multiple overrides' do
+        category = @course.group_categories.create!(name: 'New Group Category')
+        group = @course.groups.create!(group_category: category)
+        assignment = @course.assignments.create!(group_category: category, due_at: 20.minutes.ago(@now))
+        assignment.submit_homework(@student, body: 'how is babby formed')
+
+        section = @course.course_sections.create!(name: 'My Awesome Section')
+        @course.enroll_student(@student, section: section, allow_multiple_enrollments: true).accept!
+        assignment.assignment_overrides.create!(
+          due_at: 6.minutes.ago(@now),
+          due_at_overridden: true,
+          set: section
+        )
+
+        group.add_user(@student, 'active')
+        assignment.assignment_overrides.create!(
+          due_at: 21.minutes.ago(@now),
+          due_at_overridden: true,
+          set: group
+        )
+
+        student_override = assignment.assignment_overrides.create!(
+          due_at: 14.minutes.ago(@now),
+          due_at_overridden: true
+        )
+        override_student = student_override.assignment_override_students.create!(user: @student)
+
+        submission = assignment.submissions.find_by(user: @student)
+        expect { @student.enrollments.find_by(course_section: section).destroy }.to change {
+          submission.reload.cached_due_date
+        }.from(6.minutes.ago(@now)).to(14.minutes.ago(@now))
+
+        expect { override_student.destroy }.to change {
+          submission.reload.cached_due_date
+        }.from(14.minutes.ago(@now)).to(21.minutes.ago(@now))
+      end
+
+      it 'uses override due dates instead of assignment due dates, even if the assignment due date is more lenient' do
+        student_override = @assignment.assignment_overrides.create!(
+          due_at: 21.minutes.ago(@now),
+          due_at_overridden: true
+        )
+
+        student_override.assignment_override_students.create!(user: @student)
+        expect(submission.cached_due_date).to eq(21.minutes.ago(@now))
+      end
+
+      it 'falls back to use the assignment due date if all overrides are destroyed' do
+        student_override = @assignment.assignment_overrides.create!(
+          due_at: 21.minutes.ago(@now),
+          due_at_overridden: true
+        )
+
+        override_student = student_override.assignment_override_students.create!(user: @student)
+        expect { override_student.destroy }.to change {
+          submission.reload.cached_due_date
+        }.from(21.minutes.ago(@now)).to(20.minutes.ago(@now))
+      end
+    end
   end
 
   include_examples "url validation tests"
@@ -1646,26 +1891,6 @@ describe Submission do
       @submission.score = 0.00000001
       @submission.graded_at = Time.zone.now + 1.day
       expect(@submission).to be_missing
-    end
-  end
-
-  describe "cached_due_date" do
-    it "should get initialized during submission creation" do
-      # create an invited user, so that the submission is not automatically
-      # created by the DueDateCacher
-      student_in_course
-      @assignment.update_attribute(:due_at, Time.zone.now - 1.day)
-
-      override = @assignment.assignment_overrides.build
-      override.title = "Some Title"
-      override.set = @course.default_section
-      override.override_due_at(Time.zone.now + 1.day)
-      override.save!
-      # mysql just truncated the timestamp
-      override.reload
-
-      submission = @assignment.submissions.create(:user => @user)
-      expect(submission.cached_due_date).to eq override.due_at
     end
   end
 

@@ -184,7 +184,6 @@ class Submission < ActiveRecord::Base
   before_save :prep_for_submitting_to_plagiarism
   before_save :check_url_changed
   before_save :check_reset_graded_anonymously
-  before_create :cache_due_date
   after_save :touch_user
   after_save :touch_graders
   after_save :update_assignment
@@ -1080,6 +1079,9 @@ class Submission < ActiveRecord::Base
   end
 
   def infer_values
+    # we don't want this to be in a before_create because we want cache_due_date
+    # to happen before we infer other values, if it's needed
+    cache_due_date if new_record? && assignment.present?
     if assignment
       self.context_code = assignment.context_code
     end

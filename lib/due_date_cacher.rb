@@ -17,8 +17,10 @@
 
 class DueDateCacher
   def self.recompute(assignment)
-    new([assignment]).send_later_if_production_enqueue_args(:recompute,
-      :strand => "cached_due_date:calculator:#{assignment.context_type}:#{Shard.global_id_for(assignment.context_id)}")
+    new([assignment]).send_later_if_production_enqueue_args(
+      :recompute,
+      singleton: "cached_due_date:calculator:Assignment:#{assignment.global_id}"
+    )
   end
 
   def self.recompute_course(course, assignments = nil)

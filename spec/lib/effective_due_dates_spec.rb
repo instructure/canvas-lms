@@ -555,8 +555,7 @@ describe Course do
       it 'uses assigned date instead of submission date even if submission was late' do
         override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
         override.assignment_override_students.create!(user: @student1)
-        @assignment1.submissions.create!(
-          user: @student1,
+        @assignment1.submissions.find_by(user: @student1).update!(
           submitted_at: 1.week.from_now(@now),
           submission_type: 'online_text_entry',
           workflow_state: 'graded'
@@ -618,8 +617,7 @@ describe Course do
       it 'prioritizes the override due date even if it is earlier than the Everyone Else date and the student has a graded submission that does not qualify' do
         override = @assignment2.assignment_overrides.create!(due_at: 3.days.ago(@now), due_at_overridden: true)
         override.assignment_override_students.create!(user: @student1)
-        @assignment2.submissions.create!(
-          user: @student1,
+        @assignment2.submissions.find_by(user: @student1).update!(
           submitted_at: 1.week.from_now(@now),
           submission_type: 'online_text_entry',
           workflow_state: 'graded'
