@@ -21,7 +21,9 @@ module UserSearch
         context.grants_right?(searcher, session, :manage_admin_users)
       restrict_search = true
     end
-    base_scope.where(conditions_statement(search_term, {:restrict_search => restrict_search}))
+    context.shard.activate do
+      base_scope.where(conditions_statement(search_term, {:restrict_search => restrict_search}))
+    end
   end
 
   def self.conditions_statement(search_term, options={})
