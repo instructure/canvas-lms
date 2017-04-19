@@ -1040,7 +1040,7 @@ class Account < ActiveRecord::Base
   def default_enrollment_term
     return @default_enrollment_term if @default_enrollment_term
     if self.root_account?
-      @default_enrollment_term = self.enrollment_terms.active.where(name: EnrollmentTerm::DEFAULT_TERM_NAME).first_or_create
+      @default_enrollment_term = Shackles.activate(:master) { self.enrollment_terms.active.where(name: EnrollmentTerm::DEFAULT_TERM_NAME).first_or_create }
     end
   end
 
