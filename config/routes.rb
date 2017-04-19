@@ -25,6 +25,7 @@ CanvasRails::Application.routes.draw do
   get 'bz/accessibility_mapper' => 'bz#accessibility_mapper'
   post 'bz/accessibility_mapper' => 'bz#save_html_changes'
   get 'bz/full_module_view' => 'bz#full_module_view'
+  get 'bz/assignment_with_magic_fields' => 'bz#assignment_with_magic_fields'
   # IMPORTANT: there are more custom routes below, search for 'bz'
   # end
   resources :epub_exports, only: [:index]
