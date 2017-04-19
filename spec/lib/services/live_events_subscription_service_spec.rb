@@ -84,6 +84,7 @@ module Services
       describe '.destroy_all_tool_proxy_subscriptions' do
         it 'makes the expected request' do
           tool_proxy.stubs(:context).returns(root_account_context)
+          root_account_context.stubs(:root_account).returns(root_account_object)
           HTTParty.expects(:send).with do |method, endpoint, options|
             expect(method).to eq(:delete)
             expect(endpoint).to eq('http://example.com/api/subscriptions')
