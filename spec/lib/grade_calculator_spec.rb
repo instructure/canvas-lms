@@ -117,6 +117,39 @@ describe GradeCalculator do
         expect(Enrollment.shard(@course.shard).where(user_id: @user.global_id).first.computed_current_score).to eql(50.0)
         expect(Enrollment.shard(@course.shard).where(user_id: @user.global_id).first.computed_final_score).to eql(25.0)
       end
+
+      it "should update cross-shard scores with grading periods" do
+        now = Time.zone.now
+        @user = User.create!
+
+        @shard1.activate do
+          account = Account.create!
+          course_with_student(active_all: true, account: account, user: @user)
+          grading_period_set = account.grading_period_groups.create!
+          grading_period_set.enrollment_terms << @course.enrollment_term
+          @grading_period = grading_period_set.grading_periods.create!(
+            title: 'Fall Semester',
+            start_date: 1.month.from_now(now),
+            end_date: 3.months.from_now(now)
+          )
+          @group = @course.assignment_groups.create!(name: "some group", group_weight: 100)
+          @assignment = @course.assignments.create!(title: "Some Assignment", due_at: now, points_possible: 10, assignment_group: @group)
+          @course.assignments.create!(title: "Some Assignment2", due_at: now, points_possible: 10, assignment_group: @group)
+          @assignment_in_period = @course.assignments.create!(title: 'In a Grading Period', due_at: 2.months.from_now(now), points_possible: 10)
+          @course.assignments.create!(title: 'In a Grading Period', due_at: 2.months.from_now(now), points_possible: 10)
+          @submission = @assignment.submissions.create!(user: @user)
+          @submission_in_period = @assignment_in_period.submissions.create!(user: @user)
+        end
+
+        @submission.update_column(:score, 5)
+        @submission_in_period.update_column(:score, 2)
+        GradeCalculator.recompute_final_score(@user.id, @course.id, grading_period_id: @grading_period.id)
+
+        expect(Enrollment.shard(@course.shard).where(user_id: @user.global_id).first.computed_current_score).to eql(35.0)
+        expect(Enrollment.shard(@course.shard).where(user_id: @user.global_id).first.computed_final_score).to eql(17.5)
+        expect(Enrollment.shard(@course.shard).where(user_id: @user.global_id).first.computed_current_score(grading_period_id: @grading_period.id)).to eql(20.0)
+        expect(Enrollment.shard(@course.shard).where(user_id: @user.global_id).first.computed_final_score(grading_period_id: @grading_period.id)).to eql(10.0)
+      end
     end
 
     it "should recompute when an assignment's points_possible changes'" do
