@@ -21,15 +21,25 @@ require 'nokogiri'
 class BigBlueButtonConference < WebConference
   include ActionDispatch::Routing::PolymorphicRoutes
   include CanvasRails::Application.routes.url_helpers
-  after_destroy :end_meeting
-  after_destroy :delete_all_recordings
+  before_destroy :end_meeting
+  before_destroy :delete_all_recordings
+
+  SHOW_RECORDING_OPTION = '1'
+  HIDE_RECORDING_OPTION = '2'
+  RECORD_EVERYTHING = '3'
+
+  RECORDING_OPTIONS = {
+    SHOW_RECORDING_OPTION.to_i => t('settings_show_option','Show record option'),
+    HIDE_RECORDING_OPTION.to_i => t('settings_hide_option','Hide record option (true by default)'),
+    RECORD_EVERYTHING.to_i => t('settings_record_everything','Record everything')
+  }
 
   user_setting_field :record, {
     name: ->{ t('recording_setting', 'Recording') },
     description: ->{ t('recording_setting_enabled_description', 'Enable recording for this conference') },
     type: :boolean,
-    default: false,
-    visible: ->{ WebConference.config(BigBlueButtonConference.to_s)[:recording_enabled] },
+    default: ->{ WebConference.config(BigBlueButtonConference.to_s) && WebConference.config(BigBlueButtonConference.to_s).key?(:recording_option_enabled) ? WebConference.config(BigBlueButtonConference.to_s)[:recording_option_enabled] : false },
+    visible: ->{ WebConference.config(BigBlueButtonConference.to_s) && WebConference.config(BigBlueButtonConference.to_s).key?(:recording_options) ? WebConference.config(BigBlueButtonConference.to_s)[:recording_options]==SHOW_RECORDING_OPTION : false },
   }
 
   def initiate_conference
@@ -44,19 +54,35 @@ class BigBlueButtonConference < WebConference
       settings[:user_key] = 8.times.map{ chars[chars.size * rand] }.join
       settings[:admin_key] = 8.times.map{ chars[chars.size * rand] }.join until settings[:admin_key] && settings[:admin_key] != settings[:user_key]
     end
-    settings[:record] &&= config[:recording_enabled]
     current_host = URI(settings[:default_return_url] || "http://www.instructure.com").host
-    send_request(:create, {
+
+    requestBody = {
       :meetingID => conference_key,
       :name => title,
       :voiceBridge => "%020d" % self.global_id,
       :attendeePW => settings[:user_key],
       :moderatorPW => settings[:admin_key],
-      :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
-      :record => settings[:record] ? "true" : "false",
-      :welcome => settings[:record] ? t("This conference may be recorded.") : "",
-      "meta_canvas-recording-ready-url" => recording_ready_url(current_host)
-    }) or return nil
+      :logoutURL => settings[:default_return_url] ? "javascript:window.close()" : "http://www.instructure.com",
+      :welcome => config[:recording_enabled] ? t("This conference may be recorded.") : ""
+    }
+    requestBody["meta_bn-recording-ready-url"] = recording_ready_url(current_host)
+
+    if config[:recording_enabled]
+      case config[:recording_options]
+      when SHOW_RECORDING_OPTION
+        requestBody[:record] = settings[:record]
+      when HIDE_RECORDING_OPTION
+        requestBody[:record] = true
+      when RECORD_EVERYTHING
+        requestBody[:record] = true
+        requestBody[:autoStartRecording] = true
+        requestBody[:allowStartStopRecording] = false
+      end
+    else
+      requestBody[:record] = false
+    end
+
+    send_request(:create, requestBody) or return nil
     @conference_active = true
     save
     conference_key
@@ -87,19 +113,77 @@ class BigBlueButtonConference < WebConference
 
   def recordings
     fetch_recordings.map do |recording|
-      recording_format = recording.fetch(:playback, {}).fetch(:format, {})
-      {
-        recording_id:     recording[:recordID],
-        duration_minutes: recording_format[:length].to_i,
-        playback_url:     recording_format[:url],
+      recording_formats = recording.fetch(:playback, {})
+      recordingObj = {
+        recording_id:       recording[:recordID],
+        recording_vendor:   "big_blue_button",
+        published:          recording[:published]=="true" ? true : false,
+        protected:          recording[:protected] ? recording[:protected]=="true" ? true : false : nil,
+        ended_at:           recording[:endTime].to_i,
+        duration_minutes:   recording_formats.first[:length].to_i,
+        recording_formats:  [],
+        images:             []
       }
+      recording_formats.each do |recording_format|
+        recordingObj[:recording_formats] << {
+          type:             recording_format[:type].capitalize,
+          playback_url:     recording_format[:url]
+        }
+        if recording_format[:preview] && recording_format[:preview][:images] && recording_format[:preview][:images].length > recordingObj[:images].length
+          recordingObj[:images] = recording_format[:preview][:images]
+        end
+      end
+      recordingObj
     end
   end
 
   def delete_all_recordings
-    fetch_recordings.map do |recording|
-      delete_recording recording[:recordID]
+    recordings = fetch_recordings.map!{ |recording| recording[:recordID] }
+    if recordings.length > 0
+      page_size = 25
+      for page in 0..(recordings.length / page_size + 1)
+        offset = page * page_size
+        recs = recordings[(offset)..(offset + page_size)]
+        send_request(:deleteRecordings, {
+          :recordID => recs.join(","),
+          })
+      end
     end
+  end
+
+  def delete_recording(recording_id)
+    send_request(:deleteRecordings, {
+      :recordID => recording_id,
+      })
+    get_recording(recording_id)
+  end
+
+  def publish_recording(recording_id, publish)
+    send_request(:publishRecordings, {
+      :recordID => recording_id,
+      :publish  => publish
+      })
+    get_recording(recording_id)
+  end
+
+  def protect_recording(recording_id, protect)
+    send_request(:updateRecordings, {
+      :recordID => recording_id,
+      :protect  => protect
+      })
+    get_recording(recording_id)
+  end
+
+  def get_recording(recording_id)
+    response_recordings = send_request(:getRecordings, {
+      :meetingID => conference_key
+      })
+    recording = response_recordings[:recordings].find{ |r| r[:recordID]==recording_id }
+    if recording
+      response = { :published => recording[:published], :protected => recording[:protected], :recording_formats => [] }
+      recording[:playback].each{ |formats| response[:recording_formats] << { :type => formats[:type].capitalize, :url => formats[:url] } }
+    end
+    response if response
   end
 
   def close
@@ -112,9 +196,7 @@ class BigBlueButtonConference < WebConference
   def retouch?
     # If we've queried the room status recently, use that result to determine if
     # we need to recreate it.
-    if !@conference_active.nil?
-      return !@conference_active
-    end
+    return !@conference_active unless @conference_active.nil?
 
     # BBB removes chat rooms that have been idle fairly quickly.
     # There's no harm in "creating" a room that already exists; the api will
@@ -132,15 +214,17 @@ class BigBlueButtonConference < WebConference
   end
 
   def end_meeting
-    response = send_request(:end, {
-      :meetingID => conference_key,
-      :password => settings[(type == :user ? :user_key : :admin_key)],
-      })
-    response[:ended] if response
+    if self.ended_at.nil?
+      response = send_request(:end, {
+        :meetingID => conference_key,
+        :password => settings[(type == :user ? :user_key : :admin_key)],
+        })
+      response[:ended] if response
+    end
   end
 
   def fetch_recordings
-    return [] unless conference_key && settings[:record]
+    return [] unless conference_key && config[:recording_enabled]
     response = send_request(:getRecordings, {
       :meetingID => conference_key,
       })
@@ -149,17 +233,23 @@ class BigBlueButtonConference < WebConference
     Array(result)
   end
 
-  def delete_recording(recording_id)
-    response = send_request(:deleteRecordings, {
-      :recordID => recording_id,
-      })
-    response[:deleted] if response
-  end
-
   def generate_request(action, options)
     query_string = options.to_query
     query_string << ("&checksum=" + Digest::SHA1.hexdigest(action.to_s + query_string + config[:secret_dec]))
-    "http://#{config[:domain]}/bigbluebutton/api/#{action}?#{query_string}"
+    returnUrl = config[:domain]
+    returnUrl.slice!(-1) if returnUrl[-1]=="/"
+    unless returnUrl.include?("http://") && returnUrl.include?("/api")
+      returnUrl = if returnUrl.include?("http://") && !returnUrl.include?("/api")
+                    returnUrl.include?("/bigbluebutton") ? "#{returnUrl}/api" : "#{returnUrl}/bigbluebutton/api"
+                  elsif !returnUrl.include?("http://") && returnUrl.include?("/api")
+                    #We assume that we have a URL in the type "domain/bigbluebutton/api"
+                    "http://#{returnUrl}"
+                  else
+                    #For URLs only including the IP address
+                    "http://#{returnUrl}/bigbluebutton/api"
+                  end
+    end
+    "#{returnUrl}/#{action}?#{query_string}"
   end
 
   def send_request(action, options)
@@ -202,11 +292,21 @@ class BigBlueButtonConference < WebConference
       nil
     # If no child_elements, this is probably a text node, so just return its content
     elsif child_elements.empty?
-      node.content
+      if node.name == "image"
+        {
+          :width            =>  node.attributes["width"].value,
+          :height           =>  node.attributes["height"].value,
+          :title            =>  node.attributes["alt"].value,
+          :thumbnail_url    =>  node.content
+        }
+      else
+        node.content
+      end
     # The BBB API follows the pattern where a plural element (ie <bars>)
     # contains many singular elements (ie <bar>) and nothing else. Detect this
     # and return an array to be assigned to the plural element.
-    elsif node.name.singularize == child_elements.first.name
+    # Also if the node name is playback, so that it returns an array of all the available recording formats
+    elsif node.name.singularize == child_elements.first.name || node.name=="playback"
       child_elements.map { |child| xml_to_value(child) }
     # otherwise, make a hash of the child elements
     else

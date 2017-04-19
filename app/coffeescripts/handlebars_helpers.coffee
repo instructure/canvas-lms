@@ -126,6 +126,18 @@ define [
       real_min_str = (if real_minutes < 10 then "0" + real_minutes else real_minutes)
       "#{hours}:#{real_min_str}"
 
+    # Convert the total amount of minutes into a readable duration format.
+    durationToString : (minutes) ->
+      hours = Math.floor(minutes / 60)
+      real_minutes = minutes % 60
+      str = I18n.t('edit_conference_form.duration', 'Duration')+": "
+      if minutes>=60
+        return str+I18n.t('quiz_statistics.duration_in_hours_and_minutes', "%{hours} and %{minutes}", {hours: hours, minutes: real_minutes})
+      else if minutes>1
+        return str+I18n.t('quiz_statistics.duration_in_minutes.other', "%{count} minutes", {count: real_minutes})
+      else
+        return str+I18n.t('quiz_statistics.duration_in_minutes.one', "1 minute")
+
     # helper for easily creating icon font markup
     addIcon : (icontype) ->
       new Handlebars.SafeString "<i class='icon-#{htmlEscape icontype}'></i>"

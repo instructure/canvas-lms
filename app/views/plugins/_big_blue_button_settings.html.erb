@@ -1,3 +1,6 @@
+<%
+  js_bundle :big_blue_button
+%>
 <%= fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
@@ -22,7 +25,27 @@
     <tr>
       <td></td>
       <td>
-        <%= f.check_box :recording_enabled %> <%= f.label :recording_enabled, :en => "Allow conferences to be recorded." %>
+        <%= f.check_box :recording_enabled, :id => "recordings_enabled_checkbox" %> <%= f.label :recording_enabled, :en => "Enable recordings" %>
+      </td>
+    </tr>
+    <tr id="recording_feature_options">
+      <td></td>
+      <td>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <%= f.select :recording_options, options_for_select(BigBlueButtonConference::RECORDING_OPTIONS.map{ |k,v| [v, k] }, :selected => (WebConference.config(BigBlueButtonConference.to_s) && WebConference.config(BigBlueButtonConference.to_s).key?(:recording_options)) ? WebConference.config(BigBlueButtonConference.to_s)[:recording_options] : '1' ), :id => "recording_options" %>
+      </td>
+    </tr>
+    <tr id="recording_option_enabled" style="display:none;">
+      <td></td>
+      <td>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <%= f.check_box :recording_option_enabled %> <%= f.label :recording_option_enabled, :en => "Recording option true by default" %>
+      </td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <%= f.check_box :invitations_enabled, :class => "invitations_enabled_checkbox" %> <%= f.label :invitations_enabled, :en => "Invitations are sent to all participants by default." %>
       </td>
     </tr>
   </table>

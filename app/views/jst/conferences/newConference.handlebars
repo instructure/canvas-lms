@@ -7,7 +7,7 @@
             aria-controls="conference-{{id}}"
             aria-expanded="false"
             role="button">
-          <i class="icon-mini-arrow-right"></i>
+          <i class="icon-mini-arrow-right auto_rotate"></i>
           {{title}}
         </a>
       {{else}}
@@ -22,29 +22,35 @@
         {{#if scheduled}}
           <div>{{datetimeFormatted scheduled_at}}</div>
         {{/if}}
-        {{#if recording}}
-          {{#if multipleRecordings}}
-            <div>{{#t "recordings"}}{{recordingCount}} Recordings{{/t}}</div>
-          {{else}}
-            <div>{{#t "recording"}}1 Recording{{/t}}</div>
-          {{/if}}
+        {{#if description}}
+          <div class="ig-details__item ig-details__item--wrap-text">
+            {{description}}
+          </div>
         {{/if}}
-        <div>{{description}}</div>
+        {{#if recording}}
+          <div class="ig-details__item">
+            {{#if multipleRecordings}}
+              {{#t "recordings"}}{{recordingCount}} Recordings{{/t}}
+            {{else}}
+              {{#t "recording"}}1 Recording{{/t}}
+            {{/if}}
+          </div>
+        {{/if}}
       </div>
     </div>
     <div class="ig-admin">
       {{# if show_end}}
-        <a class='btn btn-small close_conference_link' href="{{ url }}/close">{{#t "end_it_now"}}End{{/t}}</a>
+        <a class='btn btn-small close_conference_link' href="{{url}}/close">{{#t "end_it_now"}}End{{/t}}</a>
       {{/if}}
       {{#if started_at}}
         {{#if permissions.join}}
-          <a href="{{ join_url }}" class="btn btn-small join-button btn-primary" target="_blank">
+          <a href="{{join_url}}" class="btn btn-small join-button btn-primary" target="_blank">
             {{#t "join"}}Join{{/t}}
           </a>
         {{/if}}
       {{else}}
         {{#if permissions.initiate}}
-          <a href="{{ join_url }}" class="btn btn-small start-button" target="_blank" {{#unless id}}disabled="disabled"{{/unless}}>
+          <a href="{{join_url}}" class="btn btn-small start-button" target="_blank" {{#unless id}}disabled="disabled"{{/unless}}>
             {{#t "start"}}Start{{/t}}
          </a>
         {{/if}}
@@ -60,7 +66,7 @@
           <ul id="{{id}}-content-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false" aria-activedescendant="{{id}}-content-2">
             {{#if permissions.update}}
               <li role="presentation">
-                <a href="#conference_{{ id }}"
+                <a href="#conference_{{id}}"
                     class="icon-edit edit_conference_link"
                     id="{{id}}-content-2"
                     role="menuitem"
@@ -69,7 +75,7 @@
             {{/if}}
             {{#if permissions.delete}}
               <li role="presentation">
-                <a href="{{ url }}"
+                <a href="{{url}}"
                     class="icon-trash  delete_conference_link"
                     id="{{id}}-content-3"
                     role="menuitem"
@@ -89,27 +95,88 @@
     <ul>
       {{#each recordings}}
         <li>
-          <div class="ig-row">
-            <div class="ig-row__layout">
-              <div class="ig-info">
-                <div class="ig-details">
-                  <a href="{{playback_url}}" target="_blank" class="ig-title">
-                    {{title}}
+          {{#if recording_vendor}}
+            {{#ifEqual recording_vendor "big_blue_button"}}
+              <div class="ig-row" data-id="{{recording_id}}" style="text-align: center;">
+                <div class="ig-row__layout">
+                  <div class="ig-info">
+                    <div class="ig-details">
+                      {{#each recording_formats}}
+                        <a {{#if ../../published}}href="{{playback_url}}" target="_blank"{{/if}}
+                          class="ig-title" data-id="{{../recording_id}}" style="line-height: inherit;" data-format="{{type}}">
+                          {{type}}
+                        </a>
+                      {{/each}}
+                      {{dateString ended_at}}
+                      &#124;&nbsp;
+                      {{durationToString duration_minutes}}
+                    </div>
+                  </div>
+                  {{#if ../../../permissions.delete}}
+                    <div class="ig-loader" data-id="{{recording_id}}" style="display: none;">
+                      <img src="/images/ajax-loader-black-on-white.gif" class="loader" />
+                    </div>
+                    <div class="ig-button" data-id="{{recording_id}}" data-url="{{../../../../url}}">
+                      {{#ifNull ../protected}}
+                      {{else}}
+                        <img src="/images/ajax-loader-black-on-white.gif" class="loader" data-action="protect" style="display: none;" />
+                        <a class="btn btn-small protect{{#if ../protected}} icon-lock{{else}} icon-unlock{{/if}}" data-protect="{{#if ../protected}}true{{else}}false{{/if}}">
+                            {{#if ../protected}}
+                              {{#t 'protected'}}Protected{{/t}}
+                            {{else}}
+                              {{#t 'unprotected'}}Unprotected{{/t}}
+                            {{/if}}
+                        </a>
+                      {{/ifNull}}
+                      <img src="/images/ajax-loader-black-on-white.gif" class="loader" data-action="publish" style="display: none;" />
+                      <a class="btn btn-small publish{{#if ../published}} icon-publish{{else}} icon-unpublish{{/if}}" data-publish="{{#if ../published}}true{{else}}false{{/if}}">
+                          {{#if ../published}}
+                            {{#t 'published'}}Published{{/t}}
+                          {{else}}
+                            {{#t 'unpublished'}}Unpublished{{/t}}
+                          {{/if}}
+                      </a>
+                      <a class="btn btn-small icon-trash delete_recording_link">
+                        {{#t "delete"}}Delete{{/t}}
+                      </a>
+                    </div>
+                  {{/if}}
+                </div>
+                {{#ifEqual images.length 0}}
+                {{else}}
+                  <div class="recording-thumbnails{{#if ../../published}}{{else}} hidden{{/if}}" data-id="{{recording_id}}">
+                    {{#each images}}
+                      <img src="{{#if ../../published}}{{thumbnail_url}}{{/if}}" alt="{{title}}" class="recording-thumbnail" data-src="{{thumbnail_url}}" />
+                      <img src="{{#if ../../published}}{{thumbnail_url}}{{/if}}" class="large-thumbnail" data-src="{{thumbnail_url}}" />
+                    {{/each}}
+                    <small class="help-text">Hover over an image to view it in full size.</small>
+                  </div>
+                {{/ifEqual}}
+              </div>
+            {{/ifEqual}}
+          {{else}}
+            <div class="ig-row">
+              <div class="ig-row__layout">
+                <div class="ig-info">
+                  <div class="ig-details">
+                    <a href="{{playback_url}}" target="_blank" class="ig-title">
+                      {{title}}
+                    </a>
+                    {{dateString created_at}}
+                    &nbsp;&#124;&nbsp;
+                    {{durationToString duration_minutes}}
+                  </div>
+                </div>
+                <div class="ig-button">
+                  <a class="btn btn-small" target="_blank" href="{{playback_url}}">
+                    {{#t "view"}}View{{/t}}
                   </a>
-                  {{dateString created_at}}
-                  &nbsp;&#124;&nbsp;
-                  {{minutesToHM duration_minutes}}
                 </div>
               </div>
-              <div class="ig-button">
-                <a class="btn btn-small" target="_blank" href="{{playback_url}}">
-                  {{#t "view"}}View{{/t}}
-                </a>
-              </div>
             </div>
-          </div>
+          {{/if}}
         </li>
       {{/each}}
-    </ul
+    </ul>
   </div>
 {{/if}}

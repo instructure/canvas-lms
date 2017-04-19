@@ -21,13 +21,21 @@ module Canvas::Plugins::Validators::BigBlueButtonValidator
     if settings.map(&:last).all?(&:blank?)
       {}
     else
-      expected_settings = [:domain, :secret, :recording_enabled]
-      if settings.size != expected_settings.size || settings.map(&:last).any?(&:blank?)
+      expected_settings = [:domain, :secret, :recording_enabled, :recording_options, :recording_option_enabled, :invitations_enabled]
+      if settings.size != expected_settings.size || settings[:domain].blank? || settings[:secret].blank?
         plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
         false
       else
         settings = settings.permit(*expected_settings).to_h.with_indifferent_access
         settings[:recording_enabled] = Canvas::Plugin.value_to_boolean(settings[:recording_enabled])
+        if settings[:recording_enabled]
+          settings[:recording_option_enabled] = settings[:recording_options]=='1' ? Canvas::Plugin.value_to_boolean(settings[:recording_option_enabled]) : false
+          settings[:invitations_enabled] = Canvas::Plugin.value_to_boolean(settings[:invitations_enabled])
+        else
+          settings[:recording_options] = '1'
+          settings[:recording_option_enabled] = false
+          settings[:invitations_enabled] = false
+        end
         settings
       end
     end
