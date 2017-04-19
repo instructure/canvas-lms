@@ -6,6 +6,7 @@ define [
   'jst/DiscussionTopics/discussionList'
   'compiled/views/DiscussionTopics/DiscussionView'
   'jqueryui/draggable'
+  'jqueryui/droppable'
   'jqueryui/sortable'
 ], ($, _, Spinner, CollectionView, template, itemView) ->
 
