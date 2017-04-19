@@ -22,6 +22,7 @@ import AssignmentGroupListView from 'compiled/views/assignments/AssignmentGroupL
 import CreateGroupView from 'compiled/views/assignments/CreateGroupView'
 import IndexView from 'compiled/views/assignments/IndexView'
 import AssignmentSettingsView from 'compiled/views/assignments/AssignmentSettingsView'
+import AssignmentSyncSettingsView from 'compiled/views/assignments/AssignmentSyncSettingsView'
 import AssignmentGroupWeightsView from 'compiled/views/assignments/AssignmentGroupWeightsView'
 import ToggleShowByView from 'compiled/views/assignments/ToggleShowByView'
 import _ from 'underscore'
@@ -60,6 +61,7 @@ const assignmentGroupsView = new AssignmentGroupListView({
 })
 
 let assignmentSettingsView = false
+let assignmentSyncSettingsView = false
 let createGroupView = false
 let showByView = false
 const indexEl = window.location.href.indexOf('assignments') === -1 ? '#course_home_content' : '#content'
@@ -69,6 +71,12 @@ if (ENV.PERMISSIONS.manage_course) {
     model: course,
     assignmentGroups,
     weightsView: AssignmentGroupWeightsView,
+    userIsAdmin
+  })
+
+  assignmentSyncSettingsView = new AssignmentSyncSettingsView({
+    collection: assignmentGroups,
+    model: course,
     userIsAdmin
   })
 
@@ -88,6 +96,7 @@ const app = new IndexView({
   el: indexEl,
   assignmentGroupsView,
   assignmentSettingsView,
+  assignmentSyncSettingsView,
   createGroupView,
   showByView,
   collection: assignmentGroups

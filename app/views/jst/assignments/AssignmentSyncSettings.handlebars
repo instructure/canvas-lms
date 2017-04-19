@@ -1,0 +1,27 @@
+<div class="form-dialog-content sync-to-sis-message-content">
+  {{#if cannotDisableSync}}
+    <span class="disable-sync-to-sis-message alert">
+      {{#t}}You are not authorized to disable the Sync to {{ENV.SIS_NAME}} option.{{/t}}
+    </span>
+  {{else}}
+    <span class="disable-sync-to-sis-message">
+      {{#t}} Are you sure you want to disable Sync to {{ENV.SIS_NAME}} for all assignments?{{/t}}
+    </span>
+  {{/if}}
+</div>
+
+<div class="form-controls">
+  <button
+    id="cancel-assignment-settings"
+    class="btn dialog_closer {{#if cannotDisableSync}}disabled{{/if}}"
+    type="button"
+    {{#if cannotDisableSync}}aria-disabled="true"{{/if}}
+  >{{#t}}Cancel{{/t}}</button>
+  <button
+    id="update-assignment-settings"
+    class="btn btn-primary {{#if cannotDisableSync}}disabled{{/if}}"
+    data-text-while-loading='{{#t}}Loading...{{/t}}'
+    type="submit"
+    {{#if cannotDisableSync}}aria-disabled="true"{{/if}}
+  >{{#t}}Disable{{/t}}</button>
+</div>
