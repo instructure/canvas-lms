@@ -12,6 +12,59 @@ class BzController < ApplicationController
   before_filter :require_user
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user]
 
+  # When in speed grader and there's an assignment with BOTH magic fields and file upload,
+  # Canvas prefers the file upload. It won't even submit the magic field info if the user
+  # uploads the file, nor will it allow the grader to see it.
+  #
+  # This page allows us to link to the assignment definition with a specific user's magic
+  # field entry for use from the grader. It is meant to be iframed in there for TAs.
+  def assignment_with_magic_fields
+    course_id = params[:course]
+    assignment_id = params[:assignment]
+    student_id = params[:student]
+
+    @assignment = Assignment.find(assignment_id)
+    @context = Course.find(course_id)
+    if @assignment.rubric_association || can_do(@context, @current_user, :manage_grades)
+      @assignment_html = @assignment.description
+
+      # this is basically a port of the getInnerHtmlWithMagicFieldsReplaced function
+      # from bz_support.js. Just doing it server side for 1) speed and 2) viewing another
+      # user's data, with proper permission checking
+      doc = Nokogiri::HTML(@assignment_html)
+      doc.css('[data-bz-retained]').each do |o|
+        result = RetainedData.where(:user_id => student_id, :name => o["data-bz-retained"])
+        value = ''
+        value = result.first.value unless result.empty?
+
+        if o.name == "TEXTAREA"
+          n = doc.create_element 'div'
+          n.content = value
+        elsif o.name == "INPUT" && o.attr['type'] == 'checkbox'
+          n = doc.create_element 'span'
+          n.inner_html = value == 'yes' ? '[X]' : '[ ]'
+        elsif o.name == "INPUT" && o.attr['type'] == 'radio'
+          n = doc.create_element 'span'
+          n.inner_html = value == 'yes' ? '[O]' : '[ ]'
+        else
+          n = doc.create_element 'span'
+          n.content = value
+        end
+
+        n['class'] = "bz-retained-field-replaced"
+
+        o.replace n
+
+      end
+
+      @assignment_html = "<div class=\"bz-magic-field-submission\">" + doc.to_xhtml + "</div>";
+
+      @permission = true
+    else
+      @permission = false
+    end
+  end
+
   def accessibility_mapper
     @items = []
     WikiPage.all.each do |page|
