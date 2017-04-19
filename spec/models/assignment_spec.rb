@@ -2000,8 +2000,10 @@ describe Assignment do
           expect(@assignment.reload.grants_right?(@admin, :delete)).to eql(true)
         end
 
-        it "is true for teachers" do
-          expect(@assignment.reload.grants_right?(@teacher, :delete)).to eql(true)
+        it "is false for teachers" do
+          # since the override does not have the due date overridden, we fall
+          # back to using the assignment's due_at, which falls in a closed grading period
+          expect(@assignment.reload.grants_right?(@teacher, :delete)).to eql(false)
         end
       end
     end

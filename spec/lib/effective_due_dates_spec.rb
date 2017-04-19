@@ -291,12 +291,62 @@ describe Course do
         expect(result).to eq expected
       end
 
-      it 'ignores overrides without due_at_overridden' do
+      it 'includes overrides without due_at_overridden, and uses the due_at from the assignment' do
         override = @assignment1.assignment_overrides.create!(due_at: nil)
         override.assignment_override_students.create!(user: @student3)
 
         edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd.to_hash).to eq({})
+        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(@assignment1.due_at)
+      end
+
+      it 'uses the due_at from the assignment when the assignment is only visible to overrides and no overrides for the student have due_at_overridden' do
+        @assignment1.update!(due_at: @now)
+        override = @assignment1.assignment_overrides.create!(due_at: 2.days.from_now(@now))
+        override.assignment_override_students.create!(user: @student3)
+
+        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(@now)
+      end
+
+      it 'uses the due_at from the assignment when the assignment is visible to everyone and no overrides for the student have due_at_overridden' do
+        @assignment1.update!(only_visible_to_overrides: false, due_at: @now)
+        override = @assignment1.assignment_overrides.create!(due_at: 2.days.from_now(@now))
+        override.assignment_override_students.create!(user: @student3)
+
+        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(@now)
+      end
+
+      it 'does not consider the due_at from overrides without due_at_overridden when the override due_at is nil' do
+        override = @assignment1.assignment_overrides.create!(due_at: nil)
+        override.assignment_override_students.create!(user: @student3)
+
+        section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
+        student_in_section(section, user: @student3)
+        section_override = @assignment1.assignment_overrides.create!(
+          due_at: 1.day.from_now(@now),
+          due_at_overridden: true,
+          set: section
+        )
+
+        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(1.day.from_now(@now))
+      end
+
+      it 'does not consider the due_at from overrides without due_at_overridden even if the due date is more lenient than other dates' do
+        override = @assignment1.assignment_overrides.create!(due_at: 2.days.from_now(@now))
+        override.assignment_override_students.create!(user: @student3)
+
+        section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
+        student_in_section(section, user: @student3)
+        section_override = @assignment1.assignment_overrides.create!(
+          due_at: 1.day.from_now(@now),
+          due_at_overridden: true,
+          set: section
+        )
+
+        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(1.day.from_now(@now))
       end
 
       it 'applies adhoc overrides' do
