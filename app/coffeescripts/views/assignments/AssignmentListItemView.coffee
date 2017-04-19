@@ -106,7 +106,11 @@ define [
           saveURL: -> "#{ENV.URLS.assignment_sort_base_url}/#{@parentListView.value()}/reorder"
 
         if @isGraded() && @model.postToSISEnabled() && @model.published()
-          @sisButtonView = new SisButtonView(model: @model, sisName: @model.postToSISName(), dueDateRequired: @model.dueDateRequiredForAccount())
+          @sisButtonView = new SisButtonView
+            model: @model
+            sisName: @model.postToSISName()
+            dueDateRequired: @model.dueDateRequiredForAccount()
+            maxNameLengthRequired: @model.maxNameLengthRequiredForAccount()
 
       @dateDueColumnView       = new DateDueColumnView(model: @model)
       @dateAvailableColumnView = new DateAvailableColumnView(model: @model)

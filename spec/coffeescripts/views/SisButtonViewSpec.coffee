@@ -86,7 +86,7 @@ define [
     ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
     @assignment.set('post_to_sis', false)
     @assignment.set('name', 'Too Much Tuna')
-    @view = new SisButtonView(model: @assignment)
+    @view = new SisButtonView(model: @assignment, maxNameLengthRequired: true)
     @view.render()
     @view.$el.click()
     ok !@assignment.postToSIS()
@@ -96,7 +96,7 @@ define [
     ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
     @assignment.set('post_to_sis', false)
     @assignment.set('name', 'Too Much Tuna')
-    @view = new SisButtonView(model: @assignment)
+    @view = new SisButtonView(model: @assignment, maxNameLengthRequired: false)
     @view.render()
     @view.$el.click()
     ok @assignment.postToSIS()
@@ -106,7 +106,7 @@ define [
     ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
     @quiz.set('post_to_sis', false)
     @quiz.set('title', 'Too Much Tuna')
-    @view = new SisButtonView(model: @quiz)
+    @view = new SisButtonView(model: @quiz, maxNameLengthRequired: true)
     @view.render()
     @view.$el.click()
     ok !@quiz.postToSIS()
@@ -116,7 +116,7 @@ define [
     ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
     @quiz.set('post_to_sis', false)
     @quiz.set('title', 'Too Much Tuna')
-    @view = new SisButtonView(model: @quiz)
+    @view = new SisButtonView(model: @quiz, maxNameLengthRequired: false)
     @view.render()
     @view.$el.click()
     ok @quiz.postToSIS()

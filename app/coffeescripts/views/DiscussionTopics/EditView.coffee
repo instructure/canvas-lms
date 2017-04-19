@@ -391,6 +391,7 @@ define [
         postToSIS: post_to_sis
         maxNameLength: max_name_length
         name: data.title
+        maxNameLengthRequired: ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT
       })
 
       if validationHelper.nameTooLong()

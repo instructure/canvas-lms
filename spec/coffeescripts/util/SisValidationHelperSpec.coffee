@@ -28,7 +28,8 @@ define [
                                 model: new AssignmentStub()
                                 postToSIS: true
                                 name: 'Too Much Tuna'
-                                maxNameLength: 5)
+                                maxNameLength: 5,
+                                maxNameLengthRequired: true)
     ok @helper.nameTooLong()
 
   test 'nameTooLong returns false if name is too long AND postToSIS is false', ->
@@ -36,7 +37,8 @@ define [
                                 model: new AssignmentStub()
                                 postToSIS: false
                                 name: 'Too Much Tuna'
-                                maxNameLength: 5)
+                                maxNameLength: 5,
+                                maxNameLengthRequired: false)
     ok !@helper.nameTooLong()
 
   test 'dueDateMissing returns true if dueAt is null AND postToSIS is true', ->

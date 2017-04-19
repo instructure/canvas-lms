@@ -157,6 +157,9 @@ define [
     maxNameLength: =>
       return ENV.MAX_NAME_LENGTH
 
+    maxNameLengthRequiredForAccount: =>
+      return ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT
+
     dueDateRequiredForAccount: =>
       return ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
 

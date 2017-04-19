@@ -22,6 +22,11 @@ define [
     # is required
     @optionProperty 'dueDateRequired'
 
+    # {boolean}
+    # boolean used to determine if name length
+    # is required
+    @optionProperty 'maxNameLengthRequired'
+
     setAttributes: ->
       newSisAttributes = @sisAttributes()
       @$input.attr({
@@ -41,6 +46,7 @@ define [
         dueDate: @model.dueAt()
         name: @model.name()
         maxNameLength: @model.maxNameLength()
+        maxNameLengthRequired: @maxNameLengthRequired
       })
       errors = @errorsExist(validationHelper)
       if errors['has_error'] == true && @model.sisIntegrationSettingsEnabled()
