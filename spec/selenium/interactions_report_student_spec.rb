@@ -28,8 +28,8 @@ describe "student interactions report" do
         @student2 = student_in_course(:active_all => true, :name => "zzz student").user
 
         @assignment = @course.assignments.create(:name => "first assignment", :points_possible => 10)
-        @sub1 = @assignment.submissions.create(:user => @student1)
-        @sub2 = @assignment.submissions.create(:user => @student2)
+        @sub1 = @assignment.submissions.find_by!(user: @student1)
+        @sub2 = @assignment.submissions.find_by!(user: @student2)
 
         @sub1.update_attribute(:score, 10)
         @sub2.update_attribute(:score, 5)

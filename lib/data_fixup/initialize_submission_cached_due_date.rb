@@ -17,8 +17,10 @@
 
 module DataFixup::InitializeSubmissionCachedDueDate
   def self.run
-    Assignment.find_ids_in_ranges do |min, max|
-      DueDateCacher.recompute_batch(min.to_i..max.to_i)
+    Course.find_in_batches do |courses|
+      courses.each do |course|
+        DueDateCacher.recompute_course(course, nil, priority: Delayed::LOWER_PRIORITY)
+      end
     end
   end
 end

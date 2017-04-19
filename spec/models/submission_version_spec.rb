@@ -22,9 +22,7 @@ describe SubmissionVersion do
   def unversioned_submission
     # bypass the built-in submission versioning
     course_with_student
-    submission = @user.submissions.build(:assignment => @course.assignments.create!)
-    submission.without_versioning{ submission.save! }
-    submission
+    @user.submissions.find_by(assignment: @course.assignments.create!)
   end
 
   before do

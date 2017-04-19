@@ -99,14 +99,14 @@ describe DiscussionEntriesController do
       assignment_model(:course => @course)
       @topic.assignment = @assignment
       @topic.save
-      expect(@student.submissions).to be_empty
+      expect(@student.submissions.not_placeholder).to be_empty
 
       post 'create', :course_id => @course.id, :discussion_entry => {:discussion_topic_id => @topic.id, :message => "yo"}
       expect(response).to be_redirect
 
       @student.reload
-      expect(@student.submissions.size).to eq 1
-      expect(@student.submissions.first.submission_type).to eq 'discussion_topic'
+      expect(@student.submissions.not_placeholder.size).to eq 1
+      expect(@student.submissions.not_placeholder.first.submission_type).to eq 'discussion_topic'
     end
   end
   

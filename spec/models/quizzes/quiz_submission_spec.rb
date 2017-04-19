@@ -1554,7 +1554,8 @@ describe Quizzes::QuizSubmission do
           finished_at: Time.zone.now, user: @user, quiz: quiz, workflow_state: :complete
         )
 
-        expect(qs.submission.minutes_late).to eq(4)
+        expected_minutes_late = (Time.zone.now - 60.seconds - 5.minutes.ago.change(sec: 0)) / 60
+        expect(qs.submission.minutes_late).to eq(expected_minutes_late)
       end
     end
   end

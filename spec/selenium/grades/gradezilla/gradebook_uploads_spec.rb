@@ -167,7 +167,7 @@ describe "Gradezilla - uploads" do
     expect(@course.assignments.count).to eql (assignment_count + 1)
     assignment = @course.assignments.order(:created_at).last
     expect(assignment.name).to eq "Assignment 2"
-    expect(assignment.submissions.count).to eql 0
+    expect(assignment.submissions.having_submission.count).to eql 0
     expect(f('#gradebook_wrapper')).to be_displayed
   end
 

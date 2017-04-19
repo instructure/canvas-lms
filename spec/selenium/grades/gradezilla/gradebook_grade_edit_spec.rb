@@ -136,8 +136,8 @@ describe "Gradezilla editing grades" do
 
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l4', 'A-')
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l4')).to include_text('A-')
-    expect(@assignment.reload.submissions.size).to eq 1
-    sub = @assignment.submissions.first
+    expect(@assignment.submissions.where('grade is not null').count).to eq 1
+    sub = @assignment.submissions.where('grade is not null').first
     expect(sub.grade).to eq 'A-'
     expect(sub.score).to eq 0.0
   end

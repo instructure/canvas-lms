@@ -43,7 +43,7 @@ class EffectiveDueDates
       hsh[assignment_id] ||= {}
       attributes = {}
       if include?(included, :due_at)
-        attributes[:due_at] = row["due_at"] && Time.zone.parse(row["due_at"])
+        attributes[:due_at] = row["due_at"] && Time.parse(row["due_at"])
       end
       if include?(included, :grading_period_id)
         attributes[:grading_period_id] = row["grading_period_id"] && row["grading_period_id"].to_i

@@ -242,6 +242,7 @@ class GradingPeriod < ActiveRecord::Base
     gp_id = time_boundaries_changed? ? id : nil
     if course_group?
       recompute_score_for(grading_period_group.course, gp_id)
+      DueDateCacher.recompute_course(grading_period_group.course) if gp_id
     else
       self.send_later_if_production(:recompute_scores_for_term_courses, gp_id) # there could be a lot of courses here
     end

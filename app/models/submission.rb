@@ -58,6 +58,7 @@ class Submission < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :user
   belongs_to :grader, :class_name => 'User'
+  belongs_to :grading_period
   belongs_to :group
   belongs_to :media_object
   belongs_to :student, :class_name => 'User', :foreign_key => :user_id
@@ -400,20 +401,14 @@ class Submission < ActiveRecord::Base
       else
         Rails.logger.info "GRADES: submission #{global_id} score changed. recomputing grade for course #{context.global_id} user #{user_id}."
         self.class.connection.after_transaction_commit do
-          effective_due_dates = EffectiveDueDates.new(self.context, self.assignment_id)
-          grading_period_id = effective_due_dates.grading_period_id_for(
-            student_id: self.user_id,
-            assignment_id: self.assignment_id
-          )
           Enrollment.recompute_final_score_in_singleton(
             self.user_id,
             self.context.id,
-            grading_period_id: grading_period_id,
-            update_all_grading_period_scores: false
+            grading_period_id: grading_period_id
           )
         end
       end
-      self.assignment.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score) if self.assignment
+      self.assignment&.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score)
     end
     true
   end
@@ -1089,8 +1084,9 @@ class Submission < ActiveRecord::Base
     end
 
     self.accepted_at = nil unless late_policy_status == 'late'
-    self.submitted_at ||= Time.now if self.has_submission? || (self.submission_type && !self.submission_type.empty?)
+    self.submitted_at ||= Time.now if self.has_submission?
     self.quiz_submission.reload if self.quiz_submission_id
+    self.workflow_state = 'submitted' if self.unsubmitted? && self.submitted_at
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?
     self.workflow_state = 'graded' if self.grade && self.score && self.grade_matches_current_submission
     self.workflow_state = 'pending_review' if self.submission_type == 'online_quiz' && self.quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
@@ -1229,6 +1225,8 @@ class Submission < ActiveRecord::Base
 
     student_id = user_id || self.user.try(:id)
 
+    # TODO: replace this check with `grading_period&.closed?` once
+    # the populate_grading_period_for_submissions data fixup finishes
     if assignment.in_closed_grading_period_for_student?(student_id)
       :assignment_in_closed_grading_period
     else
@@ -1257,6 +1255,8 @@ class Submission < ActiveRecord::Base
 
     student_id = self.user_id || self.user.try(:id)
 
+    # TODO: replace this check with `grading_period&.closed?` once
+    # the populate_grading_period_for_submissions data fixup finishes
     if assignment.in_closed_grading_period_for_student?(student_id)
       :assignment_in_closed_grading_period
     else
@@ -1483,7 +1483,7 @@ class Submission < ActiveRecord::Base
     unless submission_type
       self.submission_type ||= "online_url" if self.url
       self.submission_type ||= "online_text_entry" if self.body
-      self.submission_type ||= "online_upload" if !self.attachments.empty?
+      self.submission_type ||= "online_upload" unless self.attachment_ids.blank?
     end
     true
   end
@@ -1506,6 +1506,9 @@ class Submission < ActiveRecord::Base
 
   scope :having_submission, -> { where("submissions.submission_type IS NOT NULL") }
   scope :without_submission, -> { where(submission_type: nil, workflow_state: "unsubmitted") }
+  scope :not_placeholder, -> {
+    where("submissions.submission_type IS NOT NULL or submissions.excused or submissions.score IS NOT NULL")
+  }
 
   scope :include_user, -> { preload(:user) }
 

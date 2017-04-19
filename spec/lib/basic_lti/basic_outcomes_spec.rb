@@ -276,7 +276,7 @@ describe BasicLTI::BasicOutcomes do
       it "creates a new submissions if there isn't one" do
         xml.css('resultData').remove
         expect{BasicLTI::BasicOutcomes.process_request(tool, xml)}.
-          to change{assignment.submissions.where(user_id: @user.id).count}.from(0).to(1)
+          to change{assignment.submissions.not_placeholder.where(user_id: @user.id).count}.from(0).to(1)
       end
 
       it 'creates a new submission of type "external_tool" when a grade is passed back without a submission' do

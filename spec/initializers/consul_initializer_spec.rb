@@ -20,6 +20,7 @@ require_relative '../../config/initializers/consul'
 
 describe ConsulInitializer do
   after(:each) do
+    Canvas::DynamicSettings.config = nil
     Canvas::DynamicSettings.reset_cache!
     Canvas::DynamicSettings.fallback_data = nil
   end

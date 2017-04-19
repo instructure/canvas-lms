@@ -131,8 +131,9 @@ describe "editing grades" do
 
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l5', 'A-')
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l5')).to include_text('A-')
-    expect(@assignment.reload.submissions.size).to eq 1
-    sub = @assignment.submissions.first
+    submissions = @assignment.submissions.where('grade is not null')
+    expect(submissions.count).to eq 1
+    sub = submissions.first
     expect(sub.grade).to eq 'A-'
     expect(sub.score).to eq 0.0
   end

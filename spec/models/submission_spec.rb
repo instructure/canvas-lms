@@ -29,11 +29,12 @@ describe Submission do
     @assignment.workflow_state = "published"
     @assignment.save
     @valid_attributes = {
-      assignment_id: @assignment.id,
-      user_id: @user.id,
+      assignment: @assignment,
+      user: @user,
       grade: "1.5",
       grader: @teacher,
-      url: "www.instructure.com"
+      url: "www.instructure.com",
+      workflow_state: "submitted"
     }
   end
 
@@ -76,7 +77,7 @@ describe Submission do
           before(:once) do
             @assignment.due_at = in_open_grading_period
             @assignment.save!
-            @submission = Submission.create!(@valid_attributes)
+            submission_spec_model
           end
 
           it "has grade permissions if the user is a root account admin" do
@@ -98,7 +99,7 @@ describe Submission do
           before(:once) do
             @assignment.due_at = outside_of_any_grading_period
             @assignment.save!
-            @submission = Submission.create!(@valid_attributes)
+            submission_spec_model
           end
 
           it "has grade permissions if the user is a root account admin" do
@@ -124,7 +125,7 @@ describe Submission do
       @now = Time.zone.local(2013, 10, 18)
     end
 
-    let(:submission) { @assignment.submissions.find_by(user_id: @student) }
+    let(:submission) { @assignment.submissions.find_by!(user_id: @student) }
 
     it "gets initialized during submission creation" do
       # create an invited user, so that the submission is not automatically
@@ -138,8 +139,8 @@ describe Submission do
       override.override_due_at(Time.zone.now + 1.day)
       override.save!
 
-      submission = @assignment.submissions.create(:user => @user)
-      expect(submission.cached_due_date).to eq override.reload.due_at
+      submission = @assignment.submissions.find_by!(user: @user)
+      expect(submission.cached_due_date).to eq override.reload.due_at.change(sec: 0)
     end
 
     context 'due date changes after student submits' do
@@ -352,7 +353,7 @@ describe Submission do
         )
         override_student = student_override.assignment_override_students.create!(user: @student)
 
-        submission = assignment.submissions.find_by(user: @student)
+        submission = assignment.submissions.find_by!(user: @student)
         expect { @student.enrollments.find_by(course_section: section).destroy }.to change {
           submission.reload.cached_due_date
         }.from(6.minutes.ago(@now)).to(14.minutes.ago(@now))
@@ -416,7 +417,7 @@ describe Submission do
       @assignment.update!(due_at: 1.hour.ago(@date), submission_types: "online_text_entry")
     end
 
-    let(:submission) { @assignment.submissions.find_by(user_id: @student) }
+    let(:submission) { @assignment.submissions.find_by!(user_id: @student) }
 
     it "returns time between submitted_at and cached_due_date" do
       Timecop.freeze(@date) do
@@ -526,11 +527,11 @@ describe Submission do
 
   include_examples "url validation tests"
   it "should check url validity" do
-    test_url_validation(Submission.create!(@valid_attributes))
+    test_url_validation(submission_spec_model)
   end
 
   it "should add http:// to the body for long urls, too" do
-    s = Submission.create!(@valid_attributes)
+    s = submission_spec_model
     expect(s.url).to eq 'http://www.instructure.com'
 
     long_url = ("a"*300 + ".com")
@@ -1049,7 +1050,7 @@ describe Submission do
   describe 'computation of scores' do
     before(:once) do
       @assignment.update!(points_possible: 10)
-      @submission = Submission.create!(@valid_attributes)
+      submission_spec_model
     end
 
     let(:scores) do
@@ -1720,19 +1721,13 @@ describe Submission do
   end
 
   it "should return the correct quiz_submission_version" do
-    # see redmine #6048
-
     # set up the data to have a submission with a quiz submission with multiple versions
     course_factory
     quiz = @course.quizzes.create!
     quiz_submission = quiz.generate_submission @user, false
     quiz_submission.save
 
-    submission = Submission.create!({
-      :assignment_id => @assignment.id,
-      :user_id => @user.id,
-      :quiz_submission_id => quiz_submission.id
-    })
+    @assignment.submissions.find_by!(user: @user).update!(quiz_submission_id: quiz_submission.id)
 
     submission = @assignment.submit_homework @user, :submission_type => 'online_quiz'
     submission.quiz_submission_id = quiz_submission.id
@@ -2355,7 +2350,7 @@ describe Submission do
 
   describe "#get_web_snapshot" do
     it "should not blow up if web snapshotting fails" do
-      sub = Submission.new(@valid_attributes)
+      sub = submission_spec_model
       CutyCapt.expects(:enabled?).returns(true)
       CutyCapt.expects(:snapshot_attachment_for_url).with(sub.url).returns(nil)
       sub.get_web_snapshot
@@ -2807,7 +2802,7 @@ describe Submission do
 
   describe '#add_comment' do
     before(:once) do
-      @submission = Submission.create!(@valid_attributes)
+      submission_spec_model
     end
 
     it 'creates a draft comment when passed true in the draft_comment option' do
@@ -3068,8 +3063,12 @@ describe Submission do
 
 
   def submission_spec_model(opts={})
-    @submission = Submission.new(@valid_attributes.merge(opts))
-    @submission.save!
+    opts = @valid_attributes.merge(opts)
+    assignment = opts.delete(:assignment) || Assignment.find(opts.delete(:assignment_id))
+    user = opts.delete(:user) || User.find(opts.delete(:user_id))
+    @submission = assignment.submissions.find_by!(user: user)
+    @submission.update!(opts)
+    @submission
   end
 
   def setup_account_for_turnitin(account)

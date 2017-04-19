@@ -221,7 +221,9 @@ describe Assignment::SpeedGrader do
     json = Assignment::SpeedGrader.new(assignment, @teacher).json
     json[:submissions].each do |submission|
       user = [student_1, student_2].detect { |s| s.id.to_s == submission[:user_id] }
-      expect(submission[:late]).to eq user.submissions.first.late?
+      if(submission[:workflow_state] == "submitted")
+        expect(submission[:late]).to eq user.submissions.first.late?
+      end
     end
   end
 

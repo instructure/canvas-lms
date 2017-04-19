@@ -22,21 +22,21 @@ describe Pseudonym do
 
   it "should create a new instance given valid attributes" do
     user_model
-    factory_with_protected_attributes(Pseudonym, valid_pseudonym_attributes)
+    expect{factory_with_protected_attributes(Pseudonym, valid_pseudonym_attributes)}.to change(Pseudonym, :count).by(1)
   end
 
   it "should allow single character usernames" do
     user_model
     pseudonym_model
     @pseudonym.unique_id = 'c'
-    @pseudonym.save!
+    expect(@pseudonym.save).to be true
   end
 
   it "should allow a username that starts with a special character" do
     user_model
     pseudonym_model
     @pseudonym.unique_id = '+c'
-    @pseudonym.save!
+    expect(@pseudonym.save).to be true
   end
 
   it "should allow apostrophes in usernames" do

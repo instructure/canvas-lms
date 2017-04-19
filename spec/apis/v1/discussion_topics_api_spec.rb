@@ -1345,7 +1345,7 @@ describe DiscussionTopicsController, type: :request do
       @topic.save
 
       student_in_course(:active_all => true)
-      expect(@user.submissions).to be_empty
+      expect(@user.submissions.not_placeholder).to be_empty
 
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
@@ -1354,8 +1354,8 @@ describe DiscussionTopicsController, type: :request do
         {:message => @message})
 
       @user.reload
-      expect(@user.submissions.size).to eq 1
-      expect(@user.submissions.first.submission_type).to eq 'discussion_topic'
+      expect(@user.submissions.not_placeholder.size).to eq 1
+      expect(@user.submissions.not_placeholder.first.submission_type).to eq 'discussion_topic'
     end
 
     it "should create a submission from a reply on a graded topic" do
@@ -1365,7 +1365,7 @@ describe DiscussionTopicsController, type: :request do
       @topic.save
 
       student_in_course(:active_all => true)
-      expect(@user.submissions).to be_empty
+      expect(@user.submissions.not_placeholder).to be_empty
 
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{top_entry.id}/replies.json",
@@ -1374,8 +1374,8 @@ describe DiscussionTopicsController, type: :request do
         {:message => @message})
 
       @user.reload
-      expect(@user.submissions.size).to eq 1
-      expect(@user.submissions.first.submission_type).to eq 'discussion_topic'
+      expect(@user.submissions.not_placeholder.size).to eq 1
+      expect(@user.submissions.not_placeholder.first.submission_type).to eq 'discussion_topic'
     end
   end
 

@@ -170,12 +170,15 @@ describe "assignments" do
         assignment_form = f('#submit_online_text_entry_form')
         wait_for_tiny(assignment_form)
         wait_for_ajaximations
-        expect {
-          type_in_tiny('#submission_body', 'something to submit')
+        body_text = 'something to submit'
+        expect do
+          type_in_tiny('#submission_body', body_text)
           wait_for_ajaximations
           submit_form(assignment_form)
           wait_for_ajaximations
-        }.to change(Submission, :count).by(1)
+        end.to change {
+          @assignment.submissions.find_by!(user: @student).body
+        }.from(nil).to("<p>#{body_text}</p>")
       end
     end
 

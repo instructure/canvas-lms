@@ -43,6 +43,7 @@ describe Submissions::SubmissionForShow do
 
   describe '#submission' do
     it 'instantiates a new submission when one is not present' do
+      Submission.delete_all
       expect(subject.submission).to be_new_record
     end
 

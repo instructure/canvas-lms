@@ -215,7 +215,7 @@ describe Canvas::LiveEvents do
       submission.grader = @teacher
       submission.grade = '10'
       submission.score = 10
-      Canvas::LiveEvents.grade_changed(submission, submission.versions.current.model)
+      Canvas::LiveEvents.grade_changed(submission)
     end
 
     it "should include the user_id and assignment_id" do

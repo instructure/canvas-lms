@@ -19,6 +19,9 @@ class PopulateOverriddenDueAtForDueDateCacher < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up
-    DataFixup::PopulateOverriddenDueAtForDueDateCacher.send_later_if_production(:run)
+    DataFixup::InitializeSubmissionCachedDueDate.send_later_if_production_enqueue_args(
+      :run,
+      singleton: "DataFixup:InitializeSubmissionCachedDueDate:#{Shard.current.id}"
+    )
   end
 end

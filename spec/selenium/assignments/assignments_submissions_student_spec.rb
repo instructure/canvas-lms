@@ -231,31 +231,32 @@ describe "submissions" do
       f('.submit_assignment_link').click
       assignment_form = f('#submit_online_text_entry_form')
       wait_for_tiny(assignment_form)
-
-      submit_form(assignment_form)
+      submission = @assignment.submissions.find_by!(user_id: @student)
 
       # it should not actually submit and pop up an error message
+      expect { submit_form(assignment_form) }.not_to change { submission.reload.updated_at }
+      expect(submission.reload.body).to be nil
       expect(ff('.error_box')[1]).to include_text('Required')
 
-      expect(Submission.count).to eq 0
-
       # now make sure it works
-      type_in_tiny('#submission_body', 'now it is not blank')
-      submit_form(assignment_form)
-      expect { Submission.count }.to become 1
+      body_text = 'now it is not blank'
+      type_in_tiny('#submission_body', body_text)
+      expect { submit_form(assignment_form) }.to change { submission.reload.updated_at }
+      expect(submission.reload.body).to eq "<p>#{body_text}</p>"
     end
 
     it "should not allow a submission with only comments", priority: "1", test_id: 237027 do
       @assignment.update_attributes(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
+
       expect(f('#submission_body_ifr')).to be_displayed
       replace_content(f('#submit_online_text_entry_form').find_element(:id, 'submission_comment'), 'this should not be able to be submitted for grading')
-      submit_form("#submit_online_text_entry_form")
+      submission = @assignment.submissions.find_by!(user_id: @student)
 
       # it should not actually submit and pop up an error message
+      expect { submit_form("#submit_online_text_entry_form") }.not_to change { submission.reload.updated_at }
       expect(ff('.error_box')[1]).to include_text('Required')
-      expect(Submission.count).to eq 0
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests

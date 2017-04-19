@@ -305,7 +305,7 @@ describe "grades" do
 
     it "should show rubric even if there are no comments", priority: "1", test_id: 229669 do
       @third_association = @rubric.associate_with(@third_assignment, @course, :purpose => 'grading')
-      @third_submission = @third_assignment.submissions.create!(:user => @student_1) # unsubmitted submission :/
+      @third_submission = @third_assignment.submissions.find_by!(user: @student_1) # unsubmitted submission :/
 
       @third_association.assess({
         :user => @student_1,

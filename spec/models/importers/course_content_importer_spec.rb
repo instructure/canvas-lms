@@ -362,7 +362,7 @@ describe Course do
   end
 
   it 'should be able to i18n without keys' do
-    Importers::CourseContentImporter.translate('stuff')
+    expect { Importers::CourseContentImporter.translate('stuff') }.not_to raise_error
   end
 end
 

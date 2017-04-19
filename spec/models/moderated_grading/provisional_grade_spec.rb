@@ -23,7 +23,7 @@ describe ModeratedGrading::ProvisionalGrade do
       grade.scorer = scorer
     end
   end
-  let(:submission) { assignment.submissions.create!(user: student) }
+  let(:submission) { assignment.submissions.find_by!(user: student) }
   let(:assignment) { course.assignments.create! submission_types: 'online_text_entry' }
   let(:account) { a = account_model; a}
   let(:course) { c = account.courses.create!; c  }

@@ -231,9 +231,8 @@ describe 'Speedgrader' do
           purpose: 'grading',
           use_for_grading: true
         )
-        @submission = Submission.create!(
-          user: @student,
-          assignment: @assignment,
+        @submission = @assignment.submissions.find_by!(user: @student)
+        @submission.update!(
           submission_type: "online_text_entry",
           has_rubric_assessment: true
         )

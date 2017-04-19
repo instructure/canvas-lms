@@ -36,7 +36,6 @@ describe "submissions" do
 
       student_in_course
       assignment = create_assignment
-      assignment.submissions.create(:user => @student)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
 
       # make sure the JS didn't burn any bridges, and submit two
@@ -51,7 +50,6 @@ describe "submissions" do
     it "should display the grade in grade field", priority: "1", test_id: 237033 do
       student_in_course
       assignment = create_assignment
-      assignment.submissions.create(:user => @student)
       assignment.grade_student @student, grade: 2, grader: @teacher
       get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
       expect(f('.grading_value')[:value]).to eq '2'
