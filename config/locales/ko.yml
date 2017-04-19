@@ -1089,6 +1089,7 @@ ko:
       your_search_did_not_match_any_announcements: "검색과 일치하는 공지가 없습니다."
     podcast_feed_description_course: "\"%{course}\" 과목에 속한 공지에서 링크하거나 포함된 모든 미디어 파일이 이 피드에 표시됩니다."
     podcast_feed_name: "%{course} 공지 Podcast 피드"
+  announcements_a4b8ed4a: 공지
   anonymous_e1b8ad27: 익명
   application: 
     errors: 
@@ -2410,6 +2411,7 @@ ko:
         current: "현재 협업"
     titles: 
       delete: "협업을 삭제하시겠습니까?"
+  collaborations_5c56c15f: 협업
   coming_up_4348b0bd: 예정
   comm_messages: 
     from_beginning: 시작
@@ -3408,6 +3410,7 @@ ko:
       section_enrollments: "섹션 등록"
   course_statistics: 
     unknown: "알 수 없음"
+  course_syllabus_5de1b0af: "과목 요강"
   course_users: 
     greater_than_three: "3자 이상으로 된 검색어를 입력하시기 바랍니다."
     unknown_error: "검색에 오류가 발생했습니다. 다시 시도하시기 바랍니다."
@@ -3685,6 +3688,7 @@ ko:
         grading_standard_enabled: "과목 평가 구성표 사용"
         hide_distribution_graphs: "학생에게 평점 분포 그래프 숨기기"
         hide_final_grades: "학생 평점 요약에서 총점 숨기기"
+        image: 이미지
         indexed: "이 과목을 공개 과목 색인에 포함"
         language: 언어
         license: 라이선스
@@ -4437,6 +4441,7 @@ ko:
     unsubscribe: "이 주제를 구독 해제"
     unsubscribed: "구독 해제함"
     unsubscribed_hint: "이 주제를 구독하고 있지 않습니다. 구독하려면 클릭합니다."
+  discussions_a5f96392: 토론
   domain_3b54c511: 도메인
   download_submissions_7454665f: "제출물 다운로드"
   due_a73610f6: 기한
@@ -4486,9 +4491,11 @@ ko:
     keyboard_shortcuts: 
       dialog_title: "키보드 단축키"
     loading: "로드 중..."
+    mathjax_text_entry_field_label: "Enter the equation as LaTeX."
     more_external_tools: "더 많은 외부 도구"
     save_failed: "저장 실패"
     saving: "저장 중..."
+    screen_reader_tip: "Screen reader users: The most accessible way to use this editor is to switch to the advanced view, and then either enter LaTeX directly, or use the toolbar to assist you in doing so. The link to switch to the advanced view can be found near the end of this dialog, directly before the edit field."
     search_flickr: "Flickr creative commons 검색"
     switch_to_mathjax: "기본 뷰로 전환"
     switch_to_mathquill: "고급 뷰로 전환"
@@ -4511,6 +4518,7 @@ ko:
     titles: 
       font_size: "글자 크기, 선택하려면 누름"
       formatting: "서식, 선택하려면 누름"
+      rte_help: "Rich Text Area. Press ALT+F8 for help"
   either_the_url_or_domain_should_be_set_c29cf8c1: "url이나 도메인을 설정해야 합니다."
   email: 
     default_from_name: "Instructure Canvas"
@@ -5045,6 +5053,7 @@ ko:
         folder_locked: "이 파일을 포함한 \"%{folder},\" 폴더가 잠겼습니다."
     text_show: 
       page_title: "파일 미리 보기"
+  files_c300e900: 파일
   filter_by_name_34cbe139: "이름으로 필터링"
   find_flickr_image_view: 
     find_cc_on_flickr: "Flickr에서 크리에이티브 커먼즈 이미지 찾기"
@@ -5063,6 +5072,7 @@ ko:
     errors: 
       invalid_recursion: "폴더는 자신의 부모가 될 수 없음"
     folder_created: "\"%{name}\" 폴더 만듦"
+  folder_705fd2d7: 폴더
   folders: 
     event_updated: "행사를 성공적으로 업데이트했습니다."
     file_zip_in_process: "파일 압축 진행 중..."
@@ -5963,6 +5973,7 @@ ko:
       start_a_group: "그룹 시작하기"
     styleguide: 
       manage: 관리
+  insert_math_equation_57c6e767: "Insert Math Equation"
   installed_7b284a91: 설치됨
   instructions: 
     authorize_google_docs: "문서에 대해 협업하기 전에 Canvas가 Google Docs 계정을 접근할 수 있도록 권한을 부여해야 합니다."
@@ -6191,6 +6202,7 @@ ko:
       word_separator: " "
   license_help: 
     content_license_help: "내용 라이선싱 도움말"
+  link_7262adec: Link
   link_enrollment: 
     buttons: 
       link: "학생에게 연결"
@@ -8070,6 +8082,7 @@ ko:
       back_to_modules: "모듈 페이지로 돌아가기"
       no_students_found: "학생을 찾을 수 없음"
       student_progress: "학생 진행률"
+  modules_c4325335: 모듈
   modules_item_controller: 
     must_contribute_complete: "페이지 내용에 참여함"
     must_contribute_incomplete: "페이지 내용에 참여해야 함"
@@ -8533,6 +8546,7 @@ ko:
     saving_button: "저장 중..."
     warnings: 
       unsaved_changes: "저장하지 않은 변경 사항이 있습니다. 해당 변경 사항을 저장하지 않고 계속 진행하시겠습니까?"
+  pages_e5414c2c: 페이지
   paginated_collection: 
     no_items: "항목이 없습니다."
   paginated_list: 
@@ -8544,6 +8558,7 @@ ko:
   paste_xml_cda3a64e: "XML 붙여넣기"
   paypal: 
     exception: "죄송합니다. 오류가 발생했습니다. 나중에 다시 시도하시기 바랍니다."
+  people_b4ebb13c: 사용자
   plugins: 
     academic_benchmark_importer: 
       description: "이를 사용하면 Academic Benchmark 표준을 Canvas로 가져올 수 있습니다."
@@ -10167,6 +10182,7 @@ ko:
     top_level: ""
     ? "true"
     : 참
+  quizzes_7e598f57: 퀴즈
   re_upload_submissions_form: 
     buttons: 
       upload: "파일 업로드"
@@ -10486,6 +10502,7 @@ ko:
     enrollments_tas: 조교
     enrollments_teachers: 교사
     student_groups: "학생 그룹"
+  search_280d00bd: 검색
   search_by_user_dd3ad189: "사용자 검색"
   search_entries_or_author_63fb0a86: "항목이나 작성자 검색"
   search_title_body_or_author_1d26711f: "제목, 내용, 작성자 검색"
@@ -11149,6 +11166,8 @@ ko:
         click_to_embed: "%{image}을(를) 내장하려면 클릭"
         embed_image: "이미지를 내장하려면 클릭"
     wiki_sidebar: 
+      aria: 
+        file_label: "Select a file, Upload limit 50"
       aria_only: 
         folder: 폴더
       buttons: 
@@ -11691,6 +11710,7 @@ ko:
   unlock_date_cannot_be_after_lock_date_591f7fda: "잠금 해제 날짜는 잠금 날짜 이후일 수 없음"
   unsupported_package: "지원하지 않는 내용 묶음"
   until_date_949017c4: "%{date} 까지"
+  upload_8b403d05: 업로드
   upload_button: 
     upload: 업로드
   upload_data_dc4fa4cb: "데이터 업로드"
@@ -11861,6 +11881,7 @@ ko:
       unenroll_user: "이 사용자를 등록 취소하시겠습니까?"
     could_not_find_url: "다운로드 URL을 찾을 수 없음"
     crumbs: 
+      grades: 평점
       profile: "%{user}의 프로필"
     current_conference: 
       current_conference_text: "**[%{conference}](%{link_to_conference})**에 참여하도록 초대를 받았습니다. 회의는 %{started_at}에 시작되었고 %{participant_count}명이 참여합니다."
