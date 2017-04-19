@@ -193,17 +193,17 @@
           <h2>Inline Answers</h2>
           <div class="content_box">
             <a onclick="
-              var content = document.getElementById('speedgrader_iframe');
+              var content = document.getElementById('iframe_holder');
+              content.style.display = ''; // ensure visible
               var url = this.href;
-              if(content) {
-                var info = JSON.parse(decodeURIComponent(location.hash.substring(1)));
-                url += '&student=' + info['student_id'];
-                content.src = url;
-              } else {
-                window.open(url);
-              }
+              var info = JSON.parse(decodeURIComponent(location.hash.substring(1)));
+              url += '&amp;student=' + info['student_id'];
+              content.innerHTML = '';
+              var iframe = document.createElement('iframe');
+              iframe.src = url;
+              content.appendChild(iframe);
               return false;
-            " href="/bz/assignment_with_magic_fields?course=<%=@context.id%>&assignment=<%=@assignment.id%>">View Assignment with inline answers</a>
+            " href="/bz/assignment_with_magic_fields?course=<%=@context.id%>&amp;assignment=<%=@assignment.id%>">View Assignment with inline answers</a>
           </div>
         </div>
 
