@@ -189,6 +189,24 @@
         </div>
         <% end %>
 
+        <div id="magic-fields-link">
+          <h2>Inline Answers</h2>
+          <div class="content_box">
+            <a onclick="
+              var content = document.getElementById('speedgrader_iframe');
+              var url = this.href;
+              if(content) {
+                var info = JSON.parse(decodeURIComponent(location.hash.substring(1)));
+                url += '&student=' + info['student_id'];
+                content.src = url;
+              } else {
+                window.open(url);
+              }
+              return false;
+            " href="/bz/assignment_with_magic_fields?course=<%=@context.id%>&assignment=<%=@assignment.id%>">View Assignment with inline answers</a>
+          </div>
+        </div>
+
         <% if  @assignment.rubric_association || can_do(@context, @current_user, :manage_grades) %>
         <div id="grading">
           <h2><%= t('headers.assessment', "Assessment") %></h2>
