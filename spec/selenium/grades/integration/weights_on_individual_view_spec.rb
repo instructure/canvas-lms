@@ -25,5 +25,9 @@ describe 'individual view' do
     weighted_grading_setup
   end
 
+  after(:each) do
+    clear_local_storage
+  end
+
   it_behaves_like 'a gradebook'
 end

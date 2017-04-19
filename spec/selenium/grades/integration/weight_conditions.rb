@@ -69,10 +69,6 @@ shared_context 'assign outside of weighted grading period' do
 
     @a2.update_attributes(due_at: 3.weeks.ago)
   end
-
-  after(:all) do
-    @a2.update_attributes(due_at: 1.week.from_now)
-  end
 end
 
 shared_context 'assign outside of unweighted grading period' do
@@ -83,10 +79,6 @@ shared_context 'assign outside of unweighted grading period' do
     @course.update_attributes(group_weighting_scheme: "percent")
 
     @a2.update_attributes(due_at: 3.weeks.ago)
-  end
-
-  after(:all) do
-    @a2.update_attributes(due_at: 1.week.from_now)
   end
 end
 
