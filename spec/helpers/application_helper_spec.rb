@@ -753,21 +753,4 @@ describe ApplicationHelper do
       end
     end
   end
-
-  describe "show_planner?" do
-    before(:each) do
-      @current_user = User.create!
-    end
-
-    it "returns true when the dashboard view is set to planner" do
-      @current_user.preferences[:dashboard_view] = 'planner'
-      expect(show_planner?).to be true
-    end
-
-    it "returns false when the dashboard view is not set to planner" do
-      @current_user.preferences[:dashboard_view] = 'cards'
-      expect(show_planner?).to be false
-    end
-  end
-
 end

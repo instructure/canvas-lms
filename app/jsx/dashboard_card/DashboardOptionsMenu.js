@@ -26,10 +26,12 @@ export default class DashboardOptionsMenu extends React.Component {
     super(props)
 
     let view;
-    if (props.planner_enabled) {
-      view = props.planner_selected ? ['planner'] : ['cards']
+    if (props.planner_enabled && props.planner_selected) {
+      view = ['planner']
+    } else if (props.recent_activity_dashboard) {
+      view = ['activity']
     } else {
-      view = props.recent_activity_dashboard ? ['activity'] : ['cards']
+      view = ['cards']
     }
 
     this.state = {
@@ -43,7 +45,7 @@ export default class DashboardOptionsMenu extends React.Component {
       return
     }
     this.setState({view: newSelected}, () => {
-      this.toggleDashboardView()
+      this.toggleDashboardView(this.state.view)
       this.postDashboardToggle()
     })
   }
@@ -56,17 +58,31 @@ export default class DashboardOptionsMenu extends React.Component {
     this.postToggleColorOverlays()
   }
 
-  toggleDashboardView () {
-    if (this.props.planner_enabled) {
-      const dashboardPlanner = document.getElementById('dashboard-planner')
-      dashboardPlanner.style.display = (dashboardPlanner.style.display === 'none') ? 'block' : 'none'
-    } else {
-      const dashboardActivity = document.getElementById('dashboard-activity')
-      dashboardActivity.style.display = (dashboardActivity.style.display === 'none') ? 'block' : 'none'
+  toggleDashboardView (newView) {
+    const fakeObj = {
+      style: {}
     }
-
+    const dashboardPlanner = document.getElementById('dashboard-planner') || fakeObj
+    const dashboardPlannerHeader = document.getElementById('dashboard-planner-header') || fakeObj
+    const dashboardActivity = document.getElementById('dashboard-activity')
     const dashboardCards = document.getElementById('DashboardCard_Container')
-    dashboardCards.style.display = (dashboardCards.style.display === 'none') ? 'block' : 'none'
+
+    if (newView[0] === 'planner') {
+      dashboardPlanner.style.display = 'block'
+      dashboardPlannerHeader.style.display = 'block'
+      dashboardActivity.style.display = 'none'
+      dashboardCards.style.display = 'none'
+    } else if (newView[0] === 'activity') {
+      dashboardPlanner.style.display = 'none'
+      dashboardPlannerHeader.style.display = 'none'
+      dashboardActivity.style.display = 'block'
+      dashboardCards.style.display = 'none'
+    } else {
+      dashboardPlanner.style.display = 'none'
+      dashboardPlannerHeader.style.display = 'none'
+      dashboardActivity.style.display = 'none'
+      dashboardCards.style.display = 'block'
+    }
   }
 
   toggleColorOverlays () {
@@ -84,13 +100,9 @@ export default class DashboardOptionsMenu extends React.Component {
   }
 
   postDashboardToggle () {
-    if (this.props.planner_enabled) {
-      axios.put('/dashboard/view', {
-        dashboard_view: this.state.view[0]
-      })
-    } else {
-      axios.post('/users/toggle_recent_activity_dashboard')
-    }
+    axios.put('/dashboard/view', {
+      dashboard_view: this.state.view[0]
+    })
   }
 
   postToggleColorOverlays () {
@@ -123,14 +135,13 @@ export default class DashboardOptionsMenu extends React.Component {
           onSelect={this.handleViewOptionSelect}
           selected={this.state.view}
         >
+          <MenuItem value="cards">{I18n.t('Card View')}</MenuItem>
           {
-            (this.props.planner_enabled) ?
-              <MenuItem value="planner">{I18n.t('Planner')}</MenuItem> :
-              <MenuItem value="activity">{I18n.t('Recent Activity')}</MenuItem>
+            (this.props.planner_enabled) && (
+              <MenuItem value="planner">{I18n.t('List View')}</MenuItem>
+            )
           }
-          <MenuItem value="cards">
-            {I18n.t('Course Cards')}
-          </MenuItem>
+          <MenuItem value="activity">{I18n.t('Recent Activity')}</MenuItem>
         </MenuItemGroup>
         { cardView && <MenuItemSeparator /> }
         { cardView && (

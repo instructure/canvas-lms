@@ -888,8 +888,4 @@ module ApplicationHelper
     @domain_root_account&.feature_enabled?(:student_planner)
   end
 
-  def show_planner?
-    @current_user.preferences[:dashboard_view] == 'planner'
-  end
-
 end

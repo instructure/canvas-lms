@@ -16,19 +16,23 @@ const FakeDashboard = function (props) {
         planner_enabled={props.planner_enabled}
       />
       {
-        (props.planner_enabled) ? (
-          <div
-            id="dashboard-planner"
-            style={{ display: 'block' }}
-          />
-        ) :
-        (
-          <div
-            id="dashboard-activity"
-            style={{ display: 'block' }}
-          />
+        props.planner_enabled && (
+          <div>
+            <div
+              id="dashboard-planner"
+              style={{ display: 'block' }}
+            />
+            <div
+              id="dashboard-planner-header"
+              style={{ display: 'block' }}
+            />
+          </div>
         )
       }
+      <div
+        id="dashboard-activity"
+        style={{ display: 'block' }}
+      />
       <div
         id="DashboardCard_Container"
         style={{ display: 'none' }}
@@ -120,11 +124,21 @@ test('it should switch dashboard view appropriately with Student Planner enabled
 
   dashboardMenu.handleViewOptionSelect(null, ['cards'])
   ok(document.getElementById('dashboard-planner').style.display === 'none')
+  ok(document.getElementById('dashboard-planner-header').style.display === 'none')
   ok(document.getElementById('DashboardCard_Container').style.display === 'block')
+  ok(document.getElementById('dashboard-activity').style.display === 'none')
 
   dashboardMenu.handleViewOptionSelect(null, ['planner'])
   ok(document.getElementById('dashboard-planner').style.display === 'block')
+  ok(document.getElementById('dashboard-planner-header').style.display === 'block')
   ok(document.getElementById('DashboardCard_Container').style.display === 'none')
+  ok(document.getElementById('dashboard-activity').style.display === 'none')
+
+  dashboardMenu.handleViewOptionSelect(null, ['activity'])
+  ok(document.getElementById('dashboard-planner').style.display === 'none')
+  ok(document.getElementById('dashboard-planner-header').style.display === 'none')
+  ok(document.getElementById('DashboardCard_Container').style.display === 'none')
+  ok(document.getElementById('dashboard-activity').style.display === 'block')
 })
 
 test('it should use the dashboard view endpoint when Student Planner is enabled', function (assert) {
@@ -150,7 +164,7 @@ test('it should use the dashboard view endpoint when Student Planner is enabled'
   moxios.uninstall();
 })
 
-test('it should include a planner menu item when Student Planner is enabled', function () {
+test('it should include a List View menu item when Student Planner is enabled', function () {
   const wrapper = mount(
     <DashboardOptionsMenu
       planner_enabled
@@ -158,7 +172,7 @@ test('it should include a planner menu item when Student Planner is enabled', fu
   )
   wrapper.find('button').simulate('click')
   const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
-  ok(menuItems.some(menuItem => menuItem.textContent.trim() === 'Planner'))
+  ok(menuItems.some(menuItem => menuItem.textContent.trim() === 'List View'))
   wrapper.unmount()
 });
 
