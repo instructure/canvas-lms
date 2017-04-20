@@ -519,7 +519,8 @@ END
       description: -> { I18n.t('Default to modules for the course home page') },
       applies_to: "RootAccount",
       state: "hidden",
-      beta: true
+      beta: true,
+      development: true,
     },
     'new_user_tutorial' =>
     {
@@ -527,7 +528,8 @@ END
       description: -> { I18n.t('Provide tutorial information for new users in a flyout tray.')},
       applies_to: "RootAccount",
       state: "hidden",
-      beta: true
+      beta: true,
+      development: true
     },
     'student_planner' =>
     {
@@ -536,7 +538,7 @@ END
       applies_to: "RootAccount",
       state: "hidden",
       beta: true,
-      development: true,
+      development: true
     },
     'quizzes2_exporter' =>
     {
