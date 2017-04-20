@@ -1,4 +1,5 @@
 require "rspec/core/formatters/base_formatter"
+require_relative "../rerun_argument"
 
 # Base formatter that doesn't do anything in and of itself, except gather
 # error context-y stuff for subclasses. If you have multiple such
@@ -82,7 +83,7 @@ module ErrorContext
 
       def note_recent_spec_run(example)
         recent_spec_runs << {
-          location: example.location_rerun_argument,
+          location: RerunArgument.for(example),
           exception: example.exception,
           pending: example.pending
         }
@@ -182,7 +183,7 @@ module ErrorContext
     end
 
     def spec_path
-      @spec_path ||= example.location_rerun_argument.sub(/\A[.\/]+/, "")
+      @spec_path ||= RerunArgument.for(example).sub(/\A[.\/]+/, "")
     end
 
     def errors_path

@@ -7,7 +7,7 @@
   <body style="font-family:sans-serif;line-height:1.25;font-size:14px">
     <h1><%= example.full_description %></h1>
 
-    <code><b>bin/rspec <%= example.location_rerun_argument %></b></code>
+    <code><b>bin/rspec <%= RerunArgument.for(example) %></b></code>
 
     <h2>Failure/Error</h2>
     <pre style="overflow:auto; max-height: 300px;"><%= escape_code formatted_exception %></pre>

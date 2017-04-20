@@ -1,5 +1,6 @@
 require_relative "./base_formatter"
 require "escape_code"
+require_relative "../rerun_argument"
 
 module ErrorContext
   class StderrFormatter < BaseFormatter
@@ -21,7 +22,7 @@ module ErrorContext
       output << "  Screen capture: #{File.join(errors_path, summary.screen_capture_name)}" if summary.screen_capture_name
 
       if output.any?
-        output.unshift summary.example.location_rerun_argument
+        output.unshift RerunArgument.for(summary.example)
         $stderr.puts output.join("\n")
       end
     end
