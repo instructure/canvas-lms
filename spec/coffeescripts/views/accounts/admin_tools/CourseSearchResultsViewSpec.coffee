@@ -62,7 +62,6 @@ define [
     @courseRestore.clear silent: yes
     @courseRestore.set errorMessageJSON
     @courseSearchResultsView.resultsFound()
-    debugger
     ok $('#flash_screenreader_holder').text().match('Course not found')
 
   test "show screenreader text on finding deleted course", ->
