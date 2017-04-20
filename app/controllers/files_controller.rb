@@ -350,7 +350,8 @@ class FilesController < ApplicationController
       css_bundle :react_files
       js_env({
         :FILES_CONTEXTS => files_contexts,
-        :NEW_FOLDER_TREE => @context.feature_enabled?(:use_new_tree)
+        :NEW_FOLDER_TREE => @context.feature_enabled?(:use_new_tree),
+        :COURSE_ID => context.id.to_s
       })
       log_asset_access([ "files", @context ], "files", "other")
 
@@ -796,6 +797,10 @@ class FilesController < ApplicationController
     if @attachment.usage_rights_id.present?
       json_params[:include] ||= []
       json_params[:include] << 'usage_rights'
+    end
+
+    if @attachment.context.is_a?(Course)
+      json_params[:master_course_status] = setup_master_course_restrictions([@attachment], @attachment.context)
     end
 
     json = attachment_json(@attachment, @current_user, {}, json_params)

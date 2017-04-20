@@ -46,13 +46,13 @@ describe "master courses - child courses - file locking" do
 
     get "/courses/#{@copy_to.id}/files"
 
-    expect(f('.ef-item-row .master-course-cell')).to contain_css('.icon-lock')
+    expect(f('.ef-directory .ef-item-row .lock-icon')).to contain_css('.icon-lock')
 
     f('.ef-item-row .ef-date-created-col').click # select the file
-    expect(f('.ef-header')).to_not contain_css('.btn-delete')
+    expect(f('.ef-header')).not_to contain_css('.btn-delete')
 
     f('.ef-item-row .al-trigger').click
-    expect(f('.al-options').text).to_not include("Delete")
+    expect(f('.al-options').text).not_to include("Delete")
   end
 
   it "should not show the manageable cog-menu options when a folder contains a locked file" do
@@ -64,19 +64,19 @@ describe "master courses - child courses - file locking" do
     get "/courses/#{@copy_to.id}/files"
 
     expect(f('.ef-item-row .ef-name-col').text).to include("subfolder") # we're looking at the folder right?
-    expect(f('.ef-item-row .master-course-cell')).to contain_css('.icon-lock')
+    expect(f('.ef-directory .ef-item-row .lock-icon')).to contain_css('.icon-lock')
 
     f('.ef-item-row .ef-date-created-col').click # select the file
-    expect(f('.ef-header')).to_not contain_css('.btn-delete')
+    expect(f('.ef-header')).not_to contain_css('.btn-delete')
 
     f('.ef-item-row .al-trigger').click
-    expect(f('.al-options').text).to_not include("Delete")
+    expect(f('.al-options').text).not_to include("Delete")
   end
 
   it "should show the manageable cog-menu options when a file is unlocked" do
     get "/courses/#{@copy_to.id}/files"
 
-    expect(f('.ef-item-row .master-course-cell')).to contain_css('.icon-unlock')
+    expect(f('.ef-directory .ef-item-row .lock-icon')).to contain_css('.icon-unlock')
 
     f('.ef-item-row .ef-date-created-col').click # select the file
     expect(f('.ef-header')).to contain_css('.btn-delete')

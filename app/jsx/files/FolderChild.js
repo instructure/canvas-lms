@@ -23,12 +23,17 @@ import filesEnv from 'compiled/react_files/modules/filesEnv'
 import classnames from 'classnames'
 import ItemCog from 'jsx/files/ItemCog'
 import PublishCloud from 'jsx/shared/PublishCloud'
+import MasterCourseLock from 'jsx/shared/MasterCourseLock'
 import FilesystemObjectThumbnail from 'jsx/files/FilesystemObjectThumbnail'
 import UsageRightsIndicator from 'jsx/files/UsageRightsIndicator'
 import Folder from 'compiled/models/Folder'
 import preventDefault from 'compiled/fn/preventDefault'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
 import friendlyBytes from 'compiled/util/friendlyBytes'
+
+FolderChild.isFolder = function () {
+  return this.props.model instanceof Folder
+}
 
   FolderChild.renderItemCog = function (canManage) {
     if (!this.props.model.isNew() || this.props.model.get('locked_for_user')) {
@@ -60,21 +65,16 @@ import friendlyBytes from 'compiled/util/friendlyBytes'
     }
   }
   FolderChild.renderMasterCourseIcon = function (canManage) {
-    if (canManage && this.props.model.get('is_master_course_child_content')) {
-      if (this.props.model.get('restricted_by_master_course')) {
-        return (
-          <span className="master-course-cell">
-            <i className="icon-lock"></i>
-          </span>
-        );
-      } else {
-        return (
-          <span className="master-course-cell">
-            <i className="icon-unlock icon-Line"></i>
-          </span>
-        );
-      }
+    // do not show the lock of master course folders
+    // because we don't always have it's children
+    if (!this.props.model.get('is_master_course_child_content') && this.isFolder()) {
+      return null
     }
+    if (this.isFolder() && !this.props.model.get('restricted_by_master_course')) {
+      return null
+    }
+
+    return <MasterCourseLock model={this.props.model} canManage={canManage} />
   }
 
   FolderChild.renderEditingState = function () {
@@ -88,7 +88,7 @@ import friendlyBytes from 'compiled/util/friendlyBytes'
               ref='newName'
               className='ic-Input ef-edit-name-form__input'
               placeholder={I18n.t('name', 'Name')}
-              aria-label={(this.props.model instanceof Folder) ? I18n.t('folder_name', 'Folder Name') : I18n.t('File Name')}
+              aria-label={this.isFolder() ? I18n.t('folder_name', 'Folder Name') : I18n.t('File Name')}
               defaultValue={this.props.model.displayName()}
               maxLength='255'
               onKeyUp={function (event){ if (event.keyCode === 27) {this.cancelEditingName()} }.bind(this)}
@@ -112,7 +112,7 @@ import friendlyBytes from 'compiled/util/friendlyBytes'
           </div>
         </form>
       );
-    }else if(this.props.model instanceof Folder) {
+    } else if (this.isFolder()) {
       return (
         <a
           ref= 'nameLink'
@@ -203,7 +203,7 @@ import friendlyBytes from 'compiled/util/friendlyBytes'
         </div>
 
         <div className='ef-date-modified-col' role= 'gridcell'>
-          {!(this.props.model instanceof Folder) && (
+          {!(this.isFolder()) && (
             <FriendlyDatetime dateTime={this.props.model.get('modified_at')} />
           )}
         </div>

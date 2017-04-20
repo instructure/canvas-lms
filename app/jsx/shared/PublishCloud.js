@@ -50,7 +50,7 @@ import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
   };
 
   PublishCloud.render = function () {
-    var fileName = this.props.fileName || I18n.t('This file');
+    const fileName = (this.props.model && this.props.model.displayName()) || I18n.t('This file');
     if (this.props.userCanManageFilesForContext) {
       if (this.state.published && this.state.restricted) {
         return (
@@ -61,7 +61,7 @@ import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
             ref='publishCloud'
             className='btn-link published-status restricted'
             title={this.getRestrictedText()}
-            aria-label={`${fileName} is ${this.getRestrictedText()} - ${I18n.t('Click to modify')}`}
+            aria-label={I18n.t('%{fileName} is %{restricted} - Click to modify', {fileName, restricted: this.getRestrictedText()})}
           >
             <i className='icon-cloud-lock' />
           </button>
@@ -75,7 +75,7 @@ import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
             ref='publishCloud'
             className='btn-link published-status hiddenState'
             title={I18n.t('Hidden. Available with a link')}
-            aria-label={`${fileName} is ${I18n.t('Hidden. Available with a link - Click to modify')}`}
+            aria-label={I18n.t('%{fileName} is Hidden. Available with a link - Click to modify', {fileName})}
           >
             <i className='icon-cloud-lock' />
           </button>
@@ -89,7 +89,7 @@ import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
             ref='publishCloud'
             className='btn-link published-status published'
             title={I18n.t('Published')}
-            aria-label={`${fileName} is ${I18n.t('Published - Click to modify')}`}
+            aria-label={I18n.t('%{fileName} is Published - Click to modify', {fileName})}
           >
             <i className='icon-publish' />
           </button>
@@ -103,7 +103,7 @@ import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
             ref='publishCloud'
             className='btn-link published-status unpublished'
             title={I18n.t('Unpublished')}
-            aria-label={`${fileName} is ${I18n.t('Unpublished - Click to modify')}`}
+            aria-label={I18n.t('%{fileName} is Unpublished - Click to modify', {fileName})}
           >
             <i className='icon-unpublish' />
           </button>
@@ -118,7 +118,7 @@ import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
             ref='publishCloud'
             className='published-status restricted'
             title={this.getRestrictedText()}
-            aria-label={`${fileName} is ${this.getRestrictedText()}`}
+            aria-label={I18n.t('%{fileName} is %{restricted}', {fileName, restricted: this.getRestrictedText()})}
           >
             <i className='icon-calendar-day' />
           </div>

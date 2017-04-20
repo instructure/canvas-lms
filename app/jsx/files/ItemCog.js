@@ -43,6 +43,11 @@ import $ from 'jquery'
       usageRightsRequiredForContext: React.PropTypes.bool
     },
 
+    isMasterCourseRestricted () {
+      return this.props.model.get('is_master_course_child_content') &&
+             this.props.model.get('restricted_by_master_course')
+    },
+
     downloadFile (file, args) {
       window.location = file[0].get('url');
       $(args.returnFocusTo).focus();
@@ -131,7 +136,7 @@ import $ from 'jquery'
         menuItems.push(<li key='download' role='presentation'><a onClick={wrap(this.downloadFile)} href={this.props.model.get('url')} ref='download' role='menuitem' tabIndex='-1'>{I18n.t('Download')}</a></li>);
       }
 
-      if (this.props.userCanManageFilesForContext && !this.props.model.get('restricted_by_master_course')) {
+      if (this.props.userCanManageFilesForContext && !this.isMasterCourseRestricted()) {
         // Rename Link
         menuItems.push(<li key='rename' role='presentation'><a href='#' onClick={preventDefault(this.props.startEditingName)} ref='editName' role='menuitem' tabIndex='-1'>{I18n.t('Rename')}</a></li>);
         // Move Link

@@ -413,7 +413,16 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   }
 }
 
-.master-course-cell {
-  margin-top: 6px;
-  margin-right: 6px;
+// the lock
+.ef-main {
+  .lock-icon {  // align it with the adjacent buttons
+    margin-right: $ic-sp/2;
+    padding-top: $ic-sp/2;
+    &.lock-icon button.unlocked {
+      color:  $ic-color-icon-disabled;
+    }
+    &.lock-icon button.locked {
+      color: $ic-brand-primary;
+    }
+  }
 }
