@@ -223,7 +223,9 @@ module.exports = {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }),
 
-    new WebpackCleanupPlugin(),
+    new WebpackCleanupPlugin({
+      exclude: ["selinimum-manifest.json"]
+    }),
 
     // handles our custom i18n stuff
     new I18nPlugin(),
