@@ -37,19 +37,22 @@ import CustomHelpLinkAction from './CustomHelpLinkAction'
       };
     },
     focus (action) {
-      const ref = this.actions[action];
+      // screenreaders are the worst
+      setTimeout(() => {
+        const ref = this.actions[action];
 
-      if (ref) {
-        ref.focus();
-      } else { // focus the first focusable element
-        const focusable = this.focusable();
-        if (focusable) {
-          focusable.focus();
+        if (ref && ref.props.onClick) {
+          ref.focus();
+        } else {
+          const focusable = this.focusable();
+          if (focusable) {
+            focusable.focus();
+          }
         }
-      }
+      }, 100);
     },
     focusable () {
-      const focusable = ReactDOM.findDOMNode(this).querySelectorAll('button:not([aria-disabled])');
+      const focusable = this.rootElement.querySelectorAll('button:not([disabled])');
       return focusable[0];
     },
     render () {
@@ -60,7 +63,10 @@ import CustomHelpLinkAction from './CustomHelpLinkAction'
       this.actions = {};
 
       return (
-        <li className="ic-Sortable-item">
+        <li
+          className="ic-Sortable-item"
+          ref={(c) => { this.rootElement = c }}
+        >
           <div className="ic-Sortable-item__Text">
             {text}
           </div>
