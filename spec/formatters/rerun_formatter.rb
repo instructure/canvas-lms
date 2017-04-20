@@ -12,15 +12,15 @@ module RSpec
     end
 
     def log_rerun(example)
-      path = example.metadata[:location]
-      path_without_line_number = path.gsub(/(\.\/|\:\d+)/, "")
+      path = RerunArgument.for(example)
+      path_without_line_number = path.gsub(/(\.\/|[:\[].*)/, "")
 
       if modified_specs.include?(path_without_line_number)
         puts "not adding modified spec to rerun #{path}"
         return
       end
 
-      msg = "adding spec to rerun #{RerunArgument.for(example)}"
+      msg = "adding spec to rerun #{path}"
 
       exception = example.metadata[:execution_result].exception
       exempt_exception_classes = [ SpecTimeLimit::Error ] # sometimes things are just a bit slow. we won't hold it against you the first time
