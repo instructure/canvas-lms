@@ -2264,3 +2264,17 @@ li.quiz.quiz-loading-overrides {
   width: 52px;
 }
 
+/* support for master class locked input fields */
+#quiz_edit_wrapper {
+  input[readonly] { // copied from
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    font-weight: bold;
+    cursor: default;
+    padding-left: 0;
+    &:focus {
+      outline-style: none;
+    }
+  }
+}

@@ -29,6 +29,15 @@ import LockBanner from './lockBanner'
 import LockToggle from './lockToggle'
 
 export default class LockManager {
+  constructor () {
+    this.state = {
+      isLocked: false,
+      itemLocks: [],
+      isMasterContent: false,
+      isChildContent: false,
+      itemId: ''
+    }
+  }
   init (options) {
     if (!this.shouldInit()) return;
     this.props = buildProps(options)
@@ -64,6 +73,14 @@ export default class LockManager {
 
   getItemLocks () {
     return { ...this.state.itemLocks }
+  }
+
+  isMasterContent () {
+    return this.state.isMasterContent
+  }
+
+  isChildContent () {
+    return this.state.isChildContent
   }
 
   toggleLocked = () => {
