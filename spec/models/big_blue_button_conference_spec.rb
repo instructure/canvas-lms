@@ -90,13 +90,14 @@ describe BigBlueButtonConference do
     end
   end
 
-  describe 'plugin setting recording_enabled is enabled' do
+  describe 'plugin setting recording_enabled is enabled and recording_options is set to show_recording' do
     before do
       allow(WebConference).to receive(:plugins).and_return([
         web_conference_plugin_mock("big_blue_button", {
           :domain => "bbb.instructure.com",
           :secret_dec => "secret",
           :recording_enabled => true,
+          :recording_options => BigBlueButtonConference::SHOW_RECORDING_OPTION,
         })
       ])
     end
@@ -111,7 +112,7 @@ describe BigBlueButtonConference do
       bbb.user = user_factory
       bbb.context = course_factory
       bbb.save!
-      expect(bbb).to receive(:send_request).with(:create, hash_including(record: "true"))
+      expect(bbb).to receive(:send_request).with(:create, hash_including(record: true))
       bbb.initiate_conference
     end
 
@@ -121,7 +122,7 @@ describe BigBlueButtonConference do
       bbb.user = user_factory
       bbb.context = course_factory
       bbb.save!
-      expect(bbb).to receive(:send_request).with(:create, hash_including(record: "false"))
+      expect(bbb).to receive(:send_request).with(:create, hash_including(record: false))
       bbb.initiate_conference
     end
 
@@ -140,6 +141,17 @@ describe BigBlueButtonConference do
     end
 
     describe "looking for recordings based on user setting" do
+      before do
+        allow(WebConference).to receive(:plugins).and_return([
+          web_conference_plugin_mock("big_blue_button", {
+            :domain => "bbb.instructure.com",
+            :secret_dec => "secret",
+            :recording_enabled => true,
+            :recording_options => BigBlueButtonConference::SHOW_RECORDING_OPTION,
+          })
+        ])
+      end
+
       before(:once) do
         @bbb = BigBlueButtonConference.new(user: user_factory, context: course_factory)
 
@@ -150,16 +162,17 @@ describe BigBlueButtonConference do
         @bbb.save
       end
 
-      it "doesn't look if setting is false" do
+      it "does expect recordings if setting is true" do
+        @bbb.user_settings = { :record => true }
         @bbb.save
-        expect(@bbb).to receive(:send_request).never
+        expect(@bbb).to receive(:get_recordings)
         @bbb.recordings
       end
 
-      it "does look if setting is true" do
-        @bbb.user_settings = { :record => true }
+      it "does not expect recordings if setting is false" do
+        @bbb.user_settings = { :record => false }
         @bbb.save
-        expect(@bbb).to receive(:send_request)
+        expect(@bbb).to receive(:get_recordings).and_return(nil)
         @bbb.recordings
       end
     end
@@ -186,9 +199,9 @@ describe BigBlueButtonConference do
       bbb.user = user_factory
       bbb.context = course_factory
       bbb.save!
-      expect(bbb).to receive(:send_request).with(:create, hash_including(record: "false"))
+      expect(bbb).to receive(:send_request).with(:create, hash_including(record: false))
       bbb.initiate_conference
-      expect(bbb.user_settings[:record]).to be_falsey
+      expect(bbb[:record]).to be_falsey
     end
   end
 end

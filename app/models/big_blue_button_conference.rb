@@ -175,10 +175,8 @@ class BigBlueButtonConference < WebConference
   end
 
   def get_recording(recording_id)
-    response_recordings = send_request(:getRecordings, {
-      :meetingID => conference_key
-      })
-    recording = response_recordings[:recordings].find{ |r| r[:recordID]==recording_id }
+    recordings = get_recordings()
+    recording = recordings.find{ |r| r[:recordID]==recording_id } if recordings.any?
     if recording
       response = { :published => recording[:published], :protected => recording[:protected], :recording_formats => [] }
       recording[:playback].each{ |formats| response[:recording_formats] << { :type => formats[:type].capitalize, :url => formats[:url] } }
@@ -224,13 +222,18 @@ class BigBlueButtonConference < WebConference
   end
 
   def fetch_recordings
-    return [] unless conference_key && config[:recording_enabled]
-    response = send_request(:getRecordings, {
-      :meetingID => conference_key,
+    recordings = get_recordings
+    Array(recordings)
+  end
+
+  def get_recordings
+    return nil unless conference_key && config[:recording_enabled] && (config[:recording_options] == HIDE_RECORDING_OPTION || config[:recording_options] == RECORD_EVERYTHING || settings[:record])
+    response_recordings = send_request(:getRecordings, {
+      :meetingID => conference_key
       })
-    result = response[:recordings] if response
-    result = [] if result.is_a?(String)
-    Array(result)
+    recordings = response_recordings[:recordings] if response_recordings
+    recordings = [] if recordings.is_a?(String)
+    recordings
   end
 
   def generate_request(action, options)
