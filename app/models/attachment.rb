@@ -278,7 +278,7 @@ class Attachment < ActiveRecord::Base
     if context.respond_to?(:log_merge_result)
       context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
     end
-    if context.respond_to?(:root_account_id) && self.namespace != context.root_account.file_namespace
+    if Attachment.s3_storage? && context.respond_to?(:root_account_id) && self.namespace != context.root_account.file_namespace
       dup.save_without_broadcasting!
       dup.make_rootless
       dup.change_namespace(context.root_account.file_namespace)
@@ -1270,7 +1270,7 @@ class Attachment < ActiveRecord::Base
         s3object.copy_to(destination.s3object)
       end
     else
-      return if open == destination.open
+      return if destination.store.exists? && open == destination.open
       old_content_type = self.content_type
       Attachment.where(:id => self).update_all(:content_type => "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
       destination.uploaded_data = open
