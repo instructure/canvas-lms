@@ -62,12 +62,11 @@ describe "master courses - child courses - wiki page locking" do
     expect(f('.al-options')).to contain_css('.delete-menu-item')
   end
 
-  it "should not show the edit/delete options on the show page when locked" do
+  it "should not show the delete option on the show page when locked" do
     @tag.update_attribute(:restrictions, {:all => true})
 
     get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
 
-    expect(f('#content')).not_to contain_css('.edit-wiki')
     f('.al-trigger').click
     expect(f('.al-options')).not_to contain_css('.delete_page')
   end

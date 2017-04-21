@@ -112,7 +112,6 @@ class WikiPagesController < ApplicationController
 
   def edit
     if @page.grants_any_right?(@current_user, session, :update, :update_content)
-      return render_unauthorized_action if editing_restricted?(@page)
       set_master_course_js_env_data(@page, @context)
 
       js_env ConditionalRelease::Service.env_for @context

@@ -32,11 +32,14 @@ const wikiPage = new WikiPage(ENV.WIKI_PAGE, {
   parse: true
 })
 
+const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
+
 const wikiPageEditView = new WikiPageEditView({
   model: wikiPage,
   wiki_pages_path: ENV.WIKI_PAGES_PATH,
   WIKI_RIGHTS: ENV.WIKI_RIGHTS,
-  PAGE_RIGHTS: ENV.PAGE_RIGHTS
+  PAGE_RIGHTS: ENV.PAGE_RIGHTS,
+  lockedItems,
 })
 $('#content').append(wikiPageEditView.$el)
 
