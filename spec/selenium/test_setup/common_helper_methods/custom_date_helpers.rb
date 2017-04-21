@@ -19,4 +19,8 @@ module CustomDateHelpers
       datetime_string(time, :no_words)
     end.gsub(/ +/, ' ')
   end
+
+  def calendar_time_string(time)
+    time_string(time).sub(/m\z/, "").strip
+  end
 end
