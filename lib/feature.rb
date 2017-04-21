@@ -322,8 +322,7 @@ END
       applies_to: 'Account',
       state: 'hidden',
       root_opt_in: true,
-      beta: true,
-      development: true
+      beta: true
     },
     'bulk_sis_grade_export' =>
       {
