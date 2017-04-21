@@ -56,6 +56,13 @@ module Lti
       Account.any_instance.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(true)
     end
 
+    describe 'service definition' do
+      it 'uses the correct endpoint' do
+        service = Lti::OriginalityReportsApiController::SERVICE_DEFINITIONS.first
+        expect(service[:endpoint]).to eq "api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report"
+      end
+    end
+
     describe "GET assignments/:assignment_id/originality_report/submissions/:submission_id/:id (#show)" do
       before :each do
         report_initial_values = {

@@ -73,7 +73,7 @@ module Lti
     SERVICE_DEFINITIONS = [
       {
         id: ORIGINALITY_REPORT_SERVICE,
-        endpoint: 'api/v1/assignments/{assignment_id}/submissions/{submission_id}/originality_report',
+        endpoint: 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report',
         format: ['application/json'].freeze,
         action: ['POST', 'PUT', 'GET'].freeze
       }.freeze
