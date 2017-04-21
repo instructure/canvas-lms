@@ -6005,9 +6005,9 @@ react-tinymce@0.5.1:
   dependencies:
     lodash "^3.9.3"
 
-react-tokeninput@2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/react-tokeninput/-/react-tokeninput-2.3.0.tgz#206443cc47c453ebe86910aa028ba6589e4be2db"
+react-tokeninput@2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/react-tokeninput/-/react-tokeninput-2.4.0.tgz#b9c7b173ac2527dad473a4ef0a6d77ab89e07ce4"
   dependencies:
     classnames "^2.2.1"
 

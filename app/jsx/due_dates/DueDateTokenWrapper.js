@@ -240,9 +240,19 @@ import DisabledTokenInput from 'jsx/due_dates/DisabledTokenInput'
         "group": I18n.t("Group"),
         "conditional_release": I18n.t("Mastery Paths"),
       }[heading]
-      return <ComboboxOption className="ic-tokeninput-header" value={heading} key={heading} set_props={set}>
-               {headerText}
-             </ComboboxOption>
+
+      const canSelect = heading === 'conditional_release'
+      return (
+        <ComboboxOption
+          isFocusable={canSelect}
+          className="ic-tokeninput-header"
+          value={heading}
+          key={heading}
+          set_props={set}
+        >
+          {headerText}
+        </ComboboxOption>
+      )
     },
 
     selectableOptions(type){
@@ -352,7 +362,6 @@ import DisabledTokenInput from 'jsx/due_dates/DisabledTokenInput'
              onKeyDown           = {this.suppressKeys}>
           <div id         = "assign-to-label"
                className  = "ic-Label"
-               tabIndex   = '0'
                title      = 'Assign to'
                aria-label = 'Assign to'>
              {I18n.t("Assign to")}
