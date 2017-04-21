@@ -1358,9 +1358,9 @@ canvas-rce@1.1.2:
     tinymce "^4.5.3"
     tinymce-light-skin "1.2.2"
 
-"canvas_offline_course_viewer@https://github.com/instructure/canvas_offline_course_viewer.git#1.0.0":
-  version "1.0.0"
-  resolved "https://github.com/instructure/canvas_offline_course_viewer.git#36ebfb0085a94a760ff705661708902db85d0f72"
+"canvas_offline_course_viewer@https://github.com/instructure/canvas_offline_course_viewer.git#1.1.0":
+  version "1.1.0"
+  resolved "https://github.com/instructure/canvas_offline_course_viewer.git#301a4cddda53d3c2f863b54a382f3cc79ea05fb1"
 
 caseless@~0.11.0:
   version "0.11.0"
