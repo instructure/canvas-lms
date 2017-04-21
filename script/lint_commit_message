@@ -37,9 +37,11 @@ end
 SUBJECT_MAX_LINE_LEN = 75
 SUBJECT_IDEAL_LINE_LEN = 65
 
-if subject.size > SUBJECT_MAX_LINE_LEN
+length_exemption_regex = /^Revert/
+
+if subject.size > SUBJECT_MAX_LINE_LEN && subject !~ length_exemption_regex
   comment "error", 1, "subject line can't exceed #{SUBJECT_MAX_LINE_LEN} chars (ideally keep it well under #{SUBJECT_IDEAL_LINE_LEN})", true
-elsif subject.size > SUBJECT_IDEAL_LINE_LEN
+elsif subject.size > SUBJECT_IDEAL_LINE_LEN && subject !~ length_exemption_regex
   comment "warn", 1, "subject line shouldn't exceed #{SUBJECT_IDEAL_LINE_LEN} chars", true
 end
 
