@@ -44,7 +44,7 @@ function createGradebook (options = {}) {
       show_inactive_enrollments: 'false'
     },
     context_id: '1',
-    sections: {},
+    sections: [],
     post_grades_ltis: [],
     post_grades_feature: { enabled: false, store: {}, returnFocusTo: {} },
     ...options
@@ -73,6 +73,67 @@ test('normalizes the grading period set from the env', function () {
 test('sets grading period set to null when not defined in the env', function () {
   const gradingPeriodSet = createGradebook().gradingPeriodSet;
   deepEqual(gradingPeriodSet, null);
+});
+
+test('when sections are loaded and there is no secondary info configured, set it to "section"', function () {
+  const sections = [
+    { id: 1, name: 'Section 1' },
+    { id: 2, name: 'Section 2' },
+  ];
+  const gradebook = createGradebook({ sections });
+
+  strictEqual(gradebook.getSelectedSecondaryInfo(), 'section');
+});
+
+test('when one section is loaded and there is no secondary info configured, set it to "none"', function () {
+  const sections = [
+    { id: 1, name: 'Section 1' },
+  ];
+  const gradebook = createGradebook({ sections });
+
+  strictEqual(gradebook.getSelectedSecondaryInfo(), 'none');
+});
+
+test('when zero sections are loaded and there is no secondary info configured, set it to "none"', function () {
+  const sections = [];
+  const gradebook = createGradebook({ sections });
+
+  strictEqual(gradebook.getSelectedSecondaryInfo(), 'none');
+});
+
+test('when sections are loaded and there is secondary info configured, do not change it', function () {
+  const sections = [
+    { id: 1, name: 'Section 1' },
+    { id: 2, name: 'Section 2' },
+  ];
+  const settings = {
+    student_column_secondary_info: 'login_id'
+  }
+  const gradebook = createGradebook({ sections, settings });
+
+  strictEqual(gradebook.getSelectedSecondaryInfo(), 'login_id');
+});
+
+test('when one section is loaded and there is secondary info configured, do not change it', function () {
+  const sections = [
+    { id: 1, name: 'Section 1' },
+  ];
+  const settings = {
+    student_column_secondary_info: 'login_id'
+  }
+  const gradebook = createGradebook({ sections, settings });
+
+  strictEqual(gradebook.getSelectedSecondaryInfo(), 'login_id');
+});
+
+test('when zero sections are loaded and there is secondary info configured, do not change it', function () {
+  const sections = [];
+  const settings = {
+    student_column_secondary_info: 'login_id'
+  }
+  const gradebook = createGradebook({ sections, settings });
+
+  strictEqual(gradebook.getSelectedSecondaryInfo(), 'login_id');
 });
 
 QUnit.module('Gradebook#calculateStudentGrade', {
@@ -4170,13 +4231,23 @@ test('calls ajaxJSON with default gradebook_settings', function () {
   const expectedSettings = {
     show_concluded_enrollments: true,
     show_inactive_enrollments: true,
-    show_unpublished_assignments: true
+    show_unpublished_assignments: true,
+    sort_rows_by_column_id: 'student',
+    sort_rows_by_direction: 'ascending',
+    sort_rows_by_setting_key: 'sortable_name',
+    student_column_display_as: 'first_last',
+    student_column_secondary_info: 'none',
   };
   const gradebook = createGradebook({
     settings: {
       show_concluded_enrollments: 'true',
       show_inactive_enrollments: 'true',
-      show_unpublished_assignments: 'true'
+      show_unpublished_assignments: 'true',
+      sort_rows_by_column_id: 'student',
+      sort_rows_by_direction: 'ascending',
+      sort_rows_by_setting_key: 'sortable_name',
+      student_column_display_as: 'first_last',
+      student_column_secondary_info: 'none',
     }
   });
   const ajaxJSONStub = this.stub($, 'ajaxJSON');
@@ -4196,14 +4267,26 @@ test('calls ajaxJSON with parameters', function () {
   gradebook.saveSettings({
     showConcludedEnrollments: false,
     showInactiveEnrollments: false,
-    showUnpublishedAssignments: false
+    showUnpublishedAssignments: false,
+    studentColumnDisplayAs: 'last_first',
+    studentColumnSecondaryInfo: 'login_id',
+    sortRowsBy: {
+      columnId: 'assignment_1',
+      settingKey: 'late',
+      direction: 'ascending',
+    },
   });
 
   deepEqual(ajaxJSONStub.firstCall.args[2], {
     gradebook_settings: {
       show_concluded_enrollments: false,
       show_inactive_enrollments: false,
-      show_unpublished_assignments: false
+      show_unpublished_assignments: false,
+      sort_rows_by_column_id: 'assignment_1',
+      sort_rows_by_direction: 'ascending',
+      sort_rows_by_setting_key: 'late',
+      student_column_display_as: 'last_first',
+      student_column_secondary_info: 'login_id',
     }
   });
 });
@@ -4218,7 +4301,16 @@ test('calls successFn when response is successful', function () {
   const saveSettings = Gradebook.prototype.saveSettings;
   const self = {
     options: this.options,
-    getEnrollmentFilters () { return {}; }
+    getEnrollmentFilters () { return {}; },
+    getSelectedPrimaryInfo () { return 'first_last'; },
+    getSelectedSecondaryInfo () { return 'none'; },
+    getSortRowsBySetting () {
+      return {
+        sort_rows_by_column_id: 'student',
+        sort_rows_by_direction: 'ascending',
+        sort_rows_by_setting_key: 'sortable_name',
+      };
+    },
   };
   saveSettings.call(self, {}, successFn, null);
 
@@ -4235,7 +4327,16 @@ test('calls errorFn when response is not successful', function () {
   const saveSettings = Gradebook.prototype.saveSettings;
   const self = {
     options: this.options,
-    getEnrollmentFilters () { return {}; }
+    getEnrollmentFilters () { return {}; },
+    getSelectedPrimaryInfo () { return 'first_last'; },
+    getSelectedSecondaryInfo () { return 'none'; },
+    getSortRowsBySetting () {
+      return {
+        sort_rows_by_column_id: 'student',
+        sort_rows_by_direction: 'ascending',
+        sort_rows_by_setting_key: 'sortable_name',
+      };
+    },
   };
   saveSettings.call(self, {}, null, errorFn);
 
@@ -4577,4 +4678,184 @@ test('generates props that conform to ActionMenu.propTypes', function () {
 
     strictEqual(validator(props, propKey, 'ActionMenu'), null);
   });
+});
+
+QUnit.module('Gradebook#getInitialGridDisplaySettings');
+
+test('sets selectedPrimaryInfo based on the settings passed in', function () {
+  const loadedSettings = { student_column_display_as: 'last_first' };
+  const actualSettings = createGradebook({ settings: loadedSettings }).gridDisplaySettings;
+
+  strictEqual(actualSettings.selectedPrimaryInfo, 'last_first');
+});
+
+test('sets selectedPrimaryInfo to default if no settings passed in', function () {
+  const actualSettings = createGradebook().gridDisplaySettings;
+
+  strictEqual(actualSettings.selectedPrimaryInfo, 'first_last');
+});
+
+test('sets selectedSecondaryInfo based on the settings passed in', function () {
+  const loadedSettings = { student_column_secondary_info: 'login_id' };
+  const actualSettings = createGradebook({ settings: loadedSettings }).gridDisplaySettings;
+
+  strictEqual(actualSettings.selectedSecondaryInfo, 'login_id');
+});
+
+test('sets selectedSecondaryInfo to default if no settings passed in', function () {
+  const actualSettings = createGradebook().gridDisplaySettings;
+
+  strictEqual(actualSettings.selectedSecondaryInfo, 'none');
+});
+
+test('sets sortRowsBy > columnId based on the settings passed in', function () {
+  const loadedSettings = { sort_rows_by_column_id: 'assignment_1' };
+  const actualSettings = createGradebook({ settings: loadedSettings }).gridDisplaySettings;
+
+  strictEqual(actualSettings.sortRowsBy.columnId, 'assignment_1');
+});
+
+test('sets sortRowsBy > columnId to default if no settings passed in', function () {
+  const actualSettings = createGradebook().gridDisplaySettings;
+
+  strictEqual(actualSettings.sortRowsBy.columnId, 'student');
+});
+
+test('sets sortRowsBy > settingKey based on the settings passed in', function () {
+  const loadedSettings = { sort_rows_by_setting_key: 'grade' };
+  const actualSettings = createGradebook({ settings: loadedSettings }).gridDisplaySettings;
+
+  strictEqual(actualSettings.sortRowsBy.settingKey, 'grade');
+});
+
+test('sets sortRowsBy > settingKey to default if no settings passed in', function () {
+  const actualSettings = createGradebook().gridDisplaySettings;
+
+  strictEqual(actualSettings.sortRowsBy.settingKey, 'sortable_name');
+});
+
+test('sets sortRowsBy > Direction based on the settings passed in', function () {
+  const loadedSettings = { sort_rows_by_direction: 'descending' };
+  const actualSettings = createGradebook({ settings: loadedSettings }).gridDisplaySettings;
+
+  strictEqual(actualSettings.sortRowsBy.direction, 'descending');
+});
+
+test('sets sortRowsBy > Direction to default if no settings passed in', function () {
+  const actualSettings = createGradebook().gridDisplaySettings;
+
+  strictEqual(actualSettings.sortRowsBy.direction, 'ascending');
+});
+
+test('sets showEnrollments to a default value', function () {
+  const expectedSettings = {
+    concluded: false,
+    inactive: false,
+  };
+  const actualSettings = createGradebook().gridDisplaySettings;
+
+  deepEqual(actualSettings.showEnrollments, expectedSettings);
+});
+
+test('sets showUnpublishedDisplayed to a default value', function () {
+  const expectedSettings = false;
+  const actualSettings = createGradebook().gridDisplaySettings;
+
+  strictEqual(actualSettings.showUnpublishedDisplayed, expectedSettings);
+});
+
+QUnit.module('Gradebook#setSelectedPrimaryInfo', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.stub(this.gradebook, 'saveSettings');
+    this.stub(this.gradebook, 'buildRows');
+    this.stub(this.gradebook, 'renderStudentColumnHeader');
+  }
+});
+
+test('updates the selectedPrimaryInfo in the grid display settings', function () {
+  this.gradebook.setSelectedPrimaryInfo('last_first', true);
+
+  strictEqual(this.gradebook.gridDisplaySettings.selectedPrimaryInfo, 'last_first');
+});
+
+test('saves the new grid display settings', function () {
+  this.gradebook.setSelectedPrimaryInfo('last_first', true);
+
+  strictEqual(this.gradebook.saveSettings.callCount, 1);
+});
+
+test('re-renders the grid unless asked not to do it', function () {
+  this.gradebook.setSelectedPrimaryInfo('last_first', false);
+
+  strictEqual(this.gradebook.buildRows.callCount, 1);
+});
+
+test('re-renders the header of the student name column unless asked not to do it', function () {
+  this.gradebook.setSelectedPrimaryInfo('last_first', false);
+
+  strictEqual(this.gradebook.renderStudentColumnHeader.callCount, 1);
+});
+
+QUnit.module('Gradebook#setSelectedSecondaryInfo', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.stub(this.gradebook, 'saveSettings');
+    this.stub(this.gradebook, 'buildRows');
+    this.stub(this.gradebook, 'renderStudentColumnHeader');
+  }
+});
+
+test('updates the selectedSecondaryInfo in the grid display settings', function () {
+  this.gradebook.setSelectedSecondaryInfo('last_first', true);
+
+  strictEqual(this.gradebook.gridDisplaySettings.selectedSecondaryInfo, 'last_first');
+});
+
+test('saves the new grid display settings', function () {
+  this.gradebook.setSelectedSecondaryInfo('last_first', true);
+
+  strictEqual(this.gradebook.saveSettings.callCount, 1);
+});
+
+test('re-renders the grid unless asked not to do it', function () {
+  this.gradebook.setSelectedSecondaryInfo('last_first', false);
+
+  strictEqual(this.gradebook.buildRows.callCount, 1);
+});
+
+test('re-renders the header of the student name column unless asked not to do it', function () {
+  this.gradebook.setSelectedSecondaryInfo('last_first', false);
+
+  strictEqual(this.gradebook.renderStudentColumnHeader.callCount, 1);
+});
+
+QUnit.module('Gradebook#setSortRowsBySetting', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.stub(this.gradebook, 'saveSettings');
+    this.stub(this.gradebook, 'sortGridRows');
+
+    this.gradebook.setSortRowsBySetting('assignment_1', 'grade', 'descending');
+  }
+});
+
+test('updates the sort column in the grid display settings', function () {
+  strictEqual(this.gradebook.gridDisplaySettings.sortRowsBy.columnId, 'assignment_1');
+});
+
+test('updates the sort setting key in the grid display settings', function () {
+  strictEqual(this.gradebook.gridDisplaySettings.sortRowsBy.settingKey, 'grade');
+});
+
+test('updates the sort direction in the grid display settings', function () {
+  strictEqual(this.gradebook.gridDisplaySettings.sortRowsBy.direction, 'descending');
+});
+
+test('saves the new grid display settings', function () {
+  strictEqual(this.gradebook.saveSettings.callCount, 1);
+});
+
+test('re-sorts the grid rows', function () {
+  strictEqual(this.gradebook.sortGridRows.callCount, 1);
 });

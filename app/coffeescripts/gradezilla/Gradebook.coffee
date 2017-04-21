@@ -107,15 +107,24 @@ define [
     component = React.createElement(reactClass, props, children)
     ReactDOM.render(component, mountPoint)
 
-  ## Non-Persistent Gradebook Display Settings
-  getInitialGridDisplaySettings = ->
+  ## Gradebook Display Settings
+  getInitialGridDisplaySettings = (settings) ->
+    selectedPrimaryInfo = settings.student_column_display_as || StudentRowHeaderConstants.defaultPrimaryInfo
+
+    # in case of no user preference, determine the default value after @hasSections has resolved
+    selectedSecondaryInfo = settings.student_column_secondary_info
+
+    sortRowsByColumnId = settings.sort_rows_by_column_id || 'student'
+    sortRowsBySettingKey = settings.sort_rows_by_setting_key || 'sortable_name'
+    sortRowsByDirection = settings.sort_rows_by_direction || 'ascending'
+
     {
-      selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo
-      selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo
+      selectedPrimaryInfo
+      selectedSecondaryInfo
       sortRowsBy:
-        columnId: 'student' # the column controlling the sort
-        settingKey: 'sortable_name' # the key describing the sort criteria
-        direction: 'ascending' # the direction of the sort
+        columnId: sortRowsByColumnId # the column controlling the sort
+        settingKey: sortRowsBySettingKey # the key describing the sort criteria
+        direction: sortRowsByDirection # the direction of the sort
       showEnrollments:
         concluded: false
         inactive: false
@@ -149,7 +158,7 @@ define [
     gridReady: $.Deferred()
 
     constructor: (@options) ->
-      @gridDisplaySettings = getInitialGridDisplaySettings()
+      @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings)
       @contentLoadStates = getInitialContentLoadStates()
       @students = {}
       @studentViewStudents = {}
@@ -237,8 +246,11 @@ define [
 
       @gotSections(@options.sections)
       @hasSections.then () =>
-        if @sections_enabled && @getSelectedSecondaryInfo() == 'none'
-          @setSelectedSecondaryInfo 'section', true
+        if !@getSelectedSecondaryInfo()
+          if @sections_enabled
+            @setSelectedSecondaryInfo 'section', true
+          else
+            @setSelectedSecondaryInfo 'none', true
 
       dataLoader.gotStudents.then () =>
         @contentLoadStates.studentsLoaded = true
@@ -251,6 +263,7 @@ define [
 
       dataLoader.gotSubmissions.then () =>
         @contentLoadStates.submissionsLoaded = true
+        @sortGridRows()
         @updateColumnHeaders()
 
     # End of constructor
@@ -1510,13 +1523,22 @@ define [
     saveSettings: ({
       showConcludedEnrollments = @getEnrollmentFilters().concluded,
       showInactiveEnrollments = @getEnrollmentFilters().inactive,
-      showUnpublishedAssignments = @showUnpublishedAssignments
+      showUnpublishedAssignments = @showUnpublishedAssignments,
+      studentColumnDisplayAs = @getSelectedPrimaryInfo(),
+      studentColumnSecondaryInfo = @getSelectedSecondaryInfo(),
+      sortRowsBy = @getSortRowsBySetting()
     } = {}, successFn, errorFn) =>
       data =
         gradebook_settings:
           show_concluded_enrollments: showConcludedEnrollments
           show_inactive_enrollments: showInactiveEnrollments
           show_unpublished_assignments: showUnpublishedAssignments
+          student_column_display_as: studentColumnDisplayAs
+          student_column_secondary_info: studentColumnSecondaryInfo
+          sort_rows_by_column_id: sortRowsBy.columnId
+          sort_rows_by_setting_key: sortRowsBy.settingKey
+          sort_rows_by_direction: sortRowsBy.direction
+
       $.ajaxJSON(@options.settings_update_url, 'PUT', data, successFn, errorFn)
 
     onBeforeEditCell: (event, {row, cell}) =>
@@ -1764,7 +1786,7 @@ define [
       document.getElementById(@grid.getUID() + columnId)
 
     getColumnPositionById: (colId, columnGroup = @grid.getColumns()) ->
-      position = null;
+      position = null
 
       columnGroup.forEach (col, idx) ->
         if col.id == colId
@@ -1875,7 +1897,7 @@ define [
       allColumns.splice(totalColumnPositionOverall, 1)
 
       # Add total_grade column next to the position of the student column in the current column order
-      allColumns = allColumns.concat(totalColumn);
+      allColumns = allColumns.concat(totalColumn)
 
       # Add total_grade column to the end of the aggregate section
       @aggregateColumns = @aggregateColumns.concat(totalColumn)
@@ -2138,6 +2160,7 @@ define [
 
     setSelectedPrimaryInfo: (primaryInfo, skipRedraw) =>
       @gridDisplaySettings.selectedPrimaryInfo = primaryInfo
+      @saveSettings()
       unless skipRedraw
         @buildRows()
         @renderStudentColumnHeader()
@@ -2147,6 +2170,7 @@ define [
 
     setSelectedSecondaryInfo: (secondaryInfo, skipRedraw) =>
       @gridDisplaySettings.selectedSecondaryInfo = secondaryInfo
+      @saveSettings()
       unless skipRedraw
         @buildRows()
         @renderStudentColumnHeader()
@@ -2158,6 +2182,7 @@ define [
       @gridDisplaySettings.sortRowsBy.columnId = columnId
       @gridDisplaySettings.sortRowsBy.settingKey = settingKey
       @gridDisplaySettings.sortRowsBy.direction = direction
+      @saveSettings()
       @sortGridRows()
 
     getSortRowsBySetting: =>

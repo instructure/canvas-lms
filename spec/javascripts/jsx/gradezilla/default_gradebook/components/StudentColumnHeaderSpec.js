@@ -116,6 +116,7 @@ test('renders a MenuItem for each secondary info option', function () {
 
   StudentRowHeaderConstants.secondaryInfoKeys.forEach((key) => {
     const menuItem = document.querySelector(`[data-menu-item-id="${key}"]`);
+
     ok(menuItem);
   });
 });
