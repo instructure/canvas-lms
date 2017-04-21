@@ -1,22 +1,22 @@
 import React from 'react'
 import * as enzyme from 'enzyme'
-import BlueprintCourseSidebar from 'jsx/blueprint_course_settings/components/BlueprintSidebar'
+import BlueprintSidebar from 'jsx/blueprint_course_settings/components/BlueprintSidebar'
 
-QUnit.module('BlueprintCourseSidebar component')
+QUnit.module('BlueprintSidebar component')
 
 const defaultProps = () => ({
 
 })
 
-test('renders the BlueprintCourseSidebar component', () => {
-  const tree = enzyme.shallow(<BlueprintCourseSidebar {...defaultProps()} />)
+test('renders the BlueprintSidebar component', () => {
+  const tree = enzyme.shallow(<BlueprintSidebar {...defaultProps()} />)
   const node = tree.find('.bcs__wrapper')
   ok(node.exists())
 })
 
 test('clicking open button sets isOpen to true', () => {
   const props = defaultProps()
-  const tree = enzyme.mount(<BlueprintCourseSidebar {...props} />)
+  const tree = enzyme.mount(<BlueprintSidebar {...props} />)
 
   const button = tree.find('.bcs__trigger button')
   button.at(0).simulate('click')
@@ -27,7 +27,7 @@ test('clicking open button sets isOpen to true', () => {
 
 test('clicking close button sets isOpen to false', () => {
   const props = defaultProps()
-  const tree = enzyme.mount(<BlueprintCourseSidebar {...props} />)
+  const tree = enzyme.mount(<BlueprintSidebar {...props} />)
 
   const instance = tree.instance()
   instance.setState({ isOpen: true })

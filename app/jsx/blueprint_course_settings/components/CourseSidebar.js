@@ -22,6 +22,8 @@ export default class CourseSidebar extends Component {
     loadAssociations: PropTypes.func.isRequired,
     saveAssociations: PropTypes.func.isRequired,
     clearAssociations: PropTypes.func.isRequired,
+    hasAssociationChanges: PropTypes.bool.isRequired,
+    isSavingAssociations: PropTypes.bool.isRequired,
   }
 
   constructor (props) {
@@ -39,9 +41,11 @@ export default class CourseSidebar extends Component {
   }
 
   modals = {
-    associations: {
+    associations: () => ({
       props: {
         title: I18n.t('Associations'),
+        hasChanges: this.props.hasAssociationChanges,
+        isSaving: this.props.isSavingAssociations,
         onSave: this.props.saveAssociations,
         onCancel: () => this.closeModal(() => {
           this.asscBtn.focus()
@@ -49,7 +53,7 @@ export default class CourseSidebar extends Component {
         }),
       },
       children: () => <ConnectedBlueprintAssociations />,
-    }
+    })
   }
 
   closeModal = (cb) => {
@@ -67,8 +71,12 @@ export default class CourseSidebar extends Component {
   }
 
   renderModal () {
-    const modal = this.modals[this.state.modalId] || { props: { onCancel: this.closeModal }, children: () => null }
-    return <BlueprintModal {...modal.props} isOpen={this.state.isModalOpen}>{modal.children}</BlueprintModal>
+    if (this.modals[this.state.modalId]) {
+      const modal = this.modals[this.state.modalId]()
+      return <BlueprintModal {...modal.props} isOpen={this.state.isModalOpen}>{modal.children}</BlueprintModal>
+    } else {
+      return null
+    }
   }
 
   render () {
@@ -94,6 +102,9 @@ const connectState = ({
   migrationStatus,
   isLoadingBeginMigration,
   hasCheckedMigration,
+  addedAssociations,
+  removedAssociations,
+  isSavingAssociations,
 }) => ({
   associations: existingAssociations,
   hasLoadedAssociations,
@@ -101,6 +112,8 @@ const connectState = ({
   migrationStatus,
   isLoadingBeginMigration,
   hasCheckedMigration,
+  isSavingAssociations,
+  hasAssociationChanges: (addedAssociations.length + removedAssociations.length) > 0,
 })
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 
