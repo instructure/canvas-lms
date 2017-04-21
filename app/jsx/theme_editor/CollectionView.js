@@ -146,7 +146,7 @@ export default React.createClass({
         <div>
           <div className="ic-Action-header">
             <div className="ic-Action-header__Primary">
-              <h2 className="ic-Action-header__Heading">{I18n.t('Themes')}</h2>
+              <h1 className="ic-Action-header__Heading">{I18n.t('Themes')}</h1>
             </div>
             <div className="ic-Action-header__Secondary">
               <div className="al-dropdown__container">
