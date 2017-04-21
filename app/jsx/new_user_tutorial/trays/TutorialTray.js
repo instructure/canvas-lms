@@ -78,6 +78,7 @@ class TutorialTray extends React.Component {
         zIndex="100"
         onEntering={this.handleEntering}
         onExiting={this.handleExiting}
+        onEntered={this.handleEntering}
       >
         <div className="NewUserTutorialTray">
           <div className="NewUserTutorialTray__ButtonContainer">
