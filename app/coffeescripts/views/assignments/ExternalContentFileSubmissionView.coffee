@@ -41,7 +41,7 @@ define [
       return
 
     redirectSuccessfulAssignment: (responseData) =>
-      window.onbeforeunload = -> # remove alert message from being triggered
+      $(window).off('beforeunload') # remove alert message from being triggered
       window.location.reload()
       @loaderPromise.resolve()
       return

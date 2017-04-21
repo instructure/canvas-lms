@@ -20,6 +20,6 @@ define [
       $.ajaxJSON submissionUrl, "POST", data, @redirectSuccessfulAssignment
 
     redirectSuccessfulAssignment: (responseData) =>
-      window.onbeforeunload = -> # remove alert message from being triggered
+      $(window).off('beforeunload') # remove alert message from being triggered
       window.location.reload()
 

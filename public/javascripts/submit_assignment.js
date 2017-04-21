@@ -238,7 +238,7 @@ define([
       }
     });
 
-    window.addEventListener('beforeunload', function(e) {
+    $(window).on('beforeunload', function(e) {
       if($("#submit_assignment:visible").length > 0 && !submitting) {
         e.returnValue = I18n.t('messages.not_submitted_yet', "You haven't finished submitting your assignment.  You still need to click \"Submit\" to finish turning it in.  Do you want to leave this page anyway?");
         return e.returnValue;
