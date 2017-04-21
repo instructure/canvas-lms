@@ -1229,6 +1229,9 @@ define [
           returnFocusTo: focusReturnPoint
           label: @options.sis_name
           store: @postGradesStore
+        publishGradesToSis:
+          isEnabled: @options.publish_to_sis_enabled
+          publishToSisUrl: @options.publish_to_sis_url
 
       progressData = @options.gradebook_csv_progress
 

@@ -36,7 +36,10 @@ const { arrayOf, bool, func, object, shape, string } = React.PropTypes;
     static defaultProps = {
       lastExport: undefined,
       attachment: undefined,
-      postGradesLtis: []
+      postGradesLtis: [],
+      publishGradesToSis: {
+        publishToSisUrl: undefined
+      }
     };
 
     static propTypes = {
@@ -68,7 +71,12 @@ const { arrayOf, bool, func, object, shape, string } = React.PropTypes;
         enabled: bool.isRequired,
         store: object.isRequired,
         returnFocusTo: object
-      }).isRequired
+      }).isRequired,
+
+      publishGradesToSis: shape({
+        isEnabled: bool.isRequired,
+        publishToSisUrl: string
+      })
     };
 
     static downloadableLink (url) {
@@ -143,6 +151,10 @@ const { arrayOf, bool, func, object, shape, string } = React.PropTypes;
 
     handleImport () {
       ActionMenu.gotoUrl(this.props.gradebookImportUrl);
+    }
+
+    handlePublishGradesToSis () {
+      ActionMenu.gotoUrl(this.props.publishGradesToSis.publishToSisUrl);
     }
 
     disableImports () {
@@ -246,6 +258,22 @@ const { arrayOf, bool, func, object, shape, string } = React.PropTypes;
       ];
     }
 
+    renderPublishGradesToSis () {
+      const { isEnabled, publishToSisUrl } = this.props.publishGradesToSis;
+
+      if (!isEnabled || !publishToSisUrl) {
+        return null;
+      }
+
+      return (
+        <MenuItem onSelect={() => { this.handlePublishGradesToSis() }}>
+          <span data-menu-id="publish-grades-to-sis">
+            {I18n.t('Publish grades to SIS')}
+          </span>
+        </MenuItem>
+      );
+    }
+
     render () {
       const buttonTypographyProps = {
         weight: 'normal',
@@ -253,6 +281,7 @@ const { arrayOf, bool, func, object, shape, string } = React.PropTypes;
         size: 'medium',
         color: 'primary'
       };
+      const publishGradesToSis = this.renderPublishGradesToSis();
 
       return (
         <PopoverMenu
@@ -265,6 +294,7 @@ const { arrayOf, bool, func, object, shape, string } = React.PropTypes;
           }
         >
           { this.renderPostGradesTools() }
+          {publishGradesToSis}
 
           <MenuItem disabled={this.disableImports()} onSelect={() => { this.handleImport() }}>
             <span data-menu-id="import">{ I18n.t('Import') }</span>

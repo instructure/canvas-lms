@@ -19,11 +19,12 @@
 define([
   'react',
   'enzyme',
+  'jquery',
   'instructure-ui/lib/components/PopoverMenu',
   'jsx/gradezilla/SISGradePassback/PostGradesApp',
   'jsx/gradezilla/shared/GradebookExportManager',
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
-], (React, { mount }, { default: PopoverMenu }, PostGradesApp, GradebookExportManager, ActionMenu) => {
+], (React, { mount }, $, { default: PopoverMenu }, PostGradesApp, GradebookExportManager, ActionMenu) => {
   const workingMenuProps = () => (
     {
       gradebookIsEditable: true,
@@ -44,6 +45,10 @@ define([
         label: '',
         store: {},
         returnFocusTo: { focus () {} }
+      },
+
+      publishGradesToSis: {
+        isEnabled: false
       }
     }
   );
@@ -626,5 +631,60 @@ define([
       strictEqual(PostGradesApp.AppLaunch.called, true);
       done();
     }, 15);
+  });
+
+  QUnit.module('ActionMenu - Publish grades to SIS', {
+    setup () {
+      this.wrapper = mount(<ActionMenu {...workingMenuProps()} />);
+      this.wrapper.find('button').simulate('click');
+    },
+
+    teardown () {
+      this.wrapper.unmount();
+    }
+  });
+
+  test('Does not render menu item when isEnabled is false and publishToSisUrl is undefined', function () {
+    const menuItem = document.querySelector('[role="menuitem"] [data-menu-id="publish-grades-to-sis"]');
+    equal(menuItem, null);
+  });
+
+  test('Does not render menu item when isEnabled is true and publishToSisUrl is undefined', function () {
+    this.wrapper.setProps({
+      publishGradesToSis: {
+        isEnabled: true
+      }
+    });
+
+    const menuItem = document.querySelector('[role="menuitem"] [data-menu-id="publish-grades-to-sis"]');
+    equal(menuItem, null);
+  });
+
+  test('Renders menu item when isEnabled is true and publishToSisUrl is defined', function () {
+    this.wrapper.setProps({
+      publishGradesToSis: {
+        isEnabled: true,
+        publishToSisUrl: 'http://example.com'
+      }
+    });
+
+    const menuItem = document.querySelector('[role="menuitem"] [data-menu-id="publish-grades-to-sis"]');
+    ok(menuItem);
+  });
+
+  test('Calls gotoUrl with publishToSisUrl when clicked', function () {
+    this.wrapper.setProps({
+      publishGradesToSis: {
+        isEnabled: true,
+        publishToSisUrl: 'http://example.com'
+      }
+    });
+    this.stub(ActionMenu, 'gotoUrl');
+
+    const $menuItem = $('[role="menuitem"] [data-menu-id="publish-grades-to-sis"]');
+    $menuItem.click();
+
+    equal(ActionMenu.gotoUrl.callCount, 1);
+    equal(ActionMenu.gotoUrl.getCall(0).args[0], 'http://example.com');
   });
 });

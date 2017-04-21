@@ -4564,6 +4564,7 @@ test('generates props that conform to ActionMenu.propTypes', function () {
       currentUserId: '123',
       export_gradebook_csv_url: 'http://example.com/export',
       post_grades_feature: false,
+      publish_to_sis_enabled: false
     },
     postGradesLtis: [],
     postGradesStore: {}
