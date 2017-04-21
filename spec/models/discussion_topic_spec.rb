@@ -975,6 +975,15 @@ describe DiscussionTopic do
       expect(@topic.user_can_see_posts?(@teacher)).to eq true
     end
 
+    it "should allow course admins to see posts in concluded group topics without posting" do
+      group_category = @course.group_categories.create(:name => "category")
+      @group = @course.groups.create(:name => "group", :group_category => group_category)
+      @topic.update_attribute(:group_category, group_category)
+      subtopic = @topic.child_topics.first
+      @course.complete!
+      expect(subtopic.user_can_see_posts?(@teacher)).to eq true
+    end
+
     it "should only allow active admins to see posts without posting" do
       @ta_enrollment = course_with_ta(:course => @course, :active_enrollment => true)
       # TA should be able to see
