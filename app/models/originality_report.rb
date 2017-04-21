@@ -2,9 +2,9 @@ class OriginalityReport < ActiveRecord::Base
   belongs_to :submission
   belongs_to :attachment
   belongs_to :originality_report_attachment, class_name: "Attachment"
-  validates :originality_score, :attachment, :submission, presence: true
-  validates :originality_score, inclusion: { in: 0..100, message: 'score must be between 0 and 100' }
+  validates :attachment, :submission, presence: true
   validates :workflow_state, inclusion: { in: ['scored', 'error', 'pending'] }
+  validates :originality_score, inclusion: { in: 0..100, message: 'score must be between 0 and 100' }, allow_nil: true
 
   alias_attribute :file_id, :attachment_id
   alias_attribute :originality_report_file_id, :originality_report_attachment_id

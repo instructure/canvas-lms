@@ -12,10 +12,22 @@ describe OriginalityReport do
     expect(subject.attachment).to eq attachment
   end
 
-  it 'requires an originality score' do
+  it 'does not require an originality score' do
     subject.originality_score = nil
     subject.valid?
-    expect(subject.errors[:originality_score]).to eq ["can't be blank", "score must be between 0 and 100"]
+    expect(subject.errors[:originality_score]).to be_blank
+  end
+
+  it 'does not allow scores higher than 100' do
+    subject.originality_score = 101
+    subject.valid?
+    expect(subject.errors[:originality_score]).to eq ['score must be between 0 and 100']
+  end
+
+  it 'does not allow scores lower than 0' do
+    subject.originality_score = -1
+    subject.valid?
+    expect(subject.errors[:originality_score]).to eq ['score must be between 0 and 100']
   end
 
   it 'requires an attachment' do
