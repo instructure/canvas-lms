@@ -53,5 +53,83 @@ module DrDiff
         end
       end
     end
+
+    describe ".wip?" do
+      let(:git_proxy) { described_class.new }
+
+      context "first line starts with wip" do
+        let(:first_line) { "[WIP] foobar" }
+
+        before :each do
+          allow(git_proxy).to receive(:first_line).and_return(first_line)
+        end
+
+        it "returns true" do
+          expect(git_proxy.wip?).to be_truthy
+        end
+      end
+
+      context "first line does not starts with wip" do
+        let(:first_line) { "foobar wip yo" }
+
+        before :each do
+          allow(git_proxy).to receive(:first_line).and_return(first_line)
+        end
+
+        it "returns false" do
+          expect(git_proxy.wip?).to be_falsey
+        end
+      end
+    end
+
+    describe ".changes" do
+      let(:git_proxy) { described_class.new(sha: "12443") }
+      let(:change_path) { "path/to/some/modified/file" }
+      let(:change_status) { "M" }
+      let(:change_status_full) { "modified" }
+      let(:change_output) { [change_status, change_path].join("\t") }
+      it "creates changes from the status and path" do
+        allow(git_proxy).to receive(:shell).and_return(change_output)
+
+        results = git_proxy.changes
+        expect(results.size).to eq(1)
+        change = results.first
+        expect(change.path).to eq(change_path)
+        expect(change.status).to eq(change_status_full)
+      end
+
+      context "dirty" do
+        let(:git_proxy) { described_class.new }
+        let(:dirty_cmd) { "git diff --name-status" }
+
+        before :each do
+          allow(git_proxy).to receive(:dirty?).and_return(true)
+        end
+
+        it "uses the dirty command" do
+          expect(git_proxy).to receive(:shell)
+            .with(dirty_cmd)
+            .and_return("")
+          git_proxy.changes
+        end
+      end
+
+      context "not dirty" do
+        let(:sha) { "12345abc" }
+        let(:git_proxy) { described_class.new(sha: sha) }
+        let(:clean_cmd) { "git diff-tree --no-commit-id --name-status -r #{sha}" }
+
+        before :each do
+          allow(git_proxy).to receive(:dirty?).and_return(false)
+        end
+
+        it "uses the clean command" do
+          expect(git_proxy).to receive(:shell)
+            .with(clean_cmd)
+            .and_return("")
+          git_proxy.changes
+        end
+      end
+    end
   end
 end

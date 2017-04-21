@@ -1,252 +1,174 @@
 require 'spec_helper'
 
-describe TatlTael::Linter do
-  shared_examples "yields" do |raw_changes, ensure_method|
-    let(:changes) { raw_changes.map { |c| double(c) } }
-
-    it "yields" do
-      expect { |b| subject.send(ensure_method, &b) }.to yield_with_no_args
-    end
-  end
-
-  shared_examples "does not yield" do |raw_changes, ensure_method|
-    let(:changes) { raw_changes.map { |c| double(c) } }
-
-    it "does not yield" do
-      expect { |b| subject.send(ensure_method, &b) }.not_to yield_with_no_args
-    end
-  end
-
-  shared_examples "change combos" do |change_path, spec_path, ensure_method|
-    context "not deletion" do
-      context "no spec changes" do
-        include_examples "yields",
-                         [{ path: change_path, deleted?: false }], ensure_method
-      end
-      context "has spec non deletions" do
-        include_examples "does not yield",
-                         [{ path: change_path, deleted?: false },
-                          { path: spec_path, deleted?: false }], ensure_method
-      end
-      context "has spec deletions" do
-        include_examples "yields",
-                         [{ path: change_path, deleted?: false },
-                          { path: spec_path, deleted?: true }], ensure_method
-      end
-    end
-    context "deletion" do
-      include_examples "does not yield",
-                       [{ path: change_path, deleted?: true }], ensure_method
-    end
-  end
-
-  let(:subject) { TatlTael::Linter.new(git_dir: ".") }
-
-  APP_COFFEE_PATH        = "app/coffeescripts/calendar/CalendarEvent.coffee"
-  APP_COFFEE_BUNDLE_PATH = "app/coffeescripts/bundles/account_authorization_configs.coffee"
-  COFFEE_SPEC_PATH       = "spec/coffeescripts/calendar/CalendarSpec.coffee"
-
-  APP_JSX_PATH           = "app/jsx/dashboard_card/DashboardCardAction.jsx"
-  JSX_SPEC_PATH          = "spec/javascripts/jsx/dashboard_card/DashboardCardActionSpec.coffee"
-
-  APP_RB_PATH            = "app/controllers/accounts_controller.rb"
-  APP_RB_SPEC_PATH       = "spec/controllers/accounts_controller_spec.rb"
-  LIB_RB_PATH            = "lib/reporting/counts_report.rb"
-  LIB_RB_SPEC_PATH       = "spec/lib/reporting/counts_report_spec.rb"
-
-  APP_ERB_PATH           = "app/views/announcements/index.html.erb"
-  OTHER_ERB_PATH         = "spec/formatters/error_context/html_page_formatter/template.html.erb"
-  PUBLIC_JS_PATH         = "public/javascripts/eportfolios/eportfolio_section.js"
-  PUBLIC_JS_SPEC_PATH    = "spec/javascripts/jsx/eportfolios/eportfolioSectionSpec.jsx"
-
-  PUBLIC_BOWER_JS_PATH   = "public/javascripts/bower/axios/dist/axios.amd.js"
-  PUBLIC_ME_JS_PATH      = "public/javascripts/mediaelement/mep-feature-speed-instructure.js"
-  PUBLIC_VENDOR_JS_PATH  = "public/javascripts/vendor/bootstrap/bootstrap-dropdown.js"
-  SELENIUM_SPEC_PATH     = "spec/selenium/announcements/announcements_student_spec.rb"
-
-  before(:each) do
-    allow(subject).to receive(:changes).and_return(changes)
-  end
-
-  describe "#ensure_coffee_specs" do
-    context "coffee changes" do
-      include_examples "change combos",
-                       APP_COFFEE_PATH,
-                       COFFEE_SPEC_PATH,
-                       :ensure_coffee_specs
-
-      context "bundles" do
-        include_examples "does not yield",
-                         [{ path: APP_COFFEE_BUNDLE_PATH, deleted?: false }],
-                         :ensure_coffee_specs
-      end
-
-      context "with jsx spec changes" do
-        include_examples "change combos",
-                         APP_COFFEE_PATH,
-                         JSX_SPEC_PATH,
-                         :ensure_coffee_specs
-      end
-    end
-  end
-
-  describe "#ensure_public_js_specs" do
-    include_examples "change combos",
-                     PUBLIC_JS_PATH,
-                     PUBLIC_JS_SPEC_PATH,
-                     :ensure_public_js_specs
-
-    context "in excluded public sub dirs" do
-      context "bower" do
-        include_examples "does not yield",
-                         [{ path: PUBLIC_BOWER_JS_PATH, deleted?: false }],
-                         :ensure_public_js_specs
-      end
-      context "mediaelement" do
-        include_examples "does not yield",
-                         [{ path: PUBLIC_ME_JS_PATH, deleted?: false }],
-                         :ensure_public_js_specs
-      end
-      context "vendor" do
-        include_examples "does not yield",
-                         [{ path: PUBLIC_VENDOR_JS_PATH, deleted?: false }],
-                         :ensure_public_js_specs
-      end
-    end
-  end
-
-  describe "#ensure_jsx_specs" do
-    include_examples "change combos",
-                     APP_JSX_PATH,
-                     JSX_SPEC_PATH,
-                     :ensure_jsx_specs
-  end
-
-  describe "#ensure_ruby_specs" do
-    context "app" do
-      include_examples "change combos",
-                       APP_RB_PATH,
-                       APP_RB_SPEC_PATH,
-                       :ensure_ruby_specs
-    end
-
-    context "lib" do
-      include_examples "change combos",
-                       LIB_RB_PATH,
-                       LIB_RB_SPEC_PATH,
-                       :ensure_ruby_specs
-    end
-  end
-
-  describe "#ensure_no_unnecessary_selenium_specs" do
-    context "has selenium specs" do
-      context "needs public js specs" do
-        context "has no public js specs" do
-          include_examples "yields",
-                           [{ path: SELENIUM_SPEC_PATH, deleted?: false },
-                            { path: PUBLIC_JS_PATH, deleted?: false }],
-                           :ensure_no_unnecessary_selenium_specs
+describe TatlTael::Linters do
+  describe TatlTael::Linters::BaseLinter do
+    describe ".inherited" do
+      context "not a simple linter" do
+        class FooLinter < TatlTael::Linters::BaseLinter;
         end
 
-        context "has public js specs" do
-          include_examples "does not yield",
-                           [{ path: SELENIUM_SPEC_PATH, deleted?: false },
-                            { path: PUBLIC_JS_PATH, deleted?: false },
-                            { path: PUBLIC_JS_SPEC_PATH, deleted?: false }],
-                           :ensure_no_unnecessary_selenium_specs
+        it "saves the subclass" do
+          expect(TatlTael::Linters.linters).to include(FooLinter)
         end
       end
 
-      context "needs coffee specs" do
-        context "has no coffee specs" do
-          include_examples "yields",
-                           [{ path: SELENIUM_SPEC_PATH, deleted?: false },
-                            { path: APP_COFFEE_PATH, deleted?: false }],
-                           :ensure_no_unnecessary_selenium_specs
-        end
-
-        context "has coffee specs" do
-          include_examples "does not yield",
-                           [{ path: SELENIUM_SPEC_PATH, deleted?: false },
-                            { path: APP_COFFEE_PATH, deleted?: false },
-                            { path: COFFEE_SPEC_PATH, deleted?: false }],
-                           :ensure_no_unnecessary_selenium_specs
-        end
-      end
-
-      context "needs jsx specs" do
-        context "has no jsx specs" do
-          include_examples "yields",
-                           [{ path: SELENIUM_SPEC_PATH, deleted?: false },
-                            { path: APP_JSX_PATH, deleted?: false }],
-                           :ensure_no_unnecessary_selenium_specs
-        end
-
-        context "has jsx specs" do
-          include_examples "does not yield",
-                           [{ path: SELENIUM_SPEC_PATH, deleted?: false },
-                            { path: APP_JSX_PATH, deleted?: false },
-                            { path: JSX_SPEC_PATH, deleted?: false }],
-                           :ensure_no_unnecessary_selenium_specs
-        end
-      end
-
-      context "needs ruby specs" do
-        context "has no ruby specs" do
-          include_examples "yields",
-                           [{ path: SELENIUM_SPEC_PATH, deleted?: false },
-                            { path: APP_RB_PATH, deleted?: false }],
-                           :ensure_no_unnecessary_selenium_specs
-        end
-
-        context "has ruby specs" do
-          include_examples "does not yield",
-                           [{ path: SELENIUM_SPEC_PATH, deleted?: false },
-                            { path: APP_RB_PATH, deleted?: false },
-                            { path: APP_RB_SPEC_PATH, deleted?: false }],
-                           :ensure_no_unnecessary_selenium_specs
+      context "simple linter" do
+        it "saves the subclass" do
+          expect(TatlTael::Linters.linters).not_to include(TatlTael::Linters::SimpleLinter)
         end
       end
     end
 
-    context "has no selenium specs" do
-      include_examples "does not yield",
-                       [{ path: PUBLIC_VENDOR_JS_PATH, deleted?: false }],
-                       :ensure_no_unnecessary_selenium_specs
+    describe "#changes_matching" do
+      Change = Struct.new(:status, :path)
+
+      let(:base_linter) { TatlTael::Linters::BaseLinter.new(changes) }
+
+      before :each do
+        allow(base_linter).to receive(:changes)
+                                .and_return(changes)
+      end
+
+      context "filtering by statuses" do
+        let(:added_change_path) { "path/to/foo" }
+        let(:added_change) { Change.new("added", added_change_path) }
+        let(:deleted_change_path) { "path/to/deleted" }
+        let(:deleted_change) { Change.new("deleted", deleted_change_path) }
+        let(:modified_change_path) { "path/to/mod" }
+        let(:modified_change) { Change.new("modified", modified_change_path) }
+
+        let(:changes) { [added_change, deleted_change, modified_change] }
+
+        it "defaults to added and modified changes" do
+          expect(base_linter.changes_matching).to match([added_change, modified_change])
+        end
+
+        context "deleted" do
+          let(:query) { {statuses: ["deleted"]} }
+
+          it "returns deleted changes" do
+            expect(base_linter.changes_matching(query)).to match([deleted_change])
+          end
+        end
+      end
+
+      context "filtering by include_regexes" do
+        let(:added_change_path) { "path/to/foo" }
+        let(:added_change) { Change.new("added", added_change_path) }
+        let(:modified_change_path) { "path/to/mod" }
+        let(:modified_change) { Change.new("modified", modified_change_path) }
+
+        let(:changes) { [added_change, modified_change] }
+
+        it "defaults to include all" do
+          expect(base_linter.changes_matching).to match(changes)
+        end
+
+        context "include_regexes exist" do
+          let(:query) { {include_regexes: [/zoo/, /foo/, /bar/]} }
+
+          it "returns the changes that match any of the include_regexes" do
+            expect(base_linter.changes_matching(query)).to match([added_change])
+          end
+        end
+      end
+
+      context "filtering by exclude_regexes" do
+        let(:added_change_path) { "path/to/foo" }
+        let(:added_change) { Change.new("added", added_change_path) }
+        let(:modified_change_path) { "path/to/mod" }
+        let(:modified_change) { Change.new("modified", modified_change_path) }
+
+        let(:changes) { [added_change, modified_change] }
+
+        it "defaults to exclude none" do
+          expect(base_linter.changes_matching).to match(changes)
+        end
+
+        context "include_regexes exist" do
+          let(:query) { {exclude_regexes: [/zoo/, /foo/, /bar/]} }
+
+          it "returns the changes that don't match any of the exclude_regexes" do
+            expect(base_linter.changes_matching(query)).to match([modified_change])
+          end
+        end
+      end
+    end
+
+    describe "#changes_exist?" do
+      let(:changes) { double }
+      let(:query) do
+        {
+          include_regexes: [/.js/],
+          exclude_regexes: [/^public/]
+        }
+      end
+      let(:base_linter) { TatlTael::Linters::BaseLinter.new(changes) }
+
+      before :each do
+        allow(base_linter).to receive(:changes_matching)
+                                .with(hash_including(query))
+                                .and_return(changes)
+      end
+
+
+      context "changes exist matching the query" do
+        before :each do
+          allow(changes).to receive(:empty?).and_return(false)
+        end
+
+        it "returns true" do
+          expect(base_linter.changes_exist?(query)).to be_truthy
+        end
+      end
+
+      context "changes DO NOT exist matching the query" do
+        before :each do
+          allow(changes).to receive(:empty?).and_return(true)
+        end
+
+        it "returns false" do
+          expect(base_linter.changes_exist?(query)).to be_falsey
+        end
+      end
     end
   end
 
-  describe "#ban_new_erb" do
-    context "app views erb additions exist" do
-      let(:changes) { [double(path: APP_ERB_PATH, added?: true)] }
+  let(:linters) { TatlTael::Linters }
+  let(:changes) { double }
 
-      it "yields" do
-        expect { |b| subject.ban_new_erb(&b) }.to yield_with_no_args
+  describe ".comments" do
+    let(:simple_comments) { [["a", "b", nil, "c"]] }
+    let(:reg_comments) { nil }
+
+    it "collects simple and regular linter comments" do
+      expect(TatlTael::Linters::SimpleLinter).to receive(:comments)
+                                                   .with(changes)
+                                                   .and_return(simple_comments)
+      expect(linters).to receive(:run_linters)
+                           .with(changes)
+                           .and_return(reg_comments)
+      expect(linters.comments(changes)).to match(%w[a b c])
+    end
+  end
+
+  describe ".run_linters" do
+    class BarLinter < TatlTael::Linters::BaseLinter
+      def run
+        [[], [nil], "1"]
+      end
+    end
+    class ZooLinter < TatlTael::Linters::BaseLinter
+      def run
+        [nil, "2", "3"]
       end
     end
 
-    context "other erb additions exist" do
-      let(:changes) { [double(path: OTHER_ERB_PATH, added?: true)] }
+    let(:saved_linters) { [BarLinter, ZooLinter] }
 
-      it "yields" do
-        expect { |b| subject.ban_new_erb(&b) }.not_to yield_with_no_args
-      end
-    end
-
-    context "erb non additions exist" do
-      let(:changes) { [double(path: APP_ERB_PATH, added?: false)] }
-
-      it "does not yield" do
-        expect { |b| subject.ban_new_erb(&b) }.not_to yield_with_no_args
-      end
-    end
-
-    context "no erb changes exist" do
-      let(:changes) { [double(path: PUBLIC_VENDOR_JS_PATH, added?: true)] }
-
-      it "does not yield" do
-        expect { |b| subject.ban_new_erb(&b) }.not_to yield_with_no_args
-      end
+    it "collects regular linter comments" do
+      expect(TatlTael::Linters).to receive(:linters).and_return(saved_linters)
+      expect(linters.run_linters(changes)).to match(%w[1 2 3])
     end
   end
 end

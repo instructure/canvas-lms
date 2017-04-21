@@ -10,12 +10,14 @@ class Linter
     comment_post_processing: proc { |comments| comments },
     env_sha: ENV['SHA'] || ENV['GERRIT_PATCHSET_REVISION'],
     file_regex: /./,
+    gergich_capture: true,
     gerrit_patchset: !!ENV['GERRIT_PATCHSET_REVISION'],
     heavy_mode: false,
     heavy_mode_proc: proc {},
     include_git_dir_in_output: !!!ENV['GERRIT_PATCHSET_REVISION'],
     plugin: ENV['GERRIT_PROJECT'],
     skip_file_size_check: false,
+    skip_wips: false,
   }.freeze
 
   def initialize(options = {})
@@ -31,6 +33,11 @@ class Linter
   end
 
   def run
+    if skip_wips && wip?
+      puts "WIP detected, #{linter_name} will not run."
+      exit 0
+    end
+
     if git_dir && !Dir.exist?(git_dir)
       puts "No plugin #{plugin} found"
       exit 0
@@ -59,6 +66,7 @@ class Linter
               :env_sha,
               :file_regex,
               :format,
+              :gergich_capture,
               :gerrit_patchset,
               :heavy_mode,
               :heavy_mode_proc,
@@ -66,7 +74,8 @@ class Linter
               :linter_name,
               :plugin,
               :severe_levels,
-              :skip_file_size_check
+              :skip_file_size_check,
+              :skip_wips
 
   def git_dir
     @git_dir ||= plugin && "gems/plugins/#{plugin}/"
@@ -78,6 +87,14 @@ class Linter
 
   def dr_diff
     @dr_diff ||= ::DrDiff::Manager.new(git_dir: git_dir, sha: env_sha, campsite: campsite_mode)
+  end
+
+  def wip?
+    dr_diff.wip?
+  end
+
+  def changes
+    dr_diff.changes
   end
 
   def files
@@ -99,8 +116,16 @@ class Linter
                                    severe_levels: severe_levels)
   end
 
+  def generate_comments
+    if gergich_capture
+      comments
+    else
+      TatlTael::Linters.comments(changes)
+    end
+  end
+
   def publish_comments
-    processed_comments = comment_post_processing.call(comments)
+    processed_comments = comment_post_processing.call(generate_comments)
 
     unless processed_comments.size > 0
       puts "-- -- -- -- -- -- -- -- -- -- --"
@@ -119,11 +144,20 @@ class Linter
   def publish_gergich_comments(comments)
     require "gergich"
     draft = Gergich::Draft.new
+
+    cover_comments, comments = comments.partition do |comment|
+      comment[:cover_message]
+    end
+
     comments.each do |comment|
       draft.add_comment comment[:path],
                         comment[:position],
                         comment[:message],
                         comment[:severity]
+    end
+
+    cover_comments.each do |cover_comment|
+      draft.add_message(cover_comment[:message])
     end
   end
 
@@ -135,7 +169,9 @@ class Linter
   def pretty_comment(comment)
     message = ""
     message += "[#{comment[:severity]}]".colorize(:yellow)
-    message += " #{comment[:path].colorize(:light_blue)}:#{comment[:position]}"
+    unless comment[:cover_message]
+      message += " #{comment[:path].colorize(:light_blue)}:#{comment[:position]}"
+    end
     message += " => #{comment[:message].colorize(:green)}"
     puts message
   end

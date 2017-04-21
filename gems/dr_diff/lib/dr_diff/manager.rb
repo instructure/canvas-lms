@@ -18,6 +18,9 @@ module DrDiff
       @campsite = campsite
     end
 
+    extend Forwardable
+    def_delegators :@git, :wip?, :changes
+
     def files(regex = /./)
       all_files = git.files.split("\n")
 
