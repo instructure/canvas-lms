@@ -99,7 +99,7 @@ module Lti
         end
         (context_roles + institution_roles).to_a.compact.uniq.sort.join(',')
       else
-        [role_none]
+        role_none
       end
     end
 
