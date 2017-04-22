@@ -1,5 +1,7 @@
 module GlobalLookups
-  def self.enabled?
-    false
+  unless singleton_class.method_defined?(:enabled?)
+    def self.enabled?
+      false
+    end
   end
 end
