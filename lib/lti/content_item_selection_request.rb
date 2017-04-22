@@ -18,8 +18,26 @@
 
 module Lti
   class ContentItemSelectionRequest
-    def generate_lti_launch
-      Lti::Launch.new
+    def generate_lti_launch(opts = {})
+      lti_launch = Lti::Launch.new
+      lti_launch.resource_url = opts[:launch_url]
+      lti_launch
+    end
+
+    def self.default_lti_params(context, domain_root_account, user = nil)
+      lti_helper = Lti::SubstitutionsHelper.new(context, domain_root_account, user)
+
+      params = {
+        context_id: Lti::Asset.opaque_identifier_for(context),
+        tool_consumer_instance_guid: domain_root_account.lti_guid,
+        roles: lti_helper.current_lis_roles,
+        launch_presentation_locale: I18n.locale || I18n.default_locale.to_s,
+        launch_presentation_document_target: 'iframe',
+        ext_roles: lti_helper.all_roles,
+      }
+
+      params.merge!(user_id: Lti::Asset.opaque_identifier_for(user)) if user
+      params
     end
   end
 end
