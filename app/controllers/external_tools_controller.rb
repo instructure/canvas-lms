@@ -1143,22 +1143,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def default_lti_params
-    lti_helper = Lti::SubstitutionsHelper.new(@context, @domain_root_account, @current_user)
-
-    params = {
-      context_id: Lti::Asset.opaque_identifier_for(@context),
-      tool_consumer_instance_guid: @domain_root_account.lti_guid,
-      roles: lti_helper.current_lis_roles,
-      launch_presentation_locale: I18n.locale || I18n.default_locale.to_s,
-      launch_presentation_document_target: 'iframe',
-      ext_roles: lti_helper.all_roles,
-      # launch_presentation_width:,
-      # launch_presentation_height:,
-      # launch_presentation_return_url: return_url,
-    }
-
-    params.merge!(user_id: Lti::Asset.opaque_identifier_for(@current_user)) if @current_user
-    params
+    Lti::ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @current_user)
   end
 
   def placement_from_params
