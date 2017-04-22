@@ -18,9 +18,16 @@
 
 module Lti
   class ContentItemSelectionRequest
+    def initialize(context, domain_root_account, user=nil)
+      @context = context
+      @domain_root_account = domain_root_account
+      @user = user
+    end
+
     def generate_lti_launch(opts = {})
       lti_launch = Lti::Launch.new
       lti_launch.resource_url = opts[:launch_url]
+      lti_launch.params = ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @user)
       lti_launch
     end
 

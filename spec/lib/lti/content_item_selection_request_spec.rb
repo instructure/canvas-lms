@@ -19,7 +19,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Lti::ContentItemSelectionRequest do
-  subject(:lti_request) { described_class.new }
+  subject(:lti_request) { described_class.new(course, root_account, teacher) }
+
+  let(:course) { course_model }
+  let(:root_account) { course.root_account }
+  let(:teacher) { course_with_teacher(course: course).user }
 
   context '#generate_lti_launch' do
     it 'generates an Lti::Launch' do
@@ -30,12 +34,17 @@ describe Lti::ContentItemSelectionRequest do
       lti_launch = lti_request.generate_lti_launch(launch_url: 'https://www.example.com')
       expect(lti_launch.resource_url).to eq 'https://www.example.com'
     end
+
+    context 'params' do
+      it 'builds a params hash that includes the default lti params' do
+        lti_launch = lti_request.generate_lti_launch
+        default_params = described_class.default_lti_params(course, root_account, teacher)
+        expect(lti_launch.params).to include(default_params)
+      end
+    end
   end
 
   context '.default_lti_params' do
-    let(:course) { course_model }
-    let(:root_account) { course.root_account }
-
     before do
       allow(Lti::Asset).to receive(:opaque_identifier_for).with(course).and_return('course_opaque_id')
     end
@@ -56,7 +65,6 @@ describe Lti::ContentItemSelectionRequest do
     end
 
     it 'adds user information when a user is provided' do
-      teacher = course_with_teacher(course: course).user
       allow(Lti::Asset).to receive(:opaque_identifier_for).with(teacher).and_return('teacher_opaque_id')
 
       params = described_class.default_lti_params(course, root_account, teacher)
