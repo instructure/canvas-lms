@@ -39,7 +39,7 @@ class MessagesController < ApplicationController
     message.body            = params[:message]
 
     IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new).process_single(message, "#{secure_id}-#{message_id}")
-    render :nothing => true
+    head :ok
   end
 
   def html_message

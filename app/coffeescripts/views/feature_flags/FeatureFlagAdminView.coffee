@@ -52,6 +52,10 @@ define [
       features.account = features.account.concat(features.rootaccount)
       _.each(@featureGroups, (group) =>
         return unless features[group]?.length
+        if (this.options.hiddenFlags?.length)
+          features[group] = features[group].filter((flag) =>
+            !this.options.hiddenFlags.includes(flag.get('feature'))
+          )
         title = if @shouldShowTitles(features) then @titles[group] else null
         view = new FeatureFlagListView(collection: new Backbone.Collection(features[group]), el: $(".#{group}-feature-flags"), title: title)
         view.render()

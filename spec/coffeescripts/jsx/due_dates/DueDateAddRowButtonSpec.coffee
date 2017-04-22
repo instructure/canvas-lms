@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'react'
   'react-dom'
   'react-addons-test-utils'
   'underscore'
   'jsx/due_dates/DueDateAddRowButton'
-], (React, ReactDOM, {Simulate, SimulateNative}, _, DueDateAddRowButton) ->
+], ($, React, ReactDOM, {Simulate, SimulateNative}, _, DueDateAddRowButton) ->
 
   QUnit.module 'DueDateAddRowButton with true display prop',
     setup: ->

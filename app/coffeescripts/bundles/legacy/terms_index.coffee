@@ -10,6 +10,10 @@ require [
   dateOpts = { format: 'full' }
 
   $(document).ready ->
+    $(".submit_button").click (event) ->
+      $term = $(this).closest(".term")
+      $term.find(".enrollment_term_form").submit()
+
     $(".edit_term_link").click (event) ->
       event.preventDefault()
       $(this).parents(".term").addClass "editing_term"
@@ -50,14 +54,15 @@ require [
         $.extend permissions, data
 
       beforeSubmit: (data) ->
-        $(this).find("button").attr "disabled", true
-        $(this).find(".submit_button").text I18n.t("messages.submitting", "Submitting...")
+        $tr = $(this).parents(".term")
+        $tr.find("button").attr "disabled", true
+        $tr.find(".submit_button").text I18n.t("messages.submitting", "Submitting...")
 
       success: (data) ->
         term = data.enrollment_term
         $tr = $(this).parents(".term")
-        $(this).find("button").attr "disabled", false
-        $(this).find(".submit_button").text I18n.t("update_term", "Update Term")
+        $tr.find("button").attr "disabled", false
+        $tr.find(".submit_button").text I18n.t("update_term", "Update Term")
         url = $.replaceTags($(".term_url").attr("href"), "id", term.id)
         $(this).attr "action", url
         $(this).attr "method", "PUT"
@@ -89,9 +94,15 @@ require [
         $(".edit_term_link", $tr).focus()
 
       error: (data) ->
-        $(this).find("button").attr "disabled", false
+        $term = $(this).closest(".term")
+        $tr = $(this).parents(".term")
+        $tr.find("button").attr "disabled", false
         $(this).formErrors data
-        $(this).find(".submit_button").text I18n.t("errors.submit", "Error Submitting")
+        if $term.attr("id") is "term_new"
+          button_text = I18n.t("add_term", "Add Term")
+        else
+          button_text = I18n.t("update_term", "Update Term")
+        $tr.find(".submit_button").text button_text
         $(".edit_term_link", $(this).closest("term")).focus()
 
     $(".add_term_link").click (event) ->

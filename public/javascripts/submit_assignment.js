@@ -298,7 +298,7 @@ define([
         },
         activate: function(event, ui) {
           if (ui.newTab.find('a').hasClass('submit_online_text_entry_option')) {
-            $el = $("#submit_online_text_entry_form textarea:first");
+            var $el = $("#submit_online_text_entry_form textarea:first");
             if (!RichContentEditor.callOnRCE($el, 'exists?')) {
               RichContentEditor.loadNewEditor($el, {manageParent: true});
             }
@@ -310,7 +310,7 @@ define([
         },
         create: function(event, ui) {
           if (ui.tab.find('a').hasClass('submit_online_text_entry_option')) {
-            $el = $("#submit_online_text_entry_form textarea:first");
+            var $el = $("#submit_online_text_entry_form textarea:first");
             if (!RichContentEditor.callOnRCE($el, 'exists?')) {
               RichContentEditor.loadNewEditor($el, {manageParent: true});
             }

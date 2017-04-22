@@ -481,14 +481,14 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.shard.activate do
       self.class.unscoped do
         old_shard = self.user.shard
-        conversation.conversation_messages.where(:author_id => user_id).update_all(:author_id => new_user)
+        conversation.conversation_messages.where(:author_id => user_id).update_all(:author_id => new_user.id)
         if existing = conversation.conversation_participants.where(user_id: new_user).first
           existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
           destroy
         else
           ConversationMessageParticipant.joins(:conversation_message).
               where(:conversation_messages => { :conversation_id => self.conversation_id }, :user_id => self.user_id).
-              update_all(:user_id => new_user)
+              update_all(:user_id => new_user.id)
           update_attribute :user, new_user
           existing = self
         end

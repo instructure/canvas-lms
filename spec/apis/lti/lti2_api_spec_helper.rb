@@ -10,6 +10,8 @@ RSpec.shared_context "lti2_api_spec_helper", :shared_context => :metadata do
   end
   let(:access_token) do
     aud = host rescue (@request || request).host
+    file_host, _ = HostUrl.file_host_with_shard(account)
+    aud = [aud, file_host]
     Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: tool_proxy.guid)
   end
   let(:request_headers) { {Authorization: "Bearer #{access_token}"} }
@@ -27,7 +29,7 @@ RSpec.shared_context "lti2_api_spec_helper", :shared_context => :metadata do
     ims_tp.as_json
   end
   let(:tool_proxy) do
-    Lti::ToolProxy.create!(
+    tp = Lti::ToolProxy.create!(
       context: account,
       guid: SecureRandom.uuid,
       shared_secret: 'abc',
@@ -37,5 +39,8 @@ RSpec.shared_context "lti2_api_spec_helper", :shared_context => :metadata do
       raw_data: raw_data.as_json,
       lti_version: '1'
     )
+    Lti::ToolProxyBinding.where(context_id: account, context_type: account.class.to_s,
+                                tool_proxy_id: tp).first_or_create!
+    tp
   end
 end

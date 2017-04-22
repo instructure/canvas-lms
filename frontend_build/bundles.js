@@ -2,10 +2,11 @@ const glob = require('glob')
 
 const entries = {}
 
-const bundlesPattern = __dirname + '/../app/coffeescripts/bundles/**/*.coffee'
-const pluginBundlesPattern = __dirname + '/../gems/plugins/*/app/coffeescripts/bundles/*.coffee'
-const bundleNameRegexp = /\/coffeescripts\/bundles\/(.*).coffee/
-const fileNameRegexp = /\/([^/]+)\.coffee/
+
+const bundlesPattern = __dirname + '/../app/{jsx,coffeescripts}/bundles/**/*.{coffee,js}'
+const pluginBundlesPattern = __dirname + '/../gems/plugins/*/app/{jsx,coffeescripts}/bundles/**/*.{coffee,js}'
+const bundleNameRegexp = /\/(coffeescripts|jsx)\/bundles\/(.*).(coffee|js)/
+const fileNameRegexp = /\/([^/]+)\.(coffee|js)/
 const pluginNameRegexp = /plugins\/([^/]+)\/app/
 
 const appBundles = glob.sync(bundlesPattern, [])
@@ -17,8 +18,8 @@ const pluginBundles = glob.sync(pluginBundlesPattern, [])
 const nonEntryPoints = ['modules/account_quota_settings', 'modules/content_migration_setup']
 
 appBundles.forEach((entryFilepath) => {
-  const entryBundlePath = entryFilepath.replace(/^.*app\/coffeescripts\/bundles/, './app/coffeescripts/bundles')
-  const entryName = bundleNameRegexp.exec(entryBundlePath)[1]
+  const entryBundlePath = entryFilepath.replace(/^.*app\/(coffeescripts|jsx)\/bundles/, (_, dir) => `./app/${dir}/bundles`)
+  const entryName = bundleNameRegexp.exec(entryBundlePath)[2]
   if (!nonEntryPoints.includes(entryName)) {
     entries[entryName] = entryBundlePath
   }

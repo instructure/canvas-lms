@@ -14,7 +14,7 @@ class SetDefaultValuesForQuizzes < ActiveRecord::Migration[4.2]
     DataFixup::BackfillNulls.run(Quizzes::Quiz, default_false_fields, default_value: false)
     DataFixup::BackfillNulls.run(Quizzes::Quiz, [:show_correct_answers], default_value: true)
     not_null_fields = default_false_fields + [:show_correct_answers]
-    not_null_fields.each { |field| change_column_null_with_less_locking(:quizzes, field) }
+    not_null_fields.each { |field| change_column_null(:quizzes, field, false) }
   end
 
   def down

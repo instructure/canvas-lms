@@ -33,11 +33,12 @@ describe "dashboard" do
 
       get "/"
 
-      f('#dashboardToggleButton').click
-      #verify assignment changed notice is in messages
+      f('#DashboardOptionsMenu_Container button').click
+      fj('span[role="menuitemradio"]:contains("Recent Activity")').click
+      # verify assignment changed notice is in messages
       f('.stream-assignment .stream_header').click
       expect(f('#assignment-details')).to include_text('Assignment Due Date Changed')
-      #verify assignment is in to do list
+      # verify assignment is in to do list
       expect(f('.to-do-list > li')).to include_text(assignment.submission_action_string)
       expect(f('.coming_up')).to include_text(assignment.title)
     end

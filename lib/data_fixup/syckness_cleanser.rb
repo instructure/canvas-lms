@@ -6,8 +6,10 @@ module DataFixup
         next unless model.connection.table_exists?(model.table_name)
         next if model.name == 'RemoveQuizDataIds::QuizQuestionDataMigrationARShim'
 
-        attributes = model.serialized_attributes.select do |attr, coder|
-          coder.is_a?(ActiveRecord::Coders::YAMLColumn)
+        attributes = ActiveSupport::Deprecation.silence do
+          model.serialized_attributes.select do |attr, coder|
+            coder.is_a?(ActiveRecord::Coders::YAMLColumn)
+          end
         end
         next if attributes.empty?
         [model, attributes.keys]

@@ -605,6 +605,29 @@ describe "Common Cartridge exporting" do
       end
     end
 
+    context 'locked items' do
+      it "should not export locked items for a student" do
+        student_in_course(active_all: true, user_name: "a student")
+        assignment = @course.assignments.create!({title: 'assignment', unlock_at: 5.days.from_now})
+        quiz = @course.quizzes.create!(title: 'quiz', unlock_at: 5.days.from_now)
+        topic = @course.discussion_topics.create!(title: 'topic', unlock_at: 5.days.from_now)
+        page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+        mod = @course.context_modules.create!(:name => "some module")
+        mod.add_item(type: 'page', id: page.id)
+        mod.unlock_at = 5.days.from_now
+        mod.save!
+
+        @ce.user = @student
+        @ce.save!
+        run_export
+
+        check_resource_node(assignment, CC::CCHelper::LOR, false)
+        check_resource_node(quiz, CC::CCHelper::ASSESSMENT_TYPE, false)
+        check_resource_node(topic, CC::CCHelper::DISCUSSION_TOPIC, false)
+        check_resource_node(page, CC::CCHelper::WEBCONTENT, false)
+      end
+    end
+
     context 'attachment permissions' do
       before do
         folder = Folder.root_folders(@course).first

@@ -108,8 +108,12 @@ module Qti
       is_html = (html_node && @flavor == Qti::Flavors::CANVAS) ? true : false
       # heuristic for detecting html: the sanitized html node is more than just a container for a single text node
       sanitized = sanitize_html!(html_node ? Nokogiri::HTML::DocumentFragment.parse(node.text) : node, true) { |s| is_html ||= !(s.children.size == 1 && s.children.first.is_a?(Nokogiri::XML::Text)) }
-      if is_html && sanitized.present?
-        html = sanitized
+      if sanitized.present?
+        if is_html
+          html = sanitized
+        else
+          text = sanitized.gsub(/\s+/, " ").strip
+        end
       end
       [text, html]
     end

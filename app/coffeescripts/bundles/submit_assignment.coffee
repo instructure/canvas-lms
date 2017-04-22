@@ -1,1 +1,0 @@
-require ['submit_assignment']

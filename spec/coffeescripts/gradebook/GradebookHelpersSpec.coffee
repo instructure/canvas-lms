@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'compiled/gradebook/GradebookHelpers'
   'jsx/gradebook/shared/constants'
-], (GradebookHelpers, GradebookConstants) ->
+], ($, GradebookHelpers, GradebookConstants) ->
   QUnit.module "GradebookHelpers#noErrorsOnPage",
     setup: ->
       @mockFind = @mock($, "find")

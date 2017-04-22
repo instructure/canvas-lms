@@ -1,4 +1,8 @@
 class Canvas::Security::ServicesJwt
+  class InvalidRefresh < RuntimeError; end
+
+  REFRESH_WINDOW = 6.hours
+
   attr_reader :token_string, :is_wrapped
 
   def initialize(raw_token_string, wrapped=true)
@@ -15,13 +19,18 @@ class Canvas::Security::ServicesJwt
     Canvas::Security.decode_jwt(raw_wrapper_token, [signing_secret])
   end
 
-  def original_token
+  def original_token(ignore_expiration: false)
     original_crypted_token = if is_wrapped
       wrapper_token[:user_token]
     else
       Canvas::Security.base64_decode(token_string)
     end
-    Canvas::Security.decrypt_services_jwt(original_crypted_token, signing_secret, encryption_secret)
+    Canvas::Security.decrypt_services_jwt(
+      original_crypted_token,
+      signing_secret,
+      encryption_secret,
+      ignore_expiration: ignore_expiration
+    )
   end
 
   def id
@@ -69,6 +78,31 @@ class Canvas::Security::ServicesJwt
     generate(payload)
   end
 
+  def self.refresh_for_user(jwt, domain, user, real_user: nil)
+    begin
+      payload = new(jwt, false).original_token(ignore_expiration: true)
+    rescue JSON::JWT::InvalidFormat
+      raise InvalidRefresh, "invalid token"
+    end
+
+    if refresh_invalid_for_user?(payload, domain, user, real_user)
+      raise InvalidRefresh, "token does not match user and domain"
+    end
+
+    if past_refresh_window?(payload[:exp])
+      raise InvalidRefresh, "refresh window exceeded"
+    end
+
+    if payload[:context_type].present?
+      context = payload[:context_type].constantize.find(payload[:context_id])
+    end
+
+    for_user(domain, user,
+      real_user: real_user,
+      workflows: payload[:workflows],
+      context: context)
+  end
+
   private
 
   def self.create_payload(payload_data)
@@ -100,5 +134,31 @@ class Canvas::Security::ServicesJwt
 
   def self.signing_secret
     Canvas::DynamicSettings.from_cache("canvas")["signing-secret"]
+  end
+
+  class << self
+    private
+
+    def refresh_invalid_for_user?(payload, domain, user, real_user)
+      invalid_user = payload[:sub] != user.global_id
+      invalid_domain = payload[:domain] != domain
+      if payload[:masq_sub].present?
+        invalid_real = real_user.nil? || payload[:masq_sub] != real_user.global_id
+      else
+        invalid_real = real_user.present?
+      end
+      invalid_user || invalid_domain || invalid_real
+    end
+
+    def past_refresh_window?(exp)
+      if exp.is_a?(Time)
+        refresh_exp = exp + REFRESH_WINDOW
+        now = Time.zone.now
+      else
+        refresh_exp = exp + REFRESH_WINDOW.to_i
+        now = Time.zone.now.to_i
+      end
+      refresh_exp <= now
+    end
   end
 end

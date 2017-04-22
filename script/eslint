@@ -3,7 +3,7 @@ require_relative './linter'
 
 linter_options = {
   linter_name: "eslint",
-  file_regex: /\.jsx?$/,
+  file_regex: /\.js$/,
   format: "eslint",
   command: "node_modules/.bin/eslint",
   campsite_mode: false,

@@ -40,6 +40,18 @@ module GradingStandards
       f(grading_period_set_title_css)
     end
 
+    def weighted_checkbox
+      f('input[value^="weighted"]').find_element(:xpath, "..")
+    end
+
+    def show_total_checkbox
+      f('input[value^="totals"]').find_element(:xpath, "..")
+    end
+
+    def show_total_checkbox_checked?
+      f('input[value^="totals"]').attribute("checked")
+    end
+
     def add_grading_period_link
       f('button[aria-label="Add Grading Period"]')
     end
@@ -81,6 +93,9 @@ module GradingStandards
       f('input[data-row-key="close-date"]')
     end
 
+    def weight_input
+      f('#weight')
+    end
     def save_period_button
       f('button[aria-label="Save Grading Period"]')
     end
@@ -105,16 +120,23 @@ module GradingStandards
       get "/accounts/#{account_id}/grading_standards"
     end
 
-    def add_grading_period_set(name = "Grading Period Set 1", term = nil)
+    def add_grading_period_set(name: "Grading Period Set 1", term: nil, weighted: nil, show_total: nil)
       add_set_of_grading_periods_button.click
       replace_content(set_name_input, name)
       if term.present? then attach_term_to_set(term) end
+      if weighted.present? then weighted_checkbox.click end
+      if show_total.present? then show_total_checkbox.click end
       create_set_button.click
     end
 
     def attach_term_to_set(term)
       term_input.click
       hover_and_click("div:contains(#{term})")
+    end
+
+    def show_total_checked?
+      edit_grading_period_set_button.click
+      show_total_checkbox_checked?
     end
 
     def delete_first_grading_period_set(are_you_sure)
@@ -141,6 +163,11 @@ module GradingStandards
       replace_content(start_date_input, format_date_for_view(Time.zone.now, :medium))
       replace_content(end_date_input, format_date_for_view(Time.zone.now + 1.month, :medium))
       save_period_button.click
+    end
+
+    def weight_field_in_grading_period?
+      add_grading_period_link.click
+      weight_input.displayed?
     end
 
     def expand_first_set

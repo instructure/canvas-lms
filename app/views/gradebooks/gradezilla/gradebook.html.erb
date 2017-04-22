@@ -79,7 +79,10 @@
         <input type="text" class="search-query" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
       </div>
       <div class="gradebook_menu">
-        <button id="gradebook_settings"><i class="icon-settings"></i></button>
+        <button id="gradebook_settings">
+          <i class="icon-settings" aria-hidden="true"></i>
+          <span class="screenreader-only"><%= t('Gradebook Settings') %></span>
+        </button>
         <ul style="display: none;" class="gradebook_dropdown ui-kyle-menu">
           <% if @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades) %>
           <li><a id="publish_to_sis" href="<%= context_url(@context, :context_details_url,

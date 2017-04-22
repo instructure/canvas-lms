@@ -383,7 +383,7 @@ module AccountReports
     def enrollments
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['course_id', 'user_id', 'role', 'role_id', 'section_id', 'status', 'associated_user_id']
+        headers = ['course_id', 'user_id', 'role', 'role_id', 'section_id', 'status', 'associated_user_id', 'limit_section_privileges']
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
@@ -399,6 +399,7 @@ module AccountReports
         headers << I18n.t('#account_reports.report_header_associated_user_id', 'associated_user_id')
         headers << I18n.t('created_by_sis')
         headers << I18n.t('base_role_type')
+        headers << I18n.t('limit_section_privileges')
       end
       enrol = root_account.enrollments.
         select("enrollments.*, courses.sis_source_id AS course_sis_id,
@@ -472,6 +473,7 @@ module AccountReports
           row << e.ob_sis_id
           row << e.sis_batch_id? unless @sis_format
           row << e.type unless @sis_format
+          row << e.limit_privileges_to_course_section
           csv << row
         end
       end
@@ -509,9 +511,13 @@ module AccountReports
       end
 
       if account != root_account
-        groups.where!(groups: { context_type: 'Account' })
-        groups.where!("accounts.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
-                      OR accounts.id = :account_id", { account_id: account.id })
+        groups = groups.joins("LEFT JOIN #{Course.quoted_table_name} ON groups.context_type = 'Course' AND groups.context_id = courses.id")
+        groups.where!("(groups.context_type = 'Account'
+                         AND (accounts.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
+                           OR accounts.id = :account_id))
+                       OR (groups.context_type = 'Course'
+                         AND (courses.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
+                           OR courses.account_id = :account_id))", { account_id: account.id })
       end
 
       generate_and_run_report headers do |csv|

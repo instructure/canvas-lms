@@ -22,8 +22,8 @@ define([
 ], function(I18n, $) {
 
   function addAriaDescription($answer, id) {
-    text = I18n.t("Answer %{answerId}", {answerId: id})
-    labelId = "answer" + id
+    var text = I18n.t("Answer %{answerId}", {answerId: id})
+    var labelId = "answer" + id
 
     var $label = $("<label/>", {
       id: labelId,

@@ -577,6 +577,11 @@ class ContentMigration < ActiveRecord::Base
     self.migration_type == 'master_course_import'
   end
 
+  def add_skipped_item(child_tag)
+    @skipped_master_course_items ||= Set.new
+    @skipped_master_course_items << child_tag.migration_id
+  end
+
   def process_master_deletions(deletions)
     deletions.keys.each do |klass|
       next unless MasterCourses::ALLOWED_CONTENT_TYPES.include?(klass)
@@ -594,6 +599,7 @@ class ContentMigration < ActiveRecord::Base
         child_tag = master_course_subscription.content_tag_for(content)
         if child_tag.downstream_changes.any?
           Rails.logger.debug("skipping deletion sync for #{content.asset_string} due to downstream changes #{child_tag.downstream_changes}")
+          add_skipped_item(child_tag)
         else
           Rails.logger.debug("syncing deletion of #{content.asset_string} from master course")
           content.destroy

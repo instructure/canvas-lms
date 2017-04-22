@@ -62,4 +62,14 @@ describe "gradebook" do
       expect(active_element).to have_attribute('id', 'gradebook_settings')
     end
   end
+
+  context 'settings menu is accessible' do
+    it 'hides the icon from screen readers' do
+      expect(f('#gradebook_settings .icon-settings')).to have_attribute('aria-hidden', 'true')
+    end
+
+    it 'has screen reader only text' do
+      expect(f('#gradebook_settings .screenreader-only').text).to eq('Gradebook Settings')
+    end
+  end
 end

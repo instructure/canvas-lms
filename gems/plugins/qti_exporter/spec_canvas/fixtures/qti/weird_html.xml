@@ -1,0 +1,37 @@
+<assessmentItem
+    xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="id79fb07bfd06d28f0c92a599116244f1"
+    title="essay"
+    adaptive="false"
+    timeDependent="false">
+  <instructureMetadata>
+    <instructureField name="points_possible" value="6" />
+    <instructureField name="question_type" value="essay_question" />
+  </instructureMetadata>
+  <responseDeclaration identifier="response1" cardinality="single" baseType="string"/>
+  <outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+  <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+  <itemBody>
+    <p>i hope nobody notices i copy pasted this from somewhere else</p>
+    <extendedTextInteraction responseIdentifier="response1"/>
+  </itemBody>
+  <responseProcessing>
+    <responseCondition>
+      <responseIf><baseValue baseType="boolean">true</baseValue>
+        <setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">general_fb</baseValue></multiple></setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf><baseValue baseType="boolean">true</baseValue>
+      </responseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+        <setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+  </responseProcessing>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="general_fb">
+    <div class="html">viva la mol&amp;eacute;</div></modalFeedback>
+</assessmentItem>

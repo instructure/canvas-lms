@@ -174,6 +174,8 @@ https://canvas.instructure.com
 ## ToolProxyBinding.memberships.url
 returns the URL for the membership service associated with the current context.
 
+This variable is for future use only. Complete support for the IMS Membership Service has not been added to Canvas. This will be updated when we fully support and certify the IMS Membership Service.
+
 **Availability**: *always*  
 
 

@@ -16,24 +16,25 @@ describe 'dashcards' do
       course_with_student_logged_in(active_all: true)
     end
 
-    it 'should show the toggle button for dashcard in new UI', priority: "1", test_id: 222506 do
+    it 'should show the trigger button for dashboard options menu in new UI', priority: "1", test_id: 222506 do
       get '/'
       # verify features of new UI
       expect(f('#application.ic-app')).to be_present
       expect(f('.ic-app-header__main-navigation')).to be_present
-      # verify the toggle switch is present
-      expect(f('#dashboardToggleButton')).to be_present
+      # verify the trigger button for the menu is present
+      expect(f('#DashboardOptionsMenu_Container button')).to be_present
     end
 
-    it 'should toggle dashboard based on the toggle switch', priority: "1", test_id: 222507 do
+    it 'should toggle dashboard based on the selected menu view', priority: "1", test_id: 222507 do
       get '/'
-      expect(f('#dashboardToggleButton')).to be_present
-      f('#dashboardToggleButton').click
-      if fj('#dashboardToggleButtonGridIcon').attribute(:class).include?('--active')
-        expect(f('.ic-DashboardCard__link')).to be_displayed
-      else
-        expect(f('#dashboard-activity').text).to include('Recent Activity')
-      end
+      # verify dashboard card view and trigger button for menu
+      expect(f('.ic-DashboardCard__link')).to be_displayed
+      expect(f('#DashboardOptionsMenu_Container button')).to be_present
+      # open dashboard options menu and select recent activity view
+      f('#DashboardOptionsMenu_Container button').click
+      fj('span[role="menuitemradio"]:contains("Recent Activity")').click
+      # verify recent activity view
+      expect(f('#dashboard-activity').text).to include('Recent Activity')
     end
 
     it 'should redirect to announcements index', priority: "1", test_id: 222509 do

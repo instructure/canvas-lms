@@ -171,6 +171,7 @@ class ContentMigrationsController < ApplicationController
       js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose))
       js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose))
       js_env(:SHOW_SELECT => @current_user.manageable_courses.count <= 100)
+      set_tutorial_js_env
     end
   end
 

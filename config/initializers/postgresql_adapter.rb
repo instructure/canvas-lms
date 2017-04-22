@@ -60,40 +60,6 @@ module PostgreSQLAdapterExtensions
     return execute "ALTER INDEX #{quote_table_name(old_name)} RENAME TO #{quote_column_name(new_name)}";
   end
 
-  # have to replace the entire method to support concurrent
-  def add_index(table_name, column_name, options = {})
-    column_names = Array(column_name)
-    index_name   = index_name(table_name, :column => column_names)
-
-    if Hash === options # legacy support, since this param was a string
-      index_type = options[:unique] ? "UNIQUE" : ""
-      index_name = options[:name].to_s if options[:name]
-      concurrently = "CONCURRENTLY " if options[:algorithm] == :concurrently && self.open_transactions == 0
-      conditions = options[:where]
-      if conditions
-        sql_conditions = options[:where]
-        conditions = " WHERE #{sql_conditions}"
-      end
-    else
-      index_type = options
-    end
-
-    if index_name.length > index_name_length
-      warning = "Index name '#{index_name}' on table '#{table_name}' is too long; the limit is #{index_name_length} characters. Skipping."
-      @logger.warn(warning)
-      raise warning unless Rails.env.production?
-      return
-    end
-
-    if index_exists?(table_name, column_names, :name => index_name)
-      @logger.warn("Index name '#{index_name}' on table '#{table_name}' already exists. Skipping.")
-      return
-    end
-    quoted_column_names = quoted_columns_for_index(column_names, options).join(", ")
-
-    execute "CREATE #{index_type} INDEX #{concurrently}#{quote_column_name(index_name)} ON #{quote_table_name(table_name)} (#{quoted_column_names})#{conditions}"
-  end
-
   def set_standard_conforming_strings
     super unless postgresql_version >= 90100
   end
@@ -175,6 +141,20 @@ module PostgreSQLAdapterExtensions
 
       ActiveRecord::ConnectionAdapters::IndexDefinition.new(table_name, index_name, unique, column_names, [], orders)
     end
+  end
+
+  def index_exists?(_table_name, columns, _options = {})
+    raise ArgumentError.new("if you're identifying an index by name only, you should use index_name_exists?") if columns.is_a?(Hash) && columns[:name]
+    raise ArgumentError.new("columns should be a string, a symbol, or an array of those ") unless columns.is_a?(String) || columns.is_a?(Symbol) || columns.is_a?(Array)
+    super
+  end
+
+  # some migration specs test migrations that add concurrent indexes; detect that, and strip the concurrent
+  # but _only_ if there isn't another transaction in the stack
+  def add_index_options(_table_name, _column_name, _options = {})
+    index_name, index_type, index_columns, index_options, algorithm, using = super
+    algorithm = nil if Rails.env.test? && algorithm == "CONCURRENTLY" && !ActiveRecord::Base.in_transaction_in_test?
+    [index_name, index_type, index_columns, index_options, algorithm, using]
   end
 
   # Force things with (approximate) integer representations (Floats,
@@ -273,6 +253,14 @@ module PostgreSQLAdapterExtensions
 
   def drop_trigger(name, table, generated: false)
     execute("DROP TRIGGER IF EXISTS #{name} ON #{quote_table_name(table)};\nDROP FUNCTION IF EXISTS #{quote_table_name(name)}();\n")
+  end
+
+  # does a query first to warm the db cache, to make the actual constraint adding fast
+  def change_column_null(table, column, nullness, default = nil)
+    # no point in pre-warming the cache to avoid locking if we're already in a transaction
+    return super if nullness != false || default || open_transactions != 0
+    execute("SELECT COUNT(*) FROM #{quote_table_name(table)} WHERE #{column} IS NULL")
+    super
   end
 
   private

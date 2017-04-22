@@ -127,13 +127,3 @@ has_a_test_plan = commit_message =~ /test[ -]plan/i
 unless has_a_test_plan
   comment "warn", 3, "y u no add test plan? ლ(ಠ益ಠლ)"
 end
-
-references_webpack = commit_message =~ /webpack/i
-gerrit_topic = ENV["GERRIT_TOPIC"]
-has_webpack_topic = gerrit_topic && gerrit_topic =~ /webpack/i
-if references_webpack && !has_webpack_topic
-  comment "warn", 3,
-          "looks like your commit is webpack related." \
-          " trigger webpack builds by pushing to the webpack topic:" \
-          " `git push origin HEAD:refs/for/master/webpack`"
-end

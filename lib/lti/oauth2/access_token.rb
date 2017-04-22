@@ -31,7 +31,7 @@ module Lti
         decoded_jwt = Canvas::Security.decode_jwt(jwt)
         check_required_assertions(decoded_jwt.keys)
         raise InvalidTokenError, 'invalid iss' if decoded_jwt['iss'] != ISS
-        raise InvalidTokenError, 'invalid aud' if decoded_jwt[:aud] != aud
+        raise InvalidTokenError, 'invalid aud' unless [*decoded_jwt[:aud]].include?(aud)
         raise InvalidTokenError, 'iat must be in the past' unless Time.zone.at(decoded_jwt['iat']) < Time.zone.now
         true
       rescue InvalidTokenError

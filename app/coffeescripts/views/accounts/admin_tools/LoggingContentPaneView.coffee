@@ -40,8 +40,7 @@ define [
       $target = $(e.target)
       value = $target.val()
       @$el.find(".loggingTypeContent").hide()
-      @$el.find(value).show().find("input").first().focus()
-      $target.find('[value=default]').remove()
+      @$el.find(value).show()
 
     initAuthLogging: ->
       unless @permissions.authentication

@@ -30,7 +30,8 @@ describe "master courses - child courses - quiz locking" do
 
     expect(f('.master-course-cell')).to contain_css('.icon-lock')
 
-    expect(f('.quiz')).to_not contain_css('.al-trigger')
+    f('.quiz .al-trigger').click
+    expect(f('.quiz')).to contain_css('a.delete-item.disabled')
   end
 
   it "should show the cog-menu options on the index when not locked" do
@@ -38,7 +39,9 @@ describe "master courses - child courses - quiz locking" do
 
     expect(f('.master-course-cell')).to contain_css('.icon-unlock')
 
-    expect(f('.quiz')).to contain_css('.al-trigger')
+    f('.quiz .al-trigger').click
+    expect(f('.quiz')).to contain_css('a.delete-item')
+    expect(f('.quiz')).to_not contain_css('a.delete-item.disabled')
   end
 
   it "should not show the edit/delete options on the show page when locked" do
@@ -46,7 +49,7 @@ describe "master courses - child courses - quiz locking" do
 
     get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}"
 
-    expect(f('#content')).to_not contain_css('.quiz-edit-button')
+    expect(f('#content')).to contain_css('.quiz-edit-button')
     f('.al-trigger').click
     expect(f('.al-options')).to_not contain_css('.delete_quiz_link')
   end
@@ -54,7 +57,6 @@ describe "master courses - child courses - quiz locking" do
   it "should show the edit/delete cog-menu options on the show when not locked" do
     get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}"
 
-    expect(f('#content')).to contain_css('.quiz-edit-button')
     f('.al-trigger').click
     expect(f('.al-options')).to contain_css('.delete_quiz_link')
   end

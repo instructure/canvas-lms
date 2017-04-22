@@ -189,7 +189,7 @@ describe CustomGradebookColumnsApiController, type: :request do
         order: [c3.id, c1.id, c2.id]
       expect(response).to be_success
 
-      expect(@course.custom_gradebook_columns(true)).to eq [c3, c1, c2]
+      expect(@course.custom_gradebook_columns.reload).to eq [c3, c1, c2]
     end
   end
 end

@@ -1,0 +1,1 @@
+import 'compiled/jquery/ModuleSequenceFooter'

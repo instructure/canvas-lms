@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*global jsonData*/
 define([
   'jsx/speed_grader/gradingPeriod',
   'jsx/grading/helpers/OutlierScoreHelper',
@@ -568,7 +569,7 @@ define([
         // show the div that contains the button because it is hidden from browsers that dont support speech
       $(".speech_recognition_link").closest('div.speech-recognition').show();
 
-      function processSpeech($this){
+      var processSpeech = function ($this){
         if ($('#record_button').attr("recording") == "true"){
           recognition.stop();
           var current_comment = $('#final_results').html() + $('#interim_results').html()
@@ -581,11 +582,11 @@ define([
         }
       }
 
-      function formatComment(current_comment){
+      var formatComment = function (current_comment){
         return current_comment.replace(/<p><\/p>/g, '\n\n').replace(/<br>/g, '\n');
       }
 
-      function configureRecognition(recognition){
+      function configureRecognition (recognition) {
         recognition.continuous = true;
         recognition.interimResults = true;
         var final_transcript = '';
@@ -1101,7 +1102,7 @@ define([
         if (student.avatar_path && !hideStudentNames) {
           // If there's any kind of delay in loading the user's avatar, it's
           // better to show a blank image than the previous student's image.
-          $new_image = $avatar_image.clone().show();
+          var $new_image = $avatar_image.clone().show();
           $avatar_image.after($new_image.attr('src', student.avatar_path)).remove();
           $avatar_image = $new_image;
         } else {
@@ -1467,7 +1468,7 @@ define([
         var defaultInfoMessage = I18n.t('turnitin.info_message',
                                         'This file is still being processed by turnitin. Please check back later to see the score'),
             defaultErrorMessage = I18n.t('turnitin.error_message',
-                                         'There was an error submitting to turnitin. Please try resubmitting the file before contacting support');
+                                         'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.');
         var $turnitinInfo = $(turnitinInfoTemplate({
           assetString: assetString,
           message: (turnitinAsset.status == 'error' ? (turnitinAsset.public_error_message || defaultErrorMessage) : defaultInfoMessage),
@@ -1625,7 +1626,7 @@ define([
         if (browserableCssClasses.test(attachment.mime_class)) {
           browserableAttachments.push(attachment);
         }
-        $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
+        var $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
           data: {
             submissionId: submission.user_id,
             attachmentId: attachment.id,
@@ -1786,14 +1787,14 @@ define([
 
       if (scores.length) { //if there are some submissions that have been graded.
         $average_score_wrapper.show();
-        function avg(arr) {
+        var avg = function (arr) {
           var sum = 0;
           for (var i = 0, j = arr.length; i < j; i++) {
             sum += arr[i];
           }
           return sum / arr.length;
         }
-        function roundWithPrecision(number, precision) {
+        var roundWithPrecision = function (number, precision) {
           precision = Math.abs(parseInt(precision, 10)) || 0;
           var coefficient = Math.pow(10, precision);
           return Math.round(number*coefficient)/coefficient;
@@ -2431,9 +2432,9 @@ define([
           .removeClass(submissionStates)
           .addClass(className.raw)
 
-        $status = $(".ui-selectmenu-status");
-        $statusIcon = $status.find(".speedgrader-selectmenu-icon");
-        $queryIcon = $query.find(".speedgrader-selectmenu-icon");
+        var $status = $(".ui-selectmenu-status");
+        var $statusIcon = $status.find(".speedgrader-selectmenu-icon");
+        var $queryIcon = $query.find(".speedgrader-selectmenu-icon");
 
         if(this == EG.currentStudent && (className.raw == "graded" || className.raw == "not_gradeable")){
           var studentInfo = EG.getStudentNameAndGrade()

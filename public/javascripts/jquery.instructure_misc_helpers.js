@@ -47,7 +47,7 @@ define([
     var c = 0;
     var h;
     for (var i = 0; i < str.length; i++) {
-      part = str.charCodeAt(i).toString(16);
+      var part = str.charCodeAt(i).toString(16);
       while (part.length < 2) {
         part = "0" + part;
       }

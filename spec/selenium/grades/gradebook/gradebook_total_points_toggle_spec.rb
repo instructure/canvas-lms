@@ -71,6 +71,7 @@ describe "gradebook - total points toggle" do
 
   it 'should allow toggling display by points or percent', priority: "1", test_id: 164012 do
     get "/courses/#{@course.id}/gradebook"
+    wait_for_ajaximations
     should_show_percentages
     toggle_grade_display
 
@@ -84,6 +85,7 @@ describe "gradebook - total points toggle" do
 
   it 'should change the text on the toggle option when toggling' do
     get "/courses/#{@course.id}/gradebook"
+    wait_for_ajaximations
     dropdown_text = []
     f("#total_dropdown").click
     dropdown_text << f(".toggle_percent").text
@@ -99,6 +101,7 @@ describe "gradebook - total points toggle" do
 
   it 'should not show the warning once dont show is checked' do
     get "/courses/#{@course.id}/gradebook"
+    wait_for_ajaximations
     open_display_dialog
     close_dialog_and_dont_show_again
 

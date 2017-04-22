@@ -59,22 +59,13 @@
 <% end %>
 
 <div class="item-group-container" id="context_modules_sortable_container">
-
-  <div id="no_context_modules_message" style="display:none; clear: both;">
+  <div id="no_context_modules_message" style="display:none;">
     <% if can_do(@context.context_modules.temp_record, @current_user, :create) %>
-      <%= mt 'help.create', <<TEXT, :button => t('#context_modules.buttons.add_module_first', 'Add a New Module')
-  Course modules let you organize your assignments, pages, files, etc. into smaller sections or units. Modules could be centered around a theme, focused on a specific topic, or even just grouped chronologically.
-
-  You can also sequence modules by defining criteria and prerequisites for each module. Students won't be able to access modules until they have unlocked all their prerequisites. That way you can prevent students from accessing certain content or files until they have, say, gotten at least 75% on a review quiz.
-
-  To start organizing your course into modules, click the "%{button}" button to the right.
-TEXT
-  %>
+      <div id="modules_homepage_user_create"></div>
     <% else %>
       <p><%= t('help.no_modules', %{No modules have been defined for this course.}) %></p>
     <% end %>
   </div>
-
   <div
     id="context_modules"
     aria-label="<%= t('headings.course_modules', %{Course Modules}) %>"
@@ -87,6 +78,7 @@ TEXT
       <% end %>
     <% end %>
   </div>
+
 </div>
 
 <%= render :partial => 'context_modules/context_module_next', :object => nil, :as => :context_module %>
@@ -218,8 +210,7 @@ TEXT
 <div style="display: none;">
   <a href="<%= context_url(@context, :progressions_context_context_modules_url) %>" class="progression_list_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_context_modules_assignment_info_url) %>" class="assignment_info_url">&nbsp;</a>
-  <label class="screenreader-only" for="module_list"><%= t('Select prerequisite module') %></label>
-  <select id="module_list">
+  <select id="module_list" aria-label="<%= t('Select prerequisite module') %>">
     <option value="">[ <%= t('select_module.instructions', %{Select Module}) %> ]</option>
     <% @modules.each do |m| %>
       <option value="<%= m.id %>" class="context_module_option context_module_<%= m.id %>"><%= t 'select_module.name', '%{module}', :module => m.name %></option>
@@ -234,13 +225,11 @@ TEXT
   <div id="completion_criterion_option" class="completion_criterion_option">
     <% ot 'criterion_for_assignment', '%{assignment} %{select_criterion}', :assignment => capture { %>
     <span style="padding: 0 4px;">
-      <label class="screenreader-only" for="criterion_assignment_picker"><%= t('Requirement subject') %></label>
-      <select id="criterion_assignment_picker" class="id assignment_picker" tabindex="0"></select>
+      <select class="id assignment_picker" tabindex="0" aria-label="<%= t('Requirement subject') %>"></select>
     </span>
     <% }, :select_criterion => capture { %>
     <span style="padding: 0 4px;">
-      <label class="screenreader-only" for="criterion_requirement_picker"><%= t('Requirement') %></label>
-      <select id="criterion_requirement_picker" class="type assignment_requirement_picker" tabindex="0">
+      <select class="type assignment_requirement_picker" tabindex="0" aria-label="<%= t('Requirement') %>">
         <option class="any" value="must_view"><%= t('requirements.must_view', %{view the item}) %></option>
         <option class="assignment wiki_page" value="must_mark_done"><%= t(%{mark as done}) %></option>
         <option class="wiki_page discussion_topic" value="must_contribute"><%= t('requirements.must_contribute', %{contribute to the page}) %></option>

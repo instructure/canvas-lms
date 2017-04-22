@@ -15,8 +15,8 @@ module Onceler
       klass.before :record do
         sharding_failed = Switchman::RSpecHelper.class_variable_get(:@@sharding_failed)
         raise "Sharding did not set up correctly" if sharding_failed
-        @shard1 = Shard.find(Switchman::RSpecHelper.class_variable_get(:@@shard1))
-        @shard2 = Shard.find(Switchman::RSpecHelper.class_variable_get(:@@shard2))
+        @shard1 = Shard.find(Switchman::RSpecHelper.class_variable_get(:@@shard1).id)
+        @shard2 = Shard.find(Switchman::RSpecHelper.class_variable_get(:@@shard2).id)
       end
     end
   end

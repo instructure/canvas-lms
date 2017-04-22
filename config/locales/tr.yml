@@ -43,21 +43,28 @@ tr:
   LongTextEditor: 
     cancel: İptal
     save: Kaydet
+  _at_the_bottom__4360f2b4: "-- Alt kısımda --"
   _b4455c8b: "%"
   _section_not_synced_yet_cd07d0dd: "-- Bölüm henüz senkronize edilmedi"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Bu hesaplama yöntemiyle bir hesaplama değeri kullanılmıyor "
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "%{itemName} adlı bir dosya bu klasörde zaten var."
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Canvas yönetim panelinin sağdaki kenar çubuğunda görünen tam ölçülü logo. İdeal boyutlar 360 x 140 pikseldir. Kabul edilen dosya formatları: svg, png, jepg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Raporlayan kullanıcı için ilgi çekici ortam bilgisi barındırmada kullanışlı bir anahtar/değer yığını "
+  a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "\"%{name}\" adına bir öğe zaten bu konumda mevcut. Lütfen teni bir ad giriniz."
   a_message_is_required_129e1814: "Bir mesaj gerekli"
   a_name_for_this_set_is_required_222bad23: "Bu set için bir isim gereklidir"
+  a_name_is_required_b5df38a9: "Bir isim gerekli"
   a_new_assignment_has_been_created_for_your_course__12b72639: "Dersiniz %{course_name} için yeni bir ödev oluşturuldu"
+  a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Akademik Karşılaştırma'yı kullanmak için Partner ID'si gerekiyor"
+  a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Akademik Karşılaştırma'yı kullanmak için Partner anahtarı gerekiyor"
   a_problem_occurred_adding_reviewers_57b083d9: "Gözlemci ekleme esnasında hata oluştu."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Notlandırma şemaları, şemayı düzenleme ya da silme ikonlarının adlarını içeren tablo"
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "Notlandırma şemasının adını, şemayı düzenleme ya da silme ikonlarının adlarını içeren tablo"
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Öğrencilerin cevap tercihleri ile ilgili cevaplar ve kısa istatistik tablosu"
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Notlandırma şema verisini içeren tablo. Her satırda bir isim, maksimum yüzde ve minimum yüzde vardır. Ayrıca, her satırda bir alt satır eklemek ve mevcut satırı silmek için bir simge vardır."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Notlandırma şema verisini içeren tablo. Her satırda bir isim, maksimum yüzde ve minimum yüzde vardır. Ayrıca, her satırda bir alt satır eklemek ve mevcut satırı silmek için bir simge vardır."
+  a_z_243c3301: A–Z
+  a_z_29d8e67c: A-Z
   academic_benchmark: 
     api_error: "%{auth} yetkilendirmesi için standartlar güncellenemedi."
     bad_ab_file: "Sağlanan Academic Benchmark dosyasında hata meydana geldi."
@@ -75,10 +82,13 @@ tr:
         api_key: "API Anahtarı"
         api_url: "Api Url"
         common_core_guid: "Ortak Çekirdek GUID (opsiyonel)"
+        partner_id: "Partner ID"
+        partner_key: "Partner Anahtarı"
   accept_2fdd362e: Onayla
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "kabul edilebilir formatlar: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "kabul edilebilir formatlar: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Kabul edilen: %{user}, %{role_type}, course, %{course}"
+  access_report_80d28095: "Erişim Raporu"
   access_token_3be22221: "Access Token"
   access_token_is_valid_until_d2f048cf: "Erişim dizgesi şu tarihe kadar geçerli"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Access token'lar diğer uygulamaların sizin adınıza API iletişimi kurmalarına izin vermek için kullanılır. Kendi entegrasyonlarınız için access tokenlar üretip *Canvas Açık API'yi de kullanabilirsiniz.*"
@@ -125,6 +135,7 @@ tr:
     default_login_handle_name: Eposta
   account_authorization_config/ldap: 
     test_bind_failed: "Birleştirme başarısız: %{error}"
+    test_bind_timeout: "Bağlarken zaman aşımına uğradı"
     test_connection_timeout: "Bağlanırken zaman aşımına uğradı"
     test_host_unknown: "Bilinmeyen sağlayıcı: %{host}"
     test_login_auth_exception: "Oturum açma hatası: %{error}"
@@ -230,10 +241,13 @@ tr:
   account_course_and_user_search_22bf297a: "Hesap içinde Ders ve Kullanıcı Arama"
   account_domain_78f43049: "Hesap Alan Adı"
   account_id_2c3b4f15: "hesap id"
+  account_id_f6e26867: "Hesap Id"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "hesap adı"
   account_name_analytics_62bf60ae: "%{account.name} Analitikleri"
+  account_name_bff54ed5: "Hesap Adı"
   account_navigation_80bbefd4: "Hesapta Gezinme"
+  account_navigation_menu_10c05bf9: "Hesap Gezinme Menüsü"
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Hesap onay son tarihi başlangıç tarihinden sonra olamaz"
@@ -362,6 +376,7 @@ tr:
       remove_account_admin: "Bu yönetici hesabını kaldırmak istediğinizden emin misiniz?"
     course: Ders
     custom_text_blank: "[Varsayılan Metin]"
+    help_menu_name_too_long: "Yardım menüsü ismi çok uzun"
     links: 
       turnitin: 
         confirm_settings: "Turnitin ayarlarını onaylayın"
@@ -376,6 +391,7 @@ tr:
       what_are_quiz_ip_filters: "Kısa Sınav IP Filtreleri Nelerdir?"
     user: Kullanıcı
   account_sis_id_2e4a461: "hesap öbs id"
+  account_sis_id_5da8fd2d: "Hesap  Öbs id"
   account_surveys_b0039876: "Kullanıcı Anketleri"
   account_user: 
     types: 
@@ -621,6 +637,9 @@ tr:
     consortium_users: 
       user_search_label: "Kullanıcı Arama"
     course: 
+      associated_count: 
+        one: "1 İlişkili Ders"
+        other: "%{count} İlişkili Ders"
       course_unpublished_title: "Bu ders henüz yayınlanmadı"
       course_unpublished_tooltip: Yayınlanmamış
       homepage_link: "Ana Sayfa"
@@ -690,6 +709,11 @@ tr:
         bryan_engagement: 
           enrollment_term_ids: 
             field: "Kayıt Dönem Idleri"
+    excelsior_activity_report_csv_parameters: 
+      account_reports: 
+        excelsior: 
+          outcome: 
+            text: "Bölüm Yapısı:"
     find_not_authorized: "Bu %{type}'e erişime yetkiniz yok"
     find_not_found: "Bu ID ile bir %{type} bulunamadı"
     grade_export_csv_description: 
@@ -769,6 +793,34 @@ tr:
         sis_export: 
           description: 
             text: "Bu rapor, ilgili kategorilerindeki Canvas ön hazırlığı ile ilgili gerekli tüm bilgileri dışa aktaracak."
+    provisioning_csv_parameters: 
+      account_reports: 
+        default: 
+          accounts: 
+            check_box: "Hesaplar CSV"
+          courses: 
+            check_box: "Dersler CSV"
+          enrollments: 
+            check_box: "Kayıtlar CSV"
+          group_categories: 
+            login: 
+              check_box: "Grup Kategorileri CSV"
+          group_membership: 
+            login: 
+              check_box: "Grup Üyeliği CSV"
+          groups: 
+            check_box: "Gruplar CSV"
+          sections: 
+            check_box: "Bölümler CSV"
+          terms: 
+            check_box: "Dönemler CSV"
+          users: 
+            check_box: "Kullanıcılar CSV"
+          xlist: 
+            check_box: "X liste CSV"
+        sis_default: 
+          parameters: 
+            note: "*Dönem ayarları yalnızca Dersleri, Bölümleri, Kayıtları ve CSV dosyalarındaki X listeyi etkiler."
     public_courses_csv_description: 
       account_reports: 
         default: 
@@ -908,6 +960,7 @@ tr:
         enable_alerts: "Uyarılar (beta)"
         enable_eportfolios: ePortfolyolar
         enable_profiles: "Profilleri Etkinleştir"
+        enable_turnitin: Turnitin
         enable_user_notes: "Öğretim Üyesi Kaydı"
         end_at: Biter
         equella: Equella
@@ -921,6 +974,7 @@ tr:
         help_link_text: "Link için görüntülenecek metin"
         help_link_url: URL
         include_students_in_global_survey: "Genel anketlerde öğrencileri dahil et"
+        lock_all_announcements: "Duyurulara yorum yapılmasını engelle"
         locked: "Alt hesaplar ve dersler için bu ayarı kilitle"
         locked_for_sub_accounts: "Alt hesaplar için bu ayarı kilitle"
         login_handle_name: "Oturum Açma Etiketi"
@@ -949,7 +1003,7 @@ tr:
         sis_source_id: "ÖBS ID"
         start_at: Başlangıç
         students_can_create_courses: Öğrenciler
-        sub_account_includes: "Alt hesaplar ek içerik tanımlayabilsin"
+        sub_account_includes: "Alt hesaplar kendi markaları için Tema Düzenleyiciyi kullanabilsin"
         subject: Konu
         teachers_can_create_courses: Öğretmenler
         trusted_referers: "Güvenilir HTTP Yönlendiricileri"
@@ -1050,6 +1104,10 @@ tr:
             text: "Ödev Grup Id:"
           course_id: 
             text: "Ders Id:"
+    sis_agent_token_auth: 
+      labels: 
+        sis_app_token: "ÖBS Agent Token"
+        sis_app_url: "ÖBS App URL"
     sis_batch_counts: 
       accounts_label: Hesaplar
       courses_label: Dersler
@@ -1124,6 +1182,9 @@ tr:
       started_at_message: "Başladı: %{started_at}"
       title: "ÖBS İçe Aktarımı"
       try_import_again_link: "İçe aktarımı yeniden deneyin"
+    sis_integration_settings: 
+      labels: 
+        value: Karakterler
     site_admin_statistics: 
       page_title: "%{account} için İstatistikler"
     statistics: 
@@ -1169,6 +1230,11 @@ tr:
         orbis: 
           parameters: 
             note: "Askıya alınmış ödev içeren derslerde bu rapordaki notlar doğru görünmeyebilir."
+    student_assignment_grades_csv_parameters: 
+      account_reports: 
+        auburn: 
+          pseudonym_ids: 
+            field: "Oturum Açma IDleri"
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -3151,6 +3217,7 @@ tr:
       resolution: "Oluşturan ile iletişime geçip bilgilendirin."
     titles: 
       delete: "Çalışma ekibini sil?"
+  collaborations_5c56c15f: "İşbirliğine Yönelik Çalışmalar"
   collapse_group_c2af7cad: "Grubu Daralt"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "%{groupName} için grup üyeleri listesini daraltın"
   collapse_subdiscussion_89af1f5c: "Alt Tartışmaları Daralt"
@@ -4776,6 +4843,7 @@ tr:
         is_public_to_auth_users: "Bu dersi kimliği doğrulanmış kullanıcılara görünür yap"
         language: Dil
         license: Lisans
+        lock_all_announcements: "Duyurulara yorum yapılmasını engelle"
         open_enrollment: "Dersin ana sayfasına \"Bu Derse Katıl\" bağlantısı ekle"
         public_syllabus: "Bu dersin programı herkes tarafından görülebilsin"
         restrict_enrollments_to_course_dates: "Kullanıcılar derse yalnızca bu tarihler arasında katılabilirler"
@@ -5771,6 +5839,7 @@ tr:
     unsubscribe: "Bu başlığı artık takip etmiyorsunuz"
     unsubscribed: "Takip Edilmiyor"
     unsubscribed_hint: "Bu başlığı takip etmiyorsunuz. Takip etmek için tıklayınız."
+  discussions_a5f96392: Tartışmalar
   dismiss_dacdb625: Yoksay
   display_course_catalog: "Bu kök hesapta \"Bu dersi herkese açık dersler listesi\" işareti etkinleştirilmiş olarak aranabilir ders listesi göster."
   display_name_b80c243e: "Görünen Ad"
@@ -11149,6 +11218,7 @@ tr:
           
           Değişiklikler üzerine yazılsın mı?
       unsaved_changes: "Değişiklikler kaydedilmedi. Değişiklikleri kaydetmeden devam etmek istediğinize emin misiniz?"
+  pages_e5414c2c: Sayfalar
   paginated_collection: 
     no_items: "Öğe bulunamadı."
   paginated_list: 

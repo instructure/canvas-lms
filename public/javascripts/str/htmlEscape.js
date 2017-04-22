@@ -32,6 +32,8 @@ define(['INST'], function(INST) {
       return htmlEscape(strOrObject);
     } else if (strOrObject instanceof SafeString) {
       return strOrObject;
+    } else if (typeof strOrObject === 'number') {
+      return escape(strOrObject.toString())
     }
 
     var k, v;

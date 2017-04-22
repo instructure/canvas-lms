@@ -1,2 +1,0 @@
-require ['rubric_assessment']
-

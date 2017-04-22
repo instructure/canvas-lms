@@ -888,6 +888,17 @@ describe ExternalToolsController do
       expect(assigns[:tool].shared_secret).to eq "secret"
     end
 
+    it "sets the oauth_compliant setting" do
+      user_session(@teacher)
+      external_tool_settings = {name: "tool name",
+                                url: "http://example.com",
+                                consumer_key: "key",
+                                shared_secret: "secret",
+                                oauth_compliant: true}
+      post 'create', course_id: @course.id, external_tool: external_tool_settings, format: "json"
+      expect(assigns[:tool].settings[:oauth_compliant]).to equal true
+    end
+
     it "should fail on basic xml with no url or domain set" do
       user_session(@teacher)
       xml = <<-XML

@@ -96,7 +96,8 @@ module Canvas
             Rails.logger.debug "reading #{file}"
             @webpack_manifest = JSON.parse(file.read).freeze
           else
-            raise "you need to run webpack"
+            raise "you need to run webpack" unless Rails.env.test?
+            @webpack_manifest = Hash.new("Error: you need to run webpack").freeze
           end
           @webpack_revved_urls = Set.new(@webpack_manifest.values.map{|s| "/#{webpack_dir}/#{s}" }).freeze
         end

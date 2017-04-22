@@ -48,7 +48,7 @@ module DataFixup::RemoveMultipleRootFolders
               unless folder.id == main_root_folder.id
                 Folder.transaction do
                   if folder.attachments.count > 0 || folder.sub_folders.count > 0
-                    Folder.where(:id => folder).update_all(:parent_folder_id => main_root_folder)
+                    Folder.where(:id => folder).update_all(:parent_folder_id => main_root_folder.id)
                   else
                     Folder.where(:id => folder).update_all(:workflow_state => 'deleted')
                   end

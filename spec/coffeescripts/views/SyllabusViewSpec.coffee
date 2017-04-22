@@ -27,7 +27,7 @@ define [
   'compiled/collections/SyllabusCalendarEventsCollection'
   'compiled/collections/SyllabusAppointmentGroupsCollection'
   'compiled/views/courses/SyllabusView'
-  (if window.USE_WEBPACK then './SyllabusViewPrerendered.coffee' else 'spec/javascripts/compiled/views/SyllabusViewPrerendered')
+  './SyllabusViewPrerendered.coffee'
   'helpers/fakeENV'
   'helpers/jquery.simulate'
 ], ($, _, tz, denver, newYork, SyllabusBehaviors, SyllabusCollection, SyllabusCalendarEventsCollection, SyllabusAppointmentGroupsCollection, SyllabusView, SyllabusViewPrerendered, fakeENV) ->

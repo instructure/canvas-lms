@@ -35,6 +35,10 @@ class LiveEventsObserver < ActiveRecord::Observer
       Canvas::LiveEvents.enrollment_updated(obj)
     when EnrollmentState
       Canvas::LiveEvents.enrollment_state_updated(obj)
+    when Group
+      Canvas::LiveEvents.group_updated(obj)
+    when GroupMembership
+      Canvas::LiveEvents.group_membership_updated(obj)
     when WikiPage
       if changes["title"] || changes["body"]
         Canvas::LiveEvents.wiki_page_updated(obj, changes["title"] ? changes["title"].first : nil,

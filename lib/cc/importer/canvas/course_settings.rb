@@ -65,7 +65,7 @@ module CC::Importer::Canvas
        'open_enrollment', 'allow_wiki_comments',
        'self_enrollment', 'hide_final_grade', 'grading_standard_enabled',
        'hide_distribution_graphs', 'allow_student_discussion_topics',
-       'allow_student_discussion_editing', 'show_announcements_on_home_page', 'home_page_announcement_limit'].each do |bool_val|
+       'allow_student_discussion_editing', 'show_announcements_on_home_page'].each do |bool_val|
         val = get_bool_val(doc, bool_val)
         course[bool_val] = val unless val.nil?
       end
@@ -73,8 +73,10 @@ module CC::Importer::Canvas
         val = get_time_val(doc, date_type)
         course[date_type] = val unless val.nil?
       end
-      if val = get_int_val(doc, 'grading_standard_id')
-        course['grading_standard_id'] = val
+      ['grading_standard_id', 'home_page_announcement_limit'].each do |int_val|
+        if val = get_int_val(doc, int_val)
+          course[int_val] = val
+        end
       end
       if nav = get_node_val(doc, 'tab_configuration')
         begin

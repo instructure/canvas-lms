@@ -187,7 +187,7 @@ module CCHelper
           else
             obj = match.obj_class.where(id: match.obj_id).first
           end
-          next(match.url) unless obj && @rewriter.user_can_view_content?(obj)
+          next(match.url) unless obj && (@rewriter.user_can_view_content?(obj) || @for_epub_export)
           folder = obj.folder.full_name.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
           folder = folder.split("/").map{|part| URI.escape(part)}.join("/")
 

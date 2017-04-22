@@ -43,7 +43,8 @@ require([
       $("#add_user_dialog").dialog('close');
     },
     error: function(data) {
-      errorData = {};
+      var errorData = {};
+      var errorList;
 
       // Email errors
       if(data.pseudonym.unique_id){

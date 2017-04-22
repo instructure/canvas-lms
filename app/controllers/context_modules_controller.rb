@@ -152,7 +152,7 @@ class ContextModulesController < ApplicationController
 
             @page_title = join_title(t('Choose Assignment Set'), @context.name)
 
-            return render :text => '', :layout => true
+            return render :html => '', :layout => true
           else
             flash[:warning] = t('Module Item is locked.')
             return redirect_to named_context_url(@context, :context_context_modules_url)

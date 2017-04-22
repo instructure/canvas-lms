@@ -305,6 +305,7 @@ class CoursesController < ApplicationController
   include CustomSidebarLinksHelper
   include SyllabusHelper
   include WebZipExportHelper
+  include CoursesHelper
 
   before_action :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
   before_action :require_user_or_observer, :only=>[:user_index]
@@ -884,7 +885,7 @@ class CoursesController < ApplicationController
       user_id = params[:user_id]
       if user_id.present? && user = users.where(:users => { :id => user_id }).first
         position_scope = users.where("#{User.sortable_name_order_by_clause}<=#{User.best_unicode_collation_key('?')}", user.sortable_name)
-        position = position_scope.uniq.count(:all)
+        position = position_scope.distinct.count(:all)
         per_page = Api.per_page_for(self)
         params[:page] = (position.to_f / per_page.to_f).ceil
       end
@@ -917,10 +918,16 @@ class CoursesController < ApplicationController
           enrollment_scope = include_inactive ? enrollment_scope.all_active_or_pending : enrollment_scope.active_or_pending
         end
         enrollments_by_user = enrollment_scope.group_by(&:user_id)
+      else
+        confirmed_user_ids = @context.enrollments.where.not(:workflow_state => %w{invited creation_pending rejected}).
+          where(:user_id => users).distinct.pluck(:user_id)
       end
+
       render :json => users.map { |u|
         enrollments = enrollments_by_user[u.id] || [] if includes.include?('enrollments')
-        user_json(u, @current_user, session, includes, @context, enrollments)
+        user_unconfirmed = enrollments ? enrollments.all?{|e| %w{invited creation_pending rejected}.include?(e.workflow_state)} : !confirmed_user_ids.include?(u.id)
+        excludes = user_unconfirmed ? %w{pseudonym personal_info} : []
+        user_json(u, @current_user, session, includes, @context, enrollments, excludes)
       }
     end
   end
@@ -958,8 +965,11 @@ class CoursesController < ApplicationController
   def user
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      users = api_find_all(@context.users_visible_to(@current_user), [params[:id]])
       includes = Array(params[:include])
+      users = api_find_all(@context.users_visible_to(@current_user, {
+        :include_inactive => includes.include?('inactive_enrollments')
+      }), [params[:id]])
+
       user_json_preloads(users, includes.include?('email'))
       if includes.include?('enrollments')
         # not_ended_enrollments for enrollment_json
@@ -1130,7 +1140,7 @@ class CoursesController < ApplicationController
         js_bundle :course_blueprint_settings
 
         @page_title = join_title(t('Blueprint Settings'), @context.name)
-        render text: '', layout: true
+        render html: '', layout: true
       else
        render status: 404, template: 'shared/errors/404_message'
       end
@@ -1199,6 +1209,8 @@ class CoursesController < ApplicationController
         PUBLISHING_ENABLED: @publishing_enabled,
         COURSE_IMAGES_ENABLED: @context.feature_enabled?(:course_card_images)
       })
+
+      set_tutorial_js_env
 
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
       unless @context.grants_right?(@current_user, session, :read_as_admin)
@@ -1654,8 +1666,16 @@ class CoursesController < ApplicationController
 
       set_tutorial_js_env
 
+      default_view = @context.default_view || @context.default_home_page
       @course_home_view = "feed" if params[:view] == "feed"
-      @course_home_view ||= @context.default_view || @context.default_home_page
+      @course_home_view ||= default_view
+
+      js_env COURSE: {
+        id: @context.id.to_s,
+        pages_url: polymorphic_url([@context, :wiki_pages]),
+        front_page_title: @context&.wiki&.front_page&.title,
+        default_view: default_view
+      }
 
       # make sure the wiki front page exists
       if @course_home_view == 'wiki'&& @context.wiki.front_page.nil?
@@ -2143,6 +2163,13 @@ class CoursesController < ApplicationController
   #   If this option is set to true, the course image url and course image
   #   ID are both set to nil
   #
+  # @argument course[blueprint] [Boolean]
+  #   Sets the course as a blueprint course. NOTE: The Blueprint Courses feature is in beta
+  #
+  # @argument course[blueprint_restrictions] [BlueprintRestriction]
+  #   Sets a default set to apply to blueprint course objects when restricted.
+  #   See the {api:Blueprint_Templates:BlueprintRestriction Blueprint Restriction} documentation
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
   #     -X PUT \
@@ -2303,13 +2330,31 @@ class CoursesController < ApplicationController
       params_for_update[:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
 
-      if params[:course].has_key?(:master_course)
-        master_course = value_to_boolean(params[:course].delete(:master_course))
-        if master_course && @course.student_enrollments.not_fake.exists?
-           @course.errors.add(:master_course, t("Cannot have a blueprint course with students"))
+      if params[:course].has_key?(:blueprint)
+        master_course = value_to_boolean(params[:course].delete(:blueprint))
+        if master_course != MasterCourses::MasterTemplate.is_master_course?(@course)
+          return unless authorized_action(@course.account, @current_user, :manage_master_courses)
+          message = master_course && why_cant_i_enable_master_course(@course)
+          if message
+            @course.errors.add(:master_course, message)
+          else
+            action = master_course ? "set" : "remove"
+            MasterCourses::MasterTemplate.send("#{action}_as_master_course", @course)
+          end
+        end
+      end
+      if (mc_restrictions = params[:course][:blueprint_restrictions]) && MasterCourses::MasterTemplate.is_master_course?(@course)
+        return unless authorized_action(@course.account, @current_user, :manage_master_courses)
+        template = MasterCourses::MasterTemplate.full_template_for(@course)
+        restrictions = Hash[mc_restrictions.map{|k, v| [k.to_sym, value_to_boolean(v)]}]
+        if restrictions.has_key?(:content) && !restrictions[:content]
+          @course.errors.add(:master_course_restrictions, t("Content must be restricted"))
         else
-          action = master_course ? "set" : "remove"
-          MasterCourses::MasterTemplate.send("#{action}_as_master_course", @course)
+          restrictions[:content] = true # just default it because whatevs
+          template.default_restrictions = restrictions
+          unless template.save
+            @course.errors.add(:master_course_restrictions, t("Invalid restrictions"))
+          end
         end
       end
 
@@ -2324,7 +2369,7 @@ class CoursesController < ApplicationController
       @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
         { :priority => Delayed::LOW_PRIORITY }, changes)
 
-      if @course.save
+      if @course.errors.none? && @course.save
         Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
         @current_user.touch
         if params[:update_default_pages]
@@ -2441,7 +2486,7 @@ class CoursesController < ApplicationController
       feed.entries << entry.to_atom(:context => @context)
     end
     respond_to do |format|
-      format.atom { render :text => feed.to_xml }
+      format.atom { render :plain => feed.to_xml }
     end
   end
 

@@ -58,7 +58,7 @@
     }
   }
   .special_date_title {
-    color: #999;
+    color: $ic-color-medium;
     @include fontSize(12px);
   }
 }

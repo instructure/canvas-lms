@@ -40,6 +40,7 @@ define [
   'jsx/gradebook/GradingSchemeHelper'
   'compiled/userSettings'
   'spin.js'
+  'compiled/AssignmentMuter'
   'compiled/SubmissionDetailsDialog'
   'compiled/gradezilla/AssignmentGroupWeightsDialog'
   'compiled/gradezilla/GradeDisplayWarningDialog'
@@ -49,11 +50,13 @@ define [
   'compiled/util/natcompare'
   'str/htmlEscape'
   'jsx/gradezilla/shared/AssignmentDetailsDialogManager',
-  'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
   'jsx/gradezilla/shared/SetDefaultGradeDialogManager'
+  'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
+  'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
+  'jsx/gradezilla/default_gradebook/components/StudentRowHeader'
   'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader'
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
@@ -61,13 +64,14 @@ define [
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
   'jsx/gradezilla/SISGradePassback/PostGradesApp'
   'jsx/gradezilla/SubmissionStateMap'
+  'jsx/gradezilla/shared/DownloadSubmissionsDialogManager'
+  'jsx/gradezilla/shared/ReuploadSubmissionsDialogManager'
   'jst/gradezilla/group_total_cell'
-  'jst/gradezilla/row_student_name'
   'compiled/views/gradezilla/SectionMenuView'
   'compiled/views/gradezilla/GradingPeriodMenuView'
   'compiled/gradezilla/GradebookKeyboardNav'
+  'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
-  'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jqueryui/dialog'
@@ -85,17 +89,38 @@ define [
   'jsx/context_cards/StudentContextCardTrigger'
 ], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
-  CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog,
-  AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
-  NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, CurveGradesDialogManager,
-  SetDefaultGradeDialogManager, AssignmentColumnHeader, AssignmentGroupColumnHeader, StudentColumnHeader,
-  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp,
-  SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView,
-  GradebookKeyboardNav, assignmentHelper) ->
+  CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, AssignmentMuter,
+  SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
+  SubmissionCell, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, SetDefaultGradeDialogManager,
+  CurveGradesDialogManager, StudentRowHeaderConstants, AssignmentColumnHeader, AssignmentGroupColumnHeader,
+  StudentColumnHeader, StudentRowHeader, TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu,
+  PostGradesStore, PostGradesApp, SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager,
+  GroupTotalCellTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
+  assignmentHelper) ->
   IS_ADMIN = _.contains(ENV.current_user_roles, 'admin')
+
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
     component = React.createElement(reactClass, props, children)
     ReactDOM.render(component, mountPoint)
+
+  ## Non-Persistent Gradebook Display Settings
+  getInitialGridDisplaySettings = ->
+    {
+      selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo
+      selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo
+      sortRowsBy:
+        columnId: 'student' # the column controlling the sort
+        settingKey: 'sortable_name' # the key describing the sort criteria
+        direction: 'ascending' # the direction of the sort
+    }
+
+  ## Gradebook Application State
+  getInitialContentLoadStates = ->
+    {
+      assignmentsLoaded: false
+      studentsLoaded: false
+      submissionsLoaded: false
+    }
 
   class Gradebook
     columnWidths =
@@ -115,6 +140,8 @@ define [
     gridReady: $.Deferred()
 
     constructor: (@options) ->
+      @gridDisplaySettings = getInitialGridDisplaySettings()
+      @contentLoadStates = getInitialContentLoadStates()
       @students = {}
       @studentViewStudents = {}
       @rows = []
@@ -130,8 +157,6 @@ define [
         @options.settings['show_concluded_enrollments'] == "true"
       @showInactiveEnrollments =
         @options.settings['show_inactive_enrollments'] == "true"
-      @totalColumnInFront = UserSettings.contextGet 'total_column_in_front'
-      @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
       @gradingPeriods = GradingPeriodsApi.deserializePeriods(@options.active_grading_periods)
       if @options.grading_period_set
         @gradingPeriodSet = GradingPeriodSetsApi.deserializeSet(@options.grading_period_set)
@@ -209,6 +234,9 @@ define [
       @checkForUploadComplete()
 
       @gotSections(@options.sections)
+      @hasSections.then () =>
+        if @sections_enabled && @getSelectedSecondaryInfo() == 'none'
+          @setSelectedSecondaryInfo 'section', true
 
       dataLoader.gotStudents.then () =>
         @contentLoadStates.studentsLoaded = true
@@ -221,6 +249,8 @@ define [
       dataLoader.gotSubmissions.then () =>
         @contentLoadStates.submissionsLoaded = true
         @updateColumnHeaders()
+
+    # End of constructor
 
     loadOverridesForSIS: ->
       return unless $('.post-grades-placeholder').length > 0
@@ -299,7 +329,6 @@ define [
       $('#gradebook-grid-wrapper').hide()
 
     gotCustomColumns: (columns) =>
-      @numberOfFrozenCols += columns.length
       @customColumns = columns
 
     gotCustomColumnDataChunk: (column, columnData) =>
@@ -389,36 +418,13 @@ define [
     addRow: (student) =>
       student.computed_current_score ||= 0
       student.computed_final_score ||= 0
-      student.secondary_identifier = student.sis_login_id || student.login_id
 
       student.isConcluded = _.all student.enrollments, (e) ->
         e.enrollment_state == 'completed'
       student.isInactive = _.all student.enrollments, (e) ->
         e.enrollment_state == 'inactive'
 
-      if @sections_enabled
-        mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
-        sectionNames = $.toSentence(mySections.sort())
-
-      displayName = if @options.list_students_by_sortable_name_enabled
-        student.sortable_name
-      else
-        student.name
-
-      enrollmentStatus = if student.isConcluded
-        I18n.t 'concluded'
-      else if student.isInactive
-        I18n.t 'inactive'
-
-      student.display_name = RowStudentNameTemplate
-        student_id: student.id
-        course_id: ENV.GRADEBOOK_OPTIONS.context_id
-        avatar_url: student.avatar_url
-        display_name: displayName
-        enrollment_status: enrollmentStatus
-        url: student.enrollments[0].grades.html_url+'#tab-assignments'
-        sectionNames: sectionNames
-        alreadyEscaped: true
+      @setStudentDisplay(student)
 
       if @rowFilter(student)
         student.row = @rowIndex
@@ -473,7 +479,7 @@ define [
       else
         @storeCustomColumnOrder()
 
-      @fixColumnReordering()
+      @updateColumnHeaders()
 
     reorderCustomColumns: (ids) ->
       $.ajaxJSON(@options.reorder_custom_columns_url, "POST", order: ids)
@@ -496,12 +502,12 @@ define [
       @setStoredSortOrder(newSortOrder) unless isFirstArrangement
 
       columns = @grid.getColumns()
-      frozen = columns.splice(0, @numberOfFrozenCols)
+      frozen = columns.splice(0, @getFrozenColumnCount())
       columns.sort @makeColumnSortFn(newSortOrder)
       columns.splice(0, 0, frozen...)
       @grid.setColumns(columns)
 
-      @fixColumnReordering()
+      @updateColumnHeaders()
 
     makeColumnSortFn: (sortOrder) =>
       fn = switch sortOrder.sortType
@@ -567,8 +573,7 @@ define [
 
     handleAssignmentMutingChange: (assignment) =>
       @renderAssignmentColumnHeader(assignment.id)
-      @grid.setColumns(@grid.getColumns())
-      @fixColumnReordering()
+      @setAssignmentWarnings()
       @buildRows()
 
     handleAssignmentGroupWeightChange: (assignment_group_options) =>
@@ -581,10 +586,9 @@ define [
       # TODO: don't buildRows?
       @buildRows()
 
-    moveTotalColumn: =>
-      @totalColumnInFront = not @totalColumnInFront
-      UserSettings.contextSet 'total_column_in_front', @totalColumnInFront
-      window.location.reload()
+    handleSubmissionsDownloading: (assignmentId) =>
+      @getAssignment(assignmentId).hasDownloadedSubmissions = true
+      @renderAssignmentColumnHeader(assignmentId)
 
     # filter, sort, and build the dataset for slickgrid to read from, then
     # force a full redraw
@@ -605,10 +609,25 @@ define [
             @rowIndex += 1
             @rows.push(student)
             @calculateStudentGrade(student) # TODO: this may not be necessary
+            @setStudentDisplay(student)
 
       @grid.updateRowCount(@rows.length)
 
-      @sortRowsBy (a, b) => @localeSort(a.sortable_name, b.sortable_name)
+      @sortGridRows()
+
+    setStudentDisplay: (student) =>
+      if @sections_enabled
+        mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
+        sectionNames = $.toSentence(mySections.sort())
+
+      options =
+        selectedPrimaryInfo: @getSelectedPrimaryInfo()
+        selectedSecondaryInfo: @getSelectedSecondaryInfo()
+        sectionNames: sectionNames
+        courseId: ENV.GRADEBOOK_OPTIONS.context_id
+
+      cell = new StudentRowHeader(student, options)
+      student.display_name = cell.render()
 
     gotSubmissionsChunk: (student_submissions) =>
       for data in student_submissions
@@ -790,6 +809,8 @@ define [
 
         @addDroppedClass(student)
 
+    ## Grid Styling Methods
+
     addDroppedClass: (student) ->
       droppedAssignments = (name for name, assignment of student when name.match(/assignment_\d+/) and (assignment.drop? or assignment.excused))
       drops = {}
@@ -810,30 +831,6 @@ define [
 
     unhighlightColumns: () =>
       @$grid.find('.hovered-column').removeClass('hovered-column')
-
-    # this is a workaroud to make it so only assignments are sortable but at the same time
-    # so that the total and final grade columns don't dissapear after reordering columns
-    fixColumnReordering: =>
-      $headers = $('#gradebook_grid .container_1').find('.slick-header-columns')
-      originalItemsSelector = $headers.sortable 'option', 'items'
-      onlyAssignmentColsSelector = '> *:not([id*="assignment_group"]):not([id*="total_grade"]):not([id*=student])'
-      (makeOnlyAssignmentsSortable = ->
-        $headers.sortable 'option', 'items', onlyAssignmentColsSelector
-        $notAssignments = $(originalItemsSelector, $headers).not($(onlyAssignmentColsSelector, $headers))
-        $notAssignments.data('sortable-item', null)
-      )()
-      originalStopFn = $headers.sortable 'option', 'stop'
-      (fixupStopCallback = ->
-        $headers.sortable 'option', 'stop', (event, ui) ->
-          # we need to set the items selector back to the default because slickgrid's 'stop'
-          # function relies on it to re-render correctly.  if not it will render without the
-          # assignment group and final grade columns
-          $headers.sortable 'option', 'items', originalItemsSelector
-          returnVal = originalStopFn.apply(this, arguments)
-          makeOnlyAssignmentsSortable() # set it back
-          fixupStopCallback() # originalStopFn re-creates sortable widget so we need to re-fix
-          returnVal
-      )()
 
     minimizeColumn: ($columnHeader) =>
       columnDef = $columnHeader.data('column')
@@ -1271,13 +1268,9 @@ define [
       @setAssignmentWarnings()
 
       studentColumnWidth = 150
-      identifierColumnWidth = 100
       if @gradebookColumnSizeSettings
         if @gradebookColumnSizeSettings['student']
           studentColumnWidth = parseInt(@gradebookColumnSizeSettings['student'])
-
-        if @gradebookColumnSizeSettings['secondary_identifier']
-          identifierColumnWidth = parseInt(@gradebookColumnSizeSettings['secondary_identifier'])
 
       @parentColumns = [
         id: 'student'
@@ -1286,14 +1279,6 @@ define [
         cssClass: "meta-cell"
         resizable: true
         neverSort: true
-        formatter: @htmlContentFormatter
-      ,
-        id: 'secondary_identifier'
-        name: htmlEscape I18n.t('Secondary ID')
-        field: 'secondary_identifier'
-        width: identifierColumnWidth
-        cssClass: "meta-cell secondary_identifier_cell"
-        resizable: true
         formatter: @htmlContentFormatter
       ]
 
@@ -1377,14 +1362,11 @@ define [
           minWidth: columnWidths.total.min
           maxWidth: columnWidths.total.max
           width: totalWidth
-          cssClass: if @totalColumnInFront then 'meta-cell' else 'total-cell'
+          cssClass: 'total-cell'
           type: 'total_grade'
           neverSort: true
 
-        if @totalColumnInFront
-          @parentColumns.push total_column
-        else
-          @aggregateColumns.push total_column
+        @aggregateColumns.push total_column
 
       $widthTester.remove()
 
@@ -1398,7 +1380,7 @@ define [
         syncColumnCellResize: true
         rowHeight: 35
         headerHeight: 38
-        numberOfColumnsToFreeze: @numberOfFrozenCols
+        numberOfColumnsToFreeze: @getFrozenColumnCount()
       }, @options)
 
       @grid = new Slick.Grid('#gradebook_grid', @rows, @getVisibleGradeGridColumns(), options)
@@ -1409,22 +1391,6 @@ define [
 
       # this is a faux blur event for SlickGrid.
       $('body').on('click', @onGridBlur)
-
-      @grid.onSort.subscribe (event, data) =>
-        if data.sortCol.field == "display_name" ||
-           data.sortCol.field == "secondary_identifier" ||
-           data.sortCol.field.match /^custom_col/
-          sortProp = if data.sortCol.field == "display_name"
-            "sortable_name"
-          else
-            data.sortCol.field
-
-          @sortRowsBy (a, b) =>
-            [b, a] = [a, b] unless data.sortAsc
-            @localeSort(a[sortProp], b[sortProp])
-        else
-          @sortRowsBy (a, b) =>
-            @gradeSort(a, b, data.sortCol.field, data.sortAsc)
 
       @grid.onKeyDown.subscribe ->
         # TODO: start editing automatically when a number or letter is typed
@@ -1488,6 +1454,8 @@ define [
         @calculateStudentGrade(item)
         @grid.invalidate()
 
+    ## Grid Sorting Methods
+
     sortRowsBy: (sortFn) ->
       respectorOfPersonsSort = =>
         if _(@studentViewStudents).size()
@@ -1505,32 +1473,100 @@ define [
       for student, i in @rows
         student.row = i
         @addDroppedClass(student)
-      @grid.invalidate()
+      @grid?.invalidate()
+
+    getStudentGradeForColumn: (student, field) =>
+      student[field] || { score: null, possible: 0 }
+
+    getGradeAsPercent: (grade) =>
+      if grade.possible > 0
+        (grade.score || 0) / grade.possible
+      else
+        null
 
     localeSort: (a, b) ->
       natcompare.strings(a || '', b || '')
 
     gradeSort: (a, b, field, asc) =>
-      scoreForSorting = (obj) =>
-        percent = (obj) ->
-          if obj[field].possible > 0
-            obj[field].score / obj[field].possible
-          else
-            null
-
+      scoreForSorting = (student) =>
+        grade = @getStudentGradeForColumn(student, field)
         switch
           when field == "total_grade"
             if @options.show_total_grade_as_points
-              obj[field].score
+              grade.score
             else
-              percent(obj)
+              @getGradeAsPercent(grade)
           when field.match /^assignment_group/
-            percent(obj)
+            @getGradeAsPercent(grade)
           else
             # TODO: support assignment grading types
-            obj[field].score
+            grade.score
 
       NumberCompare(scoreForSorting(a), scoreForSorting(b), descending: !asc)
+
+    # when fn is true, those rows get a -1 so they go to the top of the sort
+    sortRowsWithFunction: (fn, { asc = true } = {}) ->
+      @sortRowsBy((a, b) =>
+        [b, a] = [a, b] unless asc
+        [rowA, rowB] = [fn(a), fn(b)]
+        return -1 if rowA > rowB
+        return 1 if rowA < rowB
+        @localeSort a.sortable_name, b.sortable_name
+      )
+
+    missingSort: (columnId) =>
+      @sortRowsWithFunction((row) =>
+        submission = row[columnId]
+        # if there are no submissions the usual case here is that workflow_state is undefined
+        submission.workflow_state == undefined || submission.workflow_state == 'unsubmitted'
+      )
+
+    lateSort: (columnId) =>
+      @sortRowsWithFunction((row) => row[columnId].late)
+
+    sortByStudentColumn: (settingKey, direction) =>
+      @sortRowsBy((a, b) =>
+        [b, a] = [a, b] unless direction == 'ascending'
+        @localeSort(a[settingKey], b[settingKey])
+      )
+
+    sortByCustomColumn: (columnId, direction) =>
+      @sortRowsBy((a, b) =>
+        [b, a] = [a, b] unless direction == 'ascending'
+        @localeSort(a[columnId], b[columnId])
+      )
+
+    sortByAssignmentColumn: (columnId, settingKey, direction) =>
+      switch settingKey
+        when 'grade'
+          @sortRowsBy((a, b) => @gradeSort(a, b, columnId, direction == 'ascending'))
+        when 'late'
+          @lateSort(columnId)
+        when 'missing'
+          @missingSort(columnId)
+        # when 'unposted' # TODO: in a future milestone, unposted will be added
+
+    sortByAssignmentGroupColumn: (columnId, settingKey, direction) =>
+      if settingKey == 'grade'
+        @sortRowsBy((a, b) => @gradeSort(a, b, columnId, direction == 'ascending'))
+
+    sortByTotalGradeColumn: (direction) =>
+      @sortRowsBy((a, b) => @gradeSort(a, b, 'total_grade', direction == 'ascending'))
+
+    sortGridRows: =>
+      { columnId, settingKey, direction } = @getSortRowsBySetting()
+      if columnId.match /^custom_col/
+        @sortByCustomColumn(columnId, direction)
+      else if columnId.match /^assignment_(?!group)/
+        @sortByAssignmentColumn(columnId, settingKey, direction)
+      else if columnId.match /^assignment_group/
+        @sortByAssignmentGroupColumn(columnId, settingKey, direction)
+      else if columnId == 'total_grade'
+        @sortByTotalGradeColumn(direction)
+      else
+        @sortByStudentColumn(settingKey, direction)
+
+      @updateColumnHeaders()
 
     # show warnings for bad grading setups
     setAssignmentWarnings: =>
@@ -1609,9 +1645,8 @@ define [
           for c, i in @customColumns
             if c.teacher_notes
               @customColumns.splice i, 1
-              @numberOfFrozenCols -= 1
               break
-          @grid.setNumberOfColumnsToFreeze @numberOfFrozenCols
+          @grid.setNumberOfColumnsToFreeze @getFrozenColumnCount()
         linkContainer.html(showLink())
 
       linkContainer.click (e) =>
@@ -1645,7 +1680,7 @@ define [
         linkContainer.html(hideLink())
 
     toggleNotesColumn: (callback) =>
-      columnsToReplace = @numberOfFrozenCols
+      columnsToReplace = @getFrozenColumnCount()
       callback()
       cols = @grid.getColumns()
       cols.splice 0, columnsToReplace,
@@ -1660,7 +1695,10 @@ define [
 
       @toggleNotesColumn =>
         @customColumns.splice 0, 0, @options.teacher_notes
-        @grid.setNumberOfColumnsToFreeze ++@numberOfFrozenCols
+        @grid.setNumberOfColumnsToFreeze @getFrozenColumnCount()
+
+    getFrozenColumnCount: ->
+      @parentColumns.length + @customColumns.length
 
     isAllGradingPeriods: (currentPeriodId) ->
       currentPeriodId == "0"
@@ -1708,19 +1746,92 @@ define [
       @renderTotalGradeColumnHeader()
 
     # Student Column Header
+    getStudentColumnSortBySetting: =>
+      columnId = 'student'
+      sortRowsBySetting = @getSortRowsBySetting()
+
+      {
+        direction: sortRowsBySetting.direction
+        disabled: !@contentLoadStates.studentsLoaded
+        isSortColumn: sortRowsBySetting.columnId == columnId
+        onSortBySortableNameAscending: () =>
+          @setSortRowsBySetting(columnId, 'sortable_name', 'ascending')
+        onSortBySortableNameDescending: () =>
+          @setSortRowsBySetting(columnId, 'sortable_name', 'descending')
+        settingKey: sortRowsBySetting.settingKey
+      }
+
+    getStudentColumnHeaderProps: ->
+      selectedPrimaryInfo: @getSelectedPrimaryInfo()
+      onSelectPrimaryInfo: @setSelectedPrimaryInfo
+      selectedSecondaryInfo: @getSelectedSecondaryInfo()
+      onSelectSecondaryInfo: @setSelectedSecondaryInfo
+      sectionsEnabled: @sections_enabled
+      sortBySetting: @getStudentColumnSortBySetting()
 
     renderStudentColumnHeader: =>
       mountPoint = @getColumnHeaderNode('student')
-      renderComponent(StudentColumnHeader, mountPoint)
+      props = @getStudentColumnHeaderProps()
+      renderComponent(StudentColumnHeader, mountPoint, props)
 
     # Total Grade Column Header
+
+    getTotalGradeColumnSortBySetting: (assignmentId) =>
+      columnId = 'total_grade'
+      gradeSortDataLoaded =
+        @contentLoadStates.assignmentsLoaded and
+        @contentLoadStates.studentsLoaded and
+        @contentLoadStates.submissionsLoaded
+      sortRowsBySetting = @getSortRowsBySetting()
+
+      {
+        direction: sortRowsBySetting.direction
+        disabled: !gradeSortDataLoaded
+        isSortColumn: sortRowsBySetting.columnId == columnId
+        onSortByGradeAscending: () =>
+          @setSortRowsBySetting(columnId, 'grade', 'ascending')
+        onSortByGradeDescending: () =>
+          @setSortRowsBySetting(columnId, 'grade', 'descending')
+        settingKey: sortRowsBySetting.settingKey
+      }
+
+    getTotalGradeColumnHeaderProps: ->
+      {
+        sortBySetting: @getTotalGradeColumnSortBySetting()
+      }
 
     renderTotalGradeColumnHeader: =>
       return if @hideAggregateColumns()
       mountPoint = @getColumnHeaderNode('total_grade')
-      renderComponent(TotalGradeColumnHeader, mountPoint)
+      props = @getTotalGradeColumnHeaderProps()
+      renderComponent(TotalGradeColumnHeader, mountPoint, props)
 
     # Assignment Column Header
+
+    getAssignmentColumnSortBySetting: (assignmentId) =>
+      columnId = @getAssignmentColumnId(assignmentId)
+      gradeSortDataLoaded =
+        @contentLoadStates.assignmentsLoaded and
+        @contentLoadStates.studentsLoaded and
+        @contentLoadStates.submissionsLoaded
+      sortRowsBySetting = @getSortRowsBySetting()
+
+      {
+        direction: sortRowsBySetting.direction
+        disabled: !gradeSortDataLoaded
+        isSortColumn: sortRowsBySetting.columnId == columnId
+        onSortByGradeAscending: () =>
+          @setSortRowsBySetting(columnId, 'grade', 'ascending')
+        onSortByGradeDescending: () =>
+          @setSortRowsBySetting(columnId, 'grade', 'descending')
+        onSortByLate: () =>
+          @setSortRowsBySetting(columnId, 'late', 'ascending')
+        onSortByMissing: () =>
+          @setSortRowsBySetting(columnId, 'missing', 'ascending')
+        onSortByUnposted: () =>
+          @setSortRowsBySetting(columnId, 'unposted', 'ascending')
+        settingKey: sortRowsBySetting.settingKey
+      }
 
     getAssignmentColumnHeaderProps: (assignmentId) =>
       assignment = @getAssignment(assignmentId)
@@ -1749,6 +1860,12 @@ define [
       assignmentDetailsDialogManager = new AssignmentDetailsDialogManager(
         assignment, students, @contentLoadStates.submissionsLoaded
       )
+      downloadSubmissionsManager = new DownloadSubmissionsDialogManager(
+        assignment, @options.download_assignment_submissions_url, @handleSubmissionsDownloading
+      )
+      reuploadSubmissionsManager = new ReuploadSubmissionsDialogManager(
+        assignment, @options.re_upload_submissions_url
+      )
       curveGradesActionOptions =
         isAdmin: IS_ADMIN
         contextUrl: contextUrl
@@ -1756,6 +1873,11 @@ define [
       setDefaultGradeDialogManager = new SetDefaultGradeDialogManager(
         assignment, studentsThatCanSeeAssignment, @options.context_id, @sectionToShow,
         IS_ADMIN, @contentLoadStates.submissionsLoaded
+      )
+      assignmentMuterDialogManager = new AssignmentMuterDialogManager(
+        assignment,
+        "#{@options.context_url}/assignments/#{assignmentId}/mute",
+        @contentLoadStates.submissionsLoaded
       )
 
       {
@@ -1772,6 +1894,7 @@ define [
           inClosedGradingPeriod: assignment.in_closed_grading_period
         students: students
         submissionsLoaded: @contentLoadStates.submissionsLoaded
+        sortBySetting: @getAssignmentColumnSortBySetting(assignmentId)
         assignmentDetailsAction:
           disabled: !assignmentDetailsDialogManager.isDialogEnabled()
           onSelect: assignmentDetailsDialogManager.showDialog
@@ -1783,6 +1906,15 @@ define [
           onSelect: setDefaultGradeDialogManager.showDialog
         students: students
         submissionsLoaded: @contentLoadStates.submissionsLoaded
+        downloadSubmissionsAction:
+          hidden: !downloadSubmissionsManager.isDialogEnabled()
+          onSelect: downloadSubmissionsManager.showDialog
+        reuploadSubmissionsAction:
+          hidden: !reuploadSubmissionsManager.isDialogEnabled()
+          onSelect: reuploadSubmissionsManager.showDialog
+        muteAssignmentAction:
+          disabled: !assignmentMuterDialogManager.isDialogEnabled()
+          onSelect: assignmentMuterDialogManager.showDialog
       }
 
     renderAssignmentColumnHeader: (assignmentId) =>
@@ -1793,12 +1925,32 @@ define [
 
     # Assignment Group Column Header
 
+    getAssignmentGroupColumnSortBySetting: (assignmentGroupId) =>
+      columnId = @getAssignmentGroupColumnId(assignmentGroupId)
+      gradeSortDataLoaded =
+        @contentLoadStates.assignmentsLoaded and
+        @contentLoadStates.studentsLoaded and
+        @contentLoadStates.submissionsLoaded
+      sortRowsBySetting = @getSortRowsBySetting()
+
+      {
+        direction: sortRowsBySetting.direction
+        disabled: !gradeSortDataLoaded
+        isSortColumn: sortRowsBySetting.columnId == columnId
+        onSortByGradeAscending: () =>
+          @setSortRowsBySetting(columnId, 'grade', 'ascending')
+        onSortByGradeDescending: () =>
+          @setSortRowsBySetting(columnId, 'grade', 'descending')
+        settingKey: sortRowsBySetting.settingKey
+      }
+
     getAssignmentGroupColumnHeaderProps: (assignmentGroupId) =>
       assignmentGroup = @getAssignmentGroup(assignmentGroupId)
       {
         assignmentGroup:
           name: assignmentGroup.name
           groupWeight: assignmentGroup.group_weight
+        sortBySetting: @getAssignmentGroupColumnSortBySetting(assignmentGroupId)
         weightedGroups: @weightedGroups()
       }
 
@@ -1812,10 +1964,43 @@ define [
 
     defaultSortType: 'assignment_group'
 
-    contentLoadStates:
-      studentsLoaded: false
-      submissionsLoaded: false
-      assignmentsLoaded: false
+    ## Gradebook Application State Methods
+
+    setAssignmentsLoaded: (loaded) =>
+      @contentLoadStates.assignmentsLoaded = loaded
+
+    setStudentsLoaded: (loaded) =>
+      @contentLoadStates.studentsLoaded = loaded
+
+    setSubmissionsLoaded: (loaded) =>
+      @contentLoadStates.submissionsLoaded = loaded
+
+    setSelectedPrimaryInfo: (primaryInfo, skipRedraw) =>
+      @gridDisplaySettings.selectedPrimaryInfo = primaryInfo
+      unless skipRedraw
+        @buildRows()
+        @renderStudentColumnHeader()
+
+    getSelectedPrimaryInfo: () =>
+      @gridDisplaySettings.selectedPrimaryInfo
+
+    setSelectedSecondaryInfo: (secondaryInfo, skipRedraw) =>
+      @gridDisplaySettings.selectedSecondaryInfo = secondaryInfo
+      unless skipRedraw
+        @buildRows()
+        @renderStudentColumnHeader()
+
+    getSelectedSecondaryInfo: () =>
+      @gridDisplaySettings.selectedSecondaryInfo
+
+    setSortRowsBySetting: (columnId, settingKey, direction) =>
+      @gridDisplaySettings.sortRowsBy.columnId = columnId
+      @gridDisplaySettings.sortRowsBy.settingKey = settingKey
+      @gridDisplaySettings.sortRowsBy.direction = direction
+      @sortGridRows()
+
+    getSortRowsBySetting: =>
+      @gridDisplaySettings.sortRowsBy
 
     ## Gradebook Content Access Methods
 

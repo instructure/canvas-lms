@@ -40,17 +40,30 @@ class AssignmentsController < ApplicationController
       log_asset_access([ "assignments", @context ], 'assignments', 'other')
 
       add_crumb(t('#crumbs.assignments', "Assignments"), named_context_url(@context, :context_assignments_url))
-      sis_name = @context.respond_to?(:assignments) ? AssignmentUtil.post_to_sis_friendly_name(@context.assignments.first) : 'SIS'
+
+      max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)
+      max_name_length = AssignmentUtil.assignment_max_name_length(@context)
+      sis_name = AssignmentUtil.post_to_sis_friendly_name(@context)
+      due_date_required_for_account = AssignmentUtil.due_date_required_for_account?(@context)
+      sis_integration_settings_enabled = AssignmentUtil.sis_integration_settings_enabled?(@context)
 
       # It'd be nice to do this as an after_create, but it's not that simple
       # because of course import/copy.
       @context.require_assignment_group
       set_js_assignment_data # in application_controller.rb, because the assignments page can be shared with the course home
 
-      js_env(WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
-             POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
-             SIS_NAME: sis_name,
-             QUIZ_LTI_ENABLED: @context.quiz_lti_tool.present?)
+      set_tutorial_js_env
+      hash = {
+        WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
+        POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
+        SIS_INTEGRATION_SETTINGS_ENABLED: sis_integration_settings_enabled,
+        SIS_NAME: sis_name,
+        MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT: max_name_length_required_for_account,
+        MAX_NAME_LENGTH: max_name_length,
+        QUIZ_LTI_ENABLED: @context.quiz_lti_tool.present?,
+        DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account
+      }
+      js_env(hash)
 
       respond_to do |format|
         format.html do
@@ -130,7 +143,7 @@ class AssignmentsController < ApplicationController
         :ASSIGNMENT_ID => @assignment.id,
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session)
       })
-
+      set_master_course_js_env_data(@assignment, @context)
       conditional_release_js_env(@assignment, includes: :rule)
 
       @can_view_grades = @context.grants_right?(@current_user, session, :view_all_grades)
@@ -165,18 +178,23 @@ class AssignmentsController < ApplicationController
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       add_crumb(t('Moderate'))
 
+      can_edit_grades = @context.grants_right?(@current_user, :manage_grades)
       js_env({
-        :ASSIGNMENT_TITLE => @assignment.title,
-        :GRADES_PUBLISHED => @assignment.grades_published?,
-        :COURSE_ID => @context.id,
-        :STUDENT_CONTEXT_CARDS_ENABLED => @domain_root_account.feature_enabled?(:student_context_cards),
-        :URLS => {
-          :student_submissions_url => polymorphic_url([:api_v1, @context, @assignment, :submissions]) + "?include[]=user_summary&include[]=provisional_grades",
-          :publish_grades_url => api_v1_publish_provisional_grades_url({course_id: @context.id, assignment_id: @assignment.id}),
-          :list_gradeable_students => api_v1_course_assignment_gradeable_students_url({course_id: @context.id, assignment_id: @assignment.id}) + "?include[]=provisional_grades&per_page=50",
-          :add_moderated_students => api_v1_add_moderated_students_url({course_id: @context.id, assignment_id: @assignment.id}),
-          :assignment_speedgrader_url => speed_grader_course_gradebook_url({course_id: @context.id, assignment_id: @assignment.id}),
-          :provisional_grades_base_url => polymorphic_url([:api_v1, @context, @assignment]) + "/provisional_grades"
+        ASSIGNMENT_TITLE: @assignment.title,
+        GRADES_PUBLISHED: @assignment.grades_published?,
+        COURSE_ID: @context.id,
+        STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards),
+        PERMISSIONS: {
+          view_grades: can_edit_grades || @context.grants_right?(@current_user, :view_all_grades),
+          edit_grades: can_edit_grades
+        },
+        URLS: {
+          student_submissions_url: polymorphic_url([:api_v1, @context, @assignment, :submissions]) + "?include[]=user_summary&include[]=provisional_grades",
+          publish_grades_url: api_v1_publish_provisional_grades_url({course_id: @context.id, assignment_id: @assignment.id}),
+          list_gradeable_students: api_v1_course_assignment_gradeable_students_url({course_id: @context.id, assignment_id: @assignment.id}) + "?include[]=provisional_grades&per_page=50",
+          add_moderated_students: api_v1_add_moderated_students_url({course_id: @context.id, assignment_id: @assignment.id}),
+          assignment_speedgrader_url: speed_grader_course_gradebook_url({course_id: @context.id, assignment_id: @assignment.id}),
+          provisional_grades_base_url: polymorphic_url([:api_v1, @context, @assignment]) + "/provisional_grades"
         }})
 
       respond_to do |format|
@@ -295,7 +313,7 @@ class AssignmentsController < ApplicationController
                         @context.students_visible_to(@current_user)
                       end
 
-      @students = student_scope.not_fake_student.uniq.order_by_sortable_name
+      @students = student_scope.not_fake_student.distinct.order_by_sortable_name
       @submissions = @assignment.submissions.include_assessment_requests
     end
   end
@@ -315,6 +333,7 @@ class AssignmentsController < ApplicationController
       hash = { :CONTEXT_ACTION_SOURCE => :syllabus }
       append_sis_data(hash)
       js_env(hash)
+      set_tutorial_js_env
 
       log_asset_access([ "syllabus", @context ], "syllabus", 'other')
       respond_to do |format|
@@ -394,7 +413,6 @@ class AssignmentsController < ApplicationController
     rce_js_env(:highrisk)
     @assignment ||= @context.assignments.active.find(params[:id])
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
-      return render_unauthorized_action if !@assignment.new_record? && editing_restricted?(@assignment)
       @assignment.title = params[:title] if params[:title]
       @assignment.due_at = params[:due_at] if params[:due_at]
       @assignment.points_possible = params[:points_possible] if params[:points_possible]
@@ -449,7 +467,7 @@ class AssignmentsController < ApplicationController
         HAS_GRADING_PERIODS: @context.grading_periods?,
         PLAGIARISM_DETECTION_PLATFORM: @context.root_account.feature_enabled?(:plagiarism_detection_platform),
         POST_TO_SIS: post_to_sis,
-        SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@assignment),
+        SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@context),
         SECTION_LIST: @context.course_sections.active.map do |section|
           {
             id: section.id,
@@ -470,8 +488,8 @@ class AssignmentsController < ApplicationController
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
       hash[:CONTEXT_ID] = @context.id
       hash[:CONTEXT_ACTION_SOURCE] = :assignments
-      hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@assignment)
-      hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@assignment)
+      hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)
+      hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context)
       hash[:MAX_NAME_LENGTH] = self.try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value).to_i
 
       selected_tool = @assignment.tool_settings_tool
@@ -488,6 +506,7 @@ class AssignmentsController < ApplicationController
       end
       js_env(hash)
       conditional_release_js_env(@assignment)
+      set_master_course_js_env_data(@assignment, @context)
       render :edit
     end
   end

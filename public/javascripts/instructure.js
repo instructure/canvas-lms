@@ -182,12 +182,12 @@ define([
     if (window._earlyClick) {
 
       // unset the onclick handler we were using to capture the events
-      document.removeEventListener('click', _earlyClick);
+      document.removeEventListener('click', window._earlyClick);
 
-      if (_earlyClick.clicks) {
+      if (window._earlyClick.clicks) {
         // wait to fire the "click" events till after all of the event hanlders loaded at dom ready are initialized
         setTimeout(function(){
-          $.each(_.uniq(_earlyClick.clicks), function() {
+          $.each(_.uniq(window._earlyClick.clicks), function() {
             // cant use .triggerHandler because it will not bubble,
             // but we do want to preventDefault, so this is what we have to do
             var event = $.Event('click');
@@ -444,8 +444,10 @@ define([
 
 
     $(document).bind('user_content_change', enhanceUserContent);
-    setInterval(enhanceUserContent, 15000);
-    setTimeout(enhanceUserContent, 1000);
+    $(function () {
+      setInterval(enhanceUserContent, 15000);
+      setTimeout(enhanceUserContent, 15);
+    })
 
     $(".zone_cached_datetime").each(function() {
       if($(this).attr('title')) {
@@ -550,7 +552,7 @@ define([
         var $conversation = $message.parents(".communication_message");
 
         // fill out this message, display the new info, and remove the form
-        message_data = data.messages[0];
+        var message_data = data.messages[0];
         $message.fillTemplateData({
           data: {
             post_date: $.datetimeString(message_data.created_at),
@@ -898,6 +900,9 @@ define([
     // the external link look and behavior (force them to open in a new tab)
     setTimeout(function() {
       $("#content a:external,#content a.explicit_external_link").each(function(){
+        var indicatorText = I18n.t('titles.external_link', 'Links to an external site.');
+        var $linkIndicator = $('<span class="ui-icon ui-icon-extlink ui-icon-inline"/>').attr('title', indicatorText);
+        $linkIndicator.append($('<span class="screenreader-only"/>').text(indicatorText));
         $(this)
           .not(".open_in_a_new_tab")
           .not(":has(img)")
@@ -908,7 +913,7 @@ define([
           .html('<span>' + $(this).html() + '</span>')
           .attr('target', '_blank')
           .attr('rel', 'noreferrer')
-          .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="' + htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')) + '"/>');
+          .append($linkIndicator);
       });
     }, 2000);
   });

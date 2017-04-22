@@ -23,7 +23,7 @@ gem 'authlogic', '3.5.0'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.9.5'
+gem 'switchman', '1.9.8'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -38,7 +38,7 @@ gem 'bcrypt', '3.1.11'
 gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.5', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.12.1'
+gem 'inst-jobs', '0.12.3'
   gem 'rufus-scheduler', '3.3.3', require: false
 gem 'ffi', '1.9.14', require: false
 gem 'hashery', '2.1.2', require: false
@@ -49,7 +49,7 @@ gem 'i18nliner', '0.0.12'
   gem 'ruby2ruby', '2.3.1', require: false
   gem 'ruby_parser', '3.8.4', require: false
 gem 'icalendar', '1.5.4', require: false
-gem 'ims-lti', '2.1.0.beta.4', require: 'ims'
+gem 'ims-lti', '2.1.2', require: 'ims'
 gem 'json', '2.0.3'
 gem 'oj', '2.17.1'
 gem 'jwt', '1.2.1', require: false
@@ -62,7 +62,7 @@ gem 'mime-types', '1.25.1', require: 'mime/types'
 gem 'mini_magick', '4.2.7'
 gem 'multi_json', '1.12.1'
 gem 'netaddr', '1.5.1', require: false
-gem 'nokogiri', '1.7.0.1', require: false
+gem 'nokogiri', '1.7.1', require: false
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', require: false
 gem 'parallel', '1.10.0', require: false
@@ -76,8 +76,8 @@ gem 'ritex', '1.0.1', require: false
 gem 'rotp', '3.3.0', require: false
 gem 'net-ldap', '0.10.1', require: false
 gem 'ruby-duration', '3.2.3', require: false
-gem 'ruby-saml-mod', '0.3.2'
-gem 'saml2', '1.0.8', require: false
+gem 'ruby-saml-mod', '0.3.5'
+gem 'saml2', '1.0.10', require: false
   gem 'nokogiri-xmlsec-me-harder', '0.9.3pre', require: false, github: 'instructure/nokogiri-xmlsec-me-harder', ref: '57d071040cc4649db9f158e09bbcea028271a4a6'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.2.0', require: 'zip'
@@ -90,8 +90,8 @@ gem 'useragent', '0.16.8', require: false
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
 gem 'sentry-raven', '0.15.6', require: false
-gem 'canvas_statsd', '2.0.1'
-  gem 'statsd-ruby', '1.3.0', require: false
+gem 'canvas_statsd', '2.0.4'
+  gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.4', require: false
 gem 'diplomat', '1.0.0', require: false
 gem 'gepub', '0.7.0beta3', github: 'ccutrer/gepub', ref: '7cea2f4912f15d89bc9e9cb9d4c51e5f491c2328'

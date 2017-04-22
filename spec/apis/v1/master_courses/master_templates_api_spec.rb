@@ -23,8 +23,14 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it "should require authorization" do
-      Account.default.role_overrides.create!(:role => admin_role, :permission => "manage_master_courses", :enabled => false)
+      Account.default.role_overrides.create!(:role => admin_role, :permission => "manage_courses", :enabled => false)
       api_call(:get, @url, @params, {}, {}, {:expected_status => 401})
+    end
+
+    it "should let teachers in the master course view details" do
+      course_with_teacher(:course => @course, :active_all => true)
+      json = api_call(:get, @url, @params)
+      expect(json['id']).to eq @template.id
     end
 
     it "should require am active template" do
@@ -84,6 +90,16 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
       json = api_call(:put, @url, @params, {:course_ids_to_add => [other_course.id]}, {}, {:expected_status => 400})
       expect(json['message']).to include("invalid courses")
+    end
+
+    it "should require account-level authorization" do
+      course_with_teacher(:course => @course, :active_all => true)
+      json = api_call(:put, @url, @params, {}, {}, {:expected_status => 401})
+    end
+
+    it "should require account-level blueprint permissions" do
+      Account.default.role_overrides.create!(:role => admin_role, :permission => "manage_master_courses", :enabled => false)
+      json = api_call(:put, @url, @params, {}, {}, {:expected_status => 401})
     end
 
     it "should not try to add other blueprint courses" do
@@ -179,6 +195,61 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations", @base_params.merge(:action => 'migrations_index'))
       pairs = json.map{|hash| [hash['id'], hash['workflow_state']]}
       expect(pairs).to eq [[migration2.id, 'queued'], [@migration.id, 'completed']]
+    end
+  end
+
+  describe "#restrict_item" do
+    before :once do
+      setup_template
+      @url = "/api/v1/courses/#{@course.id}/blueprint_templates/default/restrict_item"
+      @params = @base_params.merge(:action => 'restrict_item')
+    end
+
+    it "should be able to find all the (currently) supported types" do
+      expect(@template.default_restrictions[:content]).to be_truthy
+
+      assmt = @course.assignments.create!
+      topic = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
+      page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      quiz = @course.quizzes.create!
+      file = @course.attachments.create!(:filename => 'blah', :uploaded_data => default_uploaded_data)
+      tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key",
+        :shared_secret => "secret", :custom_fields => {'a' => '1', 'b' => '2'}, :url => "http://www.example.com")
+
+      type_pairs = {'assignment' => assmt, 'attachment' => file, 'discussion_topic' => topic,
+        'external_tool' => tool, 'quiz' => quiz, 'wiki_page' => page}
+      type_pairs.each do |content_type, obj|
+        api_call(:put, @url, @params, {:content_type => content_type, :content_id => obj.id, :restricted => '1'}, {}, {:expected_status => 200})
+        mc_tag = @template.content_tag_for(obj)
+        expect(mc_tag.restrictions).to eq @template.default_restrictions
+        expect(mc_tag.use_default_restrictions).to be_truthy
+      end
+    end
+
+    it "should be able to set custom restrictions" do
+      assmt = @course.assignments.create!
+      api_call(:put, @url, @params, {:content_type => 'assignment', :content_id => assmt.id,
+        :restricted => '1', :restrictions => {'content' => '1', 'points' => '1'}}, {}, {:expected_status => 200})
+
+      mc_tag = @template.content_tag_for(assmt)
+      expect(mc_tag.restrictions).to eq({:content => true, :points => true})
+      expect(mc_tag.use_default_restrictions).to be_falsey
+    end
+
+    it "should validate custom restrictions" do
+      assmt = @course.assignments.create!
+      api_call(:put, @url, @params, {:content_type => 'assignment', :content_id => assmt.id,
+        :restricted => '1', :restrictions => {'content' => '1', 'not_a_real_thing' => '1'}}, {}, {:expected_status => 400})
+    end
+
+    it "should be able to unset restrictions" do
+      assmt = @course.assignments.create!
+      mc_tag = @template.content_tag_for(assmt, {:restrictions => @template.default_restrictions, :use_default_restrictions => true})
+      api_call(:put, @url, @params, {:content_type => 'assignment', :content_id => assmt.id,
+        :restricted => '0'}, {}, {:expected_status => 200})
+      mc_tag.reload
+      expect(mc_tag.restrictions).to be_blank
+      expect(mc_tag.use_default_restrictions).to be_falsey
     end
   end
 end

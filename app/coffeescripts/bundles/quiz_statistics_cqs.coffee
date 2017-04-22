@@ -1,1 +1,0 @@
-require [ 'quiz_statistics_cqs' ]

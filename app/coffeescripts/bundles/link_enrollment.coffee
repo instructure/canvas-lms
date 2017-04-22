@@ -1,1 +1,0 @@
-require ['link_enrollment']

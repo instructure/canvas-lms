@@ -34,12 +34,13 @@ class GradingPeriod < ActiveRecord::Base
   after_save :recompute_scores, if: :dates_or_weight_changed?
   after_destroy :destroy_grading_period_set, if: :last_remaining_legacy_period?
   after_destroy :destroy_scores
-
   scope :current, -> do
-    period_table = GradingPeriod.arel_table
-    now = Time.zone.now
-    where(period_table[:start_date].lt(now)).
-      where(period_table[:end_date].gteq(now))
+    now = Time.zone.now.change(sec: 0)
+    where(
+      "date_trunc('minute', grading_periods.end_date) >= ? AND date_trunc('minute', grading_periods.start_date) < ?",
+      now,
+      now
+    )
   end
 
   scope :grading_periods_by, ->(context_with_ids) do
@@ -112,7 +113,8 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def in_date_range?(date)
-    start_date < date && date <= end_date
+    comparison_date = date_for_comparison(date)
+    date_for_comparison(start_date) < comparison_date && comparison_date <= date_for_comparison(end_date)
   end
 
   def last?
@@ -160,6 +162,11 @@ class GradingPeriod < ActiveRecord::Base
 
   private
 
+  def date_for_comparison(date)
+    comparison_date = date.is_a?(String) ? Time.zone.parse(date) : date
+    comparison_date&.change(sec: 0)
+  end
+
   def destroy_scores
     scores.find_ids_in_ranges do |min_id, max_id|
       scores.where(id: min_id..max_id).update_all(workflow_state: :deleted)
@@ -180,7 +187,11 @@ class GradingPeriod < ActiveRecord::Base
 
   scope :overlaps, ->(from, to) do
     # sourced: http://c2.com/cgi/wiki?TestIfDateRangesOverlap
-    where('((end_date > ?) and (start_date < ?))', from, to)
+    where(
+      "((date_trunc('minute', end_date) > ?) and (date_trunc('minute', start_date) < ?))",
+      from&.change(sec: 0),
+      to&.change(sec: 0)
+    )
   end
 
   def not_overlapping

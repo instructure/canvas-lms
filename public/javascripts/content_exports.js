@@ -69,7 +69,7 @@ $(document).ready(function(event) {
           $(".progress_message").text(I18n.t("Your content has been exported."));
           $("#export_files").append('<p>' + htmlEscape(I18n.t('labels.new_export', "New Export:")) + ' <a href="' + htmlEscape(content_export.download_url) + '">' + htmlEscape(I18n.t('links.download_plain', "Click here to download")) + '</a> </p>')
         } else if(content_export.workflow_state == 'failed') {
-          code = "content_export_" + content_export.id;
+          var code = "content_export_" + content_export.id;
           $(".progress_bar_holder").hide();
           $exporter_form.hide();
           var message = I18n.t('errors.error', "There was an error exporting your content.  Please notify your system administrator and give them the following export identifier: \"%{code}\"", {code: code});

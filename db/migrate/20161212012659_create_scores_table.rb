@@ -8,7 +8,7 @@ class CreateScoresTable < ActiveRecord::Migration[4.2]
       t.string  :workflow_state, default: :active, null: false, limit: 255
       t.float   :current_score
       t.float   :final_score
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_foreign_key :scores, :enrollments

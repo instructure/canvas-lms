@@ -969,7 +969,7 @@ class ConversationsController < ApplicationController
       end
     end
     respond_to do |format|
-      format.atom { render :text => feed.to_xml }
+      format.atom { render :plain => feed.to_xml }
     end
   end
 

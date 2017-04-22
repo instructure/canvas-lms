@@ -2,8 +2,9 @@ define [
   'i18n!assignments',
   'Backbone',
   'jquery',
-  'jst/_sisButton'
-], (I18n, Backbone, $, template) ->
+  'jst/_sisButton',
+  'compiled/util/SisValidationHelper'
+], (I18n, Backbone, $, template, SisValidationHelper) ->
 
   class SisButtonView extends Backbone.View
     template: template
@@ -15,6 +16,11 @@ define [
     # {string}
     # text used to describe the SIS NAME
     @optionProperty 'sisName'
+
+    # {boolean}
+    # boolean used to determine if due date
+    # is required
+    @optionProperty 'dueDateRequired'
 
     setAttributes: ->
       newSisAttributes = @sisAttributes()
@@ -28,9 +34,19 @@ define [
     togglePostToSIS: (e) =>
       e.preventDefault()
       sisUrl = @model.get('toggle_post_to_sis_url')
-      c = @model.postToSIS()
-      @model.postToSIS(!c)
-      if sisUrl
+      post_to_sis = @model.postToSIS()
+      validationHelper = new SisValidationHelper({
+        postToSIS: !post_to_sis
+        dueDateRequired: @dueDateRequired
+        dueDate: @model.dueAt()
+        name: @model.name()
+        maxNameLength: @model.maxNameLength()
+      })
+      errors = @errorsExist(validationHelper)
+      if errors['has_error'] == true && @model.sisIntegrationSettingsEnabled()
+        $.flashWarning(errors['message'])
+      else if sisUrl
+        @model.postToSIS(!post_to_sis)
         @model.save({ override_dates: false }, {
           type: 'POST',
           url: sisUrl,
@@ -38,10 +54,25 @@ define [
             @setAttributes()
         })
       else
+        @model.postToSIS(!post_to_sis)
         @model.save({ override_dates: false }, {
           success: =>
             @setAttributes()
         })
+
+    errorsExist: (validationHelper) =>
+      errors = {}
+      base_message = "Unable to sync with #{@sisName}."
+      if validationHelper.dueDateMissing() && validationHelper.nameTooLong()
+        errors['has_error'] = true
+        errors['message'] = I18n.t("%{base_message} Please make sure %{name} has a due date and name is not too long.", name: @model.name(), base_message: base_message)
+      else if validationHelper.dueDateMissing()
+        errors['has_error'] = true
+        errors['message'] = I18n.t("%{base_message} Please make sure %{name} has a due date.", name: @model.name(), base_message: base_message)
+      else if validationHelper.nameTooLong()
+        errors['has_error'] = true
+        errors['message'] = I18n.t("%{base_message} Please make sure %{name} name is not too long.", name: @model.name(), base_message: base_message)
+      errors
 
     sisAttributes: =>
       if @model.postToSIS()

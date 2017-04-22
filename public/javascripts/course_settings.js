@@ -21,6 +21,7 @@ define([
   'underscore',
   'course_settings_helper' /* tabIdFromElement */,
   'timezone',
+  'jsx/shared/helpers/forceScreenreaderToReparse',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* datetimeString, date_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */,
@@ -31,13 +32,13 @@ define([
   'jquery.loadingImg' /* loadingImage */,
   'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'link_enrollment' /* link_enrollment */,
+  'link_enrollment' /* global link_enrollment */,
   'vendor/jquery.ba-tinypubsub' /* /\.publish/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/autocomplete' /* /\.autocomplete/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, _, CourseSettingsHelper, tz) {
+], function(I18n, $, _, CourseSettingsHelper, tz, forceScreenReaderToReparse) {
 
   var GradePublishing = {
     status: null,
@@ -71,7 +72,7 @@ define([
         $publish_grades_link.text(I18n.t('links.republish', "Republish grades to SIS"));
         $publish_grades_link.removeClass("disabled");
       }
-      $messages = $("#publish_grades_messages");
+      var $messages = $("#publish_grades_messages");
       $messages.empty();
       $.each(messages, function(message, users) {
         var $message = $("<span/>");
@@ -209,7 +210,7 @@ define([
       return false;
     });
     $("#nav_form").submit(function(){
-      tab_id_regex = /(\d+)$/;
+      var tab_id_regex = /(\d+)$/;
 
       var tabs = [];
       $("#nav_enabled_list li").each(function() {
@@ -443,6 +444,14 @@ define([
 
     $("#course_show_announcements_on_home_page").change(function(event) {
       $("#course_home_page_announcement_limit").prop("disabled", !$(this).prop('checked'))
+    });
+
+    if ($('#course_blueprint').is(':checked')) {
+      $('#master_course_restrictions').show();
+    }
+    $('#course_blueprint').change(function(event) {
+      $('#master_course_restrictions').slideToggle();
+      forceScreenReaderToReparse($('#master_course_restrictions')[0]);
     });
   });
 });

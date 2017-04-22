@@ -24,7 +24,7 @@ define([
   'jsx/gradebook/uploads/wait_for_processing',
   'jsx/gradebook/uploads/process_gradebook_upload',
   'jsx/gradebook/shared/helpers/GradeFormatHelper',
-  'vendor/slickgrid' /* global.Slick */,
+  'vendor/slickgrid' /* global Slick */,
   'vendor/slickgrid/slick.editors' /* global.Slick.Editors */,
   'jquery.instructure_forms' /* errorBox */,
   'jquery.instructure_misc_helpers' /* /\.detect/ */,
@@ -136,7 +136,7 @@ define([
             id        : this.id
           };
           $.each(this.submissions, function(){
-            var originalGrade = parseInt(this.original_grade);
+            var originalGrade = parseInt(this.original_grade),
                 updatedGrade  = parseInt(this.grade),
                 updateWillRemoveGrade = !isNaN(originalGrade) && isNaN(updatedGrade);
 

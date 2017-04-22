@@ -6,7 +6,7 @@ define([], function(){
     var combined = {};
     objs = objs.reverse();
     objs.forEach(function(obj){
-      for(prop in obj) {
+      for(var prop in obj) {
         combined[prop] = obj[prop]
       }
     });

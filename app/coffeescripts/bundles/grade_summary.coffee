@@ -5,12 +5,12 @@ require [
   'compiled/userSettings'
   'compiled/collections/OutcomeSummaryCollection'
   'compiled/views/grade_summary/OutcomeSummaryView'
-  'grade_summary'
+  'jsx/grading/GradeSummary'
   'jqueryui/tabs'
   'jquery.disableWhileLoading'
-], ($, _, Backbone, userSettings, OutcomeSummaryCollection, OutcomeSummaryView, grade_summary) ->
+], ($, _, Backbone, userSettings, OutcomeSummaryCollection, OutcomeSummaryView, GradeSummary) ->
   # Ensure the gradebook summary code has had a chance to setup all its handlers
-  grade_summary.setup()
+  GradeSummary.setup()
 
   class GradebookSummaryRouter extends Backbone.Router
     routes:
@@ -39,7 +39,7 @@ require [
       else
         $('.outcome-toggles').hide()
 
-    activate: (event, ui) =>
+    activate: (event, ui) ->
       tab = ui.newPanel.attr('id')
       router.navigate("#tab-#{tab}", {trigger: true})
       userSettings.contextSet('grade_summary_tab', tab)

@@ -1,5 +1,6 @@
 class AddTimetableCodeToCalendarEvents < ActiveRecord::Migration[4.2]
   tag :predeploy
+  disable_ddl_transaction!
 
   def change
     add_column :calendar_events, :timetable_code, :string

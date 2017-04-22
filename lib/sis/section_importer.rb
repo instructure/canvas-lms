@@ -31,7 +31,7 @@ module SIS
       end
       Course.update_account_associations(importer.course_ids_to_update_associations.to_a) unless importer.course_ids_to_update_associations.empty?
       importer.sections_to_update_sis_batch_ids.in_groups_of(1000, false) do |batch|
-        CourseSection.where(:id => batch).update_all(:sis_batch_id => @batch)
+        CourseSection.where(:id => batch).update_all(:sis_batch_id => @batch.id)
       end if @batch
       # there could be a ton of deleted sections, and it would be really slow to do a normal find_each
       # that would order by id. So do it on the slave, to force a cursor that avoids the sort so that

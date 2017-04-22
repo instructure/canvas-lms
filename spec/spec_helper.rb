@@ -53,7 +53,7 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 # and then ensure people aren't creating records outside the rspec
 # lifecycle, e.g. inside a describe/context block rather than a
 # let/before/example
-BlankSlateProtection.truncate_all_tables! unless defined?(TestQueue::Runner::RSpec) # we do this in each runner
+TestDatabaseUtils.reset_database! unless defined?(TestQueue::Runner::RSpec) # we do this in each runner
 BlankSlateProtection.install!
 GreatExpectations.install!
 
@@ -118,9 +118,15 @@ Time.class_eval do
   alias_method :<=>, :compare_with_round
 end
 
-# temporary patch to keep things sane
-# TODO: actually fix the deprecation messages once we're on Rails 4 permanently and remove this
-ActiveSupport::Deprecation.silenced = !CANVAS_RAILS4_2
+# when dropping Rails 4.2, remove this block so that we can start addressing these
+# deprecation warnings
+unless CANVAS_RAILS4_2
+  module IgnoreActionControllerKWArgsWarning
+    def non_kwarg_request_warning; end
+  end
+  Rails::Controller::Testing::Integration.prepend(IgnoreActionControllerKWArgsWarning)
+  ActionDispatch::Integration::Session.prepend(IgnoreActionControllerKWArgsWarning)
+end
 
 # we use ivars too extensively for factories; prevent them from
 # being propagated to views in view specs
@@ -200,7 +206,6 @@ require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
 require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 
 require 'i18n_tasks'
-require 'handlebars_tasks'
 
 # if mocha was initialized before rails (say by another spec), CollectionProxy would have
 # undef_method'd them; we need to restore them
@@ -486,9 +491,10 @@ RSpec.configure do |config|
   #****************************************************************
 
   def login_as(username = "nobody@example.com", password = "asdfasdf")
-    post_via_redirect "/login",
+    post "/login",
                       "pseudonym_session[unique_id]" => username,
                       "pseudonym_session[password]" => password
+    follow_redirect! while response.redirect?
     assert_response :success
     expect(request.fullpath).to eq "/?login_success=1"
   end

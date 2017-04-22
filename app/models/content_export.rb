@@ -192,9 +192,27 @@ class ContentExport < ActiveRecord::Base
     begin
       reset_and_start_job_progress
 
-      @quizzes2 = Exporters::Quizzes2Exporter.new(self)
-      if @quizzes2.export
-        self.settings[:quizzes2] = @quizzes2.build_assignment_payload
+      @quiz_exporter = Exporters::Quizzes2Exporter.new(self)
+
+      if @quiz_exporter.export
+        self.update(
+          export_type: QTI,
+          selected_content: {
+            quizzes: {
+              create_key(@quiz_exporter.quiz) => true
+            }
+          }
+        )
+        self.settings[:quizzes2] = @quiz_exporter.build_assignment_payload
+        @cc_exporter = CC::CCExporter.new(self)
+      end
+
+      if @cc_exporter && @cc_exporter.export
+        self.update(
+          export_type: QUIZZES2
+        )
+        self.settings[:quizzes2][:qti_export] = {}
+        self.settings[:quizzes2][:qti_export][:url] = self.attachment.download_url
         self.progress = 100
         mark_exported
       end
@@ -234,10 +252,6 @@ class ContentExport < ActiveRecord::Base
 
   def master_migration
     @master_migration ||= MasterCourses::MasterMigration.find(settings[:master_migration_id])
-  end
-
-  def deletions
-    settings[:deletions]
   end
 
   def common_cartridge?
@@ -353,6 +367,7 @@ class ContentExport < ActiveRecord::Base
   def add_exported_asset(obj)
     if for_master_migration? && settings[:primary_master_migration]
       master_migration.master_template.ensure_tag_on_export(obj)
+      master_migration.add_exported_asset(obj)
     end
     return unless selective_export?
     return if qti_export? || epub_export.present? || quizzes2_export?

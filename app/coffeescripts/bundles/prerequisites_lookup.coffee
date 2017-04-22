@@ -1,2 +1,0 @@
-require ['prerequisites_lookup']
-

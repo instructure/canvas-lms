@@ -48,7 +48,7 @@ module.exports = function(onSuccess, onError) {
   };
 
   config.jsx = {
-    fileExtension: '.jsx',
+    fileExtension: '.js',
     moduleId: ''
   };
 

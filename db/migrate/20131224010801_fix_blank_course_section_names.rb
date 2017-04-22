@@ -4,7 +4,7 @@ class FixBlankCourseSectionNames < ActiveRecord::Migration[4.2]
 
   def self.up
     DataFixup::FixBlankCourseSectionNames.run
-    change_column_null_with_less_locking :course_sections, :name
+    change_column_null :course_sections, :name, false
   end
 
   def self.down

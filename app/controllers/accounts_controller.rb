@@ -151,7 +151,7 @@ class AccountsController < ApplicationController
       account_ids = Rails.cache.fetch(['admin_enrollment_course_account_ids', @current_user].cache_key) do
         Account.joins(:courses => :enrollments).merge(
           @current_user.enrollments.admin.shard(@current_user).except(:select)
-        ).select("accounts.id").uniq.pluck(:id).map{|id| Shard.global_id_for(id)}
+        ).select("accounts.id").distinct.pluck(:id).map{|id| Shard.global_id_for(id)}
       end
       course_accounts = BookmarkedCollection.wrap(Account::Bookmarker, Account.where(:id => account_ids))
       @accounts = Api.paginate(course_accounts, self, api_v1_accounts_url)
@@ -433,6 +433,20 @@ class AccountsController < ApplicationController
       includes = Array(params[:includes]) || []
       unauthorized = false
 
+      if params[:account].key?(:sis_account_id)
+        sis_id = params[:account].delete(:sis_account_id)
+        if @account.root_account.grants_right?(@current_user, session, :manage_sis) && !@account.root_account?
+          @account.sis_source_id = sis_id.presence
+        else
+          if @account.root_account?
+            @account.errors.add(:unauthorized, t('Cannot set sis_account_id on a root_account.'))
+          else
+            @account.errors.add(:unauthorized, t('To change sis_account_id the user must have manage_sis permission.'))
+          end
+          unauthorized = true
+        end
+      end
+
       if params[:account][:services]
         if authorized_action(@account, @current_user, :manage_account_settings)
           params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user, @account).keys).each do |key, value|
@@ -516,6 +530,10 @@ class AccountsController < ApplicationController
   #
   # @argument account[name] [String]
   #   Updates the account name
+  #
+  # @argument account[sis_account_id] [String]
+  #   Updates the account sis_account_id
+  #   Must have manage_sis permission and must not be a root_account.
   #
   # @argument account[default_time_zone] [String]
   #   The default time zone of the account. Allowed time zones are
@@ -680,7 +698,7 @@ class AccountsController < ApplicationController
       @available_reports = AccountReport.available_reports if @account.grants_right?(@current_user, @session, :read_reports)
       if @available_reports
         @account.shard.activate do
-          scope = @account.account_reports.where("report_type=name").most_recent
+          scope = @account.account_reports.active.where("report_type=name").most_recent
           @last_complete_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
                 LATERAL (#{scope.complete.to_sql}) account_reports ").
               order("report_types.name").

@@ -366,6 +366,7 @@ class DiscussionTopicsController < ApplicationController
         conditional_release_js_env(includes: :active_rules)
         append_sis_data(hash)
         js_env(hash)
+        set_tutorial_js_env
 
         if user_can_edit_course_settings?
           js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
@@ -404,7 +405,6 @@ class DiscussionTopicsController < ApplicationController
   def edit
     @topic ||= @context.all_discussion_topics.find(params[:id])
     if authorized_action(@topic, @current_user, (@topic.new_record? ? :create : :update))
-      return render_unauthorized_action if !@topic.new_record? && editing_restricted?(@topic)
       hash =  {
         URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
         PERMISSIONS: {
@@ -456,13 +456,10 @@ class DiscussionTopicsController < ApplicationController
       js_hash[:POST_TO_SIS] = post_to_sis
       js_hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @topic.new_record?
 
-      if @context.respond_to?(:assignments)
-        assignment = @context.assignments.first
-        js_hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(assignment)
-        js_hash[:MAX_NAME_LENGTH] = AssignmentUtil.assignment_max_name_length(assignment)
-        js_hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(assignment)
-        js_hash[:SIS_NAME] = AssignmentUtil.post_to_sis_friendly_name(assignment)
-      end
+      js_hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context)
+      js_hash[:MAX_NAME_LENGTH] = AssignmentUtil.assignment_max_name_length(@context)
+      js_hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)
+      js_hash[:SIS_NAME] = AssignmentUtil.post_to_sis_friendly_name(@context)
 
       if @context.is_a?(Course)
         js_hash['SECTION_LIST'] = sections.map { |section|
@@ -489,6 +486,7 @@ class DiscussionTopicsController < ApplicationController
       end
       js_env(js_hash)
 
+      set_master_course_js_env_data(@topic, @context)
       conditional_release_js_env(@topic.assignment)
 
       render :edit
@@ -633,6 +631,7 @@ class DiscussionTopicsController < ApplicationController
 
             append_sis_data(js_hash)
             js_env(js_hash)
+            set_master_course_js_env_data(@topic, @context)
             conditional_release_js_env(@topic.assignment, includes: [:rule])
           end
         end
@@ -850,7 +849,7 @@ class DiscussionTopicsController < ApplicationController
       feed.entries << entry.to_atom
     end
     respond_to do |format|
-      format.atom { render :text => feed.to_xml }
+      format.atom { render :plain => feed.to_xml }
     end
   end
 

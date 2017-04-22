@@ -73,7 +73,10 @@ SQL
     end
 
     def partition_exists?(table_name)
-      base_class.connection.table_exists?(table_name)
+      # CANVAS_RAILS5_0 - don't silence this deprecation in 5.1
+      ActiveSupport::Deprecation.silence do
+        base_class.connection.table_exists?(table_name)
+      end
     end
 
     def drop_partition(value)

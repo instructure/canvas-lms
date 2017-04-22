@@ -97,9 +97,10 @@ define [
         new RegExp rEscape(word), 'i'
       return results unless regexps.length
       _.filter results, (entry) ->
+        return false if entry.deleted
         concat = """
           #{entry.message}
-          #{entry.author.display_name} 
+          #{entry.author.display_name}
         """
         for regexp in regexps
           return false unless regexp.test concat

@@ -90,7 +90,7 @@ class QuestionBanksController < ApplicationController
             "INSERT INTO #{AssessmentQuestion.quoted_table_name} (#{(%w{assessment_question_bank_id created_at updated_at} + attributes).join(', ')})" +
             @questions.select(([@new_bank.id, now, now] + attributes).join(', ')).to_sql)
       else
-        @questions.update_all(:assessment_question_bank_id => @new_bank)
+        @questions.update_all(:assessment_question_bank_id => @new_bank.id)
       end
 
       [ @bank, @new_bank ].each(&:touch)

@@ -1,4 +1,4 @@
-<p>consumer key: <span id="consumer_key"><%= params[:oauth_consumer_key] %></span></p>
+<p>Consumer Key: <span id="consumer_key"><%= params[:oauth_consumer_key] %></span></p>
 
 <% if params[:ext_content_intended_use] == 'embed' || params[:ext_content_intended_use] == 'homework' %>
   <a id="image_link" class="link" href="<%= @return_url %>?return_type=image&url=/images/delete.png&width=16&height=16&alt=delete">image embed</a>

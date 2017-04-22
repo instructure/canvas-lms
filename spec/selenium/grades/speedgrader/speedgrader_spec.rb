@@ -586,6 +586,7 @@ describe 'Speedgrader' do
       f('#mute_link').click
       expect(f('#unmute_dialog').attribute('style')).not_to include('display: none')
       f('button.btn-unmute').click
+      expect(f('#unmute_dialog')).not_to contain_css('button.btn-unmute')
       @assignment.reload
       expect(@assignment.muted?).to be false
     end

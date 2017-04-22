@@ -36,7 +36,11 @@
       <button type="button" class="Button" id="show_all_details_button"><%= t("Show All Details") %></button>
     </div>
     <div id="assignments-not-weighted">
-      <%= render :partial => "courses/sidebar_weighting", :object => @presenter.groups %>
+      <% if @current_grading_period_id == 0 && @context.weighted_grading_periods? %>
+        <%= render :partial => "courses/sidebar_periods_weighting", :object => @presenter.grading_periods %>
+      <% else %>
+        <%= render :partial => "courses/sidebar_weighting", :object => @presenter.groups %>
+      <% end %>
       <% unless @presenter.no_calculations? %>
         <div id="only_consider_graded_assignments_wrapper" class="ic-Form-control ic-Form-control--checkbox">
           <input type="checkbox" id="only_consider_graded_assignments" checked="true"/>
@@ -186,27 +190,27 @@
       <td class="assignment_score" title="<%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>">
         <div style="position: relative; height: 100%;" class="score_holder">
           <span class="tooltip">
-            <span class="tooltip_wrap right">
-              <% if @presenter.editable? || assignment.special_class %>
-                <span class="tooltip_text score_teaser">
-                  <% if assignment.muted? %>
-                    <%= t(:student_mute_notification, "Instructor is working on grades") %>
-                  <% elsif submission.try :pending_review? %>
-                    <%= t(:grading_in_progress, "Instructor is working on grades") %>
-                  <% elsif assignment.special_class %>
-                    <%= t(:total, "Total") %>
-                  <% else %>
-                    <%= t(:click_to_change, "Click to test a different score") %>
-                  <% end %>
-                </span>
-              <% end %>
-            </span>
             <span
               class="grade"
               <% unless assignment_presenter.unchangeable? %>
                 tabindex="0"
               <% end %>
             >
+              <span class="tooltip_wrap right" aria-hidden="true">
+                <% if @presenter.editable? || assignment.special_class %>
+                  <span class="tooltip_text score_teaser">
+                    <% if assignment.muted? %>
+                      <%= t(:student_mute_notification, "Instructor is working on grades") %>
+                    <% elsif submission.try :pending_review? %>
+                      <%= t(:grading_in_progress, "Instructor is working on grades") %>
+                    <% elsif assignment.special_class %>
+                      <%= t(:total, "Total") %>
+                    <% else %>
+                      <%= t(:click_to_change, "Click to test a different score") %>
+                    <% end %>
+                  </span>
+                <% end %>
+              </span>
               <% if assignment.muted? %>
                 <i class="icon-muted" title="<%= t("#gradebooks.grade.muted", "Muted") %>"></i>
               <% else %>
@@ -272,6 +276,7 @@
         <a href="#"
           class="toggle_comments_link tooltip"
           aria-label="<%= t('Read comments') %>"
+          aria-describedby="comment_count_for_assignment_<%= assignment.id %>"
           <% if assignment_presenter.has_comments? && !assignment.muted? %>
             aria-expanded="false"
             aria-controls="comments_thread_<%= assignment.id %>"
@@ -282,7 +287,9 @@
             style='visibility: hidden;'
           <% end %>>
           <span class="tooltip_wrap right">
-            <span class="tooltip_text"><%= t("comment", count: n((submission.visible_submission_comments.size rescue 0))) %></span>
+            <span class="tooltip_text" id="comment_count_for_assignment_<%= assignment.id %>">
+              <%= t("comment", count: submission&.visible_submission_comments&.size || 0) %>
+            </span>
           </span>
           <i class="icon-discussion standalone-icon"></i>
         </a>
@@ -298,7 +305,7 @@
           tabindex='-1'
           style='visibility: hidden;'
         <% end %>
-          title="<%= t('View Scoring Details') %>">
+        >
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t("See scoring details") %></span>
           </span>
@@ -310,7 +317,6 @@
           aria-expanded='false'
           aria-controls="rubric_<%= assignment.id %>"
           tabindex='0'
-          title="<%= t('View Rubric Evaluation') %>"
           style="<%= 'visibility: hidden;' unless assignment_presenter.has_rubric_assessments? %>">
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t("See rubric results") %></span>

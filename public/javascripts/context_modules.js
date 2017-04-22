@@ -54,6 +54,7 @@ define([
 ], function(_, ModuleFile, PublishCloud, React, ReactDOM, PublishableModuleItem, PublishIconView, INST, I18n, $, Helper, CyoeHelper, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds) {
 
   // TODO: AMD don't export global, use as module
+  /*global modules*/
   window.modules = (function() {
     return {
       updateTaggedItems: function() {
@@ -62,7 +63,7 @@ define([
       currentIndent: function($item) {
         var classes = $item.attr('class').split(/\s/);
         var indent = 0;
-        for (idx = 0; idx < classes.length; idx++) {
+        for (var idx = 0; idx < classes.length; idx++) {
           if(classes[idx].match(/^indent_/)) {
             var new_indent = parseInt(classes[idx].substring(7), 10);
             if(!isNaN(new_indent)) {
@@ -71,6 +72,20 @@ define([
           }
         }
         return indent;
+      },
+
+      addModule: function() {
+        var $module = $("#context_module_blank").clone(true).attr('id', 'context_module_new');
+        $("#context_modules").append($module);
+        var opts = modules.sortable_module_options;
+        opts['update'] = modules.updateModuleItemPositions;
+        $module.find(".context_module_items").sortable(opts);
+        $("#context_modules.ui-sortable").sortable('refresh');
+        $("#context_modules .context_module .context_module_items.ui-sortable").each(function() {
+          $(this).sortable('refresh');
+          $(this).sortable('option', 'connectWith', '.context_module_items');
+        });
+        modules.editModule($module);
       },
 
       updateModulePositions: function() {
@@ -182,10 +197,10 @@ define([
       updateAssignmentData: function(callback) {
         return $.ajaxJSON($(".assignment_info_url").attr('href'), 'GET', {}, function(data) {
           $.each(data, function(id, info) {
-            $context_module_item = $("#context_module_item_" + id);
+            var $context_module_item = $("#context_module_item_" + id);
             var data = {};
             if (info["points_possible"] != null) {
-              data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', {'points': "" + info["points_possible"]});
+              data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', {'points': I18n.n(info["points_possible"])});
             }
             if (info["due_date"] != null) {
               if (info["past_due"] != null) {
@@ -242,7 +257,7 @@ define([
 
       updateAllItemInstances: function(content_tag) {
         $(".context_module_item."+modules.itemClass(content_tag)+" .title").each(function() {
-          $this = $(this);
+          var $this = $(this);
           $this.text(content_tag.title);
           $this.attr('title', content_tag.title);
         });
@@ -421,7 +436,7 @@ define([
           .find(".completion_entry .no_items_message").hide().end()
           .find(".add_completion_criterion_link").showIf(!no_items);
 
-        // Set no items or criteria message plus diasable elements if there are no items or no requirements
+        // Set no items or criteria message plus disable elements if there are no items or no requirements
         if (no_items) {
           $form.find(".completion_entry .no_items_message").show();
         }
@@ -453,6 +468,10 @@ define([
           close: function() {
             modules.hideEditModule(true);
             $toFocus.focus();
+            var $contextModules = $("#context_modules .context_module");
+            if ($contextModules.length) {
+              $('#context_modules_sortable_container').removeClass('item-group-container--is-empty');
+            }
           },
           open: function(){
             $(this).find('input[type=text],textarea,select').first().focus();
@@ -583,7 +602,7 @@ define([
       refreshModuleList: function() {
         $("#module_list").find(".context_module_option").remove();
         $("#context_modules .context_module").each(function() {
-          $this = $(this);
+          var $this = $(this);
           var data = $this.find(".header").getTemplateData({textValues: ['name']});
           data.id = $this.find(".header").attr('id');
           $this.find('.name').attr('title', data.name);
@@ -738,9 +757,8 @@ define([
   })();
 
   var addIcon = function($icon_container, css_class, message) {
-    var $icon = $("<i data-tooltip><span class='screenreader-only'></span></i>");
+    var $icon = $("<i data-tooltip></i>");
     $icon.attr('class', css_class).attr('title', message).attr('aria-label', message);
-    $icon.find('span').html(htmlEscape(message));
     $icon_container.empty().append($icon);
   }
 
@@ -809,7 +827,7 @@ define([
     var $context_module_unlocked_at = $("#context_module_unlock_at");
     var valCache = '';
     $("#unlock_module_at").change(function() {
-      $this = $(this);
+      var $this = $(this);
       var $unlock_module_at_details = $(".unlock_module_at_details");
       $unlock_module_at_details.showIf($this.attr('checked'));
 
@@ -936,7 +954,7 @@ define([
         // new module, setup publish icon and other stuff
         if (!$publishIcon.data('id')) {
           var fixLink = function(locator, attribute) {
-              el = $module.find(locator);
+              var el = $module.find(locator);
               el.attr(attribute, el.attr(attribute).replace('{{ id }}', data.context_module.id));
           }
           fixLink('span.collapse_module_link', 'href');
@@ -999,6 +1017,7 @@ define([
       var prereqs = modules.prerequisites();
       var $optgroups = {};
       $module.find(".content .context_module_item").not('.context_module_sub_header').each(function() {
+        var displayType;
         var data = $(this).getTemplateData({textValues: ['id', 'title', 'type']});
         if (data.type == 'assignment') {
           displayType = I18n.t('optgroup.assignments', "Assignments");
@@ -1306,17 +1325,7 @@ define([
 
     $(".add_module_link").live('click', function(event) {
       event.preventDefault();
-      var $module = $("#context_module_blank").clone(true).attr('id', 'context_module_new');
-      $("#context_modules").append($module);
-      var opts = modules.sortable_module_options;
-      opts['update'] = modules.updateModuleItemPositions;
-      $module.find(".context_module_items").sortable(opts);
-      $("#context_modules.ui-sortable").sortable('refresh');
-      $("#context_modules .context_module .context_module_items.ui-sortable").each(function() {
-        $(this).sortable('refresh');
-        $(this).sortable('option', 'connectWith', '.context_module_items');
-      });
-      modules.editModule($module);
+      modules.addModule();
     });
 
     $(".add_module_item_link").on('click', function(event) {
@@ -1733,6 +1742,7 @@ define([
     // This will also return the element that is now in focus
     var selectItem = function (options) {
       options = options || {};
+      var $elem;
 
       if (!$currentElem) {
         $elem = $('.context_module:first');
@@ -1795,8 +1805,8 @@ define([
     $document.keycodes('e d space', function(event) {
       if (!$currentElem) return;
 
-      $elem = getClosestModuleOrItem($currentElem);
-      $hasClassItemHover = $elem.hasClass('context_module_item_hover');
+      var $elem = getClosestModuleOrItem($currentElem);
+      var $hasClassItemHover = $elem.hasClass('context_module_item_hover');
 
       if(event.keyString == 'e') {
         $hasClassItemHover ? $currentElem.find(".edit_item_link:first").click() : $currentElem.find(".edit_module_link:first").click();
@@ -1962,6 +1972,7 @@ define([
     var $contextModules = $("#context_modules .context_module");
     if (!$contextModules.length) {
       $('#no_context_modules_message').show();
+      $('#context_modules_sortable_container').addClass('item-group-container--is-empty');
     }
     $contextModules.each(function() {
       modules.updateProgressionState($(this));

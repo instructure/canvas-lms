@@ -1,1 +1,0 @@
-require ['account_statistics']

@@ -43,7 +43,7 @@ define([], function(){
   };
 
   QuizFormulaSolution.prototype._appropriateSolutionValue = function(){
-    rawVal = this.rawValue();
+    var rawVal = this.rawValue();
     return !!(rawVal == 0 || rawVal);
   };
 

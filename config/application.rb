@@ -20,15 +20,18 @@ Bundler.require(*Rails.groups)
 
 module CanvasRails
   class Application < Rails::Application
-    config.autoload_paths += [config.root.join('lib').to_s]
     $LOAD_PATH << config.root.to_s
     config.encoding = 'utf-8'
-    require_dependency 'logging_filter'
+    require 'logging_filter'
     config.filter_parameters.concat LoggingFilter.filtered_parameters
     config.action_dispatch.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
     config.action_dispatch.rescue_responses['AuthenticationMethods::LoggedOutError'] = 401
     config.action_dispatch.default_headers['X-UA-Compatible'] = "IE=Edge,chrome=1"
     config.action_dispatch.default_headers.delete('X-Frame-Options')
+    unless CANVAS_RAILS4_2
+      config.action_controller.forgery_protection_origin_check = true
+      ActiveSupport.to_time_preserves_timezone = true
+    end
 
     config.app_generators do |c|
       c.test_framework :rspec
@@ -85,14 +88,8 @@ module CanvasRails
 
     config.active_support.encode_big_decimal_as_string = false
 
-    config.autoload_paths += %W(#{Rails.root}/app/middleware
-                            #{Rails.root}/app/observers
-                            #{Rails.root}/app/presenters
-                            #{Rails.root}/app/services
-                            #{Rails.root}/app/serializers
-                            #{Rails.root}/app/presenters)
-
-    config.autoload_once_paths << Rails.root.join("app/middleware")
+    config.paths['lib'].eager_load!
+    config.paths.add('app/middleware', eager_load: true, autoload_once: true)
 
     # prevent directory->module inference in these directories from wreaking
     # havoc on the app (e.g. stylesheets/base -> ::Base)
@@ -259,6 +256,11 @@ module CanvasRails
     if config.action_dispatch.rack_cache != false
       config.action_dispatch.rack_cache[:ignore_headers] =
         %w[Set-Cookie X-Request-Context-Id X-Canvas-User-Id X-Canvas-Meta]
+    end
+
+    def validate_secret_key_config!
+      # no validation; we don't use Rails' CookieStore session middleware, so we
+      # don't care about secret_key_base
     end
   end
 end

@@ -172,31 +172,6 @@ module ApplicationHelper
     @wiki_sidebar_data
   end
 
-  # js_block captures the content of what you pass it and render_js_blocks will
-  # render all of the blocks that were captured by js_block inside of a <script> tag
-  # if you are in the development environment it will also print out a javascript // comment
-  # that shows the file and line number of where this block of javascript came from.
-  def js_block(options = {}, &block)
-    js_blocks << options.merge(
-      :file_and_line => block.to_s,
-      :contents => capture(&block)
-    )
-  end
-
-  def js_blocks; @js_blocks ||= []; end
-
-  def render_js_blocks
-    output = js_blocks.inject('') do |str, e|
-      # print file and line number for debugging in development mode.
-      value = ""
-      value << "<!-- BEGIN SCRIPT BLOCK FROM: " + e[:file_and_line] + " --> \n" if Rails.env.development?
-      value << e[:contents]
-      value << "<!-- END SCRIPT BLOCK FROM: " + e[:file_and_line] + " --> \n" if Rails.env.development?
-      str << value
-    end
-    raw(output)
-  end
-
   def hidden_dialog(id, &block)
     content = capture(&block)
     if !Rails.env.production? && hidden_dialogs[id] && hidden_dialogs[id] != content
@@ -224,20 +199,10 @@ module ApplicationHelper
 
   # See `js_base_url`
   def use_optimized_js?
-    if ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
-      # allows overriding by adding ?debug_assets=1 or ?debug_js=1 to the url
-      use_webpack? || !(params[:debug_assets] || params[:debug_js])
+    if params.key?(:optimized_js)
+      params[:optimized_js] == 'true' || params[:optimized_js] == '1'
     else
-      # allows overriding by adding ?optimized_js=1 to the url
-      params[:optimized_js] || false
-    end
-  end
-
-  def use_webpack?
-    if CANVAS_WEBPACK
-      !(params[:require_js])
-    else
-      params[:webpack]
+      ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
     end
   end
 
@@ -252,39 +217,26 @@ module ApplicationHelper
   #   * when ENV['USE_OPTIMIZED_JS'] is false
   #   * or when ?debug_assets=true is present in the url
   def js_base_url
-    if use_webpack?
-      use_optimized_js? ? '/dist/webpack-production' : '/dist/webpack-dev'
-    else
-      use_optimized_js? ? '/optimized' : '/javascripts'
-    end.freeze
+    (use_optimized_js? ? '/dist/webpack-production' : '/dist/webpack-dev').freeze
   end
 
   # Returns a <script> tag for each registered js_bundle
   def include_js_bundles
-    if use_webpack?
+    # This contains the webpack runtime, it needs to be loaded first
+    paths = ["#{js_base_url}/vendor"]
 
-      # This contains the webpack runtime, it needs to be loaded first
-      paths = ["#{js_base_url}/vendor"]
+    # We preemptive load these timezone/locale data files so they are ready
+    # by the time our app-code runs and so webpack doesn't need to know how to load them
+    paths << "/javascripts/vendor/timezone/#{js_env[:TIMEZONE]}.js" if js_env[:TIMEZONE]
+    paths << "/javascripts/vendor/timezone/#{js_env[:CONTEXT_TIMEZONE]}.js" if js_env[:CONTEXT_TIMEZONE]
+    paths << "/javascripts/vendor/timezone/#{js_env[:BIGEASY_LOCALE]}.js" if js_env[:BIGEASY_LOCALE]
+    paths << "#{js_base_url}/moment/locale/#{js_env[:MOMENT_LOCALE]}" if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != 'en'
 
-      # We preemptive load these timezone/locale data files so they are ready
-      # by the time our app-code runs and so webpack doesn't need to know how to load them
-      paths << "/javascripts/vendor/timezone/#{js_env[:TIMEZONE]}.js" if js_env[:TIMEZONE]
-      paths << "/javascripts/vendor/timezone/#{js_env[:CONTEXT_TIMEZONE]}.js" if js_env[:CONTEXT_TIMEZONE]
-      paths << "/javascripts/vendor/timezone/#{js_env[:BIGEASY_LOCALE]}.js" if js_env[:BIGEASY_LOCALE]
-      paths << "#{js_base_url}/moment/locale/#{js_env[:MOMENT_LOCALE]}" if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != 'en'
-
-      paths << "#{js_base_url}/appBootstrap"
-      paths << "#{js_base_url}/common"
-    else
-      paths = []
-    end
+    paths << "#{js_base_url}/appBootstrap"
+    paths << "#{js_base_url}/common"
 
     js_bundles.each do |(bundle, plugin)|
-      if use_webpack?
-        paths << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}"
-      else
-        paths << "#{js_base_url}#{plugin ? "/plugins/#{plugin}" : ''}/compiled/bundles/#{bundle}.js"
-      end
+      paths << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}"
     end
     javascript_include_tag(*paths, type: nil)
   end
@@ -988,16 +940,26 @@ module ApplicationHelper
   end
 
   def tutorials_enabled?
-    @domain_root_account.try(:feature_enabled?, :new_user_tutorial)
+    @domain_root_account&.feature_enabled?(:new_user_tutorial) &&
+    @current_user&.feature_enabled?(:new_user_tutorial_on_off)
   end
 
   def set_tutorial_js_env
     return if @js_env && @js_env[:NEW_USER_TUTORIALS]
 
     is_enabled = @context.is_a?(Course) &&
-      @context.grants_right?(@current_user, session, :manage) &&
-      tutorials_enabled?
+      tutorials_enabled? &&
+      @context.grants_right?(@current_user, session, :manage)
 
     js_env NEW_USER_TUTORIALS: {is_enabled: is_enabled}
   end
+
+  def planner_enabled?
+    @domain_root_account&.feature_enabled?(:student_planner)
+  end
+
+  def show_planner?
+    @current_user.preferences[:dashboard_view] == 'planner'
+  end
+
 end

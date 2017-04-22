@@ -69,7 +69,7 @@ module Api::V1::ContentMigration
     end
 
     # For easier auditing for support requests
-    if Account.site_admin.grants_right?(current_user, :manage_courses)
+    if Account.site_admin.grants_right?(current_user, :read)
       json[:audit_info] = migration.respond_to?(:slice) &&
                           migration.slice(:id,
                                           :user_id,

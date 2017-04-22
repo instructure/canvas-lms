@@ -2,7 +2,9 @@ define [
   'axios'
   'helpers/fakeENV',
   'compiled/api/gradingPeriodSetsApi'
-], (axios, fakeENV, api) ->
+  'jquery'
+  'jquery.ajaxJSON'
+], (axios, fakeENV, api, $) ->
   deserializedSets = [
     {
       id: '1',

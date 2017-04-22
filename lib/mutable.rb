@@ -62,7 +62,7 @@ module Mutable
 
   def show_stream_items
     if self.respond_to? :submissions
-      submissions        = submissions(:include => {:hidden_submission_comments => :author})
+      submissions        = self.submissions.preload(hidden_submission_comments: :author)
       stream_items = StreamItem.select([:id, :context_type, :context_id]).
           where(:asset_type => 'Submission', :asset_id => submissions).
           preload(:context).to_a

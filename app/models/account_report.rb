@@ -37,6 +37,13 @@ class AccountReport < ActiveRecord::Base
 
   scope :complete, -> { where(progress: 100) }
   scope :most_recent, -> { order(updated_at: :desc).limit(1) }
+  scope :active, -> { where.not(workflow_state: 'deleted') }
+
+  alias_method :destroy_permanently!, :destroy
+  def destroy
+    self.workflow_state = 'deleted'
+    save!
+  end
 
   def context
     self.account

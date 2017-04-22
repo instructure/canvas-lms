@@ -7,7 +7,7 @@ define([
 
   var quizRubric = {
     ready: function() {
-      $dialog = $("#rubrics.rubric_dialog");
+      var $dialog = $("#rubrics.rubric_dialog");
       $dialog.dialog({
         title: I18n.t('titles.details', "Assignment Rubric Details"),
         width: 600,

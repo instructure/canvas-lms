@@ -123,11 +123,9 @@ class SubmissionsController < ApplicationController
         format.html
         format.json do
           @submission.limit_comments(@current_user, session)
-          excludes = @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score] : []
           render :json => @submission.as_json(
             Submission.json_serialization_full_parameters(
-              exclude: excludes,
-              except: %w(quiz_submission submission_history)
+              except: %i(quiz_submission submission_history)
             ).merge(permissions: {
               user: @current_user,
               session: session,
@@ -510,7 +508,7 @@ class SubmissionsController < ApplicationController
   private :legacy_plagiarism_report
 
   def plagiarism_report(type)
-    return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
+    return head(:bad_request) unless params_are_integers?(:assignment_id, :submission_id)
 
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
@@ -533,11 +531,12 @@ class SubmissionsController < ApplicationController
   private :plagiarism_report
 
   def resubmit_to_plagiarism(type)
-    return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
+    return head 400 unless params_are_integers?(:assignment_id, :submission_id)
 
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
       @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
+      Canvas::LiveEvents.plagiarism_resubmit(@submission)
 
       if type == 'vericite'
         # VeriCite
@@ -553,7 +552,7 @@ class SubmissionsController < ApplicationController
           flash[:notice] = message
           redirect_to named_context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id)
         }
-        format.json { render :nothing => true, :status => :no_content }
+        format.json { head :no_content }
       end
     end
   end
@@ -567,7 +566,12 @@ class SubmissionsController < ApplicationController
 
     if params[:submission][:student_entered_score] && @submission.grants_right?(@current_user, session, :comment)
       update_student_entered_score(params[:submission][:student_entered_score])
-      render :json => @submission
+
+      render json: @submission.as_json(permissions: {
+        user: @current_user,
+        session: session,
+        include_permissions: false
+      })
       return
     end
 
@@ -620,7 +624,6 @@ class SubmissionsController < ApplicationController
           format.html { redirect_to course_assignment_url(@context, @assignment) }
 
           json_args = Submission.json_serialization_full_parameters({
-            :exclude => @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score, :turnitin_data] : [],
             :except => [:quiz_submission,:submission_history],
             :comments => admin_in_context ? :submission_comments : :visible_submission_comments
           }).merge(:permissions => { :user => @current_user, :session => session, :include_permissions => false })

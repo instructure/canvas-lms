@@ -80,8 +80,7 @@ describe "Gradezilla - message students who" do
 
     gradezilla_page.visit(@course)
     # set grade for first student, 3rd assignment
-    # l4 because the the first two columns are part of the same grid
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l4', 0)
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l3', 0)
     gradezilla_page.open_assignment_options(2)
 
     # expect dialog to show 1 more student with the "Haven't been graded" option
@@ -200,12 +199,12 @@ describe "Gradezilla - message students who" do
     message_form.find_element(:css, '.cutoff_score').send_keys('3') # both assignments have score of 5
     message_form.find_element(:css, '#body').send_keys(message_text)
 
-    expect(f('#message_students_dialog .student_list')).to_not include_text(@student_1.name)
+    expect(f('#message_students_dialog .student_list')).not_to include_text(@student_1.name)
 
     submit_form(message_form)
     wait_for_ajax_requests
     run_jobs
 
-    expect(ConversationBatch.last.recipient_ids).to_not include(@student_1.id)
+    expect(ConversationBatch.last.recipient_ids).not_to include(@student_1.id)
   end
 end

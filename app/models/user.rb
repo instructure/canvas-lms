@@ -34,6 +34,7 @@ class User < ActiveRecord::Base
   attr_accessor :previous_id, :menu_data, :gradebook_importer_submissions, :prior_enrollment
 
   before_save :infer_defaults
+  after_create :set_default_feature_flags
   serialize :preferences
   include TimeZoneHelper
   time_zone_attribute :time_zone
@@ -138,7 +139,6 @@ class User < ActiveRecord::Base
   has_many :gradebook_csvs, dependent: :destroy
 
   has_one :profile, :class_name => 'UserProfile'
-  alias :orig_profile :profile
 
   has_many :progresses, :as => :context, :inverse_of => :context
 
@@ -319,7 +319,7 @@ class User < ActiveRecord::Base
   after_save :self_enroll_if_necessary
 
   def courses_for_enrollments(enrollment_scope)
-    Course.active.joins(:all_enrollments).merge(enrollment_scope.except(:joins)).uniq
+    Course.active.joins(:all_enrollments).merge(enrollment_scope.except(:joins)).distinct
   end
 
   def courses
@@ -478,7 +478,7 @@ class User < ActiveRecord::Base
             Enrollment.where("workflow_state<>'deleted' AND type<>'StudentViewEnrollment'").
                 where(:user_id => shard_user_ids).
                 select([:user_id, :course_id, :course_section_id]).
-                uniq.to_a
+                distinct.to_a
 
         # probably a lot of dups, so more efficient to use a set than uniq an array
         course_section_ids = Set.new
@@ -494,9 +494,9 @@ class User < ActiveRecord::Base
 
         data[:courses] += Course.select([:id, :account_id]).where(:id => course_ids.to_a).to_a unless course_ids.empty?
 
-        data[:pseudonyms] += Pseudonym.active.select([:user_id, :account_id]).uniq.where(:user_id => shard_user_ids).to_a
+        data[:pseudonyms] += Pseudonym.active.select([:user_id, :account_id]).distinct.where(:user_id => shard_user_ids).to_a
         AccountUser.unscoped do
-          data[:account_users] += AccountUser.select([:user_id, :account_id]).uniq.where(:user_id => shard_user_ids).to_a
+          data[:account_users] += AccountUser.select([:user_id, :account_id]).distinct.where(:user_id => shard_user_ids).to_a
         end
       end
       # now make it easy to get the data by user id
@@ -725,6 +725,10 @@ class User < ActiveRecord::Base
     true
   end
 
+  def set_default_feature_flags
+    self.enable_feature!(:new_user_tutorial_on_off)
+  end
+
   def sortable_name
     self.sortable_name = read_attribute(:sortable_name) ||
         User.last_name_first(self.name, likely_already_surname_first: false)
@@ -860,7 +864,7 @@ class User < ActiveRecord::Base
 
   # avoid extraneous callbacks when enrolled in multiple sections
   def delete_enrollments(enrollment_scope=self.enrollments)
-    courses_to_update = enrollment_scope.active.uniq.pluck(:course_id)
+    courses_to_update = enrollment_scope.active.distinct.pluck(:course_id)
     Enrollment.suspend_callbacks(:update_cached_due_dates) do
       enrollment_scope.each{ |e| e.destroy }
     end
@@ -886,8 +890,8 @@ class User < ActiveRecord::Base
         # student view user won't be cross shard, so that will still be the
         # right shard
         enrollment_scope = fake_student? ? self.enrollments : root_account.enrollments.where(user_id: self)
-        user_observer_scope = self.user_observers(self)
-        user_observee_scope = self.user_observees(self)
+        user_observer_scope = self.user_observers.shard(self)
+        user_observee_scope = self.user_observees.shard(self)
         pseudonym_scope = root_account.pseudonyms.active.where(user_id: self)
 
         account_users = root_account.account_users.where(user_id: self).to_a +
@@ -1537,7 +1541,7 @@ class User < ActiveRecord::Base
         expecting_submission.
         where(:moderated_grading => true).
         where("assignments.grades_published_at IS NULL").
-        joins(:provisional_grades).uniq.preload(:context).
+        joins(:provisional_grades).distinct.preload(:context).
         need_grading_info.
         lazy.select{|a| a.context.grants_right?(self, :moderate_grades)}.take(opts[:limit]).to_a
     end
@@ -1674,7 +1678,7 @@ class User < ActiveRecord::Base
       current_and_concluded.
       where(user_id: self).
       joins(:course).
-      uniq.
+      distinct.
       pluck(:account_id)
 
     longest_chain = [in_root_account]
@@ -2314,7 +2318,7 @@ class User < ActiveRecord::Base
     @roles = Rails.cache.fetch(['user_roles_for_root_account3', self, root_account].cache_key) do
       roles = ['user']
 
-      enrollment_types = root_account.all_enrollments.where(user_id: self, workflow_state: 'active').uniq.pluck(:type)
+      enrollment_types = root_account.all_enrollments.where(user_id: self, workflow_state: 'active').distinct.pluck(:type)
       roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
       roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
       roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
@@ -2607,7 +2611,11 @@ class User < ActiveRecord::Base
   end
 
   def profile(force_reload = false)
-    orig_profile(force_reload) || build_profile
+    if CANVAS_RAILS4_2
+      super(force_reload) || build_profile
+    else
+      (force_reload ? reload_profile : super) || build_profile
+    end
   end
 
   def parse_otp_remember_me_cookie(cookie)

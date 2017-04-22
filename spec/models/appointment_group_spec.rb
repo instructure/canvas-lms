@@ -476,6 +476,19 @@ describe AppointmentGroup do
       enrollment.conclude
       expect(@ag.reload.available_slots).to eql 4
     end
+
+    it "should not cancel a slot for a user if they have another active enrollment" do
+      enrollment1 = student_in_course(:course => @course, :active_all => true)
+      cs = @course.course_sections.create!
+      enrollment2 = @course.enroll_student(@student, :section => cs, :allow_multiple_enrollments => true, :enrollment_state => 'active')
+
+      @appointment.reserve_for(@student, @teacher)
+      expect(@ag.reload.available_slots).to eql 3
+      enrollment1.conclude
+      expect(@ag.reload.available_slots).to eql 3
+      enrollment2.conclude
+      expect(@ag.reload.available_slots).to eql 4
+    end
   end
 
   context "possible_participants" do
@@ -530,6 +543,21 @@ describe AppointmentGroup do
       expect(@ag.possible_participants(registration_status: 'registered')).to eql [@group1]
       expect(@ag.possible_participants(registration_status: 'unregistered')).to eql [@group2]
     end
+  end
+
+  it "should restrict instructors by section" do
+    course_factory(:active_all => true)
+    unrestricted_teacher = @teacher
+    limited_teacher1 = user_factory(:active_all => true)
+    @course.enroll_teacher(limited_teacher1, :limit_privileges_to_course_section => true, :enrollment_state => 'active')
+
+    section2 = @course.course_sections.create!
+    limited_teacher2 = user_factory(:active_all => true)
+    @course.enroll_teacher(limited_teacher2, :section => section2, :limit_privileges_to_course_section => true, :enrollment_state => 'active')
+
+    @ag = AppointmentGroup.create!(:title => "test", :contexts => [@course])
+    @ag.appointment_group_sub_contexts.create! :sub_context => section2
+    expect(@ag.instructors).to match_array([unrestricted_teacher, limited_teacher2])
   end
 
   context "#requiring_action?" do

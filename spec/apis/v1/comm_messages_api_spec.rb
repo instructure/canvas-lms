@@ -34,6 +34,7 @@ describe CommMessagesApiController, type: :request do
             :controller => 'comm_messages_api', :action => 'index', :format => 'json',
             :user_id => @test_user.to_param })
           expect(json.size).to eql 2
+          expect(json.first['from']).to eq "Instructure Canvas"
           expect(json.map {|m| m['body'] }.sort).to eql ['account message', 'site admin message']
         end
 

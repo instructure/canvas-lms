@@ -112,7 +112,7 @@
 
       <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
       <div class="header-group-right">
-        <% if can_do(@quiz, @current_user, :update) && !editing_restricted?(@quiz) %>
+        <% if can_do(@quiz, @current_user, :update) %>
         <a href="<%= edit_course_quiz_path(@context, @quiz) %>" class='btn edit_assignment_link quiz-edit-button' role='button'>
           <i class="icon-edit"></i> <%= admin_edit_title %>
         </a>

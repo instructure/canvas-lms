@@ -122,7 +122,7 @@ class SplitUsers
       transfer_enrollment_data(source_user, user, Course.where(id: courses))
 
       account_users_ids = records.where(context_type: 'AccountUser').pluck(:context_id)
-      AccountUser.where(id: account_users_ids).update_all(user_id: user)
+      AccountUser.where(id: account_users_ids).update_all(user_id: user.id)
       restore_worklow_states_from_records(records)
     end
 
@@ -136,7 +136,7 @@ class SplitUsers
       # move moved communication channels back
       max_position = user.communication_channels.last.try(:position) || 0
       scope = source_user.communication_channels.where(id: cc_records.where(previous_user_id: user).pluck(:context_id))
-      scope.update_all(["user_id=?, position=position+?", user, max_position]) unless scope.empty?
+      scope.update_all(["user_id=?, position=position+?", user.id, max_position]) unless scope.empty?
 
       cc_records.where.not(previous_workflow_state: 'non existent').each do |cr|
         CommunicationChannel.where(id: cr.context_id).update_all(workflow_state: cr.previous_workflow_state)
@@ -148,8 +148,8 @@ class SplitUsers
       not_obs = UserObserver.where(user_id: [source_user, user], observer_id: [source_user, user])
       obs = UserObserver.where(id: records.pluck(:context_id)).where.not(id: not_obs)
 
-      source_user.user_observers.where(id: obs).update_all(user_id: user)
-      source_user.user_observees.where(id: obs).update_all(observer_id: user)
+      source_user.user_observers.where(id: obs).update_all(user_id: user.id)
+      source_user.user_observees.where(id: obs).update_all(observer_id: user.id)
     end
 
     def move_attachments(source_user, user, records)

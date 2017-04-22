@@ -38,7 +38,10 @@ define [
 
         # Get alt attributes from IMG nodes
         else if elem.nodeName is 'IMG' && elem.className is 'equation_image'
-          elem.alt
+          if elem.dataset.equationContent
+            elem.dataset.equationContent
+          else
+            elem.alt
 
         # Traverse everything else, except comment nodes
         else if elem.nodeType isnt 8
@@ -173,12 +176,14 @@ define [
       event.preventDefault()
 
       text = @getEquation()
+      altText = "LaTeX: #{ text }"
       url = "/equation_images/#{ encodeURIComponent escape text }"
       $img = $(document.createElement('img')).attr
         src: url
-        alt: text
+        alt: altText
         title: text
         class: 'equation_image'
+        'data-equation-content': text
       $div = $(document.createElement('div')).append($img)
 
       @restoreCaret()

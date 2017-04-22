@@ -61,7 +61,7 @@ module Lti
         expect(response.code).to eq '401'
       end
 
-      it 'requires an active developer key' do
+      it 'requires the developer key to be active' do
         @request.headers.merge!(request_headers)
         developer_key.deactivate
         get :index, format: :json

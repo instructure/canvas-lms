@@ -31,6 +31,7 @@ describe 'creating a quiz' do
         unlock_at_a = default_time_for_unlock_date(now.advance(days: -3))
         lock_at_a = default_time_for_lock_date(now.advance(days: 3))
 
+        select_first_override_section(@section_a.name)
         assign_dates_for_first_override_section(
           due_at: due_at_a,
           unlock_at: unlock_at_a,
@@ -43,16 +44,13 @@ describe 'creating a quiz' do
         lock_at_b = default_time_for_lock_date(now.advance(days: 5))
 
         add_override
+        select_last_override_section(@section_b.name)
         assign_dates_for_last_override_section(
           due_at: due_at_b,
           unlock_at: unlock_at_b,
           lock_at: lock_at_b
         )
 
-        # Must select sections after setting dates in order to avoid intermittent failure.
-        # Workaround is to set the dates using the date-selector tools.
-        select_first_override_section(@section_a.name)
-        select_last_override_section(@section_b.name)
         save_settings
 
         # verify default section due date & availability dates

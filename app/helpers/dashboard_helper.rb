@@ -21,6 +21,14 @@ module DashboardHelper
     @current_user.preferences[:recent_activity_dashboard].present?
   end
 
+  def show_dashboard_cards?
+    if planner_enabled?
+      show_planner?
+    else
+      show_recent_activity?
+    end
+  end
+
   def show_welcome_message?
     @current_user.present? && !@current_user.has_active_enrollment?
   end

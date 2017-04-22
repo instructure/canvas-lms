@@ -4,9 +4,13 @@
     <textarea name="description">{{description}}</textarea>
   </p>
   <p>
+   <label>
     {{checkbox "max_participants_option" id=null}}
-    {{#t "slot_limit"}}Limit this slot to{{/t}}
-    <input type="number" name="max_participants" class="max-participants" min="1" disabled>
-    {{#t "users"}}users.{{/t}}
+    {{#ifEqual calendarEvent.participant_type "Group"}}
+      {{#t}}Limit this slot to <input type="number" name="max_participants" class="max-participants" min="1" disabled> groups.{{/t}}
+    {{else}}
+      {{#t}}Limit this slot to <input type="number" name="max_participants" class="max-participants" min="1" disabled> users.{{/t}}
+    {{/ifEqual}}
+   </label>
   </p>
 </form>

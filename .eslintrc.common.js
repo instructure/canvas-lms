@@ -5,10 +5,12 @@
 
 module.exports = {
   globals: {
-    "ENV": true
+    ENV: true,
+    INST: true,
   },
   plugins: [
-    "promise"
+    "promise",
+    "import"
   ],
   // 0 - off, 1 - warning, 2 - error
   rules: {
@@ -23,14 +25,14 @@ module.exports = {
     "object-curly-spacing": [0],
     "semi": [0],
     "space-before-function-paren": [2, "always"],
-    "import/no-amd": [0],
 
     // allows 'i18n!webzip_exports' and 'compiled/foo/bar'
     "import/no-extraneous-dependencies": [0],
     "import/named": [2],
     "import/no-unresolved": [0],
     "import/no-webpack-loader-syntax": [0],
-
+    "import/no-commonjs": [2],
+    "react/jsx-filename-extension": [2, { "extensions": [".js"] }],
     "import/extensions": [1, { "js": "never", "jsx": "never", "json": "always" }],
     "promise/avoid-new": [0],
   }

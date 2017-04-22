@@ -172,7 +172,7 @@ describe Conversation do
         @shard1.activate do
           users << user_factory(:name => 'd')
           conversation.add_participants(users.first, [users.last])
-          expect(conversation.conversation_participants(:reload).size).to eq 4
+          expect(conversation.conversation_participants.reload.size).to eq 4
           expect(conversation.conversation_participants.all? { |cp| cp.shard == Shard.default }).to be_truthy
           expect(users.last.all_conversations.last.shard).to eq @shard1
           expect(conversation.participants(true).map(&:id)).to eq users.map(&:id)
@@ -180,7 +180,7 @@ describe Conversation do
         @shard2.activate do
           users << user_factory(:name => 'e')
           conversation.add_participants(users.first, users[-2..-1])
-          expect(conversation.conversation_participants(:reload).size).to eq 5
+          expect(conversation.conversation_participants.reload.size).to eq 5
           expect(conversation.conversation_participants.all? { |cp| cp.shard == Shard.default }).to be_truthy
           expect(users.last.all_conversations.last.shard).to eq @shard2
           expect(conversation.participants(true).map(&:id)).to eq users.map(&:id)

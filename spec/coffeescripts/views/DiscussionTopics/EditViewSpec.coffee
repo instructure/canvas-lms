@@ -193,7 +193,7 @@ define [
 
   test "has an error when a title is 257 chars", ->
     view = @editView({ withAssignment: true})
-    errors = nameLengthHelper(view, 257, false, 30, '0')
+    errors = nameLengthHelper(view, 257, false, 30, '1')
     equal errors["title"][0]["message"], "Title is too long, must be under 257 characters"
 
   test "allows dicussion to save when a title is 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true", ->

@@ -27,7 +27,8 @@ describe "interaction with differentiated assignments on the dashboard and calen
       it "should not show inaccessible assignments in Recent activity" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/"
-        f('#dashboardToggleButton').click
+        f('#DashboardOptionsMenu_Container button').click
+        fj('span[role="menuitemradio"]:contains("Recent Activity")').click
         expect(f("#not_right_side .no_recent_messages")).to include_text("No Recent Messages")
       end
     end
@@ -91,7 +92,8 @@ describe "interaction with differentiated assignments on the dashboard and calen
       it "should not show inaccessible assignments in Recent activity" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/"
-        f('#dashboardToggleButton').click
+        f('#DashboardOptionsMenu_Container button').click
+        fj('span[role="menuitemradio"]:contains("Recent Activity")').click
         expect(f("#not_right_side .no_recent_messages")).to include_text("No Recent Messages")
       end
     end

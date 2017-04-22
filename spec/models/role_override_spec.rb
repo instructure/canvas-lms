@@ -88,7 +88,7 @@ describe RoleOverride do
 
     AdheresToPolicy::Cache.clear
     RoleOverride.clear_cached_contexts
-    c2 = Course.find(c2)
+    c2 = Course.find(c2.id)
 
     expect(c2.grants_right?(u2, :moderate_forum)).to be_truthy
   end

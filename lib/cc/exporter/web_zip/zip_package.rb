@@ -16,7 +16,7 @@ module CC::Exporter::WebZip
       @user = user
       @current_progress = Rails.cache.fetch(progress_key)
       @current_progress ||= MustViewModuleProgressor.new(user, course).current_progress
-      @html_converter = CC::CCHelper::HtmlContentExporter.new(course, user)
+      @html_converter = CC::CCHelper::HtmlContentExporter.new(course, user, for_epub_export: true)
     end
     attr_reader :files, :course, :user, :current_progress
     attr_accessor :file_data
@@ -237,6 +237,7 @@ module CC::Exporter::WebZip
           title: export_item[:title],
           content: parse_content(item) || export_item[:text]
         }
+        item_hash[:frontPage] = export_item[:front_page] if type == :wiki_pages
         add_assignment_details(item, item_hash) unless type == :wiki_pages
         item_hash
       end

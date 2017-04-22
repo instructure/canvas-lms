@@ -53,40 +53,40 @@ describe AssignmentUtil do
   describe "due_date_required_for_account?" do
     it "returns true when all 3 are set to true" do
       account_stub_helper(assignment, true, true, true)
-      expect(described_class.due_date_required_for_account?(assignment)).to eq(true)
+      expect(described_class.due_date_required_for_account?(assignment.context)).to eq(true)
     end
 
     it "returns false when sis_require_assignment_due_date is false" do
       account_stub_helper(assignment, false, true, true)
-      expect(described_class.due_date_required_for_account?(assignment)).to eq(false)
+      expect(described_class.due_date_required_for_account?(assignment.context)).to eq(false)
     end
 
     it "returns false when sis_syncing is false" do
       account_stub_helper(assignment, true, false, true)
-      expect(described_class.due_date_required_for_account?(assignment)).to eq(false)
+      expect(described_class.due_date_required_for_account?(assignment.context)).to eq(false)
     end
 
     it "returns false when new_sis_integrations is false" do
       account_stub_helper(assignment, true, true, false)
-      expect(described_class.due_date_required_for_account?(assignment)).to eq(false)
+      expect(described_class.due_date_required_for_account?(assignment.context)).to eq(false)
     end
   end
 
   describe "assignment_max_name_length" do
     it "returns 15 when the account setting sis_assignment_name_length_input is 15" do
       assignment.context.account.stubs(:sis_assignment_name_length_input).returns({value: 15})
-      expect(described_class.assignment_max_name_length(assignment)).to eq(15)
+      expect(described_class.assignment_max_name_length(assignment.context)).to eq(15)
     end
   end
 
   describe "post_to_sis_friendly_name" do
     it "returns custom friendly name when the account setting sis_name is custom" do
       assignment.context.account.root_account.settings[:sis_name] = 'Foo Bar'
-      expect(described_class.post_to_sis_friendly_name(assignment)).to eq('Foo Bar')
+      expect(described_class.post_to_sis_friendly_name(assignment.context)).to eq('Foo Bar')
     end
 
     it "returns SIS when the account setting sis_name is not custom" do
-      expect(described_class.post_to_sis_friendly_name(assignment)).to eq('SIS')
+      expect(described_class.post_to_sis_friendly_name(assignment.context)).to eq('SIS')
     end
   end
 
@@ -95,6 +95,13 @@ describe AssignmentUtil do
       assignment.due_at = nil
       described_class.stubs(:due_date_required?).with(assignment).returns(true)
       expect(described_class.due_date_ok?(assignment)).to eq(false)
+    end
+
+    it "returns true when due_at is blank, due_date_required? is true and grading_type is not_graded" do
+      assignment.due_at = nil
+      assignment.grading_type = 'not_graded'
+      described_class.stubs(:due_date_required?).with(assignment).returns(true)
+      expect(described_class.due_date_ok?(assignment)).to eq(true)
     end
 
     it "returns true when due_at is present and due_date_required? is true" do
@@ -113,6 +120,18 @@ describe AssignmentUtil do
       assignment.due_at = nil
       described_class.stubs(:due_date_required?).with(assignment).returns(false)
       expect(described_class.due_date_ok?(assignment)).to eq(true)
+    end
+  end
+
+  describe "sis_integration_settings_enabled?" do
+    it "returns true when new_sis_integrations fetaure enabled" do
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+      expect(described_class.sis_integration_settings_enabled?(assignment.context)).to eq(true)
+    end
+
+    it "returns false when new_sis_integrations fetaure enabled" do
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(false)
+      expect(described_class.sis_integration_settings_enabled?(assignment.context)).to eq(false)
     end
   end
 

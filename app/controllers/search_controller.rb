@@ -217,7 +217,7 @@ class SearchController < ApplicationController
 
     if request.xhr?
       set_no_cache_headers
-      return render :text => @contentHTML
+      return render :html => @contentHTML
     end
   end
 

@@ -164,7 +164,7 @@ private
     folders = @context.folders.active.where(id: folder_ids).to_a
     file_ids = folders.inject([]) { |file_ids, folder| file_ids += enumerate_contents(folder) }
     file_ids += @context.attachments.not_deleted.where(id: Array(params[:file_ids]).map(&:to_i)).pluck(:id)
-    update_attrs = {usage_rights_id: usage_rights}
+    update_attrs = {usage_rights_id: usage_rights&.id}
     update_attrs.merge!(locked: false) if usage_rights.present? && value_to_boolean(params[:publish])
 
     count = @context.attachments.not_deleted.where(id: file_ids).update_all(update_attrs)

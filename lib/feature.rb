@@ -155,6 +155,15 @@ END
       state: 'allowed',
       beta: true
     },
+    'new_user_tutorial_on_off' =>
+    {
+      display_name: -> { I18n.t('Course Set-up Tutorial') },
+      description: -> { I18n.t('Course set-up tutorial provides tips on how to leverage the feature opportunities on each page in Canvas. It is especially useful when you are new to Canvas or are setting up a new course for the first time in a long time.') },
+      applies_to: 'User',
+      state: 'allowed',
+      beta: true
+    },
+
     'outcome_gradebook' =>
     {
       display_name: -> { I18n.t('features.learning_mastery_gradebook', 'Learning Mastery Gradebook') },
@@ -304,7 +313,8 @@ END
       applies_to: 'Account',
       state: 'hidden',
       root_opt_in: true,
-      beta: true
+      beta: true,
+      development: true
     },
     'bulk_sis_grade_export' =>
       {
@@ -454,7 +464,7 @@ END
     {
       display_name: -> { I18n.t('New Annotations') },
       description: -> { I18n.t('Use the new document annotation tool') },
-      applies_to: 'Course',
+      applies_to: 'Account',
       state: 'hidden',
       beta: true,
       root_opt_in: true
@@ -500,18 +510,25 @@ END
       display_name: -> { I18n.t('Modules Home Page') },
       description: -> { I18n.t('Default to modules for the course home page') },
       applies_to: "RootAccount",
-      state: "hidden",
-      beta: true,
-      development: true,
+      state: "allowed",
+      beta: true
     },
     'new_user_tutorial' =>
     {
       display_name: -> { I18n.t('New User Tutorial')},
       description: -> { I18n.t('Provide tutorial information for new users in a flyout tray.')},
       applies_to: "RootAccount",
+      state: "allowed",
+      beta: true
+    },
+    'student_planner' =>
+    {
+      display_name: -> { I18n.t('Student Planner')},
+      description: -> { I18n.t('Provides users with a planner dashboard option.')},
+      applies_to: "RootAccount",
       state: "hidden",
       beta: true,
-      development: true
+      development: true,
     },
     'quizzes2_exporter' =>
     {
@@ -521,6 +538,15 @@ END
       state: "hidden",
       beta: false,
       development: true,
+    },
+    'lti_2_auth_url_registration' =>
+    {
+      display_name: -> { I18n.t('Send Authorization URL in LTI2 Registration') },
+      description: -> { I18n.t("If enabled, 'oauth2_access_token_url' will be sent in LTI2 registration launch") },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: false,
+      root_opt_in: true
     },
   )
 

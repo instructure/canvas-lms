@@ -386,7 +386,7 @@ define(['jquery'], function ($) {
                 
                 var header_index = computeTableHeaderCellIndexes(table);
 
-                $tableHeaders = $(table.config.selectorHeaders, table).each(function (index) {
+                var $tableHeaders = $(table.config.selectorHeaders, table).each(function (index) {
 
                     this.column = header_index[this.parentNode.rowIndex + "-" + this.cellIndex];
                     // this.column = index;
@@ -862,7 +862,7 @@ define(['jquery'], function ($) {
             };
             this.clearTableBody = function (table) {
                 if ($.browser.msie) {
-                    function empty() {
+                    var empty = function () {
                         while (this.firstChild)
                         this.removeChild(this.firstChild);
                     }

@@ -133,7 +133,7 @@ describe Turnitin::Client do
         :error => {
           :error_code => 123,
           :error_message => 'You cannot create this assignment right now',
-          :public_error_message => 'There was an error submitting to turnitin. Please try resubmitting the file before contacting support.'
+          :public_error_message => 'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
         }
       })
     end

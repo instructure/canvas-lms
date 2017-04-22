@@ -135,6 +135,26 @@ describe "grades" do
       user_session(@student_1)
     end
 
+    it "should display tooltip on focus", priority: "1", test_id: 229659 do
+      get "/courses/#{@course.id}/grades"
+
+      expect(driver.execute_script(
+        "return $('#submission_#{@submission.assignment_id} .assignment_score .grade .tooltip_wrap').css('visibility')"
+      )).to eq('hidden')
+
+      driver.execute_script(
+        'window.focus()'
+      )
+
+      driver.execute_script(
+        "$('#submission_#{@submission.assignment_id} .assignment_score .grade').focus()"
+      )
+
+      expect(driver.execute_script(
+        "return $('#submission_#{@submission.assignment_id} .assignment_score .grade .tooltip_wrap').css('visibility')"
+      )).to eq('visible')
+    end
+
     it "should allow student to test modifying grades", priority: "1", test_id: 229660 do
       skip_if_chrome('issue with blur')
       get "/courses/#{@course.id}/grades"

@@ -38,7 +38,7 @@ describe ConferencesController do
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should redirect 'disabled', if disabled by the teacher" do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>12,'hidden'=>true}])
@@ -46,7 +46,7 @@ describe ConferencesController do
       expect(response).to be_redirect
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
-    
+
     it "should assign variables" do
       user_session(@student)
       get 'index', :course_id => @course.id
@@ -60,7 +60,7 @@ describe ConferencesController do
       get 'index', :group_id => @group.id
       expect(response).to be_success
     end
-    
+
     it "should not include the student view student" do
       user_session(@teacher)
       @student_view_student = @course.student_view_student
@@ -81,7 +81,7 @@ describe ConferencesController do
       expect(@course).not_to be_available
       @fake_student = @course.student_view_student
       session[:become_user_id] = @fake_student.id
-      
+
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
@@ -104,7 +104,7 @@ describe ConferencesController do
       post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'Wimba'}
       assert_unauthorized
     end
-    
+
     it "should create a conference" do
       user_session(@teacher)
       post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'Wimba'}, :format => 'json'
@@ -133,7 +133,7 @@ describe ConferencesController do
           group_category = @course.group_categories.create(:name => "category 1")
           group = @course.groups.create(:name => "some group", :group_category => group_category)
           group.add_user enrollment.user, 'accepted'
-          group.add_user concluded_enrollment.user 'accepted'
+          group.add_user concluded_enrollment.user, 'accepted'
 
           post 'create', :group_id => group.id, :web_conference => {:title => "My Conference", :conference_type => 'Wimba'}, :format => 'json'
           conference = WebConference.last
@@ -149,7 +149,7 @@ describe ConferencesController do
       post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'Wimba'}
       assert_unauthorized
     end
-    
+
     it "should update a conference" do
       user_session(@teacher)
       @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :user => @teacher)

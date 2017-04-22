@@ -1,6 +1,6 @@
 define ->
 
-  regex = /<(http.*?)>; rel="([a-z]*)",/g
+  regex = /<(http.*?)>; rel="([a-z]*)"/g
 
   parseLinkHeader = (jqXhr) ->
     links = {}

@@ -130,7 +130,9 @@ module Api::V1::AssignmentOverride
         # look up all the active students since the assignment will affect all
         # active students in the course on this override and not just what the
         # teacher can see that were sent in the request object
-        students = api_find_all(assignment.context.students.active, student_ids).uniq
+        students = api_find_all(assignment.context.students.active, student_ids)
+        students = students.distinct if students.is_a?(ActiveRecord::Relation)
+        students = students.uniq if students.is_a?(Array)
 
         # make sure they were all valid
         found_ids = students.map{ |s| [

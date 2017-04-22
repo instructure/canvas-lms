@@ -171,6 +171,8 @@ module SimplyVersioned
     def version_number
       if @simply_versioned_version_number
         @simply_versioned_version_number
+      elsif @preloaded_current_version_number
+        @preloaded_current_version_number
       else
         self.versions.maximum(:number) || 0
       end
@@ -302,7 +304,6 @@ module SimplyVersioned
     receiver.extend         ClassMethods
     receiver.send :include, InstanceMethods
   end
-
 end
 
 ActiveRecord::Base.send( :include, SimplyVersioned )

@@ -110,7 +110,7 @@ describe "Gradezilla - concluded courses and enrollments" do
     it "does not allow editing grades", priority: "1", test_id: 210027 do
       @course.complete!
       gradezilla_page.visit(@course)
-      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
+      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l1')
       expect(cell).to include_text '10'
       cell.click
       expect(cell).not_to contain_css('.grade') # no input box for entry

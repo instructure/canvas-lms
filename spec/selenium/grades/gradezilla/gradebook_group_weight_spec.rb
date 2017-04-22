@@ -117,25 +117,33 @@ describe "Gradezilla - group weights" do
       expect(f("body")).not_to contain_css('.icon-warning')
     end
 
-    it 'should not display triangle warnings if an assignment is muted in both header and total column' do
-      pending('TODO: Refactor this and add it back as part of CNVS-33679')
-      header_warning_selector = ".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning"
+    it 'should display mute icon if an assignment is muted in both header and total column' do
+      header_mute_icon_selector = [
+        ".container_1",
+        ".slick-header-column[id*='assignment_#{@assignment2.id}']",
+        "svg[aria-labelledby^=IconMutedSolid]"
+      ].join(' ')
 
       gradezilla_page.visit(@course)
       toggle_muting(@assignment2)
-      expect(f("#content")).not_to contain_jqcss('.total-cell .icon-warning')
-      expect(f("#content")).not_to contain_jqcss(header_warning_selector)
+      expect(f("#content")).to contain_jqcss('.total-cell .icon-muted')
+      expect(f("#content")).to contain_jqcss(header_mute_icon_selector)
     end
 
-    it 'should display triangle warnings if an assignment is unmuted in both header and total column' do
-      pending('TODO: Refactor this and add it back as part of CNVS-33679')
+    it 'should not display mute icon if an assignment is unmuted in both header and total column' do
       @assignment2.muted = true
       @assignment2.save!
+
+      header_mute_icon_selector = [
+        ".container_1",
+        ".slick-header-column[id*='assignment_#{@assignment2.id}']",
+        "svg[aria-labelledby^=IconMutedSolid]"
+      ].join(' ')
+
       gradezilla_page.visit(@course)
       toggle_muting(@assignment2)
-      expect(f('.total-cell .icon-warning')).to be_displayed
-      expect(fj(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning")).to be_displayed
-      expect(f("#content")).not_to contain_jqcss(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .muted")
+      expect(f("#content")).not_to contain_jqcss('.total-cell .icon-muted')
+      expect(f("#content")).not_to contain_jqcss(header_mute_icon_selector)
     end
   end
 end

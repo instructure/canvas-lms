@@ -95,7 +95,7 @@ module Lti
 
     def update_workflow_state(workflow_state)
       @tool_proxy.update_attribute(:workflow_state, workflow_state)
-
+      ToolProxyService.delete_subscriptions(@tool_proxy) if workflow_state == 'deleted'
       # this needs to be moved to whatever changes the workflow state to active
       invalidate_nav_tabs_cache(@tool_proxy)
     end

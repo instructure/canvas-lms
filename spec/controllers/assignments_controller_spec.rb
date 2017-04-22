@@ -63,6 +63,42 @@ describe AssignmentsController do
       expect(assigns[:js_env][:WEIGHT_FINAL_GRADES]).to eq(@course.apply_group_weights?)
     end
 
+    it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:due_date_required_for_account?).returns(true)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
+    end
+
+    it "js_env SIS_INTEGRATION_SETTINGS_ENABLED is true when AssignmentUtil.sis_integration_settings_enabled? == true" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:sis_integration_settings_enabled?).returns(true)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to eq(true)
+    end
+
+    it "js_env SIS_INTEGRATION_SETTINGS_ENABLED is false when AssignmentUtil.sis_integration_settings_enabled? == false" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:sis_integration_settings_enabled?).returns(false)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to eq(false)
+    end
+
+    it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:due_date_required_for_account?).returns(false)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
+    end
+
+    it "js_env SIS_NAME is SIS when @context does not respond_to assignments" do
+      user_session(@teacher)
+      @course.stubs(:respond_to?).returns(false)
+      controller.stubs(:set_js_assignment_data).returns({:js_env => {}})
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:SIS_NAME]).to eq('SIS')
+    end
+
     it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
       user_session(@teacher)
       AssignmentUtil.stubs(:post_to_sis_friendly_name).returns('Foo Bar')
@@ -89,6 +125,27 @@ describe AssignmentsController do
       expect(assigns[:js_env][:QUIZ_LTI_ENABLED]).to be false
     end
 
+    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:name_length_required_for_account?).returns(true)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
+    end
+
+    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:name_length_required_for_account?).returns(false)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
+    end
+
+    it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:assignment_max_name_length).returns(15)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
+    end
+
     context "draft state" do
       it "should create a default group if none exist" do
         user_session(@student)
@@ -111,7 +168,6 @@ describe AssignmentsController do
   end
 
   describe "GET 'show_moderate'" do
-
     it "should set the js_env for URLS" do
       user_session(@teacher)
       assignment = @course.assignments.create(:title => "some assignment")
@@ -133,6 +189,60 @@ describe AssignmentsController do
 
       get 'show_moderate', :course_id => @course.id, :assignment_id => assignment.id
       expect(assigns[:js_env][:ASSIGNMENT_TITLE]).to eq "some assignment"
+    end
+
+    describe 'permissions' do
+      before(:once) do
+        @user = User.create!
+        @custom_role = @course.root_account.roles.create!(name: 'CustomRole', base_role_type: 'TaEnrollment')
+        @course.root_account.role_overrides.create!(permission: :moderate_grades, role: @custom_role, enabled: true)
+        @course.root_account.role_overrides.create!(permission: :view_all_grades, role: @custom_role, enabled: false)
+        @course.root_account.role_overrides.create!(permission: :manage_grades, role: @custom_role, enabled: false)
+        @course.enroll_user(@user, 'TaEnrollment', role: @custom_role, active_all: true)
+        @assignment = @course.assignments.create!(workflow_state: 'published', moderated_grading: true)
+      end
+
+      before(:each) { user_session(@user) }
+      let(:permissions) { assigns[:js_env][:PERMISSIONS] }
+
+      let(:allow_editing) do
+        override = @course.root_account.role_overrides.find_by(permission: 'manage_grades')
+        override.update!(enabled: true)
+      end
+
+      let(:allow_viewing) do
+        override = @course.root_account.role_overrides.find_by(permission: 'view_all_grades')
+        override.update!(enabled: true)
+      end
+
+      it 'grants the user view permissions if they have "View all grades" permissions in the course' do
+        allow_viewing
+        get :show_moderate, course_id: @course, assignment_id: @assignment
+        expect(permissions[:view_grades]).to eq true
+      end
+
+      it 'grants the user view permissions if they have "Edit grades" permissions in the course' do
+        allow_editing
+        get :show_moderate, course_id: @course, assignment_id: @assignment
+        expect(permissions[:view_grades]).to eq true
+      end
+
+      it 'denies the user view permissions if they lack both "View all grades" and "Edit grades" \
+      permissions in the course' do
+        get :show_moderate, course_id: @course, assignment_id: @assignment
+        expect(permissions[:view_grades]).to eq false
+      end
+
+      it 'grants the user edit permissions if they have "Edit grades" permissions in the course' do
+        allow_editing
+        get :show_moderate, course_id: @course, assignment_id: @assignment
+        expect(permissions[:edit_grades]).to eq true
+      end
+
+      it 'denies the user edit permissions if they lack "Edit grades" permissions in the course' do
+        get :show_moderate, course_id: @course, assignment_id: @assignment
+        expect(permissions[:edit_grades]).to eq false
+      end
     end
   end
 
@@ -535,6 +645,7 @@ describe AssignmentsController do
         resource_handler: resource_handler
       )
 
+      AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
       Lti::ToolProxyBinding.create(context: @course, tool_proxy: tool_proxy)
       @assignment.tool_settings_tool = message_handler
 

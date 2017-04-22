@@ -18,8 +18,11 @@
 
 require_relative '../sharding_spec_helper'
 require_relative '../selenium/helpers/groups_common'
+require_relative '../lti2_spec_helper'
 
 describe Assignment do
+  include_context 'lti2_spec_helper'
+
   before :once do
     course_with_teacher(active_all: true)
     @initial_student = student_in_course(active_all: true, user_name: 'a student').user
@@ -91,14 +94,6 @@ describe Assignment do
 
     expect(@assignment).not_to be_valid
     expect(@assignment.errors[:grading_type]).not_to be_nil
-  end
-
-  it "should allow ContextExternalTools through polymorphic association" do
-    setup_assignment_with_homework
-    tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
-    @assignment.tool_settings_tool = tool
-    @assignment.save
-    expect(@assignment.tool_settings_tool).to eq(tool)
   end
 
   describe "default values for boolean attributes" do
@@ -268,41 +263,25 @@ describe Assignment do
       @assignment.save
       expect(@assignment.tool_settings_tool).to eq(message_handler)
     end
-  end
 
-  it "should have Lti::MessageHandler through polymorphic association" do
-    setup_assignment_with_homework
-    account = @assignment.context.account
-    product_family = Lti::ProductFamily.create(
-      vendor_code: '123',
-      product_code: 'abc',
-      vendor_name: 'acme',
-      root_account: account
-    )
-    tool_proxy = Lti::ToolProxy.create!(
-      context: account,
-      guid: SecureRandom.uuid,
-      shared_secret: 'abc',
-      product_family: product_family,
-      product_version: '1',
-      workflow_state: 'disabled',
-      raw_data: {'proxy' => 'value'},
-      lti_version: '1'
-    )
-    resource_handler = Lti::ResourceHandler.create(
-      resource_type_code: 'code',
-      name: 'resource name',
-      tool_proxy: tool_proxy
-    )
-    message_handler = Lti::MessageHandler.create(
-      message_type: 'message_type',
-      launch_path: 'https://samplelaunch/blti',
-      resource_handler: resource_handler
-    )
+    it 'destroys subscriptions when they exist' do
+      setup_assignment_with_homework
+      expect(subscription_helper_instance).to receive(:destroy_subscription)
+      @assignment.tool_settings_tool = message_handler
+      @assignment.save!
+      @assignment.tool_settings_tool = nil
+      @assignment.save!
+    end
 
-    @assignment.tool_settings_tool = message_handler
-    @assignment.save
-    expect(@assignment.tool_settings_tool).to eq(message_handler)
+    it "destroys tool unless tool is 'ContextExternalTool'" do
+      setup_assignment_with_homework
+      expect(subscription_helper_instance).not_to receive(:destroy_subscription)
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      @assignment.tool_settings_tool = tool
+      @assignment.save!
+      @assignment.tool_settings_tool = nil
+      @assignment.save!
+    end
   end
 
   describe "#representatives" do
@@ -4290,6 +4269,28 @@ describe Assignment do
       assignment.valid?
       errors = assignment.errors
       expect(errors[:title]).not_to be_empty
+    end
+  end
+
+  describe "#ensure_post_to_sis_valid" do
+    let(:assignment) { assignment_model(course: @course, post_to_sis: true) }
+
+    it "sets post_to_sis to false if the assignment is not_graded" do
+      assignment.submission_types = 'not_graded'
+      assignment.save!
+
+      expect(assignment.post_to_sis).to eq false
+    end
+
+    it "sets post_to_sis to false if the assignment is a wiki_page" do
+      assignment.submission_types = 'wiki_page'
+      assignment.save!
+
+      expect(assignment.post_to_sis).to eq false
+    end
+
+    it "does not set post_to_sis to false for other assignments" do
+      expect(assignment.post_to_sis).to eq true
     end
   end
 

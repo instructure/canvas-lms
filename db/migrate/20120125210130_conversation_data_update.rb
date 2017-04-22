@@ -2,7 +2,7 @@ class ConversationDataUpdate < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up
-    SubmissionComment.where("NOT hidden").uniq.pluck(:submission_id).each_slice(1000) do |ids|
+    SubmissionComment.where("NOT hidden").distinct.pluck(:submission_id).each_slice(1000) do |ids|
       Submission.send_later_if_production_enqueue_args(:batch_migrate_conversations!, {
         :priority => Delayed::LOWER_PRIORITY,
         :max_attempts => 1,

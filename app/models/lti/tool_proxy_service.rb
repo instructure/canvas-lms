@@ -73,6 +73,16 @@ module Lti
       end
     end
 
+    def delete_subscriptions_for(tool_proxy)
+      subscription_helper = AssignmentSubscriptionsHelper.new(tool_proxy)
+      lookups = AssignmentConfigurationToolLookup.where(tool: tool_proxy.message_handlers)
+      lookups.each { |l| subscription_helper.send_later(:destroy_subscription, l.subscription_id) }
+    end
+
+    def self.delete_subscriptions(tool_proxy)
+      self.new.delete_subscriptions_for(tool_proxy)
+    end
+
     private
     def depricated_split_secret?(tp)
       tp.enabled_capability.present? &&
@@ -126,6 +136,7 @@ module Lti
         m.launch_path = "#{base_path}#{mh.path}"
         m.capabilities = create_json(mh.enabled_capability)
         m.parameters = create_json(mh.parameter.as_json)
+        m.tool_proxy = resource.tool_proxy
       end
       create_placements(mh, message_handler)
     end

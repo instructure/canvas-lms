@@ -84,7 +84,7 @@ define [
         (a, _z, status) =>
           a.muted = status
           @gradebook.setAssignmentWarnings()
-      )
+      ).show()
 
     menuPopupOpenHandler: (menu) ->
       # Hide any menu options that haven't had their dependencies met yet

@@ -1086,7 +1086,7 @@ define([
       var url = $(this).attr('href');
       var errorCount = 0;
       var check = function(first) {
-        req_url = url;
+        var req_url = url;
         if (first) {
           req_url = url + "?compile=1";
         }

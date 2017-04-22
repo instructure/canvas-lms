@@ -119,8 +119,7 @@ module AdheresToPolicy
     #   grants_all_rights?(user, session, :update, :delete)
     #   # => false
     #
-    # Returns true if any of the provided rights are granted to the user.  False
-    # if any of the provided rights are not granted.
+    # Returns true if all of the provided rights are granted. Otherwise, returns false.
     def grants_all_rights?(user, *args)
       session, sought_rights = parse_args(args)
       return false if sought_rights.empty?

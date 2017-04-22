@@ -165,7 +165,7 @@ class MessageableUser
 
     def count_messageable_users_in_scope(scope)
       if scope
-        scope.except(:select, :group, :order).uniq.count
+        scope.except(:select, :group, :order).distinct.count
       else
         0
       end
@@ -774,7 +774,7 @@ class MessageableUser
     def uncached_messageable_groups
       fully_visible_scope = GroupMembership.
         select("group_memberships.group_id AS group_id").
-        uniq.
+        distinct.
         joins(:user, :group).
         where(:workflow_state => 'accepted').
         where("groups.workflow_state<>'deleted'").
@@ -783,7 +783,7 @@ class MessageableUser
 
       section_visible_scope = GroupMembership.
         select("group_memberships.group_id AS group_id").
-        uniq.
+        distinct.
         joins(:user, :group).
         joins(<<-SQL).
           INNER JOIN #{Enrollment.quoted_table_name} ON

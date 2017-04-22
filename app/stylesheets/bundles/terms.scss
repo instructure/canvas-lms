@@ -7,8 +7,14 @@
 .term.editing_term .show_term {
   display: none;
 }
+.term.editing_term .links {
+  visibility: hidden;
+}
 .term.editing_term .edit_term {
   display: block;
+}
+.edit_term_buttons {
+  text-align: right;
 }
 #terms .term td.header {
   font-size: 1.2em;
@@ -39,10 +45,6 @@
 }
 #terms form.enrollment_term_form label {
   margin-bottom: 0px;
-}
-#terms form.enrollment_term_form .edit_term_buttons {
-  text-align: right;
-  width: 286px;
 }
 .terms-wrapper {
   margin: 0 10px;

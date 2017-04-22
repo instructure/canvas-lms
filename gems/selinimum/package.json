@@ -1,7 +1,7 @@
 {
   "name": "selinimum",
   "private": true,
-  "devDependencies": {
+  "dependencies": {
     "sass-graph": "^2.0.1"
   }
 }

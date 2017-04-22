@@ -37,13 +37,32 @@ module SIS
             update_progress
 
             begin
-              importer.add_user(row['user_id'], row['login_id'], row['status'], row['first_name'], row['last_name'], row['email'], row['password'], row['ssha_password'], row['integration_id'], row['short_name'], row['full_name'], row['sortable_name'], row['authentication_provider_id'])
+              importer.add_user(create_user(row))
             rescue ImportError => e
-              messages << "#{e}"
+              messages << e.to_s
             end
           end
         end
         messages.each { |message| add_warning(csv, message) }
+      end
+
+      private
+      def create_user(row)
+        SIS::Models::User.new(
+          user_id: row['user_id'],
+          login_id: row['login_id'],
+          status: row['status'],
+          first_name: row['first_name'],
+          last_name: row['last_name'],
+          email: row['email'],
+          password: row['password'],
+          ssha_password: row['ssha_password'],
+          integration_id: row['integration_id'],
+          short_name: row['short_name'],
+          full_name: row['full_name'],
+          sortable_name: row['sortable_name'],
+          authentication_provider_id: row['authentication_provider_id']
+        )
       end
     end
   end

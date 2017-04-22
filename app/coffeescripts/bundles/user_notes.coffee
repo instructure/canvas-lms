@@ -1,2 +1,0 @@
-require ['user_notes']
-

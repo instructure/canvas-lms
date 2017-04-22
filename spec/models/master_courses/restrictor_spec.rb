@@ -11,7 +11,7 @@ describe MasterCourses::Restrictor do
     @page_copy = @copy_to.wiki.wiki_pages.new(:title => "blah", :body => "bloo") # just create a copy directly instead of doing a real migraiton
     @page_copy.migration_id = @tag.migration_id
     @page_copy.save!
-    @page_copy.master_course_restrictions = nil
+    @page_copy.child_content_restrictions = nil
   end
 
   describe "column locking validations" do
@@ -92,7 +92,7 @@ describe MasterCourses::Restrictor do
     end
   end
 
-  describe "preload_restrictions" do
+  describe "preload_child_restrictions" do
     it "should bulk preload restrictions in a single query" do
       page2 = @copy_from.wiki.wiki_pages.create!(:title => "blah2")
       tag2 = @template.create_content_tag_for!(page2, {:restrictions => {:content => true}})
@@ -101,11 +101,11 @@ describe MasterCourses::Restrictor do
       page2_copy.migration_id = tag2.migration_id
       page2_copy.save!
 
-      MasterCourses::Restrictor.preload_restrictions([@page_copy, page2_copy])
+      MasterCourses::Restrictor.preload_child_restrictions([@page_copy, page2_copy])
 
       MasterCourses::MasterContentTag.expects(:where).never # don't load again
-      expect(@page_copy.master_course_restrictions).to eq({})
-      expect(page2_copy.master_course_restrictions).to eq({:content => true})
+      expect(@page_copy.child_content_restrictions).to eq({})
+      expect(page2_copy.child_content_restrictions).to eq({:content => true})
     end
   end
 

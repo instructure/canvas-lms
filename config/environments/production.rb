@@ -28,7 +28,11 @@ environment_configuration(defined?(config) && config) do |config|
 
   # Disable Rails's static asset server
   # In production, Apache or nginx will already do this
-  config.serve_static_files = false
+  if CANVAS_RAILS4_2
+    config.serve_static_files = false
+  else
+    config.public_file_server.enabled = false
+  end
 
   # Enable serving of images, stylesheets, and javascripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"

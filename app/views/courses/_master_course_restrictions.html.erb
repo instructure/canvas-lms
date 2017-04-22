@@ -1,0 +1,32 @@
+<% form ||= nil %>
+<% course ||= nil %>
+<% master_template = course.master_course_templates.for_full_course.first %>
+<% default_restrictions = master_template&.default_restrictions || { :content => true } %>
+<div id="master_course_restrictions" class="master_course_restrictions">
+  <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+    <legend class="ic-Legend">
+      <span class="master-course-cell"><i class="icon-lock"></i></span>
+      <%= t('Locked object configuration:') %>
+    </legend>
+    <div class="ic-Checkbox-group">
+      <%= form.fields_for :blueprint_restrictions do |f| %>
+        <div class="ic-Form-control ic-Form-control--checkbox">
+          <%= f.check_box :content, :checked => true, :disabled => true %>
+          <%= f.label :content, :class => 'ic-Label', :en => "Content" %>
+        </div>
+        <div class="ic-Form-control ic-Form-control--checkbox">
+          <%= f.check_box :points, :checked => default_restrictions[:points] %>
+          <%= f.label :points, :class => 'ic-Label', :en => "Points" %>
+        </div>
+        <div class="ic-Form-control ic-Form-control--checkbox">
+          <%= f.check_box :due_dates, :checked => default_restrictions[:due_dates] %>
+          <%= f.label :due_dates, :class => 'ic-Label', :en => "Due Dates" %>
+        </div>
+        <div class="ic-Form-control ic-Form-control--checkbox">
+          <%= f.check_box :availability_dates, :checked => default_restrictions[:availability_dates] %>
+          <%= f.label :availability_dates, :class => 'ic-Label', :en => "Availability Dates" %>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

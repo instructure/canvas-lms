@@ -179,6 +179,7 @@ class CourseSection < ActiveRecord::Base
     return true unless scope.exists?
 
     self.errors.add(:sis_source_id, t('sis_id_taken', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
+    throw :abort unless CANVAS_RAILS4_2
     false
   end
 
@@ -228,7 +229,7 @@ class CourseSection < ActiveRecord::Base
     assignment_overrides.active.destroy_all
     user_ids = self.all_enrollments.map(&:user_id).uniq
 
-    all_attrs = { course_id: course }
+    all_attrs = { course_id: course.id }
     if self.root_account_id_changed?
       all_attrs[:root_account_id] = self.root_account_id
     end

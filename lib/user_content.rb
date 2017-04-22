@@ -37,7 +37,8 @@ module UserContent
     end
 
     find_equation_images(html) do |node|
-      mathml = latex_to_mathml(node['alt'])
+      equation = node['data-equation-content'] || node['alt']
+      mathml = UserContent.latex_to_mathml(equation)
       next if mathml.blank?
 
       mathml_span = Nokogiri::HTML::DocumentFragment.parse(

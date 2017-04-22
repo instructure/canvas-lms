@@ -6,7 +6,7 @@ class EnsureSubmissionsForDiscussions < ActiveRecord::Migration[4.2]
     # the topic's assignment's course and there's no current submission for the
     # poster and that assignment, but only one entry per (topic, user) pair
     entries = DiscussionTopic.select(["discussion_entries.discussion_topic_id", "discussion_entries.user_id"]).
-        uniq.
+        distinct.
         joins("
       INNER JOIN #{Assignment.quoted_table_name} ON
         assignments.id=discussion_topics.assignment_id AND

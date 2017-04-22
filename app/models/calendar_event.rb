@@ -293,7 +293,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def cache_child_event_ranges!
-    events = child_events(true)
+    events = CANVAS_RAILS4_2 ? child_events(true) : child_events.reload
 
     if events.present?
       CalendarEvent.where(:id => self).

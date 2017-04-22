@@ -10,6 +10,8 @@ define [
 
   class AssignmentMuter
     constructor: (@$link, @assignment, @url, @setter, @options) ->
+
+    show: () ->
       if @options?.openDialogInstantly
         if @assignment.muted then @confirmUnmute() else @showDialog()
       else

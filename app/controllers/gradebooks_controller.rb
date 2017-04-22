@@ -66,12 +66,11 @@ class GradebooksController < ApplicationController
     end
 
     @exclude_total = exclude_total?(@context)
+
     Shackles.activate(:slave) do
       # run these queries on the slave database for speed
       @presenter.assignments
-      @presenter.groups_assignments = groups_as_assignments(@presenter.groups,
-                                                            :out_of_final => true,
-                                                            :exclude_total => @exclude_total)
+      aggregate_assignments
       @presenter.submissions
       @presenter.submission_counts
       @presenter.assignment_stats
@@ -119,7 +118,11 @@ class GradebooksController < ApplicationController
       @current_user.preferences[:course_grades_assignment_order] ||= {}
       @current_user.preferences[:course_grades_assignment_order][@context.id] = assignment_order
       @current_user.save!
-      redirect_to :back
+      if CANVAS_RAILS4_2
+        redirect_to :back
+      else
+        redirect_back(fallback_location: course_grades_url(@context))
+      end
     end
   end
 
@@ -198,6 +201,7 @@ class GradebooksController < ApplicationController
       @last_exported_gradebook_csv = GradebookCsv.last_successful_export(course: @context, user: @current_user)
       set_current_grading_period if grading_periods?
       set_js_env
+      set_tutorial_js_env
       @course_is_concluded = @context.completed?
       @post_grades_tools = post_grades_tools
 
@@ -643,7 +647,7 @@ class GradebooksController < ApplicationController
     grade_by_question = value_to_boolean(params[:enable_speedgrader_grade_by_question])
     @current_user.preferences[:enable_speedgrader_grade_by_question] = grade_by_question
     @current_user.save!
-    render nothing: true
+    head :ok
   end
 
   def blank_submission
@@ -678,44 +682,6 @@ class GradebooksController < ApplicationController
     @current_user.preferences[:gradebook_version] = params[:version]
     @current_user.save!
     redirect_to polymorphic_url([@context, 'gradebook'])
-  end
-
-  def groups_as_assignments(groups=nil, options = {})
-    groups ||= @context.assignment_groups.active
-
-    percentage = lambda do |weight|
-      I18n.n(weight, percentage: true)
-    end
-
-    points_possible =
-      (@context.group_weighting_scheme == "percent") ?
-        (options[:out_of_final] ?
-          lambda{ |group| t(:out_of_final, "%{weight} of Final", :weight => percentage[group.group_weight]) } :
-          lambda{ |group| percentage[group.group_weight] }) :
-        lambda{ |group| nil }
-
-    groups = groups.map { |group|
-      OpenObject.build('assignment',
-        :id => 'group-' + group.id.to_s,
-        :rules => group.rules,
-        :title => group.name,
-        :points_possible => points_possible[group],
-        :hard_coded => true,
-        :special_class => 'group_total',
-        :assignment_group_id => group.id,
-        :group_weight => group.group_weight,
-        :asset_string => "group_total_#{group.id}")
-    }
-
-    groups << OpenObject.build('assignment',
-        :id => 'final-grade',
-        :title => t('titles.total', 'Total'),
-        :points_possible => (options[:out_of_final] ? '' : percentage[100]),
-        :hard_coded => true,
-        :special_class => 'final_grade',
-        :asset_string => "final_grade_column") unless options[:exclude_total]
-    groups = [] if options[:exclude_total] && groups.length == 1
-    groups
   end
 
   def set_gradebook_warnings(groups, assignments)
@@ -757,6 +723,89 @@ class GradebooksController < ApplicationController
   private :set_gradebook_warnings
 
   private
+
+  def percentage(weight)
+    I18n.n(weight, percentage: true)
+  end
+
+  def points_possible(weight, options)
+    return unless options[:weighting]
+    return t("%{weight} of Final", weight: percentage(weight)) if options[:out_of_final]
+    percentage(weight)
+  end
+
+  def aggregate_by_grading_period?
+    view_all_grading_periods? && @context.weighted_grading_periods?
+  end
+
+  def aggregate_assignments
+    if aggregate_by_grading_period?
+      @presenter.periods_assignments = periods_as_assignments(@presenter.grading_periods,
+                                                              out_of_final: true,
+                                                              exclude_total: @exclude_total)
+    else
+      @presenter.groups_assignments = groups_as_assignments(@presenter.groups,
+                                                            out_of_final: true,
+                                                            exclude_total: @exclude_total)
+    end
+  end
+
+  def groups_as_assignments(groups=nil, options = {})
+    as_assignments(
+      groups || @context.assignment_groups.active,
+      options.merge!(weighting: @context.group_weighting_scheme == 'percent')
+    ) { |group| group_as_assignment(group, options) }
+  end
+
+  def periods_as_assignments(periods=nil, options = {})
+    as_assignments(
+      periods || @context.grading_periods.active,
+      options.merge!(weighting: @context.weighted_grading_periods?)
+    ) { |period| period_as_assignment(period, options) }
+  end
+
+  def as_assignments(objects=nil, options={})
+    fakes = []
+    fakes.concat(objects.map { |object| yield(object) }) if objects && block_given?
+    fakes << total_as_assignment(options) unless options[:exclude_total]
+    fakes
+  end
+
+  def group_as_assignment(group, options)
+    OpenObject.build('assignment',
+                     id: "group-#{group.id}",
+                     rules: group.rules,
+                     title: group.name,
+                     points_possible: points_possible(group.group_weight, options),
+                     hard_coded: true,
+                     special_class: 'group_total',
+                     assignment_group_id: group.id,
+                     group_weight: group.group_weight,
+                     asset_string: "group_total_#{group.id}")
+  end
+
+  def period_as_assignment(period, options)
+    OpenObject.build('assignment',
+                     id: "period-#{period.id}",
+                     rules: [],
+                     title: period.title,
+                     points_possible: points_possible(period.weight, options),
+                     hard_coded: true,
+                     special_class: 'group_total',
+                     assignment_group_id: period.id,
+                     group_weight: period.weight,
+                     asset_string: "period_total_#{period.id}")
+  end
+
+  def total_as_assignment(options = {})
+    OpenObject.build('assignment',
+                     id: 'final-grade',
+                     title: t('Total'),
+                     points_possible: (options[:out_of_final] ? '' : percentage(100)),
+                     hard_coded: true,
+                     special_class: 'final_grade',
+                     asset_string: "final_grade_column")
+  end
 
   def moderated_grading_enabled_and_no_grades_published
     @assignment.moderated_grading? && !@assignment.grades_published?

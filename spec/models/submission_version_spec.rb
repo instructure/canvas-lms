@@ -112,4 +112,18 @@ describe SubmissionVersion do
       end
     end.not_to change(SubmissionVersion, :count)
   end
+
+  it "should let you preload current_version in one query" do
+    sub1 = unversioned_submission
+    3.times { Version.create(:versionable => sub1, :yaml => sub1.attributes.to_yaml) }
+    sub2 = unversioned_submission
+    2.times { Version.create(:versionable => sub2, :yaml => sub2.attributes.to_yaml) }
+
+    Version.preload_version_number([sub1, sub2])
+
+    [sub1, sub2].each{|s| s.expects(:versions).never}
+
+    expect(sub1.version_number).to eq 3
+    expect(sub2.version_number).to eq 2
+  end
 end

@@ -267,11 +267,11 @@ class Attachment < ActiveRecord::Base
     excluded_atts += ["locked", "hidden"] if dup == existing
     dup.assign_attributes(self.attributes.except(*excluded_atts))
 
-    dup.write_attribute(:filename, self.filename)
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
     if dup.new_record? || ![self.id, self.root_attachment_id].include?(dup.id)
       dup.root_attachment_id = self.root_attachment_id || self.id
     end
+    dup.write_attribute(:filename, self.filename) unless dup.root_attachment_id?
     dup.context = context
     dup.migration_id = options[:migration_id] || CC::CCHelper.create_key(self)
     dup.mark_as_importing!(options[:migration]) if options[:migration]
@@ -323,6 +323,7 @@ class Attachment < ActiveRecord::Base
   def assert_attachment
     if !self.to_be_zipped? && !self.zipping? && !self.errored? && !self.deleted? && (!filename || !content_type || !downloadable?)
       self.errors.add(:base, t('errors.not_found', "File data could not be found"))
+      throw :abort unless CANVAS_RAILS4_2
       return false
     end
   end
@@ -513,7 +514,7 @@ class Attachment < ActiveRecord::Base
           existing_attachment.write_attribute(:filename, nil)
           existing_attachment.save!
           Attachment.where(root_attachment_id: existing_attachment).update_all(
-            root_attachment_id: self,
+            root_attachment_id: id,
             filename: nil,
             updated_at: Time.zone.now)
         end
@@ -684,13 +685,13 @@ class Attachment < ActiveRecord::Base
         end
       end
     elsif method == :overwrite
-      atts.update_all(:replacement_attachment_id => self) # so we can find the new file in content links
+      atts.update_all(replacement_attachment_id: self.id) # so we can find the new file in content links
       copy_access_attributes!(atts) unless atts.empty?
       atts.each do |a|
         # update content tags to refer to the new file
-        ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(:content_id => self)
+        ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(content_id: self.id)
         # update replacement pointers pointing at the overwritten file
-        context.attachments.where(:replacement_attachment_id => a).update_all(:replacement_attachment_id => self)
+        context.attachments.where(:replacement_attachment_id => a).update_all(replacement_attachment_id: self.id)
         # delete the overwritten file (unless the caller is queueing them up)
         a.destroy unless opts[:caller_will_destroy]
         deleted_attachments << a
@@ -1258,12 +1259,12 @@ class Attachment < ActiveRecord::Base
     return unless child
     raise "must be a child" unless child.root_attachment_id == id
     child.root_attachment_id = nil
-    child.filename = filename if filename
     copy_attachment_content(child)
     Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child.id)
   end
 
   def copy_attachment_content(destination)
+    destination.write_attribute(:filename, filename) if filename
     if Attachment.s3_storage?
       if filename && s3object.exists? && !destination.s3object.exists?
         s3object.copy_to(destination.s3object)
@@ -1283,7 +1284,6 @@ class Attachment < ActiveRecord::Base
     root = self.root_attachment
     return unless root
     self.root_attachment_id = nil
-    self.write_attribute(:filename, root.filename) if root.filename
     root.copy_attachment_content(self)
   end
 
