@@ -2,7 +2,7 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 he: 
-  1_item_scores_5512cd03: "1- ציוני הרכיב"
+  1_item_scores_5512cd03: "1- ציוני הפריט"
   1_user_found_76399771: "נמצא משתמש אחד"
   1st_reviewer_3c1d0119: "בודק/ת מספר 1"
   25th_75th_ile_406a67bf: "האחוזון ה 25-75"
@@ -56,13 +56,13 @@ he:
   a_name_for_this_set_is_required_222bad23: "נדרש שם לאוגדן הזה"
   a_name_is_required_b5df38a9: "נדרש שם"
   a_new_assignment_has_been_created_for_your_course__12b72639: "הוקצתה לך משימה חדשה בקורס  %{course_name}"
-  a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "נדרש מזהה חבר כדי להשתמש בתקן מדידה אקדמי"
-  a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "נדרש מפתח חבר כדי להשתמש בתקן מדידה אקדמי"
+  a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "נדרש מזהה חברות כדי להשתמש בתקני השוואה אקדמים"
+  a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "נדרש מפתח חברות כדי להשתמש בבתקני השוואה אקדמים"
   a_problem_occurred_adding_reviewers_57b083d9: "אירעה תקלה בעת הוספת בודקים"
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "טבלה הכוללת את שם סכימת ההערכה והכפתורים לעריכת וביטול הסכימה."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "טבלת התשובות ותקציר סטטיסטיקה של אפשרויות התשובה של תלמיד"
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "טבלה שכוללת את נתוני סכימת ההערכה. כל שורה כוללת שם, אחוז מרבי, ואחוז מזערי. בנוסף, כל שורה כוללת כפתור להוספה של שורה חדשה מתחת, וכפתור לביטול השורה הנוכחית."
-  a_z_29d8e67c: "א = ת"
+  a_z_29d8e67c: "א - ת"
   academic_benchmark: 
     no_api_key: "נדרש מפתח API כדי להשתמש באמות מדה אקדמיות"
     no_file: "לא סופק קובץ הישגי למידה או שאין הרשאה לביצוע"
@@ -76,8 +76,8 @@ he:
         api_key: "מפתח API"
         api_url: "כתובת דף ה API "
         common_core_guid: " מזהה ייחודי (GUID) של הליבה המשותפת (אופציונלי)"
-        partner_id: "מזהה חבר"
-        partner_key: "מפתח חבר"
+        partner_id: "מזהה חברות"
+        partner_key: "מפתח חברות"
   accept_2fdd362e: קבלה
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "הפורמטים האפשריים: hex, rgb, rgba, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "הפורמטים האפשריים: svg, png, jpg, gif"
@@ -705,7 +705,7 @@ he:
       account_reports: 
         excelsior: 
           outcome: 
-            text: "בחירת תבנית קישוט"
+            text: "תבנית פסקה"
     find_not_authorized: "אינך מורשה לגשת  ל%{type} זה"
     grade_export_csv_description: 
       account_reports: 
@@ -795,7 +795,7 @@ he:
             check_box: "קובץ CSV של הרשמות"
           group_categories: 
             login: 
-              check_box: "קובץ CSV של קבוצות קטגוריות"
+              check_box: "קובץ CSV של קבוצות קטגוריה"
           group_membership: 
             login: 
               check_box: "קובץ CSV של קבוצות חבריויות"
@@ -1227,7 +1227,7 @@ he:
       account_reports: 
         student_assignment_map: 
           description: 
-            text: "דוח זה מציג הישגי למידה לכל התלמידים. קובץ CSV של התוצאות יראה שורה אחת בצמד משתמש-הישגי-למידה, ויראה את פירוט התוצאות כולל המשימות הנלוות. דוח זה כולל רק את הישגי הלמידה למשימות ואינו כולל תוצאות למידה הקשורות למאגר השאלות."
+            text: "דוח זה מציג הישגי למידה לכל התלמידים. קובץ CSV של התוצאות יראה שורה אחת בצמד משתמש-הישגי-למידה, ואת פירוט התוצאות כולל המשימות הנלוות. דוח זה כולל רק את הישגי הלמידה למשימות ואינו כולל תוצאות למידה הקשורות למאגר השאלות."
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
@@ -1336,7 +1336,7 @@ he:
           one: "אין אפשרות לבטל רשומה כיון שיש %{record} התלויה בה"
   activity_by_category_9c2033d1: "פעילות לפי קטגוריה"
   activity_by_date_878c5b49: "פעילות לפי תאריך"
-  activity_compared_to_class_8133cb0: "פעילות בהשוואה לכתה"
+  activity_compared_to_class_8133cb0: "פעילות מושווית לכתה"
   add_2nd_review_ea988088: "הוספת ביקורת מספר 2"
   add_8523c19b: הוסף
   add_a_comment_872470ac: "הוספת הערה"
@@ -1390,7 +1390,7 @@ he:
   add_rubric_3636d9a6: "הוספת רובריקה"
   add_section_8b027a1c: "הוספת הקבצה"
   add_set_of_grading_periods_5b4d6e51: "הוספת אוגדן תקופות הערכה"
-  add_students_by_searching_by_name_course_section_o_abb9e2f2: "הוספת תלמידים בעזרת חיפוש שמי, הקבצת קורס או בקבוצה. לאחר הקלדת הטקסט, ניווט בתוצאות הוא ע\"י השימוש בחץ התחתון. בחירת תוצאה מתבצעת בעזרת מקש ה ENTER"
+  add_students_by_searching_by_name_course_section_o_abb9e2f2: "הוספת תלמידים בעזרת חיפוש שמי, הקבצת קורס או בקבוצה. לאחר הקלדת הטקסט, הניווט בתוצאות הוא ע\"י השימוש בחץ התחתון. בחירת תוצאה מתבצעת בעזרת מקש ה ENTER"
   add_students_tas_and_observers_to_your_course_e84692dd: "הוספת תלמידים, עוזרי הוראה ומשקיפים לקורס שלך"
   add_students_to_the_course_874be8fb: "הוספת תלמידים לקורס"
   add_tas_to_the_course_2aac6e02: "הוספת עוזרי הוראה לקורס"
@@ -1486,10 +1486,10 @@ he:
   all_terms_cd27b0fb: "כל התקופות/תנאים"
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "כל המשקלות צריכים להיות חיוביים או אפס"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "אפשר/י למפקח לסקור מספר חישובי ציונים עצמאיים עבור הגשות נבחרות"
-  allow_bulk_grade_export_to_sis_e11a6e66: "התרה לייצוא מנות של הערכות למערכת הבית ספרית"
+  allow_bulk_grade_export_to_sis_e11a6e66: "התרה לייצא הערכות למערכת הבית ספרית במנות "
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "התרה להורדת תכני קורס לעיון לא מקוון. "
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "הרשאת השמה של תמונות הקורס לקורס והשימוש בהן על גבי לוח המחוונים."
-  allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "התרה לכל משתמש לסדר מחדש של פריטי דף המחוונים."
+  allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "התרה לכל משתמש לסדר מחדש את פריטי דף המחוונים."
   allow_in_mastery_paths_5332c786: "אפשר/י במסלולי התמחות"
   allow_intra_group_peer_reviews_53f1e455: "התרה לסקירת עמיתים תוך קבוצתית"
   allow_lor_tools: "אפשר/י למשתמשים לעיין ולהשתמש בכלי קונפיגורציה חיצוניים עבור LOR."
@@ -1500,12 +1500,12 @@ he:
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "התרה לתלמידים לראות מי נרשם לחלונות זמן"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "אפשר/י את היכולת לשגר תזכורות באמצעות תור השדרים שלנו"
   allowed_attempts_4e229caa: "נסיונות מותרים"
-  allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "התרה למורים לסמן נתוני הערכה לייצוא במנות לתאום במערכת הבית ספרית"
+  allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "התרה למורים לסמן נתוני הערכה לייצוא במנות לסינכרון עם המערכת הבית ספרית"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "אפשר / י תזמון של אירועים נשנים ביומן האירועים"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "אפשר / י למשתמשים עם מספר טלפון בינלאומי לקבל הודעות טקסט מקנבס."
   always_3a59e701: תמיד
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "תמיד יש לטעון את עורך התוכן העשיר והסרגל הצידי משרות התוכן העשיר של קנבס בכל המקומות"
-  an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "נדרש מפתח API כדי להשתמש באמות מדה אקדמיות"
+  an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "נדרש מפתח API כדי להשתמש בתקני השוואה אקדמים"
   an_assignment_name_dc624e70: "שם מטלה"
   an_error_accurred_selecting_provisional_grades_61b36f64: "אירעה שגיאה בבחירת ציונים זמניים"
   an_error_occured_please_try_again_e59b65b: "אירעה שגיאה. נא לנסות שוב."
@@ -1526,7 +1526,7 @@ he:
   an_error_occurred_while_migrating_405ac0b5: "אירעה שגיארה בעת ייצוא הנתונים"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "אירעה תקלה בעת נסיון ביטול פגישה קבוצתית"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "אירעה תקלה בעת נסיון לשמור פגישה קבוצתית"
-  an_export_is_already_in_progress_54270f01: "תהליך ייצוא כבר פועל"
+  an_export_is_already_in_progress_54270f01: "תהליך ייצוא כבר בפעולה"
   an_internal_error_occurred_83b8a685: "אירעה תקלה פנימית"
   an_item_named_name_already_exists_in_this_location_147b7312: "פריט בשם  \"%{name}\"  כבר קיים במיקום זה. האם בכוונתך להחליף את הקובץ הקיים?"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "אירעה שגיאת שרת לא ידועה. נא לנסות שוב."
@@ -1609,7 +1609,7 @@ he:
     podcast_feed_description_group: "כל קובץ מדיה המקושר או מוטבע בתוך הכרזות הקבוצה \"%{group}\" יוצג בפיד זה"
     podcast_feed_name: "פודקאסט פיד של הכרזות הקורס %{course} "
   announcements_a4b8ed4a: הכרזות
-  announcements_tutorial_tray_994287d6: "איזור מדריך ההכרזות"
+  announcements_tutorial_tray_994287d6: "מגש מדריך ההכרזות"
   anonymous_e1b8ad27: אנונימי
   anonymous_grading_ccb5045c: "מתן ציונים אנונימי"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "מתן ציונים אנונימי מחייב ששמות התלמידים יוסתרו ב SpeedGrader"
@@ -1814,8 +1814,8 @@ he:
     default_title: משימות
   assignment_group_1a781505: "קבוצת משימה"
   assignment_group_was_saved_successfully_5caa27d3: "קבוצת משימה נשמרה בהצלחה"
-  assignment_group_weights_and_drop_rules_can_t_be_e_7b5f305d: "משקלות מטלה קבוצתית או כללי נשירה לא ניתנים לעריכה כיון שיש מטלות באחת הקבוצות אשר תאריך הסיום שלהן עבר.."
-  assignment_group_weights_can_t_be_edited_because_t_b6b591ae: "משקלות מטלה קבוצתית לא ניתנים לעריכה כיון שיש מטלות באחת הקבוצות אשר תאריך הסיום שלהן עבר."
+  assignment_group_weights_and_drop_rules_can_t_be_e_7b5f305d: "משקלות מטלה קבוצתית או כללי נשירה לא ניתנים לעריכה כיון שבאחת הקבוצות יש מטלות  אשר תאריך הסיום שלהן עבר."
+  assignment_group_weights_can_t_be_edited_because_t_b6b591ae: "משקלות מטלה קבוצתית לא ניתנים לעריכה כיון שבאחת הקבוצות יש מטלות אשר תאריך הסיום שלהן עבר."
   assignment_group_weights_dialog: 
     buttons: 
       save: שמירה
@@ -2413,7 +2413,7 @@ he:
         update_settings: "עדכון הגדרות"
       vericite_settings: 
         originality_report_never: "אף פעם"
-        originality_report_visibility: "תלמידים יכולים לעיין בדו\"ח האורגינליות"
+        originality_report_visibility: "תלמידים יכולים לעיין בדו\"ח המקוריות"
         originality_report_visible_after_due_date: "לאחר תאריך היעד"
         originality_report_visible_after_grading: "לאחר שהמטלה הוערכה"
         originality_report_visible_immediately: מיד
@@ -2423,8 +2423,8 @@ he:
     invalid_submission_types: "סוגי הגשה לא תקינים"
   assignments_in_this_group_have_no_points_possible__3cd35922: "הגשות בקבוצה זו אינן מאפשרות ניקוד ואינן נכללות בחישוב הציון"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "מטלות בקבוצה זו הן ללא ניקוד ואינן יכולות להכלל בתחשיב הציון"
-  assignments_settings_30613d0c: "הגדרות מטלות"
-  assignments_tutorial_tray_4cc844b: "איזור מדריך ההכרזות"
+  assignments_settings_30613d0c: "הגדרת מטלות"
+  assignments_tutorial_tray_4cc844b: "מגש מדריך ההכרזות"
   associated_74756cc4: נלווה
   associated_account_course_id_d87a01c5: "מזהה חשבון/קורס נלווה"
   associated_account_name_91854e37: "שם חשבון נלווה"
@@ -2532,7 +2532,7 @@ he:
   blank_38df4238: "תו ריק"
   blocked_by_running_migration_d8a57cb7: "חסום ע\"י תהליך הגירת נתונים"
   blue_daf8fea9: כחול
-  blueprint_course_associations_72c9609: "שייוכים לקורס לדוגמה"
+  blueprint_course_associations_72c9609: "שיוכים לקורס לדוגמה"
   blueprint_course_e16ed131: "תבנית קורס"
   blueprint_courses_9dd321b8: "תבניות קורסים"
   blueprint_courses_create_edit_associate_delete_bf41988e: "תבינות קורסים (יצירה / עדכון / שיוך / ביטול)"
@@ -2778,7 +2778,7 @@ he:
       message_groups: "קבוצות הודעות אשר..."
       message_students: "הודעות תלמידים אשר..."
       scheduler_explanation_student_header: "לא קיימות עבורך קבוצות מפגש כלשהן להרשמה"
-      scheduler_explanation_student_paragraph_1: "מורים יכולים להשתמש בכלי זה כדי לתזמן דברים לתלמידים אליהם יוכלו להרשם, כלומר חלנות זמן לשעות משרד, זמני מצגת קבוצתית וכדומה."
+      scheduler_explanation_student_paragraph_1: "מורים יכולים להשתמש בכלי זה כדי לתזמן ארועים לתלמידים אליהם יוכלו להרשם, כלומר חלנות זמן לשעות משרד, זמני מצגת קבוצתית וכדומה."
       scheduler_explanation_student_paragraph_2: "בשלב זה אף אחד ממוריך לא פתח חלון זמין לפגישות. תקבל הודעה כאשר חלון כזה יפתח."
       scheduler_explanation_teacher_header: "לא יצרת כל קבוצת מפגש שהיא, ואין כאלו שניתן לך להרשם אליהן"
       scheduler_explanation_teacher_paragraph_1: "זהו כלי תזמון. תוכל להשתמש בו כדי ליצור קבוצות מפגש אליהם תלמידיך יוכלו להרשם."
