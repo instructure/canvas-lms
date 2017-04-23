@@ -1,9 +1,9 @@
 <tr>
   <th scope="row" class="ic-Table--header-row">
-    {{ag.name}}
+    {{subtotal.name}}
   </th>
 
-  <td class="assignment-group-grade">
+  <td class="assignment-subtotal-grade">
     <span class="grade">
       {{#if hasGrade}}
         <span class="perc">{{percent}}</span>
@@ -27,7 +27,7 @@
   <td>
     {{#if hasWeightedGroups}}
       <span class="weight">
-        {{groupWeight}}
+        {{weight}}
       </span>
     {{else}}
       -

@@ -22,10 +22,10 @@ define [
   'jsx/gradebook/GradingSchemeHelper'
 ], (I18n, Ember, round, GradingSchemeHelper) ->
 
-  AssignmentGroupGradesComponent = Ember.Component.extend
+  AssignmentSubtotalGradesComponent = Ember.Component.extend
 
     tagName: ''
-    ag: null
+    subtotal: null
     student: null
     weightingScheme: null
     gradingStandard: null
@@ -41,8 +41,8 @@ define [
 
     values:(->
       student = @get('student')
-      Ember.get(student, "assignment_group_#{@get('ag.id')}")
-    ).property('ag', 'student', 'student.total_grade')
+      Ember.get(student, "#{@get('subtotal.key')}")
+    ).property('subtotal', 'student', 'student.total_grade')
 
     points: (->
       values = @get('values')
@@ -65,6 +65,6 @@ define [
       "(#{points})"
     ).property('points')
 
-    groupWeight:(->
-      I18n.n(@get('ag').group_weight, percentage: true)
-    ).property('ag')
+    weight:(->
+      I18n.n(@get('subtotal').weight, percentage: true)
+    ).property('subtotal')

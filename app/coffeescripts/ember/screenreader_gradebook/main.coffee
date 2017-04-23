@@ -19,7 +19,7 @@ define [
   "ember",
   "compiled/ember/screenreader_gradebook/config/app",
   "compiled/ember/screenreader_gradebook/config/routes",
-  "compiled/ember/screenreader_gradebook/components/assignment_group_grades_component",
+  "compiled/ember/screenreader_gradebook/components/assignment_subtotal_grades_component",
   "compiled/ember/screenreader_gradebook/components/assignment_muter_component",
   "compiled/ember/screenreader_gradebook/components/custom_column_cell_component",
   "compiled/ember/screenreader_gradebook/components/fast_select_component",
@@ -36,7 +36,7 @@ define [
   "compiled/ember/screenreader_gradebook/templates/assignment_information/details",
   "compiled/ember/screenreader_gradebook/templates/assignment_information/index",
   "compiled/ember/screenreader_gradebook/templates/assignments",
-  "compiled/ember/screenreader_gradebook/templates/components/assignment-group-grades",
+  "compiled/ember/screenreader_gradebook/templates/components/assignment-subtotal-grades",
   "compiled/ember/screenreader_gradebook/templates/components/custom-column-cell",
   "compiled/ember/screenreader_gradebook/templates/components/final-grade",
   "compiled/ember/screenreader_gradebook/templates/components/grading-cell",
@@ -57,14 +57,14 @@ define [
   "compiled/ember/screenreader_gradebook/templates/settings/mastery_toggles_and_actions",
   "compiled/ember/screenreader_gradebook/templates/settings/section_select",
   "compiled/ember/screenreader_gradebook/templates/settings/sort_select",
-  "compiled/ember/screenreader_gradebook/templates/student_information/assignment_groups",
+  "compiled/ember/screenreader_gradebook/templates/student_information/assignment_subtotals",
   "compiled/ember/screenreader_gradebook/templates/student_information/details",
   "compiled/ember/screenreader_gradebook/templates/student_information/index"
 ], (
   Ember,
   App,
   routes,
-  AssignmentGroupGradesComponent,
+  AssignmentSubtotalGradesComponent,
   AssignmentMuterComponent,
   CustomColumnCellComponent,
   FastSelectComponent,
@@ -84,7 +84,7 @@ define [
       application.Router.map(routes)
 
   App.reopen({
-    AssignmentGroupGradesComponent: AssignmentGroupGradesComponent
+    AssignmentSubtotalGradesComponent: AssignmentSubtotalGradesComponent
     AssignmentMuterComponent: AssignmentMuterComponent
     CustomColumnCellComponent: CustomColumnCellComponent
     FastSelectComponent: FastSelectComponent

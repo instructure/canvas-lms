@@ -18,7 +18,7 @@
 define [
   'ember'
   '../start_app'
-  '../../components/assignment_group_grades_component'
+  '../../components/assignment_subtotal_grades_component'
   '../shared_ajax_fixtures'
 ], (Ember, startApp, AGGrades, fixtures) ->
 
@@ -28,21 +28,22 @@ define [
   originalGradingStandard = null
   groupScores =
     assignment_group_1:
-      possible: 100
-      score: 54.5
-      submission_count: 1
+      possible: 1000.111
+      score: 85.115
+      submission_count: 10
       submissions: []
-      weight: 100
+      weight: 90
 
-  QUnit.module 'assignment_group_grades_component_letter_grade',
+
+  QUnit.module 'assignment_subtotal_grades_component',
     setup: ->
       fixtures.create()
       App = startApp()
-      @component = App.AssignmentGroupGradesComponent.create()
+      @component = App.AssignmentSubtotalGradesComponent.create()
       @component.reopen
         gradingStandard: (->
           originalGradingStandard = this._super
-          [["A", 0.80],["B+", 55.5],["B", 54.5],["C", 0.05],["F", 0.00]]
+          [["A", 0.50],["C", 0.05],["F", 0.00]]
         ).property()
         weightingScheme: (->
           originalWeightingScheme = this._super
@@ -53,7 +54,10 @@ define [
         @student = Ember.Object.create Ember.copy groupScores
         @component.setProperties
           student: @student
-          ag: @assignment_group
+          subtotal:
+            name: @assignment_group.name
+            weight: @assignment_group.group_weight
+            key: "assignment_group_#{@assignment_group.id}"
 
 
     teardown: ->
@@ -61,6 +65,22 @@ define [
         @component.destroy()
         App.destroy()
 
+
+  test 'values', ->
+    deepEqual @component.get('values'), groupScores.assignment_group_1
+
+  test 'points', ->
+    expected = "85.12 / 1,000.11"
+    equal @component.get('points'), expected
+
+  test 'percent', ->
+    expected = "8.51%"
+    equal @component.get('percent'), expected
+
   test 'letterGrade', ->
     expected = "C"
     equal @component.get('letterGrade'), expected
+
+  test 'scoreDetail', ->
+    expected = "(85.12 / 1,000.11)"
+    equal @component.get('scoreDetail'), expected

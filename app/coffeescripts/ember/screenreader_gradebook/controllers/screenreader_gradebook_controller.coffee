@@ -417,6 +417,7 @@ define [
     submissionStateMap: null
 
     assignment_groups: []
+    assignment_subtotals: []
 
     fetchAssignmentGroups: (->
       params = { exclude_response_fields: ['in_closed_grading_period'] }
@@ -428,6 +429,17 @@ define [
       Ember.run.once =>
         fetchAllPages(get(window, 'ENV.GRADEBOOK_OPTIONS.assignment_groups_url'), records: @get('assignment_groups'), data: params)
     ).observes('selectedGradingPeriod').on('init')
+
+    assignmentSubtotals: (->
+      subtotals = []
+      for group in @get('assignment_groups')
+        subtotal =
+          name: group.name
+          key: "assignment_group_#{group.id}"
+          weight: group.group_weight
+        subtotals.push(subtotal)
+      @set('assignment_subtotals', subtotals)
+    ).observes('assignment_groups', 'selectedGradingPeriod', 'students.@each', 'selectedStudent').on('init')
 
     students: studentsUniqByEnrollments('enrollments')
 

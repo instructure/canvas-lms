@@ -55,8 +55,8 @@ class GradezillaIndividualViewPage
       f('#student_information .total-grade')
     end
 
-    def assign_group_grade
-      f('.assignment-group-grade .grade')
+    def assign_subtotal_grade
+      f('.assignment-subtotal-grade .grade')
     end
 
     def secondary_id_label

@@ -8,10 +8,10 @@
     </tr>
   </thead>
   <tbody>
-    {{#each assignment_group in assignment_groups}}
+    {{#each assignment_subtotal in assignment_subtotals}}
       {{
-        assignment-group-grades
-        ag=assignment_group
+        assignment-subtotal-grades
+        subtotal=assignment_subtotal
         student=selectedStudent
         weightingScheme=weightingScheme
         gradingStandard=ENV.GRADEBOOK_OPTIONS.grading_standard
