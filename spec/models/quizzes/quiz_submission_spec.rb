@@ -1696,6 +1696,23 @@ describe Quizzes::QuizSubmission do
     let(:now)             { Time.zone.now }
     let(:quiz)            { course.quizzes.create! due_at: 3.days.ago(now) }
 
+    context "for submission with late_policy_status set" do
+      let(:submission) { Submission.new }
+      let(:quiz_submission) { quiz.quiz_submissions.create!(submission: submission) }
+
+      it "is late when late_policy_status is 'late'" do
+        submission.late_policy_status = 'late'
+
+        expect(quiz_submission).to be_late
+      end
+
+      it "is not late when late_policy_status is not 'late'" do
+        submission.late_policy_status = 'foo'
+
+        expect(quiz_submission).not_to be_late
+      end
+    end
+
     context "for quizzes with a due date" do
       let(:quiz_submission) { quiz.quiz_submissions.create! }
 
@@ -1765,7 +1782,7 @@ describe Quizzes::QuizSubmission do
       end
 
       it "is late when it's overridden due date is before the submission" do
-        submission = stub("blank?" => false, "user" => student)
+        submission = stub("blank?" => false, "user" => student, late_policy_status: nil)
         quiz_submission.stubs(:submission).returns(submission)
         expect(quiz_submission.late?).to eq true
       end

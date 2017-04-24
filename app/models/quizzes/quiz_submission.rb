@@ -852,6 +852,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   # TODO: Extract? conceptually similar to Submission::Tardiness#late?
   def late?
+    return submission.late_policy_status == 'late' if submission&.late_policy_status.present?
     return false if finished_at.blank?
     return false if due_at.blank?
 
@@ -862,12 +863,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # same as the instance method, but with a hash of attributes, instead
   # of an instance, so that you can avoid instantiating
   def self.late_from_attributes?(attributes, quiz, submission)
+    return submission.late_policy_status == 'late' if submission&.late_policy_status.present?
     return false if attributes['finished_at'].blank?
+
     due_at = if submission.blank?
-               quiz.due_at
-             else
-               quiz.overridden_for(submission.user, skip_clone: true).due_at
-             end
+      quiz.due_at
+    else
+      quiz.overridden_for(submission.user, skip_clone: true).due_at
+    end
     return false if due_at.blank?
 
     check_time = attributes['finished_at'] - 60.seconds

@@ -2085,51 +2085,147 @@ describe Submission do
     end
   end
 
-  describe "missing" do
+  describe "scope: missing" do
     before :once do
-      submission_spec_model
+      @now = Time.zone.now
+      submission_spec_model(cached_due_date: 1.day.ago(@now), submission_type: nil, submit_homework: true)
+      @submission.assignment.update!(submission_types: "on_paper")
     end
 
-    it "should be false if not past due" do
-      @submission.submitted_at = 2.days.ago
-      @submission.cached_due_date = 1.day.ago
+    it 'excludes submission when late_policy_status is nil' do
+      expect(Submission.missing).to be_empty
+    end
+
+    it 'includes submission when late_policy_status is "missing"' do
+      @submission.update(late_policy_status: 'missing')
+
+      expect(Submission.missing).not_to be_empty
+    end
+
+    it 'excludes submission when late_policy_status is not nil, not missing' do
+      @submission.update(late_policy_status: 'foo')
+
+      expect(Submission.missing).to be_empty
+    end
+
+    it 'excludes submission when not past due' do
+      @submission.update(submitted_at: 2.days.ago(@now))
+
+      expect(Submission.missing).to be_empty
+    end
+
+    it 'excludes submission when past due and submitted' do
+      @submission.update(submitted_at: @now)
+
+      expect(Submission.missing).to be_empty
+    end
+
+    it 'excludes submission when past due, not submitted, assignment does not expect a submission, is excused' do
+      @submission.assignment.update(submission_types: 'none')
+      @submission.update(excused: true)
+      @submission.update_columns(submission_type: nil)
+
+      expect(Submission.missing).to be_empty
+    end
+
+    it 'includes submission when past due, not submitted, assignment does not expect a submission, not excused, and no score' do
+      @submission.assignment.update(submission_types: 'none')
+      @submission.update_columns(submission_type: nil)
+
+      expect(Submission.missing).not_to be_empty
+    end
+
+    it 'includes submission when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is not "graded"' do
+      @submission.update(score: 1)
+      @submission.update_columns(submission_type: nil)
+
+      expect(Submission.missing).not_to be_empty
+    end
+
+    it 'includes submission when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is "graded", and score is 0' do
+      @submission.update(score: 0, workflow_state: 'graded')
+      @submission.update_columns(submission_type: nil)
+
+      expect(Submission.missing).not_to be_empty
+    end
+
+    it 'excludes submission when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is "graded", and score is greater than 0' do
+      @submission.update(score: 1, workflow_state: 'graded')
+      @submission.update_columns(submission_type: nil)
+
+      expect(Submission.missing).to be_empty
+    end
+  end
+
+  describe "#missing" do
+    before :once do
+      @now = Time.zone.now
+      submission_spec_model(cached_due_date: 1.day.ago(@now), submission_type: nil, submit_homework: true)
+      @submission.assignment.update!(submission_types: "on_paper")
+    end
+
+    it 'returns false when late_policy_status is nil' do
       expect(@submission).not_to be_missing
     end
 
-    it "should be false if submitted, even if past due" do
-      @submission.submitted_at = 1.day.ago
-      @submission.cached_due_date = 2.days.ago
+    it 'returns true when late_policy_status is "missing"' do
+      @submission.update(late_policy_status: 'missing')
+
+      expect(@submission).to be_missing
+    end
+
+    it 'returns false when late_policy_status is not nil, not missing' do
+      @submission.update(late_policy_status: 'foo')
+
       expect(@submission).not_to be_missing
     end
 
-    it "should be true if not submitted, past due, and expects a submission" do
-      @submission.assignment.submission_types = "online_quiz"
-      @submission.submission_type = nil # forces submitted_at to be nil
-      @submission.cached_due_date = 1.day.ago
+    it 'returns false when not past due' do
+      @submission.update(submitted_at: 2.days.ago(@now))
 
-      # Regardless of score
-      @submission.score = 0.00000001
-      @submission.graded_at = Time.zone.now + 1.day
+      expect(@submission).not_to be_missing
+    end
+
+    it 'returns false when past due and submitted' do
+      @submission.update(submitted_at: @now)
+
+      expect(@submission).not_to be_missing
+    end
+
+    it 'returns false when past due, not submitted, assignment does not expect a submission, is excused' do
+      @submission.assignment.update(submission_types: 'none')
+      @submission.update(excused: true)
+      @submission.update_columns(submission_type: nil)
+
+      expect(@submission).not_to be_missing
+    end
+
+    it 'returns true when past due, not submitted, assignment does not expect a submission, not excused, and no score' do
+      @submission.assignment.update(submission_types: 'none')
+      @submission.update_columns(submission_type: nil)
 
       expect(@submission).to be_missing
     end
 
-    it "should be true if not submitted, score of zero, and does not expect a submission" do
-      @submission.assignment.submission_types = "on_paper"
-      @submission.submission_type = nil # forces submitted_at to be nil
-      @submission.cached_due_date = 1.day.ago
-      @submission.score = 0
-      @submission.graded_at = Time.zone.now + 1.day
+    it 'returns true when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is not "graded"' do
+      @submission.update(score: 1)
+      @submission.update_columns(submission_type: nil)
+
       expect(@submission).to be_missing
     end
 
-    it "should be false if not submitted, score greater than zero, and does not expect a submission" do
-      @submission.assignment.submission_types = "on_paper"
-      @submission.submission_type = nil # forces submitted_at to be nil
-      @submission.cached_due_date = 1.day.ago
-      @submission.score = 0.00000001
-      @submission.graded_at = Time.zone.now + 1.day
+    it 'returns true when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is "graded", and score is 0' do
+      @submission.update(score: 0, workflow_state: 'graded')
+      @submission.update_columns(submission_type: nil)
+
       expect(@submission).to be_missing
+    end
+
+    it 'returns false when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is "graded", and score is greater than 0' do
+      @submission.update(score: 1, workflow_state: 'graded')
+      @submission.update_columns(submission_type: nil)
+
+      expect(@submission).not_to be_missing
     end
   end
 
@@ -3146,12 +3242,17 @@ describe Submission do
     end
   end
 
-
   def submission_spec_model(opts={})
     opts = @valid_attributes.merge(opts)
     assignment = opts.delete(:assignment) || Assignment.find(opts.delete(:assignment_id))
     user = opts.delete(:user) || User.find(opts.delete(:user_id))
-    @submission = assignment.submissions.find_by!(user: user)
+    submit_homework = opts.delete(:submit_homework)
+
+    if submit_homework
+      @submission = assignment.submit_homework(user)
+    else
+      @submission = assignment.submissions.find_by!(user: user)
+    end
     @submission.update!(opts)
     @submission
   end

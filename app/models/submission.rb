@@ -122,6 +122,83 @@ class Submission < ActiveRecord::Base
     where(assignment_id: course.assignments.except(:order))
   }
 
+  # truth table for `missing` and `not_missing` scopes
+  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
+  # | late_policy_status | past_due? | submitted_at | assignment          | excused | graded? | score > 0 | MISSING |
+  # |                    |           | .present?    | .expects_submission?|         |         |           |         |
+  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
+  # | missing            | any       | any          | any                 | any     | any     | any       | TRUE    |
+  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
+  # | not null           | any       | any          | any                 | any     | any     | any       | FALSE   |
+  # | not missing        |           |              |                     |         |         |           |         |
+  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
+  # | NULL               | FALSE     | any          | any                 | any     | any     | any       | FALSE   |
+  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
+  # | NULL               | TRUE      | TRUE         | any                 | any     | any     | any       | FALSE   |
+  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
+  # | NULL               | TRUE      | FALSE        | TRUE                | any     | any     | any       | TRUE    |
+  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
+  # | NULL               | TRUE      | FALSE        | FALSE               | TRUE    | any     | any       | FALSE   |
+  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
+  # | NULL               | TRUE      | FALSE        | FALSE               | FALSE   | FALSE   | any       | TRUE    |
+  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
+  # | NULL               | TRUE      | FALSE        | FALSE               | FALSE   | TRUE    | TRUE      | FALSE   |
+  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
+  # | NULL               | TRUE      | FALSE        | FALSE               | FALSE   | TRUE    | FALSE     | TRUE    |
+  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
+  scope :missing, -> do
+    joins(:assignment).
+    where("
+      -- teacher said it's missing, 'nuff said.
+      late_policy_status = 'missing' OR
+      (
+        -- Otherwise, submission does not have a late policy applied and
+        late_policy_status is null and
+        -- submission is past due and
+        COALESCE(accepted_at, submitted_at, CURRENT_TIMESTAMP) >= cached_due_date +
+          CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END and
+        -- submission is not submitted and
+        NULLIF(submission_type, '') is null and
+        (
+          -- we expect a digital submission or
+          COALESCE(NULLIF(assignments.submission_types, ''), 'none') similar to '%(online\_%|discussion\_topic)%' or
+          (
+            -- submission is not excused and
+            excused is not true and
+            -- submission is not graded
+            (submissions.workflow_state is distinct from 'graded' or NULLIF(score, 0) IS NULL)
+          )
+        )
+      )
+    ")
+  end
+
+  scope :not_missing, -> do
+    joins(:assignment).
+    where("
+      -- teacher hasn't said it's missing and
+      late_policy_status is distinct from 'missing' and
+      (
+        -- submission is not past due or
+        COALESCE(accepted_at, submitted_at, CURRENT_TIMESTAMP) < cached_due_date +
+          CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END or
+        -- submission is submitted or
+        NULLIF(submission_type, '') is not null or
+        (
+          -- we expect an offline submission and
+          COALESCE(NULLIF(assignments.submission_types, ''), 'none') similar to
+            '%(none|not\_graded|on\_paper|wiki\_page|external\_tool)%' and
+          (
+            -- submission is excused or
+            excused is true or
+            -- submission is graded
+            (submissions.workflow_state = 'graded' and NULLIF(score, 0) IS NOT NULL)
+          )
+        )
+      )
+    ")
+  end
+
   workflow do
     state :submitted do
       event :grade_it, :transitions_to => :graded
@@ -1842,11 +1919,15 @@ class Submission < ActiveRecord::Base
     alias past_due past_due?
 
     def late?
+      return late_policy_status == 'late' unless late_policy_status.nil?
+
       accepted_at.present? && past_due?
     end
     alias late late?
 
     def missing?
+      return late_policy_status == 'missing' unless late_policy_status.nil?
+
       return false if !past_due? || submitted_at.present?
       assignment.expects_submission? || !(self.excused || (self.graded? && self.score > 0))
     end
