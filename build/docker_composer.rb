@@ -25,15 +25,13 @@ end
 class DockerComposer
   class << self
     # :cry: not the same as canvas docker-compose ... yet
-    COMPOSE_DIR = File.dirname(__FILE__)
-    RUNNER_IDS = ENV['MASTER_RUNNERS'].to_i.times.map { |i| i == 0 ? "" : i + 1 }
-    KEYSPACES = YAML.load_file("config/cassandra.yml")["test"].keys
-    SERVICES = YAML.load_file(COMPOSE_DIR + "/docker-compose.yml")["services"]
+    RUNNER_IDS = Array.new(ENV['MASTER_RUNNERS'].to_i) { |i| i == 0 ? "" : i + 1 }
+    COMPOSE_FILES = %w[docker-compose.yml docker-compose.override.yml docker-compose.test.yml]
 
     def run
       nuke_old_crap
       pull_cached_images
-      create_databases
+      launch_services
       migrate if run_migrations?
       push_artifacts if push_artifacts?
 
@@ -58,7 +56,7 @@ class DockerComposer
     def pull_simple_images
       puts "Pulling simple images..."
       simple_services.each do |key|
-        docker "pull #{SERVICES[key]["image"]}"
+        docker "pull #{service_config(key)["image"]}"
       end
     end
 
@@ -83,16 +81,16 @@ class DockerComposer
 
     # e.g. postgres
     def built_services
-      SERVICES.keys.select { |key| SERVICES[key]["build"] }
+      services.select { |key| service_config(key)["build"] }
     end
 
     # e.g. redis
     def simple_services
-      SERVICES.keys - built_services
+      services - built_services
     end
 
-    def create_databases
-      docker_compose "build"
+    def launch_services
+      docker_compose "build #{services.join(" ")}"
       prepare_volumes
       start_services
       db_prepare unless using_snapshot? # already set up, just need to migrate
@@ -121,26 +119,28 @@ class DockerComposer
 
     def cassandra_setup
       puts "Creating keyspaces..."
-      docker "exec -i #{ENV["COMPOSE_PROJECT_NAME"]}_cassandra_1 /create-keyspaces #{KEYSPACES.join(" ")}"
+      docker "exec -i #{ENV["COMPOSE_PROJECT_NAME"]}_cassandra_1 /create-keyspaces #{cassandra_keyspaces.join(" ")}"
     end
 
-    # each service defines its own /wait-for-it
+    def cassandra_keyspaces
+      YAML.load_file("config/cassandra.yml")["test"].keys
+    end
+
+    # each service can define its own /wait-for-it
     def wait_for(service)
-      docker "exec -i #{ENV["COMPOSE_PROJECT_NAME"]}_#{service}_1 /wait-for-it"
+      docker "exec -i #{ENV["COMPOSE_PROJECT_NAME"]}_#{service}_1 sh -c \"[ ! -x /wait-for-it ] || /wait-for-it\""
     end
 
-    def docker_compose_up(services = nil)
+    def docker_compose_up(services = self.services.join(" "))
       docker_compose "up -d #{services} && docker ps"
     end
 
     def wait_for_services
-      %w[cassandra postgres].map { |service|
-        Thread.new { wait_for service }
-      }.each(&:join)
+      parallel_each(services) { |service| wait_for service }
     end
 
     def stop_services
-      docker_compose "stop postgres cassandra && docker ps"
+      docker_compose "stop #{(services - ["data_loader"]).join(" ")} && docker ps"
     end
 
     def start_services
@@ -213,7 +213,36 @@ class DockerComposer
     end
 
     def docker_compose(args)
-      system "cd #{COMPOSE_DIR} && docker-compose #{args}" or raise("`docker-compose #{args}` failed")
+      file_args = COMPOSE_FILES.map { |f| "-f #{f}" }.join(" ")
+      system "docker-compose #{file_args} #{args}" or raise("`docker-compose #{args}` failed")
+    end
+
+    def service_config(key)
+      config["services"][key]
+    end
+
+    def services
+      own_config["services"].keys
+    end
+
+    def own_config
+      @own_config ||= YAML.load_file(COMPOSE_FILES.last)
+    end
+
+    def config
+      @config ||= begin
+        merger = proc do |key, v1, v2|
+          Hash === v1 && Hash === v2 ?
+            v1.merge(v2, &merger) :
+          Array === v1 && Array === v2 ?
+            v1.concat(v2) :
+            v2
+        end
+
+        COMPOSE_FILES.inject({}) do |config, file|
+          config.merge(YAML.load_file(file), &merger)
+        end
+      end
     end
   end
 end
