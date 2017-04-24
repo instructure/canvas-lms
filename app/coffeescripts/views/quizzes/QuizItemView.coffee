@@ -57,7 +57,7 @@ define [
           content_id: @model.get('id'),
           content_type: 'quiz'
         })
-        if @model.postToSIS() != null && @model.attributes.published
+        if @model.postToSISEnabled() && @model.postToSIS() != null && @model.attributes.published
           @sisButtonView = new SisButtonView(model: @model, sisName: @model.postToSISName(), dueDateRequired: @model.dueDateRequiredForAccount())
 
       @dateDueColumnView       = new DateDueColumnView(model: @model)
