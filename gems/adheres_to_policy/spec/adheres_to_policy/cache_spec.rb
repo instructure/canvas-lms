@@ -43,6 +43,12 @@ describe AdheresToPolicy::Cache do
       value = AdheresToPolicy::Cache.fetch(:key){ 'new_value' }
       expect(value).to eq [false, :in_proc]
     end
+
+    it 'times generating the value and sets Thread.current[:last_cache_generate]' do
+      Thread.current[:last_cache_generate] = nil
+      AdheresToPolicy::Cache.fetch(:key){ 'new_value' }
+      expect(Thread.current[:last_cache_generate]).to_not be_nil
+    end
   end
 
   context "#write" do

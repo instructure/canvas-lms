@@ -122,6 +122,7 @@ module Canvas::Redis
       response
     end
 
+    SET_COMMANDS = %i{set setex}.freeze
     def log_request_response(request, response, start_time)
       return if request.nil? # redis client does internal keepalives and connection commands
       return if Canvas::Redis.log_style == 'off'
@@ -144,7 +145,7 @@ module Canvas::Redis
         message[:action] = Marginalia::Comment.action
         message[:job_tag] = Marginalia::Comment.job_tag
       end
-      if command == :set && Thread.current[:last_cache_generate]
+      if SET_COMMANDS.include?(command) && Thread.current[:last_cache_generate]
         # :last_cache_generate comes from the instrumentation added in
         # config/initializeers/cache_store_instrumentation.rb
         # This is necessary because the Rails caching layer doesn't pass this

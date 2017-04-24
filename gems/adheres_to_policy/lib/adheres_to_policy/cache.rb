@@ -42,7 +42,10 @@ module AdheresToPolicy
       if value.nil?
         if block_given?
           how_it_got_it = :generated
-          value = yield
+          elapsed = Benchmark.realtime do
+            value = yield
+          end
+          Thread.current[:last_cache_generate] = elapsed # so we can record it in the logs
           self.write(key, value)
         end
       end
