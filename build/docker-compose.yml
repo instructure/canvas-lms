@@ -1,0 +1,38 @@
+version: "2"
+services:
+  redis:
+    image: redis:alpine
+    ports:
+      - "${REDIS_PORT}:6379"
+
+  postgres:
+    build: ./docker-compose/postgres/$PGVERSION
+    environment:
+      MASTER_RUNNERS: $MASTER_RUNNERS
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${PGPORT}:5432"
+
+  cassandra:
+    build: ./docker-compose/cassandra
+    environment:
+      CASSANDRA_START_RPC: 'true'
+      MASTER_RUNNERS: $MASTER_RUNNERS
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    ports:
+      - "${CASSANDRA_PORT}:9160"
+
+  data_loader:
+    build: ./docker-compose/data_loader
+    environment:
+      BASE_DOCKER_VOLUME_ARCHIVE: $BASE_DOCKER_VOLUME_ARCHIVE
+      DOCKER_CACHE_S3_REGION: $DOCKER_CACHE_S3_REGION
+    volumes:
+      - postgres_data:/volumes/postgres_data
+      - cassandra_data:/volumes/cassandra_data
+
+volumes:
+  postgres_data: {}
+  cassandra_data: {}
