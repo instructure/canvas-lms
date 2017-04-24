@@ -31,6 +31,8 @@ import 'grading_standards'
 const lockManager = new LockManager()
 lockManager.init({ itemType: 'discussion_topic', page: 'edit' })
 
+const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
+
 const isAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES != null ? ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement : undefined
 const model = new (isAnnouncement ? Announcement : DiscussionTopic)(ENV.DISCUSSION_TOPIC.ATTRIBUTES, {parse: true})
 model.urlRoot = ENV.DISCUSSION_TOPIC.URL_ROOT
@@ -47,9 +49,12 @@ const view = new EditView({
   views: {
     'js-assignment-overrides': new OverrideView({
       model: dueDateList,
-      views: {}
+      views: {},
+      dueDatesReadonly: !!lockedItems.due_dates,
+      availabilityDatesReadonly: !!lockedItems.availability_dates
     })
-  }
+  },
+  lockedItems: model.id ? lockedItems : {}  // if no id, creating a new discussion
 })
 
 if ((contextType === 'courses') && !isAnnouncement && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT) {

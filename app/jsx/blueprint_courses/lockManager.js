@@ -42,10 +42,8 @@ export default class LockManager {
     if (!this.shouldInit()) return;
     this.props = buildProps(options)
     this.setupState()
-    if (this.state.itemId !== undefined) {
+    if (this.state.itemId !== undefined) {  // will be undefined if creating a new assignment, discussion, etc.
       this.render()
-    } else {
-      $.flashError(I18n.t('Oops, there was a problem loading content locks.'))
     }
   }
 

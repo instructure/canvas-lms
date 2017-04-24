@@ -93,26 +93,28 @@ define [
     addDatePicker: (options) ->
       @$field.wrap('<div class="input-append" />')
       $wrapper = @$field.parent('.input-append')
-      datepickerOptions = $.extend {}, @datepickerDefaults, {
-        timePicker: @allowTime,
-        beforeShow: () =>
-          @$field.trigger("detachTooltip")
-        ,
-        onClose: () =>
-          @$field.trigger("reattachTooltip")
-      }, options.datepicker
-      @$field.datepicker(datepickerOptions)
+      unless @isReadonly()
+        datepickerOptions = $.extend {}, @datepickerDefaults, {
+          timePicker: @allowTime,
+          beforeShow: () =>
+            @$field.trigger("detachTooltip")
+          ,
+          onClose: () =>
+            @$field.trigger("reattachTooltip")
+        }, options.datepicker
+        @$field.datepicker(datepickerOptions)
 
-      # TEMPORARY FIX: Hide from aria screenreader until the jQuery UI datepicker is updated for accessibility.
-      $datepickerButton = @$field.next()
-      $datepickerButton.attr('aria-hidden', 'true')
-      $datepickerButton.attr('tabindex', '-1')
-      if (options.disableButton)
-        $datepickerButton.attr('disabled', 'true')
+        # TEMPORARY FIX: Hide from aria screenreader until the jQuery UI datepicker is updated for accessibility.
+        $datepickerButton = @$field.next()
+        $datepickerButton.attr('aria-hidden', 'true')
+        $datepickerButton.attr('tabindex', '-1')
+        if (options.disableButton)
+          $datepickerButton.attr('disabled', 'true')
 
       return $wrapper
 
     addSuggests: ($sibling, options={}) ->
+      return if @isReadonly()
       @courseTimezone = options.courseTimezone or ENV.CONTEXT_TIMEZONE
       @$suggest = $('<div class="datetime_suggest" />').insertAfter($sibling)
       if @courseTimezone? and @courseTimezone isnt ENV.TIMEZONE
@@ -233,6 +235,7 @@ define [
           'time-ampm': null
 
     updateSuggest: ->
+      return if @isReadonly()
       localText = @formatSuggest()
       @screenreaderAlert = localText
       if @$courseSuggest
@@ -284,3 +287,6 @@ define [
         I18n.t("#date.formats.medium_with_weekday")
       else
         I18n.t("#time.formats.tiny")
+
+    isReadonly: ->
+      !!@$field.attr('readonly')

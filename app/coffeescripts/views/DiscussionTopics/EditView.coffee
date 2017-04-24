@@ -111,6 +111,8 @@ define [
         @redirectAfterSave()
       super
 
+      @lockedItems = options.lockedItems || {}
+
     redirectAfterSave: ->
       window.location = @locationAfterSave(deparam())
 
@@ -150,6 +152,7 @@ define [
         isLargeRoster: ENV?.IS_LARGE_ROSTER || false
         threaded: data.discussion_type is "threaded"
         inClosedGradingPeriod: @assignment.inClosedGradingPeriod()
+        lockedItems: @lockedItems
       json.assignment = json.assignment.toView()
       json
 
@@ -168,22 +171,24 @@ define [
 
     # also separated for easy stubbing
     loadNewEditor: ($textarea)->
+      return if @lockedItems.content
       RichContentEditor.loadNewEditor($textarea, { focus: true, manageParent: true})
 
     render: =>
       super
       $textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message'))
 
-      RichContentEditor.initSidebar()
-      _.defer =>
-        @loadNewEditor($textarea)
-        $('.rte_switch_views_link').click (event) ->
-          event.preventDefault()
-          event.stopPropagation()
-          RichContentEditor.callOnRCE($textarea, 'toggle')
-          # hide the clicked link, and show the other toggle link.
-          # todo: replace .andSelf with .addBack when JQuery is upgraded.
-          $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
+      unless @lockedItems.content
+        RichContentEditor.initSidebar()
+        _.defer =>
+          @loadNewEditor($textarea)
+          $('.rte_switch_views_link').click (event) ->
+            event.preventDefault()
+            event.stopPropagation()
+            RichContentEditor.callOnRCE($textarea, 'toggle')
+            # hide the clicked link, and show the other toggle link.
+            # todo: replace .andSelf with .addBack when JQuery is upgraded.
+            $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
       if @assignmentGroupCollection
         (@assignmentGroupFetchDfd ||= @assignmentGroupCollection.fetch()).done @renderAssignmentGroupOptions
 
@@ -289,8 +294,8 @@ define [
       if assign_data?.set_assignment is '1'
         data.set_assignment = '1'
         data.assignment = @updateAssignment(assign_data)
-        data.delayed_post_at = ''
-        data.lock_at = ''
+        # code used to set delayed_post_at = locked_at = '', but that broke
+        # saving a locked graded discussion.  Leaving them as they were didn't break anything
       else
         # Announcements don't have assignments.
         # DiscussionTopics get a model created for them in their

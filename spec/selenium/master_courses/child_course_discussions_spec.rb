@@ -23,15 +23,21 @@ describe "master courses - child courses - discussion locking" do
   before :once do
     Account.default.enable_feature!(:master_courses)
 
+    due_date = format_date_for_view(Time.zone.now + 1.month)
     @copy_from = course_factory(:active_all => true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
-    @original_topic = @copy_from.discussion_topics.create!(:title => "blah", :message => "bloo")
+    @original_topic = @copy_from.discussion_topics.create!(
+      :title => "blah", :message => "bloo"
+    )
     @tag = @template.create_content_tag_for!(@original_topic)
 
     course_with_teacher(:active_all => true)
     @copy_to = @course
     @template.add_child_course!(@copy_to)
-    @topic_copy = @copy_to.discussion_topics.new(:title => "blah", :message => "bloo") # just create a copy directly instead of doing a real migration
+    # just create a copy directly instead of doing a real migration
+    @topic_copy = @copy_to.discussion_topics.new(
+      :title => "blah", :message => "bloo"
+    )
     @topic_copy.migration_id = @tag.migration_id
     @topic_copy.save!
   end
@@ -75,6 +81,19 @@ describe "master courses - child courses - discussion locking" do
 
     f('.al-trigger').click
     expect(f('.al-options')).to contain_css('.delete_discussion')
+  end
+
+  it "should not allow popup editing of restricted items" do
+    # restrict everything
+    @tag.update_attribute(:restrictions, {:content => true, :points => true, :due_dates => true, :availability_dates => true})
+
+    get "/courses/#{@copy_to.id}/discussion_topics/#{@topic_copy.id}/edit"
+
+    expect(f("#discussion-title").tag_name).to eq "h1"
+    expect(f("#discussion-description").tag_name).to eq "div"
+    # this passes because the UI elems are on the page but hidden because the discussion is not graded
+    expect(f("#discussion_topic_assignment_points_possible").attribute("readonly")).to eq "true"
+    expect(f("#due_at").attribute("readonly")).to eq "true"
   end
 
   context "announcements" do

@@ -67,6 +67,7 @@ define [
         'js-assignment-overrides': new DueDateOverrideView
           model: dueDateList
           views: {}
+      lockedItems: opts.lockedItems || {}
 
     (app.assignmentGroupCollection = new AssignmentGroupCollection).contextAssetString = ENV.context_asset_string
     app.render()
@@ -95,8 +96,16 @@ define [
 
   test 'tells RCE to manage the parent', ->
     lne = @stub(RichContentEditor, 'loadNewEditor')
-    EditView.prototype.loadNewEditor.call()
+    view = @editView()
+    view.loadNewEditor()
     ok lne.firstCall.args[1].manageParent, 'manageParent flag should be set'
+
+  test 'does not tell RCE to manage the parent of locked content', ->
+    lne = @stub(RichContentEditor, 'loadNewEditor')
+    view = @editView
+      lockedItems: {content: true}
+    view.loadNewEditor()
+    ok lne.callCount==0, 'RCE not called'
 
   test 'shows error message on assignment point change with submissions', ->
     view = @editView

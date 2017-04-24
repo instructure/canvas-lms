@@ -456,6 +456,9 @@ define [
     disabledIf: ( thing, hash ) ->
       if thing then 'disabled' else ''
 
+    readonlyIf: ( thing, hash ) ->
+      if thing then 'readonly' else ''
+
     checkedUnless: ( thing ) ->
       if thing then '' else 'checked'
 
