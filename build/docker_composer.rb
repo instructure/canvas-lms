@@ -76,7 +76,7 @@ class DockerComposer
       puts "Pushing built images..."
       built_services.each do |key|
         name = "canvas_#{key}"
-        path = "s3:///#{DOCKER_CACHE_S3_BUCKET}/canvas-lms/canvas_#{key}-ci.tar"
+        path = "s3://#{DOCKER_CACHE_S3_BUCKET}/canvas-lms/canvas_#{key}-ci.tar"
         system "docker save #{name} $(docker history -q #{name} | grep -v missing) | aws s3 cp --only-show-errors --region #{DOCKER_CACHE_S3_REGION} - #{path}"
       end
     end
@@ -178,7 +178,7 @@ class DockerComposer
       puts "Pushing artifacts..."
       stop_services # shut it down cleanly before we commit
       archive_path = ENV["PUSH_DOCKER_VOLUME_ARCHIVE"]
-      publish_vars_path = "s3:///#{DOCKER_CACHE_S3_BUCKET}/canvas-lms/docker_vars/#{ENV["PGVERSION"]}/" + `git rev-parse HEAD` if publish_artifacts?
+      publish_vars_path = "s3://#{DOCKER_CACHE_S3_BUCKET}/canvas-lms/docker_vars/#{ENV["PGVERSION"]}/" + `git rev-parse HEAD` if publish_artifacts?
       docker "exec -i #{ENV["COMPOSE_PROJECT_NAME"]}_data_loader_1 /push-volumes #{archive_path} #{publish_vars_path}"
       push_built_images if publish_artifacts?
       start_services
