@@ -205,6 +205,18 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       @params = @base_params.merge(:action => 'restrict_item')
     end
 
+    it "should validate content type" do
+      json = api_call(:put, @url, @params, {:content_type => 'passignment', :content_id => "2", :restricted => '1'}, {}, {:expected_status => 400})
+      expect(json['message']).to include("Must be a valid content type")
+    end
+
+    it "should give a useful error when content is missing" do
+      other_course = Course.create!
+      other_assmt = other_course.assignments.create!
+      json = api_call(:put, @url, @params, {:content_type => 'assignment', :content_id => other_assmt.id, :restricted => '1'}, {}, {:expected_status => 404})
+      expect(json['message']).to include("Could not find content")
+    end
+
     it "should be able to find all the (currently) supported types" do
       expect(@template.default_restrictions[:content]).to be_truthy
 

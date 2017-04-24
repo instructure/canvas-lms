@@ -291,7 +291,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def restrict_item
     content_type = params[:content_type]
     unless %w{assignment attachment discussion_topic external_tool quiz wiki_page}.include?(content_type)
-      return render :json => {:message => "Cannot queue a migration while one is currently running"}, :status => :bad_request
+      return render :json => {:message => "Must be a valid content type (assignment,attachment,discussion_topic,external_tool,quiz,wiki_page)"}, :status => :bad_request
     end
     unless params.has_key?(:restricted)
       return render :json => {:message => "Must set 'restricted'"}, :status => :bad_request
@@ -308,7 +308,10 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       else
         @course.send(content_type.pluralize).where.not(:workflow_state => 'deleted')
       end
-    item = scope.find(params[:content_id])
+    item = scope.where(:id => params[:content_id]).first
+    unless item
+      return render :json => {:message => "Could not find content: #{content_type} #{params[:content_id]}"}, :status => :not_found
+    end
     mc_tag = @template.content_tag_for(item)
     if value_to_boolean(params[:restricted])
       custom_restrictions = params[:restrictions] && Hash[params[:restrictions].map{|k, v| [k.to_sym, value_to_boolean(v)]}]
