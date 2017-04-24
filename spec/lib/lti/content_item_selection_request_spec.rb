@@ -30,6 +30,17 @@ describe Lti::ContentItemSelectionRequest do
       expect(lti_request.generate_lti_launch).to be_a Lti::Launch
     end
 
+    it 'sends opts to the Lti::Launch' do
+      opts = {
+        post_only: true, 
+        tool_dimensions: {selection_height: '1000px', selection_width: '100%'}
+      }
+
+      expect(Lti::Launch).to receive(:new).with(opts).and_return(Lti::Launch.new(opts))
+
+      lti_request.generate_lti_launch(opts)
+    end
+
     it 'generates resource_url based on a launch_url' do
       lti_launch = lti_request.generate_lti_launch(launch_url: 'https://www.example.com')
       expect(lti_launch.resource_url).to eq 'https://www.example.com'
@@ -40,6 +51,13 @@ describe Lti::ContentItemSelectionRequest do
         lti_launch = lti_request.generate_lti_launch
         default_params = described_class.default_lti_params(course, root_account, teacher)
         expect(lti_launch.params).to include(default_params)
+      end
+
+      it 'adds request specific params' do
+        lti_launch = lti_request.generate_lti_launch
+        expect(lti_launch.params).to include({
+
+        })
       end
     end
   end
