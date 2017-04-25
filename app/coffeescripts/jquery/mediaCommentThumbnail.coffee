@@ -54,7 +54,9 @@ define [
                         class='media_comment_thumbnail media_comment_thumbnail-#{htmlEscape(size)}'
                       >
                         <span class='media_comment_thumbnail_play_button'>
-                          #{htmlEscape I18n.t 'click_to_view', 'Click to view'}
+                          <span class='screenreader-only'>
+                            #{htmlEscape I18n.t 'click_to_view', 'Click to view'}
+                          </span>
                         </span>
                       </span>"
 
