@@ -95,6 +95,21 @@ const ApiClient = {
       })
   },
 
+  getMigrationDetails ({ course }, migrationId) {
+    return axios.get(`/api/v1/courses/${course.id}/blueprint_templates/default/migrations/${migrationId}/details`)
+  },
+
+  getSyncHistory ({ course }) {
+    return this.getMigrations({ course })
+      .then(({ data }) =>
+        Promise.all(
+          // limit to last 5 migrations
+          data.slice(0, 5)
+            .map(mig =>
+              this.getMigrationDetails({ course }, mig.id)
+                .then(res => Object.assign(mig, { changes: res.data }))
+            )))
+  },
 }
 
 export default ApiClient

@@ -31,13 +31,13 @@ define [
   test "parses datetime from a string", ->
     fDT = React.createFactory(FriendlyDatetime)
     rendered = TestUtils.renderIntoDocument(fDT(dateTime: '1970-01-17'))
-    equal $(rendered.getDOMNode()).find('.visible-desktop').text(), "Jan 17, 1970", "converts to readable format"
-    equal $(rendered.getDOMNode()).find('.hidden-desktop').text(), "1/17/1970", "converts to readable format"
-    ReactDOM.unmountComponentAtNode(rendered.getDOMNode().parentNode)
+    equal $(rendered.time).find('.visible-desktop').text(), "Jan 17, 1970", "converts to readable format"
+    equal $(rendered.time).find('.hidden-desktop').text(), "1/17/1970", "converts to readable format"
+    ReactDOM.unmountComponentAtNode(rendered.time.parentNode)
 
   test "parses datetime from a Date", ->
     fDT = React.createFactory(FriendlyDatetime)
     rendered = TestUtils.renderIntoDocument(fDT(dateTime: new Date(1431570574)))
-    equal $(rendered.getDOMNode()).find('.visible-desktop').text(), "Jan 17, 1970", "converts to readable format"
-    equal $(rendered.getDOMNode()).find('.hidden-desktop').text(), "1/17/1970", "converts to readable format"
-    ReactDOM.unmountComponentAtNode(rendered.getDOMNode().parentNode)
+    equal $(rendered.time).find('.visible-desktop').text(), "Jan 17, 1970", "converts to readable format"
+    equal $(rendered.time).find('.hidden-desktop').text(), "1/17/1970", "converts to readable format"
+    ReactDOM.unmountComponentAtNode(rendered.time.parentNode)

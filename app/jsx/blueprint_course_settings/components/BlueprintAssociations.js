@@ -21,6 +21,7 @@ import $ from 'jquery'
 import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import select from 'jsx/shared/select'
 import 'compiled/jquery.rails_flash_notifications'
 
 import Heading from 'instructure-ui/lib/components/Heading'
@@ -47,6 +48,7 @@ export default class BlueprintAssociations extends React.Component {
     addedAssociations: propTypes.courseList.isRequired,
     removedAssociations: arrayOf(string).isRequired,
 
+    hasLoadedCourses: bool.isRequired,
     isLoadingCourses: bool.isRequired,
     isLoadingAssociations: bool.isRequired,
     isSavingAssociations: bool.isRequired,
@@ -56,6 +58,12 @@ export default class BlueprintAssociations extends React.Component {
 
   static defaultProps = {
     isExpanded: false,
+  }
+
+  componentDidMount () {
+    if (!this.props.hasLoadedCourses) {
+      this.props.loadCourses()
+    }
   }
 
   componentWillReceiveProps (nextProps) {
@@ -128,17 +136,18 @@ export default class BlueprintAssociations extends React.Component {
 }
 
 const connectState = state =>
-  [
+  select(state, [
     'existingAssociations',
     'addedAssociations',
     'removedAssociations',
     'courses',
     'terms',
     'subAccounts',
+    'errors',
+    'hasLoadedCourses',
     'isLoadingCourses',
     'isLoadingAssociations',
     'isSavingAssociations',
-  ].reduce((propSet, prop) => Object.assign(propSet, { [prop]: state[prop] }), {})
+  ])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-
 export const ConnectedBlueprintAssociations = connect(connectState, connectActions)(BlueprintAssociations)

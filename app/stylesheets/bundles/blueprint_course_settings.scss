@@ -31,6 +31,88 @@
   }
 }
 
+.bcs__history-item {
+  margin-bottom: 3em;
+}
+
+.bcs__history-item__title {
+  border-bottom: 2px solid $ic-color-medium;
+  padding-bottom: 0.5em;
+  margin-bottom: 1.5em;
+
+  & > * {
+    display: inline-block;
+    margin-left: 1em;
+  }
+}
+
+.bcs__history-item__change {
+  padding: 1em;
+  border: 1px solid $ic-border-color;
+
+  & + & {
+    border-top: none;
+  }
+
+  &:first-of-type {
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+  }
+
+  &:last-of-type {
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+  }
+
+  &.bcs__history-item__change__expanded {
+    .pill {
+      background-color: $ic-color-medium;
+      color: $ic-color-light;
+    }
+  }
+
+  .pill {
+    text-transform: uppercase;
+    padding: 0.1em 0.75em;
+  }
+}
+
+.bcs__history-item__content {
+  min-height: 1.5em;
+  position: relative;
+}
+
+.bcs__history-item__content-grid {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 50px;
+}
+
+.bcs__history-item__change-exceps {
+  margin: 0 2em;
+  list-style: none;
+}
+
+.bcs__history-item__change-exceps__group {
+    margin: 1.5em 0 1em;
+}
+
+.bcs__history-item__change-exceps__courses {
+  margin: 0.5em 0 0;
+  list-style: none;
+
+  > li {
+    margin-bottom: 5px;
+  }
+}
+
+.bcs__history-item__lock-icon {
+  position: absolute;
+  top: -5px;
+  left: 20px;
+}
+
 @keyframes spinning {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -85,7 +167,7 @@
   left: 0.5em;
 }
 
-.bca__wrapper {
+.bcs__modal-content-wrapper {
   margin: 0 auto;
   max-width: 850px;
   position: relative;

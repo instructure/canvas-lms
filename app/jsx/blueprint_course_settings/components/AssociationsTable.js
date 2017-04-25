@@ -37,7 +37,7 @@ function shortId () {
   return prefix + id
 }
 
-export default class CoursePickerTable extends React.Component {
+export default class AssociationsTable extends React.Component {
   static propTypes = {
     existingAssociations: propTypes.courseList.isRequired,
     addedAssociations: propTypes.courseList.isRequired,

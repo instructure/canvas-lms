@@ -32,6 +32,7 @@ const defaultProps = () => ({
   removeAssociations: () => {},
   loadCourses: () => {},
   loadAssociations: () => {},
+  hasLoadedCourses: false,
   isLoadingCourses: false,
   isLoadingAssociations: false,
   isSavingAssociations: false,
@@ -39,8 +40,28 @@ const defaultProps = () => ({
   terms: data.terms,
 })
 
-test('renders the BlueprintSettings component', () => {
+test('renders the BlueprintAssociations component', () => {
   const tree = enzyme.shallow(<BlueprintAssociations {...defaultProps()} />)
   const node = tree.find('.bca__wrapper')
+  ok(node.exists())
+})
+
+test('displays saving spinner when saving', () => {
+  const props = defaultProps()
+  props.isSavingAssociations = true
+  const tree = enzyme.shallow(<BlueprintAssociations {...props} />)
+  const node = tree.find('.bca__overlay__save-wrapper Spinner')
+  ok(node.exists())
+})
+
+test('renders a child CoursePicker component', () => {
+  const tree = enzyme.mount(<BlueprintAssociations {...defaultProps()} />)
+  const node = tree.find('CoursePicker')
+  ok(node.exists())
+})
+
+test('renders a child AssociationsTable component', () => {
+  const tree = enzyme.mount(<BlueprintAssociations {...defaultProps()} />)
+  const node = tree.find('AssociationsTable')
   ok(node.exists())
 })

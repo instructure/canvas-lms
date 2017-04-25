@@ -31,6 +31,7 @@ const handleError = (msg, dispatch, actionCreator) => (err) => {
 const types = [
   'LOAD_COURSES_START', 'LOAD_COURSES_SUCCESS', 'LOAD_COURSES_FAIL',
   'LOAD_ASSOCIATIONS_START', 'LOAD_ASSOCIATIONS_SUCCESS', 'LOAD_ASSOCIATIONS_FAIL',
+  'LOAD_HISTORY_START', 'LOAD_HISTORY_SUCCESS', 'LOAD_HISTORY_FAIL',
   'SAVE_ASSOCIATIONS_START', 'SAVE_ASSOCIATIONS_SUCCESS', 'SAVE_ASSOCIATIONS_FAIL',
   'CHECK_MIGRATION_START', 'CHECK_MIGRATION_SUCCESS', 'CHECK_MIGRATION_FAIL',
   'BEGIN_MIGRATION_START', 'BEGIN_MIGRATION_SUCCESS', 'BEGIN_MIGRATION_FAIL',
@@ -39,6 +40,13 @@ const types = [
   'CLEAR_ASSOCIATIONS',
 ]
 const actions = createActions(...types)
+
+actions.loadHistory = () => (dispatch, getState) => {
+  dispatch(actions.loadHistoryStart())
+  api.getSyncHistory(getState())
+    .then(data => dispatch(actions.loadHistorySuccess(data)))
+    .catch(err => dispatch(actions.loadHistoryFail(err)))
+}
 
 actions.checkMigration = () => (dispatch, getState) => {
   dispatch(actions.checkMigrationStart())
@@ -108,8 +116,11 @@ actions.loadCourses = filters => (dispatch, getState) => {
 }
 
 actions.loadAssociations = () => (dispatch, getState) => {
+  const state = getState()
+  // return if request is already in progress
+  if (state.isLoadingAssociations) return
   dispatch(actions.loadAssociationsStart())
-  api.getAssociations(getState())
+  api.getAssociations(state)
     .then((res) => {
       const data = res.data.map(course =>
         Object.assign({}, course, {

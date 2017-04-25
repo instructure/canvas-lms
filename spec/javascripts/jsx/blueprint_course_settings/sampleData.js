@@ -53,4 +53,40 @@ export default {
       sis_course_id: '1001',
     }
   ],
+  history: [
+    {
+      id: '2',
+      workflow_state: 'completed',
+      created_at: '2013-08-28T23:59:00-06:00',
+      changes: [
+        {
+          asset_id: '2',
+          asset_type: 'quiz',
+          asset_name: 'Chapter 5 Quiz',
+          change_type: 'update',
+          html_url: 'http://localhost:3000/courses/3/quizzes/2',
+          exceptions: [
+            {
+              course_id: '1',
+              conflicting_changes: ['points'],
+              name: 'Course 1',
+              term: { name: 'Default Term' },
+            },
+            {
+              course_id: '5',
+              conflicting_changes: ['content'],
+              name: 'Course 5',
+              term: { name: 'Default Term' },
+            },
+            {
+              course_id: '56',
+              conflicting_changes: ['points'],
+              name: 'Course 56',
+              term: { name: 'Default Term' },
+            }
+          ],
+        }
+      ],
+    },
+  ]
 }

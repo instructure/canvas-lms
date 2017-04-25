@@ -30,6 +30,17 @@ export default combineReducers({
   course: identity(),
   terms: identity([]),
   subAccounts: identity([]),
+  isLoadingHistory: handleActions({
+    [actionTypes.LOAD_HISTORY_START]: () => true,
+    [actionTypes.LOAD_HISTORY_SUCCESS]: () => false,
+    [actionTypes.LOAD_HISTORY_FAIL]: () => false,
+  }, false),
+  hasLoadedHistory: handleActions({
+    [actionTypes.LOAD_HISTORY_SUCCESS]: () => true,
+  }, false),
+  migrations: handleActions({
+    [actionTypes.LOAD_HISTORY_SUCCESS]: (state, action) => action.payload,
+  }, []),
   migrationStatus: handleActions({
     [actionTypes.CHECK_MIGRATION_SUCCESS]: (state, action) => action.payload,
     [actionTypes.BEGIN_MIGRATION_SUCCESS]: (state, action) => action.payload.workflow_state,

@@ -21,6 +21,7 @@ import $ from 'jquery'
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import select from 'jsx/shared/select'
 import cx from 'classnames'
 import 'compiled/jquery.rails_flash_notifications'
 
@@ -137,15 +138,11 @@ export default class MigrationSync extends Component {
   }
 }
 
-const connectState = ({
-  migrationStatus,
-  isLoadingBeginMigration,
-  hasCheckedMigration,
-}) => ({
-  migrationStatus,
-  isLoadingBeginMigration,
-  hasCheckedMigration,
-})
+const connectState = state =>
+  select(state, [
+    'migrationStatus',
+    'isLoadingBeginMigration',
+    'hasCheckedMigration',
+  ])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-
 export const ConnectedMigrationSync = connect(connectState, connectActions)(MigrationSync)

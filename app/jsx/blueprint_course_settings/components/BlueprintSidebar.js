@@ -74,6 +74,7 @@ export default class BlueprintCourseSidebar extends Component {
         <Tray
           label={I18n.t('Blueprint Settings')}
           isDismissable={false}
+          trapFocus
           isOpen={this.state.isOpen}
           placement="right"
           onEntering={this.handleOpen}

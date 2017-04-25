@@ -20,6 +20,7 @@ import I18n from 'i18n!blueprint_settings'
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import select from 'jsx/shared/select'
 
 import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
@@ -29,14 +30,13 @@ import actions from '../actions'
 import BlueprintSidebar from './BlueprintSidebar'
 import BlueprintModal from './BlueprintModal'
 import { ConnectedMigrationSync as MigrationSync } from './MigrationSync'
-import { ConnectedBlueprintAssociations } from './BlueprintAssociations'
+import { ConnectedBlueprintAssociations as BlueprintAssociations } from './BlueprintAssociations'
+import { ConnectedSyncHistory as SyncHistory } from './SyncHistory'
 
 export default class CourseSidebar extends Component {
   static propTypes = {
     hasLoadedAssociations: PropTypes.bool.isRequired,
-    hasLoadedCourses: PropTypes.bool.isRequired,
     associations: propTypes.courseList.isRequired,
-    loadCourses: PropTypes.func.isRequired,
     loadAssociations: PropTypes.func.isRequired,
     saveAssociations: PropTypes.func.isRequired,
     clearAssociations: PropTypes.func.isRequired,
@@ -70,8 +70,21 @@ export default class CourseSidebar extends Component {
           this.props.clearAssociations()
         }),
       },
-      children: () => <ConnectedBlueprintAssociations />,
-    })
+      children: () => <BlueprintAssociations />,
+      onCancel: () => this.closeModal(() => {
+        this.asscBtn.focus()
+        this.props.clearAssociations()
+      }),
+    }),
+    syncHistory: () => ({
+      props: {
+        title: I18n.t('Sync History'),
+        onCancel: () => this.closeModal(() => {
+          this.syncHistoryBtn.focus()
+        }),
+      },
+      children: () => <SyncHistory />,
+    }),
   }
 
   closeModal = (cb) => {
@@ -79,12 +92,16 @@ export default class CourseSidebar extends Component {
   }
 
   handleAssociationsClick = () => {
-    if (!this.props.hasLoadedCourses) {
-      this.props.loadCourses()
-    }
     this.setState({
       isModalOpen: true,
       modalId: 'associations',
+    })
+  }
+
+  handleSyncHistoryClick = () => {
+    this.setState({
+      isModalOpen: true,
+      modalId: 'syncHistory',
     })
   }
 
@@ -106,6 +123,11 @@ export default class CourseSidebar extends Component {
           </Button>
           <Typography><span className="bcs__row-right-content">{this.props.associations.length}</span></Typography>
         </div>
+        <div className="bcs__row">
+          <Button ref={(c) => { this.syncHistoryBtn = c }} variant="link" onClick={this.handleSyncHistoryClick}>
+            <Typography>{I18n.t('Sync History')}</Typography>
+          </Button>
+        </div>
         <MigrationSync />
         {this.renderModal()}
       </BlueprintSidebar>
@@ -113,26 +135,16 @@ export default class CourseSidebar extends Component {
   }
 }
 
-const connectState = ({
-  existingAssociations,
-  hasLoadedAssociations,
-  hasLoadedCourses,
-  migrationStatus,
-  isLoadingBeginMigration,
-  hasCheckedMigration,
-  addedAssociations,
-  removedAssociations,
-  isSavingAssociations,
-}) => ({
-  associations: existingAssociations,
-  hasLoadedAssociations,
-  hasLoadedCourses,
-  migrationStatus,
-  isLoadingBeginMigration,
-  hasCheckedMigration,
-  isSavingAssociations,
-  hasAssociationChanges: (addedAssociations.length + removedAssociations.length) > 0,
-})
+const connectState = state =>
+  Object.assign(select(state, [
+    'hasLoadedAssociations',
+    'migrationStatus',
+    'isLoadingBeginMigration',
+    'hasCheckedMigration',
+    'isSavingAssociations',
+    ['existingAssociations', 'associations'],
+  ]), {
+    hasAssociationChanges: (state.addedAssociations.length + state.removedAssociations.length) > 0,
+  })
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-
 export const ConnectedCourseSidebar = connect(connectState, connectActions)(CourseSidebar)

@@ -35,8 +35,8 @@ export default class BlueprintModal extends Component {
 
   static defaultProps = {
     title: I18n.t('Blueprint'),
-    isSaving: false,
     hasChanges: false,
+    isSaving: false,
     onSave: () => {},
     onCancel: () => {},
   }
@@ -68,7 +68,9 @@ export default class BlueprintModal extends Component {
           <Heading level="h3">{this.props.title}</Heading>
         </ModalHeader>
         <ModalBody>
-          {this.props.children()}
+          <div className="bcs__modal-content-wrapper">
+            {this.props.children()}
+          </div>
         </ModalBody>
         <ModalFooter ref={(c) => { this.footer = c }}>
           {this.props.hasChanges && !this.props.isSaving ? (

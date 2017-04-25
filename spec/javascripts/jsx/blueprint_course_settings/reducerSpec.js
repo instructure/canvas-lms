@@ -88,107 +88,127 @@ test('removes associations from removedAssociations on UNDO_REMOVE_COURSE_ASSOCI
   deepEqual(newState.removedAssociations, ['2'])
 })
 
-test('sets hasLoadedCourses to true on on LOAD_COURSES_SUCCESS', () => {
+test('sets hasLoadedCourses to true on LOAD_COURSES_SUCCESS', () => {
   const newState = reduce(actions.loadCoursesSuccess({}))
   equal(newState.hasLoadedCourses, true)
 })
 
-test('sets isLoadingCourses to true on on LOAD_COURSES_START', () => {
+test('sets isLoadingCourses to true on LOAD_COURSES_START', () => {
   const newState = reduce(actions.loadCoursesStart())
   equal(newState.isLoadingCourses, true)
 })
 
-test('sets isLoadingCourses to false on on LOAD_COURSES_SUCCESS', () => {
+test('sets isLoadingCourses to false on LOAD_COURSES_SUCCESS', () => {
   const newState = reduce(actions.loadCoursesSuccess({}))
   equal(newState.isLoadingCourses, false)
 })
 
-test('sets isLoadingCourses to false on on LOAD_COURSES_FAIL', () => {
+test('sets isLoadingCourses to false on LOAD_COURSES_FAIL', () => {
   const newState = reduce(actions.loadCoursesFail())
   equal(newState.isLoadingCourses, false)
 })
 
-test('sets hasLoadedAssociations to true on on LOAD_ASSOCIATIONS_SUCCESS', () => {
+test('sets hasLoadedAssociations to true on LOAD_ASSOCIATIONS_SUCCESS', () => {
   const newState = reduce(actions.loadAssociationsSuccess([]))
   equal(newState.hasLoadedAssociations, true)
 })
 
-test('sets isLoadingAssociations to true on on LOAD_ASSOCIATIONS_START', () => {
+test('sets isLoadingAssociations to true on LOAD_ASSOCIATIONS_START', () => {
   const newState = reduce(actions.loadAssociationsStart())
   equal(newState.isLoadingAssociations, true)
 })
 
-test('sets isLoadingAssociations to false on on LOAD_ASSOCIATIONS_SUCCESS', () => {
+test('sets isLoadingAssociations to false on LOAD_ASSOCIATIONS_SUCCESS', () => {
   const newState = reduce(actions.loadAssociationsSuccess([]))
   equal(newState.isLoadingAssociations, false)
 })
 
-test('sets isLoadingAssociations to false on on LOAD_ASSOCIATIONS_FAIL', () => {
+test('sets isLoadingAssociations to false on LOAD_ASSOCIATIONS_FAIL', () => {
   const newState = reduce(actions.loadAssociationsFail())
   equal(newState.isLoadingAssociations, false)
 })
 
-test('sets isSavingAssociations to true on on SAVE_ASSOCIATIONS_START', () => {
+test('sets isSavingAssociations to true on SAVE_ASSOCIATIONS_START', () => {
   const newState = reduce(actions.saveAssociationsStart())
   equal(newState.isSavingAssociations, true)
 })
 
-test('sets isSavingAssociations to false on on SAVE_ASSOCIATIONS_SUCCESS', () => {
+test('sets isSavingAssociations to false on SAVE_ASSOCIATIONS_SUCCESS', () => {
   const newState = reduce(actions.saveAssociationsSuccess({}))
   equal(newState.isSavingAssociations, false)
 })
 
-test('sets isSavingAssociations to false on on SAVE_ASSOCIATIONS_FAIL', () => {
+test('sets isSavingAssociations to false on SAVE_ASSOCIATIONS_FAIL', () => {
   const newState = reduce(actions.saveAssociationsFail())
   equal(newState.isSavingAssociations, false)
 })
 
-test('sets isLoadingBeginMigration to true on on BEGIN_MIGRATION_START', () => {
+test('sets isLoadingBeginMigration to true on BEGIN_MIGRATION_START', () => {
   const newState = reduce(actions.beginMigrationStart())
   equal(newState.isLoadingBeginMigration, true)
 })
 
-test('sets isLoadingBeginMigration to false on on BEGIN_MIGRATION_SUCCESS', () => {
+test('sets isLoadingBeginMigration to false on BEGIN_MIGRATION_SUCCESS', () => {
   const newState = reduce(actions.beginMigrationSuccess({ workflow_state: 'queued' }))
   equal(newState.isLoadingBeginMigration, false)
 })
 
-test('sets isLoadingBeginMigration to false on on BEGIN_MIGRATION_FAIL', () => {
+test('sets isLoadingBeginMigration to false on BEGIN_MIGRATION_FAIL', () => {
   const newState = reduce(actions.beginMigrationFail())
   equal(newState.isLoadingBeginMigration, false)
 })
 
-test('sets hasCheckedMigration to true on on CHECK_MIGRATION_SUCCESS', () => {
+test('sets hasCheckedMigration to true on CHECK_MIGRATION_SUCCESS', () => {
   const newState = reduce(actions.checkMigrationSuccess('queued'))
   equal(newState.hasCheckedMigration, true)
 })
 
-test('sets hasCheckedMigration to true on on BEGIN_MIGRATION_SUCCESS', () => {
+test('sets hasCheckedMigration to true on BEGIN_MIGRATION_SUCCESS', () => {
   const newState = reduce(actions.beginMigrationSuccess({ workflow_state: 'queued' }))
   equal(newState.hasCheckedMigration, true)
 })
 
-test('sets isCheckinMigration to true on on CHECK_MIGRATION_START', () => {
+test('sets isCheckinMigration to true on CHECK_MIGRATION_START', () => {
   const newState = reduce(actions.checkMigrationStart())
   equal(newState.isCheckinMigration, true)
 })
 
-test('sets isCheckinMigration to false on on CHECK_MIGRATION_SUCCESS', () => {
+test('sets isCheckinMigration to false on CHECK_MIGRATION_SUCCESS', () => {
   const newState = reduce(actions.checkMigrationSuccess('queued'))
   equal(newState.isCheckinMigration, false)
 })
 
-test('sets isCheckinMigration to false on on CHECK_MIGRATION_FAIL', () => {
+test('sets isCheckinMigration to false on CHECK_MIGRATION_FAIL', () => {
   const newState = reduce(actions.checkMigrationFail())
   equal(newState.isCheckinMigration, false)
 })
 
-test('sets migrationStatus to true on on BEGIN_MIGRATION_SUCCESS', () => {
+test('sets migrationStatus to true on BEGIN_MIGRATION_SUCCESS', () => {
   const newState = reduce(actions.beginMigrationSuccess({ workflow_state: 'queued' }))
   equal(newState.migrationStatus, 'queued')
 })
 
-test('sets migrationStatus to true on on CHECK_MIGRATION_SUCCESS', () => {
+test('sets migrationStatus to true on CHECK_MIGRATION_SUCCESS', () => {
   const newState = reduce(actions.checkMigrationSuccess('queued'))
   equal(newState.migrationStatus, 'queued')
+})
+
+test('sets hasLoadedHistory to true on LOAD_HISTORY_SUCCESS', () => {
+  const newState = reduce(actions.loadHistorySuccess({}))
+  equal(newState.hasLoadedHistory, true)
+})
+
+test('sets isLoadingHistory to true on LOAD_HISTORY_START', () => {
+  const newState = reduce(actions.loadHistoryStart())
+  equal(newState.isLoadingHistory, true)
+})
+
+test('sets isLoadingHistory to false on LOAD_HISTORY_SUCCESS', () => {
+  const newState = reduce(actions.loadHistorySuccess({}))
+  equal(newState.isLoadingHistory, false)
+})
+
+test('sets isLoadingHistory to false on LOAD_HISTORY_FAIL', () => {
+  const newState = reduce(actions.loadHistoryFail())
+  equal(newState.isLoadingHistory, false)
 })
