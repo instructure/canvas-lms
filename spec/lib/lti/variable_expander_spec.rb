@@ -41,6 +41,7 @@ module Lti
       m.stubs(:id).returns(1)
       m.stubs(:context).returns(root_account)
       m.stubs(:extension_setting).with(nil, :prefer_sis_email).returns(nil)
+      m.stubs(:extension_setting).with(:tool_configuration, :prefer_sis_email).returns(nil)
       shard_mock = mock('shard')
       shard_mock.stubs(:settings).returns({encription_key: 'abc'})
       m.stubs(:shard).returns(shard_mock)

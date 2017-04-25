@@ -1208,6 +1208,22 @@ describe ExternalToolsController do
 
   end
 
+  describe "PUT 'update'" do
+    it 'updates tool with tool_configuration[prefer_sis_email] param' do
+      @tool = new_valid_tool(@course)
+      user_session(@teacher)
+
+      put :update, course_id: @course.id, external_tool_id: @tool.id, external_tool: { tool_configuration: { prefer_sis_email: "true" } }, format: 'json'
+
+      expect(response).to be_success
+
+      json = json_parse(response.body)
+
+      expect(json['tool_configuration']).to be_truthy
+      expect(json['tool_configuration']['prefer_sis_email']).to eq 'true'
+    end
+  end
+
   describe "'GET 'generate_sessionless_launch'" do
     it "generates a sessionless launch" do
       @tool = new_valid_tool(@course)

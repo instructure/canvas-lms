@@ -440,7 +440,15 @@ module Lti
             expect(substitution_helper.email).to eq sis_email
           end
 
-          it "returns the users email if there isn't an sis email" do
+          it "returns the sis_email when set via tool_configuration" do
+            tool.settings[:prefer_sis_email] = nil
+            tool.settings[:tool_configuration] = { prefer_sis_email: 'true' }
+            tool.save!
+            sis_pseudonym
+            expect(substitution_helper.email).to eq sis_email
+          end
+
+          it "returns the users email if there isn't a sis email" do
             expect(substitution_helper.email).to eq user.email
           end
 
