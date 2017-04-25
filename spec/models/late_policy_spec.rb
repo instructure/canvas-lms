@@ -76,37 +76,37 @@ describe LatePolicy do
 
   describe 'rounding' do
     it 'only keeps 2 digits after the decimal for late_submission_minimum_percent' do
-      policy = LatePolicy.new(late_submission_minimum_percent: 100.223)
-      expect(policy.late_submission_minimum_percent).to eql BigDecimal.new('100.22')
+      policy = LatePolicy.new(late_submission_minimum_percent: 25.223)
+      expect(policy.late_submission_minimum_percent).to eql BigDecimal.new('25.22')
     end
 
     it 'rounds late_submission_minimum_percent' do
-      policy = LatePolicy.new(late_submission_minimum_percent: 100.225)
-      expect(policy.late_submission_minimum_percent).to eql BigDecimal.new('100.23')
+      policy = LatePolicy.new(late_submission_minimum_percent: 25.225)
+      expect(policy.late_submission_minimum_percent).to eql BigDecimal.new('25.23')
     end
 
     it 'only keeps 2 digits after the decimal for missing_submission_deduction' do
-      policy = LatePolicy.new(missing_submission_deduction: 100.223)
-      expect(policy.missing_submission_deduction).to eql BigDecimal.new('100.22')
+      policy = LatePolicy.new(missing_submission_deduction: 25.223)
+      expect(policy.missing_submission_deduction).to eql BigDecimal.new('25.22')
     end
 
     it 'rounds missing_submission_deduction' do
-      policy = LatePolicy.new(missing_submission_deduction: 100.225)
-      expect(policy.missing_submission_deduction).to eql BigDecimal.new('100.23')
+      policy = LatePolicy.new(missing_submission_deduction: 25.225)
+      expect(policy.missing_submission_deduction).to eql BigDecimal.new('25.23')
     end
 
     it 'only keeps 2 digits after the decimal for late_submission_deduction' do
-      policy = LatePolicy.new(late_submission_deduction: 100.223)
-      expect(policy.late_submission_deduction).to eql BigDecimal.new('100.22')
+      policy = LatePolicy.new(late_submission_deduction: 25.223)
+      expect(policy.late_submission_deduction).to eql BigDecimal.new('25.22')
     end
 
     it 'rounds late_submission_deduction' do
-      policy = LatePolicy.new(late_submission_deduction: 100.225)
-      expect(policy.late_submission_deduction).to eql BigDecimal.new('100.23')
+      policy = LatePolicy.new(late_submission_deduction: 25.225)
+      expect(policy.late_submission_deduction).to eql BigDecimal.new('25.23')
     end
   end
 
-  describe 'deduction' do
+  describe '#points_deducted' do
     it 'ignores disabled late submission deduction' do
       expect(late_policy_model.points_deducted(score: 500, possible: 1000, late_for: 1.day)).to eq 0
     end
@@ -141,6 +141,45 @@ describe LatePolicy do
     it 'can deduct fractional points' do
       policy = late_policy_model(deduct: 1.0, every: :hour)
       expect(policy.points_deducted(score: 10, possible: 10, late_for: 6.hours)).to eq 0.6
+    end
+  end
+
+  describe '#points_for_missing' do
+    it 'returns 0 when assignment grading_type is pass_fail' do
+      policy = late_policy_model
+      assignment = instance_double('Assignment')
+      allow(assignment).to receive(:grading_type).and_return('pass_fail')
+
+      expect(policy.points_for_missing(assignment)).to eq(0)
+    end
+
+    it 'computes expected value' do
+      policy = late_policy_model(missing_submission_deduction: 60)
+      assignment = instance_double('Assignment')
+      allow(assignment).to receive(:grading_type).and_return('foo')
+      allow(assignment).to receive(:points_possible).and_return(100)
+
+      expect(policy.points_for_missing(assignment)).to eq(40)
+    end
+  end
+
+  describe '#missing_points_deducted' do
+    it 'returns points_possible when assignment grading_type is pass_fail' do
+      policy = late_policy_model
+      assignment = instance_double('Assignment')
+      allow(assignment).to receive(:grading_type).and_return('pass_fail')
+      allow(assignment).to receive(:points_possible).and_return(100)
+
+      expect(policy.missing_points_deducted(assignment)).to eq(100)
+    end
+
+    it 'computes expected value' do
+      policy = late_policy_model(missing_submission_deduction: 60)
+      assignment = instance_double('Assignment')
+      allow(assignment).to receive(:grading_type).and_return('foo')
+      allow(assignment).to receive(:points_possible).and_return(100)
+
+      expect(policy.missing_points_deducted(assignment)).to eq(60)
     end
   end
 

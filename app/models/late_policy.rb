@@ -42,6 +42,16 @@ class LatePolicy < ActiveRecord::Base
     possible * [late_percent_deduct, maximum_deduct].min / 100
   end
 
+  def missing_points_deducted(assignment)
+    return assignment.points_possible.to_f if assignment.grading_type == 'pass_fail'
+    assignment.points_possible.to_f * missing_submission_deduction.to_f / 100
+  end
+
+  def points_for_missing(assignment)
+    return 0 if assignment.grading_type == 'pass_fail'
+    assignment.points_possible.to_f * (100 - missing_submission_deduction.to_f) / 100
+  end
+
   private
 
   def interval_seconds
