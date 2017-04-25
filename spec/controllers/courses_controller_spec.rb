@@ -1699,10 +1699,10 @@ describe CoursesController do
 
       it "should allow setting of default template restrictions" do
         put 'update', :id => @course.id, :format => 'json', :course => { :blueprint => '1',
-          :blueprint_restrictions => {'content' => '1', 'due_dates' => '1'}}
+          :blueprint_restrictions => {'content' => '0', 'due_dates' => '1'}}
         expect(response).to be_success
         template = MasterCourses::MasterTemplate.full_template_for(@course)
-        expect(template.default_restrictions).to eq({:content => true, :due_dates => true})
+        expect(template.default_restrictions).to eq({:content => false, :due_dates => true})
       end
 
       it "should validate template restrictions" do

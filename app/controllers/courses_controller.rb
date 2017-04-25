@@ -2332,14 +2332,9 @@ class CoursesController < ApplicationController
         return unless authorized_action(@course.account, @current_user, :manage_master_courses)
         template = MasterCourses::MasterTemplate.full_template_for(@course)
         restrictions = Hash[mc_restrictions.map{|k, v| [k.to_sym, value_to_boolean(v)]}]
-        if restrictions.has_key?(:content) && !restrictions[:content]
-          @course.errors.add(:master_course_restrictions, t("Content must be restricted"))
-        else
-          restrictions[:content] = true # just default it because whatevs
-          template.default_restrictions = restrictions
-          unless template.save
-            @course.errors.add(:master_course_restrictions, t("Invalid restrictions"))
-          end
+        template.default_restrictions = restrictions
+        unless template.save
+          @course.errors.add(:master_course_restrictions, t("Invalid restrictions"))
         end
       end
 

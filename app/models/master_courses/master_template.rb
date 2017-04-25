@@ -49,8 +49,6 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     if self.default_restrictions_changed?
       if (self.default_restrictions.keys - MasterCourses::LOCK_TYPES).any?
         self.errors.add(:default_restrictions, "Invalid settings")
-      elsif !self.default_restrictions[:content]
-        self.errors.add(:default_restrictions, "Content must be restricted")
       end
     end
   end

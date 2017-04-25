@@ -11,7 +11,7 @@
     <div class="ic-Checkbox-group">
       <%= form.fields_for :blueprint_restrictions do |f| %>
         <div class="ic-Form-control ic-Form-control--checkbox">
-          <%= f.check_box :content, :checked => true, :disabled => true %>
+          <%= f.check_box :content, :checked => default_restrictions[:content] %>
           <%= f.label :content, :class => 'ic-Label', :en => "Content" %>
         </div>
         <div class="ic-Form-control ic-Form-control--checkbox">

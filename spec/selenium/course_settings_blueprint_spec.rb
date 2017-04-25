@@ -21,7 +21,6 @@ describe "course settings/blueprint" do
       f('label[for="course_blueprint"]').click
       wait_for_animations
       expect(f('#master_course_restrictions')).to be_displayed
-      expect(f('#course_blueprint_restrictions_content')).to be_disabled
       expect(is_checked('#course_blueprint_restrictions_content')).to be
       expect(is_checked('#course_blueprint_restrictions_points')).not_to be
       expect(is_checked('#course_blueprint_restrictions_due_dates')).not_to be
