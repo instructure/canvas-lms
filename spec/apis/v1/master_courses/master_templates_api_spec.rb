@@ -167,9 +167,10 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it "should queue a master migration" do
-      json = api_call(:post, @url, @params)
+      json = api_call(:post, @url, @params.merge(:comment => 'seriously'))
       migration = @template.master_migrations.find(json['id'])
       expect(migration).to be_queued
+      expect(migration.comment).to eq 'seriously'
     end
   end
 
@@ -178,13 +179,14 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       setup_template
       @child_course = Account.default.courses.create!
       @sub = @template.add_child_course!(@child_course)
-      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
+      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @user, :comment => 'Hark!')
     end
 
     it "should show a migration" do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations/#{@migration.id}",
         @base_params.merge(:action => 'migrations_show', :id => @migration.to_param))
       expect(json['workflow_state']).to eq 'queued'
+      expect(json['comment']).to eq 'Hark!'
     end
 
     it "should show migrations" do

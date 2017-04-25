@@ -74,6 +74,11 @@
 #         "description": "Time when the imports were completed",
 #         "example": "2013-08-28T23:59:00-06:00",
 #         "type": "datetime"
+#       },
+#       "comment": {
+#         "description": "User-specified comment describing changes made in this operation",
+#         "example": "Fixed spelling in question 3 of midterm exam",
+#         "type": "string"
 #       }
 #     }
 #   }
@@ -217,9 +222,13 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   # Begins a migration to push recently updated content to all associated courses.
   # Only one migration can be running at a time.
   #
+  # @argument comment [Optional, String]
+  #     An optional comment to be included in the sync history.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/1/blueprint_templates/default/migrations \
   #     -X POST \
+  #     -F 'comment=Fixed spelling in question 3 of midterm exam' \
   #     -H 'Authorization: Bearer <token>'
   #
   # @returns BlueprintMigration
@@ -230,7 +239,9 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       return render :json => {:message => "No associated courses to migrate to"}, :status => :bad_request
     end
 
-    migration = MasterCourses::MasterMigration.start_new_migration!(@template, @current_user)
+    options = params.permit(:comment)
+
+    migration = MasterCourses::MasterMigration.start_new_migration!(@template, @current_user, options)
     render :json => master_migration_json(migration, @current_user, session)
   end
 

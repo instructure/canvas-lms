@@ -18,13 +18,13 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   # create a new migration and queue it up (if we can)
-  def self.start_new_migration!(master_template, user)
+  def self.start_new_migration!(master_template, user, opts = {})
     master_template.class.transaction do
       master_template.lock!
       if master_template.active_migration_running?
         raise "cannot start new migration while another one is running"
       else
-        new_migration = master_template.master_migrations.create!(:user => user)
+        new_migration = master_template.master_migrations.create!({:user => user}.merge(opts))
         master_template.active_migration = new_migration
         master_template.save!
         new_migration.queue_export_job
