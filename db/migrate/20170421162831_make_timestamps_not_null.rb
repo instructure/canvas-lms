@@ -38,7 +38,6 @@ class MakeTimestampsNotNull < ActiveRecord::Migration[4.2]
     :lti_tool_settings,
     :media_tracks,
     :migration_issues,
-    :migration_systems,
     :moderated_grading_provisional_grades,
     :notification_endpoints,
     :polling_poll_choices,
@@ -51,8 +50,7 @@ class MakeTimestampsNotNull < ActiveRecord::Migration[4.2]
     :quiz_statistics,
     :session_persistence_tokens,
     :sis_post_grades_statuses,
-    :user_profile_links,
-    :webhooks
+    :user_profile_links
   ].freeze
 
   def change
