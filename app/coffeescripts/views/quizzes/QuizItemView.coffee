@@ -141,10 +141,10 @@ define [
         base.link_text = @messages.multipleDates
         base.link_href = @model.get("url")
 
-      if base.permissions?.delete && @model.get('is_master_course_child_content') && @model.get('restricted_by_master_course')
-        base.permissions.delete = false
-
       base.migrateQuizEnabled = @migrateQuizEnabled
       base.showAvailability = @model.multipleDueDates() or not @model.defaultDates().available()
       base.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
+
+      base.is_locked = @model.get('is_master_course_child_content') &&
+                       @model.get('restricted_by_master_course')
       base

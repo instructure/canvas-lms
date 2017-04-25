@@ -31,7 +31,7 @@ describe "master courses - child courses - quiz locking" do
     expect(f("#summary_quiz_#{@quiz_copy.id}")).to contain_css('.icon-lock')
 
     f('.quiz .al-trigger').click
-    expect(f('.quiz')).to contain_css('a.delete-item.disabled')
+    expect(f('.quiz')).not_to contain_css('a.delete-item')
   end
 
   it "should show the cog-menu options on the index when not locked" do

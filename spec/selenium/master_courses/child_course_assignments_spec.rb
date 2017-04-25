@@ -29,7 +29,16 @@ describe "master courses - child courses - assignment locking" do
     user_session(@teacher)
   end
 
-  it "should not allow the delete cog-menu option on the index when locked" do
+  it "should contain the delete cog-menu option on the index when unlocked" do
+    get "/courses/#{@copy_to.id}/assignments"
+
+    expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-unlock')
+
+    f('.al-trigger').click
+    expect(f('.assignment')).to contain_css('a.delete_assignment')
+  end
+
+  it "should not contain the delete cog-menu option on the index when locked" do
     @tag.update_attribute(:restrictions, {:content => true})
 
     get "/courses/#{@copy_to.id}/assignments"
@@ -37,7 +46,7 @@ describe "master courses - child courses - assignment locking" do
     expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-lock')
 
     f('.al-trigger').click
-    expect(f('.assignment')).to contain_css('a.delete_assignment.disabled')
+    expect(f('.assignment')).not_to contain_css('a.delete_assignment')
   end
 
   it "should show the delete cog-menu option on the index when not locked" do
@@ -55,8 +64,8 @@ describe "master courses - child courses - assignment locking" do
 
     get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
-    f('.al-trigger').click
-    expect(f('#edit_assignment_header')).to contain_css('a.delete_assignment_link.disabled')
+    # when locked, the whole menu is removed
+    expect(f('#edit_assignment_header')).not_to contain_css('.al-trigger')
   end
 
   it "should show the delete cog-menu options on the edit when not locked" do

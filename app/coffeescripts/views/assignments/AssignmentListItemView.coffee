@@ -173,6 +173,7 @@ define [
 
       data.canMove = @canMove()
       data.canDelete = @canDelete()
+      data.is_locked =  @model.isRestrictedByMasterCourse()
       data.showAvailability = @model.multipleDueDates() or not @model.defaultDates().available()
       data.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
 

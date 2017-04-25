@@ -132,25 +132,25 @@
               >{{#t}}Mastery Paths{{/t}}</a>
             </li>
             {{/if}}
-            {{#if canDelete}}
-            <li>
-              <a
-                class="delete_assignment icon-trash"
-                id="assignment_{{id}}_settings_delete_item"
-                aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
-                data-focus-returns-to="assign_{{id}}_manage_link"
-              >{{#t "delete"}}Delete{{/t}}</a>
-            </li>
-            {{else}}
-            <li>
-              <a
-                class="delete_assignment icon-trash disabled"
-                id="assignment_{{id}}_settings_delete_item"
-                aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
-                aria-disabled=true
-              >{{#t "delete"}}Delete{{/t}}</a>
-            </li>
-            {{/if}}
+            {{#unless is_locked}}
+              <li>
+                {{#if canDelete}}
+                  <a
+                    class="delete_assignment icon-trash"
+                    id="assignment_{{id}}_settings_delete_item"
+                    aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
+                    data-focus-returns-to="assign_{{id}}_manage_link"
+                  >{{#t "delete"}}Delete{{/t}}</a>
+                {{else}}
+                  <a
+                    class="delete_assignment icon-trash disabled"
+                    id="assignment_{{id}}_settings_delete_item"
+                    aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
+                    aria-disabled=true
+                  >{{#t "delete"}}Delete{{/t}}</a>
+                {{/if}}
+              </li>
+            {{/unless}}
             {{>ExternalTools/external_tools_menu menu_tools}}
           </ul>
         </div>

@@ -85,4 +85,5 @@ define [
       json = @model.toView()
       json.canDelete = @canDelete()
       json['CONDITIONAL_RELEASE_SERVICE_ENABLED'] = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+      json['is_locked'] = (ENV.MASTER_COURSE_DATA?.is_master_course_child_content && ENV.MASTER_COURSE_DATA.restricted_by_master_course)
       json
