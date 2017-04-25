@@ -24,10 +24,17 @@ module Lti
       @user = user
     end
 
-    def generate_lti_launch(opts = {})
+    def generate_lti_launch(placement, opts = {})
       lti_launch = Lti::Launch.new(opts)
       lti_launch.resource_url = opts[:launch_url]
-      lti_launch.params = ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @user)
+
+      default_params = ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @user)
+      lti_launch.params = default_params.merge({
+        # required params
+        lti_message_type: 'ContentItemSelectionRequest',
+        lti_version: 'LTI-1p0',
+      }).merge(placement_params(placement, assignment: opts[:assignment]))
+
       lti_launch
     end
 
@@ -43,7 +50,85 @@ module Lti
         ext_roles: lti_helper.all_roles,
       }
 
-      params.merge!(user_id: Lti::Asset.opaque_identifier_for(user)) if user
+      params[:user_id] = Lti::Asset.opaque_identifier_for(user) if user
+      params
+    end
+
+    private
+
+    def placement_params(placement, assignment: nil)
+      case placement
+      when 'migration_selection'
+        migration_selection_params
+      when 'editor_button'
+        editor_button_params
+      when 'resource_selection', 'link_selection', 'assignment_selection'
+        lti_launch_selection_params
+      when 'collaboration'
+        collaboration_params
+        # collaboration = ExternalToolCollaboration.find(opts[:content_item_id]) if opts[:content_item_id]
+      when 'homework_submission'
+        homework_submission_params(assignment)
+      else
+        # TODO: we _could_, if configured, have any other placements return to the content migration page...
+        raise "Content-Item not supported at this placement"
+      end
+    end
+
+    def migration_selection_params
+      accept_media_types = %w(
+        application/vnd.ims.imsccv1p1
+        application/vnd.ims.imsccv1p2
+        application/vnd.ims.imsccv1p3
+        application/zip
+        application/xml
+      )
+
+      {
+        accept_media_types: accept_media_types.join(','),
+        accept_presentation_document_targets: 'download',
+        accept_copy_advice: true,
+        ext_content_file_extensions: %w(zip imscc mbz xml).join(','),
+      }
+    end
+
+    def editor_button_params
+      {
+        accept_media_types: %w(image/* text/html application/vnd.ims.lti.v1.ltilink */*).join(','),
+        accept_presentation_document_targets: %w(embed frame iframe window).join(','),
+      }
+    end
+
+    def lti_launch_selection_params
+      {
+        accept_media_types: 'application/vnd.ims.lti.v1.ltilink',
+        accept_presentation_document_targets: %w(frame window).join(','),
+      }
+    end
+
+    def collaboration_params
+      {
+        accept_media_types: 'application/vnd.ims.lti.v1.ltilink',
+        accept_presentation_document_targets: 'window',
+        accept_unsigned: false,
+        auto_create: true,
+      }
+    end
+
+    def homework_submission_params(assignment)
+      params = {}
+      params[:accept_media_types] = '*/*'
+      accept_presentation_document_targets = []
+      accept_presentation_document_targets << 'window' if assignment.submission_types.include?('online_url')
+      accept_presentation_document_targets << 'none' if assignment.submission_types.include?('online_upload')
+      params[:accept_presentation_document_targets] = accept_presentation_document_targets.join(',')
+      params[:accept_copy_advice] = !!assignment.submission_types.include?('online_upload')
+      if assignment.submission_types.strip == 'online_upload' && assignment.allowed_extensions.present?
+        params[:ext_content_file_extensions] = assignment.allowed_extensions.compact.join(',')
+        params[:accept_media_types] = assignment.allowed_extensions.map do |ext|
+          MimetypeFu::EXTENSIONS[ext]
+        end.compact.join(',')
+      end
       params
     end
   end

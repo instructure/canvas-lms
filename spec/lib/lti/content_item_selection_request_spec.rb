@@ -24,40 +24,150 @@ describe Lti::ContentItemSelectionRequest do
   let(:course) { course_model }
   let(:root_account) { course.root_account }
   let(:teacher) { course_with_teacher(course: course).user }
+  let(:placement) {'resource_selection'}
 
   context '#generate_lti_launch' do
     it 'generates an Lti::Launch' do
-      expect(lti_request.generate_lti_launch).to be_a Lti::Launch
+      expect(lti_request.generate_lti_launch(placement)).to be_a Lti::Launch
     end
 
     it 'sends opts to the Lti::Launch' do
       opts = {
-        post_only: true, 
+        post_only: true,
         tool_dimensions: {selection_height: '1000px', selection_width: '100%'}
       }
 
       expect(Lti::Launch).to receive(:new).with(opts).and_return(Lti::Launch.new(opts))
 
-      lti_request.generate_lti_launch(opts)
+      lti_request.generate_lti_launch(placement, opts)
     end
 
     it 'generates resource_url based on a launch_url' do
-      lti_launch = lti_request.generate_lti_launch(launch_url: 'https://www.example.com')
+      lti_launch = lti_request.generate_lti_launch(placement, launch_url: 'https://www.example.com')
       expect(lti_launch.resource_url).to eq 'https://www.example.com'
     end
 
     context 'params' do
       it 'builds a params hash that includes the default lti params' do
-        lti_launch = lti_request.generate_lti_launch
+        lti_launch = lti_request.generate_lti_launch(placement)
         default_params = described_class.default_lti_params(course, root_account, teacher)
         expect(lti_launch.params).to include(default_params)
       end
 
-      it 'adds request specific params' do
-        lti_launch = lti_request.generate_lti_launch
+      it 'adds message type and version params' do
+        lti_launch = lti_request.generate_lti_launch(placement)
         expect(lti_launch.params).to include({
-
+          lti_message_type: 'ContentItemSelectionRequest',
+          lti_version: 'LTI-1p0'
         })
+      end
+
+      context 'placement params' do
+        it 'adds params for the migration_selection placement' do
+          lti_launch = lti_request.generate_lti_launch('migration_selection')
+          params = lti_launch.params
+          expect(params[:accept_media_types]).to include(
+            'application/vnd.ims.imsccv1p1',
+            'application/vnd.ims.imsccv1p2',
+            'application/vnd.ims.imsccv1p3',
+            'application/zip,application/xml'
+          )
+          expect(params[:ext_content_file_extensions]).to include('zip','imscc','mbz','xml')
+          expect(params).to include({
+            accept_presentation_document_targets: 'download',
+            accept_copy_advice: true
+          })
+        end
+
+        it 'adds params for the editor_button placement' do
+          lti_launch = lti_request.generate_lti_launch('editor_button')
+          params = lti_launch.params
+          expect(params[:accept_media_types]).to include(
+            'image/*',
+            'text/html',
+            'application/vnd.ims.lti.v1.ltilink',
+            '*/*'
+          )
+          expect(params[:accept_presentation_document_targets]).to include(
+            'embed',
+            'frame',
+            'iframe',
+            'window'
+          )
+        end
+
+        it 'adds params for the resource_selection placement' do
+          lti_launch = lti_request.generate_lti_launch('resource_selection')
+          params = lti_launch.params
+          expect(params[:accept_media_types]).to eq 'application/vnd.ims.lti.v1.ltilink'
+          expect(params[:accept_presentation_document_targets]).to include(
+            'frame',
+            'window'
+          )
+        end
+
+        it 'adds params for the link_selection placement'
+        it 'adds params for the assignment_selection placement'
+
+        it 'adds params for the collaboration placement' do
+          lti_launch = lti_request.generate_lti_launch('collaboration')
+
+          expect(lti_launch.params).to include({
+            accept_media_types: 'application/vnd.ims.lti.v1.ltilink',
+            accept_presentation_document_targets: 'window',
+            accept_unsigned: false,
+            auto_create: true,
+          })
+        end
+
+        it 'substitutes collaboration variables in a collaboration launch'
+
+        context 'homework_submission' do
+          it 'adds params for an assignment that can accept an online_url submission' do
+            assignment = assignment_model(course: course, submission_types: 'online_url')
+            lti_launch = lti_request.generate_lti_launch('homework_submission', assignment: assignment)
+            expect(lti_launch.params).to include({
+              accept_media_types: '*/*',
+              accept_presentation_document_targets: 'window',
+              accept_copy_advice: false
+            })
+          end
+
+          it 'adds params for an assignment that can accept an online_upload submission' do
+            assignment = assignment_model(course: course, submission_types: 'online_upload')
+            lti_launch = lti_request.generate_lti_launch('homework_submission', assignment: assignment)
+            expect(lti_launch.params).to include({
+              accept_media_types: '*/*',
+              accept_presentation_document_targets: 'none',
+              accept_copy_advice: true
+            })
+          end
+
+          it 'adds params for extensions allowed by an assignment' do
+            assignment = assignment_model(
+              course: course, 
+              submission_types: 'online_upload', 
+              allowed_extensions: %w(txt jpg)
+            )
+            lti_launch = lti_request.generate_lti_launch('homework_submission', assignment: assignment)
+            expect(lti_launch.params[:accept_media_types]).to include('text/plain', 'image/jpeg')
+            expect(lti_launch.params[:ext_content_file_extensions]).to include('txt', 'jpg')
+          end
+
+          it 'adds params for assignments that accept either an online_upload or online_url' do
+            assignment = assignment_model(course: course, submission_types: 'online_upload,online_url')
+            lti_launch = lti_request.generate_lti_launch('homework_submission', assignment: assignment)
+
+            expect(lti_launch.params[:accept_presentation_document_targets]).to include(
+              'window',
+              'none'
+            )
+            expect(lti_launch.params).to include({
+              accept_media_types: '*/*',
+              accept_copy_advice: true
+            })
+          end
+        end
       end
     end
   end
