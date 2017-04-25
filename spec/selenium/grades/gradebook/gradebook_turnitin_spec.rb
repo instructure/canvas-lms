@@ -45,7 +45,7 @@ describe "gradebook - turnitin" do
     expect(cell.find_element(:css, "a")).to be_displayed
     cell.find_element(:css, "a").click
 
-    fj('.ui-icon-closethick:visible').click
+    fj('button.ui-dialog-titlebar-close:visible').click
 
     cell = acceptable.find_element(:xpath, '..')
 
@@ -56,6 +56,6 @@ describe "gradebook - turnitin" do
     expect(cell.find_element(:css, "a")).to be_displayed
     cell.find_element(:css, "a").click
 
-    fj('.ui-icon-closethick:visible').click
+    fj('button.ui-dialog-titlebar-close:visible').click
   end
 end

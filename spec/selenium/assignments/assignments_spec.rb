@@ -712,7 +712,7 @@ describe "assignments" do
     end
 
     it "should cancel adding new assignment group via the x button", priority: "2", test_id: 602874 do
-      fj('.ui-icon-closethick:visible').click
+      fj('button.ui-dialog-titlebar-close:visible').click
       wait_for_ajaximations
 
       expect(f('#assignment_group_id')).not_to include_text(@new_group)

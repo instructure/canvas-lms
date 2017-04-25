@@ -64,7 +64,7 @@ shared_examples 'user settings page change pic window' do |context|
     expect(fj('.nav.nav-pills li :contains("Take a Picture")')).to include_text('Take a Picture')
 
     # There are 'X', Save, and Cancel buttons
-    expect(f('.ui-icon.ui-icon-closethick')).to be_truthy
+    expect(f('button.ui-dialog-titlebar-close')).to be_truthy
     expect(fj('.ui-button :contains("Cancel")')).to be_truthy
     expect(fj('.ui-button :contains("Save")')).to be_truthy
   end

@@ -186,7 +186,7 @@ describe "gradebook - post grades to SIS" do
       f('a#post-grades-button').click
       expect(f('.post-grades-dialog')).to be_displayed
       # close post grade dialog
-      fj('.ui-icon-closethick:visible').click
+      fj('button.ui-dialog-titlebar-close:visible').click
 
       expect(f('#post_grades .icon-mini-arrow-down')).to be_displayed
       move_to_click('button#post_grades')
@@ -224,12 +224,12 @@ describe "gradebook - post grades to SIS" do
       expect(f('.post-grades-dialog')).to be_displayed
     end
   end
-  
+
   context "when new_sis_integrations is enabled" do
     before(:each) do
       Account.default.set_feature_flag!('new_sis_integrations', 'on')
     end
-    
+
     def create_post_grades_tool(opts={})
       course = opts[:course] || @course
       post_grades_tool = course.context_external_tools.create!(
@@ -267,13 +267,13 @@ describe "gradebook - post grades to SIS" do
       get "/courses/#{@course.id}/gradebook"
       expect(ff('li.external-tools-dialog')).to have_size(10)
     end
-    
+
     it "should include the powerschool option in max number of items " \
       "in exports dropdown" do
       (0...11).each do |i|
         create_post_grades_tool(name: "test tool #{i}")
       end
-      
+
       Account.default.set_feature_flag!('post_grades', 'on')
       @course.sis_source_id = 'xyz'
       @course.save
@@ -284,7 +284,7 @@ describe "gradebook - post grades to SIS" do
       expect(ff('li.external-tools-dialog')).to have_size(9)
       expect(f('li.post-grades-placeholder > a')).to be_present
     end
-    
+
     it "should show powerschool option in exports dropdown" do
       Account.default.set_feature_flag!('post_grades', 'on')
       @course.sis_source_id = 'xyz'

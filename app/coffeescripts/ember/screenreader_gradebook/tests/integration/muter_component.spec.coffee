@@ -46,7 +46,7 @@ define [
     equal(dialog.length, 0, 'the dialog closes')
 
   closeDialog = (dialog) ->
-    click find('a', dialog)
+    click find('button.ui-dialog-titlebar-close', dialog)
     checkDialogClosed()
 
   QUnit.module 'screenreader_gradebook assignment_muter_component: muted',

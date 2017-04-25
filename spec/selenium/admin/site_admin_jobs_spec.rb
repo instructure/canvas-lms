@@ -98,7 +98,7 @@ describe "site admin jobs ui" do
       f('#job-handler-show').click
       wait_for_ajax_requests
       expect(get_value('#job-handler')).to eq job.handler
-      f('a.ui-dialog-titlebar-close').click
+      f('button.ui-dialog-titlebar-close').click
 
       # also for failed job
       filter_jobs(FlavorTags::FAILED)
