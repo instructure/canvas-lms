@@ -203,9 +203,13 @@ describe 'Student Gradebook' do
 
     it 'should display comments from a teacher on student grades page', priority: "1", test_id: 537621 do
       user_session(student)
-
       get "/courses/#{published_course.id}/grades"
-      fj('.toggle_comments_link .icon-discussion:first').click
+
+      student_grades_page.toggle_comment_module
+      unless f('.score_details_table').displayed?
+        # 1st click seems to fail on chrome 1 out of 5 times so adding a second click
+        student_grades_page.toggle_comment_module
+      end
       expect(fj('.score_details_table span:first')).to include_text('good job')
     end
 

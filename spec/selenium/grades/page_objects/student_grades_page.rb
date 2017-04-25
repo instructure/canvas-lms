@@ -40,4 +40,8 @@ class StudentGradesPage
   def assignment_row(assignment)
     f("#submission_#{assignment.id}")
   end
+
+  def toggle_comment_module
+    fj('.toggle_comments_link .icon-discussion:first').click
+  end
 end
