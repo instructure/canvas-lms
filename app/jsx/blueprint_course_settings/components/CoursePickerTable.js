@@ -143,12 +143,12 @@ export default class CoursePickerTable extends React.Component {
             checked={this.state.selected[course.id]}
             label={
               <ScreenReaderContent>
-                {I18n.t('Toggle select course %{name}', { name: course.name })}
+                {I18n.t('Toggle select course %{name}', { name: course.original_name || course.name })}
               </ScreenReaderContent>
             }
           />
         </td>
-        <td>{this.renderCellText(course.name)}</td>
+        <td>{this.renderCellText(course.original_name || course.name)}</td>
         <td>{this.renderCellText(course.course_code)}</td>
         <td>{this.renderCellText(course.term.name)}</td>
         <td>{this.renderCellText(course.sis_course_id)}</td>
