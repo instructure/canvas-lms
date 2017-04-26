@@ -143,21 +143,6 @@ test('sets isSavingAssociations to false on on SAVE_ASSOCIATIONS_FAIL', () => {
   equal(newState.isSavingAssociations, false)
 })
 
-test('sets error on LOAD_COURSES_FAIL', () => {
-  const newState = reduce(actions.loadCoursesFail(new Error('Uh oh! Error Happened!')))
-  deepEqual(newState.errors, ['Uh oh! Error Happened!'])
-})
-
-test('sets error on LOAD_ASSOCIATIONS_FAIL', () => {
-  const newState = reduce(actions.loadAssociationsFail(new Error('Uh oh! Error Happened!')))
-  deepEqual(newState.errors, ['Uh oh! Error Happened!'])
-})
-
-test('sets error on SAVE_ASSOCIATIONS_FAIL', () => {
-  const newState = reduce(actions.saveAssociationsFail(new Error('Uh oh! Error Happened!')))
-  deepEqual(newState.errors, ['Uh oh! Error Happened!'])
-})
-
 test('sets isLoadingBeginMigration to true on on BEGIN_MIGRATION_START', () => {
   const newState = reduce(actions.beginMigrationStart())
   equal(newState.isLoadingBeginMigration, true)

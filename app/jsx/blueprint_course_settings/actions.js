@@ -16,8 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!blueprint_settings'
 import { createActions } from 'redux-actions'
+import { showAjaxFlashAlert } from 'jsx/shared/AjaxFlashAlert'
 import api from './apiClient'
+
+const handleError = (msg, dispatch, actionCreator) => (err) => {
+  showAjaxFlashAlert(msg, err)
+  if (dispatch && actionCreator) {
+    dispatch(actionCreator(err))
+  }
+}
 
 const types = [
   'LOAD_COURSES_START', 'LOAD_COURSES_SUCCESS', 'LOAD_COURSES_FAIL',
@@ -35,14 +44,14 @@ actions.checkMigration = () => (dispatch, getState) => {
   dispatch(actions.checkMigrationStart())
   api.checkMigration(getState())
     .then(res => dispatch(actions.checkMigrationSuccess(res.data)))
-    .catch(err => dispatch(actions.checkMigrationFail(err)))
+    .catch(handleError(I18n.t('An error occurred while checking the migration status'), dispatch, actions.checkMigrationFail))
 }
 
 actions.beginMigration = () => (dispatch, getState) => {
   dispatch(actions.beginMigrationStart())
   api.beginMigration(getState())
     .then(res => dispatch(actions.beginMigrationSuccess(res.data)))
-    .catch(err => dispatch(actions.beginMigrationFail(err)))
+    .catch(handleError(I18n.t('An error occurred while starting migration'), dispatch, actions.beginMigrationFail))
 }
 
 actions.addAssociations = associations => (dispatch, getState) => {
@@ -95,7 +104,7 @@ actions.loadCourses = filters => (dispatch, getState) => {
   dispatch(actions.loadCoursesStart())
   api.getCourses(getState(), filters)
     .then(res => dispatch(actions.loadCoursesSuccess(res.data)))
-    .catch(err => dispatch(actions.loadCoursesFail(err)))
+    .catch(handleError(I18n.t('An error occurred while loading courses'), dispatch, actions.loadCoursesFail))
 }
 
 actions.loadAssociations = () => (dispatch, getState) => {
@@ -112,7 +121,7 @@ actions.loadAssociations = () => (dispatch, getState) => {
         }))
       dispatch(actions.loadAssociationsSuccess(data))
     })
-    .catch(err => dispatch(actions.loadAssociationsFail(err)))
+    .catch(handleError(I18n.t('An error occurred while loading associations'), dispatch, actions.loadAssociationsFail))
 }
 
 actions.saveAssociations = () => (dispatch, getState) => {
@@ -120,7 +129,7 @@ actions.saveAssociations = () => (dispatch, getState) => {
   const state = getState()
   api.saveAssociations(state)
     .then(() => dispatch(actions.saveAssociationsSuccess({ added: state.addedAssociations, removed: state.removedAssociations })))
-    .catch(err => dispatch(actions.saveAssociationsFail(err)))
+    .catch(handleError(I18n.t('An error occurred while saving associations'), dispatch, actions.saveAssociationsFail))
 }
 
 const actionTypes = types.reduce((typesMap, actionType) =>

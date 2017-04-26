@@ -91,9 +91,4 @@ export default combineReducers({
     [actionTypes.SAVE_ASSOCIATIONS_SUCCESS]: () => false,
     [actionTypes.SAVE_ASSOCIATIONS_FAIL]: () => false,
   }, false),
-  errors: (state = [], action) => {
-    return action.error
-      ? state.concat([action.payload.message])
-      : state
-  },
 })

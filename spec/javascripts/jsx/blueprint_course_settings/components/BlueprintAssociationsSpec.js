@@ -28,7 +28,6 @@ const defaultProps = () => ({
   existingAssociations: [],
   addedAssociations: [],
   removedAssociations: [],
-  errors: [],
   addAssociations: () => {},
   removeAssociations: () => {},
   loadCourses: () => {},

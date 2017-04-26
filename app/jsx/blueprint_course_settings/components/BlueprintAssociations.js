@@ -24,7 +24,6 @@ import { bindActionCreators } from 'redux'
 import 'compiled/jquery.rails_flash_notifications'
 
 import Heading from 'instructure-ui/lib/components/Heading'
-import Alert from 'instructure-ui/lib/components/Alert'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Spinner from 'instructure-ui/lib/components/Spinner'
 
@@ -52,12 +51,10 @@ export default class BlueprintAssociations extends React.Component {
     isLoadingAssociations: bool.isRequired,
     isSavingAssociations: bool.isRequired,
 
-    errors: arrayOf(string),
     isExpanded: bool,
   }
 
   static defaultProps = {
-    errors: [],
     isExpanded: false,
   }
 
@@ -101,8 +98,6 @@ export default class BlueprintAssociations extends React.Component {
     return (
       <div className="bca__wrapper">
         {this.renderLoadingOverlay()}
-        {this.props.errors.map(err => <Alert key={err} variant="warning">Error: {err}</Alert>)}
-        {this.props.errors.length ? <br /> : null}
         <Heading level="h3">{I18n.t('Search Courses')}</Heading>
         <br />
         <div className="bca-course-associations">
@@ -140,7 +135,6 @@ const connectState = state =>
     'courses',
     'terms',
     'subAccounts',
-    'errors',
     'isLoadingCourses',
     'isLoadingAssociations',
     'isSavingAssociations',
