@@ -113,12 +113,11 @@ describe MasterCourses::MasterTemplate do
   end
 
   describe "default restriction syncing" do
-    it "should keep content tag restrictiosn up to date" do
+    it "should keep content tag restrictions up to date" do
       @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
-      tag1 = @template.create_content_tag_for!(@course.discussion_topics.create!)
-      tag2 = @template.create_content_tag_for!(@course.discussion_topics.create!)
+      tag1 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => true)
+      tag2 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => false)
       old_default = tag2.restrictions
-      tag2.update_attributes(:use_default_restrictions => false) # unlink
 
       new_default = {:content => true, :points => true}
       @template.update_attribute(:default_restrictions, new_default)
