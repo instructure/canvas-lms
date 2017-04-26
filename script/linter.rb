@@ -8,9 +8,10 @@ class Linter
     boyscout_mode: true,
     campsite_mode: true,
     comment_post_processing: proc { |comments| comments },
+    custom_comment_generation: false,
     env_sha: ENV['SHA'] || ENV['GERRIT_PATCHSET_REVISION'],
     file_regex: /./,
-    gergich_capture: true,
+    generate_comment_proc: proc { },
     gerrit_patchset: !!ENV['GERRIT_PATCHSET_REVISION'],
     heavy_mode: false,
     heavy_mode_proc: proc {},
@@ -57,15 +58,18 @@ class Linter
 
   private
 
+  # TODO: generate from DEFAULT_OPTIONS
   attr_reader :append_files_to_command,
               :boyscout_mode,
               :campsite_mode,
               :command,
               :comment_post_processing,
               :default_boyscout_mode,
+              :custom_comment_generation,
               :env_sha,
               :file_regex,
               :format,
+              :generate_comment_proc,
               :gergich_capture,
               :gerrit_patchset,
               :heavy_mode,
@@ -117,10 +121,10 @@ class Linter
   end
 
   def generate_comments
-    if gergich_capture
-      comments
+    if custom_comment_generation
+      generate_comment_proc.call(changes: changes)
     else
-      TatlTael::Linters.comments(changes)
+      comments
     end
   end
 

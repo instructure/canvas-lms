@@ -6,8 +6,11 @@ require_relative "./linter"
 linter_options = {
   linter_name: "tatl_tael",
   skip_file_size_check: true,
-  skip_wips: true,
-  gergich_capture: false
+  skip_wips: false,
+  custom_comment_generation: true,
+  generate_comment_proc: proc do |config|
+    TatlTael::Linters.comments(config)
+  end
 }
 
 user_config_file = File.expand_path("../../gems/dr_diff/config/gergich_user_config.yml", __FILE__)

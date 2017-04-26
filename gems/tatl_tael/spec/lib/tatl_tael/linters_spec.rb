@@ -155,7 +155,7 @@ describe TatlTael::Linters do
 
     it "collects linter comments" do
       expect(linters).to receive(:linters).and_return(saved_linters)
-      expect(linters.comments(changes)).to match(%w[1 2 3])
+      expect(linters.comments(changes: changes)).to match(%w[1 2 3])
     end
   end
 end

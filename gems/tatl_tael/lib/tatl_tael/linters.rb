@@ -53,7 +53,7 @@ module TatlTael
         underscore_and_symbolize_keys(config[base_config_key])
       end
 
-      def comments(changes)
+      def comments(changes:)
         @comments ||= linters.map do |linter_class|
           linter_class.new(config: config_for_linter(linter_class), changes: changes).run
         end.flatten.compact
