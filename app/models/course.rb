@@ -2352,11 +2352,12 @@ class Course < ActiveRecord::Base
                                            enrollment_state: opts[:enrollment_state])
   end
 
-  def enrollments_visible_to(user)
+  def enrollments_visible_to(user, opts={})
     visibilities = section_visibilities_for(user)
     visibility = enrollment_visibility_level_for(user, visibilities)
 
-    apply_enrollment_visibilities_internal(current_enrollments.except(:preload), user, visibilities, visibility)
+    enrollment_scope = opts[:include_concluded] ? enrollments : current_enrollments
+    apply_enrollment_visibilities_internal(enrollment_scope.except(:preload), user, visibilities, visibility)
   end
 
   def apply_enrollment_visibilities_internal(scope, user, visibilities, visibility, enrollment_state: nil)
