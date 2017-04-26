@@ -18,6 +18,7 @@ CanvasRails::Application.routes.draw do
   get 'bz/retained_data_stats' => 'bz#retained_data_stats'
   get 'bz/retained_data_export' => 'bz#retained_data_export'
 
+  get 'bz/linked_in_auth' => 'bz#linked_in_auth'
   get 'bz/linked_in_export' => 'bz#linked_in_export'
   post 'bz/linked_in_export' => 'bz#do_linked_in_export'
   get 'bz/linked_in_export_oauth_success' => 'bz#linked_in_export_oauth_success'

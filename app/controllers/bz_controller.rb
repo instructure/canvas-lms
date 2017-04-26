@@ -286,6 +286,11 @@ class BzController < ApplicationController
     end
   end
 
+  # Renders a view to authorize access to LinkedIn regardless of what course you are enrolled in.
+  def linked_in_auth
+    @host_url = "#{request.protocol}#{request.host_with_port}"
+  end
+
   def linked_in_export
     # renders a view to fetch the email address
     @email = @current_user.email
