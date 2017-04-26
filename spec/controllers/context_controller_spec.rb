@@ -189,6 +189,31 @@ describe ContextController do
         expect(response).to be_success
         expect(assigns[:enrollments].map(&:course_section_id)).to match_array([@other_section.id])
       end
+
+      it "lets admins see concluded students" do
+        user_session(@teacher)
+        @student.enrollments.first.complete!
+        get 'roster_user', :course_id => @course.id, :id => @student.id
+        expect(response).to be_success
+      end
+
+      it "lets admins see inactive students" do
+        user_session(@teacher)
+        @student.enrollments.first.deactivate
+        get 'roster_user', :course_id => @course.id, :id => @student.id
+        expect(response).to be_success
+      end
+
+      it "does not let students see inactive students" do
+        another_student = user_factory
+        @course.enroll_student(another_student, :section => @course.default_section).accept!
+        user_session(another_student)
+
+        @student.enrollments.first.deactivate
+
+        get 'roster_user', :course_id => @course.id, :id => @student.id
+        expect(response).to_not be_success
+      end
     end
   end
 
