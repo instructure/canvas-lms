@@ -62,4 +62,12 @@ module MasterCourses::TagHelper
       tag
     end
   end
+
+  def cached_content_tag_for(content)
+    raise "must call `load_tags!` first" unless @content_tag_index
+    if content.is_a?(Assignment) && submittable = content.submittable_object
+      content = submittable # use one child tag
+    end
+    @content_tag_index.dig(content.class.base_class.name, content.id)
+  end
 end

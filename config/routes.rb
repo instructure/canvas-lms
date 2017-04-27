@@ -1928,6 +1928,7 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/blueprint_templates/:template_id', action: :show
       get 'courses/:course_id/blueprint_templates/:template_id/associated_courses', action: :associated_courses, as: :course_blueprint_associated_courses
       put 'courses/:course_id/blueprint_templates/:template_id/update_associations', action: :update_associations
+      get 'courses/:course_id/blueprint_templates/:template_id/unsynced_changes', action: :unsynced_changes, as: :course_blueprint_unsynced_changes
 
       post 'courses/:course_id/blueprint_templates/:template_id/migrations', action: :queue_migration
       get 'courses/:course_id/blueprint_templates/:template_id/migrations', action: :migrations_index, as: :course_blueprint_migrations

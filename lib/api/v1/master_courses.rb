@@ -27,7 +27,7 @@ module Api::V1::MasterCourses
     hash
   end
 
-  def changed_asset_json(asset, action, migration_id, locked, exceptions)
+  def changed_asset_json(asset, action, locked, migration_id = nil, exceptions = {})
     asset_type = asset.class_name.underscore.sub(/^.+\//, '')
     url = case asset.class_name
     when 'Attachment'
@@ -52,14 +52,15 @@ module Api::V1::MasterCourses
       asset.name
     end
 
-    {
+    json = {
       asset_id: asset.id,
       asset_type: asset_type,
       asset_name: asset_name,
       change_type: action.to_s,
       html_url: url,
-      locked: locked,
-      exceptions: exceptions[migration_id] || []
+      locked: locked
     }
+    json[:exceptions] = exceptions[migration_id] || [] unless migration_id.nil?
+    json
   end
 end

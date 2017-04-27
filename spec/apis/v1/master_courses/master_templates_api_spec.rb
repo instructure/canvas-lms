@@ -267,13 +267,13 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
   end
 
-  describe "migration_details" do
-    def run_master_migration
-      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin)
-      run_jobs
-      @migration.reload
-    end
+  def run_master_migration
+    @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin)
+    run_jobs
+    @migration.reload
+  end
 
+  describe "migration_details" do
     before :once do
       setup_template
       @master = @course
@@ -373,6 +373,39 @@ describe MasterCourses::MasterTemplatesController, type: :request do
                  { :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
                    :id => @migration.to_param, :course_id => other_course.to_param, :action => 'migration_details' },
                  {}, {}, { :expected_status => 404 })
+    end
+  end
+
+  describe 'unsynced_changes' do
+    before :once do
+      Timecop.travel(1.hour.ago) do
+        setup_template
+        @master = @course
+        @template.add_child_course!(course_factory(:name => 'Minion'))
+        @page = @master.wiki.wiki_pages.create! :title => 'Old News'
+        @asmt = @master.assignments.create! :title => 'Boring'
+        @file = attachment_model(:context => @master, :display_name => 'Some File')
+        @template.content_tag_for(@file).update_attribute(:restrictions, {:content => true})
+        run_master_migration
+      end
+    end
+
+    it 'detects creates, updates, and deletes since the last sync' do
+      @asmt.destroy
+      @file.update_attribute(:display_name, 'Renamed')
+      @new_page = @master.wiki.wiki_pages.create! :title => 'New News'
+
+      json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/unsynced_changes",
+        :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
+        :course_id => @master.to_param, :action => 'unsynced_changes')
+      expect(json).to match_array([
+       {"asset_id"=>@asmt.id,"asset_type"=>"assignment","asset_name"=>"Boring","change_type"=>"deleted",
+        "html_url"=>"http://www.example.com/courses/#{@master.id}/assignments/#{@asmt.id}","locked"=>false},
+       {"asset_id"=>@file.id,"asset_type"=>"attachment","asset_name"=>"Renamed","change_type"=>"updated",
+        "html_url"=>"http://www.example.com/courses/#{@master.id}/files/#{@file.id}","locked"=>true},
+       {"asset_id"=>@new_page.id,"asset_type"=>"wiki_page","asset_name"=>"New News","change_type"=>"created",
+        "html_url"=>"http://www.example.com/courses/#{@master.id}/pages/new-news","locked"=>false}
+      ])
     end
   end
 end

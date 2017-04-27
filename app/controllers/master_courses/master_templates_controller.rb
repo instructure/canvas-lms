@@ -459,8 +459,47 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       restricted_ids = find_restricted_ids(tags)
       tags.each do |tag|
         next if tag.content_type == 'AssignmentGroup' # these are noise, since they're touched with each assignment
-        changes << changed_asset_json(tag.content, action, tag.migration_id,
-                                      restricted_ids.include?(tag.migration_id), exceptions)
+        changes << changed_asset_json(tag.content, action, restricted_ids.include?(tag.migration_id),
+                                      tag.migration_id, exceptions)
+      end
+    end
+
+    render :json => changes
+  end
+
+  # @API Get unsynced changes
+  #
+  # Retrieve a list of learning objects that have changed since the last blueprint sync operation.
+  #
+  # @returns [ChangeRecord]
+  def unsynced_changes
+    cutoff_time = @template.last_export_started_at
+    return render :json => [] unless cutoff_time
+
+    # FIXME there's probably a bookmark thing I can use to paginate this nonsense
+    @template.load_tags!
+    changes = []
+    (MasterCourses::ALLOWED_CONTENT_TYPES - ['AssignmentGroup']).each do |klass|
+      item_scope = case klass
+      when 'Attachment'
+        @course.attachments
+      when 'WikiPage'
+        @course.wiki.wiki_pages
+      else
+        klass.constantize.where(:context_id => @course, :context_type => 'Course')
+      end
+
+      item_scope.where('updated_at>?', cutoff_time).each do |asset|
+        action = if asset.respond_to?(:deleted?) && asset.deleted?
+          :deleted
+        elsif asset.created_at > cutoff_time
+          :created
+        else
+          :updated
+        end
+        tag = @template.cached_content_tag_for(asset)
+        locked = !!tag&.restrictions&.values&.any?
+        changes << changed_asset_json(asset, action, locked)
       end
     end
 
@@ -518,7 +557,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     end
 
     master_tags.inject(Set.new) do |ids, tag|
-      ids << tag.migration_id if tag.restrictions.values.any?
+      ids << tag.migration_id if tag.restrictions&.values&.any?
       ids
     end
   end
