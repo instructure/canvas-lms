@@ -410,7 +410,7 @@ es:
       add_course_link: "Nuevo curso"
       add_user_button: "Agregar usuario"
       add_user_link: "Nuevo usuario"
-      display_name_help: "Las personas verán este nombre en debates, mensajes y comentarios."
+      display_name_help: "Las personas verán este nombre en foros, mensajes y comentarios."
       full_name_description: "Este nombre será usado por los profesores para la calificación."
       labels: 
         account_id: Subcuenta
@@ -1301,7 +1301,7 @@ es:
       account_reports: 
         unused_courses: 
           main: 
-            text: "Este informe muestra todos los cursos que no tienen ninguno de los siguientes elementos: tareas, anuncios, debates, archivos, módulos, páginas o evaluaciones."
+            text: "Este informe muestra todos los cursos que no tienen ninguno de los siguientes elementos: tareas, anuncios, foros, archivos, módulos, páginas o evaluaciones."
     update_failed_notice: "Configuraciones de actualización de cuenta falló"
     user_access_csv_parameters: 
       account_reports: 
@@ -4222,7 +4222,7 @@ es:
     module_unlocked: Desbloqueado
     optgroup: 
       assignments: Tareas
-      discussion_topics: Debates
+      discussion_topics: Foros
       external_tools: "Herramientas externas"
       external_urls: "URL externas"
       files: Archivos
@@ -4615,7 +4615,7 @@ es:
   course_copy_name: "Copiar curso de Canvas"
   course_copy_no_course_error: "No se ha encontrado el curso original."
   course_copy_not_allowed_error: "No tiene permiso para copiar el curso original."
-  course_discussions_38c0b74f: "Debates del curso"
+  course_discussions_38c0b74f: "Foros del curso"
   course_ends_at_e8b166df: "El curso termina el"
   course_exports: 
     errors: 
@@ -5127,7 +5127,7 @@ es:
         account_id: Subcuenta
         allow_student_discussion_editing: "Permitir que los alumnos editen o eliminen sus propias publicaciones en los debates"
         allow_student_discussion_topics: "Permitir que los usuarios creen temas de debate"
-        allow_student_forum_attachments: "Permitir que los alumnos adjunten archivos a los debates"
+        allow_student_forum_attachments: "Permitir que los alumnos adjunten archivos a los foros"
         allow_student_organized_groups: "Permitir que los alumnos organicen sus propios grupos"
         blueprint: "Habilitar curso como Curso de proyectos"
         blueprint_course: "Curso de heliografía"
@@ -5221,7 +5221,7 @@ es:
       headings: 
         current_users: "Usuarios actuales"
       help: 
-        reset_course_content: "Si reconfigura el contenido del curso se eliminarán permanentemente todas las tareas, debates, evaluaciones, módulos, rúbricas, páginas, archivos, resultados del aprendizaje, banco de preguntas, colaboraciones, conferencias y cualquier otro contenido. Esta acción es irreversible y la información *no puede* recuperarse. ¿Está seguro que desea continuar?"
+        reset_course_content: "Si reconfigura el contenido del curso se eliminarán permanentemente todas las tareas, foros, evaluaciones, módulos, rúbricas, páginas, archivos, resultados del aprendizaje, banco de preguntas, colaboraciones, conferencias y cualquier otro contenido. Esta acción es irreversible y la información *no puede* recuperarse. ¿Está seguro que desea continuar?"
       links: 
         calendar: "Calendario del curso"
         conclude: "Finalizar este curso"
@@ -5297,7 +5297,7 @@ es:
       course_rubrics: "Rúbricas del curso"
       discussion_posts: "Mensajes del debate"
       discussion_topic: "Tema de debate"
-      discussions: Debates
+      discussions: Foros
       file_count: 
         one: 1 archivo
         other: "%{count} archivos"
@@ -5314,7 +5314,7 @@ es:
         uploaded_files: "Archivos cargados"
       new: Nuevo
       new_discussion_entries: "Nuevas respuestas en el debate"
-      new_discussions: "Nuevos debates"
+      new_discussions: "Nuevos foros"
       number_of_assignments: "# Tareas"
       number_of_submissions: "# Presentaciones"
       page_title: "Estadísticas del curso"
@@ -5407,7 +5407,7 @@ es:
     confirmation: Confirmación
     copy_course: "Copiar el curso"
     developer_keys: "Claves del desarrollador"
-    discussions: Debates
+    discussions: Foros
     eportfolio_welcome: "Bienvenido a su ePortfolio"
     error_reports: "Informes de error"
     files: Archivos
@@ -5556,10 +5556,10 @@ es:
       other: "Expandir %{count} mensajes de conversaciones"
     discussions_collapse: 
       one: "Colapsar %{count} debate"
-      other: "Colapsar %{count} debates"
+      other: "Colapsar %{count} foros"
     discussions_expand: 
       one: "Expandir %{count} debate"
-      other: "Expandir %{count} debates"
+      other: "Expandir %{count} foros"
     show_more_link: 
       show_less: "Mostrar menos"
       show_more: "Mostrar más"
@@ -5954,13 +5954,13 @@ es:
       user_unsubscribed: "No está suscrito a este tema. Haga clic aquí para suscribirse."
     discussion_feed_title: "Canal de debate %{title}"
     discussion_list: 
-      no_pinned_discussions: "Actualmente no tiene debates anclados"
+      no_pinned_discussions: "Actualmente no tiene foros anclados"
       pinned_instructions: "Para anclar un debate en la parte superior de la página, arrastre un debate aquí o seleccione Anclar en el menú de configuración de debates."
-      there_are_no_discussions_show: "No hay debates que mostrar en esta sección."
+      there_are_no_discussions_show: "No hay foros que mostrar en esta sección."
     discussions_settings_view: 
       allow_student_discussion_editing: "Editar y eliminar sus propias publicaciones"
       allow_student_topics: "Crear temas de debate"
-      attach_files: "Adjuntar archivos a los debates"
+      attach_files: "Adjuntar archivos a los foros"
       manually_mark_as_read: "Marcar manualmente los comentarios como leídos"
       my_settings: "Mi configuración"
       student_settings: "Configuración de los alumnos"
@@ -6021,12 +6021,12 @@ es:
     group_discussion_locked: "Los alumnos ya han realizado presentaciones para este debate, por lo que no se puede cambiar la configuración de grupo."
     group_discussion_title: "Debate grupal"
     index: 
-      course_discussions_atom_feed_title: "Canal de debate de Atom del curso"
+      course_discussions_atom_feed_title: "Canal de foro de Atom del curso"
     index_view: 
       assignments: Tareas
       delete: Eliminar
       discussion_topics: "Temas de debate"
-      edit_settings: "Editar la configuración de los debates"
+      edit_settings: "Editar la configuración de los foros"
       loading: Cargando...
       lock_for_comments: "Buscar comentarios"
       make_sure_all_search_terms_are_spelled_correctly: "Asegurarse de que todos los términos de búsqueda están escritos correctamente."
@@ -6144,8 +6144,8 @@ es:
     deleted_entry: 
       deleted: "Eliminada por *%{editor_name}* el %{edited_at}"
     discussion_participant: "Participante del debate"
-    discussions: Debates
-    edit_settings: "Editar la configuración de los debates"
+    discussions: Foros
+    edit_settings: "Editar la configuración de los foros"
     entry_collection_view: 
       add_reply_to_topic: "Agregar respuesta al tema"
     entry_content: 
@@ -6183,7 +6183,7 @@ es:
     ordered_by_recent_activity: "Ordenado por actividad reciente"
     participant: 
       anonymous_user: Anónimo
-    pinned_discussions: "Debates anclados"
+    pinned_discussions: "Foros anclados"
     reply: 
       saving_reply: "Guardando la respuesta..."
     reply_attachment: 
@@ -6214,7 +6214,7 @@ es:
     unsubscribe: "Cancelar la suscripción a este tema"
     unsubscribed: "No suscripto"
     unsubscribed_hint: "No está suscripto a este tema. Haga clic aquí para suscribirse."
-  discussions_a5f96392: Debates
+  discussions_a5f96392: Foros
   discussions_tutorial_tray_4ef79bcc: "Bandeja de tutoriales: foros"
   dismiss_dacdb625: Descartar
   display_all_text_links_in_canvas_as_underlined_tex_e698e714: "Mostrar todos los enlaces de texto en lCanvas *como texto subrayado*."
@@ -7233,8 +7233,8 @@ es:
   filter_by_ip_address_40965f66: "Filtrar por dirección de IP"
   filter_by_name_34cbe139: "Filtrar por nombre"
   filter_by_student_name_or_secondary_id_83dc524f: "Filtrado por nombre de alumno o ID secundario"
-  filter_discussions_by_assignments_757924ed: "filtrar debates por tareas"
-  filter_discussions_by_unread_6c48322: "filtrar debates por no leídos"
+  filter_discussions_by_assignments_757924ed: "filtrar foros por tareas"
+  filter_discussions_by_unread_6c48322: "filtrar foros por no leídos"
   filter_e3398407: Filtro
   filter_ip_addresses_2f296bd2: "Filtrar por direcciones de IP"
   filter_replies_by_unread_342e8e90: "Filtrar respuestas por no leídas"
@@ -8116,7 +8116,7 @@ es:
     name_required: "Nombre obligatorio"
     name_too_long: "Introduzca un nombre de grupo más corto"
     tabs: 
-      discussions: Debates
+      discussions: Foros
       files: Archivos
       home: "Página de inicio"
       pages: Páginas
@@ -8164,7 +8164,7 @@ es:
   group_name_group_calendar_7f10e0ed: "%{group_name}-Calendario del grupo"
   group_name_group_collaborations_49b5dcd7: "%{group_name}-Colaboraciones del grupo"
   group_name_group_conferences_8b01695f: "%{group_name}-Conferencias del grupo"
-  group_name_group_discussions_8e509286: "%{group_name}-Debates del grupo"
+  group_name_group_discussions_8e509286: "%{group_name}-Foros del grupo"
   group_name_group_files_f8b0c078: "%{group_name}-Archivos del grupo"
   group_name_group_home_21f8a655: "%{group_name}-Página de inicio del grupo"
   group_name_group_pages_def16554: "%{group_name}-Páginas del grupo"
@@ -8248,7 +8248,7 @@ es:
       buttons: 
         create: "Crear grupo"
       course_groups: "Grupos del curso"
-      group_explanation: "Los grupos son un buen lugar para colaborar en proyectos o para establecer calendarios para sesiones de estudio y otras. Todos los grupos tienen un calendario, un wiki, debates, y un poco de espacio para almacenar archivos. Los grupos pueden colaborar en documentos, o programar conferencias en línea. En realidad es un mini-curso donde puede trabajar con un número más pequeño de alumnos o en un proyecto más enfocado."
+      group_explanation: "Los grupos son un buen lugar para colaborar en proyectos o para establecer calendarios para sesiones de estudio y otras. Todos los grupos tienen un calendario, un wiki, foros, y un poco de espacio para almacenar archivos. Los grupos pueden colaborar en documentos, o programar conferencias en línea. En realidad es un mini-curso donde puede trabajar con un número más pequeño de alumnos o en un proyecto más enfocado."
       groups_disabled: "Grupos organizados por estudiantes han sido desactivados para este curso, entonces solo tendrá los grupos creados por el maestro para usted."
       headings: 
         available_groups: "Grupos disponibles"
@@ -8515,7 +8515,7 @@ es:
   groups_6c90e26a: Grupos
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
       Los grupos son ideales para colaborar en proyectos o para determinar horarios para sesiones de estudio
-      y similares.  Cada grupo tiene un calendario, un wiki, debates y cierto espacio para guardar
+      y similares.  Cada grupo tiene un calendario, un wiki, foros y cierto espacio para guardar
       archivos. Los grupos pueden colaborar en documentos o incluso programar conferencias en línea.
       En realidad es como un minicurso en el que puede trabajar con una cantidad inferior de alumnos para centrarse
       más en un proyecto determinado.
@@ -8580,7 +8580,7 @@ es:
       conversation_details: "Detalles de la conversación"
       conversation_label: "Visite las conversaciones"
       discussion_details: "Detalles del debate"
-      discussion_label: "Visite los debates del curso"
+      discussion_label: "Visite los foros del curso"
       peer_review_details: "Detalles de la revisión entre pares"
       peer_review_label: "Visite las revisiones entre pares del curso"
       x_more: "%{x} más..."
@@ -8594,8 +8594,8 @@ es:
         one: "*1* mensaje de conversación"
         other: "*%{count}* mensajes de conversación"
       x_new_in_discussions: 
-        one: "*1* debate"
-        other: "*%{count}* debates"
+        one: "*1* foro"
+        other: "*%{count}* foros"
       x_new_in_peer_reviews: 
         one: "*1* revisión entre pares"
         other: "*%{count}* revisiones entre pares"
@@ -11940,7 +11940,7 @@ es:
       communication: Conversaciones
       conferences: Conferencias
       course: "Actividades del curso"
-      discussions: Debates
+      discussions: Foros
       groups: Grupos
       one: Otro
       other: Otro
@@ -12353,7 +12353,7 @@ es:
   people_b4ebb13c: Personas
   people_options_cfb419a6: "Opciones de personas"
   people_tutorial_tray_a87a6c48: "Bandeja de tutoriales: personas"
-  people_will_see_this_name_in_discussions_messages__fca9ebb2: "Otros verán este nombre en los debates, mensajes y comentarios."
+  people_will_see_this_name_in_discussions_messages__fca9ebb2: "Otros verán este nombre en los foros, mensajes y comentarios."
   percent_448ea947: porcentaje
   percent_complete_3a7edc20: "%{percent} completo"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Porcentaje de respuestas que seleccionaron esta respuesta"
@@ -12880,7 +12880,7 @@ es:
   post_grades_to_name_e0554f64: "Publicar calificaciones en %{name}"
   post_grades_to_posttosisname_70430da4: "Publicar calificaciones en %{postToSISName}"
   post_grades_to_sis_97ece878: "Publicar calificaciones en SIS"
-  post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "La casilla de verificación de \"Publicar las calificaciones en el SIS\" está activada de forma predeterminada para las tareas, debates graduados y cuestionarios"
+  post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "La casilla de verificación de \"Publicar las calificaciones en el SIS\" está activada de forma predeterminada para las tareas, foros graduados y cuestionarios"
   posted_at_4cfce2c3: "%{posted_at}"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: "Evaluación de las prácticas"
@@ -13031,7 +13031,7 @@ es:
         expires_at: "dejar en blanco para que no expire"
         language: "Esto anulará las configuraciones de cualquier navegador o cuenta."
         name: "Este nombre será usado por los profesores para las calificaciones."
-        short_name: "Otros verán este nombre en los debates, mensajes y comentarios."
+        short_name: "Otros verán este nombre en los foros, mensajes y comentarios."
         sortable_name: "Este nombre aparece en listas clasificables."
       labels: 
         change_password: "Cambiar contraseña"
@@ -14954,11 +14954,11 @@ es:
       manage_user_observers: "Gestionar observadores para los usuarios"
       manage_wiki: "Manejar las wiki (agregar / editar / borrar páginas)"
       managed_jobs: "Manejar los trabajos del fondo"
-      moderate_form: "Moderar debates (eliminar/editar otras contribuciones, bloquear temas)"
-      post_to_forum: "Publicar a debates"
+      moderate_form: "Moderar foros (eliminar/editar otras contribuciones, bloquear temas)"
+      post_to_forum: "Publicar a foros"
       read_course_content: "Ver contenido del curso"
       read_course_list: "Ver la lista de los cursos"
-      read_forum: "Ver los debates"
+      read_forum: "Ver los foros"
       read_messages: "Ver las notificaciones enviadas a los usuarios"
       read_question_banks: "Ver y enlazar todos los bancos de preguntas"
       read_reports: "Ver los informes de uso para este curso"
@@ -15878,7 +15878,7 @@ es:
         dashboard: Tablero
         skip_to_content: "Saltar al contenido"
     no_recent_activity: 
-      empty_stream_message: "No tiene mensajes que mostrar aún en su stream. Una vez comience a participar en sus cursos verá este stream llenarse de mensajes de los debates, actualizaciones de calificaciones, mensajes privados entre usted y otros usuarios, etc. "
+      empty_stream_message: "No tiene mensajes que mostrar aún en su stream. Una vez comience a participar en sus cursos verá este stream llenarse de mensajes de los foros, actualizaciones de calificaciones, mensajes privados entre usted y otros usuarios, etc. "
       no_recent_messages: "No hay Mensajes Recientes"
     pending_enrollment: 
       designer: "%{course} como diseñador."
@@ -16179,7 +16179,7 @@ es:
         assignments_page: "Haga clic para insertar un enlace a la página de tareas"
         collaborations_page: "Hacer clic para insertar un enlace a la página de colaboraciones"
         discussions: "Haga clic para insertar un enlace a este tema"
-        discussions_page: "Haga clic para insertar un enlace a la página de debates"
+        discussions_page: "Haga clic para insertar un enlace a la página de foros"
         files_page: "Haga clic para insertar un enlace a la página de archivos"
         grades_page: "Haga clic para insertar un enlace a la página de calificaciones"
         modules: "Haga clic para insertar un enlace a este módulo"
@@ -16198,7 +16198,7 @@ es:
         assignments_page: "Lista de tareas"
         collaborations_page: Colaboraciones
         discussions: "Índice de debates"
-        discussions_page: "Índice de debates"
+        discussions_page: "Índice de foros"
         files_page: "Índice de archivos"
         find_on_flickr: "Encontrar imágenes en flickr creative commons"
         grades_page: Calificaciones
@@ -16214,7 +16214,7 @@ es:
       links_to: 
         announcements: Anuncios
         assignments: Tareas
-        discussions: Debates
+        discussions: Foros
         modules: Módulos
         nav: 
           course: "Navegación del curso"
@@ -16282,7 +16282,7 @@ es:
   show_student_names_dcb40934: "Mostrar los nombres de los estudiantes"
   show_sub_accounts_for_account_name_fa71a658: "Mostrar subcuentas de %{account_name}"
   showing_all_announcements_36ff0cec: "Mostrando todos los anuncios"
-  showing_all_discussions_7e09f4b7: "Mostrando todas las debates"
+  showing_all_discussions_7e09f4b7: "Mostrando todas los foros"
   showing_all_sets_of_grading_periods_6c160874: "Se muestran todos los conjuntos de los períodos de calificación."
   shuffle_answers_edb602b7: "Mezclar aleatoriamente las respuestas"
   signup_type_8b4506f3: "Tipo de registro"
@@ -16816,7 +16816,7 @@ es:
     course_assignments: "Tareas del curso"
     course_grades: "Calificaciones del curso"
     course_settings: "Configuración del curso"
-    discussions: Debates
+    discussions: Foros
     eportfolios: ePortfolios
     files: Archivos
     grades: Calificaciones
@@ -17341,7 +17341,7 @@ es:
     assignments: Tareas
     come_back_later: "Marcó esta pregunta para regresar a ella"
     discussion: Debate
-    discussions: Debates
+    discussions: Foros
     error_reports: "Informes de error"
     learning_outcomes: "Resultados del aprendizaje"
     messages: Mensajes
@@ -18362,7 +18362,7 @@ es:
       por escrito de su institución. Consulte a su institución para obtener directrices
       específicas en línea en lo referido a acuerdos de usuario.
   you_may_not_see_all_comments_right_now_because_the_96cf2051: "Es posible que no vea todos los comentarios ahora porque la tarea está siendo calificada en este momento."
-  you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Es posible que desee asignar alguna AP para que le ayude con este curso. Las AP pueden calificar las entregas de los alumnos, ayudar a moderar los debates e incluso actualizar las fechas límite y detalles de las tareas por usted."
+  you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Es posible que desee asignar alguna AP para que le ayude con este curso. Las AP pueden calificar las entregas de los alumnos, ayudar a moderar los foros e incluso actualizar las fechas límite y detalles de las tareas por usted."
   you_must_agree_to_the_terms_99723f97: "Debe aceptar estos términos"
   you_must_allow_at_least_one_appointment_per_partic_c142139c: "Debe al menos asignar un turno por participante."
   you_must_allow_at_least_one_appointment_per_time_s_76e22300: "Debe al menos asignar un turno por intervalo de tiempo."
