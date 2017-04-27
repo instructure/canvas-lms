@@ -1126,23 +1126,26 @@ describe "Default Account Reports" do
       it 'should run user_observer provisioning report' do
         parameters = {}
         parameters["user_observers"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 0})
-        expect(parsed[0]).to eq [@user1.id.to_s, "user_sis_id_01",
-                                 @user2.id.to_s, "user_sis_id_02", "active", 'true']
-        expect(parsed[1]).to eq [@user3.id.to_s, "user_sis_id_03",
-                                 @user4.id.to_s, "user_sis_id_04", "active", 'true']
-        expect(parsed[2]).to eq [@user6.id.to_s, nil,
-                                 @user7.id.to_s, nil, "active", 'false']
-        expect(parsed.length).to eq 3
+        parsed = read_report("provisioning_csv", {params: parameters, order: 0, header: true})
+        expect(parsed[0]).to eq ['canvas_observer_id', 'observer_id', 'canvas_student_id',
+                                 'student_id', 'status', 'created_by_sis']
+        expect(parsed[1]).to eq [@user2.id.to_s, "user_sis_id_02",
+                                 @user1.id.to_s, "user_sis_id_01", "active", 'true']
+        expect(parsed[2]).to eq [@user4.id.to_s, "user_sis_id_04",
+                                 @user3.id.to_s, "user_sis_id_03", "active", 'true']
+        expect(parsed[3]).to eq [@user7.id.to_s, nil,
+                                 @user6.id.to_s, nil, "active", 'false']
+        expect(parsed.length).to eq 4
       end
 
       it 'should run user_observer sis_export report' do
         parameters = {}
         parameters["user_observers"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
-        expect(parsed[0]).to eq ["user_sis_id_01", "user_sis_id_02", "active"]
-        expect(parsed[1]).to eq ["user_sis_id_03", "user_sis_id_04", "active"]
-        expect(parsed.length).to eq 2
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0, header: true})
+        expect(parsed[0]).to eq ['observer_id', 'student_id', 'status']
+        expect(parsed[1]).to eq ["user_sis_id_02", "user_sis_id_01", "active"]
+        expect(parsed[2]).to eq ["user_sis_id_04", "user_sis_id_03", "active"]
+        expect(parsed.length).to eq 3
       end
 
     end
