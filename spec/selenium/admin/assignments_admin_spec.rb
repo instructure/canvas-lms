@@ -13,9 +13,8 @@ describe "assignments" do
 
     it "should not show google docs tab for masquerading admin" do
       PluginSetting.create!(:name => 'google_drive', :settings => {})
-      masquerade_url = "/users/#{@student.id}/masquerade"
-      get masquerade_url
-      expect_new_page_load { f('a[href="' + masquerade_url + '"]').click }
+      get "/users/#{@student.id}/masquerade"
+      expect_new_page_load { f('.masquerade_button').click }
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       wait_for_ajaximations

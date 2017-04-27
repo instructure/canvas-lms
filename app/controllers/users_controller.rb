@@ -461,23 +461,7 @@ class UsersController < ApplicationController
       return_url = session[:masquerade_return_to]
       session.delete(:masquerade_return_to)
       @current_user.associate_with_shard(@user.shard, :shadow) if PageView.db?
-      if request.referer =~ /.*\/users\/#{@user.id}\/masquerade/
-        return return_to(return_url, dashboard_url)
-      else
-        return return_to(return_url, request.referer || dashboard_url)
-      end
-    else
-      js_bundle :masquerade_modal
-      css_bundle :masquerade_modal
-
-      @page_title = t('Act as %{user_name}', user_name: @user.short_name)
-      js_env masquerade_modal_data: {
-        user: {
-          short_name: @user.short_name,
-          id: @user.id
-        }
-      }
-      render :text => '<div id="masquerade_modal"></div>'.html_safe, :layout => 'layouts/bare'
+      return return_to(return_url, request.referer || dashboard_url)
     end
   end
 

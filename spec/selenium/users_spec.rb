@@ -317,13 +317,12 @@ describe "users" do
       site_admin_logged_in(:name => 'The Admin')
       user_with_pseudonym(:active_user => true, :name => 'The Student')
 
-      masquerade_url = "/users/#{@user.id}/masquerade"
-      get masquerade_url
-      f('a[href="' + masquerade_url + '"]').click
+      get "/users/#{@user.id}/masquerade"
+      f('.masquerade_button').click
       expect(displayed_username).to include('The Student')
 
       bar = f('#masquerade_bar')
-      expect(bar).to include_text 'You are currently acting as'
+      expect(bar).to include_text 'You are currently masquerading'
       bar.find_element(:css, '.stop_masquerading').click
       expect(displayed_username).to eq('The Admin')
     end
