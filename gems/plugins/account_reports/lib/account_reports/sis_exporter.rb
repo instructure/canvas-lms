@@ -625,10 +625,10 @@ module AccountReports
       generate_and_run_report headers do |csv|
         observers.find_each do |observer|
           row = []
-          row << observer.user_id unless @sis_format
-          row << observer.sis_user_id
           row << observer.observer_id unless @sis_format
           row << observer.observer_sis_id
+          row << observer.user_id unless @sis_format
+          row << observer.sis_user_id
           row << observer.state
           row << observer.o_batch_id? unless @sis_format
           csv << row
