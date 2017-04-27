@@ -135,7 +135,7 @@ class Submission < ActiveRecord::Base
     conditions = <<-SQL
       submissions.submission_type IS NOT NULL
       AND (submissions.workflow_state = 'pending_review'
-        OR (submissions.workflow_state = 'submitted'
+        OR (submissions.workflow_state IN ('submitted', 'graded')
           AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)
         )
       )
@@ -150,9 +150,9 @@ class Submission < ActiveRecord::Base
 
     !send("submission_type#{suffix}").nil? &&
     (send("workflow_state#{suffix}") == 'pending_review' ||
-      (send("workflow_state#{suffix}") == 'submitted' &&
-        (send("score#{suffix}").nil? || !send("grade_matches_current_submission#{suffix}"))
-      )
+     (['submitted', 'graded'].include?(send("workflow_state#{suffix}")) &&
+      (send("score#{suffix}").nil? || !send("grade_matches_current_submission#{suffix}"))
+     )
     )
   end
 

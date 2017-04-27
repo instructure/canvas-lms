@@ -2698,10 +2698,49 @@ describe Submission do
       expect(Submission.needs_grading.count).to eq(0)
     end
 
+    it "does include submissions that have been graded but the score was reset to nil" do
+      @assignment.grade_student(@student, grade: '100', grader: @teacher)
+      @assignment.grade_student(@student, grade: nil, grader: @teacher)
+      expect(Submission.needs_grading.count).to eq(1)
+    end
+
     it "does not include submission by non-student user" do
       @student.enrollments.take!.complete
       @course.enroll_user(@student, 'TaEnrollment').accept
       expect(Submission.needs_grading.count).to eq(0)
+    end
+  end
+
+  describe "#needs_grading?" do
+    before :once do
+      @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'asdf')
+    end
+
+    it "returns true for submission that has not been graded" do
+      expect(@submission.needs_grading?).to be true
+    end
+
+    it "returns false for submission that has been graded" do
+      @assignment.grade_student(@student, grade: '100', grader: @teacher)
+      @submission.reload
+      expect(@submission.needs_grading?).to be false
+    end
+
+    it "returns true for submission that has been graded but the score was reset to nil" do
+      @assignment.grade_student(@student, grade: '100', grader: @teacher)
+      @assignment.grade_student(@student, grade: nil, grader: @teacher)
+      @submission.reload
+      expect(@submission.needs_grading?).to be true
+    end
+
+    it "returns true for submission that is pending review" do
+      @submission.workflow_state = 'pending_review'
+      expect(@submission.needs_grading?).to be true
+    end
+
+    it "returns false for submission with nil submission_type" do
+      @submission.submission_type = nil
+      expect(@submission.needs_grading?).to be false
     end
   end
 
