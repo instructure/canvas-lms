@@ -33,13 +33,13 @@ class Linter
   end
 
   def run
-    if skip_wips && wip?
-      puts "WIP detected, #{linter_name} will not run."
+    if git_dir && !Dir.exist?(git_dir)
+      puts "No plugin #{plugin} found"
       exit 0
     end
 
-    if git_dir && !Dir.exist?(git_dir)
-      puts "No plugin #{plugin} found"
+    if skip_wips && wip?
+      puts "WIP detected, #{linter_name} will not run."
       exit 0
     end
 
