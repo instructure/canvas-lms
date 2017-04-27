@@ -2298,22 +2298,14 @@ class User < ActiveRecord::Base
   TAB_EPORTFOLIOS = 3
   TAB_HOME = 4
 
-  def roles(root_account)
+  def roles(root_account, exclude_deleted_accounts = nil)
+    # Don't include roles for deleted accounts and don't cache
+    # the results.
+    return user_roles(root_account, true) if exclude_deleted_accounts
+
     return @roles if @roles
     @roles = Rails.cache.fetch(['user_roles_for_root_account3', self, root_account].cache_key) do
-      roles = ['user']
-
-      enrollment_types = root_account.all_enrollments.where(user_id: self, workflow_state: 'active').distinct.pluck(:type)
-      roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
-      roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
-      roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
-      account_users = root_account.all_account_users_for(self)
-      if account_users.any?
-        roles << 'admin'
-        root_ids = [root_account.id,  Account.site_admin.id]
-        roles << 'root_admin' if account_users.any?{|au| root_ids.include?(au.account_id) }
-      end
-      roles
+      user_roles(root_account)
     end
   end
 
@@ -2844,5 +2836,25 @@ class User < ActiveRecord::Base
     return unless regenerate
     one_time_passwords.scope.delete_all
     Setting.get('one_time_password_count', 10).to_i.times { one_time_passwords.create! }
+  end
+
+  def user_roles(root_account, exclude_deleted_accounts = nil)
+    roles = ['user']
+    enrollment_types = root_account.all_enrollments.where(user_id: self, workflow_state: 'active').distinct.pluck(:type)
+    roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
+    roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
+    roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
+    account_users = root_account.all_account_users_for(self)
+
+    if exclude_deleted_accounts
+      account_users = account_users.select { |a| a.account.workflow_state == 'active' }
+    end
+
+    if account_users.any?
+      roles << 'admin'
+      root_ids = [root_account.id,  Account.site_admin.id]
+      roles << 'root_admin' if account_users.any?{|au| root_ids.include?(au.account_id) }
+    end
+    roles
   end
 end

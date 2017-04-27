@@ -3054,6 +3054,31 @@ describe User do
       @account.account_users.create!(:user => @user, :role => admin_role)
       expect(@user.roles(@account)).to eq %w[user admin root_admin]
     end
+
+    it 'caches results' do
+      sub_account = @account.sub_accounts.create!
+      sub_account.account_users.create!(:user => @user, :role => admin_role)
+      result = @user.roles(@account)
+      sub_account.destroy!
+      expect(@user.roles(@account)).to eq result
+    end
+
+    context 'exclude_deleted_accounts' do
+      it 'does not include admin if user has a sub-account admin user record in deleted account' do
+        sub_account = @account.sub_accounts.create!
+        sub_account.account_users.create!(:user => @user, :role => admin_role)
+        @user.roles(@account)
+        sub_account.destroy!
+        expect(@user.roles(@account, true)).to eq %w[user]
+      end
+
+      it 'does not cache results when exclude_deleted_accounts is true' do
+        sub_account = @account.sub_accounts.create!
+        sub_account.account_users.create!(:user => @user, :role => admin_role)
+        @user.roles(@account, true)
+        expect(@user.roles(@account)).to eq %w[user admin]
+      end
+    end
   end
 
   it "should not grant user_notes rights to restricted users" do

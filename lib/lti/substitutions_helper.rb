@@ -93,7 +93,7 @@ module Lti
       if @user
         context_roles = course_enrollments.each_with_object(Set.new) { |role, set| set.add([*role_map[role.class]].join(",")) }
 
-        institution_roles = @user.roles(@root_account).map { |role| role_map[role] }
+        institution_roles = @user.roles(@root_account, true).map { |role| role_map[role] }
         if Account.site_admin.account_users_for(@user).present?
           institution_roles << role_map['siteadmin']
         end
