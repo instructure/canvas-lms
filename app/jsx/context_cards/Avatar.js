@@ -12,7 +12,10 @@ class Avatar extends React.Component {
       short_name: React.PropTypes.string,
       id: React.PropTypes.string
     }).isRequired,
-    courseId: React.PropTypes.string.isRequired,
+    courseId: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.number
+    ]).isRequired,
     canMasquerade: React.PropTypes.bool.isRequired,
   }
 
@@ -30,17 +33,18 @@ class Avatar extends React.Component {
               userImgUrl={user.avatar_url}
             />
           </Link>
-          <br />
           {
-            canMasquerade && (
+            canMasquerade ? (
               <Typography size="x-small" weight="bold" as="div">
                 <a
                   href={`/courses/${courseId}?become_user_id=${user.id}`}
-                  aria-label={I18n.t('Act as %{name}', { name: user.short_name })}
+                  aria-label={I18n.t('Masquerade as %{name}', { name: user.short_name })}
                 >
-                  {I18n.t('Act as User')}
+                  {I18n.t('Masquerade')}
                 </a>
               </Typography>
+            ) : (
+              null
             )
           }
         </div>

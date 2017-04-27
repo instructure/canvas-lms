@@ -38,7 +38,7 @@ const { object, string, func, shape, bool } = React.PropTypes
             key="masqueradeLink"
             href={`/users/${id}/masquerade`}
           >
-            <span className="screenreader-only">{I18n.t("Act as %{name}", {name})}</span>
+            <span className="screenreader-only">{I18n.t("Masquerade as %{name}", {name})}</span>
             <i className="icon-masquerade" aria-hidden="true"></i>
           </a>
         );

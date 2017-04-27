@@ -1,0 +1,31 @@
+<% content_for :page_title do %><%= t('masquerade_as', 'Masquerade as %{user_name}', :user_name => @user.short_name) %> <% end %>
+
+<% css_bundle :roster_user %>
+<h1 class="screenreader-only"><%= t(:page_title_header, "Masquerade as User") %></h1>
+<div class="user-switch-alert">
+  <% if @user == @real_current_user %>
+    <span class="warning-text"><%= t('are_you_sure_stop', 'Are you sure you want to stop masquerading?') %></span>
+    <% link_text = t('#buttons.unmasquerade', "Stop Masquerading") %>
+  <% else %>
+    <span class="warning-text"><%= t('are_you_sure_start', 'Are you sure you want to masquerade as this user?') %></span>
+    <% link_text = t('#buttons.masquerade', "Masquerade as user") %>
+    <p><%= mt 'details', <<-HEREDOC
+Masquerading is essentially logging in as this user without a password.
+You will be able to take any action as if you were this user, and from other users' points of views,
+it will be as if this user performed them. However, audit logs record the fact that
+**you** were the one that actually performed the actions on behalf of this user.
+HEREDOC
+      %></p>
+  <% end %>
+
+  <div style="float: right">
+    <%= link_to t('#buttons.cancel', "Cancel"), :back %> &nbsp; &nbsp;
+    <%= link_to link_text, user_masquerade_url(@user.id), { :method => :post, :class => 'btn masquerade_button' } %>
+  </div>
+
+  <div style="clear: both; padding-top: 15px"></div>
+
+  <% @read_only = true %>
+  <%= render :partial => 'users/name' %>
+  <%= render :partial => 'users/logins' %>
+</div>
