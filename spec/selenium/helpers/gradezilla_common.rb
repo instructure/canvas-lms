@@ -18,12 +18,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 module GradezillaCommon
-  shared_context 'gradebook_components' do
-    let(:gradebook_settings_cog) { f('#gradebook_settings') }
-    let(:gradebook_view_options_menu) { f('[data-component="ViewOptionsMenu"] button') }
-    let(:notes_option) { f('span [data-menu-item-id="show-notes-column"]') }
-    let(:save_button) { fj('button span:contains("Save")') }
-  end
+
   shared_context 'reusable_course' do
     let(:test_course)       { course_factory(active_course: true) }
     let(:teacher)           { user_factory(active_all: true) }

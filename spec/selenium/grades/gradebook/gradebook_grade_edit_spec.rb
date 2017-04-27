@@ -23,6 +23,8 @@ describe "editing grades" do
   include_context "in-process server selenium tests"
   include GradebookCommon
 
+  let(:grade_page) { Gradebook::MultipleGradingPeriods.new }
+
   before(:once) do
     gradebook_data_setup
   end
@@ -269,20 +271,15 @@ describe "editing grades" do
       @second_assignment.reload
     end
 
-    before(:each) do
-      @page = Gradebook::MultipleGradingPeriods.new
-    end
-
     context 'for assignments with at least one due date in a closed grading period' do
       before(:each) do
         get "/courses/#{@course.id}/gradebook?grading_period_id=0"
-
-        @page.assignment_header_menu(@first_assignment.name).click
+        grade_page.assignment_header_menu(@first_assignment.name).click
       end
 
       describe 'the Curve Grades menu item' do
         before(:each) do
-          @curve_grades_menu_item = @page.assignment_header_menu_item('Curve Grades')
+          @curve_grades_menu_item = grade_page.assignment_header_menu_item('Curve Grades')
         end
 
         it 'is disabled' do
@@ -298,7 +295,7 @@ describe "editing grades" do
 
       describe 'the Set Default Grade menu item' do
         before(:each) do
-          @set_default_grade_menu_item = @page.assignment_header_menu_item('Set Default Grade')
+          @set_default_grade_menu_item = grade_page.assignment_header_menu_item('Set Default Grade')
         end
 
         it 'is disabled' do

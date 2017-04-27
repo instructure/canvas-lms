@@ -18,13 +18,6 @@
 require_relative '../common'
 
 module GradebookCommon
-  shared_context 'gradebook_components' do
-    let(:gradebook_settings_cog) { f('#gradebook_settings') }
-    let(:show_notes) { fj('li a:contains("Show Notes Column")') }
-    let(:save_button) { fj('button span:contains("Save")') }
-    let(:hide_notes) { f(".hide") }
-  end
-
   shared_context 'reusable_course' do
     let(:test_course)       { course_factory(active_course: true) }
     let(:teacher)           { user_factory(active_all: true) }

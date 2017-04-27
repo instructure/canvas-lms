@@ -140,14 +140,14 @@ describe "interaction with grading periods" do
       it 'should list an assignment from a previous grading period', priority: "2", test_course: 381145 do
         user_session(teacher)
         get "/courses/#{test_course.id}/assignments"
-        expect(fj("#assignment_#{assignment.id} a.ig-title")).to include_text('Assignment 1')
+        expect(f("#assignment_#{assignment.id} a.ig-title")).to include_text('Assignment 1')
       end
 
       it 'should list an assignment from a current grading period when due date is updated', priority: "2", test_course: 576764 do
         assignment.update_attributes(due_at: 3.days.from_now(now))
         user_session(teacher)
         get "/courses/#{test_course.id}/assignments"
-        expect(fj("#assignment_#{assignment.id} a.ig-title")).to include_text('Assignment 1')
+        expect(f("#assignment_#{assignment.id} a.ig-title")).to include_text('Assignment 1')
       end
     end
   end

@@ -20,7 +20,6 @@ require_relative '../page_objects/srgb_page'
 
 describe "Screenreader Gradebook" do
   include_context 'in-process server selenium tests'
-  include_context 'gradebook_components'
   include_context 'reusable_course'
   include GradebookCommon
 

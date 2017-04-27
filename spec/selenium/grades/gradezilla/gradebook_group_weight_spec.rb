@@ -20,7 +20,6 @@ require_relative '../page_objects/gradezilla_page'
 
 describe "Gradezilla - group weights" do
   include_context "in-process server selenium tests"
-  include_context "gradebook_components"
   include GradezillaCommon
 
   let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
@@ -35,10 +34,10 @@ describe "Gradezilla - group weights" do
   end
 
   def toggle_group_weight
-    gradebook_settings_cog.click
+    gradezilla_page.settings_cog_select
     set_group_weights.click
     group_weighting_scheme.click
-    save_button.click
+    gradezilla_page.save_button_click
     wait_for_ajax_requests
   end
 

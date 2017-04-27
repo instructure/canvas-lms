@@ -39,6 +39,21 @@ module Gradezilla
     # Menu Items
     MENU_ITEM_SELECTOR = 'span [data-menu-item-id="%s"]'.freeze
 
+    def gradebook_settings_cog
+      f('#gradebook_settings')
+    end
+
+    def gradebook_view_options_menu
+      f('[data-component="ViewOptionsMenu"] button')
+    end
+
+    def notes_option
+      f('span [data-menu-item-id="show-notes-column"]')
+    end
+
+    def save_button
+      fj('button span:contains("Save")')
+    end
 
     def ungradable_selector
       ".cannot_edit"
@@ -58,8 +73,31 @@ module Gradezilla
       f('a', parent_element)
     end
 
+    def menu_container(container_id)
+      selector = '[aria-expanded=true][role=menu]'
+      selector += "[aria-labelledby=#{container_id}]" if container_id
+
+      f(selector)
+    end
+
+    def gradebook_menu_group(name, container: nil)
+      menu_group = ff('[id*=MenuItemGroup]', container).find { |el| el.text.strip =~ /#{name}/ }
+      return unless menu_group
+
+      menu_group_id = menu_group.attribute('id')
+      f("[role=group][aria-labelledby=#{menu_group_id}]", container)
+    end
+
     def student_names
       ff('#gradebook_grid .student-name').map(&:text)
+    end
+
+    def gradebook_menu_options(container)
+      ff('[role*=menuitem]', container)
+    end
+
+    def gradebook_menu(name)
+      ff(".gradebook-menus [data-component]").find { |el| el.text.strip =~ /#{name}/ }
     end
 
     def student_column_menu
@@ -85,6 +123,30 @@ module Gradezilla
     def gradebook_dropdown_menu
       fj(GRADEBOOK_MENU_SELECTOR + ':visible')
     end
+
+    def gp_dropdown
+      f(".grading-period-select-button")
+    end
+
+    def gp_menu_list
+      ff("#grading-period-to-show-menu li")
+    end
+
+    def grade_input(cell)
+      f(".grade", cell)
+    end
+
+    def assignment_header_selector(name)
+      return ASSIGNMENT_HEADER_SELECTOR unless name
+
+      ASSIGNMENT_HEADER_SELECTOR + "[title=\"#{name}\"]"
+    end
+
+    def assignment_header_menu_selector(name)
+      [assignment_header_selector(name), ASSIGNMENT_HEADER_MENU_SELECTOR].join(' ')
+    end
+
+    # actions
 
     def visit(course)
       Account.default.enable_feature!(:gradezilla)
@@ -203,55 +265,12 @@ module Gradezilla
       gradebook_menu_options(menu_container).find { |el| el.text =~ /#{menu_item_name}/ }
     end
 
-    # private
-
-    def gradebook_menu_options(container)
-      ff('[role*=menuitem]', container)
+    def settings_cog_select
+      gradebook_settings_cog.click
     end
 
-    def gradebook_menu(name)
-      ff(".gradebook-menus [data-component]").find { |el| el.text.strip =~ /#{name}/ }
-    end
-
-    def menu_container(container_id)
-      selector = '[aria-expanded=true][role=menu]'
-      selector += "[aria-labelledby=#{container_id}]" if container_id
-
-      f(selector)
-    end
-
-    def gradebook_menu_group(name, container: nil)
-      menu_group = ff('[id*=MenuItemGroup]', container).find { |el| el.text.strip =~ /#{name}/ }
-      return unless menu_group
-
-      menu_group_id = menu_group.attribute('id')
-      f("[role=group][aria-labelledby=#{menu_group_id}]", container)
-    end
-
-    # End Methods for Gradebook Menus
-
-    private
-
-    def gp_dropdown
-      f(".grading-period-select-button")
-    end
-
-    def gp_menu_list
-      ff("#grading-period-to-show-menu li")
-    end
-
-    def grade_input(cell)
-      f(".grade", cell)
-    end
-
-    def assignment_header_selector(name)
-      return ASSIGNMENT_HEADER_SELECTOR unless name
-
-      ASSIGNMENT_HEADER_SELECTOR + "[title=\"#{name}\"]"
-    end
-
-    def assignment_header_menu_selector(name)
-      [assignment_header_selector(name), ASSIGNMENT_HEADER_MENU_SELECTOR].join(' ')
+    def save_button_click
+      save_button.click
     end
   end
 end

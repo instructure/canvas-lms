@@ -16,13 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../helpers/gradebook_common'
+require_relative '../page_objects/gradebook_page'
 
 describe "group weights" do
   include_context "in-process server selenium tests"
-  include_context "gradebook_components"
   include GradebookCommon
 
-  def student_totals()
+  def student_totals
     totals = ff('.total-cell')
     points = []
     for i in totals do
@@ -32,10 +32,10 @@ describe "group weights" do
   end
 
   def toggle_group_weight
-    gradebook_settings_cog.click
+    gradebook_page.settings_cog.click
     set_group_weights.click
     group_weighting_scheme.click
-    save_button.click
+    gradebook_page.save_button_click
     wait_for_ajax_requests
   end
 

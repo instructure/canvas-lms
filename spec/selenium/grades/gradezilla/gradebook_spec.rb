@@ -22,7 +22,6 @@ require_relative '../../helpers/groups_common'
 
 describe "Gradezilla" do
   include_context "in-process server selenium tests"
-  include_context "gradebook_components"
   include GradezillaCommon
   include GroupsCommon
 
