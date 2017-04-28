@@ -1,19 +1,20 @@
 # encoding: UTF-8
 #
-# By Henrik Nyh <http://henrik.nyh.se> 2008-01-30.
-# Free to modify and redistribute with credit.
-
-# modified by Dave Nolan <http://textgoeshere.org.uk> 2008-02-06
-# Ellipsis appended to text of last HTML node
-# Ellipsis inserted after final word break
-
-# modified by Mark Dickson <mark@sitesteaders.com> 2008-12-18
-# Option to truncate to last full word
-# Option to include a 'more' link
-# Check for nil last child
-
-# Copied from http://pastie.textmate.org/342485,
-# based on http://henrik.nyh.se/2008/01/rails-truncate-html-helper
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'nokogiri'
 require 'rdiscount'
@@ -89,6 +90,20 @@ module TextHelper
     end
   end
 
+  # By Henrik Nyh <http://henrik.nyh.se> 2008-01-30.
+  # Free to modify and redistribute with credit.
+
+  # modified by Dave Nolan <http://textgoeshere.org.uk> 2008-02-06
+  # Ellipsis appended to text of last HTML node
+  # Ellipsis inserted after final word break
+
+  # modified by Mark Dickson <mark@sitesteaders.com> 2008-12-18
+  # Option to truncate to last full word
+  # Option to include a 'more' link
+  # Check for nil last child
+
+  # Copied from http://pastie.textmate.org/342485,
+  # based on http://henrik.nyh.se/2008/01/rails-truncate-html-helper
   def truncate_html(input, options={})
     doc = Nokogiri::HTML(input)
     options[:max_length] ||= 250
