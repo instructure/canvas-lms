@@ -407,5 +407,17 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         "html_url"=>"http://www.example.com/courses/#{@master.id}/pages/new-news","locked"=>false}
       ])
     end
+
+    it "limits result size" do
+      Setting.set('master_courses_history_count', '2')
+
+      3.times { |x| @master.wiki.wiki_pages.create! :title => "Page #{x}" }
+
+      json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/unsynced_changes",
+        :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
+        :course_id => @master.to_param, :action => 'unsynced_changes')
+
+      expect(json.length).to eq 2
+    end
   end
 end

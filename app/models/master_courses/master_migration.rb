@@ -122,6 +122,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       @deletions = self.master_template.deletions_since_last_export
       @creations = {} # will be populated during export
       @updates = {}   # "
+      @export_count = 0
     end
     export = self.create_export(type, export_is_primary, :deletions => @deletions)
 
@@ -177,6 +178,8 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   def add_exported_asset(asset)
     return unless last_export_at
+    @export_count += 1
+    return if @export_count > Setting.get('master_courses_history_count', '150').to_i
     set = asset.created_at >= last_export_at ? @creations : @updates
     set[asset.class.name] ||= []
     set[asset.class.name] << master_template.content_tag_for(asset).migration_id

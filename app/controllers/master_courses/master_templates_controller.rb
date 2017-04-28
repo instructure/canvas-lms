@@ -476,7 +476,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     cutoff_time = @template.last_export_started_at
     return render :json => [] unless cutoff_time
 
-    # FIXME there's probably a bookmark thing I can use to paginate this nonsense
+    max_records = Setting.get('master_courses_history_count', '150').to_i
     @template.load_tags!
     changes = []
     (MasterCourses::ALLOWED_CONTENT_TYPES - ['AssignmentGroup']).each do |klass|
@@ -500,7 +500,9 @@ class MasterCourses::MasterTemplatesController < ApplicationController
         tag = @template.cached_content_tag_for(asset)
         locked = !!tag&.restrictions&.values&.any?
         changes << changed_asset_json(asset, action, locked)
+        break if changes.size >= max_records
       end
+      break if changes.size >= max_records
     end
 
     render :json => changes

@@ -309,6 +309,20 @@ describe MasterCourses::MasterMigration do
       end
     end
 
+    it "limits the number of items to track" do
+      Setting.set('master_courses_history_count', '2')
+
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+      run_master_migration
+
+      Timecop.travel(10.minutes.from_now) do
+        3.times { |x| @copy_from.wiki.wiki_pages.create! :title => "Page #{x}" }
+        mm = run_master_migration
+        expect(mm.export_results[:selective][:created]['WikiPage'].length).to eq 2
+      end
+    end
+
     it "should create two exports (one selective and one full) if needed" do
       @copy_to1 = course_factory
       @template.add_child_course!(@copy_to1)
