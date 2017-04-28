@@ -1337,9 +1337,9 @@ caniuse-db@^1.0.30000153, caniuse-db@^1.0.30000187, caniuse-db@^1.0.30000214, ca
   version "1.0.30000632"
   resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000632.tgz#12e3f5c114d19de58e74dec478a327fb2eeb6bcb"
 
-canvas-rce@1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-1.1.2.tgz#59d279e290c5ad6612470b587a379e24f73c9b5c"
+canvas-rce@1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-1.1.5.tgz#3eb33f1bea1ffcbcd380cec1fede55bd2e43406e"
   dependencies:
     aphrodite "^1.1.0"
     bloody-offset "0.0.0"
@@ -1348,14 +1348,14 @@ canvas-rce@1.1.2:
     format-message-generate-id "^5.1.0"
     isomorphic-fetch "2.2.1"
     load-css "0.1.0"
-    react-addons-css-transition-group "15.0.0"
-    react-redux "4.4.1"
+    react-addons-css-transition-group "^0.14.8 || ^15.0.0"
+    react-redux "~4.4.5"
     react-tinymce "0.5.1"
-    redux "3.3.1"
+    redux "~3.5.2"
     redux-batch-middleware "0.2.0"
-    redux-thunk "1.0.3"
+    redux-thunk "~2.1.0"
     scroll-into-view "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab"
-    tinymce "^4.5.3"
+    tinymce "~4.5.3"
     tinymce-light-skin "1.2.2"
 
 "canvas_offline_course_viewer@https://github.com/instructure/canvas_offline_course_viewer.git#1.1.0":
@@ -3747,7 +3747,7 @@ install@~0.1.7:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/install/-/install-0.1.8.tgz#9980ef93e30dfb534778d163bc86ddd472ad5fe8"
 
-instructure-icons@2.2.0, instructure-icons@^2.2.0:
+instructure-icons@2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/instructure-icons/-/instructure-icons-2.2.0.tgz#4106e18536560734fe76d14e658b0664ef0ca7f7"
   dependencies:
@@ -5915,13 +5915,9 @@ rc@~1.1.6:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-addons-css-transition-group@0.14.8:
+react-addons-css-transition-group@0.14.8, "react-addons-css-transition-group@^0.14.8 || ^15.0.0":
   version "0.14.8"
   resolved "https://registry.yarnpkg.com/react-addons-css-transition-group/-/react-addons-css-transition-group-0.14.8.tgz#c7a2279e71095e743c43a3a4583a1e4f1a2dd61d"
-
-react-addons-css-transition-group@15.0.0:
-  version "15.0.0"
-  resolved "https://registry.yarnpkg.com/react-addons-css-transition-group/-/react-addons-css-transition-group-15.0.0.tgz#8abdffae4adcb467ce7b6a99bdeb49f991ae93c4"
 
 react-addons-pure-render-mixin@0.14.8:
   version "0.14.8"
@@ -5970,16 +5966,7 @@ react-modal@1.6.5:
     exenv "1.2.0"
     lodash.assign "^4.2.0"
 
-react-redux@4.4.1:
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-4.4.1.tgz#f0be889d3dff0b9caf9f4e31fdcc0d0b481aa311"
-  dependencies:
-    hoist-non-react-statics "^1.0.3"
-    invariant "^2.0.0"
-    lodash "^4.2.0"
-    loose-envify "^1.1.0"
-
-react-redux@4.4.5:
+react-redux@4.4.5, react-redux@~4.4.5:
   version "4.4.5"
   resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-4.4.5.tgz#f509a2981be2252d10c629ef7c559347a4aec457"
   dependencies:
@@ -6192,23 +6179,11 @@ redux-logger@2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/redux-logger/-/redux-logger-2.6.1.tgz#f558a40e3abd03feaf4e69ace4d71fec09803c74"
 
-redux-thunk@1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-1.0.3.tgz#778aa0099eea0595031ab6b39165f6670d8d26bd"
-
-redux-thunk@2.1.0:
+redux-thunk@2.1.0, redux-thunk@~2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.1.0.tgz#c724bfee75dbe352da2e3ba9bc14302badd89a98"
 
-redux@3.3.1:
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/redux/-/redux-3.3.1.tgz#716df8004786deaf01c93ae396c84fc1041e424b"
-  dependencies:
-    lodash "^4.2.1"
-    lodash-es "^4.2.1"
-    loose-envify "^1.1.0"
-
-redux@3.5.2, redux@^3.2.0:
+redux@3.5.2, redux@^3.2.0, redux@~3.5.2:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/redux/-/redux-3.5.2.tgz#4533745e970b647ec26066a83aa30e9e26faf843"
   dependencies:
@@ -7083,9 +7058,9 @@ tinymce@4.1.9:
   version "4.1.9"
   resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-4.1.9.tgz#7f45780fc9dd8bf47e798d6df02c383f2a713013"
 
-tinymce@^4.5.3:
-  version "4.5.6"
-  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-4.5.6.tgz#3acd9b515331daf3ff4ccd81d544e91630ed0e1b"
+tinymce@~4.5.3:
+  version "4.5.7"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-4.5.7.tgz#e1f5cd286ec3c9977bd672a4c14e496f63bc4fef"
 
 tmp@0.0.28:
   version "0.0.28"
