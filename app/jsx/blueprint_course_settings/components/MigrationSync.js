@@ -41,10 +41,16 @@ export default class MigrationSync extends Component {
     checkMigration: PropTypes.func.isRequired,
     beginMigration: PropTypes.func.isRequired,
     intervalDuration: PropTypes.number,
+    showProgress: PropTypes.bool,
+    willSendNotification: PropTypes.bool,
+    onClick: PropTypes.func
   }
 
   static defaultProps = {
     intervalDuration: 3000,
+    showProgress: true,
+    willSendNotification: false,
+    onClick: null
   }
 
   constructor (props) {
@@ -81,6 +87,10 @@ export default class MigrationSync extends Component {
     }
   }
 
+  componentWillUnmount () {
+    this.clearMigrationInterval()
+  }
+
   clearMigrationInterval () {
     if (this.intId !== null) {
       clearInterval(this.intId)
@@ -90,6 +100,9 @@ export default class MigrationSync extends Component {
 
   handleSyncClick = () => {
     this.props.beginMigration()
+    if (this.props.onClick) {
+      this.props.onClick()
+    }
   }
 
   render () {
@@ -101,8 +114,8 @@ export default class MigrationSync extends Component {
     })
     return (
       <div className="bcs__migration-sync">
-        { isSyncing && (
-          <span className="bcs__migration-sync__loading">
+        { this.props.showProgress && isSyncing && (
+          <div className="bcs__migration-sync__loading">
             <Typography as="p">{I18n.t('Processing')}</Typography>
             <Typography as="p" size="small">{I18n.t('This may take a bit...')}</Typography>
             <Progress
@@ -111,12 +124,15 @@ export default class MigrationSync extends Component {
               valueNow={MigrationStates.getLoadingValue(migrationStatus)}
               valueMax={MigrationStates.maxLoadingValue}
             />
-            <Typography as="p" size="small">
-              {I18n.t('You can leave the page and you will get a notification when the sync process is complete.')}
-            </Typography>
-          </span>
+            {
+              this.props.willSendNotification &&
+                <Typography as="p" size="small">
+                  {I18n.t('You can leave the page and you will get a notification when the sync process is complete.')}
+                </Typography>
+            }
+          </div>
         )}
-        <span style={{float: 'right'}}>
+        <div className="bcs__migration-sync__button">
           <Button
             variant="primary"
             onClick={this.handleSyncClick}
@@ -132,7 +148,7 @@ export default class MigrationSync extends Component {
               {isSyncing ? I18n.t('Syncing...') : I18n.t('Sync')}
             </span>
           </Button>
-        </span>
+        </div>
       </div>
     )
   }
@@ -143,6 +159,7 @@ const connectState = state =>
     'migrationStatus',
     'isLoadingBeginMigration',
     'hasCheckedMigration',
+    'willSendNotification',
   ])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 export const ConnectedMigrationSync = connect(connectState, connectActions)(MigrationSync)

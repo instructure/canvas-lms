@@ -15,6 +15,10 @@
 *
 * You could also import the lower level showAjaxFlashAlert function or
 * the AjaxFlashAlert component if you need more control
+*
+* showAjaxFlashAlert(message, errorOrVariant)
+*  errorOrVariant: if a string, interpreted as the Alert variant,
+*                   otherwise, it's an error object and the variant='error'
 */
 
 import React from 'react'
@@ -35,10 +39,12 @@ class AjaxFlashAlert extends React.Component {
   static propTypes = {
     onClose: React.PropTypes.func.isRequired,
     message: React.PropTypes.string.isRequired,
-    error: React.PropTypes.instanceOf(Error)
+    error: React.PropTypes.instanceOf(Error),
+    variant: React.PropTypes.oneOf('info', 'success', 'warning', 'error')
   }
   static defaultProps = {
-    error: null
+    error: null,
+    variant: 'info'
   }
 
   constructor (props) {
@@ -132,7 +138,7 @@ class AjaxFlashAlert extends React.Component {
 
     return (
       <Alert
-        variant="error"
+        variant={this.props.variant}
         closeButtonLabel={I18n.t('Close')}
         onClose={this.closeAlert}
         isDismissable
@@ -150,7 +156,15 @@ class AjaxFlashAlert extends React.Component {
   }
 }
 
-function showAjaxFlashAlert (message, error = null) {
+function showAjaxFlashAlert (message, errorOrVariant = 'info') {
+  let error = null
+  let variant = 'info'
+  if (typeof errorOrVariant === 'string') {
+    variant = errorOrVariant
+  } else {
+    error = errorOrVariant
+  }
+
   function closeAlert (atNode) {
     ReactDOM.unmountComponentAtNode(atNode)
     atNode.parentElement.removeChild(atNode)
@@ -172,6 +186,7 @@ function showAjaxFlashAlert (message, error = null) {
       <AjaxFlashAlert
         message={message}
         error={error}
+        variant={variant}
         onClose={closeAlert.bind(null, parent)} // eslint-disable-line react/jsx-no-bind
       />, parent
     )

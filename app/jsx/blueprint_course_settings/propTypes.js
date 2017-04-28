@@ -19,7 +19,7 @@
 import React from 'react'
 import MigrationStates from './migrationStates'
 
-const { shape, string, arrayOf, oneOf } = React.PropTypes
+const { shape, string, arrayOf, oneOf, bool } = React.PropTypes
 const propTypes = {}
 
 propTypes.term = shape({
@@ -73,5 +73,15 @@ propTypes.migration = shape({
   changes: propTypes.migrationChangeList,
 })
 propTypes.migrationList = arrayOf(propTypes.migration)
+
+propTypes.unsynchedChange = shape({
+  asset_id: string.isRequired,
+  asset_type: string.isRequired,
+  asset_name: string.isRequired,
+  change_type: string.isRequired,
+  html_url: string.isRequired,
+  locked: bool.isRequired
+})
+propTypes.unsynchedChanges = arrayOf(propTypes.unsynchedChange)
 
 export default propTypes

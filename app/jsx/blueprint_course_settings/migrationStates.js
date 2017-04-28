@@ -34,6 +34,7 @@ const migrationStates = {
 migrationStates.isEndState = state => endStates.includes(state)
 migrationStates.isLoadingState = state => loadingStates.includes(state)
 migrationStates.getLoadingValue = state => loadingStates.indexOf(state) + 1
+migrationStates.isSuccessful = state => state === 'completed'
 migrationStates.maxLoadingValue = loadingStates.length + 1
 
 export default migrationStates

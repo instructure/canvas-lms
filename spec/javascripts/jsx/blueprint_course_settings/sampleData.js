@@ -88,5 +88,31 @@ export default {
         }
       ],
     },
+  ],
+  unsynchedChanges: [
+    {
+      asset_id: '22',
+      asset_type: 'assignment',
+      asset_name: 'Another Discussion',
+      change_type: 'deleted',
+      html_url: '/courses/4/assignments/22',
+      locked: false
+    },
+    {
+      asset_id: '96',
+      asset_type: 'attachment',
+      asset_name: 'Bulldog.png',
+      change_type: 'updated',
+      html_url: '/courses/4/files/96',
+      locked: true
+    },
+    {
+      asset_id: 'page-1',
+      asset_type: 'wiki_page',
+      asset_name: 'Page 1',
+      change_type: 'created',
+      html_url: '/4/pages/page-1',
+      locked: false
+    }
   ]
 }

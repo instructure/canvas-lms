@@ -2,6 +2,7 @@ import I18n from 'i18n!blueprint_settings'
 import React, { Component } from 'react'
 import cx from 'classnames'
 
+import dig from 'jsx/shared/dig'
 import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
 import Typography from 'instructure-ui/lib/components/Typography'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
@@ -11,26 +12,7 @@ import IconUnlockSolid from 'instructure-icons/lib/Solid/IconUnlockSolid'
 
 import propTypes from '../propTypes'
 
-const itemTypeLabels = {
-  assignment: I18n.t('Assignment'),
-  quiz: I18n.t('Quiz'),
-  discussion_topic: I18n.t('Discussion'),
-  wiki_page: I18n.t('Page'),
-  attachment: I18n.t('File'),
-}
-
-const changeTypeLabels = {
-  created: I18n.t('Created'),
-  updated: I18n.t('Updated'),
-  deleted: I18n.t('Deleted'),
-}
-
-const exceptionTypeLabels = {
-  points: I18n.t('Points changed exceptions:'),
-  content: I18n.t('Content changed exceptions:'),
-  due_dates: I18n.t('Due Dates changed exceptions:'),
-  availability_dates: I18n.t('Availability Dates changed exceptions:'),
-}
+import {itemTypeLabels, changeTypeLabels, exceptionTypeLabels} from './labels'
 
 class SyncChange extends Component {
   static propTypes = {
@@ -58,7 +40,7 @@ class SyncChange extends Component {
         <ul className="bcs__history-item__change-exceps__courses">
           {items.map(item => (
             <li key={item.course_id}>
-              {item.term.name} - {item.name}{this.renderSpace()}{item.sis_course_id}{this.renderSpace()}{item.course_code}
+              {dig(item, 'term.name') || ''} - {item.name}{this.renderSpace()}{item.sis_course_id}{this.renderSpace()}{item.course_code}
             </li>
           ))}
         </ul>

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import I18n from 'i18n!blueprint_settings'
 import select from 'jsx/shared/select'
 
 import Typography from 'instructure-ui/lib/components/Typography'
@@ -57,7 +58,7 @@ export default class SyncHistory extends Component {
 
   renderLoading () {
     if (this.props.isLoadingHistory || this.props.isLoadingAssociations) {
-      const title = 'Loading Sync History'
+      const title = I18n.t('Loading Sync History')
       return (
         <div style={{textAlign: 'center'}}>
           <Spinner title={title} />

@@ -31,6 +31,7 @@ export default class BlueprintModal extends Component {
     children: PropTypes.func.isRequired,
     hasChanges: PropTypes.bool,
     isSaving: PropTypes.bool,
+    doneButton: PropTypes.element,
   }
 
   static defaultProps = {
@@ -39,6 +40,7 @@ export default class BlueprintModal extends Component {
     isSaving: false,
     onSave: () => {},
     onCancel: () => {},
+    doneButton: null,
   }
 
   componentDidUpdate (prevProps) {
@@ -73,12 +75,13 @@ export default class BlueprintModal extends Component {
           </div>
         </ModalBody>
         <ModalFooter ref={(c) => { this.footer = c }}>
-          {this.props.hasChanges && !this.props.isSaving ? (
-            <span>
-              <Button onClick={this.props.onCancel}>{I18n.t('Cancel')}</Button>&nbsp;
-              <Button onClick={this.props.onSave} variant="primary">{I18n.t('Save')}</Button>
-            </span>
-          ) : (
+          {this.props.hasChanges && !this.props.isSaving ? [
+            <Button onClick={this.props.onCancel}>{I18n.t('Cancel')}</Button>,
+            <span>&nbsp;</span>,
+            this.props.doneButton
+              ? this.props.doneButton
+              : <Button onClick={this.props.onSave} variant="primary">{I18n.t('Save')}</Button>
+          ] : (
             <Button ref={(c) => { this.doneBtn = c }} onClick={this.props.onCancel} variant="primary">{I18n.t('Done')}</Button>
           )}
         </ModalFooter>

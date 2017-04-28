@@ -135,14 +135,14 @@
 }
 
 .bcs__row {
-  margin: 0.75em 0 1em;
-  border-bottom: 1px solid $ic-border-color;
+  padding: 0.5em 0;
+  border-top: 1px solid $ic-border-color;
 
   & > button:first-child {
     padding: 0 !important;
   }
 
-  &:last-of-type {
+  &:first-child {
     border: none;
   }
 
@@ -304,4 +304,34 @@
       margin: 0;
     }
   }
+}
+
+.bcs__body .bcs__migration-sync .bcs__migration-sync__button { // when sync button is in the sidebar
+  float: right;
+}
+
+.bcs__history-notification {
+  margin-bottom: 1em;
+}
+
+
+.bcs__migration-sync .bcs__migration-sync__loading {
+  margin-bottom: .5em;
+}
+
+/* unsynched changes are a little different than sync history */
+.bcs__history-item__content.bcs__unsynched-change__content {
+  .bcs__history-item__uncynched-changes-grid {
+    left: 25px;
+  }
+  .bcs__history-item__lock-icon {
+    left: 0
+  }
+}
+
+.bcs__unsynched-changes .bcs__history-notification {
+  padding-top: 1em;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 }

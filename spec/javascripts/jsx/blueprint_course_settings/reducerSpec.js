@@ -169,19 +169,19 @@ test('sets hasCheckedMigration to true on BEGIN_MIGRATION_SUCCESS', () => {
   equal(newState.hasCheckedMigration, true)
 })
 
-test('sets isCheckinMigration to true on CHECK_MIGRATION_START', () => {
+test('sets isCheckingMigration to true on CHECK_MIGRATION_START', () => {
   const newState = reduce(actions.checkMigrationStart())
-  equal(newState.isCheckinMigration, true)
+  equal(newState.isCheckingMigration, true)
 })
 
-test('sets isCheckinMigration to false on CHECK_MIGRATION_SUCCESS', () => {
+test('sets isCheckingMigration to false on CHECK_MIGRATION_SUCCESS', () => {
   const newState = reduce(actions.checkMigrationSuccess('queued'))
-  equal(newState.isCheckinMigration, false)
+  equal(newState.isCheckingMigration, false)
 })
 
-test('sets isCheckinMigration to false on CHECK_MIGRATION_FAIL', () => {
+test('sets isCheckingMigration to false on CHECK_MIGRATION_FAIL', () => {
   const newState = reduce(actions.checkMigrationFail())
-  equal(newState.isCheckinMigration, false)
+  equal(newState.isCheckingMigration, false)
 })
 
 test('sets migrationStatus to true on BEGIN_MIGRATION_SUCCESS', () => {
@@ -217,4 +217,38 @@ test('sets isLoadingHistory to false on LOAD_HISTORY_SUCCESS', () => {
 test('sets isLoadingHistory to false on LOAD_HISTORY_FAIL', () => {
   const newState = reduce(actions.loadHistoryFail())
   equal(newState.isLoadingHistory, false)
+})
+
+test('sets isLoadingUnynchedChanges to true on LOAD_UNSYNCHED_CHANGES_START', () => {
+  const newState = reduce(actions.loadUnsynchedChangesStart())
+  equal(newState.isLoadingUnsynchedChanges, true)
+})
+test('sets isLoadingUnynchedChanges to false on LOAD_UNSYNCHED_CHANGES_SUCCESS', () => {
+  const newState = reduce(actions.loadUnsynchedChangesSuccess({}))
+  equal(newState.isLoadingUnsynchedChanges, false)
+})
+test('sets isLoadingUnynchedChanges to alse on LOAD_UNSYNCHED_CHANGES_FAIL', () => {
+  const newState = reduce(actions.loadUnsynchedChangesFail())
+  equal(newState.isLoadingUnsynchedChanges, false)
+})
+
+test('sets hasLoadedUnsynchedChanges to false on LOAD_UNSYNCHED_CHANGES_START', () => {
+  const newState = reduce(actions.loadUnsynchedChangesStart())
+  equal(newState.hasLoadedUnsynchedChanges, false)
+})
+test('sets hasLoadedUnsynchedChanges to true on LOAD_UNSYNCHED_CHANGES_SUCCESS', () => {
+  const newState = reduce(actions.loadUnsynchedChangesSuccess({}))
+  equal(newState.hasLoadedUnsynchedChanges, true)
+})
+
+test('sets unsynchedChanges on LOAD_UNSYNCHED_CHANGES_SUCCESS', () => {
+  const newState = reduce(actions.loadUnsynchedChangesSuccess(sampleData.unsynchedChanges))
+  deepEqual(newState.unsynchedChanges, sampleData.unsynchedChanges)
+})
+
+test('sets willSendNotification on ENABLE_SEND_NOTIFICATION', () => {
+  let newState = reduce(actions.enableSendNotification(true))
+  equal(newState.willSendNotification, true)
+  newState = reduce(actions.enableSendNotification(false))
+  equal(newState.willSendNotification, false)
 })

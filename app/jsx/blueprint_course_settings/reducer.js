@@ -21,9 +21,9 @@ import { handleActions } from 'redux-actions'
 import { actionTypes } from './actions'
 import MigrationStates from './migrationStates'
 
-const identity = (defaultState = null) => {
-  return state => state === undefined ? defaultState : state
-}
+const identity = (defaultState = null) => (
+  state => (state === undefined ? defaultState : state)
+)
 
 export default combineReducers({
   accountId: identity(),
@@ -50,7 +50,7 @@ export default combineReducers({
     [actionTypes.CHECK_MIGRATION_SUCCESS]: () => true,
     [actionTypes.BEGIN_MIGRATION_SUCCESS]: () => true,
   }, false),
-  isCheckinMigration: handleActions({
+  isCheckingMigration: handleActions({
     [actionTypes.CHECK_MIGRATION_START]: () => true,
     [actionTypes.CHECK_MIGRATION_SUCCESS]: () => false,
     [actionTypes.CHECK_MIGRATION_FAIL]: () => false,
@@ -103,4 +103,24 @@ export default combineReducers({
     [actionTypes.SAVE_ASSOCIATIONS_SUCCESS]: () => false,
     [actionTypes.SAVE_ASSOCIATIONS_FAIL]: () => false,
   }, false),
+  isLoadingUnsynchedChanges: handleActions({
+    [actionTypes.LOAD_UNSYNCHED_CHANGES_START]: () => true,
+    [actionTypes.LOAD_UNSYNCHED_CHANGES_SUCCESS]: () => false,
+    [actionTypes.LOAD_UNSYNCHED_CHANGES_FAIL]: () => false,
+  }, false),
+  hasLoadedUnsynchedChanges: handleActions({
+    [actionTypes.LOAD_UNSYNCHED_CHANGES_START]: () => false,
+    [actionTypes.LOAD_UNSYNCHED_CHANGES_SUCCESS]: () => true,
+  }, false),
+  unsynchedChanges: handleActions({
+    [actionTypes.LOAD_UNSYNCHED_CHANGES_SUCCESS]: (state, action) => action.payload
+  }, []),
+  willSendNotification: handleActions({
+    [actionTypes.ENABLE_SEND_NOTIFICATION]: (state, action) => action.payload
+  }, false),
+  errors: (state = [], action) => (
+    action.error
+      ? state.concat([action.payload.message])
+      : state
+  ),
 })

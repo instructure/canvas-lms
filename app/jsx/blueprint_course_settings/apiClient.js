@@ -110,6 +110,9 @@ const ApiClient = {
                 .then(res => Object.assign(mig, { changes: res.data }))
             )))
   },
+  loadUnsynchedChanges ({ course }) {
+    return axios.get(`/api/v1/courses/${course.id}/blueprint_templates/default/unsynced_changes`)
+  },
 }
 
 export default ApiClient
