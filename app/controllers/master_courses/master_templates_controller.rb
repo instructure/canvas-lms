@@ -106,7 +106,7 @@
 #     "description" : "A set of restrictions on editing for copied objects in associated courses",
 #     "properties": {
 #       "content": {
-#         "description": "Restriction on main content (e.g. title, description). Required to be true",
+#         "description": "Restriction on main content (e.g. title, description).",
 #         "example": true,
 #         "type": "boolean"
 #       },
