@@ -23,6 +23,7 @@ module Canvas::Plugins::Validators::LiveEventsValidator
     if settings.map(&:last).all?(&:blank?)
       {}
     else
+      return settings if settings[:use_consul]
       err = false
 
       if settings[:kinesis_stream_name].blank?

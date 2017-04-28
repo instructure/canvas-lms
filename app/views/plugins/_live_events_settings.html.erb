@@ -27,6 +27,12 @@
       </td>
     </tr>
     <tr>
+      <td><%= f.blabel :use_consul, :en => "Configure using Consul instead of this page" %></td>
+      <td>
+        <%= f.check_box :use_consul %>
+      </td>
+    </tr>
+    <tr>
       <td><%= f.blabel :kinesis_stream_name, :en => "Kinesis Stream Name" %></td>
       <td>
         <%= f.text_field :kinesis_stream_name %>

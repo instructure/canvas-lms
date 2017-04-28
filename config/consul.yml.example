@@ -38,3 +38,6 @@ development:
       secret: opensesame
     live-events-subscription-service:
       app-host: http://les.docker
+    live-events:
+      aws_endpoint: http://localhost:4567 # assumes kinesalite is running locally
+      kinesis_stream_name: live-events

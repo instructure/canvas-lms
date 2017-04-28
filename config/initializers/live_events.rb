@@ -20,6 +20,13 @@ Rails.configuration.to_prepare do
   LiveEvents.cache = Rails.cache
   LiveEvents.statsd = CanvasStatsd::Statsd
   LiveEvents.max_queue_size = -> { Setting.get('live_events_max_queue_size', 1000).to_i }
-  LiveEvents.settings = -> { Canvas::Plugin.find(:live_events)&.settings }
+  LiveEvents.settings = -> {
+    plugin_settings = Canvas::Plugin.find(:live_events)&.settings
+    if plugin_settings && Canvas::Plugin.value_to_boolean(plugin_settings['use_consul'])
+      Canvas::DynamicSettings.from_cache('live-events', expires_in: 2.hours)
+    else
+      plugin_settings
+    end
+  }
 end
 

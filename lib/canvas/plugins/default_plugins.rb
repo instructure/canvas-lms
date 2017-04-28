@@ -398,6 +398,7 @@ Canvas::Plugin.register('live_events', nil, {
   :author_website => 'http://www.instructure.com',
   :version => '1.0.0',
   :settings => {
+    :use_consul => false,
     :kinesis_stream_name => nil,
     :aws_access_key_id => nil,
     :aws_secret_access_key => nil,
