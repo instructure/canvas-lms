@@ -3753,9 +3753,9 @@ instructure-icons@2.2.0, instructure-icons@^2.2.0:
   dependencies:
     shortid "2.2.8"
 
-instructure-ui@^1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-1.4.1.tgz#7c39786751274e01b2ceeaa4d06c99f824cd34f8"
+instructure-ui@1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-1.4.2.tgz#946573282b8d69397d0e70831246da9cf6d68825"
   dependencies:
     classnames "2.2.5"
     deep-equal "1.0.1"
